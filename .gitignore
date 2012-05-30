@@ -7,3 +7,6 @@
 /foo.sh
 /bin
 /oscar.properties
+.project
+.settings/
+.classpath
