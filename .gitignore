@@ -8,3 +8,6 @@
 /bin
 /oscar.properties
 velocity.log
+.project
+.settings/
+.classpath
