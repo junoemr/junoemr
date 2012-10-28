@@ -104,4 +104,12 @@ public class ScheduleWs extends AbstractWs {
 		appointmentTransfer.copyTo(appointment);
 		scheduleManager.updateAppointment(appointment);
 	}
+
+	public void updateAppointmentStatusBilled(Integer appointmentNo)
+	{
+		Appointment appointment=scheduleManager.getAppointment(appointmentNo);
+		
+		appointment.setStatus("B");
+		scheduleManager.updateAppointment(appointment);
+	}
 }
