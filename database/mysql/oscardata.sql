@@ -211,7 +211,7 @@ insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportA","O
 insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportA","Oral Surgery");
 insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportA","Orthopedic Surgery");
 insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportA","Osteopathy");
-insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportA","Other Consultant ReportAnt");
+insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportA","Other Consultant");
 insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportA","Other Therapy");
 insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportA","Otolaryngology (ENT)");
 insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportA","Paediatrics");
@@ -237,7 +237,7 @@ insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportA","U
 insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportA","Vascular Surgery");
 
 insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportB","Admission History");
-insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportB","Consultant ReportAtion");
+insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportB","Consultation");
 insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportB","Discharge Summary");
 insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportB","Encounter Report");
 insert into ctl_doc_class (reportclass,subclass) values ("Consultant ReportB","Operative Report");
