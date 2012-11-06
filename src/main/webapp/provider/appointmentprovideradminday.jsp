@@ -30,6 +30,7 @@
 <%@page import="org.oscarehr.common.model.Provider,org.oscarehr.common.model.BillingONCHeader1"%>
 <%@page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
+<%@page import="oscar.OscarProperties"%>
 <%@page import="org.oscarehr.common.dao.UserPropertyDAO, org.oscarehr.common.dao.DemographicDao, org.oscarehr.common.model.Demographic, org.oscarehr.common.model.UserProperty" %>
 <%@ page import="org.oscarehr.common.dao.MyGroupAccessRestrictionDao" %>
 <%@ page import="org.oscarehr.common.model.MyGroupAccessRestriction" %>
@@ -977,11 +978,23 @@ java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.stru
 
 <security:oscarSec roleName="<%=roleName$%>" objectName="_billing" rights="r">
 <li>
-     <%if (vLocale.getCountry().equals("BR")) { %>
+     <%
+     OscarProperties oscarProps = OscarProperties.getInstance();
+     String clinicaid_link = "";
+     if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){
+    	 clinicaid_link = "../billing/billingClinicAid.jsp?billing_action=invoice_reports";
+    	 //Force this link to go to BC billing report
+    	 %>
+    	 <a HREF="#" ONCLICK ="popupPage2('../billing/CA/BC/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;" TITLE='<bean:message key="global.genBillReport"/>' onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message key="global.billing"/></a>
+    	 <%
+     }else{
+     
+     if (vLocale.getCountry().equals("BR")) { %>
        <a HREF="#" ONCLICK ="popupPage2('../oscar/billing/consultaFaturamentoMedico/init.do');return false;" TITLE='<bean:message key="global.genBillReport"/>' onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message key="global.billing"/></a>
      <% } else {%>
 	<a HREF="#" ONCLICK ="popupPage2('../billing/CA/<%=prov%>/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;" TITLE='<bean:message key="global.genBillReport"/>' onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message key="global.billing"/></a>
-     <% } %>
+	<% }
+	}%>
 </li>
 </security:oscarSec>
 
@@ -1811,16 +1824,34 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 <!-- billing code block -->
 <% if (!isWeekView) { %>
 	<security:oscarSec roleName="<%=roleName$%>" objectName="_billing" rights="r">
+	<%
+	OscarProperties oscarProps = OscarProperties.getInstance();
+	String clinicaid_link = "";
+	if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){
+		clinicaid_link = "../billing/billingClinicAid.jsp?demographic_no="+demographic_no+
+						"&service_start_date="+URLEncoder.encode(strYear+"-"+strMonth+"-"+strDay, "UTF-8")+
+						"&appointment_no="+appointment.get("appointment_no")+
+						"&appointment_provider_no="+appointment.get("provider_no")+
+						"&chart_no="+
+						"&appointment_start_time="+appointment.get("start_time");
+						
+	}
+	%>
              <% if(status.indexOf('B')==-1) {
                 //java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.action.Action.LOCALE_KEY);
                 if (vLocale.getCountry().equals("BR")) { %>
                <a href=# onClick='popupPage(700,1024, "../oscar/billing/procedimentoRealizado/init.do?appId=<%=appointment.get("appointment_no")%>");return false;' title="Faturamento">|FAT|</a>
+             <% } else if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){%>
+           	   <a href="<%=clinicaid_link+"&billing_action=create_invoice"%>" target="_blank" title="<bean:message key="global.billing"/>">|<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
              <% } else {%>
               <a href=# onClick='popupPage(755,1200, "../billing.do?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=<%=URLEncoder.encode("")%>&appointment_no=<%=appointment.get("appointment_no")%>&demographic_name=<%=URLEncoder.encode(name)%>&status=<%=status%>&demographic_no=<%=demographic_no%>&providerview=<%=curProvider_no[nProvider]%>&user_no=<%=curUser_no%>&apptProvider_no=<%=curProvider_no[nProvider]%>&appointment_date=<%=year+"-"+month+"-"+day%>&start_time=<%=iS+":"+iSm%>&bNewForm=1");return false;' title="<bean:message key="global.billingtag"/>">|<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
              <% } %>
 <% } else {%>
 	 <%if(caisiBillingPreferenceNotDelete!=null && caisiBillingPreferenceNotDelete.equals("1")) {%>
          <a href=# onClick='onUpdatebill("../billing/CA/ON/billingEditWithApptNo.jsp?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=<%=URLEncoder.encode("")%>&appointment_no=<%=appointment.get("appointment_no")%>&demographic_name=<%=URLEncoder.encode(name)%>&status=<%=status%>&demographic_no=<%=demographic_no%>&providerview=<%=curProvider_no[nProvider]%>&user_no=<%=curUser_no%>&apptProvider_no=<%=curProvider_no[nProvider]%>&appointment_date=<%=year+"-"+month+"-"+day%>&start_time=<%=iS+":"+iSm%>&bNewForm=1");return false;' title="<bean:message key="global.billingtag"/>">|=<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
+	     <% } else if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){%>
+	     	<% /*<a href="<%=clinicaid_link+"&billing_action=delete_invoice&appointment_number"+appointment.get("appointment_no")%->" target="_blank" title="<bean:message key="global.billing"/>">|-<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a> */%>
+	     	<a href="#" title="<bean:message key="global.billing"/>">|-<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
      <% } else { %>
     <a href=# onClick='onUnbilled("../billing/CA/<%=prov%>/billingDeleteWithoutNo.jsp?status=<%=status%>&appointment_no=<%=appointment.get("appointment_no")%>");return false;' title="<bean:message key="global.billingtag"/>">|-<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
 	<% } %>

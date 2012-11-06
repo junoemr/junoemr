@@ -932,12 +932,26 @@ if(wLReadonly.equals("")){
 			</tr>
 			<tr>
 				<td>
-<% if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myFunction() {return false; }" onClick="popupPage(500,600,'../billing/billinghistory.jsp?demographic_no=<%=demographic.getDemographicNo()%>&last_name=<%=URLEncoder.encode(demographic.getLastName())%>&first_name=<%=URLEncoder.encode(demographic.getFirstName())%>&orderby=appointment_date&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=10')">Billing History</a-->
+<%
+
+
+if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myFunction() {return false; }" onClick="popupPage(500,600,'../billing/billinghistory.jsp?demographic_no=<%=demographic.getDemographicNo()%>&last_name=<%=URLEncoder.encode(demographic.getLastName())%>&first_name=<%=URLEncoder.encode(demographic.getFirstName())%>&orderby=appointment_date&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=10')">Billing History</a-->
 				<a
 					href='../oscar/billing/consultaFaturamentoPaciente/init.do?demographic_no=<%=demographic.getDemographicNo()%>'>Hist&oacute;rico
 				do Faturamento</a>
 
-<% } else if("ON".equals(prov)) {%>
+<% } else {
+	if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) &&
+		"AB".equals(prov)){
+		String clinicaid_link = "";
+		clinicaid_link = "../billing/billingClinicAid.jsp?billing_action=invoice_reports";
+		%>
+			<a href="<%=clinicaid_link %>" target="_blank">
+				<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/>
+			</a>
+		<%
+		
+	} else if("ON".equals(prov)) {%>
 				<a href="javascript: function myFunction() {return false; }"
 					onClick="popupPage(500,600,'../billing/CA/ON/billinghistory.jsp?demographic_no=<%=demographic.getDemographicNo()%>&last_name=<%=URLEncoder.encode(demographic.getLastName())%>&first_name=<%=URLEncoder.encode(demographic.getFirstName())%>&orderby=appointment_date&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=10')">
 				<bean:message key="demographic.demographiceditdemographic.msgBillHistory"/></a>
@@ -959,10 +973,37 @@ if(wLReadonly.equals("")){
 
 
 
-<%}%>
+<%
+	}
+}	
+%>
 				</td>
 			</tr>
-<% if (!vLocale.getCountry().equals("BR")) { %>
+<% if (!vLocale.getCountry().equals("BR")) { 
+	if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) &&
+			"AB".equals(prov)){
+		String strYear=""+curYear;
+		String strMonth=curMonth>9?(""+curMonth):("0"+curMonth);
+		String strDay=curDay>9?(""+curDay):("0"+curDay);
+		String newDateString = strYear+"-"+strMonth+"-"+strDay;
+		String clinicaid_link = "";
+		clinicaid_link = "../billing/billingClinicAid.jsp?demographic_no="+demographic.getDemographicNo()+
+				"&service_start_date="+URLEncoder.encode(newDateString, "UTF-8")+
+				"&chart_no="+demographic.getChartNo()+
+				"&appointment_start_time=0"+
+				"&billing_action=create_invoice&appointment_no=0";
+	
+		%>
+			<tr>
+				<td>
+					<a href="<%=clinicaid_link%>" target="_blank" title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>">
+						<bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/>
+					</a>
+				</td>
+			</tr>
+		<%
+	}else{
+%>
 			<tr>
 				<td><a
 					href="javascript: function myFunction() {return false; }"
@@ -1009,7 +1050,9 @@ if(wLReadonly.equals("")){
 				</td>
 			</tr>
 <%      } %>
-<% } %>
+<% } 
+}
+%>
 </security:oscarSec>
 			<tr class="Header">
 				<td style="font-weight: bold"><bean:message

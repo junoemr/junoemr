@@ -426,8 +426,25 @@ div.logoutBox {
 		objectName="_admin,_admin.billing" rights="r" reverse="<%=false%>">
 		<%-- This links doesnt make sense on Brazil. There are other billing engines that we must use for billing --%>
 		<%
-			if (!country.equals("BR"))
-						{
+			Boolean clinicaid_enabled = Boolean.parseBoolean( oscarVariables.getProperty("clinicaid_billing", ""));
+			if(clinicaid_enabled && oscarVariables.getProperty("billregion","").equals("AB")){
+				String clinicaid_link = "/billing/billingClinicAid.jsp?billing_action=invoice_reports";
+				%>
+				<div class="adminBox">
+					<h3>&nbsp;<bean:message key="admin.admin.billing" /></h3>
+					<ul>
+						<li>
+							<a href="<html:rewrite page="/billing/billingClinicAid.jsp?billing_action=invoice_reports"/>" target="_blank">
+								<bean:message key="admin.admin.invoiceRpts"/>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<%
+			}
+		
+			if (!country.equals("BR") && !(clinicaid_enabled && oscarVariables.getProperty("billregion","").equals("AB")))
+			{
 		%>
 		<div class="adminBox">
 		<h3>&nbsp;<bean:message key="admin.admin.billing" /></h3>

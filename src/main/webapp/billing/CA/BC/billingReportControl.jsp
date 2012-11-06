@@ -45,6 +45,7 @@
 	import="java.math.*,java.util.*, java.sql.*, oscar.*, java.net.*"
 	errorPage="errorpage.jsp"%>
 
+<%@page import="oscar.OscarProperties"%>
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean"
 	scope="session" />
 <jsp:useBean id="SxmlMisc" class="oscar.SxmlMisc" scope="session" />
@@ -189,18 +190,26 @@ String billinggroup_no;
 
 <p>&nbsp;</p>
 <% } else {  
+	OscarProperties oscarProps = OscarProperties.getInstance();
+	String prov= (oscarProps.getProperty("billregion","")).trim().toUpperCase();
+	  
+
 if (reportAction.compareTo("unbilled") == 0) {
 %>
 <%@ include file="billingReport_unbilled.jspf"%>
 <%
 } else {
+	if (reportAction.compareTo("billed") == 0) {
+		if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){
 %>
+		<%@ include file="billingReport_billed_clinicaid.jspf"%>
 <%
-if (reportAction.compareTo("billed") == 0) {
+		}else{
 %>
 <%@ include file="billingReport_billed.jspf"%>
 <%
-}else{
+		}
+	}else{
 if (reportAction.compareTo("unsettled") == 0) {
 %>
 <%@ include file="billingReport_unsettled.jspf"%>
@@ -217,7 +226,8 @@ if (reportAction.compareTo("billob") == 0) {
 		}  
   	     }
        }
-       }}
+	}
+}
 %>
 
 

@@ -24,22 +24,26 @@
  */
 -->
 
-<table width="100%" border="2" valign="top">
+
+<%@page import="org.apache.commons.lang.StringUtils"%>
+<%@page import="oscar.OscarProperties"%><table width="100%" border="2" valign="top">
 	<% 
- String dateBegin = request.getParameter("xml_vdate");
-   String dateEnd = request.getParameter("xml_appointment_date");
-   if (dateEnd.compareTo("") == 0) dateEnd = oscar.MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay);
-   if (dateBegin.compareTo("") == 0) dateBegin="1950-01-01"; // set to any early time to start search from beginning
+ String dateBegin = StringUtils.trimToNull(request.getParameter("xml_vdate"));
+   String dateEnd = StringUtils.trimToNull(request.getParameter("xml_appointment_date"));
+   if (dateEnd==null) dateEnd = MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay);
+   if (dateBegin==null) dateBegin="1950-01-01"; // set to any really early time, effectively search everything. 
  ResultSet rs=null ;
   String[] param =new String[3];
   param[0] = request.getParameter("providerview");
  param[1] = dateBegin;
   param[2] = dateEnd;
-  rs = apptMainBean.queryResults(param, "search_unbill_history_daterange");
+  String search_bill_history = "search_bill_history_appointment_daterange";
+
+  rs = apptMainBean.queryResults(param, search_bill_history);
 
   boolean bodd=false;
    nItems=0;
-  String apptStatus="", apptNo="", demoNo = "", demoName="", userno="", apptDate="", apptTime="", reason="";
+  String apptStatus="", apptNo="", demoNo = "", demoName="", userno="", apptDate="", apptTime="", reason="",  note="";
   if(rs==null) {
     out.println("failed!!!"); 
   } else {
@@ -54,13 +58,25 @@
 		<TH align="center" width="20%"><b><font size="2"
 			face="Arial, Helvetica, sans-serif">DESCRIPTION</font></b></TH>
 		<TH align="center" width="10%"><b><font size="2"
-			face="Arial, Helvetica, sans-serif">COMMENTS</font></b></TH>
+			face="Arial, Helvetica, sans-serif">STATUS</font></b></TH>
 	</tr>
 	<%
     while (rs.next()) {
      
       bodd=bodd?false:true; //for the color of rows
       nItems++; //to calculate if it is the end of records
+	/*
+      apptDoctorNo = apptMainBean.getString(rs,"apptProvider_no");
+      apptNo = apptMainBean.getString(rs,"appointment_no");
+      demoNo = apptMainBean.getString(rs,"demographic_no");
+      demoName = apptMainBean.getString(rs,"demographic_name");
+      userno=apptMainBean.getString(rs,"provider_no");
+      apptDate = apptMainBean.getString(rs,"billing_date");
+      apptTime = apptMainBean.getString(rs,"billing_time");
+      reason = apptMainBean.getString(rs,"status");
+      */
+      
+      
       apptNo = apptMainBean.getString(rs,"appointment_no");
       demoNo = apptMainBean.getString(rs,"demographic_no");
       demoName = apptMainBean.getString(rs,"name");
@@ -69,6 +85,26 @@
       apptTime = apptMainBean.getString(rs,"start_time");
       reason = apptMainBean.getString(rs,"reason");
       apptStatus = apptMainBean.getString(rs,"status");
+      
+      /*
+      if (apptDoctorNo.compareTo("none") == 0){
+      note = "No Appt / INR";
+      } 
+      else{
+      if (apptDoctorNo.compareTo(userno) == 0) {
+      note = "With Appt. Doctor";
+      }else{
+      note = "Unmatched Appt. Doctor";
+      }
+      }
+      */
+      /*
+      if (reason.compareTo("N") == 0) reason="Do Not Bill ";
+           if (reason.compareTo("O") == 0) reason="Bill MSP ";
+                if (reason.compareTo("W") == 0) reason="Bill WCB ";
+                     if (reason.compareTo("H") == 0) reason="Capitated Bill ";
+                          if (reason.compareTo("P") == 0) reason="Bill Patient";
+      */
 %>
 	<tr bgcolor="<%=bodd?"#EEEEFF":"white"%>">
 		<TD align="center" width="20%"><b><font size="2"
@@ -78,21 +114,12 @@
 		<TD align="center" width="10%"><b><font size="2"
 			face="Arial, Helvetica, sans-serif"><%=demoName%></font></b></TD>
 		<TD align="center" width="20%"><b><font size="2"
-			face="Arial, Helvetica, sans-serif"><%=reason%> </font></b></TD>
+			face="Arial, Helvetica, sans-serif"><%=reason%></font></b></TD>
 		<TD align="center" width="10%"><b> <font size="2"
-			face="Arial, Helvetica, sans-serif">
-			<%
-            if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){
-            %>
-            <a href="../../../billing/billingClinicAid.jsp?demographic_no=<%=demoNo%>&service_start_date=<%=apptDate%>&appointment_no=<%=apptNo%>&chart_no=&appointment_start_time=<%=apptTime%>&billing_action=create_invoice" target="_blank">Bill |$|</a>
-            <%
-            }else{
-            %>
-			<a href=#
-			onClick='popupPage(700,1000, "../../../billing.do?billRegion=<%=URLEncoder.encode(oscarVariables.getProperty("billregion"))%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=<%=apptNo%>&demographic_name=<%=URLEncoder.encode(demoName)%>&status=<%=apptStatus%>&demographic_no=<%=demoNo%>&user_no=<%=userno%>&apptProvider_no=<%=providerview%>&appointment_date=<%=apptDate%>&start_time=<%=apptTime==null?"00:00:00":apptTime%>&bNewForm=1")'
-			title="<%=reason%>">Bill |$|</a>
-			<% } %>
-			</font></b></TD>
+			face="Arial, Helvetica, sans-serif"><a
+			href="../../../billing/billingClinicAid.jsp?billing_action=invoice_reports"
+			target="_blank"
+			title="<%=reason%>">Billed</a></font></b></TD>
 	</tr>
 	<%  rowCount = rowCount + 1;
     }
@@ -103,5 +130,6 @@
 			face="Arial, Helvetica, sans-serif">No unbill items</font></b></TD>
 	</tr>
 	<% }
+  
 }%>
 </table>

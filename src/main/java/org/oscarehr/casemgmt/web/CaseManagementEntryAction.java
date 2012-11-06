@@ -1981,6 +1981,16 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			}
 
 			String url = "/billing.do?billRegion=" + region + "&billForm=" + defaultView + "&hotclick=&appointment_no=" + appointmentNo + "&demographic_name=" + java.net.URLEncoder.encode(name, "utf-8") + "&amp;status=t&demographic_no=" + demoNo + "&providerview=" + providerview + "&user_no=" + providerNo + "&apptProvider_no=" + apptProvider + "&appointment_date=" + date + "&start_time=" + start_time + "&bNewForm=1" + dxCodes.toString();
+			if(Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", "")) 
+					&& OscarProperties.getInstance().getProperty("billregion","").trim().toUpperCase().equals("AB")){
+				url = "/billing/billingClinicAid.jsp?demographic_no="+demoNo+
+								"&service_start_date="+date+
+								"&appointment_no="+appointmentNo+
+								"&chart_no="+
+								"&appointment_start_time="+start_time+
+								"&billing_action=create_invoice";
+								
+			}
 			logger.debug("BILLING URL " + url);
 			ActionForward forward = new ActionForward();
 			forward.setPath(url);
