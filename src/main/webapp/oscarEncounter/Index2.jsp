@@ -1211,7 +1211,7 @@ function grabEnterGetTemplate(event){
 				<form style="display: inline;" name="ksearch"><select
 					name="channel">
 					<option
-						value="http://resource.oscarmcmaster.org/oscarResource/OSCAR_search/OSCAR_search_results?title="><bean:message
+						value="http://res.oscarmcmaster.org/?SUBMIT=Search&advancedSearchF=0&taglist=&query="><bean:message
 						key="oscarEncounter.Index.oscarSearch" /></option>
 					<option value="http://www.google.com/search?q="><bean:message
 						key="global.google" /></option>

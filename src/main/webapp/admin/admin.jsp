@@ -753,7 +753,6 @@ div.logoutBox {
 		<div class="adminBox">
 		<h3>&nbsp;<bean:message key="admin.admin.misc" /></h3>
 		<ul>
-                    <li><a href="javascript:void(0);" onclick="popupPage(550,800,&quot;<html:rewrite page="/admin/updateDrugref.jsp"/>&quot;);return false;" ><bean:message key="admin.admin.UpdateDrugref"/></a></li>
                     <li><a href="javascript:void(0);" onclick="popupPage(550,800,&quot;<html:rewrite page="/admin/addQueue.jsp"/>&quot;);return false;" ><bean:message key="admin.admin.AddNewQueue"/></a></li>
 			<li><a href="#"
 				onclick='popupPage(550,800,&quot;<html:rewrite page="/admin/displayDocumentCategories.jsp"/>&quot;);return false;'><bean:message key="admin.admin.DocumentCategories"/></a></li>
@@ -858,7 +857,6 @@ div.logoutBox {
 			<% if (OscarProperties.getInstance().isFaxEnabled()) { %>
             <li><a href="#" onclick='popupPage(600, 800,&quot;<html:rewrite page="/admin/faxStatus.do" />&quot;);return false;'><bean:message key="admin.faxStatus.faxStatus" /></a></li>
             <% } %>
-			<li><a href="#" onclick='popupPage(800, 800,&quot;<html:rewrite page="/admin/oscarStatus.do" />&quot;);return false;'><bean:message key="admin.oscarStatus.oscarStatus" /></a></li>
 
             <oscar:oscarPropertiesCheck property="LOGINTEST" value="yes">
             <li><a href="#"

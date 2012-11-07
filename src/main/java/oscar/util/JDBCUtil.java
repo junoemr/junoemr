@@ -96,9 +96,12 @@ public class JDBCUtil
             StreamResult result = new StreamResult(os);
 
             transformer.transform(source, result);
-            MiscUtils.getLogger().debug("Next is to call zip function!");
-            zip z = new zip();
-            z.write2Zip("xml");
+
+			// Skipping this step because it gets quite slow when there are a
+			// lot of forms to be zipped.
+            //MiscUtils.getLogger().debug("Next is to call zip function!");
+            //zip z = new zip();
+            //z.write2Zip("xml");
         }
         catch(Exception e){
             MiscUtils.getLogger().debug(e.getMessage() + "cannot saveAsXML");

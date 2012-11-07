@@ -70,24 +70,6 @@ onLoad="setTimeout('doDocuments()',3000);"
 		<input type="hidden" name="delayed" value="do" />
 	</form>
 	
-	<% if (request.getAttribute("restartOscar") != null) { %>
-		<div style="margin-bottom: 20px;">
-		<em>Oscar is restarting.</em>
-		<div style="colour: black; border: 1px solid black; background-color: lightgrey; padding: 5px; margin: 10px;">
-			<pre><%=request.getAttribute("restartOscar") %></pre>
-		</div>
-		</div>
-	<% } %>
-	
-	<% if (request.getAttribute("rebootServer") != null) { %>
-		<div style="margin-bottom: 20px;">
-		<em>Server is rebooting.</em>
-		<div style="colour: black; border: 1px solid black; background-color: lightgrey; padding: 5px; margin: 10px;">
-			<pre><%=request.getAttribute("rebootServer") %></pre>
-		</div>
-		</div>
-	<% } %>
-
 	<tr class="MainTableTopRow">	
 		<td style="color: white" class="MainTableTopRowRightColumn"><bean:message key="admin.oscarStatus.oscarStatus" /></td>
 	</tr>
@@ -144,28 +126,6 @@ onLoad="setTimeout('doDocuments()',3000);"
 			</div>
 		</td>
 	</tr>
-	<tr class="MainTableTopRow">	
-		<td style="color: white" class="MainTableTopRowRightColumn"><bean:message key="admin.oscarStatus.restart" /></td>
-	</tr>
-	<security:oscarSec roleName="<%=roleName$%>"
-		objectName="_admin,_admin.misc" rights="r" reverse="<%=false%>">
-	<tr>
-		<td>
-			<div style="margin-top: 10px;">
-				<form method="post" action="admincontrol.jsp" name="confirmOscarReboot">
-					<input type="hidden" name="displaymode" value="reboot_confirmation">
-					If you are having issues with Oscar, click the button below to restart Oscar.
-					<br>
-					<input type="submit" name="subbutton" value="REBOOT OSCAR" > 
-					<br>
-					If the server is experiencing problems, click the button below to reboot the server.
-					<br>
-					<input type="submit" name="subbutton" value="REBOOT SERVER" >
-				</form>
-			</div>
-		</td>
-	</tr>
-	</security:oscarSec>
 	
 </table>
 </body>

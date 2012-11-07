@@ -10,7 +10,6 @@
 package oscar.util;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,7 +17,6 @@ import java.io.InputStreamReader;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -45,6 +43,10 @@ public class OscarStatusAction extends Action {
 		
 		String roleName$ = (String)servletRequest.getSession().getAttribute("userrole") + "," + (String)servletRequest.getAttribute("user");
 		
+		/*
+		 * This is being removed because it is dangerous to allow our users
+		 * reboot the program or especially the computer.
+		 *
 		if (roleName$.contains("admin")) {
 			if (servletRequest.getParameter("method") != null && servletRequest.getParameter("method").equalsIgnoreCase("rebootOscar")) {
 				servletRequest.setAttribute("restartOscar",restartOscar());
@@ -52,6 +54,7 @@ public class OscarStatusAction extends Action {
 				servletRequest.setAttribute("rebootServer",rebootServer());
 			} 
 		}
+		*/
 		
 		if (servletRequest.getParameter("delayed") != null) {
 			servletRequest.setAttribute("documentStatusText", documentStorage());
@@ -311,6 +314,8 @@ public class OscarStatusAction extends Action {
 		return output;
 	}
 
+	/* We don't want anyone to do this stuff.
+	 
 	private String restartOscar() 
 	{
 		File f = new File(System.getProperty("java.io.tmpdir") + File.separator + "restartOscar.action");
@@ -337,5 +342,6 @@ public class OscarStatusAction extends Action {
 			return "[An error has been encountered.]\n[" + e.getMessage() + "]\n";
 		}
 	}
+	*/
 	
 }

@@ -502,7 +502,7 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
         using ...
         <br>
         <select name="channel" class="ControlSelect">
-            <option value="http://resource.oscarmcmaster.org/oscarResource/OSCAR_search/OSCAR_search_results?title=">OSCAR search</option>
+            <option value="http://res.oscarmcmaster.org/?SUBMIT=Search&advancedSearchF=0&taglist=&query=">OSCAR search</option>
             <option value="http://www.google.com/search?q=">Google</option>
             <option value="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?SUBMIT=y&CDM=Search&DB=PubMed&term=">Pubmed</option>
             <option value="http://search.nlm.nih.gov/medlineplus/query?DISAMBIGUATION=true&FUNCTION=search&SERVER2=server2&SERVER1=server1&PARAMETER=">Medline Plus</option>
