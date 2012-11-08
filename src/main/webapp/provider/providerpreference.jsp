@@ -209,7 +209,7 @@ function showHideERxPref() {
 	}
 %>
 
-<body bgproperties="fixed"  onLoad="setfocus();showHideBillPref();showHideERxPref();" topmargin="0"leftmargin="0" rightmargin="0" style="font-family:sans-serif">
+<body bgproperties="fixed"  onLoad="setfocus();showHideERxPref();" topmargin="0"leftmargin="0" rightmargin="0" style="font-family:sans-serif">
 	<FORM NAME = "UPDATEPRE" METHOD="post" ACTION="providerupdatepreference.jsp" onSubmit="return(checkTypeInAll())">
 
 		<div style="background-color:<%=deepcolor%>;text-align:center;font-weight:bold">
@@ -478,6 +478,36 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
 
 </script>
 			</tr>
+  <tr>
+    <td class="preferenceLabel">
+      <bean:message key="provider.labelDefaultBillForm"/>:
+	</td>
+    <td class="preferenceValue">
+	  <select name="default_servicetype">
+	    <option value="no">-- no --</option>
+<%
+	if (providerPreference!=null) {
+		String def = providerPreference.getDefaultServiceType();
+		List<Map<String,Object>> resultList = oscarSuperManager.find("providerDao", "list_bills_servicetype", new Object[] {});
+		for (Map bill : resultList) {
+%>
+				<option value="<%=bill.get("servicetype")%>"
+					<%=bill.get("servicetype").equals(def)?"selected":""%>>
+					<%=bill.get("servicetype_name")%></option>
+<%
+		}
+	} else {
+		List<Map<String,Object>> resultList = oscarSuperManager.find("providerDao", "list_bills_servicetype", new Object[] {});
+		for (Map bill : resultList) {
+%>
+		<option value="<%=bill.get("servicetype")%>"><%=bill.get("servicetype_name")%></option>
+<%
+		}
+	}
+%>
+	  </select>
+    </td>
+  </tr>
 
 
 		</table>
@@ -529,36 +559,6 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
 	<a href=# onClick ="showHideBillPref();return false;"><bean:message key="provider.btnBillPreference"/></a>
 <% } %>
     </td>
-  </tr>
-  <tr>
-      <td align="center">
-	  <div id="billingONpref">
-          <bean:message key="provider.labelDefaultBillForm"/>:
-	  <select name="default_servicetype">
-	      <option value="no">-- no --</option>
-<%
-	if (providerPreference!=null) {
-		String def = providerPreference.getDefaultServiceType();
-		List<Map<String,Object>> resultList = oscarSuperManager.find("providerDao", "list_bills_servicetype", new Object[] {});
-		for (Map bill : resultList) {
-%>
-				<option value="<%=bill.get("servicetype")%>"
-					<%=bill.get("servicetype").equals(def)?"selected":""%>>
-					<%=bill.get("servicetype_name")%></option>
-<%
-		}
-	} else {
-		List<Map<String,Object>> resultList = oscarSuperManager.find("providerDao", "list_bills_servicetype", new Object[] {});
-		for (Map bill : resultList) {
-%>
-		<option value="<%=bill.get("servicetype")%>"><%=bill.get("servicetype_name")%></option>
-<%
-		}
-	}
-%>
-	  </select>
-	  </div>
-      </td>
   </tr>
 </security:oscarSec>
 	  <tr>

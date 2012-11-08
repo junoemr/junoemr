@@ -53,7 +53,10 @@
 		<variableExpression><![CDATA["test"]]></variableExpression>
 		<initialValueExpression><![CDATA["test"		]]></initialValueExpression>
 	</variable>
-	<variable name="amtTotal" class="java.lang.Double" resetType="Group" resetGroup="practitioner_no" calculation="Sum">
+	<variable name="payeeTotal" class="java.lang.Double" resetType="Group" resetGroup="practitioner_no" calculation="Sum">
+		<variableExpression><![CDATA[new Double(oscar.oscarBilling.ca.bc.MSP.MSPReconcile.convCurValue($F{t_paidamt}))]]></variableExpression>
+	</variable>
+	<variable name="amtTotal" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[new Double(oscar.oscarBilling.ca.bc.MSP.MSPReconcile.convCurValue($F{t_paidamt}))]]></variableExpression>
 	</variable>
 	<variable name="cnt01" class="java.lang.Double" resetType="Report" calculation="Sum">
@@ -79,12 +82,12 @@
 			</band>
 			</groupHeader>
 			<groupFooter>
-			<band height="19"  isSplitAllowed="true" >
+			<band height="22"  isSplitAllowed="true" >
 				<line direction="TopDown">
 					<reportElement
 						mode="Opaque"
 						x="0"
-						y="17"
+						y="20"
 						width="535"
 						height="0"
 						forecolor="#000000"
@@ -124,7 +127,7 @@
 						x="0"
 						y="3"
 						width="284"
-						height="12"
+						height="16"
 						forecolor="#000000"
 						backcolor="#FFFFFF"
 						key="textField-6"
@@ -138,7 +141,7 @@
 					<textElement textAlignment="Left" verticalAlignment="Top" rotation="None" lineSpacing="Single">
 						<font fontName="Arial" pdfFontName="Helvetica" size="10" isBold="false" isItalic="false" isUnderline="false" isPdfEmbedded ="false" pdfEncoding ="Cp1252" isStrikeThrough="false" />
 					</textElement>
-				<textFieldExpression   class="java.lang.String"><![CDATA["Total for: " +$F{first_name} + " " + $F{last_name}+ ": " + NumberFormat.getCurrencyInstance().format($V{amtTotal})]]></textFieldExpression>
+				<textFieldExpression   class="java.lang.String"><![CDATA["Total for: " +$F{first_name} + " " + $F{last_name}+ ": " + NumberFormat.getCurrencyInstance().format($V{payeeTotal})]]></textFieldExpression>
 				</textField>
 			</band>
 			</groupFooter>

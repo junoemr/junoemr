@@ -26,8 +26,8 @@ package oscar.oscarBilling.ca.bc.pageUtil;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -238,21 +238,17 @@ public class BillingReProcessBillAction extends Action {
 
     try{
 
-      //BillingCodeData bcd = new BillingCodeData();
-      //BillingService billingService = bcd.getBillingCodeByCode(billingServiceCode, new Date());
-      String codePrice = request.getParameter("billingAmount"); //billingService.getValue();
+      String codePrice = request.getParameter("billingAmount");
       logger.debug("codePrice=" + codePrice+" amount on form "+request.getParameter("billingAmount"));
 
       if("E".equals(payment_mode)){
           codePrice = "0.00";
       }
 
-      double dblBillAmount = Double.parseDouble(codePrice);
-      BigDecimal bdFee = new BigDecimal(""+dblBillAmount).setScale(2,RoundingMode.HALF_UP);
+      BigDecimal bdFee = new BigDecimal(codePrice);
+      DecimalFormat decimalFormatter = new DecimalFormat("0.00");
+      billingServicePrice = decimalFormatter.format(bdFee);
 
-
-
-      billingServicePrice = bdFee.toString();
     } catch(NumberFormatException e){
       MiscUtils.getLogger().error("Error", e);
       throw new RuntimeException("BC BILLING - Exception when attempting to multiply Bill Amount by Unit ");

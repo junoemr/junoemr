@@ -26,6 +26,11 @@
 <%
   if (session.getValue("user") == null)
     response.sendRedirect("../../../logout.jsp");
+
+	String protocol = "http://";
+	if(request.isSecure()){
+		protocol = "https://";
+	}
 %>
 <%@taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -121,6 +126,7 @@
 </title>
 <html:base/>
 <link rel="stylesheet" type="text/css" media="all" href="../../../share/calendar/calendar.css" title="win2k-cold-1"/>
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/blitzer/jquery-ui.css"/>
 <script type="text/javascript" src="../../../share/calendar/calendar.js"></script>
 <script type="text/javascript" src="../../../share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>
 <script type="text/javascript" src="../../../share/calendar/calendar-setup.js"></script>
@@ -617,6 +623,7 @@ function checkifSet(icd9,feeitem,extrafeeitem){
 
 </script>
 <link rel="stylesheet" href="../billing/billing.css" type="text/css">
+<link rel="stylesheet" href="../../../css/jquery.autocomplete.css" type="text/css">
 </head>
 <%!
   /**
@@ -1369,7 +1376,50 @@ if(wcbneeds != null){%>
     </tr>
   </table>
 </html:form>
-<p>&nbsp;</p>
-
+<script src="<%=protocol%>www.google.com/jsapi"></script>
+<script>
+	google.load("jquery", "1");
+	google.load("jqueryui", "1");
+</script>
+<script type="text/javascript">
+jQuery.noConflict();
+jQuery(document).ready(function(){
+	jQuery("input[name=xml_refer1]").removeAttr('onkeypress');
+	jQuery("input[name=xml_refer2]").removeAttr('onkeypress');
+	
+	// AJAX autocomplete referrer doctors 
+	jQuery("input[name=xml_refer1]").keypress(function(){
+		jQuery("input[name=xml_refer1]").autocomplete({
+	    	source: "billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+	    	close: function(event, ui){
+	    		jQuery("input[name=xml_refer1]").keypress(function(event){
+	    			return grabEnter(event,'ReferralScriptAttach1()');
+	    		});
+	    	}
+    	});
+	});
+	jQuery("input[name=xml_refer2]").keypress(function(){
+		jQuery("input[name=xml_refer2]").autocomplete({
+	    	source: "billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+	    	close: function(event, ui){
+	    		jQuery("input[name=xml_refer2]").keypress(function(event){
+	    			return grabEnter(event,'ReferralScriptAttach2 ()');
+	    		});
+	    	}
+    	});
+	});
+    <oscar:oscarPropertiesCheck property="BILLING_DX_REFERENCE" value="yes">
+    function getDxInformation(origRequest){
+        var url = "DxReference.jsp";
+        var ran_number=Math.round(Math.random()*1000000);
+        var params = "demographicNo=<%=bean.getPatientNo()%>&rand="+ran_number;  //hack to get around ie caching the page
+        jQuery.get(url+"?"+params, function(data){
+                jQuery('#DX_REFERENCE').html(data);
+        });
+    }
+    getDxInformation();
+    </oscar:oscarPropertiesCheck>
+});
+</script>
 </body>
 </html>

@@ -310,7 +310,7 @@
 
             String[] paramWLPosition = new String[1];
             paramWLPosition[0] = request.getParameter("list_id");
-            if(paramWLPosition[0].compareTo("")!=0){
+            if(!StringUtils.isEmpty(paramWLPosition[0])){
                 ResultSet rsWL = apptMainBean.queryResults(paramWLPosition, "search_waitingListPosition");
 
                 if(rsWL.next()){

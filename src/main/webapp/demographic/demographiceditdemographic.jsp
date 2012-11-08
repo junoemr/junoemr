@@ -58,6 +58,7 @@
 
 <%@ page import="java.util.*, java.sql.*, java.net.*,java.text.DecimalFormat, oscar.*, oscar.oscarDemographic.data.ProvinceNames, oscar.oscarWaitingList.WaitingList, oscar.oscarReport.data.DemographicSets,oscar.log.*"%>
 <%@ page import="org.oscarehr.phr.PHRAuthentication"%>
+<%@ page import="oscar.service.OscarSuperManager"%>
 <%@ page import="oscar.oscarDemographic.data.*"%>
 <%@ page import="oscar.oscarDemographic.pageUtil.Util" %>
 <%@ page import="org.springframework.web.context.*,org.springframework.web.context.support.*" %>
@@ -1003,11 +1004,27 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 			</tr>
 		<%
 	}else{
+
+		// Get Oscar Dao manager
+		OscarSuperManager oscarSuperManager = (OscarSuperManager)ctx.getBean("oscarSuperManager");
+
+		// Get the default service type to use for the billing page. (Service type = Billing form)
+		// If the user has a default selected in thier preferences use it. Otherwise use the 
+		// global default defined in the properties file.
+		String billingServiceType = URLEncoder.encode(oscarVariables.getProperty("default_view"));
+		List<Map<java.lang.String,java.lang.Object>> providerPreferences = oscarSuperManager.find("providerDao", "search_pref_defaultbill", new Object[] {apptMainBean.getString(rs,"provider_no")});
+		if (providerPreferences.size() > 0) 
+		{
+			if ( !String.valueOf(providerPreferences.get(0).get("defaultServiceType")).equals( "no" ) )
+			{
+				billingServiceType = URLEncoder.encode(String.valueOf(providerPreferences.get(0).get("defaultServiceType")));
+			}
+		}
 %>
 			<tr>
 				<td><a
 					href="javascript: function myFunction() {return false; }"
-					onClick="popupPage(700, 1000, '../billing.do?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=1&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=0:00&bNewForm=1&status=t');return false;"
+					onClick="popupPage(700, 1000, '../billing.do?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=billingServiceType%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=1&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=0:00&bNewForm=1&status=t');return false;"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>
 <%      if("ON".equals(prov)) {

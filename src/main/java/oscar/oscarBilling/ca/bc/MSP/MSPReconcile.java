@@ -2198,6 +2198,7 @@ public class MSPReconcile {
         " and teleplanS00.s21_id = " + s21Id +
         " and billingmaster.billing_no = billing.billing_no " +
         " and provider.ohip_no= teleplanS00.t_practitionerno " +
+		" and provider.billing_no = teleplanS00.t_payeeNo " +
         " and teleplanS00.t_payeeno = " + payeeNo +
         " order by provider.first_name,t_servicedate,billing.demographic_name";
 

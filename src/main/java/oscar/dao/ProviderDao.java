@@ -103,7 +103,7 @@ public class ProviderDao extends OscarSuperDao {
 
 			{"search_numgrpscheduledate", "select count(scheduledate.provider_no) from mygroup, scheduledate where mygroup_no = ? and scheduledate.sdate=? and mygroup.provider_no=scheduledate.provider_no and scheduledate.available = '1'  and scheduledate.status = 'A'"},
 
-			{"search_pref_defaultbill", "select default_servicetype,defaultDoNotDeleteBilling from preference where provider_no = ?"},
+			{"search_pref_defaultbill", "select defaultServiceType,defaultDoNotDeleteBilling from ProviderPreference where providerNo = ?"},
 			{"list_bills_servicetype", "select distinct servicetype, servicetype_name from ctl_billingservice where status='A'"},
 
 			{"searchpassword", "select password from security where provider_no = ?" },

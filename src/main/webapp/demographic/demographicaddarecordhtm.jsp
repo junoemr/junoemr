@@ -29,6 +29,11 @@
   if(session.getAttribute("user") == null) response.sendRedirect("../logout.jsp");
   String curUser_no = (String) session.getAttribute("user");
   String str = null;
+
+	String protocol = "http://";
+	if(request.isSecure()){
+		protocol = "https://";
+	}
 %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -126,6 +131,8 @@
 <!-- calendar stylesheet -->
 <link rel="stylesheet" type="text/css" media="all"
 	href="../share/calendar/calendar.css" title="win2k-cold-1" />
+	
+<link rel="stylesheet" type="text/css" href="<%=protocol%>ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/blitzer/jquery-ui.css"/>
 
 <!-- main calendar program -->
 <script type="text/javascript" src="../share/calendar/calendar.js"></script>
@@ -1326,6 +1333,32 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) { out.println(os
 
 <script type="text/javascript">
 Calendar.setup({ inputField : "waiting_list_referral_date", ifFormat : "%Y-%m-%d", showsTime :false, button : "referral_date_cal", singleClick : true, step : 1 });
+</script>
+<script src="<%=protocol%>www.google.com/jsapi"></script>
+<script>
+	google.load("jquery", "1");
+	google.load("jqueryui", "1");
+</script>
+<script type="text/javascript">
+$(document).ready(function(){
+	// AJAX autocomplete referrer doctors 
+	$("input[name=r_doctor]").keypress(function(){
+		$("input[name=r_doctor]").autocomplete({
+	    	source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
+	    	select: function( event, ui){
+	    		$("input[name=r_doctor_ohip]").val(ui.item.referral_no);
+	    	}
+		});
+	});
+	$("input[name=r_doctor_ohip]").keypress(function(){
+		$("input[name=r_doctor_ohip]").autocomplete({
+	    	source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+	    	select: function( event, ui){
+	    		$("input[name=r_doctor]").val(ui.item.namedesc);
+	    	}
+		});
+	});	
+});
 </script>
 </body>
 </html:html>
