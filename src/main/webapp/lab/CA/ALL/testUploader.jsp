@@ -31,6 +31,8 @@ if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
 
 <%
 String outcome = (String) request.getAttribute("outcome");
+String importoutcome = (String) request.getAttribute("importoutcome");
+
 if(outcome != null){
     if(outcome.equals("success")){
 %><script type="text/javascript">alert("Lab uploaded successfully");</script>
@@ -148,5 +150,18 @@ if(outcome != null){
 </table>
 </form>
 
+<div class="excelleris">
+	<p>Click on the button below to check for new Excelleris Lab Reports</p>
+<%
+if(importoutcome!=null){
+%>
+	<div class="alert">Import outcome: <%= importoutcome %> (Note: 1 lab import may contain multiple lab reports)</div>
+<% 
+}
+%>
+<form action="excellerisImport.do" method="post">
+	<input type="submit" value="Import my labs"/>
+</form>
+</div>
 </body>
 </html>

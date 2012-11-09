@@ -672,7 +672,7 @@ public class TDISHandler implements MessageHandler {
 			
 			return getString(this.pat_25.getPID().getPatientName(0).getGivenName().getValue());
 
-		} catch (HL7Exception e) {
+		} catch (Exception e) {
 			logger.error("Exception while parsing first name of patient: " + e);
 		}
 		return null;
@@ -682,7 +682,7 @@ public class TDISHandler implements MessageHandler {
 	public String getLastName() {
 		try {
 			return getString(this.pat_25.getPID().getPatientName(0).getFamilyName().getSurname().getValue());
-		} catch (HL7Exception e) {
+		} catch (Exception e) {
 			logger.error("Exception while parsing last name of patient: " + e);
 		}
 		return "";
@@ -729,7 +729,7 @@ public class TDISHandler implements MessageHandler {
 				if ((hinArray!=null)&& hinArray.length>0) {
 				hin = hinArray[0];
 				return hin; } //return first instance that is not null
-		} catch (HL7Exception e) {
+		} catch (Exception e) {
 			logger.error("ERROR getting the health number for HL7 lab report patient: " + e.toString());
 		}
 

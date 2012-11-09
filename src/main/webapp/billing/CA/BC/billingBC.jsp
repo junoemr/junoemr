@@ -36,9 +36,10 @@
 <%@taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite"%>
-<%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
-<%@ page import="org.springframework.web.context.WebApplicationContext"%>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@taglib uri="/WEB-INF/security.tld" prefix="security" %>
+<%@taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
+<%@page import="org.springframework.web.context.WebApplicationContext"%>
+<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="oscar.oscarDemographic.data.*"%>
 <%@page import="java.text.*, java.util.*, oscar.oscarBilling.ca.bc.data.*,oscar.oscarBilling.ca.bc.pageUtil.*,oscar.*,oscar.entities.*"%>
 <%!
@@ -126,7 +127,7 @@
 </title>
 <html:base/>
 <link rel="stylesheet" type="text/css" media="all" href="../../../share/calendar/calendar.css" title="win2k-cold-1"/>
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/blitzer/jquery-ui.css"/>
+<link rel="stylesheet" type="text/css" href="<%=protocol%>ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/blitzer/jquery-ui.css"/>
 <script type="text/javascript" src="../../../share/calendar/calendar.js"></script>
 <script type="text/javascript" src="../../../share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>
 <script type="text/javascript" src="../../../share/calendar/calendar-setup.js"></script>
@@ -841,6 +842,7 @@ if(wcbneeds != null){%>
                   <html:option value="Pri">Private</html:option>
                   <html:option value="DONOTBILL">Do Not Bill</html:option>
                 </html:select>
+                Pay Patient <input type="checkbox" name="pay_patient"/>
             </td>
             <td width="33%">
                 <b>Clarification Code:</b>
@@ -1298,19 +1300,6 @@ if(wcbneeds != null){%>
                   </td>
                   <td align="left" width="*" valign="top">
                       <div id="DX_REFERENCE"></div>
-                       <oscar:oscarPropertiesCheck property="BILLING_DX_REFERENCE" value="yes">
-                         <script type="text/javascript">
-                         function getDxInformation(origRequest){
-                               var url = "DxReference.jsp";
-                               var ran_number=Math.round(Math.random()*1000000);
-                               var params = "demographicNo=<%=bean.getPatientNo()%>&rand="+ran_number;  //hack to get around ie caching the page
-                               //alert(params);
-                               new Ajax.Updater('DX_REFERENCE',url, {method:'get',parameters:params,asynchronous:true}); 
-                               //alert(origRequest.responseText);
-                         }
-                         getDxInformation();
-                         </script>
-                       </oscar:oscarPropertiesCheck>
                      
                   </td>
                 </tr>
@@ -1408,7 +1397,12 @@ jQuery(document).ready(function(){
 	    	}
     	});
 	});
-    <oscar:oscarPropertiesCheck property="BILLING_DX_REFERENCE" value="yes">
+});
+</script>
+
+<oscar:oscarPropertiesCheck property="BILLING_DX_REFERENCE" value="yes">
+<script type="text/javascript">
+jQuery(document).ready(function(){
     function getDxInformation(origRequest){
         var url = "DxReference.jsp";
         var ran_number=Math.round(Math.random()*1000000);
@@ -1418,8 +1412,8 @@ jQuery(document).ready(function(){
         });
     }
     getDxInformation();
-    </oscar:oscarPropertiesCheck>
 });
 </script>
+</oscar:oscarPropertiesCheck>
 </body>
 </html>

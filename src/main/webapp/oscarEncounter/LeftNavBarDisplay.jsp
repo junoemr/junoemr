@@ -60,7 +60,7 @@
         %>
 <div id='menuTitle<%=rh%>'
 	style="width: 10%; float: right; text-align: center;">
-<h3 style="padding:0px; <%=getBackgroundColor(dao)%>"><a href="javascript:void(0);"
+<h3 style="padding:0px; <%=getBackgroundColor(dao)%>"><a href="#" onclick="<%=dao.getRightURL()%>"
 	<%=dao.numPopUpMenuItems() > 0 ? "onmouseover" : "onclick"%>="<%=dao.getRightURL()%>">+</a></h3>
 </div>
 <%

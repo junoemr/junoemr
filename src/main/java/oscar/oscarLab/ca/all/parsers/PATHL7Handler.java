@@ -45,6 +45,7 @@ import org.apache.log4j.Logger;
 
 import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Varies;
 import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.parser.Parser;
@@ -69,7 +70,17 @@ public class PATHL7Handler implements MessageHandler {
     public void init(String hl7Body) throws HL7Exception {
         Parser p = new PipeParser();
         p.setValidationContext(new NoValidation());
-        msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ).replace("\\.Zt\\", "\t"));
+    	try{  		
+    		msg = new ORU_R01();
+    		/* 
+        	 * Setting the following system property allows you to specify a default
+        	 * value to assume if OBX-2 is missing. 
+        	 */
+    		System.setProperty(Varies.INVALID_OBX2_TYPE_PROP, "ST");
+    		msg.parse(hl7Body.replaceAll( "\n", "\r\n" ));
+    	}catch(Exception e){
+            logger.error("Error parsing file.", e);
+    	}
     }
 
     public String getMsgType(){

@@ -198,6 +198,7 @@
 		<form-bean name="PreventionReportForm" type="oscar.oscarPrevention.pageUtil.PreventionReportForm" />
 		<form-bean name="ImportDemographicDataForm" type="oscar.oscarDemographic.pageUtil.ImportDemographicDataForm" />
 		<form-bean name="newLabUploadForm" type="oscar.oscarLab.ca.all.pageUtil.LabUploadForm" />
+        <form-bean name="ExcellerisImport" type="oscar.oscarLab.ca.all.pageUtil.ExcellerisImport" />
 		<form-bean name="hrmLabUploadForm" type="oscar.oscarLab.ca.all.pageUtil.LabUploadForm" />
 		<form-bean name="oruR01UploadForm" type="oscar.oscarLab.ca.all.pageUtil.OruR01UploadForm" />
 		<form-bean name="LabUploadForm" type="oscar.oscarLab.ca.bc.PathNet.pageUtil.LabUploadForm" />
@@ -1750,6 +1751,9 @@
 		<action input="/lab/CA/ALL/testUploader.jsp" name="newLabUploadForm" path="/lab/CA/ALL/insideLabUpload" scope="request" type="oscar.oscarLab.ca.all.pageUtil.InsideLabUploadAction">
 			<forward name="success" path="/lab/CA/ALL/testUploader.jsp" />
 		</action>
+        <action input="/lab/CA/ALL/testUploader.jsp" name="ExcellerisImport" path="/lab/CA/ALL/excellerisImport" scope="request" type="oscar.oscarLab.ca.all.pageUtil.ExcellerisImport">
+            <forward name="success" path="/lab/CA/ALL/testUploader.jsp" />
+        </action>
 		<action name="oruR01UploadForm" path="/lab/CA/ALL/oruR01Upload" scope="request" type="oscar.oscarLab.ca.all.pageUtil.OruR01UploadAction">
 			<forward name="result" path="/common/genericResultPage.jsp" />
 		</action>

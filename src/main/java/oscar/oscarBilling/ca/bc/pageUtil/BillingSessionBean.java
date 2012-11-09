@@ -93,6 +93,15 @@ public class BillingSessionBean implements java.io.Serializable{
   private String startTimeHr = "";
   private String startTimeMin = "";
   private String wcbId="";
+  private String oinInsurerCode = "";
+
+  public String getOinInsurerCode() {
+      return this.oinInsurerCode;
+  }
+  
+  public void setOinInsurerCodePP() {
+      this.oinInsurerCode = "PP";
+  }
 
   public String getIcbc_claim_no() {
     this.icbc_claim_no = (null != this.icbc_claim_no) ? this.icbc_claim_no : "";

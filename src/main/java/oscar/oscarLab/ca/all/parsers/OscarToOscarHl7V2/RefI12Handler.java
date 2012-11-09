@@ -28,7 +28,6 @@ package oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
-import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v26.datatype.XPN;
 import ca.uhn.hl7v2.model.v26.group.REF_I12_PROVIDER_CONTACT;
 import ca.uhn.hl7v2.model.v26.message.REF_I12;
@@ -81,7 +80,7 @@ public final class RefI12Handler extends ChainnedMessageAdapter<REF_I12> {
 	            	logger.debug("xpn/name="+name);
 	            	return (name);
 	            }
-            } catch (HL7Exception e) {
+            } catch (Exception e) {
             	logger.error("Unexpected error.", e);
             }
 		}

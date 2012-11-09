@@ -142,7 +142,7 @@ public final class Factory {
 					mh.init(hl7Body);
 					return (mh);
 				} catch (Exception e1) {
-					logger.error("Could not create message handler: " + msgHandler + "\nUsing default message handler instead", e1);
+					logger.error("Could not create message handler: " + msgHandler + "\nUsing default message handler instead. Error message: " + e1.getMessage(), e1);
 					MessageHandler mh = new DefaultGenericHandler();
 					mh.init(hl7Body);
 					return (mh);

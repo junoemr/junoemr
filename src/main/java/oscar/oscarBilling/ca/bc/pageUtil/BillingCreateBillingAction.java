@@ -96,6 +96,12 @@ public class BillingCreateBillingAction extends Action {
                                            other_service3_unit);
     BillingFormData billform = new BillingFormData();
     String payMeth = ( (BillingCreateBillingForm) form).getXml_encounter();
+
+    if (request.getParameter("pay_patient") != null)
+    {
+	    bean.setOinInsurerCodePP();
+    }
+
     bean.setGrandtotal(bmanager.getGrandTotal(billItem));
     bean.setPatientLastName(demo.getLastName());
     bean.setPatientFirstName(demo.getFirstName());

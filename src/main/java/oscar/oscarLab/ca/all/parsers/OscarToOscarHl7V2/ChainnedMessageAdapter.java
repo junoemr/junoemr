@@ -223,7 +223,7 @@ public abstract class ChainnedMessageAdapter<T extends AbstractMessage> implemen
 	public String getHealthNum() {
 		try {
 			return (getPid().getPatientIdentifierList(0).getIDNumber().getValue());
-		} catch (HL7Exception e) {
+		} catch (Exception e) {
 			logger.error("Unexpected Error.", e);
 			return (null);
 		}
@@ -232,7 +232,7 @@ public abstract class ChainnedMessageAdapter<T extends AbstractMessage> implemen
 	public String getHomePhone() {
 		try {
 			return (getPid().getPhoneNumberHome(0).getUnformattedTelephoneNumber().getValue());
-		} catch (HL7Exception e) {
+		} catch (Exception e) {
 			logger.error("Unexpected Error.", e);
 			return (null);
 		}

@@ -440,7 +440,7 @@ public class MEDVUEHandler implements MessageHandler {
 			String hnumber = patIdList.getID().getValue();
 			return hnumber;
 			
-		} catch (HL7Exception e) {
+		} catch (Exception e) {
 			logger.error("ERROR getting the health number for HL7 lab report patient: " + e.toString());
 		}
 

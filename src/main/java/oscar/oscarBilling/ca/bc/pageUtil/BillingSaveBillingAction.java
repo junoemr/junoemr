@@ -291,7 +291,7 @@ public class BillingSaveBillingAction extends Action {
         //      log.debug("Service count : "+ billItem.size());
         ActionForward af = mapping.findForward("success");
         if (frm.getSubmit().equals("Another Bill")) {
-            bean.setBillForm("GP");   //Todo: is this what this should be?
+            bean.setCorrespondenceCode("0");
             af = mapping.findForward("anotherBill");
 
         } else if (frm.getSubmit().equals("Save & Print Receipt")) {
@@ -498,7 +498,37 @@ public class BillingSaveBillingAction extends Action {
             bill.setOinAddress2(bean.getPatientAddress2());
             bill.setOinAddress3("");
             bill.setOinAddress4("");
-            bill.setOinPostalcode(bean.getPatientPostal());
+            bill.setOinPostalcode(bean.getPatientPostal().replaceAll("\\s",""));
+
+            bill.setPhn("0000000000");
+            bill.setNameVerify("0000");
+            bill.setDependentNum("00");
+            bill.setBirthDate("00000000");
+
+        }
+        else if (bean.getOinInsurerCode() == "PP") {
+
+            String oin_reg_num = "";
+            bill.setOinInsurerCode("PP");
+            if(bean.getDependent() == "66")
+            {
+            	oin_reg_num = bean.getPatientPHN() + "66";
+            }
+            else
+            {
+            	oin_reg_num = bean.getPatientPHN() + "00";
+            }
+            bill.setOinRegistrationNo(oin_reg_num);
+            bill.setOinBirthdate(convertDate8Char(bean.getPatientDoB()));
+            bill.setOinFirstName(bean.getPatientFirstName());
+            bill.setOinSecondName(" ");
+            bill.setOinSurname(bean.getPatientLastName());
+            bill.setOinSexCode(bean.getPatientSex());
+            bill.setOinAddress(bean.getPatientAddress1());
+            bill.setOinAddress2(bean.getPatientAddress2());
+            bill.setOinAddress3("");
+            bill.setOinAddress4("");
+            bill.setOinPostalcode(bean.getPatientPostal().replaceAll("\\s",""));
 
             bill.setPhn("0000000000");
             bill.setNameVerify("0000");

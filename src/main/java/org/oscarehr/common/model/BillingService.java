@@ -80,7 +80,7 @@ public class BillingService extends AbstractModel<Integer> implements Serializab
 
 	private Boolean gstFlag;
 	private Boolean sliFlag;
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER, mappedBy="service_code")	
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="service_code")	
 	@OrderBy("effective_date DESC")
 	private List<BillingPercLimit> billingPercLimit;
 
