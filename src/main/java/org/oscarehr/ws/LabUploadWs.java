@@ -48,6 +48,7 @@ public class LabUploadWs extends AbstractWs {
 
 	private static final String LAB_TYPE_CML = "CML";
 	private static final String LAB_TYPE_LIFELABS = "MDS";
+	private static final String LAB_TYPE_EXCELLERIS = "PATHL7";
     private static final Logger logger=MiscUtils.getLogger();
 
     public String uploadCML(
@@ -81,6 +82,27 @@ public class LabUploadWs extends AbstractWs {
         
         try {
             importLab(fileName, contents, LAB_TYPE_LIFELABS, oscarProviderNo);
+        } catch(Exception e)
+        {
+            logger.error(e.getMessage());
+            returnMessage = "{\"success\":0,\"message\":\"" +
+                e.getMessage() + "\"}";
+            return returnMessage;
+        }
+        returnMessage = "{\"success\":1,\"message\":\"\"}";
+        return returnMessage;
+    }
+
+    public String uploadExcelleris(
+            @WebParam(name="file_name") String fileName,
+            @WebParam(name="contents") String contents,
+            @WebParam(name="oscar_provider_no") String oscarProviderNo 
+            )
+    {
+        String returnMessage;
+        
+        try {
+            importLab(fileName, contents, LAB_TYPE_EXCELLERIS, oscarProviderNo);
         } catch(Exception e)
         {
             logger.error(e.getMessage());
