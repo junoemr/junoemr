@@ -131,12 +131,14 @@ public class PHRUserManagementAction extends DispatchAction {
         PropertyDao propertyDao = (PropertyDao) SpringUtils.getBean("propertyDao");
 
         try{
-        List<Property> propertyList = propertyDao.findByName("MYOSCAR_REGISTRATION_LETTER_NAME_OFFSET");
-        log.debug("property size list "+propertyList.size());
-        Property property =  propertyList.get(propertyList.size()-1);
-        log.debug("property value "+property.getValue());
-        intialNameOffset = Integer.parseInt(property.getValue());
-    	}catch(Exception e){
+	        List<Property> propertyList = propertyDao.findByName("MYOSCAR_REGISTRATION_LETTER_NAME_OFFSET");
+            if (propertyList.size() > 0){
+    		    log.debug("property size list "+propertyList.size());
+		        Property property =  propertyList.get(propertyList.size()-1);
+        		log.debug("property value "+property.getValue());
+		        intialNameOffset = Integer.parseInt(property.getValue());
+			}
+	    }catch(Exception e){
         	log.error("OFFSET ERROR",e);
         }
 
