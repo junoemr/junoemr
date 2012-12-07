@@ -266,6 +266,16 @@ function checkName() {
 	return typeInOK;
 }
 
+function checkWaitList() {
+	var typeInOK = false;
+	if(document.adddemographic.list_id.value!="0" && document.adddemographic.waiting_list_referral_date.value=="") {
+		alert ("If you choose a waiting list, you must also provide a \"Date of request\".");
+	} else {
+	    typeInOK = true;
+    }
+	return typeInOK;
+}
+
 function checkDob() {
 	var typeInOK = false;
 	var yyyy = document.adddemographic.year_of_birth.value;
@@ -372,6 +382,7 @@ function checkAllDate() {
 	}
 
 function checkFormTypeIn() {
+	if ( !checkWaitList() ) return false;
 	if ( !checkName() ) return false;
 	if ( !checkDob() ) return false;
 	if ( !checkHin() ) return false;

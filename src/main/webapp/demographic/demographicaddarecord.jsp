@@ -216,6 +216,13 @@
 
     demographicDao.save(demographic);
 
+
+	String [][] dbQueries=new String[][] {
+		{"search_waitingListPosition", "select max(position) as position from waitingList where listID=? AND is_history='N' "},
+		{"search_program", "select id from program where name = ?"}
+	};
+	apptMainBean.doConfigure( dbQueries );
+
          //propagate demographic to caisi admission table
         
             //fetch programId associated with provider
