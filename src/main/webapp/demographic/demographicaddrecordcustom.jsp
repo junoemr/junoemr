@@ -1,5 +1,4 @@
 <%--
-
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
     This program is free software; you can redistribute it and/or
@@ -106,8 +105,9 @@
   if(demographic_string == null){
 	  demographic_string = "";
   }
+  String all_fields = "last_name,first_name,official_lang,title,address,city,province,postal,phone,phone2,cellphone,newsletter,email,pin,dob,sex,hin,eff_date,hc_type,countryOfOrigin,sin,cytolNum,doctor,nurse,midwife,resident,referral_doc,roster_status,date_rostered,patient_status,chart_no,waiting_list,date_joined,end_date,alert,form_notes";
   List<String> custom_demographic_fields = new ArrayList<String>(Arrays.asList(demographic_string.split(",")));
-  Boolean hc_type_hidden = false;
+  List<String> hidden_demographic_fields = new ArrayList<String>(Arrays.asList(all_fields.split(",")));
   if( !custom_demographic_fields.contains("last_name") ){
 	  custom_demographic_fields.add(new String("last_name"));
   }
@@ -129,9 +129,11 @@
   if( !custom_demographic_fields.contains("patient_status") ){
 	  custom_demographic_fields.add(new String("patient_status"));
   }
+  /*
   if( !custom_demographic_fields.contains("hc_type") ){
 	  hc_type_hidden = true;
   }
+  
   if( !custom_demographic_fields.contains("province") ){
 	  custom_demographic_fields.add(new String("province_hidden"));
   }
@@ -156,6 +158,7 @@
   if( !custom_demographic_fields.contains("resident") ){
 	  custom_demographic_fields.add(new String("resident_hidden"));
   }
+  */
   //String[] demographic_fields = custom_demographic_fields.toArray(); 
   
 %>
@@ -483,6 +486,9 @@ function autoFillHin(){
 <form method="post" name="adddemographic" action="demographicaddarecord.jsp" onsubmit="return checkFormTypeIn()">
 <%
 for(int i=0; i<custom_demographic_fields.size(); i++){
+	if(hidden_demographic_fields.indexOf(custom_demographic_fields.get(i)) >= 0){
+		hidden_demographic_fields.remove(hidden_demographic_fields.indexOf(custom_demographic_fields.get(i)));
+	}
 	if(custom_demographic_fields.get(i).equals("last_name"))
 	{
 		%>
@@ -547,10 +553,6 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 			<label><b><bean:message key="demographic.demographicaddrecordhtm.formCity" />: </b></label>
 			<input type="text" name="city" value="<%=defaultCity %>" />
 		</div>
-		<%
-	}else if(custom_demographic_fields.get(i).equals("province_hidden")){
-		%>
-		<input type="hidden" name="province" value="<%=defaultProvince%>"/>
 		<%
 	}else if(custom_demographic_fields.get(i).equals("province")){
 		%>
@@ -805,13 +807,6 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 			<input type="text" name="hin" size="15">
 			<b><bean:message key="demographic.demographicaddrecordhtm.formVer" />:</b>
 			<input type="text" name="ver" value="" size="3" onBlur="upCaseCtrl(this)">
-			<%
-			if( hc_type_hidden ){
-				%>
-				<input type="hidden" name="hc_type" value="<%=HCType%>"/>
-				<%
-			}
-			%>
 		</div>
 		<%
 	}else if(custom_demographic_fields.get(i).equals("eff_date")){
@@ -966,10 +961,6 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 			</select>
 		</div>
 		<%
-	}else if(custom_demographic_fields.get(i).equals("nurse_hidden")){
-		%>
-			<input type="hidden" name="cust1" value="">
-		<%
 	}else if(custom_demographic_fields.get(i).equals("nurse")){
 		%>
 		<div>
@@ -987,10 +978,6 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 			%>
 			</select>
 		</div>
-		<%
-	}else if(custom_demographic_fields.get(i).equals("midwife_hidden")){
-		%>
-			<input type="hidden" name="cust4" value="">
 		<%
 	}else if(custom_demographic_fields.get(i).equals("midwife")){
 		%>
@@ -1011,10 +998,6 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 			</select>
 		</div>
 		<%
-	}else if(custom_demographic_fields.get(i).equals("resident_hidden")){
-		%>
-			<input type="hidden" name="cust2" value="">
-		<%
 	}else if(custom_demographic_fields.get(i).equals("resident")){
 		%>
 		<div>
@@ -1033,11 +1016,6 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 				%>
 			</select>
 		</div>
-		<%
-	}else if(custom_demographic_fields.get(i).equals("referral_doc_hidden")){
-		%>
-			<input type="hidden" name="r_doctor" value=""/>
-			<input type="hidden" name="r_doctor_ohip" value=""/>
 		<%
 	}else if(custom_demographic_fields.get(i).equals("referral_doc")){
 		%>
@@ -1195,12 +1173,6 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 		Calendar.setup({ inputField : "waiting_list_referral_date", ifFormat : "%Y-%m-%d", showsTime :false, button : "referral_date_cal", singleClick : true, step : 1 });
 		</script>
 		<%		
-	}else if(custom_demographic_fields.get(i).equals("date_joined_hidden")){
-		%>
-			<input type="hidden" name="date_joined_date" value="<%=curDay%>"> 
-			<input type="hidden" name="date_joined_month" value="<%=curMonth%>"> 
-			<input type="hidden" name="date_joined_year" value="<%=curYear%>"> 
-		<%
 	}else if(custom_demographic_fields.get(i).equals("date_joined")){
 		%>
 		<div>
@@ -1219,20 +1191,12 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 				<input type="text" name="end_date_date" size="2" maxlength="2">
 			</div>
 	<%
-	}else if(custom_demographic_fields.get(i).equals("alert_hidden")){
-		%>
-			<input type="hidden" name="cust3" value="">
-		<%
 	}else if(custom_demographic_fields.get(i).equals("alert")){
 		%>
 			<div>
 				<label style="color: #FF0000;"><b><bean:message key="demographic.demographicaddrecordhtm.formAlert" />: </b></label>
 				<textarea name="cust3" style="width: 100%" rows="2"></textarea>
 			</div>
-		<%
-	}else if(custom_demographic_fields.get(i).equals("form_notes_hidden")){
-		%>
-			<input type="hidden" name="content" value=""/>
 		<%
 	}else if(custom_demographic_fields.get(i).equals("form_notes")){
 		%>
@@ -1332,8 +1296,207 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 			</div>
 			<%
 		}
-	}
+	}//end of Brazil form fields
 	
+	
+	
+}
+
+for(int i=0; i<hidden_demographic_fields.size(); i++){
+	if(hidden_demographic_fields.get(i).equals("last_name"))
+	{
+		%>
+		<input type="hidden" name="last_name" size=30 value=""/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("first_name"))
+	{
+		%>
+		<input type="hidden" name="first_name" size=30 value=""/>
+		<%		
+	}else if(hidden_demographic_fields.get(i).equals("official_lang")){
+		if(vLocale.getLanguage().equals("en")){
+			%>
+			<input type="hidden" name="official_lang" value="English"/>
+			<%
+		}else if(vLocale.getLanguage().equals("fr")){
+			%>
+			<input type="hidden" name="official_lang" value="French"/>
+			<%
+		}
+		%>
+		<input type="hidden" name="spoken_lang" value=""/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("title")){
+		%>
+		<input type="hidden" name="title" value=""/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("address")){
+		%>
+		<input type="hidden" name="address" value="" />
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("city")){
+		%>
+		<input type="hidden" name="city" value="<%=defaultCity %>" />
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("province_hidden")){
+		%>
+		<input type="hidden" name="province" value="<%=defaultProvince%>"/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("province")){
+			
+		if (vLocale.getCountry().equals("BR")) { 
+			 %> <input type="hidden" name="province" value="<%=props.getProperty("billregion", "ON")%>"/><%
+		} else { 
+			 %> <input type="hidden" name="province" value="<%=defaultProvince%>"/><%
+		}
+	}else if(hidden_demographic_fields.get(i).equals("postal")){
+		%>
+		<input type="hidden" name="postal" value="">
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("phone")){
+		%>
+		<input type="hidden" name="phone" value="<%=props.getProperty("phoneprefix", "905-")%>" />
+		<input type="hidden" name="hPhoneExt" value="" />
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("phone2")){
+		%>
+		<input type="hidden" name="phone2" value=""/>
+		<input type="hidden" name="wPhoneExt" value="" />
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("cellphone")){
+		%>
+		<input type="hidden" name="cellphone" value=""/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("newsletter")){
+		%>
+		<input type="hidden" name="newsletter" value="Unknown"/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("email")){
+		%>
+		<input type="hidden" name="email" value=""/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("pin")){
+		%>
+		<input type="hidden" name="pin" value="">
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("dob")){
+		%>
+		<input type="hidden" name="year_of_birth" value="">
+		<input type="hidden" name="month_of_birth" value="">
+		<input type="hidden" name="date_of_birth" value="">
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("sex")){
+		// Determine if curUser has selected a default sex in preferences
+        UserProperty sexProp = userPropertyDAO.getProp(curUser_no,  UserProperty.DEFAULT_SEX);
+        String sex = "";
+        if (sexProp != null) {
+            sex = sexProp.getValue();
+        } else {
+            // Access defaultsex system property
+            sex = props.getProperty("defaultsex","");
+        }
+     %>
+     	<input type="hidden" name="sex" value="<%=sex%>">
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("hin")){
+		%>
+		<input type="hidden" name="hin" value=""/>
+		<input type="hidden" name="ver" value=""/>
+		<%
+	}else if( hidden_demographic_fields.get(i).equals("hc_type") ){
+		%>
+		<input type="hidden" name="hc_type" value="<%=HCType%>"/>
+		<%
+	
+	}else if(hidden_demographic_fields.get(i).equals("eff_date")){
+		%>
+		<input type="hidden" name="eff_date_year" value=""/>
+		<input type="hidden" name="eff_date_month" value=""/>
+		<input type="hidden" name="eff_date_date" value=""/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("countryOfOrigin")){
+		%>
+		<input type="hidden" name="countryOfOrigin" value="-1"/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("sin")){
+		%>
+		<input type="hidden" name="sin" value="">
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("cytolNum")){
+		%>
+		<input type="hidden" name="cytolNum" value="">
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("doctor")){
+		%>
+		<input type="hidden" name="staff" value=""/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("nurse")){
+		%>
+		<input type="hidden" name="cust1" value="">
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("midwife")){
+		%>
+		<input type="hidden" name="cust4" value="">
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("resident")){
+		%>
+		<input type="hidden" name="cust2" value="">
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("referral_doc")){
+		%>
+		<input type="hidden" name="r_doctor" value=""/>
+		<input type="hidden" name="r_doctor_ohip" value=""/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("roster_status")){
+		%>
+		<input type="hidden" name="roster_status" value=""/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("date_rostered")){
+		%>		
+		<input type="hidden" name="hc_renew_date_year" value=""/>
+		<input type="hidden" name="hc_renew_date_month" value=""/>
+		<input type="hidden" name="hc_renew_date_date" value=""/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("patient_status")){
+		%>
+		<input type="hidden" name="patient_status" value="AC"/>
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("chart_no")){
+		%>
+		<input type="hidden" name="chart_no" value="">
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("waiting_list")){
+		String wLReadonly = "";
+		WaitingList wL = WaitingList.getInstance();
+		if(!wL.getFound()){
+		    wLReadonly = "readonly";
+		}
+		%>
+		<input type="hidden" name="list_id" value="0"/>
+		<input type="hidden" name="waiting_list_note" value=""/>
+		<input type="hidden" name="waiting_list_referral_date" value=""/>
+		<%		
+	}else if(hidden_demographic_fields.get(i).equals("date_joined")){
+		%>
+		<input type="hidden" name="date_joined_date" value="<%=curDay%>"> 
+		<input type="hidden" name="date_joined_month" value="<%=curMonth%>"> 
+		<input type="hidden" name="date_joined_year" value="<%=curYear%>"> 
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("end_date")){
+		%>
+		<input type="hidden" name="end_date_year" value="">
+		<input type="hidden" name="end_date_month" value="">
+		<input type="hidden" name="end_date_date" value="">
+		<% 
+	}else if(hidden_demographic_fields.get(i).equals("alert")){
+		%>
+			<input type="hidden" name="cust3" value="">
+		<%
+	}else if(hidden_demographic_fields.get(i).equals("form_notes")){
+		%>
+			<input type="hidden" name="content" value=""/>
+		<%
+	}
 }
 
 
