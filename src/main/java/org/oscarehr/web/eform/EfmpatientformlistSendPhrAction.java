@@ -88,7 +88,7 @@ public final class EfmpatientformlistSendPhrAction {
 			url.append(port);
 		}
 		url.append(request.getContextPath());
-		url.append("/eformViewForPdfGenerationServlet?parentAjaxId=eforms&fdid=");
+		url.append("/EFormViewForPdfGenerationServlet?parentAjaxId=eforms&fdid=");
 
 		return (url.toString());
 	}
