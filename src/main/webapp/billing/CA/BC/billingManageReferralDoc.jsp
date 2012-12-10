@@ -28,6 +28,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ page
 	import="java.util.*,oscar.oscarBilling.ca.bc.data.*,oscar.oscarBilling.ca.bc.pageUtil.*"%>
+<%@page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="org.oscarehr.common.model.Billingreferral" %>
 <%@page import="org.oscarehr.common.dao.BillingreferralDao" %>
@@ -102,15 +103,18 @@ function checkUnits(){
 		<td class="MainTableRightColumn">
 		<%
               String limit = request.getParameter("limit");
+			  String offset = request.getParameter("offset");
               String lastname = request.getParameter("lastname");
+              String escaped_lastname = StringEscapeUtils.escapeHtml(lastname);
             %>
 		<form action="billingManageReferralDoc.jsp">Last Name: <input
 			type="text" name="lastname"
-			value="<%= (lastname == null)?"":lastname%>" /> <select name="limit">
+			value="<%= (lastname == null)?"":escaped_lastname%>" /> <select name="limit">
 			<option value="10" <%=selected(limit,"10")%>>10</option>
 			<option value="50" <%=selected(limit,"50")%>>50</option>
 			<option value="100" <%=selected(limit,"100")%>>100</option>
-		</select> <input type="submit" value="Search" /></form>
+		</select> <input type="submit" value="Search" />
+		<input type="hidden" name="offset" value="0" />
 		<table class="ele">
 			<tr>
 				<!--th>id</th-->
@@ -129,11 +133,25 @@ function checkUnits(){
 			<%
 			//ReferralBillingData rbd = new ReferralBillingData();
                if (limit == null) limit = "10";
+               if (offset == null) offset = "0";
                if (lastname == null) lastname = "%";
-               List<Billingreferral> alist = billingReferralDao.getBillingreferralByLastName(lastname);
-               for ( int i =0 ; i < alist.size() ; i++ ){
-                  Billingreferral billingReferral = alist.get(i);
-            %>
+
+			   int limit_int = 10;
+			   int offset_int = 0;
+			   try {
+			      limit_int = Integer.parseInt(limit);
+			      offset_int = Integer.parseInt(offset);
+			   }
+			   catch(Exception e)
+			   {
+			   	  // Don't really want to do anything here
+			   }
+               List<Billingreferral> alist = billingReferralDao.getBillingreferralByLastName(lastname, limit_int, offset_int);
+			   if(null != alist) {
+
+                  for ( int i =0 ; i < alist.size() ; i++ ){
+                     Billingreferral billingReferral = alist.get(i);
+                     %>
 			<tr>
 				<!--td><%=billingReferral.getBillingreferralNo()%></td-->
 				<td><a
@@ -151,9 +169,35 @@ function checkUnits(){
 			</tr>
 
 
-			<%}%>
+			        <%
+					}	
+			     }
+				 else {
+				    %><tr colspan="11"><td>No Results</td></tr><%
+				 }
+			
+			%>
 		</table>
-
+		<div style="margin-top: 20px;">
+		<% 
+		if(alist != null && offset_int > 0) {
+	  		int previous_page = 0;
+			if( (offset_int - limit_int) > 0) {
+				previous_page = offset_int - limit_int;
+			}
+			%>
+			<a href="#" onclick="document.forms[0].offset.value=<%=previous_page%>;document.forms[0].submit();return false;">Previous</a>  
+			<%
+		}
+		if(alist != null && alist.size() == limit_int)
+		{
+			%>
+			<a href="#" onclick="document.forms[0].offset.value=<%=offset_int+limit_int%>;document.forms[0].submit();return false;">Next</a>
+			<%
+		}
+		%>
+		</div>
+        </form>
 		</td>
 	</tr>
 	<tr>
