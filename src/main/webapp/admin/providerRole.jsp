@@ -166,7 +166,21 @@ if (request.getParameter("buttonUpdate") != null && request.getParameter("button
                 }
                 programProvider.setProgramId( Long.valueOf(caisiProgram));
                 programProvider.setProviderNo(number);
-                programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleNew).getId()));
+
+				// If the provider has a 'doctor' role, override the updated
+				// role with the 'doctor' role.  This is here to try to 
+				// mitigate the issue of having > 1 security roles map down to
+				// 1 program provider role.
+				List<Secuserrole> sec_user_roles = secUserRoleDao.findByProviderNo(number);
+				String override_role = roleNew;
+				for(Secuserrole sec_user_role:sec_user_roles) {
+					if(sec_user_role.getRoleName().toString().equals("doctor"))
+					{
+						override_role = "doctor";
+					}
+				}
+
+                programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(override_role).getId()));
                 programProviderDao.saveProgramProvider(programProvider);
 			}
 
@@ -197,7 +211,22 @@ if (request.getParameter("submit") != null && request.getParameter("submit").equ
             }
             programProvider.setProgramId( Long.valueOf(caisiProgram));
             programProvider.setProviderNo(number);
-            programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleNew).getId()));
+
+
+			// If the provider has a 'doctor' role, override the updated
+			// role with the 'doctor' role.  This is here to try to 
+			// mitigate the issue of having > 1 security roles map down to
+			// 1 program provider role.
+			List<Secuserrole> sec_user_roles = secUserRoleDao.findByProviderNo(number);
+			String override_role = roleNew;
+			for(Secuserrole sec_user_role:sec_user_roles) {
+				if(sec_user_role.getRoleName().toString().equals("doctor"))
+				{
+					override_role = "doctor";
+				}
+			}
+
+            programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(override_role).getId()));
             programProviderDao.saveProgramProvider(programProvider);
 	    }
     } else {
@@ -231,7 +260,21 @@ if (request.getParameter("submit") != null && request.getParameter("submit").equ
         if( newCaseManagement ) {
             ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
             if(programProvider != null) {
-            	programProviderDao.deleteProgramProvider(programProvider.getId());
+
+				// If the provider still has an existing "doctor" role, don't
+				// delete the program provider.
+				List<Secuserrole> sec_user_roles = secUserRoleDao.findByProviderNo(number);
+				boolean delete_program_provider = true;	
+				for(Secuserrole sec_user_role:sec_user_roles) {
+					if(sec_user_role.getRoleName().toString().equals("doctor"))
+					{
+						delete_program_provider = false;
+					}
+				}
+
+				if(delete_program_provider) {
+            		programProviderDao.deleteProgramProvider(programProvider.getId());
+				}
             }
         }
     } else {
