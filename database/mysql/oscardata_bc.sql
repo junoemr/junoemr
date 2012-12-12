@@ -8,14 +8,14 @@
 -- Dumping data for table 'encounterForm'
 --
 
-INSERT INTO encounterForm VALUES ('BC-AR','../form/formbcar.jsp?demographic_no=','formBCAR', '1');
-INSERT INTO encounterForm VALUES ('BC-AR 2007','../form/formbcar2007.jsp?demographic_no=','formBCAR2007', '1');
-INSERT INTO encounterForm VALUES ('BC-LabourBirth','../form/formbcbirthsummo.jsp?demographic_no=','formBCBirthSumMo', '1');
-INSERT INTO encounterForm VALUES ('BC-NewBorn','../form/formbcnewborn.jsp?demographic_no=','formBCNewBorn', '1');
+INSERT INTO encounterForm VALUES ('BC-AR','../form/formbcar.jsp?demographic_no=','formBCAR', '6');
+INSERT INTO encounterForm VALUES ('BC-AR 2007','../form/formbcar2007.jsp?demographic_no=','formBCAR2007', '7');
+INSERT INTO encounterForm VALUES ('BC-LabourBirth','../form/formbcbirthsummo.jsp?demographic_no=','formBCBirthSumMo', '8');
+INSERT INTO encounterForm VALUES ('BC-NewBorn','../form/formbcnewborn.jsp?demographic_no=','formBCNewBorn', '9');
 INSERT INTO encounterForm values ('BC-WCB','../billing/CA/BC/viewformwcb.do?demographic_no=','wcb','0');
 INSERT INTO encounterForm values ('BC-INR','../form/formbcinr.jsp?demographic_no=','formBCINR','0');
-INSERT INTO encounterForm VALUES ('BC-NewBorn 2008','../form/formBCNewBorn2008.jsp?demographic_no=','formBCNewBorn2008',2);
-INSERT INTO encounterForm VALUES ('BC Birth Sum 2008','../form/formbcbirthsummo2008.jsp?demographic_no=','formBCBirthSumMo2008',2);
+INSERT INTO encounterForm VALUES ('BC-NewBorn 2008','../form/formBCNewBorn2008.jsp?demographic_no=','formBCNewBorn2008',10);
+INSERT INTO encounterForm VALUES ('BC Birth Sum 2008','../form/formbcbirthsummo2008.jsp?demographic_no=','formBCBirthSumMo2008',11);
 insert into encounterForm values ('Chart Checklist', '../form/formbcclientchartchecklist.jsp?demographic_no=', 'formBCClientChartChecklist', 0);                                       
 
 
