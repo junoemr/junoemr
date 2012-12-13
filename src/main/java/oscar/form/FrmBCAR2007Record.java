@@ -94,10 +94,16 @@ public class FrmBCAR2007Record extends FrmRecord {
             frh.setDateFormat(_dateFormat);
             props = (frh).getFormRecord(sql);
 
-            sql = "SELECT last_name, first_name, address, city, province, postal, phone,phone2, hin FROM demographic WHERE demographic_no = "
+            sql = "SELECT last_name, first_name, address, city, province, postal, phone,phone2, year_of_birth, month_of_birth, date_of_birth, hin FROM demographic WHERE demographic_no = "
                     + demographicNo;
             ResultSet rs = DBHelp.searchDBRecord(sql);
+
             if (rs.next()) {
+
+                java.util.Date date = UtilDateUtilities.calcDate(
+						rs.getString("year_of_birth"), rs.getString("month_of_birth"), 
+						rs.getString("date_of_birth"));
+
                 props.setProperty("c_surname_cur", rs.getString("last_name"));
                 props.setProperty("c_givenName_cur", rs.getString("first_name"));
                 props.setProperty("c_address_cur", rs.getString("address"));
@@ -107,6 +113,7 @@ public class FrmBCAR2007Record extends FrmRecord {
                 props.setProperty("c_phn_cur", rs.getString("hin"));
                 props.setProperty("c_phone_cur", rs.getString("phone"));
                 props.setProperty("c_phoneAlt1_cur", rs.getString("phone2"));
+                props.setProperty("c_birthdate_cur", UtilDateUtilities.DateToString(date, _dateFormat));
                 Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(""+demographicNo);
                 String cell = demoExt.get("demo_cell");
                 if ( cell != null ){

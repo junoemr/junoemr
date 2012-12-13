@@ -58,6 +58,7 @@ if(!props.getProperty("c_surname_cur", "").equals("") && !(props.getProperty("c_
 && props.getProperty("c_phone_cur", "").trim().equals(props.getProperty("c_phone", "").trim())
 && props.getProperty("c_phoneAlt1_cur", "").trim().equals(props.getProperty("c_phoneAlt1", "").trim())
 && props.getProperty("c_phoneAlt2_cur", "").trim().equals(props.getProperty("c_phoneAlt2", "").trim())
+&& props.getProperty("c_birthdate_cur", "").trim().equals(props.getProperty("pg1_dateOfBirth", "").trim())
 )) {
     bSync = true;
 }
@@ -192,6 +193,7 @@ function syncDemo() {
     document.forms[0].c_phone.value = "<%=props.getProperty("c_phone_cur", "")%>";
     document.forms[0].c_phoneAlt1.value = "<%=props.getProperty("c_phoneAlt1_cur", "")%>";
     document.forms[0].c_phoneAlt2.value = "<%=props.getProperty("c_phoneAlt2_cur", "")%>";
+    document.forms[0].pg1_dateOfBirth.value = "<%=props.getProperty("c_birthdate_cur", "")%>";
 }
 
 function wtEnglish2Metric(obj) {
