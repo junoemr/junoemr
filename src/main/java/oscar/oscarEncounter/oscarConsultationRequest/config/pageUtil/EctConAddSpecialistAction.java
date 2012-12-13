@@ -115,7 +115,7 @@ public class EctConAddSpecialistAction extends Action {
 
 	private boolean referralNoValid(String referralNo) {
 		try {
-			if (referralNo.length() == 6 &&	referralNo.matches("\\d*"))
+			if ((referralNo.length() == 6 || referralNo.length() == 5 ) &&	referralNo.compareTo("" + Integer.parseInt(referralNo)) == 0)
 				return true;
 		} catch (Exception e) {
 			MiscUtils.getLogger().info("Specified referral number invalid (" + referralNo + ")", e);
