@@ -47,7 +47,7 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
 <% 
 String [][] dbQueries=new String[][] { 
 //{"select_bcformar", "select distinct(demographic_no) from formBCAR where c_EDD >= ? and c_EDD <= ? order by c_EDD desc limit ? offset ?"  }, c_phyMid,
-{"select_bcformar", "select demographic_no, c_EDD, c_surname,c_givenName, pg1_ageAtEDD, pg1_dateOfBirth, pg1_langPref, c_phn, pg1_gravida, pg1_term, c_phone,  pg2_doula, pg2_doulaNo, provider_no from formBCAR2007 where c_EDD >= ? and c_EDD <= ? order by c_EDD desc, ID desc  limit ? offset ?"  }, 
+{"select_bcformar", "select demographic_no, c_EDD, c_surname,c_givenName, pg1_ageAtEDD, pg1_dateOfBirth, pg1_langPref, c_phn, pg1_gravida, pg1_term, c_phone,  pg2_doula, pg2_doulaNo, provider_no from formBCAR2007 f1 where c_EDD >= ? and c_EDD <= ? and formEdited = (SELECT MAX(formEdited) FROM formBCAR2007 f2 WHERE f1.demographic_no = f2.demographic_no) order by c_EDD desc, ID desc  limit ? offset ?"  }, 
 {"search_provider", "select provider_no, last_name, first_name from provider order by last_name"}, 
 };
 reportMainBean.doConfigure(dbQueries);
