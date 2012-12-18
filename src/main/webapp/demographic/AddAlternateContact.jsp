@@ -91,9 +91,13 @@ function newWindow(file,window) {
 		</td>
 	</tr>
 	<tr>
-		<td class="MainTableLeftColumn" valign="top">&nbsp; <a
-			href="<%=request.getContextPath()%>/PMmodule/ClientManager.do?id=<%=creatorDemo%>">Back
-		to PMM </a></td>
+		<td class="MainTableLeftColumn" valign="top">&nbsp; 
+		<% if(org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.IsPropertiesOn.isProgramEnable()){ %> 
+			<a
+				href="<%=request.getContextPath()%>/PMmodule/ClientManager.do?id=<%=creatorDemo%>">Back
+			to PMM </a>
+		<% } %>
+		</td>
 		<td valign="top" class="MainTableRightColumn">
 
 		<form id="ADDAPPT" method="post"
