@@ -115,7 +115,13 @@ public class EctConAddSpecialistAction extends Action {
 
 	private boolean referralNoValid(String referralNo) {
 		try {
-			if ((referralNo.length() == 6 || referralNo.length() == 5 ) &&	referralNo.compareTo("" + Integer.parseInt(referralNo)) == 0)
+			// Run a parseint to make sure it's an integer (it will log an
+			// error and return false if it is invalid)
+			Integer.parseInt(referralNo);
+
+			// Make sure the referral number is 5 or 6 characters long to be 
+			// valid in either bc or ontario.
+			if ((referralNo.length() == 6 || referralNo.length() == 5 ))
 				return true;
 		} catch (Exception e) {
 			MiscUtils.getLogger().info("Specified referral number invalid (" + referralNo + ")", e);
