@@ -24,9 +24,10 @@
 
 --%>
 
-<%@page import="java.util.HashMap, oscar.log.*"
+<%@page import="java.util.HashMap, oscar.log.*,oscar.OscarProperties"
 	errorPage="errorpage.jsp"%>
 <%
+  OscarProperties props = OscarProperties.getInstance();
   if(oscar.oscarSecurity.CRHelper.isCRFrameworkEnabled()) net.sf.cookierevolver.CRFactory.getManager().recordLogout(request);
   if(session != null) {
     Object user = session.getAttribute("user");
@@ -39,8 +40,13 @@
     }
   }
   String param = "";
+  
   if(request.getParameter("login")!=null ) {
 	  param = "?login="+request.getParameter("login") ;
   }
+  if(props.getProperty("oscarhost_login").equals("true")){
+	  response.sendRedirect("oscarhost_login.jsp"+param);
+  }
   response.sendRedirect("index.jsp"+param);
+  
 %>
