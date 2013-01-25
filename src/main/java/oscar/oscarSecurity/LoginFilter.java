@@ -57,6 +57,7 @@ public class LoginFilter implements Filter {
 		"/login.do",
 		"/logout.jsp",
 		"/index.jsp",
+		"/oscarhost_login.jsp",
 		"/loginfailed.jsp",
 		"/index.html",
 		"/eformViewForPdfGenerationServlet",

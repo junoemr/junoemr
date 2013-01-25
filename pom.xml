@@ -813,6 +813,7 @@
                 <header>utils/headers/mcmaster.txt</header>
 		<validHeaders>
                         <validHeader>utils/headers/os.txt</validHeader>
+                        <validHeader>utils/headers/oscarhost.txt</validHeader>
                         <validHeader>utils/headers/quatro.txt</validHeader>
                         <validHeader>utils/headers/quatro2.txt</validHeader>
                         <validHeader>utils/headers/md.txt</validHeader>
