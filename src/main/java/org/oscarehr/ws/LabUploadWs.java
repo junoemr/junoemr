@@ -43,6 +43,7 @@ import oscar.oscarLab.FileUploadCheck;
 import oscar.oscarLab.ca.all.upload.HandlerClassFactory;
 import oscar.oscarLab.ca.all.upload.handlers.MessageHandler;
 
+
 @WebService
 public class LabUploadWs extends AbstractWs {
 
@@ -58,10 +59,10 @@ public class LabUploadWs extends AbstractWs {
             @WebParam(name="oscar_provider_no") String oscarProviderNo 
             )
     {
-        String returnMessage;
+        String returnMessage, audit;
         
         try {
-            importLab(fileName, contents, LAB_TYPE_CML, oscarProviderNo);
+            audit = importLab(fileName, contents, LAB_TYPE_CML, oscarProviderNo);
         } catch(Exception e)
         {
             logger.error(e.getMessage());
@@ -69,7 +70,7 @@ public class LabUploadWs extends AbstractWs {
                 e.getMessage() + "\"}";
             return returnMessage;
         }
-        returnMessage = "{\"success\":1,\"message\":\"\"}";
+        returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
         return returnMessage;
     }
 
@@ -79,10 +80,10 @@ public class LabUploadWs extends AbstractWs {
             @WebParam(name="oscar_provider_no") String oscarProviderNo 
             )
     {
-        String returnMessage;
+        String returnMessage, audit;
         
         try {
-            importLab(fileName, contents, LAB_TYPE_LIFELABS, oscarProviderNo);
+        	audit = importLab(fileName, contents, LAB_TYPE_LIFELABS, oscarProviderNo);
         } catch(Exception e)
         {
             logger.error(e.getMessage());
@@ -90,7 +91,7 @@ public class LabUploadWs extends AbstractWs {
                 e.getMessage() + "\"}";
             return returnMessage;
         }
-        returnMessage = "{\"success\":1,\"message\":\"\"}";
+        returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
         return returnMessage;
     }
 
@@ -100,10 +101,10 @@ public class LabUploadWs extends AbstractWs {
             @WebParam(name="oscar_provider_no") String oscarProviderNo 
             )
     {
-        String returnMessage;
+        String returnMessage, audit;
         
         try {
-            importLab(fileName, contents, LAB_TYPE_EXCELLERIS, oscarProviderNo);
+        	audit = importLab(fileName, contents, LAB_TYPE_EXCELLERIS, oscarProviderNo);
         } catch(Exception e)
         {
             logger.error(e.getMessage());
@@ -111,7 +112,7 @@ public class LabUploadWs extends AbstractWs {
                 e.getMessage() + "\"}";
             return returnMessage;
         }
-        returnMessage = "{\"success\":1,\"message\":\"\"}";
+        returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
         return returnMessage;
     }
     
@@ -121,10 +122,10 @@ public class LabUploadWs extends AbstractWs {
             @WebParam(name="oscar_provider_no") String oscarProviderNo 
             )
     {
-        String returnMessage;
+        String returnMessage, audit;
         
         try {
-            importLab(fileName, contents, LAB_TYPE_GAMMADYNACARE, oscarProviderNo);
+            audit = importLab(fileName, contents, LAB_TYPE_GAMMADYNACARE, oscarProviderNo);
         } catch(Exception e)
         {
             logger.error(e.getMessage());
@@ -132,15 +133,16 @@ public class LabUploadWs extends AbstractWs {
                 e.getMessage() + "\"}";
             return returnMessage;
         }
-        returnMessage = "{\"success\":1,\"message\":\"\"}";
+        returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
         return returnMessage;
     }
 
 
-    private void importLab(String fileName, String labContent, String labType, String oscarProviderNo) throws ParseException, SQLException, Exception
+    private String importLab(String fileName, String labContent, String labType, String oscarProviderNo) throws ParseException, SQLException, Exception
     {
         OscarProperties props = OscarProperties.getInstance();
         String labFolderPath = props.getProperty("DOCUMENT_DIR") + "labs";
+        String retVal = "";
 
         File labFolder = new File(labFolderPath);
 
@@ -171,13 +173,18 @@ public class LabUploadWs extends AbstractWs {
             logger.info("MESSAGE HANDLER "+msgHandler.getClass().getName());
             
             // Parse and handle the lab
-            if((msgHandler.parse(getClass().getSimpleName(), labFilePath,checkFileUploadedSuccessfully)) == null) {
+            if((retVal = msgHandler.parse(getClass().getSimpleName(), labFilePath,checkFileUploadedSuccessfully)) == null) {
             	throw new ParseException("Failed to parse lab: " + fileName + " of type: " + labType, 0);
             }
-            
+                        
         }else{
         	throw new SQLException("Failed insert lab into DB (Likely duplicate lab): " + fileName + " of type: " + labType);
         }
+        
+        // This will always contain one line, so let's just remove the newline characters
+        retVal = retVal.replace("\n", "").replace("\r", "");
+        
+        return retVal;
     }
 }
 
