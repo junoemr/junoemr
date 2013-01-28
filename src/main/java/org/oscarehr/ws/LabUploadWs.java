@@ -67,7 +67,7 @@ public class LabUploadWs extends AbstractWs {
         {
             logger.error(e.getMessage());
             returnMessage = "{\"success\":0,\"message\":\"" +
-                e.getMessage() + "\"}";
+                e.getMessage() + "\", \"audit\":\"\"}";
             return returnMessage;
         }
         returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
@@ -88,7 +88,7 @@ public class LabUploadWs extends AbstractWs {
         {
             logger.error(e.getMessage());
             returnMessage = "{\"success\":0,\"message\":\"" +
-                e.getMessage() + "\"}";
+                e.getMessage() + "\", \"audit\":\"\"}";
             return returnMessage;
         }
         returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
@@ -109,7 +109,7 @@ public class LabUploadWs extends AbstractWs {
         {
             logger.error(e.getMessage());
             returnMessage = "{\"success\":0,\"message\":\"" +
-                e.getMessage() + "\"}";
+                e.getMessage() + "\", \"audit\":\"\"}";
             return returnMessage;
         }
         returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
@@ -130,7 +130,7 @@ public class LabUploadWs extends AbstractWs {
         {
             logger.error(e.getMessage());
             returnMessage = "{\"success\":0,\"message\":\"" +
-                e.getMessage() + "\"}";
+                e.getMessage() + "\", \"audit\":\"\"}";
             return returnMessage;
         }
         returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
