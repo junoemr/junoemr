@@ -26,6 +26,7 @@ package oscar.oscarBilling.ca.bc.data;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,14 +120,20 @@ public class BillingHistoryDAO {
    * @param status String - The status of the BillingMaster  record
    */
   public void createBillingHistoryArchive(BillHistory history) {
-
-
-    String qry = "insert into billing_history(billingmaster_no,billingstatus,creation_date,practitioner_no,billingtype,seqNum,amount,amount_received,payment_type_id) values(" +
-        history.getBillingMasterNo() + ",'" + history.getBillingStatus() +
-        "',now(),'" + history.getPractitioner_no() + "','" +
-        history.getBillingtype() +
+	
+	String qry = "insert into billing_history(billingmaster_no,billingstatus,creation_date,practitioner_no,billingtype,seqNum,amount,amount_received,payment_type_id) values(" +
+		        history.getBillingMasterNo() + ",'" + history.getBillingStatus() +"',";
+	 	
+	if(history.getCreateDate() == null){
+		qry += "now()";
+	}else{
+		qry += "'"+history.getCreateDate().toString()+"'";
+	}
+	
+    qry += ",'" + history.getPractitioner_no() + "','" + history.getBillingtype() +
         "','" + history.getSeqNum() + "','" + history.getAmount() + "','" +
         history.getAmountReceived() + "'," + history.getPaymentTypeId() + ")";
+    
     try {
 
     	DBHandler.RunSQL(qry);
@@ -207,6 +214,25 @@ public class BillingHistoryDAO {
     }
   }
 
+  /**
+   * Creates a history archive initiialized with the supplied parameters
+   *
+   * @param billingMasterNo int
+   * @param amount double
+   * @param paymentType int
+   * @param createDate Timestamp
+   */
+  public void createBillingHistoryArchive(String billingMasterNo, double amount,
+                                          String paymentType, Timestamp createDate) {
+    BillHistory item = this.getCurrentBillItemState(billingMasterNo);
+    if(item != null){
+      item.setAmountReceived(amount);
+      item.setPaymentTypeId(paymentType);
+      item.setCreateDate(createDate);
+      this.createBillingHistoryArchive(item);
+    }
+  }
+  
   /**
    * Creates a history archive initiialized with the supplied parameters
    *

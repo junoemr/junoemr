@@ -24,6 +24,11 @@
 
 package oscar.oscarBilling.ca.bc.pageUtil;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +37,7 @@ import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
+import org.oscarehr.util.MiscUtils;
 
 import oscar.util.StringUtils;
 
@@ -44,6 +50,8 @@ public class ReceivePaymentActionForm
   private String billingmasterNo;
   private String billNo;
   private boolean paymentReceived;
+  private String paymentDate;
+  private Timestamp paymentTimestamp;
   private String isRefund;
   private String payeeProviderNo;
   public String getAmountReceived() {
@@ -72,6 +80,10 @@ public class ReceivePaymentActionForm
 
   public void setBillNo(String billNo) {
     this.billNo = billNo;
+  }
+
+  public void setPaymentDate(String paymentDate) {
+    this.paymentDate = paymentDate;
   }
 
   public void setPaymentReceived(boolean paymentReceived) {
@@ -106,6 +118,10 @@ public class ReceivePaymentActionForm
   public String getBillNo() {
     return billNo;
   }
+  
+  public String getPaymentDate() {
+	return paymentDate;
+  }
 
   public boolean isPaymentReceived() {
     return paymentReceived;
@@ -119,7 +135,30 @@ public class ReceivePaymentActionForm
     return payeeProviderNo;
   }
 
-  public ActionErrors validate(ActionMapping actionMapping,
+  public Timestamp getPaymentTimestamp() {
+	
+	if( this.paymentDate.trim().length() == 0 ){
+		return null;
+	}
+	
+	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	Date paymentdate = null;
+	paymentTimestamp = null;
+	
+    try {
+        paymentdate = dateFormat.parse(this.paymentDate);
+        paymentTimestamp = new Timestamp(paymentdate.getTime());
+    } catch (ParseException e) {
+    	MiscUtils.getLogger().error("Parsing Error", e);
+    } 
+    return paymentTimestamp;
+  }
+
+  public void setPaymentTimestamp(Timestamp paymentTimestamp) {
+    this.paymentTimestamp = paymentTimestamp;
+  }
+
+public ActionErrors validate(ActionMapping actionMapping,
                                HttpServletRequest httpServletRequest) {
     ActionErrors errors = new ActionErrors();
     if (!StringUtils.isNumeric(this.getAmountReceived())) {

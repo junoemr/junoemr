@@ -24,6 +24,7 @@
 
 package oscar.entities;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import oscar.util.UtilMisc;
@@ -45,6 +46,7 @@ public class BillHistory {
   private double amountReceived;
   private String paymentTypeId;
   private String paymentTypeDesc;
+  private Timestamp createDate = null;
   public BillHistory() {
   }
 
@@ -156,6 +158,14 @@ public class BillHistory {
 
   public String getPaymentTypeDesc() {
     return paymentTypeDesc;
+  }
+
+  public Timestamp getCreateDate() {
+    return createDate;
+  }
+
+  public void setCreateDate(Timestamp createDate) {
+	  this.createDate = createDate;
   }
 
 }

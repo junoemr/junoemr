@@ -12,7 +12,20 @@ function refreshParent(){
 	opener.window.location.href = opener.window.location.href;
 }
 </script>
-<link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
+<!-- calendar stylesheet -->
+<link rel="stylesheet" type="text/css" media="all"
+    href="../../../share/calendar/calendar.css" title="win2k-cold-1" />
+<!-- main calendar program -->
+<script type="text/javascript" src="../../../share/calendar/calendar.js"></script>
+
+<!-- language for the calendar -->
+<script type="text/javascript"
+    src="../../../share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>
+
+<!-- the following script defines the Calendar.setup helper function, which makes
+       adding a calendar a matter of 1 or 2 lines of code. -->
+<script type="text/javascript" src="../../../share/calendar/calendar-setup.js"></script>
+<link rel="stylesheet" type="text/css" media="all" href="../../../share/css/extractedFromPages.css"  />
 </head>
 <body>
 <logic:equal name="receivePaymentActionForm" property="paymentReceived"
@@ -59,9 +72,20 @@ oscar.oscarBilling.ca.bc.pageUtil.ReceivePaymentActionForm frm = (oscar.oscarBil
 				collection="paymentMethodList" property="id"
 				labelProperty="paymentType" />
 		</html:select> </label></p>
+		<p>
+		  <bean:message key="oscar.billing.CA.BC.paymentdate" /> 
+		  <html:text maxlength="10" property="paymentDate" styleId="payment_date" readonly="true"/>
+          <img src="../../../images/cal.gif" id="paymentdate_cal">
+          <a href="#" onclick="document.forms[0].payment_date.value = ''">clear</a>
+        </p>
 		<p><input type="submit" value="Submit" /></p>
 		</fieldset>
 	</html:form>
+	<script type="text/javascript">
+	Calendar.setup({ inputField : "payment_date", ifFormat : "%Y-%m-%d", showsTime :false, button : "paymentdate_cal", singleClick : true, step : 1 });
+	</script>
 </logic:notEqual>
+
+
 </body>
 </html>

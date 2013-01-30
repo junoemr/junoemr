@@ -24,6 +24,8 @@
 
 package oscar.oscarBilling.ca.bc.pageUtil;
 
+import java.sql.Timestamp;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -55,15 +57,19 @@ public class ReceivePaymentAction
 
     frm.setAmountReceived(String.valueOf(dblAmount*-1.0));
     }
-    this.receivePayment(frm.getBillingmasterNo(),dblAmount,frm.getPaymentMethod());
+    this.receivePayment(frm.getBillingmasterNo(),dblAmount,frm.getPaymentMethod(), frm.getPaymentTimestamp());
     frm.setPaymentReceived(true);
     return actionMapping.findForward("success");
   }
 
-public void receivePayment(String billingMasterNo, double amount,String paymentType) {
+public void receivePayment(String billingMasterNo, double amount,String paymentType, Timestamp paymentDate) {
    BillingHistoryDAO dao = new BillingHistoryDAO();
    MSPReconcile msp = new MSPReconcile();
-   dao.createBillingHistoryArchive(billingMasterNo,amount,paymentType);
+   if(paymentDate == null){
+	   dao.createBillingHistoryArchive(billingMasterNo,amount,paymentType);
+   }else{
+	   dao.createBillingHistoryArchive(billingMasterNo,amount,paymentType, paymentDate);
+   }
    msp.settleIfBalanced(billingMasterNo);
  }
 }
