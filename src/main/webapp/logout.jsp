@@ -24,7 +24,7 @@
 
 --%>
 
-<%@page import="java.util.HashMap, oscar.log.*,oscar.OscarProperties"
+<%@page import="java.util.HashMap, oscar.log.*,oscar.OscarProperties,java.net.*, javax.xml.parsers.*,org.w3c.dom.*,org.oscarehr.util.MiscUtils"
 	errorPage="errorpage.jsp"%>
 <%
   OscarProperties props = OscarProperties.getInstance();
@@ -44,9 +44,45 @@
   if(request.getParameter("login")!=null ) {
 	  param = "?login="+request.getParameter("login") ;
   }
-  if(props.getProperty("oscarhost_login").equals("true")){
-	  response.sendRedirect("oscarhost_login.jsp"+param);
+  String oscarhost_login = props.getProperty("oscarhost_login");                
+  Boolean remote_oscar_login = false;                                           
+  if(oscarhost_login != null){                                                  
+    try{                                                                        
+        HttpURLConnection.setFollowRedirects(false);                            
+        HttpURLConnection con = (HttpURLConnection) new URL(oscarhost_login).openConnection();
+        con.setRequestMethod("HEAD");                                           
+                                                                                
+        if(con.getResponseCode() == HttpURLConnection.HTTP_OK){                 
+                                                                                
+           MiscUtils.getLogger().info("Page OK"+oscarhost_login);               
+           DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();   
+           DocumentBuilder db = dbf.newDocumentBuilder();                       
+           Document doc = db.parse(new URL(oscarhost_login).openStream());      
+    MiscUtils.getLogger().info("parse complete");                               
+    MiscUtils.getLogger().info(doc.getElementsByTagName("form").item(0).getNodeName());
+    MiscUtils.getLogger().info(doc.getElementsByTagName("input").item(0).getNodeName());
+    MiscUtils.getLogger().info(doc.getElementsByTagName("input").item(0).hasAttributes());
+                                                                                
+          if(doc.getElementsByTagName("input").item(0).getNodeType() == Node.ELEMENT_NODE){
+            Element first_input = (Element) doc.getElementsByTagName("input").item(0);
+            MiscUtils.getLogger().info(first_input.getAttribute("value"));      
+            //TODO: might be better if we check this against the instance id    
+            if(first_input.getAttribute("value").length() > 0){                 
+              remote_oscar_login = true;                                        
+            }                                                                   
+          }                                                                     
+        }                                                                       
+    }catch(Exception e){                                                        
+           MiscUtils.getLogger().info("Exception "+e);                          
+    }                                                                           
+  }                                                                             
+  if(remote_oscar_login){                                                       
+    response.sendRedirect(oscarhost_login);                                     
+  }else if(oscarhost_login != null){                                            
+    MiscUtils.getLogger().info("can't load page");                              
+    response.sendRedirect("oscarhost_login.jsp"+param);                         
+  }else{                                                                        
+    response.sendRedirect("index.jsp"+param);                                   
   }
-  response.sendRedirect("index.jsp"+param);
   
 %>
