@@ -29,11 +29,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.math.BigDecimal;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
+import org.oscarehr.common.dao.DiagnosticCodeDao;
+import org.oscarehr.common.model.DiagnosticCode;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 
 
 /**
@@ -98,6 +103,50 @@ REM076 **                                                             **
        }
        MiscUtils.getLogger().debug("end while");
        return list;
+    }
+    
+    public void parseICD9(File f) throws Exception{
+    	BufferedReader buff = new BufferedReader(new FileReader(f));
+    	DiagnosticCodeDao bDx = SpringUtils.getBean(DiagnosticCodeDao.class);
+
+        String line = null;
+        Properties dxProp = new Properties();
+        while ((line = buff.readLine()) != null) {
+            if (!line.startsWith("REM")){
+                MiscUtils.getLogger().debug(line.substring(0,5).trim()+"="+line.substring(4).trim());
+                String code = line.substring(0,5).trim();
+                String desc = line.substring(4).trim();
+
+                if(dxProp.containsKey(code)){//Some of the lines in file double up for a longer desc.
+                    String dxDesc = dxProp.getProperty(code);
+                    dxDesc += " " +desc;
+                    dxProp.setProperty(code, dxDesc);
+                }else{
+                    dxProp.put(code, desc);
+                }
+
+            }
+        }
+        
+        Enumeration dxKeys = dxProp.keys();
+        while(dxKeys.hasMoreElements()){
+            String code = (String) dxKeys.nextElement();
+            String desc = dxProp.getProperty(code);
+
+                List<DiagnosticCode> dxList = bDx.getByDxCode(code);
+                if (dxList == null || dxList.size() == 0){ //New Code
+             	   DiagnosticCode dxCode = new DiagnosticCode();
+             	  MiscUtils.getLogger().debug("Adding new code "+code+" desc : "+desc);
+                     dxCode.setDiagnosticCode(code);
+                     dxCode.setDescription(desc);
+                     dxCode.setRegion("BC");
+                     dxCode.setStatus("A");
+                     bDx.persist(dxCode);
+                }
+
+
+        }
+        
     }
     
     

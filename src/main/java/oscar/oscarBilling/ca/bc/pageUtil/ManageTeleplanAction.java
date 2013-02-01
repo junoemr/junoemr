@@ -29,10 +29,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +43,6 @@ import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DiagnosticCodeDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DiagnosticCode;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -135,46 +132,15 @@ public class ManageTeleplanAction extends DispatchAction {
            log.debug("real filename "+tr.getRealFilename());
 
            File file = tr.getFile();
-           BufferedReader buff = new BufferedReader(new FileReader(file));
-
-           String line = null;
-           Properties dxProp = new Properties();
-           while ((line = buff.readLine()) != null) {
-               if (!line.startsWith("REM")){
-                   log.debug(line.substring(0,5).trim()+"="+line.substring(4).trim());
-                   String code = line.substring(0,5).trim();
-                   String desc = line.substring(4).trim();
-
-                   if(dxProp.containsKey(code)){//Some of the lines in file double up for a longer desc.
-                       String dxDesc = dxProp.getProperty(code);
-                       dxDesc += " " +desc;
-                       dxProp.setProperty(code, dxDesc);
-                   }else{
-                       dxProp.put(code, desc);
-                   }
-
-               }
-           }
-
-           Enumeration dxKeys = dxProp.keys();
-           while(dxKeys.hasMoreElements()){
-               String code = (String) dxKeys.nextElement();
-               String desc = dxProp.getProperty(code);
-
-                   List<DiagnosticCode> dxList = bDx.getByDxCode(code);
-                   if (dxList == null || dxList.size() == 0){ //New Code
-                	   DiagnosticCode dxCode = new DiagnosticCode();
-                        log.debug("Adding new code "+code+" desc : "+desc);
-                        dxCode.setDiagnosticCode(code);
-                        dxCode.setDescription(desc);
-                        dxCode.setRegion("BC");
-                        dxCode.setStatus("A");
-                        bDx.persist(dxCode);
-                   }
-
-
-
-           }
+           
+           TeleplanCodesManager tcm = new TeleplanCodesManager();
+           tcm.parseICD9(file);
+           
+           tr = tAPI.getAsciiFile("I");
+           log.debug("real filename "+tr.getRealFilename());
+           File Ifile = tr.getFile();
+           tcm.parseICD9(Ifile);
+           
            return mapping.findForward("success");
     }
 
