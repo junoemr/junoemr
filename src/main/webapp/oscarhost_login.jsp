@@ -83,19 +83,29 @@ Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
     </div>
             <div id="container_box" class="container page login">
         <div id="content">
-            <form id="login_form" action="/login.do" method="post">
+            <html:form action="login" >
                 <div class="header">
                     <span>Account Login:</span>
                     <span class="red">
-                         <% if (props.getProperty("logintext", "").equals("")) { %>
-                         <bean:message key="loginApplication.image.logoText"/>
-                         <% } else { %>
-                         <%=props.getProperty("logintext", "")%>
+                         <% if (request.getParameter("instance_id") !=null ) { %>
+                            <%=request.getParameter("instance_id")%>
+                            <input type="hidden" name="practice_name" value="<%=request.getParameter("instance_id")%>"/>
                          <% } %>
                     </span>
                 </div>
                 <div class="login_form">
-                    <input type="hidden" name="practice_name" value="bcl_family"/>
+                    <%
+                    String key = "loginApplication.formLabel" ;
+                    if(request.getParameter("login")!=null && request.getParameter("login").equals("failed") ){
+                        key = "loginApplication.formFailedLabel" ;
+                        %>
+                        <div class="alert alert-error">
+                            <bean:message key="<%=key%>"/> 
+                        </div>
+                        <%
+                    }
+                    %>
+                    
                     <div class="text">
                         <label for="username">Username</label>
                         <span class="form_element"><input type="text" id="username" name="username" class="input-medium"/><script type="text/javascript">document.getElementById('username').focus()</script></span>
@@ -123,7 +133,7 @@ Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
                     </div>
                     <div id="error_message" class="login_error_text"></div>
                 </div>
-            </form>
+            </html:form>
         </div>
         <div class="content">
             <p><strong>Please note:</strong></p>

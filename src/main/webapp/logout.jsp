@@ -25,7 +25,7 @@
 --%>
 
 <%@page import="java.util.HashMap, oscar.log.*,oscar.OscarProperties,java.net.*, javax.xml.parsers.*,org.w3c.dom.*,org.oscarehr.util.MiscUtils"
-	errorPage="errorpage.jsp"%>
+    errorPage="errorpage.jsp"%>
 <%
   OscarProperties props = OscarProperties.getInstance();
   if(oscar.oscarSecurity.CRHelper.isCRFrameworkEnabled()) net.sf.cookierevolver.CRFactory.getManager().recordLogout(request);
@@ -36,7 +36,7 @@
       session.invalidate();
       request.getSession();
       String ip = request.getRemoteAddr();
-	  LogAction.addLog((String)user, LogConst.LOGOUT, LogConst.CON_LOGIN, "", ip);
+      LogAction.addLog((String)user, LogConst.LOGOUT, LogConst.CON_LOGIN, "", ip);
     }
   }
   String param = "";
@@ -44,45 +44,45 @@
   if(request.getParameter("login")!=null ) {
 	  param = "?login="+request.getParameter("login") ;
   }
-  String oscarhost_login = props.getProperty("oscarhost_login");                
-  Boolean remote_oscar_login = false;                                           
-  if(oscarhost_login != null){                                                  
-    try{                                                                        
-        HttpURLConnection.setFollowRedirects(false);                            
+  String oscarhost_login = props.getProperty("oscarhost_login");
+  String instance_id = "";
+  Boolean remote_oscar_login = false;
+  if(oscarhost_login != null){
+        String splitted_string[] = oscarhost_login.split("/");
+        instance_id = splitted_string[splitted_string.length-1];
+        
+    try{
+        HttpURLConnection.setFollowRedirects(false);
         HttpURLConnection con = (HttpURLConnection) new URL(oscarhost_login).openConnection();
-        con.setRequestMethod("HEAD");                                           
-                                                                                
-        if(con.getResponseCode() == HttpURLConnection.HTTP_OK){                 
-                                                                                
-           MiscUtils.getLogger().info("Page OK"+oscarhost_login);               
-           DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();   
-           DocumentBuilder db = dbf.newDocumentBuilder();                       
-           Document doc = db.parse(new URL(oscarhost_login).openStream());      
-    MiscUtils.getLogger().info("parse complete");                               
-    MiscUtils.getLogger().info(doc.getElementsByTagName("form").item(0).getNodeName());
-    MiscUtils.getLogger().info(doc.getElementsByTagName("input").item(0).getNodeName());
-    MiscUtils.getLogger().info(doc.getElementsByTagName("input").item(0).hasAttributes());
-                                                                                
-          if(doc.getElementsByTagName("input").item(0).getNodeType() == Node.ELEMENT_NODE){
-            Element first_input = (Element) doc.getElementsByTagName("input").item(0);
-            MiscUtils.getLogger().info(first_input.getAttribute("value"));      
-            //TODO: might be better if we check this against the instance id    
-            if(first_input.getAttribute("value").length() > 0){                 
-              remote_oscar_login = true;                                        
-            }                                                                   
-          }                                                                     
-        }                                                                       
-    }catch(Exception e){                                                        
-           MiscUtils.getLogger().info("Exception "+e);                          
-    }                                                                           
-  }                                                                             
-  if(remote_oscar_login){                                                       
-    response.sendRedirect(oscarhost_login);                                     
-  }else if(oscarhost_login != null){                                            
-    MiscUtils.getLogger().info("can't load page");                              
-    response.sendRedirect("oscarhost_login.jsp"+param);                         
-  }else{                                                                        
-    response.sendRedirect("index.jsp"+param);                                   
+        con.setRequestMethod("HEAD");
+
+        if(con.getResponseCode() == HttpURLConnection.HTTP_OK){
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(new URL(oscarhost_login).openStream());
+
+            if(doc.getElementsByTagName("input").item(0).getNodeType() == Node.ELEMENT_NODE){
+                Element first_input = (Element) doc.getElementsByTagName("input").item(0);
+                MiscUtils.getLogger().info(first_input.getAttribute("value"));
+                //TODO: might be better if we check this against the instance id    
+                if(first_input.getAttribute("value").length() > 0 && first_input.getAttribute("value").equals(instance_id)){
+                    remote_oscar_login = true;
+                }
+            }
+        }
+    }catch(Exception e){
+           MiscUtils.getLogger().info("Exception "+e);
+    }
+  }
+  if(remote_oscar_login){
+    response.sendRedirect(oscarhost_login+param);
+  }else if(oscarhost_login != null){
+    MiscUtils.getLogger().info("can't load page");
+    param += (param.length() == 0)? "?instance_id="+instance_id : "&instance_id="+instance_id;
+    response.sendRedirect("oscarhost_login.jsp"+param);
+  }else{
+    response.sendRedirect("index.jsp"+param);
   }
   
 %>
