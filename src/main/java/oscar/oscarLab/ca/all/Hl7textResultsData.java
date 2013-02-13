@@ -33,9 +33,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.MeasurementsDeletedDao;
@@ -52,8 +49,6 @@ import oscar.util.UtilDateUtilities;
 
 public class Hl7textResultsData {
 
-	@PersistenceContext
-	protected static EntityManager entityManager = null;
 	
     private static Logger logger = MiscUtils.getLogger();
     private static MeasurementsDeletedDao measurementsDeletedDao = (MeasurementsDeletedDao) SpringUtils.getBean("measurementsDeletedDao");
