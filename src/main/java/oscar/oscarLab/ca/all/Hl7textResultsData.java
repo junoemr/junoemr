@@ -33,6 +33,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.MeasurementsDeletedDao;
@@ -49,6 +52,9 @@ import oscar.util.UtilDateUtilities;
 
 public class Hl7textResultsData {
 
+	@PersistenceContext
+	protected static EntityManager entityManager = null;
+	
     private static Logger logger = MiscUtils.getLogger();
     private static MeasurementsDeletedDao measurementsDeletedDao = (MeasurementsDeletedDao) SpringUtils.getBean("measurementsDeletedDao");
 
@@ -631,6 +637,9 @@ public class Hl7textResultsData {
 			// note to self: lab reports not found in the providerLabRouting table will not show up - need to ensure every lab is entered in providerLabRouting, with '0'
 			// for the provider number if unable to find correct provider
 
+			
+			Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
+			PreparedStatement ps;
 			if (mixLabsAndDocs) {
 				if ("0".equals(demographicNo)  || "0".equals(providerNo)) {
 					sql = " SELECT info.label, info.lab_no, info.sex, info.health_no, info.result_status, info.obr_date, info.priority, info.requesting_client, info.discipline, info.last_name, info.first_name, info.report_status, info.accessionNum, info.final_result_count, X.status "
@@ -638,8 +647,8 @@ public class Hl7textResultsData {
 						+ " (SELECT plr.id, plr.lab_type, plr.lab_no, plr.status "
 						+ "  FROM patientLabRouting plr2, providerLabRouting plr, hl7TextInfo info "
 						+ "  WHERE plr.lab_no = plr2.lab_no "
-						+ (searchProvider ? " AND plr.provider_no = '"+providerNo+"' " : "")
-						+ "    AND plr.status like '%"+status+"%' "
+						+ (searchProvider ? " AND plr.provider_no = ? " : "")
+						+ "    AND plr.status like ? "
 						+ "    AND plr.lab_type = 'HL7' "
 						+ "    AND plr2.lab_type = 'HL7' "
 						+ "    AND info.lab_no = plr.lab_no "
@@ -648,14 +657,33 @@ public class Hl7textResultsData {
 							+ " UNION "
 							+ " SELECT plr.id, plr.lab_type, plr.lab_no, plr.status "
 							+ " FROM ctl_document cd, providerLabRouting plr  "
-							+ " WHERE plr.lab_type = 'DOC' AND plr.status like '%"+status+"%' "
-							+ (searchProvider ? " AND plr.provider_no = '"+providerNo+"' " : "")
+							+ " WHERE plr.lab_type = 'DOC' AND plr.status like ? "
+							+ (searchProvider ? " AND plr.provider_no = ? " : "")
 							+ " AND plr.lab_no = cd.document_no "
 							+ " AND 	cd.module_id = -1 "
 							+ " ORDER BY id DESC "
 							+ " ) AS X "
 							+ " WHERE X.lab_type = 'HL7' AND X.lab_no = info.lab_no "
-							+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
+							+ (isPaged ? "	LIMIT ?,?" : "");
+					 
+					 ps = c.prepareStatement(sql);
+					 if(searchProvider){
+						 ps.setString(1, providerNo);
+						 ps.setString(2, "%"+status+"%");
+						 ps.setString(3, "%"+status+"%");
+						 ps.setString(4, providerNo);
+						 if(isPaged){
+							 ps.setInt(5, (page * pageSize));
+							 ps.setInt(6, pageSize);
+						 }
+					 }else{
+						 ps.setString(1, "%"+status+"%");
+						 ps.setString(2, "%"+status+"%");
+						 if(isPaged){
+							 ps.setInt(3, (page * pageSize));
+							 ps.setInt(4, pageSize);
+						 }
+					 }
 				}
 
 				else if (demographicNo != null && !"".equals(demographicNo)) {
@@ -664,23 +692,43 @@ public class Hl7textResultsData {
 						+" (SELECT * FROM "
 						+" (SELECT DISTINCT plr.id, plr.lab_type, plr.lab_no, plr.status FROM providerLabRouting plr, ctl_document cd "
 						+" WHERE 	"
-						+" (cd.module_id = '"+demographicNo+"' "
+						+" (cd.module_id = ? "
 						+ "	AND cd.document_no = plr.lab_no"
 						+ "	AND plr.lab_type = 'DOC'  	"
-						+ "	AND plr.status like '%"+status+"%' " + (searchProvider ? " AND plr.provider_no = '"+providerNo+"' )" : " )")
+						+ "	AND plr.status like ? " + (searchProvider ? " AND plr.provider_no = ? )" : " )")
 						+ " ORDER BY id DESC) AS Y"
 						+ " UNION"
 						+ " SELECT * FROM"
 						+ " (SELECT DISTINCT plr.id, plr.lab_type, plr.lab_no, plr.status  FROM providerLabRouting plr, patientLabRouting plr2"
 						+ " WHERE"
 						+ "	plr.lab_type = 'HL7' AND plr2.lab_type = 'HL7'"
-						+ "	AND plr.status like '%"+status+"%' " + (searchProvider ? " AND plr.provider_no = '"+providerNo+"' " : " ")
-						+ " 	AND plr.lab_no = plr2.lab_no AND plr2.demographic_no = '"+demographicNo+"'"
+						+ "	AND plr.status like ?' " + (searchProvider ? " AND plr.provider_no = ? " : " ")
+						+ " 	AND plr.lab_no = plr2.lab_no AND plr2.demographic_no = ?"
 						+ " ORDER BY id DESC) AS Z"
 						+ " ORDER BY id DESC"
 						+ " ) AS X "
 						+ " WHERE X.lab_type = 'HL7' and X.lab_no = info.lab_no "
-						+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
+						+ (isPaged ? "	LIMIT ?,?" : "");
+					ps = c.prepareStatement(sql);
+					ps.setString(1, demographicNo);
+					ps.setString(2, "%"+status+"%");
+					if(searchProvider){
+						ps.setString(3, providerNo);
+						ps.setString(4, "%"+status+"%");
+						ps.setString(5, providerNo);
+						ps.setString(6, demographicNo);
+						if(isPaged){
+							ps.setInt(7, (page * pageSize));
+							ps.setInt(8, pageSize);
+						}
+					}else{
+						ps.setString(3, "%"+status+"%");
+						ps.setString(4, demographicNo);
+						if(isPaged){
+							ps.setInt(5, (page * pageSize));
+							ps.setInt(6, pageSize);
+						}
+					}
 				}
 				else if (patientSearch) { // N
 					sql = " SELECT info.label, info.lab_no, info.sex, info.health_no, info.result_status, info.obr_date, info.priority, info.requesting_client, info.discipline, info.last_name, info.first_name, info.report_status, info.accessionNum, info.final_result_count, Z.status "
@@ -690,23 +738,49 @@ public class Hl7textResultsData {
 						+ "		(SELECT DISTINCT plr.id, plr.lab_type, plr.lab_no, plr.status, d.demographic_no "
 						+ "			FROM providerLabRouting plr, ctl_document cd, demographic d "
 						+ "			WHERE 	 "
-						+ "			(d.first_name like '%"+patientFirstName+"%' AND d.last_name like '%"+patientLastName+"%' AND d.hin like '%"+patientHealthNumber+"%' "
+						+ "			(d.first_name like ? AND d.last_name like ? AND d.hin like ? "
 						+ "		AND cd.module_id = d.demographic_no 	AND cd.document_no = plr.lab_no	AND plr.lab_type = 'DOC' "
-						+ "				AND plr.status like '%"+status+"%' " + (searchProvider ? " AND plr.provider_no = '"+providerNo+"' " : " ")
+						+ "				AND plr.status like ? " + (searchProvider ? " AND plr.provider_no = ? " : " ")
 						+ "		)ORDER BY id DESC) AS Y "
 						+ " 	UNION "
 						+ "	SELECT * FROM "
 						+ "		(SELECT DISTINCT plr.id, plr.lab_type, plr.lab_no, plr.status, d.demographic_no "
 						+ "		FROM providerLabRouting plr, patientLabRouting plr2, demographic d" + (isAbnormal != null ? ", hl7TextInfo info " : " ")
-						+ "		WHERE d.first_name like '%"+patientFirstName+"%' AND d.last_name like '%"+patientLastName+"%' AND d.hin like '%"+patientHealthNumber+"%' "
+						+ "		WHERE d.first_name like ? AND d.last_name like ? AND d.hin like ? "
 						+ "		AND	plr.lab_type = 'HL7' AND plr2.lab_type = 'HL7' "
 						+ (isAbnormal != null ? " AND plr.lab_no = info.lab_no AND (info.result_status IS NULL OR info.result_status != 'A') " : " " )
-						+ "				AND plr.status like '%"+status+"%' " + (searchProvider ? " AND plr.provider_no = '"+providerNo+"' " : " ")
+						+ "				AND plr.status like ? " + (searchProvider ? " AND plr.provider_no = ? " : " ")
 						+ " 	AND plr.lab_no = plr2.lab_no AND plr2.demographic_no = d.demographic_no ORDER BY id DESC) AS Z "
 						+ " 			ORDER BY id DESC) AS X "
 						+ " 	  ) AS Z  "
 						+ " WHERE Z.lab_type = 'HL7' and Z.lab_no = info.lab_no "
-						+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
+						+ (isPaged ? "	LIMIT ?,?": "");
+					ps = c.prepareStatement(sql);
+					ps.setString(1, "%"+patientFirstName+"%");
+					ps.setString(2, "%"+patientLastName+"%");
+					ps.setString(3, "%"+patientHealthNumber+"%");
+					ps.setString(4, "%"+status+"%");
+					if(searchProvider){
+						ps.setString(5, providerNo);
+						ps.setString(6, "%"+patientFirstName+"%");
+						ps.setString(7, "%"+patientLastName+"%");
+						ps.setString(8, "%"+patientHealthNumber+"%");
+						ps.setString(9, "%"+status+"%");
+						ps.setString(10, providerNo);
+						if(isPaged){
+							ps.setInt(11, (page * pageSize));
+							ps.setInt(12, pageSize);
+						}
+					}else{
+						ps.setString(5, "%"+patientFirstName+"%");
+						ps.setString(6, "%"+patientLastName+"%");
+						ps.setString(7, "%"+patientHealthNumber+"%");
+						ps.setString(8, "%"+status+"%");
+						if(isPaged){
+							ps.setInt(9, (page * pageSize));
+							ps.setInt(10, pageSize);
+						}
+					}
 				}
 				else { // N
 					sql = " SELECT info.label, info.lab_no, info.sex, info.health_no, info.result_status, info.obr_date, info.priority, info.requesting_client, info.discipline, info.last_name, info.first_name, info.report_status,  info.accessionNum, info.final_result_count, X.status "
@@ -714,13 +788,25 @@ public class Hl7textResultsData {
 						+ " (SELECT DISTINCT plr.id, plr.lab_type, plr.lab_no, plr.status "
 						+ " FROM providerLabRouting plr"  + (isAbnormal != null ? ", hl7TextInfo info " : " ")
 						+ " WHERE ("
-						+ "       plr.status like '%"+status+"%' " + (searchProvider ? " AND plr.provider_no = '"+providerNo+"' " : "")
+						+ "       plr.status like ? " + (searchProvider ? " AND plr.provider_no = ? " : "")
 						+ (isAbnormal != null ? "     AND (plr.lab_type = 'DOC' OR (plr.lab_no = info.lab_no AND ("+(!isAbnormal ? "info.result_status IS NULL OR" : "") + " info.result_status "+(isAbnormal ? "" : "!")+"= 'A'))) " : " ")
 						+ "       ) "
 						+ " ORDER BY id DESC "
 						+ " ) AS X "
 						+ " WHERE X.lab_type = 'HL7' and X.lab_no = info.lab_no "
-						+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
+						+ (isPaged ? "	LIMIT ?,?" : "");
+					ps = c.prepareStatement(sql);
+					ps.setString(1, "%"+status+"%");
+					if(searchProvider){
+						ps.setString(2, providerNo);
+						if(isPaged){
+							ps.setInt(3, (page * pageSize));
+							ps.setInt(4, pageSize);
+						}
+					}else if(isPaged){
+						ps.setInt(2, (page * pageSize));
+						ps.setInt(3, pageSize);
+					}
 				}
 			}
 			else {
@@ -728,65 +814,124 @@ public class Hl7textResultsData {
 					sql = " SELECT info.label, info.lab_no, info.sex, info.health_no, info.result_status, info.obr_date, info.priority, info.requesting_client, info.discipline, info.last_name, info.first_name, info.report_status,  info.accessionNum, info.final_result_count, plr.status "
 						+ " FROM patientLabRouting plr2, providerLabRouting plr, hl7TextInfo info "
 						+ " WHERE plr.lab_no = plr2.lab_no "
-						+ (searchProvider ? " AND plr.provider_no = '"+providerNo+"' " : "")
+						+ (searchProvider ? " AND plr.provider_no = ? " : "")
 						+ " AND plr.lab_type = 'HL7' "
-						+ " AND plr.status like '%"+status+"%' "
+						+ " AND plr.status like ? "
 						+ " AND plr2.lab_type = 'HL7' "
 						+ " AND plr.lab_no = info.lab_no "
 						+ (isAbnormal != null && isAbnormal ? "AND info.result_status = 'A'" :
 							isAbnormal != null && !isAbnormal ? "AND (info.result_status IS NULL OR info.result_status != 'A')" : "")
 							+ " ORDER BY plr.id DESC "
-							+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
+							+ (isPaged ? "	LIMIT ?,?" : "");
+					ps = c.prepareStatement(sql);
+					if(searchProvider){
+						ps.setString(1, providerNo);
+						ps.setString(2, "%"+status+"%");
+						if(isPaged){
+							ps.setInt(3, (page * pageSize));
+							ps.setInt(4, pageSize);
+						}
+					}else{
+						ps.setString(1, "%"+status+"%");
+						if(isPaged){
+							ps.setInt(2, (page * pageSize));
+							ps.setInt(3, pageSize);
+						}
+					}
+					
 				}
 				else if (demographicNo != null && !"".equals(demographicNo)) {
 					sql = " SELECT info.label, info.lab_no, info.sex, info.health_no, info.result_status, info.obr_date, info.priority, info.requesting_client, info.discipline, info.last_name, info.first_name, info.report_status,  info.accessionNum, info.final_result_count, X.status "
 						+ " FROM hl7TextInfo info, "
 						+ " (SELECT DISTINCT plr.id,plr.lab_no, plr.lab_type,  plr.status, d.demographic_no "
 						+ " FROM providerLabRouting plr, patientLabRouting plr2, demographic d "
-						+ " WHERE 	(d.demographic_no = '"+demographicNo+"' "
+						+ " WHERE 	(d.demographic_no = ? "
 						+ " 		AND plr.lab_no = plr2.lab_no AND plr2.demographic_no = d.demographic_no "
 						+ " 		AND plr.lab_type = 'HL7' AND plr2.lab_type = 'HL7' "
-						+ " 		AND plr.status like '%"+status+"%' " + (searchProvider ? " AND plr.provider_no = '"+providerNo+"' " : "")
+						+ " 		AND plr.status like ? " + (searchProvider ? " AND plr.provider_no = ? " : "")
 						+ " 		) "
 						+ " ORDER BY plr.id DESC "
 						+ " ) AS X "
 						+ " WHERE X.lab_type = 'HL7' and X.lab_no = info.lab_no "
-						+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
+						+ (isPaged ? "	LIMIT ?,?" : "");
+					ps = c.prepareStatement(sql);
+					ps.setString(1, demographicNo);
+					ps.setString(2, "%"+status+"%");
+					if(searchProvider){
+						ps.setString(3, providerNo);
+						if(isPaged){
+							ps.setInt(4, (page * pageSize));
+							ps.setInt(5, pageSize);
+						}
+					}else if(isPaged){
+						ps.setInt(3, (page * pageSize));
+						ps.setInt(4, pageSize);
+					}
 				}
 				else if (patientSearch) { // A
 					sql = " SELECT info.label, info.lab_no, info.sex, info.health_no, info.result_status, info.obr_date, info.priority, info.requesting_client, info.discipline, info.last_name, info.first_name, info.report_status, info.accessionNum, info.final_result_count, X.status "
 						+ " FROM hl7TextInfo info, "
 						+ " (SELECT DISTINCT plr.id, plr.lab_type, plr.status, plr.lab_no, d.demographic_no "
 						+ " FROM providerLabRouting plr, patientLabRouting plr2, demographic d "
-						+ " WHERE   (d.first_name like '%"+patientFirstName+"%' AND d.last_name like '%"+patientLastName+"%' AND d.hin like '%"+patientHealthNumber+"%' "
+						+ " WHERE   (d.first_name like ? AND d.last_name like ? AND d.hin like ? "
 						+ " 		AND plr.lab_no = plr2.lab_no AND plr2.demographic_no = d.demographic_no "
 						+ " 		AND plr.lab_type = 'HL7' AND plr2.lab_type = 'HL7' "
-						+ " 		AND plr.status like '%"+status+"%' " + (searchProvider ? " AND plr.provider_no = '"+providerNo+"' " : "")
+						+ " 		AND plr.status like ? " + (searchProvider ? " AND plr.provider_no = ? " : "")
 						+ " 		) "
 						+ " ORDER BY plr.id DESC "
 						+ " ) AS X "
 						+ " WHERE X.lab_type = 'HL7' and X.lab_no = info.lab_no "
 						+ (isAbnormal != null ? " AND (" + (!isAbnormal ? "info.result_status IS NULL OR" : "") + " info.result_status " + (isAbnormal ? "" : "!") + "= 'A') " : " ")
-						+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
+						+ (isPaged ? "	LIMIT ?,?" : "");
+					ps = c.prepareStatement(sql);
+					ps.setString(1, "%"+patientFirstName+"%");
+					ps.setString(2, "%"+patientLastName+"%");
+					ps.setString(3, "%"+patientHealthNumber+"%");
+					ps.setString(4, "%"+status+"%");
+					if(searchProvider){
+						ps.setString(5, providerNo);
+						if(isPaged){
+							ps.setInt(6, (page * pageSize));
+							ps.setInt(7, pageSize);
+						}
+					}else if(isPaged){
+						ps.setInt(5, (page * pageSize));
+						ps.setInt(6, pageSize);
+					}
 				}
 				else { // A
 					sql = " SELECT info.label, info.lab_no, info.sex, info.health_no, info.result_status, info.obr_date, info.priority, info.requesting_client, info.discipline, info.last_name, info.first_name, info.report_status,  info.accessionNum, info.final_result_count, plr.status "
 						+ " FROM providerLabRouting plr, hl7TextInfo info "
-						+ " WHERE plr.status like '%"+status+"%' " + (searchProvider ? " AND plr.provider_no = '"+providerNo+"' " : "")
+						+ " WHERE plr.status like ? " + (searchProvider ? " AND plr.provider_no = ?' " : "")
 						+ "   AND lab_type = 'HL7' and info.lab_no = plr.lab_no "
 						+ (isAbnormal != null ? " AND (" + (!isAbnormal ? "info.result_status IS NULL OR" : "") + " info.result_status " + (isAbnormal ? "" : "!") + "= 'A') " : " ")
 						+ " ORDER BY plr.id DESC "
-						+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
+						+ (isPaged ? "	LIMIT ?,?" : "");
+					ps = c.prepareStatement(sql);
+					ps.setString(1, "%"+status+"%");
+					if(searchProvider){
+						ps.setString(2, providerNo);
+						if(isPaged){
+							ps.setInt(3, (page * pageSize));
+							ps.setInt(4, pageSize);
+						}
+					}else if(isPaged){
+						ps.setInt(2, (page * pageSize));
+						ps.setInt(3, pageSize);
+					}
 				}
 			}
 
 			logger.info(sql);
-			ResultSet rs = DBHandler.GetSQL(sql);
+			
+			ResultSet rs = ps.executeQuery();
+			
 			while(rs.next()){
 
 				LabResultData lbData = new LabResultData(LabResultData.HL7TEXT);
 				lbData.labType = LabResultData.HL7TEXT;
 				lbData.segmentID = rs.getString("lab_no");
+				
 
 				if (demographicNo == null && !providerNo.equals("0")) {
 					lbData.acknowledgedStatus = rs.getString("status");

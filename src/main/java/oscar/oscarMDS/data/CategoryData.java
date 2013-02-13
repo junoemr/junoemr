@@ -136,15 +136,21 @@ public class CategoryData {
 		sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
 			+ " FROM patientLabRouting plr2, providerLabRouting plr  "
 			+ " WHERE plr.lab_no = plr2.lab_no "
-			+ (providerSearch ? " AND plr.provider_no = '"+searchProviderNo+"' " : "")
+			+ (providerSearch ? " AND plr.provider_no = ? " : "")
 			+ "   AND plr.lab_type = 'HL7' "
-			+ "   AND plr.status like '%"+status+"%' "
+			+ "   AND plr.status like ? "
 			+ "   AND plr2.lab_type = 'HL7'"
 			+ "   AND plr2.demographic_no = '0' ";
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
-		ResultSet rs= ps.executeQuery(sql);
+		if(providerSearch){
+			ps.setString(1, searchProviderNo);
+			ps.setString(2, "%"+status+"%");
+		}else{
+			ps.setString(1, "%"+status+"%");
+		}
+		ResultSet rs= ps.executeQuery();
 
 		return (rs.next() ? rs.getInt("count") : 0);
 	}
@@ -152,38 +158,54 @@ public class CategoryData {
 	public int getAbnormalCount(boolean isAbnormal) throws SQLException {
 		ResultSet rs;
 		String sql;
+		
+		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
+		PreparedStatement ps;
 		if (patientSearch) {
         	sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
         		+ " FROM patientLabRouting cd, demographic d, providerLabRouting plr, hl7TextInfo info "
-        		+ " WHERE d.last_name like '%"+patientLastName+"%'  "
-        		+ " 	AND d.first_name like '%"+patientFirstName+"%' "
-        		+ " 	AND d.hin like '%"+patientHealthNumber+"%' "
-        		+ " 	AND plr.status like '%"+status+"%' "
-        		+ (providerSearch ? "AND plr.provider_no = '"+searchProviderNo+"' " : "")
+        		+ " WHERE d.last_name like ? "
+        		+ " 	AND d.first_name like ? "
+        		+ " 	AND d.hin like ? "
+        		+ " 	AND plr.status like ? "
+        		+ (providerSearch ? "AND plr.provider_no = ? " : "")
         		+ " 	AND plr.lab_type = 'HL7' "
         		+ " 	AND cd.lab_type = 'HL7' "
         		+ " 	AND cd.lab_no = plr.lab_no "
         		+ " 	AND cd.demographic_no = d.demographic_no "
         		+ " 	AND info.lab_no = plr.lab_no "
         		+ " 	AND result_status "+(isAbnormal ? "" : "!")+"= 'A' ";
+        	ps = c.prepareStatement(sql);
+        	ps.setString(1, "%"+patientLastName+"%");
+        	ps.setString(2, "%"+patientFirstName+"%");
+        	ps.setString(3, "%"+patientHealthNumber+"%");
+        	ps.setString(4, "%"+status+"%");
+        	if(providerSearch){
+        		ps.setString(5, searchProviderNo);
+        	}
         }
         else if (providerSearch || !"".equals(status)){ // providerSearch
         	sql = "SELECT HIGH_PRIORITY COUNT(1) as count "
 				+ " FROM providerLabRouting plr, hl7TextInfo info "
-				+ " WHERE plr.status like '%"+status+"%' "
-				+ (providerSearch ? " AND plr.provider_no = '"+searchProviderNo+"' " : " ")
+				+ " WHERE plr.status like ? "
+				+ (providerSearch ? " AND plr.provider_no = ? " : " ")
 				+ " AND plr.lab_type = 'HL7'  "
 				+ " AND info.lab_no = plr.lab_no"
 				+ " AND result_status "+(isAbnormal ? "" : "!")+"= 'A' ";
+        	ps = c.prepareStatement(sql);
+        	ps.setString(1, "%"+status+"%");
+        	if(providerSearch){
+        		ps.setString(2, searchProviderNo);
+        	}
         }
         else {
         	sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
             	+ " FROM hl7TextInfo info "
             	+ " WHERE result_status "+(isAbnormal ? "" : "!")+"= 'A' ";
+        	ps = c.prepareStatement(sql);
         }
-		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
-		PreparedStatement ps = c.prepareStatement(sql);
-		rs= ps.executeQuery(sql);
+		
+		rs= ps.executeQuery();
         return (rs.next() ? rs.getInt("count") : 0);
 	}
 
@@ -191,13 +213,17 @@ public class CategoryData {
 			throws SQLException {
 		String sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
 					+ " FROM ctl_document cd, providerLabRouting plr "
-					+ " WHERE plr.lab_type = 'DOC' AND plr.status like '%"+status+"%' "
-					+ (providerSearch ? " AND plr.provider_no ='"+searchProviderNo+"' " : "")
+					+ " WHERE plr.lab_type = 'DOC' AND plr.status like ? "
+					+ (providerSearch ? " AND plr.provider_no =? " : "")
 					+ "	AND plr.lab_no = cd.document_no"
 					+ " AND 	cd.module_id = -1 ";
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
-		ResultSet rs= ps.executeQuery(sql);
+		ps.setString(1, "%"+status+"%");
+		if(providerSearch){
+			ps.setString(2, searchProviderNo);
+		}
+		ResultSet rs= ps.executeQuery();
 		return (rs.next() ? rs.getInt("count") : 0);
 	}
 
@@ -205,20 +231,27 @@ public class CategoryData {
 		PatientInfo info;
 		String sql = " SELECT HIGH_PRIORITY d.demographic_no, last_name, first_name, COUNT(1) as count "
         	+ " FROM patientLabRouting cd,  demographic d, providerLabRouting plr "
-        	+ " WHERE   d.last_name like '%"+patientLastName+"%' "
-        	+ " 	AND d.first_name like '%"+patientFirstName+"%' "
-        	+ " 	AND d.hin like '%"+patientHealthNumber+"%' "
+        	+ " WHERE   d.last_name like ? "
+        	+ " 	AND d.first_name like ? "
+        	+ " 	AND d.hin like ? "
         	+ " 	AND cd.demographic_no = d.demographic_no "
         	+ " 	AND cd.lab_no = plr.lab_no "
         	+ " 	AND plr.lab_type = 'HL7' "
         	+ " 	AND cd.lab_type = 'HL7' "
-        	+ " 	AND plr.status like '%"+status+"%' "
-        	+ (providerSearch ? "AND plr.provider_no = '"+searchProviderNo+"' " : "")
+        	+ " 	AND plr.status like ? "
+        	+ (providerSearch ? "AND plr.provider_no = ? " : "")
         	+ " GROUP BY demographic_no ";
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
-		ResultSet rs= ps.executeQuery(sql);
+		ps.setString(1, "%"+patientLastName+"%");
+		ps.setString(2, "%"+patientFirstName+"%");
+		ps.setString(3, "%"+patientHealthNumber+"%");
+		ps.setString(4, "%"+status+"%");
+		if( providerSearch ){
+			ps.setString(5, searchProviderNo);
+		}
+		ResultSet rs= ps.executeQuery();
         int count = 0;
         while(rs.next()){
         	int id = rs.getInt("demographic_no");
@@ -241,37 +274,49 @@ public class CategoryData {
 	public int getLabCountForDemographic(String demographicNo) throws SQLException {
 		String sql = " SELECT HIGH_PRIORITY d.demographic_no, last_name, first_name, COUNT(1) as count "
         	+ " FROM patientLabRouting cd,  demographic d, providerLabRouting plr "
-        	+ " WHERE   d.demographic_no = " + demographicNo
+        	+ " WHERE   d.demographic_no = ?" 
         	+ " 	AND cd.demographic_no = d.demographic_no "
         	+ " 	AND cd.lab_no = plr.lab_no "
         	+ " 	AND plr.lab_type = 'HL7' "
         	+ " 	AND cd.lab_type = 'HL7' "
-        	+ " 	AND plr.status like '%"+status+"%' "
-        	+ (providerSearch ? "AND plr.provider_no = '"+searchProviderNo+"' " : "")
+        	+ " 	AND plr.status like ? "
+        	+ (providerSearch ? "AND plr.provider_no = ? " : "")
         	+ " GROUP BY demographic_no ";
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
-		ResultSet rs= ps.executeQuery(sql);
+		ps.setString(1, demographicNo);
+		ps.setString(2, "%"+status+"%");
+		if(providerSearch){
+			ps.setString(3, searchProviderNo);
+		}
+		ResultSet rs= ps.executeQuery();
         return (rs.next() ? rs.getInt("count") : 0);
 	}
 
 	public int getDocumentCountForPatientSearch() throws SQLException {
 		PatientInfo info;
-		String sql = " SELECT HIGH_PRIORITY demographic_no, last_name, first_name, COUNT(1) as count "
-					+ " FROM ctl_document cd, demographic d, providerLabRouting plr "
-					+ " WHERE   d.last_name like '%"+patientLastName+"%'  "
-					+ " 	AND d.first_name like '%"+patientFirstName+"%' "
-					+ " 	AND d.hin like '%"+patientHealthNumber+"%' "
-					+ " 	AND cd.module_id = d.demographic_no "
-					+ " 	AND cd.document_no = plr.lab_no "
-					+ " 	AND plr.lab_type = 'DOC' "
-					+ " 	AND plr.status like '%"+status+"%' "
-					+ (providerSearch ? "AND plr.provider_no = '"+searchProviderNo+"' " : "")
-					+ " GROUP BY demographic_no ";
+		String sql = "SELECT HIGH_PRIORITY demographic_no, last_name, first_name, COUNT(1) as count"
+					+ " FROM ctl_document cd, demographic d, providerLabRouting plr"
+					+ " WHERE d.last_name like ?"
+					+ " AND d.first_name like ?"
+					+ " AND d.hin like ?"
+					+ " AND cd.module_id = d.demographic_no"
+					+ " AND cd.document_no = plr.lab_no"
+					+ " AND plr.lab_type = 'DOC'"
+					+ " AND plr.status like ?"
+					+ (providerSearch ? " AND plr.provider_no = ?" : "")
+					+ " GROUP BY demographic_no";
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
-		ResultSet rs= ps.executeQuery(sql);
+		ps.setString(1, "%"+patientLastName+"%");
+		ps.setString(2, "%"+patientFirstName+"%");
+		ps.setString(3, "%"+patientHealthNumber+"%");
+		ps.setString(4, "%"+status+"%");		
+		if(providerSearch){
+			ps.setString(5, searchProviderNo);
+		}
+		ResultSet rs= ps.executeQuery();
         int count = 0;
         while(rs.next()){
         	info = new PatientInfo(rs.getInt("demographic_no"), rs.getString("first_name"), rs.getString("last_name"));
@@ -285,16 +330,21 @@ public class CategoryData {
 	public int getDocumentCountForDemographic(String demographicNo) throws SQLException {
 		String sql = " SELECT HIGH_PRIORITY demographic_no, last_name, first_name, COUNT(1) as count "
 					+ " FROM ctl_document cd, demographic d, providerLabRouting plr "
-					+ " WHERE   d.demographic_no = " + demographicNo
+					+ " WHERE   d.demographic_no = ?" 
 					+ " 	AND cd.module_id = d.demographic_no "
 					+ " 	AND cd.document_no = plr.lab_no "
 					+ " 	AND plr.lab_type = 'DOC' "
-					+ " 	AND plr.status like '%"+status+"%' "
-					+ (providerSearch ? "AND plr.provider_no = '"+searchProviderNo+"' " : "")
+					+ " 	AND plr.status like ? "
+					+ (providerSearch ? "AND plr.provider_no = ? " : "")
 					+ " GROUP BY demographic_no ";
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
-		ResultSet rs= ps.executeQuery(sql);
+		ps.setString(1, demographicNo);
+		ps.setString(2, "%"+status+"%");
+		if(providerSearch){
+			ps.setString(3, searchProviderNo);
+		}
+		ResultSet rs= ps.executeQuery();
         return (rs.next() ? rs.getInt("count") : 0);
 	}
 
