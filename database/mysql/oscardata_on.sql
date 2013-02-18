@@ -13144,7 +13144,6 @@ INSERT INTO diagnosticcode VALUES (533,'042','AIDS                              
 --
 -- Dumping data for table 'validations'
 --
-insert into encounterForm values('Growth Charts', '../form/formGrowthChart.jsp?demographic_no=', 'formGrowthChart', 0);
 insert into encounterForm values('AR2005', '../form/formonar.jsp?demographic_no=', 'formONAR', '0');
 insert into encounterForm values('Ovulation', '../form/formovulation.jsp?demographic_no=', 'formovulation', '0');
 INSERT INTO encounterForm (form_name, form_value, form_table, hidden) VALUES ('Lab Req 2007', '../form/formlabreq07.jsp?demographic_no=', 'formLabReq07', 0);
