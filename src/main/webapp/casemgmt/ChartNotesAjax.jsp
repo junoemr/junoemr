@@ -30,7 +30,7 @@
 <%@taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi"%>
 <%@page import="java.util.Enumeration"%>
 <%@page import="oscar.oscarEncounter.pageUtil.NavBarDisplayDAO"%>
-<%@page	import="java.util.Arrays,java.util.Properties,java.util.List,java.util.Set,java.util.ArrayList,java.util.Enumeration,java.util.HashSet,java.util.Iterator,java.text.SimpleDateFormat,java.util.Calendar,java.util.Date,java.text.ParseException"%>
+<%@page	import="java.util.Arrays,java.util.Properties,java.util.List,java.util.Set,java.util.ArrayList,java.util.Enumeration,java.util.HashSet,java.util.Iterator,java.text.SimpleDateFormat,java.util.Calendar,java.util.Date,java.text.ParseException,java.net.URLEncoder"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="org.oscarehr.common.model.UserProperty,org.oscarehr.casemgmt.model.*,org.oscarehr.casemgmt.service.* "%>
 <%@page import="org.oscarehr.casemgmt.web.formbeans.*"%>
@@ -489,7 +489,7 @@ int maxId = 0;
 							String winName = "docs" + demographicNo;
 							int hash = Math.abs(winName.hashCode());
 
-							url = "popupPage(700,800,'" + hash + "', '" + request.getContextPath() + "/dms/documentGetFile.jsp?document=" + StringEscapeUtils.escapeJavaScript(dispFilename) + "&type=" + dispStatus + "&doc_no=" + dispDocNo + "');";
+							url = "popupPage(700,800,'" + hash + "', '" + request.getContextPath() + "/dms/documentGetFile.jsp?document=" + URLEncoder.encode(StringEscapeUtils.escapeJavaScript(URLEncoder.encode(dispFilename)) + "&type=" + dispStatus + "&doc_no=" + dispDocNo + "');";
 							url = url + "return false;";
 
 							if (note.getRemoteFacilityId()==null) // only allow editing for local notes
@@ -516,7 +516,7 @@ int maxId = 0;
 							String winName = "docs" + demographicNo;
 							int hash = Math.abs(winName.hashCode());
 
-							url = "popupPage(700,800,'" + hash + "', '" + request.getContextPath() + "/dms/documentGetFile.jsp?document=" + StringEscapeUtils.escapeJavaScript(dispFilename) + "&type=" + dispStatus + "&doc_no=" + dispDocNo + "');";
+							url = "popupPage(700,800,'" + hash + "', '" + request.getContextPath() + "/dms/documentGetFile.jsp?document=" + StringEscapeUtils.escapeJavaScript(URLEncoder.encode(dispFilename)) + "&type=" + dispStatus + "&doc_no=" + dispDocNo + "');";
 							url = url + "return false;";
 						 	%>
 							 	<a class="links" title="<bean:message key="oscarEncounter.view.docView"/>" id="view<%=globalNoteId%>" href="javascript:void(0);" onclick="<%=url%>" style="float: right; margin-right: 5px; font-size: 10px;color:black">
