@@ -489,7 +489,7 @@ int maxId = 0;
 							String winName = "docs" + demographicNo;
 							int hash = Math.abs(winName.hashCode());
 
-							url = "popupPage(700,800,'" + hash + "', '" + request.getContextPath() + "/dms/documentGetFile.jsp?document=" + URLEncoder.encode(StringEscapeUtils.escapeJavaScript(URLEncoder.encode(dispFilename)) + "&type=" + dispStatus + "&doc_no=" + dispDocNo + "');";
+							url = "popupPage(700,800,'" + hash + "', '" + request.getContextPath() + "/dms/documentGetFile.jsp?document=" + StringEscapeUtils.escapeJavaScript(URLEncoder.encode(dispFilename)) + "&type=" + dispStatus + "&doc_no=" + dispDocNo + "');";
 							url = url + "return false;";
 
 							if (note.getRemoteFacilityId()==null) // only allow editing for local notes
