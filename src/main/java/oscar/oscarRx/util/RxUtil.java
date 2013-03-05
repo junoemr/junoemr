@@ -1561,7 +1561,7 @@ public class RxUtil {
         String[] specArr = codesData.getSpecialInstructions();
         List<String> specList=Arrays.asList(specArr);
         // get all past record spec inst from drugs table
-        String sql ="SELECT distinct special_instruction from drugs where special_instruction!='NULL'";
+        String sql ="SELECT distinct special_instruction from drugs where special_instruction!='NULL' order by rx_date desc limit 100";
         List<String> resultSpecInst=new ArrayList<String>();
         try {
 
