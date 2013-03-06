@@ -916,10 +916,12 @@ function switchProvider(value) {
 		document.getElementById("letterheadFax").value = "<%=clinic.getClinicFax().trim() %>";
 		document.getElementById("letterheadFaxSpan").innerHTML = "<%=clinic.getClinicFax().trim() %>";
 	} else {
-		if (typeof providerData["prov_" + value] != "undefined")
+		if (typeof providerData["prov_" + value] != "undefined"){
+			document.getElementById("letterheadName").value = value;
 			value = "prov_" + value;
+		}
 
-		document.getElementById("letterheadName").value = value;
+		
 		document.getElementById("letterheadAddress").value = providerData[value]['address'];
 		document.getElementById("letterheadAddressSpan").innerHTML = providerData[value]['address'].replace(" ", "&nbsp;");
 		document.getElementById("letterheadPhone").value = providerData[value]['phone'];

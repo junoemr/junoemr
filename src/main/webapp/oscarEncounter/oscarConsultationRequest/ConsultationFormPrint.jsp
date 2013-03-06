@@ -393,7 +393,10 @@
                             <td colspan="2" class="title4" id="clinicName">
                             	<c:if test="${empty infirmaryView_programAddress}">
 	                                <b><%=clinic.getClinicName()%></b>
-                                </c:if>
+								</c:if>
+								<% if (!reqFrm.letterheadName.trim().equals("-1")){%>
+									<div><%=reqFrm.getProviderName(reqFrm.letterheadName) %></div>
+								<% } %>
                             </td>
 <% if(vecAddressBillingNo != null) {%>
                             <td rowspan=3 align="right">
