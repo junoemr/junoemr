@@ -46,6 +46,7 @@
   }
   String oscarhost_login = props.getProperty("oscarhost_login");
   String instance_id = "";
+  String non_secure_oscarhost_login = oscarhost_login.replace("https", "http");
   Boolean remote_oscar_login = false;
   if(oscarhost_login != null){
         String splitted_string[] = oscarhost_login.split("/");
@@ -53,26 +54,25 @@
         
     try{
         HttpURLConnection.setFollowRedirects(false);
-        HttpURLConnection con = (HttpURLConnection) new URL(oscarhost_login).openConnection();
+        HttpURLConnection con = (HttpURLConnection) new URL(non_secure_oscarhost_login).openConnection();
         con.setRequestMethod("HEAD");
 
-        if(con.getResponseCode() == HttpURLConnection.HTTP_OK){
+        if(con.getResponseCode() != HttpURLConnection.HTTP_UNAVAILABLE &&
+            con.getResponseCode() != HttpURLConnection.HTTP_UNAUTHORIZED &&
+            con.getResponseCode() != HttpURLConnection.HTTP_PROXY_AUTH &&
+            con.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND &&
+            con.getResponseCode() != HttpURLConnection.HTTP_INTERNAL_ERROR &&
+            con.getResponseCode() != HttpURLConnection.HTTP_GONE &&
+            con.getResponseCode() != HttpURLConnection.HTTP_GATEWAY_TIMEOUT &&
+            con.getResponseCode() != HttpURLConnection.HTTP_FORBIDDEN &&
+            con.getResponseCode() != HttpURLConnection.HTTP_BAD_REQUEST &&
+            con.getResponseCode() != HttpURLConnection.HTTP_BAD_GATEWAY ){
 
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(new URL(oscarhost_login).openStream());
+            remote_oscar_login = true;
 
-            if(doc.getElementsByTagName("input").item(0).getNodeType() == Node.ELEMENT_NODE){
-                Element first_input = (Element) doc.getElementsByTagName("input").item(0);
-                MiscUtils.getLogger().info(first_input.getAttribute("value"));
-                //TODO: might be better if we check this against the instance id    
-                if(first_input.getAttribute("value").length() > 0 && first_input.getAttribute("value").equals(instance_id)){
-                    remote_oscar_login = true;
-                }
-            }
         }
     }catch(Exception e){
-           MiscUtils.getLogger().info("Exception "+e);
+        MiscUtils.getLogger().info("Exception "+e);
     }
   }
   if(remote_oscar_login){
