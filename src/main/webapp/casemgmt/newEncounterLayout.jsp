@@ -615,7 +615,7 @@ var Colour = {
         printDateMsg = "<bean:message key="oscarEncounter.printDate.msg"/>";
         printDateOrderMsg = "<bean:message key="oscarEncounter.printDateOrder.msg"/>";
         nothing2PrintMsg = "<bean:message key="oscarEncounter.nothingToPrint.msg"/>";
-        editUnsignedMsg = "<bean:message key="oscarEncounter.printDateOrder.msg"/>";
+        editUnsignedMsg = "<bean:message key="oscarEncounter.editUnsignedNote.msg"/>";
         msgDraftSaved = "<bean:message key="oscarEncounter.draftSaved.msg"/>";
         msgPasswd = "<bean:message key="Logon.passWord"/>";
         btnMsgUnlock = "<bean:message key="oscarEncounter.Index.btnUnLock"/>";
