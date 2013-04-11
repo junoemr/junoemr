@@ -46,11 +46,11 @@
   }
   String oscarhost_login = props.getProperty("oscarhost_login");
   String instance_id = "";
-  String non_secure_oscarhost_login = oscarhost_login.replace("https", "http");
   Boolean remote_oscar_login = false;
   if(oscarhost_login != null){
-        String splitted_string[] = oscarhost_login.split("/");
-        instance_id = splitted_string[splitted_string.length-1];
+    String non_secure_oscarhost_login = oscarhost_login.replace("https", "http");
+    String splitted_string[] = oscarhost_login.split("/");
+    instance_id = splitted_string[splitted_string.length-1];
         
     try{
         HttpURLConnection.setFollowRedirects(false);
