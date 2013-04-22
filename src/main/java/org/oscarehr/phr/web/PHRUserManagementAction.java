@@ -54,6 +54,7 @@ import org.oscarehr.document.model.CtlDocumentPK;
 import org.oscarehr.myoscar_server.ws.AccountWs;
 import org.oscarehr.myoscar_server.ws.InvalidRelationshipException_Exception;
 import org.oscarehr.myoscar_server.ws.InvalidRequestException_Exception;
+import org.oscarehr.myoscar_server.ws.NoSuchItemException_Exception;
 import org.oscarehr.myoscar_server.ws.NotAuthorisedException_Exception;
 import org.oscarehr.myoscar_server.ws.PersonTransfer;
 import org.oscarehr.myoscar_server.ws.Relation;
@@ -466,6 +467,7 @@ public class PHRUserManagementAction extends DispatchAction {
     	    ar.addParameter("DocId",""+document.getId());
 
             addRelationships(request, newAccount);
+            registerExternalComponent( request, newAccount );
         }
         catch (InvalidRequestException_Exception e)
         {
@@ -508,6 +510,22 @@ public class PHRUserManagementAction extends DispatchAction {
 		}
 
 		RegistrationHelper.storeSelectionDefaults(request);
+    }
+    
+    private void registerExternalComponent(HttpServletRequest request, PersonTransfer newAccount) throws NotAuthorisedException_Exception, NoSuchItemException_Exception {
+		
+		OscarProperties props = OscarProperties.getInstance();
+		String externalComponentName = props.getProperty("myoscar_external_component");
+
+		if( externalComponentName != null){
+			PHRAuthentication auth=MyOscarUtils.getPHRAuthentication(request.getSession());
+			AccountWs accountWs=MyOscarServerWebServicesManager.getAccountWs(auth.getMyOscarUserId(), auth.getMyOscarPassword());
+		
+			//See setExternalComponentVisible on myoscar_client_utils' AccountManager.java
+			String myoscar_client_prefix = "MyOscarClient.External.";
+			accountWs.setPersonPreferences3(newAccount.getId(), myoscar_client_prefix + externalComponentName, "true");
+			log.debug("Registering component: "+externalComponentName);
+		}
     }
 
 	private void handleReverseRelation(AccountWs accountWs, HttpServletRequest request, PersonTransfer newAccount, String key) throws NotAuthorisedException_Exception, InvalidRequestException_Exception, InvalidRelationshipException_Exception {
