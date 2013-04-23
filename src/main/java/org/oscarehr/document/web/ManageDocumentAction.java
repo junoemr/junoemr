@@ -172,14 +172,6 @@ public class ManageDocumentAction extends DispatchAction {
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("Error", e);
 		}
-		if (flagproviders != null) {
-			for (String str : flagproviders) {
-
-			}
-		}
-		if (ret != null && !ret.equals("")) {
-			// response.getOutputStream().print(ret);
-		}
 		HashMap hm = new HashMap();
 		hm.put("patientId", demog);
 		JSONObject jsonObject = JSONObject.fromObject(hm);
