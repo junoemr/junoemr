@@ -467,7 +467,8 @@ public class PHRUserManagementAction extends DispatchAction {
     	    ar.addParameter("DocId",""+document.getId());
 
             addRelationships(request, newAccount);
-            registerExternalComponent( request, newAccount );
+            enableExternalComponent( request, newAccount );
+            enableEmailNotifications( request, newAccount );
         }
         catch (InvalidRequestException_Exception e)
         {
@@ -512,12 +513,12 @@ public class PHRUserManagementAction extends DispatchAction {
 		RegistrationHelper.storeSelectionDefaults(request);
     }
     
-    private void registerExternalComponent(HttpServletRequest request, PersonTransfer newAccount) throws NotAuthorisedException_Exception, NoSuchItemException_Exception {
+    private void enableExternalComponent(HttpServletRequest request, PersonTransfer newAccount) throws NotAuthorisedException_Exception, NoSuchItemException_Exception {
 		
 		OscarProperties props = OscarProperties.getInstance();
 		String externalComponentName = props.getProperty("myoscar_external_component");
 
-		if( externalComponentName != null){
+		if( externalComponentName != null ){
 			PHRAuthentication auth=MyOscarUtils.getPHRAuthentication(request.getSession());
 			AccountWs accountWs=MyOscarServerWebServicesManager.getAccountWs(auth.getMyOscarUserId(), auth.getMyOscarPassword());
 		
@@ -525,6 +526,29 @@ public class PHRUserManagementAction extends DispatchAction {
 			String myoscar_client_prefix = "MyOscarClient.External.";
 			accountWs.setPersonPreferences3(newAccount.getId(), myoscar_client_prefix + externalComponentName, "true");
 			log.debug("Registering component: "+externalComponentName);
+		}
+    }
+    
+    private void enableEmailNotifications(HttpServletRequest request, PersonTransfer newAccount) throws NotAuthorisedException_Exception, NoSuchItemException_Exception{
+    	OscarProperties props = OscarProperties.getInstance();
+		String enableEmailNotifications = props.getProperty("myoscar_email_notifications");
+
+		if( enableEmailNotifications != null && ("yes").equals(enableEmailNotifications)){
+			PHRAuthentication auth=MyOscarUtils.getPHRAuthentication(request.getSession());
+			AccountWs accountWs=MyOscarServerWebServicesManager.getAccountWs(auth.getMyOscarUserId(), auth.getMyOscarPassword());
+		
+			accountWs.setPersonPreferences3(newAccount.getId(), "EMAIL_NOTIFICATION_ON_NEW_DOCUMENT", "true");
+			log.debug("Setting email notifications to true for new documents");
+			
+			/*
+			//Our version of oscar can't handle this at the moment
+			MessageWs messageWs = MyOscarServerWebServicesManager.getMessageWs(auth.getMyOscarUserId(), auth.getMyOscarPassword());
+			MessagingPreferencesTransfer messagePrefTransfer = new MessagingPreferencesTransfer();
+			messagePrefTransfer.setEmailNotifyUponNewMessage(true)
+			messageWs.updateMessagingPreferences(messagePrefTransfer);
+			log.debug("Setting email notifications to true for new messages");
+			
+			*/
 		}
     }
 
