@@ -36,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Date;
@@ -573,7 +574,7 @@ public class ManageDocumentAction extends DispatchAction {
 			log.debug("about to Print to stream");
 			ServletOutputStream outs = response.getOutputStream();
 
-			response.setHeader("Content-Disposition", "attachment;filename=" + d.getDocfilename());
+			response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(d.getDocfilename(), "UTF-8"));
 			BufferedInputStream bfis = null;
 			try {
 				bfis = new BufferedInputStream(new FileInputStream(outfile));
@@ -625,7 +626,7 @@ public class ManageDocumentAction extends DispatchAction {
 			}
 			response.setContentType("image/png");
 			ServletOutputStream outs = response.getOutputStream();
-			response.setHeader("Content-Disposition", "attachment;filename=" + d.getDocfilename());
+			response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(d.getDocfilename(), "UTF-8"));
 
 			BufferedInputStream bfis = null;
 			try {
@@ -823,7 +824,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 		response.setContentType(contentType);
 		response.setContentLength(contentBytes.length);
-		response.setHeader("Content-Disposition", "inline; filename=" + filename);
+		response.setHeader("Content-Disposition", "inline; filename=" + URLEncoder.encode(filename, "UTF-8"));
 		log.debug("about to Print to stream");
 		ServletOutputStream outs = response.getOutputStream();
 		outs.write(contentBytes);
