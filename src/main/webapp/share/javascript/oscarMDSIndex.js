@@ -1535,18 +1535,11 @@ function  popupStart(vheight,vwidth,varpage,windowname) {
 }
 
 function updateDocumentAndNext(eleId){//save doc info
-    return updateDocument(eleId, true);
-}
-
-function updateDocument(eleId, andNext){//save doc info
-    if (typeof(andNext) === 'undefined') { andNext = false; }
 	var url="../dms/ManageDocument.do",data=$(eleId).serialize(true);
-    // Note: synchronous Ajax to allow for the parent reload below
 	new Ajax.Request(url,
 			{
 				method:'post',
 				parameters:data,
-                asynchronous:false,
 				onSuccess:function(transport){
 					var json=transport.responseText.evalJSON();
 					var patientId;
@@ -1560,11 +1553,8 @@ function updateDocument(eleId, andNext){//save doc info
 						$("saveSucessMsg_"+num).show();
 						$('saved'+num).value='true';
 						$("msgBtn_"+num).onclick = function() { popup(700,960,'/oscar/oscarMessenger/SendDemoMessage.do?demographic_no='+patientId,'msg'); };
-                        if (andNext)
-                        {
-                            //Hide document						
-                            Effect.BlindUp('labdoc_'+num);
-                        }
+						//Hide document						
+						Effect.BlindUp('labdoc_'+num);
 
 						var success= updateGlobalDataAndSideNav(num,patientId);
 						if(success){
@@ -1582,10 +1572,38 @@ function updateDocument(eleId, andNext){//save doc info
 				}
 			}
 	);
-    window.opener.location.reload();
 	return false;
 }
 
+function updateDocument(eleId){//save doc info
+	var url="../dms/ManageDocument.do",data=$(eleId).serialize(true);
+	new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){
+		var json=transport.responseText.evalJSON();
+		var patientId;
+		//oscarLog(json);
+		if(json!=null ){
+			patientId=json.patientId;
+
+			var ar=eleId.split("_");
+			var num=ar[1];
+			num=num.replace(/\s/g,'');
+			$("saveSucessMsg_"+num).show();
+			$('saved'+num).value='true';
+			$("msgBtn_"+num).onclick = function() { popup(700,960,'/oscar/oscarMessenger/SendDemoMessage.do?demographic_no='+patientId,'msg'); };
+			var success= updateGlobalDataAndSideNav(num,patientId);
+			if(success){
+				success=updatePatientDocLabNav(num,patientId);
+				if(success){
+					//disable demo input
+					$('autocompletedemo'+num).disabled=true;
+					//console.log('updated by save');
+					//console.log(patientDocs);
+				}
+			}
+		}
+	}});
+	return false;
+}
 
 function updateStatus(formid){//acknowledge
 	var num=formid.split("_");

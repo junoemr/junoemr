@@ -150,20 +150,11 @@ public class ReportReassignAction extends Action {
         	}
         	
             newURL = mapping.findForward("success").getPath();
-            if (newURL.contains("labDisplay.jsp")) {
-                newURL = newURL 
-                            + "?providerNo=" + ((providerNo != null) ? providerNo : "")
-                            + "&searchProviderNo=" + ((searchProviderNo != null) ? searchProviderNo : "") 
-                            + "&status=" + ((status != null) ? status : "") 
-                            + "&segmentID=" + ((flaggedLabs != null && flaggedLabs.length > 0 && flaggedLabs[0] != null) ? flaggedLabs[0] : "");
-                // the segmentID is needed when being called from a lab display
-            } else {
-                newURL = newURL
-                            + "&providerNo=" + ((providerNo != null) ? providerNo : "")
-                            + "&searchProviderNo=" + ((searchProviderNo != null) ? searchProviderNo : "") 
-                            + "&status=" + ((status != null) ? status : "") 
-                            + "&segmentID=" + ((flaggedLabs != null && flaggedLabs.length > 0 && flaggedLabs[0] != null) ? flaggedLabs[0] : "");
-            }
+            if(newURL.contains("labDisplay.jsp"))
+                newURL = newURL + "?providerNo=" + providerNo + "&searchProviderNo=" + searchProviderNo + "&status=" + status + "&segmentID=" + flaggedLabs[0];
+
+            // the segmentID is needed when being called from a lab display
+            else newURL = newURL + "&providerNo=" + providerNo + "&searchProviderNo=" + searchProviderNo + "&status=" + status + "&segmentID=" + flaggedLabs[0];
             if (request.getParameter("lname") != null) { newURL = newURL + "&lname="+request.getParameter("lname"); }
             if (request.getParameter("fname") != null) { newURL = newURL + "&fname="+request.getParameter("fname"); }
             if (request.getParameter("hnum") != null) { newURL = newURL + "&hnum="+request.getParameter("hnum"); }
