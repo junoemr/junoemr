@@ -209,20 +209,41 @@ public class CategoryData {
         return (rs.next() ? rs.getInt("count") : 0);
 	}
 
-	public int getDocumentCountForUnmatched()
-			throws SQLException {
-		String sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
-					+ " FROM ctl_document cd, providerLabRouting plr "
-					+ " WHERE plr.lab_type = 'DOC' AND plr.status like ? "
-					+ (providerSearch ? " AND plr.provider_no =? " : "")
-					+ "	AND plr.lab_no = cd.document_no"
-					+ " AND 	cd.module_id = -1 ";
+	public int getDocumentCountForUnmatched() throws SQLException {
+		int qp_number = 1;
+		boolean qp_status = false;
+		boolean qp_provider_no = false;
+
+		String sql	= "SELECT count(*) AS count "
+					+ "FROM document doc "
+					+ "INNER JOIN ctl_document cdoc ON (cdoc.module = 'demographic' AND doc.document_no = cdoc.document_no) "
+					+ "LEFT JOIN patientLabRouting patLR ON (patLR.lab_type = 'DOC' AND patLR.lab_no = doc.document_no) "
+					+ "LEFT JOIN providerLabRouting proLR ON (proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no) "
+					+ "WHERE NOT EXISTS (SELECT 1 FROM demographic WHERE demographic_no IN (patLR.demographic_no, cdoc.module_id)) ";
+
+		if ("N".equals(status)) {
+			sql = sql + " AND (proLR.status IN ('N', NULL)) ";
+		} else if (!"".equals(status)) {
+			sql = sql + " AND (proLR.status = ?) ";
+			qp_status = true;
+		}
+
+		if (providerSearch)
+		{
+			if ("0".equals(searchProviderNo)) {
+				sql = sql + "	AND NOT EXISTS (SELECT 1 FROM provider WHERE provider_no = proLR.provider_no) ";
+			} else {
+				sql = sql + " AND proLR.provider_no = ? ";
+				qp_provider_no = true;
+			}
+		}
+
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
-		ps.setString(1, "%"+status+"%");
-		if(providerSearch){
-			ps.setString(2, searchProviderNo);
-		}
+		qp_number = 1;
+		if (qp_status) { ps.setString(qp_number++, status); }
+		if (qp_provider_no) { ps.setString(qp_number++, searchProviderNo); }
+
 		ResultSet rs= ps.executeQuery();
 		return (rs.next() ? rs.getInt("count") : 0);
 	}
@@ -296,26 +317,63 @@ public class CategoryData {
 
 	public int getDocumentCountForPatientSearch() throws SQLException {
 		PatientInfo info;
-		String sql = "SELECT HIGH_PRIORITY demographic_no, last_name, first_name, COUNT(1) as count"
-					+ " FROM ctl_document cd, demographic d, providerLabRouting plr"
-					+ " WHERE d.last_name like ?"
-					+ " AND d.first_name like ?"
-					+ " AND d.hin like ?"
-					+ " AND cd.module_id = d.demographic_no"
-					+ " AND cd.document_no = plr.lab_no"
-					+ " AND plr.lab_type = 'DOC'"
-					+ " AND plr.status like ?"
-					+ (providerSearch ? " AND plr.provider_no = ?" : "")
-					+ " GROUP BY demographic_no";
+		int qp_number = 1;
+		boolean qp_status = false;
+		boolean qp_provider_no = false;
+		boolean qp_first_name = false;
+		boolean qp_last_name = false;
+		boolean qp_hin = false;
+
+		String sql 	= "SELECT d.demographic_no, d.last_name, d.first_name, COUNT(1) as count "
+					+ "FROM ctl_document cd "
+					+ "INNER JOIN demographic d ON d.demographic_no = cd.module_id "
+					+ "INNER JOIN providerLabRouting proLR ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = cd.document_no ) "
+					+ "WHERE cd.module='demographic' ";
+
+		if ("N".equals(status)) {
+			sql = sql + " AND (proLR.status IN ('N', NULL)) ";
+		} else if (!"".equals(status)) {
+			sql = sql + " AND (proLR.status = ?) ";
+			qp_status = true;
+		}
+
+		if (providerSearch)
+		{
+			if ("0".equals(searchProviderNo)) {
+				//sql = sql + "	AND NOT EXISTS (SELECT 1 FROM provider WHERE provider_no = proLR.provider_no) ";
+				sql = sql + "	AND proLR.provider_no = '0' ";
+			} else {
+				sql = sql + " AND proLR.provider_no = ? ";
+				qp_provider_no = true;
+			}
+		}
+
+		if (!"".equals(patientLastName)) {
+			sql = sql + "  AND d.last_name like ? ";
+			qp_last_name = true;
+		}
+
+		if (!"".equals(patientFirstName)) {
+			sql = sql + "  AND d.first_name like ? ";
+			qp_first_name = true;
+		}
+
+		if (!"".equals(patientHealthNumber)) {
+			sql = sql + "  AND d.hin like ? ";
+			qp_hin = true;
+		}
+
+		sql = sql + "GROUP BY d.demographic_no ";
+
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
-		ps.setString(1, "%"+patientLastName+"%");
-		ps.setString(2, "%"+patientFirstName+"%");
-		ps.setString(3, "%"+patientHealthNumber+"%");
-		ps.setString(4, "%"+status+"%");		
-		if(providerSearch){
-			ps.setString(5, searchProviderNo);
-		}
+		qp_number = 1;
+		if (qp_status) { ps.setString(qp_number++, status); }
+		if (qp_provider_no) { ps.setString(qp_number++, searchProviderNo); }
+		if (qp_last_name) { ps.setString(qp_number++, "%" + patientLastName + "%"); }
+		if (qp_first_name) { ps.setString(qp_number++, "%" + patientFirstName + "%"); }
+		if (qp_hin) { ps.setString(qp_number++, "%" + patientHealthNumber + "%"); }
+
 		ResultSet rs= ps.executeQuery();
         int count = 0;
         while(rs.next()){

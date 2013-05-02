@@ -2329,7 +2329,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                 out.write(fillUp("",'-',tableWidth)); out.newLine();
 
                 //general log data
-                if (importNo==0) importNo = 1;
                 for (int i=0; i<importNo; i++) {
                     for (int j=0; j<keyword[0].length; j++) {
                         String category = keyword[0][j].trim();

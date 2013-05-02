@@ -262,6 +262,12 @@ public class LabResultData implements Comparable{
             PathnetResultsData prd = new PathnetResultsData();
             this.dateTime = prd.findPathnetObservationDate(this.segmentID);
         }*/
+        if ( this.dateTime == null ) {
+            StackTraceElement stackTraceOne = new Throwable().getStackTrace()[1];
+            String filename = stackTraceOne.getFileName();
+            String lineNumber = new Integer(stackTraceOne.getLineNumber()).toString();
+            logger.warn(filename + ":" + lineNumber + " this.dateTime is NULL. This is probably going to cause an exception somewhere in the code soon.");
+        }
 		return this.dateTime;
 	}
 

@@ -204,6 +204,22 @@ public class InboxResultsDao {
 
 
 			idLoc = 0; docNoLoc = 1; statusLoc = 2; docTypeLoc = 3; lastNameLoc = 4; firstNameLoc = 5; hinLoc = 6; sexLoc = 7; moduleLoc = 8; obsDateLoc = 9;
+            // Notes on query:
+            //
+            // Returns only DOCUMENTS so INNER JOIN providerLabRouting with
+            // document and ctl_document because they must exist for this 
+            // to be a valid document.  
+            //
+            // patientLabRouting is written into 
+            // the query as a LEFT JOIN but with a FALSE WHERE clause so
+            // it's never actually used.  Sometimes a patientLabRouting 
+            // exists for a DOCUMENT, sometimes it doesn't -- I don't know
+            // why, but it seems to be consistent with the ctl_document with
+            // respect to the demographic_no (module_id in ctl_document).
+            // 
+            // Similarly, getting the demographic based on the patientLabRouting
+            // is written into the query, but since the patientLabRouting is 
+            // never joined, it will never be used.
 			sql = "SELECT  proLR.id, "
 				+ "        proLR.lab_no AS document_no, "
 				+ "        proLR.status, "
@@ -218,10 +234,10 @@ public class InboxResultsDao {
 				+ "        CASE WHEN d1.demographic_no IS NOT NULL THEN d1.demographic_no ELSE d2.demographic_no END AS demographic_no, "
 				+ "        doc.observationdate AS observationdate "
 				+ "FROM providerLabRouting proLR "
-				+ "LEFT JOIN patientLabRouting patLR ON ( proLR.lab_type = patLR.lab_type AND proLR.lab_no = patLR.lab_no ) "
-				+ "LEFT JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no ) "
-				+ "LEFT JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' ) "
-				+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no ) "
+				+ "LEFT JOIN patientLabRouting patLR ON ( proLR.lab_type = patLR.lab_type AND proLR.lab_no = patLR.lab_no AND FALSE ) "
+				+ "INNER JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no ) "
+				+ "INNER JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' ) "
+				+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no AND FALSE ) "
 				+ "LEFT JOIN demographic d2 ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id > 0 AND cdoc.module_id = d2.demographic_no ) "
 				+ "WHERE proLR.lab_type = 'DOC' ";
 
