@@ -644,7 +644,7 @@ function pasteAppt(multipleSameDayGroupAppt) {
             		name = String.valueOf((bFirstDisp && !bFromWL)?"":request.getParameter("name")==null?session.getAttribute("appointmentname")==null?"":session.getAttribute("appointmentname"):request.getParameter("name"));
             	%>
                 <INPUT TYPE="TEXT" NAME="keyword"
-                        VALUE="<%=name%>"
+                        VALUE="<%=StringEscapeUtils.escapeHtml((String) ((bFirstDisp && !bFromWL)?"":request.getParameter("name")==null?session.getAttribute("appointmentname")==null?"":session.getAttribute("appointmentname"):request.getParameter("name")))%>"
                         HEIGHT="20" border="0" hspace="2" width="25" tabindex="1">
             </div>
             <div class="space">
