@@ -143,7 +143,7 @@ public class EctConsultationFormFaxAction extends Action {
 				recipients = new ArrayList<String>(new HashSet<String>(recipients));
 				
 				// Writing consultation request to disk as a pdf.
-				String tempPath = System.getProperty("java.io.tmpdir");
+				String tempPath = OscarProperties.getInstance().getProperty("fax_file_location");
 				String faxPdf = String.format("%s%s%s.pdf", tempPath, File.separator, reqId + System.currentTimeMillis());
 				FileOutputStream fos = new FileOutputStream(faxPdf);				
 				ConcatPDF.concat(alist, fos);				

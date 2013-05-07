@@ -96,12 +96,12 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 					writer.println("<script>alert('Error: No fax number found!');window.close();</script>");
 				} else {
 		                	// write to file
-		                	String pdfFile = System.getProperty("java.io.tmpdir")+"/prescription_"+req.getParameter("pdfId")+".pdf";
+		                	String pdfFile = OscarProperties.getInstance().getProperty("fax_file_location")+"/prescription_"+req.getParameter("pdfId")+".pdf";
 		                	FileOutputStream fos = new FileOutputStream(pdfFile);
 		                	baosPDF.writeTo(fos);
 		                	fos.close();
 
-			                String txtFile = System.getProperty("java.io.tmpdir")+"/prescription_"+req.getParameter("pdfId")+".txt";
+			                String txtFile = OscarProperties.getInstance().getProperty("fax_file_location")+"/prescription_"+req.getParameter("pdfId")+".txt";
 			                FileWriter fstream = new FileWriter(txtFile);
 		                	BufferedWriter out = new BufferedWriter(fstream);
 		                	out.write(faxNo);

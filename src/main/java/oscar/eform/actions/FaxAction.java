@@ -99,7 +99,7 @@ public final class FaxAction {
 			
 			// Removing duplicate phone numbers.
 			recipients = new ArrayList<String>(new HashSet<String>(recipients));
-			String tempPath = System.getProperty("java.io.tmpdir");
+			String tempPath = OscarProperties.getInstance().getProperty("fax_file_location");
 			FileOutputStream fos;
 			for (int i = 0; i < recipients.size(); i++) {					
 			    String faxNo = recipients.get(i).trim().replaceAll("\\D", "");
