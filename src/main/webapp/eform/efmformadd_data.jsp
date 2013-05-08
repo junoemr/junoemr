@@ -67,12 +67,15 @@ function hideDiv() {
       thisEForm.setProviderNo(provider_no);  //needs provider for the action
   }
 
+  
   if (appointment_no!=null) thisEForm.setAppointmentNo(appointment_no);
   if (eform_link!=null) thisEForm.setEformLink(eform_link);
+  thisEForm.setLoggedInProvider(provider_no);
   thisEForm.setContextPath(request.getContextPath());
   thisEForm.setupInputFields();
   thisEForm.setImagePath();
   thisEForm.setDatabaseAPs();
+  thisEForm.setDatabaseUpdateAPs();
   thisEForm.setOscarOPEN(request.getRequestURI());
   thisEForm.setAction();
   out.print(thisEForm.getFormHtml());

@@ -26,12 +26,14 @@
 <%@ page import="java.sql.*, oscar.eform.data.*"%>
 <%
 	String id = request.getParameter("fid");
+	String provider_no = (String) session.getValue("user");
   if (id == null) {  // form exists in patient
       id = request.getParameter("fdid");
       String appointmentNo = request.getParameter("appointment");
       String eformLink = request.getParameter("eform_link");
 
       EForm eForm = new EForm(id);
+      eForm.setLoggedInProvider(provider_no);
       eForm.setContextPath(request.getContextPath());
       eForm.setOscarOPEN(request.getRequestURI());
       if ( appointmentNo != null ) eForm.setAppointmentNo(appointmentNo);
@@ -39,13 +41,16 @@
 
       String parentAjaxId = request.getParameter("parentAjaxId");
       if( parentAjaxId != null ) eForm.setAction(parentAjaxId);
+      eForm.setDatabaseUpdateAPs();      
       out.print(eForm.getFormHtml());
   } else {  //if form is viewed from admin screen
       EForm eForm = new EForm(id, "-1"); //form cannot be submitted, demographic_no "-1" indicate this specialty
+      eForm.setLoggedInProvider(provider_no);
       eForm.setContextPath(request.getContextPath());
       eForm.setupInputFields();
       eForm.setOscarOPEN(request.getRequestURI());
       eForm.setImagePath();
+      eForm.setDatabaseUpdateAPs(); 
       out.print(eForm.getFormHtml());
   }
 %>

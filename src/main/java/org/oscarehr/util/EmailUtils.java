@@ -36,10 +36,12 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
-import org.apache.log4j.Logger;
 import org.apache.commons.validator.EmailValidator;
+import org.apache.log4j.Logger;
+
 import oscar.OscarProperties;
 
 /**
@@ -153,6 +155,8 @@ public final class EmailUtils
 		Properties properties = session.getProperties();
 		properties.setProperty("mail.smtp.connectiontimeout", "20000");
 		properties.setProperty("mail.smtp.timeout", "20000");
+		properties.setProperty("mail.smtp.starttls.enable", "true");
+		properties.setProperty("mail.smtp.auth", "true");
 
 		return(email);
 	}
@@ -187,6 +191,38 @@ public final class EmailUtils
 		htmlEmail.setSubject(subject);
 		if (textContents != null) htmlEmail.setTextMsg(textContents);
 		if (htmlContents != null) htmlEmail.setHtmlMsg(htmlContents);
+
+		htmlEmail.send();
+	}
+	
+	/**
+	 * This is a convenience method for sending and email to 1 recipient using the configuration file settings.
+	 * @throws EmailException 
+	 */
+	public static void sendEmailWithAttachment(String toEmailAddress, String toName, String fromEmailAddress, String fromName, String subject, String textContents, String htmlContents, String attachmentPath) throws EmailException
+	{
+		HtmlEmail htmlEmail = getHtmlEmail();
+
+		htmlEmail.addTo(toEmailAddress, toName);
+				
+		htmlEmail.setFrom(fromEmailAddress, fromName);
+		
+		htmlEmail.addReplyTo(fromEmailAddress);
+
+		htmlEmail.setSubject(subject);
+		if (textContents != null) htmlEmail.setTextMsg(textContents);
+		if (htmlContents != null) htmlEmail.setHtmlMsg(htmlContents);
+		
+		EmailAttachment attachment = new EmailAttachment();
+
+		logger.debug("path: " + attachmentPath);
+		
+		attachment.setPath(attachmentPath);
+		attachment.setDisposition(EmailAttachment.ATTACHMENT);
+		attachment.setDescription("Email Attachment");
+		
+		logger.debug("Attachment: "+attachmentPath);
+		htmlEmail.attach(attachment);
 
 		htmlEmail.send();
 	}

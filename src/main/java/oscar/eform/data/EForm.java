@@ -60,6 +60,8 @@ public class EForm extends EFormBase {
 	private HashMap<String, String> fieldValues = new HashMap<String, String>();
 	private int needValueInForm = 0;
 	private boolean setAP2nd = false;
+	
+	private String loggedInProvider = null;
 
 	private static final String EFORM_DEMOGRAPHIC = "eform_demographic";
 	private static final String VAR_NAME = "var_name";
@@ -98,6 +100,7 @@ public class EForm extends EFormBase {
 			this.formHtml = eFormData.getFormData();
 			this.patientIndependent = eFormData.getPatientIndependent();
 			this.roleType = eFormData.getRoleType();
+			
 		} else {
 			this.formName = "";
 			this.formSubject = "";
@@ -124,6 +127,10 @@ public class EForm extends EFormBase {
 	}
 	public void setAppointmentNo(String appt_no) {
             this.appointment_no = EFormUtil.blank(appt_no) ? "-1" : appt_no;
+	}
+	
+	public void setLoggedInProvider( String providerNo ){
+		this.loggedInProvider = providerNo;
 	}
 
 	public String getEformLink() {
@@ -281,6 +288,63 @@ public class EForm extends EFormBase {
 			else i = 2;
 		}
 	}
+	
+	// --------------------------Setting Update APs utilities----------------------------------------
+	public void setDatabaseUpdateAPs() {
+		StringBuilder html = new StringBuilder(this.formHtml);
+		EFormLoader.getInstance();
+		String marker = EFormLoader.getUpdateMarker(); // default: marker: "oscarUpdateMarker="
+		for (int i = 0; i < 2; i++) { // run the following twice if "count"-type field is found
+			int markerLoc = -1;
+			while ((markerLoc = getFieldIndex(html, markerLoc + 1)) >= 0) {
+				log.debug("===============START UPDATE AP CYCLE===========");
+				String fieldHeader = getFieldHeader(html, markerLoc);
+				String apName = EFormUtil.getAttribute(marker, fieldHeader); // gets varname from oscarDB=varname
+                                String apName0 = EFormUtil.removeQuotes(apName);
+				if (EFormUtil.blank(apName)) {
+					if (!setAP2nd) saveFieldValue(html, markerLoc);
+					continue;
+				}
+				log.debug("AP ==== " + apName);
+				if (setAP2nd && !apName0.startsWith("e$")) continue; // ignore non-e$ oscarDB on 2nd run
+
+				int needing = needValueInForm;
+				String fieldType = getFieldType(fieldHeader); // textarea, text, hidden etc..
+				if ((fieldType.equals("")) || (apName0.equals(""))) continue;
+
+				// sets up the pointer where to write the value				
+				int header_pos = markerLoc;				
+				
+				int pointer = markerLoc + EFormUtil.getAttributePos(marker,fieldHeader) + marker.length() + 1;
+				if (!fieldType.equals("textarea")) {
+					pointer += apName.length();
+				}
+				EFormLoader.getInstance();
+				DatabaseAP curAP = EFormLoader.getAP(apName0);
+				if (curAP == null) curAP = getAPExtra(apName0, fieldHeader);
+				if (curAP == null) continue;
+				if (!setAP2nd) { // 1st run
+					//html = putValuesFromAP(curAP, fieldType, pointer, html);
+					html = replaceFieldValueFromAP(curAP, fieldType, header_pos, html);
+					
+					saveFieldValue(html, markerLoc);
+				} else { // 2nd run
+					if (needing > needValueInForm) html = replaceFieldValueFromAP(curAP, fieldType, pointer, html);
+				}
+
+				log.debug("Marker ==== " + markerLoc);
+				log.debug("FIELD TYPE ====" + fieldType);
+				log.debug("=================End Cycle==============");
+				
+				
+			}
+			formHtml = html.toString();
+			if (needValueInForm > 0) setAP2nd = true;
+			else i = 2;
+		}
+		
+	}
+
 
 	// Gets all the fields that are "input" (i.e. write-to-database) fields.
 	public void setupInputFields() {
@@ -668,7 +732,9 @@ public class EForm extends EFormBase {
 	public String replaceAllFields(String sql) {
 		sql = DatabaseAP.parserReplace("demographic", demographicNo, sql);
 		sql = DatabaseAP.parserReplace("provider", providerNo, sql);
+		sql = DatabaseAP.parserReplace("loggedInProvider", loggedInProvider, sql);
 		sql = DatabaseAP.parserReplace("appt_no", appointment_no, sql);
+		sql = DatabaseAP.parserReplace("fdid", fdid, sql);
 
 		sql = DatabaseAP.parserReplace(EFORM_DEMOGRAPHIC, getSqlParams(EFORM_DEMOGRAPHIC), sql);
 		sql = DatabaseAP.parserReplace(REF_FID, getSqlParams(REF_FID), sql);
@@ -796,6 +862,61 @@ public class EForm extends EFormBase {
 			}
 		}
 		return html.substring(fieldIndex, end);
+	}
+	
+	private StringBuilder replaceFieldValueFromAP(DatabaseAP ap, String type, int pointer, StringBuilder html) {
+        //prepare all sql & output
+		String sql = ap.getApSQL();
+		String output = ap.getApOutput();
+		int end_tag;
+		if (!EFormUtil.blank(sql)) {
+			sql = replaceAllFields(sql);
+			log.debug("SQL----" + sql);
+			ArrayList<String> names = DatabaseAP.parserGetNames(output); // a list of ${apName} --> apName
+			sql = DatabaseAP.parserClean(sql); // replaces all other ${apName} expressions with 'apName'
+			ArrayList<String> values = EFormUtil.getValues(names, sql);
+			if (values.size() != names.size()) {
+				output = "";
+			} else {
+				for (int i = 0; i < names.size(); i++) {
+					output = DatabaseAP.parserReplace( names.get(i), values.get(i), output);
+				}
+			}
+		}
+	            //put values into according controls
+		if (type.equals("textarea")) {
+			pointer = html.indexOf(">", pointer) + 1;
+			end_tag = html.indexOf("</textarea>", pointer);
+			//html.insert(pointer, output);
+			html.replace(pointer, end_tag, output);
+		} else if (type.equals("select")) {
+			int selectEnd = StringBuilderUtils.indexOfIgnoreCase(html, "</select>", pointer);
+			if (selectEnd >= 0) {
+				int valueLoc = nextIndex(html, " value="+output, " value=\""+output, pointer);
+				if (valueLoc < 0 || valueLoc > selectEnd) return html;
+				pointer = nextSpot(html, valueLoc);
+				html = html.insert(pointer, " selected");
+			}
+		} else {
+			int end_value, start_value;
+			start_value = html.indexOf("value=\"", pointer);
+			end_tag = html.indexOf(">", pointer);
+			
+			String quote = output.contains("\"") ? "'" : "\"";
+			
+			if(start_value > 0 && start_value < end_tag){
+				
+				end_value = html.indexOf("\"", start_value + 7 ) + 1;
+				log.debug(start_value);
+				log.debug(end_tag);
+				log.debug(end_value);
+				html.replace(start_value, end_value, "value="+quote+output+quote);
+			}else{
+				start_value = html.indexOf(">", pointer);
+				html.insert(start_value, " value="+quote+output+quote);
+			}
+		}
+		return (html);
 	}
 
 	private void saveFieldValue(StringBuilder html, int fieldIndex) {

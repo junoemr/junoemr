@@ -44,6 +44,7 @@ public class EFormLoader {
     static private String marker = "oscarDB";
     static private String opener = "oscarOPEN";
     static private String inputMarker = "oscarDBinput";
+    static private String updateMarker = "oscarUpdateDB";
 
 
     static public EFormLoader getInstance() {
@@ -99,6 +100,7 @@ public class EFormLoader {
     public static String getMarker() { return marker; }
     public static String getInputMarker() { return inputMarker; }
     public static String getOpener() { return opener; }
+    public static String getUpdateMarker() { return updateMarker; }
 
     public static String getOpenEform(String url, String fdid, String fname, String field, EForm efm) {
         String fid = EFormUtil.getEFormIdByName(fname);
