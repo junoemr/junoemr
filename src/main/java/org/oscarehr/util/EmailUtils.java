@@ -186,6 +186,7 @@ public final class EmailUtils
 
 		htmlEmail.addTo(toEmailAddress, toName);
 		htmlEmail.setFrom(fromEmailAddress, fromName);
+		htmlEmail.addReplyTo(fromEmailAddress);
 
 		htmlEmail.setSubject(subject);
 		if (textContents != null) htmlEmail.setTextMsg(textContents);
