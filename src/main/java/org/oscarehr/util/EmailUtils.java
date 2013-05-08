@@ -155,7 +155,6 @@ public final class EmailUtils
 		Properties properties = session.getProperties();
 		properties.setProperty("mail.smtp.connectiontimeout", "20000");
 		properties.setProperty("mail.smtp.timeout", "20000");
-		properties.setProperty("mail.smtp.starttls.enable", "true");
 		properties.setProperty("mail.smtp.auth", "true");
 
 		return(email);
@@ -204,10 +203,7 @@ public final class EmailUtils
 		HtmlEmail htmlEmail = getHtmlEmail();
 
 		htmlEmail.addTo(toEmailAddress, toName);
-				
 		htmlEmail.setFrom(fromEmailAddress, fromName);
-		
-		htmlEmail.addReplyTo(fromEmailAddress);
 
 		htmlEmail.setSubject(subject);
 		if (textContents != null) htmlEmail.setTextMsg(textContents);
