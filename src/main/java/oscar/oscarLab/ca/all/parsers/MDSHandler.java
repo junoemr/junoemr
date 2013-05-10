@@ -505,7 +505,7 @@ public class MDSHandler implements MessageHandler {
     }
 
     public String getUnescapedName(){
-        return getLastName()+"^"+getFirstName()+"^"+getMiddleName();
+        return getLastName()+","+getFirstName()+" "+getMiddleName();
     }
 
     public String getDOB(){
