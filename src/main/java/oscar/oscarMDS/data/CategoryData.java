@@ -219,7 +219,7 @@ public class CategoryData {
 					+ "INNER JOIN ctl_document cdoc ON (cdoc.module = 'demographic' AND doc.document_no = cdoc.document_no) "
 					+ "LEFT JOIN patientLabRouting patLR ON (patLR.lab_type = 'DOC' AND patLR.lab_no = doc.document_no) "
 					+ "LEFT JOIN providerLabRouting proLR ON (proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no) "
-					+ "WHERE NOT EXISTS (SELECT 1 FROM demographic WHERE demographic_no IN (patLR.demographic_no, cdoc.module_id)) ";
+					+ "WHERE (cdoc.module_id = 0) ";
 
 		if ("N".equals(status)) {
 			sql = sql + " AND (proLR.status IN ('N', NULL)) ";
@@ -231,7 +231,7 @@ public class CategoryData {
 		if (providerSearch)
 		{
 			if ("0".equals(searchProviderNo)) {
-				sql = sql + "	AND NOT EXISTS (SELECT 1 FROM provider WHERE provider_no = proLR.provider_no) ";
+				sql = sql + "	AND (proLR.provider_no = '0') ";
 			} else {
 				sql = sql + " AND proLR.provider_no = ? ";
 				qp_provider_no = true;
@@ -340,7 +340,6 @@ public class CategoryData {
 		if (providerSearch)
 		{
 			if ("0".equals(searchProviderNo)) {
-				//sql = sql + "	AND NOT EXISTS (SELECT 1 FROM provider WHERE provider_no = proLR.provider_no) ";
 				sql = sql + "	AND proLR.provider_no = '0' ";
 			} else {
 				sql = sql + " AND proLR.provider_no = ? ";

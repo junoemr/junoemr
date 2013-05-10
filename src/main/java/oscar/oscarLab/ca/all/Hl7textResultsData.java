@@ -670,7 +670,7 @@ public class Hl7textResultsData {
 				// any provider
 			} else if ("0".equals(providerNo)) {
 				// unclaimed
-				sql = sql + "AND (NOT EXISTS ( SELECT 1 FROM provider WHERE proLR.provider_no = provider.provider_no )) ";
+				sql = sql + "AND (proLR.provider_no = '0') ";
 			} else {
 				sql = sql + "AND (proLR.provider_no = ?) ";
 				qp_provider_no = true;
