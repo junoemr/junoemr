@@ -9,19 +9,16 @@
 package oscar.eform.actions;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.mail.EmailException;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.EFormDataDao;
 import org.oscarehr.common.model.EFormData;
+import org.oscarehr.util.EmailUtils;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
@@ -30,19 +27,23 @@ import oscar.OscarProperties;
 
 import com.lowagie.text.DocumentException;
 
-public final class FaxAction {
+public final class EmailAction {
 
 	private static final Logger logger = MiscUtils.getLogger();
 
 	private String localUri = null;
 	
 	private boolean skipSave = false;
+	
+	private String fromEmailAddress = null;
 
-	public FaxAction(HttpServletRequest request) {
+	public EmailAction(HttpServletRequest request) {
 		localUri = getEformRequestUrl(request);
 		skipSave = "true".equals(request.getParameter("skipSave"));
+		
+		//LoggedInInfo loggedInfo = LoggedInInfo.loggedInInfo.get();
+		//providerNo = loggedInfo.loggedInProvider.getProviderNo();
 	}
-
 	/**
 	 * This method is a copy of Apache Tomcat's ApplicationHttpRequest getRequestURL method with the exception that the uri is removed and replaced with our eform viewing uri. Note that this requires that the remote url is valid for local access. i.e. the
 	 * host name from outside needs to resolve inside as well. The result needs to look something like this : https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&parentAjaxId=eforms
@@ -50,9 +51,7 @@ public final class FaxAction {
 	private String getEformRequestUrl(HttpServletRequest request) {
 		StringBuilder url = new StringBuilder();
 		String scheme = request.getScheme();
-		Integer port;
-		try { port = new Integer(OscarProperties.getInstance().getProperty("oscar_port")); }
-	    catch (Exception e) { port = 8443; }
+		int port = request.getServerPort();
 		if (port < 0) port = 80; // Work around java.net.URL bug
 
 		url.append(scheme);
@@ -68,24 +67,22 @@ public final class FaxAction {
 		// the serverName now resolves properly from localhost, i.e. usually this means
 		// make a /etc/hosts entry if you're using NAT.
 		url.append(request.getServerName());
-		
 		if ((scheme.equals("http") && (port != 80)) || (scheme.equals("https") && (port != 443))) {
 			url.append(':');
 			url.append(port);
 		}
 		url.append(request.getContextPath());
-		url.append("/EFormViewForPdfGenerationServlet?parentAjaxId=eforms&prepareForFax=true&providerId=");
-		url.append(request.getParameter("providerId"));
-		url.append("&fdid=");
-
+		url.append("/EFormViewForPdfGenerationServlet?parentAjaxId=eforms&fdid=");
 		return (url.toString());
 	}
+
 
 	/**
 	 * This method will take eforms and send them to a PHR.
 	 * @throws DocumentException 
+	 * @throws EmailException 
 	 */
-	public void faxForms(String[] numbers, String formId, String providerId) throws DocumentException {
+	public void sendEformToEmail( String toEmailAddress, String toName, String formId) throws DocumentException, EmailException {
 		
 		File tempFile = null;
 
@@ -99,52 +96,46 @@ public final class FaxAction {
 			String viewUri = localUri + formId;
 			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
 			logger.info("Writing pdf to : "+tempFile.getCanonicalPath());
+
+			String tempPath = OscarProperties.getInstance().getProperty("email_file_location");
+
+		    String tempName = "EForm-" + formId + "." + System.currentTimeMillis();
 			
-			// Removing all non digit characters from fax numbers.
-			for (int i = 0; i < numbers.length; i++) { 
-				numbers[i] = numbers[i].trim().replaceAll("\\D", "");
-			}
-			ArrayList<String> recipients = new ArrayList<String>(Arrays.asList(numbers));
+			String tempPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
 			
-			// Removing duplicate phone numbers.
-			recipients = new ArrayList<String>(new HashSet<String>(recipients));
-			String tempPath = OscarProperties.getInstance().getProperty("fax_file_location");
-			FileOutputStream fos;
-			for (int i = 0; i < recipients.size(); i++) {					
-			    String faxNo = recipients.get(i).trim().replaceAll("\\D", "");
-			    if (faxNo.length() < 7) { throw new DocumentException("Document target fax number '"+faxNo+"' is invalid."); }
-			    String tempName = "EForm-" + formId + "." + System.currentTimeMillis();
-				
-				String tempPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
-				String tempTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
-				
-				// Copying the fax pdf.
-				FileUtils.copyFile(tempFile, new File(tempPdf));
-				
-				// Creating text file with the specialists fax number.
-				fos = new FileOutputStream(tempTxt);				
-				PrintWriter pw = new PrintWriter(fos);
-				pw.println(faxNo);
-				pw.close();
-				fos.close();
-				
-				// A little sanity check to ensure both files exist.
-				if (!new File(tempPdf).exists() || !new File(tempTxt).exists()) {
-					throw new DocumentException("Unable to create files for fax of eform " + formId + ".");
-				}		
-				if (skipSave) {
-		        	 EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
-		        	 EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));
-		        	 eFormData.setCurrent(false);
-		        	 eFormDataDao.merge(eFormData);
-				}
+			// Copying the pdf.
+			FileUtils.copyFile(tempFile, new File(tempPdf));
+			logger.debug("Copying pdf to : "+tempPdf);
+			
+
+			// A little sanity check to ensure both files exist.
+			if (!new File(tempPdf).exists()) {
+				throw new DocumentException("Unable to create files for email of eform " + formId + ".");
 			}
-			// Removing the consulation pdf.
+			
+			if (skipSave) {
+	        	 EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
+	        	 EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));
+	        	 eFormData.setCurrent(false);
+	        	 eFormDataDao.merge(eFormData);
+			}
+			
+			logger.debug("Emailing PDF from "+tempPdf);
+			logger.debug("skipsave: "+skipSave);
+			String emailSubject=OscarProperties.getInstance().getProperty("eform_email_subject");
+			fromEmailAddress = OscarProperties.getInstance().getProperty("eform_email_from_address");
+
+			emailPdf(tempPdf, emailSubject, toEmailAddress, toName);
 			tempFile.delete();			
 						
 		} catch (IOException e) {
 			MiscUtils.getLogger().error("Error converting and sending eform. id="+formId, e);
 		} 
+	}
+	
+	private void emailPdf(String pdfPath, String emailSubject, String toEmailAddress, String toName) throws EmailException{
+		logger.debug("Sending email to "+toEmailAddress + " from " + fromEmailAddress);
+		EmailUtils.sendEmailWithAttachment(toEmailAddress, toName, fromEmailAddress, null, emailSubject, null, null, pdfPath);
 	}
 
 }

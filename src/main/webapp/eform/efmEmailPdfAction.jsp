@@ -20,28 +20,49 @@
     OscarHost, a Division of Cloud Practice Inc.
 
 --%>
+<%/* <%@page import="org.oscarehr.web.eform.EfmEmailPdfAction"> --*/%>
 <%@page import="java.util.Collections"%>
 <%@page import="java.util.Arrays"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="org.oscarehr.web.eform.EfmEmailPdfAction"%>
 <%@page import="org.oscarehr.util.MiscUtils"%>
+<%@page import="oscar.eform.actions.EmailAction"%>
+<html>
+<head>
+        <script type="text/javascript" language="JavaScript">
+            function startCloseWindowTimeout() {
+                var sec=1500;
+                setTimeout("closeWindow()",sec);
+            }
+
+            function closeWindow() {
+                window.opener=self;
+                window.close();
+            }
+        </script>
+</head>
+<body>
 <%
 //fdid
-String eform_id=request.getParameter("eform_id");
+String eform_id=(String)request.getAttribute("fdid");
 
-EfmEmailPdfAction bean=new EfmEmailPdfAction(request);
+//EfmEmailPdfAction bean=new EfmEmailPdfAction(request);
+EmailAction bean=new EmailAction(request);
 
 String clientId = request.getParameter("clientId");
+String toEmailAddress = request.getParameter("toEmail");
+String toName = request.getParameter("toName");
 try{
-    String docId = bean.sendEformToEmail(Integer.parseInt(eform_id));
+    bean.sendEformToEmail(toEmailAddress, toName, eform_id);
+    %>
+    <div class="success">Email sent successfully</div>
+    <%
 }catch( Exception e ){
     MiscUtils.getLogger().error("Error", e);
+    %>
+    An error occurred sending the email, please contact an administrator.
+    <%
 }
 
 %>
-<html>
-<head>
-</head>
-<body onload="window.close();">
 </body>
 </html>

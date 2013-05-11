@@ -70,10 +70,12 @@ public class AddEFormAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("==================SAVING ==============");
+		
 		HttpSession se = request.getSession();
 
 		boolean fax = "true".equals(request.getParameter("faxEForm"));
 		boolean print = "true".equals(request.getParameter("print"));
+		boolean email = "true".equals(request.getParameter("emailEForm"));
 
 		@SuppressWarnings("unchecked")
 		Enumeration<String> paramNamesE = request.getParameterNames();
@@ -96,7 +98,7 @@ public class AddEFormAction extends Action {
 		ActionMessages updateErrors = new ActionMessages();
 
 		// The fields in the _oscarupdatefields parameter are separated by %s.
-		if (!print && !fax && doDatabaseUpdate && request.getParameter("_oscarupdatefields") != null) {
+		if (!print && !fax && !email && doDatabaseUpdate && request.getParameter("_oscarupdatefields") != null) {
 
 			oscarUpdateFields = Arrays.asList(request.getParameter("_oscarupdatefields").split("%"));
 
@@ -215,6 +217,11 @@ public class AddEFormAction extends Action {
 				request.setAttribute("fdid", fdid);
 				return(mapping.findForward("print"));
 			}
+			
+			else if(email){
+				request.setAttribute("fdid", fdid);
+				return(mapping.findForward("email"));
+			}
 
 			else {
 				//write template message to echart
@@ -238,6 +245,9 @@ public class AddEFormAction extends Action {
 			else if (print) {
 				request.setAttribute("fdid", prev_fdid);
 				return(mapping.findForward("print"));
+			}else if(email){
+				request.setAttribute("fdid", prev_fdid);
+				return(mapping.findForward("email"));
 			}
 		}
 		

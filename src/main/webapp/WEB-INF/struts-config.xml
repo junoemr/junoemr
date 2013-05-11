@@ -1689,6 +1689,7 @@
 			<forward name="close" path="/eform/efmclosewindow.jsp" />
 			<forward name="fax" path="/eform/efmformfax_send.jsp" />
 			<forward name="print" path="/eform/efmformprint.do" />
+			<forward name="email" path="/eform/efmEmailPdfAction.jsp" />
 		</action>
 		<action input="/eform/efmformadd_data.jsp" scope="request"
 			path="/eform/efmformprint" type="oscar.eform.actions.PrintAction">
