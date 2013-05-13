@@ -107,6 +107,8 @@ function submitEmailButtonAjax(save, emailPatient) {
 			toEmail = jQuery("#patient_email").val();
 			jQuery('#toEmail').val(toEmail);
 			jQuery('#toName').val('');
+		}else{
+			chooseEmail();
 		}
 
 		if(jQuery('#toEmail').val() == ""){
