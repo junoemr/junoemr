@@ -28,7 +28,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
 
-import oscar.OscarProperties;
 import oscar.util.UtilDateUtilities;
 
 import com.sun.xml.messaging.saaj.util.ByteOutputStream;
@@ -66,15 +65,23 @@ public class PrintAction extends Action {
 	private String getEformRequestUrl(HttpServletRequest request) {
 		StringBuilder url = new StringBuilder();
 		String scheme = request.getScheme();
-		Integer port;
-		try { port = new Integer(OscarProperties.getInstance().getProperty("oscar_port")); }
-	    catch (Exception e) { port = 8443; }
+		
+		int port = request.getServerPort();
 		if (port < 0) port = 80; // Work around java.net.URL bug
 
 		url.append(scheme);
 		url.append("://");
-		//url.append(request.getServerName());
-		url.append("127.0.0.1");
+		
+		// IMPORTANT : do not change the serverName to 127.0.0.1
+		// you can not do that because on virtual hosts or named hosts 127.0.0.1 may
+		// not resolve to the same webapp. You must use the serverName that maps properly
+		// as per the server.xml (in tomcat). Admittedly 95% of the time 127.0.0.1 would
+		// work because most people don't do virtual hosting with tomcat on an oscar
+		// system (but some caisi systems have in the past), but by keeping the hostName
+		// this code would then work with everyone - although everyone needs to ensure
+		// the serverName now resolves properly from localhost, i.e. usually this means
+		// make a /etc/hosts entry if you're using NAT.
+		url.append(request.getServerName());
 		
 		if ((scheme.equals("http") && (port != 80)) || (scheme.equals("https") && (port != 443))) {
 			url.append(':');
