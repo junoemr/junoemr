@@ -2,7 +2,7 @@ if (typeof jQuery == "undefined") { alert("The emailControl library requires jQu
 
 var emailControlPlaceholder = "<br/>Email Recipients:<br/><div id='emailForm'>Loading email options..</div>";
 var emailControlEmailPatientButton     = "<span>&nbsp;</span><input value='Email to Patient' name='EmailPatientButton' id='email_patient_button' type='button' onclick='submitEmailButtonAjax(false, true)'>";
-var emailControlEmailButton     = "<span>&nbsp;</span><input value='Email' name='EmailSaveButton' id='email_button' type='button' onclick='submitEmailButtonAjax(false, false)'>";
+var emailControlEmailButton     = "<span>&nbsp;</span><input value='Email to Provider' name='EmailSaveButton' id='email_button' type='button' onclick='submitEmailButtonAjax(false, false)'>";
 var emailControlEmailSaveButton = "<span>&nbsp;</span><input value='Submit & Email' name='EmailButton' id='emailSave_button' type='button' onclick='submitEmailButtonAjax(true, false)'>";
 var emailControlMemoryInput = "<input value='false' name='emailEForm' id='emailEForm' type='hidden' />";	
 var emailControlToEmail = "<input value='' name='toEmail' id='toEmail' type='hidden' />";	
@@ -106,6 +106,12 @@ function submitEmailButtonAjax(save, emailPatient) {
 		if(emailPatient){
 			toEmail = jQuery("#patient_email").val();
 			jQuery('#toEmail').val(toEmail);
+			jQuery('#toName').val(toName);
+		}
+
+		if(jQuery('#toEmail').val() == ""){
+			alert("No email address chosen");
+			return;
 		}
 		var form = $("form");
 		
