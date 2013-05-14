@@ -172,9 +172,16 @@ for(Billingreferral billingReferral:billingReferrals) {
 	Map<String,String> result_doctor = new HashMap<String,String>();
 	
 	result_doctor.put("referral_no", new String(billingReferral.getReferralNo()));
-	result_doctor.put("namedesc", new String(billingReferral.getLastName()+","+billingReferral.getFirstName()));
-	result_doctor.put("city", new String(billingReferral.getCity()));
-	result_doctor.put("phone", new String(billingReferral.getPhone()));
+	result_doctor.put("namedesc", new String(billingReferral.getLastName()+", "+billingReferral.getFirstName()));
+	String city = "", phone = "";
+	if(billingReferral.getCity() != null){
+		city = billingReferral.getCity();
+	}
+	if(billingReferral.getPhone() != null){
+		phone = billingReferral.getPhone();
+	}
+	result_doctor.put("city", city);
+	result_doctor.put("phone", phone);
 	
 	result_doctors.add(result_doctor);
 	
