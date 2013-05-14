@@ -42,7 +42,6 @@ var emailControl = {
 						buttonLocation = jQuery(buttonLocation[buttonLocation.size() -1]);
 						jQuery(emailControlEmailPatientButton).insertAfter(buttonLocation);
 						jQuery(emailControlEmailButton).insertAfter(buttonLocation);
-						jQuery(emailControlEmailSaveButton).insertAfter(buttonLocation);
 						jQuery(emailControlMemoryInput).insertAfter(buttonLocation);
 						jQuery(emailControlToEmail).insertAfter(buttonLocation);
 						jQuery(emailControlToName).insertAfter(buttonLocation);
@@ -55,7 +54,6 @@ var emailControl = {
 						if (buttonLocation != null) {
 							buttonLocation.append(jQuery(emailControlEmailPatientButton));
 							buttonLocation.append(jQuery(emailControlEmailButton));
-							buttonLocation.append(jQuery(emailControlEmailSaveButton));
 							buttonLocation.append(jQuery(emailControlMemoryInput));
 							buttonLocation.append(jQuery(emailControlToEmail));
 							buttonLocation.append(jQuery(emailControlToName));
@@ -72,6 +70,11 @@ var emailControl = {
 jQuery(document).ready(function() {
 	emailControl.initialize();
 });
+
+function clearEmailFields(){
+	jQuery('#toEmail').val('');
+	jQuery('#toName').val('');
+}
 
 function chooseEmail(){
 	toName = jQuery("#emailSelect").find(":selected").text();
@@ -93,6 +96,7 @@ function getSearchValue(name, url)
 }
 
 function submitEmailButtonAjax(save, emailPatient) {
+	clearEmailFields();
 	document.getElementById('emailEForm').value=true;
 	
 	var saveHolder = jQuery("#saveHolder");
@@ -133,9 +137,11 @@ function submitEmailButtonAjax(save, emailPatient) {
 			 success: function() {
 				 resultWindow.document.write("<div style=\"color:#458B00; font-weight: bold; padding-top: 10px;\">Email successfully sent</div>");
 				 resultWindow.document.write("<script type=\"text/javascript\">closeWindow();</script>");
+				 clearEmailFields();
 			 },
 			 error: function() {
 				 resultWindow.document.write("<div>Something went wrong while trying to send the email. Please contact your administrator.</div>");
+				 clearEmailFields();
 			 } 
 		});
 	}
