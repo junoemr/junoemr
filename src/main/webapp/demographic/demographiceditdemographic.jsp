@@ -43,6 +43,10 @@
     List<CountryCode> countryList = ccDAO.getAllCountryCodes();
 
     DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
+    String protocol = "http://";
+    if(request.isSecure()){
+        protocol = "https://";
+    }
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_demographic"
 	rights="r" reverse="<%=true%>">
@@ -151,6 +155,10 @@
 <script language="javascript" src="<%=request.getContextPath() %>/hcHandler/hcHandler.js"></script>
 <script language="javascript" src="<%=request.getContextPath() %>/hcHandler/hcHandlerUpdateDemographic.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath() %>/hcHandler/hcHandler.css" type="text/css" />
+<% } %>
+<% if (OscarProperties.getInstance().getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
+<link rel="stylesheet" type="text/css" href="<%=protocol%>ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/blitzer/jquery-ui.css"/>
+<link rel="stylesheet" href="../css/jquery.autocomplete.css" type="text/css">
 <% } %>
 
 <!-- main calendar program -->
@@ -2663,7 +2671,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 }
 //-->
 </script> <% } else {%> <input type="text" name="r_doctor" size="30" maxlength="40" <%=getDisabled("r_doctor")%>
-									value="<%=rd%>"> <% } %>
+									value="<%=rd%>"> <%	} %>
 								</td>
 								<td align="right" nowrap><b><bean:message
 									key="demographic.demographiceditdemographic.formRefDocNo" />: </b></td>
@@ -3162,16 +3170,40 @@ function callEligibilityWebService(url,id){
 
        var ran_number=Math.round(Math.random()*1000000);
        var params = "demographic=<%=demographic_no%>&method=checkElig&rand="+ran_number;  //hack to get around ie caching the page
-       var response;
-        new Ajax.Request(url+'?'+params, {
-           onSuccess: function(response) {
-                document.getElementById(id).innerHTML=response.responseText ;
-                document.getElementById('search_spinner').innerHTML="";
-           }
-        });
-        }
-
+       new Ajax.Updater(id,url, {method:'get',parameters:params,asynchronous:true,onComplete:function(request){Element.hide('search_spinner')},onLoading:function(request){Element.show('search_spinner')}});
+ }
 </script>
+
+<% if (OscarProperties.getInstance().getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
+
+<script src="<%=protocol%>www.google.com/jsapi"></script>
+<script>
+    google.load("jquery", "1");
+    google.load("jqueryui", "1");
+</script>
+<script type="text/javascript">
+jQuery.noConflict();
+jQuery(document).ready(function(){
+    // AJAX autocomplete referrer doctors 
+    jQuery("input[name=r_doctor]").keypress(function(){
+    	jQuery("input[name=r_doctor]").autocomplete({
+            source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
+            select: function( event, ui){
+            	jQuery("input[name=r_doctor_ohip]").val(ui.item.referral_no);
+            }
+        });
+    });
+    jQuery("input[name=r_doctor_ohip]").keypress(function(){
+    	jQuery("input[name=r_doctor_ohip]").autocomplete({
+            source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+            select: function( event, ui){
+            	jQuery("input[name=r_doctor]").val(ui.item.namedesc);
+            }
+        });
+    }); 
+});
+</script>
+<% } %>
 </body>
 </html:html>
 
