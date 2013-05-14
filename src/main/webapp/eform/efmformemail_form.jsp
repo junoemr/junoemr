@@ -10,7 +10,7 @@
 --%>
 <%--  
 
-This Page creates the fax form for eforms.
+This Page creates the email form for eforms.
  
 --%>
 <%@ page import="java.sql.*, java.util.ArrayList, oscar.eform.data.*, oscar.SxmlMisc, org.oscarehr.common.model.Demographic, oscar.oscarDemographic.data.DemographicData,oscar.OscarProperties,org.springframework.web.context.support.WebApplicationContextUtils, org.springframework.web.context.WebApplicationContext"%>
@@ -23,7 +23,7 @@ This Page creates the fax form for eforms.
 <%
 
 	OscarProperties props = OscarProperties.getInstance();
-	if (props.isEFormFaxEnabled()) {
+	if (props.isEFormEmailEnabled()) {
 		
 		displayServiceUtil.estSpecialist();		
 		String demo = request.getParameter("demographicNo");
@@ -47,7 +47,6 @@ This Page creates the fax form for eforms.
 			<option value=""></option>
 		<%
 		String rdName = "";
-		String rdFaxNo = "";
 		for (int i=0;i < displayServiceUtil.specIdVec.size(); i++) {
                              String  specId     = (String) displayServiceUtil.specIdVec.elementAt(i);
                              String  fName      = (String) displayServiceUtil.fNameVec.elementAt(i);
@@ -60,7 +59,6 @@ This Page creates the fax form for eforms.
                              String  referralNo = (displayServiceUtil.referralNoVec.size() > 0 ? displayServiceUtil.referralNoVec.get(i).trim() : "");
                              if (rdohip != null && !"".equals(rdohip) && rdohip.equals(referralNo)) {
                             	 rdName = String.format("%s, %s", lName, fName);
-                            	 rdFaxNo = fax;
                              }
 			if (!"".equals(email)) {
 			%>
@@ -70,4 +68,4 @@ This Page creates the fax form for eforms.
 		} %>		                        
 		</select>
 </div>
-<% } // end if (props.isRichEFormFaxEnabled()) { %>
+<% } // end if (props.isEFormEmailEnabled()) { %>

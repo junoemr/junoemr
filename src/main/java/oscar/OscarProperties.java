@@ -229,6 +229,10 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("eform_signature_enabled");
 	}
 	
+	public boolean isEFormEmailEnabled() {
+		return isPropertyActive("eform_email_enabled");
+	}
+	
 	public boolean isEFormFaxEnabled() {
 		return isPropertyActive("eform_fax_enabled");
 	}
