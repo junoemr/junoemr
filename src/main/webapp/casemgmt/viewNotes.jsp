@@ -66,7 +66,7 @@
                 <div style="clear: both; overflow: auto;">
             </c:when>
             <c:otherwise>
-                <div style="clear: both; height: 65px; overflow: auto;">
+                <div style="clear: both; height: 63px; overflow: auto;">
             </c:otherwise>
         </c:choose>
 <ul style="margin-left: 5px;">
