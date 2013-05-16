@@ -575,7 +575,7 @@ CREATE TABLE document (
   doctype varchar(60),
   docClass varchar(60),
   docSubClass varchar(60),
-  docdesc varchar(255) NOT NULL default '',
+  docdesc text NOT NULL default '',
   docxml text,
   docfilename varchar(255) NOT NULL default '',
   doccreator varchar(30) NOT NULL default '',
