@@ -50,11 +50,12 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>{
 	}
 
 	public List<ScheduleDate> findByProviderPriorityAndDateRange(String providerNo, char priority, Date date, Date date2) {
-		Query query = entityManager.createQuery("select s from ScheduleDate s where s.providerNo=? and s.priority=? and s.date>=? and s.date <=?");
+		Query query = entityManager.createQuery("select s from ScheduleDate s where s.providerNo=? and s.priority=? and s.date>=? and s.date <=? and s.status=?");
 		query.setParameter(1, providerNo);
 		query.setParameter(2, priority);
 		query.setParameter(3, date);
 		query.setParameter(4, date2);
+		query.setParameter(5, 'A');
 
 		@SuppressWarnings("unchecked")
         List<ScheduleDate> results = query.getResultList();
