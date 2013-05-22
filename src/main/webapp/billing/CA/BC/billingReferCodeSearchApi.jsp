@@ -134,6 +134,9 @@ else{
 	}
 }
 
+// Search for all things like %codeName%, not just anything that starts with codeName%
+codeName = "%"+codeName;
+
 String[] param =new String[9];
 param[0] = codeName;
 param[1] = codeName1;
