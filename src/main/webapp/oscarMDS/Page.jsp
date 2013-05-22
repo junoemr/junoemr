@@ -85,7 +85,7 @@ String curUser_no = (String) session.getAttribute("user");
                     <table width="100%" style="margin:0px;padding:0px;" cellpadding="0" cellspacing="0">
                         <tr>
                             <th align="left" valign="bottom" class="cell" nowrap>
-                                <input type="checkbox" onclick="checkAll('lab_form');" name="checkA"/>
+                                <input type="checkbox" onclick="checkAll();" name="checkA"/>
                                 <bean:message key="oscarMDS.index.msgHealthNumber"/>
                             </th>
                             <th align="left" valign="bottom" class="cell">
@@ -127,7 +127,7 @@ String curUser_no = (String) session.getAttribute("user");
 					<table id="summaryView" width="100%" style="margin:0px;padding:0px;" cellpadding="0" cellspacing="0">
 						<tr>
                             <th align="left" valign="bottom" class="cell" nowrap>
-                                <input type="checkbox" onclick="checkAll('lab_form');" name="checkA"/>
+                                <input type="checkbox" onclick="checkAll();" name="checkA"/>
                                 <bean:message key="oscarMDS.index.msgHealthNumber"/>
                             </th>
                             <th align="left" valign="bottom" class="cell">

@@ -418,7 +418,6 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 </head>
 
 <body oldclass="BodyStyle" vlink="#0000FF"  >
-    <form name="reassignForm" method="post" action="ReportReassign.do" id="lab_form">
         <table  oldclass="MainTable" id="scrollNumber1" border="0" name="encounterTable" cellspacing="0" cellpadding="3" width="100%">
             <tr oldclass="MainTableTopRow">
                 <td class="MainTableTopRowRightColumn" colspan="10" align="left">
@@ -587,7 +586,7 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
              </td>
           </tr>
      </table>
-     </form>
+     
 </body>
 </html>
 <% } // end if(!ajax) %>
