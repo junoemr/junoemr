@@ -41,6 +41,7 @@ import org.oscarehr.ui.servlet.ImageRenderingServlet;
 import org.oscarehr.util.DigitalSignatureUtils;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.owasp.esapi.ESAPI;
 
 import oscar.eform.EFormLoader;
 import oscar.eform.EFormUtil;
@@ -566,19 +567,21 @@ public class EForm extends EFormBase {
 
 	private StringBuilder putValue(String value, String type, int pointer, StringBuilder html) {
 		// inserts value= into tag or textarea
-                if (type.equals("onclick") || type.equals("onclick_append")) {
-                        if (type.equals("onclick_append")) {
-                            if (html.charAt(pointer-1)=='"') pointer -= 1;
-                            if (html.charAt(pointer-1)!=';') value = ";"+value;
-                        } else {
-                            value = "onclick=\"" + value + "\"";
-                        }
+        if (type.equals("onclick") || type.equals("onclick_append")) {
+            if (type.equals("onclick_append")) {
+            	if (html.charAt(pointer-1)=='"') pointer -= 1;
+            	if (html.charAt(pointer-1)!=';') value = ";"+value;
+            } else {
+            	value = "onclick=\"" + value + "\"";
+            }
 			html.insert(pointer, " " + value);
-                } else if (type.equals(OPENER_VALUE)) {
+        } else if (type.equals(OPENER_VALUE)) {
+        	value = ESAPI.encoder().encodeForHTMLAttribute(value);
 			html.insert(pointer, " "+OPENER_VALUE+"=\""+value+"\"");
 		} else if (type.equals("text") || type.equals("hidden")) {
+			value = ESAPI.encoder().encodeForHTMLAttribute(value);
 			html.insert(pointer, " value=\""+value+"\"");
-                } else if(type.equals("textarea")) {
+        } else if(type.equals("textarea")) {
 			pointer = html.indexOf(">", pointer) + 1;
 			int endPointer = html.indexOf("<", pointer);
 			html.delete(pointer, endPointer);
@@ -723,7 +726,9 @@ public class EForm extends EFormBase {
 				html = html.insert(pointer, " selected");
 			}
 		} else {
-			String quote = output.contains("\"") ? "'" : "\"";
+			String quote = "\"";
+
+			output = ESAPI.encoder().encodeForHTMLAttribute(output);
 			html.insert(pointer, " value="+quote+output+quote);
 		}
 		return (html);
