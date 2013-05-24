@@ -41,7 +41,7 @@ public class BillCodesTableWrapper
     BillingService bcd = (BillingService) this.getCurrentRowObject();
     String links = "<a href=\"billingEditCode.jsp?codeId=" + bcd.getBillingserviceNo() +
     "&code=" + bcd.getServiceCode()+"&desc=" + bcd.getDescription() + "&value=" + bcd.getValue() + "&whereTo=private\">Edit</a> <br>" +
-    "<a href=\"deletePrivateCode.jsp?code=" + bcd.getBillingserviceNo() + "\">Delete</a>";
+    "<a onclick=\"return confirm('Are you sure you want to delete this code ["+bcd.getServiceCode()+" "+bcd.getDescription()+"]?');\" href=\"deletePrivateCode.jsp?code=" + bcd.getBillingserviceNo() + "\">Delete</a>";
     return links;
   }
 
