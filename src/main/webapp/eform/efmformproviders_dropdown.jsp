@@ -21,7 +21,7 @@
 
 --%>
 
-<%@ page import="java.sql.*, java.util.List, oscar.eform.data.*, oscar.SxmlMisc, org.oscarehr.common.model.Demographic, oscar.oscarDemographic.data.DemographicData,oscar.OscarProperties,org.springframework.web.context.support.WebApplicationContextUtils, org.springframework.web.context.WebApplicationContext"%>
+<%@ page import="java.sql.*, java.util.List, oscar.eform.data.*, oscar.SxmlMisc, org.springframework.web.context.support.WebApplicationContextUtils, org.springframework.web.context.WebApplicationContext"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
