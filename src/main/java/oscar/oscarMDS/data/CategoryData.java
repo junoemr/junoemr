@@ -219,7 +219,7 @@ public class CategoryData {
 					+ "INNER JOIN ctl_document cdoc ON (cdoc.module = 'demographic' AND doc.document_no = cdoc.document_no) "
 					+ "LEFT JOIN patientLabRouting patLR ON (patLR.lab_type = 'DOC' AND patLR.lab_no = doc.document_no) "
 					+ "LEFT JOIN providerLabRouting proLR ON (proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no) "
-					+ "WHERE (cdoc.module_id = 0) ";
+					+ "WHERE (cdoc.module_id = -1) ";
 
 		if ("N".equals(status)) {
 			sql = sql + " AND (proLR.status IN ('N', NULL)) ";
@@ -237,6 +237,8 @@ public class CategoryData {
 				qp_provider_no = true;
 			}
 		}
+		
+		sql = sql + " AND doc.status <> 'D' ";
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
@@ -328,6 +330,7 @@ public class CategoryData {
 					+ "FROM ctl_document cd "
 					+ "INNER JOIN demographic d ON d.demographic_no = cd.module_id "
 					+ "INNER JOIN providerLabRouting proLR ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = cd.document_no ) "
+					+ "LEFT JOIN document doc ON ( doc.document_no = cd.document_no ) "
 					+ "WHERE cd.module='demographic' ";
 
 		if ("N".equals(status)) {
@@ -361,6 +364,8 @@ public class CategoryData {
 			sql = sql + "  AND d.hin like ? ";
 			qp_hin = true;
 		}
+		sql = sql + "AND doc.status <> 'D' ";
+		
 
 		sql = sql + "GROUP BY d.demographic_no ";
 
