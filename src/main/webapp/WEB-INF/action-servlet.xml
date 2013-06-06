@@ -155,6 +155,7 @@
 		<property name="surveyManager" ref="oscarSurveyManager" />
 	</bean>
 	<bean name="/CaseManagementEntry" class="org.oscarehr.casemgmt.web.CaseManagementEntryAction" singleton="false">
+        <property name="clientImageManager" ref="ClientImageManager" />
 		<property name="caseManagementManager" ref="caseManagementManager" />
 		<property name="providerManager" ref="providerManager" />
 	</bean>
