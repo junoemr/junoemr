@@ -99,6 +99,10 @@ function submitEmailButtonAjax(save, emailPatient) {
 	clearEmailFields();
 	document.getElementById('emailEForm').value=true;
 	
+	if(typeof(window.beforeSubmit) !== undefined){
+		window.beforeSubmit();
+	}
+	
 	var saveHolder = jQuery("#saveHolder");
 	if (saveHolder == null || saveHolder.size() == 0) {
 		jQuery("form").append("<input id='saveHolder' type='hidden' name='skipSave' value='"+!save+"' >");
