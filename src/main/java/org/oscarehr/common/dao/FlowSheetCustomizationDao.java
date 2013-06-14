@@ -44,9 +44,10 @@ public class FlowSheetCustomizationDao extends AbstractDao<FlowSheetCustomizatio
     }
 
     public List<FlowSheetCustomization> getFlowSheetCustomizations(String flowsheet,String provider,String demographic){
-    	if(demographic == null || demographic.isEmpty())
-    		demographic = "0";
-    	Query query = entityManager.createQuery("SELECT fd FROM FlowSheetCustomization fd WHERE fd.flowsheet=? and fd.archived=0 and ( ( fd.providerNo = ?  and fd.demographicNo = 0) or (fd.providerNo =? and fd.demographicNo = ?  ) )");
+    	if(demographic == null || demographic.isEmpty())                        
+            demographic = "0";                                                  
+        Query query = entityManager.createQuery("SELECT fc FROM FlowSheetCustomization fc WHERE fc.flowsheet=? and fc.archived=0 and ( ( fc.providerNo = ?  and fc.demographicNo = 0) or (fc.providerNo =? and fc.demographicNo = ?  ) )");
+        
     	query.setParameter(1, flowsheet);
     	query.setParameter(2, provider);
     	query.setParameter(3, provider);
