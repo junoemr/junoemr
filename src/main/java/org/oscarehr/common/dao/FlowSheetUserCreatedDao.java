@@ -27,9 +27,10 @@ package org.oscarehr.common.dao;
 
 import java.util.List;
 
+import javax.persistence.Query;
+
 import org.oscarehr.common.model.FlowSheetUserCreated;
 import org.springframework.stereotype.Repository;
-import javax.persistence.Query;
 
 @Repository
 public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated> {
@@ -44,6 +45,17 @@ public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated> {
         
         //@SuppressWarnings("unchecked")
         return query.getResultList();                
+     }
+	
+	public FlowSheetUserCreated getMaxName(){
+        Query query = entityManager.createQuery("SELECT f FROM FlowSheetUserCreated f ORDER BY f.id DESC LIMIT 1");
+        
+        //@SuppressWarnings("unchecked")
+        List<FlowSheetUserCreated> fsuc = query.getResultList();
+        if(fsuc.size() == 0){
+        	return null;
+        }
+        return fsuc.get(0);
      }
 	
 }

@@ -185,8 +185,17 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 
 
     public String addFlowsheet(MeasurementFlowSheet m ){
+    	FlowSheetUserCreatedDao flowSheetUserCreatedDao = (FlowSheetUserCreatedDao) SpringUtils.getBean("flowSheetUserCreatedDao");
         if( m.getName() == null || m.getName().equals("")){
-            m.setName("U"+(flowsheets.size()+1));
+        	
+        	FlowSheetUserCreated fsuc = flowSheetUserCreatedDao.getMaxName();
+        	Integer maxNameId;
+        	if(fsuc == null){
+        		maxNameId = 0;
+        	}else{
+	        	maxNameId = Integer.parseInt(fsuc.getName().substring(1));
+        	}
+            m.setName("U"+(maxNameId+1));
         }
 
         flowsheets.put(m.getName(),m);
@@ -286,7 +295,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         }
         List<FlowSheetUserCreated> flowSheetUserCreateds = flowSheetUserCreatedDao.getAllUserCreatedFlowSheets();
         for(FlowSheetUserCreated flowSheetUserCreated: flowSheetUserCreateds){
-
+        	
         	MeasurementFlowSheet m = new MeasurementFlowSheet();
         	m.setName(flowSheetUserCreated.getName());
             m.parseDxTriggers(flowSheetUserCreated.getDxcodeTriggers());

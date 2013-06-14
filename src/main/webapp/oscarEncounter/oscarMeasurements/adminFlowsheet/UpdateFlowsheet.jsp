@@ -281,7 +281,6 @@ div.recommendations li{
 </tr>
 <tr>
 <td class="MainTableLeftColumn" valign="top">
-   sdfsdf
 
 
 </td>
