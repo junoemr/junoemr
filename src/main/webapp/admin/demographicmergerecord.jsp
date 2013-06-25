@@ -74,6 +74,10 @@ if( outcome !=null){
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean"
 	scope="session" />
 
+<%!
+	OscarProperties op = OscarProperties.getInstance();
+%>
+
 <html>
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -113,6 +117,21 @@ if( outcome !=null){
         function searchMerged(){
             document.titlesearch.dboperation.value="demographic_search_merged";
         }
+                                                                                
+        function fullMerge(){                                                   
+            if(!confirm("Are you sure you want to merge these records?  The " + 
+                "merge is not reversible.")){                                   
+                                                                                
+                console.log('cancelled');                                       
+                return false;                                                   
+            }                                                                   
+                                                                                
+            // Set the action for a full merge.                                 
+            var action_field = document.getElementsByName('mergeAction')[0];    
+            action_field.value = 'fullmerge';                                   
+                                                                                
+            return true;                                                        
+        }  
         
         function popupWindow(page) {
             windowprops="height=660, width=960, location=no, scrollbars=yes, menubars=no, toolbars=no, resizable=yes, top=0, left=0";
@@ -316,10 +335,32 @@ if(rs==null) {
 
 </table>
 
-<br>
-<% if (mergedSearch){%> <input type="submit"
-	value="UnMerge Selected Records" onclick="UnMerge()" /> <%}else{%> <input
-	type="submit" value="Merge Selected Records" /> <%}%> <br />
+<br />
+
+<% 
+if (mergedSearch){
+%>                                                         
+
+<input type="submit" value="UnMerge Selected Records" onclick="UnMerge()" />    
+                                                                                
+<%
+}else{%>                                                                      
+                                                                                
+<input type="submit" value="Merge Selected Records" />                          
+
+<%	
+	if (op.isPropertyActive("enable_full_merge")){
+%>                                                         
+
+<input type="submit" onclick="return fullMerge();" value="Full Merge" />        
+                                                                                
+<%
+	}
+}
+%>   
+
+<br />
+
 </form>
 <%
 int nLastPage=0,nNextPage=0;

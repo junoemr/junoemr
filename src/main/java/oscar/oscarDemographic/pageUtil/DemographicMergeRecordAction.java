@@ -84,6 +84,18 @@ public class DemographicMergeRecordAction  extends Action {
                     }
             }
 
+		}else if (action.equals("fullmerge") && head != null && records.size() > 1 && records.contains(head)){
+
+            for (int i=0; i < records.size(); i++){
+                if (!( records.get(i)).equals(head))
+                    try{
+                        dmDAO.FullMerge( records.get(i), head, provider_no);
+                    }catch(SQLException e){
+                        logger.error("Could not fully merge records: "+records.get(i)+","+head, e);
+                        outcome = "failure";
+                    }
+            }
+
         }else if(action.equals("unmerge") && records.size() > 0){
             outcome = "successUnMerge";
             for (int i=0; i < records.size(); i++){
