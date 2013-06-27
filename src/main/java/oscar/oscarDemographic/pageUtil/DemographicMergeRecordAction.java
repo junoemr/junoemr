@@ -90,7 +90,7 @@ public class DemographicMergeRecordAction  extends Action {
                 if (!( records.get(i)).equals(head))
                     try{
                         dmDAO.FullMerge( records.get(i), head, provider_no);
-                    }catch(SQLException e){
+                    }catch(Exception e){
                         logger.error("Could not fully merge records: "+records.get(i)+","+head, e);
                         outcome = "failure";
                     }
