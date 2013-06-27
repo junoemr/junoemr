@@ -154,9 +154,14 @@ public class DemographicMerged {
 					"SET eform_data.demographic_no = ? " +
 					"WHERE eform_data.demographic_no = ? ;",
 
+				/*
+				 * Don't merge this because it causes errors when adding case
+				 * notes.  If the info in this table is required to be merged
+				 * a specific merge process will have to be developed.
 				"UPDATE casemgmt_issue " +
 					"SET casemgmt_issue.demographic_no = ? " +
 					"WHERE casemgmt_issue.demographic_no = ? ;",
+					*/
 
 				"UPDATE ctl_document " +
 					"SET ctl_document.module_id = ? " +
@@ -253,6 +258,26 @@ public class DemographicMerged {
 			statement.setInt(1, to_demographic_no);
 			statement.setInt(2, from_demographic_no);
 			this.makeDbCall(statement);
+
+			// Merge the the records the old way as well
+			sql = "insert into demographic_merged (demographic_no, merged_to) values (?,?)";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+
+			// always merge the head of records that have already been merged to the new head
+			String record_head = getHead(from_demographic_no + "");
+			if (record_head == null)
+				pstmt.setInt(1, from_demographic_no);
+			else
+				pstmt.setInt(1, Integer.parseInt(record_head));
+
+			pstmt.setInt(2, to_demographic_no);
+			pstmt.executeUpdate();
+			pstmt.close();
+
+			sql = "insert into secObjPrivilege (roleUserGroup, objectName, privilege, priority, provider_no) values ('_all','_eChart$"+from_demographic_no+"','|or|','0','0')";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.executeUpdate();
+			pstmt.close();
 
 
 			// Commit Transaction
