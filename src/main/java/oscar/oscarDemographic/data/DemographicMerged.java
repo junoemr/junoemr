@@ -154,14 +154,9 @@ public class DemographicMerged {
 					"SET eform_data.demographic_no = ? " +
 					"WHERE eform_data.demographic_no = ? ;",
 
-				/*
-				 * Don't merge this because it causes errors when adding case
-				 * notes.  If the info in this table is required to be merged
-				 * a specific merge process will have to be developed.
 				"UPDATE casemgmt_issue " +
 					"SET casemgmt_issue.demographic_no = ? " +
 					"WHERE casemgmt_issue.demographic_no = ? ;",
-					*/
 
 				"UPDATE ctl_document " +
 					"SET ctl_document.module_id = ? " +
@@ -202,8 +197,37 @@ public class DemographicMerged {
 			-- SET demographiccust.demographic_no = ?                 
 			-- WHERE demographiccust.demographic_no = ? ;             
 			*/
+			
 
+			// If the demographic has multiple casemgmt_issue entries, point
+			// all of the issue notes to the one with the higher id.
+			sql = "UPDATE casemgmt_issue_notes, ( " +
+				"SELECT bad_id, good_id FROM ( " +
+				"SELECT MIN(id) as bad_id, MAX(id) as good_id " +
+				"FROM casemgmt_issue " +
+				"WHERE demographic_no = ? " +
+				"GROUP BY demographic_no, issue_id " +
+				"HAVING count(*) > 1) as something) as something_else " +
+				"SET id = good_id " +
+				"WHERE id = bad_id;";
 
+			statement = conn.prepareStatement(sql);
+			statement.setInt(1, to_demographic_no);
+			this.makeDbCall(statement);
+
+			// If the demographic has multiple casemgmt_issue entries, delete
+			// the one with the lower id.
+			sql = "DELETE FROM casemgmt_issue WHERE id IN ( " +
+				"SELECT id FROM ( " +
+				"SELECT MIN(id) as id " +
+				"FROM casemgmt_issue " +
+				"WHERE demographic_no = ? " +
+				"GROUP BY demographic_no, issue_id " +
+				"HAVING count(*) > 1) as something); ";
+
+			statement = conn.prepareStatement(sql);
+			statement.setInt(1, to_demographic_no);
+			this.makeDbCall(statement);
 
 
 
