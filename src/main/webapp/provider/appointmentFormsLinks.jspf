@@ -22,7 +22,7 @@
 		for (Integer eFormIdTemp : eFormIds)
 		{
 			EForm eForm=AppointmentProviderAdminDayUIBean.getEForms(eFormIdTemp);
-			String trimmedEscapedLinkName=StringEscapeUtils.escapeHtml(AppointmentProviderAdminDayUIBean.getLengthLimitedLinkName(eForm.getFormName()));
+			String trimmedEscapedLinkName=StringEscapeUtils.escapeHtml(eForm.getFormName().substring(0,2));
 			String escapedLinkName=StringEscapeUtils.escapeHtml(eForm.getFormName());
 			%>
 				|<a href=# onClick='popupPage2("<%=request.getContextPath()%>/eform/efmformadd_data.jsp?fid=<%=eFormIdTemp%>&amp;demographic_no=<%=demographic_no%>&amp;appointment=<%=appointment_no%>")' title='<%=escapedLinkName%>'><%=trimmedEscapedLinkName%></a>
