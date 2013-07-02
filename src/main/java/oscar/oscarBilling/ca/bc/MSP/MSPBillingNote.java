@@ -140,7 +140,7 @@ public class MSPBillingNote {
                        + Misc.forwardZero(payeeNum, 5)
                        + Misc.forwardZero(practitionerNum, 5)
                        + Misc.forwardSpace(noteType,1)
-                       + Misc.forwardSpace(Misc.stripLineBreaks(note),400);      
+                       + Misc.backwardSpace(Misc.stripLineBreaks(note),400);
       return s;      
    }
    
