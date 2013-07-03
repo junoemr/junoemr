@@ -1578,8 +1578,20 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
                   //Pull the appointment name from the demographic information if the appointment is attached to a specific demographic.
                   //Otherwise get the name associated with the appointment from the appointment information
                   StringBuilder nameSb = new StringBuilder();
+				  Boolean active_medical_coverage = false;
                   if ((demographic_no != 0)&& (demographicDao != null)) {
                         Demographic demo = demographicDao.getDemographic(String.valueOf(demographic_no));
+
+			// Check for active medical coverage
+                        java.util.Date hc_renew_date = demo.getHcRenewDate();
+                        java.util.Date todays_date = new java.util.Date();
+                        if( hc_renew_date != null &&
+                            hc_renew_date.getYear() == todays_date.getYear() &&
+                            hc_renew_date.getMonth() == todays_date.getMonth())
+                        {
+                            active_medical_coverage = true;
+                        }
+
                         nameSb.append(demo.getLastName())
                               .append(",")
                               .append(demo.getFirstName());
@@ -1797,6 +1809,14 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 	<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <% } %>
 <% if(len==lenLimitedL || view!=0 || numAvailProvider==1 || OscarProperties.getInstance().getProperty("APPT_ALWAYS_SHOW_LINKS", "false").equals("true") ) {%>
+=======
+<oscar:oscarPropertiesCheck property="show_hc_eligibility" value="true" defaultVal="false">
+<%=active_medical_coverage?"+&nbsp":""%></oscar:oscarPropertiesCheck><%=(view==0)?(name.length()>len?name.substring(0,len):name):name%></a>
+<% 
+// Daine: Changed this to never truncate appointment buttons
+//if(len==lenLimitedL || view!=0 || numAvailProvider==1 ) {
+if(true){
+%>
 
 <security:oscarSec roleName="<%=roleName$%>" objectName="_eChart" rights="r">
 <oscar:oscarPropertiesCheck property="eform_in_appointment" value="yes">

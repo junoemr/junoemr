@@ -484,6 +484,11 @@ public class ManageTeleplanAction extends DispatchAction {
 
                         line = "<span style=\"color:red; font-weight:bold;\">"+line+"</span>";
                       }
+                      else if(el.equalsIgnoreCase("yes")){
+                    	  Date lastEligCheck = new Date();
+                    	  demo.setHcRenewDate(lastEligCheck);
+						  dDao.save(demo);
+                      }
                   }
                   sb.append(line);
                   sb.append("<br>");
