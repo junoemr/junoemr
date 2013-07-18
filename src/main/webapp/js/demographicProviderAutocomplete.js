@@ -85,6 +85,28 @@ var resultFormatter3 = function(oResultData, sQuery, sResultMatch) {
 
 };
 
+var resultFormatter4 = function(oResultData, sQuery, sResultMatch) {
+    //console.log(oResultData);
+    var query = sQuery.toLowerCase(),
+    fname = oResultData[0],
+    dob = oResultData[1],
+    status = oResultData[12],
+    fnameMatchIndex = fname.toLowerCase().indexOf(query),
+    displayfname= '';
+    //oscarLog("in resultFormatter2");
+    //oscarLog(oResultData);
+    if(fnameMatchIndex > -1) {
+        displayfname = highlightMatch(fname, query, fnameMatchIndex);
+    //oscarLog("displayfname in if="+displayfname);
+    }
+    else {
+        displayfname = fname;
+    }
+    return status + " - " + displayfname + " (" + dob+ ")";
+
+};
+
+
 function checkSave(elementId){
     var curVal=$('autocompletedemo'+elementId).value;
     var isCurValValid=false;

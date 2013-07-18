@@ -160,7 +160,7 @@
                                                 // Define the schema of the delimited resultsTEST, PATIENT(1985-06-15)
                                                 oDS.responseSchema = {
                                                     resultsList : "results",
-                                                    fields : ["formattedName","fomattedDob","demographicNo","providerNo","providerName","nextAppointment", "cust1", "cust1Name", "cust2", "cust2Name", "cust4", "cust4Name"]
+                                                    fields : ["formattedName","fomattedDob","demographicNo","providerNo","providerName","nextAppointment", "cust1", "cust1Name", "cust2", "cust2Name", "cust4", "cust4Name", "status"]
                                                 };
                                                 // Enable caching
                                                 oDS.maxCacheEntries = 0;
@@ -168,7 +168,7 @@
                                                 oAC.queryMatchSubset = true;
                                                 oAC.minQueryLength = 3;
                                                 oAC.maxResultsDisplayed = 25;
-                                                oAC.formatResult = resultFormatter2;
+                                                oAC.formatResult = resultFormatter4;
                                                 //oAC.typeAhead = true;
                                                 oAC.queryMatchContains = true;
                                                 //oscarLog(oAC);
@@ -338,7 +338,7 @@
                                             <input id="saved<%=docId%>" type="hidden" name="saved" value="false"/>
                                             <input type="hidden" name="demog" value="<%=demographicID%>" id="demofind<%=docId%>" />
                                             <input type="text" id="autocompletedemo<%=docId%>" onchange="checkSave('<%=docId%>');" name="demographicKeyword" />
-                                            <div id="autocomplete_choices<%=docId%>"class="autocomplete"></div>
+                                            <div id="autocomplete_choices<%=docId%>"class="autocomplete demographic-search"></div>
                                             <%}%>
 											<input type="button" id="createNewDemo" value="Create New Demographic"  onclick="popup(700,960,'<%= request.getContextPath() %>/demographic/demographicaddarecordhtm.jsp','demographic')"/>
 
