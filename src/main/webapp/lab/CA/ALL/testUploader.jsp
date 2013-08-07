@@ -120,6 +120,7 @@ if(outcome != null){
 				<td><select name="type" onClick="selectOther()">
 					<option value="ALPHA">ALPHA</option>
 					<option value="CML">CML</option>
+					<option value="CDL">CDL</option>
 					<option value="EPSILON">EPSILON/MHL</option>
 					<option value="PATHL7"
 					<oscar:oscarPropertiesCheck property="PATHNET_LABS" value="yes">Selected</oscar:oscarPropertiesCheck>>EXCELLERIS</option>

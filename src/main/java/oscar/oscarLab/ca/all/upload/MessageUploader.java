@@ -384,25 +384,26 @@ public final class MessageUploader {
 	 * Attempt to match the patient from the lab to a demographic, return the patients provider which is to be used then no other provider can be found to match the patient to.
 	 */
 	private static String patientRouteReport(int labId, String lastName, String firstName, String sex, String dob, String hin, Connection conn) throws SQLException {
+
 		PatientLabRoutingResult result = null;
-		
-			String sql;
-			String demo = "0";
-			String provider_no = "0";
-			// 19481015
-			String dobYear = "%";
-			String dobMonth = "%";
-			String dobDay = "%";
-			String hinMod = "%";
-	
-			
-			try {
-	
-				if (hin != null) {
-					hinMod = new String(hin);
-					if (hinMod.length() == 12) {
-						hinMod = hinMod.substring(0, 10);
-					}
+		String sql;
+		String demo = "0";
+		String provider_no = "0";
+		// 19481015
+		String dobYear = "%";
+		String dobMonth = "%";
+		String dobDay = "%";
+		String hinMod = "%";
+
+		int count = 0;
+		try {
+
+			Boolean truncated_hin = false;
+			if (hin != null) {
+				hinMod = new String(hin);
+				if (hinMod.length() == 12) {
+					truncated_hin = true;
+					hinMod = hinMod.substring(0, 10);
 				}
 	
 				if (dob != null && !dob.equals("")) {
@@ -445,7 +446,50 @@ public final class MessageUploader {
 				throw sqlE;
 			}
 
-		
+			if (dob != null && !dob.equals("")) {
+				String[] dobArray = dob.trim().split("-");
+				dobYear = dobArray[0];
+				dobMonth = dobArray[1];
+				dobDay = dobArray[2];
+			}
+
+			if (!firstName.equals("")) firstName = firstName.substring(0, 1);
+			if (!lastName.equals("")) lastName = lastName.substring(0, 1);
+
+			if (hinMod.equals("%")) {
+				sql = "select demographic_no, provider_no from demographic where" + " last_name like '" + lastName + "%' and " + " first_name like '" + firstName + "%' and " + " year_of_birth like '" + dobYear + "' and " + " month_of_birth like '" + dobMonth + "' and " + " date_of_birth like '" + dobDay + "' and " + " sex like '" + sex + "%' ";
+			} else if (OscarProperties.getInstance().getBooleanProperty("LAB_NOMATCH_NAMES", "yes")) {
+				sql = "select demographic_no, provider_no from demographic where hin='" + hinMod + "' and " + " year_of_birth like '" + dobYear + "' and " + " month_of_birth like '" + dobMonth + "' and " + " date_of_birth like '" + dobDay + "' and " + " sex like '" + sex + "%' ";
+			} else {
+				sql = "select demographic_no, provider_no from demographic where hin='" + hinMod + "' and " + " last_name like '" + lastName + "%' and " + " first_name like '" + firstName + "%' and " + " year_of_birth like '" + dobYear + "' and " + " month_of_birth like '" + dobMonth + "' and " + " date_of_birth like '" + dobDay + "' and " + " sex like '" + sex + "%' ";
+			}
+
+			logger.info(sql);
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			ResultSet rs = pstmt.executeQuery();
+
+			// If the hin was truncated try to match the full hin. This is here as there is code to 
+			// truncate hins that are 12 characters. Unfortunately Quebec hins are 12 characters...
+			if (truncated_hin && rs.first() == false)
+			{
+				sql = "select demographic_no, provider_no from demographic where hin='" + hin + "' and " + " last_name like '" + lastName + "%' and " + " first_name like '" + firstName + "%' and " + " year_of_birth like '" + dobYear + "' and " + " month_of_birth like '" + dobMonth + "' and " + " date_of_birth like '" + dobDay + "' and " + " sex like '" + sex + "%' ";
+				rs.close();
+				pstmt.close();
+				pstmt = conn.prepareStatement(sql);
+				rs = pstmt.executeQuery();
+			}
+
+			while (rs.next()) {
+				count++;
+				demo = oscar.Misc.getString(rs, "demographic_no");
+				provider_no = oscar.Misc.getString(rs, "provider_no");
+			}
+			rs.close();
+			pstmt.close();
+		} catch (SQLException sqlE) {
+			throw sqlE;
+		}
+
 		try {
 			if (result == null) {
 				logger.info("Could not find patient for lab: " + labId);
