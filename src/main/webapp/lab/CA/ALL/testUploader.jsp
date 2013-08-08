@@ -150,19 +150,5 @@ if(outcome != null){
 	</tr>
 </table>
 </form>
-
-<div class="excelleris">
-	<p>Click on the button below to check for new Excelleris Lab Reports</p>
-<%
-if(importoutcome!=null){
-%>
-	<div class="alert">Import outcome: <%= importoutcome %> (Note: 1 lab import may contain multiple lab reports)</div>
-<% 
-}
-%>
-<form action="excellerisImport.do" method="post">
-	<input type="submit" value="Import my labs"/>
-</form>
-</div>
 </body>
 </html>
