@@ -27,7 +27,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ page import="oscar.oscarMDS.data.ProviderData, java.util.ArrayList"%>
-
+ 
 <%
 
 %>
@@ -118,7 +118,7 @@ function onSubmitCheck(){
 							key="oscarMDS.search.formPhysicianUnclaimed" /></option>
 					</optgroup>
 					<OPTGROUP LABEL="Docs with labs">
-						<% ArrayList providers2 = ProviderData.getProviderListWithLabNo();
+						<% ArrayList providers2 = ProviderData.getActiveProviderListWithLabNo();
                                                for (int i=0; i < providers2.size(); i++) { %>
 						<option
 							value="<%= (String) ((ArrayList) providers2.get(i)).get(0) %>"
@@ -127,13 +127,23 @@ function onSubmitCheck(){
 						<% } %>
 					</optgroup>
 
-					<OPTGROUP LABEL="All Docs">
-						<% ArrayList providers = ProviderData.getProviderList();
+					<OPTGROUP LABEL="All Active Docs">
+						<% ArrayList providers = ProviderData.getActiveProviderList();
                                                for (int i=0; i < providers.size(); i++) { %>
 						<option
 							value="<%= (String) ((ArrayList) providers.get(i)).get(0) %>"
 							<%= ( ((String) ((ArrayList) providers.get(i)).get(0)).equals(request.getParameter("providerNo")) ? " selected" : "" ) %>><%= (String) ((ArrayList) providers.get(i)).get(1) %>
 						<%= (String) ((ArrayList) providers.get(i)).get(2) %></option>
+						<% } %>
+					</optgroup>
+
+					<OPTGROUP LABEL="All Inactive Docs">
+						<% ArrayList providers3 = ProviderData.getInactiveProviderList();
+                                               for (int i=0; i < providers3.size(); i++) { %>
+						<option
+							value="<%= (String) ((ArrayList) providers3.get(i)).get(0) %>"
+							<%= ( ((String) ((ArrayList) providers3.get(i)).get(0)).equals(request.getParameter("providerNo")) ? " selected" : "" ) %>><%= (String) ((ArrayList) providers3.get(i)).get(1) %>
+						<%= (String) ((ArrayList) providers3.get(i)).get(2) %></option>
 						<% } %>
 					</optgroup>
 				</select> <input type="hidden" name="providerNo"

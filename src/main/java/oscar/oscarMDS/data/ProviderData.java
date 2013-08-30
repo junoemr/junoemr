@@ -34,6 +34,8 @@ import oscar.oscarDB.DBHandler;
 
 public class ProviderData {
 
+    private enum Status { INACTIVE, ACTIVE, BOTH }
+
     public ProviderData(String refDoctor, String conDoctor, String admDoctor) {
         referringDoctor = beautifyProviderName(refDoctor);
         consultingDoctor = beautifyProviderName(conDoctor);
@@ -70,11 +72,26 @@ public class ProviderData {
     }
 
     public static ArrayList<ArrayList<String>> getProviderList () {
+        return getProviderList(Status.BOTH);
+    }
+
+    public static ArrayList<ArrayList<String>> getActiveProviderList () {
+        return getProviderList(Status.ACTIVE);
+    }
+
+    public static ArrayList<ArrayList<String>> getInactiveProviderList () {
+        return getProviderList(Status.INACTIVE);
+    }
+
+    private static ArrayList<ArrayList<String>> getProviderList (Status status) {
         try {
 
             ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
 
-            String sql = "select provider_no, first_name, last_name from provider where provider_type='doctor' order by last_name , first_name";
+            String sql = "select provider_no, first_name, last_name from provider where provider_type='doctor'" 
+                        + ((status == Status.ACTIVE) ? " AND status = '1'" : "")
+                        + ((status == Status.INACTIVE) ? " AND status = '0'" : "") 
+                        + " order by last_name , first_name";
             ResultSet rs = DBHandler.GetSQL(sql);
             while ( rs.next() ) {
                 ArrayList<String> provider = new ArrayList<String>();
@@ -91,12 +108,28 @@ public class ProviderData {
     }
 
 
+
     public static ArrayList<ArrayList<String>> getProviderListWithLabNo () {
+        return getProviderListWithLabNo(Status.BOTH); 
+    }
+
+    public static ArrayList<ArrayList<String>> getActiveProviderListWithLabNo () {
+        return getProviderListWithLabNo(Status.ACTIVE); 
+    }
+
+    public static ArrayList<ArrayList<String>> getInactiveProviderListWithLabNo () {
+        return getProviderListWithLabNo(Status.INACTIVE); 
+    }
+
+    private static ArrayList<ArrayList<String>> getProviderListWithLabNo (Status status) {
         try {
 
             ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
 
-            String sql = "select provider_no, first_name, last_name from provider where provider_type='doctor'  and ohip_no != '' order by last_name , first_name";
+            String sql = "select provider_no, first_name, last_name from provider where provider_type='doctor'  and ohip_no != '' "
+                        + ((status == Status.ACTIVE) ? " AND status = '1'" : "")
+                        + ((status == Status.INACTIVE) ? " AND status = '0'" : "") 
+                       + "order by last_name , first_name";
             ResultSet rs = DBHandler.GetSQL(sql);
             while ( rs.next() ) {
                 ArrayList<String> provider = new ArrayList<String>();
