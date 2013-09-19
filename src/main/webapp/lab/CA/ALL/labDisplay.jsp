@@ -626,7 +626,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						                	 labelval = "(not set)";
 
 						                 } %>
-						                <input type="text" id="acklabel" name="label" value="<%=labelval %>"/>
+						                <input type="text" size="35" id="acklabel" name="label" value="<%=labelval %>"/>
 					                 <span id="labelspan" class="Field2"><i>Label: <%=labelval %> </i></span>
 
                                     <span class="Field2"><i>Next Appointment: <oscar:nextAppt demographicNo="<%=demographicID%>"/></i></span>
