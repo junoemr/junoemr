@@ -577,10 +577,41 @@ public class ProviderData {
             return null;
         }
     }
+
+   public static ArrayList<Hashtable<String,String>> getProviderListWithNurses(boolean inactive) {
+
+        try {
+
+            ArrayList<Hashtable<String,String>> result = new ArrayList<Hashtable<String,String>>();
+            String active = " and status = '1' ";
+            if (inactive){
+               active = "";
+            }
+
+            String sql = "select provider_no, first_name, last_name, ohip_no " +
+				"from provider where provider_type in ('doctor', 'nurse')" +
+				 active + " order by last_name , first_name";
+
+            ResultSet rs = DBHandler.GetSQL(sql);
+
+            while ( rs.next() ) {
+                Hashtable<String,String> provider = new Hashtable<String,String>();
+                provider.put("providerNo",oscar.Misc.getString(rs, "provider_no"));
+                provider.put("firstName",oscar.Misc.getString(rs, "first_name"));
+                provider.put("lastName",oscar.Misc.getString(rs, "last_name"));
+				provider.put("ohipNo",oscar.Misc.getString(rs, "ohip_no"));
+                result.add(provider);
+            }
+            return result;
+        }catch(Exception e){
+            MiscUtils.getLogger().debug("exception in ProviderData:"+e);
+            return null;
+        }
+    }
+
    public static List<Hashtable<String,String>> searchProvider(String searchStr){
 	   return searchProvider(searchStr, false);
    }
-
 
    public static List<Hashtable<String,String>> searchProvider(String searchStr,boolean onlyActive){
        String sql="select provider_no, first_name, last_name from provider where ";

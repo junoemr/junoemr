@@ -98,7 +98,7 @@
       layoutType = "default";
   }
 
-  ArrayList providers = ProviderData.getProviderList();
+  ArrayList providers = ProviderData.getProviderListWithNurses(false);
 
   //calc age at time of prevention
   Date dob = PreventionData.getDemographicDateOfBirth(demographic_no);

@@ -242,7 +242,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 
       	    });
       	  jQuery("#labelspan").children().get(0).innerHTML = "Label: " +  jQuery("#label").val();
-      	  document.forms['acknowledgeForm'].label.value = "";
+      	  //document.forms['acknowledgeForm'].label.value = "";
 
       	  });
       });
@@ -618,7 +618,6 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										<button type="button" id="createLabel" style="background-color:#6699FF" value="Label" onclick="submitLabel(this);">Label</button>
 										<%} %>
 										<input type="hidden" id="labNum" name="lab_no" value="<%=lab_no%>">
-						                <input type="text" id="acklabel" name="label" value=""/>
 
 						                 <% String labelval="";
 						                 if (label!="" && label!=null) {
@@ -627,6 +626,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						                	 labelval = "(not set)";
 
 						                 } %>
+						                <input type="text" id="acklabel" name="label" value="<%=labelval %>"/>
 					                 <span id="labelspan" class="Field2"><i>Label: <%=labelval %> </i></span>
 
                                     <span class="Field2"><i>Next Appointment: <oscar:nextAppt demographicNo="<%=demographicID%>"/></i></span>

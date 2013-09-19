@@ -3073,6 +3073,7 @@
         <ViolationValue>/src/main/java/oscar/oscarProvider/data/ProviderData.java:List&lt;Hashtable&lt;String,String&gt;&gt; retList=new ArrayList&lt;Hashtable&lt;String,String&gt;&gt;();</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarProvider/data/ProviderData.java:import java.util.Hashtable;</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarProvider/data/ProviderData.java:public static ArrayList&lt;Hashtable&lt;String,String&gt;&gt; getProviderList () {</ViolationValue>
+		<ViolationValue>/src/main/java/oscar/oscarProvider/data/ProviderData.java:public static ArrayList&lt;Hashtable&lt;String,String&gt;&gt; getProviderListWithNurses(boolean inactive) {</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarProvider/data/ProviderData.java:public static ArrayList&lt;Hashtable&lt;String,String&gt;&gt; getProviderList (boolean inactive) {</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarProvider/data/ProviderData.java:public static ArrayList&lt;Hashtable&lt;String,String&gt;&gt; getProviderListOfAllTypes () {</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarProvider/data/ProviderData.java:public static ArrayList&lt;Hashtable&lt;String,String&gt;&gt; getProviderListOfAllTypes (boolean inactive) {</ViolationValue>
