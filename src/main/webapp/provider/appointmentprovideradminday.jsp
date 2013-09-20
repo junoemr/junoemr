@@ -1808,15 +1808,9 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 		<% } %>
 	<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <% } %>
-<% if(len==lenLimitedL || view!=0 || numAvailProvider==1 || OscarProperties.getInstance().getProperty("APPT_ALWAYS_SHOW_LINKS", "false").equals("true") ) {%>
-=======
 <oscar:oscarPropertiesCheck property="show_hc_eligibility" value="true" defaultVal="false">
 <%=active_medical_coverage?"+&nbsp":""%></oscar:oscarPropertiesCheck><%=(view==0)?(name.length()>len?name.substring(0,len):name):name%></a>
-<% 
-// Daine: Changed this to never truncate appointment buttons
-//if(len==lenLimitedL || view!=0 || numAvailProvider==1 ) {
-if(true){
-%>
+<% if(len==lenLimitedL || view!=0 || numAvailProvider==1 || OscarProperties.getInstance().getProperty("APPT_ALWAYS_SHOW_LINKS", "false").equals("true") ) {%>
 
 <security:oscarSec roleName="<%=roleName$%>" objectName="_eChart" rights="r">
 <oscar:oscarPropertiesCheck property="eform_in_appointment" value="yes">
