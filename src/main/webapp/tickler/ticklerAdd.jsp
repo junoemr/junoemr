@@ -24,10 +24,13 @@
 
 --%>
 
+<%@ page import="oscar.OscarProperties" %>
 <%    
+
 if(session.getAttribute("user") == null)
     response.sendRedirect("../logout.jsp");
 String user_no;
+oscar.OscarProperties props = oscar.OscarProperties.getInstance();
 user_no = (String) session.getAttribute("user");
 int  nItems=0;
 String strLimit1="0";
@@ -368,15 +371,27 @@ function changeSite(sel) {
             <%  String proFirst="";
                 String proLast="";
                 String proOHIP="";
+				String defaultProvider = 
+					props.getProperty("default_tickler_provider", "");
 
                 ResultSet rslocal = apptMainBean.queryResults("%", "search_provider_all");
-                while(rslocal.next()){
+				while(rslocal.next())
+				{
+					String selected = "";
                     proFirst = rslocal.getString("first_name");
                     proLast = rslocal.getString("last_name");
                     proOHIP = rslocal.getString("provider_no"); 
+					if(defaultProvider.equals(proOHIP))
+					{
+						selected = "selected";
+					}
+					else if(user_no.equals(proOHIP) && defaultProvider == "")
+					{
+						selected = "selected";
+					}
 
             %> 
-            <option value="<%=proOHIP%>" <%=user_no.equals(proOHIP)?"selected":""%>><%=proLast%>, <%=proFirst%></option>
+			<option value="<%=proOHIP%>" <%=selected%> ><%=proLast%>, <%=proFirst%></option>
             <%
                 }
             %>
