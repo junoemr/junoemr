@@ -13,3 +13,13 @@ create table demographic_merged_full (
 	from_demographic_no int,
 	created_tstamp timestamp
 );
+
+create index scheduledate_sdate on scheduledate(sdate);
+create index scheduledate_provider_no on scheduledate (provider_no);
+create index scheduledate_status on scheduledate (status);
+create index scheduledate_key1 on scheduledate (sdate,provider_no,hour,status);
+create index secObjPrivilege_objectName on secObjPrivilege (objectName);
+create index appointment_date_provider on appointment ( appointment_date, provider_no);
+create index appointment_status_active on appointment_status(active);
+create index eform_form_name on eform(form_name);
+

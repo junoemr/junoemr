@@ -75,9 +75,18 @@ if( uProp != null && uProp.getValue().equalsIgnoreCase("yes")) {
 	skipComment = true;
 }
 
+Boolean setLabelOnAck = false;
+if (props.getProperty("set_lab_label_on_acknowledge", "").equals("true"))
+{
+	setLabelOnAck = true;
+}
+
 String ackLabFunc;
 if( skipComment ) {
 	ackLabFunc = "handleLab('acknowledgeForm','" + segmentID + "','ackLab');";
+}
+else if(setLabelOnAck) {
+	ackLabFunc = "setLabel('ackLab');";
 }
 else {
 	ackLabFunc = "getComment('ackLab');";
@@ -396,6 +405,40 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
            if(ret) handleLab('acknowledgeForm','<%=segmentID%>', action);
 
             return false;
+        }
+
+        function setLabel(action) {
+            var success = true;
+            var currentLabel = document.forms['TDISLabelForm'].label.value;
+            if( currentLabel == null)
+            {
+                currentLabel = "";
+            }   
+            
+            var newLabel = prompt('Set Lab Label', currentLabel);
+            if( newLabel == null ) 
+            {
+                success = false;
+            }   
+            else if( newLabel != null && newLabel.length > 0 )
+            {
+                document.forms['TDISLabelForm'].label.value = newLabel;
+            }   
+            else
+            {
+                document.forms['TDISLabelForm'].label.value = currentLabel;
+            }   
+            
+            jQuery.ajax( {
+              type: "POST",
+              url: '<%=request.getContextPath()%>'+"/lab/CA/ALL/createLabelTDIS.do",
+              dataType: "json",
+              data: { lab_no: jQuery("#labNum").val(),accessionNum: jQuery("#accNum").val(), label: jQuery("#label").val() } 
+              });
+              
+            if(success) handleLab('acknowledgeForm','<%=segmentID%>', action);
+           
+            return success;
         }
 
         function printPDF(){
