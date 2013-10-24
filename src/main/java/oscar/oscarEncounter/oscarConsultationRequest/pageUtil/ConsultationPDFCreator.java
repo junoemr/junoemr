@@ -231,7 +231,13 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 		infoTable.addCell(cell);
 
 		if (reqFrm.pwb.equals("1")){
-			cell.setPhrase(new Phrase(getResource("msgPleaseReplyPatient"), boldFont));
+			// msgPleaseReplayPatient does not exist. Using Part1 and Part2 method
+			// instead
+			//cell.setPhrase(new Phrase(getResource("msgPleaseReplyPatient"), boldFont));
+			cell.setPhrase(new Phrase(
+					String.format("%s %s %s", getResource("msgPleaseReplyPart1"),
+											  clinic.getClinicName(),
+											  getResource("msgPleaseReplyPart2")), boldFont));
 		}
 
 		else if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
