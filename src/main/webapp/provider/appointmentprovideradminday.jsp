@@ -1722,7 +1722,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 <bean:message key="provider.appointmentProviderAdminDay.reason"/>: <%=UtilMisc.htmlEscape(reason)%>
 <bean:message key="provider.appointmentProviderAdminDay.notes"/>: <%=UtilMisc.htmlEscape(notes)%>" >
 
-            .<%=(view==0&&numAvailProvider!=1)?(name.length()>len?name.substring(0,len).toUpperCase():name.toUpperCase()):name.toUpperCase()%>
+			.<%=name.toUpperCase()%>
             </font></a><!--Inline display of reason -->
         <% if(OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true")) { %>
 	      	<br/>
@@ -1791,7 +1791,13 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 %>
 <a class="apptLink" href=# onClick ="popupPage(535,860,'../appointment/appointmentcontrol.jsp?appointment_no=<%=appointment.get("appointment_no")%>&provider_no=<%=curProvider_no[nProvider]%>&year=<%=year%>&month=<%=month%>&day=<%=day%>&start_time=<%=iS+":"+iSm%>&demographic_no=<%=demographic_no%>&displaymode=edit&dboperation=search');return false;"  <oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true"> title="<%=name%>
 &nbsp; reason: <%=UtilMisc.htmlEscape(reason)%>
-&nbsp; notes: <%=UtilMisc.htmlEscape(notes)%>"</oscar:oscarPropertiesCheck>   ><%=(view==0)?(name.length()>len?name.substring(0,len):name):name%></a>
+
+&nbsp; notes: <%=UtilMisc.htmlEscape(notes)%>"</oscar:oscarPropertiesCheck> >
+
+<oscar:oscarPropertiesCheck property="show_hc_eligibility" value="true" defaultVal="false">
+<%=active_medical_coverage?"+&nbsp":""%></oscar:oscarPropertiesCheck>
+
+<%=name%></a>
 <%if(OscarProperties.getInstance().getProperty("APPT_THREE_LINE","false").equals("true")){  %>
 	<%if((apptType != null && apptType.length()>0) || (reason != null && reason.length() > 0)) {%>
 	<br/>
@@ -1808,8 +1814,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 		<% } %>
 	<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <% } %>
-<oscar:oscarPropertiesCheck property="show_hc_eligibility" value="true" defaultVal="false">
-<%=active_medical_coverage?"+&nbsp":""%></oscar:oscarPropertiesCheck><%=(view==0)?(name.length()>len?name.substring(0,len):name):name%></a>
+
 <% if(len==lenLimitedL || view!=0 || numAvailProvider==1 || OscarProperties.getInstance().getProperty("APPT_ALWAYS_SHOW_LINKS", "false").equals("true") ) {%>
 
 <security:oscarSec roleName="<%=roleName$%>" objectName="_eChart" rights="r">
