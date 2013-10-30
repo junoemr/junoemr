@@ -62,7 +62,7 @@ oscar.oscarBilling.ca.bc.pageUtil.ReceivePaymentActionForm frm = (oscar.oscarBil
 			name="receivePaymentActionForm" property="billingmasterNo" /></p>
 		</div>
 		<p><label> <bean:message key="oscar.billing.CA.BC.amount" />
-		<html:text maxlength="6" property="amountReceived" /><!--&nbsp;<html:checkbox property="isRefund" value="true"/>-->
+		<html:text maxlength="7" property="amountReceived" /><!--&nbsp;<html:checkbox property="isRefund" value="true"/>-->
 		</label></p>
 		<p><label> <bean:message key="oscar.billing.CA.BC.method" />
 		<bean:define id="paymentMethodList" scope="request"
