@@ -1619,6 +1619,40 @@ function updateStatus(formid){//acknowledge
 	}
 }
 
+function updateStatusAndReview(formid){//acknowledge
+	var num=formid.split("_");
+	var doclabid=num[1];
+	if(doclabid){
+		var demoId=$('demofind'+doclabid).value;
+		var saved=$('saved'+doclabid).value;
+		if(demoId=='-1'|| saved=='false'){
+			alert('Document is not assigned and saved to a patient,please file it');
+		}else{
+			var url=contextpath+"/oscarMDS/UpdateStatus.do";
+			$('mark_as_reviewed').value = 'true';
+			var data=$(formid).serialize(true);
+			$('mark_as_reviewed').value = 'false';
+
+			new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){
+
+				if(doclabid){
+					Effect.BlindUp('labdoc_'+doclabid);
+					//updateDocLabData(doclabid);
+				}
+
+				if (_in_window) {
+					self.opener.removeReport(doclabid);
+					window.close();
+				}
+				else {
+					refreshCategoryList();
+					fakeScroll();
+				}
+			}});
+		}
+	}
+}
+
 
 
 function fileDoc(docId){

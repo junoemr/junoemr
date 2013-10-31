@@ -58,7 +58,17 @@ public class DocumentUploadAction extends DispatchAction {
 			int numberOfPages = 0;
 			String fileName = docFile.getFileName();
 			String user = (String) request.getSession().getAttribute("user");
-			EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A',
+			String providerId = request.getParameter("provider");
+
+			String responsibleId = user;
+			String use_responsible_string = 
+				request.getParameter("use_provider_as_responsible"); 
+			if(null != use_responsible_string)
+			{
+				responsibleId = providerId;
+			}
+
+			EDoc newDoc = new EDoc("", "", fileName, "", user, responsibleId, fm.getSource(), 'A',
 								   oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1", 0);
 			newDoc.setDocPublic("0");
 			fileName = newDoc.getFileName();
@@ -80,7 +90,6 @@ public class DocumentUploadAction extends DispatchAction {
 			String doc_no = EDocUtil.addDocumentSQL(newDoc);
 			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 	
-			String providerId = request.getParameter("provider");
 			if (providerId != null) { 
 				WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
 				ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) ctx.getBean("providerInboxRoutingDAO");

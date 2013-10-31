@@ -300,6 +300,30 @@ public class CommonLabResultData {
 		return labs;
 	}
 
+	public static boolean markDocumentReviewed(int labNo, String providerNo) 
+	{
+		Logger l = Logger.getLogger(CommonLabResultData.class);
+
+		try {
+			DBPreparedHandler db = new DBPreparedHandler();
+
+			String sql =  "UPDATE document ";
+			sql += "SET ";
+			sql += "  reviewer = ?, ";
+			sql += "  reviewdatetime = CURRENT_TIMESTAMP ";
+			sql += "WHERE document_no = ? ";
+
+			String labNoParam = "" + labNo;
+			db.queryExecute(sql, new String[] { providerNo, labNoParam });
+
+		} catch (Exception e) {
+			l.error("exception in MDSResultsData.updateReportStatus()", e);
+			return false;
+		}
+
+		return true;
+	}
+
 	public static boolean updateReportStatus(int labNo, String providerNo, char status, String comment, String labType) {
 
 		try {

@@ -88,6 +88,15 @@ if (isFirefox > 0) {
 					}
 					%>
 				</select>
+				<%
+				if(OscarProperties.getInstance().isPropertyActive("INBOX_SET_RESPONSIBLE"))
+				{
+				%>
+				&nbsp;<label for="use_provider_as_responsible" style="font-family:Arial; font-weight:normal; font-size:12px">Make selected provider responsible</label>
+				<input type="checkbox" id="use_provider_as_responsible" name="use_provider_as_responsible" checked="checked" />
+				<%
+				}
+				%>
 			</span>
         </div>
     </form>

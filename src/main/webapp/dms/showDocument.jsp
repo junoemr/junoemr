@@ -471,6 +471,14 @@
                                                         <input type="hidden" name="status" value="A"/>
                                                         <input type="hidden" name="labType" value="DOC"/>
                                                         <input type="hidden" name="ajaxcall" value="yes"/>
+														<%
+														if(OscarProperties.getInstance().isPropertyActive("INBOX_SET_REVIEWER"))
+														{
+														%>
+                                                        <input type="hidden" id="mark_as_reviewed" name="mark_as_reviewed" value="false"/>
+														<%
+														}
+														%>
                                                         <textarea id="comment_<%=docId%>" name="comment" cols="40" rows="4"></textarea>
                                                     </td>
                                                 </tr>
@@ -490,6 +498,18 @@
                                                         %>
                                                     </td>
                                                 </tr>
+												<%
+												if(OscarProperties.getInstance().isPropertyActive("INBOX_SET_REVIEWER"))
+												{
+												%>
+                                                <tr>
+                                                    <td>
+														<input type="button" id="ackRevBtn_<%=docId%>" value="<bean:message key="oscarMDS.segmentDisplay.btnAcknowledgeAndReview"/>" onclick="updateStatusAndReview('acknowledgeForm_<%=docId%>',<%=inQueueB%>)" />
+                                                    </td>
+                                                </tr>
+												<%
+												}
+												%>
                                             </table>
                                         </td>
                                     </tr>

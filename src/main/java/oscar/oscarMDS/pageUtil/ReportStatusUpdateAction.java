@@ -39,6 +39,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.util.MiscUtils;
 
+import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarDB.DBHandler;
@@ -68,6 +69,25 @@ public class ReportStatusUpdateAction extends DispatchAction {
         String comment = request.getParameter("comment");
         String lab_type = request.getParameter("labType");
         String ajaxcall=request.getParameter("ajaxcall");
+
+		// XXX: this is a spliced-in hack, only run this code if explicitly
+		//      asked to do so in the properties.
+		if(OscarProperties.getInstance().isPropertyActive("INBOX_SET_REVIEWER"))
+		{
+			String mark_as_reviewed = request.getParameter("mark_as_reviewed");
+
+			if(mark_as_reviewed != null && mark_as_reviewed.equals("true"))
+			{
+				// Mark the document as reviewed
+				try
+				{
+					CommonLabResultData.markDocumentReviewed(labNo, providerNo);
+				} catch (Exception e) {
+					logger.error("exception in ReportStatusUpdateAction marking as reviewed",e);
+					return mapping.findForward("failure");
+				}
+			}
+		}
 
         if(status == 'A'){
             String demographicID = getDemographicIdFromLab(lab_type, labNo);
