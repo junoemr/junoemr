@@ -611,7 +611,32 @@ public class MDSHandler implements MessageHandler {
 
         String ret = "F";
         try{
-            if (getString(DynamicHapiLoaderUtils.terserGet(terser,"/.ZFR-3-1")).equals("0"))
+            String message_id = 
+				getString(DynamicHapiLoaderUtils.terserGet(terser,"/.MSH-10-1"));
+
+			String[] id_array = message_id.split("-");
+
+			if(id_array.length == 3)
+			{
+				String form_number = id_array[2];
+
+				int i = 0;
+				String status = "";
+            	while ((status = DynamicHapiLoaderUtils.terserGet(terser,"/.ZFR("+i+")-3-1")) != null)
+				{
+					String current_form = DynamicHapiLoaderUtils.terserGet(terser,"/.ZFR("+i+")-2-1");
+					
+					if(current_form.equals(form_number) && status.equals("1"))
+					{
+						return "F";
+					}
+					i++;
+				}
+
+				return "P";
+			}
+
+			else if (getString(DynamicHapiLoaderUtils.terserGet(terser,"/.ZFR-3-1")).equals("0"))
                 return("P");
 
             String status = "";
