@@ -48,7 +48,7 @@
     if ( searchProviderNo == null ) { searchProviderNo = providerNo; }
     //mDSData.populateMDSResultsData2(searchProviderNo, demographicNo, request.getParameter("fname"), request.getParameter("lname"), request.getParameter("hnum"), ackStatus);
     
-    ArrayList<LabResultData> labs = comLab.populateLabResultsData("",demographicNo, "", "","","U");
+    ArrayList<LabResultData> labs = comLab.populateLabResultsData("",demographicNo, "", "","","U", null);
     
     LoggedInInfo loggedInInfo=LoggedInInfo.loggedInInfo.get();
     if (loggedInInfo.currentFacility.isIntegratorEnabled())

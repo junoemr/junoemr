@@ -210,7 +210,7 @@ function toggleSelectAll() {
             
             privatedocs = EDocUtil.listDocs("demographic", demoNo, null, EDocUtil.PRIVATE, EDocUtil.SORT_DESCRIPTION, "active");
             labData = new CommonLabResultData();
-            labs = labData.populateLabResultsData("",demoNo, "", "","","U");
+            labs = labData.populateLabResultsData("",demoNo, "", "","","U", null);
             Collections.sort(labs);       
             
             if (labs.size() == 0 && privatedocs.size() == 0) {

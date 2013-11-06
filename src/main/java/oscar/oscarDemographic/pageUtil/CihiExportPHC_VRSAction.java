@@ -1029,7 +1029,7 @@ public class CihiExportPHC_VRSAction extends DispatchAction {
 	private void buildLaboratoryResults(Demographic demo, PatientRecord patientRecord) {
 
 		CommonLabResultData comLab = new CommonLabResultData();
-		ArrayList<LabResultData> labdocs = comLab.populateLabsData(demo.getProviderNo(), String.valueOf(demo.getDemographicNo()), demo.getFirstName(), demo.getLastName(), demo.getHin(), "", "");
+		ArrayList<LabResultData> labdocs = comLab.populateLabsData(demo.getProviderNo(), String.valueOf(demo.getDemographicNo()), demo.getFirstName(), demo.getLastName(), demo.getHin(), "", "", null);
 		MessageHandler handler;
 		int i;
 		int j;

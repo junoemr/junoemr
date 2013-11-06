@@ -70,7 +70,7 @@ public class EctDisplayLabAction2 extends EctDisplayAction {
 		} else {
 
 			CommonLabResultData comLab = new CommonLabResultData();
-			ArrayList<LabResultData> labs = comLab.populateLabResultsData("", bean.demographicNo, "", "", "", "U");
+			ArrayList<LabResultData> labs = comLab.populateLabResultsData("", bean.demographicNo, "", "", "", "U", null);
 			logger.debug("local labs found : "+labs.size());
 
 			LoggedInInfo loggedInInfo = LoggedInInfo.loggedInInfo.get();

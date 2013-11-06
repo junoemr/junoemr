@@ -57,6 +57,7 @@ import org.oscarehr.PMmodule.utility.UtilDateUtilities;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DocumentResultsDao;
 import org.oscarehr.common.dao.InboxResultsDao;
+import org.oscarehr.common.dao.MyGroupDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.QueueDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
@@ -370,6 +371,7 @@ public class DmsInboxManageAction extends DispatchAction {
 		// String providerNo = request.getParameter("providerNo");
 		String providerNo = (String) session.getAttribute("user");
 		String searchProviderNo = request.getParameter("searchProviderNo");
+		String searchGroupNo = request.getParameter("searchGroupNo");
 		String ackStatus = request.getParameter("status");
 		String demographicNo = request.getParameter("demographicNo"); // used when searching for labs by patient instead of provider
 		String scannedDocStatus = request.getParameter("scannedDocument");
@@ -393,7 +395,10 @@ public class DmsInboxManageAction extends DispatchAction {
 
 		String startDateStr = request.getParameter("startDate");
 		String endDateStr = request.getParameter("endDate");
+		
+		MyGroupDao myGroupDao = (MyGroupDao)SpringUtils.getBean("myGroupDao");
 
+		List<String> providerNoArr = myGroupDao.getGroupDoctors(searchGroupNo);
 
 
 		String view = request.getParameter("view");
@@ -465,7 +470,7 @@ public class DmsInboxManageAction extends DispatchAction {
 		if ("labs".equals(view) || "abnormal".equals(view) || "normal".equals(view) || "all".equals(view)) {
 			labdocs.addAll(comLab.populateLabResultsData(searchProviderNo, demographicNo, patientFirstName,
 					patientLastName, patientHealthNumber, ackStatus, scannedDocStatus, true, page, pageSize,
-					mixLabsAndDocs, isAbnormal));
+					mixLabsAndDocs, isAbnormal, providerNoArr));
 		}
 
 		ArrayList<LabResultData> validlabdocs = new ArrayList<LabResultData>();

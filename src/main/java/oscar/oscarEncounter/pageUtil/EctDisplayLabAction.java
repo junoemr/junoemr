@@ -52,7 +52,7 @@ public class EctDisplayLabAction extends EctDisplayAction {
 	  logger.debug("EctDisplayLabAction");
 	  
 	  CommonLabResultData comLab = new CommonLabResultData();
-        ArrayList<LabResultData> labs = comLab.populateLabResultsData("",bean.demographicNo, "", "","","U");
+        ArrayList<LabResultData> labs = comLab.populateLabResultsData("",bean.demographicNo, "", "","","U", null);
         Collections.sort(labs);
 
         //set text for lefthand module title

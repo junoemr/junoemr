@@ -16,8 +16,11 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
+<%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@page import="org.oscarehr.common.hl7.v2.oscar_to_oscar.OscarToOscarUtils"%>
 <%@page import="org.oscarehr.util.MiscUtils,org.apache.commons.lang.StringEscapeUtils"%>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.common.dao.MyGroupDao" %>
 
 <%
 @SuppressWarnings("unchecked")
@@ -36,6 +39,7 @@ Integer totalNumDocs    = (Integer) request.getAttribute("totalNumDocs");
 Long categoryHash       = (Long) request.getAttribute("categoryHash");
 String  providerNo		= (String) request.getAttribute("providerNo");
 String searchProviderNo = (String) request.getAttribute("searchProviderNo");
+String searchGroupNo = (String) request.getAttribute("searchGroupNo");
 String demographicNo	= (String) request.getAttribute("demographicNo");
 String ackStatus 		= (String) request.getAttribute("ackStatus");
 
@@ -156,6 +160,8 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 	var loadingDocs = false;
 	var currentBold = false;
 	var oldestDate = null;
+	var searchGroupNo = "<%=(searchGroupNo == null ? "" : searchGroupNo)%>";
+	var startDate = null;
 
 	window.changePage = function (p) {
 		if (p == "Next") { page++; }
@@ -249,7 +255,8 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 	function getQuery() {
 		var query = "method=prepareForContentPage";
 		query +="&searchProviderNo="+searchProviderNo+"&providerNo="+providerNo+"&status="+searchStatus+"&page="+page
-			   +"&pageSize="+pageSize+"&isListView="+(isListView?"true":"false");
+			   +"&pageSize="+pageSize+"&isListView="+(isListView?"true":"false")
+			   +"&searchGroupNo="+searchGroupNo+"&startDate="+startDate;
 		switch (selected_category) {
 		case CATEGORY_ALL:
 			query  += "&view=all";
@@ -400,6 +407,30 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 			el.remove();
 		}
 	}
+	function searchUrgentByGroup(){
+		var search_urgent_group = jQuery('#search_urgent_group').val();
+		loadingDocs = true;
+        selected_category = CATEGORY_ABNORMAL;
+        selected_category_patient = "\"\"";
+        selected_category_type = "\"\"";
+        searchStatus = "N";
+        
+        var d = new Date();
+        d.setDate(d.getDate() - 1);
+        var yyyy = d.getFullYear().toString();
+        var mm = (d.getMonth()+1).toString();
+        var dd = d.getDate().toString();
+        startDate = yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' +(dd[1]?dd:"0"+dd[0]);
+        
+        searchProviderNo = -1;
+        searchGroupNo = search_urgent_group;
+        
+        //set providers filters
+        
+        document.getElementById("docViews").innerHTML = "";
+        
+		changePage(1);
+	}
 </script>
 
 
@@ -417,6 +448,10 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 </style>
 </head>
 
+<%
+MyGroupDao myGroupDao = SpringUtils.getBean(MyGroupDao.class);
+List<String> resultList = myGroupDao.getGroups();
+%>
 <body oldclass="BodyStyle" vlink="#0000FF"  >
         <table  oldclass="MainTable" id="scrollNumber1" border="0" name="encounterTable" cellspacing="0" cellpadding="3" width="100%">
             <tr oldclass="MainTableTopRow">
@@ -439,6 +474,23 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
                                     <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnSearch"/>" onClick="window.location='<%=request.getContextPath()%>/oscarMDS/Search.jsp?providerNo=<%= providerNo %>'" />
                                 <% } %>
                                 <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnClose"/>" onClick="wrapUp()" />
+                                <oscar:oscarPropertiesCheck property="inbox_urgent_search" value="yes">
+                                <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnUrgentSearch"/>" onClick="searchUrgentByGroup()" />
+                                <select name="search_urgent_group" id="search_urgent_group">
+                                <%
+                                Iterator<String> groupsIter = resultList.iterator();
+                                String group = "";
+                                while(groupsIter.hasNext())
+                                {
+                                	group = groupsIter.next();
+                                	%>
+                                	  <option value="<%=group%>"
+                                	        ><%=group%></option>
+                                	<%
+                                }
+                                %>
+                                </select>
+                                </oscar:oscarPropertiesCheck>
                       		</td>
 
                             <td align="right" valign="center" width="35%">

@@ -29,7 +29,9 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import oscar.oscarDB.DBHandler;
@@ -99,13 +101,17 @@ public class PathnetResultsData {
         return labResults;
     }
     /////
-    public ArrayList<LabResultData> populatePathnetResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status) {
+    public ArrayList<LabResultData> populatePathnetResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status, List<String> providerNoArr) {
         if ( providerNo == null) { providerNo = ""; }
         if ( patientFirstName == null) { patientFirstName = ""; }
         if ( patientLastName == null) { patientLastName = ""; }
         if ( patientHealthNumber == null) { patientHealthNumber = ""; }
         if ( status == null ) { status = ""; }
 
+        String providerNoList = StringUtils.join(providerNoArr, ",");
+        if(providerNoArr.size() == 0){
+        	providerNoList = "";
+        }
 
         ArrayList<LabResultData> labResults =  new ArrayList<LabResultData>();
         String sql = "";
@@ -120,6 +126,9 @@ public class PathnetResultsData {
                         " AND providerLabRouting.lab_type = 'BCP' " +
                         " AND pid.patient_name like '"+patientLastName+"%^"+patientFirstName+"%' AND pid.external_id like '%"+patientHealthNumber+"%'" +
                         " GROUP BY pid.message_id";
+                if(providerNoList != ""){
+                	sql = sql + "AND providerLabRouting.provider_no IN ("+providerNoList+")";
+                }
 
             } else {
 

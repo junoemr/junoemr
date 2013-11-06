@@ -807,7 +807,7 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 		logger.debug("pushing pushLabResults facilityId:" + facility.getId() + ", demographicId:" + demographicId);
 
 		CommonLabResultData comLab = new CommonLabResultData();
-		ArrayList<LabResultData> labs = comLab.populateLabResultsData("", demographicId.toString(), "", "", "", "U");
+		ArrayList<LabResultData> labs = comLab.populateLabResultsData("", demographicId.toString(), "", "", "", "U", null);
 		StringBuilder sentIds = new StringBuilder();
 		if (labs.size() == 0) return;
 

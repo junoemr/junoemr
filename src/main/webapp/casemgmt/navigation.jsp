@@ -427,7 +427,7 @@ String backurl=bsurl+"/oscarEncounter/IncomingEncounter.do?";
 <%
     String pAge = Integer.toString(oscar.util.UtilDateUtilities.calcAge(bean.yearOfBirth,bean.monthOfBirth,bean.dateOfBirth));
     oscar.oscarLab.ca.on.CommonLabResultData comLab = new oscar.oscarLab.ca.on.CommonLabResultData();
-    java.util.ArrayList labs = comLab.populateLabResultsData("",bean.demographicNo, "", "","","U");
+    java.util.ArrayList labs = comLab.populateLabResultsData("",bean.demographicNo, "", "","","U", null);
     session.setAttribute("casemgmt_labsbeans",labs);
 %>
 <caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">

@@ -29,6 +29,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -36,6 +37,7 @@ import org.apache.log4j.Logger;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarDB.DBPreparedHandler;
 import oscar.oscarLab.ca.on.LabResultData;
+import oscar.util.StringUtils;
 import oscar.util.UtilDateUtilities;
 
 
@@ -197,14 +199,19 @@ public class MDSResultsData {
 
 }
 
-    public ArrayList<LabResultData> populateCMLResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status) {
+    public ArrayList<LabResultData> populateCMLResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status, List<String> providerNoArr) {
         //logger.info("populateCMLResultsData getting called now");
+    	
         if ( providerNo == null) { providerNo = ""; }
         if ( patientFirstName == null) { patientFirstName = ""; }
         if ( patientLastName == null) { patientLastName = ""; }
         if ( patientHealthNumber == null) { patientHealthNumber = ""; }
         if ( status == null ) { status = ""; }
-
+        
+        String providerNoList = StringUtils.join(providerNoArr, ",");
+        if(providerNoArr.size() == 0){
+        	providerNoList = "";
+        }
 
         labResults =  new ArrayList<LabResultData>();
         // select lpp.patient_health_num, concat(lpp.patient_last_name,',',lpp.patient_first_name), lpp.patient_sex, lpp.doc_name, lpp.collection_date, lpp.lab_status from labPatientPhysicianInfo lpp;
@@ -225,6 +232,9 @@ public class MDSResultsData {
                         +" where providerLabRouting.status like '%"+status+"%' AND providerLabRouting.provider_no like '"+(providerNo.equals("")?"%":providerNo)+"'"
                         +" AND providerLabRouting.lab_type = 'CML' "
                         +" AND lpp.patient_last_name like '"+patientLastName+"%' and lpp.patient_first_name like '"+patientFirstName+"%' AND lpp.patient_health_num like '%"+patientHealthNumber+"%' and providerLabRouting.lab_no = lpp.id";
+                if(providerNoList != ""){
+                	sql = sql + " AND providerLabRouting.provider_no IN ("+providerNoList+")";
+                }
             } else {
 
                 sql = "select lpp.id, lpp.patient_health_num, concat(lpp.patient_last_name,',',lpp.patient_first_name) as patientName, lpp.patient_sex, lpp.doc_name, lpp.collection_date, lpp.lab_status, lpp.accession_num "
@@ -466,8 +476,7 @@ public class MDSResultsData {
     }
     //////
 
-    public ArrayList<LabResultData> populateMDSResultsData2(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status) {
-
+    public ArrayList<LabResultData> populateMDSResultsData2(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status, List<String> providerNoArr) {
         if ( providerNo == null) { providerNo = ""; }
         if ( patientFirstName == null) { patientFirstName = ""; }
         if ( patientLastName == null) { patientLastName = ""; }
@@ -477,7 +486,12 @@ public class MDSResultsData {
         labResults = new ArrayList<LabResultData>();
         String sql = "";
         String seqId = null;  //for debugging purposes
-
+        
+        String providerNoList = StringUtils.join(providerNoArr, ",");
+        if(providerNoArr.size() == 0){
+        	providerNoList = "";
+        }
+        
         try {
 
 
@@ -499,6 +513,10 @@ public class MDSResultsData {
                         "providerLabRouting.lab_type = 'MDS' " +
                         "AND providerLabRouting.status like '%"+status+"%' AND providerLabRouting.provider_no like '"+(providerNo.equals("")?"%":providerNo)+"' " +
                         "AND mdsPID.patientName like '"+patientLastName+"%^"+patientFirstName+"%^%' AND mdsPID.healthNumber like '%"+patientHealthNumber+"%' group by mdsMSH.segmentID";
+                
+                if(providerNoList != ""){
+                	sql = sql + "AND providerLabRouting.provider_no IN ("+providerNoList+")";
+                }
             } else {
                 sql = "SELECT mdsMSH.segmentID, mdsMSH.messageConID AS accessionNum, mdsPID.patientName, mdsPID.healthNumber, " +
                         "mdsPID.sex, max(mdsZFR.abnormalFlag) as abnormalFlag, mdsMSH.dateTime, mdsOBR.quantityTiming, mdsPV1.refDoctor, " +

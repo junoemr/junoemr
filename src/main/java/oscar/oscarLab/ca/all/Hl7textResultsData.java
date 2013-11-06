@@ -488,13 +488,18 @@ public class Hl7textResultsData {
 		return lbData;
 	}
 
-	public static ArrayList<LabResultData> populateHl7ResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status) {
+	public static ArrayList<LabResultData> populateHl7ResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status, List<String> providerNoArr) {
 
 		if ( providerNo == null) { providerNo = ""; }
 		if ( patientFirstName == null) { patientFirstName = ""; }
 		if ( patientLastName == null) { patientLastName = ""; }
 		if ( status == null ) { status = ""; }
 
+		String providerNoList = StringUtils.join(providerNoArr, ",");
+        if(providerNoArr.size() == 0){
+        	providerNoList = "";
+        }
+		
 		patientHealthNumber=StringUtils.trimToNull(patientHealthNumber);
 
 		ArrayList<LabResultData> labResults =  new ArrayList<LabResultData>();
@@ -514,6 +519,10 @@ public class Hl7textResultsData {
 
 				if (patientHealthNumber!=null) sql=sql+" AND info.health_no like '%"+patientHealthNumber+"%'";
 
+				if(providerNoList != ""){
+                	sql = sql + "AND providerLabRouting.provider_no IN ("+providerNoList+")";
+                }
+				
 				sql=sql+" ORDER BY info.lab_no DESC";
 
 			} else {
@@ -613,7 +622,7 @@ public class Hl7textResultsData {
 	}
 
 	public static ArrayList<LabResultData> populateHl7ResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber,
-			String status, boolean isPaged, Integer page, Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal) {
+			String status, boolean isPaged, Integer page, Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, List<String> providerNoArr) {
 
 		boolean qp_provider_no = false;
 		boolean qp_status = false;
@@ -636,6 +645,7 @@ public class Hl7textResultsData {
 		|| !"".equals(patientHealthNumber);
 
 		ArrayList<LabResultData> labResults =  new ArrayList<LabResultData>();
+		String providerNoList = StringUtils.join(providerNoArr, ",");
 		String sql = "";
 		try {
 			// note to self: lab reports not found in the providerLabRouting table will not show up - need to ensure every lab is entered in providerLabRouting, with '0'
@@ -674,6 +684,10 @@ public class Hl7textResultsData {
 			} else {
 				sql = sql + "AND (proLR.provider_no = ?) ";
 				qp_provider_no = true;
+			}
+			
+			if(providerNoList != "" && providerNoList != null){
+				sql = sql + "AND (proLR.provider_no IN ("+providerNoList+") ) ";
 			}
 
 			if ("N".equals(status) || "A".equals(status) || "F".equals(status)) {
@@ -736,6 +750,8 @@ public class Hl7textResultsData {
 				ps.setInt(qp_index++, pageSize);
 			}
 
+			
+			logger.info("provider list: "+providerNoList);
 
 			logger.info(sql);
 			
