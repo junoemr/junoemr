@@ -420,7 +420,8 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
         var yyyy = d.getFullYear().toString();
         var mm = (d.getMonth()+1).toString();
         var dd = d.getDate().toString();
-        startDate = yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' +(dd[1]?dd:"0"+dd[0]);
+        
+        EndDate = yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' +(dd[1]?dd:"0"+dd[0]);
         
         searchProviderNo = -1;
         searchGroupNo = search_urgent_group;
