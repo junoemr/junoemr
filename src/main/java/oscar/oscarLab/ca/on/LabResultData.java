@@ -74,6 +74,7 @@ public class LabResultData implements Comparable{
 	private Date dateTimeObr;
 	public String priority;
 	public String requestingClient;
+	public String requestingClientNo;
 	public String discipline;
 	public String reportStatus;
 	public boolean abn = false;
@@ -142,8 +143,6 @@ public class LabResultData implements Comparable{
 		}
 
 		return abn ;
-
-
 	}
 
 
@@ -298,6 +297,10 @@ public class LabResultData implements Comparable{
             this.requestingClient = prd.findPathnetOrderingProvider(this.segmentID);
         }*/
 		return this.requestingClient;
+	}
+	
+	public String getRequestingClientNo(){
+		return this.requestingClientNo;
 	}
 
 	public Date getDateObj(){

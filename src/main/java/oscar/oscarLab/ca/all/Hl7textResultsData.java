@@ -510,7 +510,7 @@ public class Hl7textResultsData {
 				// note to self: lab reports not found in the providerLabRouting table will not show up - need to ensure every lab is entered in providerLabRouting, with '0'
 				// for the provider number if unable to find correct provider
 
-				sql = "select info.label,info.lab_no, info.sex, info.health_no, info.result_status, info.obr_date, info.priority, info.requesting_client, info.discipline, info.last_name, info.first_name, info.report_status, info.accessionNum, info.final_result_count, providerLabRouting.status " +
+				sql = "select info.label,info.lab_no, info.sex, info.health_no, info.result_status, info.obr_date, info.priority, info.requesting_client, info.requesting_client_no, info.discipline, info.last_name, info.first_name, info.report_status, info.accessionNum, info.final_result_count, providerLabRouting.status " +
 				"from hl7TextInfo info, providerLabRouting " +
 				" where info.lab_no = providerLabRouting.lab_no "+
 				" AND providerLabRouting.status like '%"+status+"%' AND providerLabRouting.provider_no like '"+(providerNo.equals("")?"%":providerNo)+"'" +
@@ -663,6 +663,7 @@ public class Hl7textResultsData {
 				+ "		hl7.obr_date, "
 				+ "		hl7.priority, "
 				+ "		hl7.requesting_client, "
+				+ "		hl7.requesting_client_no, "
 				+ "		hl7.discipline, "
 				+ "		hl7.last_name, "
 				+ "		hl7.first_name, "
@@ -799,6 +800,7 @@ public class Hl7textResultsData {
 				}
 
 				lbData.requestingClient = rs.getString("requesting_client");
+				lbData.requestingClientNo = rs.getString("requesting_client_no");
 				lbData.reportStatus =  rs.getString("report_status");
 
 				// the "C" is for corrected excelleris labs

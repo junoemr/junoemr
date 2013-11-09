@@ -14,6 +14,7 @@ create table demographic_merged_full (
 	created_tstamp timestamp
 );
 
+-- Indexes
 create index scheduledate_sdate on scheduledate(sdate);
 create index scheduledate_provider_no on scheduledate (provider_no);
 create index scheduledate_status on scheduledate (status);
@@ -23,3 +24,6 @@ create index appointment_date_provider on appointment ( appointment_date, provid
 create index appointment_status_active on appointment_status(active);
 create index eform_form_name on eform(form_name);
 
+
+-- New column to store the requesting client number for labs
+alter table hl7TextInfo add column requesting_client_no varchar(20);

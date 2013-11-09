@@ -162,6 +162,8 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 	var oldestDate = null;
 	var searchGroupNo = "<%=(searchGroupNo == null ? "" : searchGroupNo)%>";
 	var startDate = null;
+	var endDate = null;
+	var checkRequestingProvider = false;
 
 	window.changePage = function (p) {
 		if (p == "Next") { page++; }
@@ -256,7 +258,8 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 		var query = "method=prepareForContentPage";
 		query +="&searchProviderNo="+searchProviderNo+"&providerNo="+providerNo+"&status="+searchStatus+"&page="+page
 			   +"&pageSize="+pageSize+"&isListView="+(isListView?"true":"false")
-			   +"&searchGroupNo="+searchGroupNo+"&startDate="+startDate;
+			   +"&searchGroupNo="+searchGroupNo+"&startDate="+startDate
+			   +"&endDate="+endDate+"&checkRequestingProvider="+checkRequestingProvider;
 		switch (selected_category) {
 		case CATEGORY_ALL:
 			query  += "&view=all";
@@ -421,10 +424,11 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
         var mm = (d.getMonth()+1).toString();
         var dd = d.getDate().toString();
         
-        EndDate = yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' +(dd[1]?dd:"0"+dd[0]);
+        endDate = yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' +(dd[1]?dd:"0"+dd[0]);
         
         searchProviderNo = -1;
         searchGroupNo = search_urgent_group;
+        checkRequestingProvider = true;
         
         //set providers filters
         

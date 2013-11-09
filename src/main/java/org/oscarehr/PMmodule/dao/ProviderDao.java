@@ -58,6 +58,20 @@ public class ProviderDao extends HibernateDaoSupport {
 
 		return exists;
 	}
+	
+	public boolean billingProviderExists(String ohipNo) {
+		List<Provider> providerList = getHibernateTemplate().find("From Provider p where p.OhipNo=?",new Object[]{ohipNo});
+		boolean exists = false;
+		if (providerList.size() > 0)
+		{
+			exists = true;
+			
+		}
+		log.debug("billingProviderExists: " + exists);
+
+		return exists;
+		
+	}
 
 	public Provider getProvider(String providerNo) {
 		if (providerNo == null || providerNo.length() <= 0) {

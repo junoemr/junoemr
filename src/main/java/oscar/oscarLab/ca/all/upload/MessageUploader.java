@@ -100,6 +100,7 @@ public final class MessageUploader {
 			String resultStatus = "";
 			String priority = h.getMsgPriority();
 			String requestingClient = h.getDocName();
+			String requestingClientNo = h.getClientRef();
 			String reportStatus = h.getOrderStatus();
 			String accessionNum = h.getAccessionNum();
 			String fillerOrderNum = h.getFillerOrderNumber();
@@ -211,6 +212,7 @@ public final class MessageUploader {
 				hl7TextInfo.setObrDate(obrDate);
 				hl7TextInfo.setPriority(priority);
 				hl7TextInfo.setRequestingProvider(requestingClient);
+				hl7TextInfo.setRequestingProviderNo(requestingClientNo);
 				hl7TextInfo.setDiscipline(discipline);
 				hl7TextInfo.setReportStatus(reportStatus);
 				hl7TextInfo.setAccessionNumber(accessionNum);

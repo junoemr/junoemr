@@ -51,6 +51,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.PMmodule.dao.SecUserRoleDao;
 import org.oscarehr.PMmodule.model.SecUserRole;
 import org.oscarehr.PMmodule.utility.UtilDateUtilities;
@@ -375,6 +376,13 @@ public class DmsInboxManageAction extends DispatchAction {
 		String ackStatus = request.getParameter("status");
 		String demographicNo = request.getParameter("demographicNo"); // used when searching for labs by patient instead of provider
 		String scannedDocStatus = request.getParameter("scannedDocument");
+		String checkRequestingProviderStr = request.getParameter("checkRequestingProvider");
+		
+		Boolean checkRequestingProvider = false;
+		
+		// only becomes true of checkRequestingProviderStr is "true" (case-sensitive)
+		checkRequestingProvider = Boolean.parseBoolean(checkRequestingProviderStr);
+		
 		Integer page = 0;
 		try {
 			page = Integer.parseInt(request.getParameter("page"));
@@ -518,8 +526,9 @@ public class DmsInboxManageAction extends DispatchAction {
 					}
 				}
 			} else {// add lab
+				
 				if (isSegmentIDUnique(validlabdocs, data)) {
-					validlabdocs.add(data);
+                	validlabdocs.add(data);
 				}
 			}
 		}
@@ -570,6 +579,18 @@ public class DmsInboxManageAction extends DispatchAction {
 			if (endDate != null && endDate.before(result.getDateObj())) {
 				continue;
 			}
+			
+			if(checkRequestingProvider){
+				//Make sure the requesting client is a provider in oscar
+				String requesting_client_no = result.getRequestingClientNo();
+				
+				ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
+				logger.debug("Requesting client of this lab: "+requesting_client_no);
+				logger.debug("Is requesting client a provider in oscar? "+providerDao.billingProviderExists(requesting_client_no));
+				if(!providerDao.billingProviderExists(requesting_client_no)){
+					continue;
+				}                	
+            }
 
 			String segmentId = result.getSegmentID();
 			if (result.isDocument())

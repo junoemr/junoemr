@@ -65,6 +65,9 @@ public class Hl7TextInfo extends AbstractModel<Integer> implements Serializable 
 
 	@Column(name = "requesting_client")
 	private String requestingProvider;
+	
+	@Column(name = "requesting_client_no")
+	private String requestingProviderNo;
 
 	private String discipline;
 
@@ -171,6 +174,15 @@ public class Hl7TextInfo extends AbstractModel<Integer> implements Serializable 
 
 	public void setRequestingProvider(String requestingProvider) {
 		this.requestingProvider = StringUtils.trimToNull(requestingProvider);
+	}
+	
+
+	public String getRequestingProviderNo() {
+		return requestingProviderNo;
+	}
+	
+	public void setRequestingProviderNo(String requestingProviderNo) {
+		this.requestingProviderNo = StringUtils.trimToNull(requestingProviderNo);
 	}
 
 	public String getDiscipline() {
