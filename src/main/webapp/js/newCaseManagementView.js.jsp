@@ -113,7 +113,14 @@
             
             
             //check to see if we need to save
-            if( $(caseNote) != null && tmpSaveNeeded || ( (origCaseNote != $(caseNote).value || origObservationDate != $("observationDate").value) )) {
+            
+			// XXX: This is the official way to check if a note needs saving.
+			//      It saves a new note revision every time the encounter 
+			//      screen is closed, so we reverted back to the original way.
+			//if( $(caseNote) != null && tmpSaveNeeded || ( (origCaseNote != $(caseNote).value || origObservationDate != $("observationDate").value) )) {
+			
+			//This is the original way to check if a note needs saving.
+            if( $(caseNote) != null && tmpSaveNeeded && (origCaseNote != $(caseNote).value || origObservationDate != $("observationDate").value) ) {
                 tmpSaveNeeded = false;
                 //autoSave(false);
                 document.forms['caseManagementEntryForm'].sign.value='persist';
