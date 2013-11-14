@@ -208,9 +208,10 @@ public class MDSResultsData {
         if ( patientHealthNumber == null) { patientHealthNumber = ""; }
         if ( status == null ) { status = ""; }
         
-        String providerNoList = StringUtils.join(providerNoArr, ",");
-        if(providerNoArr.size() == 0){
-        	providerNoList = "";
+        String providerNoList = "";
+		
+        if(providerNoArr != null && providerNoArr.size() > 0){
+        	providerNoList = StringUtils.join(providerNoArr, ",");
         }
 
         labResults =  new ArrayList<LabResultData>();
@@ -487,9 +488,10 @@ public class MDSResultsData {
         String sql = "";
         String seqId = null;  //for debugging purposes
         
-        String providerNoList = StringUtils.join(providerNoArr, ",");
-        if(providerNoArr.size() == 0){
-        	providerNoList = "";
+        String providerNoList = "";
+		
+        if(providerNoArr != null && providerNoArr.size() > 0){
+        	providerNoList = StringUtils.join(providerNoArr, ",");
         }
         
         try {

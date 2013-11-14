@@ -495,9 +495,10 @@ public class Hl7textResultsData {
 		if ( patientLastName == null) { patientLastName = ""; }
 		if ( status == null ) { status = ""; }
 
-		String providerNoList = StringUtils.join(providerNoArr, ",");
-        if(providerNoArr.size() == 0){
-        	providerNoList = "";
+		String providerNoList = "";
+		
+        if(providerNoArr != null && providerNoArr.size() > 0){
+        	providerNoList = StringUtils.join(providerNoArr, ",");
         }
 		
 		patientHealthNumber=StringUtils.trimToNull(patientHealthNumber);
