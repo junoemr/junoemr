@@ -108,9 +108,10 @@ public class PathnetResultsData {
         if ( patientHealthNumber == null) { patientHealthNumber = ""; }
         if ( status == null ) { status = ""; }
 
-        String providerNoList = StringUtils.join(providerNoArr, ",");
-        if(providerNoArr.size() == 0){
-        	providerNoList = "";
+        String providerNoList = "";
+        
+        if(providerNoArr != null && providerNoArr.size() > 0){
+        	providerNoList = StringUtils.join(providerNoArr, ",");
         }
 
         ArrayList<LabResultData> labResults =  new ArrayList<LabResultData>();
