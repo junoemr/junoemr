@@ -287,9 +287,9 @@ public final class EDocUtil extends SqlUtilBaseS {
 	 * Fetches all consult documents attached to specific consultation
 	 */
 	public static ArrayList<EDoc> listDocs(String demoNo, String consultationId, boolean attached) {
-		String sql = "SELECT DISTINCT d.document_no, d.doccreator, d.source, d.sourceFacility, d.responsible, d.program_id, d.doctype, d.docdesc, d.observationdate, d.status, d.docfilename, d.contenttype, d.reviewer, d.reviewdatetime, d.appointment_no FROM document d, ctl_document c " + "WHERE d.status=c.status AND d.status != 'D' AND c.document_no=d.document_no AND " + "c.module='demographic' AND c.module_id = " + demoNo;
+		String sql = "SELECT DISTINCT d.document_no, d.doccreator, d.source, d.sourceFacility, d.responsible, d.program_id, d.doctype, d.docdesc, d.observationdate, d.status, d.docfilename, d.contenttype, d.reviewer, d.reviewdatetime, d.appointment_no, d.doc_result_status FROM document d, ctl_document c " + "WHERE d.status=c.status AND d.status != 'D' AND c.document_no=d.document_no AND " + "c.module='demographic' AND c.module_id = " + demoNo;
 
-		String attachQuery = "SELECT d.document_no, d.doccreator, d.source, d.sourceFacility, d.responsible, d.program_id, d.doctype, d.docdesc, d.observationdate, d.status, d.docfilename, d.contenttype, d.reviewer, d.reviewdatetime, d.appointment_no FROM document d, consultdocs cd " + "WHERE d.document_no = cd.document_no AND " + "cd.requestId = " + consultationId + " AND cd.doctype = 'D' AND cd.deleted IS NULL";
+		String attachQuery = "SELECT d.document_no, d.doccreator, d.source, d.sourceFacility, d.responsible, d.program_id, d.doctype, d.docdesc, d.observationdate, d.status, d.docfilename, d.contenttype, d.reviewer, d.reviewdatetime, d.appointment_no, d.doc_result_status FROM document d, consultdocs cd " + "WHERE d.document_no = cd.document_no AND " + "cd.requestId = " + consultationId + " AND cd.doctype = 'D' AND cd.deleted IS NULL";
 
 		ArrayList<EDoc> resultDocs = new ArrayList<EDoc>();
 		ArrayList<EDoc> attachedDocs = new ArrayList<EDoc>();
@@ -368,7 +368,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 	public static EDoc getEDocFromDocId(String docId) {
 		String sql = "SELECT DISTINCT c.module, c.module_id, d.doccreator, d.source, d.sourceFacility, d.responsible, d.program_id, "
                            + "d.status, d.docdesc, d.docfilename, d.doctype, d.document_no, d.updatedatetime, d.contenttype, d.observationdate, "
-                           + "d.docClass, d.docSubClass, d.reviewer, d.reviewdatetime, d.appointment_no " + "FROM document d, ctl_document c "
+                           + "d.docClass, d.docSubClass, d.reviewer, d.reviewdatetime, d.appointment_no, d.doc_result_status " + "FROM document d, ctl_document c "
                            + "WHERE c.document_no=d.document_no AND c.document_no='" + docId + "'";
 		sql = sql + " ORDER BY " + EDocUtil.SORT_OBSERVATIONDATE;// default sort
 
@@ -429,7 +429,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 		// docType = null or = "all" to show all doctypes
 		// select publicDoc and sorting from static variables for this class i.e. sort=EDocUtil.SORT_OBSERVATIONDATE
 		// sql base (prefix) to avoid repetition in the if-statements
-		String sql = "SELECT DISTINCT c.module, c.module_id, d.doccreator, d.source, d.sourceFacility, d.docClass, d.docSubClass,d.responsible, d.program_id, d.status, d.docdesc, d.docfilename, d.doctype, d.document_no, d.updatedatetime, d.contenttype, d.observationdate, d.reviewer, d.reviewdatetime, d.appointment_no " + "FROM document d, ctl_document c WHERE c.document_no=d.document_no AND c.module='" + module + "'";
+		String sql = "SELECT DISTINCT c.module, c.module_id, d.doccreator, d.source, d.sourceFacility, d.docClass, d.docSubClass,d.responsible, d.program_id, d.status, d.docdesc, d.docfilename, d.doctype, d.document_no, d.updatedatetime, d.contenttype, d.observationdate, d.reviewer, d.reviewdatetime, d.appointment_no, d.doc_result_status " + "FROM document d, ctl_document c WHERE c.document_no=d.document_no AND c.module='" + module + "'";
 		// if-statements to select the where condition (suffix)
 		if (publicDoc.equals(PUBLIC)) {
 			if (docType == null || docType.equals("all") || docType.length() == 0) sql = sql + " AND d.public1=1";
@@ -493,7 +493,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 	public ArrayList<EDoc> getUnmatchedDocuments(String creator, String responsible, Date startDate, Date endDate, boolean unmatchedDemographics) {
 		ArrayList<EDoc> list = new ArrayList<EDoc>();
 		// boolean matchedDemographics = true;
-		String sql = "SELECT DISTINCT c.module, c.module_id, d.doccreator, d.source, d.sourceFacility, d.responsible, d.program_id, d.status, d.docdesc, d.docfilename, d.doctype, d.document_no, d.updatedatetime, d.contenttype, d.observationdate, d.appointment_no FROM document d, ctl_document c WHERE c.document_no=d.document_no AND c.module='demographic' and doccreator = ? and responsible = ? and updatedatetime >= ?  and updatedatetime <= ?";
+		String sql = "SELECT DISTINCT c.module, c.module_id, d.doccreator, d.source, d.sourceFacility, d.responsible, d.program_id, d.status, d.docdesc, d.docfilename, d.doctype, d.document_no, d.updatedatetime, d.contenttype, d.observationdate, d.appointment_no, d.doc_result_status FROM document d, ctl_document c WHERE c.document_no=d.document_no AND c.module='demographic' and doccreator = ? and responsible = ? and updatedatetime >= ?  and updatedatetime <= ?";
 		if (unmatchedDemographics) {
 			sql += " and c.module_id = -1 ";
 		}
