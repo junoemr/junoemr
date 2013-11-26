@@ -513,7 +513,7 @@ function setType(typeSel,reasonSel,locSel,durSel,notesSel,resSel) {
 
             boolean bMoreAddr = bMultisites? true : props.getProperty("scheduleSiteID", "").equals("") ? false : true;
 
-            String loc = bFirstDisp?((appt.get("location") == null?"":(String)appt.get("location"))):request.getParameter("location");
+            String loc = bFirstDisp?(((appt.get("location") == null || appt.get("location").equals("null"))?"":(String)appt.get("location"))):request.getParameter("location");
             String colo = bMultisites
                                         ? ApptUtil.getColorFromLocation(sites, loc)
                                         : bMoreAddr? ApptUtil.getColorFromLocation(props.getProperty("scheduleSiteID", ""), props.getProperty("scheduleSiteColor", ""),loc) : "white";
@@ -528,7 +528,7 @@ function setType(typeSel,reasonSel,locSel,durSel,notesSel,resSel) {
 
             <div class="input">
                 <INPUT TYPE="TEXT" NAME="type"
-					VALUE="<%=bFirstDisp?(appt.get("type") == null ? "" :appt.get("type")):request.getParameter("type")%>"
+					VALUE="<%=bFirstDisp?((appt.get("type") == null || appt.get("type").equals("null"))? "" :appt.get("type")):request.getParameter("type")%>"
                     WIDTH="25">
             </div>
         </li>
@@ -622,7 +622,7 @@ function setType(typeSel,reasonSel,locSel,durSel,notesSel,resSel) {
             <div class="label"><bean:message key="Appointment.formReason" />:</div>
             <div class="input">
 				<textarea name="reason" tabindex="2" rows="2" wrap="virtual"
-					cols="18"><%=bFirstDisp?(appt.get("reason") == null?"":appt.get("reason")):request.getParameter("reason")%></textarea>
+					cols="18"><%=bFirstDisp?((appt.get("reason") == null || appt.get("reason").equals("null"))?"":appt.get("reason")):request.getParameter("reason")%></textarea>
             </div>
             <div class="space">&nbsp;</div>
             <div class="label"><bean:message key="Appointment.formNotes" />:</div>
@@ -672,7 +672,7 @@ if (bMultisites) { %>
 	// multisites end ==================
 %>
             <INPUT TYPE="TEXT" NAME="location" tabindex="4"
-					VALUE="<%=bFirstDisp?(appt.get("location") == null ? "":appt.get("location")):request.getParameter("location")%>"
+					VALUE="<%=bFirstDisp?((appt.get("location") == null || appt.get("location").equals("null"))? "":appt.get("location")):request.getParameter("location")%>"
 					WIDTH="25">
 <% } %>
             </div>
@@ -681,7 +681,7 @@ if (bMultisites) { %>
             <div class="input">
                 <input type="TEXT"
 					name="resources" tabindex="5"
-					value="<%=bFirstDisp?(appt.get("resources") == null ?"":appt.get("resources")):request.getParameter("resources")%>"
+					value="<%=bFirstDisp?((appt.get("resources") == null || appt.get("resources").equals("null")) ?"":appt.get("resources")):request.getParameter("resources")%>"
                     width="25">
             </div>
         </li>

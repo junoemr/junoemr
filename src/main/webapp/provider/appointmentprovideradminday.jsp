@@ -1937,7 +1937,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 	  %>
 	  |<b style="color:#FF0000">$</b>
 	  <%}}%>
-      <oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes">| <b><%=(reason == null || reason == "null")?"":reason%></b></oscar:oscarPropertiesCheck>
+      <oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes">| <b><%=(reason == null || reason.equals("null"))?"":reason%></b></oscar:oscarPropertiesCheck>
 	  </security:oscarSec>
 
 	  <!-- add one link to caisi Program Management Module -->
@@ -1965,7 +1965,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 	</oscar:oscarPropertiesCheck>
 
       <!--Inline display of reason -->
-      <oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true"><span class="reason"><bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=(reason == null || reason == "null")?"":UtilMisc.htmlEscape(reason)%></span></oscar:oscarPropertiesCheck>
+      <oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true"><span class="reason"><bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=(reason == null || reason.equals("null"))?"":UtilMisc.htmlEscape(reason)%></span></oscar:oscarPropertiesCheck>
       <% } %>
       <% if(OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true")) { %>
 	      	<br/>
