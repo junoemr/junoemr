@@ -201,10 +201,11 @@ public class InboxResultsDao {
 		int sexLoc = -1;
 		int moduleLoc = -1;
 		int obsDateLoc = -1;
+		int docResultStatusLoc = -1;
 		try {
 
 
-			idLoc = 0; docNoLoc = 1; statusLoc = 2; docTypeLoc = 3; lastNameLoc = 4; firstNameLoc = 5; hinLoc = 6; sexLoc = 7; moduleLoc = 8; obsDateLoc = 9;
+			idLoc = 0; docNoLoc = 1; statusLoc = 2; docTypeLoc = 3; lastNameLoc = 4; firstNameLoc = 5; hinLoc = 6; sexLoc = 7; moduleLoc = 8; obsDateLoc = 9; docResultStatusLoc = 10;
             // Notes on query:
             //
             // Returns only DOCUMENTS so INNER JOIN providerLabRouting with
@@ -233,7 +234,8 @@ public class InboxResultsDao {
 				+ "            ELSE CASE WHEN d2.sex IN ('F', 'M') THEN d2.sex ELSE '?' END "
 				+ "            END AS sex, "
 				+ "        CASE WHEN d1.demographic_no IS NOT NULL THEN d1.demographic_no ELSE d2.demographic_no END AS demographic_no, "
-				+ "        doc.observationdate AS observationdate "
+				+ "        doc.observationdate AS observationdate, "
+				+ "        doc.doc_result_status "
 				+ "FROM providerLabRouting proLR "
 				+ "LEFT JOIN patientLabRouting patLR ON ( proLR.lab_type = patLR.lab_type AND proLR.lab_no = patLR.lab_no AND FALSE ) "
 				+ "INNER JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no ) "
@@ -379,9 +381,9 @@ public class InboxResultsDao {
 
 				lbData.requestingClient = "";
 				
-				//Set the abnormal flag to true when we're querying for abnormal docs
-				lbData.abn = (isAbnormalDoc != null && isAbnormalDoc) ? true : false;
-
+				//Documents can be flagged as abnormal 
+				lbData.abn = (getStringValue(r[docResultStatusLoc]).equals("A")) ? true : false;
+				
 				lbData.reportStatus = "F";
 
 
