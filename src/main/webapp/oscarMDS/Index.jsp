@@ -164,6 +164,7 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 	var startDate = null;
 	var endDate = null;
 	var checkRequestingProvider = false;
+	var docview = null;
 
 	window.changePage = function (p) {
 		if (p == "Next") { page++; }
@@ -259,7 +260,7 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 		query +="&searchProviderNo="+searchProviderNo+"&providerNo="+providerNo+"&status="+searchStatus+"&page="+page
 			   +"&pageSize="+pageSize+"&isListView="+(isListView?"true":"false")
 			   +"&searchGroupNo="+searchGroupNo+"&startDate="+startDate
-			   +"&endDate="+endDate+"&checkRequestingProvider="+checkRequestingProvider;
+			   +"&endDate="+endDate+"&checkRequestingProvider="+checkRequestingProvider+"&docview="+docview;
 		switch (selected_category) {
 		case CATEGORY_ALL:
 			query  += "&view=all";
@@ -417,6 +418,7 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
         selected_category_patient = "\"\"";
         selected_category_type = "\"\"";
         searchStatus = "N";
+        docview = "abnormal";
         
         var d = new Date();
         d.setDate(d.getDate() - 1);

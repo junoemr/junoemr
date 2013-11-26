@@ -129,13 +129,13 @@ public class InboxResultsDao {
     public ArrayList populateDocumentResultsData(String providerNo, String demographicNo, String patientFirstName,
 			String patientLastName, String patientHealthNumber, String status) {
 		return populateDocumentResultsData(providerNo, demographicNo, patientFirstName, patientLastName,
-				patientHealthNumber, status, false, null, null, false, null);
+				patientHealthNumber, status, false, null, null, false, null, null);
 	}
 
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	public ArrayList<LabResultData> populateDocumentResultsData(String providerNo, String demographicNo, String patientFirstName,
 			String patientLastName, String patientHealthNumber, String status, boolean isPaged, Integer page,
-			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal) {
+			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, Boolean isAbnormalDoc) {
 
         boolean qp_provider_no = false;
         boolean qp_status = false;
@@ -156,7 +156,8 @@ public class InboxResultsDao {
                     + "page = "+ ((page == null) ? "NULL" : page.toString()) + ", "
                     + "pageSize = "+ ((pageSize == null) ? "NULL" : pageSize.toString()) + ", "
                     + "mixLabsAndDocs = " + ((mixLabsAndDocs) ? "true" : "false") + ", "
-                    + "isAbnormal = " + ((isAbnormal == null) ? "NULL" : ((isAbnormal) ? "true" : "false")) 
+                    + "isAbnormal = " + ((isAbnormal == null) ? "NULL" : ((isAbnormal) ? "true" : "false"))  +", "
+                    + "isAbnormalDoc = " + ((isAbnormalDoc == null) ? "NULL" : ((isAbnormalDoc) ? "true" : "false")) 
                     + ")");
 
 		if (providerNo == null) {
@@ -180,7 +181,7 @@ public class InboxResultsDao {
 
 		ArrayList<LabResultData> labResults = new ArrayList<LabResultData>();
 
-		if (isAbnormal != null) { 
+		if (isAbnormal != null && (isAbnormalDoc == null || !isAbnormalDoc)) { 
 			// Only need to return DOCs.  If isAbnormal is set, this would imply 
 			// HL7 (i.e. something that identifies whether it is normal or not)
 			// so we return nothing without running any queries.
@@ -271,6 +272,10 @@ public class InboxResultsDao {
 			if (!"".equals(patientHealthNumber)) {
 				sql = sql + "AND ((CASE WHEN d1.demographic_no IS NOT NULL THEN d1.hin ELSE d2.hin END) LIKE :hin) ";
 				qp_hin = true;
+			}
+			
+			if(isAbnormalDoc != null && isAbnormalDoc) {
+				sql = sql + "AND doc_result_status = 'A' ";
 			}
 
 			if ("0".equals(demographicNo)) {
@@ -373,6 +378,9 @@ public class InboxResultsDao {
 				}
 
 				lbData.requestingClient = "";
+				
+				//Set the abnormal flag to true when we're querying for abnormal docs
+				lbData.abn = (isAbnormalDoc != null && isAbnormalDoc) ? true : false;
 
 				lbData.reportStatus = "F";
 

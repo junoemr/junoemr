@@ -76,6 +76,7 @@ public class EDoc extends TagObject implements Comparable {
 	private boolean indivoRegistered = false;
 	private int numberOfPages = 0;
 	private Integer appointmentNo = -1;
+	private String docResultStatus;
 
 	/** Creates a new instance of EDoc */
 	public EDoc() {
@@ -481,4 +482,12 @@ public class EDoc extends TagObject implements Comparable {
 	{
 		return(ReflectionToStringBuilder.toString(this));
 	}
+
+	public String getDocResultStatus() {
+	    return docResultStatus;
+    }
+
+	public void setDocResultStatus(String docResultStatus) {
+	    this.docResultStatus = docResultStatus;
+    }
 }

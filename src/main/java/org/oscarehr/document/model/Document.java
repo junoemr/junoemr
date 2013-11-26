@@ -49,6 +49,7 @@ public  class Document  implements Serializable {
 	public static String PROP_DOCDESC = "docdesc";
 	public static String PROP_DOCCREATOR = "doccreator";
 	public static String PROP_DOCFILENAME = "docfilename";
+	public static String PROP_DOCRESULTSTATUS = "docresultstatus";
 	public static String PROP_ID = "id";
 	public static String PROP_DOCTYPE = "doctype";
 	public static String PROP_NUMBEROFPAGES = "numberOfPages";
@@ -76,7 +77,8 @@ public  class Document  implements Serializable {
 		java.lang.String doccreator,
 		java.lang.String status,
 		java.lang.String contenttype,
-		java.lang.Byte m_public) {
+		java.lang.Byte m_public,
+		java.lang.String doc_result_status) {
 
 		this.setId(id);
 		this.setDocdesc(docdesc);
@@ -85,6 +87,7 @@ public  class Document  implements Serializable {
 		this.setStatus(status);
 		this.setContenttype(contenttype);
 		this.setPublic(m_public);
+		this.setDocresultstatus(docresultstatus);
 		initialize();
 	}
 
@@ -109,6 +112,7 @@ public  class Document  implements Serializable {
 	private java.lang.Byte m_public;
 	private java.util.Date observationdate;
 	private Integer numberOfPages;
+	private java.lang.String docresultstatus;
 
 
 
@@ -293,7 +297,7 @@ public  class Document  implements Serializable {
 	public java.util.Date getObservationdate () {
 		return observationdate;
 	}
-
+	
 	/**
 	 * Set the value related to the column: observationdate
 	 * @param observationdate the observationdate value
@@ -301,6 +305,14 @@ public  class Document  implements Serializable {
 	public void setObservationdate (java.util.Date observationdate) {
 		this.observationdate = observationdate;
 	}
+	
+	public java.lang.String getDocresultstatus() {
+	    return docresultstatus;
+    }
+
+	public void setDocresultstatus(java.lang.String doc_result_status) {
+	    this.docresultstatus = doc_result_status;
+    }
 	
 	/**
 	 * Return the value associated with the column: number_of_pages
@@ -327,7 +339,8 @@ public  class Document  implements Serializable {
                  +" status "+status
                  +" contenttype "+contenttype
                  +" m_public "+m_public
-                 +" observationdate "+observationdate;
+                 +" observationdate "+observationdate
+                 +" doc_result_status "+docresultstatus;
         }
 
 	public boolean equals (Object obj) {
@@ -350,6 +363,8 @@ public  class Document  implements Serializable {
 		}
 		return this.hashCode;
 	}
+
+	
 
 
 	//public String toString () {

@@ -124,6 +124,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String documentDescription = request.getParameter("documentDescription");// :test2<
 		String documentId = request.getParameter("documentId");// :29<
 		String docType = request.getParameter("docType");// :consult<
+		String docResultStatus = request.getParameter("doc_result_status");
 
 		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
 
@@ -151,6 +152,9 @@ public class ManageDocumentAction extends DispatchAction {
 
 		d.setDocdesc(documentDescription);
 		d.setDoctype(docType);
+		if(docResultStatus != null){
+			d.setDocresultstatus(docResultStatus);
+		}
 		Date obDate = UtilDateUtilities.StringToDate(observationDate);
 
 		if (obDate != null) {
@@ -158,7 +162,7 @@ public class ManageDocumentAction extends DispatchAction {
 		}
 
 		documentDAO.save(d);
-
+		
 		try {
 
 			CtlDocument ctlDocument = documentDAO.getCtrlDocument(Integer.parseInt(documentId));

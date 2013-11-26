@@ -185,6 +185,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 		doc.setObservationdate(MyDateFormat.getSysDate(newDocument.getObservationDate()));
 		doc.setNumberofpages(newDocument.getNumberOfPages());
 		doc.setAppointmentNo(newDocument.getAppointmentNo());
+		doc.setDocresultstatus(newDocument.getDocResultStatus());
 		documentDao.persist(doc);
 
 
@@ -245,6 +246,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 			doc.setDocxml(newDocument.getHtml());
 			doc.setResponsible(newDocument.getResponsibleId());
 			doc.setPublic1(Integer.parseInt(newDocument.getDocPublic()));
+			doc.setDocresultstatus(newDocument.getDocResultStatus());
 			if(doReview) {
 				doc.setReviewer(newDocument.getReviewerId());
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -314,6 +316,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 				currentdoc.setReviewerId(rsGetString(rs, "reviewer"));
 				currentdoc.setReviewDateTime(rsGetString(rs, "reviewdatetime"));
 				currentdoc.setReviewDateTimeDate(rs.getTimestamp("reviewdatetime"));
+				currentdoc.setDocResultStatus(rsGetString(rs,"doc_result_status"));
 				attachedDocs.add(currentdoc);
 			}
 			rs.close();
@@ -340,6 +343,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 					currentdoc.setReviewerId(rsGetString(rs, "reviewer"));
 					currentdoc.setReviewDateTime(rsGetString(rs, "reviewdatetime"));
 					currentdoc.setReviewDateTimeDate(rs.getTimestamp("reviewdatetime"));
+					currentdoc.setDocResultStatus(rsGetString(rs,"doc_result_status"));
 
 					if (!attachedDocs.contains(currentdoc)) resultDocs.add(currentdoc);
 				}
@@ -398,6 +402,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 				currentdoc.setReviewerId(rsGetString(rs, "reviewer"));
 				currentdoc.setReviewDateTime(rsGetString(rs, "reviewdatetime"));
 				currentdoc.setReviewDateTimeDate(rs.getTimestamp("reviewdatetime"));
+				currentdoc.setDocResultStatus(rsGetString(rs,"doc_result_status"));
 
 				rs.close();
 			}
@@ -470,6 +475,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 				currentdoc.setReviewerId(rsGetString(rs, "reviewer"));
 				currentdoc.setReviewDateTime(rsGetString(rs, "reviewdatetime"));
 				currentdoc.setReviewDateTimeDate(rs.getTimestamp("reviewdatetime"));
+				currentdoc.setDocResultStatus(rsGetString(rs,"doc_result_status"));
 				resultDocs.add(currentdoc);
 			}
 			rs.close();
@@ -527,6 +533,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 				currentdoc.setStatus(rsGetString(rs, "status").charAt(0));
 				currentdoc.setContentType(rsGetString(rs, "contenttype"));
 				currentdoc.setObservationDate(rsGetString(rs, "observationdate"));
+				currentdoc.setDocResultStatus(rsGetString(rs,"doc_result_status"));
 
 				list.add(currentdoc);
 			}
@@ -578,6 +585,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 				currentdoc.setReviewerId(rsGetString(rs, "reviewer"));
 				currentdoc.setReviewDateTime(rsGetString(rs, "reviewdatetime"));
 				currentdoc.setReviewDateTimeDate(rs.getTimestamp("reviewdatetime"));
+				currentdoc.setDocResultStatus(rsGetString(rs,"doc_result_status"));
 				resultDocs.add(currentdoc);
 			}
 			rs.close();
@@ -640,6 +648,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 				currentdoc.setStatus(rsGetString(rs, "status").charAt(0));
 				currentdoc.setContentType(rsGetString(rs, "contenttype"));
 				currentdoc.setNumberOfPages(rs.getInt("number_of_pages"));
+				currentdoc.setDocResultStatus(rsGetString(rs,"doc_result_status"));
 
 				if (myOscarEnabled) {
 					String tmp = indivoSql.replaceFirst("\\?", oscar.Misc.getString(rs, "document_no"));
@@ -715,14 +724,14 @@ public final class EDocUtil extends SqlUtilBaseS {
 	}
 
 	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime) throws SQLException {
-		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, observationDate, updateDateTime, docCreator, responsible, reviewer, reviewDateTime, null, null);
+		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, observationDate, updateDateTime, docCreator, responsible, reviewer, reviewDateTime, null, null, null);
 	}
 
 	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime, String source) throws SQLException {
-		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, observationDate, updateDateTime, docCreator, responsible, reviewer, reviewDateTime, source, null);
+		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, observationDate, updateDateTime, docCreator, responsible, reviewer, reviewDateTime, source, null, null);
 	}
 
-	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime, String source, String sourceFacility) throws SQLException {
+	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime, String source, String sourceFacility, String docResultStatus) throws SQLException {
 
 		Document doc = new Document();
 		doc.setDoctype(docType);
@@ -741,6 +750,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 		doc.setReviewdatetime(MyDateFormat.getSysDate(reviewDateTime));
 		doc.setSource(source);
 		doc.setSourceFacility(sourceFacility);
+		doc.setDocresultstatus(docResultStatus);
 		documentDao.persist(doc);
 
 
@@ -956,6 +966,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 		eDoc.setSource(remoteDocument.getSource());
 		eDoc.setStatus(remoteDocument.getStatus()!=null&&remoteDocument.getStatus().length()>0?remoteDocument.getStatus().charAt(0):' ');
 		eDoc.setType(remoteDocument.getContentType());
+		//eDoc.setDocResultStatus(remoteDocument.getDocResultStatus());
 
 	    return(eDoc);
     }

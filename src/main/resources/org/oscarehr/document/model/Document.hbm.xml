@@ -31,6 +31,8 @@
 			not-null="true" length="1" />
 		<property name="observationdate" column="observationdate"
 			type="date" not-null="false" length="10" />
+		<property name="docresultstatus" column="doc_result_status"
+            type="string" length="1" />
 		
 
 

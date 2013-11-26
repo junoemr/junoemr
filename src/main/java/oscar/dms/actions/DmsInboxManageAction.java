@@ -413,8 +413,14 @@ public class DmsInboxManageAction extends DispatchAction {
 		if (view == null || "".equals(view)) {
 			view = "all";
 		}
+		
+		// Create another view just for docs in case we want to view abnormal docs
+		String docview = request.getParameter("docview");
+		if (docview == null || "".equals(docview)) {
+			docview = "all";
+		}
 
-		boolean mixLabsAndDocs = "normal".equals(view) || "all".equals(view);
+		boolean mixLabsAndDocs = "normal".equals(view) || "all".equals(view) || ("abnormal".equals(docview) && docview.equals(view));
 
 		Date startDate = null;
 		Date endDate = null;
@@ -428,10 +434,14 @@ public class DmsInboxManageAction extends DispatchAction {
 		}
 
 		Boolean isAbnormal = null;
+		Boolean isAbnormalDoc = null;
 		if ("abnormal".equals(view))
 			isAbnormal = new Boolean(true);
 		if ("normal".equals(view))
 			isAbnormal = new Boolean(false);
+		
+		if ("abnormal".equals(docview))
+			isAbnormalDoc = new Boolean(true);
 
 		if (ackStatus == null) {
 			ackStatus = "N";
@@ -470,9 +480,9 @@ public class DmsInboxManageAction extends DispatchAction {
 
 		ArrayList<LabResultData> labdocs = new ArrayList<LabResultData>();
 
-		if ("documents".equals(view) || "all".equals(view)) {
+		if ("documents".equals(view) || "all".equals(view) || "abnormal".equals(docview)) {
 			labdocs = inboxResultsDao.populateDocumentResultsData(searchProviderNo, demographicNo, patientFirstName,
-					patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal);
+					patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal, isAbnormalDoc);
 		}
 
 		if ("labs".equals(view) || "abnormal".equals(view) || "normal".equals(view) || "all".equals(view)) {
@@ -480,6 +490,7 @@ public class DmsInboxManageAction extends DispatchAction {
 					patientLastName, patientHealthNumber, ackStatus, scannedDocStatus, true, page, pageSize,
 					mixLabsAndDocs, isAbnormal, providerNoArr));
 		}
+		
 
 		ArrayList<LabResultData> validlabdocs = new ArrayList<LabResultData>();
 
@@ -580,7 +591,7 @@ public class DmsInboxManageAction extends DispatchAction {
 				continue;
 			}
 			
-			if(checkRequestingProvider){
+			if(checkRequestingProvider && !result.isDocument()){
 				//Make sure the requesting client is a provider in oscar
 				String requesting_client_no = result.getRequestingClientNo();
 				

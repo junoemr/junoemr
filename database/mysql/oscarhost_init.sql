@@ -27,3 +27,6 @@ create index eform_form_name on eform(form_name);
 
 -- New column to store the requesting client number for labs
 alter table hl7TextInfo add column requesting_client_no varchar(20);
+
+-- New column to store the result status for docs (a way to set a document as "abnormal")
+alter table document add column doc_result_status varchar(1);

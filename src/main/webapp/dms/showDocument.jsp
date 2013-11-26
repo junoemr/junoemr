@@ -366,7 +366,19 @@
                                         <td><bean:message key="dms.documentReport.msgCreator"/>:</td>
                                         <td><%=curdoc.getCreatorName()%></td>
                                     </tr>
-
+                                    <!-- Ability to set documents as abnormal -->
+                                    <% if(OscarProperties.getInstance().isPropertyActive("inbox_urgent_search")){ %>
+                                    <tr>
+                                        <td><bean:message key="inboxmanager.document.DocResultStatus"/></td>
+                                        <td>
+                                            <select name="doc_result_status">
+                                                <option value=""><bean:message key="dms.addDocument.formSelect" /></option>
+                                                <option value=""<%=(curdoc.getDocResultStatus() != null && !curdoc.getDocResultStatus().equals("A"))?"selected":"" %>>Normal</option>
+                                                <option value="A"<%=(curdoc.getDocResultStatus() != null && curdoc.getDocResultStatus().equals("A"))?"selected":"" %>>Abnormal</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <% } %>
                                     <tr>
                                         <td width="30%" colspan="1" align="right"><a id="saveSucessMsg_<%=docId%>" style="display:none;color:blue;"><bean:message key="inboxmanager.document.SuccessfullySavedMsg"/></a></td>
                                         <td width="30%" colspan="1" align="right"><%if(demographicID.equals("-1")){%><input type="submit" name="save" disabled id="save<%=docId%>" value="Save" /><input type="button" name="save" id="saveNext<%=docId%>" onclick="saveNext(<%=docId%>)" disabled value='<bean:message key="inboxmanager.document.SaveAndNext"/>' /><%}
@@ -392,6 +404,7 @@
                                             </ul>
                                         </td>
                                     </tr>
+                                    
                                 </table>
 
                             </form>

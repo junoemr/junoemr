@@ -132,6 +132,8 @@ public class Document extends AbstractModel<Integer> implements Serializable {
     private int numberofpages;
     @Column(name="appointment_no")
     private Integer appointmentNo;
+    @Column(name="doc_result_status")
+    private String docResultStatus;
 
     public Document() {
     }
@@ -141,7 +143,7 @@ public class Document extends AbstractModel<Integer> implements Serializable {
        // this.id=this.documentNo;
     }
 
-    public Document(Integer documentNo, String docdesc, String docfilename, String doccreator, String responsible, char status, String contenttype, int public1, int numberOfPages) {
+    public Document(Integer documentNo, String docdesc, String docfilename, String doccreator, String responsible, char status, String contenttype, int public1, int numberOfPages, String docResultStatus) {
         this.documentNo = documentNo;
         this.docdesc = docdesc;
         this.docfilename = docfilename;
@@ -151,6 +153,7 @@ public class Document extends AbstractModel<Integer> implements Serializable {
         this.contenttype = contenttype;
         this.public1 = public1;
         this.numberofpages = numberOfPages;
+        this.docResultStatus = docResultStatus; 
 //        this.id=this.documentNo;
     }
 
@@ -323,6 +326,14 @@ public class Document extends AbstractModel<Integer> implements Serializable {
 
 	public void setSourceFacility(String sourceFacility) {
     	this.sourceFacility = sourceFacility;
+    }
+
+	public String getDocresultstatus() {
+	    return docResultStatus;
+    }
+
+	public void setDocresultstatus(String docResultStatus) {
+	    this.docResultStatus = docResultStatus;
     }
 
 
