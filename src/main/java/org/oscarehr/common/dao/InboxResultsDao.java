@@ -382,7 +382,7 @@ public class InboxResultsDao {
 				lbData.requestingClient = "";
 				
 				//Documents can be flagged as abnormal 
-				lbData.abn = (getStringValue(r[docResultStatusLoc]).equals("A")) ? true : false;
+				lbData.abn = (r[docResultStatusLoc] != null && getStringValue(r[docResultStatusLoc]).equals("A")) ? true : false;
 				
 				lbData.reportStatus = "F";
 
