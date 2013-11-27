@@ -421,7 +421,6 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
         docview = "abnormal";
         
         var d = new Date();
-        d.setDate(d.getDate() - 1);
         var yyyy = d.getFullYear().toString();
         var mm = (d.getMonth()+1).toString();
         var dd = d.getDate().toString();

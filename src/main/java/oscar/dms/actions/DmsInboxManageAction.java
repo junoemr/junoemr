@@ -596,7 +596,7 @@ public class DmsInboxManageAction extends DispatchAction {
 				String requesting_client_no = result.getRequestingClientNo();
 				
 				ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
-				logger.debug("Requesting client of this lab: "+requesting_client_no);
+				logger.debug("Requesting client of this lab ("+result.segmentID+"): "+requesting_client_no);
 				logger.debug("Is requesting client a provider in oscar? "+providerDao.billingProviderExists(requesting_client_no));
 				if(!providerDao.billingProviderExists(requesting_client_no)){
 					continue;
