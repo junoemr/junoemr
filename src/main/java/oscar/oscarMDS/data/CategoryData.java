@@ -29,9 +29,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.dao.MyGroupDao;
 import org.oscarehr.util.DbConnectionFilter;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 
 public class CategoryData {
 
@@ -83,9 +89,16 @@ public class CategoryData {
 	private String patientHealthNumber;
 	private boolean patientSearch;
 	private boolean providerSearch;
+	private boolean checkRequestingProvider;
+	private boolean abnormalsOnly;
+	private Date endDate;
+	private String searchGroupNo;
+	private String providerNoList;
 
 	public CategoryData(String patientLastName, String patientFirstName, String patientHealthNumber, boolean patientSearch,
-					    boolean providerSearch, String searchProviderNo, String status)  {
+					    boolean providerSearch, String searchProviderNo, String status, boolean checkRequestingProvider, boolean abnormalsOnly,
+					    Date endDate, String searchGroupNo)  {
+		MiscUtils.getLogger().debug("constructor");
 
 		this.patientLastName = patientLastName;
 		this.searchProviderNo = searchProviderNo;
@@ -94,6 +107,20 @@ public class CategoryData {
 		this.patientHealthNumber = patientHealthNumber;
 		this.patientSearch = patientSearch;
 		this.providerSearch = providerSearch;
+		this.checkRequestingProvider = checkRequestingProvider;
+		this.abnormalsOnly = abnormalsOnly;
+		this.endDate = endDate;
+		this.searchGroupNo = searchGroupNo;
+		
+		MyGroupDao myGroupDao = (MyGroupDao)SpringUtils.getBean("myGroupDao");
+
+		List<String> providerNoArr = myGroupDao.getGroupDoctors(searchGroupNo);
+		
+		providerNoList = "";
+		
+        if(providerNoArr != null && providerNoArr.size() > 0){
+        	providerNoList = StringUtils.join(providerNoArr, ",");
+        }
 
     	totalDocs = 0;
 		totalLabs = 0;
@@ -110,7 +137,10 @@ public class CategoryData {
 
 		// Retrieving documents and labs.
 		totalDocs += getDocumentCountForPatientSearch();
-        totalLabs += getLabCountForPatientSearch();
+        totalLabs += getLabCountForPatientSearch();       
+        
+		MiscUtils.getLogger().debug("totalDocs:"+totalDocs);
+        MiscUtils.getLogger().debug("totalLabs:"+totalLabs);
 
         // If this is not a patient search, then we need to find the unmatched documents.
         if (!patientSearch) {
@@ -133,14 +163,18 @@ public class CategoryData {
 	public int getLabCountForUnmatched()
 			throws SQLException {
 		String sql;
+		
 		sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
-			+ " FROM patientLabRouting plr2, providerLabRouting plr  "
+			+ " FROM patientLabRouting plr2, providerLabRouting plr, hl7TextInfo hl7  "
 			+ " WHERE plr.lab_no = plr2.lab_no "
+			+ " AND hl7.lab_no = plr2.lab_no "
 			+ (providerSearch ? " AND plr.provider_no = ? " : "")
+			+ (!providerNoList.equals("") ? " AND plr.provider_no IN ("+providerNoList+") " : "")
 			+ "   AND plr.lab_type = 'HL7' "
 			+ "   AND plr.status like ? "
 			+ "   AND plr2.lab_type = 'HL7'"
-			+ "   AND plr2.demographic_no = '0' ";
+			+ "   AND plr2.demographic_no = '0' "
+			+ (abnormalsOnly ? " AND hl7.result_status = 'A' " : "");
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
@@ -238,6 +272,15 @@ public class CategoryData {
 			}
 		}
 		
+		if(!providerNoList.equals("")){
+			sql = sql + " AND  proLR.provider_no IN ("+providerNoList+") ";
+		}
+		
+		if (abnormalsOnly)
+		{
+			sql = sql + " AND doc.doc_result_status = 'A' ";
+		}
+		
 		sql = sql + " AND doc.status <> 'D' ";
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
@@ -252,18 +295,48 @@ public class CategoryData {
 
 	public int getLabCountForPatientSearch() throws SQLException {
 		PatientInfo info;
-		String sql = " SELECT HIGH_PRIORITY d.demographic_no, last_name, first_name, COUNT(1) as count "
-        	+ " FROM patientLabRouting cd,  demographic d, providerLabRouting plr "
+		/*
+		String sql = " SELECT HIGH_PRIORITY d.demographic_no, d.last_name, d.first_name, COUNT(1) as count "
+        	+ " FROM patientLabRouting cd,  demographic d, providerLabRouting plr, hl7TextInfo hl7, provider p "
         	+ " WHERE   d.last_name like ? "
         	+ " 	AND d.first_name like ? "
         	+ " 	AND d.hin like ? "
         	+ " 	AND cd.demographic_no = d.demographic_no "
+        	+ "     AND hl7.lab_no = plr.lab_no "
         	+ " 	AND cd.lab_no = plr.lab_no "
         	+ " 	AND plr.lab_type = 'HL7' "
         	+ " 	AND cd.lab_type = 'HL7' "
         	+ " 	AND plr.status like ? "
         	+ (providerSearch ? "AND plr.provider_no = ? " : "")
+        	+ (abnormalsOnly ? "AND hl7.result_status = 'A' " : "")
+        	+ (checkRequestingProvider ? "AND hl7.requesting_client_no = p.ohip_no ":"")        	
         	+ " GROUP BY demographic_no ";
+        	*/
+		String sql = "SELECT * , COUNT(1) as count FROM ("
+				+ " SELECT * FROM ("
+				+ "   SELECT d.demographic_no, d.last_name, d.first_name, hl7.lab_no, hl7.accessionNum "
+				+ "   FROM "
+				+ "     patientLabRouting cd,"
+				+ "     providerLabRouting plr,"
+				+ "     hl7TextInfo hl7,"
+				+ "     demographic d,"
+				+ "     provider p "
+				+ "   WHERE "
+				+ "     d.last_name like ?"
+				+ " 	AND d.first_name like ? "
+	        	+ " 	AND d.hin like ? "
+	        	+ " 	AND cd.demographic_no = d.demographic_no "
+	        	+ "     AND hl7.lab_no = plr.lab_no "
+	        	+ " 	AND cd.lab_no = plr.lab_no "
+	        	+ " 	AND plr.lab_type = 'HL7' "
+	        	+ " 	AND cd.lab_type = 'HL7' "
+	        	+ " 	AND plr.status like ? "
+	        	+ (providerSearch ? "AND plr.provider_no = ? " : "")
+	        	+ (!providerNoList.equals("") ? " AND  plr.provider_no IN ("+providerNoList+") " :"")	      
+	        	+ (abnormalsOnly ? "AND hl7.result_status = 'A' " : "")
+	        	+ (checkRequestingProvider ? "AND hl7.requesting_client_no = p.ohip_no ":"")
+	        	+ "   GROUP BY hl7.lab_no "
+	        	+ " ) labs GROUP BY accessionNum ) labs2 GROUP BY demographic_no";
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
@@ -349,6 +422,10 @@ public class CategoryData {
 				qp_provider_no = true;
 			}
 		}
+		
+		if(!providerNoList.equals("")){
+			sql = sql + " AND  proLR.provider_no IN ("+providerNoList+") ";
+		}
 
 		if (!"".equals(patientLastName)) {
 			sql = sql + "  AND d.last_name like ? ";
@@ -364,10 +441,15 @@ public class CategoryData {
 			sql = sql + "  AND d.hin like ? ";
 			qp_hin = true;
 		}
+		
+		if(abnormalsOnly){
+			sql = sql + "  AND doc.doc_result_status = 'A' ";
+		}
 		sql = sql + "AND doc.status <> 'D' ";
 		
 
 		sql = sql + "GROUP BY d.demographic_no ";
+		
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
@@ -379,6 +461,7 @@ public class CategoryData {
 		if (qp_hin) { ps.setString(qp_number++, "%" + patientHealthNumber + "%"); }
 
 		ResultSet rs= ps.executeQuery();
+		
         int count = 0;
         while(rs.next()){
         	info = new PatientInfo(rs.getInt("demographic_no"), rs.getString("first_name"), rs.getString("last_name"));

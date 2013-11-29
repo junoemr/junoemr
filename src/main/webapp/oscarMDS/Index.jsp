@@ -50,6 +50,12 @@ String selectedCategoryType    = request.getParameter("selectedCategoryType");
 String patientFirstName    = (String) request.getAttribute("patientFirstName");
 String patientLastName     = (String) request.getAttribute("patientLastName");
 String patientHealthNumber = (String) request.getAttribute("patientHealthNumber");
+String endDate = (String) request.getAttribute("endDate");
+
+
+String docview = (String) request.getAttribute("docview");
+boolean abnormalsOnly = "true".equals(request.getAttribute("abnormalsOnly").toString());
+boolean checkRequestingProvider = "true".equals(request.getAttribute("checkRequestingProvider").toString());
 
 boolean ajax = "true".equals(request.getParameter("ajax"));
 /*
@@ -162,9 +168,14 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 	var oldestDate = null;
 	var searchGroupNo = "<%=(searchGroupNo == null ? "" : searchGroupNo)%>";
 	var startDate = null;
-	var endDate = null;
-	var checkRequestingProvider = false;
-	var docview = null;
+	var endDate = "<%=(endDate == null ? "" : endDate)%>";
+	var checkRequestingProvider = <%=checkRequestingProvider%>;
+	var docview = "<%=(docview == null ? "" : docview)%>";
+	var totalNumDocs = <%=totalNumDocs%>;
+	var abnormalsOnly = <%=abnormalsOnly%>;
+	
+	
+	
 
 	window.changePage = function (p) {
 		if (p == "Next") { page++; }
@@ -244,6 +255,10 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 					document.getElementById("docViews").style.overflow = "auto";
 				}
 			}
+			var tempDOM = jQuery('<div></div>');
+            tempDOM.html( transport.responseText );
+            var totalNumDocs = jQuery('#totalNumDocs', tempDOM).val();
+            
 			if (transport.responseText.indexOf("<input type=\"hidden\" name=\"NoMoreItems\" value=\"true\" />") >= 0) {
 				canLoad = false;
 			}
@@ -256,11 +271,16 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 	}
 
 	function getQuery() {
+		//Override the 'category' to always show abnormal results
+		var abnormalflag = null;
+	    if(abnormalsOnly){
+	    	abnormalflag = "true";
+	    }
 		var query = "method=prepareForContentPage";
 		query +="&searchProviderNo="+searchProviderNo+"&providerNo="+providerNo+"&status="+searchStatus+"&page="+page
 			   +"&pageSize="+pageSize+"&isListView="+(isListView?"true":"false")
 			   +"&searchGroupNo="+searchGroupNo+"&startDate="+startDate
-			   +"&endDate="+endDate+"&checkRequestingProvider="+checkRequestingProvider+"&docview="+docview;
+			   +"&endDate="+endDate+"&checkRequestingProvider="+checkRequestingProvider+"&docview="+docview+"&abnormalFlag="+abnormalflag;
 		switch (selected_category) {
 		case CATEGORY_ALL:
 			query  += "&view=all";
@@ -434,8 +454,9 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
         //set providers filters
         
         document.getElementById("docViews").innerHTML = "";
-        
-		changePage(1);
+
+		window.location.href= url + getQuery().replace('prepareForContentPage', 'prepareForIndexPage');
+		//changePage(1);
 	}
 </script>
 

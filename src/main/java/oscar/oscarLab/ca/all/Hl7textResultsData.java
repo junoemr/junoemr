@@ -646,7 +646,10 @@ public class Hl7textResultsData {
 		|| !"".equals(patientHealthNumber);
 
 		ArrayList<LabResultData> labResults =  new ArrayList<LabResultData>();
-		String providerNoList = StringUtils.join(providerNoArr, ",");
+		String providerNoList = "";
+        if(providerNoArr != null && providerNoArr.size() > 0){
+        	providerNoList = StringUtils.join(providerNoArr, ",");
+        }
 		String sql = "";
 		try {
 			// note to self: lab reports not found in the providerLabRouting table will not show up - need to ensure every lab is entered in providerLabRouting, with '0'
@@ -688,7 +691,7 @@ public class Hl7textResultsData {
 				qp_provider_no = true;
 			}
 			
-			if(providerNoList != "" && providerNoList != null){
+			if(providerNoList != null && !providerNoList.equals("")){
 				sql = sql + "AND (proLR.provider_no IN ("+providerNoList+") ) ";
 			}
 

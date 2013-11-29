@@ -17,6 +17,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.impl.cookie.DateUtils;
 import org.apache.log4j.Logger;
 import org.springframework.transaction.annotation.Transactional;
@@ -129,13 +130,13 @@ public class InboxResultsDao {
     public ArrayList populateDocumentResultsData(String providerNo, String demographicNo, String patientFirstName,
 			String patientLastName, String patientHealthNumber, String status) {
 		return populateDocumentResultsData(providerNo, demographicNo, patientFirstName, patientLastName,
-				patientHealthNumber, status, false, null, null, false, null, null);
+				patientHealthNumber, status, false, null, null, false, null, null, null);
 	}
 
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	public ArrayList<LabResultData> populateDocumentResultsData(String providerNo, String demographicNo, String patientFirstName,
 			String patientLastName, String patientHealthNumber, String status, boolean isPaged, Integer page,
-			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, Boolean isAbnormalDoc) {
+			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, Boolean isAbnormalDoc, List<String> providerNoArr) {
 
         boolean qp_provider_no = false;
         boolean qp_status = false;
@@ -144,6 +145,11 @@ public class InboxResultsDao {
         boolean qp_hin = false;
         boolean qp_demographic_no = false;
         boolean qp_page = false;
+        
+        String providerNoList = "";
+        if(providerNoArr != null && providerNoArr.size() > 0){
+        	providerNoList = StringUtils.join(providerNoArr, ",");
+        }
 
         logger.debug("populateDocumentResultsData(" 
                     + "providerNo = " + ((providerNo == null) ? "NULL" : providerNo) + ", "
@@ -157,8 +163,11 @@ public class InboxResultsDao {
                     + "pageSize = "+ ((pageSize == null) ? "NULL" : pageSize.toString()) + ", "
                     + "mixLabsAndDocs = " + ((mixLabsAndDocs) ? "true" : "false") + ", "
                     + "isAbnormal = " + ((isAbnormal == null) ? "NULL" : ((isAbnormal) ? "true" : "false"))  +", "
-                    + "isAbnormalDoc = " + ((isAbnormalDoc == null) ? "NULL" : ((isAbnormalDoc) ? "true" : "false")) 
+                    + "isAbnormalDoc = " + ((isAbnormalDoc == null) ? "NULL" : ((isAbnormalDoc) ? "true" : "false"))
+                    + "providerNoList = "+ ((providerNoList == null) ? "NULL" : (providerNoList.equals("") ? "empty" : providerNoList))
                     + ")");
+        
+        
 
 		if (providerNo == null) {
 			providerNo = "";
@@ -254,6 +263,10 @@ public class InboxResultsDao {
 			} else {
 				sql = sql + "AND (proLR.provider_no = :provider_no) ";
 				qp_provider_no = true;
+			}
+			
+			if(providerNoList != null && !providerNoList.equals("")){
+				sql = sql + "AND (proLR.provider_no IN ("+providerNoList+") ) ";
 			}
 
 			if ("N".equals(status) || "A".equals(status) || "F".equals(status)) {

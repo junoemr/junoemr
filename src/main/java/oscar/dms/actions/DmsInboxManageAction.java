@@ -300,6 +300,13 @@ public class DmsInboxManageAction extends DispatchAction {
 		String status = request.getParameter("status");
 		String demographicNo = request.getParameter("demographicNo"); // used when searching for labs by patient instead of provider
 		String scannedDocStatus = request.getParameter("scannedDocument");
+		String checkRequestingProviderStr = request.getParameter("checkRequestingProvider");
+		String searchGroupNo = request.getParameter("searchGroupNo");
+		
+		Boolean checkRequestingProvider = false;
+		
+		// only becomes true of checkRequestingProviderStr is "true" (case-sensitive)
+		checkRequestingProvider = Boolean.parseBoolean(checkRequestingProviderStr);
 
 		scannedDocStatus = "I";
 		boolean providerSearch = !"-1".equals(searchProviderNo);
@@ -330,11 +337,34 @@ public class DmsInboxManageAction extends DispatchAction {
 		if (patientHealthNumber == null) {
 			patientHealthNumber = "";
 		}
+		
+		String view = request.getParameter("view");
+		
+		// Create another view just for docs in case we want to view abnormal docs
+		String docview = request.getParameter("docview");
+		
+		boolean abnormalsOnly = false;
+		if(view != null && docview != null && view.equals("abnormal") && docview.equals("abnormal")){
+			abnormalsOnly = true;
+		}
+		
 		boolean patientSearch = !"".equals(patientFirstName) || !"".equals(patientLastName)
 				|| !"".equals(patientHealthNumber);
+		
+		Date endDate = null;
+		
+		String endDateStr = request.getParameter("endDate");
+		logger.debug("checkRequestingProvider: "+checkRequestingProvider);
+
+		try {
+			endDate = UtilDateUtilities.StringToDate(endDateStr);
+		} catch (Exception e) {
+			endDate = null;
+		}
+		logger.debug("docview: "+docview);
 		try {
 			CategoryData cData = new CategoryData(patientLastName, patientFirstName, patientHealthNumber,
-					patientSearch, providerSearch, searchProviderNo, status);
+					patientSearch, providerSearch, searchProviderNo, status, checkRequestingProvider, abnormalsOnly, endDate, searchGroupNo);
 			cData.populateCountsAndPatients();
 			request.setAttribute("patientFirstName", patientFirstName);
 			request.setAttribute("patientLastName", patientLastName);
@@ -351,7 +381,14 @@ public class DmsInboxManageAction extends DispatchAction {
 			request.setAttribute("searchProviderNo", searchProviderNo);
 			request.setAttribute("ackStatus", status);
 			request.setAttribute("categoryHash", cData.getCategoryHash());
+			request.setAttribute("docview", docview);
+			request.setAttribute("abnormalsOnly", abnormalsOnly);
+			request.setAttribute("searchGroupNo", searchGroupNo);
+			request.setAttribute("endDate", endDateStr);
+			request.setAttribute("checkRequestingProvider", checkRequestingProvider);
+			
 			return mapping.findForward("dms_index");
+			
 		} catch (SQLException e) {
 			return mapping.findForward("error");
 		}
@@ -377,6 +414,7 @@ public class DmsInboxManageAction extends DispatchAction {
 		String demographicNo = request.getParameter("demographicNo"); // used when searching for labs by patient instead of provider
 		String scannedDocStatus = request.getParameter("scannedDocument");
 		String checkRequestingProviderStr = request.getParameter("checkRequestingProvider");
+		String abnormalFlag = request.getParameter("abnormalFlag");
 		
 		Boolean checkRequestingProvider = false;
 		
@@ -440,6 +478,11 @@ public class DmsInboxManageAction extends DispatchAction {
 		if ("normal".equals(view))
 			isAbnormal = new Boolean(false);
 		
+		if("true".equals(abnormalFlag))
+			isAbnormal = new Boolean(true);
+		else if("false".equals(abnormalFlag))
+			isAbnormal = new Boolean(false);
+		
 		if ("abnormal".equals(docview))
 			isAbnormalDoc = new Boolean(true);
 
@@ -482,14 +525,16 @@ public class DmsInboxManageAction extends DispatchAction {
 
 		if ("documents".equals(view) || "all".equals(view) || "abnormal".equals(docview)) {
 			labdocs = inboxResultsDao.populateDocumentResultsData(searchProviderNo, demographicNo, patientFirstName,
-					patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal, isAbnormalDoc);
+					patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal, isAbnormalDoc, providerNoArr);
 		}
 
+		logger.debug("documents grabbed:"+labdocs.size());
 		if ("labs".equals(view) || "abnormal".equals(view) || "normal".equals(view) || "all".equals(view)) {
 			labdocs.addAll(comLab.populateLabResultsData(searchProviderNo, demographicNo, patientFirstName,
 					patientLastName, patientHealthNumber, ackStatus, scannedDocStatus, true, page, pageSize,
 					mixLabsAndDocs, isAbnormal, providerNoArr));
 		}
+		logger.debug("labs grabbed:"+labdocs.size());
 		
 
 		ArrayList<LabResultData> validlabdocs = new ArrayList<LabResultData>();
@@ -979,3 +1024,4 @@ public class DmsInboxManageAction extends DispatchAction {
 
 	}
 }
+
