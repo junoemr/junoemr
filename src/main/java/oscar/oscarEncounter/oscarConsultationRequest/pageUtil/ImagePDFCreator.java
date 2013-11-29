@@ -11,7 +11,6 @@ package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -70,8 +69,9 @@ public class ImagePDFCreator extends PdfPageEventHelper {
 
 		
 		document.setPageSize(PageSize.LETTER);
-		ResourceBundle.getBundle("oscarResources",request.getLocale())
-			.getString("oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgImage");
+		// This string doesn't exist and it doesn't seem to be used anywhere so I'm removing it
+		//ResourceBundle.getBundle("oscarResources",request.getLocale())
+		//	.getString("oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgImage");
 		document.addCreator("OSCAR");
 		document.open();
 		
