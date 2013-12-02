@@ -166,7 +166,21 @@ public class CategoryData {
 		String sql;
 		
 		sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
-			+ " FROM patientLabRouting plr2, providerLabRouting plr, hl7TextInfo hl7  "
+			+ " FROM patientLabRouting plr2, ";
+		
+		if(this.neverAcknowledgedItems && "N".equals(status)){
+			sql = sql + "(" +
+					    "    SELECT * FROM (" +
+					    "        SELECT plr.*" +
+					    "        FROM providerLabRouting plr" + 
+					    "        GROUP BY lab_no, status" +
+					    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
+					    ") plr, ";
+		}else{
+			sql = sql + "providerLabRouting plr, ";
+		}
+		
+		sql = sql + "hl7TextInfo hl7  "
 			+ " WHERE plr.lab_no = plr2.lab_no "
 			+ " AND hl7.lab_no = plr2.lab_no "
 			+ (providerSearch ? " AND plr.provider_no = ? " : "")
@@ -211,7 +225,22 @@ public class CategoryData {
 		PreparedStatement ps;
 		if (patientSearch) {
         	sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
-        		+ " FROM patientLabRouting cd, demographic d, providerLabRouting plr, hl7TextInfo info "
+        		+ " FROM patientLabRouting cd, demographic d, ";
+
+        	if(this.neverAcknowledgedItems && "N".equals(this.status)){
+        		sql = sql +"(" +
+					    "    SELECT * FROM (" +
+					    "        SELECT plr.*" +
+					    "        FROM providerLabRouting plr" + 
+					    "        GROUP BY lab_no, status" +
+					    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
+					    ") plr, ";
+        		
+        	}else{
+        		sql = sql +"providerLabRouting plr, ";
+        	}
+        	sql = sql +"hl7TextInfo info, "
+        		+ " document doc "
         		+ " WHERE d.last_name like ? "
         		+ " 	AND d.first_name like ? "
         		+ " 	AND d.hin like ? "
@@ -222,8 +251,10 @@ public class CategoryData {
         		+ " 	AND cd.lab_type = 'HL7' "
         		+ " 	AND cd.lab_no = plr.lab_no "
         		+ " 	AND cd.demographic_no = d.demographic_no "
+        		+ "     AND doc.document_no = plr.lab_no"
         		+ " 	AND info.lab_no = plr.lab_no "
         		+ " 	AND result_status "+(isAbnormal ? "" : "!")+"= 'A' "
+        		+ " 	AND doc.doc_result_status "+(isAbnormal ? "" : "!")+"= 'A' "
         		+ (endDateStr != null && !endDateStr.equals("")?"     AND DATE(info.obr_date) < ? " : "");
         	ps = c.prepareStatement(sql);
         	ps.setString(1, "%"+patientLastName+"%");
@@ -242,12 +273,27 @@ public class CategoryData {
         }
         else if (providerSearch || !"".equals(status)){ // providerSearch
         	sql = "SELECT HIGH_PRIORITY COUNT(1) as count "
-				+ " FROM providerLabRouting plr, hl7TextInfo info "
+				+ " FROM ";
+        	if(this.neverAcknowledgedItems && "N".equals(this.status)){
+        		sql = sql + "(" +
+					    "    SELECT * FROM (" +
+					    "        SELECT plr.*" +
+					    "        FROM providerLabRouting plr" + 
+					    "        GROUP BY lab_no, status" +
+					    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
+					    ")  plr, ";
+        	}else{
+        		sql = sql + "providerLabRouting plr, ";
+        	}
+			sql = sql +"hl7TextInfo info, "
+				+ " document doc "
 				+ " WHERE plr.status like ? "
 				+ (providerSearch ? " AND plr.provider_no = ? " : " ")
 				+ " AND plr.lab_type = 'HL7'  "
 				+ " AND info.lab_no = plr.lab_no"
-				+ " AND result_status "+(isAbnormal ? "" : "!")+"= 'A' ";
+				+ " AND doc.document_no = plr.lab_no"
+				+ " AND result_status "+(isAbnormal ? "" : "!")+"= 'A' "
+				+ " AND doc.doc_result_status "+(isAbnormal ? "" : "!")+"= 'A' ";
         	ps = c.prepareStatement(sql);
         	ps.setString(1, "%"+status+"%");
         	if(providerSearch){
@@ -256,8 +302,11 @@ public class CategoryData {
         }
         else {
         	sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
-            	+ " FROM hl7TextInfo info "
-            	+ " WHERE result_status "+(isAbnormal ? "" : "!")+"= 'A' ";
+            	+ " FROM hl7TextInfo info, "
+            	+ " document doc "
+            	+ " WHERE result_status "+(isAbnormal ? "" : "!")+"= 'A' "
+            	+ " AND doc.doc_result_status "+(isAbnormal ? "" : "!")+"= 'A' "
+        	    + " AND doc.document_no = info.lab_no";
         	ps = c.prepareStatement(sql);
         }
 		
@@ -274,9 +323,19 @@ public class CategoryData {
 		String sql	= "SELECT count(*) AS count "
 					+ "FROM document doc "
 					+ "INNER JOIN ctl_document cdoc ON (cdoc.module = 'demographic' AND doc.document_no = cdoc.document_no) "
-					+ "LEFT JOIN patientLabRouting patLR ON (patLR.lab_type = 'DOC' AND patLR.lab_no = doc.document_no) "
-					+ "LEFT JOIN providerLabRouting proLR ON (proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no) "
-					+ "WHERE (cdoc.module_id = -1) ";
+					+ "LEFT JOIN patientLabRouting patLR ON (patLR.lab_type = 'DOC' AND patLR.lab_no = doc.document_no) ";
+		if(this.neverAcknowledgedItems && "N".equals(status)){
+			sql = sql + "LEFT JOIN (" +
+					    "    SELECT * FROM (" +
+					    "        SELECT plr.*" +
+					    "        FROM providerLabRouting plr" + 
+					    "        GROUP BY lab_no, status" +
+					    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
+					    ") proLR ON (proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no) ";
+		}else{
+			sql = sql + "LEFT JOIN providerLabRouting proLR ON (proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no) ";
+		}
+		sql = sql + "WHERE (cdoc.module_id = -1) ";
 
 		if ("N".equals(status)) {
 			sql = sql + " AND (proLR.status IN ('N', NULL)) ";
