@@ -533,7 +533,7 @@ public class DmsInboxManageAction extends DispatchAction {
 		logger.debug("abnormalFlag: "+abnormalFlag+ ", view: "+ view + ", isAbnormal:"+isAbnormal+ ", docview:"+docview + ", isAbnormalDoc:"+isAbnormalDoc +", neverAcknowledgedItems: "+neverAcknowledgedItems);
 		if ("labs".equals(view) || "abnormal".equals(view) || "normal".equals(view) || "all".equals(view) ) {
 			// if the "abnormal" flag is set and the view is normal, we should get zero (0) labs
-			if(("true".equals(abnormalFlag) && !"normal".equals(view)) || "false".equals(abnormalFlag)){
+			if(("true".equals(abnormalFlag) && !"normal".equals(view)) || "false".equals(abnormalFlag) || "null".equals(abnormalFlag)){
 				labdocs.addAll(comLab.populateLabResultsData(searchProviderNo, demographicNo, patientFirstName,
 					patientLastName, patientHealthNumber, ackStatus, scannedDocStatus, true, page, pageSize,
 					mixLabsAndDocs, isAbnormal, providerNoArr, neverAcknowledgedItems));
