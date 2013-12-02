@@ -132,13 +132,14 @@ public class InboxResultsDao {
     public ArrayList populateDocumentResultsData(String providerNo, String demographicNo, String patientFirstName,
 			String patientLastName, String patientHealthNumber, String status) {
 		return populateDocumentResultsData(providerNo, demographicNo, patientFirstName, patientLastName,
-				patientHealthNumber, status, false, null, null, false, null, null, null);
+				patientHealthNumber, status, false, null, null, false, null, null, null, false);
 	}
 
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	public ArrayList<LabResultData> populateDocumentResultsData(String providerNo, String demographicNo, String patientFirstName,
 			String patientLastName, String patientHealthNumber, String status, boolean isPaged, Integer page,
-			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, Boolean isAbnormalDoc, List<String> providerNoArr) {
+			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, Boolean isAbnormalDoc, 
+			List<String> providerNoArr, boolean neverAcknowledgedItems) {
 
         boolean qp_provider_no = false;
         boolean qp_status = false;
@@ -246,9 +247,21 @@ public class InboxResultsDao {
 				+ "            END AS sex, "
 				+ "        CASE WHEN d1.demographic_no IS NOT NULL THEN d1.demographic_no ELSE d2.demographic_no END AS demographic_no, "
 				+ "        doc.observationdate AS observationdate, "
-				+ "        doc.doc_result_status "
-				+ "FROM providerLabRouting proLR "
-				+ "LEFT JOIN patientLabRouting patLR ON ( proLR.lab_type = patLR.lab_type AND proLR.lab_no = patLR.lab_no AND FALSE ) "
+				+ "        doc.doc_result_status ";
+			
+			if(neverAcknowledgedItems && "N".equals(status)){
+				sql = sql + "FROM (" +
+						    "    SELECT * FROM (" +
+						    "        SELECT plr.*" +
+						    "        FROM providerLabRouting plr" + 
+						    "        GROUP BY lab_no, status" +
+						    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
+						    ") proLR";
+			}else{
+				sql = sql + "FROM providerLabRouting proLR ";
+			}
+			
+			sql = sql + "LEFT JOIN patientLabRouting patLR ON ( proLR.lab_type = patLR.lab_type AND proLR.lab_no = patLR.lab_no AND FALSE ) "
 				+ "INNER JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no ) "
 				+ "INNER JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' ) "
 				+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no AND FALSE ) "

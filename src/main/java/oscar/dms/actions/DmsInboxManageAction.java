@@ -302,6 +302,7 @@ public class DmsInboxManageAction extends DispatchAction {
 		String scannedDocStatus = request.getParameter("scannedDocument");
 		String checkRequestingProviderStr = request.getParameter("checkRequestingProvider");
 		String searchGroupNo = request.getParameter("searchGroupNo");
+		Boolean neverAcknowledgedItems = Boolean.parseBoolean(request.getParameter("neverAcknowledgedItems"));
 		
 		Boolean checkRequestingProvider = false;
 		
@@ -358,7 +359,7 @@ public class DmsInboxManageAction extends DispatchAction {
 		logger.debug("docview: "+docview);
 		try {
 			CategoryData cData = new CategoryData(patientLastName, patientFirstName, patientHealthNumber,
-					patientSearch, providerSearch, searchProviderNo, status, checkRequestingProvider, abnormalsOnly, endDateStr, searchGroupNo);
+					patientSearch, providerSearch, searchProviderNo, status, checkRequestingProvider, abnormalsOnly, endDateStr, searchGroupNo, neverAcknowledgedItems);
 			cData.populateCountsAndPatients();
 			request.setAttribute("patientFirstName", patientFirstName);
 			request.setAttribute("patientLastName", patientLastName);
@@ -380,6 +381,7 @@ public class DmsInboxManageAction extends DispatchAction {
 			request.setAttribute("searchGroupNo", searchGroupNo);
 			request.setAttribute("endDate", endDateStr);
 			request.setAttribute("checkRequestingProvider", checkRequestingProvider);
+			request.setAttribute("neverAcknowledgedItems", neverAcknowledgedItems);
 			
 			return mapping.findForward("dms_index");
 			
@@ -409,6 +411,7 @@ public class DmsInboxManageAction extends DispatchAction {
 		String scannedDocStatus = request.getParameter("scannedDocument");
 		String checkRequestingProviderStr = request.getParameter("checkRequestingProvider");
 		String abnormalFlag = request.getParameter("abnormalFlag");
+		Boolean neverAcknowledgedItems = Boolean.parseBoolean(request.getParameter("neverAcknowledgedItems"));
 		
 		Boolean checkRequestingProvider = false;
 		
@@ -519,14 +522,15 @@ public class DmsInboxManageAction extends DispatchAction {
 
 		if ("documents".equals(view) || "all".equals(view) || "abnormal".equals(docview)) {
 			labdocs = inboxResultsDao.populateDocumentResultsData(searchProviderNo, demographicNo, patientFirstName,
-					patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal, isAbnormalDoc, providerNoArr);
+					patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal, isAbnormalDoc, 
+					providerNoArr, neverAcknowledgedItems);
 		}
 
 		logger.debug("documents grabbed:"+labdocs.size());
 		if ("labs".equals(view) || "abnormal".equals(view) || "normal".equals(view) || "all".equals(view)) {
 			labdocs.addAll(comLab.populateLabResultsData(searchProviderNo, demographicNo, patientFirstName,
 					patientLastName, patientHealthNumber, ackStatus, scannedDocStatus, true, page, pageSize,
-					mixLabsAndDocs, isAbnormal, providerNoArr));
+					mixLabsAndDocs, isAbnormal, providerNoArr, neverAcknowledgedItems));
 		}
 		logger.debug("documents + labs grabbed:"+labdocs.size());
 		

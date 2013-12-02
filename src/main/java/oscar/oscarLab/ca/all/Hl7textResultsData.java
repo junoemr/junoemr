@@ -623,7 +623,7 @@ public class Hl7textResultsData {
 	}
 
 	public static ArrayList<LabResultData> populateHl7ResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber,
-			String status, boolean isPaged, Integer page, Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, List<String> providerNoArr) {
+			String status, boolean isPaged, Integer page, Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, List<String> providerNoArr, Boolean neverAcknowledgedItems) {
 
 		boolean qp_provider_no = false;
 		boolean qp_status = false;
@@ -675,9 +675,21 @@ public class Hl7textResultsData {
 				+ "		hl7.accessionNum, "
 				+ "		hl7.final_result_count, "
 				+ "		proLR.status "
-				+ "FROM hl7TextInfo hl7 "
-				+ "LEFT JOIN providerLabRouting proLR ON (hl7.lab_no = proLR.lab_no AND proLR.lab_type = 'HL7') "
-				+ "LEFT JOIN patientLabRouting patLR ON (hl7.lab_no = patLR.lab_no AND patLR.lab_type = 'HL7') "
+				+ "FROM hl7TextInfo hl7 ";
+			
+			if(neverAcknowledgedItems && "N".equals(status)){
+				sql = sql + "LEFT JOIN (" +
+						    "    SELECT * FROM (" +
+						    "        SELECT plr.*" +
+						    "        FROM providerLabRouting plr" + 
+						    "        GROUP BY lab_no, status" +
+						    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
+						    ") proLR ON (hl7.lab_no = proLR.lab_no AND proLR.lab_type = 'HL7') ";
+			}else{
+				sql = sql + "LEFT JOIN providerLabRouting proLR ON (hl7.lab_no = proLR.lab_no AND proLR.lab_type = 'HL7') ";
+			}
+			
+			sql = sql + "LEFT JOIN patientLabRouting patLR ON (hl7.lab_no = patLR.lab_no AND patLR.lab_type = 'HL7') "
 				+ "LEFT JOIN demographic d ON (patLR.demographic_no = d.demographic_no ) "
 				+ "WHERE true ";
 

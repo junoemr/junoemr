@@ -114,7 +114,7 @@ public class CommonLabResultData {
 	}
 
 
-    public ArrayList<LabResultData> populateLabResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status, boolean isPaged, Integer page, Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, List<String> providerNoArr) {
+    public ArrayList<LabResultData> populateLabResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status, boolean isPaged, Integer page, Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, List<String> providerNoArr, Boolean neverAcknowledgedItems) {
 
     		ArrayList<LabResultData> labs = new ArrayList<LabResultData>();
     		oscar.oscarMDS.data.MDSResultsData mDSData = new oscar.oscarMDS.data.MDSResultsData();
@@ -146,7 +146,7 @@ public class CommonLabResultData {
     		if (hl7text != null && hl7text.trim().equals("yes")){
     			if (isPaged) {
     		        ArrayList<LabResultData> hl7Labs = Hl7textResultsData.populateHl7ResultsData(providerNo, demographicNo, patientFirstName, patientLastName,
-    		        												   patientHealthNumber, status, true, page, pageSize, mixLabsAndDocs, isAbnormal, providerNoArr);
+    		        												   patientHealthNumber, status, true, page, pageSize, mixLabsAndDocs, isAbnormal, providerNoArr, neverAcknowledgedItems);
     		        labs.addAll(hl7Labs);
                 }
                 else {
@@ -158,8 +158,8 @@ public class CommonLabResultData {
     		return labs;
     }
 
-    public ArrayList<LabResultData> populateLabResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String ackStatus, String docScanStatus, boolean isPaged, Integer page, Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, List<String> providerNoArr) {
-    		return populateLabResultsData(providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, ackStatus, isPaged, page, pageSize, mixLabsAndDocs, isAbnormal, providerNoArr);
+    public ArrayList<LabResultData> populateLabResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String ackStatus, String docScanStatus, boolean isPaged, Integer page, Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, List<String> providerNoArr, Boolean neverAcknowledgedItems) {
+    		return populateLabResultsData(providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, ackStatus, isPaged, page, pageSize, mixLabsAndDocs, isAbnormal, providerNoArr, neverAcknowledgedItems);
     }
 
 	public ArrayList<LabResultData> populateLabResultsData(String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status, List<String> providerNoArr) {

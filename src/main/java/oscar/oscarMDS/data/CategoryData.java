@@ -93,10 +93,11 @@ public class CategoryData {
 	private String endDateStr;
 	private String searchGroupNo;
 	private String providerNoList;
+	private boolean neverAcknowledgedItems;
 
 	public CategoryData(String patientLastName, String patientFirstName, String patientHealthNumber, boolean patientSearch,
 					    boolean providerSearch, String searchProviderNo, String status, boolean checkRequestingProvider, boolean abnormalsOnly,
-					    String endDateStr, String searchGroupNo)  {
+					    String endDateStr, String searchGroupNo, Boolean neverAcknowledgedItems)  {
 		MiscUtils.getLogger().debug("constructor");
 
 		this.patientLastName = patientLastName;
@@ -110,6 +111,7 @@ public class CategoryData {
 		this.abnormalsOnly = abnormalsOnly;
 		this.endDateStr = endDateStr;
 		this.searchGroupNo = searchGroupNo;
+		this.neverAcknowledgedItems = neverAcknowledgedItems;
 		
 		MyGroupDao myGroupDao = (MyGroupDao)SpringUtils.getBean("myGroupDao");
 
