@@ -351,20 +351,14 @@ public class DmsInboxManageAction extends DispatchAction {
 		boolean patientSearch = !"".equals(patientFirstName) || !"".equals(patientLastName)
 				|| !"".equals(patientHealthNumber);
 		
-		Date endDate = null;
 		
 		String endDateStr = request.getParameter("endDate");
 		logger.debug("checkRequestingProvider: "+checkRequestingProvider);
 
-		try {
-			endDate = UtilDateUtilities.StringToDate(endDateStr);
-		} catch (Exception e) {
-			endDate = null;
-		}
 		logger.debug("docview: "+docview);
 		try {
 			CategoryData cData = new CategoryData(patientLastName, patientFirstName, patientHealthNumber,
-					patientSearch, providerSearch, searchProviderNo, status, checkRequestingProvider, abnormalsOnly, endDate, searchGroupNo);
+					patientSearch, providerSearch, searchProviderNo, status, checkRequestingProvider, abnormalsOnly, endDateStr, searchGroupNo);
 			cData.populateCountsAndPatients();
 			request.setAttribute("patientFirstName", patientFirstName);
 			request.setAttribute("patientLastName", patientLastName);
@@ -534,7 +528,7 @@ public class DmsInboxManageAction extends DispatchAction {
 					patientLastName, patientHealthNumber, ackStatus, scannedDocStatus, true, page, pageSize,
 					mixLabsAndDocs, isAbnormal, providerNoArr));
 		}
-		logger.debug("labs grabbed:"+labdocs.size());
+		logger.debug("documents + labs grabbed:"+labdocs.size());
 		
 
 		ArrayList<LabResultData> validlabdocs = new ArrayList<LabResultData>();
@@ -632,7 +626,7 @@ public class DmsInboxManageAction extends DispatchAction {
 				continue;
 			}
 
-			if (endDate != null && endDate.before(result.getDateObj())) {
+			if (endDate != null && (endDate.before(result.getDateObj()) || endDate.equals(result.getDateObj()))) {
 				continue;
 			}
 			

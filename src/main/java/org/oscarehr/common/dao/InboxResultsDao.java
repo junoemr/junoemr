@@ -9,6 +9,8 @@
 
 package org.oscarehr.common.dao;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,8 +20,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.impl.cookie.DateUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.utility.UtilDateUtilities;
 import org.springframework.transaction.annotation.Transactional;
 
 import oscar.oscarLab.ca.on.LabResultData;
@@ -362,10 +364,15 @@ public class InboxResultsDao {
 				if (lbData.resultStatus.equals("A")) lbData.abn = true;
 
 				lbData.dateTime = getStringValue(r[obsDateLoc]);
-				lbData.setDateObj(DateUtils.parseDate(getStringValue(r[obsDateLoc]), new String[] {
-						"yyyy-MM-dd"
-				}));
-
+			
+				//This doesn't properly format the date. It assumes the date given is on UTC Format and converts it to the server timezone
+				//lbData.setDateObj(DateUtils.parseDate(getStringValue(r[obsDateLoc]), new String[] {
+				//		"yyyy-MM-dd"
+				//}));
+				
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+				lbData.setDateObj(UtilDateUtilities.StringToDate(getStringValue(r[obsDateLoc])));
+				
 				String priority = "";
 				if (priority != null && !priority.equals("")) {
 					switch (priority.charAt(0)) {

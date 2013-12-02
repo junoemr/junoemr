@@ -29,7 +29,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -91,13 +90,13 @@ public class CategoryData {
 	private boolean providerSearch;
 	private boolean checkRequestingProvider;
 	private boolean abnormalsOnly;
-	private Date endDate;
+	private String endDateStr;
 	private String searchGroupNo;
 	private String providerNoList;
 
 	public CategoryData(String patientLastName, String patientFirstName, String patientHealthNumber, boolean patientSearch,
 					    boolean providerSearch, String searchProviderNo, String status, boolean checkRequestingProvider, boolean abnormalsOnly,
-					    Date endDate, String searchGroupNo)  {
+					    String endDateStr, String searchGroupNo)  {
 		MiscUtils.getLogger().debug("constructor");
 
 		this.patientLastName = patientLastName;
@@ -109,12 +108,12 @@ public class CategoryData {
 		this.providerSearch = providerSearch;
 		this.checkRequestingProvider = checkRequestingProvider;
 		this.abnormalsOnly = abnormalsOnly;
-		this.endDate = endDate;
+		this.endDateStr = endDateStr;
 		this.searchGroupNo = searchGroupNo;
 		
 		MyGroupDao myGroupDao = (MyGroupDao)SpringUtils.getBean("myGroupDao");
 
-		List<String> providerNoArr = myGroupDao.getGroupDoctors(searchGroupNo);
+		List<String> providerNoArr = myGroupDao.getGroupDoctors(this.searchGroupNo);
 		
 		providerNoList = "";
 		
@@ -174,15 +173,28 @@ public class CategoryData {
 			+ "   AND plr.status like ? "
 			+ "   AND plr2.lab_type = 'HL7'"
 			+ "   AND plr2.demographic_no = '0' "
-			+ (abnormalsOnly ? " AND hl7.result_status = 'A' " : "");
+			+ (abnormalsOnly ? " AND hl7.result_status = 'A' " : "")
+			+ (endDateStr != null && !endDateStr.equals("") ? " AND DATE(hl7.obr_date) < ? " : "");
+		    
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
+		
+		int qp_number = 1;
 		if(providerSearch){
-			ps.setString(1, searchProviderNo);
-			ps.setString(2, "%"+status+"%");
+			
+			ps.setString(qp_number, searchProviderNo);
+			qp_number++;
+			ps.setString(qp_number, "%"+status+"%");
+			qp_number++;
 		}else{
-			ps.setString(1, "%"+status+"%");
+			ps.setString(qp_number, "%"+status+"%");
+			qp_number++;
+		}
+		
+		if(endDateStr != null && !endDateStr.equals("")){
+			ps.setString(qp_number, endDateStr);
+			qp_number++;
 		}
 		ResultSet rs= ps.executeQuery();
 
@@ -203,19 +215,27 @@ public class CategoryData {
         		+ " 	AND d.hin like ? "
         		+ " 	AND plr.status like ? "
         		+ (providerSearch ? "AND plr.provider_no = ? " : "")
+        		+ (!providerNoList.equals("") ? " AND plr.provider_no IN ("+providerNoList+") " : "")
         		+ " 	AND plr.lab_type = 'HL7' "
         		+ " 	AND cd.lab_type = 'HL7' "
         		+ " 	AND cd.lab_no = plr.lab_no "
         		+ " 	AND cd.demographic_no = d.demographic_no "
         		+ " 	AND info.lab_no = plr.lab_no "
-        		+ " 	AND result_status "+(isAbnormal ? "" : "!")+"= 'A' ";
+        		+ " 	AND result_status "+(isAbnormal ? "" : "!")+"= 'A' "
+        		+ (endDateStr != null && !endDateStr.equals("")?"     AND DATE(info.obr_date) < ? " : "");
         	ps = c.prepareStatement(sql);
         	ps.setString(1, "%"+patientLastName+"%");
         	ps.setString(2, "%"+patientFirstName+"%");
         	ps.setString(3, "%"+patientHealthNumber+"%");
         	ps.setString(4, "%"+status+"%");
+        	int qp_number = 5;
         	if(providerSearch){
-        		ps.setString(5, searchProviderNo);
+        		ps.setString(qp_number, searchProviderNo);
+        		qp_number++;
+        	}
+        	if(endDateStr != null && !endDateStr.equals("")){
+        		ps.setString(qp_number, endDateStr);
+        		qp_number++;
         	}
         }
         else if (providerSearch || !"".equals(status)){ // providerSearch
@@ -247,6 +267,7 @@ public class CategoryData {
 		int qp_number = 1;
 		boolean qp_status = false;
 		boolean qp_provider_no = false;
+		boolean qp_end_date = false;
 
 		String sql	= "SELECT count(*) AS count "
 					+ "FROM document doc "
@@ -281,6 +302,11 @@ public class CategoryData {
 			sql = sql + " AND doc.doc_result_status = 'A' ";
 		}
 		
+		if( endDateStr != null && !endDateStr.equals("")){
+			sql = sql + " AND doc.observationdate < ? ";
+			qp_end_date = true;
+		}
+		
 		sql = sql + " AND doc.status <> 'D' ";
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
@@ -288,6 +314,7 @@ public class CategoryData {
 		qp_number = 1;
 		if (qp_status) { ps.setString(qp_number++, status); }
 		if (qp_provider_no) { ps.setString(qp_number++, searchProviderNo); }
+		if (qp_end_date) { ps.setString(qp_number++, endDateStr); }
 
 		ResultSet rs= ps.executeQuery();
 		return (rs.next() ? rs.getInt("count") : 0);
@@ -335,17 +362,24 @@ public class CategoryData {
 	        	+ (!providerNoList.equals("") ? " AND  plr.provider_no IN ("+providerNoList+") " :"")	      
 	        	+ (abnormalsOnly ? "AND hl7.result_status = 'A' " : "")
 	        	+ (checkRequestingProvider ? "AND hl7.requesting_client_no = p.ohip_no ":"")
+	        	+ ((endDateStr != null && !endDateStr.equals("")) ? "AND DATE(hl7.obr_date) < ? ": "")
 	        	+ "   GROUP BY hl7.lab_no "
 	        	+ " ) labs GROUP BY accessionNum ) labs2 GROUP BY demographic_no";
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
+		int q_number = 5;
 		ps.setString(1, "%"+patientLastName+"%");
 		ps.setString(2, "%"+patientFirstName+"%");
 		ps.setString(3, "%"+patientHealthNumber+"%");
 		ps.setString(4, "%"+status+"%");
 		if( providerSearch ){
-			ps.setString(5, searchProviderNo);
+			ps.setString(q_number, searchProviderNo);
+			q_number++;
+		}
+		if(endDateStr != null && endDateStr != ""){
+			ps.setString(q_number, endDateStr);
+			q_number++;
 		}
 		ResultSet rs= ps.executeQuery();
         int count = 0;
@@ -398,6 +432,7 @@ public class CategoryData {
 		boolean qp_first_name = false;
 		boolean qp_last_name = false;
 		boolean qp_hin = false;
+		boolean qp_end_date = false;
 
 		String sql 	= "SELECT d.demographic_no, d.last_name, d.first_name, COUNT(1) as count "
 					+ "FROM ctl_document cd "
@@ -447,6 +482,12 @@ public class CategoryData {
 		}
 		sql = sql + "AND doc.status <> 'D' ";
 		
+		
+		if(endDateStr != null && !endDateStr.equals("")){
+			sql = sql + "  AND doc.observationdate < ? ";
+			qp_end_date = true;
+		}
+		
 
 		sql = sql + "GROUP BY d.demographic_no ";
 		
@@ -459,6 +500,7 @@ public class CategoryData {
 		if (qp_last_name) { ps.setString(qp_number++, "%" + patientLastName + "%"); }
 		if (qp_first_name) { ps.setString(qp_number++, "%" + patientFirstName + "%"); }
 		if (qp_hin) { ps.setString(qp_number++, "%" + patientHealthNumber + "%"); }
+		if (qp_end_date) { ps.setString(qp_number++, endDateStr ); }
 
 		ResultSet rs= ps.executeQuery();
 		
