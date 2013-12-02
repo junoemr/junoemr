@@ -166,8 +166,9 @@ public class InboxResultsDao {
                     + "pageSize = "+ ((pageSize == null) ? "NULL" : pageSize.toString()) + ", "
                     + "mixLabsAndDocs = " + ((mixLabsAndDocs) ? "true" : "false") + ", "
                     + "isAbnormal = " + ((isAbnormal == null) ? "NULL" : ((isAbnormal) ? "true" : "false"))  +", "
-                    + "isAbnormalDoc = " + ((isAbnormalDoc == null) ? "NULL" : ((isAbnormalDoc) ? "true" : "false"))
-                    + "providerNoList = "+ ((providerNoList == null) ? "NULL" : (providerNoList.equals("") ? "empty" : providerNoList))
+                    + "isAbnormalDoc = " + ((isAbnormalDoc == null) ? "NULL" : ((isAbnormalDoc) ? "true" : "false")) + ", "
+                    + "providerNoList = "+ ((providerNoList == null) ? "NULL" : (providerNoList.equals("") ? "empty" : providerNoList)) + ", "
+                    + "neverAcknowledgedItems = " + ((neverAcknowledgedItems) ? "true" : "false") + ", "
                     + ")");
         
         
@@ -256,7 +257,7 @@ public class InboxResultsDao {
 						    "        FROM providerLabRouting plr" + 
 						    "        GROUP BY lab_no, status" +
 						    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
-						    ") proLR";
+						    ") proLR ";
 			}else{
 				sql = sql + "FROM providerLabRouting proLR ";
 			}

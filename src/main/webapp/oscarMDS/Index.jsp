@@ -56,6 +56,7 @@ String endDate = (String) request.getAttribute("endDate");
 String docview = (String) request.getAttribute("docview");
 boolean abnormalsOnly = "true".equals(request.getAttribute("abnormalsOnly").toString());
 boolean checkRequestingProvider = "true".equals(request.getAttribute("checkRequestingProvider").toString());
+boolean neverAcknowledgedItems = "true".equals(request.getAttribute("neverAcknowledgedItems").toString());
 
 boolean ajax = "true".equals(request.getParameter("ajax"));
 /*
@@ -173,6 +174,7 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 	var docview = "<%=(docview == null ? "" : docview)%>";
 	var totalNumDocs = <%=totalNumDocs%>;
 	var abnormalsOnly = <%=abnormalsOnly%>;
+	var neverAcknowledgedItems = <%=neverAcknowledgedItems%>;
 	
 	
 	
@@ -280,7 +282,8 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 		query +="&searchProviderNo="+searchProviderNo+"&providerNo="+providerNo+"&status="+searchStatus+"&page="+page
 			   +"&pageSize="+pageSize+"&isListView="+(isListView?"true":"false")
 			   +"&searchGroupNo="+searchGroupNo+"&startDate="+startDate
-			   +"&endDate="+endDate+"&checkRequestingProvider="+checkRequestingProvider+"&docview="+docview+"&abnormalFlag="+abnormalflag;
+			   +"&endDate="+endDate+"&checkRequestingProvider="+checkRequestingProvider+"&docview="+docview
+			   +"&abnormalFlag="+abnormalflag+"&neverAcknowledgedItems="+neverAcknowledgedItems;
 		switch (selected_category) {
 		case CATEGORY_ALL:
 			query  += "&view=all";
@@ -450,6 +453,7 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
         searchProviderNo = -1;
         searchGroupNo = search_urgent_group;
         checkRequestingProvider = true;
+        neverAcknowledgedItems = true;
         
         //set providers filters
         

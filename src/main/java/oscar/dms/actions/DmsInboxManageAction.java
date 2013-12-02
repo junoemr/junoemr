@@ -480,8 +480,11 @@ public class DmsInboxManageAction extends DispatchAction {
 		else if("false".equals(abnormalFlag))
 			isAbnormal = new Boolean(false);
 		
-		if ("abnormal".equals(docview))
+		if ("abnormal".equals(docview) && !("normal".equals(view))){
 			isAbnormalDoc = new Boolean(true);
+		}else{
+			isAbnormalDoc = new Boolean(false);
+		}
 
 		if (ackStatus == null) {
 			ackStatus = "N";
@@ -520,17 +523,21 @@ public class DmsInboxManageAction extends DispatchAction {
 
 		ArrayList<LabResultData> labdocs = new ArrayList<LabResultData>();
 
-		if ("documents".equals(view) || "all".equals(view) || "abnormal".equals(docview)) {
+		if ("documents".equals(view) || "all".equals(view) || "normal".equals("view") || isAbnormalDoc) {
 			labdocs = inboxResultsDao.populateDocumentResultsData(searchProviderNo, demographicNo, patientFirstName,
 					patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal, isAbnormalDoc, 
 					providerNoArr, neverAcknowledgedItems);
 		}
 
 		logger.debug("documents grabbed:"+labdocs.size());
-		if ("labs".equals(view) || "abnormal".equals(view) || "normal".equals(view) || "all".equals(view)) {
-			labdocs.addAll(comLab.populateLabResultsData(searchProviderNo, demographicNo, patientFirstName,
+		logger.debug("abnormalFlag: "+abnormalFlag+ ", view: "+ view + ", isAbnormal:"+isAbnormal+ ", docview:"+docview + ", isAbnormalDoc:"+isAbnormalDoc +", neverAcknowledgedItems: "+neverAcknowledgedItems);
+		if ("labs".equals(view) || "abnormal".equals(view) || "normal".equals(view) || "all".equals(view) ) {
+			// if the "abnormal" flag is set and the view is normal, we should get zero (0) labs
+			if(("true".equals(abnormalFlag) && !"normal".equals(view)) || "false".equals(abnormalFlag)){
+				labdocs.addAll(comLab.populateLabResultsData(searchProviderNo, demographicNo, patientFirstName,
 					patientLastName, patientHealthNumber, ackStatus, scannedDocStatus, true, page, pageSize,
 					mixLabsAndDocs, isAbnormal, providerNoArr, neverAcknowledgedItems));
+			}
 		}
 		logger.debug("documents + labs grabbed:"+labdocs.size());
 		

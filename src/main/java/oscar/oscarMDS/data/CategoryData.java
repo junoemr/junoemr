@@ -345,9 +345,21 @@ public class CategoryData {
 				+ " SELECT * FROM ("
 				+ "   SELECT d.demographic_no, d.last_name, d.first_name, hl7.lab_no, hl7.accessionNum "
 				+ "   FROM "
-				+ "     patientLabRouting cd,"
-				+ "     providerLabRouting plr,"
-				+ "     hl7TextInfo hl7,"
+				+ "     patientLabRouting cd,";
+		
+		if(this.neverAcknowledgedItems && "N".equals(this.status)){
+			sql = sql + "(" +
+				    "    SELECT * FROM (" +
+				    "        SELECT plr.*" +
+				    "        FROM providerLabRouting plr" + 
+				    "        GROUP BY lab_no, status" +
+				    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
+				    ") plr, ";
+		}else{
+			sql = sql + "     providerLabRouting plr,";
+		}
+		
+		sql = sql + "     hl7TextInfo hl7,"
 				+ "     demographic d,"
 				+ "     provider p "
 				+ "   WHERE "
@@ -438,9 +450,20 @@ public class CategoryData {
 
 		String sql 	= "SELECT d.demographic_no, d.last_name, d.first_name, COUNT(1) as count "
 					+ "FROM ctl_document cd "
-					+ "INNER JOIN demographic d ON d.demographic_no = cd.module_id "
-					+ "INNER JOIN providerLabRouting proLR ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = cd.document_no ) "
-					+ "LEFT JOIN document doc ON ( doc.document_no = cd.document_no ) "
+					+ "INNER JOIN demographic d ON d.demographic_no = cd.module_id ";
+	
+		if(this.neverAcknowledgedItems && "N".equals(status)){
+			sql = sql + "INNER JOIN (" +
+					    "    SELECT * FROM (" +
+					    "        SELECT plr.*" +
+					    "        FROM providerLabRouting plr" + 
+					    "        GROUP BY lab_no, status" +
+					    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
+					    ") proLR ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = cd.document_no ) ";
+		}else{
+			sql = sql + "INNER JOIN providerLabRouting proLR ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = cd.document_no ) ";
+		}
+		sql = sql + "LEFT JOIN document doc ON ( doc.document_no = cd.document_no ) "
 					+ "WHERE cd.module='demographic' ";
 
 		if ("N".equals(status)) {
