@@ -1703,11 +1703,26 @@ function addDocToList(provNo, provName, docId) {
 	idoc.setAttribute("value", provNo);
 
 	adoc.appendChild(idoc);
+	
+	var providers_count = document.getElementsByName("flagproviders").length + 1;
+	var inbox_set_responsible = document.getElementById('use_provider_as_responsible');
+	if(null != inbox_set_responsible){
+		inbox_set_responsible.disabled = true;
+		inbox_set_responsible.checked = false;
+		if(providers_count == 1 ){
+			inbox_set_responsible.disabled = false;
+			inbox_set_responsible.checked = true;
+		}
+		bdoc.setAttribute("onclick", "removeProv(this); document.getElementById('use_provider_as_responsible').checked = false; document.getElementById('use_provider_as_responsible').disabled = true;");
+	}
 
 	adoc.appendChild(bdoc);
 	var providerList = $('providerList' + docId);
 	providerList.appendChild(adoc);
+	
+	
 }
+	
 
 function removeLink(docType, docId, providerNo, e) {
 	var url = "../dms/ManageDocument.do";

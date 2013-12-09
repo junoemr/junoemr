@@ -366,6 +366,14 @@
                                         <td><bean:message key="dms.documentReport.msgCreator"/>:</td>
                                         <td><%=curdoc.getCreatorName()%></td>
                                     </tr>
+                                    <% if(OscarProperties.getInstance().isPropertyActive("INBOX_SET_RESPONSIBLE")){ %>
+                                    <tr>
+                                        <td><bean:message key="dms.documentReport.msgResponsibleProvider"/>:</td>                                  
+						                <td>
+						                  <input type="checkbox" id="use_provider_as_responsible" name="use_provider_as_responsible" disabled/>
+						                </td>
+					                </tr>
+					                <% } %>
                                     <!-- Ability to set documents as abnormal -->
                                     <% if(OscarProperties.getInstance().isPropertyActive("inbox_urgent_search")){ %>
                                     <tr>

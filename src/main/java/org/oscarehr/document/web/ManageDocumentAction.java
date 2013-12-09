@@ -81,6 +81,7 @@ import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
@@ -125,6 +126,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String documentId = request.getParameter("documentId");// :29<
 		String docType = request.getParameter("docType");// :consult<
 		String docResultStatus = request.getParameter("doc_result_status");
+		String use_provider_as_responsible = request.getParameter("use_provider_as_responsible");
 
 		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
 
@@ -177,6 +179,14 @@ public class ManageDocumentAction extends DispatchAction {
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("Error", e);
 		}
+
+		if( null != use_provider_as_responsible && flagproviders.length == 1) {
+			EDoc edoc = EDocUtil.getEDocFromDocId(documentId);
+			edoc.setResponsibleId(flagproviders[0]);
+			EDocUtil.editDocumentSQL(edoc, false);
+		}
+		
+		
 		HashMap hm = new HashMap();
 		hm.put("patientId", demog);
 		JSONObject jsonObject = JSONObject.fromObject(hm);
