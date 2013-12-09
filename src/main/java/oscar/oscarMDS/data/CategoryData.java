@@ -419,8 +419,8 @@ public class CategoryData {
 		}
 		
 		sql = sql + "     hl7TextInfo hl7,"
-				+ "     demographic d,"
-				+ "     provider p "
+				+ "     demographic d"
+				+ (checkRequestingProvider ? ", provider p " : "")
 				+ "   WHERE "
 				+ "     d.last_name like ?"
 				+ " 	AND d.first_name like ? "
