@@ -628,7 +628,7 @@ function setType(typeSel,reasonSel,locSel,durSel,notesSel,resSel) {
             <div class="label"><bean:message key="Appointment.formNotes" />:</div>
             <div class="input">
 				<textarea name="notes" tabindex="3" rows="2" wrap="virtual"
-					cols="18"><%=bFirstDisp?appt.get("notes"):request.getParameter("notes")%></textarea>
+					cols="18"><%=bFirstDisp?((appt.get("notes") == null || appt.get("notes").equals("null"))?"":appt.get("notes")):request.getParameter("notes")%></textarea>
             </div>
         </li>
 			<% if (pros.isPropertyActive("mc_number")) {
@@ -953,21 +953,21 @@ Currently this is only used in the mobile version -->
                 to <%=bFirstDisp ? String.valueOf(appt.get("end_time")).substring(0, 5) : request.getParameter("end_time")%></div>
             </li>
             <li><div class="label"><bean:message key="Appointment.formType" />: </div>
-                <div class="info"><%=bFirstDisp ? appt.get("type") : request.getParameter("type")%></div>
+                <div class="info"><%=bFirstDisp ? ((appt.get("type") == null || appt.get("type").equals("null"))?"":appt.get("type")) : request.getParameter("type")%></div>
             </li>
             <li><div class="label"><bean:message key="Appointment.formReason" />: </div>
-                <div class="info"><%=bFirstDisp ? appt.get("reason") : request.getParameter("reason")%></div>
+                <div class="info"><%=bFirstDisp ? ((appt.get("reason") == null || appt.get("reason").equals("null"))?"":appt.get("reason")) : request.getParameter("reason")%></div>
             </li>
             <li><div class="label"><bean:message key="Appointment.formLocation" />: </div>
-                <div class="info"><%=bFirstDisp ? appt.get("location") : request.getParameter("location")%></div>
+                <div class="info"><%=bFirstDisp ? ((appt.get("location") == null || appt.get("location").equals("null"))?"":appt.get("location")) : request.getParameter("location")%></div>
             </li>
             <li><div class="label"><bean:message key="Appointment.formResources" />: </div>
-                <div class="info"><%=bFirstDisp ? appt.get("resources") : request.getParameter("resources")%></div>
+                <div class="info"><%=bFirstDisp ? ((appt.get("resources") == null || appt.get("resources").equals("null"))?"":appt.get("resources")) : request.getParameter("resources")%></div>
             </li>
             <li>&nbsp;</li>
             <li class="notes">
                 <div class="label"><bean:message key="Appointment.formNotes" />: </div>
-                <div class="info"><%=bFirstDisp ? appt.get("notes") : request.getParameter("notes")%></div>
+                <div class="info"><%=bFirstDisp ? ((appt.get("notes") == null || appt.get("notes").equals("null"))?"":appt.get("notes")) : request.getParameter("notes")%></div>
             </li>
         </ul>
     </div>
