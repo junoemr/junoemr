@@ -133,6 +133,7 @@ public class ScheduleOfBenefits {
 		Hashtable change = new Hashtable();
 		String oldPrice = oldPricingInfo == null ? "0.00" : (String) oldPricingInfo.get("value");
 
+		
 		double oldDoub = 0.00;
 		try {
 			oldDoub = Double.parseDouble(oldPrice);
@@ -155,12 +156,14 @@ public class ScheduleOfBenefits {
 
 		// No need to edit a billing code if the price hasn't changed.  
 		if (oldPricingInfo != null && addChangedCodes && !feeChanged) { return null; }
-		
+				
 		// Check for date change
-		String oldServiceDate = (String)oldPricingInfo.get("billingservice_date");
-		oldServiceDate = oldServiceDate.replace("-",  "");
-		String newServiceDate = (String)newPricingInfo.get("effectiveDate");
-		if(oldServiceDate.equals(newServiceDate)) {return null; }
+		if(oldPricingInfo != null){
+			String oldServiceDate = (String)oldPricingInfo.get("billingservice_date");
+			oldServiceDate = oldServiceDate.replace("-",  "");
+			String newServiceDate = (String)newPricingInfo.get("effectiveDate");
+			if(oldServiceDate.equals(newServiceDate)) {return null; }
+		}
 
 		change.put("newprice", fee);
 		change.put("feeCode", newPricingInfo.get("feeCode") + feeType);
