@@ -71,6 +71,7 @@ public class Demographic implements Serializable {
 	private String sexDesc;
 	private Date dateJoined;
 	private String familyDoctor;
+	private String familyDoctor2;
 	private String city;
 	private String firstName;
 	private String postal;
@@ -488,12 +489,28 @@ public class Demographic implements Serializable {
 	}
 
 	/**
+	 * Return the value associated with the column: family_doctor_2
+	 */
+	public String getFamilyDoctor2() {
+		return familyDoctor2;
+	}
+
+	/**
 	 * Set the value related to the column: family_doctor
 	 *
 	 * @param familyDoctor the family_doctor value
 	 */
 	public void setFamilyDoctor(String familyDoctor) {
 		this.familyDoctor = familyDoctor;
+	}
+
+	/**
+	 * Set the value related to the column: family_doctor_2
+	 *
+	 * @param familyDoctor2 the family_doctor value
+	 */
+	public void setFamilyDoctor2(String familyDoctor2) {
+		this.familyDoctor2 = familyDoctor2;
 	}
 
 	/**

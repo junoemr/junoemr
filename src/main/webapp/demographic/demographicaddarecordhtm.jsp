@@ -1128,6 +1128,36 @@ document.forms[1].r_doctor_ohip.value = refNo;
 								#</a> <% } %>
 				</td>
 			</tr>
+			<!-- Family Doctor -->
+			<tr>
+
+				<td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.familyDoctor" />: </b></td>
+				<td align="left">
+				<%
+					  Properties prop = null;
+					  Vector vecRef = new Vector();
+					  List<ProfessionalSpecialist> specialists = professionalSpecialistDao.findAll();
+					  for(ProfessionalSpecialist specialist : specialists) {
+						  prop = new Properties();
+						  prop.setProperty("fd_referral_no", specialist.getReferralNo());
+						  prop.setProperty("fd_last_name", specialist.getLastName());
+						  prop.setProperty("fd_first_name", specialist.getFirstName());
+						  vecRef.add(prop);
+					  }
+
+					  %> <select name="family_doctor" onChange="document.adddemographic.family_doctor_name.value = this.options[this.selectedIndex].innerHTML.trim()" style="width: 200px">
+						<option value=""></option>
+						<% for(int k=0; k<vecRef.size(); k++) {
+							prop= (Properties) vecRef.get(k);
+						%>
+						<option value="<%=prop.getProperty("fd_referral_no","")%>" >
+							<%=Misc.getShortStr( (prop.getProperty("fd_last_name")+", "+prop.getProperty("fd_first_name")),"",nStrShowLen)%>
+						</option>
+						<% } %>
+					</select> 
+					<input type="hidden" name="family_doctor_name" value=""/>
+				</td>
+			</tr>
 			<tr valign="top">
 				<td align="right" nowrap><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPCNRosterStatus" />: </b></td>

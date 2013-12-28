@@ -832,6 +832,7 @@ div.demographicWrapper {
                            java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
                                 //----------------------------REFERRAL DOCTOR------------------------------
                                 String rdohip="", rd="", fd="", family_doc = "";
+                                String fd2ohip="", fd2="", family_doctor_name = "";
 
                                 String resident="", nurse="", alert="", notes="", midwife="";
                                 ResultSet rs = null;
@@ -875,7 +876,22 @@ div.demographicWrapper {
                                                         family_doc = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"family_doc");
                                                         family_doc = family_doc !=null ? family_doc : "" ;
                                                 }
-                                                //----------------------------REFERRAL DOCTOR --------------end-----------
+												//----------------------------REFERRAL DOCTOR --------------end-----------
+
+												fd2 = demographic.getFamilyDoctor2();
+												if(fd2 == null){
+													fd2ohip="";
+													family_doctor_name="";
+												}else{
+													fd2ohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(fd2),"fd");
+                                                    fd2ohip = fd2ohip !=null ? fd2ohip : "" ;
+                                                    family_doctor_name = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(fd2),"fdname");
+
+												}
+
+
+
+
 
                                                 if (oscar.util.StringUtils.filled(demographic.getYearOfBirth())) birthYear = StringUtils.trimToEmpty(demographic.getYearOfBirth());
                                                 if (oscar.util.StringUtils.filled(demographic.getMonthOfBirth())) birthMonth = StringUtils.trimToEmpty(demographic.getMonthOfBirth());
@@ -2044,6 +2060,9 @@ if ( PatStat.equals(Dead) ) {%>
                                                     <li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.formRefDocNo" />:</span><span class="info"><%=rdohip%></span>
 							</li>
+                                                    <li><span class="label"><bean:message
+															key="demographic.demographiceditdemographic.familyDoctor" />:</span><span class="info"><%=fd2ohip%> <%=family_doctor_name%></span>
+							</li>
 						</ul>
 						</div>
 
@@ -2682,6 +2701,38 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 								#</a> <% } %>
 								</td>
 							</tr>
+							<!-- Family Doctor -->
+							<% if (oscarProps.getProperty("demographic_family_doctor").equals("true")) { %>
+							<tr>
+								<td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.familyDoctor" />: </b></td>
+								<td align="left">
+								<%
+									  Properties prop = null;
+									  Vector vecRef = new Vector();
+									  List<ProfessionalSpecialist> specialists = professionalSpecialistDao.findAll();
+                                      for(ProfessionalSpecialist specialist : specialists) {
+                                    	  prop = new Properties();
+                                          prop.setProperty("fd_referral_no", specialist.getReferralNo());
+                                          prop.setProperty("fd_last_name", specialist.getLastName());
+                                          prop.setProperty("fd_first_name", specialist.getFirstName());
+                                          vecRef.add(prop);
+                                      }
+
+                                  %> <select name="family_doctor" onChange="document.updatedelete.family_doctor_name.value = this.options[this.selectedIndex].innerHTML.trim()" style="width: 200px">
+		 							 	<option value=""></option>
+										<% for(int k=0; k<vecRef.size(); k++) {
+                    	              		prop= (Properties) vecRef.get(k);
+                	                  	%>
+										<option value="<%=prop.getProperty("fd_referral_no","")%>"
+											<%=(prop.getProperty("fd_referral_no").equals(fd2ohip) && !fd2ohip.equals(""))?"selected":""%>>
+											<%=Misc.getShortStr( (prop.getProperty("fd_last_name")+", "+prop.getProperty("fd_first_name")),"",nStrShowLen)%>
+										</option>
+										<% } %>
+									</select> 
+									<input type="hidden" name="family_doctor_name" value=""/>
+								</td>
+							</tr>
+							<% } %>
 
 							<tr valign="top">
 								<td align="right" nowrap><b><bean:message

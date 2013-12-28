@@ -120,6 +120,8 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	@Column(name = "hc_renew_date")
 	@Temporal(TemporalType.DATE)
 	Date hcRenewDate = null;
+	@Column(name = "family_doctor_2")
+	private String familyDoctor2 = null;
 	@Column(name = "family_doctor")
 	private String familyDoctor = null;
 	@Column(name = "alias")
@@ -394,8 +396,15 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		public String getFamilyDoctor() {
 		    return this.familyDoctor;
 		}
+		public String getFamilyDoctor2() {
+		    return this.familyDoctor2;
+		}
 		public void setFamilyDoctor(String s) {
 		    this.familyDoctor = s;
+		}
+
+		public void setFamilyDoctor2(String s) {
+		    this.familyDoctor2 = s;
 		}
 
 		public String getAlias() {
