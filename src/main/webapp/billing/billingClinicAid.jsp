@@ -190,26 +190,31 @@ if(action.equals("create_invoice")){
 	if(provider_uli == null){
 		provider_uli = "";
 	}
-	provider_uli = URLEncoder.encode(provider_uli, "UTF-8");
+	provider_uli = provider_uli;
 	
 	String appointment_number = request.getParameter("appointment_no");
 	
-	String patient_dob = URLEncoder.encode(demo.getYearOfBirth()+"-"+demo.getMonthOfBirth()+"-"+demo.getDateOfBirth(), "UTF-8");
+	String patient_dob = demo.getYearOfBirth()+"-"+demo.getMonthOfBirth()+"-"+demo.getDateOfBirth();
+	String encoded_patient_gender = demo.getSex();
+	String first_name = UtilMisc.toUpperLowerCase(demo.getFirstName());
+	String last_name = UtilMisc.toUpperLowerCase(demo.getLastName());
+	String status = demo.getPatientStatus();
+	String hin = demo.getHin();
+	String age = demo.getAge();
+	String encoded_province = demo.getProvince();
+	String encoded_city = demo.getCity();
+	String encoded_address = demo.getAddress();
+	String encoded_postal_code = demo.getPostal();
 
-	String first_name = URLEncoder.encode(UtilMisc.toUpperLowerCase(demo.getFirstName()), "UTF-8");
-	String last_name = URLEncoder.encode(UtilMisc.toUpperLowerCase(demo.getLastName()), "UTF-8");
+	String appointment_start_time = request.getParameter("appointment_start_time");
+	String chart_no=request.getParameter("chart_no");
+	String service_start_date = request.getParameter("service_start_date");
 
-	String status = URLEncoder.encode(demo.getPatientStatus(), "UTF-8");
-
-	String hin = URLEncoder.encode(demo.getHin(), "UTF-8");
-
-	String age = URLEncoder.encode(demo.getAge(), "UTF-8");
-
-	String appointment_start_time = URLEncoder.encode(request.getParameter("appointment_start_time"), "UTF-8");
-	
-	String chart_no=URLEncoder.encode(request.getParameter("chart_no"), "UTF-8");
-	
-	String service_start_date = URLEncoder.encode(request.getParameter("service_start_date"), "UTF-8");
+	String encoded_referral_number = demo.getFamilyDoctorNumber();
+	String encoded_referral_first_name =
+		demo.getFamilyDoctorFirstName();
+	String encoded_referral_last_name =
+		demo.getFamilyDoctorLastName();
 	
 	//String billing_form_type = URLEncoder.encode(request.getParameter("billing_service_type"), "UTF-8");
 	clinicaid_link = clinicaid_domain+"/?nonce="+ nonce +"#/invoice/add?service_recipient_first_name="+first_name+
@@ -218,15 +223,23 @@ if(action.equals("create_invoice")){
 						"&service_recipient_oscar_number="+service_recipient_oscar_number+
 						"&service_recipient_status="+status+
 						"&service_recipient_age="+age+
+						"&service_recipient_gender="+encoded_patient_gender+
 						"&service_provider_oscar_number="+provider_no+
 						"&service_provider_first_name="+provider_first_name+
 						"&service_provider_last_name="+provider_last_name+
 						"&service_provider_uli="+provider_uli+
+						"&province="+encoded_province+
+						"&city="+encoded_city+
+						"&postal_code="+encoded_postal_code+
 						"&service_start_date="+service_start_date+
 						"&chart_number="+chart_no+
 						"&service_recipient_birth_date="+patient_dob+
 						"&appointment_number="+appointment_number+
-						"&appointment_start_time="+appointment_start_time;
+						"&appointment_start_time="+appointment_start_time +
+	    	            "&referral_number=" + encoded_referral_number +
+	    	            "&referral_first_name=" + encoded_referral_first_name +
+						"&referral_last_name=" + encoded_referral_last_name +
+						"&address=" + encoded_address;
 						//"&billForm="+billing_form_type;
 }else if(action.equals("invoice_reports")){
 	clinicaid_link = clinicaid_domain+"/?nonce="+nonce+"#/reports";
