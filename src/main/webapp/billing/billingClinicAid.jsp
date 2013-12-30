@@ -200,6 +200,7 @@ if(action.equals("create_invoice")){
 	String last_name = UtilMisc.toUpperLowerCase(demo.getLastName());
 	String status = demo.getPatientStatus();
 	String hin = demo.getHin();
+	String ver = demo.getVer();
 	String age = demo.getAge();
 	String encoded_province = demo.getProvince();
 	String encoded_city = demo.getCity();
@@ -219,6 +220,7 @@ if(action.equals("create_invoice")){
 	//String billing_form_type = URLEncoder.encode(request.getParameter("billing_service_type"), "UTF-8");
 	clinicaid_link = clinicaid_domain+"/?nonce="+ nonce +"#/invoice/add?service_recipient_first_name="+first_name+
 						"&service_recipient_uli="+hin+
+						"&service_recipient_ver="+ver+
 						"&service_recipient_last_name="+last_name+
 						"&service_recipient_oscar_number="+service_recipient_oscar_number+
 						"&service_recipient_status="+status+
