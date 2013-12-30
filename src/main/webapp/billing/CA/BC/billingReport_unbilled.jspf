@@ -82,7 +82,7 @@
 		<TD align="center" width="10%"><b> <font size="2"
 			face="Arial, Helvetica, sans-serif">
 			<%
-            if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){
+            if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){
             %>
             <a href="../../../billing/billingClinicAid.jsp?demographic_no=<%=demoNo%>&service_start_date=<%=apptDate%>&appointment_no=<%=apptNo%>&chart_no=&appointment_start_time=<%=apptTime%>&billing_action=create_invoice" target="_blank">Bill |$|</a>
             <%

@@ -200,7 +200,7 @@ if (reportAction.compareTo("unbilled") == 0) {
 <%
 } else {
 	if (reportAction.compareTo("billed") == 0) {
-		if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){
+		if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){
 %>
 		<%@ include file="billingReport_billed_clinicaid.jspf"%>
 <%

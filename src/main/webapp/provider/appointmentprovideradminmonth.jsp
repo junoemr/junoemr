@@ -472,7 +472,7 @@ function refreshTabAlerts(id) {
 				TITLE='<bean:message key="global.genBillReport"/>'
 				onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message
 				key="global.billing" /></a>
-				<% } else if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){%>
+				<% } else if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){%>
 				 <a HREF="#"
 				ONCLICK="popupOscarRx(550,687,'../billing/CA/BC/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;"
 				TITLE='<bean:message key="global.genBillReport"/>'

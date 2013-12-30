@@ -981,7 +981,7 @@ java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.stru
      <%
      OscarProperties oscarProps = OscarProperties.getInstance();
      String clinicaid_link = "";
-     if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){
+     if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){
     	 clinicaid_link = "../billing/billingClinicAid.jsp?billing_action=invoice_reports";
     	 //Force this link to go to BC billing report
     	 %>
@@ -1864,7 +1864,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 	<%
 	OscarProperties oscarProps = OscarProperties.getInstance();
 	String clinicaid_link = "";
-	if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){
+	if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){
 		clinicaid_link = "../billing/billingClinicAid.jsp?demographic_no="+demographic_no+
 						"&service_start_date="+URLEncoder.encode(strYear+"-"+strMonth+"-"+strDay, "UTF-8")+
 						"&appointment_no="+appointment.get("appointment_no")+
@@ -1878,7 +1878,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
                 //java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.action.Action.LOCALE_KEY);
                 if (vLocale.getCountry().equals("BR")) { %>
                <a href=# onClick='popupPage(700,1024, "../oscar/billing/procedimentoRealizado/init.do?appId=<%=appointment.get("appointment_no")%>");return false;' title="Faturamento">|FAT|</a>
-             <% } else if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){%>
+             <% } else if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){%>
            	   <a href="<%=clinicaid_link+"&billing_action=create_invoice"%>" target="_blank" title="<bean:message key="global.billing"/>">|<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
              <% } else {%>
               <a href=# onClick='popupPage(755,1200, "../billing.do?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=billingServiceType%>&hotclick=<%=URLEncoder.encode("")%>&appointment_no=<%=appointment.get("appointment_no")%>&demographic_name=<%=URLEncoder.encode(name)%>&status=<%=status%>&demographic_no=<%=demographic_no%>&providerview=<%=curProvider_no[nProvider]%>&user_no=<%=curUser_no%>&apptProvider_no=<%=curProvider_no[nProvider]%>&appointment_date=<%=year+"-"+month+"-"+day%>&start_time=<%=iS+":"+iSm%>&bNewForm=1");return false;' title="<bean:message key="global.billingtag"/>">|<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
@@ -1886,7 +1886,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 <% } else {%>
 	 <%if(caisiBillingPreferenceNotDelete!=null && caisiBillingPreferenceNotDelete.equals("1")) {%>
          <a href=# onClick='onUpdatebill("../billing/CA/ON/billingEditWithApptNo.jsp?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=billingServiceType%>&hotclick=<%=URLEncoder.encode("")%>&appointment_no=<%=appointment.get("appointment_no")%>&demographic_name=<%=URLEncoder.encode(name)%>&status=<%=status%>&demographic_no=<%=demographic_no%>&providerview=<%=curProvider_no[nProvider]%>&user_no=<%=curUser_no%>&apptProvider_no=<%=curProvider_no[nProvider]%>&appointment_date=<%=year+"-"+month+"-"+day%>&start_time=<%=iS+":"+iSm%>&bNewForm=1");return false;' title="<bean:message key="global.billingtag"/>">|=<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
-	     <% } else if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) && prov.equals("AB")){%>
+	     <% } else if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){%>
 	     	<% /*<a href="<%=clinicaid_link+"&billing_action=delete_invoice&appointment_number"+appointment.get("appointment_no")%->" target="_blank" title="<bean:message key="global.billing"/>">|-<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a> */%>
 	     	<a href="#" title="<bean:message key="global.billing"/>">|-<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
      <% } else { %>

@@ -966,8 +966,7 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 				do Faturamento</a>
 
 <% } else {
-	if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) &&
-		"AB".equals(prov)){
+	if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){
 		String clinicaid_link = "";
 		clinicaid_link = "../billing/billingClinicAid.jsp?billing_action=invoice_reports";
 		%>
@@ -1005,8 +1004,7 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 				</td>
 			</tr>
 <% if (!vLocale.getCountry().equals("BR")) { 
-	if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")) &&
-			"AB".equals(prov)){
+	if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){
 		String strYear=""+curYear;
 		String strMonth=curMonth>9?(""+curMonth):("0"+curMonth);
 		String strDay=curDay>9?(""+curDay):("0"+curDay);

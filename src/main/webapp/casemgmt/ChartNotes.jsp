@@ -379,8 +379,7 @@ try
 </html:form>
 <%
 String form_target = "";
-if(Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", "")) 
-					&& OscarProperties.getInstance().getProperty("billregion","").trim().toUpperCase().equals("AB")){
+if(Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", ""))){
 	form_target = "_blank";
 
 }
@@ -506,7 +505,7 @@ if(Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_bil
 			<%
 				if(bean.source == null)  {
 				%>
-					<input tabindex="21" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>" onclick="document.forms['caseManagementEntryForm'].sign.value='on';document.forms['caseManagementEntryForm'].toBill.value='true';Event.stop(event);<%if (Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", "")) && OscarProperties.getInstance().getProperty("billregion","").trim().toUpperCase().equals("AB")){%> window.opener.location.reload(true);window.close();<% } %> return savePage('saveAndExit', '');" title='<bean:message key="oscarEncounter.Index.btnBill"/>'>&nbsp;
+					<input tabindex="21" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>" onclick="document.forms['caseManagementEntryForm'].sign.value='on';document.forms['caseManagementEntryForm'].toBill.value='true';Event.stop(event);<%if (Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", ""))){%> window.opener.location.reload(true);window.close();<% } %> return savePage('saveAndExit', '');" title='<bean:message key="oscarEncounter.Index.btnBill"/>'>&nbsp;
 				<%
 				}
 			%>

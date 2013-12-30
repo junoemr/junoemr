@@ -83,6 +83,19 @@ function onsub() {
 	// check input data in the future
 }
 
+function toggleDisplay(elementId)
+{
+    display_type = document.getElementById(elementId).style.display;
+    if(display_type == 'none')
+    {
+        document.getElementById(elementId).style.display='block';
+    }
+    else
+    {
+        document.getElementById(elementId).style.display='none';
+    }
+}
+
 function popupOscarRx(vheight,vwidth,varpage) { //open a new popup window
   var page = varpage;
   windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=0,left=0";
@@ -427,7 +440,7 @@ div.logoutBox {
 		<%-- This links doesnt make sense on Brazil. There are other billing engines that we must use for billing --%>
 		<%
 			Boolean clinicaid_enabled = Boolean.parseBoolean( oscarVariables.getProperty("clinicaid_billing", ""));
-			if(clinicaid_enabled && oscarVariables.getProperty("billregion","").equals("AB")){
+			if(clinicaid_enabled){
 				String clinicaid_link = "/billing/billingClinicAid.jsp?billing_action=invoice_reports";
 				%>
 				<div class="adminBox">
@@ -443,11 +456,26 @@ div.logoutBox {
 				<%
 			}
 		
-			if (!country.equals("BR") && !(clinicaid_enabled && oscarVariables.getProperty("billregion","").equals("AB")))
+			if (!country.equals("BR"))
 			{
 		%>
 		<div class="adminBox">
-		<h3>&nbsp;<bean:message key="admin.admin.billing" /></h3>
+            <%
+            if(clinicaid_enabled)
+            {
+                %>
+                <h3 onclick="toggleDisplay('hidden_billing');">&nbsp;Old Billing</h3>
+                <div id="hidden_billing" style="display:none;">
+                <%
+            }
+            else
+            {
+                %>
+                <h3>&nbsp;<bean:message key="admin.admin.billing" /></h3>
+                <div>
+                <%
+            }
+            %>
 		<ul>
 
 			<%
@@ -556,6 +584,7 @@ div.logoutBox {
 				}
 			%>
 		</ul>
+		</div>
 		</div>
 		<%
 			}
