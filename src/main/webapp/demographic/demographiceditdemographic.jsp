@@ -2060,9 +2060,11 @@ if ( PatStat.equals(Dead) ) {%>
                                                     <li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.formRefDocNo" />:</span><span class="info"><%=rdohip%></span>
 							</li>
+							<% if (Boolean.parseBoolean(oscarProps.getProperty("demographic_family_doctor"))) { %>
                                                     <li><span class="label"><bean:message
 															key="demographic.demographiceditdemographic.familyDoctor" />:</span><span class="info"><%=fd2ohip%> <%=family_doctor_name%></span>
 							</li>
+							<% } %>
 						</ul>
 						</div>
 
@@ -2499,7 +2501,11 @@ if ( PatStat.equals(Dead) ) {%>
 									<option value="BC" <%=hctype.equals("BC")?" selected":""%>>BC-British Columbia</option>
 									<option value="MB" <%=hctype.equals("MB")?" selected":""%>>MB-Manitoba</option>
 									<option value="NB" <%=hctype.equals("NB")?" selected":""%>>NB-New Brunswick</option>
+									<% if ( oscarProps.getProperty("billregion") != null &&  oscarProps.getProperty("billregion").equals("BC")) {%>
+									<option value="NF" <%=hctype.equals("NF")?" selected":""%>>NF-Newfoundland & Labrador</option>
+									<% } else { %>
 									<option value="NL" <%=hctype.equals("NL")?" selected":""%>>NL-Newfoundland & Labrador</option>
+									<% } %>
 									<option value="NT" <%=hctype.equals("NT")?" selected":""%>>NT-Northwest Territory</option>
 									<option value="NS" <%=hctype.equals("NS")?" selected":""%>>NS-Nova Scotia</option>
 									<option value="NU" <%=hctype.equals("NU")?" selected":""%>>NU-Nunavut</option>
@@ -2702,7 +2708,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 								</td>
 							</tr>
 							<!-- Family Doctor -->
-							<% if (oscarProps.getProperty("demographic_family_doctor").equals("true")) { %>
+							<% if (Boolean.parseBoolean(oscarProps.getProperty("demographic_family_doctor"))) { %>
 							<tr>
 								<td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.familyDoctor" />: </b></td>
 								<td align="left">

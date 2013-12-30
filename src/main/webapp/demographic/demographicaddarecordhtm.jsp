@@ -913,7 +913,11 @@ function autoFillHin(){
 		<option value="BC"<%=HCType.equals("BC")?" selected":""%>>BC-British Columbia</option>
 		<option value="MB"<%=HCType.equals("MB")?" selected":""%>>MB-Manitoba</option>
 		<option value="NB"<%=HCType.equals("NB")?" selected":""%>>NB-New Brunswick</option>
+		<% if ( oscarProps.getProperty("billregion") != null &&  oscarProps.getProperty("billregion").equals("BC")) {%>
+		<option value="NF"<%=HCType.equals("NF")?" selected":""%>>NF-Newfoundland & Labrador</option>
+		<% } else { %>
 		<option value="NL"<%=HCType.equals("NL")?" selected":""%>>NL-Newfoundland & Labrador</option>
+		<% } %>
 		<option value="NT"<%=HCType.equals("NT")?" selected":""%>>NT-Northwest Territory</option>
 		<option value="NS"<%=HCType.equals("NS")?" selected":""%>>NS-Nova Scotia</option>
 		<option value="NU"<%=HCType.equals("NU")?" selected":""%>>NU-Nunavut</option>
@@ -1129,6 +1133,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				</td>
 			</tr>
 			<!-- Family Doctor -->
+            <% if (Boolean.parseBoolean(oscarProps.getProperty("demographic_family_doctor"))) { %>
 			<tr>
 
 				<td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.familyDoctor" />: </b></td>
@@ -1158,6 +1163,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
 					<input type="hidden" name="family_doctor_name" value=""/>
 				</td>
 			</tr>
+			<% } %>
 			<tr valign="top">
 				<td align="right" nowrap><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPCNRosterStatus" />: </b></td>

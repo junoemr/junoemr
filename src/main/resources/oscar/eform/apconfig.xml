@@ -699,6 +699,92 @@
 		</ap-sql>
 		<ap-output>${referralNo}</ap-output>
 	</databaseap>
-</eformap-config>
+	<!-- family doctor --> 
+    <databaseap>
+        <ap-name>family_doctor_name</ap-name>
+		<ap-sql>
+			SELECT ps.lName, ps.fName
+				  FROM (
+				  SELECT ExtractValue(family_doctor_2, '//fdname') AS original_name,
+				  ExtractValue(family_doctor_2, '//fd') AS doctor_no,
+				  IF(ExtractValue(family_doctor_2, '//rd') regexp '^Dr.', TRIM(substr(ExtractValue(family_doctor_2, '//rd') from 4)), ExtractValue(family_doctor_2, '//fdname') ) as full_name
+				  FROM demographic
+				  WHERE demographic_no = ${demographic}
+				  ) as q
+			LEFT JOIN professionalSpecialists ps ON if(q.doctor_no is not null and q.doctor_no > 0, q.doctor_no = ps.referralNo, coalesce(LCASE(substr(ps.fName,1,1)) = LCASE(substr(if(locate(' ', q.full_name) != 0, SUBSTRING_INDEX(q.full_name, ' ', 1), null),1,1)), true) and LCASE(ps.lName) = LCASE(substring_index(q.full_name, ' ', -1))) GROUP BY 1 HAVING COUNT(*) = 1
+		</ap-sql>
+        <ap-output>${lName}, ${fName}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>family_doctor_last_name</ap-name>
+		<ap-sql>
+			SELECT ps.lName
+				  FROM (
+				  SELECT ExtractValue(family_doctor_2, '//fdname') AS original_name,
+				  ExtractValue(family_doctor_2, '//fd') AS doctor_no,
+				  IF(ExtractValue(family_doctor_2, '//rd') regexp '^Dr.', TRIM(substr(ExtractValue(family_doctor_2, '//rd') from 4)), ExtractValue(family_doctor_2, '//fdname') ) as full_name
+				  FROM demographic
+				  WHERE demographic_no = ${demographic}
+				  ) as q
+			LEFT JOIN professionalSpecialists ps ON if(q.doctor_no is not null and q.doctor_no > 0, q.doctor_no = ps.referralNo, coalesce(LCASE(substr(ps.fName,1,1)) = LCASE(substr(if(locate(' ', q.full_name) != 0, SUBSTRING_INDEX(q.full_name, ' ', 1), null),1,1)), true) and LCASE(ps.lName) = LCASE(substring_index(q.full_name, ' ', -1))) GROUP BY 1 HAVING COUNT(*) = 1
+		</ap-sql>
+        <ap-output>${lName}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>family_doctor_address</ap-name>
+		<ap-sql>                                                                
+			SELECT ps.address AS raddress FROM 
+			(
+				  SELECT ExtractValue(family_doctor_2, '//fdname') AS original_name,
+				  ExtractValue(family_doctor_2, '//fd') AS doctor_no,
+				  IF(ExtractValue(family_doctor_2, '//rd') regexp '^Dr.', TRIM(substr(ExtractValue(family_doctor_2, '//rd') from 4)), ExtractValue(family_doctor_2, '//fdname') ) as full_name
+				  FROM demographic
+				  WHERE demographic_no = ${demographic}
+			) as q LEFT JOIN professionalSpecialists ps ON if(q.doctor_no IS NOT NULL AND q.doctor_no > 0, q.doctor_no = ps.referralNo, COALESCE(LCASE(substr(ps.fName,1,1)) = LCASE(SUBSTR(if(locate(' ', q.full_name) != 0, SUBSTRING_INDEX(q.full_name, ' ', 1), null),1,1)), true) and LCASE(ps.lName) = LCASE(substring_index(q.full_name, ' ', -1))) GROUP BY 1 HAVING COUNT(*) = 1
+		</ap-sql>
+                <ap-output>${raddress}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>family_doctor_phone</ap-name>
+		<ap-sql>                                                                
+			SELECT ps.phone FROM (                                                              
+				  SELECT ExtractValue(family_doctor_2, '//fdname') AS original_name,
+				  ExtractValue(family_doctor_2, '//fd') AS doctor_no,
+				  IF(ExtractValue(family_doctor_2, '//rd') regexp '^Dr.', TRIM(substr(ExtractValue(family_doctor_2, '//rd') from 4)), ExtractValue(family_doctor_2, '//fdname') ) as full_name
+				  FROM demographic
+				  WHERE demographic_no = ${demographic}
+			) as q LEFT JOIN professionalSpecialists ps ON if(q.doctor_no IS NOT NULL and q.doctor_no > 0, q.doctor_no = ps.referralNo, COALESCE(LCASE(SUBSTR(ps.fName,1,1)) = LCASE(SUBSTR(if(locate(' ', q.full_name) != 0, SUBSTRING_INDEX(q.full_name, ' ', 1), null),1,1)), true) and LCASE(ps.lName) = LCASE(substring_index(q.full_name, ' ', -1))) GROUP BY 1 HAVING COUNT(*) = 1
+		</ap-sql>
+        <ap-output>${phone}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>family_doctor_fax</ap-name>
+		<ap-sql>                                                                
+			SELECT ps.fax FROM (
+				  SELECT ExtractValue(family_doctor_2, '//fdname') AS original_name,
+				  ExtractValue(family_doctor_2, '//fd') AS doctor_no,
+				  IF(ExtractValue(family_doctor_2, '//rd') regexp '^Dr.', TRIM(substr(ExtractValue(family_doctor_2, '//rd') from 4)), ExtractValue(family_doctor_2, '//fdname') ) as full_name
+				  FROM demographic
+				  WHERE demographic_no = ${demographic}
+            ) as q LEFT JOIN professionalSpecialists ps ON if(q.doctor_no IS NOT NULL and q.doctor_no > 0, q.doctor_no = ps.referralNo, COALESCE(LCASE(SUBSTR(ps.fName,1,1)) = LCASE(SUBSTR(if(locate(' ', q.full_name) != 0, SUBSTRING_INDEX(q.full_name, ' ', 1), null),1,1)), true) and LCASE(ps.lName) = LCASE(substring_index(q.full_name, ' ', -1))) GROUP BY 1 HAVING COUNT(*) = 1
+		</ap-sql>
+        <ap-output>${fax}</ap-output>
+    </databaseap>
+    <databaseap>
+>>>>>>> Updated the eform queries to work with billingreferral and made it so
+		<ap-name>family_doctor_no</ap-name>
+		<ap-sql>
+			SELECT ps.referralNo FROM (        
+				  SELECT ExtractValue(family_doctor_2, '//fdname') AS original_name,
+				  ExtractValue(family_doctor_2, '//fd') AS doctor_no,
+				  IF(ExtractValue(family_doctor_2, '//rd') regexp '^Dr.', TRIM(substr(ExtractValue(family_doctor_2, '//rd') from 4)), ExtractValue(family_doctor_2, '//fdname') ) as full_name
+				  FROM demographic
+				  WHERE demographic_no = ${demographic}
+            ) as q LEFT JOIN professionalSpecialists ps ON if(q.doctor_no IS NOT NULL and q.doctor_no > 0, q.doctor_no = ps.referralNo, COALESCE(LCASE(SUBSTR(ps.fName,1,1)) = LCASE(SUBSTR(if(locate(' ', q.full_name) != 0, SUBSTRING_INDEX(q.full_name, ' ', 1), null),1,1)), true) and LCASE(ps.lName) = LCASE(substring_index(q.full_name, ' ', -1))) GROUP BY 1 HAVING COUNT(*) = 1
+		</ap-sql>
+		<ap-output>${referralNo}</ap-output>
+	</databaseap>
+	<!-- end family doctor --> 
 
 </eformap-config>
+
