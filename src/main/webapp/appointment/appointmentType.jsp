@@ -17,7 +17,7 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 --%>
-<%@ page import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*,java.net.*, oscar.appt.*, org.oscarehr.common.dao.AppointmentTypeDao, org.oscarehr.common.model.AppointmentType, org.oscarehr.util.SpringUtils" %>
+<%@ page import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*,java.net.*, oscar.appt.*, org.oscarehr.common.dao.AppointmentTypeDao, org.oscarehr.common.model.AppointmentType, org.oscarehr.util.SpringUtils, org.apache.commons.lang.StringEscapeUtils" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%
 	AppointmentTypeDao appDao = (AppointmentTypeDao) SpringUtils.getBean("appointmentTypeDao");
@@ -35,11 +35,11 @@ var resources = '';
 var names = '';
 <%   for(int j = 0;j < types.size(); j++) { %>
 		dur = dur + '<%= types.get(j).getDuration() %>'+',';
-		reason = reason + '<%= types.get(j).getReason() %>'+',';
-		loc = loc + '<%= types.get(j).getLocation() %>'+',';
-		notes = notes + '<%= types.get(j).getNotes() %>'+',';
-		resources = resources + '<%= types.get(j).getResources() %>'+',';
-		names = names + '<%= types.get(j).getName() %>'+',';
+		reason = reason + '<%= StringEscapeUtils.escapeJavaScript(types.get(j).getReason()) %>'+',';
+		loc = loc + '<%= StringEscapeUtils.escapeJavaScript(types.get(j).getLocation()) %>'+',';
+		notes = notes + '<%= StringEscapeUtils.escapeJavaScript(types.get(j).getNotes()) %>'+',';
+		resources = resources + '<%= StringEscapeUtils.escapeJavaScript(types.get(j).getResources()) %>'+',';
+		names = names + '<%= StringEscapeUtils.escapeJavaScript(types.get(j).getName()) %>'+',';
 <%   } %>
 	var durArray = dur.split(",");
 	var reasonArray = reason.split(",");
