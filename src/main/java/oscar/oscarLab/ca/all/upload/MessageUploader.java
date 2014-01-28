@@ -400,7 +400,7 @@ public final class MessageUploader {
 		try {
 
 			Boolean truncated_hin = false;
-			if (hin != null) {
+			if ( hin != null && !hin.trim().equals("") ) {
 				hinMod = new String(hin);
 				if (hinMod.length() == 12) {
 					truncated_hin = true;
