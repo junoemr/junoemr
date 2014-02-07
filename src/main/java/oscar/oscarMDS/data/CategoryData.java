@@ -150,12 +150,16 @@ public class CategoryData {
             totalDocs += unmatchedDocs;
             totalLabs += unmatchedLabs;
         }
+        
+        MiscUtils.getLogger().debug("unmatched docs:"+unmatchedDocs);
+        MiscUtils.getLogger().debug("unmatched labs:"+unmatchedLabs);
 
         // The total overall items is the sum of docs and labs.
         totalNumDocs = totalDocs + totalLabs;
 
         // Retrieving abnormal labs.
         abnormalCount = getAbnormalCount(true);
+        MiscUtils.getLogger().debug("abnormal count:"+abnormalCount);
 
         // Cheaper to subtract abnormal from total to find the number of normal docs.
         normalCount = totalNumDocs - abnormalCount;
@@ -166,7 +170,7 @@ public class CategoryData {
 		String sql;
 		
 		sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
-			+ " FROM patientLabRouting plr2, ";
+			+ " FROM (SELECT plr2.lab_no as plab_no2, plr.lab_no as plab_no, hl7.lab_no FROM patientLabRouting plr2, ";
 		
 		if(this.neverAcknowledgedItems && "N".equals(status)){
 			sql = sql + "(" +
@@ -180,7 +184,7 @@ public class CategoryData {
 			sql = sql + "providerLabRouting plr, ";
 		}
 		
-		sql = sql + "hl7TextInfo hl7  "
+		sql = sql + " hl7TextInfo hl7 "
 			+ " WHERE plr.lab_no = plr2.lab_no "
 			+ " AND hl7.lab_no = plr2.lab_no "
 			+ (providerSearch ? " AND plr.provider_no = ? " : "")
@@ -190,7 +194,8 @@ public class CategoryData {
 			+ "   AND plr2.lab_type = 'HL7'"
 			+ "   AND plr2.demographic_no = '0' "
 			+ (abnormalsOnly ? " AND hl7.result_status = 'A' " : "")
-			+ (endDateStr != null && !endDateStr.equals("") ? " AND DATE(hl7.obr_date) < ? " : "");
+			+ (endDateStr != null && !endDateStr.equals("") ? " AND DATE(hl7.obr_date) < ? " : "")
+			+ "   GROUP BY hl7.accessionNum) counttable";
 		    
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
@@ -224,8 +229,9 @@ public class CategoryData {
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps;
 		if (patientSearch) {
-        	sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
-        		+ " FROM patientLabRouting cd, demographic d, ";
+        	sql = " SELECT HIGH_PRIORITY COUNT(1) as count" 
+        		+ " FROM (SELECT plr.lab_no as plrlab_no, info.lab_no, doc.document_no "
+        		+ " 	FROM patientLabRouting cd, demographic d, ";
 
         	if(this.neverAcknowledgedItems && "N".equals(this.status)){
         		sql = sql +"(" +
@@ -239,7 +245,8 @@ public class CategoryData {
         	}else{
         		sql = sql +"providerLabRouting plr, ";
         	}
-        	sql = sql +"hl7TextInfo info, "
+        	
+        	sql = sql + " hl7TextInfo info, " 
         		+ " document doc "
         		+ " WHERE d.last_name like ? "
         		+ " 	AND d.first_name like ? "
@@ -253,9 +260,12 @@ public class CategoryData {
         		+ " 	AND cd.demographic_no = d.demographic_no "
         		+ "     AND doc.document_no = plr.lab_no"
         		+ " 	AND info.lab_no = plr.lab_no "
-        		+ " 	AND result_status "+(isAbnormal ? "" : "!")+"= 'A' "
-        		+ " 	AND doc.doc_result_status "+(isAbnormal ? "" : "!")+"= 'A' "
-        		+ (endDateStr != null && !endDateStr.equals("")?"     AND DATE(info.obr_date) < ? " : "");
+        		+ " 	AND " 
+        		+ "			(result_status "+(isAbnormal ? "" : "!")+"= 'A' "
+        		+ " 	     OR doc.doc_result_status "+(isAbnormal ? "" : "!")+"= 'A' " 
+        		+"           ) "
+        		+ (endDateStr != null && !endDateStr.equals("")?"     AND DATE(info.obr_date) < ? " : "")
+        		+ " GROUP BY info.accessionNum) counttable";
         	ps = c.prepareStatement(sql);
         	ps.setString(1, "%"+patientLastName+"%");
         	ps.setString(2, "%"+patientFirstName+"%");
@@ -273,7 +283,7 @@ public class CategoryData {
         }
         else if (providerSearch || !"".equals(status)){ // providerSearch
         	sql = "SELECT HIGH_PRIORITY COUNT(1) as count "
-				+ " FROM ";
+				+ " FROM (SELECT plr.lab_no as plrlab_no, info.lab_no, doc.document_no FROM ";
         	if(this.neverAcknowledgedItems && "N".equals(this.status)){
         		sql = sql + "(" +
 					    "    SELECT * FROM (" +
@@ -285,15 +295,17 @@ public class CategoryData {
         	}else{
         		sql = sql + "providerLabRouting plr, ";
         	}
-			sql = sql +"hl7TextInfo info, "
+        	
+			sql = sql + "hl7TextInfo info, " 
 				+ " document doc "
 				+ " WHERE plr.status like ? "
 				+ (providerSearch ? " AND plr.provider_no = ? " : " ")
 				+ " AND plr.lab_type = 'HL7'  "
 				+ " AND info.lab_no = plr.lab_no"
 				+ " AND doc.document_no = plr.lab_no"
-				+ " AND result_status "+(isAbnormal ? "" : "!")+"= 'A' "
-				+ " AND doc.doc_result_status "+(isAbnormal ? "" : "!")+"= 'A' ";
+				+ " AND (info.result_status "+(isAbnormal ? "" : "!")+"= 'A' "
+				+ " OR doc.doc_result_status "+(isAbnormal ? "" : "!")+"= 'A') "
+				+ " GROUP BY info.accessionNum) counttable";
         	ps = c.prepareStatement(sql);
         	ps.setString(1, "%"+status+"%");
         	if(providerSearch){
@@ -302,11 +314,13 @@ public class CategoryData {
         }
         else {
         	sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
-            	+ " FROM hl7TextInfo info, "
+            	+ " FROM (SELECT info.lab_no, doc.document_no FROM " 
+				+ " hl7TextInfo info, " 
             	+ " document doc "
-            	+ " WHERE result_status "+(isAbnormal ? "" : "!")+"= 'A' "
-            	+ " AND doc.doc_result_status "+(isAbnormal ? "" : "!")+"= 'A' "
-        	    + " AND doc.document_no = info.lab_no";
+            	+ " WHERE (info.result_status "+(isAbnormal ? "" : "!")+"= 'A' "
+            	+ " OR doc.doc_result_status "+(isAbnormal ? "" : "!")+"= 'A') "
+        	    + " AND doc.document_no = info.lab_no"
+        	    + " GROUP BY info.accessionNum) counttable";
         	ps = c.prepareStatement(sql);
         }
 		
@@ -383,6 +397,10 @@ public class CategoryData {
 
 	public int getLabCountForPatientSearch() throws SQLException {
 		PatientInfo info;
+		;
+		boolean qp_first_name = false;
+		boolean qp_last_name = false;
+		boolean qp_hin = false;
 		/*
 		String sql = " SELECT HIGH_PRIORITY d.demographic_no, d.last_name, d.first_name, COUNT(1) as count "
         	+ " FROM patientLabRouting cd,  demographic d, providerLabRouting plr, hl7TextInfo hl7, provider p "
@@ -418,14 +436,28 @@ public class CategoryData {
 			sql = sql + "     providerLabRouting plr,";
 		}
 		
-		sql = sql + "     hl7TextInfo hl7,"
+		
+		sql = sql + " hl7TextInfo hl7, " 
 				+ "     demographic d"
 				+ (checkRequestingProvider ? ", provider p " : "")
-				+ "   WHERE "
-				+ "     d.last_name like ?"
-				+ " 	AND d.first_name like ? "
-	        	+ " 	AND d.hin like ? "
-	        	+ " 	AND cd.demographic_no = d.demographic_no "
+				+ "   WHERE true";
+		
+		if (!"".equals(patientFirstName)) {
+			sql = sql + "AND (d.first_name LIKE ?) ";
+			qp_first_name = true;
+		}
+		
+		if (!"".equals(patientLastName)) {
+			sql = sql + "AND (d.last_name LIKE ?) ";
+			qp_last_name = true;
+		}
+		
+		if (!"".equals(patientHealthNumber)) {
+			sql = sql + "AND (d.hin LIKE ?) ";
+			qp_hin = true;
+		}
+		
+		sql = sql + " 	AND cd.demographic_no = d.demographic_no "
 	        	+ "     AND hl7.lab_no = plr.lab_no "
 	        	+ " 	AND cd.lab_no = plr.lab_no "
 	        	+ " 	AND plr.lab_type = 'HL7' "
@@ -441,11 +473,26 @@ public class CategoryData {
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
-		int q_number = 5;
-		ps.setString(1, "%"+patientLastName+"%");
-		ps.setString(2, "%"+patientFirstName+"%");
-		ps.setString(3, "%"+patientHealthNumber+"%");
-		ps.setString(4, "%"+status+"%");
+		int q_number = 1;
+		
+		if (qp_first_name) { 
+			ps.setString(q_number, "%" + patientFirstName + "%"); 
+			q_number++;
+		}
+		
+		if (qp_last_name) { 
+			ps.setString(q_number++, "%" + patientLastName + "%");
+			q_number++;
+		}
+		
+		if (qp_hin) { 
+			ps.setString(q_number++, "%" + patientHealthNumber + "%"); 
+			q_number++;
+		}
+		
+		ps.setString(q_number, "%"+status+"%");
+		q_number++;
+						
 		if( providerSearch ){
 			ps.setString(q_number, searchProviderNo);
 			q_number++;
@@ -454,6 +501,7 @@ public class CategoryData {
 			ps.setString(q_number, endDateStr);
 			q_number++;
 		}
+				
 		ResultSet rs= ps.executeQuery();
         int count = 0;
         while(rs.next()){

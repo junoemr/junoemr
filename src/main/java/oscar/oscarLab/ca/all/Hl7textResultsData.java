@@ -659,7 +659,7 @@ public class Hl7textResultsData {
 			Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 			PreparedStatement ps;
 
-			sql = "SELECT  hl7.label, "
+			sql = "SELECT * FROM (SELECT  hl7.label, "
 				+ "		hl7.lab_no, "
 				+ "		hl7.sex, "
 				+ "		hl7.health_no, "
@@ -716,13 +716,7 @@ public class Hl7textResultsData {
 				sql = sql + "AND (proLR.lab_type = 'HL7') ";
 			}
 
-			if (isAbnormal != null) {
-				if (isAbnormal) {
-					sql = sql + "AND (hl7.result_status = 'A') ";
-				} else {
-					sql = sql + "AND (hl7.result_status IS NULL OR hl7.result_status != 'A') ";
-				}
-			}
+			
 
 			if (!"".equals(patientFirstName)) {
 				sql = sql + "AND (d.first_name LIKE ?) ";
@@ -747,6 +741,19 @@ public class Hl7textResultsData {
 			} else if (demographicNo != null && !"".equals(demographicNo)) {
 				sql = sql + "AND (d.demographic_no = ?) ";
 				qp_demographic_no = true;
+			}
+			
+			sql = sql + " ORDER BY hl7.obr_date desc) ordered_labs ";
+			sql = sql + " GROUP BY accessionNum ";
+			
+			// Some labs sometimes become normal or abnormal. Let's just use the last
+			// lab result in checking if it's normal or abnormal
+			if (isAbnormal != null) {
+				if (isAbnormal) {
+					sql = sql + "HAVING (ordered_labs.result_status = 'A') ";
+				} else {
+					sql = sql + "HAVING (ordered_labs.result_status IS NULL OR ordered_labs.result_status != 'A') ";
+				}
 			}
 
 			if (isPaged) {
