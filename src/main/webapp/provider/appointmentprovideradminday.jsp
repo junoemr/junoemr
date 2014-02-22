@@ -1614,6 +1614,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
                           ver = "";
                   roster = "";
                       List<Map<String,Object>> demoList = oscarSuperManager.find("providerDao", "search_demograph", new Object[] {demographic_no});
+                  String demo_alert = "";
                   for (Map demo : demoList) {
                     ver = (String)demo.get("ver");
                     roster = (String)demo.get("roster_status");
@@ -1628,6 +1629,8 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
                     dob = String.valueOf(demo.get("date_of_birth"));
                     if(dob.length()>0 && !dob.equals("null"))
                     	intDob = Integer.parseInt(dob);
+                    
+                    demo_alert = String.valueOf(!(null == demo.get("alert") || "null".equals(demo.get("alert")) )? demo.get("alert"): "").trim();
 
 
                     demBday = mob + "-" + dob;
@@ -1685,6 +1688,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 			 	<span title="<%= sitename %>" style="background-color:<%=siteBgColor.get(sitename)%>;">&nbsp;</span>|
 			 <%} %>
 
+            
             <%
 			    if (as.getNextStatus() != null && !as.getNextStatus().equals("")) {
             %>
@@ -1704,10 +1708,12 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
             	<img src="../images/warning-icon.png" border="0" width="14" height="14" title="Critical Appointment"/>
             <% } %>
 <%--|--%>
+            
         <%
         			if(demographic_no==0) {
         				//MARC
         %>
+            
         	<!--  caisi  -->
         	<% if (tickler_no.compareTo("") != 0) {%>
 	        	<caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
@@ -1754,7 +1760,9 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
     						<a href="#" onClick="popupPage(700,1024, '../Tickler.do?method=filter&filter.client=<%=demographic_no %>');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: <%=UtilMisc.htmlEscape(tickler_note)%>"><font color="red">!</font></a>
     					</caisi:isModuleLoad>
 					<%} %>
-
+<% if(OscarProperties.getInstance().getProperty("show_demographic_alert_flag","false").equals("true") && !demo_alert.equals("")){ %>
+    <img height="14px" src="../images/icons/071.png" alt="<%=demo_alert%>" title="<%=demo_alert%>" />
+<% } %>
 <!-- doctor code block 1 -->
 <% if(bShowDocLink) { %>
 <!-- security:oscarSec roleName="<%--=roleName$--%>" objectName="_appointment.doctorLink" rights="r" -->

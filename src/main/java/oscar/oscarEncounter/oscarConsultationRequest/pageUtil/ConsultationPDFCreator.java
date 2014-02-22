@@ -414,7 +414,7 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 
 		ProviderDao proDAO = (ProviderDao) SpringUtils.getBean("providerDao");
 		org.oscarehr.common.model.Provider pro = proDAO.getProvider(reqFrm.providerNo);
-		String billingNo = pro.getBillingNo();
+		String billingNo = pro.getOhipNo();
 		
 		DemographicDao demoDAO = (DemographicDao) SpringUtils.getBean("demographicDao");
 		Demographic demo = demoDAO.getDemographic(reqFrm.demoNo);
@@ -422,7 +422,7 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 		String famDocBillingNo = "";
 		if(demo.getProviderNo()!=null && !demo.getProviderNo().equals("")) {
 			pro = proDAO.getProvider(demo.getProviderNo());
-			famDocBillingNo = pro.getBillingNo();
+			famDocBillingNo = pro.getOhipNo();
 		}
 		infoTable.addCell(setFooterCell(cell, getResource("msgAssociated2"), reqFrm.getProviderName(reqFrm.providerNo) + ((getlen(billingNo) > 0) ? " (" + billingNo + ")" : "")));
 		infoTable.addCell(setFooterCell(cell, getResource("msgFamilyDoc2"), reqFrm.getFamilyDoctor() + ((getlen(famDocBillingNo) > 0) ? " (" + famDocBillingNo + ")" : "")));
