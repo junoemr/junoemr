@@ -769,6 +769,16 @@ function getParameter(paramName) {
 .reason {
     display: <%=showPersonal ? "inline" : "none"%>;
 }
+<% if (OscarProperties.getInstance().getBooleanProperty("navigation_always_on_top", "true")) { %>
+
+#firstTable{
+    position: fixed;
+    background-color: #EEEEFF;
+}
+form[name=appointmentForm]{
+    padding-top: 21px;
+}
+<% } %>
 </style>
 
 <% if (OscarProperties.getInstance().getBooleanProperty("indivica_hc_read_enabled", "true")) { %>
