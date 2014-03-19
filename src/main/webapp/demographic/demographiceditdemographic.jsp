@@ -1615,6 +1615,12 @@ if ( PatStat.equals(Dead) ) {%>
                                                             key="demographic.demographiceditdemographic.formChartNo" />:</span>
                                                         <span class="info"><%=demographic.getChartNo()%></span>
 							</li>
+							<% if (Boolean.parseBoolean(oscarProps.getProperty("demographic_scanned_chart"))) { %>
+							<li><span class="label"><bean:message
+                                                            key="demographic.demographiceditdemographic.scannedChart" />:</span>
+                                                        <span class="info"><%=demographic.getScannedChart().equals("1")?"YES":"NO"%></span>
+                            </li>
+							<% } %>
 							<% if (oscarProps.isPropertyActive("meditech_id")) { %>
                                                     <li><span class="label">Meditech ID:</span>
                                                         <span class="info"><%=OtherIdManager.getDemoOtherId(demographic_no, "meditech_id")%></span>
@@ -2890,12 +2896,17 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 								</td>
                                                         </tr>
                                                         <tr>
-                                                                <td>&nbsp;</td>
 								<td align="right"><b><bean:message
 									key="demographic.demographiceditdemographic.formChartNo" />:</b></td>
 								<td align="left"><input type="text" name="chart_no"
 									size="30" value="<%=demographic.getChartNo()%>" <%=getDisabled("chart_no")%>>
 								</td>
+								<!-- Scanned Chart -->
+					            <% if (Boolean.parseBoolean(oscarProps.getProperty("demographic_scanned_chart"))) { %>
+					                <td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.scannedChart"/>:</b></td>
+					                <td align="left"><input type="checkbox" name="scanned_chart" value="scanned" <%=demographic.getScannedChart().equals("1")?"checked":""%>/></td> 
+					            </tr>
+					            <% } %>
 							</tr>
 <% if (oscarProps.isPropertyActive("meditech_id")) { %>
                                                         <tr>

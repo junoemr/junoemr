@@ -31,8 +31,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -117,6 +117,8 @@ public class Demographic implements Serializable {
 
     private String countryOfOrigin;
     private String newsletter;
+    
+    private String scannedChart;
     
 
         public String getTitle() {
@@ -1130,6 +1132,14 @@ public class Demographic implements Serializable {
 
 	public void setNewsletter(String newsletter) {
     	this.newsletter = newsletter;
+    }
+
+	public String getScannedChart() {
+	    return scannedChart;
+    }
+
+	public void setScannedChart(String scannedChart) {
+	    this.scannedChart = scannedChart;
     }
 
 

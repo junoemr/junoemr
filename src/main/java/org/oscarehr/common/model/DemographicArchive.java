@@ -147,6 +147,8 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	@Column(name = "lastUpdateDate")
 	@Temporal(TemporalType.DATE)
 	private Date lastUpdateDate = null;
+	@Column(name = "scanned_chart")
+	private String scannedChart = null;
 
 
 	public DemographicArchive() {}
@@ -491,4 +493,12 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		public void setId(Long id) {
 		    this.id = id;
 		}
+
+		public String getScannedChart() {
+	        return scannedChart;
+        }
+
+		public void setScannedChart(String scannedChart) {
+	        this.scannedChart = scannedChart;
+        }
 }

@@ -80,6 +80,7 @@
 
 		<property column="newsletter" name="newsletter" type="string" />
 		<property column="country_of_origin" name="countryOfOrigin" type="string" />
+		<property column="scanned_chart" length="1" name="ScannedChart" type="string" />
 
 
 	</class>

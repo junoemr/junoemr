@@ -1624,10 +1624,12 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
                           ver = "";
                   roster = "";
                       List<Map<String,Object>> demoList = oscarSuperManager.find("providerDao", "search_demograph", new Object[] {demographic_no});
-                  String demo_alert = "";
+                  String demo_alert = "", demo_scanned_chart = "";
                   for (Map demo : demoList) {
                     ver = (String)demo.get("ver");
                     roster = (String)demo.get("roster_status");
+                    
+                    demo_scanned_chart = (String)demo.get("scanned_chart");
 
                     int intMob = 0;
                     int intDob = 0;
@@ -1772,6 +1774,9 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 					<%} %>
 <% if(OscarProperties.getInstance().getProperty("show_demographic_alert_flag","false").equals("true") && !demo_alert.equals("")){ %>
     <img height="14px" src="../images/icons/071.png" alt="<%=demo_alert%>" title="<%=demo_alert%>" />
+<% } %>
+<% if(OscarProperties.getInstance().getProperty("show_demographic_not_scanned_flag","false").equals("true") && demo_scanned_chart.equals("0")){ %>
+    <img height="14px" src="../images/icons/072.png" alt="Patient's chart has not yet been scanned" title="Patient's chart has not yet been scanned " />
 <% } %>
 <!-- doctor code block 1 -->
 <% if(bShowDocLink) { %>

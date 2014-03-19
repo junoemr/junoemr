@@ -108,6 +108,7 @@
   demographic.setRosterTerminationReason(request.getParameter("roster_termination_reason"));
   demographic.setLastUpdateUser((String)session.getAttribute("user"));
   demographic.setLastUpdateDate(new java.util.Date());
+  demographic.setScannedChart((request.getParameter("scanned_chart")!= null && request.getParameter("scanned_chart").equals("scanned"))?"1":"0");
 
   //if action is good, then give me the result
     String[] param =new String[31];

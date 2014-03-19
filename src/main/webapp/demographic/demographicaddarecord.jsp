@@ -177,6 +177,7 @@
 		demographic.setLastUpdateUser(curUser_no);
 		demographic.setLastUpdateDate(new java.util.Date());
 		demographic.setPatientStatusDate(new java.util.Date());
+		demographic.setScannedChart((request.getParameter("scanned_chart")!= null && request.getParameter("scanned_chart").equals("scanned"))?"1":"0");
 
 		List<Demographic> duplicateList = demographicDao.getDemographicWithLastFirstDOBExact(demographic.getLastName(),demographic.getFirstName(),
 				demographic.getYearOfBirth(),demographic.getMonthOfBirth(),demographic.getDateOfBirth());

@@ -1213,6 +1213,13 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				<td align="left"><input type="text" name="chart_no" value="">
 				</td>
 			</tr>
+			<!-- Scanned Chart -->
+            <% if (Boolean.parseBoolean(oscarProps.getProperty("demographic_scanned_chart"))) { %>
+            <tr valign="top">
+                <td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.scannedChart"/>:</b></td>
+                <td align="left"><input type="checkbox" name="scanned_chart" value="scanned"/></td> 
+            </tr>
+            <% } %>
 
 			<%if (oscarProps.getProperty("EXTRA_DEMO_FIELDS") !=null){
       String fieldJSP = oscarProps.getProperty("EXTRA_DEMO_FIELDS");
