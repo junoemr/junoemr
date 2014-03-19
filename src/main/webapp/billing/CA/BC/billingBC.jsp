@@ -41,7 +41,7 @@
 <%@page import="org.springframework.web.context.WebApplicationContext"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="oscar.oscarDemographic.data.*"%>
-<%@page import="java.text.*, java.util.*, oscar.oscarBilling.ca.bc.data.*,oscar.oscarBilling.ca.bc.pageUtil.*,oscar.*,oscar.entities.*"%>
+<%@page import="java.text.*, java.util.*, oscar.oscarBilling.ca.bc.data.*,oscar.oscarBilling.ca.bc.pageUtil.*,oscar.*,oscar.entities.*, org.apache.commons.lang.StringEscapeUtils"%>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -705,7 +705,7 @@ function checkifSet(icd9,feeitem,extrafeeitem){
   %>
     <tr class="<%=rowClass%>">
       <td colspan="2">
-        <a href="../../../billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=<%=billformlist[i].getFormCode()%>&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=bean.getPatientName()%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=<%=bean.getBillForm()%>" onClick="showHideLayers('Layer1','','hide')"><%=billformlist[i].getDescription()%>        </a>
+        <a href="../../../billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=<%=billformlist[i].getFormCode()%>&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=StringEscapeUtils.escapeHtml(bean.getPatientName())%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=<%=bean.getBillForm()%>" onClick="showHideLayers('Layer1','','hide')"><%=billformlist[i].getDescription()%>        </a>
       </td>
     </tr>
   <%}  %>
