@@ -310,6 +310,9 @@ if(prop!=null && prop.getValue().equalsIgnoreCase("yes")){
                                             <input type="hidden" name="sigDoctorName" value="<%= StringEscapeUtils.escapeHtml(doctorName) %>" /> <!--img src="img/rx.gif" border="0"-->
                                             </td>
                                             <td valign=top height="100px" id="clinicAddress"><b><%=doctorName%></b><br>
+                                            <oscar:oscarPropertiesCheck property="RX_MSP_BILLNO" value="true">
+                                                <%=provider.getOhipNo()%> <%=provider.getBillingNo()%><br/>
+                                            </oscar:oscarPropertiesCheck>
                                             <c:choose>
                                                     <c:when test="${empty infirmaryView_programAddress}">
                                                             <%= provider.getClinicName().replaceAll("\\(\\d{6}\\)","") %><br>

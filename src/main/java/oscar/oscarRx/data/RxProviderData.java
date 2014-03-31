@@ -57,7 +57,7 @@ public class RxProviderData {
     }
     
     public Provider convertProvider(org.oscarehr.common.model.Provider p) {
-    	String surname=null, firstName=null,  clinicName=null, clinicAddress=null, clinicCity=null, clinicPostal=null, clinicPhone=null, clinicFax=null, clinicProvince=null, practitionerNo=null;
+    	String surname=null, firstName=null,  clinicName=null, clinicAddress=null, clinicCity=null, clinicPostal=null, clinicPhone=null, clinicFax=null, clinicProvince=null, practitionerNo=null, ohip_no=null, billing_no=null;
     	boolean useFullAddress=true;
         //Get Provider from database
 
@@ -76,6 +76,8 @@ public class RxProviderData {
         	surname = p.getLastName();
         	firstName = p.getFirstName();
         	practitionerNo = p.getPractitionerNo();
+        	ohip_no = p.getOhipNo();
+        	billing_no = p.getBillingNo();
         	if(firstName.indexOf("Dr.")<0) {
                 firstName = "Dr. " + firstName;
             }
@@ -121,7 +123,7 @@ public class RxProviderData {
 
        
         Provider prov =  new Provider(p.getProviderNo(), surname, firstName, clinicName, clinicAddress,
-                clinicCity, clinicPostal, clinicPhone, clinicFax, clinicProvince, practitionerNo);
+                clinicCity, clinicPostal, clinicPhone, clinicFax, clinicProvince, practitionerNo, ohip_no, billing_no);
         if(!useFullAddress)
         	prov.fullAddress=false;
         
@@ -150,10 +152,13 @@ public class RxProviderData {
         String clinicFax;
         String clinicProvince;
         String practitionerNo;
+        String ohipNo;
+        String billingNo;
 
         public Provider(String providerNo, String surname, String firstName,
         String clinicName, String clinicAddress, String clinicCity,
-        String clinicPostal, String clinicPhone, String clinicFax, String practitionerNo){
+        String clinicPostal, String clinicPhone, String clinicFax, String practitionerNo,
+        String ohipNo, String billingNo){
             this.providerNo = providerNo;
             this.surname = surname;
             this.firstName = firstName;
@@ -163,13 +168,15 @@ public class RxProviderData {
             this.clinicPostal = clinicPostal;
             this.clinicPhone = clinicPhone;
             this.clinicFax = clinicFax;
-	    this.practitionerNo = practitionerNo;
+            this.practitionerNo = practitionerNo;
+            this.ohipNo = ohipNo;
+            this.billingNo = billingNo;
         }
 
         public Provider(String providerNo, String surname, String firstName,
         String clinicName, String clinicAddress, String clinicCity,
-        String clinicPostal, String clinicPhone, String clinicFax,String clinicProvince, String practitionerNo){
-        	this(providerNo,surname,firstName,clinicName,clinicAddress,clinicCity,clinicPostal,clinicPhone,clinicFax,practitionerNo);
+        String clinicPostal, String clinicPhone, String clinicFax,String clinicProvince, String practitionerNo, String ohipNo, String billingNo){
+        	this(providerNo,surname,firstName,clinicName,clinicAddress,clinicCity,clinicPostal,clinicPhone,clinicFax,practitionerNo,ohipNo,billingNo);
             this.clinicProvince = clinicProvince;
         }
 
@@ -223,6 +230,14 @@ public class RxProviderData {
 				return (getClinicAddress() + "  " + getClinicCity() + "   " + getClinicProvince() + "  " + getClinicPostal()).trim();
 			else
 				return getClinicAddress().trim();
+		}
+		
+		public String getOhipNo(){
+			return this.ohipNo;
+		}
+		
+		public String getBillingNo(){
+			return this.billingNo;
 		}
 
     }
