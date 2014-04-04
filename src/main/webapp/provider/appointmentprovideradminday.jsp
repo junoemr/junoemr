@@ -1740,7 +1740,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 <bean:message key="provider.appointmentProviderAdminDay.reason"/>: <%=UtilMisc.htmlEscape(reason)%>
 <bean:message key="provider.appointmentProviderAdminDay.notes"/>: <%=UtilMisc.htmlEscape(notes)%>" >
 
-			.<%=name.toUpperCase()%>
+			.<%=(view==0&&numAvailProvider!=1)?(name.length()>len?name.substring(0,len).toUpperCase():name.toUpperCase()):name.toUpperCase()%>
             </font></a><!--Inline display of reason -->
         <% if(OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true")) { %>
 	      	<br/>
@@ -1820,7 +1820,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 <oscar:oscarPropertiesCheck property="show_hc_eligibility" value="true" defaultVal="false">
 <%=active_medical_coverage?"+&nbsp":""%></oscar:oscarPropertiesCheck>
 
-<%=name%></a>
+<%=(view==0)?(name.length()>len?name.substring(0,len):name):name%></a>
 <%if(OscarProperties.getInstance().getProperty("APPT_THREE_LINE","false").equals("true")){  %>
 	<%if((apptType != null && apptType.length()>0) || (reason != null && reason.length() > 0)) {%>
 	<br/>
