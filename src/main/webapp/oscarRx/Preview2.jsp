@@ -311,7 +311,7 @@ if(prop!=null && prop.getValue().equalsIgnoreCase("yes")){
                                             </td>
                                             <td valign=top height="100px" id="clinicAddress"><b><%=doctorName%></b><br>
                                             <oscar:oscarPropertiesCheck property="RX_MSP_BILLNO" value="true">
-                                                <%=provider.getOhipNo()%> <%=provider.getBillingNo()%><br/>
+                                                <%=provider.getOhipNo()%> <%=provider.getPractitionerNo()%><br/>
                                             </oscar:oscarPropertiesCheck>
                                             <c:choose>
                                                     <c:when test="${empty infirmaryView_programAddress}">
