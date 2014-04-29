@@ -39,6 +39,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
@@ -238,7 +239,21 @@ public final class MessageUploader {
 					orderByLength = true;
 					search = "provider_no";
 				}
-				providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+				
+				String route_labs_to_provider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
+				if(route_labs_to_provider.equals("0")){  
+					// Send to the unclaimed inbox
+					providerRouteReport(String.valueOf(insertID), null, DbConnectionFilter.getThreadLocalDbConnection(), String.valueOf(0), type);
+					
+				} else if(!route_labs_to_provider.equals("")) {
+					// Send to matching provider ohip_no
+					ArrayList<String> providers = new ArrayList<String>(Arrays.asList(route_labs_to_provider.split(",")));
+					providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+				} else {
+					// Normal -- send to docs who requested for the labs OR to the family doctor
+					providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+				}
+				
 			}
 			retVal = h.audit();
 			if(results != null) {
@@ -332,7 +347,9 @@ public final class MessageUploader {
 		
 		if (orderByLength) {
 			sqlOrderByLength = " order by length(first_name)";
-		}		
+		}
+		MiscUtils.getLogger().debug("Sending to: " +docNums);
+		MiscUtils.getLogger().debug("Demographic Provider: " + altProviderNo);
 		
 		if (docNums != null) {
 			for (int i = 0; i < docNums.size(); i++) {
