@@ -2722,9 +2722,10 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 									  List<ProfessionalSpecialist> specialists = professionalSpecialistDao.findAll();
                                       for(ProfessionalSpecialist specialist : specialists) {
                                     	  prop = new Properties();
-                                          prop.setProperty("fd_referral_no", specialist.getReferralNo());
-                                          prop.setProperty("fd_last_name", specialist.getLastName());
-                                          prop.setProperty("fd_first_name", specialist.getFirstName());
+                                    	  //setProperties throws an exception if it's set to null
+                                          prop.setProperty("fd_referral_no", (specialist.getReferralNo() != null)?specialist.getReferralNo():"");
+                                          prop.setProperty("fd_last_name", (specialist.getLastName() != null)?specialist.getLastName():"");
+                                          prop.setProperty("fd_first_name", (specialist.getFirstName() != null)?specialist.getFirstName():"");
                                           vecRef.add(prop);
                                       }
 
@@ -2734,8 +2735,8 @@ document.updatedelete.r_doctor_ohip.value = refNo;
                     	              		prop= (Properties) vecRef.get(k);
                 	                  	%>
 										<option value="<%=prop.getProperty("fd_referral_no","")%>"
-											<%=(prop.getProperty("fd_referral_no", "").equals(fd2ohip) && !fd2ohip.equals(""))?"selected":""%>>
-											<%=Misc.getShortStr( (prop.getProperty("fd_last_name", "")+", "+prop.getProperty("fd_first_name", "")),"",nStrShowLen)%>
+											<%=(prop.getProperty("fd_referral_no").equals(fd2ohip) && !fd2ohip.equals(""))?"selected":""%>>
+											<%=Misc.getShortStr( (prop.getProperty("fd_last_name")+", "+prop.getProperty("fd_first_name")),"",nStrShowLen)%>
 										</option>
 										<% } %>
 									</select> 
