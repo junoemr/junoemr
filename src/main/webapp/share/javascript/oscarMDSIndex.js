@@ -1625,6 +1625,8 @@ function updateStatusAndReview(formid){//acknowledge
 	if(doclabid){
 		var demoId=$('demofind'+doclabid).value;
 		var saved=$('saved'+doclabid).value;
+		
+		updateDocument('forms_'+doclabid);
 		if(demoId=='-1'|| saved=='false'){
 			alert('Document is not assigned and saved to a patient,please file it');
 		}else{
