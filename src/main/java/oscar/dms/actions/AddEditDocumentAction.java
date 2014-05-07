@@ -323,6 +323,9 @@ public class AddEditDocumentAction extends DispatchAction {
 				cmn.setPosition(0);
 				
 				Long note_id = cmm.saveNoteSimpleReturnID(cmn);
+				
+				// Debugging purposes on the live server
+				MiscUtils.getLogger().info("Document Note ID: "+note_id.toString());
 				 
 				// Add a noteLink to casemgmt_note_link
 				CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
