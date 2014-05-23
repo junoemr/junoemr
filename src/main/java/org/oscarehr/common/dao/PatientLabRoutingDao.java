@@ -34,6 +34,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
 
+	public static final Integer UNMATCHED = 0;
 	public static final String HL7 = "HL7";
 
 	public PatientLabRoutingDao() {
@@ -78,6 +79,25 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
     	q.setParameter(1, Integer.parseInt(docNum));
     	q.setParameter(2, "DOC");
 
+    	return q.getResultList();
+    }
+    
+    public PatientLabRouting findByLabNo(int labNo) {
+    	String query = "select x from " + modelClass.getName() + " x where x.labNo=?";
+    	Query q = entityManager.createQuery(query);
+    	q.setParameter(1, labNo);
+    	return this.getSingleResultOrNull(q);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<PatientLabRouting> findByLabNoAndLabType(int labNo, String labType) {
+
+    	String query = "select x from " + modelClass.getName() + " x where x.labNo=? and x.labType=?";
+    	Query q = entityManager.createQuery(query);
+
+    	q.setParameter(1, labNo);
+    	q.setParameter(2, labType);
+    	
     	return q.getResultList();
     }
 
