@@ -35,10 +35,10 @@
 package oscar.oscarDemographic.data;
 
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -168,7 +168,47 @@ public class DemographicMerged {
 
 				"UPDATE formGrowthChart " +
 					"SET formGrowthChart.demographic_no = ? " +
-					"WHERE formGrowthChart.demographic_no = ? "
+					"WHERE formGrowthChart.demographic_no = ? ",
+					
+				"UPDATE tickler " +
+						"SET tickler.demographic_no = ? " +
+						"WHERE tickler.demographic_no = ? ",
+
+				// Lab results & lab documents
+				"UPDATE patientLabRouting " +
+						"SET patientLabRouting.demographic_no = ? " +
+						"WHERE patientLabRouting.demographic_no = ? ",
+						
+				// Messages
+				"UPDATE msgDemoMap " +
+						"SET msgDemoMap.demographic_no = ? " +
+						"WHERE msgDemoMap.demographic_no = ? ",
+						
+				"UPDATE measurements " +
+						"SET measurements.demographicNo = ? " +
+						"WHERE measurements.demographicNo = ? ",
+				
+				"UPDATE measurementsDeleted " +
+						"SET measurementsDeleted.demographicNo = ? " +
+						"WHERE measurementsDeleted.demographicNo = ? ",
+						
+				"UPDATE consultationRequests " +
+						"SET consultationRequests.demographicNo = ? " +
+						"WHERE consultationRequests.demographicNo = ? ",
+						
+				"UPDATE allergies " +
+						"SET allergies.demographic_no = ? " +
+						"WHERE allergies.demographic_no = ? ",
+						
+				"UPDATE prescription " +
+						"SET prescription.demographic_no = ? " +
+						"WHERE prescription.demographic_no = ? ",
+						
+				"UPDATE drugs " +
+						"SET drugs.demographic_no = ? " +
+						"WHERE drugs.demographic_no = ? "
+						
+				
 			};
 
 			for(int i = 0; i < sql_array.length; i++)	
