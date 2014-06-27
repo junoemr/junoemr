@@ -109,6 +109,13 @@
   }
   // Use this value as the default value for province, as well
   String defaultProvince = HCType;
+		 
+  // Kensington custom required fields
+  String required_fields = props.getProperty("cust_required_fields");
+  if(required_fields == null){
+	  required_fields = "";
+  }
+  List<String> custom_required_fields = new ArrayList<String>(Arrays.asList(required_fields.split(",")));
 %>
 <html:html locale="true">
 <head>
@@ -380,6 +387,14 @@ function checkAllDate() {
 		if (y>=1 && y<=31) return true;
 		return false;
 	}
+	
+function checkCustomRequiredFields(){
+	Iterator required_fields = custom_required_fields.iterator();
+	while(required_fields.hasNext()){
+		
+	}
+	
+}
 
 function checkFormTypeIn() {
 	if ( !checkWaitList() ) return false;
@@ -387,6 +402,7 @@ function checkFormTypeIn() {
 	if ( !checkDob() ) return false;
 	if ( !checkHin() ) return false;
 	if ( !checkAllDate() ) return false;
+	if ( !checkCustomRequiredFields() ) return false;
 	return true;
 }
 
@@ -744,7 +760,7 @@ function autoFillHin(){
 				<td align="left"><input type="text" name="phone"
 					onBlur="formatPhoneNum()"
 					value="<%=props.getProperty("phoneprefix", "905-")%>"> <bean:message
-					key="demographic.demographicaddrecordhtm.Ext" />:<input
+					key="demographic.demographicaddrecordhtm.Ext" /><% if(custom_required_fields.contains("phone")){%><font color="red">:</font> </b><% %>}else{ %>:<%} %><input
 					type="text" name="hPhoneExt" value="" size="4" /></td>
 				<td align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPhoneWork" />:</b></td>
