@@ -175,6 +175,7 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 	var totalNumDocs = <%=totalNumDocs%>;
 	var abnormalsOnly = <%=abnormalsOnly%>;
 	var neverAcknowledgedItems = <%=neverAcknowledgedItems%>;
+	var scrollCount = 0;
 	
 	
 	
@@ -188,6 +189,7 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 	};
 
 	function handleScroll(e) {
+		scrollCount++;
 		if (!canLoad || loadingDocs) { return false; }
 		var evt = e || window.event;
 		var loadMore = false;
@@ -207,14 +209,17 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 	}
 
 	function fakeScroll() {
-		var scroller;
-		if (isListView) {
-			scroller = document.getElementById("summaryView");
+		//Add a limit to fake scrolling
+		if(scrollCount < 3){
+			var scroller;
+			if (isListView) {
+				scroller = document.getElementById("summaryView");
+			}
+			else {
+				scroller = document.getElementById("docViews");
+			}
+	 		handleScroll(scroller);
 		}
-		else {
-			scroller = document.getElementById("docViews");
-		}
- 		handleScroll(scroller);
 	}
 
 	function updateListView() {
