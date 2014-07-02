@@ -110,8 +110,8 @@
   // Use this value as the default value for province, as well
   String defaultProvince = HCType;
 		 
-  // Kensington custom required fields
-  String required_fields = props.getProperty("cust_required_fields");
+  // Custom required fields
+  String required_fields = props.getProperty("custom_required_fields");
   if(required_fields == null){
 	  required_fields = "";
   }
@@ -389,10 +389,19 @@ function checkAllDate() {
 	}
 	
 function checkCustomRequiredFields(){
-	Iterator required_fields = custom_required_fields.iterator();
-	while(required_fields.hasNext()){
-		
+	<%
+	Iterator field_itr = custom_required_fields.iterator();
+	while(field_itr.hasNext()){
+		Object field = field_itr.next();
+		%>
+		if(document.adddemographic.<%=field%>.value.length==0){
+			alert("You must provide the following field: <%=field%>");
+			return false;
+		}
+		<%
 	}
+	%>
+	return true;
 	
 }
 
