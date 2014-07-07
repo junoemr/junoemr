@@ -66,7 +66,7 @@ public final class EFormViewForPdfGenerationServlet extends HttpServlet {
 				html = "<html><body style='width:640px;'>" + html + "</body></html>";
 				eForm.setFormHtml(html);
 			}
-			if (value.getVarName().equals("signatureValue")) { 
+			if (value.getVarName().equals("signatureValue")) {
 				
 				// Checking to see if there are any parameters for the signature in the html.
 				String html = eForm.getFormHtml();
@@ -86,7 +86,10 @@ public final class EFormViewForPdfGenerationServlet extends HttpServlet {
 		eForm.setFormHtml(eForm.getFormHtml().replace("../eform/displayImage.do",  "/" + projectHome + "/EFormImageViewForPdfGenerationServlet"));
 		eForm.setFormHtml(eForm.getFormHtml().replace("${oscar_image_path}", "/" + projectHome + "/EFormImageViewForPdfGenerationServlet?imagefile="));
 		eForm.setFormHtml(eForm.getFormHtml().replace("$%7Boscar_image_path%7D", "/" + projectHome + "/EFormImageViewForPdfGenerationServlet?imagefile="));
+		eForm.setFormHtml(eForm.getFormHtml().replace("../share", "/" + projectHome + "/EFormResourceViewForPdfGenerationServlet?filename="));
+		eForm.setFormHtml(eForm.getFormHtml().replace("/share", "/EFormResourceViewForPdfGenerationServlet?filename="));
 		eForm.setFormHtml(eForm.getFormHtml().replace("<div class=\"DoNotPrint\" style=\"", "<div class=\"DoNotPrint\" style=\"display:none;"));
+		eForm.setFormHtml(eForm.getFormHtml().replace("</body>", "<input type=\"hidden\" id=\"full_eform_url\" value=\""+request.getContextPath()+"/eform/\"/>\n</body>"));
 		eForm.setImagePath();
 		eForm.setNowDateTime();
 

@@ -10,6 +10,13 @@ var emailControlToName = "<input value='' name='toName' id='toName' type='hidden
 var emailControl = {
 	initialize: function () {
 		var placeholder = jQuery("#emailControl");
+		var eform_url = jQuery("#full_eform_url")[0];                           
+        if(eform_url === undefined)                                             
+        {                                                                       
+            eform_url = "../eform/";                                            
+        }else{                                                                  
+            eform_url = eform_url.value;                                        
+        }
 		if (placeholder == null || placeholder.size() == 0) { 
 			if (jQuery(".DoNotPrint").size() > 0) { 
 				placeholder = jQuery("<div id='emailControl'>&nbsp;</div>");
@@ -27,7 +34,8 @@ var emailControl = {
 		placeholder.html(emailControlPlaceholder);
 		
 		$.ajax({
-			url:"../eform/efmformemail_form.jsp",
+			
+			url:eform_url+"efmformemail_form.jsp",
 			data:"demographicNo=" + demoNo,
 			success: function(data) {
 				
