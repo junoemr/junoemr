@@ -30,6 +30,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
+<%@page import="oscar.OscarProperties"%>
 
 <% String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user"); %>
 <% Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null; %>
@@ -118,10 +119,12 @@
 	<a href="../demographic/demographicaddarecordhtm.jsp"><bean:message
 		key="demographic.search.btnCreateNew" /></a>
 	</div>
-	<div>
+<% if (!OscarProperties.getInstance().getBooleanProperty("hide_quickform", "true")) { %>
+<div>
 	<a href="../demographic/demographicaddrecordcustom.jsp"><bean:message
 		key="demographic.search.btnQuickCreateNew" /></a>
 </div>
+<% } %>
 <p>
 <!-- we may want to not allow students to create new patients? -->
 <!-- <security:oscarSec roleName="<%=roleName$%>" objectName="_demographic.addnew" rights="r">  -->

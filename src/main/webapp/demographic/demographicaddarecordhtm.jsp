@@ -389,18 +389,32 @@ function checkAllDate() {
 	}
 	
 function checkCustomRequiredFields(){
-	<%
-	Iterator field_itr = custom_required_fields.iterator();
-	while(field_itr.hasNext()){
-		Object field = field_itr.next();
-		%>
-		if(document.adddemographic.<%=field%>.value.length==0){
-			alert("You must provide the following field: <%=field%>");
-			return false;
-		}
-		<%
+	var field_mapping = {
+			phone: "Phone (H)",
+			phone2: "Phone (W)",
+			email: "Email",
+		};
+<%
+Iterator field_itr = custom_required_fields.iterator();
+while(field_itr.hasNext()){
+	Object field = field_itr.next();
+%>
+	if((document.adddemographic.<%=field%>_checkbox !== undefined &&
+		!document.adddemographic.<%=field%>_checkbox.checked &&
+		document.adddemographic.<%=field%>.value.length==0
+		) ||
+		(document.adddemographic.<%=field%>_checkbox === undefined &&
+		document.adddemographic.<%=field%>.value.length==0)
+	<% if(field.equals("phone")){%>
+		|| (document.adddemographic.<%=field%>.value == "<%=props.getProperty("phoneprefix", "905-")%>")
+	<%}%>
+	){
+		alert("You must provide the following field: "+field_mapping.<%=field%>);
+		return false;
 	}
-	%>
+<%
+}
+%>
 	return true;
 	
 }
@@ -765,14 +779,14 @@ function autoFillHin(){
 
 			<tr valign="top">
 				<td align="right"><b><bean:message
-					key="demographic.demographicaddrecordhtm.formPhoneHome" />: </b></td>
+					key="demographic.demographicaddrecordhtm.formPhoneHome" /><% if(custom_required_fields.contains("phone")){%><font color="red">:</font> </b><% }else{ %>:<%} %> </b></td>
 				<td align="left"><input type="text" name="phone"
 					onBlur="formatPhoneNum()"
 					value="<%=props.getProperty("phoneprefix", "905-")%>"> <bean:message
-					key="demographic.demographicaddrecordhtm.Ext" /><% if(custom_required_fields.contains("phone")){%><font color="red">:</font> </b><% %>}else{ %>:<%} %><input
+					key="demographic.demographicaddrecordhtm.Ext" />:<input
 					type="text" name="hPhoneExt" value="" size="4" /></td>
 				<td align="right"><b><bean:message
-					key="demographic.demographicaddrecordhtm.formPhoneWork" />:</b></td>
+					key="demographic.demographicaddrecordhtm.formPhoneWork" /><% if(custom_required_fields.contains("phone2")){%><font color="red">:</font> </b><% }else{ %>:<%} %></b></td>
 				<td align="left"><input type="text" name="phone2"
 					onBlur="formatPhoneNum()" value=""> <bean:message
 					key="demographic.demographicaddrecordhtm.Ext" />:<input type="text"
@@ -798,8 +812,11 @@ function autoFillHin(){
 			</tr>
 			<tr valign="top">
 				<td align="right"><b><bean:message
-					key="demographic.demographicaddrecordhtm.formEMail" />: </b></td>
+					key="demographic.demographicaddrecordhtm.formEMail" /><% if(custom_required_fields.contains("email")){%><font color="red">:</font> </b><% }else{ %>:<%} %> </b></td>
 				<td align="left"><input type="text" name="email" value="">
+				<% if(custom_required_fields.contains("email")){%>
+					<input type="checkbox" name="email_checkbox"/> Not available
+				<%}%>
 				</td>
 				<td align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formMyOscarUserName" />:</b></td>
