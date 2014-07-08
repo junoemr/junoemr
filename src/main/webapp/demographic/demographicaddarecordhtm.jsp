@@ -111,12 +111,12 @@
   String defaultProvince = HCType;
 		 
   // Custom required fields
-  String required_fields = props.getProperty("custom_required_fields");
-  if(required_fields == null){
-	  required_fields = "";
-  }
-  List<String> custom_required_fields = new ArrayList<String>(Arrays.asList(required_fields.split(",")));
-%>
+  String required_fields = props.getProperty("custom_required_fields");         
+  List<String> custom_required_fields = new ArrayList<String>();
+  if(required_fields != null){
+    custom_required_fields = new ArrayList<String>(Arrays.asList(required_fields.split(",")));
+    }
+  %>
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
