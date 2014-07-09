@@ -67,7 +67,10 @@ var emailControl = {
 							buttonLocation.append(jQuery(emailControlToName));
 						}
 					}
-					if (buttonLocation == null) { alert("Unable to find form or save button please check this is a proper eform."); return; }					
+					if (buttonLocation == null) { alert("Unable to find form or save button please check this is a proper eform."); return; }
+					
+					var provider_email = jQuery("#provider_email").val();
+					jQuery("select#emailSelect option[value='"+provider_email+"']").attr('selected', true);
 					
 				}
 			}
@@ -82,6 +85,7 @@ jQuery(document).ready(function() {
 function clearEmailFields(){
 	jQuery('#toEmail').val('');
 	jQuery('#toName').val('');
+	jQuery('#provider_email').val('');
 }
 
 function chooseEmail(){
@@ -121,6 +125,7 @@ function submitEmailButtonAjax(save, emailPatient) {
 			jQuery('#toName').val('');
 		}else{
 			chooseEmail();
+			jQuery('#provider_email').val(jQuery('#toEmail').val());
 		}
 
 		if(jQuery('#toEmail').val() == ""){
