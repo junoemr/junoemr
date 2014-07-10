@@ -403,9 +403,11 @@ function popupEChart(vheight,vwidth,varpage) { //open a new popup window
 
 <div class="createNew">
 	<a href="demographiccontrol.jsp?displaymode=Create"><b><font size="+1"><bean:message key="demographic.search.btnCreateNew" /></font></b></a>
+	<% if (!OscarProperties.getInstance().getBooleanProperty("hide_quickform", "true")) { %>
 	<br/>
 		<a href="demographicaddrecordcustom.jsp"><b><font size="+1"><bean:message
-	key="demographic.search.btnQuickCreateNew" /></font></b></a> 
+	key="demographic.search.btnQuickCreateNew" /></font></b></a>
+	<% } %> 
 <br>
 </div>
 

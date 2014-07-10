@@ -392,6 +392,7 @@ function checkCustomRequiredFields(){
 	var field_mapping = {
 			phone: "Phone (H)",
 			phone2: "Phone (W)",
+			cellphone: "Cell Phone",
 			email: "Email",
 		};
 <%
@@ -794,7 +795,7 @@ function autoFillHin(){
 			</tr>
 			<tr valign="top">
 				<td align="right"><b><bean:message
-					key="demographic.demographicaddrecordhtm.formPhoneCell" />: </b></td>
+					key="demographic.demographicaddrecordhtm.formPhoneCell" /><% if(custom_required_fields.contains("cellphone")){%><font color="red">:</font> </b><% }else{ %>:<%} %> </b></td>
 				<td align="left"><input type="text" name="cellphone"
 					onBlur="formatPhoneNum()"></td>
 				<td align="right"><b><bean:message
