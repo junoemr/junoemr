@@ -53,6 +53,7 @@ public class LabUploadWs extends AbstractWs {
 	private static final String LAB_TYPE_IHA = "IHA";
 	private static final String LAB_TYPE_GAMMADYNACARE = "GDML";
 	private static final String LAB_TYPE_CDL = "CDL";
+
     private static final Logger logger=MiscUtils.getLogger();
 
     public String uploadCML(
@@ -65,6 +66,7 @@ public class LabUploadWs extends AbstractWs {
         
         try {
             audit = importLab(fileName, contents, LAB_TYPE_CML, oscarProviderNo);
+
         } catch(Exception e)
         {
             logger.error(e.getMessage());
@@ -187,6 +189,7 @@ public class LabUploadWs extends AbstractWs {
         String labFolderPath = props.getProperty("DOCUMENT_DIR") + "labs";
         String retVal = "";
 
+
         File labFolder = new File(labFolderPath);
 
         if(!labFolder.exists())
@@ -230,4 +233,5 @@ public class LabUploadWs extends AbstractWs {
         return retVal;
     }
 }
+
 

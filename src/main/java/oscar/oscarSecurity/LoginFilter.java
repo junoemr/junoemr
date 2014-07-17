@@ -66,7 +66,9 @@ public class LoginFilter implements Filter {
 		"/ws/",
 		"/EFormViewForPdfGenerationServlet",
 		"/EFormSignatureViewForPdfGenerationServlet",
-		"/EFormImageViewForPdfGenerationServlet"
+		"/EFormImageViewForPdfGenerationServlet",
+		"/EFormResourceViewForPdfGenerationServlet",
+		"/eform/efmformemail_form.jsp",
 	};
 
 	/*

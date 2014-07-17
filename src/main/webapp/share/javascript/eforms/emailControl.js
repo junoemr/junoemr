@@ -10,6 +10,13 @@ var emailControlToName = "<input value='' name='toName' id='toName' type='hidden
 var emailControl = {
 	initialize: function () {
 		var placeholder = jQuery("#emailControl");
+		var eform_url = jQuery("#full_eform_url")[0];                           
+        if(eform_url === undefined)                                             
+        {                                                                       
+            eform_url = "../eform/";                                            
+        }else{                                                                  
+            eform_url = eform_url.value;                                        
+        }
 		if (placeholder == null || placeholder.size() == 0) { 
 			if (jQuery(".DoNotPrint").size() > 0) { 
 				placeholder = jQuery("<div id='emailControl'>&nbsp;</div>");
@@ -27,7 +34,8 @@ var emailControl = {
 		placeholder.html(emailControlPlaceholder);
 		
 		$.ajax({
-			url:"../eform/efmformemail_form.jsp",
+			
+			url:eform_url+"efmformemail_form.jsp",
 			data:"demographicNo=" + demoNo,
 			success: function(data) {
 				
@@ -59,7 +67,10 @@ var emailControl = {
 							buttonLocation.append(jQuery(emailControlToName));
 						}
 					}
-					if (buttonLocation == null) { alert("Unable to find form or save button please check this is a proper eform."); return; }					
+					if (buttonLocation == null) { alert("Unable to find form or save button please check this is a proper eform."); return; }
+					
+					var provider_email = jQuery("#provider_email").val();
+					jQuery("select#emailSelect option[value='"+provider_email+"']").attr('selected', true);
 					
 				}
 			}
@@ -74,6 +85,7 @@ jQuery(document).ready(function() {
 function clearEmailFields(){
 	jQuery('#toEmail').val('');
 	jQuery('#toName').val('');
+	jQuery('#provider_email').val('');
 }
 
 function chooseEmail(){
@@ -113,6 +125,7 @@ function submitEmailButtonAjax(save, emailPatient) {
 			jQuery('#toName').val('');
 		}else{
 			chooseEmail();
+			jQuery('#provider_email').val(jQuery('#toEmail').val());
 		}
 
 		if(jQuery('#toEmail').val() == ""){

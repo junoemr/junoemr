@@ -109,7 +109,14 @@
   }
   // Use this value as the default value for province, as well
   String defaultProvince = HCType;
-%>
+		 
+  // Custom required fields
+  String required_fields = props.getProperty("custom_required_fields");         
+  List<String> custom_required_fields = new ArrayList<String>();
+  if(required_fields != null){
+    custom_required_fields = new ArrayList<String>(Arrays.asList(required_fields.split(",")));
+    }
+  %>
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -380,6 +387,38 @@ function checkAllDate() {
 		if (y>=1 && y<=31) return true;
 		return false;
 	}
+	
+function checkCustomRequiredFields(){
+	var field_mapping = {
+			phone: "Phone (H)",
+			phone2: "Phone (W)",
+			cellphone: "Cell Phone",
+			email: "Email",
+		};
+<%
+Iterator field_itr = custom_required_fields.iterator();
+while(field_itr.hasNext()){
+	Object field = field_itr.next();
+%>
+	if((document.adddemographic.<%=field%>_checkbox !== undefined &&
+		!document.adddemographic.<%=field%>_checkbox.checked &&
+		document.adddemographic.<%=field%>.value.length==0
+		) ||
+		(document.adddemographic.<%=field%>_checkbox === undefined &&
+		document.adddemographic.<%=field%>.value.length==0)
+	<% if(field.equals("phone")){%>
+		|| (document.adddemographic.<%=field%>.value == "<%=props.getProperty("phoneprefix", "905-")%>")
+	<%}%>
+	){
+		alert("You must provide the following field: "+field_mapping.<%=field%>);
+		return false;
+	}
+<%
+}
+%>
+	return true;
+	
+}
 
 function checkFormTypeIn() {
 	if ( !checkWaitList() ) return false;
@@ -387,6 +426,7 @@ function checkFormTypeIn() {
 	if ( !checkDob() ) return false;
 	if ( !checkHin() ) return false;
 	if ( !checkAllDate() ) return false;
+	if ( !checkCustomRequiredFields() ) return false;
 	return true;
 }
 
@@ -740,14 +780,14 @@ function autoFillHin(){
 
 			<tr valign="top">
 				<td align="right"><b><bean:message
-					key="demographic.demographicaddrecordhtm.formPhoneHome" />: </b></td>
+					key="demographic.demographicaddrecordhtm.formPhoneHome" /><% if(custom_required_fields.contains("phone")){%><font color="red">:</font> </b><% }else{ %>:<%} %> </b></td>
 				<td align="left"><input type="text" name="phone"
 					onBlur="formatPhoneNum()"
 					value="<%=props.getProperty("phoneprefix", "905-")%>"> <bean:message
 					key="demographic.demographicaddrecordhtm.Ext" />:<input
 					type="text" name="hPhoneExt" value="" size="4" /></td>
 				<td align="right"><b><bean:message
-					key="demographic.demographicaddrecordhtm.formPhoneWork" />:</b></td>
+					key="demographic.demographicaddrecordhtm.formPhoneWork" /><% if(custom_required_fields.contains("phone2")){%><font color="red">:</font> </b><% }else{ %>:<%} %></b></td>
 				<td align="left"><input type="text" name="phone2"
 					onBlur="formatPhoneNum()" value=""> <bean:message
 					key="demographic.demographicaddrecordhtm.Ext" />:<input type="text"
@@ -755,7 +795,7 @@ function autoFillHin(){
 			</tr>
 			<tr valign="top">
 				<td align="right"><b><bean:message
-					key="demographic.demographicaddrecordhtm.formPhoneCell" />: </b></td>
+					key="demographic.demographicaddrecordhtm.formPhoneCell" /><% if(custom_required_fields.contains("cellphone")){%><font color="red">:</font> </b><% }else{ %>:<%} %> </b></td>
 				<td align="left"><input type="text" name="cellphone"
 					onBlur="formatPhoneNum()"></td>
 				<td align="right"><b><bean:message
@@ -773,8 +813,11 @@ function autoFillHin(){
 			</tr>
 			<tr valign="top">
 				<td align="right"><b><bean:message
-					key="demographic.demographicaddrecordhtm.formEMail" />: </b></td>
+					key="demographic.demographicaddrecordhtm.formEMail" /><% if(custom_required_fields.contains("email")){%><font color="red">:</font> </b><% }else{ %>:<%} %> </b></td>
 				<td align="left"><input type="text" name="email" value="">
+				<% if(custom_required_fields.contains("email")){%>
+					<input type="checkbox" name="email_checkbox"/> Not available
+				<%}%>
 				</td>
 				<td align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formMyOscarUserName" />:</b></td>

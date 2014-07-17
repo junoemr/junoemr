@@ -195,7 +195,7 @@ public class CategoryData {
 			+ "   AND plr2.demographic_no = '0' "
 			+ (abnormalsOnly ? " AND hl7.result_status = 'A' " : "")
 			+ (endDateStr != null && !endDateStr.equals("") ? " AND DATE(hl7.obr_date) < ? " : "")
-			+ "   GROUP BY hl7.accessionNum) counttable";
+			+ "   GROUP BY COALESCE(hl7.accessionNum, hl7.lab_no)) counttable";
 		    
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
@@ -265,7 +265,7 @@ public class CategoryData {
         		+ " 	     OR doc.doc_result_status "+(isAbnormal ? "" : "!")+"= 'A' " 
         		+"           ) "
         		+ (endDateStr != null && !endDateStr.equals("")?"     AND DATE(info.obr_date) < ? " : "")
-        		+ " GROUP BY info.accessionNum) counttable";
+        		+ " GROUP BY COALESCE(info.accessionNum, info.lab_no)) counttable";
         	ps = c.prepareStatement(sql);
         	ps.setString(1, "%"+patientLastName+"%");
         	ps.setString(2, "%"+patientFirstName+"%");
@@ -305,7 +305,7 @@ public class CategoryData {
 				+ " AND doc.document_no = plr.lab_no"
 				+ " AND (info.result_status "+(isAbnormal ? "" : "!")+"= 'A' "
 				+ " OR doc.doc_result_status "+(isAbnormal ? "" : "!")+"= 'A') "
-				+ " GROUP BY info.accessionNum) counttable";
+				+ " GROUP BY COALESCE(info.accessionNum, info.lab_no)) counttable";
         	ps = c.prepareStatement(sql);
         	ps.setString(1, "%"+status+"%");
         	if(providerSearch){
@@ -320,7 +320,7 @@ public class CategoryData {
             	+ " WHERE (info.result_status "+(isAbnormal ? "" : "!")+"= 'A' "
             	+ " OR doc.doc_result_status "+(isAbnormal ? "" : "!")+"= 'A') "
         	    + " AND doc.document_no = info.lab_no"
-        	    + " GROUP BY info.accessionNum) counttable";
+        	    + " GROUP BY COALESCE(info.accessionNum, info.lab_no)) counttable";
         	ps = c.prepareStatement(sql);
         }
 		
@@ -469,7 +469,7 @@ public class CategoryData {
 	        	+ (checkRequestingProvider ? "AND hl7.requesting_client_no = p.ohip_no ":"")
 	        	+ ((endDateStr != null && !endDateStr.equals("")) ? "AND DATE(hl7.obr_date) < ? ": "")
 	        	+ "   GROUP BY hl7.lab_no "
-	        	+ " ) labs GROUP BY accessionNum ) labs2 GROUP BY demographic_no";
+	        	+ " ) labs GROUP BY COALESCE(accessionNum, lab_no) ) labs2 GROUP BY demographic_no";
 
 		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
 		PreparedStatement ps = c.prepareStatement(sql);
