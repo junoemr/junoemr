@@ -40,6 +40,7 @@
 <%@ taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@page import="org.oscarehr.util.AppointmentUtil" %>
+<%@page import="oscar.OscarProperties" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <% 
   if(session.getAttribute("user") == null)    response.sendRedirect("../logout.htm");
@@ -277,6 +278,13 @@ var fullname="";
 function addName(demographic_no, lastname, firstname, chartno, messageID, doctorNo, remoteFacilityId, lastAppointmentDate) {
   fullname=lastname+","+firstname;
 
+  <%
+  if(OscarProperties.getInstance().getBooleanProperty("check_last_appointment", true)){
+	  %>
+   if( !checkLastAppointment(lastAppointmentDate) ){
+ 	  return false
+   }
+  <% } %>
    if (remoteFacilityId == '')
    {
 	   document.addform.action="<%=request.getParameter("originalpage")%>?";
@@ -290,6 +298,16 @@ function addName(demographic_no, lastname, firstname, chartno, messageID, doctor
   
   document.addform.submit();
   return true;
+}
+
+function checkLastAppointment(lastAppointmentDate){
+	if( lastAppointmentDate == "(none)" ){
+		return false;
+	}
+	var apptDate = new Date(lastAppointmentDate);
+	var curDate = new Date();
+	console.log(apptDate);
+	console.log(curDate);
 }
 
 <%if(caisi) {%>
