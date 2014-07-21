@@ -52,7 +52,7 @@ public class LabTag extends TagSupport {
             
             //String sql = new String("select count(*) from providerLabRouting plr LEFT JOIN hl7TextInfo hl7 ON hl7.lab_no = plr.lab_no LEFT JOIN document d ON d.document_no = plr.lab_no where plr.provider_no = '"+ providerNo +"' and plr.status = 'N' AND (d.status <> 'D' OR d.status IS NULL) GROUP BY lab_type, accessionNum");            
             String sql = new String("select count(*) FROM ("+
-            			"select plr.* from providerLabRouting plr LEFT JOIN hl7TextInfo hl7 ON hl7.lab_no = plr.lab_no where plr.provider_no = '"+ providerNo +"' and plr.status = 'N' AND plr.lab_type = 'HL7' GROUP BY hl7.accessionNum " +
+            			"select plr.* from providerLabRouting plr LEFT JOIN hl7TextInfo hl7 ON hl7.lab_no = plr.lab_no where plr.provider_no = '"+ providerNo +"' and plr.status = 'N' AND plr.lab_type = 'HL7' GROUP BY COALESCE(hl7.accessionNum, hl7.lab_no) " +
             			"UNION "+
             			"select plr.* from providerLabRouting plr LEFT JOIN  document d ON d.document_no = plr.lab_no where plr.provider_no = '"+ providerNo +"' and plr.status = 'N' AND plr.lab_type = 'DOC' AND (d.status <> 'D' OR d.status IS NULL) "+
             			") as count_labs");
