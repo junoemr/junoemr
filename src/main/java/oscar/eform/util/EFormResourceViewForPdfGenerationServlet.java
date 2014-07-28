@@ -37,45 +37,23 @@ public final class EFormResourceViewForPdfGenerationServlet extends HttpServlet 
 		// ensure it's a local machine request... no one else should be calling this servlet.
 		String remoteAddress=request.getRemoteAddr();
 		logger.debug("EformPdfServlet request from : "+remoteAddress);
-		/*
 		if (!"127.0.0.1".equals(remoteAddress))
 		{
 			logger.warn("Unauthorised request made to EFormImageViewForPdfGenerationServlet from address : "+remoteAddress);
 			response.sendError(HttpServletResponse.SC_FORBIDDEN);
 		}
-		*/
 		
 		String fileName = request.getParameter("filename");
+		String path = request.getParameter("path");
 		String measurementType = request.getParameter("measurementType");
 		
-		/*
-		response.setHeader("Content-disposition","inline; filename=" + fileName);
-		String javascript_dir = "share/javascript";
-
-        File file = null;
-        try{
-           File directory = new File(javascript_dir);
-           if(!directory.exists()){
-              throw new Exception("Directory:  "+javascript_dir+ " does not exist");
-           }
-           file = new File(directory,fileName);
-           //String canonicalPath = file.getParentFile().getCanonicalPath(); //absolute path of the retrieved file
-
-           if (!directory.equals(file.getParentFile())) {
-               MiscUtils.getLogger().debug("SECURITY WARNING: Illegal file path detected, client attempted to navigate away from the file directory");
-               throw new Exception("Could not open file " + fileName + ".  Check the file path");
-           }
-        }catch(Exception e){
-            MiscUtils.getLogger().error("Error", e);
-            throw new Exception("Could not open file "+javascript_dir+fileName +" does "+javascript_dir+ " exist ?",e);
-        }
-        
-        String contentType = "text/javascript";
-        */
-		
 		request.setAttribute("prepareForFax", true);
+
+		if(path == null || path == ""){
+			path = "share";
+		}
 		
-		String url = "/share/"+fileName;
+		String url = "/"+path+"/"+fileName;
 		
 		// Check if we're getting measurements
 		if(measurementType != null && measurementType.length() > 0 
