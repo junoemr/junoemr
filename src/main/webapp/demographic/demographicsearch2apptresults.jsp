@@ -39,7 +39,6 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@page import="org.oscarehr.util.AppointmentUtil" %>
 <%@page import="oscar.OscarProperties" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <% 
@@ -275,16 +274,9 @@ function searchAll() {
 
 var fullname="";
 <%-- RJ 07/10/2006 Need to pass doctor of patient back to referrer --%>
-function addName(demographic_no, lastname, firstname, chartno, messageID, doctorNo, remoteFacilityId, lastAppointmentDate) {
+function addName(demographic_no, lastname, firstname, chartno, messageID, doctorNo, remoteFacilityId) {
   fullname=lastname+","+firstname;
 
-  <%
-  if(OscarProperties.getInstance().getBooleanProperty("check_last_appointment", true)){
-	  %>
-   if( !checkLastAppointment(lastAppointmentDate) ){
- 	  return false
-   }
-  <% } %>
    if (remoteFacilityId == '')
    {
 	   document.addform.action="<%=request.getParameter("originalpage")%>?";
@@ -299,17 +291,6 @@ function addName(demographic_no, lastname, firstname, chartno, messageID, doctor
   document.addform.submit();
   return true;
 }
-
-function checkLastAppointment(lastAppointmentDate){
-	if( lastAppointmentDate == "(none)" ){
-		return false;
-	}
-	var apptDate = new Date(lastAppointmentDate);
-	var curDate = new Date();
-	console.log(apptDate);
-	console.log(curDate);
-}
-
 <%if(caisi) {%>
 function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
   	fullname=lastname+","+firstname;
@@ -346,11 +327,11 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 	  String bgColor = rowCounter%2==0?"#EEEEFF":"white";
 %>
    <li style="background-color: <%=bgColor%>" onMouseOver="this.style.cursor='hand';this.style.backgroundColor='pink';" onMouseout="this.style.backgroundColor='<%=bgColor%>';"
-   onClick="document.forms[0].demographic_no.value=<%=apptMainBean.getString(rs,"demographic_no")%>;<% if(caisi) { out.print("addNameCaisi");} else { out.print("addName");} %>('<%=apptMainBean.getString(rs,"demographic_no")%>','<%=URLEncoder.encode(apptMainBean.getString(rs,"last_name"))%>','<%=URLEncoder.encode(apptMainBean.getString(rs,"first_name"))%>','<%=URLEncoder.encode(apptMainBean.getString(rs,"chart_no"))%>','<%=request.getParameter("messageId")%>','<%=apptMainBean.getString(rs,"provider_no")%>','',<%=AppointmentUtil.getLastAppointment(apptMainBean.getString(rs,"demographic_no"))%>')">
+   onClick="document.forms[0].demographic_no.value=<%=apptMainBean.getString(rs,"demographic_no")%>;<% if(caisi) { out.print("addNameCaisi");} else { out.print("addName");} %>('<%=apptMainBean.getString(rs,"demographic_no")%>','<%=URLEncoder.encode(apptMainBean.getString(rs,"last_name"))%>','<%=URLEncoder.encode(apptMainBean.getString(rs,"first_name"))%>','<%=URLEncoder.encode(apptMainBean.getString(rs,"chart_no"))%>','<%=request.getParameter("messageId")%>','<%=apptMainBean.getString(rs,"provider_no")%>','')">
 		<%-- 07/10/2006 RJ Added doctor provider_no to url --%>
 		<div class="demoId"><input type="submit" class="mbttn" name="demographic_no"
 			value="<%=apptMainBean.getString(rs,"demographic_no")%>"
-			onClick="<% if(caisi) {out.print("addNameCaisi");} else {out.print("addName");} %>('<%=apptMainBean.getString(rs,"demographic_no")%>','<%=URLEncoder.encode(apptMainBean.getString(rs,"last_name"))%>','<%=URLEncoder.encode(apptMainBean.getString(rs,"first_name"))%>','<%=URLEncoder.encode(apptMainBean.getString(rs,"chart_no"))%>','<%=request.getParameter("messageId")%>','<%=apptMainBean.getString(rs,"provider_no")%>','','<%=AppointmentUtil.getLastAppointment(apptMainBean.getString(rs,"demographic_no"))%>')">
+			onClick="<% if(caisi) {out.print("addNameCaisi");} else {out.print("addName");} %>('<%=apptMainBean.getString(rs,"demographic_no")%>','<%=URLEncoder.encode(apptMainBean.getString(rs,"last_name"))%>','<%=URLEncoder.encode(apptMainBean.getString(rs,"first_name"))%>','<%=URLEncoder.encode(apptMainBean.getString(rs,"chart_no"))%>','<%=request.getParameter("messageId")%>','<%=apptMainBean.getString(rs,"provider_no")%>','')">
                 </div>
 		<div class="lastName"><%=Misc.toUpperLowerCase(apptMainBean.getString(rs,"last_name"))%></div>
 		<div class="firstName"><%=Misc.toUpperLowerCase(apptMainBean.getString(rs,"first_name"))%></div>
@@ -381,7 +362,7 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 		  DemographicTransfer demographicTransfer=matchingDemographicTransferScore.getDemographicTransfer();
 		%>
 		   <li style="background-color: <%=bgColor%>" onMouseOver="this.style.cursor='hand';this.style.backgroundColor='pink';" onMouseout="this.style.backgroundColor='<%=bgColor%>';"
-		   onClick="document.forms[0].demographic_no.value=<%=demographicTransfer.getCaisiDemographicId()%>;addName('<%=demographicTransfer.getCaisiDemographicId()%>','<%=URLEncoder.encode(demographicTransfer.getLastName())%>','<%=URLEncoder.encode(demographicTransfer.getFirstName())%>','','<%=request.getParameter("messageId")%>','<%=demographicTransfer.getCaisiProviderId()%>','<%=demographicTransfer.getIntegratorFacilityId()%>','<%=AppointmentUtil.getLastAppointment(String.valueOf(demographicTransfer.getCaisiDemographicId()))%>')"
+		   onClick="document.forms[0].demographic_no.value=<%=demographicTransfer.getCaisiDemographicId()%>;addName('<%=demographicTransfer.getCaisiDemographicId()%>','<%=URLEncoder.encode(demographicTransfer.getLastName())%>','<%=URLEncoder.encode(demographicTransfer.getFirstName())%>','','<%=request.getParameter("messageId")%>','<%=demographicTransfer.getCaisiProviderId()%>','<%=demographicTransfer.getIntegratorFacilityId()%>')"
 		   >
 				<div class="demoId">
 					<input type="submit" class="mbttn" name="demographic_no" value="Integrator <%=CaisiIntegratorManager.getRemoteFacility(demographicTransfer.getIntegratorFacilityId()).getName()%>:<%=demographicTransfer.getCaisiDemographicId()%>" />
@@ -444,7 +425,7 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
   if(nItems==1 && nLastPage<=0 && !caisi) { //if there is only one search result, it should be added to the appoint page directly.
 %> <script language="JavaScript">
 <!--
-	addName('<%=URLEncoder.encode(bufNo.toString())%>','<%=URLEncoder.encode(strLName)%>','<%=URLEncoder.encode(strFName)%>','<%=URLEncoder.encode(bufChart.toString())%>','<%=request.getParameter("messageId")%>','<%=bufDoctorNo.toString()%>','',<%=AppointmentUtil.getLastAppointment(bufNo.toString())%>');
+	addName('<%=URLEncoder.encode(bufNo.toString())%>','<%=URLEncoder.encode(strLName)%>','<%=URLEncoder.encode(strFName)%>','<%=URLEncoder.encode(bufChart.toString())%>','<%=request.getParameter("messageId")%>','<%=bufDoctorNo.toString()%>','');
   //document.addform.action="<%=request.getParameter("originalpage")%>?name=<%=URLEncoder.encode(bufName.toString())%>&chart_no=<%=URLEncoder.encode(bufChart.toString())%>&bFirstDisp=false&demographic_no=<%=bufNo.toString()%>&messageID=<%=request.getParameter("messageId")%>&doctor_no=<%=bufDoctorNo.toString()%>";
   //document.addform.submit();  
 //-->

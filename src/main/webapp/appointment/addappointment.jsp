@@ -66,9 +66,13 @@
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page import="oscar.oscarEncounter.data.EctFormData"%>
-<%@page import="org.oscarehr.common.model.DemographicCust" %>
 <%@page import="org.oscarehr.common.dao.DemographicCustDao" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@page import="org.oscarehr.util.AppointmentUtil" %>
+<%@page import="org.oscarehr.common.model.DemographicCust" %>
+<%@page import="org.oscarehr.util.SpringUtils" %>
+<jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean"
+	scope="session" />
 <%
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 %>
@@ -103,14 +107,47 @@
    </script>
 <oscar:customInterface section="addappt"/>
 <script type="text/javascript">
-
+<%
+if((pros.getProperty("check_last_appointment","").equalsIgnoreCase("true") || pros.getProperty("check_last_appointment","").equalsIgnoreCase("yes")) && request.getParameter("demographic_no") != null){
+	%>
+function onAdd(){
+	if (document.ADDAPPT.notes.value.length > 255) {
+	    window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
+	    return false;
+	}
+	if(calculateEndTime()){
+		jQuery.ajax({
+			type:"GET",
+			contentType: "application/json; charset=utf-8",
+			url:"addappointmentchecker.jsp?demographic_no=<%=request.getParameter("demographic_no")%>",
+			data:"{}",
+			dataType:"json",
+			success:function(data){
+				if(data.result != "success" || data.result == "update_required"){
+					window.open("../demographic/demographiceditdemographic.jsp?demographic_no=<%=request.getParameter("demographic_no")%>&return=addappointment&displaymode=edit&dboperation=search_detail", "editdemographic", "height=600,width=900");
+				}else{
+					jQuery("form#addappt").submit();
+				}
+			
+			},
+			error:function(result){
+				// Create the appointment if something is wrong with the checker
+				jQuery("form#addappt").submit();
+			}
+			
+		});
+	}
+	return false;
+}
+<% }else{ %>
 function onAdd() {
   if (document.ADDAPPT.notes.value.length > 255) {
     window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
     return false;	
   }	
   return calculateEndTime() ;
-}	
+}
+<% } %>
 			
 <!--
 function setfocus() {
@@ -536,7 +573,7 @@ function pasteAppt(multipleSameDayGroupAppt) {
 	</tr>
 </table>
 <% } %>
-<FORM NAME="ADDAPPT" METHOD="post" ACTION="<%=request.getContextPath()%>/appointment/appointmentcontrol.jsp"
+<FORM NAME="ADDAPPT" id="addappt" METHOD="post" ACTION="<%=request.getContextPath()%>/appointment/appointmentcontrol.jsp"
 	onsubmit="return(onAdd())"><INPUT TYPE="hidden"
 	NAME="displaymode" value="">
 	<input type="hidden" name="year" value="<%=request.getParameter("year") %>" >
