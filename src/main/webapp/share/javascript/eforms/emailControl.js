@@ -109,7 +109,7 @@ function getSearchValue(name, url)
 
 function submitEmailButtonAjax(save, emailPatient) {
 	clearEmailFields();
-	document.getElementById('emailEForm').value=true;
+	
 	
 	var saveHolder = jQuery("#saveHolder");
 	if (saveHolder == null || saveHolder.size() == 0) {
@@ -143,6 +143,7 @@ function submitEmailButtonAjax(save, emailPatient) {
 		resultWindow = window.open('', 'resultWindow', "location=1,status=1,scrollbars=1,resizable=no,width=300,height=100,menubar=no,toolbar=no");
 		resultWindow.document.write(closeWindowHTML);
 		resultWindow.document.write("Sending email to &lt;"+$('#toEmail').val()+"&gt; ");
+		document.getElementById('emailEForm').value=true;
 		$.ajax({
 			 type: "POST",  
 			 url: form.attr("action"),  
@@ -150,10 +151,12 @@ function submitEmailButtonAjax(save, emailPatient) {
 			 success: function() {
 				 resultWindow.document.write("<div style=\"color:#458B00; font-weight: bold; padding-top: 10px;\">Email successfully sent</div>");
 				 resultWindow.document.write("<script type=\"text/javascript\">closeWindow();</script>");
+				 document.getElementById('emailEForm').value=false;
 				 clearEmailFields();
 			 },
 			 error: function() {
 				 resultWindow.document.write("<div>Something went wrong while trying to send the email. Please contact your administrator.</div>");
+				 document.getElementById('emailEForm').value=false;
 				 clearEmailFields();
 			 } 
 		});
@@ -162,16 +165,18 @@ function submitEmailButtonAjax(save, emailPatient) {
 		var form = $("form[name='RichTextLetter']");
 		if (!save) { form.attr("target", "_blank"); }
 		document.getElementById('Letter').value=editControlContents('edit');
-		
+		document.getElementById('emailEForm').value=true;
 		$.ajax({
 			 type: "POST",  
 			 url: form.attr("action"),  
 			 data: form.serialize(),  
 			 success: function() {  
 			    alert("Email sent successfully");
+			    document.getElementById('emailEForm').value=false;
 			    if (save) { window.close(); }
 			 },
 			 error: function() {
+				 document.getElementById('emailEForm').value=false;
 				 alert("An error occured while attempting to send your email, please contact an administrator.");
 			 } 
 		});
