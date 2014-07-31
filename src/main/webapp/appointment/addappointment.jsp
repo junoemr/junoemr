@@ -124,7 +124,7 @@ function onAdd(){
 			dataType:"json",
 			success:function(data){
 				if(data.result != "success" || data.result == "update_required"){
-					window.open("../demographic/demographiceditdemographic.jsp?demographic_no=<%=request.getParameter("demographic_no")%>&return=addappointment&displaymode=edit&dboperation=search_detail", "editdemographic", "height=600,width=900");
+					window.open("../demographic/demographiceditdemographic.jsp?demographic_no=<%=request.getParameter("demographic_no")%>&return=addappointment&displaymode=edit&dboperation=search_detail", "editdemographic", "height=600,width=900,scrollbars=yes");
 				}else{
 					jQuery("form#addappt").submit();
 				}
