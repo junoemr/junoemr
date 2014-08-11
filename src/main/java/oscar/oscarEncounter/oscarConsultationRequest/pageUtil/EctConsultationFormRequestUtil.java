@@ -269,7 +269,7 @@ public class EctConsultationFormRequestUtil {
     }
 
     public String getSpecailistsName(String id) {
-    	if (id == null || id.trim().length() == 0) { return "-1"; }
+    	if (id == null || id.trim().length() == 0) { return ""; }
         String retval = new String();
         try {
 
