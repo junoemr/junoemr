@@ -475,13 +475,47 @@ function patientStatusDateValid(trueIfBlank) {
     }
     return checkDate(yyyy,mm,dd,"<bean:message key="demographic.search.msgWrongPatientStatusDate"/>");
 }
-
+function checkCustomRequiredFields(){
+	var field_mapping = {
+			phone: "Phone (H)",
+			phone2: "Phone (W)",
+			cellphone: "Cell Phone",
+			demo_cell: "Cell Phone",
+			email: "Email",
+		};
+<%
+Iterator field_itr = custom_required_fields.iterator();
+while(field_itr.hasNext()){
+	Object field = field_itr.next();
+%>
+	if((document.updatedelete.<%=field%>_checkbox !== undefined &&
+		!document.updatedelete.<%=field%>_checkbox.checked &&
+		document.updatedelete.<%=field%>.value.length==0
+		) ||
+		(document.updatedelete.<%=field%>_checkbox === undefined &&
+		document.updatedelete.<%=field%> !== undefined &&
+		document.updatedelete.<%=field%>.value.length==0)
+	<% if(field.equals("phone")){%>
+		|| (document.updatedelete.<%=field%>.value == "<%=oscarProps.getProperty("phoneprefix", "905-")%>")
+		|| document.updatedelete.<%=field%>.value.length < 7
+	<%}%>
+	){
+		alert("You must provide the following field: "+field_mapping.<%=field%>);
+		return false;
+	}
+<%
+}
+%>
+	return true;
+	
+}
 function checkTypeInEdit() {
   if ( !checkName() ) return false;
   if ( !checkDob() ) return false;
   if ( !checkHin() ) return false;
   if ( !checkRosterStatus() ) return false;
   if ( !checkPatientStatus() ) return false;
+  if ( !checkCustomRequiredFields() ) return false;
   return(true);
 }
 
