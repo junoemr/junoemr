@@ -135,6 +135,13 @@
     int curYear = now.get(Calendar.YEAR);
     int curMonth = (now.get(Calendar.MONTH)+1);
     int curDay = now.get(Calendar.DAY_OF_MONTH);
+    
+	// Custom required fields
+	String required_fields = oscarProps.getProperty("custom_required_fields");         
+	List<String> custom_required_fields = new ArrayList<String>();
+	if(required_fields != null){
+		 custom_required_fields = new ArrayList<String>(Arrays.asList(required_fields.split(",")));
+	}
 %>
 
 
@@ -2321,7 +2328,7 @@ if ( PatStat.equals(Dead) ) {%>
 							</tr>
 							<tr valign="top">
 								<td align="right"><b><bean:message
-									key="demographic.demographiceditdemographic.formPhoneH" />: </b></td>
+									key="demographic.demographiceditdemographic.formPhoneH" /><% if(custom_required_fields.contains("phone")){%><font color="red">:</font> </b><% }else{ %>:<%} %> </b></td>
 								<td align="left">
 								<input type="text" name="phone" onblur="formatPhoneNum();" <%=getDisabled("phone")%>
 									style="display: inline; width: auto;"
@@ -2332,7 +2339,7 @@ if ( PatStat.equals(Dead) ) {%>
 									value="<%=apptMainBean.getString(demoExt.get("hPhoneExt"))%>" />
 								</td>
 								<td align="right"><b><bean:message
-									key="demographic.demographiceditdemographic.formPhoneW" />:</b></td>
+									key="demographic.demographiceditdemographic.formPhoneW" /><% if(custom_required_fields.contains("phone2")){%><font color="red">:</font> </b><% }else{ %>:<%} %></b></td>
 								<td align="left"><input type="text" name="phone2" <%=getDisabled("phone2")%>
 									onblur="formatPhoneNum();"
 									style="display: inline; width: auto;"
@@ -2346,7 +2353,7 @@ if ( PatStat.equals(Dead) ) {%>
 							</tr>
 							<tr valign="top">
 								<td align="right"><b><bean:message
-									key="demographic.demographiceditdemographic.formPhoneC" />: </b></td>
+									key="demographic.demographiceditdemographic.formPhoneC" /><% if(custom_required_fields.contains("cellphone")){%><font color="red">:</font> </b><% }else{ %>:<%} %> </b></td>
 								<td align="left">
 								<input type="text" name="demo_cell" onblur="formatPhoneNum();"
 									style="display: inline; width: auto;" <%=getDisabled("demo_cell")%>
@@ -2365,9 +2372,12 @@ if ( PatStat.equals(Dead) ) {%>
 							</tr>
 							<tr valign="top">
 								<td align="right"><b><bean:message
-									key="demographic.demographiceditdemographic.formEmail" />: </b></td>
+									key="demographic.demographiceditdemographic.formEmail" /><% if(custom_required_fields.contains("email")){%><font color="red">:</font> </b><% }else{ %>:<%} %> </b></td>
 								<td align="left"><input type="text" name="email" size="30" <%=getDisabled("email")%>
 									value="<%=demographic.getEmail()!=null? demographic.getEmail() : ""%>">
+									<% if(custom_required_fields.contains("email")){%>
+									<input type="checkbox" name="email_checkbox"/> Not available
+									<%}%>
 								</td>
 								<td align="right"><b><bean:message
 									key="demographic.demographiceditdemographic.formMyOscarUserName" />: </b></td>
