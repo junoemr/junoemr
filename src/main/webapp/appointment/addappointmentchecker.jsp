@@ -28,6 +28,8 @@
 <%@page import="org.oscarehr.common.model.Demographic" %>
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@page import="org.oscarehr.common.model.DemographicCust" %>
+<%@page import="org.oscarehr.common.model.DemographicExt" %>
+<%@page import="org.oscarehr.common.dao.DemographicExtDao" %>
 <%@page import="org.oscarehr.util.MiscUtils" %>
 <%@ page contentType="application/json" %>
 <%
@@ -51,7 +53,7 @@ Date today_date = new Date();
 String today_string = dt.format(today_date);
 Date today = dt.parse(today_string);
 
-// no appointment ever
+// no appointment ever for this demographic
 if(last_appointment_date_string.equals("(none)")){
 	result="update_required";
 	message="No appointments found";
@@ -68,7 +70,7 @@ if(last_appointment_date_string.equals("(none)")){
 	}
 }
 
-// updated today
+// Demographic was updated today
 if( last_update_date != null &&
 	today_date != null &&
     last_update_date.compareTo(today) == 0)
@@ -81,12 +83,37 @@ Calendar cal = Calendar.getInstance();
 cal.add(Calendar.MONTH, -3);
 Date three_months_ago = cal.getTime();
 
+// Check if last appointment is less than three months ago
 if(last_appointment_date != null &&
    last_appointment_date.after(three_months_ago))
 {
 	result = "success";	
 	message = "Last appointment was on "+last_appointment_date.toString();
 
+}
+
+// If we're all good in checking if the last appointment is less than 3 months ago,
+// Let's check if they have missing demographic info
+if(result.equals("success")){
+	// Check if demographic has email and cellphone
+	
+	DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
+	DemographicExt demoext_cellphone = demographicExtDao.getLatestDemographicExt(Integer.parseInt(demo_no),"demo_cell");
+	String cellphone = "";
+	if(demoext_cellphone != null){
+		cellphone = demoext_cellphone.getValue();
+	}
+	
+	if(cellphone.length() == 0){
+		result = "update_required";
+		message = "No cellphone";
+	}
+	
+	String email = demo.getEmail();
+	if(email == null || email.length() == 0){
+		result = "update_required";
+		message = "No email";
+	}
 }
 %>
 {"result":"<%=result%>", "message":"<%=message%>"}
