@@ -34,7 +34,6 @@
 <%@ taglib uri="/WEB-INF/special_tag.tld" prefix="special" %>
 <!-- end -->
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
-
 <%
 	if (session.getAttribute("user") == null) response.sendRedirect("../../logout.jsp");
 %>
@@ -1062,6 +1061,16 @@ function updateFaxButton() {
 	document.getElementById("fax_button").disabled = disabled;
 	document.getElementById("fax_button2").disabled = disabled;
 }
+<%if(props.isConsultationEmailEnabled()){%>
+function chooseEmail(){
+    toName = jQuery("#emailSelect").find(":selected").text();
+    toEmail = jQuery("#emailSelect").find(":selected").val();
+                                                                                
+    jQuery('#toProviderName').val(toName);
+    jQuery('#toProviderEmail').val(toEmail);
+}
+<%}%>
+
 </script>
 
 <%=WebUtils.popErrorMessagesAsAlert(session)%>
@@ -1297,6 +1306,63 @@ function updateFaxButton() {
 						<input id="fax_button" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
 					<% 	   } 
 					   }
+						if(props.isConsultationEmailEnabled()){
+							%>
+							<div>
+								<%
+								if(request.getAttribute("id")!=null){
+								%>							
+								<input id="updateAndEmailPatient" name="updateAndEmailPatient" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailPatient"/>" onclick="return checkForm('Update And Email Patient','EctConsultationFormRequestForm');" />
+								<input id="updateAndEmailProvider" name="updateAndEmailProvider" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailProvider"/>" onclick="return checkForm('Update And Email Provider','EctConsultationFormRequestForm');" />
+								<%
+								}else{
+								%>
+								<input id="submitAndEmailPatient" name="submitAndEmailPatient" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailPatient"/>" onclick="return checkForm('Submit And Email Patient','EctConsultationFormRequestForm');" />
+								<input id="submitAndEmailProvider" name="submitAndEmailProvider" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailProvider"/>" onclick="return checkForm('Submit And Email Provider','EctConsultationFormRequestForm');" />
+							    <%}
+							
+								// Get email addresses
+								displayServiceUtil.estSpecialist();
+								String rdohip = "";
+								if (!"".equals(demo))
+								{
+								 rdohip = SxmlMisc.getXmlContent(org.apache.commons.lang.StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
+								 rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(),"rdohip").trim();
+								}
+								
+								%>
+								<div style="display: inline-block;">
+									Provider:
+									<select id="emailSelect" name="emailSelect" onchange="chooseEmail()">
+										<option value=""></option>
+									<%
+									String rdName = "";
+									for (int i=0;i < displayServiceUtil.specIdVec.size(); i++) {
+							                             String  specId     = (String) displayServiceUtil.specIdVec.elementAt(i);
+							                             String  fName      = (String) displayServiceUtil.fNameVec.elementAt(i);
+							                             String  lName      = (String) displayServiceUtil.lNameVec.elementAt(i);
+							                             String  proLetters = (String) displayServiceUtil.proLettersVec.elementAt(i);
+							                             String  address    = (String) displayServiceUtil.addressVec.elementAt(i);
+							                             String  phone      = (String) displayServiceUtil.phoneVec.elementAt(i);
+							                             String  fax        = (String) displayServiceUtil.faxVec.elementAt(i);
+							                             String  email      = (String) displayServiceUtil.emailVec.elementAt(i);
+							                             String  referralNo = (displayServiceUtil.referralNoVec.size() > 0 ? displayServiceUtil.referralNoVec.get(i).trim() : "");
+							                             if (rdohip != null && !"".equals(rdohip) && rdohip.equals(referralNo)) {
+							                            	 rdName = String.format("%s, %s", lName, fName);
+							                             }
+										if (!"".equals(email)) {
+										%>
+										<option value="<%= email%>"><%= String.format("%s, %s &lt;%s&gt;", lName, fName, email) %> </option>
+										<%						
+										}
+									} %>		                        
+									</select>
+								</div>
+							</div>
+							<%
+						}
+					  
+
 					   if (thisForm.iseReferral()) { %>
 						<input type="button" value="Send eResponse" onclick="$('saved').value='true';document.location='<%=thisForm.getOruR01UrlString(request)%>'" />
 					<% } %>
@@ -1935,6 +2001,10 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 								}
 		                        %>
 								</select>
+								<input value="" name="toProviderName" id="toProviderName" type="hidden" />
+								<input value="" name="toProviderEmail" id="toProviderEmail" type="hidden" />
+								<input value="<%=demographic.getDisplayName()%>" name="toPatientName" id="toPatientName" type="hidden" />
+								<input value="<%=demographic.getEmail()%>" name="toPatientEmail" id="toPatientEmail" type="hidden" />
 							</td>
 							<td class="tite3">
 								<button onclick="AddOtherFaxProvider(); return false;">Add Provider</button>

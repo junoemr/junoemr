@@ -353,6 +353,22 @@ public class EctConsultationFormRequestAction extends Action {
 	    		forward.addParameter("requestId", requestId);
 	    		return forward;
             }
+		}               
+		else if(submission.endsWith("Email Provider"))
+        {                                                                                     
+            // Email consultation to provider 
+			request.setAttribute("reqId", requestId);
+			request.setAttribute("recipient", "provider");
+			MiscUtils.getLogger().debug("email provider");
+			return mapping.findForward("email");
+	    }
+		else if(submission.endsWith("Email Patient"))
+		{
+            // Email consultation to patient      
+			request.setAttribute("reqId", requestId);
+			request.setAttribute("recipient", "patient");
+			MiscUtils.getLogger().debug("email patient");
+			return mapping.findForward("email");
 		}
 			
 

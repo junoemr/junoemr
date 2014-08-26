@@ -1057,6 +1057,7 @@
 			<forward name="printIndivica" path="/oscarEncounter/oscarConsultationRequest/printPdf2.do" />
 			<forward name="fax" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax.jsp" />
 			<forward name="faxIndivica" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax.do" />
+			<forward name="email" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormEmail.do" />
 		</action>
 		<action input="/oscarEncounter/oscarconsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/printPdf" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestPrintAction">
 			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
@@ -1065,6 +1066,10 @@
 			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
 		</action>
 		<action input="/oscarEncounter/oscarconsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormFaxAction">
+			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
+			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
+		</action>
+		<action input="/oscarEncounter/oscarconsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormEmail" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormEmailAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
 			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
 		</action>
@@ -1808,6 +1813,7 @@
 		</action>
 		<action input="/dms/documentReport.jsp" name="eDocsAddEditDocument" path="/dms/addEditDocument" type="oscar.dms.actions.AddEditDocumentAction" parameter="method" scope="request" validate="false">
 			<forward name="successAdd" path="/dms/documentReport.jsp"></forward>
+			<forward name="successAddEForm" path="/eform/efmDocumentUpload.jsp"></forward>
 			<forward name="failAdd" path="/dms/documentReport.jsp"></forward>
 			<forward name="failEdit" path="/dms/editDocument.jsp"></forward>
 			<forward name="successEdit" path="/dms/closeWindow.html"></forward>

@@ -196,6 +196,13 @@ public class AddEditDocumentAction extends DispatchAction {
 			// if add/edit success then send redirect, if failed send a forward (need the formdata and errors hashtables while trying to avoid POSTDATA messages)
 			if (addDocument(fm, mapping, request) == true) { // if success
 				ActionRedirect redirect = new ActionRedirect(mapping.findForward("successAdd"));
+				// If this is for an eform...
+				if(request.getParameter("eformUpload") != null & request.getParameter("eformUpload").equals("true")){
+					MiscUtils.getLogger().debug("document_no::"+ ((String)request.getSession().getAttribute("document_no")));
+					redirect = new ActionRedirect(mapping.findForward("successAddEForm"));
+					// TODO: I can't figure out a way to easily get the document_no from addDocument() without significantly changing the function, so let's use this hack for now.
+					redirect.addParameter("document_no", EDocUtil.getLastDocumentNo());
+				}
 				redirect.addParameter("docerrors", "docerrors"); // Allows the JSP to check if the document was just submitted
 				redirect.addParameter("function", request.getParameter("function"));
 				redirect.addParameter("functionid", request.getParameter("functionid"));
@@ -207,6 +214,8 @@ public class AddEditDocumentAction extends DispatchAction {
 					redirect.addParameter("parentAjaxId", parentAjaxId);
 					redirect.addParameter("updateParent", "true");
 				}
+
+				
 				return redirect;
 			} else {
 				request.setAttribute("function", request.getParameter("function"));
@@ -332,6 +341,9 @@ public class AddEditDocumentAction extends DispatchAction {
 				cmnl.setTableName(CaseManagementNoteLink.DOCUMENT);
 				cmnl.setTableId(Long.parseLong(EDocUtil.getLastDocumentNo()));
 				cmnl.setNoteId(note_id);
+			
+				request.setAttribute("document_no", doc_no);
+				MiscUtils.getLogger().info(" document no"+doc_no);
 
 				EDocUtil.addCaseMgmtNoteLink(cmnl);
 			}
