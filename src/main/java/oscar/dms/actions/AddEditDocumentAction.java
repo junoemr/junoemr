@@ -197,7 +197,7 @@ public class AddEditDocumentAction extends DispatchAction {
 			if (addDocument(fm, mapping, request) == true) { // if success
 				ActionRedirect redirect = new ActionRedirect(mapping.findForward("successAdd"));
 				// If this is for an eform...
-				if(request.getParameter("eformUpload") != null & request.getParameter("eformUpload").equals("true")){
+				if(request.getParameter("eformUpload") != null && request.getParameter("eformUpload").equals("true")){
 					MiscUtils.getLogger().debug("document_no::"+ ((String)request.getSession().getAttribute("document_no")));
 					redirect = new ActionRedirect(mapping.findForward("successAddEForm"));
 					// TODO: I can't figure out a way to easily get the document_no from addDocument() without significantly changing the function, so let's use this hack for now.
