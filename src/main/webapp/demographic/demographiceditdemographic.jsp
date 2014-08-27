@@ -1015,6 +1015,17 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 				<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/>
 			</a>
 		<%
+		if("BC".equals(prov)){
+			//show eligibility check
+		%>
+		<br/>
+		<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmouseover="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','returnTeleplanMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+		<div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
+                                     <span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
+                                     <span id="returnTeleplanMsg"></span>
+		</div>
+		<%
+		}
 		
 	} else if("ON".equals(prov)) {%>
 				<a href="javascript: function myFunction() {return false; }"
