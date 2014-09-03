@@ -1357,6 +1357,10 @@ function chooseEmail(){
 										}
 									} %>		                        
 									</select>
+									<input value="" name="toProviderName" id="toProviderName" type="hidden" />
+									<input value="" name="toProviderEmail" id="toProviderEmail" type="hidden" />
+									<input value="<%=demographic.getDisplayName()%>" name="toPatientName" id="toPatientName" type="hidden" />
+									<input value="<%=demographic.getEmail()%>" name="toPatientEmail" id="toPatientEmail" type="hidden" />
 								</div>
 							</div>
 							<%
@@ -2001,10 +2005,6 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 								}
 		                        %>
 								</select>
-								<input value="" name="toProviderName" id="toProviderName" type="hidden" />
-								<input value="" name="toProviderEmail" id="toProviderEmail" type="hidden" />
-								<input value="<%=demographic.getDisplayName()%>" name="toPatientName" id="toPatientName" type="hidden" />
-								<input value="<%=demographic.getEmail()%>" name="toPatientEmail" id="toPatientEmail" type="hidden" />
 							</td>
 							<td class="tite3">
 								<button onclick="AddOtherFaxProvider(); return false;">Add Provider</button>
