@@ -50,7 +50,7 @@ public class UnclaimedLabTag extends TagSupport {
         try {
 
             
-            String sql = new String("select count(*) from providerLabRouting where provider_no = '0' and status = 'N'");            
+            String sql = new String("SELECT COUNT(*) from providerLabRouting plr LEFT JOIN hl7TextInfo info ON (info.lab_no = plr.lab_no) LEFT JOIN document doc ON (doc.document_no = plr.lab_no) WHERE doc.status <> 'D' AND plr.status = 'N' AND plr.provider_no = 0;");            
             ResultSet rs = DBHandler.GetSQL(sql);
             while (rs.next()) {
                numNewLabs = (rs.getInt(1));
