@@ -198,10 +198,10 @@ public class AddEditDocumentAction extends DispatchAction {
 				ActionRedirect redirect = new ActionRedirect(mapping.findForward("successAdd"));
 				// If this is for an eform...
 				if(request.getParameter("eformUpload") != null && request.getParameter("eformUpload").equals("true")){
-					MiscUtils.getLogger().debug("document_no::"+ ((String)request.getSession().getAttribute("document_no")));
 					redirect = new ActionRedirect(mapping.findForward("successAddEForm"));
 					// TODO: I can't figure out a way to easily get the document_no from addDocument() without significantly changing the function, so let's use this hack for now.
 					redirect.addParameter("document_no", EDocUtil.getLastDocumentNo());
+					redirect.addParameter("document_index", request.getParameter("document_index")); 
 				}
 				redirect.addParameter("docerrors", "docerrors"); // Allows the JSP to check if the document was just submitted
 				redirect.addParameter("function", request.getParameter("function"));
@@ -273,6 +273,7 @@ public class AddEditDocumentAction extends DispatchAction {
 				newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
 			}
 			
+			// if the document was added in the context of a program
 		 	// If a new document type is added, include it in the database to create filters 
 		 	if (!EDocUtil.getDoctypes(fm.getFunction()).contains(fm.getDocType())){ 
 		 		EDocUtil.addDocTypeSQL(fm.getDocType(),fm.getFunction());

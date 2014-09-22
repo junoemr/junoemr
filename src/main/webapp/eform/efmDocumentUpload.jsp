@@ -24,7 +24,9 @@
 <%@ page import="java.util.*, oscar.util.*, oscar.OscarProperties, oscar.dms.*, oscar.dms.data.*, org.oscarehr.util.SpringUtils, org.oscarehr.common.dao.CtlDocClassDao"%>
 <%
 String curUser = "";
+String document_index = request.getParameter("document_index");
 if(request.getParameter("showform") != null && request.getParameter("showform").equals("true")){
+	
 	OscarProperties props = OscarProperties.getInstance();
 	String appointment = request.getParameter("appointmentNo");
 	String user_no = (String) session.getAttribute("user");
@@ -86,15 +88,11 @@ if(request.getParameter("showform") != null && request.getParameter("showform").
 		<input type="file" name="docFile" id="docFile" size="20" >
 		<input type="hidden" name="mode" value="add">
 		<input type="hidden" name="eformUpload" value="true">
+		<input type="hidden" name="document_index" value="<%=document_index%>">
+		<input type="hidden" name="observationDate" id="observationDate" value="<%=UtilDateUtilities.DateToString(UtilDateUtilities.now(), "yyyy/MM/dd")%>" size="10" style="text-align: center;">
+		
 		<div>
 			Photo Label: <input type="text" name="docDesc" id="docDesc" size="30" value="<%=formdata.getDocDesc()%>" placeholder="Description">
-		</div>
-		<div>
-			<span class="fieldlabel" title="Observation Date">
-				Observation Date (yyyy/mm/dd):
-			</span>
-			<input type="text" name="observationDate" id="observationDate" value="<%=formdata.getObservationDate()%>" onclick="checkDefaultDate(this, '<%=UtilDateUtilities.DateToString(UtilDateUtilities.now(), "yyyy/MM/dd")%>')" size="10" style="text-align: center;">
-			<a id="obsdate"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a>
 		</div>
 		<div>
 			<input type="submit" name="Submit" value="Add">
@@ -116,12 +114,12 @@ function checkRequired(){
     return true;
 }
 function showLoader(){
-    document.getElementById("loader").style.display = "block";
-    document.getElementById("addImage").style.display = "none";
+//    document.getElementById("loader").style.display = "block";
+//    document.getElementById("addImage").style.display = "none";
 }
 function hideLoader(){
-    document.getElementById("loader").style.display = "none";
-    document.getElementById("addImage").style.display = "block";
+//    document.getElementById("loader").style.display = "none";
+//    document.getElementById("addImage").style.display = "block";
 }
 </script>
 <%
@@ -131,15 +129,16 @@ String document_no = request.getParameter("document_no");
 %>
 <%=document_no%>
 <script type="text/javascript">
+	parent.document.getElementById("document_no_<%=document_index%>").value = "<%=document_no%>";
     parent.document.getElementById("uploaded_document_no").value = "<%=document_no%>";
     parent.document.getElementById("current_document_no").value = "<%=document_no%>";
 	var img = document.createElement("img");
 	img.setAttribute("src", "../dms/ManageDocument.do?method=display&doc_no=<%=document_no%>&providerNo=<%=curUser%>");
 	img.setAttribute("class", "uploadedimage");
-	img.setAttribute("height", "375");
-	img.setAttribute("width", "375");
-    parent.document.getElementById("photodisplay").appendChild(img);
-    parent.document.getElementById("photodisplay").style.display = "block";
-	parent.document.getElementById("uploadiframe").style.display = "none";
+	img.setAttribute("height", "240");
+	img.setAttribute("width", "240");
+	parent.document.getElementById("photodisplay_<%=document_index%>").appendChild(img);
+	parent.document.getElementById("photodisplay_<%=document_index%>").style.display = "block";
+	parent.document.getElementById("uploadiframe_<%=document_index%>").style.display = "none";
 </script>
 <%}%>
