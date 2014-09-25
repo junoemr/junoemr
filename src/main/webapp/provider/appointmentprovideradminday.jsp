@@ -1963,7 +1963,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
         int rowLength = 0;
         int numRows = 1;
         for(String word : reasonWords) {
-            if(rowLength > preferredReasonRowLength && numRows < iRows) {
+            if(rowLength > preferredReasonRowLength && numRows < (iRows - 1)) {
                 rowLength = 0;
                 numRows += 1;
     %>
