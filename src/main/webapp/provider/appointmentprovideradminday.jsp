@@ -1938,7 +1938,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 
 <!-- weekly view: inline reason - span multiple rows if possible -->
 <% if(isWeekView && OscarProperties.getInstance().isWeekViewReasonDisplayEnabled() && reason != null && reason.length() > 0 && !reason.equals("null")) {
-    int preferredReasonRowLength = 30;
+    int preferredReasonRowLength = OscarProperties.getInstance().getWeekViewReasonDisplayPreferredLength();
 %>
     <% if(iRows <= 1) {
         // put the reason inline on the same line

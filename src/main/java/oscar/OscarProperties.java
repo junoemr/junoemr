@@ -327,4 +327,14 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("week_view_reason_display");
 	}
 
+	public int getWeekViewReasonDisplayPreferredLength() {
+		int defaultValue = 30; // default number of characters
+		String prop = getProperty("week_view_reason_preferred_length", String.valueOf(defaultValue));
+		try {
+			return Integer.parseInt(prop);
+		} catch(NumberFormatException e) {
+			return defaultValue;
+		}
+	}
+
 }
