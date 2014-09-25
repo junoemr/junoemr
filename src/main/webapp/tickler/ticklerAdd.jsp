@@ -25,7 +25,7 @@
 --%>
 
 <%@ page import="oscar.OscarProperties" %>
-<%    
+<%
 
 if(session.getAttribute("user") == null)
     response.sendRedirect("../logout.jsp");
@@ -56,12 +56,12 @@ if( request.getParameter("parentAjaxId") != null )
     parentAjaxId = request.getParameter("parentAjaxId");
 else
     parentAjaxId = "";
-    
+
 String updateParent;
 if( request.getParameter("updateParent") != null )
     updateParent = request.getParameter("updateParent");
 else
-    updateParent = "true";  
+    updateParent = "true";
 
 %>
 <%@ page import="java.util.*, java.sql.*, oscar.*, java.net.*, oscar.oscarEncounter.pageUtil.EctSessionBean" %>
@@ -72,8 +72,8 @@ else
 GregorianCalendar now=new GregorianCalendar();
   int curYear = now.get(Calendar.YEAR);
   int curMonth = (now.get(Calendar.MONTH)+1);
-  int curDay = now.get(Calendar.DAY_OF_MONTH);   
-  
+  int curDay = now.get(Calendar.DAY_OF_MONTH);
+
   %><% //String providerview=request.getParameter("provider")==null?"":request.getParameter("provider");
    String xml_vdate=request.getParameter("xml_vdate") == null?"":request.getParameter("xml_vdate");
    String xml_appointment_date = request.getParameter("xml_appointment_date")==null?MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay):request.getParameter("xml_appointment_date");
@@ -112,7 +112,7 @@ function popupPage(vheight,vwidth,varpage) { //open a new popup window
   var popup=window.open(page, "attachment", windowprops);
   if (popup != null) {
     if (popup.opener == null) {
-      popup.opener = self; 
+      popup.opener = self;
     }
   }
 }
@@ -121,7 +121,7 @@ function selectprovider(s) {
   else a = self.location.href;
 	self.location.href = a + "&providerview=" +s.options[s.selectedIndex].value ;
 }
-function openBrWindow(theURL,winName,features) { 
+function openBrWindow(theURL,winName,features) {
   window.open(theURL,winName,features);
 }
 function setfocus() {
@@ -151,7 +151,7 @@ alert("<bean:message key="tickler.ticklerAdd.msgMissingDate"/>");
  else if (document.serviceform.site.value=="none"){
 alert("Must assign task to a provider.");
 	return false;
- } 
+ }
 <% } %>
  else{
  return true;
@@ -177,7 +177,7 @@ function DateAdd(startDate, numDays, numMonths, numYears)
 {
 	var returnDate = new Date(startDate.getTime());
 	var yearsToAdd = numYears;
-	
+
 	var month = returnDate.getMonth()	+ numMonths;
 	if (month > 11)
 	{
@@ -187,9 +187,9 @@ function DateAdd(startDate, numDays, numMonths, numYears)
 	}
 	returnDate.setMonth(month);
 	returnDate.setFullYear(returnDate.getFullYear()	+ yearsToAdd);
-	
+
 	returnDate.setTime(returnDate.getTime()+60000*60*24*numDays);
-	
+
 	return returnDate;
 
 }
@@ -213,7 +213,7 @@ function DayAdd(startDate, numDays)
 function addMonth(no)
 {       var gCurrentDate = new Date();
 	var newDate = DateAdd(gCurrentDate, 0, no,0 );
-var newYear = newDate.getFullYear() 
+var newYear = newDate.getFullYear()
 var newMonth = newDate.getMonth()+1;
 var newDay = newDate.getDate();
 var newD = newYear + "-" + newMonth + "-" + newDay;
@@ -236,17 +236,17 @@ var newD = newYear + "-" + newMonth + "-" + newDay;
 
 <body bgcolor="#FFFFFF" text="#000000" leftmargin="0" rightmargin="0" topmargin="10" onLoad="setfocus()">
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <tr bgcolor="#000000"> 
+  <tr bgcolor="#000000">
     <td height="40" width="10%"> </td>
-    <td width="90%" align="left"> 
-      <p><font face="Verdana, Arial, Helvetica, sans-serif" color="#FFFFFF"><b><font face="Arial, Helvetica, sans-serif" size="4"><bean:message key="tickler.ticklerAdd.msgTickler"/></font></b></font> 
+    <td width="90%" align="left">
+      <p><font face="Verdana, Arial, Helvetica, sans-serif" color="#FFFFFF"><b><font face="Arial, Helvetica, sans-serif" size="4"><bean:message key="tickler.ticklerAdd.msgTickler"/></font></b></font>
       </p>
     </td>
   </tr>
 </table>
 <table width="100%" border="0" cellspacing="0" cellpadding="0"bgcolor="#EEEEFF">
  <form name="ADDAPPT" method="post" action="../appointment/appointmentcontrol.jsp">
-<tr> 
+<tr>
       <td width="35%"><font color="#003366"><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><b><bean:message key="tickler.ticklerAdd.formDemoName"/>: </b></font></font></td>
       <td colspan="2" width="65%">
 <div align="left"><INPUT TYPE="TEXT" NAME="keyword" size="25" VALUE="<%=bFirstDisp?"":demoName.equals("")?session.getAttribute("appointmentname"):demoName%>">
@@ -266,7 +266,7 @@ var newD = newYear + "-" + newMonth + "-" + newDay;
 				      <INPUT TYPE="hidden" NAME="limit1" VALUE="0" >
 				      <INPUT TYPE="hidden" NAME="limit2" VALUE="5" >
               <!--input type="hidden" name="displaymode" value="TicklerSearch" -->
-              <INPUT TYPE="hidden" NAME="displaymode" VALUE="Search "> 
+              <INPUT TYPE="hidden" NAME="displaymode" VALUE="Search ">
 
 <% ChartNo = bFirstDisp?"":request.getParameter("chart_no")==null?"":request.getParameter("chart_no"); %>
    <INPUT TYPE="hidden" NAME="appointment_date" VALUE="2002-10-01" WIDTH="25" HEIGHT="20" border="0" hspace="2">
@@ -275,7 +275,7 @@ var newD = newYear + "-" + newMonth + "-" + newDay;
               <INPUT TYPE="hidden" NAME="type" VALUE="" WIDTH="25" HEIGHT="20" border="0" hspace="2">
               <INPUT TYPE="hidden" NAME="duration" VALUE="15" WIDTH="25" HEIGHT="20" border="0" hspace="2" >
               <INPUT TYPE="hidden" NAME="end_time" VALUE="10:59" WIDTH="25" HEIGHT="20" border="0" hspace="2"  onChange="checkTimeTypeIn(this)">
-       
+
 
  <input type="hidden" name="demographic_no"  readonly value="" width="25" height="20" border="0" hspace="2">
          <input type="hidden" name="location"  tabindex="4" value="" width="25" height="20" border="0" hspace="2">
@@ -287,43 +287,43 @@ var newD = newYear + "-" + newMonth + "-" + newDay;
               <INPUT TYPE="hidden" NAME="creator" VALUE="oscardoc, doctor">
               <INPUT TYPE="hidden" NAME="remarks" VALUE="">
               <input type="hidden" name="parentAjaxId" value="<%=parentAjaxId%>"/>
-              <input type="hidden" name="updateParent" value="<%=updateParent%>"/> 
+              <input type="hidden" name="updateParent" value="<%=updateParent%>"/>
  </form>
 </table>
 <table width="100%" border="0" bgcolor="#EEEEFF">
   <form name="serviceform" method="post" >
       <input type="hidden" name="parentAjaxId" value="<%=parentAjaxId%>"/>
       <input type="hidden" name="updateParent" value="<%=updateParent%>"/>
-     <tr> 
+     <tr>
       <td width="35%"> <div align="left"><font color="#003366"><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><strong><bean:message key="tickler.ticklerAdd.formChartNo"/>:</strong> </font></font></div></td>
       <td colspan="2"> <div align="left"><INPUT TYPE="hidden" NAME="demographic_no" VALUE="<%=bFirstDisp?"":request.getParameter("demographic_no").equals("")?"":request.getParameter("demographic_no")%>"><%=ChartNo%></div></td>
     </tr>
 
-    <tr> 
+    <tr>
       <td><font color="#003366" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><bean:message key="tickler.ticklerAdd.formServiceDate"/>:</strong></font></td>
-      <td><input type="text" name="xml_appointment_date" value="<%=xml_appointment_date%>"> 
+      <td><input type="text" name="xml_appointment_date" value="<%=xml_appointment_date%>">
         <font color="#003366" size="1" face="Verdana, Arial, Helvetica, sans-serif">
-        <a href="#" onClick="openBrWindow('../billing/billingCalendarPopup.jsp?type=end&amp;year=<%=curYear%>&amp;month=<%=curMonth%>','','width=300,height=300')"><bean:message key="tickler.ticklerAdd.btnCalendarLookup"/></a> &nbsp; &nbsp; 
+        <a href="#" onClick="openBrWindow('../billing/billingCalendarPopup.jsp?type=end&amp;year=<%=curYear%>&amp;month=<%=curMonth%>','','width=300,height=300')"><bean:message key="tickler.ticklerAdd.btnCalendarLookup"/></a> &nbsp; &nbsp;
         <a href="#" onClick="addMonth(6)"><bean:message key="tickler.ticklerAdd.btn6Month"/></a>&nbsp; &nbsp;
         <a href="#" onClick="addMonth(12)"><bean:message key="tickler.ticklerAdd.btn1Year"/></a></font> </td>
       <td>&nbsp;</td>
     </tr>
-    <tr> 
+    <tr>
       <td height="21" valign="top"><font color="#003366" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><bean:message key="tickler.ticklerMain.Priority"/></strong></font></td>
-      <td valign="top"> 
+      <td valign="top">
 	<select name="priority" style="font-face:Verdana, Arial, Helvetica, sans-serif">
  	<option value="<bean:message key="tickler.ticklerMain.priority.high"/>"><bean:message key="tickler.ticklerMain.priority.high"/>
 	<option value="<bean:message key="tickler.ticklerMain.priority.normal"/>" SELECTED><bean:message key="tickler.ticklerMain.priority.normal"/>
-	<option value="<bean:message key="tickler.ticklerMain.priority.low"/>"><bean:message key="tickler.ticklerMain.priority.low"/>	
+	<option value="<bean:message key="tickler.ticklerMain.priority.low"/>"><bean:message key="tickler.ticklerMain.priority.low"/>
      	</select>
       </td>
       <td>&nbsp;</td>
     </tr>
 
-    <tr> 
+    <tr>
       <td height="21" valign="top"><font color="#003366" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><bean:message key="tickler.ticklerMain.taskAssignedTo"/></strong></font></td>
       <td valign="top"> <font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#333333">
-<% if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) 
+<% if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
 { // multisite start ==========================================
         	SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
           	List<Site> sites = siteDao.getActiveSitesByProviderNo(user_no);
@@ -333,10 +333,10 @@ var newD = newYear + "-" + newMonth + "-" + newDay;
           		ResultSet rs = apptMainBean.queryResults(appNo, "get_appt_location");
           		if(rs.next()) location=apptMainBean.getString(rs,1);
           	}
-      %> 
+      %>
       <script>
 var _providers = [];
-<%	
+<%
 Site site = null;
 for (int i=0; i<sites.size(); i++) { %>
 	_providers["<%= sites.get(i).getSiteId() %>"]="<% Iterator<Provider> iter = sites.get(i).getProviders().iterator();
@@ -347,8 +347,11 @@ for (int i=0; i<sites.size(); i++) { %>
 <%	if (sites.get(i).getName().equals(location))
 		site = sites.get(i);
 	} %>
-function changeSite(sel) {
+function changeSite(sel, cb) {
 	sel.form.task_assigned_to.innerHTML=sel.value=="none"?"":_providers[sel.value];
+  if(cb && typeof cb === "function") {
+    cb();
+  }
 }
       </script>
       	<select id="site" name="site" onchange="changeSite(this)">
@@ -367,11 +370,11 @@ function changeSite(sel) {
 <% // multisite end ==========================================
 } else {
 %>
-      <select name="task_assigned_to">           
+      <select name="task_assigned_to">
             <%  String proFirst="";
                 String proLast="";
                 String proOHIP="";
-				String defaultProvider = 
+				String defaultProvider =
 					props.getProperty("default_tickler_provider", "");
 
                 ResultSet rslocal = apptMainBean.queryResults("%", "search_provider_all");
@@ -380,7 +383,7 @@ function changeSite(sel) {
 					String selected = "";
                     proFirst = rslocal.getString("first_name");
                     proLast = rslocal.getString("last_name");
-                    proOHIP = rslocal.getString("provider_no"); 
+                    proOHIP = rslocal.getString("provider_no");
 					if(defaultProvider.equals(proOHIP))
 					{
 						selected = "selected";
@@ -390,27 +393,27 @@ function changeSite(sel) {
 						selected = "selected";
 					}
 
-            %> 
+            %>
 			<option value="<%=proOHIP%>" <%=selected%> ><%=proLast%>, <%=proFirst%></option>
             <%
                 }
             %>
       </select>
 <% } %>
-          
+
            <input type="hidden" name="docType" value="<%=request.getParameter("docType")%>"/>
            <input type="hidden" name="docId" value="<%=request.getParameter("docId")%>"/>
       </td>
       <td>&nbsp;</td>
     </tr>
-    <tr> 
+    <tr>
       <td height="21" valign="top"><font color="#003366" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><bean:message key="tickler.ticklerAdd.formReminder"/>:</strong></font></td>
       <td valign="top"> <textarea style="font-face:Verdana, Arial, Helvetica, sans-serif"name="textarea" cols="50" rows="10"></textarea></td>
       <td>&nbsp;</td>
     </tr>
-        
+
      <INPUT TYPE="hidden" NAME="user_no" VALUE="<%=user_no%>">
-    <tr> 
+    <tr>
       <td><input type="button" name="Button" value="<bean:message key="tickler.ticklerAdd.btnCancel"/>" onClick="window.close()"></td>
       <td><input type="button" name="Button" value="<bean:message key="tickler.ticklerAdd.btnSubmit"/>" onClick="validate(this.form)"></td>
       <td></td>
@@ -419,7 +422,7 @@ function changeSite(sel) {
 </table>
 <p><font face="Arial, Helvetica, sans-serif" size="2"> </font></p>
   <p>&nbsp; </p>
-<%@ include file="../demographic/zfooterbackclose.jsp" %> 
+<%@ include file="../demographic/zfooterbackclose.jsp" %>
 
 </body>
 </html:html>
