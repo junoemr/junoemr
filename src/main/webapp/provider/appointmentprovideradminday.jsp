@@ -37,7 +37,7 @@
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%
-			
+
 	if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.jsp");
 	String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 
@@ -230,7 +230,7 @@ public boolean patientHasOutstandingPrivateBills(String demographicNo){
     for( String formName : forms ) {
     	ectFormNames = ectFormNames.append("&encounterFormName=" + formName);
     }
-    
+
     boolean prescriptionQrCodes = providerPreference2.isPrintQrCodeOnPrescriptions();
     boolean erx_enable = providerPreference2.isERxEnabled();
     boolean erx_training_mode = providerPreference2.isERxTrainingMode();
@@ -281,7 +281,7 @@ if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.Is
     int view = request.getParameter("view")!=null ? Integer.parseInt(request.getParameter("view")) : 0; //0-multiple views, 1-single view
     //// THIS IS THE VALUE I HAVE BEEN LOOKING FOR!!!!!
 	boolean bDispTemplatePeriod = ( oscarVariables.getProperty("receptionist_alt_view") != null && oscarVariables.getProperty("receptionist_alt_view").equals("yes") ); // true - display as schedule template period, false - display as preference
-	
+
 %>
 <%
 
@@ -349,7 +349,7 @@ formatDate = UtilDateUtilities.DateToString(inform.parse(strDate), "EEE, yyyy-MM
 String strYear=""+year;
 String strMonth=month>9?(""+month):("0"+month);
 String strDay=day>9?(""+day):("0"+day);
-   
+
 UserPropertyDAO userPropertyDao = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
 DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
 
@@ -824,7 +824,7 @@ if(mygroupno != null && providerBean.get(mygroupno) != null) { //single appointe
      curProvider_no[0]=mygroupno;
      {
     	 ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
-    	    
+
      	curProviderName[0]=providerDao.getProvider(mygroupno).getFullName();
      }
 } else {
@@ -866,20 +866,20 @@ if(mygroupno != null && providerBean.get(mygroupno) != null) { //single appointe
        }
       UserProperty uppatientNameLength = userPropertyDao.getProp(curUser_no, UserProperty.PATIENT_NAME_LENGTH);
       int NameLength=0;
-      
+
       if ( uppatientNameLength != null && uppatientNameLength.getValue() != null) {
           try {
              NameLength=Integer.parseInt(uppatientNameLength.getValue());
           } catch (NumberFormatException e) {
              NameLength=0;
           }
-      
+
           if(NameLength>0) {
              len=lenLimitedS= lenLimitedL = NameLength;
           }
      }
-      
-     
+
+
      curProvider_no = new String [numProvider];
      curProviderName = new String [numProvider];
 
@@ -894,7 +894,7 @@ if(mygroupno != null && providerBean.get(mygroupno) != null) { //single appointe
        curProvider_no[iTemp] = String.valueOf(provider.get("provider_no"));
        {
       	 ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
-      	 
+
       	 Provider p = providerDao.getProvider((String)provider.get("provider_no"));
       	 if (p!=null) {
       		 curProviderName[iTemp]=p.getFullName();
@@ -902,7 +902,7 @@ if(mygroupno != null && providerBean.get(mygroupno) != null) { //single appointe
       		curProviderName[iTemp]=null;
       	 }
        }
-       
+
        iTemp++;
      }
     }
@@ -998,7 +998,7 @@ java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.stru
     	 <a HREF="#" ONCLICK ="popupPage2('../billing/CA/BC/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;" TITLE='<bean:message key="global.genBillReport"/>' onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message key="global.billing"/></a>
     	 <%
      }else{
-     
+
      if (vLocale.getCountry().equals("BR")) { %>
        <a HREF="#" ONCLICK ="popupPage2('../oscar/billing/consultaFaturamentoMedico/init.do');return false;" TITLE='<bean:message key="global.genBillReport"/>' onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message key="global.billing"/></a>
      <% } else {%>
@@ -1560,7 +1560,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
                   if(OscarProperties.getInstance().getProperty("APPT_ALWAYS_SHOW_LONG_NAME","false").equals("false")) {
                 	len = bFirstTimeRs&&!bFirstFirstR?lenLimitedS:lenLimitedL;
                   }
-                  
+
                   iS=Integer.parseInt(String.valueOf(appointment.get("start_time")).substring(0,2));
                   iSm=Integer.parseInt(String.valueOf(appointment.get("start_time")).substring(3,5));
                   iE=Integer.parseInt(String.valueOf(appointment.get("end_time")).substring(0,2));
@@ -1628,7 +1628,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
                   for (Map demo : demoList) {
                     ver = (String)demo.get("ver");
                     roster = (String)demo.get("roster_status");
-                    
+
                     demo_scanned_chart = (String)demo.get("scanned_chart");
 
                     int intMob = 0;
@@ -1641,7 +1641,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
                     dob = String.valueOf(demo.get("date_of_birth"));
                     if(dob.length()>0 && !dob.equals("null"))
                     	intDob = Integer.parseInt(dob);
-                    
+
                     demo_alert = String.valueOf(!(null == demo.get("alert") || "null".equals(demo.get("alert")) )? demo.get("alert"): "").trim();
 
 
@@ -1686,7 +1686,9 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 			 //multi-site. if a site have been selected, only display appointment in that site
 			 if (!bMultisites || (selectedSite == null && CurrentSiteMap.get(sitename) != null) || sitename.equals(selectedSite)) {
         %>
-            <td class="appt" bgcolor='<%=as.getBgColor()%>' rowspan="<%=iRows%>" <%-- =view==0?(len==lenLimitedL?"nowrap":""):"nowrap"--%> nowrap>
+
+            <td class='appt <%= OscarProperties.getInstance().isWeekViewReasonDisplayEnabled() ? "align-top" : "" %>'
+                bgcolor='<%=as.getBgColor()%>' rowspan="<%=iRows%>" <%-- =view==0?(len==lenLimitedL?"nowrap":""):"nowrap"--%> nowrap>
 			<%
 				if (BookingSource.MYOSCAR_SELF_BOOKING.name().equals(appointment.get("bookingSource")))
 				{
@@ -1700,7 +1702,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 			 	<span title="<%= sitename %>" style="background-color:<%=siteBgColor.get(sitename)%>;">&nbsp;</span>|
 			 <%} %>
 
-            
+
             <%
 			    if (as.getNextStatus() != null && !as.getNextStatus().equals("")) {
             %>
@@ -1720,12 +1722,12 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
             	<img src="../images/warning-icon.png" border="0" width="14" height="14" title="Critical Appointment"/>
             <% } %>
 <%--|--%>
-            
+
         <%
         			if(demographic_no==0) {
         				//MARC
         %>
-            
+
         	<!--  caisi  -->
         	<% if (tickler_no.compareTo("") != 0) {%>
 	        	<caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
@@ -1745,22 +1747,25 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
         <% if(OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true")) { %>
 	      	<br/>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<%if((apptType != null && apptType.length()>0) && (reason != null && reason.length()>0) ) { %>	
+		<%if((apptType != null && apptType.length()>0) && (reason != null && reason.length()>0) ) { %>
 			<%=UtilMisc.htmlEscape(apptType)%>&nbsp;|&nbsp;<%=UtilMisc.htmlEscape(reason)%>
 		<% } %>
-		<%if((apptType != null && apptType.length()>0) && (reason == null || reason.length() == 0) ) { %>	
+		<%if((apptType != null && apptType.length()>0) && (reason == null || reason.length() == 0) ) { %>
 			<%=UtilMisc.htmlEscape(apptType)%>
 		<% } %>
-		<%if((apptType == null || apptType.length()==0) && (reason != null && reason.length() > 0) ) { %>	
+		<%if((apptType == null || apptType.length()==0) && (reason != null && reason.length() > 0) ) { %>
 			<%=UtilMisc.htmlEscape(reason)%>
 		<% } %>
-		
+
 		<%if(OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true")) { %>
 		<br/>
 		<% } %>
 	<% } %>
-	
-      <oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true"><span class="reason"><bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=UtilMisc.htmlEscape(reason)%></span></oscar:oscarPropertiesCheck></td>
+
+      <oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true">
+        <span class="reason"><bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=UtilMisc.htmlEscape(reason)%></span>
+      </oscar:oscarPropertiesCheck></td>
+
         <%
         			} else {
 				%>	<% if (tickler_no.compareTo("") != 0) {%>
@@ -1826,13 +1831,13 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 	<br/>
 	<%} %>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<%if((apptType != null && apptType.length()>0) && (reason != null && reason.length()>0) ) { %>	
+		<%if((apptType != null && apptType.length()>0) && (reason != null && reason.length()>0) ) { %>
 			<%=UtilMisc.htmlEscape(apptType)%>&nbsp;|&nbsp;<%=UtilMisc.htmlEscape(reason)%>
 		<% } %>
-		<%if((apptType != null && apptType.length()>0) && (reason == null || reason.length() == 0) ) { %>	
+		<%if((apptType != null && apptType.length()>0) && (reason == null || reason.length() == 0) ) { %>
 			<%=UtilMisc.htmlEscape(apptType)%>
 		<% } %>
-		<%if((apptType == null || apptType.length()==0) && (reason != null && reason.length() > 0) ) { %>	
+		<%if((apptType == null || apptType.length()==0) && (reason != null && reason.length() > 0) ) { %>
 			<%=UtilMisc.htmlEscape(reason)%>
 		<% } %>
 	<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1866,22 +1871,22 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 <!-- billing code block -->
 <%
 	// Get the default service type to use for the billing page. (Service type = Billing form)
-	// If the patients provider has a default selected in thier preferences use it. Otherwise use the 
+	// If the patients provider has a default selected in thier preferences use it. Otherwise use the
 	// global default defined in the properties file. (Note: The preferences for the patients provider
 	// are used, not the preference for the active user)
 	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 	Demographic demographic = demographicDao.getDemographic(Integer.toString(demographic_no));
 	String billingServiceType = URLEncoder.encode(oscarVariables.getProperty("default_view"));
 	List<Map<java.lang.String,java.lang.Object>> providerPreferences = oscarSuperManager.find("providerDao", "search_pref_defaultbill", new Object[] {demographic.getProviderNo()});
-	if (providerPreferences.size() > 0) 
+	if (providerPreferences.size() > 0)
 	{
 		if ( !String.valueOf(providerPreferences.get(0).get("defaultServiceType")).equals( "no" ) )
 		{
 			billingServiceType = URLEncoder.encode(String.valueOf(providerPreferences.get(0).get("defaultServiceType")));
 		}
 	}
-	
-	
+
+
 	if (!isWeekView) { %>
 	<security:oscarSec roleName="<%=roleName$%>" objectName="_billing" rights="r">
 	<%
@@ -1894,7 +1899,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 						"&appointment_provider_no="+appointment.get("provider_no")+
 						"&chart_no="+
 						"&appointment_start_time="+appointment.get("start_time");
-						
+
 	}
 	%>
              <% if(status.indexOf('B')==-1) {
@@ -1930,6 +1935,47 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
     title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>">|<bean:message key="provider.appointmentProviderAdminDay.btnM"/></a>
     <%}%>
 </security:oscarSec>
+
+<!-- weekly view: inline reason - span multiple rows if possible -->
+<% if(isWeekView && OscarProperties.getInstance().isWeekViewReasonDisplayEnabled() && reason != null && reason.length() > 0 && !reason.equals("null")) {
+    int preferredReasonRowLength = 30;
+%>
+    <% if(iRows <= 1) {
+        // put the reason inline on the same line
+    %>
+        <span class="reason reason-weekly">
+            <%= UtilMisc.htmlEscape(reason) %>
+        </span>
+    <% } else if(iRows == 2 || reason.length() <= preferredReasonRowLength) {
+        // put the reason on the second line
+    %>
+        <div class="reason reason-weekly">
+            <%= UtilMisc.htmlEscape(reason) %>
+        </div>
+    <% } else {
+        // put the reason on the second line and subsequent lines as necessary, with a manual 'wrap'
+        // (in order to 'wrap' the reason within the nowrap cell, to a maximum number of rows, just force a parse into multiple lines)
+    %>
+        <div class="reason reason-weekly">
+
+    <%
+        String[] reasonWords = reason.split(" ");
+        int rowLength = 0;
+        int numRows = 1;
+        for(String word : reasonWords) {
+            if(rowLength > preferredReasonRowLength && numRows < iRows) {
+                rowLength = 0;
+                numRows += 1;
+    %>
+        <br/>
+    <%      } %>
+        <%= UtilMisc.htmlEscape(word) %>
+    <%  rowLength += word.length() + 1;
+        } %>
+        </div>
+    <% } %>
+<% } %>
+
       <% if (!vLocale.getCountry().equals("BR") && !isWeekView) { %>
 
 <!-- doctor code block 4 -->
@@ -1988,18 +2034,24 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 	</oscar:oscarPropertiesCheck>
 
       <!--Inline display of reason -->
-      <oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true"><span class="reason"><bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=(reason == null || reason.equals("null"))?"":UtilMisc.htmlEscape(reason)%></span></oscar:oscarPropertiesCheck>
+      <oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true">
+        <span class="reason">
+            <bean:message key="provider.appointmentProviderAdminDay.Reason"/>:
+            <%=(reason == null || reason.equals("null"))?"":UtilMisc.htmlEscape(reason)%>
+        </span>
+      </oscar:oscarPropertiesCheck>
+
       <% } %>
       <% if(OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true")) { %>
 	      	<br/>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<%if((apptType != null && apptType.length()>0) && (reason != null && reason.length()>0) ) { %>	
+		<%if((apptType != null && apptType.length()>0) && (reason != null && reason.length()>0) ) { %>
 			<%=UtilMisc.htmlEscape(apptType)%>&nbsp;|&nbsp;<%=UtilMisc.htmlEscape(reason)%>
 		<% } %>
-		<%if((apptType != null && apptType.length()>0) && (reason == null || reason.length() == 0) ) { %>	
+		<%if((apptType != null && apptType.length()>0) && (reason == null || reason.length() == 0) ) { %>
 			<%=UtilMisc.htmlEscape(apptType)%>
 		<% } %>
-		<%if((apptType == null || apptType.length()==0) && (reason != null && reason.length() > 0) ) { %>	
+		<%if((apptType == null || apptType.length()==0) && (reason != null && reason.length() > 0) ) { %>
 			<%=UtilMisc.htmlEscape(reason)%>
 		<% } %>
 	<% } %>
@@ -2008,31 +2060,31 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 	<% if(OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true")) { %>
 	<br/>&nbsp;
 	<% } %>
-	
+
 	<%}%>
-	
+
 
         		</font></td>
         <%
         			}
         			}
         			bFirstFirstR = false;
-        			
-          	} 
-                  
+
+          	}
+
             //out.println("<td width='1'>&nbsp;</td></tr>"); give a grid display
             out.println("<td class='noGrid' width='1'></td></tr>"); //no grid display
-          } 
-         
+          }
+
 				%>
 
           </table> <!-- end table for each provider schedule display -->
 <!-- caisi infirmary view extension add fffffffffff-->
 </logic:notEqual>
 <!-- caisi infirmary view extension add end fffffffffffffff-->
-	
-		
-		
+
+
+
          </td></tr>
           <tr><td class="infirmaryView" ALIGN="center" BGCOLOR="<%=bColor?"#bfefff":"silver"%>">
 <!-- caisi infirmary view extension modify fffffffffffffffffff-->
