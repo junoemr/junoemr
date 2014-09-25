@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,10 +54,10 @@ public class OscarProperties extends Properties {
 	/* If cant find the file, inform and continue */
 	/*
 	 * private OscarProperties() {
-	 * 
+	 *
 	 * InputStream is = getClass().getResourceAsStream("/oscar_mcmaster.properties"); try { load(is); } catch (Exception e) { MiscUtils.getLogger().debug("Error, file oscar_mcmaster.properties not found.");
 	 * MiscUtils.getLogger().debug("This file must be placed at WEB-INF/classes."); }
-	 * 
+	 *
 	 * try{ is.close(); } catch (IOException e) { MiscUtils.getLogger().debug("IO error."); MiscUtils.getLogger().error("Error", e); } } //OscarProperties - end
 	 */
 
@@ -103,7 +103,7 @@ public class OscarProperties extends Properties {
 
 	/**
 	 * Will check the properties to see if that property is set and if it's set to the given value. If it is method returns true if not method returns false. This method was improved to ensure positive response on any "true", "yes" or "on" property value.
-	 * 
+	 *
 	 * @param key key of property
 	 * @param val value that will cause a true value to be returned
 	 * @return boolean
@@ -119,7 +119,7 @@ public class OscarProperties extends Properties {
 
 	/**
 	 * Will check the properties to see if that property is set and if it's set to "true", "yes" or "on" value. If it is method returns true if not method returns false.
-	 * 
+	 *
 	 * @param key key of property
 	 * @return boolean whether the property is active
 	 */
@@ -212,35 +212,35 @@ public class OscarProperties extends Properties {
 	public boolean isOscarLearning() {
 		return isPropertyActive("OSCAR_LEARNING");
 	}
-	
+
 	public boolean faxEnabled() {
 		return isPropertyActive("enableFax");
 	}
-	
+
 	public boolean isRxFaxEnabled() {
 		return isPropertyActive("rx_fax_enabled");
 	}
-		
+
 	public boolean isConsultationFaxEnabled() {
 		return isPropertyActive("consultation_fax_enabled");
 	}
-	
+
 	public boolean isConsultationEmailEnabled() {
 		return isPropertyActive("consultation_email_enabled");
 	}
-	
+
 	public boolean isEFormSignatureEnabled() {
 		return isPropertyActive("eform_signature_enabled");
 	}
-	
+
 	public boolean isEFormEmailEnabled() {
 		return isPropertyActive("eform_email_enabled");
 	}
-	
+
 	public boolean isEFormFaxEnabled() {
 		return isPropertyActive("eform_fax_enabled");
 	}
-	
+
 	public boolean isFaxEnabled() {
 		return faxEnabled() || isRxFaxEnabled() || isConsultationFaxEnabled() || isEFormFaxEnabled();
 	}
@@ -248,32 +248,32 @@ public class OscarProperties extends Properties {
 	public boolean isRxSignatureEnabled() {
 		return isRxFaxEnabled() || isPropertyActive("rx_signature_enabled");
 	}
-	
+
 	public boolean isConsultationSignatureEnabled() {
 		return isPropertyActive("consultation_signature_enabled");
 	}
-	
+
 	public boolean isSpireClientEnabled() {
 		return isPropertyActive("SPIRE_CLIENT_ENABLED");
 	}
-	
+
 	public int getSpireClientRunFrequency() {
 		String prop = getProperty("spire_client_run_frequency");
 		return Integer.parseInt(prop);
 	}
-	
+
 	public String getSpireServerUser() {
 		return getProperty("spire_server_user");
 	}
-	
+
 	public String getSpireServerPassword() {
 		return getProperty("spire_server_password");
 	}
-	
+
 	public String getSpireServerHostname() {
 		return getProperty("spire_server_hostname");
 	}
-	
+
 	public String getSpireDownloadDir() {
 		return getProperty("spire_download_dir");
 	}
@@ -281,46 +281,50 @@ public class OscarProperties extends Properties {
 	public String getHL7A04BuildDirectory() {
 		return getProperty("hl7_a04_build_dir");
 	}
-	
+
 	public String getHL7A04SentDirectory() {
 		return getProperty("hl7_a04_sent_dir");
 	}
-	
+
 	public String getHL7A04FailDirectory() {
 		return getProperty("hl7_a04_fail_dir");
 	}
-	
+
 	public String getHL7SendingApplication() {
 		return getProperty("HL7_SENDING_APPLICATION");
 	}
-	
+
 	public String getHL7SendingFacility() {
 		return getProperty("HL7_SENDING_FACILITY");
 	}
-	
+
 	public String getHL7ReceivingApplication() {
 		return getProperty("HL7_RECEIVING_APPLICATION");
 	}
-	
+
 	public String getHL7ReceivingFacility() {
 		return getProperty("HL7_RECEIVING_FACILITY");
 	}
-	
+
 	public boolean isHL7A04GenerationEnabled() {
 		return isPropertyActive("HL7_A04_GENERATION");
 	}
-	
+
 	public boolean isEmeraldHL7A04TransportTaskEnabled() {
 		return isPropertyActive("EMERALD_HL7_A04_TRANSPORT_TASK");
 	}
-	
+
 	public String getEmeraldHL7A04TransportAddr() {
 		return getProperty("EMERALD_HL7_A04_TRANSPORT_ADDR");
 	}
-	
+
 	public int getEmeraldHL7A04TransportPort() {
 		String prop = getProperty("EMERALD_HL7_A04_TRANSPORT_PORT", "3987"); // default to port 3987
 		return Integer.parseInt(prop);
+	}
+
+	public boolean isConsultRequestSocialHistoryOptionEnabled() {
+		return isPropertyActive("consult_request_social_history_option");
 	}
 
 }
