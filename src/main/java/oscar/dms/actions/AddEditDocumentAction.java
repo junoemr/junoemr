@@ -202,6 +202,7 @@ public class AddEditDocumentAction extends DispatchAction {
 					// TODO: I can't figure out a way to easily get the document_no from addDocument() without significantly changing the function, so let's use this hack for now.
 					redirect.addParameter("document_no", EDocUtil.getLastDocumentNo());
 					redirect.addParameter("document_index", request.getParameter("document_index")); 
+					redirect.addParameter("document_description", fm.getDocDesc());
 				}
 				redirect.addParameter("docerrors", "docerrors"); // Allows the JSP to check if the document was just submitted
 				redirect.addParameter("function", request.getParameter("function"));
