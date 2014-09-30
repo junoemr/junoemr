@@ -90,8 +90,9 @@ if(request.getParameter("showform") != null && request.getParameter("showform").
 		<input type="hidden" name="eformUpload" value="true">
 		<input type="hidden" name="document_index" value="<%=document_index%>">
 		<input type="hidden" name="observationDate" id="observationDate" value="<%=UtilDateUtilities.DateToString(UtilDateUtilities.now(), "yyyy/MM/dd")%>" size="10" style="text-align: center;">
-		<input type="hidden" name="docDesc" id="docDesc" size="30" value="<%=formdata.getDocDesc()%>" placeholder="Description">
-		
+		<div>
+			Photo Label: <input type="text" name="docDesc" id="docDesc" size="30" value="<%=formdata.getDocDesc()%>" placeholder="Description">
+		</div>
 		<div>
 			<input type="submit" name="Submit" value="Add">
 		</div>
@@ -102,8 +103,11 @@ function setDescriptionToFileName(){
 }
 function checkRequired(){
     showLoader();
-    // Set the document description to the filename
-    document.getElementById("docDesc").value = document.getElementById("docFile").value;
+    if(document.getElementById("docDesc").value == ""){
+        alert("Please enter a photo label");
+        hideLoader();
+        return false;
+    }
     if(document.getElementById("docFile").value == ""){
         alert("Please choose a file");
         hideLoader();
