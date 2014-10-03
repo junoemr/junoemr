@@ -1101,7 +1101,7 @@ public class Demographic implements Serializable {
 	public String getBirthDayMasterFileString() {
 
 		String result = getBirthDayAsString();
-		String dobFormatOverride = OscarProperties.getInstance().getMasterFileDateOfBirthOverride();
+		String dobFormatOverride = OscarProperties.getInstance().getDemographicDobFormatOverride();
 		if(dobFormatOverride != null) {
 		  try {
 		  	SimpleDateFormat formatter = new SimpleDateFormat(dobFormatOverride);

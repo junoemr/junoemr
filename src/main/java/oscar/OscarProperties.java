@@ -323,8 +323,8 @@ public class OscarProperties extends Properties {
 		return Integer.parseInt(prop);
 	}
 
-	public String getMasterFileDateOfBirthOverride() {
-		return getProperty("master_file_date_of_birth_override");
+	public String getDemographicDobFormatOverride() {
+		return getProperty("demographic_dob_format_override");
 	}
 
 }
