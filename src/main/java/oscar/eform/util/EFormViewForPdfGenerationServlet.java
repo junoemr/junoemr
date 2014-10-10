@@ -88,9 +88,11 @@ public final class EFormViewForPdfGenerationServlet extends HttpServlet {
 		eForm.setFormHtml(eForm.getFormHtml().replace("$%7Boscar_image_path%7D", "/" + projectHome + "/EFormImageViewForPdfGenerationServlet?imagefile="));
 		eForm.setFormHtml(eForm.getFormHtml().replace("../share", "/" + projectHome + "/EFormResourceViewForPdfGenerationServlet?path=share&filename="));
 		eForm.setFormHtml(eForm.getFormHtml().replace("/share", "/EFormResourceViewForPdfGenerationServlet?filename="));
+		eForm.setFormHtml(eForm.getFormHtml().replace("../dms/ManageDocument.do", "EFormResourceViewForPdfGenerationServlet"));
 		eForm.setFormHtml(eForm.getFormHtml().replace("<div class=\"DoNotPrint\" style=\"", "<div class=\"DoNotPrint\" style=\"display:none;"));
 		eForm.setFormHtml(eForm.getFormHtml().replace("</body>", "<input type=\"hidden\" id=\"full_eform_url\" value=\""+request.getContextPath()+"/eform/\"/>\n</body>"));
 		eForm.setFormHtml(eForm.getFormHtml().replace(" media=\"print\">", ">"));
+		eForm.setFormHtml(eForm.getFormHtml().replace("<iframe id=\"uploadiframe_", "<iframe style=\"display: none;\" id=\"uploadiframe_"));
 		eForm.setFormHtml(eForm.getFormHtml().replace("../eform/efmformproviders_dropdown.jsp",  "/" + projectHome + "/EFormResourceViewForPdfGenerationServlet?&path=eform&filename=efmformproviders_dropdown.jsp"));
 		eForm.setImagePath();
 		eForm.setNowDateTime();

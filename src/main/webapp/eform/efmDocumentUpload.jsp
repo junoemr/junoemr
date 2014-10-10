@@ -90,7 +90,6 @@ if(request.getParameter("showform") != null && request.getParameter("showform").
 		<input type="hidden" name="eformUpload" value="true">
 		<input type="hidden" name="document_index" value="<%=document_index%>">
 		<input type="hidden" name="observationDate" id="observationDate" value="<%=UtilDateUtilities.DateToString(UtilDateUtilities.now(), "yyyy/MM/dd")%>" size="10" style="text-align: center;">
-		
 		<div>
 			Photo Label: <input type="text" name="docDesc" id="docDesc" size="30" value="<%=formdata.getDocDesc()%>" placeholder="Description">
 		</div>
@@ -99,6 +98,9 @@ if(request.getParameter("showform") != null && request.getParameter("showform").
 		</div>
 	</form>
 <script type="text/javascript">
+function setDescriptionToFileName(){
+
+}
 function checkRequired(){
     showLoader();
     if(document.getElementById("docDesc").value == ""){
@@ -126,18 +128,25 @@ function hideLoader(){
 }else{
 
 String document_no = request.getParameter("document_no");
+String document_description = request.getParameter("document_description");
 %>
 <%=document_no%>
 <script type="text/javascript">
 	parent.document.getElementById("document_no_<%=document_index%>").value = "<%=document_no%>";
-    parent.document.getElementById("uploaded_document_no").value = "<%=document_no%>";
-    parent.document.getElementById("current_document_no").value = "<%=document_no%>";
+	parent.document.getElementById("document_description_<%=document_index%>").value = "<%=document_description%>";
 	var img = document.createElement("img");
 	img.setAttribute("src", "../dms/ManageDocument.do?method=display&doc_no=<%=document_no%>&providerNo=<%=curUser%>");
 	img.setAttribute("class", "uploadedimage");
 	img.setAttribute("height", "240");
 	img.setAttribute("width", "240");
+	img.setAttribute("style", "float: left;");
+	var desc = document.createElement("div");
+	desc.setAttribute("style", "float: left; eight: 240px; margin-top: 100px; padding-left: 10px");
+	desc.setAttribute("class", "description");
+	var t = document.createTextNode("<%=document_description%>");
+	desc.appendChild(t);
 	parent.document.getElementById("photodisplay_<%=document_index%>").appendChild(img);
+	parent.document.getElementById("photodisplay_<%=document_index%>").appendChild(desc);
 	parent.document.getElementById("photodisplay_<%=document_index%>").style.display = "block";
 	parent.document.getElementById("uploadiframe_<%=document_index%>").style.display = "none";
 </script>
