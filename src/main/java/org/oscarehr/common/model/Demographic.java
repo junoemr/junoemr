@@ -39,6 +39,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
 import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.util.MiscUtils;
+import oscar.OscarProperties;
 
 /**
  * This is the object class that relates to the demographic table. Any customizations belong here.
@@ -54,7 +55,7 @@ public class Demographic implements Serializable {
 	private static final String DEFAULT_FUTURE_DATE = "2100-01-01";
 	public static final String ANONYMOUS = "ANONYMOUS";
 	public static final String UNIQUE_ANONYMOUS = "UNIQUE_ANONYMOUS";
-	
+
 	private int hashCode = Integer.MIN_VALUE;// primary key
 	private Integer demographicNo;// fields
 	private String phone;
@@ -117,9 +118,9 @@ public class Demographic implements Serializable {
 
     private String countryOfOrigin;
     private String newsletter;
-    
+
     private String scannedChart;
-    
+
 
         public String getTitle() {
         	return title;
@@ -549,7 +550,7 @@ public class Demographic implements Serializable {
         }
         return m.group(1);
     }
-      
+
 
 	/**
 	 * Set the value related to the column: family_doctor_2
@@ -1094,6 +1095,23 @@ public class Demographic implements Serializable {
 	// Returns birthday in the format yyyy-mm-dd
 	public String getBirthDayAsString() {
 		return getYearOfBirth() + "-" + getMonthOfBirth() + "-" + getDateOfBirth();
+	}
+
+	// Returns birthday in the format yyyy-mm-dd or overriden format
+	public String getBirthDayMasterFileString() {
+
+		String result = getBirthDayAsString();
+		String dobFormatOverride = OscarProperties.getInstance().getDemographicDobFormatOverride();
+		if(dobFormatOverride != null) {
+		  try {
+		  	SimpleDateFormat formatter = new SimpleDateFormat(dobFormatOverride);
+		  	formatter.setCalendar(getBirthDay());
+		  	result = formatter.format(getBirthDay().getTime());
+		  } catch(Exception e) {
+		    // do nothing; use default result
+		  }
+		}
+		return result;
 	}
 
 	public String getSpokenLanguage() {
