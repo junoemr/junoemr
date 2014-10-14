@@ -323,6 +323,14 @@ public class OscarProperties extends Properties {
 		return Integer.parseInt(prop);
 	}
 
+	public boolean isConsultRequestSocialHistoryOptionEnabled() {
+		return isPropertyActive("consult_request_social_history_option");
+	}
+
+	public String getDemographicDobFormatOverride() {
+		return getProperty("demographic_dob_format_override");
+	}
+
 	public boolean isEChartAdditionalPatientInfoEnabled() {
 		return isPropertyActive("echart_additional_patient_info");
 	}
