@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,6 +32,7 @@ import java.util.Date;
 import org.oscarehr.util.MiscUtils;
 
 import oscar.OscarProperties;
+import oscar.SxmlMisc;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarEncounter.oscarConsultation.data.EctConProviderData;
 import oscar.util.UtilDateUtilities;
@@ -86,6 +87,10 @@ public class EctSessionBean implements java.io.Serializable {
     public ArrayList<String> templateNames;
     public ArrayList<String> measurementGroupNames;
     public String source;
+    public String patientBirthdate;
+    public String referringDoctorName;
+    public String referringDoctorNumber;
+    public String rosterDate;
 
     public void resetAll() {
         eChartTimeStamp = null;
@@ -95,6 +100,7 @@ public class EctSessionBean implements java.io.Serializable {
         yearOfBirth = "";
         monthOfBirth = "";
         dateOfBirth = "";
+        patientBirthdate = "";
         patientSex = "";
         patientAge = "";
         familyDoctorNo = "";
@@ -112,6 +118,9 @@ public class EctSessionBean implements java.io.Serializable {
         roster = "";
         template = "";
         oscarMsg = "";
+        referringDoctorName = "";
+        referringDoctorNumber = "";
+        rosterDate = "";
     }
 
     /**
@@ -147,6 +156,7 @@ public class EctSessionBean implements java.io.Serializable {
                 monthOfBirth = oscar.Misc.getString(rs, "month_of_birth");
                 dateOfBirth = oscar.Misc.getString(rs, "date_of_birth");
                 roster = oscar.Misc.getString(rs, "roster_status");
+                rosterDate = oscar.Misc.getString(rs, "roster_date");
                 patientSex = oscar.Misc.getString(rs, "sex");
 
                 if (yearOfBirth.equals("null") || yearOfBirth=="") {
@@ -158,12 +168,19 @@ public class EctSessionBean implements java.io.Serializable {
                 if (dateOfBirth.equals("null") || dateOfBirth=="") {
                     dateOfBirth = "0";
                 }
+                
+                String referringDoctor = oscar.Misc.getString(rs, "family_doctor");
+                if(referringDoctor != null) {
+                    referringDoctorName = SxmlMisc.getXmlContent(referringDoctor, "rd") != null ? SxmlMisc.getXmlContent(referringDoctor, "rd") : "";
+                    referringDoctorNumber = SxmlMisc.getXmlContent(referringDoctor, "rdohip") != null ? SxmlMisc.getXmlContent(referringDoctor, "rdohip") : "";
+                }                
             }
             rs.close();
 
-            if(yearOfBirth!="" && yearOfBirth!=null)
-            	patientAge = UtilDateUtilities
-                    .calcAge(UtilDateUtilities.calcDate(yearOfBirth, monthOfBirth, dateOfBirth));
+            if(yearOfBirth!="" && yearOfBirth!=null) {
+                patientAge = UtilDateUtilities.calcAge(UtilDateUtilities.calcDate(yearOfBirth, monthOfBirth, dateOfBirth));
+                patientBirthdate = yearOfBirth + "-" + monthOfBirth + "-" + dateOfBirth;
+            }
 
             sql = "select * from appointment where provider_no='" + curProviderNo + "' and appointment_date='"
                     + appointmentDate + "'";
@@ -345,6 +362,7 @@ public class EctSessionBean implements java.io.Serializable {
                 monthOfBirth = oscar.Misc.getString(rs, "month_of_birth");
                 dateOfBirth = oscar.Misc.getString(rs, "date_of_birth");
                 roster = oscar.Misc.getString(rs, "roster_status");
+                rosterDate = oscar.Misc.getString(rs, "roster_date");
                 patientSex = oscar.Misc.getString(rs, "sex");
                 if (yearOfBirth.equals("null")) {
                     yearOfBirth = "0";
@@ -355,11 +373,17 @@ public class EctSessionBean implements java.io.Serializable {
                 if (dateOfBirth.equals("null")) {
                     dateOfBirth = "0";
                 }
+                String referringDoctor = oscar.Misc.getString(rs, "family_doctor");
+                if(referringDoctor != null) {
+                    referringDoctorName = SxmlMisc.getXmlContent(referringDoctor, "rd") != null ? SxmlMisc.getXmlContent(referringDoctor, "rd") : "";
+                    referringDoctorNumber = SxmlMisc.getXmlContent(referringDoctor, "rdohip") != null ? SxmlMisc.getXmlContent(referringDoctor, "rdohip") : "";
+                }
             }
             rs.close();
 
-            patientAge = UtilDateUtilities
-                    .calcAge(UtilDateUtilities.calcDate(yearOfBirth, monthOfBirth, dateOfBirth));
+            patientAge = UtilDateUtilities.calcAge(UtilDateUtilities.calcDate(yearOfBirth, monthOfBirth, dateOfBirth));
+            patientBirthdate = yearOfBirth + "-" + monthOfBirth + "-" + dateOfBirth;
+
         } catch (java.sql.SQLException e) {
             MiscUtils.getLogger().error("Error", e);
         }
@@ -417,6 +441,7 @@ public class EctSessionBean implements java.io.Serializable {
                 monthOfBirth = oscar.Misc.getString(rs, "month_of_birth");
                 dateOfBirth = oscar.Misc.getString(rs, "date_of_birth");
                 roster = oscar.Misc.getString(rs, "roster_status");
+                rosterDate = oscar.Misc.getString(rs, "roster_date");
                 patientSex = oscar.Misc.getString(rs, "sex");
                 if (yearOfBirth.equals("null")) {
                     yearOfBirth = "0";
@@ -426,6 +451,12 @@ public class EctSessionBean implements java.io.Serializable {
                 }
                 if (dateOfBirth.equals("null")) {
                     dateOfBirth = "0";
+                }
+
+                String referringDoctor = oscar.Misc.getString(rs, "family_doctor");
+                if(referringDoctor != null) {
+                    referringDoctorName = SxmlMisc.getXmlContent(referringDoctor, "rd") != null ? SxmlMisc.getXmlContent(referringDoctor, "rd") : "";
+                    referringDoctorNumber = SxmlMisc.getXmlContent(referringDoctor, "rdohip") != null ? SxmlMisc.getXmlContent(referringDoctor, "rdohip") : "";
                 }
             }
             rs.close();
@@ -513,5 +544,8 @@ public class EctSessionBean implements java.io.Serializable {
     public String getPatientAge() {
         return patientAge;
     }
-
+    
+    public boolean hasRosterDate() {
+    	return rosterDate != null && !"".equals(rosterDate);
+    }
 }

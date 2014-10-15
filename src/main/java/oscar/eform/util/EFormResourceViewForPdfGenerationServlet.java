@@ -9,7 +9,6 @@
 package oscar.eform.util;
 
 import java.io.IOException;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -46,6 +45,7 @@ public final class EFormResourceViewForPdfGenerationServlet extends HttpServlet 
 		String fileName = request.getParameter("filename");
 		String path = request.getParameter("path");
 		String measurementType = request.getParameter("measurementType");
+		String docNo = request.getParameter("doc_no");
 		
 		request.setAttribute("prepareForFax", true);
 
@@ -54,6 +54,7 @@ public final class EFormResourceViewForPdfGenerationServlet extends HttpServlet 
 		}
 		
 		String url = "/"+path+"/"+fileName;
+		
 		
 		// Check if we're getting measurements
 		if(measurementType != null && measurementType.length() > 0 
@@ -85,6 +86,14 @@ public final class EFormResourceViewForPdfGenerationServlet extends HttpServlet 
 			
 			
 			//CaisiIntegratorManager.setIntegratorOffline(true);
+		}
+		
+		if(docNo != null && !docNo.equals("")
+			&& measurementType == null && fileName == null){
+			logger.debug("doc no:" +docNo);
+			String providerNo = request.getParameter("providerNo");
+			url = "/dms/ManageDocument.do?method=display&doc_no" + docNo +
+					"&providerNo="+providerNo;
 		}
 		
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(url);
