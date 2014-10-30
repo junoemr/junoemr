@@ -48,6 +48,7 @@
      {"edit" , "editappointment.jsp"},
      {"Update Appt" , "appointmentupdatearecord.jsp"},
      {"Delete Appt" , "appointmentdeletearecord.jsp"},
+     {"Email Reminder" , "appointmentemailreminder.jsp"},
      {"Cut" , "appointmentcutrecord.jsp"},
      {"Copy" , "appointmentcopyrecord.jsp"}
   };

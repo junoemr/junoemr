@@ -1,0 +1,18 @@
+Dear ${demographic.firstName} ${demographic.lastName},
+
+This is a courtesy email to remind you that you have an appointment with Dr. ${provider.firstName} ${provider.lastName} on:
+
+${appointmentDateTime}
+
+You are not required to confirm your appointment, however if you need to reschedule or cancel your appointment, 24hrs notice is required, otherwise a cancellation fee will apply.
+
+Thank you for choosing Kensington Medical Clinic.
+
+If you wish to cancel or change this appointment, please email appointments@kensingtonmedicalclinic.com or reply to this email within 24 hours of your appointment.
+
+Have a nice day.
+
+Sincerely,
+Kensington Medical Clinic Staff
+
+*** This message is private and confidential. If you have received this message in error, please notify us and remove it from your system . ***

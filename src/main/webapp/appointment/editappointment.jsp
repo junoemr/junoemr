@@ -52,6 +52,7 @@
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 <%@page import="org.oscarehr.common.model.DemographicCust" %>
 <%@page import="org.oscarehr.common.dao.DemographicCustDao" %>
+<%@page import="org.oscarehr.util.EmailUtils" %>
 <%
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 	org.oscarehr.PMmodule.dao.ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
@@ -194,7 +195,7 @@ function onSub() {
 function calculateEndTime() {
   var stime = document.EDITAPPT.start_time.value;
   var vlen = stime.indexOf(':')==-1?1:2;
-  
+
   if(vlen==1 && stime.length==4 ) {
     document.EDITAPPT.start_time.value = stime.substring(0,2) +":"+ stime.substring(2);
     stime = document.EDITAPPT.start_time.value;
@@ -208,12 +209,12 @@ function calculateEndTime() {
   var shour = stime.substring(0,2) ;
   var smin = stime.substring(stime.length-vlen) ;
   var duration = document.EDITAPPT.duration.value ;
-  
+
   if(isNaN(duration)) {
 	  alert("<bean:message key="Appointment.msgFillTimeField"/>");
 	  return false;
   }
-  
+
   if(eval(duration) == 0) { duration =1; }
   if(eval(duration) < 0) { duration = Math.abs(duration) ; }
 
@@ -538,6 +539,7 @@ function setType(typeSel,reasonSel,locSel,durSel,notesSel,resSel) {
 				<%
   int everyMin = 1;
   StringBuilder nameSb = new StringBuilder();
+  boolean validEmailAddress = false;
   if(bFirstDisp) {
     int endtime = (Integer.parseInt(String.valueOf(appt.get("end_time")).substring(0,2) ) )*60 + (Integer.parseInt(String.valueOf(appt.get("end_time")).substring(3,5) ) ) ;
     int starttime = (Integer.parseInt(String.valueOf(appt.get("start_time")).substring(0,2) ) )*60 + (Integer.parseInt(String.valueOf(appt.get("start_time")).substring(3,5) ) ) ;
@@ -548,6 +550,7 @@ function setType(typeSel,reasonSel,locSel,durSel,notesSel,resSel) {
         nameSb.append(demo.getLastName())
               .append(",")
               .append(demo.getFirstName());
+        validEmailAddress = EmailUtils.isValidEmailAddress(demo.getEmail());
     }
     else {
         nameSb.append(appt.get("name"));
@@ -777,6 +780,13 @@ if (bMultisites) { %>
 			name="buttoncancel" id="noShowButton"
 			value="<bean:message key="appointment.editappointment.btnNoShow"/>"
 			onClick="window.location='appointmentcontrol.jsp?buttoncancel=No Show&displaymode=Update Appt&appointment_no=<%=appointment_no%>'">
+
+    <% if(validEmailAddress) { %>
+      <input type="submit" id="reminderButton"
+        onclick="document.forms['EDITAPPT'].displaymode.value='Email Reminder'; onButUpdate();"
+        value="<bean:message key="appointment.editappointment.btnEmailReminder"/>">
+    <% } %>
+
 		</td>
 		<td align="right" nowrap><input type="button" name="labelprint" id="labelButton"
 			value="<bean:message key="appointment.editappointment.btnLabelPrint"/>"
@@ -841,17 +851,17 @@ if (bMultisites) { %>
 </FORM>
 </div> <!-- end of edit appointment screen -->
 
-<% 
+<%
     String formTblProp = props.getProperty("appt_formTbl");
     String[] formTblNames = formTblProp.split(";");
-               
+
     int numForms = 0;
     for (String formTblName : formTblNames){
         if ((formTblName != null) && !formTblName.equals("")) {
             //form table name defined
             List<Map<String,Object>> resultList = oscarSuperManager.find("appointmentDao", "search_formtbl", new Object [] {formTblName});
             if (resultList.size() > 0) {
-                //form table exists                            
+                //form table exists
                 Map mFormName = resultList.get(0);
                 String formName = (String) mFormName.get("form_name");
                 pageContext.setAttribute("formName", formName);
@@ -869,27 +879,27 @@ if (bMultisites) { %>
                 <th colspan="2">
                     <bean:message key="appointment.addappointment.msgFormsSaved"/>
                 </th>
-            </tr>              
+            </tr>
 <%              } %>
-             
+
             <tr bgcolor="#c0c0c0" align="left">
                 <th style="padding-right: 20px"><c:out value="${formName}:"/></th>
 <%                 if (formComplete){  %>
                 <td><bean:message key="appointment.addappointment.msgFormCompleted"/></td>
 <%                 } else {            %>
                 <td><bean:message key="appointment.addappointment.msgFormNotCompleted"/></td>
-<%                 } %>               
+<%                 } %>
             </tr>
-<%                         
+<%
             }
         }
     }
-               
+
     if (numForms > 0) {        %>
          </table>
 <%  }   %>
-         
-         
+
+
 <!-- View Appointment: Screen that summarizes appointment data.
 Currently this is only used in the mobile version -->
 <div id="viewAppointment" style="display:<%=(bFirstDisp && isMobileOptimized) ? "block":"none"%>;">

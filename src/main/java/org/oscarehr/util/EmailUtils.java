@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,22 +46,22 @@ import oscar.OscarProperties;
 
 /**
  * Example of how to use this is as follows
- * 
+ *
  * // Create the email message
  * HtmlEmail email=getHtmlEmail("127.0.0.1", null, null, null,null); // or just getHtmlEmail();
  * email.addTo("root@[127.0.0.1]", "da root user");
  * email.setFrom("tleung@[127.0.0.1]", "Moi");
  * email.setSubject("test subject");
- * 
+ *
  * // set the html message
  * email.setHtmlMsg("<html>html contents</html>");
- * 
+ *
  * // set the alternative message
  * email.setTextMsg("text contents");
- * 
+ *
  * // send the email
  * email.send();
- * 
+ *
  * If the recipient_override parameter is not null, it will assume the value is an email address and use that and replace to/cc/bcc addresses.
  * The print_instead_of_send value should be true or false, if true it will skip the last send step and log it at info level instead.
  * The email.connection_security parameter sets which type of connection security is used (choices are: ssl, starttls, or unset for none)
@@ -69,7 +69,7 @@ import oscar.OscarProperties;
 public final class EmailUtils
 {
 	private static final Logger logger=MiscUtils.getLogger();
-	
+
 	private static final String CATEGORY = "email.";
 	private static final String SMTP_HOST_KEY = "host";
 	private static final String SMTP_SSL_PORT_KEY = "port";
@@ -78,7 +78,7 @@ public final class EmailUtils
         private static final String SMTP_CONNECTION_SECURITY = "connection_security";
 	private static final String RECIPIENT_OVERRIDE_KEY = "recipient_override";
 	private static final String PRINT_INSTEAD_OF_SEND_KEY = "print_instead_of_send";
-        
+
         private static final String CONNECTION_SECURITY_SSL = "ssl";
         private static final String CONNECTION_SECURITY_STARTTLS = "starttls";
 
@@ -98,13 +98,13 @@ public final class EmailUtils
 					message.setRecipients(Message.RecipientType.CC, new InternetAddress[0]);
 					message.setRecipients(Message.RecipientType.BCC, new InternetAddress[0]);
 				}
-				
+
 				if (printInsteadOfSend)
 				{
 					logger.info(getAsString(message));
 				}
 				else
-				{					
+				{
 					logger.debug("Sending Email to "+Arrays.toString(message.getAllRecipients()));
 					return(super.sendMimeMessage());
 				}
@@ -112,6 +112,9 @@ public final class EmailUtils
 			catch (Exception e)
 			{
 				logger.error("Error", e);
+				if(e instanceof EmailException) {
+					throw (EmailException) e;
+				}
 			}
 
 			return(null);
@@ -119,39 +122,39 @@ public final class EmailUtils
 	}
 
 	/**
-	 * This method will return an HtmlEmail object populated with 
+	 * This method will return an HtmlEmail object populated with
 	 * the values passed in, ignoring the parameters in the configuration file.
 	 */
 	public static HtmlEmail getHtmlEmail(String smtpServer, String smtpPort, String smtpUser, String smtpPassword, String connectionSecurity) throws EmailException
 	{
 		logger.debug("smtpServer="+smtpServer+", smtpSslPort="+smtpPort+", smtpUser="+smtpUser+", smtpPassword="+smtpPassword + ",connectionSecurity="+connectionSecurity);
-		
+
 		HtmlEmail email = null;
-		
+
 		if (RECIPIENT_OVERRIDE_KEY!=null || printInsteadOfSend) email=new HtmlEmailWrapper();
 		else email=new HtmlEmail();
-		
+
 		email.setHostName(smtpServer);
 
 		if (smtpUser != null && smtpPassword != null) email.setAuthentication(smtpUser, smtpPassword);
 
                 Session session = email.getMailSession();
-                
+
                 if (connectionSecurity != null) {
                     if (connectionSecurity.equals(CONNECTION_SECURITY_STARTTLS)){
                         session.getProperties().setProperty(Email.MAIL_TRANSPORT_TLS, "true");
-                        email.setTLS(true);                        
+                        email.setTLS(true);
                     } else if (connectionSecurity.equals(CONNECTION_SECURITY_SSL)) {
                         email.setSSL(true);
                     }
                 }
-                
+
 		if (smtpPort != null)
 		{
 			email.setSslSmtpPort(smtpPort);
 		}
 
-		
+
 		Properties properties = session.getProperties();
 		properties.setProperty("mail.smtp.connectiontimeout", "20000");
 		properties.setProperty("mail.smtp.timeout", "20000");
@@ -161,9 +164,9 @@ public final class EmailUtils
 	}
 
 	/**
-	 * This method will return an HtmlEmail object populated with 
+	 * This method will return an HtmlEmail object populated with
 	 * the smtpServer/smtpUser/smtpPassword from the config xml file.
-	 * @throws EmailException 
+	 * @throws EmailException
 	 */
 	public static HtmlEmail getHtmlEmail() throws EmailException
 	{
@@ -174,11 +177,11 @@ public final class EmailUtils
                 String smtpConnectionSecurity = OscarProperties.getInstance().getProperty(CATEGORY+SMTP_CONNECTION_SECURITY);
 
 		return(getHtmlEmail(smtpHost, smtpSslPort, smtpUser, smtpPassword, smtpConnectionSecurity));
-	}        
+	}
 
 	/**
 	 * This is a convenience method for sending and email to 1 recipient using the configuration file settings.
-	 * @throws EmailException 
+	 * @throws EmailException
 	 */
 	public static void sendEmail(String toEmailAddress, String toName, String fromEmailAddress, String fromName, String subject, String textContents, String htmlContents) throws EmailException
 	{
@@ -194,10 +197,10 @@ public final class EmailUtils
 
 		htmlEmail.send();
 	}
-	
+
 	/**
 	 * This is a convenience method for sending and email to 1 recipient using the configuration file settings.
-	 * @throws EmailException 
+	 * @throws EmailException
 	 */
 	public static void sendEmailWithAttachment(String toEmailAddress, String toName, String fromEmailAddress, String fromName, String subject, String textContents, String htmlContents, String attachmentPath) throws EmailException
 	{
@@ -209,15 +212,15 @@ public final class EmailUtils
 		htmlEmail.setSubject(subject);
 		if (textContents != null) htmlEmail.setTextMsg(textContents);
 		if (htmlContents != null) htmlEmail.setHtmlMsg(htmlContents);
-		
+
 		EmailAttachment attachment = new EmailAttachment();
 
 		logger.debug("path: " + attachmentPath);
-		
+
 		attachment.setPath(attachmentPath);
 		attachment.setDisposition(EmailAttachment.ATTACHMENT);
 		attachment.setDescription("Email Attachment");
-		
+
 		logger.debug("Attachment: "+attachmentPath);
 		htmlEmail.attach(attachment);
 
@@ -232,7 +235,7 @@ public final class EmailUtils
 		email.buildMimeMessage();
 		return(getAsString(email.getMimeMessage()));
 	}
-	
+
 	/**
 	 * This method is like a toString for Email objects.
 	 */
@@ -248,12 +251,12 @@ public final class EmailUtils
 	 */
 	public static void main(String... argv) throws EmailException
 	{
-			// gmail : smtp.gmail.com:465		
-		
+			// gmail : smtp.gmail.com:465
+
 			String fromEmailAddress=argv[0];
 			String toEmailAddress=argv[1];
 			String smtpServer=argv[2];
-			
+
 			String smtpPort=(argv.length>3?argv[3]:null);
 			String smtpUser=(argv.length>4?argv[4]:null);
 			String smtpPassword=(argv.length>5?argv[4]:null);
@@ -268,9 +271,9 @@ public final class EmailUtils
 
 			htmlEmail.send();
 	}
-        
-        public static boolean isValidEmailAddress(String emailAddr){           
+
+        public static boolean isValidEmailAddress(String emailAddr){
             EmailValidator eValidator = EmailValidator.getInstance();
-            return eValidator.isValid(emailAddr);           
+            return eValidator.isValid(emailAddr);
         }
 }
