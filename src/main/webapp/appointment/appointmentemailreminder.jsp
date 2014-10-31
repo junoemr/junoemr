@@ -91,7 +91,7 @@
     String fromEmail = props.getProperty("appointment_reminder_from_email_address");
     String fromName = props.getProperty("appointment_reminder_from_name");
     String subject = props.getProperty("appointment_reminder_subject");
-    String dateFormat = props.getProperty("appointment_reminder_appt_date_format");
+    String dateFormat = props.getProperty("appointment_reminder_appt_date_format_java");
 
     if(fromEmail == null || fromName == null || subject == null || dateFormat == null) {
       throw new IllegalArgumentException("Application is misconfigured to send email.");
