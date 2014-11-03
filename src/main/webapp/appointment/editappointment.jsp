@@ -63,6 +63,8 @@
   oscar.OscarProperties pros = oscar.OscarProperties.getInstance();
   String strEditable = pros.getProperty("ENABLE_EDIT_APPT_STATUS");
 
+  boolean appointmentReminderEnabled = pros.isPropertyActive("appointment_reminder_enabled");
+
   AppointmentStatusMgr apptStatusMgr = (AppointmentStatusMgr)webApplicationContext.getBean("AppointmentStatusMgr");
   List allStatus = apptStatusMgr.getAllActiveStatus();
 
@@ -781,7 +783,7 @@ if (bMultisites) { %>
 			value="<bean:message key="appointment.editappointment.btnNoShow"/>"
 			onClick="window.location='appointmentcontrol.jsp?buttoncancel=No Show&displaymode=Update Appt&appointment_no=<%=appointment_no%>'">
 
-    <% if(validEmailAddress) { %>
+    <% if(appointmentReminderEnabled && validEmailAddress) { %>
       <input type="submit" id="reminderButton"
         onclick="document.forms['EDITAPPT'].displaymode.value='Email Reminder'; onButUpdate();"
         value="<bean:message key="appointment.editappointment.btnEmailReminder"/>">
