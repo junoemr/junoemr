@@ -112,7 +112,12 @@ function checkRequired(){
         alert("Please choose a file");
         hideLoader();
         return false;
-    }
+	}
+	if(document.getElementById("docDesc").value.length > 30){
+		alert("Image description can't be more than 30 characters");
+		hideLoader();
+		return false;
+	}
     return true;
 }
 function showLoader(){
@@ -132,6 +137,12 @@ String document_description = request.getParameter("document_description");
 %>
 <%=document_no%>
 <script type="text/javascript">
+	// Clear photo node
+	var photonode = parent.document.getElementById("photodisplay_<%=document_index%>");
+	while(photonode.hasChildNodes()){
+		photonode.removeChild(photonode.firstChild);
+	}
+
 	parent.document.getElementById("document_no_<%=document_index%>").value = "<%=document_no%>";
 	parent.document.getElementById("document_description_<%=document_index%>").value = "<%=document_description%>";
 	var img = document.createElement("img");
@@ -139,14 +150,39 @@ String document_description = request.getParameter("document_description");
 	img.setAttribute("class", "uploadedimage");
 	img.setAttribute("height", "240");
 	img.setAttribute("width", "240");
-	img.setAttribute("style", "float: left;");
+	img.setAttribute("style", "float: left; padding: 5px;");
 	var desc = document.createElement("div");
-	desc.setAttribute("style", "float: left; eight: 240px; margin-top: 100px; padding-left: 10px");
 	desc.setAttribute("class", "description");
 	var t = document.createTextNode("<%=document_description%>");
+	desc.setAttribute("style", "padding-top: 20px");
 	desc.appendChild(t);
+
+
+	var actions = document.createElement("div");
+	actions.setAttribute("class","actions");
+	var button = document.createElement("button");
+	button.setAttribute("style", "font-size: 10px; height: 20px; padding: 0;");
+	var button_text = document.createTextNode("Remove image");
+	button.appendChild(button_text);
+	button.onclick = function(){
+		//parent.document.deleteDocument("<%=document_no%>", "<%=document_description%>", "<%=document_index%>");
+		
+		if(confirm('Are you sure you want to remove this image?')){
+			//do something
+			parent.document.getElementById("photodisplay_<%=document_index%>").style.display = "none";
+			var iframe = parent.document.getElementById("uploadiframe_<%=document_index%>");
+			iframe.src = iframe.src;
+			parent.document.getElementById("uploadiframe_<%=document_index%>").style.display = "block";
+		}
+		return false;
+		
+	};
+	actions.setAttribute("style", "padding-left: 10px; clear: both;");
+	actions.appendChild(button);
+		
 	parent.document.getElementById("photodisplay_<%=document_index%>").appendChild(img);
 	parent.document.getElementById("photodisplay_<%=document_index%>").appendChild(desc);
+	parent.document.getElementById("photodisplay_<%=document_index%>").appendChild(actions);
 	parent.document.getElementById("photodisplay_<%=document_index%>").style.display = "block";
 	parent.document.getElementById("uploadiframe_<%=document_index%>").style.display = "none";
 </script>
