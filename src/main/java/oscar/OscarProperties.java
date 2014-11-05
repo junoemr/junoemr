@@ -51,6 +51,11 @@ public class OscarProperties extends Properties {
 		return oscarProperties;
 	}
 
+	public String getProperty(String key) {
+		String property = super.getProperty(key);
+		return property == null ? property : property.trim();
+	}
+
 	/* If cant find the file, inform and continue */
 	/*
 	 * private OscarProperties() {
