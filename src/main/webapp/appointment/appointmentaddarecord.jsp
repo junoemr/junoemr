@@ -43,7 +43,9 @@
 		<bean:message key="appointment.addappointment.msgMainLabel" /></font></th>
 	</tr>
 </table>
+
 <%
+
 	String[] param = new String[19];
 	param[0]=request.getParameter("provider_no");
 	param[1]=request.getParameter("appointment_date");
@@ -79,38 +81,41 @@
 	param[18]=(request.getParameter("urgency")!=null)?request.getParameter("urgency"):"";
 	int rowsAffected = oscarSuperManager.update("appointmentDao", request.getParameter("dboperation"), param);
 
+  Integer apptNo = null;
 	if (rowsAffected == 1) {
 
-             //email patient appointment record
-            if (request.getParameter("emailPt")!= null) {
-                try{
-                    String[] param3 = new String[7];
-                    param3[0]=param[0]; //provider_no
-                    param3[1]=param[1]; //appointment_date
-                    param3[2]=param[2]; //start_time
-                    param3[3]=param[3]; //end_time
-                    param3[4]=param[13]; //createdatetime
-                    param3[5]=param[14]; //creator
-                    param3[6]=param[16]; //demographic_no
+    // fetch the appointment number for the new record
+    try {
+        String[] param3 = new String[7];
+        param3[0]=param[0]; //provider_no
+        param3[1]=param[1]; //appointment_date
+        param3[2]=param[2]; //start_time
+        param3[3]=param[3]; //end_time
+        param3[4]=param[13]; //createdatetime
+        param3[5]=param[14]; //creator
+        param3[6]=param[16]; //demographic_no
 
-		    List<Map<String,Object>> resultList = oscarSuperManager.find("appointmentDao", "search_appt_no", param3);
-                    if (resultList.size()>0) {
-			Integer apptNo = (Integer)resultList.get(0).get("appointment_no");
-                        DemographicDao demoDao = (DemographicDao) SpringUtils.getBean("demographicDao");
-                        Demographic demographic = demoDao.getDemographic(param[16]);
+        List<Map<String,Object>> resultList = oscarSuperManager.find("appointmentDao", "search_appt_no", param3);
+        if (resultList.size()>0) {
+            apptNo = (Integer)resultList.get(0).get("appointment_no");
+        }
 
-                        if ((demographic != null) && (apptNo > 0)) {
-                            AppointmentMailer emailer = new AppointmentMailer(apptNo,demographic);
-                            emailer.prepareMessage();
-                            emailer.send();
-                        }
-                    }
+    }catch(Exception e) {
+        out.print(e.getMessage());
+    }
 
-                }catch(Exception e) {
-                    out.print(e.getMessage());
-                }
-            }
+    // email patient appointment record
+    if (request.getParameter("emailPt")!= null) {
+      DemographicDao demoDao = (DemographicDao) SpringUtils.getBean("demographicDao");
+      Demographic demographic = demoDao.getDemographic(param[16]);
 
+      if ((demographic != null) && (apptNo > 0)) {
+          AppointmentMailer emailer = new AppointmentMailer(apptNo,demographic);
+          emailer.prepareMessage();
+          emailer.send();
+      }
+
+    }
 
 		// turn off reminder of "remove patient from the waiting list"
 		oscar.OscarProperties pros = oscar.OscarProperties.getInstance();
@@ -145,31 +150,30 @@
 <p>
 <h1><bean:message key="appointment.addappointment.msgAddSuccess" /></h1>
 
+<%
+		if (apptNo != null && apptNo > 0) {
+			String mcNumber = request.getParameter("appt_mc_number");
+			OtherIdManager.saveIdAppointment(apptNo, "appt_mc_number", mcNumber);
+			EventService eventService = SpringUtils.getBean(EventService.class);
+			eventService.appointmentCreated(this,apptNo.toString(), param[0]); // called when adding an appointment
+		}
+
+
+    String postAction = (String)request.getAttribute("postAction");
+    if("Email".equals(postAction) && apptNo != null) {
+      pageContext.getRequest().setAttribute("appointment_no", String.valueOf(apptNo));
+      pageContext.forward("appointmentemailreminder.jsp");
+
+    } else {
+%>
+
 <script LANGUAGE="JavaScript">
-	self.opener.refresh();
-	self.close();
+  self.opener.refresh();
+  self.close();
 </script>
 
 <%
-		String[] param2 = new String[7];
-		param2[0]=param[0]; //provider_no
-		param2[1]=param[1]; //appointment_date
-		param2[2]=param[2]; //start_time
-		param2[3]=param[3]; //end_time
-		param2[4]=param[13]; //createdatetime
-		param2[5]=param[14]; //creator
-		param2[6]=param[16]; //demographic_no
-
-		List<Map<String,Object>> resultList = oscarSuperManager.find("appointmentDao", "search_appt_no", param2);
-		if (resultList.size()>0) {
-			Integer apptNo = (Integer)resultList.get(0).get("appointment_no");
-			String mcNumber = request.getParameter("appt_mc_number");
-			OtherIdManager.saveIdAppointment(apptNo, "appt_mc_number", mcNumber);
-			
-			EventService eventService = SpringUtils.getBean(EventService.class);
-			eventService.appointmentCreated(this,apptNo.toString(), param[0]); // called when adding an appointment
-			
-		}
+    }
 
 	} else {
 %>

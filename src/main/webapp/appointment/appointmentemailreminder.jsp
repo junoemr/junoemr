@@ -71,7 +71,16 @@
 
   try {
 
-    Appointment appt = appointmentDao.find(Integer.parseInt(request.getParameter("appointment_no")));
+    String appointment_no = request.getParameter("appointment_no");
+    if(appointment_no == null) {
+      // when coming from a newly added appointment, the ID is added as an attribute instead of coming in as a parameter
+      appointment_no = (String)request.getAttribute("appointment_no");
+    }
+    if(appointment_no == null) {
+      throw new IllegalArgumentException("Unable to find appointment ID");
+    }
+
+    Appointment appt = appointmentDao.find(Integer.parseInt(appointment_no));
     Demographic demo = demographicDao.getDemographic(String.valueOf(appt.getDemographicNo()));
     Provider provider = providerDao.getProvider(appt.getProviderNo());
 

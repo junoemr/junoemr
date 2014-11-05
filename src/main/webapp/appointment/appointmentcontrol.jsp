@@ -38,6 +38,7 @@
   // associate each operation with an output JSP file -- displaymode
   String[][] opToFile = new String[][] {
      {"Add Appointment" , "appointmentaddarecord.jsp"},
+     {"Add Appt & Email" , "appointmentaddarecord.jsp"},
      {"Group Appt" , "appointmentgrouprecords.jsp"},
      {"Group Action" ,  "appointmentgrouprecords.jsp"},
      {"Add Appt & PrintPreview" , "appointmentaddrecordprint.jsp"},
@@ -53,6 +54,11 @@
      {"Copy" , "appointmentcopyrecord.jsp"}
   };
 
+  // map operation to value of "postAction" request attribute to set
+  String[][] opToPostAction = new String[][] {
+    {"Add Appt & Email" , "Email"},
+  };
+
   // create an operation-to-file dictionary
   UtilDict opToFileDict = new UtilDict();
   opToFileDict.setDef(opToFile);
@@ -63,6 +69,14 @@
 
   // get operation name from request
   String operation = requestParamDict.getDef("displaymode","");
+
+  // create an operation-to-post-action dictionary and add a request attribute if applicable
+  UtilDict opToPostActionDict = new UtilDict();
+  opToPostActionDict.setDef(opToPostAction);
+  String postAction = opToPostActionDict.getDef(operation, null);
+  if(postAction != null) {
+    pageContext.getRequest().setAttribute("postAction", postAction);
+  }
 
   // redirect to a file associated with operation
   pageContext.forward(opToFileDict.getDef(operation,""));
