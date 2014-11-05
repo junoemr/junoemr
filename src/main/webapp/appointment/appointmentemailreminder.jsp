@@ -107,7 +107,7 @@
 
     String formattedApptDate = DateUtils.format(dateFormat, apptDate.getTime(), null);
 
-    InputStream templateInputStream = Appointment.class.getResourceAsStream("/appointment_reminder_email_notification_template.txt");
+    InputStream templateInputStream = Appointment.class.getResourceAsStream("/appointment_details_email_template.txt");
     String emailTemplate = IOUtils.toString(templateInputStream);
 
     VelocityContext velocityContext = VelocityUtils.createVelocityContextWithTools();
