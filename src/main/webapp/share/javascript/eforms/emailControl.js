@@ -154,8 +154,11 @@ function submitEmailButtonAjax(save, emailPatient) {
 				 document.getElementById('emailEForm').value=false;
 				 clearEmailFields();
 			 },
-			 error: function() {
+			 error: function(xhr, status, error) {
 				 resultWindow.document.write("<div>Something went wrong while trying to send the email. Please contact your administrator.</div>");
+				 var err = eval("(" + xhr.responseText + ")");
+				 resultWindow.document.write("<div>Error:"+err.Message+".</div>");
+				 resultWindow.document.write("<div>Error:"+error+".</div>");
 				 document.getElementById('emailEForm').value=false;
 				 clearEmailFields();
 			 } 

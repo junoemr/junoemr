@@ -146,8 +146,12 @@ public final class EmailAction {
 	}
 	
 	private void emailPdf(String pdfPath, String emailSubject, String toEmailAddress, String toName) throws EmailException{
-		logger.debug("Sending email to "+toEmailAddress + " from " + fromEmailAddress);
-		EmailUtils.sendEmailWithAttachment(toEmailAddress, toName, fromEmailAddress, null, emailSubject, null, null, pdfPath);
+		try {
+			logger.debug("Sending email to "+toEmailAddress + " from " + fromEmailAddress);
+			EmailUtils.sendEmailWithAttachment(toEmailAddress, toName, fromEmailAddress, null, emailSubject, null, null, pdfPath);
+		}catch (EmailException e){
+			logger.error("Error sending email to "+toEmailAddress + " from " + fromEmailAddress, e);
+		}
 	}
 
 }
