@@ -1,0 +1,18 @@
+Dear Patient,
+
+You have booked the following appointment at Kensington Medical Clinic.
+
+${appointmentDateTime}
+
+You are no longer required to call/email us to confirm an appointment.  Instead, once the appointment is booked with us, the appointment is considered confirmed at that time.  This includes appointment times in which we email you.
+
+We will attempt to send a reminder via email  72 hours prior to the appointment as a courtesy.
+
+If you are unable to make the appointment or need to change the appointment, you will need to do so within 24 hours of your appointment.  Changes can be made via email or phone . No shows, or changes to the appointments within 24 hours of the appointment time will result in a cancellation charge.
+
+Sincerely,
+
+Kensington Medical Clinic
+
+
+*** This message is private and confidential. If you have received this message in error, please notify us and remove it from your system . ***

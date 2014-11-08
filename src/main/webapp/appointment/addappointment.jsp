@@ -129,13 +129,13 @@ function onAdd(){
 				}else{
 					jQuery("form#addappt").submit();
 				}
-			
+
 			},
 			error:function(result){
 				// Create the appointment if something is wrong with the checker
 				jQuery("form#addappt").submit();
 			}
-			
+
 		});
 	}
 	return false;
@@ -144,12 +144,12 @@ function onAdd(){
 function onAdd() {
   if (document.ADDAPPT.notes.value.length > 255) {
     window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
-    return false;	
-  }	
+    return false;
+  }
   return calculateEndTime() ;
 }
 <% } %>
-			
+
 <!--
 function setfocus() {
 	this.focus();
@@ -262,6 +262,9 @@ function pasteAppt(multipleSameDayGroupAppt) {
            }
            if (document.forms[0].addPrintPreviewButton){
               document.forms[0].addPrintPreviewButton.style.display = "none";
+           }
+           if (document.forms[0].addEmailButton){
+              document.forms[0].addEmailButton.style.display = "none";
            }
            document.forms[0].addButton.style.display = "none";
            document.forms[0].printButton.style.display = "none";
@@ -581,7 +584,7 @@ function pasteAppt(multipleSameDayGroupAppt) {
     <input type="hidden" name="month" value="<%=request.getParameter("month") %>" >
     <input type="hidden" name="day" value="<%=request.getParameter("day") %>" >
     <input type="hidden" name="fromAppt" value="1" >
-	
+
 <div class="header deep">
     <div class="title">
         <!-- We display a shortened title for the mobile version -->
@@ -677,7 +680,7 @@ function pasteAppt(multipleSameDayGroupAppt) {
         <li class="row deep">
             <div class="label"><bean:message key="appointment.addappointment.formSurName" />:</div>
             <div class="input">
-            	<% 
+            	<%
             		String name="";
             		name = String.valueOf((bFirstDisp && !bFromWL)?"":request.getParameter("name")==null?session.getAttribute("appointmentname")==null?"":session.getAttribute("appointmentname"):request.getParameter("name"));
             	%>
@@ -694,13 +697,13 @@ function pasteAppt(multipleSameDayGroupAppt) {
     if (searchMode == null || searchMode.isEmpty()) {
         searchMode = OscarProperties.getInstance().getProperty("default_search_mode","search_name");
     }
-%> 
-            <INPUT TYPE="hidden" NAME="search_mode" VALUE="<%=searchMode%>"> 
-            <INPUT TYPE="hidden" NAME="originalpage" VALUE="../appointment/addappointment.jsp"> 
-            <INPUT TYPE="hidden" NAME="limit1" VALUE="0"> 
-            <INPUT TYPE="hidden" NAME="limit2" VALUE="5"> 
-            <INPUT TYPE="hidden" NAME="ptstatus" VALUE="active"> 
-			<input type="hidden" name="outofdomain" value="<%=OscarProperties.getInstance().getProperty("pmm.client.search.outside.of.domain.enabled","true")%>"/> 
+%>
+            <INPUT TYPE="hidden" NAME="search_mode" VALUE="<%=searchMode%>">
+            <INPUT TYPE="hidden" NAME="originalpage" VALUE="../appointment/addappointment.jsp">
+            <INPUT TYPE="hidden" NAME="limit1" VALUE="0">
+            <INPUT TYPE="hidden" NAME="limit2" VALUE="5">
+            <INPUT TYPE="hidden" NAME="ptstatus" VALUE="active">
+			<input type="hidden" name="outofdomain" value="<%=OscarProperties.getInstance().getProperty("pmm.client.search.outside.of.domain.enabled","true")%>"/>
             <!--input type="hidden" name="displaymode" value="Search " -->
             <div class="label">
                 <INPUT TYPE="submit" style="width:auto;"
@@ -826,13 +829,21 @@ function pasteAppt(multipleSameDayGroupAppt) {
             onclick="document.forms['ADDAPPT'].displaymode.value='Add Appt & PrintPreview'"
             VALUE="<bean:message key='appointment.addappointment.btnAddApptPrintPreview'/>"
             <%=disabled%>>
-
-
 <%
   }
 
 %>
-        <INPUT TYPE="submit" id="addButton" class="rightButton blueButton top"
+
+<% if(OscarProperties.getInstance().isPropertyActive("appointment_reminder_enabled")) { %>
+
+       <INPUT TYPE="submit" id="addEmailButton"
+        onclick="document.forms['ADDAPPT'].displaymode.value='Add Appt & Email'"
+        VALUE="<bean:message key='appointment.addappointment.btnAddApptEmail'/>"
+        <%=disabled%>>
+
+<% } %>
+
+      <INPUT TYPE="submit" id="addButton" class="rightButton blueButton top"
             onclick="document.forms['ADDAPPT'].displaymode.value='Add Appointment'"
             tabindex="6"
             VALUE="<% if (isMobileOptimized) { %><bean:message key="appointment.addappointment.btnAddAppointmentMobile" />
