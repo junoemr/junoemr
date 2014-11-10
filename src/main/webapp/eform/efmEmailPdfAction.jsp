@@ -61,10 +61,6 @@ try{
     MiscUtils.getLogger().error("Error", e);
     %>
 	An error occurred sending the email, please contact an administrator.
-	<div class="error">
-	<%=e.printStackTrace(new PrintWriter(out));%>
-	</div>
-
 	<%
     
 }
