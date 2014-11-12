@@ -1,4 +1,4 @@
-Dear Patient,
+Dear ${demographic.firstName} ${demographic.lastName},
 
 You have booked the following appointment at Kensington Medical Clinic.
 
