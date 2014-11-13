@@ -24,6 +24,7 @@
 <%@page import="java.util.Collections"%>
 <%@page import="java.util.Arrays"%>
 <%@page import="java.util.ArrayList"%>
+<%@page import="java.io.PrintWriter"%>
 <%@page import="org.oscarehr.util.MiscUtils"%>
 <%@page import="oscar.eform.actions.EmailAction"%>
 <html>
@@ -59,8 +60,9 @@ try{
 }catch( Exception e ){
     MiscUtils.getLogger().error("Error", e);
     %>
-    An error occurred sending the email, please contact an administrator.
-    <%
+	An error occurred sending the email, please contact an administrator.
+	<%
+    
 }
 
 %>
