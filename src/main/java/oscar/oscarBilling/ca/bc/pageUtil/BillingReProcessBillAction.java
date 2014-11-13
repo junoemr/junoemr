@@ -159,6 +159,7 @@ public class BillingReProcessBillAction extends Action {
     String submit = frm.getSubmit();
     String secondSQL = null;
 
+	MiscUtils.getLogger().debug("Insurer code: "+oinInsurerCode);
     if ( (submit.equals("Resubmit Bill") || submit.equals("Reprocess and Resubmit Bill")) || billingStatus.equals("O")) {
       if(!"W".equals(billingStatus)){
         billingStatus = "O";
@@ -169,25 +170,6 @@ public class BillingReProcessBillAction extends Action {
       billingStatus = "S";
     }
 
-    if (hcType.equals(billRegion)) { //if its bc go on
-      //oinInsurerCode = "";
-      oinRegistrationNo = "";
-      oinBirthdate = "";
-      oinFirstName = "";
-      oinSecondName = "";
-      oinSurname = "";
-      oinSexCode = "";
-      oinAddress = "";
-      oinAddress2 = "";
-      oinAddress3 = "";
-      oinAddress4 = "";
-      oinPostalcode = "";
-
-    } else { //other provinces
-      oinInsurerCode = hcType;
-      hcNo = "000000000";
-      name_verify = "0000";
-    }
 
     if (submissionCode.equals("E")) {
       String seqNum = frm.getDebitRequestSeqNum();
@@ -256,68 +238,148 @@ public class BillingReProcessBillAction extends Action {
     bill.setProviderOhipNo(practitionerNo);
     bill.setBillingDate(MyDateFormat.getSysDate(serviceDate));
     billingmaster.setDatacenter(dataCenterId);
-        //TODO
-        billingmaster.setPayeeNo(billingGroupNo);
-        billingmaster.setPractitionerNo(practitionerNo);
-        billingmaster.setPhn(hcNo);
-        billingmaster.setNameVerify(name_verify);
-        billingmaster.setDependentNum(dependentNo);
-        billingmaster.setBillingUnit(billingUnit);
-        billingmaster.setClarificationCode(clarificationCode);
-        billingmaster.setAnatomicalArea(anatomicalArea);
-        billingmaster.setAfterHour(afterHour);
-        billingmaster.setNewProgram(newProgram);
-        billingmaster.setBillingCode(billingServiceCode);
-        billingmaster.setBillAmount(billingServicePrice);
-        billingmaster.setPaymentMode(payment_mode);
-        billingmaster.setServiceDate(convertDate8Char(serviceDate));
-        billingmaster.setServiceToDay(serviceToDate);
-        billingmaster.setSubmissionCode(submissionCode);
-        billingmaster.setExtendedSubmissionCode(exSubmissionCode);
-        billingmaster.setDxCode1(dxCode1);
-        billingmaster.setDxCode2(dxCode2);
-        billingmaster.setDxCode3(dxCode3);
-        billingmaster.setDxExpansion(dxExpansion);
-        billingmaster.setServiceLocation(serviceLocation);
-        billingmaster.setReferralFlag1(referralFlag1);
-        billingmaster.setReferralNo1(referralNo1);
-        billingmaster.setReferralFlag2(referralFlag2);
-        billingmaster.setReferralNo2(referralNo2);
-        billingmaster.setTimeCall(timeCall);
-        billingmaster.setServiceStartTime(serviceStartTime);
-        billingmaster.setServiceEndTime(serviceEndTime);
-        billingmaster.setBirthDate(birthDate);
-        billingmaster.setCorrespondenceCode(correspondenceCode);
-        billingmaster.setClaimComment(claimComment);
-        billingmaster.setOriginalClaim(originalMSPNumber);
-        billingmaster.setFacilityNo(facilityNum);
-        billingmaster.setFacilitySubNo(facilitySubNum);
-        billingmaster.setIcbcClaimNo(icbcClaimNo);
+	//TODO
+	billingmaster.setPayeeNo(billingGroupNo);
+	billingmaster.setPractitionerNo(practitionerNo);
+	billingmaster.setPhn(hcNo);
+	billingmaster.setNameVerify(name_verify);
+	billingmaster.setDependentNum(dependentNo);
+	billingmaster.setBillingUnit(billingUnit);
+	billingmaster.setClarificationCode(clarificationCode);
+	billingmaster.setAnatomicalArea(anatomicalArea);
+	billingmaster.setAfterHour(afterHour);
+	billingmaster.setNewProgram(newProgram);
+	billingmaster.setBillingCode(billingServiceCode);
+	billingmaster.setBillAmount(billingServicePrice);
+	billingmaster.setPaymentMode(payment_mode);
+	billingmaster.setServiceDate(convertDate8Char(serviceDate));
+	billingmaster.setServiceToDay(serviceToDate);
+	billingmaster.setSubmissionCode(submissionCode);
+	billingmaster.setExtendedSubmissionCode(exSubmissionCode);
+	billingmaster.setDxCode1(dxCode1);
+	billingmaster.setDxCode2(dxCode2);
+	billingmaster.setDxCode3(dxCode3);
+	billingmaster.setDxExpansion(dxExpansion);
+	billingmaster.setServiceLocation(serviceLocation);
+	billingmaster.setReferralFlag1(referralFlag1);
+	billingmaster.setReferralNo1(referralNo1);
+	billingmaster.setReferralFlag2(referralFlag2);
+	billingmaster.setReferralNo2(referralNo2);
+	billingmaster.setTimeCall(timeCall);
+	billingmaster.setServiceStartTime(serviceStartTime);
+	billingmaster.setServiceEndTime(serviceEndTime);
+	billingmaster.setBirthDate(birthDate);
+	billingmaster.setCorrespondenceCode(correspondenceCode);
+	billingmaster.setClaimComment(claimComment);
+	billingmaster.setOriginalClaim(originalMSPNumber);
+	billingmaster.setFacilityNo(facilityNum);
+	billingmaster.setFacilitySubNo(facilitySubNum);
+	billingmaster.setIcbcClaimNo(icbcClaimNo);
 
-        billingmaster.setOinInsurerCode(oinInsurerCode);
-        billingmaster.setOinRegistrationNo(oinRegistrationNo);
-        billingmaster.setOinBirthdate(oinBirthdate);
-        billingmaster.setOinFirstName(oinFirstName);
-        billingmaster.setOinSecondName(oinSecondName);
-        billingmaster.setOinSurname(oinSurname);
-        billingmaster.setOinSexCode(oinSexCode);
-        billingmaster.setOinAddress(oinAddress);
-        billingmaster.setOinAddress2(oinAddress2);
-        billingmaster.setOinAddress3(oinAddress3);
-        billingmaster.setOinAddress4(oinAddress4);
-        billingmaster.setOinPostalcode(oinPostalcode);
-        try{
-        billingmaster.setWcbId(Integer.parseInt(request.getParameter("WCBid")));
-        }catch(Exception e){}
-        bill.setProviderNo(providerNo);
-        logger.debug("WHAT IS BILL <ASTER "+billingmaster.getBillingmasterNo());
-        billingmasterDAO.update(billingmaster);
-        billingmasterDAO.update(bill);
+	billingmaster.setOinInsurerCode(oinInsurerCode);
+	billingmaster.setOinRegistrationNo(oinRegistrationNo);
+	billingmaster.setOinBirthdate(oinBirthdate);
+	billingmaster.setOinFirstName(oinFirstName);
+	billingmaster.setOinSecondName(oinSecondName);
+	billingmaster.setOinSurname(oinSurname);
+	billingmaster.setOinSexCode(oinSexCode);
+	billingmaster.setOinAddress(oinAddress);
+	billingmaster.setOinAddress2(oinAddress2);
+	billingmaster.setOinAddress3(oinAddress3);
+	billingmaster.setOinAddress4(oinAddress4);
+	billingmaster.setOinPostalcode(oinPostalcode);
 
-        logger.debug("type 2"+bill.getBillingtype());
-        logger.debug("WHAT IS BILL <ASTER2 "+billingmaster.getBillingmasterNo());
 
-        try {
+	// clear other insurance (oin) fields
+	// teleplan 4.3 manual states that the following insurer codes are valid:
+	// Other provinces: AB, SK, MB, ON, NB, NS, PE, NF, NT, YT, NU
+	// IN = BC Institutional claim - MSP can set limits for claims
+	// PP = BC Pay Patient Opted Out
+	// WC = Work Safe BC
+	MiscUtils.getLogger().debug("hcType: "+hcType+" oinInsurerCode: "+oinInsurerCode);
+    if (hcType.equals(billRegion) && oinInsurerCode.equals("")) {
+		MiscUtils.getLogger().debug("Normal MSP...");
+		billingmaster.setOinRegistrationNo("");
+		billingmaster.setOinBirthdate("");
+		billingmaster.setOinFirstName("");
+		billingmaster.setOinSecondName("");
+		billingmaster.setOinSurname("");
+		billingmaster.setOinSexCode("");
+		billingmaster.setOinAddress("");
+		billingmaster.setOinAddress2("");
+		billingmaster.setOinAddress3("");
+		billingmaster.setOinAddress4("");
+		billingmaster.setOinPostalcode("");
+    } 
+	if (!hcType.trim().equals(billRegion.trim())) {
+		MiscUtils.getLogger().debug("Other province");
+
+		billingmaster.setOinInsurerCode(hcType);
+		billingmaster.setOinRegistrationNo(oinRegistrationNo);
+		billingmaster.setOinBirthdate(oinBirthdate);
+		billingmaster.setOinFirstName(oinFirstName);
+		billingmaster.setOinSecondName(oinSecondName);
+		billingmaster.setOinSurname(oinSurname);
+		billingmaster.setOinSexCode(oinSexCode);
+		billingmaster.setOinAddress(oinAddress);
+		billingmaster.setOinAddress2(oinAddress2);
+		billingmaster.setOinAddress3(oinAddress3);
+		billingmaster.setOinAddress4(oinAddress4);
+		billingmaster.setOinPostalcode(oinPostalcode);
+		billingmaster.setPhn("0000000000");
+		billingmaster.setNameVerify("0000");
+		billingmaster.setDependentNum("00");
+		billingmaster.setBirthDate("00000000");
+
+	}
+	else if (oinInsurerCode.equals("PP")) {
+		MiscUtils.getLogger().debug("PP insurer type");
+
+		String oin_reg_num = "";
+		billingmaster.setOinInsurerCode("PP");
+		if(dependentNo.equals("66"))
+		{
+			oin_reg_num = demo.getHin().trim() + "66";
+		}
+		else
+		{
+			oin_reg_num = demo.getHin().trim() + "00";
+		}
+		billingmaster.setOinRegistrationNo(oin_reg_num);
+		billingmaster.setOinBirthdate(oinBirthdate);
+		billingmaster.setOinFirstName(oinFirstName);
+		billingmaster.setOinSecondName(oinSecondName);
+		billingmaster.setOinSurname(oinSurname);
+		billingmaster.setOinSexCode(oinSexCode);
+		billingmaster.setOinAddress(oinAddress);
+		billingmaster.setOinAddress2(oinAddress2);
+		billingmaster.setOinAddress3("");
+		billingmaster.setOinAddress4("");
+		billingmaster.setOinPostalcode(oinPostalcode);
+
+		billingmaster.setPhn("0000000000");
+		billingmaster.setNameVerify("0000");
+		billingmaster.setDependentNum("00");
+		billingmaster.setBirthDate("00000000");
+
+	}
+	// oinInsurerCode "IN" is not supported yet, but the specs for it are:
+	// billingmaster.setOinRegistrationNo("0010000008nn") OR
+	// billingmaster.setOinRegistrationNo("0000000000nn") 
+	// .: where "nn" is the institution number
+
+	try{
+		billingmaster.setWcbId(Integer.parseInt(request.getParameter("WCBid")));
+	}catch(Exception e){}
+	bill.setProviderNo(providerNo);
+	logger.debug("WHAT IS BILL <ASTER "+billingmaster.getBillingmasterNo());
+	billingmasterDAO.update(billingmaster);
+	billingmasterDAO.update(bill);
+
+	logger.debug("type 2"+bill.getBillingtype());
+	logger.debug("WHAT IS BILL <ASTER2 "+billingmaster.getBillingmasterNo());
+
+	try {
 
       //DBHandler.RunSQL(sql);
       //DBHandler.RunSQL(providerSQL);
