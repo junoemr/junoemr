@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -93,7 +93,7 @@ public class EctConsultationFormRequestAction extends Action {
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		EctConsultationFormRequestForm frm = (EctConsultationFormRequestForm) form;		
+		EctConsultationFormRequestForm frm = (EctConsultationFormRequestForm) form;
 
 		String appointmentHour = frm.getAppointmentHour();
 		String appointmentPm = frm.getAppointmentPm();
@@ -103,7 +103,7 @@ public class EctConsultationFormRequestAction extends Action {
 		}
                 else if( appointmentHour.equals("12") && appointmentPm.equals("AM") ) {
                     appointmentHour = "0";
-                }		
+                }
 
 		String sendTo = frm.getSendTo();
 		String submission = frm.getSubmission();
@@ -117,39 +117,39 @@ public class EctConsultationFormRequestAction extends Action {
 		String signatureImg = frm.getSignatureImg();
 		if(StringUtils.isBlank(signatureImg)) {
 			signatureImg = request.getParameter("newSignatureImg");
-			if(signatureImg ==null) 
+			if(signatureImg ==null)
 				signatureImg = "";
 		}
-	
-		
+
+
         ConsultationRequestDao consultationRequestDao=(ConsultationRequestDao)SpringUtils.getBean("consultationRequestDao");
         ConsultationRequestExtDao consultationRequestExtDao=(ConsultationRequestExtDao)SpringUtils.getBean("consultationRequestExtDao");
         ProfessionalSpecialistDao professionalSpecialistDao=(ProfessionalSpecialistDao)SpringUtils.getBean("professionalSpecialistDao");
-        
+
         String[] format = new String[] {"yyyy-MM-dd","yyyy/MM/dd"};
 
 		if (submission.startsWith("Submit")) {
 
-			try {				
+			try {
 								if (newSignature) {
 									LoggedInInfo loggedInInfo = LoggedInInfo.loggedInInfo.get();
 									DigitalSignature signature = DigitalSignatureUtils.storeDigitalSignatureFromTempFileToDB(loggedInInfo, signatureImg, Integer.parseInt(demographicNo));
 									if (signature != null) { signatureId = "" + signature.getId(); }
 								}
-				
-								
+
+
                                 ConsultationRequest consult = new ConsultationRequest();
                                 Date date = DateUtils.parseDate(frm.getReferalDate(), format);
                                 consult.setReferralDate(date);
                                 consult.setServiceId(new Integer(frm.getService()));
 
                                 consult.setSignatureImg(signatureId);
-                                
+
                         		consult.setLetterheadName(frm.getLetterheadName());
                         		consult.setLetterheadAddress(frm.getLetterheadAddress());
                         		consult.setLetterheadPhone(frm.getLetterheadPhone());
                         		consult.setLetterheadFax(frm.getLetterheadFax());
-                        		
+
                                 if( frm.getAppointmentYear() != null && !frm.getAppointmentYear().equals("") ) {
                                    date = DateUtils.parseDate(frm.getAppointmentYear() + "-" + frm.getAppointmentMonth() + "-" + frm.getAppointmentDay(), format);
                                    consult.setAppointmentDate(date);
@@ -191,7 +191,7 @@ public class EctConsultationFormRequestAction extends Action {
                                     }
                                         MiscUtils.getLogger().info("saved new consult id "+ consult.getId());
                                         requestId = String.valueOf(consult.getId());
-                                        
+
                                 Enumeration e = request.getParameterNames();
                                 while(e.hasMoreElements()) {
                                 	String name = (String)e.nextElement();
@@ -203,7 +203,7 @@ public class EctConsultationFormRequestAction extends Action {
                                 // now that we have consultation id we can save any attached docs as well
 								// format of input is D2|L2 for doc and lab
 								String[] docs = frm.getDocuments().split("\\|");
-			
+
 								for (int idx = 0; idx < docs.length; ++idx) {
 									if (docs[idx].length() > 0) {
 										if (docs[idx].charAt(0) == 'D') EDocUtil.attachDocConsult(providerNo, docs[idx].substring(1), requestId);
@@ -224,8 +224,8 @@ public class EctConsultationFormRequestAction extends Action {
 
 			requestId = frm.getRequestId();
 
-			try {				     
-				
+			try {
+
 								if (newSignature) {
 									LoggedInInfo loggedInInfo = LoggedInInfo.loggedInInfo.get();
 									DigitalSignature signature = DigitalSignatureUtils.storeDigitalSignatureFromTempFileToDB(loggedInInfo, signatureImg, Integer.parseInt(demographicNo));
@@ -237,21 +237,21 @@ public class EctConsultationFormRequestAction extends Action {
 								} else {
 									signatureId = signatureImg;
 								}
-								
+
                                 ConsultationRequest consult = consultationRequestDao.find(new Integer(requestId));
                                 Date date = DateUtils.parseDate(frm.getReferalDate(), format);
                                 consult.setReferralDate(date);
                                 consult.setServiceId(new Integer(frm.getService()));
 
                                 consult.setSignatureImg(signatureId);
-                                //We shouldn't change the referral provider just because someone updated and printed it! 
+                                //We shouldn't change the referral provider just because someone updated and printed it!
                                 //consult.setProviderNo(frm.getProviderNo());
-                                
+
                         		consult.setLetterheadName(frm.getLetterheadName());
                         		consult.setLetterheadAddress(frm.getLetterheadAddress());
                         		consult.setLetterheadPhone(frm.getLetterheadPhone());
                         		consult.setLetterheadFax(frm.getLetterheadFax());
-                                
+
                                 Integer specId = new Integer(frm.getSpecialist());
                                 ProfessionalSpecialist professionalSpecialist=professionalSpecialistDao.find(specId);
                                 consult.setProfessionalSpecialist(professionalSpecialist);
@@ -284,7 +284,7 @@ public class EctConsultationFormRequestAction extends Action {
                                     consult.setFollowUpDate(date);
                                 }
                                 consultationRequestDao.merge(consult);
-                                
+
                                 consultationRequestExtDao.clear(Integer.parseInt(requestId));
                                 Enumeration e = request.getParameterNames();
                                 while(e.hasMoreElements()) {
@@ -306,7 +306,7 @@ public class EctConsultationFormRequestAction extends Action {
 		else if( submission.equalsIgnoreCase("And Print Preview")) {
 			requestId = frm.getRequestId();
 		}
-				
+
 
 		frm.setRequestId("");
 
@@ -331,12 +331,16 @@ public class EctConsultationFormRequestAction extends Action {
 			request.setAttribute("reqId", requestId);
 			if (OscarProperties.getInstance().isConsultationFaxEnabled()) {
 				return mapping.findForward("faxIndivica");
-			}	
+			}
 			else {
 				return mapping.findForward("fax");
 			}
 
-		} 
+		} else if (submission.endsWith("And Email Details")) {
+            // email consultation details to patient
+            request.setAttribute("consult_request_id", requestId);
+            return mapping.findForward("emailalt");
+        }
 		else if (submission.endsWith("esend"))
 		{
 			// upon success continue as normal with success message
@@ -346,17 +350,17 @@ public class EctConsultationFormRequestAction extends Action {
 	            WebUtils.addResourceBundleInfoMessage(request, "oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgCreatedUpdateESent");
             } catch (Exception e) {
             	logger.error("Error contacting remote server.", e);
-            	
+
 	            WebUtils.addResourceBundleErrorMessage(request, "oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgCreatedUpdateESendError");
 	    		ParameterActionForward forward = new ParameterActionForward(mapping.findForward("failESend"));
 	    		forward.addParameter("de", demographicNo);
 	    		forward.addParameter("requestId", requestId);
 	    		return forward;
             }
-		}               
+		}
 		else if(submission.endsWith("Email Provider"))
-        {                                                                                     
-            // Email consultation to provider 
+        {
+            // Email consultation to provider
 			request.setAttribute("reqId", requestId);
 			request.setAttribute("recipient", "provider");
 			MiscUtils.getLogger().debug("email provider");
@@ -364,19 +368,19 @@ public class EctConsultationFormRequestAction extends Action {
 	    }
 		else if(submission.endsWith("Email Patient"))
 		{
-            // Email consultation to patient      
+            // Email consultation to patient
 			request.setAttribute("reqId", requestId);
 			request.setAttribute("recipient", "patient");
 			MiscUtils.getLogger().debug("email patient");
 			return mapping.findForward("email");
 		}
-			
+
 
 		ParameterActionForward forward = new ParameterActionForward(mapping.findForward("success"));
 		forward.addParameter("de", demographicNo);
 		return forward;
 	}
-	
+
 	private ConsultationRequestExt createExtEntry(String requestId, String name,String value) {
 		ConsultationRequestExt obj = new ConsultationRequestExt();
 		obj.setDateCreated(new Date());
@@ -386,7 +390,7 @@ public class EctConsultationFormRequestAction extends Action {
 		return obj;
 	}
 	private void doHl7Send(Integer consultationRequestId) throws InvalidKeyException, SignatureException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException, IOException, HL7Exception, ServletException {
-		
+
 	    ConsultationRequestDao consultationRequestDao=(ConsultationRequestDao)SpringUtils.getBean("consultationRequestDao");
 	    ProfessionalSpecialistDao professionalSpecialistDao=(ProfessionalSpecialistDao)SpringUtils.getBean("professionalSpecialistDao");
 	    Hl7TextInfoDao hl7TextInfoDao=(Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
@@ -395,18 +399,18 @@ public class EctConsultationFormRequestAction extends Action {
 	    ConsultationRequest consultationRequest=consultationRequestDao.find(consultationRequestId);
 	    ProfessionalSpecialist professionalSpecialist=professionalSpecialistDao.find(consultationRequest.getSpecialistId());
 	    Clinic clinic=clinicDAO.getClinic();
-	    
+
         LoggedInInfo loggedInInfo=LoggedInInfo.loggedInInfo.get();
-	    
+
 	    // set status now so the remote version shows this status
 	    consultationRequest.setStatus("2");
 
 	    REF_I12 refI12=RefI12.makeRefI12(clinic, consultationRequest);
 	    SendingUtils.send(refI12, professionalSpecialist);
-	    
+
 	    // save after the sending just in case the sending fails.
 	    consultationRequestDao.merge(consultationRequest);
-	    
+
 	    //--- send attachments ---
     	Provider sendingProvider=loggedInInfo.loggedInProvider;
     	DemographicDao demographicDao=(DemographicDao) SpringUtils.getBean("demographicDao");
@@ -422,10 +426,10 @@ public class EctConsultationFormRequestAction extends Action {
 	        observationData.binaryDataFileName=attachment.getFileName();
 	        observationData.binaryData=attachment.getFileBytes();
 
-	        ORU_R01 hl7Message=OruR01.makeOruR01(clinic, demographic, observationData, sendingProvider, professionalSpecialist);        
-	        SendingUtils.send(hl7Message, professionalSpecialist);	    	
+	        ORU_R01 hl7Message=OruR01.makeOruR01(clinic, demographic, observationData, sendingProvider, professionalSpecialist);
+	        SendingUtils.send(hl7Message, professionalSpecialist);
 	    }
-	    
+
 	    //--- process all labs ---
         CommonLabResultData labData = new CommonLabResultData();
         ArrayList<LabResultData> labs = labData.populateLabResultsData(demographic.getDemographicNo().toString(), consultationRequest.getId().toString(), CommonLabResultData.ATTACHED);
@@ -434,20 +438,20 @@ public class EctConsultationFormRequestAction extends Action {
 	    	try {
 	            byte[] dataBytes=LabPDFCreator.getPdfBytes(attachment.getSegmentID(), sendingProvider.getProviderNo());
 	            Hl7TextInfo hl7TextInfo=hl7TextInfoDao.findLabId(Integer.parseInt(attachment.getSegmentID()));
-	            
+
 	            ObservationData observationData=new ObservationData();
 	            observationData.subject=hl7TextInfo.getDiscipline();
 	            observationData.textMessage="Attachment for consultation : "+consultationRequestId;
 	            observationData.binaryDataFileName=hl7TextInfo.getDiscipline()+".pdf";
 	            observationData.binaryData=dataBytes;
 
-	            
-	            ORU_R01 hl7Message=OruR01.makeOruR01(clinic, demographic, observationData, sendingProvider, professionalSpecialist);        
+
+	            ORU_R01 hl7Message=OruR01.makeOruR01(clinic, demographic, observationData, sendingProvider, professionalSpecialist);
 	            int statusCode=SendingUtils.send(hl7Message, professionalSpecialist);
 	            if (HttpServletResponse.SC_OK!=statusCode) throw(new ServletException("Error, received status code:"+statusCode));
             } catch (DocumentException e) {
 	            logger.error("Unexpected error.", e);
-            }	    	
+            }
 	    }
     }
 

@@ -61,6 +61,7 @@
 <%@page import="org.oscarehr.util.MiscUtils, org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager, org.oscarehr.caisi_integrator.ws.CachedDemographicNote"%>
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao, org.oscarehr.PMmodule.model.Program" %>
 <%@page import="oscar.oscarDemographic.data.DemographicData, oscar.oscarRx.data.RxProviderData, oscar.oscarRx.data.RxProviderData.Provider, oscar.oscarClinic.ClinicData"%>
+<%@page import="org.oscarehr.util.EmailUtils" %>
 <html:html locale="true">
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 <%
@@ -99,7 +100,7 @@ displayServiceUtil.estSpecialist();
 
 
 <%
-	String demo = request.getParameter("de");
+	  String demo = request.getParameter("de");
 		String requestId = request.getParameter("requestId");
 		// segmentId is != null when viewing a remote consultation request from an hl7 source
 		String segmentId = request.getParameter("segmentId");
@@ -144,6 +145,11 @@ displayServiceUtil.estSpecialist();
 
 		if (demo != null) consultUtil.estPatient(demo);
 		consultUtil.estActiveTeams();
+
+    boolean enableEmailDetails = false;
+    if(demographic != null) {
+      enableEmailDetails = EmailUtils.isValidEmailAddress(demographic.getEmail()) && "3".equals(consultUtil.status);
+    }
 
 		if (request.getParameter("error") != null)
 		{
@@ -357,6 +363,7 @@ function disableEditing()
 		disableIfExists(form.update, disableFields);
 		disableIfExists(form.updateAndPrint, disableFields);
 		disableIfExists(form.updateAndSendElectronically, disableFields);
+    disableIfExists(form.updateAndEmailDetails, disableFields);
 		disableIfExists(form.updateAndFax, disableFields);
 
 		disableIfExists(form.submitSaveOnly, disableFields);
@@ -1316,6 +1323,15 @@ function chooseEmail(){
 						<% if (faxEnabled) { %>
 						<input id="fax_button" name="updateAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndFax"/>" onclick="return checkForm('Update And Fax','EctConsultationFormRequestForm');" />
 						<% } %>
+
+            <% if (OscarProperties.getInstance().isPropertyActive("appointment_reminder_enabled")) { %>
+              <input type="button"
+                <% if(!enableEmailDetails) { %> disabled="disabled" <% } %>
+                name="updateAndEmailDetails"
+                value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailPatient"/>'
+                onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
+            <% } %>
+
 					<% } else { %>
 						<input name="submitSaveOnly" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmit"/>" onclick="return checkForm('Submit Consultation Request','EctConsultationFormRequestForm'); " />
 						<input name="submitAndPrint" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndPrint"/>" onclick="return checkForm('Submit Consultation Request And Print Preview','EctConsultationFormRequestForm'); " />
@@ -1652,12 +1668,22 @@ function chooseEmail(){
 							</td>
 							<td class="tite1"><%=thisForm.getPatientName()%></td>
 						</tr>
+
+            <tr>
+              <td class="tite4"><bean:message
+                key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgEmail" />:
+              </td>
+              <td class="tite1"><%=thisForm.getPatientEmail()%></td>
+            </tr>
+
+<% if (OscarProperties.getInstance().isPropertyActive("appointment_reminder_enabled")) { %>
 						<tr>
 							<td class="tite4"><bean:message
 								key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgAddress" />:
 							</td>
 							<td class="tite1"><%=thisForm.getPatientAddress()%></td>
 						</tr>
+<% } %>
 						<tr>
 							<td class="tite4"><bean:message
 								key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgPhone" />:
@@ -2087,6 +2113,15 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 						<%
 							}
 						%>
+
+            <% if (OscarProperties.getInstance().isPropertyActive("appointment_reminder_enabled")) { %>
+              <input type="button"
+                <% if(!enableEmailDetails) { %> disabled="disabled" <% } %>
+                name="updateAndEmailDetails"
+                value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailPatient"/>'
+                onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
+            <% } %>
+
 					<%
 						}
 								else
