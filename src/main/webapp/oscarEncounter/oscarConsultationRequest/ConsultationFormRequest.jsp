@@ -148,7 +148,7 @@ displayServiceUtil.estSpecialist();
 
     boolean enableEmailDetails = false;
     if(demographic != null) {
-      enableEmailDetails = EmailUtils.isValidEmailAddress(demographic.getEmail()) && "3".equals(consultUtil.status);
+      enableEmailDetails = EmailUtils.isValidEmailAddress(demographic.getEmail());
     }
 
 		if (request.getParameter("error") != null)
