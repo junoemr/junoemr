@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -63,9 +63,9 @@ import ca.uhn.hl7v2.model.v26.segment.PID;
 import ca.uhn.hl7v2.model.v26.segment.PRD;
 
 public class EctViewRequestAction extends Action {
-	
+
 	private static final Logger logger=MiscUtils.getLogger();
-	
+
 	@Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse  response)	throws ServletException, IOException {
 
@@ -75,16 +75,16 @@ public class EctViewRequestAction extends Action {
 
 		logger.debug("Id:"+frm.getRequestId());
 		logger.debug("SegmentId:"+request.getParameter("segmentId"));
-		
+
 		return mapping.findForward("success");
 	}
-	
+
 		private static Calendar setAppointmentDateTime(EctConsultationFormRequestForm thisForm, ConsultationRequest consult) {
 			Calendar cal = Calendar.getInstance();
-			
+
 			Date date1 = consult.getAppointmentDate();
 			Date date2 = consult.getAppointmentTime();
-			
+
 			if( date1 == null || date2 == null ) {
 				cal.set(1970, 0, 1, 1, 0, 0);
 				thisForm.setAppointmentDay(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
@@ -95,7 +95,7 @@ public class EctViewRequestAction extends Action {
 	            hr = hr > 12 ? hr - 12: hr;
 	            thisForm.setAppointmentHour(String.valueOf(hr));
 	            thisForm.setAppointmentMinute(String.valueOf(cal.get(Calendar.MINUTE)));
-	            String appointmentPm;            
+	            String appointmentPm;
 	            if (cal.get(Calendar.HOUR_OF_DAY) > 11) {
 	                appointmentPm = "PM";
 	            } else {
@@ -108,15 +108,15 @@ public class EctViewRequestAction extends Action {
 				thisForm.setAppointmentDay(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
 				thisForm.setAppointmentMonth(String.valueOf(cal.get(Calendar.MONTH)+1));
 				thisForm.setAppointmentYear(String.valueOf(cal.get(Calendar.YEAR)));
-				
+
 				cal.setTime(date2);
 				Integer hr = cal.get(Calendar.HOUR_OF_DAY);
 				hr = hr == 0 ? 12 : hr;
 	            hr = hr > 12 ? hr - 12: hr;
 	            thisForm.setAppointmentHour(String.valueOf(hr));
 	            thisForm.setAppointmentMinute(String.valueOf(cal.get(Calendar.MINUTE)));
-	            
-	            String appointmentPm;            
+
+	            String appointmentPm;
 	            if (cal.get(Calendar.HOUR_OF_DAY) > 11) {
 	                appointmentPm = "PM";
 	            } else {
@@ -135,19 +135,19 @@ public class EctViewRequestAction extends Action {
             thisForm.setReasonForConsultation(consult.getReasonForReferral());
             thisForm.setClinicalInformation(consult.getClinicalInfo());
             thisForm.setCurrentMedications(consult.getCurrentMeds());
-            Date date = consult.getReferralDate();            
+            Date date = consult.getReferralDate();
             thisForm.setReferalDate(DateFormatUtils.ISO_DATE_FORMAT.format(date));
             thisForm.setSendTo(consult.getSendTo());
             thisForm.setService(consult.getServiceId().toString());
             thisForm.setStatus(consult.getStatus());
-            
+
             setAppointmentDateTime(thisForm, consult);
-            
+
             thisForm.setConcurrentProblems(consult.getConcurrentProblems());
             thisForm.setAppointmentNotes(consult.getStatusText());
             thisForm.setUrgency(consult.getUrgency());
             thisForm.setPatientWillBook(String.valueOf(consult.isPatientWillBook()));
-            
+
             date = consult.getFollowUpDate();
             if( date != null ) {
                 thisForm.setFollowUpDate(DateFormatUtils.ISO_DATE_FORMAT.format(date));
@@ -166,6 +166,7 @@ public class EctViewRequestAction extends Action {
             thisForm.setPatientHealthCardType(demo.getHcType());
             thisForm.setPatientFirstName(demo.getFirstName());
             thisForm.setPatientLastName(demo.getLastName());
+            thisForm.setPatientEmail(demo.getEmail());
             thisForm.setPatientPhone(demo.getPhone());
             thisForm.setPatientSex(demo.getSex());
             thisForm.setPatientWPhone(demo.getPhone2());
@@ -202,9 +203,9 @@ public class EctViewRequestAction extends Action {
         if( consultUtil.sendTo != null && !consultUtil.teamVec.contains(consultUtil.sendTo) ) {
             consultUtil.teamVec.add(consultUtil.sendTo);
         }
-        
+
         //---
-        
+
         thisForm.setPatientAddress(consultUtil.patientAddress);
         thisForm.setPatientDOB(consultUtil.patientDOB);
         thisForm.setPatientHealthNum(consultUtil.patientHealthNum);
@@ -212,34 +213,35 @@ public class EctViewRequestAction extends Action {
         thisForm.setPatientHealthCardType(consultUtil.patientHealthCardType);
         thisForm.setPatientFirstName(consultUtil.patientFirstName);
         thisForm.setPatientLastName(consultUtil.patientLastName);
+        thisForm.setPatientEmail(consultUtil.patientEmail);
         thisForm.setPatientPhone(consultUtil.patientPhone);
         thisForm.setPatientSex(consultUtil.patientSex);
         thisForm.setPatientWPhone(consultUtil.patientWPhone);
         thisForm.setPatientAge(consultUtil.patientAge);
-        
+
         thisForm.setProviderName(consultUtil.getProviderName(consultUtil.providerNo));
-        
+
         thisForm.seteReferral(false);
 	}
-	
+
 	public static void fillFormValues(EctConsultationFormRequestForm thisForm, String segmentId) throws HL7Exception, UnsupportedEncodingException
 	{
 		Hl7TextMessageDao hl7TextMessageDao=(Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
 		Hl7TextMessage hl7TextMessage=hl7TextMessageDao.find(Integer.parseInt(segmentId));
-		
+
 		String encodedMessage=hl7TextMessage.getBase64EncodedeMessage();
 		byte[] decodedMessage=MiscUtils.decodeBase64(encodedMessage);
 		String decodedMessageString=new String(decodedMessage, MiscUtils.ENCODING);
-		
+
 		REF_I12 refI12=(REF_I12) OscarToOscarUtils.pipeParserParse(decodedMessageString);
-		
+
 		thisForm.setHl7TextMessageId(hl7TextMessage.getId());
-		
+
         thisForm.setAllergies(RefI12.getNteValue(refI12, RefI12.REF_NTE_TYPE.ALLERGIES));
         thisForm.setReasonForConsultation(RefI12.getNteValue(refI12, RefI12.REF_NTE_TYPE.REASON_FOR_CONSULTATION));
         thisForm.setClinicalInformation(RefI12.getNteValue(refI12, RefI12.REF_NTE_TYPE.CLINICAL_INFORMATION));
         thisForm.setCurrentMedications(RefI12.getNteValue(refI12, RefI12.REF_NTE_TYPE.CURRENT_MEDICATIONS));
-        
+
         GregorianCalendar referralDate=DataTypeUtils.getCalendarFromDTM(refI12.getRF1().getEffectiveDate());
         thisForm.setReferalDate(DateFormatUtils.ISO_DATE_FORMAT.format(referralDate));
 
@@ -249,11 +251,11 @@ public class EctViewRequestAction extends Action {
         // thisForm.setAppointmentNotes(RefI12.getNteValue(refI12, RefI12.REF_NTE_TYPE.APPOINTMENT_NOTES));
 
         //---
-        
-        
+
+
         PID pid=refI12.getPID();
         Demographic demographic=DataTypeUtils.parsePid(pid);
-        
+
         StringBuilder address=new StringBuilder();
         if (demographic.getAddress()!=null) address.append(demographic.getAddress()).append("<br />");
         if (demographic.getCity()!=null) address.append(demographic.getCity()).append(", ");
@@ -266,17 +268,18 @@ public class EctViewRequestAction extends Action {
 	        String ageString=UtilDateUtilities.calcAgeAtDate(demographic.getBirthDay().getTime(), new Date());
 	        thisForm.setPatientAge(ageString);
         }
-        
+
         thisForm.setPatientHealthNum(demographic.getHin());
         thisForm.setPatientHealthCardType(demographic.getHcType());
         thisForm.setPatientHealthCardVersionCode(demographic.getVer());
-        
+
         thisForm.setPatientFirstName(demographic.getFirstName());
         thisForm.setPatientLastName(demographic.getLastName());
+        thisForm.setPatientEmail(demographic.getEmail());
         thisForm.setPatientPhone(demographic.getPhone());
         thisForm.setPatientSex(demographic.getSex());
 //        thisForm.setPatientWPhone(patientAddress);
-        
+
         // referring provider
         PRD referringPrd=RefI12.getPrdByRoleId(refI12, "RP");
         Provider provider=DataTypeUtils.parsePrdAsProvider(referringPrd);
@@ -291,5 +294,5 @@ public class EctViewRequestAction extends Action {
         thisForm.setProfessionalSpecialistAddress(professionalSpecialist.getStreetAddress());
         thisForm.setProfessionalSpecialistPhone(professionalSpecialist.getPhoneNumber());
 
-	}	
+	}
 }

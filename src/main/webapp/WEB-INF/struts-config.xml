@@ -1058,6 +1058,7 @@
 			<forward name="fax" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax.jsp" />
 			<forward name="faxIndivica" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax.do" />
 			<forward name="email" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormEmail.do" />
+			<forward name="emailalt" path="/oscarEncounter/oscarConsultationRequest/emailPatient.jsp" />
 		</action>
 		<action input="/oscarEncounter/oscarconsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/printPdf" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestPrintAction">
 			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
@@ -1695,7 +1696,7 @@
 		<action input="/eform/efmformrtl_config.jsp" path="/eform/IndivicaRichTextLetterSettings" scope="request" type="oscar.eform.actions.RTLSettingsAction">
 			<forward name="success" path="/eform/efmformrtl_config.jsp" />
 		</action>
-		
+
 		<action input="/eform/efmformadd_data.jsp" path="/eform/addEForm" scope="request" type="oscar.eform.actions.AddEFormAction">
 			<forward name="close" path="/eform/efmclosewindow.jsp" />
 			<forward name="fax" path="/eform/efmformfax_send.jsp" />
@@ -2341,7 +2342,7 @@
 			<forward name="success" path="/dms/undocument.jsp" />
 			<forward name="displaySingleDoc" path="/dms/MultiPageDocDisplay.jsp" />
 		</action>
-		
+
 		<action path="/dms/SplitDocument" name="FrmForm" type="org.springframework.web.struts.DelegatingActionProxy" parameter="method" scope="request">
         	<forward name="success" path="/oscarMDS/Splitclose.jsp" />
         </action>

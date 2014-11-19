@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -90,13 +90,14 @@ public final class EctConsultationFormRequestForm extends ActionForm {
 	String submission;
 
 	String urgency;
-	
+
 	//multi-site
 	String siteName;
 
 	private String signatureImg;
 	private String patientFirstName;
 	private String patientLastName;
+	private String patientEmail;
 	private String patientAddress;
 	private String patientPhone;
 	private String patientWPhone;
@@ -115,7 +116,7 @@ public final class EctConsultationFormRequestForm extends ActionForm {
 	private Integer hl7TextMessageId;
 
 	private String letterheadName, letterheadAddress, letterheadPhone, letterheadFax;
-	
+
 	public String getProfessionalSpecialistName() {
 		return (StringUtils.trimToEmpty(professionalSpecialistName));
 	}
@@ -420,6 +421,14 @@ public final class EctConsultationFormRequestForm extends ActionForm {
 		this.patientAddress = patientAddress;
 	}
 
+	public String getPatientEmail() {
+		return (StringUtils.trimToEmpty(patientEmail));
+	}
+
+	public void setPatientEmail(String patientEmail) {
+		this.patientEmail = patientEmail;
+	}
+
 	public String getPatientPhone() {
 		return (StringUtils.trimToEmpty(patientPhone));
 	}
@@ -545,7 +554,7 @@ public final class EctConsultationFormRequestForm extends ActionForm {
 		}
       	return siteName;
   	}
-  
+
   	public void setSiteName(String str) {
 	  	this.siteName = str;
   	}
@@ -589,6 +598,6 @@ public final class EctConsultationFormRequestForm extends ActionForm {
 	public void setLetterheadFax(String letterheadFax) {
 	    this.letterheadFax = letterheadFax;
     }
-  
+
 
 }
