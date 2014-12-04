@@ -263,6 +263,14 @@ public class AddEditDocumentAction extends DispatchAction {
 			// save local file
 			File file = writeLocalFile(docFile, fileName2);
 			newDoc.setContentType(docFile.getContentType());
+			int numberOfPages = 0;
+			if (fileName2.endsWith(".PDF") || fileName2.endsWith(".pdf")) {
+				newDoc.setContentType("application/pdf");
+				// get number of pages when document is pdf;
+				numberOfPages = countNumOfPages(fileName2);
+			}
+			newDoc.setNumberOfPages(numberOfPages);
+			MiscUtils.getLogger().info("Content Type:" + newDoc.getContentType());
 
 
 			// if the document was added in the context of a program
