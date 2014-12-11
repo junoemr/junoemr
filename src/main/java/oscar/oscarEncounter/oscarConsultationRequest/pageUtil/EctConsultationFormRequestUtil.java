@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -59,6 +59,8 @@ public class EctConsultationFormRequestUtil {
                 patientFirstName = oscar.Misc.getString(rs, "first_name");
                 patientLastName = oscar.Misc.getString(rs, "last_name");
                 patientName = patientLastName + "," +patientFirstName;
+
+                patientEmail = oscar.Misc.getString(rs, "email");
 
                 patientAddress = oscar.Misc.getString(rs, "address") + "<br>" + oscar.Misc.getString(rs, "city") +
                         "," + oscar.Misc.getString(rs, "province") + "," + oscar.Misc.getString(rs, "postal");
@@ -199,7 +201,7 @@ public class EctConsultationFormRequestUtil {
                 allergies = oscar.Misc.getString(rs, "allergies");
                 sendTo = oscar.Misc.getString(rs, "sendTo");
                 status = oscar.Misc.getString(rs, "status");
-                
+
                 letterheadName = oscar.Misc.getString(rs, "letterheadName");
                 letterheadAddress = oscar.Misc.getString(rs, "letterheadAddress");
                 letterheadPhone = oscar.Misc.getString(rs, "letterheadPhone");
@@ -211,8 +213,8 @@ public class EctConsultationFormRequestUtil {
 		letterheadFax = letterheadFax == null?"":letterheadFax;
 
                 signatureImg = oscar.Misc.getString(rs, "signature_img");
-                
-                appointmentNotes = oscar.Misc.getString(rs, "statusText");                
+
+                appointmentNotes = oscar.Misc.getString(rs, "statusText");
                 if (appointmentNotes == null || appointmentNotes.equals("null")) {
                     appointmentNotes = new String();
                 }
@@ -399,6 +401,7 @@ public class EctConsultationFormRequestUtil {
     public String patientName;
     public String patientFirstName;
     public String patientLastName;
+    public String patientEmail;
     public String patientAddress;
     public String patientPhone;
     public String patientWPhone;
@@ -439,12 +442,12 @@ public class EctConsultationFormRequestUtil {
     public String mrp = "";
     public String siteName;
     public String signatureImg;
-    
+
     public String letterheadName;
     public String letterheadAddress;
     public String letterheadPhone;
     public String letterheadFax;
-    
 
-	
+
+
 }
