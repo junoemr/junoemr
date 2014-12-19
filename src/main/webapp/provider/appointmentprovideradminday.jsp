@@ -36,6 +36,7 @@
 <%@ page import="org.oscarehr.common.model.MyGroupAccessRestriction" %>
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
+<%@ page import="org.apache.commons.validator.routines.EmailValidator" %>
 <%
 
 	if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.jsp");
@@ -1624,7 +1625,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
                           ver = "";
                   roster = "";
                       List<Map<String,Object>> demoList = oscarSuperManager.find("providerDao", "search_demograph", new Object[] {demographic_no});
-                  String demo_alert = "", demo_scanned_chart = "";
+                  String demo_alert = "", demo_scanned_chart = "", demo_email = "";
                   for (Map demo : demoList) {
                     ver = (String)demo.get("ver");
                     roster = (String)demo.get("roster_status");
@@ -1642,8 +1643,8 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
                     if(dob.length()>0 && !dob.equals("null"))
                     	intDob = Integer.parseInt(dob);
 
+					demo_email = String.valueOf(!(null == demo.get("email") || "null".equals(demo.get("email")) )? demo.get("email"): "").trim();
                     demo_alert = String.valueOf(!(null == demo.get("alert") || "null".equals(demo.get("alert")) )? demo.get("alert"): "").trim();
-
 
                     demBday = mob + "-" + dob;
 
@@ -1780,6 +1781,9 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 <% } %>
 <% if(OscarProperties.getInstance().getProperty("show_demographic_not_scanned_flag","false").equals("true") && demo_scanned_chart.equals("0")){ %>
     <img height="14px" src="../images/icons/072.png" alt="Patient's chart has not yet been scanned" title="Patient's chart has not yet been scanned " />
+<% } %>
+<% if(OscarProperties.getInstance().getProperty("show_demographic_valid_email","false").equals("true") && !org.apache.commons.validator.routines.EmailValidator.getInstance().isValid(demo_email)){ %>
+    <img height="14px" src="../images/icons/073.png" alt="Invalid Email" title="Patient's email address is not valid" />
 <% } %>
 <!-- doctor code block 1 -->
 <% if(bShowDocLink) { %>
