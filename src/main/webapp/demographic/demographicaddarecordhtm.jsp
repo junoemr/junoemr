@@ -661,7 +661,7 @@ function autoFillHin(){
 				<td align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formCity" />: </b></td>
 				<td align="left"><input type="text" name="city"
-					value="<%=props.getProperty("defaultcity")%>" /></td>
+					value="<%=props.getProperty("defaultcity","")%>" /></td>
 			</tr>
 			<% if (vLocale.getCountry().equals("BR")) { %>
 			<tr valign="top">
