@@ -83,7 +83,10 @@
   String prov= ((String ) props.getProperty("billregion","")).trim().toUpperCase();
 
   String billingCentre = ((String ) props.getProperty("billcenter","")).trim().toUpperCase();
-  
+  String defaultCity = ((String ) props.getProperty("defaultcity",""));
+  if (defaultCity==null || defaultCity.equals("")) {
+  	defaultCity = prov.equals("ON")&&billingCentre.equals("N") ? "Toronto":"";
+  }
 
   WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
   CountryCodeDao ccDAO =  (CountryCodeDao) ctx.getBean("countryCodeDao");
@@ -661,7 +664,7 @@ function autoFillHin(){
 				<td align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formCity" />: </b></td>
 				<td align="left"><input type="text" name="city"
-					value="<%=props.getProperty("defaultcity","")%>" /></td>
+					value="<%=defaultCity%>" /></td>
 			</tr>
 			<% if (vLocale.getCountry().equals("BR")) { %>
 			<tr valign="top">
