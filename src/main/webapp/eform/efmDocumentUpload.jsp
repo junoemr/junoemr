@@ -91,7 +91,7 @@ if(request.getParameter("showform") != null && request.getParameter("showform").
 		<input type="hidden" name="document_index" value="<%=document_index%>">
 		<input type="hidden" name="observationDate" id="observationDate" value="<%=UtilDateUtilities.DateToString(UtilDateUtilities.now(), "yyyy/MM/dd")%>" size="10" style="text-align: center;">
 		<div>
-			Photo Label: <input type="text" name="docDesc" id="docDesc" size="30" value="<%=formdata.getDocDesc()%>" placeholder="Description">
+			Photo Label: <input type="text" name="docDesc" id="docDesc" size="50" value="<%=formdata.getDocDesc()%>" placeholder="Description">
 		</div>
 		<div>
 			<input type="submit" name="Submit" value="Add">
@@ -113,8 +113,8 @@ function checkRequired(){
         hideLoader();
         return false;
 	}
-	if(document.getElementById("docDesc").value.length > 30){
-		alert("Image description can't be more than 30 characters");
+	if(document.getElementById("docDesc").value.length > 100){
+		alert("Image description can't be more than 100 characters");
 		hideLoader();
 		return false;
 	}
