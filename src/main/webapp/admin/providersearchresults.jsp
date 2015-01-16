@@ -150,6 +150,13 @@
 			key="admin.provider.formStatus" /></B></TH>
 	</tr>
 	<%
+	
+	
+  String status = request.getParameter("search_status");
+  if(request.getAttribute("active").equals("0")&&request.getAttribute("inactive").equals("0")) {
+	status = null;	
+  }
+  
   ResultSet rs = null;
   String dboperation = request.getParameter("dboperation");
   String keyword=request.getParameter("keyword").trim();  
@@ -222,12 +229,12 @@
   nLastPage=Integer.parseInt(strLimit1)-Integer.parseInt(strLimit2);
   if(nLastPage>=0) {
 %> <a
-	href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%=request.getParameter("orderby")%>&limit1=<%=nLastPage%>&limit2=<%=strLimit2%>&search_status=<%=request.getParameter("search_status")%>"><bean:message
+	href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%=request.getParameter("orderby")%>&limit1=<%=nLastPage%>&limit2=<%=strLimit2%>&search_status=<%=status%>"><bean:message
 	key="admin.providersearchresults.btnLastPage" /></a> | <%
   }
   if(nItems==Integer.parseInt(strLimit2)) {
 %> <a
-	href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%=request.getParameter("orderby")%>&limit1=<%=nNextPage%>&limit2=<%=strLimit2%>&search_status=<%=request.getParameter("search_status")%>"><bean:message
+	href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%=request.getParameter("orderby")%>&limit1=<%=nNextPage%>&limit2=<%=strLimit2%>&search_status=<%=status%>"><bean:message
 	key="admin.providersearchresults.btnNextPage" /></a> <%
 }
 %>

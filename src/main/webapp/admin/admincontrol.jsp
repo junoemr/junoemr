@@ -109,8 +109,8 @@ if(session.getAttribute("user") == null ) //|| !((String) session.getValue("user
             }
         }
         else if( status.length == 2 ) {
-            inactive = "1";
-            active = "1";
+            inactive = "0";
+            active = "0";
         }
         fieldname = sql + fieldname;
 
