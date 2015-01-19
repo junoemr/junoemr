@@ -151,12 +151,13 @@
 	</tr>
 	<%
 	
+	String status = request.getParameter("search_status");
 	
-  String status = request.getParameter("search_status");
-  if(request.getAttribute("active").equals("0")&&request.getAttribute("inactive").equals("0")) {
-	status = null;	
-  }
-  
+	if(request.getAttribute("active").equals("1")&&request.getAttribute("inactive").equals("1")) {
+		status = "2";
+	}
+	
+	
   ResultSet rs = null;
   String dboperation = request.getParameter("dboperation");
   String keyword=request.getParameter("keyword").trim();  

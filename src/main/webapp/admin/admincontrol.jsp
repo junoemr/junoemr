@@ -98,20 +98,27 @@ if(session.getAttribute("user") == null ) //|| !((String) session.getValue("user
     if( status != null ) {
         int numConditions = status.length;
         String sql = new String();
-        if( status.length == 1 ) {
-            if( status[0].equals("0") ) {
-                sql = "status = 0 and ";
+        if(numConditions>1){
+          	if(status[0].equals("1")&&status[1].equals("0") ) {
                 inactive = "1";
+            	active = "1";
             }
-            else if( status[0].equals("1") ) {
-                sql = "status = 1 and ";
+        }
+        else if (numConditions ==1) {
+        	if(status[0].equals("1")){
+        		sql = "status = 1 and ";
                 active = "1";
-            }
-        }
-        else if( status.length == 2 ) {
-            inactive = "0";
-            active = "0";
-        }
+        	}
+        	else if (status[0].equals("0")){
+        		sql = "status = 0 and ";
+                inactive = "1";
+        	}
+        	else if (status[0].equals("2")){
+        		inactive = "1";
+             	active = "1";
+        	}
+        	
+         }
         fieldname = sql + fieldname;
 
     }
