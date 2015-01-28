@@ -170,9 +170,12 @@ String document_description = request.getParameter("document_description");
 		if(confirm('Are you sure you want to remove this image?')){
 			//do something
 			parent.document.getElementById("photodisplay_<%=document_index%>").style.display = "none";
+			parent.document.getElementById("photodisplay_<%=document_index%>").innerHTML = "";
 			var iframe = parent.document.getElementById("uploadiframe_<%=document_index%>");
 			iframe.src = iframe.src;
 			parent.document.getElementById("uploadiframe_<%=document_index%>").style.display = "block";
+			parent.document.getElementById("document_no_<%=document_index%>").value = "";
+			parent.document.getElementById("document_description_<%=document_index%>").value = "";
 		}
 		return false;
 		
