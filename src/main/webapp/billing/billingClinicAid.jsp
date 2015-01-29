@@ -201,6 +201,7 @@ if(action.equals("create_invoice")){
 	String status = demo.getPatientStatus();
 	String hin = demo.getHin();
 	String ver = demo.getVer();
+	String hc_type = demo.getHcType();
 	String age = demo.getAge();
 	String encoded_province = demo.getProvince();
 	String encoded_city = demo.getCity();
@@ -221,6 +222,7 @@ if(action.equals("create_invoice")){
 	clinicaid_link = clinicaid_domain+"/?nonce="+ nonce +"#/invoice/add?service_recipient_first_name="+first_name+
 						"&service_recipient_uli="+hin+
 						"&service_recipient_ver="+ver+
+						"&service_recipient_hctype="+hc_type+
 						"&service_recipient_last_name="+last_name+
 						"&service_recipient_oscar_number="+service_recipient_oscar_number+
 						"&service_recipient_status="+status+
