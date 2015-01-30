@@ -96,21 +96,31 @@ if(session.getAttribute("user") == null ) //|| !((String) session.getValue("user
     String active = "0";
 
     if( status != null ) {
-        int numConditions = status.length;
         String sql = new String();
-        if( status.length == 1 ) {
-            if( status[0].equals("0") ) {
-                sql = "status = 0 and ";
-                inactive = "1";
-            }
-            else if( status[0].equals("1") ) {
-                sql = "status = 1 and ";
-                active = "1";
-            }
+        
+        if(status.length == 1) {
+    		if(status[0].equals("active")) {
+    			sql = "status = 1 and ";
+ 	            active = "1";
+    		}
+    		else if (status[0].equals("inactive")){
+    			sql = "status = 0 and ";
+	            inactive = "1";
+    		}
         }
-        else if( status.length == 2 ) {
-            inactive = "1";
-            active = "1";
+        else if(status.length == 2){
+	        if(status[0].equals("active")&&status[1].equals("") ) {
+	            sql = "status = 1 and ";
+	            active = "1";
+	        }
+	        else if(status[0].equals("")&&status[1].equals("inactive")) {
+	        	sql = "status = 0 and ";
+	            inactive = "1";
+	        }
+	        else if(status[0].equals("active")&&status[1].equals("inactive")) {
+	            inactive = "1";
+	            active = "1";
+	        }
         }
         fieldname = sql + fieldname;
 
