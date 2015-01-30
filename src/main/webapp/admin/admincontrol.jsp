@@ -97,34 +97,33 @@ if(session.getAttribute("user") == null ) //|| !((String) session.getValue("user
 
     if( status != null ) {
         String sql = new String();
-        
         if(status.length == 1) {
-    		if(status[0].equals("active")) {
-    			sql = "status = 1 and ";
- 	            active = "1";
-    		}
-    		else if (status[0].equals("inactive")){
-    			sql = "status = 0 and ";
-	            inactive = "1";
-    		}
+                if(status[0].equals("active")) {
+                        sql = "status = 1 and ";
+                    active = "1";
+                }
+                else if (status[0].equals("inactive")){
+                        sql = "status = 0 and ";
+                    inactive = "1";
+                }
         }
         else if(status.length == 2){
-	        if(status[0].equals("active")&&status[1].equals("") ) {
-	            sql = "status = 1 and ";
-	            active = "1";
-	        }
-	        else if(status[0].equals("")&&status[1].equals("inactive")) {
-	        	sql = "status = 0 and ";
-	            inactive = "1";
-	        }
-	        else if(status[0].equals("active")&&status[1].equals("inactive")) {
-	            inactive = "1";
-	            active = "1";
-	        }
+                if(status[0].equals("active")&&status[1].equals("") ) {
+                    sql = "status = 1 and ";
+                    active = "1";
+                }
+                else if(status[0].equals("")&&status[1].equals("inactive")) {
+                        sql = "status = 0 and ";
+                    inactive = "1";
+                }
+                else if(status[0].equals("active")&&status[1].equals("inactive")) {
+                    inactive = "1";
+                    active = "1";
+                }
         }
         fieldname = sql + fieldname;
-
     }
+
     //we save results in request to maintain state of form
     request.setAttribute("inactive",inactive);
     request.setAttribute("active",active);

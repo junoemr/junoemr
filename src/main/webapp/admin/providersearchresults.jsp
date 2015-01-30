@@ -150,6 +150,14 @@
 			key="admin.provider.formStatus" /></B></TH>
 	</tr>
 	<%
+	
+	String status = request.getParameter("search_status");
+	
+	if(request.getAttribute("active").equals("1")&&request.getAttribute("inactive").equals("1")) {
+		status = "2";
+	}
+	
+	
   ResultSet rs = null;
   String dboperation = request.getParameter("dboperation");
   String keyword=request.getParameter("keyword").trim();  
