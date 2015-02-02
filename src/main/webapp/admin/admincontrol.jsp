@@ -26,6 +26,8 @@
 
 <%@page import="org.oscarehr.util.SessionConstants"%>
 <%@page import="org.oscarehr.common.model.ProviderPreference"%>
+<%@page import="java.util.Arrays" %>
+
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
     if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.jsp");
@@ -97,30 +99,17 @@ if(session.getAttribute("user") == null ) //|| !((String) session.getValue("user
 
     if( status != null ) {
         String sql = new String();
-        if(status.length == 1) {
-                if(status[0].equals("active")) {
-                        sql = "status = 1 and ";
-                    active = "1";
-                }
-                else if (status[0].equals("inactive")){
-                        sql = "status = 0 and ";
-                    inactive = "1";
-                }
+        if(Arrays.asList(status).contains("active")){
+        	sql = "status = 1 and ";
+            active = "1";
         }
-        else if(status.length == 2){
-                if(status[0].equals("active")&&status[1].equals("") ) {
-                    sql = "status = 1 and ";
-                    active = "1";
-                }
-                else if(status[0].equals("")&&status[1].equals("inactive")) {
-                        sql = "status = 0 and ";
-                    inactive = "1";
-                }
-                else if(status[0].equals("active")&&status[1].equals("inactive")) {
-                    inactive = "1";
-                    active = "1";
-                }
+		if(Arrays.asList(status).contains("inactive")){
+			sql = "status = 0 and ";
+            inactive = "1";
         }
+		if(inactive.equals("1")&&active.equals("1")) {
+			sql = "";
+		}
         fieldname = sql + fieldname;
     }
 
