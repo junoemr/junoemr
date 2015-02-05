@@ -224,15 +224,22 @@ public class TeleplanFileWriter {
            //Billingmaster bm = billingmasterDAO.getBillingMasterByBillingMasterNo(billing_no);
            
             
-           WCB wcbForm = billingmasterDAO.getWCBForm(""+bm.getWcbId());
+           WCB wcbForm = billingmasterDAO.getWCBForm(String.valueOf(bm.getWcbId()));
                
            MiscUtils.getLogger().debug("BM "+bm+" WCB "+wcbForm + " for "+billing_no);
            
            WCBTeleplanSubmission wcbSub = new WCBTeleplanSubmission();
            wcbSub.setDemographicDao(demographicDAO);
            //WcbSb sb = new WcbSb(billing_no);
-           appendToHTML(wcbSub.getHtmlLine(wcbForm,bm)); //sb.getHtmlLine());
-           appendToHTML(wcbSub.validate(wcbForm,bm)); //sb.validate());
+           
+           String html = wcbSub.validate(wcbForm,bm);
+           appendToHTML(html);
+           if(html.equals("")){
+           	  appendToHTML(wcbSub.getHtmlLine(wcbForm,bm));
+           }
+           else {
+        	   return null;
+           }
            //TODO: DOES THIS DO ANYTHING appendToHTML(checkData.printWarningMsg(""))
            
            Claims claims = new Claims();
@@ -289,6 +296,7 @@ public class TeleplanFileWriter {
                 appendToFile("\n"+ lines +"\r");
                 setLog(logNo, lines,""+bm.getBillingmasterNo());
            }
+           
            addToMarkBillingmasterList(""+bm.getBillingmasterNo());
            return claims;
     }
