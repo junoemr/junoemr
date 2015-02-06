@@ -343,6 +343,10 @@ public class OscarProperties extends Properties {
 	public boolean isWeekViewReasonDisplayEnabled() {
 		return isPropertyActive("week_view_reason_display");
 	}
+	
+	public boolean isGroupedEFormEnabled() {
+		return isPropertyActive("grouped_eform_on_echart");
+	}
 
 	public int getWeekViewReasonDisplayPreferredLength() {
 		int defaultValue = 30; // default number of characters

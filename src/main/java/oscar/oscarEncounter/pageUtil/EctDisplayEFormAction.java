@@ -47,6 +47,8 @@ import oscar.util.DateUtils;
 import oscar.util.OscarRoleObjectPrivilege;
 import oscar.util.StringUtils;
 
+import oscar.OscarProperties;
+
 //import oscar.oscarSecurity.CookieSecurity;
 
 public class EctDisplayEFormAction extends EctDisplayAction {
@@ -104,7 +106,14 @@ public class EctDisplayEFormAction extends EctDisplayAction {
 	        eForms.clear();
 	
 			EFormDataDao eFormDataDao=(EFormDataDao)SpringUtils.getBean("EFormDataDao");
-			List<EFormData> eFormDatas=eFormDataDao.findByDemographicIdCurrentPatientIndependent(new Integer(bean.demographicNo), true, false);
+			
+			List<EFormData> eFormDatas = new ArrayList<EFormData>();
+			if(OscarProperties.getInstance().isGroupedEFormEnabled()){
+				eFormDatas=eFormDataDao.findByDemographicIdCurrentPatientIndependentGroupByFormId(new Integer(bean.demographicNo), true, false);
+			}else{
+				eFormDatas=eFormDataDao.findByDemographicIdCurrentPatientIndependent(new Integer(bean.demographicNo), true, false);
+			}
+			
 			filterRoles(eFormDatas, roleName);
 			Collections.sort(eFormDatas, EFormData.FORM_DATE_COMPARATOR);
 			Collections.reverse(eFormDatas);
