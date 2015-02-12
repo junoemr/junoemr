@@ -135,6 +135,60 @@ public class EFormDataDao extends AbstractDao<EFormData> {
      * @param patientIndependent can be null to be both
      * @return
      */
+    public List<EFormData> findByDemographicIdCurrentPatientIndependentGroupByFormId(Integer demographicId, Boolean current, Boolean patientIndependent)
+	{
+    	String sqlCommand = "select * from "
+    			+ "(select * from eform_data order by fdid desc) eform_data_ordered "
+    			+ "where demographic_no=(?1) and status='1' ";
+    	
+    	int counter=2;
+    	if (current!=null)
+    	{
+    		sqlCommand += " and status=(?"+counter+")";
+    		counter++;
+    	}
+
+    	if (patientIndependent!=null)
+    	{
+    		sqlCommand += " and patient_independent=(?"+counter+")";
+    		counter++;
+    	}
+    	
+    	sqlCommand += " group by fid";
+    	
+    	logger.debug("SqlCommand="+sqlCommand);
+
+		Query query = entityManager.createNativeQuery(sqlCommand, modelClass);
+		query.setParameter(1, demographicId);
+
+    	counter=2;
+
+    	if (current!=null)
+    	{
+    		query.setParameter(counter, current);
+    		counter++;
+    	}
+
+    	if (patientIndependent!=null)
+    	{
+    		query.setParameter(counter, patientIndependent);
+    		counter++;
+    	}
+
+    	@SuppressWarnings("unchecked")
+		List<EFormData> results=query.getResultList();
+    	MiscUtils.getLogger().debug("here?");
+    	MiscUtils.getLogger().debug(results);
+
+		return(results);
+	}
+    
+    /**
+     * @param demographicId can not be null
+     * @param current can be null for both
+     * @param patientIndependent can be null to be both
+     * @return
+     */
     public List<Map<String,Object>> findByDemographicIdCurrentPatientIndependentNoData(Integer demographicId, Boolean current, Boolean patientIndependent)
 	{
     	StringBuilder sb=new StringBuilder();
