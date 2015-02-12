@@ -111,12 +111,12 @@ public class EctDisplayEFormAction extends EctDisplayAction {
 			if(OscarProperties.getInstance().isGroupedEFormEnabled()){
 				eFormDatas=eFormDataDao.findByDemographicIdCurrentPatientIndependentGroupByFormId(new Integer(bean.demographicNo), true, false);
 			}else{
-				eFormDatas=eFormDataDao.findByDemographicIdCurrentPatientIndependent(new Integer(bean.demographicNo), true, false);
+				eFormDatas=eFormDataDao.findByDemographicIdCurrentPatientIndependent(new Integer(bean.demographicNo), true, false);				
 			}
-			
 			filterRoles(eFormDatas, roleName);
 			Collections.sort(eFormDatas, EFormData.FORM_DATE_COMPARATOR);
 			Collections.reverse(eFormDatas);
+			
 	
 			for (EFormData eFormData : eFormDatas)
 			{
