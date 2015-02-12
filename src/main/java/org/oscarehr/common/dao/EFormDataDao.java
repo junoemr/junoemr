@@ -154,7 +154,7 @@ public class EFormDataDao extends AbstractDao<EFormData> {
     		counter++;
     	}
     	
-    	sqlCommand += " group by fid";
+    	sqlCommand += " group by fid order by fdid";
     	
     	logger.debug("SqlCommand="+sqlCommand);
 
