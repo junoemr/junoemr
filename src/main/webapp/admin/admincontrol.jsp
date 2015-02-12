@@ -26,6 +26,8 @@
 
 <%@page import="org.oscarehr.util.SessionConstants"%>
 <%@page import="org.oscarehr.common.model.ProviderPreference"%>
+<%@page import="java.util.Arrays" %>
+
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
     if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.jsp");
@@ -96,25 +98,21 @@ if(session.getAttribute("user") == null ) //|| !((String) session.getValue("user
     String active = "0";
 
     if( status != null ) {
-        int numConditions = status.length;
         String sql = new String();
-        if( status.length == 1 ) {
-            if( status[0].equals("0") ) {
-                sql = "status = 0 and ";
-                inactive = "1";
-            }
-            else if( status[0].equals("1") ) {
-                sql = "status = 1 and ";
-                active = "1";
-            }
-        }
-        else if( status.length == 2 ) {
-            inactive = "1";
+        if(Arrays.asList(status).contains("active")){
+        	sql = "status = 1 and ";
             active = "1";
         }
+		if(Arrays.asList(status).contains("inactive")){
+			sql = "status = 0 and ";
+            inactive = "1";
+        }
+		if(inactive.equals("1")&&active.equals("1")) {
+			sql = "";
+		}
         fieldname = sql + fieldname;
-
     }
+
     //we save results in request to maintain state of form
     request.setAttribute("inactive",inactive);
     request.setAttribute("active",active);

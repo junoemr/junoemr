@@ -110,9 +110,9 @@
 			onclick="document.forms['searchprovider'].keyword.focus();"><bean:message
 			key="admin.providersearch.formNo" /></font></td>
 		<td nowrap><font size="1" face="Verdana" color="#0000FF">
-		<input type="checkbox" name="search_status" value="1"><bean:message
+		<input type="checkbox" name="search_status" value="active"><bean:message
 			key="admin.providersearch.formActiveStatus" /><br />
-		<input type="checkbox" name="search_status" value="0"><bean:message
+		<input type="checkbox" name="search_status" value="inactive"><bean:message
 			key="admin.providersearch.formInactiveStatus" /> </font></td>
 
 		<td valign="middle" rowspan="2" ALIGN="left"><input type="text"

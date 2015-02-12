@@ -51,7 +51,8 @@ public class WCBTeleplanSubmission {
     //Misc misc = new Misc();
     public String getHtmlLine(WCB wcb,Billingmaster bm) {
         log.debug("WCB "+wcb+ " BM "+bm);
-        return getHtmlLine(""+bm.getBillingmasterNo(),""+bm.getBillingNo(), wcb.getW_lname() + "," + wcb.getW_fname(), wcb.getW_phn(),dateFormat(wcb.getW_servicedate()), bm.getBillingCode(), bm.getBillAmount(), bm.getDxCode1(), "", "");
+        
+        return getHtmlLine(""+bm.getBillingmasterNo(),""+bm.getBillingNo(), wcb.getW_lname() + ", " + wcb.getW_fname(), wcb.getW_phn(),dateFormat(wcb.getW_servicedate()), bm.getBillingCode(), bm.getBillAmount(), bm.getDxCode1(), "", "");
 
 
     }
@@ -100,34 +101,39 @@ public class WCBTeleplanSubmission {
         }catch(Exception e){
             m.append(": ICD9 may only contain Numbers ");
         }
-
-
-        if (wcb.getW_wcbno() != null && !wcb.getW_wcbno().trim().equals("")){
-            try {
-                Integer.parseInt(wcb.getW_wcbno());
-            }catch(Exception e){
-                m.append(": WCB claim # may only contain Numbers ");
-            }
+        if(wcb==null) {
+        	
+        	m.append(": Please select a WCB form or change billing type for invoice no:"+bm.getBillingNo());
         }
         
-        if (wcb.getW_reporttype() != null && wcb.getW_reporttype().equals("F") ){
-            if (wcb.getW_empname() != null && wcb.getW_empname().trim().length() == 0 ){
-                m.append(": Employer's name can not be empty ");
-            }
-            
-            if (wcb.getW_opaddress() != null && wcb.getW_opaddress().trim().length() == 0 ){
-                m.append(": Employer's Operation Address can not be empty ");
-            }
-            
-            if (wcb.getW_opcity() != null && wcb.getW_opcity().trim().length() == 0 ){
-                m.append(": Employer's Operation City can not be empty ");
-            }
-             
-            if (wcb.getW_empphone() != null && wcb.getW_empphone().trim().length() == 0 ){
-                m.append(": Employer's Phone # can not be empty ");
-            }
-        }    
-        
+        else {
+
+	        if (wcb.getW_wcbno() != null && !wcb.getW_wcbno().trim().equals("")){
+	            try {
+	                Integer.parseInt(wcb.getW_wcbno());
+	            }catch(Exception e){
+	                m.append(": WCB claim # may only contain Numbers ");
+	            }
+	        }
+	        
+	        if (wcb.getW_reporttype() != null && wcb.getW_reporttype().equals("F") ){
+	            if (wcb.getW_empname() != null && wcb.getW_empname().trim().length() == 0 ){
+	                m.append(": Employer's name can not be empty ");
+	            }
+	            
+	            if (wcb.getW_opaddress() != null && wcb.getW_opaddress().trim().length() == 0 ){
+	                m.append(": Employer's Operation Address can not be empty ");
+	            }
+	            
+	            if (wcb.getW_opcity() != null && wcb.getW_opcity().trim().length() == 0 ){
+	                m.append(": Employer's Operation City can not be empty ");
+	            }
+	             
+	            if (wcb.getW_empphone() != null && wcb.getW_empphone().trim().length() == 0 ){
+	                m.append(": Employer's Phone # can not be empty ");
+	            }
+	        }    
+        }
 
        
         String ret = "<tr bgcolor='red'><td colspan='11'>"

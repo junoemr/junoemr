@@ -929,7 +929,7 @@ if(billService != null){
 
   <%if(bill.getBillingtype().equals("WCB")){ %>
          oscarLog("DOES THIS LOG");
-      replaceWCB('<%=billingmaster.getWcbId()%>');
+      replaceWCB("<%=String.valueOf(billingmaster.getWcbId())%>");
 
   <%}%>
   </script>

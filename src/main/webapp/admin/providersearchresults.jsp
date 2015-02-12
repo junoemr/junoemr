@@ -94,10 +94,10 @@
 			onclick="document.forms['searchprovider'].keyword.focus();"><bean:message
 			key="admin.provider.formProviderNo" /></font></td>
 		<td nowrap><font size="1" face="Verdana" color="#0000FF">
-		<input type="checkbox" name="search_status" value="1"
+		<input type="checkbox" name="search_status" value="active"
 			<%=request.getAttribute("active").equals("1")?"checked":""%>><bean:message
 			key="admin.providersearch.formActiveStatus" /><br />
-		<input type="checkbox" name="search_status" value="0"
+		<input type="checkbox" name="search_status" value="inactive"
 			<%=request.getAttribute("inactive").equals("1")?"checked":""%>><bean:message
 			key="admin.providersearch.formInactiveStatus" /> </font></td>
 		<td valign="middle" rowspan="2" ALIGN="left"><input type="text"
@@ -150,6 +150,14 @@
 			key="admin.provider.formStatus" /></B></TH>
 	</tr>
 	<%
+	
+	String status = request.getParameter("search_status");
+	
+	if(request.getAttribute("active").equals("1")&&request.getAttribute("inactive").equals("1")) {
+		status = "2";
+	}
+	
+	
   ResultSet rs = null;
   String dboperation = request.getParameter("dboperation");
   String keyword=request.getParameter("keyword").trim();  
@@ -222,12 +230,12 @@
   nLastPage=Integer.parseInt(strLimit1)-Integer.parseInt(strLimit2);
   if(nLastPage>=0) {
 %> <a
-	href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%=request.getParameter("orderby")%>&limit1=<%=nLastPage%>&limit2=<%=strLimit2%>"><bean:message
+	href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%=request.getParameter("orderby")%>&limit1=<%=nLastPage%>&limit2=<%=strLimit2%>&search_status=<%=request.getAttribute("active").equals("1") ? "active" : ""%>&search_status=<%=request.getAttribute("inactive").equals("1") ? "inactive" : ""%>"><bean:message
 	key="admin.providersearchresults.btnLastPage" /></a> | <%
   }
   if(nItems==Integer.parseInt(strLimit2)) {
 %> <a
-	href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%=request.getParameter("orderby")%>&limit1=<%=nNextPage%>&limit2=<%=strLimit2%>"><bean:message
+	href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%=request.getParameter("orderby")%>&limit1=<%=nNextPage%>&limit2=<%=strLimit2%>&search_status=<%=request.getAttribute("active").equals("1") ? "active" : ""%>&search_status=<%=request.getAttribute("inactive").equals("1") ? "inactive" : ""%>"><bean:message
 	key="admin.providersearchresults.btnNextPage" /></a> <%
 }
 %>

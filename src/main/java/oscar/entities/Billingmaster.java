@@ -1344,8 +1344,8 @@ public class Billingmaster {
         return retval;
     }
 
-    public int getWcbId() {
-        return wcbId;
+    public Integer getWcbId() {
+    	return wcbId;
     }
 
     public void setWcbId(Integer wcbId) {
