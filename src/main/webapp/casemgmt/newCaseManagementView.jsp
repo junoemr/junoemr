@@ -32,7 +32,7 @@
 <%@taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi"%>
 <%@page import="java.util.Enumeration"%>
 <%@page import="oscar.oscarEncounter.pageUtil.NavBarDisplayDAO"%>
-<%@page	import="java.util.Arrays,java.util.Properties,java.util.List,java.util.Set,java.util.ArrayList,java.util.Enumeration,java.util.HashSet,java.util.Iterator,java.text.SimpleDateFormat,java.util.Calendar,java.util.Date,java.text.ParseException"%>
+<%@page	import="javax.servlet.http.HttpServletRequest,java.util.Arrays,java.util.Properties,java.util.List,java.util.Set,java.util.ArrayList,java.util.Enumeration,java.util.HashSet,java.util.Iterator,java.text.SimpleDateFormat,java.util.Calendar,java.util.Date,java.text.ParseException"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="org.oscarehr.common.model.UserProperty,org.oscarehr.casemgmt.model.*,org.oscarehr.casemgmt.service.* "%>
 <%@page import="org.oscarehr.casemgmt.web.formbeans.*"%>
