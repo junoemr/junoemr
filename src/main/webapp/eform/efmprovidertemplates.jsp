@@ -26,6 +26,7 @@
 <%@page import="oscar.util.*"%>
 <%@page import="java.util.*"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
+<%@page import="org.json.*"%>
 <%@ page language="java" contentType="application/json; charset=UTF-8"%>
 <%
 String searchterm = request.getParameter("term");
@@ -36,11 +37,10 @@ EncounterTemplateDao encounterTemplateDao = SpringUtils.getBean(EncounterTemplat
 if(searchterm != null && searchterm != ""){
 	List<EncounterTemplate> encounterTemplates = encounterTemplateDao.findLike(searchterm);
 
-
-	%>[<%
 	int MaxLen = 20;
 	int TruncLen = 17;
 	String ellipses = "...";
+	JSONArray templateArray = new JSONArray();
 	for (int j = 0; j < encounterTemplates.size(); j++)
 	{
 		EncounterTemplate template = encounterTemplates.get(j);
@@ -48,19 +48,24 @@ if(searchterm != null && searchterm != ""){
 		String encounterTmp = template.getEncounterTemplateName();
 		encounterTmp = oscar.util.StringUtils.maxLenString(encounterTmp, MaxLen, TruncLen, ellipses);
 		encounterTmp = StringEscapeUtils.escapeJavaScript(encounterTmp);
-		%>{"label":"<%=encounterTmp.replace("\r\n","\\n").replace("\n","\\n").replace("\"","\\\"")%>"<%
-		%>,"value":"<%=encounterTmp.replace("\r\n","\\n").replace("\n","\\n").replace("\"","\\\"")%>"}<%
 		
-		if( j < encounterTemplates.size() - 1){
-			%>,<%
-		}
+		JSONObject obj = new JSONObject();
+		obj.put("label", encounterTmp.replace("\r\n","\\n").replace("\n","\\n").replace("\"","\\\""));
+		obj.put("value", encounterTmp.replace("\r\n","\\n").replace("\n","\\n").replace("\"","\\\""));
+		
+		templateArray.put(obj);
+		
 	}
-
-	%>]<%
+	
+	%><%=templateArray.toString()%><%
 // Or grabbing a specific template...
 }else if(templateName != null && templateName != ""){
+	JSONObject obj = new JSONObject();	
+	
 	EncounterTemplate encounterTemplate = encounterTemplateDao.find(templateName);
 	String templateValue = encounterTemplate.getEncounterTemplateValue();
-	%>{"templateValue":"<%=templateValue.replace("\r\n","\\n").replace("\n","\\n").replace("\"","\\\"")%>"}<%
+	
+	obj.put("templateValue", templateValue);
+	%><%=obj.toString()%><%
 }
 %>
