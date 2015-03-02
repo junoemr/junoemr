@@ -54,7 +54,7 @@ public class SplitDocumentAction extends DispatchAction {
 
 	public ActionForward split(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String docNum = request.getParameter("document");
-		String[] commands = request.getParameterValues("page[]");
+		String[] commands = request.getParameterValues("page");
 
 		Document doc = documentDAO.getDocument(docNum);
 
