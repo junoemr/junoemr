@@ -377,14 +377,8 @@ try
 		</div>
 	</div>
 </html:form>
-<%
-String form_target = "";
-if(Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", ""))){
-	form_target = "_blank";
 
-}
-%>
-<nested:form action="/CaseManagementEntry" style="display:inline; margin-top:0; margin-bottom:0; position: relative;" target="<%=form_target%>">
+<nested:form action="/CaseManagementEntry" style="display:inline; margin-top:0; margin-bottom:0; position: relative;" target="">
 	<html:hidden property="demographicNo" value="<%=demographicNo%>" />
 	<html:hidden property="includeIssue" value="off" />
 	<%
@@ -505,7 +499,7 @@ if(Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_bil
 			<%
 				if(bean.source == null)  {
 				%>
-					<input tabindex="21" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>" onclick="document.forms['caseManagementEntryForm'].sign.value='on';document.forms['caseManagementEntryForm'].toBill.value='true';Event.stop(event);<%if (Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", ""))){%> window.opener.location.reload(true);window.close();<% } %> return savePage('saveAndExit', '');" title='<bean:message key="oscarEncounter.Index.btnBill"/>'>&nbsp;
+					<input tabindex="21" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>" onclick="document.forms['caseManagementEntryForm'].sign.value='on';document.forms['caseManagementEntryForm'].toBill.value='true';Event.stop(event);<%if (Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", ""))){%> window.opener.location.reload(true);<% } %> return savePage('saveAndExit', '');" title='<bean:message key="oscarEncounter.Index.btnBill"/>'>&nbsp;
 				<%
 				}
 			%>
