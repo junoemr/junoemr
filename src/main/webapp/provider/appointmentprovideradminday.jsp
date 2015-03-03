@@ -2254,4 +2254,12 @@ document.onkeydown=function(e){
                 return false;
         }
 %>
+<script src="../js/boomerang.js"></script>
+<script src="../js/rt.js"></script>
+<script type ="text/javascript">
+   BOOMR.init({
+        beacon_url: "<%=request.getScheme() + "://" + request.getServerName() + request.getContextPath()%>/nothing.js"
+   });
+</script>
+
 

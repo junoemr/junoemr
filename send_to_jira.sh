@@ -38,4 +38,5 @@ if [ $OSCAR_VERSION = "oscar_12_3" ]; then
 	SNAPSHOT="oscar-12.1.1-SNAPSHOT.war"
 fi
 
+echo $OSCAR_VERSION$DELIMITER$DATE$ITERATION.war
 scp -P 20202 target/$SNAPSHOT jira.oh.ca:/var/storage/oscar_versions/$OSCAR_VERSION$DELIMITER$DATE$ITERATION.war
