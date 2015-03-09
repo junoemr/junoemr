@@ -963,4 +963,8 @@ public class MDSHandler implements MessageHandler {
     	return "";
     }
 
+    public String getNteForPID() {
+	    return "";
+    }
+
 }

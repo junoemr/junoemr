@@ -672,4 +672,8 @@ public class PATHL7Handler implements MessageHandler {
 		return (header.equals(VIHARTF));
 	}
 
+    public String getNteForPID() {
+	    return "";
+    }
+
 }
