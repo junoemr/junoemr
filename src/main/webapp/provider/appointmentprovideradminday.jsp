@@ -2258,7 +2258,7 @@ document.onkeydown=function(e){
 <script src="../js/rt.js"></script>
 <script type ="text/javascript">
    BOOMR.init({
-        beacon_url: "<%=request.getScheme() + "://" + request.getServerName() + request.getContextPath()%>/nothing.js"
+        beacon_url: "<%=request.getScheme() + "://" + request.getServerName() + request.getContextPath()%>/oscarhost_pageLoadTimer.html"
    });
 </script>
 
