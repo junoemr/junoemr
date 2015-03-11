@@ -224,7 +224,7 @@ $(document).ready(function() {
 		});
 		
 		$("#builder").sortable();
-		var serialized = $("#builder").sortable('serialize').replace("[]","");
+		var serialized = $("#builder").sortable('serialize').replace(/\[\]/g,"");
 		$("#builder").sortable("destroy");
 		$("#builder").empty();
 		
@@ -250,7 +250,7 @@ $(document).ready(function() {
 		});
 		
 		$("#builder").sortable();
-		var serialized = $("#builder").sortable('serialize').replace("[]","");
+		var serialized = $("#builder").sortable('serialize').replace(/\[\]/g,"");
 		$("#builder").sortable("destroy");
 		
 		var docnum = $("#document_no").attr('value');
