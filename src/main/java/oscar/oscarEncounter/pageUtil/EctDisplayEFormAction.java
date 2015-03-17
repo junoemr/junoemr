@@ -136,7 +136,7 @@ public class EctDisplayEFormAction extends EctDisplayAction {
 	            url = "popupPage( 700, 800, '" + hash + "', '" + request.getContextPath() + "/eform/efmshowform_data.jsp?fdid="+eFormData.getId()+"&appointment="+bean.appointmentNo+"&parentAjaxId="+cmd+"');";
 	            String formattedDate = DateUtils.formatDate(eFormData.getFormDate(),request.getLocale());
 	            key = StringUtils.maxLenString(eFormData.getFormName(), MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + "(" + formattedDate + ")";
-	            item.setLinkTitle(eFormData.getSubject());
+	            item.setLinkTitle(StringEscapeUtils.escapeHtml(eFormData.getSubject()));
 	            key = StringEscapeUtils.escapeJavaScript(key);
 	            js = "itemColours['" + key + "'] = '" + BGCOLOUR + "'; autoCompleted['" + key + "'] = \"" + url + "\"; autoCompList.push('" + key + "');";
 	            javascript.append(js);                
