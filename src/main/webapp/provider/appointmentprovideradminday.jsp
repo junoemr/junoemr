@@ -1986,7 +1986,12 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
       <a href=# onClick="popupWithApptNo(700,1027,'../oscarRx/choosePatient.do?providerNo=<%=curUser_no%>&demographicNo=<%=demographic_no%>','rx',<%=appointment.get("appointment_no")%>)" title="<bean:message key="global.prescriptions"/>">|<bean:message key="global.rx"/>
       </a>
 
-
+      <%if(OscarProperties.getInstance().isPropertyActive("SHOW_PATIENT_APPOINTMENT_PHN_CHART")){
+        //WLPatientWaitingListBeanHandler hd = new WLPatientWaitingListBeanHandler(demographic_no);
+        Demographic patient_demo=(demographicDao.getDemographic(String.valueOf(demographic_no)));%>
+        | <%=patient_demo.getHin()%> |
+        <%=patient_demo.getChartNo()%>
+      <%}%>
 <!-- doctor color -->
 <oscar:oscarPropertiesCheck property="ENABLE_APPT_DOC_COLOR" value="yes">
         <%
