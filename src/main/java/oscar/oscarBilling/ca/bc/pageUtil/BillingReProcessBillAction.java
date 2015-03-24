@@ -98,11 +98,8 @@ public class BillingReProcessBillAction extends Action {
     if(demographicLastName.length() >= 2){
     	name_verify  = demographicFirstName.substring(0,1) + " " + demographicLastName.substring(0,2);  //d
     }
-    else if (demographicLastName.length() == 1){
-    	name_verify  = demographicFirstName.substring(0,1) + " " + demographicLastName.substring(0,1);
-    }
     else {
-    	name_verify  = demographicFirstName.substring(0,1);
+    	name_verify  = demographicFirstName.substring(0,1) + " " + demographicLastName.substring(0,1) + " ";
     }
     String billingGroupNo = billform.getGroupNo(providerNo);
     String practitionerNo = billform.getPracNo(providerNo); //p
