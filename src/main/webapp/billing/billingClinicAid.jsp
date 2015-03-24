@@ -146,8 +146,9 @@ String user_first_name = (String)session.getAttribute("userfirstname");
 String user_last_name = (String)session.getAttribute("userlastname");
 
 nonce = getNonce(user_no, user_first_name, user_last_name);
-
-if(action.equals("create_invoice")){
+if(action.equals("invoice_reports")){
+	clinicaid_link = clinicaid_domain+"/?nonce="+nonce+"#/reports";
+}else{
 	String service_recipient_oscar_number = request.getParameter("demographic_no");
 	org.oscarehr.common.model.Demographic demo = demoData.getDemographic(service_recipient_oscar_number);
 
@@ -218,35 +219,41 @@ if(action.equals("create_invoice")){
 	String encoded_referral_last_name =
 		demo.getFamilyDoctorLastName();
 	
-	//String billing_form_type = URLEncoder.encode(request.getParameter("billing_service_type"), "UTF-8");
-	clinicaid_link = clinicaid_domain+"/?nonce="+ nonce +"#/invoice/add?service_recipient_first_name="+first_name+
-						"&service_recipient_uli="+hin+
-						"&service_recipient_ver="+ver+
-						"&service_recipient_hctype="+hc_type+
-						"&service_recipient_last_name="+last_name+
-						"&service_recipient_oscar_number="+service_recipient_oscar_number+
-						"&service_recipient_status="+status+
-						"&service_recipient_age="+age+
-						"&service_recipient_gender="+encoded_patient_gender+
-						"&service_provider_oscar_number="+provider_no+
-						"&service_provider_first_name="+provider_first_name+
-						"&service_provider_last_name="+provider_last_name+
-						"&service_provider_uli="+provider_uli+
-						"&province="+encoded_province+
-						"&city="+encoded_city+
-						"&postal_code="+encoded_postal_code+
-						"&service_start_date="+service_start_date+
-						"&chart_number="+chart_no+
-						"&service_recipient_birth_date="+patient_dob+
-						"&appointment_number="+appointment_number+
-						"&appointment_start_time="+appointment_start_time +
-	    	            "&referral_number=" + encoded_referral_number +
-	    	            "&referral_first_name=" + encoded_referral_first_name +
-						"&referral_last_name=" + encoded_referral_last_name +
-						"&address=" + encoded_address;
-						//"&billForm="+billing_form_type;
-}else if(action.equals("invoice_reports")){
-	clinicaid_link = clinicaid_domain+"/?nonce="+nonce+"#/reports";
+	if(action.equals("invoice_reports_by_demographic")){
+		clinicaid_link = clinicaid_domain+"/?nonce="+nonce+"#/reports"+
+							"?service_recipient_uli="+hin+
+							"&service_recipient_oscar_number="+service_recipient_oscar_number;
+	}else if(action.equals("create_invoice")){
+		
+		//String billing_form_type = URLEncoder.encode(request.getParameter("billing_service_type"), "UTF-8");
+		clinicaid_link = clinicaid_domain+"/?nonce="+ nonce +"#/invoice/add?service_recipient_first_name="+first_name+
+							"&service_recipient_uli="+hin+
+							"&service_recipient_ver="+ver+
+							"&service_recipient_hctype="+hc_type+
+							"&service_recipient_last_name="+last_name+
+							"&service_recipient_oscar_number="+service_recipient_oscar_number+
+							"&service_recipient_status="+status+
+							"&service_recipient_age="+age+
+							"&service_recipient_gender="+encoded_patient_gender+
+							"&service_provider_oscar_number="+provider_no+
+							"&service_provider_first_name="+provider_first_name+
+							"&service_provider_last_name="+provider_last_name+
+							"&service_provider_uli="+provider_uli+
+							"&province="+encoded_province+
+							"&city="+encoded_city+
+							"&postal_code="+encoded_postal_code+
+							"&service_start_date="+service_start_date+
+							"&chart_number="+chart_no+
+							"&service_recipient_birth_date="+patient_dob+
+							"&appointment_number="+appointment_number+
+							"&appointment_start_time="+appointment_start_time +
+		    	            "&referral_number=" + encoded_referral_number +
+		    	            "&referral_first_name=" + encoded_referral_first_name +
+							"&referral_last_name=" + encoded_referral_last_name +
+							"&address=" + encoded_address;
+							//"&billForm="+billing_form_type;
+	
+	}
 }
 			
 %>

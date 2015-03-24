@@ -441,7 +441,6 @@ div.logoutBox {
 		<%
 			Boolean clinicaid_enabled = Boolean.parseBoolean( oscarVariables.getProperty("clinicaid_billing", ""));
 			if(clinicaid_enabled){
-				String clinicaid_link = "/billing/billingClinicAid.jsp?billing_action=invoice_reports";
 				%>
 				<div class="adminBox">
 					<h3>&nbsp;<bean:message key="admin.admin.billing" /></h3>
