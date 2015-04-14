@@ -116,7 +116,7 @@ public class WCBTeleplanSubmission {
 	            }
 	        }
 	        
-	        if (wcb.getW_reporttype() != null && wcb.getW_reporttype().equals("F") ){
+	        if (wcb.getW_reporttype() != null && wcb.getW_reporttype().equals("F") && wcb.getFormNeeded() == 1 ){
 	            if (wcb.getW_empname() != null && wcb.getW_empname().trim().length() == 0 ){
 	                m.append(": Employer's name can not be empty ");
 	            }
