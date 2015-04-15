@@ -1015,12 +1015,25 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 <% } else {
 	if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){
 		String clinicaid_link = "";
-		clinicaid_link = "../billing/billingClinicAid.jsp?billing_action=invoice_reports";
+		clinicaid_link = "../billing/billingClinicAid.jsp?billing_action=invoice_reports&demographic_no="+demographic.getDemographicNo();
 		%>
 			<a href="<%=clinicaid_link %>" target="_blank">
 				<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/>
 			</a>
+			<br/>
+		<%		
+		// Old invoice list
+		if("ON".equals(prov)) {%>
+		<a href="javascript: function myFunction() {return false; }"
+			onClick="popupPage(500,600,'../billing/CA/ON/billinghistory.jsp?demographic_no=<%=demographic.getDemographicNo()%>&last_name=<%=URLEncoder.encode(demographic.getLastName())%>&first_name=<%=URLEncoder.encode(demographic.getFirstName())%>&orderby=appointment_date&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=10')">
+		<bean:message key="demographic.demographiceditdemographic.msgOldInvoiceList"/></a>
+		<%}else{%>
+				<a href="#"
+					onclick="popupPage(800,1000,'../billing/CA/BC/billStatus.jsp?lastName=<%=URLEncoder.encode(demographic.getLastName())%>&firstName=<%=URLEncoder.encode(demographic.getFirstName())%>&filterPatient=true&demographicNo=<%=demographic.getDemographicNo()%>');return false;">
+				<bean:message key="demographic.demographiceditdemographic.msgOldInvoiceList"/></a>
 		<%
+		}
+		
 		if("BC".equals(prov)){
 			//show eligibility check
 		%>
@@ -1037,7 +1050,7 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 				<a href="javascript: function myFunction() {return false; }"
 					onClick="popupPage(500,600,'../billing/CA/ON/billinghistory.jsp?demographic_no=<%=demographic.getDemographicNo()%>&last_name=<%=URLEncoder.encode(demographic.getLastName())%>&first_name=<%=URLEncoder.encode(demographic.getFirstName())%>&orderby=appointment_date&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=10')">
 				<bean:message key="demographic.demographiceditdemographic.msgBillHistory"/></a>
-<%}else{%>
+    <%}else{%>
 				<a href="#"
 					onclick="popupPage(800,1000,'../billing/CA/BC/billStatus.jsp?lastName=<%=URLEncoder.encode(demographic.getLastName())%>&firstName=<%=URLEncoder.encode(demographic.getFirstName())%>&filterPatient=true&demographicNo=<%=demographic.getDemographicNo()%>');return false;">
 				<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/></a>
@@ -1049,12 +1062,6 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
                                         <span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
                                         <span id="returnTeleplanMsg"></span>
 					</div>
-
-
-
-
-
-
 <%
 	}
 }

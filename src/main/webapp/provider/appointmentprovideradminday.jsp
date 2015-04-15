@@ -993,7 +993,6 @@ java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.stru
      OscarProperties oscarProps = OscarProperties.getInstance();
      String clinicaid_link = "";
      if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){
-    	 clinicaid_link = "../billing/billingClinicAid.jsp?billing_action=invoice_reports";
     	 //Force this link to go to BC billing report
     	 %>
     	 <a HREF="#" ONCLICK ="popupPage2('../billing/CA/BC/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;" TITLE='<bean:message key="global.genBillReport"/>' onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message key="global.billing"/></a>
