@@ -1742,7 +1742,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 
 			.<%=(view==0&&numAvailProvider!=1)?(name.length()>len?name.substring(0,len).toUpperCase():name.toUpperCase()):name.toUpperCase()%>
             </font></a><!--Inline display of reason -->
-        <% if(OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true")) { %>
+        <% if(OscarProperties.getInstance().getProperty("APPT_MULTILINE","false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE","true").equals("true")) { %>
 	      	<br/>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<%if((apptType != null && apptType.length()>0) && (reason != null && reason.length()>0) ) { %>
@@ -1754,8 +1754,8 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 		<%if((apptType == null || apptType.length()==0) && (reason != null && reason.length() > 0) ) { %>
 			<%=UtilMisc.htmlEscape(reason)%>
 		<% } %>
-
-		<%if(OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true")) { %>
+		
+		<%if(OscarProperties.getInstance().getProperty("APPT_THREE_LINE","true").equals("true")) { %>
 		<br/>
 		<% } %>
 	<% } %>
@@ -1844,7 +1844,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 	<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <% } %>
 
-<% if(len==lenLimitedL || view!=0 || numAvailProvider==1 || OscarProperties.getInstance().getProperty("APPT_ALWAYS_SHOW_LINKS", "false").equals("true") ) {%>
+<% if(len==lenLimitedL || view!=0 || numAvailProvider==1 || OscarProperties.getInstance().getProperty("APPT_ALWAYS_SHOW_LINKS","false").equals("true") ) {%>
 
 <security:oscarSec roleName="<%=roleName$%>" objectName="_eChart" rights="r">
 <oscar:oscarPropertiesCheck property="eform_in_appointment" value="yes">
@@ -1857,7 +1857,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 <% if(bShowEncounterLink && !isWeekView) { %>
 <% String  eURL = "../oscarEncounter/IncomingEncounter.do?providerNo="+curUser_no+"&appointmentNo="+appointment.get("appointment_no")+"&demographicNo="+demographic_no+"&curProviderNo="+curProvider_no[nProvider]+"&reason="+((reason == null || reason.equals("null"))?"":URLEncoder.encode(reason))+"&encType="+URLEncoder.encode("face to face encounter with client","UTF-8")+"&userName="+URLEncoder.encode( userfirstname+" "+userlastname)+"&curDate="+curYear+"-"+curMonth+"-"+curDay+"&appointmentDate="+year+"-"+month+"-"+day+"&startTime="+iS+":"+iSm+"&status="+status + "&apptProvider_no=" + curProvider_no[nProvider] + "&providerview=" + curProvider_no[nProvider];%>
 <a href=# class="encounterBtn" onClick="popupWithApptNo(710, 1024,'<%=eURL%>','encounter',<%=appointment.get("appointment_no")%>);return false;" title="<bean:message key="global.encounter"/>">
-            <%if(OscarProperties.getInstance().getProperty("APPT_THREE_LINE","false").equals("false")){  %>| <%} %>
+  <%if(OscarProperties.getInstance().getProperty("APPT_THREE_LINE","false").equals("false")){  %>| <%} %>
             <bean:message key="provider.appointmentProviderAdminDay.btnE"/></a>
 <% } %>
 
@@ -1985,8 +1985,15 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
       <a href=# onClick="popupWithApptNo(700,1027,'../oscarRx/choosePatient.do?providerNo=<%=curUser_no%>&demographicNo=<%=demographic_no%>','rx',<%=appointment.get("appointment_no")%>)" title="<bean:message key="global.prescriptions"/>">|<bean:message key="global.rx"/>
       </a>
 
-
+      <%if(OscarProperties.getInstance().isPropertyActive("SHOW_PATIENT_APPOINTMENT_PHN_CHART")){
+        //WLPatientWaitingListBeanHandler hd = new WLPatientWaitingListBeanHandler(demographic_no);
+        Demographic patient_demo=(demographicDao.getDemographic(String.valueOf(demographic_no)));%>
+        | <%=patient_demo.getHin()%> |
+        <%=patient_demo.getChartNo()%>
+      <%}%>
 <!-- doctor color -->
+
+
 <oscar:oscarPropertiesCheck property="ENABLE_APPT_DOC_COLOR" value="yes">
         <%
                 String providerColor = null;
@@ -2043,7 +2050,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
       </oscar:oscarPropertiesCheck>
 
       <% } %>
-      <% if(OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true")) { %>
+      <% if(OscarProperties.getInstance().getProperty("APPT_MULTILINE","false").equals("true")) { %>
 	      	<br/>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<%if((apptType != null && apptType.length()>0) && (reason != null && reason.length()>0) ) { %>
@@ -2058,7 +2065,7 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 	<% } %>
 <% } else {%>
 	<!-- no links -->
-	<% if(OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true")) { %>
+	<% if(OscarProperties.getInstance().getProperty("APPT_MULTILINE","false").equals("true")) { %>
 	<br/>&nbsp;
 	<% } %>
 
