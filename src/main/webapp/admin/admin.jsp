@@ -272,18 +272,24 @@ div.logoutBox {
 		<li><html:link page="/admin/securitysearchrecordshtm.jsp">
 			<bean:message key="admin.admin.btnSearchLogin" />
 		</html:link></li>
+
 		<security:oscarSec roleName="<%=roleName$%>"
 			objectName="_admin,_admin.userAdmin" rights="r" reverse="<%=false%>">
-			<li><a href="#"
-				onclick='popupPage(300,600,&quot;<html:rewrite page="/admin/providerAddRole.jsp"/>&quot;);return false;'>
-			<bean:message key="admin.admin.addRole"/></a></li>
+			<%if(!OscarProperties.getInstance().isPropertyActive("RESTRICT_ROLE_CHANGES")){%>
+				<li><a href="#"
+					onclick='popupPage(300,600,&quot;<html:rewrite page="/admin/providerAddRole.jsp"/>&quot;);return false;'>
+				<bean:message key="admin.admin.addRole"/></a></li>
+			<%} %>
 		</security:oscarSec>
+		
 		<li><a href="#"
 			onclick='popupPage(500,700,&quot;<html:rewrite page="/admin/providerRole.jsp"/>&quot;);return false;'>
 		<bean:message key="admin.admin.assignRole"/></a></li>
-		<li><a href="#"
-			onclick='popupPage(500,800,&quot;<html:rewrite page="/admin/providerPrivilege.jsp"/>&quot;);return false;'>
-		<bean:message key="admin.admin.assignRightsObject"/></a></li>
+		<%if(!OscarProperties.getInstance().isPropertyActive("RESTRICT_ROLE_CHANGES")){%>
+			<li><a href="#"
+				onclick='popupPage(500,800,&quot;<html:rewrite page="/admin/providerPrivilege.jsp"/>&quot;);return false;'>
+			<bean:message key="admin.admin.assignRightsObject"/></a></li>
+		<%} %>
 
 		<security:oscarSec roleName="<%=roleName$%>"
 			objectName="_admin,_admin.securityLogReport" rights="r">
