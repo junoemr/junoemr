@@ -168,26 +168,6 @@ if(action.equals("invoice_reports")){
 		}
 	}
 
-	//If there's no appointment provider, get the doctor assigned to the patient
-	if(provider_first_name.length() == 0){
-		provider_no = URLEncoder.encode(demo.getProviderNo(), "UTF-8");
-		provider_uli = billform.getPracNo(demo.getProviderNo());
-
-		ResultSet rslocal2 = apptMainBean.queryResults(demo.getProviderNo(), "search_provider_name");
-		while(rslocal2.next()){
-			provider_first_name = rslocal2.getString("first_name");
-			provider_last_name = rslocal2.getString("last_name");
-		}
-	}
-	
-	//If there's no doctor assigned to this patient
-	if(provider_first_name.length() == 0){
-		provider_no = user_no;
-		provider_first_name = user_first_name;
-		provider_last_name = user_last_name;
-		provider_uli = billform.getPracNo(provider_no);
-		
-	}
 	if(provider_uli == null){
 		provider_uli = "";
 	}
