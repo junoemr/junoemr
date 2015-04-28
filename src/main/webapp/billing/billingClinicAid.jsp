@@ -61,10 +61,20 @@ public String getNonce(String identifier, String first_name, String last_name)
 
 	// Create the URL
 	final String clinicaid_domain = oscarProps.getProperty("clinicaid_domain");
+	final String old_ssl_port = oscarProps.getProperty("clinicaid_old_ssl_port");
 	final String instance_name = oscarProps.getProperty("clinicaid_instance_name");
 	final String api_key = oscarProps.getProperty("clinicaid_api_key");
 	
-	String url_string = clinicaid_domain + "/auth/pushed_login/";
+	String url_string = clinicaid_domain;
+	if(old_ssl_port != null && !old_ssl_port.isEmpty())
+	{
+		url_string = url_string + ":" + old_ssl_port + "/auth/pushed_login/";
+	}
+	else
+	{
+		url_string = url_string + "/auth/pushed_login/";
+	}
+	
 	URL nonce_url;
 	try
 	{
