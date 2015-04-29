@@ -243,6 +243,6 @@ public class EctConsultationFormEmailAction extends Action {
 	
 	private void emailPdf(String pdfPath, String emailSubject, String toEmailAddress, String toName, String fromEmailAddress) throws EmailException{
 		logger.debug("Sending email to "+toEmailAddress + " from " + fromEmailAddress);
-		EmailUtils.sendEmailWithAttachment(toEmailAddress, toName, fromEmailAddress, null, emailSubject, null, null, pdfPath);
+		EmailUtils.sendEmailWithAttachment(toEmailAddress, toName, fromEmailAddress, null, emailSubject, null, pdfPath);
 	}
 }

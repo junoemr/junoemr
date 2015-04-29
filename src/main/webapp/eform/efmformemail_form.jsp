@@ -50,7 +50,12 @@ This Page creates the email form for eforms.
 			rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
 			rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(),"rdohip").trim();
 		}
-	  
+		
+	String default_subject = props.getProperty("eform_email_subject");
+	String default_text_patients = (props.getProperty("eform_email_text_patients")==null)?"":props.getProperty("eform_email_text_patients");
+	String default_text_providers = (props.getProperty("eform_email_text_providers")==null)?"":props.getProperty("eform_email_text_providers");
+	
+  
 %> 
 <div style="width: 100px; float: left;">
 	Providers:
@@ -80,5 +85,31 @@ This Page creates the email form for eforms.
 			}
 		} %>		                        
 		</select>
+		
 </div>
+<div id="emailFormBox" style="display: none">
+	<div id="additionalInfoForm">
+		<div>
+			<label>To:</label>
+			<span id="emailTo">
+		</div>
+		<div>
+			<label>Subject:</label>
+			<input type="text" name="subject" id="subject" value="<%=default_subject%>">
+		</div>
+		<div>
+			<label>Body text:</label>
+			<textarea id="bodytext"></textarea>
+		</div>
+		<div>
+			<input type="button" onClick="emailEForm()" value="Email eForm">
+		</div>
+	</div>
+	
+	<span class="progress"></span>
+	
+</div>
+<input type="hidden" id="default_text_patients" value="<%=default_text_patients%>"/>
+<input type="hidden" id="default_text_providers" value="<%=default_text_providers%>"/>
 <% } // end if (props.isEFormEmailEnabled()) { %>
+

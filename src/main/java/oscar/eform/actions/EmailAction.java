@@ -66,12 +66,12 @@ public final class EmailAction {
 	private boolean skipSave = false;
 	
 	private String fromEmailAddress = null;
-
+	
 	private static CaseManagementNoteLinkDAO cmDao = (CaseManagementNoteLinkDAO) SpringUtils.getBean("CaseManagementNoteLinkDAO");
 	private static ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
 	
 	private static HttpServletRequest servletRequest;
-
+	
 
 	public EmailAction(HttpServletRequest request) {
 		localUri = getEformRequestUrl(request);
@@ -120,7 +120,7 @@ public final class EmailAction {
 	 * @throws DocumentException 
 	 * @throws EmailException 
 	 */
-	public void sendEformToEmail( String toEmailAddress, String toName, String formId) throws DocumentException, EmailException {
+	public void sendEformToEmail( String toEmailAddress, String toName, String formId, String emailSubject, String emailBodyText) throws DocumentException, EmailException {
 		
 		File tempFile = null;
 
@@ -153,7 +153,7 @@ public final class EmailAction {
 			
 			EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
 			EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));
-
+			
 			if (skipSave) {
 	        	 eFormData.setCurrent(false);
 	        	 eFormDataDao.merge(eFormData);
@@ -161,17 +161,27 @@ public final class EmailAction {
 			
 			logger.debug("Emailing PDF from "+tempPdf);
 			logger.debug("skipsave: "+skipSave);
-			String emailSubject=OscarProperties.getInstance().getProperty("eform_email_subject");
+			
+			if(emailSubject == null){
+				emailSubject = OscarProperties.getInstance().getProperty("eform_email_subject");
+			}
+			
+			if(emailBodyText == null){
+				emailBodyText = "";
+			}
+			
 			fromEmailAddress = OscarProperties.getInstance().getProperty("eform_email_from_address");
 
-			emailPdf(tempPdf, emailSubject, toEmailAddress, toName);
-			tempFile.delete();			
+			emailPdf(tempPdf, emailSubject, toEmailAddress, toName, emailBodyText);
+			tempFile.delete();
 			
 			// write note to echart
 			saveEmailNoteOnEChart(formId,Integer.toString(eFormData.getDemographicId()), eFormData.getFormName(), toEmailAddress);
 						
 		} catch (IOException e) {
 			MiscUtils.getLogger().error("Error converting and sending eform. id="+formId, e);
+		}catch (EmailException e){
+			throw e;
 		} 
 	}
 	
@@ -230,12 +240,13 @@ public final class EmailAction {
 		cmDao.save(cmnl);
 	}
 	
-	private void emailPdf(String pdfPath, String emailSubject, String toEmailAddress, String toName) throws EmailException{
+	private void emailPdf(String pdfPath, String emailSubject, String toEmailAddress, String toName, String emailBodyText) throws EmailException{
 		try {
 			logger.debug("Sending email to "+toEmailAddress + " from " + fromEmailAddress);
-			EmailUtils.sendEmailWithAttachment(toEmailAddress, toName, fromEmailAddress, null, emailSubject, null, null, pdfPath);
+			EmailUtils.sendEmailWithAttachment(toEmailAddress, toName, fromEmailAddress, null, emailSubject, emailBodyText, pdfPath);
 		}catch (EmailException e){
 			logger.error("Error sending email to "+toEmailAddress + " from " + fromEmailAddress, e);
+			throw e;
 		}
 	}
 
