@@ -22,8 +22,14 @@ package oscar.eform.actions;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.mail.EmailException;
@@ -34,6 +40,18 @@ import org.oscarehr.util.EmailUtils;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
+import org.oscarehr.casemgmt.dao.CaseManagementNoteLinkDAO;
+import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
+import org.oscarehr.casemgmt.model.CaseManagementNote;
+import org.oscarehr.common.model.SecRole;
+import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.casemgmt.service.CaseManagementManager;
+import oscar.util.UtilDateUtilities;
+import oscar.oscarEncounter.data.EctProgram;
+
+import org.oscarehr.util.LoggedInInfo;
 
 import oscar.OscarProperties;
 
@@ -49,9 +67,17 @@ public final class EmailAction {
 	
 	private String fromEmailAddress = null;
 
+	private static CaseManagementNoteLinkDAO cmDao = (CaseManagementNoteLinkDAO) SpringUtils.getBean("CaseManagementNoteLinkDAO");
+	private static ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
+	
+	private static HttpServletRequest servletRequest;
+
+
 	public EmailAction(HttpServletRequest request) {
 		localUri = getEformRequestUrl(request);
 		skipSave = "true".equals(request.getParameter("skipSave"));
+		
+		servletRequest = request;
 		
 		//LoggedInInfo loggedInfo = LoggedInInfo.loggedInInfo.get();
 		//providerNo = loggedInfo.loggedInProvider.getProviderNo();
@@ -125,9 +151,10 @@ public final class EmailAction {
 				throw new DocumentException("Unable to create files for email of eform " + formId + ".");
 			}
 			
+			EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
+			EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));
+
 			if (skipSave) {
-	        	 EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
-	        	 EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));
 	        	 eFormData.setCurrent(false);
 	        	 eFormDataDao.merge(eFormData);
 			}
@@ -139,10 +166,68 @@ public final class EmailAction {
 
 			emailPdf(tempPdf, emailSubject, toEmailAddress, toName);
 			tempFile.delete();			
+			
+			// write note to echart
+			saveEmailNoteOnEChart(formId,Integer.toString(eFormData.getDemographicId()), eFormData.getFormName(), toEmailAddress);
 						
 		} catch (IOException e) {
 			MiscUtils.getLogger().error("Error converting and sending eform. id="+formId, e);
 		} 
+	}
+	
+	private void saveEmailNoteOnEChart(String formId, String demographicNo, String formName, String toEmailAddress){
+		
+		Date now = UtilDateUtilities.now();
+		CaseManagementNote cmn = new CaseManagementNote();
+		cmn.setUpdate_date(now);
+		cmn.setObservation_date(now);
+		cmn.setDemographic_no(demographicNo);
+		
+		LoggedInInfo loggedInfo = LoggedInInfo.loggedInInfo.get();
+		String providerNo = loggedInfo.loggedInProvider.getProviderNo();
+		
+		
+		HttpSession se = servletRequest.getSession();
+		String prog_no = new EctProgram(se).getProgram(providerNo);
+		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(se.getServletContext());
+		CaseManagementManager cmm = (CaseManagementManager) ctx.getBean("caseManagementManager");
+		
+		
+		cmn.setProviderNo("-1");// set the provider no to be -1 so the editor appears as 'System'.
+		Provider provider = providerDao.getProvider(providerNo);
+		String provFirstName = "";
+		String provLastName = "";
+		if(provider!=null) {
+			provFirstName=provider.getFirstName();
+			provLastName=provider.getLastName();
+		}
+		String strNote = "\"" + formName + "\" " + " emailed to " + 
+						toEmailAddress + " by " + provFirstName + " " + provLastName + ".";
+
+		// String strNote="Document"+" "+docDesc+" "+ "created at "+now+".";
+		cmn.setNote(strNote);
+		cmn.setSigned(true);
+		cmn.setSigning_provider_no("-1");
+		cmn.setProgram_no(prog_no);
+		
+		SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
+		SecRole doctorRole = secRoleDao.findByName("doctor");		
+		cmn.setReporter_caisi_role(doctorRole.getId().toString());
+		
+		cmn.setReporter_program_team("0");
+		cmn.setPassword("NULL");
+		cmn.setLocked(false);
+		cmn.setHistory(strNote);
+		cmn.setPosition(0);
+		
+		Long note_id = cmm.saveNoteSimpleReturnID(cmn);
+		
+		// Add a noteLink to casemgmt_note_link
+		CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
+		cmnl.setTableName(CaseManagementNoteLink.EFORMDATA);
+		cmnl.setTableId(Long.parseLong(formId));
+		cmnl.setNoteId(note_id);
+		cmDao.save(cmnl);
 	}
 	
 	private void emailPdf(String pdfPath, String emailSubject, String toEmailAddress, String toName) throws EmailException{
