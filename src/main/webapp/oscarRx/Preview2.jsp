@@ -457,10 +457,15 @@ if(prop!=null && prop.getValue().equalsIgnoreCase("yes")){
 																	imageUrl=request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_preview.name()+"&"+DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
 																	startimageUrl=request.getContextPath()+"/images/1x1.gif";		
 																	statusUrl = request.getContextPath()+"/PMmodule/ClientManager/check_signature_status.jsp?" + DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
+																	
+																	
+																	if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures")){
+																		startimageUrl = request.getContextPath()+"/eform/displayImage.do?imagefile=doctor_signature_"+user.getProviderNo()+".png";
+                                                                    }
 																	%>
 																	<input type="hidden" name="<%=DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY%>" value="<%=signatureRequestId%>" />	
 
-																	<img id="signature" style="width:200px; height:100px" src="<%=startimageUrl%>" alt="digital_signature" />
+																	<img id="signature" style="width:200px; height:100px" src="<%=startimageUrl%>" alt="digital_signature" onerror="this.style.display='none'"/>
 				 													<input type="hidden" name="imgFile" id="imgFile" value="" />
 																	<script type="text/javascript">
 																		var POLL_TIME=2500;
