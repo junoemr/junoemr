@@ -36,9 +36,19 @@
 <%
 String[] param = new String[2];
 String[] temp = request.getParameterValues("checkbox");
+
+
+String filterparams = "";
+filterparams += "?ticklerview=" + request.getParameter("ticklerview");
+filterparams += "&xml_vdate=" + request.getParameter("xml_vdate");
+filterparams += "&xml_appointment_date=" + request.getParameter("xml_appointment_date");
+filterparams += "&mrpview=" + request.getParameter("mrpview");
+filterparams += "&providerview=" + request.getParameter("providerview");
+filterparams += "&assignedTo=" + request.getParameter("assignedTo");
+
 if (temp == null){
 %>
-<% response.sendRedirect("ticklerMain.jsp"); %>
+<% response.sendRedirect("ticklerMain.jsp"+filterparams); %>
 <%}else{
 		//temp=e.nextElement().toString();
     for (int i=0; i<temp.length; i++){
@@ -61,6 +71,6 @@ if (temp == null){
 
 
     }
-    response.sendRedirect("ticklerMain.jsp");
+    response.sendRedirect("ticklerMain.jsp"+filterparams);
 }
 %>

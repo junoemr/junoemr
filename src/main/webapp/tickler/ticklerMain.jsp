@@ -695,6 +695,16 @@ function changeSite(sel) {
                                 
                                 String cellColour = rowColour + warnColour;
                                 %>
+                                
+                                <input type="hidden" name="ticklerview" value="<%=ticklerview%>" />
+                                <input type="hidden" name="xml_vdate" value="<%=dateBegin%>" />
+                                <input type="hidden" name="xml_appointment_date" value="<%=dateEnd%>" />
+                                
+                                <input type="hidden" name="mrpview" value="<%=mrpview%>" />
+                                
+                                <input type="hidden" name="providerview" value="<%=providerview%>" />
+                                
+                                <input type="hidden" name="assignedTo" value="<%=assignedTo%>" />
 
                                 <tr >
                                     <TD width="3%"  ROWSPAN="1" class="<%=cellColour%>"><input type="checkbox" name="checkbox" value="<%=t.getTickler_no()%>"></TD>
