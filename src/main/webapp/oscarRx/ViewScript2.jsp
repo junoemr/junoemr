@@ -616,7 +616,11 @@ function toggleView(form) {
 					<tr>                            
                             <td><span><input type=button value="Fax & Paste into EMR"
                                     class="ControlPushButton" id="faxButton" style="width: 150px"
-                                    onClick="printPaste2Parent(false);sendFax();" disabled/></span></td>
+                                    onClick="printPaste2Parent(false);sendFax();" 
+                                    <% if(!oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures")){%>
+                                    disabled
+                                    <%}%>/></span></td>
+                                    }
                     </tr>
                     <% } %>
 					<tr>
