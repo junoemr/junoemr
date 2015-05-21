@@ -73,7 +73,7 @@ if(last_appointment_date_string.equals("(none)")){
 // Demographic was updated today
 if( last_update_date != null &&
 	today_date != null &&
-    last_update_date.compareTo(today) == 0)
+  org.apache.commons.lang.time.DateUtils.isSameDay(last_update_date, today))
 {
 	result="success";
 	message = "Updated today";
