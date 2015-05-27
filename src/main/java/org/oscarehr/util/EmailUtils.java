@@ -280,7 +280,8 @@ public final class EmailUtils
 		if (textContents != null){
 			email.setMsg(textContents);
 		}else{
-			email.setMsg("");
+      // A blank string is not valid for some reason
+			//email.setMsg("");
 		}
 
 		
