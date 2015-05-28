@@ -162,7 +162,13 @@ function submitEmailButtonAjax(save, emailPatient) {
 				featherlight.open();
 			}
 		}else{
-			// This is the old school email script -- pops up a new window to inform you of the progress.		
+			// This is the old school email script -- pops up a new window to 
+			// inform you of the progress.		
+			 
+			// Load up the default values for the email body and subject.
+			jQuery('#emailSubject').val($('#subject').val());
+			jQuery('#emailBodyText').val(default_text);    
+
 			var closeWindowHTML = '<script type="text/javascript">'+
 								'function closeWindow(){'+
 								'    setTimeout("window.close()",5000);'+
