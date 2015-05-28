@@ -6,7 +6,11 @@ var emailControlEmailButton     = "<span>&nbsp;</span><input value='Email to Pro
 var emailControlEmailSaveButton = "<span>&nbsp;</span><input value='Submit & Email' name='EmailButton' id='emailSave_button' type='button' onclick='submitEmailButtonAjax(true, false)'>";
 var emailControlMemoryInput = "<input value='false' name='emailEForm' id='emailEForm' type='hidden' />";	
 var emailControlToEmail = "<input value='' name='toEmail' id='toEmail' type='hidden' />";	
-var emailControlToName = "<input value='' name='toName' id='toName' type='hidden' />";	
+var emailControlToName = "<input value='' name='toName' id='toName' type='hidden' />";
+var emailControlSubject = "<input value='' name='emailSubject' id='emailSubject' type='hidden' />";	
+var emailControlBodyText = "<input value='' name='emailBodyText' id='emailBodyText' type='hidden' />";	
+
+var featherlight = null;
 var emailControl = {
 	initialize: function () {
 		var placeholder = jQuery("#emailControl");
@@ -53,6 +57,8 @@ var emailControl = {
 						jQuery(emailControlMemoryInput).insertAfter(buttonLocation);
 						jQuery(emailControlToEmail).insertAfter(buttonLocation);
 						jQuery(emailControlToName).insertAfter(buttonLocation);
+						jQuery(emailControlSubject).insertAfter(buttonLocation);
+						jQuery(emailControlBodyText).insertAfter(buttonLocation);
 					}
 					else {
 						buttonLocation = jQuery(".DoNotPrint");
@@ -65,6 +71,8 @@ var emailControl = {
 							buttonLocation.append(jQuery(emailControlMemoryInput));
 							buttonLocation.append(jQuery(emailControlToEmail));
 							buttonLocation.append(jQuery(emailControlToName));
+							buttonLocation.append(jQuery(emailControlSubject));
+							buttonLocation.append(jQuery(emailControlBodyText));
 						}
 					}
 					if (buttonLocation == null) { alert("Unable to find form or save button please check this is a proper eform."); return; }
@@ -118,53 +126,79 @@ function submitEmailButtonAjax(save, emailPatient) {
 	saveHolder = jQuery("#saveHolder");
 	saveHolder.val(!save);
 	needToConfirm=false;
+	var default_text = "";
 	if (document.getElementById('Letter') == null) {
 		if(emailPatient){
 			toEmail = jQuery("#patient_email").val();
 			jQuery('#toEmail').val(toEmail);
-			jQuery('#toName').val('');
+			jQuery('#toName').val("");
+			default_text = $("#default_text_patients").val();
 		}else{
 			chooseEmail();
 			jQuery('#provider_email').val(jQuery('#toEmail').val());
+			default_text = $("#default_text_providers").val();
 		}
 
 		if(jQuery('#toEmail').val() == ""){
 			alert("No email address chosen");
 			return;
 		}
-		var form = $("form");
+		var form = $("form");		
 		
-		var closeWindowHTML = '<script type="text/javascript">'+
-							'function closeWindow(){'+
-							'    setTimeout("window.close()",5000);'+
-							'    console.log("test");'+
-							'}'+
-							'</script>';
-		resultWindow = window.open('', 'resultWindow', "location=1,status=1,scrollbars=1,resizable=no,width=300,height=100,menubar=no,toolbar=no");
-		resultWindow.document.write(closeWindowHTML);
-		resultWindow.document.write("Sending email to &lt;"+$('#toEmail').val()+"&gt; ");
-		document.getElementById('emailEForm').value=true;
-		$.ajax({
-			 type: "POST",  
-			 url: form.attr("action"),  
-			 data: form.serialize(),  
-			 success: function() {
-				 resultWindow.document.write("<div style=\"color:#458B00; font-weight: bold; padding-top: 10px;\">Email successfully sent</div>");
-				 resultWindow.document.write("<script type=\"text/javascript\">closeWindow();</script>");
-				 document.getElementById('emailEForm').value=false;
-				 clearEmailFields();
-			 },
-			 error: function(xhr, status, error) {
-				 resultWindow.document.write("<div>Something went wrong while trying to send the email. Please contact your administrator.</div>");
-				 var err = eval("(" + xhr.responseText + ")");
-				 resultWindow.document.write("<div>Error:"+err.Message+".</div>");
-				 resultWindow.document.write("<div>Error:"+error+".</div>");
-				 document.getElementById('emailEForm').value=false;
-				 clearEmailFields();
-			 } 
-		});
+		// Use the new email advanced features if featherlight exists
+		if($.isFunction($.featherlight)){
+			$("span.progress").hide();
+			$("#emailFormBox").show();
+			$("#additionalInfoForm").show();
+			
+			// Set body text & email address in the form
+			$("#emailTo").html( $("#toEmail").val() ); 
+			$("#bodytext").text(default_text);		
+		
+			if(featherlight == null){
+				$.isFunction("featherlight");
+				featherlight = $.featherlight('#emailFormBox',{closeOnClick:false, closeOnEsc:false});
+			}else{
+				featherlight.open();
+			}
+		}else{
+			// This is the old school email script -- pops up a new window to inform you of the progress.		
+			var closeWindowHTML = '<script type="text/javascript">'+
+								'function closeWindow(){'+
+								'    setTimeout("window.close()",5000);'+
+								'    console.log("test");'+
+								'}'+
+								'</script>';
+							
+			resultWindow = window.open('', 'resultWindow', "location=1,status=1,scrollbars=1,resizable=no,width=300,height=100,menubar=no,toolbar=no");
+			resultWindow.document.write(closeWindowHTML);
+			resultWindow.document.write("Sending email to &lt;"+$('#toEmail').val()+"&gt; ");
+			document.getElementById('emailEForm').value=true;
+			$.ajax({
+				 type: "POST",  
+				 url: form.attr("action"),  
+				 data: form.serialize(),  
+				 success: function() {
+					 resultWindow.document.write("<div style=\"color:#458B00; font-weight: bold; padding-top: 10px;\">Email successfully sent</div>");
+					 resultWindow.document.write("<script type=\"text/javascript\">closeWindow();</script>");
+					 document.getElementById('emailEForm').value=false;
+					 clearEmailFields();
+				 },
+				 error: function(xhr, status, error) {
+					 resultWindow.document.write("<div>Something went wrong while trying to send the email. Please contact your administrator.</div>");
+					 var err = eval("(" + xhr.responseText + ")");
+					 resultWindow.document.write("<div>Error:"+err.Message+".</div>");
+					 resultWindow.document.write("<div>Error:"+error+".</div>");
+					 document.getElementById('emailEForm').value=false;
+					 clearEmailFields();
+				 } 
+			});
+		
+		}
 	}
 	else {
+	
+		// TODO: Make this do the same functionality as above. I didn't do it for now because it will take time & it's only clubtinytots who wants this feature.
 		var form = $("form[name='RichTextLetter']");
 		if (!save) { form.attr("target", "_blank"); }
 		document.getElementById('Letter').value=editControlContents('edit');
@@ -185,4 +219,57 @@ function submitEmailButtonAjax(save, emailPatient) {
 		});
 	}
 	document.getElementById('emailEForm').value=false;
+}
+
+// This function is only used by the new email feature with featherlight
+function emailEForm(){
+	var form = $("form");
+
+	$("#emailBodyText").val($(".featherlight-content #emailFormBox #bodytext").val());
+	$("#emailSubject").val($(".featherlight-content #emailFormBox #subject").val());
+	$("#emailEForm").val("true");
+	
+
+	//Hide the form & show "sending" text
+	$(".featherlight-content #additionalInfoForm").hide();
+	$("span.progress").html("Sending email to "+$("#toEmail").val()+"...");
+	$("span.progress").show();
+	
+	$(".featherlight-close-icon").hide();
+	
+	$.ajax({
+		 type: "POST",  
+		 url: form.attr("action"),  
+		 data: form.serialize(),  
+		 success: function(data) {
+		 	 if(data.trim() == "success"){
+				 $("span.progress").html("<div style=\"color:#458B00; font-weight: bold;\">Email successfully sent</div>");
+				 $("#emailEForm").val("false");
+				 clearEmailFields();
+				 $(".featherlight-close-icon").show();			 
+				 $("#emailFormBox").hide();
+				 
+				 //Let the user close featherlight
+				 //featherlight.close();
+			 }else{
+			 
+				 $("span.progress").html("Something went wrong while trying to send the email. Please contact your administrator. Error: "+ data.trim());
+				 $("#emailEForm").val("false");			 
+				 clearEmailFields();
+				 $(".featherlight-close-icon").show();
+				 $("#emailFormBox").hide();
+			 }
+		 },
+		 error: function(xhr, status, error) {
+
+			 var err = eval("(" + xhr.responseText + ")");
+			 
+			 $("span.progress").html("Something went wrong while trying to send the email. Please contact your administrator. "+ xhr.responseText);
+			 $("#emailEForm").val("false");			 
+			 clearEmailFields();
+			 $(".featherlight-close-icon").show();
+			 $("#emailFormBox").hide();
+
+		 } 
+	});
 }

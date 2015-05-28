@@ -27,6 +27,8 @@
 <%@page import="java.io.PrintWriter"%>
 <%@page import="org.oscarehr.util.MiscUtils"%>
 <%@page import="oscar.eform.actions.EmailAction"%>
+<% String featherlight = (request.getParameter("featherlight") == null)?"false":request.getParameter("featherlight");%>
+<% if(!featherlight.equals("true")){%>
 <html>
 <head>
         <script type="text/javascript" language="JavaScript">
@@ -41,30 +43,41 @@
             }
         </script>
 </head>
-<body>
 <%
+}
 //fdid
 String eform_id=(String)request.getAttribute("fdid");
 
-//EfmEmailPdfAction bean=new EfmEmailPdfAction(request);
 EmailAction bean=new EmailAction(request);
 
 String clientId = request.getParameter("clientId");
 String toEmailAddress = request.getParameter("toEmail");
 String toName = request.getParameter("toName");
+String emailSubject = request.getParameter("emailSubject");
+String emailBodyText = request.getParameter("emailBodyText");
 try{
-    bean.sendEformToEmail(toEmailAddress, toName, eform_id);
-    %>
-    <div class="success">Email sent successfully</div>
-    <%
+    bean.sendEformToEmail(toEmailAddress, toName, eform_id, emailSubject, emailBodyText);
+    if(!featherlight.equals("true")){
+    	%>
+    	<div class="success">Email sent successfully</div>
+    	<%
+    }else{
+    	%>success<%
+    }
 }catch( Exception e ){
     MiscUtils.getLogger().error("Error", e);
-    %>
-	An error occurred sending the email, please contact an administrator.
-	<%
+    if(!featherlight.equals("true")){
+    	%>
+    	An error occurred sending the email, please contact an administrator.
+		<%
+    }else{
+    	%><%=e.getMessage()%><%
+    }
     
 }
 
 %>
+<% if(!featherlight.equals("true")){%>
 </body>
 </html>
+<%}%>
