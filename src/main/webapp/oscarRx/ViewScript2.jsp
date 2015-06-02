@@ -105,7 +105,6 @@ if(bMultisites) {
       provider = new oscar.oscarRx.data.RxProviderData().getProvider(signingProvider);
   }
   else {
-      bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
       provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
   }
     ProSignatureData sig = new ProSignatureData();
@@ -146,7 +145,6 @@ if(bMultisites) {
       provider = new oscar.oscarRx.data.RxProviderData().getProvider(signingProvider);
   }
   else {
-      bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
       provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
   }
   ProSignatureData sig = new ProSignatureData();
