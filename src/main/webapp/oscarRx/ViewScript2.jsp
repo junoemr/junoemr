@@ -106,6 +106,7 @@ if(bMultisites) {
 			provider = new oscar.oscarRx.data.RxProviderData().getProvider(signingProvider);
 		}
 		catch(NullPointerException e) {
+			bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
 			provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
 		}
 	}
@@ -150,6 +151,7 @@ if(bMultisites) {
 			provider = new oscar.oscarRx.data.RxProviderData().getProvider(signingProvider);
 		}
 		catch(NullPointerException e) {
+			bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
 			provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
 		}
 	}
