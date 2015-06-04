@@ -40,7 +40,6 @@
 <%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
 <%! boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable(); %>
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
-
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.oscarehr.common.model.Site"%>
@@ -52,14 +51,14 @@
 
 <html:base />
 <logic:notPresent name="RxSessionBean" scope="session">
-	<logic:redirect href="error.html" />
+  <logic:redirect href="error.html" />
 </logic:notPresent>
 <logic:present name="RxSessionBean" scope="session">
-	<bean:define id="bean" type="oscar.oscarRx.pageUtil.RxSessionBean"
-		name="RxSessionBean" scope="session" />
-	<logic:equal name="bean" property="valid" value="false">
-		<logic:redirect href="error.html" />
-	</logic:equal>
+  <bean:define id="bean" type="oscar.oscarRx.pageUtil.RxSessionBean"
+    name="RxSessionBean" scope="session" />
+  <logic:equal name="bean" property="valid" value="false">
+    <logic:redirect href="error.html" />
+  </logic:equal>
 </logic:present>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <%
@@ -97,47 +96,74 @@ if(bMultisites) {
 		List<Map<String,Object>> resultList = oscarSuperManager.find("appointmentDao", "search", new Object[] {appt_no});
 		if (resultList!=null) location = (String) resultList.get(0).get("location");
 	}
+	
+	oscar.oscarRx.data.RxProviderData.Provider provider;
+	String signingProvider;
 
-    oscar.oscarRx.data.RxProviderData.Provider provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
-    ProSignatureData sig = new ProSignatureData();
-    boolean hasSig = sig.hasSignature(bean.getProviderNo());
-    String doctorName = "";
-    if (hasSig){
-       doctorName = sig.getSignature(bean.getProviderNo());
-    }else{
-       doctorName = (provider.getFirstName() + ' ' + provider.getSurname());
-    }
-    doctorName = doctorName.replaceAll("\\d{6}","");
-    doctorName = doctorName.replaceAll("\\-","");
-
-    vecAddressName = new Vector();
-    vecAddress = new Vector();
-    vecAddressPhone = new Vector();
-    vecAddressFax = new Vector();
-
-    java.util.ResourceBundle rb = java.util.ResourceBundle.getBundle("oscarResources",request.getLocale());
-
-	SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
-	List<Site> sites = siteDao.getActiveSitesByProviderNo((String) session.getAttribute("user"));
-
-	for (int i=0;i<sites.size();i++) {
-		Site s = sites.get(i);
-        vecAddressName.add(s.getName());
-        vecAddress.add("<b>"+doctorName+"</b><br>"+s.getName()+"<br>"+s.getAddress() + "<br>" + s.getCity() + ", " + s.getProvince() + " " + s.getPostal() + "<br>"+rb.getString("RxPreview.msgTel")+": " + s.getPhone() + "<br>"+rb.getString("RxPreview.msgFax")+": " + s.getFax());
-        if (s.getName().equals(location))
-        	session.setAttribute("RX_ADDR",String.valueOf(i));
+	if( reprint != null && reprint.equalsIgnoreCase("true") ) {
+		try{
+			signingProvider = bean.getStashItem(bean.getStashSize()-1).getProviderNo();
+			provider = new oscar.oscarRx.data.RxProviderData().getProvider(signingProvider);
+		}
+		catch(NullPointerException e) {
+			provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
+		}
+	}
+	else {
+	    provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
 	}
 
-
+	ProSignatureData sig = new ProSignatureData();
+	boolean hasSig = sig.hasSignature(bean.getProviderNo());
+	String doctorName = "";
+	if (hasSig){
+		doctorName = sig.getSignature(bean.getProviderNo());
+	}else{
+		doctorName = (provider.getFirstName() + ' ' + provider.getSurname());
+	}
+	doctorName = doctorName.replaceAll("\\d{6}","");
+	doctorName = doctorName.replaceAll("\\-","");
+	
+	vecAddressName = new Vector();
+	vecAddress = new Vector();
+	vecAddressPhone = new Vector();
+	vecAddressFax = new Vector();
+	
+	java.util.ResourceBundle rb = java.util.ResourceBundle.getBundle("oscarResources",request.getLocale());
+	
+	SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
+	List<Site> sites = siteDao.getActiveSitesByProviderNo((String) session.getAttribute("user"));
+	
+	for (int i=0;i<sites.size();i++) {
+	  Site s = sites.get(i);
+	      vecAddressName.add(s.getName());
+	      vecAddress.add("<b>"+doctorName+"</b><br>"+s.getName()+"<br>"+s.getAddress() + "<br>" + s.getCity() + ", " + s.getProvince() + " " + s.getPostal() + "<br>"+rb.getString("RxPreview.msgTel")+": " + s.getPhone() + "<br>"+rb.getString("RxPreview.msgFax")+": " + s.getFax());
+	      if (s.getName().equals(location))
+	        session.setAttribute("RX_ADDR",String.valueOf(i));
+	}
 } else if(props.getProperty("clinicSatelliteName") != null) {
-    oscar.oscarRx.data.RxProviderData.Provider provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
-    ProSignatureData sig = new ProSignatureData();
+	oscar.oscarRx.data.RxProviderData.Provider provider;
+	String signingProvider;
+	if( reprint != null && reprint.equalsIgnoreCase("true") ) {
+		try{
+			signingProvider = bean.getStashItem(bean.getStashSize()-1).getProviderNo();
+			provider = new oscar.oscarRx.data.RxProviderData().getProvider(signingProvider);
+		}
+		catch(NullPointerException e) {
+			provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
+		}
+	}
+	else {
+	    provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
+	}
+
+  	ProSignatureData sig = new ProSignatureData();
     boolean hasSig = sig.hasSignature(bean.getProviderNo());
     String doctorName = "";
     if (hasSig){
-       doctorName = sig.getSignature(bean.getProviderNo());
+    	doctorName = sig.getSignature(bean.getProviderNo());
     }else{
-       doctorName = (provider.getFirstName() + ' ' + provider.getSurname());
+		doctorName = (provider.getFirstName() + ' ' + provider.getSurname());
     }
 
     ClinicData clinic = new ClinicData();
@@ -175,11 +201,11 @@ if (pharmacy != null) {
 String userAgent = request.getHeader("User-Agent");
 String browserType = "";
 if (userAgent != null) {
-	if (userAgent.toLowerCase().indexOf("ipad") > -1) {
-		browserType = "IPAD";
-	} else {
-		browserType = "ALL";
-	}
+  if (userAgent.toLowerCase().indexOf("ipad") > -1) {
+    browserType = "IPAD";
+  } else {
+    browserType = "ALL";
+  }
 }
 %>
 <link rel="stylesheet" type="text/css" href="styles.css" />
@@ -229,8 +255,8 @@ if (userAgent != null) {
     %>
         useSC=true;
    <%      for(int i=0; i<vecAddressName.size(); i++) {%>
-	    if(document.getElementById("addressSel").value=="<%=i%>") {
-    	       scAddress="<%=vecAddress.get(i)%>";
+      if(document.getElementById("addressSel").value=="<%=i%>") {
+             scAddress="<%=vecAddress.get(i)%>";
             }
 <%       }
       }%>
@@ -270,25 +296,25 @@ function addNotes(){
 
 
 function printIframe(){
-	var browserName=navigator.appName;
-	   if (browserName=="Microsoft Internet Explorer")
-			{
-	              try
-	            {
-	                iframe = document.getElementById('preview');
-	                iframe.contentWindow.document.execCommand('print', false, null);
-	            }
-	            catch(e)
-	            {
-	                window.print();
-	            }
-			}
-			else
-			{
-				preview.focus();
-				preview.print();
-			}
-	}
+  var browserName=navigator.appName;
+     if (browserName=="Microsoft Internet Explorer")
+      {
+                try
+              {
+                  iframe = document.getElementById('preview');
+                  iframe.contentWindow.document.execCommand('print', false, null);
+              }
+              catch(e)
+              {
+                  window.print();
+              }
+      }
+      else
+      {
+        preview.focus();
+        preview.print();
+      }
+  }
 
 
 function printPaste2Parent(print){
@@ -331,8 +357,8 @@ function addressSelect() {
     %>
         setDefaultAddr();
    <%      for(int i=0; i<vecAddressName.size(); i++) {%>
-	    if(document.getElementById("addressSel").value=="<%=i%>") {
-    	       frames['preview'].document.getElementById("clinicAddress").innerHTML="<%=vecAddress.get(i)%>";
+      if(document.getElementById("addressSel").value=="<%=i%>") {
+             frames['preview'].document.getElementById("clinicAddress").innerHTML="<%=vecAddress.get(i)%>";
             }
 <%       }
       }%>
@@ -347,19 +373,19 @@ function addressSelect() {
 
 
 function popupPrint(vheight,vwidth,varpage) { //open a new popup window
-	  var page = "" + varpage;
-	  windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=0,left=0";//360,680
-	  var popup=window.open(page, "groupno", windowprops);
-	  if (popup != null) {
-	    if (popup.opener == null) {
-	      popup.opener = self;
-	    }
-	    popup.focus();
-	}
+    var page = "" + varpage;
+    windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=0,left=0";//360,680
+    var popup=window.open(page, "groupno", windowprops);
+    if (popup != null) {
+      if (popup.opener == null) {
+        popup.opener = self;
+      }
+      popup.focus();
+  }
 }
 
 function resizeFrame(height) {
-	document.getElementById("preview").height = (parseInt(height) + 10) + "px";
+  document.getElementById("preview").height = (parseInt(height) + 10) + "px";
 }
 
 </script>
@@ -375,17 +401,17 @@ var counter=0;
 
 function refreshImage()
 {
-	counter=counter+1;
-	frames["preview"].document.getElementById("signature").src="<%=imageUrl%>&rand="+counter;
-	frames['preview'].document.getElementById('imgFile').value='<%=System.getProperty("java.io.tmpdir")%>/signature_<%=signatureRequestId%>.jpg';	
+  counter=counter+1;
+  frames["preview"].document.getElementById("signature").src="<%=imageUrl%>&rand="+counter;
+  frames['preview'].document.getElementById('imgFile').value='<%=System.getProperty("java.io.tmpdir")%>/signature_<%=signatureRequestId%>.jpg'; 
 }
 
 function sendFax()
 {
-	frames['preview'].document.getElementById('pdfId').value='<%=signatureRequestId%>';	
-	frames['preview'].onPrint2('oscarRxFax');
-	frames['preview'].document.FrmForm.submit();	
-	window.onbeforeunload = null;
+  frames['preview'].document.getElementById('pdfId').value='<%=signatureRequestId%>'; 
+  frames['preview'].onPrint2('oscarRxFax');
+  frames['preview'].document.FrmForm.submit();  
+  window.onbeforeunload = null;
 }
 
 function unloadMess(){
@@ -398,23 +424,23 @@ function unloadMess(){
 var isSignatureDirty = false;
 var isSignatureSaved = false;
 function signatureHandler(e) {
-	<% if (OscarProperties.getInstance().isRxFaxEnabled()) { %>
-	var hasFaxNumber = <%= pharmacy != null && pharmacy.fax.trim().length() > 0 ? "true" : "false" %>;
-	<% } %>
-	isSignatureDirty = e.isDirty;
-	isSignatureSaved = e.isSave;
-	e.target.onbeforeunload = null;
-	<% if (OscarProperties.getInstance().isRxFaxEnabled()) { //%>
-	e.target.document.getElementById("faxButton").disabled = !hasFaxNumber || !e.isSave;
-	<% } %>
-	if (e.isSave) {
-		<% if (OscarProperties.getInstance().isRxFaxEnabled()) { //%>
-		if (hasFaxNumber) {
-			e.target.onbeforeunload = unloadMess;
-		}
-		<% } %>
-		refreshImage();			
-	}
+  <% if (OscarProperties.getInstance().isRxFaxEnabled()) { %>
+  var hasFaxNumber = <%= pharmacy != null && pharmacy.fax.trim().length() > 0 ? "true" : "false" %>;
+  <% } %>
+  isSignatureDirty = e.isDirty;
+  isSignatureSaved = e.isSave;
+  e.target.onbeforeunload = null;
+  <% if (OscarProperties.getInstance().isRxFaxEnabled()) { //%>
+  e.target.document.getElementById("faxButton").disabled = !hasFaxNumber || !e.isSave;
+  <% } %>
+  if (e.isSave) {
+    <% if (OscarProperties.getInstance().isRxFaxEnabled()) { //%>
+    if (hasFaxNumber) {
+      e.target.onbeforeunload = unloadMess;
+    }
+    <% } %>
+    refreshImage();     
+  }
 }
 var requestIdKey = "<%=signatureRequestId %>";
 
@@ -422,16 +448,16 @@ var requestIdKey = "<%=signatureRequestId %>";
 </head>
 
 <body topmargin="0" leftmargin="0" vlink="#0000FF"
-	onload="addressSelect();">
+  onload="addressSelect();">
 
 <!-- added by vic, hsfo -->
 <%
-	int hsfo_patient_id = bean.getDemographicNo();
-	oscar.form.study.HSFO.HSFODAO hsfoDAO = new oscar.form.study.HSFO.HSFODAO();
-	int dx = hsfoDAO.retrievePatientDx(String.valueOf(hsfo_patient_id));
-	if (dx >=0 && dx < 7) {
-		// dx>=0 means patient is enrolled in HSFO program
-		// dx==7 means patient has all 3 symptoms, according to hsfo requirement, stop showing the popup
+  int hsfo_patient_id = bean.getDemographicNo();
+  oscar.form.study.HSFO.HSFODAO hsfoDAO = new oscar.form.study.HSFO.HSFODAO();
+  int dx = hsfoDAO.retrievePatientDx(String.valueOf(hsfo_patient_id));
+  if (dx >=0 && dx < 7) {
+    // dx>=0 means patient is enrolled in HSFO program
+    // dx==7 means patient has all 3 symptoms, according to hsfo requirement, stop showing the popup
 %>
 <script type="text/javascript" language="javascript">
 function toggleView(form) {
@@ -444,28 +470,28 @@ function toggleView(form) {
 
 </script>
 <div id="hsfoPop"
-	style="border: ridge; background-color: ivory; width: 550px; height: 150px; position: absolute; left: 100px; top: 100px;">
+  style="border: ridge; background-color: ivory; width: 550px; height: 150px; position: absolute; left: 100px; top: 100px;">
 <form name="hsfoForm">
 <center><BR>
 <table>
-	<tr>
-		<td colspan="3"><b>Please mark the corresponding symptom(s)
-		for the enrolled patient.</b></td>
-	</tr>
-	<tr>
-		<td><input type="checkbox" name="hsfo_Hypertension" value="1"
-			<%= (dx&1)==0?"":"checked" %>> Hypertension</td>
-		<td><input type="checkbox" name="hsfo_Diabetes" value="2"
-			<%= (dx&2)==0?"":"checked" %>> Diabetes</td>
-		<td><input type="checkbox" name="hsfo_Dyslipidemia" value="4"
-			<%= (dx&4)==0?"":"checked" %>> Dyslipidemia</td>
-	</tr>
-	<tr>
-		<td colspan="3" align="center">
-		<hr>
-		<input type="button" name="hsfo_submit" value="submit"
-			onclick="toggleView(this.form);"></td>
-	</tr>
+  <tr>
+    <td colspan="3"><b>Please mark the corresponding symptom(s)
+    for the enrolled patient.</b></td>
+  </tr>
+  <tr>
+    <td><input type="checkbox" name="hsfo_Hypertension" value="1"
+      <%= (dx&1)==0?"":"checked" %>> Hypertension</td>
+    <td><input type="checkbox" name="hsfo_Diabetes" value="2"
+      <%= (dx&2)==0?"":"checked" %>> Diabetes</td>
+    <td><input type="checkbox" name="hsfo_Dyslipidemia" value="4"
+      <%= (dx&4)==0?"":"checked" %>> Dyslipidemia</td>
+  </tr>
+  <tr>
+    <td colspan="3" align="center">
+    <hr>
+    <input type="button" name="hsfo_submit" value="submit"
+      onclick="toggleView(this.form);"></td>
+  </tr>
 </table>
 </center>
 </form>
@@ -477,32 +503,32 @@ function toggleView(form) {
 
 
 <table border="0" cellpadding="0" cellspacing="0"
-	style="border-collapse: collapse" bordercolor="#111111" width="100%"
-	id="AutoNumber1" height="100%">
-	<tr>
-		<td width="100%"
-			style="padding-left: 3; padding-right: 3; padding-top: 2; padding-bottom: 2"
-			height="0%" colspan="2">
+  style="border-collapse: collapse" bordercolor="#111111" width="100%"
+  id="AutoNumber1" height="100%">
+  <tr>
+    <td width="100%"
+      style="padding-left: 3; padding-right: 3; padding-top: 2; padding-bottom: 2"
+      height="0%" colspan="2">
 
-		</td>
-	</tr>
+    </td>
+  </tr>
 
-			<tr>
-		<td width="100%" class="leftGreyLine" height="100%" valign="top">
-		<table style="border-collapse: collapse" bordercolor="#111111"
-			width="100%" height="100%">
+      <tr>
+    <td width="100%" class="leftGreyLine" height="100%" valign="top">
+    <table style="border-collapse: collapse" bordercolor="#111111"
+      width="100%" height="100%">
 
-			<tr>
-				<td width=420px>
-				<div class="DivContentPadding"><!-- src modified by vic, hsfo -->
-				<iframe id='preview' name='preview' width=420px height=1000px
-					src="<%= dx<0?"Preview2.jsp?scriptId="+request.getParameter("scriptId")+"&rePrint="+reprint:dx==7?"HsfoPreview.jsp?dxCode=7":"about:blank" %>"
-					align=center border=0 frameborder=0></iframe></div>
-				</td>
+      <tr>
+        <td width=420px>
+        <div class="DivContentPadding"><!-- src modified by vic, hsfo -->
+        <iframe id='preview' name='preview' width=420px height=1000px
+          src="<%= dx<0?"Preview2.jsp?scriptId="+request.getParameter("scriptId")+"&rePrint="+reprint:dx==7?"HsfoPreview.jsp?dxCode=7":"about:blank" %>"
+          align=center border=0 frameborder=0></iframe></div>
+        </td>
 
-				<td valign=top><html:form action="/oscarRx/clearPending">
-					<html:hidden property="action" value="" />
-				</html:form>
+        <td valign=top><html:form action="/oscarRx/clearPending">
+          <html:hidden property="action" value="" />
+        </html:form>
                                     <script type="text/javascript">
                                 function clearPending(action){
                                     document.forms.RxClearPendingForm.action.value = action;
@@ -550,30 +576,30 @@ function toggleView(form) {
                                 }
                             </script>
 
-				<table cellpadding=10 cellspacingp=0>
-					<% //vecAddress=null;
+        <table cellpadding=10 cellspacingp=0>
+          <% //vecAddress=null;
                                         if(vecAddress != null) { %>
-					<tr>
-						<td align="left" colspan=2><bean:message key="ViewScript.msgAddress"/>
-                                                    <select	name="addressSel" id="addressSel" onChange="addressSelect()" style="width:200px;" >
-							<% String rxAddr = (String) session.getAttribute("RX_ADDR");
+          <tr>
+            <td align="left" colspan=2><bean:message key="ViewScript.msgAddress"/>
+                                                    <select name="addressSel" id="addressSel" onChange="addressSelect()" style="width:200px;" >
+              <% String rxAddr = (String) session.getAttribute("RX_ADDR");
                                                           for (int i =0; i < vecAddressName.size();i++){
-					                 String te = (String) vecAddressName.get(i);
+                           String te = (String) vecAddressName.get(i);
                                                          String tf = (String) vecAddress.get(i);%>
 
-							<option value="<%=i%>"
-								<% if ( rxAddr != null && rxAddr.equals(""+i)){ %>SELECTED<%}%>
+              <option value="<%=i%>"
+                <% if ( rxAddr != null && rxAddr.equals(""+i)){ %>SELECTED<%}%>
                                                                 ><%=te%></option>
-							<%  }%>
+              <%  }%>
 
                                                     </select>
                                                 </td>
-					</tr>
-					<% } %>
-					<tr>
-						<td colspan=2 style="font-weight: bold;"><span><bean:message key="ViewScript.msgActions"/></span>
-						</td>
-					</tr>
+          </tr>
+          <% } %>
+          <tr>
+            <td colspan=2 style="font-weight: bold;"><span><bean:message key="ViewScript.msgActions"/></span>
+            </td>
+          </tr>
 
                                         <tr>
                                             <!--td width=10px></td-->
@@ -591,29 +617,29 @@ function toggleView(form) {
                                                 </select>
                                             </td>
                                         </tr>
-					<tr>
-						<!--td width=10px></td-->
-						<td>
-						<span>
-							<input type=button value="Print PDF" class="ControlPushButton" style="width: 150px" onClick="<%=reprint.equalsIgnoreCase("true") ? "javascript:return onPrint2('rePrint', "+request.getParameter("scriptId")+");" : "javascript:return onPrint2('print', "+request.getParameter("scriptId")+");" %>" />
-						</span>
-						</td>
-					</tr>
+          <tr>
+            <!--td width=10px></td-->
+            <td>
+            <span>
+              <input type=button value="Print PDF" class="ControlPushButton" style="width: 150px" onClick="<%=reprint.equalsIgnoreCase("true") ? "javascript:return onPrint2('rePrint', "+request.getParameter("scriptId")+");" : "javascript:return onPrint2('print', "+request.getParameter("scriptId")+");" %>" />
+            </span>
+            </td>
+          </tr>
 
-					<tr>
-						<!--td width=10px></td-->
-						<td><span><input type=button value="<bean:message key="ViewScript.msgPrint"/>"
-							class="ControlPushButton" style="width: 150px"
-							onClick="javascript:printIframe();" /></span></td>
-					</tr>
-					<tr>
-						<td><span><input type=button
-							<%=reprint.equals("true")?"disabled='true'":""%> value="<bean:message key="ViewScript.msgPrintPasteEmr"/>"
-							class="ControlPushButton" style="width: 150px"
-							onClick="javascript:printPaste2Parent(true);" /></span></td>
-					</tr>
-					<% if (OscarProperties.getInstance().isRxFaxEnabled()) { %>
-					<tr>                            
+          <tr>
+            <!--td width=10px></td-->
+            <td><span><input type=button value="<bean:message key="ViewScript.msgPrint"/>"
+              class="ControlPushButton" style="width: 150px"
+              onClick="javascript:printIframe();" /></span></td>
+          </tr>
+          <tr>
+            <td><span><input type=button
+              <%=reprint.equals("true")?"disabled='true'":""%> value="<bean:message key="ViewScript.msgPrintPasteEmr"/>"
+              class="ControlPushButton" style="width: 150px"
+              onClick="javascript:printPaste2Parent(true);" /></span></td>
+          </tr>
+          <% if (OscarProperties.getInstance().isRxFaxEnabled()) { %>
+          <tr>                            
                             <td><span><input type=button value="Fax & Paste into EMR"
                                     class="ControlPushButton" id="faxButton" style="width: 150px"
                                     onClick="printPaste2Parent(false);sendFax();" 
@@ -623,19 +649,19 @@ function toggleView(form) {
                                     }
                     </tr>
                     <% } %>
-					<tr>
-						<!--td width=10px></td-->
-						<td><span><input type=button
-							value="<bean:message key="ViewScript.msgCreateNewRx"/>" class="ControlPushButton"
+          <tr>
+            <!--td width=10px></td-->
+            <td><span><input type=button
+              value="<bean:message key="ViewScript.msgCreateNewRx"/>" class="ControlPushButton"
                                                         style="width: 150px"  onClick="resetStash();resetReRxDrugList();javascript:parent.myLightWindow.deactivate();" /></span></td>
-					</tr>
-					<tr>
-						<!--td width=10px></td-->
-						<td><span><input type=button value="<bean:message key="ViewScript.msgBackToOscar"/>"
-							class="ControlPushButton" style="width: 150px"
+          </tr>
+          <tr>
+            <!--td width=10px></td-->
+            <td><span><input type=button value="<bean:message key="ViewScript.msgBackToOscar"/>"
+              class="ControlPushButton" style="width: 150px"
                                                         onClick="javascript:clearPending('close');parent.window.close();" /></span></td>
-							<!--onClick="javascript:clearPending('close');" /></span></td>-->
-					</tr>
+              <!--onClick="javascript:clearPending('close');" /></span></td>-->
+          </tr>
                                        <%if(prefPharmacy.length()>0 && prefPharmacyId.length()>0){   %>
                                            <tr><td><span><input id="selectPharmacyButton" type=button value="<bean:message key='oscarRx.printPharmacyInfo.addPharmacyButton'/>" class="ControlPushButton" style="width:150px;"
                                                              onclick="printPharmacy('<%=prefPharmacyId%>','<%=prefPharmacy%>');"/>
@@ -653,8 +679,8 @@ function toggleView(form) {
                         if (request.getSession().getAttribute("rePrint") == null ){%>
 
                                         <tr>
-						<td colspan=2 style="font-weight: bold"><span><bean:message key="ViewScript.msgAddNotesRx"/></span></td>
-					</tr>
+            <td colspan=2 style="font-weight: bold"><span><bean:message key="ViewScript.msgAddNotesRx"/></span></td>
+          </tr>
                                         <tr>
                                                 <!--td width=10px></td-->
                                                 <td>
@@ -664,54 +690,54 @@ function toggleView(form) {
                                         </tr>
 
                                         <%}%>
-					<% if (OscarProperties.getInstance().isRxSignatureEnabled() && !OscarProperties.getInstance().getBooleanProperty("signature_tablet", "yes")) { %>
+          <% if (OscarProperties.getInstance().isRxSignatureEnabled() && !OscarProperties.getInstance().getBooleanProperty("signature_tablet", "yes")) { %>
                                         
                     <tr>
-						<td colspan=2 style="font-weight: bold"><span>Signature</span></td>
-					</tr>               
-					<tr>
+            <td colspan=2 style="font-weight: bold"><span>Signature</span></td>
+          </tr>               
+          <tr>
                         <td>
                             <input type="hidden" name="<%=DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY%>" value="<%=signatureRequestId%>" />
                             <iframe style="width:500px; height:132px;"id="signatureFrame" src="<%= request.getContextPath() %>/signature_pad/tabletSignature.jsp?inWindow=true&<%=DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY%>=<%=signatureRequestId%>" ></iframe>
                         </td>
-					</tr>
-		            <%}%>
+          </tr>
+                <%}%>
                     <tr>
-						<td colspan=2 style="font-weight: bold"><span><bean:message key="ViewScript.msgDrugInfo"/></span></td>
-					</tr>
-					<%
+            <td colspan=2 style="font-weight: bold"><span><bean:message key="ViewScript.msgDrugInfo"/></span></td>
+          </tr>
+          <%
                         for(int i=0; i<bean.getStashSize(); i++){
                             oscar.oscarRx.data.RxPrescriptionData.Prescription rx
                                 = bean.getStashItem(i);
 
                             if (! rx.isCustom()){
                             %>
-					<tr>
-						<!--td width=10px></td-->
-						<td><span><a
-							href="javascript:ShowDrugInfo('<%= rx.getGenericName() %>');">
-						<%= rx.getGenericName() %> (<%= rx.getBrandName() %>) </a></span></td>
-					</tr>
-					<%
+          <tr>
+            <!--td width=10px></td-->
+            <td><span><a
+              href="javascript:ShowDrugInfo('<%= rx.getGenericName() %>');">
+            <%= rx.getGenericName() %> (<%= rx.getBrandName() %>) </a></span></td>
+          </tr>
+          <%
                             }
                         }
                         %>
-				</table>
-				</td>
-			</tr>
-			<tr height="100%">
-				<td></td>
-			</tr>
-		</table>
-		</td>
-	</tr>
-	<tr>
-		<td height="0%" class="leftBottomGreyLine"></td>
-		<td height="0%" class="leftBottomGreyLine"></td>
-	</tr>
-	<tr>
-		<td width="100%" height="0%" colspan="2">&nbsp;</td>
-	</tr>
+        </table>
+        </td>
+      </tr>
+      <tr height="100%">
+        <td></td>
+      </tr>
+    </table>
+    </td>
+  </tr>
+  <tr>
+    <td height="0%" class="leftBottomGreyLine"></td>
+    <td height="0%" class="leftBottomGreyLine"></td>
+  </tr>
+  <tr>
+    <td width="100%" height="0%" colspan="2">&nbsp;</td>
+  </tr>
 </table>
 
 </div>
