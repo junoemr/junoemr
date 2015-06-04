@@ -2004,6 +2004,10 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			}
 
 			String url = "/billing.do?billRegion=" + region + "&billForm=" + defaultView + "&hotclick=&appointment_no=" + appointmentNo + "&demographic_name=" + java.net.URLEncoder.encode(name, "utf-8") + "&amp;status=t&demographic_no=" + demoNo + "&providerview=" + providerview + "&user_no=" + providerNo + "&apptProvider_no=" + apptProvider + "&appointment_date=" + date + "&start_time=" + start_time + "&bNewForm=1" + dxCodes.toString();
+			if(OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc")
+				&& demographic.getFamilyDoctor() != null){
+				url += "&referral_no_1=" + getRefNo(demographic.getFamilyDoctor());
+			}
 			if(Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", ""))){
 				url = "/billing/billingClinicAid.jsp?demographic_no="+demoNo+
 								"&service_start_date="+date+

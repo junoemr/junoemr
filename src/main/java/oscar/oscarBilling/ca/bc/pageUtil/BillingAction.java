@@ -42,6 +42,7 @@ import org.apache.struts.action.ActionMessages;
 import org.oscarehr.decisionSupport.model.DSConsequence;
 import org.oscarehr.util.MiscUtils;
 
+import oscar.OscarProperties;
 import oscar.oscarBilling.ca.bc.MSP.ServiceCodeValidationLogic;
 import oscar.oscarBilling.ca.bc.decisionSupport.BillingGuidelines;
 import oscar.util.SqlUtils;
@@ -144,6 +145,11 @@ public final class BillingAction extends Action {
     bean.setApptDate(request.getParameter("appointment_date"));
     bean.setApptStart(request.getParameter("start_time"));
     bean.setApptStatus(request.getParameter("status"));
+    
+    if(OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc")){
+    	bean.setReferral1(request.getParameter("referral_no_1"));
+    }
+    
   }
 
   /**

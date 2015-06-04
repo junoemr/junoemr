@@ -767,6 +767,7 @@ if(wcbneeds != null){%>
     if (oscar.util.StringUtils.isNumeric(thisForm.getXml_provider())) {
       pref = dao.getUserBillingPreference((String) thisForm.getXml_provider());
     }
+    
     String userReferralPref = "";
     if (pref != null) {
       if (pref.getReferral() == 1) {
@@ -778,6 +779,8 @@ if(wcbneeds != null){%>
       thisForm.setRefertype1(userReferralPref);
       thisForm.setRefertype2(userReferralPref);
     }
+    
+    thisForm.setXml_refer1(bean.getReferral1());
   }
 %>
   <table width="100%" border="0" cellspacing="0" cellpadding="0">
