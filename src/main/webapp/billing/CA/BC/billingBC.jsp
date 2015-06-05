@@ -779,8 +779,9 @@ if(wcbneeds != null){%>
       thisForm.setRefertype1(userReferralPref);
       thisForm.setRefertype2(userReferralPref);
     }
-    
-    thisForm.setXml_refer1(bean.getReferral1());
+    if(OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc")){ 
+      thisForm.setXml_refer1(bean.getReferral1());
+    }
   }
 %>
   <table width="100%" border="0" cellspacing="0" cellpadding="0">
