@@ -62,8 +62,11 @@
 <%@page import="org.oscarehr.casemgmt.web.NoteDisplayNonNote"%>
 <%@page import="org.oscarehr.common.dao.EncounterTemplateDao"%>
 <%@page import="org.oscarehr.casemgmt.web.CheckBoxBean"%>
-
+<%@ page import="org.apache.log4j.Logger"%>
 <%
+Logger logger=Logger.getLogger("CaseManagementView.jsp");
+    		
+    		
 String ctx = request.getContextPath();
 
 Facility facility = org.oscarehr.util.LoggedInInfo.loggedInInfo.get().currentFacility;
@@ -166,7 +169,7 @@ int maxId = 0;
 
 		String noteStr;
 		int length;
-
+		boolean minimizeOldNotes = OscarProperties.getInstance().isPropertyActive("MINIMIZE_OLD_NOTES");
 		/*
 		 *  Cycle through notes starting from the most recent and marking them for full inclusion or one line display
 		 *  Need to do this now as we only count face to face encounters against limit of how many to fully display
@@ -177,39 +180,55 @@ int maxId = 0;
 		int pos;
 		idx = 0;
 
+		
 		for (pos = noteSize - 1; pos >= 0; --pos)
 		{
-			NoteDisplay cmNote = notesToDisplay.get(pos);
-
-			if (cmNote.isCpp())
-			{
-				fullTxtFormat.add(Boolean.FALSE);
-				continue;
-			}
-
-			if( cmNote.getObservationDate() == null ) {
-				fullTxtFormat.add(Boolean.FALSE);
-				continue;
-			}
-
-			if (noteSize > numToDisplay)
-			{
-				if (uProp == null)
+			
+			if(minimizeOldNotes) {
+				NoteDisplay cmNote = notesToDisplay.get(pos);
+	
+				if (cmNote.isCpp())
 				{
-					if (numDisplayed < numToDisplay && cmNote.getObservationDate().compareTo(dStaleDate) >= 0)
+					fullTxtFormat.add(Boolean.FALSE);
+					continue;
+				}
+	
+				if( cmNote.getObservationDate() == null ) {
+					fullTxtFormat.add(Boolean.FALSE);
+					continue;
+				}
+	
+				if (noteSize > numToDisplay)
+				{
+					if (uProp == null)
 					{
-						fullTxtFormat.add(Boolean.TRUE);
-
-						if (EncounterUtil.EncounterType.FACE_TO_FACE_WITH_CLIENT.getOldDbValue().equalsIgnoreCase(cmNote.getEncounterType()))
+						if (numDisplayed < numToDisplay && cmNote.getObservationDate().compareTo(dStaleDate) >= 0)
 						{
-							++numDisplayed;
+							fullTxtFormat.add(Boolean.TRUE);
+	
+							if (EncounterUtil.EncounterType.FACE_TO_FACE_WITH_CLIENT.getOldDbValue().equalsIgnoreCase(cmNote.getEncounterType()))
+							{
+								++numDisplayed;
+							}
+						}
+						else
+						{
+							fullTxtFormat.add(Boolean.FALSE);
 						}
 					}
 					else
 					{
-						fullTxtFormat.add(Boolean.FALSE);
+						if (cmNote.getObservationDate().compareTo(dStaleDate) >= 0)
+						{
+							fullTxtFormat.add(Boolean.TRUE);
+						}
+						else
+						{
+							fullTxtFormat.add(Boolean.FALSE);
+						}
 					}
 				}
+			
 				else
 				{
 					if (cmNote.getObservationDate().compareTo(dStaleDate) >= 0)
@@ -219,19 +238,12 @@ int maxId = 0;
 					else
 					{
 						fullTxtFormat.add(Boolean.FALSE);
+	
 					}
 				}
 			}
-			else
-			{
-				if (cmNote.getObservationDate().compareTo(dStaleDate) >= 0)
-				{
-					fullTxtFormat.add(Boolean.TRUE);
-				}
-				else
-				{
-					fullTxtFormat.add(Boolean.FALSE);
-				}
+			else{
+				fullTxtFormat.add(Boolean.TRUE);
 			}
 		} //end of for loop
 
