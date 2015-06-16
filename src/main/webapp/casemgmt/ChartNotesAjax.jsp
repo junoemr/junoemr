@@ -62,9 +62,7 @@
 <%@page import="org.oscarehr.casemgmt.web.NoteDisplayNonNote"%>
 <%@page import="org.oscarehr.common.dao.EncounterTemplateDao"%>
 <%@page import="org.oscarehr.casemgmt.web.CheckBoxBean"%>
-<%@ page import="org.apache.log4j.Logger"%>
 <%
-Logger logger=Logger.getLogger("CaseManagementView.jsp");
     		
     		
 String ctx = request.getContextPath();
