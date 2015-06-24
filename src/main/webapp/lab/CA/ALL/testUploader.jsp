@@ -121,6 +121,7 @@ if(outcome != null){
 					<option value="ALPHA">ALPHA</option>
 					<option value="CML">CML</option>
 					<option value="CDL">CDL</option>
+					<option value="CLS">CLS</option>
 					<option value="EPSILON">EPSILON/MHL</option>
 					<option value="PATHL7"
 					<oscar:oscarPropertiesCheck property="PATHNET_LABS" value="yes">Selected</oscar:oscarPropertiesCheck>>EXCELLERIS</option>

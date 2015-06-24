@@ -391,11 +391,17 @@ public class LabPDFCreator extends PdfPageEventHelper{
 							cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 							if(handler.getMsgType().equals("PATHL7")){
 								cell.setPhrase(new Phrase(handler.getOBXAbnormalFlag(j, k), lineFont));
-							}else{
-							cell.setPhrase(new Phrase(
+							} else if("CLS".equals(handler.getMsgType())) {
+								cell.setPhrase(new Phrase(
+									(handler.isOBXAbnormal(j, k) ? handler
+											.getOBXAbnormalFlag(j, k) : ""),
+									lineFont));
+							} else {
+								cell.setPhrase(new Phrase(
 									(handler.isOBXAbnormal(j, k) ? handler
 											.getOBXAbnormalFlag(j, k) : "N"),
-									lineFont));}
+									lineFont));
+							}
 							table.addCell(cell);
 							cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 							cell.setPhrase(new Phrase(handler
@@ -546,6 +552,8 @@ public class LabPDFCreator extends PdfPageEventHelper{
     private Color getTextColor(String abn){
         Color ret = Color.BLACK;
         if ( abn != null && ( abn.equals("A") || abn.startsWith("H")) ){
+            ret = Color.RED;
+        } else if("CLS".equals(handler.getMsgType()) && abn.equals("C")) {
             ret = Color.RED;
         }else if ( abn != null && abn.startsWith("L")){
             ret = Color.BLUE;

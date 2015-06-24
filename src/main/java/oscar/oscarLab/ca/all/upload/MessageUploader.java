@@ -217,6 +217,9 @@ public final class MessageUploader {
 				hl7TextInfo.setDiscipline(discipline);
 				hl7TextInfo.setReportStatus(reportStatus);
 				hl7TextInfo.setAccessionNumber(accessionNum);
+				if("CLS".equals(type)) {
+					hl7TextInfo.setFillerOrderNum(fillerOrderNum);
+				}
 				hl7TextInfoDao.persist(hl7TextInfo);
 			}
 
@@ -238,6 +241,8 @@ public final class MessageUploader {
 					limit = new Integer(1);
 					orderByLength = true;
 					search = "provider_no";
+				} else  if (type.equals("CLS")) {
+					search = "hso_no";
 				}
 				
 				String route_labs_to_provider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");

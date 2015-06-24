@@ -2,6 +2,7 @@
 
 <message-configuration id="HL7_upload" version="1.0">
 	<handler name="CDL" className="CDLHandler" />
+	<handler name="CLS" className="CLSHandler" />
 	<handler name="CML" className="CMLHandler" />
 	<handler name="GDML" className="GDMLHandler" />
 	<handler name="ICL" className="ICLHandler" />
