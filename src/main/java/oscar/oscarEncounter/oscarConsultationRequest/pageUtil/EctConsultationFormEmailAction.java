@@ -195,22 +195,27 @@ public class EctConsultationFormEmailAction extends Action {
     			String recipient = (String) request.getAttribute("recipient");
 				String toEmailAddress = null;
 				String toName = null;
+				String emailBody = null;
 				if(recipient.equals("provider")){
 					toEmailAddress = request.getParameter("toProviderEmail");
 					toName = request.getParameter("toProviderName");
+					emailBody = request.getParameter("providerEmailBody");
 				}else if(recipient.equals("patient")){
 					toEmailAddress = request.getParameter("toPatientEmail");
 					toName = request.getParameter("toPatientName");
+					emailBody = request.getParameter("patientEmailBody");
 				}
-				String emailSubject=OscarProperties.getInstance().getProperty("eform_email_subject");
+				//String emailSubject=OscarProperties.getInstance().getProperty("eform_email_subject");
+				String emailSubject = request.getParameter("emailSubject");
 				String fromEmailAddress = OscarProperties.getInstance().getProperty("eform_email_from_address");
 				
 				MiscUtils.getLogger().debug("8:"+toEmailAddress);
 				MiscUtils.getLogger().debug("9:"+toName);
 				MiscUtils.getLogger().debug("10:"+fromEmailAddress);
 				MiscUtils.getLogger().debug("11:"+emailSubject);
+				MiscUtils.getLogger().debug("12:"+emailBody);
 
-				emailPdf(emailPdf, emailSubject, toEmailAddress, toName, fromEmailAddress);
+				emailPdf(emailPdf, emailSubject, toEmailAddress, toName, fromEmailAddress, emailBody);
 				request.setAttribute("emailSuccessful", true);
 				return mapping.findForward("success");
 			}
@@ -241,8 +246,8 @@ public class EctConsultationFormEmailAction extends Action {
     	return null;
     }  
 	
-	private void emailPdf(String pdfPath, String emailSubject, String toEmailAddress, String toName, String fromEmailAddress) throws EmailException{
+	private void emailPdf(String pdfPath, String emailSubject, String toEmailAddress, String toName, String fromEmailAddress, String emailBody) throws EmailException{
 		logger.debug("Sending email to "+toEmailAddress + " from " + fromEmailAddress);
-		EmailUtils.sendEmailWithAttachment(toEmailAddress, toName, fromEmailAddress, null, emailSubject, null, pdfPath);
+		EmailUtils.sendEmailWithAttachment(toEmailAddress, toName, fromEmailAddress, null, emailSubject, emailBody, pdfPath);
 	}
 }

@@ -767,6 +767,7 @@ if(wcbneeds != null){%>
     if (oscar.util.StringUtils.isNumeric(thisForm.getXml_provider())) {
       pref = dao.getUserBillingPreference((String) thisForm.getXml_provider());
     }
+    
     String userReferralPref = "";
     if (pref != null) {
       if (pref.getReferral() == 1) {
@@ -777,6 +778,9 @@ if(wcbneeds != null){%>
       }
       thisForm.setRefertype1(userReferralPref);
       thisForm.setRefertype2(userReferralPref);
+    }
+    if(OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc")){ 
+      thisForm.setXml_refer1(bean.getReferral1());
     }
   }
 %>

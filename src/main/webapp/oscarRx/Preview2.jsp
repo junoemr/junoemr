@@ -452,16 +452,23 @@ if(prop!=null && prop.getValue().equalsIgnoreCase("yes")){
 																	String imageUrl=null;
 																	String startimageUrl=null;
 																	String statusUrl=null;
+																	String imgFile="";
 
 																	signatureRequestId=LoggedInInfo.loggedInInfo.get().loggedInProvider.getProviderNo();
 																	imageUrl=request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_preview.name()+"&"+DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
 																	startimageUrl=request.getContextPath()+"/images/1x1.gif";		
 																	statusUrl = request.getContextPath()+"/PMmodule/ClientManager/check_signature_status.jsp?" + DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
+																	
+																	
+																	if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures")){
+																		startimageUrl = request.getContextPath()+"/eform/displayImage.do?imagefile=doctor_signature_"+user.getProviderNo()+".png";
+																		imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image","")+"doctor_signature_"+user.getProviderNo()+".png";
+                                                                    }
 																	%>
 																	<input type="hidden" name="<%=DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY%>" value="<%=signatureRequestId%>" />	
 
-																	<img id="signature" style="width:200px; height:100px" src="<%=startimageUrl%>" alt="digital_signature" />
-				 													<input type="hidden" name="imgFile" id="imgFile" value="" />
+																	<img id="signature" style="width:200px; height:100px" src="<%=startimageUrl%>" alt="digital_signature" onerror="this.src='<%=request.getContextPath()%>/share/lightwindow/images/blank.gif'"/>
+				 													<input type="hidden" name="imgFile" id="imgFile" value="<%=imgFile%>" />
 																	<script type="text/javascript">
 																		var POLL_TIME=2500;
 																		var counter=0;
