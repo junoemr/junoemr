@@ -176,8 +176,13 @@ displayServiceUtil.estSpecialist();
 	var demoNo = '<%=demo%>';
 	var appointmentNo = '<%=appNo%>';
 </script>
+
+<link href="//cdn.rawgit.com/noelboss/featherlight/1.2.3/release/featherlight.min.css" type="text/css" rel="stylesheet" title="Featherlight Styles" />
+<script src="//code.jquery.com/jquery-latest.js"></script>
+<script src="//cdn.rawgit.com/noelboss/featherlight/1.2.3/release/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
+<!--<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>-->
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery_oscar_defaults.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/prototype.js"></script>
 <link rel="stylesheet" type="text/css" media="all"
@@ -192,7 +197,7 @@ displayServiceUtil.estSpecialist();
 <script type="text/javascript"
 	src="<%=request.getContextPath()%>/share/calendar/calendar-setup.js"></script>
 
-   <script src="<c:out value="${ctx}/js/jquery.js"/>"></script>
+   <!--<script src="<c:out value="${ctx}/js/jquery.js"/>"></script>-->
    <script>
      jQuery.noConflict();
    </script>
@@ -275,14 +280,13 @@ input.righty{
 text-align: right;
 }
 </style>
-</head>
-
 
 
 <link type="text/javascript" src="../consult.js" />
 
 <script language="JavaScript" type="text/javascript">
 
+var featherlight = null;
 var servicesName = new Object();   		// used as a cross reference table for name and number
 var services = new Array();				// the following are used as a 2D table for makes and models
 var specialists = new Array();
@@ -680,8 +684,41 @@ function popupOscarCal(vheight,vwidth,varpage) { //open a new popup window
     }
   }
 }
+function sendEmail(type)
+{
+	var box_id = null
+		if(type == 'patient')
+		{
+			box_id = "#emailFormBoxPatient";
+		}
+		else if(type == 'provider')
+		{
+			box_id = "#emailFormBoxProvider";
+
+			chooseEmail();
+			jQuery("#providerEmailTo").text(jQuery("#emailSelect").find(":selected").text());
+		}
+
+	jQuery(box_id).show();
+
+	if(featherlight == null)
+	{
+		jQuery.isFunction("featherlight");
+		featherlight = jQuery.featherlight(box_id,{closeOnClick:false, closeOnEsc:false});
+	}
+	else
+	{
+		featherlight.open();
+	}
+}
+
 
 function checkForm(submissionVal,formName){
+
+    jQuery("#emailSubject").val(jQuery(".featherlight-content #emailSubjectForm").val());
+    jQuery("#patientEmailBody").val(jQuery(".featherlight-content #patientEmailBodyForm").val());
+    jQuery("#providerEmailBody").val(jQuery(".featherlight-content #providerEmailBodyForm").val());
+
     //if document attach to consultation is still active user needs to close before submitting
     if( DocPopup != null && !DocPopup.closed ) {
         alert("Please close Consultation Documents window before proceeding");
@@ -1099,7 +1136,8 @@ function chooseEmail(){
 </script>
 
 <%=WebUtils.popErrorMessagesAsAlert(session)%>
-<link rel="stylesheet" type="text/css" href="../encounterStyles.css">
+<link rel="stylesheet" type="text/css" href="../encounterStyles.css" />
+</head>
 <body topmargin="0" leftmargin="0" vlink="#0000FF"
 	onload="window.focus();disableDateFields();fetchAttached();disableEditing();showSignatureImage();">
 <html:errors />
@@ -1346,13 +1384,13 @@ function chooseEmail(){
 								<%
 								if(request.getAttribute("id")!=null){
 								%>
-								<input id="updateAndEmailPatient" name="updateAndEmailPatient" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailPatient"/>" onclick="return checkForm('Update And Email Patient','EctConsultationFormRequestForm');" />
-								<input id="updateAndEmailProvider" name="updateAndEmailProvider" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailProvider"/>" onclick="return checkForm('Update And Email Provider','EctConsultationFormRequestForm');" />
+								<input id="updateAndEmailPatient" name="updateAndEmailPatient" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailPatient"/>" onclick="return sendEmail('patient');" />
+								<input id="updateAndEmailProvider" name="updateAndEmailProvider" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailProvider"/>" onclick="return sendEmail('provider');" />
 								<%
 								}else{
 								%>
-								<input id="submitAndEmailPatient" name="submitAndEmailPatient" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailPatient"/>" onclick="return checkForm('Submit And Email Patient','EctConsultationFormRequestForm');" />
-								<input id="submitAndEmailProvider" name="submitAndEmailProvider" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailProvider"/>" onclick="return checkForm('Submit And Email Provider','EctConsultationFormRequestForm');" />
+								<input id="submitAndEmailPatient" name="submitAndEmailPatient" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailPatient"/>" onclick="return sendEmail('patient');" />
+								<input id="submitAndEmailProvider" name="submitAndEmailProvider" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailProvider"/>" onclick="return sendEmail('provider');" />
 							    <%}
 
 								// Get email addresses
@@ -1391,10 +1429,18 @@ function chooseEmail(){
 										}
 									} %>
 									</select>
-									<input value="" name="toProviderName" id="toProviderName" type="hidden" />
-									<input value="" name="toProviderEmail" id="toProviderEmail" type="hidden" />
+
+									<input value="" name="toProviderName" id="toProviderName" type="hidden" />                             
+									<input value="" name="toProviderEmail" id="toProviderEmail" type="hidden" />                           
+									<input name="providerEmailBody" id="providerEmailBody" type="hidden" value="<%= props.getProperty("eform_email_text_providers") %>" />
+
 									<input value="<%=demographic.getDisplayName()%>" name="toPatientName" id="toPatientName" type="hidden" />
-									<input value="<%=demographic.getEmail()%>" name="toPatientEmail" id="toPatientEmail" type="hidden" />
+									<input value="<%=demographic.getEmail()%>" name="toPatientEmail" id="toPatientEmail" type="hidden" />  
+									<input name="patientEmailBody" id="patientEmailBody" type="hidden" value="<%= props.getProperty("eform_email_text_patients") %>" />
+
+									<input name="emailSubject" id="emailSubject" type="hidden" value="<%= props.getProperty("eform_email_subject") %>" /> 
+
+
 								</div>
 							</div>
 							<%
@@ -2190,7 +2236,78 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 			<td class="MainTableBottomRowRightColumn"></td>
 		</tr>
 	</table>
+
+    <div id="emailFormBoxPatient" style="display: none">                        
+        <div id="additionalInfoForm">                                           
+            <div>                                                               
+                <label>To:</label>                                              
+                <span id="emailTo"><%=demographic.getDisplayName()%></span>     
+            </div>                                                              
+            <div>                                                               
+                <label>Subject:</label>                                         
+                <input type="text" name="emailSubjectForm" id="emailSubjectForm" value="<%= props.getProperty("eform_email_subject") %>">
+            </div>                                                              
+            <div>                                                               
+                <label>Body text:</label>                                       
+                <textarea name="patientEmailBodyForm" id="patientEmailBodyForm"><%= props.getProperty("eform_email_text_patients") %></textarea>
+            </div>                                                              
+            <div>                                                               
+				<%
+				if(request.getAttribute("id")!=null){
+				%>
+                <input type="button" onClick="checkForm('Update And Email Patient','EctConsultationFormRequestForm')" value="Email eForm">
+				<% } else { %>
+                <input type="button" onClick="checkForm('Submit And Email Patient','EctConsultationFormRequestForm')" value="Email eForm">
+				<% } %>
+            </div>                                                              
+        </div>                                                                  
+                                                                                
+        <span class="progress"></span>                                          
+                                                                                
+    </div>
+
+    <input value="" name="toProviderName" id="toProviderName" type="hidden" />  
+    <input value="" name="toProviderEmail" id="toProviderEmail" type="hidden" />
+                                                                                
+    <input value="<%=demographic.getDisplayName()%>" name="toPatientName" id="toPatientName" type="hidden" />
+    <input value="<%=demographic.getEmail()%>" name="toPatientEmail" id="toPatientEmail" type="hidden" />
+    <input name="providerEmailBody" id="providerEmailBody" type="hidden" value="" />
+                                                                                
+    <input name="patientEmailBody" id="patientEmailBody" type="hidden" value="" />
+                                                                                
+    <input name="emailSubject" id="emailSubject" type="hidden" value="" />      
+                                                                                
+    <div id="emailFormBoxProvider" style="display: none">                       
+        <div id="additionalInfoForm">                                           
+            <div>                                                               
+                <label>To:</label>                                              
+                <span id="providerEmailTo" />                                   
+            </div>                                                              
+            <div>                                                               
+                <label>Subject:</label>                                         
+                <input type="text" name="emailSubjectForm" id="emailSubjectForm" value="<%= props.getProperty("eform_email_subject") %>">
+            </div>                                                              
+            <div>                                                               
+                <label>Body text:</label>                                       
+                <textarea name="providerEmailBodyForm" id="providerEmailBodyForm"><%= props.getProperty("eform_email_text_providers") %></textarea>
+            </div>                                                              
+            <div>                                                               
+				<%
+				if(request.getAttribute("id")!=null){
+				%>
+                <input type="button" onClick="checkForm('Update And Email Provider','EctConsultationFormRequestForm')" value="Email eForm">
+				<% } else { %>
+                <input type="button" onClick="checkForm('Submit And Email Provider','EctConsultationFormRequestForm')" value="Email eForm">
+				<% } %>
+            </div>                                                              
+        </div>                                                                  
+                                                                                
+        <span class="progress"></span>                                          
+                                                                                
+    </div>  
+
 </html:form>
+
 </body>
 
 <script type="text/javascript" language="javascript">

@@ -94,12 +94,12 @@ This Page creates the email form for eforms.
 			<span id="emailTo">
 		</div>
 		<div>
-			<label>Subject:</label>
-			<input type="text" name="subject" id="subject" value="<%=default_subject%>">
-		</div>
-		<div>
-			<label>Body text:</label>
-			<textarea id="bodytext"></textarea>
+			<label>Subject:</label>                                             
+			<input type="text" name="subject" id="subject" style="width: 500px;" value="<%=default_subject%>">
+		</div>                                                                  
+		<div>                                                                   
+			<label>Body text:</label>                                           
+			<textarea id="bodytext" style="width: 475px; height: 200px;"></textarea>
 		</div>
 		<div>
 			<input type="button" onClick="emailEForm()" value="Email eForm">

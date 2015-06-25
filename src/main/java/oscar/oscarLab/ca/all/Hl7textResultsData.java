@@ -289,7 +289,9 @@ public class Hl7textResultsData {
 	}
 
 	public static String getMatchingLabs(String lab_no){
-		String sql = "SELECT a.lab_no, a.obr_date, b.obr_date as labDate FROM hl7TextInfo a, hl7TextInfo b WHERE a.accessionNum !='' AND a.accessionNum=b.accessionNum AND b.lab_no='"+lab_no+"' ORDER BY a.obr_date, a.final_result_count, a.lab_no";
+		String sql = "SELECT a.lab_no, a.obr_date, b.obr_date as labDate FROM hl7TextInfo a, hl7TextInfo b " +
+				"WHERE a.accessionNum !='' AND a.accessionNum=b.accessionNum AND b.lab_no='"+lab_no+"' " + 
+				"ORDER BY a.obr_date, a.lab_no";
 		String ret = "";
 		int monthsBetween = 0;
 
@@ -743,8 +745,8 @@ public class Hl7textResultsData {
 				qp_demographic_no = true;
 			}
 			
-			sql = sql + " ORDER BY hl7.obr_date desc) ordered_labs ";
-			sql = sql + " GROUP BY COALESCE( accessionNum, lab_no ) ";
+			sql = sql + " GROUP BY COALESCE( hl7.accessionNum, hl7.lab_no ) ";
+			sql = sql + " ORDER BY hl7.obr_date desc, hl7.lab_no desc) ordered_labs ";
 			
 			// Some labs sometimes become normal or abnormal. Let's just use the last
 			// lab result in checking if it's normal or abnormal
