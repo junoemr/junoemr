@@ -745,8 +745,8 @@ public class Hl7textResultsData {
 				qp_demographic_no = true;
 			}
 			
+			sql = sql + " GROUP BY COALESCE( hl7.accessionNum, hl7.lab_no ) ";
 			sql = sql + " ORDER BY hl7.obr_date desc, hl7.lab_no desc) ordered_labs ";
-			sql = sql + " GROUP BY COALESCE( accessionNum, lab_no ) ";
 			
 			// Some labs sometimes become normal or abnormal. Let's just use the last
 			// lab result in checking if it's normal or abnormal
