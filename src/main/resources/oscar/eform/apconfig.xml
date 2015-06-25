@@ -210,6 +210,20 @@
         <ap-output>${ageComplex}</ap-output>
     </databaseap>
     <databaseap>
+        <ap-name>ageComplex2</ap-name>
+        <ap-sql>SELECT (IF ( (YEAR(CURRENT_DATE) - YEAR(@bdate))&lt; 1,<!--IF  Less than one year Old -->
+                          (IF ((TO_DAYS(CURRENT_DATE)-TO_DAYS(@bdate))&lt; 31,<!-- {IF less than 31 days old -->
+                            CONCAT((TO_DAYS(CURRENT_DATE)-TO_DAYS(@bdate)), ' days old'),<!-- {Print Age in Days} -->
+                            (IF ((DAY(CURRENT_DATE)-DAY(@bdate))&lt;0,<!-- ELSE { print in  months and week}} -->
+                               CONCAT((((YEAR(CURRENT_DATE) - 1) * 12 + MONTH(CURRENT_DATE)-1) - ((YEAR(@bdate) - 1) * 12 + MONTH(@bdate))) - (MID(@bdate, 9, 2) &lt;  MID(@bdate, 9, 2)),' months ',FLOOR((DAY(CURRENT_DATE)/7)),' weeks old'),
+                                CONCAT((((YEAR(CURRENT_DATE) - 1) * 12 + MONTH(CURRENT_DATE)) - ((YEAR(@bdate) - 1) * 12 + MONTH(@bdate))) - (MID(@bdate, 9, 2) &lt;  MID(@bdate, 9, 2)),' month old ',FLOOR(((DAY(CURRENT_DATE)-DAY(@bdate))/7)),' weeks old'))))),
+                                (IF (MONTH(CURRENT_DATE)-MONTH(@bdate)&lt; 0, <!--ELSE { print in years and months}-->
+                             CONCAT((YEAR(CURRENT_DATE)-1-YEAR(@bdate)), ' years ',(12-MONTH(@bdate)+MONTH(CURRENT_DATE)), ' months old'),
+                             CONCAT((YEAR(CURRENT_DATE)-YEAR(@bdate)), ' years ',(MONTH(CURRENT_DATE)-MONTH(@bdate)), ' months old'))))) as ageComplex2 from (SELECT @bdate:=
+                DATE_FORMAT(CONCAT((demographic.year_of_birth), '-', (demographic.month_of_birth), '-', (demographic.date_of_birth)),'%Y-%m-%d') AS birthdate FROM demographic WHERE demographic_no=${demographic}) as t</ap-sql>
+        <ap-output>${ageComplex2}</ap-output>
+    </databaseap>
+    <databaseap>
         <ap-name>sex</ap-name>
         <ap-sql>SELECT sex FROM demographic WHERE demographic_no=${demographic}</ap-sql>
         <ap-output>${sex}</ap-output>
