@@ -883,7 +883,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         <tr>
                                             <td>
                                                 <div class="FieldData">
+                                                <% if ("CLS".equals(handler.getMsgType())) { %>
+                                                    <strong><bean:message key="oscarMDS.segmentDisplay.formDateServiceCLS"/>:</strong>
+												<% } else { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateService"/>:</strong>
+												<% } %>
                                                 </div>
                                             </td>
                                             <td>
@@ -895,7 +899,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         <tr>
                                         	<td>
                                         		<div class="FieldData">
+                                                <% if ("CLS".equals(handler.getMsgType())) { %>
+                                                    <strong><bean:message key="oscarMDS.segmentDisplay.formDateReceivedCLS"/>:</strong>
+												<% } else { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateReceived"/>:</strong>
+												<% } %>
                                                 </div>
                                             </td>
                                             <td>
@@ -1141,7 +1149,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                           <tr class="Field2">
 	                               <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formTestName"/></td>
 	                               <td width="60%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formResult"/></td>
-	                               <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompleted"/></td>
+								   <% if ("CLS".equals(handler.getMsgType())) { %>
+									   <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLS"/></td>
+								   <% } else { %>
+									   <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompleted"/></td>
+								   <% } %>
 	                           </tr><%
 						} else {%>
                        <table style="page-break-inside:avoid;" bgcolor="#003399" border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -1168,7 +1180,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                <td width="5%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formAbn"/></td>
                                <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formReferenceRange"/></td>
                                <td width="10%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formUnits"/></td>
-                               <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompleted"/></td>
+                               <% if ("CLS".equals(handler.getMsgType())) { %>
+                                   <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLS"/></td>
+							   <% } else { %>
+                                   <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompleted"/></td>
+							   <% } %>
                                <td width="6%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formNew"/></td>
                           	   <td width="6%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formAnnotate"/></td>
                            </tr>
@@ -1590,7 +1606,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                     <% } %>
                                 </td>
                                 <td width="50%" valign="center" align="left">
-                                    <span class="Field2"><i><bean:message key="oscarMDS.segmentDisplay.msgReportEnd"/></i></span>
+                                    <% if ("CLS".equals(handler.getMsgType())) { %>
+										<span class="Field2"><i><bean:message key="oscarMDS.segmentDisplay.msgReportEndCLS"/></i></span>
+									<% } else { %>
+										<span class="Field2"><i><bean:message key="oscarMDS.segmentDisplay.msgReportEnd"/></i></span>
+									<% } %>
                                 </td>
                             </tr>
                         </table>

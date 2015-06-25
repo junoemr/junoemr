@@ -204,7 +204,13 @@ public class LabPDFCreator extends PdfPageEventHelper{
         table.addCell(cell);
         cell.setBorder(15);
         cell.setBackgroundColor(new Color(210, 212, 255));
-        cell.setPhrase(new Phrase("END OF REPORT", boldFont));
+		if(handler.getMsgType().equals("CLS")){
+		cell.setPhrase(new Phrase("Legend:  A=Abnormal  L=Low  H=High  C=Critical", boldFont));
+		}
+		else
+		{
+		cell.setPhrase(new Phrase("END OF REPORT", boldFont));
+		}
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         table.addCell(cell);
@@ -284,7 +290,13 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		table.addCell(cell);
 		cell.setPhrase(new Phrase("Units", boldFont));
 		table.addCell(cell);
-		cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
+		if(handler.getMsgType().equals("CLS")){
+			cell.setPhrase(new Phrase("Date/Time Collected", boldFont));
+		}
+		else
+		{
+			cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
+		}
 		table.addCell(cell);
 		cell.setPhrase(new Phrase("Status", boldFont));
 		table.addCell(cell); }
@@ -621,10 +633,29 @@ public class LabPDFCreator extends PdfPageEventHelper{
         //Create results info table
         PdfPTable rInfoTable = new PdfPTable(2);
         cell.setPhrase(new Phrase("Date of Service: ", boldFont));
+
+        if(handler.getMsgType().equals("CLS"))
+		{
+		cell.setPhrase(new Phrase("Received: ", boldFont));
+        }
+		else
+		{
+		cell.setPhrase(new Phrase("Date of Service: ", boldFont));
+		}
+
         rInfoTable.addCell(cell);
         cell.setPhrase(new Phrase(handler.getServiceDate(), font));
         rInfoTable.addCell(cell);
-        cell.setPhrase(new Phrase("Date Received: ", boldFont));
+
+        if(handler.getMsgType().equals("CLS"))
+		{
+		cell.setPhrase(new Phrase("Date Downloaded: ", boldFont));
+        }
+		else
+		{
+		cell.setPhrase(new Phrase("Date Received: ", boldFont));
+		}
+
         rInfoTable.addCell(cell);
         cell.setPhrase(new Phrase(dateLabReceived, font));
         rInfoTable.addCell(cell);
@@ -734,7 +765,16 @@ public class LabPDFCreator extends PdfPageEventHelper{
         patientInfo.add(clientPhrase);
         
         clientPhrase = new Phrase();
-        clientPhrase.add(new Chunk("Date of Service: ", boldFont));
+
+        if(handler.getMsgType().equals("CLS")){
+		clientPhrase.add(new Chunk("Received: ", boldFont));
+        }
+		else
+		{
+		clientPhrase.add(new Chunk("Date of Service: ", boldFont));
+		}
+
+
         clientPhrase.add(new Chunk(handler.getServiceDate()+"\t\t\t\t", font));
         patientInfo.add(clientPhrase);
         
