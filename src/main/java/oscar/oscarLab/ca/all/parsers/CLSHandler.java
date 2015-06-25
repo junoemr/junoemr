@@ -110,7 +110,7 @@ public class CLSHandler implements MessageHandler {
 		return msg.getRESPONSE().getORDER_OBSERVATION(i);
 	}
 
-	public ORC getOBC(int i) {
+	public ORC getORC(int i) {
         return msg.getRESPONSE().getORDER_OBSERVATION(i).getORC();
 	}
 	

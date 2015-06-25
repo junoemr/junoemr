@@ -141,7 +141,7 @@ public class CLSHandler implements MessageHandler {
                 }
 
         		// Get Previous version ORC record if one exists
-                ORC orc = oldVersionCLSParser.getOBC(obrIndex);
+                ORC orc = oldVersionCLSParser.getORC(obrIndex);
                 if(orc != null && orc.encode().length() > 5) {
                     test.append(outLabString += this.lineDelimiter + orc.encode());
                 }
