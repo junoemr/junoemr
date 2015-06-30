@@ -31,6 +31,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -356,6 +358,20 @@ public class OscarProperties extends Properties {
 		} catch(NumberFormatException e) {
 			return defaultValue;
 		}
+	}
+	
+	public Map<String,String> getIPProviderMap() {
+		int counter=1;
+		String userIp="";
+		String providerNo="";
+		Map<String, String> hash = new HashMap<String, String>();
+		while (hasProperty("TICKLERIP"+Integer.toString(counter))&&hasProperty("TICKLERPROVIDER"+Integer.toString(counter))){
+			userIp= getProperty("TICKLERIP"+Integer.toString(counter));
+			providerNo = getProperty("TICKLERPROVIDER"+Integer.toString(counter));
+			hash.put(userIp, providerNo);	
+			counter++;
+		}
+		return hash;
 	}
 
 }

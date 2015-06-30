@@ -25,6 +25,7 @@
 --%>
 
 <%@ page import="oscar.OscarProperties" %>
+<%@ page import="java.util.HashMap" %>
 <%
 
 if(session.getAttribute("user") == null)
@@ -381,10 +382,25 @@ function changeSite(sel, cb) {
 				while(rslocal.next())
 				{
 					String selected = "";
-                    proFirst = rslocal.getString("first_name");
-                    proLast = rslocal.getString("last_name");
-                    proOHIP = rslocal.getString("provider_no");
-					if(defaultProvider.equals(proOHIP))
+			        proFirst = rslocal.getString("first_name");
+			        proLast = rslocal.getString("last_name");
+			        proOHIP = rslocal.getString("provider_no");
+			        String ip="";
+			        String provider ="";
+			        if(props.hasProperty("TICKLERIP1"))
+			        {
+			        	Map<String, String> hash = props.getIPProviderMap();
+			        	for (Map.Entry<String, String> entry : hash.entrySet()) {
+			            	ip = entry.getKey();
+			                provider = entry.getValue();
+			                if(provider.equals(proOHIP)&&ip.equals(request.getRemoteAddr()))
+			                {
+			                  selected = "selected";
+			          
+			                }
+			            }
+			         }
+				  	else if(defaultProvider.equals(proOHIP))
 					{
 						selected = "selected";
 					}
