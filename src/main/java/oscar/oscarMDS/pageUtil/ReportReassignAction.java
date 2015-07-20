@@ -148,7 +148,9 @@ public class ReportReassignAction extends Action {
         		}
         		
         	}
-        	
+//        	if(flaggedLabs != null && flaggedLabs.length > 0 && flaggedLabs[0] != null){
+  //      		CommonLabResultData.updateReportStatus( Integer.parseInt(flaggedLabs[0]), ((providerNo != null) ? providerNo : ""), 'A', "",labTypes[0]);
+   //     	}
             newURL = mapping.findForward("success").getPath();
             if (newURL.contains("labDisplay.jsp")) {
                 newURL = newURL 

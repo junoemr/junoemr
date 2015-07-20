@@ -2241,7 +2241,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
         <div id="additionalInfoForm">                                           
             <div>                                                               
                 <label>To:</label>                                              
-                <span id="emailTo"><%=demographic.getDisplayName()%></span>     
+                <input type=text id="emailTo" value="<%=demographic.getDisplayName()%>">     
             </div>                                                              
             <div>                                                               
                 <label>Subject:</label>                                         
@@ -2281,7 +2281,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
         <div id="additionalInfoForm">                                           
             <div>                                                               
                 <label>To:</label>                                              
-                <span id="providerEmailTo" />                                   
+                <input type=text id="providerEmailTo">                                   
             </div>                                                              
             <div>                                                               
                 <label>Subject:</label>                                         
@@ -2304,7 +2304,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
                                                                                 
         <span class="progress"></span>                                          
                                                                                 
-    </div>  
+    </div> 
 
 </html:form>
 

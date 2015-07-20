@@ -3,6 +3,7 @@ if (typeof jQuery == "undefined") { alert("The emailControl library requires jQu
 var emailControlPlaceholder = "<br/>Email Recipients:<br/><div id='emailForm'>Loading email options..</div>";
 var emailControlEmailPatientButton     = "<span>&nbsp;</span><input value='Email to Patient' name='EmailPatientButton' id='email_patient_button' type='button' onclick='submitEmailButtonAjax(false, true)'>";
 var emailControlEmailButton     = "<span>&nbsp;</span><input value='Email to Provider' name='EmailSaveButton' id='email_button' type='button' onclick='submitEmailButtonAjax(false, false)'>";
+
 var emailControlEmailSaveButton = "<span>&nbsp;</span><input value='Submit & Email' name='EmailButton' id='emailSave_button' type='button' onclick='submitEmailButtonAjax(true, false)'>";
 var emailControlMemoryInput = "<input value='false' name='emailEForm' id='emailEForm' type='hidden' />";	
 var emailControlToEmail = "<input value='' name='toEmail' id='toEmail' type='hidden' />";	
@@ -152,7 +153,7 @@ function submitEmailButtonAjax(save, emailPatient) {
 			$("#additionalInfoForm").show();
 			
 			// Set body text & email address in the form
-			$("#emailTo").html( $("#toEmail").val() ); 
+			$("#emailTo").text( $("#toEmail").val() ); 
 			$("#bodytext").text(default_text);		
 		
 			if(featherlight == null){
@@ -229,53 +230,113 @@ function submitEmailButtonAjax(save, emailPatient) {
 
 // This function is only used by the new email feature with featherlight
 function emailEForm(){
-	var form = $("form");
-
-	$("#emailBodyText").val($(".featherlight-content #emailFormBox #bodytext").val());
-	$("#emailSubject").val($(".featherlight-content #emailFormBox #subject").val());
-	$("#emailEForm").val("true");
 	
-
-	//Hide the form & show "sending" text
-	$(".featherlight-content #additionalInfoForm").hide();
-	$("span.progress").html("Sending email to "+$("#toEmail").val()+"...");
-	$("span.progress").show();
+	$("#toEmail").val($(".featherlight-content #emailFormBox #emailTo").val());
 	
-	$(".featherlight-close-icon").hide();
+	if($("#toEmail").val().indexOf(',')!=-1){
+		
+		var emailstring = $("#toEmail").val();
+		var emailArray = emailstring.split(",");
+		$(".featherlight-content #additionalInfoForm").hide();
+		
+	    for (var i=0; i<emailArray.length; i++){
+	        var form = $("form");
+	        $("#toEmail").val(emailArray[i].trim());
+	        $("#emailBodyText").val($(".featherlight-content #emailFormBox #bodytext").val());
+	        $("#emailSubject").val($(".featherlight-content #emailFormBox #subject").val());
+	        $("#emailEForm").val("true");
+	        if($("#toEmail").val().length > 0){
+	          if(i==0){
+	            $("span.progress").html("<div>Sending email to "+emailArray[i]+"...</div>");
+	          }
+	          else {
+	            $("span.progress").append("<div>Sending email to "+emailArray[i]+"...</div>");
+	          }
+	          $("span.progress").show();
+	          
+	          $(".featherlight-close-icon").hide();
+	            
+	          $.ajax({
+	             type: "POST",  
+	             url: form.attr("action"),
+	             data: form.serialize(),
+	             success: function(data) {
+	               dataParts= data.split(",");
+	               
+	               if(dataParts[0].trim() == "success"){
+	                 $("span.progress").append("<div style=\"color:#458B00; font-weight: bold;\">Email successfully sent to "+dataParts[1]+"</div>");
+	                 $("#emailEForm").val("false");    
+	               }else{
+	                 $("span.progress").append("<div>Something went wrong while trying to send the email to "+dataParts[1]+". Please contact your administrator. Error: "+ dataParts[0].trim()+"</div>");
+	                 $("#emailEForm").val("false"); 
+	                
+	               }
+	             },
+	             error: function(xhr, status, error) {
+	               var err = eval("(" + xhr.responseText + ")");
+	               $("span.progress").append("<div>Something went wrong while trying to send the email to "+dataParts[1]+". Please contact your administrator. "+ xhr.responseText+"</div>");
+	               $("#emailEForm").val("false");   
+	             },
+	             ajax:"false"
+	          });
+	        }
+	      }
+	      $(".featherlight-close-icon").show();
+	      $("#emailFormBox").hide();
+	      
+	}
+	else {
+		var form = $("form");
+		$("#toEmail").val($(".featherlight-content #emailFormBox #emailTo").val());
+		$("#emailBodyText").val($(".featherlight-content #emailFormBox #bodytext").val());
+		$("#emailSubject").val($(".featherlight-content #emailFormBox #subject").val());
+		$("#toEmail").val($(".featherlight-content #emailFormBox #emailTo").val());
+		$("#emailEForm").val("true");
+		
 	
-	$.ajax({
-		 type: "POST",  
-		 url: form.attr("action"),  
-		 data: form.serialize(),  
-		 success: function(data) {
-		 	 if(data.trim() == "success"){
-				 $("span.progress").html("<div style=\"color:#458B00; font-weight: bold;\">Email successfully sent</div>");
-				 $("#emailEForm").val("false");
-				 clearEmailFields();
-				 $(".featherlight-close-icon").show();			 
-				 $("#emailFormBox").hide();
+		//Hide the form & show "sending" text
+		$(".featherlight-content #additionalInfoForm").hide();
+		$("span.progress").html("<div>Sending email to "+$("#toEmail").val()+"...</div>");
+		$("span.progress").show();
+		
+		$(".featherlight-close-icon").hide();
+		
+		$.ajax({
+			 type: "POST",  
+			 url: form.attr("action"),  
+			 data: form.serialize(),  
+			 success: function(data) {
+				 dataParts= data.split(",");
+			 	
+			 	 if(dataParts[0].trim() == "success"){
+					 $("span.progress").html("<div style=\"color:#458B00; font-weight: bold;\">Email successfully sent to "+dataParts[1]+"</div>");
+					 $("#emailEForm").val("false");
+					 clearEmailFields();
+					 $(".featherlight-close-icon").show();			 
+					 $("#emailFormBox").hide();
+					 
+					 //Let the user close featherlight
+					 //featherlight.close();
+				 }else{
 				 
-				 //Let the user close featherlight
-				 //featherlight.close();
-			 }else{
-			 
-				 $("span.progress").html("Something went wrong while trying to send the email. Please contact your administrator. Error: "+ data.trim());
+					 $("span.progress").html("<div>Something went wrong while trying to send the email to "+dataParts[1]+". Please contact your administrator. Error: "+ dataParts[0].trim()+"</div>");
+					 $("#emailEForm").val("false");			 
+					 clearEmailFields();
+					 $(".featherlight-close-icon").show();
+					 $("#emailFormBox").hide();
+				 }
+			 },
+			 error: function(xhr, status, error) {
+	
+				 var err = eval("(" + xhr.responseText + ")");
+				 
+				 $("span.progress").html("<div>Something went wrong while trying to send the email. Please contact your administrator. "+ xhr.responseText+"</div>");
 				 $("#emailEForm").val("false");			 
 				 clearEmailFields();
 				 $(".featherlight-close-icon").show();
 				 $("#emailFormBox").hide();
-			 }
-		 },
-		 error: function(xhr, status, error) {
-
-			 var err = eval("(" + xhr.responseText + ")");
-			 
-			 $("span.progress").html("Something went wrong while trying to send the email. Please contact your administrator. "+ xhr.responseText);
-			 $("#emailEForm").val("false");			 
-			 clearEmailFields();
-			 $(".featherlight-close-icon").show();
-			 $("#emailFormBox").hide();
-
-		 } 
-	});
+	
+			 } 
+		});
+	}
 }

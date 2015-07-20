@@ -62,7 +62,7 @@ try{
     	<div class="success">Email sent successfully</div>
     	<%
     }else{
-    	%>success<%
+    	%>success,<%=toEmailAddress%><%
     }
 }catch( Exception e ){
     MiscUtils.getLogger().error("Error", e);
@@ -71,7 +71,7 @@ try{
     	An error occurred sending the email, please contact an administrator.
 		<%
     }else{
-    	%><%=e.getMessage()%><%
+    	%><%=e.getMessage()%>,<%=toEmailAddress%><%
     }
     
 }

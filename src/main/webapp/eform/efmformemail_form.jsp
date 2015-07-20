@@ -91,7 +91,8 @@ This Page creates the email form for eforms.
 	<div id="additionalInfoForm">
 		<div>
 			<label>To:</label>
-			<span id="emailTo">
+			<input type="text" name="emailTo" id="emailTo" style="width: 500px;" value="">
+			
 		</div>
 		<div>
 			<label>Subject:</label>                                             
