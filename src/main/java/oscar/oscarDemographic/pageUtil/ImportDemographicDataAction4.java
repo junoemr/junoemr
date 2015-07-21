@@ -2057,6 +2057,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                                     if (binaryFormat) err_data.add("Error! No File Extension for Report ("+(i+1)+")");
                                 }
                                 String docDesc = repR[i].getSubClass();
+                                if (StringUtils.empty(docDesc)) docDesc = repR[i].getNotes();
                                 if (StringUtils.empty(docDesc)) docDesc = "ImportReport"+(i+1);
                                 FileOutputStream f = new FileOutputStream(docDir + docFileName);
                                 f.write(b);
