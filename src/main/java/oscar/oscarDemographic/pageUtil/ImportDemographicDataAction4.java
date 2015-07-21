@@ -872,12 +872,16 @@ import cdsDt.PersonNameStandard.OtherNames;
                 }
                 dump = Util.addLine(dump, summary);
                 */
+
+                /* Why are we inserting two notes for this? Removing this one as it doesn't actually show anything
                 String diagCode = getCode(fHist[i].getDiagnosisProcedureCode(),"Diagnosis/Procedure");
+                dump = Util.addLine(dump, "Family History");
                 dump = Util.addLine(dump, diagCode);
                 dump = Util.addLine(dump, getResidual(fHist[i].getResidualInfo()));
                 cmNote = prepareCMNote("2",null);
                 cmNote.setNote(dump);
                 saveLinkNote(hostNoteId, cmNote);
+                */
 
                 //extra fields
                 CaseManagementNoteExt cme = new CaseManagementNoteExt();
@@ -951,12 +955,16 @@ import cdsDt.PersonNameStandard.OtherNames;
                 }
                 dump = Util.addLine(dump, summary);
                 */
+
+                /* Why are we inserting two notes for this? Removing this one as it doesn't actually show anything
                 String diagCode = isICD9(pHealth[i].getDiagnosisProcedureCode()) ? null : getCode(pHealth[i].getDiagnosisProcedureCode(),"Diagnosis/Procedure");
+                //dump = Util.addLine(dump, "Medical History");
                 dump = Util.addLine(dump, diagCode);
                 dump = Util.addLine(dump, getResidual(pHealth[i].getResidualInfo()));
                 cmNote = prepareCMNote("2",null);
                 cmNote.setNote(dump);
                 saveLinkNote(hostNoteId, cmNote);
+                */
 
                 //extra fields
                 CaseManagementNoteExt cme = new CaseManagementNoteExt();
@@ -1025,6 +1033,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                     dump = Util.addLine(dump, summary);
                     */
                     String diagCode = isICD9(probList[i].getDiagnosisCode()) ? null : getCode(probList[i].getDiagnosisCode(),"Diagnosis");
+                    dump = Util.addLine(dump, "Concern");
                     dump = Util.addLine(dump, diagCode);
                     dump = Util.addLine(dump, getResidual(probList[i].getResidualInfo()));
                     cmNote = prepareCMNote("2",null);
@@ -1098,6 +1107,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                     }
                     dump = Util.addLine(dump, summary);
                     */
+                    dump = Util.addLine(dump, "Risk Factor");
                     dump = Util.addLine(dump, getResidual(rFactors[i].getResidualInfo()));
                     cmNote = prepareCMNote("2",null);
                     cmNote.setNote(dump);
@@ -1171,6 +1181,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                     }
                     dump = Util.addLine(dump, summary);
                     */
+                    dump = Util.addLine(dump, "Alert");
                     dump = Util.addLine(dump, getResidual(alerts[i].getResidualInfo()));
                     cmNote = prepareCMNote("2",null);
                     cmNote.setNote(dump);
@@ -1365,6 +1376,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                     }
                     dump = Util.addLine(dump, summary);
                     */
+                    dump = Util.addLine(dump, "Allergy");
                     dump = Util.addLine(dump, alg_extra);
                     dump = Util.addLine(dump, getResidual(aaReactArray[i].getResidualInfo()));
 
@@ -1377,7 +1389,8 @@ import cdsDt.PersonNameStandard.OtherNames;
                 //MEDICATIONS & TREATMENTS
                 MedicationsAndTreatments[] medArray = patientRec.getMedicationsAndTreatmentsArray();
                 String duration, quantity, dosage, special;
-                for (int i=0; i<medArray.length; i++) {
+                for (int i=0; i<medArray.length; i++) 
+                {
                     Drug drug = new Drug();
                     drug.setCreateDate(new Date());
                     drug.setWrittenDate(dateTimeFPtoDate(medArray[i].getPrescriptionWrittenDate(), timeShiftInDays));
@@ -1551,6 +1564,9 @@ import cdsDt.PersonNameStandard.OtherNames;
 
                     //annotation
                     CaseManagementNote cmNote = prepareCMNote("2",null);
+                    cmNote.setCreate_date(drug.getWrittenDate());
+                    cmNote.setObservation_date(drug.getWrittenDate());
+                    cmNote.setUpdate_date(drug.getWrittenDate());
                     String note = StringUtils.noNull(medArray[i].getNotes());
                     cmNote.setNote(note);
                     saveLinkNote(cmNote, CaseManagementNoteLink.DRUGS, (long)drug.getId());
@@ -1565,8 +1581,13 @@ import cdsDt.PersonNameStandard.OtherNames;
                     dump = Util.addLine(dump, summary);
                     */
                     dump = Util.addLine(dump, getResidual(medArray[i].getResidualInfo()));
+                    dump = Util.addLine(dump, "Medication");
+                    dump = Util.addLine(dump, special);
 
                     cmNote = prepareCMNote("2",null);
+                    cmNote.setCreate_date(drug.getWrittenDate());
+                    cmNote.setObservation_date(drug.getWrittenDate());
+                    cmNote.setUpdate_date(drug.getWrittenDate());
                     cmNote.setNote(dump);
                     saveLinkNote(cmNote, CaseManagementNoteLink.DRUGS, (long)drug.getId());
                 }
@@ -2856,13 +2877,32 @@ import cdsDt.PersonNameStandard.OtherNames;
 
 	String writeProviderData(String firstName, String lastName, String ohipNo, String cpsoNo) {
 		ProviderData pd = getProviderByOhip(ohipNo);
-		if (pd==null) pd = getProviderByNames(firstName, lastName, matchProviderNames);
+		if (pd == null) {
+      pd = getProviderByNames(firstName, lastName, matchProviderNames);
+    }
+
+    if (pd == null) {
+      MiscUtils.getLogger().error("No provider found for firstName: " + firstName.toString() +
+        " lastName: " + lastName.toString() + " ohipNo: " + ohipNo.toString());
+
+      if (StringUtils.empty(firstName) || StringUtils.empty(lastName)) {
+        //return defaultProviderNo();
+        return ""; //no information at all!
+      }
+      pd = new ProviderData();
+      pd.addExternalProvider(firstName, lastName, ohipNo, cpsoNo);
+    }
+
+    /* This all seems very broken... Why would we only be interested in negative provider ids
+     * and why whould we greate a new provider then merge it instead of just using the 
+     * one we found. Removing it so the importer can match providers properly
+     
 		if (pd!=null) return updateExternalProvider(firstName, lastName, ohipNo, cpsoNo, pd);
 
 		//Write as a new provider
 		if (StringUtils.empty(firstName) && StringUtils.empty(lastName) && StringUtils.empty(ohipNo)) return ""; //no information at all!
-		pd = new ProviderData();
-		pd.addExternalProvider(firstName, lastName, ohipNo, cpsoNo);
+    */
+
 		return pd.getProviderNo();
 	}
 
@@ -3053,6 +3093,9 @@ import cdsDt.PersonNameStandard.OtherNames;
 		allergy.setSeverityOfReaction(severity);
 		allergy.setRegionalIdentifier(regionalId);
 		allergy.setLifeStage(lifeStage);
+		allergy.setArchived("0");
+		allergy.setOnsetOfReaction("0");
+		allergy.setDrugrefId("0");
 
 		allergyDao.persist(allergy);
 		return(allergy.getId());
