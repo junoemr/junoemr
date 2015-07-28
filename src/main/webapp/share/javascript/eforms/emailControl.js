@@ -153,7 +153,7 @@ function submitEmailButtonAjax(save, emailPatient) {
 			$("#additionalInfoForm").show();
 			
 			// Set body text & email address in the form
-			$("#emailTo").text( $("#toEmail").val() ); 
+			$("#emailTo").val( $("#toEmail").val() ); 
 			$("#bodytext").text(default_text);		
 		
 			if(featherlight == null){

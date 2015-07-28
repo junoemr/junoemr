@@ -43,12 +43,14 @@ This Page creates the email form for eforms.
 		DemographicData demoData = null;
 		Demographic demographic = null;
 		String rdohip = "";
+		String patient_email = "";
 		if (!"".equals(demo))
 		{
 			demoData = new oscar.oscarDemographic.data.DemographicData();
 			demographic = demoData.getDemographic(demo);
 			rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
 			rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(),"rdohip").trim();
+			patient_email = demographic.getEmail();
 		}
 		
 	String default_subject = props.getProperty("eform_email_subject");
@@ -91,7 +93,7 @@ This Page creates the email form for eforms.
 	<div id="additionalInfoForm">
 		<div>
 			<label>To:</label>
-			<input type="text" name="emailTo" id="emailTo" style="width: 500px;" value="">
+			<input type="text" name="emailTo" id="emailTo" style="width: 500px;">
 			
 		</div>
 		<div>
@@ -110,6 +112,8 @@ This Page creates the email form for eforms.
 	<span class="progress"></span>
 	
 </div>
+<input type="hidden" id="patient_email" name="patient_email" value="<%=patient_email%>"/>
+<input type="hidden" id="default_text_patients" value="<%=default_text_patients%>"/>
 <input type="hidden" id="default_text_patients" value="<%=default_text_patients%>"/>
 <input type="hidden" id="default_text_providers" value="<%=default_text_providers%>"/>
 <% } // end if (props.isEFormEmailEnabled()) { %>

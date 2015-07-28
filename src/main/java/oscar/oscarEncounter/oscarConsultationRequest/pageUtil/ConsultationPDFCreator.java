@@ -443,7 +443,7 @@ private void addSignature(PdfPTable infoTable) {
 		table.addCell(cell);
 		try {
 			DigitalSignatureDao digitalSignatureDao = (DigitalSignatureDao) SpringUtils.getBean("digitalSignatureDao");
-			DigitalSignature digitalSignature = digitalSignatureDao.find(Integer.parseInt(reqFrm.signatureImg));
+			DigitalSignature digitalSignature = digitalSignatureDao.find(Integer.valueOf(reqFrm.signatureImg.substring(0, reqFrm.signatureImg.lastIndexOf("_"))));
 			if (digitalSignature != null) {
 				Image image = Image.getInstance(digitalSignature.getSignatureImage());
 				image.scalePercent(80f);
@@ -461,6 +461,7 @@ private void addSignature(PdfPTable infoTable) {
 			}
 		} catch (Exception e) {
 			logger.error("Unexpected error.", e);
+			return;
 		}
 	}
 	/**

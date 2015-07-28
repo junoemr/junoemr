@@ -696,7 +696,8 @@ function sendEmail(type)
 			box_id = "#emailFormBoxProvider";
 
 			chooseEmail();
-			jQuery("#providerEmailTo").text(jQuery("#emailSelect").find(":selected").text());
+			jQuery("#emailToProvider").val(jQuery("#emailSelect").find(":selected").val());
+			jQuery(".featherlight-content #emailToProvider").val(jQuery("#emailSelect").find(":selected").val());
 		}
 
 	jQuery(box_id).show();
@@ -718,7 +719,9 @@ function checkForm(submissionVal,formName){
     jQuery("#emailSubject").val(jQuery(".featherlight-content #emailSubjectForm").val());
     jQuery("#patientEmailBody").val(jQuery(".featherlight-content #patientEmailBodyForm").val());
     jQuery("#providerEmailBody").val(jQuery(".featherlight-content #providerEmailBodyForm").val());
-
+    jQuery("#emailToProvider").val(jQuery(".featherlight-content #emailToProvider").val());
+    jQuery("#emailToPatient").val(jQuery(".featherlight-content #emailToPatient").val());
+    
     //if document attach to consultation is still active user needs to close before submitting
     if( DocPopup != null && !DocPopup.closed ) {
         alert("Please close Consultation Documents window before proceeding");
@@ -1129,7 +1132,7 @@ function chooseEmail(){
     toEmail = jQuery("#emailSelect").find(":selected").val();
 
     jQuery('#toProviderName').val(toName);
-    jQuery('#toProviderEmail').val(toEmail);
+    jQuery('#emailToProvider').val(toEmail);
 }
 <%}%>
 
@@ -1424,7 +1427,7 @@ function chooseEmail(){
 							                             }
 										if (!"".equals(email)) {
 										%>
-										<option value="<%= email%>"><%= String.format("%s, %s &lt;%s&gt;", lName, fName, email) %> </option>
+										<option value="<%=email%>"><%= String.format("%s, %s &lt;%s&gt;", lName, fName, email) %> </option>
 										<%
 										}
 									} %>
@@ -2236,12 +2239,50 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 			<td class="MainTableBottomRowRightColumn"></td>
 		</tr>
 	</table>
-
+	<input value="" name="toProviderName" id="toProviderName" type="hidden" />  
+    <input value="" name="toProviderEmail" id="toProviderEmail" type="hidden" />
+                                                                                
+    <input value="<%=demographic.getDisplayName()%>" name="toPatientName" id="toPatientName" type="hidden" />
+    <input value="<%=demographic.getEmail()%>" name="toPatientEmail" id="toPatientEmail" type="hidden" />
+    <input name="providerEmailBody" id="providerEmailBody" type="hidden" value="" />
+                                                                                
+    <input name="patientEmailBody" id="patientEmailBody" type="hidden" value="" />
+                                                                                
+    <input name="emailSubject" id="emailSubject" type="hidden" value="" />      
+                                                                           
+<div id="emailFormBoxProvider" style="display: none">                       
+        <div id="additionalInfoForm">                                           
+            <div>                                                               
+                <label>To:</label>                                              
+                <input type=text id="emailToProvider" name="emailToProvider" value="">                                   
+            </div>                                                              
+            <div>                                                               
+                <label>Subject:</label>                                         
+                <input type="text" name="emailSubjectForm" id="emailSubjectForm" value="<%= props.getProperty("eform_email_subject") %>">
+            </div>                                                              
+            <div>                                                               
+                <label>Body text:</label>                                       
+                <textarea name="providerEmailBodyForm" id="providerEmailBodyForm"><%= props.getProperty("eform_email_text_providers") %></textarea>
+            </div>                                                              
+            <div>                                                               
+				<%
+				if(request.getAttribute("id")!=null){
+				%>
+                <input type="button" onClick="checkForm('Update And Email Provider','EctConsultationFormRequestForm')" value="Email eForm">
+				<% } else { %>
+                <input type="button" onClick="checkForm('Submit And Email Provider','EctConsultationFormRequestForm')" value="Email eForm">
+				<% } %>
+            </div>                                                              
+        </div>                                                                  
+                                                                                
+        <span class="progress"></span>                                          
+                                                                                
+    </div> 
     <div id="emailFormBoxPatient" style="display: none">                        
         <div id="additionalInfoForm">                                           
             <div>                                                               
                 <label>To:</label>                                              
-                <input type=text id="emailTo" value="<%=demographic.getDisplayName()%>">     
+                <input type=text id="emailToPatient" name="emailToPatient" value="<%=demographic.getEmail()%>">     
             </div>                                                              
             <div>                                                               
                 <label>Subject:</label>                                         
@@ -2266,45 +2307,8 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
                                                                                 
     </div>
 
-    <input value="" name="toProviderName" id="toProviderName" type="hidden" />  
-    <input value="" name="toProviderEmail" id="toProviderEmail" type="hidden" />
-                                                                                
-    <input value="<%=demographic.getDisplayName()%>" name="toPatientName" id="toPatientName" type="hidden" />
-    <input value="<%=demographic.getEmail()%>" name="toPatientEmail" id="toPatientEmail" type="hidden" />
-    <input name="providerEmailBody" id="providerEmailBody" type="hidden" value="" />
-                                                                                
-    <input name="patientEmailBody" id="patientEmailBody" type="hidden" value="" />
-                                                                                
-    <input name="emailSubject" id="emailSubject" type="hidden" value="" />      
-                                                                                
-    <div id="emailFormBoxProvider" style="display: none">                       
-        <div id="additionalInfoForm">                                           
-            <div>                                                               
-                <label>To:</label>                                              
-                <input type=text id="providerEmailTo">                                   
-            </div>                                                              
-            <div>                                                               
-                <label>Subject:</label>                                         
-                <input type="text" name="emailSubjectForm" id="emailSubjectForm" value="<%= props.getProperty("eform_email_subject") %>">
-            </div>                                                              
-            <div>                                                               
-                <label>Body text:</label>                                       
-                <textarea name="providerEmailBodyForm" id="providerEmailBodyForm"><%= props.getProperty("eform_email_text_providers") %></textarea>
-            </div>                                                              
-            <div>                                                               
-				<%
-				if(request.getAttribute("id")!=null){
-				%>
-                <input type="button" onClick="checkForm('Update And Email Provider','EctConsultationFormRequestForm')" value="Email eForm">
-				<% } else { %>
-                <input type="button" onClick="checkForm('Submit And Email Provider','EctConsultationFormRequestForm')" value="Email eForm">
-				<% } %>
-            </div>                                                              
-        </div>                                                                  
-                                                                                
-        <span class="progress"></span>                                          
-                                                                                
-    </div> 
+        
+    
 
 </html:form>
 

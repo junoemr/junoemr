@@ -1977,8 +1977,9 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			Demographic demographic = demographicDao.getDemographic(demoNo);
 			//Should we get the billform based on the appointment provider or the demographic's provider?
 			ProviderPreference providerPreference = providerPreferenceDao.find(demographic.getProviderNo());
-		  if (providerPreference != null && !providerPreference.getDefaultServiceType().equals("no")) {
-          defaultView = providerPreference.getDefaultServiceType();
+			
+			if (providerPreference != null && !providerPreference.getDefaultServiceType().equals("no")) {
+				defaultView = providerPreference.getDefaultServiceType();
 			}
 
 			Set setIssues = cform.getCaseNote().getIssues();
@@ -2008,12 +2009,24 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 				url += "&referral_no_1=" + getRefNo(demographic.getFamilyDoctor());
 			}
 			if(Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", ""))){
-				url = "/billing/billingClinicAid.jsp?demographic_no="+demoNo+
-								"&service_start_date="+date+
-								"&appointment_no="+appointmentNo+
-								"&chart_no="+
-								"&appointment_start_time="+start_time+
-								"&billing_action=create_invoice";
+				if(apptProvider!= null) {
+					url = "/billing/billingClinicAid.jsp?demographic_no="+demoNo+
+									"&service_start_date="+date+
+									"&appointment_no="+appointmentNo+
+									"&chart_no="+
+									"&appointment_start_time="+start_time+
+									"&appointment_provider_no="+apptProvider+
+									"&billing_action=create_invoice";
+				}
+				else {
+					url = "/billing/billingClinicAid.jsp?demographic_no="+demoNo+
+							"&service_start_date="+date+
+							"&appointment_no="+appointmentNo+
+							"&chart_no="+
+							"&appointment_start_time="+start_time+
+							"&appointment_provider_no="+providerNo+
+							"&billing_action=create_invoice";
+				}
 								
 			}
 			logger.debug("BILLING URL " + url);

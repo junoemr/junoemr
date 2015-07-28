@@ -1075,12 +1075,22 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 		String strDay=curDay>9?(""+curDay):("0"+curDay);
 		String newDateString = strYear+"-"+strMonth+"-"+strDay;
 		String clinicaid_link = "";
-		clinicaid_link = "../billing/billingClinicAid.jsp?demographic_no="+demographic.getDemographicNo()+
+		if(apptProvider!=null){
+			clinicaid_link = "../billing/billingClinicAid.jsp?demographic_no="+demographic.getDemographicNo()+
 				"&service_start_date="+URLEncoder.encode(newDateString, "UTF-8")+
 				"&chart_no="+demographic.getChartNo()+
 				"&appointment_start_time=0"+
+				"&appointment_provider_no="+apptProvider+
 				"&billing_action=create_invoice&appointment_no=0";
-
+		}
+		else {
+			clinicaid_link = "../billing/billingClinicAid.jsp?demographic_no="+demographic.getDemographicNo()+
+				"&service_start_date="+URLEncoder.encode(newDateString, "UTF-8")+
+				"&chart_no="+demographic.getChartNo()+
+				"&appointment_start_time=0"+
+				"&appointment_provider_no="+curProvider_no+
+				"&billing_action=create_invoice&appointment_no=0";
+		}
 		%>
 			<tr>
 				<td>
