@@ -2009,24 +2009,20 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 				url += "&referral_no_1=" + getRefNo(demographic.getFamilyDoctor());
 			}
 			if(Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", ""))){
+				String linkProvider="";
 				if(apptProvider!= null) {
-					url = "/billing/billingClinicAid.jsp?demographic_no="+demoNo+
-									"&service_start_date="+date+
-									"&appointment_no="+appointmentNo+
-									"&chart_no="+
-									"&appointment_start_time="+start_time+
-									"&appointment_provider_no="+apptProvider+
-									"&billing_action=create_invoice";
+					linkProvider=apptProvider;
 				}
 				else {
-					url = "/billing/billingClinicAid.jsp?demographic_no="+demoNo+
-							"&service_start_date="+date+
-							"&appointment_no="+appointmentNo+
-							"&chart_no="+
-							"&appointment_start_time="+start_time+
-							"&appointment_provider_no="+providerNo+
-							"&billing_action=create_invoice";
+					linkProvider=providerNo;
 				}
+				url = "/billing/billingClinicAid.jsp?demographic_no="+demoNo+
+						"&service_start_date="+date+
+						"&appointment_no="+appointmentNo+
+						"&chart_no="+
+						"&appointment_start_time="+start_time+
+						"&appointment_provider_no="+linkProvider+
+						"&billing_action=create_invoice";
 								
 			}
 			logger.debug("BILLING URL " + url);

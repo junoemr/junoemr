@@ -443,7 +443,7 @@ private void addSignature(PdfPTable infoTable) {
 		table.addCell(cell);
 		try {
 			DigitalSignatureDao digitalSignatureDao = (DigitalSignatureDao) SpringUtils.getBean("digitalSignatureDao");
-			DigitalSignature digitalSignature = digitalSignatureDao.find(Integer.valueOf(reqFrm.signatureImg.substring(0, reqFrm.signatureImg.lastIndexOf("_"))));
+			DigitalSignature digitalSignature = digitalSignatureDao.find(Integer.parseInt(reqFrm.signatureImg));
 			if (digitalSignature != null) {
 				Image image = Image.getInstance(digitalSignature.getSignatureImage());
 				image.scalePercent(80f);

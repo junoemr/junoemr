@@ -50,7 +50,9 @@ This Page creates the email form for eforms.
 			demographic = demoData.getDemographic(demo);
 			rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
 			rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(),"rdohip").trim();
-			patient_email = demographic.getEmail();
+			if(demographic.getEmail()!=null) {
+				patient_email = demographic.getEmail();
+			}
 		}
 		
 	String default_subject = props.getProperty("eform_email_subject");
