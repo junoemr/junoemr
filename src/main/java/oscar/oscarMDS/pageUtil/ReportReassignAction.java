@@ -148,7 +148,7 @@ public class ReportReassignAction extends Action {
         		}
         		
         	}
-
+        	
             newURL = mapping.findForward("success").getPath();
             if (newURL.contains("labDisplay.jsp")) {
                 newURL = newURL 
