@@ -156,7 +156,7 @@ public class CLSHandler implements MessageHandler {
 
 	public boolean isOBXAbnormal(int i, int j) {
 		try {
-			return getOBXAbnormalFlag(i, j).equals("C") || getOBXAbnormalFlag(i, j).equals("H") || getOBXAbnormalFlag(i, j).equals("L");
+			return getOBXAbnormalFlag(i, j).equals("C") || getOBXAbnormalFlag(i, j).equals("H") || getOBXAbnormalFlag(i, j).equals("L") || getOBXAbnormalFlag(i, j).equals("A");
 		} catch (Exception e) {
 			return false;
 		}
