@@ -123,6 +123,19 @@ public class EctConAddSpecialistAction extends Action {
 			// valid in either bc or ontario.
 			if ((referralNo.length() == 6 || referralNo.length() == 5 ))
 				return true;
+			
+			// get oscar variables to check for billing region
+			java.util.Properties oscarVariables = oscar.OscarProperties.getInstance();
+			//security null check - should never happen
+			if(oscarVariables==null || oscarVariables.getProperty("billregion")==null){
+				MiscUtils.getLogger().error("unable to obtain billingregion property from oscarVariables.");
+				return false;
+			}
+			
+			// Make sure Alberta case is handled. referral number is 9 characters
+			if (referralNo.length() == 9 && oscarVariables.getProperty("billregion").equals("AB"))
+				return true;
+			
 		} catch (Exception e) {
 			MiscUtils.getLogger().info("Specified referral number invalid (" + referralNo + ")", e);
 		}
