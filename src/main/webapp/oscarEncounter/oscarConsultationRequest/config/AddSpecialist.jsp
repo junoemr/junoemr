@@ -161,6 +161,9 @@ function BackToOscar() {
 								<% if (request.getAttribute("refnoinuse") != null) { %>
 									<span style="color: red;"><bean:message
 										key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInUse" /></span><br />
+								<% } else if (oscarVariables.getProperty("billregion").equals("AB") && request.getAttribute("refnoinvalid") != null) { %>
+									<span style="color: red;"><bean:message
+										key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalidAB" /></span><br />
 								<% } else if (request.getAttribute("refnoinvalid") != null) { %>
 									<span style="color: red;"><bean:message
 										key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalid" /></span><br />
