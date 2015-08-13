@@ -118,11 +118,6 @@ public class EctConAddSpecialistAction extends Action {
 			// Run a parseint to make sure it's an integer (it will log an
 			// error and return false if it is invalid)
 			Integer.parseInt(referralNo);
-
-			// Make sure the referral number is 5 or 6 characters long to be 
-			// valid in either bc or ontario.
-			if ((referralNo.length() == 6 || referralNo.length() == 5 ))
-				return true;
 			
 			// get oscar variables to check for billing region
 			java.util.Properties oscarVariables = oscar.OscarProperties.getInstance();
@@ -131,10 +126,19 @@ public class EctConAddSpecialistAction extends Action {
 				MiscUtils.getLogger().error("unable to obtain billingregion property from oscarVariables.");
 				return false;
 			}
-			
-			// Make sure Alberta case is handled. referral number is 9 characters
-			if (referralNo.length() == 9 && oscarVariables.getProperty("billregion").equals("AB"))
+			String region = oscarVariables.getProperty("billregion");
+
+			// Make sure Alberta case is handled. referral number is 9 characters in AB
+			if (region.equals("AB")){
+				if(referralNo.length() == 9)
+					return true;
+				return false;
+			}
+			// Make sure the referral number is 5 or 6 characters long to be 
+			// valid in either bc or ontario.
+			else if ((referralNo.length() == 6 || referralNo.length() == 5))
 				return true;
+		
 			
 		} catch (Exception e) {
 			MiscUtils.getLogger().info("Specified referral number invalid (" + referralNo + ")", e);
