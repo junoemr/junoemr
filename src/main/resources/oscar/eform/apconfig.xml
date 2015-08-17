@@ -124,6 +124,11 @@
         <ap-sql>SELECT date_of_birth, month_of_birth, year_of_birth FROM demographic WHERE demographic_no=${demographic}</ap-sql>
         <ap-output>${year_of_birth}/${month_of_birth}/${date_of_birth}</ap-output>
     </databaseap>
+    <databaseap>
+        <ap-name>dobc3</ap-name>
+        <ap-sql>SELECT date_of_birth, MONTHNAME(STR_TO_DATE(month_of_birth, '%m')) AS month_of_birth_full, year_of_birth FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+        <ap-output>${month_of_birth_full} ${date_of_birth}, ${year_of_birth}</ap-output>
+    </databaseap>
      <databaseap>
         <ap-name>dob_year</ap-name>
         <ap-sql>SELECT year_of_birth FROM demographic WHERE demographic_no=${demographic}</ap-sql>
@@ -264,9 +269,9 @@
     </databaseap>
     <databaseap>
         <ap-name>allergies_des</ap-name>
-        <ap-sql>SELECT IF ((SELECT COUNT(*) FROM allergies, demographic	WHERE ( demographic.demographic_no=${demographic} AND allergies.demographic_no=demographic.demographic_no AND allergies.archived=1))>0, 
-			CONCAT((SELECT GROUP_CONCAT(allergies.DESCRIPTION SEPARATOR ', ') FROM allergies, demographic WHERE demographic.demographic_no=${demographic} AND allergies.demographic_no=demographic.demographic_no AND allergies.archived != 1),' \n','archived allergies:',(SELECT GROUP_CONCAT(allergies.DESCRIPTION SEPARATOR ', ') FROM allergies, demographic WHERE demographic.demographic_no=${demographic} AND allergies.demographic_no=demographic.demographic_no AND allergies.archived = 1)), 
-			(SELECT GROUP_CONCAT(allergies.DESCRIPTION SEPARATOR ', ') FROM allergies, demographic WHERE demographic.demographic_no=${demographic} AND allergies.demographic_no=demographic.demographic_no AND allergies.archived != 1)) 
+        <ap-sql>SELECT IF ((SELECT COUNT(*) FROM allergies, demographic	WHERE ( demographic.demographic_no=${demographic} AND allergies.demographic_no=demographic.demographic_no AND allergies.archived=1))>0,
+			CONCAT((SELECT GROUP_CONCAT(allergies.DESCRIPTION SEPARATOR ', ') FROM allergies, demographic WHERE demographic.demographic_no=${demographic} AND allergies.demographic_no=demographic.demographic_no AND allergies.archived != 1),' \n','archived allergies:',(SELECT GROUP_CONCAT(allergies.DESCRIPTION SEPARATOR ', ') FROM allergies, demographic WHERE demographic.demographic_no=${demographic} AND allergies.demographic_no=demographic.demographic_no AND allergies.archived = 1)),
+			(SELECT GROUP_CONCAT(allergies.DESCRIPTION SEPARATOR ', ') FROM allergies, demographic WHERE demographic.demographic_no=${demographic} AND allergies.demographic_no=demographic.demographic_no AND allergies.archived != 1))
 			as allergy</ap-sql>
 		<ap-output>${allergy}</ap-output>
     </databaseap>
@@ -356,88 +361,132 @@
 		<ap-sql>
 			SELECT br.last_name, br.first_name
 			from (
-			select ExtractValue(family_doctor, '//rd') as original_name, 
-			ExtractValue(family_doctor, '//rdohip') as doctor_no, 
-			IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', trim(substr(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name 
-			from demographic 
+			select ExtractValue(family_doctor, '//rd') as original_name,
+			ExtractValue(family_doctor, '//rdohip') as doctor_no,
+			IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', trim(substr(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name
+			from demographic
 			where demographic_no = ${demographic}
 			) as q
 			left join billingreferral br ON if(q.doctor_no is not null and q.doctor_no > 0, q.doctor_no = br.referral_no, coalesce(lcase(substr(br.first_name,1,1)) = lcase(substr(if(locate(' ', q.full_name) != 0, substring_index(q.full_name, ' ', 1), null),1,1)), true)
 			and lcase(br.last_name) = lcase(substring_index(q.full_name, ' ', -1))) group by 1 having COUNT(*) = 1</ap-sql>
         <ap-output>${last_name}, ${first_name}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>referral_fullname</ap-name>
+        <ap-sql>
+            SELECT br.last_name, br.first_name
+            from (
+            select ExtractValue(family_doctor, '//rd') as original_name,
+            ExtractValue(family_doctor, '//rdohip') as doctor_no,
+            IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', trim(substr(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name
+            from demographic
+            where demographic_no = ${demographic}
+            ) as q
+            left join billingreferral br ON if(q.doctor_no is not null and q.doctor_no > 0, q.doctor_no = br.referral_no, coalesce(lcase(substr(br.first_name,1,1)) = lcase(substr(if(locate(' ', q.full_name) != 0, substring_index(q.full_name, ' ', 1), null),1,1)), true)
+            and lcase(br.last_name) = lcase(substring_index(q.full_name, ' ', -1))) group by 1 having COUNT(*) = 1</ap-sql>
+        <ap-output>${first_name} ${last_name}</ap-output>
     </databaseap>
     <databaseap>
         <ap-name>referral_last_name</ap-name>
 		<ap-sql>
 			SELECT br.last_name
 			from (
-			select ExtractValue(family_doctor, '//rd') as original_name, 
-			ExtractValue(family_doctor, '//rdohip') as doctor_no, 
-			IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', trim(substr(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name 
-			from demographic 
+			select ExtractValue(family_doctor, '//rd') as original_name,
+			ExtractValue(family_doctor, '//rdohip') as doctor_no,
+			IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', trim(substr(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name
+			from demographic
 			where demographic_no = ${demographic}
 			) as q
 			left join billingreferral br ON if(q.doctor_no is not null and q.doctor_no > 0, q.doctor_no = br.referral_no, coalesce(lcase(substr(br.first_name,1,1)) = lcase(substr(if(locate(' ', q.full_name) != 0, substring_index(q.full_name, ' ', 1), null),1,1)), true)
 			and lcase(br.last_name) = lcase(substring_index(q.full_name, ' ', -1))) group by 1 having COUNT(*) = 1</ap-sql>
-        <ap-output>${last_name}, ${first_name}</ap-output>
+        <ap-output>${last_name}</ap-output>
     </databaseap>
     <databaseap>
         <ap-name>referral_address</ap-name>
-		<ap-sql>                                                                
-            SELECT  CONCAT(br.address1,if(length(br.address2) > 0 and br.address2 is not null,concat(', ',br.address2),''),', ',br.city,', ',br.province,', ',br.country,', ',br.postal) AS raddress                                 
-            from (                                                              
-            select ExtractValue(family_doctor, '//rd') as original_name,        
-            ExtractValue(family_doctor, '//rdohip') as doctor_no,               
+		<ap-sql>
+            SELECT  CONCAT(br.address1,if(length(br.address2) > 0 and br.address2 is not null,concat(', ',br.address2),''),', ',br.city,', ',br.province,', ',br.country,', ',br.postal) AS raddress
+            from (
+            select ExtractValue(family_doctor, '//rd') as original_name,
+            ExtractValue(family_doctor, '//rdohip') as doctor_no,
             IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', trim(substr(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name
-            from demographic                                                    
-            where demographic_no = ${demographic}                            
-            ) as q                                                              
+            from demographic
+            where demographic_no = ${demographic}
+            ) as q
             left join billingreferral br ON if(q.doctor_no is not null and q.doctor_no > 0, q.doctor_no = br.referral_no, coalesce(lcase(substr(br.first_name,1,1)) = lcase(substr(if(locate(' ', q.full_name) != 0, substring_index(q.full_name, ' ', 1), null),1,1)), true)
             and lcase(br.last_name) = lcase(substring_index(q.full_name, ' ', -1))) group by 1 having COUNT(*) = 1</ap-sql>
                 <ap-output>${raddress}</ap-output>
     </databaseap>
     <databaseap>
-        <ap-name>referral_phone</ap-name>
-		<ap-sql>                                                                
-            SELECT  br.phone                                 
-            from (                                                              
-            select ExtractValue(family_doctor, '//rd') as original_name,        
-            ExtractValue(family_doctor, '//rdohip') as doctor_no,               
+        <ap-name>referral_addressline</ap-name>
+        <ap-sql>
+            SELECT CONCAT(br.address1,if(length(br.address2) > 0 and br.address2 is not null,concat(', ',br.address2),'')) AS raddressline
+            from (
+            select ExtractValue(family_doctor, '//rd') as original_name,
+            ExtractValue(family_doctor, '//rdohip') as doctor_no,
             IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', trim(substr(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name
-            from demographic                                                    
-            where demographic_no = ${demographic}                            
-            ) as q                                                              
+            from demographic
+            where demographic_no = ${demographic}
+            ) as q
+            left join billingreferral br ON if(q.doctor_no is not null and q.doctor_no > 0, q.doctor_no = br.referral_no, coalesce(lcase(substr(br.first_name,1,1)) = lcase(substr(if(locate(' ', q.full_name) != 0, substring_index(q.full_name, ' ', 1), null),1,1)), true)
+            and lcase(br.last_name) = lcase(substring_index(q.full_name, ' ', -1))) group by 1 having COUNT(*) = 1</ap-sql>
+                <ap-output>${raddressline}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>referral_cityprovpost</ap-name>
+        <ap-sql>
+            SELECT  CONCAT(br.city, ', ', br.province, ' ', br.postal) AS raddresscityprovpost
+            from (
+            select ExtractValue(family_doctor, '//rd') as original_name,
+            ExtractValue(family_doctor, '//rdohip') as doctor_no,
+            IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', trim(substr(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name
+            from demographic
+            where demographic_no = ${demographic}
+            ) as q
+            left join billingreferral br ON if(q.doctor_no is not null and q.doctor_no > 0, q.doctor_no = br.referral_no, coalesce(lcase(substr(br.first_name,1,1)) = lcase(substr(if(locate(' ', q.full_name) != 0, substring_index(q.full_name, ' ', 1), null),1,1)), true)
+            and lcase(br.last_name) = lcase(substring_index(q.full_name, ' ', -1))) group by 1 having COUNT(*) = 1</ap-sql>
+                <ap-output>${raddresscityprovpost}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>referral_phone</ap-name>
+		<ap-sql>
+            SELECT  br.phone
+            from (
+            select ExtractValue(family_doctor, '//rd') as original_name,
+            ExtractValue(family_doctor, '//rdohip') as doctor_no,
+            IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', trim(substr(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name
+            from demographic
+            where demographic_no = ${demographic}
+            ) as q
             left join billingreferral br ON if(q.doctor_no is not null and q.doctor_no > 0, q.doctor_no = br.referral_no, coalesce(lcase(substr(br.first_name,1,1)) = lcase(substr(if(locate(' ', q.full_name) != 0, substring_index(q.full_name, ' ', 1), null),1,1)), true)
             and lcase(br.last_name) = lcase(substring_index(q.full_name, ' ', -1))) group by 1 having COUNT(*) = 1</ap-sql>
         <ap-output>${phone}</ap-output>
     </databaseap>
     <databaseap>
         <ap-name>referral_fax</ap-name>
-		<ap-sql>                                                                
-            SELECT  br.fax                                 
-            from (                                                              
-            select ExtractValue(family_doctor, '//rd') as original_name,        
-            ExtractValue(family_doctor, '//rdohip') as doctor_no,               
+		<ap-sql>
+            SELECT  br.fax
+            from (
+            select ExtractValue(family_doctor, '//rd') as original_name,
+            ExtractValue(family_doctor, '//rdohip') as doctor_no,
             IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', trim(substr(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name
-            from demographic                                                    
-            where demographic_no = ${demographic}                            
-            ) as q                                                              
+            from demographic
+            where demographic_no = ${demographic}
+            ) as q
             left join billingreferral br ON if(q.doctor_no is not null and q.doctor_no > 0, q.doctor_no = br.referral_no, coalesce(lcase(substr(br.first_name,1,1)) = lcase(substr(if(locate(' ', q.full_name) != 0, substring_index(q.full_name, ' ', 1), null),1,1)), true)
             and lcase(br.last_name) = lcase(substring_index(q.full_name, ' ', -1))) group by 1 having COUNT(*) = 1</ap-sql>
         <ap-output>${fax}</ap-output>
     </databaseap>
     <databaseap>
->>>>>>> Updated the eform queries to work with billingreferral and made it so
 		<ap-name>referral_no</ap-name>
-		<ap-sql>                                                                
-            SELECT  br.referral_no                                 
-            from (                                                              
-            select ExtractValue(family_doctor, '//rd') as original_name,        
-            ExtractValue(family_doctor, '//rdohip') as doctor_no,               
+		<ap-sql>
+            SELECT  br.referral_no
+            from (
+            select ExtractValue(family_doctor, '//rd') as original_name,
+            ExtractValue(family_doctor, '//rdohip') as doctor_no,
             IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', trim(substr(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name
-            from demographic                                                    
-            where demographic_no = ${demographic}                            
-            ) as q                                                              
+            from demographic
+            where demographic_no = ${demographic}
+            ) as q
             left join billingreferral br ON if(q.doctor_no is not null and q.doctor_no > 0, q.doctor_no = br.referral_no, coalesce(lcase(substr(br.first_name,1,1)) = lcase(substr(if(locate(' ', q.full_name) != 0, substring_index(q.full_name, ' ', 1), null),1,1)), true)
             and lcase(br.last_name) = lcase(substring_index(q.full_name, ' ', -1))) group by 1 having COUNT(*) = 1</ap-sql>
 		<ap-output>${referral_no}</ap-output>
@@ -598,7 +647,7 @@
        </ap-sql>
         <ap-output>${prevention_date}</ap-output>
     </databaseap>
- 
+
     <databaseap>
         <ap-name>mammogram_immunization_date</ap-name>
         <ap-sql>select prevention_date from preventions p where p.prevention_type = 'MAM' and p.deleted = '0' and p.demographic_no = ${demographic} order by p.prevention_date desc limit 1
@@ -659,8 +708,8 @@
     </databaseap>
     <databaseap>
         <ap-name>ps_referral_address</ap-name>
-		<ap-sql>                                                                
-			SELECT ps.address AS raddress FROM 
+		<ap-sql>
+			SELECT ps.address AS raddress FROM
 			(
 				SELECT ExtractValue(family_doctor, '//rd') AS original_name,
 				  ExtractValue(family_doctor, '//rdohip') AS doctor_no,
@@ -673,20 +722,20 @@
     </databaseap>
     <databaseap>
         <ap-name>ps_referral_phone</ap-name>
-		<ap-sql>                                                                
-			SELECT ps.phone FROM (                                                              
+		<ap-sql>
+			SELECT ps.phone FROM (
 				  SELECT ExtractValue(family_doctor, '//rd') AS original_name,
 				  ExtractValue(family_doctor, '//rdohip') AS doctor_no,
 				  IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', TRIM(SUBSTR(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name
 				  FROM demographic
-				  WHERE demographic_no = ${demographic}                            
+				  WHERE demographic_no = ${demographic}
 			) as q LEFT JOIN professionalSpecialists ps ON if(q.doctor_no IS NOT NULL and q.doctor_no > 0, q.doctor_no = ps.referralNo, COALESCE(LCASE(SUBSTR(ps.fName,1,1)) = LCASE(SUBSTR(if(locate(' ', q.full_name) != 0, SUBSTRING_INDEX(q.full_name, ' ', 1), null),1,1)), true) and LCASE(ps.lName) = LCASE(substring_index(q.full_name, ' ', -1))) GROUP BY 1 HAVING COUNT(*) = 1
 		</ap-sql>
         <ap-output>${phone}</ap-output>
     </databaseap>
     <databaseap>
         <ap-name>ps_referral_fax</ap-name>
-		<ap-sql>                                                                
+		<ap-sql>
 			SELECT ps.fax FROM (
 				SELECT ExtractValue(family_doctor, '//rd') AS original_name,
 					  ExtractValue(family_doctor, '//rdohip') AS doctor_no,
@@ -698,10 +747,9 @@
         <ap-output>${fax}</ap-output>
     </databaseap>
     <databaseap>
->>>>>>> Updated the eform queries to work with billingreferral and made it so
 		<ap-name>ps_referral_no</ap-name>
 		<ap-sql>
-			SELECT ps.referralNo FROM (        
+			SELECT ps.referralNo FROM (
 				SELECT ExtractValue(family_doctor, '//rd') AS original_name,
 					  ExtractValue(family_doctor, '//rdohip') AS doctor_no,
 					  IF(ExtractValue(family_doctor, '//rd') regexp '^Dr.', TRIM(SUBSTR(ExtractValue(family_doctor, '//rd') from 4)), ExtractValue(family_doctor, '//rd') ) as full_name
@@ -711,7 +759,7 @@
 		</ap-sql>
 		<ap-output>${referralNo}</ap-output>
 	</databaseap>
-	<!-- family doctor --> 
+	<!-- family doctor -->
     <databaseap>
         <ap-name>family_doctor_name</ap-name>
 		<ap-sql>
@@ -744,8 +792,8 @@
     </databaseap>
     <databaseap>
         <ap-name>family_doctor_address</ap-name>
-		<ap-sql>                                                                
-			SELECT ps.address AS raddress FROM 
+		<ap-sql>
+			SELECT ps.address AS raddress FROM
 			(
 				  SELECT ExtractValue(family_doctor_2, '//fdname') AS original_name,
 				  ExtractValue(family_doctor_2, '//fd') AS doctor_no,
@@ -758,8 +806,8 @@
     </databaseap>
     <databaseap>
         <ap-name>family_doctor_phone</ap-name>
-		<ap-sql>                                                                
-			SELECT ps.phone FROM (                                                              
+		<ap-sql>
+			SELECT ps.phone FROM (
 				  SELECT ExtractValue(family_doctor_2, '//fdname') AS original_name,
 				  ExtractValue(family_doctor_2, '//fd') AS doctor_no,
 				  IF(ExtractValue(family_doctor_2, '//rd') regexp '^Dr.', TRIM(substr(ExtractValue(family_doctor_2, '//rd') from 4)), ExtractValue(family_doctor_2, '//fdname') ) as full_name
@@ -771,7 +819,7 @@
     </databaseap>
     <databaseap>
         <ap-name>family_doctor_fax</ap-name>
-		<ap-sql>                                                                
+		<ap-sql>
 			SELECT ps.fax FROM (
 				  SELECT ExtractValue(family_doctor_2, '//fdname') AS original_name,
 				  ExtractValue(family_doctor_2, '//fd') AS doctor_no,
@@ -783,10 +831,9 @@
         <ap-output>${fax}</ap-output>
     </databaseap>
     <databaseap>
->>>>>>> Updated the eform queries to work with billingreferral and made it so
 		<ap-name>family_doctor_no</ap-name>
 		<ap-sql>
-			SELECT ps.referralNo FROM (        
+			SELECT ps.referralNo FROM (
 				  SELECT ExtractValue(family_doctor_2, '//fdname') AS original_name,
 				  ExtractValue(family_doctor_2, '//fd') AS doctor_no,
 				  IF(ExtractValue(family_doctor_2, '//rd') regexp '^Dr.', TRIM(substr(ExtractValue(family_doctor_2, '//rd') from 4)), ExtractValue(family_doctor_2, '//fdname') ) as full_name
@@ -796,7 +843,7 @@
 		</ap-sql>
 		<ap-output>${referralNo}</ap-output>
 	</databaseap>
-	<!-- end family doctor --> 
+	<!-- end family doctor -->
 
 </eformap-config>
 
