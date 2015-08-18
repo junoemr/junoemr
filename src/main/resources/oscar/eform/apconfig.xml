@@ -404,7 +404,13 @@
     <databaseap>
         <ap-name>referral_address</ap-name>
 		<ap-sql>
-            SELECT  CONCAT(br.address1,if(length(br.address2) > 0 and br.address2 is not null,concat(', ',br.address2),''),', ',br.city,', ',br.province,', ',br.country,', ',br.postal) AS raddress
+            SELECT  CONCAT(
+            	if(br.address1 is not null, br.address1, ''),
+            	if(length(br.address2) > 0 and br.address2 is not null,concat(', ',br.address2),''),
+            	if(br.city is not null,concat(', ',br.city),''),
+            	if(br.province is not null,concat(', ',br.province),''),
+            	if(br.country is not null,concat(', ',br.country),''),
+            	if(br.postal is not null,concat(', ',br.postal),'')) AS raddress
             from (
             select ExtractValue(family_doctor, '//rd') as original_name,
             ExtractValue(family_doctor, '//rdohip') as doctor_no,
