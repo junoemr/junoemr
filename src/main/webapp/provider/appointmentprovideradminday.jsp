@@ -1121,9 +1121,15 @@ java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.stru
 </td>
 
 <form method="post" name="findprovider" onSubmit="findProvider(<%=year%>,<%=month%>,<%=day%>);return false;" target="apptReception" action="receptionistfindprovider.jsp">
+
+<!-- top right menu bar links -->
 <td align="right" valign="bottom">
+
+<a href=# onClick="popupPage(700,1024,'<%=resourcebaseurl%>')">
+<img src="<%=request.getContextPath()%>/images/notepad.gif" border="0" align="absbottom" title="Help"></a>
+
 <caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
-| <a href=# onClick ="popupPage(600,750,'<%=resourcebaseurl%>')"><bean:message key="global.help"/></a>
+  <a href=# onClick ="popupPage(700,1024,'<%=resourcebaseurl%>')"><bean:message key="global.help"/></a>
 </caisi:isModuleLoad>
 
 <caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
@@ -1136,7 +1142,7 @@ java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.stru
 
 	| <a href="../logout.jsp"><bean:message key="global.btnLogout"/>&nbsp;</a>
 
-</td>
+</td> <!-- end top right menu bar links -->
 </form>
 
 </tr>
@@ -2198,7 +2204,7 @@ document.onkeydown=function(e){
 			case <bean:message key="global.billingShortcut"/> : popupOscarRx(600,1024,'../billing/CA/<%=prov%>/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;  //code for 'B'illing
 			case <bean:message key="global.calendarShortcut"/> : popupOscarRx(425,430,'../share/CalendarPopup.jsp?urlfrom=../provider/providercontrol.jsp&year=<%=strYear%>&month=<%=strMonth%>&param=<%=URLEncoder.encode("&view=0&displaymode=day&dboperation=searchappointmentday","UTF-8")%>');  return false;  //run code for 'C'alendar
 			case <bean:message key="global.edocShortcut"/> : popupOscarRx('700', '1024', '../dms/documentReport.jsp?function=provider&functionid=<%=curUser_no%>&curUser=<%=curUser_no%>', 'edocView');  return false;  //run code for e'D'oc
- 			case <bean:message key="global.helpShortcut"/> : popupOscarRx(600,750,'<%=resourcebaseurl%>');  return false;  //run code for 'H'elp
+ 			case <bean:message key="global.helpShortcut"/> : popupOscarRx(700,1024,'<%=resourcebaseurl%>');  return false;  //run code for 'H'elp
 			case <bean:message key="global.ticklerShortcut"/> : {
 				<caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
 					popupOscarRx(700,1024,'../tickler/ticklerMain.jsp','<bean:message key="global.tickler"/>') //run code for t'I'ckler
