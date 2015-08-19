@@ -1123,16 +1123,16 @@ java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.stru
 <form method="post" name="findprovider" onSubmit="findProvider(<%=year%>,<%=month%>,<%=day%>);return false;" target="apptReception" action="receptionistfindprovider.jsp">
 <td align="right" valign="bottom">
 <caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
+| <a href=# onClick ="popupPage(600,750,'<%=resourcebaseurl%>')"><bean:message key="global.help"/></a>
+</caisi:isModuleLoad>
+
+<caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
 <INPUT TYPE="text" NAME="providername" VALUE="" WIDTH="2" HEIGHT="10" border="0" size="10" maxlength="10">
 <INPUT TYPE="SUBMIT" NAME="Go" VALUE='<bean:message key="receptionist.appointmentreceptionistadminday.btnGo"/>' onClick="findProvider(<%=year%>,<%=month%>,<%=day%>);return false;">
 &nbsp;&nbsp;
 </caisi:isModuleLoad>
 
   	| <a href="javascript: function myFunction() {return false; }" onClick="popup(700,1024,'../scratch/index.jsp','scratch')"><span id="oscar_scratch"></span></a>&nbsp;
-
-	<caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
-	| <a href=# onClick ="popupPage(600,750,'<%=resourcebaseurl%>')"><bean:message key="global.help"/></a>
-	</caisi:isModuleLoad>
 
 	| <a href="../logout.jsp"><bean:message key="global.btnLogout"/>&nbsp;</a>
 
