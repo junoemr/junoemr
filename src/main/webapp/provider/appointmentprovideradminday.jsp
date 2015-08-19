@@ -1126,7 +1126,7 @@ java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.stru
 <td align="right" valign="bottom">
 
 <a href=# onClick="popupPage(700,1024,'<%=resourcebaseurl%>')">
-<img src="<%=request.getContextPath()%>/images/notepad.gif" border="0" align="absbottom" title="Help"></a>
+<img src="<%=request.getContextPath()%>/images/life-buoy-icon-small.png" border="0" align="absbottom" title="Help"></a>
 
 <caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
   <a href=# onClick ="popupPage(700,1024,'<%=resourcebaseurl%>')"><bean:message key="global.help"/></a>
