@@ -58,6 +58,12 @@ A:Hover {
 	text-decoration: none;
 	color: red;
 }
+#helpLink {
+	color: #a40000;
+}
+#helpLink:Hover {
+	color: red;
+}
 
 input,select,textarea {
 	font-size: 11px;
