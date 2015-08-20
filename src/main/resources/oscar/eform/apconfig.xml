@@ -404,7 +404,13 @@
     <databaseap>
         <ap-name>referral_address</ap-name>
 		<ap-sql>
-            SELECT  CONCAT(br.address1,if(length(br.address2) > 0 and br.address2 is not null,concat(', ',br.address2),''),', ',br.city,', ',br.province,', ',br.country,', ',br.postal) AS raddress
+            SELECT  CONCAT(
+            	if(br.address1 is not null, br.address1, ''),
+            	if(length(br.address2) > 0 and br.address2 is not null,concat(', ',br.address2),''),
+            	if(br.city is not null,concat(', ',br.city),''),
+            	if(br.province is not null,concat(', ',br.province),''),
+            	if(br.country is not null,concat(', ',br.country),''),
+            	if(br.postal is not null,concat(', ',br.postal),'')) AS raddress
             from (
             select ExtractValue(family_doctor, '//rd') as original_name,
             ExtractValue(family_doctor, '//rdohip') as doctor_no,
@@ -565,14 +571,14 @@
         <ap-name>_eform_values_first</ap-name>
         <ap-sql>SELECT var_value FROM eform_values WHERE var_name='${var_name}' AND fid=${fid}
                 AND demographic_no like '${eform_demographic}'
-                AND fdid IN (SELECT fdid FROM eform_data WHERE status=1) ORDER BY id LIMIT 1</ap-sql>
+                AND fdid IN (SELECT fdid FROM eform_data WHERE status=1) ORDER BY id+0 LIMIT 1</ap-sql>
         <ap-output>${var_value}</ap-output>
     </databaseap>
     <databaseap>
         <ap-name>_eform_values_last</ap-name>
         <ap-sql>SELECT var_value FROM eform_values WHERE var_name='${var_name}' AND fid=${fid}
                 AND demographic_no like '${eform_demographic}'
-                AND fdid IN (SELECT fdid FROM eform_data WHERE status=1) ORDER BY id DESC LIMIT 1</ap-sql>
+                AND fdid IN (SELECT fdid FROM eform_data WHERE status=1) ORDER BY id+0 DESC LIMIT 1</ap-sql>
         <ap-output>${var_value}</ap-output>
     </databaseap>
     <databaseap>
