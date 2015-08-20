@@ -694,7 +694,7 @@ public class Hl7textResultsData {
 			sql = sql + "LEFT JOIN patientLabRouting patLR ON (hl7.lab_no = patLR.lab_no AND patLR.lab_type = 'HL7') "
 				+ "LEFT JOIN demographic d ON (patLR.demographic_no = d.demographic_no ) "
 				+ "WHERE true "
-				+ "AND hl7.lab_no = (SELECT MAX(hl72.lab_no) FROM hl7TextInfo hl72 WHERE hl7.accessionNum = hl72.accessionNum) ";
+				+ "AND (hl7.accessionNum is null or hl7.lab_no = (SELECT MAX(hl72.lab_no) FROM hl7TextInfo hl72 WHERE hl7.accessionNum = hl72.accessionNum)) ";
 
 			if ("-1".equals(providerNo) || "".equals(providerNo)) {
 				// any provider
