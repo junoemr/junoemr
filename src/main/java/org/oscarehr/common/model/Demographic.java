@@ -1127,7 +1127,7 @@ public class Demographic implements Serializable {
      */
     public Provider getProvider() {
         return provider;
-}
+	}
 
     /**
      * @param provider the provider to set
@@ -1159,6 +1159,4 @@ public class Demographic implements Serializable {
 	public void setScannedChart(String scannedChart) {
 	    this.scannedChart = scannedChart;
     }
-
-
 }

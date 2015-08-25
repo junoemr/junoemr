@@ -72,4 +72,10 @@ public class DemographicCustDao extends AbstractDao<DemographicCust> {
         List<DemographicCust> results = query.getResultList();
         return results;
     }
+
+	/*
+	public void save(DemographicCust demographicCust){
+		this.getHibernateTemplate().saveOrUpdate(demographicCust);
+	}
+	*/
 }

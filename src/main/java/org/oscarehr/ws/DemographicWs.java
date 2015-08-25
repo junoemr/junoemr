@@ -26,6 +26,8 @@
 package org.oscarehr.ws;
 
 import javax.jws.WebService;
+//import javax.xml.ws.WebServiceContext;
+//import com.sun.net.httpserver.HttpExchange;
 
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.managers.DemographicManager;
@@ -36,6 +38,10 @@ import org.springframework.stereotype.Component;
 @WebService
 @Component
 public class DemographicWs extends AbstractWs {
+
+	//@Resource
+	//private WebServiceContext wsc;
+
 	@Autowired
 	private DemographicManager demographicManager;
 	
@@ -49,5 +55,54 @@ public class DemographicWs extends AbstractWs {
 	{
 		Demographic demographic=demographicManager.getDemographicByMyOscarUserName(myOscarUserName);
 		return(DemographicTransfer.toTransfer(demographic));
+	}
+
+	/**
+	 * @return the ID of the demographic just added
+	 */
+	public Integer addDemographic(DemographicTransfer demographicTransfer) 
+		throws Exception
+	{
+		/*
+		HttpExchange exchange = (HttpExchange) wsc.getMessageContext().get(JAXWSProperties.HTTP_EXCHANGE);
+		if(true)
+		{
+			throw new Exception("hello " + exchange.getRemoteAddress().getHostString());
+		}
+		*/
+
+		Demographic demographic = new Demographic();
+		demographicTransfer.copyTo(demographic);
+
+		if(demographic.getDemographicNo() != null)
+		{
+			Integer demo_no = demographic.getDemographicNo();
+
+			throw new Exception("Demographic " + demo_no + " already exists.");
+		}
+
+		demographicManager.addDemographic(demographic);
+		demographicManager.addDemographicExtras(demographic);
+
+		return(demographic.getDemographicNo());
+	}
+	
+	public void updateDemographic(DemographicTransfer demographicTransfer)
+		throws Exception
+	{
+		Demographic demographic = new Demographic();
+		demographicTransfer.copyTo(demographic);
+
+		Integer demo_no = demographic.getDemographicNo();
+
+		Demographic existingDemographic = 
+			demographicManager.getDemographic(demo_no);
+
+		if(existingDemographic == null)
+		{
+			throw new Exception("Demographic " + demo_no + " doesn't exist.");
+		}
+		
+		demographicManager.addDemographic(demographic);
 	}
 }
