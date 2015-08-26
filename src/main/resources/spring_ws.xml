@@ -22,6 +22,8 @@
 		</cxf:properties>
     	
         <cxf:inInterceptors>
+			<bean class="org.oscarehr.ws.IPInWSS4JInterceptor">
+			</bean>
 			<bean class="org.oscarehr.ws.AuthenticationInWSS4JInterceptor">
 				<property name="excludes">
 					<list>

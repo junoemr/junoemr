@@ -26,7 +26,10 @@
 package org.oscarehr.ws;
 
 import javax.jws.WebService;
-//import javax.xml.ws.WebServiceContext;
+import javax.annotation.Resource;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
+import javax.servlet.http.HttpServletRequest;
 //import com.sun.net.httpserver.HttpExchange;
 
 import org.oscarehr.common.model.Demographic;
@@ -35,12 +38,14 @@ import org.oscarehr.ws.transfer_objects.DemographicTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import oscar.log.LogAction;
+
 @WebService
 @Component
 public class DemographicWs extends AbstractWs {
 
-	//@Resource
-	//private WebServiceContext wsc;
+	@Resource
+	private WebServiceContext wsContext;
 
 	@Autowired
 	private DemographicManager demographicManager;
@@ -63,13 +68,10 @@ public class DemographicWs extends AbstractWs {
 	public Integer addDemographic(DemographicTransfer demographicTransfer) 
 		throws Exception
 	{
-		/*
-		HttpExchange exchange = (HttpExchange) wsc.getMessageContext().get(JAXWSProperties.HTTP_EXCHANGE);
-		if(true)
-		{
-			throw new Exception("hello " + exchange.getRemoteAddress().getHostString());
-		}
-		*/
+		MessageContext mc = wsContext.getMessageContext();
+		HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST); 
+		LogAction.addLogSynchronous("DemographicWs.addDemographic", 
+			"Client IP = " + req.getRemoteAddr());
 
 		Demographic demographic = new Demographic();
 		demographicTransfer.copyTo(demographic);
