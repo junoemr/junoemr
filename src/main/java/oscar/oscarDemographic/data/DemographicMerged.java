@@ -713,8 +713,12 @@ public class DemographicMerged {
             head = oscar.Misc.getString(rs, "merged_to");
 
         pstmt.close();
-        if (head != null)
+        if (head != null) {
+        	// prevent infinite looping if for some reason the entry links to itself
+        	if(head.equals(demographic_no))
+        		return demographic_no;
             head = getHead(head);
+        }
         else
             head = demographic_no;
 
