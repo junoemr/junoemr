@@ -48,6 +48,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Varies;
 import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
+
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
@@ -101,6 +102,10 @@ public class PATHL7Handler implements MessageHandler {
         //} catch (HL7Exception ex) {
         //    return ("");
         //}
+    }
+    
+    public String getLabUser() {
+    	return(msg.getMSH().getReceivingFacility().getNamespaceID().toString());
     }
 
     /*
@@ -169,6 +174,8 @@ public class PATHL7Handler implements MessageHandler {
         }
     }
 
+
+    
     public String getWorkPhone(){
         String phone = "";
         int i=0;
