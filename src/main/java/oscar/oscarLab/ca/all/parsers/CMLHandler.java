@@ -611,4 +611,8 @@ public class CMLHandler implements MessageHandler {
 
     	return "";
     }
+
+    public String getNteForPID() {
+	    return "";
+    }
 }

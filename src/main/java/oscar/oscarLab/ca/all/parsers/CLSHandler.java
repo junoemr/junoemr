@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -62,7 +62,7 @@ public class CLSHandler implements MessageHandler {
 	private ORU_R01 msg;
 
 	private Terser terser;
-	
+
 
 	public void init(String hl7Body) throws HL7Exception {
 		Parser p = new PipeParser();
@@ -88,8 +88,8 @@ public class CLSHandler implements MessageHandler {
 	}
 
 	public Date getMsgDateTime() {
-		try { 
-			String dateFormat = "yyyyMMddHHmmss"; 
+		try {
+			String dateFormat = "yyyyMMddHHmmss";
 			Date dateTime = UtilDateUtilities.StringToDate(get("/.MSH-7"), dateFormat);
 			return dateTime;
 		} catch (Exception e) {
@@ -113,15 +113,15 @@ public class CLSHandler implements MessageHandler {
 	public ORC getORC(int i) {
         return msg.getRESPONSE().getORDER_OBSERVATION(i).getORC();
 	}
-	
+
 	public OBX getOBX(int i, int ii) {
 		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(ii).getOBX();
 	}
-	
+
 	public NTE getNTE(int i, int j, int k) {
         return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k);
 	}
-	
+
 	public void insertOBR(ORU_R01_ORDER_OBSERVATION newOBR) {
 		try {
         	msg.getRESPONSE().insertORDER_OBSERVATION(newOBR, getOBRCount());
@@ -284,7 +284,7 @@ public class CLSHandler implements MessageHandler {
 		} catch(Exception e) {
 			return 0;
 		}
-				
+
 		return count;
 	}
 
@@ -636,7 +636,7 @@ public class CLSHandler implements MessageHandler {
 
 	/**
 	 * Gets the ordering provider name.
-	 * 
+	 *
 	 * @return
 	 * 		Returns the provider name or an empty string if it's not specified
 	 */
@@ -645,8 +645,8 @@ public class CLSHandler implements MessageHandler {
 	}
 
 	/**
-	 * Gets the ordering provider ID for matching provider with the correct inbox routing. 
-	 * 
+	 * Gets the ordering provider ID for matching provider with the correct inbox routing.
+	 *
 	 * @return
 	 * 		Returns the provider id or an empty string if it's not specified
 	 */
@@ -656,7 +656,7 @@ public class CLSHandler implements MessageHandler {
 
 	/**
 	 * Gets the date and time the specimen was collected
-	 * 
+	 *
 	 * @param i
 	 * 		Segment count
 	 * @return
@@ -682,4 +682,8 @@ public class CLSHandler implements MessageHandler {
 		}
 		return result;
 	}
+
+    public String getNteForPID() {
+	    return "";
+    }
 }
