@@ -41,10 +41,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.OtherIdManager;
 import org.oscarehr.common.dao.DemographicDao;
@@ -66,8 +64,8 @@ import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.HHSEmrDownloadHandler;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
-import oscar.oscarLab.ca.all.parsers.SpireHandler;
 import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
+import oscar.oscarLab.ca.all.parsers.SpireHandler;
 import oscar.util.UtilDateUtilities;
 
 public final class MessageUploader {
@@ -248,39 +246,39 @@ public final class MessageUploader {
 					search = "hso_no";
 				}
 				else if (type.equals("PATHL7")){
-					custom_lab_route= OscarProperties.getInstance().getProperty("custom_lab_route1");
-				}
+					//custom lab routing for excelleris labs
+					//Parses custom_lab_routeX properties (starting at 1)
+					//Property format: custom_lab_routeX=<excelleris_lab_account>,<provider_no>
+					custom_lab_route= OscarProperties.getInstance().getProperty("custom_lab_route1");	
 				
 				
-				/*This only works for excelleris labs*/
-				
-				String account;
-				String lab_user;
-				PreparedStatement pstmt;
-				ResultSet rs;
-				
-				PATHL7Handler handler = new PATHL7Handler();
-				handler.init(hl7Body);
-				
-				int k = 1;
-				boolean custom_route_enabled=false;
-				
-				while(custom_lab_route!=null&&!custom_lab_route.equals("")){
-					custom_route_enabled=true;
+					String account;
+					String lab_user;
+					PreparedStatement pstmt;
+					ResultSet rs;
 					
-					ArrayList<String> cust_route = new ArrayList<String>(Arrays.asList(custom_lab_route.split(",")));
-					account = cust_route.get(0);
-					ArrayList<String> to_provider = new ArrayList<String>(Arrays.asList(cust_route.get(1)));
+					PATHL7Handler handler = new PATHL7Handler();
+					handler.init(hl7Body);
 					
-					lab_user = handler.getLabUser();
-					if(lab_user.equals(account)) {
-						providerRouteReport(String.valueOf(insertID), to_provider, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, "provider_no", limit, orderByLength);
+					int k = 1;
+					boolean custom_route_enabled=false;
+					
+					while(custom_lab_route!=null&&!custom_lab_route.equals("")){
+						custom_route_enabled=true;
+						
+						ArrayList<String> cust_route = new ArrayList<String>(Arrays.asList(custom_lab_route.split(",")));
+						account = cust_route.get(0);
+						ArrayList<String> to_provider = new ArrayList<String>(Arrays.asList(cust_route.get(1)));
+						
+						lab_user = handler.getLabUser();
+						if(lab_user.equals(account)) {
+							providerRouteReport(String.valueOf(insertID), to_provider, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, "provider_no", limit, orderByLength);
+						}
+						
+						k++;
+						custom_lab_route= OscarProperties.getInstance().getProperty("custom_lab_route"+k);
 					}
-					
-					k++;
-					custom_lab_route= OscarProperties.getInstance().getProperty("custom_lab_route"+k);
 				}
-				
 				
 				if(!custom_route_enabled) {
 					String route_labs_to_provider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
