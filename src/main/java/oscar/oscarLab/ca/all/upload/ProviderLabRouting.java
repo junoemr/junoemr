@@ -86,7 +86,7 @@ public class ProviderLabRouting {
             String status = fr.getStatus(provider_no);
             ArrayList<ArrayList<String>> forwardProviders = fr.getProviders(provider_no);
             sql = "insert into providerLabRouting (provider_no, lab_no, status, lab_type) values('"+provider_no+"', '"+labId+"', '"+status+"', '"+labType+"')";
-
+            
             pstmt = conn.prepareStatement(sql);
             pstmt.executeUpdate();
 
