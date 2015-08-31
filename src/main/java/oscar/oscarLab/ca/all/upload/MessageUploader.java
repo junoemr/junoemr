@@ -224,6 +224,7 @@ public final class MessageUploader {
 				hl7TextInfoDao.persist(hl7TextInfo);
 			}
 
+			boolean custom_route_enabled=false;
 			String demProviderNo = patientRouteReport(insertID, lastName, firstName, sex, dob, hin, DbConnectionFilter.getThreadLocalDbConnection());
 			if(type.equals("OLIS_HL7") && demProviderNo.equals("0")) {
 				OLISSystemPreferencesDao olisPrefDao = (OLISSystemPreferencesDao)SpringUtils.getBean("OLISSystemPreferencesDao");
@@ -261,9 +262,7 @@ public final class MessageUploader {
 					PATHL7Handler handler = new PATHL7Handler();
 					handler.init(hl7Body);
 					
-					int k = 1;
-					boolean custom_route_enabled=false;
-					
+					int k = 1;					
 					while(custom_lab_route!=null&&!custom_lab_route.equals("")){
 						custom_route_enabled=true;
 						
