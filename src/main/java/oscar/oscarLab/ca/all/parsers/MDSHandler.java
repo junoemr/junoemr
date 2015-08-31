@@ -46,8 +46,8 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
 import org.oscarehr.util.MiscUtils;
 
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
+import oscar.util.UtilDateUtilities;
 
 /**
  *
@@ -797,6 +797,8 @@ public class MDSHandler implements MessageHandler {
 
     private String getOBXField(String field, int i, int j){
         ArrayList obxSegs = (ArrayList) obrGroups.get(i);
+        if(j < 0 || j>= obxSegs.size()) // indexOOB prevention
+        	return "";
         String obxSeg = (String) obxSegs.get(j);
 
         try{
