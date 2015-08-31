@@ -796,10 +796,10 @@ public class MDSHandler implements MessageHandler {
     }
 
     private String getOBXField(String field, int i, int j){
-        ArrayList obxSegs = (ArrayList) obrGroups.get(i);
-        if(j < 0 || j>= obxSegs.size()) // indexOOB prevention
+        ArrayList<String> obxSegs = (ArrayList<String>) obrGroups.get(i);
+        if(obxSegs == null || j < 0 || j>= obxSegs.size()) // bad cast & indexOOB prevention
         	return "";
-        String obxSeg = (String) obxSegs.get(j);
+        String obxSeg = obxSegs.get(j);
 
         try{
             return(getString(DynamicHapiLoaderUtils.terserGet(terser,obxSeg+"-"+field)));
