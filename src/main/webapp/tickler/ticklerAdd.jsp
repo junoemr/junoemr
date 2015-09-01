@@ -394,10 +394,10 @@ function changeSite(sel, cb) {
 			        	for (Map.Entry<String, String> entry : hash.entrySet()) {
 			            	ip = entry.getKey();
 			                provider = entry.getValue();
-			                if(provider.equals(proOHIP)&&ip.equals(request.getRemoteAddr()))
+			                if(provider.equals(proOHIP)&&ip.equals(request.getParameter("docIp")))
 			                {
 			                  selected = "selected";
-			          
+
 			                }
 			            }
 			         }

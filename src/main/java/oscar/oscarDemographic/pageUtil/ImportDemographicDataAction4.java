@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -1389,7 +1389,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                 //MEDICATIONS & TREATMENTS
                 MedicationsAndTreatments[] medArray = patientRec.getMedicationsAndTreatmentsArray();
                 String duration, quantity, dosage, special;
-                for (int i=0; i<medArray.length; i++) 
+                for (int i=0; i<medArray.length; i++)
                 {
                     Drug drug = new Drug();
                     drug.setCreateDate(new Date());
@@ -2100,7 +2100,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                                 observationDate = dateFPtoString(repR[i].getEventDateTime(), timeShiftInDays);
                                 updateDateTime = dateFPtoString(repR[i].getReceivedDateTime(), timeShiftInDays);
 
-                                docNum = EDocUtil.addDocument(demographicNo,docFileName,docDesc,"",docClass,docSubClass,contentType,observationDate,updateDateTime,docCreator,admProviderNo,reviewer,reviewDateTime,source,sourceFacility,null);
+                                docNum = EDocUtil.addDocument(demographicNo,docFileName,docDesc,"",docClass,docSubClass,contentType,observationDate,updateDateTime,docCreator,admProviderNo,reviewer,reviewDateTime,source,sourceFacility,null, request.getRemoteAddr());
                                 if (docNum==null) docNum = 0;
                                 if (binaryFormat) addOneEntry(REPORTBINARY);
                                 else addOneEntry(REPORTTEXT);
@@ -2895,9 +2895,9 @@ import cdsDt.PersonNameStandard.OtherNames;
     }
 
     /* This all seems very broken... Why would we only be interested in negative provider ids
-     * and why whould we greate a new provider then merge it instead of just using the 
+     * and why whould we greate a new provider then merge it instead of just using the
      * one we found. Removing it so the importer can match providers properly
-     
+
 		if (pd!=null) return updateExternalProvider(firstName, lastName, ohipNo, cpsoNo, pd);
 
 		//Write as a new provider

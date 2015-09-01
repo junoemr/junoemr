@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -72,7 +72,7 @@ public final class EfmpatientformlistSendPhrAction {
 
 		url.append(scheme);
 		url.append("://");
-		
+
 		// IMPORTANT : do not change the serverName to 127.0.0.1
 		// you can not do that because on virtual hosts or named hosts 127.0.0.1 may
 		// not resolve to the same webapp. You must use the serverName that maps properly
@@ -95,32 +95,32 @@ public final class EfmpatientformlistSendPhrAction {
 
 	/**
 	 * This method will take eforms and send them to a PHR.
-	 * 
+	 *
 	 * @return a list of documentIds it just added
 	 */
-	public ArrayList<String> sendEFormsToPhr(String[] eFormIds) {
+	public ArrayList<String> sendEFormsToPhr(String[] eFormIds, String ipAddress) {
 		// This is a 2 phase algorithm,
 		// 1) convert an eform to a pdf oscar document
 		// 2) send the pdf oscar document to the phr
 
 		ArrayList<String> docIds=new ArrayList<String>();
-		
+
 		for (String eFormId : eFormIds) {
 			try {
-				String newDocId=sendEformToPhr(Integer.parseInt(eFormId));
+				String newDocId=sendEformToPhr(Integer.parseInt(eFormId), ipAddress);
 				docIds.add(newDocId);
 			} catch (Exception e) {
 				logger.error("Error converting eform to oscar document. eformId="+eFormId, e);
 			}
 		}
-		
+
 		return(docIds);
 	}
 
 	/**
 	 * @return the new document id
 	 */
-	private String sendEformToPhr(int eFormId) throws Exception {
+	private String sendEformToPhr(int eFormId, String ipAddress) throws Exception {
 		File tempFile = null;
 
 		try {
@@ -135,7 +135,7 @@ public final class EfmpatientformlistSendPhrAction {
 			logger.debug("Writing pdf to : " + tempFile.getCanonicalPath());
 
 			// upload pdf to oscar docs
-			return(uploadToOscarDocuments(tempFile, "eform", "eform"));
+			return(uploadToOscarDocuments(tempFile, "eform", "eform", ipAddress));
 		} finally {
 			// we'll be nice and if debugging is enabled we'll leave the file lying around so you can see it.
 			if (tempFile != null && !logger.isDebugEnabled()) tempFile.delete();
@@ -145,10 +145,10 @@ public final class EfmpatientformlistSendPhrAction {
 	/**
 	 * @return the new documentId
 	 */
-	private String uploadToOscarDocuments(File file, String description, String type) throws Exception {
+	private String uploadToOscarDocuments(File file, String description, String type, String ipAddress) throws Exception {
 
 		String originalFileName = file.getName();
-		EDoc newDoc = new EDoc(description, type, originalFileName, "", providerNo, "", "", 'A', oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", clientId);
+		EDoc newDoc = new EDoc(description, type, originalFileName, "", providerNo, "", "", 'A', oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", clientId, ipAddress);
 		newDoc.setContentType("application/pdf");
 		String newFileName = newDoc.getFileName();
 

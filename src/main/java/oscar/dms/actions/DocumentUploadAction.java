@@ -42,16 +42,16 @@ import oscar.log.LogConst;
 import com.lowagie.text.pdf.PdfReader;
 
 public class DocumentUploadAction extends DispatchAction {
-	
+
 	private static Logger logger = MiscUtils.getLogger();
-	
+
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 								 HttpServletResponse response) throws Exception {
 		DocumentUploadForm fm = (DocumentUploadForm) form;
 
 		HashMap<String,Object>map = new HashMap<String,Object>();
 		FormFile docFile = fm.getFiledata();
-		if (docFile == null) { 
+		if (docFile == null) {
 			map.put("error", 4);
 		}
 		else {
@@ -61,15 +61,15 @@ public class DocumentUploadAction extends DispatchAction {
 			String providerId = request.getParameter("provider");
 
 			String responsibleId = user;
-			String use_responsible_string = 
-				request.getParameter("use_provider_as_responsible"); 
+			String use_responsible_string =
+				request.getParameter("use_provider_as_responsible");
 			if(null != use_responsible_string)
 			{
 				responsibleId = providerId;
 			}
 
 			EDoc newDoc = new EDoc("", "", fileName, "", user, responsibleId, fm.getSource(), 'A',
-								   oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1", 0);
+								   oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1", request.getRemoteAddr(), 0);
 			newDoc.setDocPublic("0");
 			fileName = newDoc.getFileName();
 			// save local file;
@@ -77,7 +77,7 @@ public class DocumentUploadAction extends DispatchAction {
 				map.put("error", 4);
 				throw new FileNotFoundException();
 			}
-	
+
 			// write file to local dir
 			writeLocalFile(docFile, fileName);
 			newDoc.setContentType(docFile.getContentType());
@@ -89,13 +89,13 @@ public class DocumentUploadAction extends DispatchAction {
 			newDoc.setNumberOfPages(numberOfPages);
 			String doc_no = EDocUtil.addDocumentSQL(newDoc);
 			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
-	
-			if (providerId != null) { 
+
+			if (providerId != null) {
 				WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
 				ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) ctx.getBean("providerInboxRoutingDAO");
 				providerInboxRoutingDao.addToProviderInbox(providerId, doc_no, "DOC");
 			}
-	
+
 			String queueId=request.getParameter("queue");
 	        if (queueId !=null &&!queueId.equals("-1")) {
 	            WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
@@ -105,17 +105,17 @@ public class DocumentUploadAction extends DispatchAction {
 	            queueDocumentLinkDAO.addToQueueDocumentLink(qid,did);
 	            request.getSession().setAttribute("preferredQueue", queueId);
 	        }
-			
+
 	        map.put("name", docFile.getFileName());
 	        map.put("size", docFile.getFileSize());
-	        
+
 			if (docFile != null) {
 				docFile.destroy();
 				docFile = null;
 			}
 		}
 		JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = JSONObject.fromObject(map);        
+        JSONObject jsonObject = JSONObject.fromObject(map);
         jsonArray.add(jsonObject);
         response.getOutputStream().write(jsonArray.toString().getBytes());
 		return null;

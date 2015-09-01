@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -287,13 +287,13 @@ public class EFormUtil {
 		}
 		return (results);
 	}
-	
+
 	public static ArrayList<HashMap<String,? extends Object>> listPatientEFormsNoData(String demographic_no, String userRoles) {
 
 		Boolean current = true;
-		
+
 		List<Map<String,Object>> allEformDatas = eFormDataDao.findByDemographicIdCurrentPatientIndependentNoData(Integer.parseInt(demographic_no), current, false);
-		
+
 
 		ArrayList<HashMap<String, ? extends Object>> results = new ArrayList<HashMap<String, ? extends Object>>();
 		try {
@@ -326,14 +326,14 @@ public class EFormUtil {
 		}
 		return (results);
 	}
-	
+
 	public static ArrayList<HashMap<String,? extends Object>> loadEformsByFdis(List<Integer> ids) {
 
 		List<EFormData> allEformDatas = eFormDataDao.findByFdids(ids);
 
 		ArrayList<HashMap<String, ? extends Object>> results = new ArrayList<HashMap<String, ? extends Object>>();
 		try {
-			for (EFormData eFormData : allEformDatas) {				
+			for (EFormData eFormData : allEformDatas) {
 				HashMap<String, Object> curht = new HashMap<String, Object>();
 				curht.put("fdid", eFormData.getId().toString());
 				curht.put("fid", eFormData.getFormId().toString());
@@ -564,7 +564,7 @@ public class EFormUtil {
 	public static ArrayList<Hashtable<String,String>> getEFormGroups(String demographic_no) {
 		String sql;
 
-		sql = "SELECT group_name, sum(count) FROM (SELECT eform_groups.group_name, count(*)-1 AS 'count' FROM eform_groups LEFT JOIN eform_data ON eform_data.fid=eform_groups.fid WHERE eform_data.status=1 AND eform_data.demographic_no=" + demographic_no + " GROUP BY eform_groups.group_name UNION SELECT eg.group_name, count(*)-1 AS 'count' FROM eform_groups AS eg WHERE eg.fid = 0 GROUP BY eg.group_name) as sub_query GROUP BY group_name"; 
+		sql = "SELECT group_name, sum(count) FROM (SELECT eform_groups.group_name, count(*)-1 AS 'count' FROM eform_groups LEFT JOIN eform_data ON eform_data.fid=eform_groups.fid WHERE eform_data.status=1 AND eform_data.demographic_no=" + demographic_no + " GROUP BY eform_groups.group_name UNION SELECT eg.group_name, count(*)-1 AS 'count' FROM eform_groups AS eg WHERE eg.fid = 0 GROUP BY eg.group_name) as sub_query GROUP BY group_name";
 
 		ArrayList<Hashtable<String,String>> al = new ArrayList<Hashtable<String,String>>();
 		try {
@@ -677,7 +677,7 @@ public class EFormUtil {
 		return (results);
 	}
 
-	public static void writeEformTemplate(ArrayList<String> paramNames, ArrayList<String> paramValues, EForm eForm, String fdid, String programNo, String context_path) {
+	public static void writeEformTemplate(ArrayList<String> paramNames, ArrayList<String> paramValues, EForm eForm, String fdid, String programNo, String context_path, String ipAddress) {
 		String text = eForm != null ? eForm.getTemplate() : null;
 		if (blank(text)) return;
 
@@ -712,7 +712,7 @@ public class EFormUtil {
 			docText = putTemplateEformHtml(eForm.getFormHtml(), docText);
 
                         if (NumberUtils.isDigits(docOwner)) {
-                            EDoc edoc = new EDoc(docDesc,"forms","html",docText,docOwner,eForm.getProviderNo(),"",'H',eForm.getFormDate().toString(),"",null,belong,docOwner);
+                            EDoc edoc = new EDoc(docDesc,"forms","html",docText,docOwner,eForm.getProviderNo(),"",'H',eForm.getFormDate().toString(),"",null,belong,docOwner, ipAddress);
                             edoc.setContentType("text/html");
                             edoc.setDocPublic("0");
                             EDocUtil.addDocumentSQL(edoc);
@@ -971,11 +971,11 @@ public class EFormUtil {
 		cmNote.setSigning_provider_no(providerNo);
 		cmNote.setSigned(true);
 		cmNote.setHistory("");
-		
+
 		SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-		SecRole doctorRole = secRoleDao.findByName("doctor");		
-		cmNote.setReporter_caisi_role(doctorRole.getId().toString());		
-		
+		SecRole doctorRole = secRoleDao.findByName("doctor");
+		cmNote.setReporter_caisi_role(doctorRole.getId().toString());
+
 		cmNote.setReporter_program_team("0");
 		cmNote.setProgram_no(programNo);
 		cmNote.setUuid(UUID.randomUUID().toString());
@@ -1128,7 +1128,7 @@ public class EFormUtil {
 		}
 		return sentWho;
 	}
-	
+
 	public static ArrayList<String> listRichTextLetterTemplates() {
 		String imagePath = OscarProperties.getInstance().getProperty("eform_image");
 		MiscUtils.getLogger().debug("Img Path: " + imagePath);

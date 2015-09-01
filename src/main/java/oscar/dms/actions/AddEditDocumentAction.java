@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -83,7 +83,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		int numberOfPages = 0;
 		String fileName = docFile.getFileName();
 		String user = (String) request.getSession().getAttribute("user");
-		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A', oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1", 0);
+		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A', oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1", request.getRemoteAddr(), 0);
 		newDoc.setDocPublic("0");
 		newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
 		fileName = newDoc.getFileName();
@@ -161,7 +161,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		FormFile docFile = fm.getDocFile();
 		String fileName = docFile.getFileName();
 		String user = (String) request.getSession().getAttribute("user");
-		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A', oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1");
+		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A', oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1", request.getRemoteAddr());
 		newDoc.setDocPublic("0");
 		newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
 		fileName = newDoc.getFileName();
@@ -201,7 +201,7 @@ public class AddEditDocumentAction extends DispatchAction {
 					redirect = new ActionRedirect(mapping.findForward("successAddEForm"));
 					// TODO: I can't figure out a way to easily get the document_no from addDocument() without significantly changing the function, so let's use this hack for now.
 					redirect.addParameter("document_no", EDocUtil.getLastDocumentNo());
-					redirect.addParameter("document_index", request.getParameter("document_index")); 
+					redirect.addParameter("document_index", request.getParameter("document_index"));
 					redirect.addParameter("document_description", fm.getDocDesc());
 				}
 				redirect.addParameter("docerrors", "docerrors"); // Allows the JSP to check if the document was just submitted
@@ -216,7 +216,7 @@ public class AddEditDocumentAction extends DispatchAction {
 					redirect.addParameter("updateParent", "true");
 				}
 
-				
+
 				return redirect;
 			} else {
 				request.setAttribute("function", request.getParameter("function"));
@@ -253,7 +253,7 @@ public class AddEditDocumentAction extends DispatchAction {
 			// original file name
 			String fileName1 = docFile.getFileName();
 
-			EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName1, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), "", "", fm.getFunction(), fm.getFunctionId());
+			EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName1, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), "", "", fm.getFunction(), fm.getFunctionId(), request.getRemoteAddr());
 			newDoc.setDocPublic(fm.getDocPublic());
 			newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
                         newDoc.setDocClass(fm.getDocClass());
@@ -281,14 +281,14 @@ public class AddEditDocumentAction extends DispatchAction {
 			if(fm.getAppointmentNo() != null && fm.getAppointmentNo().length()>0) {
 				newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
 			}
-			
+
 			// if the document was added in the context of a program
-		 	// If a new document type is added, include it in the database to create filters 
-		 	if (!EDocUtil.getDoctypes(fm.getFunction()).contains(fm.getDocType())){ 
+		 	// If a new document type is added, include it in the database to create filters
+		 	if (!EDocUtil.getDoctypes(fm.getFunction()).contains(fm.getDocType())){
 		 		EDocUtil.addDocTypeSQL(fm.getDocType(),fm.getFunction());
-		 	} 
-		 	
-			
+		 	}
+
+
 			// ---
 			String doc_no = EDocUtil.addDocumentSQL(newDoc);
 			if(ConformanceTestHelper.enableConformanceOnlyTestFeatures){
@@ -330,28 +330,28 @@ public class AddEditDocumentAction extends DispatchAction {
 				cmn.setSigned(true);
 				cmn.setSigning_provider_no("-1");
 				cmn.setProgram_no(prog_no);
-				
+
 				SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-				SecRole doctorRole = secRoleDao.findByName("doctor");		
+				SecRole doctorRole = secRoleDao.findByName("doctor");
 				cmn.setReporter_caisi_role(doctorRole.getId().toString());
-								
+
 				cmn.setReporter_program_team("0");
 				cmn.setPassword("NULL");
 				cmn.setLocked(false);
 				cmn.setHistory(strNote);
 				cmn.setPosition(0);
-				
+
 				Long note_id = cmm.saveNoteSimpleReturnID(cmn);
-				
+
 				// Debugging purposes on the live server
 				MiscUtils.getLogger().info("Document Note ID: "+note_id.toString());
-				 
+
 				// Add a noteLink to casemgmt_note_link
 				CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
 				cmnl.setTableName(CaseManagementNoteLink.DOCUMENT);
 				cmnl.setTableId(Long.parseLong(EDocUtil.getLastDocumentNo()));
 				cmnl.setNoteId(note_id);
-			
+
 				request.setAttribute("document_no", doc_no);
 				MiscUtils.getLogger().info(" document no"+doc_no);
 
@@ -395,7 +395,7 @@ public class AddEditDocumentAction extends DispatchAction {
 
 				}
 			}
-			EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), reviewerId, reviewDateTime, fm.getFunction(), fm.getFunctionId());
+			EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), reviewerId, reviewDateTime, fm.getFunction(), fm.getFunctionId(), request.getRemoteAddr());
 			newDoc.setSourceFacility(fm.getSourceFacility());
 			newDoc.setDocId(fm.getMode());
 			newDoc.setDocPublic(fm.getDocPublic());

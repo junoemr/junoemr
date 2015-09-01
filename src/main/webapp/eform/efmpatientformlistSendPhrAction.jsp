@@ -33,7 +33,7 @@ EfmpatientformlistSendPhrAction bean=new EfmpatientformlistSendPhrAction(request
 
 String clientId = request.getParameter("clientId");
 
-ArrayList<String> newDocIds=bean.sendEFormsToPhr(s);
+ArrayList<String> newDocIds=bean.sendEFormsToPhr(s, request.getRemoteAddr());
 
 StringBuilder sb=new StringBuilder();
 sb.append(request.getContextPath());

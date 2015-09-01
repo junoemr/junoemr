@@ -70,7 +70,7 @@ public class AddEFormAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
 		logger.debug("==================SAVING ==============");
-		
+
 		HttpSession se = request.getSession();
 
 		boolean fax = "true".equals(request.getParameter("faxEForm"));
@@ -193,7 +193,7 @@ public class AddEFormAction extends Action {
 			EForm prevForm = new EForm(prev_fdid);
 			if (prevForm!=null) {
 				sameform = curForm.getFormHtml().equals(prevForm.getFormHtml());
-			}			
+			}
 		}
 		if (!sameform) {
 			EFormDataDao eFormDataDao=(EFormDataDao)SpringUtils.getBean("EFormDataDao");
@@ -207,17 +207,17 @@ public class AddEFormAction extends Action {
 			if (eform_link!=null) {
 				se.setAttribute(eform_link, fdid);
 			}
-			
+
 			if (fax) {
 				request.setAttribute("fdid", fdid);
 				return(mapping.findForward("fax"));
 			}
-			
+
 			else if (print) {
 				request.setAttribute("fdid", fdid);
 				return(mapping.findForward("print"));
 			}
-			
+
 			else if(email){
 				request.setAttribute("fdid", fdid);
 				return(mapping.findForward("email"));
@@ -230,10 +230,10 @@ public class AddEFormAction extends Action {
 				String uri = request.getRequestURI();
 				path = path.substring(0, path.indexOf(uri));
 				path += request.getContextPath();
-	
-				EFormUtil.writeEformTemplate(paramNames, paramValues, curForm, fdid, program_no, path);
+
+				EFormUtil.writeEformTemplate(paramNames, paramValues, curForm, fdid, program_no, path, request.getRemoteAddr());
 			}
-			
+
 		}
 		else {
 			logger.debug("Warning! Form HTML exactly the same, new form data not saved.");
@@ -241,7 +241,7 @@ public class AddEFormAction extends Action {
 				request.setAttribute("fdid", prev_fdid);
 				return(mapping.findForward("fax"));
 			}
-			
+
 			else if (print) {
 				request.setAttribute("fdid", prev_fdid);
 				return(mapping.findForward("print"));
@@ -250,8 +250,8 @@ public class AddEFormAction extends Action {
 				return(mapping.findForward("email"));
 			}
 		}
-		
-		
+
+
 
 		return(mapping.findForward("close"));
 	}

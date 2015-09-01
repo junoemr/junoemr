@@ -92,7 +92,7 @@ public class SplitDocumentAction extends DispatchAction {
 			LoggedInInfo loggedInInfo=LoggedInInfo.loggedInInfo.get();
 
 
-			EDoc newDoc = new EDoc("","", newFilename, "", loggedInInfo.loggedInProvider.getProviderNo(), doc.getDoccreator(), "", 'A', oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1",0);
+			EDoc newDoc = new EDoc("","", newFilename, "", loggedInInfo.loggedInProvider.getProviderNo(), doc.getDoccreator(), "", 'A', oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1", request.getRemoteAddr(), 0);
 			newDoc.setDocPublic("0");
 			newDoc.setContentType("application/pdf");
 			newDoc.setNumberOfPages(newPdf.getNumberOfPages());

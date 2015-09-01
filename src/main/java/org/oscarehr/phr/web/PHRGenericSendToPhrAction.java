@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -132,12 +132,12 @@ public class PHRGenericSendToPhrAction extends DispatchAction {
         String labId = request.getParameter("labId");
         String subject = request.getParameter("subject");
         String message = request.getParameter("message");
-        
+
         DemographicData demographicData = new DemographicData();
         String recipientMyOscarUserName = demographicData.getDemographic(demographicNo).getMyOscarUserName();
         PHRAuthentication auth  = MyOscarUtils.getPHRAuthentication(request.getSession());
         Long recipientMyOscarUserId=MyOscarUtils.getMyOscarUserId(auth, recipientMyOscarUserName);
-        
+
         int recipientType = PHRDocument.TYPE_DEMOGRAPHIC;
 
         EDocFactory eDocFactory = new EDocFactory();
@@ -152,7 +152,7 @@ public class PHRGenericSendToPhrAction extends DispatchAction {
         EDocFactory.Status status = EDocFactory.Status.SENT;
         Date observationDate = new Date();
         String reviewerId = null;
-       
+
         EDocFactory.Module docModule = EDocFactory.Module.demographic;
         String docModuleId = demographicNo;
 
@@ -164,7 +164,7 @@ public class PHRGenericSendToPhrAction extends DispatchAction {
                 type = "lab";
                 fileName =  "labtophr";
                 description = subject;
-                newEDoc = eDocFactory.createEDoc(description, type, fileName, contentType, html, creatorId, responsibleId, source, status, observationDate, reviewerId, observationDate, docModule, docModuleId);
+                newEDoc = eDocFactory.createEDoc(description, type, fileName, contentType, html, creatorId, responsibleId, source, status, observationDate, reviewerId, observationDate, docModule, docModuleId, request.getRemoteAddr());
                 OutputStream os = newEDoc.getFileOutputStream();
                 LabPDFCreator labPDFCreator = new LabPDFCreator(request, os);
                 labPDFCreator.printPdf();
@@ -175,7 +175,7 @@ public class PHRGenericSendToPhrAction extends DispatchAction {
                 type = "others";
                 fileName =  "immunizationtophr";
                 description = subject;
-                newEDoc = eDocFactory.createEDoc(description, type, fileName, contentType, html, creatorId, responsibleId, source, status, observationDate, reviewerId, observationDate, docModule, docModuleId);
+                newEDoc = eDocFactory.createEDoc(description, type, fileName, contentType, html, creatorId, responsibleId, source, status, observationDate, reviewerId, observationDate, docModule, docModuleId, request.getRemoteAddr());
 
                 OutputStream os = newEDoc.getFileOutputStream();
                 PreventionPrintPdf preventionPrintPdf = new PreventionPrintPdf();
@@ -184,7 +184,7 @@ public class PHRGenericSendToPhrAction extends DispatchAction {
                 type = "others";
                 fileName =  "echarttophr";
                 description = subject;
-                newEDoc = eDocFactory.createEDoc(description, type, fileName, contentType, html, creatorId, responsibleId, source, status, observationDate, reviewerId, observationDate, docModule, docModuleId);
+                newEDoc = eDocFactory.createEDoc(description, type, fileName, contentType, html, creatorId, responsibleId, source, status, observationDate, reviewerId, observationDate, docModule, docModuleId, request.getRemoteAddr());
 
                 OutputStream os = newEDoc.getFileOutputStream();
 
@@ -211,15 +211,15 @@ public class PHRGenericSendToPhrAction extends DispatchAction {
 			XmlUtils.appendChildToRoot(doc, "MimeType", eDoc.getContentType());
 			XmlUtils.appendChildToRoot(doc, "Data", eDoc.getFileBytes());
 			String docAsString=XmlUtils.toString(doc, false);
-			
+
 			MedicalDataWs medicalDataWs = MyOscarServerWebServicesManager.getMedicalDataWs(auth.getMyOscarUserId(), auth.getMyOscarPassword());
-			
+
 			DemographicDao demographicDao=(DemographicDao) SpringUtils.getBean("demographicDao");
 			Demographic demographic=demographicDao.getDemographic(demographicNo);
 			Long patientMyOscarUserId=MyOscarUtils.getMyOscarUserId(auth, demographic.getMyOscarUserName());
 			GregorianCalendar dateOfData=new GregorianCalendar();
 			if (eDoc.getDateTimeStampAsDate()!=null) dateOfData.setTime(eDoc.getDateTimeStampAsDate());
-			
+
 			MedicalDataTransfer3 medicalDataTransfer=new MedicalDataTransfer3();
 			medicalDataTransfer.setActive(true);
 			medicalDataTransfer.setCompleted(true);
@@ -232,9 +232,9 @@ public class PHRGenericSendToPhrAction extends DispatchAction {
 			medicalDataTransfer.setObserverOfDataPersonName(loggedInInfo.loggedInProvider.getFormattedName());
 			medicalDataTransfer.setOriginalSourceId(loggedInInfo.currentFacility.getName()+":eDoc:"+eDoc.getDocId());
 			medicalDataTransfer.setOwningPersonId(patientMyOscarUserId);
-						
+
 			Long medicalDataId=medicalDataWs.addMedicalData3(medicalDataTransfer);
-			
+
 			// log the send
 			RemoteDataLogDao remoteDataLogDao=(RemoteDataLogDao) SpringUtils.getBean("remoteDataLogDao");
 			RemoteDataLog remoteDataLog=new RemoteDataLog();
@@ -250,9 +250,9 @@ public class PHRGenericSendToPhrAction extends DispatchAction {
 
 			//--- send annotations ---
 			medicalDataWs.addMedicalDataAnnotation2(patientMyOscarUserId, medicalDataId, message);
-			
+
 			return mapping.findForward("loginPage");
-            
+
         } catch (Exception e) {
             logger.error("Could not send document to PHR", e);
             request.setAttribute("error_msg", "Error: " + e.getMessage());

@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -41,26 +41,28 @@ import oscar.oscarDemographic.data.DemographicNameAgeString;
  * This class is used to forward to the add tickler screen with the demographic preselected
  * @author jay
  */
-public class ForwardDemographicTicklerAction extends Action {  
+public class ForwardDemographicTicklerAction extends Action {
     /** Creates a new instance of ForwardDemographicTicklerAction */
     public ForwardDemographicTicklerAction() {
     }
-    
+
     public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response){
        String demoNo = request.getParameter("demographic_no");
        if ( demoNo != null  && new Integer(demoNo) >= 0){
           Hashtable h = DemographicNameAgeString.getInstance().getNameAgeSexHashtable(demoNo);
           request.setAttribute("demographic_no", demoNo);
           request.setAttribute("demoName", ""+h.get("lastName")+", "+h.get("firstName"));
-          
+
           String docType = request.getParameter("docType");
           String docId = request.getParameter("docId");
-          
+          String docIp = request.getParameter("docIp");
+
           request.setAttribute("docType", docType);
           request.setAttribute("docId", docId);
-          
-          
+          request.setAttribute("docIp", docIp);
+
+
        }
-       return mapping.findForward("success");   
-    }     
+       return mapping.findForward("success");
+    }
 }

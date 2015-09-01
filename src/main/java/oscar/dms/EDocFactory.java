@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,12 +54,12 @@ public class EDocFactory {
         demographic, provider;
     }
 
-    public EDoc createEDoc(String description, String type, String fileName, String contentType, String html, String creatorId, String responsibleId, String source, Status status, Date observationDate, String reviewerId, Date reviewDateTime, Module module, String moduleId) {
+    public EDoc createEDoc(String description, String type, String fileName, String contentType, String html, String creatorId, String responsibleId, String source, Status status, Date observationDate, String reviewerId, Date reviewDateTime, Module module, String moduleId, String ipAddress) {
         SimpleDateFormat reviewDateTimeFormat = new SimpleDateFormat(EDocUtil.REVIEW_DATETIME_FORMAT);
         SimpleDateFormat observationDateFormat = new SimpleDateFormat(EDocUtil.DMS_DATE_FORMAT);
         String reviewDateTimeStr = reviewDateTimeFormat.format(reviewDateTime);
         String observationDateStr = observationDateFormat.format(observationDate);
-        EDoc eDoc = new EDoc(description, type, fileName, html, creatorId, responsibleId, source, status.getStatusCharacter(), observationDateStr, reviewerId, reviewDateTimeStr, module + "", moduleId);
+        EDoc eDoc = new EDoc(description, type, fileName, html, creatorId, responsibleId, source, status.getStatusCharacter(), observationDateStr, reviewerId, reviewDateTimeStr, module + "", moduleId, ipAddress);
         eDoc.setContentType(contentType);
         return eDoc;
     }
