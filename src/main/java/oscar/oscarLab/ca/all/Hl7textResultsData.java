@@ -747,7 +747,6 @@ public class Hl7textResultsData {
 			
 			sql = sql + " ORDER BY hl7.obr_date desc, hl7.lab_no desc) ordered_labs ";
 			sql = sql + " GROUP BY COALESCE( accessionNum, lab_no ) ";
-			sql = sql + " ORDER BY obr_date desc, lab_no desc ";
 			
 			// Some labs sometimes become normal or abnormal. Let's just use the last
 			// lab result in checking if it's normal or abnormal
@@ -758,6 +757,8 @@ public class Hl7textResultsData {
 					sql = sql + "HAVING (ordered_labs.result_status IS NULL OR ordered_labs.result_status != 'A') ";
 				}
 			}
+
+			sql = sql + " ORDER BY obr_date desc, lab_no desc ";
 
 			if (isPaged) {
 				sql = sql + "LIMIT ?,?";
