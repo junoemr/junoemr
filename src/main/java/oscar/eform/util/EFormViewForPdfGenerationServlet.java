@@ -63,7 +63,7 @@ public final class EFormViewForPdfGenerationServlet extends HttpServlet {
 				if (prepareForFax) {
 					html = "<div style=\"position:relative\"><div style=\"position:absolute; margin-top:35px;\">" + html + "</div></div>";
 				}
-				html = "<html><body style='width:640px;'>" + html + "</body></html>";
+				html = "<html><body style='width:640px; margin: 0 auto;'>" + html + "</body></html>";
 				eForm.setFormHtml(html);
 			}
 			if (value.getVarName().equals("signatureValue")) {
