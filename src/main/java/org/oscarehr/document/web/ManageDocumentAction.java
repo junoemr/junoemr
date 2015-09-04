@@ -91,11 +91,13 @@ import oscar.log.LogConst;
 import oscar.oscarDemographic.data.DemographicData;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarLab.ca.on.LabResultData;
+import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.util.UtilDateUtilities;
 
 import com.lowagie.text.pdf.PdfReader;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
+
 
 /**
  * @author jaygallagher
@@ -182,6 +184,11 @@ public class ManageDocumentAction extends DispatchAction {
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("Error", e);
 		}
+
+		// OHSUPPORT-1968: when a document is assigned to a demographic,
+		// link to the echart should be created
+		CommonLabResultData.updatePatientLabRouting(documentId, demog, "DOC");
+
 
 		if( null != use_provider_as_responsible && flagproviders.length == 1) {
 			EDoc edoc = EDocUtil.getEDocFromDocId(documentId);
@@ -293,6 +300,10 @@ public class ManageDocumentAction extends DispatchAction {
 			MiscUtils.getLogger().error("Error", e);
 		}
 
+		// OHSUPPORT-1968: when a document is assigned to a demographic,
+		// link to the echart should be created
+		CommonLabResultData.updatePatientLabRouting(documentId, demog, "DOC");
+
 		if (ret != null && !ret.equals("")) {
 			// response.getOutputStream().print(ret);
 		}
@@ -367,10 +378,6 @@ public class ManageDocumentAction extends DispatchAction {
 		cmnl.setNoteId(note_id);
 		EDocUtil.addCaseMgmtNoteLink(cmnl);
 	}
-
-	/*
-	 * private void savePatientLabRouting(String demog,String docId,String docType){ CommonLabResultData.updatePatientLabRouting(docId, demog, docType); }
-	 */
 
 	private static File getDocumentCacheDir(String docdownload) {
 		// File cacheDir = new File(docdownload+"_cache");
