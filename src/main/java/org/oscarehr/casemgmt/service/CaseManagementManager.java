@@ -100,10 +100,10 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-import oscar.OscarProperties;
-
 import com.quatro.model.security.Secrole;
 import com.quatro.service.security.RolesManager;
+
+import oscar.OscarProperties;
 
 /*
  * Updated by Eugene Petruhin on 24 dec 2008 while fixing #2459538
@@ -1174,7 +1174,9 @@ public class CaseManagementManager {
 
 			if(cmNote.getType().equals("local_note")) {
 				noteRole = cmNote.getRole();
-				noteRoleName = RoleCache.getRole(Long.valueOf(noteRole)).getName().toLowerCase();
+				Secrole r = RoleCache.getRole(Long.valueOf(noteRole));
+				if(r != null)
+					noteRoleName = r.getName().toLowerCase();
 			}
 			if(cmNote.getType().equals("remote_note")) {
 				noteRoleName = cmNote.getRole();
