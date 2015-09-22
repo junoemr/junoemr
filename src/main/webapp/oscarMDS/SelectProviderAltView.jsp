@@ -72,14 +72,14 @@ function doStuff() {
     }
 }
 function forwardDocLab(doclabid){
-            
+
             if(doclabid){
                 var data=Form.serialize(self.opener.document.forms['reassignForm_'+doclabid]);
-                
+
                 var url= '<%=request.getContextPath()%>' + "/oscarMDS/Forward.do";
                 new Ajax.Request(url,{method: 'post',postBody:data, onSuccess:function(transport){
-                        
-                        
+
+
                     }});
             }
         }
@@ -91,7 +91,7 @@ function forwardDocLab(doclabid){
 <p><font size="-1"><bean:message
 	key="oscarMDS.selectProvider.msgSelectProvider" />:</font></p>
 <select name="selectedProviders" size="10" multiple>
-	<% ArrayList providers = ProviderData.getProviderList();
+	<% ArrayList providers = ProviderData.getActiveProviderList();
                        for (int i=0; i < providers.size(); i++) { %>
 	<option value="<%= (String) ((ArrayList) providers.get(i)).get(0) %>"
 		<%= ( ((String) ((ArrayList) providers.get(i)).get(0)).equals(request.getParameter("providerNo")) ? " selected" : "" ) %>><%= (String) ((ArrayList) providers.get(i)).get(1) %>
