@@ -43,7 +43,6 @@ import org.oscarehr.util.SpringUtils;
  * Rewritten June 2012
  *
  */
-@SuppressWarnings("unused")
 public abstract class FrmRecord {
 	
 	protected Demographic demographic;
