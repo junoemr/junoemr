@@ -69,7 +69,7 @@ INSERT IGNORE INTO measurementMap(loinc_code,ident_code,name,lab_type,flowsheet)
 drop index flowsheet_loinc on measurementMap;
 ALTER TABLE measurementMap DROP COLUMN flowsheet;
 
-INSERT IGNORE INTO `measurementMap` (loinc_code,ident_code,name,lab_type) VALUES 
+INSERT IGNORE INTO `measurementMap` (loinc_code,ident_code,name,lab_type) VALUES
 ('14771-0','14771-0','Glucose Fasting','PATHL7'),
 ('1920-8','1920-8','AST','PATHL7'),
 ('12195-4','12195-4','Creatinine Clearance 24h Corrected','PATHL7'),
@@ -105,11 +105,86 @@ INSERT IGNORE INTO `measurementMap` (loinc_code,ident_code,name,lab_type) VALUES
 
 create index hl7TextInfo_AccessionNum on hl7TextInfo (accessionNum);
 
+-- 2015-08-19-OHSUPPORT-2444.sql
+-- indexes for query performance
 CREATE INDEX idx_eform_values_varname_fid_fdid ON eform_values (var_name, fid, fdid);
 
 CREATE INDEX idx_measurementsExt_measurement_id_keyval ON measurementsExt (measurement_id, keyval);
 
 CREATE INDEX idx_drugs_demographic_no_archived ON drugs (demographic_no, archived);
 
+-- 2015-09-01-OHSUPPORT-2362.sql
 -- new column for ip address where document was uploaded from
 alter table ctl_document add column doc_ip_address varchar(50);
+
+-- 2015-09-09-primary11-performance.sql
+-- indexes for query performance
+CREATE INDEX idx_program_programStatus ON program (programStatus);
+
+CREATE INDEX idx_admission_program_id_admission_status ON admission (program_id, admission_status);
+
+
+CREATE INDEX idx_billing_provider_no_billing_no_demographic_no ON billing (provider_no, billing_no, demographic_no);
+
+
+CREATE INDEX idx_measurements_demographicNo_type_id ON measurements (demographicNo, type, id);
+
+
+CREATE INDEX idx_casemgmt_tmpsave_provider_no_demographic_no_program_id ON casemgmt_tmpsave (provider_no, demographic_no, program_id);
+
+
+CREATE INDEX idx_billingmaster_demographic_no ON billingmaster (demographic_no);
+
+
+CREATE INDEX idx_billactivity_updatedatetime_id ON billactivity (updatedatetime, id);
+
+
+CREATE INDEX idx_casemgmt_note_reporter_caisi_role ON casemgmt_note (reporter_caisi_role);
+
+
+CREATE INDEX idx_providerLabRouting_provider_no_status_lab_no_lab_type ON providerLabRouting (provider_no, status, lab_no, lab_type);
+
+
+CREATE INDEX idx_scheduledate_sdate_available_status ON scheduledate (sdate, available, status);
+
+
+CREATE INDEX idx_dsGuidelines_uuid_status_dateStart ON dsGuidelines (uuid, status, dateStart);
+
+
+CREATE INDEX idx_demographic_roster_status ON demographic (roster_status);
+
+
+CREATE INDEX idx_patientLabRouting_demographic_no_lab_type_lab_no ON patientLabRouting (demographic_no, lab_type, lab_no);
+
+
+CREATE INDEX idx_eChart_demographicNo_eChartId ON eChart (demographicNo, eChartId);
+
+
+CREATE INDEX idx_billing_history_billingmaster_no ON billing_history (billingmaster_no);
+
+
+CREATE INDEX idx_billing_demographic_no_billingtype ON billing (demographic_no, billingtype);
+
+
+CREATE INDEX idx_messagelisttbl_provider_no_status_remoteLocation_message ON messagelisttbl (provider_no, status, remoteLocation, message);
+
+
+CREATE INDEX idx_consultationRequests_demographicNo ON consultationRequests (demographicNo);
+
+
+CREATE INDEX idx_demographic_patient_status ON demographic (patient_status);
+
+
+CREATE INDEX idx_secObjPrivilege_objectName_priority ON secObjPrivilege (objectName, priority);
+
+
+CREATE INDEX idx_demographicArchive_demographic_no ON demographicArchive (demographic_no);
+
+
+CREATE INDEX idx_scheduledate_sdate_provider_no_status ON scheduledate (sdate, provider_no, status);
+
+
+CREATE INDEX idx_formBCAR2007_demographic_no ON formBCAR2007 (demographic_no);
+
+
+CREATE INDEX idx_log_action_provider_no_content_contentId ON log (action, provider_no, content, contentId);
