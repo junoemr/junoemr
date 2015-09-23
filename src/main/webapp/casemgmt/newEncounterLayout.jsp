@@ -813,7 +813,7 @@ function doscroll(){
                        	</indivo:indivoRegistered>
                        </oscarProperties:oscarPropertiesCheck>
                        <input type="submit" id="cancelprintOp" style="border: 1px solid #7682b1;" value="Cancel" onclick="$('printOps').style.display='none';">
-                       <input type="submit" id="clearprintOp" style="border: 1px solid #7682b1;" value="Clear" onclick="$('printOps').style.display='none'; return clearAll(event);">
+                       <input type="submit" id="clearprintOp" style="border: 1px solid #7682b1;" value="Clear" onclick="$('printOps').style.display='none'; return clearAll(event, true);">
                    </div>
 
 <%
