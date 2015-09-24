@@ -13,9 +13,6 @@ CREATE INDEX idx_measurements_demographicNo_type_id ON measurements (demographic
 CREATE INDEX idx_casemgmt_tmpsave_provider_no_demographic_no_program_id ON casemgmt_tmpsave (provider_no, demographic_no, program_id);
 
 
-CREATE INDEX idx_billingmaster_demographic_no ON billingmaster (demographic_no);
-
-
 CREATE INDEX idx_billactivity_updatedatetime_id ON billactivity (updatedatetime, id);
 
 
@@ -40,9 +37,6 @@ CREATE INDEX idx_patientLabRouting_demographic_no_lab_type_lab_no ON patientLabR
 CREATE INDEX idx_eChart_demographicNo_eChartId ON eChart (demographicNo, eChartId);
 
 
-CREATE INDEX idx_billing_history_billingmaster_no ON billing_history (billingmaster_no);
-
-
 CREATE INDEX idx_billing_demographic_no_billingtype ON billing (demographic_no, billingtype);
 
 
@@ -62,9 +56,6 @@ CREATE INDEX idx_demographicArchive_demographic_no ON demographicArchive (demogr
 
 
 CREATE INDEX idx_scheduledate_sdate_provider_no_status ON scheduledate (sdate, provider_no, status);
-
-
-CREATE INDEX idx_formBCAR2007_demographic_no ON formBCAR2007 (demographic_no);
 
 
 CREATE INDEX idx_log_action_provider_no_content_contentId ON log (action, provider_no, content, contentId);
