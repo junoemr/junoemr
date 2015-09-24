@@ -319,7 +319,7 @@ public class InboxResultsDao {
 				qp_demographic_no = true;
 			}
 
-			sql = sql + "ORDER BY observationdate desc, document_no desc ";
+			sql = sql + "ORDER BY observationdate desc, doc.document_no desc ";
 			if (isPaged) {
 				sql = sql + "LIMIT :page_start, :page_size";
 				qp_page = true;
