@@ -564,7 +564,7 @@ public class EFormUtil {
 	public static ArrayList<Hashtable<String,String>> getEFormGroups(String demographic_no) {
 		String sql;
 
-		sql = "SELECT group_name, sum(count) FROM (SELECT eform_groups.group_name, count(*)-1 AS 'count' FROM eform_groups LEFT JOIN eform_data ON eform_data.fid=eform_groups.fid WHERE eform_data.status=1 AND eform_data.demographic_no=" + demographic_no + " GROUP BY eform_groups.group_name UNION SELECT eg.group_name, count(*)-1 AS 'count' FROM eform_groups AS eg WHERE eg.fid = 0 GROUP BY eg.group_name) as sub_query GROUP BY group_name";
+		sql = "SELECT group_name, sum(count) AS 'count' FROM (SELECT eform_groups.group_name, count(*)-1 AS 'count' FROM eform_groups LEFT JOIN eform_data ON eform_data.fid=eform_groups.fid WHERE eform_data.status=1 AND eform_data.demographic_no=" + demographic_no + " GROUP BY eform_groups.group_name UNION SELECT eg.group_name, count(*)-1 AS 'count' FROM eform_groups AS eg WHERE eg.fid = 0 GROUP BY eg.group_name) as sub_query GROUP BY group_name";
 
 		ArrayList<Hashtable<String,String>> al = new ArrayList<Hashtable<String,String>>();
 		try {
