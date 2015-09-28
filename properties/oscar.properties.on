@@ -21,19 +21,17 @@
 #* Ontario, Canada
 #*
 
-buildDateTime=${build.dateTime}
-buildtag=${build.JOB_NAME}-${build.BUILD_NUMBER}
 
 ## Mysql connection
 
 # mysql database name
-db_name = oscar_mcmaster
+db_name = {oscar_db_name}
 
 # username
-db_username = root
+db_username = {oscar_db_username}
 
 # password for the username above
-db_password = liyi
+db_password = {oscar_db_user_password}
 
 db_type = mysql
 db_driver = com.mysql.jdbc.Driver
@@ -65,8 +63,8 @@ hibernate.show_sql=false
 #hibernate.dialect=org.hibernate.dialect.Oracle9iDialect
 
 ## DrugRef server
-# drugref_url = http://yourDrugRefServerIP:portNumber
-drugref_url = http://67.69.12.116:8001
+drugref_url = http://localhost:8080/drugref/DrugrefService
+#drugref_url = http://67.69.12.116:8001
 
 # DrugRef search administration route ("Oral" is preset)
 # off : turn off ;  on : turn on
@@ -112,13 +110,13 @@ IMMUNIZATION_IN_PREVENTION=yes
 #The needed directories will be created from this directory
 #ie. DOCUMENT_DIR will be create as /var/lib/OscarDocument/<Context>/document
 #
-#BASE_DOCUMENT_DIR=/var/lib/OscarDocument/
+BASE_DOCUMENT_DIR=/var/lib/OscarDocument/{oscar_practice_id}
 
 # Billing download folder
-#HOME_DIR = /var/lib/tomcat6/webapps/OscarDocument/oscar_mcmaster/billing/download/
+HOME_DIR = /var/lib/OscarDocument/{oscar_practice_id}/billing/download/
 
 # Documents directory
-#DOCUMENT_DIR = /var/lib/OscarDocument/oscar_mcmaster/document/
+DOCUMENT_DIR = /var/lib/OscarDocument/{oscar_practice_id}/document/
 DOCUMENT_DOWNLOAD_METHOD = stream
 DOC_FORWARD: /dms/complete.jsp
 RA_FORWORD: /billing/CA/ON/genRA.jsp
@@ -127,7 +125,7 @@ TA_FORWARD: /billing/CA/BC/genTA.jsp
 
 # Demographic export/import
 # TeMPorary DIRectory for export/import  demographic files
-#TMP_DIR: /var/lib/OscarDocument/oscar_mcmaster/export/
+TMP_DIR: /var/lib/OscarDocument/{oscar_practice_id}/export/
 
 #PGP BINary executable (with full path) for export files encryption
 PGP_BIN: /usr/bin/pgpgpg
@@ -142,8 +140,8 @@ PGP_KEY: Name (Company) <email@address>
 PGP_ENV: GNUPGHOME=/usr/local/gnupg/
 
 # Export information
-Vendor_Product = OSCARMcMaster, OSCARMcMaster ver11
-Support_Contact = Jay Gallagher (905-525-9140 ext28517, jay@jayweb.ca)
+Vendor_Product = OSCARMcMaster, OSCARMcMaster ver12.1
+Support_Contact = Oscar Host (1-888-686-8560 support@oscarhost.ca)
 ontariomd_cds_diabetes_link = https://www.ontariomd.ca/cms/xml/ontariomd_cds_diabetes.xsd
 
 #### for IBD clinic
@@ -222,7 +220,7 @@ billregion=ON
 # N - Toronto
 billcenter = G
 
-default_view = MFP
+default_view = GP
 clinic_view = 3866
 clinic_no = 3821
 
@@ -231,7 +229,7 @@ inPatient = no
 
 # visit_type can be: Clinic Visit, Outpatient Visit, Hospital Visit, ER, Nursing Home, and Home Visit
 visit_type = Clinic Visit
-visittype = O|Physician's office
+visittype = A|Practitioner's Office - In Community
 visitlocation = P1|PEMBERTON
 dataCenterId = 00000
 #msp_error_codes = # file location of msp error codes
@@ -257,16 +255,16 @@ NEW_BC_TELEPLAN=yes
 SUPERUSER = oscardoc
 
 ## eform image file path
-#eform_image = /usr/local/OscarDocument/oscar_mcmaster/eform/images/
-# eform_databaseap_config = /usr/local/tomcat/OscarDocument/oscar_mcmaster/eform/apconfig.xml
+eform_image = /var/lib/OscarDocument/{oscar_practice_id}/eform/images/
+#eform_databaseap_config = /var/lib/OscarDocument/{oscar_practice_id}/eform/apconfig.xml
 
 ## forms
 save_as_xml = true
-#form_record_path = /usr/local/tomcat/webapps/OscarDocument/oscar_mcmaster/form/records/
+form_record_path = /var/lib/OscarDocument/{oscar_practice_id}/form/records/
 
 ### send to osdsf thru XMLRPC
 #osdsfRPCURL=
-#pdfFORMDIR = /usr/local/tomcat/webapps/OscarDocument/oscar_mcmaster/form
+pdfFORMDIR = /var/lib/OscarDocument/{oscar_practice_id}/form
 
 
 ## oscarComm
@@ -276,11 +274,11 @@ save_as_xml = true
 
 ## Path
 ## adjust the following value according to your factual needs
-tomcat_path = /usr/local/tomcat/
-project_home = oscar_mcmaster
+tomcat_path = /usr/share/tomcat/
+project_home = {oscar_practice_id}
 backup_path = /home/mysql/
-oscarMeasurement_css=/OscarDocument/oscar_mcmaster/oscarEncounter/oscarMeasurements/styles/
-#oscarMeasurement_css_upload_path=/usr/local/OscarDocument/oscar_mcmaster/oscarEncounter/oscarMeasurements/styles
+oscarMeasurement_css=/var/lib/OscarDocument/{oscar_practice_id}/oscarEncounter/oscarMeasurements/styles/
+oscarMeasurement_css_upload_path=/var/lib/OscarDocument/{oscar_practice_id}/oscarEncounter/oscarMeasurements/styles
 
 oscarMeasurement_css_download_method = stream
 
@@ -320,7 +318,7 @@ oscarMeasurement_css_download_method = stream
 
 # Login info
 login_local_ip = 192.168
-login_max_failed_times = 3
+login_max_failed_times = 10
 login_max_duration = 10
 
 # Password strength policy
@@ -364,19 +362,14 @@ loginlogo =
 # the size of the receptionist's preference
 receptionist_alt_view = no
 
-# Default viewall of the main appointment screen
-# false  - when the appointment screen loads it will show only the scheduled physicians for today, similar to how it was in 9.12
-# true   - show the schedules for all the providers, including blank ones
-default_schedule_viewall = true
-
 #Show appt reason in the appt view
 #SHOW_APPT_REASON=yes
 
 #Enable abilty to change appt statuses
-#ENABLE_EDIT_APPT_STATUS=yes
+ENABLE_EDIT_APPT_STATUS=yes
 
 # Fax configuration
-#faxEnable = no
+faxEnable = no
 faxLogo =
 faxIdentifier = zwf4t%8*9@s
 faxURI = https://67.69.12.117:14043/OSCARFaxWebService
@@ -461,7 +454,7 @@ cr_security=off
 ## Load CAISI Application Context
 #plugins=on
 #caisi=on
-#ModuleNames=Caisi,ERx,HRM,OLIS,Indivo
+#ModuleNames=Caisi
 #NEW_CME_SWITCH=on
 
 ##caisi plugins
@@ -619,7 +612,7 @@ ECHART_VERSIGN_LINE=[${oscarEncounter.class.EctSaveEncounterAction.msgVerAndSig}
 # and the executable is in the path of the running process.
 # This is used for converting html screens to pdf's. As an example to send eforms to MyOscar it first converts the eform to pdf.
 # This value should not be null.
-WKHTMLTOPDF_COMMAND=wkhtmltopdf-i386
+WKHTMLTOPDF_COMMAND=wkhtmltopdf
 
 # This is the error correction level QR Codes will be rendered with. Do not change this value unless
 # you know what you're doing. This is the com.google.zxing.qrcode.decoder.ErrorCorrectionLevel values
@@ -701,8 +694,6 @@ OMD_HRM_IP=207.219.74.198
 OMD_HRM_PORT=22
 OMD_HRM_AUTH_KEY_FILENAME=mcmu_sk.ppk
 
-SFTP_CONNECTOR_REMOTE_DIR=Test
-
 #Email Configuration
 email.host=localhost
 email.port=25
@@ -713,7 +704,6 @@ email.connection_security=ssl
 #email.recipient_override=test@example.com
 #email.print_instead_of_send=true
 
-
 # cxf web services
 https_endpoint_url_base=https://127.0.0.1:8081/oscar/ws
 
@@ -723,7 +713,7 @@ https_endpoint_url_base=https://127.0.0.1:8081/oscar/ws
 allowMultipleSameDayGroupAppt=yes
 
 #Indivica contributed diabetes flowsheet with sparklines
-new_flowsheet_enabled=false
+new_flowsheet_enabled=true
 
 # RMA Billing
 rma_enabled=false
@@ -746,12 +736,15 @@ appt_intake_form=off
 #CAISI should not search for duplicates outside your program domain when true.
 caisi.new_client.strict_search=false
 
-
 #Turn on display of whether demographic form is complete for the demographic
 #shown on the add appointment and edit appointment windows.
 #Provide semi-colon seperated list of forms to display
 #(just as they appear in encounterForm table's form_table column)
 appt_formTbl=
+
+
+# Default Instructions on all new prescription
+rx.default_instruction=1 OD
 
 #Indivica Rx Enhancmenets
 rx_enhance=false
@@ -774,10 +767,10 @@ consultation_signature_enabled=true
 tickler_warn_period=1
 
 # True if fax should be enabled in eforms and false otherwise.
-eform_fax_enabled=false
+eform_fax_enabled=true
 
 # True if signature should be enabled in eforms and false otherwise.
-eform_signature_enabled=false
+eform_signature_enabled=true
 
 # EForm Generator flags to include indivica fax, sign and print components.
 eform_generator_indivica_signature_enabled=false
@@ -785,7 +778,7 @@ eform_generator_indivica_print_enabled=false
 eform_generator_indivica_fax_enabled=false
 
 # True if Indivica Rich Text Letter is enabled and false otherwise.
-indivica_rich_text_letter_enabled=false
+indivica_rich_text_letter_enabled=true
 
 #Seconds until a integrated facilty is considered Stale ( has not pushed to the integrator)
 #Seconds until a integrated facilty is considered Stale ( has not pushed to the integrator)
@@ -801,7 +794,7 @@ wait_list_email_notification_period=86400000
 wait_list_email_notification_program_ids=
 
 #True: Enable ability to add additional messages to the same tickler and update tickler status
-tickler_edit_enabled=false
+tickler_edit_enabled=true
 tickler_email_enabled=false
 #The tickler email from address
 #tickler_email_from_address=test@example.com
@@ -817,14 +810,14 @@ consultation_dynamic_labelling_enabled=false
 consultation_indivica_attachment_enabled=false
 
 #Help link URL
-resource_base_url=http://www.oscarmanual.org/oscar_emr_12/
+resource_base_url=https://help.oscarhost.ca
 
 # MOH File Management
 moh_file_management_enabled=false
-ONEDT_INBOX=/usr/local/tomcat/webapps/OscarDocument/oscar_mcmaster/onEDTDocs/inbox/
-ONEDT_OUTBOX=/usr/local/tomcat/webapps/OscarDocument/oscar_mcmaster/onEDTDocs/outbox/
-ONEDT_SENT=/usr/local/tomcat/webapps/OscarDocument/oscar_mcmaster/onEDTDocs/sent/
-ONEDT_ARCHIVE=/usr/local/tomcat/webapps/OscarDocument/oscar_mcmaster/onEDTDocs/archive/
+ONEDT_INBOX=/var/lib/OscarDocument/{oscar_practice_id}/onEDTDocs/inbox/
+ONEDT_OUTBOX=/var/lib/OscarDocument/{oscar_practice_id}/onEDTDocs/outbox/
+ONEDT_SENT=/var/lib/OscarDocument/{oscar_practice_id}/onEDTDocs/sent/
+ONEDT_ARCHIVE=/var/lib/OscarDocument/{oscar_practice_id}/onEDTDocs/archive/
 
 #Antenal Enhanced form - lab req to use .. either 07 or 10
 onare_labreqver=07
@@ -881,42 +874,67 @@ redirectstudysite_default_password = 5157505648485648534853535448524852484848515
 web_service_client.connection_timeout_ms=1500
 web_service_client.received_timeout_ms=3000
 
-APPT_ALWAYS_SHOW_LINKS=true
-APPT_MULTILINE=false
+# Enable clinicaid billing
+# clinicaid_billing=true
 
-#Enter bill code of default bill center to be populated on Add Provider Record window
-default_bill_center=
+# Required if clinicaid_billing is set to true
+# clinicaid_domain=http://clinicly.com
 
-#Enter 1 of the following:
-#
-# search_name
-# search_phone
-# search_dob
-# search_address
-# search_hin
-# search_chart_no
-#
-# to set the default search criteria for demographic search
-default_search_mode=search_name
+# OscarHost Login page
+oscarhost_login=https://www.oscarhost.ca/{oscar_practice_id}
 
-# OHSUPPORT-1840 social history on consult request
-#consult_request_social_history_option=true
-# OHSUPPORT-1839 override date of birth format on master file (use SimpleDateFormat format syntax)
-#demographic_dob_format_override=MMM dd/yyyy
+# Set the location to write fax files to
+#fax_file_location=/var/lib/OscarDocument/{oscar_practice_id}/fax/
+
+# Enable full demographics merge
+#enable_full_merge = true
+
+# Custom "Search Urgent Labs by Group" feature
+#inbox_urgent_search=no
+
+casemgmt_photo_enabled=false
+
 # OHSUPPORT-1700 kensington: additional patient info at the top of the eChart
 #echart_additional_patient_info=true
+
 # OHSUPPORT-1850 perrier_lepage: appointment reason in week view, with top align
 #week_view_reason_display=true
 #week_view_reason_preferred_length=30
-#defaultcity property will populate the demographic creation form city field with the specified property.
-#defaultcity=
 
-# OHSUPPORT-2222: when labs are forwarded to a provider, if they had previously filed it, set it back to new
+# OHSUPPORT-1840 social history on consult request
+#consult_request_social_history_option=true
+
+# OHSUPPORT-1839 override date of birth format on master file (use SimpleDateFormat format syntax)
+#demographic_dob_format_override=MMM dd/yyyy
+
+# OHSUPPORT-1928 appointment reminder emails
+#appointment_reminder_enabled=true
+#appointment_reminder_from_email_address=from_email_address@domain.com
+#appointment_reminder_from_name=From Name
+#appointment_reminder_subject=Appointment Reminder
+# _java: SimpleDateFormat format, _ruby: DateTime format
+#appointment_reminder_appt_date_format_java=EEEE MMMM d yyyy 'at' h:mm a
+#appointment_reminder_appt_date_format_ruby=%A %B %-d %Y at %-l:%M %p
+#appointment_reminder_automated_update_status=a
+# OHSUPPORT-2217 prevent users from messing with role privileges in oscar
+RESTRICT_ROLE_CHANGES=yes
+
+default_search_mode=search_name
+auto_populate_billingreferral_bc=true
+
+#OHSUPPORT-2456
+#custom lab routing for excelleris labs
+#Parses custom_lab_routeX properties (starting at 1)
+#Property format: custom_lab_routeX=<excelleris_lab_account>,<provider_no>
+#EG:
+#custom_lab_route1=khatsahlano1,300
+#custom_lab_route2=khatsahlano2,100
+
+#OHSUPPORT-2222: when labs are forwarded to a provider, if they had previously filed it, set it back to new
 #AUTO_UNFILE_LABS=yes
 
-# OHSUPPORT-2463: invert dark document previews (workaround pdf to png bug where previews had inverted colors)
+#OHSUPPORT-2463: invert dark document previews (workaround pdf to png bug where previews had inverted colors)
 #INVERT_DARK_DOCUMENT_PREVIEWS=yes
 
 # OHSUPPORT-2541 show uploaded by in the inbox
 #INBOX_UPLOADED_BY_COLUMN=yes
-
