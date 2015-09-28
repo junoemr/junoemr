@@ -10,7 +10,7 @@
 --%>
 <%@ page language="java" %>
 <%@ page import="java.util.*" %>
-<%@ page import="oscar.oscarMDS.data.*,oscar.oscarLab.ca.on.*,oscar.util.StringUtils,oscar.util.UtilDateUtilities" %>
+<%@ page import="oscar.oscarMDS.data.*,oscar.oscarLab.ca.on.*,oscar.util.StringUtils,oscar.util.UtilDateUtilities, oscar.OscarProperties" %>
 <%@ page import="org.apache.commons.collections.MultiHashMap" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -126,10 +126,24 @@ String curUser_no = (String) session.getAttribute("user");
 					</style>
 					<table id="summaryView" width="100%" style="margin:0px;padding:0px;" cellpadding="0" cellspacing="0">
 						<tr>
+
+<% if (OscarProperties.getInstance().isPropertyActive("INBOX_UPLOADED_BY_COLUMN")) { %>
+
+                            <th align="left" valign="bottom" class="cell" nowrap>
+                                <input type="checkbox" onclick="checkAll();" name="checkA"/>
+                                <bean:message key="oscarMDS.index.msgUploadedBy"/>
+                            </th>
+                            <th align="left" valign="bottom" class="cell" nowrap>
+                                <bean:message key="oscarMDS.index.msgHealthNumber"/>
+                            </th>
+<% } else { %>
+
                             <th align="left" valign="bottom" class="cell" nowrap>
                                 <input type="checkbox" onclick="checkAll();" name="checkA"/>
                                 <bean:message key="oscarMDS.index.msgHealthNumber"/>
                             </th>
+<% } %>
+
                             <th align="left" valign="bottom" class="cell">
                                 <bean:message key="oscarMDS.index.msgPatientName"/>
                             </th>
@@ -281,6 +295,24 @@ String curUser_no = (String) session.getAttribute("user");
                                 else {
                         		%>
                                 <tr id="labdoc_<%=segmentID%>" bgcolor="<%=bgcolor%>" <%if(result.isDocument()){%> name="scannedDoc" <%} else{%> name="HL7lab" <%}%> class="<%= (result.isAbnormal() ? "AbnormalRes" : "NormalRes" ) + " " + (result.isMatchedToPatient() ? "AssignedRes" : "UnassignedRes") %>">
+
+
+<% if (OscarProperties.getInstance().isPropertyActive("INBOX_UPLOADED_BY_COLUMN")) { %>
+
+                                <td nowrap>
+                                    <input type="hidden" id="totalNumberRow" value="<%=total_row_index+1%>">
+                                    <input type="checkbox" name="flaggedLabs" value="<%=segmentID%>">
+                                    <input type="hidden" name="labType<%=segmentID+result.labType%>" value="<%=result.labType%>"/>
+                                    <input type="hidden" name="ackStatus" value="<%= result.isMatchedToPatient() %>" />
+                                    <input type="hidden" name="patientName" value="<%=StringEscapeUtils.escapeHtml(result.patientName) %>"/>
+                                    <%= result.getUploadedBy() == null ? "" : result.getUploadedBy() %>
+                                </td>
+
+                                <td nowrap>
+                                    <%=result.getHealthNumber() %>
+                                </td>
+<% } else { %>
+
                                 <td nowrap>
                                     <input type="hidden" id="totalNumberRow" value="<%=total_row_index+1%>">
                                     <input type="checkbox" name="flaggedLabs" value="<%=segmentID%>">
@@ -289,6 +321,10 @@ String curUser_no = (String) session.getAttribute("user");
                                     <input type="hidden" name="patientName" value="<%=StringEscapeUtils.escapeHtml(result.patientName) %>"/>
                                     <%=result.getHealthNumber() %>
                                 </td>
+<% } %>
+
+
+
                                 <td nowrap>
                                     <% if ( result.isMDS() ){ %>
                                     <a href="javascript:parent.reportWindow('SegmentDisplay.jsp?segmentID=<%=segmentID%>&providerNo=<%=providerNo%>&searchProviderNo=<%=searchProviderNo%>&status=<%=status%>')"><%=labRead%><%= StringEscapeUtils.escapeHtml(result.getPatientName())%></a>
