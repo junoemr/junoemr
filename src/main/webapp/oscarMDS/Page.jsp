@@ -309,7 +309,7 @@ String curUser_no = (String) session.getAttribute("user");
                                 </td>
 
                                 <td nowrap>
-                                    <%=result.getHealthNumber() %>
+                                    <%= result.getHealthNumber() == null ? "" : result.getHealthNumber() %>
                                 </td>
 <% } else { %>
 
@@ -319,7 +319,7 @@ String curUser_no = (String) session.getAttribute("user");
                                     <input type="hidden" name="labType<%=segmentID+result.labType%>" value="<%=result.labType%>"/>
                                     <input type="hidden" name="ackStatus" value="<%= result.isMatchedToPatient() %>" />
                                     <input type="hidden" name="patientName" value="<%=StringEscapeUtils.escapeHtml(result.patientName) %>"/>
-                                    <%=result.getHealthNumber() %>
+                                    <%= result.getHealthNumber() == null ? "" : result.getHealthNumber() %>
                                 </td>
 <% } %>
 
