@@ -2051,7 +2051,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 						<input type="hidden" name="newSignatureImg" id="newSignatureImg" value="<%=signatureRequestId %>" />
 
 						<div id="signatureShow" style="display: none;">
-							<img id="signatureImgTag" src="" />
+							<img id="signatureImgTag"/>
 						</div>
 
 						<% if (OscarProperties.getInstance().getBooleanProperty("topaz_enabled", "true")) { %>
