@@ -63,17 +63,15 @@ public class CaseManagementIssueDAO extends HibernateDaoSupport {
 
     public CaseManagementIssue getIssuebyId(String demo, String id) {
         @SuppressWarnings("unchecked")
-        List<CaseManagementIssue> list = this.getHibernateTemplate().find("from CaseManagementIssue cmi where cmi.issue_id = ? and demographic_no = ? order by cmi.id",new Object[]{Long.parseLong(id),demo});
+        List<CaseManagementIssue> list = this.getHibernateTemplate().find("from CaseManagementIssue cmi where cmi.issue_id = ? and demographic_no = ? order by cmi.id desc",new Object[]{Long.parseLong(id),demo});
         
         if(list == null || list.isEmpty())
         	return null;
-        else if(list.size() == 1)
-        	return list.get(0);
-        else {
+        if(list.size() > 1) {
         	// the database should not have more than one result here, but return something to prevent further db errors
-        	logger.error("Multiple CaseManagementIssue entries with same issue id found for demographic: "+ demo +" (issue_id: "+id+" )");
-        	return list.get(list.size()-1);//return the issue with highest id
+        	logger.error("Multiple CaseManagementIssue entries with same issue id found for demographic: "+ demo +" (issue_id: "+id+" ). Check databse for duplicates.");
         }
+        return list.get(0); //always return the result with the highest id
     }
 
     public CaseManagementIssue getIssuebyIssueCode(String demo, String issueCode) {
