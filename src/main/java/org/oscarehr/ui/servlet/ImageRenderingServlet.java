@@ -252,7 +252,7 @@ public final class ImageRenderingServlet extends HttpServlet {
 
 		try {
 			// get image
-			DigitalSignature digitalSignature = digitalSignatureDao.find(Long.parseLong(request.getParameter("digitalSignatureId")));
+			DigitalSignature digitalSignature = digitalSignatureDao.find(Integer.parseInt(request.getParameter("digitalSignatureId")));
 			if (digitalSignature != null) {
 				renderImage(response, digitalSignature.getSignatureImage(), "jpeg");
 				return;

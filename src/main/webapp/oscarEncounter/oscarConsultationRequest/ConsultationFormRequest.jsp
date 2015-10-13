@@ -100,7 +100,7 @@ displayServiceUtil.estSpecialist();
 
 
 <%
-	  String demo = request.getParameter("de");
+		String demo = request.getParameter("de");
 		String requestId = request.getParameter("requestId");
 		// segmentId is != null when viewing a remote consultation request from an hl7 source
 		String segmentId = request.getParameter("segmentId");
@@ -997,9 +997,9 @@ function switchProvider(value) {
 </script>
 <script type="text/javascript">
 <%
-String signatureRequestId=DigitalSignatureUtils.generateSignatureRequestId(LoggedInInfo.loggedInInfo.get().loggedInProvider.getProviderNo());
-String imageUrl=request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_preview.name()+"&"+DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
-String storedImgUrl=request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_stored.name()+"&digitalSignatureId=";
+String signatureRequestId=null;
+String imageUrl= null; //request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_preview.name()+"&"+DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
+String storedImgUrl=null;//request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_stored.name()+"&digitalSignatureId=";
 %>
 var POLL_TIME=1500;
 var counter=0;
