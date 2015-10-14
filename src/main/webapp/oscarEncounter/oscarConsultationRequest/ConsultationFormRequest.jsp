@@ -997,9 +997,9 @@ function switchProvider(value) {
 </script>
 <script type="text/javascript">
 <%
-String signatureRequestId=null;
-String imageUrl= null; //request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_preview.name()+"&"+DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
-String storedImgUrl=null;//request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_stored.name()+"&digitalSignatureId=";
+String signatureRequestId=LoggedInInfo.loggedInInfo.get().loggedInProvider.getProviderNo();
+String imageUrl= request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_preview.name()+"&"+DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
+String storedImgUrl=request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_stored.name()+"&digitalSignatureId=";
 %>
 var POLL_TIME=1500;
 var counter=0;
