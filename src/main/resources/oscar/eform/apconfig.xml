@@ -15,7 +15,7 @@
         <ap-name>next_appt_date</ap-name>
         <ap-sql>SELECT appointment_date, start_time from appointment WHERE demographic_no = ${demographic} AND `status` NOT IN('C', 'N', 'NS') AND appointment_date >= CURDATE( )
                   ORDER BY appointment_date LIMIT 1 </ap-sql>
-        <ap-output>${next_appt_date}, ${start_time}</ap-output>
+        <ap-output>${appointment_date}, ${start_time}</ap-output>
     </databaseap>
     <databaseap>
         <ap-name>next_appt_time</ap-name>
