@@ -1109,8 +1109,7 @@ function chooseEmail(){
 				{
 					thisForm.setCurrentMedications(RxInfo.getCurrentMedication(demo));
 				}
-
-				team = consultUtil.getProviderTeam(consultUtil.mrp);
+				team = consultUtil.mrp.equals("") ? "" : consultUtil.getProviderTeam(consultUtil.mrp);
 			}
 
 			thisForm.setStatus("1");
