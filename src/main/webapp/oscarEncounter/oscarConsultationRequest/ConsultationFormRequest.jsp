@@ -55,7 +55,6 @@
 <%@page import="org.oscarehr.util.MiscUtils,oscar.oscarClinic.ClinicData"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="org.oscarehr.util.DigitalSignatureUtils"%>
 <%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
 <%@page import="org.oscarehr.util.MiscUtils, org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager, org.oscarehr.caisi_integrator.ws.CachedDemographicNote"%>
@@ -996,41 +995,6 @@ function switchProvider(value) {
 }
 </script>
 <script type="text/javascript">
-<%
-String signatureRequestId=LoggedInInfo.loggedInInfo.get().loggedInProvider.getProviderNo();
-String imageUrl= request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_preview.name()+"&"+DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
-String storedImgUrl=request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_stored.name()+"&digitalSignatureId=";
-%>
-var POLL_TIME=1500;
-var counter=0;
-function refreshImage()
-{
-	counter=counter+1;
-	document.getElementById('signatureImgTag').src='<%=imageUrl%>&rand='+counter;
-	document.getElementById('signatureImg').value='<%=signatureRequestId%>';
-}
-
-function showSignatureImage()
-{
-	if (document.getElementById('signatureImg') != null && document.getElementById('signatureImg').value.length > 0) {
-		document.getElementById('signatureImgTag').src = "<%=storedImgUrl %>" + document.getElementById('signatureImg').value;
-
-		<% if (OscarProperties.getInstance().getBooleanProperty("topaz_enabled", "true")) { %>
-
-		document.getElementById('clickToSign').style.display = "none";
-
-		<% } else { %>
-
-		document.getElementById("signatureFrame").style.display = "none";
-
-		<% } %>
-
-
-		document.getElementById('signatureShow').style.display = "block";
-	}
-
-	return true;
-}
 
 <%
 String userAgent = request.getHeader("User-Agent");
@@ -1044,42 +1008,6 @@ if (userAgent != null) {
 }
 %>
 
-function requestSignature()
-{
-
-
-	<% if (OscarProperties.getInstance().getBooleanProperty("topaz_enabled", "true")) { %>
-	document.getElementById('newSignature').value = "true";
-	document.getElementById('signatureShow').style.display = "block";
-	document.getElementById('clickToSign').style.display = "none";
-	document.getElementById('signatureShow').style.display = "block";
-	setInterval('refreshImage()', POLL_TIME);
-	document.location='<%=request.getContextPath()%>/signature_pad/topaz_signature_pad.jnlp.jsp?<%=DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY%>=<%=signatureRequestId%>';
-
-	<% } %>
-}
-
-var isSignatureDirty = false;
-var isSignatureSaved = <%= consultUtil.signatureImg != null && !"".equals(consultUtil.signatureImg) ? "true" : "false" %>;
-
-function signatureHandler(e) {
-	isSignatureDirty = e.isDirty;
-	isSignatureSaved = e.isSave;
-	<%
-	if (props.isConsultationFaxEnabled()) { //
-	%>
-	updateFaxButton();
-	<% } %>
-	if (e.isSave) {
-		refreshImage();
-		document.getElementById('newSignature').value = "true";
-	}
-	else {
-		document.getElementById('newSignature').value = "false";
-	}
-}
-
-var requestIdKey = "<%=signatureRequestId %>";
 
 function AddOtherFaxProvider() {
 	var selected = jQuery("#otherFaxSelect option:selected");
@@ -1142,7 +1070,7 @@ function chooseEmail(){
 <link rel="stylesheet" type="text/css" href="../encounterStyles.css" />
 </head>
 <body topmargin="0" leftmargin="0" vlink="#0000FF"
-	onload="window.focus();disableDateFields();fetchAttached();disableEditing();showSignatureImage();">
+	onload="window.focus();disableDateFields();fetchAttached();disableEditing();">
 <html:errors />
 
 <html:form action="/oscarEncounter/RequestConsultation"
@@ -2036,33 +1964,6 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 						property="allergies"></html:textarea></td>
 				</tr>
 
-<%
-				if (props.isConsultationSignatureEnabled()) {
-				%>
-				<tr>
-					<td colspan=2 class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formSignature" />:
-					</td>
-				</tr>
-				<tr>
-					<td colspan=2>
-
-						<input type="hidden" name="newSignature" id="newSignature" value="true" />
-						<input type="hidden" name="signatureImg" id="signatureImg" value="<%=(consultUtil.signatureImg != null ? consultUtil.signatureImg : "") %>" />
-						<input type="hidden" name="newSignatureImg" id="newSignatureImg" value="<%=signatureRequestId %>" />
-
-						<div id="signatureShow" style="display: none;">
-							<img id="signatureImgTag"/>
-						</div>
-
-						<% if (OscarProperties.getInstance().getBooleanProperty("topaz_enabled", "true")) { %>
-						<input type="button" id="clickToSign" onclick="requestSignature()" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formClickToSign" />" />
-						<% } else { %>
-						<iframe style="width:500px; height:132px;"id="signatureFrame" src="<%= request.getContextPath() %>/signature_pad/tabletSignature.jsp?inWindow=true&<%=DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY%>=<%=signatureRequestId%>" ></iframe>
-						<% } %>
-
-					</td>
-				</tr>
-				<% }%>
 				<%
 				if (props.isConsultationFaxEnabled()) {
 				%>
