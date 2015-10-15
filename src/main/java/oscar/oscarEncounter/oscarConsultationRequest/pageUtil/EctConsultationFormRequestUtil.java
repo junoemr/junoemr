@@ -330,32 +330,36 @@ public class EctConsultationFormRequestUtil {
 
     public String getProviderTeam(String id) {
         String retval = new String();
-        try {
-
-            String sql = "select team from provider where provider_no  = " + id;
-            ResultSet rs = DBHandler.GetSQL(sql);
-            if (rs.next()) {
-                retval = oscar.Misc.getString(rs, "team");
-            }
-            rs.close();
-        } catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
+        if(id != null && !id.equals("")) { //prevent sql syntax exceptions
+	        try {
+	
+	            String sql = "select team from provider where provider_no  = " + id;
+	            ResultSet rs = DBHandler.GetSQL(sql);
+	            if (rs.next()) {
+	                retval = oscar.Misc.getString(rs, "team");
+	            }
+	            rs.close();
+	        } catch (SQLException e) {
+	            MiscUtils.getLogger().error("Error", e);
+	        }
         }
         return retval;
     }
 
     public String getProviderName(String id) {
         String retval = new String();
-        try {
-
-            String sql = "select * from provider where provider_no  = " + id;
-            ResultSet rs = DBHandler.GetSQL(sql);
-            if (rs.next()) {
-                retval = oscar.Misc.getString(rs, "last_name") + ", " + oscar.Misc.getString(rs, "first_name");
-            }
-            rs.close();
-        } catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
+        if(id != null && !id.equals("")) { //prevent sql syntax exceptions
+	        try {
+	
+	            String sql = "select * from provider where provider_no  = " + id;
+	            ResultSet rs = DBHandler.GetSQL(sql);
+	            if (rs.next()) {
+	                retval = oscar.Misc.getString(rs, "last_name") + ", " + oscar.Misc.getString(rs, "first_name");
+	            }
+	            rs.close();
+	        } catch (SQLException e) {
+	            MiscUtils.getLogger().error("Error", e);
+	        }
         }
         return retval;
     }
