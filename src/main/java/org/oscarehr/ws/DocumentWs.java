@@ -50,7 +50,7 @@ import oscar.oscarLab.ca.all.upload.handlers.MessageHandler;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import sun.misc.BASE64Decoder;
+import org.apache.commons.codec.binary.Base64;
 import com.lowagie.text.pdf.PdfReader;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
@@ -75,14 +75,14 @@ public class DocumentWs extends AbstractWs {
 		int numberOfPages = 0;
 
 		// Decode document
-		BASE64Decoder decoder = new BASE64Decoder();
-		byte[] docContents = decoder.decodeBuffer(docContentsBase64);
+		Base64 base64 = new Base64();
+		byte[] docContents = base64.decode(docContentsBase64);
 
 		// Make document object
 		EDoc newDoc = new EDoc("", "", docFilename, "", providerId, 
 			responsibleId, "", 'A', 
 			oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", 
-			"demographic", "-1", 0);
+			"demographic", "-1", "", 0);
 
 		newDoc.setDocPublic("0");
 		String systemFilename = newDoc.getFileName();
