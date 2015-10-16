@@ -120,7 +120,12 @@ public final class ProblemCheckFilter implements Filter
 
 		public void putValue(String arg0, Object arg1)
 		{
-			if (!(arg1 instanceof Serializable)) logger.warn("Some one putting non serialisable item into session. key="+arg0, new Exception("Non serialisable item in session"));
+			if (!(arg1 instanceof Serializable)) {
+				logger.warn("Some one putting non serialisable item into session. key="+arg0);
+				logger.warn("caused by "+ arg1.getClass().toString());
+				logger.warn(new Exception("Non serialisable item in session"));
+				
+			}
 			
 			session.putValue(arg0, arg1);
 		}
@@ -137,7 +142,11 @@ public final class ProblemCheckFilter implements Filter
 
 		public void setAttribute(String arg0, Object arg1)
 		{
-			if (!(arg1 instanceof Serializable)) logger.warn("Some one putting non serialisable item into session. key="+arg0, new Exception("Non serialisable item in session"));
+			if (!(arg1 instanceof Serializable)) {
+				logger.warn("Some one putting non serialisable item into session. key="+arg0);
+				logger.warn("caused by "+ arg1.getClass().toString());
+				logger.warn(new Exception("Non serialisable item in session"));
+			}
 
 			session.setAttribute(arg0, arg1);
 		}
