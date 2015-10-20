@@ -136,7 +136,7 @@ if (request.getParameter("year")!=null && request.getParameter("month")!=null &&
 
 	}else
 	{
-		session.setAttribute("infirmaryView_date",null);
+		session.removeAttribute("infirmaryView_date");
 	}
 	String reqstr =request.getQueryString();
 	if (reqstr == null)
