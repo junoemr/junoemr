@@ -123,7 +123,7 @@ public final class ProblemCheckFilter implements Filter
 			// arg0 and arg1 should never be null
 			if (!(arg1 instanceof Serializable)) {
 				logger.warn("Some one putting non serializable item into session. key="+arg0 +
-						"\nCause: "+ arg1.getClass().toString() + " is not serializeable", 
+						"\nCause: "+ arg1.getClass().toString() + " is not serializable", 
 						new Exception("Non serializable item in session"));
 			}
 			
@@ -146,7 +146,7 @@ public final class ProblemCheckFilter implements Filter
 			// otherwise, attribute should be Serializable
 			if (arg1 != null && !(arg1 instanceof Serializable)) {
 				logger.warn("Some one putting non serializable item into session. key="+arg0 +
-						"\nCause: "+ arg1.getClass().toString() + " is not serializeable", 
+						"\nCause: "+ arg1.getClass().toString() + " is not serializable", 
 						new Exception("Non serializable item in session"));
 			}
 
