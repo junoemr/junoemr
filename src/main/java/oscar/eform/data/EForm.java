@@ -575,8 +575,10 @@ public class EForm extends EFormBase {
             }
 			html.insert(pointer, " " + value);
         } else if (type.equals(OPENER_VALUE)) {
+        	value = StringEscapeUtils.escapeHtml(value);
 			html.insert(pointer, " "+OPENER_VALUE+"=\""+value+"\"");
 		} else if (type.equals("text") || type.equals("hidden")) {
+			value = StringEscapeUtils.escapeHtml(value);
 			html.insert(pointer, " value=\""+value+"\"");
         } else if(type.equals("textarea")) {
 			pointer = html.indexOf(">", pointer) + 1;
@@ -723,7 +725,7 @@ public class EForm extends EFormBase {
 				html = html.insert(pointer, " selected");
 			}
 		} else {
-			output = output.replace("\"", "&quot;");
+			output = StringEscapeUtils.escapeHtml(output);
 			html.insert(pointer, " value=\""+output+"\"");
 		}
 		return (html);
