@@ -564,6 +564,15 @@ public class EForm extends EFormBase {
 		return curAP;
 	}
 
+	private String escapeHtml(String value) {
+		if(value == null)
+			return null;
+		String escaped = value.replace("\'", "&apos;");
+		escaped = StringEscapeUtils.escapeHtml(value);
+		
+		return escaped;
+	}
+	
 	private StringBuilder putValue(String value, String type, int pointer, StringBuilder html) {
 		// inserts value= into tag or textarea
         if (type.equals("onclick") || type.equals("onclick_append")) {
@@ -575,10 +584,10 @@ public class EForm extends EFormBase {
             }
 			html.insert(pointer, " " + value);
         } else if (type.equals(OPENER_VALUE)) {
-        	value = StringEscapeUtils.escapeHtml(value);
+        	value = escapeHtml(value);
 			html.insert(pointer, " "+OPENER_VALUE+"=\""+value+"\"");
 		} else if (type.equals("text") || type.equals("hidden")) {
-			value = StringEscapeUtils.escapeHtml(value);
+			value = escapeHtml(value);
 			html.insert(pointer, " value=\""+value+"\"");
         } else if(type.equals("textarea")) {
 			pointer = html.indexOf(">", pointer) + 1;
@@ -725,7 +734,7 @@ public class EForm extends EFormBase {
 				html = html.insert(pointer, " selected");
 			}
 		} else {
-			output = StringEscapeUtils.escapeHtml(output);
+			output = escapeHtml(output);
 			html.insert(pointer, " value=\""+output+"\"");
 		}
 		return (html);
