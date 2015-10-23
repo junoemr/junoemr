@@ -122,6 +122,10 @@ public class CLSHandler implements MessageHandler {
         return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k);
 	}
 
+	public NTE getOBRNTE(int i, int j) {
+        return msg.getRESPONSE().getORDER_OBSERVATION(i).getNTE(j);
+	}
+
 	public void insertOBR(ORU_R01_ORDER_OBSERVATION newOBR) {
 		try {
         	msg.getRESPONSE().insertORDER_OBSERVATION(newOBR, getOBRCount());
