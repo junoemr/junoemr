@@ -184,7 +184,8 @@ function disableifchecked(ele,nextDate){
 }
 function validatePrevDate(date) {
 	var d = Date.parse(date);
-	if(isNaN(d)) {
+	var match = date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/);
+	if(isNaN(d) || !match) {
 		alert("Invalid date: ".concat(date));
 		document.getElementById("prevDate").value="<%=UtilDateUtilities.getToday(dateFmt)%>";
 	}
