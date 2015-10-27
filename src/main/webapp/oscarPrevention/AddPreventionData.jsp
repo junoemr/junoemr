@@ -187,7 +187,7 @@ function validateDate(id, date) {
 		var res = date.split("-");
 		var d = new Date(res[0], res[1], res[2], "","","","","");
 		var match = date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/);
-		if(d == "Invalid Date" || !match) {
+		if(isNaN(d) || !match) {
 			throw "Invalid Date Format";
 		}
 	}
