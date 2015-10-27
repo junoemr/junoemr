@@ -311,7 +311,7 @@ function checkDob() {
 		    typeInOK = true;
 		    //alert("failed in here 1");
 		}
-		if ( yyyy == "0000"|| yyyy == "yyyy"){
+		if ( yyyy == "0000" || yyyy == "yyyy"){
         	typeInOK = false;
       }
 	}
