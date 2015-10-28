@@ -1,19 +1,18 @@
 Dear ${demographic.firstName} ${demographic.lastName},
-
+ 
 You have booked the following appointment at Kensington Medical Clinic with Dr. ${provider.firstName} ${provider.lastName}:
-
+ 
 ${appointmentDateTime}
+  
+You are required to confirm your appointment via email or phone within 24 hours of your visit.  You may also confirm you appointment on our website kensingtonmedicalclinic.com by clicking on the confirm/change/cancel your appointment button and filling out the appropriate form.  
 
-You are no longer required to call/email us to confirm an appointment.  Instead, once the appointment is booked with us, the appointment is considered confirmed at that time.  This includes appointment times in which we email you.
+Failure to confirm your appointment may result in the appointment being cancelled.
 
-We will attempt to send a reminder via email  72 hours prior to the appointment as a courtesy.
-
-If you are unable to make the appointment or need to change the appointment, you will need to do so within 24 hours of your appointment.  Changes can be made via email or phone . No shows, or changes to the appointments within 24 hours of the appointment time will result in a cancellation charge.
+If you wish to cancel or change this appointment, please click the confirm/change/cancel email button on our website, or reply to this email within 24 hours of your appointment, otherwise a no show fee will be applied to your account.
 
 Sincerely,
+Kensington Medical Clinic Staff
 
-Kensington Medical Clinic
-
-This communication, including any attachments, may contain confidential information and is intent only for the individual or entity to whom it is addressed.  
-Any review, dissemination or copying of this communication by anyone other than the intended recipient is strictly prohibited.  
-If you are not the intended recipient, please contact the sender by reply e-mail anddelete all copies of the original message. 
+This communication, including any attachments, may contain confidential information and is intent only for the individual or entity to whom it is addressed.
+Any review, dissemination or copying of this communication by anyone other than the intended recipient is strictly prohibited.
+If you are not the intended recipient, please contact the sender by reply e-mail and delete all copies of the original message.
