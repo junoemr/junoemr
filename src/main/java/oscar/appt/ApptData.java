@@ -23,7 +23,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ApptData implements Serializable{
+public class ApptData implements Serializable {
 	String appointment_no;
 	String provider_no;
 	String appointment_date;

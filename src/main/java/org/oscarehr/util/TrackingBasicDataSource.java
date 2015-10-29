@@ -51,7 +51,7 @@ import org.apache.log4j.Logger;
 
 public class TrackingBasicDataSource extends BasicDataSource {
 
-	public static final int MAX_CONNECTION_WARN_SIZE = 2;
+	public static final int MAX_CONNECTION_WARN_SIZE = 3;
 	public static final Logger logger = MiscUtils.getLogger();
 
 	public static final Map<Connection, StackTraceElement[]> debugMap = Collections.synchronizedMap(new WeakHashMap<Connection, StackTraceElement[]>());
