@@ -285,8 +285,14 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		float[] mainTableWidths;
 		if(isUnstructuredDoc)
 		{
-			mainTableWidths = new float[] { 5f, 12f, 3f};
-		}else
+			if(handler.getMsgType().equals("CLS"))
+			{
+				mainTableWidths = new float[] { 5f, 10f, 3f, 2f};
+			} else
+			{
+				mainTableWidths = new float[] { 5f, 12f, 3f};
+			}
+		} else
 		{
 			mainTableWidths = new float[] {5f, 3f, 1f, 3f, 2f, 4f, 2f };
 		}
@@ -334,8 +340,18 @@ public class LabPDFCreator extends PdfPageEventHelper{
 			table.addCell(cell);
 			cell.setPhrase(new Phrase("Result", boldFont));
 			table.addCell(cell);
-			cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
-			table.addCell(cell);
+			if(handler.getMsgType().equals("CLS"))
+			{
+				cell.setPhrase(new Phrase("Date/Time Collected", boldFont));
+				table.addCell(cell);
+				cell.setPhrase(new Phrase("Status", boldFont));
+				table.addCell(cell); 
+			} else 
+			{
+				cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
+				table.addCell(cell);
+			}
+
 		} else
 		{
 			cell.setColspan(1);
@@ -465,6 +481,12 @@ public class LabPDFCreator extends PdfPageEventHelper{
 								} else 
 								{
 									cell.setPhrase(new Phrase(handler.getTimeStamp(j, k), lineFont));
+									table.addCell(cell);
+								}
+								if(handler.getMsgType().equals("CLS"))
+								{
+									cell.setPhrase(new Phrase(handler
+											.getOBXResultStatus(j, k), lineFont));
 									table.addCell(cell);
 								}
 							} 
@@ -704,7 +726,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
      */
     private Color getTextColor(String abn){
         Color ret = Color.BLACK;
-        if ( abn != null && ( abn.equals("A") || abn.startsWith("H")) ){
+        if ( abn != null && ( abn.equals("A") || abn.startsWith("H") || abn.equals("C")) ){
             ret = Color.RED;
         }else if ( abn != null && abn.startsWith("L")){
             ret = Color.BLUE;
