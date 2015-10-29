@@ -25,6 +25,7 @@
 
 package oscar.oscarBilling.pageUtil;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import org.oscarehr.util.MiscUtils;
 import oscar.oscarBilling.pageUtil.BillingBillingManager.BillingItem;
 import oscar.oscarDB.DBHandler;
 
-public class BillingViewBean {
+public class BillingViewBean implements Serializable {
     private String apptProviderNo = null;
     private String patientName 	  = null;
     private String providerView	  = null;
