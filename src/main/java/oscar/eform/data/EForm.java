@@ -567,9 +567,8 @@ public class EForm extends EFormBase {
 	private String escapeHtml(String value) {
 		if(value == null)
 			return null;
-		String escaped = value.replace("\'", "&apos;");
-		escaped = StringEscapeUtils.escapeHtml(escaped);
-		
+		String escaped = StringEscapeUtils.escapeHtml(value);
+		//String escaped = ESAPI.encoder().encodeForHTMLAttribute(value);
 		return escaped;
 	}
 	
