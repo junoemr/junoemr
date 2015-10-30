@@ -25,6 +25,7 @@
 
 package oscar.oscarEncounter.oscarMeasurements.bean;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -34,7 +35,7 @@ import org.oscarehr.util.MiscUtils;
 
 import oscar.oscarDB.DBHandler;
 
-public class EctMeasurementTypesBeanHandler {
+public class EctMeasurementTypesBeanHandler implements Serializable {
     
     Vector measurementTypeVector = new Vector();
     Vector measuringInstrcVector = new Vector();
