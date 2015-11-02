@@ -128,12 +128,18 @@ public class CLSHandler implements MessageHandler {
         		// Set the OBR index
                 outLabString += this.lineDelimiter + "OBR|" + Integer.toString(currentObrCount) + "|" + tempObr;
 
+                // Get OBR NTE records
+                int obrNteCount = oldVersionCLSParser.getOBRCommentCount(obrIndex);
+                for(int obrNteIndex = 0; obrNteIndex < obrNteCount; obrNteIndex++) {
+					outLabString += this.lineDelimiter + oldVersionCLSParser.getOBRNTE(obrIndex, obrNteIndex).encode();
+                }
+
         		// Get Previous version OBX records
                 int obxCount = oldVersionCLSParser.getOBXCount(obrIndex);
                 for(int obxIndex = 0; obxIndex < obxCount; obxIndex++) {
                     outLabString += this.lineDelimiter + oldVersionCLSParser.getOBX(obrIndex, obxIndex).encode();
 
-                    // Get Previous version NTE records
+                    // Get Previous version OBX NTE records
                     int nteCount = oldVersionCLSParser.getOBXCommentCount(obrIndex, obxIndex);
                     for(int nteIndex = 0; nteIndex < nteCount; nteIndex++) {
                         outLabString += this.lineDelimiter + oldVersionCLSParser.getNTE(obrIndex, obxIndex, nteIndex).encode();

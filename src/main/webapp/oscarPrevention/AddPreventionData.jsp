@@ -182,6 +182,20 @@ function disableifchecked(ele,nextDate){
        document.getElementById(nextDate).disabled = false;
     }
 }
+function validateDate(id, date) {
+	try {
+		var res = date.split("-");
+		var d = new Date(res[0], res[1], res[2], "","","","","");
+		var match = date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/);
+		if(isNaN(d) || !match) {
+			throw "Invalid Date Format";
+		}
+	}
+	catch(err) {
+		alert("Invalid date: ".concat(date));
+		document.getElementById(id).value="<%=UtilDateUtilities.getToday(dateFmt)%>";
+	}
+}
 </SCRIPT>
 
 <style type="text/css">
@@ -348,7 +362,7 @@ clear: left;
                             <input name="given" type="radio" value="ineligible" <%=checked(completed,"2")%>>Ineligible</input>
                          </div>
                          <div style="float:left;margin-left:30px;">
-                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="9" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
+                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="9" onChange="validateDate(this.id, this.value)"> <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
                             <label for="provider" class="fields">Provider:</label> <input type="text" name="providerName" id="providerName" value="<%=providerName%>"/>
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
                                       <%for (int i=0; i < providers.size(); i++) {
@@ -386,7 +400,7 @@ clear: left;
                             <input name="given" type="radio" value="ineligible" <%=checked(completed,"2")%>>Ineligible</input>
                          </div>
                          <div style="float:left;margin-left:30px;">
-                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="9" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
+                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="9" onChange="validateDate(this.id, this.value)"> <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
                             <label for="provider" class="fields">Provider:</label> <input type="text" name="providerName" id="providerName" value="<%=providerName%>"/>
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
                                       <%for (int i=0; i < providers.size(); i++) {
@@ -479,7 +493,7 @@ clear: left;
                             <input name="given" type="radio" value="ineligible" <%=checked(completed,"2")%>>Ineligible</input><br/>
                          </div>
                          <div style="float:left;margin-left:30px;">
-                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="9" > <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
+                            <label for="prevDate" class="fields" >Date:</label>    <input type="text" name="prevDate" id="prevDate" value="<%=prevDate%>" size="9" onChange="validateDate(this.id, this.value)"> <a id="date"><img title="Calendar" src="../images/cal.gif" alt="Calendar" border="0" /></a> <br>
                             <label for="provider" class="fields">Provider:</label> <input type="text" name="providerName" id="providerName"/>
                                   <select onchange="javascript:hideExtraName(this);" id="providerDrop" name="provider">
                                       <%for (int i=0; i < providers.size(); i++) {
