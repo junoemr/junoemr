@@ -11,7 +11,7 @@
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
-    
+
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -64,7 +64,7 @@ public String getNonce(String identifier, String first_name, String last_name)
 	final String old_ssl_port = oscarProps.getProperty("clinicaid_old_ssl_port");
 	final String instance_name = oscarProps.getProperty("clinicaid_instance_name");
 	final String api_key = oscarProps.getProperty("clinicaid_api_key");
-	
+
 	String url_string = clinicaid_domain;
 	if(old_ssl_port != null && !old_ssl_port.isEmpty())
 	{
@@ -74,7 +74,7 @@ public String getNonce(String identifier, String first_name, String last_name)
 	{
 		url_string = url_string + "/auth/pushed_login/";
 	}
-	
+
 	URL nonce_url;
 	try
 	{
@@ -84,7 +84,7 @@ public String getNonce(String identifier, String first_name, String last_name)
 	{
 		return e.getMessage();
 	}
-	
+
 	String post_data = "{\"identifier\":\"" + identifier + "\",\"first_name\":\"" + first_name + "\",\"last_name\":\"" + last_name + "\"}";
 
 	String userpass = instance_name + ":" + api_key;
@@ -110,7 +110,7 @@ public String getNonce(String identifier, String first_name, String last_name)
 		// Read the result
 		BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream()));
 		String inputLine;
-		while ((inputLine = in.readLine()) != null) 
+		while ((inputLine = in.readLine()) != null)
 		{
 			output += inputLine;
 		}
@@ -139,7 +139,7 @@ public String getNonce(String identifier, String first_name, String last_name)
 	//return URLEncoder.encode(basicauth);
 }
 
-%>	
+%>
 <%
 oscar.oscarDemographic.data.DemographicData demoData = new oscar.oscarDemographic.data.DemographicData();
 OscarProperties oscarProps = OscarProperties.getInstance();
@@ -156,17 +156,22 @@ String user_first_name = (String)session.getAttribute("userfirstname");
 String user_last_name = (String)session.getAttribute("userlastname");
 
 nonce = getNonce(user_no, user_first_name, user_last_name);
-if(action.equals("invoice_reports")){
+
+if(action.equals("invoice_reports")) {
 	clinicaid_link = clinicaid_domain+"/?nonce="+nonce+"#/reports";
-}else{
+
+} else if(action.equals("invoice_list")) {
+	clinicaid_link = clinicaid_domain+"/?nonce="+nonce+"#/invoice/list";
+
+} else {
 	String service_recipient_oscar_number = request.getParameter("demographic_no");
 	org.oscarehr.common.model.Demographic demo = demoData.getDemographic(service_recipient_oscar_number);
 
 	String provider_no = "", provider_uli = "", provider_first_name = "", provider_last_name = "";
-	
+
 	// Get the appointment provider first
 	String appointment_provider_no = request.getParameter("appointment_provider_no");
-	
+
 	if(appointment_provider_no != null){
 		provider_no = URLEncoder.encode(appointment_provider_no, "UTF-8");
 		provider_uli = billform.getPracNo(appointment_provider_no);
@@ -182,9 +187,9 @@ if(action.equals("invoice_reports")){
 		provider_uli = "";
 	}
 	provider_uli = provider_uli;
-	
+
 	String appointment_number = request.getParameter("appointment_no");
-	
+
 	String patient_dob = demo.getYearOfBirth()+"-"+demo.getMonthOfBirth()+"-"+demo.getDateOfBirth();
 	String encoded_patient_gender = demo.getSex();
 	String first_name = UtilMisc.toUpperLowerCase(demo.getFirstName());
@@ -208,13 +213,13 @@ if(action.equals("invoice_reports")){
 		demo.getFamilyDoctorFirstName();
 	String encoded_referral_last_name =
 		demo.getFamilyDoctorLastName();
-	
+
 	if(action.equals("invoice_reports_by_demographic")){
 		clinicaid_link = clinicaid_domain+"/?nonce="+nonce+"#/reports"+
 							"?service_recipient_uli="+hin+
 							"&service_recipient_oscar_number="+service_recipient_oscar_number;
 	}else if(action.equals("create_invoice")){
-		
+
 		//String billing_form_type = URLEncoder.encode(request.getParameter("billing_service_type"), "UTF-8");
 		clinicaid_link = clinicaid_domain+"/?nonce="+ nonce +"#/invoice/add?service_recipient_first_name="+first_name+
 							"&service_recipient_uli="+hin+
@@ -242,10 +247,10 @@ if(action.equals("invoice_reports")){
 							"&referral_last_name=" + encoded_referral_last_name +
 							"&address=" + encoded_address;
 							//"&billForm="+billing_form_type;
-	
+
 	}
 }
-			
+
 %>
 <script type="text/javascript">
 	window.location="<%=clinicaid_link%>";
