@@ -1338,12 +1338,12 @@ function changeLt(drugId){
          new Ajax.Request(url, {method: 'post',parameters:data});
      }
 
-    function changeText(elementId){
-        if($(elementId).value=='Enter Special Instruction'){
+    function changeText(elementId, defaultText){
+        if($(elementId).value==defaultText){
             $(elementId).value="";
             $(elementId).setStyle({color:'black'});
-        }else if ($(elementId).value==''){
-            $(elementId).value='Enter Special Instruction';
+        }else if ($(elementId).value.trim()==''){
+            $(elementId).value=defaultText;
             $(elementId).setStyle({color:'gray'});
         }
 
@@ -1638,6 +1638,20 @@ function customWarning2(){
 
     }
 
+}
+/*
+ * validate a text value and set it to the default if it is empty using the element id
+ */
+function emptyValidation(element, defaultValue, message) {
+	if(element.value == null || element.value.trim().length == 0) {
+		if(message === undefined) {
+			message = "Please provide a non-empty value";
+		}
+		alert(message);
+		element.value=defaultValue;
+		return false;
+	}
+	return true;
 }
 function saveCustomName(element){
     var elemId=element.id;
