@@ -451,7 +451,7 @@ public class RxUtil {
         rx.setDurationUnit("");
         rx.setPrn(false);
         rx.setQuantity(Integer.toString(0));
-        rx.setSpecial("");
+        rx.setSpecial(null);
     }
     private static String changeToStandardFrequencyCode(String str) {
         String retVal=str;
@@ -1172,7 +1172,7 @@ public class RxUtil {
     	if(defaultRx != null) {
     		rx.setSpecial(defaultRx);
     	} else {
-    		rx.setSpecial("");
+    		rx.setSpecial(null);
     	}
         rx.setQuantity(getDefaultQuantity());
         rx.setRepeat(0);

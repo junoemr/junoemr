@@ -333,7 +333,7 @@ public class PHRMedication extends PHRDocument {
 		drug.setCustomName(med.getCustomName());
 
 		if (med.getInstructions() != null) drug.setSpecial(med.getInstructions().replace("<pre>", "").replace("</pre>", "").trim());
-		else drug.setSpecial("");
+		else drug.setSpecial(null);
 	}
 
 	public void createDrugFromMedicalDataTransfer(String providerNo, MedicalDataTransfer3 medicalDataTransfer) throws IOException, SAXException, ParserConfigurationException {

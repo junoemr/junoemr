@@ -255,8 +255,10 @@ public final class RxWriteScriptForm extends ActionForm {
     
     public void setSpecial(String RHS) {
     	
-    	if (RHS==null || RHS.length()<6) MiscUtils.getLogger().error("drug special is either null or empty : "+RHS, new IllegalArgumentException("special is null or empty"));
-    	
+    	if (RHS==null || RHS.trim().length() == 0) {
+    		MiscUtils.getLogger().error("The RX-SCRIPT-FORM drug special has been set to a bad value:'" + RHS + "'; "+
+	    		"The old value was:'"+this.special+"';", new IllegalArgumentException("special is null or empty"));
+    	}
         this.special = RHS;
     }
     
