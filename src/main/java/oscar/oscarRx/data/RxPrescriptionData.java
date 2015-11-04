@@ -1715,17 +1715,6 @@ public class RxPrescriptionData {
         }
 
         public String getSpecial() {
-
-            //if (special == null || special.length() < 6) {
-            if (special == null || special.length() < 4) {
-            	// the reason this is here is because Tomislav/Caisi was having massive problems tracking down
-            	// drugs that randomly go missing in prescriptions, like a list of 20 drugs and 3 would be missing on the prescription.
-            	// it was tracked down to some code which required a special, but we couldn't figure out why a special was required or missing.
-            	// so now we have code to log an error when a drug is missing a special, we still don't know why it's required or missing
-            	// but at least we know which drug does it.
-                logger.error("Some one is retrieving the drug special but it appears to be blank : " + special, new IllegalStateException());
-            }
-
             return special;
         }
 
@@ -1747,11 +1736,6 @@ public class RxPrescriptionData {
 
         public void setSpecial(String RHS) {
 
-            //if (RHS == null || RHS.length() < 6) {
-              if (RHS == null || RHS.length() < 4) {
-                  logger.error("Some one is setting the drug special but it appears to be blank : " + special, new IllegalStateException());
-            }
-
             if (RHS != null) {
                 if (!RHS.equals("null")) {
                     special = RHS;
@@ -1761,10 +1745,8 @@ public class RxPrescriptionData {
             } else {
                 special = null;
             }
-
-            //if (special == null || special.length() < 6) {
-              if (special == null || special.length() < 4) {
-                  logger.error("after processing the drug special but it appears to be blank : " + special, new IllegalStateException());
+            if (special == null || special.trim().length() == 0) {
+                  logger.error("The drug special has been set to a bad value : " + special, new IllegalStateException());
             }
         }
 
@@ -2027,17 +2009,9 @@ public class RxPrescriptionData {
                 this.takeMax = this.takeMin;
             }
 
-            if (getSpecial() == null || getSpecial().length() < 6) {
-                logger.error("drug special appears to be null or empty : " + getSpecial(), new IllegalStateException("Drug special is invalid."));
-            }
           //  String parsedSpecial = RxUtil.replace(this.getSpecial(), "'", "");//a bug?
              String escapedSpecial = StringEscapeUtils.escapeSql(this.getSpecial());
-          /*  if (parsedSpecial == null || parsedSpecial.length() < 6) {
-                logger.error("drug special after parsing appears to be null or empty : " + parsedSpecial, new IllegalStateException("Drug special is invalid after parsing."));
-            }*/
-            if (escapedSpecial == null || escapedSpecial.length() < 6) {
-                logger.error("drug special after escaping appears to be null or empty : " + escapedSpecial, new IllegalStateException("Drug special is invalid after escaping."));
-            }
+
             try {
 
                 ResultSet rs;
@@ -2674,15 +2648,8 @@ public class RxPrescriptionData {
             if (this.takeMin > this.takeMax) {
                 this.takeMax = this.takeMin;
             }
-if (getSpecial() == null || getSpecial().length() < 4) {
-            //if (getSpecial() == null || getSpecial().length() < 6) {
-                logger.error("drug special appears to be null or empty : " + getSpecial(), new IllegalStateException("Drug special is invalid."));
-            }
+
             String parsedSpecial = RxUtil.replace(this.getSpecial(), "'", "");
-            //if (parsedSpecial == null || parsedSpecial.length() < 6) {
-                if (parsedSpecial == null || parsedSpecial.length() < 4) {
-                logger.error("drug special after parsing appears to be null or empty : " + parsedSpecial, new IllegalStateException("Drug special is invalid after parsing."));
-            }
 
             try {
 
