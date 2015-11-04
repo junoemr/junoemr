@@ -100,23 +100,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SessionConstants;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.OscarProperties;
-import oscar.appt.ApptStatusData;
-import oscar.dms.EDocUtil;
-import oscar.oscarDemographic.data.DemographicAddResult;
-import oscar.oscarDemographic.data.DemographicData;
-import oscar.oscarDemographic.data.DemographicRelationship;
-import oscar.oscarEncounter.data.EctProgram;
-import oscar.oscarEncounter.oscarMeasurements.data.ImportExportMeasurements;
-import oscar.oscarEncounter.oscarMeasurements.data.Measurements;
-import oscar.oscarEncounter.oscarMeasurements.model.MeasurementsExt;
-import oscar.oscarLab.LabRequestReportLink;
-import oscar.oscarLab.ca.on.LabResultImport;
-import oscar.oscarPrevention.PreventionData;
-import oscar.oscarProvider.data.ProviderData;
-import oscar.service.OscarSuperManager;
-import oscar.util.StringUtils;
-import oscar.util.UtilDateUtilities;
 import cds.AlertsAndSpecialNeedsDocument.AlertsAndSpecialNeeds;
 import cds.AllergiesAndAdverseReactionsDocument.AllergiesAndAdverseReactions;
 import cds.AppointmentsDocument.Appointments;
@@ -139,6 +122,23 @@ import cdsDt.DiabetesComplicationScreening.ExamCode;
 import cdsDt.DiabetesMotivationalCounselling.CounsellingPerformed;
 import cdsDt.PersonNameStandard.LegalName;
 import cdsDt.PersonNameStandard.OtherNames;
+import oscar.OscarProperties;
+import oscar.appt.ApptStatusData;
+import oscar.dms.EDocUtil;
+import oscar.oscarDemographic.data.DemographicAddResult;
+import oscar.oscarDemographic.data.DemographicData;
+import oscar.oscarDemographic.data.DemographicRelationship;
+import oscar.oscarEncounter.data.EctProgram;
+import oscar.oscarEncounter.oscarMeasurements.data.ImportExportMeasurements;
+import oscar.oscarEncounter.oscarMeasurements.data.Measurements;
+import oscar.oscarEncounter.oscarMeasurements.model.MeasurementsExt;
+import oscar.oscarLab.LabRequestReportLink;
+import oscar.oscarLab.ca.on.LabResultImport;
+import oscar.oscarPrevention.PreventionData;
+import oscar.oscarProvider.data.ProviderData;
+import oscar.service.OscarSuperManager;
+import oscar.util.StringUtils;
+import oscar.util.UtilDateUtilities;
 
 /**
  *
@@ -2834,6 +2834,19 @@ import cdsDt.PersonNameStandard.OtherNames;
 
 	void saveLinkNote(CaseManagementNote cmn, Integer tableName, Long tableId, String otherId) {
 		if (StringUtils.filled(cmn.getNote())) {
+			
+            /* prevent the update_date from being null */
+            Date updateDate = cmn.getUpdate_date();
+            if(updateDate == null) updateDate = cmn.getCreate_date();
+            if(updateDate == null) updateDate = new Date();
+            cmn.setUpdate_date(updateDate);
+            
+            /* prevent the observation_date from being null */
+            Date obserDate = cmn.getObservation_date();
+            if(obserDate == null) obserDate = cmn.getCreate_date();
+            if(obserDate == null) obserDate = new Date();
+            cmn.setObservation_date(obserDate);
+			
 			caseManagementManager.saveNoteSimple(cmn);    //new note id created
 
 			CaseManagementNoteLink cml = new CaseManagementNoteLink();
@@ -2841,6 +2854,7 @@ import cdsDt.PersonNameStandard.OtherNames;
 			cml.setTableId(tableId);
 			cml.setNoteId(cmn.getId()); //new note id
             cml.setOtherId(otherId);
+            
 			caseManagementManager.saveNoteLink(cml);
 		}
 	}
@@ -2879,30 +2893,30 @@ import cdsDt.PersonNameStandard.OtherNames;
 	String writeProviderData(String firstName, String lastName, String ohipNo, String cpsoNo) {
 		ProviderData pd = getProviderByOhip(ohipNo);
 		if (pd == null) {
-      pd = getProviderByNames(firstName, lastName, matchProviderNames);
-    }
-
-    if (pd == null) {
-      MiscUtils.getLogger().error("No provider found for firstName: " + firstName.toString() +
-        " lastName: " + lastName.toString() + " ohipNo: " + ohipNo.toString());
-
-      if (StringUtils.empty(firstName) || StringUtils.empty(lastName)) {
-        //return defaultProviderNo();
-        return ""; //no information at all!
-      }
-      pd = new ProviderData();
-      pd.addExternalProvider(firstName, lastName, ohipNo, cpsoNo);
-    }
-
-    /* This all seems very broken... Why would we only be interested in negative provider ids
-     * and why whould we greate a new provider then merge it instead of just using the
-     * one we found. Removing it so the importer can match providers properly
-
-		if (pd!=null) return updateExternalProvider(firstName, lastName, ohipNo, cpsoNo, pd);
-
-		//Write as a new provider
-		if (StringUtils.empty(firstName) && StringUtils.empty(lastName) && StringUtils.empty(ohipNo)) return ""; //no information at all!
-    */
+			pd = getProviderByNames(firstName, lastName, matchProviderNames);
+	    }
+	
+	    if (pd == null) {
+	    	logger.error("No provider found for firstName: " + firstName +
+	    			" lastName: " + lastName + " ohipNo: " + ohipNo);
+		
+		    if (StringUtils.empty(firstName) || StringUtils.empty(lastName)) {
+		    	//return defaultProviderNo();
+		    	return ""; //no information at all!
+		    }
+			pd = new ProviderData();
+			pd.addExternalProvider(firstName, lastName, ohipNo, cpsoNo);
+	    }
+	
+		/* This all seems very broken... Why would we only be interested in negative provider ids
+		 * and why whould we greate a new provider then merge it instead of just using the
+		 * one we found. Removing it so the importer can match providers properly
+		
+			if (pd!=null) return updateExternalProvider(firstName, lastName, ohipNo, cpsoNo, pd);
+		
+			//Write as a new provider
+			if (StringUtils.empty(firstName) && StringUtils.empty(lastName) && StringUtils.empty(ohipNo)) return ""; //no information at all!
+		*/
 
 		return pd.getProviderNo();
 	}
