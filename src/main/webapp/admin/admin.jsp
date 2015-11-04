@@ -281,7 +281,7 @@ div.logoutBox {
 				<bean:message key="admin.admin.addRole"/></a></li>
 			<%} %>
 		</security:oscarSec>
-		
+
 		<li><a href="#"
 			onclick='popupPage(500,700,&quot;<html:rewrite page="/admin/providerRole.jsp"/>&quot;);return false;'>
 		<bean:message key="admin.admin.assignRole"/></a></li>
@@ -452,7 +452,7 @@ div.logoutBox {
 					<h3>&nbsp;<bean:message key="admin.admin.billing" /></h3>
 					<ul>
 						<li>
-							<a href="<html:rewrite page="/billing/billingClinicAid.jsp?billing_action=invoice_reports"/>" target="_blank">
+							<a href="<html:rewrite page="/billing/billingClinicAid.jsp?billing_action=invoice_list"/>" target="_blank">
 								<bean:message key="admin.admin.invoiceRpts"/>
 							</a>
 						</li>
@@ -460,7 +460,7 @@ div.logoutBox {
 				</div>
 				<%
 			}
-		
+
 			if (!country.equals("BR"))
 			{
 		%>
@@ -671,7 +671,7 @@ div.logoutBox {
 				onclick="popupPage(600,900,&quot;<html:rewrite page="/oscarReport/patientlist.jsp"/>&quot;)"><bean:message key="admin.admin.exportPatientbyAppt"/></a></li>
 			<caisi:isModuleLoad moduleName="caisi">
 				<li><html:link page="/PMmodule/reports/activity_report_form.jsp"><bean:message key="admin.admin.activityRpt"/></html:link></li>
-			</caisi:isModuleLoad>	
+			</caisi:isModuleLoad>
 			<li><html:link page="/oscarReport/provider_service_report_form.jsp"><bean:message key="admin.admin.providerServiceRpt"/></html:link></li>
 			<caisi:isModuleLoad moduleName="caisi">
 				<li><html:link page="/PopulationReport.do"><bean:message key="admin.admin.popRpt"/></html:link></li>
@@ -853,7 +853,7 @@ div.logoutBox {
 			<li><a href="#" onclick='popupPage(800, 1000,&quot;<html:rewrite page="/hospitalReportManager/hrmPreferences.jsp"/>&quot;);return false;'>Hospital Report Manager (HRM) Preferences</a></li>
 			<li><a href="#" onclick='popupPage(800, 1000,&quot;<html:rewrite page="/hospitalReportManager/hrmShowMapping.jsp"/>&quot;);return false;'>Hospital Report Manager (HRM) Class Mappings</a></li>
 			<li><a href="#" onclick='popupPage(800, 1000,&quot;<html:rewrite page="/hospitalReportManager/hrmCategories.jsp"/>&quot;);return false;'>Hospital Report Manager (HRM) Categories</a></li>
-			
+
 			<li><a href="#" onclick='popupPage(800, 700,&quot;<html:rewrite page="/oscarPrevention/PreventionManager.jsp"/>&quot;);return false;' title="Customize prevention notifications."><bean:message key="admin.admin.preventionNotification.title" /></a></li>
 
 			<%

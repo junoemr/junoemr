@@ -1015,13 +1015,13 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 <% } else {
 	if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){
 		String clinicaid_link = "";
-		clinicaid_link = "../billing/billingClinicAid.jsp?billing_action=invoice_reports&demographic_no="+demographic.getDemographicNo();
+		clinicaid_link = "../billing/billingClinicAid.jsp?billing_action=invoice_list&demographic_no="+demographic.getDemographicNo();
 		%>
 			<a href="<%=clinicaid_link %>" target="_blank">
 				<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/>
 			</a>
 			<br/>
-		<%		
+		<%
 		// Old invoice list
 		if("ON".equals(prov)) {%>
 		<a href="javascript: function myFunction() {return false; }"
@@ -1033,7 +1033,7 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 				<bean:message key="demographic.demographiceditdemographic.msgOldInvoiceList"/></a>
 		<%
 		}
-		
+
 		if("BC".equals(prov)){
 			//show eligibility check
 		%>
@@ -1114,7 +1114,7 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 				billingServiceType = URLEncoder.encode(String.valueOf(providerPreferences.get(0).get("defaultServiceType")));
 			}
 		}
-		
+
 		String referral_no_parameter = "";
 		if(oscarProps.isPropertyActive("auto_populate_billingreferral_bc")){
 			referral_no_parameter = "&referral_no_1=" + rdohip;
