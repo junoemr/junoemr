@@ -130,7 +130,7 @@ public class RxPrescriptionData {
 		if (drug.getRefillDuration() != null) prescription.setRefillDuration(drug.getRefillDuration());
 		if (drug.getRefillQuantity() != null) prescription.setRefillQuantity(drug.getRefillQuantity());
 
-		if (prescription.getSpecial() == null || prescription.getSpecial().length() <= 6) {
+		if (prescription.getSpecial() == null || prescription.getSpecial().trim().length() == 0) {
 			logger.error("I strongly suspect something is wrong, either special is null or it appears to not contain anything useful. drugId=" + drugId + ", drug.special=" + prescription.getSpecial(), new IllegalStateException("Drug special is blank or invalid"));
 			logger.error("data from db is : " + drug.getSpecial());
 		}
@@ -1004,7 +1004,7 @@ public class RxPrescriptionData {
             Prescription rx = bean.getStashItem(i);
 
             String fullOutLine = rx.getFullOutLine();
-            if (fullOutLine == null || fullOutLine.length() < 6) {
+            if (fullOutLine == null || fullOutLine.trim().length() == 0) {
                 logger.error("Drug full outline appears to be null or empty : " + fullOutLine, new IllegalStateException("full out line appears wrong"));
             }
 
@@ -1740,9 +1740,9 @@ public class RxPrescriptionData {
         	 * Error if setting a null or empty special
         	 * only if it wasn't already null, as the special is initialized to null 
         	 * and sometimes it gets set to its current value.
-        	 * We should never set the special to empty string.
+        	 * We should never set the special to empty string (empty string should mean bad client-side input checking).
         	 */
-			if ((RHS == null && special != null) || RHS.trim().length() == 0) {
+			if ((RHS == null && special != null) || (RHS != null && RHS.trim().length() == 0)) {
 			    logger.error("The drug special has been set to a bad value:'" + RHS + "'; "+
 			    		"The old value was:'"+special+"';", new IllegalStateException());
 			}

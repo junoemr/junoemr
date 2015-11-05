@@ -855,7 +855,7 @@ if(bean.getStashIndex() > -1){ //new way
     thisForm.setPrn(rx.getPrn());
 
     //if (rx.getSpecial()==null || rx.getSpecial().length()<6) MiscUtils.getLogger().error("The drug special passed to the display of the user was already blank :"+rx.getSpecial());
-    if (rx.getSpecial()==null || rx.getSpecial().length()<6) MiscUtils.getLogger().error("The drug special passed to the display of the user by bean.getStashItem(bean.getStashIndex()) is empty:'"+rx.getSpecial() + "';");
+    if (rx.getSpecial()==null || rx.getSpecial().trim().length()==0) MiscUtils.getLogger().error("The drug special passed to the display of the user by bean.getStashItem(bean.getStashIndex()) is empty:'"+rx.getSpecial() + "';");
     
     thisForm.setSpecial(rx.getSpecial());
     thisForm.setLongTerm(rx.getLongTerm());
