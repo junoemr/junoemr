@@ -48,13 +48,15 @@ public class UnclaimedLabTag extends TagSupport {
    
    public int doStartTag() throws JspException    {
         try {
-
+        	/*
+        	 * get a count of all new labs and non-deleted documents 
+        	 * for provider 0 (unassigned)
+        	 */
         	String sql = "SELECT COUNT(*) from providerLabRouting plr "
-        		+ "LEFT JOIN hl7TextInfo info ON (info.lab_no = plr.lab_no) AND (plr.lab_type = 'HL7') "
-        		+ "LEFT JOIN document doc ON (doc.document_no = plr.lab_no) AND (plr.lab_type = 'DOC') AND (doc.status <> 'D') "
+        		+ "LEFT JOIN document doc ON (doc.document_no = plr.lab_no) AND (plr.lab_type = 'DOC') "
         		+ "WHERE plr.status = 'N' "
         		+ "AND plr.provider_no = '0' "
-        		+ "AND NOT (info.lab_no IS NULL AND doc.document_no IS NULL);";
+        		+ "AND (doc.status IS NULL OR doc.status <> 'D');";
 
             ResultSet rs = DBHandler.GetSQL(sql);
             while (rs.next()) {
