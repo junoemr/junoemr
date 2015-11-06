@@ -49,11 +49,12 @@ public class UnclaimedLabTag extends TagSupport {
    public int doStartTag() throws JspException    {
         try {
 
-            String sql = new String("SELECT COUNT(*) from providerLabRouting plr " +
-					"LEFT JOIN hl7TextInfo info ON (info.lab_no = plr.lab_no) AND (plr.lab_type = 'HL7') " +
-					"JOIN document doc ON (doc.document_no = plr.lab_no) AND (plr.lab_type = 'DOC') " +
-					"AND (doc.status <> 'D') " + 
-					"WHERE  plr.status = 'N' AND plr.provider_no = '0';");          
+        	String sql = "SELECT COUNT(*) from providerLabRouting plr "
+        		+ "LEFT JOIN hl7TextInfo info ON (info.lab_no = plr.lab_no) AND (plr.lab_type = 'HL7') "
+        		+ "LEFT JOIN document doc ON (doc.document_no = plr.lab_no) AND (plr.lab_type = 'DOC') AND (doc.status <> 'D') "
+        		+ "WHERE plr.status = 'N' "
+        		+ "AND plr.provider_no = '0' "
+        		+ "AND NOT (info.lab_no IS NULL AND doc.document_no IS NULL);";
 
             ResultSet rs = DBHandler.GetSQL(sql);
             while (rs.next()) {
