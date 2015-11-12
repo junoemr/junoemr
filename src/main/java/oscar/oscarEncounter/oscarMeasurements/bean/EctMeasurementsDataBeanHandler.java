@@ -25,6 +25,7 @@
 
 package oscar.oscarEncounter.oscarMeasurements.bean;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ import org.oscarehr.util.MiscUtils;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarEncounter.oscarMeasurements.data.MeasurementTypes;
 
-public class EctMeasurementsDataBeanHandler {
+public class EctMeasurementsDataBeanHandler implements Serializable {
     private static Logger log = MiscUtils.getLogger();
     Vector<EctMeasurementsDataBean> measurementsDataVector = new Vector<EctMeasurementsDataBean>();
 
