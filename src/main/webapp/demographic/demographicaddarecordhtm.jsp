@@ -1172,10 +1172,10 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				<td align="right" nowrap height="10"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formReferalDoctorN" />:</b></td>
 				<td align="left" height="10"><input type="text"
-					name="r_doctor_ohip" maxlength="6"> <% if("ON".equals(prov)) { %>
-								<a
-									href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
-								#</a> <% } %>
+					name="r_doctor_ohip" maxlength="6">
+				<a
+					href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
+				#</a>
 				</td>
 			</tr>
 			<!-- Family Doctor -->
