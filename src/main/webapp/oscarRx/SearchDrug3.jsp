@@ -1991,7 +1991,7 @@ function updateQty(element){
         var elemId=element.id;
         var ar=elemId.split("_");
         var rand=ar[1];
-        var inst_value = (element.value != "")? element.value : "No Instructions";
+        var inst_value = (element.value.trim().length != 0) ? element.value : "No Instructions";
         var instruction="instruction="+inst_value+"&action=parseInstructions&randomId="+rand;
         var url= "<c:out value="${ctx}"/>" + "/oscarRx/UpdateScript.do?parameterValue=updateDrug";
         var quantity="quantity_"+rand;
