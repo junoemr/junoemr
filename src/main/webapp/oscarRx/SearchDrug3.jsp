@@ -2146,7 +2146,7 @@ function updateQty(element){
    	    		alert(message);
    	    		return valid = false;
     		 }
-    		 return valid = true;
+    		 return valid;
     	 });
 		return valid;
     }
