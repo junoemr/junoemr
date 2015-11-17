@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -311,6 +312,22 @@ import oscar.util.UtilDateUtilities;
     	return tmp;
     }
 
+    /**
+     * Parses a date from the parse string using the SimpleDateFormat
+     * @param parseDate - date as string
+     * @param formatter - SimpleDateFormat
+     * @return formatted date or null if date cannot be parsed.
+     */
+    private Date toDateOrNull(String parseDate, SimpleDateFormat formatter) {
+    	if(parseDate==null || parseDate.trim().equals("")) {
+    		return null;
+    	}
+    	try {
+    		return formatter.parse(parseDate);
+		} catch (ParseException e) {
+			return null;
+		}
+    }
 
 
     String[] importXML(String xmlFile, ArrayList<String> warnings, HttpServletRequest request, int timeShiftInDays, Provider student, Program admitTo, int courseId) throws SQLException, Exception {
@@ -626,18 +643,18 @@ import oscar.util.UtilDateUtilities;
             demographic.setHin(hin);
             demographic.setVer(versionCode);
             demographic.setRosterStatus(rosterStatus);
-            demographic.setRosterDate( (rosterDate==null || rosterDate.trim().equals("")) ? null : formatter.parse(rosterDate) );
-            demographic.setRosterTerminationDate( (termDate==null || termDate.trim().equals("")) ? null : formatter.parse(termDate) );
+            demographic.setRosterDate(toDateOrNull(rosterDate, formatter));
+            demographic.setRosterTerminationDate(toDateOrNull(termDate, formatter));
             demographic.setRosterTerminationReason(termReason);
             demographic.setPatientStatus(patient_status);
-            demographic.setPatientStatusDate( (psDate==null || psDate.trim().equals("")) ? null : formatter.parse(psDate) );
+            demographic.setPatientStatusDate(toDateOrNull(psDate, formatter));
             demographic.setChartNo(chart_no);
             demographic.setOfficialLanguage(official_lang);
             demographic.setSpokenLanguage(spoken_lang);
             demographic.setFamilyDoctor(primaryPhysician);
             demographic.setSex(sex);
             demographic.setHcType(hc_type);
-            demographic.setHcRenewDate( (hc_renew_date==null || hc_renew_date.trim().equals("")) ? null : formatter.parse(hc_renew_date) );
+            demographic.setHcRenewDate(toDateOrNull(hc_renew_date, formatter));
             demographic.setSin(sin);
             dd.setDemographic(demographic);
             err_note.add("Replaced Contact-only patient "+patientName+" (Demo no="+demographicNo+")");
