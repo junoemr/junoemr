@@ -25,9 +25,11 @@
 
 package oscar.oscarResearch.oscarDxResearch.util;
 
+import java.io.Serializable;
+
 import oscar.OscarProperties;
 
-public class dxResearchCodingSystem{
+public class dxResearchCodingSystem implements Serializable {
 
     private String codingSystem;
     private String[] arrCodingSystems;
