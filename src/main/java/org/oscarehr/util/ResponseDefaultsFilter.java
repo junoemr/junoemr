@@ -65,7 +65,7 @@ public final class ResponseDefaultsFilter implements Filter
 		setEncoding(request, response);
 		setCaching(request, response);
 		
-		response = new ResponseDefaultsFilterResponseWrapper(response, true, true);
+		response = new ResponseDefaultsFilterResponseWrapper(response, true, false);
 		chain.doFilter(request, response);
 		
 	}

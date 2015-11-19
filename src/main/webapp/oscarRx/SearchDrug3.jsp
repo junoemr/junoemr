@@ -1639,20 +1639,7 @@ function customWarning2(){
     }
 
 }
-/*
- * validate a text value and set it to the default if it is empty using the element id
- */
-function emptyValidation(element, defaultValue, message) {
-	if(element.value == null || element.value.trim().length == 0) {
-		if(message === undefined) {
-			message = "Please provide a non-empty value";
-		}
-		alert(message);
-		element.value=defaultValue;
-		return false;
-	}
-	return true;
-}
+
 function saveCustomName(element){
     var elemId=element.id;
     var ar=elemId.split("_");
@@ -2004,7 +1991,8 @@ function updateQty(element){
         var elemId=element.id;
         var ar=elemId.split("_");
         var rand=ar[1];
-        var instruction="instruction="+element.value+"&action=parseInstructions&randomId="+rand;
+        var inst_value = (element.value.trim().length != 0) ? element.value : "No Instructions";
+        var instruction="instruction="+inst_value+"&action=parseInstructions&randomId="+rand;
         var url= "<c:out value="${ctx}"/>" + "/oscarRx/UpdateScript.do?parameterValue=updateDrug";
         var quantity="quantity_"+rand;
         var str;
@@ -2143,13 +2131,31 @@ function updateQty(element){
         });
         return x;
     }
+    
+    /*
+     * validate instruction text value for non-empty values
+     */
+    function validateInstructionString(message) {
+    	 var valid = true;
+    	 
+    	 jQuery('input[name^="instructions_"]').each(function(){
+    		 var value = jQuery(this).val();
+    		 if(value == null || value.trim().length == 0) {
+   	    		if(message === undefined) {
+   	    			message = "Please provide a non-empty instruction value";
+   	    		}
+   	    		alert(message);
+   	    		return valid = false;
+    		 }
+    		 return valid;
+    	 });
+		return valid;
+    }
 
 
     function updateSaveAllDrugsPrint(){
-    	if(!validateWrittenDate()) {
-    		return false;
-    	}
-		if(!validateRxDate()) {
+    	
+    	if(!validateInstructionString() || !validateWrittenDate() || !validateRxDate()) {
     		return false;
     	}
         var data=Form.serialize($('drugForm'));
@@ -2164,10 +2170,8 @@ function updateQty(element){
         return false;
     }
     function updateSaveAllDrugs(){
-    	if(!validateWrittenDate()) {
-    		return false;
-    	}
-		if(!validateRxDate()) {
+
+    	if(!validateInstructionString() || !validateWrittenDate() || !validateRxDate()) {
     		return false;
     	}
         var data=Form.serialize($('drugForm'));
