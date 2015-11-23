@@ -244,9 +244,12 @@ public class DemographicDao extends HibernateDaoSupport {
 	private List<Demographic> searchDemographic(String searchStr, boolean hasActiveStatus) {
         String regularexp = "like";
         Object[] object = null;
+        String[] lastfirst = {""};
         
-        // separate search terms by ',' into an array
-        String[] lastfirst = searchStr.trim().split(","); 
+	  	// throws an outOfBoundsException if keyword is exactly the split delimiter (java6)
+	  	if(!searchStr.trim().equals(",")) {
+	  		lastfirst = searchStr.trim().split(",");
+	  	}
         
         String hql = "From Demographic d where last_name "+ regularexp + " ?";
         // search by last name, first name
