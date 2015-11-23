@@ -151,11 +151,9 @@ public class DocumentWs extends AbstractWs {
 	public int countNumOfPages(String fileName) {// count number of pages in a
 													// local pdf file
 		int numOfPage = 0;
-		/*
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		String filePath = docdownload + fileName;
-		*/
-		String filePath = fileName;
+
+		String filePath = oscar.OscarProperties.getInstance()
+			.getProperty("DOCUMENT_DIR") + "/" + fileName;
 
 		try {
 			PdfReader reader = new PdfReader(filePath);
