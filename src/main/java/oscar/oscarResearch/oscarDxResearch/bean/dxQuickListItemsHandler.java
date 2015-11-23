@@ -25,6 +25,7 @@
 
 package oscar.oscarResearch.oscarDxResearch.bean;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -35,7 +36,7 @@ import org.oscarehr.util.MiscUtils;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarResearch.oscarDxResearch.util.dxResearchCodingSystem;
 
-public class dxQuickListItemsHandler {
+public class dxQuickListItemsHandler implements Serializable {
 
     Vector dxQuickListItemsVector = new Vector();
 

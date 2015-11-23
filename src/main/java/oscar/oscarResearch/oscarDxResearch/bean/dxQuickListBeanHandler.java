@@ -25,6 +25,7 @@
 
 package oscar.oscarResearch.oscarDxResearch.bean;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -35,7 +36,7 @@ import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 import oscar.oscarDB.DBHandler;
 
-public class dxQuickListBeanHandler {
+public class dxQuickListBeanHandler implements Serializable {
     
     Vector dxQuickListBeanVector = new Vector();
     String lastUsedQuickList = "default";

@@ -25,6 +25,7 @@
 
 package oscar.oscarResearch.oscarDxResearch.bean;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
@@ -34,7 +35,7 @@ import org.oscarehr.util.MiscUtils;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarResearch.oscarDxResearch.util.dxResearchCodingSystem;
 
-public class dxResearchBeanHandler {
+public class dxResearchBeanHandler implements Serializable {
 
     Vector<dxResearchBean> dxResearchBeanVector = new Vector<dxResearchBean>();
 

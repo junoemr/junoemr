@@ -100,18 +100,20 @@
     if(searchMode.equals("search_chart_no")) fieldname="chart_no";
     if(searchMode.equals("search_name")) {
 	  	matchingDemographicParameters=new MatchingDemographicParameters();
-	  	String[] lastfirst = keyword.split(",");
+	  	String[] lastfirst = {""};
+	  	// throws an outOfBoundsException if keyword is exactly the split dilimeter (java6)
+	  	if(!keyword.trim().equals(",")) {
+	  		lastfirst = keyword.trim().split(",");
+	  	}
 
         if (lastfirst.length > 1) {
-            matchingDemographicParameters.setLastName(lastfirst[0].trim());
-            matchingDemographicParameters.setFirstName(lastfirst[1].trim());
+            matchingDemographicParameters.setLastName(lastfirst[0].trim()+"%");
+            matchingDemographicParameters.setFirstName(lastfirst[1].trim()+"%");
+            fieldname="lower(last_name) "+regularexp+" ?"+" and lower(first_name) ";
         }else{
-            matchingDemographicParameters.setLastName(lastfirst[0].trim());
+            matchingDemographicParameters.setLastName(lastfirst[0].trim()+"%");
+            fieldname="lower(last_name)";
         }
-
-    	if(keyword.indexOf(",")==-1)  fieldname="lower(last_name)";
-      else if(keyword.trim().indexOf(",")==(keyword.trim().length()-1)) fieldname="lower(last_name)";
-      else fieldname="lower(last_name) "+regularexp+" ?"+" and lower(first_name) ";
     }
   }
 
