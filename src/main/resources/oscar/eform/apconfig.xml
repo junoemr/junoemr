@@ -61,6 +61,28 @@
         <ap-sql>SELECT '${provider}' AS id</ap-sql>
         <ap-output>${id}</ap-output>
     </databaseap>
+    
+	<databaseap>
+		<ap-name>current_logged_in_user</ap-name>
+		<ap-sql>SELECT provider.first_name, provider.last_name FROM provider WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
+		<ap-output>${last_name}, ${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_logged_in_user_roles</ap-name>
+		<ap-sql>SELECT group_concat(role_name) as roles FROM secUserRole where provider_no='${loggedInProvider}'</ap-sql>
+		<ap-output>${roles}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_logged_in_user_type</ap-name>
+		<ap-sql>SELECT provider_type FROM provider where provider_no='${loggedInProvider}'</ap-sql>
+		<ap-output>${provider_type}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_logged_in_user_id</ap-name>
+		<ap-sql>SELECT '${loggedInProvider}' as id </ap-sql>
+		<ap-output>${id}</ap-output>
+	</databaseap>
+    
 
 <!-- Patient demographic information -->
     <databaseap>
