@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Date;
+import java.util.List;
 
 import oscar.log.LogAction;
 
@@ -79,6 +80,23 @@ public class DemographicManager
 		{
 			LogAction.addLogSynchronous("DemographicManager.getDemographic", 
 				"demographicId="+result.getDemographicNo());
+		}
+		
+		return(result);
+	}
+
+	public List getDemographicsByHealthNum(String hin)
+	{
+		List result = 
+			demographicDao.getDemographicsByHealthNum(hin);
+		
+		//--- log action ---
+		if (result!=null)
+		{
+			LogAction.addLogSynchronous(
+				"DemographicManager.getDemographicsByHealthNum", 
+				"List");
+				//"demographicId="+result.getDemographicNo());
 		}
 		
 		return(result);

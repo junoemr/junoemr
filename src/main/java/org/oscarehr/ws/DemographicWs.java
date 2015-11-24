@@ -38,6 +38,10 @@ import org.oscarehr.ws.transfer_objects.DemographicTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import oscar.log.LogAction;
 
 @WebService
@@ -60,6 +64,22 @@ public class DemographicWs extends AbstractWs {
 	{
 		Demographic demographic=demographicManager.getDemographicByMyOscarUserName(myOscarUserName);
 		return(DemographicTransfer.toTransfer(demographic));
+	}
+
+	public List getDemographicsByHealthNum(String hin)
+	{
+		List<Demographic> demographicList = 
+			demographicManager.getDemographicsByHealthNum(hin);
+
+		Iterator<Demographic> demographicListIterator = demographicList.iterator();
+		List<DemographicTransfer> out = new ArrayList<DemographicTransfer>();
+		while(demographicListIterator.hasNext())
+		{
+			Demographic demographic = demographicListIterator.next();
+			out.add(DemographicTransfer.toTransfer(demographic));
+		}
+
+		return(out);
 	}
 
 	/**
