@@ -4,17 +4,15 @@ This is a courtesy email to remind you that you have an appointment with Dr. ${p
 
 ${appointmentDateTime}
 
-You are not required to confirm your appointment, however if you need to reschedule or cancel your appointment, 24hrs notice is required, otherwise a cancellation fee will apply.
+You are required to confirm your appointment via email or phone within 24 hours of your visit.  You may also confirm you appointment on our website kensingtonmedicalclinic.com by clicking on the confirm/change/cancel your appointment button and filling out the appropriate form.  
 
-Thank you for choosing Kensington Medical Clinic.
+Failure to confirm your appointment may result in the appointment being cancelled. 
 
-If you wish to cancel or change this appointment, please email appointments@kensingtonmedicalclinic.com or reply to this email within 24 hours of your appointment.
-
-Have a nice day.
+If you wish to cancel or change this appointment, please click the confirm/change/cancel email button on our website, or reply to this email within 24 hours of your appointment, otherwise a no show fee will be applied to your account.
 
 Sincerely,
 Kensington Medical Clinic Staff
 
-This communication, including any attachments, may contain confidential information and is intent only for the individual or entity to whom it is addressed.  
-Any review, dissemination or copying of this communication by anyone other than the intended recipient is strictly prohibited.  
-If you are not the intended recipient, please contact the sender by reply e-mail anddelete all copies of the original message. 
+This communication, including any attachments, may contain confidential information and is intent only for the individual or entity to whom it is addressed.
+Any review, dissemination or copying of this communication by anyone other than the intended recipient is strictly prohibited.
+If you are not the intended recipient, please contact the sender by reply e-mail and delete all copies of the original message.

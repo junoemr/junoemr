@@ -457,6 +457,7 @@ public class CommonLabResultData {
 			CommonLabResultData data = new CommonLabResultData();
 			ProviderLabRouting plr = new ProviderLabRouting();
 			// MiscUtils.getLogger().info(flaggedLabs.size()+"--");
+			
 			for (int i = 0; i < flaggedLabs.size(); i++) {
 				String[] strarr = flaggedLabs.get(i);
 				String lab = strarr[0];
@@ -473,6 +474,7 @@ public class CommonLabResultData {
 						 * if (!insertString.equals("")) { insertString = insertString + ", "; } insertString = insertString + "('" + providersArray[j] + "','" + labIds[k]+ "','N','"+labType+"')";
 						 */
 						plr.route(labIds[k], providersArray[j], DbConnectionFilter.getThreadLocalDbConnection(), labType);
+						//updateReportStatus(Integer.parseInt(labIds[k]),((providersArray[j]==null)?"":providersArray[j]),'N',"",labType);
 					}
 
 					// delete old entries

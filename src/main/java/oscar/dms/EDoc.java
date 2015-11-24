@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -77,12 +77,13 @@ public class EDoc extends TagObject implements Comparable {
 	private int numberOfPages = 0;
 	private Integer appointmentNo = -1;
 	private String docResultStatus;
+	private String docIpAddress;
 
 	/** Creates a new instance of EDoc */
 	public EDoc() {
 	}
 
-	public EDoc(String description, String type, String fileName, String html, String creatorId, String responsibleId, String source, char status, String observationDate, String reviewerId, String reviewDateTime, String module, String moduleId) {
+	public EDoc(String description, String type, String fileName, String html, String creatorId, String responsibleId, String source, char status, String observationDate, String reviewerId, String reviewDateTime, String module, String moduleId, String ipAddress) {
 		this.setDescription(description.trim());
 		this.setType(type.trim());
 		this.setFileName(fileName.trim());
@@ -96,10 +97,11 @@ public class EDoc extends TagObject implements Comparable {
 		this.setObservationDate(observationDate);
 		this.setReviewerId(reviewerId);
 		this.setReviewDateTime(reviewDateTime);
+		this.setDocIpAddress(ipAddress);
 		preliminaryProcessing();
 	}
 
-	public EDoc(String description, String type, String fileName, String html, String creatorId, String responsibleId, String source, char status, String observationDate, String reviewerId, String reviewDateTime, String module, String moduleId, int numberOfPages) {
+	public EDoc(String description, String type, String fileName, String html, String creatorId, String responsibleId, String source, char status, String observationDate, String reviewerId, String reviewDateTime, String module, String moduleId, String ipAddress, int numberOfPages) {
 		this.setDescription(description.trim());
 		this.setType(type.trim());
 		this.setFileName(fileName.trim());
@@ -113,6 +115,7 @@ public class EDoc extends TagObject implements Comparable {
 		this.setObservationDate(observationDate);
 		this.setReviewerId(reviewerId);
 		this.setReviewDateTime(reviewDateTime);
+		this.setDocIpAddress(ipAddress);
 		this.setNumberOfPages(numberOfPages);
 		preliminaryProcessing();
 	}
@@ -369,22 +372,22 @@ public class EDoc extends TagObject implements Comparable {
 	}
 
 	/**
-	 * Returns true if this document's content type is that of an image.	
+	 * Returns true if this document's content type is that of an image.
 	 * @return true if document is an image and false otherwise
 	 */
 	public boolean isImage() {
 		return this.contentType != null && !isPDF() && this.contentType.toLowerCase().contains("image/");
 	}
-	
+
 	/**
 	 * Returns true if this document is printable to PDF format.
 	 * @return true if this document is printable to PDF format and false otherwise
 	 */
-	public boolean isPrintable() {		
+	public boolean isPrintable() {
 		// At this time only PDF  and image files are supported.
 		return isPDF() || isImage();
 	}
-	
+
 	public String getObservationDate() {
 		return observationDate;
 	}
@@ -489,5 +492,13 @@ public class EDoc extends TagObject implements Comparable {
 
 	public void setDocResultStatus(String docResultStatus) {
 	    this.docResultStatus = docResultStatus;
+    }
+
+    public String getDocIpAddress() {
+    	return docIpAddress;
+    }
+
+    public void setDocIpAddress(String docIpAddress) {
+    	this.docIpAddress = docIpAddress;
     }
 }

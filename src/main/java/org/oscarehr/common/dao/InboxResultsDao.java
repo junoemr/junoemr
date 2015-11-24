@@ -138,7 +138,7 @@ public class InboxResultsDao {
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	public ArrayList<LabResultData> populateDocumentResultsData(String providerNo, String demographicNo, String patientFirstName,
 			String patientLastName, String patientHealthNumber, String status, boolean isPaged, Integer page,
-			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, Boolean isAbnormalDoc, 
+			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, Boolean isAbnormalDoc,
 			List<String> providerNoArr, boolean neverAcknowledgedItems) {
 
         boolean qp_provider_no = false;
@@ -148,13 +148,13 @@ public class InboxResultsDao {
         boolean qp_hin = false;
         boolean qp_demographic_no = false;
         boolean qp_page = false;
-        
+
         String providerNoList = "";
         if(providerNoArr != null && providerNoArr.size() > 0){
         	providerNoList = StringUtils.join(providerNoArr, ",");
         }
 
-        logger.debug("populateDocumentResultsData(" 
+        logger.debug("populateDocumentResultsData("
                     + "providerNo = " + ((providerNo == null) ? "NULL" : providerNo) + ", "
                     + "demographicNo = " + ((demographicNo == null) ? "NULL" : demographicNo) + ", "
                     + "patientFirstName = " + ((patientFirstName == null) ? "NULL" : patientFirstName) + ", "
@@ -170,8 +170,8 @@ public class InboxResultsDao {
                     + "providerNoList = "+ ((providerNoList == null) ? "NULL" : (providerNoList.equals("") ? "empty" : providerNoList)) + ", "
                     + "neverAcknowledgedItems = " + ((neverAcknowledgedItems) ? "true" : "false") + ", "
                     + ")");
-        
-        
+
+
 
 		if (providerNo == null) {
 			providerNo = "";
@@ -194,8 +194,8 @@ public class InboxResultsDao {
 
 		ArrayList<LabResultData> labResults = new ArrayList<LabResultData>();
 
-		if (isAbnormal != null && (isAbnormalDoc == null || !isAbnormalDoc)) { 
-			// Only need to return DOCs.  If isAbnormal is set, this would imply 
+		if (isAbnormal != null && (isAbnormalDoc == null || !isAbnormalDoc)) {
+			// Only need to return DOCs.  If isAbnormal is set, this would imply
 			// HL7 (i.e. something that identifies whether it is normal or not)
 			// so we return nothing without running any queries.
 			return labResults;
@@ -204,36 +204,37 @@ public class InboxResultsDao {
 		Query q;
 		String sql = "";
 
-		int idLoc = -1;
-		int docNoLoc = -1;
-		int statusLoc = -1;
-		int docTypeLoc = -1;
-		int lastNameLoc = -1;
-		int firstNameLoc = -1;
-		int hinLoc = -1;
-		int sexLoc = -1;
-		int moduleLoc = -1;
-		int obsDateLoc = -1;
-		int docResultStatusLoc = -1;
 		try {
 
+			int pos = 0;
+			int idLoc = pos++;
+			int docNoLoc = pos++;
+			int statusLoc = pos++;
+			int docTypeLoc = pos++;
+			int lastNameLoc = pos++;
+			int firstNameLoc = pos++;
+			int hinLoc = pos++;
+			int sexLoc = pos++;
+			int moduleLoc = pos++;
+			int obsDateLoc = pos++;
+			int docResultStatusLoc = pos++;
+			int docUploadedByLoc = pos++;
 
-			idLoc = 0; docNoLoc = 1; statusLoc = 2; docTypeLoc = 3; lastNameLoc = 4; firstNameLoc = 5; hinLoc = 6; sexLoc = 7; moduleLoc = 8; obsDateLoc = 9; docResultStatusLoc = 10;
             // Notes on query:
             //
             // Returns only DOCUMENTS so INNER JOIN providerLabRouting with
-            // document and ctl_document because they must exist for this 
-            // to be a valid document.  
+            // document and ctl_document because they must exist for this
+            // to be a valid document.
             //
-            // patientLabRouting is written into 
+            // patientLabRouting is written into
             // the query as a LEFT JOIN but with a FALSE WHERE clause so
-            // it's never actually used.  Sometimes a patientLabRouting 
+            // it's never actually used.  Sometimes a patientLabRouting
             // exists for a DOCUMENT, sometimes it doesn't -- I don't know
             // why, but it seems to be consistent with the ctl_document with
             // respect to the demographic_no (module_id in ctl_document).
-            // 
+            //
             // Similarly, getting the demographic based on the patientLabRouting
-            // is written into the query, but since the patientLabRouting is 
+            // is written into the query, but since the patientLabRouting is
             // never joined, it will never be used.
 			sql = "SELECT  proLR.id, "
 				+ "        proLR.lab_no AS document_no, "
@@ -248,22 +249,24 @@ public class InboxResultsDao {
 				+ "            END AS sex, "
 				+ "        CASE WHEN d1.demographic_no IS NOT NULL THEN d1.demographic_no ELSE d2.demographic_no END AS demographic_no, "
 				+ "        doc.observationdate AS observationdate, "
-				+ "        doc.doc_result_status ";
-			
+				+ "        doc.doc_result_status, "
+				+ "        CONCAT(creator.last_name, ', ', creator.first_name) AS uploadedBy ";
+
 			if(neverAcknowledgedItems && "N".equals(status)){
 				sql = sql + "FROM (" +
 						    "    SELECT * FROM (" +
 						    "        SELECT plr.*" +
-						    "        FROM providerLabRouting plr" + 
+						    "        FROM providerLabRouting plr" +
 						    "        GROUP BY lab_no, status" +
 						    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
 						    ") proLR ";
 			}else{
 				sql = sql + "FROM providerLabRouting proLR ";
 			}
-			
+
 			sql = sql + "LEFT JOIN patientLabRouting patLR ON ( proLR.lab_type = patLR.lab_type AND proLR.lab_no = patLR.lab_no AND FALSE ) "
 				+ "INNER JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no ) "
+				+ "LEFT JOIN provider creator ON ( doc.doccreator = creator.provider_no ) "
 				+ "INNER JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' ) "
 				+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no AND FALSE ) "
 				+ "LEFT JOIN demographic d2 ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id > 0 AND cdoc.module_id = d2.demographic_no ) "
@@ -280,7 +283,7 @@ public class InboxResultsDao {
 				sql = sql + "AND (proLR.provider_no = :provider_no) ";
 				qp_provider_no = true;
 			}
-			
+
 			if(providerNoList != null && !providerNoList.equals("")){
 				sql = sql + "AND (proLR.provider_no IN ("+providerNoList+") ) ";
 			}
@@ -304,14 +307,14 @@ public class InboxResultsDao {
 				sql = sql + "AND ((CASE WHEN d1.demographic_no IS NOT NULL THEN d1.hin ELSE d2.hin END) LIKE :hin) ";
 				qp_hin = true;
 			}
-			
+
 			if(isAbnormalDoc != null && isAbnormalDoc) {
 				sql = sql + "AND doc_result_status = 'A' ";
 			}
 
 			if ("0".equals(demographicNo)) {
 				// There seems to be an inconsistency where a ctl_document.module_id of either 0 or -1
-				// (when module='demographic') indicates that the document is unassigned hence the 
+				// (when module='demographic') indicates that the document is unassigned hence the
 				// checking for either in the following condition
 				sql = sql + "AND (COALESCE(d1.demographic_no, d2.demographic_no) IS NULL OR COALESCE(d1.demographic_no, d2.demographic_no) IN ('0', '-1')) ";
 			} else if (demographicNo != null && !"".equals(demographicNo)) {
@@ -319,7 +322,7 @@ public class InboxResultsDao {
 				qp_demographic_no = true;
 			}
 
-			sql = sql + "ORDER BY observationdate desc ";
+			sql = sql + "ORDER BY observationdate desc, doc.document_no desc ";
 			if (isPaged) {
 				sql = sql + "LIMIT :page_start, :page_size";
 				qp_page = true;
@@ -337,13 +340,12 @@ public class InboxResultsDao {
 				q.setParameter("page_start", page * pageSize);
 				q.setParameter("page_size", pageSize);
 			}
-			
-
 
 			logger.info(sql);
 
 			List<Object[]> result = q.getResultList();
 			for (Object[] r : result) {
+
 				LabResultData lbData = new LabResultData(LabResultData.DOCUMENT);
 				lbData.labType = LabResultData.DOCUMENT;
 
@@ -379,15 +381,15 @@ public class InboxResultsDao {
 				if (lbData.resultStatus.equals("A")) lbData.abn = true;
 
 				lbData.dateTime = getStringValue(r[obsDateLoc]);
-			
+
 				//This doesn't properly format the date. It assumes the date given is on UTC Format and converts it to the server timezone
 				//lbData.setDateObj(DateUtils.parseDate(getStringValue(r[obsDateLoc]), new String[] {
 				//		"yyyy-MM-dd"
 				//}));
-				
+
 				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 				lbData.setDateObj(UtilDateUtilities.StringToDate(getStringValue(r[obsDateLoc])));
-				
+
 				String priority = "";
 				if (priority != null && !priority.equals("")) {
 					switch (priority.charAt(0)) {
@@ -415,10 +417,10 @@ public class InboxResultsDao {
 				}
 
 				lbData.requestingClient = "";
-				
-				//Documents can be flagged as abnormal 
+
+				//Documents can be flagged as abnormal
 				lbData.abn = (r[docResultStatusLoc] != null && getStringValue(r[docResultStatusLoc]).equals("A")) ? true : false;
-				
+
 				lbData.reportStatus = "F";
 
 
@@ -441,6 +443,9 @@ public class InboxResultsDao {
 				}
 
 				lbData.finalResultsCount = 0;//rs.getInt("final_result_count");
+
+				lbData.uploadedBy = getStringValue(r[docUploadedByLoc]);
+
 				labResults.add(lbData);
 			}
 

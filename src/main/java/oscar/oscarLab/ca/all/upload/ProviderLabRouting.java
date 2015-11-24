@@ -67,15 +67,14 @@ public class ProviderLabRouting {
         route(Integer.parseInt(labId), provider_no, conn, labType);
     }
 
-	    public void route(int labId, String provider_no,String labType) throws SQLException{
-	        route(Integer.toString(labId), provider_no,labType);
-	    }
+    public void route(int labId, String provider_no, Connection conn, String labType) throws SQLException {
 
-    public void route(int labId, String provider_no, Connection conn, String labType) throws SQLException{
         PreparedStatement pstmt;
         ForwardingRules fr = new ForwardingRules();
         OscarProperties props = OscarProperties.getInstance();
+
         String autoFileLabs = props.getProperty("AUTO_FILE_LABS");
+        String autoUnfileLabs = props.getProperty("AUTO_UNFILE_LABS");
 
         String sql = "SELECT status FROM providerLabRouting WHERE provider_no='"+provider_no+"' AND lab_no='"+labId+"' AND lab_type='"+labType+"'";
         pstmt = conn.prepareStatement(sql);
@@ -95,17 +94,38 @@ public class ProviderLabRouting {
                 logger.info("FORWARDING PROVIDER: "+((forwardProviders.get(j)).get(0)));
                 route(labId, ( ( forwardProviders.get(j)).get(0)), conn, labType);
             }
-
-        // If the lab has already been sent to this provider check to make sure that
-        // it is set as a new lab for at least one provider if AUTO_FILE_LABS=yes is not
-        // set in the oscar.properties file
-        }else if (autoFileLabs == null || !autoFileLabs.equalsIgnoreCase("yes")){
-            sql = "SELECT provider_no FROM providerLabRouting WHERE lab_no='"+labId+"' AND status='N' AND lab_type='"+labType+"'";
-            pstmt = conn.prepareStatement(sql);
-            rs = pstmt.executeQuery();
-            if (!rs.next()){
-                sql = "UPDATE providerLabRouting set status='N' WHERE lab_no='"+labId+"' AND lab_type='"+labType+"'";
+        }
+        else
+        {
+            // If the lab has already been sent to this provider check to make sure that
+            // it is set as a new lab for at least one provider if AUTO_FILE_LABS=yes is not
+            // set in the oscar.properties file
+            if (autoFileLabs == null || !autoFileLabs.equalsIgnoreCase("yes"))
+            {
+                sql = "SELECT provider_no FROM providerLabRouting WHERE lab_no='"+labId+"' AND status='N' AND lab_type='"+labType+"'";
                 pstmt = conn.prepareStatement(sql);
+                rs = pstmt.executeQuery();
+                if (!rs.next()){
+
+                    sql = "UPDATE providerLabRouting set status='N' WHERE lab_no='"+labId+"' AND lab_type='"+labType+"'";
+                    pstmt = conn.prepareStatement(sql);
+                    pstmt.executeUpdate();
+                }
+            }
+
+            // if auto-unfile-labs is turned on, when a lab is forwarded and
+            // the status is filed for that provider, change it to new
+            if("yes".equalsIgnoreCase(autoUnfileLabs))
+            {
+                logger.info(String.format("unfiling lab %s (%s) for %s", labId, labType, provider_no));
+                sql = "UPDATE providerLabRouting set status = ? WHERE provider_no = ? AND lab_no = ? AND lab_type= ? AND status = ?";
+                pstmt = conn.prepareStatement(sql);
+                int paramIndex = 1;
+                pstmt.setString(paramIndex++, "N");
+                pstmt.setString(paramIndex++, provider_no);
+                pstmt.setInt(paramIndex++, labId);
+                pstmt.setString(paramIndex++, labType);
+                pstmt.setString(paramIndex++, "F");
                 pstmt.executeUpdate();
             }
         }
@@ -130,11 +150,13 @@ public class ProviderLabRouting {
 	return info;
     }
 
+    public void route(String labId, String provider_no, String labType) throws SQLException {
 
-    public void route(String labId, String provider_no, String labType) throws SQLException{
     	ForwardingRules fr = new ForwardingRules();
+
         OscarProperties props = OscarProperties.getInstance();
         String autoFileLabs = props.getProperty("AUTO_FILE_LABS");
+        String autoUnfileLabs = props.getProperty("AUTO_UNFILE_LABS");
 
         ProviderLabRoutingDao providerLabRoutingDao = new ProviderLabRoutingDao();
         List<ProviderLabRoutingModel> rs = providerLabRoutingDao.getProviderLabRoutingForLabProviderType(labId, provider_no, labType);
@@ -157,14 +179,25 @@ public class ProviderLabRouting {
                 route(labId, ( ( forwardProviders.get(j)).get(0)),labType);
             }
 
-            // If the lab has already been sent to this provider check to make sure that
-            // it is set as a new lab for at least one provider if AUTO_FILE_LABS=yes is not
-            // set in the oscar.properties file
-           }else if (autoFileLabs == null || !autoFileLabs.equalsIgnoreCase("yes")){
-        	   rs = providerLabRoutingDao.getProviderLabRoutingForLabAndType(labId, labType);
-        	   if (rs.isEmpty()) {
-        		   providerLabRoutingDao.updateStatus(labId,labType);
-        	   }
+           } else {
+
+                // If the lab has already been sent to this provider check to make sure that
+                // it is set as a new lab for at least one provider if AUTO_FILE_LABS=yes is not
+                // set in the oscar.properties file
+                if (autoFileLabs == null || !autoFileLabs.equalsIgnoreCase("yes")) {
+            	   rs = providerLabRoutingDao.getProviderLabRoutingForLabAndType(labId, labType);
+            	   if (rs.isEmpty()) {
+            		   providerLabRoutingDao.updateStatus(labId,labType);
+            	   }
+                }
+
+                // if auto-unfile-labs is turned on, when a lab is forwarded and
+                // the status is filed for that provider, change it to new
+                if("yes".equalsIgnoreCase(autoUnfileLabs))
+                {
+                    logger.info(String.format("unfiling lab %s (%s) for %s", labId, labType, provider_no));
+                    providerLabRoutingDao.updateStatus("N", labId, labType, provider_no, "F");
+                }
            }
 
 

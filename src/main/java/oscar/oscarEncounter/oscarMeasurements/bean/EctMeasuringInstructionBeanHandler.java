@@ -25,9 +25,10 @@
 
 package oscar.oscarEncounter.oscarMeasurements.bean;
 
+import java.io.Serializable;
 import java.util.Vector;
 
-public class EctMeasuringInstructionBeanHandler {
+public class EctMeasuringInstructionBeanHandler implements Serializable {
     
     Vector measuringInstructionVector = new Vector();
  

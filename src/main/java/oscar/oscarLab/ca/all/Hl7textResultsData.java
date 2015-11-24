@@ -693,8 +693,7 @@ public class Hl7textResultsData {
 			
 			sql = sql + "LEFT JOIN patientLabRouting patLR ON (hl7.lab_no = patLR.lab_no AND patLR.lab_type = 'HL7') "
 				+ "LEFT JOIN demographic d ON (patLR.demographic_no = d.demographic_no ) "
-				+ "WHERE true "
-				+ "AND (hl7.accessionNum is null or hl7.lab_no = (SELECT MAX(hl72.lab_no) FROM hl7TextInfo hl72 WHERE hl7.accessionNum = hl72.accessionNum)) ";
+				+ "WHERE true ";
 
 			if ("-1".equals(providerNo) || "".equals(providerNo)) {
 				// any provider
@@ -746,8 +745,8 @@ public class Hl7textResultsData {
 				qp_demographic_no = true;
 			}
 			
-			sql = sql + " GROUP BY COALESCE( hl7.accessionNum, hl7.lab_no ) ";
 			sql = sql + " ORDER BY hl7.obr_date desc, hl7.lab_no desc) ordered_labs ";
+			sql = sql + " GROUP BY COALESCE( accessionNum, lab_no ) ";
 			
 			// Some labs sometimes become normal or abnormal. Let's just use the last
 			// lab result in checking if it's normal or abnormal
@@ -758,6 +757,8 @@ public class Hl7textResultsData {
 					sql = sql + "HAVING (ordered_labs.result_status IS NULL OR ordered_labs.result_status != 'A') ";
 				}
 			}
+
+			sql = sql + " ORDER BY obr_date desc, lab_no desc ";
 
 			if (isPaged) {
 				sql = sql + "LIMIT ?,?";

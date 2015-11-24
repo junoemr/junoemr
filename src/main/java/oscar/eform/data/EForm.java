@@ -41,7 +41,6 @@ import org.oscarehr.ui.servlet.ImageRenderingServlet;
 import org.oscarehr.util.DigitalSignatureUtils;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.owasp.esapi.ESAPI;
 
 import oscar.eform.EFormLoader;
 import oscar.eform.EFormUtil;
@@ -565,6 +564,14 @@ public class EForm extends EFormBase {
 		return curAP;
 	}
 
+	private String escapeHtml(String value) {
+		if(value == null)
+			return null;
+		String escaped = StringEscapeUtils.escapeHtml(value);
+		//String escaped = ESAPI.encoder().encodeForHTMLAttribute(value);
+		return escaped;
+	}
+	
 	private StringBuilder putValue(String value, String type, int pointer, StringBuilder html) {
 		// inserts value= into tag or textarea
         if (type.equals("onclick") || type.equals("onclick_append")) {
@@ -576,10 +583,10 @@ public class EForm extends EFormBase {
             }
 			html.insert(pointer, " " + value);
         } else if (type.equals(OPENER_VALUE)) {
-        	value = ESAPI.encoder().encodeForHTMLAttribute(value);
+        	value = escapeHtml(value);
 			html.insert(pointer, " "+OPENER_VALUE+"=\""+value+"\"");
 		} else if (type.equals("text") || type.equals("hidden")) {
-			value = ESAPI.encoder().encodeForHTMLAttribute(value);
+			value = escapeHtml(value);
 			html.insert(pointer, " value=\""+value+"\"");
         } else if(type.equals("textarea")) {
 			pointer = html.indexOf(">", pointer) + 1;
@@ -726,10 +733,8 @@ public class EForm extends EFormBase {
 				html = html.insert(pointer, " selected");
 			}
 		} else {
-			String quote = "\"";
-
-			output = ESAPI.encoder().encodeForHTMLAttribute(output);
-			html.insert(pointer, " value="+quote+output+quote);
+			output = escapeHtml(output);
+			html.insert(pointer, " value=\""+output+"\"");
 		}
 		return (html);
 	}

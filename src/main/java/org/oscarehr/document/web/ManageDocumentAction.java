@@ -25,6 +25,7 @@
 
 package org.oscarehr.document.web;
 
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -32,9 +33,7 @@ import java.awt.image.RenderedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
@@ -42,8 +41,11 @@ import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Iterator;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,6 +83,7 @@ import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.log.LogAction;
@@ -88,11 +91,13 @@ import oscar.log.LogConst;
 import oscar.oscarDemographic.data.DemographicData;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarLab.ca.on.LabResultData;
+import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.util.UtilDateUtilities;
 
 import com.lowagie.text.pdf.PdfReader;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
+
 
 /**
  * @author jaygallagher
@@ -164,7 +169,7 @@ public class ManageDocumentAction extends DispatchAction {
 		}
 
 		documentDAO.save(d);
-		
+
 		try {
 
 			CtlDocument ctlDocument = documentDAO.getCtrlDocument(Integer.parseInt(documentId));
@@ -180,13 +185,18 @@ public class ManageDocumentAction extends DispatchAction {
 			MiscUtils.getLogger().error("Error", e);
 		}
 
+		// OHSUPPORT-1968: when a document is assigned to a demographic,
+		// link to the echart should be created
+		CommonLabResultData.updatePatientLabRouting(documentId, demog, "DOC");
+
+
 		if( null != use_provider_as_responsible && flagproviders.length == 1) {
 			EDoc edoc = EDocUtil.getEDocFromDocId(documentId);
 			edoc.setResponsibleId(flagproviders[0]);
 			EDocUtil.editDocumentSQL(edoc, false);
 		}
-		
-		
+
+
 		HashMap hm = new HashMap();
 		hm.put("patientId", demog);
 		JSONObject jsonObject = JSONObject.fromObject(hm);
@@ -290,6 +300,10 @@ public class ManageDocumentAction extends DispatchAction {
 			MiscUtils.getLogger().error("Error", e);
 		}
 
+		// OHSUPPORT-1968: when a document is assigned to a demographic,
+		// link to the echart should be created
+		CommonLabResultData.updatePatientLabRouting(documentId, demog, "DOC");
+
 		if (ret != null && !ret.equals("")) {
 			// response.getOutputStream().print(ret);
 		}
@@ -342,21 +356,21 @@ public class ManageDocumentAction extends DispatchAction {
 		cmn.setSigned(true);
 		cmn.setSigning_provider_no("-1");
 		cmn.setProgram_no(prog_no);
-		
+
 		SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-		SecRole doctorRole = secRoleDao.findByName("doctor");		
+		SecRole doctorRole = secRoleDao.findByName("doctor");
 		cmn.setReporter_caisi_role(doctorRole.getId().toString());
-		
+
 		cmn.setReporter_program_team("0");
 		cmn.setPassword("NULL");
 		cmn.setLocked(false);
 		cmn.setHistory(strNote);
 		cmn.setPosition(0);
-		
+
 		Long note_id = cmm.saveNoteSimpleReturnID(cmn);
 		// Debugging purposes on the live server
 		MiscUtils.getLogger().info("Document Note ID: "+note_id.toString());
-		
+
 		// Add a noteLink to casemgmt_note_link
 		CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
 		cmnl.setTableName(CaseManagementNoteLink.DOCUMENT);
@@ -364,10 +378,6 @@ public class ManageDocumentAction extends DispatchAction {
 		cmnl.setNoteId(note_id);
 		EDocUtil.addCaseMgmtNoteLink(cmnl);
 	}
-
-	/*
-	 * private void savePatientLabRouting(String demog,String docId,String docType){ CommonLabResultData.updatePatientLabRouting(docId, demog, docType); }
-	 */
 
 	private static File getDocumentCacheDir(String docdownload) {
 		// File cacheDir = new File(docdownload+"_cache");
@@ -384,7 +394,7 @@ public class ManageDocumentAction extends DispatchAction {
 	}
 
 	private File hasCacheVersion2(Document d, Integer pageNum) {
-		File documentCacheDir = getDocumentCacheDir(oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
+		File documentCacheDir = getDocumentCacheDir(OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
 		File outfile = new File(documentCacheDir, d.getDocfilename() + "_" + pageNum + ".png");
 		if (!outfile.exists()) {
 			outfile = null;
@@ -393,7 +403,7 @@ public class ManageDocumentAction extends DispatchAction {
 	}
 
 	private File hasCacheVersion(Document d) {
-		File documentCacheDir = getDocumentCacheDir(oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
+		File documentCacheDir = getDocumentCacheDir(OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
 		File outfile = new File(documentCacheDir, d.getDocfilename() + ".png");
 		if (!outfile.exists()) {
 			outfile = null;
@@ -403,7 +413,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 
 	public static void deleteCacheVersion(org.oscarehr.document.model.Document d, int pageNum) {
-		File documentCacheDir = getDocumentCacheDir(oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
+		File documentCacheDir = getDocumentCacheDir(OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
 		//pageNum=pageNum-1;
 		File outfile = new File(documentCacheDir,d.getDocfilename()+"_"+pageNum+".png");
 		if (outfile.exists()){
@@ -412,7 +422,7 @@ public class ManageDocumentAction extends DispatchAction {
 	}
 
 	private File hasCacheVersion(org.oscarehr.document.model.Document d, int pageNum){
-		File documentCacheDir = getDocumentCacheDir(oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
+		File documentCacheDir = getDocumentCacheDir(OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
 		//pageNum= pageNum-1;
 		File outfile = new File(documentCacheDir,d.getDocfilename()+"_"+pageNum+".png");
 		if (!outfile.exists()){
@@ -422,7 +432,7 @@ public class ManageDocumentAction extends DispatchAction {
 	}
 
 	public File createCacheVersion2(Document d, Integer pageNum) {
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+		String docdownload = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 		File documentDir = new File(docdownload);
 		File documentCacheDir = getDocumentCacheDir(docdownload);
 		log.debug("Document Dir is a dir" + documentDir.isDirectory());
@@ -453,7 +463,10 @@ public class ManageDocumentAction extends DispatchAction {
 
 			ofile = new File(documentCacheDir, d.getDocfilename() + "_" + pageNum + ".png");
 
-
+			if("yes".equalsIgnoreCase(OscarProperties.getInstance().getProperty(
+				"INVERT_DARK_DOCUMENT_PREVIEWS"))) {
+				correctImageFileColors(ofile);
+			}
 
 		}catch(Exception e) {
 			log.error("Error decoding pdf file " + d.getDocfilename());
@@ -464,7 +477,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 		/*
 
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+		String docdownload = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 		File documentDir = new File(docdownload);
 		File documentCacheDir = getDocumentCacheDir(docdownload);
 		log.debug("Document Dir is a dir" + documentDir.isDirectory());
@@ -511,55 +524,55 @@ public class ManageDocumentAction extends DispatchAction {
 */
 	}
 
-	public File createCacheVersion(Document d) throws Exception {
+	// public File createCacheVersion(Document d) throws Exception {
 
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		File documentDir = new File(docdownload);
-		File documentCacheDir = getDocumentCacheDir(docdownload);
-		log.debug("Document Dir is a dir" + documentDir.isDirectory());
+	// 	String docdownload = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+	// 	File documentDir = new File(docdownload);
+	// 	File documentCacheDir = getDocumentCacheDir(docdownload);
+	// 	log.debug("Document Dir is a dir" + documentDir.isDirectory());
 
-		File file = new File(documentDir, d.getDocfilename());
+	// 	File file = new File(documentDir, d.getDocfilename());
 
-		RandomAccessFile raf = new RandomAccessFile(file, "r");
-		FileChannel channel = raf.getChannel();
-		ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-		PDFFile pdffile = new PDFFile(buf);
-		if(raf != null) raf.close();
-		if(channel != null) channel.close();
-		// long readfile = System.currentTimeMillis() - start;
-		// draw the first page to an image
-		PDFPage ppage = pdffile.getPage(0);
+	// 	RandomAccessFile raf = new RandomAccessFile(file, "r");
+	// 	FileChannel channel = raf.getChannel();
+	// 	ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+	// 	PDFFile pdffile = new PDFFile(buf);
+	// 	if(raf != null) raf.close();
+	// 	if(channel != null) channel.close();
+	// 	// long readfile = System.currentTimeMillis() - start;
+	// 	// draw the first page to an image
+	// 	PDFPage ppage = pdffile.getPage(0);
 
-		log.debug("WIDTH " + (int) ppage.getBBox().getWidth() + " height " + (int) ppage.getBBox().getHeight());
+	// 	log.debug("WIDTH " + (int) ppage.getBBox().getWidth() + " height " + (int) ppage.getBBox().getHeight());
 
-		// get the width and height for the doc at the default zoom
-		Rectangle rect = new Rectangle(0, 0, (int) ppage.getBBox().getWidth(), (int) ppage.getBBox().getHeight());
+	// 	// get the width and height for the doc at the default zoom
+	// 	Rectangle rect = new Rectangle(0, 0, (int) ppage.getBBox().getWidth(), (int) ppage.getBBox().getHeight());
 
-		log.debug("generate the image");
-		Image img = ppage.getImage(rect.width, rect.height, // width & height
-		        rect, // clip rect
-		        null, // null for the ImageObserver
-		        true, // fill background with white
-		        true // block until drawing is done
-		        );
+	// 	log.debug("generate the image");
+	// 	Image img = ppage.getImage(rect.width, rect.height, // width & height
+	// 	        rect, // clip rect
+	// 	        null, // null for the ImageObserver
+	// 	        true, // fill background with white
+	// 	        true // block until drawing is done
+	// 	        );
 
-		log.debug("about to Print to stream");
-		File outfile = new File(documentCacheDir, d.getDocfilename() + ".png");
+	// 	log.debug("about to Print to stream");
+	// 	File outfile = new File(documentCacheDir, d.getDocfilename() + ".png");
 
-		OutputStream outs = null;
-		try {
-			outs = new FileOutputStream(outfile);
+	// 	OutputStream outs = null;
+	// 	try {
+	// 		outs = new FileOutputStream(outfile);
 
-			RenderedImage rendImage = (RenderedImage) img;
-			ImageIO.write(rendImage, "png", outs);
-			outs.flush();
-		} finally {
-			if (outs != null) outs.close();
-		}
+	// 		RenderedImage rendImage = (RenderedImage) img;
+	// 		ImageIO.write(rendImage, "png", outs);
+	// 		outs.flush();
+	// 	} finally {
+	// 		if (outs != null) outs.close();
+	// 	}
 
-		return outfile;
+	// 	return outfile;
 
-	}
+	// }
 
 	public ActionForward showPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		return getPage(mapping, form, request, response, Integer.parseInt(request.getParameter("page")));
@@ -676,7 +689,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+		String docdownload = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 		File documentDir = new File(docdownload);
 		log.debug("Document Dir is a dir" + documentDir.isDirectory());
 
@@ -724,7 +737,7 @@ public class ManageDocumentAction extends DispatchAction {
 	public ActionForward getDocPageNumber(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 
 		String doc_no = request.getParameter("doc_no");
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+		String docdownload = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 		// File documentDir = new File(docdownload);
 		Document d = documentDAO.getDocument(doc_no);
 		String filePath = docdownload + d.getDocfilename();
@@ -768,7 +781,7 @@ public class ManageDocumentAction extends DispatchAction {
 				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 			}
 
-			String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+			String docdownload = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 
 			File documentDir = new File(docdownload);
 			log.debug("Document Dir is a dir" + documentDir.isDirectory());
@@ -851,4 +864,89 @@ public class ManageDocumentAction extends DispatchAction {
 		return null;
 	}
 
+    private void correctImageFileColors(File file) {
+
+		ImageInputStream inputStream = null;
+    	try {
+
+	        inputStream = ImageIO.createImageInputStream(file);
+	        Iterator iter = ImageIO.getImageReaders(inputStream);
+
+	        if (!iter.hasNext())
+	        {
+	            log.warn("unable to load image file for color correction");
+	            return;
+	        }
+
+	        ImageReader imageReader = (ImageReader)iter.next();
+	        imageReader.setInput(inputStream);
+
+	        BufferedImage image = imageReader.read(0);
+
+	        int height = image.getHeight();
+	        int width = image.getWidth();
+
+	        int countWhitish = 0;
+	        int countBlackish = 0;
+	        for(int i = 0; i < width; i++) {
+	            for(int j = 0; j < height ; j++) {
+
+	                int rgb = image.getRGB(i, j);
+	                int brightness = getBrightness(rgb);
+
+	                if(brightness > 240) {
+	                	countWhitish++;
+	                } else if(brightness < 10) {
+	                	countBlackish++;
+	                }
+	            }
+	        }
+
+	        log.info(String.format("White vs Black image ratio: %s/%s",
+	        	countWhitish, countBlackish));
+
+	        if(countBlackish > (countWhitish * 10)) {
+	        	log.info("inverting image");
+
+		        for (int x = 0; x < width; x++) {
+		            for (int y = 0; y < height; y++) {
+
+		            	int rgb = image.getRGB(x, y);
+		                Color col = new Color(rgb, true);
+		                col = new Color(
+		                	255 - col.getRed(),
+							255 - col.getGreen(),
+							255 - col.getBlue());
+		                image.setRGB(x, y, col.getRGB());
+		            }
+		        }
+
+				ImageIO.write(image, "png", file);
+	        }
+
+        } catch (IOException e) {
+            log.error("error inverting image: " + e.getMessage(), e);
+
+        } finally {
+        	if(inputStream != null) {
+        		try {
+        			inputStream.close();
+        		} catch (IOException e) {
+        		}
+        	}
+        }
+
+    }
+
+	private int getBrightness(int pixel) {
+        int alpha = (pixel >> 24) & 0xff;
+        int red = (pixel >> 16) & 0xff;
+        int green = (pixel >> 8) & 0xff;
+        int blue = (pixel) & 0xff;
+
+	    return (int) Math.sqrt(
+	      red * red * .241 +
+	      green * green * .691 +
+	      blue * blue * .068);
+	}
 }

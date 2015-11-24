@@ -199,9 +199,10 @@ public final class ApptStatusData {
                         return "";
                     }
                     if (strStatus.equals(rs.getString("status"))){
+                    	if(rs.isLast()) { //don't run off the end of the result set
+                    		rs.beforeFirst();
+                    	}
                         rs.next();
-                        while (Integer.parseInt(rs.getString("active"))==0)
-                            rs.next();
                         rstr = rs.getString("status");
                         if (strOtherIcon.length()==1)
                             return rstr + strOtherIcon;

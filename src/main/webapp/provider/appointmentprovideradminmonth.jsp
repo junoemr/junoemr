@@ -198,7 +198,7 @@ if (bMultisites) {
 
 <%
   String prov=  oscarVariables.getProperty("billregion","").trim().toUpperCase();
-  String resourcebaseurl = "http://resource.oscarmcmaster.org/oscarResource/";
+  String resourcebaseurl = oscarVariables.getProperty("resource_base_url");
   List<Map<String, Object>> resultList = oscarSuperManager.find("providerDao", "search_resource_baseurl", new String[] {"resource_baseurl"});
   for (Map url : resultList) {
  	  resourcebaseurl = (String) url.get("value");
@@ -439,11 +439,6 @@ function refreshTabAlerts(id) {
 				TITLE='<bean:message key="provider.appointmentProviderAdminDay.viewMonthSched"/>'
 				OnMouseOver="window.status='<bean:message key="provider.appointmentProviderAdminDay.viewMonthSched"/>' ; return true"><bean:message
 				key="global.month" /></a></li>
-			<li><a href="#"
-				ONCLICK="popupOscarRx(550,687,'<%=resourcebaseurl%>');return false;"
-				title="<bean:message key="provider.appointmentProviderAdminDay.viewResources"/>"
-				onmouseover="window.status='<bean:message key="provider.appointmentProviderAdminDay.viewResources"/>';return true"><bean:message
-				key="oscarEncounter.Index.clinicalResources" /></a></li>
 			<li><caisi:isModuleLoad moduleName="caisi">
 				<a HREF="../PMmodule/ClientSearch2.do"
 					TITLE='<bean:message key="global.searchPatientRecords"/>'
@@ -558,7 +553,16 @@ function refreshTabAlerts(id) {
 		</td>
 
 		<form method="post" name="jumptodate" action="providercontrol.jsp">
-		<td align="right" valign="bottom"><INPUT TYPE="text" NAME="year"
+		<td align="right" valign="bottom">
+		
+		<a href=# onClick="popupPage(700,1024,'<%=resourcebaseurl%>')">
+		<img src="<%=request.getContextPath()%>/images/life-buoy-icon-small.png" border="0" align="absbottom" title="Help"></a>
+		
+		<caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
+		  <a id="helpLink" href=# onClick ="popupPage(700,1024,'<%=resourcebaseurl%>')"><bean:message key="global.help"/></a>
+		</caisi:isModuleLoad>
+		
+		<INPUT TYPE="text" NAME="year"
 			VALUE="<%=strYear%>" WIDTH="4" HEIGHT="10" border="0" size="4"
 			maxlength="4">- <INPUT TYPE="text" NAME="month"
 			VALUE="<%=strMonth%>" WIDTH="2" HEIGHT="10" border="0" size="2"
@@ -576,16 +580,9 @@ function refreshTabAlerts(id) {
 			onclick="document.forms['jumptodate'].Go.value='GO'; document.forms['jumptodate'].submit();"
 			SIZE="5">&nbsp;&nbsp;
 
-		  <a href="javascript: function myFunction() {return false; }" onClick="popup(700,1000,'../scratch/index.jsp','scratch')"><span id="oscar_scratch"></span></a>&nbsp;
-		  
-
-		  <caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
-		  <a href="#" onClick ="popupPage(600,750,'<%=resourcebaseurl%>')"><bean:message key="global.help"/></a> 
-		  </caisi:isModuleLoad>			
+		 	<a href="javascript: function myFunction() {return false; }" onClick="popup(700,1000,'../scratch/index.jsp','scratch')"><span id="oscar_scratch"></span></a>&nbsp;	
 			
-			| <a href="../logout.jsp"><bean:message key="provider.appointmentprovideradminmonth.btnlogOut" />  &nbsp;</a>
-			
-			
+			<a href="../logout.jsp"><bean:message key="provider.appointmentprovideradminmonth.btnlogOut" />  &nbsp;</a>
 			
 			</td>
 		</form>
@@ -1052,8 +1049,7 @@ document.onkeypress=function(e){
 			case <bean:message key="global.billingShortcut"/> : popupOscarRx(600,1024,'../billing/CA/<%=prov%>/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;  //code for 'B'illing
 			case <bean:message key="global.calendarShortcut"/> : popupOscarRx(425,430,'../share/CalendarPopup.jsp?urlfrom=../provider/providercontrol.jsp&year=<%=strYear%>&month=<%=strMonth%>&param=<%=URLEncoder.encode("&view=0&displaymode=day&dboperation=searchappointmentday","UTF-8")%>');  return false;  //run code for 'C'alendar
 			case <bean:message key="global.edocShortcut"/> : popupOscarRx('700', '1024', '../dms/documentReport.jsp?function=provider&functionid=<%=curUser_no%>&curUser=<%=curUser_no%>', 'edocView');  return false;  //run code for e'D'oc
-			case <bean:message key="global.resourcesShortcut"/> : popupOscarRx(550,687,'<%=resourcebaseurl%>'); return false; // code for R'e'sources
-			case <bean:message key="global.helpShortcut"/> : popupOscarRx(600,750,'<%=resourcebaseurl%>');  return false;  //run code for 'H'elp
+			case <bean:message key="global.helpShortcut"/> : popupOscarRx(700, 1024,'<%=resourcebaseurl%>');  return false;  //run code for 'H'elp
 			case <bean:message key="global.ticklerShortcut"/> : {  
 				<caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
 					popupOscarRx(700,1024,'../tickler/ticklerMain.jsp','<bean:message key="global.tickler"/>') //run code for t'I'ckler

@@ -1,37 +1,37 @@
-<!--  
+<!--
 /*
- * 
+ *
  * Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved. *
- * This software is published under the GPL GNU General Public License. 
- * This program is free software; you can redistribute it and/or 
- * modify it under the terms of the GNU General Public License 
- * as published by the Free Software Foundation; either version 2 
- * of the License, or (at your option) any later version. * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
- * GNU General Public License for more details. * * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. * 
- * 
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version. *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details. * * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. *
+ *
  * <OSCAR TEAM>
- * 
- * This software was written for the 
- * Department of Family Medicine 
- * McMaster University 
- * Hamilton 
- * Ontario, Canada 
+ *
+ * This software was written for the
+ * Department of Family Medicine
+ * McMaster University
+ * Hamilton
+ * Ontario, Canada
  */
 -->
 
 
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="oscar.OscarProperties"%><table width="100%" border="2" valign="top">
-	<% 
+	<%
  String dateBegin = StringUtils.trimToNull(request.getParameter("xml_vdate"));
    String dateEnd = StringUtils.trimToNull(request.getParameter("xml_appointment_date"));
    if (dateEnd==null) dateEnd = MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay);
-   if (dateBegin==null) dateBegin="1950-01-01"; // set to any really early time, effectively search everything. 
+   if (dateBegin==null) dateBegin="1950-01-01"; // set to any really early time, effectively search everything.
  ResultSet rs=null ;
   String[] param =new String[3];
   param[0] = request.getParameter("providerview");
@@ -45,7 +45,7 @@
    nItems=0;
   String apptStatus="", apptNo="", demoNo = "", demoName="", userno="", apptDate="", apptTime="", reason="",  note="";
   if(rs==null) {
-    out.println("failed!!!"); 
+    out.println("failed!!!");
   } else {
   %>
 	<tr bgcolor="#CCCCFF">
@@ -62,7 +62,7 @@
 	</tr>
 	<%
     while (rs.next()) {
-     
+
       bodd=bodd?false:true; //for the color of rows
       nItems++; //to calculate if it is the end of records
 	/*
@@ -75,8 +75,8 @@
       apptTime = apptMainBean.getString(rs,"billing_time");
       reason = apptMainBean.getString(rs,"status");
       */
-      
-      
+
+
       apptNo = apptMainBean.getString(rs,"appointment_no");
       demoNo = apptMainBean.getString(rs,"demographic_no");
       demoName = apptMainBean.getString(rs,"name");
@@ -85,11 +85,11 @@
       apptTime = apptMainBean.getString(rs,"start_time");
       reason = apptMainBean.getString(rs,"reason");
       apptStatus = apptMainBean.getString(rs,"status");
-      
+
       /*
       if (apptDoctorNo.compareTo("none") == 0){
       note = "No Appt / INR";
-      } 
+      }
       else{
       if (apptDoctorNo.compareTo(userno) == 0) {
       note = "With Appt. Doctor";
@@ -117,7 +117,7 @@
 			face="Arial, Helvetica, sans-serif"><%=reason%></font></b></TD>
 		<TD align="center" width="10%"><b> <font size="2"
 			face="Arial, Helvetica, sans-serif"><a
-			href="../../../billing/billingClinicAid.jsp?billing_action=invoice_reports"
+			href="../../../billing/billingClinicAid.jsp?billing_action=invoice_list"
 			target="_blank"
 			title="<%=reason%>">Billed</a></font></b></TD>
 	</tr>
@@ -130,6 +130,6 @@
 			face="Arial, Helvetica, sans-serif">No unbill items</font></b></TD>
 	</tr>
 	<% }
-  
+
 }%>
 </table>

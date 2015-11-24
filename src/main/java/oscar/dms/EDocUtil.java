@@ -139,7 +139,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 
 		return doctypes;
 	}
-	
+
 	public static ArrayList<String> getDoctypes(String module) {
 		return getDoctypesByStatus(module,new String[]{ "A", "H", "I" });
 	}
@@ -190,7 +190,13 @@ public final class EDocUtil extends SqlUtilBaseS {
 
 
 		Integer document_no = doc.getId();
-		String ctlDocumentSql = "INSERT INTO ctl_document (module,module_id,document_no,status) VALUES ('" + newDocument.getModule() + "', " + newDocument.getModuleId() + ", " + document_no + ", '" + newDocument.getStatus() + "'  )";
+		String ctlDocumentSql =
+			"INSERT INTO ctl_document (module,module_id,document_no,status,doc_ip_address) VALUES ('" +
+			newDocument.getModule() + "', " +
+			newDocument.getModuleId() + ", " +
+			document_no + ", '" +
+			newDocument.getStatus() + "', '" +
+			newDocument.getDocIpAddress() + "' )";
 
 		logger.debug("in addDocumentSQL ,add ctl_document: " + ctlDocumentSql);
 		runSQL(ctlDocumentSql);
@@ -615,7 +621,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 	}
 
 	public static EDoc getDoc(String documentNo) {
-		String sql = "SELECT DISTINCT c.module, c.module_id, d.* FROM document d, ctl_document c WHERE d.status=c.status AND d.status != 'D' AND " + "c.document_no=d.document_no AND c.document_no='" + documentNo + "' ORDER BY d.updatedatetime DESC";
+		String sql = "SELECT DISTINCT c.module, c.module_id, c.doc_ip_address, d.* FROM document d, ctl_document c WHERE d.status=c.status AND d.status != 'D' AND " + "c.document_no=d.document_no AND c.document_no='" + documentNo + "' ORDER BY d.updatedatetime DESC";
 
 		String indivoSql = "SELECT indivoDocIdx FROM indivoDocs i WHERE i.oscarDocNo = ? and i.docType = 'document' limit 1";
 		boolean myOscarEnabled = OscarProperties.getInstance().getProperty("MY_OSCAR", "").trim().equalsIgnoreCase("YES");
@@ -627,6 +633,7 @@ public final class EDocUtil extends SqlUtilBaseS {
 			while (rs.next()) {
 				currentdoc.setModule(rsGetString(rs, "module"));
 				currentdoc.setModuleId(rsGetString(rs, "module_id"));
+				currentdoc.setDocIpAddress(rsGetString(rs, "doc_ip_address"));
 				currentdoc.setDocId(rsGetString(rs, "document_no"));
 				currentdoc.setDescription(rsGetString(rs, "docdesc"));
 				currentdoc.setType(rsGetString(rs, "doctype"));
@@ -719,19 +726,19 @@ public final class EDocUtil extends SqlUtilBaseS {
 		return UtilDateUtilities.now();
 	}
 
-	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String observationDate, String updateDateTime, String docCreator, String responsible) throws SQLException {
-		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, observationDate, updateDateTime, docCreator, responsible, null, null, null);
+	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String observationDate, String updateDateTime, String docCreator, String responsible, String ipAddress) throws SQLException {
+		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, observationDate, updateDateTime, docCreator, responsible, null, null, null, ipAddress);
 	}
 
-	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime) throws SQLException {
-		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, observationDate, updateDateTime, docCreator, responsible, reviewer, reviewDateTime, null, null, null);
+	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime, String ipAddress) throws SQLException {
+		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, observationDate, updateDateTime, docCreator, responsible, reviewer, reviewDateTime, null, null, null, ipAddress);
 	}
 
-	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime, String source) throws SQLException {
-		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, observationDate, updateDateTime, docCreator, responsible, reviewer, reviewDateTime, source, null, null);
+	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime, String source, String ipAddress) throws SQLException {
+		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, observationDate, updateDateTime, docCreator, responsible, reviewer, reviewDateTime, source, null, null, ipAddress);
 	}
 
-	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime, String source, String sourceFacility, String docResultStatus) throws SQLException {
+	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime, String source, String sourceFacility, String docResultStatus, String ipAddress) throws SQLException {
 
 		Document doc = new Document();
 		doc.setDoctype(docType);
@@ -756,12 +763,13 @@ public final class EDocUtil extends SqlUtilBaseS {
 
 		int key=0;
 		if (doc.getDocumentNo() > 0) {
-			String add_record_string2 = "insert into ctl_document values ('demographic',?,?,'A')";
+			String add_record_string2 = "insert into ctl_document values ('demographic',?,?,'A',?)";
 			Connection conn = DbConnectionFilter.getThreadLocalDbConnection();
 			PreparedStatement add_record = conn.prepareStatement(add_record_string2);
 
 			add_record.setString(1, demoNo);
 			add_record.setString(2, doc.getDocumentNo().toString());
+			add_record.setString(3, ipAddress);
 
 			add_record.executeUpdate();
 			ResultSet rs = add_record.getGeneratedKeys();

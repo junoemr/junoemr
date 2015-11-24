@@ -84,6 +84,7 @@ public class LabResultData implements Comparable{
 	public String multiLabId;
 	public String label;
 	public boolean cancelledReport = false;
+	public String uploadedBy = null;
 
 	private Integer ackCount = null;
 	private Integer multiplAckCount = null;
@@ -298,7 +299,7 @@ public class LabResultData implements Comparable{
         }*/
 		return this.requestingClient;
 	}
-	
+
 	public String getRequestingClientNo(){
 		return this.requestingClientNo;
 	}
@@ -439,5 +440,13 @@ public class LabResultData implements Comparable{
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public String getUploadedBy() {
+		return uploadedBy;
+	}
+
+	public void setUploadedBy(String uploadedBy) {
+		this.uploadedBy = uploadedBy;
 	}
 }

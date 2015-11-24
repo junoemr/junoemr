@@ -94,10 +94,13 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 
 	public CaseManagementNote getNote(Long id) {
 		CaseManagementNote note = this.getHibernateTemplate().get(CaseManagementNote.class, id);
-		getHibernateTemplate().initialize(note.getIssues());
+		if(note != null)
+		{
+			getHibernateTemplate().initialize(note.getIssues());
+		}
 		return note;
 	}
-	
+
 	public List<CaseManagementNote> getNotes(List<Long> ids) {
 		if(ids.size()==0)
 			return new ArrayList<CaseManagementNote>();
@@ -198,23 +201,23 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 
 		}
 	}
-	
+
 		@SuppressWarnings("unchecked")
 	    public List<Object[]> getRawNoteInfoByDemographic(String demographic_no) {
 			String hql = "select cmn.id,cmn.observation_date,cmn.providerNo,cmn.program_no,cmn.reporter_caisi_role,cmn.uuid from CaseManagementNote cmn where cmn.demographic_no = ? order by cmn.update_date DESC";
-			return getHibernateTemplate().find(hql, demographic_no);			
+			return getHibernateTemplate().find(hql, demographic_no);
 		}
-	    
+
 	@SuppressWarnings("unchecked")
 	public List<Map<String,Object>> getRawNoteInfoMapByDemographic(String demographic_no) {
 		String hql = "select new map(cmn.id as id,cmn.observation_date as observation_date,cmn.providerNo as providerNo,cmn.program_no as program_no,cmn.reporter_caisi_role as reporter_caisi_role,cmn.uuid as uuid, cmn.update_date as update_date) from CaseManagementNote cmn where cmn.demographic_no = ? order by cmn.update_date DESC";
-		return getHibernateTemplate().find(hql, demographic_no);			
+		return getHibernateTemplate().find(hql, demographic_no);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Map<String,Object>> getUnsignedRawNoteInfoMapByDemographic(String demographic_no) {
 		String hql = "select new map(cmn.id as id,cmn.observation_date as observation_date,cmn.providerNo as providerNo,cmn.program_no as program_no,cmn.reporter_caisi_role as reporter_caisi_role,cmn.uuid as uuid, cmn.update_date as update_date) from CaseManagementNote cmn where cmn.demographic_no = ? and cmn.signed=? and cmn.id = (select max(cmn2.id) from CaseManagementNote cmn2 where cmn2.uuid = cmn.uuid) order by cmn.update_date DESC";
-		return getHibernateTemplate().find(hql, new Object[]{demographic_no,false});			
+		return getHibernateTemplate().find(hql, new Object[]{demographic_no,false});
 	}
 
 	@SuppressWarnings("unchecked")
@@ -421,7 +424,7 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 	public List<CaseManagementNote> getNotesByDemographicLimit(String demographic_no, Integer offset, Integer numToReturn) {
 		return getHibernateTemplate().findByNamedQuery("mostRecentLimit", new Object[] { demographic_no, offset, numToReturn });
 	}
-	
+
 	public void updateNote(CaseManagementNote note) {
 		this.getHibernateTemplate().update(note);
 	}

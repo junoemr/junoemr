@@ -387,16 +387,17 @@ function changeSite(sel, cb) {
 			        proOHIP = rslocal.getString("provider_no");
 			        String ip="";
 			        String provider ="";
-			        if(props.hasProperty("TICKLERIP1"))
+			        Map<String, String> hash = props.getIPProviderMap();
+			        if(!hash.isEmpty())
 			        {
-			        	Map<String, String> hash = props.getIPProviderMap();
+			        
 			        	for (Map.Entry<String, String> entry : hash.entrySet()) {
 			            	ip = entry.getKey();
 			                provider = entry.getValue();
-			                if(provider.equals(proOHIP)&&ip.equals(request.getRemoteAddr()))
+			                if(provider.equals(proOHIP)&&ip.equals(request.getParameter("docIp")))
 			                {
 			                  selected = "selected";
-			          
+
 			                }
 			            }
 			         }

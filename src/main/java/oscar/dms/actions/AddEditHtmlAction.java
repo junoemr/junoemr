@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -49,17 +49,17 @@ import oscar.dms.data.AddEditDocumentForm;
 import oscar.util.UtilDateUtilities;
 
 public class AddEditHtmlAction extends Action {
-    
+
     /** Creates a new instance of AddLinkAction */
     public ActionForward execute(ActionMapping mapping, ActionForm form,
             HttpServletRequest request, HttpServletResponse response) {
-	
+
         AddEditDocumentForm fm = (AddEditDocumentForm) form;
         Hashtable errors = new Hashtable();
         String fileName = "";
-        if (!EDocUtil.getDoctypes(fm.getFunction()).contains(fm.getDocType())){ 
+        if (!EDocUtil.getDoctypes(fm.getFunction()).contains(fm.getDocType())){
         	EDocUtil.addDocTypeSQL(fm.getDocType(),fm.getFunction());
-        } 
+        }
         if ((fm.getDocDesc().length() == 0) || (fm.getDocDesc().equals("Enter Title"))) {
              errors.put("descmissing", "dms.error.descriptionInvalid");
              request.setAttribute("linkhtmlerrors", errors);
@@ -103,7 +103,7 @@ public class AddEditHtmlAction extends Action {
         } else if (fm.getMode().equals("addHtml")) {
             fileName = "html";
 	}
-	
+
 	String reviewerId = filled(fm.getReviewerId()) ? fm.getReviewerId() : "";
 	String reviewDateTime = filled(fm.getReviewDateTime()) ? fm.getReviewDateTime() : "";
 
@@ -114,13 +114,13 @@ public class AddEditHtmlAction extends Action {
         EDoc currentDoc;
         MiscUtils.getLogger().debug("mode: " + fm.getMode());
         if (fm.getMode().indexOf("add") != -1) {
-            currentDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName, fm.getHtml(), fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'H', fm.getObservationDate(), reviewerId, reviewDateTime, fm.getFunction(), fm.getFunctionId());
+            currentDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName, fm.getHtml(), fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'H', fm.getObservationDate(), reviewerId, reviewDateTime, fm.getFunction(), fm.getFunctionId(), request.getRemoteAddr());
             currentDoc.setContentType("text/html");
             currentDoc.setDocPublic(fm.getDocPublic());
             currentDoc.setDocClass(fm.getDocClass());
             currentDoc.setDocSubClass(fm.getDocSubClass());
             String docId = EDocUtil.addDocumentSQL(currentDoc);
-	    
+
 	    /* Save annotation */
 	    String attrib_name = request.getParameter("annotation_attrib");
 	    HttpSession se = request.getSession();
@@ -140,7 +140,7 @@ public class AddEditHtmlAction extends Action {
 		}
 	    }
         } else {
-            currentDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), "", fm.getHtml(), fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'H', fm.getObservationDate(), reviewerId, reviewDateTime, fm.getFunction(), fm.getFunctionId());
+            currentDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), "", fm.getHtml(), fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'H', fm.getObservationDate(), reviewerId, reviewDateTime, fm.getFunction(), fm.getFunctionId(), request.getRemoteAddr());
             currentDoc.setDocId(fm.getMode());
             currentDoc.setContentType("text/html");
             currentDoc.setDocPublic(fm.getDocPublic());
@@ -153,7 +153,7 @@ public class AddEditHtmlAction extends Action {
         redirect.addParameter("functionid", request.getParameter("functionid"));
         return redirect;
     }
-    
+
     private boolean filled(String s) {
 	return (s!=null && s.trim().length()>0);
     }

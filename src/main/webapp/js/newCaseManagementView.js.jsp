@@ -3229,7 +3229,7 @@ function autoCompleteShowMenuCPP(element, update) {
 
     //print today's notes
     function printToday(e) {
-        clearAll(e);
+        clearAll(e, false);
 
         var today = $F("serverDate").split(" ");
         $("printStartDate").value = today[1].substr(0,today[1].indexOf(",")) + "-" + today[0] + "-" + today[2];
@@ -3240,7 +3240,7 @@ function autoCompleteShowMenuCPP(element, update) {
 
     }
 
-    function clearAll(e) {
+    function clearAll(e, selected) {
         var idx;
         var noteId;
         var notesDiv;
@@ -3266,11 +3266,17 @@ function autoCompleteShowMenuCPP(element, update) {
             }
         }
 
-        if( $F("printCPP") == "true" )
-            printInfo("imgPrintCPP","printCPP");
+		if(selected) {
 
-        if( $F("printRx") == "true" )
-            printInfo("imgPrintRx","printRx");
+			if( $F("printCPP") == "true" )
+				printInfo("imgPrintCPP","printCPP");
+
+			if( $F("printRx") == "true" )
+				printInfo("imgPrintRx","printRx");
+
+			if( $F("printLabs") == "true" )
+				printInfo("imgPrintLabs","printLabs");
+		}
 
         return false;
 

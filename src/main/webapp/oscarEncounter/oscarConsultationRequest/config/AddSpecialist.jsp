@@ -168,7 +168,7 @@ function BackToOscar() {
 									<span style="color: red;"><bean:message
 										key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalid" /></span><br />
 								<% } %>
-								<%if(oscarVariables.getProperty("billregion").equals("AB")) { %>
+								<%if(oscarVariables.getProperty("billregion")!=null && oscarVariables.getProperty("billregion").equals("AB")) { %>
 									<html:text name="EctConAddSpecialistForm" property="referralNo" maxlength="9" />
 								<% } 
 								else { %>

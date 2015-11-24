@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,22 +46,22 @@ import org.oscarehr.common.dao.ProviderLabRoutingFavoritesDao;
 import org.oscarehr.common.model.ProviderLabRoutingFavorite;
 
 public class ReportReassignAction extends Action {
-    
+
     Logger logger = Logger.getLogger(ReportReassignAction.class);
-    
+
     public ReportReassignAction() {
     }
-    
+
     public ActionForward execute(ActionMapping mapping,
             ActionForm form,
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String providerNo = request.getParameter("providerNo");
         String searchProviderNo = request.getParameter("searchProviderNo");
         String status = request.getParameter("status");
-        
+
         String[] flaggedLabs = request.getParameterValues("flaggedLabs");
         String selectedProviders = request.getParameter("selectedProviders");
         String newFavorites = request.getParameter("favorites");
@@ -87,13 +87,13 @@ public class ReportReassignAction extends Action {
                         String[] la =  new String[] {flaggedLabs[i],labTypes[j]};
                         listFlaggedLabs.add(la);
                         j = labTypes.length;
-                        
+
                     }
-                    
+
                 }
             }
         }
-        
+
         String newURL = "";
        // MiscUtils.getLogger().info(listFlaggedLabs.size());
         try {
@@ -105,15 +105,15 @@ public class ReportReassignAction extends Action {
         	ProviderLabRoutingFavoritesDao favDao = (ProviderLabRoutingFavoritesDao)SpringUtils.getBean("ProviderLabRoutingFavoritesDao");
         	String user = (String)request.getSession().getAttribute("user");
         	List<ProviderLabRoutingFavorite>currentFavorites = favDao.findFavorites(user);
-        	
-        	if( "".equals(newFavorites) ) {
+
+        	if(newFavorites == null || "".equals(newFavorites) ) {
         		for( ProviderLabRoutingFavorite fav : currentFavorites ) {
         			favDao.remove(fav.getId());
         		}
         	}
         	else {
         		String[] arrNewFavs = newFavorites.split(",");
-        		
+
         		//Check for new favorites to add
         		boolean isNew;
         		for( int idx = 0; idx < arrNewFavs.length; ++idx ) {
@@ -131,7 +131,7 @@ public class ReportReassignAction extends Action {
         				favDao.persist(newFav);
         			}
         		}
-        		
+
         		//check for favorites to remove
         		boolean remove;
         		for( ProviderLabRoutingFavorite fav : currentFavorites ) {
@@ -146,22 +146,22 @@ public class ReportReassignAction extends Action {
         				favDao.remove(fav.getId());
         			}
         		}
-        		
-        	}
 
+        	}
+        	
             newURL = mapping.findForward("success").getPath();
             if (newURL.contains("labDisplay.jsp")) {
-                newURL = newURL 
+                newURL = newURL
                             + "?providerNo=" + ((providerNo != null) ? providerNo : "")
-                            + "&searchProviderNo=" + ((searchProviderNo != null) ? searchProviderNo : "") 
-                            + "&status=" + ((status != null) ? status : "") 
+                            + "&searchProviderNo=" + ((searchProviderNo != null) ? searchProviderNo : "")
+                            + "&status=" + ((status != null) ? status : "")
                             + "&segmentID=" + ((flaggedLabs != null && flaggedLabs.length > 0 && flaggedLabs[0] != null) ? flaggedLabs[0] : "");
                 // the segmentID is needed when being called from a lab display
             } else {
                 newURL = newURL
                             + "&providerNo=" + ((providerNo != null) ? providerNo : "")
-                            + "&searchProviderNo=" + ((searchProviderNo != null) ? searchProviderNo : "") 
-                            + "&status=" + ((status != null) ? status : "") 
+                            + "&searchProviderNo=" + ((searchProviderNo != null) ? searchProviderNo : "")
+                            + "&status=" + ((status != null) ? status : "")
                             + "&segmentID=" + ((flaggedLabs != null && flaggedLabs.length > 0 && flaggedLabs[0] != null) ? flaggedLabs[0] : "");
             }
             if (request.getParameter("lname") != null) { newURL = newURL + "&lname="+request.getParameter("lname"); }

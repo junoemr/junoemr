@@ -52,6 +52,9 @@ public class IsPropertiesOn {
 	public static boolean isMultisitesEnable() {
 		return propertiesOn("multisites");
 	}
+	public static boolean isMultisitesAlwaysShowClinicAddress() {
+		return propertiesOn("multisites_always_show_clinic_address");
+	}
 
 	public static boolean isProviderFormalizeEnable() {
 		return propertiesOn("multioffice.formalize.provider.id");

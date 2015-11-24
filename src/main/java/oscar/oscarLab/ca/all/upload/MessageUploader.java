@@ -65,6 +65,7 @@ import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.HHSEmrDownloadHandler;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 import oscar.oscarLab.ca.all.parsers.SpireHandler;
 import oscar.util.UtilDateUtilities;
 
@@ -223,6 +224,7 @@ public final class MessageUploader {
 				hl7TextInfoDao.persist(hl7TextInfo);
 			}
 
+			boolean custom_route_enabled=false;
 			String demProviderNo = patientRouteReport(insertID, lastName, firstName, sex, dob, hin, DbConnectionFilter.getThreadLocalDbConnection());
 			if(type.equals("OLIS_HL7") && demProviderNo.equals("0")) {
 				OLISSystemPreferencesDao olisPrefDao = (OLISSystemPreferencesDao)SpringUtils.getBean("OLISSystemPreferencesDao");
@@ -235,6 +237,7 @@ public final class MessageUploader {
 			    }
 			} else {
 				Integer limit = null;
+				String custom_lab_route="";
 				boolean orderByLength = false;
 				String search = null;
 				if (type.equals("Spire")) {
@@ -244,19 +247,54 @@ public final class MessageUploader {
 				} else  if (type.equals("CLS")) {
 					search = "hso_no";
 				}
+				else if (type.equals("PATHL7")){
+					//custom lab routing for excelleris labs
+					//Parses custom_lab_routeX properties (starting at 1)
+					//Property format: custom_lab_routeX=<excelleris_lab_account>,<provider_no>
+					custom_lab_route= OscarProperties.getInstance().getProperty("custom_lab_route1");	
 				
-				String route_labs_to_provider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
-				if(route_labs_to_provider.equals("0")){  
-					// Send to the unclaimed inbox
-					providerRouteReport(String.valueOf(insertID), null, DbConnectionFilter.getThreadLocalDbConnection(), String.valueOf(0), type);
+				
+					String account;
+					String lab_user;
+					PreparedStatement pstmt;
+					ResultSet rs;
 					
-				} else if(!route_labs_to_provider.equals("")) {
-					// Send to matching provider ohip_no
-					ArrayList<String> providers = new ArrayList<String>(Arrays.asList(route_labs_to_provider.split(",")));
-					providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
-				} else {
-					// Normal -- send to docs who requested for the labs OR to the family doctor
-					providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+					PATHL7Handler handler = new PATHL7Handler();
+					handler.init(hl7Body);
+					
+					int k = 1;					
+					while(custom_lab_route!=null&&!custom_lab_route.equals("")){
+						custom_route_enabled=true;
+						
+						ArrayList<String> cust_route = new ArrayList<String>(Arrays.asList(custom_lab_route.split(",")));
+						account = cust_route.get(0);
+						ArrayList<String> to_provider = new ArrayList<String>(Arrays.asList(cust_route.get(1)));
+						
+						lab_user = handler.getLabUser();
+						if(lab_user.equals(account)) {
+							providerRouteReport(String.valueOf(insertID), to_provider, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, "provider_no", limit, orderByLength);
+						}
+						
+						k++;
+						custom_lab_route= OscarProperties.getInstance().getProperty("custom_lab_route"+k);
+					}
+				}
+				
+				if(!custom_route_enabled) {
+					String route_labs_to_provider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
+					
+					if(route_labs_to_provider.equals("0")){  
+						// Send to the unclaimed inbox
+						providerRouteReport(String.valueOf(insertID), null, DbConnectionFilter.getThreadLocalDbConnection(), String.valueOf(0), type);
+						
+					} else if(!route_labs_to_provider.equals("")) {
+						// Send to matching provider ohip_no
+						ArrayList<String> providers = new ArrayList<String>(Arrays.asList(route_labs_to_provider.split(",")));
+						providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+					} else {
+						// Normal -- send to docs who requested for the labs OR to the family doctor
+						providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+					}
 				}
 				
 			}

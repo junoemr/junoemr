@@ -6,6 +6,9 @@
 
 <suppressions>
 	<suppress checks="RegexpMultiline" files="MSHSegment.java" lines="50" />
+	<suppress checks="org.oscarehr.utils.checkstyle.TrackingRegexpCheck" files="oscarhost_init_bc.sql" lines="23, 24, 25" />
+	<suppress checks="org.oscarehr.utils.checkstyle.TrackingRegexpCheck" files="2015-09-23-OHSUPPORT-2516.sql" lines="3, 4, 5" />
+	
 	<!-- 
 	<suppress checks="RegexpMultiline" files="ResponseDefaultsFilter.java" lines="54" />
 	<suppress checks="RegexpMultiline" files="ResponseDefaultsChangeDetectingWrapper.java" lines="44" />

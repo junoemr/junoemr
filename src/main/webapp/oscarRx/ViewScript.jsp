@@ -28,6 +28,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%! boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable(); %>
+<%! boolean bMS_ShowClinicName = org.oscarehr.common.IsPropertiesOn.isMultisitesAlwaysShowClinicAddress(); %>
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
@@ -103,9 +104,18 @@ if(bMultisites) {
 	for (int i=0;i<sites.size();i++) {
 		Site s = sites.get(i);
         vecAddressName.add(s.getName());
-        vecAddress.add("<b>"+doctorName+"</b><br>"+s.getName()+"<br>"+s.getAddress() + "<br>" + s.getCity() + ", " + s.getProvince() + " " + s.getPostal() + "<br>"+rb.getString("RxPreview.msgTel")+": " + s.getPhone() + "<br>"+rb.getString("RxPreview.msgFax")+": " + s.getFax());
-        if (s.getName().equals(location))
+        
+		// if clinic always wants to show the clinic name rather than site name
+		if(bMS_ShowClinicName) {
+			String clinicName = provider.getClinicName().replaceAll("\\(\\d{6}\\)","");
+			vecAddress.add("<b>"+doctorName+"</b><br>"+clinicName+"<br>"+s.getAddress() + "<br>" + s.getCity() + ", " + s.getProvince() + " " + s.getPostal() + "<br>"+rb.getString("RxPreview.msgTel")+": " + s.getPhone() + "<br>"+rb.getString("RxPreview.msgFax")+": " + s.getFax());
+		}
+		else {
+			vecAddress.add("<b>"+doctorName+"</b><br>"+s.getName()+"<br>"+s.getAddress() + "<br>" + s.getCity() + ", " + s.getProvince() + " " + s.getPostal() + "<br>"+rb.getString("RxPreview.msgTel")+": " + s.getPhone() + "<br>"+rb.getString("RxPreview.msgFax")+": " + s.getFax());
+		}
+        if (s.getName().equals(location)) {
         	session.setAttribute("RX_ADDR",String.valueOf(i));
+        }
 	}
 
 

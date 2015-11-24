@@ -241,55 +241,50 @@ public class DemographicDao extends HibernateDaoSupport {
         }
     }
 
-
-     public List<Demographic> searchDemographic(String searchStr){
-        String fieldname = "", regularexp = "like";
-
-        if (searchStr.indexOf(",") == -1) {
-            fieldname = "last_name";
-        } else if (searchStr.trim().indexOf(",") == (searchStr.trim().length() - 1)) {
-            fieldname = "last_name";
-        } else {
-            fieldname = "last_name " + regularexp + " ?" + " and first_name ";
-        }
-
-        String hql = "From Demographic d where " + fieldname + " " + regularexp + " ? ";
-
-        String[] lastfirst = searchStr.split(",");
+	private List<Demographic> searchDemographic(String searchStr, boolean hasActiveStatus) {
+        String regularexp = "like";
         Object[] object = null;
-        if (lastfirst.length > 1) {
-            object = new Object[] { lastfirst[0].trim()+"%",lastfirst[1].trim()+"%" };
-        }else{
-            object = new Object[] { lastfirst[0].trim()+"%" };
-        }
-        List list = getHibernateTemplate().find(hql,object );
-        return list;
-    }
-
-    public List<Demographic> searchDemographicActive(String searchStr) {
-        String fieldname = "", regularexp = "like";
-        if (searchStr.indexOf(",") == -1) {
-            fieldname = "last_name";
-         } else if (searchStr.trim().indexOf(",") == (searchStr.trim().length() - 1)) {
-            fieldname = "last_name";
-         } else {
-            fieldname = "last_name " + regularexp + " ?" + " and first_name ";
-        }
+        String[] lastfirst = {""};
         
-        String hql = "From Demographic d where " + fieldname + " " + regularexp + " ?  and patient_status = 'AC'";
+	  	// throws an outOfBoundsException if keyword is exactly the split delimiter (java6)
+	  	if(!searchStr.trim().equals(",")) {
+	  		lastfirst = searchStr.trim().split(",");
+	  	}
         
-        String[] lastfirst = searchStr.split(",");
-        Object[] object = null;
+        String hql = "From Demographic d where last_name "+ regularexp + " ?";
+        // search by last name, first name
         if (lastfirst.length > 1) {
+        	hql += " and first_name "+ regularexp + " ?";
             object = new Object[] { lastfirst[0].trim() + "%", lastfirst[1].trim() + "%" };
-        } else {
+        } 
+        // search by last name only
+        else {
             object = new Object[] { lastfirst[0].trim() + "%" };
         }
-        List list = getHibernateTemplate().find(hql, object);
+        // optionally limit search to active demographics
+        if(hasActiveStatus){
+        	hql += " and patient_status = 'AC'";
+        }
+        List<Demographic> list = getHibernateTemplate().find(hql, object);
         return list;
-     }
-
-
+    }
+    
+    /**
+     * Search for demographics by last name, first name
+     * @param searchStr
+     * @return list of Demographics found
+     */
+	public List<Demographic> searchDemographic(String searchStr){
+		return searchDemographic(searchStr, false);
+    }
+     /**
+      * Search for active demographics by last name, first name
+      * @param searchStr
+      * @return list of Demographics found
+      */
+	public List<Demographic> searchDemographicActive(String searchStr) {
+		return searchDemographic(searchStr, true);
+	}
 
      public List<Demographic> getDemographicsByExtKey(String key, String value) {
     	 List<DemographicExt> extras = this.getHibernateTemplate().find("from DemographicExt d where d.key=? and d.value=?", new Object[] {key,value});

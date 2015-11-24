@@ -149,6 +149,7 @@ String annotation_attrib = "";// = "anno"+now;
     }
 
     function submitForm(action){
+    	verifySpecialValue("No Instructions Provided");
         oscarLog(frm);
         oscarLog("submitForm called");
         if(frm.repeat.value.length < 1 || isNaN(parseInt(frm.repeat.value))){
@@ -164,6 +165,13 @@ String annotation_attrib = "";// = "anno"+now;
 
             frm.submit();
         }
+    }
+    /* Ensure that the special value is not null or empty to prevent DB errors */
+    function verifySpecialValue(defaultText) {
+    	var txt = frm.special.value;
+    	if(txt == null || txt.trim() == ""){
+    		frm.special.value = defaultText;
+    	}
     }
 
     function changeDuration(){
@@ -627,7 +635,6 @@ String annotation_attrib = "";// = "anno"+now;
         var txt = frm.special.value;
         frm.special.value =  txt  + "LU Code: " +codeToAdd;
     }
-
     function clearWarning(){
        warningArray = new Array();
     }
@@ -854,8 +861,9 @@ if(bean.getStashIndex() > -1){ //new way
     thisForm.setNosubs(rx.getNosubs());
     thisForm.setPrn(rx.getPrn());
 
-    if (rx.getSpecial()==null || rx.getSpecial().length()<6) MiscUtils.getLogger().error("The drug special passed to the display of the user was already blank :"+rx.getSpecial());
-
+    //if (rx.getSpecial()==null || rx.getSpecial().length()<6) MiscUtils.getLogger().error("The drug special passed to the display of the user was already blank :"+rx.getSpecial());
+    if (rx.getSpecial()==null || rx.getSpecial().trim().length()==0) MiscUtils.getLogger().error("The drug special passed to the display of the user by bean.getStashItem(bean.getStashIndex()) is empty:'"+rx.getSpecial() + "';");
+    
     thisForm.setSpecial(rx.getSpecial());
     thisForm.setLongTerm(rx.getLongTerm());
     thisForm.setPastMed(rx.getPastMed());
@@ -1281,7 +1289,8 @@ int i;
 							<table width=100% border=1>
 								<tr>
 									<td valign=top><html:textarea property="special" cols="50"
-										rows="5" /> <input type=button value="RD" title="Redraw"
+										rows="5" /></textarea>
+										<input type=button value="RD" title="Redraw"
 										onclick="javascript:first = false; writeScriptDisplay(); clearWarning(); fillWarnings();" />
 									<div id="warningDiv" style="display: none;">
 									<ul id="warningList">

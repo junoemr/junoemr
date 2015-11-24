@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,23 +101,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SessionConstants;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.OscarProperties;
-import oscar.appt.ApptStatusData;
-import oscar.dms.EDocUtil;
-import oscar.oscarDemographic.data.DemographicAddResult;
-import oscar.oscarDemographic.data.DemographicData;
-import oscar.oscarDemographic.data.DemographicRelationship;
-import oscar.oscarEncounter.data.EctProgram;
-import oscar.oscarEncounter.oscarMeasurements.data.ImportExportMeasurements;
-import oscar.oscarEncounter.oscarMeasurements.data.Measurements;
-import oscar.oscarEncounter.oscarMeasurements.model.MeasurementsExt;
-import oscar.oscarLab.LabRequestReportLink;
-import oscar.oscarLab.ca.on.LabResultImport;
-import oscar.oscarPrevention.PreventionData;
-import oscar.oscarProvider.data.ProviderData;
-import oscar.service.OscarSuperManager;
-import oscar.util.StringUtils;
-import oscar.util.UtilDateUtilities;
 import cds.AlertsAndSpecialNeedsDocument.AlertsAndSpecialNeeds;
 import cds.AllergiesAndAdverseReactionsDocument.AllergiesAndAdverseReactions;
 import cds.AppointmentsDocument.Appointments;
@@ -139,6 +123,23 @@ import cdsDt.DiabetesComplicationScreening.ExamCode;
 import cdsDt.DiabetesMotivationalCounselling.CounsellingPerformed;
 import cdsDt.PersonNameStandard.LegalName;
 import cdsDt.PersonNameStandard.OtherNames;
+import oscar.OscarProperties;
+import oscar.appt.ApptStatusData;
+import oscar.dms.EDocUtil;
+import oscar.oscarDemographic.data.DemographicAddResult;
+import oscar.oscarDemographic.data.DemographicData;
+import oscar.oscarDemographic.data.DemographicRelationship;
+import oscar.oscarEncounter.data.EctProgram;
+import oscar.oscarEncounter.oscarMeasurements.data.ImportExportMeasurements;
+import oscar.oscarEncounter.oscarMeasurements.data.Measurements;
+import oscar.oscarEncounter.oscarMeasurements.model.MeasurementsExt;
+import oscar.oscarLab.LabRequestReportLink;
+import oscar.oscarLab.ca.on.LabResultImport;
+import oscar.oscarPrevention.PreventionData;
+import oscar.oscarProvider.data.ProviderData;
+import oscar.service.OscarSuperManager;
+import oscar.util.StringUtils;
+import oscar.util.UtilDateUtilities;
 
 /**
  *
@@ -311,6 +312,22 @@ import cdsDt.PersonNameStandard.OtherNames;
     	return tmp;
     }
 
+    /**
+     * Parses a date from the parse string using the SimpleDateFormat
+     * @param parseDate - date as string
+     * @param formatter - SimpleDateFormat
+     * @return formatted date or null if date cannot be parsed.
+     */
+    private Date toDateOrNull(String parseDate, SimpleDateFormat formatter) {
+    	if(parseDate==null || parseDate.trim().equals("")) {
+    		return null;
+    	}
+    	try {
+    		return formatter.parse(parseDate);
+		} catch (ParseException e) {
+			return null;
+		}
+    }
 
 
     String[] importXML(String xmlFile, ArrayList<String> warnings, HttpServletRequest request, int timeShiftInDays, Provider student, Program admitTo, int courseId) throws SQLException, Exception {
@@ -626,18 +643,18 @@ import cdsDt.PersonNameStandard.OtherNames;
             demographic.setHin(hin);
             demographic.setVer(versionCode);
             demographic.setRosterStatus(rosterStatus);
-            demographic.setRosterDate(formatter.parse(rosterDate));
-            demographic.setRosterTerminationDate(formatter.parse(termDate));
+            demographic.setRosterDate(toDateOrNull(rosterDate, formatter));
+            demographic.setRosterTerminationDate(toDateOrNull(termDate, formatter));
             demographic.setRosterTerminationReason(termReason);
             demographic.setPatientStatus(patient_status);
-            demographic.setPatientStatusDate(formatter.parse(psDate));
+            demographic.setPatientStatusDate(toDateOrNull(psDate, formatter));
             demographic.setChartNo(chart_no);
             demographic.setOfficialLanguage(official_lang);
             demographic.setSpokenLanguage(spoken_lang);
             demographic.setFamilyDoctor(primaryPhysician);
             demographic.setSex(sex);
             demographic.setHcType(hc_type);
-            demographic.setHcRenewDate(formatter.parse(hc_renew_date));
+            demographic.setHcRenewDate(toDateOrNull(hc_renew_date, formatter));
             demographic.setSin(sin);
             dd.setDemographic(demographic);
             err_note.add("Replaced Contact-only patient "+patientName+" (Demo no="+demographicNo+")");
@@ -1389,7 +1406,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                 //MEDICATIONS & TREATMENTS
                 MedicationsAndTreatments[] medArray = patientRec.getMedicationsAndTreatmentsArray();
                 String duration, quantity, dosage, special;
-                for (int i=0; i<medArray.length; i++) 
+                for (int i=0; i<medArray.length; i++)
                 {
                     Drug drug = new Drug();
                     drug.setCreateDate(new Date());
@@ -2100,7 +2117,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                                 observationDate = dateFPtoString(repR[i].getEventDateTime(), timeShiftInDays);
                                 updateDateTime = dateFPtoString(repR[i].getReceivedDateTime(), timeShiftInDays);
 
-                                docNum = EDocUtil.addDocument(demographicNo,docFileName,docDesc,"",docClass,docSubClass,contentType,observationDate,updateDateTime,docCreator,admProviderNo,reviewer,reviewDateTime,source,sourceFacility,null);
+                                docNum = EDocUtil.addDocument(demographicNo,docFileName,docDesc,"",docClass,docSubClass,contentType,observationDate,updateDateTime,docCreator,admProviderNo,reviewer,reviewDateTime,source,sourceFacility,null, request.getRemoteAddr());
                                 if (docNum==null) docNum = 0;
                                 if (binaryFormat) addOneEntry(REPORTBINARY);
                                 else addOneEntry(REPORTTEXT);
@@ -2834,6 +2851,19 @@ import cdsDt.PersonNameStandard.OtherNames;
 
 	void saveLinkNote(CaseManagementNote cmn, Integer tableName, Long tableId, String otherId) {
 		if (StringUtils.filled(cmn.getNote())) {
+			
+            /* prevent the update_date from being null */
+            Date updateDate = cmn.getUpdate_date();
+            if(updateDate == null) updateDate = cmn.getCreate_date();
+            if(updateDate == null) updateDate = new Date();
+            cmn.setUpdate_date(updateDate);
+            
+            /* prevent the observation_date from being null */
+            Date obserDate = cmn.getObservation_date();
+            if(obserDate == null) obserDate = cmn.getCreate_date();
+            if(obserDate == null) obserDate = new Date();
+            cmn.setObservation_date(obserDate);
+			
 			caseManagementManager.saveNoteSimple(cmn);    //new note id created
 
 			CaseManagementNoteLink cml = new CaseManagementNoteLink();
@@ -2841,6 +2871,7 @@ import cdsDt.PersonNameStandard.OtherNames;
 			cml.setTableId(tableId);
 			cml.setNoteId(cmn.getId()); //new note id
             cml.setOtherId(otherId);
+            
 			caseManagementManager.saveNoteLink(cml);
 		}
 	}
@@ -2879,30 +2910,30 @@ import cdsDt.PersonNameStandard.OtherNames;
 	String writeProviderData(String firstName, String lastName, String ohipNo, String cpsoNo) {
 		ProviderData pd = getProviderByOhip(ohipNo);
 		if (pd == null) {
-      pd = getProviderByNames(firstName, lastName, matchProviderNames);
-    }
-
-    if (pd == null) {
-      MiscUtils.getLogger().error("No provider found for firstName: " + firstName.toString() +
-        " lastName: " + lastName.toString() + " ohipNo: " + ohipNo.toString());
-
-      if (StringUtils.empty(firstName) || StringUtils.empty(lastName)) {
-        //return defaultProviderNo();
-        return ""; //no information at all!
-      }
-      pd = new ProviderData();
-      pd.addExternalProvider(firstName, lastName, ohipNo, cpsoNo);
-    }
-
-    /* This all seems very broken... Why would we only be interested in negative provider ids
-     * and why whould we greate a new provider then merge it instead of just using the 
-     * one we found. Removing it so the importer can match providers properly
-     
-		if (pd!=null) return updateExternalProvider(firstName, lastName, ohipNo, cpsoNo, pd);
-
-		//Write as a new provider
-		if (StringUtils.empty(firstName) && StringUtils.empty(lastName) && StringUtils.empty(ohipNo)) return ""; //no information at all!
-    */
+			pd = getProviderByNames(firstName, lastName, matchProviderNames);
+	    }
+	
+	    if (pd == null) {
+	    	logger.error("No provider found for firstName: " + firstName +
+	    			" lastName: " + lastName + " ohipNo: " + ohipNo);
+		
+		    if (StringUtils.empty(firstName) || StringUtils.empty(lastName)) {
+		    	//return defaultProviderNo();
+		    	return ""; //no information at all!
+		    }
+			pd = new ProviderData();
+			pd.addExternalProvider(firstName, lastName, ohipNo, cpsoNo);
+	    }
+	
+		/* This all seems very broken... Why would we only be interested in negative provider ids
+		 * and why whould we greate a new provider then merge it instead of just using the
+		 * one we found. Removing it so the importer can match providers properly
+		
+			if (pd!=null) return updateExternalProvider(firstName, lastName, ohipNo, cpsoNo, pd);
+		
+			//Write as a new provider
+			if (StringUtils.empty(firstName) && StringUtils.empty(lastName) && StringUtils.empty(ohipNo)) return ""; //no information at all!
+		*/
 
 		return pd.getProviderNo();
 	}

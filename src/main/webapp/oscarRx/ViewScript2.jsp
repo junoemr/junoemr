@@ -39,6 +39,7 @@
 <%@ page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
 <%! boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable(); %>
+<%! boolean bMS_ShowClinicName = org.oscarehr.common.IsPropertiesOn.isMultisitesAlwaysShowClinicAddress(); %>
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
@@ -135,11 +136,20 @@ if(bMultisites) {
 	List<Site> sites = siteDao.getActiveSitesByProviderNo((String) session.getAttribute("user"));
 	
 	for (int i=0;i<sites.size();i++) {
-	  Site s = sites.get(i);
-	      vecAddressName.add(s.getName());
-	      vecAddress.add("<b>"+doctorName+"</b><br>"+s.getName()+"<br>"+s.getAddress() + "<br>" + s.getCity() + ", " + s.getProvince() + " " + s.getPostal() + "<br>"+rb.getString("RxPreview.msgTel")+": " + s.getPhone() + "<br>"+rb.getString("RxPreview.msgFax")+": " + s.getFax());
-	      if (s.getName().equals(location))
-	        session.setAttribute("RX_ADDR",String.valueOf(i));
+		Site s = sites.get(i);
+	    vecAddressName.add(s.getName());
+	      
+	    // if clinic always wants to show the clinic name rather than site name
+	    if(bMS_ShowClinicName) {
+			String clinicName = provider.getClinicName().replaceAll("\\(\\d{6}\\)","");
+			vecAddress.add("<b>"+doctorName+"</b><br>"+clinicName+"<br>"+s.getAddress() + "<br>" + s.getCity() + ", " + s.getProvince() + " " + s.getPostal() + "<br>"+rb.getString("RxPreview.msgTel")+": " + s.getPhone() + "<br>"+rb.getString("RxPreview.msgFax")+": " + s.getFax());
+	    }
+	    else {
+			vecAddress.add("<b>"+doctorName+"</b><br>"+s.getName()+"<br>"+s.getAddress() + "<br>" + s.getCity() + ", " + s.getProvince() + " " + s.getPostal() + "<br>"+rb.getString("RxPreview.msgTel")+": " + s.getPhone() + "<br>"+rb.getString("RxPreview.msgFax")+": " + s.getFax());
+	    }
+	    if (s.getName().equals(location)) {
+	    	session.setAttribute("RX_ADDR",String.valueOf(i));
+	    }
 	}
 } else if(props.getProperty("clinicSatelliteName") != null) {
 	oscar.oscarRx.data.RxProviderData.Provider provider;

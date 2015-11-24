@@ -712,7 +712,7 @@ function changeSite(sel) {
                                     <td width="3%" ROWSPAN="1" class="<%=cellColour%>"><a href=#  onClick="popupPage(600,800, '../tickler/ticklerEdit.jsp?tickler_no=<%=t.getTickler_no()%>')"><bean:message key="tickler.ticklerMain.editTickler"/></a></td>
                                     <%}%>                                    
                                     <TD width="12%" ROWSPAN="1" class="<%=cellColour%>"><a href=# onClick="popupPage(600,800,'../demographic/demographiccontrol.jsp?demographic_no=<%=demo.getDemographicNo()%>&displaymode=edit&dboperation=search_detail')"><%=demo.getLastName()%>,<%=demo.getFirstName()%></a></TD>                                                                       
-                                    <TD ROWSPAN="1" class="<%=cellColour%>"><%=t.getProvider().getLastName()%>,<%=t.getProvider().getFirstName()%></TD>
+									<TD ROWSPAN="1" class="<%=cellColour%>"><%=( t.getProvider() == null ? "" : t.getProvider().getLastName() + ", " + t.getProvider().getFirstName() ) %></TD>
                                     <TD ROWSPAN="1" class="<%=cellColour%>"><%=t.getServiceDate()%></TD>
                                     <TD ROWSPAN="1" class="<%=cellColour%>"><%=t.getUpdateDate()%></TD>
                                     <TD ROWSPAN="1" class="<%=cellColour%>"><%=t.getPriority()%></TD>
@@ -753,7 +753,7 @@ function changeSite(sel) {
                                         <td width="3%"  ROWSPAN="1" class="<%=cellColour%>"></td>
                                         <td width="3%" ROWSPAN="1" class="<%=cellColour%>"></td>
                                         <td width="12%" ROWSPAN="1" class="<%=cellColour%>"></td>
-                                        <td ROWSPAN="1" class="<%=cellColour%>"><%=tc.getProvider().getLastName()%>,<%=tc.getProvider().getFirstName()%></td>
+                                        <td ROWSPAN="1" class="<%=cellColour%>"><%=( tc.getProvider() == null ? "" : tc.getProvider().getLastName() + ", " + tc.getProvider().getFirstName() ) %></td>
                                         <td ROWSPAN="1" class="<%=cellColour%>"></td>
                                         <% if (tc.isUpdateDateToday()) { %>
                                         <td ROWSPAN="1" class="<%=cellColour%>"><%=tc.getUpdateTime(request.getLocale())%></td>

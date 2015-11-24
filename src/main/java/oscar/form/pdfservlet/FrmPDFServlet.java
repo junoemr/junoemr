@@ -28,20 +28,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperRunManager;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-
-import oscar.OscarProperties;
-import oscar.form.FrmRecord;
-import oscar.form.FrmRecordFactory;
-import oscar.form.graphic.FrmGraphicFactory;
-import oscar.form.graphic.FrmPdfGraphic;
-import oscar.util.ConcatPDF;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -56,6 +45,16 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfImportedPage;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfWriter;
+
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperRunManager;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import oscar.OscarProperties;
+import oscar.form.FrmRecord;
+import oscar.form.FrmRecordFactory;
+import oscar.form.graphic.FrmGraphicFactory;
+import oscar.form.graphic.FrmPdfGraphic;
+import oscar.util.ConcatPDF;
 
 /**
  *
@@ -411,7 +410,7 @@ public class FrmPDFServlet extends HttpServlet {
             document.addKeywords("pdf, itext");
             document.addCreator("OSCAR");
             document.addAuthor("");
-            document.addHeader("Expires", "0");
+            //document.addHeader("Expires", "0");
 
             // A0-A10, LEGAL, LETTER, HALFLETTER, _11x17, LEDGER, NOTE, B0-B5, ARCH_A-ARCH_E, FLSA
             // and FLSE
@@ -535,27 +534,35 @@ public class FrmPDFServlet extends HttpServlet {
 	                        ct.go();
 	                        continue;
 	                    }
-	
-	                    // draw line directly
-	                    if (tempName.toString().startsWith("__$line")) {
+	                    
+	                    //adapted by DENNIS WARREN June 2012 to allow a colour rectangle
+	                    // handy for covering up parts of a document
+	                    if(tempName.toString().startsWith("__$rectangle")) {
+	                    	
+	                    	float llx = Float.parseFloat(cfgVal[0].trim());
+		                	float lly = Float.parseFloat(cfgVal[1].trim());
+		                	float urx = Float.parseFloat(cfgVal[2].trim());
+		                	float ury = Float.parseFloat(cfgVal[3].trim());
+		                	
+		                    Rectangle rec = new Rectangle(llx, lly, urx, ury);
+		                    rec.setBackgroundColor(java.awt.Color.WHITE);
+		                    cb.rectangle(rec);
+	                    	
+	                    } else if (tempName.toString().startsWith("__$line")) {
 	                        cb.setRGBColorStrokeF(0f, 0f, 0f);
 	                        cb.setLineWidth(Float.parseFloat(cfgVal[4].trim()));
 	                        cb.moveTo(Float.parseFloat(cfgVal[0].trim()), Float.parseFloat(cfgVal[1].trim()));
 	                        cb.lineTo(Float.parseFloat(cfgVal[2].trim()), Float.parseFloat(cfgVal[3].trim()));
-	                        // stroke the lines
 	                        cb.stroke();
-	                        // write text directly
 	
 	                    } else if (tempName.toString().startsWith("__")) {
 	                        cb.beginText();
 	                        cb.setFontAndSize(bf, Integer.parseInt(cfgVal[5].trim()));
-	                        cb
-	                                .showTextAligned((cfgVal[0].trim().equals("left") ? PdfContentByte.ALIGN_LEFT
+	                        cb.showTextAligned((cfgVal[0].trim().equals("left") ? PdfContentByte.ALIGN_LEFT
 	                                : (cfgVal[0].trim().equals("right") ? PdfContentByte.ALIGN_RIGHT
 	                                : PdfContentByte.ALIGN_CENTER)), (cfgVal.length >= 7 ? (cfgVal[6]
 	                                .trim()) : propValue), Integer
-	                                .parseInt(cfgVal[1].trim()), (height - Integer.parseInt(cfgVal[2].trim())), 0);
-	
+	                                .parseInt(cfgVal[1].trim()), (height - Integer.parseInt(cfgVal[2].trim())), 0);	
 	                        cb.endText();
 	                    } else if (tempName.toString().equals("forms_promotext")){
 	                        if ( OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT") != null ){
@@ -566,16 +573,13 @@ public class FrmPDFServlet extends HttpServlet {
 	                                    OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT"),
 	                                    Integer.parseInt(cfgVal[1].trim()),
 	                                    (height - Integer.parseInt(cfgVal[2].trim())),
-	                                    0);
-	
+	                                    0);	
 	                            cb.endText();
 	                        }
-	                    } else { // write prop text
-	
+	                    } else { // write prop text	
 	                        cb.beginText();
 	                        cb.setFontAndSize(bf, Integer.parseInt(cfgVal[5].trim()));
-	                        cb
-	                                .showTextAligned((cfgVal[0].trim().equals("left") ? PdfContentByte.ALIGN_LEFT
+	                        cb.showTextAligned((cfgVal[0].trim().equals("left") ? PdfContentByte.ALIGN_LEFT
 	                                : (cfgVal[0].trim().equals("right") ? PdfContentByte.ALIGN_RIGHT
 	                                : PdfContentByte.ALIGN_CENTER)), (cfgVal.length >= 7 ? ((propValue.equals("") ? "" : cfgVal[6].trim()))
 	                                : propValue), Integer.parseInt(cfgVal[1]
@@ -645,9 +649,9 @@ public class FrmPDFServlet extends HttpServlet {
 	                            tempName = new StringBuilder(e.nextElement().toString());
 	                            tempValue = tempPropertiesArray[k].getProperty(tempName.toString()).trim();
 	                            if (tempName.toString().equals("__finalEDB"))
-	                                args.setProperty(tempName.toString(), props.getProperty(tempValue));
+	                                args.setProperty(tempName.toString(), props.getProperty(tempValue, ""));
 	                            else if (tempName.toString().equals("__xDateScale"))
-	                                args.setProperty(tempName.toString(), props.getProperty(tempValue));
+	                                args.setProperty(tempName.toString(), props.getProperty(tempValue, ""));
 	                            else if (tempName.toString().equals("__dateFormat"))
 	                                args.setProperty(tempName.toString(),tempValue);
 	                            else if (tempName.toString().equals("__nMaxPixX"))
@@ -768,7 +772,7 @@ public class FrmPDFServlet extends HttpServlet {
             baosPDF.reset();
             throw dex;
         } finally {
-            if (document.isOpen())
+            if (document != null)
                 document.close();
             if (writer != null)
                 writer.close();

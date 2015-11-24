@@ -46,8 +46,8 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
 import org.oscarehr.util.MiscUtils;
 
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
+import oscar.util.UtilDateUtilities;
 
 /**
  *
@@ -796,8 +796,10 @@ public class MDSHandler implements MessageHandler {
     }
 
     private String getOBXField(String field, int i, int j){
-        ArrayList obxSegs = (ArrayList) obrGroups.get(i);
-        String obxSeg = (String) obxSegs.get(j);
+        ArrayList<String> obxSegs = (ArrayList<String>) obrGroups.get(i);
+        if(obxSegs == null || j < 0 || j>= obxSegs.size()) // bad cast & indexOOB prevention
+        	return "";
+        String obxSeg = obxSegs.get(j);
 
         try{
             return(getString(DynamicHapiLoaderUtils.terserGet(terser,obxSeg+"-"+field)));

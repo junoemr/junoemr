@@ -28,11 +28,15 @@ import java.util.List;
 
 import javax.persistence.NonUniqueResultException;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.model.Issue;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class CaseManagementIssueDAO extends HibernateDaoSupport {
+	
+	private static final Logger logger = MiscUtils.getLogger();
 
     @SuppressWarnings("unchecked")
     public List<CaseManagementIssue> getIssuesByDemographic(String demographic_no) {
@@ -59,22 +63,26 @@ public class CaseManagementIssueDAO extends HibernateDaoSupport {
 
     public CaseManagementIssue getIssuebyId(String demo, String id) {
         @SuppressWarnings("unchecked")
-        List<CaseManagementIssue> list = this.getHibernateTemplate().find("from CaseManagementIssue cmi where cmi.issue_id = ? and demographic_no = ?",new Object[]{Long.parseLong(id),demo});
-        if( list != null && list.size() == 1 )
-            return list.get(0);
+        List<CaseManagementIssue> list = this.getHibernateTemplate().find("from CaseManagementIssue cmi where cmi.issue_id = ? and demographic_no = ? order by cmi.id desc",new Object[]{Long.parseLong(id),demo});
         
-        return null;                    
+        if(list == null || list.isEmpty())
+        	return null;
+        if(list.size() > 1) {
+        	// the database should not have more than one result here, but return something to prevent further db errors
+        	logger.error("Multiple CaseManagementIssue entries with same issue id found for demographic: "+ demo +" (issue_id: "+id+" ). Check databse for duplicates.");
+        }
+        return list.get(0); //always return the result with the highest id
     }
 
     public CaseManagementIssue getIssuebyIssueCode(String demo, String issueCode) {
         @SuppressWarnings("unchecked")
         List<CaseManagementIssue> list = this.getHibernateTemplate().find("select cmi from CaseManagementIssue cmi, Issue issue where cmi.issue_id=issue.id and issue.code = ? and cmi.demographic_no = ?",new Object[]{issueCode,demo});
         
-        if(list == null || list.size()<1) return(null);
+        if(list == null || list.isEmpty()) return(null);
         	
         if (list.size() == 1 ) return list.get(0);
         
-        throw(new NonUniqueResultException("Expected 1 result got more : "+list.size() + "(" + demo + "," + issueCode + ")"));          
+        throw(new NonUniqueResultException("Expected 1 result got more : "+list.size() + "(demographic: " + demo + ", issueCode: " + issueCode + ")"));          
     }
 
     public void deleteIssueById(CaseManagementIssue issue) {
