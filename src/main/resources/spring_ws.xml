@@ -42,6 +42,7 @@
 
 	<!-- web service endpoints -->
 	<jaxws:endpoint implementor="org.oscarehr.ws.LabUploadWs" address="/LabUploadService" publishedEndpointUrl="${https_endpoint_url_base}/LabUploadService" />	
+	<jaxws:endpoint implementor="org.oscarehr.ws.DocumentWs" address="/DocumentService" publishedEndpointUrl="${https_endpoint_url_base}/DocumentService" />	
 	<jaxws:endpoint implementor="#systemInfoWs" address="/SystemInfoService" publishedEndpointUrl="${https_endpoint_url_base}/SystemInfoService" />	
 	<jaxws:endpoint implementor="#loginWs" address="/LoginService" publishedEndpointUrl="${https_endpoint_url_base}/LoginService" />	
 	<jaxws:endpoint implementor="#scheduleWs" address="/ScheduleService" publishedEndpointUrl="${https_endpoint_url_base}/ScheduleService" />	
