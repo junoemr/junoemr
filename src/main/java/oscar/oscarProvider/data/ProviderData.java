@@ -613,30 +613,32 @@ public class ProviderData {
 	   return searchProvider(searchStr, false);
    }
 
+   /**
+    * Retrieve a list of providers by last name, first name.
+    * @param searchStr - string in the form of firstName, lastName
+    * @param onlyActive - only include active providers
+    * @return List of provider Hashtables with the results in <String, String> key-value pairs
+    */
    public static List<Hashtable<String,String>> searchProvider(String searchStr,boolean onlyActive){
-       String sql="select provider_no, first_name, last_name from provider where ";
+       String sql="SELECT provider_no, first_name, last_name FROM provider WHERE ";
        List<Hashtable<String,String>> retList=new ArrayList<Hashtable<String,String>>();
-       String firstname=null;
-       String lastname=null;
-       if(searchStr.indexOf(",")!=-1){
-            String[] array=new String[2];
-            array=searchStr.split(",");
-            lastname=array[0].trim();
-            firstname=array[1].trim();
-       }else{
-           lastname=searchStr.trim();
+       
+       String[] lastfirst = {""};
+       // throws an outOfBoundsException if keyword is exactly the split delimiter (java6)
+       if(!searchStr.trim().equals(",")) {
+    	   lastfirst = searchStr.trim().split(",");
        }
-       if(lastname!=null && firstname==null)
-           sql+="last_name like '"+lastname+"%' ";
-       if(lastname!=null && firstname!=null)
-           sql+="last_name like '"+lastname+ "%' AND first_name like '"+firstname+"%' ";
+       // search by last name
+       sql += "last_name like '"+lastfirst[0].trim()+"%' ";
+       
+       // optionally search by first name as well
+       if (lastfirst.length > 1) {
+    	   sql += "AND first_name like '"+lastfirst[1].trim()+"%' ";
+       }
 
+       // optionally search only active providers
        if(onlyActive){
-    	   if(lastname != null) {
-    		   sql+=" and status = 1";
-    	   }else{
-    		   sql +=" status = 1";
-    	   }
+    	   sql += "AND status = 1 ";
        }
        try{
            ResultSet rs=DBHandler.GetSQL(sql);
