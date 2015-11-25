@@ -617,7 +617,7 @@ public class ProviderData {
     * Retrieve a list of providers by last name, first name.
     * @param searchStr - string in the form of firstName, lastName
     * @param onlyActive - only include active providers
-    * @return List of provider Hashtables with the results in <String, String> key-value pairs
+    * @return List of provider hashes with key-value String pairs
     */
    public static List<Hashtable<String,String>> searchProvider(String searchStr,boolean onlyActive){
        String sql="SELECT provider_no, first_name, last_name FROM provider WHERE ";
