@@ -25,6 +25,7 @@
 
 package oscar.oscarWaitingList.bean;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import org.oscarehr.util.MiscUtils;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarWaitingList.util.WLWaitingListUtil;
 
-public class WLWaitingListBeanHandler {
+public class WLWaitingListBeanHandler implements Serializable {
     
     List waitingListArrayList = new ArrayList();
     String waitingListName ="";

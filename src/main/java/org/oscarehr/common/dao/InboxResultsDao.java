@@ -43,6 +43,9 @@ public class InboxResultsDao {
 	 */
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public ArrayList populateHL7ResultsData(String demographicNo, String consultationId, boolean attached) {
+		
+		logger.info("Populating hl7 results (demographic:"+demographicNo+", consultaion id:"+consultationId+")");
+		
 		String sql = "SELECT hl7.label, hl7.lab_no, hl7.obr_date, hl7.discipline, hl7.accessionNum, hl7.final_result_count, patientLabRouting.id "
 				+ "FROM hl7TextInfo hl7, patientLabRouting "
 				+ "WHERE patientLabRouting.lab_no = hl7.lab_no "
@@ -110,7 +113,7 @@ public class InboxResultsDao {
 				Query q = entityManager.createNativeQuery(sql);
 				List<Object[]> rs = q.getResultList();
 
-				logger.info(sql);
+				logger.debug("METHOD:isSentToProvider; QUERY:" + sql);
 				if (!rs.isEmpty()) {
 					return true;
 				} else
@@ -140,6 +143,8 @@ public class InboxResultsDao {
 			String patientLastName, String patientHealthNumber, String status, boolean isPaged, Integer page,
 			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, Boolean isAbnormalDoc,
 			List<String> providerNoArr, boolean neverAcknowledgedItems) {
+		
+		logger.info("Populating document results (provider:"+providerNo+", demographic:"+demographicNo+")");
 
         boolean qp_provider_no = false;
         boolean qp_status = false;
@@ -341,7 +346,7 @@ public class InboxResultsDao {
 				q.setParameter("page_size", pageSize);
 			}
 
-			logger.info(sql);
+			logger.debug("METHOD:populateDocumentResultsData; QUERY:" + sql);
 
 			List<Object[]> result = q.getResultList();
 			for (Object[] r : result) {

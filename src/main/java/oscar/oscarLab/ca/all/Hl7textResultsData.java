@@ -58,6 +58,7 @@ public class Hl7textResultsData {
     }
 
     public static void populateMeasurementsTable(String lab_no, String demographic_no){
+    	logger.info("Populating HL7 Measurements Table (lab_no:"+lab_no+" demographic:"+demographic_no+")"); 
         MessageHandler h = Factory.getHandler(lab_no);
 
         java.util.Calendar calender = java.util.Calendar.getInstance();
@@ -156,7 +157,7 @@ public class Hl7textResultsData {
 
 
                     sql = "INSERT INTO measurements (type, demographicNo, providerNo, dataField, measuringInstruction, dateObserved, dateEntered )VALUES (?, ?, '0', ?, ?, ?, ?)";
-                    logger.debug(sql);
+                    logger.debug("METHOD:populateMeasurementsTable; QUERY:"+sql);
                     pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1,measType);
                     pstmt.setString(2,demographic_no);
@@ -409,7 +410,7 @@ public class Hl7textResultsData {
 				"from hl7TextInfo info " +
 				" where info.lab_no = "+labNo +" ORDER BY info.obr_date DESC";
 
-			logger.debug(sql);
+			logger.debug("METHOD:getNotAckLabResultDataFromLabNo; QUERY:"+sql);
 			ResultSet rs = DBHandler.GetSQL(sql);
 			if(rs.first()){
 
@@ -536,7 +537,7 @@ public class Hl7textResultsData {
 				" AND patientLabRouting.lab_type = 'HL7' AND patientLabRouting.demographic_no='"+demographicNo+"' ORDER BY info.lab_no DESC";
 			}
 
-			logger.debug(sql);
+			logger.debug("METHOD:populateHl7ResultsData; QUERY:" + sql);
 			ResultSet rs = DBHandler.GetSQL(sql);
 			while(rs.next()){
 
@@ -779,9 +780,9 @@ public class Hl7textResultsData {
 			}
 
 			
-			logger.info("provider list: "+providerNoList);
+			logger.debug("provider list: "+providerNoList);
 
-			logger.info(sql);
+			logger.debug("METHOD:populateHl7ResultsData; QUERY:"+sql);
 			
 			ResultSet rs = ps.executeQuery();
 			

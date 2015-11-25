@@ -45,16 +45,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Varies;
 import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
-
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import oscar.util.UtilDateUtilities;
 
 
 /**
@@ -178,7 +177,7 @@ public class PATHL7Handler implements MessageHandler {
             }
             return(phone);
         }catch(Exception e){
-            logger.error("Could not return phone number", e);
+            logger.error("Could not return home phone number", e);
 
             return("");
         }
@@ -200,7 +199,7 @@ public class PATHL7Handler implements MessageHandler {
             }
             return(phone);
         }catch(Exception e){
-            logger.error("Could not return phone number", e);
+            logger.error("Could not return work phone number", e);
 
             return("");
         }
@@ -420,7 +419,7 @@ public class PATHL7Handler implements MessageHandler {
             // if count is 1 there may only be an nte segment and no obx segments so check
             if (count == 1){
                 String test = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(0).getOBX().getObservationIdentifier().getText().getValue();
-                logger.info("name: "+test);
+                logger.debug("MEHTOD:getOBXCount; name retrieved: "+test);
                 if (test == null)
                     count = 0;
             }
@@ -584,7 +583,7 @@ public class PATHL7Handler implements MessageHandler {
                 currentHeader = getObservationHeader(i, 0);
                 arraySize = headers.size();
                 if (arraySize == 0 || !currentHeader.equals(headers.get(arraySize-1))){
-                    logger.info("Adding header: '"+currentHeader+"' to list");
+                    logger.debug("METHOD:getHeaders; Adding header: '"+currentHeader+"' to list");
                     headers.add(currentHeader);
                 }
 
