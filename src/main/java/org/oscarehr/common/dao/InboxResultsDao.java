@@ -44,7 +44,7 @@ public class InboxResultsDao {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public ArrayList populateHL7ResultsData(String demographicNo, String consultationId, boolean attached) {
 		
-		logger.info("Populating hl7 results (demographic:"+demographicNo+", consultaion id:"+consultationId+")");
+		logger.info("POPULATING HL7 RESULTS: demographic:"+demographicNo+", consultaion id:"+consultationId);
 		
 		String sql = "SELECT hl7.label, hl7.lab_no, hl7.obr_date, hl7.discipline, hl7.accessionNum, hl7.final_result_count, patientLabRouting.id "
 				+ "FROM hl7TextInfo hl7, patientLabRouting "
@@ -113,7 +113,7 @@ public class InboxResultsDao {
 				Query q = entityManager.createNativeQuery(sql);
 				List<Object[]> rs = q.getResultList();
 
-				logger.debug("METHOD:isSentToProvider; QUERY:" + sql);
+				logger.debug("QUERY: " + sql);
 				if (!rs.isEmpty()) {
 					return true;
 				} else
@@ -144,7 +144,7 @@ public class InboxResultsDao {
 			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal, Boolean isAbnormalDoc,
 			List<String> providerNoArr, boolean neverAcknowledgedItems) {
 		
-		logger.info("Populating document results (provider:"+providerNo+", demographic:"+demographicNo+")");
+		logger.info("POPULATING DOCUMENT RESULTS: provider:"+providerNo+", demographic:"+demographicNo);
 
         boolean qp_provider_no = false;
         boolean qp_status = false;

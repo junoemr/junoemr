@@ -773,7 +773,7 @@ public class RxPrescriptionData {
             String indivoSql = "SELECT indivoDocIdx FROM indivoDocs i WHERE i.oscarDocNo = ? and docType = 'Rx' limit 1";
             boolean myOscarEnabled = OscarProperties.getInstance().getProperty("MY_OSCAR", "").trim().equalsIgnoreCase("YES");
             Prescription p;
-            logger.debug("METHOD:getUniquePrescriptionsByPatient; QUERY:" + sql);
+            logger.debug("QUERY: " + sql);
             rs = DBHandler.GetSQL(sql);
 
             while (rs.next()) {
@@ -799,7 +799,7 @@ public class RxPrescriptionData {
                 }
 
                 if (b) {
-                	logger.info("ADDING PRESCRIPTION (id="+rs.getInt("drugid")+" for demographic "+demographicNo+")");
+                	logger.info("ADDING PRESCRIPTION: drugid "+rs.getInt("drugid")+" for demographic "+demographicNo);
                     p = new Prescription(rs.getInt("drugid"), oscar.Misc.getString(rs, "provider_no"), demographicNo);
                     p.setRxCreatedDate(rs.getDate("create_date"));
                     p.setRxDate(rs.getDate("rx_date"));
@@ -1051,7 +1051,7 @@ public class RxPrescriptionData {
     public String getScriptComment(String scriptNo) {
         String ret = null;
         String sql = "select rx_comments from  prescription where script_no = " + scriptNo;
-        logger.debug("SQL " + sql);
+        logger.debug("QUERY: " + sql);
         try {
 
             ResultSet rs = DBHandler.GetSQL(sql);
@@ -2048,7 +2048,7 @@ public class RxPrescriptionData {
                             "outside_provider_ohip = '" + this.getOutsideProviderOhip() + "' AND " + "custom_instructions = " + this.getCustomInstr() + " AND " + "long_term = " +
                             this.getLongTerm() +" AND " + "custom_note = " + this.isCustomNote() + " AND " + "past_med = " + this.getPastMed() + " AND " + "patient_compliance = " + this.getPatientCompliance()
                             +" AND "+" special_instruction = '"+this.getSpecialInstruction()+"' AND comment = '" + this.getComment() + "' AND start_date_unknown = " + this.getStartDateUnknown();
-                    MiscUtils.getLogger().debug("METHOD:Save; QUERY:"+sql);
+                    MiscUtils.getLogger().debug("QUERY: " + sql);
                     rs = DBHandler.GetSQL(sql);
 
                     if (rs.next()) {
