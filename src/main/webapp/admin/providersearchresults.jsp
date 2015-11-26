@@ -169,8 +169,8 @@
 		if(!keyword.trim().equals(",")) {
 			lastfirst = keyword.trim().split(",");
 		}
-		for(int i=0; i< lastfirst.length; i++) {
-			lastfirst[i] += "%";
+		for(int i=0; i < lastfirst.length; i++) {
+			lastfirst[i] = lastfirst[i].trim() + "%";
 		}
 		rs = apptMainBean.queryResults(lastfirst, dboperation);
 	}
