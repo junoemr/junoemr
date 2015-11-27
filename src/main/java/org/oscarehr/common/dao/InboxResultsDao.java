@@ -346,7 +346,7 @@ public class InboxResultsDao {
 				q.setParameter("page_size", pageSize);
 			}
 
-			logger.debug("METHOD:populateDocumentResultsData; QUERY:" + sql);
+			logger.debug("QUERY: " + sql);
 
 			List<Object[]> result = q.getResultList();
 			for (Object[] r : result) {

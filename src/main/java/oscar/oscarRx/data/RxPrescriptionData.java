@@ -763,7 +763,7 @@ public class RxPrescriptionData {
     // /////////////////////
     public Prescription[] getUniquePrescriptionsByPatient(int demographicNo) {
         Prescription[] arr = {};
-        ArrayList lst = new ArrayList();
+        ArrayList<Prescription> lst = new ArrayList<Prescription>();
 
         try {
             // Get Prescription from database
@@ -780,7 +780,7 @@ public class RxPrescriptionData {
                 boolean b = true;
 
                 for (int i = 0; i < lst.size(); i++) {
-                    Prescription p2 = (Prescription) lst.get(i);
+                    Prescription p2 = lst.get(i);
 
                     if (p2.getGCN_SEQNO() == rs.getInt("GCN_SEQNO")) {
                         if (p2.getGCN_SEQNO() != 0) // not custom - safe GCN
@@ -864,7 +864,7 @@ public class RxPrescriptionData {
 
             rs.close();
 
-            arr = (Prescription[]) lst.toArray(arr);
+            arr = lst.toArray(arr);
 
         } catch (SQLException e) {
             logger.error("unexpected error", e);
@@ -877,7 +877,7 @@ public class RxPrescriptionData {
 
     public Favorite[] getFavorites(String providerNo) {
         Favorite[] arr = {};
-        LinkedList lst = new LinkedList();
+        LinkedList<Favorite> lst = new LinkedList<Favorite>();
 
         try {
 
@@ -896,7 +896,7 @@ public class RxPrescriptionData {
 
             rs.close();
 
-            arr = (Favorite[]) lst.toArray(arr);
+            arr = lst.toArray(arr);
 
         } catch (SQLException e) {
             logger.error("unexpected error", e);

@@ -26,15 +26,12 @@
 package oscar.oscarEncounter.pageUtil;
 
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
-import net.sf.json.processors.JsDateJsonBeanProcessor;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -43,13 +40,16 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.MessageResources;
 import org.oscarehr.util.MiscUtils;
 
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+import net.sf.json.processors.JsDateJsonBeanProcessor;
 import oscar.util.UtilDateUtilities;
 /**
  * Base action class for populating left navbar of encounter
  * @author rjonasz
  */
 public class EctDisplayAction extends Action {
-    private static Hashtable Actions = null;
+    private static Map<String, String> Actions = null;
     protected static final String ELLIPSES = "...";
     protected static final int MAX_LEN_TITLE = 48;
     protected static final int CROP_LEN_TITLE = 45;
@@ -59,7 +59,7 @@ public class EctDisplayAction extends Action {
     public EctDisplayAction() {
         super();
         if( Actions == null ) {
-            Actions = new Hashtable();
+            Actions = new HashMap<String, String>();
             Actions.put("labs", "/oscarEncounter/displayLabs.do");
             Actions.put("forms", "/oscarEncounter/displayForms.do");
             Actions.put("msgs", "/oscarEncounter/displayMessages.do");
@@ -200,9 +200,9 @@ public class EctDisplayAction extends Action {
             }
         }
         if(forward != null && !forward.equals("success")) {
-        	MiscUtils.getLogger().error("Forward :"+forward+" navName :"+navName+" cmd "+cmd+" params "+params);
+        	MiscUtils.getLogger().error("Forward:"+forward+" navName:"+navName+" cmd:"+cmd+" params:"+params);
         }
-        return new ActionForward((String)Actions.get(forward));
+        return new ActionForward(Actions.get(forward));
     }
 
     //must be implemented by subclasses to populate dao object
