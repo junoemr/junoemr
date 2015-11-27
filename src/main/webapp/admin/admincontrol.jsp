@@ -76,46 +76,47 @@ if(session.getAttribute("user") == null ) //|| !((String) session.getValue("user
 
   String fieldname="", regularexp="like"; // exactly search is not required by users, e.g. regularexp="=";
   if(request.getParameter("search_mode")!=null) {
-	  if(request.getParameter("keyword").indexOf("*")!=-1 || request.getParameter("keyword").indexOf("%")!=-1) regularexp="like";
-    if(request.getParameter("search_mode").equals("search_address")) fieldname="address";
-    if(request.getParameter("search_mode").equals("search_phone")) fieldname="phone";
-    if(request.getParameter("search_mode").equals("search_hin")) fieldname="hin";
-    if(request.getParameter("search_mode").equals("search_providerno")) fieldname="provider_no";
-    if(request.getParameter("search_mode").equals("search_preferenceno")) fieldname="preference_no";
-    if(request.getParameter("search_mode").equals("search_username")) fieldname="user_name";
-    if(request.getParameter("search_mode").equals("search_dob")) fieldname="year_of_birth "+regularexp+" ?"+" and month_of_birth "+regularexp+" ?"+" and date_of_birth ";
-    if(request.getParameter("search_mode").equals("search_name")) {
-      if(request.getParameter("keyword").indexOf(",")==-1)  fieldname="lower(last_name)";
-      else if(request.getParameter("keyword").trim().indexOf(",")==(request.getParameter("keyword").trim().length()-1)) fieldname="lower(last_name)";
-      else fieldname="lower(last_name) "+regularexp+" ?"+" and lower(first_name) ";
-    }
-
-
-  }
-    //We find out if search is limited to active or inactive providers
-    String[] status = request.getParameterValues("search_status");
-    String inactive = "0";
-    String active = "0";
-
-    if( status != null ) {
-        String sql = new String();
-        if(Arrays.asList(status).contains("active")){
-        	sql = "status = 1 and ";
-            active = "1";
-        }
-		if(Arrays.asList(status).contains("inactive")){
-			sql = "status = 0 and ";
-            inactive = "1";
-        }
-		if(inactive.equals("1")&&active.equals("1")) {
-			sql = "";
+	if(request.getParameter("keyword").indexOf("*")!=-1 || request.getParameter("keyword").indexOf("%")!=-1) regularexp="like";
+	if(request.getParameter("search_mode").equals("search_address")) fieldname="address";
+	if(request.getParameter("search_mode").equals("search_phone")) fieldname="phone";
+	if(request.getParameter("search_mode").equals("search_hin")) fieldname="hin";
+	if(request.getParameter("search_mode").equals("search_providerno")) fieldname="provider_no";
+	if(request.getParameter("search_mode").equals("search_preferenceno")) fieldname="preference_no";
+	if(request.getParameter("search_mode").equals("search_username")) fieldname="user_name";
+	if(request.getParameter("search_mode").equals("search_dob")) fieldname="year_of_birth "+regularexp+" ?"+" and month_of_birth "+regularexp+" ?"+" and date_of_birth ";
+	if(request.getParameter("search_mode").equals("search_name")) {
+		String keyword = request.getParameter("keyword");
+		String[] lastfirst = {""};
+		// throws an outOfBoundsException if keyword is exactly the split delimiter (java6)
+		if(!keyword.trim().equals(",")) {
+			lastfirst = keyword.trim().split(",");
 		}
+		fieldname="lower(last_name)";
+		if(lastfirst.length > 1) {
+			fieldname += " "+regularexp+" ?"+" and lower(first_name)";
+		}
+	  }
+	}
+    //find out if search is limited to active or inactive providers
+    String[] status = request.getParameterValues("search_status");
+    boolean active = false;
+    boolean inactive = false;
+    
+    if( status != null ) {
+    	active = Arrays.asList(status).contains("active");
+        inactive = Arrays.asList(status).contains("inactive");
+        String sql = "";
+        if(active && !inactive){
+        	sql = "status = 1 and ";
+        }
+        else if(inactive && !active) {
+        	sql = "status = 0 and ";
+        }
         fieldname = sql + fieldname;
     }
-
-    //we save results in request to maintain state of form
-    request.setAttribute("inactive",inactive);
-    request.setAttribute("active",active);
+    //save results in request to maintain state of form
+    request.setAttribute("inactive", ((inactive)?"1":"0"));
+    request.setAttribute("active",((active)?"1":"0"));
 
 
   //operation available to the client - dboperation
