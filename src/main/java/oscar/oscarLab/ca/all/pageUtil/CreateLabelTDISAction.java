@@ -29,7 +29,7 @@ public class CreateLabelTDISAction extends Action{
 		
 		CreateLabelTDISForm frm = (CreateLabelTDISForm) form;
 		String label = frm.getLabel();//request.getParameter("label");
-		logger.info("Label before db insert ="+label);
+		logger.debug("Label before db insert ="+label);
 		String lab_no = frm.getLab_no();//request.getParameter("lab_no");
 		String accessionNum = frm.getAccessionNum();//request.getParameter("accessionNum");
 		String ajaxcall=request.getParameter("ajaxcall");
@@ -48,14 +48,12 @@ public class CreateLabelTDISAction extends Action{
 			
 			logger.info("Label created successfully.");
 			
-			
 		} catch (Exception e){
 			logger.error("Error inserting label into hl7TextInfo" + e);
 			request.setAttribute("error", "There was an error creating a label.");
-			
 		}
 		
-		logger.info("Label ="+label);
+		logger.info("Label Saved = '"+label+"'");
 		label = StringEscapeUtils.escapeJavaScript(label);
 		return mapping.findForward("complete");
 	}
