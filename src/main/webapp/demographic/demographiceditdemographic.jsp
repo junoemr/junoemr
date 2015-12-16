@@ -2151,6 +2151,11 @@ if ( PatStat.equals(Dead) ) {%>
 															key="demographic.demographiceditdemographic.familyDoctor" />:</span><span class="info"><%=fd2ohip%> <%=family_doctor_name%></span>
 							</li>
 							<% } %>
+							<li>
+                                                    <span class="label"><bean:message
+                                                          	key="demographic.demographiceditdemographic.licensedProducer" />:</span>
+                                                    <span class="info">None</span>
+							</li>
 						</ul>
 						</div>
 
@@ -2981,8 +2986,30 @@ document.updatedelete.r_doctor_ohip.value = refNo;
                                                                     <input  type="text" name="patientstatus_date_month" size="2" maxlength="2" value="<%=patientStatusDateMonth%>">
                                                                     <input  type="text" name="patientstatus_date_day" size="2" maxlength="2" value="<%=patientStatusDateDay%>">
 								</td>
-                                                        </tr>
-                                                        <tr>
+							</tr>
+							<%					
+							if(Boolean.parseBoolean(oscarProps.getProperty("show_demographic_licensed_producers"))) {
+								ResultSet producerRs = apptMainBean.queryResults("search_licensed_producer");
+							%>
+	                            <tr>
+	                            	<td align="right"><b><bean:message key="demographic.demographiceditdemographic.licensedProducer" />:</b></td>
+									<td align="left">
+										<select name="licensed_producers">
+										<option selected value="None">None</option>
+										<%
+										while(producerRs.next()) {
+											%>
+											<option value="<%=producerRs.getString("producer_id")%>"><%=producerRs.getString("producer_name")%></option>
+											<%
+										}
+										%>
+										</select>
+									</td>
+                            	</tr>
+                            	<%
+							}
+							%>
+							<tr>
 								<td align="right"><b><bean:message
 									key="demographic.demographiceditdemographic.formChartNo" />:</b></td>
 								<td align="left"><input type="text" name="chart_no"

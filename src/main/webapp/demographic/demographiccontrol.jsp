@@ -161,7 +161,8 @@
     {"search_demo_waiting_list", "select * from waitingList where demographic_no=? AND listID=?  AND is_history='N' "},
     {"search_future_appt", "select a.demographic_no, a.appointment_date from appointment a where a.appointment_date >= now() AND a.demographic_no=?"},
     {"search_hin", "select demographic_no, ver from demographic where hin=?"},
-    {"search_program", "select id from program where name = ?"}
+    {"search_program", "select id from program where name = ?"},
+    {"search_licensed_producer", "SELECT producer_id, producer_name FROM licensed_producer ORDER BY producer_id"}
    };
 
 	//associate each operation with an output JSP file -- displaymode
