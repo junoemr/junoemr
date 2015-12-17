@@ -146,10 +146,13 @@
 	// Custom licensed producer fields
 	String licensedProducerDefault = "None";
 	String licensedProducer = licensedProducerDefault;
-	String[] params = {demographic_no};
-	ResultSet demoProducerRs = apptMainBean.queryResults(params, "search_demo_licensed_producer");
-	if(demoProducerRs.next()) {
-		licensedProducer = demoProducerRs.getString("producer_name");
+	
+	if(Boolean.parseBoolean(oscarProps.getProperty("show_demographic_licensed_producers"))) {
+		String[] params = {demographic_no};
+		ResultSet demoProducerRs = apptMainBean.queryResults(params, "search_demo_licensed_producer");
+		if(demoProducerRs.next()) {
+			licensedProducer = demoProducerRs.getString("producer_name");
+		}
 	}
 	
 %>
@@ -2160,12 +2163,16 @@ if ( PatStat.equals(Dead) ) {%>
                                                     <li><span class="label"><bean:message
 															key="demographic.demographiceditdemographic.familyDoctor" />:</span><span class="info"><%=fd2ohip%> <%=family_doctor_name%></span>
 							</li>
-							<% } %>
+							<% } 
+							//-- Licensed producer drop-down selection -->
+
+							if(Boolean.parseBoolean(oscarProps.getProperty("show_demographic_licensed_producers"))) { %>
 							<li>
                                                     <span class="label"><bean:message
                                                           	key="demographic.demographiceditdemographic.licensedProducer" />:</span>
                                                     <span class="info"><%= licensedProducer %></span>
 							</li>
+							<% } %>
 						</ul>
 						</div>
 
