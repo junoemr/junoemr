@@ -142,6 +142,16 @@
 	if(required_fields != null){
 		 custom_required_fields = new ArrayList<String>(Arrays.asList(required_fields.split(",")));
 	}
+	
+	// Custom licensed producer fields
+	String licensedProducerDefault = "None";
+	String licensedProducer = licensedProducerDefault;
+	String[] params = {demographic_no};
+	ResultSet demoProducerRs = apptMainBean.queryResults(params, "search_demo_licensed_producer");
+	if(demoProducerRs.next()) {
+		licensedProducer = demoProducerRs.getString("producer_name");
+	}
+	
 %>
 
 
@@ -2154,7 +2164,7 @@ if ( PatStat.equals(Dead) ) {%>
 							<li>
                                                     <span class="label"><bean:message
                                                           	key="demographic.demographiceditdemographic.licensedProducer" />:</span>
-                                                    <span class="info">None</span>
+                                                    <span class="info"><%= licensedProducer %></span>
 							</li>
 						</ul>
 						</div>
@@ -2987,19 +2997,23 @@ document.updatedelete.r_doctor_ohip.value = refNo;
                                                                     <input  type="text" name="patientstatus_date_day" size="2" maxlength="2" value="<%=patientStatusDateDay%>">
 								</td>
 							</tr>
-							<%					
+							
+							<!-- Licensed producer drop-down selection -->
+							<%
 							if(Boolean.parseBoolean(oscarProps.getProperty("show_demographic_licensed_producers"))) {
 								ResultSet producerRs = apptMainBean.queryResults("search_licensed_producer");
 							%>
 	                            <tr>
 	                            	<td align="right"><b><bean:message key="demographic.demographiceditdemographic.licensedProducer" />:</b></td>
 									<td align="left">
-										<select name="licensed_producers">
-										<option selected value="None">None</option>
+										<select name="licensed_producer">
+										<option value="0" <%=licensedProducerDefault.equals(licensedProducer)?" selected":""%> ><%=licensedProducerDefault%></option>
 										<%
 										while(producerRs.next()) {
+											String producer_id = producerRs.getString("producer_id");
+											String producer_name = producerRs.getString("producer_name");
 											%>
-											<option value="<%=producerRs.getString("producer_id")%>"><%=producerRs.getString("producer_name")%></option>
+											<option value="<%=producer_id%>" <%=producer_name.equals(licensedProducer)?" selected":""%> ><%=producer_name%></option>
 											<%
 										}
 										%>
@@ -3102,7 +3116,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 
 									</tr>
 								</table>
-								</td>
+								</td>selected
 							</tr>
 
 							<tr valign="top">

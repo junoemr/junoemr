@@ -34,6 +34,9 @@
 	if(request.isSecure()){
 		protocol = "https://";
 	}
+	
+	// Custom licensed producer fields
+	String licensedProducerDefault = "None";
 %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -1286,8 +1289,8 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				<tr>
 					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.licensedProducer" />:</b></td>
 					<td align="left">
-						<select name="licensed_producers">
-						<option selected value="-1">None</option>
+						<select name="licensed_producer">
+						<option selected value="0"><%=licensedProducerDefault%></option>
 						<%
 						while(producerRs.next()) {
 							%>

@@ -162,7 +162,8 @@
     {"search_future_appt", "select a.demographic_no, a.appointment_date from appointment a where a.appointment_date >= now() AND a.demographic_no=?"},
     {"search_hin", "select demographic_no, ver from demographic where hin=?"},
     {"search_program", "select id from program where name = ?"},
-    {"search_licensed_producer", "SELECT producer_id, producer_name FROM licensed_producer ORDER BY producer_id"}
+    {"search_licensed_producer", "SELECT producer_id, producer_name FROM licensed_producer ORDER BY producer_id"},
+    {"search_demo_licensed_producer", "SELECT lp.producer_id, lp.producer_name FROM demographic_licensed_producer d JOIN licensed_producer lp ON (d.producer_id=lp.producer_id) where d.demographic_no=?"}
    };
 
 	//associate each operation with an output JSP file -- displaymode

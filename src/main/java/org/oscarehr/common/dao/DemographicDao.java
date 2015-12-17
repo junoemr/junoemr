@@ -320,8 +320,32 @@ public class DemographicDao extends HibernateDaoSupport {
  		if (OscarProperties.getInstance().isHL7A04GenerationEnabled() && !objExists)
 			(new HL7A04Generator()).generateHL7A04(demographic);
      }
+     
+     /**
+      * save custom licensed producer info for a demographic.
+      * @param demo_no
+      * @param producer_id
+      */
+     public void saveDemographicLicensedProducer(int demo_no, int producer_id) {
+    	 Connection c = null;
+    	 try {
+    		 c = DbConnectionFilter.getThreadLocalDbConnection();
+    		 PreparedStatement ps = c.prepareStatement("INSERT INTO demographic_licensed_producer (demographic_no, producer_id) "
+    		 	+ "VALUES(?, ?) ON DUPLICATE KEY UPDATE producer_id=?");
+    		 ps.setInt(1, demo_no);
+    		 ps.setInt(2, producer_id);
+    		 ps.setInt(3, producer_id);
+    		 ps.executeUpdate();
+    	 }
+    	 catch(SQLException e) {
+    		 log.error("SQL Exception", e);
+    	 }
+    	 finally {
+    		 SqlUtils.closeResources(c, null, null);
+    	 }
+     }
 
-public static List<Integer> getDemographicIdsAlteredSinceTime(Date value) {
+     public static List<Integer> getDemographicIdsAlteredSinceTime(Date value) {
     	 Connection c = null;
     	 try {
     		 c = DbConnectionFilter.getThreadLocalDbConnection();

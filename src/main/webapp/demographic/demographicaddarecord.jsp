@@ -217,6 +217,12 @@
     bufDoctorNo = new StringBuilder( apptMainBean.getString("provider_no") );
 
     demographicDao.save(demographic);
+    
+    // save custom licensed producer if enabled
+    String licensedProducer = request.getParameter("licensed_producer");
+    if (licensedProducer != null && !licensedProducer.trim().equals("")) {
+    	demographicDao.saveDemographicLicensedProducer(demographic.getDemographicNo(), Integer.parseInt(licensedProducer));
+    }
 
 
 	String [][] dbQueries=new String[][] {

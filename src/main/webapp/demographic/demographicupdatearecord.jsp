@@ -271,6 +271,13 @@
     //demographicArchiveDao.persist(da);
 
     demographicDao.save(demographic);
+    
+    // save custom licensed producer if enabled
+    String licensedProducer = request.getParameter("licensed_producer");
+    if (licensedProducer != null && !licensedProducer.trim().equals("")) {
+    	demographicDao.saveDemographicLicensedProducer(demographic.getDemographicNo(), Integer.parseInt(licensedProducer));
+    }
+    
     int rowsAffected=1;
   if (rowsAffected ==1) {
     //find the democust record for update
