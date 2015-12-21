@@ -309,6 +309,13 @@
         <ap-sql>SELECT sin FROM demographic WHERE demographic_no=${demographic}</ap-sql>
         <ap-output>${sin}</ap-output>
     </databaseap>
+    
+    <!-- OHSUPPORT-2712 licensed Marijuana Producers (requires custom database tables)-->
+	<databaseap>
+		<ap-name>licensed_producer_by_demographic</ap-name>
+		<ap-sql>SELECT lp.producer_name AS producer_name FROM demographic_licensed_producer d JOIN licensed_producer lp ON (d.producer_id=lp.producer_id) where d.demographic_no=${demographic}</ap-sql>
+		<ap-output>${producer_name}</ap-output>
+	</databaseap>
 
 <!-- Patient medical information -->
     <databaseap>
