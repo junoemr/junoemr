@@ -938,3 +938,7 @@ auto_populate_billingreferral_bc=true
 
 # OHSUPPORT-2541 show uploaded by in the inbox
 #INBOX_UPLOADED_BY_COLUMN=yes
+
+#OHSUPPORT-2712 - adds licensed producers dropdown to demographic master files.
+#REQUIRES the database patch be applied to create the correct tables.
+#show_demographic_licensed_producers=true
