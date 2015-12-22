@@ -3123,7 +3123,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 
 									</tr>
 								</table>
-								</td>selected
+								</td>
 							</tr>
 
 							<tr valign="top">
