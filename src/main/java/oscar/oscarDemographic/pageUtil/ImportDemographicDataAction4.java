@@ -165,6 +165,7 @@ import oscar.util.UtilDateUtilities;
     private static final String REPORTTEXT = "Text";
     private static final String RISKFACTOR = "Risk";
 
+    private static final String DEFAULT_ALLERGY_DESCRIPTION = "NO DESCRIPTION IMPORTED";
 
     boolean matchProviderNames = true;
     String admProviderNo = null;
@@ -1357,6 +1358,9 @@ import oscar.util.UtilDateUtilities;
                         else if (aaReactArray[i].getPropertyOfOffendingAgent()==cdsDt.PropertyOfOffendingAgent.ND) typeCode="0"; //non-drug
                     else if (aaReactArray[i].getPropertyOfOffendingAgent()==cdsDt.PropertyOfOffendingAgent.UK) typeCode="0"; //unknown
                     }
+                    else {
+                    	typeCode="0"; //unknown
+                    }
                     if (aaReactArray[i].getSeverity()!=null) {
                         if (aaReactArray[i].getSeverity()==cdsDt.AdverseReactionSeverity.MI) severity="1"; //mild
                         else if (aaReactArray[i].getSeverity()==cdsDt.AdverseReactionSeverity.MO) severity="2"; //moderate
@@ -1419,7 +1423,7 @@ import oscar.util.UtilDateUtilities;
                     duration = medArray[i].getDuration();
                     if (StringUtils.filled(duration)) {
                     	duration = duration.trim();
-                    	if (duration.endsWith("days")) duration = Util.leadingNum(duration);
+                    	if (duration.toLowerCase().endsWith("days")) duration = Util.leadingNum(duration);
                     	if (NumberUtils.isDigits(duration)) {
                     		drug.setDuration(duration);
     	                    drug.setDurUnit("D");
@@ -3114,6 +3118,11 @@ import oscar.util.UtilDateUtilities;
 	private static Integer saveRxAllergy(Integer demographicNo, Date entryDate, String description, Integer typeCode, String reaction, Date startDate, String severity, String regionalId, String lifeStage) {
 
 		AllergyDao allergyDao=(AllergyDao) SpringUtils.getBean("allergyDao");
+		
+		// the database rejects the empty string so here we always set a default right before the insert/save
+		if (description == null || description.trim().equals("")) {
+			description = DEFAULT_ALLERGY_DESCRIPTION;
+		}
 
 		Allergy allergy=new Allergy();
 		allergy.setDemographicNo(demographicNo);
