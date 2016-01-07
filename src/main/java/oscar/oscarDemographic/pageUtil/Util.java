@@ -208,21 +208,233 @@ public class Util {
         return StringUtils.noNull(dirName);
     }
 
+    /**
+     * get a map of key-value pairings for converting mimeType to a file extension string
+     * @return HashMap of key-value string pairings
+     */
+    static private HashMap<String, String> getTypeExtensions() {
+		HashMap<String, String> type_ext = new HashMap<String, String>();
+		
+		/* 
+		 * Map all the values to extension type. 
+		 * the previous system always took the first value with a matching key, but contained multiples.
+		 * Here those values are commented out instead, as a map will always use the last value added with duplicate keys.
+		 */
+		type_ext.put("application/envoy", "evy");
+		type_ext.put("application/fractals", "fif");
+		type_ext.put("application/futuresplash", "spl");
+		type_ext.put("application/hta", "hta");
+		type_ext.put("application/internet-property-stream", "acx");
+		type_ext.put("application/mac-binhex40", "hqx");
+		type_ext.put("application/msword", "doc");
+		//type_ext.put("application/msword", "dot");
+		type_ext.put("application/octet-stream", "bin");
+		//type_ext.put("application/octet-stream", "class");
+		//type_ext.put("application/octet-stream", "dms");
+		//type_ext.put("application/octet-stream", "exe");
+		//type_ext.put("application/octet-stream", "lha");
+		//type_ext.put("application/octet-stream", "lzh");
+		type_ext.put("application/oda", "oda");
+		type_ext.put("application/olescript", "axs");
+		type_ext.put("application/pdf", "pdf");
+		type_ext.put("application/pics-rules", "prf");
+		type_ext.put("application/pkcs10", "p10");
+		type_ext.put("application/pkix-crl", "crl");
+		type_ext.put("application/postscript", "ai");
+		//type_ext.put("application/postscript", "eps");
+		//type_ext.put("application/postscript", "ps");
+		type_ext.put("application/rtf", "rtf");
+		type_ext.put("application/set-payment-initiation", "setpay");
+		type_ext.put("application/set-registration-initiation", "setreg");
+		type_ext.put("application/vnd.ms-excel", "xla");
+		//type_ext.put("application/vnd.ms-excel", "xlc");
+		//type_ext.put("application/vnd.ms-excel", "xlm");
+		//type_ext.put("application/vnd.ms-excel", "xls");
+		//type_ext.put("application/vnd.ms-excel", "xlt");
+		type_ext.put("application/vnd.ms-excel", "xlw");
+		type_ext.put("application/vnd.ms-outlook", "msg");
+		type_ext.put("application/vnd.ms-pkicertstore", "sst");
+		type_ext.put("application/vnd.ms-pkiseccat", "cat");
+		type_ext.put("application/vnd.ms-pkistl", "stl");
+		type_ext.put("application/vnd.ms-powerpoint", "pot");
+		//type_ext.put("application/vnd.ms-powerpoint", "pps");
+		//type_ext.put("application/vnd.ms-powerpoint", "ppt");
+		type_ext.put("application/vnd.ms-project", "mpp");
+		type_ext.put("application/vnd.ms-works", "wcm");
+		//type_ext.put("application/vnd.ms-works", "wdb");
+		//type_ext.put("application/vnd.ms-works", "wks");
+		//type_ext.put("application/vnd.ms-works", "wps");
+		type_ext.put("application/winhlp", "hlp");
+		type_ext.put("application/x-bcpio", "bcpio");
+		type_ext.put("application/x-cdf", "cdf");
+		type_ext.put("application/x-compress", "z");
+		type_ext.put("application/x-compressed", "tgz");
+		type_ext.put("application/x-cpio", "cpio");
+		type_ext.put("application/x-csh", "csh");
+		type_ext.put("application/x-director", "dcr");
+		//type_ext.put("application/x-director", "dir");
+		//type_ext.put("application/x-director", "dxr");
+		type_ext.put("application/x-dvi", "dvi");
+		type_ext.put("application/x-gtar", "gtar");
+		type_ext.put("application/x-gzip", "gz");
+		type_ext.put("application/x-hdf", "hdf");
+		type_ext.put("application/x-internet-signup", "ins");
+		//type_ext.put("application/x-internet-signup", "isp");
+		type_ext.put("application/x-iphone", "iii");
+		type_ext.put("application/x-javascript", "js");
+		type_ext.put("application/x-latex", "latex");
+		type_ext.put("application/x-msaccess", "mdb");
+		type_ext.put("application/x-mscardfile", "crd");
+		type_ext.put("application/x-msclip", "clp");
+		type_ext.put("application/x-msdownload", "dll");
+		type_ext.put("application/x-msmediaview", "m13");
+		//type_ext.put("application/x-msmediaview", "m14");
+		//type_ext.put("application/x-msmediaview", "mvb");
+		type_ext.put("application/x-msmetafile", "wmf");
+		type_ext.put("application/x-msmoney", "mny");
+		type_ext.put("application/x-mspublisher", "pub");
+		type_ext.put("application/x-msschedule", "scd");
+		type_ext.put("application/x-msterminal", "trm");
+		type_ext.put("application/x-mswrite", "wri");
+		type_ext.put("application/x-netcdf", "cdf");
+		type_ext.put("application/x-netcdf", "nc");
+		type_ext.put("application/x-perfmon", "pma");
+		//type_ext.put("application/x-perfmon", "pmc");
+		//type_ext.put("application/x-perfmon", "pml");
+		//type_ext.put("application/x-perfmon", "pmr");
+		//type_ext.put("application/x-perfmon", "pmw");
+		type_ext.put("application/x-pkcs12", "p12");
+		//type_ext.put("application/x-pkcs12", "pfx");
+		type_ext.put("application/x-pkcs7-certificates", "p7b");
+		//type_ext.put("application/x-pkcs7-certificates", "spc");
+		type_ext.put("application/x-pkcs7-certreqresp", "p7r");
+		type_ext.put("application/x-pkcs7-mime", "p7c");
+		//type_ext.put("application/x-pkcs7-mime", "p7m");
+		type_ext.put("application/x-pkcs7-signature", "p7s");
+		type_ext.put("application/x-sh", "sh");
+		type_ext.put("application/x-shar", "shar");
+		type_ext.put("application/x-shockwave-flash", "swf");
+		type_ext.put("application/x-stuffit", "sit");
+		type_ext.put("application/x-sv4cpio", "sv4cpio");
+		type_ext.put("application/x-sv4crc", "sv4crc");
+		type_ext.put("application/x-tar", "tar");
+		type_ext.put("application/x-tcl", "tcl");
+		type_ext.put("application/x-tex", "tex");
+		type_ext.put("application/x-texinfo", "texi");
+		//type_ext.put("application/x-texinfo", "texinfo");
+		type_ext.put("application/x-troff", "roff");
+		//type_ext.put("application/x-troff", "t");
+		//type_ext.put("application/x-troff", "tr");
+		type_ext.put("application/x-troff-man", "man");
+		type_ext.put("application/x-troff-me", "me");
+		type_ext.put("application/x-troff-ms", "ms");
+		type_ext.put("application/x-ustar", "ustar");
+		type_ext.put("application/x-wais-source", "src");
+		type_ext.put("application/x-x509-ca-cert", "cer");
+		//type_ext.put("application/x-x509-ca-cert", "crt");
+		//type_ext.put("application/x-x509-ca-cert", "der");
+		type_ext.put("application/ynd.ms-pkipko", "pko");
+		type_ext.put("application/zip", "zip");
+		type_ext.put("audio/basic", "au");
+		//type_ext.put("audio/basic", "snd");
+		type_ext.put("audio/mid", "mid");
+		//type_ext.put("audio/mid", "rmi");
+		type_ext.put("audio/mpeg", "mp3");
+		type_ext.put("audio/x-aiff", "aif");
+		//type_ext.put("audio/x-aiff", "aifc");
+		//type_ext.put("audio/x-aiff", "aiff");
+		type_ext.put("audio/x-mpegurl", "m3u");
+		type_ext.put("audio/x-pn-realaudio", "ra");
+		//type_ext.put("audio/x-pn-realaudio", "ram");
+		type_ext.put("audio/x-wav", "wav");
+		type_ext.put("image/png", "png");
+		type_ext.put("image/bmp", "bmp");
+		type_ext.put("image/cis-cod", "cod");
+		type_ext.put("image/gif", "gif");
+		type_ext.put("image/ief", "ief");
+		type_ext.put("image/jpeg", "jpe");
+		//type_ext.put("image/jpeg", "jpeg");
+		//type_ext.put("image/jpeg", "jpg");
+		type_ext.put("image/pipeg", "jfif");
+		type_ext.put("image/svg+xml", "svg");
+		type_ext.put("image/tiff", "tif");
+		//type_ext.put("image/tiff", "tiff");
+		type_ext.put("image/x-cmu-raster", "ras");
+		type_ext.put("image/x-cmx", "cmx");
+		type_ext.put("image/x-icon", "ico");
+		type_ext.put("image/x-portable-anymap", "pnm");
+		type_ext.put("image/x-portable-bitmap", "pbm");
+		type_ext.put("image/x-portable-graymap", "pgm");
+		type_ext.put("image/x-portable-pixmap", "ppm");
+		type_ext.put("image/x-rgb", "rgb");
+		type_ext.put("image/x-xbitmap", "xbm");
+		type_ext.put("image/x-xpixmap", "xpm");
+		type_ext.put("image/x-xwindowdump", "xwd");
+		type_ext.put("message/rfc822", "mht");
+		//type_ext.put("message/rfc822", "mhtml");
+		//type_ext.put("message/rfc822", "nws");
+		type_ext.put("text/css", "css");
+		type_ext.put("text/h323", "323");
+		type_ext.put("text/html", "htm");
+		//type_ext.put("text/html", "html");
+		//type_ext.put("text/html", "stm");
+		type_ext.put("text/iuls", "uls");
+		type_ext.put("text/plain", "bas");
+		//type_ext.put("text/plain", "c");
+		//type_ext.put("text/plain", "h");
+		//type_ext.put("text/plain", "txt");
+		type_ext.put("text/richtext", "rtx");
+		type_ext.put("text/scriptlet", "sct");
+		type_ext.put("text/tab-separated-values", "tsv");
+		type_ext.put("text/webviewhtml", "htt");
+		type_ext.put("text/x-component", "htc");
+		type_ext.put("text/x-setext", "etx");
+		type_ext.put("text/x-vcard", "vcf");
+		type_ext.put("video/mpeg", "mp2");
+		//type_ext.put("video/mpeg", "mpa");
+		//type_ext.put("video/mpeg", "mpe");
+		//type_ext.put("video/mpeg", "mpeg");
+		//type_ext.put("video/mpeg", "mpg");
+		//type_ext.put("video/mpeg", "mpv2");
+		type_ext.put("video/quicktime", "mov");
+		//type_ext.put("video/quicktime", "qt");
+		type_ext.put("video/x-la-asf", "lsf");
+		//type_ext.put("video/x-la-asf", "lsx");
+		type_ext.put("video/x-ms-asf", "asf");
+		//type_ext.put("video/x-ms-asf", "asr");
+		//type_ext.put("video/x-ms-asf", "asx");
+		type_ext.put("video/x-msvideo", "avi");
+		type_ext.put("video/x-sgi-movie", "movie");
+		type_ext.put("x-world/x-vrml", "flr");
+		//type_ext.put("x-world/x-vrml", "vrml");
+		//type_ext.put("x-world/x-vrml", "wrl");
+		//type_ext.put("x-world/x-vrml", "wrz");
+		//type_ext.put("x-world/x-vrml", "xaf");
+		//type_ext.put("x-world/x-vrml", "xof");
+		
+		/* Additional values (oscarhost added) */
+		type_ext.put("txt", "txt");
+		
+		return type_ext;
+    }
+    
     static public String mimeToExt(String mimeType) {
-	String ret = "";
-	if (!StringUtils.filled(mimeType)) return ret;
-	if (mimeType.charAt(0)=='.') return mimeType;
+		String ret = "";
+		if (!StringUtils.filled(mimeType)) return ret;
+		if (mimeType.charAt(0)=='.') return mimeType;
+		
+		HashMap<String, String> type_ext = getTypeExtensions();
 
-	String type_ext = "application/envoy=evy|application/fractals=fif|application/futuresplash=spl|application/hta=hta|application/internet-property-stream=acx|application/mac-binhex40=hqx|application/msword=doc|application/msword=dot|application/octet-stream=bin|application/octet-stream=class|application/octet-stream=dms|application/octet-stream=exe|application/octet-stream=lha|application/octet-stream=lzh|application/oda=oda|application/olescript=axs|application/pdf=pdf|application/pics-rules=prf|application/pkcs10=p10|application/pkix-crl=crl|application/postscript=ai|application/postscript=eps|application/postscript=ps|application/rtf=rtf|application/set-payment-initiation=setpay|application/set-registration-initiation=setreg|application/vnd.ms-excel=xla|application/vnd.ms-excel=xlc|application/vnd.ms-excel=xlm|application/vnd.ms-excel=xls|application/vnd.ms-excel=xlt|application/vnd.ms-excel=xlw|application/vnd.ms-outlook=msg|application/vnd.ms-pkicertstore=sst|application/vnd.ms-pkiseccat=cat|application/vnd.ms-pkistl=stl|application/vnd.ms-powerpoint=pot|application/vnd.ms-powerpoint=pps|application/vnd.ms-powerpoint=ppt|application/vnd.ms-project=mpp|application/vnd.ms-works=wcm|application/vnd.ms-works=wdb|application/vnd.ms-works=wks|application/vnd.ms-works=wps|application/winhlp=hlp|application/x-bcpio=bcpio|application/x-cdf=cdf|application/x-compress=z|application/x-compressed=tgz|application/x-cpio=cpio|application/x-csh=csh|application/x-director=dcr|application/x-director=dir|application/x-director=dxr|application/x-dvi=dvi|application/x-gtar=gtar|application/x-gzip=gz|application/x-hdf=hdf|application/x-internet-signup=ins|application/x-internet-signup=isp|application/x-iphone=iii|application/x-javascript=js|application/x-latex=latex|application/x-msaccess=mdb|application/x-mscardfile=crd|application/x-msclip=clp|application/x-msdownload=dll|application/x-msmediaview=m13|application/x-msmediaview=m14|application/x-msmediaview=mvb|application/x-msmetafile=wmf|application/x-msmoney=mny|application/x-mspublisher=pub|application/x-msschedule=scd|application/x-msterminal=trm|application/x-mswrite=wri|application/x-netcdf=cdf|application/x-netcdf=nc|application/x-perfmon=pma|application/x-perfmon=pmc|application/x-perfmon=pml|application/x-perfmon=pmr|application/x-perfmon=pmw|application/x-pkcs12=p12|application/x-pkcs12=pfx|application/x-pkcs7-certificates=p7b|application/x-pkcs7-certificates=spc|application/x-pkcs7-certreqresp=p7r|application/x-pkcs7-mime=p7c|application/x-pkcs7-mime=p7m|application/x-pkcs7-signature=p7s|application/x-sh=sh|application/x-shar=shar|application/x-shockwave-flash=swf|application/x-stuffit=sit|application/x-sv4cpio=sv4cpio|application/x-sv4crc=sv4crc|application/x-tar=tar|application/x-tcl=tcl|application/x-tex=tex|application/x-texinfo=texi|application/x-texinfo=texinfo|application/x-troff=roff|application/x-troff=t|application/x-troff=tr|application/x-troff-man=man|application/x-troff-me=me|application/x-troff-ms=ms|application/x-ustar=ustar|application/x-wais-source=src|application/x-x509-ca-cert=cer|application/x-x509-ca-cert=crt|application/x-x509-ca-cert=der|application/ynd.ms-pkipko=pko|application/zip=zip|audio/basic=au|audio/basic=snd|audio/mid=mid|audio/mid=rmi|audio/mpeg=mp3|audio/x-aiff=aif|audio/x-aiff=aifc|audio/x-aiff=aiff|audio/x-mpegurl=m3u|audio/x-pn-realaudio=ra|audio/x-pn-realaudio=ram|audio/x-wav=wav|image/png=png|image/bmp=bmp|image/cis-cod=cod|image/gif=gif|image/ief=ief|image/jpeg=jpe|image/jpeg=jpeg|image/jpeg=jpg|image/pipeg=jfif|image/svg+xml=svg|image/tiff=tif|image/tiff=tiff|image/x-cmu-raster=ras|image/x-cmx=cmx|image/x-icon=ico|image/x-portable-anymap=pnm|image/x-portable-bitmap=pbm|image/x-portable-graymap=pgm|image/x-portable-pixmap=ppm|image/x-rgb=rgb|image/x-xbitmap=xbm|image/x-xpixmap=xpm|image/x-xwindowdump=xwd|message/rfc822=mht|message/rfc822=mhtml|message/rfc822=nws|text/css=css|text/h323=323|text/html=htm|text/html=html|text/html=stm|text/iuls=uls|text/plain=bas|text/plain=c|text/plain=h|text/plain=txt|text/richtext=rtx|text/scriptlet=sct|text/tab-separated-values=tsv|text/webviewhtml=htt|text/x-component=htc|text/x-setext=etx|text/x-vcard=vcf|video/mpeg=mp2|video/mpeg=mpa|video/mpeg=mpe|video/mpeg=mpeg|video/mpeg=mpg|video/mpeg=mpv2|video/quicktime=mov|video/quicktime=qt|video/x-la-asf=lsf|video/x-la-asf=lsx|video/x-ms-asf=asf|video/x-ms-asf=asr|video/x-ms-asf=asx|video/x-msvideo=avi|video/x-sgi-movie=movie|x-world/x-vrml=flr|x-world/x-vrml=vrml|x-world/x-vrml=wrl|x-world/x-vrml=wrz|x-world/x-vrml=xaf|x-world/x-vrml=xof|";
-	mimeType = mimeType.toLowerCase();
-	type_ext = type_ext.toLowerCase();
-	int pos = type_ext.indexOf(mimeType);
-	if (pos>-1) {
-	    pos = pos + mimeType.length() + 1;
-	    int end_pos = type_ext.indexOf('|', pos);
-	    ret = "." + type_ext.substring(pos, end_pos);
-	}
-	return ret;
+		// return value associated with key
+		String key = mimeType.toLowerCase();
+		if (type_ext.containsKey(key)) {
+			ret = "." + type_ext.get(key);
+		}
+		// sometimes the value is already just the extension without the '.' (ie 'PDF'), so check the values too
+		else if (type_ext.containsValue(key)) {
+			ret = "." + key;
+		}
+		return ret;
     }
 
     static public cdsDt.HealthCardProvinceCode.Enum setProvinceCode(String provinceCode) {
