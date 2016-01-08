@@ -195,16 +195,22 @@ import oscar.util.UtilDateUtilities;
      * This is because many of these notes will add any leftover data that oscar cannot directly store.
      * Use with caution
      */
-	final boolean ADD_IMPORT_NOTES_DEMOGRAPHIC_DATA = oscarProperties.hasProperty("ADD_IMPORT_NOTES_DEMOGRAPHIC_DATA") ? oscarProperties.isPropertyActive("ADD_IMPORT_NOTES_DEMOGRAPHIC_DATA") : true;
-	final boolean ADD_IMPORT_NOTES_ALLERGIES 		= oscarProperties.hasProperty("ADD_IMPORT_NOTES_ALLERGIES") ? oscarProperties.isPropertyActive("ADD_IMPORT_NOTES_ALLERGIES") : true;
-    final boolean ADD_IMPORT_NOTES_CLINICAL_NOTES 	= oscarProperties.hasProperty("ADD_IMPORT_NOTES_CLINICAL_NOTES") ? oscarProperties.isPropertyActive("ADD_IMPORT_NOTES_CLINICAL_NOTES") : true;
-    final boolean ADD_IMPORT_NOTES_PERSONAL_HIST 	= oscarProperties.hasProperty("ADD_IMPORT_NOTES_PERSONAL_HIST") ? oscarProperties.isPropertyActive("ADD_IMPORT_NOTES_PERSONAL_HIST") : true;
-    final boolean ADD_IMPORT_NOTES_PROBLEM_LIST 	= oscarProperties.hasProperty("ADD_IMPORT_NOTES_PROBLEM_LIST") ? oscarProperties.isPropertyActive("ADD_IMPORT_NOTES_PROBLEM_LIST") : true;
-    final boolean ADD_IMPORT_NOTES_RISK_FACTORS 	= oscarProperties.hasProperty("ADD_IMPORT_NOTES_RISK_FACTORS") ? oscarProperties.isPropertyActive("ADD_IMPORT_NOTES_RISK_FACTORS") : true;
-    final boolean ADD_IMPORT_NOTES_ALERTS 			= oscarProperties.hasProperty("ADD_IMPORT_NOTES_ALERTS") ? oscarProperties.isPropertyActive("ADD_IMPORT_NOTES_ALERTS") : true;
-    final boolean ADD_IMPORT_NOTES_MEDICATIONS 		= oscarProperties.hasProperty("ADD_IMPORT_NOTES_MEDICATIONS") ? oscarProperties.isPropertyActive("ADD_IMPORT_NOTES_MEDICATIONS") : true;
-    final boolean ADD_IMPORT_NOTES_IMMUNIZATIONS 	= oscarProperties.hasProperty("ADD_IMPORT_NOTES_IMMUNIZATIONS") ? oscarProperties.isPropertyActive("ADD_IMPORT_NOTES_IMMUNIZATIONS") : true;
-    final boolean ADD_IMPORT_NOTES_REPORTS 			= oscarProperties.hasProperty("ADD_IMPORT_NOTES_REPORTS") ? oscarProperties.isPropertyActive("ADD_IMPORT_NOTES_REPORTS") : true;
+	final boolean ADD_IMPORT_NOTES_DEMOGRAPHIC_DATA = !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_DEMOGRAPHIC_DATA", "false");
+	final boolean ADD_IMPORT_NOTES_ALLERGIES 		= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_ALLERGIES", "false");
+    final boolean ADD_IMPORT_NOTES_CLINICAL_NOTES 	= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_CLINICAL_NOTES", "false");
+    final boolean ADD_IMPORT_NOTES_PERSONAL_HIST 	= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_PERSONAL_HIST", "false");
+    final boolean ADD_IMPORT_NOTES_PROBLEM_LIST 	= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_PROBLEM_LIST", "false");
+    final boolean ADD_IMPORT_NOTES_RISK_FACTORS 	= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_RISK_FACTORS", "false");
+    final boolean ADD_IMPORT_NOTES_ALERTS 			= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_ALERTS", "false");
+    final boolean ADD_IMPORT_NOTES_MEDICATIONS 		= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_MEDICATIONS", "false");
+    final boolean ADD_IMPORT_NOTES_IMMUNIZATIONS 	= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_IMMUNIZATIONS", "false");
+    final boolean ADD_IMPORT_NOTES_REPORTS 			= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_REPORTS", "false");
+    
+    /*
+     * Allow the default provider to be customized via properties file
+     */
+    final String IMPORT_DEFAULT_PROVIDER_FIRST_NAME = oscarProperties.getProperty("IMPORT_DEFAULT_PROVIDER_FIRST_NAME", "doctor");
+    final String IMPORT_DEFAULT_PROVIDER_LAST_NAME 	= oscarProperties.getProperty("IMPORT_DEFAULT_PROVIDER_LAST_NAME", "oscardoc");
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception  {
@@ -621,7 +627,7 @@ import oscar.util.UtilDateUtilities;
             }
             if (StringUtils.empty(primaryPhysician)) {
                 primaryPhysician = defaultProviderNo();
-                err_data.add("Error! No Primary Physician; patient assigned to \"doctor oscardoc\"");
+                err_data.add("Error! No Primary Physician; patient assigned to \""+IMPORT_DEFAULT_PROVIDER_FIRST_NAME + " " + IMPORT_DEFAULT_PROVIDER_LAST_NAME + "\"");
             }
         } else {
             primaryPhysician = student.getProviderNo();
@@ -1300,7 +1306,7 @@ import oscar.util.UtilDateUtilities;
                                 String authorProvider = writeProviderData(authorName.get("firstname"), authorName.get("lastname"), authorOHIP);
                                 if (StringUtils.empty(authorProvider)) {
                                     authorProvider = defaultProviderNo();
-                                    err_note.add("Clinical notes have no author; assigned to \"doctor oscardoc\" ("+(i+1)+")");
+                                    err_note.add("Clinical notes have no author; assigned to \""+IMPORT_DEFAULT_PROVIDER_FIRST_NAME + " " + IMPORT_DEFAULT_PROVIDER_LAST_NAME + "\" ("+(i+1)+")");
                                 }
                                 cmNote.setProviderNo(authorProvider);
                                 cmNote.setSigning_provider_no(authorProvider);
@@ -1342,7 +1348,7 @@ import oscar.util.UtilDateUtilities;
                         }
                     }
                     if (p_total==0) {
-                        err_note.add("Clinical notes have no author; assigned to \"doctor oscardoc\" ("+(i+1)+")");
+                        err_note.add("Clinical notes have no author; assigned to \""+IMPORT_DEFAULT_PROVIDER_FIRST_NAME + " " + IMPORT_DEFAULT_PROVIDER_LAST_NAME + "\" ("+(i+1)+")");
                     	caseManagementManager.saveNoteSimple(cmNote);
                     }
 
@@ -2020,7 +2026,7 @@ import oscar.util.UtilDateUtilities;
                         apptProvider = writeProviderData(providerName.get("firstname"), providerName.get("lastname"), personOHIP);
                         if (StringUtils.empty(apptProvider)) {
                             apptProvider = defaultProviderNo();
-                            err_note.add("Appointment has no provider; assigned to \"doctor oscardoc\" ("+(i+1)+")");
+                            err_note.add("Appointment has no provider; assigned to \""+IMPORT_DEFAULT_PROVIDER_FIRST_NAME + " " + IMPORT_DEFAULT_PROVIDER_LAST_NAME + "\" ("+(i+1)+")");
                         }
                     }
                     oscarSuperManager.update("appointmentDao", "import_appt", new Object [] {
@@ -2616,10 +2622,10 @@ import oscar.util.UtilDateUtilities;
     }
 
 	String defaultProviderNo() {
-		ProviderData pd = getProviderByNames("doctor", "oscardoc", true);
+		ProviderData pd = getProviderByNames(IMPORT_DEFAULT_PROVIDER_FIRST_NAME, IMPORT_DEFAULT_PROVIDER_LAST_NAME, true);
 		if (pd!=null) return pd.getProviderNo();
 
-		return writeProviderData("doctor", "oscardoc", "");
+		return writeProviderData(IMPORT_DEFAULT_PROVIDER_FIRST_NAME, IMPORT_DEFAULT_PROVIDER_LAST_NAME, "");
 	}
 
         boolean isICD9(cdsDt.StandardCoding diagCode) {

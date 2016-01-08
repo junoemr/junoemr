@@ -297,7 +297,7 @@ public class Util {
 		type_ext.put("application/x-msterminal", "trm");
 		type_ext.put("application/x-mswrite", "wri");
 		type_ext.put("application/x-netcdf", "cdf");
-		type_ext.put("application/x-netcdf", "nc");
+		//type_ext.put("application/x-netcdf", "nc");
 		type_ext.put("application/x-perfmon", "pma");
 		//type_ext.put("application/x-perfmon", "pmc");
 		//type_ext.put("application/x-perfmon", "pml");
@@ -327,7 +327,7 @@ public class Util {
 		//type_ext.put("application/x-troff", "tr");
 		type_ext.put("application/x-troff-man", "man");
 		type_ext.put("application/x-troff-me", "me");
-		type_ext.put("application/x-troff-ms", "ms");
+		//type_ext.put("application/x-troff-ms", "ms");
 		type_ext.put("application/x-ustar", "ustar");
 		type_ext.put("application/x-wais-source", "src");
 		type_ext.put("application/x-x509-ca-cert", "cer");
