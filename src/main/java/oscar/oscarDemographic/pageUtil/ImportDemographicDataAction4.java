@@ -2948,18 +2948,55 @@ import oscar.util.UtilDateUtilities;
 		return writeProviderData(firstName, lastName, ohipNo, null);
 	}
 
+	/**
+	 * helper method to parse special cases where entire provider names exist in the first_name or last_name fields
+	 * @return string array of [first name, last name] where entries are not null or empty. null if it fails
+	 */
+	private String[] coerceProviderNames(String fullName) {
+		try {
+			fullName = fullName.trim();
+			int i = fullName.lastIndexOf(" ");//get last space in the string
+			if (i >= 0 ) {
+				String[] a =  {fullName.substring(0, i), fullName.substring(i).trim()};
+				
+				if(StringUtils.empty(a[0]) || StringUtils.empty(a[1])) {
+					return null;
+				}
+				return a;
+			}
+		}
+		catch(Exception e) {
+			logger.warn("Exception encounterd in coerceProviderNames");
+		}
+		return null;
+	}
 	String writeProviderData(String firstName, String lastName, String ohipNo, String cpsoNo) {
 		ProviderData pd = getProviderByOhip(ohipNo);
 		if (pd == null) {
 			pd = getProviderByNames(firstName, lastName, matchProviderNames);
 	    }
+		/* attempt to split single names into first and last parts */
+		if (pd == null) {
+	    	String[] parsedName = null;
+	    	if (!StringUtils.empty(firstName)) {
+	    		parsedName = coerceProviderNames(firstName);
+	    	}
+	    	else if (!StringUtils.empty(lastName)) {
+	    		parsedName = coerceProviderNames(lastName);
+	    	}
+	    	if (parsedName != null) {
+	    		firstName = parsedName[0];
+	    		lastName  = parsedName[1];
+	    		pd = getProviderByNames(firstName, lastName, matchProviderNames);
+	    		logger.warn("Provider name recovered through string parsing. Using firstName: "+firstName+" lastName: "+lastName+" as provider");
+	    	}
+		}
 	
 	    if (pd == null) {
 	    	logger.error("No provider found for firstName: " + firstName +
 	    			" lastName: " + lastName + " ohipNo: " + ohipNo);
 		
 		    if (StringUtils.empty(firstName) || StringUtils.empty(lastName)) {
-		    	//return defaultProviderNo();
 		    	return ""; //no information at all!
 		    }
 			pd = new ProviderData();
