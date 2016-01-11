@@ -273,11 +273,15 @@
     demographicDao.save(demographic);
     
     // save custom licensed producer if enabled
-    String licensedProducer = request.getParameter("licensed_producer");
-    String licensedProducerAddress = request.getParameter("licensed_producer_address");
-    if (licensedProducer != null && !licensedProducer.trim().equals("")
-    		&& licensedProducerAddress != null && !licensedProducerAddress.trim().equals("")) {
-    	demographicDao.saveDemographicLicensedProducer(demographic.getDemographicNo(), Integer.parseInt(licensedProducer), Integer.parseInt(licensedProducerAddress));
+    if(Boolean.parseBoolean(oscarVariables.getProperty("show_demographic_licensed_producers"))) {
+	    try {
+		    int licensedProducerID = Integer.parseInt(request.getParameter("licensed_producer"));
+		    int licensedProducerAddressID = Integer.parseInt(request.getParameter("licensed_producer_address"));
+	    	demographicDao.saveDemographicLicensedProducer(demographic.getDemographicNo(), licensedProducerID, licensedProducerAddressID);
+	    }
+	    catch(NumberFormatException e) {
+	    	// unable to save licensed producer info
+	    }
     }
     
     int rowsAffected=1;
