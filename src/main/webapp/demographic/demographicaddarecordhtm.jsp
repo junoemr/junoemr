@@ -37,6 +37,7 @@
 	
 	// Custom licensed producer fields
 	String licensedProducerDefault = "None";
+	String licensedProducerDefaultAddress = "None";
 %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -64,7 +65,8 @@
     {"search_rsstatus", "select distinct roster_status from demographic where roster_status != '' and roster_status != 'RO' and roster_status != 'NR' and roster_status != 'TE' and roster_status != 'FS' "},
     {"search_ptstatus", "select distinct patient_status from demographic where patient_status != '' and patient_status != 'AC' and patient_status != 'IN' and patient_status != 'DE' and patient_status != 'MO' and patient_status != 'FI'"},
     {"search_waiting_list", "select * from waitingListName where group_no='" + ((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo() +"' and is_history='N'  order by name"},
-    {"search_licensed_producer", "SELECT producer_id, producer_name FROM licensed_producer ORDER BY producer_id"}
+    {"search_licensed_producer", "SELECT producer_id, producer_name FROM licensed_producer ORDER BY producer_id"},
+    {"search_licensed_producer_address_name", "SELECT address_id, display_name FROM licensed_producer_address ORDER BY address_id"}
   };
   String[][] responseTargets=new String[][] {  };
   addDemoBean.doConfigure(dbQueries,responseTargets);
@@ -1285,6 +1287,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
 			<%					
 			if(Boolean.parseBoolean(oscarProps.getProperty("show_demographic_licensed_producers"))) {
 				ResultSet producerRs = addDemoBean.queryResults("search_licensed_producer");
+				ResultSet producerAddrRs = addDemoBean.queryResults("search_licensed_producer_address_name");
 				%>
 				<tr>
 					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.licensedProducer" />:</b></td>
@@ -1295,6 +1298,21 @@ document.forms[1].r_doctor_ohip.value = refNo;
 						while(producerRs.next()) {
 							%>
 							<option value="<%=producerRs.getString("producer_id")%>"><%=producerRs.getString("producer_name")%></option>
+							<%
+						}
+						%>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.licensedProducerAddress" />:</b></td>
+					<td align="left">
+						<select name="licensed_producer_address">
+						<option selected value="0"><%=licensedProducerDefaultAddress%></option>
+						<%
+						while(producerAddrRs.next()) {
+							%>
+							<option value="<%=producerAddrRs.getString("address_id")%>"><%=producerAddrRs.getString("display_name")%></option>
 							<%
 						}
 						%>

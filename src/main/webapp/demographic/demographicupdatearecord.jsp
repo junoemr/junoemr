@@ -274,8 +274,10 @@
     
     // save custom licensed producer if enabled
     String licensedProducer = request.getParameter("licensed_producer");
-    if (licensedProducer != null && !licensedProducer.trim().equals("")) {
-    	demographicDao.saveDemographicLicensedProducer(demographic.getDemographicNo(), Integer.parseInt(licensedProducer));
+    String licensedProducerAddress = request.getParameter("licensed_producer_address");
+    if (licensedProducer != null && !licensedProducer.trim().equals("")
+    		&& licensedProducerAddress != null && !licensedProducerAddress.trim().equals("")) {
+    	demographicDao.saveDemographicLicensedProducer(demographic.getDemographicNo(), Integer.parseInt(licensedProducer), Integer.parseInt(licensedProducerAddress));
     }
     
     int rowsAffected=1;
