@@ -316,6 +316,20 @@
 		<ap-sql>SELECT lp.producer_name AS producer_name FROM demographic_licensed_producer d JOIN licensed_producer lp ON (d.producer_id=lp.producer_id) where d.demographic_no=${demographic}</ap-sql>
 		<ap-output>${producer_name}</ap-output>
 	</databaseap>
+	<databaseap>
+        <ap-name>licensed_producer_address_name</ap-name>
+        <ap-sql>SELECT pa.display_name as address_name
+        		 FROM demographic_licensed_producer d JOIN licensed_producer_address pa ON (d.address_id=pa.address_id) where d.demographic_no=${demographic}
+       	</ap-sql>
+        <ap-output>${address_name}</ap-output>
+    </databaseap>
+	<databaseap>
+        <ap-name>licensed_producer_full_address</ap-name>
+        <ap-sql>SELECT pa.address as address, pa.city as city, pa.province as province, pa.postal as postal
+        		 FROM demographic_licensed_producer d JOIN licensed_producer_address pa ON (d.address_id=pa.address_id) where d.demographic_no=${demographic}
+       	</ap-sql>
+        <ap-output>${address}\n${city}, ${province}, ${postal}</ap-output>
+    </databaseap>
 
 <!-- Patient medical information -->
     <databaseap>
