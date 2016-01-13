@@ -965,3 +965,8 @@ auto_populate_billingreferral_bc=true
 #OHSUPPORT-2712 - adds licensed producers dropdown to demographic master files.
 #REQUIRES the database patch be applied to create the correct tables.
 #show_demographic_licensed_producers=true
+
+#OHSUPPORT-2764
+# Customize Report-list default appointment start/end times (use the 24 hour clock. must be int values)
+#reportlist_defaultApptStartTime=8
+#reportlist_defaultApptEndTime=20
