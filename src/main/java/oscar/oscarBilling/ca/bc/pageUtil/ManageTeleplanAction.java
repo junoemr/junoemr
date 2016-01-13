@@ -66,6 +66,7 @@ import oscar.util.UtilDateUtilities;
 public class ManageTeleplanAction extends DispatchAction {
 
     private static Logger log = MiscUtils.getLogger();
+    private static final String teleplan_login_failure_msgHdr = "An error occured connecting to teleplan:<br/>";
 
     /** Creates a new instance of ManageTeleplanAction */
     public ManageTeleplanAction() {
@@ -95,54 +96,66 @@ public class ManageTeleplanAction extends DispatchAction {
            return mapping.findForward("success");
     }
 
-    public ActionForward updateBillingCodes(ActionMapping mapping, ActionForm  form,
-           HttpServletRequest request, HttpServletResponse response)
-           throws Exception {
+	public ActionForward updateBillingCodes(ActionMapping mapping, ActionForm form, 
+			HttpServletRequest request, HttpServletResponse response) 
+			throws Exception {
 
-           TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
-           String[] userpass = dao.getUsernamePassword();
-           TeleplanService tService = new TeleplanService();
-           TeleplanAPI tAPI = tService.getTeleplanAPI(userpass[0],userpass[1]);
+		TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
+		String[] userpass = dao.getUsernamePassword();
+		TeleplanService tService = new TeleplanService();
+		TeleplanAPI tAPI = null;
+		try {
+			tAPI = tService.getTeleplanAPI(userpass[0], userpass[1]);
+		} catch (Exception e) {
+			request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
+			return mapping.findForward("error");
+		}
+	
+		TeleplanResponse tr = tAPI.getAsciiFile("3");
+	
+		log.debug("real filename " + tr.getRealFilename());
+	
+		File file = tr.getFile();
+		TeleplanCodesManager tcm = new TeleplanCodesManager();
+		List list = tcm.parse(file);
+		request.setAttribute("codes", list);
+		return mapping.findForward("codelist");
+	}
 
-           TeleplanResponse tr = tAPI.getAsciiFile("3");
 
-           log.debug("real filename "+tr.getRealFilename());
-
-           File file = tr.getFile();
-           TeleplanCodesManager tcm = new TeleplanCodesManager();
-           List list = tcm.parse(file);
-           request.setAttribute("codes",list);
-           return mapping.findForward("codelist");
-    }
-
-
-    public ActionForward updateteleplanICDCodesList(ActionMapping mapping, ActionForm  form,
-           HttpServletRequest request, HttpServletResponse response)
-           throws Exception {
-
-           DiagnosticCodeDao bDx = SpringUtils.getBean(DiagnosticCodeDao.class);
-
-           log.debug("UPDATE ICD  CODE WITH PARSING");
-           TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
-           String[] userpass = dao.getUsernamePassword();
-           TeleplanService tService = new TeleplanService();
-           TeleplanAPI tAPI = tService.getTeleplanAPI(userpass[0],userpass[1]);
-           TeleplanResponse tr = tAPI.getAsciiFile("2");
-
-           log.debug("real filename "+tr.getRealFilename());
-
-           File file = tr.getFile();
-           
-           TeleplanCodesManager tcm = new TeleplanCodesManager();
-           tcm.parseICD9(file);
-           
-           tr = tAPI.getAsciiFile("I");
-           log.debug("real filename "+tr.getRealFilename());
-           File Ifile = tr.getFile();
-           tcm.parseICD9(Ifile);
-           
-           return mapping.findForward("success");
-    }
+	public ActionForward updateteleplanICDCodesList(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) 
+			throws Exception {
+	
+		DiagnosticCodeDao bDx = SpringUtils.getBean(DiagnosticCodeDao.class);
+	
+		log.debug("UPDATE ICD  CODE WITH PARSING");
+		TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
+		String[] userpass = dao.getUsernamePassword();
+		TeleplanService tService = new TeleplanService();
+		TeleplanAPI tAPI = null;
+		try {
+			tAPI = tService.getTeleplanAPI(userpass[0], userpass[1]);
+		} catch (Exception e) {
+			request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
+			return mapping.findForward("error");
+		}
+		TeleplanResponse tr = tAPI.getAsciiFile("2");
+	
+		log.debug("real filename " + tr.getRealFilename());
+	
+		File file = tr.getFile();
+	
+		TeleplanCodesManager tcm = new TeleplanCodesManager();
+		tcm.parseICD9(file);
+	
+		tr = tAPI.getAsciiFile("I");
+		log.debug("real filename " + tr.getRealFilename());
+		File Ifile = tr.getFile();
+		tcm.parseICD9(Ifile);
+	
+		return mapping.findForward("success");
+	}
 
     /*
      *  2 = MSP ICD9 Codes (3 char)
@@ -157,7 +170,13 @@ public class ManageTeleplanAction extends DispatchAction {
            TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
            String[] userpass = dao.getUsernamePassword();
            TeleplanService tService = new TeleplanService();
-           TeleplanAPI tAPI = tService.getTeleplanAPI(userpass[0],userpass[1]);
+	   		TeleplanAPI tAPI = null;
+	   		try {
+	   			tAPI = tService.getTeleplanAPI(userpass[0], userpass[1]);
+	   		} catch (Exception e) {
+	   			request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
+	   			return mapping.findForward("error");
+	   		}
 
            TeleplanResponse tr = tAPI.getAsciiFile("1");
 
@@ -262,8 +281,8 @@ public class ManageTeleplanAction extends DispatchAction {
                 tAPI = tService.getTeleplanAPI(userpass[0],userpass[1]);
            }catch(Exception e){
                log.debug(e.getMessage(),e);
-               request.setAttribute("error",e.getMessage());
-               return mapping.findForward("success");
+               request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
+               return mapping.findForward("error");
            }
 
 
@@ -312,7 +331,7 @@ public class ManageTeleplanAction extends DispatchAction {
                 tAPI = tService.getTeleplanAPI(userpass[0],userpass[1]);
            }catch(Exception e){
                log.debug(e.getMessage(),e);
-               request.setAttribute("error",e.getMessage());
+               request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
                return mapping.findForward("submission");
            }
 
@@ -363,8 +382,8 @@ public class ManageTeleplanAction extends DispatchAction {
                 tAPI = tService.getTeleplanAPI(userpass[0],userpass[1]);
            }catch(Exception e){
                log.debug(e.getMessage(),e);
-               request.setAttribute("error",e.getMessage());
-               return mapping.findForward("success");
+               request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
+               return mapping.findForward("error");
            }
 
            TeleplanResponse tr = tAPI.getRemittance(true);
@@ -410,8 +429,8 @@ public class ManageTeleplanAction extends DispatchAction {
 
            }catch(Exception e){
                log.debug(e.getMessage(),e);
-               request.setAttribute("error",e.getMessage());
-               return mapping.findForward("success");
+               request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
+               return mapping.findForward("error");
            }
 
            TeleplanResponse tr = tAPI.changePassword(userpass[0],userpass[1],newpass,confpass);
@@ -446,7 +465,7 @@ public class ManageTeleplanAction extends DispatchAction {
                 tAPI = tService.getTeleplanAPI(userpass[0],userpass[1]);
            }catch(Exception e){
                log.debug(e.getMessage(),e);
-               request.setAttribute("error",e.getMessage());
+               request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
                return mapping.findForward("checkElig");
            }
 
