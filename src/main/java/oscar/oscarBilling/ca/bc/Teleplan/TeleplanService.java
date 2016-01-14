@@ -58,23 +58,28 @@ public class TeleplanService {
      
     public TeleplanAPI getTeleplanAPI(String username,String password) throws Exception{
         TeleplanAPI tAPI = new TeleplanAPI();//
+        String errorMesage = "";
         
         TeleplanResponse tr = tAPI.login(username,password);
-               
-        if (tr != null && "SUCCESS".equalsIgnoreCase(tr.getResult())) {
-           return tAPI;
-        }
-        else if(tr != null && "EXPIRED.PASSWORD".equalsIgnoreCase(tr.getResult())) {
-        	throw new Exception("User password has expired and must be updated!");
-        }
-        else if(tr != null && "FAILED".equalsIgnoreCase(tr.getResult())) {
-        	throw new Exception("Invalid Login Information");
-        }
         
-        //TODO: ALSO RESULT COULD BE   EXPIRED.PASSWORD   need some kind of trigger that will prompt user to change password
-        
-        log.error("Teleplan API Response object returned " + ((tr == null) ? "null":"invalid results") + " during login attempt");
-        throw new Exception("Teleplan API returned an unknown response: " + tr.getMsgs());
+        if(tr == null || tr.getResult() == null) {
+        	log.error("TeleplanAPI login returned null " + ((tr == null) ? "TeleplanResponse object":"results string") + " during login attempt");
+        	errorMesage = "Teleplan API returned an unknown response";
+        }
+        else if (tr.getResult().equalsIgnoreCase("SUCCESS")) {
+        	return tAPI;
+        }
+        else if (tr.getResult().equalsIgnoreCase("FAILED")) {
+        	errorMesage = "Invalid Login Information";
+        }
+        else if (tr.getResult().equalsIgnoreCase("EXPIRED.PASSWORD")) {
+        	errorMesage = "User password has expired and must be updated!";
+        }
+        else {
+        	log.error("TeleplanAPI login returned an unknown state: " + tr.getResult() + "\nWith message: " + tr.getMsgs());
+        	errorMesage = tr.getMsgs();
+        }
+        throw new Exception(errorMesage);
     } 
     
     
