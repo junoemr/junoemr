@@ -260,6 +260,10 @@ div.recommendations ul{
 div.recommendations li{
     
 }    
+div#error_msg {
+	padding:2px;
+	background: #FF6347;
+}
         
        
 
@@ -303,7 +307,7 @@ div.recommendations li{
             </td>
             <td valign="top" class="MainTableRightColumn">
                 <%if (request.getAttribute("error") != null) { %>
-                <div> <%=request.getAttribute("error")%></div>
+                <div id="error_msg"> <%=request.getAttribute("error")%></div>
                 <%}%>
                 <oscar:oscarPropertiesCheck property="BILLING_SUPERUSER" value="<%=superUser%>" >
                     <div class="leftBox">
