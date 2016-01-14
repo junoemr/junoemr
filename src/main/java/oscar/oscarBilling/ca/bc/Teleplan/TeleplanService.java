@@ -69,7 +69,7 @@ public class TeleplanService {
         else if (tr.getResult().equalsIgnoreCase("SUCCESS")) {
         	return tAPI;
         }
-        else if (tr.getResult().equalsIgnoreCase("FAILED")) {
+        else if (tr.getResult().equalsIgnoreCase("FAILURE")) {
         	errorMesage = "Invalid Login Information";
         }
         else if (tr.getResult().equalsIgnoreCase("EXPIRED.PASSWORD")) {
