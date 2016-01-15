@@ -45,7 +45,8 @@ INSERT INTO licensed_producer_address(address, city, province, postal, display_n
 VALUES
 ('329 Queenston Rd.', 'Hamilton', 'ON', 'L8K 1H7', 'Hamilton'),
 ('137 McKeller St. N', 'Thunder Bay', 'ON', 'P7C 3Y9', 'Thunder Bay'),
-('121 Dundas St. E #106', 'Belleville', 'ON', 'K8N 1L3', 'Belleville');
+('121 Dundas St. E #106', 'Belleville', 'ON', 'K8N 1L3', 'Belleville'),
+('556 Bryne Dr. Unit 16', 'Barrie', 'ON', 'L4N 9P6', 'Barrie');
 
 CREATE TABLE demographic_licensed_producer (
 	id int NOT NULL AUTO_INCREMENT,
