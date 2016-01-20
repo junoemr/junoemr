@@ -34,6 +34,10 @@
 	if(request.isSecure()){
 		protocol = "https://";
 	}
+	
+	// Custom licensed producer fields
+	String licensedProducerDefault = "None";
+	String licensedProducerDefaultAddress = "None";
 %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -60,7 +64,9 @@
     {"search_provider", "select * from provider where provider_type='doctor' and status='1' order by last_name"},
     {"search_rsstatus", "select distinct roster_status from demographic where roster_status != '' and roster_status != 'RO' and roster_status != 'NR' and roster_status != 'TE' and roster_status != 'FS' "},
     {"search_ptstatus", "select distinct patient_status from demographic where patient_status != '' and patient_status != 'AC' and patient_status != 'IN' and patient_status != 'DE' and patient_status != 'MO' and patient_status != 'FI'"},
-    {"search_waiting_list", "select * from waitingListName where group_no='" + ((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo() +"' and is_history='N'  order by name"}
+    {"search_waiting_list", "select * from waitingListName where group_no='" + ((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo() +"' and is_history='N'  order by name"},
+    {"search_licensed_producer", "SELECT producer_id, producer_name FROM licensed_producer ORDER BY producer_id"},
+    {"search_licensed_producer_address_name", "SELECT address_id, display_name FROM licensed_producer_address ORDER BY address_id"}
   };
   String[][] responseTargets=new String[][] {  };
   addDemoBean.doConfigure(dbQueries,responseTargets);
@@ -574,6 +580,7 @@ function autoFillHin(){
 	<td align="left">
 	    <select name="title" onchange="checkTitleSex(value);">
                 <option value=""><bean:message key="demographic.demographicaddrecordhtm.msgNotSet"/></option>
+                <option value="DR"><bean:message key="demographic.demographicaddrecordhtm.msgDr"/></option>
                 <option value="MS"><bean:message key="demographic.demographicaddrecordhtm.msgMs"/></option>
                 <option value="MISS"><bean:message key="demographic.demographicaddrecordhtm.msgMiss"/></option>
                 <option value="MRS"><bean:message key="demographic.demographicaddrecordhtm.msgMrs"/></option>
@@ -1235,38 +1242,98 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				</td>
 			</tr>
 			<tr valign="top">
-                            <td align="right"><b><bean:message
-					key="demographic.demographicaddrecordhtm.formPatientStatus" />:</b></td>
+				<td align="right"><b><bean:message
+							key="demographic.demographicaddrecordhtm.formPatientStatus" />:</b></td>
 				<td align="left">
-				<% if (vLocale.getCountry().equals("BR")) { %> <input type="text"
+					<%
+						if (vLocale.getCountry().equals("BR")) {
+					%> <input type="text"
 					name="patient_status" value="AC" onBlur="upCaseCtrl(this)">
-				<% } else { %> <select name="patient_status" style="width: 160">
-					<option value="AC"><bean:message key="demographic.demographicaddrecordhtm.AC-Active" /></option>
-					<option value="IN"><bean:message key="demographic.demographicaddrecordhtm.IN-InActive" /></option>
-					<option value="DE"><bean:message key="demographic.demographicaddrecordhtm.DE-Deceased" /></option>
-					<option value="MO"><bean:message key="demographic.demographicaddrecordhtm.MO-Moved" /></option>
-					<option value="FI"><bean:message key="demographic.demographicaddrecordhtm.FI-Fired" /></option>
-					<% ResultSet rsstatus = addDemoBean.queryResults("search_ptstatus");
-             while (rsstatus.next()) { %>
-					<option value="<%=rsstatus.getString("patient_status")%>"><%=rsstatus.getString("patient_status")%></option>
-					<% } // end while %>
-				</select> <input type="button" onClick="newStatus();" value="<bean:message
-					key="demographic.demographicaddrecordhtm.AddNewPatient"/> ">
-				<% } // end if...then...else %>
+					<%
+						} else {
+					%> <select name="patient_status" style="width: 160">
+						<option value="AC"><bean:message
+								key="demographic.demographicaddrecordhtm.AC-Active" /></option>
+						<option value="IN"><bean:message
+								key="demographic.demographicaddrecordhtm.IN-InActive" /></option>
+						<option value="DE"><bean:message
+								key="demographic.demographicaddrecordhtm.DE-Deceased" /></option>
+						<option value="MO"><bean:message
+								key="demographic.demographicaddrecordhtm.MO-Moved" /></option>
+						<option value="FI"><bean:message
+								key="demographic.demographicaddrecordhtm.FI-Fired" /></option>
+						<%
+							ResultSet rsstatus = addDemoBean.queryResults("search_ptstatus");
+							while (rsstatus.next()) {
+						%>
+								<option value="<%=rsstatus.getString("patient_status")%>"><%=rsstatus.getString("patient_status")%></option>
+						<%
+							} // end while
+						%>
+				</select> <input type="button" onClick="newStatus();"
+					value="<bean:message
+						key="demographic.demographicaddrecordhtm.AddNewPatient"/> ">
+					<%
+						} // end if...then...else
+					%>
 				</td>
 				<td align="right"><b><bean:message
-					key="demographic.demographicaddrecordhtm.formChartNo" />:</b></td>
+							key="demographic.demographicaddrecordhtm.formChartNo" />:</b></td>
 				<td align="left"><input type="text" name="chart_no" value="">
 				</td>
 			</tr>
+			
+			<!-- Licensed producer drop-down selection -->
+			<%					
+			if(Boolean.parseBoolean(oscarProps.getProperty("show_demographic_licensed_producers"))) {
+				ResultSet producerRs = addDemoBean.queryResults("search_licensed_producer");
+				ResultSet producerAddrRs = addDemoBean.queryResults("search_licensed_producer_address_name");
+				%>
+				<tr>
+					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.licensedProducer" />:</b></td>
+					<td align="left">
+						<select name="licensed_producer">
+						<option selected value="0"><%=licensedProducerDefault%></option>
+						<%
+						while(producerRs.next()) {
+							%>
+							<option value="<%=producerRs.getString("producer_id")%>"><%=producerRs.getString("producer_name")%></option>
+							<%
+						}
+						%>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.licensedProducerAddress" />:</b></td>
+					<td align="left">
+						<select name="licensed_producer_address">
+						<option selected value="0"><%=licensedProducerDefaultAddress%></option>
+						<%
+						while(producerAddrRs.next()) {
+							%>
+							<option value="<%=producerAddrRs.getString("address_id")%>"><%=producerAddrRs.getString("display_name")%></option>
+							<%
+						}
+						%>
+						</select>
+					</td>
+				</tr>
+				<%
+			}
+			%>
 			<!-- Scanned Chart -->
-            <% if (Boolean.parseBoolean(oscarProps.getProperty("demographic_scanned_chart"))) { %>
-            <tr valign="top">
-                <td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.scannedChart"/>:</b></td>
-                <td align="left"><input type="checkbox" name="scanned_chart" value="scanned"/></td> 
-            </tr>
-            <% } %>
-
+			<%
+				if (Boolean.parseBoolean(oscarProps.getProperty("demographic_scanned_chart"))) {
+			%>
+				<tr valign="top">
+					<td align="right" nowrap><b><bean:message
+								key="demographic.demographiceditdemographic.scannedChart" />:</b></td>
+					<td align="left"><input type="checkbox" name="scanned_chart"
+						value="scanned" /></td>
+				</tr>
+			<% } %>
+	
 			<%if (oscarProps.getProperty("EXTRA_DEMO_FIELDS") !=null){
       String fieldJSP = oscarProps.getProperty("EXTRA_DEMO_FIELDS");
       fieldJSP+= ".jsp";

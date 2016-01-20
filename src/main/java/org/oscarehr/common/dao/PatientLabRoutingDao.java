@@ -36,6 +36,7 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
 
 	public static final Integer UNMATCHED = 0;
 	public static final String HL7 = "HL7";
+	public static final String DOC = "DOC";
 
 	public PatientLabRoutingDao() {
 		super(PatientLabRouting.class);
@@ -45,7 +46,7 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
 	 * Finds routing record containing reference to the demographic record with the 
 	 * specified lab results reference number of {@link #HL7} lab type. 
 	 * 
-	 * LabId is also refereed to as Lab_no, and segmentId.
+	 * LabId is also referred to as Lab_no, and segmentId.
 	 */
 	public PatientLabRouting findDemographicByLabId(Integer labId) {
 		return findDemographics(HL7, labId);
@@ -70,28 +71,14 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
 		return(getSingleResultOrNull(query));
 	}
 
-    @SuppressWarnings("unchecked")
     public List<PatientLabRouting> findDocByDemographic(String docNum) {
-
-    	String query = "select x from " + modelClass.getName() + " x where x.labNo=? and x.labType=?";
-    	Query q = entityManager.createQuery(query);
-
-    	q.setParameter(1, Integer.parseInt(docNum));
-    	q.setParameter(2, "DOC");
-
-    	return q.getResultList();
+    	return findRouteList(Integer.parseInt(docNum), DOC);
     }
-    
-    public PatientLabRouting findByLabNo(int labNo) {
-    	String query = "select x from " + modelClass.getName() + " x where x.labNo=?";
-    	Query q = entityManager.createQuery(query);
-    	q.setParameter(1, labNo);
-    	return this.getSingleResultOrNull(q);
-    }
-    
-    @SuppressWarnings("unchecked")
     public List<PatientLabRouting> findByLabNoAndLabType(int labNo, String labType) {
-
+    	return findRouteList(labNo, labType);
+    }
+    @SuppressWarnings("unchecked")
+    public List<PatientLabRouting> findRouteList(Integer labNo, String labType) {
     	String query = "select x from " + modelClass.getName() + " x where x.labNo=? and x.labType=?";
     	Query q = entityManager.createQuery(query);
 
@@ -99,6 +86,40 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
     	q.setParameter(2, labType);
     	
     	return q.getResultList();
+    }
+    
+    /**
+     * Retrieves a single PatientLabRoute from the database of type DOC, with the given lab id and demographic number
+     * @param labNo
+     * @param demographicNo
+     * @return PatientLabRoute or null
+     */
+	public PatientLabRouting findSingleDocRoute(Integer labNo, Integer demographicNo) {
+		return findSingleRoute(labNo, DOC, demographicNo);
+	}
+    /**
+     * Retrieves a single PatientLabRoute from the database of type HL7, with the given lab id and demographic number
+     * @param labNo
+     * @param demographicNo
+     * @return PatientLabRoute or null
+     */
+    public PatientLabRouting findSingleLabRoute(Integer labNo, Integer demographicNo) {
+    	return findSingleRoute(labNo, HL7, demographicNo);
+    }
+    /**
+     * Retrieves a single PatientLabRoute from the database with the given lab id, type, and demographic number
+     * @param labNo
+     * @param labType
+     * @param demographicNo
+     * @return PatientLabRoute or null
+     */
+    public PatientLabRouting findSingleRoute(Integer labNo, String labType, Integer demographicNo) {
+		String sqlCommand="SELECT x FROM "+ this.modelClass.getName() +" x WHERE x.labType=?1 AND x.labNo=?2 AND x.demographicNo=?3";
+		Query query = entityManager.createQuery(sqlCommand);
+		query.setParameter(1, labType);
+		query.setParameter(2, labNo);
+		query.setParameter(3, demographicNo);
+		return(getSingleResultOrNull(query));
     }
 
 }

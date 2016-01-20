@@ -83,7 +83,7 @@ if (props.getProperty("set_lab_label_on_acknowledge", "").equals("true"))
 
 String ackLabFunc;
 if( skipComment ) {
-	ackLabFunc = "handleLab('acknowledgeForm','" + segmentID + "','ackLab');";
+	ackLabFunc = "handleLab('acknowledgeForm','" + segmentID + "','" +demographicID + "','ackLab');";
 }
 else if(setLabelOnAck) {
 	ackLabFunc = "setLabel('ackLab');";
@@ -402,7 +402,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
             else
             	document.acknowledgeForm.comment.value = comment;
 
-           if(ret) handleLab('acknowledgeForm','<%=segmentID%>', action);
+           if(ret) handleLab('acknowledgeForm','<%=segmentID%>','<%=demographicID%>', action);
 
             return false;
         }
@@ -436,7 +436,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
               data: { lab_no: jQuery("#labNum").val(),accessionNum: jQuery("#accNum").val(), label: jQuery("#label").val() }
               });
 
-            if(success) handleLab('acknowledgeForm','<%=segmentID%>', action);
+            if(success) handleLab('acknowledgeForm','<%=segmentID%>','<%=demographicID%>', action);
 
             return success;
         }
@@ -477,7 +477,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	}
 
 
-        function handleLab(formid,labid,action){
+        function handleLab(formid, labid, demographic_no, action){
             var url='../../../dms/inboxManage.do';
                                            var data='method=isLabLinkedToDemographic&labid='+labid;
                                            new Ajax.Request(url, {method: 'post',parameters:data,onSuccess:function(transport){
@@ -504,7 +504,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                                             else if( action == 'addComment' ) {
                                                                             	addComment(formid,labid);
                                                                             } else if (action == 'unlinkDemo') {
-                                                                            	unlinkDemographic(labid);
+                                                                            	unlinkDemographic(labid, demographic_no);
                                                                             }
 
                                                                         }else{
@@ -559,7 +559,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
         }
 
-        function unlinkDemographic(labNo){
+        function unlinkDemographic(labNo, demographic_no){
             var reason = "Incorrect demographic";
             reason = prompt('<bean:message key="oscarMDS.segmentDisplay.msgUnlink"/>', reason);
 
@@ -569,7 +569,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
             }
 
             var urlStr='<%=request.getContextPath()%>'+"/lab/CA/ALL/UnlinkDemographic.do";
-            var dataStr="reason="+reason+"&labNo="+labNo;
+            var dataStr="reason="+reason+"&labNo="+labNo+"&demographicNo="+demographic_no;
             jQuery.ajax({
                 type: "POST",
                 url:  urlStr,
@@ -662,9 +662,9 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                     <input type="button" value=" <bean:message key="global.btnClose"/> " onClick="window.close()">
                                     <input type="button" value=" <bean:message key="global.btnPrint"/> " onClick="printPDF()">
 
-                                    <input type="button" value="Msg" onclick="handleLab('','<%=segmentID%>','msgLab');"/>
-                                    <input type="button" value="Tickler" onclick="handleLab('','<%=segmentID%>','ticklerLab');"/>
-                                    <input type="button" value="<bean:message key="oscarMDS.segmentDisplay.btnUnlinkDemo"/>" onclick="handleLab('','<%=segmentID%>','unlinkDemo');"/>
+                                    <input type="button" value="Msg" onclick="handleLab('','<%=segmentID%>','<%=demographicID%>','msgLab');"/>
+                                    <input type="button" value="Tickler" onclick="handleLab('','<%=segmentID%>','<%=demographicID%>','ticklerLab');"/>
+                                    <input type="button" value="<bean:message key="oscarMDS.segmentDisplay.btnUnlinkDemo"/>" onclick="handleLab('','<%=segmentID%>','<%=demographicID%>','unlinkDemo');"/>
 
                                     <% if ( searchProviderNo != null ) { // null if we were called from e-chart%>
                                     <input type="button" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupStart(360, 680, '../../../oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">

@@ -739,14 +739,18 @@ if(wcbneeds != null){%>
     if (sxml_location.compareTo("") == 0) {
       sxml_location = OscarProperties.getInstance().getProperty("visitlocation");
       sxml_visittype = OscarProperties.getInstance().getProperty("visittype");
-      sxml_provider = bean.getApptProviderNo();
       thisForm.setXml_location(sxml_location);
-      thisForm.setXml_provider(sxml_provider);
       thisForm.setXml_visittype(sxml_visittype);
       if ( OscarProperties.getInstance().getProperty("BC_DEFAULT_ALT_BILLING") != null && OscarProperties.getInstance().getProperty("BC_DEFAULT_ALT_BILLING").equalsIgnoreCase("YES")){
          thisForm.setXml_encounter("8");
       }
     }
+ 	// OHSUPORT-2718 - set the default billing physician. Ovverrides appointment physician
+    if (sxml_provider.trim().equals("")) {
+    	sxml_provider = OscarProperties.getInstance().getProperty("auto_populate_billingreferral_physicianID_bc", bean.getApptProviderNo());
+    	thisForm.setXml_provider(sxml_provider);
+    }
+    
     String apDate = thisForm.getXml_appointment_date();
     if (apDate != null && apDate.trim().length() == 0) {
       thisForm.setXml_appointment_date(bean.getApptDate());
@@ -768,7 +772,8 @@ if(wcbneeds != null){%>
       pref = dao.getUserBillingPreference((String) thisForm.getXml_provider());
     }
     
-    String userReferralPref = "";
+	// OHSUPORT-2718 - default the referral type fields to B=refer By or T=refer To. ''="Select Type"
+    String userReferralPref = OscarProperties.getInstance().getProperty("auto_populate_billingreferral_type_bc", "");
     if (pref != null) {
       if (pref.getReferral() == 1) {
         userReferralPref = "T";
@@ -776,9 +781,9 @@ if(wcbneeds != null){%>
       else if (pref.getReferral() == 2) {
         userReferralPref = "B";
       }
-      thisForm.setRefertype1(userReferralPref);
-      thisForm.setRefertype2(userReferralPref);
     }
+    thisForm.setRefertype1(userReferralPref);
+    thisForm.setRefertype2(userReferralPref);
     if(OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc")){ 
       thisForm.setXml_refer1(bean.getReferral1());
     }

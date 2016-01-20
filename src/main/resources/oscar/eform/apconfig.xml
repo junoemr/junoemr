@@ -11,7 +11,8 @@
         <ap-sql>SELECT appointment_date from appointment WHERE appointment_no=${appt_no}</ap-sql>
         <ap-output>${appointment_date}</ap-output>
     </databaseap>
-   <databaseap>
+    <!-- Next booked appointment date -->
+    <databaseap>
         <ap-name>next_appt_date</ap-name>
         <ap-sql>SELECT appointment_date, start_time from appointment WHERE demographic_no = ${demographic} AND `status` NOT IN('C', 'N', 'NS') AND appointment_date >= CURDATE( )
                   ORDER BY appointment_date LIMIT 1 </ap-sql>
@@ -29,12 +30,29 @@
                   ORDER BY appointment_date LIMIT 1 </ap-sql>
         <ap-output>${nextf_appt_date}</ap-output>
     </databaseap>
+    
+<!-- Current eform information -->
+    <databaseap>
+        <ap-name>current_form_id</ap-name>
+        <ap-sql>SELECT '${fid}' AS fid</ap-sql>
+        <ap-output>${fid}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>current_form_data_id</ap-name>
+        <ap-sql>SELECT '${fdid}' AS fdid</ap-sql>
+        <ap-output>${fdid}</ap-output>
+    </databaseap>
 
 <!-- Current user information -->
     <databaseap>
         <ap-name>current_user</ap-name>
         <ap-sql>SELECT provider.first_name, provider.last_name FROM provider WHERE provider.provider_no='${provider}' </ap-sql>
         <ap-output>${last_name}, ${first_name}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>current_user_fname_lname</ap-name>
+        <ap-sql>SELECT provider.first_name, provider.last_name FROM provider WHERE provider.provider_no='${provider}' </ap-sql>
+        <ap-output>${first_name} ${last_name}</ap-output>
     </databaseap>
     <databaseap>
         <ap-name>current_user_ohip_no</ap-name>
@@ -61,7 +79,11 @@
         <ap-sql>SELECT '${provider}' AS id</ap-sql>
         <ap-output>${id}</ap-output>
     </databaseap>
-    
+    <databaseap>
+		<ap-name>current_user_signature</ap-name>
+		<ap-sql>SELECT providerExt.signature FROM providerExt WHERE providerExt.provider_no='${provider}' </ap-sql>
+		<ap-output>${signature}</ap-output>
+    </databaseap>
 	<databaseap>
 		<ap-name>current_logged_in_user</ap-name>
 		<ap-sql>SELECT provider.first_name, provider.last_name FROM provider WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
@@ -83,7 +105,6 @@
 		<ap-output>${id}</ap-output>
 	</databaseap>
     
-
 <!-- Patient demographic information -->
     <databaseap>
         <ap-name>patient_name</ap-name>
@@ -110,9 +131,16 @@
         <archive>demographic</archive>
     </databaseap>
     <databaseap>
+        <ap-name>patient_alias</ap-name>
+        <ap-sql>SELECT alias FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+        <ap-output>${alias}</ap-output>
+        <ap-insql>UPDATE demographic SET alias='${value}' WHERE demographic_no=${demographic}</ap-insql>
+        <archive>demographic</archive>
+    </databaseap>
+    <databaseap>
         <ap-name>patient_id</ap-name>
-        <ap-sql>SELECT '${demographic}' AS id</ap-sql>
-        <ap-output>${id}</ap-output>
+        <ap-sql>SELECT '${demographic}' AS demographicId</ap-sql>
+        <ap-output>${demographicId}</ap-output>
     </databaseap>
     <databaseap>
         <ap-name>label</ap-name>
@@ -245,6 +273,11 @@
         <ap-output>${age}</ap-output>
     </databaseap>
     <databaseap>
+        <ap-name>age_in_months</ap-name>
+        <ap-sql>SELECT (MONTH(CURDATE()) - MONTH(DATE_FORMAT(CONCAT((demographic.year_of_birth), '-', (demographic.month_of_birth), '-', (demographic.date_of_birth)),'%Y-%m-%d')))  - IF(DAYOFMONTH(CURDATE( )) &lt; DAYOFMONTH(DATE_FORMAT(CONCAT((demographic.year_of_birth), '-', (demographic.month_of_birth), '-', (demographic.date_of_birth)),'%Y-%m-%d')),1,0) +  (12*(YEAR(CURRENT_DATE)-YEAR(DATE_FORMAT(CONCAT((demographic.year_of_birth), '-', (demographic.month_of_birth), '-', (demographic.date_of_birth)),'%Y-%m-%d')))-(RIGHT(CURRENT_DATE, 5) &lt; RIGHT(DATE_FORMAT(CONCAT((demographic.year_of_birth), '-', (demographic.month_of_birth), '-', (demographic.date_of_birth)),'%Y-%m-%d'),5)))  AS 'age' FROM demographic demographic WHERE demographic_no=${demographic}</ap-sql>
+        <ap-output>${age}</ap-output>
+    </databaseap>
+    <databaseap>
         <ap-name>ageComplex</ap-name>
         <ap-sql>SELECT (IF ( (YEAR(CURRENT_DATE) - YEAR(@bdate))&lt; 3,
                 (IF ( (((YEAR(CURRENT_DATE) - 1) * 12 + MONTH(CURRENT_DATE)) - ((YEAR(@bdate) - 1) * 12 + MONTH(@bdate))) - (MID(@bdate, 9, 2) &lt;  MID(@bdate, 9, 2))&lt; 3,
@@ -271,12 +304,38 @@
         <ap-sql>SELECT sex FROM demographic WHERE demographic_no=${demographic}</ap-sql>
         <ap-output>${sex}</ap-output>
     </databaseap>
+    <databaseap>
+        <ap-name>sin</ap-name>
+        <ap-sql>SELECT sin FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+        <ap-output>${sin}</ap-output>
+    </databaseap>
+    
+    <!-- OHSUPPORT-2712 licensed Marijuana Producers (requires custom database tables)-->
+	<databaseap>
+		<ap-name>licensed_producer_by_demographic</ap-name>
+		<ap-sql>SELECT lp.producer_name AS producer_name FROM demographic_licensed_producer d JOIN licensed_producer lp ON (d.producer_id=lp.producer_id) where d.demographic_no=${demographic}</ap-sql>
+		<ap-output>${producer_name}</ap-output>
+	</databaseap>
+	<databaseap>
+        <ap-name>licensed_producer_address_name</ap-name>
+        <ap-sql>SELECT pa.display_name as address_name
+        		 FROM demographic_licensed_producer d JOIN licensed_producer_address pa ON (d.address_id=pa.address_id) where d.demographic_no=${demographic}
+       	</ap-sql>
+        <ap-output>${address_name}</ap-output>
+    </databaseap>
+	<databaseap>
+        <ap-name>licensed_producer_full_address</ap-name>
+        <ap-sql>SELECT pa.address as address, pa.city as city, pa.province as province, pa.postal as postal
+        		 FROM demographic_licensed_producer d JOIN licensed_producer_address pa ON (d.address_id=pa.address_id) where d.demographic_no=${demographic}
+       	</ap-sql>
+        <ap-output>${address}\n${city}, ${province}, ${postal}</ap-output>
+    </databaseap>
 
 <!-- Patient medical information -->
     <databaseap>
-        <ap-name>social_family_history</ap-name>
-        <ap-sql>SELECT socialHistory FROM eChart WHERE demographicNo=${demographic} ORDER BY eChartId DESC limit 1</ap-sql>
-        <ap-output>${socialHistory}</ap-output>
+        <ap-name>medical_history</ap-name>
+        <ap-sql>SELECT medicalHistory FROM eChart WHERE demographicNo=${demographic} ORDER BY eChartId DESC limit 1</ap-sql>
+        <ap-output>${medicalHistory}</ap-output>
     </databaseap>
     <databaseap>
         <ap-name>other_medications_history</ap-name>
@@ -284,19 +343,10 @@
         <ap-output>${familyHistory}</ap-output>
     </databaseap>
     <databaseap>
-        <ap-name>medical_history</ap-name>
-        <ap-sql>SELECT medicalHistory FROM eChart WHERE demographicNo=${demographic} ORDER BY eChartId DESC limit 1</ap-sql>
-        <ap-output>${medicalHistory}</ap-output>
+        <ap-name>social_family_history</ap-name>
+        <ap-sql>SELECT socialHistory FROM eChart WHERE demographicNo=${demographic} ORDER BY eChartId DESC limit 1</ap-sql>
+        <ap-output>${socialHistory}</ap-output>
     </databaseap>
-    <databaseap>
-    	<ap-name>dxregistry</ap-name>
-    	<ap-sql>SELECT GROUP_CONCAT(icd9.description SEPARATOR ', ') AS dxlist FROM icd9, dxresearch WHERE status='A' AND coding_system='icd9' AND icd9.icd9=dxresearch.dxresearch_code AND demographic_no=${demographic};</ap-sql>
-    	<ap-output>${dxlist}</ap-output></databaseap>
-    <databaseap>
-    	<ap-name>OHIPdxCode</ap-name>
-
-    	<ap-sql>SELECT GROUP_CONCAT(DISTINCT billing_on_item.dx) AS ohipdxc FROM billing_on_item, billing_on_cheader1 WHERE billing_on_cheader1.id=billing_on_item.ch1_id AND billing_on_cheader1.demographic_no=${demographic};</ap-sql>
-    	<ap-output>${ohipdxc}</ap-output></databaseap>
     <databaseap>
         <ap-name>ongoingconcerns</ap-name>
         <ap-sql>SELECT ongoingConcerns FROM eChart WHERE demographicNo=${demographic} ORDER BY eChartId DESC limit 1</ap-sql>
@@ -306,6 +356,36 @@
         <ap-name>reminders</ap-name>
         <ap-sql>SELECT reminders FROM eChart WHERE demographicNo=${demographic} ORDER BY eChartId DESC limit 1</ap-sql>
         <ap-output>${reminders}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>risk_factors_json</ap-name>
+        <ap-sql>select s1.note as note from casemgmt_note s1, (select max(cn.note_id) as note_id from casemgmt_note cn, casemgmt_issue_notes cin 
+                where cn.note_id = cin.note_id and cin.id = (select id from casemgmt_issue 
+                where demographic_no=${demographic} and issue_id = (select issue_id from issue where code='riskfactors' limit 1) limit 1) group by cn.uuid) s2 
+                where s1.note_id = s2.note_id and s1.archived=0;
+        </ap-sql>
+        <ap-output>${note}</ap-output>
+        <ap-json-output>true</ap-json-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>family_history_json</ap-name>
+        <ap-sql>select s1.note as note from casemgmt_note s1, (select max(cn.note_id) as note_id from casemgmt_note cn, casemgmt_issue_notes cin 
+                where cn.note_id = cin.note_id and cin.id = (select id from casemgmt_issue 
+                where demographic_no=${demographic} and issue_id = (select issue_id from issue where code='famhistory' limit 1) limit 1) group by cn.uuid) s2 
+                where s1.note_id = s2.note_id and s1.archived=0;
+        </ap-sql>
+        <ap-output>${note}</ap-output>
+        <ap-json-output>true</ap-json-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>dxregistry</ap-name>
+    	<ap-sql>SELECT GROUP_CONCAT(icd9.description SEPARATOR ', ') AS dxlist FROM icd9, dxresearch WHERE status='A' AND coding_system='icd9' AND icd9.icd9=dxresearch.dxresearch_code AND demographic_no=${demographic};</ap-sql>
+    	<ap-output>${dxlist}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>OHIPdxCode</ap-name>
+    	<ap-sql>SELECT GROUP_CONCAT(DISTINCT billing_on_item.dx) AS ohipdxc FROM billing_on_item, billing_on_cheader1 WHERE billing_on_cheader1.id=billing_on_item.ch1_id AND billing_on_cheader1.demographic_no=${demographic};</ap-sql>
+    	<ap-output>${ohipdxc}</ap-output>
     </databaseap>
     <databaseap>
         <ap-name>allergies_des</ap-name>
@@ -349,12 +429,39 @@
                 FROM drugs d WHERE d.demographic_no=${demographic} AND d.end_date &gt; DATE_ADD(CURDATE(), INTERVAL -1 WEEK);</ap-sql>
         <ap-output>${rxlist}</ap-output>
     </databaseap>
+    
+<!-- Prenatal information -->
+    <databaseap>
+        <ap-name>onGTPAL</ap-name>
+        <ap-sql>SELECT  CONCAT('G',c_gravida,' T', c_term,' P' , c_prem,' A', c_abort ,' L', c_living) as onGTPAL FROM formONAREnhancedRecord f where demographic_no=${demographic} order by ID desc limit 1;</ap-sql>
+        <ap-output>${onGTPAL}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>onEDB</ap-name>
+        <ap-sql>SELECT  c_finalEDB FROM formONAREnhancedRecord f where demographic_no=${demographic} order by ID desc limit 1;</ap-sql>
+        <ap-output>${c_finalEDB}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>bcGTPAL</ap-name>
+        <ap-sql>SELECT CONCAT('G',pg1_gravida,' T', pg1_term ,' P',  pg1_preterm ,' A',  pg1_abortion, ' L', pg1_living ) AS bcGTPAL FROM formBCAR2012 where demographic_no=${demographic} ORDER BY ID DESC LIMIT 1;</ap-sql>
+        <ap-output>${bcGTPAL}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>bcEDD</ap-name>
+        <ap-sql>SELECT  c_EDD FROM formBCAR2012 f where demographic_no=${demographic} order by ID desc limit 1;</ap-sql>
+        <ap-output>${c_EDD}</ap-output>
+    </databaseap>
 
 <!-- Doctor information -->
     <databaseap>
         <ap-name>doctor</ap-name>
         <ap-sql>SELECT provider.first_name, provider.last_name  FROM provider, demographic WHERE demographic.demographic_no=${demographic} AND demographic.provider_no=provider.provider_no</ap-sql>
         <ap-output>${last_name}, ${first_name}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>doctor_provider_no</ap-name>
+        <ap-sql>SELECT provider_no FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+        <ap-output>${provider_no}</ap-output>
     </databaseap>
     <databaseap>
         <ap-name>doctor_ohip_no</ap-name>
@@ -379,6 +486,11 @@
         <ap-output>${practitionerNo}</ap-output>
     </databaseap>
     <databaseap>
+		<ap-name>doctor_title</ap-name>
+		<ap-sql>SELECT provider.title FROM provider, demographic WHERE demographic.demographic_no=${demographic} AND demographic.provider_no=provider.provider_no</ap-sql>
+		<ap-output>${title}</ap-output>
+    </databaseap>
+    <databaseap>
         <ap-name>provider_name</ap-name>
         <ap-sql>SELECT provider.last_name, provider.first_name FROM provider, demographic
                 WHERE demographic_no=${demographic} AND demographic.provider_no=provider.provider_no</ap-sql>
@@ -396,6 +508,30 @@
                 WHERE demographic.demographic_no=${demographic} AND demographic.provider_no=provider.provider_no</ap-sql>
         <ap-output>${work_phone}</ap-output>
     </databaseap>
+    <databaseap>
+		<ap-name>doctor_signature</ap-name>
+		<ap-sql>SELECT providerExt.signature FROM providerExt, demographic
+				WHERE demographic.demographic_no=${demographic} AND demographic.provider_no=providerExt.provider_no</ap-sql>
+		<ap-output>${signature}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>appt_provider_name</ap-name>
+        <ap-sql>SELECT p.last_name, p.first_name FROM provider p, appointment a
+                WHERE p.provider_no=a.provider_no AND a.appointment_no=${appt_no}</ap-sql>
+        <ap-output>${last_name}, ${first_name}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>appt_provider_id</ap-name>
+        <ap-sql>SELECT provider_no FROM appointment WHERE appointment_no=${appt_no}</ap-sql>
+        <ap-output>${provider_no}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>appt_no</ap-name>
+        <ap-sql>SELECT ${appt_no} as appt_no</ap-sql>
+        <ap-output>${appt_no}</ap-output>
+    </databaseap>
+    
+<!-- Referral information -->
     <databaseap>
         <ap-name>referral_name</ap-name>
 		<ap-sql>
@@ -537,22 +673,51 @@
             and lcase(br.last_name) = lcase(substring_index(q.full_name, ' ', -1))) group by 1 having COUNT(*) = 1</ap-sql>
 		<ap-output>${referral_no}</ap-output>
 	</databaseap>
-    <databaseap>
-        <ap-name>appt_provider_name</ap-name>
-        <ap-sql>SELECT p.last_name, p.first_name FROM provider p, appointment a
-                WHERE p.provider_no=a.provider_no AND a.appointment_no=${appt_no}</ap-sql>
-        <ap-output>${last_name}, ${first_name}</ap-output>
-    </databaseap>
-    <databaseap>
-        <ap-name>appt_provider_id</ap-name>
-        <ap-sql>SELECT provider_no FROM appointment WHERE appointment_no=${appt_no}</ap-sql>
-        <ap-output>${provider_no}</ap-output>
-    </databaseap>
-    <databaseap>
-        <ap-name>appt_no</ap-name>
-        <ap-sql>SELECT ${appt_no} as appt_no</ap-sql>
-        <ap-output>${appt_no}</ap-output>
-    </databaseap>
+	<databaseap>
+		<ap-name>bc_referral_name</ap-name>
+		<ap-sql>SELECT billingreferral.last_name, billingreferral.first_name
+				FROM billingreferral, demographic
+				WHERE demographic.demographic_no=${demographic}
+				AND LENGTH(billingreferral.referral_no) > 0
+				AND SUBSTRING(demographic.family_doctor,9,(LENGTH(billingreferral.referral_no)))=billingreferral.referral_no</ap-sql>
+		<ap-output>${last_name}, ${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bc_referral_address</ap-name>
+		<ap-sql>SELECT CONCAT( b.address1, IF( b.address1 ='', '', '\n' ), b.address2, IF( b.address2 ='', '',  '\n' ) , b.city, ' ', b.province, ' ', b.postal ) AS raddress
+				FROM billingreferral b, demographic d
+				WHERE d.demographic_no=${demographic}
+				AND LENGTH(b.referral_no) > 0
+				AND SUBSTRING(d.family_doctor,9,(LENGTH(b.referral_no)))=b.referral_no</ap-sql>
+                <ap-output>${raddress}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bc_referral_phone</ap-name>
+		<ap-sql>SELECT b.phone
+				FROM billingreferral b, demographic d
+				WHERE d.demographic_no=${demographic}
+				AND LENGTH(b.referral_no) > 0
+				AND SUBSTRING(d.family_doctor,9,(LENGTH(b.referral_no)))=b.referral_no</ap-sql>
+                <ap-output>${phone}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bc_referral_fax</ap-name>
+		<ap-sql>SELECT b.fax
+				FROM billingreferral b, demographic d
+				WHERE d.demographic_no=${demographic}
+				AND LENGTH(b.referral_no) > 0
+				AND SUBSTRING(d.family_doctor,9,(LENGTH(b.referral_no)))=b.referral_no</ap-sql>
+                <ap-output>${fax}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bc_referral_no</ap-name>
+		<ap-sql>SELECT b.referral_no
+				FROM billingreferral b, demographic d
+				WHERE d.demographic_no=${demographic}
+				AND LENGTH(b.referral_no) > 0
+				AND SUBSTRING(d.family_doctor,9,(LENGTH(b.referral_no)))=b.referral_no</ap-sql>
+		<ap-output>${referral_no}</ap-output>
+	</databaseap>
 
 <!-- Clinic information -->
     <databaseap>
@@ -622,6 +787,26 @@
         <ap-output>${var_value}</ap-output>
     </databaseap>
     <databaseap>
+        <ap-name>_eform_values_first_all_json</ap-name>
+        <ap-sql>SELECT var_name AS fieldname, var_value AS fieldvalue FROM eform_values
+                WHERE fdid=
+                (SELECT MIN(fdid) FROM eform_data
+                 WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND status=1)
+        </ap-sql> 
+        <ap-output>${fieldname}, ${fieldvalue}</ap-output>
+        <ap-json-output>true</ap-json-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>_eform_values_last_all_json</ap-name>
+        <ap-sql>SELECT var_name AS fieldname, var_value AS fieldvalue FROM eform_values
+                WHERE fdid=
+                (SELECT MAX(fdid) FROM eform_data
+                 WHERE demographic_no like '${eform_demographic}' AND fid=${fid} AND status=1)
+        </ap-sql> 
+        <ap-output>${fieldname}, ${fieldvalue}</ap-output>
+        <ap-json-output>true</ap-json-output>
+    </databaseap>
+    <databaseap>
         <ap-name>_eform_values_count</ap-name>
         <ap-sql>SELECT count(0) FROM eform_values WHERE var_name='${var_name}' AND var_value='${var_value}'
                 AND demographic_no like '${eform_demographic}'
@@ -673,6 +858,8 @@
                 AND other_key='${other_key}' AND deleted=false ORDER BY id DESC LIMIT 1</ap-sql>
         <ap-output>${other_id}</ap-output>
     </databaseap>
+<!-- Extended eform tags end -->
+
     <databaseap>
         <ap-name>dtap_immunization_date</ap-name>
         <ap-sql>select prevention_date from preventions p where p.prevention_type = 'dtap-ipv-hib' and p.deleted = '0' and p.demographic_no = ${demographic} order by p.prevention_date desc limit 1
@@ -709,6 +896,13 @@
     </databaseap>
 
     <databaseap>
+        <ap-name>cytology_no</ap-name>
+        <ap-sql>select value from demographicExt d where d.key_val = 'cytolNum' and d.demographic_no = ${demographic};
+       </ap-sql>
+        <ap-output>${value}</ap-output>
+    </databaseap>
+    
+    <databaseap>
     	<ap-name>guardian_label</ap-name>
         <ap-sql>select d.first_name, d.last_name, d.address, d.city, d.province, d.postal from relationships r, demographic d where r.relation_demographic_no = d.demographic_no and r.demographic_no = ${demographic}
         </ap-sql>
@@ -719,6 +913,115 @@
         <ap-sql>select d.first_name, d.last_name, d.address, d.city, d.province, d.postal from DemographicContact r, demographic d where r.contactId = d.demographic_no and r.sdm = 'true' and r.demographicNo =  ${demographic}
         </ap-sql>
         <ap-output>${first_name} ${last_name}\n${address}\n${city} ${province}\n${postal}</ap-output>
+    </databaseap>
+     <databaseap>
+        <ap-name>email</ap-name>
+        <ap-sql>SELECT email FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+        <ap-output>${email}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>service_date</ap-name>
+        <ap-sql>select billing_date from billing_on_cheader1 where id=${invoiceNo}
+        </ap-sql>
+        <ap-output>${billing_date}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>practitioner</ap-name>
+        <ap-sql>select CONCAT('Dr.',' ',p.first_name,' ', UPPER(p.last_name)) as provider_name from provider p, billing_on_cheader1 b where p.provider_no=b.provider_no and b.id=${invoiceNo}
+        </ap-sql>
+        <ap-output>${provider_name}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>ref_doctor</ap-name>
+        <ap-sql>select ref_num from billing_on_cheader1 where id=${invoiceNo}
+        </ap-sql>
+        <ap-output>${ref_num}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>fee_total</ap-name>
+        <ap-sql>select ifnull((select format(sum(fee),2) from billing_on_item where ch1_id=${invoiceNo} and status !='D'),'0.00') as fees
+        </ap-sql>
+        <ap-output>${fees}</ap-output>
+    </databaseap>
+     <databaseap>
+    	<ap-name>payment_total</ap-name>
+        <ap-sql>select ifnull((select format(sum(value),2) from billing_on_ext where billing_no=${invoiceNo} and status='1' and key_val='payment'),'0.00') as payment       
+        </ap-sql>
+        <ap-output>${payment}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>refund_total</ap-name>
+        <ap-sql>select ifnull((select format(sum(value),2) from billing_on_ext where billing_no=${invoiceNo} and status='1' and key_val='refund'),'0.00') as refund
+        </ap-sql>
+        <ap-output>${refund}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>balance_owing</ap-name>
+        <ap-sql> select format((select ifnull((select format(sum(fee),2) as fees from billing_on_item where ch1_id=${invoiceNo} and status !='D'),'0.00') - (select ifnull((select format(sum(value),2) as payment from billing_on_ext where billing_no=${invoiceNo} and status='1' and key_val='payment'),'0.00')) - (select ifnull((select format(sum(value),2) as refund from billing_on_ext where billing_no=${invoiceNo} and status='1' and key_val='refund'),'0.00'))),2) as balance_owing
+        </ap-sql>
+        <ap-output>${balance_owing}</ap-output>
+    </databaseap>    
+    <databaseap>
+    	<ap-name>bill_item_number</ap-name>
+        <ap-sql>select GROUP_CONCAT(id SEPARATOR '<![CDATA[<br/>]]>') as billing_id from billing_on_item where ch1_id=${invoiceNo} and status != 'D' order by id
+        </ap-sql>
+        <ap-output>${billing_id}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>bill_item_description</ap-name>
+        <ap-sql>select GROUP_CONCAT(description SEPARATOR '<![CDATA[<br/>]]>') as billing_desc from billingservice b, billing_on_item bi where b.service_code=bi.service_code and bi.ch1_id=${invoiceNo} and bi.status !='D' and b.billingservice_no = (select max(b2.billingservice_no) from billingservice b2 where b.service_code = b2.service_code and b2.billingservice_date &lt;= now()) order by bi.id
+        </ap-sql>
+        <ap-output>${billing_desc}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>bill_item_service_code</ap-name>
+        <ap-sql>select GROUP_CONCAT(service_code SEPARATOR '<![CDATA[<br/>]]>') as billing_service_code from billing_on_item where ch1_id=${invoiceNo} and status != 'D' order by id
+        </ap-sql>
+        <ap-output>${billing_service_code}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>bill_item_qty</ap-name>
+        <ap-sql>select GROUP_CONCAT(ser_num SEPARATOR '<![CDATA[<br/>]]>') as billing_qty from billing_on_item where ch1_id=${invoiceNo} and status != 'D' order by id
+        </ap-sql>
+        <ap-output>${billing_qty}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>bill_item_dx</ap-name>
+        <ap-sql>select GROUP_CONCAT(dx SEPARATOR '<![CDATA[<br/>]]>') as billing_dx from billing_on_item where ch1_id=${invoiceNo} and status != 'D' order by id
+        </ap-sql>
+        <ap-output>${billing_dx}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>bill_item_amount</ap-name>
+        <ap-sql>select GROUP_CONCAT(format(fee,2) SEPARATOR '<![CDATA[<br/>]]>') as billing_fee from billing_on_item where ch1_id=${invoiceNo} and status != 'D' order by id
+        </ap-sql>
+        <ap-output>${billing_fee}</ap-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>urine_tox_test_json</ap-name>
+        <ap-sql>select type, dataField, comments, dateObserved, dateEntered from measurements
+        		where demographicNo=${demographic}
+        		and (type="OPID" or type="MAMP" or type="BZD" or type="CANB" or type="Uetc")
+        		order by dateEntered;
+        </ap-sql>
+        <ap-output>${type}, ${dataField}, ${comments}, ${dateObserved}, ${dateEntered}</ap-output>
+        <ap-json-output>true</ap-json-output>
+    </databaseap>
+    <databaseap>
+    	<ap-name>methadone_induction_assessment_json</ap-name>
+        <ap-sql>select type, dataField, comments, dateObserved, dateEntered from measurements
+        		where demographicNo=${demographic}
+        		and (type="RHU" or type="ORDU" or type="MDD" or type="GWS")
+        		order by dateEntered;
+        </ap-sql>
+        <ap-output>${type}, ${dataField}, ${comments}, ${dateObserved}, ${dateEntered}</ap-output>
+        <ap-json-output>true</ap-json-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>provider_list_json</ap-name>
+        <ap-sql>SELECT provider.provider_no, provider.first_name, provider.last_name FROM provider order by provider.last_name</ap-sql>
+        <ap-output>${provider_no}, ${last_name}, ${first_name}</ap-output>
+        <ap-json-output>true</ap-json-output>
     </databaseap>
 
 <!--Professional Specalists as referral doctors -->

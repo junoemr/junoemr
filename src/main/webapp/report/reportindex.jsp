@@ -244,6 +244,9 @@ function popUpWaitingList(vheight,vwidth,varpage) {
 GregorianCalendar now = new GregorianCalendar();
 GregorianCalendar cal = (GregorianCalendar) now.clone();
 String today = now.get(Calendar.YEAR)+"-"+(now.get(Calendar.MONTH)+1)+"-"+now.get(Calendar.DATE) ;
+
+int defaultApptStartTime = Integer.parseInt(oscar.OscarProperties.getInstance().getProperty("reportlist_defaultApptStartTime", "8"));
+int defaultApptEndTime   = Integer.parseInt(oscar.OscarProperties.getInstance().getProperty("reportlist_defaultApptEndTime" , "20"));
 %>
 <table border=0 cellspacing=0 cellpadding=0 width="100%">
 	<tr bgcolor="#486ebd">
@@ -360,14 +363,14 @@ String today = now.get(Calendar.YEAR)+"-"+(now.get(Calendar.MONTH)+1)+"-"+now.ge
               for(int i=0; i<24; i++) {
                 String timeString = i<12&&i>=0? (i+" am") : ((i==12?i:i-12)+ " pm") ;
             %>
-			<option value="<%=""+i%>" <%=i==8?"selected":""%>><%=timeString%></option>
+			<option value="<%=""+i%>" <%=i==defaultApptStartTime?"selected":""%>><%=timeString%></option>
 			<% } %>
 		</select> - <select name="eTime">
 			<%
               for(int i=0; i<24; i++) {
                 String timeString = i<12&&i>=0? (i+" am") : ((i==12?i:i-12)+ " pm") ;
             %>
-			<option value="<%=""+i%>" <%=i==20?"selected":""%>><%=timeString%></option>
+			<option value="<%=""+i%>" <%=i==defaultApptEndTime?"selected":""%>><%=timeString%></option>
 			<% } %>
 		</select></td>
 		<td></td>
