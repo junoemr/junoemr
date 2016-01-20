@@ -347,6 +347,10 @@ public class LabResultData implements Comparable{
 				ret = -1;
 			}else if(this.finalResultsCount < labData.finalResultsCount){
 				ret = 1;
+			}else if(Integer.parseInt(this.segmentID) > Integer.parseInt(labData.segmentID)) {
+				return -1;
+			}else if(Integer.parseInt(this.segmentID) < Integer.parseInt(labData.segmentID)) {
+				return 1;
 			}
 		}
 		return ret;

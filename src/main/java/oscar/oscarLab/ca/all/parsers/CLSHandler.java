@@ -257,7 +257,11 @@ public class CLSHandler implements MessageHandler {
 		for (int i = 0; i < obrCount; i++) {
 			obxCount = getOBXCount(i);
 			for (int j = 0; j < obxCount; j++) {
-				if (getOBXResultStatus(i, j).equals("Final")) count++;
+				if (getOBXResultStatus(i, j).equals("Final") ||
+						getOBXResultStatus(i, j).equals("Corrected"))
+				{
+					count++;
+				}
 			}
 		}
 		return count;
