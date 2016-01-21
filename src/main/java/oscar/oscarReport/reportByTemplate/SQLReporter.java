@@ -26,17 +26,18 @@ package oscar.oscarReport.reportByTemplate;
 
 import java.io.StringWriter;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.oscarehr.util.MiscUtils;
 
+import com.Ostermiller.util.CSVPrinter;
+
 import oscar.oscarDB.DBHandler;
 import oscar.oscarReport.data.RptResultStruct;
 import oscar.util.UtilMisc;
-
-import com.Ostermiller.util.CSVPrinter;
 
 
 /**
@@ -73,7 +74,12 @@ public class SQLReporter implements Reporter {
             //csv = csv.replace("\\", "\"");  //natural quotes in the data create '\' characters in CSV, xls works fine
                                               //this line fixes it but messes up XLS generation.
             //csv = UtilMisc.getCSV(rs);
-        } catch (Exception sqe) {
+        } 
+        // since users can write custom queries this error is expected and should not generate an error in the log
+        catch (SQLException sqe) {
+        	MiscUtils.getLogger().warn("An SQL Exception occured while generating a report by template (from user defined query).");
+        }
+        catch (Exception sqe) {
             MiscUtils.getLogger().error("Error", sqe);
         }
         request.getSession().setAttribute("csv", csv);
