@@ -120,7 +120,7 @@ public class CommonLabTestValues {
                 "and ltr.labPatientPhysicianInfo_id = lpp.id and  ltr.test_name is not null  and ltr.test_name != '' "+
                 "order by title";
 
-        logger.info(sql);
+        logger.debug(sql);
 
         try {
 
@@ -158,7 +158,7 @@ public class CommonLabTestValues {
                 "and m.segmentID = p.lab_no " +
                 "and x.segmentID = m.segmentID  and p.lab_type = 'MDS' ";
 
-        logger.info(sql);
+        logger.debug(sql);
 
         try {
 
@@ -207,7 +207,7 @@ public class CommonLabTestValues {
                 "and r.pid_id = pi.pid_id " +
                 "and r.obr_id = x.obr_id and p.lab_type='BCP'";
 
-        logger.info(sql);
+        logger.debug(sql);
 
         try {
 
@@ -234,7 +234,7 @@ public class CommonLabTestValues {
     public static ArrayList<HashMap<String, Serializable>> findUniqueLabsForPatientHL7Text(String demographic){
         ArrayList<HashMap<String, Serializable>> labList = new ArrayList<HashMap<String, Serializable>>();
         String sql = "SELECT lab_no FROM patientLabRouting WHERE demographic_no='"+demographic+"' AND lab_type='HL7'";
-        logger.info(sql);
+        logger.debug(sql);
         try {
 
             ResultSet rs = DBHandler.GetSQL(sql);
@@ -373,7 +373,7 @@ public class CommonLabTestValues {
                     " and ltr.test_name = '"+testName+"' " +
                     " and ltr.labPatientPhysicianInfo_id = lpp.id order by lpp.collection_date";
 
-            logger.info(sql);
+            logger.debug(sql);
 
             try {
 
@@ -421,7 +421,7 @@ public class CommonLabTestValues {
         } else if ( labType != null && labType.equals("MDS")){
             //String sql = "select *   from mdsOBX x, mdsMSH m, patientLabRouting p where observationIden like '%^"+testName+"%' and  x.segmentID = m.segmentID and p.demographic_no = '"+demographicNo+"' and m.segmentID = p.lab_no";
             String sql = "select *   from mdsOBX x, mdsMSH m, patientLabRouting p where p.lab_type = 'MDS' and p.demographic_no = '"+demographicNo+"' and observationIden like '%^"+testName+"%' and  x.segmentID = m.segmentID  and m.segmentID = p.lab_no order by dateTime";
-            logger.info(sql);
+            logger.debug(sql);
 
             try {
 
@@ -495,7 +495,7 @@ public class CommonLabTestValues {
             }
         }else if ( labType != null && labType.equals("BCP")){
             String sql = "select * from patientLabRouting p, hl7_msh m ,hl7_pid pi, hl7_obr r,hl7_obx x, hl7_orc c  where p.lab_type = 'BCP' and p.demographic_no = '"+demographicNo+"' and x.observation_identifier like '%^"+testName+"' and p.lab_no = m.message_id and pi.message_id = m.message_id and r.pid_id = pi.pid_id and c.pid_id = pi.pid_id and r.obr_id = x.obr_id order by r.observation_date_time";
-            logger.info(sql);
+            logger.debug(sql);
             try {
 
                 ResultSet rs = DBHandler.GetSQL(sql);
@@ -554,7 +554,7 @@ public class CommonLabTestValues {
                     " JOIN measurementsExt e1 ON m.id=e1.measurement_id AND e1.keyval='identifier'" +
                     " JOIN measurementsExt e2 ON m.id=e2.measurement_id AND e2.keyval='lab_no'" +
                     " WHERE e1.val='"+identCode+"' AND m.demographicNo='"+demographicNo+"'";
-            logger.info(sql);
+            logger.debug(sql);
             try {
 
                 ResultSet rs = DBHandler.GetSQL(sql);
@@ -624,7 +624,7 @@ public class CommonLabTestValues {
                 " and p.lab_no = ltr.labPatientPhysicianInfo_id " +
                 " and ltr.labPatientPhysicianInfo_id = lpp.id and test_name != ''";
 
-        logger.info(sql);
+        logger.debug(sql);
         try {
 
             ResultSet rs = DBHandler.GetSQL(sql);
@@ -642,7 +642,7 @@ public class CommonLabTestValues {
 		String accession = oscar.Misc.getString(rs, "accession_num")==null ? "" : oscar.Misc.getString(rs, "accession_num");
 
                 String collDate = UtilDateUtilities.DateToString(UtilDateUtilities.StringToDate(oscar.Misc.getString(rs, "collection_date"),"dd-MMM-yy"),"yyyy-MM-dd");
-                logger.info("This went in "+oscar.Misc.getString(rs, "collection_date")+" this came out "+UtilDateUtilities.DateToString(UtilDateUtilities.StringToDate(oscar.Misc.getString(rs, "collection_date"),"dd-MMM-yy"),"yyyy-MM-dd"));
+                logger.debug("This went in "+oscar.Misc.getString(rs, "collection_date")+" this came out "+UtilDateUtilities.DateToString(UtilDateUtilities.StringToDate(oscar.Misc.getString(rs, "collection_date"),"dd-MMM-yy"),"yyyy-MM-dd"));
 
                 HashMap<String, Serializable> h = new HashMap<String, Serializable>();
 		h.put("id", id);
@@ -668,7 +668,7 @@ public class CommonLabTestValues {
 
         sql = null;
         sql = "select *   from mdsOBX x, mdsMSH m, patientLabRouting p  where p.lab_type = 'MDS' and x.segmentID = m.segmentID and p.demographic_no = '"+demographicNo+"' and m.segmentID = p.lab_no";
-        logger.info(sql);
+        logger.debug(sql);
 
         try {
 
@@ -695,7 +695,7 @@ public class CommonLabTestValues {
 
                 String sql2 = "select * from mdsZMN where segmentID = '"+segId+"' and resultMnemonic = '"+obserIden+"'";
 
-                logger.info(sql2);
+                logger.debug(sql2);
                 ResultSet rs2 = DBHandler.GetSQL(sql2);
 
                 if(rs2.next()){
