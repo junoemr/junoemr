@@ -64,7 +64,11 @@ public class RosterTermReasonProperties extends Properties {
 	}
 	
 	public String getReasonByCode(String code) {
-		return rosterTermReasonProperties.getProperty(code);
+		String defaultReason = "Unknown";
+		if ( code == null) { 
+			return defaultReason;
+		}
+		return rosterTermReasonProperties.getProperty(code, defaultReason);
 	}
 	
 	public SortedSet<String> getTermReasonCodes() {

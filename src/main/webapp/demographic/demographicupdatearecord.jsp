@@ -271,6 +271,19 @@
     //demographicArchiveDao.persist(da);
 
     demographicDao.save(demographic);
+    
+    // save custom licensed producer if enabled
+    if(Boolean.parseBoolean(oscarVariables.getProperty("show_demographic_licensed_producers"))) {
+	    try {
+		    int licensedProducerID = Integer.parseInt(request.getParameter("licensed_producer"));
+		    int licensedProducerAddressID = Integer.parseInt(request.getParameter("licensed_producer_address"));
+	    	demographicDao.saveDemographicLicensedProducer(demographic.getDemographicNo(), licensedProducerID, licensedProducerAddressID);
+	    }
+	    catch(NumberFormatException e) {
+	    	// unable to save licensed producer info
+	    }
+    }
+    
     int rowsAffected=1;
   if (rowsAffected ==1) {
     //find the democust record for update

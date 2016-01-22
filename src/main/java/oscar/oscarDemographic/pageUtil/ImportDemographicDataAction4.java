@@ -165,6 +165,7 @@ import oscar.util.UtilDateUtilities;
     private static final String REPORTTEXT = "Text";
     private static final String RISKFACTOR = "Risk";
 
+    private static final String DEFAULT_ALLERGY_DESCRIPTION = "NO DESCRIPTION IMPORTED";
 
     boolean matchProviderNames = true;
     String admProviderNo = null;
@@ -186,6 +187,30 @@ import oscar.util.UtilDateUtilities;
     ProviderDataDao providerDataDao = (ProviderDataDao) SpringUtils.getBean("providerDataDao");
     PartialDateDao partialDateDao = (PartialDateDao) SpringUtils.getBean("partialDateDao");
     DemographicExtDao demographicExtDao = (DemographicExtDao) SpringUtils.getBean("demographicExtDao");
+    
+    /*
+     * Custom flags for controlling import notes in the main e-chart.
+     * Note: by default all flags are true (default oscar behavior). 
+     * Setting a flag to false will skip adding import notes for that section, but may result in the loss of import data.
+     * This is because many of these notes will add any leftover data that oscar cannot directly store.
+     * Use with caution
+     */
+	final boolean ADD_IMPORT_NOTES_DEMOGRAPHIC_DATA = !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_DEMOGRAPHIC_DATA", "false");
+	final boolean ADD_IMPORT_NOTES_ALLERGIES 		= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_ALLERGIES", "false");
+    final boolean ADD_IMPORT_NOTES_CLINICAL_NOTES 	= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_CLINICAL_NOTES", "false");
+    final boolean ADD_IMPORT_NOTES_PERSONAL_HIST 	= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_PERSONAL_HIST", "false");
+    final boolean ADD_IMPORT_NOTES_PROBLEM_LIST 	= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_PROBLEM_LIST", "false");
+    final boolean ADD_IMPORT_NOTES_RISK_FACTORS 	= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_RISK_FACTORS", "false");
+    final boolean ADD_IMPORT_NOTES_ALERTS 			= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_ALERTS", "false");
+    final boolean ADD_IMPORT_NOTES_MEDICATIONS 		= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_MEDICATIONS", "false");
+    final boolean ADD_IMPORT_NOTES_IMMUNIZATIONS 	= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_IMMUNIZATIONS", "false");
+    final boolean ADD_IMPORT_NOTES_REPORTS 			= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_REPORTS", "false");
+    
+    /*
+     * Allow the default provider to be customized via properties file
+     */
+    final String IMPORT_DEFAULT_PROVIDER_FIRST_NAME = oscarProperties.getProperty("IMPORT_DEFAULT_PROVIDER_FIRST_NAME", "doctor");
+    final String IMPORT_DEFAULT_PROVIDER_LAST_NAME 	= oscarProperties.getProperty("IMPORT_DEFAULT_PROVIDER_LAST_NAME", "oscardoc");
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception  {
@@ -602,7 +627,7 @@ import oscar.util.UtilDateUtilities;
             }
             if (StringUtils.empty(primaryPhysician)) {
                 primaryPhysician = defaultProviderNo();
-                err_data.add("Error! No Primary Physician; patient assigned to \"doctor oscardoc\"");
+                err_data.add("Error! No Primary Physician; patient assigned to \""+IMPORT_DEFAULT_PROVIDER_FIRST_NAME + " " + IMPORT_DEFAULT_PROVIDER_LAST_NAME + "\"");
             }
         } else {
             primaryPhysician = student.getProviderNo();
@@ -691,7 +716,7 @@ import oscar.util.UtilDateUtilities;
             if (StringUtils.filled(dNote)) dd.addDemographiccust(demographicNo, dNote);
 
             //to dumpsite: Extra demographic data
-            if (StringUtils.filled(extra)) {
+            if (StringUtils.filled(extra) && ADD_IMPORT_NOTES_DEMOGRAPHIC_DATA) {
 	            extra = Util.addLine("imported.cms4.2011.06", extra);
 	            CaseManagementNote dmNote = prepareCMNote("2",null);
 	            dmNote.setNote(extra);
@@ -845,12 +870,14 @@ import oscar.util.UtilDateUtilities;
                 caseManagementManager.saveNoteSimple(cmNote);
                 addOneEntry(PERSONALHISTORY);
 
-                //to dumpsite
-                residual = Util.addLine("imported.cms4.2011.06", residual);
-                Long hostNoteId = cmNote.getId();
-                cmNote = prepareCMNote("2",null);
-                cmNote.setNote(residual);
-                saveLinkNote(hostNoteId, cmNote);
+                if (ADD_IMPORT_NOTES_PERSONAL_HIST) {
+	                //to dumpsite
+	                residual = Util.addLine("imported.cms4.2011.06", residual);
+	                Long hostNoteId = cmNote.getId();
+	                cmNote = prepareCMNote("2",null);
+	                cmNote.setNote(residual);
+	                saveLinkNote(hostNoteId, cmNote);
+                }
             }
 
             //FAMILY HISTORY
@@ -881,7 +908,7 @@ import oscar.util.UtilDateUtilities;
                 saveLinkNote(hostNoteId, cmNote);
 
                 //to dumpsite
-                String dump = "imported.cms4.2011.06";
+                //String dump = "imported.cms4.2011.06";
                 /*
                 String summary = fHist[i].getCategorySummaryLine();
                 if (StringUtils.empty(summary)) {
@@ -964,7 +991,7 @@ import oscar.util.UtilDateUtilities;
 
 
                 //to dumpsite
-                String dump = "imported.cms4.2011.06";
+                //String dump = "imported.cms4.2011.06";
                 /*
                 String summary = pHealth[i].getCategorySummaryLine();
                 if (StringUtils.empty(summary)) {
@@ -1039,23 +1066,24 @@ import oscar.util.UtilDateUtilities;
                     cmNote.setNote(note);
                     saveLinkNote(hostNoteId, cmNote);
 
-
-                    //to dumpsite
-                    String dump = "imported.cms4.2011.06";
-                    /*
-                    String summary = probList[i].getCategorySummaryLine();
-                    if (StringUtils.empty(summary)) {
-                            err_summ.add("No Summary for Problem List ("+(i+1)+")");
+                    if (ADD_IMPORT_NOTES_PROBLEM_LIST) {
+	                    //to dumpsite
+	                    String dump = "imported.cms4.2011.06";
+	                    /*
+	                    String summary = probList[i].getCategorySummaryLine();
+	                    if (StringUtils.empty(summary)) {
+	                            err_summ.add("No Summary for Problem List ("+(i+1)+")");
+	                    }
+	                    dump = Util.addLine(dump, summary);
+	                    */
+	                    String diagCode = isICD9(probList[i].getDiagnosisCode()) ? null : getCode(probList[i].getDiagnosisCode(),"Diagnosis");
+	                    dump = Util.addLine(dump, "Concern");
+	                    dump = Util.addLine(dump, diagCode);
+	                    dump = Util.addLine(dump, getResidual(probList[i].getResidualInfo()));
+	                    cmNote = prepareCMNote("2",null);
+	                    cmNote.setNote(dump);
+	                    saveLinkNote(hostNoteId, cmNote);
                     }
-                    dump = Util.addLine(dump, summary);
-                    */
-                    String diagCode = isICD9(probList[i].getDiagnosisCode()) ? null : getCode(probList[i].getDiagnosisCode(),"Diagnosis");
-                    dump = Util.addLine(dump, "Concern");
-                    dump = Util.addLine(dump, diagCode);
-                    dump = Util.addLine(dump, getResidual(probList[i].getResidualInfo()));
-                    cmNote = prepareCMNote("2",null);
-                    cmNote.setNote(dump);
-                    saveLinkNote(hostNoteId, cmNote);
 
                     //extra fields
                     CaseManagementNoteExt cme = new CaseManagementNoteExt();
@@ -1115,20 +1143,22 @@ import oscar.util.UtilDateUtilities;
                     cmNote.setNote(note);
                     saveLinkNote(hostNoteId, cmNote);
 
-                    //to dumpsite
-                    String dump = "imported.cms4.2011.06";
-                    /*
-                    String summary = rFactors[i].getCategorySummaryLine();
-                    if (StringUtils.empty(summary)) {
-                        err_summ.add("No Summary for Risk Factors ("+(i+1)+")");
+                    if (ADD_IMPORT_NOTES_RISK_FACTORS) {
+	                    //to dumpsite
+	                    String dump = "imported.cms4.2011.06";
+	                    /*
+	                    String summary = rFactors[i].getCategorySummaryLine();
+	                    if (StringUtils.empty(summary)) {
+	                        err_summ.add("No Summary for Risk Factors ("+(i+1)+")");
+	                    }
+	                    dump = Util.addLine(dump, summary);
+	                    */
+	                    dump = Util.addLine(dump, "Risk Factor");
+	                    dump = Util.addLine(dump, getResidual(rFactors[i].getResidualInfo()));
+	                    cmNote = prepareCMNote("2",null);
+	                    cmNote.setNote(dump);
+	                    saveLinkNote(hostNoteId, cmNote);
                     }
-                    dump = Util.addLine(dump, summary);
-                    */
-                    dump = Util.addLine(dump, "Risk Factor");
-                    dump = Util.addLine(dump, getResidual(rFactors[i].getResidualInfo()));
-                    cmNote = prepareCMNote("2",null);
-                    cmNote.setNote(dump);
-                    saveLinkNote(hostNoteId, cmNote);
 
                     //extra fields
                     CaseManagementNoteExt cme = new CaseManagementNoteExt();
@@ -1189,20 +1219,22 @@ import oscar.util.UtilDateUtilities;
                     cmNote.setNote(note);
                     saveLinkNote(hostNoteId, cmNote);
 
-                    //to dumpsite
-                    String dump = "imported.cms4.2011.06";
-                    /*
-                    String summary = alerts[i].getCategorySummaryLine();
-                    if (StringUtils.empty(summary)) {
-                            err_summ.add("No Summary for Alerts & Special Needs ("+(i+1)+")");
+                    if (ADD_IMPORT_NOTES_ALERTS) {
+	                    //to dumpsite
+	                    String dump = "imported.cms4.2011.06";
+	                    /*
+	                    String summary = alerts[i].getCategorySummaryLine();
+	                    if (StringUtils.empty(summary)) {
+	                            err_summ.add("No Summary for Alerts & Special Needs ("+(i+1)+")");
+	                    }
+	                    dump = Util.addLine(dump, summary);
+	                    */
+	                    dump = Util.addLine(dump, "Alert");
+	                    dump = Util.addLine(dump, getResidual(alerts[i].getResidualInfo()));
+	                    cmNote = prepareCMNote("2",null);
+	                    cmNote.setNote(dump);
+	                    saveLinkNote(hostNoteId, cmNote);
                     }
-                    dump = Util.addLine(dump, summary);
-                    */
-                    dump = Util.addLine(dump, "Alert");
-                    dump = Util.addLine(dump, getResidual(alerts[i].getResidualInfo()));
-                    cmNote = prepareCMNote("2",null);
-                    cmNote.setNote(dump);
-                    saveLinkNote(hostNoteId, cmNote);
 
                     //extra fields
                     CaseManagementNoteExt cme = new CaseManagementNoteExt();
@@ -1274,7 +1306,7 @@ import oscar.util.UtilDateUtilities;
                                 String authorProvider = writeProviderData(authorName.get("firstname"), authorName.get("lastname"), authorOHIP);
                                 if (StringUtils.empty(authorProvider)) {
                                     authorProvider = defaultProviderNo();
-                                    err_note.add("Clinical notes have no author; assigned to \"doctor oscardoc\" ("+(i+1)+")");
+                                    err_note.add("Clinical notes have no author; assigned to \""+IMPORT_DEFAULT_PROVIDER_FIRST_NAME + " " + IMPORT_DEFAULT_PROVIDER_LAST_NAME + "\" ("+(i+1)+")");
                                 }
                                 cmNote.setProviderNo(authorProvider);
                                 cmNote.setSigning_provider_no(authorProvider);
@@ -1304,7 +1336,7 @@ import oscar.util.UtilDateUtilities;
                             uuid = cmNote.getUuid();
 
                             //create "header", cms4 only
-                        	if (cNotes[i].getEnteredDateTime()!=null && !createDate.equals(cmNote.getUpdate_date())) {
+                        	if (cNotes[i].getEnteredDateTime()!=null && !createDate.equals(cmNote.getUpdate_date()) && ADD_IMPORT_NOTES_CLINICAL_NOTES) {
                         		CaseManagementNote headNote = prepareCMNote("2",null);
                         		headNote.setCreate_date(createDate);
                         		headNote.setUpdate_date(createDate);
@@ -1316,19 +1348,21 @@ import oscar.util.UtilDateUtilities;
                         }
                     }
                     if (p_total==0) {
-                        err_note.add("Clinical notes have no author; assigned to \"doctor oscardoc\" ("+(i+1)+")");
+                        err_note.add("Clinical notes have no author; assigned to \""+IMPORT_DEFAULT_PROVIDER_FIRST_NAME + " " + IMPORT_DEFAULT_PROVIDER_LAST_NAME + "\" ("+(i+1)+")");
                     	caseManagementManager.saveNoteSimple(cmNote);
                     }
 
-                    //to dumpsite
-                    String noteType = cNotes[i].getNoteType();
-                    if (StringUtils.filled(noteType)) {
-                    	noteType = Util.addLine("imported.cms4.2011.06", "Note Type: ", noteType);
+                    if(ADD_IMPORT_NOTES_CLINICAL_NOTES) {
+	                    //to dumpsite
+	                    String noteType = cNotes[i].getNoteType();
+	                    if (StringUtils.filled(noteType)) {
+	                    	noteType = Util.addLine("imported.cms4.2011.06", "Note Type: ", noteType);
+	                    }
+	
+	                    CaseManagementNote dumpNote = prepareCMNote("2",null);
+	                    dumpNote.setNote(noteType);
+	                    saveLinkNote(cmNote.getId(), dumpNote);
                     }
-
-                    CaseManagementNote dumpNote = prepareCMNote("2",null);
-                    dumpNote.setNote(noteType);
-                    saveLinkNote(cmNote.getId(), dumpNote);
                 }
 
                 //ALLERGIES & ADVERSE REACTIONS
@@ -1357,6 +1391,9 @@ import oscar.util.UtilDateUtilities;
                         else if (aaReactArray[i].getPropertyOfOffendingAgent()==cdsDt.PropertyOfOffendingAgent.ND) typeCode="0"; //non-drug
                     else if (aaReactArray[i].getPropertyOfOffendingAgent()==cdsDt.PropertyOfOffendingAgent.UK) typeCode="0"; //unknown
                     }
+                    else {
+                    	typeCode="0"; //unknown
+                    }
                     if (aaReactArray[i].getSeverity()!=null) {
                         if (aaReactArray[i].getSeverity()==cdsDt.AdverseReactionSeverity.MI) severity="1"; //mild
                         else if (aaReactArray[i].getSeverity()==cdsDt.AdverseReactionSeverity.MO) severity="2"; //moderate
@@ -1384,22 +1421,24 @@ import oscar.util.UtilDateUtilities;
                     cmNote.setNote(note);
                     saveLinkNote(cmNote, CaseManagementNoteLink.ALLERGIES, Long.valueOf(allergyId));
 
-                    //to dumpsite
-                    String dump = "imported.cms4.2011.06";
-                    /*
-                    String summary = aaReactArray[i].getCategorySummaryLine();
-                    if (StringUtils.empty(summary)) {
-                        err_summ.add("No Summary for Allergies & Adverse Reactions ("+(i+1)+")");
+                    if (ADD_IMPORT_NOTES_ALLERGIES) {
+                    	//to dumpsite
+                    	String dump = "imported.cms4.2011.06";
+	                    /*
+	                    String summary = aaReactArray[i].getCategorySummaryLine();
+	                    if (StringUtils.empty(summary)) {
+	                        err_summ.add("No Summary for Allergies & Adverse Reactions ("+(i+1)+")");
+	                    }
+	                    dump = Util.addLine(dump, summary);
+	                    */
+	                    dump = Util.addLine(dump, "Allergy");
+	                    dump = Util.addLine(dump, alg_extra);
+	                    dump = Util.addLine(dump, getResidual(aaReactArray[i].getResidualInfo()));
+	
+	                    cmNote = prepareCMNote("2",null);
+	                    cmNote.setNote(dump);
+	                    saveLinkNote(cmNote, CaseManagementNoteLink.ALLERGIES, Long.valueOf(allergyId));
                     }
-                    dump = Util.addLine(dump, summary);
-                    */
-                    dump = Util.addLine(dump, "Allergy");
-                    dump = Util.addLine(dump, alg_extra);
-                    dump = Util.addLine(dump, getResidual(aaReactArray[i].getResidualInfo()));
-
-                    cmNote = prepareCMNote("2",null);
-                    cmNote.setNote(dump);
-                    saveLinkNote(cmNote, CaseManagementNoteLink.ALLERGIES, Long.valueOf(allergyId));
                 }
 
 
@@ -1419,7 +1458,7 @@ import oscar.util.UtilDateUtilities;
                     duration = medArray[i].getDuration();
                     if (StringUtils.filled(duration)) {
                     	duration = duration.trim();
-                    	if (duration.endsWith("days")) duration = Util.leadingNum(duration);
+                    	if (duration.toLowerCase().endsWith("days")) duration = Util.leadingNum(duration);
                     	if (NumberUtils.isDigits(duration)) {
                     		drug.setDuration(duration);
     	                    drug.setDurUnit("D");
@@ -1588,25 +1627,27 @@ import oscar.util.UtilDateUtilities;
                     cmNote.setNote(note);
                     saveLinkNote(cmNote, CaseManagementNoteLink.DRUGS, (long)drug.getId());
 
-                    //to dumpsite
-                    String dump = "imported.cms4.2011.06";
-                    /*
-                    String summary = medArray[i].getCategorySummaryLine();
-                    if (StringUtils.empty(summary)) {
-                        err_summ.add("No Summary for Medications & Treatments ("+(i+1)+")");
+                    if (ADD_IMPORT_NOTES_MEDICATIONS) {
+	                    //to dumpsite
+	                    String dump = "imported.cms4.2011.06";
+	                    /*
+	                    String summary = medArray[i].getCategorySummaryLine();
+	                    if (StringUtils.empty(summary)) {
+	                        err_summ.add("No Summary for Medications & Treatments ("+(i+1)+")");
+	                    }
+	                    dump = Util.addLine(dump, summary);
+	                    */
+	                    dump = Util.addLine(dump, getResidual(medArray[i].getResidualInfo()));
+	                    dump = Util.addLine(dump, "Medication");
+	                    dump = Util.addLine(dump, special);
+	
+	                    cmNote = prepareCMNote("2",null);
+	                    cmNote.setCreate_date(drug.getWrittenDate());
+	                    cmNote.setObservation_date(drug.getWrittenDate());
+	                    cmNote.setUpdate_date(drug.getWrittenDate());
+	                    cmNote.setNote(dump);
+	                    saveLinkNote(cmNote, CaseManagementNoteLink.DRUGS, (long)drug.getId());
                     }
-                    dump = Util.addLine(dump, summary);
-                    */
-                    dump = Util.addLine(dump, getResidual(medArray[i].getResidualInfo()));
-                    dump = Util.addLine(dump, "Medication");
-                    dump = Util.addLine(dump, special);
-
-                    cmNote = prepareCMNote("2",null);
-                    cmNote.setCreate_date(drug.getWrittenDate());
-                    cmNote.setObservation_date(drug.getWrittenDate());
-                    cmNote.setUpdate_date(drug.getWrittenDate());
-                    cmNote.setNote(dump);
-                    saveLinkNote(cmNote, CaseManagementNoteLink.DRUGS, (long)drug.getId());
                 }
 
 
@@ -1693,7 +1734,7 @@ import oscar.util.UtilDateUtilities;
                     addOneEntry(IMMUNIZATION);
 
                     //to dumpsite: Extra immunization data
-                    if (StringUtils.filled(immExtra) && preventionId>=0) {
+                    if (StringUtils.filled(immExtra) && preventionId>=0 && ADD_IMPORT_NOTES_IMMUNIZATIONS) {
         	            immExtra = Util.addLine("imported.cms4.2011.06", immExtra);
         	            CaseManagementNote imNote = prepareCMNote("2",null);
         	            imNote.setNote(immExtra);
@@ -1985,7 +2026,7 @@ import oscar.util.UtilDateUtilities;
                         apptProvider = writeProviderData(providerName.get("firstname"), providerName.get("lastname"), personOHIP);
                         if (StringUtils.empty(apptProvider)) {
                             apptProvider = defaultProviderNo();
-                            err_note.add("Appointment has no provider; assigned to \"doctor oscardoc\" ("+(i+1)+")");
+                            err_note.add("Appointment has no provider; assigned to \""+IMPORT_DEFAULT_PROVIDER_FIRST_NAME + " " + IMPORT_DEFAULT_PROVIDER_LAST_NAME + "\" ("+(i+1)+")");
                         }
                     }
                     oscarSuperManager.update("appointmentDao", "import_appt", new Object [] {
@@ -2123,7 +2164,7 @@ import oscar.util.UtilDateUtilities;
                                 else addOneEntry(REPORTTEXT);
 
                                 //to dumpsite: Extra report data
-                                if (StringUtils.filled(reportExtra)) {
+                                if (StringUtils.filled(reportExtra) && ADD_IMPORT_NOTES_REPORTS) {
                     	            reportExtra = Util.addLine("imported.cms4.2011.06", reportExtra);
                     	            CaseManagementNote rpNote = prepareCMNote("2",null);
                     	            rpNote.setNote(reportExtra);
@@ -2581,10 +2622,10 @@ import oscar.util.UtilDateUtilities;
     }
 
 	String defaultProviderNo() {
-		ProviderData pd = getProviderByNames("doctor", "oscardoc", true);
+		ProviderData pd = getProviderByNames(IMPORT_DEFAULT_PROVIDER_FIRST_NAME, IMPORT_DEFAULT_PROVIDER_LAST_NAME, true);
 		if (pd!=null) return pd.getProviderNo();
 
-		return writeProviderData("doctor", "oscardoc", "");
+		return writeProviderData(IMPORT_DEFAULT_PROVIDER_FIRST_NAME, IMPORT_DEFAULT_PROVIDER_LAST_NAME, "");
 	}
 
         boolean isICD9(cdsDt.StandardCoding diagCode) {
@@ -2907,18 +2948,55 @@ import oscar.util.UtilDateUtilities;
 		return writeProviderData(firstName, lastName, ohipNo, null);
 	}
 
+	/**
+	 * helper method to parse special cases where entire provider names exist in the first_name or last_name fields
+	 * @return string array of [first name, last name] where entries are not null or empty. null if it fails
+	 */
+	private String[] coerceProviderNames(String fullName) {
+		try {
+			fullName = fullName.trim();
+			int i = fullName.lastIndexOf(" ");//get last space in the string
+			if (i >= 0 ) {
+				String[] a =  {fullName.substring(0, i), fullName.substring(i).trim()};
+				
+				if(StringUtils.empty(a[0]) || StringUtils.empty(a[1])) {
+					return null;
+				}
+				return a;
+			}
+		}
+		catch(Exception e) {
+			logger.warn("Exception encounterd in coerceProviderNames");
+		}
+		return null;
+	}
 	String writeProviderData(String firstName, String lastName, String ohipNo, String cpsoNo) {
 		ProviderData pd = getProviderByOhip(ohipNo);
 		if (pd == null) {
 			pd = getProviderByNames(firstName, lastName, matchProviderNames);
 	    }
+		/* attempt to split single names into first and last parts */
+		if (pd == null) {
+	    	String[] parsedName = null;
+	    	if (!StringUtils.empty(firstName)) {
+	    		parsedName = coerceProviderNames(firstName);
+	    	}
+	    	else if (!StringUtils.empty(lastName)) {
+	    		parsedName = coerceProviderNames(lastName);
+	    	}
+	    	if (parsedName != null) {
+	    		firstName = parsedName[0];
+	    		lastName  = parsedName[1];
+	    		pd = getProviderByNames(firstName, lastName, matchProviderNames);
+	    		logger.warn("Provider name recovered through string parsing. Using firstName: "+firstName+" lastName: "+lastName+" as provider");
+	    	}
+		}
 	
 	    if (pd == null) {
 	    	logger.error("No provider found for firstName: " + firstName +
 	    			" lastName: " + lastName + " ohipNo: " + ohipNo);
 		
 		    if (StringUtils.empty(firstName) || StringUtils.empty(lastName)) {
-		    	//return defaultProviderNo();
 		    	return ""; //no information at all!
 		    }
 			pd = new ProviderData();
@@ -3114,6 +3192,11 @@ import oscar.util.UtilDateUtilities;
 	private static Integer saveRxAllergy(Integer demographicNo, Date entryDate, String description, Integer typeCode, String reaction, Date startDate, String severity, String regionalId, String lifeStage) {
 
 		AllergyDao allergyDao=(AllergyDao) SpringUtils.getBean("allergyDao");
+		
+		// the database rejects the empty string so here we always set a default right before the insert/save
+		if (description == null || description.trim().equals("")) {
+			description = DEFAULT_ALLERGY_DESCRIPTION;
+		}
 
 		Allergy allergy=new Allergy();
 		allergy.setDemographicNo(demographicNo);
