@@ -45,8 +45,8 @@ mDSSegmentData.populateMDSSegmentData(segmentID);
 
 CommonLabResultData clrd = new CommonLabResultData();
 
-String multiLabId = clrd.getMatchingLabs(request.getParameter("segmentID"), "MDS");
- String demoNo = clrd.getDemographicNo(request.getParameter("segmentID"),"MDS");
+String multiLabId = clrd.getMatchingLabs(segmentID, "MDS");
+String demoNo = clrd.getDemographicNo(segmentID,"MDS");
 
 PatientData.Patient pd = new PatientData().getPatient(segmentID);
 String AbnFlag = "";
