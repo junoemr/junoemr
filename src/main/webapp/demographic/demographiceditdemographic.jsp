@@ -758,6 +758,8 @@ jQuery(document).ready(function() {
 
 </script>
 
+<script type="text/javascript" src="<%=request.getContextPath() %>/demographic/demographiceditdemographic.js.jsp?demographic_no=<%=request.getParameter("demographic_no")%>&apptProvider=<%=request.getParameter("apptProvider")%>&appointment=<%=request.getParameter("appointment")%>"></script>
+
 </head>
 <body onLoad="setfocus(); checkONReferralNo(); formatPhoneNum(); checkRosterStatus2();"
 	topmargin="0" leftmargin="0" rightmargin="0" id="demographiceditdemographic">

@@ -133,8 +133,26 @@ You have no rights to access the data!
             String strBeanName = "casemgmt_oscar_bean" + bean.getDemographicNo();
             session.setAttribute(strBeanName, bean);
             session.setAttribute("casemgmt_bean_flag", "true");
-            String hrefurl=request.getContextPath()+"/casemgmt/forward.jsp?action=view&demographicNo="+bean.demographicNo+"&providerNo="+bean.providerNo+"&providerName="+bean.userName+"&appointmentNo="+request.getParameter("appointmentNo")+"&reason=" + request.getParameter("reason") + "&appointmentDate="+request.getParameter("appointmentDate")+"&start_time="+request.getParameter("startTime")+ "&apptProvider=" + request.getParameter("apptProvider_no")+"&providerview="+ request.getParameter("providerview") +
-                    "&msgType="+request.getParameter("msgType")+"&OscarMsgTypeLink="+request.getParameter("OscarMsgTypeLink")+"&noteId="+request.getParameter("noteId")+"&forceNote=true";
+			String hrefurl = request.getContextPath() +                         
+				"/casemgmt/forward.jsp?action=view" +                           
+				"&demographicNo=" + URLEncoder.encode(StringUtils.transformNullInEmptyString(
+					bean.demographicNo)) +                                      
+				"&providerNo=" + URLEncoder.encode(StringUtils.transformNullInEmptyString(
+					bean.providerNo)) +                                         
+				"&providerName=" + URLEncoder.encode(StringUtils.transformNullInEmptyString(
+					bean.userName)) +                                           
+				"&appointmentNo=" + URLEncoder.encode(StringUtils.transformNullInEmptyString(
+					request.getParameter("appointmentNo"))) +                   
+				"&reason=" + URLEncoder.encode(StringUtils.transformNullInEmptyString(
+					request.getParameter("reason"))) +                          
+				"&appointmentDate=" + URLEncoder.encode(StringUtils.transformNullInEmptyString(
+					request.getParameter("appointmentDate"))) +                 
+				"&start_time=" + URLEncoder.encode(StringUtils.transformNullInEmptyString(
+					request.getParameter("startTime"))) +                       
+				"&apptProvider=" + URLEncoder.encode(StringUtils.transformNullInEmptyString(
+					request.getParameter("apptProvider_no"))) +                 
+				"&providerview=" + URLEncoder.encode(StringUtils.transformNullInEmptyString(
+					request.getParameter("providerview")));
 
 
             if( request.getParameter("noteBody") != null )

@@ -24,26 +24,45 @@
 
 package org.oscarehr.ws;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import javax.jws.WebService;
+
+import javax.servlet.ServletContext;
+
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.handler.MessageContext;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.service.ProgramManager;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.lowagie.text.pdf.PdfReader;
+
+import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.model.CtlDocument;
 import org.oscarehr.common.model.Document;
+import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.managers.DocumentManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.transfer_objects.DocumentTransfer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
+import oscar.dms.EDoc;
+import oscar.dms.EDocUtil;
+
 
 @WebService
 @Component
@@ -80,5 +99,94 @@ public class DocumentWs extends AbstractWs {
 		List<Document> documents = documentManager.getDocumentsByProgramProviderDemographicDate(loggedInInfo, programId, providerNo, demographicId, updatedAfterThisDateExclusive, itemsToReturn);
 		logger.debug("programId="+programId+", providerNo="+providerNo+", demographicId="+demographicId+", updatedAfterThisDateExclusive="+DateFormatUtils.ISO_DATETIME_FORMAT.format(updatedAfterThisDateExclusive)+", itemsToReturn="+itemsToReturn+", results="+documents.size());
 		return (DocumentTransfer.getTransfers(loggedInInfo, documents));
+	}
+
+	public String addDocument(String docFilename, String docContentsBase64,
+					String providerId, String responsibleId)
+					throws IOException {
+		// Gather required data                                                 
+		int numberOfPages = 0;
+
+		// Decode document                                                      
+		Base64 base64 = new Base64();
+		byte[] docContents = base64.decode(docContentsBase64);
+
+		// Make document object                                                 
+		EDoc newDoc = new EDoc("", "", docFilename, "", providerId,
+						responsibleId, "", 'A',
+						oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "",
+						"demographic", "-1", 0);
+
+		newDoc.setDocPublic("0");
+		String systemFilename = newDoc.getFileName();
+
+		if (docContents.length == 0) {
+			throw new FileNotFoundException();
+		}
+
+		// Save file to document folder                                         
+		saveDocumentFile(docContents, systemFilename);
+
+		// Set content type                                                     
+		if (systemFilename.endsWith(".PDF") || systemFilename.endsWith(".pdf")) {
+			newDoc.setContentType("application/pdf");
+			numberOfPages = countNumOfPages(systemFilename);
+		}
+		newDoc.setNumberOfPages(numberOfPages);
+
+		Integer doc_no = Integer.parseInt(EDocUtil.addDocumentSQL(newDoc));
+
+		ServletContext servletContext = (ServletContext) context.getMessageContext().get(MessageContext.SERVLET_CONTEXT);
+		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+
+		ProviderInboxRoutingDao providerInboxRoutingDao
+						= (ProviderInboxRoutingDao) ctx.getBean("providerInboxRoutingDAO");
+		providerInboxRoutingDao.addToProviderInbox(providerId, doc_no, "DOC");
+
+		return "{\"success\":1,\"message\":\"\"}";
+	}
+
+	private void saveDocumentFile(byte[] docContents, String fileName)
+					throws IOException {
+		FileOutputStream fos = null;
+
+		try {
+			String savePath = 
+				oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "/" + fileName;
+
+			fos = new FileOutputStream(savePath);
+
+			fos.write(docContents);
+			fos.flush();
+		} catch (Exception e) {
+			logger.debug(e.toString());
+		} finally {
+			if (fos != null) {
+				fos.close();
+			}
+		}
+	}
+
+	/**
+	 * Counts the number of pages in a local pdf file.
+	 *
+	 * @param fileName the name of the file
+	 * @return the number of pages in the file
+	 */
+	public int countNumOfPages(String fileName) {// count number of pages in a  
+		// local pdf file           
+		int numOfPage = 0;
+
+		String filePath = oscar.OscarProperties.getInstance()
+						.getProperty("DOCUMENT_DIR") + "/" + fileName;
+
+		try {
+			PdfReader reader = new PdfReader(filePath);
+			numOfPage = reader.getNumberOfPages();
+			reader.close();
+		} catch (IOException e) {
+			logger.debug(e.toString());
+		}
+		return numOfPage;
 	}
 }

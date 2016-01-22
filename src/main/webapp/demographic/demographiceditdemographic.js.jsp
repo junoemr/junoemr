@@ -23,7 +23,67 @@
     Ontario, Canada
 
 --%>
-<%@page import="oscar.OscarProperties" %>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
+<%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
+<%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@page import="org.oscarehr.util.SpringUtils"%>
+<%@page import="org.oscarehr.PMmodule.model.Program"%>
+<%@page import="org.oscarehr.managers.ProgramManager2"%>
+<%@page import="java.util.Calendar"%>
+<%@page import="java.util.GregorianCalendar"%>
+<%@page import="java.net.URLEncoder"%>
+<%@page import="java.util.ResourceBundle"%>
+<%@page import="oscar.OscarProperties"%>
+
+<c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<%
+	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+
+    String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+
+	String curProvider_no = (String) session.getAttribute("user");
+	String demographic_no = request.getParameter("demographic_no") ;
+	String apptProvider = request.getParameter("apptProvider");
+	String appointment = request.getParameter("appointment");
+	String userfirstname = (String) session.getAttribute("userfirstname");
+	String userlastname = (String) session.getAttribute("userlastname");
+	String currentProgram="";
+
+	ResourceBundle oscarResources = ResourceBundle.getBundle("oscarResources", request.getLocale());
+    String noteReason = oscarResources.getString("oscarEncounter.noteReason.TelProgress");
+
+    if (OscarProperties.getInstance().getProperty("disableTelProgressNoteTitleInEncouterNotes") != null 
+			&& OscarProperties.getInstance().getProperty("disableTelProgressNoteTitleInEncouterNotes").equals("yes")) {
+		noteReason = "";
+	}
+    
+ 	String programId = (String)session.getAttribute(org.oscarehr.util.SessionConstants.CURRENT_PROGRAM_ID);
+ 	if(programId != null && programId.length()>0) {
+ 		Integer prId = null;
+ 		try {
+ 			prId = Integer.parseInt(programId);
+ 		} catch(NumberFormatException e) {
+ 			//do nothing
+ 		}
+ 		if(prId != null) {
+ 			ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
+ 			Program p = programManager.getProgram(loggedInInfo, prId);
+ 			if(p != null) {
+ 				currentProgram = p.getName();
+ 			}
+ 		}
+ 	}
+
+   GregorianCalendar now=new GregorianCalendar();
+   int curYear = now.get(Calendar.YEAR);
+   int curMonth = (now.get(Calendar.MONTH)+1);
+   int curDay = now.get(Calendar.DAY_OF_MONTH);
+
+%>
+
 function rs(n,u,w,h,x) {
   args="width="+w+",height="+h+",resizable=yes,scrollbars=yes,status=0,top=360,left=30";
   remote=window.open(u,n,args);
