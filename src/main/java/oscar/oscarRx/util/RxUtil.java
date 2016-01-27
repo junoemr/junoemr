@@ -1510,44 +1510,38 @@ public class RxUtil {
         return discontinuedLatest;
     }
 
-    //check to see if a represcription of a med is clicked twice.
+    /**
+     * check to see if a represcription of a med is clicked twice.
+     */
     public static boolean isRxUniqueInStash(final oscar.oscarRx.pageUtil.RxSessionBean beanRx, final RxPrescriptionData.Prescription rx) {
         boolean unique = true;
-        if(rx.isCustom()){
+        
         for (int j = 0; j < beanRx.getStashSize(); j++) {
             try {
-                RxPrescriptionData.Prescription rxTemp = beanRx.getStashItem(j);
-                    //p(""+rxTemp.isCustom());
-                    //p(rxTemp.getCustomName());
-                    //p(rx.getCustomName());
-                    //p(""+rxTemp.isCustomNote());
-                    //p(""+rx.isCustomNote());
-                    //p(""+rxTemp.getRandomId());
-                    //p(""+rx.getRandomId());
-                    if (rxTemp.isCustom() && rxTemp.getCustomName().equals(rx.getCustomName()) && rxTemp.isCustomNote()==rx.isCustomNote()
-                            && rxTemp.getRandomId()!=rx.getRandomId()) {
-                        p("1unique turning false");
-                    unique = false;
-                }
-            } catch (Exception e) {MiscUtils.getLogger().error("Error", e);
-            }
-        }
-        }else{
-            for (int j = 0; j < beanRx.getStashSize(); j++) {
-                try {
-                    RxPrescriptionData.Prescription rxTemp = beanRx.getStashItem(j);
-                    //p(rx.getBrandName());
-                    //p(rxTemp.getBrandName());
-
-                    //p(""+rxTemp.getRandomId());
-                    //p(""+rx.getRandomId());
-                    if (rx.getBrandName()!=null && !rx.getBrandName().equalsIgnoreCase("null") && rx.getBrandName().equals(rxTemp.getBrandName())
-                            &&  rxTemp.getRandomId()!=rx.getRandomId()) { //GCN_SWQNO changes when drugref database is updated
+            	RxPrescriptionData.Prescription rxTemp = beanRx.getStashItem(j);
+            	if ( rxTemp == null ) {
+            		logger.error("Prescription in RxSessionBean is null. StashItem index " + j);
+            		continue;
+            	}
+            	
+            	if(rx.isCustom()) {
+            		if (rxTemp.isCustom() && rxTemp.getCustomName().equals(rx.getCustomName()) && 
+            				rxTemp.isCustomNote()==rx.isCustomNote() && rxTemp.getRandomId()!=rx.getRandomId()) {
+	                    p("1unique turning false");
+	                    unique = false;
+	                }
+            	}
+            	else {
+                    if (rx.getBrandName()!=null && !rx.getBrandName().equalsIgnoreCase("null") && 
+                    		rx.getBrandName().equals(rxTemp.getBrandName()) &&  rxTemp.getRandomId()!=rx.getRandomId()) {
+                    	//GCN_SWQNO changes when drugref database is updated
                         p("2unique turning false");
                         unique = false;
                     }
-                } catch (Exception e) {MiscUtils.getLogger().error("Error", e);
-                }
+            	}
+            } 
+            catch (Exception e) {
+            	logger.error("Error", e);
             }
         }
         if (unique) {
