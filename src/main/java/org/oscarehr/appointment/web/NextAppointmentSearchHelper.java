@@ -65,6 +65,8 @@ public class NextAppointmentSearchHelper {
 	 */
 	public static List<NextAppointmentSearchResult> search(NextAppointmentSearchBean searchBean) {
 		List<NextAppointmentSearchResult> results = new ArrayList<NextAppointmentSearchResult>();
+		
+		logger.info("SEARCH AVAILABLE APPOINTMENTS:");
 				
 		Calendar c = Calendar.getInstance();
 		int curHour = c.get(Calendar.HOUR_OF_DAY);
@@ -87,7 +89,7 @@ public class NextAppointmentSearchHelper {
 			daysSearched++;
 		}
 		
-		
+		logger.info(results.size() + " available appointments found. searched " + daysSearched + " days.");
 		return results;
 	}
 	
@@ -157,6 +159,12 @@ public class NextAppointmentSearchHelper {
 		//we have a schedule..lets check what template to use
 		String templateName = sd.getHour();		
 		ScheduleTemplate template = scheduleTemplateDao.find(new ScheduleTemplatePrimaryKey(providerNo,templateName));
+		
+		/* hack to look for public templates */
+		if(template == null) {
+			logger.info("No Private template found for provider " + providerNo + ". Search for public template '" + templateName + "'");
+			template = scheduleTemplateDao.find(new ScheduleTemplatePrimaryKey(ScheduleTemplatePrimaryKey.DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES,templateName));
+		}
 		if(template == null) {
 			logger.warn("no template found for provider " + providerNo + " and name=" + templateName);
 			return results;
