@@ -25,17 +25,22 @@
 
 package org.oscarehr.common.dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.model.ScheduleDate;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class ScheduleDateDao extends AbstractDao<ScheduleDate>{
 
+	static Logger logger = MiscUtils.getLogger();
+	
 	public ScheduleDateDao() {
 		super(ScheduleDate.class);
 	}
@@ -69,6 +74,51 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>{
 		query.setParameter(3, date2);
 
 		@SuppressWarnings("unchecked")
+        List<ScheduleDate> results = query.getResultList();
+		return results;
+	}
+	
+	/**
+	 * find an ordered list (by date, id) of schedule dates for multiple providers. 
+	 * @param providerNos
+	 * @param startDate
+	 * @param endDate
+	 * @param limit (0 or negative for no limit)
+	 * @return
+	 */
+	public List<ScheduleDate> findByProviderListAndDateRange(List<String> providerNos, Date startDate, Date endDate, int limit) {
+		
+		if (providerNos == null || providerNos.isEmpty()) {
+			return new ArrayList<ScheduleDate>();
+		}
+		
+		String queryString = "SELECT s FROM ScheduleDate s WHERE s.providerNo IN (";
+		
+		for(int i=0; i< providerNos.size(); i++) {
+			queryString += "?";
+			if ( i != providerNos.size()-1) {
+				queryString += ", ";
+			}
+		}
+		queryString += ") AND s.date >= ? and s.date <= ? AND status = ? ";
+		queryString += "ORDER BY s.date, id ";
+		
+		Query query = entityManager.createQuery( queryString );
+		if(limit > 0) {
+			query.setMaxResults(limit);
+		}
+		
+		for(int i=0; i< providerNos.size(); i++) {
+			query.setParameter(i+1, providerNos.get(i));
+		}
+		int index = providerNos.size();
+		query.setParameter(index+1, startDate);
+		query.setParameter(index+2, endDate);
+		query.setParameter(index+3, 'A');
+		
+		logger.debug("QUERY: " + queryString);
+
+        @SuppressWarnings("unchecked")
         List<ScheduleDate> results = query.getResultList();
 		return results;
 	}

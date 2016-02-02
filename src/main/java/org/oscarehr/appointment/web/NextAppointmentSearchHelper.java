@@ -72,24 +72,50 @@ public class NextAppointmentSearchHelper {
 		int curHour = c.get(Calendar.HOUR_OF_DAY);
 		
 		int endTimeHour = Integer.parseInt(searchBean.getEndTimeOfDay());
+		boolean today = false;
 		
 		//can we search today?
 		if((endTimeHour-curHour)>=1) {
-			results.addAll(searchDay(c.getTime(),true,searchBean));
+			today = true;
+			//results.addAll(searchDay(c.getTime(),true,searchBean));
 		} 
-			
-		//main loop..each from tomorrow onward
-		int daysSearched=0;
-		while(daysSearched < MAX_DAYS_TO_SEARCH) {
-			c.add(Calendar.DAY_OF_MONTH, 1);
-			results.addAll(searchDay(c.getTime(),false,searchBean));
-			if(results.size()>=searchBean.getNumResults()) {
-				break;
+		
+		// build a list of provider numbers to include in the search
+		ArrayList<String> providerNos = new ArrayList<String>();
+		
+		// search all providers
+		if(searchBean.getProviderNo().equals("")) { 
+			List<Provider> providers = providerDao.getActiveProviders();
+			for(Provider p:providers) {
+				providerNos.add(p.getProviderNo());
 			}
-			daysSearched++;
+		}
+		// search specific provider
+		else {
+			providerNos.add(searchBean.getProviderNo());
 		}
 		
-		logger.info(results.size() + " available appointments found. searched " + daysSearched + " days.");
+		Date currentTime = c.getTime();
+		c.add(Calendar.DAY_OF_MONTH, MAX_DAYS_TO_SEARCH);
+		List<ScheduleDate> scheduleDateList = scheduleDateDao.findByProviderListAndDateRange(providerNos, currentTime, c.getTime(), searchBean.getNumResults());
+		
+		for(ScheduleDate sd : scheduleDateList) {
+			// basically skip weekends and specific days of the week
+			if(!searchBean.getDayOfWeek().isEmpty()) {
+				c.setTime(sd.getDate());
+				if(searchBean.getDayOfWeek().equals("daily")) {
+					if(c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+						continue;		
+					}
+				} 
+				else if(c.get(Calendar.DAY_OF_WEEK) != Integer.parseInt(searchBean.getDayOfWeek())) {
+					continue;
+				}
+			}
+			results.addAll(searchTemplate(sd.getProviderNo(), sd, sd.getDate(), today, searchBean));
+		}
+		
+		logger.info(results.size() + " available appointments found.");
 		return results;
 	}
 	
@@ -170,6 +196,39 @@ public class NextAppointmentSearchHelper {
 			return results;
 		}
 		
+		return formatTemplateResults(providerNo, template, day, today, searchBean);
+	}
+	
+	/**
+	 * Retrieve template formatted NextAppointmentSearchResult list for the given provider and schedule date
+	 * @param providerNo
+	 * @param sd
+	 * @param day
+	 * @param today
+	 * @param searchBean
+	 * @return
+	 */
+	private static List<NextAppointmentSearchResult> searchTemplate(String providerNo, ScheduleDate sd, Date day, boolean today, NextAppointmentSearchBean searchBean) {
+		
+		//we have a schedule..lets check what template to use
+		String templateName = sd.getHour();
+		ScheduleTemplate template = scheduleTemplateDao.find(new ScheduleTemplatePrimaryKey(providerNo,templateName));
+		
+		/* hack to look for public templates */
+		if(template == null) {
+			logger.debug("No Private template found for provider " + providerNo + ". Search for public template '" + templateName + "'");
+			template = scheduleTemplateDao.find(new ScheduleTemplatePrimaryKey(ScheduleTemplatePrimaryKey.DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES,templateName));
+		}
+		if(template == null) {
+			logger.warn("no template found for provider " + providerNo + " and template name '" + templateName + "'");
+			return new ArrayList<NextAppointmentSearchResult>();
+		}
+		return formatTemplateResults(providerNo, template, day, today, searchBean);
+	}
+	
+	private static List<NextAppointmentSearchResult> formatTemplateResults(String providerNo, ScheduleTemplate template, Date day, boolean today, NextAppointmentSearchBean searchBean) {
+		List<NextAppointmentSearchResult> results = new ArrayList<NextAppointmentSearchResult>();
+		
 		String timecode = template.getTimecode();   //length=96
 		int slotsPerHour = (timecode.length()/24);  //4
 		int slotSize = (60/(timecode.length()/24)); //15
@@ -243,7 +302,7 @@ public class NextAppointmentSearchHelper {
 						results.add(result);
 					} 
 				}
-			}						
+			}
 		}
 		return results;
 	}
