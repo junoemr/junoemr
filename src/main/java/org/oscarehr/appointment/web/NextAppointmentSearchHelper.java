@@ -69,7 +69,7 @@ public class NextAppointmentSearchHelper {
 		logger.info("SEARCH AVAILABLE APPOINTMENTS:");
 				
 		Calendar c = Calendar.getInstance();
-		int maxResults = searchBean.getNumResults();
+		int maxResults = -1 ; // no limit
 		
 		// build a list of provider numbers to include in the search
 		ArrayList<String> providerNos = new ArrayList<String>();
@@ -96,7 +96,7 @@ public class NextAppointmentSearchHelper {
 			results.addAll(searchTemplate(sd.getProviderNo(), sd.getHour(), sd.getDate(), searchBean));
 			/* since each DB result can have multiple openings, we can skip the later ones if there are 
 			 * more than the max amount being displayed */
-			if(results.size() > maxResults) {
+			if(results.size() >= searchBean.getNumResults()) {
 				break;
 			}
 		}
