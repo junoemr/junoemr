@@ -69,7 +69,9 @@ public class NextAppointmentSearchHelper {
 		logger.info("SEARCH AVAILABLE APPOINTMENTS:");
 				
 		Calendar c = Calendar.getInstance();
-		int maxResults = -1 ; // no limit
+		/* limit the number of templates we retrieve from the database
+		 * if we can't find any free appointments before reaching this limit they probably don't have any. */
+		int maxResults = 500 ; 
 		
 		// build a list of provider numbers to include in the search
 		ArrayList<String> providerNos = new ArrayList<String>();
@@ -139,9 +141,8 @@ public class NextAppointmentSearchHelper {
 	/**
 	 * Retrieve template formatted NextAppointmentSearchResult list for the given provider and schedule date
 	 * @param providerNo
-	 * @param sd
+	 * @param templateName
 	 * @param day
-	 * @param isToday
 	 * @param searchBean
 	 * @return
 	 */
