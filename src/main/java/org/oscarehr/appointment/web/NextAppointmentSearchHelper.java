@@ -69,17 +69,7 @@ public class NextAppointmentSearchHelper {
 		logger.info("SEARCH AVAILABLE APPOINTMENTS:");
 				
 		Calendar c = Calendar.getInstance();
-		int curHour = c.get(Calendar.HOUR_OF_DAY);
-		
-		int endTimeHour = Integer.parseInt(searchBean.getEndTimeOfDay());
-		boolean isToday = false;
 		int maxResults = searchBean.getNumResults();
-		
-		//can we search today?
-		if((endTimeHour-curHour)>=1) {
-			isToday = true;
-			//results.addAll(searchDay(c.getTime(),true,searchBean));
-		} 
 		
 		// build a list of provider numbers to include in the search
 		ArrayList<String> providerNos = new ArrayList<String>();
@@ -96,14 +86,14 @@ public class NextAppointmentSearchHelper {
 			providerNos.add(searchBean.getProviderNo());
 		}
 		
-		ArrayList<Integer> getDaysOfWeek = getDaysOfWeek(searchBean);
+		ArrayList<Integer> daysOfWeek = getDaysOfWeek(searchBean);
 		
 		Date currentTime = c.getTime();
 		c.add(Calendar.DAY_OF_MONTH, MAX_DAYS_TO_SEARCH);
-		List<ScheduleDate> scheduleDateList = scheduleDateDao.findByProviderListAndDateRange(providerNos, currentTime, c.getTime(), maxResults, getDaysOfWeek);
+		List<ScheduleDate> scheduleDateList = scheduleDateDao.findByProviderListAndDateRange(providerNos, currentTime, c.getTime(), maxResults, daysOfWeek);
 		
 		for(ScheduleDate sd : scheduleDateList) {
-			results.addAll(searchTemplate(sd.getProviderNo(), sd, sd.getDate(), isToday, searchBean));
+			results.addAll(searchTemplate(sd.getProviderNo(), sd.getHour(), sd.getDate(), searchBean));
 			/* since each DB result can have multiple openings, we can skip the later ones if there are 
 			 * more than the max amount being displayed */
 			if(results.size() > maxResults) {
@@ -147,86 +137,6 @@ public class NextAppointmentSearchHelper {
 	}
 	
 	/**
-	 * Break it up by provider..it doesn't really make sense to search all providers, but could be modified to do groups
-	 * of providers.
-	 * 
-	 * @param day
-	 * @param today
-	 * @param searchBean
-	 * @return
-	 */
-	private static List<NextAppointmentSearchResult> searchDay(Date day, boolean today, NextAppointmentSearchBean searchBean) {
-		List<NextAppointmentSearchResult> results = new ArrayList<NextAppointmentSearchResult>();
-		
-		Calendar c = Calendar.getInstance();
-		c.setTime(day);
-		if(searchBean.getDayOfWeek().length()>0) {
-			if(searchBean.getDayOfWeek().equals("daily")) {
-				if(c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
-					return results;				
-				}
-			} else {
-				if(c.get(Calendar.DAY_OF_WEEK) != Integer.parseInt(searchBean.getDayOfWeek())) {
-					return results;				
-				}
-			}
-		}
-		
-		if(searchBean.getProviderNo().equals("")) {			
-			List<Provider> providers = providerDao.getActiveProviders();
-			for(Provider p:providers) {
-				results.addAll(searchDayProvider(p.getProviderNo(),day,today,searchBean));
-				if(results.size()>=searchBean.getNumResults()) {
-					break;
-				}
-			}
-		} else {
-			results.addAll(searchDayProvider(searchBean.getProviderNo(),day,today,searchBean));
-		}
-		
-		return results;
-	}
-	
-	/**
-	 * Search by provider and day.
-	 * 
-	 * 1) load up schedule
-	 * 2) see what slots are available
-	 * 3) for each slot, check to see if it's already booked
-	 * 4) if not, add it to result set.
-	 * 
-	 * @param providerNo
-	 * @param day
-	 * @param today
-	 * @param searchBean
-	 * @return
-	 */
-	private static List<NextAppointmentSearchResult> searchDayProvider(String providerNo, Date day, boolean today, NextAppointmentSearchBean searchBean) {
-		List<NextAppointmentSearchResult> results = new ArrayList<NextAppointmentSearchResult>();
-		//load up the schedule
-		ScheduleDate sd = scheduleDateDao.findByProviderNoAndDate(providerNo, day);
-		if(sd == null) {
-			logger.warn("no schedule found for provider " + providerNo + " on day " + day);
-			return results;
-		}
-		//we have a schedule..lets check what template to use
-		String templateName = sd.getHour();		
-		ScheduleTemplate template = scheduleTemplateDao.find(new ScheduleTemplatePrimaryKey(providerNo,templateName));
-		
-		/* hack to look for public templates */
-		if(template == null) {
-			logger.debug("No Private template found for provider " + providerNo + ". Search for public template '" + templateName + "'");
-			template = scheduleTemplateDao.find(new ScheduleTemplatePrimaryKey(ScheduleTemplatePrimaryKey.DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES,templateName));
-		}
-		if(template == null) {
-			logger.warn("no template found for provider " + providerNo + " and name=" + templateName);
-			return results;
-		}
-		
-		return formatTemplateResults(providerNo, template, day, today, searchBean);
-	}
-	
-	/**
 	 * Retrieve template formatted NextAppointmentSearchResult list for the given provider and schedule date
 	 * @param providerNo
 	 * @param sd
@@ -235,10 +145,9 @@ public class NextAppointmentSearchHelper {
 	 * @param searchBean
 	 * @return
 	 */
-	private static List<NextAppointmentSearchResult> searchTemplate(String providerNo, ScheduleDate sd, Date day, boolean isToday, NextAppointmentSearchBean searchBean) {
+	private static List<NextAppointmentSearchResult> searchTemplate(String providerNo, String templateName, Date day, NextAppointmentSearchBean searchBean) {
 		
 		//we have a schedule..lets check what template to use
-		String templateName = sd.getHour();
 		ScheduleTemplate template = scheduleTemplateDao.find(new ScheduleTemplatePrimaryKey(providerNo,templateName));
 		
 		/* hack to look for public templates */
@@ -250,10 +159,10 @@ public class NextAppointmentSearchHelper {
 			logger.warn("no template found for provider " + providerNo + " and template name '" + templateName + "'");
 			return new ArrayList<NextAppointmentSearchResult>();
 		}
-		return formatTemplateResults(providerNo, template, day, isToday, searchBean);
+		return formatTemplateResults(providerNo, template, day, searchBean);
 	}
 	
-	private static List<NextAppointmentSearchResult> formatTemplateResults(String providerNo, ScheduleTemplate template, Date day, boolean today, NextAppointmentSearchBean searchBean) {
+	private static List<NextAppointmentSearchResult> formatTemplateResults(String providerNo, ScheduleTemplate template, Date day, NextAppointmentSearchBean searchBean) {
 		List<NextAppointmentSearchResult> results = new ArrayList<NextAppointmentSearchResult>();
 		
 		String timecode = template.getTimecode();   //length=96
@@ -265,23 +174,11 @@ public class NextAppointmentSearchHelper {
 		int startMin = 0;
 		int endHour = Integer.parseInt(searchBean.getEndTimeOfDay());
 		
-		if(today) {
-			Calendar c = Calendar.getInstance();
-			int curHour = c.get(Calendar.HOUR_OF_DAY);
-			int curMin= c.get(Calendar.MINUTE);
-			if(curHour >= startHour) {
-				startHour = curHour;
-				startMin = curMin;
-			}
-		}
-		
-		//logger.info("startHour="+startHour + ",endHour="+endHour);
-		
 		for(int x=0;x<timecode.length();x++) {
 			char slot = timecode.charAt(x);
 			int hour = (int)Math.floor(x/slotsPerHour);
 			int min = (x%slotsPerHour)*slotSize;
-			if( (hour>=startHour) && (hour <=(endHour-1))) {
+			if(( hour >= startHour ) && ( hour < endHour )) {
 				if(hour==startHour && min<startMin) {
 					continue;
 				}
@@ -313,18 +210,24 @@ public class NextAppointmentSearchHelper {
 					//ready to check appointments
 					//logger.info("schedule availability found at hour " + hour + ", min = " + min + " duration = " + duration);
 					
-					Calendar cal2 = Calendar.getInstance();
-					cal2.setTime(day);
-					cal2.set(Calendar.HOUR_OF_DAY, hour);
-					cal2.set(Calendar.MINUTE, min);
-					cal2.set(Calendar.SECOND,0);
-					cal2.set(Calendar.MILLISECOND, 0);
-					if(checkAvailability(cal2.getTime(), duration, providerNo)) {
+					Calendar currentTimeCal = Calendar.getInstance();
+					Calendar appointmentCal = Calendar.getInstance();
+					appointmentCal.setTime(day);
+					appointmentCal.set(Calendar.HOUR_OF_DAY, hour);
+					appointmentCal.set(Calendar.MINUTE, min);
+					appointmentCal.set(Calendar.SECOND,0);
+					appointmentCal.set(Calendar.MILLISECOND, 0);
+					
+					// skip time slots that are in the past
+					if ( currentTimeCal.after(appointmentCal) ) {
+						continue;
+					}
+					if(checkAvailability(appointmentCal.getTime(), duration, providerNo)) {
 						//logger.info("spot available at " + cal2.getTime() + " for " + duration + " mins with provider " + providerNo);
 						NextAppointmentSearchResult result = new NextAppointmentSearchResult();
 						result.setProviderNo(providerNo);
 						result.setProvider(providerDao.getProvider(providerNo));
-						result.setDate(cal2.getTime());
+						result.setDate(appointmentCal.getTime());
 						result.setDuration(duration);
 						results.add(result);
 					} 

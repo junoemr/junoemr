@@ -116,7 +116,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>{
 		}
 		queryString += "ORDER BY s.date, id ";
 		
-		logger.info("QUERY: " + queryString); //TODO move to debug
+		logger.debug("QUERY: " + queryString);
 		Query query = entityManager.createQuery( queryString );
 		if(limit > 0) {
 			query.setMaxResults(limit);
