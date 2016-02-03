@@ -72,11 +72,12 @@ public class NextAppointmentSearchHelper {
 		int curHour = c.get(Calendar.HOUR_OF_DAY);
 		
 		int endTimeHour = Integer.parseInt(searchBean.getEndTimeOfDay());
-		boolean today = false;
+		boolean isToday = false;
+		int maxResults = searchBean.getNumResults();
 		
 		//can we search today?
 		if((endTimeHour-curHour)>=1) {
-			today = true;
+			isToday = true;
 			//results.addAll(searchDay(c.getTime(),true,searchBean));
 		} 
 		
@@ -95,28 +96,54 @@ public class NextAppointmentSearchHelper {
 			providerNos.add(searchBean.getProviderNo());
 		}
 		
+		ArrayList<Integer> getDaysOfWeek = getDaysOfWeek(searchBean);
+		
 		Date currentTime = c.getTime();
 		c.add(Calendar.DAY_OF_MONTH, MAX_DAYS_TO_SEARCH);
-		List<ScheduleDate> scheduleDateList = scheduleDateDao.findByProviderListAndDateRange(providerNos, currentTime, c.getTime(), searchBean.getNumResults());
+		List<ScheduleDate> scheduleDateList = scheduleDateDao.findByProviderListAndDateRange(providerNos, currentTime, c.getTime(), maxResults, getDaysOfWeek);
 		
 		for(ScheduleDate sd : scheduleDateList) {
-			// basically skip weekends and specific days of the week
-			if(!searchBean.getDayOfWeek().isEmpty()) {
-				c.setTime(sd.getDate());
-				if(searchBean.getDayOfWeek().equals("daily")) {
-					if(c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
-						continue;		
-					}
-				} 
-				else if(c.get(Calendar.DAY_OF_WEEK) != Integer.parseInt(searchBean.getDayOfWeek())) {
-					continue;
-				}
+			results.addAll(searchTemplate(sd.getProviderNo(), sd, sd.getDate(), isToday, searchBean));
+			/* since each DB result can have multiple openings, we can skip the later ones if there are 
+			 * more than the max amount being displayed */
+			if(results.size() > maxResults) {
+				break;
 			}
-			results.addAll(searchTemplate(sd.getProviderNo(), sd, sd.getDate(), today, searchBean));
 		}
 		
 		logger.info(results.size() + " available appointments found.");
 		return results;
+	}
+	
+	/**
+	 * helper method for finding days of the week. 
+	 * @param searchBean
+	 * @return an array of integer values (1 - 7) representing days of the week to search.
+	 * Where 1=Sunday and 7=Saturday
+	 */
+	private static ArrayList<Integer> getDaysOfWeek(NextAppointmentSearchBean searchBean) {
+		ArrayList<Integer> daysOfTheWeek = new ArrayList<Integer>();
+		
+		if(!searchBean.getDayOfWeek().isEmpty() && searchBean.getDayOfWeek().equals("daily")) {
+			// Add all days of the week except Saturday(7) & Sunday(1)
+			for(int i=2; i<=6; i++) {
+				daysOfTheWeek.add(i);
+			}
+		}
+		else {
+			try {
+				daysOfTheWeek.add(Integer.parseInt(searchBean.getDayOfWeek()));
+			}
+			catch (NumberFormatException e) {
+				logger.error("Error", e);
+				
+				// all days of the week 1 -7
+				for(int i=1; i<=7; i++) {
+					daysOfTheWeek.add(i);
+				}
+			}
+		}
+		return daysOfTheWeek;
 	}
 	
 	/**
@@ -188,7 +215,7 @@ public class NextAppointmentSearchHelper {
 		
 		/* hack to look for public templates */
 		if(template == null) {
-			logger.info("No Private template found for provider " + providerNo + ". Search for public template '" + templateName + "'");
+			logger.debug("No Private template found for provider " + providerNo + ". Search for public template '" + templateName + "'");
 			template = scheduleTemplateDao.find(new ScheduleTemplatePrimaryKey(ScheduleTemplatePrimaryKey.DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES,templateName));
 		}
 		if(template == null) {
@@ -204,11 +231,11 @@ public class NextAppointmentSearchHelper {
 	 * @param providerNo
 	 * @param sd
 	 * @param day
-	 * @param today
+	 * @param isToday
 	 * @param searchBean
 	 * @return
 	 */
-	private static List<NextAppointmentSearchResult> searchTemplate(String providerNo, ScheduleDate sd, Date day, boolean today, NextAppointmentSearchBean searchBean) {
+	private static List<NextAppointmentSearchResult> searchTemplate(String providerNo, ScheduleDate sd, Date day, boolean isToday, NextAppointmentSearchBean searchBean) {
 		
 		//we have a schedule..lets check what template to use
 		String templateName = sd.getHour();
@@ -223,7 +250,7 @@ public class NextAppointmentSearchHelper {
 			logger.warn("no template found for provider " + providerNo + " and template name '" + templateName + "'");
 			return new ArrayList<NextAppointmentSearchResult>();
 		}
-		return formatTemplateResults(providerNo, template, day, today, searchBean);
+		return formatTemplateResults(providerNo, template, day, isToday, searchBean);
 	}
 	
 	private static List<NextAppointmentSearchResult> formatTemplateResults(String providerNo, ScheduleTemplate template, Date day, boolean today, NextAppointmentSearchBean searchBean) {

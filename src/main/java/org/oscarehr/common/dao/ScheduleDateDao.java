@@ -84,15 +84,18 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>{
 	 * @param startDate
 	 * @param endDate
 	 * @param limit (0 or negative for no limit)
+	 * @param daysOfWeek list of numbers 1-7 (1=Sunday, 7=Saturday)
 	 * @return
 	 */
-	public List<ScheduleDate> findByProviderListAndDateRange(List<String> providerNos, Date startDate, Date endDate, int limit) {
+	public List<ScheduleDate> findByProviderListAndDateRange(List<String> providerNos, Date startDate, Date endDate, int limit, List<Integer> daysOfWeek) {
 		
 		if (providerNos == null || providerNos.isEmpty()) {
 			return new ArrayList<ScheduleDate>();
 		}
 		
-		String queryString = "SELECT s FROM ScheduleDate s WHERE s.providerNo IN (";
+		/* build the query */
+		String queryString = "SELECT s FROM ScheduleDate s "
+			+ "WHERE status = ? AND s.date >= ? AND s.date <= ? AND s.providerNo IN ( ";
 		
 		for(int i=0; i< providerNos.size(); i++) {
 			queryString += "?";
@@ -100,23 +103,40 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>{
 				queryString += ", ";
 			}
 		}
-		queryString += ") AND s.date >= ? and s.date <= ? AND status = ? ";
+		queryString += " ) ";
+		if(daysOfWeek != null && !daysOfWeek.isEmpty()) {
+			queryString += "AND DAYOFWEEK(s.date) IN ( ";
+			for(int i=0; i< daysOfWeek.size(); i++) {
+				queryString += "?";
+				if ( i != daysOfWeek.size()-1) {
+					queryString += ", ";
+				}
+			}
+			queryString += " ) ";
+		}
 		queryString += "ORDER BY s.date, id ";
 		
+		logger.info("QUERY: " + queryString); //TODO move to debug
 		Query query = entityManager.createQuery( queryString );
 		if(limit > 0) {
 			query.setMaxResults(limit);
 		}
 		
-		for(int i=0; i< providerNos.size(); i++) {
-			query.setParameter(i+1, providerNos.get(i));
-		}
-		int index = providerNos.size();
-		query.setParameter(index+1, startDate);
-		query.setParameter(index+2, endDate);
-		query.setParameter(index+3, 'A');
+		/* set the query parameters */
+		int index = 1;
+		query.setParameter(index++, 'A');
+		query.setParameter(index++, startDate);
+		query.setParameter(index++, endDate);
 		
-		logger.debug("QUERY: " + queryString);
+		for(int i=0; i< providerNos.size(); i++) {
+			query.setParameter(index++, providerNos.get(i));
+		}
+
+		if(daysOfWeek != null && !daysOfWeek.isEmpty()) {
+			for(int i=0; i< daysOfWeek.size(); i++) {
+				query.setParameter(index++, daysOfWeek.get(i));
+			}
+		}
 
         @SuppressWarnings("unchecked")
         List<ScheduleDate> results = query.getResultList();
