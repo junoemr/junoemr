@@ -323,12 +323,26 @@
        	</ap-sql>
         <ap-output>${address_name}</ap-output>
     </databaseap>
+    	<databaseap>
+        <ap-name>licensed_producer_address_name_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(pa.display_name SEPARATOR ';') as list
+        		 FROM licensed_producer_address pa
+       	</ap-sql>
+        <ap-output>${address_name}</ap-output>
+    </databaseap>
 	<databaseap>
         <ap-name>licensed_producer_full_address</ap-name>
         <ap-sql>SELECT pa.address as address, pa.city as city, pa.province as province, pa.postal as postal
         		 FROM demographic_licensed_producer d JOIN licensed_producer_address pa ON (d.address_id=pa.address_id) where d.demographic_no=${demographic}
        	</ap-sql>
         <ap-output>${address}\n${city}, ${province}, ${postal}</ap-output>
+    </databaseap>
+    	<databaseap>
+        <ap-name>licensed_producer_full_address_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(pa.address, '\n', pa.city, ', ', pa.province, ', ', pa.postal SEPARATOR ';') AS list
+        		 FROM licensed_producer_address pa
+       	</ap-sql>
+        <ap-output>${list}</ap-output>
     </databaseap>
 
 <!-- Patient medical information -->

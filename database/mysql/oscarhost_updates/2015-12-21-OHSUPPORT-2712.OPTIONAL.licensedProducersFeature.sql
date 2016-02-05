@@ -47,7 +47,8 @@ VALUES
 ('137 McKeller St. N', 'Thunder Bay', 'ON', 'P7C 3Y9', 'Thunder Bay'),
 ('121 Dundas St. E #106', 'Belleville', 'ON', 'K8N 1L3', 'Belleville'),
 ('556 Bryne Dr. Unit 16', 'Barrie', 'ON', 'L4N 9P6', 'Barrie'),
-('16700 Bayview Ave. Unit 208', 'Newmarket', 'ON', 'L3X 1W1', 'Newmarket');
+('16700 Bayview Ave. Unit 208', 'Newmarket', 'ON', 'L3X 1W1', 'Newmarket'),
+('1940 Avenue Road', 'Toronto', 'ON', 'M5M 4A1', 'Toronto');
 
 CREATE TABLE demographic_licensed_producer (
 	id int NOT NULL AUTO_INCREMENT,
