@@ -4347,5 +4347,6 @@
         <ViolationValue>/src/main/webapp/schedule/scheduleholidaysetting.jsp:strHolidayName = new StringBuffer("");</ViolationValue>
         <ViolationValue>/src/main/webapp/schedule/scheduleholidaysetting.jsp:strHolidayName = new StringBuffer(aHScheduleHoliday.holiday_name) ;</ViolationValue>
         <ViolationValue>/src/main/webapp/scratch/index.jsp:Hashtable hashtable = scratchData.getLatest(user_no);</ViolationValue>
+		<ViolationValue>/src/main/java/org/oscarehr/ws/MeasurementWs.java:messageFormat.format(message.getValues(), new StringBuffer(), null).toString());</ViolationValue>
     </ViolationSet>
 </TrackingRegexpCheck>

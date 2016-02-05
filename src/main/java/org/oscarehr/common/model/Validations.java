@@ -43,26 +43,26 @@ public class Validations extends AbstractModel<Integer>{
 
 	private String regularExp;
 
-	private double minValue;
+	private Double minValue;
 
-	private double maxValue;
+	private Double maxValue;
 
-	private int minLength;
+	private Integer minLength;
 
-	private int maxLength;
+	private Integer maxLength;
 
-	private boolean isNumeric;
+	private Boolean isNumeric;
 
-	private boolean isTrue;
+	private Boolean isTrue;
 
-	private boolean isDate;
+	private Boolean isDate;
 
 	public Integer getId() {
     	return id;
     }
 
 	public void setId(Integer id) {
-    	this.id = id;
+    	this.id = new Integer(id);
     }
 
 	public String getName() {
@@ -81,59 +81,59 @@ public class Validations extends AbstractModel<Integer>{
     	this.regularExp = regularExp;
     }
 
-	public double getMinValue() {
+	public Double getMinValue() {
     	return minValue;
     }
 
-	public void setMinValue(double minValue) {
+	public void setMinValue(Double minValue) {
     	this.minValue = minValue;
     }
 
-	public double getMaxValue() {
+	public Double getMaxValue() {
     	return maxValue;
     }
 
-	public void setMaxValue(double maxValue) {
+	public void setMaxValue(Double maxValue) {
     	this.maxValue = maxValue;
     }
 
-	public int getMinLength() {
+	public Integer getMinLength() {
     	return minLength;
     }
 
-	public void setMinLength(int minLength) {
+	public void setMinLength(Integer minLength) {
     	this.minLength = minLength;
     }
 
-	public int getMaxLength() {
+	public Integer getMaxLength() {
     	return maxLength;
     }
 
-	public void setMaxLength(int maxLength) {
+	public void setMaxLength(Integer maxLength) {
     	this.maxLength = maxLength;
     }
 
-	public boolean isNumeric() {
+	public Boolean isNumeric() {
     	return isNumeric;
     }
 
-	public void setNumeric(boolean isNumeric) {
+	public void setNumeric(Boolean isNumeric) {
     	this.isNumeric = isNumeric;
     }
 
-	public boolean isTrue() {
+	public Boolean isTrue() {
     	return isTrue;
     }
 
-	public void setTrue(boolean isTrue) {
+	public void setTrue(Boolean isTrue) {
     	this.isTrue = isTrue;
     }
 
-	public boolean isDate() {
+	public Boolean isDate() {
     	return isDate;
     }
 
-	public void setDate(boolean isDate) {
+	public void setDate(Boolean isDate) {
     	this.isDate = isDate;
     }
 
