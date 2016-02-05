@@ -27,6 +27,7 @@ package org.oscarehr.appointment.web;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -104,6 +105,8 @@ public class NextAppointmentSearchHelper {
 		}
 		
 		logger.info(results.size() + " available appointments found.");
+		
+		Collections.sort(results, new NextAppointmentSearchResultDateComparator());
 		return results;
 	}
 	
