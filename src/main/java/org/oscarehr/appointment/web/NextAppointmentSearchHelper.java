@@ -67,10 +67,12 @@ public class NextAppointmentSearchHelper {
 	public static List<NextAppointmentSearchResult> search(NextAppointmentSearchBean searchBean) {
 		List<NextAppointmentSearchResult> results = new ArrayList<NextAppointmentSearchResult>();
 		
-		logger.info("SEARCH AVAILABLE APPOINTMENTS:");
+		String provider_no = searchBean.getProviderNo().trim();
+		boolean searchAllProviders = provider_no.equals("");
+		logger.info("SEARCH AVAILABLE APPOINTMENTS: " + provider_no);
 				
 		Calendar c = Calendar.getInstance();
-		/* limit the number of templates we retrieve from the database
+		/* hard limit on the number of templates we retrieve from the database
 		 * if we can't find any free appointments before reaching this limit they probably don't have any. */
 		int maxResults = 500 ; 
 		
@@ -78,7 +80,7 @@ public class NextAppointmentSearchHelper {
 		ArrayList<String> providerNos = new ArrayList<String>();
 		
 		// search all providers
-		if(searchBean.getProviderNo().equals("")) { 
+		if(searchAllProviders) {
 			List<Provider> providers = providerDao.getActiveProviders();
 			for(Provider p:providers) {
 				providerNos.add(p.getProviderNo());
@@ -86,7 +88,7 @@ public class NextAppointmentSearchHelper {
 		}
 		// search specific provider
 		else {
-			providerNos.add(searchBean.getProviderNo());
+			providerNos.add(provider_no);
 		}
 		
 		ArrayList<Integer> daysOfWeek = getDaysOfWeek(searchBean);
@@ -95,18 +97,36 @@ public class NextAppointmentSearchHelper {
 		c.add(Calendar.DAY_OF_MONTH, MAX_DAYS_TO_SEARCH);
 		List<ScheduleDate> scheduleDateList = scheduleDateDao.findByProviderListAndDateRange(providerNos, currentTime, c.getTime(), maxResults, daysOfWeek);
 		
+		/* the calendar comparison is a hack to ensure all provider templates for each day are loaded before checking the break condition.
+		 * this ensures all templates are included when sorting by appointment time. only effects multiple provider search results */
+		Calendar sdCal = Calendar.getInstance();
+		Calendar lastSdCal = Calendar.getInstance();
+		if(!scheduleDateList.isEmpty()) {
+			lastSdCal.setTime(scheduleDateList.get(0).getDate());
+		}
+		int templatesUsed = 0;
 		for(ScheduleDate sd : scheduleDateList) {
 			results.addAll(searchTemplate(sd.getProviderNo(), sd.getHour(), sd.getDate(), searchBean));
+			templatesUsed++;
 			/* since each DB result can have multiple openings, we can skip the later ones if there are 
-			 * more than the max amount being displayed */
-			if(results.size() >= searchBean.getNumResults()) {
+			 * more than the max amount being displayed. Can't do this with multiple providers since this causes
+			 * only a single provider to show up; because all free times were from the first template loaded.*/
+			sdCal.setTime(sd.getDate());
+			if( !(searchAllProviders && lastSdCal.get(Calendar.DAY_OF_YEAR) != sdCal.get(Calendar.DAY_OF_YEAR)) 
+					&& results.size() >= searchBean.getNumResults()) {
 				break;
 			}
+			lastSdCal.setTime(sd.getDate());
 		}
-		
+		logger.info(templatesUsed + " schedule templates searched.");
 		logger.info(results.size() + " available appointments found.");
 		
 		Collections.sort(results, new NextAppointmentSearchResultDateComparator());
+		
+		// trim the sorted list to the proper size
+		if (searchBean.getNumResults() < results.size()) {
+			return results.subList(0, searchBean.getNumResults());
+		}
 		return results;
 	}
 	
