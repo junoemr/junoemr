@@ -38,8 +38,10 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.common.dao.ValidationsDao;
 import org.oscarehr.common.dao.MeasurementDao;
+import org.oscarehr.common.dao.MeasurementTypeDao;
 import org.oscarehr.common.model.Validations;
 import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.MeasurementType;
 import org.oscarehr.common.model.MeasurementInvalidException;
 import org.oscarehr.common.model.MeasurementNotFoundException;
 import org.apache.log4j.Logger;
@@ -71,7 +73,7 @@ public class MeasurementWs extends AbstractWs {
 	}
 
     public String addMeasurement(String providerNo, String demographicNo, String inputType,
-			String inputTypeDisplay, String mInstrc, String inputValue, String dateObserved, 
+			String mInstrc, String inputValue, String dateObserved, 
 			String comments)
 		throws IOException, MeasurementNotFoundException, 
 			MeasurementInvalidException, ParseException
@@ -107,6 +109,18 @@ public class MeasurementWs extends AbstractWs {
 		int iMin = (val.getMinLength() != null ? val.getMinLength() : 0);
 
 
+		MeasurementTypeDao measurementTypeDao =
+			(MeasurementTypeDao) SpringUtils.getBean("measurementTypeDao");
+		List<MeasurementType> types = measurementTypeDao.findByType(inputType);
+
+		String inputTypeDisplay = "";
+		Iterator type_iter = types.iterator();
+		if(type_iter.hasNext()){
+			MeasurementType type = (MeasurementType) type_iter.next();
+			inputTypeDisplay = type.getTypeDescription();
+		}
+
+
 		// Validate the measurement
 		
 		boolean valid = true;
@@ -129,17 +143,17 @@ public class MeasurementWs extends AbstractWs {
 
 		if(!ectValidation.matchRegExp(regExp, inputValue)){
 			errors.add(inputValueName,
-					new ActionMessage("errors.invalid", inputTypeDisplay));
+				new ActionMessage("errors.invalid", inputTypeDisplay));
 			valid = false;
 		}
 		if(!ectValidation.isValidBloodPressure(regExp, inputValue)){
 			errors.add(inputValueName,
-					new ActionMessage("error.bloodPressure"));
+				new ActionMessage("errors.bloodPressure"));
 			valid = false;
 		}
 		if(!ectValidation.isDate(dateObserved)&&inputValue.compareTo("")!=0){
 			errors.add(inputValueName,
-					new ActionMessage("errors.invalidDate", inputTypeDisplay));
+				new ActionMessage("errors.invalidDate", inputTypeDisplay));
 			valid = false;
 		}
 
@@ -153,8 +167,15 @@ public class MeasurementWs extends AbstractWs {
 
 				ActionMessage message = (ActionMessage)errorIter.next();
 
+				String format = messages.get(message.getKey());
+
+				if(format == null){
+					throw new MeasurementInvalidException(
+						"No error message for type: " + message.getKey());
+				}
+
 				MessageFormat messageFormat = 
-					new MessageFormat(messages.get(message.getKey()));
+					new MessageFormat(format);
 
 				if(!errorMessages.toString().equals("")){
 					errorMessages.append(", ");
