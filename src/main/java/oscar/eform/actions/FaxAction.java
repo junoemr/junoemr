@@ -11,7 +11,7 @@ package oscar.eform.actions;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+//import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -21,7 +21,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.EFormDataDao;
+import org.oscarehr.common.dao.FaxConfigDao;
+import org.oscarehr.common.dao.FaxJobDao;
 import org.oscarehr.common.model.EFormData;
+import org.oscarehr.common.model.FaxConfig;
+import org.oscarehr.common.model.FaxJob;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
@@ -50,6 +54,12 @@ public final class FaxAction {
 	private String getEformRequestUrl(HttpServletRequest request) {
 		StringBuilder url = new StringBuilder();
 		String scheme = request.getScheme();
+		String prop_scheme = OscarProperties.getInstance().getProperty("oscar_protocol");
+		if(prop_scheme != null && prop_scheme != "")
+		{
+			scheme = prop_scheme;
+		}
+
 		Integer port;
 		try { port = new Integer(OscarProperties.getInstance().getProperty("oscar_port")); }
 	    catch (Exception e) { port = 8443; }
@@ -83,8 +93,12 @@ public final class FaxAction {
 		try {
 			logger.info("Generating PDF for eform with fdid = " + formId);
 
-			tempFile = File.createTempFile("EForm." + formId, ".pdf");
+			String pdfFile = "EForm." + formId + System.currentTimeMillis();
+			tempFile = File.createTempFile(pdfFile, ".pdf");
 			//tempFile.deleteOnExit();
+			
+			String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "/";
+			FileUtils.copyFile(tempFile, new File(path + tempFile.getName()));
 
 			// convert to PDF
 			String viewUri = localUri + formId;
@@ -102,27 +116,63 @@ public final class FaxAction {
 			String tempPath = System.getProperty("java.io.tmpdir");
 			FileOutputStream fos;
 			for (int i = 0; i < recipients.size(); i++) {					
-			    String faxNo = recipients.get(i).trim().replaceAll("\\D", "");
-			    if (faxNo.length() < 7) { throw new DocumentException("Document target fax number '"+faxNo+"' is invalid."); }
-			    String tempName = "EForm-" + formId + "." + System.currentTimeMillis();
 				
-				String tempPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
-				String tempTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
+			    String faxNo = recipients.get(i).trim().replaceAll("\\D", "");
+			    if (faxNo.length() < 7) { 
+					throw new DocumentException("Document target fax number '"+faxNo+"' is invalid."); 
+				}
+
+				String demo = req.getParameter("demographic_no");
+				FaxJobDao faxJobDao = SpringUtils.getBean(FaxJobDao.class);
+				FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
+				List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
+				String provider_no = 
+					LoggedInInfo.getLoggedInInfoFromSession(req).getLoggedInProviderNo();
+
+				FaxJob faxJob;
+				boolean validFaxNumber = false;
+			                
+				for( FaxConfig faxConfig : faxConfigs ) {
+
+					PdfReader pdfReader = new PdfReader(path + tempFile.getName());
+
+					faxJob = new FaxJob();
+					faxJob.setDestination(faxNo);
+					//faxJob.setFax_line(faxNumber);
+					faxJob.setFax_line(null);
+					faxJob.setFile_name(tempFile.getName());
+					faxJob.setUser(faxConfig.getFaxUser());
+					faxJob.setNumPages(pdfReader.getNumberOfPages());
+					faxJob.setStamp(new Date());
+					faxJob.setStatus(FaxJob.STATUS.SENT);
+					faxJob.setOscarUser(provider_no);
+					//faxJob.setDemographicNo(Integer.parseInt(demo));
+					faxJob.setDemographicNo(null);
+
+					faxJobDao.persist(faxJob);
+					validFaxNumber = true;
+					break;
+				}
+
+			    //String tempName = "EForm-" + formId + "." + System.currentTimeMillis();
+				
+				//String tempPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
+				//String tempTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
 				
 				// Copying the fax pdf.
-				FileUtils.copyFile(tempFile, new File(tempPdf));
+				//FileUtils.copyFile(tempFile, new File(tempPdf));
 				
 				// Creating text file with the specialists fax number.
-				fos = new FileOutputStream(tempTxt);				
-				PrintWriter pw = new PrintWriter(fos);
-				pw.println(faxNo);
-				pw.close();
-				fos.close();
+				//fos = new FileOutputStream(tempTxt);				
+				//PrintWriter pw = new PrintWriter(fos);
+				//pw.println(faxNo);
+				//pw.close();
+				//fos.close();
 				
 				// A little sanity check to ensure both files exist.
-				if (!new File(tempPdf).exists() || !new File(tempTxt).exists()) {
-					throw new DocumentException("Unable to create files for fax of eform " + formId + ".");
-				}		
+				//if (!new File(tempPdf).exists() || !new File(tempTxt).exists()) {
+			//		throw new DocumentException("Unable to create files for fax of eform " + formId + ".");
+				//}		
 				if (skipSave) {
 		        	 EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
 		        	 EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));

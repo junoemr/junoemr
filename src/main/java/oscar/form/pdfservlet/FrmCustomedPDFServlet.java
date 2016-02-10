@@ -109,7 +109,7 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 					writer.println("<script>alert('Error: No fax number found!');window.close();</script>");
 				} else {
 		                	// write to file
-		                	String pdfFile = "prescription_"+req.getParameter("pdfId")+".pdf";
+		                	String pdfFile = "prescription_"+Long.parseLong(req.getParameter("pdfId"), 10)+".pdf";
 		                	String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "/";
 		                	FileOutputStream fos = new FileOutputStream(path+pdfFile);
 		                	baosPDF.writeTo(fos);

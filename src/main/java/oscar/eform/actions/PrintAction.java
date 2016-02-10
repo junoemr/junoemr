@@ -76,9 +76,16 @@ public class PrintAction extends Action {
 	private String getEformRequestUrl(HttpServletRequest request) {
 		StringBuilder url = new StringBuilder();
 		String scheme = request.getScheme();
+		String prop_scheme = OscarProperties.getInstance().getProperty("oscar_protocol");
+		if(prop_scheme != null && prop_scheme != "")
+		{
+			scheme = prop_scheme;
+		}
+
 		Integer port;
 		try { port = new Integer(OscarProperties.getInstance().getProperty("oscar_port")); }
 	    catch (Exception e) { port = 8443; }
+		//int port = request.getServerPort();
 		if (port < 0) port = 80; // Work around java.net.URL bug
 
 		url.append(scheme);
