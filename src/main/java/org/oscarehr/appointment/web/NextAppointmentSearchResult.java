@@ -27,6 +27,7 @@ package org.oscarehr.appointment.web;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 
 import org.oscarehr.common.model.Provider;
@@ -96,3 +97,18 @@ public class NextAppointmentSearchResult {
 	}
 	
 }
+
+class NextAppointmentSearchResultDateComparator implements Comparator<NextAppointmentSearchResult> {
+    @Override
+    public int compare(NextAppointmentSearchResult a, NextAppointmentSearchResult b) {
+    	
+    	if(a.getDate().after(b.getDate())) {
+    		return 1;
+    	}
+    	else if(a.getDate().before(b.getDate())) {
+    		return -1;
+    	}
+        return 0;
+    }
+}
+

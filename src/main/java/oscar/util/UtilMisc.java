@@ -423,29 +423,32 @@ public class UtilMisc {
   }
 
   
-  //returns a 2d array from the result set
-  //Used by 'report by template'
-  public static String[][] getArrayFromResultSet(ResultSet rs) throws SQLException {
-	ResultSetMetaData rsmd = rs.getMetaData();
-        int columns = rsmd.getColumnCount();
-        ArrayList rows = new ArrayList();
-        ArrayList cols = new ArrayList();
-	for (int i=0; i<columns; i++) {  // for each column in result set
-            cols.add(rsmd.getColumnName(i+1));
+	//returns a 2d array from the result set
+	//Used by 'report by template'
+	public static String[][] getArrayFromResultSet(ResultSet rs) throws SQLException {
+		ResultSetMetaData rsmd = rs.getMetaData();
+		int columns = rsmd.getColumnCount();
+		ArrayList<ArrayList<String>> rows = new ArrayList<ArrayList<String>>();
+		ArrayList<String> cols = new ArrayList<String>();
+		for (int i = 0; i < columns; i++) { // for each column in result set
+			cols.add(rsmd.getColumnName(i + 1));
+		}
+		rows.add(cols);
+		// if first result set is not empty, move cursor to first row
+		if ( rs.first() ) { 
+			do {
+				cols = new ArrayList<String>();
+				for (int j = 0; j < columns; j++) {
+					cols.add(oscar.Misc.getString(rs, j + 1));
+				}
+				rows.add(cols);
+			} while (rs.next());
+		}
+		
+		String[][] data = new String[rows.size()][columns];
+		for (int i = 0; i < rows.size(); i++) {
+			data[i] = rows.get(i).toArray(data[i]);
+		}
+		return data;
 	}
-        rows.add(cols);
-        rs.first();
-        do {
-            cols = new ArrayList();
-            for(int j=0; j<columns; j++) {
-                cols.add(oscar.Misc.getString(rs,j+1));
-            }
-            rows.add(cols);
-        } while (rs.next());
-        String[][] data = new String[rows.size()][columns];
-        for (int i=0; i<rows.size(); i++) {
-            data[i] = (String[]) ((ArrayList) rows.get(i)).toArray(data[i]);
-        }
-	return data;
-    }
 }

@@ -23,41 +23,19 @@
  */
 
 
-package org.oscarehr.common.dao;
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 
-import java.util.List;
+package org.oscarehr.common.model;
 
-import javax.persistence.Query;
-
-import org.oscarehr.common.model.Validations;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public class ValidationsDao extends AbstractDao<Validations>{
-    
-	public ValidationsDao() {
-		super(Validations.class);
-	}
-
-    public List<Validations> getFromMeasurementType(String inputType, 
-			String mInstrc){
-		String sqlCommand = "SELECT x " +
-			"FROM " + modelClass.getSimpleName() + " x " +
-			"WHERE x.id IN (" + 
-			"  SELECT validation " +
-			"  FROM MeasurementType " +
-			"  WHERE type = ? " +
-			"  AND measuringInstruction = ? " +
-			")"; 
-
-		Query query = entityManager.createQuery(sqlCommand);
-
-		query.setParameter(1, inputType);
-		query.setParameter(2, mInstrc);
-
-		@SuppressWarnings("unchecked")
-		List<Validations> results = query.getResultList();
-
-		return (results);
-	}
+public class MeasurementInvalidException extends Exception {
+    public MeasurementInvalidException(String message, Throwable e) {
+        super(message, e);
+    }
+    public MeasurementInvalidException(String message) {
+        super(message);
+    }
 }
+

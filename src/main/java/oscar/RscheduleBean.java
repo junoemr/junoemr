@@ -25,11 +25,12 @@
 
 package oscar;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.StringTokenizer;
 
-public class RscheduleBean {
+public class RscheduleBean implements Serializable {
 	
   public String provider_no = "";
   public String sdate = "";
@@ -44,16 +45,16 @@ public class RscheduleBean {
   private String sitedaytag[] = {"A7","A1","A2","A3","A4","A5","A6"};
 
   public RscheduleBean() {}
-  public RscheduleBean( String provider_no1, String sdate1,String edate1,String bAvailable1, String day_of_week1, String avail_hourB1, String avail_hour1, String creator1) {
-    provider_no = provider_no1;
-    sdate = sdate1;
-    edate = edate1;
-    available = bAvailable1;
-    day_of_week = day_of_week1;
-    avail_hourB = avail_hourB1;
-    avail_hour = avail_hour1;
-    creator = creator1;
-	}
+
+  public RscheduleBean(String provider_no1, String sdate1, String edate1, String bAvailable1, String day_of_week1, String avail_hourB1, String avail_hour1, String creator1) {
+	  setRscheduleBean(provider_no1, sdate1, edate1, bAvailable1, day_of_week1, avail_hourB1, avail_hour1, creator1);
+  }
+  public void setRscheduleBean(String provider_no1, String sdate1,String edate1, String bAvailable1, String day_of_week1, String day_of_week2 ,String avail_hourB1, String avail_hour1, String creator1) { 
+	  setRscheduleBean( provider_no1, sdate1, edate1, bAvailable1, ( day_of_week1+"|"+day_of_week2 ), avail_hourB1, avail_hour1, creator1 );
+  }  
+  public void clear() {
+	  setRscheduleBean("", "", "", "", "", "", "", "");
+  } 
   public void setRscheduleBean(String provider_no1, String sdate1,String edate1, String bAvailable1, String day_of_week1, String avail_hourB1, String avail_hour1, String creator1) { 
     provider_no = provider_no1;
     sdate = sdate1;
@@ -63,27 +64,7 @@ public class RscheduleBean {
     avail_hourB = avail_hourB1;
     avail_hour = avail_hour1;
     creator = creator1;
-  }  
-  public void setRscheduleBean(String provider_no1, String sdate1,String edate1, String bAvailable1, String day_of_week1, String day_of_week2 ,String avail_hourB1, String avail_hour1, String creator1) { 
-    provider_no = provider_no1;
-    sdate = sdate1;
-    edate = edate1;
-    available = bAvailable1;
-    day_of_week = day_of_week1+"|"+day_of_week2;
-    avail_hourB = avail_hourB1;
-    avail_hour = avail_hour1;
-    creator = creator1;
-  }  
-  public void clear() { 
-    provider_no = "";
-    sdate = "";
-    edate = "";
-    available = "";
-    day_of_week = "";
-    avail_hourB = "";
-    avail_hour = "";
-    creator = "";
-  }  
+  }   
   public boolean getEvenWeek(GregorianCalendar aDate) { 
   	int sWeek = (new GregorianCalendar(MyDateFormat.getYearFromStandardDate(this.sdate), MyDateFormat.getMonthFromStandardDate(this.sdate)-1,MyDateFormat.getDayFromStandardDate(this.sdate))).get(Calendar.WEEK_OF_YEAR);
   	int curWeek = aDate.get(Calendar.WEEK_OF_YEAR);
