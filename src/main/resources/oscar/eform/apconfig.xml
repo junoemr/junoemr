@@ -328,7 +328,7 @@
         <ap-sql>SELECT GROUP_CONCAT(pa.display_name SEPARATOR ';') as list
         		 FROM licensed_producer_address pa
        	</ap-sql>
-        <ap-output>${address_name}</ap-output>
+        <ap-output>${list}</ap-output>
     </databaseap>
 	<databaseap>
         <ap-name>licensed_producer_full_address</ap-name>
