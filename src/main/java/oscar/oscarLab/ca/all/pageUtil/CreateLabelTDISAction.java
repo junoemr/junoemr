@@ -54,6 +54,10 @@ public class CreateLabelTDISAction extends Action {
 			request.setAttribute("error", "There was an error creating a label.");
 		}
 		
+		if( ajaxcall != null && !"null".equalsIgnoreCase(ajaxcall)) {
+			return null;
+		}
+		
 		return mapping.findForward("complete");
 	}
 

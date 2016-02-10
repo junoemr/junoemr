@@ -246,7 +246,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
       	      type: "POST",
       	      url: '<%=request.getContextPath()%>'+"/lab/CA/ALL/createLabelTDIS.do",
       	      dataType: "json",
-      	      data: { lab_no: jQuery("#labNum").val(),accessionNum: jQuery("#accNum").val(), label: jQuery("#label").val() }
+      	      data: { lab_no: jQuery("#labNum").val(),accessionNum: jQuery("#accNum").val(), label: jQuery("#label").val(), ajaxcall: true }
 
 
       	    });
@@ -433,7 +433,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
               type: "POST",
               url: '<%=request.getContextPath()%>'+"/lab/CA/ALL/createLabelTDIS.do",
               dataType: "json",
-              data: { lab_no: jQuery("#labNum").val(),accessionNum: jQuery("#accNum").val(), label: jQuery("#label").val() }
+              data: { lab_no: jQuery("#labNum").val(),accessionNum: jQuery("#accNum").val(), label: jQuery("#label").val(), ajaxcall: true}
               });
 
             if(success) handleLab('acknowledgeForm','<%=segmentID%>','<%=demographicID%>', action);
