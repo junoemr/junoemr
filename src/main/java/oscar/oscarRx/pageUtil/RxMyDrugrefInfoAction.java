@@ -467,15 +467,16 @@ public final class RxMyDrugrefInfoAction extends DispatchAction {
         String server_url = OscarProperties.getInstance().getProperty("MY_DRUGREF_URL","http://mydrugref.org/backend/api");
 
         TimingOutCallback callback = new TimingOutCallback(10 * 1000);
+        
         try{
-            log2.debug("server_url :"+server_url);
+            log2.debug("server_url: "+server_url);
             XmlRpcClientLite server = new XmlRpcClientLite(server_url);
             server.executeAsync(procedureName, params, callback);
             object = callback.waitForResponse();
         } catch (TimeoutException e) {
-            log2.debug("No response from server."+server_url);
+            log2.warn("No response from server: "+server_url);
         }catch(Throwable ethrow){
-            log2.debug("Throwing error."+ethrow.getMessage());
+            log2.error("Throwing error: "+ethrow.getMessage());
         }
         return object;
     }

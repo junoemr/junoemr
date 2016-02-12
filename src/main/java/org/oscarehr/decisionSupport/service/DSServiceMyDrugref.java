@@ -62,15 +62,20 @@ public class DSServiceMyDrugref extends DSService {
 
     public void fetchGuidelinesFromService(String providerNo) {
 
+        String drugrefID = this.getMyDrugrefId(providerNo);
+        if ( drugrefID == null) {
+        	logger.warn("No drugrefID property for provider " + providerNo + " in database. Provider decision support not retrieved from MyDrugref.");
+        	return;
+        }
         Vector<String> params = new Vector<String>();
-        params.addElement(this.getMyDrugrefId(providerNo));
+        params.addElement(drugrefID);
         RxMyDrugrefInfoAction myDrugrefAction = new RxMyDrugrefInfoAction();
         try {
             logger.debug("CALLING MYDRUGREF");
             @SuppressWarnings("unchecked")
             Vector<Hashtable<String,String>> providerGuidelines = (Vector<Hashtable<String,String>>) myDrugrefAction.callWebserviceLite("GetGuidelineIds", params);
             if (providerGuidelines == null) {
-                logger.error("Could not get provider decision support guidelines from MyDrugref.");
+                logger.warn("Could not get provider decision support guidelines from MyDrugref.");
                 return;
             }
             logger.debug("MyDrugref call returned: " + providerGuidelines.size() + " guidelines");
