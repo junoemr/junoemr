@@ -25,6 +25,7 @@
 
 package org.oscarehr.phr;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Transient;
@@ -35,7 +36,7 @@ import org.indivo.xml.talk.AuthenticateResultType;
 
 import oscar.oscarEncounter.data.EctProviderData;
 
-public final class PHRAuthentication
+public final class PHRAuthentication implements Serializable
 {
 	public static final String SESSION_PHR_AUTH = "PHR_AUTH";
 
