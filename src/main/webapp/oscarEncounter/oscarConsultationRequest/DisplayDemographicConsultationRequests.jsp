@@ -29,6 +29,8 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@page
 	import="oscar.oscarEncounter.pageUtil.*,oscar.oscarEncounter.data.*"%>
+<%@ page import="oscar.OscarProperties"%>
+<%@ page import="java.util.*, java.net.*"%>
 
 <%
 if(session.getAttribute("user") == null) response.sendRedirect("../../logout.jsp");
@@ -36,6 +38,8 @@ String demo = request.getParameter("de");
 String proNo = (String) session.getAttribute("user");
 oscar.oscarDemographic.data.DemographicData demoData=null;
 org.oscarehr.common.model.Demographic demographic=null;
+
+OscarProperties oscarProps = OscarProperties.getInstance();
 
 oscar.oscarProvider.data.ProviderData pdata = new oscar.oscarProvider.data.ProviderData(proNo);
 String team = pdata.getTeam();
@@ -108,8 +112,8 @@ function popupOscarConS(vheight,vwidth,varpage) { //open a new popup window
 				<td class="Header" NOWRAP><bean:message
 					key="oscarEncounter.oscarConsultationRequest.DisplayDemographicConsultationRequests.msgConsReqFor" />
 				<%=demographic.getLastName() %>, <%=demographic.getFirstName()%> <%=demographic.getSex()%>
-				<%=demographic.getAge()%></td>
-				<td></td>
+				<%=demographic.getAge()%>
+				</td>
 			</tr>
 		</table>
 		</td>
@@ -124,6 +128,60 @@ function popupOscarConS(vheight,vwidth,varpage) { //open a new popup window
 					key="oscarEncounter.oscarConsultationRequest.ConsultChoice.btnNewCon" /></a>
 				</td>
 			</tr>
+			<%
+			/* -- Begin custom work OHSUPPORT 2883 - add invoice link to consultation page -- */
+			if(oscarProps.isPropertyActive("enable_consultation_invoice_link")){
+				String prov= (oscarProps.getProperty("billregion","")).trim().toUpperCase();
+				String billingServiceType = URLEncoder.encode(oscarProps.getProperty("default_view"));
+				
+			    GregorianCalendar now=new GregorianCalendar();
+			    int curYear = now.get(Calendar.YEAR);
+			    int curMonth = (now.get(Calendar.MONTH)+1);
+			    int curDay = now.get(Calendar.DAY_OF_MONTH);
+			    
+				String strYear=""+curYear;
+				String strMonth=curMonth>9?(""+curMonth):("0"+curMonth);
+				String strDay=curDay>9?(""+curDay):("0"+curDay);
+				String newDateString = strYear+"-"+strMonth+"-"+strDay;
+				String dateString = curYear+"-"+curMonth+"-"+curDay;
+				String linkProvider=proNo;
+				/*if(apptProvider!=null){
+					linkProvider=apptProvider;
+				}*/
+
+    			%>
+				<tr>
+				<%
+				if(oscarProps.isPropertyActive("clinicaid_billing")){
+					String clinicaid_link = "../../billing/billingClinicAid.jsp?demographic_no="+demographic.getDemographicNo()+
+						"&service_start_date="+URLEncoder.encode(newDateString, "UTF-8")+
+						"&chart_no="+demographic.getChartNo()+
+						"&appointment_start_time=0"+
+						"&appointment_provider_no="+linkProvider+
+						"&billing_action=create_invoice&appointment_no=0";
+					%>
+					<td>
+						<a href="<%=clinicaid_link%>" target="_blank" title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>">
+							<bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/>
+						</a>
+					</td>
+				<%
+				}
+				else {
+					String invoice_link = "../../billing.do?billRegion=" + URLEncoder.encode(prov) + "&billForm=" + billingServiceType
+							+ "&hotclick=&appointment_no=0&demographic_name=" + URLEncoder.encode(demographic.getLastName()) + "%2C"
+						 	+ URLEncoder.encode(demographic.getFirstName()) + "&demographic_no=" + demographic.getDemographicNo() + "&providerview=1&user_no=" 
+							+ proNo + "&apptProvider_no=none&appointment_date=" + dateString + "&start_time=0:00&bNewForm=1&status=t";
+				%>
+				<td NOWRAP><a 
+	                href="<%=invoice_link%>"
+					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/>
+				</a></td> <%
+				}%>
+				</tr>
+			<%
+			}
+		/* -- End custom work OHSUPPORT 2883 -- */%>
 		</table>
 		</td>
 		<td class="MainTableRightColumn">
