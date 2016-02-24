@@ -2516,10 +2516,14 @@ function changeDiagnosisUnresolved(issueId) {
     function toggleNotePasswd() {
         if( passwordEnabled ) {
             Element.toggle('notePasswd');
-            if( $('notePasswd').style.display != "none" )
+            if( $('notePasswd').style.display != "none" ) {
+            	document.forms['caseManagementEntryForm'].elements['caseNote.password'].removeAttribute('readonly');
+            	document.forms['caseManagementEntryForm'].elements['caseNote.passwordConfirm'].removeAttribute('readonly');
                 document.forms['caseManagementEntryForm'].elements['caseNote.password'].focus();
-            else
+            }
+            else {
                 document.forms['caseManagementEntryForm'].elements[caseNote].focus();
+            }
         }
         return false;
     }
@@ -2706,7 +2710,7 @@ function newNote(e) {
     var input = "<textarea tabindex='7' cols='84' rows='1' wrap='hard' class='txtArea' style='line-height:1.0em;' name='caseNote_note' id='caseNote_note" + newNoteIdx + "'>" + reason + "<\/textarea>";
     var passwd = "";
     if( passwordEnabled ) {
-        passwd = "<p style='background-color:#CCCCFF; display:none; margin:0px;' id='notePasswd'>Password:&nbsp;<input type='password' name='caseNote.password'/><\/p>";
+        passwd = "<p style='background-color:#CCCCFF; display:none; margin:0px;' id='notePasswd'>Password:&nbsp;<input type='password' name='caseNote.password' autocomplete='off' readonly\/><\/p>";
     }
 
     // the extra BR NBSP at the ends are for IE fix for selection box is out of scrolling pane view.

@@ -377,7 +377,7 @@ int maxId = 0;
 						<div class="sig" style="display:inline;<%=bgColour%>" id="sig<%=globalNoteId%>"><%@ include file="noteIssueList.jsp"%></div>
 
 						<c:if test="${sessionScope.passwordEnabled=='true'}">
-							<p style='background-color: #CCCCFF; display: none; margin: 0px;' id='notePasswd'>Password:&nbsp;<input type="password" name="caseNote.password" value="" />&nbsp;Confirmation:&nbsp;<input type='password' name='caseNote.passwordConfirm'/></p>
+							<p style='background-color: #CCCCFF; display: none; margin: 0px;' id='notePasswd'>Password:&nbsp;<input type="password" readonly name="caseNote.password" value="" autocomplete="off" />&nbsp;Confirmation:&nbsp;<input type='password' readonly name='caseNote.passwordConfirm' autocomplete='off'/></p>
 						</c:if>
 					<%
 		 		}
@@ -770,7 +770,7 @@ int maxId = 0;
 			<div class="sig" id="sig<%=savedId%>"><%@ include file="noteIssueList.jsp"%></div>
 
 			<c:if test="${sessionScope.passwordEnabled=='true'}">
-				<p style='background-color: #CCCCFF; display: none; margin: 0px;' id='notePasswd'>Password:&nbsp;<input type="password" name="caseNote.password" value="" />&nbsp;Confirmation:&nbsp;<input type='password' name='caseNote.passwordConfirm'/></p>
+				<p style='background-color: #CCCCFF; display: none; margin: 0px;' id='notePasswd'>Password:&nbsp;<input type="password" readonly name="caseNote.password" value="" autocomplete="off" />&nbsp;Confirmation:&nbsp;<input type='password' readonly name='caseNote.passwordConfirm' autocomplete="off"/></p>
 			</c:if>
 		</div>
 	</div>
