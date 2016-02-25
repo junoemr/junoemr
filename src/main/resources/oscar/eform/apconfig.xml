@@ -337,12 +337,46 @@
        	</ap-sql>
         <ap-output>${address}\n${city}, ${province}, ${postal}</ap-output>
     </databaseap>
-    	<databaseap>
+    <databaseap>
         <ap-name>licensed_producer_full_address_list</ap-name>
         <ap-sql>SELECT GROUP_CONCAT(pa.address, '\n', pa.city, ', ', pa.province, ', ', pa.postal SEPARATOR ';') AS list
         		 FROM licensed_producer_address pa
        	</ap-sql>
         <ap-output>${list}</ap-output>
+    </databaseap>
+    
+<!-- Multisite Information -->
+    <databaseap>
+        <ap-name>multisite_name_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(REPLACE(name,';','') SEPARATOR ';') AS name_list FROM site WHERE status=1 ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${name_list}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>multisite_fax_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(REPLACE(fax,';','') SEPARATOR ';') AS fax_list FROM site WHERE status=1 ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${fax_list}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>multisite_phone_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(REPLACE(phone,';','') SEPARATOR ';') AS phone_list FROM site WHERE status=1 ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${phone_list}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>multisite_full_address_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(
+					REPLACE(address,';',''), ' ', 
+					REPLACE(city,';',''), ' ', 
+					REPLACE(province,';',''), ' ', 
+					REPLACE(postal,';','')
+					SEPARATOR ';') AS address_list
+					FROM site
+					WHERE status=1
+					ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${address_list}</ap-output>
     </databaseap>
 
 <!-- Patient medical information -->
