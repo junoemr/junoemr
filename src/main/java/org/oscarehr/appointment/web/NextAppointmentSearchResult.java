@@ -102,11 +102,16 @@ class NextAppointmentSearchResultDateComparator implements Comparator<NextAppoin
     @Override
     public int compare(NextAppointmentSearchResult a, NextAppointmentSearchResult b) {
     	
-    	if(a.getDate().after(b.getDate())) {
-    		return 1;
-    	}
-    	else if(a.getDate().before(b.getDate())) {
-    		return -1;
+    	Date dateA = a.getDate();
+    	Date dateB = b.getDate();
+    	
+    	if(dateA != null && dateB != null) {
+	    	if(dateA.after(dateB)) {
+	    		return 1;
+	    	}
+	    	else if(dateA.before(dateB)) {
+	    		return -1;
+	    	}
     	}
         return 0;
     }
