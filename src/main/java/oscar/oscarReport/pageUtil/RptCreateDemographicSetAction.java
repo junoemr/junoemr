@@ -30,10 +30,12 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.util.MiscUtils;
 
 import oscar.oscarReport.data.DemographicSets;
 
@@ -43,7 +45,8 @@ import oscar.oscarReport.data.DemographicSets;
  */
 public class RptCreateDemographicSetAction extends Action {
    
-
+	private static final Logger logger = MiscUtils.getLogger();
+	
    public RptCreateDemographicSetAction() {
    }
    
@@ -52,9 +55,11 @@ public class RptCreateDemographicSetAction extends Action {
 				 HttpServletRequest request,
 				 HttpServletResponse response){
 	
+	   logger.info("CREATING DEMOGRAPHIC SET ...");
+	   
       String setName = request.getParameter("setName");      
       String sizestr = request.getParameter("size");      
-      ArrayList list = new ArrayList();      
+      ArrayList<String> list = new ArrayList<String>();
       int size = Integer.parseInt(sizestr);
                                       
       for (int i = 0 ; i < size; i++){
@@ -65,6 +70,9 @@ public class RptCreateDemographicSetAction extends Action {
          DemographicSets demoSet = new DemographicSets();
          demoSet.addDemographicSet(setName,list);
       }                                       
+      
+      logger.info("DEMOGRAPHIC SET CREATED. LIST SIZE = " + list.size());
+      
       return (mapping.findForward("success"));
    }   
 }

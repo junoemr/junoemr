@@ -75,6 +75,22 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WebUtils;
 
+import cds.AlertsAndSpecialNeedsDocument.AlertsAndSpecialNeeds;
+import cds.AllergiesAndAdverseReactionsDocument.AllergiesAndAdverseReactions;
+import cds.AppointmentsDocument.Appointments;
+import cds.CareElementsDocument.CareElements;
+import cds.ClinicalNotesDocument.ClinicalNotes;
+import cds.DemographicsDocument.Demographics;
+import cds.FamilyHistoryDocument.FamilyHistory;
+import cds.ImmunizationsDocument.Immunizations;
+import cds.LaboratoryResultsDocument.LaboratoryResults;
+import cds.MedicationsAndTreatmentsDocument.MedicationsAndTreatments;
+import cds.OmdCdsDocument;
+import cds.PastHealthDocument.PastHealth;
+import cds.PatientRecordDocument.PatientRecord;
+import cds.ProblemListDocument.ProblemList;
+import cds.ReportsReceivedDocument.ReportsReceived;
+import cds.RiskFactorsDocument.RiskFactors;
 import oscar.OscarProperties;
 import oscar.appt.ApptData;
 import oscar.appt.ApptStatusData;
@@ -98,22 +114,6 @@ import oscar.oscarRx.data.RxPrescriptionData;
 import oscar.service.OscarSuperManager;
 import oscar.util.StringUtils;
 import oscar.util.UtilDateUtilities;
-import cds.AlertsAndSpecialNeedsDocument.AlertsAndSpecialNeeds;
-import cds.AllergiesAndAdverseReactionsDocument.AllergiesAndAdverseReactions;
-import cds.AppointmentsDocument.Appointments;
-import cds.CareElementsDocument.CareElements;
-import cds.ClinicalNotesDocument.ClinicalNotes;
-import cds.DemographicsDocument.Demographics;
-import cds.FamilyHistoryDocument.FamilyHistory;
-import cds.ImmunizationsDocument.Immunizations;
-import cds.LaboratoryResultsDocument.LaboratoryResults;
-import cds.MedicationsAndTreatmentsDocument.MedicationsAndTreatments;
-import cds.OmdCdsDocument;
-import cds.PastHealthDocument.PastHealth;
-import cds.PatientRecordDocument.PatientRecord;
-import cds.ProblemListDocument.ProblemList;
-import cds.ReportsReceivedDocument.ReportsReceived;
-import cds.RiskFactorsDocument.RiskFactors;
 
 /**
  *
@@ -154,6 +154,9 @@ public class DemographicExportAction4 extends Action {
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		logger.info("BEGIN DEMOGRAPHIC EXPORT ...");
+		
 		String strEditable = oscarProperties.getProperty("ENABLE_EDIT_APPT_STATUS");
 
 		DemographicExportForm defrm = (DemographicExportForm)form;
@@ -1967,7 +1970,7 @@ public class DemographicExportAction4 extends Action {
 	if (setName!=null) zipName = "export_"+setName.replace(" ","")+"_"+UtilDateUtilities.getToday("yyyyMMddHHmmss")+".zip";
 //	if (setName!=null) zipName = "export_"+setName.replace(" ","")+"_"+UtilDateUtilities.getToday("yyyyMMddHHmmss")+".pgp";
 	if (!Util.zipFiles(files, zipName, tmpDir)) {
-			logger.debug("Error! Failed to zip export files");
+			logger.error("Error! Failed to zip export files");
 	}
 
 		if (pgpReady.equals("Yes")) {
@@ -1981,7 +1984,7 @@ public class DemographicExportAction4 extends Action {
 				request.getSession().setAttribute("pgp_ready", "No");
 			}
 		} else {
-			logger.info("Warning: PGP Encryption NOT available - unencrypted file exported!");
+			logger.warn("PGP Encryption NOT available - unencrypted file exported!");
 			Util.downloadFile(zipName, tmpDir, response);
 			ffwd = "success";
 		}
@@ -1992,6 +1995,8 @@ public class DemographicExportAction4 extends Action {
 		Util.cleanFiles(files);
 	}
 
+	logger.info("DEMOGRAPHIC EXPORT COMPLETE");
+	
 	return mapping.findForward(ffwd);
 }
 
