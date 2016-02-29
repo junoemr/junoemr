@@ -214,6 +214,9 @@ import oscar.util.UtilDateUtilities;
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception  {
+    	
+    	logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
+    	
         admProviderNo = (String) request.getSession().getAttribute("user");
         programId = new EctProgram(request.getSession()).getProgram(admProviderNo);
         String tmpDir = oscarProperties.getProperty("TMP_DIR");
@@ -305,6 +308,7 @@ import oscar.util.UtilDateUtilities;
         request.setAttribute("warnings",warnings);
         if (importLog!=null) request.setAttribute("importlog",importLog.getPath());
 
+        logger.info("IMPORT PROCESS COMPLETE");
         return mapping.findForward("success");
     }
 
