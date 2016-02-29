@@ -28,9 +28,9 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@page
-	import="oscar.oscarEncounter.pageUtil.*,oscar.oscarEncounter.data.*"%>
+	import="oscar.oscarEncounter.pageUtil.*, oscar.SxmlMisc, oscar.oscarEncounter.data.*"%>
 <%@ page import="oscar.OscarProperties"%>
-<%@ page import="java.util.*, java.net.*"%>
+<%@ page import="java.util.*, java.net.*, org.apache.commons.lang.StringUtils"%>
 
 <%
 if(session.getAttribute("user") == null) response.sendRedirect("../../logout.jsp");
@@ -114,20 +114,7 @@ function popupOscarConS(vheight,vwidth,varpage) { //open a new popup window
 				<%=demographic.getLastName() %>, <%=demographic.getFirstName()%> <%=demographic.getSex()%>
 				<%=demographic.getAge()%>
 				</td>
-			</tr>
-		</table>
-		</td>
-	</tr>
-	<tr style="vertical-align: top">
-		<td class="MainTableLeftColumn">
-		<table>
-			<tr>
-				<td NOWRAP><a
-					href="javascript:popupOscarRx(700,960,'ConsultationFormRequest.jsp?de=<%=demo%>&teamVar=<%=team%>')">
-				<bean:message
-					key="oscarEncounter.oscarConsultationRequest.ConsultChoice.btnNewCon" /></a>
-				</td>
-			</tr>
+
 			<%
 			/* -- Begin custom work OHSUPPORT 2883 - add invoice link to consultation page -- */
 			if(oscarProps.isPropertyActive("enable_consultation_invoice_link")){
@@ -145,13 +132,7 @@ function popupOscarConS(vheight,vwidth,varpage) { //open a new popup window
 				String newDateString = strYear+"-"+strMonth+"-"+strDay;
 				String dateString = curYear+"-"+curMonth+"-"+curDay;
 				String linkProvider=proNo;
-				/*if(apptProvider!=null){
-					linkProvider=apptProvider;
-				}*/
 
-    			%>
-				<tr>
-				<%
 				if(oscarProps.isPropertyActive("clinicaid_billing")){
 					String clinicaid_link = "../../billing/billingClinicAid.jsp?demographic_no="+demographic.getDemographicNo()+
 						"&service_start_date="+URLEncoder.encode(newDateString, "UTF-8")+
@@ -160,7 +141,7 @@ function popupOscarConS(vheight,vwidth,varpage) { //open a new popup window
 						"&appointment_provider_no="+linkProvider+
 						"&billing_action=create_invoice&appointment_no=0";
 					%>
-					<td>
+					<td NOWRAP>
 						<a href="<%=clinicaid_link%>" target="_blank" title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>">
 							<bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/>
 						</a>
@@ -168,20 +149,39 @@ function popupOscarConS(vheight,vwidth,varpage) { //open a new popup window
 				<%
 				}
 				else {
+					
+					String referral_no_parameter = "";
+					if(oscarProps.isPropertyActive("auto_populate_billingreferral_bc")){
+                        String rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
+						referral_no_parameter = "&referral_no_1=" + (rdohip !=null ? rdohip : "");
+					}
+					
 					String invoice_link = "../../billing.do?billRegion=" + URLEncoder.encode(prov) + "&billForm=" + billingServiceType
 							+ "&hotclick=&appointment_no=0&demographic_name=" + URLEncoder.encode(demographic.getLastName()) + "%2C"
 						 	+ URLEncoder.encode(demographic.getFirstName()) + "&demographic_no=" + demographic.getDemographicNo() + "&providerview=1&user_no=" 
-							+ proNo + "&apptProvider_no=none&appointment_date=" + dateString + "&start_time=0:00&bNewForm=1&status=t";
+							+ proNo + "&apptProvider_no=none&appointment_date=" + dateString + "&start_time=0:00&bNewForm=1&status=t" + referral_no_parameter + "'";
 				%>
-				<td NOWRAP><a 
+				<td NOWRAP align='right'><a
 	                href="<%=invoice_link%>"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/>
 				</a></td> <%
-				}%>
-				</tr>
-			<%
+				}
 			}
-		/* -- End custom work OHSUPPORT 2883 -- */%>
+			/* -- End custom work OHSUPPORT 2883 -- */%>
+			</tr>
+		</table>
+		</td>
+	</tr>
+	<tr style="vertical-align: top">
+		<td class="MainTableLeftColumn">
+		<table>
+			<tr>
+				<td NOWRAP><a
+					href="javascript:popupOscarRx(700,960,'ConsultationFormRequest.jsp?de=<%=demo%>&teamVar=<%=team%>')">
+				<bean:message
+					key="oscarEncounter.oscarConsultationRequest.ConsultChoice.btnNewCon" /></a>
+				</td>
+			</tr>
 		</table>
 		</td>
 		<td class="MainTableRightColumn">
