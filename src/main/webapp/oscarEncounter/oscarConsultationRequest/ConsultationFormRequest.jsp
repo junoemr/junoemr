@@ -61,6 +61,9 @@
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao, org.oscarehr.PMmodule.model.Program" %>
 <%@page import="oscar.oscarDemographic.data.DemographicData, oscar.oscarRx.data.RxProviderData, oscar.oscarRx.data.RxProviderData.Provider, oscar.oscarClinic.ClinicData"%>
 <%@page import="org.oscarehr.util.EmailUtils" %>
+<!-- add for custom invoice link OHSUPPORT 2883 -->
+<%@ page import="java.net.*, oscar.SxmlMisc"%>
+<!-- end -->
 <html:html locale="true">
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 <%
@@ -1151,7 +1154,60 @@ function chooseEmail(){
 				<tr>
 					<td class="Header"
 						style="padding-left: 2px; padding-right: 2px; border-right: 2px solid #003399; text-align: left; font-size: 80%; font-weight: bold; width: 100%;"
-						NOWRAP><%=thisForm.getPatientName()%> <%=thisForm.getPatientSex()%>	<%=thisForm.getPatientAge()%></td>
+						NOWRAP><%=thisForm.getPatientName()%> <%=thisForm.getPatientSex()%>	<%=thisForm.getPatientAge()%>
+					</td> <%
+					/* -- Begin custom work OHSUPPORT 2883 - add invoice link to consultation page -- */
+					if(props.isPropertyActive("enable_consultation_invoice_link")){
+						String prov= (props.getProperty("billregion","")).trim().toUpperCase();
+						String billingServiceType = URLEncoder.encode(props.getProperty("default_view"));
+						
+					    GregorianCalendar now=new GregorianCalendar();
+					    int curYear = now.get(Calendar.YEAR);
+					    int curMonth = (now.get(Calendar.MONTH)+1);
+					    int curDay = now.get(Calendar.DAY_OF_MONTH);
+					    
+						String strYear=""+curYear;
+						String strMonth=curMonth>9?(""+curMonth):("0"+curMonth);
+						String strDay=curDay>9?(""+curDay):("0"+curDay);
+						String newDateString = strYear+"-"+strMonth+"-"+strDay;
+						String dateString = curYear+"-"+curMonth+"-"+curDay;
+						String linkProvider=providerNo;
+		
+						if(props.isPropertyActive("clinicaid_billing")){
+							String clinicaid_link = "../../billing/billingClinicAid.jsp?demographic_no="+demographic.getDemographicNo()+
+								"&service_start_date="+URLEncoder.encode(newDateString, "UTF-8")+
+								"&chart_no="+demographic.getChartNo()+
+								"&appointment_start_time=0"+
+								"&appointment_provider_no="+linkProvider+
+								"&billing_action=create_invoice&appointment_no=0";
+							%>
+							<td NOWRAP>
+								<a href="<%=clinicaid_link%>" target="_blank" title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>">
+									<bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/>
+								</a>
+							</td>
+						<%
+						}
+						else {
+							
+							String referral_no_parameter = "";
+							if(props.isPropertyActive("auto_populate_billingreferral_bc")){
+		                        String rdohip = SxmlMisc.getXmlContent(org.apache.commons.lang.StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
+								referral_no_parameter = "&referral_no_1=" + (rdohip !=null ? rdohip : "");
+							}
+							
+							String invoice_link = "../../billing.do?billRegion=" + URLEncoder.encode(prov) + "&billForm=" + billingServiceType
+									+ "&hotclick=&appointment_no=0&demographic_name=" + URLEncoder.encode(demographic.getLastName()) + "%2C"
+								 	+ URLEncoder.encode(demographic.getFirstName()) + "&demographic_no=" + demographic.getDemographicNo() + "&providerview=1&user_no=" 
+									+ providerNo + "&apptProvider_no=none&appointment_date=" + dateString + "&start_time=0:00&bNewForm=1&status=t" + referral_no_parameter;
+						%>
+						<td NOWRAP align='right'><a
+			                href="<%=invoice_link%>"
+							title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/>
+						</a></td> <%
+						}
+					}
+					/* -- End custom work OHSUPPORT 2883 -- */%>
 				</tr>
 			</table>
 			</td>
