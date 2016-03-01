@@ -159,7 +159,7 @@ function popupOscarConS(vheight,vwidth,varpage) { //open a new popup window
 					String invoice_link = "../../billing.do?billRegion=" + URLEncoder.encode(prov) + "&billForm=" + billingServiceType
 							+ "&hotclick=&appointment_no=0&demographic_name=" + URLEncoder.encode(demographic.getLastName()) + "%2C"
 						 	+ URLEncoder.encode(demographic.getFirstName()) + "&demographic_no=" + demographic.getDemographicNo() + "&providerview=1&user_no=" 
-							+ proNo + "&apptProvider_no=none&appointment_date=" + dateString + "&start_time=0:00&bNewForm=1&status=t" + referral_no_parameter + "'";
+							+ proNo + "&apptProvider_no=none&appointment_date=" + dateString + "&start_time=0:00&bNewForm=1&status=t" + referral_no_parameter;
 				%>
 				<td NOWRAP align='right'><a
 	                href="<%=invoice_link%>"

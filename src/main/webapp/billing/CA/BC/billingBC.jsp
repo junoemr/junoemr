@@ -74,6 +74,9 @@
   }
 %>
 <%
+
+	OscarProperties oscarProperties = OscarProperties.getInstance();
+
   int year = 0; //Integer.parseInt(request.getParameter("year"));
   int month = 0; //Integer.parseInt(request.getParameter("month"));
   //int day = now.get(Calendar.DATE);
@@ -747,7 +750,15 @@ if(wcbneeds != null){%>
     }
  	// OHSUPORT-2718 - set the default billing physician. Ovverrides appointment physician
     if (sxml_provider.trim().equals("")) {
-    	sxml_provider = OscarProperties.getInstance().getProperty("auto_populate_billingreferral_physicianID_bc", bean.getApptProviderNo());
+    	sxml_provider = oscarProperties.getProperty("auto_populate_billing_bc_billingPhysicianID", bean.getApptProviderNo());
+    	//TODO remove this as I changed the name to the above to make more sense. it is only used by one instance.
+    	sxml_provider = oscarProperties.getProperty("auto_populate_billingreferral_physicianID_bc", sxml_provider); 
+    	
+    	// OHSUPORT-2883 - autofill based on assigned provider. only if not already autofilled
+        if (oscarProperties.isPropertyActive("auto_populate_billing_bc_billingPhysician") && sxml_provider.trim().equals("")) {
+        	sxml_provider = demo.getProviderNo();
+        }
+    	
     	thisForm.setXml_provider(sxml_provider);
     }
     
@@ -773,7 +784,7 @@ if(wcbneeds != null){%>
     }
     
 	// OHSUPORT-2718 - default the referral type fields to B=refer By or T=refer To. ''="Select Type"
-    String userReferralPref = OscarProperties.getInstance().getProperty("auto_populate_billingreferral_type_bc", "");
+    String userReferralPref = oscarProperties.getProperty("auto_populate_billingreferral_type_bc", "");
     if (pref != null) {
       if (pref.getReferral() == 1) {
         userReferralPref = "T";
@@ -784,10 +795,20 @@ if(wcbneeds != null){%>
     }
     thisForm.setRefertype1(userReferralPref);
     thisForm.setRefertype2(userReferralPref);
-    if(OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc")){ 
+    if(oscarProperties.isPropertyActive("auto_populate_billingreferral_bc")){ 
       thisForm.setXml_refer1(bean.getReferral1());
     }
-  }
+    
+    // OHSUPORT-2883 - autofill other codes with specific values
+    thisForm.setXml_other1(oscarProperties.getProperty("auto_populate_billing_bc_other_codesVal1", ""));
+    thisForm.setXml_other2(oscarProperties.getProperty("auto_populate_billing_bc_other_codesVal2", ""));
+    thisForm.setXml_other3(oscarProperties.getProperty("auto_populate_billing_bc_other_codesVal3", ""));
+    
+	// OHSUPORT-2883 - autofill diagnostic codes with specific values
+    thisForm.setXml_diagnostic_detail1(oscarProperties.getProperty("auto_populate_billing_bc_diagnostic_codesVal1", ""));
+    thisForm.setXml_diagnostic_detail2(oscarProperties.getProperty("auto_populate_billing_bc_diagnostic_codesVal2", ""));
+    thisForm.setXml_diagnostic_detail3(oscarProperties.getProperty("auto_populate_billing_bc_diagnostic_codesVal3", ""));
+	}
 %>
   <table width="100%" border="0" cellspacing="0" cellpadding="0">
     <tr>
