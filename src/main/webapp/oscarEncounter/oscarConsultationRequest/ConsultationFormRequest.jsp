@@ -1161,21 +1161,20 @@ function chooseEmail(){
 						String prov= (props.getProperty("billregion","")).trim().toUpperCase();
 						String billingServiceType = URLEncoder.encode(props.getProperty("default_view"));
 						
-					    GregorianCalendar now=new GregorianCalendar();
-					    int curYear = now.get(Calendar.YEAR);
-					    int curMonth = (now.get(Calendar.MONTH)+1);
-					    int curDay = now.get(Calendar.DAY_OF_MONTH);
+						// set the invoice date to match the consultation referral date
+					    int apptMonth = Integer.parseInt(consultUtil.appointmentMonth);
+					    int apptDay = Integer.parseInt(consultUtil.appointmentDay);
 					    
-						String strYear=""+curYear;
-						String strMonth=curMonth>9?(""+curMonth):("0"+curMonth);
-						String strDay=curDay>9?(""+curDay):("0"+curDay);
-						String newDateString = strYear+"-"+strMonth+"-"+strDay;
-						String dateString = curYear+"-"+curMonth+"-"+curDay;
+						String strYear= consultUtil.appointmentYear;
+						String strMonth=apptMonth>9?(""+apptMonth):("0"+apptMonth);
+						String strDay=apptDay>9?(""+apptDay):("0"+apptDay);
+						String service_date_parameter = strYear+"-"+strMonth+"-"+strDay;
+						
 						String linkProvider=providerNo;
-		
+								
 						if(props.isPropertyActive("clinicaid_billing")){
 							String clinicaid_link = "../../billing/billingClinicAid.jsp?demographic_no="+demographic.getDemographicNo()+
-								"&service_start_date="+URLEncoder.encode(newDateString, "UTF-8")+
+								"&service_start_date="+URLEncoder.encode(service_date_parameter, "UTF-8")+
 								"&chart_no="+demographic.getChartNo()+
 								"&appointment_start_time=0"+
 								"&appointment_provider_no="+linkProvider+
@@ -1199,10 +1198,11 @@ function chooseEmail(){
 							String invoice_link = "../../billing.do?billRegion=" + URLEncoder.encode(prov) + "&billForm=" + billingServiceType
 									+ "&hotclick=&appointment_no=0&demographic_name=" + URLEncoder.encode(demographic.getLastName()) + "%2C"
 								 	+ URLEncoder.encode(demographic.getFirstName()) + "&demographic_no=" + demographic.getDemographicNo() + "&providerview=1&user_no=" 
-									+ providerNo + "&apptProvider_no=none&appointment_date=" + dateString + "&start_time=0:00&bNewForm=1&status=t" + referral_no_parameter;
+									+ providerNo + "&apptProvider_no=none&appointment_date=" + service_date_parameter + "&start_time=0:00&bNewForm=1&status=t" 
+								 	+ referral_no_parameter;
 						%>
 						<td NOWRAP align='right'><a
-			                href="<%=invoice_link%>"
+			                href="<%=invoice_link%>" target="_blank"
 							title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/>
 						</a></td> <%
 						}

@@ -28,9 +28,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@page
-	import="oscar.oscarEncounter.pageUtil.*, oscar.oscarEncounter.data.*"%>
-<%@ page import="oscar.OscarProperties"%>
-<%@ page import="java.util.*, java.net.*"%>
+	import="oscar.oscarEncounter.pageUtil.*,oscar.oscarEncounter.data.*"%>
 
 <%
 if(session.getAttribute("user") == null) response.sendRedirect("../../logout.jsp");
@@ -38,8 +36,6 @@ String demo = request.getParameter("de");
 String proNo = (String) session.getAttribute("user");
 oscar.oscarDemographic.data.DemographicData demoData=null;
 org.oscarehr.common.model.Demographic demographic=null;
-
-OscarProperties oscarProps = OscarProperties.getInstance();
 
 oscar.oscarProvider.data.ProviderData pdata = new oscar.oscarProvider.data.ProviderData(proNo);
 String team = pdata.getTeam();
@@ -112,8 +108,7 @@ function popupOscarConS(vheight,vwidth,varpage) { //open a new popup window
 				<td class="Header" NOWRAP><bean:message
 					key="oscarEncounter.oscarConsultationRequest.DisplayDemographicConsultationRequests.msgConsReqFor" />
 				<%=demographic.getLastName() %>, <%=demographic.getFirstName()%> <%=demographic.getSex()%>
-				<%=demographic.getAge()%>
-				</td>
+				<%=demographic.getAge()%></td>
 			</tr>
 		</table>
 		</td>
