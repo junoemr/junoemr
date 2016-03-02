@@ -143,6 +143,9 @@ public class BillingCreateBillingAction extends Action {
     bean.setReferral2(frm.getXml_refer2());
     bean.setReferType1(frm.getRefertype1());
     bean.setReferType2(frm.getRefertype2());
+    bean.setOtherCode1(frm.getXml_other1());
+    bean.setOtherCode2(frm.getXml_other2());
+    bean.setOtherCode3(frm.getXml_other3());
     bean.setBillItem(billItem);
     bean.setCorrespondenceCode(frm.getCorrespondenceCode());
     bean.setNotes(frm.getNotes());

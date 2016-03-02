@@ -1161,11 +1161,21 @@ function chooseEmail(){
 						String prov= (props.getProperty("billregion","")).trim().toUpperCase();
 						String billingServiceType = URLEncoder.encode(props.getProperty("default_view"));
 						
-						// set the invoice date to match the consultation referral date
-					    int apptMonth = Integer.parseInt(consultUtil.appointmentMonth);
-					    int apptDay = Integer.parseInt(consultUtil.appointmentDay);
+						// default todays date
+					    GregorianCalendar now=new GregorianCalendar();
+					    int apptYear = now.get(Calendar.YEAR);
+					    int apptMonth = (now.get(Calendar.MONTH)+1);
+					    int apptDay = now.get(Calendar.DAY_OF_MONTH);
+						
+						// set the invoice date to match the consultation referral date (if all date fields exists)
+						if(consultUtil.appointmentYear != null && consultUtil.appointmentMonth != null && consultUtil.appointmentDay != null) {
+							apptYear = Integer.parseInt(consultUtil.appointmentYear);
+						    apptMonth = Integer.parseInt(consultUtil.appointmentMonth);
+						    apptDay = Integer.parseInt(consultUtil.appointmentDay);
+						}
 					    
-						String strYear= consultUtil.appointmentYear;
+						// format date to yyyy-mm-dd
+						String strYear= ""+apptYear;
 						String strMonth=apptMonth>9?(""+apptMonth):("0"+apptMonth);
 						String strDay=apptDay>9?(""+apptDay):("0"+apptDay);
 						String service_date_parameter = strYear+"-"+strMonth+"-"+strDay;
@@ -1195,11 +1205,20 @@ function chooseEmail(){
 								referral_no_parameter = "&referral_no_1=" + (rdohip !=null ? rdohip : "");
 							}
 							
+							String diagnosticCode1 = props.getProperty("auto_populate_billing_bc_diagnostic_codesVal1", "");
+							if( !diagnosticCode1.equals("")) {
+								diagnosticCode1 = "&diag_code_1=" + diagnosticCode1;
+							}
+							String otherCode1 = props.getProperty("auto_populate_billing_bc_other_codesVal1", "");
+							if( !otherCode1.equals("")) {
+								otherCode1 = "&other_code_1=" + otherCode1;
+							}
+							
 							String invoice_link = "../../billing.do?billRegion=" + URLEncoder.encode(prov) + "&billForm=" + billingServiceType
 									+ "&hotclick=&appointment_no=0&demographic_name=" + URLEncoder.encode(demographic.getLastName()) + "%2C"
 								 	+ URLEncoder.encode(demographic.getFirstName()) + "&demographic_no=" + demographic.getDemographicNo() + "&providerview=1&user_no=" 
-									+ providerNo + "&apptProvider_no=none&appointment_date=" + service_date_parameter + "&start_time=0:00&bNewForm=1&status=t" 
-								 	+ referral_no_parameter;
+									+ providerNo + "&apptProvider_no=none&appointment_date=" + service_date_parameter + "&start_time=0:00&bNewForm=1&status=t"
+								 	+ referral_no_parameter + diagnosticCode1 + otherCode1;
 						%>
 						<td NOWRAP align='right'><a
 			                href="<%=invoice_link%>" target="_blank"

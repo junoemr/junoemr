@@ -795,19 +795,19 @@ if(wcbneeds != null){%>
     }
     thisForm.setRefertype1(userReferralPref);
     thisForm.setRefertype2(userReferralPref);
-    if(oscarProperties.isPropertyActive("auto_populate_billingreferral_bc")){ 
+    if(oscarProperties.isPropertyActive("auto_populate_billingreferral_bc")){
       thisForm.setXml_refer1(bean.getReferral1());
     }
     
     // OHSUPORT-2883 - autofill other codes with specific values
-    thisForm.setXml_other1(oscarProperties.getProperty("auto_populate_billing_bc_other_codesVal1", ""));
-    thisForm.setXml_other2(oscarProperties.getProperty("auto_populate_billing_bc_other_codesVal2", ""));
-    thisForm.setXml_other3(oscarProperties.getProperty("auto_populate_billing_bc_other_codesVal3", ""));
+    thisForm.setXml_diagnostic_detail1((bean.getDx1()==null) ? "" : bean.getDx1());
+    thisForm.setXml_diagnostic_detail2((bean.getDx2()==null) ? "" : bean.getDx2());
+    thisForm.setXml_diagnostic_detail3((bean.getDx3()==null) ? "" : bean.getDx3());
     
 	// OHSUPORT-2883 - autofill diagnostic codes with specific values
-    thisForm.setXml_diagnostic_detail1(oscarProperties.getProperty("auto_populate_billing_bc_diagnostic_codesVal1", ""));
-    thisForm.setXml_diagnostic_detail2(oscarProperties.getProperty("auto_populate_billing_bc_diagnostic_codesVal2", ""));
-    thisForm.setXml_diagnostic_detail3(oscarProperties.getProperty("auto_populate_billing_bc_diagnostic_codesVal3", ""));
+    thisForm.setXml_other1((bean.getOtherCode1()==null) ? "" : bean.getOtherCode1());
+    thisForm.setXml_other2((bean.getOtherCode1()==null) ? "" : bean.getOtherCode2());
+    thisForm.setXml_other3((bean.getOtherCode1()==null) ? "" : bean.getOtherCode3());
 	}
 %>
   <table width="100%" border="0" cellspacing="0" cellpadding="0">

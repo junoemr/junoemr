@@ -150,6 +150,14 @@ public final class BillingAction extends Action {
     	bean.setReferral1(request.getParameter("referral_no_1"));
     }
     
+    bean.setDx1(request.getParameter("diag_code_1"));
+    bean.setDx2(request.getParameter("diag_code_2"));
+    bean.setDx3(request.getParameter("diag_code_3"));
+    
+    bean.setOtherCode1(request.getParameter("other_code_1"));
+    bean.setOtherCode2(request.getParameter("other_code_2"));
+    bean.setOtherCode3(request.getParameter("other_code_3"));
+    
   }
 
   /**

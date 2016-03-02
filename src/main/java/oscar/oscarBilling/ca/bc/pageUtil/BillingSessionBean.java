@@ -71,6 +71,9 @@ public class BillingSessionBean implements java.io.Serializable{
   private String patientAge = null;
   private String billingPracNo = null;
   private String billingGroupNo = null;
+  private String otherCode1 = null;
+  private String otherCode2 = null;
+  private String otherCode3 = null;
 
   private String notes = "";
   private String encounter = "";
@@ -696,6 +699,26 @@ public class BillingSessionBean implements java.io.Serializable{
 
     public void setWcbId(String wcbId) {
         this.wcbId = wcbId;
+    }
+    
+
+    public void setOtherCode1(String code) {
+    	otherCode1 = code;
+    }
+    public void setOtherCode2(String code) {
+    	otherCode2 = code;
+    }
+    public void setOtherCode3(String code) {
+    	otherCode3 = code;
+    }
+    public String getOtherCode1() {
+    	return otherCode1;
+    }
+    public String getOtherCode2() {
+    	return otherCode2;
+    }
+    public String getOtherCode3() {
+    	return otherCode3;
     }
 
   // public void estUserName(){
