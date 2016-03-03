@@ -388,14 +388,14 @@ function disableIfExists(item, disabled)
 /////////////////////////////////////////////////////////////////////
 // create car model objects and fill arrays
 //=======
-function D( servNumber, specNum, phoneNum ,SpecName,SpecFax,SpecAddress){
-    var specialistObj = new Specialist(servNumber,specNum,phoneNum, SpecName, SpecFax, SpecAddress);
+function D( servNumber, specNum, phoneNum ,SpecName,SpecFax,SpecAddress, specRefNo){
+    var specialistObj = new Specialist(servNumber,specNum,phoneNum, SpecName, SpecFax, SpecAddress, specRefNo);
     services[servNumber].specialists.push(specialistObj);
 }
 //-------------------------------------------------------------------
 
 /////////////////////////////////////////////////////////////////////
-function Specialist(makeNumber,specNum,phoneNum,SpecName, SpecFax, SpecAddress){
+function Specialist(makeNumber,specNum,phoneNum,SpecName, SpecFax, SpecAddress, specRefNo){
 
 	this.specId = makeNumber;
 	this.specNbr = specNum;
@@ -403,6 +403,7 @@ function Specialist(makeNumber,specNum,phoneNum,SpecName, SpecFax, SpecAddress){
 	this.specName = SpecName;
 	this.specFax = SpecFax;
 	this.specAddress = SpecAddress;
+	this.specRefNo = specRefNo;
 }
 //-------------------------------------------------------------------
 
@@ -574,6 +575,13 @@ function onSelectSpecialist(SelectedSpec)	{
 		%>
 		specialistFaxNumber = "";
 		updateFaxButton();
+		<% }
+		
+		/* -- OHSUPPORT 2883 - consultation page referral_no autofills to consultation specialist -- */
+		if(props.isPropertyActive("enable_consultation_invoice_link")){
+			%>
+			var newLink = jQuery("#invoice_link").attr("data-href");
+			jQuery("#invoice_link").attr("href", newLink);
 		<% } %>
 
 		return;
@@ -593,6 +601,14 @@ function onSelectSpecialist(SelectedSpec)	{
 				specialistFaxNumber = aSpeci.specFax.trim();
 				updateFaxButton();
         		<% } %>
+        		
+        		<%
+				/* -- OHSUPPORT 2883 - consultation page referral_no autofills to consultation specialist -- */
+				if(props.isPropertyActive("enable_consultation_invoice_link")){
+					%>
+					var newLink = jQuery("#invoice_link").attr("data-href") + "&referral_no_1=" + encodeURIComponent(aSpeci.specRefNo);
+					jQuery("#invoice_link").attr("href", newLink);
+				<% } %>
 
             	jQuery.getJSON("getProfessionalSpecialist.json", {id: aSpeci.specNbr},
                     function(xml)
@@ -1199,11 +1215,11 @@ function chooseEmail(){
 						}
 						else {
 							
-							String referral_no_parameter = "";
-							if(props.isPropertyActive("auto_populate_billingreferral_bc")){
+							//String referral_no_parameter = "";
+							/*if(props.isPropertyActive("auto_populate_billingreferral_bc")){
 		                        String rdohip = SxmlMisc.getXmlContent(org.apache.commons.lang.StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
-								referral_no_parameter = "&referral_no_1=" + (rdohip !=null ? rdohip : "");
-							}
+								referral_no_parameter = "&referral_no_1=";// + (rdohip !=null ? rdohip : "");
+							}*/
 							
 							String diagnosticCode1 = props.getProperty("auto_populate_billing_bc_diagnostic_codesVal1", "");
 							if( !diagnosticCode1.equals("")) {
@@ -1214,14 +1230,16 @@ function chooseEmail(){
 								otherCode1 = "&other_code_1=" + otherCode1;
 							}
 							
+							// should not include referral_no_1 parameter ()
 							String invoice_link = "../../billing.do?billRegion=" + URLEncoder.encode(prov) + "&billForm=" + billingServiceType
 									+ "&hotclick=&appointment_no=0&demographic_name=" + URLEncoder.encode(demographic.getLastName()) + "%2C"
 								 	+ URLEncoder.encode(demographic.getFirstName()) + "&demographic_no=" + demographic.getDemographicNo() + "&providerview=1&user_no=" 
 									+ providerNo + "&apptProvider_no=none&appointment_date=" + service_date_parameter + "&start_time=0:00&bNewForm=1&status=t"
-								 	+ referral_no_parameter + diagnosticCode1 + otherCode1;
+								 	+ diagnosticCode1 + otherCode1;
 						%>
-						<td NOWRAP align='right'><a
-			                href="<%=invoice_link%>" target="_blank"
+						<td NOWRAP align='right'><a id="invoice_link"
+			                href="<%=invoice_link%>" 
+			                data-href="<%=invoice_link%>" target="_blank"
 							title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/>
 						</a></td> <%
 						}
