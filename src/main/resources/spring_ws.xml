@@ -213,4 +213,10 @@
     </bean>
 	
 	
+
+	<jaxws:endpoint implementor="#labUploadWs" address="/LabUploadService" >
+		<jaxws:inInterceptors>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>	
 </beans>

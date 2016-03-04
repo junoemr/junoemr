@@ -90,6 +90,7 @@ public final class BillingAction extends Action {
       newURL = newURL + "?" + request.getQueryString();
       ActionForward Clinicaid = new ActionForward();
       Clinicaid.setPath(clinicaidURL);
+      _log.info(clinicaidURL);
 
       Clinicaid.setRedirect(true);
       return Clinicaid;

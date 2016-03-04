@@ -14,7 +14,9 @@ import java.io.IOException;
 //import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,6 +35,8 @@ import org.oscarehr.util.WKHtmlToPdfUtils;
 import oscar.OscarProperties;
 
 import com.lowagie.text.DocumentException;
+
+import com.itextpdf.text.pdf.PdfReader;
 
 public final class FaxAction {
 
@@ -95,10 +99,7 @@ public final class FaxAction {
 
 			String pdfFile = "EForm." + formId + System.currentTimeMillis();
 			tempFile = File.createTempFile(pdfFile, ".pdf");
-			//tempFile.deleteOnExit();
-			
-			String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "/";
-			FileUtils.copyFile(tempFile, new File(path + tempFile.getName()));
+			tempFile.deleteOnExit();
 
 			// convert to PDF
 			String viewUri = localUri + formId;
@@ -111,9 +112,11 @@ public final class FaxAction {
 			}
 			ArrayList<String> recipients = new ArrayList<String>(Arrays.asList(numbers));
 			
+			String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "/";
+			FileUtils.copyFile(tempFile, new File(path + tempFile.getName()));
+			
 			// Removing duplicate phone numbers.
 			recipients = new ArrayList<String>(new HashSet<String>(recipients));
-			String tempPath = System.getProperty("java.io.tmpdir");
 			FileOutputStream fos;
 			for (int i = 0; i < recipients.size(); i++) {					
 				
@@ -122,12 +125,12 @@ public final class FaxAction {
 					throw new DocumentException("Document target fax number '"+faxNo+"' is invalid."); 
 				}
 
-				String demo = req.getParameter("demographic_no");
+				//String demo = req.getParameter("demographic_no");
 				FaxJobDao faxJobDao = SpringUtils.getBean(FaxJobDao.class);
 				FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 				List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
-				String provider_no = 
-					LoggedInInfo.getLoggedInInfoFromSession(req).getLoggedInProviderNo();
+				//String provider_no = 
+				//	LoggedInInfo.getLoggedInInfoFromSession(req).getLoggedInProviderNo();
 
 				FaxJob faxJob;
 				boolean validFaxNumber = false;
@@ -145,8 +148,7 @@ public final class FaxAction {
 					faxJob.setNumPages(pdfReader.getNumberOfPages());
 					faxJob.setStamp(new Date());
 					faxJob.setStatus(FaxJob.STATUS.SENT);
-					faxJob.setOscarUser(provider_no);
-					//faxJob.setDemographicNo(Integer.parseInt(demo));
+					faxJob.setOscarUser(providerId);
 					faxJob.setDemographicNo(null);
 
 					faxJobDao.persist(faxJob);
@@ -156,6 +158,7 @@ public final class FaxAction {
 
 			    //String tempName = "EForm-" + formId + "." + System.currentTimeMillis();
 				
+				//String tempPath = System.getProperty("java.io.tmpdir");
 				//String tempPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
 				//String tempTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
 				

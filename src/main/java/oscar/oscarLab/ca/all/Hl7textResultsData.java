@@ -43,7 +43,7 @@ import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.model.ConsultDocs;
 import org.oscarehr.common.model.ConsultResponseDoc;
 import org.oscarehr.common.model.Hl7TextInfo;
-import org.oscarehr.common.model.Hl7TextMessage;
+//import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.MeasurementMap;
 import org.oscarehr.common.model.MeasurementType;
@@ -276,6 +276,7 @@ public class Hl7textResultsData {
 
 	}
 
+	/*
 	public static String getMatchingLabs_CLS(String lab_no) {
 		String ret = "";
 		Hl7TextInfo self = null;
@@ -321,15 +322,18 @@ public class Hl7textResultsData {
 	//	if (ret.equals("")) return (lab_no);
 	//	else return (ret.substring(1));
 	}
+	*/
 	
 	public static String getMatchingLabs(String lab_no) {
 		String ret = "";
 		int monthsBetween = 0;
 		
+		/*
 		Hl7TextMessage hl7Msg = hl7TxtMsgDao.find(Integer.parseInt(lab_no));
 		if(hl7Msg != null && "CLS".equals(hl7Msg.getType())) {
 			return getMatchingLabs_CLS(lab_no);
 		}
+		*/
 
 		for (Object[] o : hl7TxtInfoDao.findByLabIdViaMagic(ConversionUtils.fromIntString(lab_no))) {
 			Hl7TextInfo a = (Hl7TextInfo) o[0];

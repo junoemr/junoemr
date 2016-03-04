@@ -4,6 +4,7 @@
 	<handler name="ALPHA" className="AlphaHandler"/>
 	<handler name="BIOTEST" className="BioTestHandler"/>
 	<handler name="CML" className="CMLHandler"/>
+    <handler name="CDL"		className="CDLHandler" />
     <handler name="CLS"		className="CLSHandler"/>
  	<handler name="eaaps"   className="org.oscarehr.research.eaaps.EaapsHandler"/>
 	<handler name="EPSILON" className="EpsilonHandler" />
