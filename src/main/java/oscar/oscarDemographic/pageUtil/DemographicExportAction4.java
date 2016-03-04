@@ -1017,17 +1017,61 @@ public class DemographicExportAction4 extends Action {
 				}
 			}
 
-			if (exImmunizations) {
-				// IMMUNIZATIONS
-				ArrayList<Map<String,Object>> prevList = PreventionData.getPreventionData(demoNo);
-				String imSummary;
-				for (int k =0 ; k < prevList.size(); k++){
+			// IMMUNIZATIONS & PASTHEALTH (Preventive tests)
+			ArrayList<Map<String,Object>> prevList = PreventionData.getPreventionData(demoNo);
+			String phSummary, imSummary;
+			int cnt = 0;
+			
+			for (Map<String, Object> prevMap : prevList) {
+				HashMap<String,Object> extraData = new HashMap<String,Object>();
+				extraData.putAll(PreventionData.getPreventionById((String) prevMap.get("id")));
+
+				String prevType = (String)prevMap.get("type");
+				if (Util.isNonImmunizationPrevention(prevType)) {
+					if (exPastHealth) {
+						phSummary = null;
+						PastHealth pHealth = patientRec.addNewPastHealth();
+						
+						String preventionDate = (String) prevMap.get("prevention_date");
+						if (UtilDateUtilities.StringToDate(preventionDate)!=null) {
+							pHealth.addNewProcedureDate().setFullDate(Util.calDate(preventionDate));
+							phSummary = Util.addSummary(phSummary, "Date", preventionDate);
+						}
+						
+						String description = prevType;
+						phSummary = Util.addSummary("Procedure", prevType);
+						
+						String refused = (String) prevMap.get("refused");
+						if (StringUtils.filled(refused) && !refused.equals("0")) {
+							if (refused.equals("1")) refused = "Refused";
+							if (refused.equals("2")) refused = "Ineligible";
+							description = Util.addLine(description, refused);
+						}
+						
+						String extra = (String)extraData.get("result");
+						if (StringUtils.filled(extra)) {
+							description = Util.addLine(description, "Result:", extra);
+							phSummary = Util.addSummary(phSummary, "Result", extra);
+						}
+						extra = (String)extraData.get("reason");
+						if (StringUtils.filled(extra)) {
+							description = Util.addLine(description, "Reason:", extra);
+							phSummary = Util.addSummary(phSummary, "Reason", extra);
+						}
+						pHealth.setPastHealthProblemDescriptionOrProcedures(description);
+						
+						extra = (String)extraData.get("comments");
+						if (StringUtils.filled(extra)) {
+							pHealth.setNotes(extra);
+							phSummary = Util.addSummary(phSummary, "Comments", extra);
+						}
+						pHealth.setCategorySummaryLine(phSummary);
+					}
+				} else if (exImmunizations) {
 					imSummary = null;
-					HashMap<String,Object> a = new HashMap<String,Object>();
-					a.putAll(prevList.get(k));
+					cnt++;
 					Immunizations immu = patientRec.addNewImmunizations();
-					HashMap<String,Object> extraData = new HashMap<String,Object>();
-					extraData.putAll(PreventionData.getPreventionById((String) a.get("id")));
+
 					if (StringUtils.filled((String)extraData.get("manufacture"))) immu.setManufacturer((String)extraData.get("manufacture"));
 					if (StringUtils.filled((String)extraData.get("lot"))) immu.setLotNumber((String)extraData.get("lot"));
 					if (StringUtils.filled((String)extraData.get("route"))) immu.setRoute((String)extraData.get("route"));
@@ -1035,17 +1079,17 @@ public class DemographicExportAction4 extends Action {
 					if (StringUtils.filled((String)extraData.get("dose"))) immu.setDose((String)extraData.get("dose"));
 					if (StringUtils.filled((String)extraData.get("comments"))) immu.setNotes((String)extraData.get("comments"));
 
-					String prevType = Util.getImmunizationType((String)a.get("type"));
+					prevType = Util.getImmunizationType(prevType);
 					if (cdsDt.ImmunizationType.Enum.forString(prevType)!=null) {
 						immu.setImmunizationType(cdsDt.ImmunizationType.Enum.forString(prevType));
 					} else {
-						exportError.add("Error! No matching type for Immunization "+a.get("type")+" for Patient "+demoNo+" ("+(k+1)+")");
+						exportError.add("Error! No matching type for Immunization "+prevMap.get("type")+" for Patient "+demoNo+" ("+(cnt)+")");
 					}
 
 					if (StringUtils.filled((String)extraData.get("name"))) immu.setImmunizationName((String)extraData.get("name"));
 					else
 					{
-						exportError.add("Error! No Name for Immunization "+prevType+" for Patient "+demoNo+" ("+(k+1)+")");
+						exportError.add("Error! No Name for Immunization "+prevType+" for Patient "+demoNo+" ("+(cnt)+")");
 						if (StringUtils.filled(prevType)) {
 							immu.setImmunizationName(prevType);
 							imSummary = Util.addSummary("Immunization Name",prevType);
@@ -1054,16 +1098,16 @@ public class DemographicExportAction4 extends Action {
 					}
 					addOneEntry(IMMUNIZATION);
 
-					String refused = (String) a.get("refused");
+					String refused = (String) prevMap.get("refused");
 					if (StringUtils.empty(refused)) {
 						immu.addNewRefusedFlag();
-						exportError.add("Error! No Refused Flag for Patient "+demoNo+" ("+(k+1)+")");
+						exportError.add("Error! No Refused Flag for Patient "+demoNo+" ("+(cnt)+")");
 					} else {
 						immu.addNewRefusedFlag().setBoolean(Util.convert10toboolean(refused));
 						imSummary = Util.addSummary(imSummary, "Refused Flag", Util.convert10toboolean(refused)?"Y":"N");
 					}
 
-					String preventionDate = (String) a.get("prevention_date");
+					String preventionDate = (String) prevMap.get("prevention_date");
 					if (UtilDateUtilities.StringToDate(preventionDate)!=null) {
 						immu.addNewDate().setFullDate(Util.calDate(preventionDate));
 						imSummary = Util.addSummary(imSummary, "Date", preventionDate);
@@ -1077,7 +1121,7 @@ public class DemographicExportAction4 extends Action {
 					imSummary = Util.addSummary(imSummary, "Notes", immu.getNotes());
 
 					if (StringUtils.empty(imSummary)) {
-						exportError.add("Error! No Category Summary Line (Immunization) for Patient "+demoNo+" ("+(k+1)+")");
+						exportError.add("Error! No Category Summary Line (Immunization) for Patient "+demoNo+" ("+(cnt)+")");
 					}
 					immu.setCategorySummaryLine(StringUtils.noNull(imSummary));
 				}
