@@ -695,6 +695,7 @@ import oscar.util.UtilDateUtilities;
 
         if (StringUtils.filled(demographicNo))
         {
+        	logger.info("IMPORT FOR DEMOGRAPHIC " + demographicNo);
             //TODO: Course - Admit to student program
 
             entries.put(PATIENTID+importNo, Integer.valueOf(demographicNo));
@@ -859,21 +860,28 @@ import oscar.util.UtilDateUtilities;
             Set<CaseManagementIssue> scmi = null;	//Declare a set for CaseManagementIssues
             //PERSONAL HISTORY
             PersonalHistory[] pHist = patientRec.getPersonalHistoryArray();
+            logger.info("IMPORT PERSONAL HISTORY: " + pHist.length + " entries found");
             for (int i=0; i<pHist.length; i++) {
                 if (i==0) scmi = getCMIssue("SocHistory");
                 CaseManagementNote cmNote = prepareCMNote("1",null);
                 cmNote.setIssues(scmi);
 
                 //main field
-                String socialHist = "Imported Personal History";
-//                String summary = pHist[i].getCategorySummaryLine();
-                String residual = getResidual(pHist[i].getResidualInfo());
-                if (StringUtils.empty(residual)) continue;
+                String socialHist = pHist[i].getCategorySummaryLine();
+                // fast hack to remove the field header
+                if (!StringUtils.empty(socialHist)) socialHist = org.apache.commons.lang.StringUtils.replace(socialHist, "[Personal History]:", "", 1);
+                if (!StringUtils.empty(socialHist)) {
+                	//socialHist = "Imported Personal History";
 
-                cmNote.setNote(socialHist);
-                caseManagementManager.saveNoteSimple(cmNote);
+	                cmNote.setNote(socialHist);
+	                caseManagementManager.saveNoteSimple(cmNote);
+                }
+                
                 addOneEntry(PERSONALHISTORY);
 
+                String residual = getResidual(pHist[i].getResidualInfo());
+                if (StringUtils.empty(residual)) continue;
+                
                 if (ADD_IMPORT_NOTES_PERSONAL_HIST) {
 	                //to dumpsite
 	                residual = Util.addLine("imported.cms4.2011.06", residual);
@@ -886,6 +894,7 @@ import oscar.util.UtilDateUtilities;
 
             //FAMILY HISTORY
             FamilyHistory[] fHist = patientRec.getFamilyHistoryArray();
+            logger.info("IMPORT FAMILY HISTORY: " + fHist.length + " entries found");
             for (int i=0; i<fHist.length; i++) {
                 if (i==0) scmi = getCMIssue("FamHistory");
                 CaseManagementNote cmNote = prepareCMNote("1",null);
@@ -968,6 +977,7 @@ import oscar.util.UtilDateUtilities;
 
             //PAST HEALTH
             PastHealth[] pHealth = patientRec.getPastHealthArray();
+            logger.info("IMPORT PAST HEALTH: " + pHealth.length + " entries found");
             for (int i=0; i< pHealth.length; i++) {
                 if (i==0) scmi = getCMIssue("MedHistory");
                 CaseManagementNote cmNote = prepareCMNote("1",null);
@@ -1045,6 +1055,7 @@ import oscar.util.UtilDateUtilities;
 
                 //PROBLEM LIST
                 ProblemList[] probList = patientRec.getProblemListArray();
+                logger.info("IMPORT PROBLEM LIST: " + probList.length + " entries found");
                 for (int i=0; i<probList.length; i++) {
                     if (i==0) scmi = getCMIssue("Concerns");
                     CaseManagementNote cmNote = prepareCMNote("1",null);
@@ -1128,6 +1139,7 @@ import oscar.util.UtilDateUtilities;
 
                 //RISK FACTORS
                 RiskFactors[] rFactors = patientRec.getRiskFactorsArray();
+                logger.info("IMPORT RISK FACTORS: " + rFactors.length + " entries found");
                 for (int i=0; i<rFactors.length; i++) {
                     if (i==0) scmi = getCMIssue("RiskFactors");
                     CaseManagementNote cmNote = prepareCMNote("1",null);
@@ -1201,6 +1213,7 @@ import oscar.util.UtilDateUtilities;
 
                 //ALERTS & SPECIAL NEEDS
                 AlertsAndSpecialNeeds[] alerts = patientRec.getAlertsAndSpecialNeedsArray();
+                logger.info("IMPORT ALERTS & SPECIAL NEEDS: " + alerts.length + " entries found");
                 for (int i=0; i<alerts.length; i++) {
                     if (i==0) scmi = getCMIssue("Reminders");
                     CaseManagementNote cmNote = prepareCMNote("1",null);
@@ -1259,6 +1272,7 @@ import oscar.util.UtilDateUtilities;
 
                 //CLINICAL NOTES
                 ClinicalNotes[] cNotes = patientRec.getClinicalNotesArray();
+                logger.info("IMPORT CLINICAL NOTES: " + cNotes.length + " entries found");
                 Date observeDate = new Date(), createDate = new Date();
                 for (int i=0; i<cNotes.length; i++) {
                     //encounter note
@@ -1371,6 +1385,7 @@ import oscar.util.UtilDateUtilities;
 
                 //ALLERGIES & ADVERSE REACTIONS
                 AllergiesAndAdverseReactions[] aaReactArray = patientRec.getAllergiesAndAdverseReactionsArray();
+                logger.info("IMPORT ALLERGIES & ADVERSE REACTIONS: " + aaReactArray.length + " entries found");
                 for (int i=0; i<aaReactArray.length; i++) {
                     String description="", regionalId="", reaction="", severity="", entryDate="", startDate="", typeCode="", lifeStage="", alg_extra="";
                     String entryDateFormat=null, startDateFormat=null;
@@ -1448,6 +1463,7 @@ import oscar.util.UtilDateUtilities;
 
                 //MEDICATIONS & TREATMENTS
                 MedicationsAndTreatments[] medArray = patientRec.getMedicationsAndTreatmentsArray();
+                logger.info("IMPORT MEDICATIONS & TREATMENTS: " + medArray.length + " entries found");
                 String duration, quantity, dosage, special;
                 for (int i=0; i<medArray.length; i++)
                 {
@@ -1657,6 +1673,7 @@ import oscar.util.UtilDateUtilities;
 
                 //IMMUNIZATIONS
                 Immunizations[] immuArray = patientRec.getImmunizationsArray();
+                logger.info("IMPORT IMMUNIZATIONS: " + immuArray.length + " entries found");
                 for (int i=0; i<immuArray.length; i++) {
                     String preventionDate="", refused="0";
                     String preventionType=null, immExtra=null;
@@ -2217,7 +2234,7 @@ import oscar.util.UtilDateUtilities;
                         if (wc.getDate()==null) err_data.add("Error! No Date for Waist Circumference in Care Element ("+(i+1)+")");
                         if (StringUtils.empty(wc.getWaistCircumference())) err_data.add("Error! No value for Waist Circumference in Care Element ("+(i+1)+")");
                         if (wc.getWaistCircumferenceUnit()==null) err_data.add("Error! No unit for Waist Circumference in Care Element ("+(i+1)+")");
-                        ImportExportMeasurements.saveMeasurements("WC", demographicNo, admProviderNo, dataField, dataUnit, dateObserved);
+                        ImportExportMeasurements.saveMeasurements("WAIS", demographicNo, admProviderNo, dataField, dataUnit, dateObserved);
                         addOneEntry(CAREELEMENTS);
                     }
                     cdsDt.BloodPressure[] bloodp = ce.getBloodPressureArray();
