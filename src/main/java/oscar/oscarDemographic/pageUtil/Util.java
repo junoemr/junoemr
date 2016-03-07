@@ -181,10 +181,10 @@ public class Util {
 	return ret;
     }
 
-    static public void downloadFile(String fileName, String dirName, HttpServletResponse rsp) {
+    static public boolean downloadFile(String fileName, String dirName, HttpServletResponse rsp) {
         try {
             dirName = fixDirName(dirName);
-            if (rsp==null) return;
+            if (rsp==null) return false;
 
             rsp.setContentType("application/octet-stream");
             rsp.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
@@ -197,7 +197,10 @@ public class Util {
             }
             in.close();
             out.close();
-        } catch (IOException ex) {logger.error("Error", ex);
+            return true;
+        } catch (IOException ex) {
+        	logger.error("Error", ex);
+        	return false;
         }
     }
 

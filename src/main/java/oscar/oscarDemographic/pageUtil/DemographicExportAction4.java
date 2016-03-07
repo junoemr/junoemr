@@ -2016,26 +2016,29 @@ public class DemographicExportAction4 extends Action {
 	if (!Util.zipFiles(files, zipName, tmpDir)) {
 			logger.error("Error! Failed to zip export files");
 	}
+	
+	boolean downloadSuccess = false;
 
 		if (pgpReady.equals("Yes")) {
 			//PGP encrypt zip file
 			PGPEncrypt pgp = new PGPEncrypt();
 			if (pgp.encrypt(zipName, tmpDir)) {
-				Util.downloadFile(zipName+".pgp", tmpDir, response);
-				Util.cleanFile(zipName+".pgp", tmpDir);
+				downloadSuccess = Util.downloadFile(zipName+".pgp", tmpDir, response);
+				if(downloadSuccess) Util.cleanFile(zipName+".pgp", tmpDir);
 				ffwd = "success";
 			} else {
 				request.getSession().setAttribute("pgp_ready", "No");
 			}
 		} else {
 			logger.warn("PGP Encryption NOT available - unencrypted file exported!");
-			Util.downloadFile(zipName, tmpDir, response);
+			downloadSuccess = Util.downloadFile(zipName, tmpDir, response);
 			ffwd = "success";
 		}
 
-
 		//Remove zip & export files from temp dir
-		Util.cleanFile(zipName, tmpDir);
+		// only do this is the files were downloaded. Otherwise leave them in the temp directory for OSP
+		if(downloadSuccess) Util.cleanFile(zipName, tmpDir);
+		else logger.error("Demographic Export Files were not downloaded properly. Zip file not removed from temp directory.");
 		Util.cleanFiles(files);
 	}
 
