@@ -304,7 +304,7 @@ function initMaster() {
 //-------------------------------------------------------------------
 
 /////////////////////////////////////////////////////////////////////
-// create car make objects and fill arrays
+// called from functions in EctConConstructSpecialistsScriptsFile
 //==========
 function K( serviceNumber, service ){
 
@@ -386,9 +386,10 @@ function disableIfExists(item, disabled)
 
 //------------------------------------------------------------------------------------------
 /////////////////////////////////////////////////////////////////////
-// create car model objects and fill arrays
+// called from functions in EctConConstructSpecialistsScriptsFile
 //=======
 function D( servNumber, specNum, phoneNum ,SpecName,SpecFax,SpecAddress, specRefNo){
+	//alert("caller is " + arguments.callee.caller.toString());
     var specialistObj = new Specialist(servNumber,specNum,phoneNum, SpecName, SpecFax, SpecAddress, specRefNo);
     services[servNumber].specialists.push(specialistObj);
 }
@@ -1221,11 +1222,11 @@ function chooseEmail(){
 								referral_no_parameter = "&referral_no_1=";// + (rdohip !=null ? rdohip : "");
 							}*/
 							
-							String diagnosticCode1 = props.getProperty("auto_populate_billing_bc_diagnostic_codesVal1", "");
+							String diagnosticCode1 = props.getProperty("auto_populate_billing_bc_diagnostic_codesVal1_consult", "");
 							if( !diagnosticCode1.equals("")) {
 								diagnosticCode1 = "&diag_code_1=" + diagnosticCode1;
 							}
-							String otherCode1 = props.getProperty("auto_populate_billing_bc_other_codesVal1", "");
+							String otherCode1 = props.getProperty("auto_populate_billing_bc_other_codesVal1_consult", "");
 							if( !otherCode1.equals("")) {
 								otherCode1 = "&other_code_1=" + otherCode1;
 							}
