@@ -130,6 +130,7 @@ public class LabUploadWs extends AbstractWs {
     {
         String returnMessage, audit;
         
+		long startTime = System.nanoTime();
         try {
         	audit = importLab(fileName, contents, LAB_TYPE_EXCELLERIS, oscarProviderNo);
         } catch(Exception e)
@@ -137,9 +138,19 @@ public class LabUploadWs extends AbstractWs {
             logger.error(e.getMessage());
             returnMessage = "{\"success\":0,\"message\":\"" +
                 e.getMessage() + "\", \"audit\":\"\"}";
+
+			long endTime = System.nanoTime();
+
+			logger.info("Excelleris upload attempt took " + 
+				String.valueOf((((float)(endTime - startTime))/1000000)) + " milliseconds");
+
             return returnMessage;
         }
         returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
+
+		logger.info("Excelleris upload took " + 
+			String.valueOf((((float)(endTime - startTime))/1000000)) + " milliseconds");
+
         return returnMessage;
     }
     
@@ -233,8 +244,9 @@ public class LabUploadWs extends AbstractWs {
         
         // Upload lab info and hash to DB to check for duplicates
         FileInputStream is = new FileInputStream(labFilePath);
-        int checkFileUploadedSuccessfully = FileUploadCheck.addFile(fileName,is,oscarProviderNo);            
+        int checkFileUploadedSuccessfully = FileUploadCheck.addFileLogged(fileName, is, oscarProviderNo, labType);            
         is.close();
+
         if (checkFileUploadedSuccessfully != FileUploadCheck.UNSUCCESSFUL_SAVE){
             logger.info("filePath" + labFilePath);
             logger.info("Type :" + labType);
@@ -245,9 +257,6 @@ public class LabUploadWs extends AbstractWs {
             if((retVal = msgHandler.parse(getClass().getSimpleName(), labFilePath,checkFileUploadedSuccessfully)) == null) {
             	throw new ParseException("Failed to parse lab: " + fileName + " of type: " + labType, 0);
             }
-                        
-        }else{
-        	throw new SQLException("Failed insert lab into DB (Likely duplicate lab): " + fileName + " of type: " + labType);
         }
         
         // This will always contain one line, so let's just remove the newline characters

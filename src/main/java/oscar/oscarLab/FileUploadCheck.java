@@ -129,4 +129,48 @@ public final class FileUploadCheck {
 		return fileUploaded;
 	}
 
+
+	/**
+	 * Used to add a new file to the database, checks to see if it already has
+	 * been added.  Logs details about what it is doing.
+	 */
+	public static synchronized int addFileLogged(String name, InputStream is, 
+		String provider, String labType) 
+			throws Exception, FileUploadException {
+
+		int fileUploaded = UNSUCCESSFUL_SAVE;
+		try {
+			String md5sum = DigestUtils.md5Hex(IOUtils.toByteArray(is));
+			if (!hasFileBeenUploaded(md5sum)) {
+
+				String sql = "insert into fileUploadCheck " +
+					"(provider_no,filename,md5sum,date_time) " +
+					"values (" +
+					"'" + provider + "'," +
+					"'" + StringEscapeUtils.escapeSql(name) + "'," +
+					"'" + md5sum + "'," +
+					"now())";
+				MiscUtils.getLogger().debug(sql);
+				DBHandler.RunSQL(sql);
+				ResultSet rs = DBHandler.GetSQL("SELECT LAST_INSERT_ID() ");
+				if (rs.next()) {
+					fileUploaded = rs.getInt(1);
+				}
+			}
+			else {
+				throw new FileUploadException("Lab file has already been uploaded: " + 
+					name + " of type: " + labType);
+			}
+		} catch (SQLException conE) {
+			MiscUtils.getLogger().error("Error", conE);
+			throw new Exception("Database Is not Running");
+		} catch (Exception e) {
+			MiscUtils.getLogger().error("Error", e);
+			throw e;
+		}
+
+		MiscUtils.getLogger().debug("returning " + fileUploaded);
+        	
+		return fileUploaded;
+	}
 }
