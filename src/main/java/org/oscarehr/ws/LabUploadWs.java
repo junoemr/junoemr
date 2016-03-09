@@ -148,6 +148,8 @@ public class LabUploadWs extends AbstractWs {
         }
         returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
 
+		long endTime = System.nanoTime();
+
 		logger.info("Excelleris upload took " + 
 			String.valueOf((((float)(endTime - startTime))/1000000)) + " milliseconds");
 
