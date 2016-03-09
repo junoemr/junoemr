@@ -799,15 +799,15 @@ if(wcbneeds != null){%>
       thisForm.setXml_refer1(bean.getReferral1());
     }
     
-    // OHSUPORT-2883 - autofill other codes with specific values
-    thisForm.setXml_diagnostic_detail1((bean.getDx1()==null) ? "" : bean.getDx1());
-    thisForm.setXml_diagnostic_detail2((bean.getDx2()==null) ? "" : bean.getDx2());
-    thisForm.setXml_diagnostic_detail3((bean.getDx3()==null) ? "" : bean.getDx3());
+    // OHSUPORT-2883 - autofill diagnostic codes with specific values (from url)
+    if ( request.getParameter("diag_code_1") != null ) { thisForm.setXml_diagnostic_detail1(request.getParameter("diag_code_1")); }
+    if ( request.getParameter("diag_code_2") != null ) { thisForm.setXml_diagnostic_detail2(request.getParameter("diag_code_2")); }
+    if ( request.getParameter("diag_code_3") != null ) { thisForm.setXml_diagnostic_detail3(request.getParameter("diag_code_3")); }
     
-	// OHSUPORT-2883 - autofill diagnostic codes with specific values
-    thisForm.setXml_other1((bean.getOtherCode1()==null) ? "" : bean.getOtherCode1());
-    thisForm.setXml_other2((bean.getOtherCode1()==null) ? "" : bean.getOtherCode2());
-    thisForm.setXml_other3((bean.getOtherCode1()==null) ? "" : bean.getOtherCode3());
+	// OHSUPORT-2883 - autofill other codes with specific values (from url)
+	if ( request.getParameter("other_code_1") != null ) { thisForm.setXml_other1(request.getParameter("other_code_1")); }
+	if ( request.getParameter("other_code_2") != null ) { thisForm.setXml_other2(request.getParameter("other_code_2")); }
+	if ( request.getParameter("other_code_3") != null ) { thisForm.setXml_other3(request.getParameter("other_code_3")); }
 	}
 %>
   <table width="100%" border="0" cellspacing="0" cellpadding="0">
