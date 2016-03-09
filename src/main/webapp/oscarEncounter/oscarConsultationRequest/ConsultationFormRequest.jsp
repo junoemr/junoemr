@@ -1178,27 +1178,27 @@ function chooseEmail(){
 						String prov= (props.getProperty("billregion","")).trim().toUpperCase();
 						String billingServiceType = URLEncoder.encode(props.getProperty("default_view"));
 						
-						// default todays date
-					    GregorianCalendar now=new GregorianCalendar();
-					    int apptYear = now.get(Calendar.YEAR);
-					    int apptMonth = (now.get(Calendar.MONTH)+1);
-					    int apptDay = now.get(Calendar.DAY_OF_MONTH);
-						
-						// set the invoice date to match the consultation referral date (if all date fields exists)
-						if(consultUtil.appointmentYear != null && consultUtil.appointmentMonth != null && consultUtil.appointmentDay != null) {
-							apptYear = Integer.parseInt(consultUtil.appointmentYear);
-						    apptMonth = Integer.parseInt(consultUtil.appointmentMonth);
-						    apptDay = Integer.parseInt(consultUtil.appointmentDay);
-						}
-					    
-						// format date to yyyy-mm-dd
-						String strYear= ""+apptYear;
-						String strMonth=apptMonth>9?(""+apptMonth):("0"+apptMonth);
-						String strDay=apptDay>9?(""+apptDay):("0"+apptDay);
-						String service_date_parameter = strYear+"-"+strMonth+"-"+strDay;
-						
 						String linkProvider=providerNo;
-								
+						String service_date_parameter = "";
+						// set the invoice date to match the consultation referral date (if all date fields exists)
+						if(consultUtil.referalDate != null) {
+							service_date_parameter = consultUtil.referalDate.replace('/', '-');
+						}
+						else {
+							// default todays date
+						    GregorianCalendar now=new GregorianCalendar();
+						    int apptYear = now.get(Calendar.YEAR);
+						    int apptMonth = (now.get(Calendar.MONTH)+1);
+						    int apptDay = now.get(Calendar.DAY_OF_MONTH);
+						    
+							// format date to yyyy-mm-dd
+							String strYear= ""+apptYear;
+							String strMonth=apptMonth>9?(""+apptMonth):("0"+apptMonth);
+							String strDay=apptDay>9?(""+apptDay):("0"+apptDay);
+							
+							service_date_parameter = strYear+"-"+strMonth+"-"+strDay;
+						}
+						
 						if(props.isPropertyActive("clinicaid_billing")){
 							String clinicaid_link = "../../billing/billingClinicAid.jsp?demographic_no="+demographic.getDemographicNo()+
 								"&service_start_date="+URLEncoder.encode(service_date_parameter, "UTF-8")+
