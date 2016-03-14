@@ -43,8 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONObject;
-
 import org.apache.http.impl.cookie.DateUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -70,6 +68,10 @@ import org.oscarehr.document.dao.DocumentDAO;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
+import com.quatro.dao.security.SecObjectNameDao;
+import com.quatro.model.security.Secobjectname;
+
+import net.sf.json.JSONObject;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
@@ -80,9 +82,6 @@ import oscar.oscarMDS.data.CategoryData;
 import oscar.oscarMDS.data.PatientInfo;
 import oscar.oscarProvider.data.ProviderData;
 import oscar.util.OscarRoleObjectPrivilege;
-
-import com.quatro.dao.security.SecObjectNameDao;
-import com.quatro.model.security.Secobjectname;
 
 public class DmsInboxManageAction extends DispatchAction {
 	private static Logger logger=MiscUtils.getLogger();
@@ -390,6 +389,14 @@ public class DmsInboxManageAction extends DispatchAction {
 		}
 	}
 
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return ActionForward
+	 */
 	public ActionForward prepareForContentPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		try {

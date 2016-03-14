@@ -24,7 +24,7 @@
 
 --%>
 
-<%@page errorPage="../provider/errorpage.jsp" %>
+<%@page errorPage="../ALL/InboxPreviewError.jsp" %>
 <%@ page import="java.util.*,
 		 java.sql.*,
 		 oscar.oscarDB.*,
@@ -45,13 +45,16 @@
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="/WEB-INF/oscarProperties-tag.tld" prefix="oscarProperties"%>
 <%@ taglib uri="/WEB-INF/indivo-tag.tld" prefix="indivo"%>
+
 <%
 oscar.OscarProperties props = oscar.OscarProperties.getInstance();
 String segmentID = request.getParameter("segmentID");
 String providerNo = request.getParameter("providerNo");
 String searchProviderNo = request.getParameter("searchProviderNo");
 String patientMatched = request.getParameter("patientMatched");
-String sql = "SELECT demographic_no FROM patientLabRouting WHERE lab_type='HL7' and lab_no='"+segmentID+"';";
+String labType = request.getParameter("labType");
+
+String sql = "SELECT demographic_no FROM patientLabRouting WHERE lab_type='" + labType + "' and lab_no='"+segmentID+"';";
 
 UserPropertyDAO userPropertyDAO = (UserPropertyDAO)SpringUtils.getBean("UserPropertyDAO");
 UserProperty uProp = userPropertyDAO.getProp(providerNo, UserProperty.LAB_ACK_COMMENT);
@@ -111,19 +114,19 @@ MessageHandler handler = Factory.getHandler(segmentID);
 String hl7 = Factory.getHL7Body(segmentID);
 Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 int lab_no = Integer.parseInt(segmentID);
-String label = ""; Hl7TextInfo hl7Lab = hl7TextInfoDao.findLabId(lab_no);
+String label = ""; 
+Hl7TextInfo hl7Lab = hl7TextInfoDao.findLabId(lab_no);
 if (hl7Lab.getLabel()!=null) label = hl7Lab.getLabel();
-// check for errors printing
-if (request.getAttribute("printError") != null && (Boolean) request.getAttribute("printError")){
-%>
-<script language="JavaScript">
-    alert("The lab could not be printed due to an error. Please see the server logs for more detail.");
-</script>
-<%}
-%>
-<script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-1.4.2.js"></script>
 
-                <script language="JavaScript">
+// check for errors printing
+if (request.getAttribute("printError") != null && (Boolean) request.getAttribute("printError")){ %>
+	<script language="JavaScript">
+	    alert("The lab could not be printed due to an error. Please see the server logs for more detail.");
+	</script> <%
+}
+%>
+
+<script language="JavaScript">
          popupStart=function(vheight,vwidth,varpage,windowname) {
             var page = varpage;
             windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
@@ -137,7 +140,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
      		String[] multiID = multiLabId.split(",");
      		    if( multiID.length > 1 ) {
      		    	for( int k = 0; k < multiID.length; ++k ) {
-     					if( multiID[k].equals(segmentID)) {     	
+     					if( multiID[k].equals(segmentID)) {
      						version = k;     	
      					}
      				}
@@ -180,10 +183,10 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
             document.forms['acknowledgeForm_'+doclabid].submit();
         }
 
-	 linkreq=function(rptId, reqId) {
-	    var link = "../lab/LinkReq.jsp?table=hl7TextMessage&rptid="+rptId+"&reqid="+reqId;
-	    window.open(link, "linkwin", "width=500, height=200");
-	}
+		linkreq=function(rptId, reqId) {
+		    var link = "../lab/LinkReq.jsp?table=hl7TextMessage&rptid="+rptId+"&reqid="+reqId;
+		    window.open(link, "linkwin", "width=500, height=200");
+		}
 
          sendToPHR=function(labId, demographicNo) {
             popup(300, 600, "<%=request.getContextPath()%>/phr/SendToPhrPreview.jsp?labId=" + labId + "&demographic_no=" + demographicNo, "sendtophr");

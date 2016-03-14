@@ -3683,7 +3683,7 @@ jQuery.contains = contains;
 
 return;
 
-window.Sizzle = Sizzle;
+//window.Sizzle = Sizzle;
 
 })();
 var runtil = /Until$/,

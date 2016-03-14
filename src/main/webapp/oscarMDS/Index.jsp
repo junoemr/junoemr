@@ -224,21 +224,24 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 
 	function updateListView() {
 		var query = getQuery();
+		var div;
 		if (page == 1) {
 			document.getElementById("docViews").innerHTML = "";
 			canLoad = true;
 		}
-
-		if (isListView && page == 1) {
-			document.getElementById("docViews").innerHTML =	"<div id='tempLoader'><img src='<%=request.getContextPath()%>/images/DMSLoader.gif'> Loading reports...</div>"
-		}
-		else if (isListView) {
-			document.getElementById("loader").style.display = "block";
+		
+		if (isListView) {
+			if (page == 1) {
+				document.getElementById("docViews").innerHTML =	"<div id='tempLoader'><img src='<%=request.getContextPath()%>/images/DMSLoader.gif'> Loading reports...</div>"
+			}
+			else {
+				document.getElementById("loader").style.display = "block";
+			}
 		}
 		else {
 			jQuery("#docViews").append(jQuery("<div id='tempLoader'><img src='<%=request.getContextPath()%>/images/DMSLoader.gif'> Loading reports...</div>"));
 		}
-		var div;
+
 		if (!isListView || page == 1) {
 			div = document.getElementById("docViews");
 		}
@@ -264,6 +267,7 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 			}
 			var tempDOM = jQuery('<div></div>');
             tempDOM.html( transport.responseText );
+            //console.info("transport response text:\n" + transport.responseText);
             var totalNumDocs = jQuery('#totalNumDocs', tempDOM).val();
             
 			if (transport.responseText.indexOf("<input type=\"hidden\" name=\"NoMoreItems\" value=\"true\" />") >= 0) {
@@ -290,30 +294,30 @@ Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
 			   +"&endDate="+endDate+"&checkRequestingProvider="+checkRequestingProvider+"&docview="+docview
 			   +"&abnormalFlag="+abnormalflag+"&neverAcknowledgedItems="+neverAcknowledgedItems;
 		switch (selected_category) {
-		case CATEGORY_ALL:
-			query  += "&view=all";
-			query  += "&fname=" + firstName + "&lname=" + lastName + "&hnum=" + hin;
-			break;
-		case CATEGORY_DOCUMENTS:
-			query  += "&view=documents";
-			query  += "&fname=" + firstName + "&lname=" + lastName + "&hnum=" + hin;
-			break;
-		case CATEGORY_HL7:
-			query  += "&view=labs";
-			query  += "&fname=" + firstName + "&lname=" + lastName + "&hnum=" + hin;
-			break;
-		case CATEGORY_NORMAL:
-			query  += "&view=normal";
-			query  += "&fname=" + firstName + "&lname=" + lastName + "&hnum=" + hin;
-			break;
-		case CATEGORY_ABNORMAL:
-			query  += "&view=abnormal";
-			query  += "&fname=" + firstName + "&lname=" + lastName + "&hnum=" + hin;
-			break;
-		case CATEGORY_PATIENT:
-			query  += "&view=all&demographicNo=" + selected_category_patient;
-			break;
-	    case CATEGORY_PATIENT_SUB:
+			case CATEGORY_ALL:
+				query  += "&view=all";
+				query  += "&fname=" + firstName + "&lname=" + lastName + "&hnum=" + hin;
+				break;
+			case CATEGORY_DOCUMENTS:
+				query  += "&view=documents";
+				query  += "&fname=" + firstName + "&lname=" + lastName + "&hnum=" + hin;
+				break;
+			case CATEGORY_HL7:
+				query  += "&view=labs";
+				query  += "&fname=" + firstName + "&lname=" + lastName + "&hnum=" + hin;
+				break;
+			case CATEGORY_NORMAL:
+				query  += "&view=normal";
+				query  += "&fname=" + firstName + "&lname=" + lastName + "&hnum=" + hin;
+				break;
+			case CATEGORY_ABNORMAL:
+				query  += "&view=abnormal";
+				query  += "&fname=" + firstName + "&lname=" + lastName + "&hnum=" + hin;
+				break;
+			case CATEGORY_PATIENT:
+				query  += "&view=all&demographicNo=" + selected_category_patient;
+				break;
+		    case CATEGORY_PATIENT_SUB:
 	    	query  += "&demographicNo=" + selected_category_patient;
 	    	switch (selected_category_type) {
 		    	case CATEGORY_TYPE_DOC:
