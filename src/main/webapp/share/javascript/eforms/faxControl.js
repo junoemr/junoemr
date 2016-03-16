@@ -135,26 +135,29 @@ function submitFaxButtonAjax(save) {
 	saveHolder = jQuery("#saveHolder");
 	saveHolder.val(!save);
 	needToConfirm=false;
-	if (document.getElementById('Letter') == null) {
-		jQuery("form").submit();
-	}
-	else {
-		var form = $("form[name='RichTextLetter']");
+	
+	var form = jQuery("form");
+	// preserve old RTL functionality
+	var formName=form.attr("name");
+	if ((typeof formName !== typeof undefined && formName !== false) && formName === "RichTextLetter") {
 		form.attr("target", "_blank");
 		document.getElementById('Letter').value=editControlContents('edit');
-		
-		$.ajax({
-			 type: "POST",  
-			 url: form.attr("action"),  
-			 data: form.serialize(),  
-			 success: function() {  
-			    alert("Fax sent successfully");
-			    if (save) { window.close(); }
-			 },
-			 error: function() {
-				 alert("An error occured while attempting to send your fax, please contact an administrator.");
-			 } 
-		});
 	}
+	/* POST the AddEFormAction without navigating away from the page */
+	$.ajax({
+		 type: "POST",
+		 url: form.attr("action"),
+		 data: form.serialize(),
+		 success: function() {
+		    alert("Fax sent successfully");
+		    /* if the save option is selected, close the window after the call */
+		    if (save) { 
+		    	window.close(); 
+	    	}
+		 },
+		 error: function() {
+			 alert("An error occured while attempting to send your fax, please contact an administrator.");
+		 } 
+	});
 	document.getElementById('faxEForm').value=false;
 }

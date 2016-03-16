@@ -56,7 +56,7 @@ public class EForm extends EFormBase {
 	private String appointment_no = "-1";
 	private HashMap<String,String> sql_params = new HashMap<String, String>();
 	private String parentAjaxId = null;
-        private String eform_link = null;
+	private String eform_link = null;
 	private HashMap<String, String> fieldValues = new HashMap<String, String>();
 	private int needValueInForm = 0;
 	private boolean setAP2nd = false;
@@ -72,7 +72,7 @@ public class EForm extends EFormBase {
 	private static final String TABLE_NAME = "table_name";
 	private static final String TABLE_ID = "table_id";
 	private static final String OTHER_KEY = "other_key";
-        private static final String OPENER_VALUE = "link$eform";
+	private static final String OPENER_VALUE = "link$eform";
 
 	public EForm() {
 	}
