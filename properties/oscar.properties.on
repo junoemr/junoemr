@@ -973,3 +973,7 @@ auto_populate_billingreferral_bc=true
 
 #OHSUPPORT-2883 - adds a link to invoices in the consultation request page.
 #enable_consultation_invoice_link=true
+
+#OHSUPPORT-2932 - add encounter notes for faxes
+#encounter_notes_add_fax_notes=on
+
