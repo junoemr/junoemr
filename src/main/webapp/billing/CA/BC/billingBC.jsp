@@ -783,18 +783,33 @@ if(wcbneeds != null){%>
       pref = dao.getUserBillingPreference((String) thisForm.getXml_provider());
     }
     
+    // -- autofill referral type code --
+    String refType1 = "";
+    String refType2 = "";
+    // url parameters override properties file, but not user pref
+    if ( request.getParameter("referral_type_1") != null) { refType1 = request.getParameter("referral_type_1").toUpperCase(); }
+    if ( request.getParameter("referral_type_2") != null) { refType2 = request.getParameter("referral_type_2").toUpperCase(); }
+    
 	// OHSUPORT-2718 - default the referral type fields to B=refer By or T=refer To. ''="Select Type"
-    String userReferralPref = oscarProperties.getProperty("auto_populate_billingreferral_type_bc", "");
+    String propReferralPref = oscarProperties.getProperty("auto_populate_billingreferral_type_bc", "").toUpperCase();
+	if(refType1.isEmpty()) { refType1 = propReferralPref; }
+	if(refType2.isEmpty()) { refType2 = propReferralPref; }
+	
+	// prefrences overrides the properties file settings
     if (pref != null) {
       if (pref.getReferral() == 1) {
-        userReferralPref = "T";
+    	  refType1 = "T";
+    	  refType2 = "T";
       }
       else if (pref.getReferral() == 2) {
-        userReferralPref = "B";
+    	  refType1 = "B";
+    	  refType2 = "B";
       }
-    }
-    thisForm.setRefertype1(userReferralPref);
-    thisForm.setRefertype2(userReferralPref);
+    }	
+    thisForm.setRefertype1(refType1);
+    thisForm.setRefertype2(refType2);
+    
+	// -- autofill referral physician --
     if(oscarProperties.isPropertyActive("auto_populate_billingreferral_bc")){
       thisForm.setXml_refer1(bean.getReferral1());
     }
