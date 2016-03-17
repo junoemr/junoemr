@@ -47,7 +47,6 @@ public final class FaxAction {
 
 	private String localUri = null;
 	private HttpServletRequest request;
-	private HttpSession session;
 	private OscarProperties props;
 	
 	private boolean skipSave = false;
@@ -57,7 +56,6 @@ public final class FaxAction {
 		localUri = getEformRequestUrl(request);
 		skipSave = "true".equals(request.getParameter("skipSave"));
 		props = OscarProperties.getInstance();
-		session = request.getSession();
 	}
 
 	/**
@@ -101,7 +99,7 @@ public final class FaxAction {
 	 * Add an encounter note when a fax is sent.
 	 *  -- OHSUPPORT-2932 -- 
 	 */
-	private boolean addFaxEncounterNote(String providerId, String demographic_no, String faxNo, Long formId) {
+	private boolean addFaxEncounterNote(HttpSession session, String providerId, String demographic_no, String faxNo, Long formId) {
 		CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 		if(demographic_no != null && providerId != null) {
 			Date now = UtilDateUtilities.now();
@@ -129,7 +127,7 @@ public final class FaxAction {
 				provLastName=provider.getLastName();
 			}
 			
-			String strNote = "Fax Sent to " + faxNo + " at " + now + " by " + provFirstName + " " + provLastName + ".";
+			String strNote = "Eform Faxed to " + faxNo + " at " + now + " by " + provFirstName + " " + provLastName + ".";
 
 			cmn.setNote(strNote);
 			cmn.setHistory(strNote);
@@ -209,9 +207,9 @@ public final class FaxAction {
 				}
 				
 				/* -- OHSUPPORT-2932 -- */
-				if(props.isPropertyActive("encounter_notes_add_fax_notes")) {
+				if(props.isPropertyActive("encounter_notes_add_fax_notes_eform")) {
 					String demographic_no = request.getParameter("efmdemographic_no");
-					addFaxEncounterNote(providerId, demographic_no, faxNo, Long.valueOf(formId));
+					addFaxEncounterNote(request.getSession(), providerId, demographic_no, faxNo, Long.valueOf(formId));
 				}
 			}
 			// Removing the consulation pdf.
