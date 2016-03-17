@@ -1230,13 +1230,17 @@ function chooseEmail(){
 							if( !otherCode1.equals("")) {
 								otherCode1 = "&other_code_1=" + otherCode1;
 							}
+							String referralType1 = props.getProperty("auto_populate_billing_bc_billingreferral_type1_consult", "");
+							if( !referralType1.equals("")) {
+								referralType1 = "&referral_type_1=" + referralType1;
+							}
 							
 							// should not include referral_no_1 parameter ()
 							String invoice_link = "../../billing.do?billRegion=" + URLEncoder.encode(prov) + "&billForm=" + billingServiceType
 									+ "&hotclick=&appointment_no=0&demographic_name=" + URLEncoder.encode(demographic.getLastName()) + "%2C"
 								 	+ URLEncoder.encode(demographic.getFirstName()) + "&demographic_no=" + demographic.getDemographicNo() + "&providerview=1&user_no=" 
 									+ providerNo + "&apptProvider_no=none&appointment_date=" + service_date_parameter + "&start_time=0:00&bNewForm=1&status=t"
-								 	+ diagnosticCode1 + otherCode1;
+								 	+ diagnosticCode1 + otherCode1 + referralType1;
 						%>
 						<td NOWRAP align='right'><a id="invoice_link"
 			                href="<%=invoice_link%>" 
