@@ -43,10 +43,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.lowagie.text.DocumentException;
+
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
-
-import com.lowagie.text.DocumentException;
 
 /**
  *
@@ -61,6 +61,8 @@ public class PrintLabsAction extends Action{
     }
     
     public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response){
+    	
+    	logger.info("PRINT LAB REPORT");
         
         try {
             MessageHandler handler = Factory.getHandler(request.getParameter("segmentID"));

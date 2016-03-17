@@ -41,16 +41,11 @@ import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.model.Hl7TextMessage;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
-import oscar.oscarLab.ca.all.Hl7textResultsData;
-import oscar.oscarLab.ca.all.parsers.Factory;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
-import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
-import oscar.oscarLab.ca.all.parsers.CLSHandler;
-import oscar.util.UtilDateUtilities;
 
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
@@ -67,15 +62,25 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfPageEventHelper;
-import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
+import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.rtf.RtfWriter2;
+
+import oscar.oscarLab.ca.all.Hl7textResultsData;
+import oscar.oscarLab.ca.all.parsers.CLSHandler;
+import oscar.oscarLab.ca.all.parsers.Factory;
+import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
+import oscar.util.UtilDateUtilities;
 /**
  *
  * @author wrighd
  */
 public class LabPDFCreator extends PdfPageEventHelper{
+	
+	private static final Logger logger=MiscUtils.getLogger();
+	
     private OutputStream os;
 
     private boolean ackFlag = false;
@@ -196,9 +201,10 @@ public class LabPDFCreator extends PdfPageEventHelper{
 
         // add the tests and test info for each header
         ArrayList<String> headers = handler.getHeaders();
-        for (int i=0; i < headers.size(); i++)
+        for (int i=0; i < headers.size(); i++) {
             addLabCategory( headers.get(i));
-
+        }
+           
         // add end of report table
         PdfPTable table = new PdfPTable(1);
         table.setWidthPercentage(100);
@@ -312,6 +318,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		// category name
 		if(!isUnstructuredDoc)
 		{
+			logger.info(header + " is structured");
 			cell.setPadding(3);
 			cell.setPhrase(new Phrase("  "));
 			cell.setBorder(0);
@@ -332,6 +339,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		// table headers
 		if(isUnstructuredDoc)
 		{
+			logger.info(header + " is un-structured");
 			cell.setColspan(1);
 			cell.setBorder(15);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -488,6 +496,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 									cell.setPhrase(new Phrase(handler
 											.getOBXResultStatus(j, k), lineFont));
 									table.addCell(cell);
+									logger.info("ADD CELL TO PDF: '" + handler.getOBXResultStatus(j, k) + "'");
 								}
 							} 
 							else
@@ -556,6 +565,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 												handler.getOBXAbnormalFlag(j, k) :
 												""),
 											lineFont));
+										logger.info("ADD CELL TO PDF: '" + (handler.isOBXAbnormal(j, k) ? handler.getOBXAbnormalFlag(j, k) :"") + "'");
 									} else 
 									{
 										cell.setPhrase(new Phrase(
