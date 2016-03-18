@@ -318,7 +318,6 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		// category name
 		if(!isUnstructuredDoc)
 		{
-			logger.info(header + " is structured");
 			cell.setPadding(3);
 			cell.setPhrase(new Phrase("  "));
 			cell.setBorder(0);
@@ -339,7 +338,6 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		// table headers
 		if(isUnstructuredDoc)
 		{
-			logger.info(header + " is un-structured");
 			cell.setColspan(1);
 			cell.setBorder(15);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -445,10 +443,13 @@ public class LabPDFCreator extends PdfPageEventHelper{
 						{ // <<-- DNS only needed for
 													// MDS messages
 							String obrName = handler.getOBRName(j);
+							/* fix for CLS labs not showing test names with one line results. 
+							 * No idea why it works this way but trying not to break existing functionality. */
+							boolean obxCountBool = ((handler.getMsgType().equals("CLS") && obxCount > 0 ) || obxCount > 1);
 							// add the obrname if necessary
 							if (!obrFlag
 									&& !obrName.equals("")
-									&& !(obxName.contains(obrName) && obxCount < 2)) 
+									&& (!obxName.contains(obrName) || obxCountBool ))
 							{
 								// cell.setBackgroundColor(getHighlightColor(linenum));
 								linenum++;
@@ -496,7 +497,6 @@ public class LabPDFCreator extends PdfPageEventHelper{
 									cell.setPhrase(new Phrase(handler
 											.getOBXResultStatus(j, k), lineFont));
 									table.addCell(cell);
-									logger.info("ADD CELL TO PDF: '" + handler.getOBXResultStatus(j, k) + "'");
 								}
 							} 
 							else
@@ -565,7 +565,6 @@ public class LabPDFCreator extends PdfPageEventHelper{
 												handler.getOBXAbnormalFlag(j, k) :
 												""),
 											lineFont));
-										logger.info("ADD CELL TO PDF: '" + (handler.isOBXAbnormal(j, k) ? handler.getOBXAbnormalFlag(j, k) :"") + "'");
 									} else 
 									{
 										cell.setPhrase(new Phrase(
