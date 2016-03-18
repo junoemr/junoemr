@@ -41,16 +41,11 @@ import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.model.Hl7TextMessage;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
-import oscar.oscarLab.ca.all.Hl7textResultsData;
-import oscar.oscarLab.ca.all.parsers.Factory;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
-import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
-import oscar.oscarLab.ca.all.parsers.CLSHandler;
-import oscar.util.UtilDateUtilities;
 
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
@@ -67,15 +62,25 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfPageEventHelper;
-import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
+import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.rtf.RtfWriter2;
+
+import oscar.oscarLab.ca.all.Hl7textResultsData;
+import oscar.oscarLab.ca.all.parsers.CLSHandler;
+import oscar.oscarLab.ca.all.parsers.Factory;
+import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
+import oscar.util.UtilDateUtilities;
 /**
  *
  * @author wrighd
  */
 public class LabPDFCreator extends PdfPageEventHelper{
+	
+	private static final Logger logger=MiscUtils.getLogger();
+	
     private OutputStream os;
 
     private boolean ackFlag = false;
@@ -196,9 +201,10 @@ public class LabPDFCreator extends PdfPageEventHelper{
 
         // add the tests and test info for each header
         ArrayList<String> headers = handler.getHeaders();
-        for (int i=0; i < headers.size(); i++)
+        for (int i=0; i < headers.size(); i++) {
             addLabCategory( headers.get(i));
-
+        }
+           
         // add end of report table
         PdfPTable table = new PdfPTable(1);
         table.setWidthPercentage(100);
@@ -437,10 +443,13 @@ public class LabPDFCreator extends PdfPageEventHelper{
 						{ // <<-- DNS only needed for
 													// MDS messages
 							String obrName = handler.getOBRName(j);
+							/* fix for CLS labs not showing test names with one line results. 
+							 * No idea why it works this way but trying not to break existing functionality. */
+							boolean obxCountBool = ((handler.getMsgType().equals("CLS") && obxCount > 0 ) || obxCount > 1);
 							// add the obrname if necessary
 							if (!obrFlag
 									&& !obrName.equals("")
-									&& !(obxName.contains(obrName) && obxCount < 2)) 
+									&& (!obxName.contains(obrName) || obxCountBool ))
 							{
 								// cell.setBackgroundColor(getHighlightColor(linenum));
 								linenum++;
