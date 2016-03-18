@@ -378,6 +378,53 @@
        	</ap-sql>
         <ap-output>${address_list}</ap-output>
     </databaseap>
+	<databaseap>
+        <ap-name>multisite_address_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(
+					REPLACE(address,';','')
+					SEPARATOR ';') AS address_list
+					FROM site
+					WHERE status=1
+					ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${address_list}</ap-output>
+    </databaseap>
+	</databaseap>
+        <databaseap>
+        <ap-name>multisite_city_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(
+					REPLACE(city,';','')
+					SEPARATOR ';') AS city_list
+					FROM site
+					WHERE status=1
+					ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${city_list}</ap-output>
+    </databaseap>
+	</databaseap>
+        <databaseap>
+        <ap-name>multisite_province_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(
+					REPLACE(province,';','')
+					SEPARATOR ';') AS province_list
+					FROM site
+					WHERE status=1
+					ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${province_list}</ap-output>
+    </databaseap>
+	</databaseap>
+        <databaseap>
+        <ap-name>multisite_postal_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(
+					REPLACE(postal,';','')
+					SEPARATOR ';') AS postal_list
+					FROM site
+					WHERE status=1
+					ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${postal_list}</ap-output>
+    </databaseap>
 
 <!-- Patient medical information -->
     <databaseap>
