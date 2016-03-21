@@ -33,12 +33,11 @@
 <%@ page import="org.oscarehr.common.model.DiagnosticCode" %>
 <%@ page import="org.oscarehr.common.dao.DiagnosticCodeDao" %>
 <%
-	DiagnosticCodeDao diagnosticCodeDao = SpringUtils.getBean(DiagnosticCodeDao.class);
-%>
-<% String search = "",search2 = "";
+DiagnosticCodeDao diagnosticCodeDao = SpringUtils.getBean(DiagnosticCodeDao.class);
+String search = "",search2 = "";
  search = request.getParameter("search");
  if (search.compareTo("") == 0){
- search = "search_diagnostic_code";
+ 	search = "search_diagnostic_code";
  }
 
 
@@ -54,7 +53,6 @@
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title><bean:message key="billing.billingDigSearch.title" /></title>
 <script LANGUAGE="JavaScript">
-<!--
 function CodeAttach(File2) {
       if (self.opener.callChangeCodeDesc) self.opener.callChangeCodeDesc();
 
@@ -140,174 +138,173 @@ function setfocus() {
 			size="2"><bean:message
 			key="billing.billingDigSearch.formDescription" /></font></b></td>
 	</tr>
-
-
-	<%  ResultSet rslocal = null;
-      ResultSet rslocal2 = null;
-        String Dcode="", DcodeDesc="", Dcode2="", DcodeDesc2="";
-        String codeName2="";
-    String color="";
- int Count = 0;
- int intCount = 0;
- String numCode="";
-   String textCode="";
-   String searchType="";
+<%  
+ResultSet rslocal = null;
+ResultSet rslocal2 = null;
+String Dcode="", DcodeDesc="", Dcode2="", DcodeDesc2="";
+String codeName2="";
+String color="";
+int Count = 0;
+int intCount = 0;
+String numCode="";
+String textCode="";
+String searchType="";
 for(int i=0;i<codeName.length();i++)
- {
- String c = codeName.substring(i,i+1);
- if(c.hashCode()>=48 && c.hashCode()<=58)
- numCode += c;
- }
+{
+	String c = codeName.substring(i,i+1);
+	if(c.hashCode()>=48 && c.hashCode()<=58)
+	numCode += c;
+}
 for(int j=0;j<codeName.length();j++)
- {
- String d = codeName.substring(j,j+1);
- if(d.hashCode()<48 || d.hashCode()>58)
- textCode += d;
- }
-if (textCode.compareTo("") == -1 && textCode != null){
-StringBuffer sBuffer = new StringBuffer(textCode);
-int k = textCode.indexOf(' ');
-sBuffer.deleteCharAt(k);
-sBuffer.insert(k,"");
-textCode = sBuffer.toString();
- }
- if (numCode.compareTo("")==0){
-    if(textCode.compareTo("")==0){
-    // search all case
+{
+	String d = codeName.substring(j,j+1);
+	if(d.hashCode()<48 || d.hashCode()>58)
+	textCode += d;
+}
+if (textCode != null && textCode.compareTo("") == -1){
+	StringBuffer sBuffer = new StringBuffer(textCode);
+	int k = textCode.indexOf(' ');
+	sBuffer.deleteCharAt(k);
+	sBuffer.insert(k,"");
+	textCode = sBuffer.toString();
+}
+if (numCode.equals("")) {
+	if(textCode.equals("")) {
+	    // search all case
         codeName = numCode;
         search = "search_diagnostic_code";
         searchType= "N";
-        }
-        else{
-    //search text only
-         codeName = "%" + textCode;
-         search = "search_diagnostic_text";
-         searchType="N";
-         }
-   }else{
+	}
+	else{
+		//search text only
+        codeName = "%" + textCode;
+        search = "search_diagnostic_text";
+        searchType="N";
+	}
+}
+else {
+    if(textCode.equals("")) {
+		// search number only
+		codeName = numCode;
+		search = "search_diagnostic_code";
+		searchType= "N";
+	}
+	else {
+    	//search both text and number only
+		codeName = "%" + textCode;
+		codeName2 = numCode;
+		search = "search_diagnostic_text";
+		search2 = "search_diagnostic_code";
+		searchType="BOTH";
+	}
+}
 
-    if(textCode.compareTo("")==0){
-    // search number only
-        codeName = numCode;
-        search = "search_diagnostic_code";
-        searchType= "N";
-        }
-        else{
-    //search both text and number only
-         codeName = "%" + textCode;
-         codeName2 = numCode;
-         search = "search_diagnostic_text";
-         search2 = "search_diagnostic_code";
-         searchType="BOTH";
-         }
-   }
+List<DiagnosticCode> results = null;
 
- List<DiagnosticCode> results = null;
-
-         if (searchType.length() == 1) {
-
-// Retrieving Provider
+if (searchType.length() == 1) {
+	
+	// Retrieving Provider
 
 	if("search_diagnostic_code".equals(search)) {
 		results=diagnosticCodeDao.searchCode(codeName+"%");
-	} else if("search_diagnostic_text".equals(search)) {
+	} 
+	else if("search_diagnostic_text".equals(search)) {
 		results=diagnosticCodeDao.searchText(codeName+"%");
 	}
 	for(DiagnosticCode result:results) {
 		intCount++;
 		Dcode = result.getDiagnosticCode();
-		DcodeDesc = result.getDescription().trim();
+		DcodeDesc = result.getDescription();
+		DcodeDesc = (DcodeDesc == null) ? "" : DcodeDesc.trim();
+		if (Count == 0) {
+			Count = 1;
+			color = "#FFFFFF";
+		} 
+		else {
+			Count = 0;
+			color="#EEEEFF";
+		} %>
+
+	<tr bgcolor="<%=color%>">
+		<td width="12%"><font face="Arial, Helvetica, sans-serif"
+			size="2"><a
+			href="javascript:CodeAttach('<%=Dcode%>|<%=DcodeDesc%>')"><%=Dcode%><a></font></td>
+		<td width="88%"><font face="Arial, Helvetica, sans-serif"
+			size="2"><input type="text" name="<%=Dcode%>"
+			value="<%=DcodeDesc%>" size="60"><input type="submit"
+			name="update"
+			value="<bean:message key="billing.billingDigSearch.btnUpdate"/> <%=Dcode%>"></font></td>
+	</tr>
+	<%
+	} //end of while looop
+}
+else { //both
+	
+	results=diagnosticCodeDao.searchText(codeName+"%");
+	for(DiagnosticCode result:results) {
+		intCount++;
+		Dcode = result.getDiagnosticCode();
+		DcodeDesc = result.getDescription();
+		DcodeDesc = (DcodeDesc == null) ? "" : DcodeDesc.trim();
+		if (Count == 0) {
+			Count = 1;
+			color = "#FFFFFF";
+		} 
+		else {
+			Count = 0;
+			color="#F9E6F0";
+		} %>
+	
+	<tr bgcolor="<%=color%>">
+	<td width="12%"><font face="Arial, Helvetica, sans-serif"
+		size="2"><a
+		href="javascript:CodeAttach('<%=Dcode%>|<%=DcodeDesc%>')"><%=Dcode%><a></font></td>
+	<td width="88%"><font face="Arial, Helvetica, sans-serif"
+		size="2"><input type="text" name="<%=Dcode%>"
+		value="<%=DcodeDesc%>" size="60"><input type="submit"
+		name="update"
+		value="<bean:message key="billing.billingDigSearch.btnUpdate"/> <%=Dcode%>"></font></td>
+	</tr>
+	<%
+	}
+
+
+	results=diagnosticCodeDao.searchCode(codeName2+"%");
+	for(DiagnosticCode result:results) {
+		intCount++;
+		Dcode2 = result.getDiagnosticCode();
+		DcodeDesc = result.getDescription();
+		DcodeDesc = (DcodeDesc == null) ? "" : DcodeDesc.trim();
 		if (Count == 0){
 			Count = 1;
 			color = "#FFFFFF";
-		} else {
+		} 
+		else {
 			Count = 0;
-			color="#EEEEFF";
-		}
- %>
+			color="#F9E6F0";
+		} %>
+		<tr bgcolor="<%=color%>">
+			<td width="12%"><font face="Arial, Helvetica, sans-serif"
+				size="2"><a
+				href="javascript:CodeAttach('<%=Dcode2%>|<%=DcodeDesc2%>')"><%=Dcode2%><a></font></td>
+			<td width="88%"><font face="Arial, Helvetica, sans-serif"
+				size="2"><input type="text" name="<%=Dcode2%>"
+				value="<%=DcodeDesc2%>" size="60"><input type="submit"
+				name="update"
+				value="<bean:message key="billing.billingDigSearch.btnUpdate"/> <%=Dcode2%>"></font></td>
+		</tr> <%
+	}
+}
 
-	<tr bgcolor="<%=color%>">
-		<td width="12%"><font face="Arial, Helvetica, sans-serif"
-			size="2"><a
-			href="javascript:CodeAttach('<%=Dcode%>|<%=DcodeDesc%>')"><%=Dcode%><a></font></td>
-		<td width="88%"><font face="Arial, Helvetica, sans-serif"
-			size="2"><input type="text" name="<%=Dcode%>"
-			value="<%=DcodeDesc%>" size="60"><input type="submit"
-			name="update"
-			value="<bean:message key="billing.billingDigSearch.btnUpdate"/> <%=Dcode%>"></font></td>
-	</tr>
-	<%
-  } //end of while looop
-  } else { //both
-
-	  results=diagnosticCodeDao.searchText(codeName+"%");
-  	  for(DiagnosticCode result:results) {
-  		  intCount++;
-  		  Dcode = result.getDiagnosticCode();
-  		  DcodeDesc = result.getDescription().trim();
-  		  if (Count == 0){
-  			 Count = 1;
-  			 color = "#FFFFFF";
-  		  } else {
-  			 Count = 0;
-  			 color="#F9E6F0";
-  		  }
-
- %>
-
-	<tr bgcolor="<%=color%>">
-		<td width="12%"><font face="Arial, Helvetica, sans-serif"
-			size="2"><a
-			href="javascript:CodeAttach('<%=Dcode%>|<%=DcodeDesc%>')"><%=Dcode%><a></font></td>
-		<td width="88%"><font face="Arial, Helvetica, sans-serif"
-			size="2"><input type="text" name="<%=Dcode%>"
-			value="<%=DcodeDesc%>" size="60"><input type="submit"
-			name="update"
-			value="<bean:message key="billing.billingDigSearch.btnUpdate"/> <%=Dcode%>"></font></td>
-	</tr>
-	<%
-  }
-
-
-	  results=diagnosticCodeDao.searchCode(codeName2+"%");
-  	  for(DiagnosticCode result:results) {
-  		  intCount++;
-  		  Dcode2 = result.getDiagnosticCode();
-  		  DcodeDesc2 = result.getDescription().trim();
-  		  if (Count == 0){
-  			 Count = 1;
-  			 color = "#FFFFFF";
-  		  } else {
-  			 Count = 0;
-  			 color="#F9E6F0";
-  		  }
- %>
-
-	<tr bgcolor="<%=color%>">
-		<td width="12%"><font face="Arial, Helvetica, sans-serif"
-			size="2"><a
-			href="javascript:CodeAttach('<%=Dcode2%>|<%=DcodeDesc2%>')"><%=Dcode2%><a></font></td>
-		<td width="88%"><font face="Arial, Helvetica, sans-serif"
-			size="2"><input type="text" name="<%=Dcode2%>"
-			value="<%=DcodeDesc2%>" size="60"><input type="submit"
-			name="update"
-			value="<bean:message key="billing.billingDigSearch.btnUpdate"/> <%=Dcode2%>"></font></td>
-	</tr>
-	<%
-  }
-  }
-  %>
-
-	<%  if (intCount == 0 ) { %>
+if (intCount == 0 ) { %>
 	<tr bgcolor="<%=color%>">
 		<td colspan="2"><font face="Arial, Helvetica, sans-serif"
 			size="2"><bean:message
-			key="billing.billingDigSearch.msgNoMatch" />. <%// =i%></font></td>
-
-	</tr>
-	<%  }%>
-
-	<% if (intCount == 1) { %>
+			key="billing.billingDigSearch.msgNoMatch" />. <%// =i%></font>
+		</td>
+	</tr> <%  
+}
+if (intCount == 1) { %>
 	<script LANGUAGE="JavaScript">
 <!--
  CodeAttach('<%=Dcode%>|<%=DcodeDesc%>');

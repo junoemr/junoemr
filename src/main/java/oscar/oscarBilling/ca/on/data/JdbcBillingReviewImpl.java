@@ -256,7 +256,6 @@ public class JdbcBillingReviewImpl {
 				" and status!='D' order by billing_date desc, billing_time desc, id desc ";// + strLimit;
 	      rs = dbPH.queryResults_paged(sql, pDateRange, iOffSet);
 		}	
-		 _logger.error("getBillingHist(sql = " + sql + ")");
 
 		try {
 			while (rs.next()) {
