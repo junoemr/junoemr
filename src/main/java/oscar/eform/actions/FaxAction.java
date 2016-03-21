@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -96,59 +95,6 @@ public final class FaxAction {
 	}
 	
 	/**
-	 * Add an encounter note when a fax is sent.
-	 *  -- OHSUPPORT-2932 -- 
-	 */
-	private boolean addFaxEncounterNote(HttpSession session, String providerId, String demographic_no, String faxNo, Long formId) {
-		CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
-		if(demographic_no != null && providerId != null) {
-			Date now = UtilDateUtilities.now();
-			CaseManagementNote cmn = new CaseManagementNote();
-			cmn.setUpdate_date(now);
-			cmn.setObservation_date(now);
-			cmn.setDemographic_no(demographic_no);
-			cmn.setPosition(0);
-			cmn.setReporter_program_team("0");
-			cmn.setPassword("NULL");
-			cmn.setLocked(false);
-			
-			String prog_no = new EctProgram(session).getProgram(providerId);
-			cmn.setProgram_no(prog_no);
-			
-			SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-			SecRole doctorRole = secRoleDao.findByName("doctor");
-			cmn.setReporter_caisi_role(doctorRole.getId().toString());
-			
-			Provider provider = EDocUtil.getProvider(providerId);
-			String provFirstName = "";
-			String provLastName = "";
-			if(provider!=null) {
-				provFirstName=provider.getFirstName();
-				provLastName=provider.getLastName();
-			}
-			
-			String strNote = "Eform Faxed to " + faxNo + " at " + now + " by " + provFirstName + " " + provLastName + ".";
-
-			cmn.setNote(strNote);
-			cmn.setHistory(strNote);
-			cmn.setProviderNo(providerId);
-			cmn.setSigned(true);
-			cmn.setSigning_provider_no(providerId);
-			
-			Long note_id = cmm.saveNoteSimpleReturnID(cmn);
-			CaseManagementNoteLink cmLink = new CaseManagementNoteLink(CaseManagementNoteLink.EFORMDATA, formId, note_id);
-			EDocUtil.addCaseMgmtNoteLink(cmLink);
-			
-			logger.info("Saved note id=" + note_id.toString() + " for demographic " + demographic_no);
-			return true;
-		}
-		else {
-			logger.error("failed to add fax note to encounter notes. null demographicNo or providerId");
-		}
-		return false;
-	}
-
-	/**
 	 * This method will take eforms and send them to a PHR.
 	 * @throws DocumentException 
 	 */
@@ -209,7 +155,8 @@ public final class FaxAction {
 				/* -- OHSUPPORT-2932 -- */
 				if(props.isPropertyActive("encounter_notes_add_fax_notes_eform")) {
 					String demographic_no = request.getParameter("efmdemographic_no");
-					addFaxEncounterNote(request.getSession(), providerId, demographic_no, faxNo, Long.valueOf(formId));
+					String programNo = new EctProgram(request.getSession()).getProgram(providerId);
+					addFaxEncounterNote(demographic_no, providerId, programNo, faxNo, Long.valueOf(formId));
 				}
 			}
 			// Removing the consulation pdf.
@@ -219,5 +166,56 @@ public final class FaxAction {
 			MiscUtils.getLogger().error("Error converting and sending eform. id="+formId, e);
 		} 
 	}
+	
+	/**
+	 * Add an encounter note when a fax is sent.
+	 *  -- OHSUPPORT-2932 -- 
+	 */
+	private boolean addFaxEncounterNote(String demographic_no, String providerId, String programNo, String faxNo, Long formId) {
+		CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
+		if(demographic_no != null) {
+			Provider provider = EDocUtil.getProvider(providerId);
+			if( providerId == null || provider == null) {
+				providerId = "-1"; //system
+				provider = EDocUtil.getProvider(providerId);
+				logger.warn("Missing or invalid providerNo for fax encounter note. Assigned to system (-1)");
+			}
+			SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
+			SecRole doctorRole = secRoleDao.findByName("doctor");
+			Date now = UtilDateUtilities.now();
+			String provFirstName = provider.getFirstName();
+			String provLastName = provider.getLastName();
+			
+			String strNote = "Eform Faxed to " + faxNo + " at " + now + " by " + provFirstName + " " + provLastName + ".";
 
+			// create the note
+			CaseManagementNote cmn = new CaseManagementNote();
+			cmn.setDemographic_no(demographic_no);
+			cmn.setProgram_no(programNo);
+			cmn.setUpdate_date(now);
+			cmn.setObservation_date(now);
+			cmn.setPosition(0);
+			cmn.setReporter_program_team("0");
+			cmn.setPassword("NULL");
+			cmn.setLocked(false);
+			cmn.setReporter_caisi_role(doctorRole.getId().toString());
+			cmn.setNote(strNote);
+			cmn.setHistory(strNote);
+			cmn.setProviderNo(providerId);
+			cmn.setSigned(true);
+			cmn.setSigning_provider_no(providerId);
+			
+			// save the note and create the link
+			Long note_id = cmm.saveNoteSimpleReturnID(cmn);
+			CaseManagementNoteLink cmLink = new CaseManagementNoteLink(CaseManagementNoteLink.EFORMDATA, formId, note_id);
+			EDocUtil.addCaseMgmtNoteLink(cmLink);
+			
+			logger.info("Saved note_id=" + note_id.toString() + " for demographic " + demographic_no);
+			return true;
+		}
+		else {
+			logger.error("failed to add fax note to encounter notes. null demographicNo");
+		}
+		return false;
+	}
 }

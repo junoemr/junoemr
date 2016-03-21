@@ -234,6 +234,10 @@ public class NoteDisplayNonNote implements NoteDisplay {
 	public boolean isDocument() {
 		return false;
 	}
+	
+	public boolean isConsultation() {
+		return false;
+	}
 
 	public boolean isEditable() {
 		return false;

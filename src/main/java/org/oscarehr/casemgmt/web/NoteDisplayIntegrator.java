@@ -162,6 +162,10 @@ public class NoteDisplayIntegrator implements NoteDisplay {
 	public boolean isDocument() {
 	    return(false);
     }
+	
+	public boolean isConsultation() {
+		return false;
+	}
 
 	public boolean isRxAnnotation(){
 		return (false);

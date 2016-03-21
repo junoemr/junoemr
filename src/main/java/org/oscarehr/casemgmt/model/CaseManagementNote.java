@@ -504,6 +504,9 @@ public class CaseManagementNote extends BaseObject {
 	public boolean isDocumentNote() {
 		return isLinkTo(CaseManagementNoteLink.DOCUMENT);
 	}
+	public boolean isConsultation() {
+		return isLinkTo(CaseManagementNoteLink.CONSULTATION);
+	}
 
 
     public boolean isRxAnnotation() {
