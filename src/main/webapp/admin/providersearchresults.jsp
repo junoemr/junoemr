@@ -130,13 +130,13 @@
 	bgcolor="ivory">
 	<tr bgcolor="<%=deepcolor%>">
 		<TH align="center" width="10%"><b><a
-			href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%="provider_no"%>&limit1=0&limit2=10"><bean:message
+			href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%="provider_no"%>&limit1=0&limit2=10&search_status=<%=request.getParameter("search_status")%>"><bean:message
 			key="admin.providersearchresults.ID" /></a></b></TH>
 		<TH align="center" width="19%"><b><a
-			href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%="first_name"%>&limit1=0&limit2=10"><bean:message
+			href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%="first_name"%>&limit1=0&limit2=10&search_status=<%=request.getParameter("search_status")%>"><bean:message
 			key="admin.provider.formFirstName" /></a> </b></TH>
 		<TH align="center" width="19%"><b><a
-			href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%="last_name"%>&limit1=0&limit2=10"><bean:message
+			href="admincontrol.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&displaymode=<%=request.getParameter("displaymode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=<%="last_name"%>&limit1=0&limit2=10&search_status=<%=request.getParameter("search_status")%>"><bean:message
 			key="admin.provider.formLastName" /></a></b></TH>
 		<TH align="center" width="16%"><b><bean:message
 			key="admin.provider.formSpecialty" /></b></TH>
