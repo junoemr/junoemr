@@ -186,7 +186,7 @@ public final class FaxAction {
 			String provFirstName = provider.getFirstName();
 			String provLastName = provider.getLastName();
 			
-			String strNote = "Eform Faxed to " + faxNo + " at " + now + " by " + provFirstName + " " + provLastName + ".";
+			String strNote = "Faxed eForm to " + faxNo + " at " + now + " by " + provFirstName + " " + provLastName + ".";
 
 			// create the note
 			CaseManagementNote cmn = new CaseManagementNote();

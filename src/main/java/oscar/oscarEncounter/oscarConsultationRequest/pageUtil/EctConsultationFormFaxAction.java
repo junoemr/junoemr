@@ -241,7 +241,7 @@ public class EctConsultationFormFaxAction extends Action {
 			String provFirstName = provider.getFirstName();
 			String provLastName = provider.getLastName();
 			
-			String strNote = "Consultation Faxed to " + faxNo + " at " + now + " by " + provFirstName + " " + provLastName + ".";
+			String strNote = "Faxed Consultation to " + faxNo + " at " + now + " by " + provFirstName + " " + provLastName + ".";
 			
 			// create the note
 			CaseManagementNote cmn = new CaseManagementNote();
