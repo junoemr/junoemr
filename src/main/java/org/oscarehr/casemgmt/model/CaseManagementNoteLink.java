@@ -37,6 +37,7 @@ public class CaseManagementNoteLink {
 	public static final Integer DEMOGRAPHIC = 7;
 	public static final Integer PREVENTIONS = 8;
 	public static final Integer LABTEST2 = 9; //repesents the labPatientPhysicianInfo table
+	public static final Integer CONSULTATION = 10;// added OHsupport-2932
 	
 	public static final String DISP_PRESCRIP = "Prescriptions";
 	public static final String DISP_ALLERGY = "Allergies";

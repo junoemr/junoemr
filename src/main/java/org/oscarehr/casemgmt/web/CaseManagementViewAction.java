@@ -48,10 +48,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
-import net.sf.json.processors.JsDateJsonBeanProcessor;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
@@ -111,6 +107,9 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+import net.sf.json.processors.JsDateJsonBeanProcessor;
 import oscar.OscarProperties;
 import oscar.eform.EFormUtil;
 import oscar.oscarEncounter.data.EctFormData;
@@ -1730,6 +1729,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		String ticklerColour = "color:#" + blackColour + ";background-color:#" + Colour.getInstance().tickler + ";";
 		String rxColour = "color:#" + blackColour + ";background-color:#" + Colour.getInstance().rx + ";";
 		String invoiceColour = "color:#" + blackColour + ";background-color:#" + Colour.getInstance().invoices + ";";
+		String consultationColour = "color:#" + blackColour + ";background-color:#" + Colour.getInstance().consultation + ";";
 
 		String bgColour = "color:#000000;background-color:#CCCCFF;";
 
@@ -1745,6 +1745,8 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 			bgColour = formsColour;
 		} else if (noteDisplay.isInvoice()) {
 			bgColour = invoiceColour;
+		} else if (noteDisplay.isConsultation()) {
+			bgColour = consultationColour;
 		}
 
 

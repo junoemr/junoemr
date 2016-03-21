@@ -319,6 +319,7 @@ int maxId = 0;
 			boolean hideDocumentNotes = OscarProperties.getInstance().isPropertyActive("encounter.hide_document_notes");
 			boolean hideEformNotes = OscarProperties.getInstance().isPropertyActive("encounter.hide_eform_notes");
 			//boolean hideMetaData = OscarProperties.getInstance().isPropertyActive("encounter.hide_metadata");
+			boolean hideConsultNotes = OscarProperties.getInstance().isPropertyActive("encounter.hide_consult_notes");
 
 			String noteDisplay = "block";
 			if(note.isCpp() && hideCppNotes) {
@@ -328,6 +329,9 @@ int maxId = 0;
 				noteDisplay="none";
 			}
 			if(note.isEformData() && hideEformNotes) {
+				noteDisplay="none";
+			}
+			if(note.isConsultation() && hideConsultNotes) {
 				noteDisplay="none";
 			}
 
@@ -349,7 +353,7 @@ int maxId = 0;
 
 			//String metaDisplay = (hideMetaData)?"none":"block";
 		%>
-		<div id="nc<%=offset > 0 ? offset : ""%><%=idx+1%>" style="display:<%=noteDisplay %>" class="note<%=note.isDocument()||note.isCpp()||note.isEformData()||note.isEncounterForm()||note.isInvoice()?"":" noteRounded"%>">
+		<div id="nc<%=offset > 0 ? offset : ""%><%=idx+1%>" style="display:<%=noteDisplay %>" class="note<%=note.isDocument()||note.isCpp()||note.isEformData()||note.isEncounterForm()||note.isInvoice()||note.isConsultation()?"":" noteRounded"%>">
 			<input type="hidden" id="signed<%=globalNoteId%>" value="<%=note.isSigned()%>">
 			<input type="hidden" id="full<%=globalNoteId%>" value="<%=fulltxt || (note.getNoteId() !=null && note.getNoteId().equals(savedId))%>">
 			<input type="hidden" id="bgColour<%=globalNoteId%>" value="<%=bgColour%>">
@@ -396,7 +400,7 @@ int maxId = 0;
 						String rev = note.getRevision();
 						if (note.getRemoteFacilityId()==null) // always display full note for remote notes
 						{
-							if (note.isDocument() || note.isCpp() || note.isEformData() || note.isEncounterForm() || note.isInvoice())
+							if (note.isDocument() || note.isCpp() || note.isEformData() || note.isEncounterForm() || note.isInvoice() || note.isConsultation())
 							{
 								// blank if so it never displays min/max icon for documents
 							}
@@ -429,7 +433,7 @@ int maxId = 0;
 						<%
 						}
 
-						if (!note.isDocument() && !note.isCpp() && !note.isEformData() && !note.isEncounterForm() && !note.isInvoice())
+						if (!note.isDocument() && !note.isCpp() && !note.isEformData() && !note.isEncounterForm() && !note.isInvoice() && !note.isConsultation())
 						{
 
 					 	%>
@@ -437,7 +441,7 @@ int maxId = 0;
 						<%
 						}
 
-					 	if (!note.isDocument() && !note.isRxAnnotation())
+					 	if (!note.isDocument() && !note.isRxAnnotation() && !note.isConsultation())
 					 	{
 					 		// only allow editing for local notes
 					 		// also disallow editing of cpp's inline (can be edited in the cpp area)
@@ -518,6 +522,9 @@ int maxId = 0;
 								<a class="links" title="<bean:message key="oscarEncounter.view.docView"/>" id="view<%=globalNoteId%>" href="#" onclick="<%=url%>" style="float: right; margin-right: 5px; font-size: 10px;"> <bean:message key="oscarEncounter.view" /> </a>
 							<%
 			 			}
+						else if(note.isConsultation()) {
+							// no links for consultations for now
+						}
 						else
 						{ //document note
 							String url;
@@ -564,7 +571,10 @@ int maxId = 0;
 								<a class="links" title="<bean:message key="oscarEncounter.view.eformView"/>" id="view<%=globalNoteId%>" href="#" onclick="<%=url%>" style="float: right; margin-right: 5px; font-size: 10px;"> <bean:message key="oscarEncounter.view" /> </a>
 							<%
 						}
-					 	if (!note.isDocument() && !note.isCpp() && !note.isEformData() && !note.isEncounterForm() && !note.isInvoice()) {
+						else if (note.isConsultation()) {
+							// TODO implement linking to consultation
+						}
+					 	if (!note.isDocument() && !note.isCpp() && !note.isEformData() && !note.isEncounterForm() && !note.isInvoice() && !note.isConsultation()) {
 					 		String atbname = "anno" + String.valueOf(new Date().getTime());
 					 		String addr = request.getContextPath() + "/annotation/annotation.jsp?atbname=" + atbname + "&table_id=" + String.valueOf(note.getNoteId()) + "&display=EChartNote&demo=" + demographicNo;
 						%>
@@ -572,7 +582,7 @@ int maxId = 0;
 						<%}
 						%>
 							<%-- render the note contents here --%>
-			  				<div id="txt<%=globalNoteId%>" style="<%=(note.isDocument()||note.isCpp()||note.isEformData()||note.isEncounterForm()||note.isInvoice())?(bgColour+";color:white;font-size:10px"):""%>">
+			  				<div id="txt<%=globalNoteId%>" style="<%=(note.isDocument()||note.isCpp()||note.isEformData()||note.isEncounterForm()||note.isInvoice()||note.isConsultation())?(bgColour+";color:white;font-size:10px"):""%>">
 		  						<%=noteStr%>
 		  						<%
 		  							if (note.isCpp()||note.isEformData()||note.isEncounterForm()||note.isInvoice())
@@ -618,7 +628,7 @@ int maxId = 0;
 						<%
 				 		}
 
-						if (!note.isDocument() && !note.isCpp() && !note.isEformData() && !note.isEncounterForm() && !note.isInvoice())
+						if (!note.isDocument() && !note.isCpp() && !note.isEformData() && !note.isEncounterForm() && !note.isInvoice() && !note.isConsultation())
 						{
 						
 							if (OscarProperties.getInstance().getBooleanProperty("note_program_ui_enabled", "true")) {

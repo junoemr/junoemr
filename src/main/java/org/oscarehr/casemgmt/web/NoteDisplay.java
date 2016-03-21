@@ -117,6 +117,8 @@ public interface NoteDisplay {
 	public boolean isEncounterForm();
 
 	public boolean isInvoice();
+	
+	public boolean isConsultation();
 
 	public CaseManagementNoteLink getNoteLink();
 

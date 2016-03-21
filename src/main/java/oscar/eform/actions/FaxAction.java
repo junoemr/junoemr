@@ -14,33 +14,47 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.casemgmt.model.CaseManagementNote;
+import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
+import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.EFormDataDao;
+import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.EFormData;
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.SecRole;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
 
-import oscar.OscarProperties;
-
 import com.lowagie.text.DocumentException;
+
+import oscar.OscarProperties;
+import oscar.dms.EDocUtil;
+import oscar.oscarEncounter.data.EctProgram;
+import oscar.util.UtilDateUtilities;
 
 public final class FaxAction {
 
 	private static final Logger logger = MiscUtils.getLogger();
 
 	private String localUri = null;
+	private HttpServletRequest request;
+	private OscarProperties props;
 	
 	private boolean skipSave = false;
 
 	public FaxAction(HttpServletRequest request) {
+		this.request = request;
 		localUri = getEformRequestUrl(request);
 		skipSave = "true".equals(request.getParameter("skipSave"));
+		props = OscarProperties.getInstance();
 	}
 
 	/**
@@ -79,7 +93,7 @@ public final class FaxAction {
 
 		return (url.toString());
 	}
-
+	
 	/**
 	 * This method will take eforms and send them to a PHR.
 	 * @throws DocumentException 
@@ -137,13 +151,71 @@ public final class FaxAction {
 		        	 eFormData.setCurrent(false);
 		        	 eFormDataDao.merge(eFormData);
 				}
+				
+				/* -- OHSUPPORT-2932 -- */
+				if(props.isPropertyActive("encounter_notes_add_fax_notes_eform")) {
+					String demographic_no = request.getParameter("efmdemographic_no");
+					String programNo = new EctProgram(request.getSession()).getProgram(providerId);
+					addFaxEncounterNote(demographic_no, providerId, programNo, faxNo, Long.valueOf(formId));
+				}
 			}
 			// Removing the consulation pdf.
-			tempFile.delete();			
+			tempFile.delete();
 						
 		} catch (IOException e) {
 			MiscUtils.getLogger().error("Error converting and sending eform. id="+formId, e);
 		} 
 	}
+	
+	/**
+	 * Add an encounter note when a fax is sent.
+	 *  -- OHSUPPORT-2932 -- 
+	 */
+	private boolean addFaxEncounterNote(String demographic_no, String providerId, String programNo, String faxNo, Long formId) {
+		CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
+		if(demographic_no != null) {
+			Provider provider = EDocUtil.getProvider(providerId);
+			if( providerId == null || provider == null) {
+				providerId = "-1"; //system
+				provider = EDocUtil.getProvider(providerId);
+				logger.warn("Missing or invalid providerNo for fax encounter note. Assigned to system (-1)");
+			}
+			SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
+			SecRole doctorRole = secRoleDao.findByName("doctor");
+			Date now = UtilDateUtilities.now();
+			String provFirstName = provider.getFirstName();
+			String provLastName = provider.getLastName();
+			
+			String strNote = "Faxed eForm to " + faxNo + " at " + now + " by " + provFirstName + " " + provLastName + ".";
 
+			// create the note
+			CaseManagementNote cmn = new CaseManagementNote();
+			cmn.setDemographic_no(demographic_no);
+			cmn.setProgram_no(programNo);
+			cmn.setUpdate_date(now);
+			cmn.setObservation_date(now);
+			cmn.setPosition(0);
+			cmn.setReporter_program_team("0");
+			cmn.setPassword("NULL");
+			cmn.setLocked(false);
+			cmn.setReporter_caisi_role(doctorRole.getId().toString());
+			cmn.setNote(strNote);
+			cmn.setHistory(strNote);
+			cmn.setProviderNo(providerId);
+			cmn.setSigned(true);
+			cmn.setSigning_provider_no(providerId);
+			
+			// save the note and create the link
+			Long note_id = cmm.saveNoteSimpleReturnID(cmn);
+			CaseManagementNoteLink cmLink = new CaseManagementNoteLink(CaseManagementNoteLink.EFORMDATA, formId, note_id);
+			EDocUtil.addCaseMgmtNoteLink(cmLink);
+			
+			logger.info("Saved note_id=" + note_id.toString() + " for demographic " + demographic_no);
+			return true;
+		}
+		else {
+			logger.error("failed to add fax note to encounter notes. null demographicNo");
+		}
+		return false;
+	}
 }

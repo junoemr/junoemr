@@ -55,7 +55,7 @@ function finishPage(secs){
 					
 				String id  = (String)request.getAttribute("fdid");
 				String[] s = request.getParameterValues("faxRecipients");
-				String providerId = request.getParameter("providerId");
+				String providerId = request.getParameter("efmprovider_no");
 				FaxAction bean=new FaxAction(request);
 				try { 
 					bean.faxForms(s,id,providerId);

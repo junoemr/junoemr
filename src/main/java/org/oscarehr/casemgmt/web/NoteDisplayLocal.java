@@ -155,6 +155,9 @@ public class NoteDisplayLocal implements NoteDisplay {
 	public boolean isDocument() {
 		return (caseManagementNote.isDocumentNote());
 	}
+	public boolean isConsultation() {
+		return caseManagementNote.isConsultation();
+	}
 
 	public boolean isEformData() {
 		return (caseManagementNote.isEformData());
