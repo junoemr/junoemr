@@ -46,6 +46,9 @@ if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 		siteBgColor.put(st.getName(), new String[]{st.getBgColor(), st.getShortName()});
 	}
 }
+//default colour/name when appointment not assigned to multisite correctly (happens when appoinment made before multisites enabled)
+String multisiteDefaultColour = "#EEEEFF"; 
+String multisiteDefaultShName = "N/A";
 
   String curProvider_no = (String) session.getAttribute("user");
   String demographic_no = request.getParameter("demographic_no");
@@ -56,6 +59,8 @@ if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
   String demolastname = request.getParameter("last_name")==null?"":request.getParameter("last_name");
   String demofirstname = request.getParameter("first_name")==null?"":request.getParameter("first_name");
   String deepColor = "#CCCCFF" , weakColor = "#EEEEFF" ;
+	
+
 %>
 <%@ page
 	import="java.util.*, java.sql.*, java.net.*, oscar.*, oscar.oscarDB.*"
@@ -313,7 +318,14 @@ function popupPageNew(vheight,vwidth,varpage) {
       %>
       <td>&nbsp;<%=remarks%><% if(newline){%><br/>&nbsp;<%}%><%=comments%></td>
       <% if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) { 
-	String[] sbc = siteBgColor.get(apptMainBean.getString(rs,"location")); 
+			String siteName = apptMainBean.getString(rs,"location");
+			String[] sbc;
+			if(siteName != null && siteBgColor.containsKey(siteName)) {
+				sbc = siteBgColor.get(siteName);
+			}
+			else {
+				sbc = new String[] {multisiteDefaultColour, multisiteDefaultShName};
+			}
       %>      
 	<td style='background-color:<%= sbc[0] %>'><%= sbc[1] %></td>
       <% } %>      
