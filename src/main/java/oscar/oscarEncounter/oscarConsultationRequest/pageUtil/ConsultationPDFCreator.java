@@ -25,11 +25,6 @@ import org.oscarehr.common.model.DigitalSignature;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.OscarProperties;
-import oscar.oscarClinic.ClinicData;
-import oscar.oscarRx.data.RxProviderData;
-import oscar.oscarRx.data.RxProviderData.Provider;
-
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
@@ -42,6 +37,11 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
+
+import oscar.OscarProperties;
+import oscar.oscarClinic.ClinicData;
+import oscar.oscarRx.data.RxProviderData;
+import oscar.oscarRx.data.RxProviderData.Provider;
 
 public class ConsultationPDFCreator extends PdfPageEventHelper {
 
@@ -230,28 +230,37 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		infoTable.addCell(cell);
 
-		if (reqFrm.pwb.equals("1")){
-			// msgPleaseReplayPatient does not exist. Using Part1 and Part2 method
-			// instead
-			//cell.setPhrase(new Phrase(getResource("msgPleaseReplyPatient"), boldFont));
-			cell.setPhrase(new Phrase(
-					String.format("%s %s %s", getResource("msgPleaseReplyPart1"),
-											  clinic.getClinicName(),
-											  getResource("msgPleaseReplyPart2")), boldFont));
+		// allow header message to be disabled in properties file
+		if(!props.isPropertyActive("consultation_fax_disable_header_message")) {
+			cell = createHeaderMessage();
+			infoTable.addCell(cell);
 		}
 
-		else if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
+		return infoTable;
+	}
+	
+	/**
+	 * Creates a special header cell with a message
+	 * @return
+	 */
+	private PdfPCell createHeaderMessage() {
+		PdfPCell cell = new PdfPCell(new Phrase("", headerFont));
+		
+		boolean patientWillBook = reqFrm.pwb.equals("1");
+		
+		// multisite reply message
+		if (!patientWillBook && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 			cell.setPhrase(new Phrase("Please reply", boldFont));
 		}
+		// default reply message
 		else {
 			cell.setPhrase(new Phrase(
 					String.format("%s %s %s", getResource("msgPleaseReplyPart1"),
 											  clinic.getClinicName(),
 											  getResource("msgPleaseReplyPart2")), boldFont));
 		}
-		infoTable.addCell(cell);
-
-		return infoTable;
+		
+		return cell;
 	}
 
 	/**
