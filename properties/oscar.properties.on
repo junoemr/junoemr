@@ -978,3 +978,6 @@ auto_populate_billingreferral_bc=true
 #encounter_notes_add_fax_notes_eform=on
 #encounter_notes_add_fax_notes_consult=on
 
+#OHSUPPORT-2929 - disable the 'please reply to' header message in consultation print/fax pages. 
+# -- Only for consultation_fax_enabled=true faxing/printing
+#consultation_fax_disable_header_message=true
