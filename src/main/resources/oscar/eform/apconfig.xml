@@ -323,7 +323,7 @@
        	</ap-sql>
         <ap-output>${address_name}</ap-output>
     </databaseap>
-    	<databaseap>
+    <databaseap>
         <ap-name>licensed_producer_address_name_list</ap-name>
         <ap-sql>SELECT GROUP_CONCAT(pa.display_name SEPARATOR ';') as list
         		 FROM licensed_producer_address pa
@@ -389,8 +389,7 @@
        	</ap-sql>
         <ap-output>${address_list}</ap-output>
     </databaseap>
-	</databaseap>
-        <databaseap>
+    <databaseap>
         <ap-name>multisite_city_list</ap-name>
         <ap-sql>SELECT GROUP_CONCAT(
 					REPLACE(city,';','')
@@ -401,8 +400,7 @@
        	</ap-sql>
         <ap-output>${city_list}</ap-output>
     </databaseap>
-	</databaseap>
-        <databaseap>
+    <databaseap>
         <ap-name>multisite_province_list</ap-name>
         <ap-sql>SELECT GROUP_CONCAT(
 					REPLACE(province,';','')
@@ -413,8 +411,7 @@
        	</ap-sql>
         <ap-output>${province_list}</ap-output>
     </databaseap>
-	</databaseap>
-        <databaseap>
+    <databaseap>
         <ap-name>multisite_postal_list</ap-name>
         <ap-sql>SELECT GROUP_CONCAT(
 					REPLACE(postal,';','')
