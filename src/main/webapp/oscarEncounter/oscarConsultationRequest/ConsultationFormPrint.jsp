@@ -165,7 +165,7 @@
 	        clinic.setClinic_fax(temp6[0]);
 	    } else {
 	    	//is letterhead different?
-	    	if(!reqFrm.letterheadName.equals(clinic.getClinicName()) && !reqFrm.letterheadName.equals("-1")) {
+	    	if(!reqFrm.letterheadName.equals(clinic.getClinicName()) && !reqFrm.letterheadName.equals("-1") && !reqFrm.letterheadName.equals("multisite")) {
 	    		Provider p = providerDao.getProvider(reqFrm.letterheadName);
 	    		if(p != null) {
 		    		//why, yes it is
@@ -394,7 +394,7 @@
                             	<c:if test="${empty infirmaryView_programAddress}">
 	                                <b><%=clinic.getClinicName()%></b>
 								</c:if>
-								<% if (!reqFrm.letterheadName.trim().equals("-1")){%>
+								<% if (!reqFrm.letterheadName.trim().equals("-1") && !reqFrm.letterheadName.equals("multisite")){%>
 									<div><%=reqFrm.getProviderName(reqFrm.letterheadName) %></div>
 								<% } %>
                             </td>

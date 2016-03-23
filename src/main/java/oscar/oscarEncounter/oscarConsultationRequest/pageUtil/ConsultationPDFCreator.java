@@ -46,6 +46,7 @@ import oscar.oscarRx.data.RxProviderData.Provider;
 public class ConsultationPDFCreator extends PdfPageEventHelper {
 
 	private static Logger logger = MiscUtils.getLogger();
+	private static boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 	private OutputStream os;
 
 	private Document document;
@@ -182,7 +183,7 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 		main.addCell(cell);
 		return cell;
 	}
-
+	
 	/**
 	 * Creates a table and populates it with the clinic information for the header.
 	 * @return the table produced
@@ -195,11 +196,13 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 			ProgramDao programDao = (ProgramDao) SpringUtils.getBean("programDao");
 			Integer programNo = Integer.parseInt(reqFrm.letterheadName.substring(5));
 			letterheadName = programDao.getProgramName(programNo);
-		} else if (!reqFrm.letterheadName.equals("-1")) {
+		}
+		else if (!reqFrm.letterheadName.equals("-1") && !reqFrm.letterheadName.equals("multisite")) {
 			Provider letterheadNameProvider = (reqFrm.letterheadName != null ? new RxProviderData().getProvider(reqFrm.letterheadName) : null);
 			if (letterheadNameProvider != null)
 				letterheadName = letterheadNameProvider.getFirstName() + " " + letterheadNameProvider.getSurname();
-		} else {
+		}
+		else {
 			letterheadName = clinic.getClinicName();
 		}
 
