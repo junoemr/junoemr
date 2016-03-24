@@ -320,9 +320,7 @@ function onDocumentLoad() {
 	// intitalize to the correct site and set the letterhead
 	if(bMultisites) { %>
 		updateSelectedMultisite(document.getElementById("siteName"));
-		if(isLetterheadMultisiteSelected()) {
-			setLetterheadToMultisiteInfo(selectedMultisiteIndex);
-		}
+
 	<%
 	}%>
 }
