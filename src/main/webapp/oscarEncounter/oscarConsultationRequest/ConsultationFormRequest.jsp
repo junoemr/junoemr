@@ -313,6 +313,21 @@ var specialistFaxNumber = "";
 <%oscar.oscarEncounter.oscarConsultationRequest.config.data.EctConConfigurationJavascriptData configScript;
 				configScript = new oscar.oscarEncounter.oscarConsultationRequest.config.data.EctConConfigurationJavascriptData();
 				out.println(configScript.getJavascript());%>
+
+// initialize anything that needs it when the document has loaded
+function onDocumentLoad() {
+	<%
+	// intitalize to the correct site and set the letterhead
+	if(bMultisites) { %>
+		updateSelectedMultisite(document.getElementById("siteName"));
+		if(isLetterheadMultisiteSelected()) {
+			setLetterheadToMultisiteInfo(selectedMultisiteIndex);
+		}
+	<%
+	}%>
+}
+jQuery(document).ready(onDocumentLoad);
+				
 				
 /////////////////////////////////////////////////////////////////////
 function initMaster() {
@@ -1004,11 +1019,16 @@ if (OscarProperties.getInstance().getBooleanProperty("consultation_program_lette
 		}
 	}
 } %>
-function letterheadMultisiteSelected() {
+function isLetterheadMultisiteSelected() {
 	return document.getElementById("letterheadName").value === multisiteSpecialVal;
 }
 
-function updateSelectedMultisite(siteName) {
+function updateSelectedMultisite(element) {
+	// set the background colour
+	element.style.backgroundColor=element.options[element.selectedIndex].style.backgroundColor;
+	
+	// update the global index
+	var siteName = element.value;
 	selectedMultisiteIndex = 0;
 	for(i=0; i< multisite.length; i++) {
 		if(multisite[i].name === siteName) {
@@ -1017,7 +1037,7 @@ function updateSelectedMultisite(siteName) {
 		}
 	}
 	console.info("set site index " + selectedMultisiteIndex);
-	if(letterheadMultisiteSelected()) {
+	if(isLetterheadMultisiteSelected()) {
 		setLetterheadToMultisiteInfo(selectedMultisiteIndex);
 	}
 }
@@ -1032,7 +1052,7 @@ function setLetterheadToMultisiteInfo(multisiteIndex) {
 	
 	var addressline = site.address + " " + site.city + " " + site.province + " " + site.postal;
 	
-	// apparently letterheadName.value is actually a providerNo. Until this is fixed we pass in a special value that is specifically checked for
+	/* apparently letterheadName.value is actually a providerNo. Until this is fixed we pass in a special 'multisite' value that is specifically checked for */
 	document.getElementById("letterheadName").value = multisiteSpecialVal;
 	//document.getElementById("letterheadName").value = site.name;
 	document.getElementById("letterheadAddress").value = addressline;
@@ -1776,7 +1796,7 @@ function chooseEmail(){
 								<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.siteName" />:
 							</td>
 							<td>
-								<html:select property="siteName" onchange='this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor; updateSelectedMultisite(this.value);'>
+								<html:select property="siteName" styleId="siteName" onchange='updateSelectedMultisite(this);'>
 						            <%
 						            for (Site site:sites) {
 					            		String addrName = site.getName();
@@ -1787,7 +1807,7 @@ function chooseEmail(){
 						            %>
 						                    <html:option value="<%=addrName%>" style='<%="background-color: "+bgColour%>'> <%=addrName%> </html:option>
 						            <%  }%>
-							</html:select>
+								</html:select>
 							</td>
 						</tr>
 						<%} %>
@@ -1913,7 +1933,9 @@ function chooseEmail(){
 								if(bMultisites && sites.size() > 0 ) { %>
 									<option value="multisite"><%=multisiteLetterheadSelectionName %></option> <%
 								}%>
-									<option value="-1"><%=clinic.getClinicName() %></option> 
+									<option value="-1" <%=(consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase("-1") ? "selected='selected'"  : "") %>>
+									<%=clinic.getClinicName() %>
+									</option> 
 								<%
 									for (Provider p : prList) {
 										if (p.getProviderNo().compareTo("-1") != 0 && (p.getFirstName() != null || p.getSurname() != null)) {
@@ -2378,15 +2400,6 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 
 Calendar.setup( { inputField : "followUpDate", ifFormat : "%Y/%m/%d", showsTime :false, button : "followUpDate_cal", singleClick : true, step : 1 } );
 
-<%
-// intitalize to the correct site and set the letterhead
-if(bMultisites) { %>
-	updateSelectedMultisite("<%=defaultSiteName%>");
-	if(letterheadMultisiteSelected()) {
-		setLetterheadToMultisiteInfo(selectedMultisiteIndex);
-	}
-<%
-}%>
 </script>
 </html:html>
 

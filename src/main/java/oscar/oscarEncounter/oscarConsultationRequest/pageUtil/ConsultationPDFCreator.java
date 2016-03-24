@@ -202,6 +202,9 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 			if (letterheadNameProvider != null)
 				letterheadName = letterheadNameProvider.getFirstName() + " " + letterheadNameProvider.getSurname();
 		}
+		else if (reqFrm.letterheadName.equals("multisite")) {
+			letterheadName = reqFrm.getSiteName();
+		}
 		else {
 			letterheadName = clinic.getClinicName();
 		}

@@ -397,6 +397,9 @@ public class EctConsultationFormRequestUtil {
 
         return retval;
     }
+    public String getSiteName() {
+    	return (siteName == null) ? "" : siteName;
+    }
 
     public String patientName;
     public String patientFirstName;
