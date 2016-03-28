@@ -44,6 +44,7 @@ import org.oscarehr.util.SpringUtils;
 public class EctConAddSpecialistAction extends Action {
 
 	private static final Logger logger=MiscUtils.getLogger();
+	private static final int[] refNoRange = {4, 9}; // inclusive
 
 	private ProfessionalSpecialistDao professionalSpecialistDao=(ProfessionalSpecialistDao) SpringUtils.getBean("professionalSpecialistDao");
 
@@ -126,21 +127,10 @@ public class EctConAddSpecialistAction extends Action {
 				MiscUtils.getLogger().error("unable to obtain billingregion property from oscarVariables.");
 				return false;
 			}
-			String region = oscarVariables.getProperty("billregion");
-
-			// Make sure Alberta case is handled. referral number is 9 characters in AB
-			if (region.equals("AB")){
-				if(referralNo.length() == 9)
-					return true;
-				return false;
-			}
-			// Make sure the referral number is 5 or 6 characters long to be 
-			// valid in either bc or ontario.
-			else if ((referralNo.length() == 6 || referralNo.length() == 5))
-				return true;
-		
-			
-		} catch (Exception e) {
+			// Ensure referral number is within a valid range
+			return (referralNo.length() >= refNoRange[0] && referralNo.length() <= refNoRange[1] );
+		} 
+		catch (Exception e) {
 			MiscUtils.getLogger().info("Specified referral number invalid (" + referralNo + ")", e);
 		}
 

@@ -6731,7 +6731,7 @@ CREATE TABLE professionalSpecialists (
   eDataServiceName varchar(255),
   lastUpdated datetime not null,
   annotation text,
-  referralNo varchar(6)
+  referralNo varchar(9)
 );
 
 --

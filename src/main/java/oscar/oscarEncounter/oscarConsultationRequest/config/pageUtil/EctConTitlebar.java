@@ -25,38 +25,31 @@
 
 package oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil;
 
+import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 
 public class EctConTitlebar
 {
+    private ArrayList<String> jspVect;
+    private ArrayList<String> displayNameVect;
 
     public EctConTitlebar()
     {
     	ResourceBundle oscarR = ResourceBundle.getBundle("oscarResources");
-    	
-        jspVect = new Vector();
-        displayNameVect = new Vector();
-        jspVect.add("AddSpecialist.jsp");
-        displayNameVect.add(oscarR.getString("oscarEncounter.oscarConsultationRequest.config.btnAddSpecialist"));
-        jspVect.add("AddService.jsp");
-        displayNameVect.add(oscarR.getString("oscarEncounter.oscarConsultationRequest.config.btnAddService"));
-        jspVect.add("EditSpecialists.jsp");
-        displayNameVect.add(oscarR.getString("oscarEncounter.oscarConsultationRequest.config.btnEditSpecialists"));
-        jspVect.add("ShowAllServices.jsp");
-        displayNameVect.add(oscarR.getString("oscarEncounter.oscarConsultationRequest.config.btnShowAllServices"));
-        jspVect.add("DeleteServices.jsp");
-        displayNameVect.add(oscarR.getString("oscarEncounter.oscarConsultationRequest.config.btnDeleteServices"));
+    	init(oscarR);
     }
 
     public EctConTitlebar(HttpServletRequest request)
     {
     	ResourceBundle oscarR = ResourceBundle.getBundle("oscarResources",request.getLocale());
-    	
-        jspVect = new Vector();
-        displayNameVect = new Vector();
+    	init(oscarR);
+    }
+    
+    private void init(ResourceBundle oscarR) {
+        jspVect = new ArrayList<String>(5);
+        displayNameVect = new ArrayList<String>(5);
         jspVect.add("AddSpecialist.jsp");
         displayNameVect.add(oscarR.getString("oscarEncounter.oscarConsultationRequest.config.btnAddSpecialist"));
         jspVect.add("AddService.jsp");
@@ -80,15 +73,15 @@ public class EctConTitlebar
         uri = uri.substring(ind + 1);
 
         for(int i = 0; i < jspVect.size(); i++){
-            if(uri.equals(jspVect.elementAt(i)) && request.getAttribute("upd") == null)
+            if(uri.equals(jspVect.get(i)) && request.getAttribute("upd") == null)
             {
                 strBuf.append("      <td bgcolor=\"#ccccff\">\n");
-                strBuf.append("         <a href="+(String)jspVect.elementAt(i)+" class=\"consultButtonsDormant\">"+(String)displayNameVect.elementAt(i)+"</a>\n" );
+                strBuf.append("         <a href="+jspVect.get(i)+" class=\"consultButtonsDormant\">"+displayNameVect.get(i)+"</a>\n" );
                 strBuf.append("      </td>\n");
             } else
             {
                 strBuf.append("      <td bgcolor=\"#9999ff\">\n");
-                strBuf.append(String.valueOf(String.valueOf((new StringBuilder("         <a href=")).append((String)jspVect.elementAt(i)).append(" class=\"consultButtonsActive\">").append((String)displayNameVect.elementAt(i)).append("</a>\n"))));
+                strBuf.append(String.valueOf(String.valueOf((new StringBuilder("         <a href=")).append(jspVect.get(i)).append(" class=\"consultButtonsActive\">").append(displayNameVect.get(i)).append("</a>\n"))));
                 strBuf.append("      </td>\n");
             }
             strBuf.append("   </tr>\n");
@@ -96,7 +89,4 @@ public class EctConTitlebar
         strBuf.append("</table>\n");
         return strBuf.toString();
     }
-
-    Vector jspVect;
-    Vector displayNameVect;
 }

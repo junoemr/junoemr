@@ -32,6 +32,9 @@
 
 <%@page import="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConAddSpecialistForm"%><html:html locale="true">
 
+<!-- Import jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"> </script>
+
 <%
   ResourceBundle oscarR = ResourceBundle.getBundle("oscarResources",request.getLocale());
 
@@ -50,9 +53,66 @@
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
 </head>
 <script language="javascript">
+
+var billregion = "<%=oscarVariables.getProperty("billregion")%>";
+var refnoinuse = <%=request.getAttribute("refnoinuse") != null%>;
+var refnoinvalid = <%=request.getAttribute("refnoinvalid") != null%>;
+
+var refNoInvalidAB = '<bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalidAB" />';
+var refNoInvalidBC = '<bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalidBC" />';
+var refNoInvalidON = '<bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalidON" />';
+var refNoInUseMessage = '<bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInUse" />';
+var refNoValidationFailed = '<bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalid" />';
+
+var warnColour = "#e97600";
+var errorColour = "red";
+
 function BackToOscar() {
        window.close();
 }
+function updateRefNoWarning(element) {
+
+	var messageBox = document.getElementById("refNoWarn");
+	var refNoLen = element.value.length;
+	
+	var messageString = "";
+
+	if(refNoLen > 0) {
+		if(billregion === "BC") {
+			if(refNoLen < 5 || refNoLen > 6) {
+				messageString = refNoInvalidBC;
+			}
+		}
+		else if(billregion === "ON") {
+			if(refNoLen < 5 || refNoLen > 6) {
+				messageString = refNoInvalidON;
+			}		
+		}
+		else if(billregion === "AB") {
+			if(refNoLen < 9 || refNoLen > 9) {
+				messageString = refNoInvalidAB;
+			}
+		}
+	}
+	messageBox.innerHTML = messageString;
+	messageBox.style.color = warnColour;
+}
+function onDocumentLoad() {
+	var refNoWarnElem = document.getElementById("refNoWarn");
+	var refNoInputElem = document.getElementById("EctConAddSpecialistForm");
+	refNoWarnElem.style.color = errorColour;
+	
+	if (refnoinuse) {
+		refNoWarnElem.innerHTML = refNoInUseMessage;
+	}
+	else if (refnoinvalid) {
+		refNoWarnElem.innerHTML = refNoValidationFailed;
+	}
+	else {
+		updateRefNoWarning(refNoInputElem);
+	}
+}
+jQuery(document).ready(onDocumentLoad);
 </script>
 
 <link rel="stylesheet" type="text/css" href="../../encounterStyles.css">
@@ -134,7 +194,7 @@ function BackToOscar() {
 							</td>
 							<td><html:textarea name="EctConAddSpecialistForm" property="address" cols="30" rows="3" /> <%=oscarVariables.getProperty("consultation_comments","") %>
 							</td>
-                                                        <td><bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.Annotation" />
+							<td><bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.Annotation" />
 							</td>
 							<td colspan="4"><html:textarea name="EctConAddSpecialistForm" property="annotation" cols="30" rows="3" />
 							</td>
@@ -158,24 +218,11 @@ function BackToOscar() {
 							<td><html:text name="EctConAddSpecialistForm" property="specType" /></td>
 							<td><bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNo" /></td>
 							<td colspan="4">
-								<% if (request.getAttribute("refnoinuse") != null) { %>
-									<span style="color: red;"><bean:message
-										key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInUse" /></span><br />
-								<% } else if (oscarVariables.getProperty("billregion").equals("AB") && request.getAttribute("refnoinvalid") != null) { %>
-									<span style="color: red;"><bean:message
-										key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalidAB" /></span><br />
-								<% } else if (request.getAttribute("refnoinvalid") != null) { %>
-									<span style="color: red;"><bean:message
-										key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalid" /></span><br />
-								<% } %>
-								<%if(oscarVariables.getProperty("billregion")!=null && oscarVariables.getProperty("billregion").equals("AB")) { %>
-									<html:text name="EctConAddSpecialistForm" property="referralNo" maxlength="9" />
-								<% } 
-								else { %>
-									<html:text name="EctConAddSpecialistForm" property="referralNo" maxlength="6" />
-								<% } %>
-								
-								
+
+								<span id="refNoWarn" style="color: red;"></span><br />
+								<html:text styleId="EctConAddSpecialistForm" name="EctConAddSpecialistForm" property="referralNo" maxlength="9"
+										onkeyup="updateRefNoWarning(this)" 
+										onchange="updateRefNoWarning(this)"/>
 							</td>
 						</tr>
 						<tr>
