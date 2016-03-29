@@ -114,26 +114,22 @@ public class EctConAddSpecialistAction extends Action {
 		return (specialist != null && (specialist.getId().intValue() != specId.intValue()));
 	}
 
+	/** 
+	 * Check that the given string is a valid referral number.
+	 * Run a parseInt to make sure it's an integer and ensure the length is within a valid range.
+	 * @param referralNo a String representing the referral number
+	 * @return true if string contains a valid referral number, false otherwise
+	 */
 	private boolean referralNoValid(String referralNo) {
 		try {
-			// Run a parseint to make sure it's an integer (it will log an
-			// error and return false if it is invalid)
+			// confirm that refno is valid integer value
 			Integer.parseInt(referralNo);
-			
-			// get oscar variables to check for billing region
-			java.util.Properties oscarVariables = oscar.OscarProperties.getInstance();
-			//security null check - should never happen
-			if(oscarVariables==null || oscarVariables.getProperty("billregion")==null){
-				MiscUtils.getLogger().error("unable to obtain billingregion property from oscarVariables.");
-				return false;
-			}
 			// Ensure referral number is within a valid range
-			return (referralNo.length() >= refNoRange[0] && referralNo.length() <= refNoRange[1] );
+			return( referralNo.length() >= refNoRange[0] && referralNo.length() <= refNoRange[1] );
 		} 
 		catch (Exception e) {
-			MiscUtils.getLogger().info("Specified referral number invalid (" + referralNo + ")", e);
+			MiscUtils.getLogger().info("Specified referral number invalid (" + referralNo + ")");
 		}
-
 		return false;
 	}
 
