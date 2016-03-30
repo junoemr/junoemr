@@ -117,6 +117,11 @@ if(session.getAttribute("user") == null ) //|| !((String) session.getValue("user
     //save results in request to maintain state of form
     request.setAttribute("inactive", ((inactive)?"1":"0"));
     request.setAttribute("active",((active)?"1":"0"));
+    
+    // admin accounts don't have preferences
+    ProviderPreference provPref = (ProviderPreference) session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
+    String groupNoString = "";
+    if(provPref != null ) groupNoString = " AND group_no='" + provPref.getMyGroupNo() + "' ";
 
 
   //operation available to the client - dboperation
@@ -146,7 +151,7 @@ if(session.getAttribute("user") == null ) //|| !((String) session.getValue("user
     {"search_ptstatus", "select distinct patient_status from demographic where patient_status != '' and patient_status != 'AC' and patient_status != 'IN' and patient_status != 'DE' and patient_status != 'MO' and patient_status != 'FI'"},
     {"search_rsstatus", "select distinct roster_status from demographic where roster_status != '' and roster_status != 'RO' and roster_status != 'NR' and roster_status != 'TE' and roster_status != 'FS' "},
     {"search_wlstatus", "select * from waitingList where demographic_no=? AND is_history='N' order by onListSince DESC"},
-    {"search_waiting_list", "select * from waitingListName where group_no='" + ((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo() +"' AND is_history='N' order by name"},
+    {"search_waiting_list", "select * from waitingListName where is_history='N' " + groupNoString +" order by name"},
     //muti-site query
     {"site_searchproviderall","select p.provider_no, p.last_name, p.first_name from provider p INNER JOIN providersite s ON p.provider_no = s.provider_no WHERE s.site_id IN (SELECT site_id from providersite where provider_no=?) AND p.status='1' order by last_name"},
     {"site_searchmygroupall" ,"select p.* from mygroup p INNER JOIN providersite s ON p.provider_no = s.provider_no WHERE s.site_id IN (SELECT site_id from providersite where provider_no=?) order by mygroup_no"},
@@ -179,7 +184,7 @@ if(session.getAttribute("user") == null ) //|| !((String) session.getValue("user
     {"search_ptstatus", "select distinct patient_status from demographic where patient_status != '' and patient_status != 'AC' and patient_status != 'IN' and patient_status != 'DE' and patient_status != 'MO' and patient_status != 'FI'"},
     {"search_rsstatus", "select distinct roster_status from demographic where roster_status != '' and roster_status != 'RO' and roster_status != 'NR' and roster_status != 'TE' and roster_status != 'FS' "},
     {"search_wlstatus", "select * from waitingList where demographic_no=? AND is_history='N' order by onListSince DESC"},
-    {"search_waiting_list", "select * from waitingListName where group_no='" + ((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo() +"' AND is_history='N' order by name"},
+    {"search_waiting_list", "select * from waitingListName where is_history='N' " + groupNoString +" order by name"},
     //muti-site query
     {"site_searchproviderall","select p.provider_no, p.last_name, p.first_name from provider p INNER JOIN providersite s ON p.provider_no = s.provider_no WHERE s.site_id IN (SELECT site_id from providersite where provider_no=?) AND p.status='1' order by last_name"},
     {"site_searchmygroupall" ,"select p.* from mygroup p INNER JOIN providersite s ON p.provider_no = s.provider_no WHERE s.site_id IN (SELECT site_id from providersite where provider_no=?) order by mygroup_no"},
