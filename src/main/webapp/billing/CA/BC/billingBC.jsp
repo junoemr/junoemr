@@ -748,12 +748,10 @@ if(wcbneeds != null){%>
          thisForm.setXml_encounter("8");
       }
     }
- 	// OHSUPORT-2718 - set the default billing physician. Overrides appointment physician
+ 	
     if (sxml_provider.trim().equals("")) {
-    	
+    	// OHSUPORT-2718 - set the default billing physician. Overrides appointment physician
     	sxml_provider = oscarProperties.getProperty("auto_populate_billing_bc_billingPhysicianID", bean.getApptProviderNo());
-    	//TODO remove this as I changed the name to the above to make more sense. it is only used by one instance.
-    	sxml_provider = oscarProperties.getProperty("auto_populate_billingreferral_physicianID_bc", sxml_provider);
 
     	// OHSUPORT-2883 - autofill based on assigned provider. only if not already autofilled
         if (oscarProperties.isPropertyActive("auto_populate_billing_bc_billingPhysician") && sxml_provider.trim().equals("none")) {
