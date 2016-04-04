@@ -153,6 +153,7 @@ if (isSiteAccessPrivacy || isTeamAccessPrivacy) {
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/checkDate.js"></script>
 <title><bean:message key="billing.billingCorrection.title" /></title>
 <link rel="stylesheet" type="text/css" href="billingON.css" />
 <!-- calendar stylesheet -->
@@ -273,6 +274,15 @@ function validateAllItems(){
 	   return false;
    }
    
+   // validate dates
+   var billingDate  = document.getElementById("xml_appointment_date").value;
+   var admisionDate = document.getElementById("xml_vdate").value;
+   if(!( admisionDate.trim() === "" || checkAndValidateDate(admisionDate, null) )) {
+	   return false;
+   }
+   if(!checkAndValidateDate(billingDate, null) ) {
+	   return false;
+   }
    return true;
 }
 function popupPage(vheight,vwidth,varpage) {
