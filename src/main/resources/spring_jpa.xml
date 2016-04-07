@@ -46,6 +46,7 @@
 			<props>
 				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
 				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.format_sql">true</prop>
 				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
 
 				<prop key="hibernate.cache.use_second_level_cache">false</prop>

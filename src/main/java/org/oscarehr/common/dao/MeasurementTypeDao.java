@@ -28,11 +28,14 @@ import java.util.List;
 import javax.persistence.Query;
 
 import org.oscarehr.common.model.MeasurementType;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class MeasurementTypeDao extends AbstractDao<MeasurementType> {
 
+	static org.apache.log4j.Logger log = MiscUtils.getLogger();
+	
 	public MeasurementTypeDao() {
 		super(MeasurementType.class);
 	}
@@ -58,6 +61,66 @@ public class MeasurementTypeDao extends AbstractDao<MeasurementType> {
 		List<MeasurementType> results = query.getResultList();
 
 		return (results);
+	}
+	
+	
+	/**
+	 * check the databse for duplicates matching Instruction and Name strings.
+	 * @param measuringInstrc
+	 * @param typeDisplayName
+	 * @return true if at least one entry exists matching both parameters, false otherwise
+	 */
+	public boolean isDuplicate(String typeDisplayName, String measuringInstrc) {
+		
+        String sql = "SELECT count(x) FROM "+modelClass.getSimpleName()+" x WHERE x.measuringInstruction = :instruct AND x.typeDisplayName = :name ";
+        
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("instruct", measuringInstrc);
+		query.setParameter("name", typeDisplayName);
+		
+		Long count =  (Long) query.getSingleResult();
+
+		return (count > 0);
+	}
+	
+	/**
+	 * find a list of measurement types matching the given display name
+	 * @param displayName
+	 * @return list of results
+	 */
+	public List<MeasurementType> findByDisplayName(String displayName) {
+		
+		String sqlCommand = "SELECT x FROM " + modelClass.getSimpleName() + " x WHERE x.typeDisplayName = :name ";
+
+		Query query = entityManager.createQuery(sqlCommand);
+		query.setParameter("name", displayName);
+
+		@SuppressWarnings("unchecked")
+		List<MeasurementType> results = query.getResultList();
+
+		return (results);
+	}
+	
+	/**
+	 * Saves a new measurementType to the database with the provided values
+	 * @param type
+	 * @param typeDisplayName
+	 * @param measureingInstruction
+	 * @param creationDate
+	 * @param validation
+	 * @return the id of the measurement created
+	 */
+	public int saveNewMeasurementType(String type, String typeDesc, String typeDisplayName, String measuringInstruction, String validation ) {
+		MeasurementType mt = new MeasurementType();
+		mt.setType(type);
+		mt.setTypeDescription(typeDesc);
+		mt.setTypeDisplayName(typeDisplayName);
+		mt.setMeasuringInstruction(measuringInstruction);
+		mt.setValidation(validation);
+		
+		this.persist(mt);
+		
+		return mt.getId();
 	}
 	
 }

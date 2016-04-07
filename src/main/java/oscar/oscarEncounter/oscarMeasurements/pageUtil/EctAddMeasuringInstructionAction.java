@@ -26,8 +26,6 @@
 package oscar.oscarEncounter.oscarMeasurements.pageUtil;
 
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,6 +33,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.validator.GenericValidator;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -42,113 +42,79 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.util.MessageResources;
+import org.oscarehr.common.dao.MeasurementTypeDao;
+import org.oscarehr.common.model.MeasurementType;
 import org.oscarehr.util.MiscUtils;
-
-import oscar.OscarProperties;
-import oscar.oscarDB.DBHandler;
-import oscar.oscarMessenger.util.MsgStringQuote;
+import org.oscarehr.util.SpringUtils;
 
 
 public class EctAddMeasuringInstructionAction extends Action {
+	
+	static Logger log = MiscUtils.getLogger();
 
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
+    	log.info("ADD MEASURING INSTRUCTION");
+    	
         EctAddMeasuringInstructionForm frm = (EctAddMeasuringInstructionForm) form;
+        MessageResources mr = getResources(request);
+        List<String> messages = new LinkedList<String>();
 
-        
         request.getSession().setAttribute("EctAddMeasuringInstructionForm", frm);
         
-        MsgStringQuote str = new MsgStringQuote();
-        String requestId = "";
-        List messages = new LinkedList();
-        
-        try{
-            
-
+        try {
+        	MeasurementTypeDao measurementTypeDao = (MeasurementTypeDao) SpringUtils.getBean("measurementTypeDao");
+            ActionMessages errors = new ActionMessages();  
+        	
             String typeDisplayName = frm.getTypeDisplayName();
             String measuringInstrc = frm.getMeasuringInstrc();
             String validation = frm.getValidation();
-            boolean isValid = true;
-            
-            ActionMessages errors = new ActionMessages();  
-            EctValidation validate = new EctValidation();
-            String regExp = validate.getRegCharacterExp();
-            String errorField = "The measuring instruction " + measuringInstrc;
-            if(!validate.matchRegExp(regExp, measuringInstrc)){
-                errors.add(measuringInstrc,
-                new ActionMessage("errors.invalid", errorField));
+
+    		if ( measuringInstrc == null ) measuringInstrc = "";
+        	String errorField = "The measuring instruction " + measuringInstrc;
+        	
+        	// can't exceed the table max length
+        	if (!GenericValidator.maxLength(measuringInstrc, 255)) {
+                errors.add(measuringInstrc, new ActionMessage("errors.maxlength", errorField, "255"));
                 saveErrors(request, errors);
-                isValid = false;                
-            }
-            if(!validate.maxLength(255, measuringInstrc)){
-                errors.add(measuringInstrc,
-                new ActionMessage("errors.maxlength", errorField, "255"));
-                saveErrors(request, errors);
-                isValid = false;
-            } 
-            if(!isValid)
                 return (new ActionForward(mapping.getInput()));
-            
-            String sql = "SELECT measuringInstruction FROM measurementType WHERE measuringInstruction='" + str.q(measuringInstrc) +"' AND typeDisplayName='" + str.q(typeDisplayName) + "'";
-            ResultSet rs = DBHandler.GetSQL(sql);
-            rs.next();
-            
-            if(rs.getRow()>0){
-                errors.add(measuringInstrc,
-                new ActionMessage("error.oscarEncounter.Measurements.duplicateTypeName"));
+        	}
+        	// can't have empty instructions
+        	if (!GenericValidator.minLength(measuringInstrc, 1)) {
+                errors.add(measuringInstrc, new ActionMessage("errors.minlength", errorField, "1"));
                 saveErrors(request, errors);
-                return (new ActionForward(mapping.getInput()));                
-            }
+                return (new ActionForward(mapping.getInput()));
+        	}
+        	
+        	// check database for duplicates by matching name and instruction strings
+        	if(measurementTypeDao.isDuplicate(typeDisplayName, measuringInstrc)) {
+        		errors.add(measuringInstrc, new ActionMessage("error.oscarEncounter.Measurements.duplicateTypeName"));
+                saveErrors(request, errors);
+                return (new ActionForward(mapping.getInput()));
+        	}
+
+            /* What's happening here is a query to grab the type and type descriptions from a previous 
+             * measurement type so we can duplicate them. Not a great way to do this */
+            List<MeasurementType> typeByNameList = measurementTypeDao.findByDisplayName(typeDisplayName);
             
-            rs.close();
-            sql = "SELECT * FROM measurementType WHERE typeDisplayName='" + str.q(typeDisplayName) +"'";
-            rs = DBHandler.GetSQL(sql);
-            rs.next();
-            
-            String type = oscar.Misc.getString(rs, "type");
-            String typeDesc = oscar.Misc.getString(rs, "typeDescription");            
+            // apparently we can assume this is never an empty list.
+            String type = typeByNameList.get(0).getType();
+            String typeDesc = typeByNameList.get(0).getTypeDescription();
             
             //Write to database
-            sql = "INSERT INTO measurementType"
-                +"(type, typeDisplayName, typeDescription, measuringInstruction, validation)"
-                +" VALUES ('"+str.q(type)+"','"+str.q(typeDisplayName)+"','"+str.q(typeDesc)+"','"+str.q(measuringInstrc)+"','"
-                + str.q(validation)+"')";
-            DBHandler.RunSQL(sql);
-
-
-            /* select the correct db specific command */
-            String db_type = OscarProperties.getInstance().getProperty("db_type").trim();
-            String dbSpecificCommand;
-            if (db_type.equalsIgnoreCase("mysql")) {
-                dbSpecificCommand = "SELECT LAST_INSERT_ID()";
-            } 
-            else if (db_type.equalsIgnoreCase("postgresql")){
-                dbSpecificCommand = "SELECT CURRVAL('consultationrequests_numeric')";
-            }
-            else
-                throw new SQLException("ERROR: Database " + db_type + " unrecognized.");
-
-            rs.close();
-            rs = DBHandler.GetSQL(dbSpecificCommand);
-            if(rs.next())
-                requestId = Integer.toString(rs.getInt(1));
-                
+            int typeId = measurementTypeDao.saveNewMeasurementType(type, typeDesc, typeDisplayName, measuringInstrc, validation);
+            request.setAttribute("requestId", typeId);
+            
+            messages.add(mr.getMessage("oscarEncounter.oscarMeasurements.AddMeasuringInstruction.successful", "!"));
         }
-        catch(SQLException e)
+        catch(Exception e)
         {
             MiscUtils.getLogger().error("Error", e);
+            messages.add("An Unexpected Error occured while attempting to save the measurement type!");
         }            
-        
-        MessageResources mr = getResources(request);
-        String msg = mr.getMessage("oscarEncounter.oscarMeasurements.AddMeasuringInstruction.successful", "!");
-        //String msg = "Measuring Instruction has been added successfully!";
-        messages.add(msg);
-        request.setAttribute("messages", messages);                
+        request.setAttribute("messages", messages);
         return mapping.findForward("success");
 
     }
-    
-    
-
 }
