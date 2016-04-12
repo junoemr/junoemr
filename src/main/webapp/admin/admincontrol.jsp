@@ -135,6 +135,7 @@ if(session.getAttribute("user") == null ) //|| !((String) session.getValue("user
     {"demographic_search_titlename", "select demographic_no,first_name,last_name,roster_status,sex,year_of_birth,month_of_birth,date_of_birth  from demographic where "+fieldname+ " "+regularexp+" ? " +orderby + " "+limit},
     {"demographic_search_merged", "select d.demographic_no,first_name,last_name,roster_status,sex,year_of_birth,month_of_birth,date_of_birth  from demographic d join demographic_merged dm on d.demographic_no = dm.demographic_no and dm.deleted = 0 where "+fieldname+ " "+regularexp+" ? " +orderby + " "+limit},
     {"demographic_search_detail", "select * from demographic where demographic_no=?"},
+    {"search_detail", "select * from demographic where demographic_no=?"}, // hack to allow demographic links in admincontrol
     {"demographic_search_detail_ptbr", "select * from demographic d left outer join demographic_ptbr dptbr on dptbr.demographic_no = d.demographic_no where d.demographic_no=?"},
     {"demographic_search_demoaddno", "select demographic_no from demographic where last_name=? and first_name =? and year_of_birth=? and month_of_birth=? and date_of_birth=? and hin=? and ver=?"},
     {"search_lastfirstnamedob", "select demographic_no from demographic where last_name=? and first_name=? and year_of_birth=? and month_of_birth=? and date_of_birth=?"},
@@ -169,6 +170,7 @@ if(session.getAttribute("user") == null ) //|| !((String) session.getValue("user
     {"demographic_search_titlename", "select demographic_no,first_name,last_name,roster_status,sex,year_of_birth,month_of_birth,date_of_birth  from demographic where "+fieldname+ " "+regularexp+" ? " +orderby + " "+limit},
     {"demographic_search_merged", "select d.demographic_no,first_name,last_name,roster_status,sex,year_of_birth,month_of_birth,date_of_birth  from demographic d join demographic_merged dm on d.demographic_no = dm.demographic_no and dm.deleted = 0 where "+fieldname+ " "+regularexp+" ? " +orderby + " "+limit},
     {"demographic_search_detail", "select * from demographic where demographic_no=?"},
+    {"search_detail", "select * from demographic where demographic_no=?"}, // hack to allow demographic links in admincontrol
     {"demographic_search_demoaddno", "select demographic_no from demographic where last_name=? and first_name =? and year_of_birth=? and month_of_birth=? and date_of_birth=? and hin=? and ver=?"},
     {"search_lastfirstnamedob", "select demographic_no from demographic where last_name=? and first_name=? and year_of_birth=? and month_of_birth=? and date_of_birth=?"},
 
