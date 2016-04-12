@@ -395,8 +395,7 @@ public final class RxRePrescribeAction extends DispatchAction {
 			response.sendRedirect("error.html");
 			return null;
 		}
-		List<String> reRxDrugList = new ArrayList<String>();
-		reRxDrugList = bean.getReRxDrugIdList();
+		List<String> reRxDrugList = bean.getReRxDrugIdList();
 		MiscUtils.getLogger().debug(reRxDrugList);
 		List<RxPrescriptionData.Prescription> listReRxDrug = new ArrayList<Prescription>();
 		for (String drugId : reRxDrugList) {
