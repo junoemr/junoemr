@@ -118,8 +118,10 @@
 
 
                     <td colspan="8">
-                        <div style="text-align: right; font-weight: bold"> <a id="firstP" href="javascript:void(0);" onclick="firstPage('<%=docId%>');"><<</a>
-                        <a id="prevP" href="javascript:void(0);" onclick="prevPage('<%=docId%>');"><</a>
+                        <div style="text-align: right; font-weight: bold"> 
+                        <a id="firstP" href="javascript:void(0);" onclick="firstPage('<%=docId%>');" style="visibility:hidden"><<</a>
+                        <a id="prevP" href="javascript:void(0);" onclick="prevPage('<%=docId%>');" style="visibility:hidden"><</a>
+                        <span id="pageNum" value=1>1</span>
                         <a id="nextP" href="javascript:void(0);" onclick="nextPage('<%=docId%>');">></a>
                         <a id="lastP" href="javascript:void(0);" onclick="lastPage('<%=docId%>');">>></a></div>
                         <a href="<%=url2%>" ><img alt="document" src="<%=url%>" id="docImg_<%=docId%>" /></a>
@@ -210,65 +212,64 @@
                                                         e.setAttribute('src',url);
                                                     }
                                                 }
+                                                
+                                                changePage=function(docid, pageNum) {
+                                                	if(pageNum < 1) { pageNum = 1;}
+                                                	if(pageNum > totalPage) {pageNum = totalPage;}
+                                                	
+                                                	if(pageNum == 1) {
+                                                		hidePrev();
+                                                		showNext();
+                                                	}
+                                                	else if (pageNum == totalPage) {
+                                                		hideNext();
+                                                		showPrev();
+                                                	}
+                                                	else {
+                                                		showNext();
+                                                		showPrev();
+                                                	}
+                                                	$("pageNum").innerHTML = pageNum;
+                                                	$("pageNum").value = pageNum;
+                                                	showPageImg(docid,pageNum);
+                                                	
+                                                }
+                                                
                                                 nextPage=function(docid){
-                                                    curPage++;
-                                                    
-                                                        showPageImg(docid,curPage);
-                                                        if(curPage+1==totalPage){
-                                                            hideNext();
-                                                            showPrev();
-                                                        } else{
-                                                            showNext();
-                                                            showPrev();
-                                                        }
+                                                	curPage++;
+                                                	changePage(docid, curPage)
                                                 }
                                                 prevPage=function(docid){
-                                                    curPage--;
-                                                    if(curPage<1){
-                                                        curPage=1;
-                                                        hidePrev();
-                                                    }else{
-                                                        showPageImg(docid,curPage);
-                                                       if(curPage==1){
-                                                           hidePrev();
-                                                           showNext();
-                                                        }else{
-                                                            showPrev();
-                                                            showNext();
-                                                        }
-                                                    }
+                                                	curPage--;
+                                                	changePage(docid, curPage)
                                                 }
                                                 firstPage=function(docid){
-                                                    curPage=1;
-                                                    showPageImg(docid,curPage);
-                                                    hidePrev();
-                                                    showNext();
+                                                	curPage = 1;
+                                                    changePage(docid, curPage)
                                                 }
                                                 lastPage=function(docid){
-                                                    curPage=totalPage;
-                                                    showPageImg(docid,curPage);
-                                                    hideNext();
-                                                    showPrev();
+                                                	curPage = totalPage;
+                                                    changePage(docid, curPage)
                                                 }
                                                 hidePrev=function(){
                                                     //disable previous link
-                                                    $("prevP").setStyle({display:'none'});
-                                                    $("firstP").setStyle({display:'none'});
+                                                    $("prevP").setStyle({visibility: 'hidden'});
+                                                    $("firstP").setStyle({visibility: 'hidden'});
                                                 }
                                                 hideNext=function(){
                                                     //disable next link
-                                                    $("nextP").setStyle({display:'none'});
-                                                    $("lastP").setStyle({display:'none'});
+                                                    $("nextP").setStyle({visibility: 'hidden'});
+                                                    $("lastP").setStyle({visibility: 'hidden'});
                                                 }
                                                 showPrev=function(){
                                                     //disable previous link
-                                                    $("prevP").setStyle({display:'inline'});
-                                                    $("firstP").setStyle({display:'inline'});
+                                                    $("prevP").setStyle({visibility: 'visible'});
+                                                    $("firstP").setStyle({visibility: 'visible'});
                                                 }
                                                 showNext=function(){
                                                     //disable next link
-                                                    $("nextP").setStyle({display:'inline'});
-                                                    $("lastP").setStyle({display:'inline'});
+                                                    $("nextP").setStyle({visibility: 'visible'});
+                                                    $("lastP").setStyle({visibility: 'visible'});
                                                 }
                                                 popupStart=function(vheight,vwidth,varpage,windowname) {
                                                     oscarLog("in popupStart ");
