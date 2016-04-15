@@ -66,7 +66,7 @@
     {"search_ptstatus", "select distinct patient_status from demographic where patient_status != '' and patient_status != 'AC' and patient_status != 'IN' and patient_status != 'DE' and patient_status != 'MO' and patient_status != 'FI'"},
     {"search_waiting_list", "select * from waitingListName where group_no='" + ((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo() +"' and is_history='N'  order by name"},
     {"search_licensed_producer", "SELECT producer_id, producer_name FROM licensed_producer ORDER BY producer_id"},
-    {"search_licensed_producer_address_name", "SELECT address_id, display_name FROM licensed_producer_address ORDER BY address_id"}
+    {"search_licensed_producer_address_name", "SELECT address_id, display_name FROM licensed_producer_address ORDER BY display_name"}
   };
   String[][] responseTargets=new String[][] {  };
   addDemoBean.doConfigure(dbQueries,responseTargets);
