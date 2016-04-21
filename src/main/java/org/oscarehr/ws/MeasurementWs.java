@@ -24,36 +24,37 @@
 
 package org.oscarehr.ws;
 
-import javax.jws.WebService;
 import java.io.IOException;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-import org.oscarehr.common.dao.ValidationsDao;
-import org.oscarehr.common.dao.MeasurementDao;
-import org.oscarehr.common.dao.MeasurementTypeDao;
-import org.oscarehr.common.model.Validations;
-import org.oscarehr.common.model.Measurement;
-import org.oscarehr.common.model.MeasurementType;
-import org.oscarehr.common.model.MeasurementInvalidException;
-import org.oscarehr.common.model.MeasurementNotFoundException;
+
+import javax.jws.WebService;
+import javax.servlet.ServletContext;
+import javax.xml.ws.handler.MessageContext;
+
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import oscar.oscarEncounter.oscarMeasurements.pageUtil.EctValidation;
-
-
+import org.oscarehr.common.dao.MeasurementDao;
+import org.oscarehr.common.dao.MeasurementTypeDao;
+import org.oscarehr.common.dao.ValidationsDao;
+import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.MeasurementInvalidException;
+import org.oscarehr.common.model.MeasurementNotFoundException;
+import org.oscarehr.common.model.MeasurementType;
+import org.oscarehr.common.model.Validations;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import javax.servlet.ServletContext;
-import javax.xml.ws.handler.MessageContext;
+
+import oscar.oscarEncounter.oscarMeasurements.pageUtil.EctValidation;
 
 @WebService
 public class MeasurementWs extends AbstractWs {
@@ -66,7 +67,7 @@ public class MeasurementWs extends AbstractWs {
 		messages = new HashMap<String, String>();
 		messages.put("errors.range", "{0} is not in the range {1} through {2}");
 		messages.put("errors.maxlength", "{0} cannot be more than {1} characters");
-		messages.put("errors.minlength", "{0} cannot be more than {1} characteres");
+		messages.put("errors.minlength", "{0} cannot be less than {1} characteres");
 		messages.put("errors.invalid", "{0} is invalid");
 		messages.put("errors.bloodPressure", "Blood Pressure must be in ###/### format");
 		messages.put("errors.invalidDate", "The date of {0} is invalid");

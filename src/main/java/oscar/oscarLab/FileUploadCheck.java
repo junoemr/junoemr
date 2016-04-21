@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -53,8 +53,10 @@ public final class FileUploadCheck {
 		try {
 
 			String sql = "select * from fileUploadCheck where md5sum = '" + md5sum + "' ";
+			MiscUtils.getLogger().info(sql);
 			ResultSet rs = DBHandler.GetSQL(sql);
 			if (rs.next()) {
+				MiscUtils.getLogger().info("Found fileUploadCheck match: " + rs.getInt("id"));
 				hasFileBeenUploaded = true;
 			}
 		} catch (Exception e) {
@@ -62,7 +64,7 @@ public final class FileUploadCheck {
 		}
 		return hasFileBeenUploaded;
 	}
-	
+
 	public static Map<String,String> getFileInfo(Integer id) {
 		Map<String, String> fileInfo = new HashMap<String, String>();
 		try {
@@ -77,9 +79,9 @@ public final class FileUploadCheck {
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("Error", e);
 		}
-		
+
 		return fileInfo;
-		
+
 	}
 
 	public static Hashtable<String, String> getFileInfo(String md5sum) {
@@ -134,8 +136,8 @@ public final class FileUploadCheck {
 	 * Used to add a new file to the database, checks to see if it already has
 	 * been added.  Logs details about what it is doing.
 	 */
-	public static synchronized int addFileLogged(String name, InputStream is, 
-		String provider, String labType) 
+	public static synchronized int addFileLogged(String name, InputStream is,
+		String provider, String labType)
 			throws Exception, FileUploadException {
 
 		int fileUploaded = UNSUCCESSFUL_SAVE;
@@ -158,7 +160,7 @@ public final class FileUploadCheck {
 				}
 			}
 			else {
-				throw new FileUploadException("Lab file has already been uploaded: " + 
+				throw new FileUploadException("Lab file has already been uploaded: " +
 					name + " of type: " + labType);
 			}
 		} catch (SQLException conE) {
@@ -170,7 +172,7 @@ public final class FileUploadCheck {
 		}
 
 		MiscUtils.getLogger().debug("returning " + fileUploaded);
-        	
+
 		return fileUploaded;
 	}
 }

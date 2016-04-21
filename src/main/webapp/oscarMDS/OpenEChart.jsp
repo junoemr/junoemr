@@ -53,7 +53,7 @@ function popupPage(vheight,vwidth,varpage) {
   }
 }
 
-popupPage(700, 980, '../oscarEncounter/IncomingEncounter.do?demographicNo=<%=request.getParameter("demographicNo")%>&reason=Lab+Results-Notes&curDate=<%=curYear%>-<%=curMonth%>-<%=curDay%>&encType=<%=URLEncoder.encode("Lab Results","UTF-8")%>&status=');
+popupPage(700, 980, '../oscarEncounter/IncomingEncounter.do?demographicNo=<%=request.getParameter("demographicNo")%>&reason=Lab+Results-Notes&appointmentNo=0&apptProvider_no=none&appointmentDate=<%=curYear%>-<%=curMonth%>-<%=curDay%>&startTime=0:00&encType=<%=URLEncoder.encode("Lab Results","UTF-8")%>&status=');
 //window.close();
 </script>
 
@@ -61,7 +61,7 @@ popupPage(700, 980, '../oscarEncounter/IncomingEncounter.do?demographicNo=<%=req
 <body>
 
 <a
-	href="javascript:popupPage(700, 980, '../oscarEncounter/IncomingEncounter.do?demographicNo=<%=request.getParameter("demographicNo")%>&reason=Lab+Results-Notes&curDate=<%=curYear%>-<%=curMonth%>-<%=curDay%>&encType=<%=URLEncoder.encode("Lab Results","UTF-8")%>&status=');window.close();">Please
+	href="javascript:popupPage(700, 980, '../oscarEncounter/IncomingEncounter.do?demographicNo=<%=request.getParameter("demographicNo")%>&reason=Lab+Results-Notes&appointmentNo=0&apptProvider_no=none&appointmentDate=<%=curYear%>-<%=curMonth%>-<%=curDay%>&startTime=0:00&encType=<%=URLEncoder.encode("Lab Results","UTF-8")%>&status=');window.close();">Please
 click here to go to the patient's E-Chart.</a>
 
 </body>

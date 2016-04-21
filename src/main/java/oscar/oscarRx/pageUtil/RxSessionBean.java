@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Allergy;
@@ -58,7 +59,7 @@ public class RxSessionBean  implements java.io.Serializable {
     private Hashtable workingAllergyWarnings = new Hashtable();
     private ArrayList attributeNames = new ArrayList();
     private String interactingDrugList="";//contains hash tables, each hashtable has the a
-    private List<String> reRxDrugIdList=new ArrayList();
+    private List<String> reRxDrugIdList=new CopyOnWriteArrayList<String>(); // regular array list may cause concurrent modification exceptions.
     private HashMap randomIdDrugIdPair=new HashMap();
     private List<HashMap<String,String>> listMedHistory=new ArrayList();
     private HashMap<Long,PHRMedication> pairPHRMed=new HashMap<Long,PHRMedication>();
@@ -114,7 +115,7 @@ public class RxSessionBean  implements java.io.Serializable {
         return reRxDrugIdList;
     }
     public void clearReRxDrugIdList(){
-        reRxDrugIdList=new ArrayList();
+        reRxDrugIdList=new CopyOnWriteArrayList<String>();
     }
     public String getInteractingDrugList(){
         return interactingDrugList;
