@@ -45,6 +45,9 @@ int appointmentNo = 0;
 if(appointment != null && appointment.length()>0) {
 	appointmentNo = Integer.parseInt(appointment);
 }
+
+OscarProperties props = OscarProperties.getInstance();
+
 %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -237,6 +240,20 @@ function submitForm(actionPath) {
         return false;
 }
 
+function newWindowForm(actionPath) {
+
+    var form = document.forms[2];
+    if(verifyChecks(form)) {
+        form.action = actionPath;
+		form.setAttribute("target", "_blank");
+        form.submit();
+		form.setAttribute("target", "");
+        return true;
+    }
+    else
+        return false;
+}
+
 function submitPhrForm(actionPath, windowName) {
 
     var form = document.forms[2];
@@ -333,7 +350,11 @@ function popup1(height, width, url, windowName){
 
 			<html:form action="/dms/combinePDFs">
 			<input type="hidden" name="curUser" value="<%=curUser%>">
+			<% if(module.equals("demographic")) { %>
 			<input type="hidden" name="demoId" value="<%=moduleid%>">
+			<% } else { %>
+			<input type="hidden" name="demoId" value="-1">
+			<% } %>
 			<div class="documentLists"><%-- STUFF TO DISPLAY --%> <%
                 ArrayList categories = new ArrayList();
                 ArrayList categoryKeys = new ArrayList();
@@ -577,7 +598,13 @@ function popup1(height, width, url, windowName){
 				onClick="window.print()"> <input type="button"
 				value="<bean:message key="dms.documentReport.btnCombinePDF"/>"
 				onclick="return submitForm('<rewrite:reWrite jspPage="combinePDFs.do"/>');" />
-				<%
+				<% if (props.isPropertyActive("document_fax_enabled")) { %>
+				<input type="button"
+					value="<bean:message key="dms.documentReport.btnFaxPDF"/>"
+					onclick="return newWindowForm('<rewrite:reWrite jspPage="faxPDFs.do"/>');" />
+		 		<% 
+				} 
+				
                     if( module.equals("demographic") ) {
 
                   	  if (MyOscarUtils.isVisibleMyOscarSendButton())

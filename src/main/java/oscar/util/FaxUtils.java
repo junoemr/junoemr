@@ -60,6 +60,15 @@ public class FaxUtils {
 		return addFaxEncounterNote(demographic_no, providerId, programNo, faxNo, formId, CaseManagementNoteLink.CONSULTATION, "Consultation");
 	}
 	/**
+	 * Add a note to the encounter page recording the Document fax recipient, sender, time etc.
+	 */
+	public static boolean addFaxDocumentEncounterNote(String demographic_no, 
+		String providerId, String programNo, String faxNo, Long documentId) {
+
+		return addFaxEncounterNote(demographic_no, providerId, programNo, 
+			faxNo, documentId, CaseManagementNoteLink.DOCUMENT, "Document");
+	}
+	/**
 	 * Add an encounter note specific to faxing.
 	 */
 	private static boolean addFaxEncounterNote(String demographic_no, String providerId, 
