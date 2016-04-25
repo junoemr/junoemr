@@ -325,49 +325,109 @@ var newD = newYear + "-" + newMonth + "-" + newDay;
       <td height="21" valign="top"><font color="#003366" size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong><bean:message key="tickler.ticklerMain.taskAssignedTo"/></strong></font></td>
       <td valign="top"> <font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#333333">
 <% if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
-{ // multisite start ==========================================
-        	SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
-          	List<Site> sites = siteDao.getActiveSitesByProviderNo(user_no);
-          	String appNo = (String) session.getAttribute("cur_appointment_no");
-          	String location = null;
-          	if (appNo != null) {
-          		ResultSet rs = apptMainBean.queryResults(appNo, "get_appt_location");
-          		if(rs.next()) location=apptMainBean.getString(rs,1);
-          	}
-      %>
-      <script>
-var _providers = [];
-<%
-Site site = null;
-for (int i=0; i<sites.size(); i++) { %>
-	_providers["<%= sites.get(i).getSiteId() %>"]="<% Iterator<Provider> iter = sites.get(i).getProviders().iterator();
-	while (iter.hasNext()) {
-		Provider p=iter.next();
-		if ("1".equals(p.getStatus())) {
-	%><option value='<%= p.getProviderNo() %>'><%= p.getLastName() %>, <%= p.getFirstName() %></option><% }} %>";
-<%	if (sites.get(i).getName().equals(location))
-		site = sites.get(i);
-	} %>
-function changeSite(sel, cb) {
-	sel.form.task_assigned_to.innerHTML=sel.value=="none"?"":_providers[sel.value];
-  if(cb && typeof cb === "function") {
-    cb();
-  }
-}
-      </script>
-      	<select id="site" name="site" onchange="changeSite(this)">
-      		<option value="none">---select clinic---</option>
-      	<%
-      	for (int i=0; i<sites.size(); i++) {
-      	%>
-      		<option value="<%= sites.get(i).getSiteId() %>"><%= sites.get(i).getName() %></option>
-      	<% } %>
-      	</select>
-      	<select name="task_assigned_to" style="width:140px"></select>
-      	<script>
-      		document.getElementById("site").value = '<%= site==null?"none":site.getSiteId() %>';
-      		changeSite(document.getElementById("site"));
-      	</script>
+{ 
+
+
+   // multisite start ==========================================               
+                                                                                
+    // Get the default site/provider based off of IP address                    
+    String currentIp = request.getParameter("docIp");                           
+                                                                                
+    Map<String, Map<String, String>> hash = props.getIPProviderSiteMap();       
+    Map<String, String> values = hash.get(currentIp);                           
+                                                                                
+    String providerNoFromIp = null;                                             
+    String siteNoFromIp = null;                                                 
+    if(values != null)                                                          
+    {                                                                           
+        providerNoFromIp = values.get("providerNo");                            
+        siteNoFromIp = values.get("siteNo");                                    
+    }                                                                           
+                                                                                
+    // Get default site from the current location                               
+    SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
+    List<Site> sites = siteDao.getActiveSitesByProviderNo(user_no);             
+    String appNo = (String) session.getAttribute("cur_appointment_no");         
+    String location = null;                                                     
+    if (appNo != null)                                                          
+    {                                                                           
+        ResultSet rs = apptMainBean.queryResults(appNo, "get_appt_location");   
+        if(rs.next())                                                           
+        {                                                                       
+            location = apptMainBean.getString(rs,1);                            
+        }                                                                       
+    }                                                                      
+
+    // Choose which site to use.  First check IP, then use location.            
+    String siteNo = null;                                                       
+    if(siteNoFromIp != null)                                                    
+    {                                                                           
+        siteNo = siteNoFromIp;                                                  
+    }                                                                           
+    else                                                                        
+    {                                                                           
+        for (int i=0; i<sites.size(); i++)                                      
+        {                                                                       
+            if (sites.get(i).getName().equals(location))                        
+            {                                                                   
+                siteNo = sites.get(i).getSiteId().toString();                   
+            }                                                                   
+        }                                                                       
+    }                                                                           
+              
+%>
+
+<script>                                                                        
+var _providers = [];                                                            
+<%                                                                              
+                                                                                
+for (int i=0; i<sites.size(); i++)                                              
+{                                                                               
+    %>                                                                          
+    _providers["<%= sites.get(i).getSiteId() %>"]="<%                           
+                                                                                
+    Iterator<Provider> iter = sites.get(i).getProviders().iterator();           
+    while (iter.hasNext())                                                      
+    {                                                                           
+        Provider p=iter.next();                                                 
+        if ("1".equals(p.getStatus()))                                          
+        {                                                                       
+            String selected = "";                                               
+            if(p.getProviderNo().toString().equals(providerNoFromIp))           
+            {                                                                   
+                selected = " selected=\'selected\'";                            
+            }                                                                   
+                                                                                
+            %><option value='<%= p.getProviderNo() %>'<%= selected %>><%= p.getLastName() %>, <%= p.getFirstName() %></option><% 
+        }                                                                       
+    }                                                                           
+%>";                                                                            
+<%                                                                              
+} %>                                                                            
+                                                                                
+function changeSite(sel, cb)                                                    
+{                                                                               
+    sel.form.task_assigned_to.innerHTML = sel.value=="none"?"":_providers[sel.value];
+    if(cb && typeof cb === "function")                                          
+    {                                                                           
+        cb();                                                                   
+    }                                                                           
+}                                                                               
+</script>     
+
+        <select id="site" name="site" onchange="changeSite(this)">              
+            <option value="none">---select clinic---</option>                   
+        <%                                                                      
+        for (int i=0; i<sites.size(); i++) {                                    
+        %>                                                                      
+            <option value="<%= sites.get(i).getSiteId() %>"><%= sites.get(i).getName() %></option>
+        <% } %>                                                                 
+        </select>                                                               
+        <select name="task_assigned_to" style="width:140px"></select>           
+        <script>                                                                
+            document.getElementById("site").value = '<%= siteNo==null?"none":siteNo %>';
+            changeSite(document.getElementById("site"));                        
+        </script>     
 <% // multisite end ==========================================
 } else {
 %>
@@ -382,9 +442,9 @@ function changeSite(sel, cb) {
 				while(rslocal.next())
 				{
 					String selected = "";
-			        proFirst = rslocal.getString("first_name");
-			        proLast = rslocal.getString("last_name");
-			        proOHIP = rslocal.getString("provider_no");
+					proFirst = rslocal.getString("first_name");
+					proLast = rslocal.getString("last_name");
+					proOHIP = rslocal.getString("provider_no");
 			        String ip="";
 			        String provider ="";
 			        Map<String, String> hash = props.getIPProviderMap();

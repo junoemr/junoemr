@@ -374,4 +374,29 @@ public class OscarProperties extends Properties {
 		return hash;
 	}
 
+	public Map<String, Map<String, String>> getIPProviderSiteMap() {
+		int counter=1;
+		String userIp="";
+		String providerNo="";
+		String siteNo="";
+		Map<String, Map<String, String>> hash = new HashMap<String, Map<String, String>>();
+		while (
+			hasProperty("TICKLERIP" + Integer.toString(counter)) &&
+			hasProperty("TICKLERSITE" + Integer.toString(counter)) &&
+			hasProperty("TICKLERPROVIDER" + Integer.toString(counter))
+		)
+		{
+
+			userIp= getProperty("TICKLERIP" + Integer.toString(counter));
+			providerNo = getProperty("TICKLERPROVIDER" + Integer.toString(counter));
+			siteNo = getProperty("TICKLERSITE" + Integer.toString(counter));
+
+			hash.put(userIp, new HashMap<String, String>());
+			hash.get(userIp).put("providerNo", providerNo);
+			hash.get(userIp).put("siteNo", siteNo);
+		
+			counter++;
+		}
+		return hash;
+	}
 }
