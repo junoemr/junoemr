@@ -588,22 +588,22 @@ function toggleView(form) {
 
         <table cellpadding=10 cellspacingp=0>
           <% //vecAddress=null;
-                                        if(vecAddress != null) { %>
+         if(vecAddress != null) { %>
           <tr>
             <td align="left" colspan=2><bean:message key="ViewScript.msgAddress"/>
-                                                    <select name="addressSel" id="addressSel" onChange="addressSelect()" style="width:200px;" >
-              <% String rxAddr = (String) session.getAttribute("RX_ADDR");
-                                                          for (int i =0; i < vecAddressName.size();i++){
-                           String te = (String) vecAddressName.get(i);
-                                                         String tf = (String) vecAddress.get(i);%>
+            	<select name="addressSel" id="addressSel" onChange="addressSelect()" style="width:200px;" >
+              	<% String rxAddr = (String) session.getAttribute("RX_ADDR");
+                   for (int i =0; i < vecAddressName.size();i++) {
+                   		String te = (String) vecAddressName.get(i);
+                        String tf = (String) vecAddress.get(i);%>
+                        
+              			<option value="<%=i%>"
+		                <% 
+		                if ( rxAddr != null && rxAddr.equals(""+i)){ %>SELECTED<%}%> > <%=te%> </option> <%  
+              		}%>
 
-              <option value="<%=i%>"
-                <% if ( rxAddr != null && rxAddr.equals(""+i)){ %>SELECTED<%}%>
-                                                                ><%=te%></option>
-              <%  }%>
-
-                                                    </select>
-                                                </td>
+                </select>
+            </td>
           </tr>
           <% } %>
           <tr>
