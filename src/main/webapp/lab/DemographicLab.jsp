@@ -74,6 +74,13 @@
 	href="../share/css/OscarStandardLayout.css">
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
 
+<style>
+    .Nav a { padding:2px; font-weight:bold; float:center; }
+    .Nav a:link { color:#d0d0d0; }
+    .Nav a:visited { color:#d0d0d0; }
+    .Nav a:hover { color:#ffffff; }
+    .Nav a:active { color:#ffffff; }
+</style>
 
 <script type="text/javascript" language=javascript>
 
