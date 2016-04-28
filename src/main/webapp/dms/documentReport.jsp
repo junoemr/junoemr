@@ -604,6 +604,12 @@ function popup1(height, width, url, windowName){
 					onclick="return newWindowForm('<rewrite:reWrite jspPage="faxPDFs.do"/>');" />
 		 		<% 
 				} 
+				if (props.isPropertyActive("document_email_enabled")) { %>
+				<input type="button"
+					value="<bean:message key="dms.documentReport.btnEmailPDF"/>"
+					onclick="return newWindowForm('<rewrite:reWrite jspPage="emailPDFs.do"/>');" />
+		 		<% 
+				} 
 				
                     if( module.equals("demographic") ) {
 

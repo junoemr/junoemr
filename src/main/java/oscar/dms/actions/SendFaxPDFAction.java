@@ -203,5 +203,3 @@ public class SendFaxPDFAction extends Action {
     }
 
 }
-
-
