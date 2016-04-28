@@ -994,3 +994,11 @@ auto_populate_billingreferral_bc=true
 #TICKLERIP2=24.37.180.108
 #TICKLERPROVIDER2=79
 #TICKLERSITE2=1
+
+# Settings for sending documents via email
+#document_email_enabled=true                                                     
+#document_email_subject=Oscar Document
+#document_email_body=Document Sent From Oscar
+#document_email_name=Oscar                                    
+#document_email_from_address=test@test.com
+
