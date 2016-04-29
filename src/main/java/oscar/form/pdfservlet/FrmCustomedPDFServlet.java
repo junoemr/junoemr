@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
@@ -44,16 +45,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperRunManager;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.util.LocaleUtils;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.PrescriptionQrCodeUIBean;
-
-import oscar.OscarProperties;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -70,7 +65,11 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
-import java.util.Locale;
+
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperRunManager;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import oscar.OscarProperties;
 
 
 
@@ -289,14 +288,25 @@ public String geti18nTagValue(Locale locale, String tag) {
 				head.setTotalWidth(272f);
 				head.writeSelectedRows(0, -1, 13f, height - 100f, cb);
 
-				bf = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-				writeDirectContent(cb, bf, 12, PdfContentByte.ALIGN_LEFT, "o s c a r", 21, page.getHeight() - 60, 90);
-				// draw R
-				writeDirectContent(cb, bf, 50, PdfContentByte.ALIGN_LEFT, "P", 24, page.getHeight() - 53, 0);
+				// OHSUPPORT-2994 - custom prescription logo
+				String custom_logo_name = OscarProperties.getInstance().getProperty("rx_custom_logo");
+				if(custom_logo_name != null ){
+					Image img = Image.getInstance(OscarProperties.getInstance().getProperty("eform_image") + custom_logo_name);
+			        img.scaleToFit(50, 50);
+			        img.setAbsolutePosition(20, page.getHeight()-50);
+			        document.add(img);
+				}
+				else {
+					bf = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+					writeDirectContent(cb, bf, 12, PdfContentByte.ALIGN_LEFT, "o s c a r", 21, page.getHeight() - 60, 90);
+					// draw R
+					writeDirectContent(cb, bf, 50, PdfContentByte.ALIGN_LEFT, "P", 24, page.getHeight() - 53, 0);
 
-				bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-				// draw X
-				writeDirectContent(cb, bf, 43, PdfContentByte.ALIGN_LEFT, "X", 38, page.getHeight() - 69, 0);
+					bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+					// draw X
+					writeDirectContent(cb, bf, 43, PdfContentByte.ALIGN_LEFT, "X", 38, page.getHeight() - 69, 0);
+				}
+				
 
 				bf = BaseFont.createFont(BaseFont.HELVETICA_BOLD, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 				writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_LEFT, this.sigDoctorName, 80, (page.getHeight() - 25), 0);
