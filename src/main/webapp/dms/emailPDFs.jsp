@@ -115,7 +115,9 @@ function disableButtons()
 function emailProvider()
 {
 	var name = 'provider';
+	<% if(providerData != null) { %>
 	var email = '<%= StringEscapeUtils.escapeHtml(providerData.getEmail()) %>';
+	<% } %>
 	_AddHiddenEmail(email) 
 	submitForm('<rewrite:reWrite jspPage="sendEmailPDFs.do"/>');
 }
@@ -123,7 +125,9 @@ function emailProvider()
 function emailPatient()
 {
 	var name = 'patient';
+	<% if(demographic != null) { %>
 	var email = '<%= StringEscapeUtils.escapeHtml(demographic.getEmail()) %>';
+	<% } %>
 	_AddHiddenEmail(email) 
 	submitForm('<rewrite:reWrite jspPage="sendEmailPDFs.do"/>');
 }
@@ -284,11 +288,13 @@ function updateEmailButton()
     <input type="button" id="email_button" disabled="disabled"
         value="<bean:message key="dms.documentReport.btnEmailPDF"/>"
         onclick="return submitForm('<rewrite:reWrite jspPage="sendEmailPDFs.do"/>');" />
-	<% if(providerData.getEmail() != null && !providerData.getEmail().equals("")) { %>
+	<% if(providerData != null && providerData.getEmail() != null && 
+		!providerData.getEmail().equals("")) { %>
     <input type="button" id="email_provider_button" value="Email to Patient's Provider"
         onclick="return emailProvider();" />
 	<% } %>
-	<% if(demographic.getEmail() != null && !demographic.getEmail().equals("")) { %>
+	<% if(demographic != null && demographic.getEmail() != null && 
+		!demographic.getEmail().equals("")) { %>
     <input type="button" id="email_patient_button" value="Email to Patient"
         onclick="return emailPatient();" />
 	<% } %>
