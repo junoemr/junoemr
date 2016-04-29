@@ -1002,3 +1002,5 @@ auto_populate_billingreferral_bc=true
 #document_email_name=Oscar                                    
 #document_email_from_address=test@test.com
 
+#OHSUPPORT-2994 - add custom logo for prescritions. best size is 100x100px
+#rx_custom_logo=ClickMD_Logo.png
