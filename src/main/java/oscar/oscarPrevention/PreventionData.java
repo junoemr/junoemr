@@ -79,6 +79,11 @@ public class PreventionData {
 			prevention.setNever(neverWarn.trim().equals("1"));
 			if (refused.trim().equals("1")) prevention.setRefused(true);
 			else if (refused.trim().equals("2")) prevention.setIneligible(true);
+			
+			/* Only want to use this field if the 'other' option is selected, meaning -1 providerNo */
+			if(providerName != null && !providerName.trim().isEmpty() && providerNo.equals("-1")) {
+				prevention.setProviderName(providerName.trim());
+			}
 
 			preventionDao.persist(prevention);
 			if (prevention.getId()==null) return insertId;
@@ -160,6 +165,22 @@ public class PreventionData {
 			}
 		}
 		return name;
+	}
+	
+	public static String getProviderName(Prevention prevention) {
+		
+		String prividerName = prevention.getProviderName();
+		String providerNo = prevention.getProviderNo();
+		
+		/* special case where provider is not in the system and entered into the prevention record as 'other' provider
+		 * In this case, rather than displaying 'system' name, load from the prevention directly.
+		 * the prevention name should only be used if the provider is not in the system */
+		if( providerNo.equals("-1") && prividerName != null) {
+			return prividerName;
+		}
+		else {
+			return ProviderData.getProviderName(providerNo);
+		}
 	}
 
 	public static void updatetPreventionData(String id, String creator, String demoNo, String date, String providerNo, String providerName, String preventionType, String refused,
@@ -264,7 +285,7 @@ public class PreventionData {
 				h.put("refused", prevention.isRefused()?"1":prevention.isIneligible()?"2":"0");
 				h.put("type", prevention.getPreventionType());
 				h.put("provider_no", prevention.getProviderNo());
-				h.put("provider_name", ProviderData.getProviderName(prevention.getProviderNo()));
+				h.put("provider_name", getProviderName(prevention));
 
 				Date pDate = prevention.getPreventionDate();
 				h.put("prevention_date", blankIfNull(UtilDateUtilities.DateToString(pDate, "yyyy-MM-dd")));
@@ -456,7 +477,7 @@ public class PreventionData {
 			Prevention prevention = preventionDao.find(Integer.valueOf(id));
 			if (prevention!=null) {
 				h = new HashMap<String,Object>();
-				String providerName = ProviderData.getProviderName(prevention.getProviderNo());
+				String providerName = getProviderName(prevention);
 				String preventionDate = UtilDateUtilities.DateToString(prevention.getPreventionDate(), "yyyy-MM-dd");
 
 
