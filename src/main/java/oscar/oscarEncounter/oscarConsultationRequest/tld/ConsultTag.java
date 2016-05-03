@@ -45,9 +45,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class ConsultTag extends TagSupport {
 
+    private String providerNo;
+    private long numNewLabs;
 
    public ConsultTag() {
-	numNewLabs = 0;
+	   numNewLabs = 0;
    }
 
    public int doStartTag() throws JspException    {
@@ -140,7 +142,4 @@ public class ConsultTag extends TagSupport {
        }
        return EVAL_PAGE;
     }
-
-    private String providerNo;
-    private int numNewLabs;
 }
