@@ -796,7 +796,7 @@ eform_generator_indivica_print_enabled=false
 eform_generator_indivica_fax_enabled=false
 
 # Enable faxing from the document list
-#document_fax_enabled=true
+document_fax_enabled=false
 
 # True if Indivica Rich Text Letter is enabled and false otherwise.
 indivica_rich_text_letter_enabled=true
@@ -978,8 +978,8 @@ auto_populate_billingreferral_bc=true
 #enable_consultation_invoice_link=true
 
 #OHSUPPORT-2932 - add encounter notes for faxes
-encounter_notes_add_fax_notes_eform=on
-encounter_notes_add_fax_notes_consult=on
+#encounter_notes_add_fax_notes_eform=on
+#encounter_notes_add_fax_notes_consult=on
 
 #OHSUPPORT-2929 - disable the 'please reply to' header message in consultation print/fax pages. 
 # -- Only for consultation_fax_enabled=true faxing/printing
