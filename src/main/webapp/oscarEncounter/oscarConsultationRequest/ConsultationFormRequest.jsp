@@ -196,9 +196,7 @@ displayServiceUtil.estSpecialist();
 	} %>
 </script>
 
-<link href="//cdn.rawgit.com/noelboss/featherlight/1.2.3/release/featherlight.min.css" type="text/css" rel="stylesheet" title="Featherlight Styles" />
-<script src="//code.jquery.com/jquery-latest.js"></script>
-<script src="//cdn.rawgit.com/noelboss/featherlight/1.2.3/release/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="//code.jquery.com/jquery-1.12.4.js"></script>
 
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
 <!--<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>-->
@@ -215,6 +213,10 @@ displayServiceUtil.estSpecialist();
        adding a calendar a matter of 1 or 2 lines of code. -->
 <script type="text/javascript"
 	src="<%=request.getContextPath()%>/share/calendar/calendar-setup.js"></script>
+	
+<!-- featherlight is used for emailing code -->
+<script src="//cdn.rawgit.com/noelboss/featherlight/1.2.3/release/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="//cdn.rawgit.com/noelboss/featherlight/1.2.3/release/featherlight.min.css" type="text/css" rel="stylesheet" title="Featherlight Styles" />
 
    <!--<script src="<c:out value="${ctx}/js/jquery.js"/>"></script>-->
    <script>
@@ -1738,7 +1740,7 @@ function chooseEmail(){
 													dayOfWeek = "0" + dayOfWeek;
 												}
 												%>
-                                                                                                <html:option value="<%=String.valueOf(i)%>"><%=dayOfWeek%></html:option>
+                                                 <html:option value="<%=String.valueOf(i)%>"><%=dayOfWeek%></html:option>
 												<%
 											}
 										%>
@@ -1913,7 +1915,10 @@ function chooseEmail(){
 							</td>
 						</tr>
 						<tr>
-                                                    <td colspan="2" class="tite3"><img alt="calendar" id="followUpDate_cal" src="../../images/cal.gif">&nbsp;<html:text styleId="followUpDate" property="followUpDate" readonly="true" ondblclick="this.value='';"/>
+                             <td colspan="2" class="tite3">
+                             	<img alt="calendar" id="followUpDate_cal" src="../../images/cal.gif">
+                             	&nbsp;
+                             	<html:text styleId="followUpDate" property="followUpDate" readonly="true" ondblclick="this.value='';"/>
 						</tr>
 
 					</table>
