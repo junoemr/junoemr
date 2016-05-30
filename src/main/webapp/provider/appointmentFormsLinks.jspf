@@ -26,7 +26,7 @@
 			String trimmedEscapedLinkName=StringEscapeUtils.escapeHtml(eForm.getFormName().substring(0,2));
 			String escapedLinkName=StringEscapeUtils.escapeHtml(eForm.getFormName());
 			%>
-				|<a href=# onClick='popupPage2("<%=request.getContextPath()%>/eform/efmformadd_data.jsp?fid=<%=eFormIdTemp%>&amp; demographic_no=<%=demographic_no%>&amp;appointment=<%=appointment_no%>", "Eform_<%=demographic_no + "_" + eFormIdTemp%>")' 
+				|<a href=# onClick='popupPage2("<%=request.getContextPath()%>/eform/efmformadd_data.jsp?fid=<%=eFormIdTemp%>&amp;demographic_no=<%=demographic_no%>&amp;appointment=<%=appointment_no%>", "Eform_<%=demographic_no + "_" + eFormIdTemp%>")' 
 				 title='<%=escapedLinkName%>'><%=trimmedEscapedLinkName%></a>
 			<%
 		}
