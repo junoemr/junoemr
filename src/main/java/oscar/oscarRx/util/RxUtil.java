@@ -1685,9 +1685,10 @@ public class RxUtil {
     private static RxPrescriptionData.Prescription findRxFromDrugNameOrGN(final RxPrescriptionData.Prescription[] rxs,String interactingDrugName){
         RxPrescriptionData.Prescription returnRx=null;
         for (RxPrescriptionData.Prescription rxItem:rxs){
-            if(rxItem.getDrugName().contains(interactingDrugName)){
+            if(rxItem.getDrugName().contains(interactingDrugName)) {
                 returnRx=rxItem;
-            }else if(rxItem.getGenericName().contains(interactingDrugName)){
+            }
+            else if(rxItem.getGenericName() != null && rxItem.getGenericName().contains(interactingDrugName)) {
                 returnRx=rxItem;
             }
         }
