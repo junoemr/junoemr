@@ -562,6 +562,17 @@
         <ap-output>${rxlist}</ap-output>
     </databaseap>
     
+    <databaseap>
+        <ap-name>latest_echart_note</ap-name>
+        <ap-sql>SELECT distinct cmn.note AS note FROM casemgmt_note cmn
+				WHERE cmn.demographic_no = ${demographic}
+				AND cmn.include_issue_innote='0'
+				ORDER BY cmn.observation_date 
+				DESC LIMIT 1;
+		</ap-sql>
+        <ap-output>${note}</ap-output>
+    </databaseap>
+    
 <!-- Prenatal information -->
     <databaseap>
         <ap-name>onGTPAL</ap-name>
