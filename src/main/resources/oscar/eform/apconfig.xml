@@ -651,6 +651,17 @@
                 WHERE demographic.demographic_no=${demographic} AND demographic.provider_no=provider.provider_no</ap-sql>
         <ap-output>${work_phone}</ap-output>
     </databaseap>
+        <databaseap>
+        <ap-name>doctor_fax</ap-name>
+       	<ap-sql>SELECT SUBSTR(p.comments,
+       				LOCATE('&lt;xml_p_fax&gt;', p.comments )+11,
+       				LOCATE('&lt;/xml_p_fax&gt;', p.comments )-(LOCATE('&lt;xml_p_fax&gt;', p.comments )+11)
+    				) as fax 
+				FROM provider p JOIN demographic d ON(d.provider_no=p.provider_no)
+				WHERE d.demographic_no = ${demographic};
+   		</ap-sql>
+        <ap-output>${fax}</ap-output>
+    </databaseap>
     <databaseap>
 		<ap-name>doctor_signature</ap-name>
 		<ap-sql>SELECT providerExt.signature FROM providerExt, demographic
