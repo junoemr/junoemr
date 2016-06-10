@@ -25,11 +25,15 @@
 
 package oscar.eform.actions;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,6 +91,7 @@ public class AddEFormAction extends Action {
 		String eform_link = request.getParameter("eform_link");
 		String subject = request.getParameter("subject");
 		String provider_no = LoggedInInfo.loggedInInfo.get().loggedInProvider.getProviderNo();
+		String dateOverrideValue = request.getParameter("_oscarOverrideFormDate");
 
 		boolean doDatabaseUpdate = false;
 
@@ -198,6 +203,17 @@ public class AddEFormAction extends Action {
 		if (!sameform) {
 			EFormDataDao eFormDataDao=(EFormDataDao)SpringUtils.getBean("EFormDataDao");
 			EFormData eFormData=toEFormData(curForm);
+			/* OHSUPPORT-3172 -- allow certain eforms to override the default form date */
+			if(dateOverrideValue != null && !dateOverrideValue.trim().isEmpty()) {
+				try {
+					DateFormat format = new SimpleDateFormat("yyyy-mm-dd", Locale.ENGLISH);
+					Date date = format.parse(dateOverrideValue);
+					eFormData.setFormDate(date);
+				}
+				catch(ParseException e) {
+					logger.error("Failed to parse eform date override string. current date (default) used.", e);
+				}
+			}
 			eFormDataDao.persist(eFormData);
 			String fdid = eFormData.getId().toString();
 
