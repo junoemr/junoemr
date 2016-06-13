@@ -31,8 +31,6 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-//import oscar.util.ConversionUtils;
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.v23.datatype.FT;
@@ -46,6 +44,8 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+//import oscar.util.ConversionUtils;
+import oscar.util.UtilDateUtilities;
 
 /**
  * Dual message handler for both the manual and automated lab uploads in the Calgary Lab Service HL7 format.

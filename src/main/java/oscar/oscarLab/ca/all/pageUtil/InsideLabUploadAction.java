@@ -77,7 +77,7 @@ public class InsideLabUploadAction extends Action {
             File file = new File(filePath);
             
             is = new FileInputStream(filePath);
-            int checkFileUploadedSuccessfully = FileUploadCheck.addFile(file.getName(),is,proNo);            
+            int checkFileUploadedSuccessfully = FileUploadCheck.addFile(file.getName(),is,proNo);
             is.close();
             
             if (checkFileUploadedSuccessfully != FileUploadCheck.UNSUCCESSFUL_SAVE){
