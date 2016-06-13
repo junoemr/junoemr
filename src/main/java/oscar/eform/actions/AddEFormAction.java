@@ -206,7 +206,7 @@ public class AddEFormAction extends Action {
 			/* OHSUPPORT-3172 -- allow certain eforms to override the default form date */
 			if(dateOverrideValue != null && !dateOverrideValue.trim().isEmpty()) {
 				try {
-					DateFormat format = new SimpleDateFormat("yyyy-mm-dd", Locale.ENGLISH);
+					DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 					Date date = format.parse(dateOverrideValue);
 					eFormData.setFormDate(date);
 				}
