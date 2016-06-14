@@ -217,13 +217,13 @@ function checkTypeIn() {
 				lastfirst = keyword.trim().split(",");
 			}
 			if (lastfirst.length > 1) {
-				fieldname += regularexp+" ?"+" and first_name ";
+				fieldname += " "+regularexp+" ? "+"and first_name";
 			}
 		}
 	}
 
-	String sql = "select demographic_no,first_name,last_name,roster_status,sex,chart_no,year_of_birth,month_of_birth,date_of_birth,provider_no from demographic where patient_status = 'AC' and "+fieldname+ " "+regularexp+" ? " +orderby; // + " "+limit;  
-  
+	String sql = "select demographic_no,first_name,last_name,roster_status,sex,chart_no,year_of_birth,month_of_birth,date_of_birth,provider_no from demographic where patient_status = 'AC' and "+fieldname+ " "+regularexp+" ? " +orderby;
+	
 	if(request.getParameter("search_mode").equals("search_name")) {
 		lastfirst[0] = lastfirst[0].trim() + "%";
 		//lastname,firstname

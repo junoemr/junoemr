@@ -347,51 +347,41 @@ public class CLSHandler implements MessageHandler {
 	}
 
 	private String getName(NameType type) {
-		// PID contains
-		// Last, First Middle
-		String name = get("/.PID-5-1");
-		if (name == null) {
+		// format is last,first middle
+		String content = get("/.PID-5-1");
+		
+		String firstName = "";
+		String lastName = "";
+		String middleName = "";
+		
+		if(content == null || content.trim().isEmpty() || content.trim().equals(",")) {
 			return "";
 		}
+		
+		String[] allNames = content.trim().split(",");
 
-		int firstLastDelimiterIndex = name.indexOf(',');
-		if (firstLastDelimiterIndex == -1) {
-			if (type == NameType.LAST) {
-				return name.trim(); // assume it's the last name
-			} else {
-				return "";
+		lastName = allNames[0].trim();
+		// First and middle names occur after the comma, if it exists
+		if( allNames.length > 1 ) {
+			String firstMiddle = allNames[1].trim();
+			
+			int firstMiddleDelimiterIndex = firstMiddle.lastIndexOf(' ');
+			if (firstMiddleDelimiterIndex == -1) {
+				firstName = firstMiddle;
+			}
+			else {
+				firstName = firstMiddle.substring(0, firstMiddleDelimiterIndex).trim();
+				middleName = firstMiddle.substring(firstMiddleDelimiterIndex).trim();
 			}
 		}
-
-		String last = name.substring(0, firstLastDelimiterIndex).trim();
-		if (type == NameType.LAST) {
-			return last; // assume it's the last name
+		
+		switch(type) {
+			case FIRST: return firstName;
+			case MIDDLE: return middleName;
+			case LAST: return lastName;
+			default:
+				throw new IllegalArgumentException("Invalid name type " + type);
 		}
-
-		String firstMiddle = name.substring(Math.min(name.length(), firstLastDelimiterIndex + 1));
-		if (firstMiddle != null) {
-			firstMiddle = firstMiddle.trim();
-		}
-
-		int firstMiddleDelimiterIndex = firstMiddle.lastIndexOf(' ');
-		if (firstMiddleDelimiterIndex == -1) {
-			if (type == NameType.FIRST) {
-				return firstMiddle; // assume it's the first name
-			} else {
-				return "";
-			}
-		}
-
-		String result;
-		if (type == NameType.FIRST) {
-			result = firstMiddle.substring(0, firstMiddleDelimiterIndex);
-			return result.trim();
-		} else if (type == NameType.MIDDLE) {
-			result = firstMiddle.substring(firstMiddleDelimiterIndex);
-			return result.trim();
-		}
-
-		throw new IllegalArgumentException("Invalid name type " + type);
 	}
 
 	public String getLastName() {
@@ -602,7 +592,7 @@ public class CLSHandler implements MessageHandler {
 	protected String getString(String retrieve) {
 		if (retrieve != null) {
 			retrieve.replaceAll("^", " ");
-			return (retrieve.trim());
+			return(retrieve.trim().replaceAll("\\\\\\.br\\\\", "<br />"));
 		} else {
 			return ("");
 		}
