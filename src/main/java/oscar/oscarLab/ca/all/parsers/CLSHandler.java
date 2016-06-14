@@ -350,9 +350,9 @@ public class CLSHandler implements MessageHandler {
 		// format is last,first middle
 		String content = get("/.PID-5-1");
 		
-		String firstName = "";
-		String lastName = "";
-		String middleName = "";
+		String firstName = getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()).trim();
+		String lastName = getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getFamilyName().getValue()).trim();
+		String middleName = getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getXpn3_MiddleInitialOrName().getValue()).trim();
 		
 		if(content == null || content.trim().isEmpty() || content.trim().equals(",")) {
 			return "";
@@ -420,11 +420,43 @@ public class CLSHandler implements MessageHandler {
 	}
 
 	public String getHomePhone() {
-		return "";
+        String phone = "";
+        int i=0;
+        try{
+            while(!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue()).equals("")){
+                if (i==0){
+                    phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
+                }else{
+                    phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
+                }
+                i++;
+            }
+            return(phone);
+        }catch(Exception e){
+            logger.error("Could not return home phone number", e);
+
+            return("");
+        }
 	}
 
 	public String getWorkPhone() {
-		return "";
+        String phone = "";
+        int i=0;
+        try{
+            while(!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue()).equals("")){
+                if (i==0){
+                    phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
+                }else{
+                    phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
+                }
+                i++;
+            }
+            return(phone);
+        }catch(Exception e){
+            logger.error("Could not return work phone number", e);
+
+            return("");
+        }
 	}
 
 	public String getPatientLocation() {
@@ -591,7 +623,7 @@ public class CLSHandler implements MessageHandler {
 
 	protected String getString(String retrieve) {
 		if (retrieve != null) {
-			retrieve.replaceAll("^", " ");
+			retrieve = retrieve.replaceAll("^", " ");
 			return(retrieve.trim().replaceAll("\\\\\\.br\\\\", "<br />"));
 		} else {
 			return ("");
