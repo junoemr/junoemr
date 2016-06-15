@@ -196,14 +196,13 @@ displayServiceUtil.estSpecialist();
 	} %>
 </script>
 
-<script src="//code.jquery.com/jquery-1.12.4.js"></script>
+<script src="//code.jquery.com/jquery-2.2.4.js"></script>
 
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
+<!--  <script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>-->
 <!--<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>-->
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery_oscar_defaults.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/prototype.js"></script>
-<link rel="stylesheet" type="text/css" media="all"
-	href="<%=request.getContextPath()%>/share/calendar/calendar.css" title="win2k-cold-1" />
+<link rel="stylesheet" type="text/css" media="all" href="<%=request.getContextPath()%>/share/calendar/calendar.css" />
 <!-- main calendar program -->
 <script type="text/javascript" src="<%=request.getContextPath()%>/share/calendar/calendar.js"></script>
 <!-- language for the calendar -->
@@ -2330,17 +2329,17 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
     <input value="<%=demographic.getDisplayName()%>" name="toPatientName" id="toPatientName" type="hidden" />
     <input value="<%=demographic.getEmail()%>" name="toPatientEmail" id="toPatientEmail" type="hidden" />
     <input name="providerEmailBody" id="providerEmailBody" type="hidden" value="" />
-                                                                                
+
     <input name="patientEmailBody" id="patientEmailBody" type="hidden" value="" />
-                                                                                
-    <input name="emailSubject" id="emailSubject" type="hidden" value="" />      
+
+    <input name="emailSubject" id="emailSubject" type="hidden" value="" />
                                                                            
-<div id="emailFormBoxProvider" style="display: none">                       
-        <div id="additionalInfoForm">                                           
-            <div>                                                               
-                <label>To:</label>                                              
+	<div id="emailFormBoxProvider" style="display: none">
+        <div id="additionalInfoForm">
+            <div>
+                <label>To:</label>
                 <input type=text id="emailToProvider" name="emailToProvider" value="">                                   
-            </div>                                                              
+            </div>
             <div>                                                               
                 <label>Subject:</label>                                         
                 <input type="text" name="emailSubjectForm" id="emailSubjectForm" value="<%= props.getProperty("eform_email_subject") %>">
@@ -2363,17 +2362,17 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
         <span class="progress"></span>                                          
                                                                                 
     </div> 
-    <div id="emailFormBoxPatient" style="display: none">                        
-        <div id="additionalInfoForm">                                           
-            <div>                                                               
-                <label>To:</label>                                              
-                <input type=text id="emailToPatient" name="emailToPatient" value="<%=demographic.getEmail()%>">     
-            </div>                                                              
-            <div>                                                               
-                <label>Subject:</label>                                         
+    <div id="emailFormBoxPatient" style="display: none">
+        <div id="additionalInfoForm">
+            <div>
+                <label>To:</label>
+                <input type=text id="emailToPatient" name="emailToPatient" value="<%=demographic.getEmail()%>">
+            </div>
+            <div>
+                <label>Subject:</label>
                 <input type="text" name="emailSubjectForm" id="emailSubjectForm" value="<%= props.getProperty("eform_email_subject") %>">
-            </div>                                                              
-            <div>                                                               
+            </div>
+            <div>
                 <label>Body text:</label>                                       
                 <textarea name="patientEmailBodyForm" id="patientEmailBodyForm"><%= props.getProperty("eform_email_text_patients") %></textarea>
             </div>                                                              
