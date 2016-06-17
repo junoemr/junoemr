@@ -36,6 +36,8 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -140,12 +142,27 @@ public final class EDocUtil extends SqlUtilBaseS {
 		return doctypes;
 	}
 
-	public static ArrayList<String> getDoctypes(String module) {
-		return getDoctypesByStatus(module,new String[]{ "A", "H", "I" });
+	private static ArrayList<String> getDoctypesSorted(String module, String[] statusArray) {
+		ArrayList<String> types = getDoctypesByStatus(module,statusArray);
+	    Collections.sort(types, new Comparator<String>() {
+	        @Override
+	        public int compare(String s1, String s2) {
+	            return s1.compareToIgnoreCase(s2);
+	        }
+	    });
+		return types;
 	}
-
+	/**
+	 * get all document types sorted alphabetically (case insensitive)
+	 */
+	public static ArrayList<String> getDoctypes(String module) {
+		return getDoctypesSorted(module,new String[]{ "A", "H", "I" });
+	}
+	/**
+	 * get all active document types sorted alphabetically (case insensitive)
+	 */
 	public static ArrayList<String> getActiveDocTypes(String module) {
-		return getDoctypesByStatus(module,new String[]{"A"});
+		return getDoctypesSorted(module,new String[]{"A"});
 	}
 
 	public static String getDocStatus(String module, String doctype){
