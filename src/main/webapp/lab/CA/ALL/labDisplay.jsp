@@ -48,11 +48,16 @@
 <%@ page import="org.oscarehr.casemgmt.model.CaseManagementNote"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO, org.oscarehr.common.model.UserProperty" %>
+<%@ page import="org.oscarehr.common.map.LabReport" %>
+<%@ page import="org.oscarehr.common.map.LabReportHeader" %>
+<%@ page import="org.oscarehr.common.map.LabReportOBX" %>
+<%@ page import="org.oscarehr.common.map.LabReportUnit" %>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.dao.*,oscar.oscarEncounter.oscarMeasurements.model.Measurementmap" %>
 <%@ page import="org.oscarehr.casemgmt.service.CaseManagementManager, org.oscarehr.common.dao.Hl7TextMessageDao, org.oscarehr.common.model.Hl7TextMessage,org.oscarehr.common.dao.Hl7TextInfoDao,org.oscarehr.common.model.Hl7TextInfo"%>
 <jsp:useBean id="oscarVariables" class="java.util.Properties" scope="session" />
 <%@	page import="javax.swing.text.rtf.RTFEditorKit"%>
 <%@	page import="java.io.ByteArrayInputStream"%>
+<%@ page import="org.oscarehr.common.dao.LabReportInformationDao"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -108,6 +113,9 @@ boolean isLinkedToDemographic=false;
 ArrayList<ReportStatus> ackList=null;
 String multiLabId = null;
 MessageHandler handler=null;
+//Map<String, Map<String, Map<String, String>>> previousVersion = null;
+LabReport previousVersion = null;
+boolean compareEnabled = false;
 String hl7 = null;
 String reqID = null, reqTableID = null;
 String remoteFacilityIdQueryString="";
@@ -152,6 +160,21 @@ if (remoteFacilityIdString==null) // local lab
 		<jsp:forward page="labDisplayOLIS.jsp" />
 		<%
 	}
+	
+	// Enable lab version comparisons
+	if(props.isPropertyActive("lab_comparison_enabled"))
+	{
+			String previousLabId = Hl7textResultsData.getPreviousLabFromCsv(segmentID, multiLabId);
+
+			if(previousLabId != null)
+			{
+					LabReportInformationDao labInfo =
+							(LabReportInformationDao) SpringUtils.getBean("labReportInformationDao");
+					previousVersion = labInfo.mapLabVersion(previousLabId);
+					compareEnabled = (previousVersion != null);
+			}
+	}
+
 }
 else // remote lab
 {
@@ -174,6 +197,53 @@ else // remote lab
 		MiscUtils.getLogger().error("Error", e);
 	}
 }
+
+
+%>                                                                              
+<%!                                                                             
+public String[] getPreviousIdArray(String idCsvString, String currentLabId)     
+{                                                                               
+    String[] multiID = idCsvString.split(",");                                  
+    ArrayList<String> ids = new ArrayList<String>();                            
+    for(int i = 0; i < multiID.length; i++)                                     
+    {                                                                           
+        String id = multiID[i];                                                 
+        if(!id.equals(currentLabId))                                            
+        {                                                                       
+            ids.add(id);                                                        
+        }                                                                       
+    }                                                                           
+                                                                                
+    return ids.toArray(new String[0]);                                          
+}                                                                               
+                                                                                
+public ArrayList<MessageHandler> getHandlersFromIdArray(String[] idArray)       
+{                                                                               
+    ArrayList<MessageHandler> ret = new ArrayList<MessageHandler>();            
+                                                                                
+    for(int i = 0; i < idArray.length; i++)                                     
+    {                                                                           
+        ret.add(Factory.getHandler(idArray[i]));                                
+    }                                                                           
+                                                                                
+    return ret;                                                                 
+}                                                                               
+%>                                                                              
+<%                                                                              
+                                                                                
+/*
+String[] idArray = getPreviousIdArray(multiLabId, segmentID);                   
+                                                                                
+ArrayList<MessageHandler> previousVersionHandlers = getHandlersFromIdArray(idArray);
+                                                                                
+                                                                                
+Iterator<MessageHandler> iter = previousVersionHandlers.iterator();             
+                                                                                
+while(iter.hasNext())                                                           
+{                                                                               
+    MessageHandler oldHandler = iter.next();                                    
+}  
+*/
 
 
 boolean notBeenAcked = ackList.size() == 0;
@@ -268,6 +338,8 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
         <link rel="stylesheet" type="text/css" href="../../../share/css/OscarStandardLayout.css">
         <style type="text/css">
             <!--
+.new_content_header {}
+.new_content { background-color: #FFF380; }
 .RollRes     { font-weight: 700; font-size: 8pt; color: white; font-family:
                Verdana, Arial, Helvetica }
 .RollRes a:link { color: white }
@@ -1135,6 +1207,16 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						boolean	isVIHARtf = false;
 						boolean isSGorCDC = false;
 
+                        //Map<String, Map<String, String>> section = null;
+						LabReportHeader section = null;
+                        if(previousVersion != null)
+                        {
+                            section = previousVersion.get(headers.get(i));
+                        }
+
+                        boolean headerIsNew = (section == null);
+
+
 						//Checks to see if the PATHL7 lab is an unstructured document, a VIHA RTF pathology report, or if the patient location is SG/CDC
 						//labs that fall into any of these categories have certain requirements per Excelleris
 						if(handler.getMsgType().equals("PATHL7")){
@@ -1153,7 +1235,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                           </tr>
 	                           <tr>
 	                               <td bgcolor="#FFCC00" width="300" valign="bottom">
-	                                   <div class="Title2">
+                                       <div class="Title2<%= getClassIfSame(compareEnabled, " new_content_header", headerIsNew) %>">
 	                                       <%=headers.get(i)%>
 	                                   </div>
 	                               </td>
@@ -1199,6 +1281,22 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                for (k=0; k < obxCount; k++){
 
                                	String obxName = handler.getOBXName(j, k);
+
+								LabReportOBX unit_values = null;
+								LabReportUnit values = null;
+                                boolean obxIsNew = true;
+                                boolean unitIsNew = true;
+                                if(section != null)
+                                {
+                                    unit_values = section.get(obxName);
+                                    obxIsNew = (unit_values == null);
+
+									if(unit_values != null)
+									{
+										values = unit_values.get(handler.getOBXUnits( j, k));
+										unitIsNew = (values == null);
+									}
+                                }
 
 								boolean isAllowedDuplicate = false;
 								if(handler.getMsgType().equals("PATHL7")){
@@ -1468,8 +1566,12 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                				if(handler.getMsgType().equals("PATHL7") && !isAllowedDuplicate && (obxCount>1) && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (handler.getOBXValueType(j, k).equals("TX") || handler.getOBXValueType(j, k).equals("FT"))){%>
                                    				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"></a><%
                                    				}
-                               				else{%>
-                                           <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"><%=obxName %></a>
+                               				else{
+											
+											// Lab comparison highlighting is enabled for this section
+
+											%>
+                                           <td valign="top" align="left" class="<%= getClassIfSame(compareEnabled, "new_content", obxIsNew) %>"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"><%=obxName %></a>
                                            &nbsp;<%if(loincCode != null){ %>
                                                 	<a href="javascript:popupStart('660','1000','http://apps.nlm.nih.gov/medlineplus/services/mpconnect.cfm?mainSearchCriteria.v.cs=2.16.840.1.113883.6.1&mainSearchCriteria.v.c=<%=loincCode%>&informationRecipient.languageCode.c=en')"> info</a>
                                                 	<%} %> </td><%}%>
@@ -1478,16 +1580,17 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                            	if((handler.getOBXResult(j, k).length() > 100) && (isSGorCDC)){%>
                                            		<td align="left"><%= handler.getOBXResult( j, k) %></td><%
                                            	}else{%>
-                                           <td align="right"><%= handler.getOBXResult( j, k) %></td><%}%>
 
-                                           <td align="center">
-                                                   <%= handler.getOBXAbnormalFlag(j, k)%>
-                                           </td>
-                                           <td align="left"><%=handler.getOBXReferenceRange( j, k)%></td>
-                                           <td align="left"><%=handler.getOBXUnits( j, k) %></td>
-                                           <td align="center"><%= handler.getTimeStamp(j, k) %></td>
-                                           <td align="center"><%= handler.getOBXResultStatus( j, k) %></td>
-                                      		<td align="center" valign="top">                                           <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
+                                                <td align="right" class="<%= getClassIfSame(compareEnabled, "new_content", handler.getOBXResult(j,k), values, "result") %>"><%= handler.getOBXResult( j, k) %></td><%}%>
+
+                                                <td align="center" class="<%= getClassIfSame(compareEnabled, "new_content", handler.getOBXAbnormalFlag(j,k), values, "abnormal_flag") %>">
+                                                       <%= handler.getOBXAbnormalFlag(j, k)%>
+                                                </td>
+                                                <td align="left" class="<%= getClassIfSame(compareEnabled, "new_content", handler.getOBXReferenceRange(j,k), values, "reference_range") %>"><%=handler.getOBXReferenceRange( j, k)%></td>
+                                                <td align="left" class="<%= getClassIfSame(compareEnabled, "new_content", unitIsNew) %>"><%=handler.getOBXUnits( j, k) %></td>
+                                                <td align="center" class="<%= getClassIfSame(compareEnabled, "new_content", handler.getTimeStamp(j,k), values, "timestamp") %>"><%= handler.getTimeStamp(j, k) %></td>
+                                                <td align="center" class="<%= getClassIfSame(compareEnabled, "new_content", handler.getOBXResultStatus(j,k), values, "result_status") %>"><%= handler.getOBXResultStatus( j, k) %></td>
+                                          		<td align="center" valign="top">                                           <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
 	                                                	<%if(!isPrevAnnotation){ %><img src="../../../images/notes.gif" alt="rxAnnotation" height="16" width="13" border="0"/><%}else{ %><img src="../../../images/filledNotes.gif" alt="rxAnnotation" height="16" width="13" border="0"/> <%} %>
 	                                                </a>
                                                 </td>
@@ -1652,7 +1755,32 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
             }
         return ret;
     }
+
+
+    public String getClassIfSame(boolean enabled, String className, boolean isSame) 
+    {
+        if(enabled && isSame)
+        {
+            return className;
+        }
+
+        return "";
+    }
+
+    public String getClassIfSame(boolean enabled, String className, String compare1, 
+		LabReportUnit fields, String fieldName)
+    {
+        if(enabled && 
+			(fields == null || !compare1.equals(fields.get(fieldName))))
+        {
+            return className;
+        }
+
+        return "";
+    }
+
 %>
+
  <%--
     AD Address
     CE Coded Entry
