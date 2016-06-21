@@ -36,12 +36,12 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.oscarLab.ca.all.parsers.Factory;
-import oscar.oscarLab.ca.all.upload.MessageUploader;
-import oscar.oscarLab.ca.all.util.Utilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v23.segment.OBR;
 import ca.uhn.hl7v2.model.v23.segment.ORC;
+import oscar.oscarLab.ca.all.parsers.Factory;
+import oscar.oscarLab.ca.all.upload.MessageUploader;
+import oscar.oscarLab.ca.all.util.Utilities;
 
 public class CLSHandler implements MessageHandler {
 
@@ -61,6 +61,11 @@ public class CLSHandler implements MessageHandler {
 			ArrayList<String> messages = Utilities.separateMessages(fileName);
 			for (i = 0; i < messages.size(); i++) {
 				String msg = messages.get(i);
+				
+				// HACK -- some labs start with an extra line which oscar doesn't read, so skip it
+				if( i==0 && msg.startsWith("BHS")) {
+					continue;
+				}
 				/*
 				if(isDuplicate(msg)) {
 					return ("success");
