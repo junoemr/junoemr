@@ -29,6 +29,8 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicData"%>
+<%@ page import="oscar.oscarMessenger.data.MsgDisplayMessage"%>
+<%@ page import="java.util.ArrayList"%>
 
 <%
 int pageType = 0;
@@ -285,7 +287,7 @@ function checkAll(formId){
 
                          <html:form action="<%=strutsAction%>" styleId="msgList" >
                     <% //java.util.Vector theMessages = new java.util.Vector() ;
-                           java.util.Vector theMessages2 = new java.util.Vector() ;
+                    	ArrayList<MsgDisplayMessage> theMessages2 = new ArrayList<MsgDisplayMessage>() ;
                         switch(pageType){
                             case 0:
                                 theMessages2 = DisplayMessagesBeanId.estInbox(orderby,moreMessages,INITIAL_DISPLAY);
@@ -398,11 +400,10 @@ function checkAll(formId){
                                 </tr>
                                 
                                
-                                <!--   for loop Control Initiliation variabe changed to nextMessage   -->
+                                <!--   for loop Control Initialization variable changed to nextMessage   -->
                             <% 
                                     for (int i = 0; i < theMessages2.size() ; i++) {
-                                        oscar.oscarMessenger.data.MsgDisplayMessage dm;
-                                        dm = (oscar.oscarMessenger.data.MsgDisplayMessage) theMessages2.get(i);
+                                        MsgDisplayMessage dm = theMessages2.get(i);
                                         String key = "oscarMessenger.DisplayMessages.msgStatus"+dm.status.substring(0,1).toUpperCase()+dm.status.substring(1); 
                                         %>
                                         
