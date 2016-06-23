@@ -40,6 +40,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
@@ -478,26 +479,121 @@ public final class MessageUploader {
 			if (!firstName.equals("")) firstName = firstName.substring(0, 1);
 			if (!lastName.equals("")) lastName = lastName.substring(0, 1);
 
+			ArrayList<String> params = new ArrayList<String>();
+			params.add(dobYear);
+			params.add(dobMonth);
+			params.add(dobDay);
+			params.add(sex + "%");
 			if (hinMod.equals("%")) {
-				sql = "select demographic_no, provider_no from demographic where" + " last_name like '" + lastName + "%' and " + " first_name like '" + firstName + "%' and " + " year_of_birth like '" + dobYear + "' and " + " month_of_birth like '" + dobMonth + "' and " + " date_of_birth like '" + dobDay + "' and " + " sex like '" + sex + "%' ";
+
+				sql = "SELECT ";
+				sql += "  d.demographic_no, d.provider_no ";
+				sql += "FROM demographic d ";
+				sql += "LEFT JOIN demographic_merged dm ";
+				sql += "  ON d.demographic_no = dm.demographic_no ";
+				sql += "WHERE dm.id IS NULL ";
+				sql += "AND d.year_of_birth like ? ";
+				sql += "AND d.month_of_birth like ? ";
+				sql += "AND d.date_of_birth like ? ";
+				sql += "AND d.sex like ? ";
+				sql += "AND d.last_name like ? ";
+				sql += "AND d.first_name like ? ";
+
+				params.add(lastName + "%");
+				params.add(firstName + "%");
+
 			} else if (OscarProperties.getInstance().getBooleanProperty("LAB_NOMATCH_NAMES", "yes")) {
-				sql = "select demographic_no, provider_no from demographic where hin='" + hinMod + "' and " + " year_of_birth like '" + dobYear + "' and " + " month_of_birth like '" + dobMonth + "' and " + " date_of_birth like '" + dobDay + "' and " + " sex like '" + sex + "%' ";
+
+				sql = "SELECT ";
+				sql += "  d.demographic_no, d.provider_no ";
+				sql += "FROM demographic d ";
+				sql += "LEFT JOIN demographic_merged dm ";
+				sql += "  ON d.demographic_no = dm.demographic_no ";
+				sql += "WHERE dm.id IS NULL ";
+				sql += "AND d.year_of_birth like ? ";
+				sql += "AND d.month_of_birth like ? ";
+				sql += "AND d.date_of_birth like ? ";
+				sql += "AND d.sex like ? ";
+				sql += "AND d.hin = ? ";
+
+				params.add(hinMod);
+
 			} else {
-				sql = "select demographic_no, provider_no from demographic where hin='" + hinMod + "' and " + " last_name like '" + lastName + "%' and " + " first_name like '" + firstName + "%' and " + " year_of_birth like '" + dobYear + "' and " + " month_of_birth like '" + dobMonth + "' and " + " date_of_birth like '" + dobDay + "' and " + " sex like '" + sex + "%' ";
+
+				sql = "SELECT ";
+				sql += "  d.demographic_no, d.provider_no ";
+				sql += "FROM demographic d ";
+				sql += "LEFT JOIN demographic_merged dm ";
+				sql += "  ON d.demographic_no = dm.demographic_no ";
+				sql += "WHERE dm.id IS NULL ";
+				sql += "AND d.year_of_birth like ? ";
+				sql += "AND d.month_of_birth like ? ";
+				sql += "AND d.date_of_birth like ? ";
+				sql += "AND d.sex like ? ";
+				sql += "AND d.hin = ? ";
+				sql += "AND d.last_name like ? ";
+				sql += "AND d.first_name like ? ";
+
+				params.add(hinMod);
+				params.add(lastName + "%");
+				params.add(firstName + "%");
 			}
 
-			logger.debug(sql);
 			PreparedStatement pstmt = conn.prepareStatement(sql);
+
+			Iterator<String> iter = params.iterator();
+			int index = 1;
+			while(iter.hasNext())
+			{
+				String paramValue = iter.next();
+				pstmt.setString(index, paramValue);
+
+				index++;
+			}
+
 			ResultSet rs = pstmt.executeQuery();
 
 			// If the hin was truncated try to match the full hin. This is here as there is code to 
 			// truncate hins that are 12 characters. Unfortunately Quebec hins are 12 characters...
 			if (truncated_hin && rs.first() == false)
 			{
-				sql = "select demographic_no, provider_no from demographic where hin='" + hin + "' and " + " last_name like '" + lastName + "%' and " + " first_name like '" + firstName + "%' and " + " year_of_birth like '" + dobYear + "' and " + " month_of_birth like '" + dobMonth + "' and " + " date_of_birth like '" + dobDay + "' and " + " sex like '" + sex + "%' ";
+				sql = "SELECT ";
+				sql += "  d.demographic_no, d.provider_no ";
+				sql += "FROM demographic d ";
+				sql += "LEFT JOIN demographic_merged dm ";
+				sql += "  ON d.demographic_no = dm.demographic_no ";
+				sql += "WHERE dm.id IS NULL ";
+				sql += "AND d.year_of_birth like ? ";
+				sql += "AND d.month_of_birth like ? ";
+				sql += "AND d.date_of_birth like ? ";
+				sql += "AND d.sex like ? ";
+				sql += "AND d.hin = ? ";
+				sql += "AND d.last_name like ? ";
+				sql += "AND d.first_name like ? ";
+
+				ArrayList<String> params_trunc = new ArrayList<String>();
+				params_trunc.add(dobYear);
+				params_trunc.add(dobMonth);
+				params_trunc.add(dobDay);
+				params_trunc.add(sex + "%");
+				params_trunc.add(hin);
+				params_trunc.add(lastName + "%");
+				params_trunc.add(firstName + "%");
+
 				rs.close();
 				pstmt.close();
 				pstmt = conn.prepareStatement(sql);
+
+				iter = params_trunc.iterator();
+				index = 1;
+				while(iter.hasNext())
+				{
+					String paramValue = iter.next();
+					pstmt.setString(index, paramValue);
+
+					index++;
+				}
+
 				rs = pstmt.executeQuery();
 			}
 

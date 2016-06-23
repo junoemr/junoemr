@@ -216,7 +216,23 @@ function checkTypeIn() {
     }
   }
 
-  String sql = "select demographic_no,first_name,last_name,roster_status,sex,chart_no,year_of_birth,month_of_birth,date_of_birth,provider_no from demographic where patient_status = 'AC' and "+fieldname+ " "+regularexp+" ? " +orderby; // + " "+limit;  
+  String sql = "SELECT ";
+  sql += "  d.demographic_no, ";
+  sql += "  d.first_name, ";
+  sql += "  d.last_name, ";
+  sql += "  d.roster_status, ";
+  sql += "  d.sex, ";
+  sql += "  d.chart_no, ";
+  sql += "  d.year_of_birth, ";
+  sql += "  d.month_of_birth, ";
+  sql += "  d.date_of_birth, ";
+  sql += "  d.provider_no ";
+  sql += "FROM demographic d ";
+  sql += "LEFT JOIN demographic_merged dm ";
+  sql += "  ON d.demographic_no = dm.demographic_no ";
+  sql += "WHERE patient_status = 'AC' ";
+  sql += "AND dm.id IS NULL ";
+  sql += "AND " + fieldname + " " + regularexp + " ? " + orderby; // + " "+limit;  
   
   if(request.getParameter("search_mode").equals("search_name")) {      
       keyword=keyword+"%";
