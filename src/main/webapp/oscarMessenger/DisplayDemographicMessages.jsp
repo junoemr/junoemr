@@ -29,6 +29,8 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 <%@ page import="oscar.oscarDemographic.data.DemographicData"%>
+<%@ page import="oscar.oscarMessenger.data.MsgDisplayMessage"%>
+<%@ page import="java.util.ArrayList"%>
 
 <%
 
@@ -210,14 +212,12 @@ function unlink(){
                                                         </th>
 						</tr>
 						<% //java.util.Vector theMessages = new java.util.Vector() ;
-                                   java.util.Vector theMessages2 = new java.util.Vector() ;
-                                   theMessages2 = DisplayMessagesBeanId.estDemographicInbox(orderby,demographic_no);
-                                   String msgCount = Integer.toString(theMessages2.size());
+									ArrayList<MsgDisplayMessage> theMessages2 = DisplayMessagesBeanId.estDemographicInbox(orderby,demographic_no);
+                                  	String msgCount = Integer.toString(theMessages2.size());
                                 %>
 						<!--   for loop Control Initiliation variabe changed to nextMessage   -->
-						<%for (int i = 0; i < theMessages2.size() ; i++) {  
-                                        oscar.oscarMessenger.data.MsgDisplayMessage dm;
-                                        dm = (oscar.oscarMessenger.data.MsgDisplayMessage) theMessages2.get(i);
+						<%for (int i = 0; i < theMessages2.size() ; i++) {
+                                        MsgDisplayMessage dm = theMessages2.get(i);
                                         String isLastMsg = "false";
                             %>
 						<tr>

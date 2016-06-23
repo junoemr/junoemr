@@ -25,7 +25,7 @@
 
 package oscar.oscarMessenger.pageUtil;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +38,7 @@ import org.apache.struts.action.ActionMapping;
 import org.oscarehr.util.MiscUtils;
 
 import oscar.oscarDB.DBHandler;
+import oscar.oscarMessenger.data.MsgDisplayMessage;
 import oscar.oscarMessenger.util.MsgDemoMap;
 import oscar.util.ParameterActionForward;
 
@@ -70,7 +71,7 @@ public class MsgViewMessageAction extends Action {
         
         if(msgCount==null){
             MsgDisplayMessagesBean DisplayMessagesBeanId = new MsgDisplayMessagesBean();
-            Vector theMessages2 = DisplayMessagesBeanId.estDemographicInbox(orderBy,demographic_no);
+            ArrayList<MsgDisplayMessage> theMessages2 = DisplayMessagesBeanId.estDemographicInbox(orderBy,demographic_no);
             msgCount = Integer.toString(theMessages2.size());
         }
         

@@ -201,65 +201,69 @@ function checkTypeIn() {
     limit="limit "+limit2+" offset "+limit1;
   }
 
-  String fieldname="", regularexp="like"; // exactly search is not required by users, e.g. regularexp="=";
-  if(request.getParameter("search_mode")!=null) {
-    if(request.getParameter("keyword").indexOf("*")!=-1 || request.getParameter("keyword").indexOf("%")!=-1) regularexp="like";
-    if(request.getParameter("search_mode").equals("search_address")) fieldname="address";
-    if(request.getParameter("search_mode").equals("search_phone")) fieldname="phone";
-    if(request.getParameter("search_mode").equals("search_hin")) fieldname="hin";
-    if(request.getParameter("search_mode").equals("search_dob")) fieldname="year_of_birth "+regularexp+" ?"+" and month_of_birth "+regularexp+" ?"+" and date_of_birth ";
-    if(request.getParameter("search_mode").equals("search_chart_no")) fieldname="chart_no";
-    if(request.getParameter("search_mode").equals("search_name")) {
-      if(request.getParameter("keyword").indexOf(",")==-1)  fieldname="last_name";
-      else if(request.getParameter("keyword").trim().indexOf(",")==(request.getParameter("keyword").trim().length()-1)) fieldname="last_name";
-      else fieldname="last_name "+regularexp+" ?"+" and first_name ";
-    }
-  }
+	String[] lastfirst = {""};
+	String fieldname="", regularexp="like"; // exactly search is not required by users, e.g. regularexp="=";
+	if(request.getParameter("search_mode")!=null) {
+		if(request.getParameter("keyword").indexOf("*")!=-1 || request.getParameter("keyword").indexOf("%")!=-1) regularexp="like";
+		if(request.getParameter("search_mode").equals("search_address")) fieldname="address";
+		if(request.getParameter("search_mode").equals("search_phone")) fieldname="phone";
+		if(request.getParameter("search_mode").equals("search_hin")) fieldname="hin";
+		if(request.getParameter("search_mode").equals("search_dob")) fieldname="year_of_birth "+regularexp+" ?"+" and month_of_birth "+regularexp+" ?"+" and date_of_birth ";
+		if(request.getParameter("search_mode").equals("search_chart_no")) fieldname="chart_no";
+		if(request.getParameter("search_mode").equals("search_name")) {
+			fieldname="last_name";			
+			// throws an outOfBoundsException if keyword is exactly the split dilimeter (java6)
+			if(!keyword.trim().equals(",")) {
+				lastfirst = keyword.trim().split(",");
+			}
+			if (lastfirst.length > 1) {
+				fieldname += " "+regularexp+" ? "+"and first_name";
+			}
+		}
+	}
 
-  String sql = "SELECT ";
-  sql += "  d.demographic_no, ";
-  sql += "  d.first_name, ";
-  sql += "  d.last_name, ";
-  sql += "  d.roster_status, ";
-  sql += "  d.sex, ";
-  sql += "  d.chart_no, ";
-  sql += "  d.year_of_birth, ";
-  sql += "  d.month_of_birth, ";
-  sql += "  d.date_of_birth, ";
-  sql += "  d.provider_no ";
-  sql += "FROM demographic d ";
-  sql += "LEFT JOIN demographic_merged dm ";
-  sql += "  ON d.demographic_no = dm.demographic_no ";
-  sql += "WHERE patient_status = 'AC' ";
-  sql += "AND dm.id IS NULL ";
-  sql += "AND " + fieldname + " " + regularexp + " ? " + orderby; // + " "+limit;  
-  
-  if(request.getParameter("search_mode").equals("search_name")) {      
-      keyword=keyword+"%";
-      if(keyword.indexOf(",")==-1){         
-         rs = db.queryResults(sql, keyword) ; //lastname
-      }
-      else if(keyword.indexOf(",")==(keyword.length()-1)){         
-         rs = db.queryResults(sql, keyword.substring(0,(keyword.length()-1)));//lastname
-      }
-      else { //lastname,firstname         
-    		String[] param =new String[2];
-    		int index = keyword.indexOf(",");
-	  		param[0]=keyword.substring(0,index).trim()+"%";//(",");
-	  		param[1]=keyword.substring(index+1).trim()+"%";
-    		rs = db.queryResults(sql, param);
-   	}
-  } else if(request.getParameter("search_mode").equals("search_dob")) {      
-    		String[] param =new String[3];
-	  		param[0]=""+MyDateFormat.getYearFromStandardDate(keyword)+"%";//(",");
-	  		param[1]=""+MyDateFormat.getMonthFromStandardDate(keyword)+"%";
-	  		param[2]=""+MyDateFormat.getDayFromStandardDate(keyword)+"%";  
-    		rs = db.queryResults(sql, param);
-  } else {      
-    keyword=keyword+"%";
-    rs = db.queryResults(sql, keyword);
-  }
- 
+	String sql = "SELECT ";
+	sql += "  d.demographic_no, ";
+	sql += "  d.first_name, ";
+	sql += "  d.last_name, ";
+	sql += "  d.roster_status, ";
+	sql += "  d.sex, ";
+	sql += "  d.chart_no, ";
+	sql += "  d.year_of_birth, ";
+	sql += "  d.month_of_birth, ";
+	sql += "  d.date_of_birth, ";
+	sql += "  d.provider_no ";
+	sql += "FROM demographic d ";
+	sql += "LEFT JOIN demographic_merged dm ";
+	sql += "  ON d.demographic_no = dm.demographic_no ";
+	sql += "WHERE patient_status = 'AC' ";
+	sql += "AND dm.id IS NULL ";
+	sql += "AND " + fieldname + " " + regularexp + " ? " + orderby; // + " "+limit;  
+
+	if(request.getParameter("search_mode").equals("search_name")) {
+		lastfirst[0] = lastfirst[0].trim() + "%";
+		//lastname,firstname
+		if (lastfirst.length > 1) {
+			lastfirst[1] = lastfirst[1].trim() + "%";
+			rs = db.queryResults(sql, lastfirst);
+		}
+		//lastname
+		else {
+			rs = db.queryResults(sql, lastfirst[0]) ;
+		}
+	}
+	else if(request.getParameter("search_mode").equals("search_dob")) {      
+		String[] param =new String[3];
+		param[0]=""+MyDateFormat.getYearFromStandardDate(keyword)+"%";//(",");
+		param[1]=""+MyDateFormat.getMonthFromStandardDate(keyword)+"%";
+		param[2]=""+MyDateFormat.getDayFromStandardDate(keyword)+"%";  
+		rs = db.queryResults(sql, param);
+	} 
+	else {      
+		keyword=keyword+"%";
+		rs = db.queryResults(sql, keyword);
+	}
+	
   boolean bodd=false;
   int nItems=0;
   

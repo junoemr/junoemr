@@ -38,6 +38,25 @@ public class MsgDisplayMessage {
     public String attach     = null;
     public String pdfAttach     = null;
     public String demographic_no = null;
-
-
+    
+    public MsgDisplayMessage() {
+    	this(null, null, false, null, null, null, null, null, null, null, null, null);
+    }
+    public MsgDisplayMessage(String id, String pos, boolean lastMsg, String status, String subj, String date, String time, String by, String to, String demoNo) {
+        this(id, pos, lastMsg, status, subj, date, time, by, to, null, null, demoNo);
+    }
+    public MsgDisplayMessage(String id, String pos, boolean lastMsg, String status, String subj, String date, String time, String by, String to, String attach, String pdf, String demoNo) {
+        this.messageId = id;
+        this.messagePosition = pos;
+        this.isLastMsg = lastMsg;
+        this.status = status;
+        this.thesubject = subj;
+        this.thedate = date;
+        this.theime = time;
+        this.sentby = by;
+        this.sentto = to;
+        this.attach = attach;
+        this.pdfAttach = pdf;
+        this.demographic_no = demoNo;
+    }
 }
