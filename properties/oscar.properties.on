@@ -1004,3 +1004,6 @@ auto_populate_billingreferral_bc=true
 
 #OHSUPPORT-2994 - add custom logo for prescriptions. best size is 100x100px
 #rx_custom_logo=Custom_Rx_Logo.png
+
+# OHSUPPORT-2894 - Refresh the appointment screen when the clinicaid window is closed
+#refresh_schedule_after_clinicaid=on
