@@ -31,13 +31,6 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
@@ -46,30 +39,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.util.LocaleUtils;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.web.PrescriptionQrCodeUIBean;
 
-import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
-import com.lowagie.text.Element;
-import com.lowagie.text.Font;
-import com.lowagie.text.Image;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Phrase;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.ColumnText;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfPageEventHelper;
-import com.lowagie.text.pdf.PdfWriter;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import oscar.OscarProperties;
+import oscar.oscarRx.templates.RxPdfTemplate;
+import oscar.oscarRx.templates.RxPdfTemplateCustom1;
+import oscar.oscarRx.templates.RxPdfTemplatePrescriptionPad;
 
 
 
@@ -77,9 +57,12 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 
 	public static final String HSFO_RX_DATA_KEY = "hsfo.rx.data";
 	private static Logger logger = MiscUtils.getLogger();
+	private OscarProperties props = OscarProperties.getInstance();
 
 	@Override
     public void service(HttpServletRequest req, HttpServletResponse res) throws javax.servlet.ServletException, java.io.IOException {
+		
+		logger.info("CREATE CUSTOM RX PDF SERVICE");
 
 		ByteArrayOutputStream baosPDF = null;
 
@@ -176,6 +159,22 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 		}
 		return baos;
 	}
+	
+	protected ByteArrayOutputStream generatePDFDocumentBytes(final HttpServletRequest req, final ServletContext ctx) throws DocumentException {
+
+		if (HSFO_RX_DATA_KEY.equals(req.getParameter("__title"))) {
+			return generateHsfoRxPDF(req);
+		}
+		
+		RxPdfTemplate template;
+		if ("custom1".equals(props.getProperty("rx_custom_template"))) {
+			template = new RxPdfTemplateCustom1(req, ctx);
+		}
+		else {
+			template = new RxPdfTemplatePrescriptionPad(req, ctx);
+		}
+		return template.getOutputStream();
+	}
 
 	/**
 	 * the form txt file has lines in the form: For Checkboxes: ie. ohip : left, 76, 193, 0, BaseFont.ZAPFDINGBATS, 8, \u2713 requestParamName : alignment, Xcoord, Ycoord, 0, font, fontSize, textToPrint[if empty, prints the value of the request param]
@@ -184,7 +183,7 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 	 * into gimp, switch to pt. coordinate system and use the mouse to find the coordinates. Prepare to be bored!
 	 */
 
-	class EndPage extends PdfPageEventHelper {
+	/*class EndPage extends PdfPageEventHelper {
 
 		private String clinicName;
 		private String clinicTel;
@@ -244,9 +243,9 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 			cb.showTextAligned(alignment, text, x, y, rotation);
 			cb.endText();
 		}
-public String geti18nTagValue(Locale locale, String tag) {
-	return LocaleUtils.getMessage(locale,tag);
-}
+		public String geti18nTagValue(Locale locale, String tag) {
+			return LocaleUtils.getMessage(locale, tag);
+		}
 
 		public void renderPage(PdfWriter writer, Document document) {
 			Rectangle page = document.getPageSize();
@@ -404,9 +403,9 @@ public String geti18nTagValue(Locale locale, String tag) {
 				logger.error("Error", e);
 			}
 		}
-	}
+	}*/
 
-	private HashMap<String,String> parseSCAddress(String s) {
+	/*private HashMap<String,String> parseSCAddress(String s) {
 		HashMap<String,String> hm = new HashMap<String,String>();
 		String[] ar = s.split("</b>");
 		String[] ar2 = ar[1].split("<br>");
@@ -426,23 +425,9 @@ public String geti18nTagValue(Locale locale, String tag) {
 
 		return hm;
 
-	}
-
-	protected ByteArrayOutputStream generatePDFDocumentBytes(final HttpServletRequest req, final ServletContext ctx) throws DocumentException {
-		logger.debug("***in generatePDFDocumentBytes2 FrmCustomedPDFServlet.java***");
-		// added by vic, hsfo
-		Enumeration<String> em = req.getParameterNames();
-		while (em.hasMoreElements()) {
-			logger.debug("para=" + em.nextElement());
-		}
-		em = req.getAttributeNames();
-		while (em.hasMoreElements())
-			logger.debug("attr: " + em.nextElement());
-
-		if (HSFO_RX_DATA_KEY.equals(req.getParameter("__title"))) {
-			return generateHsfoRxPDF(req);
-		}
-		String newline = System.getProperty("line.separator");
+	}*/		
+		
+		/*String newline = System.getProperty("line.separator");
 
 		ByteArrayOutputStream baosPDF = new ByteArrayOutputStream();
 		PdfWriter writer = null;
@@ -567,14 +552,14 @@ public String geti18nTagValue(Locale locale, String tag) {
 				} else if ("PageSize.A4".equals(pageSizeParameter)) {
 					pageSize = PageSize.A4;
 				}
-			}
+			}*/
 			/*
 			 * if ("PageSize.HALFLETTER".equals(props.getProperty(PAGESIZE))) { pageSize = PageSize.HALFLETTER; } else if ("PageSize.A6".equals(props.getProperty(PAGESIZE))) { pageSize = PageSize.A6; } else if
 			 * ("PageSize.A4".equals(props.getProperty(PAGESIZE))) { pageSize = PageSize.A4; }
 			 */
 			// p("size of page ", props.getProperty(PAGESIZE));
 
-			document.setPageSize(pageSize);
+			/*document.setPageSize(pageSize);
 			// 285=left margin+width of box, 5f is space for looking nice
 			document.setMargins(15, pageSize.getWidth() - 285f + 5f, 170, 60);// left, right, top , bottom
 
@@ -635,6 +620,5 @@ public String geti18nTagValue(Locale locale, String tag) {
 			}
 		}
 		logger.debug("***END in generatePDFDocumentBytes2 FrmCustomedPDFServlet.java***");
-		return baosPDF;
-	}
+		return baosPDF;*/
 }
