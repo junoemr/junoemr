@@ -85,6 +85,10 @@ public class TeleplanAPI {
 
     private void getClient(){
        CONTACT_URL = OscarProperties.getInstance().getProperty("TELEPLAN_URL",CONTACT_URL);
+
+       String proxy_host = OscarProperties.getInstance().getProperty("teleplan_proxy_host");
+       String proxy_port = OscarProperties.getInstance().getProperty("teleplan_proxy_port");
+
        HttpState initialState = new HttpState();
         // Initial set of cookies can be retrieved from persistent storage and 
         // re-created, using a persistence mechanism of choice,
@@ -98,6 +102,12 @@ public class TeleplanAPI {
         httpclient = new HttpClient(); //hcParams);
         httpclient.getHttpConnectionManager().getParams().setConnectionTimeout(30000);
         httpclient.setState(initialState);
+		
+		if(proxy_host != null && proxy_port != null)
+		{
+			httpclient.getHostConfiguration().setProxy(
+				proxy_host, Integer.parseInt(proxy_port));
+		}
         
         httpclient.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
         httpclient.getParams().setParameter("User-Agent","TeleplanPerl 1.0");  
