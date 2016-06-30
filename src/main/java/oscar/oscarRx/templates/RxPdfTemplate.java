@@ -58,11 +58,9 @@ public abstract class RxPdfTemplate {
 		PdfWriter writer = null;
 		Document document = null;
 		try {
-			document = getDocument();
+			document = documentSetup();
 			Rectangle pageSize = getPageSize(req.getParameter("rxPageSize"));
 			document.setPageSize(pageSize);
-			// 285=left margin+width of box, 5f is space for looking nice
-			document.setMargins(15, pageSize.getWidth() - 285f + 5f, 170, 60);
 			
 			writer = PdfWriter.getInstance(document, baosPDF);
 			buildPdfLayout(document, writer);
@@ -84,7 +82,7 @@ public abstract class RxPdfTemplate {
 	}
 	
 	protected abstract Rectangle getPageSize(String pageSizeParameter);
-	protected abstract Document getDocument();		
+	protected abstract Document documentSetup();		
 	protected abstract void buildPdfLayout(Document document, PdfWriter writer) throws DocumentException, IOException;
 	
 	protected HashMap<String,String> parseSCAddress(String s) {
@@ -95,6 +93,7 @@ public abstract class RxPdfTemplate {
 		lst.remove(0);
 		String tel = lst.get(3);
 		tel = tel.replace("Tel: ", "");
+		tel = tel.replace("Tel", "");
 		String fax = lst.get(4);
 		fax = fax.replace("Fax: ", "");
 		String clinicName = lst.get(0) + "\n" + lst.get(1) + "\n" + lst.get(2);

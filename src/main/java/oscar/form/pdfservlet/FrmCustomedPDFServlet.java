@@ -76,22 +76,27 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 				String faxNo = req.getParameter("pharmaFax").trim().replaceAll("\\D", "");
 			    if (faxNo.length() < 7) {
 					writer.println("<script>alert('Error: No fax number found!');window.close();</script>");
-				} else {
-		                	// write to file
-		                	String pdfFile = OscarProperties.getInstance().getProperty("fax_file_location")+"/prescription_"+req.getParameter("pdfId")+".pdf";
-		                	FileOutputStream fos = new FileOutputStream(pdfFile);
-		                	baosPDF.writeTo(fos);
-		                	fos.close();
-
-			                String txtFile = OscarProperties.getInstance().getProperty("fax_file_location")+"/prescription_"+req.getParameter("pdfId")+".txt";
-			                FileWriter fstream = new FileWriter(txtFile);
-		                	BufferedWriter out = new BufferedWriter(fstream);
-		                	out.write(faxNo);
-		                	out.close();
-
-					writer.println("<script>alert('Fax sent to: " + req.getParameter("pharmaName") + " (" + req.getParameter("pharmaFax") + ")');window.close();</script>");
 				}
-			} else {
+				else {
+					// write to file
+					String pdfFile = OscarProperties.getInstance().getProperty("fax_file_location") + "/prescription_"
+							+ req.getParameter("pdfId") + ".pdf";
+					FileOutputStream fos = new FileOutputStream(pdfFile);
+					baosPDF.writeTo(fos);
+					fos.close();
+
+					String txtFile = OscarProperties.getInstance().getProperty("fax_file_location") + "/prescription_"
+							+ req.getParameter("pdfId") + ".txt";
+					FileWriter fstream = new FileWriter(txtFile);
+					BufferedWriter out = new BufferedWriter(fstream);
+					out.write(faxNo);
+					out.close();
+
+					writer.println("<script>alert('Fax sent to: " + req.getParameter("pharmaName") + " ("
+							+ req.getParameter("pharmaFax") + ")');window.close();</script>");
+				}
+			}
+			else {
 				StringBuilder sbFilename = new StringBuilder();
 				sbFilename.append("filename_");
 				sbFilename.append(".pdf");
@@ -124,23 +129,25 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 
 				sos.flush();
 			}
-		} catch (DocumentException dex) {
+		}
+		catch (DocumentException dex) {
 			res.setContentType("text/html");
 			PrintWriter writer = res.getWriter();
 			writer.println("Exception from: " + this.getClass().getName() + " " + dex.getClass().getName() + "<br>");
 			writer.println("<pre>");
 			writer.println(dex.getMessage());
 			writer.println("</pre>");
-		} catch (java.io.FileNotFoundException dex) {
-		    res.setContentType("text/html");
-		    PrintWriter writer = res.getWriter();
-		    writer.println("<script>alert('Signature not found. Please sign the prescription.');</script>");
-	    } finally {
+		}
+		catch (java.io.FileNotFoundException dex) {
+			res.setContentType("text/html");
+			PrintWriter writer = res.getWriter();
+			writer.println("<script>alert('Signature not found. Please sign the prescription.');</script>");
+		}
+		finally {
 			if (baosPDF != null) {
 				baosPDF.reset();
 			}
 		}
-
 	}
 
 	// added by vic, hsfo

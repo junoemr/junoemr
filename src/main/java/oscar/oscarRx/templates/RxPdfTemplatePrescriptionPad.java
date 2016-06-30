@@ -134,6 +134,8 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 		String[] cfgGraphicFile = req.getParameterValues("__cfgGraphicFile");
 		String[] graphicPage = req.getParameterValues("__graphicPage");
 
+		document.setMargins(15, document.getPageSize().getWidth() - 285f + 5f, 170, 60);
+		
 		writer.setPageEvent(new EndPage(clinicName, clinicTel, clinicFax, patientPhone, patientCityPostal,
 				patientAddress, patientName, patientDOB, sigDoctorName, rxDate, origPrintDate, numPrint, imgFile,
 				patientHIN, patientChartNo, pracNo, locale));
@@ -191,7 +193,7 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 		return pageSize;
 	}
 	@Override
-	protected Document getDocument() {
+	protected Document documentSetup() {
 		Document document = new Document();
 		
 		String title = req.getParameter("__title") != null ? req.getParameter("__title") : "Unknown";
