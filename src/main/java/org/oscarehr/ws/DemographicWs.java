@@ -26,6 +26,11 @@
 package org.oscarehr.ws;
 
 import javax.jws.WebService;
+import javax.annotation.Resource;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
+import javax.servlet.http.HttpServletRequest;
+//import com.sun.net.httpserver.HttpExchange;
 
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.managers.DemographicManager;
@@ -33,9 +38,19 @@ import org.oscarehr.ws.transfer_objects.DemographicTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import oscar.log.LogAction;
+
 @WebService
 @Component
 public class DemographicWs extends AbstractWs {
+
+	@Resource
+	private WebServiceContext wsContext;
+
 	@Autowired
 	private DemographicManager demographicManager;
 	
@@ -49,5 +64,67 @@ public class DemographicWs extends AbstractWs {
 	{
 		Demographic demographic=demographicManager.getDemographicByMyOscarUserName(myOscarUserName);
 		return(DemographicTransfer.toTransfer(demographic));
+	}
+
+	public List getDemographicsByHealthNum(String hin)
+	{
+		List<Demographic> demographicList = 
+			demographicManager.getDemographicsByHealthNum(hin);
+
+		Iterator<Demographic> demographicListIterator = demographicList.iterator();
+		List<DemographicTransfer> out = new ArrayList<DemographicTransfer>();
+		while(demographicListIterator.hasNext())
+		{
+			Demographic demographic = demographicListIterator.next();
+			out.add(DemographicTransfer.toTransfer(demographic));
+		}
+
+		return(out);
+	}
+
+	/**
+	 * @return the ID of the demographic just added
+	 */
+	public Integer addDemographic(DemographicTransfer demographicTransfer) 
+		throws Exception
+	{
+		MessageContext mc = wsContext.getMessageContext();
+		HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST); 
+		LogAction.addLogSynchronous("DemographicWs.addDemographic", 
+			"Client IP = " + req.getRemoteAddr());
+
+		Demographic demographic = new Demographic();
+		demographicTransfer.copyTo(demographic);
+
+		if(demographic.getDemographicNo() != null)
+		{
+			Integer demo_no = demographic.getDemographicNo();
+
+			throw new Exception("Demographic " + demo_no + " already exists.");
+		}
+
+		demographicManager.addDemographic(demographic);
+		demographicManager.addDemographicExtras(demographic);
+
+		return(demographic.getDemographicNo());
+	}
+	
+	public void updateDemographic(DemographicTransfer demographicTransfer)
+		throws Exception
+	{
+		Demographic demographic = new Demographic();
+		demographicTransfer.copyTo(demographic);
+
+		Integer demo_no = demographic.getDemographicNo();
+
+		Demographic existingDemographic = 
+			demographicManager.getDemographic(demo_no);
+
+		if(existingDemographic == null)
+		{
+			throw new Exception("Demographic " + demo_no + " doesn't exist.");
+		}
+		
+		demographicManager.addDemographic(demographic);
 	}
 }

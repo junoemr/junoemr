@@ -537,4 +537,10 @@ public final class DemographicTransfer {
 	public String toString() {
 		return (ReflectionToStringBuilder.toString(this));
 	}
+
+	public Demographic copyTo(Demographic demographic) {
+		BeanUtils.copyProperties(this, demographic);
+
+		return (demographic);
+	}
 }

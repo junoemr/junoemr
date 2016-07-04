@@ -289,6 +289,26 @@ public class Hl7textResultsData {
 
 	}
 
+	public static String getPreviousLabFromCsv(String current_lab_id, String lab_csv)
+	{
+		String[] lab_id_array = lab_csv.split(",");
+
+		String previous_lab_id = null;
+		for(int i = 0; i < lab_id_array.length; i++)
+		{
+			String lab_id = lab_id_array[i];
+
+			if(current_lab_id.equals(lab_id))
+			{
+				return previous_lab_id;
+			}
+
+			previous_lab_id = lab_id;
+		}
+
+		return null;
+	}
+
 	public static String getMatchingLabs(String lab_no){
 		String sql = "SELECT a.lab_no, a.obr_date, b.obr_date as labDate FROM hl7TextInfo a, hl7TextInfo b " +
 				"WHERE a.accessionNum !='' AND a.accessionNum=b.accessionNum AND b.lab_no='"+lab_no+"' " + 
