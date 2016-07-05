@@ -81,8 +81,17 @@ public abstract class RxPdfTemplate {
 		return baosPDF;
 	}
 	
+	/**
+	 * page size is determined here.
+	 */
 	protected abstract Rectangle getPageSize(String pageSizeParameter);
+	/**
+	 * Document is initialized here, and given custom metadata.
+	 */
 	protected abstract Document documentSetup();		
+	/**
+	 * custom pdf layout and data is set up here. 
+	 */
 	protected abstract void buildPdfLayout(Document document, PdfWriter writer) throws DocumentException, IOException;
 	
 	protected HashMap<String,String> parseSCAddress(String s) {
