@@ -1004,3 +1004,6 @@ auto_populate_billingreferral_bc=true
 
 #OHSUPPORT-2994 - add custom logo for prescriptions. best size is 100x100px
 #rx_custom_logo=Custom_Rx_Logo.png
+
+#OHSUPPORT-3201 - full page custom prescription pdfs for faxing.
+#rx_custom_template=custom1

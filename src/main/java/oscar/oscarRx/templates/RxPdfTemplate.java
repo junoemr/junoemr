@@ -58,11 +58,17 @@ public abstract class RxPdfTemplate {
 		PdfWriter writer = null;
 		Document document = null;
 		try {
-			document = documentSetup();
+			document = new Document();
+			
 			Rectangle pageSize = getPageSize(req.getParameter("rxPageSize"));
 			document.setPageSize(pageSize);
 			
 			writer = PdfWriter.getInstance(document, baosPDF);
+			document = documentSetup(document, writer);
+			
+			document.open();
+			document.newPage();
+			
 			buildPdfLayout(document, writer);
 		}
 		catch (DocumentException dex) {
@@ -88,7 +94,7 @@ public abstract class RxPdfTemplate {
 	/**
 	 * Document is initialized here, and given custom metadata.
 	 */
-	protected abstract Document documentSetup();		
+	protected abstract Document documentSetup(Document document, PdfWriter writer);
 	/**
 	 * custom pdf layout and data is set up here. 
 	 */

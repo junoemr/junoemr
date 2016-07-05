@@ -62,6 +62,22 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 	}
 
 	@Override
+	protected Rectangle getPageSize(String pageSizeParameter) {
+		return PageSize.LETTER;
+	}
+	@Override
+	protected Document documentSetup(Document document, PdfWriter writer) {
+		
+		String title = req.getParameter("__title") != null ? req.getParameter("__title") : "Unknown";
+		document.addTitle(title);
+		document.addSubject("");
+		document.addKeywords("pdf, itext");
+		document.addCreator("OSCAR");
+		document.addAuthor("");
+		document.addHeader("Expires", "0");
+		return document;
+	}
+	@Override
 	protected void buildPdfLayout(Document document, PdfWriter writer) throws DocumentException, IOException {
 		
 		headerFont = FontFactory.getFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
@@ -73,28 +89,7 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		smallFont = FontFactory.getFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 		smallFont.setSize(8);
 		
-		document.open();
-		document.newPage();
-		
 		createRxPdf(document, writer);
-	}
-
-	@Override
-	protected Rectangle getPageSize(String pageSizeParameter) {
-		return PageSize.LETTER;
-	}
-	@Override
-	protected Document documentSetup() {
-		Document document = new Document();
-		
-		String title = req.getParameter("__title") != null ? req.getParameter("__title") : "Unknown";
-		document.addTitle(title);
-		document.addSubject("");
-		document.addKeywords("pdf, itext");
-		document.addCreator("OSCAR");
-		document.addAuthor("");
-		document.addHeader("Expires", "0");
-		return document;
 	}
 
 	/**

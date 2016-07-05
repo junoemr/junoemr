@@ -61,7 +61,24 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 	}
 	
 	@Override
-	protected void buildPdfLayout(Document document, PdfWriter writer) throws DocumentException, IOException {
+	protected Rectangle getPageSize(String pageSizeParameter) {
+		// A0-A10, LEGAL, LETTER, HALFLETTER, _11x17, LEDGER, NOTE, B0-B5, ARCH_A-ARCH_E, FLSA
+		// and FLSE
+		// the following shows a temp way to get a print page size
+		Rectangle pageSize = PageSize.LETTER;
+		if (pageSizeParameter != null) {
+			if ("PageSize.HALFLETTER".equals(pageSizeParameter)) {
+				pageSize = PageSize.HALFLETTER;
+			} else if ("PageSize.A6".equals(pageSizeParameter)) {
+				pageSize = PageSize.A6;
+			} else if ("PageSize.A4".equals(pageSizeParameter)) {
+				pageSize = PageSize.A4;
+			}
+		}
+		return pageSize;
+	}
+	@Override
+	protected Document documentSetup(Document document, PdfWriter writer) {
 		
 		String method = req.getParameter("__method");
 		String origPrintDate = null;
@@ -96,7 +113,6 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 		String patientName = req.getParameter("patientName");
 		String sigDoctorName = req.getParameter("sigDoctorName");
 		String rxDate = req.getParameter("rxDate");
-		String rx = req.getParameter("rx");
         String patientDOB=req.getParameter("patientDOB");
         String showPatientDOB=req.getParameter("showPatientDOB");
         String imgFile=req.getParameter("imgFile");
@@ -105,12 +121,36 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
         String pracNo=req.getParameter("pracNo");
         Locale locale = req.getLocale();
         
+		String[] cfgGraphicFile = req.getParameterValues("__cfgGraphicFile");
+		String[] graphicPage = req.getParameterValues("__graphicPage");
+        
         boolean isShowDemoDOB=false;
         if(showPatientDOB!=null&&showPatientDOB.equalsIgnoreCase("true")){
             isShowDemoDOB=true;
         }
         if(!isShowDemoDOB)
             patientDOB="";
+		
+		String title = req.getParameter("__title") != null ? req.getParameter("__title") : "Unknown";
+		document.addTitle(title);
+		document.addSubject("");
+		document.addKeywords("pdf, itext");
+		document.addCreator("OSCAR");
+		document.addAuthor("");
+		document.addHeader("Expires", "0");
+		
+		document.setMargins(15, document.getPageSize().getWidth() - 285f + 5f, 170, 60);
+		
+		writer.setPageEvent(new EndPage(clinicName, clinicTel, clinicFax, patientPhone, patientCityPostal,
+				patientAddress, patientName, patientDOB, sigDoctorName, rxDate, origPrintDate, numPrint, imgFile,
+				patientHIN, patientChartNo, pracNo, locale));
+		
+		return document;
+	}
+	@Override
+	protected void buildPdfLayout(Document document, PdfWriter writer) throws DocumentException, IOException {
+
+		String rx = req.getParameter("rx");
 		if (rx == null) {
 			rx = "";
 		}
@@ -130,18 +170,6 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				listElem += newline;
 			}
 		}
-
-		String[] cfgGraphicFile = req.getParameterValues("__cfgGraphicFile");
-		String[] graphicPage = req.getParameterValues("__graphicPage");
-
-		document.setMargins(15, document.getPageSize().getWidth() - 285f + 5f, 170, 60);
-		
-		writer.setPageEvent(new EndPage(clinicName, clinicTel, clinicFax, patientPhone, patientCityPostal,
-				patientAddress, patientName, patientDOB, sigDoctorName, rxDate, origPrintDate, numPrint, imgFile,
-				patientHIN, patientChartNo, pracNo, locale));
-
-		document.open();
-		document.newPage();
 
 		PdfContentByte cb = writer.getDirectContent();
 		BaseFont bf; // = normFont;
@@ -174,238 +202,6 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 			document.add(qrCode);
 		}
 	}
-	
-	@Override
-	protected Rectangle getPageSize(String pageSizeParameter) {
-		// A0-A10, LEGAL, LETTER, HALFLETTER, _11x17, LEDGER, NOTE, B0-B5, ARCH_A-ARCH_E, FLSA
-		// and FLSE
-		// the following shows a temp way to get a print page size
-		Rectangle pageSize = PageSize.LETTER;
-		if (pageSizeParameter != null) {
-			if ("PageSize.HALFLETTER".equals(pageSizeParameter)) {
-				pageSize = PageSize.HALFLETTER;
-			} else if ("PageSize.A6".equals(pageSizeParameter)) {
-				pageSize = PageSize.A6;
-			} else if ("PageSize.A4".equals(pageSizeParameter)) {
-				pageSize = PageSize.A4;
-			}
-		}
-		return pageSize;
-	}
-	@Override
-	protected Document documentSetup() {
-		Document document = new Document();
-		
-		String title = req.getParameter("__title") != null ? req.getParameter("__title") : "Unknown";
-		document.addTitle(title);
-		document.addSubject("");
-		document.addKeywords("pdf, itext");
-		document.addCreator("OSCAR");
-		document.addAuthor("");
-		document.addHeader("Expires", "0");
-		return document;
-	}
-	
-	/*@Override
-	public ByteArrayOutputStream getOutputStream() throws DocumentException {
-		String newline = System.getProperty("line.separator");
-
-		ByteArrayOutputStream baosPDF = new ByteArrayOutputStream();
-		PdfWriter writer = null;
-		String method = req.getParameter("__method");
-		String origPrintDate = null;
-		String numPrint = null;
-		if (method != null && method.equalsIgnoreCase("rePrint")) {
-			origPrintDate = req.getParameter("origPrintDate");
-			numPrint = req.getParameter("numPrints");
-		}
-
-		logger.debug("method in generatePDFDocumentBytes " + method);
-		String clinicName;
-		String clinicTel;
-		String clinicFax;
-		// check if satellite clinic is used
-		String useSatelliteClinic = req.getParameter("useSC");
-		logger.debug(useSatelliteClinic);
-		if (useSatelliteClinic != null && useSatelliteClinic.equalsIgnoreCase("true")) {
-			String scAddress = req.getParameter("scAddress");
-			logger.debug("clinic detail" + "=" + scAddress);
-			HashMap<String,String> hm = parseSCAddress(scAddress);
-			clinicName =  hm.get("clinicName");
-			clinicTel = hm.get("clinicTel");
-			clinicFax = hm.get("clinicFax");
-		} else {
-			// parameters need to be passed to header and footer
-			clinicName = req.getParameter("clinicName");
-			logger.debug("clinicName" + "=" + clinicName);
-			clinicTel = req.getParameter("clinicPhone");
-			clinicFax = req.getParameter("clinicFax");
-		}
-		String patientPhone = req.getParameter("patientPhone");
-		String patientCityPostal = req.getParameter("patientCityPostal");
-		String patientAddress = req.getParameter("patientAddress");
-		String patientName = req.getParameter("patientName");
-		String sigDoctorName = req.getParameter("sigDoctorName");
-		String rxDate = req.getParameter("rxDate");
-		String rx = req.getParameter("rx");
-        String patientDOB=req.getParameter("patientDOB");
-        String showPatientDOB=req.getParameter("showPatientDOB");
-        String imgFile=req.getParameter("imgFile");
-        String patientHIN=req.getParameter("patientHIN");
-        String patientChartNo = req.getParameter("patientChartNo");
-        String pracNo=req.getParameter("pracNo");
-        Locale locale = req.getLocale();
-        
-        boolean isShowDemoDOB=false;
-        if(showPatientDOB!=null&&showPatientDOB.equalsIgnoreCase("true")){
-            isShowDemoDOB=true;
-        }
-        if(!isShowDemoDOB)
-            patientDOB="";
-		if (rx == null) {
-			rx = "";
-		}
-
-		String additNotes = req.getParameter("additNotes");
-		String[] rxA = rx.split(newline);
-		List<String> listRx = new ArrayList<String>();
-		String listElem = "";
-		// parse rx and put into a list of rx;
-		for (String s : rxA) {
-
-			if (s.equals("") || s.equals(newline) || s.length() == 1) {
-				listRx.add(listElem);
-				listElem = "";
-			} else {
-				listElem = listElem + s;
-				listElem += newline;
-			}
-
-		}
-
-		// get the print prop values
-		Properties props = new Properties();
-		StringBuilder temp = new StringBuilder();
-		for (Enumeration<String> e = req.getParameterNames(); e.hasMoreElements();) {
-			temp = new StringBuilder(e.nextElement().toString());
-			props.setProperty(temp.toString(), req.getParameter(temp.toString()));
-		}
-
-		for (Enumeration<String> e = req.getAttributeNames(); e.hasMoreElements();) {
-			temp = new StringBuilder(e.nextElement().toString());
-			props.setProperty(temp.toString(), req.getAttribute(temp.toString()).toString());
-		}
-		Document document = new Document();
-
-		try {
-			String title = req.getParameter("__title") != null ? req.getParameter("__title") : "Unknown";
-
-			// specify the page of the picture using __graphicPage, it may be used multiple times to specify multiple pages
-			// however the same graphic will be applied to all pages
-			// ie. __graphicPage=2&__graphicPage=3
-			String[] cfgGraphicFile = req.getParameterValues("__cfgGraphicFile");
-			int cfgGraphicFileNo = cfgGraphicFile == null ? 0 : cfgGraphicFile.length;
-			if (cfgGraphicFile != null) {
-				// for (String s : cfgGraphicFile) {
-				// p("cfgGraphicFile", s);
-				// }
-			}
-
-			String[] graphicPage = req.getParameterValues("__graphicPage");
-			ArrayList<String> graphicPageArray = new ArrayList<String>();
-			if (graphicPage != null) {
-				// for (String s : graphicPage) {
-				// p("graphicPage", s);
-				// }
-				graphicPageArray = new ArrayList<String>(Arrays.asList(graphicPage));
-			}
-
-			// A0-A10, LEGAL, LETTER, HALFLETTER, _11x17, LEDGER, NOTE, B0-B5, ARCH_A-ARCH_E, FLSA
-			// and FLSE
-			// the following shows a temp way to get a print page size
-			Rectangle pageSize = PageSize.LETTER;
-			String pageSizeParameter = req.getParameter("rxPageSize");
-			if (pageSizeParameter != null) {
-				if ("PageSize.HALFLETTER".equals(pageSizeParameter)) {
-					pageSize = PageSize.HALFLETTER;
-				} else if ("PageSize.A6".equals(pageSizeParameter)) {
-					pageSize = PageSize.A6;
-				} else if ("PageSize.A4".equals(pageSizeParameter)) {
-					pageSize = PageSize.A4;
-				}
-			}
-			/*
-			 * if ("PageSize.HALFLETTER".equals(props.getProperty(PAGESIZE))) { pageSize = PageSize.HALFLETTER; } else if ("PageSize.A6".equals(props.getProperty(PAGESIZE))) { pageSize = PageSize.A6; } else if
-			 * ("PageSize.A4".equals(props.getProperty(PAGESIZE))) { pageSize = PageSize.A4; }
-			 */
-			// p("size of page ", props.getProperty(PAGESIZE));
-
-			/*document.setPageSize(pageSize);
-			// 285=left margin+width of box, 5f is space for looking nice
-			document.setMargins(15, pageSize.getWidth() - 285f + 5f, 170, 60);// left, right, top , bottom
-
-			writer = PdfWriter.getInstance(document, baosPDF);
-			writer.setPageEvent(new EndPage(clinicName, clinicTel, clinicFax, patientPhone, patientCityPostal, patientAddress, patientName,patientDOB, sigDoctorName, rxDate, origPrintDate, numPrint, imgFile, patientHIN, patientChartNo, pracNo, locale));
-			document.addTitle(title);
-			document.addSubject("");
-			document.addKeywords("pdf, itext");
-			document.addCreator("OSCAR");
-			document.addAuthor("");
-			document.addHeader("Expires", "0");
-
-			document.open();
-			document.newPage();
-
-			PdfContentByte cb = writer.getDirectContent();
-			BaseFont bf; // = normFont;
-
-			cb.setRGBColorStroke(0, 0, 255);
-			// render prescriptions
-			for (String rxStr : listRx) {
-				//bf = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-				bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-				Paragraph p = new Paragraph(new Phrase(rxStr, new Font(bf, 10)));
-				p.setKeepTogether(true);
-				p.setSpacingBefore(5f);
-				document.add(p);
-			}
-			// render additional notes
-			if (additNotes != null && !additNotes.equals("")) {
-				bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-				Paragraph p = new Paragraph(new Phrase(additNotes, new Font(bf, 10)));
-				p.setKeepTogether(true);
-				p.setSpacingBefore(10f);
-				document.add(p);
-			}
-
-			// render QrCode
-			if (PrescriptionQrCodeUIBean.isPrescriptionQrCodeEnabledForCurrentProvider())
-			{
-				Integer scriptId=Integer.parseInt(req.getParameter("scriptId"));
-				byte[] qrCodeImage=PrescriptionQrCodeUIBean.getPrescriptionHl7QrCodeImage(scriptId);
-				Image qrCode=Image.getInstance(qrCodeImage);
-				document.add(qrCode);
-			}
-		}
-		catch (DocumentException dex) {
-			baosPDF.reset();
-			throw dex;
-		} catch (Exception e) {
-			logger.error("Error", e);
-		} finally {
-			if (document != null) {
-				document.close();
-			}
-			if (writer != null) {
-				writer.close();
-			}
-		}
-		logger.debug("***END in generatePDFDocumentBytes2 FrmCustomedPDFServlet.java***");
-		return baosPDF;
-	}
-	*/
-	
-
 	
 	/**
 	 * the form txt file has lines in the form: For Checkboxes: ie. ohip : left, 76, 193, 0, BaseFont.ZAPFDINGBATS, 8, \u2713 requestParamName : alignment, Xcoord, Ycoord, 0, font, fontSize, textToPrint[if empty, prints the value of the request param]
