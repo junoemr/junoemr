@@ -1007,3 +1007,7 @@ auto_populate_billingreferral_bc=true
 
 #OHSUPPORT-3201 - full page custom prescription pdfs for faxing.
 #rx_custom_template=custom1
+
+# OHSUPPORT-2894 - Refresh the appointment screen when the clinicaid window is closed
+#refresh_schedule_after_clinicaid=on
+

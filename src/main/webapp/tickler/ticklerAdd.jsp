@@ -332,6 +332,12 @@ var newD = newYear + "-" + newMonth + "-" + newDay;
                                                                                 
     // Get the default site/provider based off of IP address                    
     String currentIp = request.getParameter("docIp");                           
+
+	if(currentIp == null)
+	{
+		// Get connection IP if none is found from the document
+		currentIp = request.getRemoteAddr();
+	}
                                                                                 
     Map<String, Map<String, String>> hash = props.getIPProviderSiteMap();       
     Map<String, String> values = hash.get(currentIp);                           

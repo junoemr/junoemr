@@ -727,6 +727,29 @@ refreshTabAlerts("oscar_aged_consults");
 refreshTabAlerts("oscar_scratch");
 }
 
+<% if(OscarProperties.getInstance().isPropertyActive("refresh_schedule_after_clinicaid")) { %>
+
+	<% // check if there is an existing clinicaid window %>
+	var win = window.open('', 'ca_clinicaid_billing_from_oscar');
+
+	<% // If there isn't one, a blank window will have opened, so close it %>
+	try
+	{
+			if(win.location == 'about:blank')
+			{
+					win.close();
+			}
+	}
+	catch(e){}
+
+	<% // If there is an open window, set it to refresh this page if it is closed %>
+	if(!win.closed)
+	{
+			refresh_if_closed(win);
+	}
+
+<% } %>
+
 function callRefreshTabAlerts(id) {
 setTimeout("refreshTabAlerts('"+id+"')", 10);
 }
@@ -765,6 +788,36 @@ function getParameter(paramName) {
   }
   return null;
 }
+
+function refresh_on_close(url)
+{
+	var win = window.open(url);
+	var timer = setInterval(function(){
+		if(win.closed){
+			clearInterval(timer);
+			refresh();
+		}
+	}, 500);
+
+}
+
+function open_then_refresh_on_close(url)
+{
+	win = window.open(url, 'ca_clinicaid_billing_from_oscar');
+	refresh_if_closed(win);
+}
+
+function refresh_if_closed(win)
+{
+	var timer = setInterval(function(){
+		if(win.closed){
+			clearInterval(timer);
+			refresh();
+		}
+	}, 500);
+}
+
+
 </script>
 
 <style type="text/css">
@@ -1916,9 +1969,23 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
                 //java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.action.Action.LOCALE_KEY);
                 if (vLocale.getCountry().equals("BR")) { %>
                <a href=# onClick='popupPage(700,1024, "../oscar/billing/procedimentoRealizado/init.do?appId=<%=appointment.get("appointment_no")%>");return false;' title="Faturamento">|FAT|</a>
-             <% } else if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){%>
-           	   <a href="<%=clinicaid_link+"&billing_action=create_invoice"%>" target="_blank" title="<bean:message key="global.billing"/>">|<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
-             <% } else {%>
+             <% } 
+			 
+			 else if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", "")))
+			 {
+				 if(oscarProps.isPropertyActive("refresh_schedule_after_clinicaid"))
+				 {
+
+				 	// poll til window close then refresh
+					%><a href="#" onclick="open_then_refresh_on_close('<%=clinicaid_link+"&billing_action=create_invoice"%>');" title="<bean:message key="global.billing"/>">|<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a><% 
+					
+				 } else { 
+
+					%><a href="<%=clinicaid_link+"&billing_action=create_invoice"%>" target="_blank" title="<bean:message key="global.billing"/>">|<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a><% 
+					
+				 }
+
+			 } else {%>
               <a href=# onClick='popupPage(755,1200, "../billing.do?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=billingServiceType%>&hotclick=<%=URLEncoder.encode("")%>&appointment_no=<%=appointment.get("appointment_no")%>&demographic_name=<%=URLEncoder.encode(name)%>&status=<%=status%>&demographic_no=<%=demographic_no%>&providerview=<%=curProvider_no[nProvider]%>&user_no=<%=curUser_no%>&apptProvider_no=<%=curProvider_no[nProvider]%>&appointment_date=<%=year+"-"+month+"-"+day%>&start_time=<%=iS+":"+iSm%>&bNewForm=1<%=referral_no_parameter%>");return false;' title="<bean:message key="global.billingtag"/>">|<bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
              <% } %>
 <% } else {%>
