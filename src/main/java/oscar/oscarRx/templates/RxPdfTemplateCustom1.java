@@ -122,6 +122,11 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
 		cell.setBorder(0);
 		mainTable.addCell(cell);
+
+		/*PdfPCell borderCell = new PdfPCell(mainTable);
+		borderCell.setBorder(1);
+		PdfPTable outerTable = new PdfPTable(1);
+		outerTable.addCell(borderCell);*/
 		
 		document.add(mainTable);
 	}
@@ -365,15 +370,19 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		addToTable(table, subtable1, false);
 		addToTable(table, subtable2, false);
 		
+		cell.setBorder(0);
 		if (method != null && method.equalsIgnoreCase("rePrint")) {
 			String printsLine = "Original print date: " + origPrintDate + ". printed " + numPrint + " times";
 			
-			cell.setBorder(0);
 			cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 			cell.setPhrase(new Phrase(printsLine, smallFont));
 			table.addCell(cell);
 		}
-		
+		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cell.setPadding(10f);
+		cell.setPhrase(new Phrase("Created by: OSCAR The open-source EMR www.oscarcanada.org", baseFont));
+		table.addCell(cell);
+				
 		return table;
 	}
 }
