@@ -11,6 +11,16 @@
         <ap-sql>SELECT appointment_date from appointment WHERE appointment_no=${appt_no}</ap-sql>
         <ap-output>${appointment_date}</ap-output>
     </databaseap>
+    <databaseap>
+        <ap-name>appt_start_time</ap-name>
+        <ap-sql>SELECT start_time from appointment WHERE appointment_no=${appt_no}</ap-sql>
+        <ap-output>${start_time}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>appt_end_time</ap-name>
+        <ap-sql>SELECT end_time from appointment WHERE appointment_no=${appt_no}</ap-sql>
+        <ap-output>${end_time}</ap-output>
+    </databaseap>
     <!-- Next booked appointment date -->
     <databaseap>
         <ap-name>next_appt_date</ap-name>
