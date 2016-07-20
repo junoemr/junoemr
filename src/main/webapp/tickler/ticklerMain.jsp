@@ -522,7 +522,7 @@ var beginD = "1900-01-01"
       <script>
 var _providers = [];
 <%	for (int i=0; i<sites.size(); i++) { %>
-	_providers["<%= sites.get(i).getSiteId() %>"]="<% Iterator<Provider> iter = sites.get(i).getProviders().iterator();
+	_providers["<%= sites.get(i).getSiteId() %>"]="<% Iterator<Provider> iter = sites.get(i).getProvidersAlphabetically().iterator();
 	while (iter.hasNext()) {
 		Provider p=iter.next();
 		if ("1".equals(p.getStatus())) {

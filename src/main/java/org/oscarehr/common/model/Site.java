@@ -18,6 +18,9 @@
 
 package org.oscarehr.common.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -238,6 +241,11 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 
 	public Set<Provider> getProviders() {
 		return providers;
+	}	
+	public List<Provider> getProvidersAlphabetically() {
+		ArrayList<Provider> providerListSorted = new ArrayList<Provider>(providers);
+		Collections.sort(providerListSorted, new Provider().ComparatorName());
+		return providerListSorted;
 	}
 
 	public void setProviders(Set<Provider> providers) {
