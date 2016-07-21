@@ -178,6 +178,12 @@
 		demographic.setLastUpdateDate(new java.util.Date());
 		demographic.setPatientStatusDate(new java.util.Date());
 		demographic.setScannedChart((request.getParameter("scanned_chart")!= null && request.getParameter("scanned_chart").equals("scanned"))?"1":"0");
+		
+		  // Patient parental name OHSUPPORT-3228
+		if(Boolean.parseBoolean(oscarVariables.getProperty("demographic_parent_names"))) {
+			demographic.setParentFirstName(request.getParameter("parent_FName"));
+			demographic.setParentLastName(request.getParameter("parent_LName"));
+		}
 
 		List<Demographic> duplicateList = demographicDao.getDemographicWithLastFirstDOBExact(demographic.getLastName(),demographic.getFirstName(),
 				demographic.getYearOfBirth(),demographic.getMonthOfBirth(),demographic.getDateOfBirth());

@@ -1282,6 +1282,24 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				<td align="left"><input type="text" name="chart_no" value="">
 				</td>
 			</tr>
+			<!-- Patient parental name OHSUPPORT-3228 -->
+			<%					
+			if(Boolean.parseBoolean(oscarProps.getProperty("demographic_parent_names"))) { %>
+				<tr>
+					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.parentLName" />:</b></td>
+					<td align="left">
+						<input name="parent_LName" type="text">
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.parentFName" />:</b></td>
+					<td align="left">
+						<input name="parent_FName" type="text">
+					</td>
+				</tr>
+				<%
+			}
+			%>
 			
 			<!-- Licensed producer drop-down selection -->
 			<%					

@@ -39,6 +39,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
 import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.util.MiscUtils;
+
 import oscar.OscarProperties;
 
 /**
@@ -120,6 +121,8 @@ public class Demographic implements Serializable {
     private String newsletter;
 
     private String scannedChart;
+    private String parentFirstName;
+    private String parentLastName;
 
 
         public String getTitle() {
@@ -1159,4 +1162,17 @@ public class Demographic implements Serializable {
 	public void setScannedChart(String scannedChart) {
 	    this.scannedChart = scannedChart;
     }
+	
+	public void setParentFirstName (String name) {
+		parentFirstName = name;
+	}
+	public String getParentFirstName () {
+		return parentFirstName;
+	}
+	public void setParentLastName (String name) {
+		parentLastName = name;
+	}
+	public String getParentLastName () {
+		return parentLastName;
+	}
 }

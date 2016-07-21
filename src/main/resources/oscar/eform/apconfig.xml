@@ -319,6 +319,18 @@
         <ap-sql>SELECT sin FROM demographic WHERE demographic_no=${demographic}</ap-sql>
         <ap-output>${sin}</ap-output>
     </databaseap>
+    <!-- OHSUPPORT-3228 - patient parent names -->
+    <databaseap>
+        <ap-name>parent_first_name</ap-name>
+        <ap-sql>SELECT parent_fname FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+        <ap-output>${parent_fname}</ap-output>
+    </databaseap>
+        <databaseap>
+        <ap-name>parent_first_name</ap-name>
+        <ap-sql>SELECT parent_lname FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+        <ap-output>${parent_lname}</ap-output>
+    </databaseap>
+    
     
     <!-- OHSUPPORT-2712 licensed Marijuana Producers (requires custom database tables)-->
 	<databaseap>

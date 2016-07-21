@@ -39,6 +39,12 @@ ALTER TABLE demographicArchive ADD COLUMN `family_doctor_2` varchar(80);
 ALTER TABLE demographic ADD COLUMN `scanned_chart` char(1);
 ALTER TABLE demographicArchive ADD COLUMN `scanned_chart` char(1);
 
+-- New columns for demographic parent names
+ALTER TABLE demographic ADD COLUMN `parent_fname` varchar(32);
+ALTER TABLE demographicArchive ADD COLUMN `parent_fname` varchar(32);
+ALTER TABLE demographic ADD COLUMN `parent_lname` varchar(32);
+ALTER TABLE demographicArchive ADD COLUMN `parent_lname` varchar(32);
+
 ALTER TABLE measurementMap ADD COLUMN flowsheet varchar(15);
 UPDATE measurementMap SET flowsheet = 'FLOWSHEET' WHERE lab_type = "FLOWSHEET";
 UPDATE measurementMap SET flowsheet = CONCAT(id,loinc_code) WHERE lab_type != "FLOWSHEET";

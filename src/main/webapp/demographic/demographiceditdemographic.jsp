@@ -1639,12 +1639,23 @@ if (iviewTag!=null && !"".equalsIgnoreCase(iviewTag.trim())){
                                              String ec = relHash.get("emergencyContact") == null?"":((Boolean) relHash.get("emergencyContact")).booleanValue()?"<span title=\"Emergency Contact\">/EC</span>":"";
 
                                           %>
-							<li><span class="label"><%=relHash.get("relation")%><%=sdb%><%=ec%>:</span>
-                                                            <span class="info"><%=relHash.get("lastName")%>, <%=relHash.get("firstName")%>, <%=relHash.get("phone")%></span>
-                                                        </li>
-							<%}%>
-
-						</ul>
+										<li>
+											<span class="label"><%=relHash.get("relation")%><%=sdb%><%=ec%>:</span>
+			                                <span class="info"><%=relHash.get("lastName")%>, <%=relHash.get("firstName")%>, <%=relHash.get("phone")%></span>
+		                                </li> <%
+							}
+                            // OHSUPPORT3228 - parent names
+							if(Boolean.parseBoolean(oscarProps.getProperty("demographic_parent_names"))) { %>
+										<li>
+                                            <span class="label"><bean:message key="demographic.demographiceditdemographic.parentLName" />:</span>
+                                            <span class="info"><%= demographic.getParentLastName() %></span>
+										</li>
+										<li>
+			                            	<span class="label"><bean:message key="demographic.demographiceditdemographic.parentFName" />:</span>
+			                                <span class="info"><%= demographic.getParentFirstName() %></span>
+										</li>
+							<% } %>
+							</ul>
 						</div>
 
 						<% } else { %>
@@ -3016,7 +3027,24 @@ document.updatedelete.r_doctor_ohip.value = refNo;
                                                                     <input  type="text" name="patientstatus_date_day" size="2" maxlength="2" value="<%=patientStatusDateDay%>">
 								</td>
 							</tr>
-							
+							<!-- Patient parental name OHSUPPORT-3228 -->
+							<%					
+							if(Boolean.parseBoolean(oscarProps.getProperty("demographic_parent_names"))) { %>
+								<tr>
+									<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.parentLName" />:</b></td>
+									<td align="left">
+										<input name="parent_LName" type="text" value="<%= demographic.getParentLastName() %>">
+									</td>
+								</tr>
+								<tr>
+									<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.parentFName" />:</b></td>
+									<td align="left">
+										<input name="parent_FName" type="text" value="<%= demographic.getParentFirstName() %>">
+									</td>
+								</tr>
+								<%
+							}
+							%>
 							<!-- Licensed producer drop-down selection -->
 							<%
 							if(Boolean.parseBoolean(oscarProps.getProperty("show_demographic_licensed_producers"))) {
