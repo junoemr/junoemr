@@ -561,7 +561,7 @@ function formatPhoneNum() {
 
 function checkONReferralNo() {
 	<%
-		String skip = oscar.oscarProps.getProperty("SKIP_REFERRAL_NO_CHECK","false");
+		String skip = oscarProps.getProperty("SKIP_REFERRAL_NO_CHECK","false");
 		if(!skip.equals("true")) {
 	%>
   var referralNo = document.updatedelete.r_doctor_ohip.value ;
@@ -1031,7 +1031,7 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 				do Faturamento</a>
 
 <% } else {
-	if(oscarProps.isPropertyActive("clinicaid_billing", "")){
+	if(oscarProps.isPropertyActive("clinicaid_billing")){
 		String clinicaid_link = "";
 		clinicaid_link = "../billing/billingClinicAid.jsp?billing_action=invoice_list&demographic_no="+demographic.getDemographicNo();
 		%>
@@ -3468,7 +3468,7 @@ jQuery(document).ready(function(){
 <%!
 
 	public String getDisabled(String fieldName) {
-		String val = oscarProps.getProperty("demographic.edit."+fieldName,"");
+		String val = OscarProperties.getInstance().getProperty("demographic.edit."+fieldName,"");
 		if(val != null && val.equals("disabled")) {
 			return " disabled=\"disabled\" ";
 		}
