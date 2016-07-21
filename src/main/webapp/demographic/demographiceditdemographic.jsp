@@ -1643,14 +1643,17 @@ if (iviewTag!=null && !"".equalsIgnoreCase(iviewTag.trim())){
 		                                </li> <%
 							}
                             // OHSUPPORT3228 - parent names
-							if(oscarProps.isPropertyActive("demographic_parent_names")) { %>
+							if(oscarProps.isPropertyActive("demographic_parent_names")) { 
+								String parentFirstName = (demographic.getParentFirstName() != null ? demographic.getParentFirstName() : "");
+								String parentLastName = (demographic.getParentLastName() != null ? demographic.getParentLastName() : "");
+								%>
 										<li>
                                             <span class="label"><bean:message key="demographic.demographiceditdemographic.parentLName" />:</span>
-                                            <span class="info"><%= demographic.getParentLastName() %></span>
+                                            <span class="info"><%= parentLastName %></span>
 										</li>
 										<li>
 			                            	<span class="label"><bean:message key="demographic.demographiceditdemographic.parentFName" />:</span>
-			                                <span class="info"><%= demographic.getParentFirstName() %></span>
+			                                <span class="info"><%= parentFirstName %></span>
 										</li>
 							<% } %>
 							</ul>
@@ -3027,17 +3030,20 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 							</tr>
 							<!-- Patient parental name OHSUPPORT-3228 -->
 							<%					
-							if(oscarProps.isPropertyActive("demographic_parent_names")) { %>
+							if(oscarProps.isPropertyActive("demographic_parent_names")) { 
+								String parentFirstName = (demographic.getParentFirstName() != null ? demographic.getParentFirstName() : "");
+								String parentLastName = (demographic.getParentLastName() != null ? demographic.getParentLastName() : "");
+								%>
 								<tr>
 									<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.parentLName" />:</b></td>
 									<td align="left">
-										<input name="parent_LName" type="text" value="<%= demographic.getParentLastName() %>">
+										<input name="parent_LName" type="text" value="<%= parentLastName %>">
 									</td>
 								</tr>
 								<tr>
 									<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.parentFName" />:</b></td>
 									<td align="left">
-										<input name="parent_FName" type="text" value="<%= demographic.getParentFirstName() %>">
+										<input name="parent_FName" type="text" value="<%= parentFirstName %>">
 									</td>
 								</tr>
 								<%
