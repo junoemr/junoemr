@@ -73,8 +73,6 @@
 
   java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
 
-  OscarProperties props = OscarProperties.getInstance();
-
   GregorianCalendar now=new GregorianCalendar();
   String curYear = Integer.toString(now.get(Calendar.YEAR));
   String curMonth = Integer.toString(now.get(Calendar.MONTH)+1);
@@ -86,10 +84,10 @@
   OscarProperties oscarProps = OscarProperties.getInstance();
 
   ProvinceNames pNames = ProvinceNames.getInstance();
-  String prov= ((String ) props.getProperty("billregion","")).trim().toUpperCase();
+  String prov= ((String ) oscarProps.getProperty("billregion","")).trim().toUpperCase();
 
-  String billingCentre = ((String ) props.getProperty("billcenter","")).trim().toUpperCase();
-  String defaultCity = ((String ) props.getProperty("defaultcity",""));
+  String billingCentre = ((String ) oscarProps.getProperty("billcenter","")).trim().toUpperCase();
+  String defaultCity = ((String ) oscarProps.getProperty("defaultcity",""));
   if (defaultCity==null || defaultCity.equals("")) {
   	defaultCity = prov.equals("ON")&&billingCentre.equals("N") ? "Toronto":"";
   }
@@ -109,10 +107,10 @@
      HCType = HCTypeProp.getValue();
   } else {
      // If there is no user defined property, then determine if the hctype system property is activated
-     HCType = props.getProperty("hctype","");
+     HCType = oscarProps.getProperty("hctype","");
      if (HCType == null || HCType.equals("")) {
            // The system property is not activated, so use the billregion
-           String billregion = props.getProperty("billregion", "");
+           String billregion = oscarProps.getProperty("billregion", "");
            HCType = billregion;
      }
   }
@@ -120,7 +118,7 @@
   String defaultProvince = HCType;
 		 
   // Custom required fields
-  String required_fields = props.getProperty("custom_required_fields");         
+  String required_fields = oscarProps.getProperty("custom_required_fields");         
   List<String> custom_required_fields = new ArrayList<String>();
   if(required_fields != null){
     custom_required_fields = new ArrayList<String>(Arrays.asList(required_fields.split(",")));
@@ -416,7 +414,7 @@ while(field_itr.hasNext()){
 		(document.adddemographic.<%=field%>_checkbox === undefined &&
 		document.adddemographic.<%=field%>.value.length==0)
 	<% if(field.equals("phone")){%>
-		|| (document.adddemographic.<%=field%>.value == "<%=props.getProperty("phoneprefix", "905-")%>")
+		|| (document.adddemographic.<%=field%>.value == "<%=oscarProps.getProperty("phoneprefix", "905-")%>")
 	<%}%>
 	){
 		alert("You must provide the following field: "+field_mapping.<%=field%>);
@@ -694,7 +692,7 @@ function autoFillHin(){
       	 } %> : </b></td>
 				<td align="left">
 				<% if (vLocale.getCountry().equals("BR")) { %> <input type="text"
-					name="province" value="<%=props.getProperty("billregion", "ON")%>">
+					name="province" value="<%=oscarProps.getProperty("billregion", "ON")%>">
 				<% } else { %> <select name="province">
 					<option value="OT"
 						<%=defaultProvince.equals("")||defaultProvince.equals("OT")?" selected":""%>>Other</option>
@@ -793,7 +791,7 @@ function autoFillHin(){
 					key="demographic.demographicaddrecordhtm.formPhoneHome" /><% if(custom_required_fields.contains("phone")){%><font color="red">:</font> </b><% }else{ %>:<%} %> </b></td>
 				<td align="left"><input type="text" name="phone"
 					onBlur="formatPhoneNum()"
-					value="<%=props.getProperty("phoneprefix", "905-")%>"> <bean:message
+					value="<%=oscarProps.getProperty("phoneprefix", "905-")%>"> <bean:message
 					key="demographic.demographicaddrecordhtm.Ext" />:<input
 					type="text" name="hPhoneExt" value="" size="4" /></td>
 				<td align="right"><b><bean:message
@@ -912,7 +910,7 @@ function autoFillHin(){
                                        sex = sexProp.getValue();
                                    } else {
                                        // Access defaultsex system property
-                                       sex = props.getProperty("defaultsex","");
+                                       sex = oscarProps.getProperty("defaultsex","");
                                    }
                                 %>
                                 <td align="left"><select name="sex" id="sex">
@@ -1186,7 +1184,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				</td>
 			</tr>
 			<!-- Family Doctor -->
-            <% if (Boolean.parseBoolean(oscarProps.getProperty("demographic_family_doctor"))) { %>
+            <% if (oscarProps.isPropertyActive("demographic_family_doctor")) { %>
 			<tr>
 
 				<td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.familyDoctor" />: </b></td>
@@ -1284,7 +1282,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
 			</tr>
 			<!-- Patient parental name OHSUPPORT-3228 -->
 			<%					
-			if(Boolean.parseBoolean(oscarProps.getProperty("demographic_parent_names"))) { %>
+			if(oscarProps.isPropertyActive("demographic_parent_names")) { %>
 				<tr>
 					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.parentLName" />:</b></td>
 					<td align="left">
@@ -1303,7 +1301,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
 			
 			<!-- Licensed producer drop-down selection -->
 			<%					
-			if(Boolean.parseBoolean(oscarProps.getProperty("show_demographic_licensed_producers"))) {
+			if(oscarProps.isPropertyActive("show_demographic_licensed_producers")) {
 				ResultSet producerRs = addDemoBean.queryResults("search_licensed_producer");
 				ResultSet producerAddrRs = addDemoBean.queryResults("search_licensed_producer_address_name");
 				%>
@@ -1342,7 +1340,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
 			%>
 			<!-- Scanned Chart -->
 			<%
-				if (Boolean.parseBoolean(oscarProps.getProperty("demographic_scanned_chart"))) {
+				if (oscarProps.isPropertyActive("demographic_scanned_chart")) {
 			%>
 				<tr valign="top">
 					<td align="right" nowrap><b><bean:message
@@ -1372,7 +1370,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
 					value=""></td>
 			</tr>
  <% }
-   if (props.isPropertyActive("meditech_id")) { %>
+   if (oscarProps.isPropertyActive("meditech_id")) { %>
                          <tr valign="top">
                              <td align="right"><b>Meditech ID:</b></td>
                              <td align="left"><input type="text" name="meditech_id" value=""></td>

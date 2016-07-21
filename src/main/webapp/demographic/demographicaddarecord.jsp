@@ -34,7 +34,7 @@
 <%@ page import="org.oscarehr.PMmodule.dao.AdmissionDao" %>
 <%@ page import="org.oscarehr.common.dao.WaitingListDao" %>
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean" scope="session" />
-<% java.util.Properties oscarVariables = oscar.OscarProperties.getInstance(); %>
+<% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
 <%
 	AdmissionDao admissionDao = (AdmissionDao)SpringUtils.getBean("admissionDao");
 	WaitingListDao waitingListDao = (WaitingListDao)SpringUtils.getBean("waitingListDao");
@@ -180,7 +180,7 @@
 		demographic.setScannedChart((request.getParameter("scanned_chart")!= null && request.getParameter("scanned_chart").equals("scanned"))?"1":"0");
 		
 		  // Patient parental name OHSUPPORT-3228
-		if(Boolean.parseBoolean(oscarVariables.getProperty("demographic_parent_names"))) {
+		if(oscarVariables.isPropertyActive("demographic_parent_names")) {
 			demographic.setParentFirstName(request.getParameter("parent_FName"));
 			demographic.setParentLastName(request.getParameter("parent_LName"));
 		}
@@ -225,7 +225,7 @@
     demographicDao.save(demographic);
     
     // save custom licensed producer if enabled
-    if(Boolean.parseBoolean(oscarVariables.getProperty("show_demographic_licensed_producers"))) {
+    if(oscarVariables.isPropertyActive("show_demographic_licensed_producers")) {
 	    try {
 		    int licensedProducerID = Integer.parseInt(request.getParameter("licensed_producer"));
 		    int licensedProducerAddressID = Integer.parseInt(request.getParameter("licensed_producer_address"));

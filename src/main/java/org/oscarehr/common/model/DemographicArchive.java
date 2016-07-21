@@ -150,9 +150,9 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	@Column(name = "scanned_chart")
 	private String scannedChart = null;
 	@Column(name = "parent_fname")
-    private String parentFirstName = null;
+	private String parentFirstName = null;
 	@Column(name = "parent_lname")
-    private String parentLastName = null;
+	private String parentLastName = null;
 
 
 	public DemographicArchive() {}

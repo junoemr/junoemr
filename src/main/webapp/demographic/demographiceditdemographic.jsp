@@ -86,7 +86,6 @@
 	scope="session" />
 <jsp:useBean id="providerBean" class="java.util.Properties"
 	scope="session" />
-<% java.util.Properties oscarVariables = OscarProperties.getInstance(); %>
 
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/phr-tag.tld" prefix="phr"%>
@@ -105,6 +104,8 @@
 		return;
 	}
 
+	OscarProperties oscarProps = OscarProperties.getInstance();
+
 	String curProvider_no = (String) session.getAttribute("user");
 	String demographic_no = request.getParameter("demographic_no") ;
 	String apptProvider = request.getParameter("apptProvider");
@@ -114,7 +115,7 @@
 	String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF" ;
 	String str = null;
 	int nStrShowLen = 20;
-	String prov= (oscarVariables.getProperty("billregion","")).trim().toUpperCase();
+	String prov= (oscarProps.getProperty("billregion","")).trim().toUpperCase();
 
 	CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 	List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.DEMOGRAPHIC, Long.valueOf(demographic_no));
@@ -123,10 +124,7 @@
 
 	LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_DEMOGRAPHIC,  demographic_no , request.getRemoteAddr(),demographic_no);
 
-
-	OscarProperties oscarProps = OscarProperties.getInstance();
-
-        Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
+	Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
 	ProvinceNames pNames = ProvinceNames.getInstance();
 	List<String[]> arr = demographicExtDao.getListOfValuesForDemo(demographic_no);
 	Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographic_no);
@@ -179,12 +177,12 @@
 
 <script type="text/javascript" src="../share/javascript/prototype.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
-<% if (OscarProperties.getInstance().getBooleanProperty("workflow_enhance", "true")) { %>
+<% if (oscarProps.getBooleanProperty("workflow_enhance", "true")) { %>
 <script language="javascript" src="<%=request.getContextPath() %>/hcHandler/hcHandler.js"></script>
 <script language="javascript" src="<%=request.getContextPath() %>/hcHandler/hcHandlerUpdateDemographic.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath() %>/hcHandler/hcHandler.css" type="text/css" />
 <% } %>
-<% if (OscarProperties.getInstance().getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
 <link rel="stylesheet" type="text/css" href="<%=protocol%>ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/blitzer/jquery-ui.css"/>
 <link rel="stylesheet" href="../css/jquery.autocomplete.css" type="text/css">
 <% } %>
@@ -563,7 +561,7 @@ function formatPhoneNum() {
 
 function checkONReferralNo() {
 	<%
-		String skip = oscar.OscarProperties.getInstance().getProperty("SKIP_REFERRAL_NO_CHECK","false");
+		String skip = oscar.oscarProps.getProperty("SKIP_REFERRAL_NO_CHECK","false");
 		if(!skip.equals("true")) {
 	%>
   var referralNo = document.updatedelete.r_doctor_ohip.value ;
@@ -703,7 +701,7 @@ function showMenu(menuNumber, eventObj) {
     return showPopup(menuId, eventObj);
 }
 
-<%if (OscarProperties.getInstance().getProperty("workflow_enhance")!=null && OscarProperties.getInstance().getProperty("workflow_enhance").equals("true")) {%>
+<%if (oscarProps.getProperty("workflow_enhance")!=null && oscarProps.getProperty("workflow_enhance").equals("true")) {%>
 
 function showAppt (targetAppt, eventObj) {
     if(eventObj) {
@@ -1033,7 +1031,7 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 				do Faturamento</a>
 
 <% } else {
-	if(Boolean.parseBoolean(oscarProps.getProperty("clinicaid_billing", ""))){
+	if(oscarProps.isPropertyActive("clinicaid_billing", "")){
 		String clinicaid_link = "";
 		clinicaid_link = "../billing/billingClinicAid.jsp?billing_action=invoice_list&demographic_no="+demographic.getDemographicNo();
 		%>
@@ -1125,7 +1123,7 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 		// Get the default service type to use for the billing page. (Service type = Billing form)
 		// If the user has a default selected in thier preferences use it. Otherwise use the
 		// global default defined in the properties file.
-		String billingServiceType = URLEncoder.encode(oscarVariables.getProperty("default_view"));
+		String billingServiceType = URLEncoder.encode(oscarProps.getProperty("default_view"));
 		List<Map<java.lang.String,java.lang.Object>> providerPreferences = oscarSuperManager.find("providerDao", "search_pref_defaultbill", new Object[] {apptMainBean.getString(rs,"provider_no")});
 		if (providerPreferences.size() > 0)
 		{
@@ -1152,7 +1150,7 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>
 <%      if("ON".equals(prov)) {
-            String default_view = oscarVariables.getProperty("default_view", "");
+            String default_view = oscarProps.getProperty("default_view", "");
 
             if (!oscarProps.getProperty("clinic_no", "").startsWith("1022")) { // part 2 of quick hack to make Dr. Hunter happy
 %>
@@ -1166,7 +1164,7 @@ if (vLocale.getCountry().equals("BR")) { %> <!--a href="javascript: function myF
 			<tr>
 				<td><a
 					href="javascript: function myFunction() {return false; }"
-					onClick="popupS('../billing/CA/ON/billingShortcutPg1.jsp?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("hospital_view", default_view))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=1&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=0:00&bNewForm=1&status=t');return false;"
+					onClick="popupS('../billing/CA/ON/billingShortcutPg1.jsp?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(oscarProps.getProperty("hospital_view", default_view))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=1&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=0:00&bNewForm=1&status=t');return false;"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgHospitalBilling"/></a></td>
 			</tr>
 			<tr>
@@ -1485,7 +1483,7 @@ if (iviewTag!=null && !"".equalsIgnoreCase(iviewTag.trim())){
 						</td>
 					</tr>
 
-					<%if (OscarProperties.getInstance().getProperty("workflow_enhance") != null && OscarProperties.getInstance().getProperty("workflow_enhance").equals("true")) {%>
+					<%if (oscarProps.getProperty("workflow_enhance") != null && oscarProps.getProperty("workflow_enhance").equals("true")) {%>
 
 					<tr bgcolor="#CCCCFF">
                         <td colspan="4">
@@ -1527,12 +1525,12 @@ if (iviewTag!=null && !"".equalsIgnoreCase(iviewTag.trim())){
                                     onclick="window.open('demographicExport.jsp?demographicNo=<%=apptMainBean.getString(rs,"demographic_no")%>');">
                                 </td>
                                 <td width="30%" align='center' valign="top">
-                                <% if (OscarProperties.getInstance().getBooleanProperty("workflow_enhance", "true")) { %>
+                                <% if (oscarProps.getBooleanProperty("workflow_enhance", "true")) { %>
 									<span style="position: relative; float: right; font-style: italic; background: black; color: white; padding: 4px; font-size: 12px; border-radius: 3px;">
 										<span class="_hc_status_icon _hc_status_success"></span>Ready for Card Swipe
 									</span>
 								<% } %>
-                                <% if (!OscarProperties.getInstance().getBooleanProperty("workflow_enhance", "true")) { %>
+                                <% if (!oscarProps.getBooleanProperty("workflow_enhance", "true")) { %>
 								<span id="swipeButton" style="display: inline;">
                                     <input type="button" name="Button"
                                     value="<bean:message key="demographic.demographiceditdemographic.btnSwipeCard"/>"
@@ -1624,7 +1622,7 @@ if (iviewTag!=null && !"".equalsIgnoreCase(iviewTag.trim())){
 						</ul>
 						</div>
 
-						<%if(!OscarProperties.getInstance().isPropertyActive("NEW_CONTACTS_UI")) { %>
+						<%if(!oscarProps.isPropertyActive("NEW_CONTACTS_UI")) { %>
 						<div class="demographicSection" id="otherContacts">
 						<h3>&nbsp;<bean:message key="demographic.demographiceditdemographic.msgOtherContacts"/>: <b><a
 							href="javascript: function myFunction() {return false; }"
@@ -1645,7 +1643,7 @@ if (iviewTag!=null && !"".equalsIgnoreCase(iviewTag.trim())){
 		                                </li> <%
 							}
                             // OHSUPPORT3228 - parent names
-							if(Boolean.parseBoolean(oscarProps.getProperty("demographic_parent_names"))) { %>
+							if(oscarProps.isPropertyActive("demographic_parent_names")) { %>
 										<li>
                                             <span class="label"><bean:message key="demographic.demographiceditdemographic.parentLName" />:</span>
                                             <span class="info"><%= demographic.getParentLastName() %></span>
@@ -1728,7 +1726,7 @@ if ( PatStat.equals(Dead) ) {%>
                                                             key="demographic.demographiceditdemographic.formChartNo" />:</span>
                                                         <span class="info"><%=demographic.getChartNo()%></span>
 							</li>
-							<% if (Boolean.parseBoolean(oscarProps.getProperty("demographic_scanned_chart"))) { %>
+							<% if (oscarProps.isPropertyActive("demographic_scanned_chart")) { %>
 							<li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.scannedChart" />:</span>
                                                         <span class="info"><%=demographic.getScannedChart().equals("1")?"YES":"NO"%></span>
@@ -1850,7 +1848,7 @@ if ( PatStat.equals(Dead) ) {%>
 						</ul>
 						</div>
 
-						<%if (OscarProperties.getInstance().getProperty("workflow_enhance")!=null && OscarProperties.getInstance().getProperty("workflow_enhance").equals("true")) {%>
+						<%if (oscarProps.getProperty("workflow_enhance")!=null && oscarProps.getProperty("workflow_enhance").equals("true")) {%>
 						<div class="demographicSection">
                         <h3>&nbsp;<bean:message key="demographic.demographiceditdemographic.msgInternalProviders"/></h3>
                         <div style="background-color: #EEEEFF;">
@@ -2177,14 +2175,14 @@ if ( PatStat.equals(Dead) ) {%>
                                                     <li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.formRefDocNo" />:</span><span class="info"><%=rdohip%></span>
 							</li>
-							<% if (Boolean.parseBoolean(oscarProps.getProperty("demographic_family_doctor"))) { %>
+							<% if (oscarProps.isPropertyActive("demographic_family_doctor")) { %>
                                                     <li><span class="label"><bean:message
 															key="demographic.demographiceditdemographic.familyDoctor" />:</span><span class="info"><%=fd2ohip%> <%=family_doctor_name%></span>
 							</li>
 							<% } 
 							//-- Licensed producer drop-down selection (display only)-->
 
-							if(Boolean.parseBoolean(oscarProps.getProperty("show_demographic_licensed_producers"))) { %>
+							if(oscarProps.isPropertyActive("show_demographic_licensed_producers")) { %>
 							<li>
                                                     <span class="label"><bean:message
                                                           	key="demographic.demographiceditdemographic.licensedProducer" />:</span>
@@ -2216,8 +2214,8 @@ if ( PatStat.equals(Dead) ) {%>
 						</div>
 
 						<% // customized key
-						if(oscarVariables.getProperty("demographicExt") != null) {
-							String [] propDemoExt = oscarVariables.getProperty("demographicExt","").split("\\|");
+						if(oscarProps.getProperty("demographicExt") != null) {
+							String [] propDemoExt = oscarProps.getProperty("demographicExt","").split("\\|");
 						%>
 						<div class="demographicSection" id="special">
 						<h3>&nbsp;Special</h3>
@@ -2843,7 +2841,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 								</td>
 							</tr>
 							<!-- Family Doctor -->
-							<% if (Boolean.parseBoolean(oscarProps.getProperty("demographic_family_doctor"))) { %>
+							<% if (oscarProps.isPropertyActive("demographic_family_doctor")) { %>
 							<tr>
 								<td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.familyDoctor" />: </b></td>
 								<td align="left">
@@ -3029,7 +3027,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 							</tr>
 							<!-- Patient parental name OHSUPPORT-3228 -->
 							<%					
-							if(Boolean.parseBoolean(oscarProps.getProperty("demographic_parent_names"))) { %>
+							if(oscarProps.isPropertyActive("demographic_parent_names")) { %>
 								<tr>
 									<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.parentLName" />:</b></td>
 									<td align="left">
@@ -3047,7 +3045,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 							%>
 							<!-- Licensed producer drop-down selection -->
 							<%
-							if(Boolean.parseBoolean(oscarProps.getProperty("show_demographic_licensed_producers"))) {
+							if(oscarProps.isPropertyActive("show_demographic_licensed_producers")) {
 								ResultSet producerRs = apptMainBean.queryResults("search_licensed_producer");
 								ResultSet producerAddrRs = apptMainBean.queryResults("search_licensed_producer_address_name");
 							%>
@@ -3095,7 +3093,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 									size="30" value="<%=demographic.getChartNo()%>" <%=getDisabled("chart_no")%>>
 								</td>
 								<!-- Scanned Chart -->
-					            <% if (Boolean.parseBoolean(oscarProps.getProperty("demographic_scanned_chart"))) { %>
+					            <% if (oscarProps.isPropertyActive("demographic_scanned_chart")) { %>
 					                <td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.scannedChart"/>:</b></td>
 					                <td align="left"><input type="checkbox" name="scanned_chart" value="scanned" <%=demographic.getScannedChart().equals("1")?"checked":""%>/></td>
 					            </tr>
@@ -3239,10 +3237,10 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 									value="<%= endDay %>"></td>
 							</tr>
 							<% // customized key
-if(oscarVariables.getProperty("demographicExt") != null) {
-    boolean bExtForm = oscarVariables.getProperty("demographicExtForm") != null ? true : false;
-    String [] propDemoExtForm = bExtForm ? (oscarVariables.getProperty("demographicExtForm","").split("\\|") ) : null;
-	String [] propDemoExt = oscarVariables.getProperty("demographicExt","").split("\\|");
+if(oscarProps.getProperty("demographicExt") != null) {
+    boolean bExtForm = oscarProps.getProperty("demographicExtForm") != null ? true : false;
+    String [] propDemoExtForm = bExtForm ? (oscarProps.getProperty("demographicExtForm","").split("\\|") ) : null;
+	String [] propDemoExt = oscarProps.getProperty("demographicExt","").split("\\|");
 	for(int k=0; k<propDemoExt.length; k=k+2) {
 %>
 							<tr valign="top" bgcolor="#CCCCFF">
@@ -3285,7 +3283,7 @@ if(oscarVariables.getProperty("demographicExt") != null) {
 							</tr>
 							<% 	}
 }
-if(oscarVariables.getProperty("demographicExtJScript") != null) { out.println(oscarVariables.getProperty("demographicExtJScript")); }
+if(oscarProps.getProperty("demographicExtJScript") != null) { out.println(oscarProps.getProperty("demographicExtJScript")); }
 %>
 
 <tr valign="top">
@@ -3433,7 +3431,7 @@ function callEligibilityWebService(url,id){
  }
 </script>
 
-<% if (OscarProperties.getInstance().getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
 
 <script src="<%=protocol%>www.google.com/jsapi"></script>
 <script>
@@ -3470,7 +3468,7 @@ jQuery(document).ready(function(){
 <%!
 
 	public String getDisabled(String fieldName) {
-		String val = OscarProperties.getInstance().getProperty("demographic.edit."+fieldName,"");
+		String val = oscarProps.getProperty("demographic.edit."+fieldName,"");
 		if(val != null && val.equals("disabled")) {
 			return " disabled=\"disabled\" ";
 		}
