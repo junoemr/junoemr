@@ -392,7 +392,7 @@ for (int i=0; i<sites.size(); i++)
     %>                                                                          
     _providers["<%= sites.get(i).getSiteId() %>"]="<%                           
                                                                                 
-    Iterator<Provider> iter = sites.get(i).getProviders().iterator();           
+    Iterator<Provider> iter = sites.get(i).getProvidersAlphabetically().iterator();
     while (iter.hasNext())                                                      
     {                                                                           
         Provider p=iter.next();                                                 
