@@ -128,8 +128,10 @@
 
     EmailUtils.sendEmail(emailAddress, fullName, fromEmail, fromName, subject, emailBody, null);
     sentEmail = true;
+    MiscUtils.getLogger().info("APPOINTMENT REMINDER EMAIL SUCCESSFULLY SENT TO " + emailAddress + " FOR APPOINTMENT #: " + appointment_no);
 
-  } catch (Exception e) {
+  } 
+  catch (Exception e) {
     MiscUtils.getLogger().error("Unable to email appointment reminder", e);
     errorMsg = e.getMessage();
   }
