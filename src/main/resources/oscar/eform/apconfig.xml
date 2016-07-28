@@ -326,7 +326,7 @@
         <ap-output>${parent_fname}</ap-output>
     </databaseap>
         <databaseap>
-        <ap-name>parent_first_name</ap-name>
+        <ap-name>parent_last_name</ap-name>
         <ap-sql>SELECT parent_lname FROM demographic WHERE demographic_no=${demographic}</ap-sql>
         <ap-output>${parent_lname}</ap-output>
     </databaseap>
