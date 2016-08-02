@@ -18,9 +18,6 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -33,13 +30,15 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.lowagie.text.pdf.PdfReader;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.dms.data.DocumentUploadForm;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
-
-import com.lowagie.text.pdf.PdfReader;
 
 public class DocumentUploadAction extends DispatchAction {
 
@@ -88,7 +87,7 @@ public class DocumentUploadAction extends DispatchAction {
 			}
 			newDoc.setNumberOfPages(numberOfPages);
 			String doc_no = EDocUtil.addDocumentSQL(newDoc);
-			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+			LogAction.addLog(user, LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 
 			if (providerId != null) {
 				WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());

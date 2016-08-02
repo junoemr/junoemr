@@ -38,6 +38,8 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.util.MiscUtils;
 
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 
 public class FileLabsAction extends DispatchAction {
@@ -54,8 +56,9 @@ public class FileLabsAction extends DispatchAction {
       String providerNo = (String) request.getSession().getAttribute("user");
       String searchProviderNo = request.getParameter("searchProviderNo");
       String status = request.getParameter("status");
-
+      String labType = request.getParameter("labType");
       String[] flaggedLabs = request.getParameterValues("flaggedLabs");
+      String segmentID = ((flaggedLabs != null && flaggedLabs.length > 0 && flaggedLabs[0] != null) ? flaggedLabs[0] : "");
 
       String[] labTypes = CommonLabResultData.getLabTypes();
       ArrayList<String[]> listFlaggedLabs = new ArrayList<String[]>();
@@ -86,6 +89,9 @@ public class FileLabsAction extends DispatchAction {
          if (request.getParameter("fname") != null) { newURL = newURL + "&fname="+request.getParameter("fname"); }
          if (request.getParameter("hnum")  != null) { newURL = newURL + "&hnum="+request.getParameter("hnum"); }
          //MiscUtils.getLogger().info(newURL);
+         String logConst = (labType.equalsIgnoreCase("DOC")) ? LogConst.CON_DOCUMENT : LogConst.CON_HL7_LAB;
+         LogAction.addLog(providerNo, LogConst.REASSIGN, logConst, segmentID, request.getRemoteAddr());
+         
       return (new ActionForward(newURL));
    }
 

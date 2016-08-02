@@ -38,147 +38,152 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.oscarLab.ca.on.CommonLabResultData;
-
 import org.oscarehr.common.dao.ProviderLabRoutingFavoritesDao;
 import org.oscarehr.common.model.ProviderLabRoutingFavorite;
+import org.oscarehr.util.SpringUtils;
+
+import oscar.log.LogAction;
+import oscar.log.LogConst;
+import oscar.oscarLab.ca.on.CommonLabResultData;
 
 public class ReportReassignAction extends Action {
 
-    Logger logger = Logger.getLogger(ReportReassignAction.class);
+	Logger logger = Logger.getLogger(ReportReassignAction.class);
 
-    public ReportReassignAction() {
-    }
+	public ReportReassignAction() {
+	}
 
-    public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 
-        String providerNo = request.getParameter("providerNo");
-        String searchProviderNo = request.getParameter("searchProviderNo");
-        String status = request.getParameter("status");
+		String providerNo = request.getParameter("providerNo");
+		String searchProviderNo = request.getParameter("searchProviderNo");
+		String status = request.getParameter("status");
 
-        String[] flaggedLabs = request.getParameterValues("flaggedLabs");
-        String selectedProviders = request.getParameter("selectedProviders");
-        String newFavorites = request.getParameter("favorites");
-       // String labType = request.getParameter("labType");
-        String ajax=request.getParameter("ajax");
-        //Hashtable htable = new Hashtable();
-        String[] labTypes = CommonLabResultData.getLabTypes();
-        ArrayList listFlaggedLabs = new ArrayList();
-       /* Enumeration em=request.getParameterNames();
-        while(em.hasMoreElements()){
-            MiscUtils.getLogger().info("ele="+em.nextElement());
-            MiscUtils.getLogger().info("val="+request.getParameter((em.nextElement()).toString()));
-        }*/
+		String[] flaggedLabs = request.getParameterValues("flaggedLabs");
+		String selectedProviders = request.getParameter("selectedProviders");
+		String newFavorites = request.getParameter("favorites");
+		String labType = request.getParameter("labType");
+		String ajax = request.getParameter("ajax");
+		String[] labTypes = CommonLabResultData.getLabTypes();
+		ArrayList<String[]> listFlaggedLabs = new ArrayList<String[]>();
+		/*
+		 * Enumeration em=request.getParameterNames();
+		 * while(em.hasMoreElements()){
+		 * MiscUtils.getLogger().info("ele="+em.nextElement());
+		 * MiscUtils.getLogger().info("val="+request.getParameter((em.
+		 * nextElement()).toString())); }
+		 */
 
-        if(flaggedLabs != null && labTypes != null){
-            for (int i = 0; i < flaggedLabs.length; i++){
-                //MiscUtils.getLogger().info(flaggedLabs[i]);
-                for (int j = 0; j < labTypes.length; j++){
-                    //MiscUtils.getLogger().info(labTypes[j]);
-                    String s =  request.getParameter("labType"+flaggedLabs[i]+labTypes[j]);
-                    //MiscUtils.getLogger().info(s);
-                    if (s != null){  //This means that the lab was of this type.
-                        String[] la =  new String[] {flaggedLabs[i],labTypes[j]};
-                        listFlaggedLabs.add(la);
-                        j = labTypes.length;
+		if (flaggedLabs != null && labTypes != null) {
+			for (int i = 0; i < flaggedLabs.length; i++) {
+				// MiscUtils.getLogger().info(flaggedLabs[i]);
+				for (int j = 0; j < labTypes.length; j++) {
+					// MiscUtils.getLogger().info(labTypes[j]);
+					String s = request.getParameter("labType" + flaggedLabs[i] + labTypes[j]);
+					// MiscUtils.getLogger().info(s);
+					if (s != null) { // This means that the lab was of this
+										// type.
+						String[] la = new String[]{flaggedLabs[i], labTypes[j]};
+						listFlaggedLabs.add(la);
+						j = labTypes.length;
 
-                    }
+					}
 
-                }
-            }
-        }
+				}
+			}
+		}
 
-        String newURL = "";
-       // MiscUtils.getLogger().info(listFlaggedLabs.size());
-        try {
-        	//Only route if there are selected providers
-        	if( !("".equals(selectedProviders) || selectedProviders == null)) {
-        		CommonLabResultData.updateLabRouting(listFlaggedLabs, selectedProviders);
-        	}
-        	//update favorites
-        	ProviderLabRoutingFavoritesDao favDao = (ProviderLabRoutingFavoritesDao)SpringUtils.getBean("ProviderLabRoutingFavoritesDao");
-        	String user = (String)request.getSession().getAttribute("user");
-        	List<ProviderLabRoutingFavorite>currentFavorites = favDao.findFavorites(user);
+		String newURL = "";
+		// MiscUtils.getLogger().info(listFlaggedLabs.size());
+		try {
+			// Only route if there are selected providers
+			if (!("".equals(selectedProviders) || selectedProviders == null)) {
+				CommonLabResultData.updateLabRouting(listFlaggedLabs, selectedProviders);
+			}
+			// update favorites
+			ProviderLabRoutingFavoritesDao favDao = (ProviderLabRoutingFavoritesDao) SpringUtils
+					.getBean("ProviderLabRoutingFavoritesDao");
+			String user = (String) request.getSession().getAttribute("user");
+			List<ProviderLabRoutingFavorite> currentFavorites = favDao.findFavorites(user);
 
-        	if(newFavorites == null || "".equals(newFavorites) ) {
-        		for( ProviderLabRoutingFavorite fav : currentFavorites ) {
-        			favDao.remove(fav.getId());
-        		}
-        	}
-        	else {
-        		String[] arrNewFavs = newFavorites.split(",");
+			if (newFavorites == null || "".equals(newFavorites)) {
+				for (ProviderLabRoutingFavorite fav : currentFavorites) {
+					favDao.remove(fav.getId());
+				}
+			}
+			else {
+				String[] arrNewFavs = newFavorites.split(",");
 
-        		//Check for new favorites to add
-        		boolean isNew;
-        		for( int idx = 0; idx < arrNewFavs.length; ++idx ) {
-        			isNew = true;
-        			for( ProviderLabRoutingFavorite fav : currentFavorites ) {
-        				if( fav.getRoute_to_provider_no().equals(arrNewFavs[idx])) {
-        					isNew = false;
-        					break;
-        				}
-        			}
-        			if( isNew ) {
-        				ProviderLabRoutingFavorite newFav = new ProviderLabRoutingFavorite();
-        				newFav.setProvider_no(user);
-        				newFav.setRoute_to_provider_no(arrNewFavs[idx]);
-        				favDao.persist(newFav);
-        			}
-        		}
+				// Check for new favorites to add
+				boolean isNew;
+				for (int idx = 0; idx < arrNewFavs.length; ++idx) {
+					isNew = true;
+					for (ProviderLabRoutingFavorite fav : currentFavorites) {
+						if (fav.getRoute_to_provider_no().equals(arrNewFavs[idx])) {
+							isNew = false;
+							break;
+						}
+					}
+					if (isNew) {
+						ProviderLabRoutingFavorite newFav = new ProviderLabRoutingFavorite();
+						newFav.setProvider_no(user);
+						newFav.setRoute_to_provider_no(arrNewFavs[idx]);
+						favDao.persist(newFav);
+					}
+				}
 
-        		//check for favorites to remove
-        		boolean remove;
-        		for( ProviderLabRoutingFavorite fav : currentFavorites ) {
-        			remove = true;
-        			for( int idx2 = 0; idx2 < arrNewFavs.length; ++idx2 ) {
-        				if( fav.getRoute_to_provider_no().equals(arrNewFavs[idx2])) {
-        					remove = false;
-        					break;
-        				}
-        			}
-        			if( remove ) {
-        				favDao.remove(fav.getId());
-        			}
-        		}
+				// check for favorites to remove
+				boolean remove;
+				for (ProviderLabRoutingFavorite fav : currentFavorites) {
+					remove = true;
+					for (int idx2 = 0; idx2 < arrNewFavs.length; ++idx2) {
+						if (fav.getRoute_to_provider_no().equals(arrNewFavs[idx2])) {
+							remove = false;
+							break;
+						}
+					}
+					if (remove) {
+						favDao.remove(fav.getId());
+					}
+				}
 
-        	}
+			}
         	
-            newURL = mapping.findForward("success").getPath();
-            if (newURL.contains("labDisplay.jsp")) {
-                newURL = newURL
-                            + "?providerNo=" + ((providerNo != null) ? providerNo : "")
-                            + "&searchProviderNo=" + ((searchProviderNo != null) ? searchProviderNo : "")
-                            + "&status=" + ((status != null) ? status : "")
-                            + "&segmentID=" + ((flaggedLabs != null && flaggedLabs.length > 0 && flaggedLabs[0] != null) ? flaggedLabs[0] : "");
-                // the segmentID is needed when being called from a lab display
-            } else {
-                newURL = newURL
-                            + "&providerNo=" + ((providerNo != null) ? providerNo : "")
-                            + "&searchProviderNo=" + ((searchProviderNo != null) ? searchProviderNo : "")
-                            + "&status=" + ((status != null) ? status : "")
-                            + "&segmentID=" + ((flaggedLabs != null && flaggedLabs.length > 0 && flaggedLabs[0] != null) ? flaggedLabs[0] : "");
-            }
+			providerNo = ((providerNo != null) ? providerNo : "");
+			searchProviderNo = ((searchProviderNo != null) ? searchProviderNo : "");
+			status = ((status != null) ? status : "");
+			String segmentID = ((flaggedLabs != null && flaggedLabs.length > 0 && flaggedLabs[0] != null) ? flaggedLabs[0] : "");
+
+			newURL = mapping.findForward("success").getPath();
+
+			if (newURL.contains("labDisplay.jsp")) {
+				newURL += "?providerNo=" + providerNo;
+			}
+			else {
+				newURL += "&providerNo=" + providerNo;
+			}
+            newURL += "&searchProviderNo=" + searchProviderNo
+                    + "&status=" + status
+                    + "&segmentID=" + segmentID; // the segmentID is needed when being called from a lab display
+
             if (request.getParameter("lname") != null) { newURL = newURL + "&lname="+request.getParameter("lname"); }
             if (request.getParameter("fname") != null) { newURL = newURL + "&fname="+request.getParameter("fname"); }
             if (request.getParameter("hnum") != null) { newURL = newURL + "&hnum="+request.getParameter("hnum"); }
-        } catch (Exception e) {
-            logger.error("exception in ReportReassignAction", e);
-            newURL = mapping.findForward("failure").getPath();
-        }
-        //MiscUtils.getLogger().info(ajax);
-        if(ajax!=null && ajax.equals("yes")){
-            //MiscUtils.getLogger().info("if");
-            return null;
-        }
-        else{
-            //MiscUtils.getLogger().info("else");
-            return (new ActionForward(newURL));
-        }
+            
+            String logConst = (labType.equalsIgnoreCase("DOC")) ? LogConst.CON_DOCUMENT : LogConst.CON_HL7_LAB;
+            LogAction.addLog(providerNo, LogConst.REASSIGN, logConst, segmentID, request.getRemoteAddr());
+            
+		}
+		catch (Exception e) {
+			logger.error("exception in ReportReassignAction", e);
+			newURL = mapping.findForward("failure").getPath();
+		}
+		if (ajax != null && ajax.equals("yes")) {
+			return null;
+		}
+		else {
+			return (new ActionForward(newURL));
+		}
     }
 }

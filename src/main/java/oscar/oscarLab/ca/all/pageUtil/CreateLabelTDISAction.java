@@ -21,6 +21,9 @@ import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.util.SpringUtils;
 
+import oscar.log.LogAction;
+import oscar.log.LogConst;
+
 
 public class CreateLabelTDISAction extends Action {
 	Logger logger = Logger.getLogger(CreateLabelTDISAction.class);
@@ -48,16 +51,16 @@ public class CreateLabelTDISAction extends Action {
 			hl7dao.createUpdateLabelByLabNumber(label, labNum);
 			
 			logger.info("Label '" + label + "' created/updated for lab_no "+lab_no+" successfully.");
+			LogAction.addLog(request.getParameter("providerNo"), LogConst.EDIT, LogConst.CON_HL7_LAB, lab_no, request.getRemoteAddr());
 			
 		} catch (Exception e){
 			logger.error("Error inserting label '" + label + "' into hl7TextInfo" + e);
 			request.setAttribute("error", "There was an error creating a label.");
 		}
-		
+
 		if( ajaxcall != null && !"null".equalsIgnoreCase(ajaxcall)) {
 			return null;
 		}
-		
 		return mapping.findForward("complete");
 	}
 
