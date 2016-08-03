@@ -82,14 +82,11 @@ public class ReportReassignAction extends Action {
 					// MiscUtils.getLogger().info(labTypes[j]);
 					String s = request.getParameter("labType" + flaggedLabs[i] + labTypes[j]);
 					// MiscUtils.getLogger().info(s);
-					if (s != null) { // This means that the lab was of this
-										// type.
+					if (s != null) { // This means that the lab was of this type.
 						String[] la = new String[]{flaggedLabs[i], labTypes[j]};
 						listFlaggedLabs.add(la);
 						j = labTypes.length;
-
 					}
-
 				}
 			}
 		}
@@ -102,8 +99,7 @@ public class ReportReassignAction extends Action {
 				CommonLabResultData.updateLabRouting(listFlaggedLabs, selectedProviders);
 			}
 			// update favorites
-			ProviderLabRoutingFavoritesDao favDao = (ProviderLabRoutingFavoritesDao) SpringUtils
-					.getBean("ProviderLabRoutingFavoritesDao");
+			ProviderLabRoutingFavoritesDao favDao = (ProviderLabRoutingFavoritesDao) SpringUtils.getBean("ProviderLabRoutingFavoritesDao");
 			String user = (String) request.getSession().getAttribute("user");
 			List<ProviderLabRoutingFavorite> currentFavorites = favDao.findFavorites(user);
 
@@ -147,7 +143,6 @@ public class ReportReassignAction extends Action {
 						favDao.remove(fav.getId());
 					}
 				}
-
 			}
         	
 			providerNo = ((providerNo != null) ? providerNo : "");
