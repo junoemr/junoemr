@@ -2997,7 +2997,7 @@ import oscar.util.UtilDateUtilities;
 			pd = getProviderByNames(firstName, lastName, matchProviderNames);
 	    }
 		/* attempt to split single names into first and last parts */
-		if (pd == null) {
+		if (pd == null && (StringUtils.empty(firstName) || StringUtils.empty(lastName))) {
 	    	String[] parsedName = null;
 	    	if (!StringUtils.empty(firstName)) {
 	    		parsedName = coerceProviderNames(firstName);
