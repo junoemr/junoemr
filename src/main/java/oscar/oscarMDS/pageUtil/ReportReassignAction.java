@@ -172,7 +172,7 @@ public class ReportReassignAction extends Action {
             if (request.getParameter("hnum") != null) { newURL = newURL + "&hnum="+request.getParameter("hnum"); }
             
             String logConst = (labType.equalsIgnoreCase("DOC")) ? LogConst.CON_DOCUMENT : LogConst.CON_HL7_LAB;
-            LogAction.addLog(providerNo, LogConst.REASSIGN, logConst, segmentID, request.getRemoteAddr());
+            LogAction.addLog(providerNo, LogConst.REASSIGN, logConst, "id=" +segmentID, request.getRemoteAddr());
             
 		}
 		catch (Exception e) {

@@ -40,8 +40,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -50,8 +50,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import net.sf.json.JSONObject;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -83,6 +81,11 @@ import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.lowagie.text.pdf.PdfReader;
+import com.sun.pdfview.PDFFile;
+import com.sun.pdfview.PDFPage;
+
+import net.sf.json.JSONObject;
 import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
@@ -90,13 +93,9 @@ import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarDemographic.data.DemographicData;
 import oscar.oscarEncounter.data.EctProgram;
-import oscar.oscarLab.ca.on.LabResultData;
 import oscar.oscarLab.ca.on.CommonLabResultData;
+import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.UtilDateUtilities;
-
-import com.lowagie.text.pdf.PdfReader;
-import com.sun.pdfview.PDFFile;
-import com.sun.pdfview.PDFPage;
 
 
 /**
@@ -124,8 +123,6 @@ public class ManageDocumentAction extends DispatchAction {
 
 	public ActionForward documentUpdateAjax(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 
-		String ret = "";
-
 		String observationDate = request.getParameter("observationDate");// :2008-08-22<
 		String documentDescription = request.getParameter("documentDescription");// :test2<
 		String documentId = request.getParameter("documentId");// :29<
@@ -133,7 +130,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String docResultStatus = request.getParameter("doc_result_status");
 		String use_provider_as_responsible = request.getParameter("use_provider_as_responsible");
 
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
+		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
 
 		String demog = request.getParameter("demog");
 
@@ -254,7 +251,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String documentId = request.getParameter("documentId");// :29<
 		String docType = request.getParameter("docType");// :consult<
 
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
+		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
 
 		String demog = request.getParameter("demog");
 

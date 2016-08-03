@@ -53,7 +53,7 @@ public class LogAction {
 		if (loggedInInfo.loggedInProvider!=null) logEntry.setProviderNo(loggedInInfo.loggedInProvider.getProviderNo());
 		logEntry.setAction(action);
 		logEntry.setData(data);
-		LogAction.addLogSynchronous(logEntry);		
+		LogAction.addLogSynchronous(logEntry);
 	}
 	
 	/**

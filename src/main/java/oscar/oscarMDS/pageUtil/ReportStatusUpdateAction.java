@@ -91,7 +91,8 @@ public class ReportStatusUpdateAction extends DispatchAction {
 
         if(status == 'A'){
             String demographicID = getDemographicIdFromLab(lab_type, labNo);
-            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACK, LogConst.CON_HL7_LAB, ""+labNo, request.getRemoteAddr(),demographicID);
+            String logConst = (lab_type != null && lab_type.equalsIgnoreCase("DOC")) ? LogConst.CON_DOCUMENT : LogConst.CON_HL7_LAB;
+            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACK, logConst, ""+labNo, request.getRemoteAddr(),demographicID);
         }
 
         try {

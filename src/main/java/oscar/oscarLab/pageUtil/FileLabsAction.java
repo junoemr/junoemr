@@ -22,7 +22,6 @@
  * Ontario, Canada
  */
 
-
 package oscar.oscarLab.pageUtil;
 
 import java.io.IOException;
@@ -32,6 +31,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -43,73 +43,76 @@ import oscar.log.LogConst;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 
 public class FileLabsAction extends DispatchAction {
+	
+	private static Logger logger = MiscUtils.getLogger();
 
-   public FileLabsAction() {
-   }
+	public FileLabsAction() {
+	}
 
-   public ActionForward unspecified(ActionMapping mapping,
-   ActionForm form,
-   HttpServletRequest request,
-   HttpServletResponse response)
-   throws ServletException, IOException {
+	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 
-      String providerNo = (String) request.getSession().getAttribute("user");
-      String searchProviderNo = request.getParameter("searchProviderNo");
-      String status = request.getParameter("status");
-      String labType = request.getParameter("labType");
-      String[] flaggedLabs = request.getParameterValues("flaggedLabs");
-      String segmentID = ((flaggedLabs != null && flaggedLabs.length > 0 && flaggedLabs[0] != null) ? flaggedLabs[0] : "");
+		String providerNo = (String) request.getSession().getAttribute("user");
+		String searchProviderNo = request.getParameter("searchProviderNo");
+		String status = request.getParameter("status");
+		String[] flaggedLabs = request.getParameterValues("flaggedLabs");
+		
+		String[] labTypes = CommonLabResultData.getLabTypes();
+		ArrayList<String[]> listFlaggedLabs = new ArrayList<String[]>();
 
-      String[] labTypes = CommonLabResultData.getLabTypes();
-      ArrayList<String[]> listFlaggedLabs = new ArrayList<String[]>();
+		if (flaggedLabs != null && labTypes != null) {
+			for (int i = 0; i < flaggedLabs.length; i++) {
+				for (int j = 0; j < labTypes.length; j++) {
+					String s = request.getParameter("labType" + flaggedLabs[i] + labTypes[j]);
 
-      if(flaggedLabs != null && labTypes != null){
-         for (int i = 0; i < flaggedLabs.length; i++){
-            for (int j = 0; j < labTypes.length; j++){
-               String s =  request.getParameter("labType"+flaggedLabs[i]+labTypes[j]);
+					if (s != null) { // This means that the lab was of this type.
+						String[] la = new String[]{flaggedLabs[i], labTypes[j]};
+						logger.debug("ADDING lab " + flaggedLabs[i] + " of lab type " + labTypes[j]);
+						listFlaggedLabs.add(la);
+						j = labTypes.length;
+					}
+				}
+			}
+		}
 
-               if (s != null){  //This means that the lab was of this type.
-                  String[] la =  new String[] {flaggedLabs[i],labTypes[j]};
-                  MiscUtils.getLogger().debug("ADDING lab "+flaggedLabs[i]+" of lab type "+labTypes[j]);
-                  listFlaggedLabs.add(la);
-                  j = labTypes.length;
+		String newURL = "";
 
-               }
-            }
-         }
-      }
+		CommonLabResultData.fileLabs(listFlaggedLabs, providerNo);
+		
+		for(String[] labs : listFlaggedLabs) {
+			String labType = labs[1];
+			String logConst = (labType != null && labType.equalsIgnoreCase("DOC")) ? LogConst.CON_DOCUMENT : LogConst.CON_HL7_LAB;
+			LogAction.addLog(providerNo, LogConst.FILE, logConst, "id=" + labs[0], request.getRemoteAddr());
+		}
+		
+		newURL = mapping.findForward("success").getPath();
+		newURL = newURL + "&providerNo=" + providerNo + "&searchProviderNo=" + searchProviderNo + "&status=" + status;
+		if (request.getParameter("lname") != null) {
+			newURL = newURL + "&lname=" + request.getParameter("lname");
+		}
+		if (request.getParameter("fname") != null) {
+			newURL = newURL + "&fname=" + request.getParameter("fname");
+		}
+		if (request.getParameter("hnum") != null) {
+			newURL = newURL + "&hnum=" + request.getParameter("hnum");
+		}
+		return (new ActionForward(newURL));
+	}
 
-      String newURL = "";
+	public ActionForward fileLabAjax(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
 
+		String providerNo = (String) request.getSession().getAttribute("user");
+		String flaggedLab = request.getParameter("flaggedLabId").trim();
+		String labType = request.getParameter("labType").trim();
 
-         CommonLabResultData.fileLabs(listFlaggedLabs, providerNo);
-         newURL = mapping.findForward("success").getPath();
-         newURL = newURL + "&providerNo="+providerNo+"&searchProviderNo="+searchProviderNo+"&status="+status;
-         if (request.getParameter("lname") != null) { newURL = newURL + "&lname="+request.getParameter("lname"); }
-         if (request.getParameter("fname") != null) { newURL = newURL + "&fname="+request.getParameter("fname"); }
-         if (request.getParameter("hnum")  != null) { newURL = newURL + "&hnum="+request.getParameter("hnum"); }
-         //MiscUtils.getLogger().info(newURL);
-         String logConst = (labType.equalsIgnoreCase("DOC")) ? LogConst.CON_DOCUMENT : LogConst.CON_HL7_LAB;
-         LogAction.addLog(providerNo, LogConst.REASSIGN, logConst, segmentID, request.getRemoteAddr());
-         
-      return (new ActionForward(newURL));
-   }
+		ArrayList<String[]> listFlaggedLabs = new ArrayList<String[]>();
+		String[] la = new String[]{flaggedLab, labType};
+		listFlaggedLabs.add(la);
+		CommonLabResultData.fileLabs(listFlaggedLabs, providerNo);
 
-   public ActionForward fileLabAjax(ActionMapping mapping,
-   ActionForm form,
-   HttpServletRequest request,
-   HttpServletResponse response)
-   {
-
-      String providerNo = (String) request.getSession().getAttribute("user");
-      String flaggedLab=request.getParameter("flaggedLabId").trim();
-      String labType=request.getParameter("labType").trim();
-
-      ArrayList<String[]> listFlaggedLabs = new ArrayList<String[]>();
-      String[] la =  new String[] {flaggedLab,labType};
-      listFlaggedLabs.add(la);
-      CommonLabResultData.fileLabs(listFlaggedLabs, providerNo);
-
-      return null;
-}
+		String logConst = (labType.equalsIgnoreCase("DOC")) ? LogConst.CON_DOCUMENT : LogConst.CON_HL7_LAB;
+		LogAction.addLog(providerNo, LogConst.FILE, logConst, "id=" + flaggedLab, request.getRemoteAddr());
+		return null;
+	}
 }
