@@ -31,6 +31,7 @@ import org.oscarehr.common.dao.DemographicCustDao;
 import org.oscarehr.PMmodule.dao.AdmissionDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicCust;
+import org.oscarehr.ws.transfer_objects.DemographicTransfer;
 import org.oscarehr.PMmodule.model.Admission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -116,6 +117,38 @@ public class DemographicManager
 			"demographicId=" + demographic.getDemographicNo());
 
 		return(demographic.getDemographicNo());
+	}
+
+	public Integer addDemographicExts(Demographic demographic, 
+		DemographicTransfer demographicTransfer)
+	{
+		boolean saved = false;
+		if(demographicTransfer.getCellPhone() != null)
+		{
+			/*
+			DemographicExt demoExt = new DemographicExt();
+			demoExt.setId(demographic.getDemographicNo());
+
+			demoExt.setKey("demo_cell");
+			demoExt.setValue(demographicTransfer.getCellPhone());
+
+			demographicExtDao.persist(demoExt);
+			*/
+			demographicExtDao.addKey(demographic.getProviderNo(), 
+				demographic.getDemographicNo().toString(), "demo_cell", 
+				demographicTransfer.getCellPhone());
+
+			saved = true;
+		}
+
+		if(saved)
+		{
+			return(demographic.getDemographicNo());
+		}
+		else
+		{
+			return(null);
+		}
 	}
 
 	// When adding a demographic, entries are required in other tables.  This

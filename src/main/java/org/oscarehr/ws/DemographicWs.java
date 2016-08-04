@@ -35,6 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.ws.transfer_objects.DemographicTransfer;
+//import org.oscarehr.util.MiscUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -105,6 +107,7 @@ public class DemographicWs extends AbstractWs {
 
 		demographicManager.addDemographic(demographic);
 		demographicManager.addDemographicExtras(demographic);
+		demographicManager.addDemographicExts(demographic, demographicTransfer);
 
 		return(demographic.getDemographicNo());
 	}
