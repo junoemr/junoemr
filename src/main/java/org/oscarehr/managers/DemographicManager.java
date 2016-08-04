@@ -125,15 +125,6 @@ public class DemographicManager
 		boolean saved = false;
 		if(demographicTransfer.getCellPhone() != null)
 		{
-			/*
-			DemographicExt demoExt = new DemographicExt();
-			demoExt.setId(demographic.getDemographicNo());
-
-			demoExt.setKey("demo_cell");
-			demoExt.setValue(demographicTransfer.getCellPhone());
-
-			demographicExtDao.persist(demoExt);
-			*/
 			demographicExtDao.addKey(demographic.getProviderNo(), 
 				demographic.getDemographicNo().toString(), "demo_cell", 
 				demographicTransfer.getCellPhone());
