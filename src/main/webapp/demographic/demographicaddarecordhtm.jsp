@@ -1284,15 +1284,15 @@ document.forms[1].r_doctor_ohip.value = refNo;
 			<%					
 			if(oscarProps.isPropertyActive("demographic_parent_names")) { %>
 				<tr>
-					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.parentLName" />:</b></td>
+					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.motherName" />:</b></td>
 					<td align="left">
-						<input name="parent_LName" type="text">
+						<input name="nameOfMother" type="text">
 					</td>
 				</tr>
 				<tr>
-					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.parentFName" />:</b></td>
+					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.fatherName" />:</b></td>
 					<td align="left">
-						<input name="parent_FName" type="text">
+						<input name="nameOfFather" type="text">
 					</td>
 				</tr>
 				<%

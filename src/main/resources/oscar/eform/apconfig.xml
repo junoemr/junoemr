@@ -321,14 +321,14 @@
     </databaseap>
     <!-- OHSUPPORT-3228 - patient parent names -->
     <databaseap>
-        <ap-name>parent_first_name</ap-name>
-        <ap-sql>SELECT parent_fname FROM demographic WHERE demographic_no=${demographic}</ap-sql>
-        <ap-output>${parent_fname}</ap-output>
+        <ap-name>name_of_father</ap-name>
+        <ap-sql>SELECT name_of_father FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+        <ap-output>${name_of_father}</ap-output>
     </databaseap>
         <databaseap>
-        <ap-name>parent_last_name</ap-name>
-        <ap-sql>SELECT parent_lname FROM demographic WHERE demographic_no=${demographic}</ap-sql>
-        <ap-output>${parent_lname}</ap-output>
+        <ap-name>name_of_mother</ap-name>
+        <ap-sql>SELECT name_of_mother FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+        <ap-output>${name_of_mother}</ap-output>
     </databaseap>
     
     

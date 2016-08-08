@@ -1644,16 +1644,16 @@ if (iviewTag!=null && !"".equalsIgnoreCase(iviewTag.trim())){
 							}
                             // OHSUPPORT3228 - parent names
 							if(oscarProps.isPropertyActive("demographic_parent_names")) { 
-								String parentFirstName = (demographic.getParentFirstName() != null ? demographic.getParentFirstName() : "");
-								String parentLastName = (demographic.getParentLastName() != null ? demographic.getParentLastName() : "");
+								String nameOfFather = (demographic.getNameOfFather() != null ? demographic.getNameOfFather() : "");
+								String nameOfMother = (demographic.getNameOfMother() != null ? demographic.getNameOfMother() : "");
 								%>
 										<li>
-                                            <span class="label"><bean:message key="demographic.demographiceditdemographic.parentLName" />:</span>
-                                            <span class="info"><%= parentLastName %></span>
+                                            <span class="label"><bean:message key="demographic.demographiceditdemographic.motherName" />:</span>
+                                            <span class="info"><%= nameOfMother %></span>
 										</li>
 										<li>
-			                            	<span class="label"><bean:message key="demographic.demographiceditdemographic.parentFName" />:</span>
-			                                <span class="info"><%= parentFirstName %></span>
+			                            	<span class="label"><bean:message key="demographic.demographiceditdemographic.fatherName" />:</span>
+			                                <span class="info"><%= nameOfFather %></span>
 										</li>
 							<% } %>
 							</ul>
@@ -3031,19 +3031,19 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 							<!-- Patient parental name OHSUPPORT-3228 -->
 							<%					
 							if(oscarProps.isPropertyActive("demographic_parent_names")) { 
-								String parentFirstName = (demographic.getParentFirstName() != null ? demographic.getParentFirstName() : "");
-								String parentLastName = (demographic.getParentLastName() != null ? demographic.getParentLastName() : "");
+								String nameOfFather = (demographic.getNameOfFather() != null ? demographic.getNameOfFather() : "");
+								String nameOfMother = (demographic.getNameOfMother() != null ? demographic.getNameOfMother() : "");
 								%>
 								<tr>
-									<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.parentLName" />:</b></td>
+									<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.motherName" />:</b></td>
 									<td align="left">
-										<input name="parent_LName" type="text" value="<%= parentLastName %>">
+										<input name="nameOfMother" type="text" value="<%= nameOfMother %>">
 									</td>
 								</tr>
 								<tr>
-									<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.parentFName" />:</b></td>
+									<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.fatherName" />:</b></td>
 									<td align="left">
-										<input name="parent_FName" type="text" value="<%= parentFirstName %>">
+										<input name=nameOfFather type="text" value="<%= nameOfFather %>">
 									</td>
 								</tr>
 								<%

@@ -181,8 +181,8 @@
 		
 		  // Patient parental name OHSUPPORT-3228
 		if(oscarVariables.isPropertyActive("demographic_parent_names")) {
-			demographic.setParentFirstName(request.getParameter("parent_FName"));
-			demographic.setParentLastName(request.getParameter("parent_LName"));
+			demographic.setNameOfMother(request.getParameter("nameOfMother"));
+			demographic.setNameOfFather(request.getParameter("nameOfFather"));
 		}
 
 		List<Demographic> duplicateList = demographicDao.getDemographicWithLastFirstDOBExact(demographic.getLastName(),demographic.getFirstName(),

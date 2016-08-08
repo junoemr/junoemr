@@ -149,10 +149,10 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	private Date lastUpdateDate = null;
 	@Column(name = "scanned_chart")
 	private String scannedChart = null;
-	@Column(name = "parent_fname")
-	private String parentFirstName = null;
-	@Column(name = "parent_lname")
-	private String parentLastName = null;
+	@Column(name = "name_of_father")
+	private String nameOfFather = null;
+	@Column(name = "name_of_mother")
+	private String nameOfMother = null;
 
 
 	public DemographicArchive() {}
@@ -505,10 +505,16 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		public void setScannedChart(String scannedChart) {
 	        this.scannedChart = scannedChart;
         }
-		public void setParentLastName (String name) {
-			parentLastName = name;
+		public void setNameOfFather(String name) {
+			nameOfFather = name;
 		}
-		public String getParentLastName () {
-			return parentLastName;
+		public String getNameOfFather() {
+			return nameOfFather;
+		}
+		public void setNameOfMother(String name) {
+			nameOfMother = name;
+		}
+		public String getNameOfMother() {
+			return nameOfMother;
 		}
 }

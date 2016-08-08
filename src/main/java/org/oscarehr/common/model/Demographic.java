@@ -121,8 +121,8 @@ public class Demographic implements Serializable {
     private String newsletter;
 
     private String scannedChart;
-    private String parentFirstName;
-    private String parentLastName;
+    private String nameOfFather;
+    private String nameOfMother;
 
 
         public String getTitle() {
@@ -1163,16 +1163,16 @@ public class Demographic implements Serializable {
 	    this.scannedChart = scannedChart;
     }
 	
-	public void setParentFirstName (String name) {
-		parentFirstName = name;
+	public void setNameOfFather(String name) {
+		nameOfFather = name;
 	}
-	public String getParentFirstName () {
-		return parentFirstName;
+	public String getNameOfFather() {
+		return nameOfFather;
 	}
-	public void setParentLastName (String name) {
-		parentLastName = name;
+	public void setNameOfMother(String name) {
+		nameOfMother = name;
 	}
-	public String getParentLastName () {
-		return parentLastName;
+	public String getNameOfMother() {
+		return nameOfMother;
 	}
 }

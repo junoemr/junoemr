@@ -40,10 +40,10 @@ ALTER TABLE demographic ADD COLUMN `scanned_chart` char(1);
 ALTER TABLE demographicArchive ADD COLUMN `scanned_chart` char(1);
 
 -- New columns for demographic parent names
-ALTER TABLE demographic ADD COLUMN `parent_fname` varchar(32);
-ALTER TABLE demographicArchive ADD COLUMN `parent_fname` varchar(32);
-ALTER TABLE demographic ADD COLUMN `parent_lname` varchar(32);
-ALTER TABLE demographicArchive ADD COLUMN `parent_lname` varchar(32);
+ALTER TABLE demographic ADD COLUMN `name_of_mother` varchar(32);
+ALTER TABLE demographicArchive ADD COLUMN `name_of_mother` varchar(32);
+ALTER TABLE demographic ADD COLUMN `name_of_father` varchar(32);
+ALTER TABLE demographicArchive ADD COLUMN `name_of_father` varchar(32);
 
 ALTER TABLE measurementMap ADD COLUMN flowsheet varchar(15);
 UPDATE measurementMap SET flowsheet = 'FLOWSHEET' WHERE lab_type = "FLOWSHEET";
