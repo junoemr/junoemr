@@ -26,8 +26,6 @@
 package oscar.oscarEncounter.oscarMeasurements.pageUtil;
 
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,6 +33,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.validator.GenericValidator;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -42,143 +42,119 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.util.MessageResources;
+import org.oscarehr.common.dao.MeasurementTypeDao;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 
-import oscar.oscarDB.DBHandler;
 import oscar.oscarEncounter.oscarMeasurements.data.MeasurementTypes;
-import oscar.oscarMessenger.util.MsgStringQuote;
 
 public class EctAddMeasurementTypeAction extends Action {
 
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException
-    {
-        EctAddMeasurementTypeForm frm = (EctAddMeasurementTypeForm) form;
+	static Logger log = MiscUtils.getLogger();
 
-       
-        request.getSession().setAttribute("EctAddMeasurementTypeForm", frm);
-        
-        MsgStringQuote str = new MsgStringQuote();     
-        List messages = new LinkedList();
-        
-        try{
-            
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		
+		log.info("ADD MEASURMENT TYPE");
 
-            String type = frm.getType();
-            String typeUp = type.toUpperCase();
-            String typeDesc = frm.getTypeDesc();
-            String typeDisplayName = frm.getTypeDisplayName();
-            String measuringInstrc = frm.getMeasuringInstrc();
-            String validation = frm.getValidation();
-            if (!allInputIsValid(request, type, typeDesc, typeDisplayName, measuringInstrc)){
-                return (new ActionForward(mapping.getInput()));
-            }
+		EctAddMeasurementTypeForm frm = (EctAddMeasurementTypeForm) form;
+		MeasurementTypeDao measurementTypeDao = (MeasurementTypeDao) SpringUtils.getBean("measurementTypeDao");
+		MessageResources mr = getResources(request);
 
-            //Write to database
-            String sql = "INSERT INTO measurementType"
-                +"(type, typeDescription, typeDisplayName, measuringInstruction, validation)"
-                +" VALUES ('"+str.q(typeUp)+"','"+str.q(typeDesc)+"','"+str.q(typeDisplayName)+"','"+str.q(measuringInstrc)+"','"
-                + str.q(validation)+"')";
-            MiscUtils.getLogger().debug(" sql statement "+sql);
-            DBHandler.RunSQL(sql);
-                
-        }
-        catch(SQLException e)
-        {
-            MiscUtils.getLogger().error("Error", e);
-        }            
-        
-        MessageResources mr = getResources(request);
-        String msg = mr.getMessage("oscarEncounter.oscarMeasurements.AddMeasurementType.successful", "!");
-        //String msg = "Measurement Type has been added successfully!";
-        messages.add(msg);
-        request.setAttribute("messages", messages);
-        MeasurementTypes mt =  MeasurementTypes.getInstance();
-        mt.reInit();
-        return mapping.findForward("success");
+		request.getSession().setAttribute("EctAddMeasurementTypeForm", frm);
 
-    }
-    
-    private boolean allInputIsValid(HttpServletRequest request, String type, String typeDesc, String typeDisplayName, String measuringInstrc){
-        
-        ActionMessages errors = new ActionMessages();  
-        EctValidation validate = new EctValidation();
-        String regExp = validate.getRegCharacterExp();
-        boolean isValid = true;
-        try{
-            
-            String sql = "SELECT type FROM measurementType WHERE type='" + type +"'";
-            ResultSet rs = DBHandler.GetSQL(sql);
-            rs.next();
-            if(rs.getRow()>0){
-                errors.add(type,
-                new ActionMessage("error.oscarEncounter.Measurements.duplicateTypeName"));
-                saveErrors(request, errors);
-                isValid = false;                
-            }
-        }
-        catch(SQLException e)
-        {
-            MiscUtils.getLogger().error("Error", e);
-        }     
-        
-        String errorField = "The type " + type;
-        if(!validate.matchRegExp(regExp, type)){
-            errors.add(type,
-            new ActionMessage("errors.invalid", errorField));
-            saveErrors(request, errors);
-            isValid = false;
-        }
-        if(!validate.maxLength(4, type)){
-            errors.add(type,
-            new ActionMessage("errors.maxlength", errorField, "4"));
-            saveErrors(request, errors);
-            isValid = false;
-        }
+		List<String> messages = new LinkedList<String>();
 
-        errorField = "The type description " + typeDesc;
-        if(!validate.matchRegExp(regExp, typeDesc)){
-            errors.add(typeDesc,
-            new ActionMessage("errors.invalid", errorField));
+		try {
+
+			String type = frm.getType().trim();
+			String typeDesc = frm.getTypeDesc().trim();
+			String typeDisplayName = frm.getTypeDisplayName().trim();
+			String measuringInstrc = frm.getMeasuringInstrc().trim();
+			String validation = frm.getValidation().trim();
+			
+			if (!allInputIsValid(request, measurementTypeDao, type, typeDesc, typeDisplayName, measuringInstrc)) {
+				return (new ActionForward(mapping.getInput()));
+			}
+
+			// Write to database
+			measurementTypeDao.saveNewMeasurementType(type, typeDesc, typeDisplayName, measuringInstrc, validation);
+			log.info("Measurement type added successfully");
+		}
+		catch (Exception e) {
+			MiscUtils.getLogger().error("Error", e);
+		}
+
+		messages.add(mr.getMessage("oscarEncounter.oscarMeasurements.AddMeasurementType.successful", "!"));
+		request.setAttribute("messages", messages);
+		//TODO -- This is here for the benefit of other places using it, and should be removed.
+		MeasurementTypes.getInstance().reInit();
+		return mapping.findForward("success");
+	}
+	
+	private boolean allInputIsValid(HttpServletRequest request, MeasurementTypeDao measurementTypeDao, String type, String typeDesc, String typeDisplayName,
+			String measuringInstrc) {
+
+		ActionMessages errors = new ActionMessages();
+		
+		/* -- verify type -- */
+		String errorField = "The type " + type;
+
+		if (!GenericValidator.maxLength(type, 4)) {
+            errors.add(type, new ActionMessage("errors.maxlength", errorField, "4"));
             saveErrors(request, errors);
-            isValid = false;
-        }
-        if(!validate.maxLength(255, type)){
-            errors.add(type,
-            new ActionMessage("errors.maxlength", errorField, "255"));
+            return false;
+    	}
+    	else if (!GenericValidator.minLength(type, 1)) {
+            errors.add(type, new ActionMessage("errors.minlength", errorField, "1"));
             saveErrors(request, errors);
-            isValid = false;
-        }
-        
-        errorField = "The type description " + typeDisplayName;
-        if(!validate.matchRegExp(regExp, typeDisplayName)){
-            errors.add(typeDisplayName,
-            new ActionMessage("errors.invalid", errorField));
+            return false;
+    	}
+		// check database for duplicates by type
+		if(measurementTypeDao.isDuplicate(type)) {
+			errors.add(type, new ActionMessage("error.oscarEncounter.Measurements.duplicateTypeName"));
+			saveErrors(request, errors);
+			return false;
+		}
+		
+    	/* -- verify type description -- */
+    	errorField = "The type description " + typeDesc;
+    	if (!GenericValidator.maxLength(typeDesc, 255)) {
+            errors.add(typeDesc, new ActionMessage("errors.maxlength", errorField, "255"));
             saveErrors(request, errors);
-            isValid = false;
-        }
-        if(!validate.maxLength(255, type)){
-            errors.add(type,
-            new ActionMessage("errors.maxlength", errorField, "255"));
+            return false;
+    	}
+    	else if (!GenericValidator.minLength(typeDesc, 1)) {
+            errors.add(typeDesc, new ActionMessage("errors.minlength", errorField, "1"));
             saveErrors(request, errors);
-            isValid = false;
-        }
-        
-        errorField = "The measuring instruction " + measuringInstrc;
-        if(!validate.matchRegExp(regExp, measuringInstrc)){
-            errors.add(measuringInstrc,
-            new ActionMessage("errors.invalid", errorField));
+            return false;
+    	}
+    	
+    	/* -- verify type display name -- */
+    	errorField = "The type display name " + typeDisplayName;
+    	if (!GenericValidator.maxLength(typeDisplayName, 255)) {
+            errors.add(typeDisplayName, new ActionMessage("errors.maxlength", errorField, "255"));
             saveErrors(request, errors);
-            isValid = false;
-        }
-        if(!validate.maxLength(255, type)){
-            errors.add(type,
-            new ActionMessage("errors.maxlength", errorField, "255"));
+            return false;
+    	}
+    	else if (!GenericValidator.minLength(typeDisplayName, 1)) {
+            errors.add(typeDisplayName, new ActionMessage("errors.minlength", errorField, "1"));
             saveErrors(request, errors);
-            isValid = false;
-        }
-       
-        return isValid;
-        
-    }
+            return false;
+    	}
+    	
+    	/* -- verify type measuring instruction -- */
+    	errorField = "The measuring instruction " + measuringInstrc;
+    	if (!GenericValidator.maxLength(measuringInstrc, 255)) {
+            errors.add(measuringInstrc, new ActionMessage("errors.maxlength", errorField, "255"));
+            saveErrors(request, errors);
+            return false;
+    	}
+    	else if (!GenericValidator.minLength(measuringInstrc, 1)) {
+            errors.add(measuringInstrc, new ActionMessage("errors.minlength", errorField, "1"));
+            saveErrors(request, errors);
+            return false;
+    	}
+		return true;
+	}
 }
