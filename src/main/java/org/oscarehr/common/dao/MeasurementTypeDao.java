@@ -65,7 +65,7 @@ public class MeasurementTypeDao extends AbstractDao<MeasurementType> {
 	
 	
 	/**
-	 * check the databse for duplicates matching Instruction and Name strings.
+	 * check the database for duplicates matching Instruction and Name strings.
 	 * @param measuringInstrc
 	 * @param typeDisplayName
 	 * @return true if at least one entry exists matching both parameters, false otherwise
@@ -77,6 +77,22 @@ public class MeasurementTypeDao extends AbstractDao<MeasurementType> {
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("instruct", measuringInstrc);
 		query.setParameter("name", typeDisplayName);
+		
+		Long count =  (Long) query.getSingleResult();
+
+		return (count > 0);
+	}
+	/**
+	 * check the database for duplicates matching type.
+	 * @param type
+	 * @return true if at least one entry exists matching the type parameter, false otherwise
+	 */
+	public boolean isDuplicate(String type) {
+		
+        String sql = "SELECT count(x) FROM "+modelClass.getSimpleName()+" x WHERE x.type = :type ";
+        
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("type", type);
 		
 		Long count =  (Long) query.getSingleResult();
 
@@ -110,7 +126,7 @@ public class MeasurementTypeDao extends AbstractDao<MeasurementType> {
 	 * @param validation
 	 * @return the id of the measurement created
 	 */
-	public int saveNewMeasurementType(String type, String typeDesc, String typeDisplayName, String measuringInstruction, String validation ) {
+	public MeasurementType saveNewMeasurementType(String type, String typeDesc, String typeDisplayName, String measuringInstruction, String validation ) {
 		MeasurementType mt = new MeasurementType();
 		mt.setType(type);
 		mt.setTypeDescription(typeDesc);
@@ -120,7 +136,7 @@ public class MeasurementTypeDao extends AbstractDao<MeasurementType> {
 		
 		this.persist(mt);
 		
-		return mt.getId();
+		return mt;
 	}
 	
 }

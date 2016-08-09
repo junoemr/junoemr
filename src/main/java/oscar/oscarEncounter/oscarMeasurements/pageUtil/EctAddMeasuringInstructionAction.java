@@ -103,8 +103,9 @@ public class EctAddMeasuringInstructionAction extends Action {
             String typeDesc = typeByNameList.get(0).getTypeDescription();
             
             //Write to database
-            int typeId = measurementTypeDao.saveNewMeasurementType(type, typeDesc, typeDisplayName, measuringInstrc, validation);
-            request.setAttribute("requestId", typeId);
+            MeasurementType measurementType = measurementTypeDao.saveNewMeasurementType(type, typeDesc, typeDisplayName, measuringInstrc, validation);
+            request.setAttribute("requestId", measurementType.getId());
+            log.info("Measurement instruction saved successfully");
             
             messages.add(mr.getMessage("oscarEncounter.oscarMeasurements.AddMeasuringInstruction.successful", "!"));
         }
