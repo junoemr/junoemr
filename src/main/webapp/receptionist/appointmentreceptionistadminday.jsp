@@ -625,7 +625,7 @@ function findProvider(p,m,d) {
                 if (tickler_no.compareTo("") != 0) {
 %>
 										<a href="#"
-											onClick="popupPage(700,1000, '../tickler/ticklerDemoMain.jsp?demoview=0');return false;"
+											onClick="popupPage(700,1000, '../tickler/ticklerMain.jsp?demoview=0');return false;"
 											title='<bean:message key="receptionist.appointmentreceptionistadminday.ticklerMsg"/>: <%=Misc.htmlEscape(tickler_note)%>'><font
 											color="red">!</font></a>
 <%
@@ -642,7 +642,7 @@ notes: <%=Misc.htmlEscape(notes)%>">
                 if (tickler_no.compareTo("") != 0) {
 %>
 										<a href="#"
-											onClick="popupPage(700,1000, '../tickler/ticklerDemoMain.jsp?demoview=<%=demographic_no%>');return false;"
+											onClick="popupPage(700,1000, '../tickler/ticklerMain.jsp?demoview=<%=demographic_no%>');return false;"
 											title='<bean:message key="receptionist.appointmentreceptionistadminday.ticklerMsg"/>: <%=Misc.htmlEscape(tickler_note)%>'><font
 											color="red">!</font></a>
 <%              } %>

@@ -258,7 +258,7 @@ function setup() {
     
     var parentId = "<%=parentAjaxId%>";
     var Url = window.opener.URLs;
-    var update = "<%=updateParent%>";    
+    var update = "<%=updateParent%>";
     
     if( update == "true" && parentId != "" && !window.opener.closed ) {
         window.opener.document.forms['encForm'].elements['reloadDiv'].value=parentId;

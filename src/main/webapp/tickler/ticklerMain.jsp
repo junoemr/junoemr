@@ -84,6 +84,8 @@
   else {
 	  mrpview = request.getParameter("mrpview");
   }
+  
+  String demographic_no = request.getParameter("demoview");
 
 %>
 
@@ -630,6 +632,10 @@ function changeSite(sel) {
                             filter.setStatus(ticklerview);
                             filter.setStartDate(dateBegin);
                             filter.setEndDate(dateEnd);
+                            
+                            if(demographic_no != null && demographic_no.trim() != "") {
+                            	filter.setDemographic_no(demographic_no);
+                            }
                             
                             if( !mrpview.isEmpty() && !mrpview.equals("all")) {
                             	filter.setMrp(mrpview);

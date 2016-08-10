@@ -67,7 +67,7 @@ public class EctDisplayTicklerAction extends EctDisplayAction {
     	pathedit = request.getContextPath() + "/Tickler.do?method=edit&tickler.demographic_webName="+ URLEncoder.encode(bean.patientLastName + "," + bean.patientFirstName,"UTF-8") +"&tickler.demographic_no=" + bean.demographicNo;
     }
     else {
-        pathview = request.getContextPath() + "/tickler/ticklerDemoMain.jsp?demoview=" + bean.demographicNo + "&parentAjaxId=" + cmd;
+        pathview = request.getContextPath() + "/tickler/ticklerMain.jsp?demoview=" + bean.demographicNo + "&parentAjaxId=" + cmd;
         pathedit = request.getContextPath() + "/appointment/appointmentcontrol.jsp?keyword=" + URLEncoder.encode(bean.patientLastName + "," + bean.patientFirstName,"UTF-8") + "&displaymode=" + URLEncoder.encode("Search ", "UTF-8") + "&search_mode=search_name&originalpage=" + URLEncoder.encode(request.getContextPath() + "/tickler/ticklerAdd.jsp", "UTF-8") + "&orderby=last_name&appointment_date=2000-01-01&limit1=0&limit2=5&status=t&start_time=10:45&end_time=10:59&duration=15&dboperation=add_apptrecord&type=&demographic_no=" + bean.demographicNo + "&parentAjaxId=" + cmd + "&updateParent=false";
     }
 
@@ -109,7 +109,7 @@ public class EctDisplayTicklerAction extends EctDisplayAction {
         if( org.oscarehr.common.IsPropertiesOn.isTicklerPlusEnable() ) {
         	url = "popupPage(500,900,'" + hash + "','" + request.getContextPath() + "/Tickler.do?method=view&id="+oscar.Misc.getString(rs,"tickler_no")+"'); return false;";
         } else {
-        	url = "popupPage(500,900,'" + hash + "','" + request.getContextPath() + "/tickler/ticklerDemoMain.jsp?demoview=" + bean.demographicNo + "&parentAjaxId=" + cmd + "'); return false;";
+        	url = "popupPage(500,900,'" + hash + "','" + request.getContextPath() + "/tickler/ticklerMain.jsp?demoview=" + bean.demographicNo + "&parentAjaxId=" + cmd + "'); return false;";
         }
         item.setURL(url);
         Dao.addItem(item);
