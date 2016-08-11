@@ -86,17 +86,25 @@
   }
   
   
-  String temp_demoNo = request.getParameter("demoview");
-  String demographic_no = "all";
-  String demographic_name = "";
-  if(temp_demoNo != null && !temp_demoNo.trim().isEmpty() && !temp_demoNo.equals("all")) {
-	  DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
-	  Demographic de = demographicDao.getDemographic(temp_demoNo);
-	  if(de != null) {
-		  demographic_no = temp_demoNo;
-		  demographic_name = de.getLastName() + ", " + de.getFirstName() + "(" + de.getBirthDayAsString() + ")";
-	  }
-  }
+	String temp_demoNo = request.getParameter("demoview");
+	String demographic_no = "all";
+	String demographic_name = "";
+	if(temp_demoNo != null && !temp_demoNo.trim().isEmpty() && !temp_demoNo.equals("all")) {
+		DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
+		Demographic de = demographicDao.getDemographic(temp_demoNo);
+		if(de != null) {
+			demographic_no = temp_demoNo;
+			demographic_name = de.getLastName() + ", " + de.getFirstName() + "(" + de.getBirthDayAsString() + ")";
+		}
+	}
+  
+	String parentAjaxId = "";
+	if( request.getParameter("parentAjaxId") != null ) {
+		parentAjaxId = request.getParameter("parentAjaxId");
+	}
+	else if( request.getAttribute("parentAjaxId") != null ) {
+		parentAjaxId = (String)request.getAttribute("parentAjaxId");
+	}
 
 
 %>
@@ -554,7 +562,7 @@ var beginD = "1900-01-01"
         <input type="hidden" name="demoview" value="<%=demographic_no%>" id="demoview" />
         <input type="text" id="autocompletedemo" onchange="autocompletedemo_change(this.value);" name="demographicKeyword" value="<%=demographic_name%>" style="width:auto"/>
         <div id="autocomplete_choices" class="autocomplete demographic-search"></div>
-        
+        <input type="hidden" name="parentAjaxId" value="<%=parentAjaxId%>">
         
         <font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#333333"><b><bean:message key="tickler.ticklerMain.formMoveTo"/> </b>
         <select id="ticklerview" name="ticklerview">
@@ -685,7 +693,7 @@ function changeSite(sel) {
     </thead>
     <tfoot>
                                 <tr bgcolor=#666699><td colspan="8" class="white"><a href="javascript:CheckAll();"><bean:message key="tickler.ticklerMain.btnCheckAll"/></a> - <a href="javascript:ClearAll();"><bean:message key="tickler.ticklerMain.btnClearAll"/></a> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                                    <input type="button" name="button" value="<bean:message key="tickler.ticklerMain.btnAddTickler"/>" onClick="popupPage('400','600', 'ticklerAdd.jsp')" class="sbttn">
+                                    <input type="button" name="button" value="<bean:message key="tickler.ticklerMain.btnAddTickler"/>" onClick="popupPage('400','600', 'ticklerAdd.jsp?updateParent=true&parentAjaxId=<%=parentAjaxId%>')" class="sbttn">
                                     <input type="hidden" name="submit_form" value="">
                                     <% if (ticklerview.compareTo("D") == 0){%>
                                     <input type="button" value="<bean:message key="tickler.ticklerMain.btnEraseCompletely"/>" class="sbttn" onclick="document.forms['ticklerform'].submit_form.value='Erase Completely'; document.forms['ticklerform'].submit();">
@@ -793,6 +801,8 @@ function changeSite(sel) {
                                 <input type="hidden" name="assignedTo" value="<%=assignedTo%>" />
                                 
                                 <input type="hidden" name="demoview" value="<%=demographic_no%>" />
+                                
+                                <input type="hidden" name="parentAjaxId" value="<%=parentAjaxId%>">
 
                                 <tr >
                                     <TD width="3%"  ROWSPAN="1" class="<%=cellColour%>"><input type="checkbox" name="checkbox" value="<%=t.getTickler_no()%>"></TD>
