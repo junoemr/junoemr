@@ -35,7 +35,7 @@
 </security:oscarSec>
 
 <%@ page import="java.util.*,java.text.*, java.sql.*, oscar.*, java.net.*, org.oscarehr.common.dao.*, org.caisi.model.Tickler, org.caisi.model.TicklerComment,org.caisi.dao.TicklerDAO,org.caisi.model.CustomFilter,org.oscarehr.util.SpringUtils, org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@ page import="java.util.*,java.text.*, java.sql.*, oscar.*, java.net.*, org.oscarehr.common.dao.ViewDao, org.oscarehr.common.model.View, org.springframework.web.context.WebApplicationContext, org.springframework.web.context.support.WebApplicationContextUtils,org.oscarehr.util.LocaleUtils" %>
+<%@ page import="org.oscarehr.common.dao.DemographicDao, org.oscarehr.common.dao.ViewDao, org.oscarehr.common.model.View, org.springframework.web.context.WebApplicationContext, org.springframework.web.context.support.WebApplicationContextUtils,org.oscarehr.util.LocaleUtils" %>
 
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean" scope="session" />
 <jsp:useBean id="SxmlMisc" class="oscar.SxmlMisc" scope="session" />
@@ -85,7 +85,19 @@
 	  mrpview = request.getParameter("mrpview");
   }
   
-  String demographic_no = request.getParameter("demoview");
+  
+  String temp_demoNo = request.getParameter("demoview");
+  String demographic_no = "all";
+  String demographic_name = "";
+  if(temp_demoNo != null && !temp_demoNo.trim().isEmpty() && !temp_demoNo.equals("all")) {
+	  DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
+	  Demographic de = demographicDao.getDemographic(temp_demoNo);
+	  if(de != null) {
+		  demographic_no = temp_demoNo;
+		  demographic_name = de.getLastName() + ", " + de.getFirstName() + "(" + de.getBirthDayAsString() + ")";
+	  }
+  }
+
 
 %>
 
@@ -148,6 +160,20 @@ GregorianCalendar now=new GregorianCalendar();
 <!-- Prototype and scriptaculous -->
 <script src="<c:out value="${ctx}"/>/share/javascript/prototype.js" type="text/javascript"></script>
 <script src="<c:out value="${ctx}"/>/share/javascript/scriptaculous.js" type="text/javascript"></script>
+
+<!-- Autocomplete demographic text box -->
+<script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-1.4.2.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/demographicProviderAutocomplete.js"></script>
+
+<script type="text/javascript" src="<%= request.getContextPath() %>/share/yui/js/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/share/yui/js/connection-min.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/share/yui/js/animation-min.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/share/yui/js/datasource-min.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/share/yui/js/autocomplete-min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/share/yui/css/fonts-min.css"/>
+<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/share/yui/css/autocomplete.css"/>
+<link rel="stylesheet" type="text/css" media="all" href="<%= request.getContextPath() %>/share/css/demographicProviderAutocomplete.css"  />
 
 <script language="JavaScript">
 function popupPage(vheight,vwidth,varpage) { //open a new popup window
@@ -380,7 +406,53 @@ var beginD = "1900-01-01"
         );
 
     }
+    
+    /* autocomplete demographic search text field, and set a hiddent value with the demographic number */
+	YAHOO.util.Event.onDOMReady(function() {
+		if($("#autocompletedemo") && $("#autocomplete_choices")) {
+			var url = "<%=request.getContextPath()%>/demographic/SearchDemographic.do";
+			var oDS = new YAHOO.util.XHRDataSource(url,{connMethodPost:true,connXhrMode:'ignoreStaleResponses'});
+			oDS.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;// Set the responseType
+			// Define the schema of the delimited results TEST, PATIENT(1985-06-15)
+			oDS.responseSchema = {
+			    resultsList : "results",
+			    fields : ["formattedName","fomattedDob","demographicNo","providerNo","providerName","nextAppointment", "cust1", "cust1Name", "cust2", "cust2Name", "cust4", "cust4Name", "status"]
+			};
+			// Enable caching
+			oDS.maxCacheEntries = 0;
+			var oAC = new YAHOO.widget.AutoComplete("autocompletedemo","autocomplete_choices",oDS);
+			oAC.queryMatchSubset = true;
+			oAC.minQueryLength = 3;
+			oAC.maxResultsDisplayed = 25;
+			oAC.formatResult = resultFormatter4;
+			//oAC.typeAhead = true;
+			oAC.queryMatchContains = true;
 
+			oAC.itemSelectEvent.subscribe(function(type, args) {
+
+                var str = args[0].getInputEl().id.replace("autocompletedemo","demoview");
+                $(str).value = args[2][2];//li.id;
+                $("#demoview").val(args[2][2]);
+                
+                args[0].getInputEl().value = args[2][0] + "("+args[2][1]+")";
+                selectedDemos.push(args[0].getInputEl().value);
+			});
+
+			return {
+				oDS : oDS,
+				oAC : oAC
+			};
+		}
+	});
+    /* this function will reset the demographic selection if the name doesn't 
+     * match a demographic from the autofill menu. to be called on #autocompletedemo change*/
+    function autocompletedemo_change(val) {
+    	if(!isSelectedDemo(val)) {
+    		$("#demoview").val("all");
+    		//clear the input with invalid demographic searches so there is no(well, less) confusion
+    		$("#autocompletedemo").val("");
+    	}
+    }
 </script>
 <style type="text/css">
 	<!--
@@ -475,8 +547,15 @@ var beginD = "1900-01-01"
       </td>
     </tr>
     <tr>
-
         <td colspan="3">
+        
+        <!-- demographic search box -- to allow filter by demographic -->
+        <label id="autocompletedemo_label" for="autocompletedemo"><b>TODO label :</b></label>
+        <input type="hidden" name="demoview" value="<%=demographic_no%>" id="demoview" />
+        <input type="text" id="autocompletedemo" onchange="autocompletedemo_change(this.value);" name="demographicKeyword" value="<%=demographic_name%>" style="width:auto"/>
+        <div id="autocomplete_choices" class="autocomplete demographic-search"></div>
+        
+        
         <font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#333333"><b><bean:message key="tickler.ticklerMain.formMoveTo"/> </b>
         <select id="ticklerview" name="ticklerview">
         <option value="A" <%=ticklerview.equals("A")?"selected":""%>><bean:message key="tickler.ticklerMain.formActive"/></option>
@@ -486,6 +565,7 @@ var beginD = "1900-01-01"
         &nbsp; &nbsp; <font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#333333"><b>MRP</b></font> 
         <select id="mrpview" name="mrpview">
         <option value="all" <%=mrpview.equals("all")?"selected":""%>><bean:message key="tickler.ticklerMain.formAllProviders"/></option>
+        
         <%
         ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
         List<Provider> providers = providerDao.getActiveProviders(); 
@@ -504,7 +584,7 @@ var beginD = "1900-01-01"
         <option value="all" <%=providerview.equals("all")?"selected":""%>><bean:message key="tickler.ticklerMain.formAllProviders"/></option>
         <%  
             
-            for (Provider p : providers) {              
+            for (Provider p : providers) {
         %>
         <option value="<%=p.getProviderNo()%>" <%=providerview.equals(p.getProviderNo())?"selected":""%>><%=p.getLastName()%>,<%=p.getFirstName()%></option>
         <%
@@ -633,7 +713,7 @@ function changeSite(sel) {
                             filter.setStartDate(dateBegin);
                             filter.setEndDate(dateEnd);
                             
-                            if(demographic_no != null && demographic_no.trim() != "") {
+                            if(!demographic_no.isEmpty() && !demographic_no.equals("all")) {
                             	filter.setDemographic_no(demographic_no);
                             }
                             
@@ -711,6 +791,8 @@ function changeSite(sel) {
                                 <input type="hidden" name="providerview" value="<%=providerview%>" />
                                 
                                 <input type="hidden" name="assignedTo" value="<%=assignedTo%>" />
+                                
+                                <input type="hidden" name="demoview" value="<%=demographic_no%>" />
 
                                 <tr >
                                     <TD width="3%"  ROWSPAN="1" class="<%=cellColour%>"><input type="checkbox" name="checkbox" value="<%=t.getTickler_no()%>"></TD>
