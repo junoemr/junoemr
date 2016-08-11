@@ -558,7 +558,7 @@ var beginD = "1900-01-01"
         <td colspan="3">
         
         <!-- demographic search box -- to allow filter by demographic -->
-        <label id="autocompletedemo_label" for="autocompletedemo"><b>TODO label :</b></label>
+        <label id="autocompletedemo_label" for="autocompletedemo"><b><bean:message key="tickler.ticklerMain.formDemographic"/></b></label>
         <input type="hidden" name="demoview" value="<%=demographic_no%>" id="demoview" />
         <input type="text" id="autocompletedemo" onchange="autocompletedemo_change(this.value);" name="demographicKeyword" value="<%=demographic_name%>" style="width:auto"/>
         <div id="autocomplete_choices" class="autocomplete demographic-search"></div>
