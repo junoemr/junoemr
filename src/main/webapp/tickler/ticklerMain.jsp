@@ -564,7 +564,7 @@ var beginD = "1900-01-01"
         <div id="autocomplete_choices" class="autocomplete demographic-search"></div>
         <input type="hidden" name="parentAjaxId" value="<%=parentAjaxId%>">
         
-        <font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#333333"><b><bean:message key="tickler.ticklerMain.formMoveTo"/> </b>
+        <font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#333333"><b><bean:message key="tickler.ticklerMain.formStatus"/> </b>
         <select id="ticklerview" name="ticklerview">
         <option value="A" <%=ticklerview.equals("A")?"selected":""%>><bean:message key="tickler.ticklerMain.formActive"/></option>
         <option value="C" <%=ticklerview.equals("C")?"selected":""%>><bean:message key="tickler.ticklerMain.formCompleted"/></option>
