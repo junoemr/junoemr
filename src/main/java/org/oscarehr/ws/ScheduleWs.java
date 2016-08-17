@@ -30,6 +30,7 @@ import java.util.List;
 
 import javax.jws.WebService;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentType;
@@ -37,6 +38,7 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.ScheduleTemplateCode;
 import org.oscarehr.managers.DayWorkSchedule;
 import org.oscarehr.managers.ScheduleManager;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.transfer_objects.AppointmentTransfer;
 import org.oscarehr.ws.transfer_objects.AppointmentTypeTransfer;
@@ -50,6 +52,8 @@ import org.springframework.stereotype.Component;
 public class ScheduleWs extends AbstractWs {
 	@Autowired
 	private ScheduleManager scheduleManager;
+	
+	private static Logger logger=MiscUtils.getLogger();
 	
 	public ScheduleTemplateCodeTransfer[] getScheduleTemplateCodes()
 	{
@@ -96,11 +100,16 @@ public class ScheduleWs extends AbstractWs {
 		Appointment appointment=new Appointment();
 		appointmentTransfer.copyTo(appointment);
 		
-		/* prevent bad data and mismatched names in appointments by always assigning demographic names by id */
-		DemographicDao demographicDao= (DemographicDao)SpringUtils.getBean("demographicDao");
-		Demographic d = demographicDao.getDemographic(appointment.getDemographicNo());
-		if( d != null ) {
-			appointment.setName(d.getLastName() + "," + d.getFirstName());
+		try {
+			/* prevent bad data and mismatched names in appointments by always assigning demographic names by id */
+			DemographicDao demographicDao= (DemographicDao)SpringUtils.getBean("demographicDao");
+			Demographic d = demographicDao.getDemographic(appointment.getDemographicNo());
+			if( d != null ) {
+				appointment.setName(d.getLastName() + "," + d.getFirstName());
+			}
+		}
+		catch(Exception e) {
+			logger.error("Failed to set patient name while adding appointment via the Web Service", e);
 		}
 		
 		scheduleManager.addAppointment(appointment);
