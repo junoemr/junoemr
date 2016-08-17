@@ -79,8 +79,10 @@ public class DemographicDao extends HibernateDaoSupport {
         if (demographic_no == null || demographic_no.length() == 0) {
             return null;
         }
-
-        return this.getHibernateTemplate().get(Demographic.class, Integer.valueOf(demographic_no));
+        return getDemographic(Integer.valueOf(demographic_no));
+    }
+    public Demographic getDemographic(int demographic_no) {
+    	return this.getHibernateTemplate().get(Demographic.class, new Integer(demographic_no));
     }
 
     // ADD BY PINE-SOFT
