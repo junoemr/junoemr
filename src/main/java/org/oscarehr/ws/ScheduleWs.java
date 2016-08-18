@@ -101,15 +101,18 @@ public class ScheduleWs extends AbstractWs {
 		appointmentTransfer.copyTo(appointment);
 		
 		try {
-			/* prevent bad data and mismatched names in appointments by always assigning demographic names by id */
+			/* prevent bad data and mismatched names in appointments by always assigning demographic names by id when possible */
 			DemographicDao demographicDao= (DemographicDao)SpringUtils.getBean("demographicDao");
 			Demographic d = demographicDao.getDemographic(appointment.getDemographicNo());
 			if( d != null ) {
-				appointment.setName(d.getLastName() + "," + d.getFirstName());
+				appointment.setName(d.getDisplayName());
 			}
 		}
 		catch(Exception e) {
-			logger.error("Failed to set patient name while adding appointment via the Web Service", e);
+			logger.error("Error setting patient name while adding appointment via the Web Service", e);
+		}
+		if(appointment.getName() == null) {
+			appointment.setName("");
 		}
 		
 		scheduleManager.addAppointment(appointment);
