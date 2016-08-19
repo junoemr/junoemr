@@ -51,7 +51,7 @@ public class LogConst {
     public static final String VERIFY = "verify";
     public static final String REFUSED = "refused";
     public static final String UNLINK = "unlink";
-    public static final String REASSIGN = "reassign";
+    public static final String ASSIGN = "assign";
     public static final String FILE = "file";
 
     public static final String CON_LOGIN_AGREEMENT = "login agreement";

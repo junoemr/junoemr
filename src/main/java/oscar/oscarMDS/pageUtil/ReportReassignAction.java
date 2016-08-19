@@ -92,11 +92,24 @@ public class ReportReassignAction extends Action {
 		}
 
 		String newURL = "";
+		providerNo = ((providerNo != null) ? providerNo : "");
+		searchProviderNo = ((searchProviderNo != null) ? searchProviderNo : "");
+		status = ((status != null) ? status : "");
+		
 		// MiscUtils.getLogger().info(listFlaggedLabs.size());
 		try {
 			// Only route if there are selected providers
 			if (!("".equals(selectedProviders) || selectedProviders == null)) {
 				CommonLabResultData.updateLabRouting(listFlaggedLabs, selectedProviders);
+				
+				/* log the lab assignments in the security log */
+	        	for(int i=0; i<listFlaggedLabs.size(); i++) {
+	        		String iLabId = listFlaggedLabs.get(i)[0];
+	        		String iLabType = listFlaggedLabs.get(i)[1];
+	        		String logConst = (iLabType.equalsIgnoreCase("DOC")) ? LogConst.CON_DOCUMENT : LogConst.CON_HL7_LAB;
+	        		
+	        		LogAction.addLog(providerNo, LogConst.ASSIGN, logConst, "id=" + iLabId, request.getRemoteAddr(), null, selectedProviders);
+	        	}
 			}
 			// update favorites
 			ProviderLabRoutingFavoritesDao favDao = (ProviderLabRoutingFavoritesDao) SpringUtils.getBean("ProviderLabRoutingFavoritesDao");
@@ -145,11 +158,7 @@ public class ReportReassignAction extends Action {
 				}
 			}
         	
-			providerNo = ((providerNo != null) ? providerNo : "");
-			searchProviderNo = ((searchProviderNo != null) ? searchProviderNo : "");
-			status = ((status != null) ? status : "");
 			String segmentID = ((flaggedLabs != null && flaggedLabs.length > 0 && flaggedLabs[0] != null) ? flaggedLabs[0] : "");
-
 			newURL = mapping.findForward("success").getPath();
 
 			if (newURL.contains("labDisplay.jsp")) {
@@ -165,9 +174,6 @@ public class ReportReassignAction extends Action {
             if (request.getParameter("lname") != null) { newURL = newURL + "&lname="+request.getParameter("lname"); }
             if (request.getParameter("fname") != null) { newURL = newURL + "&fname="+request.getParameter("fname"); }
             if (request.getParameter("hnum") != null) { newURL = newURL + "&hnum="+request.getParameter("hnum"); }
-            
-            String logConst = (labType.equalsIgnoreCase("DOC")) ? LogConst.CON_DOCUMENT : LogConst.CON_HL7_LAB;
-            LogAction.addLog(providerNo, LogConst.REASSIGN, logConst, "id=" +segmentID, request.getRemoteAddr());
             
 		}
 		catch (Exception e) {
