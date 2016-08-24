@@ -61,9 +61,9 @@ String defaultHtml = "Enter Link URL";
 if(request.getParameter("defaultDocType") != null) {
 	defaultType = request.getParameter("defaultDocType");
 }
-Hashtable docerrors = new Hashtable();
+HashMap<String, String> docerrors = new HashMap<String, String>();
 if (request.getAttribute("docerrors") != null) {
-    docerrors = (Hashtable) request.getAttribute("docerrors");
+    docerrors = (HashMap<String, String>) request.getAttribute("docerrors");
 }
 
 Hashtable linkhtmlerrors = new Hashtable();
@@ -283,9 +283,9 @@ var docSubClassList = [
 	enctype="multipart/form-data" styleClass="forms"
 	onsubmit="return submitUpload(this)">
 	<%-- Lists Errors --%>
-	<% for (Enumeration errorkeys = docerrors.keys(); errorkeys.hasMoreElements();) {%>
+	<% for (String key : docerrors.keySet()) {%>
 	<font class="warning">Error: <bean:message
-		key="<%=(String) docerrors.get(errorkeys.nextElement())%>" /></font>
+		key="<%=docerrors.get(key)%>" /></font>
 	<br />
 	<% } %>
 	<input type="hidden" name="function"
