@@ -86,15 +86,15 @@
   }
   
   
-	String temp_demoNo = request.getParameter("demoview");
+	String tempDemoNo = request.getParameter("demoview");
 	String demographic_no = "all";
 	String demographic_name = "";
-	if(temp_demoNo != null && !temp_demoNo.trim().isEmpty() && !temp_demoNo.equals("all")) {
+	if(tempDemoNo != null && !tempDemoNo.trim().isEmpty() && !tempDemoNo.equals("all")) {
 		DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
-		Demographic de = demographicDao.getDemographic(temp_demoNo);
+		Demographic de = demographicDao.getDemographic(tempDemoNo);
 		if(de != null) {
-			demographic_no = temp_demoNo;
-			demographic_name = de.getLastName() + ", " + de.getFirstName() + "(" + de.getBirthDayAsString() + ")";
+			demographic_no = tempDemoNo;
+			demographic_name = de.getDisplayName() + "(" + de.getBirthDayAsString() + ")";
 		}
 	}
   
@@ -135,13 +135,15 @@ GregorianCalendar now=new GregorianCalendar();
   }
 
   String xml_appointment_date;
-   if( request.getParameter("xml_appointment_date") == null ) {
-          xml_appointment_date = MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay);
+  if( request.getParameter("xml_appointment_date") != null ) {
+	  xml_appointment_date = request.getParameter("xml_appointment_date");
+  }
+  else if (demographic_no != null && !demographic_no.equals("all")) {
+	  xml_appointment_date = "8888-12-31";
   }
   else {
-      xml_appointment_date = request.getParameter("xml_appointment_date");
+	  xml_appointment_date = MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay);
   }
-
 
   java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
 
