@@ -234,10 +234,9 @@ function checkTypeIn() {
 	sql += "  d.date_of_birth, ";
 	sql += "  d.provider_no ";
 	sql += "FROM demographic d ";
-	sql += "LEFT JOIN demographic_merged dm ON d.demographic_no = dm.demographic_no ";
-	sql += "LEFT JOIN (SELECT demographic_no FROM demographic_merged WHERE deleted='0') AS k ON d.demographic_no = k.demographic_no ";
+	sql += "LEFT JOIN demographic_merged dm ON d.demographic_no = dm.demographic_no AND deleted='0' ";
 	sql += "WHERE patient_status = 'AC' ";
-	sql += "AND (dm.id IS NULL OR (dm.deleted='1' AND k.demographic_no IS NULL)) ";
+	sql += "AND dm.id IS NULL ";
 	sql += "AND " + fieldname + " " + regularexp + " ? " + orderby; // + " "+limit;  
 
 	if(request.getParameter("search_mode").equals("search_name")) {
