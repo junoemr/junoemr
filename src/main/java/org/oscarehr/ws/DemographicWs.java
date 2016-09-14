@@ -129,5 +129,6 @@ public class DemographicWs extends AbstractWs {
 		}
 		
 		demographicManager.addDemographic(demographic);
+		demographicManager.addDemographicExts(demographic, demographicTransfer);
 	}
 }
