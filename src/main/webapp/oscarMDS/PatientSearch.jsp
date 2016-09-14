@@ -222,7 +222,7 @@ function checkTypeIn() {
 		}
 	}
 
-	String sql = "SELECT ";
+	String sql = "SELECT DISTINCT ";
 	sql += "  d.demographic_no, ";
 	sql += "  d.first_name, ";
 	sql += "  d.last_name, ";
@@ -234,10 +234,10 @@ function checkTypeIn() {
 	sql += "  d.date_of_birth, ";
 	sql += "  d.provider_no ";
 	sql += "FROM demographic d ";
-	sql += "LEFT JOIN demographic_merged dm ";
-	sql += "  ON d.demographic_no = dm.demographic_no ";
+	sql += "LEFT JOIN demographic_merged dm ON d.demographic_no = dm.demographic_no ";
+	sql += "LEFT JOIN (SELECT demographic_no FROM demographic_merged WHERE deleted='0') AS k ON d.demographic_no = k.demographic_no ";
 	sql += "WHERE patient_status = 'AC' ";
-	sql += "AND dm.id IS NULL ";
+	sql += "AND (dm.id IS NULL OR (dm.deleted='1' AND k.demographic_no IS NULL)) ";
 	sql += "AND " + fieldname + " " + regularexp + " ? " + orderby; // + " "+limit;  
 
 	if(request.getParameter("search_mode").equals("search_name")) {
@@ -252,7 +252,7 @@ function checkTypeIn() {
 			rs = db.queryResults(sql, lastfirst[0]) ;
 		}
 	}
-	else if(request.getParameter("search_mode").equals("search_dob")) {      
+	else if(request.getParameter("search_mode").equals("search_dob")) {
 		String[] param =new String[3];
 		param[0]=""+MyDateFormat.getYearFromStandardDate(keyword)+"%";//(",");
 		param[1]=""+MyDateFormat.getMonthFromStandardDate(keyword)+"%";
