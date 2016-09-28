@@ -128,14 +128,8 @@ public class EFormWs extends AbstractWs {
 		while(eformValueListIterator.hasNext())
 		{
 			EFormValue eformValue = eformValueListIterator.next();
-
-			// XXX: This line is causing a problem
 			out.add(EFormValueTransfer.toTransfer(eformValue));
 		}
-		/*
-		EFormValueTransfer eformValueTransfer = new EFormValueTransfer();
-		out.add(eformValueTransfer);
-		*/
 
 		return(out);
 	}
