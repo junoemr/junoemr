@@ -78,6 +78,14 @@ public class EFormValueDao extends AbstractDao<EFormValue> {
 		return(result);
     }
 
+    public EFormValue findById(int id) {
+    	Query query = entityManager.createQuery("select x from " + modelClass.getSimpleName() + " x where x.id=?1");
+		query.setParameter(1, id);
+		EFormValue result=(EFormValue)query.getSingleResult();
+
+		return(result);
+    }
+
     public List<EFormValue> findByFormDataIdList(List<Integer> fdids) {
     	Query query = entityManager.createQuery("select x from " + modelClass.getSimpleName() + " x where x.formDataId in (?1)");
 		query.setParameter(1, fdids);

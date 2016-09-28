@@ -48,6 +48,18 @@ public class EFormDao extends AbstractDao<EForm> {
         	return results.get(0);
         return null;
     }
+	
+    public EForm findById(Integer id){
+    	Query query = entityManager.createQuery("SELECT e from EForm e where e.id = ? and e.current=?");
+    	query.setParameter(1, id);
+    	query.setParameter(2,true);
+    	
+        @SuppressWarnings("unchecked")
+        List<EForm> results = query.getResultList();
+        if(!results.isEmpty())
+        	return results.get(0);
+        return null;
+    }
 
 	/**
 	 * @param current can be null for both

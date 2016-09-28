@@ -56,6 +56,18 @@ public class EFormDataDao extends AbstractDao<EFormData> {
 		return(results);
 	}
 
+    public List<EFormData> findByDemographicIdAndEForm(Integer demographicId, Integer eformId)
+	{
+		Query query = entityManager.createQuery("select x from " + modelClass.getSimpleName() + " x where x.demographicId=?1 and x.formId=?2");
+		query.setParameter(1, demographicId);
+		query.setParameter(2, eformId);
+
+		@SuppressWarnings("unchecked")
+		List<EFormData> results=query.getResultList();
+
+		return(results);
+	}
+
     public List<EFormData> findByDemographicIdSinceLastDate(Integer demographicId,Date lastDate)
 	{
     	Calendar cal1 = Calendar.getInstance();
