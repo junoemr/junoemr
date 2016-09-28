@@ -47,59 +47,43 @@ public final class LoginCheckLogin {
 	}
 
 	/**
-	 * lock username and ip
+	 * check lock status by ip / username
 	 * @param ip
 	 * @param userName
 	 * @return true if the entry is blocked, false otherwise
 	 */
-	public boolean isBlock(String ip, String userName) {
-		OscarProperties p = OscarProperties.getInstance();
-		if (!p.isPropertyActive("login_lock")) {
-			return isBlock(ip);
-		}
-
-		// the following meets the requirment of epp
-		boolean bBlock = false;
-		// judge the local network
-		if (ip.startsWith(p.getProperty("login_local_ip"))) bWAN = false;
-
-		while (loginList == null) {
-			loginList = LoginList.getLoginListInstance();
-		}
-
-		// check if it is blocked
-		if (loginList.containsKey(userName) && (loginList.get(userName)).getStatus() == 0) bBlock = true;
-
-		return bBlock;
-	}
-	
-	/**
-	 * lock ip
-	 * @param ip
-	 * @return true if the entry is blocked, false otherwise
-	 */
-	private boolean isBlock(String ip) {
-		boolean bBlock = false;
-
+	public boolean isBlocked(String ip, String userName) {
+		
 		// judge the local network
 		OscarProperties p = OscarProperties.getInstance();
 		if (ip.startsWith(p.getProperty("login_local_ip"))) bWAN = false;
-
-		GregorianCalendar now = new GregorianCalendar();
+		
 		while (loginList == null) {
 			loginList = LoginList.getLoginListInstance(); // LoginInfoBean info =
 		}
-		// delete the old entry in the loginlist if time out
-		if (bWAN && !loginList.isEmpty()) {
+		if (p.isPropertyActive("login_lock")) {
+			// check if it is blocked
+			return isBlocked(userName);
+		}
+		else {
+			GregorianCalendar now = new GregorianCalendar();
+			// delete the old entry in the login list if time out
 			for(String key: loginList.keySet()) {
 				if (loginList.get(key).timeoutPeriodExceeded(now)) { 
 					loginList.remove(key);
 				}
 			}
 			// check if it is blocked
-			if (loginList.containsKey(ip) && (loginList.get(ip)).getStatus() == 0) bBlock = true;
+			return (bWAN && isBlocked(ip));
 		}
-		return bBlock;
+	}
+	
+	/**
+	 * @param ip
+	 * @return true if the entry is blocked, false otherwise
+	 */
+	private boolean isBlocked(String key) {
+		return (loginList.containsKey(key) && (loginList.get(key)).getStatus() == 0);
 	}
 
 	// authenticate is used to check password
@@ -119,11 +103,11 @@ public final class LoginCheckLogin {
 
 	public synchronized void updateLoginList(String ip, String userName) {
 		OscarProperties p = OscarProperties.getInstance();
-		if(!p.isPropertyActive("login_lock")) {
-			updateLoginList(ip);
+		if(p.isPropertyActive("login_lock")) {
+			updateLoginList(userName);
 		}
 		else {
-			updateLoginList(userName);
+			updateLoginList(ip);
 		}
 	}
 
@@ -150,18 +134,18 @@ public final class LoginCheckLogin {
 
 	/**
 	 * remove the entry in the loginList with the given userName
-	 * @param userName
+	 * @param key - username or ip
 	 * @return true if an entry was removed, false otherwise
 	 */
-	public boolean unlock(String userName) {
+	public boolean unlock(String key) {
 	
 		while (loginList == null) {
 			loginList = LoginList.getLoginListInstance();
 		}
 		
 		// unlock the entry in the login list
-		boolean unlocked = loginList.containsKey(userName);
-		loginList.remove(userName);
+		boolean unlocked = loginList.containsKey(key);
+		loginList.remove(key);
 		return unlocked;
 	}
 
