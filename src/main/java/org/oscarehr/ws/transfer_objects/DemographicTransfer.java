@@ -90,6 +90,8 @@ public final class DemographicTransfer {
 	private Date lastUpdateDate;
 	private String title;
 	private String officialLanguage;
+	private String nameOfFather;
+	private String nameOfMother;
 
 	
 	public Integer getDemographicNo() {
@@ -491,6 +493,18 @@ public final class DemographicTransfer {
 	public void setTitle(String title) {
     	this.title = title;
     }
+	public void setNameOfFather(String nameOfFather) {
+		this.nameOfFather = nameOfFather;
+	}
+	public String getNameOfFather() {
+		return nameOfFather;
+	}
+	public void setNameOfMother(String nameOfMother) {
+		this.nameOfMother = nameOfMother;
+	}
+	public String getNameOfMother() {
+		return nameOfMother;
+	}
 
 	public String getOfficialLanguage() {
     	return (officialLanguage);
