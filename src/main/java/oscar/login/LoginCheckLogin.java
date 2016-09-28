@@ -36,7 +36,6 @@ import oscar.OscarProperties;
 
 public final class LoginCheckLogin {
 	
-	boolean bWAN = true;
 	private LoginCheckLoginBean lb = null;
 	private LoginList loginList = null;
 
@@ -47,7 +46,7 @@ public final class LoginCheckLogin {
 	}
 
 	/**
-	 * check lock status by ip / username
+	 * check lock status by IP / userName
 	 * @param ip
 	 * @param userName
 	 * @return true if the entry is blocked, false otherwise
@@ -56,25 +55,24 @@ public final class LoginCheckLogin {
 		
 		// judge the local network
 		OscarProperties p = OscarProperties.getInstance();
-		if (ip.startsWith(p.getProperty("login_local_ip"))) bWAN = false;
 		
 		while (loginList == null) {
-			loginList = LoginList.getLoginListInstance(); // LoginInfoBean info =
+			loginList = LoginList.getLoginListInstance();
 		}
+		GregorianCalendar now = new GregorianCalendar();
+		// delete the old entry in the login list if time out
+		for(String key: loginList.keySet()) {
+			if (loginList.get(key).timeoutPeriodExceeded(now)) { 
+				loginList.remove(key);
+			}
+		}
+		// check if it is blocked
 		if (p.isPropertyActive("login_lock")) {
-			// check if it is blocked
 			return isBlocked(userName);
 		}
 		else {
-			GregorianCalendar now = new GregorianCalendar();
-			// delete the old entry in the login list if time out
-			for(String key: loginList.keySet()) {
-				if (loginList.get(key).timeoutPeriodExceeded(now)) { 
-					loginList.remove(key);
-				}
-			}
-			// check if it is blocked
-			return (bWAN && isBlocked(ip));
+			boolean isLocal = (ip.startsWith(p.getProperty("login_local_ip")));
+			return (!isLocal && isBlocked(ip));
 		}
 	}
 	
@@ -101,6 +99,11 @@ public final class LoginCheckLogin {
 		return (lb.getSecurity());
 	}
 
+	/**
+	 * update login list if login failed. This will cause the lockout counter to increase
+	 * @param ip - login IP address
+	 * @param userName - the login userName
+	 */
 	public synchronized void updateLoginList(String ip, String userName) {
 		OscarProperties p = OscarProperties.getInstance();
 		if(p.isPropertyActive("login_lock")) {
@@ -117,19 +120,17 @@ public final class LoginCheckLogin {
 	 */
 	private synchronized void updateLoginList(String key) {
 		OscarProperties p = OscarProperties.getInstance();
-		if (bWAN) {
-			LoginInfoBean linfo;
-			GregorianCalendar now = new GregorianCalendar();
-			if (loginList.containsKey(key)) {
-				linfo = loginList.get(key);
-				linfo.updateLoginInfoBean(now);
-			}
-			else {
-				linfo = new LoginInfoBean(now, Integer.parseInt(p.getProperty("login_max_failed_times")), Integer.parseInt(p.getProperty("login_max_duration")));
-			}
-			loginList.put(key, linfo);
-			MiscUtils.getLogger().debug(key + "  status: " + (loginList.get(key)).getStatus() + " times: " + linfo.getTimes() + " time: ");
+		LoginInfoBean linfo;
+		GregorianCalendar now = new GregorianCalendar();
+		if (loginList.containsKey(key)) {
+			linfo = loginList.get(key);
+			linfo.updateLoginInfoBean(now);
 		}
+		else {
+			linfo = new LoginInfoBean(now, Integer.parseInt(p.getProperty("login_max_failed_times")), Integer.parseInt(p.getProperty("login_max_duration")));
+			loginList.put(key, linfo);
+		}
+		MiscUtils.getLogger().debug(key + "  status: " + (loginList.get(key)).getStatus() + " times: " + linfo.getTimes() + " time: ");
 	}
 
 	/**

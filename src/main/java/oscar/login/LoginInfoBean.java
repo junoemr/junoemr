@@ -38,8 +38,8 @@ import java.util.GregorianCalendar;
 public final class LoginInfoBean {
 	
     private GregorianCalendar starttime = null;
-    private int times = 1;
-    private int status = 1; // 1 - normal, 0 - block out
+    private int times;
+    private int status; // 1 - normal, 0 - block out
 
     private int maxtimes;
     private int maxduration;
@@ -52,9 +52,9 @@ public final class LoginInfoBean {
     	this(new GregorianCalendar(), 3, 10);
     }
     public LoginInfoBean(GregorianCalendar starttime1, int maxtimes1, int maxduration1) {
-        starttime = starttime1;
         maxtimes = maxtimes1;
         maxduration = maxduration1;
+        resetLoginInfoBean(starttime1);
     }
 
     private void resetLoginInfoBean(GregorianCalendar starttime1) {
