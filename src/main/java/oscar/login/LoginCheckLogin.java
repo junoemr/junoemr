@@ -25,62 +25,36 @@
 
 package oscar.login;
 
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.Properties;
-import java.util.Vector;
 
 import org.oscarehr.util.MiscUtils;
 
-import oscar.OscarProperties;
-
 import com.quatro.model.security.Security;
 
+import oscar.OscarProperties;
+
 public final class LoginCheckLogin {
+	
 	boolean bWAN = true;
+	private LoginCheckLoginBean lb = null;
+	private LoginList loginList = null;
 
-	LoginCheckLoginBean lb = null;
-
-	LoginInfoBean linfo = null;
-
-	LoginList llist = null;
-
+	/**
+	 * Empty constructor
+	 */
 	public LoginCheckLogin() {
 	}
 
-	public boolean isBlock(String ip) {
-		boolean bBlock = false;
-
-		// judge the local network
-		Properties p = OscarProperties.getInstance();
-		if (ip.startsWith(p.getProperty("login_local_ip"))) bWAN = false;
-
-		GregorianCalendar now = new GregorianCalendar();
-		while (llist == null) {
-			llist = LoginList.getLoginListInstance(); // LoginInfoBean info =
-			// null;
-		}
-		String sTemp = null;
-
-		// delete the old entry in the loginlist if time out
-		if (bWAN && !llist.isEmpty()) {
-			for (Enumeration e = llist.keys(); e.hasMoreElements();) {
-				sTemp = (String) e.nextElement();
-				linfo = (LoginInfoBean) llist.get(sTemp);
-				if (linfo.getTimeOutStatus(now)) llist.remove(sTemp);
-			}
-
-			// check if it is blocked
-			if (llist.get(ip) != null && ((LoginInfoBean) llist.get(ip)).getStatus() == 0) bBlock = true;
-		}
-
-		return bBlock;
-	}
-
-	// lock username and ip
+	/**
+	 * lock username and ip
+	 * @param ip
+	 * @param userName
+	 * @return true if the entry is blocked, false otherwise
+	 */
 	public boolean isBlock(String ip, String userName) {
-		Properties p = OscarProperties.getInstance();
-		if (!p.getProperty("login_lock", "").trim().equals("true")) {
+		OscarProperties p = OscarProperties.getInstance();
+		if (!p.isPropertyActive("login_lock")) {
 			return isBlock(ip);
 		}
 
@@ -89,14 +63,42 @@ public final class LoginCheckLogin {
 		// judge the local network
 		if (ip.startsWith(p.getProperty("login_local_ip"))) bWAN = false;
 
-		new GregorianCalendar();
-		while (llist == null) {
-			llist = LoginList.getLoginListInstance();
+		while (loginList == null) {
+			loginList = LoginList.getLoginListInstance();
 		}
 
 		// check if it is blocked
-		if (llist.get(userName) != null && ((LoginInfoBean) llist.get(userName)).getStatus() == 0) bBlock = true;
+		if (loginList.containsKey(userName) && (loginList.get(userName)).getStatus() == 0) bBlock = true;
 
+		return bBlock;
+	}
+	
+	/**
+	 * lock ip
+	 * @param ip
+	 * @return true if the entry is blocked, false otherwise
+	 */
+	private boolean isBlock(String ip) {
+		boolean bBlock = false;
+
+		// judge the local network
+		OscarProperties p = OscarProperties.getInstance();
+		if (ip.startsWith(p.getProperty("login_local_ip"))) bWAN = false;
+
+		GregorianCalendar now = new GregorianCalendar();
+		while (loginList == null) {
+			loginList = LoginList.getLoginListInstance(); // LoginInfoBean info =
+		}
+		// delete the old entry in the loginlist if time out
+		if (bWAN && !loginList.isEmpty()) {
+			for(String key: loginList.keySet()) {
+				if (loginList.get(key).timeoutPeriodExceeded(now)) { 
+					loginList.remove(key);
+				}
+			}
+			// check if it is blocked
+			if (loginList.containsKey(ip) && (loginList.get(ip)).getStatus() == 0) bBlock = true;
+		}
 		return bBlock;
 	}
 
@@ -109,92 +111,68 @@ public final class LoginCheckLogin {
 
 	/**
 	 * only works after you call auth successfully
-	 * 
-	 * @return
+	 * @return Security object
 	 */
 	public Security getSecurity() {
 		return (lb.getSecurity());
 	}
 
 	public synchronized void updateLoginList(String ip, String userName) {
-		Properties p = OscarProperties.getInstance();
-		if (!p.getProperty("login_lock", "").trim().equals("true")) {
+		OscarProperties p = OscarProperties.getInstance();
+		if(!p.isPropertyActive("login_lock")) {
 			updateLoginList(ip);
-		} else {
-			updateLockList(userName);
+		}
+		else {
+			updateLoginList(userName);
 		}
 	}
 
-	// update login list if login failed
-	public synchronized void updateLoginList(String ip) {
-		Properties p = OscarProperties.getInstance();
+	/**
+	 * update login list if login failed
+	 * @param key
+	 */
+	private synchronized void updateLoginList(String key) {
+		OscarProperties p = OscarProperties.getInstance();
 		if (bWAN) {
+			LoginInfoBean linfo;
 			GregorianCalendar now = new GregorianCalendar();
-			if (llist.get(ip) == null) {
-				linfo = new LoginInfoBean(now, Integer.parseInt(p.getProperty("login_max_failed_times")), Integer.parseInt(p.getProperty("login_max_duration")));
-			} else {
-				linfo = (LoginInfoBean) llist.get(ip);
-				linfo.updateLoginInfoBean(now, 1);
+			if (loginList.containsKey(key)) {
+				linfo = loginList.get(key);
+				linfo.updateLoginInfoBean(now);
 			}
-			llist.put(ip, linfo);
-			MiscUtils.getLogger().debug(ip + "  status: " + ((LoginInfoBean) llist.get(ip)).getStatus() + " times: " + linfo.getTimes() + " time: ");
+			else {
+				linfo = new LoginInfoBean(now, Integer.parseInt(p.getProperty("login_max_failed_times")), Integer.parseInt(p.getProperty("login_max_duration")));
+			}
+			loginList.put(key, linfo);
+			MiscUtils.getLogger().debug(key + "  status: " + (loginList.get(key)).getStatus() + " times: " + linfo.getTimes() + " time: ");
 		}
 	}
 
-	// lock update login list if login failed
-	public synchronized void updateLockList(String userName) {
-		Properties p = OscarProperties.getInstance();
-		if (bWAN) {
-			GregorianCalendar now = new GregorianCalendar();
-			if (llist.get(userName) == null) {
-				linfo = new LoginInfoBean(now, Integer.parseInt(p.getProperty("login_max_failed_times")), Integer.parseInt(p.getProperty("login_max_duration")));
-			} else {
-				linfo = (LoginInfoBean) llist.get(userName);
-				linfo.updateLoginInfoBean(now, 1);
-			}
-			llist.put(userName, linfo);
-			MiscUtils.getLogger().debug(userName + "  status: " + ((LoginInfoBean) llist.get(userName)).getStatus() + " times: " + linfo.getTimes() + " time: ");
-		}
-	}
-
+	/**
+	 * remove the entry in the loginList with the given userName
+	 * @param userName
+	 * @return true if an entry was removed, false otherwise
+	 */
 	public boolean unlock(String userName) {
-		boolean bBlock = false;
-
-		while (llist == null) {
-			llist = LoginList.getLoginListInstance();
+	
+		while (loginList == null) {
+			loginList = LoginList.getLoginListInstance();
 		}
-		String sTemp = null;
-
-		// unlocl the entry in the loginlist
-		if (!llist.isEmpty()) {
-			for (Enumeration e = llist.keys(); e.hasMoreElements();) {
-				sTemp = (String) e.nextElement();
-				if (sTemp.equals(userName)) {
-					llist.remove(sTemp);
-					bBlock = true;
-				}
-			}
-		}
-
-		return bBlock;
+		
+		// unlock the entry in the login list
+		boolean unlocked = loginList.containsKey(userName);
+		loginList.remove(userName);
+		return unlocked;
 	}
 
-	public Vector findLockList() {
-		Vector ret = new Vector();
-
-		while (llist == null) {
-			llist = LoginList.getLoginListInstance();
+	/**
+	 * @return a list of all login instances
+	 */
+	public ArrayList<String> findLockList() {
+	
+		while (loginList == null) {
+			loginList = LoginList.getLoginListInstance();
 		}
-		String sTemp = null;
-
-		// unlocl the entry in the loginlist
-		if (!llist.isEmpty()) {
-			for (Enumeration e = llist.keys(); e.hasMoreElements();) {
-				sTemp = (String) e.nextElement();
-				ret.add(sTemp);
-			}
-		}
-
-		return ret;
+		return new ArrayList<String>(loginList.keySet());
 	}
 }
