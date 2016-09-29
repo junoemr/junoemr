@@ -45,6 +45,7 @@
 	<jaxws:endpoint implementor="org.oscarehr.ws.DocumentWs" address="/DocumentService" publishedEndpointUrl="${https_endpoint_url_base}/DocumentService" />	
 	<jaxws:endpoint implementor="org.oscarehr.ws.MeasurementWs" address="/MeasurementService" publishedEndpointUrl="${https_endpoint_url_base}/MeasurementService" />	
 	<jaxws:endpoint implementor="org.oscarehr.ws.EFormWs" address="/EFormService" publishedEndpointUrl="${https_endpoint_url_base}/EFormService" />	
+	<jaxws:endpoint implementor="org.oscarehr.ws.DrugWs" address="/DrugService" publishedEndpointUrl="${https_endpoint_url_base}/DrugService" />	
 	<jaxws:endpoint implementor="#systemInfoWs" address="/SystemInfoService" publishedEndpointUrl="${https_endpoint_url_base}/SystemInfoService" />	
 	<jaxws:endpoint implementor="#loginWs" address="/LoginService" publishedEndpointUrl="${https_endpoint_url_base}/LoginService" />	
 	<jaxws:endpoint implementor="#scheduleWs" address="/ScheduleService" publishedEndpointUrl="${https_endpoint_url_base}/ScheduleService" />	
