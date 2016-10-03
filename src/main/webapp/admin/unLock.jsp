@@ -75,8 +75,8 @@ String curUser_no = (String)session.getAttribute("user");
   String msg = "Unlock";
   //LoginList llist = null;
   LoginCheckLogin cl = new LoginCheckLogin();
-  Vector vec = cl.findLockList();
-  if(vec == null) vec = new Vector();
+  ArrayList<String> vec = cl.findLockList();
+  if(vec == null) vec = new ArrayList<String>();
   
   if (request.getParameter("submit") != null && request.getParameter("submit").equals("Unlock")) {
     // unlock
@@ -101,8 +101,8 @@ String curUser_no = (String)session.getAttribute("user");
 	  }
 	  
 	  for(int i=0; i<vec.size(); i++) {
-		  if (!userList.contains((String)vec.get(i))) {
-			  vec.remove((String)vec.get(i));
+		  if (!userList.contains(vec.get(i))) {
+			  vec.remove(vec.get(i));
 		  }
 	  }
   }
@@ -149,7 +149,7 @@ String curUser_no = (String)session.getAttribute("user");
 		<td align="right"><b>Role name</b></td>
 		<td><select name="userName">
 			<% for(int i=0; i<vec.size(); i++) { %>
-			<option value="<%=(String) vec.get(i) %>"><%=(String) vec.get(i) %></option>
+			<option value="<%=vec.get(i) %>"><%=vec.get(i) %></option>
 			<% } %>
 		</select> <input type="submit" name="submit" value="Unlock" /></td>
 	</tr>

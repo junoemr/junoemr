@@ -36,32 +36,42 @@ import java.util.GregorianCalendar;
  * Class LoginInfoBean : set login status when bWAN = true 2003-01-29
  */
 public final class LoginInfoBean {
+	
     private GregorianCalendar starttime = null;
-    private int times = 1;
-    private int status = 1; // 1 - normal, 0 - block out
+    private int times;
+    private int status; // 1 - normal, 0 - block out
 
-    private int maxtimes = 3;
-    private int maxduration = 10;
+    private int maxtimes;
+    private int maxduration;
 
+    /** 
+     * default constructor. sets start time to instance of new GregorianCalendar
+     * default maximum tries set to 3, timeout set to 10 minutes
+     */
     public LoginInfoBean() {
+    	this(new GregorianCalendar(), 3, 10);
     }
-
     public LoginInfoBean(GregorianCalendar starttime1, int maxtimes1, int maxduration1) {
-        starttime = starttime1;
-        maxtimes = maxtimes1-1;
+        maxtimes = maxtimes1;
         maxduration = maxduration1;
+        resetLoginInfoBean(starttime1);
     }
 
-    public void initialLoginInfoBean(GregorianCalendar starttime1) {
+    private void resetLoginInfoBean(GregorianCalendar starttime1) {
         starttime = starttime1;
-        int times = 0;
-        int status = 1; // 1 - normal, 0 - block out
+        times = 0;
+        status = 1; // 1 - normal, 0 - block out
     }
 
-    public void updateLoginInfoBean(GregorianCalendar now, int times1) {
+    /**
+     * updates the internal login attempts counter and lockout status. 
+     * If called after the maximum lockout period it will reset the status and counter
+     * @param now - the time to base timeout period on
+     */
+    public void updateLoginInfoBean(GregorianCalendar now) {
         //if time out, initial bean again.
-        if (getTimeOutStatus(now)) {
-            initialLoginInfoBean(now);
+        if (timeoutPeriodExceeded(now)) {
+        	resetLoginInfoBean(now);
             return;
         }
         //else times++. if times out, status block
@@ -69,16 +79,16 @@ public final class LoginInfoBean {
         if (times > maxtimes)
             status = 0; // 1 - normal, 0 - block out
     }
-
-    public boolean getTimeOutStatus(GregorianCalendar now) {
-        boolean btemp = false;
+    /**
+     * @param now
+     * @return true if 'now' time parameter is beyond the max timeout period (timeout has expired)
+     */
+    public boolean timeoutPeriodExceeded(GregorianCalendar now) {
         //if time out and status is 1, return true
         GregorianCalendar cal = (GregorianCalendar) starttime.clone();
         cal.add(Calendar.MINUTE, maxduration);
-        if (cal.getTimeInMillis() < now.getTimeInMillis())
-            btemp = true; //starttime = starttime1;
-
-        return btemp;
+        
+        return (cal.getTimeInMillis() < now.getTimeInMillis());
     }
 
     public void setStarttime(GregorianCalendar starttime1) {

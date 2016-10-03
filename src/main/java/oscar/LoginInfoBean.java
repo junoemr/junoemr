@@ -28,7 +28,8 @@ package oscar;
 //import java.sql.*;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-
+/** use src/main/java/oscar/login/LoginInfoBean.java */
+@Deprecated
 public class LoginInfoBean {
 	
   private GregorianCalendar starttime = null;

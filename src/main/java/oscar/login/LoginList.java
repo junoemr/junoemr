@@ -29,12 +29,12 @@
 
 package oscar.login;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 /**
  * Class LoginList : an application level login list: ip/LoginInfoBean 2003-01-29
  */
-public final class LoginList extends Hashtable {
+public final class LoginList extends HashMap<String, LoginInfoBean> {
     //only one instance to use
     private static LoginList loginList;
 
