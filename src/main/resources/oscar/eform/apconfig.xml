@@ -697,6 +697,13 @@
         <ap-output>${last_name}, ${first_name}</ap-output>
     </databaseap>
     <databaseap>
+        <ap-name>appt_provider_ohip_no</ap-name>
+        <ap-sql>SELECT p.ohip_no
+				FROM provider p INNER JOIN appointment a ON (p.provider_no=a.provider_no)
+				WHERE a.appointment_no=${appt_no}</ap-sql>
+        <ap-output>${ohip_no}</ap-output>
+    </databaseap>
+    <databaseap>
         <ap-name>appt_provider_id</ap-name>
         <ap-sql>SELECT provider_no FROM appointment WHERE appointment_no=${appt_no}</ap-sql>
         <ap-output>${provider_no}</ap-output>
