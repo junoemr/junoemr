@@ -118,7 +118,7 @@ public class EFormWs extends AbstractWs {
 		return(EFormValueTransfer.toTransfer(eformValue));
 	}
 
-	public List getEFormValues(Integer eformDataId)
+	public List getEFormValueList(Integer eformDataId)
 	{
 		List<EFormValue> eformValueList = 
 			eformValueManager.getEFormValueList(eformDataId);

@@ -63,7 +63,7 @@ public class DrugWs extends AbstractWs {
 		return(DrugTransfer.toTransfer(drug));
 	}
 
-	public List getDrugs(Integer demographicId)
+	public List getDrugList(Integer demographicId)
 	{
 		List<Drug> drugList = drugManager.getDrugList(demographicId);
 		
