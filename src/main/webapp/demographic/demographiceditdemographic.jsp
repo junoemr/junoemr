@@ -30,6 +30,7 @@
 <%@page import="org.oscarehr.PMmodule.caisi_integrator.ConformanceTestHelper"%>
 <%@page import="org.oscarehr.common.dao.DemographicExtDao" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
+<%@page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%
@@ -904,6 +905,7 @@ div.demographicWrapper {
                                 	midwife = demographicCust.getMidwife();
                                 	notes = SxmlMisc.getXmlContent(demographicCust.getNotes(),"unotes") ;
                                 	notes = notes==null?"":notes;
+                                	notes = StringEscapeUtils.escapeHtml(notes);
                                 }
 
                                 DemographicDao demographicDao=(DemographicDao)SpringUtils.getBean("demographicDao");
