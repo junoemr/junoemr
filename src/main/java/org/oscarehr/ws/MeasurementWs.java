@@ -193,8 +193,19 @@ public class MeasurementWs extends AbstractWs {
 		// Add the measurement to the database
 		
 		Date cleanDateObserved = null; 
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		cleanDateObserved = formatter.parse(dateObserved);
+		SimpleDateFormat date_formatter = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat time_formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		try
+		{
+			// Try to parse as a time
+			cleanDateObserved = time_formatter.parse(dateObserved);
+		}
+		catch(ParseException e)
+		{
+			// If it fails to parse a time, parse as a date
+			cleanDateObserved = date_formatter.parse(dateObserved);
+		}
 
 		MeasurementDao measurementDao =
 			(MeasurementDao) SpringUtils.getBean("measurementDao");
