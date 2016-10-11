@@ -51,6 +51,15 @@ public class RxProviderData {
 		}
 		return results;
 	}
+	/** alternate method to getAllProviders that only returns active doctors */
+	public List<Provider> getActiveDoctors() {
+		List<org.oscarehr.common.model.Provider> providers = providerDao.getActiveProvidersByType("doctor");
+		ArrayList<Provider> results = new ArrayList<Provider>();
+		for (org.oscarehr.common.model.Provider p : providers) {
+			results.add(convertProvider(p));
+		}
+		return results;
+	}
 	
     public Provider getProvider(String providerNo) {
         return convertProvider(providerDao.getProvider(providerNo));

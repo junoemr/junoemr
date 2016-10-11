@@ -103,7 +103,7 @@ displayServiceUtil.estSpecialist();
 		org.oscarehr.common.model.Demographic demographic = null;
 
 		RxProviderData rx = new RxProviderData();
-		List<Provider> prList = rx.getAllProviders();
+		List<Provider> prList = rx.getActiveDoctors();
 		Provider thisProvider = rx.getProvider(providerNo);
 		ClinicData clinic = new ClinicData();
 
