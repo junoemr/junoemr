@@ -668,6 +668,12 @@
         <ap-output>${first_init}. ${last_name}</ap-output>
     </databaseap>
     <databaseap>
+        <ap-name>provider_specialty</ap-name>
+        <ap-sql>SELECT provider.specialty FROM provider, demographic
+                WHERE demographic_no=${demographic} AND demographic.provider_no=provider.provider_no</ap-sql>
+        <ap-output>${specialty}</ap-output>
+    </databaseap>
+    <databaseap>
         <ap-name>doctor_work_phone</ap-name>
         <ap-sql>SELECT provider.work_phone FROM provider, demographic
                 WHERE demographic.demographic_no=${demographic} AND demographic.provider_no=provider.provider_no</ap-sql>
