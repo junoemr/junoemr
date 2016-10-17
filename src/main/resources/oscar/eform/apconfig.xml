@@ -69,11 +69,6 @@
         <ap-sql>SELECT provider.ohip_no FROM provider WHERE provider.provider_no='${provider}' </ap-sql>
         <ap-output>${ohip_no}</ap-output>
     </databaseap>
-    <databaseap>
-        <ap-name>current_user_specialty</ap-name>
-        <ap-sql>SELECT provider.specialty FROM provider WHERE provider.provider_no='${provider}'</ap-sql>
-        <ap-output>${specialty}</ap-output>
-    </databaseap>
      <databaseap>
         <ap-name>current_user_specialty_code</ap-name>
         <ap-sql>SELECT
