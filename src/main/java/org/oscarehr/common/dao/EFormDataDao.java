@@ -26,6 +26,7 @@ package org.oscarehr.common.dao;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -39,10 +40,80 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class EFormDataDao extends AbstractDao<EFormData> {
 
+	public static final int DEFAULT_MAX_RESULTS = 10;
+	public static final int DEFAULT_PAGE = 0;
+
 	private static final Logger logger=MiscUtils.getLogger();
 
 	public EFormDataDao() {
 		super(EFormData.class);
+	}
+
+	public List<EFormData> findFiltered(
+		Integer demographicId,
+		Integer eformId,
+		Date startDate,
+		Date endDate,
+		Integer itemsPerPage,
+		Integer page,
+		boolean enabledPaging)
+	{
+		int maxResults = DEFAULT_MAX_RESULTS;
+		int cleanPage = DEFAULT_PAGE;
+
+		if(itemsPerPage != null)
+		{
+			maxResults = itemsPerPage;
+		}
+
+		if(page != null)
+		{
+			cleanPage = page;
+		}
+
+		int firstResult = (maxResults * cleanPage);
+
+		List<Object> paramArray = new ArrayList<Object>();
+
+		int paramCount = 1;
+		String sql = "from " + modelClass.getSimpleName() + " x " +
+			"where x.demographicId=?" + paramCount + " ";
+		paramArray.add(demographicId);
+		paramCount++;
+
+		if(startDate != null)
+		{
+			sql += "and x.formDate >= ?" + paramCount + " ";
+			paramArray.add(startDate);
+			paramCount++;
+		}
+
+		if(endDate != null)
+		{
+			sql += "and x.formDate <= ?" + paramCount + " ";
+			paramArray.add(endDate);
+			paramCount++;
+		}
+
+		sql += "order by x.id desc ";
+
+		String querySql = "select x " + sql;
+
+		// Make the query object
+		Query query = entityManager.createQuery(querySql);
+
+		addParameters(query, paramArray);
+
+		if(enabledPaging)
+		{
+			query.setFirstResult(firstResult);
+			query.setMaxResults(maxResults);
+		}
+
+		@SuppressWarnings("unchecked")
+		List<EFormData> results=query.getResultList();
+
+		return(results);
 	}
 
     public List<EFormData> findByDemographicId(Integer demographicId)
@@ -291,5 +362,17 @@ public class EFormDataDao extends AbstractDao<EFormData> {
 		List<EFormData> results=query.getResultList();
 		
 		return results;	
+	}
+
+	private void addParameters(Query query, List paramArray)
+	{
+		int paramCount = 1;
+		Iterator paramIterator = paramArray.iterator();
+		while(paramIterator.hasNext())
+		{
+			query.setParameter(paramCount, paramIterator.next());
+
+			paramCount++;
+		}
 	}
 }

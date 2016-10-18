@@ -30,6 +30,7 @@ import org.oscarehr.common.model.EFormData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import oscar.log.LogAction;
@@ -65,15 +66,15 @@ public class EFormDataManager
 		return (resultArray.get(0));
 	}
 
-	public List getEFormDataList(Integer eformId, Integer demographicId)
+	public List getEFormDataList(Integer eformId, Integer demographicId, 
+		Date startDate, Date endDate, Integer itemsPerPage, Integer page, boolean enablePaging)
 	{
 		List result = 
-			eformDataDao.findByDemographicIdAndEForm(demographicId, eformId);
+			eformDataDao.findFiltered(demographicId, eformId, startDate, endDate, itemsPerPage, page, enablePaging);
 
 		if(result != null)
 		{
-			LogAction.addLogSynchronous("EFormDataManager.getEforms",
-				"List");
+			LogAction.addLogSynchronous("EFormDataManager.getEforms", "List");
 		}
 
 		return (result);

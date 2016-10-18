@@ -42,7 +42,12 @@ import org.oscarehr.ws.transfer_objects.EFormValueTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -96,10 +101,60 @@ public class EFormWs extends AbstractWs {
 		return(EFormDataTransfer.toTransfer(eformData));
 	}
 
-	public List getEFormDataList(Integer eformId, Integer demographicNo)
+	public List<EFormDataTransfer> getEFormDataList(Integer eformId, Integer demographicNo)
+		throws ParseException
 	{
+		return getEFormData(eformId, demographicNo, null, false);
+	}
+
+	public List<EFormDataTransfer> getEFormDataListFiltered(Integer eformId, Integer demographicNo, Map<String, String> filter)
+		throws ParseException
+	{
+		return getEFormData(eformId, demographicNo, filter, true);
+	}
+
+	private List<EFormDataTransfer> getEFormData(Integer eformId, Integer demographicNo, Map<String, String> filter, boolean enablePaging)
+		throws ParseException
+	{
+		Date startDate = null;
+		Date endDate = null;
+		Integer itemsPerPage = null;
+		Integer page = null;
+
+		if(filter != null)
+		{
+			Iterator<String> i = filter.keySet().iterator();
+			while(i.hasNext())
+			{
+				String key = i.next();
+				SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
+				if(key.equals("start_date"))
+				{
+					startDate = parser.parse(filter.get(key));
+					logger.info(startDate);
+				}
+				else if(key.equals("end_date"))
+				{
+					endDate = parser.parse(filter.get(key));
+					logger.info(endDate);
+				}
+				else if(key.equals("items_per_page"))
+				{
+					itemsPerPage = Integer.parseInt(filter.get(key));
+					logger.info(itemsPerPage);
+				}
+				else if(key.equals("page"))
+				{
+					page = Integer.parseInt(filter.get(key));
+					logger.info(page);
+				}
+			}
+		}
+
+
 		List<EFormData> eformDataList = 
-			eformDataManager.getEFormDataList(eformId, demographicNo);
+			eformDataManager.getEFormDataList(eformId, demographicNo, startDate, 
+				endDate, itemsPerPage, page, enablePaging);
 		
 		Iterator<EFormData> eformDataListIterator = eformDataList.iterator();
 		List<EFormDataTransfer> out = new ArrayList<EFormDataTransfer>();
