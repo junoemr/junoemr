@@ -1805,27 +1805,37 @@ if ( PatStat.equals(Dead) ) {%>
                                                         <span class="info"><%=demographic.getCity()%></span>
                                                     </li>
                                                     <li><span class="label">
-							<% if(oscarProps.getProperty("demographicLabelProvince") == null) { %>
+							<% 
+							if(oscarProps.getProperty("demographicLabelProvince") == null) { %>
 							<bean:message
-								key="demographic.demographiceditdemographic.formProcvince" /> <% } else {
-			                                  out.print(oscarProps.getProperty("demographicLabelProvince"));
-                                                                               } %>:</span>
-                                                        <span class="info"><%=demographic.getProvince()%></span></li>
-                                                    <li><span class="label">
-							<% if(oscarProps.getProperty("demographicLabelPostal") == null) { %>
+								key="demographic.demographiceditdemographic.formProcvince" /> <% 
+								}
+							else {
+								out.print(oscarProps.getProperty("demographicLabelProvince"));
+							} %>:</span>
+                            <span class="info"><%=demographic.getProvince()%></span></li>
+                            <li><span class="label"> <% 
+							if(oscarProps.getProperty("demographicLabelPostal") == null) { %>
 							<bean:message
-								key="demographic.demographiceditdemographic.formPostal" /> <% } else {
-			                                  out.print(oscarProps.getProperty("demographicLabelPostal"));
-                                                                               } %>:</span>
-                                                       <span class="info"><%=demographic.getPostal()%></span></li>
-
-                                                    <li><span class="label"><bean:message
-                                                            key="demographic.demographiceditdemographic.formEmail" />:</span>
-                                                        <span class="info"><%=demographic.getEmail()!=null? demographic.getEmail() : ""%></span>
+								key="demographic.demographiceditdemographic.formPostal" /> <% 
+							} 
+							else {
+								out.print(oscarProps.getProperty("demographicLabelPostal"));
+							} %>:</span>
+							<span class="info"><%=demographic.getPostal()%></span></li>
+							<li><span class="label"><bean:message key="demographic.demographiceditdemographic.formEmail" />:</span>
+							<%String patientEmail = (demographic.getEmail() != null) ? demographic.getEmail() : "";
+							
+							if(oscarProps.isPropertyActive("enable_demographic_email_link")) {%>
+							<span class="info"><a href="mailto:<%=patientEmail%>">
+								<%=patientEmail%></a></span><%
+							}
+							else { %>
+								<span class="info"><%=patientEmail%></span><%
+							}%>
 							</li>
-                                                    <li><span class="label"><bean:message
-                                                            key="demographic.demographiceditdemographic.formNewsLetter" />:</span>
-                                                        <span class="info"><%=demographic.getNewsletter()!=null? demographic.getNewsletter() : "Unknown"%></span>
+							<li><span class="label"><bean:message key="demographic.demographiceditdemographic.formNewsLetter" />:</span>
+							<span class="info"><%=demographic.getNewsletter()!=null? demographic.getNewsletter() : "Unknown"%></span>
 							</li>
 						</ul>
 						</div>
