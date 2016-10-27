@@ -337,6 +337,7 @@ public class DemographicData {
 		demographic.setHin(hin);
 		demographic.setVer(ver);
 		demographic.setRosterStatus(roster_status);
+		demographic.setLastUpdateDate(new Date());
 		if(roster_date != null && roster_date.length()>0) {
 			demographic.setRosterDate(formatter.parse(roster_date));
 		}
