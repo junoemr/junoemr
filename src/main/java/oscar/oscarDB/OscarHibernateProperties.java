@@ -37,5 +37,6 @@ public class OscarHibernateProperties extends Properties {
 		setProperty("hibernate.connection.password",OscarProperties.getInstance().getProperty("db_password"));
 		setProperty("hibernate.connection.driver_class",OscarProperties.getInstance().getProperty("db_driver"));
 		setProperty("hibernate.dialect",opr.getProperty("hibernate.dialect"));
+		//setProperty("hibernate.show_sql","true");
 	}
 }

@@ -875,11 +875,18 @@ String date = year+"-"+month+"-"+day;
 		                h.put("name",mtypeBean.getTypeDisplayName());
 		                h.put("desc",mtypeBean.getTypeDesc());
 		            }
+
+					int measurementData = 0;
+					if(h.get("name") != null)
+					{
+						measurementData = Math.abs(h.get("name").hashCode());
+					}
+
 	    		%>
 	    			<%//This part here grabs the field name %>
 	    			<tr class="dataRow <%=currentSection%>" >
 					<td class="field">
-					<a style="color: black; text-decoration : underline;" href="javascript: function myFunction() {return false; }"  onclick="javascript:popup(465,635,'<%=project%>/oscarEncounter/oscarMeasurements/AddMeasurementData.jsp?measurement=<%= response.encodeURL( measure) %>&amp;demographic_no=<%=demographic_no%>&amp;template=<%= URLEncoder.encode(temp,"UTF-8") %>','addMeasurementData<%=Math.abs(h.get("name").hashCode()) %>')">
+					<a style="color: black; text-decoration : underline;" href="javascript: function myFunction() {return false; }"  onclick="javascript:popup(465,635,'<%=project%>/oscarEncounter/oscarMeasurements/AddMeasurementData.jsp?measurement=<%= response.encodeURL( measure) %>&amp;demographic_no=<%=demographic_no%>&amp;template=<%= URLEncoder.encode(temp,"UTF-8") %>','addMeasurementData<%=measurementData %>')">
 					<b><%=child.flowSheetItem.getDisplayName()%></b>
 					</a>
 					</td>
@@ -891,7 +898,7 @@ String date = year+"-"+month+"-"+day;
 
 					<td class="inputData">
 					<%//This part here grabs the type of input %>
-					<% if ( mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Yes/No")){ %>
+					<% if ( mtypeBean != null && mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Yes/No")){ %>
 	                           <input type="radio" name="<%=name%>" value="Yes">Yes
 	                           <input type="radio" name="<%=name%>" value="No">No
 	                           <input type="radio" name="<%=name%>" style="display:none;" value="">
@@ -954,7 +961,7 @@ String date = year+"-"+month+"-"+day;
 			               	 <%}%>
 			               	 "></span>
 			            <%}%>
-		           <%} else if ( mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Yes/No")){
+		           <%} else if ( mtypeBean != null && mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Yes/No")){
 		           		if (alist !=null && alist.size() > 0) {
 		           			if (alist.get(0).getDataField().equalsIgnoreCase("Yes")) { %>
 		           				<span class="checkmarksparkline" values="2,1,2,3"></span>

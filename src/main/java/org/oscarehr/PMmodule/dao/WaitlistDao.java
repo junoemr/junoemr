@@ -358,10 +358,11 @@ public class WaitlistDao {
 			+ " and LENGTH(ef.var_value)>0 and not exists (select * from eform_values where demographic_no=ef.demographic_no and var_name=ef.var_name and fdid>ef.fdid)";
 
 		
-	private static final String QUERY_GET_CLIENT_DATA = "SELECT DISTINCT ef.demographic_no, ef.fdid, ef.var_name, ef.var_value "
+	private static final String QUERY_GET_CLIENT_DATA = "SELECT ef.demographic_no, ef.fdid, ef.var_name, ef.var_value "
 			+ "FROM eform_values ef WHERE ef.demographic_no= ?1 and "
-			+" ef.var_name in ('age-years','gender','current-housing','preferred-language','location-preferences','referrer-contact-province','contact-province','Age category','prepared-live-toronto','bed_community_program_id','has-mental-illness-primary','current-legal-involvements')"
-			+ "and LENGTH(ef.var_value)>0 AND not exists (select * from eform_values where ef.demographic_no=demographic_no and var_name=ef.var_name and fdid>ef.fdid)";
+			+" ef.var_name in ('age-years','gender','current-housing','preferred-language','location-preferences','referrer-contact-province','contact-province','Age category','prepared-live-toronto','bed_community_program_id','has-mental-illness-primary','current-legal-involvements') "
+			+ "and LENGTH(ef.var_value)>0 AND not exists (select * from eform_values where ef.demographic_no=demographic_no and var_name=ef.var_name and fdid>ef.fdid) "
+			+ "GROUP BY ef.demographic_no, ef.fdid, ef.var_name, ef.var_value ";
 
 
 	

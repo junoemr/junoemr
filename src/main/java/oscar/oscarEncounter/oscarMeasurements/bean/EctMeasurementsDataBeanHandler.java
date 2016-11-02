@@ -83,12 +83,15 @@ public class EctMeasurementsDataBeanHandler {
     public boolean init(Integer demo, String type) {
         MeasurementTypes mt = MeasurementTypes.getInstance();
         EctMeasurementTypesBean mBean = mt.getByType(type);
+		MiscUtils.getLogger().info("Holey Smokes");
         if ( mBean != null){
             ValidationsDao dao = SpringUtils.getBean(ValidationsDao.class);
             ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);            
             Provider provider = null;
             
+			MiscUtils.getLogger().info("Holey Smokes1");
             for(Object[] o : dao.findValidationsBy(demo, type, ConversionUtils.fromIntString(mBean.getValidation()))) {
+				MiscUtils.getLogger().info("Holey Smokes2");
             	Validations v = (Validations) o[0];   
             	Measurement m = (Measurement) o[1];
             	provider = providerDao.getProvider(m.getProviderNo());

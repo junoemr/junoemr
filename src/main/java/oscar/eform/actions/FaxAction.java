@@ -100,9 +100,6 @@ public final class FaxAction {
 			String pdfFile = "EForm." + formId + System.currentTimeMillis();
 			tempFile = File.createTempFile(pdfFile, ".pdf");
 			//tempFile.deleteOnExit();
-			
-			String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "/";
-			FileUtils.copyFile(tempFile, new File(path + tempFile.getName()));
 
 			// convert to PDF
 			String viewUri = localUri + formId;
@@ -128,12 +125,12 @@ public final class FaxAction {
 					throw new DocumentException("Document target fax number '"+faxNo+"' is invalid."); 
 				}
 
-				String demo = req.getParameter("demographic_no");
+				//String demo = req.getParameter("demographic_no");
 				FaxJobDao faxJobDao = SpringUtils.getBean(FaxJobDao.class);
 				FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 				List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
-				String provider_no = 
-					LoggedInInfo.getLoggedInInfoFromSession(req).getLoggedInProviderNo();
+				//String provider_no = 
+				//	LoggedInInfo.getLoggedInInfoFromSession(req).getLoggedInProviderNo();
 
 				FaxJob faxJob;
 				boolean validFaxNumber = false;
@@ -151,7 +148,7 @@ public final class FaxAction {
 					faxJob.setNumPages(pdfReader.getNumberOfPages());
 					faxJob.setStamp(new Date());
 					faxJob.setStatus(FaxJob.STATUS.SENT);
-					faxJob.setOscarUser(provider_no);
+					faxJob.setOscarUser(providerId);
 					//faxJob.setDemographicNo(Integer.parseInt(demo));
 					faxJob.setDemographicNo(null);
 
