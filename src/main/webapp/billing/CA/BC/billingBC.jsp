@@ -171,55 +171,53 @@ function codeEntered(svcCode){
 	myform = document.forms[0];
 	return((myform.xml_other1.value == svcCode)||(myform.xml_other2.value == svcCode)||(myform.xml_other3.value == svcCode))
 }
-function addSvcCode(svcCode) {
-    myform = document.forms[0];
-    for (var i = 0; i < myform.service.length; i++) {
-      if (myform.service[i].value == svcCode) {
-        if (myform.service[i].checked) {
-          if (myform.xml_other1.value == "") {
-            myform.xml_other1.value = svcCode;
-            var trayCode =  getAssocCode(svcCode,trayAssocCodes);
-            if(trayCode!=''){
-              myform.xml_other2.value = trayCode;
-            }
-            myform.xml_diagnostic_detail1.value = getAssocCode(svcCode,jsAssocCodes);
-          }
-          else if (myform.xml_other2.value == "") {
-            myform.xml_other2.value = svcCode;
-            var trayCode =  getAssocCode(svcCode,trayAssocCodes);
-            if(trayCode!=''){
-              myform.xml_other3.value = trayCode;
-            }
-            myform.xml_diagnostic_detail2.value = getAssocCode(svcCode,jsAssocCodes);
-          }
-          else if (myform.xml_other3.value == "") {
-            myform.xml_other3.value = svcCode;
-            myform.xml_diagnostic_detail3.value = getAssocCode(svcCode,jsAssocCodes);
-          }
-          else {
-            alert("There are already three service codes entered");
-            myform.service[i].checked = false;
-            return;
-          }
-        }
-        else {
-          if (myform.xml_other1.value == svcCode) {
-            myform.xml_other1.value = "";
-            myform.xml_other2.value = "";
-            myform.xml_diagnostic_detail1.value = "";
-          }
-          else if (myform.xml_other2.value == svcCode) {
-            myform.xml_other2.value = "";
-            myform.xml_diagnostic_detail2.value = "";
-          }
-          else if (myform.xml_other3.value == svcCode) {
-            myform.xml_other3.value = "";
-            myform.xml_diagnostic_detail3.value = "";
-          }
-        }return;
-      }
+function addSvcCode(service, svcCode) {
+    var myform = document.forms[0];
+    
+    if (service.checked) {
+		if (myform.xml_other1.value == "") {
+		   myform.xml_other1.value = svcCode;
+		   var trayCode =  getAssocCode(svcCode,trayAssocCodes);
+		   if(trayCode!='') {
+			   myform.xml_other2.value = trayCode;
+		   }
+		   myform.xml_diagnostic_detail1.value = getAssocCode(svcCode,jsAssocCodes);
+		 }
+		 else if (myform.xml_other2.value == "") {
+			myform.xml_other2.value = svcCode;
+			var trayCode =  getAssocCode(svcCode,trayAssocCodes);
+			if(trayCode!='') {
+				myform.xml_other3.value = trayCode;
+			}
+			myform.xml_diagnostic_detail2.value = getAssocCode(svcCode,jsAssocCodes);
+		 }
+		 else if (myform.xml_other3.value == "") {
+			myform.xml_other3.value = svcCode;
+			myform.xml_diagnostic_detail3.value = getAssocCode(svcCode,jsAssocCodes);
+		 }
+		 else {
+		   alert("There are already three service codes entered");
+		   service.checked = false;
+		   return false;
+		 }
     }
-  }
+    else {
+		if (myform.xml_other1.value == svcCode) {
+			myform.xml_other1.value = "";
+			myform.xml_other2.value = "";
+			myform.xml_diagnostic_detail1.value = "";
+		}
+		else if (myform.xml_other2.value == svcCode) {
+			myform.xml_other2.value = "";
+        	myform.xml_diagnostic_detail2.value = "";
+		}
+		else if (myform.xml_other3.value == svcCode) {
+			myform.xml_other3.value = "";
+			myform.xml_diagnostic_detail3.value = "";
+		}
+	}
+    return true;
+}
 function getAssocCode(svcCode,assocCodes){
   var retcode = ""
   for (var i = 0; i < assocCodes.length; i++) {
@@ -231,21 +229,26 @@ function getAssocCode(svcCode,assocCodes){
   }
   return retcode;
 }
-function checkSelectedCodes(){
-    myform = document.forms[0];
-    for (var i = 0; i < myform.service.length; i++) {
-        if (myform.service[i].checked) {
-            if(!codeEntered(myform.service[i].value)){
-                myform.service[i].checked = false;
-            }
+function checkSelectedCode(service) {
+    if (service.checked) {
+        if(!codeEntered(service.value)) {
+        	service.checked = false;
         }
     }
 }
-
-
-
-
-
+function checkSelectedCodes(){
+    var myform = document.forms[0];
+    var service = myform.service;
+    
+    if(service.length) {
+        for (var i = 0; i < service.length; i++) {
+        	checkSelectedCode(service[i]);
+        }
+    }
+    else {
+    	checkSelectedCode(service);
+    }
+}
 
 function HideElementById(ele){
 	document.getElementById(ele).style.display='none';
@@ -263,10 +266,6 @@ function CheckType(){
 		document.BillingCreateBillingForm.mva_claim_code.options[0].selected = true;
 	}
          toggleWCB();
-
-
-
-
 }
 
 function callReplacementWebService(url,id){
@@ -350,8 +349,6 @@ function checkFACILITY(){
 		HideElementById('FACILITY');
 	}
 }
-
-
 
 
 function quickPickDiagnostic(diagnos){
@@ -447,11 +444,7 @@ function ScriptAttach() {
   t2 = escape(document.BillingCreateBillingForm.xml_diagnostic_detail3.value);
   awnd=rs('att','<rewrite:reWrite jspPage="billingDigNewSearch.jsp"/>?name='+t0 + '&name1=' + t1 + '&name2=' + t2 + '&search=',850,740,1);
   awnd.focus();
-
-
-
 }
-
 
 
 function OtherScriptAttach() {
@@ -578,18 +571,31 @@ function addCodeToList(svcCode){
 }
 
 function setCodeToChecked(svcCode){
-    myform = document.forms[0];
+    var myform = document.forms[0];
+    var service = myform.service;
     var codeset = false;
-    for (var i = 0; i < myform.service.length; i++) {
-        if (myform.service[i].value == svcCode) {
-            var wasAbleToAddCode = addCodeToList(svcCode);
-            if(wasAbleToAddCode){
-               myform.service[i].checked = true;
-               codeset = true;
+    
+    if(service.length) {
+        for (var i = 0; i < service.length; i++) {
+            if (service[i].value == svcCode) {
+                var wasAbleToAddCode = addCodeToList(svcCode);
+                if(wasAbleToAddCode){
+                   service[i].checked = true;
+                   codeset = true;
+                }
+                return;
             }
-            return;
         }
     }
+    else if (service.value == svcCode) {
+        var wasAbleToAddCode = addCodeToList(svcCode);
+        if(wasAbleToAddCode) {
+           service.checked = true;
+           codeset = true;
+        }
+        return;
+    }
+
     
     if(codeEntered(svcCode) == false){
         if (myform.xml_other1.value == "") {
@@ -604,9 +610,6 @@ function setCodeToChecked(svcCode){
             //myform.xml_diagnostic_detail3.value = "";
         }
     }
-    
-    
-    
 }
 
 
@@ -1096,7 +1099,7 @@ if(wcbneeds != null){%>
                 </tr>
               <%for (int i = 0; i < billlist1.length; i++) {              %>
                 <tr bgcolor>
-                <%String svcCall = "addSvcCode('" + billlist1[i].getServiceCode() + "')";                %>
+                <%String svcCall = "addSvcCode(this, '" + billlist1[i].getServiceCode() + "')";                %>
                   <td width="25%" height="14">
                     <b>                    </b>
                     <font face="Verdana, Arial, Helvetica, sans-serif">
@@ -1202,7 +1205,7 @@ if(wcbneeds != null){%>
                 </tr>
               <%for (int i = 0; i < billlist2.length; i++) {              %>
                 <tr bgcolor>
-                <%String svcCall = "addSvcCode('" + billlist2[i].getServiceCode() + "')";                %>
+                <%String svcCall = "addSvcCode(this, '" + billlist2[i].getServiceCode() + "')";                %>
                   <td width="21%" height="14">  d
                       <html:multibox property="service" value="<%=billlist2[i].getServiceCode()%>" onclick="<%=svcCall%>"/>
                       <%=billlist2[i].getServiceCode()%>
@@ -1291,7 +1294,7 @@ if(wcbneeds != null){%>
                 </tr>
               <%for (int i = 0; i < billlist3.length; i++) {              %>
                 <tr bgcolor>
-                <%String svcCall = "addSvcCode('" + billlist3[i].getServiceCode() + "')";                %>
+                <%String svcCall = "addSvcCode(this, '" + billlist3[i].getServiceCode() + "')";                %>
                   <td width="25%" height="14">
                       <html:multibox property="service" value="<%=billlist3[i].getServiceCode()%>" onclick="<%=svcCall%>"/>
                       <%=billlist3[i].getServiceCode()%>
