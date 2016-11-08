@@ -34,7 +34,6 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
 
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
@@ -43,6 +42,7 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import oscar.util.UtilDateUtilities;
 
 public class IHAHandler implements MessageHandler {
     
@@ -1190,6 +1190,26 @@ public class IHAHandler implements MessageHandler {
 	
     public String getNteForPID() {
 	    return "";
+    }
+    
+    public boolean isUnstructured() {
+    	
+    	logger.info("OBX HEADERS READ: " + getHeaders());
+    	
+		boolean result=true;
+		for(int j = 0; j<this.getOBRCount();j++) {
+			for(int k=0;k<this.getOBXCount(j);k++) {
+				//logger.info("OBX VALUE READ: " + getOBXValueType(j, k));
+				logger.info("ABN VALUE READ: " + isOBXAbnormal(j,k));
+				/*if(!"TX".equals(getOBXValueType(j, k))) {
+					result=false;
+				}*/
+				if(isOBXAbnormal(j,k)) {
+					result = false;
+				}
+			}
+		}
+		return result;
     }
     
 }

@@ -70,6 +70,7 @@ import com.lowagie.text.rtf.RtfWriter2;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.CLSHandler;
 import oscar.oscarLab.ca.all.parsers.Factory;
+import oscar.oscarLab.ca.all.parsers.IHAHandler;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 import oscar.util.UtilDateUtilities;
@@ -215,11 +216,11 @@ public class LabPDFCreator extends PdfPageEventHelper{
         cell.setBorder(15);
         cell.setBackgroundColor(new Color(210, 212, 255));
 		if(handler.getMsgType().equals("CLS")){
-		cell.setPhrase(new Phrase("Legend:  A=Abnormal  L=Low  H=High  C=Critical", boldFont));
+			cell.setPhrase(new Phrase("Legend:  A=Abnormal  L=Low  H=High  C=Critical", boldFont));
 		}
 		else
 		{
-		cell.setPhrase(new Phrase("END OF REPORT", boldFont));
+			cell.setPhrase(new Phrase("END OF REPORT", boldFont));
 		}
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -228,11 +229,12 @@ public class LabPDFCreator extends PdfPageEventHelper{
 
         document.close();
 
-		byte[] pdf;
         try {
-			pdf = stamp(temp_os.toByteArray());
+        	byte[] pdf = stamp(temp_os.toByteArray());
 			os.write(pdf);
-		} catch (Exception e) {
+		}
+        catch (Exception e) {
+        	logger.error("Error Writing lab pdf", e);
 		}
         os.flush();
 		temp_os.close();
@@ -280,36 +282,35 @@ public class LabPDFCreator extends PdfPageEventHelper{
 
 	private void addLabCategory(String header) throws DocumentException 
 	{
-		if(handler.getMsgType().equals("PATHL7"))
-		{
+		if (handler.getMsgType().equals("PATHL7")) {
 			this.isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(header);
-		} else if(handler.getMsgType().equals("CLS"))
-		{
+		}
+		else if (handler.getMsgType().equals("IHA")) {
+			this.isUnstructuredDoc = ((IHAHandler) handler).isUnstructured();
+		}
+		else if (handler.getMsgType().equals("CLS")) {
 			this.isUnstructuredDoc = ((CLSHandler) handler).isUnstructured();
 		}
+		logger.info("Creating PDF for lab of type " + handler.getMsgType() + "; unstructured=" + this.isUnstructuredDoc);
 
 		float[] mainTableWidths;
-		if(isUnstructuredDoc)
-		{
-			if(handler.getMsgType().equals("CLS"))
-			{
-				mainTableWidths = new float[] { 5f, 10f, 3f, 2f};
-			} else
-			{
-				mainTableWidths = new float[] { 5f, 12f, 3f};
+		if (isUnstructuredDoc) {
+			if (handler.getMsgType().equals("CLS")) {
+				mainTableWidths = new float[]{5f, 10f, 3f, 2f};
 			}
-		} else
-		{
-			mainTableWidths = new float[] {5f, 3f, 1f, 3f, 2f, 4f, 2f };
+			else {
+				mainTableWidths = new float[]{5f, 12f, 3f};
+			}
+		}
+		else {
+			mainTableWidths = new float[]{5f, 3f, 1f, 3f, 2f, 4f, 2f};
 		}
 
 		PdfPTable table = new PdfPTable(mainTableWidths);
-		if(isUnstructuredDoc)
-		{
+		if (isUnstructuredDoc) {
 			table.setHeaderRows(1);
 		}
-		else
-		{
+		else {
 			table.setHeaderRows(3);
 		}
 		table.setWidthPercentage(100);
