@@ -54,14 +54,14 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 <link href="../css/loading-bar.css" rel="stylesheet">
 
 
-<!-- we'll combine/minify later -->
+<!-- we will combine/minify later -->
 <link href="css/navbar-fixed-top.css" rel="stylesheet">
 <link href="css/navbar-demo-search.css" rel="stylesheet">
 <link href="css/patient-list.css" rel="stylesheet">
 
 <link href="../library/ng-table/ng-table.css" rel="stylesheet">
 
-<link href="../library/bootstrap-datepicker/css/datepicker3.css" rel="stylesheet">
+<link href="../library/bootstrap2-datepicker/datepicker3.css" rel="stylesheet">
 
 <link href="../css/bootstrap-timepicker.min.css" rel="stylesheet">
 
@@ -392,6 +392,7 @@ font-size:20px
 					<ul class="dropdown-menu" role="menu">
 						<li ng-repeat="item in userMenuItems">
 							<a ng-click="transition(item)" ng-class="{'more-tab-highlight': isActive(item) }" class="hand-hover" >{{item.label}}</a>
+							<a ng-if="item.url" href="{{item.url}}" target="_blank">{{dropdownItem.label}}</a>
 						</li>
 				  	</ul>
 				  	

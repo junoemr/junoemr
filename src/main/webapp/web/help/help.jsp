@@ -30,6 +30,10 @@ Thank you for using OSCAR. The following resources have been assembled to help y
 </p>
 
 <p>
+Oscarhost help site <a target="_blank" href="https://help.oscarhost.ca">here</a>.
+</p>
+
+<p>
 Official project page on SourceForge <a target="_blank" href="http://sourceforge.net/projects/oscarmcmaster/">here</a>.
 </p>
 

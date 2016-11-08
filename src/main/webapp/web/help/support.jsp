@@ -45,5 +45,5 @@
 <address>
   <strong>{{ospInfo.contact}}</strong><br>
   <a href="mailto:{{ospInfo.email}}">{{ospInfo.email}}</a><br/>
-   <a href={{ospInfo.url}}">{{ospInfo.url}}</a>
+   <a href="{{ospInfo.url}}">{{ospInfo.url}}</a>
 </address>

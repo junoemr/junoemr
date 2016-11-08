@@ -24,9 +24,11 @@
 
 --%>
 
-<%@page import="java.util.HashMap, oscar.log.*"
+<%@page import="java.util.HashMap, oscar.log.*,oscar.OscarProperties,java.net.*, javax.xml.parsers.*,org.w3c.dom.*,org.oscarehr.util.MiscUtils"
 	errorPage="errorpage.jsp"%>
 <%
+  OscarProperties props = OscarProperties.getInstance();
+
   if(oscar.oscarSecurity.CRHelper.isCRFrameworkEnabled()) net.sf.cookierevolver.CRFactory.getManager().recordLogout(request);
   if(session != null) {
     Object user = session.getAttribute("user");
@@ -42,5 +44,45 @@
   if(request.getParameter("login")!=null ) {
 	  param = "?login="+request.getParameter("login") ;
   }
-  response.sendRedirect("index.jsp"+param);
+  //response.sendRedirect("index.jsp"+param);
+  String oscarhost_login = props.getProperty("oscarhost_login");
+  String instance_id = "";
+  Boolean remote_oscar_login = false;
+  if(oscarhost_login != null){
+    String non_secure_oscarhost_login = oscarhost_login.replace("https", "http");
+    String splitted_string[] = oscarhost_login.split("/");
+    instance_id = splitted_string[splitted_string.length-1];
+        
+    try{
+        HttpURLConnection.setFollowRedirects(false);
+        HttpURLConnection con = (HttpURLConnection) new URL(non_secure_oscarhost_login).openConnection();
+        con.setRequestMethod("HEAD");
+
+        if(con.getResponseCode() != HttpURLConnection.HTTP_UNAVAILABLE &&
+            con.getResponseCode() != HttpURLConnection.HTTP_UNAUTHORIZED &&
+            con.getResponseCode() != HttpURLConnection.HTTP_PROXY_AUTH &&
+            con.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND &&
+            con.getResponseCode() != HttpURLConnection.HTTP_INTERNAL_ERROR &&
+            con.getResponseCode() != HttpURLConnection.HTTP_GONE &&
+            con.getResponseCode() != HttpURLConnection.HTTP_GATEWAY_TIMEOUT &&
+            con.getResponseCode() != HttpURLConnection.HTTP_FORBIDDEN &&
+            con.getResponseCode() != HttpURLConnection.HTTP_BAD_REQUEST &&
+            con.getResponseCode() != HttpURLConnection.HTTP_BAD_GATEWAY ){
+
+            remote_oscar_login = true;
+
+        }
+    }catch(Exception e){
+        MiscUtils.getLogger().info("Exception "+e);
+    }
+  }
+  if(remote_oscar_login){
+    response.sendRedirect(oscarhost_login+param);
+  }else if(oscarhost_login != null){
+    MiscUtils.getLogger().info("can't load page");
+    param += (param.length() == 0)? "?instance_id="+instance_id : "&instance_id="+instance_id;
+    response.sendRedirect("oscarhost_login.jsp"+param);
+  }else{
+    response.sendRedirect("index.jsp"+param);
+  }
 %>

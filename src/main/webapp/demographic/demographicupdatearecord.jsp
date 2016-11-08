@@ -247,7 +247,11 @@
 		for( ConsentType consentType : consentTypes ) {
 			consentTypeId = request.getParameter( consentType.getType() );
 			String patientConsentId = request.getParameter( consentType.getType() + "_id" );
-			patientConsentIdInt = Integer.parseInt( patientConsentId );
+			if(patientConsentId != null)
+			{
+				patientConsentIdInt = Integer.parseInt( patientConsentId );
+			}
+
 			
 			// checked box means add or edit consent. 
 			if( consentTypeId != null ) {		

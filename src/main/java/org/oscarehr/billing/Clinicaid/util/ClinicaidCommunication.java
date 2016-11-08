@@ -41,6 +41,7 @@ import java.util.regex.Matcher;
 
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.util.LoggedInInfo;
 
 import oscar.util.UtilMisc;
@@ -215,9 +216,9 @@ public class ClinicaidCommunication {
 			String encoded_last_name =
 				this.urlEncode(UtilMisc.toUpperLowerCase(demo.getLastName()));
 			String encoded_province =
-				this.urlEncode(demo.getProvince().toUpperCase());
+				this.urlEncode(StringUtils.upperCase(demo.getProvince()));
 			String encoded_hc_province =
-				this.urlEncode(demo.getHcType().toUpperCase());
+				this.urlEncode(StringUtils.upperCase(demo.getHcType()));
 			String encoded_city = this.urlEncode(demo.getCity());
 			String encoded_address = this.urlEncode(demo.getAddress());
 			String encoded_postal_code = this.urlEncode(demo.getPostal());
@@ -225,6 +226,7 @@ public class ClinicaidCommunication {
 				this.urlEncode(service_recipient_oscar_number);
 			String encoded_status = this.urlEncode(demo.getPatientStatus());
 			String encoded_hin = this.urlEncode(demo.getHin());
+			String ver = this.urlEncode(demo.getVer());
 			String encoded_age = this.urlEncode(demo.getAge());
 			String encoded_referral_number = this.urlEncode(referral_no);
 			String encoded_referral_first_name =
@@ -241,6 +243,7 @@ public class ClinicaidCommunication {
 				clinicaid_domain + "/?nonce=" + nonce +
 				"#/invoice/add?service_recipient_first_name=" + encoded_first_name +
 				"&service_recipient_uli=" + encoded_hin +
+				"&service_recipient_ver=" + ver +
 				"&service_recipient_last_name=" + encoded_last_name +
 				"&service_recipient_oscar_number=" +
 				encoded_service_recipient_oscar_number +

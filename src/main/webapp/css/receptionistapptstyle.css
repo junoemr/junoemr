@@ -214,3 +214,7 @@ p {
 @media print {
  .noprint {display:none !important;}
 }
+
+#helpLink {
+	color: #A40000;
+}

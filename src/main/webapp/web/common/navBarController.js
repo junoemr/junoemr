@@ -55,7 +55,9 @@ oscarApp.controller('NavBarCtrl', function ($scope,$location,$modal, $state, sec
     });
     
     personaService.getDashboardMenu().then(function(response){
-    	$scope.dashboardMenu = response.menus.menu;  	
+		if(response.menus) {
+    		$scope.dashboardMenu = response.menus.menu;  	
+		}
     }),function(reason){
     	alert(reason);
     };
@@ -166,6 +168,18 @@ oscarApp.controller('NavBarCtrl', function ($scope,$location,$modal, $state, sec
 					
 				window.location = item.url + qs;
 				return false;
+			}else if(item.openNewWindow){
+				newwindow=window.open(item.url);
+				if (window.focus) {
+					newwindow.focus();
+				}
+
+			}else if(angular.isDefinded(item) && angular.isDefined(item.openNewWindow) && item.openNewWindow){
+				 newwindow=window.open(url);
+				 if (window.focus) {
+					 newwindow.focus();
+				 }
+
 			}else{
 				window.location = item.url;
 			}

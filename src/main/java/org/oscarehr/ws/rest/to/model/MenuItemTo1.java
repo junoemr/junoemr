@@ -38,6 +38,7 @@ public class MenuItemTo1 implements Serializable {
     private String extra;
     private String url;
     private String state;
+    private boolean openNewWindow = false;
     private List<MenuItemTo1> dropdownItems;
     private Boolean dropdown = false;
     
@@ -88,6 +89,16 @@ public class MenuItemTo1 implements Serializable {
 
 	public void setState(String state) {
 		this.state = state;
+	}
+
+	public boolean getOpenNewWindow()
+	{
+		return this.openNewWindow;
+	}
+
+	public void setOpenNewWindow(boolean openNewWindow)
+	{
+		this.openNewWindow = openNewWindow;
 	}
 
 	public static MenuItemTo1 generateStateMenuItem(Integer id,String label, String state){

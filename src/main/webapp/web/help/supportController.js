@@ -1,5 +1,5 @@
 oscarApp.controller('SupportCtrl', function ($scope,$http) {
 
-	$scope.ospInfo= {name:'FriendlyOSP',phone:'905-555-5555',contact:'John Supportive',email:'john@support.osp.org',url:'http://oscar-emr.org'};
-	$scope.buildInfo = {versionDisplayName:'14-Alpha', version:'master-0000'};
+	$scope.ospInfo= {name:'OscarHost.ca',phone:'250-900-7373',contact:'Oscarhost Support',email:'support@oscarhost.ca',url:'https://help.oscarhost.ca'};
+	$scope.buildInfo = {versionDisplayName:'15-Beta', version:'master-0000'};
 });
