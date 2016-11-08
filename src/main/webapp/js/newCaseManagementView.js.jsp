@@ -154,62 +154,7 @@
                          measurementWindows[idx].parentChanged = true;
                  }
             
-            //check to see if we need to save
-            var noteNotNull = false;
-            var notesChanged = false;
-            var datesChanged = false;
-            
-            if($(caseNote) != null) {
-            	noteNotNull = true;
-            }
-            
-            if (origCaseNote != $(caseNote).value) {
-            	notesChanged = true;
-            }
-            if (origObservationDate != $("observationDate").value) {
-            	datesChanged = true;
-            }
-            	
-            var nId = document.forms['caseManagementEntryForm'].noteId.value;
-				
-            clearAutoSaveTimer();
-            
-            if ((noteNotNull && notesChanged) || (parseInt(nId) !=0 && datesChanged)) {
-                
-                //autoSave(false);
-                document.forms['caseManagementEntryForm'].sign.value='persist';
-                document.forms["caseManagementEntryForm"].method.value = "saveAndExit";
-                document.forms["caseManagementEntryForm"].ajax.value = false;
-                document.forms["caseManagementEntryForm"].chain.value = "";
-                document.forms["caseManagementEntryForm"].includeIssue.value = "off";
-
-                var frm = document.forms["caseManagementEntryForm"];
-                var url = ctx + "/CaseManagementEntry.do";
-                var objAjax = new Ajax.Request (
-                    url,
-                    {
-                        method: 'post',
-                        postBody: Form.serialize(frm),
-                        asynchronous: false,
-                        onComplete: function(request) {                            
-                            okToClose = true;
-                        },
-                        onFailure: function(request) {
-                            if( request.status == 403 )
-                                alert(sessionExpiredError);
-                            else
-                                alert(request.status + " " + savingNoteError);
-                        }
-                     }
-                   );
-
-                   while(1) {
-                        if( okToClose == true ) {
-                            break;
-                        }
-                   }
-            } //end if save needed
-			else if( needToReleaseLock ) {								
+                if( needToReleaseLock ) {								
 				//release lock on note
 				var url = ctx + "/CaseManagementEntry.do";
 				var nId = document.forms['caseManagementEntryForm'].noteId.value;
@@ -222,8 +167,8 @@
 						asynchronous: false						
 					}
 				);				
-			}
-        }
+                }
+            }
 
         var numMenus = 3;
         function showMenu(menuNumber, eventObj) {
@@ -709,6 +654,33 @@ function navBarLoader() {
 
 }
 
+function showIntegratedNote(title, note, location, providerName, obsDate){
+	$("integratedNoteTitle").innerHTML = title;
+	$("integratedNoteDetails").innerHTML = "Integrated Facility:" + location + " by " + providerName + " on " + obsDate;
+	
+	$("integratedNoteTxt").value = note;
+	
+	var coords = null;
+    if(document.getElementById("measurements_div") == null) {
+    	coords = Position.page($("topContent"));
+    } else {
+   		coords = Position.positionedOffset($("cppBoxes"));
+    }
+
+    var top = Math.max(coords[1], 0);
+    var right = Math.round(coords[0]/0.66);
+
+	$("showIntegratedNote").style.right = right + "px";
+    $("showIntegratedNote").style.top = top + "px";
+    
+    $("channel").style.visibility = "hidden";
+    $("showEditNote").style.display = "none";
+    
+	$("showIntegratedNote").style.display = "block";
+	
+	$("integratedNoteTxt").focus();
+}
+
 //display in place editor
 function showEdit(e,title, noteId, editors, date, revision, note, url, containerDiv, reloadUrl, noteIssues, noteExts, demoNo) {
     //Event.extend(e);
@@ -784,6 +756,7 @@ function showEdit(e,title, noteId, editors, date, revision, note, url, container
 
     $(editElem).style.right = right + "px";
     $(editElem).style.top = top + "px";
+    $("showIntegratedNote").style.display = "none";
     if( Prototype.Browser.IE ) {
         //IE6 bug of showing select box
         $("channel").style.visibility = "hidden";
@@ -3118,9 +3091,9 @@ function autoSave(async) {
 
 function backup() {
 	
-    //if(origCaseNote != $(caseNote).value || origObservationDate != $("observationDate").value) {
+    if(origCaseNote != $(caseNote).value || origObservationDate != $("observationDate").value) {
         autoSave(true);        
-    //}
+    }
 
 	if( !lostNoteLock ) {
     	setTimer();
@@ -3129,7 +3102,7 @@ function backup() {
 
 var autoSaveTimer;
 function setTimer() {
-    autoSaveTimer = setTimeout("backup()", 30000);
+    autoSaveTimer = setTimeout("backup()", 5000);
 }
 
 function clearAutoSaveTimer() {

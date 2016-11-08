@@ -597,6 +597,49 @@
 	</global-forwards>
 
 	<action-mappings>
+		<!-- OMD Dashboard Proof of Concept -->
+		<action input="/web/dashboard/admin/DashboardManager.jsp" name="FrmForm" path="/web/dashboard/admin/DashboardManager" 
+			parameter="method" type="org.oscarehr.dashboard.admin.ManageDashboardAction" scope="request" >
+			<forward name="success" path="/web/dashboard/admin/DashboardManager.jsp" />
+			<forward name="unauthorized" path="/securityError.jsp" />
+			<forward name="error" path="/failure.jsp" />
+			<forward name="ajax" path="/web/dashboard/admin/DashboardManager.do" />
+		</action>
+		
+		<action name="FrmForm" path="/web/dashboard/display/DashboardDisplay" 
+			parameter="method" type="org.oscarehr.dashboard.display.DisplayDashboardAction" scope="request" >
+			<forward name="success" path="/web/dashboard/display/DashboardDisplay.jsp" />
+			<forward name="unauthorized" path="/securityError.jsp" />
+			<forward name="error" path="/failure.jsp" />
+		</action>
+		
+		<action name="FrmForm" path="/web/dashboard/display/DrilldownDisplay" 
+			parameter="method" type="org.oscarehr.dashboard.display.DisplayDrilldownAction" scope="request" >
+			<forward name="success" path="/web/dashboard/display/DrilldownDisplay.jsp" />
+			<forward name="unauthorized" path="/securityError.jsp" />
+			<forward name="error" path="/failure.jsp" />
+		</action>
+		
+		<action name="FrmForm" path="/web/dashboard/display/AssignTickler" 
+			parameter="method" type="org.oscarehr.dashboard.admin.AssignTicklerAction" scope="request" >
+			<forward name="success" path="/web/dashboard/display/AssignTickler.jsp" />
+			<forward name="unauthorized" path="/securityError.jsp" />
+			<forward name="error" path="/failure.jsp" />
+		</action>
+		
+		<action name="FrmForm" path="/web/dashboard/display/ExportResults" 
+			parameter="method" type="org.oscarehr.dashboard.admin.ExportResultsAction" scope="request" >
+			<forward name="unauthorized" path="/securityError.jsp" />
+			<forward name="error" path="/failure.jsp" />
+		</action>
+		
+		<action name="FrmForm" path="/web/dashboard/display/DisplayIndicator" 
+			parameter="method" type="org.oscarehr.dashboard.display.DisplayIndicatorAction" scope="request" >
+			<forward name="success" path="/web/dashboard/display/IndicatorPanel.jsp" />
+			<forward name="unauthorized" path="/securityError.jsp" />
+			<forward name="error" path="/failure.jsp" />
+		</action>
+	
 		<!-- Pharma Best Possible Medication Health form -->
 	 	<action path="/formBPMH" parameter="method" name="bpmh" type="oscar.form.pharmaForms.formBPMH.web.BpmhFormRetrieve"	
 	 		scope="request" validate="false" > 
@@ -2626,7 +2669,8 @@
 			scope="request" validate="false" parameter="method" />
                         
                 <action path="/BillingInvoice" scope="request" type="org.oscarehr.common.web.BillingInvoiceAction" parameter="method">
-			<forward name="success" path="/close.html" />		
+			<forward name="success" path="/billing/CA/ON/billingONCorrection.jsp" />
+                       <forward name="listSuccess" path="/billing/CA/ON/billingONStatus.jsp" />
 		</action>        
 
             <action path="/BillingONReview" scope="request" type="org.oscarehr.common.web.BillingONReviewAction" parameter="method" />

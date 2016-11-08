@@ -160,13 +160,16 @@ public class EctConsultationFormRequestAction extends Action {
 								if (frm.getAppointmentDate() != null && !frm.getAppointmentDate().equals("")) {
 									date = DateUtils.parseDate(frm.getAppointmentDate(), format);
 									consult.setAppointmentDate(date);
-									try {
-										date = DateUtils.setHours(date, new Integer(appointmentHour));
-										date = DateUtils.setMinutes(date, new Integer(frm.getAppointmentMinute()));
-										consult.setAppointmentTime(date);
-									}
-									catch(NumberFormatException nfEx) {
-						                MiscUtils.getLogger().error("Invalid Time", nfEx);
+									
+									if(!StringUtils.isEmpty(appointmentHour) && !StringUtils.isEmpty(frm.getAppointmentMinute())) {
+										try {
+											date = DateUtils.setHours(date, new Integer(appointmentHour));
+											date = DateUtils.setMinutes(date, new Integer(frm.getAppointmentMinute()));
+											consult.setAppointmentTime(date);
+										}
+										catch(NumberFormatException nfEx) {
+							                MiscUtils.getLogger().error("Invalid Time", nfEx);
+										}
 									}
 								}
                                 consult.setReasonForReferral(frm.getReasonForConsultation());
@@ -268,10 +271,22 @@ public class EctConsultationFormRequestAction extends Action {
         		consult.setLetterheadAddress(frm.getLetterheadAddress());
         		consult.setLetterheadPhone(frm.getLetterheadPhone());
         		consult.setLetterheadFax(frm.getLetterheadFax());
-                
-                Integer specId = new Integer(frm.getSpecialist());
-                ProfessionalSpecialist professionalSpecialist=professionalSpecialistDao.find(specId);
+
+                /*
+                 * If Consultant: was changed to "blank/No Consultant Saved" we
+                 * don't want to try and create an Integer out of the specId as
+                 * it will throw a NumberForamtException
+                */
+                String specIdStr = frm.getSpecialist();
+                ProfessionalSpecialist professionalSpecialist=null;
+
+                if (specIdStr != null && !specIdStr.isEmpty())
+                {
+                    Integer specId = new Integer(frm.getSpecialist());
+                    professionalSpecialist=professionalSpecialistDao.find(specId);
+                }
                 consult.setProfessionalSpecialist(professionalSpecialist);
+
                 if( frm.getAppointmentDate() != null && !frm.getAppointmentDate().equals("") ) {
                 	date = DateUtils.parseDate(frm.getAppointmentDate(), format);
                 	consult.setAppointmentDate(date);

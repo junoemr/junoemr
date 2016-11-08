@@ -1460,8 +1460,13 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		logger.debug("UPDATING NOTE ID in LOCK");
 		casemgmtNoteLockDao.merge(casemgmtNoteLockSession);
 		session.setAttribute("casemgmtNoteLock" + demo, casemgmtNoteLockSession);
-
-		session.removeAttribute(attrib_name);
+                session.removeAttribute(attrib_name);		
+                
+                try {
+			this.caseManagementMgr.deleteTmpSave(providerNo, note.getDemographic_no(), note.getProgram_no());
+		} catch (Exception e) {
+			logger.warn("Warning", e);
+		}
 
 		return note.getId();
 	}
@@ -1906,14 +1911,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			//nothing to do. lock was not found 
 		}
 
-		//We are exiting note so we have to make sure we clean up tmpSave
-		try {
-			CaseManagementEntryFormBean cform = (CaseManagementEntryFormBean) session.getAttribute(sessionFrmName);
-			caseManagementMgr.deleteTmpSave(providerNo, demoNo, cform.getCaseNote().getProgram_no());
-		} catch (Exception e) {
-			logger.error("Could not remove tmpSave", e);
-		}
-
+		
 		return null;
 	}
 
@@ -1995,14 +1993,18 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
                     if( verifyStr != null && verifyStr.equalsIgnoreCase("on") ) {
                     
                         if( priorNote != null && !"null".equalsIgnoreCase(priorNote) && !"".equalsIgnoreCase(priorNote) ) {
-                            ResidentOscarMsg residentOscarMsg = residenOscarMsgDao.findByNoteId(Long.valueOf(priorNote));
+                            
+                            for( CaseManagementNote n : caseManagementNoteDao.getNotesByUUID(cform.getCaseNote().getUuid())) {
+                                
+                                ResidentOscarMsg residentOscarMsg = residenOscarMsgDao.findByNoteId(n.getId());
 
-                            if( residentOscarMsg != null ) {
+                                if( residentOscarMsg != null ) {
 
-                                residentOscarMsg.setComplete(Boolean.TRUE);
-                                residentOscarMsg.setComplete_time(new Date(System.currentTimeMillis()));
+                                    residentOscarMsg.setComplete(Boolean.TRUE);
+                                    residentOscarMsg.setComplete_time(new Date(System.currentTimeMillis()));
 
-                                residenOscarMsgDao.merge(residentOscarMsg);
+                                    residenOscarMsgDao.merge(residentOscarMsg);                                    
+                                }
                             }
                         }
                     }
