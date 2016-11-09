@@ -291,7 +291,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		else if (handler.getMsgType().equals("CLS")) {
 			this.isUnstructuredDoc = ((CLSHandler) handler).isUnstructured();
 		}
-		logger.info("Creating PDF for lab of type " + handler.getMsgType() + "; unstructured=" + this.isUnstructuredDoc);
+		logger.debug("Adding Category to PDF for lab of type " + handler.getMsgType() + "; unstructured=" + this.isUnstructuredDoc);
 
 		float[] mainTableWidths;
 		if (isUnstructuredDoc) {

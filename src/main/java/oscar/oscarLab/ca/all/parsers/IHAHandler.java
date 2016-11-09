@@ -1194,18 +1194,11 @@ public class IHAHandler implements MessageHandler {
     
     public boolean isUnstructured() {
     	
-    	logger.info("OBX HEADERS READ: " + getHeaders());
-    	
 		boolean result=true;
 		for(int j = 0; j<this.getOBRCount();j++) {
 			for(int k=0;k<this.getOBXCount(j);k++) {
-				//logger.info("OBX VALUE READ: " + getOBXValueType(j, k));
-				logger.info("ABN VALUE READ: " + isOBXAbnormal(j,k));
-				/*if(!"TX".equals(getOBXValueType(j, k))) {
+				if(!"NAR".equals(getOBXValueType(j, k))) {
 					result=false;
-				}*/
-				if(isOBXAbnormal(j,k)) {
-					result = false;
 				}
 			}
 		}
