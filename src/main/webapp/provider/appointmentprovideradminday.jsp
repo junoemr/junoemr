@@ -2244,6 +2244,7 @@ document.onkeydown=function(e){
 <% if (OscarProperties.getInstance().getBooleanProperty("indivica_hc_read_enabled", "true")) { %>
 <%@include file="/hcHandler/hcHandler.html" %>
 <% } %>
+
 </html:html>
 
 <%!public boolean checkRestriction(List<MyGroupAccessRestriction> restrictions, String name) {
@@ -2252,5 +2253,12 @@ document.onkeydown=function(e){
                                 return true;
                 }
                 return false;
-        }%>
-
+        }
+%>
+<script src="../js/boomerang.js"></script>
+<script src="../js/rt.js"></script>
+<script type ="text/javascript">
+   BOOMR.init({
+        beacon_url: "<%=request.getScheme() + "://" + request.getServerName() + request.getContextPath()%>/oscarhost_pageLoadTimer.html"
+   });
+</script>

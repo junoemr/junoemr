@@ -93,3 +93,10 @@
 	<div id="notCPP" style="height: 70%; margin-left: 2px; background-color: #FFFFFF;">	
  	
 	</div>
+<script src="../js/boomerang.js"></script>
+<script src="../js/rt.js"></script>
+<script type ="text/javascript">
+   BOOMR.init({
+        beacon_url: "<%=request.getScheme() + "://" + request.getServerName() + request.getContextPath()%>/oscarhost_pageLoadTimer.html"
+   });
+</script>
