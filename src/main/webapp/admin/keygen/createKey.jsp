@@ -184,6 +184,7 @@ if (message != null){
 					<option value="PATHL7"
 					<oscar:oscarPropertiesCheck property="PATHNET_LABS" value="yes">Selected</oscar:oscarPropertiesCheck>>EXCELLERIS</option>
 					<option value="GDML">GDML</option>
+					<option value="GDMLQC">GDML-QC</option>
 					<option value="HHSEMR">HHSEMR</option>
 					<option value="HRMXML">HRM XML</option>
 					<option value="ICL">ICL</option>

@@ -61,9 +61,15 @@ public final class Factory {
 	 * Find the lab corresponding to segmentID and return the appropriate MessageHandler for it
 	 */
 	public static MessageHandler getHandler(String segmentID) {
+		return getHandler(Integer.parseInt(segmentID));
+	}
+	/**
+	 * Find the lab corresponding to segmentID and return the appropriate MessageHandler for it
+	 */
+	public static MessageHandler getHandler(int segmentID) {
 		try {
 			Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
-			Hl7TextMessage hl7TextMessage = hl7TextMessageDao.find(Integer.parseInt(segmentID));
+			Hl7TextMessage hl7TextMessage = hl7TextMessageDao.find(segmentID);
 
 			String type = hl7TextMessage.getType();
 			String hl7Body = MiscUtils.decodeBase64StoString(hl7TextMessage.getBase64EncodedeMessage());
@@ -115,7 +121,7 @@ public final class Factory {
 			doc = parser.build(is);
 
 			Element root = doc.getRootElement();
-			List items = root.getChildren();
+			List<?> items = root.getChildren();
 			for (int i = 0; i < items.size(); i++) {
 				Element e = (Element) items.get(i);
 				msgType = e.getAttributeValue("name");
@@ -130,7 +136,7 @@ public final class Factory {
 				return (mh);
 			} else {
 				try {
-					Class classRef = Class.forName(msgHandler);
+					Class<?> classRef = Class.forName(msgHandler);
 					MessageHandler mh = (MessageHandler) classRef.newInstance();
 					logger.info("Message handler '" + msgHandler + "' created successfully");
 					logger.debug("Message: " + hl7Body);

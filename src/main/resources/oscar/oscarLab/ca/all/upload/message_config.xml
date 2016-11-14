@@ -5,6 +5,7 @@
 	<handler name="CLS" className="CLSHandler" />
 	<handler name="CML" className="CMLHandler" />
 	<handler name="GDML" className="GDMLHandler" />
+	<handler name="GDMLQC" className="GDMLQCHandler" />
 	<handler name="ICL" className="ICLHandler" />
 	<handler name="MDS" className="MDSHandler" />
 	<handler name="OLIS_HL7" className="OLISHL7Handler" />   
