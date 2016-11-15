@@ -63,8 +63,7 @@ public class MsgDemoMap {
         //if the combination of both msgId and demographic_no value exsit in the table, new data will not be added
         try{            
             
-            String sql = "";                   
-            sql = "insert into msgDemoMap values ('"+msgId+"','"+demographic_no+"')";
+        	String sql = "insert into msgDemoMap (messageID, demographic_no) values ('"+msgId+"','"+demographic_no+"')";
             MiscUtils.getLogger().debug(sql);
             DBHandler.RunSQL(sql);
         }
