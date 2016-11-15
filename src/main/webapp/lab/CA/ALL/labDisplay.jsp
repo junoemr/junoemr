@@ -1462,7 +1462,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
 	      	                                   </tr>
                                    	 	<%}
-	                                    	if (!handler.getNteForOBX(j,k).equals("") && handler.getNteForOBX(j,k)!=null) { %>
+	                                    	if (handler.getNteForOBX(j,k) != null && !handler.getNteForOBX(j,k).equals("")) { %>
 		                                       <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
 		                                       		<td valign="top" align="left"colspan="8"><pre  style="margin:0px 0px 0px 100px;"><%=handler.getNteForOBX(j,k)%></pre></td>
 		                                       </tr>

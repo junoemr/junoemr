@@ -370,38 +370,31 @@ public class GDMLQCHandler  implements MessageHandler {
 	public int getOBXCommentCount(int i, int j) {
 		int count = 0;
 		try {
-			String comment = "";
-			OBX obxSeg = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX();
-			while (comment != null) {
-				count++;
-				comment = Terser.get(obxSeg, 7, count, 1, 1);
-				if (comment == null) comment = Terser.get(obxSeg, 7, count, 2, 1);
-			}
-			count--;
+			count = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTEReps();
 
-		}
-		catch (Exception e) {
-			logger.error("Exception retrieving obx comment count", e);
-			count = 0;
+			// a bug in getNTEReps() causes it to return 1 instead of 0 so we check to make
+			// sure there actually is a comment there
+			if (count == 1) {
+				String comment = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE().getComment(0).getValue();
+				if (comment == null) count = 0;
+			}
+
+		} catch (Exception e) {
+			logger.error("Error retrieving obx comment count", e);
 		}
 		return count;
 	}
 
-    public String getOBXComment(int i, int j, int k){
-        String comment = "";
-        try{
-            k++;
-
-            OBX obxSeg = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX();
-            comment = Terser.get(obxSeg,7,k,1,1);
-            if (comment == null)
-                comment = Terser.get(obxSeg,7,k,2,1);
-
-        }catch(Exception e){
-            logger.error("Cannot return comment", e);
-        }
-        return getString(comment);
-    }
+	@Override
+	public String getOBXComment(int i, int j, int k) {
+		try {
+			return (getString(
+					msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k).getComment(0).getValue()));
+		}
+		catch (Exception e) {
+			return ("");
+		}
+	}
 
 
     /**
@@ -713,8 +706,9 @@ public class GDMLQCHandler  implements MessageHandler {
 
 	@Override
 	public String getNteForOBX(int i, int j) {
-
-		return "";
+		
+		String nteSeg = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE().getComment(0).getValue();
+		return nteSeg;
 	}
 	@Override
 	public String getNteForPID() {
