@@ -24,6 +24,7 @@
 package oscar.oscarLab.ca.all.parsers;
 
 import java.text.DateFormat;
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,9 +53,14 @@ public class GDMLQCHandler  implements MessageHandler {
 
 	@Override
 	public void init(String hl7Body) throws HL7Exception {
+		
+		/* Normalize string (replace French unicode characters etc.) */
+		String normalized = Normalizer.normalize(hl7Body, Normalizer.Form.NFD);
+		String resultString = normalized.replaceAll("[^\\x00-\\x7F]", "");
+		
 		Parser p = new PipeParser();
 		p.setValidationContext(new NoValidation());
-		msg = (ORU_R01) p.parse(hl7Body);
+		msg = (ORU_R01) p.parse(resultString);
 		terser = new Terser(msg);		
 	}
 
@@ -108,7 +114,7 @@ public class GDMLQCHandler  implements MessageHandler {
 	@Override
 	public String getOBRName(int i) {
 		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getUniversalServiceIdentifier().getText().getValue()));
+			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getUniversalServiceIdentifier().getAlternateIdentifier().getValue()));
 		} catch (Exception e) {
 			return ("");
 		}
@@ -185,7 +191,7 @@ public class GDMLQCHandler  implements MessageHandler {
             // is a comment, if the name is blank the obx segment will not be displayed
             OBX obxSeg =  msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX();
             if (!obxSeg.getValueType().getValue().equals("FT"))
-            	result = getString(obxSeg.getObservationIdentifier().getText().getValue());
+            	result = getString(obxSeg.getObservationIdentifier().getIdentifier().getValue());
 		} catch (Exception e) {
 			result = "";
 		}

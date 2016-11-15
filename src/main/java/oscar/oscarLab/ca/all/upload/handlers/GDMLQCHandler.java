@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarLab.ca.all.parsers.Factory;
@@ -48,9 +49,9 @@ public class GDMLQCHandler implements MessageHandler {
 			for (i = 0; i < messages.size(); i++) {
 
 				String msg = messages.get(i);
-				/*if(isDuplicate(msg)) {
+				if(isDuplicate(msg)) {
 					return ("success");
-				}*/
+				}
 				MessageUploader.routeReport(serviceName, "GDMLQC", msg, fileId);
 
 			}
@@ -87,5 +88,34 @@ public class GDMLQCHandler implements MessageHandler {
 				}
 			}
 		}		
+	}
+	private boolean isDuplicate(String msg) {
+		//OLIS requirements - need to see if this is a duplicate
+		oscar.oscarLab.ca.all.parsers.MessageHandler h = Factory.getHandler("GDMLQC", msg);
+		//if final		
+		if(h.getOrderStatus().equals("F")) {
+			String fullAcc = h.getAccessionNum();
+			String acc = h.getAccessionNum();
+			if(acc.indexOf("-")!=-1) {
+				acc = acc.substring(acc.indexOf("-")+1);
+			}
+			//do we have this?
+			List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(acc);
+			for(Hl7TextInfo dupResult:dupResults) {
+				if(dupResult.equals(fullAcc)) {
+					//if(h.getHealthNum().equals(dupResult.getHealthNumber())) {
+					OscarAuditLogger.getInstance().log("Lab", "Skip", "Duplicate lab skipped - accession " + fullAcc + "\n" + msg);
+					return true;
+					//}
+				}
+				if(dupResult.getAccessionNumber().length()>4 && dupResult.getAccessionNumber().substring(4).equals(acc)) {
+					//if(h.getHealthNum().equals(dupResult.getHealthNumber())) {
+					OscarAuditLogger.getInstance().log("Lab", "Skip", "Duplicate lab skipped - accession " + fullAcc + "\n" + msg);
+					return true;
+					//}
+				}
+			}		
+		}
+		return false;	
 	}
 }
