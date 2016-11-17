@@ -30,12 +30,12 @@ import javax.annotation.Resource;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import javax.servlet.http.HttpServletRequest;
-//import com.sun.net.httpserver.HttpExchange;
 
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.ws.transfer_objects.DemographicTransfer;
-//import org.oscarehr.util.MiscUtils;
+
+import oscar.oscarDemographic.data.DemographicRelationship;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -130,5 +130,71 @@ public class DemographicWs extends AbstractWs {
 		
 		demographicManager.addDemographic(demographic);
 		demographicManager.addDemographicExts(demographic, demographicTransfer);
+	}
+
+	public void addRelationship(Integer demographicId, Integer relationDemographicId, String relationship, boolean isSubstituteDecisionMaker, boolean isEmergencyContact, String notes, Integer creatorProviderId, Integer facilityId, boolean linkBothDirections)
+		throws Exception
+	{
+		if(demographicId == null)
+		{
+			throw new Exception("demographicId cannot be null.");
+		}
+
+		if(relationDemographicId == null)
+		{
+			throw new Exception("relationDemographicId cannot be null.");
+		}
+
+		if(relationship == null)
+		{
+			throw new Exception("relationship cannot be null.");
+		}
+
+		// Convert provider number to a string, default to 0.
+		String providerNo = "0";
+		if(creatorProviderId != null)
+		{
+			providerNo = creatorProviderId.toString();
+		}
+
+
+
+		// Make sure demographics exist
+		Demographic validatedDemographic = demographicManager.getDemographic(demographicId);
+
+		if(validatedDemographic == null)
+		{
+			throw new Exception("Demographic " + demographicId + " doesn't exist.");
+		}
+
+		Demographic validatedRelation = demographicManager.getDemographic(relationDemographicId);
+
+		if(validatedRelation == null)
+		{
+			throw new Exception("Relation Demographic " + relationDemographicId + " doesn't exist.");
+		}
+
+		// Make sure it's a valid relationship
+
+		if(!DemographicRelationship.isValidRelationship(relationship))
+		{
+			throw new Exception("Relationship " + relationship + " is not valid.");
+		}
+
+
+        DemographicRelationship demo = new DemographicRelationship();
+
+		if(linkBothDirections)
+		{
+			demo.addDemographicRelationships(demographicId.toString(), relationDemographicId.toString(), 
+				relationship, isSubstituteDecisionMaker, isEmergencyContact, notes, providerNo, 
+				facilityId);
+		}
+		else
+		{
+			demo.addDemographicRelationship(demographicId.toString(), relationDemographicId.toString(), 
+				relationship, isSubstituteDecisionMaker, isEmergencyContact, notes, providerNo, 
+				facilityId);
+		}
 	}
 }
