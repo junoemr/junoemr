@@ -134,6 +134,7 @@ window.opener.location.href = '<%=request.getContextPath()%>/administration/?sho
 	<%}%>
 
 		<input type="hidden" name="fid" id="fid" value="<%= curform.get("fid")%>">
+		<input type="hidden" name="formFileName" id="formFileName" value="<%= curform.get("formFileName")%>">
        
 		<% if ((request.getAttribute("success") == null) || (errors.size() != 0)) {%>
 			<!--error? -->

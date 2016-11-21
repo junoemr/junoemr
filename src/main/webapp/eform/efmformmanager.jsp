@@ -168,6 +168,14 @@ $(function ()  {
     ArrayList<HashMap<String, ? extends Object>> eForms = EFormUtil.listEForms(orderBy, EFormUtil.CURRENT);
   for (int i=0; i<eForms.size(); i++) {
 	  HashMap<String, ? extends Object> curForm = eForms.get(i);
+
+	  String roleType = (String)curForm.get("roleType");
+
+	  // Don't show roletype if it's null
+	  if(roleType == null)
+	  {
+	  	roleType = "";
+	  }
 %>
     <tr>
         <td><%if(curForm.get("formFileName") != null && curForm.get("formFileName").toString().length()!=0){%><i class="icon-file" title="<%=curForm.get("formFileName").toString()%>"></i><%}%></td>
@@ -177,7 +185,7 @@ $(function ()  {
         <td><%=curForm.get("formSubject")%> </td>
         <td align='center' ><%=curForm.get("formDate")%></td>
         <td align='center' ><%=curForm.get("formTime")%></td>
-        <td align='center' ><%=curForm.get("roleType")%></td>
+        <td align='center' ><%=roleType%></td>
         <td align='center'>
                     
                 

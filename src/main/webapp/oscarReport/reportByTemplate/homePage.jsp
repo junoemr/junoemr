@@ -80,7 +80,7 @@ if(!authed) {
 		<a href="javascript:void(0)" onclick="newWindow('<%=request.getContextPath()%>/oscarReport/reportByTemplate/k2aTemplates.jsp','templates')" title="<bean:message key='oscarReport.oscarReportByTemplate.msgK2ATemplate' />"><bean:message key="oscarReport.oscarReportByTemplate.msgDownloadFromK2A" /></a>
 		<jsp:include
 			page="listTemplates.jsp">
-			<jsp:param name="templateviewid" value="" />
+			<jsp:param name="templateviewid" value="0" />
 		</jsp:include></td>
 		<td class="MainTableRightColumn" valign="top">
 		<%ArrayList templates = (new ReportManager()).getReportTemplatesNoParam();

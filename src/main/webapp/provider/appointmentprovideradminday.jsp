@@ -784,13 +784,16 @@ java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.stru
  <a href='providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&caseload=1&clProv=<%=curUser_no%>'><bean:message key="global.caseload"/></a>
  </li>
 
-<caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
- <security:oscarSec roleName="<%=roleName$%>" objectName="_resource" rights="r">
- <li>
-    <a href="#" ONCLICK ="popupPage2('<%=resourcebaseurl%>');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.viewResources"/>" onmouseover="window.status='<bean:message key="provider.appointmentProviderAdminDay.viewResources"/>';return true"><bean:message key="oscarEncounter.Index.clinicalResources"/></a>
- </li>
- </security:oscarSec>
-</caisi:isModuleLoad>
+<% 
+// Remove the resources link because it is the same as help
+//<caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
+// <security:oscarSec roleName="<%=roleName$%  >" objectName="_resource" rights="r">
+// <li>
+//    <a href="#" ONCLICK ="popupPage2('<%=resourcebaseurl%  >');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.viewResources"/>" onmouseover="window.status='<bean:message key="provider.appointmentProviderAdminDay.viewResources"/>';return true"><bean:message key="oscarEncounter.Index.clinicalResources"/></a>
+// </li>
+// </security:oscarSec>
+//</caisi:isModuleLoad>
+%>
 
  <%
  	if (isMobileOptimized) {
@@ -972,6 +975,9 @@ java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.stru
 		DashboardManager dashboardManager = SpringUtils.getBean(DashboardManager.class);
 		List<Dashboard> dashboards = dashboardManager.getActiveDashboards(loggedInInfo1);
 		pageContext.setAttribute("dashboards", dashboards);
+
+		if(dashboards != null && dashboards.size() > 0)
+		{
 	%>
 
 	<li id="dashboardList">
@@ -986,6 +992,9 @@ java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.stru
 			</div>
 		</div>
 	</li>		
+	<%	
+		}
+	%>
 
 </security:oscarSec> 
  
