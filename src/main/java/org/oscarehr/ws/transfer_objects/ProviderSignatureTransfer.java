@@ -23,40 +23,51 @@
  */
 
 
-package org.oscarehr.managers;
+package org.oscarehr.ws.transfer_objects;
 
-import java.util.List;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
-import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.model.Provider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+public final class ProviderSignatureTransfer {
+	private String providerNo;
+	private String filename;
+	private String md5sum;
+	private String base64ImageData;
 
-import oscar.log.LogAction;
-
-
-@Service
-public class ProviderManager2
-{
-	@Autowired
-	private ProviderDao providerDao;
-	
-	public List<Provider> getProviders(boolean active)
-	{
-		List<Provider> results=providerDao.getProviders(active);
-		
-		//--- log action ---
-		LogAction.addLogSynchronous("ProviderManager.getProviders, active="+active, null);
-		
-		return(results);
+	public String getProviderNo() {
+		return (providerNo);
 	}
 
-	public boolean providerExists(Integer providerNo)
-	{
-		boolean result = providerDao.providerExists(providerNo.toString());
+	public void setProviderNo(String providerNo) {
+		this.providerNo = providerNo;
+	}
 
-		LogAction.addLogSynchronous("ProviderManager.providerExists, providerNo=" + providerNo, null);
+	public String getFilename() {
+		return (filename);
+	}
 
-		return result;
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
+
+	public String getMd5Sum() {
+		return (md5sum);
+	}
+
+	public void setMd5Sum(String md5sum) {
+		this.md5sum = md5sum;
+	}
+
+	public String getBase64ImageData() {
+		return (base64ImageData);
+	}
+
+	public void setBase64ImageData(String base64ImageData) {
+		this.base64ImageData = base64ImageData;
+	}
+
+	@Override
+	public String toString() {
+		return (ReflectionToStringBuilder.toString(this));
 	}
 }
+
