@@ -153,6 +153,8 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	private String nameOfFather = null;
 	@Column(name = "name_of_mother")
 	private String nameOfMother = null;
+	@Column(name = "veteran_no")
+	private String veteranNo = null;
 
 
 	public DemographicArchive() {}
@@ -516,5 +518,11 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		}
 		public String getNameOfMother() {
 			return nameOfMother;
+		}
+		public void setVeteranNo(String vetNo) {
+			veteranNo = vetNo;
+		}
+		public String getVeteranNo() {
+			return veteranNo;
 		}
 }

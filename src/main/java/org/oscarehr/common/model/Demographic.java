@@ -123,6 +123,7 @@ public class Demographic implements Serializable {
     private String scannedChart;
     private String nameOfFather;
     private String nameOfMother;
+    private String veteranNo;
 
 
         public String getTitle() {
@@ -1180,5 +1181,11 @@ public class Demographic implements Serializable {
 	}
 	public String getNameOfMother() {
 		return nameOfMother;
+	}
+	public void setVeteranNo(String vetNo) {
+		veteranNo = vetNo;
+	}
+	public String getVeteranNo() {
+		return veteranNo;
 	}
 }
