@@ -97,13 +97,13 @@ public class ProviderWs extends AbstractWs {
 		return out;
 	}
 
-	public String base64Encode(byte[] data)
+	private String base64Encode(byte[] data)
 	{
 		Base64 base64 = new Base64();
 		return base64.encodeToString(data);
 	}
 
-	public byte[] getFileData(File file) throws Exception
+	private byte[] getFileData(File file) throws Exception
 	{
 		int length = (int)file.length();
 		BufferedInputStream reader = new BufferedInputStream(new FileInputStream(file));
@@ -114,7 +114,7 @@ public class ProviderWs extends AbstractWs {
 		return bytes;
 	}
 
-	public String getImageFilename(Integer providerId)
+	private String getImageFilename(Integer providerId)
 	{
 		return providerId.toString() + ".png";
 	}
