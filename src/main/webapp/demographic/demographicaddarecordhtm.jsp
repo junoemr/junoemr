@@ -1297,7 +1297,14 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				</tr>
 				<%
 			}
-			%>
+			if(oscarProps.isPropertyActive("demographic_veteran_no")) { %>
+				<tr>
+					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.veteranNo" />:</b></td>
+					<td align="left">
+						<input name="veteranNo" type="text">
+					</td>
+				</tr> <%
+			}%>
 			
 			<!-- Licensed producer drop-down selection -->
 			<%					

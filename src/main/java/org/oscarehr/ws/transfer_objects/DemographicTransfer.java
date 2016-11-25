@@ -92,6 +92,7 @@ public final class DemographicTransfer {
 	private String officialLanguage;
 	private String nameOfFather;
 	private String nameOfMother;
+	private String veteranNo;
 
 	
 	public Integer getDemographicNo() {
@@ -504,6 +505,12 @@ public final class DemographicTransfer {
 	}
 	public String getNameOfMother() {
 		return nameOfMother;
+	}
+	public void setVeteranNo(String vetNo) {
+		veteranNo = vetNo;
+	}
+	public String getVeteranNo() {
+		return veteranNo;
 	}
 
 	public String getOfficialLanguage() {

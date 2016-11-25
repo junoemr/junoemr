@@ -184,6 +184,10 @@
 			demographic.setNameOfMother(request.getParameter("nameOfMother"));
 			demographic.setNameOfFather(request.getParameter("nameOfFather"));
 		}
+		  // Patient veteran number OHSUPPORT-3523
+		if(oscarVariables.isPropertyActive("demographic_veteran_no")) {
+			demographic.setVeteranNo(request.getParameter("veteranNo"));
+		}
 
 		List<Demographic> duplicateList = demographicDao.getDemographicWithLastFirstDOBExact(demographic.getLastName(),demographic.getFirstName(),
 				demographic.getYearOfBirth(),demographic.getMonthOfBirth(),demographic.getDateOfBirth());

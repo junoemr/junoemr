@@ -1612,6 +1612,15 @@ if (iviewTag!=null && !"".equalsIgnoreCase(iviewTag.trim())){
                                                    <span class="info"><%=sp_lang%></span>
 							</li>
 						<% }
+							// Patient veteran number OHSUPPORT-3523
+							if(oscarProps.isPropertyActive("demographic_veteran_no")) {
+								String veteranNo = (demographic.getVeteranNo() != null ? demographic.getVeteranNo() : "");
+								%>
+										<li>
+                                           <span class="label"><bean:message key="demographic.demographiceditdemographic.veteranNo" />:</span>
+                                           <span class="info"><%= veteranNo %></span>
+										</li>
+							<% } 
 						  if (oscarProps.getProperty("EXTRA_DEMO_FIELDS") !=null){
                                               String fieldJSP = oscarProps.getProperty("EXTRA_DEMO_FIELDS");
                                               fieldJSP+= "View.jsp";
@@ -3040,8 +3049,8 @@ document.updatedelete.r_doctor_ohip.value = refNo;
                                                                     <input  type="text" name="patientstatus_date_day" size="2" maxlength="2" value="<%=patientStatusDateDay%>">
 								</td>
 							</tr>
-							<!-- Patient parental name OHSUPPORT-3228 -->
-							<%					
+							<%
+							// Patient parental name OHSUPPORT-3228
 							if(oscarProps.isPropertyActive("demographic_parent_names")) { 
 								String nameOfFather = (demographic.getNameOfFather() != null ? demographic.getNameOfFather() : "");
 								String nameOfMother = (demographic.getNameOfMother() != null ? demographic.getNameOfMother() : "");
@@ -3059,10 +3068,20 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 									</td>
 								</tr>
 								<%
+							}		
+							// Patient veteran number OHSUPPORT-3523
+							if(oscarProps.isPropertyActive("demographic_veteran_no")) { 
+								String veteranNo = (demographic.getVeteranNo() != null ? demographic.getVeteranNo() : "");
+								%>
+								<tr>
+									<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.veteranNo" />:</b></td>
+									<td align="left">
+										<input name="veteranNo" type="text" value="<%= veteranNo %>">
+									</td>
+								</tr>
+								<%
 							}
-							%>
-							<!-- Licensed producer drop-down selection -->
-							<%
+							// Licensed producer drop-down selection
 							if(oscarProps.isPropertyActive("show_demographic_licensed_producers")) {
 								ResultSet producerRs = apptMainBean.queryResults("search_licensed_producer");
 								ResultSet producerAddrRs = apptMainBean.queryResults("search_licensed_producer_address_name");
