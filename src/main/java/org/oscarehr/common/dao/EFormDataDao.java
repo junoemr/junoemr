@@ -77,9 +77,15 @@ public class EFormDataDao extends AbstractDao<EFormData> {
 
 		int paramCount = 1;
 		String sql = "from " + modelClass.getSimpleName() + " x " +
-			"where x.demographicId=?" + paramCount + " ";
-		paramArray.add(demographicId);
-		paramCount++;
+			"where true = true ";
+
+		// Filter by demographic if it's provided OR if there is no paging
+		if(!enabledPaging || (demographicId != null && demographicId != 0))
+		{
+			sql += "and x.demographicId=?" + paramCount + " ";
+			paramArray.add(demographicId);
+			paramCount++;
+		}
 
 		if(startDate != null)
 		{

@@ -86,6 +86,20 @@ public class DemographicManager
 		return(result);
 	}
 
+	public List getDemographics(int pageSize, int pageNumber, Date startDate)
+	{
+		List result = demographicDao.getDemographics(pageSize, pageNumber, startDate);
+
+		if(result != null)
+		{
+			LogAction.addLogSynchronous(
+				"DemographicManager.getDemographicsByHealthNum", 
+				"List");
+		}
+		
+		return(result);
+	}
+
 	public List getDemographicsByHealthNum(String hin)
 	{
 		List result = 

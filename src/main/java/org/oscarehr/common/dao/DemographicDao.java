@@ -63,6 +63,8 @@ import org.oscarehr.common.model.DemographicExt;
 import org.oscarehr.integration.hl7.generators.HL7A04Generator;
 import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import oscar.MyDateFormat;
@@ -90,6 +92,40 @@ public class DemographicDao extends HibernateDaoSupport {
     	logger.error("No one should be calling this method, this is a good way to run out of memory and crash a server... this is too large of a result set, it should be pagenated.", new IllegalArgumentException("The entire demographic table is too big to allow a full select."));
         return this.getHibernateTemplate().find("from Demographic d order by d.LastName");
     }
+
+	public List getDemographics(final int pageSize, final int pageNumber, final Date startDate)
+	{
+		HibernateTemplate template = this.getHibernateTemplate();
+
+		return (List) template.executeFind(new HibernateCallback()
+		{
+			public Object doInHibernate(Session session) throws HibernateException, SQLException
+			{
+        		String q = "from Demographic d ";
+
+				if(startDate != null)
+				{
+					q += "where lastUpdateDate >= :lastUpdateDate ";
+				}
+
+				q += "order by d.DemographicNo ";
+
+				Query query = session.createQuery(q);
+
+				// Set parameter values
+				if(startDate != null)	
+				{
+					query.setDate("lastUpdateDate", startDate);
+				}
+
+				// Set pagination values
+				query.setMaxResults(pageSize);
+				query.setFirstResult(pageSize * (pageNumber - 1));
+
+				return query.list();
+			}
+		});
+	}
 
     public Demographic getDemographicById(Integer demographic_id) {
         String q = "FROM Demographic d WHERE d.DemographicNo = ?";

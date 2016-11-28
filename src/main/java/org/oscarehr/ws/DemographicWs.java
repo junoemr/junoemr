@@ -40,6 +40,8 @@ import oscar.oscarDemographic.data.DemographicRelationship;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -66,6 +68,45 @@ public class DemographicWs extends AbstractWs {
 	{
 		Demographic demographic=demographicManager.getDemographicByMyOscarUserName(myOscarUserName);
 		return(DemographicTransfer.toTransfer(demographic));
+	}
+
+	public List getDemographics(Integer pageSize, Integer pageNumber, String earliestUpdatedDate)
+		throws Exception
+	{
+		if(pageSize == null)
+		{
+			throw new Exception("Page size is required.");
+		}
+
+		if(pageNumber == null)
+		{
+			throw new Exception("Page number is required.");
+		}
+
+		if(pageSize > 100)
+		{
+			throw new Exception("Maximum page size is 100.");
+		}
+
+		Date startDate = null;
+		if(earliestUpdatedDate != null)
+		{
+			SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
+			startDate = parser.parse(earliestUpdatedDate);
+		}
+
+		List<Demographic> demographicList = 
+			demographicManager.getDemographics(pageSize, pageNumber, startDate);
+
+		Iterator<Demographic> demographicListIterator = demographicList.iterator();
+		List<DemographicTransfer> out = new ArrayList<DemographicTransfer>();
+		while(demographicListIterator.hasNext())
+		{
+			Demographic demographic = demographicListIterator.next();
+			out.add(DemographicTransfer.toTransfer(demographic));
+		}
+
+		return(out);
 	}
 
 	public List getDemographicsByHealthNum(String hin)

@@ -131,26 +131,21 @@ public class EFormWs extends AbstractWs {
 				if(key.equals("start_date"))
 				{
 					startDate = parser.parse(filter.get(key));
-					logger.info(startDate);
 				}
 				else if(key.equals("end_date"))
 				{
 					endDate = parser.parse(filter.get(key));
-					logger.info(endDate);
 				}
 				else if(key.equals("items_per_page"))
 				{
 					itemsPerPage = Integer.parseInt(filter.get(key));
-					logger.info(itemsPerPage);
 				}
 				else if(key.equals("page"))
 				{
 					page = Integer.parseInt(filter.get(key));
-					logger.info(page);
 				}
 			}
 		}
-
 
 		List<EFormData> eformDataList = 
 			eformDataManager.getEFormDataList(eformId, demographicNo, startDate, 
