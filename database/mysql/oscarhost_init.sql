@@ -45,6 +45,10 @@ ALTER TABLE demographicArchive ADD COLUMN `name_of_mother` varchar(32);
 ALTER TABLE demographic ADD COLUMN `name_of_father` varchar(32);
 ALTER TABLE demographicArchive ADD COLUMN `name_of_father` varchar(32);
 
+-- New columns for demographic veteran number
+ALTER TABLE demographic ADD COLUMN `veteran_no` varchar(32);
+ALTER TABLE demographicArchive ADD COLUMN `veteran_no` varchar(32);
+
 ALTER TABLE measurementMap ADD COLUMN flowsheet varchar(15);
 UPDATE measurementMap SET flowsheet = 'FLOWSHEET' WHERE lab_type = "FLOWSHEET";
 UPDATE measurementMap SET flowsheet = CONCAT(id,loinc_code) WHERE lab_type != "FLOWSHEET";
