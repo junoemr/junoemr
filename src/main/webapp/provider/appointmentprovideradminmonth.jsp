@@ -381,10 +381,10 @@ function popupOscarRx(vheight,vwidth,varpage) { //open a new popup window
             var newGroupNo = s.options[s.selectedIndex].value.substring(5) ;
             <%if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.IsPropertiesOn.isTicklerPlusEnable()){%>
             {
-                popupOscarRx(10,10, "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&new_tickler_warning_window=<%=n_t_w_w%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no="+newGroupNo) + "<%=eformIds.toString()%><%=ectFormNames.toString()%>";
+                popupOscarRx(10,10, "providercontrol.jsp") + "<%=eformIds.toString()%><%=ectFormNames.toString()%>";
             }
             <%}else {%>
-                popupOscarRx(10,10, "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no="+newGroupNo + "<%=eformIds.toString()%><%=ectFormNames.toString()%>");
+                popupOscarRx(10,10, "providercontrol.jsp");
             <%}%>
         } 
         else 
@@ -529,13 +529,13 @@ function refreshTabAlerts(id) {
 			<li><!-- remove this and let providerpreference check --> <caisi:isModuleLoad
 				moduleName="ticklerplus">
 				<a href="#"
-					onClick="popupOscarRx(715,680,'providerpreference.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&mygroup_no=<%=mygroupno%>&new_tickler_warning_window=<%=newticklerwarningwindow%>&default_pmm=<%=default_pmm%>');return false;"
+					onClick="popupOscarRx(715,680,'providerpreference.jsp');return false;"
 					TITLE='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>'
 					OnMouseOver="window.status='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>' ; return true"><bean:message
 					key="global.pref" /></a>
 			</caisi:isModuleLoad> <caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
 				<a href="#"
-					onClick="popupOscarRx(715,680,'providerpreference.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&mygroup_no=<%=mygroupno%>');return false;"
+					onClick="popupOscarRx(715,680,'providerpreference.jsp');return false;"
 					TITLE='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>'
 					OnMouseOver="window.status='<bean:message key="provider.appointmentProviderAdminDay.msgSettings"/>' ; return true"><bean:message
 					key="global.pref" /></a>
