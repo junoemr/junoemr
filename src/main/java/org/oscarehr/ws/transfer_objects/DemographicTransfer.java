@@ -92,6 +92,7 @@ public final class DemographicTransfer {
 	private String officialLanguage;
 	private String nameOfFather;
 	private String nameOfMother;
+	private String notes;
 
 	
 	public Integer getDemographicNo() {
@@ -504,6 +505,12 @@ public final class DemographicTransfer {
 	}
 	public String getNameOfMother() {
 		return nameOfMother;
+	}
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+	public String getNotes() {
+		return notes;
 	}
 
 	public String getOfficialLanguage() {

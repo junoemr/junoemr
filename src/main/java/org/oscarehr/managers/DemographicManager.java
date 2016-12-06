@@ -156,9 +156,18 @@ public class DemographicManager
 		}
 	}
 
+	public void updateDemographicExtras(Demographic demographic, DemographicTransfer demographicTransfer)
+	{
+		DemographicCust demoCust = demographicCustDao.find(demographic.getDemographicNo());
+
+		demoCust.setParsedNotes(demographicTransfer.getNotes());
+
+		demographicCustDao.merge(demoCust);
+	}
+
 	// When adding a demographic, entries are required in other tables.  This
 	// method adds those entries.
-	public Integer addDemographicExtras(Demographic demographic)
+	public Integer addDemographicExtras(Demographic demographic, DemographicTransfer demographicTransfer)
 		throws Exception
 	{
 		DemographicCust demoCust = new DemographicCust();
@@ -167,7 +176,7 @@ public class DemographicManager
 		demoCust.setResident("");
 		demoCust.setMidwife("");
 		demoCust.setNurse("");
-		demoCust.setNotes("");
+		demoCust.setParsedNotes(demographicTransfer.getNotes());
 
 		demographicCustDao.persist(demoCust);
 

@@ -32,7 +32,9 @@ import javax.xml.ws.handler.MessageContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.DemographicCust;
 import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.managers.DemographicCustManager;
 import org.oscarehr.ws.transfer_objects.DemographicTransfer;
 
 import oscar.oscarDemographic.data.DemographicRelationship;
@@ -57,17 +59,30 @@ public class DemographicWs extends AbstractWs {
 
 	@Autowired
 	private DemographicManager demographicManager;
+
+	@Autowired
+	private DemographicCustManager demographicCustManager;
 	
 	public DemographicTransfer getDemographic(Integer demographicId)
+		throws Exception
 	{
 		Demographic demographic=demographicManager.getDemographic(demographicId);
-		return(DemographicTransfer.toTransfer(demographic));
+		DemographicCust custResult = demographicCustManager.getDemographicCust(demographic.getDemographicNo());
+
+		DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
+		transfer.setNotes(custResult.getParsedNotes());
+		return transfer;
 	}
 
 	public DemographicTransfer getDemographicByMyOscarUserName(String myOscarUserName)
+		throws Exception
 	{
 		Demographic demographic=demographicManager.getDemographicByMyOscarUserName(myOscarUserName);
-		return(DemographicTransfer.toTransfer(demographic));
+		DemographicCust custResult = demographicCustManager.getDemographicCust(demographic.getDemographicNo());
+
+		DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
+		transfer.setNotes(custResult.getParsedNotes());
+		return transfer;
 	}
 
 	public List getDemographics(Integer pageSize, Integer pageNumber, String earliestUpdatedDate)
@@ -147,7 +162,7 @@ public class DemographicWs extends AbstractWs {
 		}
 
 		demographicManager.addDemographic(demographic);
-		demographicManager.addDemographicExtras(demographic);
+		demographicManager.addDemographicExtras(demographic, demographicTransfer);
 		demographicManager.addDemographicExts(demographic, demographicTransfer);
 
 		return(demographic.getDemographicNo());
@@ -170,6 +185,7 @@ public class DemographicWs extends AbstractWs {
 		}
 		
 		demographicManager.addDemographic(demographic);
+		demographicManager.updateDemographicExtras(demographic, demographicTransfer);
 		demographicManager.addDemographicExts(demographic, demographicTransfer);
 	}
 
