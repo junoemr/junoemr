@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<HTML>
+<META http-equiv="Content-Script-Type" content="text/javascript">
+
+<head>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/flick/jquery-ui.css" />
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+	<script src="https://ocean.cognisantmd.com/lib/require.min.js"></script>
+	<title>Ocean EForm</title>
+</head>
+
+<div id="patientFields" style="display:none;">
+	<!-- http://oscarmanual.org/oscar_emr_12/clinical-functions/e-forms/eform-magic  -->
+	<!-- http://oscarmanual.org/oscar_emr_12/clinical-functions/e-forms/eform-magic  -->
+	<input type="text" id="firstName" oscarDB=patient_nameF><!-- works -->
+	<input type="text" id="surname" oscarDB=patient_nameL><!-- works -->
+	<input type="text" id="dobYear" oscarDB=dob_year><!-- works -->
+	<input type="text" id="dobMonth" oscarDB=dob_month><!-- works -->
+	<input type="text" id="dobDay" oscarDB=dob_day><!-- works -->
+	<input type="text" id="hn" oscarDB=HINc><!-- works -->
+	<input type="text" id="hnVersionCode" oscarDB=HINversion><!-- works -->
+	<input type="text" id="sex" oscarDB=sex>   <!-- works -->
+	<input type="text" name="pid" id="pid" oscarDB=patient_id><!-- works -->
+	<input type="text" id="address" oscarDB=address_street_number_and_name>
+	<input type="text" id="province" oscarDB=province><!-- works -->
+	<input type="text" id="city" oscarDB=city><!-- works -->
+	<input type="text" id="postal" oscarDB=postal><!-- works -->
+	<input type="text" id="homePhone" oscarDB=phone><!-- works -->
+	<input type="text" id="phoneExt" oscarDB=phone_extension><!-- works -->
+	<input type="text" id="busPhone" oscarDB=phone2><!-- works -->
+	<input type="text" id="phoneExt" oscarDB=phone2_extension>
+	<input type="text" id="cell" oscarDB=cell><!-- works -->
+	<input type="text" id="doctor" oscarDB=doctor><!-- works -->
+	<input type="text" id="email" oscarDB=email><!-- works in versions after March 24, 2015 - see http://oscarmanual.org/oscar_emr_12/clinical-functions/e-forms/eform-magic -->
+	<textarea id="medical_history" oscarDB=medical_history></textarea>
+	<textarea id="allergies_des" oscarDB=allergies_des></textarea>
+	<textarea id="dxregistry" oscarDB=dxregistry></textarea>
+	<input type="text" id="height" oscarDB=m$HT#value>
+	<input type="text" id="weight" oscarDB=m$WT#value>
+	<input type="text" name="SMK" id="SMK" oscarDB=m$SMK#value>
+	<input type="text" name="SmkS" id="SmkS" oscarDB=m$SmkS#value>
+</div>
+
+<body onload="">
+	<script>
+		// uncomment for dev server
+		//window.oceanHost = "https://localhost:8443";
+		window.oceanHost = "https://ocean.cognisantmd.com";
+		requirejs.config({ baseUrl: window.oceanHost });
+		
+		try {
+			requirejs(["js/OscarEForm"], function(OscarEForm) { 
+				jQuery("#pleaseWait").hide();
+				if (typeof OscarEForm === "undefined") {
+					jQuery("#errMsg").show();
+				} else {
+					OscarEForm.init();
+				}
+			}, function(err) {
+				console.log(err);
+				jQuery("#pleaseWait").hide();
+				jQuery("#errMsg").show();
+			});
+		} catch (exc) {
+			console.log(exc);
+		}
+	</script>
+	<h3 id="pleaseWait">Please wait...</h3>
+	<h3 id="errMsg" style="display:none;">Sorry, the Ocean eForm could not be loaded at this time. Please try again later.</h3>
+	<form method="post" action="" name="OceanForm">
+		<div id="oscarEFormContainer"></div>
+	</form>
+</body>
+</html>
