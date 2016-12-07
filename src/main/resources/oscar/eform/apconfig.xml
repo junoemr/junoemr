@@ -889,4 +889,27 @@
         <ap-output>${type}, ${dataField}, ${comments}, ${dateObserved}, ${dateEntered}</ap-output>
         <ap-json-output>true</ap-json-output>
     </databaseap>
+
+    <!-- OHSUPPORT-3539 - measurement info for WHO forms -->
+	<databaseap>
+		<ap-name>who_measurements</ap-name>
+		<ap-sql>SELECT GROUP_CONCAT(
+					REPLACE(CONCAT( IFNULL(Q.obsDate, ''),'|', IFNULL(Q.height, ''), '|', IFNULL(Q.weight, ''), '|', IFNULL(Q.circ, ''), '|', IFNULL(REPLACE(Q.comments,'|',''), '')),';','')
+				SEPARATOR ';') AS list FROM (
+				SELECT
+					DATE(m.dateObserved) AS obsDate,
+					MAX(IF(m.type='HT', m.dataField, NULL)) AS height,
+					MAX(IF(m.type='WT', m.dataField, NULL)) AS weight,
+					MAX(IF(m.type='HEAD', m.dataField, NULL)) AS circ,
+					MAX(m.comments) as comments
+					
+					FROM measurements m
+					WHERE m.type IN ('HT', 'WT', 'HEAD')
+					AND m.demographicNo='${demographic}'
+					GROUP BY DATE(m.dateObserved)
+				) AS Q
+				ORDER BY Q.obsDate DESC
+		</ap-sql>
+		<ap-output>${list}</ap-output>
+    </databaseap>
 </eformap-config>
