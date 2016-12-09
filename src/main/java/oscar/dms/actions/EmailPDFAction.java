@@ -40,23 +40,58 @@ import oscar.OscarProperties;
  * @author jay
  */
 public class EmailPDFAction extends Action {
+	
+	OscarProperties props = OscarProperties.getInstance();
+	
+    /** Creates a new instance of CombinePDFAction */
+    public EmailPDFAction() {
+    }
 
+    /** main execution method */
     public ActionForward execute(ActionMapping mapping, ActionForm form, 
 		HttpServletRequest request, HttpServletResponse response) 
 	{
-		if(!OscarProperties.getInstance().isPropertyActive("document_email_enabled")) 
-		{
-			return mapping.findForward("failed");
-		}
-
-		// Provide the docNo values to the view to pass on to the send page	
-		request.setAttribute("docNo", request.getParameterValues("docNo"));
-
-        return mapping.findForward("success");
+    	String emailActionType = request.getParameter("emailActionType");
+    	emailActionType = (emailActionType != null)? emailActionType: "";
+    	
+    	request.setAttribute("emailActionType", emailActionType);
+    	
+    	if(emailActionType.equals("DOC")) {
+    		return emailDoc(mapping, form, request, response);
+    	}
+    	else if (emailActionType.equals("RX")) {
+    		return emailRx(mapping, form, request, response);
+    	}
+    	return mapping.findForward("failed");
     }
-
-    /** Creates a new instance of CombinePDFAction */
-    public EmailPDFAction() {
+    /** set document email parameters and forward to correct page */
+    @SuppressWarnings("unused")
+    private ActionForward emailDoc(ActionMapping mapping, ActionForm form, 
+			HttpServletRequest request, HttpServletResponse response) {
+    	
+    	if(props.isPropertyActive("document_email_enabled")) {
+        	// Provide the docNo values to the view to pass on to the send page	
+    		request.setAttribute("docNo", request.getParameterValues("docNo"));
+			return mapping.findForward("success");
+		}
+		return mapping.findForward("failed");
+    	
+    }
+    /** set rx email parameters and forward to correct page */
+    @SuppressWarnings("unused")
+	private ActionForward emailRx(ActionMapping mapping, ActionForm form, 
+			HttpServletRequest request, HttpServletResponse response) {
+    	
+    	if(props.isPropertyActive("rx_email_enabled")) {
+    		request.setAttribute("docNo", "");
+    		
+    		for(Object attr : request.getParameterMap().keySet()) {
+    			request.setAttribute((String)attr, request.getParameterValues((String)attr));
+    		}
+    		
+			return mapping.findForward("success");
+		}
+    	return mapping.findForward("failed");
     }
 }
 

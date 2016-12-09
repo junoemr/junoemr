@@ -30,7 +30,7 @@
 <%@page import="org.oscarehr.phr.PHRAuthentication"%>
 <%@page import="org.oscarehr.util.MiscUtils"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="org.oscarehr.common.dao.UserPropertyDAO, org.oscarehr.common.model.UserProperty, org.springframework.web.context.support.WebApplicationContextUtils" %>
+<%@page import="org.oscarehr.common.dao.UserPropertyDAO, oscar.OscarProperties, org.oscarehr.common.model.UserProperty, org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@page import="org.oscarehr.common.model.Demographic"%>
 <%@page import="oscar.oscarDemographic.data.DemographicData"%>
 <%@page import="org.oscarehr.common.model.Provider"%>
@@ -49,9 +49,11 @@
 <%
 	// Load the specialists
 	displayServiceUtil.estSpecialist();
+	OscarProperties props = OscarProperties.getInstance();
 
 	String providerId = (String) session.getAttribute("user");
 	String demoId = request.getParameter("demoId");
+	String emailActionType = request.getParameter("emailActionType");
 
 	DemographicData demoData = null;
 	Demographic demographic = null;
@@ -67,16 +69,27 @@
 		providerData = 
 			new oscar.oscarProvider.data.ProviderData(demographic.getProviderNo());
 	}
+	
+	String emailSubject = OscarProperties.getInstance().getProperty("document_email_subject", "");
+	String emailBody = OscarProperties.getInstance().getProperty("document_email_body", "");
+	String emailName = OscarProperties.getInstance().getProperty("document_email_name", "");
+	
+	String patientEmail = null;
+	String patientDispalyName = null;
+	if(demographic != null) {
+		patientEmail = StringEscapeUtils.escapeHtml(demographic.getEmail());
+		patientDispalyName = StringEscapeUtils.escapeHtml(demographic.getDisplayName());
+	}
 
 %>
 <html:html locale="true">
 <head>
 
-<title>Email Documents</title>
+<title>Email PDF Documents</title>
 
 <link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css" />
 
-<script src="//code.jquery.com/jquery-latest.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <script type="text/javascript">
 
 var submitting = false;                                                         
@@ -126,7 +139,7 @@ function emailPatient()
 {
 	var name = 'patient';
 	<% if(demographic != null) { %>
-	var email = '<%= StringEscapeUtils.escapeHtml(demographic.getEmail()) %>';
+	var email = '<%= patientEmail %>';
 	<% } %>
 	_AddHiddenEmail(email) 
 	submitForm('<rewrite:reWrite jspPage="sendEmailPDFs.do"/>');
@@ -179,48 +192,63 @@ function updateEmailButton()
 
 </script>
 
+<style>
+	.flexH {
+	display: flex;
+	flex-direction: row;
+	}
+	.flexV {
+	display: flex;
+	flex-direction: column;
+	}
+</style>
+
 
 
 </head>
 <body class="bodystyle">
-
-<table class="MainTable" id="scrollNumber1" name="encounterTable"               
-	style="margin: 0px;">                                                       
-	<tr class="MainTableRowTop">                                                
-		<td class="MainTableTopRowLeftColumn" width="60px">eDocs</td>           
-		<td class="MainTableTopRowRightColumn">                                 
-			<table class="TopStatusBar">                                            
-				<tr>                                                                
-					<td>Send Documents By Email</td>                                  
-				</tr>                                                               
-			</table>                                                                
-		</td>                                                                   
-	</tr>                                                                       
-</table>    
+	<html:form action="/dms/sendEmailPDFs">
+		<table class="MainTable" id="scrollNumber1" name="encounterTable" style="margin: 0px;">
+			<tr class="MainTableRowTop">
+				<td class="MainTableTopRowLeftColumn" width="60px">eDocs</td>
+				<td class="MainTableTopRowRightColumn">
+					<table class="TopStatusBar">
+						<tr>
+							<td>Send PDF Documents By Email</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
 
 
 	<table>
+		<% // if there is a demographic, show some info on who we are sending the email to. 
+		if(demographic != null) { %>
+		<tr><td>
+			<label for="patientDispName">Patient Name:</label>
+			<input id="patientDispName"type="text" value="<%=patientDispalyName%>" disabled="disabled">
+		</td></tr>
+	<% } %>
 		<tr><td class="tite4">Add Email Addresses:</td></tr>
 		<tr>
 			<td>
 				<%
-				String rdohip = "";
-				if (demographic!=null) 
-				{
-					String famDoc = demographic.getFamilyDoctor();
-					if (famDoc != null && famDoc.trim().length() > 0) 
-					{ 
-						rdohip = SxmlMisc.getXmlContent(famDoc,"rdohip"); 
-						rdohip = rdohip == null ? "" : rdohip.trim(); 
-					}
-				}
+					String rdohip = "";
+						if (demographic != null) {
+							String famDoc = demographic.getFamilyDoctor();
+							if (famDoc != null && famDoc.trim().length() > 0) {
+								rdohip = SxmlMisc.getXmlContent(famDoc, "rdohip");
+								rdohip = rdohip == null ? "" : rdohip.trim();
+							}
+						}
 				%>
 				<table width="100%">
 				<tr>
 
 					<td class="tite4" width="10%">  Providers: </td>
 					<td class="tite3" width="20%">
-						<select id="otherEmailSelect">
+						<select id="otherEmailSelect" style="width: 100%;">
 						<%
 						String rdName = "";
 						String rdEmailAddress = "";
@@ -268,33 +296,72 @@ function updateEmailButton()
 			</td>
 		</tr>
 	</table>
-
-<html:form action="/dms/sendEmailPDFs">
-
-	<ul id="emailAddresses">
-	</ul>
+	
+	<div class="flexV">
+		<label for="emailAddresses">Email To:</label>
+		<div>
+		<%if(demographic != null) { %>
+			<!-- <label for="patientEmailAddr">Patient Email:</label> -->
+			<input id="patientEmailAddr" name="patientEmailAddr" type="text" value="<%=patientEmail%>" disabled="disabled">
+		<%}%>
+			<ul id="emailAddresses"></ul></div>
+		
+		<label for="emailSubject">Subject:</label>
+		<input id="emailSubject" name="emailSubject" type="text" value="<%=emailSubject%>">
+		<label for="emailBody">Message:</label>
+		<textarea id="emailBody" name="emailBody" rows=10><%=emailBody%></textarea>
+	</div>
 
 	<input type="hidden" name="demoId" value="<%=demoId%>">
 	<input type="hidden" name="providerId" value="<%=providerId%>">
+	<input type="hidden" name="emailActionType"id="emailActionType" value="<%=emailActionType%>">
+	<%
+	// add a bunch of hidden input because they are required by the rx pdf generator
+	if(emailActionType.equals("RX")) { %>
+	<input type="hidden" id="__title" name="__title" value="<%=request.getParameter("__title")%>">
+	<input type="hidden" id="imgFile" name="imgFile" value="<%=request.getParameter("imgFile")%>">
+	<input type="hidden" id="sigDoctorName" name="sigDoctorName" value="<%=request.getParameter("sigDoctorName")%>">
+	<input type="hidden" id="pracNo" name="pracNo" value="<%=request.getParameter("pracNo")%>">
+	<input type="hidden" id="useSC" name="useSC" value="<%=request.getParameter("useSC")%>">
+	<input type="hidden" id="scAddress" name="scAddress" value="<%=request.getParameter("scAddress")%>">
+	<input type="hidden" id="clinicName" name="clinicName" value="<%=request.getParameter("clinicName")%>">
+	<input type="hidden" id="clinicPhone" name="clinicPhone" value="<%=request.getParameter("clinicPhone")%>">
+	<input type="hidden" id="clinicFax" name="clinicFax" value="<%=request.getParameter("clinicFax")%>">
+	<input type="hidden" id="patientPhone" name="patientPhone" value="<%=request.getParameter("patientPhone")%>">
+	<input type="hidden" id="patientCityPostal" name="patientCityPostal" value="<%=request.getParameter("patientCityPostal")%>">
+	<input type="hidden" id="patientAddress" name="patientAddress" value="<%=request.getParameter("patientAddress")%>">
+	<input type="hidden" id="patientName" name="patientName" value="<%=request.getParameter("patientName")%>">
+	<input type="hidden" id="patientHIN" name="patientHIN" value="<%=request.getParameter("patientHIN")%>">
+	<input type="hidden" id="patientChartNo" name="patientChartNo" value="<%=request.getParameter("patientChartNo")%>">
+	<input type="hidden" id="showPatientDOB" name="showPatientDOB" value="<%=request.getParameter("showPatientDOB")%>">
+	<input type="hidden" id="patientDOB" name="patientDOB" value="<%=request.getParameter("patientDOB")%>">
+	<input type="hidden" id="rxDate" name="rxDate" value="<%=request.getParameter("rxDate")%>">
+	<input type="hidden" id="additNotes" name="additNotes" value="<%=request.getParameter("additNotes")%>">
+	<input type="hidden" id="rx" name="rx" value="<%=request.getParameter("rx")%>">
+	<input type="hidden" id="scriptId" name="scriptId" value="<%=request.getParameter("scriptId")%>">
+	<input type="hidden" id="__method" name="__method" value="<%=request.getParameter("__method")%>">
+	<input type="hidden" id="origPrintDate" name="origPrintDate" value="<%=request.getParameter("origPrintDate")%>">
+	<input type="hidden" id="numPrints" name="numPrints" value="<%=request.getParameter("numPrints")%>">
+	<input type="hidden" id="sigDoctorName" name="sigDoctorName" value="<%=request.getParameter("sigDoctorName")%>">	
+	<%} %>
+	
+	<%if(emailActionType.equals("DOC")) { %>
     <logic:iterate name="docNo" id="doc">
-        <input type="hidden" name="docNo" value='<bean:write name="doc" />' \>
+        <input type="hidden" name="docNo" value='<bean:write name="doc" />' />
     </logic:iterate>
+    <%} %>
 
 	<!-- Show options for email recipients -->
 
 	<!-- Show free-form phone number box -->
 
-
-    <input type="button" id="email_button" disabled="disabled"
-        value="<bean:message key="dms.documentReport.btnEmailPDF"/>"
-        onclick="return submitForm('<rewrite:reWrite jspPage="sendEmailPDFs.do"/>');" />
-	<% if(providerData != null && providerData.getEmail() != null && 
-		!providerData.getEmail().equals("")) { %>
+    <input type="button" id="email_button" disabled="disabled" value="<bean:message key="dms.documentReport.btnEmailPDF"/>"
+        onclick="return submitForm('<rewrite:reWrite jspPage="sendEmailPDFs.do?emailActionType=<%=emailActionType%>/>');" />
+	<% if(providerData != null && providerData.getEmail() != null && !providerData.getEmail().equals("")) { %>
     <input type="button" id="email_provider_button" value="Email to Patient's Provider"
         onclick="return emailProvider();" />
 	<% } %>
-	<% if(demographic != null && demographic.getEmail() != null && 
-		!demographic.getEmail().equals("")) { %>
+	<% if(demographic != null && demographic.getEmail() != null && !demographic.getEmail().equals("")) { %>
     <input type="button" id="email_patient_button" value="Email to Patient"
         onclick="return emailPatient();" />
 	<% } %>
