@@ -36,8 +36,8 @@ import org.apache.struts.action.ActionMapping;
 import oscar.OscarProperties;
 
 /**
- *
  * @author jay
+ * revised Robert 2016
  */
 public class EmailPDFAction extends Action {
 	
@@ -83,12 +83,9 @@ public class EmailPDFAction extends Action {
 			HttpServletRequest request, HttpServletResponse response) {
     	
     	if(props.isPropertyActive("rx_email_enabled")) {
-    		request.setAttribute("docNo", "");
-    		
     		for(Object attr : request.getParameterMap().keySet()) {
     			request.setAttribute((String)attr, request.getParameterValues((String)attr));
     		}
-    		
 			return mapping.findForward("success");
 		}
     	return mapping.findForward("failed");

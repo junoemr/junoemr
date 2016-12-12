@@ -50,7 +50,8 @@ import oscar.oscarRx.templates.RxPdfTemplate;
 import oscar.oscarRx.templates.RxPdfTemplateCustom1;
 
 /**
- * @author Robert
+ * @author jay
+ * revised Robert 2016
  */
 public class SendEmailPDFAction extends Action {
 	

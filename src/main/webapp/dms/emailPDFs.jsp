@@ -66,8 +66,7 @@
 	ProviderData providerData = null;
 	if (providerId != null && demographic != null)
 	{
-		providerData = 
-			new oscar.oscarProvider.data.ProviderData(demographic.getProviderNo());
+		providerData = new oscar.oscarProvider.data.ProviderData(demographic.getProviderNo());
 	}
 	
 	String emailSubject = OscarProperties.getInstance().getProperty("document_email_subject", "");
@@ -92,22 +91,22 @@
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <script type="text/javascript">
 
-var submitting = false;                                                         
+var submitting = false;
 
-function submitForm(actionPath)                                                 
-{                                                                               
-	if(submitting)                                                              
-	{                                                                           
-		return false;                                                           
-	}                                                                           
-	submitting = true;                                                          
+function submitForm(actionPath)
+{
+	if(submitting)
+	{
+		return false;
+	}
+	submitting = true;
 
 	disableButtons();                                                           
-	var form = document.forms[0];                                               
-	form.action = actionPath;                                                   
-	form.submit();                                                              
+	var form = document.forms[0];
+	form.action = actionPath;
+	form.submit();
 
-	return true;                                                                
+	return true;
 } 
 
 function disableButtons()
@@ -160,8 +159,8 @@ function AddOtherEmail()
 function _AddHiddenEmail(email)                                                 
 {                                                                               
 	var html = "<input type='hidden' name='emailAddresses' value='"+email+"'></input>";
-	jQuery("#emailAddresses").append(jQuery(html));                             
-	updateEmailButton();                                                        
+	jQuery("#emailAddresses").append(jQuery(html));
+	updateEmailButton();
 }  
 
 function _AddOtherEmail(name, email) 
@@ -189,7 +188,6 @@ function updateEmailButton()
 	var disabled = !hasEmailAddress();
 	document.getElementById("email_button").disabled = disabled;
 }
-
 </script>
 
 <style>
@@ -202,8 +200,6 @@ function updateEmailButton()
 	flex-direction: column;
 	}
 </style>
-
-
 
 </head>
 <body class="bodystyle">
@@ -304,7 +300,8 @@ function updateEmailButton()
 			<!-- <label for="patientEmailAddr">Patient Email:</label> -->
 			<input id="patientEmailAddr" name="patientEmailAddr" type="text" value="<%=patientEmail%>" disabled="disabled">
 		<%}%>
-			<ul id="emailAddresses"></ul></div>
+			<ul id="emailAddresses"></ul>
+		</div>
 		
 		<label for="emailSubject">Subject:</label>
 		<input id="emailSubject" name="emailSubject" type="text" value="<%=emailSubject%>">
