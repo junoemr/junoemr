@@ -340,9 +340,18 @@ function updateEmailButton()
 	<input type="hidden" id="origPrintDate" name="origPrintDate" value="<%=request.getParameter("origPrintDate")%>">
 	<input type="hidden" id="numPrints" name="numPrints" value="<%=request.getParameter("numPrints")%>">
 	<input type="hidden" id="sigDoctorName" name="sigDoctorName" value="<%=request.getParameter("sigDoctorName")%>">	
-	<%} %>
-	
-	<%if(emailActionType.equals("DOC")) { %>
+	<%} 
+	if(emailActionType.equals("PREV")) {%>
+	<input type="hidden" id="nameAge" name="nameAge" value="<%=request.getParameter("nameAge")%>">
+	<input type="hidden" id="hin" name="hin" value="<%=request.getParameter("hin")%>">
+	<input type="hidden" id="mrp" name="mrp" value="<%=request.getParameter("mrp")%>">
+	<input type="hidden" id="preventProcedureAge" name="preventProcedureAge" value="<%=request.getParameter("preventProcedureAge")%>">
+	<input type="hidden" id="preventProcedureDate" name="preventProcedureDate" value="<%=request.getParameter("preventProcedureDate")%>">
+	<logic:iterate name="printHP" id="printHP">
+        <input type="hidden" name="printHP" value='<bean:write name="printHP" />' />
+    </logic:iterate>
+	<%}
+	if(emailActionType.equals("DOC")) { %>
     <logic:iterate name="docNo" id="doc">
         <input type="hidden" name="docNo" value='<bean:write name="doc" />' />
     </logic:iterate>
@@ -353,7 +362,7 @@ function updateEmailButton()
 	<!-- Show free-form phone number box -->
 
     <input type="button" id="email_button" disabled="disabled" value="<bean:message key="dms.documentReport.btnEmailPDF"/>"
-        onclick="return submitForm('<rewrite:reWrite jspPage="sendEmailPDFs.do?emailActionType=<%=emailActionType%>/>');" />
+        onclick="return submitForm('<rewrite:reWrite jspPage="sendEmailPDFs.do/>');" />
 	<% if(providerData != null && providerData.getEmail() != null && !providerData.getEmail().equals("")) { %>
     <input type="button" id="email_provider_button" value="Email to Patient's Provider"
         onclick="return emailProvider();" />

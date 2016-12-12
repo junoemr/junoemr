@@ -46,12 +46,13 @@ import org.oscarehr.util.MiscUtils;
 
 import oscar.OscarProperties;
 import oscar.dms.EDocUtil;
+import oscar.oscarPrevention.pageUtil.PreventionPrintPdf;
 import oscar.oscarRx.templates.RxPdfTemplate;
 import oscar.oscarRx.templates.RxPdfTemplateCustom1;
 
 /**
  * @author jay
- * revised Robert 2016
+ * revised by Robert 2016
  */
 public class SendEmailPDFAction extends Action {
 	
@@ -67,35 +68,34 @@ public class SendEmailPDFAction extends Action {
     	ArrayList<String> attachments = new ArrayList<String>();
     	ArrayList<Object> errorList = new ArrayList<Object>();
     	
+		String[] recipients = request.getParameterValues("emailAddresses");
+		
+		String fromAddress = props.getProperty("document_email_from_address");
+		String subject = request.getParameter("emailSubject");
+		String body = request.getParameter("emailBody");
+		String name = props.getProperty("document_email_name");
+    	
     	if(emailActionType.equals("DOC")) {
     		attachments = getDocAttachments(mapping, form, request, response);
     	}
     	else if (emailActionType.equals("RX")) {
     		attachments = getRxAttachments(mapping, form, request, response);
     	}
+    	else if (emailActionType.equals("PREV")) {
+    		attachments = getPreventionAttachments(mapping, form, request, response);
+    	}
     	
-    	if(attachments==null || attachments.size() <= 0) {
+    	if(attachments==null || attachments.size() < 1) {
     		logger.error("No pdf attachments to email. Aborting");
     		return mapping.findForward("failure");
     	}
-    	
-		String demoNo = request.getParameter("demoId");
-		String providerNo = request.getParameter("providerId");
-    	
-		String[] recipients = request.getParameterValues("emailAddresses");
-		
-		String fromAddress = props.getProperty("document_email_from_address");
-		
-		String subject = request.getParameter("emailSubject");
-		String body = request.getParameter("emailBody");
-		String name = props.getProperty("document_email_name");
 		
 		for (int i=0; i < recipients.length; i++) {
 			for(String pdf: attachments) {
 				try {
 					sendEmail(pdf, recipients[i], fromAddress, subject, body, name);
 					logger.info("Email Sent to " + recipients[i]);
-					logger.info("file:" + pdf);//TODO remove
+					logger.info("File:" + pdf);//TODO remove
 				}
 				catch(Exception e) {
 					logger.error("Error emailing pdf", e);
@@ -152,6 +152,36 @@ public class SendEmailPDFAction extends Action {
     	}
     	catch(Exception e) {
     		logger.error("Error creating Rx PDF for email", e);
+    	}
+
+    	return attachments;
+    }
+    @SuppressWarnings("unused")
+    private ArrayList<String> getPreventionAttachments(ActionMapping mapping, ActionForm form, 
+    		HttpServletRequest request, HttpServletResponse response) {
+    	ArrayList<String> attachments = new ArrayList<String>();
+    	
+    	try {
+            String[] headerIds = request.getParameterValues("printHP");
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    		
+    		PreventionPrintPdf pdf = new PreventionPrintPdf();
+            pdf.printPdf(headerIds, request, outputStream);
+    		
+            String demoNo = request.getParameter("demoId");
+	    	
+	    	// write to file
+			String path = props.getProperty("email_file_location");
+			String tempName = "Prevention-" + demoNo + "." + System.currentTimeMillis();
+			String tempPdf = String.format("%s%s%s.pdf", path, File.separator, tempName);
+			FileOutputStream fos = new FileOutputStream(tempPdf);
+			outputStream.writeTo(fos);
+			fos.close();
+			
+			attachments.add(tempPdf);
+    	}
+    	catch(Exception e) {
+    		logger.error("Error creating Prevention PDF for email", e);
     	}
 
     	return attachments;

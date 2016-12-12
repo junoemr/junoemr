@@ -28,20 +28,23 @@ package oscar.dms.actions;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.util.MiscUtils;
 
 import oscar.OscarProperties;
 
 /**
  * @author jay
- * revised Robert 2016
+ * revised by Robert 2016
  */
 public class EmailPDFAction extends Action {
 	
 	OscarProperties props = OscarProperties.getInstance();
+	Logger logger = MiscUtils.getLogger();
 	
     /** Creates a new instance of CombinePDFAction */
     public EmailPDFAction() {
@@ -52,7 +55,7 @@ public class EmailPDFAction extends Action {
 		HttpServletRequest request, HttpServletResponse response) 
 	{
     	String emailActionType = request.getParameter("emailActionType");
-    	emailActionType = (emailActionType != null)? emailActionType: "";
+    	emailActionType = (emailActionType != null) ? emailActionType: "";
     	
     	request.setAttribute("emailActionType", emailActionType);
     	
@@ -61,6 +64,9 @@ public class EmailPDFAction extends Action {
     	}
     	else if (emailActionType.equals("RX")) {
     		return emailRx(mapping, form, request, response);
+    	}
+    	else if (emailActionType.equals("PREV")) {
+    		return emailPrevention(mapping, form, request, response);
     	}
     	return mapping.findForward("failed");
     }
@@ -83,6 +89,19 @@ public class EmailPDFAction extends Action {
 			HttpServletRequest request, HttpServletResponse response) {
     	
     	if(props.isPropertyActive("rx_email_enabled")) {
+    		for(Object attr : request.getParameterMap().keySet()) {
+    			request.setAttribute((String)attr, request.getParameterValues((String)attr));
+    		}
+			return mapping.findForward("success");
+		}
+    	return mapping.findForward("failed");
+    }
+    /** set prevention email parameters and forward to correct page */
+    @SuppressWarnings("unused")
+	private ActionForward emailPrevention(ActionMapping mapping, ActionForm form, 
+			HttpServletRequest request, HttpServletResponse response) {
+    	
+    	if(props.isPropertyActive("prevention_email_enabled")) {
     		for(Object attr : request.getParameterMap().keySet()) {
     			request.setAttribute((String)attr, request.getParameterValues((String)attr));
     		}
