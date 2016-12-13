@@ -64,6 +64,14 @@
 			<name>MARC-HI Technology Exchange Private Maven Repository</name>
 			<url>http://te.marc-hi.ca/mvn</url>
 		</repository>
+
+		<!--
+		<repository>
+			<id>Codehaus Mojo</id>
+			<name>Codehaus Mojo</name>
+			<url>https://nexus.codehaus.org/content/repositories/releases/</url>
+		</repository>
+		-->
 	</repositories>
 
 	<pluginRepositories>
@@ -1131,7 +1139,7 @@
 		 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.1</version>
+                    <version>1.0</version>
                       <executions>
                         <execution>
                           <phase>validate</phase>
