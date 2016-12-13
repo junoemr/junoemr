@@ -35,6 +35,7 @@
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%@ taglib uri="/WEB-INF/indivo-tag.tld" prefix="indivo" %>
+<%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite"%>
 <%@ page import="org.oscarehr.util.DigitalSignatureUtils"%>
 <%@ page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
@@ -325,6 +326,24 @@ function printIframe(){
         preview.print();
       }
   }
+function emailNewWindow(actionPath) {
+
+	//var form = document.getElementById("rxEmailForm");
+	/*var form = document.createElement("form");
+	form.setAttribute('method',"post");
+	form.setAttribute('action', actionPath);
+	form.setAttribute("target", "_blank");
+	
+	document.getElementsByTagName('body')[0].appendChild(form);
+	form.submit();*/
+	
+	var action = actionPath + "&__title=Rx&useSC=false&scAddress=&rxPageSize=&scriptId=&demoId=" + "<%=bean.getDemographicNo()%>";
+    document.getElementById("preview").contentWindow.document.getElementById("preview2Form").action = action;
+    document.getElementById("preview").contentWindow.document.getElementById("preview2Form").target="_blank";
+    document.getElementById("preview").contentWindow.document.getElementById("preview2Form").submit();
+    
+	return true;
+}
 
 
 function printPaste2Parent(print){
@@ -642,6 +661,14 @@ function toggleView(form) {
               class="ControlPushButton" style="width: 150px"
               onClick="javascript:printIframe();" /></span></td>
           </tr>
+          <% if (OscarProperties.getInstance().isPropertyActive("rx_email_enabled")) { %>
+        	  <td><span>
+        	  <input type=button value="<bean:message key="ViewScript.msgEmail"/>"
+                      class="ControlPushButton" style="width: 150px"
+                      onclick="return emailNewWindow('<rewrite:reWrite jspPage="../dms/emailPDFs.do?emailActionType=RX"/>');" />
+              </span></td>
+              </tr> <% 
+        	  }%>
           <tr>
             <td><span><input type=button
               <%=reprint.equals("true")?"disabled='true'":""%> value="<bean:message key="ViewScript.msgPrintPasteEmr"/>"

@@ -607,7 +607,7 @@ function popup1(height, width, url, windowName){
 				if (props.isPropertyActive("document_email_enabled")) { %>
 				<input type="button"
 					value="<bean:message key="dms.documentReport.btnEmailPDF"/>"
-					onclick="return newWindowForm('<rewrite:reWrite jspPage="emailPDFs.do"/>');" />
+					onclick="return newWindowForm('<rewrite:reWrite jspPage="emailPDFs.do?emailActionType=DOC"/>');" />
 		 		<% 
 				} 
 				

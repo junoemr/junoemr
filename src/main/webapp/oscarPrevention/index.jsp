@@ -24,7 +24,7 @@
 
 --%>
 
-<%@page import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*"%>
+<%@page import="oscar.oscarDemographic.data.*,java.util.*,oscar.OscarProperties,oscar.oscarPrevention.*"%>
 <%@page import="org.oscarehr.phr.PHRAuthentication, org.oscarehr.phr.util.MyOscarUtils" %>
 <%@page import="org.oscarehr.common.dao.DemographicDao, org.oscarehr.common.model.Demographic" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
@@ -186,12 +186,25 @@ function EnablePrint(button) {
         display(checkboxes);
         var spaces = document.getElementsByName("printSp");
         display(spaces);
-        button.form.sendToPhrButton.style.display = 'block';
+        //button.form.sendToPhrButton.style.display = 'block';
+        document.getElementById("emailBtn").disabled= false;
     }
     else {
         if( onPrint() )
             document.printFrm.submit();
     }
+}
+function emailPdf(actionPath) {
+	if(onPrint()) {
+		var oldAction = document.printFrm.action;
+		var oldTarget = document.printFrm.target;
+		document.printFrm.action = actionPath + "&demoId="+ <%=demographic_no%>;
+		document.printFrm.target = "_blank";
+		console.info(document.printFrm.action, document.printFrm.target);
+		document.printFrm.submit();
+		document.printFrm.action = oldAction;
+		document.printFrm.target = oldTarget;
+	}
 }
 
 function onPrint() {
@@ -721,6 +734,12 @@ text-align:left;
 	<tr>
 		<td class="MainTableBottomRowLeftColumn">
 			<input type="button" class="noPrint" name="printButton" onclick="EnablePrint(this)" value="Enable Print">
+			
+			<% if (OscarProperties.getInstance().isPropertyActive("prevention_email_enabled")) { %>
+			<input id="emailBtn" type=button value="Email as PDF"
+                      class="noPrint" disabled style="width: 150px"
+                      onclick="return emailPdf('<rewrite:reWrite jspPage="../dms/emailPDFs.do?emailActionType=PREV"/>');" />
+			<% } %>
 <!--
 			<br>
 			<input type="button" name="sendToPhrButton" value="Send To MyOscar (PDF)" style="display: none;" onclick="sendToPhr(this)">
