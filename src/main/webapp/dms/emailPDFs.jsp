@@ -110,103 +110,43 @@ function submitForm(actionPath)
 
 	return true;
 } 
-
 function disableButtons()
 {
 	document.getElementById("email_button").disabled = true;
-
-	/*if(document.getElementById("email_provider_button"))                        
-	{                                                                           
-		document.getElementById("email_provider_button").disabled = true;       
-	}             */                                                              
-
-	/*if(document.getElementById("email_patient_button"))                         
-	{                                                                           
-		document.getElementById("email_patient_button").disabled = true;        
-	}   */
 }
-
-/*function emailProvider()
-{
-	var name = 'provider';
-	<% if(providerData != null) { %>
-	var email = '<%= StringEscapeUtils.escapeHtml(providerData.getEmail()) %>';
-	<% } %>
-	_AddHiddenEmail(email) 
-	submitForm('<rewrite:reWrite jspPage="sendEmailPDFs.do"/>');
-}*/
-
-/*function emailPatient()
-{
-	var name = 'patient';
-	<% if(demographic != null) { %>
-	var email = '<%= patientEmail %>';
-	<% } %>
-	_AddHiddenEmail(email);
-	submitForm('<rewrite:reWrite jspPage="sendEmailPDFs.do"/>');
-}*/
-
 function AddOtherEmailProvider() 
 {
 	var selected = jQuery("#otherEmailSelect option:selected");
 	appendEmail(selected.val());
-	//_AddOtherEmail(selected.text(),selected.val());
 }
-
 function AddOtherEmail() 
 {
 	var email = jQuery("#otherEmailInput").val();
 	appendEmail(email);
-	//_AddOtherEmail(email,email);
 }
-
-/*function _AddHiddenEmail(email)                                                 
-{                                                                               
-	var html = "<input type='hidden' name='emailAddresses' value='"+email+"'></input>";
-	jQuery("#emailAddresses").append(jQuery(html));
-	updateEmailButton();
-}  */
-
-/*function _AddOtherEmail(name, email) 
-{
-	var remove = "<a href='javascript:void(0);' onclick='removeRecipient(this)'>remove</a>";
-	var html = "<li>"+name+"<b>, Email No: </b>"+email+ " " +remove+"<input type='hidden' name='emailAddresses' value='"+email+"'></input></li>";
-	jQuery("#emailAddresses").append(jQuery(html));
-	updateEmailButton();
-}*/
-
-/*function removeRecipient(el) 
-{
-	var el = jQuery(el);
-	if (el) { el.parent().remove(); updateEmailButton(); }
-	else { alert("Unable to remove recipient."); }
-}*/
-
 function hasEmailAddress() 
 {
 	return jQuery("#emailAddresses").children().size() > 0;
 }
-
 function updateEmailButton() 
 {
 	var disabled = !hasEmailAddress();
 	document.getElementById("email_button").disabled = disabled;
 }
-
 function appendEmail(email) {
 	var $div = $("<div>", {class: "flexH"});
 	var $input = $("<input>", {
 		type:"text",
 		readonly: true,
 		name: "emailAddresses",
-		value: email
+		value: email,
+		class: "flexInput"
 	});
 	var $remove = $("<button>", {
 		type:"button",
 		text: "remove",
 		click: function() {
 			$div.remove();
-			console.info("remove called");
 			updateEmailButton();
 			return false;
 		}
@@ -281,6 +221,10 @@ $(function() {
 	display: flex;
 	flex-direction: column;
 	}
+	.flexInput {
+	flex: 1;
+	max-width: 500px;
+	}
 </style>
 
 </head>
@@ -321,7 +265,6 @@ $(function() {
 			%>
 			<table width="100%">
 			<tr>
-
 				<td class="tite4" width="10%">  Providers: </td>
 				<td class="tite3" width="20%">
 					<select id="otherEmailSelect" style="width: 100%;">
@@ -376,13 +319,7 @@ $(function() {
 <html:form action="/dms/sendEmailPDFs">
 	<div class="flexV">
 		<label for="emailAddresses">Email To:</label>
-		<div>
-		<%if(demographic != null) { %>
-			<!-- <label for="patientEmailAddr">Patient Email:</label> 
-			<input id="patientEmailAddr" name="patientEmailAddr" type="text" value="<%=patientEmail%>" disabled="disabled">-->
-		<%}%>
-			<ul id="emailAddresses"></ul>
-		</div>
+		<div id="emailAddresses"></div>
 		
 		<label for="emailSubject">Subject:</label>
 		<input id="emailSubject" name="emailSubject" type="text" value="<%=emailSubject%>">
@@ -422,32 +359,19 @@ $(function() {
 	<input type="hidden" id="numPrints" name="numPrints" value="<%=request.getParameter("numPrints")%>">
 	<input type="hidden" id="sigDoctorName" name="sigDoctorName" value="<%=request.getParameter("sigDoctorName")%>">	
 	<%} 
+	// most of the inputs for preventions are generated on document load.
 	if(emailActionType.equals("PREV")) {%>
 	<input type="hidden" id="nameAge" name="nameAge" value="<%=request.getParameter("nameAge")%>">
 	<input type="hidden" id="hin" name="hin" value="<%=request.getParameter("hin")%>">
 	<input type="hidden" id="mrp" name="mrp" value="<%=request.getParameter("mrp")%>">
-
 	<%}
 	if(emailActionType.equals("DOC")) { %>
     <logic:iterate name="docNo" id="doc">
         <input type="hidden" name="docNo" value='<bean:write name="doc" />' />
     </logic:iterate>
     <%} %>
-
-	<!-- Show options for email recipients -->
-
-	<!-- Show free-form phone number box -->
-
     <input type="button" id="email_button" value="<bean:message key="dms.documentReport.btnEmailPDF"/>"
         onclick="return submitForm('<rewrite:reWrite jspPage="sendEmailPDFs.do"/>');" />
-	<% if(providerData != null && providerData.getEmail() != null && !providerData.getEmail().equals("")) { %>
-    <!--  <input type="button" id="email_provider_button" value="Email to Patient's Provider"
-        onclick="return emailProvider();" /> -->
-	<% } %>
-	<% if(demographic != null && demographic.getEmail() != null && !demographic.getEmail().equals("")) { %>
-    <!--<input type="button" id="email_patient_button" value="Email to Patient"
-        onclick="return emailPatient();" />-->
-	<% } %>
 
 </html:form>
 </body>
