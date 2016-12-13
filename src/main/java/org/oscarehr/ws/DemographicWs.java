@@ -25,30 +25,28 @@
 
 package org.oscarehr.ws;
 
-import javax.jws.WebService;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.annotation.Resource;
+import javax.jws.WebService;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
-import javax.servlet.http.HttpServletRequest;
 
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicCust;
-import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.DemographicCustManager;
+import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.ws.transfer_objects.DemographicTransfer;
-
-import oscar.oscarDemographic.data.DemographicRelationship;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import oscar.log.LogAction;
+import oscar.oscarDemographic.data.DemographicRelationship;
 
 @WebService
 @Component
@@ -64,24 +62,26 @@ public class DemographicWs extends AbstractWs {
 	private DemographicCustManager demographicCustManager;
 	
 	public DemographicTransfer getDemographic(Integer demographicId)
-		throws Exception
 	{
 		Demographic demographic=demographicManager.getDemographic(demographicId);
 		DemographicCust custResult = demographicCustManager.getDemographicCust(demographic.getDemographicNo());
 
 		DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
-		transfer.setNotes(custResult.getParsedNotes());
+		if(custResult != null) {
+			transfer.setNotes(custResult.getParsedNotes());
+		}
 		return transfer;
 	}
 
 	public DemographicTransfer getDemographicByMyOscarUserName(String myOscarUserName)
-		throws Exception
 	{
 		Demographic demographic=demographicManager.getDemographicByMyOscarUserName(myOscarUserName);
 		DemographicCust custResult = demographicCustManager.getDemographicCust(demographic.getDemographicNo());
 
 		DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
-		transfer.setNotes(custResult.getParsedNotes());
+		if(custResult != null) {
+			transfer.setNotes(custResult.getParsedNotes());
+		}
 		return transfer;
 	}
 

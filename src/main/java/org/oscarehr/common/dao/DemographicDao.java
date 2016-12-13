@@ -63,8 +63,8 @@ import org.oscarehr.common.model.DemographicExt;
 import org.oscarehr.integration.hl7.generators.HL7A04Generator;
 import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import oscar.MyDateFormat;
@@ -97,7 +97,7 @@ public class DemographicDao extends HibernateDaoSupport {
 	{
 		HibernateTemplate template = this.getHibernateTemplate();
 
-		return (List) template.executeFind(new HibernateCallback()
+		return template.executeFind(new HibernateCallback()
 		{
 			public Object doInHibernate(Session session) throws HibernateException, SQLException
 			{

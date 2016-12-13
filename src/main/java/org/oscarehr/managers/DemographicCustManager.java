@@ -38,10 +38,8 @@ public class DemographicCustManager
 {
 	@Autowired
 	private DemographicCustDao demographicCustDao;
-	
-	
+
 	public DemographicCust getDemographicCust(Integer demographicId)
-		throws Exception
 	{
 		DemographicCust result=demographicCustDao.find(demographicId);
 		
