@@ -1590,4 +1590,7 @@ public class EFormUtil {
 		}
 		return null;
 	}
+	public static boolean blank(String s) {
+		return (s == null || s.trim().equals(""));
+	}
 }
