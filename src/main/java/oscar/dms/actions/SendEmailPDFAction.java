@@ -69,11 +69,16 @@ public class SendEmailPDFAction extends Action {
     	ArrayList<Object> errorList = new ArrayList<Object>();
     	
 		String[] recipients = request.getParameterValues("emailAddresses");
+		if(recipients==null || recipients.length < 1) {
+			logger.error("No recipients to email. Operation Aborted");
+			errorList.add("No recipients to email. Operation Aborted");
+    		return mapping.findForward("failure");
+		}
 		
 		String fromAddress = props.getProperty("document_email_from_address");
 		String subject = request.getParameter("emailSubject");
 		String body = request.getParameter("emailBody");
-		String name = props.getProperty("document_email_name");
+		String name = props.getProperty("document_email_name", "OscarEMR");
     	
     	if(emailActionType.equals("DOC")) {
     		attachments = getDocAttachments(mapping, form, request, response);
@@ -86,7 +91,8 @@ public class SendEmailPDFAction extends Action {
     	}
     	
     	if(attachments==null || attachments.size() < 1) {
-    		logger.error("No pdf attachments to email. Aborting");
+    		logger.error("No pdf attachments to email. Operation Aborted");
+    		errorList.add("No pdf attachments to email. Operation Aborted");
     		return mapping.findForward("failure");
     	}
 		
@@ -95,7 +101,7 @@ public class SendEmailPDFAction extends Action {
 				try {
 					sendEmail(pdf, recipients[i], fromAddress, subject, body, name);
 					logger.info("Email Sent to " + recipients[i]);
-					logger.info("File:" + pdf);//TODO remove
+					logger.info("File:" + pdf);
 				}
 				catch(Exception e) {
 					logger.error("Error emailing pdf", e);
@@ -163,6 +169,10 @@ public class SendEmailPDFAction extends Action {
     	
     	try {
             String[] headerIds = request.getParameterValues("printHP");
+            if(headerIds.length < 1) {
+            	logger.error("Attempt to email prevention without header Ids Aborted");
+            	return attachments;
+            }
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     		
     		PreventionPrintPdf pdf = new PreventionPrintPdf();
