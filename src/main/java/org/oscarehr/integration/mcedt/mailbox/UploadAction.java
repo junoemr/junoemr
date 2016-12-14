@@ -78,7 +78,7 @@ public class UploadAction extends DispatchAction {
 	}
 	
 	public ActionForward cancelUpload(ActionMapping mapping, ActionForm form, 
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
+			HttpServletRequest request, HttpServletResponse response) {
 		ActionUtils.removeUploadResourceId(request);
 		ActionUtils.removeUploadFileName(request);
 		List<File> files = ActionUtils.getSuccessfulUploads(request);
@@ -110,12 +110,12 @@ public class UploadAction extends DispatchAction {
 	}
 
 	public ActionForward addNew(ActionMapping mapping, ActionForm form, 
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
+			HttpServletRequest request, HttpServletResponse response) {
 		return mapping.findForward("addNew");
 	}
 	
 	public ActionForward removeSelected(ActionMapping mapping, ActionForm form, 
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
+			HttpServletRequest request, HttpServletResponse response) {
 		return mapping.findForward("success");
 	}
 

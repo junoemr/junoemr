@@ -58,8 +58,6 @@ import ca.ontario.health.edt.TypeListResult;
 
 public class DownloadAction extends DispatchAction{
 	private static Logger logger = Logger.getLogger(DownloadAction.class);
-	private boolean isFileToDownload=false;
-
 
 	@Override
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -194,7 +192,7 @@ public class DownloadAction extends DispatchAction{
 	}
 	
 	public ActionForward download(ActionMapping mapping, ActionForm form, 
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
+			HttpServletRequest request, HttpServletResponse response) {
 		List<BigInteger> ids = getResourceIds(request);
 		Collections.sort(ids);
 		
@@ -323,7 +321,7 @@ public class DownloadAction extends DispatchAction{
 	}
 	
 	public ActionForward cancel(ActionMapping mapping, ActionForm form, 
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
+			HttpServletRequest request, HttpServletResponse response) {
 		if(request.getSession().getAttribute("resourceList")!=null){
 			request.getSession().removeAttribute("resourceList");
 		}		
@@ -334,7 +332,7 @@ public class DownloadAction extends DispatchAction{
 	}	
 	
 	public ActionForward userDownload(ActionMapping mapping, ActionForm form, 
-			HttpServletRequest request, HttpServletResponse response) throws Exception {		
+			HttpServletRequest request, HttpServletResponse response) {		
 		List<BigInteger> ids = getResourceIds(request);
 		Collections.sort(ids);
 		DownloadResult downloadResult = null;	
@@ -368,7 +366,7 @@ public class DownloadAction extends DispatchAction{
 	}		
 	
 	public ActionForward changeDisplay(ActionMapping mapping, ActionForm form, HttpServletRequest request, 
-			HttpServletResponse response) throws Exception {
+			HttpServletResponse response) {
 		List<DetailDataCustom> resourceList = getResourceList(request,form);		
 		
 		request.getSession().setAttribute("resourceListSent",resourceList );

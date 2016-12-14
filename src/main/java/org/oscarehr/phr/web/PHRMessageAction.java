@@ -110,11 +110,11 @@ public class PHRMessageAction extends DispatchAction {
 		this.phrService = phrService;
 	}
 
-	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		return viewMessages(mapping, form, request, response);
 	}
 
-	public ActionForward viewMessages(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ActionForward viewMessages(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 
 		clearSessionVariables(request);
 
