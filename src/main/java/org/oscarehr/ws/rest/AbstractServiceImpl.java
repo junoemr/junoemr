@@ -53,7 +53,7 @@ public abstract class AbstractServiceImpl {
 	/**
 	 * Gets the client's locale
 	 * 
-	 * @return
+	 * @return Locale
 	 */
 	protected Locale getLocale()
 	{
@@ -64,7 +64,7 @@ public abstract class AbstractServiceImpl {
 	 * 
 	 * Get the UI resource bundle for locale specific messages
 	 * 
-	 * @return
+	 * @return ResourceBundle
 	 */
 	protected ResourceBundle getResourceBundle() 
 	{

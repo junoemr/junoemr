@@ -43,9 +43,11 @@ public class ConsultationService {
 
 
 	/**
+	 * @deprecated
+	 * 
 	 * Use to get consultation count for pagination display
 	 * @param paginationQuery
-	 * @return
+	 * @return int
 	 */
 	@Deprecated
     public int getConsultationCount(PaginationQuery paginationQuery) {
@@ -53,9 +55,11 @@ public class ConsultationService {
     }
 	
     /**
+     * @deprecated
+     * 
      * List consultations
      * @param paginationQuery
-     * @return
+     * @return List of type ConsultationRequest
      */
     @Deprecated
 	public List<ConsultationRequest> listConsultationRequests(LoggedInInfo loggedInInfo,PaginationQuery paginationQuery) {

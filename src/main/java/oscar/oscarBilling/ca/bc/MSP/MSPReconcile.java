@@ -885,7 +885,7 @@ public class MSPReconcile {
 	}
 
 	/**
-	 * @Deprecated use method signature updateBillingStatusWCB(String stat, String billingMasterNo
+	 * @deprecated use method signature updateBillingStatusWCB(String stat, String billingMasterNo
 	 */
 	@Deprecated
 	public void updateBillingStatusWCB(@SuppressWarnings("unused") String billingNo, String stat, String billingMasterNo) {
@@ -1454,7 +1454,6 @@ public class MSPReconcile {
 	 * @param providerNo
 	 * @param startDate
 	 * @param endDate
-	 * @param excludePrivate
 	 * @return BillSearch
 	 */
 	public MSPReconcile.BillSearch getPrivatePayments(String account, String payeeNo, String providerNo, String startDate, String endDate) {
@@ -1515,7 +1514,7 @@ public class MSPReconcile {
 	}
 	
 	/**
-	 * @Deprecated use method signature getPrivatePayments(String account, String payeeNo, String providerNo, String startDate, String endDate)
+	 * @deprecated use method signature getPrivatePayments(String account, String payeeNo, String providerNo, String startDate, String endDate)
 	 */
 	@Deprecated
 	public MSPReconcile.BillSearch getPrivatePayments(String account, String payeeNo, String providerNo, 

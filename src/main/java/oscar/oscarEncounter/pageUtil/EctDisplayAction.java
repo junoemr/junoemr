@@ -283,10 +283,10 @@ public class EctDisplayAction extends Action {
 	 * 
 	 * @param title
 	 * 		Title to be displayed for the item
+	 * @param url
+	 * 		Target URL to be opened with link is clicked
 	 * @param color
 	 * 		Color of the link to be displayed in the item (e.g. "red", or "green")
-	 * @param link
-	 * 		Targer URL to be opened with link is clicked
 	 * @return
 	 * 		Returns the new item.
 	 */

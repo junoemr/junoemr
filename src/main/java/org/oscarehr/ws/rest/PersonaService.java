@@ -390,7 +390,7 @@ public class PersonaService extends AbstractServiceImpl {
 	 * This will be a REST based way to get access to groups of preferences. It's not fully implemented yet
 	 * 
 	 * @param obj
-	 * @return
+	 * @return PersonaResponse
 	 */
 	@POST
 	@Path("/preferences")

@@ -99,7 +99,7 @@ public class PollTimer {
 	/**
 	 * Start a service
 	 * 
-	 * @param method
+	 * @param services
 	 * @param interval
 	 */
 	public static void start(ServiceExecuter services, Integer interval) {		

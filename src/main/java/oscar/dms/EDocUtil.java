@@ -1115,8 +1115,6 @@ public final class EDocUtil {
 		 * 
 		 * @param fileName
 		 * 		Name of the file to use for saving the content
-		 * @param content
-		 * 		Content to be saved into the file
 		 * @return
 		 * 		Returns the content of the file
 		 * @throws IOException

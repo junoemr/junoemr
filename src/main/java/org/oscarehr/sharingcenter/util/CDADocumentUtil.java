@@ -90,9 +90,9 @@ import oscar.oscarDemographic.pageUtil.Util;
 import oscar.util.DateUtils;
 
 /**
- * @description Helper class for creating xPhr & NexJ CDA documents
- * @date Modified: November 13th 2013
- * @date Modified: February 3rd 2013
+ * Helper class for creating xPhr & NexJ CDA documents
+ * date Modified: November 13th 2013
+ * date Modified: February 3rd 2013
  */
 public class CDADocumentUtil {
 
@@ -101,26 +101,25 @@ public class CDADocumentUtil {
     private static String providerNo = null;
 
     /**
-     * Initialise directory set up variables
+     * Initialize directory set up variables
      */
     public static final OscarProperties oscarProperties = OscarProperties.getInstance();
 
     /**
-     * Initialise temporary directory string for oscar properties
+     * Initialize temporary directory string for oscar properties
      */
     public static final String TEMP_DIRECTORY = oscarProperties.getProperty("TMP_DIR");
 
     /**
-     * Initialise logger for debugging
+     * Initialize logger for debugging
      */
     public static final Logger LOGGER = MiscUtils.getLogger();
 
     /**
      * Creates and formats an xPHR CDA document.
      *
-     * @param demoId The id of the patient.
-     * @param session The current session.
-     * @param mode The mode of the document.
+     * @param demographicId The id of the patient.
+     * @param providerId id of the provider.
      * @return PhrExtractDocument
      *
      */
@@ -158,7 +157,7 @@ public class CDADocumentUtil {
     /**
      * CREATE ALLERGIES SECTION OF XPHR
      *
-     * @param demoId
+     * @param demographicNo
      */
     private static void createAllergies(int demographicNo) {
 
@@ -177,7 +176,7 @@ public class CDADocumentUtil {
     /**
      * CREATE ACTIVE CONDITIONS SECTION FOR XPHR OR NEXJ
      *
-     * @param demoId, mode
+     * @param demographicNo
      */
     private static void createConditions(int demographicNo) {
         LinkedHashMap<IssueEnum, List<CaseManagementNote>> map = CaseManagementUtil.getCaseManagementNoteMap(demographicNo);
@@ -202,9 +201,7 @@ public class CDADocumentUtil {
     /**
      * CREATE HEADER PART OF XPHR
      *
-     * @param demoId
-     * @param userRole
-     * @param user
+     * @param demographicNo
      */
     private static void createHeader(int demographicNo) {
 
@@ -335,9 +332,8 @@ public class CDADocumentUtil {
     /**
      * CREATE MEDICATIONS SECTION OF XPHR
      *
-     * @param demoId
+     * @param demographicNo
      */
-    @SuppressWarnings("unchecked")
     private static void createMedications(int demographicNo) {
 
         List<Drug> medications = MedicationUtil.getMedications(demographicNo);

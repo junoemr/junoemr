@@ -2149,9 +2149,8 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	 * This method war written for BORN Kid eConnect job to figure out which eforms don't have an eform_value present
 	 * 
 	 * This method will be refined a bit during QA
-	 * @param fid
-	 * @param varName
-	 * @return
+	 * @param keyName
+	 * @return List<Integer>
 	 */
 	public List<Integer> getBORNKidsMissingExtKey(String keyName) {
 		Calendar cal = Calendar.getInstance();

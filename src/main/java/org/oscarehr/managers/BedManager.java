@@ -452,7 +452,7 @@ public class BedManager {
 		    return beds;
 	    }
 	    /**
-	     * @see org.oscarehr.PMmodule.service.BedManager#getBedTypes()
+	     * see org.oscarehr.PMmodule.service.BedManager#getBedTypes()
 	     */
 	    public BedType[] getBedTypes() {
 	        return bedTypeDao.getBedTypes();

@@ -90,7 +90,7 @@ public class IntegratorPushAction extends DispatchAction {
 	 * @param form
 	 * @param request
 	 * @param response
-	 * @return
+	 * @return ActionForward
 	 */
 	public ActionForward disableNextAndFuturePushes(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 

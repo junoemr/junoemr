@@ -38,16 +38,16 @@ public class ProviderUtil {
 
 	private static ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	
+
+	public static Provider createProvider(Demographic demographic) {
+		return createProvider(demographic, null);
+	}
 	/**
 	 * This method will return the Provider associated with providerNo given.
 	 * 
 	 * @param providerNo
-	 * @return
+	 * @return Provider
 	 */
-	public static Provider createProvider(Demographic demographic) {
-		return createProvider(demographic, null);
-	}
-	
 	public static Provider createProvider(String providerNo) {
 		return providerDao.getProvider(providerNo);
 	}
@@ -76,7 +76,7 @@ public class ProviderUtil {
 	 * This method will return the Provider associated with practionerNo given.
 	 * 
 	 * @param practitionerNo
-	 * @return
+	 * @return Provider
 	 */
 	public static Provider getProviderByPractitionerNo(String practitionerNo) {
 		return providerDao.getProviderByPractitionerNo(practitionerNo);
@@ -84,7 +84,7 @@ public class ProviderUtil {
 	/**
 	 * This method will return the List of Providers
 	 * 
-	 * @return
+	 * @return List of type Provider
 	 */
 	public static List<Provider> getProviders() {
 		return providerDao.getProviders();
@@ -92,8 +92,8 @@ public class ProviderUtil {
 	/**
 	 * This method will return the list of Providers that are either active or inactive.
 	 * 
-	 * @param active, true: active, false: inactive
-	 * @return
+	 * @param active - true: active, false: inactive
+	 * @return List of type Provider
 	 */
  	public static List<Provider> getProviders(boolean active) {
  		return providerDao.getProviders(active);
@@ -102,7 +102,7 @@ public class ProviderUtil {
  	 * This method will return the list of Providers that have the given name.
  	 * 
  	 * @param name
- 	 * @return
+ 	 * @return List of type Provider
  	 */
 	public static List<Provider> getProvidersByName(String name){
 		return providerDao.search(name);
@@ -112,7 +112,7 @@ public class ProviderUtil {
 	 * 
 	 * @param firstname
 	 * @param lastname
-	 * @return
+	 * @return List of type Provider
 	 */
 	public static List<Provider> getProvidersByName(String firstname, String lastname) {
 		return providerDao.getProviderFromFirstLastName(firstname, lastname);
@@ -121,7 +121,7 @@ public class ProviderUtil {
 	 * This method will return the list of Providers of the given type. 
 	 * 
 	 * @param type
-	 * @return
+	 * @return List of type Provider
 	 */
 	public static List<Provider> getProvidersByType(String type) {
 		return providerDao.getProvidersByType(type);

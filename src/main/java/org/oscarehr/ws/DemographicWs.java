@@ -96,7 +96,7 @@ public class DemographicWs extends AbstractWs {
 	}
 	
 	/**
-	 * @see DemographicManager.searchDemographicsByAttributes for parameter details
+	 * see DemographicManager.searchDemographicsByAttributes for parameter details
 	 */
 	public DemographicTransfer[] searchDemographicsByAttributes(String hin, String firstName, String lastName, Gender gender, Calendar dateOfBirth, String city, String province, String phone, String email, String alias, int startIndex, int itemsToReturn) {
 		List<Demographic> demographics=demographicManager.searchDemographicsByAttributes(getLoggedInInfo(),hin, firstName, lastName, gender, dateOfBirth, city, province, phone, email, alias, startIndex, itemsToReturn);
@@ -104,7 +104,7 @@ public class DemographicWs extends AbstractWs {
 	}
 	
 	/**
-	 * @programId can be null for all / any program
+	 * programId can be null for all / any program
 	 */
 	public Integer[] getAdmittedDemographicIdsByProgramProvider(Integer programId, String providerNo)
 	{

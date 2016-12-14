@@ -612,7 +612,7 @@ public class ContactAction extends DispatchAction {
 	 * @param searchMode
 	 * @param orderBy
 	 * @param keyword
-	 * @return
+	 * @return List of type Contact
 	 */
 	public static List<Contact> searchAllContacts(String searchMode, String orderBy, String keyword) {
 		List<Contact> contacts = new ArrayList<Contact>();

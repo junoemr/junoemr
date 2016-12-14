@@ -43,7 +43,7 @@ public class TicklerService {
 	/**
 	 * Use to get ticklers count for pagination display
 	 * @param paginationQuery
-	 * @return
+	 * @return int count of ticklers
 	 */
     public int getTicklersCount(PaginationQuery paginationQuery) {
 	    return this.TicklerDao.getTicklersCount(paginationQuery);
@@ -52,7 +52,7 @@ public class TicklerService {
     /**
      * List ticklers
      * @param paginationQuery
-     * @return
+     * @return List of type Tickler
      */
 	public List<Tickler> getTicklers(LoggedInInfo loggedInInfo, PaginationQuery paginationQuery) {
 		TicklerQuery query = (TicklerQuery) paginationQuery;

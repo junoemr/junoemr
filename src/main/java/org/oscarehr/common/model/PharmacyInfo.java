@@ -219,7 +219,7 @@ public class PharmacyInfo extends AbstractModel<Integer> implements Comparable<P
 
 
 	/**
-	 * @param persist the persist to set
+	 * @param persistent - boolean persist value to set
 	 */
 	public void setPersistent(Boolean persistent) {
 		this.persistent = persistent;

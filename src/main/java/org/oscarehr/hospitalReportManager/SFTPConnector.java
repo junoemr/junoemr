@@ -251,7 +251,7 @@ public class SFTPConnector {
 	 * Issue an 'ls' command and return the objects in an array
 	 * 
 	 * @param folder
-	 * @return
+	 * @return String[]
 	 * @throws SftpException
 	 */
 	public String[] ls(String folder) throws SftpException {
@@ -264,7 +264,7 @@ public class SFTPConnector {
 	 * @param folder
 	 *            to issue the 'ls' command on
 	 * @param printInfo
-	 * @return
+	 * @return String[]
 	 * @throws SftpException
 	 */
 	public String[] ls(String folder, boolean printInfo) throws SftpException {
@@ -309,8 +309,6 @@ public class SFTPConnector {
 	 * 
 	 * @param serverDirectory
 	 *            directory on server side to fetch contents
-	 * @param localDownloadFolder
-	 *            name of folder to place downloaded files. This folder is placed under the tmp folder specified at
 	 * @throws Exception
 	 *             custom error messages if Java is unable to create a folder in /tmp/oscar-sftp and parent dirs
 	 * @return array of full path filenames
@@ -447,7 +445,7 @@ public class SFTPConnector {
 	 * string value of the decrypted file.
 	 * 
 	 * @param fullPath
-	 * @return
+	 * @return String
 	 * @throws Exception
 	 */
 	public static String decryptFile(String fullPath) throws Exception {

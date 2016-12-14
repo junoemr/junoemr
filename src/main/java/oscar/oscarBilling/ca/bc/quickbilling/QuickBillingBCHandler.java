@@ -61,8 +61,7 @@ import oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean;
 
 /**
  * @author Dennis Warren
- * @Revised Jun 4, 2012
- * @Comment 
+ * Revised Jun 4, 2012
  *
  */
 public class QuickBillingBCHandler {
@@ -571,7 +570,7 @@ public class QuickBillingBCHandler {
      * UTILITY METHOD -REALLY SHOULDN'T BE IN HERE...
      * But I made it static - unlike others.
      * @param s
-     * @return
+     * @return 8 character date string
      */
     public static String convertDate8Char(String s) {
         String  sdate = "00000000", syear = "", smonth = "", sday = "";

@@ -47,7 +47,7 @@ public class CaseNoteParser {
 	/**
 	 * preset key = "familyphysician"
 	 * @param note
-	 * @return
+	 * @return String value
 	 */
 	public static String getFamilyDr(String note) {
 		return getValue( note, FAMILY_DR_KEY );
@@ -56,7 +56,7 @@ public class CaseNoteParser {
 	/**
 	 * preset phone number key = P
 	 * @param note
-	 * @return
+	 * @return String value
 	 */
 	public static String getPhoneNumber(String note) {
 		return getValue( note, PHONE_KEY );
@@ -65,7 +65,7 @@ public class CaseNoteParser {
 	/**
 	 * preset fax number key = k
 	 * @param note
-	 * @return
+	 * @return String value
 	 */
 	public static String getFaxNumber(String note) {
 		return getValue( note, FAX_KEY );
@@ -79,7 +79,7 @@ public class CaseNoteParser {
 	 * 
 	 * @param note text
 	 * @param key relationship to value desired.
-	 * @return
+	 * @return String value
 	 */
 	public static String getValue( String note, final String key ) {
 

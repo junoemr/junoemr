@@ -169,13 +169,13 @@ public class TicklerDao extends AbstractDao<Tickler>{
 	
 	
 	/**
-	 * @Deprecated
+	 * @deprecated
 	 * 
 	 * Get Ticklers.
 	 * 
 	 * Warning..this will limit you to TicklerDao.MAX_LIST_RETURN_SIZE
 	 * @param filter
-	 * @return
+	 * @return List of type Tickler
 	 */
 	public List<Tickler> getTicklers(CustomFilter filter) {
 		return getTicklers(filter,0,TicklerDao.MAX_LIST_RETURN_SIZE);

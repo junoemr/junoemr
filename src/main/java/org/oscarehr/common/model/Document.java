@@ -349,7 +349,7 @@ public class Document extends AbstractModel<Integer> implements Serializable {
     }
 
 	/**
-	 * @returns a string representing the path of the file on disk, i.e. document_dir+'/'+filename
+	 * @return a string representing the path of the file on disk, i.e. document_dir+'/'+filename
 	 */
 	public String getDocumentFileFullPath()
 	{
