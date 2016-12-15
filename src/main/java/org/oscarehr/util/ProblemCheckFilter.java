@@ -47,7 +47,7 @@ public final class ProblemCheckFilter implements Filter
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
-	private static final long MAX_THRESHOLD=1024000*10; // we'll start at 10 megs of ram for now
+	private static final long MAX_THRESHOLD=1024000*512; // we'll start at 10 megs of ram for now
 	
 	public static class SessionChecker implements HttpSession
 	{
