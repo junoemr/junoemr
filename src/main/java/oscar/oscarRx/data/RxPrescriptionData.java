@@ -131,7 +131,7 @@ public class RxPrescriptionData {
 		if (drug.getRefillDuration() != null) prescription.setRefillDuration(drug.getRefillDuration());
 		if (drug.getRefillQuantity() != null) prescription.setRefillQuantity(drug.getRefillQuantity());
 
-		if (prescription.getSpecial() == null || prescription.getSpecial().length() <= 6) {
+		if (prescription.getSpecial() == null || prescription.getSpecial().trim().length() == 0) {
 			logger.warn("I strongly suspect something is wrong, either special is null or it appears to not contain anything useful. drugId=" + drugId + ", drug.special=" + prescription.getSpecial());
 			logger.warn("data from db is : " + drug.getSpecial());
 		}
@@ -537,7 +537,7 @@ public class RxPrescriptionData {
 			Prescription rx = bean.getStashItem(i);
 
 			String fullOutLine = rx.getFullOutLine();
-			if (fullOutLine == null || fullOutLine.length() < 6) {
+			if (fullOutLine == null || fullOutLine.trim().length() == 0) {
 				logger.warn("Drug full outline appears to be null or empty : " + fullOutLine);
 			}
 
@@ -1263,18 +1263,7 @@ public class RxPrescriptionData {
 		}
 
 		public String getSpecial() {
-
-			//if (special == null || special.length() < 6) {
-			if (special == null || special.length() < 4) {
-				// the reason this is here is because Tomislav/Caisi was having massive problems tracking down
-				// drugs that randomly go missing in prescriptions, like a list of 20 drugs and 3 would be missing on the prescription.
-				// it was tracked down to some code which required a special, but we couldn't figure out why a special was required or missing.
-				// so now we have code to log an error when a drug is missing a special, we still don't know why it's required or missing
-				// but at least we know which drug does it.
-				logger.warn("Some one is retrieving the drug special but it appears to be blank : " + special);
-			}
-
-			return special;
+			return this.special;
 		}
 
 		public String getOutsideProviderName() {
@@ -1293,28 +1282,26 @@ public class RxPrescriptionData {
 			this.outsideProviderOhip = outsideProviderOhip;
 		}
 
-		public void setSpecial(String RHS) {
+        public void setSpecial(String RHS) {
 
-			//if (RHS == null || RHS.length() < 6) {
-			if (RHS == null || RHS.length() < 4) {
-				logger.warn("Some one is setting the drug special but it appears to be blank : " + special);
+        	/* 
+        	 * Error if setting a null or empty special
+        	 * only if it wasn't already null, as the special is initialized to null 
+        	 * and sometimes it gets set to its current value.
+        	 * We should never set the special to empty string (empty string should mean bad client-side input checking).
+        	 */
+			if ((RHS == null && special != null) || (RHS != null && RHS.trim().length() == 0)) {
+			    logger.error("The drug special has been set to a bad value:'" + RHS + "'; "+
+			    		"The old value was:'"+special+"';", new IllegalStateException());
 			}
-
-			if (RHS != null) {
-				if (!RHS.equals("null")) {
-					special = RHS;
-				} else {
-					special = null;
-				}
-			} else {
-				special = null;
-			}
-
-			//if (special == null || special.length() < 6) {
-			if (special == null || special.length() < 4) {
-				logger.warn("after processing the drug special but it appears to be blank : " + special);
-			}
-		}
+        	
+			if (RHS != null && !RHS.equals("null")) {
+				special = RHS;
+            }
+			else {
+                special = null;
+            }
+        }
 
 		public String getSpecialDisplay() {
 			String ret = "";
@@ -1544,12 +1531,7 @@ public class RxPrescriptionData {
 			// clean up fields
 			if (this.takeMin > this.takeMax) this.takeMax = this.takeMin;
 
-			if (getSpecial() == null || getSpecial().length() < 6) logger.warn("drug special appears to be null or empty : " + getSpecial());
-
-			//  String parsedSpecial = RxUtil.replace(this.getSpecial(), "'", "");//a bug?
 			String escapedSpecial = StringEscapeUtils.escapeSql(this.getSpecial());
-
-			if (escapedSpecial == null || escapedSpecial.length() < 6) logger.warn("drug special after escaping appears to be null or empty : " + escapedSpecial);
 
 			// check to see if there is an identitical prescription in
 			// the database. If there is we'll return that drugid instead
@@ -2104,18 +2086,10 @@ public class RxPrescriptionData {
 			if (this.takeMin > this.takeMax) {
 				this.takeMax = this.takeMin;
 			}
-			if (getSpecial() == null || getSpecial().length() < 4) {
-				//if (getSpecial() == null || getSpecial().length() < 6) {
-				logger.warn("drug special appears to be null or empty : " + getSpecial());
-			}
-			String parsedSpecial = RxUtil.replace(this.getSpecial(), "'", "");
-			//if (parsedSpecial == null || parsedSpecial.length() < 6) {
-			if (parsedSpecial == null || parsedSpecial.length() < 4) {
-				logger.warn("drug special after parsing appears to be null or empty : " + parsedSpecial);
-			}
+			String escapedSpecial = StringEscapeUtils.escapeSql(this.getSpecial());
 
 			FavoriteDao dao = SpringUtils.getBean(FavoriteDao.class);
-			org.oscarehr.common.model.Favorite favorite = dao.findByEverything(this.getProviderNo(), this.getFavoriteName(), this.getBN(), this.getGCN_SEQNO(), this.getCustomName(), this.getTakeMin(), this.getTakeMax(), this.getFrequencyCode(), this.getDuration(), this.getDurationUnit(), this.getQuantity(), this.getRepeat(), this.getNosubs(), this.getPrn(), parsedSpecial, this.getGN(), this.getUnitName(), this.getCustomInstr());
+			org.oscarehr.common.model.Favorite favorite = dao.findByEverything(this.getProviderNo(), this.getFavoriteName(), this.getBN(), this.getGCN_SEQNO(), this.getCustomName(), this.getTakeMin(), this.getTakeMax(), this.getFrequencyCode(), this.getDuration(), this.getDurationUnit(), this.getQuantity(), this.getRepeat(), this.getNosubs(), this.getPrn(), escapedSpecial, this.getGN(), this.getUnitName(), this.getCustomInstr());
 
 			if (this.getFavoriteId() == 0) {
 

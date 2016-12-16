@@ -366,11 +366,11 @@ public class DefaultNoteService implements NoteService {
 		if(endingPoint > (entries.size())){
 			endingPoint = entries.size() ;
 		}
-		logger.error("number of entries "+entries.size()+" starting "+startingPoint+" endpoint "+endingPoint+" offset "+offset+" numToReturn "+numToReturn);
+		logger.debug("number of entries "+entries.size()+" starting "+startingPoint+" endpoint "+endingPoint+" offset "+offset+" numToReturn "+numToReturn);
 		for (int x = startingPoint ; x < endingPoint; x++) {
 			slice.add(entries.get(x));
 		}
-		logger.error("slice "+slice.size() +" max size "+ criteria.getMaxResults());
+		logger.debug("slice "+slice.size() +" max size "+ criteria.getMaxResults());
 		if(slice.size() == criteria.getMaxResults() ){
 			result.setMoreNotes(true);
 		}
