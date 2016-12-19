@@ -78,17 +78,17 @@ public class WebServiceLoggingAdvice {
 			Object result = joinpoint.proceed();
 			duration = System.currentTimeMillis() - duration;
 
-			logAccess("REST WS", getServiceCallDescription(joinpoint));
+			logAccess("REST WS: " +getServiceCallDescription(joinpoint));
 			return result;
 		} catch (Throwable t) {
 			logger.debug("WS Failure", t);
 
-			logAccess("REST WS: FAILURE", getServiceCallDescription(joinpoint));
+			logAccess("REST WS: FAILURE: " + getServiceCallDescription(joinpoint));
 			throw t;
 		}
 	}
 
-	private void logAccess(String action, String content) {
+	private void logAccess(String action) {
 		OscarLog log = new OscarLog();
 		log.setAction(action);
 		log.setProviderNo("N/A");
@@ -98,8 +98,8 @@ public class WebServiceLoggingAdvice {
 		HttpServletRequest request = (HttpServletRequest) currentMessage.get("HTTP.REQUEST");
 
 		log.setIp(request.getRemoteAddr());
-		log.setContent(content);
-		log.setData(request.getRequestURL().toString() + " " + printableParameterMap(request.getParameterMap()));
+		log.setContent(request.getRequestURL().toString());
+		log.setData(printableParameterMap(request.getParameterMap()));
 
 		LogAction.addLogSynchronous(log);
 	}
