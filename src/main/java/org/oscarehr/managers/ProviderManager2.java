@@ -71,7 +71,7 @@ public class ProviderManager2 {
 		else results = providerDao.getProviders(active);
 
 		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.getProviders, active=" + active, null);
+		LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.getProviders", "active=" + active);
 
 		return (results);
 	}
@@ -81,7 +81,7 @@ public class ProviderManager2 {
 		Provider result = providerDao.getProvider(providerNo);
 
 		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.getProvider, providerNo=" + providerNo, null);
+		LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.getProvider", "providerNo=" + providerNo);
 
 		return (result);
 	}
@@ -90,7 +90,7 @@ public class ProviderManager2 {
 		List<Provider> results = new ArrayList<Provider>();
 		for(String id:ids) {
 			results.add(getProvider(loggedInInfo, id));
-			LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.getProviders, providerNo=" + id, null);
+			LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.getProviders", "providerNo=" + id);
 		}
 		return results;
 	}
@@ -100,7 +100,7 @@ public class ProviderManager2 {
 		List<Property> results=propertyDao.findByNameAndProvider(propertyName, providerNo);
 		
 		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.getProviderProperties, providerNo=" + providerNo+", propertyName="+propertyName, null);
+		LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.getProviderProperties", "providerNo=" + providerNo+", propertyName="+propertyName);
 		
 		return(results);
 	}
@@ -747,7 +747,7 @@ public class ProviderManager2 {
 		providerDao.updateProvider(provider);
 		
 		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.updateProvider, providerNo=" + provider.getProviderNo(), null);
+		LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.updateProvider", "providerNo=" + provider.getProviderNo());
 
 	}
 }
