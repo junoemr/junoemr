@@ -23,6 +23,9 @@
  */
 package org.oscarehr.ws.rest.util;
 
+import java.util.Arrays;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.message.Message;
@@ -75,17 +78,17 @@ public class WebServiceLoggingAdvice {
 			Object result = joinpoint.proceed();
 			duration = System.currentTimeMillis() - duration;
 
-			logAccess("REST WS: " + getServiceCallDescription(joinpoint));
+			logAccess("REST WS", getServiceCallDescription(joinpoint));
 			return result;
 		} catch (Throwable t) {
 			logger.debug("WS Failure", t);
 
-			logAccess("REST WS: FAILURE: " + getServiceCallDescription(joinpoint));
+			logAccess("REST WS: FAILURE", getServiceCallDescription(joinpoint));
 			throw t;
 		}
 	}
 
-	private void logAccess(String action) {
+	private void logAccess(String action, String content) {
 		OscarLog log = new OscarLog();
 		log.setAction(action);
 		log.setProviderNo("N/A");
@@ -95,10 +98,22 @@ public class WebServiceLoggingAdvice {
 		HttpServletRequest request = (HttpServletRequest) currentMessage.get("HTTP.REQUEST");
 
 		log.setIp(request.getRemoteAddr());
-		log.setContent(request.getRequestURL().toString());
-		log.setData(request.getParameterMap().toString());
+		log.setContent(content);
+		log.setData(request.getRequestURL().toString() + " " + printableParameterMap(request.getParameterMap()));
 
 		LogAction.addLogSynchronous(log);
 	}
-
+	/** display a map with values in a readable way */
+	private String printableParameterMap(Map<?, ?> map) {
+		String printable = "{";
+	
+		for(Object key: map.keySet())
+	    {
+	            String keyStr = (String)key;
+	            String[] value = (String[])map.get(keyStr);
+	            printable += keyStr + "=" + Arrays.toString(value) + ",";
+	    }
+		printable += "}";
+		return printable;
+	}
 }
