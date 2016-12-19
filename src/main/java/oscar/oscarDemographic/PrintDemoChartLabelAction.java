@@ -113,13 +113,18 @@ public class PrintDemoChartLabelAction extends OscarAction {
         InputStream ins = null;
       
         try {
-	        try {
-	        	ins = new FileInputStream(System.getProperty("user.home") + File.separator + labelFile);
-	        }
-	        catch (FileNotFoundException ex1) {
-	        	logger.warn(labelFile + " not found in user's home directory. Using default instead (classpath)",ex1);
-	        }
-	
+        	
+        	String labelFilePath = System.getProperty("user.home") + File.separator + labelFile;
+        	File file = new File(labelFilePath);
+        	
+        	if(file.exists() && file.canRead()) {
+        		try {
+        			ins = new FileInputStream(labelFilePath);
+        		}
+        		catch (FileNotFoundException ex1) {
+    	        	logger.error("Unable to load " + labelFilePath + " despite file checks. Using default instead.",ex1);
+    	        }
+        	}
 			if (ins == null) {
 				try { 
 					ins = getClass().getResourceAsStream("/oscar/oscarDemographic/" + labelFile);
