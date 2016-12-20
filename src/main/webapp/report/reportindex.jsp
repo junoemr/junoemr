@@ -792,7 +792,7 @@ int defaultApptEndTime   = Integer.parseInt(oscar.OscarProperties.getInstance().
         <td></td>
     </tr>
 
-    <tr>
+    <!-- <tr>
         <td width="2"><%=j%><%j++;%></td>
         <td width="1"></td>
         <td width="300"><a href="../oscarReport/OSISReport.jsp" title="Off Streets into Shelters (OSIS) is a report based off of a Hamilton Public Health eForm" target="_blank"><bean:message key="report.reportindex.btnOSISReport"/></a></td>
@@ -801,10 +801,6 @@ int defaultApptEndTime   = Integer.parseInt(oscar.OscarProperties.getInstance().
         <td></td>
         <td></td>
     </tr>
-        
-     <tr></tr>  
-     <tr></tr>
-     
     <tr><td width="2"></td>
     	<td colspan='3' align="left">
     <c:if
@@ -838,7 +834,7 @@ int defaultApptEndTime   = Integer.parseInt(oscar.OscarProperties.getInstance().
 </c:if> 
 	
     </td>
-    </tr>
+    </tr> -->
     
     <tr>
         <td colspan='3' align="left"><input type="button" name="Button" value="<bean:message key="report.reportindex.btnCancel"/>" onClick="window.close()"></td>

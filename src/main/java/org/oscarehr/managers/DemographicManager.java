@@ -25,20 +25,21 @@
 
 package org.oscarehr.managers;
 
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.oscarehr.PMmodule.dao.AdmissionDao;
+import org.oscarehr.PMmodule.model.Admission;
+import org.oscarehr.common.dao.DemographicCustDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DemographicExtDao;
-import org.oscarehr.common.dao.DemographicCustDao;
-import org.oscarehr.PMmodule.dao.AdmissionDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicCust;
 import org.oscarehr.ws.transfer_objects.DemographicTransfer;
-import org.oscarehr.PMmodule.model.Admission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.Date;
-import java.util.List;
 
 import oscar.log.LogAction;
 
@@ -86,10 +87,23 @@ public class DemographicManager
 		return(result);
 	}
 
+	public List getDemographics(int pageSize, int pageNumber, Date startDate)
+	{
+		List result = demographicDao.getDemographics(pageSize, pageNumber, startDate);
+
+		if(result != null)
+		{
+			LogAction.addLogSynchronous(
+				"DemographicManager.getDemographicsByHealthNum", 
+				"List");
+		}
+		
+		return(result);
+	}
+
 	public List getDemographicsByHealthNum(String hin)
 	{
-		List result = 
-			demographicDao.getDemographicsByHealthNum(hin);
+		List result = demographicDao.getDemographicsByHealthNum(hin);
 		
 		//--- log action ---
 		if (result!=null)
@@ -142,10 +156,18 @@ public class DemographicManager
 		}
 	}
 
+	public void updateDemographicExtras(Demographic demographic, DemographicTransfer demographicTransfer)
+	{
+		DemographicCust demoCust = demographicCustDao.find(demographic.getDemographicNo());
+
+		demoCust.setParsedNotes(demographicTransfer.getNotes());
+
+		demographicCustDao.merge(demoCust);
+	}
+
 	// When adding a demographic, entries are required in other tables.  This
 	// method adds those entries.
-	public Integer addDemographicExtras(Demographic demographic)
-		throws Exception
+	public Integer addDemographicExtras(Demographic demographic, DemographicTransfer demographicTransfer)
 	{
 		DemographicCust demoCust = new DemographicCust();
 		demoCust.setId(demographic.getDemographicNo());
@@ -153,7 +175,7 @@ public class DemographicManager
 		demoCust.setResident("");
 		demoCust.setMidwife("");
 		demoCust.setNurse("");
-		demoCust.setNotes("");
+		demoCust.setParsedNotes(demographicTransfer.getNotes());
 
 		demographicCustDao.persist(demoCust);
 

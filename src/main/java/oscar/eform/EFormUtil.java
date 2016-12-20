@@ -211,6 +211,20 @@ public class EFormUtil {
 		return fileList;
 	}
 
+	public static File getImage(String filename) {
+		String imagePath = OscarProperties.getInstance().getProperty("eform_image") + "/" + filename;
+		logger.info("Img Path: " + imagePath);
+
+		File file = new File(imagePath);
+
+		if(!file.exists())
+		{
+			return null;
+		}
+
+		return file;
+	}
+
 	public static ArrayList<HashMap<String,? extends Object>> listPatientEForms(String sortBy, String deleted, String demographic_no, String userRoles) {
 
 		Boolean current = null;

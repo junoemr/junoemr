@@ -25,10 +25,8 @@
 
 package org.oscarehr.managers;
 
-import java.util.List;
-
-import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.dao.DemographicCustDao;
+import org.oscarehr.common.model.DemographicCust;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,27 +34,22 @@ import oscar.log.LogAction;
 
 
 @Service
-public class ProviderManager2
+public class DemographicCustManager
 {
 	@Autowired
-	private ProviderDao providerDao;
-	
-	public List<Provider> getProviders(boolean active)
+	private DemographicCustDao demographicCustDao;
+
+	public DemographicCust getDemographicCust(Integer demographicId)
 	{
-		List<Provider> results=providerDao.getProviders(active);
+		DemographicCust result=demographicCustDao.find(demographicId);
 		
 		//--- log action ---
-		LogAction.addLogSynchronous("ProviderManager.getProviders, active="+active, null);
+		if (result!=null)
+		{
+			LogAction.addLogSynchronous("DemographicManager.getDemographic", "demographicId="+demographicId);
+		}
 		
-		return(results);
-	}
-
-	public boolean providerExists(Integer providerNo)
-	{
-		boolean result = providerDao.providerExists(providerNo.toString());
-
-		LogAction.addLogSynchronous("ProviderManager.providerExists, providerNo=" + providerNo, null);
-
-		return result;
+		return(result);
 	}
 }
+

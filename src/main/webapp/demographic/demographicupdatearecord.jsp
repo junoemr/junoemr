@@ -115,6 +115,10 @@
 		demographic.setNameOfMother(request.getParameter("nameOfMother"));
 		demographic.setNameOfFather(request.getParameter("nameOfFather"));
   }
+	// Patient veteran number OHSUPPORT-3523
+	if(oscarVariables.isPropertyActive("demographic_veteran_no")) {
+		demographic.setVeteranNo(request.getParameter("veteranNo"));
+	}
 
   //if action is good, then give me the result
     String[] param =new String[31];

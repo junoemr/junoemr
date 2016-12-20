@@ -23,8 +23,11 @@
 
 package org.oscarehr.PMmodule.dao;
 
+import java.math.BigInteger;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -51,12 +54,27 @@ public class ProviderDao extends HibernateDaoSupport {
 	private static Logger log = MiscUtils.getLogger();
 
 	public boolean providerExists(String providerNo) {
-		boolean exists = (((Long) getHibernateTemplate().iterate(
-				"select count(*) from Provider p where p.ProviderNo = "
-						+ providerNo).next()) == 1);
-		log.debug("providerExists: " + exists);
 
-		return exists;
+		String sqlQuery = "select count(*) from provider p where p.provider_no = ?";
+
+		Query query = getSession().createSQLQuery(sqlQuery);
+    	query.setString(0, providerNo);
+        List results = query.list();
+
+		Iterator iter = results.iterator();
+
+		int count = 0;
+        while (iter.hasNext())
+		{
+			Integer row = ((BigInteger)iter.next()).intValue();
+
+			if(row > 0)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 	
 	public boolean billingProviderExists(String ohipNo) {

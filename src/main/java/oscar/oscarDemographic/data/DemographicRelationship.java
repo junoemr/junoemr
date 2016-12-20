@@ -85,6 +85,112 @@ public class DemographicRelationship {
         }
    }
 
+   public void addDemographicRelationships(String demographic,String linkingDemographic,String relationship,boolean sdm,boolean emergency,String notes,String providerNo, Integer facilityId)
+   {
+        DemographicRelationship demo = new DemographicRelationship();
+        demo.addDemographicRelationship(demographic, linkingDemographic, relationship, sdm, emergency, notes, providerNo, facilityId);
+        
+        // ***** NEW CODE *****
+        // Now link in the opposite direction
+        // First work out which pairs match up
+        // From AddAlternateConcact.jsp
+        
+        // Relations for the dropdowns should be stored in a table in the database and not hardcoded
+        
+         /*
+         This is better:
+          
+                Parent
+                StepParent
+                Child
+                Sibling
+                Spouse
+                Partner
+                Grandparent
+                Other Relative
+                Other
+          
+         Sex will determine whether it is a brother,
+        grandfather, wife, husband or spouse of the same sex
+          */
+        
+        boolean relationset = false;
+		String reverseRelation = relationship;
+//--- Child
+        if ("Mother".equals(relationship)) {
+            reverseRelation = "Child";
+            relationset = true;
+        } else if ("Father".equals(relationship)) {
+            reverseRelation = "Child";
+            relationset = true;
+        } else if ("Parent".equals(relationship) ) {
+            reverseRelation = "Child";
+            relationset = true;
+        }
+//--- Parent
+        else if ("Daughter".equals(relationship) ) {
+            reverseRelation = "Parent";
+            relationset = true;
+        } else if ("Son".equals(relationship) ) {
+            reverseRelation = "Parent";
+            relationset = true;
+        } else if ("Child".equals(relationship) ) {
+            reverseRelation = "Parent";
+            relationset = true;
+        }
+//--- Spouse
+        else if ("Wife".equals(relationship) ) {
+            reverseRelation = "Spouse";
+            relationset = true;
+        } else if ("Husband".equals(relationship) ) {
+            reverseRelation = "Spouse";
+            relationset = true;
+        } else if ("Spouse".equals(relationship) ) {
+            // reverseRelation = "Spouse";
+            relationset = true;
+        }
+//--- Sibling
+        else if ("Brother".equals(relationship) ) {
+            reverseRelation = "Sibling";
+            relationset = true;
+        } else if ("Sister".equals(relationship) ) {
+            reverseRelation = "Sibling";
+            relationset = true;
+        }
+        
+        else if ("Sibling".equals(relationship) ) {
+            // reverseRelation = "Sibling";
+            relationset = true;
+        }
+//--- Partner
+        else if ("Partner".equals(relationship) ) {
+            // reverseRelation = "Parent";
+            relationset = true;
+        }
+//--- Grandparent
+        else if ("Grandfather".equals(relationship) ) {
+            reverseRelation = "Grandparent";
+            relationset = true;
+        }
+        
+        else if ("Grandmother".equals(relationship) ) {
+            reverseRelation = "Grandparent";
+            relationset = true;
+        }
+        
+        else if ("Grandparent".equals(relationship) ) {
+            // reverseRelation = "Grandparent";
+            relationset = true;
+        };
+        
+        if (relationset) {
+            
+            //now save this
+            DemographicRelationship demo2 = new DemographicRelationship();
+            demo2.addDemographicRelationship(linkingDemographic, demographic, reverseRelation, sdm, emergency, notes, providerNo, facilityId);
+        }
+   }
+
    public void deleteDemographicRelationship(String id){
       try {
 
@@ -222,6 +328,43 @@ public class DemographicRelationship {
 	      }
 	      return list;
 	   }
+
+   public static boolean isValidRelationship(String relationship)
+   {
+  		return DemographicRelationship.getValidRelationships().contains(relationship);
+   }
+
+   public static ArrayList<String> getValidRelationships()
+   {
+	   ArrayList<String> out = new ArrayList<String>();
+
+	   out.add("Mother");
+	   out.add("Father");
+	   out.add("Father");
+	   out.add("Wife");
+	   out.add("Husband");
+	   out.add("Partner");
+	   out.add("Brother");
+	   out.add("Sister");
+	   out.add("Son");
+	   out.add("Daughter");
+	   out.add("Aunt");
+	   out.add("Uncle");
+	   out.add("GrandFather");
+	   out.add("GrandMother");
+	   out.add("Guardian");
+	   out.add("Foster Parent");
+	   out.add("Next of Kin");
+	   out.add("Administrative Staff");
+	   out.add("Care Giver");
+	   out.add("Power of Attorney");
+	   out.add("Insurance");
+	   out.add("Guarantor");
+	   out.add("Spouse");
+	   out.add("Other");
+
+	   return out;
+   }
 
 
    private Boolean booleanConverter(String s){

@@ -174,79 +174,75 @@ function upCaseCtrl(ctrl) {
 	ctrl.value = ctrl.value.toUpperCase();
 }
 function onSub() {
-  if( saveTemp==1 ) {
-    var aptStat = document.EDITAPPT.status.value;
-    if (aptStat.indexOf('B') == 0){
-       return (confirm("<bean:message key="appointment.editappointment.msgDeleteBilledConfirmation"/>")) ;
-    }else{
-       return (confirm("<bean:message key="appointment.editappointment.msgDeleteConfirmation"/>")) ;
-    }
-  }
-  if( saveTemp==2 ) {
-     if (document.EDITAPPT.notes.value.length > 255) {
-	window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
-	return false;
-     }
-    return calculateEndTime() ;
-  } else
-      return true;
+	if( saveTemp==1 ) {
+		var aptStat = document.EDITAPPT.status.value;
+		if (aptStat.indexOf('B') == 0){
+			return (confirm("<bean:message key="appointment.editappointment.msgDeleteBilledConfirmation"/>")) ;
+		}else{
+			return (confirm("<bean:message key="appointment.editappointment.msgDeleteConfirmation"/>")) ;
+		}
+	}
+	if( saveTemp==2 ) {
+		if (document.EDITAPPT.notes.value.length > 255) {
+			window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
+			return false;
+		}
+		// validate appointment start time before submission
+		if (!validTimeString(document.EDITAPPT.start_time.value)) {
+			window.alert("<bean:message key="Appointment.msgFillValidTimeField"/>");
+			return false;
+		}
+		return calculateEndTime() ;
+	} 
+	else {
+		return true;
+	}
 }
-
-
 
 function calculateEndTime() {
-  var stime = document.EDITAPPT.start_time.value;
-  var vlen = stime.indexOf(':')==-1?1:2;
+	var startTime = document.EDITAPPT.start_time.value;
+	var timeFields = startTime.split(':');
+	var shour = timeFields[0] ;
+	var smin = timeFields[1] ;
+	var duration = document.EDITAPPT.duration.value;
 
-  if(vlen==1 && stime.length==4 ) {
-    document.EDITAPPT.start_time.value = stime.substring(0,2) +":"+ stime.substring(2);
-    stime = document.EDITAPPT.start_time.value;
-  }
+	if(isNaN(duration) || duration.trim() === '') {
+		alert("<bean:message key="Appointment.msgCheckDuration"/>");
+		return false;
+	}
 
-  if(stime.length!=5) {
-    alert("<bean:message key="Appointment.msgInvalidDateFormat"/>");
-    return false;
-  }
-
-  var shour = stime.substring(0,2) ;
-  var smin = stime.substring(stime.length-vlen) ;
-  var duration = document.EDITAPPT.duration.value ;
-
-  if(isNaN(duration)) {
-	  alert("<bean:message key="Appointment.msgFillTimeField"/>");
-	  return false;
-  }
-
-  if(eval(duration) == 0) { duration =1; }
-  if(eval(duration) < 0) { duration = Math.abs(duration) ; }
-
-  var lmin = eval(smin)+eval(duration)-1 ;
-  var lhour = parseInt(lmin/60);
-
-  if((lmin) > 59) {
-    shour = eval(shour) + eval(lhour);
-    shour = shour<10?("0"+shour):shour;
-    smin = lmin - 60*lhour;
-  } else {
-    smin = lmin;
-  }
-  smin = smin<10?("0"+ smin):smin;
-  document.EDITAPPT.end_time.value = shour +":"+ smin;
-  if(shour > 23) {
-    alert("<bean:message key="Appointment.msgCheckDuration"/>");
-    return false;
-  }
-  return true;
+	if(eval(duration) == 0) { duration =1; }
+	if(eval(duration) < 0) { duration = Math.abs(duration) ; }
+	
+	var lmin = eval(smin)+eval(duration)-1 ;
+	var lhour = parseInt(lmin/60);
+	
+	if((lmin) > 59) {
+		shour = eval(shour) + eval(lhour);
+		shour = shour<10?("0"+shour):shour;
+		smin = lmin - 60*lhour;
+	} else {
+		smin = lmin;
+	}
+	smin = smin<10?("0"+ smin):smin;
+	document.EDITAPPT.end_time.value = shour +":"+ smin;
+	if(shour > 23) {
+		alert("<bean:message key="Appointment.msgCheckDuration"/>");
+		return false;
+	}
+	return true;
 }
 
+function validTimeString(timeStr) {
+	return /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/.test(timeStr);
+}
 function checkTimeTypeIn(obj) {
-  if(!checkTypeNum(obj.value) ) {
-	  alert ("<bean:message key="Appointment.msgFillTimeField"/>");
-	} else {
-	  if(obj.value.indexOf(':')==-1) {
-	    if(obj.value.length < 3) alert("<bean:message key="Appointment.msgFillValidTimeField"/>");
-	    obj.value = obj.value.substring(0, obj.value.length-2 )+":"+obj.value.substring( obj.value.length-2 );
-	  }
+	var timeStr = obj.value;
+	if(timeStr == null | timeStr === '') {
+		alert ("<bean:message key="Appointment.msgFillTimeField"/>");
+	}
+	else if (!validTimeString(timeStr)) {
+		alert("<bean:message key="Appointment.msgFillValidTimeField"/>");
 	}
 }
 <% if (apptObj!=null) { %>
@@ -501,7 +497,8 @@ function setType(typeSel,reasonSel,locSel,durSel,notesSel,resSel) {
                 <INPUT TYPE="TEXT"
 					NAME="start_time"
 					VALUE="<%=bFirstDisp?String.valueOf(appt.get("start_time")).substring(0,5):request.getParameter("start_time")%>"
-                    WIDTH="25">
+                    WIDTH="25"
+                    onChange="checkTimeTypeIn(this)">
             </div>
             <div class="space">&nbsp;</div>
 

@@ -1014,6 +1014,9 @@ auto_populate_billingreferral_bc=true
 # OHSUPPORT-3228 - show parent name fields in demographic master record
 #demographic_parent_names=true
 
+# OHSUPPORT-3523 -- enable veteran number field in demographic master record
+#demographic_veteran_no=true
+
 # OHSUPPORT-3434 -- add email link to the patient email address in the demographic master file. 
 enable_demographic_email_link=false
 

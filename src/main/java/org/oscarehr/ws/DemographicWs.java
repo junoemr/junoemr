@@ -25,26 +25,28 @@
 
 package org.oscarehr.ws;
 
-import javax.jws.WebService;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.annotation.Resource;
+import javax.jws.WebService;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
-import javax.servlet.http.HttpServletRequest;
-//import com.sun.net.httpserver.HttpExchange;
 
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.DemographicCust;
+import org.oscarehr.managers.DemographicCustManager;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.ws.transfer_objects.DemographicTransfer;
-//import org.oscarehr.util.MiscUtils;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import oscar.log.LogAction;
+import oscar.oscarDemographic.data.DemographicRelationship;
 
 @WebService
 @Component
@@ -55,17 +57,71 @@ public class DemographicWs extends AbstractWs {
 
 	@Autowired
 	private DemographicManager demographicManager;
+
+	@Autowired
+	private DemographicCustManager demographicCustManager;
 	
 	public DemographicTransfer getDemographic(Integer demographicId)
 	{
 		Demographic demographic=demographicManager.getDemographic(demographicId);
-		return(DemographicTransfer.toTransfer(demographic));
+		DemographicCust custResult = demographicCustManager.getDemographicCust(demographic.getDemographicNo());
+
+		DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
+		if(custResult != null) {
+			transfer.setNotes(custResult.getParsedNotes());
+		}
+		return transfer;
 	}
 
 	public DemographicTransfer getDemographicByMyOscarUserName(String myOscarUserName)
 	{
 		Demographic demographic=demographicManager.getDemographicByMyOscarUserName(myOscarUserName);
-		return(DemographicTransfer.toTransfer(demographic));
+		DemographicCust custResult = demographicCustManager.getDemographicCust(demographic.getDemographicNo());
+
+		DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
+		if(custResult != null) {
+			transfer.setNotes(custResult.getParsedNotes());
+		}
+		return transfer;
+	}
+
+	public List getDemographics(Integer pageSize, Integer pageNumber, String earliestUpdatedDate)
+		throws Exception
+	{
+		if(pageSize == null)
+		{
+			throw new Exception("Page size is required.");
+		}
+
+		if(pageNumber == null)
+		{
+			throw new Exception("Page number is required.");
+		}
+
+		if(pageSize > 100)
+		{
+			throw new Exception("Maximum page size is 100.");
+		}
+
+		Date startDate = null;
+		if(earliestUpdatedDate != null)
+		{
+			SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
+			startDate = parser.parse(earliestUpdatedDate);
+		}
+
+		List<Demographic> demographicList = 
+			demographicManager.getDemographics(pageSize, pageNumber, startDate);
+
+		Iterator<Demographic> demographicListIterator = demographicList.iterator();
+		List<DemographicTransfer> out = new ArrayList<DemographicTransfer>();
+		while(demographicListIterator.hasNext())
+		{
+			Demographic demographic = demographicListIterator.next();
+			out.add(DemographicTransfer.toTransfer(demographic));
+		}
+
+		return(out);
 	}
 
 	public List getDemographicsByHealthNum(String hin)
@@ -106,7 +162,7 @@ public class DemographicWs extends AbstractWs {
 		}
 
 		demographicManager.addDemographic(demographic);
-		demographicManager.addDemographicExtras(demographic);
+		demographicManager.addDemographicExtras(demographic, demographicTransfer);
 		demographicManager.addDemographicExts(demographic, demographicTransfer);
 
 		return(demographic.getDemographicNo());
@@ -129,6 +185,73 @@ public class DemographicWs extends AbstractWs {
 		}
 		
 		demographicManager.addDemographic(demographic);
+		demographicManager.updateDemographicExtras(demographic, demographicTransfer);
 		demographicManager.addDemographicExts(demographic, demographicTransfer);
+	}
+
+	public void addRelationship(Integer demographicId, Integer relationDemographicId, String relationship, boolean isSubstituteDecisionMaker, boolean isEmergencyContact, String notes, Integer creatorProviderId, Integer facilityId, boolean linkBothDirections)
+		throws Exception
+	{
+		if(demographicId == null)
+		{
+			throw new Exception("demographicId cannot be null.");
+		}
+
+		if(relationDemographicId == null)
+		{
+			throw new Exception("relationDemographicId cannot be null.");
+		}
+
+		if(relationship == null)
+		{
+			throw new Exception("relationship cannot be null.");
+		}
+
+		// Convert provider number to a string, default to 0.
+		String providerNo = "0";
+		if(creatorProviderId != null)
+		{
+			providerNo = creatorProviderId.toString();
+		}
+
+
+
+		// Make sure demographics exist
+		Demographic validatedDemographic = demographicManager.getDemographic(demographicId);
+
+		if(validatedDemographic == null)
+		{
+			throw new Exception("Demographic " + demographicId + " doesn't exist.");
+		}
+
+		Demographic validatedRelation = demographicManager.getDemographic(relationDemographicId);
+
+		if(validatedRelation == null)
+		{
+			throw new Exception("Relation Demographic " + relationDemographicId + " doesn't exist.");
+		}
+
+		// Make sure it's a valid relationship
+
+		if(!DemographicRelationship.isValidRelationship(relationship))
+		{
+			throw new Exception("Relationship " + relationship + " is not valid.");
+		}
+
+
+        DemographicRelationship demo = new DemographicRelationship();
+
+		if(linkBothDirections)
+		{
+			demo.addDemographicRelationships(demographicId.toString(), relationDemographicId.toString(), 
+				relationship, isSubstituteDecisionMaker, isEmergencyContact, notes, providerNo, 
+				facilityId);
+		}
+		else
+		{
+			demo.addDemographicRelationship(demographicId.toString(), relationDemographicId.toString(), 
+				relationship, isSubstituteDecisionMaker, isEmergencyContact, notes, providerNo, 
+				facilityId);
+		}
 	}
 }

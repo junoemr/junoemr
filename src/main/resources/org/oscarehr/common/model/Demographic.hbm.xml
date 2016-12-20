@@ -83,7 +83,7 @@
 		<property column="scanned_chart" length="1" name="ScannedChart" type="string" />
 		<property column="name_of_father" length="32" name="nameOfFather" type="string" />
 		<property column="name_of_mother" length="32" name="nameOfMother" type="string" />
-
+		<property column="veteran_no" length="32" name="veteranNo" type="string" />
 
 	</class>
 </hibernate-mapping>

@@ -1,0 +1,1 @@
+ALTER TABLE prescription ADD INDEX demographic_no (demographic_no);

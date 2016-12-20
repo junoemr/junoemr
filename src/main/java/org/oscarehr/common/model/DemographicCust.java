@@ -25,6 +25,14 @@
 
 package org.oscarehr.common.model;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.xml.sax.InputSource;
+import java.io.StringReader;
+
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -90,18 +98,40 @@ public class DemographicCust extends AbstractModel<Integer>{
     }
 
 	public String getNotes() {
-    	return notes;
-    }
+		return notes;
+	}
 
 	public void setNotes(String notes) {
     	this.notes = notes;
     }
 
+	public String getParsedNotes() {
+		try
+		{
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document document = builder.parse(new InputSource(new StringReader(notes)));
+
+			NodeList list = document.getElementsByTagName("unotes");
+
+			if(list != null && list.getLength() > 0)
+			{
+				return list.item(0).getTextContent();
+			}
+			
+		}
+		catch(Exception e)
+		{
+		}
+
+    	return null;
+    }
+
+	public void setParsedNotes(String notes) {
+    	this.notes = "<unotes>" + notes + "</unotes>";
+    }
+
 	public void setId(Integer id) {
     	this.id = id;
     }
-
-
-
-
 }

@@ -61,11 +61,17 @@ public final class LoginCheckLogin {
 		}
 		GregorianCalendar now = new GregorianCalendar();
 		// delete the old entry in the login list if time out
+		ArrayList<String> toDelete = new ArrayList<String>();
 		for(String key: loginList.keySet()) {
 			if (loginList.get(key).timeoutPeriodExceeded(now)) { 
-				loginList.remove(key);
+				toDelete.add(key);
 			}
 		}
+		// delete with second array to avoid concurrent modification of loginList
+		for(String key : toDelete) {
+			loginList.remove(key);
+		}
+		
 		// check if it is blocked
 		if (p.isPropertyActive("login_lock")) {
 			return isBlocked(userName);
