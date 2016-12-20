@@ -38,7 +38,7 @@ import oscar.oscarLab.ca.all.util.Utilities;
 
 public class GDMLQCHandler implements MessageHandler {
 	
-	Logger logger = Logger.getLogger(GDMLHandler.class);	
+	Logger logger = Logger.getLogger(GDMLQCHandler.class);
 	Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
 
 	@Override
@@ -75,7 +75,7 @@ public class GDMLQCHandler implements MessageHandler {
 		List<Hl7TextInfo> labs = hl7TextInfoDao.getAllLabsByLabNumberResultStatus();
 		for(Hl7TextInfo lab : labs) {
 			String labResultStatus = lab.getResultStatus();
-			if(n > 0 && !labResultStatus.equals("A")) {
+			if(n > 0 && !("A".equals(labResultStatus))) {
 				
 				oscar.oscarLab.ca.all.parsers.MessageHandler h = Factory.getHandler(lab.getLabNumber());
 				
