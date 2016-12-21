@@ -26,6 +26,7 @@
 package oscar.util;
 
 import java.io.InputStream;
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -400,5 +401,18 @@ public class StringUtils {
 
     static public boolean filled(String s) {
 		return !isNullOrEmpty(s);
+    }
+    
+    /** 
+     * Replaces common unicode characters with similar ascii/ascii-extended characters. strips the rest.
+     * @param unicode string
+     * @return latin1 friendly string
+     */
+    public static String unicodeStripToLatin1(String unicode) {
+    	
+		String normalized = Normalizer.normalize(unicode, Normalizer.Form.NFD);
+		String resultString = normalized.replaceAll("[^\\x00-\\xFF]", "");
+		
+		return  resultString;
     }
 }

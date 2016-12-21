@@ -24,7 +24,6 @@
 package oscar.oscarLab.ca.all.parsers;
 
 import java.text.DateFormat;
-import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,6 +40,7 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import oscar.util.StringUtils;
 import oscar.util.UtilDateUtilities;
 
 public class GDMLQCHandler  implements MessageHandler {
@@ -55,9 +55,8 @@ public class GDMLQCHandler  implements MessageHandler {
 	public void init(String hl7Body) throws HL7Exception {
 		
 		/* Normalize string (replace French unicode characters etc.) */
-		String normalized = Normalizer.normalize(hl7Body, Normalizer.Form.NFD);
-		String resultString = normalized.replaceAll("[^\\x00-\\x7F]", "");
-		
+		String resultString = StringUtils.unicodeStripToLatin1(hl7Body);
+
 		Parser p = new PipeParser();
 		p.setValidationContext(new NoValidation());
 		msg = (ORU_R01) p.parse(resultString);
