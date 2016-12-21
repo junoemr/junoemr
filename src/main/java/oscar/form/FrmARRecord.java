@@ -46,17 +46,18 @@ public class FrmARRecord extends FrmRecord {
                     + demographicNo;
             ResultSet rs = DBHandler.GetSQL(sql);
             if (rs.next()) {
-                java.util.Date date = UtilDateUtilities.calcDate(oscar.Misc.getString(rs, "year_of_birth"), rs
-                        .getString("month_of_birth"), oscar.Misc.getString(rs, "date_of_birth"));
+            	String yyyy = oscar.Misc.getString(rs, "year_of_birth");
+                String mm = oscar.Misc.getString(rs, "month_of_birth");
+                String dd = oscar.Misc.getString(rs, "date_of_birth");
+                java.util.Date date = UtilDateUtilities.calcDate(yyyy,mm,dd);
                 props.setProperty("demographic_no", oscar.Misc.getString(rs, "demographic_no"));
                 props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
                 //props.setProperty("formEdited",
                 // UtilDateUtilities.DateToString(new Date(),"yyyy/MM/dd"));
                 props.setProperty("c_pName", oscar.Misc.getString(rs, "pName"));
                 props.setProperty("c_address", oscar.Misc.getString(rs, "address"));
-                props.setProperty("pg1_dateOfBirth", UtilDateUtilities.DateToString(date,
-                        "yyyy/MM/dd"));
-                props.setProperty("pg1_age", String.valueOf(UtilDateUtilities.calcAge(date)));
+                props.setProperty("pg1_dateOfBirth", UtilDateUtilities.DateToString(date, "yyyy/MM/dd"));
+                props.setProperty("pg1_age", String.valueOf(UtilDateUtilities.calcAge(yyyy,mm,dd)));
                 props.setProperty("pg1_homePhone", oscar.Misc.getString(rs, "phone"));
                 props.setProperty("pg1_workPhone", oscar.Misc.getString(rs, "phone2"));
                 props.setProperty("pg1_formDate", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
