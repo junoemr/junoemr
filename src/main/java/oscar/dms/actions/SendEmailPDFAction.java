@@ -72,7 +72,17 @@ public class SendEmailPDFAction extends Action {
 		if(recipients==null || recipients.length < 1) {
 			logger.error("No recipients to email. Operation Aborted");
 			errorList.add("No recipients to email. Operation Aborted");
+			request.setAttribute("errors", errorList);
     		return mapping.findForward("failure");
+		}
+		for(String address: recipients) {
+			if(!EmailUtils.isValidEmailAddress(address))
+			{
+				logger.error("'" + address + "' is not a valid Email. Operation Aborted without sending");
+				errorList.add("'" + address + "' is not a valid Email. Operation Aborted without sending");
+				request.setAttribute("errors", errorList);
+	    		return mapping.findForward("failure");
+			}
 		}
 		
 		String fromAddress = props.getProperty("document_email_from_address");
@@ -93,6 +103,7 @@ public class SendEmailPDFAction extends Action {
     	if(attachments==null || attachments.size() < 1) {
     		logger.error("No pdf attachments to email. Operation Aborted");
     		errorList.add("No pdf attachments to email. Operation Aborted");
+    		request.setAttribute("errors", errorList);
     		return mapping.findForward("failure");
     	}
 		

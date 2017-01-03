@@ -79,6 +79,12 @@
 		patientEmail = StringEscapeUtils.escapeHtml(demographic.getEmail());
 		patientDispalyName = StringEscapeUtils.escapeHtml(demographic.getDisplayName());
 	}
+	String providerEmail = null;
+	String providerDispalyName = null;
+	if(providerData != null) {
+		providerEmail = providerData.getEmail();
+		providerDispalyName = providerData.getDisplayName();
+	}
 	
 	String[] printHpList = request.getParameterValues("printHP");
 
@@ -90,10 +96,13 @@
 
 <link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css" />
 
-<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="../share/javascript/jquery/jquery-2.2.4.min.js"></script>
 <script>
 
 var submitting = false;
+var demoNo = '<%=demoId%>';
+var demoEmail = '<%= patientEmail%>';
+var providerEmail = '<%= providerEmail%>';
 
 function submitForm(actionPath)
 {
@@ -109,10 +118,22 @@ function submitForm(actionPath)
 	form.submit();
 
 	return true;
-} 
+}
+function emailProvider(actionPath) {
+	clearEmailList();
+	appendEmail(providerEmail);
+	submitForm(actionPath);
+}
+function emailPatient(actionPath) {
+	clearEmailList();
+	appendEmail(demoEmail);
+	submitForm(actionPath);
+}
 function disableButtons()
 {
 	document.getElementById("email_button").disabled = true;
+	document.getElementById("email_patient_button").disabled = true;
+	document.getElementById("email_provider_button").disabled = true;
 }
 function AddOtherEmailProvider() 
 {
@@ -128,10 +149,10 @@ function hasEmailAddress()
 {
 	return jQuery("#emailAddresses").children().size() > 0;
 }
-function updateEmailButton() 
+function updateEmailButton()
 {
-	var disabled = !hasEmailAddress();
-	document.getElementById("email_button").disabled = disabled;
+	var disableEmail = !hasEmailAddress();
+	document.getElementById("email_button").disabled = disableEmail;
 }
 function appendEmail(email) {
 	var $div = $("<div>", {class: "flexH"});
@@ -158,12 +179,19 @@ function appendEmail(email) {
 	
 	updateEmailButton();
 }
+function clearEmailList() {
+	$("#emailAddresses").empty();
+}
 
 $(function() {
-	var demoNo = '<%=demoId%>';
-	var demoEmail = '<%= patientEmail%>';
 	
-	appendEmail(demoEmail);
+	var disablePatientEmail = (demoEmail == null || demoEmail === "" || demoEmail === "null");
+	document.getElementById("email_patient_button").disabled = disablePatientEmail;
+	
+	var disableProviderEmail = (providerEmail == null || providerEmail === "" || providerEmail === "null");
+	document.getElementById("email_provider_button").disabled = disableProviderEmail;
+	
+	updateEmailButton();
 	
 	var form = document.forms[0];
 	
@@ -225,6 +253,13 @@ $(function() {
 	flex: 1;
 	max-width: 500px;
 	}
+	#patientDispName, #providerDispName {
+	float: right;
+	width: 80%;
+	}
+	#emailAddresses {
+	min-height: 15px;
+	}
 </style>
 
 </head>
@@ -243,11 +278,18 @@ $(function() {
 </table>
 
 <table>
-	<% // if there is a demographic, show some info on who we are sending the email to. 
+	<% // if there is a demographic, show some info.
 	if(demographic != null) { %>
 	<tr><td>
 		<label for="patientDispName">Patient Name:</label>
-		<input id="patientDispName"type="text" value="<%=patientDispalyName%>" disabled="disabled">
+		<input id="patientDispName" type="text" value="<%=patientDispalyName%>" disabled="disabled">
+	</td></tr>
+<% }
+	// if there is a provider, show some info.
+	if(providerData != null) { %>
+	<tr><td>
+		<label for="providerDispName">Provider:</label>
+		<input id="providerDispName" type="text" value="<%=providerDispalyName%>" disabled="disabled">
 	</td></tr>
 <% } %>
 	<tr><td class="tite4">Add Email Addresses:</td></tr>
@@ -372,6 +414,10 @@ $(function() {
     <%} %>
     <input type="button" id="email_button" value="<bean:message key="dms.documentReport.btnEmailPDF"/>"
         onclick="return submitForm('<rewrite:reWrite jspPage="sendEmailPDFs.do"/>');" />
+    <input type="button" id="email_patient_button" value="Email to Patient Only"
+        onclick="return emailPatient('<rewrite:reWrite jspPage="sendEmailPDFs.do"/>');" />
+    <input type="button" id="email_provider_button" value="Email to Provider Only"
+        onclick="return emailProvider('<rewrite:reWrite jspPage="sendEmailPDFs.do"/>');" />
 
 </html:form>
 </body>

@@ -240,6 +240,15 @@ public class ProviderData {
    public void setFirst_name(java.lang.String first_name) {
       this.first_name = first_name;
    }
+   
+   /** 
+    * @return provider names formatted as 'last, first'.
+    */
+   public String getDisplayName() {
+	   String last = (getLast_name() == null) ? "" : getLast_name();
+	   String first = (getFirst_name() == null) ? "" : getFirst_name();
+	   return last + ", " + first;
+   }
 
    /**
     * Getter for property provider_type.
