@@ -68,6 +68,7 @@ import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.rtf.RtfWriter2;
 
 import oscar.oscarLab.ca.all.Hl7textResultsData;
+import oscar.oscarLab.ca.all.parsers.CLSDIHandler;
 import oscar.oscarLab.ca.all.parsers.CLSHandler;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.IHAHandler;
@@ -97,6 +98,8 @@ public class LabPDFCreator extends PdfPageEventHelper{
     private Font boldFont;
     private Font redFont;
     private String dateLabReceived;
+    
+    private boolean isTypeCLS = false;
 
 	public static byte[] getPdfBytes(String segmentId, String providerNo) throws IOException, DocumentException
     {
@@ -136,7 +139,6 @@ public class LabPDFCreator extends PdfPageEventHelper{
             i++;
         }
         this.versionNum = i+1;
-
     } 
     //Creates an rtf file for viha rtf labs
     public void printRtf()throws IOException, DocumentException{
@@ -173,6 +175,8 @@ public class LabPDFCreator extends PdfPageEventHelper{
         // check that we have data to print
         if (handler == null)
             throw new DocumentException();
+
+        this.isTypeCLS = (handler.getMsgType().equals("CLS") || handler.getMsgType().equals("CLSDI"));
 
         //response.setContentType("application/pdf");  //octet-stream
         //response.setHeader("Content-Disposition", "attachment; filename=\""+handler.getPatientName().replaceAll("\\s", "_")+"_LabReport.pdf\"");
@@ -215,7 +219,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
         table.addCell(cell);
         cell.setBorder(15);
         cell.setBackgroundColor(new Color(210, 212, 255));
-		if(handler.getMsgType().equals("CLS")){
+		if(handler.getMsgType().equals("CLS")) { // intentionally skip CLSDI 
 			cell.setPhrase(new Phrase("Legend:  A=Abnormal  L=Low  H=High  C=Critical", boldFont));
 		}
 		else
@@ -291,11 +295,14 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		else if (handler.getMsgType().equals("CLS")) {
 			this.isUnstructuredDoc = ((CLSHandler) handler).isUnstructured();
 		}
+		else if (handler.getMsgType().equals("CLSDI")) {
+			this.isUnstructuredDoc = ((CLSDIHandler) handler).isUnstructured();
+		}
 		logger.debug("Adding Category to PDF for lab of type " + handler.getMsgType() + "; unstructured=" + this.isUnstructuredDoc);
 
 		float[] mainTableWidths;
 		if (isUnstructuredDoc) {
-			if (handler.getMsgType().equals("CLS")) {
+			if (isTypeCLS) {
 				mainTableWidths = new float[]{5f, 10f, 3f, 2f};
 			}
 			else {
@@ -347,7 +354,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 			table.addCell(cell);
 			cell.setPhrase(new Phrase("Result", boldFont));
 			table.addCell(cell);
-			if(handler.getMsgType().equals("CLS"))
+			if(isTypeCLS)
 			{
 				cell.setPhrase(new Phrase("Date/Time Collected", boldFont));
 				table.addCell(cell);
@@ -375,7 +382,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 			table.addCell(cell);
 			cell.setPhrase(new Phrase("Units", boldFont));
 			table.addCell(cell);
-			if(handler.getMsgType().equals("CLS")){
+			if(isTypeCLS){
 				cell.setPhrase(new Phrase("Date/Time Collected", boldFont));
 			}
 			else
@@ -446,7 +453,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 							String obrName = handler.getOBRName(j);
 							/* fix for CLS labs not showing test names with one line results. 
 							 * No idea why it works this way but trying not to break existing functionality. */
-							boolean obxCountBool = ((handler.getMsgType().equals("CLS") && obxCount > 0 ) || obxCount > 1);
+							boolean obxCountBool = ((isTypeCLS && obxCount > 0 ) || obxCount > 1);
 							// add the obrname if necessary
 							if (!obrFlag
 									&& !obrName.equals("")
@@ -493,7 +500,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 									cell.setPhrase(new Phrase(handler.getTimeStamp(j, k), lineFont));
 									table.addCell(cell);
 								}
-								if(handler.getMsgType().equals("CLS"))
+								if(isTypeCLS)
 								{
 									cell.setPhrase(new Phrase(handler
 											.getOBXResultStatus(j, k), lineFont));
@@ -559,7 +566,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 											handler.getOBXAbnormalFlag(j, k),
 											lineFont));
 
-									} else if("CLS".equals(handler.getMsgType())) 
+									} else if(isTypeCLS) 
 									{
 										cell.setPhrase(new Phrase(
 											(handler.isOBXAbnormal(j, k) ?

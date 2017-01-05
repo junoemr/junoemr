@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,38 +21,39 @@
  * Hamilton
  * Ontario, Canada
  */
-
-
 package oscar.oscarLab.ca.all.upload.handlers;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.util.SpringUtils;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v23.segment.OBR;
 import ca.uhn.hl7v2.model.v23.segment.ORC;
-import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.upload.MessageUploader;
 import oscar.oscarLab.ca.all.util.Utilities;
 
-public class CLSHandler implements MessageHandler {
-
-	protected String lineDelimiter = "\r";
-	protected Logger logger = Logger.getLogger(CLSHandler.class);	
-	protected Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
+/**
+ * Handler for:
+ * Calgary Lab Services Diagnostic Imaging
+ * @author Robert
+ */
+public class CLSDIHandler extends CLSHandler implements MessageHandler {
+	
+	public CLSDIHandler() {
+		super();
+		logger = Logger.getLogger(CLSDIHandler.class);
+	}
 	
 	public String parse(String serviceName, String fileName, int fileId) {
 
 		int i = 0;
-        oscar.oscarLab.ca.all.parsers.CLSHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler();
+        oscar.oscarLab.ca.all.parsers.CLSDIHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSDIHandler();
         
         Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
         Hl7TextMessage hl7TextMessage = new Hl7TextMessage();
@@ -73,7 +74,7 @@ public class CLSHandler implements MessageHandler {
 				*/
                 newVersionCLSParser.init(msg);
                 String accessionNumber = newVersionCLSParser.getAccessionNum();
-                String fillerOrderNumber = newVersionCLSParser.getFillerOrderNumber(); 
+                String fillerOrderNumber = newVersionCLSParser.getFillerOrderNumber();
                 Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNumberOrFillerNumber(
                 		accessionNumber, fillerOrderNumber);
                 
@@ -83,14 +84,14 @@ public class CLSHandler implements MessageHandler {
                 if(hl7TextInfo != null && hl7TextInfo.getFillerOrderNum().equals(fillerOrderNumber) && 
                 		!hl7TextInfo.getAccessionNumber().equals(accessionNumber)) {
 
-                	msg = this.ReplaceAccessionNumber(msg, accessionNumber, hl7TextInfo.getAccessionNumber());
+                	msg = ReplaceAccessionNumber(msg, accessionNumber, hl7TextInfo.getAccessionNumber());
                 }
 
                 if(hl7TextInfo != null) {
                 	String lastVersionLab = oscar.oscarLab.ca.all.parsers.Factory.getHL7Body(Integer.toString(hl7TextInfo.getLabNumber()));
                 	msg = mergeLabs(lastVersionLab, msg);
                 }
-				MessageUploader.routeReport(serviceName, "CLS", msg, fileId);
+				MessageUploader.routeReport(serviceName, "CLSDI", msg, fileId);
 
 			}
 		} catch (Exception e) {
@@ -108,9 +109,9 @@ public class CLSHandler implements MessageHandler {
 		String outLabString = newVersion;
 		StringBuilder test = new StringBuilder(newVersion);
 
-        oscar.oscarLab.ca.all.parsers.CLSHandler oldVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler();
+        oscar.oscarLab.ca.all.parsers.CLSDIHandler oldVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSDIHandler();
         oldVersionCLSParser.init(oldVersion);
-        oscar.oscarLab.ca.all.parsers.CLSHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler();
+        oscar.oscarLab.ca.all.parsers.CLSDIHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSDIHandler();
         newVersionCLSParser.init(newVersion);
 
         int currentObrCount = newVersionCLSParser.getOBRCount();
@@ -121,9 +122,11 @@ public class CLSHandler implements MessageHandler {
         int obrIndex = 0;
         for(OBR oldObr : oldObrs)
         {
+        	logger.info("CHECK OBR for merge: " + oldObr.getName());
         	String fillerNumber = this.getObrFillerNumber(oldObr);
         	if(!this.obrExists(fillerNumber, newVersionCLSParser))
         	{
+        		logger.info("OBR Not found in new lab");
         		currentObrCount++;
         		// Remove the old OBR index so we can add the new one
         		String tempObr = oldObr.encode();
@@ -161,67 +164,5 @@ public class CLSHandler implements MessageHandler {
         }
 		return outLabString;
 	}
-	
-	protected boolean obrExists(String fillerNumber, oscar.oscarLab.ca.all.parsers.CLSHandler parser)
-	{
-		ArrayList<OBR> searchObrs = this.getObrs(parser);
-		for(OBR searchObr : searchObrs) {
-			if(this.getObrFillerNumber(searchObr).equals(fillerNumber)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	protected ArrayList<OBR> getObrs( oscar.oscarLab.ca.all.parsers.CLSHandler parser)
-	{
-		ArrayList<OBR> outOBR = new ArrayList<OBR>();
-        for(int obrIndex = 0; obrIndex < parser.getOBRCount(); obrIndex++) {
-            OBR newObr = parser.getOBR(obrIndex).getOBR();
-            outOBR.add(newObr);
-        }
-        return outOBR;
-	}
-    
-    protected String getObrFillerNumber(OBR obr)
-    {
-    	return obr.getFillerOrderNumber().getEi1_EntityIdentifier().getValue() + "^" +
-                obr.getFillerOrderNumber().getEi2_NamespaceID().getValue();
-    }
-	
-    protected String ReplaceAccessionNumber(String message, String oldAccessionNumber, String newAccessionNumber)
-    {
-    	message = message.replace(oldAccessionNumber, newAccessionNumber);
-    	return message;
-    }
 
-	private boolean isDuplicate(String msg) {
-		//OLIS requirements - need to see if this is a duplicate
-		oscar.oscarLab.ca.all.parsers.MessageHandler h = Factory.getHandler("CLS", msg);
-		//if final
-		if(h.getOrderStatus().equals("CM")) {
-			String acc = h.getAccessionNum().substring(3);
-			//do we have this?
-			List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(acc);
-			for(Hl7TextInfo dupResult:dupResults) {
-				if(("CLS"+dupResult.getAccessionNumber()).equals(acc)) {
-					//if(h.getHealthNum().equals(dupResult.getHealthNumber())) {
-						OscarAuditLogger.getInstance().log("Lab", "Skip", "Duplicate lab skipped - accession " + acc + "\n" + msg);
-						return true;
-					//}					
-					
-				}
-				if(dupResult.getAccessionNumber().indexOf("-")!= -1) {
-					if(dupResult.getAccessionNumber().substring(0,dupResult.getAccessionNumber().indexOf("-")).equals(acc) ) {
-						//olis match								
-						//if(h.getHealthNum().equals(dupResult.getHealthNumber())) {
-						OscarAuditLogger.getInstance().log("Lab", "Skip", "Duplicate lab skipped - accession " + acc + "\n" + msg);
-						return true;
-						//}
-					}
-				}
-			}		
-		}
-		return false;	
-	}
 }
