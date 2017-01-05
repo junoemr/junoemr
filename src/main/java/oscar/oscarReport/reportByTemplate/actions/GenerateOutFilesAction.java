@@ -31,6 +31,7 @@ package oscar.oscarReport.reportByTemplate.actions;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -38,17 +39,24 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.util.MiscUtils;
 
 import com.Ostermiller.util.CSVParser;
 
 /**
  * Created on December 21, 2006, 10:47 AM
  * @author apavel (Paul)
+ * 
+ * @Deprecated 2017 - This can be done on the front end
  */
+@Deprecated
 public class GenerateOutFilesAction extends Action {
+	
+	private static Logger logger = Logger.getLogger(GenerateOutFilesAction.class);
+	
     public ActionForward execute(ActionMapping mapping, ActionForm form,
                                  HttpServletRequest request, HttpServletResponse response) {
+    	
+    	logger.info("GENERATE SPREADSHEET FOR REPORT BY TEMPLATE");
 
         String csv = (String) request.getSession().getAttribute("csv");
         if (csv ==null){
@@ -61,13 +69,13 @@ public class GenerateOutFilesAction extends Action {
             try {
                 response.getWriter().write(csv);
             } catch (Exception ioe) {
-                MiscUtils.getLogger().error("Error", ioe);
+            	logger.error("Error writing csv file", ioe);
             }
             return null;
         }
         action = request.getParameter("getXLS");
         if (action != null) {
-            MiscUtils.getLogger().debug("Generating Spread Sheet file for the 'report by template' module ..");
+        	logger.debug("Generating Spread Sheet file for the 'report by template' module ..");
             response.setContentType("application/octet-stream");
             response.setHeader("Content-Disposition", "attachment; filename=\"oscarReport.xls\"");
             String[][] data = CSVParser.parse(csv);
@@ -87,11 +95,13 @@ public class GenerateOutFilesAction extends Action {
             try {    
                 wb.write(response.getOutputStream());
             } catch(Exception e) {
-                MiscUtils.getLogger().error("Error", e);   
+            	logger.error("Error writing xls file", e);
             }
             return null;
         }
-        return mapping.findForward("success");
+        logger.error("FAILED");
+        //return mapping.findForward("success");
+        return null;
     }
     
 }

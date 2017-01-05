@@ -50,6 +50,30 @@ function clearSession(){
     new Ajax.Request('clearSession.jsp','{asynchronous:true}');
 
 }
+
+	function export_to_csv(csvFile, filename) {
+
+		var blob = new Blob([ csvFile ], {
+			type : 'text/csv;charset=utf-8;'
+		});
+		if (navigator.msSaveBlob) { // IE 10+
+			navigator.msSaveBlob(blob, filename);
+		} else {
+			var url = URL.createObjectURL(blob);
+			var link = document.createElement("a");
+			if (link.download !== undefined) {
+				link.setAttribute("href", url);
+				link.setAttribute("download", filename);
+				link.style.visibility = 'hidden';
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+			} 
+			else {
+				window.open(url);
+			}
+		}
+	}
 </script>
 <style type="text/css" media="print">
 .MainTableTopRow,.MainTableLeftColumn,.noprint,.showhidequery,.sqlBorderDiv,.MainTableBottomRow
@@ -105,13 +129,14 @@ function clearSession(){
 		<div class="noprint"
 			style="clear: left; float: left; margin-top: 15px;"><html:form
 			action="/oscarReport/reportByTemplate/generateOutFilesAction">
-			<input type="hidden" name="csv"
+			<input type="hidden" name="csv" id='csv'
 				value="<%=StringEscapeUtils.escapeHtml(csv)%>">
 			<input type="button" value="<-- Back"
 				onclick="javascript: history.go(-1);return false;">
 			<input type="button" value="Print"
 				onclick="javascript: window.print();">
-			<input type="submit" name="getCSV" value="Export to CSV">
+			<!--  <input type="submit" name="getCSV" value="Export to CSV"> -->
+			<input type="button" name="getCSV" value="Export to CSV" onclick="export_to_csv(document.getElementById('csv').value, 'oscarReport.csv');">
 			<input type="submit" name="getXLS" value="Export to XLS">
 		</html:form></div>
 		</td>
