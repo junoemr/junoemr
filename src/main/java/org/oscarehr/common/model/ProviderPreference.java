@@ -39,6 +39,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.CollectionOfElements;
 
 import oscar.OscarProperties;
@@ -230,6 +231,10 @@ public class ProviderPreference extends AbstractModel<String> implements Seriali
     }
 
 	public String getDefaultServiceType() {
+		if(defaultServiceType == null) {
+			defaultServiceType = "no";
+			Logger.getLogger(ProviderPreference.class).error("NULL defaultServiceType found. It has been defaulted to 'no'");
+		}
     	return defaultServiceType;
     }
 
