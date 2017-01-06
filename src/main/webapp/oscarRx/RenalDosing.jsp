@@ -65,10 +65,9 @@ double sCr = -1;
 Date sCrDate = null;
 
 List labs = CommonLabTestValues.findValuesForTest("CML",demographicNo, "CREATININE");
-if(labs != null && labs.size() >0 ){
-//SortHashtable sorter = ;
+if(labs != null && labs.size() > 0 ){
     Collections.sort(labs,new SortHashtable());
-    Hashtable hash =  (Hashtable) labs.get(0);
+   	HashMap hash =  (HashMap) labs.get(0);
     String sCrStr = (String) hash.get("result");
     sCrDate = (Date) hash.get("collDateDate");
     try{
