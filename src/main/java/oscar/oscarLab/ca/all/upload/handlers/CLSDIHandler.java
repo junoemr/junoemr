@@ -52,7 +52,6 @@ public class CLSDIHandler extends CLSHandler implements MessageHandler {
 	
 	public String parse(String serviceName, String fileName, int fileId) {
 
-		int i = 0;
         oscar.oscarLab.ca.all.parsers.CLSDIHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSDIHandler();
         
         Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
@@ -60,38 +59,36 @@ public class CLSDIHandler extends CLSHandler implements MessageHandler {
 		
 		try {
 			ArrayList<String> messages = Utilities.separateMessages(fileName);
-			for (i = 0; i < messages.size(); i++) {
+			for (int i = 0; i < messages.size(); i++) {
 				String msg = messages.get(i);
-				
-				// HACK -- some labs start with an extra line which oscar doesn't read, so skip it
-				if( i==0 && msg.startsWith("BHS")) {
-					continue;
-				}
-				/*
-				if(isDuplicate(msg)) {
-					return ("success");
-				}
-				*/
+
                 newVersionCLSParser.init(msg);
                 String accessionNumber = newVersionCLSParser.getAccessionNum();
-                String fillerOrderNumber = newVersionCLSParser.getFillerOrderNumber();
-                Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNumberOrFillerNumber(
-                		accessionNumber, fillerOrderNumber);
+                Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(accessionNumber);
                 
-                // Glucose labs come back with different accession numbers, but the same filler number.
-                // We are going to replace any successive accession numbers with the originals as
-                // suggested in the CLS conformance documentation
-                if(hl7TextInfo != null && hl7TextInfo.getFillerOrderNum().equals(fillerOrderNumber) && 
-                		!hl7TextInfo.getAccessionNumber().equals(accessionNumber)) {
-
-                	msg = ReplaceAccessionNumber(msg, accessionNumber, hl7TextInfo.getAccessionNumber());
+                // if the report exists the new version must be a correction
+                if(hl7TextInfo == null || newVersionCLSParser.getOrderStatus().equals("C")) {
+                	MessageUploader.routeReport(serviceName, "CLSDI", msg, fileId);
+                }
+                else {
+                	logger.warn("Report Already Uploaded. Status: " + newVersionCLSParser.getOrderStatus());
                 }
 
-                if(hl7TextInfo != null) {
+                /*if(hl7TextInfo != null) {
+            		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            	    Date latestDate = df.parse(hl7TextInfo.getObrDate());
+            	    
+            	    Date newDate = df.parse(newVersionCLSParser.getMsgDate());
+            	    logger.info("Compare lab dates: " + hl7TextInfo.getObrDate() + " (old), " + newVersionCLSParser.getMsgDate() + " (new)");
+            	    if(newDate.before(latestDate)) {
+            	    	// ignore this lab as outdated
+            	    	return null;
+            	    }
+                	
                 	String lastVersionLab = oscar.oscarLab.ca.all.parsers.Factory.getHL7Body(Integer.toString(hl7TextInfo.getLabNumber()));
                 	msg = mergeLabs(lastVersionLab, msg);
-                }
-				MessageUploader.routeReport(serviceName, "CLSDI", msg, fileId);
+                }*/
+				
 
 			}
 		} catch (Exception e) {

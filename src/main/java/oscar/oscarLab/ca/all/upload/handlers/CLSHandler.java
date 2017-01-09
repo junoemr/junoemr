@@ -62,10 +62,6 @@ public class CLSHandler implements MessageHandler {
 			for (i = 0; i < messages.size(); i++) {
 				String msg = messages.get(i);
 				
-				// HACK -- some labs start with an extra line which oscar doesn't read, so skip it
-				if( i==0 && msg.startsWith("BHS")) {
-					continue;
-				}
 				/*
 				if(isDuplicate(msg)) {
 					return ("success");

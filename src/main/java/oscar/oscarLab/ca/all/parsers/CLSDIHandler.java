@@ -79,12 +79,14 @@ public class CLSDIHandler extends CLSHandler implements MessageHandler {
 	}
 	@Override
 	public String getFillerOrderNumber() {
-		// this is different from the filler order number in ORC
-		return get("/.OBR-3-1");
+		/* CLS-DI switches accession number and order number positions */
+		return get("/.OBR-20");
+
 	}
 	@Override
 	public String getAccessionNum() {
-		return getFillerOrderNumber();
+		/* CLS-DI switches accession number and order number positions */
+		return get("/.OBR-3-1");
 	}
 	@Override
 	public boolean isUnstructured() {
