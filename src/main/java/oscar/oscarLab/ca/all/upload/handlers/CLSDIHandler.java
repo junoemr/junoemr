@@ -28,13 +28,9 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
-import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.v23.segment.OBR;
-import ca.uhn.hl7v2.model.v23.segment.ORC;
 import oscar.oscarLab.ca.all.upload.MessageUploader;
 import oscar.oscarLab.ca.all.util.Utilities;
 
@@ -55,7 +51,6 @@ public class CLSDIHandler extends CLSHandler implements MessageHandler {
         oscar.oscarLab.ca.all.parsers.CLSDIHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSDIHandler();
         
         Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
-        Hl7TextMessage hl7TextMessage = new Hl7TextMessage();
 		
 		try {
 			ArrayList<String> messages = Utilities.separateMessages(fileName);
@@ -73,23 +68,6 @@ public class CLSDIHandler extends CLSHandler implements MessageHandler {
                 else {
                 	logger.warn("Report Already Uploaded. Status: " + newVersionCLSParser.getOrderStatus());
                 }
-
-                /*if(hl7TextInfo != null) {
-            		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            	    Date latestDate = df.parse(hl7TextInfo.getObrDate());
-            	    
-            	    Date newDate = df.parse(newVersionCLSParser.getMsgDate());
-            	    logger.info("Compare lab dates: " + hl7TextInfo.getObrDate() + " (old), " + newVersionCLSParser.getMsgDate() + " (new)");
-            	    if(newDate.before(latestDate)) {
-            	    	// ignore this lab as outdated
-            	    	return null;
-            	    }
-                	
-                	String lastVersionLab = oscar.oscarLab.ca.all.parsers.Factory.getHL7Body(Integer.toString(hl7TextInfo.getLabNumber()));
-                	msg = mergeLabs(lastVersionLab, msg);
-                }*/
-				
-
 			}
 		} catch (Exception e) {
 			MessageUploader.clean(fileId);
@@ -100,66 +78,4 @@ public class CLSDIHandler extends CLSHandler implements MessageHandler {
 		return ("success");
 
 	}
-	
-	private String mergeLabs(String oldVersion, String newVersion) throws HL7Exception
-	{
-		String outLabString = newVersion;
-		StringBuilder test = new StringBuilder(newVersion);
-
-        oscar.oscarLab.ca.all.parsers.CLSDIHandler oldVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSDIHandler();
-        oldVersionCLSParser.init(oldVersion);
-        oscar.oscarLab.ca.all.parsers.CLSDIHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSDIHandler();
-        newVersionCLSParser.init(newVersion);
-
-        int currentObrCount = newVersionCLSParser.getOBRCount();
-        
-        // Get all OBRs from the old version that don't exist in the new version
-        // and append them to the current version
-        ArrayList<OBR> oldObrs = this.getObrs(oldVersionCLSParser);
-        int obrIndex = 0;
-        for(OBR oldObr : oldObrs)
-        {
-        	logger.info("CHECK OBR for merge: " + oldObr.getName());
-        	String fillerNumber = this.getObrFillerNumber(oldObr);
-        	if(!this.obrExists(fillerNumber, newVersionCLSParser))
-        	{
-        		logger.info("OBR Not found in new lab");
-        		currentObrCount++;
-        		// Remove the old OBR index so we can add the new one
-        		String tempObr = oldObr.encode();
-                tempObr = tempObr.substring(tempObr.indexOf('|') + 1);
-                tempObr = tempObr.substring(tempObr.indexOf('|') + 1);
-
-        		// Set the OBR index
-                outLabString += this.lineDelimiter + "OBR|" + Integer.toString(currentObrCount) + "|" + tempObr;
-
-                // Get OBR NTE records
-                int obrNteCount = oldVersionCLSParser.getOBRCommentCount(obrIndex);
-                for(int obrNteIndex = 0; obrNteIndex < obrNteCount; obrNteIndex++) {
-					outLabString += this.lineDelimiter + oldVersionCLSParser.getOBRNTE(obrIndex, obrNteIndex).encode();
-                }
-
-        		// Get Previous version OBX records
-                int obxCount = oldVersionCLSParser.getOBXCount(obrIndex);
-                for(int obxIndex = 0; obxIndex < obxCount; obxIndex++) {
-                    outLabString += this.lineDelimiter + oldVersionCLSParser.getOBX(obrIndex, obxIndex).encode();
-
-                    // Get Previous version OBX NTE records
-                    int nteCount = oldVersionCLSParser.getOBXCommentCount(obrIndex, obxIndex);
-                    for(int nteIndex = 0; nteIndex < nteCount; nteIndex++) {
-                        outLabString += this.lineDelimiter + oldVersionCLSParser.getNTE(obrIndex, obxIndex, nteIndex).encode();
-                    }
-                }
-
-        		// Get Previous version ORC record if one exists
-                ORC orc = oldVersionCLSParser.getORC(obrIndex);
-                if(orc != null && orc.encode().length() > 5) {
-                    test.append(outLabString += this.lineDelimiter + orc.encode());
-                }
-        	}
-        	obrIndex++;
-        }
-		return outLabString;
-	}
-
 }
