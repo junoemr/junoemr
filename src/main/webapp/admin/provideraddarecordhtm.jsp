@@ -311,6 +311,15 @@ for (int i=0; i<sites.size(); i++) {
 			</td>
 			<td><input type="text" name="hso_no" maxlength="10"></td>
 		</tr>
+		<%
+			if (OscarProperties.getInstance().getProperty("billregion").equals("AB")) {
+		%>
+		<tr>
+			<td align="right"><bean:message key="admin.provider.formEDeliveryIds" />
+			</td>
+			<td><input type="text" name="e_delivery_ids"></td>
+		</tr>
+		<%} %>
 		<tr>
 			<td align="right"><bean:message
 				key="admin.provider.formSpecialtyCode" />:</td>

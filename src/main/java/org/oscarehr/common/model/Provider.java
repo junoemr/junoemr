@@ -27,6 +27,9 @@ package org.oscarehr.common.model;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * This is the object class that relates to the provider table. Any customizations belong here.
@@ -64,6 +67,7 @@ public class Provider implements Serializable, Comparable<Provider>{
     private String title;
     private String lastUpdateUser;
     private Date lastUpdateDate;
+    private String eDeliveryIds;
 
 
 	public String getPractitionerNo() {
@@ -293,6 +297,15 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public void setLastUpdateDate(Date lastUpdateDate) {
     	this.lastUpdateDate = lastUpdateDate;
     }
+	public void setEDeliveryIds(List<String> idList) {
+		this.eDeliveryIds = StringUtils.trimToNull(StringUtils.join(idList, ","));
+	}
+	public void setEDeliveryIds(String idCSVString) {
+		this.eDeliveryIds = StringUtils.trimToNull(idCSVString);
+	}
+	public String getEDeliveryIds() {
+		return eDeliveryIds;
+	}
 
 	public ComparatorName ComparatorName() {
 		return new ComparatorName();
