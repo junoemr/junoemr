@@ -359,7 +359,7 @@ var maxYear=9900;
 				readonly="true" /></td>
 			<td width="8%">Age<br>
 			<input type="text" name="pg1_age" style="width: 100%" size="10"
-				maxlength="10" value="<%= props.getProperty("pg1_age", "") %>" /></td>
+				maxlength="2" value="<%= props.getProperty("pg1_age", "") %>" /></td>
 			<td width="25%" nowrap>Marital status <br>
 			<input type="checkbox" name="pg1_msMarried"
 				<%= props.getProperty("pg1_msMarried", "") %> />M <input
