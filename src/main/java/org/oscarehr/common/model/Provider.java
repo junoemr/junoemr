@@ -298,9 +298,10 @@ public class Provider implements Serializable, Comparable<Provider>{
     	this.lastUpdateDate = lastUpdateDate;
     }
 	public void setEDeliveryIds(List<String> idList) {
-		this.eDeliveryIds = StringUtils.trimToNull(StringUtils.join(idList, ","));
+		setEDeliveryIds(StringUtils.join(idList, ","));
 	}
 	public void setEDeliveryIds(String idCSVString) {
+		idCSVString = idCSVString.replaceAll("[^0-9.,]", ""); // strip non-numbers
 		this.eDeliveryIds = StringUtils.trimToNull(idCSVString);
 	}
 	public String getEDeliveryIds() {
