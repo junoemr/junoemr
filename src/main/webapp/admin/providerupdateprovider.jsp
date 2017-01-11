@@ -310,7 +310,7 @@ for (int i=0; i<sites.size(); i++) {
 			if (OscarProperties.getInstance().getProperty("billregion").equals("AB")) {
 		%>
 		<tr>
-			<td align="right"><bean:message key="admin.provider.formEDeliveryIds" />
+			<td align="right"><bean:message key="admin.provider.formEDeliveryIds" />:
 			</td>
 			<td><input type="text" name="e_delivery_ids"
 			value="<%= apptMainBean.getString(rs,"e_delivery_ids") %>"></td>

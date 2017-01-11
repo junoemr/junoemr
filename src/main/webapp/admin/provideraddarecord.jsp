@@ -108,10 +108,7 @@ p.setProviderActivity(request.getParameter("provider_activity"));
 p.setPractitionerNo(request.getParameter("practitionerNo"));
 p.setLastUpdateUser((String)session.getAttribute("user"));
 p.setLastUpdateDate(new java.util.Date());
-
-String eDeliveryIds = request.getParameter("e_delivery_ids");
-// TODO input checking for csv list
-p.setEDeliveryIds(eDeliveryIds);
+p.setEDeliveryIds(request.getParameter("e_delivery_ids"));
 
 //multi-office provide id formalize check, can be turn off on properties multioffice.formalize.provider.id
 boolean isProviderFormalize = true;

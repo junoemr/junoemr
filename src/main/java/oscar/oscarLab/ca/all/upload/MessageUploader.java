@@ -73,6 +73,7 @@ import oscar.util.UtilDateUtilities;
 public final class MessageUploader {
 
 	private static final Logger logger = MiscUtils.getLogger();
+    private static ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
 
 	private MessageUploader() {
 		// there's no reason to instantiate a class with no fields.
@@ -108,7 +109,7 @@ public final class MessageUploader {
 			String accessionNum = h.getAccessionNum();
 			String fillerOrderNum = h.getFillerOrderNumber();
 			String sendingFacility = h.getPatientLocation();
-			ArrayList docNums = h.getDocNums();
+			ArrayList<String> docNums = h.getDocNums();
 			int finalResultCount = h.getOBXFinalResultCount();
 			String obrDate = h.getMsgDate();
 
@@ -257,8 +258,6 @@ public final class MessageUploader {
 				
 					String account;
 					String lab_user;
-					PreparedStatement pstmt;
-					ResultSet rs;
 					
 					PATHL7Handler handler = new PATHL7Handler();
 					handler.init(hl7Body);
@@ -373,57 +372,37 @@ public final class MessageUploader {
 	/**
 	 * Attempt to match the doctors from the lab to a provider
 	 */ 
-	private static void providerRouteReport(String labId, ArrayList docNums, Connection conn, String altProviderNo, String labType, String search_on, Integer limit, boolean orderByLength) throws Exception {
+	private static void providerRouteReport(String labId, ArrayList<String> docNums, Connection conn, String altProviderNo, String labType, String search_on, Integer limit, boolean orderByLength) throws Exception {
 		ArrayList<String> providerNums = new ArrayList<String>();
-		PreparedStatement pstmt;
-		String sql = "";
-		String sqlLimit = "";
-		String sqlOrderByLength = "";
 		String sqlSearchOn = "ohip_no";
 		
 		if (search_on != null && search_on.length() > 0) {
 			sqlSearchOn = search_on;
 		}
-		
-		if (limit != null && limit.intValue() > 0) {
-			sqlLimit = " limit " + limit.toString();
-		}	
-		
-		if (orderByLength) {
-			sqlOrderByLength = " order by length(first_name)";
-		}
-		MiscUtils.getLogger().debug("Sending to: " +docNums);
-		MiscUtils.getLogger().debug("Demographic Provider: " + altProviderNo);
+
+		logger.debug("Sending to: " +docNums);
+		logger.debug("Demographic Provider: " + altProviderNo);
 		
 		if (docNums != null) {
 			for (int i = 0; i < docNums.size(); i++) {
+				if (docNums.get(i) != null && !(docNums.get(i)).trim().equals("")) {
 
-				if (docNums.get(i) != null && !((String) docNums.get(i)).trim().equals("")) {
-					sql = "select provider_no from provider where "+ sqlSearchOn +" = '" + ((String) docNums.get(i)) + "'" + sqlOrderByLength + sqlLimit;
-					pstmt = conn.prepareStatement(sql);
-					ResultSet rs = pstmt.executeQuery();
-					while (rs.next()) {
-						providerNums.add(oscar.Misc.getString(rs, "provider_no"));
+					List<Provider> results = providerDao.getProvidersByFieldId(docNums.get(i), labType, sqlSearchOn, limit, orderByLength);
+					for(Provider p: results) {
+						providerNums.add(p.getProviderNo());
 					}
-					rs.close();
-					pstmt.close();
 
 					String otherIdMatchKey = OscarProperties.getInstance().getProperty("lab.other_id_matching", "");
 					if(otherIdMatchKey.length()>0) {
-						OtherId otherId = OtherIdManager.searchTable(OtherIdManager.PROVIDER, otherIdMatchKey, (String)docNums.get(i));
+						OtherId otherId = OtherIdManager.searchTable(OtherIdManager.PROVIDER, otherIdMatchKey, docNums.get(i));
 						if(otherId != null) {
 							providerNums.add(otherId.getTableId());
 						}
 					}
-
 				}
 			}
 		}
-		
-		//if (!labType.equals("Spire"))
-		//	labType = "HL7";
-		
-		
+
 		ProviderLabRouting routing = new ProviderLabRouting();
 		if (providerNums.size() > 0) {
 			for (int i = 0; i < providerNums.size(); i++) {
@@ -439,7 +418,7 @@ public final class MessageUploader {
 	/**
 	 * Attempt to match the doctors from the lab to a provider
 	 */
-	private static void providerRouteReport(String labId, ArrayList docNums, Connection conn, String altProviderNo, String labType) throws Exception {
+	private static void providerRouteReport(String labId, ArrayList<String> docNums, Connection conn, String altProviderNo, String labType) throws Exception {
 		providerRouteReport(labId, docNums, conn, altProviderNo, labType, null, null, false);
 	}
 
