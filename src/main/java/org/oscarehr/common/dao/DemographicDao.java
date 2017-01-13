@@ -320,24 +320,19 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 
 	public List<Demographic> searchDemographic(String searchStr) {
 		String fieldname = "", regularexp = "like";
-
-		if (searchStr.indexOf(",") == -1) {
-			fieldname = "last_name";
-		} else if (searchStr.trim().indexOf(",") == (searchStr.trim().length() - 1)) {
-			fieldname = "last_name";
-		} else {
-			fieldname = "last_name " + regularexp + " ?" + " and first_name ";
-		}
-
-		String hql = "From Demographic d where " + fieldname + " " + regularexp + " ? ";
-
-		String[] lastfirst = searchStr.split(",");
 		Object[] object = null;
-		if (lastfirst.length > 1) {
+		String[] lastfirst = splitPatientNames(searchStr);
+		
+		if(lastfirst.length > 1) {
+			fieldname = "last_name " + regularexp + " ?" + " and first_name ";
 			object = new Object[] { lastfirst[0].trim() + "%", lastfirst[1].trim() + "%" };
-		} else {
+		}
+		else {
+			fieldname = "last_name";
 			object = new Object[] { lastfirst[0].trim() + "%" };
 		}
+		String hql = "From Demographic d where " + fieldname + " " + regularexp + " ? ";
+
 		List list = getHibernateTemplate().find(hql, object);
 		return list;
 	}
@@ -349,38 +344,38 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		String ln="";
 		String fn="";
 		String where = "";
-		try{
-		    if (searchString != null && searchString.length() > 0){
-		       String [] sh = searchString.split(",");
-		       if(sh.length > 1){
-			if(sh[0] != null && sh[0].trim().length()>0){
-		        		where = " x.LastName like :ln ";
-		                     ln=sh[0].trim();
-		           }
-		        	if(sh[1] != null && sh[1].trim().length()>0){
-		        		if(where.length() > 0) where = where + " and "; 
-		        		where = where + " x.FirstName like :fn ";
-		        		fn=sh[1].trim();
-		        	}
-		        }
-		        else{
-		        	   if(sh[0] != null && sh[0].trim().length()>0) {
-		        		where = " x.LastName like :ln ";
-		        		ln=sh[0].trim();
-		        	   }
-		        }
-		        if(where.length() > 0) sqlCommand = sqlCommand + " where " + where;
-		  }
-  	            Query q = session.createQuery(sqlCommand);
-	     	  if(ln.length()>0) q.setParameter("ln",  ln + "%");
-	     	  if(fn.length()>0) q.setParameter("fn",  fn + "%");
-		  q.setFirstResult(startIndex);
-		  q.setMaxResults(itemsToReturn);
-	        	  return (q.list());
-	       }	
-	       finally {
-		this.releaseSession(session);
-	       }
+		try {
+			if (searchString != null && searchString.length() > 0) {
+				String[] sh = splitPatientNames(searchString);
+				if (sh.length > 1) {
+					if (sh[0] != null && sh[0].trim().length() > 0) {
+						where = " x.LastName like :ln ";
+						ln = sh[0].trim();
+					}
+					if (sh[1] != null && sh[1].trim().length() > 0) {
+						if (where.length() > 0) where = where + " and ";
+						where = where + " x.FirstName like :fn ";
+						fn = sh[1].trim();
+					}
+				}
+				else {
+					if (sh[0] != null && sh[0].trim().length() > 0) {
+						where = " x.LastName like :ln ";
+						ln = sh[0].trim();
+					}
+				}
+				if (where.length() > 0) sqlCommand = sqlCommand + " where " + where;
+			}
+			Query q = session.createQuery(sqlCommand);
+			if (ln.length() > 0) q.setParameter("ln", ln + "%");
+			if (fn.length() > 0) q.setParameter("fn", fn + "%");
+			q.setFirstResult(startIndex);
+			q.setMaxResults(itemsToReturn);
+			return (q.list());
+		}
+		finally {
+			this.releaseSession(session);
+		}
 	}
 	
 	private static final String PROGRAM_DOMAIN_RESTRICTION = "select distinct a.clientId from ProgramProvider pp,Admission a WHERE pp.ProgramId=a.programId AND pp.ProviderNo=:providerNo";
@@ -401,7 +396,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		List<Demographic> list = new ArrayList<Demographic>();
 		String queryString = "From Demographic d where d.LastName like :lastName ";
 
-		String[] name = searchStr.split(",");
+		String[] name = splitPatientNames(searchStr);
 		if (name.length == 2) {
 			queryString += " and first_name like :firstName ";
 		}
@@ -446,7 +441,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		List<Demographic> list = new ArrayList<Demographic>();
 		String queryString = "From Demographic d where d.LastName like :lastName and d.HeadRecord is not null ";
 
-		String[] name = searchStr.split(",");
+		String[] name = splitPatientNames(searchStr);
 		if (name.length == 2) {
 			queryString += " and first_name like :firstName ";
 		}
@@ -1926,14 +1921,14 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		
 		String demographicQuery = generateDemographicSearchQuery(loggedInInfo,searchRequest,params, "count(*)");
 		 
-		MiscUtils.getLogger().warn(demographicQuery);
+		log.info(demographicQuery);
 		
 		Session session = getSession();
 		try {
 			SQLQuery sqlQuery = session.createSQLQuery(demographicQuery);
 			for(String key:params.keySet()) {
 				sqlQuery.setParameter(key, params.get(key));
-				MiscUtils.getLogger().warn(key +"="+params.get(key));
+				log.info(key +"="+params.get(key));
 			}
 			Integer result = ((BigInteger)sqlQuery.uniqueResult()).intValue();
 			return result;
@@ -1969,43 +1964,70 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 			this.releaseSession(session);
 		}
 	}
+	/**
+	 * Split the given patient search string on ',' into an array of form {last_name,first_name}. 
+	 * The array is guaranteed to have length 1 if no first name is present or the first name trims to empty,
+	 * and length 2 if there is a first name. 
+	 * If the parameter string is null or empty the array will contain the empty string as the first(and only) element.
+	 * If the parameter string contains more than one ',' the string will be split on the first occurrence, 
+	 * and content after the second ',' will be ignored.
+	 * 
+	 * @param toSplit - the string to be split by ','
+	 * @return patient names in a string array
+	 */
+	private String[] splitPatientNames(String toSplit) {
+		String[] defaultArr = {""};
+		if(toSplit == null ) {
+			return defaultArr;
+		}
+		String[] lastfirst = toSplit.trim().split(",");
+		if(lastfirst.length < 1) {
+			lastfirst = defaultArr;
+		}
+		else if(lastfirst.length > 2) {
+	  		lastfirst = new String[] {lastfirst[0],lastfirst[1]};
+	  	}
+		return lastfirst;
+	}
 	
 	private String generateDemographicSearchQuery(LoggedInInfo loggedInInfo, DemographicSearchRequest searchRequest, Map<String,Object> params, String select) {
 		OscarProperties props = OscarProperties.getInstance();  
 		MatchingDemographicParameters matchingDemographicParameters=null;
 		
-		params.put("keyword", searchRequest.getKeyword());
+		String keyword = searchRequest.getKeyword();
+		SEARCHMODE mode = searchRequest.getMode();
+		
+		params.put("keyword", keyword);
 	
 		String fieldname="";  
 		String regularexp = "regexp";
 	  
-		if(searchRequest.getKeyword().indexOf("*")!=-1 || searchRequest.getKeyword().indexOf("%")!=-1) {
+		if(keyword.contains("*") || keyword.contains("%")) {
 			regularexp="like";
 		}
     
-		if(searchRequest.getMode() == SEARCHMODE.Address) {
+		if(mode == SEARCHMODE.Address) {
 			fieldname="d.address";
 		}
-		if(searchRequest.getMode() == SEARCHMODE.Phone) {
+		else if(mode == SEARCHMODE.Phone) {
 			fieldname="d.phone";
 		}
-		if(searchRequest.getMode() == SEARCHMODE.DemographicNo) {
+		else if(mode == SEARCHMODE.DemographicNo) {
 			fieldname="d.demographic_no";
 		}
-		
-		if(searchRequest.getMode() == SEARCHMODE.HIN) {
+		else if(mode == SEARCHMODE.HIN) {
 			fieldname="d.hin";
 			matchingDemographicParameters=new MatchingDemographicParameters();
-		    matchingDemographicParameters.setHin(searchRequest.getKeyword());	    
+		    matchingDemographicParameters.setHin(keyword);
 		}
-		if(searchRequest.getMode() == SEARCHMODE.DOB) {
+		else if(mode == SEARCHMODE.DOB) {
 			fieldname="d.year_of_birth = :year and d.month_of_birth = :month and d.date_of_birth ";
 
 	    	try
 	    	{
-	    		String year=searchRequest.getKeyword().substring(0, 4);
-	    		String month=searchRequest.getKeyword().substring(5, 7);
-	    		String day=searchRequest.getKeyword().substring(8);
+	    		String year=keyword.substring(0, 4);
+	    		String month=keyword.substring(5, 7);
+	    		String day=keyword.substring(8);
 	    		
 	    		params.put("year", year);
 	    		params.put("month", month);
@@ -2023,40 +2045,29 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	    		params.put("keyword", null);
 	    	}
 		}
-		if(searchRequest.getMode() == SEARCHMODE.ChartNo) {
+		else if(mode == SEARCHMODE.ChartNo) {
 			fieldname="d.chart_no";
 		}
-		if(searchRequest.getMode() == SEARCHMODE.HIN) {
+		else if(mode == SEARCHMODE.HIN) {
 			fieldname="d.hin";
 		}
-		    
-		if(searchRequest.getMode() == SEARCHMODE.Name) {
+		else if(mode == SEARCHMODE.Name) {
 		  	matchingDemographicParameters=new MatchingDemographicParameters();
-		  	String[] lastfirst = searchRequest.getKeyword().split(",");
-
-	        if (lastfirst.length > 1) {
-	            matchingDemographicParameters.setLastName(lastfirst[0].trim());
+		  	String[] lastfirst = splitPatientNames(keyword);
+		  	
+		  	if(lastfirst[0].trim().equals("")) lastfirst[0] = (regularexp.equals("regexp")) ? ".*" : "%";
+		  	
+		  	matchingDemographicParameters.setLastName(lastfirst[0].trim());
+		  	params.put("keyword", lastfirst[0].trim());
+		  	fieldname="lower(d.last_name)";
+		  	
+	        if (lastfirst.length > 1) {	        	
+	        	params.put("extraKeyword", lastfirst[0].trim());
 	            matchingDemographicParameters.setFirstName(lastfirst[1].trim());
-	        }else{
-	            matchingDemographicParameters.setLastName(lastfirst[0].trim());
+	            params.put("keyword", lastfirst[1].trim());
+	            fieldname += " "+regularexp+" :extraKeyword and lower(d.first_name) ";
 	        }
-
-	    	if(searchRequest.getKeyword().indexOf(",")==-1) {
-	    		fieldname="lower(d.last_name)";
-	    	}
-	    	else if(searchRequest.getKeyword().indexOf(",")==(searchRequest.getKeyword().length()-1))  {
-	    		fieldname="lower(d.last_name)";
-	    		params.put("keyword", searchRequest.getKeyword().substring(0, searchRequest.getKeyword().length()-1).trim());
-	    	}
-	    	else if(searchRequest.getKeyword().indexOf(",")==0) {
-	    		fieldname="lower(d.first_name)";
-	    		params.put("keyword", searchRequest.getKeyword().substring(1).trim());
-	    	}else{
-	    		params.put("extraKeyword", searchRequest.getKeyword().split(",")[0].trim());
-	    		params.put("keyword", searchRequest.getKeyword().split(",")[1].trim());
-	    		fieldname="lower(d.last_name) "+regularexp+" :extraKeyword"+" and lower(d.first_name) ";
-	    		}
-			}
+		}
 		
 		String ptstatusexp="";
 		   
@@ -2168,8 +2179,5 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		} finally {
 			this.releaseSession(session);
 		}
-		
 	}
-
-	
 }
