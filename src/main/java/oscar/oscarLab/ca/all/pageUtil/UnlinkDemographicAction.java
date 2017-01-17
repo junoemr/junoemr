@@ -60,13 +60,14 @@ public class UnlinkDemographicAction  extends Action {
 			throw new SecurityException("missing required security object (_lab)");
 		}
 
-		//set the demographicNo in the patientLabRouting table 
         String reason = request.getParameter("reason");
-        String labNoStr = request.getParameter("labNo");
-        Integer labNo = Integer.parseInt(labNoStr);
+        Integer labNo = Integer.parseInt(request.getParameter("labNo"));
+        
         PatientLabRoutingDao plrDao = SpringUtils.getBean(PatientLabRoutingDao.class);
-        PatientLabRouting plr = plrDao.findByLabNo(labNo);
+        PatientLabRouting plr = plrDao.findSingleLabRoute(labNo);
         Integer demoNo = plr.getDemographicNo();
+        
+		//set the demographicNo in the patientLabRouting table
         plr.setDemographicNo(PatientLabRoutingDao.UNMATCHED);
         plrDao.merge(plr);
         

@@ -70,7 +70,7 @@ CaseManagementManager caseManagementManager = (CaseManagementManager) SpringUtil
     <%
     
     PatientLabRoutingDao dao = SpringUtils.getBean(PatientLabRoutingDao.class);
-    PatientLabRouting routing = dao.findByLabNo(ConversionUtils.fromIntString(segmentID));
+    PatientLabRouting routing = dao.findSingleLabRoute(ConversionUtils.fromIntString(segmentID));
 	
     String demographicID = "";
     if (routing != null) {
