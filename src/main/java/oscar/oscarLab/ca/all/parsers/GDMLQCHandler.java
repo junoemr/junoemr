@@ -424,7 +424,7 @@ public class GDMLQCHandler  implements MessageHandler {
     }
 
     @Override
-    public String getAge(){
+    public String getAge() {
         String age = "N/A";
         String dob = getDOB();
         try {
@@ -433,9 +433,9 @@ public class GDMLQCHandler  implements MessageHandler {
             java.util.Date dobDate = formatter.parse(dob);
             java.util.Date serviceDate = formatter.parse(getServiceDate());
             age = UtilDateUtilities.calcAgeAtDate(dobDate, serviceDate);
-        } catch (ParseException e) {
+        }
+        catch (ParseException e) {
             logger.error("Could not get age", e);
-
         }
         return age;
     }
@@ -446,9 +446,19 @@ public class GDMLQCHandler  implements MessageHandler {
     }
 
     @Override
-    public String getHealthNum(){
-    	return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalID(0).getID().getValue()));
-        //return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDExternalID().getID().getValue()));
+    public String getHealthNum() {
+    	
+    	String healthNum = "";
+    	int reps = msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalIDReps();
+    	
+    	for(int i=0; i<reps; i++) {
+    		String segmentLabel = msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalID(i).getAssigningAuthority().getNamespaceID().getValue();
+    		if("CANQC".equals(segmentLabel)) {
+    			healthNum = msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalID(i).getID().getValue();
+    			break;
+    		}
+    	}
+    	return(getString(healthNum));
     }
 
     @Override
