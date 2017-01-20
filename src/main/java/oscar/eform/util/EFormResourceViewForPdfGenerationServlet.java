@@ -96,7 +96,8 @@ public final class EFormResourceViewForPdfGenerationServlet extends HttpServlet 
 			url = "/dms/ManageDocument.do?method=display&doc_no" + docNo +
 					"&providerNo="+providerNo;
 		}
-		if(path.equals("share")) { // allow this to serve up share files properly
+		// allow this to serve up share files properly
+		if(path.equals("share") && fileName != null && !fileName.endsWith(".jsp") && !fileName.endsWith(".jspf")) {
 			String redirectURI = request.getContextPath() + url;
 			logger.info("Request URI:" + redirectURI);
 			response.sendRedirect(redirectURI);
