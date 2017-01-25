@@ -144,7 +144,7 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>{
 	 * @param endDate
 	 * @param limit (0 or negative for no limit)
 	 * @param daysOfWeek list of numbers 1-7 (1=Sunday, 7=Saturday)
-	 * @return
+	 * @return List of type ScheduleDate
 	 */
 	public List<ScheduleDate> findByProviderListAndDateRange(List<String> providerNos, Date startDate, Date endDate, int limit, List<Integer> daysOfWeek) {
 		
