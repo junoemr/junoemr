@@ -99,6 +99,15 @@ function checkSave(elementId){
     else
         $('save'+elementId).disable();
 }
+function isSelectedDemo(val) {
+    for(var i=0; i<selectedDemos.length; i++) {
+        if(val === selectedDemos[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function removeProv(th){
     var ele = th.up();
     ele.remove();

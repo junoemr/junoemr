@@ -32,6 +32,7 @@
 <%@ page import="org.oscarehr.util.DbConnectionFilter"%>
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@ page import="org.oscarehr.common.dao.ViewDao" %>
+<%@ page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@ page import="org.oscarehr.common.model.View,org.oscarehr.util.LocaleUtils" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Set" %>
@@ -70,70 +71,105 @@
 <%
 	TicklerManager ticklerManager = SpringUtils.getBean(TicklerManager.class);
 
-	String labReqVer = oscar.OscarProperties.getInstance().getProperty("onare_labreqver","07");
-	if(labReqVer.equals("")) {labReqVer="07";}
+	String labReqVer = oscar.OscarProperties.getInstance().getProperty("onare_labreqver", "07");
+	if (labReqVer.equals("")) {
+		labReqVer = "07";
+	}
 
-	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
 	String user_no;
-     user_no = (String) session.getAttribute("user");
+	user_no = (String) session.getAttribute("user");
 
-     TicklerLinkDao ticklerLinkDao = (TicklerLinkDao) SpringUtils.getBean("ticklerLinkDao");
+	TicklerLinkDao ticklerLinkDao = (TicklerLinkDao) SpringUtils.getBean("ticklerLinkDao");
 
-     String providerview;
-     String assignedTo;
-     String mrpview;
-     if( request.getParameter("providerview")==null ) {
-             providerview = "all";
-     }
-     else {
-         providerview = request.getParameter("providerview");
-     }
+	String providerview;
+	String assignedTo;
+	String mrpview;
+	if (request.getParameter("providerview") == null) {
+		providerview = "all";
+	}
+	else {
+		providerview = request.getParameter("providerview");
+	}
 
-     if( request.getParameter("assignedTo") == null ) {
-             assignedTo = "all";
-     }
-     else {
-         assignedTo = request.getParameter("assignedTo");
-     }
-     
-     if( request.getParameter("mrpview") == null ) {
-   	  mrpview = "all";
-     }
-     else {
-   	  mrpview = request.getParameter("mrpview");
-     }
+	if (request.getParameter("assignedTo") == null) {
+		assignedTo = "all";
+	}
+	else {
+		assignedTo = request.getParameter("assignedTo");
+	}
 
-     Calendar now=Calendar.getInstance();
-  int curYear = now.get(Calendar.YEAR);
-  int curMonth = (now.get(Calendar.MONTH)+1);
-  int curDay = now.get(Calendar.DAY_OF_MONTH);
+	if (request.getParameter("mrpview") == null) {
+		mrpview = "all";
+	}
+	else {
+		mrpview = request.getParameter("mrpview");
+	}
+
+	String tempDemoNo = request.getParameter("demoview");
+	String demographic_no = "all";
+	String demographic_name = "";
+	String demographic_name_bd = "";
+	String demographic_chartno = "";
+	if (tempDemoNo != null && !tempDemoNo.trim().isEmpty() && !tempDemoNo.equals("all")) {
+		DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
+		Demographic de = demographicDao.getDemographic(tempDemoNo);
+		if (de != null) {
+			demographic_no = tempDemoNo;
+			demographic_name = de.getDisplayName();
+			demographic_name_bd = demographic_name + "(" + de.getBirthDayAsString() + ")";
+			demographic_chartno = de.getChartNo();
+			demographic_chartno = (demographic_chartno == null) ? "" : demographic_chartno;
+		}
+	}
+
+	Calendar now = Calendar.getInstance();
+	int curYear = now.get(Calendar.YEAR);
+	int curMonth = (now.get(Calendar.MONTH) + 1);
+	int curDay = now.get(Calendar.DAY_OF_MONTH);
 
 	String ticklerview;
-   if( request.getParameter("ticklerview") == null ) {
-          ticklerview = "A";
-  }
-  else {
-      ticklerview = request.getParameter("ticklerview");
-  }
+	if (request.getParameter("ticklerview") == null) {
+		ticklerview = "A";
+	}
+	else {
+		ticklerview = request.getParameter("ticklerview");
+	}
 
+	String xml_vdate;
+	if (request.getParameter("xml_vdate") == null) {
+		xml_vdate = "";
+	}
+	else {
+		xml_vdate = request.getParameter("xml_vdate");
+	}
 
-  String xml_vdate;
-   if( request.getParameter("xml_vdate") == null ) {
-          xml_vdate = "";
-  }
-  else {
-      xml_vdate = request.getParameter("xml_vdate");
-  }
-
-  String xml_appointment_date;
-   if( request.getParameter("xml_appointment_date") == null ) {
-          xml_appointment_date = MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay);
-  }
-  else {
-      xml_appointment_date = request.getParameter("xml_appointment_date");
-  }
-
+	/*String xml_appointment_date;
+	if (request.getParameter("xml_appointment_date") == null) {
+		xml_appointment_date = MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay);
+	}
+	else {
+		xml_appointment_date = request.getParameter("xml_appointment_date");
+	}*/
+	String xml_appointment_date;
+	if (request.getParameter("xml_appointment_date") != null) {
+		xml_appointment_date = request.getParameter("xml_appointment_date");
+	}
+	else if (demographic_no != null && !demographic_no.equals("all")) {
+		xml_appointment_date = "8888-12-31";
+	}
+	else {
+		xml_appointment_date = MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay);
+	}
+	
+	String parentAjaxId = "";
+	if( request.getParameter("parentAjaxId") != null ) {
+		parentAjaxId = request.getParameter("parentAjaxId");
+	}
+	else if( request.getAttribute("parentAjaxId") != null ) {
+		parentAjaxId = (String)request.getAttribute("parentAjaxId");
+	}
 %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -154,6 +190,19 @@
 <script src="<%=request.getContextPath()%>/js/jquery-1.7.1.min.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/jquery-ui-1.8.18.custom.min.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/cupertino/jquery-ui-1.8.18.custom.css">
+
+<!-- Autocomplete demographic text box -->
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/demographicProviderAutocomplete.js"></script>
+
+<script type="text/javascript" src="<%= request.getContextPath() %>/share/yui/js/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/share/yui/js/connection-min.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/share/yui/js/animation-min.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/share/yui/js/datasource-min.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/share/yui/js/autocomplete-min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/share/yui/css/fonts-min.css"/>
+<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/share/yui/css/autocomplete.css"/>
+<link rel="stylesheet" type="text/css" media="all" href="<%= request.getContextPath() %>/share/css/demographicProviderAutocomplete.css"  />
 
 <script>
 jQuery.noConflict();
@@ -467,6 +516,53 @@ var beginD = "1900-01-01"
 			popupPage(900,850,url);
 		}});
 	}
+    
+    /* autocomplete demographic search text field, and set a hiddent value with the demographic number */
+	YAHOO.util.Event.onDOMReady(function() {
+		if(jQuery("#autocompletedemo") && jQuery("#autocomplete_choices")) {
+			var url = "<%=request.getContextPath()%>/demographic/SearchDemographic.do";
+			var oDS = new YAHOO.util.XHRDataSource(url,{connMethodPost:true,connXhrMode:'ignoreStaleResponses'});
+			oDS.responseType = YAHOO.util.XHRDataSource.TYPE_JSON;// Set the responseType
+			// Define the schema of the delimited results TEST, PATIENT(1985-06-15)
+			oDS.responseSchema = {
+			    resultsList : "results",
+			    fields: ["formattedName","fomattedDob","demographicNo","status"]
+			};
+			// Enable caching
+			oDS.maxCacheEntries = 0;
+			var oAC = new YAHOO.widget.AutoComplete("autocompletedemo","autocomplete_choices",oDS);
+			oAC.queryMatchSubset = true;
+			oAC.minQueryLength = 3;
+			oAC.maxResultsDisplayed = 25;
+			oAC.formatResult = resultFormatter2;
+			//oAC.typeAhead = true;
+			oAC.queryMatchContains = true;
+
+			oAC.itemSelectEvent.subscribe(function(type, args) {
+
+                var str = args[0].getInputEl().id.replace("autocompletedemo","demoview");
+                jQuery(str).value = args[2][2];//li.id;
+                jQuery("#demoview").val(args[2][2]);
+                
+                args[0].getInputEl().value = args[2][0] + "("+args[2][1]+")";
+                selectedDemos.push(args[0].getInputEl().value);
+			});
+
+			return {
+				oDS : oDS,
+				oAC : oAC
+			};
+		}
+	});
+    /* this function will reset the demographic selection if the name doesn't 
+     * match a demographic from the autofill menu. to be called on #autocompletedemo change*/
+    function autocompletedemo_change(val) {
+    	if(!isSelectedDemo(val)) {
+    		jQuery("#demoview").val("all");
+    		//clear the input with invalid demographic searches so there is no(well, less) confusion
+    		jQuery("#autocompletedemo").val("");
+    	}
+    }
 
 </script>
 <style type="text/css">
@@ -572,6 +668,14 @@ var beginD = "1900-01-01"
     <tr>
 
         <td colspan="3">
+        
+        <!-- demographic search box -- to allow filter by demographic -->
+        <label id="autocompletedemo_label" for="autocompletedemo"><b><bean:message key="tickler.ticklerMain.formDemographic"/></b></label>
+        <input type="hidden" name="demoview" value="<%=demographic_no%>" id="demoview" />
+        <input type="text" id="autocompletedemo" onchange="autocompletedemo_change(this.value);" name="demographicKeyword" value="<%=demographic_name_bd%>" style="width:auto"/>
+        <div id="autocomplete_choices" class="autocomplete demographic-search"></div>
+        <input type="hidden" name="parentAjaxId" value="<%=parentAjaxId%>">
+        
         <font face="Verdana, Arial, Helvetica, sans-serif" size="2" color="#333333"><b><bean:message key="tickler.ticklerMain.formMoveTo"/> </b>
         <select id="ticklerview" name="ticklerview">
         <option value="A" <%=ticklerview.equals("A")?"selected":""%>><bean:message key="tickler.ticklerMain.formActive"/></option>
@@ -786,9 +890,12 @@ function changeSite(sel) {
                                 if (ticklerEditEnabled) {
                                     footerColSpan = 11;
                                 }
+                                String tmpDemoNo = (demographic_no == null || demographic_no.equals("all"))? "" : demographic_no;
 %>
                                 <tr class="noprint"><td colspan="<%=footerColSpan%>" class="white"><a id="checkAllLink" name="checkAllLink" href="javascript:CheckAll();"><bean:message key="tickler.ticklerMain.btnCheckAll"/></a> - <a href="javascript:ClearAll();"><bean:message key="tickler.ticklerMain.btnClearAll"/></a> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                                    <input type="button" name="button" value="<bean:message key="tickler.ticklerMain.btnAddTickler"/>" onClick="popupPage('400','600', 'ticklerAdd.jsp')" class="sbttn">
+                                    <input type="button" name="button" value="<bean:message key="tickler.ticklerMain.btnAddTickler"/>" 
+                                    onClick="popupPage('400','600', 'ticklerAdd.jsp?updateParent=true&parentAjaxId=<%=parentAjaxId%>&demographic_no=<%=tmpDemoNo%>&chart_no=<%=demographic_chartno%>&name=<%=demographic_name%>')" 
+                                    class="sbttn">
                                     <input type="hidden" name="submit_form" value="">
                                     <%
                                     	if (ticklerview.compareTo("D") == 0){
@@ -822,10 +929,12 @@ function changeSite(sel) {
 								  filter.setPriority(null);
 								  
 								  filter.setStatus(ticklerview);
-								  		
 								  filter.setStartDateWeb(dateBegin);
 								  filter.setEndDateWeb(dateEnd);
-								  filter.setPriority(null);
+								  
+								  if(!demographic_no.isEmpty() && !demographic_no.equals("all")) {
+		                            	filter.setDemographicNo(demographic_no);
+		                          }
 								  
 								  if( !mrpview.isEmpty() && !mrpview.equals("all")) {
 								  	filter.setMrp(mrpview);
@@ -888,7 +997,7 @@ function changeSite(sel) {
                                     <%
                                     	}
                                     %>                                    
-                                    <TD width="12%" ROWSPAN="1" class="<%=cellColour%>"><a href=# onClick="popupPage(600,800,'../demographic/demographiccontrol.jsp?demographic_no=<%=demo.getDemographicNo()%>&displaymode=edit&dboperation=search_detail')"><%=demo.getLastName()%>,<%=demo.getFirstName()%></a></TD>                                                                       
+                                    <TD width="12%" ROWSPAN="1" class="<%=cellColour%>"><a href=# onClick="popupPage(600,800,'../demographic/demographiccontrol.jsp?demographic_no=<%=demo.getDemographicNo()%>&displaymode=edit&dboperation=search_detail')"><%=demo.getDisplayName()%></a></TD>                                                                       
                                     <TD ROWSPAN="1" class="<%=cellColour%>"><%=t.getProvider() == null ? "N/A" : t.getProvider().getFormattedName()%></TD>
                                     <TD ROWSPAN="1" class="<%=cellColour%>"><%=t.getServiceDate()%></TD>
                                     <TD ROWSPAN="1" class="<%=cellColour%>"><%=t.getUpdateDate()%></TD>

@@ -256,12 +256,17 @@ public class Demographic implements Serializable {
 		initialize();
 	}
 
-        public String getDisplayName(){
-            if(displayName==null){
-                displayName=getLastName() + ", " + getFirstName();
-                return displayName;
-            }else return displayName;
-        }
+	public String getDisplayName() {
+		if (displayName == null) {
+			String lastName  = (getLastName()  == null) ? "" : getLastName().trim();
+			String firstName = (getFirstName() == null) ? "" : getFirstName().trim();
+			if(!lastName.isEmpty() && !firstName.isEmpty()) {
+				lastName += ", ";
+			}
+			displayName = lastName + firstName;
+		}
+		return displayName;
+	}
 	/**
 	 * Return the unique identifier of this class
 	 *

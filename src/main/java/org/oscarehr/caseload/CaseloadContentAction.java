@@ -573,7 +573,7 @@ public class CaseloadContentAction extends DispatchAction {
 			    List<Map<String, Object>> newTicklerResult = caseloadDao.getCaseloadDemographicData(newTicklerQuery, demographicParam);
 			    if (!newTicklerResult.isEmpty() && newTicklerResult.get(0).get("count(*)")!=null && !newTicklerResult.get(0).get("count(*)").toString().equals("") && !newTicklerResult.get(0).get("count(*)").toString().equals("0")) {
 					String clNewTickler = newTicklerResult.get(0).get("count(*)").toString();
-					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../tickler/ticklerDemoMain.jsp?demoview="+demographic_no+"'); return false;\">" + clNewTickler + "</a>");
+					entry.add("<a href='#' onclick=\"popupPage('700', '1000', '../tickler/ticklerMain.jsp?demoview="+demographic_no+"'); return false;\">" + clNewTickler + "</a>");
 				} else {
 					entry.add("&nbsp;");
 				}
