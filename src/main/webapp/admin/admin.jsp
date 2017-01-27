@@ -905,7 +905,7 @@ div.logoutBox {
                                 }
                         %>		
 	
-			<li><a href="javascript:void(0);" onclick="popupPage(550,800,&quot;<html:rewrite page="/admin/updateDrugref.jsp"/>&quot;);return false;" ><bean:message key="admin.admin.UpdateDrugref"/></a></li>		
+			<!-- <li><a href="javascript:void(0);" onclick="popupPage(550,800,&quot;<html:rewrite page="/admin/updateDrugref.jsp"/>&quot;);return false;" ><bean:message key="admin.admin.UpdateDrugref"/></a></li> -->		
 		</ul>
 		</div>
 	</security:oscarSec>
