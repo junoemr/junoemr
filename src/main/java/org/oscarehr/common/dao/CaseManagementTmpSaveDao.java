@@ -24,8 +24,6 @@
 package org.oscarehr.common.dao;
 
 import java.util.Date;
-import java.util.List;
-
 import javax.persistence.Query;
 
 import org.oscarehr.common.model.CaseManagementTmpSave;
@@ -38,18 +36,13 @@ public class CaseManagementTmpSaveDao extends AbstractDao<CaseManagementTmpSave>
 		super(CaseManagementTmpSave.class);
 	}
 	
-    public void remove(String providerNo, Integer demographicNo, Integer programId) {
-    	Query query = entityManager.createQuery("SELECT x FROM CaseManagementTmpSave x WHERE x.providerNo = ? and x.demographicNo=? and x.programId = ?");
-		query.setParameter(1,providerNo);
-		query.setParameter(2,demographicNo);
-		query.setParameter(3,programId);
+    public int remove(String providerNo, Integer demographicNo, Integer programId) {
+    	Query query = entityManager.createQuery("DELETE FROM CaseManagementTmpSave x WHERE x.providerNo = :provNo and x.demographicNo=:demoNo and x.programId = :progId");
+    	query.setParameter("provNo", providerNo);
+		query.setParameter("demoNo", demographicNo);
+		query.setParameter("progId", programId);
 		
-		@SuppressWarnings("unchecked")
-        List<CaseManagementTmpSave> results = query.getResultList();
-		
-		for(CaseManagementTmpSave result : results) {
-			remove(result);
-		}
+		return query.executeUpdate();
     }
 
     public CaseManagementTmpSave find(String providerNo, Integer demographicNo, Integer programId) {
