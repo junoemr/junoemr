@@ -477,13 +477,12 @@
                                     <tr>
                                         <td colspan="2">
                                             <bean:message key="inboxmanager.document.LinkedProvidersMsg"/>
-                                            <%
-            Properties p = (Properties) session.getAttribute("providerBean");
-            List<ProviderInboxItem> routeList = providerInboxRoutingDao.getProvidersWithRoutingForDocument("DOC", Integer.parseInt(docId));
-                                            %>
                                             <ul>
-                                                <%for (ProviderInboxItem pItem : routeList) {
-                                                    String s=p.getProperty(pItem.getProviderNo(), pItem.getProviderNo());
+                                                <%
+                                                List<ProviderInboxItem> routeList = providerInboxRoutingDao.getProvidersWithRoutingForDocument("DOC", Integer.parseInt(docId));
+                                                for (ProviderInboxItem pItem : routeList) {
+                                                	Provider p = providerDao.getProvider(pItem.getProviderNo());
+                                                	String s = (p != null)? p.getDisplayName() : pItem.getProviderNo();
 
                                                     if(!s.equals("0")&&!s.equals("null")&& !pItem.getStatus().equals("X")){  %>
                                                         <li><%=s%><a href="#" onclick="removeLink('DOC', '<%=docId %>', '<%=pItem.getProviderNo() %>', this);return false;"><bean:message key="inboxmanager.document.RemoveLinkedProviderMsg" /></a></li>
