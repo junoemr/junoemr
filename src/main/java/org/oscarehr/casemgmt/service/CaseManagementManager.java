@@ -1946,27 +1946,30 @@ public class CaseManagementManager {
 	}
 	
 	
-	public CaseManagementNote makeNewNote(String providerNo,String demographicNo,String  encType,String appointmentNo,Locale locale){
+	public CaseManagementNote makeNewNote(String providerNo,String demographicNo,String encType, String appointmentNo, Locale locale) {
 		CaseManagementNote note = new CaseManagementNote();
 		note.setProviderNo(providerNo);
 		note.setDemographic_no(demographicNo);
+		String encounterText = "";
 		
-		if (!OscarProperties.getInstance().isPropertyActive("encounter.empty_new_note")) {
-			OscarAppointmentDao appointmentDao = (OscarAppointmentDao) SpringUtils.getBean("oscarAppointmentDao");
-			String encounterText = "";
-			try{
-				Appointment appointment = appointmentDao.find(Integer.parseInt(appointmentNo));
-				encounterText = "[" + oscar.util.UtilDateUtilities.DateToString(appointment.getAppointmentDate(), "dd-MMM-yyyy", locale) + " .: " + appointment.getReason() + "] \n";
-				note.setAppointmentNo(Integer.parseInt(appointmentNo));
-			}catch(Exception e){
-				logger.error("error parsing appointmentNo",e);
-			}
-		
-			note.setNote(encounterText);
+		if (appointmentNo != null && !OscarProperties.getInstance().isPropertyActive("encounter.empty_new_note")) {
 			
-		} else {
-			note.setNote("");
-		}
+			OscarAppointmentDao appointmentDao = (OscarAppointmentDao) SpringUtils.getBean("oscarAppointmentDao");
+			
+			try{
+				int apptNo = Integer.parseInt(appointmentNo);
+				Appointment appointment = appointmentDao.find(apptNo);
+				if(appointment != null) {
+					note.setAppointmentNo(apptNo);
+					encounterText = "[" + oscar.util.UtilDateUtilities.DateToString(appointment.getAppointmentDate(), "dd-MMM-yyyy", locale) + " .: " + appointment.getReason() + "] \n";
+				}
+			}
+			catch(Exception e){
+				logger.error("error parsing appointmentNo",e);
+				encounterText = "";
+			}
+		} 
+		note.setNote(encounterText);
 		
 		if (encType == null || encType.equals("")) {
 			note.setEncounter_type("");
