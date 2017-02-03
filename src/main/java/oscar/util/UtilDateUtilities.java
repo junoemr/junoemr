@@ -52,6 +52,7 @@ public class UtilDateUtilities {
         return StringToDate(s, spattern, defaultLocale);
     }
     public static Date StringToDate(String s, String spattern, Locale locale)    {
+    	if(s == null) return null;
         try {
             SimpleDateFormat simpledateformat = new SimpleDateFormat(spattern, locale);
             return simpledateformat.parse(s);

@@ -118,15 +118,15 @@ public abstract class FrmRecord {
 		
 		this.setDemographic(loggedInInfo, demographicNo);
 
-		demoProps.setProperty("c_surname_cur", demographic.getLastName());
-		demoProps.setProperty("c_givenName_cur", demographic.getFirstName());
-		demoProps.setProperty("c_address_cur", demographic.getAddress());
-		demoProps.setProperty("c_city_cur", demographic.getCity());
-		demoProps.setProperty("c_province_cur", demographic.getProvince());
-		demoProps.setProperty("c_postal_cur", demographic.getPostal());
-		demoProps.setProperty("c_phn_cur", demographic.getHin());
-		demoProps.setProperty("c_phone_cur", demographic.getPhone());
-		demoProps.setProperty("c_phoneAlt1_cur", demographic.getPhone2());
+		demoProps.setProperty("c_surname_cur", StringUtils.trimToEmpty(demographic.getLastName()));
+		demoProps.setProperty("c_givenName_cur", StringUtils.trimToEmpty(demographic.getFirstName()));
+		demoProps.setProperty("c_address_cur", StringUtils.trimToEmpty(demographic.getAddress()));
+		demoProps.setProperty("c_city_cur", StringUtils.trimToEmpty(demographic.getCity()));
+		demoProps.setProperty("c_province_cur", StringUtils.trimToEmpty(demographic.getProvince()));
+		demoProps.setProperty("c_postal_cur", StringUtils.trimToEmpty(demographic.getPostal()));
+		demoProps.setProperty("c_phn_cur", StringUtils.trimToEmpty(demographic.getHin()));
+		demoProps.setProperty("c_phone_cur", StringUtils.trimToEmpty(demographic.getPhone()));
+		demoProps.setProperty("c_phoneAlt1_cur", StringUtils.trimToEmpty(demographic.getPhone2()));
 		
         Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographicNo);
         String cell = demoExt.get("demo_cell");
