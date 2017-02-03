@@ -127,9 +127,7 @@ public class Provider implements Serializable, Comparable<Provider>{
 
 	}
 
-	/** same as getDisplayName 
-	 * @Deprecated use getDisplayName for consistency with Demographic */
-	@Deprecated
+	/** same as getDisplayName */
 	public String getFormattedName() {
 		return getDisplayName();
 	}

@@ -352,6 +352,17 @@ public class EctConsultationFormRequestUtil {
 		}
 		return "";
 	}
+	public String getProviderOhipNo(String id) {
+		if(id == null || id.length()==0)
+			return "";
+		
+		ProviderDao dao = SpringUtils.getBean(ProviderDao.class);
+		Provider p = dao.getProvider(id);
+		if (p != null) {
+			return (p.getOhipNo() == null)? "" : p.getOhipNo();
+		}
+		return "";
+	}
 
 	public String getFamilyDoctor() {
 		ProviderDao dao = SpringUtils.getBean(ProviderDao.class);
@@ -360,6 +371,14 @@ public class EctConsultationFormRequestUtil {
 			return "";
 		}
 		return ps.get(0).getFormattedName();
+	}
+	public String getFamilyDoctorOhipNo() {
+		ProviderDao dao = SpringUtils.getBean(ProviderDao.class);
+		List<Provider> ps = dao.getProviderByPatientId(ConversionUtils.fromIntString(demoNo));
+		if (ps.isEmpty() || ps.get(0).getOhipNo() == null) {
+			return "";
+		}
+		return ps.get(0).getOhipNo();
 	}
 
 	public String getServiceName(String id) {

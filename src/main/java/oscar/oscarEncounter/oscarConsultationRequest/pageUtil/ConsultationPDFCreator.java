@@ -441,13 +441,14 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 			famDocOhipNo = pro.getOhipNo();
 		}
 
-		if (OscarProperties.getInstance().getBooleanProperty("printPDF_referring_prac", "yes")) {
-		infoTable.addCell(setFooterCell(cell, getResource("msgAssociated2"), reqFrm.getProviderName(reqFrm.providerNo) + ((getlen(ohipNo) > 0) ? " (" + ohipNo + ")" : "")));
+		if (props.isPropertyActive("printPDF_referring_prac")) {
+			infoTable.addCell(setFooterCell(cell, getResource("msgAssociated2"),
+					reqFrm.getProviderName(reqFrm.providerNo) + ((getlen(ohipNo) > 0) ? " (" + ohipNo + ")" : "")));
 		}
-
-                if (OscarProperties.getInstance().getBooleanProperty("mrp_model", "yes")) {
-  		    infoTable.addCell(setFooterCell(cell, getResource("msgFamilyDoc2"), reqFrm.getFamilyDoctor() + ((getlen(famDocOhipNo) > 0) ? " (" + famDocOhipNo + ")" : "")));
-                }
+		if (props.isPropertyActive("mrp_model")) {
+			infoTable.addCell(setFooterCell(cell, getResource("msgFamilyDoc2"),
+					reqFrm.getFamilyDoctor() + ((getlen(famDocOhipNo) > 0) ? " (" + famDocOhipNo + ")" : "")));
+		}
 		if (getlen(reqFrm.signatureImg) > 0) {
 			addSignature(infoTable);
 		}
