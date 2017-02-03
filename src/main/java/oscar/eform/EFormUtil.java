@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
 
 import javax.persistence.PersistenceException;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -131,11 +132,11 @@ public class EFormUtil {
 		// sends back a list of forms that were uploaded (those that can be added to the patient)
 		String sql = "";
 		if (deleted.equals("deleted")) {
-			sql = "SELECT * FROM eform where status=0 ORDER BY " + sortBy;
+			sql = "SELECT * FROM eform where status=0 ORDER BY " + StringEscapeUtils.escapeSql(sortBy);
 		} else if (deleted.equals("current")) {
-			sql = "SELECT * FROM eform where status=1 ORDER BY " + sortBy;
+			sql = "SELECT * FROM eform where status=1 ORDER BY " + StringEscapeUtils.escapeSql(sortBy);
 		} else if (deleted.equals("all")) {
-			sql = "SELECT * FROM eform ORDER BY " + sortBy;
+			sql = "SELECT * FROM eform ORDER BY " + StringEscapeUtils.escapeSql(sortBy);
 		}
 		ResultSet rs = getSQL(sql);
 		ArrayList<HashMap<String, ? extends Object>> results = new ArrayList<HashMap<String, ? extends Object>>();
@@ -368,7 +369,7 @@ public class EFormUtil {
 
 	public static Hashtable<String,Object> loadEForm(String fid) {
 		// opens an eform that was uploaded (used to fill out patient data)
-		String sql = "SELECT * FROM eform where fid=" + fid + " LIMIT 1";
+		String sql = "SELECT * FROM eform where fid=" + StringEscapeUtils.escapeSql(fid) + " LIMIT 1";
 		ResultSet rs = getSQL(sql);
 		Hashtable<String,Object> curht = new Hashtable<String,Object>();
 		try {
@@ -422,7 +423,7 @@ public class EFormUtil {
 		else if (Column.equalsIgnoreCase("formHtml")) dbColumn = "form_html";
 		else if (Column.equalsIgnoreCase("patientIndependent")) dbColumn = "patient_independent";
 		else if (Column.equalsIgnoreCase("roleType")) dbColumn = "roleType";
-		String sql = "SELECT " + dbColumn + " FROM eform WHERE fid=" + fid;
+		String sql = "SELECT " + dbColumn + " FROM eform WHERE fid=" + StringEscapeUtils.escapeSql(fid);
 		ResultSet rs = getSQL(sql);
 		try {
 			while (rs.next()) {
@@ -436,7 +437,7 @@ public class EFormUtil {
 
 	public static String getEFormIdByName(String name) {
 		// opens an eform that was uploaded (used to fill out patient data)
-		String sql = "SELECT MAX(fid) FROM eform WHERE form_name='" + name + "' AND status=1";
+		String sql = "SELECT MAX(fid) FROM eform WHERE form_name='" + StringEscapeUtils.escapeSql(name) + "' AND status=1";
 		ResultSet rs = getSQL(sql);
 		try {
 			if (rs.next()) {
@@ -450,12 +451,12 @@ public class EFormUtil {
 
 	public static void delEForm(String fid) {
 		// deletes the form so no one can add it to the patient (sets status to deleted)
-		String sql = "UPDATE eform SET status=0 WHERE fid=" + fid;
+		String sql = "UPDATE eform SET status=0 WHERE fid=" + StringEscapeUtils.escapeSql(fid);
 		runSQL(sql);
 	}
 
 	public static void restoreEForm(String fid) {
-		String sql = "UPDATE eform SET status=1 WHERE fid=" + fid;
+		String sql = "UPDATE eform SET status=1 WHERE fid=" + StringEscapeUtils.escapeSql(fid);
 		runSQL(sql);
 	}
 
@@ -524,7 +525,7 @@ public class EFormUtil {
 	}
 
 	public static boolean formExistsInDB(String eFormName) {
-		String sql = "SELECT * FROM eform WHERE status=1 AND form_name='" + eFormName + "'";
+		String sql = "SELECT * FROM eform WHERE status=1 AND form_name='" + StringEscapeUtils.escapeSql(eFormName) + "'";
 		try {
 			ResultSet rs = getSQL(sql);
 			if (rs.next()) {
@@ -542,7 +543,8 @@ public class EFormUtil {
 
 	public static int formExistsInDBn(String formName, String fid) {
 		// returns # of forms in the DB with that name other than itself
-		String sql = "SELECT count(*) AS count FROM eform WHERE status=1 AND form_name='" + formName + "' AND fid!=" + fid;
+		String sql = "SELECT count(*) AS count FROM eform WHERE status=1 AND form_name='" 
+		+ StringEscapeUtils.escapeSql(formName) + "' AND fid!=" + StringEscapeUtils.escapeSql(fid);
 		try {
 			ResultSet rs = getSQL(sql);
 			while (rs.next()) {
@@ -578,7 +580,11 @@ public class EFormUtil {
 	public static ArrayList<Hashtable<String,String>> getEFormGroups(String demographic_no) {
 		String sql;
 
-		sql = "SELECT group_name, sum(count) AS 'count' FROM (SELECT eform_groups.group_name, count(*)-1 AS 'count' FROM eform_groups LEFT JOIN eform_data ON eform_data.fid=eform_groups.fid WHERE eform_data.status=1 AND eform_data.demographic_no=" + demographic_no + " GROUP BY eform_groups.group_name UNION SELECT eg.group_name, count(*)-1 AS 'count' FROM eform_groups AS eg WHERE eg.fid = 0 GROUP BY eg.group_name) as sub_query GROUP BY group_name";
+		sql = "SELECT group_name, sum(count) AS 'count' FROM (SELECT eform_groups.group_name, count(*)-1 AS 'count' "
+				+ "FROM eform_groups LEFT JOIN eform_data ON eform_data.fid=eform_groups.fid "
+				+ "WHERE eform_data.status=1 AND eform_data.demographic_no=" + StringEscapeUtils.escapeSql(demographic_no) + " "
+				+ "GROUP BY eform_groups.group_name UNION SELECT eg.group_name, count(*)-1 AS 'count' "
+				+ "FROM eform_groups AS eg WHERE eg.fid = 0 GROUP BY eg.group_name) as sub_query GROUP BY group_name";
 
 		ArrayList<Hashtable<String,String>> al = new ArrayList<Hashtable<String,String>>();
 		try {
@@ -596,17 +602,21 @@ public class EFormUtil {
 	}
 
 	public static void delEFormGroup(String name) {
-		String sql = "DELETE FROM eform_groups WHERE group_name='" + name + "'";
+		String sql = "DELETE FROM eform_groups WHERE group_name='" + StringEscapeUtils.escapeSql(name) + "'";
 		runSQL(sql);
 	}
 
 	public static void addEFormToGroup(String groupName, String fid) {
 		try {
 
-			String sql1 = "SELECT eform_groups.fid FROM eform_groups, eform WHERE eform_groups.fid=" + fid + " AND eform_groups.fid=eform.fid AND eform.status=1 AND eform_groups.group_name='" + groupName + "'";
+			String sql1 = "SELECT eform_groups.fid FROM eform_groups, eform "
+					+ "WHERE eform_groups.fid=" + StringEscapeUtils.escapeSql(fid) + " "
+					+ "AND eform_groups.fid=eform.fid AND eform.status=1 "
+					+ "AND eform_groups.group_name='" + StringEscapeUtils.escapeSql(groupName) + "'";
 			ResultSet rs = DBHandler.GetSQL(sql1);
 			if (!rs.next()) {
-				String sql = "INSERT INTO eform_groups (fid, group_name) " + "VALUES (" + fid + ", '" + groupName + "')";
+				String sql = "INSERT INTO eform_groups (fid, group_name) " 
+					+ "VALUES (" + StringEscapeUtils.escapeSql(fid) + ", '" + StringEscapeUtils.escapeSql(groupName) + "')";
 				DBHandler.RunSQL(sql);
 			}
 		} catch (SQLException sqe) {
@@ -615,7 +625,7 @@ public class EFormUtil {
 	}
 
 	public static void remEFormFromGroup(String groupName, String fid) {
-		String sql = "DELETE FROM eform_groups WHERE group_name='" + groupName + "' and fid=" + fid + ";";
+		String sql = "DELETE FROM eform_groups WHERE group_name='" + StringEscapeUtils.escapeSql(groupName) + "' and fid=" + StringEscapeUtils.escapeSql(fid) + ";";
 		runSQL(sql);
 	}
 
@@ -623,11 +633,11 @@ public class EFormUtil {
 		// sends back a list of forms that were uploaded (those that can be added to the patient)
 		String sql = "";
 		if (deleted.equals("deleted")) {
-			sql = "SELECT * FROM eform, eform_groups where eform.status=0 AND eform.fid=eform_groups.fid AND eform_groups.group_name='" + group + "' ORDER BY " + sortBy;
+			sql = "SELECT * FROM eform, eform_groups where eform.status=0 AND eform.fid=eform_groups.fid AND eform_groups.group_name='" + StringEscapeUtils.escapeSql(group) + "' ORDER BY " + StringEscapeUtils.escapeSql(sortBy);
 		} else if (deleted.equals("current")) {
-			sql = "SELECT * FROM eform, eform_groups where eform.status=1 AND eform.fid=eform_groups.fid AND eform_groups.group_name='" + group + "' ORDER BY " + sortBy;
+			sql = "SELECT * FROM eform, eform_groups where eform.status=1 AND eform.fid=eform_groups.fid AND eform_groups.group_name='" + StringEscapeUtils.escapeSql(group) + "' ORDER BY " + StringEscapeUtils.escapeSql(sortBy);
 		} else if (deleted.equals("all")) {
-			sql = "SELECT * FROM eform AND eform.fid=eform_groups.fid AND eform_groups.group_name='" + group + "' ORDER BY " + sortBy;
+			sql = "SELECT * FROM eform AND eform.fid=eform_groups.fid AND eform_groups.group_name='" + StringEscapeUtils.escapeSql(group) + "' ORDER BY " + StringEscapeUtils.escapeSql(sortBy);
 		}
 		ResultSet rs = getSQL(sql);
 		ArrayList<HashMap<String, ? extends Object>> results = new ArrayList<HashMap<String, ? extends Object>>();
@@ -654,11 +664,11 @@ public class EFormUtil {
 		// sends back a list of forms added to the patient
 		String sql = "";
 		if (deleted.equals("deleted")) {
-			sql = "SELECT * FROM eform_data, eform_groups WHERE eform_data.status=0 AND eform_data.patient_independent=0 AND eform_data.demographic_no=" + demographic_no + " AND eform_data.fid=eform_groups.fid AND eform_groups.group_name='" + groupName + "' ORDER BY " + sortBy;
+			sql = "SELECT * FROM eform_data, eform_groups WHERE eform_data.status=0 AND eform_data.patient_independent=0 AND eform_data.demographic_no=" + StringEscapeUtils.escapeSql(demographic_no) + " AND eform_data.fid=eform_groups.fid AND eform_groups.group_name='" + StringEscapeUtils.escapeSql(groupName) + "' ORDER BY " + StringEscapeUtils.escapeSql(sortBy);
 		} else if (deleted.equals("current")) {
-			sql = "SELECT * FROM eform_data, eform_groups WHERE eform_data.status=1 AND eform_data.patient_independent=0 AND eform_data.demographic_no=" + demographic_no + " AND eform_data.fid=eform_groups.fid AND eform_groups.group_name='" + groupName + "' ORDER BY " + sortBy;
+			sql = "SELECT * FROM eform_data, eform_groups WHERE eform_data.status=1 AND eform_data.patient_independent=0 AND eform_data.demographic_no=" + StringEscapeUtils.escapeSql(demographic_no) + " AND eform_data.fid=eform_groups.fid AND eform_groups.group_name='" + StringEscapeUtils.escapeSql(groupName) + "' ORDER BY " + StringEscapeUtils.escapeSql(sortBy);
 		} else if (deleted.equals("all")) {
-			sql = "SELECT * FROM eform_data, eform_groups WHERE eform_data.patient_independent=0 AND eform_data.demographic_no=" + demographic_no + " AND eform_data.fid=eform_groups.fid AND eform_groups.group_name='" + groupName + "' ORDER BY " + sortBy;
+			sql = "SELECT * FROM eform_data, eform_groups WHERE eform_data.patient_independent=0 AND eform_data.demographic_no=" + StringEscapeUtils.escapeSql(demographic_no) + " AND eform_data.fid=eform_groups.fid AND eform_groups.group_name='" + StringEscapeUtils.escapeSql(groupName) + "' ORDER BY " + StringEscapeUtils.escapeSql(sortBy);
 		}
 		ResultSet rs = getSQL(sql);
 		ArrayList<HashMap<String,? extends Object>> results = new ArrayList<HashMap<String,? extends Object>>();
