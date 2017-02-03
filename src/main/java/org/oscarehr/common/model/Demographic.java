@@ -1007,7 +1007,7 @@ public class Demographic implements Serializable {
 	}
 
 	public String getFormattedName() {
-		return getLastName() + ", " + getFirstName();
+		return getDisplayName();
 	}
 
 	public String getLinks() {
