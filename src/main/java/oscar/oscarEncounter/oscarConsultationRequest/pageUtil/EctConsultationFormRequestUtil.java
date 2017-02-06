@@ -29,10 +29,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.ConsultationServiceDao;
+import org.oscarehr.common.dao.DemographicExtDao;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.ConsultationServices;
+import org.oscarehr.common.model.DemographicExt;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -42,6 +45,7 @@ import oscar.util.UtilDateUtilities;
 public class EctConsultationFormRequestUtil {
 
 	private ConsultationServiceDao consultationServiceDao = (ConsultationServiceDao)SpringUtils.getBean("consultationServiceDao");
+	private DemographicExtDao demographicExtDao = (DemographicExtDao)SpringUtils.getBean("demographicExtDao");
 
 	private boolean bMultisites=org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 
@@ -78,7 +82,12 @@ public class EctConsultationFormRequestUtil {
                 mrp = oscar.Misc.getString(rs, "provider_no");
             }
             rs.close();
-        } catch (SQLException e) {
+            
+            int demographic_no = Integer.parseInt(demoNo);
+            DemographicExt demoExt = demographicExtDao.getDemographicExt(demographic_no, "demo_cell");
+            patientCPhone = (demoExt == null) ? "" : StringUtils.trimToEmpty(demoExt.getValue());
+        } 
+        catch (SQLException e) {
             MiscUtils.getLogger().error("Error", e);
             verdict = false;
         }
@@ -408,6 +417,7 @@ public class EctConsultationFormRequestUtil {
     public String patientAddress;
     public String patientPhone;
     public String patientWPhone;
+    public String patientCPhone;
     public String patientDOB;
     public String patientHealthNum;
     public String patientSex;
