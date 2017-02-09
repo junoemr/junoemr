@@ -30,14 +30,18 @@ import java.util.List;
 
 import javax.persistence.NonUniqueResultException;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.caisi_integrator.ws.CodeType;
 import org.oscarehr.caisi_integrator.ws.FacilityIdDemographicIssueCompositePk;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.model.Issue;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class CaseManagementIssueDAO extends HibernateDaoSupport {
+	
+	private static final Logger logger = MiscUtils.getLogger();
 
     @SuppressWarnings("unchecked")
     public List<CaseManagementIssue> getIssuesByDemographic(String demographic_no) {
@@ -83,28 +87,82 @@ public class CaseManagementIssueDAO extends HibernateDaoSupport {
     }
 
     public void deleteIssueById(CaseManagementIssue issue) {
+    	logger.info("DELETE casemgmt issue: [id:" + issue.getId() + ", demoNo:" + issue.getDemographic_no() + ", issue_id:" + issue.getIssue_id() + "]");
         getHibernateTemplate().delete(issue);
         return;
 
     }
+    public CaseManagementIssue getById(Long id) {
+    	@SuppressWarnings("unchecked")
+        List<CaseManagementIssue> list = getHibernateTemplate().find("from CaseManagementIssue cmi where id = ? ",new Object[] {id});
+        if(list.isEmpty()) {
+        	return null;
+        }
+        return list.get(0);
+    }
 
+    /** temporary debugging method that will log errors saving these notes. */
+    private void checkDemoIssueId(CaseManagementIssue issue) {
+    	try {
+    		logger.info("casemgmt issue MATCH TEST: [id:" + issue.getId() + ", demoNo:" + issue.getDemographic_no() + ", issue_id:" + issue.getIssue_id() + "]");
+    		CaseManagementIssue cmi = getIssuebyIssueCode(issue.getDemographic_no(), issue.getIssue().getCode());
+    		logger.info("getIssueByIssueCode check: returned id " + ((cmi==null)? "null":cmi.getId()));
+    		if(cmi != null) {
+    			logger.error("THIS CaseManagementIssue SHOULD NOT BE SAVED AS NEW");
+    		}
+    	}
+    	catch(NonUniqueResultException e) {
+    		logger.error("THIS CaseManagementIssue SHOULD NOT BE SAVED AS NEW", e);
+    	}
+    	catch(Exception e) {
+    		logger.error("Something else happened", e);
+    	}
+    }
     public void saveAndUpdateCaseIssues(List<CaseManagementIssue> issuelist) {
         Iterator<CaseManagementIssue> itr = issuelist.iterator();
         while (itr.hasNext()) {
         	CaseManagementIssue cmi = itr.next();
         	cmi.setUpdate_date(new Date());
+        	checkDemoIssueId(cmi);// TODO remove this once duplication error resolved
         	if(cmi.getId()!=null && cmi.getId().longValue()>0) {
-        		getHibernateTemplate().update(cmi);
+        		CaseManagementIssue existingIssue = getById(cmi.getId());
+        		if(existingIssue != null && existingIssue != cmi) {
+        			// these must be the exact same issue object for hibernate to update, otherwise we get an exception
+        			logger.error("OBJECT MISMATCH");
+        			logger.error("Attempt to update existing casemgmt_issue #" + Long.toString(existingIssue.getId()) + " using new object with matching ID");
+        			
+        			// hack to allow oscar to function while this error is resolved.
+        			// copy info to existing mgmt_issue and update that one.
+        			existingIssue.setDemographic_no(cmi.getDemographic_no());
+        			existingIssue.setIssue_id(cmi.getIssue_id());
+        			existingIssue.setAcute(cmi.isAcute());
+        			existingIssue.setCertain(cmi.isCertain());
+        			existingIssue.setMajor(cmi.isMajor());
+        			existingIssue.setResolved(cmi.isResolved());
+        			existingIssue.setType(cmi.getType());
+        			existingIssue.setUpdate_date(cmi.getUpdate_date());
+        			existingIssue.setNotes(cmi.getNotes());
+        			existingIssue.setIssue(cmi.getIssue());
+        			
+        			getHibernateTemplate().update(existingIssue);
+	        		logger.info("UPDATED casemgmt issue: [id:" + existingIssue.getId() + ", demoNo:" + existingIssue.getDemographic_no() + ", issue_id:" + existingIssue.getIssue_id() + "]");
+        		}
+        		else {
+	        		getHibernateTemplate().update(cmi);
+	        		logger.info("UPDATED casemgmt issue: [id:" + cmi.getId() + ", demoNo:" + cmi.getDemographic_no() + ", issue_id:" + cmi.getIssue_id() + "]");
+        		}
         	} else {
         		getHibernateTemplate().save(cmi);
-        	}            
+        		logger.info("SAVED casemgmt issue: [id:" + cmi.getId() + ", demoNo:" + cmi.getDemographic_no() + ", issue_id:" + cmi.getIssue_id() + "]");
+        	}
         }
-
     }
 
     public void saveIssue(CaseManagementIssue issue) {
     	issue.setUpdate_date(new Date());
+    	checkDemoIssueId(issue);// TODO remove this once duplication error resolved
         getHibernateTemplate().saveOrUpdate(issue);
+        logger.info("SAVE OR UPDATE casemgmt issue: [id:" + issue.getId() + ", demoNo:" + issue.getDemographic_no() + ", issue_id:" + issue.getIssue_id() + "]");
     }
     
     @SuppressWarnings("unchecked")
