@@ -66,13 +66,19 @@ public class CaseManagementIssueDAO extends HibernateDaoSupport {
         return null;
     }
 
-    public CaseManagementIssue getIssuebyId(String demo, String id) {
+    public CaseManagementIssue getIssuebyId(String demo, String issueId) {
         @SuppressWarnings("unchecked")
-        List<CaseManagementIssue> list = this.getHibernateTemplate().find("from CaseManagementIssue cmi where cmi.issue_id = ? and demographic_no = ?",new Object[]{Long.parseLong(id),demo});
-        if( list != null && list.size() == 1 )
-            return list.get(0);
+        List<CaseManagementIssue> list = this.getHibernateTemplate().find("from CaseManagementIssue cmi where cmi.issue_id = ? and demographic_no = ? order by cmi.id desc",new Object[]{Long.parseLong(issueId),demo});
         
-        return null;                    
+        if(list == null || list.isEmpty()) {
+        	return null;
+        }
+        if(list.size() > 1) {
+        	// the database should not have more than one result here, but return something to prevent further db errors
+        	logger.error("Multiple CaseManagementIssue entries with same issue_id found for demographic: "+ demo +" (issue_id: "+issueId+" ). Check database for duplicates.");
+        	//(new NonUniqueResultException("Expected 1 result got more : "+list.size() + "(" + demo + "," + issueId + ")"));
+        }
+        return list.get(0); //always return the result with the highest id
     }
 
     public CaseManagementIssue getIssuebyIssueCode(String demo, String issueCode) {
@@ -83,6 +89,7 @@ public class CaseManagementIssueDAO extends HibernateDaoSupport {
         	
         if (list.size() == 1 ) return list.get(0);
         
+        logger.error("getIssuebyIssueCode returned ("+list.size() + ") results");
         throw(new NonUniqueResultException("Expected 1 result got more : "+list.size() + "(" + demo + "," + issueCode + ")"));          
     }
 
@@ -95,7 +102,7 @@ public class CaseManagementIssueDAO extends HibernateDaoSupport {
     public CaseManagementIssue getById(Long id) {
     	@SuppressWarnings("unchecked")
         List<CaseManagementIssue> list = getHibernateTemplate().find("from CaseManagementIssue cmi where id = ? ",new Object[] {id});
-        if(list.isEmpty()) {
+        if(list == null || list.isEmpty()) {
         	return null;
         }
         return list.get(0);
