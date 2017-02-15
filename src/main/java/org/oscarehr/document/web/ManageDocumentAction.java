@@ -183,28 +183,20 @@ public class ManageDocumentAction extends DispatchAction {
 	
 			documentDao.merge(d);
 		}
-
 		
 		try {
 
 			CtlDocument ctlDocument = ctlDocumentDao.getCtrlDocument(Integer.parseInt(documentId));
 			if(ctlDocument != null) {
 				
-				CtlDocument matchedCtlDocument = new CtlDocument();
-				matchedCtlDocument.getId().setDocumentNo(ctlDocument.getId().getDocumentNo());
-				matchedCtlDocument.getId().setModule(ctlDocument.getId().getModule());
-				matchedCtlDocument.getId().setModuleId(Integer.parseInt(demog));
-				matchedCtlDocument.setStatus(ctlDocument.getStatus());
-				
-				ctlDocumentDao.persist(matchedCtlDocument);
-				
-				ctlDocumentDao.remove(ctlDocument.getId());
-				
+				ctlDocument.getId().setModuleId(Integer.parseInt(demog));
+				ctlDocumentDao.merge(ctlDocument);
 				// save a document created note
 				if (ctlDocument.isDemographicDocument()) {
 					// save note
 					saveDocNote(request, d.getDocdesc(), demog, documentId);
 				}
+				
 			}
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("Error", e);
@@ -214,7 +206,7 @@ public class ManageDocumentAction extends DispatchAction {
 		if (ret != null && !ret.equals("")) {
 			// response.getOutputStream().print(ret);
 		}
-		HashMap hm = new HashMap();
+		HashMap<String, String> hm = new HashMap<String, String>();
 		hm.put("patientId", demog);
 		JSONObject jsonObject = JSONObject.fromObject(hm);
 		try {
@@ -234,7 +226,7 @@ public class ManageDocumentAction extends DispatchAction {
         	throw new SecurityException("missing required security object (_demographic)");
         }
 		
-		HashMap hm = new HashMap();
+		HashMap<String, String> hm = new HashMap<String, String>();
 		hm.put("demoName", getDemoName(LoggedInInfo.getLoggedInInfoFromSession(request), dn));
 		JSONObject jsonObject = JSONObject.fromObject(hm);
 		try {
@@ -258,7 +250,7 @@ public class ManageDocumentAction extends DispatchAction {
 		
 
 		providerInboxRoutingDAO.removeLinkFromDocument(docType, Integer.parseInt(docId), providerNo);
-		HashMap hm = new HashMap();
+		HashMap<String, List> hm = new HashMap<String, List>();
 		hm.put("linkedProviders", providerInboxRoutingDAO.getProvidersWithRoutingForDocument(docType, Integer.parseInt(docId)));
 
 		JSONObject jsonObject = JSONObject.fromObject(hm);
