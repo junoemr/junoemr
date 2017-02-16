@@ -1,0 +1,2 @@
+ALTER TABLE `demographic_licensed_producer` ADD COLUMN `producer_id2` int(10) NOT NULL DEFAULT 0,
+ADD CONSTRAINT producer_id2_fk FOREIGN KEY (producer_id2) REFERENCES licensed_producer(producer_id) ON UPDATE CASCADE ON DELETE SET DEFAULT;

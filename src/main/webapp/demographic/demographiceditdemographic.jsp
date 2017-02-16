@@ -146,6 +146,9 @@
 	String licensedProducerDefault = "None";
 	String licensedProducer = licensedProducerDefault;
 	
+	String licensedProducerDefault2 = "None";
+	String licensedProducer2 = licensedProducerDefault2;
+	
 	String licensedProducerDefaultAddress = "None";
 	String licensedProducerAddress = licensedProducerDefaultAddress;
 	
@@ -154,6 +157,10 @@
 		ResultSet demoProducerRs = apptMainBean.queryResults(params, "search_demo_licensed_producer");
 		if(demoProducerRs.next()) {
 			licensedProducer = demoProducerRs.getString("producer_name");
+		}
+		ResultSet demoProducerRs2 = apptMainBean.queryResults(params, "search_demo_licensed_producer2");
+		if(demoProducerRs2.next()) {
+			licensedProducer2 = demoProducerRs2.getString("producer_name");
 		}
 		ResultSet demoProducerAddrRs = apptMainBean.queryResults(params, "search_demo_licensed_producer_address_name");
 		if(demoProducerAddrRs.next()) {
@@ -2214,6 +2221,11 @@ if ( PatStat.equals(Dead) ) {%>
 							</li>
 							<li>
                                                     <span class="label"><bean:message
+                                                          	key="demographic.demographiceditdemographic.licensedProducer2" />:</span>
+                                                    <span class="info"><%= licensedProducer2 %></span>
+							</li>
+							<li>
+                                                    <span class="label"><bean:message
                                                           	key="demographic.demographiceditdemographic.licensedProducerAddress" />:</span>
                                                     <span class="info"><%= licensedProducerAddress %></span>
 							</li>
@@ -3097,6 +3109,24 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 											String producer_name = producerRs.getString("producer_name");
 											%>
 											<option value="<%=producer_id%>" <%=producer_name.equals(licensedProducer)?" selected":""%> ><%=producer_name%></option>
+											<%
+										}
+										%>
+										</select>
+									</td>
+                            	</tr>
+                            	<tr>
+	                            	<td align="right"><b><bean:message key="demographic.demographiceditdemographic.licensedProducer2" />:</b></td>
+									<td align="left">
+										<select name="licensed_producer2">
+										<option value="0" <%=licensedProducerDefault2.equals(licensedProducer2)?" selected":""%> ><%=licensedProducerDefault2%></option>
+										<%
+										producerRs.beforeFirst();
+										while(producerRs.next()) {
+											String producer_id = producerRs.getString("producer_id");
+											String producer_name = producerRs.getString("producer_name");
+											%>
+											<option value="<%=producer_id%>" <%=producer_name.equals(licensedProducer2)?" selected":""%> ><%=producer_name%></option>
 											<%
 										}
 										%>
