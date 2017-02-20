@@ -99,6 +99,11 @@
 		<ap-sql>SELECT providerExt.signature FROM providerExt WHERE providerExt.provider_no='${provider}' </ap-sql>
 		<ap-output>${signature}</ap-output>
     </databaseap>
+    <databaseap>
+		<ap-name>current_user_takno</ap-name>
+		<ap-sql>SELECT p.tak_no as takno FROM provider p WHERE p.provider_no='${provider}' </ap-sql>
+		<ap-output>${takno}</ap-output>
+	</databaseap>
 	<databaseap>
 		<ap-name>current_logged_in_user</ap-name>
 		<ap-sql>SELECT provider.first_name, provider.last_name FROM provider WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
@@ -118,6 +123,11 @@
 		<ap-name>current_logged_in_user_id</ap-name>
 		<ap-sql>SELECT '${loggedInProvider}' as id </ap-sql>
 		<ap-output>${id}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_logged_in_user_takno</ap-name>
+		<ap-sql>SELECT p.tak_no as takno FROM provider p WHERE p.provider_no='${loggedInProvider}' </ap-sql>
+		<ap-output>${takno}</ap-output>
 	</databaseap>
     
 <!-- Patient demographic information -->

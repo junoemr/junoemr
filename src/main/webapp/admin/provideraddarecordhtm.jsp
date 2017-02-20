@@ -319,6 +319,11 @@ for (int i=0; i<sites.size(); i++) {
 			</td>
 			<td><input type="text" name="e_delivery_ids"></td>
 		</tr>
+		<tr>
+			<td align="right"><bean:message key="admin.provider.formTakNo" />:
+			</td>
+			<td><input type="text" name="tak_no"></td>
+		</tr>
 		<%} %>
 		<tr>
 			<td align="right"><bean:message

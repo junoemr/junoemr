@@ -38,6 +38,7 @@
 		<property name="lastUpdateUser" type="string"/>
 		<property name="lastUpdateDate" type="date" />
 		<property column="e_delivery_ids" name="EDeliveryIds" not-null="false" type="string" />
+		<property column="tak_no" name="TakNo" not-null="false" type="string" />
 
 	</class>
 </hibernate-mapping>

@@ -68,6 +68,7 @@ public class Provider implements Serializable, Comparable<Provider>{
     private String lastUpdateUser;
     private Date lastUpdateDate;
     private String eDeliveryIds;
+    private String takNo;
 
 
 	public String getPractitionerNo() {
@@ -308,6 +309,12 @@ public class Provider implements Serializable, Comparable<Provider>{
 	}
 	public String getEDeliveryIds() {
 		return eDeliveryIds;
+	}
+	public void setTakNo(String takNo) {
+		this.takNo = StringUtils.trimToNull(takNo);
+	}
+	public String getTakNo() {
+		return this.takNo;
 	}
 
 	public ComparatorName ComparatorName() {

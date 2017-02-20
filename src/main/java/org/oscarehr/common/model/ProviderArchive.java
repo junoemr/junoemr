@@ -86,6 +86,8 @@ public class ProviderArchive extends AbstractModel<Integer> {
     private Date SignedConfidentiality;
 	@Column(name="e_delivery_ids")
 	private String eDeliveryIds;
+	@Column(name="tak_no")
+	private String takNo;
 	
 	public Integer getId() {
     	return id;
@@ -255,8 +257,10 @@ public class ProviderArchive extends AbstractModel<Integer> {
 	public String getEDeliveryIds() {
 		return eDeliveryIds;
 	}
-
-
-
-
+	public void setTakNo(String takNo) {
+		this.takNo = StringUtils.trimToNull(takNo);
+	}
+	public String getTakNo() {
+		return this.takNo;
+	}
 }

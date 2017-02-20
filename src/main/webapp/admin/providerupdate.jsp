@@ -164,6 +164,7 @@
 		  p.setLastUpdateUser((String)session.getAttribute("user"));
 		  p.setLastUpdateDate(new java.util.Date());
 		  p.setEDeliveryIds(request.getParameter("e_delivery_ids"));
+		  p.setTakNo(request.getParameter("tak_no"));
 		  providerDao.updateProvider(p);
 
         if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
