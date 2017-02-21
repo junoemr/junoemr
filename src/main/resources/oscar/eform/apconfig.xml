@@ -624,13 +624,17 @@
                 FROM drugs d WHERE d.demographic_no=${demographic} AND d.end_date &gt; DATE_ADD(CURDATE(), INTERVAL -1 WEEK);</ap-sql>
         <ap-output>${rxlist}</ap-output>
     </databaseap>
-    
     <databaseap>
         <ap-name>latest_echart_note</ap-name>
-        <ap-sql>SELECT distinct cmn.note AS note FROM casemgmt_note cmn
-				WHERE cmn.demographic_no = ${demographic}
-				AND cmn.include_issue_innote='0'
-				ORDER BY cmn.observation_date 
+        <ap-sql>SELECT cmn.note AS note FROM casemgmt_note cmn
+				JOIN (SELECT DISTINCT a.uuid FROM casemgmt_note a
+					WHERE a.demographic_no=${demographic}
+					AND a.include_issue_innote='0'
+					ORDER BY a.observation_date DESC LIMIT 1)
+				AS A ON (cmn.uuid = A.uuid)
+				WHERE cmn.demographic_no=${demographic}
+				AND include_issue_innote='0'
+				ORDER BY update_date
 				DESC LIMIT 1;
 		</ap-sql>
         <ap-output>${note}</ap-output>
