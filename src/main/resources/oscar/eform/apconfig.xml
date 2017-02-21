@@ -625,6 +625,7 @@
         <ap-output>${rxlist}</ap-output>
     </databaseap>
     <databaseap>
+    	<!-- get the latest note uuid by observation_date. Then the latest revision by update_date -->
         <ap-name>latest_echart_note</ap-name>
         <ap-sql>SELECT cmn.note AS note FROM casemgmt_note cmn
 				JOIN (SELECT DISTINCT a.uuid FROM casemgmt_note a
