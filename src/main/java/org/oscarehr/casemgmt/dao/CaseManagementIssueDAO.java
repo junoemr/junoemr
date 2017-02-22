@@ -25,7 +25,6 @@ package org.oscarehr.casemgmt.dao;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.NonUniqueResultException;
@@ -110,57 +109,43 @@ public class CaseManagementIssueDAO extends HibernateDaoSupport {
 
     /** temporary debugging method that will log errors saving these notes. */
     private void checkDemoIssueId(CaseManagementIssue issue) {
+    	logger.info("casemgmt_issue MATCH TEST: [id:" + issue.getId() + ", demoNo:" + issue.getDemographic_no() + ", issue_id:" + issue.getIssue_id() + "]");
     	try {
-    		logger.info("casemgmt issue MATCH TEST: [id:" + issue.getId() + ", demoNo:" + issue.getDemographic_no() + ", issue_id:" + issue.getIssue_id() + "]");
+    		CaseManagementIssue cmi = getIssuebyId(issue.getDemographic_no(), Long.toString(issue.getIssue_id()));
+    		logger.info("getIssuebyId check: returned id " + ((cmi==null)? "null":cmi.getId()));
+    		if(cmi != null) {
+    			logger.info("This CaseManagementIssue should be updated (based on get by issue_id)");
+    		}
+    	} 
+    	catch(Exception e) {
+    		logger.error("Error retrieving by issue id", e);
+    	}
+    	try {
     		CaseManagementIssue cmi = getIssuebyIssueCode(issue.getDemographic_no(), issue.getIssue().getCode());
     		logger.info("getIssueByIssueCode check: returned id " + ((cmi==null)? "null":cmi.getId()));
     		if(cmi != null) {
-    			logger.error("THIS CaseManagementIssue SHOULD NOT BE SAVED AS NEW");
+    			logger.info("This CaseManagementIssue should be updated (based on get by issue_code)");
     		}
     	}
     	catch(NonUniqueResultException e) {
-    		logger.error("THIS CaseManagementIssue SHOULD NOT BE SAVED AS NEW", e);
+    		logger.error("CaseManagementIssue SHOULD NOT BE SAVED AS NEW", e);
     	}
     	catch(Exception e) {
-    		logger.error("Something else happened", e);
+    		logger.error("Error retrieving by issue code", e);
     	}
     }
     public void saveAndUpdateCaseIssues(List<CaseManagementIssue> issuelist) {
-        Iterator<CaseManagementIssue> itr = issuelist.iterator();
-        while (itr.hasNext()) {
-        	CaseManagementIssue cmi = itr.next();
+    	
+    	for(CaseManagementIssue cmi : issuelist) {
         	cmi.setUpdate_date(new Date());
         	checkDemoIssueId(cmi);// TODO remove this once duplication error resolved
         	if(cmi.getId()!=null && cmi.getId().longValue()>0) {
-        		CaseManagementIssue existingIssue = getById(cmi.getId());
-        		if(existingIssue != null && existingIssue != cmi) {
-        			// these must be the exact same issue object for hibernate to update, otherwise we get an exception
-        			logger.error("OBJECT MISMATCH");
-        			logger.error("Attempt to update existing casemgmt_issue #" + Long.toString(existingIssue.getId()) + " using new object with matching ID");
-        			
-        			// hack to allow oscar to function while this error is resolved.
-        			// copy info to existing mgmt_issue and update that one.
-        			existingIssue.setDemographic_no(cmi.getDemographic_no());
-        			existingIssue.setIssue_id(cmi.getIssue_id());
-        			existingIssue.setAcute(cmi.isAcute());
-        			existingIssue.setCertain(cmi.isCertain());
-        			existingIssue.setMajor(cmi.isMajor());
-        			existingIssue.setResolved(cmi.isResolved());
-        			existingIssue.setType(cmi.getType());
-        			existingIssue.setUpdate_date(cmi.getUpdate_date());
-        			existingIssue.setNotes(cmi.getNotes());
-        			existingIssue.setIssue(cmi.getIssue());
-        			
-        			getHibernateTemplate().update(existingIssue);
-	        		logger.info("UPDATED casemgmt issue: [id:" + existingIssue.getId() + ", demoNo:" + existingIssue.getDemographic_no() + ", issue_id:" + existingIssue.getIssue_id() + "]");
-        		}
-        		else {
-	        		getHibernateTemplate().update(cmi);
-	        		logger.info("UPDATED casemgmt issue: [id:" + cmi.getId() + ", demoNo:" + cmi.getDemographic_no() + ", issue_id:" + cmi.getIssue_id() + "]");
-        		}
-        	} else {
+        		logger.info("MERGE casemgmt issue: [id:" + cmi.getId() + ", demoNo:" + cmi.getDemographic_no() + ", issue_id:" + cmi.getIssue_id() + "]");
+        		getHibernateTemplate().merge(cmi);
+        	}
+        	else {
+        		logger.info("SAVE casemgmt issue: [id:" + cmi.getId() + ", demoNo:" + cmi.getDemographic_no() + ", issue_id:" + cmi.getIssue_id() + "]");
         		getHibernateTemplate().save(cmi);
-        		logger.info("SAVED casemgmt issue: [id:" + cmi.getId() + ", demoNo:" + cmi.getDemographic_no() + ", issue_id:" + cmi.getIssue_id() + "]");
         	}
         }
     }
@@ -168,8 +153,8 @@ public class CaseManagementIssueDAO extends HibernateDaoSupport {
     public void saveIssue(CaseManagementIssue issue) {
     	issue.setUpdate_date(new Date());
     	checkDemoIssueId(issue);// TODO remove this once duplication error resolved
-        getHibernateTemplate().saveOrUpdate(issue);
         logger.info("SAVE OR UPDATE casemgmt issue: [id:" + issue.getId() + ", demoNo:" + issue.getDemographic_no() + ", issue_id:" + issue.getIssue_id() + "]");
+        getHibernateTemplate().saveOrUpdate(issue);
     }
     
     @SuppressWarnings("unchecked")
