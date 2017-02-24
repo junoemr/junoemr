@@ -829,7 +829,10 @@ public class ProviderData {
     public Integer addUpdateProvider(boolean update) {
             Integer key = 0;
         try {
-            String sql = "insert into provider values (?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?, ?,?)";
+            String sql = "insert into provider (provider_no, last_name, first_name, provider_type, specialty, team, sex, dob, address,"
+            		+ "phone, work_phone, ohip_no, rma_no, billing_no, hso_no, status, comments, provider_activity,"
+            		+ "practitionerNo, init, job_title, email, title, lastUpdateUser, lastUpdateDate, e_delivery_ids, tak_no, signed_confidentiality) "
+            		+ "values (?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?, ?,?)";
             if (update) {
                 sql = "update provider set last_name=?      and first_name=?        and provider_type=? " +
                                       "and specialty=?      and team=?              and sex=? " +
@@ -845,39 +848,41 @@ public class ProviderData {
 
             Connection conn = DbConnectionFilter.getThreadLocalDbConnection();
             PreparedStatement write_rec = conn.prepareStatement(sql);
-
-            Integer i = update ? 1 : 2;
-            write_rec.setString(i, last_name);
-            write_rec.setString(i + 1, first_name);
-            write_rec.setString(i + 2, provider_type);
-            write_rec.setString(i + 3, specialty);
-            write_rec.setString(i + 4, team);
-            write_rec.setString(i + 5, sex);
-            write_rec.setString(i + 6, dob);
-            write_rec.setString(i + 7, address);
-            write_rec.setString(i + 8, phone);
-            write_rec.setString(i + 9, work_phone);
-            write_rec.setString(i + 10, ohip_no);
-            write_rec.setString(i + 11, rma_no);
-            write_rec.setString(i + 12, billing_no);
-            write_rec.setString(i + 13, hso_no);
-            write_rec.setString(i + 14, status);
-            write_rec.setString(i + 15, comments);
-            write_rec.setString(i + 16, provider_activity);
-            write_rec.setString(i + 17, practitionerNo);
-            write_rec.setString(i + 18, init);
-            write_rec.setString(i + 19, job_title);
-            write_rec.setString(i + 20, email);
-            write_rec.setString(i + 21, title);
-            write_rec.setString(i + 22, lastUpdateUser);
-            write_rec.setString(i + 23, lastUpdateDate);
-            write_rec.setString(i + 24, signed_confidentiality);
-            write_rec.setString(i + 25, e_delivery_ids);
-            write_rec.setString(i + 26, tak_no);
+            
+            int paramIndex = 1;
+            if(!update) {
+            	write_rec.setString(paramIndex++, provider_no);
+            }
+            
+            write_rec.setString(paramIndex++, last_name);
+            write_rec.setString(paramIndex++, first_name);
+            write_rec.setString(paramIndex++, provider_type);
+            write_rec.setString(paramIndex++, specialty);
+            write_rec.setString(paramIndex++, team);
+            write_rec.setString(paramIndex++, sex);
+            write_rec.setString(paramIndex++, dob);
+            write_rec.setString(paramIndex++, address);
+            write_rec.setString(paramIndex++, phone);
+            write_rec.setString(paramIndex++, work_phone);
+            write_rec.setString(paramIndex++, ohip_no);
+            write_rec.setString(paramIndex++, rma_no);
+            write_rec.setString(paramIndex++, billing_no);
+            write_rec.setString(paramIndex++, hso_no);
+            write_rec.setString(paramIndex++, status);
+            write_rec.setString(paramIndex++, comments);
+            write_rec.setString(paramIndex++, provider_activity);
+            write_rec.setString(paramIndex++, practitionerNo);
+            write_rec.setString(paramIndex++, init);
+            write_rec.setString(paramIndex++, job_title);
+            write_rec.setString(paramIndex++, email);
+            write_rec.setString(paramIndex++, title);
+            write_rec.setString(paramIndex++, lastUpdateUser);
+            write_rec.setString(paramIndex++, lastUpdateDate);
+            write_rec.setString(paramIndex++, e_delivery_ids);
+            write_rec.setString(paramIndex++, tak_no);
+            write_rec.setString(paramIndex++, signed_confidentiality);
             if (update) {
-                write_rec.setString(i + 27, provider_no);
-            } else {
-                write_rec.setString(1, provider_no);
+                write_rec.setString(paramIndex++, provider_no);
             }
             write_rec.executeUpdate();
             ResultSet rs = write_rec.getGeneratedKeys();
