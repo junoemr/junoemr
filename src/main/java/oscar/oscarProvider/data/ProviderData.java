@@ -112,6 +112,8 @@ public class ProviderData {
    String lastUpdateUser;
    String lastUpdateDate;
    String signed_confidentiality;
+   String e_delivery_ids;
+   String tak_no;
 
 
    /** Creates a new instance of ProviderData */
@@ -183,6 +185,8 @@ public class ProviderData {
                    this.lastUpdateUser= oscar.Misc.getString(rs, "lastUpdateUser");
                    this.lastUpdateDate= oscar.Misc.getString(rs, "lastUpdateDate");
                    this.signed_confidentiality= oscar.Misc.getString(rs, "signed_confidentiality");
+                   this.e_delivery_ids= oscar.Misc.getString(rs, "e_delivery_ids");
+                   this.tak_no= oscar.Misc.getString(rs, "tak_no");
                 }
 
                 rs.close();
@@ -825,7 +829,7 @@ public class ProviderData {
     public Integer addUpdateProvider(boolean update) {
             Integer key = 0;
         try {
-            String sql = "insert into provider values (?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?)";
+            String sql = "insert into provider values (?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?, ?,?)";
             if (update) {
                 sql = "update provider set last_name=?      and first_name=?        and provider_type=? " +
                                       "and specialty=?      and team=?              and sex=? " +
@@ -835,6 +839,7 @@ public class ProviderData {
                                       "and comments=?       and provider_activity=? and practitionerNo=? " +
                                       "and init=?           and job_title=?         and email=? " +
                                       "and title=?          and lastUpdateUser=?    and lastUpdateDate=? " +
+                                      "and e_delivery_ids=? and tak_no=?			" +
                                       "and signed_confidentiality=?     where provider_no=?";
             }
 
@@ -867,8 +872,10 @@ public class ProviderData {
             write_rec.setString(i + 22, lastUpdateUser);
             write_rec.setString(i + 23, lastUpdateDate);
             write_rec.setString(i + 24, signed_confidentiality);
+            write_rec.setString(i + 25, e_delivery_ids);
+            write_rec.setString(i + 26, tak_no);
             if (update) {
-                write_rec.setString(i + 25, provider_no);
+                write_rec.setString(i + 27, provider_no);
             } else {
                 write_rec.setString(1, provider_no);
             }
