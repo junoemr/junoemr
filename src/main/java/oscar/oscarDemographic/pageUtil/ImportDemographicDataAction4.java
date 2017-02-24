@@ -67,6 +67,7 @@ import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.AdmissionManager;
 import org.oscarehr.PMmodule.service.ProgramManager;
+import org.oscarehr.casemgmt.dao.CaseManagementIssueDAO;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
@@ -187,6 +188,7 @@ import oscar.util.UtilDateUtilities;
     ProviderDataDao providerDataDao = (ProviderDataDao) SpringUtils.getBean("providerDataDao");
     PartialDateDao partialDateDao = (PartialDateDao) SpringUtils.getBean("partialDateDao");
     DemographicExtDao demographicExtDao = (DemographicExtDao) SpringUtils.getBean("demographicExtDao");
+	CaseManagementIssueDAO caseManagementIssueDAO = (CaseManagementIssueDAO) SpringUtils.getBean("caseManagementIssueDAO");
     
     /*
      * Custom flags for controlling import notes in the main e-chart.
@@ -2664,13 +2666,17 @@ import oscar.util.UtilDateUtilities;
         }
 
 	Set<CaseManagementIssue> getCMIssue(String code) {
-		CaseManagementIssue cmIssu = new CaseManagementIssue();
-		cmIssu.setDemographic_no(demographicNo);
-		Issue isu = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(code));
-		cmIssu.setIssue_id(isu.getId());
-		cmIssu.setType(isu.getType());
-		caseManagementManager.saveCaseIssue(cmIssu);
-
+		
+		CaseManagementIssue cmIssu = caseManagementIssueDAO.getIssuebyIssueCode(demographicNo, code);
+		
+		if(cmIssu == null) {
+			cmIssu = new CaseManagementIssue();
+			cmIssu.setDemographic_no(demographicNo);
+			Issue isu = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(code));
+			cmIssu.setIssue_id(isu.getId());
+			cmIssu.setType(isu.getType());
+			caseManagementManager.saveCaseIssue(cmIssu);
+		}
 		Set<CaseManagementIssue> sCmIssu = new HashSet<CaseManagementIssue>();
 		sCmIssu.add(cmIssu);
 		return sCmIssu;
@@ -2680,28 +2686,35 @@ import oscar.util.UtilDateUtilities;
 		Set<CaseManagementIssue> sCmIssu = new HashSet<CaseManagementIssue>();
 		Issue isu = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(issueCode));
 		if (isu!=null) {
-			CaseManagementIssue cmIssu = new CaseManagementIssue();
-			cmIssu.setDemographic_no(demographicNo);
-			cmIssu.setIssue_id(isu.getId());
-			cmIssu.setType(isu.getType());
-			caseManagementManager.saveCaseIssue(cmIssu);
+			CaseManagementIssue cmIssu = caseManagementIssueDAO.getIssuebyId(demographicNo, Long.toString(isu.getId()));
+			
+			if(cmIssu == null) {
+				cmIssu = new CaseManagementIssue();
+				cmIssu.setDemographic_no(demographicNo);
+				cmIssu.setIssue_id(isu.getId());
+				cmIssu.setType(isu.getType());
+				caseManagementManager.saveCaseIssue(cmIssu);
+			}
 			sCmIssu.add(cmIssu);
 		}
 		if (isICD9(diagCode)) {
 			isu = caseManagementManager.getIssueInfoByCode(noDot(diagCode.getStandardCode()));
 			if (isu!=null) {
-				CaseManagementIssue cmIssu = new CaseManagementIssue();
-				cmIssu.setDemographic_no(demographicNo);
-				cmIssu.setIssue_id(isu.getId());
-				cmIssu.setType(isu.getType());
-				caseManagementManager.saveCaseIssue(cmIssu);
+				CaseManagementIssue cmIssu = caseManagementIssueDAO.getIssuebyId(demographicNo, Long.toString(isu.getId()));
+				if(cmIssu == null) {
+					cmIssu = new CaseManagementIssue();
+					cmIssu.setDemographic_no(demographicNo);
+					cmIssu.setIssue_id(isu.getId());
+					cmIssu.setType(isu.getType());
+					caseManagementManager.saveCaseIssue(cmIssu);
+				}
 				sCmIssu.add(cmIssu);
 			}
 		}
 		return sCmIssu;
 	}
 
-	Set<CaseManagementIssue> getCMIssue(String cppName, cdsDt.Code diagCode) {
+	/*Set<CaseManagementIssue> getCMIssue(String cppName, cdsDt.Code diagCode) {
 		Set<CaseManagementIssue> sCmIssu = new HashSet<CaseManagementIssue>();
 		Issue isu = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(cppName));
 		if (isu!=null) {
@@ -2724,7 +2737,7 @@ import oscar.util.UtilDateUtilities;
 			}
 		}
 		return sCmIssu;
-	}
+	}*/
 
 	String getCode(cdsDt.StandardCoding dCode, String dTitle) {
 		if (dCode==null) return "";
