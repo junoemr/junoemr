@@ -91,14 +91,19 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 		document.addTitle(getResource("msgConsReq"));
 		document.addCreator("OSCAR");
 		document.open();
+		
+		int headFontSize = Integer.parseInt(props.getProperty("consultation.pdfCreator.headerFontSize", "14"));
+		int infoFontSize = Integer.parseInt(props.getProperty("consultation.pdfCreator.infoFontSize", "12"));
+		int baseFontSize = Integer.parseInt(props.getProperty("consultation.pdfCreator.baseFontSize", "9"));
+		int boldFontSize = Integer.parseInt(props.getProperty("consultation.pdfCreator.boldFontSize", "10"));
 
 		// Create the fonts that we are going to use
 		bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252,
 				BaseFont.NOT_EMBEDDED);
-		headerFont = new Font(bf, 14, Font.BOLD);
-		infoFont = new Font(bf, 12, Font.NORMAL);
-		font = new Font(bf, 9, Font.NORMAL);
-		boldFont = new Font(bf, 10, Font.BOLD);
+		headerFont = new Font(bf, headFontSize, Font.BOLD);
+		infoFont = new Font(bf, infoFontSize, Font.NORMAL);
+		font = new Font(bf, baseFontSize, Font.NORMAL);
+		boldFont = new Font(bf, boldFontSize, Font.BOLD);
 
 		createConsultationRequest();
 
