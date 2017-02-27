@@ -156,11 +156,12 @@ public class LabPDFCreator extends PdfPageEventHelper{
     	
     	// check for custom font size property
     	int fontSize = Integer.parseInt(props.getProperty("lab.pdfCreator.headerFontSize.rtf", "11"));
+    	int boldSize = Integer.parseInt(props.getProperty("lab.pdfCreator.headerFontSizeBold.rtf", "12"));
     	
         //Create the fonts that we are going to use
         bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
         font = new Font(bf, fontSize, Font.NORMAL);
-        boldFont = new Font(bf, fontSize+1, Font.BOLD);
+        boldFont = new Font(bf, boldSize, Font.BOLD);
         redFont = new Font(bf, fontSize, Font.NORMAL, Color.RED);
         
         //add the patient information
@@ -198,11 +199,12 @@ public class LabPDFCreator extends PdfPageEventHelper{
         
         // check for custom font size property
         int fontSize = Integer.parseInt(props.getProperty("lab.pdfCreator.headerFontSize.pdf", "9"));
+        int boldSize = Integer.parseInt(props.getProperty("lab.pdfCreator.headerFontSizeBold.pdf", "10"));
 
         //Create the fonts that we are going to use
         bf = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
         font = new Font(bf, fontSize, Font.NORMAL);
-        boldFont = new Font(bf, fontSize+1, Font.BOLD);
+        boldFont = new Font(bf, boldSize, Font.BOLD);
         redFont = new Font(bf, fontSize, Font.NORMAL, Color.RED);
 
         // add the header table containing the patient and lab info to the document
