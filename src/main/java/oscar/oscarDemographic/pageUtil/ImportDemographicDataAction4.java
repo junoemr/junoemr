@@ -64,6 +64,7 @@ import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.AdmissionManager;
 import org.oscarehr.PMmodule.service.ProgramManager;
+import org.oscarehr.casemgmt.dao.CaseManagementIssueDAO;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
@@ -191,6 +192,7 @@ import cdsDt.PersonNameStandard.OtherNames;
     PartialDateDao partialDateDao = (PartialDateDao) SpringUtils.getBean("partialDateDao");
     DemographicExtDao demographicExtDao = (DemographicExtDao) SpringUtils.getBean("demographicExtDao");
     OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
+    CaseManagementIssueDAO caseManagementIssueDAO = (CaseManagementIssueDAO) SpringUtils.getBean("caseManagementIssueDAO");
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception  {
@@ -2635,69 +2637,39 @@ import cdsDt.PersonNameStandard.OtherNames;
                 String codingSystem = StringUtils.noNull(diagCode.getCodingSystem()).toLowerCase();
 		return (codingSystem.contains("icd") && codingSystem.contains("9"));
         }
+        
+        /** retrieves the CasemanagementIssue associated with the given code. 
+    	 * If none exists, it adds one if there is a matching issue with the code */
+    	Set<CaseManagementIssue> getCMIssue(String code) {
+    		
+    		Set<CaseManagementIssue> sCmIssu = new HashSet<CaseManagementIssue>();
+    		CaseManagementIssue cmIssue = caseManagementIssueDAO.getIssuebyIssueCode(demographicNo, StringUtils.noNull(code));
+    		if (cmIssue == null) {
+    			Issue issue = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(code));
+    			if(issue != null) {
+    				// add a new CaseManagementIssue with a valid issue
+    				cmIssue = new CaseManagementIssue();
+    				cmIssue.setDemographic_no(demographicNo);
+    				cmIssue.setIssue_id(issue.getId());
+    				cmIssue.setType(issue.getType());
+    				caseManagementIssueDAO.saveIssue(cmIssue);
+    			}
+    		}
+    		if(cmIssue != null) {
+    			sCmIssu.add(cmIssue);
+    		}
+    		return sCmIssu;
+    	}
 
-	Set<CaseManagementIssue> getCMIssue(String code) {
-		CaseManagementIssue cmIssu = new CaseManagementIssue();
-		cmIssu.setDemographic_no(demographicNo);
-		Issue isu = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(code));
-		cmIssu.setIssue_id(isu.getId());
-		cmIssu.setType(isu.getType());
-		caseManagementManager.saveCaseIssue(cmIssu);
-
-		Set<CaseManagementIssue> sCmIssu = new HashSet<CaseManagementIssue>();
-		sCmIssu.add(cmIssu);
-		return sCmIssu;
-	}
-
-	Set<CaseManagementIssue> getCMIssue(String issueCode, cdsDt.StandardCoding diagCode) {
-		Set<CaseManagementIssue> sCmIssu = new HashSet<CaseManagementIssue>();
-		Issue isu = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(issueCode));
-		if (isu!=null) {
-			CaseManagementIssue cmIssu = new CaseManagementIssue();
-			cmIssu.setDemographic_no(demographicNo);
-			cmIssu.setIssue_id(isu.getId());
-			cmIssu.setType(isu.getType());
-			caseManagementManager.saveCaseIssue(cmIssu);
-			sCmIssu.add(cmIssu);
-		}
-		if (isICD9(diagCode)) {
-			isu = caseManagementManager.getIssueInfoByCode(noDot(diagCode.getStandardCode()));
-			if (isu!=null) {
-				CaseManagementIssue cmIssu = new CaseManagementIssue();
-				cmIssu.setDemographic_no(demographicNo);
-				cmIssu.setIssue_id(isu.getId());
-				cmIssu.setType(isu.getType());
-				caseManagementManager.saveCaseIssue(cmIssu);
-				sCmIssu.add(cmIssu);
-			}
-		}
-		return sCmIssu;
-	}
-
-	Set<CaseManagementIssue> getCMIssue(String cppName, cdsDt.Code diagCode) {
-		Set<CaseManagementIssue> sCmIssu = new HashSet<CaseManagementIssue>();
-		Issue isu = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(cppName));
-		if (isu!=null) {
-			CaseManagementIssue cmIssu = new CaseManagementIssue();
-			cmIssu.setDemographic_no(demographicNo);
-			cmIssu.setIssue_id(isu.getId());
-			cmIssu.setType(isu.getType());
-			caseManagementManager.saveCaseIssue(cmIssu);
-			sCmIssu.add(cmIssu);
-		}
-                if (isICD9(diagCode)) {
-			isu = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(diagCode.getValue()));
-			if (isu!=null) {
-				CaseManagementIssue cmIssu = new CaseManagementIssue();
-				cmIssu.setDemographic_no(demographicNo);
-				cmIssu.setIssue_id(isu.getId());
-				cmIssu.setType(isu.getType());
-				caseManagementManager.saveCaseIssue(cmIssu);
-				sCmIssu.add(cmIssu);
-			}
-		}
-		return sCmIssu;
-	}
+    	Set<CaseManagementIssue> getCMIssue(String issueCode, cdsDt.StandardCoding diagCode) {
+    		
+    		Set<CaseManagementIssue> sCmIssu = new HashSet<CaseManagementIssue>();
+    		sCmIssu.addAll(getCMIssue(issueCode));
+    		if (isICD9(diagCode)) {
+    			sCmIssu.addAll(getCMIssue(noDot(diagCode.getStandardCode())));
+    		}
+    		return sCmIssu;
+    	}
 
 	String getCode(cdsDt.StandardCoding dCode, String dTitle) {
 		if (dCode==null) return "";
