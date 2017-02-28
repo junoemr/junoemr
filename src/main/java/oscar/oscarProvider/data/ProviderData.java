@@ -30,7 +30,10 @@
 
 package oscar.oscarProvider.data;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +82,7 @@ public class ProviderData {
 	| email                  | varchar(60)  | YES  |     | NULL       |       |
 	| title                  | varchar(20)  | YES  |     | NULL       |       |
 	| lastUpdateUser         | varchar(6)   | YES  |     | NULL       |       |
-	| lastUpdateDate         | date         | YES  |     | NULL       |       |
+	| lastUpdateDate         | date         | NO   |     | NULL       |       |
 	| signed_confidentiality | date         | YES  |     | 0001-01-01 |       |
 	+------------------------+--------------+------+-----+------------+-------+
 	*/
@@ -718,6 +721,9 @@ public class ProviderData {
 		this.status = "1";
 		this.specialty = "";
 		this.sex = "";
+		
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		this.lastUpdateDate = df.format(Calendar.getInstance().getTime());
 		
 		dao.persist(toProvider());
 	}
