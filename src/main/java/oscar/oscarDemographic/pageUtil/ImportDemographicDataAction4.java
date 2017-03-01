@@ -1481,17 +1481,17 @@ import cdsDt.PersonNameStandard.OtherNames;
                     	endDate.add(Calendar.DAY_OF_YEAR, Integer.valueOf(duration)+timeShiftInDays);
                     drug.setEndDate(endDate.getTime());
 
+                    // coerce the frequency code into oscar's format
                     String freq = StringUtils.noNull(medArray[i].getFrequency());
-                    int prnPos = freq.toUpperCase().indexOf("PRN");
-                    if (prnPos>=0) {
-                    	 drug.setPrn(true);
-                    	 freq = freq.substring(0, prnPos).trim() +" "+ freq.substring(prnPos+3).trim(); //remove "prn" from freq
-                    }
-                    drug.setFreqCode(freq);
-
-                    drug.setFreqCode(medArray[i].getFrequency());
-                    if (medArray[i].getFrequency()!=null && medArray[i].getFrequency().contains("PRN")) drug.setPrn(true);
-                    else drug.setPrn(false);
+					int prnPos = freq.toUpperCase().indexOf("PRN");
+					drug.setPrn(false);
+	
+					if (prnPos >= 0) { // frequency code contains PRN
+						drug.setPrn(true);
+						// Remove PRN from frequency code
+						freq = freq.substring(0, prnPos).trim() + freq.substring(prnPos+3).trim();
+					}
+					drug.setFreqCode(freq);
 
                     drug.setRegionalIdentifier(medArray[i].getDrugIdentificationNumber());
                     drug.setRoute(medArray[i].getRoute());
@@ -1535,8 +1535,10 @@ import cdsDt.PersonNameStandard.OtherNames;
                     int sep = take.indexOf("-");
                     if (sep>0) drug.setTakeMax(Util.leadingNumF(take.substring(sep+1)));
                     else drug.setTakeMax(drug.getTakeMin());
-                    drug.setUnit(medArray[i].getDosageUnitOfMeasure());
-                    if ("table".equalsIgnoreCase(drug.getUnit())) drug.setUnit("tab");
+                    
+                    String unit = medArray[i].getDosageUnitOfMeasure();
+                    if ("tablet".equalsIgnoreCase(unit)) unit = "tab";
+                    drug.setUnit(unit);
 
                     drug.setDemographicId(Integer.valueOf(demographicNo));
                     drug.setArchived(false);
@@ -1741,6 +1743,7 @@ import cdsDt.PersonNameStandard.OtherNames;
 
                 //LABORATORY RESULTS
                 LaboratoryResults[] labResultArr = patientRec.getLaboratoryResultsArray();
+                logger.info("IMPORT LAB RESULTS: " + labResultArr.length + " entries found");
                 String[] _accession = new String[labResultArr.length];
                 String[] _coll_date = new String[labResultArr.length];
                 String[] _title	    = new String[labResultArr.length];
@@ -1762,6 +1765,10 @@ import cdsDt.PersonNameStandard.OtherNames;
                     _location[i] = StringUtils.noNull(labResultArr[i].getLaboratoryName());
                     _accession[i] = StringUtils.noNull(labResultArr[i].getAccessionNumber());
                     _coll_date[i] = dateFPtoString(labResultArr[i].getCollectionDateTime(), timeShiftInDays);
+                    
+                    if(_coll_date[i].length() > 10) { //hack to ensure the date string is max 10 digits.
+                    	_coll_date[i] = _coll_date[i].substring(0, 11);
+                    }
                     _req_date[i] = dateFPtoString(labResultArr[i].getLabRequisitionDateTime(), timeShiftInDays);
                     if (StringUtils.empty(_req_date[i])) _req_date[i] = _coll_date[i];
 
@@ -2666,6 +2673,7 @@ import cdsDt.PersonNameStandard.OtherNames;
 				// add a new CaseManagementIssue with a valid issue
 				cmIssue = new CaseManagementIssue();
 				cmIssue.setDemographic_no(demographicNo);
+				cmIssue.setIssue(issue);
 				cmIssue.setIssue_id(issue.getId());
 				cmIssue.setType(issue.getType());
 				caseManagementIssueDAO.saveIssue(cmIssue);
@@ -2976,7 +2984,7 @@ import cdsDt.PersonNameStandard.OtherNames;
 		}
 	
 	    if (pd == null) {
-	    	logger.error("No provider found for firstName: " + firstName +
+	    	logger.warn("No provider found for firstName: " + firstName +
 	    			" lastName: " + lastName + " ohipNo: " + ohipNo);
 		
 		    if (StringUtils.empty(firstName) || StringUtils.empty(lastName)) {
