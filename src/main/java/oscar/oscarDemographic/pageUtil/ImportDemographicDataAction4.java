@@ -1503,17 +1503,17 @@ import oscar.util.UtilDateUtilities;
                     	endDate.add(Calendar.DAY_OF_YEAR, Integer.valueOf(duration)+timeShiftInDays);
                     drug.setEndDate(endDate.getTime());
 
-                    String freq = StringUtils.noNull(medArray[i].getFrequency());
-                    int prnPos = freq.toUpperCase().indexOf("PRN");
-                    if (prnPos>=0) {
-                    	 drug.setPrn(true);
-                    	 freq = freq.substring(0, prnPos).trim() +" "+ freq.substring(prnPos+3).trim(); //remove "prn" from freq
-                    }
-                    drug.setFreqCode(freq);
-
-                    drug.setFreqCode(medArray[i].getFrequency());
-                    if (medArray[i].getFrequency()!=null && medArray[i].getFrequency().contains("PRN")) drug.setPrn(true);
-                    else drug.setPrn(false);
+					// coerce the frequency code into oscar's format
+					String freq = StringUtils.noNull(medArray[i].getFrequency());
+					int prnPos = freq.toUpperCase().indexOf("PRN");
+					drug.setPrn(false);
+	
+					if (prnPos >= 0) { // frequency code contains PRN
+						drug.setPrn(true);
+						// Remove PRN from frequency code
+						freq = freq.substring(0, prnPos).trim() + freq.substring(prnPos + 3).trim();
+					}
+					drug.setFreqCode(freq);
 
                     drug.setRegionalIdentifier(medArray[i].getDrugIdentificationNumber());
                     drug.setRoute(medArray[i].getRoute());
