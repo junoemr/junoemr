@@ -146,9 +146,26 @@
 
 
          <script type="text/javascript">
-       renderCalendar=function(id,inputFieldId){
-           Calendar.setup({ inputField : inputFieldId, ifFormat : "%Y-%m-%d", showsTime :false, button : id });
-  	   }
+		function renderCalendar(id,inputFieldId) {
+			Calendar.setup({ inputField : inputFieldId, ifFormat : "%Y-%m-%d", showsTime :false, button : id });
+		}
+       
+		var docId = <%=docId%>;
+		var docIp = "<%=docIp%>";
+		var demographicNo = <%=demographicID%>;
+		var selectedDemographicNo = demographicNo;
+		var contextPath = "<%= request.getContextPath() %>";
+		
+		function onTicklerBtn() {
+			
+			var action = contextPath + "/tickler/ForwardDemographicTickler.do?docType=DOC&docId=" + docId + "&docIp=" + docIp + "&demographic_no=" + demographicNo + "";
+			console.info(demographicNo, action);
+			popupStart(450,600, action, 'tickler');
+		}
+		
+		function saveBtnAction () {
+			demographicNo = selectedDemographicNo;
+		}
 
         var tmp;
 
@@ -187,6 +204,10 @@
                                                    selectedDemos.push(args[0].getInputEl().value);
                                                	   	if (args[2][3] !== undefined) {
                                                    		addDocToList(args[2][3], args[2][4] + " (MRP)", "<%=docId%>");
+                                               	   	}
+                                               	   	if(args[2][2] !== undefined) {
+                                               	   		selectedDemographicNo = args[2][2]; // update the demographic number in js
+                                               			console.info("Change demo id:", selectedDemographicNo);
                                                	   	}
                                                    //enable Save button whenever a selection is made
                                                    $('save<%=docId%>').enable();
@@ -326,7 +347,7 @@
                                     <tr>
                                         <td><bean:message key="inboxmanager.document.ObservationDateMsg" /></td>
                                         <td>
-                                            <input   id="observationDate<%=docId%>" name="observationDate" type="text" value="<%=curdoc.getObservationDate().replaceAll("/","-")%>">
+                                            <input id="observationDate<%=docId%>" name="observationDate" type="text" value="<%=curdoc.getObservationDate().replaceAll("/","-")%>">
                                             <a id="obsdate<%=docId%>" onmouseover="renderCalendar(this.id,'observationDate<%=docId%>' );" href="javascript:void(0);" ><img title="Calendar" src="<%=request.getContextPath()%>/images/cal.gif" alt="Calendar"border="0" /></a>
                                         </td>
                                     </tr>
@@ -391,8 +412,13 @@
                                     <% } %>
                                     <tr>
                                         <td width="30%" colspan="1" align="right"><a id="saveSucessMsg_<%=docId%>" style="display:none;color:blue;"><bean:message key="inboxmanager.document.SuccessfullySavedMsg"/></a></td>
-                                        <td width="30%" colspan="1" align="right"><%if(demographicID.equals("-1")){%><input type="submit" name="save" disabled id="save<%=docId%>" value="Save" /><input type="button" name="save" id="saveNext<%=docId%>" onclick="saveNext(<%=docId%>)" disabled value='<bean:message key="inboxmanager.document.SaveAndNext"/>' /><%}
-            else{%><input type="submit" name="save" id="save<%=docId%>" value="Save" /><input type="button" name="save" onclick="saveNext(<%=docId%>)" id="saveNext<%=docId%>" value='<bean:message key="inboxmanager.document.SaveAndNext"/>' /> <%}%>
+                                        <td width="30%" colspan="1" align="right">
+                                    <%if(demographicID.equals("-1")){%>
+                                        <input type="submit" name="save" disabled id="save<%=docId%>" value="Save" onclick="saveBtnAction();" />
+                                        <input type="button" name="save" id="saveNext<%=docId%>" onclick="saveBtnAction();saveNext(<%=docId%>)" disabled value='<bean:message key="inboxmanager.document.SaveAndNext"/>' /><%}
+						            else{%>
+							            <input type="submit" name="save" id="save<%=docId%>" value="Save" onclick="saveBtnAction();"/>
+							            <input type="button" name="save" onclick="saveBtnAction();saveNext(<%=docId%>)" id="saveNext<%=docId%>" value='<bean:message key="inboxmanager.document.SaveAndNext"/>' /> <%}%>
 
                                     </tr>
 
@@ -514,7 +540,7 @@
                                                         <input type="button" id="printBtn_<%=docId%>" value=" <bean:message key="global.btnPrint"/> " onClick="popup(700,960,'<%=url2%>','file download')">
                                                         <% if (demographicID != null && !demographicID.equals("") && !demographicID.equalsIgnoreCase("null")) {%>
 														<input type="button" id="msgBtn_<%=docId%>" value="Msg" onclick="popupStart(700,960,'<%= request.getContextPath() %>/oscarMessenger/SendDemoMessage.do?demographic_no=<%=demographicID%>&docId=<%=docId%>');"/>
-                                                        <input type="button" id="ticklerBtn_<%=docId%>" value="Tickler" onclick="popupStart(450,600,'<%= request.getContextPath() %>/tickler/ForwardDemographicTickler.do?docType=DOC&docId=<%= docId %>&docIp=<%= docIp %>&demographic_no=<%=demographicID%>','tickler')"/>
+                                                        <input type="button" id="ticklerBtn_<%=docId%>" value="Tickler" onclick="onTicklerBtn();"/>
                                                         <input type="button" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupStart(360, 680, '<%= request.getContextPath() %>/oscarMDS/SearchPatient.do?labType=DOC&segmentID=<%= docId %>&name=<%=java.net.URLEncoder.encode(demoName)%>', 'searchPatientWindow')">
                                                         <% }
 
