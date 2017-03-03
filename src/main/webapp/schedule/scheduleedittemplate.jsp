@@ -45,68 +45,90 @@
 <%
 	ScheduleTemplateDao scheduleTemplateDao = SpringUtils.getBean(ScheduleTemplateDao.class);
 	ScheduleTemplateCodeDao scheduleTemplateCodeDao = SpringUtils.getBean(ScheduleTemplateCodeDao.class);
-%>
-<% //save or delete the settings
-  int rowsAffected = 0;
-  OscarProperties props = OscarProperties.getInstance();
-  int STEP = request.getParameter("step")!=null&&!request.getParameter("step").equals("")?Integer.parseInt(request.getParameter("step")):(props.getProperty("template_time", "").length()>0?Integer.parseInt(props.getProperty("template_time", "")):15);
-  if(request.getParameter("dboperation")!=null && (request.getParameter("dboperation").compareTo(" Save ")==0 || request.getParameter("dboperation").equals("Delete") ) ) {
-    String pre = request.getParameter("providerid").equals("Public")&&!request.getParameter("name").startsWith("P:")?"P:":"" ;
+	OscarProperties props = OscarProperties.getInstance();
+	
+	String dboperation = request.getParameter("dboperation");
+	String providerId = request.getParameter("providerid");
+	String providerName = (request.getParameter("providername") != null) ? request.getParameter("providername") : "";
+	String name = (request.getParameter("name") != null) ? request.getParameter("name") : "";
+	String summary = request.getParameter("summary");
+	String stepStr = request.getParameter("step");
+	
+	boolean isPublicTemplate = "Public".equals(providerId);
+	String publicPrefix = "P:";
+	String prefix = (isPublicTemplate && !name.startsWith(publicPrefix)) ? publicPrefix : "";
+	
+	// determine the appointment length (in min).
+	int STEP = 15;
+	if(stepStr != null && !stepStr.isEmpty()) {
+		STEP = Integer.parseInt(stepStr);
+	}
+	else {
+		String propTemplateTime = props.getProperty("template_time");
+		if(propTemplateTime != null && !propTemplateTime.trim().isEmpty()) {
+			STEP = Integer.parseInt(propTemplateTime);
+		}
+	}
+	
+	boolean bEdit = " Edit ".equals(dboperation);
 
-    scheduleTemplateDao.remove(new ScheduleTemplatePrimaryKey(request.getParameter("providerid"),request.getParameter("name")));
+	//save or delete the settings
+	int rowsAffected = 0;
 
-    if(request.getParameter("dboperation")!=null && request.getParameter("dboperation").equals(" Save ") ) {
-    	ScheduleTemplate scheduleTemplate = new ScheduleTemplate();
-    	scheduleTemplate.setId(new ScheduleTemplatePrimaryKey());
-    	scheduleTemplate.getId().setName(pre + request.getParameter("name"));
-    	scheduleTemplate.getId().setProviderNo(request.getParameter("providerid"));
-    	scheduleTemplate.setSummary(request.getParameter("summary"));
-    	scheduleTemplate.setTimecode(SxmlMisc.createDataString(request,"timecode","_", 300));
-    	scheduleTemplateDao.persist(scheduleTemplate);
-    }
-  }
+	//TODO move this to an action file
+	if(dboperation != null && (dboperation.equals(" Save ") || dboperation.equals("Delete"))) {
 
+    	scheduleTemplateDao.remove(new ScheduleTemplatePrimaryKey(providerId, name));
+
+		if (dboperation != null && dboperation.equals(" Save ")) {
+			
+			ScheduleTemplate scheduleTemplate = new ScheduleTemplate();
+			scheduleTemplate.setId(new ScheduleTemplatePrimaryKey());
+			scheduleTemplate.getId().setName(prefix + name);
+			scheduleTemplate.getId().setProviderNo(providerId);
+			scheduleTemplate.setSummary(summary);
+			scheduleTemplate.setTimecode(SxmlMisc.createDataString(request, "timecode", "_", 300));
+			
+			scheduleTemplateDao.persist(scheduleTemplate);
+		}
+	}
 %>
 
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title><bean:message key="schedule.scheduleedittemplate.title" /></title>
-<!--link rel="stylesheet" href="../web.css" /-->
 
 <script language="JavaScript">
-<!--
-function setfocus() {
-  this.focus();
-  document.addtemplatecode.name.focus();
-  document.addtemplatecode.name.select();
-}
-function go() {
-  var s = document.reportform.startDate.value.replace('/', '-');
-  s = s.replace('/', '-');
-  var e = document.reportform.endDate.value.replace('/', '-');
-  e = e.replace('/', '-');
-  var u = 'reportedblist.jsp?startDate=' + s + '&endDate=' + e;
-	popupPage(600,750,u);
-}
-function upCaseCtrl(ctrl) {
-	ctrl.value = ctrl.value.toUpperCase();
-}
-function checkInput() {
-	if(document.schedule.holiday_name.value == "") {
-	  alert('<bean:message key="schedule.scheduleedittemplate.msgCheckInput"/>');
-	  return false;
-	} else {
-	  return true;
+	function setfocus() {
+		this.focus();
+		document.addtemplatecode.name.focus();
+		document.addtemplatecode.name.select();
 	}
-}
-function changeGroup(s) {
-	var newGroupNo = s.options[s.selectedIndex].value;
-	newGroupNo = s.options[s.selectedIndex].value;
-	self.location.href = "scheduleedittemplate.jsp?providerid=<%=request.getParameter("providerid")%>&providername=<%=StringEscapeUtils.escapeJavaScript(request.getParameter("providername"))%>&step=" + newGroupNo;
-
-}
-//-->
+	/*function go() {
+	  var s = document.reportform.startDate.value.replace('/', '-');
+	  s = s.replace('/', '-');
+	  var e = document.reportform.endDate.value.replace('/', '-');
+	  e = e.replace('/', '-');
+	  var u = 'reportedblist.jsp?startDate=' + s + '&endDate=' + e;
+		popupPage(600,750,u);
+	}
+	function upCaseCtrl(ctrl) {
+		ctrl.value = ctrl.value.toUpperCase();
+	}
+	function checkInput() {
+		if(document.schedule.holiday_name.value == "") {
+		  alert('<bean:message key="schedule.scheduleedittemplate.msgCheckInput"/>');
+		  return false;
+		} else {
+		  return true;
+		}
+	}*/
+	function changeGroup(s) {
+		var newGroupNo = s.options[s.selectedIndex].value;
+		newGroupNo = s.options[s.selectedIndex].value;
+		self.location.href = "scheduleedittemplate.jsp?providerid=<%=providerId%>&providername=<%=StringEscapeUtils.escapeJavaScript(providerName)%>&step=" + newGroupNo;
+	}
 </script>
 </head>
 <body bgcolor="ivory" bgproperties="fixed" onLoad="setfocus()"
@@ -125,32 +147,28 @@ function changeGroup(s) {
 			<tr bgcolor="#CCFFCC">
 				<td nowrap>
 				<p><bean:message
-					key="schedule.scheduleedittemplate.formProvider" />: <%=request.getParameter("providername")%></p>
+					key="schedule.scheduleedittemplate.formProvider" />: <%=providerName%></p>
 				</td>
 				<td align='right'><select name="name">
 					<%
-   boolean bEdit=request.getParameter("dboperation")!=null&&request.getParameter("dboperation").equals(" Edit ")?true:false;
-  
-   if(bEdit) {
-	   for(ScheduleTemplate st:scheduleTemplateDao.findByProviderNoAndName(request.getParameter("providerid"), request.getParameter("name"))) {
-     	 myTempBean.setScheduleTemplateBean(st.getId().getProviderNo(),st.getId().getName(),st.getSummary(),st.getTimecode() );
-     }
-   }
-   
-   for(ScheduleTemplate st:scheduleTemplateDao.findByProviderNo(request.getParameter("providerid"))) {
-   
-	%>
-					<option value="<%=st.getId().getName()%>"><%=st.getId().getName()+" |"+st.getSummary()%></option>
-					<%
-     }
-	%>
-				</select> <input type="hidden" name="providerid"
-					value="<%=request.getParameter("providerid")%>"> <input
-					type="hidden" name="providername"
-					value="<%=request.getParameter("providername")%>">
-				<td align='right'><input type="button"
-					value='<bean:message key="schedule.scheduleedittemplate.btnEdit"/>'
-					onclick="document.forms['addtemplatecode1'].dboperation.value=' Edit '; document.forms['addtemplatecode1'].submit();"></td>
+						if (bEdit) {
+							for (ScheduleTemplate st : scheduleTemplateDao.findByProviderNoAndName(providerId, name)) {
+								myTempBean.setScheduleTemplateBean(st.getId().getProviderNo(), st.getId().getName(), st.getSummary(), st.getTimecode());
+							}
+						}
+
+						for (ScheduleTemplate st : scheduleTemplateDao.findByProviderNo(providerId)) {
+							%>
+							<option value="<%=st.getId().getName()%>"><%=st.getId().getName()+" |"+st.getSummary()%></option>
+							<%
+						} %>
+				</select> 
+				<input type="hidden" name="providerid" value="<%=providerId%>"> 
+				<input type="hidden" name="providerName" value="<%=providerName%>">
+				<td align='right'>
+					<input type="button" value='<bean:message key="schedule.scheduleedittemplate.btnEdit"/>'
+					onclick="document.forms['addtemplatecode1'].dboperation.value=' Edit '; document.forms['addtemplatecode1'].submit();">
+				</td>
 			</tr>
 		</table>
 		</form>
@@ -159,18 +177,19 @@ function changeGroup(s) {
 			action="scheduleedittemplate.jsp">
 		<table BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="95%">
 			<tr>
-				<td width="50%" align="right">&nbsp; <select name="step1"
-					onChange="changeGroup(this)">
-					<% for(int i=5; i<35; i+=5) {
-      			if(i==25) continue;%>
-					<option value="<%=i%>" <%=STEP==i? "selected":""%>><%=i%></option>
-					<% }	%>
-				</select> <input type="hidden" name="providerid"
-					value="<%=request.getParameter("providerid")%>"> <input
-					type="hidden" name="providername"
-					value="<%=request.getParameter("providername")%>"> <input
-					type="button" value='Go'
-					onclick="document.forms['addtemplatecode1'].step.value=document.forms[1].step1.options[document.forms[1].step1.selectedIndex].value; document.forms['addtemplatecode1'].submit();"></td>
+				<td width="50%" align="right">&nbsp; 
+					<select name="step1" onChange="changeGroup(this)">
+						<% 
+						for(int i=5; i<35; i+=5) {
+	      					if(i==25) continue;%>
+								<option value="<%=i%>" <%=STEP==i? "selected":""%>><%=i%></option><% 
+						} %>
+					</select>
+					<input type="hidden" name="providerid"
+						value="<%=providerId%>"> 
+					<input type="hidden" name="providername" value="<%=providerName%>"> 
+					<input type="button" value='Go'
+						onclick="document.forms['addtemplatecode1'].step.value=document.forms[1].step1.options[document.forms[1].step1.selectedIndex].value; document.forms['addtemplatecode1'].submit();">
 				</td>
 			</tr>
 		</table>
@@ -204,8 +223,9 @@ function changeGroup(s) {
 					List<ScheduleTemplateCode> stcs = scheduleTemplateCodeDao.findAll();
 					Collections.sort(stcs,ScheduleTemplateCode.CodeComparator);
 					
-   for (ScheduleTemplateCode stc:stcs) {   %>
- <%=String.valueOf(stc.getCode())+" - "+stc.getDescription()%>  <%}	%>
+					for (ScheduleTemplateCode stc:stcs) {   %>
+						<%=String.valueOf(stc.getCode())+" - "+stc.getDescription()%>  <%
+					}	%>
              "><bean:message
 					key="schedule.scheduleedittemplate.formTemplateCode" /></a></td>
 			</tr>
@@ -244,9 +264,9 @@ function changeGroup(s) {
 					value='<bean:message key="schedule.scheduleedittemplate.btnDelete"/>'
 					onclick="document.forms['addtemplatecode'].dboperation.value='Delete'; document.forms['addtemplatecode'].submit();"></td>
 				<td align="right"><input type="hidden" name="providerid"
-					value="<%=request.getParameter("providerid")%>"> <input
+					value="<%=providerId%>"> <input
 					type="hidden" name="providername"
-					value="<%=request.getParameter("providername")%>"> <input
+					value="<%=providerName%>"> <input
 					type="hidden" name="dboperation" value=""> <input
 					type="button"
 					value='<bean:message key="schedule.scheduleedittemplate.btnSave"/>'
