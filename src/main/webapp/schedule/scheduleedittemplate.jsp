@@ -71,25 +71,36 @@
 	}
 	
 	boolean bEdit = " Edit ".equals(dboperation);
+	boolean templateExists = false;
 
 	//save or delete the settings
 	int rowsAffected = 0;
 
 	//TODO move this to an action file
 	if(dboperation != null && (dboperation.equals(" Save ") || dboperation.equals("Delete"))) {
-
-    	scheduleTemplateDao.remove(new ScheduleTemplatePrimaryKey(providerId, name));
-
-		if (dboperation != null && dboperation.equals(" Save ")) {
-			
-			ScheduleTemplate scheduleTemplate = new ScheduleTemplate();
-			scheduleTemplate.setId(new ScheduleTemplatePrimaryKey());
-			scheduleTemplate.getId().setName(prefix + name);
-			scheduleTemplate.getId().setProviderNo(providerId);
-			scheduleTemplate.setSummary(summary);
-			scheduleTemplate.setTimecode(SxmlMisc.createDataString(request, "timecode", "_", 300));
-			
-			scheduleTemplateDao.persist(scheduleTemplate);
+		
+		
+		if (dboperation.equals(" Save ")) {
+			List<ScheduleTemplate> existingTemplates = scheduleTemplateDao.findByProviderNoAndName(providerId, prefix + name);
+			if(!existingTemplates.isEmpty()) {
+				templateExists = true;
+			}
+			else {
+				// remove old template for reasons
+				scheduleTemplateDao.remove(new ScheduleTemplatePrimaryKey(providerId, name));
+				
+				ScheduleTemplate scheduleTemplate = new ScheduleTemplate();
+				scheduleTemplate.setId(new ScheduleTemplatePrimaryKey());
+				scheduleTemplate.getId().setName(prefix + name);
+				scheduleTemplate.getId().setProviderNo(providerId);
+				scheduleTemplate.setSummary(summary);
+				scheduleTemplate.setTimecode(SxmlMisc.createDataString(request, "timecode", "_", 300));
+				
+				scheduleTemplateDao.persist(scheduleTemplate);
+			}
+		}
+		else if (dboperation.equals("Delete")) {
+			scheduleTemplateDao.remove(new ScheduleTemplatePrimaryKey(providerId, name));
 		}
 	}
 	
@@ -105,6 +116,14 @@
 <title><bean:message key="schedule.scheduleedittemplate.title" /></title>
 
 <script language="JavaScript">
+
+	function onLoad() {
+		var failedSave = <%=templateExists%>;
+		if(failedSave) {
+			alert("Error: failed to save template. Name already in use!");
+		}
+		setfocus();
+	}
 	function setfocus() {
 		this.focus();
 		document.addtemplatecode.name.focus();
@@ -136,7 +155,7 @@
 	}
 </script>
 </head>
-<body bgcolor="ivory" bgproperties="fixed" onLoad="setfocus()"
+<body bgcolor="ivory" bgproperties="fixed" onLoad="onLoad();"
 	topmargin="0" leftmargin="0" rightmargin="0">
 
 <table border="0" width="100%">
