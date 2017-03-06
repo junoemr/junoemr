@@ -57,6 +57,7 @@
 	boolean isPublicTemplate = "Public".equals(providerId);
 	String publicPrefix = "P:";
 	String prefix = (isPublicTemplate && !name.startsWith(publicPrefix)) ? publicPrefix : "";
+	String templateName = prefix + name;
 	
 	// determine the appointment length (in min).
 	int STEP = 15;
@@ -81,17 +82,14 @@
 		
 		
 		if (dboperation.equals(" Save ")) {
-			List<ScheduleTemplate> existingTemplates = scheduleTemplateDao.findByProviderNoAndName(providerId, prefix + name);
+			List<ScheduleTemplate> existingTemplates = scheduleTemplateDao.findByProviderNoAndName(providerId, templateName);
 			if(!existingTemplates.isEmpty()) {
 				templateExists = true;
 			}
-			else {
-				// remove old template for reasons
-				scheduleTemplateDao.remove(new ScheduleTemplatePrimaryKey(providerId, name));
-				
+			else {			
 				ScheduleTemplate scheduleTemplate = new ScheduleTemplate();
 				scheduleTemplate.setId(new ScheduleTemplatePrimaryKey());
-				scheduleTemplate.getId().setName(prefix + name);
+				scheduleTemplate.getId().setName(templateName);
 				scheduleTemplate.getId().setProviderNo(providerId);
 				scheduleTemplate.setSummary(summary);
 				scheduleTemplate.setTimecode(SxmlMisc.createDataString(request, "timecode", "_", 300));
@@ -100,7 +98,7 @@
 			}
 		}
 		else if (dboperation.equals("Delete")) {
-			scheduleTemplateDao.remove(new ScheduleTemplatePrimaryKey(providerId, name));
+			scheduleTemplateDao.remove(new ScheduleTemplatePrimaryKey(providerId, templateName));
 		}
 	}
 	
