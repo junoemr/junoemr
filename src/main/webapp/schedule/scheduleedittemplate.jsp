@@ -54,7 +54,8 @@
 	String summary = request.getParameter("summary");
 	String stepStr = request.getParameter("step");
 	
-	boolean isPublicTemplate = "Public".equals(providerId);
+	
+	boolean isPublicTemplate = ScheduleTemplatePrimaryKey.DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES.equals(providerId);
 	String publicPrefix = "P:";
 	String prefix = (isPublicTemplate && !name.startsWith(publicPrefix)) ? publicPrefix : "";
 	String templateName = prefix + name;
@@ -72,38 +73,29 @@
 	}
 	
 	boolean bEdit = " Edit ".equals(dboperation);
-	boolean templateExists = false;
 
 	//save or delete the settings
 	int rowsAffected = 0;
 
 	//TODO move this to an action file
-	if(dboperation != null && (dboperation.equals(" Save ") || dboperation.equals("Delete"))) {
-		
-		
+	if(dboperation != null) {
 		if (dboperation.equals(" Save ")) {
-			List<ScheduleTemplate> existingTemplates = scheduleTemplateDao.findByProviderNoAndName(providerId, templateName);
-			if(!existingTemplates.isEmpty()) {
-				templateExists = true;
-			}
-			else {			
-				ScheduleTemplate scheduleTemplate = new ScheduleTemplate();
-				scheduleTemplate.setId(new ScheduleTemplatePrimaryKey());
-				scheduleTemplate.getId().setName(templateName);
-				scheduleTemplate.getId().setProviderNo(providerId);
-				scheduleTemplate.setSummary(summary);
-				scheduleTemplate.setTimecode(SxmlMisc.createDataString(request, "timecode", "_", 300));
-				
-				scheduleTemplateDao.persist(scheduleTemplate);
-			}
+			// remove old template by same name/provider. it will be replaced
+			scheduleTemplateDao.remove(new ScheduleTemplatePrimaryKey(providerId, templateName));
+			
+			ScheduleTemplate scheduleTemplate = new ScheduleTemplate();
+			scheduleTemplate.setId(new ScheduleTemplatePrimaryKey());
+			scheduleTemplate.getId().setName(templateName);
+			scheduleTemplate.getId().setProviderNo(providerId);
+			scheduleTemplate.setSummary(summary);
+			scheduleTemplate.setTimecode(SxmlMisc.createDataString(request, "timecode", "_", 300));
+			
+			scheduleTemplateDao.persist(scheduleTemplate);
 		}
 		else if (dboperation.equals("Delete")) {
 			scheduleTemplateDao.remove(new ScheduleTemplatePrimaryKey(providerId, templateName));
 		}
 	}
-	
-	// remove the prefix for the displayName
-	String templateDisplayName = myTempBean.getName().replaceFirst("^" + publicPrefix, "");
 	int nameMaxLength = (isPublicTemplate) ? 20 - publicPrefix.length() : 20;
 	
 %>
@@ -116,10 +108,6 @@
 <script language="JavaScript">
 
 	function onLoad() {
-		var failedSave = <%=templateExists%>;
-		if(failedSave) {
-			alert("Error: failed to save template. Name already in use!");
-		}
 		setfocus();
 	}
 	function setfocus() {
@@ -127,25 +115,6 @@
 		document.addtemplatecode.name.focus();
 		document.addtemplatecode.name.select();
 	}
-	/*function go() {
-	  var s = document.reportform.startDate.value.replace('/', '-');
-	  s = s.replace('/', '-');
-	  var e = document.reportform.endDate.value.replace('/', '-');
-	  e = e.replace('/', '-');
-	  var u = 'reportedblist.jsp?startDate=' + s + '&endDate=' + e;
-		popupPage(600,750,u);
-	}
-	function upCaseCtrl(ctrl) {
-		ctrl.value = ctrl.value.toUpperCase();
-	}
-	function checkInput() {
-		if(document.schedule.holiday_name.value == "") {
-		  alert('<bean:message key="schedule.scheduleedittemplate.msgCheckInput"/>');
-		  return false;
-		} else {
-		  return true;
-		}
-	}*/
 	function changeGroup(s) {
 		var newGroupNo = s.options[s.selectedIndex].value;
 		newGroupNo = s.options[s.selectedIndex].value;
@@ -229,7 +198,7 @@
 				<td nowrap><bean:message
 					key="schedule.scheduleedittemplate.formTemplateName" />:</td>
 				<td><input type="text" name="name" size="30" maxlength="<%=nameMaxLength%>"
-					<%=bEdit?("value='"+templateDisplayName+"'"):"value=''"%>>
+					<%=bEdit?("value='"+myTempBean.getName().replaceFirst("^" + publicPrefix, "")+"'"):"value=''"%>>
 				<font size='-2'><bean:message
 					key="schedule.scheduleedittemplate.msgLessTwentyChars" /></font></td>
 				<td></td>
