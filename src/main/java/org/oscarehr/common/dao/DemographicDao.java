@@ -278,16 +278,35 @@ public class DemographicDao extends HibernateDaoSupport {
             SqlUtils.closeResources(c, null, null);
         }
     }
-
-	private List<Demographic> searchDemographic(String searchStr, boolean hasActiveStatus) {
+	/**
+	 * Split the given patient search string on ',' into an array of form {last_name,first_name}. 
+	 * The array is guaranteed to have length 1 if no first name is present or the first name trims to empty,
+	 * and length 2 if there is a first name. 
+	 * If the parameter string is null or empty the array will contain the empty string as the first(and only) element.
+	 * If the parameter string contains more than one ',' the string will be split on the first occurrence, 
+	 * and content after the second ',' will be ignored.
+	 * 
+	 * @param toSplit - the string to be split by ','
+	 * @return patient names in a string array
+	 */
+	private String[] splitPatientNames(String toSplit) {
+		String[] defaultArr = {""};
+		if(toSplit == null ) {
+			return defaultArr;
+		}
+		String[] lastfirst = toSplit.trim().split(",");
+		if(lastfirst.length < 1) {
+			lastfirst = defaultArr;
+		}
+		else if(lastfirst.length > 2) {
+	  		lastfirst = new String[] {lastfirst[0],lastfirst[1]};
+	  	}
+		return lastfirst;
+	}
+	private List<Demographic> searchDemographic(String searchStr, boolean hasActiveStatus, int limit) {
         String regularexp = "like";
         Object[] object = null;
-        String[] lastfirst = {""};
-        
-	  	// throws an outOfBoundsException if keyword is exactly the split delimiter (java6)
-	  	if(!searchStr.trim().equals(",")) {
-	  		lastfirst = searchStr.trim().split(",");
-	  	}
+        String[] lastfirst = splitPatientNames(searchStr);
         
         String hql = "From Demographic d where last_name "+ regularexp + " ?";
         // search by last name, first name
@@ -303,7 +322,11 @@ public class DemographicDao extends HibernateDaoSupport {
         if(hasActiveStatus){
         	hql += " and patient_status = 'AC'";
         }
-        List<Demographic> list = getHibernateTemplate().find(hql, object);
+        HibernateTemplate template = getHibernateTemplate();
+        if(limit > 0) { //optionally add a result limit
+        	template.setMaxResults(limit);
+        }
+        List<Demographic> list = template.find(hql, object);
         return list;
     }
     
@@ -313,7 +336,16 @@ public class DemographicDao extends HibernateDaoSupport {
      * @return list of Demographics found
      */
 	public List<Demographic> searchDemographic(String searchStr){
-		return searchDemographic(searchStr, false);
+		return searchDemographic(searchStr, false, 0);
+    }
+	/**
+     * Search for demographics by last name, first name
+     * @param searchStr
+     * @param limit
+     * @return list of Demographics found
+     */
+	public List<Demographic> searchDemographic(String searchStr, int limit){
+		return searchDemographic(searchStr, false, limit);
     }
      /**
       * Search for active demographics by last name, first name
@@ -321,7 +353,16 @@ public class DemographicDao extends HibernateDaoSupport {
       * @return list of Demographics found
       */
 	public List<Demographic> searchDemographicActive(String searchStr) {
-		return searchDemographic(searchStr, true);
+		return searchDemographic(searchStr, true, 0);
+	}
+    /**
+     * Search for active demographics by last name, first name
+     * @param searchStr
+     * @param limit
+     * @return list of Demographics found
+     */
+	public List<Demographic> searchDemographicActive(String searchStr, int limit) {
+		return searchDemographic(searchStr, true, limit);
 	}
 
      public List<Demographic> getDemographicsByExtKey(String key, String value) {
