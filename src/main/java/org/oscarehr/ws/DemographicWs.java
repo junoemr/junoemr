@@ -73,8 +73,8 @@ public class DemographicWs extends AbstractWs {
 		return transfer;
 	}
 	/** Retrieve a list of demographics matched by lastname, fisrtname */
-	public List<DemographicTransfer> getDemographicsByName(String lastName, String firstName)  {
-		List<Demographic> demographicList=demographicManager.getDemographicsByName(lastName, firstName, 50);
+	public List<DemographicTransfer> getDemographicsByName(String lastName, String firstName, boolean activeOnly) {
+		List<Demographic> demographicList=demographicManager.getDemographicsByName(lastName, firstName, activeOnly, 10);
 		List<DemographicTransfer> transferList = new ArrayList<DemographicTransfer>();
 		
 		for(Demographic demographic: demographicList) {

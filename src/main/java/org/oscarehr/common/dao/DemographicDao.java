@@ -355,6 +355,15 @@ public class DemographicDao extends HibernateDaoSupport {
 	public List<Demographic> searchDemographicActive(String searchStr) {
 		return searchDemographic(searchStr, true, 0);
 	}
+    /**
+     * Search for active demographics by last name, first name
+     * @param searchStr
+     * @param limit
+     * @return list of Demographics found
+     */
+	public List<Demographic> searchDemographicActive(String searchStr, int limit) {
+		return searchDemographic(searchStr, true, limit);
+	}
 
      public List<Demographic> getDemographicsByExtKey(String key, String value) {
     	 List<DemographicExt> extras = this.getHibernateTemplate().find("from DemographicExt d where d.key=? and d.value=?", new Object[] {key,value});

@@ -100,13 +100,13 @@ public class DemographicManager
 		
 		return(result);
 	}
-	public List<Demographic> getDemographicsByName(String lastName, String firstName, int limit) {
+	public List<Demographic> getDemographicsByName(String lastName, String firstName, boolean activeOnly, int limit) {
 		
 		String searchStr = (lastName != null) ? lastName.trim(): "";
 		if(firstName != null && !firstName.trim().isEmpty()) {
 			searchStr += "," + firstName.trim();
 		}
-		List<Demographic> result = demographicDao.searchDemographic(searchStr, limit);
+		List<Demographic> result = (activeOnly) ? demographicDao.searchDemographicActive(searchStr, limit) : demographicDao.searchDemographic(searchStr, limit);
 		
 		if(result != null) {
 			LogAction.addLogSynchronous( "DemographicManager.getDemographicsByName", "List");
