@@ -411,4 +411,11 @@ public class ProviderDao extends HibernateDaoSupport {
 		List<Provider> providerList = template.find(sql, params);
 		return providerList;
 	}
+	@SuppressWarnings("unchecked")
+	public List<Provider> getProviderByPatientId(Integer patientId) {
+        String hql = "SELECT p FROM Provider p, Demographic d "
+    				+ "WHERE d.ProviderNo = p.ProviderNo " 
+        			+ "AND d.DemographicNo = ?";
+    	return this.getHibernateTemplate().find(hql, patientId);
+    }
 }

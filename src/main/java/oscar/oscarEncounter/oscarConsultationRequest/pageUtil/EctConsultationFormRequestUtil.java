@@ -27,15 +27,18 @@ package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.ConsultationServiceDao;
 import org.oscarehr.common.dao.DemographicExtDao;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.common.model.DemographicExt;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -368,6 +371,17 @@ public class EctConsultationFormRequestUtil {
         }
         return retval;
     }
+    public String getProviderOhipNo(String id) {
+		if(id == null || id.length()==0)
+			return "";
+		
+		ProviderDao dao = SpringUtils.getBean(ProviderDao.class);
+		Provider p = dao.getProvider(id);
+		if (p != null) {
+			return (p.getOhipNo() == null)? "" : p.getOhipNo();
+		}
+		return "";
+	}
 
     public String getFamilyDoctor() {
         String retval = new String();
@@ -384,6 +398,14 @@ public class EctConsultationFormRequestUtil {
         }
         return retval;
     }
+    public String getFamilyDoctorOhipNo() {
+		ProviderDao dao = SpringUtils.getBean(ProviderDao.class);
+		List<Provider> ps = dao.getProviderByPatientId(Integer.parseInt(demoNo));
+		if (ps.isEmpty() || ps.get(0).getOhipNo() == null) {
+			return "";
+		}
+		return ps.get(0).getOhipNo();
+	}
 
     public String getServiceName(String id) {
         String retval = new String();
