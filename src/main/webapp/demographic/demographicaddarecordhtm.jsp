@@ -965,7 +965,7 @@ function autoFillHin(){
 		<option value="BC"<%=HCType.equals("BC")?" selected":""%>>BC-British Columbia</option>
 		<option value="MB"<%=HCType.equals("MB")?" selected":""%>>MB-Manitoba</option>
 		<option value="NB"<%=HCType.equals("NB")?" selected":""%>>NB-New Brunswick</option>
-		<% if ( oscarProps.getProperty("billregion") != null &&  oscarProps.getProperty("billregion").equals("BC")) {%>
+		<% if ( oscarProps.getProperty("billregion") != null &&  oscarProps.getProperty("billregion").equals("BC")&& !oscarProps.isPropertyActive("clinicaid_billing")) {%>
 		<option value="NF"<%=HCType.equals("NF")?" selected":""%>>NF-Newfoundland & Labrador</option>
 		<% } else { %>
 		<option value="NL"<%=HCType.equals("NL")?" selected":""%>>NL-Newfoundland & Labrador</option>
