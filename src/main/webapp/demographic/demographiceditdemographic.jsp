@@ -2672,7 +2672,7 @@ if ( PatStat.equals(Dead) ) {%>
 									<option value="NB" <%=hctype.equals("NB")?" selected":""%>>NB-New Brunswick</option>
 									<% if ( oscarProps.getProperty("billregion") != null 
 										&& oscarProps.getProperty("billregion").equals("BC")
-										&& !oscarProps.isPropertyActive("clinicaid_biling")) {%>
+										&& !oscarProps.isPropertyActive("clinicaid_billing")) {%>
 									<option value="NF" <%=hctype.equals("NF")?" selected":""%>>NF-Newfoundland & Labrador</option>
 									<% } else { %>
 									<option value="NL" <%=hctype.equals("NL")?" selected":""%>>NL-Newfoundland & Labrador</option>
