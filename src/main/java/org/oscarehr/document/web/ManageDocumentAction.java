@@ -635,7 +635,7 @@ public class ManageDocumentAction extends DispatchAction {
 			log.debug("about to Print to stream");
 			ServletOutputStream outs = response.getOutputStream();
 
-			response.setHeader("Content-Disposition", "attachment;filename=" + d.getDocfilename());
+			response.setHeader("Content-Disposition", "attachment;filename=\"" + d.getDocfilename() + "\"");
 			BufferedInputStream bfis = null;
 			try {
 				bfis = new BufferedInputStream(new FileInputStream(outfile));
@@ -692,7 +692,7 @@ public class ManageDocumentAction extends DispatchAction {
 			}
 			response.setContentType("image/png");
 			ServletOutputStream outs = response.getOutputStream();
-			response.setHeader("Content-Disposition", "attachment;filename=" + d.getDocfilename());
+			response.setHeader("Content-Disposition", "attachment;filename=\"" + d.getDocfilename() + "\"");
 
 			BufferedInputStream bfis = null;
 			try {
@@ -819,7 +819,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 		response.setContentType(contentType);
 		response.setContentLength(contentBytes.length);
-		response.setHeader("Content-Disposition", "inline; filename=" + filename);
+		response.setHeader("Content-Disposition", "inline; filename=\"" + filename + "\"");
 		log.debug("about to Print to stream");
 		ServletOutputStream outs = response.getOutputStream();
 		outs.write(contentBytes);
@@ -935,7 +935,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 		response.setContentType(contentType);
 		response.setContentLength(contentBytes.length);
-		response.setHeader("Content-Disposition", "inline; filename=" + filename);
+		response.setHeader("Content-Disposition", "inline; filename=\"" + filename + "\"");
 		log.debug("about to Print to stream");
 		ServletOutputStream outs = response.getOutputStream();
 		outs.write(contentBytes);
@@ -1223,7 +1223,7 @@ public class ManageDocumentAction extends DispatchAction {
 
         response.setContentType(contentType);
         response.setContentLength((int) file.length());
-        response.setHeader("Content-Disposition", "inline; filename=" + pdfName);
+        response.setHeader("Content-Disposition", "inline; filename=\"" + pdfName + "\"");
 
         BufferedInputStream bfis = null;
         ServletOutputStream outs = response.getOutputStream();
@@ -1275,7 +1275,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 
                 response.setContentType("image/png");
-                response.setHeader("Content-Disposition", "inline;filename=" + pdfName);
+                response.setHeader("Content-Disposition", "inline;filename=\"" + pdfName + "\"");
                 org.apache.commons.io.IOUtils.copy(bfis,outs);
                 outs.flush();
                 
