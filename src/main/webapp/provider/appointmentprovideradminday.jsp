@@ -1313,7 +1313,7 @@ if (curProvider_no[provIndex].equals(provNum)) {
 	}
 	}
 
-	for(Provider p : providerDao.getActiveProviders()) {
+	for(Provider p : providerDao.getActiveProvidersByType("doctor")) {
 		boolean skip = checkRestriction(restrictions,p.getProviderNo());
 
 		if (!skip && (!bMultisites || siteProviderNos  == null || siteProviderNos.size() == 0 || siteProviderNos.contains(p.getProviderNo()))) {

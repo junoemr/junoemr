@@ -229,6 +229,16 @@ public class ProviderDao extends HibernateDaoSupport {
 		}
 		return rs;
 	}
+	public List<Provider> getActiveProvidersByType(String providerType) {
+		
+		List<Provider> rs = getHibernateTemplate().find(
+				"FROM  Provider p where p.Status='1' AND p.ProviderType = ? ORDER BY p.LastName", providerType);
+
+		if (log.isDebugEnabled()) {
+			log.debug("getProviders: # of results=" + rs.size());
+		}
+		return rs;
+	}
 
 	public List<Provider> getActiveProvidersByRole(String role) {
 		
