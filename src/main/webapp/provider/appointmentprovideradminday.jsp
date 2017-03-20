@@ -1923,7 +1923,7 @@ start_time += iSm + ":00";
 	notes: <%=notes%>"
 </oscar:oscarPropertiesCheck> ><%=(view==0) ? (name.length()>len?name.substring(0,len) : name) :name%></a>
 
-<% if(len==lenLimitedL || view!=0 || numAvailProvider==1 ) {%>
+<% if(len==lenLimitedL || view!=0 || numAvailProvider==1 || oscar.OscarProperties.getInstance().isPropertyActive("APPT_ALWAYS_SHOW_LINKS")) {%>
 
 <security:oscarSec roleName="<%=roleName$%>" objectName="_eChart" rights="r">
 <oscar:oscarPropertiesCheck property="eform_in_appointment" value="yes">
