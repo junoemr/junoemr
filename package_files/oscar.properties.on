@@ -217,7 +217,7 @@ billregion=ON
 #   options: ON - Ontario
 #            QC - Quebec
 # And so on for other provinces in Canada, or states in US
-# hctype=ON
+hctype=ON
 
 # defaultsex has two options. If this property is not specified, users can still
 # configure their own personal default option, by visiting the preference screen
