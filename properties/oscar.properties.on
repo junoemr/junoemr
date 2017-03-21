@@ -961,6 +961,8 @@ auto_populate_billingreferral_bc=true
 
 #OHSUPPORT-2463: invert dark document previews (workaround pdf to png bug where previews had inverted colors)
 #INVERT_DARK_DOCUMENT_PREVIEWS=yes
+# Control the ratio of black to white in an image to trigger inversion. if ratio=n, inversion is triggered if dark > n*light.
+#INVERT_DOCUMENT_BW_RATIO=10
 
 # OHSUPPORT-2541 show uploaded by in the inbox
 #INBOX_UPLOADED_BY_COLUMN=yes
