@@ -1233,7 +1233,7 @@ function chooseEmail(){
 		/* add the demographic cell phone if property enabled */
 		if(demographic != null && props.isPropertyActive("consultation.include_patient_cellno")) {
 			int demographic_no = demographic.getDemographicNo();
-			DemographicExt demoExt = demographicExtDao.getDemographicExt(demographic_no, "demo_cell");
+			DemographicExt demoExt = demographicExtDao.getLatestDemographicExt(demographic_no, "demo_cell");
 			String patientCPhone = (demoExt == null) ? "" : org.apache.commons.lang.StringUtils.trimToEmpty(demoExt.getValue());
 			thisForm.setPatientCPhone(patientCPhone);
 		}

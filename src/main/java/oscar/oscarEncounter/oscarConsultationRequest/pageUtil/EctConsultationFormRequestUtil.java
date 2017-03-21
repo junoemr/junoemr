@@ -87,7 +87,7 @@ public class EctConsultationFormRequestUtil {
             rs.close();
             
             int demographic_no = Integer.parseInt(demoNo);
-            DemographicExt demoExt = demographicExtDao.getDemographicExt(demographic_no, "demo_cell");
+            DemographicExt demoExt = demographicExtDao.getLatestDemographicExt(demographic_no, "demo_cell");
             patientCPhone = (demoExt == null) ? "" : StringUtils.trimToEmpty(demoExt.getValue());
         } 
         catch (SQLException e) {

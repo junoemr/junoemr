@@ -1033,3 +1033,6 @@ enable_demographic_email_link=false
 #consultation.pdfCreator.infoFontSize=12
 #consultation.pdfCreator.baseFontSize=9
 #consultation.pdfCreator.boldFontSize=10
+
+# OHSUPPORT-3769 - display reason on appointments by default.
+#appointment.show_reason_by_default=no
