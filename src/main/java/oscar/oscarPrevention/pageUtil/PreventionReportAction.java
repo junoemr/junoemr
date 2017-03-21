@@ -22,7 +22,6 @@
  * Ontario, Canada
  */
 
-
 /*
  * PreventionReportAction.java
  *
@@ -30,7 +29,6 @@
  */
 
 package oscar.oscarPrevention.pageUtil;
-
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -62,60 +60,79 @@ import oscar.util.UtilDateUtilities;
  * @author Jay Gallagher
  */
 public class PreventionReportAction extends Action {
-   private static Logger log = MiscUtils.getLogger();
+	private static Logger log = MiscUtils.getLogger();
 
-   private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-   
-   public PreventionReportAction() {
-   }
+	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
-   public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response){
+	public PreventionReportAction() {
+	}
 
-	   LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-	   
-	   if(!securityInfoManager.hasPrivilege(loggedInInfo, "_report", "r", null)) {
- 		  throw new SecurityException("missing required security object (_report)");
- 	  }
-	   
-       String setName = request.getParameter("patientSet");
-       String prevention  = request.getParameter("prevention");
-       Date asofDate = UtilDateUtilities.getDateFromString(request.getParameter("asofDate"),"yyyy-MM-dd");
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
 
-       RptDemographicReportForm frm = new RptDemographicReportForm ();
-       frm.setSavedQuery(setName);
-       RptDemographicQueryLoader demoL = new RptDemographicQueryLoader();
-       frm = demoL.queryLoader(frm);
-       frm.addDemoIfNotPresent();
-       frm.setAsofDate(request.getParameter("asofDate"));
-       RptDemographicQueryBuilder demoQ = new RptDemographicQueryBuilder();
-       ArrayList<ArrayList<String>> list = demoQ.buildQuery(loggedInInfo, frm,request.getParameter("asofDate"));
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-       log.debug("set size "+list.size());
+		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_report", "r", null)) {
+			throw new SecurityException("missing required security object (_report)");
+		}
+		log.info("PREVENTION REPORT");
 
-       if (asofDate == null){
-          Calendar today = Calendar.getInstance();
-          asofDate = today.getTime();
-       }
-       request.setAttribute("asDate",asofDate);
-       PreventionReport report = PreventionReportFactory.getPreventionReport(prevention);
+		String setName = request.getParameter("patientSet");
+		String prevention = request.getParameter("prevention");
+		Date asofDate = UtilDateUtilities.getDateFromString(request.getParameter("asofDate"), "yyyy-MM-dd");
+		if (asofDate == null) {
+			Calendar today = Calendar.getInstance();
+			asofDate = today.getTime();
+		}
+		
+		/* some fast error checking */
+		if("-1".equals(setName)) {
+			request.setAttribute("error", "No patient set selected");
+			return (mapping.findForward("failure"));
+		}
+		if("-1".equals(prevention)) {
+			request.setAttribute("error", "No prevention selected");
+			return (mapping.findForward("failure"));
+		}
+		
+		try {
+			RptDemographicReportForm frm = new RptDemographicReportForm();
+			frm.setSavedQuery(setName);
+			RptDemographicQueryLoader demoL = new RptDemographicQueryLoader();
+			frm = demoL.queryLoader(frm);
+			frm.addDemoIfNotPresent();
+			frm.setAsofDate(request.getParameter("asofDate"));
+			RptDemographicQueryBuilder demoQ = new RptDemographicQueryBuilder();
+			ArrayList<ArrayList<String>> list = demoQ.buildQuery(loggedInInfo, frm, request.getParameter("asofDate"));
 
-       Hashtable h =report.runReport(loggedInInfo, list,asofDate);
-       request.setAttribute("up2date",h.get("up2date"));
-       request.setAttribute("percent",h.get("percent"));
-       request.setAttribute("percentWithGrace",h.get("percentWithGrace"));
-       request.setAttribute("returnReport",h.get("returnReport"));
-       request.setAttribute("inEligible", h.get("inEligible"));
-       request.setAttribute("eformSearch",h.get("eformSearch"));
-       request.setAttribute("followUpType",h.get("followUpType"));
-       request.setAttribute("BillCode", h.get("BillCode"));
+			log.debug("set size " + list.size());
 
-       request.setAttribute("prevType",prevention);
-       request.setAttribute("patientSet",setName);
-       request.setAttribute("prevention",prevention);
+			
+			PreventionReport report = PreventionReportFactory.getPreventionReport(prevention);
+			Hashtable h = report.runReport(loggedInInfo, list, asofDate);
+			
+			request.setAttribute("asDate", asofDate);
+			request.setAttribute("up2date", h.get("up2date"));
+			request.setAttribute("percent", h.get("percent"));
+			request.setAttribute("percentWithGrace", h.get("percentWithGrace"));
+			request.setAttribute("returnReport", h.get("returnReport"));
+			request.setAttribute("inEligible", h.get("inEligible"));
+			request.setAttribute("eformSearch", h.get("eformSearch"));
+			request.setAttribute("followUpType", h.get("followUpType"));
+			request.setAttribute("BillCode", h.get("BillCode"));
 
-       log.debug("setting prevention type to "+prevention);
+			request.setAttribute("prevType", prevention);
+			request.setAttribute("patientSet", setName);
+			request.setAttribute("prevention", prevention);
 
-       return (mapping.findForward("success"));
-   }
+			log.debug("setting prevention type to " + prevention);	
+		}
+		catch(Exception e) {
+			log.error("Prevention Report Error", e);
+			request.setAttribute("error", "An unknown error has occured");
+			return (mapping.findForward("failure"));
+		}
+		return (mapping.findForward("success"));
+	}
 
 }

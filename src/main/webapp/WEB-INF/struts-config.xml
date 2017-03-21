@@ -1791,6 +1791,7 @@
 		</action>
 		<action input="/oscarPrevention/PreventionReporting.jsp" name="PreventionReportForm" path="/oscarPrevention/PreventionReport" scope="request" type="oscar.oscarPrevention.pageUtil.PreventionReportAction">
 			<forward name="success" path="/oscarPrevention/PreventionReporting.jsp" />
+			<forward name="failure" path="/oscarPrevention/PreventionReporting.jsp" />
 		</action>
 
 		<action path="/oscarPrevention/printPrevention" scope="request" type="oscar.oscarPrevention.pageUtil.PreventionPrintAction">
