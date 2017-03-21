@@ -1,9 +1,9 @@
 
 # Git State
 UPSTREAM='@{u}'
-LOCAL=$(git rev-parse @)
+LOCAL=$(git rev-parse HEAD)
 REMOTE=$(git rev-parse "$UPSTREAM")
-BASE=$(git merge-base @ "$UPSTREAM")
+BASE=$(git merge-base HEAD "$UPSTREAM")
 
 
 SOURCE_BASE=.
