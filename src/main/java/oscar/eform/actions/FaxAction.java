@@ -11,7 +11,7 @@ package oscar.eform.actions;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-//import java.io.PrintWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -157,25 +157,27 @@ public final class FaxAction {
 					break;
 				}
 
-			    //String tempName = "EForm-" + formId + "." + System.currentTimeMillis();
+			    String tempName = "EForm-" + formId + "." + System.currentTimeMillis();
+				String tempPath = OscarProperties.getInstance().getProperty(
+						"fax_file_location", System.getProperty("java.io.tmpdir"));
 				
-				//String tempPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
-				//String tempTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
+				String tempPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
+				String tempTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
 				
 				// Copying the fax pdf.
-				//FileUtils.copyFile(tempFile, new File(tempPdf));
+				FileUtils.copyFile(tempFile, new File(tempPdf));
 				
 				// Creating text file with the specialists fax number.
-				//fos = new FileOutputStream(tempTxt);				
-				//PrintWriter pw = new PrintWriter(fos);
-				//pw.println(faxNo);
-				//pw.close();
-				//fos.close();
+				fos = new FileOutputStream(tempTxt);				
+				PrintWriter pw = new PrintWriter(fos);
+				pw.println(faxNo);
+				pw.close();
+				fos.close();
 				
 				// A little sanity check to ensure both files exist.
-				//if (!new File(tempPdf).exists() || !new File(tempTxt).exists()) {
-			//		throw new DocumentException("Unable to create files for fax of eform " + formId + ".");
-				//}		
+				if (!new File(tempPdf).exists() || !new File(tempTxt).exists()) {
+					throw new DocumentException("Unable to create files for fax of eform " + formId + ".");
+				}		
 				if (skipSave) {
 		        	 EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
 		        	 EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));
