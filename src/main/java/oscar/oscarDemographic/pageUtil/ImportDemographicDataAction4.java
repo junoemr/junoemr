@@ -725,12 +725,12 @@ import cdsDt.PersonNameStandard.OtherNames;
             if (StringUtils.filled(dNote)) dd.addDemographiccust(demographicNo, dNote);
 
             //to dumpsite: Extra demographic data
-            if (StringUtils.filled(extra)) {
+            /*if (StringUtils.filled(extra)) {
 	            extra = Util.addLine("imported.cms4.2011.06", extra);
 	            CaseManagementNote dmNote = prepareCMNote("2",null);
 	            dmNote.setNote(extra);
 	            saveLinkNote(dmNote, CaseManagementNoteLink.DEMOGRAPHIC, Long.valueOf(demographicNo));
-            }
+            }*/
 
             if (!workExt.equals("")) demographicExtDao.addKey(primaryPhysician, Integer.parseInt(demographicNo), "wPhoneExt", workExt);
             if (!homeExt.equals("")) demographicExtDao.addKey(primaryPhysician, Integer.parseInt(demographicNo), "hPhoneExt", homeExt);
@@ -881,11 +881,11 @@ import cdsDt.PersonNameStandard.OtherNames;
                 addOneEntry(PERSONALHISTORY);
 
                 //to dumpsite
-                residual = Util.addLine("imported.cms4.2011.06", residual);
+                /*residual = Util.addLine("imported.cms4.2011.06", residual);
                 Long hostNoteId = cmNote.getId();
                 cmNote = prepareCMNote("2",null);
                 cmNote.setNote(residual);
-                saveLinkNote(hostNoteId, cmNote);
+                saveLinkNote(hostNoteId, cmNote);*/
             }
 
             //FAMILY HISTORY
@@ -917,7 +917,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                 saveLinkNote(hostNoteId, cmNote);
 
                 //to dumpsite
-                String dump = "imported.cms4.2011.06";
+                //String dump = "imported.cms4.2011.06";
                 /*
                 String summary = fHist[i].getCategorySummaryLine();
                 if (StringUtils.empty(summary)) {
@@ -925,12 +925,12 @@ import cdsDt.PersonNameStandard.OtherNames;
                 }
                 dump = Util.addLine(dump, summary);
                 */
-                String diagCode = getCode(fHist[i].getDiagnosisProcedureCode(),"Diagnosis/Procedure");
+                /*String diagCode = getCode(fHist[i].getDiagnosisProcedureCode(),"Diagnosis/Procedure");
                 dump = Util.addLine(dump, diagCode);
                 dump = Util.addLine(dump, getResidual(fHist[i].getResidualInfo()));
                 cmNote = prepareCMNote("2",null);
                 cmNote.setNote(dump);
-                saveLinkNote(hostNoteId, cmNote);
+                saveLinkNote(hostNoteId, cmNote);*/
 
                 //extra fields
                 CaseManagementNoteExt cme = new CaseManagementNoteExt();
@@ -997,7 +997,7 @@ import cdsDt.PersonNameStandard.OtherNames;
 
 
                 //to dumpsite
-                String dump = "imported.cms4.2011.06";
+                //String dump = "imported.cms4.2011.06";
                 /*
                 String summary = pHealth[i].getCategorySummaryLine();
                 if (StringUtils.empty(summary)) {
@@ -1005,12 +1005,12 @@ import cdsDt.PersonNameStandard.OtherNames;
                 }
                 dump = Util.addLine(dump, summary);
                 */
-                String diagCode = isICD9(pHealth[i].getDiagnosisProcedureCode()) ? null : getCode(pHealth[i].getDiagnosisProcedureCode(),"Diagnosis/Procedure");
+                /*String diagCode = isICD9(pHealth[i].getDiagnosisProcedureCode()) ? null : getCode(pHealth[i].getDiagnosisProcedureCode(),"Diagnosis/Procedure");
                 dump = Util.addLine(dump, diagCode);
                 dump = Util.addLine(dump, getResidual(pHealth[i].getResidualInfo()));
                 cmNote = prepareCMNote("2",null);
                 cmNote.setNote(dump);
-                saveLinkNote(hostNoteId, cmNote);
+                saveLinkNote(hostNoteId, cmNote);*/
 
                 //extra fields
                 CaseManagementNoteExt cme = new CaseManagementNoteExt();
@@ -1071,7 +1071,7 @@ import cdsDt.PersonNameStandard.OtherNames;
 
 
                     //to dumpsite
-                    String dump = "imported.cms4.2011.06";
+                    //String dump = "imported.cms4.2011.06";
                     /*
                     String summary = probList[i].getCategorySummaryLine();
                     if (StringUtils.empty(summary)) {
@@ -1079,12 +1079,12 @@ import cdsDt.PersonNameStandard.OtherNames;
                     }
                     dump = Util.addLine(dump, summary);
                     */
-                    String diagCode = isICD9(probList[i].getDiagnosisCode()) ? null : getCode(probList[i].getDiagnosisCode(),"Diagnosis");
+                    /*String diagCode = isICD9(probList[i].getDiagnosisCode()) ? null : getCode(probList[i].getDiagnosisCode(),"Diagnosis");
                     dump = Util.addLine(dump, diagCode);
                     dump = Util.addLine(dump, getResidual(probList[i].getResidualInfo()));
                     cmNote = prepareCMNote("2",null);
                     cmNote.setNote(dump);
-                    saveLinkNote(hostNoteId, cmNote);
+                    saveLinkNote(hostNoteId, cmNote);*/
 
                     //extra fields
                     CaseManagementNoteExt cme = new CaseManagementNoteExt();
@@ -1146,7 +1146,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                     saveLinkNote(hostNoteId, cmNote);
 
                     //to dumpsite
-                    String dump = "imported.cms4.2011.06";
+                    //String dump = "imported.cms4.2011.06";
                     /*
                     String summary = rFactors[i].getCategorySummaryLine();
                     if (StringUtils.empty(summary)) {
@@ -1154,10 +1154,10 @@ import cdsDt.PersonNameStandard.OtherNames;
                     }
                     dump = Util.addLine(dump, summary);
                     */
-                    dump = Util.addLine(dump, getResidual(rFactors[i].getResidualInfo()));
+                    /*dump = Util.addLine(dump, getResidual(rFactors[i].getResidualInfo()));
                     cmNote = prepareCMNote("2",null);
                     cmNote.setNote(dump);
-                    saveLinkNote(hostNoteId, cmNote);
+                    saveLinkNote(hostNoteId, cmNote);*/
 
                     //extra fields
                     CaseManagementNoteExt cme = new CaseManagementNoteExt();
@@ -1220,7 +1220,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                     saveLinkNote(hostNoteId, cmNote);
 
                     //to dumpsite
-                    String dump = "imported.cms4.2011.06";
+                    //String dump = "imported.cms4.2011.06";
                     /*
                     String summary = alerts[i].getCategorySummaryLine();
                     if (StringUtils.empty(summary)) {
@@ -1228,10 +1228,10 @@ import cdsDt.PersonNameStandard.OtherNames;
                     }
                     dump = Util.addLine(dump, summary);
                     */
-                    dump = Util.addLine(dump, getResidual(alerts[i].getResidualInfo()));
+                    /*dump = Util.addLine(dump, getResidual(alerts[i].getResidualInfo()));
                     cmNote = prepareCMNote("2",null);
                     cmNote.setNote(dump);
-                    saveLinkNote(hostNoteId, cmNote);
+                    saveLinkNote(hostNoteId, cmNote);*/
 
                     //extra fields
                     CaseManagementNoteExt cme = new CaseManagementNoteExt();
@@ -1343,14 +1343,14 @@ import cdsDt.PersonNameStandard.OtherNames;
                             uuid = cmNote.getUuid();
 
                             //create "header", cms4 only
-                        	if (cNotes[i].getEnteredDateTime()!=null && !createDate.equals(cmNote.getUpdate_date())) {
+                        	/*if (cNotes[i].getEnteredDateTime()!=null && !createDate.equals(cmNote.getUpdate_date())) {
                         		CaseManagementNote headNote = prepareCMNote("2",null);
                         		headNote.setCreate_date(createDate);
                         		headNote.setUpdate_date(createDate);
                         		headNote.setObservation_date(observeDate);
                         		headNote.setNote("imported.cms4.2011.06"+uuid);
                         		caseManagementManager.saveNoteSimple(headNote);
-                        	}
+                        	}*/
 
                         }
                     }
@@ -1360,14 +1360,14 @@ import cdsDt.PersonNameStandard.OtherNames;
                     }
 
                     //to dumpsite
-                    String noteType = cNotes[i].getNoteType();
+                    /*String noteType = cNotes[i].getNoteType();
                     if (StringUtils.filled(noteType)) {
                     	noteType = Util.addLine("imported.cms4.2011.06", "Note Type: ", noteType);
                     }
 
                     CaseManagementNote dumpNote = prepareCMNote("2",null);
                     dumpNote.setNote(noteType);
-                    saveLinkNote(cmNote.getId(), dumpNote);
+                    saveLinkNote(cmNote.getId(), dumpNote);*/
                 }
 
                 //ALLERGIES & ADVERSE REACTIONS
@@ -1425,7 +1425,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                     saveLinkNote(cmNote, CaseManagementNoteLink.ALLERGIES, Long.valueOf(allergyId));
 
                     //to dumpsite
-                    String dump = "imported.cms4.2011.06";
+                    //String dump = "imported.cms4.2011.06";
                     /*
                     String summary = aaReactArray[i].getCategorySummaryLine();
                     if (StringUtils.empty(summary)) {
@@ -1433,12 +1433,12 @@ import cdsDt.PersonNameStandard.OtherNames;
                     }
                     dump = Util.addLine(dump, summary);
                     */
-                    dump = Util.addLine(dump, alg_extra);
+                    /*dump = Util.addLine(dump, alg_extra);
                     dump = Util.addLine(dump, getResidual(aaReactArray[i].getResidualInfo()));
 
                     cmNote = prepareCMNote("2",null);
                     cmNote.setNote(dump);
-                    saveLinkNote(cmNote, CaseManagementNoteLink.ALLERGIES, Long.valueOf(allergyId));
+                    saveLinkNote(cmNote, CaseManagementNoteLink.ALLERGIES, Long.valueOf(allergyId));*/
                 }
 
 
@@ -1633,7 +1633,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                     saveLinkNote(cmNote, CaseManagementNoteLink.DRUGS, (long)drug.getId());
 
                     //to dumpsite
-                    String dump = "imported.cms4.2011.06";
+                    //String dump = "imported.cms4.2011.06";
                     /*
                     String summary = medArray[i].getCategorySummaryLine();
                     if (StringUtils.empty(summary)) {
@@ -1641,11 +1641,11 @@ import cdsDt.PersonNameStandard.OtherNames;
                     }
                     dump = Util.addLine(dump, summary);
                     */
-                    dump = Util.addLine(dump, getResidual(medArray[i].getResidualInfo()));
+                    /*dump = Util.addLine(dump, getResidual(medArray[i].getResidualInfo()));
 
                     cmNote = prepareCMNote("2",null);
                     cmNote.setNote(dump);
-                    saveLinkNote(cmNote, CaseManagementNoteLink.DRUGS, (long)drug.getId());
+                    saveLinkNote(cmNote, CaseManagementNoteLink.DRUGS, (long)drug.getId());*/
                 }
 
 
@@ -1733,12 +1733,12 @@ import cdsDt.PersonNameStandard.OtherNames;
                     addOneEntry(IMMUNIZATION);
 
                     //to dumpsite: Extra immunization data
-                    if (StringUtils.filled(immExtra) && preventionId>=0) {
+                    /*if (StringUtils.filled(immExtra) && preventionId>=0) {
         	            immExtra = Util.addLine("imported.cms4.2011.06", immExtra);
         	            CaseManagementNote imNote = prepareCMNote("2",null);
         	            imNote.setNote(immExtra);
         	            saveLinkNote(imNote, CaseManagementNoteLink.PREVENTIONS, Long.valueOf(preventionId));
-                    }
+                    }*/
                 }
 
                 //LABORATORY RESULTS
@@ -1961,13 +1961,13 @@ import cdsDt.PersonNameStandard.OtherNames;
                         }
 
                         //to dumpsite
-                        String testResultsInfo = labResults.getTestResultsInformationReportedByTheLab();
+                        /*String testResultsInfo = labResults.getTestResultsInformationReportedByTheLab();
                         if (StringUtils.filled(testResultsInfo)) {
                             String dump = Util.addLine("imported.cms4.2011.06", "Test Results Info: ", testResultsInfo);
                             CaseManagementNote cmNote = prepareCMNote("2",null);
                             cmNote.setNote(dump);
                             saveLinkNote(cmNote, CaseManagementNoteLink.LABTEST2, Long.valueOf(lab_ppid), "0-0");
-                        }
+                        }*/
                     } else {
                         logger.error("No lab no! (demo="+demographicNo+")");
                     }
@@ -2131,6 +2131,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                                     if (binaryFormat) err_data.add("Error! No File Extension for Report ("+(i+1)+")");
                                 }
                                 String docDesc = repR[i].getSubClass();
+                                if (StringUtils.empty(docDesc)) docDesc = repR[i].getNotes();
                                 if (StringUtils.empty(docDesc)) docDesc = "ImportReport"+(i+1);
                                 FileOutputStream f = new FileOutputStream(docDir + docFileName);
                                 
@@ -2180,12 +2181,12 @@ import cdsDt.PersonNameStandard.OtherNames;
                                 else addOneEntry(REPORTTEXT);
 
                                 //to dumpsite: Extra report data
-                                if (StringUtils.filled(reportExtra)) {
+                                /*if (StringUtils.filled(reportExtra)) {
                     	            reportExtra = Util.addLine("imported.cms4.2011.06", reportExtra);
                     	            CaseManagementNote rpNote = prepareCMNote("2",null);
                     	            rpNote.setNote(reportExtra);
                     	            saveLinkNote(rpNote, CaseManagementNoteLink.DOCUMENT, Long.valueOf(docNum));
-                                }
+                                }*/
                             }
                         }
                     }
