@@ -91,8 +91,8 @@ public class EctDisplayAction extends Action {
 			Actions.put("success", "/oscarEncounter/LeftNavBarDisplay.jsp");
 			Actions.put("error", "/oscarEncounter/LeftNavBarError.jsp");
 			Actions.put("HRM", "/oscarEncounter/displayHRM.do");
-			Actions.put("myoscar", "/oscarEncounter/displayMyOscar.do");
-			Actions.put("eaaps", "/eaaps/displayEctEaaps.do");
+			//Actions.put("myoscar", "/oscarEncounter/displayMyOscar.do");
+			//Actions.put("eaaps", "/eaaps/displayEctEaaps.do");
 			
 			if (logger.isDebugEnabled()) {
 				logger.debug("Instantiated encounter display actions: " + Actions);
