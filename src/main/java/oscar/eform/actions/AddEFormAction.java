@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,6 +47,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.oscarehr.casemgmt.model.CaseManagementNote;
+import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.DatabaseAPDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.dao.DemographicDao;
@@ -91,9 +94,14 @@ public class AddEFormAction extends Action {
 		String eform_link = request.getParameter("eform_link");
 		String subject = request.getParameter("subject");
 		String provider_no = LoggedInInfo.loggedInInfo.get().loggedInProvider.getProviderNo();
+		
+		// special oscar override input names
 		String dateOverrideValue = request.getParameter("_oscarOverrideFormDate");
+		String skipEformSave = request.getParameter("_oscarSkipEformSave");
+		String saveStringAsNote = request.getParameter("_oscarTextToEncounterNote");
 
 		boolean doDatabaseUpdate = false;
+		boolean skipSave = (skipEformSave != null && skipEformSave.equalsIgnoreCase("true"));
 
 		List<String> oscarUpdateFields = new ArrayList<String>();
 
@@ -200,7 +208,41 @@ public class AddEFormAction extends Action {
 				sameform = curForm.getFormHtml().equals(prevForm.getFormHtml());
 			}
 		}
-		if (!sameform) {
+		
+		// OHSUPPORT-3712 -- Special functionality to allow writing encounter notes from eforms
+		if(saveStringAsNote != null && !saveStringAsNote.trim().isEmpty()) {
+			logger.info("Saving Eform Text to Encounter Notes.");
+		
+			CaseManagementNote cmNote = new CaseManagementNote();
+			
+			Date now = new Date();
+			cmNote.setCreate_date(now);
+			cmNote.setObservation_date(now);
+			cmNote.setUpdate_date(now);
+			
+			cmNote.setProviderNo(provider_no);
+			cmNote.setSigning_provider_no(provider_no);
+			cmNote.setSigned(true);
+			
+			cmNote.setDemographic_no(demographic_no);
+			
+			cmNote.setReporter_program_team("0");
+			cmNote.setProgram_no(new EctProgram(request.getSession()).getProgram(provider_no));
+			cmNote.setUuid(UUID.randomUUID().toString());
+			cmNote.setReporter_caisi_role("1"); // "1" for doctor, "2" for nurse - note hidden in echart
+
+            cmNote.setNote(saveStringAsNote);
+            cmNote.setHistory("");
+            cmNote.setEncounter_type("face to face encounter with client");
+            
+            CaseManagementManager caseManagementManager = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
+            caseManagementManager.saveNoteSimple(cmNote);
+		}
+		else {
+			logger.warn("Eform attempted to save text to Encounter Notes, but text was null or empty.");
+		}
+		
+		if (!skipSave && !sameform) {
 			EFormDataDao eFormDataDao=(EFormDataDao)SpringUtils.getBean("EFormDataDao");
 			EFormData eFormData=toEFormData(curForm);
 			/* OHSUPPORT-3172 -- allow certain eforms to override the default form date */
@@ -251,6 +293,9 @@ public class AddEFormAction extends Action {
 			}
 
 		}
+		else if (skipSave) {
+			logger.info("Eform save skipped.");
+		}
 		else {
 			logger.debug("Warning! Form HTML exactly the same, new form data not saved.");
 			if (fax) {
@@ -266,9 +311,6 @@ public class AddEFormAction extends Action {
 				return(mapping.findForward("email"));
 			}
 		}
-
-
-
 		return(mapping.findForward("close"));
 	}
 
