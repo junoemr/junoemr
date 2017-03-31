@@ -416,10 +416,9 @@
                                         <td width="30%" colspan="1" align="right">
                                     <%if(demographicID.equals("-1")){%>
                                         <input type="submit" name="save" disabled id="save<%=docId%>" value="Save" onclick="saveBtnAction();" />
-                                        <input type="button" name="save" id="saveNext<%=docId%>" onclick="saveBtnAction();saveNext(<%=docId%>)" disabled value='<bean:message key="inboxmanager.document.SaveAndNext"/>' /><%}
-						            else{%>
+                                    <%}else{%>
 							            <input type="submit" name="save" id="save<%=docId%>" value="Save" onclick="saveBtnAction();"/>
-							            <input type="button" name="save" onclick="saveBtnAction();saveNext(<%=docId%>)" id="saveNext<%=docId%>" value='<bean:message key="inboxmanager.document.SaveAndNext"/>' /> <%}%>
+							        <%}%>
 
                                     </tr>
 
