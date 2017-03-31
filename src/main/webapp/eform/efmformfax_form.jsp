@@ -22,52 +22,49 @@ This Page creates the fax form for eforms.
 <%@ page import="org.oscarehr.common.model.*,org.oscarehr.common.dao.*"%>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 <%
-
 	OscarProperties props = OscarProperties.getInstance();
-	if (props.isEFormFaxEnabled()) {
-		
-		displayServiceUtil.estSpecialist();		
-		String demo = request.getParameter("demographicNo");
-		DemographicData demoData = null;
-		Demographic demographic = null;
-		String rdohip = "";
-		if (!"".equals(demo))
-		{
-			demoData = new oscar.oscarDemographic.data.DemographicData();
-			demographic = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demo);
-			rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
-			rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(),"rdohip").trim();
-		}
-	  
+
+	displayServiceUtil.estSpecialist();
+	String demo = request.getParameter("demographicNo");
+	DemographicData demoData = null;
+	Demographic demographic = null;
+	String rdohip = "";
+	if (!"".equals(demo)) {
+		demoData = new oscar.oscarDemographic.data.DemographicData();
+		demographic = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demo);
+		rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()), "rdohip");
+		rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(), "rdohip").trim();
+	}
+	boolean faxEnabled = (props.isPropertyActive("faxEnable") && props.isEFormFaxEnabled());
 %> 
 <table width="100%">
-<tr>
-
-	<td class="tite4" width="10%">  Providers: </td>
-	<td class="tite3" width="20%">
-		<select id="otherFaxSelect">
-		<%
-		String rdName = "";
-		String rdFaxNo = "";
-		for (int i=0;i < displayServiceUtil.specIdVec.size(); i++) {
-                             String  specId     = (String) displayServiceUtil.specIdVec.elementAt(i);
-                             String  fName      = (String) displayServiceUtil.fNameVec.elementAt(i);
-                             String  lName      = (String) displayServiceUtil.lNameVec.elementAt(i);
-                             String  proLetters = (String) displayServiceUtil.proLettersVec.elementAt(i);
-                             String  address    = (String) displayServiceUtil.addressVec.elementAt(i);
-                             String  phone      = (String) displayServiceUtil.phoneVec.elementAt(i);
-                             String  fax        = (String) displayServiceUtil.faxVec.elementAt(i);
-                             String  referralNo = (displayServiceUtil.referralNoVec.size() > 0 ? displayServiceUtil.referralNoVec.get(i).trim() : "");
-                             if (rdohip != null && !"".equals(rdohip) && rdohip.equals(referralNo)) {
-                            	 rdName = String.format("%s, %s", lName, fName);
-                            	 rdFaxNo = fax;
-                             }
-			if (!"".equals(fax)) {
-			%>
-			<option value="<%= fax %>"> <%= String.format("%s, %s", lName, fName) %> </option>
-			<%						
-			}
-		} %>		                        
+	<input type="hidden" value=<%=faxEnabled%> id="faxControl_faxEnabled"></input>
+	<tr>
+		<td class="tite4" width="10%">  Providers: </td>
+		<td class="tite3" width="20%">
+			<select id="otherFaxSelect">
+	<%
+	String rdName = "";
+	String rdFaxNo = "";
+	for (int i=0;i < displayServiceUtil.specIdVec.size(); i++) {
+		String  specId     = (String) displayServiceUtil.specIdVec.elementAt(i);
+		String  fName      = (String) displayServiceUtil.fNameVec.elementAt(i);
+		String  lName      = (String) displayServiceUtil.lNameVec.elementAt(i);
+		String  proLetters = (String) displayServiceUtil.proLettersVec.elementAt(i);
+		String  address    = (String) displayServiceUtil.addressVec.elementAt(i);
+		String  phone      = (String) displayServiceUtil.phoneVec.elementAt(i);
+		String  fax        = (String) displayServiceUtil.faxVec.elementAt(i);
+		String  referralNo = (displayServiceUtil.referralNoVec.size() > 0 ? displayServiceUtil.referralNoVec.get(i).trim() : "");
+		if (rdohip != null && !"".equals(rdohip) && rdohip.equals(referralNo)) {
+			rdName = String.format("%s, %s", lName, fName);
+			rdFaxNo = fax;
+		}
+		if (!"".equals(fax)) {
+		%>
+		<option value="<%= fax %>"> <%= String.format("%s, %s", lName, fName) %> </option>
+		<%						
+		}
+	} %>		                        
 		</select>
 	</td>
 	<td class="tite3">				
@@ -107,4 +104,3 @@ This Page creates the fax form for eforms.
 	</td>	
 </tr>
 </table>
-<% } // end if (props.isRichEFormFaxEnabled()) { %>
