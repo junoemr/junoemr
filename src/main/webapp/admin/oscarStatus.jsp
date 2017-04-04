@@ -126,18 +126,6 @@ onLoad="setTimeout('doDocuments()',3000);"
 <h5>Build ID:</h5>
 <pre>Git SHA-1: <%=BuildNumberPropertiesFileReader.getGitSha1()%></pre>
 
-<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.misc" rights="r" reverse="<%=false%>">
-	<h4><bean:message key="admin.oscarStatus.restart" /></h4>
-	<div class="well">
-		<form method="post" action="rebootConfirmation.jsp" name="confirmOscarReboot">
-			<p>If you are having issues with Oscar, click the button below to restart Oscar.</p>
-			<input class="btn btn-danger" type="submit" name="subbutton" value="REBOOT OSCAR" > 
-			<p>If the server is experiencing problems, click the button below to reboot the server.</p>
-			<input class="btn btn-danger" type="submit" name="subbutton" value="REBOOT SERVER" >
-		</form>
-	</div>
-</security:oscarSec>
-
 <script>
 $( document ).ready(function() {	
     parent.parent.resizeIframe($('html').height());	
