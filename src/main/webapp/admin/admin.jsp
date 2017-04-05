@@ -911,31 +911,13 @@ div.logoutBox {
 	</security:oscarSec>
 <!-- #INTEGRATION END -->
 
-<!-- #STATUS-->
-	<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">
-		<div class="adminBox">
-		<h3>&nbsp;<bean:message key="admin.admin.Status" /></h3>
-		<ul>
-			<% if (OscarProperties.getInstance().isFaxEnabled()) { %>
-            <li><a href="#" onclick='popupPage(600, 800,&quot;<html:rewrite page="/admin/faxStatus.do" />&quot;);return false;'><bean:message key="admin.faxStatus.faxStatus" /></a></li>
-            <% } %>
-			<li><a href="#" onclick='popupPage(800, 800,&quot;<html:rewrite page="/admin/oscarStatus.do" />&quot;);return false;'><bean:message key="admin.oscarStatus.oscarStatus" /></a></li>
-			
-		</ul>
-		</div>
-	</security:oscarSec>
-<!-- #STATUS END -->
-	
 <!-- #Data Management -->
 	<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.backup" rights="r" reverse="<%=false%>">
 
 		<div class="adminBox">
 		<h3>&nbsp;<bean:message key="admin.admin.DataManagement" /></h3>
 		<ul>
-			<li><a href="#"
-				onclick='popupPage(500,600,&quot;<html:rewrite page="/admin/adminbackupdownload.jsp"/>&quot;); return false;'><bean:message
-				key="admin.admin.btnAdminBackupDownload" /></a></li>
-				
+
 			<li><a href="#"
 				onclick='popupPage(550,800,&quot;<html:rewrite page="/demographic/demographicExport.jsp"/>&quot;);return false;'><bean:message key="admin.admin.DemoExport"/></a></li>
                         <li><a href="#"
@@ -945,14 +927,14 @@ div.logoutBox {
 			<li><a href="#"
 				onclick='popupPage(550,800,&quot;<html:rewrite page="/admin/updatedemographicprovider.jsp"/>&quot;);return false;'><bean:message
 				key="admin.admin.btnUpdatePatientProvider" /></a></li>
-		   
+
 		   <% if (OscarProperties.getInstance().getProperty("NEW_CONTACTS_UI","false").equals("true")) { %>
             	<li><a href="#" onclick='popupPage(800, 1000,&quot;<html:rewrite page="/demographic/migrate_demographic_contacts.jsp"/>&quot;);return false;'><bean:message key="admin.admin.migrate_contacts"/></a></li>
             <% } %>
-				
+
 		</ul>
 		</div>
-		
+
 	</security:oscarSec>
 <!-- #Data Management END-->
 
