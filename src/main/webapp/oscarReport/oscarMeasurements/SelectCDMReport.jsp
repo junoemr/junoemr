@@ -111,7 +111,7 @@ if(!authed) {
 							<td width="120" class="fieldBox"><input type="button"
 								name="button"
 								value="<bean:message key="oscarReport.CDMReport.btnContinue"/>"
-								onclick="set('patientWhoMetGuideline');submit();checkGroup();" /></td>
+								onclick="set('patientWhoMetGuideline');checkGroup();" /></td>
 						</tr>
 						<tr>
 							<td width="450" class="fieldBox"><bean:message
@@ -120,7 +120,7 @@ if(!authed) {
 							<td width="120" class="fieldBox"><input type="button"
 								name="button"
 								value="<bean:message key="oscarReport.CDMReport.btnContinue"/>"
-								onclick="set('patientInAbnormalRange');submit();checkGroup();" /></td>
+								onclick="set('patientInAbnormalRange');checkGroup();" /></td>
 						</tr>
 						<tr>
 							<td width="450" class="fieldBox"><bean:message
@@ -129,7 +129,7 @@ if(!authed) {
 							<td width="120" class="fieldBox"><input type="button"
 								name="button"
 								value="<bean:message key="oscarReport.CDMReport.btnContinue"/>"
-								onclick="set('freqencyOfReleventTests');submit();checkGroup();" /></td>
+								onclick="set('freqencyOfReleventTests');checkGroup();" /></td>
 						</tr>
 					</table>
 					</td>
