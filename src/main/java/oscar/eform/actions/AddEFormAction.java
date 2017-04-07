@@ -238,7 +238,7 @@ public class AddEFormAction extends Action {
             CaseManagementManager caseManagementManager = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
             caseManagementManager.saveNoteSimple(cmNote);
 		}
-		else {
+		else if(saveStringAsNote != null) {
 			logger.warn("Eform attempted to save text to Encounter Notes, but text was null or empty.");
 		}
 		
