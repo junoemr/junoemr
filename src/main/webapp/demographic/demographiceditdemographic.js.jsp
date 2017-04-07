@@ -210,6 +210,9 @@ function checkTypeInEdit() {
   if ( !checkDob() ) return false;
   if ( !checkHin() ) return false;
   if ( !checkSex() ) return false;
+  <% if("true".equals(OscarProperties.getInstance().getProperty("skip_postal_code_validation","true"))) { %>
+  if ( !isPostalCode() ) returned false;
+  <% } %>
   if ( !checkRosterStatus() ) return false;
   if ( !checkPatientStatus() ) return false;
   return(true);
