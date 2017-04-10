@@ -156,15 +156,6 @@
 		var selectedDemographicNo = demographicNo;
 		var contextPath = "<%= request.getContextPath() %>";
 		
-		function ticklerBtnAction() {
-			var action = contextPath + "/tickler/ForwardDemographicTickler.do?docType=DOC&docId=" + docId + "&docIp=" + docIp + "&demographic_no=" + demographicNo + "";
-			popupStart(450,600, action, 'tickler');
-		}
-		function msgBtnAction() {
-			var action = contextPath + "/oscarMessenger/SendDemoMessage.do?demographic_no=" + demographicNo + "&docId=" + docId;
-			popupStart(700,960, action);
-		}
-		
 		function saveBtnAction () {
 			demographicNo = selectedDemographicNo;
 		}
@@ -539,8 +530,8 @@
                                                         <input type="button" id="closeBtn_<%=docId%>" value=" <bean:message key="global.btnClose"/> " onClick="window.close()">
                                                         <input type="button" id="printBtn_<%=docId%>" value=" <bean:message key="global.btnPrint"/> " onClick="popup(700,960,'<%=url2%>','file download')">
                                                         <% if (demographicID != null && !demographicID.equals("") && !demographicID.equalsIgnoreCase("null")) {%>
-														<input type="button" id="msgBtn_<%=docId%>" value="Msg" onclick="msgBtnAction();"/>
-                                                        <input type="button" id="ticklerBtn_<%=docId%>" value="Tickler" onclick="ticklerBtnAction();"/>
+														<input type="button" id="msgBtn_<%=docId%>" value="Msg" onclick="popupStart(360, 680, '<%= request.getContextPath() %>/oscarMessenger/SendDemoMessage.do?demographic_no=<%= demographicID %>&docId=<%= docId %>')"/>
+                                                        <input type="button" id="ticklerBtn_<%=docId%>" value="Tickler" onclick="popupStart(360, 680, '<%= request.getContextPath() %>/tickler/ForwardDemographicTickler.do?docType=DOC&docId=<%= docId %>&docIp=<%= docIp %>&demographic_no=<%= demographicID %>')"/>
                                                         <input type="button" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupStart(360, 680, '<%= request.getContextPath() %>/oscarMDS/SearchPatient.do?labType=DOC&segmentID=<%= docId %>&name=<%=java.net.URLEncoder.encode(demoName)%>', 'searchPatientWindow')">
                                                         <% }
 
