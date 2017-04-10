@@ -210,8 +210,13 @@ function checkTypeInEdit() {
   if ( !checkDob() ) return false;
   if ( !checkHin() ) return false;
   if ( !checkSex() ) return false;
+<<<<<<< Updated upstream
   <% if("true".equals(OscarProperties.getInstance().getProperty("skip_postal_code_validation","true"))) { %>
   if ( !isPostalCode() ) returned false;
+=======
+  <% if(OscarProperties.getInstance().isPropertyActive("skip_postal_code_validation")) { %>
+  if ( !isPostalCode() ) return false;
+>>>>>>> Stashed changes
   <% } %>
   if ( !checkRosterStatus() ) return false;
   if ( !checkPatientStatus() ) return false;
