@@ -114,7 +114,7 @@
   OscarProperties oscarProps = OscarProperties.getInstance();
 
   ProvinceNames pNames = ProvinceNames.getInstance();
-  String prov= (props.getProperty("billregion","")).trim().toUpperCase();
+  String prov= (props.getProperty("hctype","")).trim().toUpperCase();
 
   String billingCentre = (props.getProperty("billcenter","")).trim().toUpperCase();
   String defaultCity = prov.equals("ON")&&billingCentre.equals("N") ? "Toronto":"";
