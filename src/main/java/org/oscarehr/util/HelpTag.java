@@ -60,7 +60,7 @@ public class HelpTag extends TagSupport {
 
 
     private String keywords = null;
-    private String searchLink = OscarProperties.getInstance().getProperty("HELP_SEARCH_URL");  //"http://www.oscarmanual.org/search?SearchableText=%s";
+    private String searchLink = OscarProperties.getInstance().getProperty("HELP_SEARCH_URL");  //"https://help.oscarhost.ca/support/home/search?";
     private String classString= null;
     private String key= null;
     private String style=null;
