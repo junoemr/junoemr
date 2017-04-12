@@ -188,7 +188,12 @@
 <!-- calendar stylesheet -->
 <link rel="stylesheet" type="text/css" media="all"
 	href="../share/calendar/calendar.css" title="win2k-cold-1" />
+	
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
+<link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/blitzer/jquery-ui.css"/>
+<link rel="stylesheet" href="../css/jquery.autocomplete.css" type="text/css">
 
+<% } %>
 <!-- main calendar program -->
 <script type="text/javascript" src="../share/calendar/calendar.js"></script>
 
@@ -1588,8 +1593,35 @@ jQuery(document).ready(function(){
 <%
 }
 %>
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
+</script>
+<script src="https://www.google.com/jsapi"></script>
+<script>
+	google.load("jquery", "1");
+	google.load("jqueryui", "1");
+</script>
+<script type="text/javascript">
+$(document).ready(function(){
+	// AJAX autocomplete referrer doctors 
+	$("input[name=r_doctor]").keypress(function(){
+		$("input[name=r_doctor]").autocomplete({
+	    	source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
+	    	select: function( event, ui){
+	    		$("input[name=r_doctor_ohip]").val(ui.item.referral_no);
+	    	}
+		});
+	});
+	$("input[name=r_doctor_ohip]").keypress(function(){
+		$("input[name=r_doctor_ohip]").autocomplete({
+	    	source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+	    	select: function( event, ui){
+	    		$("input[name=r_doctor]").val(ui.item.namedesc);
+	    	}
+		});
+	});	
+});
 </script>
 <!--<iframe src="../eform/efmshowform_data.jsp?fid=<%=fid%>" width="100%" height="100%"></iframe>-->
-<%//}%>
+<%}%>
 </body>
 </html:html>
