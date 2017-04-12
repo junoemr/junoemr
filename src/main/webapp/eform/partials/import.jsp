@@ -63,16 +63,20 @@ window.top.location.href = "<%=request.getContextPath()%>/administration/?show=F
 <%}else{%>
 <form action="<%=request.getContextPath()%>/eform/manageEForm.do" method="POST" enctype="multipart/form-data" id="eformImportForm">
     <input type="hidden" name="method" value="importEForm">
-		Import eForm:		
+		Import eForm:<br/>
         <%List<String> importErrors = (List<String>) request.getAttribute("importErrors");
         if (importErrors != null && importErrors.size() > 0) {%>
        		<span class="text-error"> <html:errors /> 
                 <%for (String importError: importErrors) {%>
-                - <%=importError%>
+                - <%=importError%><br/>
                 <%}%>
            </span>
         <%}%>
-        
+        <script>
+            function getHeight() {
+                window.frames.frameElement.height = "210";
+            }
+        </script>
         
        
          <br>
@@ -81,7 +85,7 @@ window.top.location.href = "<%=request.getContextPath()%>/administration/?show=F
         <input type="file" name="zippedForm" size="50">
         <span title="<bean:message key="global.uploadWarningBody"/>" style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer"><img border="0" src="../../images/icon_alertsml.gif"/></span></span>
                                         
-        <input type="button" name="subm" value="Import" class="btn" onclick="this.value = 'Importing...'; this.disabled = true; this.form.submit();"><br>
+        <input type="button" name="subm" value="Import" class="btn" onclick="this.value = 'Importing...'; this.disabled = true; this.form.submit(); getHeight();"><br>
         <span class="label label-info">Info: </span> <strong>When importing the file format is required to be a zip file.</strong>
 </form>
 
