@@ -264,7 +264,16 @@ div.logoutBox {
 							<bean:message key="admin.admin.invoiceRpts"/>
 						</a>
 					</li>
-			<%
+					<%
+					// Only BC clinicaid users still need to be able to edit billingreferral for consultations etc.
+					if (oscarVariables.getProperty("hctype", "").equals("BC")) {
+					%>
+					<li>
+					<a href="#" onclick='popupPage(700,1000,&quot;<html:rewrite page="/billing/CA/BC/billingManageReferralDoc.jsp"/>&quot;);return false;'>
+							<bean:message key="admin.admin.ManageReferralDoc"/>
+						</a>
+					</li> <%
+					}
 				}
 				else if (oscarVariables.getProperty("billregion", "").equals("BC"))
 				{
