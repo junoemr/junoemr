@@ -957,9 +957,13 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         <tr>
                                             <td>
                                                 <div class="FieldData">
-                                                <% if (isLabCLS) { %>
+                                                <% if ("CLS".equals(handler.getMsgType())) { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateServiceCLS"/>:</strong>
-												<% } else { %>
+												<% }
+                                                else if ("CLSDI".equals(handler.getMsgType())) { %>
+                                                	<strong><bean:message key="oscarMDS.segmentDisplay.formDateServiceCLS2"/>:</strong>
+                                                <% }
+                                                else { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateService"/>:</strong>
 												<% } %>
                                                 </div>
@@ -975,7 +979,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         		<div class="FieldData">
                                                 <% if (isLabCLS) { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateReceivedCLS"/>:</strong>
-												<% } else { %>
+												<% } 
+                                                else { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateReceived"/>:</strong>
 												<% } %>
                                                 </div>

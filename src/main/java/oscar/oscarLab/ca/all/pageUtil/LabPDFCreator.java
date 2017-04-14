@@ -324,6 +324,8 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		}
 
 		PdfPTable table = new PdfPTable(mainTableWidths);
+		table.setSplitLate(false);// prevent long body from starting on next page
+		
 		if (isUnstructuredDoc) {
 			table.setHeaderRows(1);
 		}
@@ -334,8 +336,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 
 		PdfPCell cell = new PdfPCell();
 		// category name
-		if(!isUnstructuredDoc)
-		{
+		if(!isUnstructuredDoc) {
 			cell.setPadding(3);
 			cell.setPhrase(new Phrase("  "));
 			cell.setBorder(0);
@@ -353,8 +354,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		}
 
 		// table headers
-		if(isUnstructuredDoc)
-		{
+		if(isUnstructuredDoc) {
 			cell.setColspan(1);
 			cell.setBorder(15);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -363,20 +363,20 @@ public class LabPDFCreator extends PdfPageEventHelper{
 			table.addCell(cell);
 			cell.setPhrase(new Phrase("Result", boldFont));
 			table.addCell(cell);
-			if(isTypeCLS)
-			{
-				cell.setPhrase(new Phrase("Date/Time Collected", boldFont));
+			if(isTypeCLS) {
+				String phrase = (handler.getMsgType().equals("CLSDI")) ? "Exam Date" : "Date/Time Collected";
+				cell.setPhrase(new Phrase(phrase, boldFont));
 				table.addCell(cell);
 				cell.setPhrase(new Phrase("Status", boldFont));
 				table.addCell(cell); 
-			} else 
-			{
+			} 
+			else {
 				cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
 				table.addCell(cell);
 			}
 
-		} else
-		{
+		} 
+		else {
 			cell.setColspan(1);
 			cell.setBorder(15);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -392,10 +392,10 @@ public class LabPDFCreator extends PdfPageEventHelper{
 			cell.setPhrase(new Phrase("Units", boldFont));
 			table.addCell(cell);
 			if(isTypeCLS){
-				cell.setPhrase(new Phrase("Date/Time Collected", boldFont));
+				String phrase = (handler.getMsgType().equals("CLSDI")) ? "Exam Date" : "Date/Time Collected";
+				cell.setPhrase(new Phrase(phrase, boldFont));
 			}
-			else
-			{
+			else {
 				cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
 			}
 			table.addCell(cell);
