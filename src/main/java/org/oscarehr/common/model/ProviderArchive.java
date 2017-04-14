@@ -36,6 +36,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.apache.commons.lang.StringUtils;
+
 @Entity
 @Table(name="providerArchive")
 public class ProviderArchive extends AbstractModel<Integer> {
@@ -82,6 +84,11 @@ public class ProviderArchive extends AbstractModel<Integer> {
 	private Date lastUpdateDate;
 	@Column(name="signed_confidentiality")
     private Date SignedConfidentiality;
+	@Column(name="e_delivery_ids")
+	private String eDeliveryIds;
+	@Column(name="tak_no")
+	private String takNo;
+	
 	public Integer getId() {
     	return id;
     }
@@ -244,8 +251,16 @@ public class ProviderArchive extends AbstractModel<Integer> {
 	public void setSignedConfidentiality(Date signedConfidentiality) {
     	SignedConfidentiality = signedConfidentiality;
     }
-
-
-
-
+	public void setEDeliveryIds(String idCSVString) {
+		eDeliveryIds = StringUtils.trimToNull(idCSVString);
+	}
+	public String getEDeliveryIds() {
+		return eDeliveryIds;
+	}
+	public void setTakNo(String takNo) {
+		this.takNo = StringUtils.trimToNull(takNo);
+	}
+	public String getTakNo() {
+		return this.takNo;
+	}
 }

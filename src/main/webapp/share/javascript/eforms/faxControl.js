@@ -22,6 +22,7 @@ var faxControl = {
 		demoNo = getSearchValue("demographic_no");
 		if (demoNo == "") { demoNo = getSearchValue("efmdemographic_no", jQuery("form").attr('action')); }
 		placeholder.html(faxControlPlaceholder);
+		var faxEnabled = true;
 		
 		$.ajax({
 			url:"../eform/efmformfax_form.jsp",
@@ -33,7 +34,8 @@ var faxControl = {
 					alert("Error loading fax control, please contact an administrator.");
 				}
 				else { 
-					placeholder.html(data);					
+					placeholder.html(data);
+					faxEnabled = (jQuery("#faxControl_faxEnabled").val() == "true");
 					var buttonLocation = jQuery("input[name='SubmitButton']");
 					if (buttonLocation.size() != 0) { 
 						buttonLocation = jQuery(buttonLocation[buttonLocation.size() -1]);
@@ -55,6 +57,12 @@ var faxControl = {
 					if (buttonLocation == null) { alert("Unable to find form or save button please check this is a proper eform."); return; }					
 					
 					updateFaxButton();
+					
+					if(!faxEnabled) {
+						placeholder.find(":input").prop('disabled', true);
+						placeholder.find(":button").prop('disabled', true);
+						console.info("fax is disabled for this oscar instance.");
+					}
 				}
 			}
 		});

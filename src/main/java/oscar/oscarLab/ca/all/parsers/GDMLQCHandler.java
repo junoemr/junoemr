@@ -161,7 +161,6 @@ public class GDMLQCHandler  implements MessageHandler {
             if (subIdent != null)
                 ident = ident+"&"+subIdent;
 
-            logger.info("returning obx identifier: "+ident);
             return(ident);
         }
         catch(Exception e){
@@ -425,7 +424,7 @@ public class GDMLQCHandler  implements MessageHandler {
     }
 
     @Override
-    public String getAge(){
+    public String getAge() {
         String age = "N/A";
         String dob = getDOB();
         try {
@@ -434,9 +433,9 @@ public class GDMLQCHandler  implements MessageHandler {
             java.util.Date dobDate = formatter.parse(dob);
             java.util.Date serviceDate = formatter.parse(getServiceDate());
             age = UtilDateUtilities.calcAgeAtDate(dobDate, serviceDate);
-        } catch (ParseException e) {
+        }
+        catch (ParseException e) {
             logger.error("Could not get age", e);
-
         }
         return age;
     }
@@ -447,8 +446,19 @@ public class GDMLQCHandler  implements MessageHandler {
     }
 
     @Override
-    public String getHealthNum(){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDExternalID().getID().getValue()));
+    public String getHealthNum() {
+    	
+    	String healthNum = "";
+    	int reps = msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalIDReps();
+    	
+    	for(int i=0; i<reps; i++) {
+    		String segmentLabel = msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalID(i).getAssigningAuthority().getNamespaceID().getValue();
+    		if("CANQC".equals(segmentLabel)) {
+    			healthNum = msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalID(i).getID().getValue();
+    			break;
+    		}
+    	}
+    	return(getString(healthNum));
     }
 
     @Override
@@ -538,7 +548,8 @@ public class GDMLQCHandler  implements MessageHandler {
     @Override
     public String getAccessionNum(){
         try{
-            return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalID(0).getID().getValue()));
+            //return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalID(0).getID().getValue()));
+        	return (getString(msg.getRESPONSE().getORDER_OBSERVATION().getORC().getPlacerGroupNumber().getEi1_EntityIdentifier().getValue()));
         }catch(Exception e){
             logger.error("Could not return accession num: ", e);
             return("");
@@ -572,32 +583,31 @@ public class GDMLQCHandler  implements MessageHandler {
         String docNames = "";
 
         try {
-            Terser terser = new Terser(msg);
-
-            String givenName = terser.get("/.ZDR(0)-4-1");
-            String middleName = terser.get("/.ZDR(0)-4-3");
-            String familyName = terser.get("/.ZDR(0)-4-2");
-
-            int i=1;
-            while (givenName != null){
-
-                if (i==1)
-                    docNames = givenName;
-                else
-                    docNames = docNames+", "+givenName;
-
-                if (middleName != null)
-                    docNames = docNames+" "+middleName;
-                if (familyName != null)
-                    docNames = docNames+" "+familyName;
-
-                givenName = terser.get("/.ZDR("+i+")-4-1");
-                middleName = terser.get("/.ZDR("+i+")-4-3");
-                familyName = terser.get("/.ZDR("+i+")-4-2");
-
+        	Terser terser = new Terser(msg);
+        	
+        	int i=0;
+        	String segmentType = terser.get("/.ZDR("+i+")-2");
+        	/* missing segment type implies no more ZDR segments */
+        	while(segmentType != null) {
+        		
+        		String givenName = terser.get("/.ZDR("+i+")-4-1");
+                String middleName = terser.get("/.ZDR("+i+")-4-3");
+                String familyName = terser.get("/.ZDR("+i+")-4-2");
+                /* ONLY include CC'd physicians info
+                 * types are C  - client info
+                 * 			 P  - physician info 
+                 * 			 CC - courtesy copy physician info */
+                if(segmentType.equals("CC") && givenName != null) {
+                    // combine names to single string
+                    docNames = (docNames.equals(""))? givenName : docNames+", "+givenName;
+                    if (middleName != null)
+                        docNames = docNames+" "+middleName;
+                    if (familyName != null)
+                        docNames = docNames+" "+familyName;
+                }
                 i++;
-            }
-
+                segmentType = terser.get("/.ZDR("+i+")-2");
+        	}
             return(docNames);
 
         } catch (Exception e) {
@@ -605,7 +615,6 @@ public class GDMLQCHandler  implements MessageHandler {
             //logger.error("Could not retrieve cc'd docs", e);
             return("");
         }
-
     }
 
     @Override

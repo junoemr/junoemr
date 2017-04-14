@@ -222,14 +222,18 @@ if(billNoRow != null && billNoRow.length > 0){
                      awnd.focus();
                 }
 
-
-//
-function HideElementById(ele){
-	document.getElementById(ele).style.display='none';
+function HideElementById(id){
+	var elem = document.getElementById(id);
+	if(elem) {
+		elem.style.display='none';
+	}
 }
 
-function ShowElementById(ele){
-	document.getElementById(ele).style.display='';
+function ShowElementById(id){
+	var elem = document.getElementById(id);
+	if(elem) {
+		elem.style.display='';
+	}
 }
 
 

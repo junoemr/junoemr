@@ -460,8 +460,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 			ofile = new File(documentCacheDir, d.getDocfilename() + "_" + pageNum + ".png");
 
-			if("yes".equalsIgnoreCase(OscarProperties.getInstance().getProperty(
-				"INVERT_DARK_DOCUMENT_PREVIEWS"))) {
+			if(OscarProperties.getInstance().isPropertyActive("INVERT_DARK_DOCUMENT_PREVIEWS")) {
 				correctImageFileColors(ofile);
 			}
 
@@ -868,6 +867,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 	        inputStream = ImageIO.createImageInputStream(file);
 	        Iterator iter = ImageIO.getImageReaders(inputStream);
+	        int inversionRatio = Integer.parseInt(OscarProperties.getInstance().getProperty("INVERT_DOCUMENT_BW_RATIO", "10"));
 
 	        if (!iter.hasNext())
 	        {
@@ -902,7 +902,7 @@ public class ManageDocumentAction extends DispatchAction {
 	        log.info(String.format("White vs Black image ratio: %s/%s",
 	        	countWhitish, countBlackish));
 
-	        if(countBlackish > (countWhitish * 10)) {
+	        if(countBlackish > (countWhitish * inversionRatio)) {
 	        	log.info("inverting image");
 
 		        for (int x = 0; x < width; x++) {
@@ -929,6 +929,7 @@ public class ManageDocumentAction extends DispatchAction {
         		try {
         			inputStream.close();
         		} catch (IOException e) {
+        			// do nothing.
         		}
         	}
         }

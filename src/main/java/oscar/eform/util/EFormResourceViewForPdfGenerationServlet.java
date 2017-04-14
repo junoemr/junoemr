@@ -9,6 +9,7 @@
 package oscar.eform.util;
 
 import java.io.IOException;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -95,9 +96,16 @@ public final class EFormResourceViewForPdfGenerationServlet extends HttpServlet 
 			url = "/dms/ManageDocument.do?method=display&doc_no" + docNo +
 					"&providerNo="+providerNo;
 		}
-		
-		RequestDispatcher requestDispatcher = request.getRequestDispatcher(url);
-		logger.debug("Request URL:" +url);
-		requestDispatcher.forward(request, response);
+		// allow this to serve up share files properly
+		if(path.equals("share") && fileName != null && !fileName.endsWith(".jsp") && !fileName.endsWith(".jspf")) {
+			String redirectURI = request.getContextPath() + url;
+			logger.info("Request URI:" + redirectURI);
+			response.sendRedirect(redirectURI);
+		}
+		else {
+			logger.info("Request URL:" +url);
+			RequestDispatcher requestDispatcher = request.getRequestDispatcher(url);
+			requestDispatcher.forward(request, response);
+		}
 	}
 }

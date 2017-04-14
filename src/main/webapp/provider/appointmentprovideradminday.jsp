@@ -458,7 +458,7 @@ function getElementsByClass(searchClass,node,tag) {
 <%
     Boolean showPersonal = (Boolean)session.getAttribute("showPersonal");
     if( showPersonal == null ) {
-        showPersonal = false;
+        showPersonal = OscarProperties.getInstance().isPropertyActive("appointment.show_reason_by_default");
     }
 %>
 var display = <%=showPersonal%>;

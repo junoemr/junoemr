@@ -67,6 +67,7 @@ import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.AdmissionManager;
 import org.oscarehr.PMmodule.service.ProgramManager;
+import org.oscarehr.casemgmt.dao.CaseManagementIssueDAO;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
@@ -187,6 +188,7 @@ import oscar.util.UtilDateUtilities;
     ProviderDataDao providerDataDao = (ProviderDataDao) SpringUtils.getBean("providerDataDao");
     PartialDateDao partialDateDao = (PartialDateDao) SpringUtils.getBean("partialDateDao");
     DemographicExtDao demographicExtDao = (DemographicExtDao) SpringUtils.getBean("demographicExtDao");
+	CaseManagementIssueDAO caseManagementIssueDAO = (CaseManagementIssueDAO) SpringUtils.getBean("caseManagementIssueDAO");
     
     /*
      * Custom flags for controlling import notes in the main e-chart.
@@ -1501,17 +1503,17 @@ import oscar.util.UtilDateUtilities;
                     	endDate.add(Calendar.DAY_OF_YEAR, Integer.valueOf(duration)+timeShiftInDays);
                     drug.setEndDate(endDate.getTime());
 
-                    String freq = StringUtils.noNull(medArray[i].getFrequency());
-                    int prnPos = freq.toUpperCase().indexOf("PRN");
-                    if (prnPos>=0) {
-                    	 drug.setPrn(true);
-                    	 freq = freq.substring(0, prnPos).trim() +" "+ freq.substring(prnPos+3).trim(); //remove "prn" from freq
-                    }
-                    drug.setFreqCode(freq);
-
-                    drug.setFreqCode(medArray[i].getFrequency());
-                    if (medArray[i].getFrequency()!=null && medArray[i].getFrequency().contains("PRN")) drug.setPrn(true);
-                    else drug.setPrn(false);
+					// coerce the frequency code into oscar's format
+					String freq = StringUtils.noNull(medArray[i].getFrequency());
+					int prnPos = freq.toUpperCase().indexOf("PRN");
+					drug.setPrn(false);
+	
+					if (prnPos >= 0) { // frequency code contains PRN
+						drug.setPrn(true);
+						// Remove PRN from frequency code
+						freq = freq.substring(0, prnPos).trim() + freq.substring(prnPos + 3).trim();
+					}
+					drug.setFreqCode(freq);
 
                     drug.setRegionalIdentifier(medArray[i].getDrugIdentificationNumber());
                     drug.setRoute(medArray[i].getRoute());
@@ -2633,95 +2635,66 @@ import oscar.util.UtilDateUtilities;
             return name;
     }
 
-    HashMap<String, String> getPersonName(cdsDt.PersonNameSimpleWithMiddleName person) {
-            HashMap<String,String> name = new HashMap<String,String>();
-            if (person!=null) {
-                name.put("firstname", StringUtils.noNull(person.getFirstName()).trim()+" "+StringUtils.noNull(person.getMiddleName()).trim());
-                name.put("lastname", StringUtils.noNull(person.getLastName()).trim());
-            }
-            return name;
-    }
+	HashMap<String, String> getPersonName(cdsDt.PersonNameSimpleWithMiddleName person) {
+		HashMap<String, String> name = new HashMap<String, String>();
+		if (person != null) {
+			name.put("firstname", StringUtils.noNull(person.getFirstName()).trim() + " "
+					+ StringUtils.noNull(person.getMiddleName()).trim());
+			name.put("lastname", StringUtils.noNull(person.getLastName()).trim());
+		}
+		return name;
+	}
 
 	String defaultProviderNo() {
 		ProviderData pd = getProviderByNames(IMPORT_DEFAULT_PROVIDER_FIRST_NAME, IMPORT_DEFAULT_PROVIDER_LAST_NAME, true);
-		if (pd!=null) return pd.getProviderNo();
+		if (pd != null) return pd.getProviderNo();
 
 		return writeProviderData(IMPORT_DEFAULT_PROVIDER_FIRST_NAME, IMPORT_DEFAULT_PROVIDER_LAST_NAME, "");
 	}
 
-        boolean isICD9(cdsDt.StandardCoding diagCode) {
-                if (diagCode==null) return false;
+	boolean isICD9(cdsDt.StandardCoding diagCode) {
+		if (diagCode == null) return false;
 
-                String codingSystem = StringUtils.noNull(diagCode.getStandardCodingSystem()).toLowerCase();
+		String codingSystem = StringUtils.noNull(diagCode.getStandardCodingSystem()).toLowerCase();
 		return (codingSystem.contains("icd") && codingSystem.contains("9"));
-        }
+	}
 
-        boolean isICD9(cdsDt.Code diagCode) {
-                if (diagCode==null) return false;
+	boolean isICD9(cdsDt.Code diagCode) {
+		if (diagCode == null) return false;
 
-                String codingSystem = StringUtils.noNull(diagCode.getCodingSystem()).toLowerCase();
+		String codingSystem = StringUtils.noNull(diagCode.getCodingSystem()).toLowerCase();
 		return (codingSystem.contains("icd") && codingSystem.contains("9"));
-        }
+	}
 
+	/** retrieves the CasemanagementIssue associated with the given code. 
+	 * If none exists, it adds one if there is a matching issue with the code */
 	Set<CaseManagementIssue> getCMIssue(String code) {
-		CaseManagementIssue cmIssu = new CaseManagementIssue();
-		cmIssu.setDemographic_no(demographicNo);
-		Issue isu = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(code));
-		cmIssu.setIssue_id(isu.getId());
-		cmIssu.setType(isu.getType());
-		caseManagementManager.saveCaseIssue(cmIssu);
-
+		
 		Set<CaseManagementIssue> sCmIssu = new HashSet<CaseManagementIssue>();
-		sCmIssu.add(cmIssu);
+		CaseManagementIssue cmIssue = caseManagementIssueDAO.getIssuebyIssueCode(demographicNo, StringUtils.noNull(code));
+		if (cmIssue == null) {
+			Issue issue = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(code));
+			if(issue != null) {
+				// add a new CaseManagementIssue with a valid issue
+				cmIssue = new CaseManagementIssue();
+				cmIssue.setDemographic_no(demographicNo);
+				cmIssue.setIssue_id(issue.getId());
+				cmIssue.setType(issue.getType());
+				caseManagementIssueDAO.saveIssue(cmIssue);
+			}
+		}
+		if(cmIssue != null) {
+			sCmIssu.add(cmIssue);
+		}
 		return sCmIssu;
 	}
 
 	Set<CaseManagementIssue> getCMIssue(String issueCode, cdsDt.StandardCoding diagCode) {
+		
 		Set<CaseManagementIssue> sCmIssu = new HashSet<CaseManagementIssue>();
-		Issue isu = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(issueCode));
-		if (isu!=null) {
-			CaseManagementIssue cmIssu = new CaseManagementIssue();
-			cmIssu.setDemographic_no(demographicNo);
-			cmIssu.setIssue_id(isu.getId());
-			cmIssu.setType(isu.getType());
-			caseManagementManager.saveCaseIssue(cmIssu);
-			sCmIssu.add(cmIssu);
-		}
+		sCmIssu.addAll(getCMIssue(issueCode));
 		if (isICD9(diagCode)) {
-			isu = caseManagementManager.getIssueInfoByCode(noDot(diagCode.getStandardCode()));
-			if (isu!=null) {
-				CaseManagementIssue cmIssu = new CaseManagementIssue();
-				cmIssu.setDemographic_no(demographicNo);
-				cmIssu.setIssue_id(isu.getId());
-				cmIssu.setType(isu.getType());
-				caseManagementManager.saveCaseIssue(cmIssu);
-				sCmIssu.add(cmIssu);
-			}
-		}
-		return sCmIssu;
-	}
-
-	Set<CaseManagementIssue> getCMIssue(String cppName, cdsDt.Code diagCode) {
-		Set<CaseManagementIssue> sCmIssu = new HashSet<CaseManagementIssue>();
-		Issue isu = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(cppName));
-		if (isu!=null) {
-			CaseManagementIssue cmIssu = new CaseManagementIssue();
-			cmIssu.setDemographic_no(demographicNo);
-			cmIssu.setIssue_id(isu.getId());
-			cmIssu.setType(isu.getType());
-			caseManagementManager.saveCaseIssue(cmIssu);
-			sCmIssu.add(cmIssu);
-		}
-                if (isICD9(diagCode)) {
-			isu = caseManagementManager.getIssueInfoByCode(StringUtils.noNull(diagCode.getValue()));
-			if (isu!=null) {
-				CaseManagementIssue cmIssu = new CaseManagementIssue();
-				cmIssu.setDemographic_no(demographicNo);
-				cmIssu.setIssue_id(isu.getId());
-				cmIssu.setType(isu.getType());
-				caseManagementManager.saveCaseIssue(cmIssu);
-				sCmIssu.add(cmIssu);
-			}
+			sCmIssu.addAll(getCMIssue(noDot(diagCode.getStandardCode())));
 		}
 		return sCmIssu;
 	}

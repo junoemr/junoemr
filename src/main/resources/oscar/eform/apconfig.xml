@@ -99,6 +99,11 @@
 		<ap-sql>SELECT providerExt.signature FROM providerExt WHERE providerExt.provider_no='${provider}' </ap-sql>
 		<ap-output>${signature}</ap-output>
     </databaseap>
+    <databaseap>
+		<ap-name>current_user_takno</ap-name>
+		<ap-sql>SELECT p.tak_no as takno FROM provider p WHERE p.provider_no='${provider}' </ap-sql>
+		<ap-output>${takno}</ap-output>
+	</databaseap>
 	<databaseap>
 		<ap-name>current_logged_in_user</ap-name>
 		<ap-sql>SELECT provider.first_name, provider.last_name FROM provider WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
@@ -118,6 +123,11 @@
 		<ap-name>current_logged_in_user_id</ap-name>
 		<ap-sql>SELECT '${loggedInProvider}' as id </ap-sql>
 		<ap-output>${id}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_logged_in_user_takno</ap-name>
+		<ap-sql>SELECT p.tak_no as takno FROM provider p WHERE p.provider_no='${loggedInProvider}' </ap-sql>
+		<ap-output>${takno}</ap-output>
 	</databaseap>
     
 <!-- Patient demographic information -->
@@ -365,6 +375,11 @@
 		<ap-output>${producer_name}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>licensed_producer2_by_demographic</ap-name>
+		<ap-sql>SELECT lp.producer_name AS producer_name FROM demographic_licensed_producer d JOIN licensed_producer lp ON (d.producer_id2=lp.producer_id) where d.demographic_no=${demographic}</ap-sql>
+		<ap-output>${producer_name}</ap-output>
+	</databaseap>
+	<databaseap>
         <ap-name>licensed_producer_address_name</ap-name>
         <ap-sql>SELECT pa.display_name as address_name
         		 FROM demographic_licensed_producer d JOIN licensed_producer_address pa ON (d.address_id=pa.address_id) where d.demographic_no=${demographic}
@@ -609,13 +624,18 @@
                 FROM drugs d WHERE d.demographic_no=${demographic} AND d.end_date &gt; DATE_ADD(CURDATE(), INTERVAL -1 WEEK);</ap-sql>
         <ap-output>${rxlist}</ap-output>
     </databaseap>
-    
     <databaseap>
+    	<!-- get the latest note uuid by observation_date. Then the latest revision by update_date -->
         <ap-name>latest_echart_note</ap-name>
-        <ap-sql>SELECT distinct cmn.note AS note FROM casemgmt_note cmn
-				WHERE cmn.demographic_no = ${demographic}
-				AND cmn.include_issue_innote='0'
-				ORDER BY cmn.observation_date 
+        <ap-sql>SELECT cmn.note AS note FROM casemgmt_note cmn
+				JOIN (SELECT DISTINCT a.uuid FROM casemgmt_note a
+					WHERE a.demographic_no=${demographic}
+					AND a.include_issue_innote='0'
+					ORDER BY a.observation_date DESC LIMIT 1)
+				AS A ON (cmn.uuid = A.uuid)
+				WHERE cmn.demographic_no=${demographic}
+				AND include_issue_innote='0'
+				ORDER BY update_date
 				DESC LIMIT 1;
 		</ap-sql>
         <ap-output>${note}</ap-output>

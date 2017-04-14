@@ -177,7 +177,7 @@ public class WCBTeleplanSubmission {
       return this.Claim5(dsn, bm, wcb);
    }
    private String Claim1(String logNo,Billingmaster bm,WCB wcb) {
-      return this.Claim(logNo, bm.getBillAmount(), bm.getBillingCode(),TeleplanFileWriter.roundUp(bm.getBillingUnit()), "N", bm, wcb);
+      return this.Claim(logNo, bm.getBillAmount(), bm.getBillingCode(), "N", bm, wcb);
    }
 
 
@@ -251,11 +251,12 @@ public class WCBTeleplanSubmission {
       return this.Note(logNo,Misc.backwardSpace(((length >= 400)? wcb.getW_clinicinfo().substring(400, length): "Clinical Information Complete"),400),bm,wcb);
    }
    private String Claim5(String logNo,Billingmaster bm,WCB wcb) {      
-      return this.Claim(logNo, bm.getBillAmount(), bm.getBillingCode() ,TeleplanFileWriter.roundUp(bm.getBillingUnit()), "0",bm,wcb);
+      return this.Claim(logNo, bm.getBillAmount(), bm.getBillingCode(), "0",bm,wcb);
    }
    private String Note(String logNo, String a,Billingmaster bm,WCB wcb) {
       return this.Note(logNo, a, "",bm,wcb);
    }
+   @SuppressWarnings("unused")
    private String Note(String logNo, String a, String b,Billingmaster bm,WCB wcb) {
       return "N01" + this.ClaimNote1Head(logNo,bm.getPayeeNo(),bm.getPractitionerNo()) + "W" + replaceExtendedAskiiValues(a) + replaceExtendedAskiiValues(b);
    }
@@ -271,12 +272,7 @@ public class WCBTeleplanSubmission {
       return formatterDate.format(date);
    }
 
-   
-   private String Claim(String logNo, String billedAmount, String feeitem,String correspondenceCode,Billingmaster bm,WCB wcb) {
-	   String billingUnit = "1";
-	   return Claim(logNo, billedAmount,  feeitem, billingUnit,correspondenceCode, bm,wcb) ;
-   }
-   private String Claim(String logNo, String billedAmount, String feeitem,String billingUnit,String correspondenceCode,Billingmaster bm,WCB wcb) {
+   private String Claim(String logNo, String billedAmount, String feeitem, String correspondenceCode,Billingmaster bm,WCB wcb) {
       StringBuilder dLine = new StringBuilder();
       log.debug("Demographic "+demographicDao+"   "+bm.getDemographicNo());
       Demographic d = demographicDao.getDemographic(""+bm.getDemographicNo()); 
@@ -289,7 +285,7 @@ public class WCBTeleplanSubmission {
       dLine.append( "0" );//Misc.space(1)
       dLine.append( "00");//Misc.backwardSpace("", 2).toUpperCase()
       dLine.append( Misc.zero(2));
-      dLine.append( Misc.forwardZero(bm.getBillingUnit().replaceAll("\\..*", ""), 3)); // SR#: 7153 v1.9 Section 6.1.1 SEQ P20
+      dLine.append( Misc.forwardZero(TeleplanFileWriter.roundUp(bm.getBillingUnit()), 3)); // SR#: 7153 v1.9 Section 6.1.1 SEQ P20
       dLine.append( Misc.zero(2 + 2 + 1 + 2) ); //clarification
       dLine.append( Misc.forwardZero(feeitem, 5));
       dLine.append( Misc.moneyFormatPaddedZeroNoDecimal(billedAmount, 7));

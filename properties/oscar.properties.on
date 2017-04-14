@@ -630,7 +630,7 @@ ECHART_VERSIGN_LINE=[${oscarEncounter.class.EctSaveEncounterAction.msgVerAndSig}
 # and the executable is in the path of the running process.
 # This is used for converting html screens to pdf's. As an example to send eforms to MyOscar it first converts the eform to pdf.
 # This value should not be null.
-WKHTMLTOPDF_COMMAND=wkhtmltopdf
+WKHTMLTOPDF_COMMAND=wkhtmltopdf --print-media-type
 
 # This is the error correction level QR Codes will be rendered with. Do not change this value unless
 # you know what you're doing. This is the com.google.zxing.qrcode.decoder.ErrorCorrectionLevel values
@@ -961,6 +961,8 @@ auto_populate_billingreferral_bc=true
 
 #OHSUPPORT-2463: invert dark document previews (workaround pdf to png bug where previews had inverted colors)
 #INVERT_DARK_DOCUMENT_PREVIEWS=yes
+# Control the ratio of black to white in an image to trigger inversion. if ratio=n, inversion is triggered if dark > n*light.
+#INVERT_DOCUMENT_BW_RATIO=10
 
 # OHSUPPORT-2541 show uploaded by in the inbox
 #INBOX_UPLOADED_BY_COLUMN=yes
@@ -1020,3 +1022,17 @@ auto_populate_billingreferral_bc=true
 # OHSUPPORT-3434 -- add email link to the patient email address in the demographic master file. 
 enable_demographic_email_link=false
 
+# OHSUPPORT-3700 -- adjustable font sizes for consultation/lab pdf generation.
+#lab.pdfCreator.baseFontSize=8
+#lab.pdfCreator.headerFontSize.pdf=9
+#lab.pdfCreator.headerFontSizeBold.pdf=10
+#lab.pdfCreator.headerFontSize.rtf=11
+#lab.pdfCreator.headerFontSizeBold.rtf=12
+
+#consultation.pdfCreator.headerFontSize=14
+#consultation.pdfCreator.infoFontSize=12
+#consultation.pdfCreator.baseFontSize=9
+#consultation.pdfCreator.boldFontSize=10
+
+# OHSUPPORT-3769 - display reason on appointments by default.
+#appointment.show_reason_by_default=no

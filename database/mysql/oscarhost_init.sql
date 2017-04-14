@@ -190,6 +190,11 @@ CREATE INDEX idx_scheduledate_sdate_provider_no_status ON scheduledate (sdate, p
 
 CREATE INDEX idx_log_action_provider_no_content_contentId ON log (action, provider_no, content, contentId);
 
+-- OHSUPPORT-3588 - allow multiple routes per provider for alberta labs using new column
+ALTER TABLE `provider` ADD COLUMN `e_delivery_ids` text;
+ALTER TABLE `providerArchive` ADD COLUMN `e_delivery_ids` text;
 
-
+-- OHSUPPORT-3682 - add a TAK number filed for alberta instances.
+ALTER TABLE `provider` ADD COLUMN `tak_no` VARCHAR(20);
+ALTER TABLE `providerArchive` ADD COLUMN `tak_no` VARCHAR(20);
 

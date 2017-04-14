@@ -38,10 +38,15 @@ public class WKHtmlToPdfUtils {
 	private static final int PROCESS_COMPLETION_CYCLE_CHECK_PERIOD = 250;
 	private static final int MAX_NO_CHANGE_COUNT = 40000 / PROCESS_COMPLETION_CYCLE_CHECK_PERIOD;
 	private static final String CONVERT_COMMAND;
+	private static final String CONVERT_COMMAND_LABEL;
 	static {
 		String convertCommand = OscarProperties.getInstance().getProperty("WKHTMLTOPDF_COMMAND");
 		if (convertCommand != null) CONVERT_COMMAND = convertCommand;
 		else throw (new RuntimeException("Properties file is missing property : WKHTMLTOPDF_COMMAND"));
+		
+		String convertCommandLabel = OscarProperties.getInstance().getProperty("WKHTMLTOPDF_COMMAND_LABEL");
+		if (convertCommandLabel != null) CONVERT_COMMAND_LABEL = convertCommandLabel;
+		else CONVERT_COMMAND_LABEL = CONVERT_COMMAND;
 	}
 
 	private WKHtmlToPdfUtils() {
@@ -83,6 +88,19 @@ public class WKHtmlToPdfUtils {
 		logger.info("Creating : "+outputFilename);
 		// example command : wkhtmltopdf-i386 "https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&parentAjaxId=eforms" /tmp/out.pdf
 		String elements=CONVERT_COMMAND + " " + sourceUrl + " " + outputFilename;
+		String[] command = elements.split(" ");
+		logger.info("Running : "+elements);
+		runtimeExec(command, outputFilename);
+	}
+	/**
+	 * This method should convert the html page at the sourceUrl into a pdf (of label size) written to the outputFile. This method requires wkhtmltopdf to be installed on the machine. In general the outputFile should be a unique temp file. If you're not sure what you're
+	 * doing don't call this method as you will leave lingering data everywhere or you may overwrite important files...
+	 */
+	public static void convertToPdfLabel(String sourceUrl, File outputFile) throws IOException {
+		String outputFilename = outputFile.getCanonicalPath();
+		logger.info("Creating : "+outputFilename);
+		// example command : wkhtmltopdf-i386 "https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&parentAjaxId=eforms" /tmp/out.pdf
+		String elements=CONVERT_COMMAND_LABEL + " " + sourceUrl + " " + outputFilename;
 		String[] command = elements.split(" ");
 		logger.info("Running : "+elements);
 		runtimeExec(command, outputFilename);

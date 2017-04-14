@@ -24,10 +24,9 @@
 package org.oscarehr.PMmodule.dao;
 
 import java.math.BigInteger;
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -43,12 +42,13 @@ import org.oscarehr.common.model.ProviderFacility;
 import org.oscarehr.common.model.ProviderFacilityPK;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+
+import com.quatro.model.security.SecProvider;
 
 import oscar.OscarProperties;
 import oscar.util.SqlUtils;
-
-import com.quatro.model.security.SecProvider;
 
 public class ProviderDao extends HibernateDaoSupport {
 	private static Logger log = MiscUtils.getLogger();
@@ -388,4 +388,34 @@ public class ProviderDao extends HibernateDaoSupport {
 
 		return providerList;
 	}
+	
+	public List<Provider> getProvidersByFieldId(String docNo, String labType, String searchOn, Integer limit, boolean orderByLength) {
+		
+		HibernateTemplate template = getHibernateTemplate();
+		String sql = "FROM Provider p WHERE " + searchOn + " = ? ";
+		Object[] params = {docNo};
+		// Allow multiple route ids to be used for lab matching
+		if (labType.equals("CLS")) {
+			sql += " OR p.EDeliveryIds = ? OR p.EDeliveryIds like ? OR p.EDeliveryIds like ? OR p.EDeliveryIds like ? ";
+			params = new String[] {docNo, docNo, docNo + ",%", "%," + docNo + ",%", "%," + docNo};
+		}
+		if (orderByLength) {
+			sql += " order by length(p.FirstName)";
+		}
+		if(limit != null && limit > 0) {
+			template.setMaxResults(limit);
+		}
+		log.debug(sql);
+		
+		@SuppressWarnings("unchecked")
+		List<Provider> providerList = template.find(sql, params);
+		return providerList;
+	}
+	@SuppressWarnings("unchecked")
+	public List<Provider> getProviderByPatientId(Integer patientId) {
+        String hql = "SELECT p FROM Provider p, Demographic d "
+    				+ "WHERE d.ProviderNo = p.ProviderNo " 
+        			+ "AND d.DemographicNo = ?";
+    	return this.getHibernateTemplate().find(hql, patientId);
+    }
 }

@@ -67,6 +67,7 @@ import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.rtf.RtfWriter2;
 
+import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.CLSDIHandler;
 import oscar.oscarLab.ca.all.parsers.CLSHandler;
@@ -82,6 +83,7 @@ import oscar.util.UtilDateUtilities;
 public class LabPDFCreator extends PdfPageEventHelper{
 	
 	private static final Logger logger=MiscUtils.getLogger();
+	private static final OscarProperties props = OscarProperties.getInstance();
 	
     private OutputStream os;
 
@@ -154,11 +156,15 @@ public class LabPDFCreator extends PdfPageEventHelper{
     	document.addCreator("OSCAR");
     	document.open();
     	
+    	// check for custom font size property
+    	int fontSize = Integer.parseInt(props.getProperty("lab.pdfCreator.headerFontSize.rtf", "11"));
+    	int boldSize = Integer.parseInt(props.getProperty("lab.pdfCreator.headerFontSizeBold.rtf", "12"));
+    	
         //Create the fonts that we are going to use
         bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-        font = new Font(bf, 11, Font.NORMAL);
-        boldFont = new Font(bf, 12, Font.BOLD);
-        redFont = new Font(bf, 11, Font.NORMAL, Color.RED);
+        font = new Font(bf, fontSize, Font.NORMAL);
+        boldFont = new Font(bf, boldSize, Font.BOLD);
+        redFont = new Font(bf, fontSize, Font.NORMAL, Color.RED);
         
         //add the patient information
         addRtfPatientInfo();
@@ -194,12 +200,16 @@ public class LabPDFCreator extends PdfPageEventHelper{
         document.addTitle("Title of the Document");
         document.addCreator("OSCAR");
         document.open();
+        
+        // check for custom font size property
+        int fontSize = Integer.parseInt(props.getProperty("lab.pdfCreator.headerFontSize.pdf", "9"));
+        int boldSize = Integer.parseInt(props.getProperty("lab.pdfCreator.headerFontSizeBold.pdf", "10"));
 
         //Create the fonts that we are going to use
         bf = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-        font = new Font(bf, 9, Font.NORMAL);
-        boldFont = new Font(bf, 10, Font.BOLD);
-        redFont = new Font(bf, 9, Font.NORMAL, Color.RED);
+        font = new Font(bf, fontSize, Font.NORMAL);
+        boldFont = new Font(bf, boldSize, Font.BOLD);
+        redFont = new Font(bf, fontSize, Font.NORMAL, Color.RED);
 
         // add the header table containing the patient and lab info to the document
         createInfoTable();
@@ -334,8 +344,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 			cell.setBorder(15);
 			cell.setPadding(3);
 			cell.setColspan(2);
-			cell.setPhrase(new Phrase(header.replaceAll("<br\\s*/*>", "\n"),
-					new Font(bf, 12, Font.BOLD)));
+			cell.setPhrase(new Phrase(header.replaceAll("<br\\s*/*>", "\n"), new Font(bf, 12, Font.BOLD)));
 			table.addCell(cell);
 			cell.setPhrase(new Phrase("  "));
 			cell.setBorder(0);
@@ -470,9 +479,8 @@ public class LabPDFCreator extends PdfPageEventHelper{
 							}
 
 							// add the obx results and info
-							Font lineFont = new Font(bf, 8, Font.NORMAL,
-									getTextColor(handler.getOBXAbnormalFlag(j,
-											k)));
+							int fontSize = Integer.parseInt(props.getProperty("lab.pdfCreator.baseFontSize", "8"));
+							Font lineFont = new Font(bf, fontSize, Font.NORMAL, getTextColor(handler.getOBXAbnormalFlag(j,k)));
 							// cell.setBackgroundColor(getHighlightColor(linenum));
 							linenum++;
 							if(isUnstructuredDoc)

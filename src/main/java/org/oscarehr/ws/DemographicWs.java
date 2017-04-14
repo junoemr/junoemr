@@ -72,6 +72,22 @@ public class DemographicWs extends AbstractWs {
 		}
 		return transfer;
 	}
+	/** Retrieve a list of demographics matched by lastname, fisrtname */
+	public List<DemographicTransfer> getDemographicsByName(String lastName, String firstName, boolean activeOnly) {
+		List<Demographic> demographicList=demographicManager.getDemographicsByName(lastName, firstName, activeOnly, 10);
+		List<DemographicTransfer> transferList = new ArrayList<DemographicTransfer>();
+		
+		for(Demographic demographic: demographicList) {
+			DemographicCust custResult = demographicCustManager.getDemographicCust(demographic.getDemographicNo());
+
+			DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
+			if(custResult != null) {
+				transfer.setNotes(custResult.getParsedNotes());
+			}
+			transferList.add(transfer);
+		}
+		return transferList;
+	}
 
 	public DemographicTransfer getDemographicByMyOscarUserName(String myOscarUserName)
 	{

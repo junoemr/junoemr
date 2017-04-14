@@ -45,6 +45,8 @@
 	import="org.oscarehr.casemgmt.service.CaseManagementManager,org.oscarehr.casemgmt.model.CaseManagementNote,org.oscarehr.casemgmt.model.Issue,org.oscarehr.common.model.UserProperty,org.oscarehr.common.dao.UserPropertyDAO,org.springframework.web.context.support.*,org.springframework.web.context.*"%>
 
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
+<%@page import="org.oscarehr.common.dao.DemographicExtDao"%>
+<%@page import="org.oscarehr.common.model.DemographicExt"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.oscarehr.common.model.Site"%>
 <%@page import="org.oscarehr.util.WebUtils, oscar.SxmlMisc"%>
@@ -89,10 +91,10 @@ displayServiceUtil.estSpecialist();
 			defaultSiteName = siteDao.getSiteNameByAppointmentNo(appNo);
 		}
 	}
-%>
+	
+	DemographicExtDao demographicExtDao = (DemographicExtDao)SpringUtils.getBean("demographicExtDao");
 
 
-<%
 		String demo = request.getParameter("de");
 		String requestId = request.getParameter("requestId");
 		// segmentId is != null when viewing a remote consultation request from an hl7 source
@@ -1206,6 +1208,8 @@ function chooseEmail(){
 					thisForm.setCurrentMedications(RxInfo.getCurrentMedication(demo));
 				}
 				team = consultUtil.mrp.equals("") ? "" : consultUtil.getProviderTeam(consultUtil.mrp);
+				
+				
 			}
 
 			thisForm.setStatus("1");
@@ -1226,6 +1230,14 @@ function chooseEmail(){
 				</SCRIPT>
 			<%
 		}
+		/* add the demographic cell phone if property enabled */
+		if(demographic != null && props.isPropertyActive("consultation.include_patient_cellno")) {
+			int demographic_no = demographic.getDemographicNo();
+			DemographicExt demoExt = demographicExtDao.getLatestDemographicExt(demographic_no, "demo_cell");
+			String patientCPhone = (demoExt == null) ? "" : org.apache.commons.lang.StringUtils.trimToEmpty(demoExt.getValue());
+			thisForm.setPatientCPhone(patientCPhone);
+		}
+		
 
 
 	%>
@@ -1848,6 +1860,14 @@ function chooseEmail(){
 							</td>
 							<td class="tite2"><%=thisForm.getPatientWPhone()%></td>
 						</tr>
+						<%if(props.isPropertyActive("consultation.include_patient_cellno")) {%>
+						<tr>
+							<td class="tite4"><bean:message
+								key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgCPhone" />:
+							</td>
+							<td class="tite2"><%=thisForm.getPatientCPhone()%></td>
+						</tr>
+						<%} %>
 						<tr>
 							<td class="tite4"><bean:message
 								key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgBirthDate" />:

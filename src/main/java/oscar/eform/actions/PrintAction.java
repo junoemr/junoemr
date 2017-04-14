@@ -28,9 +28,9 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
 
-import oscar.util.UtilDateUtilities;
-
 import com.sun.xml.messaging.saaj.util.ByteOutputStream;
+
+import oscar.util.UtilDateUtilities;
 
 public class PrintAction extends Action {
 
@@ -39,6 +39,8 @@ public class PrintAction extends Action {
 	private String localUri = null;
 	
 	private boolean skipSave = false;
+	private boolean printLabel = false;
+	
 	
 	private HttpServletResponse response;
 
@@ -49,6 +51,7 @@ public class PrintAction extends Action {
 		String id  = (String)request.getAttribute("fdid");
 		String providerId = request.getParameter("providerId");
 		skipSave = "true".equals(request.getParameter("skipSave"));
+		printLabel = "true".equals(request.getParameter("labelSizing"));
 		try {
 			printForm(id, providerId);
 		} catch (Exception e) {
@@ -110,7 +113,12 @@ public class PrintAction extends Action {
 
 			// convert to PDF
 			String viewUri = localUri + formId;
-			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
+			if(printLabel) {
+				WKHtmlToPdfUtils.convertToPdfLabel(viewUri, tempFile);
+			}
+			else {
+				WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
+			}
 			logger.info("Writing pdf to : "+tempFile.getCanonicalPath());
 			
 			

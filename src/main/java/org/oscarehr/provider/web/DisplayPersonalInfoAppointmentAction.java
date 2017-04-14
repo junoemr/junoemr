@@ -32,33 +32,35 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import oscar.OscarProperties;
+
 /**
  * Toggles variable for displaying reason on appointment page
+ * 
  * @author rjonasz
  */
 public class DisplayPersonalInfoAppointmentAction extends DispatchAction {
-    
-    /** Creates a new instance of DisplayPersonalInfoAppointmentAction */
-    public DisplayPersonalInfoAppointmentAction() {
-    }
-    
-     public ActionForward toggle(ActionMapping actionmapping,
-                               ActionForm actionform,
-                               HttpServletRequest request,
-                               HttpServletResponse response) {
-            
-        Boolean showPersonal = (Boolean)request.getSession().getAttribute("showPersonal");
-            
-        if( showPersonal == null ) {
-            showPersonal = true;        
-        }
-        else {
-            showPersonal = !showPersonal;
-        }
-        
-        request.getSession().setAttribute("showPersonal",showPersonal);
-        
-        return null;
-     }
-     
+
+	/** Creates a new instance of DisplayPersonalInfoAppointmentAction */
+	public DisplayPersonalInfoAppointmentAction() {
+	}
+
+	public ActionForward toggle(ActionMapping actionmapping, ActionForm actionform, HttpServletRequest request,
+			HttpServletResponse response) {
+
+		Boolean showPersonal = (Boolean) request.getSession().getAttribute("showPersonal");
+
+		if (showPersonal == null) {
+			//showPersonal = true;
+			showPersonal = !OscarProperties.getInstance().isPropertyActive("appointment.show_reason_by_default");
+		}
+		else {
+			showPersonal = !showPersonal;
+		}
+
+		request.getSession().setAttribute("showPersonal", showPersonal);
+
+		return null;
+	}
+
 }

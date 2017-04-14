@@ -37,6 +37,7 @@
 	
 	// Custom licensed producer fields
 	String licensedProducerDefault = "None";
+	String licensedProducerDefault2 = "None";
 	String licensedProducerDefaultAddress = "None";
 %>
 
@@ -65,7 +66,7 @@
     {"search_rsstatus", "select distinct roster_status from demographic where roster_status != '' and roster_status != 'RO' and roster_status != 'NR' and roster_status != 'TE' and roster_status != 'FS' "},
     {"search_ptstatus", "select distinct patient_status from demographic where patient_status != '' and patient_status != 'AC' and patient_status != 'IN' and patient_status != 'DE' and patient_status != 'MO' and patient_status != 'FI'"},
     {"search_waiting_list", "select * from waitingListName where group_no='" + ((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo() +"' and is_history='N'  order by name"},
-    {"search_licensed_producer", "SELECT producer_id, producer_name FROM licensed_producer ORDER BY producer_id"},
+    {"search_licensed_producer", "SELECT producer_id, producer_name FROM licensed_producer ORDER BY producer_name"},
     {"search_licensed_producer_address_name", "SELECT address_id, display_name FROM licensed_producer_address ORDER BY display_name"}
   };
   String[][] responseTargets=new String[][] {  };
@@ -964,7 +965,7 @@ function autoFillHin(){
 		<option value="BC"<%=HCType.equals("BC")?" selected":""%>>BC-British Columbia</option>
 		<option value="MB"<%=HCType.equals("MB")?" selected":""%>>MB-Manitoba</option>
 		<option value="NB"<%=HCType.equals("NB")?" selected":""%>>NB-New Brunswick</option>
-		<% if ( oscarProps.getProperty("billregion") != null &&  oscarProps.getProperty("billregion").equals("BC")) {%>
+		<% if ( oscarProps.getProperty("billregion") != null &&  oscarProps.getProperty("billregion").equals("BC")&& !oscarProps.isPropertyActive("clinicaid_billing")) {%>
 		<option value="NF"<%=HCType.equals("NF")?" selected":""%>>NF-Newfoundland & Labrador</option>
 		<% } else { %>
 		<option value="NL"<%=HCType.equals("NL")?" selected":""%>>NL-Newfoundland & Labrador</option>
@@ -1318,6 +1319,22 @@ document.forms[1].r_doctor_ohip.value = refNo;
 						<select name="licensed_producer">
 						<option selected value="0"><%=licensedProducerDefault%></option>
 						<%
+						while(producerRs.next()) {
+							%>
+							<option value="<%=producerRs.getString("producer_id")%>"><%=producerRs.getString("producer_name")%></option>
+							<%
+						}
+						%>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.licensedProducer2" />:</b></td>
+					<td align="left">
+						<select name="licensed_producer2">
+						<option selected value="0"><%=licensedProducerDefault2%></option>
+						<%
+						producerRs.beforeFirst();
 						while(producerRs.next()) {
 							%>
 							<option value="<%=producerRs.getString("producer_id")%>"><%=producerRs.getString("producer_name")%></option>
