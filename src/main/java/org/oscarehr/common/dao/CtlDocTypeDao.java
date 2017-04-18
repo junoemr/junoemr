@@ -62,7 +62,7 @@ public class CtlDocTypeDao extends AbstractDao<CtlDocType>{
 	}
 	
 	public List<CtlDocType> findByStatusAndModule(List<String> status, String module){
-		Query query = entityManager.createQuery("select c from CtlDocType c where c.status in (?1) and c.module=?2");
+		Query query = entityManager.createQuery("select c from CtlDocType c where c.status in (?1) and c.module=?2 order by doctype asc");
 		query.setParameter(1, status);
 		query.setParameter(2, module);
 		@SuppressWarnings("unchecked")

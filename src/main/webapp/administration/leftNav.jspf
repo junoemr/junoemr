@@ -103,6 +103,12 @@ String curProvider_no = (String)session.getAttribute("user");
 		            <oscar:oscarPropertiesCheck property="billregion" value="CLINICAID">
 
 					<li><a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">Manage Invoices</a></li>
+					
+					<oscar:oscarPropertiesCheck property="hctype" value="BC">
+					<!-- BC clinicaid users still need to be able to edit billingreferral for consultations etc. -->
+					<li><a href="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="contentLink defaultManageReferralDoc"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
+					</oscar:oscarPropertiesCheck>
+					
 
 					</oscar:oscarPropertiesCheck>
 
@@ -777,21 +783,7 @@ String curProvider_no = (String)session.getAttribute("user");
 						class="xlink" rel="${ctx}/admin/logReport.jsp?keyword=admin">
 					<bean:message key="admin.admin.securityLogReport"/></a></li>
 				</security:oscarSec>
-				
-				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin, _admin.traceability" rights="r">
-					<li><a href="javascript:void(0);" class="xlink"
-						rel="${ctx}/admin/traceReport.jsp?keyword=admin">
-					<bean:message key="admin.admin.traceabilityReport"/></a></li>
-				</security:oscarSec>				
-				
-				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">
-					<% if (OscarProperties.getInstance().isFaxEnabled()) { %>
-		            <li><a href='javascript:void(0);' class="xlink" rel="${ctx}/admin/faxStatus.do"><bean:message key="admin.faxStatus.faxStatus" /></a></li>
-		            <% } %>
-					<li><a href='javascript:void(0);' class="xlink" rel="${ctx}/admin/oscarStatus.do"><bean:message key="admin.oscarStatus.oscarStatus" /></a></li>
-				</security:oscarSec>
-	
-							
+
 				</ul>	
 				</div>
 				</div>
@@ -907,10 +899,7 @@ String curProvider_no = (String)session.getAttribute("user");
 				<div id="collapseTwelve" class="accordion-body collapse">
 				<div class="accordion-inner">
 				<ul>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/admin/adminbackupdownload.jsp"><bean:message
-						key="admin.admin.btnAdminBackupDownload" /></a></li>
-						
+
 					<li><a href='javascript:void(0);'
 						class="xlink" rel="${ctx}/demographic/demographicExport.jsp"><bean:message key="admin.admin.DemoExport"/></a></li>
 		                        <li><a href='javascript:void(0);'
@@ -1006,8 +995,8 @@ String curProvider_no = (String)session.getAttribute("user");
 
 
 	<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">
-				<div class="accordion-heading">
-				<a class="accordion-toggle" data-toggle="collapse" data-parent="#adminNav" href="#collapseSixteen">
+				<div class="accordion-heading" style="display: none">
+				<a class="accordion-toggle data-toggle="collapse" data-parent="#adminNav" href="#collapseSixteen">
 				<bean:message key="admin.admin.updates" />
 				<i class="icon-chevron-right"></i>
 				</a>
