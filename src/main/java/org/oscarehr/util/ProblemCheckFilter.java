@@ -49,7 +49,7 @@ public final class ProblemCheckFilter implements Filter
 
 	private static final long MAX_THRESHOLD=1024000*512; // we'll start at 512 megs of ram for now
 	
-	public static class SessionChecker implements HttpSession
+	public static class SessionChecker implements HttpSession, Serializable
 	{
 		private HttpSession session;
 		
