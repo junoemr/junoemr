@@ -37,6 +37,7 @@
 <%@ page import="oscar.*,java.lang.*,java.util.Date,java.text.SimpleDateFormat,oscar.oscarRx.util.RxUtil,org.springframework.web.context.WebApplicationContext,
          org.springframework.web.context.support.WebApplicationContextUtils,
          org.oscarehr.common.dao.UserPropertyDAO,org.oscarehr.common.model.UserProperty"%>
+<%@ page import="java.io.File"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
 
 <!-- Classes needed for signature injection -->
@@ -479,16 +480,25 @@ if(prop!=null && prop.getValue().equalsIgnoreCase("yes")){
 																	String imageUrl=null;
 																	String startimageUrl=null;
 																	String statusUrl=null;
+																	String imgFile="";
 
 																	signatureRequestId=loggedInInfo.getLoggedInProviderNo();
 																	imageUrl=request.getContextPath()+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_preview.name()+"&"+DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
 																	startimageUrl=request.getContextPath()+"/images/1x1.gif";		
 																	statusUrl = request.getContextPath()+"/PMmodule/ClientManager/check_signature_status.jsp?" + DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
+                                                                    if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures")){
+                                                                        imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image","")+"doctor_signature_"+user.getProviderNo()+".png";
+                                                                        File f = new File(imgFile);
+                                                                        if(f.exists() && !f.isDirectory())
+                                                                        {
+                                                                            startimageUrl = request.getContextPath()+"/eform/displayImage.do?imagefile=doctor_signature_"+user.getProviderNo()+".png";
+                                                                        }
+                                                                    }
 																	%>
 																	<input type="hidden" name="<%=DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY%>" value="<%=signatureRequestId%>" />	
 
 																	<img id="signature" style="width:300px; height:60px" src="<%=startimageUrl%>" alt="digital_signature" />
-				 													<input type="hidden" name="imgFile" id="imgFile" value="" />
+				 													<input type="hidden" name="imgFile" id="imgFile" value="<%=imgFile%>" />
 																	<script type="text/javascript">
 																		
 																		var POLL_TIME=2500;
