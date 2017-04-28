@@ -51,6 +51,8 @@ if(appointment != null && appointment.length()>0) {
   appointmentNo = Integer.parseInt(appointment);
 }
 
+OscarProperties props = OscarProperties.getInstance();
+
 // MARC-HI's Sharing Center
 boolean isSharingCenterEnabled = SharingCenterUtil.isEnabled();
 
@@ -263,6 +265,19 @@ function submitForm(actionPath) {
         return false;
 }
 
+function newWindowForm(actionPath) {
+
+    var form = document.forms[2];
+    if(verifyChecks(form)) {
+        form.action = actionPath;
+		form.setAttribute("target", "_blank");
+        form.submit();
+		form.setAttribute("target", "");
+        return true;
+    }
+    else
+        return false;
+}
 function submitPhrForm(actionPath, windowName) {
 
     var form = document.forms[2];
@@ -606,7 +621,18 @@ function popup1(height, width, url, windowName){
         onClick="window.print()"> <input type="button"
         value="<bean:message key="dms.documentReport.btnCombinePDF"/>"
         onclick="return submitForm('<rewrite:reWrite jspPage="combinePDFs.do"/>');" />
-        <%
+				<% if (props.isPropertyActive("faxEnable") && props.isPropertyActive("document_fax_enabled")) { %>
+				<input type="button"
+					value="<bean:message key="dms.documentReport.btnFaxPDF"/>"
+					onclick="return newWindowForm('<rewrite:reWrite jspPage="faxPDFs.do"/>');" />
+		 		<%
+				}
+				if (props.isPropertyActive("document_email_enabled")) { %>
+				<input type="button"
+					value="<bean:message key="dms.documentReport.btnEmailPDF"/>"
+					onclick="return newWindowForm('<rewrite:reWrite jspPage="emailPDFs.do?emailActionType=DOC"/>');" />
+		 		<%
+		 		}
                     if( module.equals("demographic") ) {
 
                       if (MyOscarUtils.isMyOscarEnabled(curUser))

@@ -262,6 +262,15 @@ public class ProviderData {
 	}
 
 	/**
+	 * @return provider names formatted as 'last, first'.
+	 */
+	public String getDisplayName() {
+		String last = (getLast_name() == null) ? "" : getLast_name();
+		String first = (getFirst_name() == null) ? "" : getFirst_name();
+		return last + ", " + first;
+	}
+
+	/**
 	 * Getter for property provider_type.
 	 * @return Value of property provider_type.
 	 */

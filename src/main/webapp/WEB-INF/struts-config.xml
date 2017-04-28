@@ -2001,6 +2001,21 @@
 			<forward name="success" path="/dms/documentReport.jsp"></forward>
 			<forward name="failed" path="/dms/documentReport.jsp"></forward>
 		</action>
+		<action input="/dms/documentReport.jsp" name="FrmForm" path="/dms/faxPDFs" type="oscar.dms.actions.FaxPDFAction" scope="request" validate="false">
+			<forward name="success" path="/dms/faxPDFs.jsp"></forward>
+		</action>
+		<action input="/dms/faxPDFs.jsp" name="FrmForm" path="/dms/sendFaxPDFs" type="oscar.dms.actions.SendFaxPDFAction" scope="request" validate="false">
+			<forward name="success" path="/dms/sendFaxPDFs.jsp"></forward>
+			<forward name="failed" path="/dms/closeWindow.html"></forward>
+		</action>
+		<action input="/dms/documentReport.jsp" name="FrmForm" path="/dms/emailPDFs" type="oscar.dms.actions.EmailPDFAction" scope="request" validate="false">
+			<forward name="success" path="/dms/emailPDFs.jsp"></forward>
+		</action>
+		<action input="/dms/emailPDFs.jsp" name="FrmForm" path="/dms/sendEmailPDFs" type="oscar.dms.actions.SendEmailPDFAction" scope="request" validate="false">
+			<forward name="success" path="/dms/sendEmailPDFs.jsp"></forward>
+			<forward name="failed" path="/dms/closeWindow.html"></forward>
+		</action>
+
 		<action input="/dms/addedithtmldocument.jsp" name="addEditHtmlDoc" path="/dms/addEditHtml" type="oscar.dms.actions.AddEditHtmlAction" scope="request" validate="false">
 			<forward name="success" path="/dms/closeWindow.html" />
 			<forward name="failed" path="/dms/addedithtmldocument.jsp" />
