@@ -365,7 +365,7 @@ public class EDoc extends TagObject implements Comparable {
 	 *Returns true if document a PDF.
 	 */
 	public boolean isPDF() {
-		if (this.contentType != null && this.contentType.contains("/pdf")) {
+		if (this.contentType != null && this.contentType.contains("/pdf") || this.contentType.contains(".pdf")) {
 			return true;
 		}
 		return false;
