@@ -11,3 +11,5 @@ velocity.log
 .project
 .classpath
 .settings/
+.idea/
+oscar.iml

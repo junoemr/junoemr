@@ -1538,7 +1538,7 @@ function updateDocumentAndNext(eleId){//save doc info
     return updateDocument(eleId, true);
 }
 
-function updateDocument(eleId, andNext){//save doc info
+function updateDocument(eleId, docIp, contextPath){//save doc info
     if (typeof(andNext) === 'undefined') { andNext = false; }
 	var url="../dms/ManageDocument.do",data=$(eleId).serialize(true);
     // Note: synchronous Ajax to allow for the parent reload below
@@ -1553,13 +1553,27 @@ function updateDocument(eleId, andNext){//save doc info
 					//oscarLog(json);
 					if(json!=null ){
 						patientId=json.patientId;
-						
 						var ar=eleId.split("_");
 						var num=ar[1];
+						var docId = eleId.replace('forms_', '');
 						num=num.replace(/\s/g,'');
 						$("saveSucessMsg_"+num).show();
 						$('saved'+num).value='true';
-						$("msgBtn_"+num).onclick = function() { popup(700,960,'/oscar/oscarMessenger/SendDemoMessage.do?demographic_no='+patientId,'msg'); };
+						if(contextPath === 'undefined' || contextPath == '') {
+						    $("msgBtn_"+num).onclick = function() {
+                                popup(700,960, '../oscarMessenger/SendDemoMessage.do?demographic_no='+patientId,'msg');
+                            }
+                            $("ticklerBtn_"+num).onclick = function() {
+                                popup(450, 600, '../tickler/ForwardDemographicTickler.do?docType=DOC&docId=' + docId + '&docIp='+ docIp + '&demographic_no='+patientId,'tickler');
+                            }
+						} else {
+						    $("msgBtn_"+num).onclick = function() {
+                                popup(700,960, contextPath + '/oscarMessenger/SendDemoMessage.do?demographic_no='+patientId,'msg');
+                            }
+                            $("ticklerBtn_"+num).onclick = function() {
+                                popup(450, 600, contextPath + '/tickler/ForwardDemographicTickler.do?docType=DOC&docId=' + docId + '&docIp='+ docIp + '&demographic_no='+patientId,'tickler');
+                            }
+						}
                         if (andNext)
                         {
                             //Hide document						
