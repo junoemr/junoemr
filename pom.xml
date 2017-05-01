@@ -64,6 +64,14 @@
 			<name>MARC-HI Technology Exchange Private Maven Repository</name>
 			<url>http://te.marc-hi.ca/mvn</url>
 		</repository>
+
+		<!--
+		<repository>
+			<id>Codehaus Mojo</id>
+			<name>Codehaus Mojo</name>
+			<url>https://nexus.codehaus.org/content/repositories/releases/</url>
+		</repository>
+		-->
 	</repositories>
 
 	<pluginRepositories>
@@ -1094,11 +1102,29 @@
                 <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
-	<dependency>
-		<groupId>org.codehaus.jackson</groupId>
-		<artifactId>jackson-jaxrs</artifactId>
-		<version>1.1.1</version>
-	</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-jaxrs</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.8.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.8.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.8.6</version>
+		</dependency>
 
 	</dependencies>
 
@@ -1131,7 +1157,7 @@
 		 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.1</version>
+                    <version>1.0</version>
                       <executions>
                         <execution>
                           <phase>validate</phase>
@@ -1571,6 +1597,35 @@
         </execution>
     </executions>
 </plugin>
+<plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>read-project-properties</goal>
+            </goals>
+            <configuration>
+              <files>
+                <file>/usr/share/tomcat/my_instance.properties</file>
+              </files>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+<plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat7-maven-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+		  <url>https://nick15.ohdev.ca/</url>
+          <port>9090</port>
+          <path>/</path>
+        </configuration>
+      </plugin>
 
 <!--
             <plugin>
