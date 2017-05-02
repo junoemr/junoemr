@@ -979,7 +979,6 @@ if (OscarProperties.getInstance().getBooleanProperty("consultation_program_lette
 	}
 } %>
 
-
 function switchProvider(value) {
 	if (value==-1) {
 		document.getElementById("letterheadName").value = value;
@@ -988,18 +987,20 @@ function switchProvider(value) {
 		document.getElementById("letterheadPhone").value = "<%=clinic.getClinicPhone().trim() %>";
 		document.getElementById("letterheadPhoneSpan").innerHTML = "<%=clinic.getClinicPhone().trim() %>";
 		document.getElementById("letterheadFax").value = "<%=clinic.getClinicFax().trim() %>";
-		// document.getElementById("letterheadFaxSpan").innerHTML = "<%=clinic.getClinicFax().trim() %>";
+		document.getElementById("letterheadFaxSpan").innerHTML = "<%=clinic.getClinicFax().trim() %>";
 	} else {
-		if (typeof providerData["prov_" + value] != "undefined")
-			value = "prov_" + value;
-
-		document.getElementById("letterheadName").value = value;
+		//if (typeof providerData[value] != "undefined") {
+		//	document.getElementById("letterheadName").value = value;
+		//	value = "prov_" + value;
+		//}
+		// value should always = "prov_" + value
+		value = "prov_" + value;
 		document.getElementById("letterheadAddress").value = providerData[value]['address'];
 		document.getElementById("letterheadAddressSpan").innerHTML = providerData[value]['address'].replace(" ", "&nbsp;");
 		document.getElementById("letterheadPhone").value = providerData[value]['phone'];
 		document.getElementById("letterheadPhoneSpan").innerHTML = providerData[value]['phone'];
 		document.getElementById("letterheadFax").value = providerData[value]['fax'];
-		//document.getElementById("letterheadFaxSpan").innerHTML = providerData[value]['fax'];
+		document.getElementById("letterheadFax").innerHTML = providerData[value]['fax'];
 	}
 }
 </script>
@@ -1386,7 +1387,7 @@ function updateFaxButton() {
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgAssociated2" />:</td>
 							<td align="right" class="tite1">
-								<html:select property="providerNo" onchange="switchProvider(this.value)">
+								<html:select property="providerNo" onchange="console.log(this.value)">
 									<%
 										for (Provider p : prList) {
 											if (p.getProviderNo().compareTo("-1") != 0) {
@@ -1789,18 +1790,16 @@ function updateFaxButton() {
 									FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 									List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
 								%>
-									<span id="letterheadFaxSpan">
-										<select name="letterheadFax">
-								<%
-									for( FaxConfig faxConfig : faxConfigs ) {
+								<% if (consultUtil.letterheadFax != null) {
 								%>
-										<option value="<%=faxConfig.getFaxNumber()%>" <%=faxConfig.getFaxNumber().equalsIgnoreCase(consultUtil.letterheadFax) ? "selected" : ""%>><%=faxConfig.getFaxUser()%></option>								
-								<%	    
-									}								
-								%>
-									</select>
-								</span>
-							
+									<span id="letterheadFax">
+										<%=consultUtil.letterheadFax%>
+									</span>
+								<% } else { %>
+									<span id="letterheadFax">
+										<%=clinic.getClinicFax()%>
+									</span>
+								<% } %>
 							</td>
 						</tr>
 					</table>
