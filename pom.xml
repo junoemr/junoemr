@@ -1,6 +1,6 @@
 <project 
-	xmlns="http://maven.apache.org/POM/4.0.0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+ xmlns="http://maven.apache.org/POM/4.0.0" 
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.oscarehr</groupId>
 	<artifactId>oscar</artifactId>
@@ -62,9 +62,6 @@
 			<name>MARC-HI Technology Exchange Private Maven Repository</name>
 			<url>http://te.marc-hi.ca/mvn</url>
 		</repository>
-		<!--
-		<repository><id>Codehaus Mojo</id><name>Codehaus Mojo</name><url>https://nexus.codehaus.org/content/repositories/releases/</url></repository>
-		-->
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -304,9 +301,6 @@
 			<version>1.1.2</version>
 		</dependency>
 		<!-- pdf / lowagie -->
-		<!--
-		<dependency><groupId>com.lowagie</groupId><artifactId>itext</artifactId><version>2.1.7</version></dependency>
-		-->
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
@@ -1005,21 +999,6 @@
 			<artifactId>jackson-jaxrs</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>2.8.6</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-			<version>2.8.6</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.8.6</version>
-		</dependency>
 	</dependencies>
 	<build>
 		<resources>
@@ -1048,7 +1027,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.0</version>
+				<version>1.1</version>
 				<executions>
 					<execution>
 						<phase>validate</phase>
@@ -1063,7 +1042,6 @@
 				<artifactId>maven-site-plugin</artifactId>
 				<version>3.0</version>
 				<dependencies>
-					<!-- dependency><groupId>org.apache.maven.doxia</groupId><artifactId>doxia-core</artifactId><version>1.2</version></dependency><dependency><groupId>org.apache.maven.doxia</groupId><artifactId>doxia-sink-api</artifactId><version>1.3</version></dependency  -->
 					<dependency>
 						<groupId>org.apache.maven.doxia</groupId>
 						<artifactId>doxia-module-markdown</artifactId>
@@ -1418,9 +1396,7 @@
 						<version>0.95</version>
 					</dependency>
 				</dependencies>
-				<!--
-				<executions><execution><phase>process-sources</phase><goals><goal>check</goal></goals></execution></executions>
--->
+			
 			</plugin>
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>
@@ -1490,41 +1466,41 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>											org.apache.maven.plugins										</groupId>
-										<artifactId>											maven-antrun-plugin										</artifactId>
-										<versionRange>											[1.3,)										</versionRange>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-antrun-plugin</artifactId>
+										<versionRange>[1.3,)</versionRange>
 										<goals>
 											<goal>run</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore/>
 									</action>
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>											org.apache.maven.plugins										</groupId>
-										<artifactId>											maven-checkstyle-plugin										</artifactId>
-										<versionRange>											[2.8,)										</versionRange>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-checkstyle-plugin</artifactId>
+										<versionRange>[2.8,)</versionRange>
 										<goals>
 											<goal>checkstyle</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore/>
 									</action>
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>											org.codehaus.mojo										</groupId>
-										<artifactId>											native2ascii-maven-plugin										</artifactId>
-										<versionRange>											[1.0-beta-1,)										</versionRange>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>native2ascii-maven-plugin</artifactId>
+										<versionRange>[1.0-beta-1,)</versionRange>
 										<goals>
 											<goal>native2ascii</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
