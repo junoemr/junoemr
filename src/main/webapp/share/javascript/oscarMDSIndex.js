@@ -1538,7 +1538,7 @@ function updateDocumentAndNext(eleId){//save doc info
     return updateDocument(eleId, true);
 }
 
-function updateDocument(eleId, docIp, contextPath){//save doc info
+function updateDocument(eleId, andNext, docIp, contextPath){//save doc info
     if (typeof(andNext) === 'undefined') { andNext = false; }
 	var url="../dms/ManageDocument.do",data=$(eleId).serialize(true);
     // Note: synchronous Ajax to allow for the parent reload below

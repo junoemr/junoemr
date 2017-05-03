@@ -440,4 +440,9 @@ if (isListView && pageNum == 0) { %>
 	</tr>
 </table>
 <% } // End if (pageNum == 1) %>
-
+<script>
+    allSaveNext = document.querySelectorAll('.saveNext');
+    for(i = 0; i < allSaveNext.length; i++) {
+        allSaveNext[i].style.display = "inline";
+    }
+</script>
