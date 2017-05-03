@@ -41,6 +41,7 @@
 
 <%    
 String user_no = (String) session.getAttribute("user");
+oscar.OscarProperties props = oscar.OscarProperties.getInstance();
 int  nItems=0;
 String strLimit1="0";
 String strLimit2="5";
@@ -156,26 +157,24 @@ form.submit();
 else{}
 }
 function validateDemoNo() {
-  if (document.serviceform.demographic_no.value == "") {
-alert("<bean:message key="tickler.ticklerAdd.msgInvalidDemographic"/>");
-	return false;
- }
- else{  if (document.serviceform.xml_appointment_date.value == "") {
-alert("<bean:message key="tickler.ticklerAdd.msgMissingDate"/>");
-	return false;
- }
-<% if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) { %>
- else if (document.serviceform.site.value=="none"){
-alert("Must assign task to a provider.");
-	return false;
- } 
+	if (document.serviceform.demographic_no.value == "") {
+		alert("<bean:message key="tickler.ticklerAdd.msgInvalidDemographic"/>");
+		return false;
+	}
+ 	else {
+ 		if (document.serviceform.xml_appointment_date.value == "") {
+			alert("<bean:message key="tickler.ticklerAdd.msgMissingDate"/>");
+			return false;
+ 		}
+<% 
+if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) { %>
+		if (document.serviceform.site.value=="none") {
+			alert("Must assign task to a provider.");
+			return false;
+ 		}
 <% } %>
- else{
- return true;
-}
- }
-
-
+		return true;
+	}
 }
 function refresh() {
   var u = self.location.href;
@@ -185,10 +184,6 @@ function refresh() {
     history.go(0);
   }
 }
-
-
-
-
 
 function DateAdd(startDate, numDays, numMonths, numYears)
 {
@@ -275,7 +270,7 @@ var newD = newYear + "-" + newMonth + "-" + newDay;
   <%
     String searchMode = request.getParameter("search_mode");
     if (searchMode == null || searchMode.isEmpty()) {
-        searchMode = OscarProperties.getInstance().getProperty("default_search_mode","search_name");
+        searchMode = props.getProperty("default_search_mode","search_name");
     }
 %>
 				      <INPUT TYPE="hidden" NAME="search_mode" VALUE="<%=searchMode%>" >
@@ -391,15 +386,24 @@ function changeSite(sel) {
             <%  String proFirst="";
                 String proLast="";
                 String proOHIP="";
+                String defaultProvider = props.getProperty("default_tickler_provider", "");
 				
                 for(Provider p : providerDao.getActiveProviders()) {
+                	String selected = "";
                
                     proFirst =p.getFirstName();
                     proLast = p.getLastName();
                     proOHIP = p.getProviderNo();
+                    
+                    if(defaultProvider.equals(proOHIP)) {
+                    	selected = "selected";
+                    }
+                    else if(defaultProvider.isEmpty() && user_no.equals(proOHIP)) {
+                    	selected = "selected";
+                    }
 
-            %> 
-            <option value="<%=proOHIP%>" <%=user_no.equals(proOHIP)?"selected":""%>><%=proLast%>, <%=proFirst%></option>
+            %>
+            <option value="<%=proOHIP%>" <%=selected%> ><%=proLast%>, <%=proFirst%></option>
             <%
                 }
             %>
