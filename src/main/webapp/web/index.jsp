@@ -106,8 +106,6 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 						title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
 
 					<%--New Dashboard Menu --%>
-					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-home hand-hover" ui-sref="dashboard" title="<bean:message key="navbar.dashboard" bundle="ui"/>"></span></li>
-
 					<li style="margin-right:5px">
 						<a href="javascript:void(0)" ng-if="!dashboardMenu.dropdown" ng-click="transition(dashboardMenu)" >
 							<bean:message key="navbar.menu.dashboard" bundle="ui" />
@@ -195,14 +193,17 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 						<a ng-click="openMessenger()" title="<bean:message key="navbar.messenger" bundle="ui"/>" class="hand-hover">
 							<span  class="glyphicon glyphicon-envelope"></span> 
 						</a>
-						<span ng-repeat="item in messengerMenu">
-						   <a ng-click="openMessenger(item)"  title="{{item.label}}" class="hand-hover">{{item.extra}}</a> <span ng-if="!$last">|</span>
-						</span>
+						<%--Remove demographic message icon; Awaiting JSON fix so that a list 
+						with one item is returned instead of an object. After fix we can use ng-repeat and refer change messengerMenu to item--%>
+						<%--<span ng-repeat="item in messengerMenu">--%>
+						   <a ng-click="openMessenger(messengerMenu)"  title="{{messengerMenu.label}}" class="hand-hover">{{messengerMenu.extra}}</a> <%--<span ng-if="!$last">|</span>--%>
+						<%--</span>--%>
 					</span>
 					&nbsp; &nbsp;
 					
 					<span class="dropdown">
-						<span class="dropdown-toggle hand-hover" title="<bean:message key="navbar.changeProgram" bundle="ui"/>"><span class="glyphicon glyphicon-globe"></span></span>
+						<%--Remove globe icon? Aka ability to switch current program--%>
+						<%--<span class="dropdown-toggle hand-hover" title="<bean:message key="navbar.changeProgram" bundle="ui"/>"><span class="glyphicon glyphicon-globe"></span></span>--%>
 						<ul class="dropdown-menu" role="menu">
 	                    	<li ng-repeat="item in programDomain">
 	                        	<a ng-click="changeProgram(item.program.id)">
@@ -224,9 +225,9 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 						</li>
 				  	</ul>
 				  	
-					<a href="../logout.jsp" title="<bean:message key="navbar.logout" bundle="ui"/>" style="padding-left:10px;">
+					<%--<a href="../logout.jsp" title="<bean:message key="navbar.logout" bundle="ui"/>" style="padding-left:10px;">
 						<span class="glyphicon glyphicon-off"></span>
-					</a>
+					</a>--%>
 
 
 				</div>
