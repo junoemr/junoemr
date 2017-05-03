@@ -217,7 +217,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				 	
 					&nbsp;
 					
-					<span class="dropdown-toggle hand-hover" data-toggle="dropdown" title="<bean:message key="navbar.user" bundle="ui"/>"><span class="glyphicon glyphicon-user"></span><u>{{me.firstName}}</u></span>
+					<span class="dropdown-toggle hand-hover" data-toggle="dropdown" title="<bean:message key="navbar.user" bundle="ui"/>"><span class="glyphicon glyphicon-user"></span>{{me.firstName}}</span>
 					<ul class="dropdown-menu" role="menu">
 						<li ng-repeat="item in userMenuItems">
 							<a ng-click="transition(item)" ng-class="{'more-tab-highlight': isActive(item) }" class="hand-hover" >{{item.label}}</a>
