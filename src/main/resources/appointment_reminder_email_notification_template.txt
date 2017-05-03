@@ -1,15 +1,12 @@
 Dear ${demographic.firstName} ${demographic.lastName},
 
-This is a courtesy email to remind you that you have an appointment with Dr. ${provider.firstName} ${provider.lastName} on:
+You have booked the following appointment at Kensington Medical Clinic with Dr. ${provider.firstName} ${provider.lastName}:
 
 ${appointmentDateTime}
 
-You are required to confirm your appointment via email or phone within 24 hours of your visit.  You may also confirm you appointment on our website kensingtonmedicalclinic.com by clicking on the confirm/change/cancel your appointment button and filling out the appropriate form.  
+You are required to confirm your appointment via email, on our website or phone within 48 hours of this email. 
 
-Failure to confirm your appointment may result in the appointment being cancelled. 
-
-If you wish to cancel or change this appointment, please click the confirm/change/cancel email button on our website, or reply to this email within 24 hours of your this email, otherwise your appointment may be cancelled and/or a no show fee applied.
-
+Failure to confirm your appointment may result in the appointment being cancelled and/or a no show fee applied.
 
 Sincerely,
 Kensington Medical Clinic Staff
