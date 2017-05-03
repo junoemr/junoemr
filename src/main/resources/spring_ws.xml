@@ -1,4 +1,4 @@
-<beans xmlns="http://www.springframework.org/schema/beans" 
+<beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:aop="http://www.springframework.org/schema/aop"
@@ -14,13 +14,13 @@
 		http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 		http://cxf.apache.org/jaxws	http://cxf.apache.org/schemas/jaxws.xsd
 		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
-		
+
 	">
 
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
-	<!-- interceptors --> 
+	<!-- interceptors -->
 	<bean id="abstractLoggingInterceptor" abstract="true">
 		<property name="prettyLogging" value="true" />
 	</bean>
@@ -31,105 +31,105 @@
 		<cxf:properties>
 			<entry key="ws-security.ut.validator" value="org.oscarehr.ws.OscarUsernameTokenValidator" />
 		</cxf:properties>
-		
+
 		<!-- BORN XDS Soap Header Interceptor (Adds endpointID node to header) -->
-		
+
 		<cxf:outInterceptors>
 			<bean id="bornSOAPHeaderInterceptor" class="org.oscarehr.integration.born.BornSOAPHeaderInterceptor" />
 			<ref bean="loggingOutInterceptor" />
 		</cxf:outInterceptors>
-		
+
 		<!-- logging interceptors -->
-		 
+
 		<cxf:inInterceptors>
 			<ref bean="loggingInInterceptor" />
 		</cxf:inInterceptors>
-		
+
 		<cxf:outFaultInterceptors>
 			<ref bean="loggingOutInterceptor" />
 		</cxf:outFaultInterceptors>
 		<cxf:inFaultInterceptors>
 			<ref bean="loggingInInterceptor" />
 		</cxf:inFaultInterceptors>
-		 
+
     </cxf:bus>
 
 	<!-- Managed WS Beans -->
 	<!-- The WS classes are turned into spring beans to allow autowiring etc, then the endpoints reference them -->
  	<context:component-scan base-package="org.oscarehr.ws"/>
-	
+
 	<bean id="authenticationInWSS4JInterceptor" class="org.oscarehr.ws.AuthenticationInWSS4JInterceptor" />
 
 	<!-- web service endpoints -->
-	<jaxws:endpoint implementor="#systemInfoWs" address="/SystemInfoService"/>		
-	<jaxws:endpoint implementor="#loginWs" address="/LoginService" />	
-	
+	<jaxws:endpoint implementor="#systemInfoWs" address="/SystemInfoService"/>
+	<jaxws:endpoint implementor="#loginWs" address="/LoginService" />
+
 	<jaxws:endpoint implementor="#scheduleWs" address="/ScheduleService">
 		<jaxws:inInterceptors>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
-	</jaxws:endpoint>	
-	
+	</jaxws:endpoint>
+
 	<jaxws:endpoint implementor="#providerWs" address="/ProviderService" >
 		<jaxws:inInterceptors>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
-	</jaxws:endpoint>	
-	
+	</jaxws:endpoint>
+
 	<jaxws:endpoint implementor="#demographicWs" address="/DemographicService" >
 		<jaxws:inInterceptors>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
-		
+
 	<jaxws:endpoint implementor="#facilityWs" address="/FacilityService" >
 		<jaxws:inInterceptors>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
-	</jaxws:endpoint>	
-  
+	</jaxws:endpoint>
+
 	<jaxws:endpoint implementor="#programWs" address="/ProgramService" >
 		<jaxws:inInterceptors>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
-	</jaxws:endpoint>	
-     	
+	</jaxws:endpoint>
+
 	<jaxws:endpoint implementor="#allergyWs" address="/AllergyService" >
 		<jaxws:inInterceptors>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
-	</jaxws:endpoint>	
-     	
+	</jaxws:endpoint>
+
 	<jaxws:endpoint implementor="#preventionWs" address="/PreventionService" >
 		<jaxws:inInterceptors>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
-	</jaxws:endpoint>	
+	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#measurementWs" address="/MeasurementService" >
 		<jaxws:inInterceptors>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
-	</jaxws:endpoint>	
+	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#documentWs" address="/DocumentService" >
 		<jaxws:inInterceptors>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
-	</jaxws:endpoint>	
+	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#prescriptionWs" address="/PrescriptionService" >
 		<jaxws:inInterceptors>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
-	</jaxws:endpoint>	
-	
-	
+	</jaxws:endpoint>
+
+
 	<context:component-scan base-package="org.oscarehr.ws.rest"/>
 	<context:component-scan base-package="org.oscarehr.ws.rest.util"/>
 	<context:component-scan base-package="org.oscarehr.ws.rest.conversion"/>
 	<aop:aspectj-autoproxy/>
-	
+
 	<!-- RESTful web service  -->
 	<jaxrs:server address="/rs" id="jaxrServer">
 
@@ -137,14 +137,11 @@
 			<bean name="authInInterceptor"
 				class="org.oscarehr.ws.rest.util.AuthenticationInInterceptor" />
 		</jaxrs:inInterceptors>
-		
+
 		<jaxrs:providers>
 		    <ref bean="jaxb"/>
-			<ref bean="jsonProvider"/>
-			<bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/> 
+			<bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
 		</jaxrs:providers>
-		
-	
 
 		<jaxrs:features>
 			<cxf:logging />
@@ -185,10 +182,10 @@
 			<entry key="json" value="application/json" />
 		</jaxrs:extensionMappings>
 	</jaxrs:server>
-	
+
 	<bean id="jaxb" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="singleJaxbContext" value="true"/>
- 
+
       <property name="extraClass">
          <list>
            <value>org.oscarehr.ws.transfer_objects.ProviderTransfer</value>
@@ -197,26 +194,9 @@
 
 	</bean>
 
-    <util:list id="jsonKeys">
-        <value>tickler</value>
-        <value>ticklerComments</value>
-        <value>ticklerUpdates</value>
-        <value>content</value>
-        <value>post</value>
-    </util:list>
-
-	 <bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
-		<property name="dropRootElement" value="true" />
-		<property name="serializeAsArray" value="true" />
-		<property name="arrayKeys" ref="jsonKeys"/>
-		<property name="dropCollectionWrapperElement" value="true" />
-    </bean>
-	
-	
-
 	<jaxws:endpoint implementor="#labUploadWs" address="/LabUploadService" >
 		<jaxws:inInterceptors>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
-	</jaxws:endpoint>	
+	</jaxws:endpoint>
 </beans>
