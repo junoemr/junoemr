@@ -238,6 +238,7 @@ public class PersonaService extends AbstractServiceImpl {
 		int idCounter = 0;
 		
 		MenuTo1 menu = new MenuTo1()
+				.addWithState(idCounter++,bundle.getString("navbar.menu.dashboard"), null, "dashboard")
 		        .add(idCounter++,bundle.getString("navbar.menu.schedule"),null,"../provider/providercontrol.jsp")
 				.addWithState(idCounter++,bundle.getString("navbar.menu.inbox"),null,"inbox");
 
