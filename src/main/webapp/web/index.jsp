@@ -143,10 +143,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				<ul class="nav navbar-nav hidden-lg visible-md visible-sm visible-xs">	
 					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover" ng-show="showPtList === false" ng-click="showPatientList()" title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
 
-					<%-- 
-					New Dashboard Menu
-					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-home hand-hover" ui-sref="dashboard" title="<bean:message key="navbar.dashboard" bundle="ui"/>"></span></li> --%>
-					
+					<%--New Dashboard Menu --%>
 					<li style="margin-right:5px">
 						<a href="javascript:void(0)" ng-if="!item.dropdown" ng-click="transition(item)" >
 							Dashboard
@@ -202,8 +199,6 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					&nbsp; &nbsp;
 					
 					<span class="dropdown">
-						<%--Remove globe icon? Aka ability to switch current program--%>
-						<%--<span class="dropdown-toggle hand-hover" title="<bean:message key="navbar.changeProgram" bundle="ui"/>"><span class="glyphicon glyphicon-globe"></span></span>--%>
 						<ul class="dropdown-menu" role="menu">
 	                    	<li ng-repeat="item in programDomain">
 	                        	<a ng-click="changeProgram(item.program.id)">
@@ -224,12 +219,6 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							<a ng-if="item.url" href="{{item.url}}" target="_blank">{{dropdownItem.label}}</a>
 						</li>
 				  	</ul>
-				  	
-					<%--<a href="../logout.jsp" title="<bean:message key="navbar.logout" bundle="ui"/>" style="padding-left:10px;">
-						<span class="glyphicon glyphicon-off"></span>
-					</a>--%>
-
-
 				</div>
 			</div>
 			<!--/.nav-collapse -->
