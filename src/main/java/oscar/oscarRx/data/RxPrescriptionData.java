@@ -2086,34 +2086,30 @@ public class RxPrescriptionData {
 			if (this.takeMin > this.takeMax) {
 				this.takeMax = this.takeMin;
 			}
-			String escapedSpecial = StringEscapeUtils.escapeSql(this.getSpecial());
 
 			FavoriteDao dao = SpringUtils.getBean(FavoriteDao.class);
-			org.oscarehr.common.model.Favorite favorite = dao.findByEverything(this.getProviderNo(), this.getFavoriteName(), this.getBN(), this.getGCN_SEQNO(), this.getCustomName(), this.getTakeMin(), this.getTakeMax(), this.getFrequencyCode(), this.getDuration(), this.getDurationUnit(), this.getQuantity(), this.getRepeat(), this.getNosubs(), this.getPrn(), escapedSpecial, this.getGN(), this.getUnitName(), this.getCustomInstr());
-
+			org.oscarehr.common.model.Favorite favorite = null;
+			
 			if (this.getFavoriteId() == 0) {
 
-				if (favorite != null) this.favoriteId = favorite.getId();
+				logger.info("favorite id is 0. Save new rx favorite.");
 
+				favorite = new org.oscarehr.common.model.Favorite();
+				favorite = syncFavorite(favorite);
+
+				dao.persist(favorite);
+				this.favoriteId = favorite.getId();
 				b = true;
-
-				if (this.getFavoriteId() == 0) {
-					favorite = new org.oscarehr.common.model.Favorite();
-					favorite = syncFavorite(favorite);
-
-					dao.persist(favorite);
-					this.favoriteId = favorite.getId();
-
-					b = true;
-				}
-
-			} else {
+			} 
+			else {
+				logger.info("Update rx favorite with id=" + this.getFavoriteId());
+				favorite = dao.findById(this.getFavoriteId());
+				
 				favorite = syncFavorite(favorite);
 				dao.merge(favorite);
 
 				b = true;
 			}
-
 			return b;
 		}
 
