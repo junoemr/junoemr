@@ -419,9 +419,7 @@ if (isListView && pageNum == 0) { %>
                                                 var doclabid_seq='<%=doclabid_seq%>';
                                                 doclabid_seq=doclabid_seq.replace('[','');
                                                 doclabid_seq=doclabid_seq.replace(']','');
-                                                var arr=doclabid_se
-
-                                                q.split(',');
+                                                var arr=doclabid_seq.split(',');
                                                 var arr2=new Array();
                                                 for(var i=0;i<arr.length;i++){
                                                     var ele=arr[i];
