@@ -1,14 +1,13 @@
 Dear ${demographic.firstName} ${demographic.lastName},
  
-You have booked the following appointment at Kensington Medical Clinic with Dr. ${provider.firstName} ${provider.lastName}:
+You have booked the following appointment with Dr. ${provider.firstName} ${provider.lastName}:
  
 ${appointmentDateTime}
   
-You are required to confirm your appointment via email or phone within 24 hours of your visit.  You may also confirm you appointment on our website kensingtonmedicalclinic.com by clicking on the confirm/change/cancel your appointment button and filling out the appropriate form.  
+You are required to confirm, change or cancel your appointment via email/phone or on our website kensingtonmedicalclinic.com within 48 hours of your visit.  Failure to do so will result in a no show fee being applied to your account.
 
-Failure to confirm your appointment may result in the appointment being cancelled.
+Please note, Strollers are not Permitted in the clinic.  Car seats are allowed.
 
-If you wish to cancel or change this appointment, please click the confirm/change/cancel email button on our website, or reply to this email within 24 hours of your appointment, otherwise a no show fee will be applied to your account.
 
 Sincerely,
 Kensington Medical Clinic Staff
