@@ -25,30 +25,15 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<style>
-.flag-column {
-	width:10px
-}
-.overdue {
- background-color:pink
-}
-.significance-high {
-	border-color: red !important;
-}
-.significance-medium {
-	border-color: yellow !important;
-}
-.significance-low {
-	border-color: green !important;
-}
-</style>
+<%--Place csutom styles here to override bootstap styles--%>
+
 
 <div ng-if="me != null">
 
 	<div class="container-fluid dashboard-header">
 
 		<h1 class="lead">
-			<bean:message key="dashboard.welcome" bundle="ui" /> {{me.firstName}} <span class="pull-right">{{displayDate() | date:'MMMM d, y'}}</span></h1>
+			<bean:message key="dashboard.welcome" bundle="ui" /> to your dashboard, {{me.firstName}}! <span class="pull-right">{{displayDate() | date:'MMMM d, y'}}</span></h1>
 		<hr>
 	</div>
 	<div class="row">
