@@ -60,15 +60,18 @@
 		</table>
 	</div>
 
-	<a ng-repeat="patient in patients | offset:currentPage*pageSize | limitTo:pageSize | filter:query" class="list-group-item default hand-hover"
-		ng-click="goToRecord(patient)" ng-style="getAppointmentStyle(patient)" ng-dblclick="viewAppointment(patient.appointmentNo)">
-		<!-- 
-		<span ng-if="patient.status.length>0 && patient.status != 't'" class="badge">{{patient.status}}</span>
-		-->
-		<h5 class="list-group-item-heading pull-right" ng-style="getAppointmentTextStyle(patient)">{{patient.startTime}}</h5>
-		<h5 class="list-group-item-heading" ng-style="getAppointmentTextStyle(patient)">{{patient.name}}</h5>
+	<div id="patient-list">
+		<a ng-repeat="patient in patients | offset:currentPage*pageSize | limitTo:pageSize | filter:query" class="list-group-item default hand-hover"
+			ng-click="goToRecord(patient)" ng-style="getAppointmentStyle(patient)" ng-dblclick="viewAppointment(patient.appointmentNo)">
+			<!-- 
+			<span ng-if="patient.status.length>0 && patient.status != 't'" class="badge">{{patient.status}}</span>
+			-->
+			<h5 class="list-group-item-heading pull-right" ng-style="getAppointmentTextStyle(patient)">{{patient.startTime}}</h5>
+			<h5 class="list-group-item-heading" ng-style="getAppointmentTextStyle(patient)">{{patient.name}}</h5>
+			
+			<p class="list-group-item-text" ng-if="patient.demographicNo != 0" ng-show="patientListConfig.showReason" ng-style="getAppointmentTextStyle(patient)"><bean:message key="provider.appointmentProviderAdminDay.Reason"/>: {{patient.reason}}  </p>
+		</a>
+	</div>
 		
-		<p class="list-group-item-text" ng-if="patient.demographicNo != 0" ng-show="patientListConfig.showReason" ng-style="getAppointmentTextStyle(patient)"><bean:message key="provider.appointmentProviderAdminDay.Reason"/>: {{patient.reason}}  </p>
-	</a>
 
 </div>
