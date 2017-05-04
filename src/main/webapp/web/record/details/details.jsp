@@ -130,7 +130,7 @@
 	<div class="form" id="pd1" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 	<div class="form-group row">
 		<div class="col-md-12">
-			<legend><bean:message key="demographic.demographiceditdemographic.msgDemographic"/></legend>
+			<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.msgDemographic"/></h3>
 		</div>
 		<div class="col-md-6">
 			<label title="Required Field"><bean:message key="demographic.demographiceditdemographic.formLastName"/> <span style="color:red">*</span></label>
@@ -202,7 +202,7 @@
  
 	<div class="form-group row">
 		<div class="col-md-12">
-			<legend><bean:message key="demographic.demographiceditdemographic.msgContactInfo"/></legend>
+			<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.msgContactInfo"/></h3>
 		</div>
 		<div class="col-md-6">
 		<label><bean:message key="demographic.demographiceditdemographic.formAddr"/></label>
@@ -271,7 +271,7 @@
 	
 	<div class="form-group row">
 		<div class="col-md-12">
-			<legend><bean:message key="demographic.demographiceditdemographic.msgHealthIns"/></legend>
+			<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.msgHealthIns"/></h3>
 		</div>
 		<div class="alert-warning" ng-show="page.HCValidation=='n/a'">
 			Online Health Card Validation unavailable
@@ -307,7 +307,7 @@
 	
 	<div class="form-group row">
 		<div class="col-md-12">
-			<legend><bean:message key="web.record.details.careTeam"/></legend>
+			<h3 class="form-heading"><bean:message key="web.record.details.careTeam"/></h3>
 		</div>
 		<div class="col-md-6">
 			<label><bean:message key="web.record.details.mrp"/></label>
@@ -414,7 +414,7 @@
 	
 	<div class="form-group row">
 		<div class="col-md-12">
-			<legend><bean:message key="web.record.details.addInformation"/></legend>
+			<h3 class="form-heading"><bean:message key="web.record.details.addInformation"/></h3>
 		</div>
 		<div class="col-md-6">
 			<label style="width:150px"><bean:message key="web.record.details.archivedPaperChart"/></label>
@@ -492,21 +492,21 @@
 	<div>
 		<div id="pd2" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 		<fieldset>
-			<legend><bean:message key="demographic.demographiceditdemographic.formAlert"/></legend>
+			<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formAlert"/></h3>
 			<textarea ng-model="page.demo.alert" class="form-control form-control-details" style="height:55px; width:100%; color:red;"></textarea>
 		</fieldset>
 		<br/>
 		<fieldset>
-			<legend><bean:message key="demographic.demographiceditdemographic.formNotes"/></legend>
+			<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formNotes"/></h3>
 			<textarea ng-model="page.demo.scrNotes" class="form-control form-control-details" style="height:55px; width:100%;"></textarea>
 		</fieldset>
 		</div>
 		<br/>
 		<fieldset>
-			<legend>
+			<h3 class="form-heading">
 				<bean:message key="global.contacts"/>
 				<button type="button" class="btn" ng-click="manageContacts()"><bean:message key="web.record.details.manage"/></button>
-			</legend>
+			</h3>
 			<div class="form-group" ng-repeat="dc in page.demo.demoContacts">
 				<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
 				<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
@@ -515,10 +515,10 @@
 		</fieldset>
 		<br/>
 		<fieldset>
-			<legend>
+			<h3 class="form-heading">
 				<bean:message key="web.record.details.proContacts"/>
 				<button type="button" class="btn" ng-click="manageContacts()"><bean:message key="web.record.details.manage"/></button>
-			</legend>
+			</h3>
 			<div class="form-group" ng-repeat="dc in page.demo.demoContactPros">
 				<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
 				<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
