@@ -301,7 +301,7 @@
 
                             </table>
 
-                            <form id="forms_<%=docId%>" onsubmit="return updateDocument('forms_<%=docId%>', '<%=docIp%>', '<%=request.getContextPath()%>');">
+                            <form id="forms_<%=docId%>" onsubmit="return updateDocument('forms_<%=docId%>', false, '<%=docIp%>', '<%=request.getContextPath()%>');">
                                 <input type="hidden" name="method" value="documentUpdateAjax" />
                                 <input type="hidden" name="documentId" value="<%=docId%>" />
                                 <input type="hidden" name="curPage_<%=docId%>" id="curPage_<%=docId%>" value="1"/>
@@ -394,8 +394,10 @@
                                         <td width="30%" colspan="1" align="right">
                                     <%if(demographicID.equals("-1")){%>
                                         <input type="submit" name="save" disabled id="save<%=docId%>" value="Save"/>
+                                        <input type="submit" name="save" disabled id="saveNext<%=docId%>" class="saveNext" value="Save & Next" style="display: none;" onclick="saveNext(<%=docId%>)"/>
                                     <%}else{%>
 							            <input type="submit" name="save" id="save<%=docId%>" value="Save"/>
+							            <input type="submit" name="save" id="saveNext<%=docId%>" class="saveNext" value="Save & Next" style="display: none;" onclick="saveNext(<%=docId%>)"/>
 							        <%}%>
 
                                     </tr>

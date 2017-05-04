@@ -440,4 +440,8 @@ if (isListView && pageNum == 0) { %>
 	</tr>
 </table>
 <% } // End if (pageNum == 1) %>
-
+<style>
+.saveNext {
+    display: inline !important;
+}
+</style>
