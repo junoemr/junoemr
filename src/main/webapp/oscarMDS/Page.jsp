@@ -419,7 +419,9 @@ if (isListView && pageNum == 0) { %>
                                                 var doclabid_seq='<%=doclabid_seq%>';
                                                 doclabid_seq=doclabid_seq.replace('[','');
                                                 doclabid_seq=doclabid_seq.replace(']','');
-                                                var arr=doclabid_seq.split(',');
+                                                var arr=doclabid_se
+
+                                                q.split(',');
                                                 var arr2=new Array();
                                                 for(var i=0;i<arr.length;i++){
                                                     var ele=arr[i];
@@ -440,9 +442,8 @@ if (isListView && pageNum == 0) { %>
 	</tr>
 </table>
 <% } // End if (pageNum == 1) %>
-<script>
-    allSaveNext = document.querySelectorAll('.saveNext');
-    for(i = 0; i < allSaveNext.length; i++) {
-        allSaveNext[i].style.display = "inline";
-    }
-</script>
+<style>
+.saveNext {
+    display: inline !important;
+}
+</style>
