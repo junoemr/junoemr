@@ -67,8 +67,10 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 <link href="../library/bootstrap/3.0.0/assets/css/bootstrap3_badge_colours.css" rel="stylesheet">
 
-<%--Place csutom styles here to override bootstap styles--%>
+<%--Place custom styles here to override bootstap styles--%>
 <link href="./css/index.css" rel="stylesheet">
+<link href="./css/patient-list.css" rel="stylesheet">
+<link href="./css/record.css" rel="stylesheet">
 
 </head>
 	
@@ -83,7 +85,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				</button>
 				
 				<!-- link back to 'classic' view -->
-				<a  href="../provider/providercontrol.jsp"><img id="navbarlogo" src="../images/logo2.png" title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0" /></a>
+				<a  href="../provider/providercontrol.jsp"><img id="navbarlogo" src="../images/logo-white.png" title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0" /></a>
 			</div>
 			
 			 
@@ -191,54 +193,72 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	 <!-- Start patient List template --> 
 
 	<div class="container-fluid" ng-controller="PatientListCtrl" >
-		<div id="left_pane" class="col-md-2 noprint" ng-if="showPatientList()">
-		
-			<ul class="nav nav-tabs">			
-				<li ng-repeat="item in tabItems" ng-class="{'active': isActive(item.id)}" class="hand-hover">
-					<a ng-click="changeTab(item.id)" data-toggle="tab">{{item.label}}</a>
-				</li>
+		<div class="row">
+			<div id="left_pane" class="col-md-3 noprint" ng-if="showPatientList()">
+			
+				<%--<ul class="nav nav-tabs">			
+					<li ng-repeat="item in tabItems" ng-class="{'active': isActive(item.id)}" class="hand-hover">
+						<a ng-click="changeTab(item.id)" data-toggle="tab">{{item.label}}</a>
+					</li>
+					
+					<li class="dropdown" ng-class="{'active': currentmoretab != null}"><a class="dropdown-toggle hand-hover" ><b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li ng-repeat="item in moreTabItems">
+								<a ng-class="getMoreTabClass(item.id)" ng-click="changeMoreTab(item.id)" class="hand-hover">{{item.label}}<span ng-if="item.extra.length>0" class="badge">{{item.extra}}</span></a></li>
+							</ul>
+					</li>
+					
+				</ul>--%>
+
+				<div id="left-pane-header" class="row">
+					<div >
+						<div class="col-md-2">
+						<button id="hide-patient-list-button" type="button" class="pull-left" ng-click="hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
+							<span class="glyphicon glyphicon-chevron-left"></span> 
+						</button>
+					</div>
+					<div  class="col-md-8 col-md-offset-1">
+						<h1 id="left-pane-header-title">Your Appointments</h1>
+					</div>
+					</div>
+
+					
+					
+					
+				</div>
+				<div class="row" ng-cloak>
 				
-				<li class="dropdown" ng-class="{'active': currentmoretab != null}"><a class="dropdown-toggle hand-hover" ><b class="caret"></b></a>
-						<ul class="dropdown-menu">
-							<li ng-repeat="item in moreTabItems">
-							<a ng-class="getMoreTabClass(item.id)" ng-click="changeMoreTab(item.id)" class="hand-hover">{{item.label}}<span ng-if="item.extra.length>0" class="badge">{{item.extra}}</span></a></li>
-						</ul>
-				</li>
+					
+					
+					
+					<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>"> 
+						<span class="glyphicon glyphicon-refresh"></span> 
+					</button>
+					
+					<%--Remove these? --%>
+					<%--<button type="button" class="btn btn-default" ng-disabled="currentPage == 0" ng-click="changePage(currentPage-1)" title="<bean:message key="patientList.pageUp" bundle="ui"/>">
+						<span class="glyphicon glyphicon-circle-arrow-up"></span> 
+					</button>
+					
+					<button type="button" class="btn btn-default" ng-disabled="currentPage == nPages-1"  ng-click="changePage(currentPage+1)" title="<bean:message key="patientList.pageDown" bundle="ui"/>">
+						<span class="glyphicon glyphicon-circle-arrow-down"></span> 
+					</button>--%>
+
+					<div ng-include="sidebar.location"></div>
+					
+					<form class="form-search" role="search">
+						<span ng-show="showFilter === true" class="form-group twitter-typeahead">
+							<input type="text"  class="form-control" placeholder="<bean:message key="patientList.filter" bundle="ui"/>" ng-model="query"/>
+						</span>
+					</form>
 				
-			</ul>
-			<div class="list-group"  ng-cloak>
-			
-			
-			<button type="button" class="btn btn-default" ng-click="hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
- 				 <span class="glyphicon glyphicon-chevron-left"></span> 
-			</button>
-			
-			<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>"> 
- 				 <span class="glyphicon glyphicon-refresh"></span> 
-			</button>
-			
-			<button type="button" class="btn btn-default" ng-disabled="currentPage == 0" ng-click="changePage(currentPage-1)" title="<bean:message key="patientList.pageUp" bundle="ui"/>">
- 				 <span class="glyphicon glyphicon-circle-arrow-up"></span> 
-			</button>
-			
-			<button type="button" class="btn btn-default" ng-disabled="currentPage == nPages-1"  ng-click="changePage(currentPage+1)" title="<bean:message key="patientList.pageDown" bundle="ui"/>">
- 				 <span class="glyphicon glyphicon-circle-arrow-down"></span> 
-			</button>
-			
-			<form class="form-search" role="search">
-				<span ng-show="showFilter === true" class="form-group twitter-typeahead">
-					<input type="text"  class="form-control" placeholder="<bean:message key="patientList.filter" bundle="ui"/>" ng-model="query"/>
-				</span>
-			</form>
-		
-			<div ng-include="sidebar.location"></div>
-			
-			<span class="pull-right" title="<bean:message key="patientList.pagination" bundle="ui"/>">{{currentPage+1}}/{{numberOfPages()}}</span>
+					<span class="pull-right" title="<bean:message key="patientList.pagination" bundle="ui"/>">{{currentPage+1}}/{{numberOfPages()}}</span>
+			</div>
 		</div>
+		<!-- End patient List template -->
+			
+		<div id="right_pane" class="col-md-9" ui-view ng-cloak></div>
 	</div>
-	<!-- End patient List template -->
-		
-	<div id="right_pane" ng-class="getRightClass('col-md')" ui-view ng-cloak></div>
 	
 	
 	<!-- Bootstrap core JavaScript
