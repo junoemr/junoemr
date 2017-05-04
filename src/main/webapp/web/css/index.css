@@ -1,3 +1,7 @@
+body {
+    padding: 50px 0 0 0;
+}
+
 .hand-hover {
     cursor: pointer;
     cursor: hand;
@@ -10,12 +14,15 @@
 #parent {
     position: fixed;
     bottom: 0px;
-    width: 100%; //width should be 100%
+    width: 100%;
+    /*width should be 100%*/
 }
 
 #child {
-    width: 100px; //min width should give to center the div.
-    margin: 0px auto; //here it will make center 
+    width: 100px;
+    /*min width should give to center the div.*/
+    margin: 0px auto;
+    /*here it will make center */
 }
 
 #noteInput,
@@ -73,7 +80,7 @@ pre.noteInEdit {
 
 /*needed to fix the broken nav dropdown*/
 
-#left_pane {
+#left-pane {
     padding: 8px;
 }
 
@@ -83,15 +90,12 @@ pre.noteInEdit {
 }
 
 li.cpp-note-list {
-    background: #fff0;
+    background: #fff;
     border: none;
     border-bottom: 1px solid #ddd;
     text-align: left;
     padding-top: 4px;
     padding-bottom: 10px;
-}
-
-li.cpp-note-list {
     cursor: pointer;
 }
 
@@ -189,8 +193,109 @@ li.cpp-note-list:last-child {
 
 /*Updated styling below*/
 
-.navbar {
-    /*background-color: #2569d0;*/
+p {
+    color: #636363;
+}
+
+
+/*Navbar customizations */
+
+.navbar-default {
+    background-color: #2569d0;
+    padding-top: 0 !important;
+    margin-bottom: 0;
+    border: 0;
+}
+
+.navbar-default a {
+    color: #ebebeb !important;
+    font-weight: bold;
+}
+
+.navbar-default .caret {
+    border-bottom-color: #ebebeb !important;
+    border-top-color: #ebebeb !important;
+}
+
+.navbar-default li:hover,
+.navbar-default li:active,
+.navbar-default li:focus {
+    background-color: #1c56af;
+}
+
+.navbar-default .navbar-nav>.active>a,
+.navbar-default .navbar-nav>.active>a:hover,
+.navbar-default .navbar-nav>.active>a:focus {
+    background-color: #1c56af;
+}
+
+.navbar-default .navbar-nav>.open>a,
+.navbar-default .navbar-nav>.open>a:hover,
+.navbar-default .navbar-nav>.open>a:focus {
+    background-color: #1c56af;
+}
+
+.dropdown-menu {
+    background-color: #2569d0;
+}
+
+.dropdown-menu li:hover,
+.dropdown-menu a:hover {
+    background-color: #1c56af !important;
+}
+
+.dropdown-toggle {
+    color: #ebebeb;
+}
+
+#left_pane {
+    /*padding: 0;*/
+    /*Figure out why we need to do this, could be due to an angular template*/
+    /*margin-top: -20px;
+    height: 100vh;*/
+    background-color: #ebebeb;
+}
+
+#left_pane li {
+    color: #ebebeb;
+}
+
+#left-pane-header {
+    background-color: #1c56af;
+}
+
+#left-pane-header-title {
+    text-align: center;
+    font-size: 20px;
+    color: #ebebeb !important;
+}
+
+#hide-patient-list-button {
+    height: 60px;
+    background-color: #1c56af;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ebebeb;
+    border-bottom: 0;
+    border-top: 0;
+    border-left: 0;
+}
+
+#hide-patient-list-button:hover {
+    background-color: #1e65d2;
+}
+
+#hide-patient-list-button .glyphicon-chevron-left {
+    color: #ebebeb;
+}
+
+
+/*Media Queries*/
+
+@media (max-width: 767px) {
+    .navbar-collapse .nav>.divider-vertical {
+        display: none;
+    }
 }
 
 @media (max-width: 800px) {
