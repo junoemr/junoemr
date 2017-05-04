@@ -45,10 +45,12 @@
 
 <div ng-if="me != null">
 
-	<h1 class="lead">
-		<bean:message key="dashboard.welcome" bundle="ui" /> {{me.firstName}} <span class="pull-right">{{displayDate() | date:'MMMM d, y'}}</span></h1>
-	<hr>
+	<div class="container-fluid dashboard-header">
 
+		<h1 class="lead">
+			<bean:message key="dashboard.welcome" bundle="ui" /> {{me.firstName}} <span class="pull-right">{{displayDate() | date:'MMMM d, y'}}</span></h1>
+		<hr>
+	</div>
 	<div class="row">
 		<div class="col-md-9" ng-controller="DashboardCtrl">
 
