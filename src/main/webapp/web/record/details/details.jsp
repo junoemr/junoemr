@@ -127,11 +127,11 @@
 	</button>
 	<input type="text" id="swipecard" title="<bean:message key="web.record.details.clickCardSwipe"/>" ng-model="page.swipecard" ng-show="page.workflowEnhance" ng-focus="setSwipeReady()" ng-blur="setSwipeReady('off')" ng-keypress="healthCardHandler($event.keyCode)" style="width:0px; border:none"/>
 
-	<div id="pd1" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+	<div class="form" id="pd1" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 	<div class="form-group row">
-		<fieldset>
+		<div class="col-md-12">
 			<legend><bean:message key="demographic.demographiceditdemographic.msgDemographic"/></legend>
-		</fieldset>
+		</div>
 		<div class="col-md-6">
 			<label title="Required Field"><bean:message key="demographic.demographiceditdemographic.formLastName"/> <span style="color:red">*</span></label>
 			<input type="text" class="form-control form-control-details" placeholder="Family Name" title="Family Name" ng-model="page.demo.lastName" ng-change="formatLastName()" style="background-color:{{page.lastNameColor}}"/>
@@ -201,9 +201,9 @@
 	</div>
  
 	<div class="form-group row">
-		<fieldset>
+		<div class="col-md-12">
 			<legend><bean:message key="demographic.demographiceditdemographic.msgContactInfo"/></legend>
-		</fieldset>
+		</div>
 		<div class="col-md-6">
 		<label><bean:message key="demographic.demographiceditdemographic.formAddr"/></label>
 		<input type="text" placeholder="<bean:message key="demographic.demographiceditdemographic.formAddr"/>" title="<bean:message key="demographic.demographiceditdemographic.formAddr"/>" class="form-control form-control-details" ng-model="page.demo.address.address"/>
@@ -270,9 +270,9 @@
 	</div>
 	
 	<div class="form-group row">
-		<fieldset>
+		<div class="col-md-12">
 			<legend><bean:message key="demographic.demographiceditdemographic.msgHealthIns"/></legend>
-		</fieldset>
+		</div>
 		<div class="alert-warning" ng-show="page.HCValidation=='n/a'">
 			Online Health Card Validation unavailable
 		</div>
@@ -306,9 +306,9 @@
 	</div>
 	
 	<div class="form-group row">
-		<fieldset>
+		<div class="col-md-12">
 			<legend><bean:message key="web.record.details.careTeam"/></legend>
-		</fieldset>
+		</div>
 		<div class="col-md-6">
 			<label><bean:message key="web.record.details.mrp"/></label>
 			<select class="form-control form-control-details" title="MRP" ng-model="page.demo.providerNo" ng-options="mrp.providerNo as mrp.name for mrp in page.demo.doctors">
@@ -413,9 +413,9 @@
 	</div>
 	
 	<div class="form-group row">
-		<fieldset>
+		<div class="col-md-12">
 			<legend><bean:message key="web.record.details.addInformation"/></legend>
-		</fieldset>
+		</div>
 		<div class="col-md-6">
 			<label style="width:150px"><bean:message key="web.record.details.archivedPaperChart"/></label>
 			<select class="form-control form-control-details" title="Archived Paper Chart" ng-model="page.demo.scrPaperChartArchived" style="width:175px">
