@@ -26,7 +26,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
 <div class="page-header" style="margin-top: 0px; margin-bottom: 0px;">
-		<h1 class="patientHeaderName" style="margin-top: 0px;" ng-cloak>
+		<h1 class="patientHeaderName" ng-cloak>
 			<b>{{demographic.lastName}}, {{demographic.firstName}}</b>  <span ng-show="demographic.alias">({{demographic.alias}})</span> 
 			
 			<small class="patientHeaderExt pull-right"> 
