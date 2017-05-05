@@ -23,26 +23,6 @@
     Ontario, Canada
 
 --%>
-
-<style>
-	label {
-		width: 125px;
-	}
-	.form-control-details {
-		display: inline;
-		width: 200px;
-	}
-	.flat-btn {
-		padding-top: 0px;
-		padding-bottom: 0px;
-		font-size:x-small;
-	}
-	#photo {
-		height: 150px;
-		width: auto;
-		cursor: pointer;
-	}
-</style>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
 <div class="col-lg-12" ng-hide="page.canRead">

@@ -2,3 +2,24 @@
     color: #1e65d2;
     font-weight: bold;
 }
+
+label {
+    width: 125px;
+}
+
+.form-control-details {
+    display: inline;
+    width: 200px;
+}
+
+.flat-btn {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    font-size: x-small;
+}
+
+#photo {
+    height: 150px;
+    width: auto;
+    cursor: pointer;
+}
