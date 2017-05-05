@@ -28,14 +28,25 @@ import java.util.List;
 
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Favorite;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class FavoriteDao extends AbstractDao<Favorite> {
+	
+	static Logger logger = MiscUtils.getLogger();
 
 	public FavoriteDao() {
 		super(Favorite.class);
+	}
+	
+	/** find a favorite by primary key */
+	public Favorite findById(int favoriteId) {
+		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName() + " f WHERE f.id = :favoriteId");
+		query.setParameter("favoriteId", favoriteId);
+		return getSingleResultOrNull(query);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -45,6 +56,7 @@ public class FavoriteDao extends AbstractDao<Favorite> {
 		return query.getResultList();
 	}
 
+	@Deprecated
 	public Favorite findByEverything(String providerNo, String favoriteName, String bn, int gcn_SEQNO, String customName, float takeMin, float takeMax, String frequencyCode, String duration, String durationUnit, String quantity, int repeat, boolean nosubsInt, boolean prnInt, String parsedSpecial, String gn, String unitName, boolean customInstr) {
 		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName() + " f WHERE f.providerNo = :providerNo AND f.name = :favoritename AND f.bn = :brandName AND f.gcnSeqno = :gcnSeqNo AND f.customName = :customName AND f.takeMin = :takemin AND f.takeMax = :takemax AND f.frequencyCode = :freqcode AND f.duration = :duration "
 		        + "AND f.durationUnit = :durunit AND f.quantity = :quantity AND f.repeat = :repeat AND f.nosubs = :nosubs AND f.prn = :prn AND f.special = :special AND f.gn = :gn AND f.unitName = :unitName AND " + "f.customInstructions = :customInstructions");
