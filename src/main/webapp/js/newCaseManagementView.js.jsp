@@ -1357,9 +1357,22 @@ function changeToView(id) {
     //check if case note has been changed
     //if so, warn user that changes will be lost if not saved
 
-    if( origCaseNote != $F(id)  || origObservationDate != $("observationDate").value) {
-        if( !confirm(unsavedNoteWarning))
-            return false;
+    var noteDate = reason.trim();
+    var fullNote = $F(id).trim();
+    // Replace the date variable in the full text area with nothing
+    // to get the value of the entered text
+    var noteText = fullNote.replace(noteDate, '').trim();
+
+    if( noteText == '') {
+        return false;
+    }
+
+    if( noteText != ''  || origObservationDate != $("observationDate").value) {
+        // If the value of the current text area is not the same as the saved value, ask to save
+        if( fullNote != origCaseNote ) {
+            if( !confirm(unsavedNoteWarning) )
+                return false;
+        }
         else {
        	// Prevent saving of note if the current note isn't properly assigned to a program and role. (note_program_ui_enabled = true)
             if ((typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() != "undefined") &&
