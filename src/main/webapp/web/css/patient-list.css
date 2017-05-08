@@ -1,6 +1,7 @@
 .list-group-item-head {
     padding-top: 4px;
     padding-bottom: 4px;
+    background-color: #ebebeb;
 }
 
 .list-group-item.danger {
@@ -50,12 +51,21 @@
     padding: 0px;
 }
 
-#patient-list h5 {
+.patient-time {
     color: #5b5b5b !important;
+}
+
+.patient-name {
+    color: #3963c2 !important;
 }
 
 #patient-list a {
     background-color: #ebebeb !important;
+}
+
+#patient-list a:hover,
+#patient-list a:active {
+    background-color: #fff !important;
 }
 
 #listDate {
@@ -69,10 +79,10 @@
 
 #listDate h6,
 #listDate a {
-    color: #333;
+    color: #5b5b5b;
     padding: 0px;
     margin: 0px;
-    font-weight: bold
+    /*font-weight: bold*/
 }
 
 #listDate h6 a {

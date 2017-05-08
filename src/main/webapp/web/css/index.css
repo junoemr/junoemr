@@ -235,6 +235,11 @@ p {
     background-color: #2569d0;
 }
 
+.dropdown-menu small,
+.dropdown-menu em {
+    color: #ebebeb;
+}
+
 .dropdown-menu li:hover,
 .dropdown-menu a:hover {
     background-color: #1c56af !important;
@@ -251,6 +256,10 @@ p {
 
 #left-pane li {
     color: #ebebeb;
+}
+
+#left-pane .list-group-item {
+    border-right: 0;
 }
 
 #left-pane-header {
@@ -286,6 +295,10 @@ p {
 .vertical-align {
     display: flex;
     align-items: center;
+}
+
+#patient-search {
+    padding: 20px;
 }
 
 
