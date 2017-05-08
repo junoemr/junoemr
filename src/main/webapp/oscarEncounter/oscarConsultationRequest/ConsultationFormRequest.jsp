@@ -625,6 +625,7 @@ function onSelectSpecialist(SelectedSpec)	{
 								
         for( var idx = 0; idx < specs.length; ++idx ) {
             aSpeci = specs[idx];									// get the specialist Object for the currently selected spec
+            aSpeci.specNbr = (aSpeci.specNbr=="null")? null : aSpeci.specNbr; // hack to prevent searching null string
             if( aSpeci.specNbr == SelectedSpec.value ) {
             	form.phone.value = (aSpeci.phoneNum.replace(null,""));
             	form.fax.value = (aSpeci.specFax.replace(null,""));					// load the text fields with phone fax and address
@@ -988,18 +989,18 @@ function switchProvider(value) {
 		document.getElementById("letterheadPhone").value = "<%=clinic.getClinicPhone().trim() %>";
 		document.getElementById("letterheadPhoneSpan").innerHTML = "<%=clinic.getClinicPhone().trim() %>";
 		document.getElementById("letterheadFax").value = "<%=clinic.getClinicFax().trim() %>";
-		// document.getElementById("letterheadFaxSpan").innerHTML = "<%=clinic.getClinicFax().trim() %>";
-	} else {
-		if (typeof providerData["prov_" + value] != "undefined")
-			value = "prov_" + value;
-
+	} 
+	else {
 		document.getElementById("letterheadName").value = value;
+		
+		if (typeof providerData["prov_" + value] != "undefined") {
+			value = "prov_" + value;
+		}
 		document.getElementById("letterheadAddress").value = providerData[value]['address'];
 		document.getElementById("letterheadAddressSpan").innerHTML = providerData[value]['address'].replace(" ", "&nbsp;");
 		document.getElementById("letterheadPhone").value = providerData[value]['phone'];
 		document.getElementById("letterheadPhoneSpan").innerHTML = providerData[value]['phone'];
 		document.getElementById("letterheadFax").value = providerData[value]['fax'];
-		//document.getElementById("letterheadFaxSpan").innerHTML = providerData[value]['fax'];
 	}
 }
 </script>
@@ -1720,7 +1721,7 @@ function updateFaxButton() {
 							</td>							
 							<td align="right" class="tite3">				
 								<select name="letterheadName" id="letterheadName" onchange="switchProvider(this.value)">
-									<option value="<%=StringEscapeUtils.escapeHtml(clinic.getClinicName())%>" <%=(consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase(clinic.getClinicName()) ? "selected='selected'" : lhndType.equals("clinic") ? "selected='selected'" : "" )%>><%=clinic.getClinicName() %></option>
+									<option value="-1" <%=(consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase(clinic.getClinicName()) ? "selected='selected'" : lhndType.equals("clinic") ? "selected='selected'" : "" )%>><%=clinic.getClinicName() %></option>
 								<%
 									for (Provider p : prList) {
 										if (p.getProviderNo().compareTo("-1") != 0 && (p.getFirstName() != null || p.getSurname() != null)) {
