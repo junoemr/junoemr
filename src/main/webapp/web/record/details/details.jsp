@@ -127,11 +127,11 @@
 	</button>
 	<input type="text" id="swipecard" title="<bean:message key="web.record.details.clickCardSwipe"/>" ng-model="page.swipecard" ng-show="page.workflowEnhance" ng-focus="setSwipeReady()" ng-blur="setSwipeReady('off')" ng-keypress="healthCardHandler($event.keyCode)" style="width:0px; border:none"/>
 
-	<div id="pd1" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+	<div class="form" id="pd1" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 	<div class="form-group row">
-		<fieldset>
-			<legend><bean:message key="demographic.demographiceditdemographic.msgDemographic"/></legend>
-		</fieldset>
+		<div class="col-md-12">
+			<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.msgDemographic"/></h3>
+		</div>
 		<div class="col-md-6">
 			<label title="Required Field"><bean:message key="demographic.demographiceditdemographic.formLastName"/> <span style="color:red">*</span></label>
 			<input type="text" class="form-control form-control-details" placeholder="Family Name" title="Family Name" ng-model="page.demo.lastName" ng-change="formatLastName()" style="background-color:{{page.lastNameColor}}"/>
@@ -201,9 +201,9 @@
 	</div>
  
 	<div class="form-group row">
-		<fieldset>
-			<legend><bean:message key="demographic.demographiceditdemographic.msgContactInfo"/></legend>
-		</fieldset>
+		<div class="col-md-12">
+			<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.msgContactInfo"/></h3>
+		</div>
 		<div class="col-md-6">
 		<label><bean:message key="demographic.demographiceditdemographic.formAddr"/></label>
 		<input type="text" placeholder="<bean:message key="demographic.demographiceditdemographic.formAddr"/>" title="<bean:message key="demographic.demographiceditdemographic.formAddr"/>" class="form-control form-control-details" ng-model="page.demo.address.address"/>
@@ -270,9 +270,9 @@
 	</div>
 	
 	<div class="form-group row">
-		<fieldset>
-			<legend><bean:message key="demographic.demographiceditdemographic.msgHealthIns"/></legend>
-		</fieldset>
+		<div class="col-md-12">
+			<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.msgHealthIns"/></h3>
+		</div>
 		<div class="alert-warning" ng-show="page.HCValidation=='n/a'">
 			Online Health Card Validation unavailable
 		</div>
@@ -306,9 +306,9 @@
 	</div>
 	
 	<div class="form-group row">
-		<fieldset>
-			<legend><bean:message key="web.record.details.careTeam"/></legend>
-		</fieldset>
+		<div class="col-md-12">
+			<h3 class="form-heading"><bean:message key="web.record.details.careTeam"/></h3>
+		</div>
 		<div class="col-md-6">
 			<label><bean:message key="web.record.details.mrp"/></label>
 			<select class="form-control form-control-details" title="MRP" ng-model="page.demo.providerNo" ng-options="mrp.providerNo as mrp.name for mrp in page.demo.doctors">
@@ -413,9 +413,9 @@
 	</div>
 	
 	<div class="form-group row">
-		<fieldset>
-			<legend><bean:message key="web.record.details.addInformation"/></legend>
-		</fieldset>
+		<div class="col-md-12">
+			<h3 class="form-heading"><bean:message key="web.record.details.addInformation"/></h3>
+		</div>
 		<div class="col-md-6">
 			<label style="width:150px"><bean:message key="web.record.details.archivedPaperChart"/></label>
 			<select class="form-control form-control-details" title="Archived Paper Chart" ng-model="page.demo.scrPaperChartArchived" style="width:175px">
@@ -476,9 +476,10 @@
 <br/>
 
 <div class="col-lg-4">
-	<div class="clearfix">
-	<img class="pull-left" id="photo" title="Click to upload photo" ng-click="launchPhoto()" ng-src="../imageRenderingServlet?source=local_client&clientId={{page.demo.demographicNo}}"/>
-		<div class="pull-left" style="margin-left:5px;">
+	<div class="clearfix col-md-12">
+		<img class="pull-left" id="photo" title="Click to upload photo" ng-click="launchPhoto()" ng-src="../imageRenderingServlet?source=local_client&clientId={{page.demo.demographicNo}}"/>
+		<%--Remove this?--%>
+		<%--<div class="pull-left" style="margin-left:5px;">
 			<address>
 	  			<strong>{{page.demo.lastName}}, {{page.demo.firstName}}</strong><br/>
 		  		{{page.demo.address.address}}<br/>
@@ -486,45 +487,45 @@
 	  			<abbr title="Phone" ng-show="page.preferredPhoneNumber"><bean:message key="web.record.details.phoneShortHand"/></abbr> {{page.preferredPhoneNumber}}
 			</address>
 			<a ng-click="macPHRDo('Verification')" ng-show="page.macPHRIdsSet"><bean:message key="global.phr"/>{{page.macPHRVerificationLevel}}</a>
-		</div>
+		</div>--%>
 	</div>
 	<br/>
 	<div>
 		<div id="pd2" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
-		<fieldset>
-			<legend><bean:message key="demographic.demographiceditdemographic.formAlert"/></legend>
+		<div class="col-md-12">
+			<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formAlert"/></h3>
 			<textarea ng-model="page.demo.alert" class="form-control form-control-details" style="height:55px; width:100%; color:red;"></textarea>
-		</fieldset>
-		<br/>
-		<fieldset>
-			<legend><bean:message key="demographic.demographiceditdemographic.formNotes"/></legend>
-			<textarea ng-model="page.demo.scrNotes" class="form-control form-control-details" style="height:55px; width:100%;"></textarea>
-		</fieldset>
 		</div>
 		<br/>
-		<fieldset>
-			<legend>
+		<div class="col-md-12">
+			<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formNotes"/></h3>
+			<textarea ng-model="page.demo.scrNotes" class="form-control form-control-details" style="height:55px; width:100%;"></textarea>
+		</div>
+		</div>
+		<br/>
+		<div class="col-md-12">
+			<h3 class="form-heading">
 				<bean:message key="global.contacts"/>
-				<button type="button" class="btn" ng-click="manageContacts()"><bean:message key="web.record.details.manage"/></button>
-			</legend>
+				<button type="button" class="btn pull-right" ng-click="manageContacts()"><bean:message key="web.record.details.manage"/></button>
+			</h3>
 			<div class="form-group" ng-repeat="dc in page.demo.demoContacts">
 				<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
 				<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
 				<div class="col-md-5">{{dc.phone}}</div>
 			</div>
-		</fieldset>
+		</div>
 		<br/>
-		<fieldset>
-			<legend>
+		<div class="col-md-12">
+			<h3 class="form-heading">
 				<bean:message key="web.record.details.proContacts"/>
-				<button type="button" class="btn" ng-click="manageContacts()"><bean:message key="web.record.details.manage"/></button>
-			</legend>
+				<button type="button" class="btn pull-right" ng-click="manageContacts()"><bean:message key="web.record.details.manage"/></button>
+			</h3>
 			<div class="form-group" ng-repeat="dc in page.demo.demoContactPros">
 				<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
 				<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
 				<div class="col-md-5">{{dc.phone}}</div>
 			</div>
-		</fieldset>
+		</div>
 	</div>
 </div>
 <br/>

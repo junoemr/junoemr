@@ -67,180 +67,10 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 <link href="../library/bootstrap/3.0.0/assets/css/bootstrap3_badge_colours.css" rel="stylesheet">
 
-
-<style>
-/*styles temporary, when design complete styles will be moved to css above*/
-.hand-hover{cursor: pointer; cursor: hand;}
-
-.hand-hover:hover{
-text-decoration:none;
-}
-
-#parent{
-    position:fixed;
-    bottom:0px;
-    width:100%;   //width should be 100%
- } 
- #child{
-    width:100px; //min width should give to center the div.
-    margin:0px auto; //here it will make center 
- }
- 
-
-
-#noteInput, #noteInput2 {
-    position: fixed;
-    bottom: 0;
-    font-family: sans-serif;
-	margin-bottom:0px;
-	font-weight: bold;
-	bottom: 0;
-    z-index:999;
-}
-
-#noteInput {
-    line-height: 2;
-    font-size: 30px;
-    /*text-shadow: 0 1px 0 #84BAFF;
-    //box-shadow: 0 0 15px #00214B
-    //background: #ccccFF;
-    //text-align: center;
-    //color: #042E64;
-    */
-}
-
-.absolute-left{
-left:0px;
-}
-
-.absolute-right{
-right:0px;
-} 
-
-#noteInput ul.dropdown-menu{
-max-height:220px;
-overflow-y:auto;
-overflow-x:none;
-}
-
-
-pre.noteInEdit {
-	border-color: rgba(126, 239, 104, 0.8);
-	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
-	outline: 0 none;
-}
-
-img.navbarlogo {
-	height: 40px;
-	padding-top:10px;
-}
-
-.navbar-form .input-group-btn,
-.navbar-form .input-group-addon {
-width: auto;
-}
-
-/*needed to fix the broken nav dropdown*/
-#left_pane{
-padding:8px;
-}
-
-.add-summary:hover{
-color:#333 !important;
-text-decoration:none;
-}
-
-li.cpp-note-list{
-    background:#fff0;
-    border:none;
-    border-bottom:1px solid #ddd;
-    text-align: left;
-    padding-top:4px;
-    padding-bottom: 10px;
-}
-
-li.cpp-note-list{
-cursor: pointer;
-}
-
-li.cpp-note-list:last-child{
-    border-bottom:none;
-}
-
-.well-note{
-    border-color:#d2d2d2;
-    box-shadow:0 1px 0 #cfcfcf;
-    border-radius:3px;
-    
-    /*not sure if this will stay*/
-    max-height:300px;
-    overflow-y:auto;
-}
-
- .nav .navbar-nav li.dropdown > a .caret {
-   border-top-color:  red !important; /*#555555;*/
-   border-bottom-color: red !important;/*#555555;*/
-
- }
- 
- .more {
-   border-top-color:  #727272 !important; 
-   border-bottom-color: #727272 !important;
- }
- 
- .more:hover {
-   border-top-color:  #333 !important; 
-   border-bottom-color: #333 !important;
- }
-
-.highlight, .highlight:hover{
-color: #FF0000;
-}
-
-
-.refused, .refused:hover{
-color: #EAACAC;
-}
-
-.ineligible, .ineligible:hover{
-color: #FFCC24;
-}
-
-.pending, .pending:hover{
-color: #FF00FF;
-}
-
-/*think of changing this to be consistent*/
-.abnormal-prev, .abnormal-prev:hover{
-color: #FF4D4D;
-}
- 
- .abnormal,  .abnormal:hover{
-color:red;
-}
-
-.glyphicon-chevron-down-disabled{
-color: #999999 !important;
-}
-
-/*for patient header*/
-@media (max-width: 1320px) {
-.patientHeaderName{
-font-size:26px
-}
-
-.patientHeaderExt{
-font-size:20px
-}
-
-}
-
-@media print {
- .noprint {display:none;}
- .patientHeaderName{font-size:16px;}
- .patientHeaderExt{font-size:16px;}
-}
-</style>
+<%--Place custom styles here to override bootstap styles--%>
+<link href="./css/index.css" rel="stylesheet">
+<link href="./css/patient-list.css" rel="stylesheet">
+<link href="./css/record.css" rel="stylesheet">
 
 </head>
 	
@@ -255,7 +85,7 @@ font-size:20px
 				</button>
 				
 				<!-- link back to 'classic' view -->
-				<a  href="../provider/providercontrol.jsp"><img class="navbarlogo" src="../images/Logo2.png" title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0" /></a>
+				<a  href="../provider/providercontrol.jsp"><img id="navbarlogo" src="../images/logo-white.png" title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0" /></a>
 			</div>
 			
 			 
@@ -277,27 +107,6 @@ font-size:20px
 						ng-show="showPtList === false" ng-click="showPatientList()" 
 						title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
 
-					<%--New Dashboard Menu --%>
-					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-home hand-hover" ui-sref="dashboard" title="<bean:message key="navbar.dashboard" bundle="ui"/>"></span></li>
-
-					<li style="margin-right:5px">
-						<a href="javascript:void(0)" ng-if="!dashboardMenu.dropdown" ng-click="transition(dashboardMenu)" >
-							<bean:message key="navbar.menu.dashboard" bundle="ui" />
-
-						</a>
-						<a href="javascript:void(0)" ng-if="dashboardMenu.dropdown"  class="dropdown-toggle" data-toggle="dropdown">
-							<bean:message key="navbar.menu.dashboard" bundle="ui" />
-							<span class="caret more"></span>
-						</a>
-						<ul ng-if="dashboardMenu.dropdown" class="dropdown-menu" role="menu">
-							<li class="navbar-text hand-hover" ui-sref="dashboard" 
-									title="<bean:message key="navbar.dashboard" bundle="ui" />" >Home</li>
-							<li ng-repeat="dashboardMenuItem in dashboardMenu.dropdownItems" >
-								<a href="javascript:void(0)" ng-click="transition(dashboardMenuItem)" >{{dashboardMenuItem.label}}</a>
-							</li>
-						</ul>
-					</li>
-				
 					<li ng-repeat="item in menuItems" ng-class="isActive(item)">
 						<a href="javascript:void(0)" ng-if="!item.dropdown" ng-click="transition(item)" >{{item.label}} 
 							<span ng-if="item.label=='Inbox' && unAckLabDocTotal>0" class="badge badge-danger">{{unAckLabDocTotal}}</span>
@@ -316,30 +125,6 @@ font-size:20px
 				<!-- more condensed version -->
 				<ul class="nav navbar-nav hidden-lg visible-md visible-sm visible-xs">	
 					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover" ng-show="showPtList === false" ng-click="showPatientList()" title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
-
-					<%-- 
-					New Dashboard Menu
-					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-home hand-hover" ui-sref="dashboard" title="<bean:message key="navbar.dashboard" bundle="ui"/>"></span></li> --%>
-					
-					<li style="margin-right:5px">
-						<a href="javascript:void(0)" ng-if="!item.dropdown" ng-click="transition(item)" >
-							Dashboard
-							<span ng-if="item.label=='Inbox' && unAckLabDocTotal>0" class="badge badge-danger">{{unAckLabDocTotal}}</span>
-						</a>
-						<a href="javascript:void(0)" ng-if="item.dropdown"  class="dropdown-toggle" data-toggle="dropdown">
-							Dashboard
-							<span class="caret more"></span>
-						</a>
-						<ul ng-if="item.dropdown" class="dropdown-menu" role="menu">
-							<li>
-								<span class="navbar-text hand-hover" ui-sref="dashboard" 
-									title="<bean:message key="navbar.dashboard" bundle="ui" />" >Home</span>
-							</li>
-							<li ng-repeat="dropdownItem in " >
-							
-							</li>
-						</ul>
-					</li>
 						
 					<li class="dropdown hand-hover"><a href="void()" class="dropdown-toggle"><bean:message key="navbar.modules" bundle="ui"/><b class="caret"></b></a>
 						<ul class="dropdown-menu">
@@ -367,14 +152,15 @@ font-size:20px
 						<a ng-click="openMessenger()" title="<bean:message key="navbar.messenger" bundle="ui"/>" class="hand-hover">
 							<span  class="glyphicon glyphicon-envelope"></span> 
 						</a>
-						<span ng-repeat="item in messengerMenu">
-						   <a ng-click="openMessenger(item)"  title="{{item.label}}" class="hand-hover">{{item.extra}}</a> <span ng-if="!$last">|</span>
-						</span>
+						<%--Remove demographic message icon; Awaiting JSON fix so that a list 
+						with one item is returned instead of an object. After fix we can use ng-repeat and refer change messengerMenu to item--%>
+						<%--<span ng-repeat="item in messengerMenu">--%>
+						   <a ng-click="openMessenger(messengerMenu)"  title="{{messengerMenu.label}}" class="hand-hover">{{messengerMenu.extra}}</a> <%--<span ng-if="!$last">|</span>--%>
+						<%--</span>--%>
 					</span>
 					&nbsp; &nbsp;
 					
 					<span class="dropdown">
-						<span class="dropdown-toggle hand-hover" title="<bean:message key="navbar.changeProgram" bundle="ui"/>"><span class="glyphicon glyphicon-globe"></span></span>
 						<ul class="dropdown-menu" role="menu">
 	                    	<li ng-repeat="item in programDomain">
 	                        	<a ng-click="changeProgram(item.program.id)">
@@ -388,19 +174,13 @@ font-size:20px
 				 	
 					&nbsp;
 					
-					<span class="dropdown-toggle hand-hover" data-toggle="dropdown" title="<bean:message key="navbar.user" bundle="ui"/>"><span class="glyphicon glyphicon-user"></span><u>{{me.firstName}}</u></span>
+					<span class="dropdown-toggle hand-hover" data-toggle="dropdown" title="<bean:message key="navbar.user" bundle="ui"/>"><span class="glyphicon glyphicon-user"></span>{{me.firstName}}</span>
 					<ul class="dropdown-menu" role="menu">
 						<li ng-repeat="item in userMenuItems">
 							<a ng-click="transition(item)" ng-class="{'more-tab-highlight': isActive(item) }" class="hand-hover" >{{item.label}}</a>
 							<a ng-if="item.url" href="{{item.url}}" target="_blank">{{dropdownItem.label}}</a>
 						</li>
 				  	</ul>
-				  	
-					<a href="../logout.jsp" title="<bean:message key="navbar.logout" bundle="ui"/>" style="padding-left:10px;">
-						<span class="glyphicon glyphicon-off"></span>
-					</a>
-
-
 				</div>
 			</div>
 			<!--/.nav-collapse -->
@@ -413,54 +193,72 @@ font-size:20px
 	 <!-- Start patient List template --> 
 
 	<div class="container-fluid" ng-controller="PatientListCtrl" >
-		<div id="left_pane" class="col-md-2 noprint" ng-if="showPatientList()">
-		
-			<ul class="nav nav-tabs">			
-				<li ng-repeat="item in tabItems" ng-class="{'active': isActive(item.id)}" class="hand-hover">
-					<a ng-click="changeTab(item.id)" data-toggle="tab">{{item.label}}</a>
-				</li>
+		<div class="row">
+			<div id="left_pane" class="col-md-3 noprint" ng-if="showPatientList()">
+			
+				<%--<ul class="nav nav-tabs">			
+					<li ng-repeat="item in tabItems" ng-class="{'active': isActive(item.id)}" class="hand-hover">
+						<a ng-click="changeTab(item.id)" data-toggle="tab">{{item.label}}</a>
+					</li>
+					
+					<li class="dropdown" ng-class="{'active': currentmoretab != null}"><a class="dropdown-toggle hand-hover" ><b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li ng-repeat="item in moreTabItems">
+								<a ng-class="getMoreTabClass(item.id)" ng-click="changeMoreTab(item.id)" class="hand-hover">{{item.label}}<span ng-if="item.extra.length>0" class="badge">{{item.extra}}</span></a></li>
+							</ul>
+					</li>
+					
+				</ul>--%>
+
+				<div id="left-pane-header" class="row">
+					<div >
+						<div class="col-md-2">
+						<button id="hide-patient-list-button" type="button" class="pull-left" ng-click="hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
+							<span class="glyphicon glyphicon-chevron-left"></span> 
+						</button>
+					</div>
+					<div  class="col-md-8 col-md-offset-1">
+						<h1 id="left-pane-header-title">Your Appointments</h1>
+					</div>
+					</div>
+
+					
+					
+					
+				</div>
+				<div class="row" ng-cloak>
 				
-				<li class="dropdown" ng-class="{'active': currentmoretab != null}"><a class="dropdown-toggle hand-hover" ><b class="caret"></b></a>
-						<ul class="dropdown-menu">
-							<li ng-repeat="item in moreTabItems">
-							<a ng-class="getMoreTabClass(item.id)" ng-click="changeMoreTab(item.id)" class="hand-hover">{{item.label}}<span ng-if="item.extra.length>0" class="badge">{{item.extra}}</span></a></li>
-						</ul>
-				</li>
+					
+					
+					
+					<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>"> 
+						<span class="glyphicon glyphicon-refresh"></span> 
+					</button>
+					
+					<%--Remove these? --%>
+					<%--<button type="button" class="btn btn-default" ng-disabled="currentPage == 0" ng-click="changePage(currentPage-1)" title="<bean:message key="patientList.pageUp" bundle="ui"/>">
+						<span class="glyphicon glyphicon-circle-arrow-up"></span> 
+					</button>
+					
+					<button type="button" class="btn btn-default" ng-disabled="currentPage == nPages-1"  ng-click="changePage(currentPage+1)" title="<bean:message key="patientList.pageDown" bundle="ui"/>">
+						<span class="glyphicon glyphicon-circle-arrow-down"></span> 
+					</button>--%>
+
+					<div ng-include="sidebar.location"></div>
+					
+					<form class="form-search" role="search">
+						<span ng-show="showFilter === true" class="form-group twitter-typeahead">
+							<input type="text"  class="form-control" placeholder="<bean:message key="patientList.filter" bundle="ui"/>" ng-model="query"/>
+						</span>
+					</form>
 				
-			</ul>
-			<div class="list-group"  ng-cloak>
-			
-			
-			<button type="button" class="btn btn-default" ng-click="hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
- 				 <span class="glyphicon glyphicon-chevron-left"></span> 
-			</button>
-			
-			<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>"> 
- 				 <span class="glyphicon glyphicon-refresh"></span> 
-			</button>
-			
-			<button type="button" class="btn btn-default" ng-disabled="currentPage == 0" ng-click="changePage(currentPage-1)" title="<bean:message key="patientList.pageUp" bundle="ui"/>">
- 				 <span class="glyphicon glyphicon-circle-arrow-up"></span> 
-			</button>
-			
-			<button type="button" class="btn btn-default" ng-disabled="currentPage == nPages-1"  ng-click="changePage(currentPage+1)" title="<bean:message key="patientList.pageDown" bundle="ui"/>">
- 				 <span class="glyphicon glyphicon-circle-arrow-down"></span> 
-			</button>
-			
-			<form class="form-search" role="search">
-				<span ng-show="showFilter === true" class="form-group twitter-typeahead">
-					<input type="text"  class="form-control" placeholder="<bean:message key="patientList.filter" bundle="ui"/>" ng-model="query"/>
-				</span>
-			</form>
-		
-			<div ng-include="sidebar.location"></div>
-			
-			<span class="pull-right" title="<bean:message key="patientList.pagination" bundle="ui"/>">{{currentPage+1}}/{{numberOfPages()}}</span>
+					<span class="pull-right" title="<bean:message key="patientList.pagination" bundle="ui"/>">{{currentPage+1}}/{{numberOfPages()}}</span>
+			</div>
 		</div>
+		<!-- End patient List template -->
+			
+		<div id="right_pane" class="col-md-9" ui-view ng-cloak></div>
 	</div>
-	<!-- End patient List template -->
-		
-	<div id="right_pane" ng-class="getRightClass('col-md')" ui-view ng-cloak></div>
 	
 	
 	<!-- Bootstrap core JavaScript

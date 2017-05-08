@@ -1,76 +1,87 @@
-.list-group-item-head{
-   padding-top:4px; 
-   padding-bottom:4px;
+.list-group-item-head {
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 .list-group-item.danger {
-   background-color: #f2dede;
-   border-color: #ebccd1;
- }
- 
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
 .list-group-item.danger:hover {
-   background-color: #ebcccc;
-   border-color: #e4b9c0;
- }
- 
- .list-group-item.warning {
-   background-color: #fcf8e3;
-   border-color: #faebcc;
- }
- 
- .list-group-item.warning:hover {
-   background-color: #faf2cc;
-   border-color: #f7e1b5;
- }
- 
- .list-group-item.success {
-   background-color: #dff0d8;
-   border-color: #d6e9c6;
- }
- 
- .list-group-item.success:hover {
-   background-color: #d0e9c6;
-   border-color: #c9e2b3;
- }
- 
- .more-tab-highlight {
-	background-color: #dff0d8;
-	border-color: #d6e9c6;
- }
- 
-.list-patients{
-	overflow:hidden;
+    background-color: #ebcccc;
+    border-color: #e4b9c0;
 }
 
-.list-patient-date-select{
-	width:75px;
-	border:0px;
-	font-size:14px;
-	font-weight:bold;
-	padding:0px;
+.list-group-item.warning {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
 }
 
-#listDate{
-	width:100%;
-	text-align:left;
+.list-group-item.warning:hover {
+    background-color: #faf2cc;
+    border-color: #f7e1b5;
 }
 
-.list-patient-date-cell{
-	text-align:center;
+.list-group-item.success {
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
 }
 
-#listDate h6, #listDate a{
-	color:#333;
-	padding:0px;
-	margin:0px;
-	font-weight:bold
+.list-group-item.success:hover {
+    background-color: #d0e9c6;
+    border-color: #c9e2b3;
 }
 
-#listDate h6 a{
-	color:#727272;
+.more-tab-highlight {
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
 }
 
-#listDate a:hover, #listDate a:active, #listDate a:focus {
-	color:#000000;
-	text-decoration:none;
+.list-patients {
+    overflow: hidden;
+}
+
+.list-patient-date-select {
+    width: 75px;
+    border: 0px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0px;
+}
+
+#patient-list h5 {
+    color: #5b5b5b !important;
+}
+
+#patient-list a {
+    background-color: #ebebeb !important;
+}
+
+#listDate {
+    width: 100%;
+    text-align: left;
+}
+
+.list-patient-date-cell {
+    text-align: center;
+}
+
+#listDate h6,
+#listDate a {
+    color: #333;
+    padding: 0px;
+    margin: 0px;
+    font-weight: bold
+}
+
+#listDate h6 a {
+    color: #727272;
+}
+
+#listDate a:hover,
+#listDate a:active,
+#listDate a:focus {
+    color: #000000;
+    text-decoration: none;
 }

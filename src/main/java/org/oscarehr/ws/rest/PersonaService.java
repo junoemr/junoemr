@@ -194,12 +194,12 @@ public class PersonaService extends AbstractServiceImpl {
 		}
 		
 		/* counts */
-		
-		int messageCount = messagingManager.getMyInboxMessageCount(getLoggedInInfo(),provider.getProviderNo(), false);
+		// Remove demographic message count. Leaving comments for future debugging to address the previously mentioned JSON error.
+		// int messageCount = messagingManager.getMyInboxMessageCount(getLoggedInInfo(),provider.getProviderNo(), false);
 		int ptMessageCount = messagingManager.getMyInboxMessageCount(getLoggedInInfo(),provider.getProviderNo(),true);
 		MenuTo1 messengerMenu = new MenuTo1();
 		int menuItemCounter = 0;
-		messengerMenu.add(menuItemCounter++, bundle.getString("navbar.newOscarDemoMessages"), ""+messageCount, "classic");
+		// messengerMenu.add(menuItemCounter++, bundle.getString("navbar.newOscarDemoMessages"), ""+messageCount, "classic");
 		messengerMenu.add(menuItemCounter++, bundle.getString("navbar.newOscarMessages"), ""+ptMessageCount, "classic");
 		
 		
@@ -238,6 +238,7 @@ public class PersonaService extends AbstractServiceImpl {
 		int idCounter = 0;
 		
 		MenuTo1 menu = new MenuTo1()
+				.addWithState(idCounter++,bundle.getString("navbar.menu.dashboard"), null, "dashboard")
 		        .add(idCounter++,bundle.getString("navbar.menu.schedule"),null,"../provider/providercontrol.jsp")
 				.addWithState(idCounter++,bundle.getString("navbar.menu.inbox"),null,"inbox");
 
@@ -278,7 +279,8 @@ public class PersonaService extends AbstractServiceImpl {
 		MenuTo1 userMenu = new MenuTo1()
 		.addWithState(0,bundle.getString("navbar.menu.settings"),null,"settings")
 		.addWithState(1,bundle.getString("navbar.menu.support"),null,"support")
-		.addNewWindow(2,bundle.getString("navbar.menu.help"),null,"https://help.oscarhost.ca");
+		.addNewWindow(2,bundle.getString("navbar.menu.help"),null,"https://help.oscarhost.ca")
+		.addNewWindow(2,bundle.getString("navbar.menu.logout"),null,"../logout.jsp");
 		navBarMenu.setUserMenu(userMenu);
 
 		result.setMenus(navBarMenu);
