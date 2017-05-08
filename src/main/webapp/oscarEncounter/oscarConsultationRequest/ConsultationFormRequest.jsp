@@ -1790,7 +1790,7 @@ function updateFaxButton() {
 									List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
 								%>
 									<span id="letterheadFaxSpan">
-										<select name="letterheadFax">
+										<select name="letterheadFax" id="letterheadFax">
 								<%
 									for( FaxConfig faxConfig : faxConfigs ) {
 								%>
