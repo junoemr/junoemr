@@ -80,10 +80,6 @@ pre.noteInEdit {
 
 /*needed to fix the broken nav dropdown*/
 
-#left-pane {
-    padding: 8px;
-}
-
 .add-summary:hover {
     color: #333 !important;
     text-decoration: none;
@@ -248,20 +244,18 @@ p {
     color: #ebebeb;
 }
 
-#left_pane {
-    /*padding: 0;*/
-    /*Figure out why we need to do this, could be due to an angular template*/
-    /*margin-top: -20px;
-    height: 100vh;*/
+#left-pane {
     background-color: #ebebeb;
+    padding-right: 0;
 }
 
-#left_pane li {
+#left-pane li {
     color: #ebebeb;
 }
 
 #left-pane-header {
     background-color: #1c56af;
+    margin-right: 0px;
 }
 
 #left-pane-header-title {
@@ -271,7 +265,7 @@ p {
 }
 
 #hide-patient-list-button {
-    height: 60px;
+    height: 90px;
     background-color: #1c56af;
     border-style: solid;
     border-width: 1px;
@@ -287,6 +281,11 @@ p {
 
 #hide-patient-list-button .glyphicon-chevron-left {
     color: #ebebeb;
+}
+
+.vertical-align {
+    display: flex;
+    align-items: center;
 }
 
 
