@@ -3,16 +3,38 @@
     font-weight: bold;
 }
 
-label {
-    width: 125px;
-}
 
-.form-control-details {
+/*label {
+    width: 125px;
+}*/
+
+
+/*.form-control-details {
     display: inline;
     width: 200px;
+}*/
+
+#dob-year {
+    width: 65px;
 }
 
-.flat-btn {
+#dob-month {
+    width: 45px;
+}
+
+#dob-day {
+    width: 45px;
+}
+
+.phone-num {
+    width: 70% !important;
+}
+
+.phone-ext {
+    width: 30% !important;
+}
+
+flat-btn {
     padding-top: 0px;
     padding-bottom: 0px;
     font-size: x-small;
@@ -22,4 +44,16 @@ label {
     height: 150px;
     width: auto;
     cursor: pointer;
+}
+
+.add-status-menu {
+    right: 55px;
+    top: 0px;
+    z-index: 1;
+    background-color: #EEEEEE;
+    padding: 5px;
+}
+
+.add-status-menu button {
+    margin-top: 10px;
 }
