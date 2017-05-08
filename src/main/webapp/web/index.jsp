@@ -216,17 +216,21 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 									<span class="glyphicon glyphicon-chevron-left"></span> 
 								</button>
 							</div>
-							<div class="col-md-8 col-md-offset-1">
+							<div class="col-md-7 col-md-offset-1">
 								<h1 id="left-pane-header-title">Your Appointments</h1>
+							</div>
+							<%--NOTE: Need to give this controller access to the addNewAppointment() function before this button can be used here --%>
+							<div class="col-md-2">
+								<a class="hand-hover" ng-click="addNewAppointment()"><span class="glyphicon glyphicon-plus"></span></a>
 							</div>
 					</div>
 				</div>
 				<div class="container">
 					<div class="row" ng-cloak>
-						<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>"> 
+						<%--<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>"> 
 							<span class="glyphicon glyphicon-refresh"></span> 
 						</button>
-						
+						--%>
 						<%--Remove these? --%>
 						<%--<button type="button" class="btn btn-default" ng-disabled="currentPage == 0" ng-click="changePage(currentPage-1)" title="<bean:message key="patientList.pageUp" bundle="ui"/>">
 							<span class="glyphicon glyphicon-circle-arrow-up"></span> 
@@ -236,15 +240,17 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							<span class="glyphicon glyphicon-circle-arrow-down"></span> 
 						</button>--%>
 
-						<div ng-include="sidebar.location"></div>
-						
-						<form class="form-search" role="search">
-							<span ng-show="showFilter === true" class="form-group twitter-typeahead">
-								<input type="text"  class="form-control" placeholder="<bean:message key="patientList.filter" bundle="ui"/>" ng-model="query"/>
-							</span>
+						<form id="patient-search" class="form-search" role="search">
+							
+								<span ng-show="showFilter === true" class="form-group twitter-typeahead">
+									<input type="text"  class="form-control" placeholder="<bean:message key="patientList.search" bundle="ui"/>" ng-model="query"/>
+								</span>
 						</form>
-					
-						<span class="pull-right" title="<bean:message key="patientList.pagination" bundle="ui"/>">{{currentPage+1}}/{{numberOfPages()}}</span>
+
+						<div ng-include="sidebar.location"></div>
+						<div class="col-md-2 pull-right">
+							<span title="<bean:message key="patientList.pagination" bundle="ui"/>">{{currentPage+1}}/{{numberOfPages()}}</span>
+						</div>
 					</div>
 				</div>
 		</div>
