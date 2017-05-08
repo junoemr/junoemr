@@ -179,7 +179,7 @@ if(!authed) {
 	String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF" ;
 	String str = null;
 	int nStrShowLen = 20;
-	String prov= (oscarVariables.getProperty("hctype","")).trim().toUpperCase();
+	String billRegion = (oscarVariables.getProperty("billregion","")).trim().toUpperCase();
 
 	CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 	List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.DEMOGRAPHIC, Long.valueOf(demographic_no));
@@ -916,7 +916,7 @@ if(wLReadonly.equals("")){
 			<tr>
 				<td>
 					<% 
-					if ("CLINICAID".equals(prov)) 
+					if ("CLINICAID".equals(billRegion)) 
 					{
 						%>
 							<a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">
@@ -924,7 +924,7 @@ if(wLReadonly.equals("")){
 							</a>
 						<%
 					}
-					else if("ON".equals(prov)) 
+					else if("ON".equals(billRegion)) 
 					{
 					%>
 						<a href="javascript: function myFunction() {return false; }"
@@ -952,11 +952,11 @@ if(wLReadonly.equals("")){
 			<tr>
 				<td><a
 					href="javascript: function myFunction() {return false; }"
-					onClick="popupPage(700, 1000, '../billing.do?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
+					onClick="popupPage(700, 1000, '../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>
 			<%
-			if("ON".equals(prov)) {
+			if("ON".equals(billRegion)) {
 				String default_view = oscarVariables.getProperty("default_view", "");
 
 				if (!oscarProps.getProperty("clinic_no", "").startsWith("1022")) { // part 2 of quick hack to make Dr. Hunter happy
@@ -971,7 +971,7 @@ if(wLReadonly.equals("")){
 				<tr>
 					<td><a
 						href="javascript: function myFunction() {return false; }"
-						onClick="popupS('../billing/CA/ON/billingShortcutPg1.jsp?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("hospital_view", default_view))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
+						onClick="popupS('../billing/CA/ON/billingShortcutPg1.jsp?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("hospital_view", default_view))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
 						title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgHospitalBilling"/></a></td>
 				</tr>
 				<tr>
@@ -2831,7 +2831,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 								<td align="right" nowrap><b><bean:message
 									key="demographic.demographiceditdemographic.formRefDocNo" />: </b></td>
 								<td align="left"><input type="text" name="r_doctor_ohip" <%=getDisabled("r_doctor_ohip")%>
-									size="20" maxlength="6" value="<%=rdohip%>"> <% if("ON".equals(prov)) { %>
+									size="20" maxlength="6" value="<%=rdohip%>"> <% if("ON".equals(billRegion)) { %>
 								<a
 									href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
 								#</a> <% } %>
