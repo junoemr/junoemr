@@ -179,7 +179,7 @@ if(!authed) {
 	String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF" ;
 	String str = null;
 	int nStrShowLen = 20;
-	String prov= (oscarVariables.getProperty("hctype","")).trim().toUpperCase();
+	String prov= (oscarVariables.getProperty("billregion","")).trim().toUpperCase();
 
 	CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 	List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.DEMOGRAPHIC, Long.valueOf(demographic_no));
