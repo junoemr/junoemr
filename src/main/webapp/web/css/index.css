@@ -243,6 +243,14 @@ p {
     margin-right: 0px;
 }
 
+#left-pane-header a {
+    color: #ebebeb;
+}
+
+#left-pane-header h1 {
+    margin: 0;
+}
+
 #left-pane-header-title {
     text-align: center;
     font-size: 20px;
