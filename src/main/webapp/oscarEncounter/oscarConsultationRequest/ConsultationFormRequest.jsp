@@ -1784,11 +1784,6 @@ function updateFaxButton() {
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.letterheadFax" />:
 							</td>
 							<td align="right" class="tite3">
-							   <%
-									FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
-									List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
-								%>
-
 							   <span id="letterheadFax">
 							   <% if (consultUtil.letterheadFax != null) { %>
 							        <%= consultUtil.letterheadFax %>
