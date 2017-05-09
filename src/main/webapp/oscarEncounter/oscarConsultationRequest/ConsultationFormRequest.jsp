@@ -980,7 +980,6 @@ if (OscarProperties.getInstance().getBooleanProperty("consultation_program_lette
 	}
 } %>
 
-
 function switchProvider(value) {
 	if (value==-1) {
 		document.getElementById("letterheadName").value = value;
@@ -989,10 +988,9 @@ function switchProvider(value) {
 		document.getElementById("letterheadPhone").value = "<%=clinic.getClinicPhone().trim() %>";
 		document.getElementById("letterheadPhoneSpan").innerHTML = "<%=clinic.getClinicPhone().trim() %>";
 		document.getElementById("letterheadFax").value = "<%=clinic.getClinicFax().trim() %>";
-	} 
+	}
 	else {
 		document.getElementById("letterheadName").value = value;
-		
 		if (typeof providerData["prov_" + value] != "undefined") {
 			value = "prov_" + value;
 		}
@@ -1024,13 +1022,13 @@ function showSignatureImage()
 	if (document.getElementById('signatureImg') != null && document.getElementById('signatureImg').value.length > 0) {
 		document.getElementById('signatureImgTag').src = "<%=storedImgUrl %>" + document.getElementById('signatureImg').value;
 
-		<% if (OscarProperties.getInstance().getBooleanProperty("topaz_enabled", "true")) { 
+		<% if (OscarProperties.getInstance().getBooleanProperty("topaz_enabled", "true")) {
 		  //this is empty
 		%>
 
 		document.getElementById('clickToSign').style.display = "none";
 
-		<% } else { 
+		<% } else {
 		  //this is empty
 		%>
 
@@ -1143,7 +1141,7 @@ function updateFaxButton() {
 
 <%=WebUtilsOld.popErrorMessagesAsAlert(session)%>
 <link rel="stylesheet" type="text/css" href="../encounterStyles.css">
-<body topmargin="0" leftmargin="0" vlink="#0000FF" 
+<body topmargin="0" leftmargin="0" vlink="#0000FF"
 	onload="window.focus();disableDateFields();fetchAttached();disableEditing();showSignatureImage();">
 <html:errors />
 <html:form action="/oscarEncounter/RequestConsultation"
@@ -1215,7 +1213,7 @@ function updateFaxButton() {
 	<input type="hidden" name="documents" value="">
 	<input type="hidden" name="ext_appNo" value="<%=request.getParameter("appNo") %>">
 	<input type="hidden" name="source" value="<%=(requestId!=null)?thisForm.getSource():request.getParameter("source") %>">
-	
+
         <input type="hidden" id="saved" value="false">
 	<!--  -->
 	<table class="MainTable" id="scrollNumber1" name="encounterTable">
@@ -1372,7 +1370,7 @@ function updateFaxButton() {
 						<input name="submitAndSendElectronicallyTop" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndSendElectronicReferral"/>" onclick="return checkForm('Submit_esend','EctConsultationFormRequestForm');" />
 						<% if (faxEnabled) { %>
 						<input id="fax_button" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
-					<% 	   } 
+					<% 	   }
 					   }
 					   if (thisForm.iseReferral()) { %>
 						<input type="button" value="Send eResponse" onclick="$('saved').value='true';document.location='<%=thisForm.getOruR01UrlString(request)%>'" />
@@ -1403,7 +1401,7 @@ function updateFaxButton() {
 							</td>
 						</tr>
 						<% } %>
-						<tr>						
+						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formRefDate" />:
 							</td>
 							<td align="right" class="tite1">
@@ -1445,12 +1443,12 @@ function updateFaxButton() {
 								else
 								{
 									%>
-									
+
 									<span id="consult-disclaimer" title="When consult was saved this was the saved consultant but is no longer on this specialist list." style="display:none;font-size:24px;">*</span> <html:select styleId="specialist" property="specialist" size="1" onchange="onSelectSpecialist(this)">
-									
+
 									</html:select>
-									
-									
+
+
 									<%
 								}
 							%>
@@ -1504,10 +1502,10 @@ function updateFaxButton() {
 							<td align="right" class="tite3"><html:checkbox property="patientWillBook" value="1" onclick="disableDateFields()">
 							</html:checkbox></td>
 						</tr>
-						<tr>						
+						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnAppointmentDate" />:
 							</td>
-                            <td align="right" class="tite3"><img alt="calendar" id="appointmentDate_cal" src="../../images/cal.gif"> 
+                            <td align="right" class="tite3"><img alt="calendar" id="appointmentDate_cal" src="../../images/cal.gif">
  							<html:text styleId="appointmentDate" property="appointmentDate" readonly="true" ondblclick="this.value='';" />
 							</td>
 						</tr>
@@ -1666,15 +1664,15 @@ function updateFaxButton() {
 							<td colspan="2" class="tite3"><html:textarea cols="50"
 								rows="3" property="appointmentNotes"></html:textarea></td>
 						</tr>
-                       
-						
+
+
 						<tr>
 							<td class="tite4"><bean:message
 								key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formLastFollowup" />:
 							</td>
 							<td colspan="2" class="tite3"><img alt="calendar" id="followUpDate_cal" src="../../images/cal.gif">&nbsp;<html:text styleId="followUpDate" property="followUpDate" readonly="true" ondblclick="this.value='';"/>
 						</tr>
-						
+
 						<%
 							if(thisForm.getFdid() != null) {
 						%>
@@ -1700,12 +1698,12 @@ function updateFaxButton() {
 						String providerDefault = providerNo;
 
 						if(consultUtil.letterheadName == null ){
-						//nothing saved so find default	
+						//nothing saved so find default
 						UserProperty lhndProperty = userPropertyDAO.getProp(providerNo, UserProperty.CONSULTATION_LETTERHEADNAME_DEFAULT);
 						String lhnd = lhndProperty != null?lhndProperty.getValue():null;
 						//1 or null = provider, 2 = MRP and 3 = clinic
-						
-							if(lhnd!=null){	
+
+							if(lhnd!=null){
 								if(lhnd.equals("2")){
 									//mrp
 									providerDefault = providerNoFromChart;
@@ -1713,20 +1711,20 @@ function updateFaxButton() {
 									//clinic
 									lhndType="clinic";
 								}
-							}	
+							}
 
 						}
 						%>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.letterheadName" />:
-							</td>							
-							<td align="right" class="tite3">				
+							</td>
+							<td align="right" class="tite3">
 								<select name="letterheadName" id="letterheadName" onchange="switchProvider(this.value)">
 									<option value="-1" <%=(consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase(clinic.getClinicName()) ? "selected='selected'" : lhndType.equals("clinic") ? "selected='selected'" : "" )%>><%=clinic.getClinicName() %></option>
 								<%
 									for (Provider p : prList) {
 										if (p.getProviderNo().compareTo("-1") != 0 && (p.getFirstName() != null || p.getSurname() != null)) {
 								%>
-								<option value="<%=p.getProviderNo() %>" 
+								<option value="<%=p.getProviderNo() %>"
 								<%=(consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase(p.getProviderNo()) ? "selected='selected'"  : consultUtil.letterheadName == null && p.getProviderNo().equalsIgnoreCase(providerDefault) && lhndType.equals("provider") ? "selected='selected'"  : "") %>>
 									<%=p.getSurname() %>, <%=p.getFirstName().replace("Dr.", "") %>
 								</option>
@@ -1786,22 +1784,18 @@ function updateFaxButton() {
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.letterheadFax" />:
 							</td>
 							<td align="right" class="tite3">
-							   <%								
+							   <%
 									FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 									List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
 								%>
-									<span id="letterheadFaxSpan">
-										<select name="letterheadFax" id="letterheadFax">
-								<%
-									for( FaxConfig faxConfig : faxConfigs ) {
-								%>
-										<option value="<%=faxConfig.getFaxNumber()%>" <%=faxConfig.getFaxNumber().equalsIgnoreCase(consultUtil.letterheadFax) ? "selected" : ""%>><%=faxConfig.getFaxUser()%></option>								
-								<%	    
-									}								
-								%>
-									</select>
-								</span>
-							
+
+							   <span id="letterheadFax">
+							   <% if (consultUtil.letterheadFax != null) { %>
+							        <%= consultUtil.letterheadFax %>
+							   <% } else { %>
+								    <%= clinic.getClinicFax() %>
+							   <% } %>
+							   </span>
 							</td>
 						</tr>
 					</table>
