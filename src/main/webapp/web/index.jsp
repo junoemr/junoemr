@@ -102,7 +102,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				</form>
 			
 				<!-- large view -->
-				<ul class="nav navbar-nav visible-lg hidden-1380 ">
+				<ul class="nav navbar-nav visible-lg hidden-1500 ">
 					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover" 
 						ng-show="showPtList === false" ng-click="showPatientList()" 
 						title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
@@ -123,17 +123,16 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				</ul>
 
 				<!-- more condensed version -->
-				<ul class="nav navbar-nav hidden-lg visible-1380 visible-md visible-sm visible-xs">	
+				<ul class="nav navbar-nav hidden-lg visible-1500 visible-md visible-sm visible-xs">	
 					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover" ng-show="showPtList === false" ng-click="showPatientList()" title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
 						
 					<li class="dropdown hand-hover"><a href="void()" class="dropdown-toggle"><bean:message key="navbar.modules" bundle="ui"/><b class="caret"></b></a>
 						<ul class="dropdown-menu">
-						<li ng-repeat="item in menuItems"  ng-class="{'active': isActive(item) }">
-						<a ng-click="transition(item)" data-toggle="tab" >{{item.label}}
-							<span ng-if="item.extra.length>0">({{item.extra}})</span>
-						</a>
-					</li>
-						<li class="divider"></li>
+							<li ng-repeat="item in menuItems"  ng-class="{'active': isActive(item) }">
+								<a ng-click="transition(item)" data-toggle="tab" >{{item.label}}
+									<span ng-if="item.extra.length>0">({{item.extra}})</span>
+								</a>
+							</li>
 							<li ng-repeat="item in moreMenuItems">
 								<a ng-class="{'active': isActive(item) }" ng-click="transition(item)">{{item.label}}
 								<span ng-if="item.extra.length>0" class="badge">{{item.extra}}</span></a>
