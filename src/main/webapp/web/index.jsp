@@ -95,14 +95,14 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	 				<div class="form-group">
 		 				<div class="input-group">
 			 				<input type="text" class="form-control search-query" placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>" id="demographicQuickSearch" autocomplete="off" value="">
-			 				<span class="input-group-addon btn-default hand-hover" ng-click="goToPatientSearch()" title="<bean:message key="navbar.searchPatients" bundle="ui"/>"><span class="glyphicon glyphicon-search" ></span></span>
-			 				<span class="input-group-addon btn-default hand-hover"  ng-click="newDemographic('sm')" title="<bean:message key="navbar.newPatient" bundle="ui"/>"><span class="glyphicon glyphicon-plus"></span></span>	 				
+			 				<span class="input-group-addon btn-default hand-hover" ng-click="goToPatientSearch()" title="<bean:message key="navbar.searchPatients" bundle="ui"/>"><span class="glyphicon glyphicon-search" ></span></span>	 				
 						</div>						
-					</div>			
+					</div>	
+					<a class="btn btn btn-success hand-hover" id="add-patient" ng-click="newDemographic('sm')" title="<bean:message key="navbar.newPatient" bundle="ui"/>">Add Patient</a>		
 				</form>
 			
 				<!-- large view -->
-				<ul class="nav navbar-nav visible-lg hidden-md hidden-sm hidden-xs">
+				<ul class="nav navbar-nav visible-lg hidden-1380 ">
 					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover" 
 						ng-show="showPtList === false" ng-click="showPatientList()" 
 						title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
@@ -123,7 +123,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				</ul>
 
 				<!-- more condensed version -->
-				<ul class="nav navbar-nav hidden-lg visible-md visible-sm visible-xs">	
+				<ul class="nav navbar-nav hidden-lg visible-1380 visible-md visible-sm visible-xs">	
 					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover" ng-show="showPtList === false" ng-click="showPatientList()" title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
 						
 					<li class="dropdown hand-hover"><a href="void()" class="dropdown-toggle"><bean:message key="navbar.modules" bundle="ui"/><b class="caret"></b></a>
@@ -193,8 +193,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	 <!-- Start patient List template --> 
 
 	<div class="container-fluid" ng-controller="PatientListCtrl" >
-		<div class="row">
-			<div id="left-pane" class="col-md-3 noprint" ng-if="showPatientList()">
+		<div class="row" >
+			<div id="left-pane" class="col-md-3 noprint" ng-controller="PatientListAppointmentListCtrl" ng-if="showPatientList()">
 			
 				<%--<ul class="nav nav-tabs">			
 					<li ng-repeat="item in tabItems" ng-class="{'active': isActive(item.id)}" class="hand-hover">
@@ -221,7 +221,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							</div>
 							<%--NOTE: Need to give this controller access to the addNewAppointment() function before this button can be used here --%>
 							<div class="col-md-2">
-								<a class="hand-hover" ng-click="addNewAppointment()"><span class="glyphicon glyphicon-plus"></span></a>
+								<a class="hand-hover" ng-click="addNewAppointment()"><span class="glyphicon glyphicon-plus" title="Add appointment"></span></a>
 							</div>
 					</div>
 				</div>

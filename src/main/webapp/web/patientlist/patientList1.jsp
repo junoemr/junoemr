@@ -25,8 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<div ng-controller="PatientListAppointmentListCtrl" class="list-patients">
-
+<div class="list-patients">
 	<div class="list-group-item list-group-item-head">
 		<table id="listDate">
 			<thead>
