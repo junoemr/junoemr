@@ -152,8 +152,8 @@
 
 <button class="btn btn-default" ng-click="noShowAppointment()">
 		No Show</button>
-		<button class="btn btn-default" ng-click="cancelAppointment()">
-		Cancel</button>
+		<button class="btn btn-warning" ng-click="cancelAppointment()">
+		Cancel Appointment</button>
 		
 	<button class="btn btn-danger" ng-click="deleteAppointment()">
 		<span class="glyphicon glyphicon-trash"></span>Delete
