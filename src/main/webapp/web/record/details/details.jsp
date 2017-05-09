@@ -28,7 +28,7 @@
 <div class="col-lg-12" ng-hide="page.canRead">
 	<bean:message key="demographic.demographiceditdemographic.accessDenied"/>
 </div>
-<div class="container" ng-show="page.canRead">
+<div class="container no-margin-left" ng-show="page.canRead">
 		<div class="row">
 			<div class="col-md-12 pull-left">
 				<div class="btn-group sub-nav">
@@ -99,7 +99,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-8">
+			<div class="col-md-10 col-lg-8 ">
 				
 
 				<button type="button" class="btn {{page.readyForSwipe}}" ng-show="page.workflowEnhance" ng-click="setSwipeReady()" title="Click for Card Swipe" style="padding-top: 0px; padding-bottom: 0px; font-size: small">
@@ -425,8 +425,8 @@
 							</div>
 						</div>
 						<div class="form-group">
-							<div class="col-md-12">
-								<button type="button" class="btn flat-btn" ng-click="showEnrollmentHistory()"><bean:message key="demographic.demographiceditdemographic.msgEnrollmentHistory"/></button>
+							<div class="col-md-10 col-md-offset-2">
+								<button type="button" class="btn btn-primary flat-btn" ng-click="showEnrollmentHistory()"><bean:message key="demographic.demographiceditdemographic.msgEnrollmentHistory"/></button>
 							</div>
 						</div>
 						<div class="form-group" ng-show="isRosterTerminated()">
@@ -570,7 +570,7 @@
 				</div>
 				<br/>
 
-			<div class="col-lg-4">
+			<div class=" col-md-10 col-lg-4">
 				<div class="clearfix col-md-12">
 					<img class="pull-left" id="photo" title="Click to upload photo" ng-click="launchPhoto()" ng-src="../imageRenderingServlet?source=local_client&clientId={{page.demo.demographicNo}}"/>
 					<%--Remove this?--%>
@@ -625,7 +625,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-2">
+			<div class="col-lg-8 col-md-10">
 				<div class="alert alert-success" ng-show="page.saving">
 					<bean:message key="web.record.details.saving"/>
 				</div>
