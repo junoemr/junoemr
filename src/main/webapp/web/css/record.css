@@ -1,4 +1,67 @@
+.sub-nav .dropdown-menu {
+    background-color: #ebebeb;
+}
+
+.sub-nav .dropdown-toggle {
+    color: #333333;
+}
+
 .form-heading {
     color: #1e65d2;
     font-weight: bold;
+}
+
+#dob-year {
+    width: 65px;
+}
+
+#dob-month {
+    width: 45px;
+}
+
+#dob-day {
+    width: 45px;
+}
+
+.phone-num {
+    width: 70% !important;
+}
+
+.phone-ext {
+    width: 30% !important;
+}
+
+#photo {
+    height: 150px;
+    width: auto;
+    cursor: pointer;
+}
+
+.add-status-menu {
+    right: 55px;
+    top: 0px;
+    z-index: 1;
+    background-color: #EEEEEE;
+    padding: 5px;
+}
+
+.add-status-menu button {
+    margin-top: 10px;
+}
+
+#save-button {
+    width: 100%;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+#alert-text-box {
+    height: 55px;
+    width: 100%;
+    color: #df4646;
+}
+
+#notes-text-box {
+    height: 55px;
+    width: 100%;
 }
