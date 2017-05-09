@@ -1,3 +1,16 @@
+.patient-header-name {
+    margin: 0;
+    color: #1c56af;
+}
+
+.patient-header-ext p {
+    margin: 0;
+}
+
+.patient-header-ext b {
+    color: #1c56af;
+}
+
 .sub-nav .dropdown-menu {
     background-color: #ebebeb;
 }
@@ -64,4 +77,28 @@
 #notes-text-box {
     height: 55px;
     width: 100%;
+}
+
+
+/*for patient header*/
+
+@media (max-width: 1320px) {
+    .patient-header-name {
+        font-size: 26px
+    }
+    .patientHeaderExt {
+        font-size: 20px
+    }
+}
+
+@media print {
+    .noprint {
+        display: none;
+    }
+    .patient-header-name {
+        font-size: 16px;
+    }
+    .patient-header-ext {
+        font-size: 16px;
+    }
 }

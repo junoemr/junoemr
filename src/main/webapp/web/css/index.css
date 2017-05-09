@@ -163,30 +163,6 @@ li.cpp-note-list:last-child {
 }
 
 
-/*for patient header*/
-
-@media (max-width: 1320px) {
-    .patientHeaderName {
-        font-size: 26px
-    }
-    .patientHeaderExt {
-        font-size: 20px
-    }
-}
-
-@media print {
-    .noprint {
-        display: none;
-    }
-    .patientHeaderName {
-        font-size: 16px;
-    }
-    .patientHeaderExt {
-        font-size: 16px;
-    }
-}
-
-
 /*Updated styling below*/
 
 p {
