@@ -24,16 +24,15 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-
-<div class="page-header">
-	<div class="container-fluid">
+<div class="container no-margin-left-md">
+	<div class="page-header">
 		<div class="row">
-			<div class="col-md-4 col-xs-4">	
+			<div class="col-md-4">	
 				<h2 class="patient-header-name" ng-cloak>
 					{{demographic.lastName}}, {{demographic.firstName}}  <span ng-show="demographic.alias">({{demographic.alias}})</span> 
 				</h2>
 			</div>
-			<div class="col-md-7 col-xs-7">	
+			<div class="col-md-8">	
 				<div class="patient-header-ext pull-right"> 
 					<p><b><bean:message key="demographic.patient.context.born"/>:</b>
 					{{demographic.dobYear}}-{{demographic.dobMonth}}-{{demographic.dobDay}} ({{demographic.age | age}})  
@@ -44,9 +43,9 @@
 			</div>
 		</div>
 	</div>
-</div>
 
-			
+
+	
 	<nav class="navbar navbar-default" role="navigation"
 		style="padding-top: 0px;margin-bottom:3px;">
 		<!-- Brand and toggle get grouped for better mobile display -->
@@ -160,4 +159,5 @@
     		
     	</div>
     </div>
+</div>
     

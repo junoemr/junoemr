@@ -102,3 +102,9 @@
         font-size: 16px;
     }
 }
+
+@media (min-width: 992px) {
+    .no-margin-left-md {
+        margin-left: 0;
+    }
+}
