@@ -988,6 +988,7 @@ function switchProvider(value) {
 		document.getElementById("letterheadPhone").value = "<%=clinic.getClinicPhone().trim() %>";
 		document.getElementById("letterheadPhoneSpan").innerHTML = "<%=clinic.getClinicPhone().trim() %>";
 		document.getElementById("letterheadFax").value = "<%=clinic.getClinicFax().trim() %>";
+		document.getElementById("letterheadFaxSpan").innerHTML = "<%=clinic.getClinicFax().trim() %>";
 	}
 	else {
 		document.getElementById("letterheadName").value = value;
@@ -999,6 +1000,8 @@ function switchProvider(value) {
 		document.getElementById("letterheadPhone").value = providerData[value]['phone'];
 		document.getElementById("letterheadPhoneSpan").innerHTML = providerData[value]['phone'];
 		document.getElementById("letterheadFax").value = providerData[value]['fax'];
+		document.getElementById("letterheadFaxSpan").innerHTML = providerData[value]['fax'];
+
 	}
 }
 </script>
@@ -1784,14 +1787,18 @@ function updateFaxButton() {
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.letterheadFax" />:
 							</td>
 							<td align="right" class="tite3">
-							   <span id="letterheadFax">
-							   <% if (consultUtil.letterheadFax != null) { %>
-							        <%= consultUtil.letterheadFax %>
-							   <% } else { %>
-								    <%= clinic.getClinicFax() %>
-							   <% } %>
-							   </span>
-							</td>
+                            <% if (consultUtil.letterheadFax != null) { %>
+                                <input type="hidden" name="letterheadFax" id="letterheadFax" value="<%=StringEscapeUtils.escapeHtml(consultUtil.letterheadFax) %>"/>
+                                <span id="letterheadFaxSpan">
+                                    <%= consultUtil.letterheadFax %>
+                                </span>
+                            <% } else { %>
+                                <input type="hidden" name="letterheadFax" id="letterheadFax" value="<%=StringEscapeUtils.escapeHtml(clinic.getClinicFax()) %>" />
+                                <span id="letterheadFaxSpan">
+                                    <%= clinic.getClinicFax() %>
+                                </span>
+                            <% } %>
+                        </td>
 						</tr>
 					</table>
 					</td>
