@@ -73,7 +73,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 <link href="./css/record.css" rel="stylesheet">
 
 </head>
-	
+
 <body ng-controller="OscarCtrl">
 
 	<!-- Fixed navbar -->
@@ -83,32 +83,32 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 					<span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
 				</button>
-				
+
 				<!-- link back to 'classic' view -->
 				<a  href="../provider/providercontrol.jsp"><img id="navbarlogo" src="../images/logo-white.png" title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0" /></a>
 			</div>
-			
-			 
+
+
 			<div class="navbar-collapse collapse">
-			
+
 				<form class="navbar-form navbar-left" role="search">
 	 				<div class="form-group">
 		 				<div class="input-group">
 			 				<input type="text" class="form-control search-query" placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>" id="demographicQuickSearch" autocomplete="off" value="">
 			 				<span class="input-group-addon btn-default hand-hover" ng-click="goToPatientSearch()" title="<bean:message key="navbar.searchPatients" bundle="ui"/>"><span class="glyphicon glyphicon-search" ></span></span>
-			 				<span class="input-group-addon btn-default hand-hover"  ng-click="newDemographic('sm')" title="<bean:message key="navbar.newPatient" bundle="ui"/>"><span class="glyphicon glyphicon-plus"></span></span>	 				
-						</div>						
-					</div>			
+			 				<span class="input-group-addon btn-default hand-hover"  ng-click="newDemographic('sm')" title="<bean:message key="navbar.newPatient" bundle="ui"/>"><span class="glyphicon glyphicon-plus"></span></span>
+						</div>
+					</div>
 				</form>
-			
+
 				<!-- large view -->
 				<ul class="nav navbar-nav visible-lg hidden-md hidden-sm hidden-xs">
-					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover" 
-						ng-show="showPtList === false" ng-click="showPatientList()" 
+					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover"
+						ng-show="showPtList === false" ng-click="showPatientList()"
 						title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
 
 					<li ng-repeat="item in menuItems" ng-class="isActive(item)">
-						<a href="javascript:void(0)" ng-if="!item.dropdown" ng-click="transition(item)" >{{item.label}} 
+						<a href="javascript:void(0)" ng-if="!item.dropdown" ng-click="transition(item)" >{{item.label}}
 							<span ng-if="item.label=='Inbox' && unAckLabDocTotal>0" class="badge badge-danger">{{unAckLabDocTotal}}</span>
 						</a>
 						<a href="javascript:void(0)" ng-if="item.dropdown"  class="dropdown-toggle" data-toggle="dropdown">{{item.label}}
@@ -123,9 +123,9 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				</ul>
 
 				<!-- more condensed version -->
-				<ul class="nav navbar-nav hidden-lg visible-md visible-sm visible-xs">	
+				<ul class="nav navbar-nav hidden-lg visible-md visible-sm visible-xs">
 					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover" ng-show="showPtList === false" ng-click="showPatientList()" title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
-						
+
 					<li class="dropdown hand-hover"><a href="void()" class="dropdown-toggle"><bean:message key="navbar.modules" bundle="ui"/><b class="caret"></b></a>
 						<ul class="dropdown-menu">
 						<li ng-repeat="item in menuItems"  ng-class="{'active': isActive(item) }">
@@ -139,10 +139,10 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 								<span ng-if="item.extra.length>0" class="badge">{{item.extra}}</span></a>
 							</li>
 						</ul>
-					</li>		
+					</li>
 				</ul>
-				
-				
+
+
 				<div class="navbar-text pull-right" style="line-height:20px">
 					<a onClick="popup(700,1024,'../scratch/index.jsp','scratch')" title="<bean:message key="navbar.scratchpad" bundle="ui"/>" class="hand-hover">
 					 	<span class="glyphicon glyphicon-edit"></span>
@@ -150,16 +150,16 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					&nbsp;&nbsp;
 					<span ng-show="messageRights === true">
 						<a ng-click="openMessenger()" title="<bean:message key="navbar.messenger" bundle="ui"/>" class="hand-hover">
-							<span  class="glyphicon glyphicon-envelope"></span> 
+							<span  class="glyphicon glyphicon-envelope"></span>
 						</a>
-						<%--Remove demographic message icon; Awaiting JSON fix so that a list 
+						<%--Remove demographic message icon; Awaiting JSON fix so that a list
 						with one item is returned instead of an object. After fix we can use ng-repeat and refer change messengerMenu to item--%>
 						<%--<span ng-repeat="item in messengerMenu">--%>
 						   <a ng-click="openMessenger(messengerMenu)"  title="{{messengerMenu.label}}" class="hand-hover">{{messengerMenu.extra}}</a> <%--<span ng-if="!$last">|</span>--%>
 						<%--</span>--%>
 					</span>
 					&nbsp; &nbsp;
-					
+
 					<span class="dropdown">
 						<ul class="dropdown-menu" role="menu">
 	                    	<li ng-repeat="item in programDomain">
@@ -171,9 +171,9 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 						    </li>
 					 	</ul>
 				 	</span>
-				 	
+
 					&nbsp;
-					
+
 					<span class="dropdown-toggle hand-hover" data-toggle="dropdown" title="<bean:message key="navbar.user" bundle="ui"/>"><span class="glyphicon glyphicon-user"></span>{{me.firstName}}</span>
 					<ul class="dropdown-menu" role="menu">
 						<li ng-repeat="item in userMenuItems">
@@ -189,32 +189,32 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 	<!-- nav bar is done here -->
 
-	 
-	 <!-- Start patient List template --> 
+
+	 <!-- Start patient List template -->
 
 	<div class="container-fluid" ng-controller="PatientListCtrl" >
 		<div class="row">
 			<div id="left_pane" class="col-md-3 noprint" ng-if="showPatientList()">
-			
-				<%--<ul class="nav nav-tabs">			
+
+				<%--<ul class="nav nav-tabs">
 					<li ng-repeat="item in tabItems" ng-class="{'active': isActive(item.id)}" class="hand-hover">
 						<a ng-click="changeTab(item.id)" data-toggle="tab">{{item.label}}</a>
 					</li>
-					
+
 					<li class="dropdown" ng-class="{'active': currentmoretab != null}"><a class="dropdown-toggle hand-hover" ><b class="caret"></b></a>
 							<ul class="dropdown-menu">
 								<li ng-repeat="item in moreTabItems">
 								<a ng-class="getMoreTabClass(item.id)" ng-click="changeMoreTab(item.id)" class="hand-hover">{{item.label}}<span ng-if="item.extra.length>0" class="badge">{{item.extra}}</span></a></li>
 							</ul>
 					</li>
-					
+
 				</ul>--%>
 
 				<div id="left-pane-header" class="row">
 					<div >
 						<div class="col-md-2">
 						<button id="hide-patient-list-button" type="button" class="pull-left" ng-click="hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
-							<span class="glyphicon glyphicon-chevron-left"></span> 
+							<span class="glyphicon glyphicon-chevron-left"></span>
 						</button>
 					</div>
 					<div  class="col-md-8 col-md-offset-1">
@@ -222,134 +222,137 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					</div>
 					</div>
 
-					
-					
-					
+
+
+
 				</div>
 				<div class="row" ng-cloak>
-				
-					
-					
-					
-					<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>"> 
-						<span class="glyphicon glyphicon-refresh"></span> 
+
+
+
+
+					<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>">
+						<span class="glyphicon glyphicon-refresh"></span>
 					</button>
-					
+
 					<%--Remove these? --%>
 					<%--<button type="button" class="btn btn-default" ng-disabled="currentPage == 0" ng-click="changePage(currentPage-1)" title="<bean:message key="patientList.pageUp" bundle="ui"/>">
-						<span class="glyphicon glyphicon-circle-arrow-up"></span> 
+						<span class="glyphicon glyphicon-circle-arrow-up"></span>
 					</button>
-					
+
 					<button type="button" class="btn btn-default" ng-disabled="currentPage == nPages-1"  ng-click="changePage(currentPage+1)" title="<bean:message key="patientList.pageDown" bundle="ui"/>">
-						<span class="glyphicon glyphicon-circle-arrow-down"></span> 
+						<span class="glyphicon glyphicon-circle-arrow-down"></span>
 					</button>--%>
 
 					<div ng-include="sidebar.location"></div>
-					
+
 					<form class="form-search" role="search">
 						<span ng-show="showFilter === true" class="form-group twitter-typeahead">
 							<input type="text"  class="form-control" placeholder="<bean:message key="patientList.filter" bundle="ui"/>" ng-model="query"/>
 						</span>
 					</form>
-				
+
 					<span class="pull-right" title="<bean:message key="patientList.pagination" bundle="ui"/>">{{currentPage+1}}/{{numberOfPages()}}</span>
 			</div>
 		</div>
 		<!-- End patient List template -->
-			
+
 		<div id="right_pane" class="col-md-9" ui-view ng-cloak></div>
 	</div>
-	
-	
-	<!-- Bootstrap core JavaScript
-    ================================================== -->
-	<!-- Placed at the end of the document so the pages load faster -->
-	<script src="../js/jquery-1.9.1.js"></script>
-	
-	<script src="../library/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-	<!-- script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script -->
-	
-	<script src="../library/hogan-2.0.0.js"></script>
-	<script src="../library/typeahead.js/typeahead.min.js"></script>
-	<script src="../library/angular.min.js"></script>
-	<!-- script src="../library/angular-route.min.js"></script  -->
-	<script src="../library/angular-ui-router.js"></script>
- 	<script src="../library/angular-resource.min.js"></script>
- 	
- 	<script src="../library/ui-bootstrap-tpls-0.11.0.js"></script>
- 	<script src="../library/pym.js"></script>
- 	
- 	<script src="../library/ng-infinite-scroll.min.js"></script>
- 	
- 	<script src="../library/ng-table/ng-table.js"></script>
- 	<script src="../js/loading-bar.js"></script>
- 	
 
-	<!-- we'll combine/minify later -->
-	<script src="common/demographicServices.js"></script>
-	<script src="common/programServices.js"></script>
-	<script src="common/scheduleServices.js"></script>
-	<script src="common/securityServices.js"></script>
-	<script src="common/staticDataServices.js"></script>
-	<script src="common/billingServices.js"></script>
-	<script src="common/ticklerServices.js"></script>
-	<script src="common/formServices.js"></script>
-	<script src="common/noteServices.js"></script>
-	<script src="common/providerServices.js"></script>
-	<script src="common/patientDetailStatusServices.js"></script>
-	<script src="common/uxServices.js"></script>
-	<script src="common/messageServices.js"></script>
-	<script src="common/inboxServices.js"></script>
-	<script src="common/k2aServices.js"></script>
-	<script src="common/personaServices.js"></script>
-	<script src="common/consultServices.js"></script>
-	<script src="common/appServices.js"></script>
-	<script src="common/diseaseRegistryServices.js"></script>
-	<script src="filters.js"></script>
-	<script src="app.js"></script>
-	
-	<script src="oscarController.js"></script>
-	<script src="dashboard/dashboardController.js"></script>
-	<script src="common/navBarController.js"></script>
-	<script src="patientlist/patientListController.js"></script>
-	<script src="record/recordController.js"></script>
-	<script src="record/summary/summaryController.js"></script>
-	<script src="record/forms/formsController.js"></script>
-	<script src="record/details/detailsController.js"></script>
-	<script src="record/phr/phrController.js"></script>
-	<script src="record/tracker/trackerController.js"></script>
-	
-	<script src="tickler/ticklerController.js"></script>
-	<script src="tickler/ticklerViewController.js"></script>
-	<script src="tickler/ticklerAddController.js"></script>
-	
-	<script src="schedule/scheduleController.js"></script>
-	<script src="admin/adminController.js"></script>
-	<script src="billing/billingController.js"></script>
-	<script src="consults/consultRequestListController.js"></script>
-	<script src="consults/consultRequestController.js"></script>	
-	<script src="consults/consultResponseListController.js"></script>
-	<script src="consults/consultResponseController.js"></script>	
-	<script src="inbox/inboxController.js"></script>
-	<script src="patientsearch/patientSearchController.js"></script>
-	
-	<script src="report/reportsController.js"></script>
-	<script src="document/documentsController.js"></script>
-	<script src="settings/settingsController.js"></script>
-	<script src="help/supportController.js"></script>
-	<script src="help/helpController.js"></script>
-	
-	<script src="schedule/appointmentAddController.js"></script>
-	<script src="schedule/appointmentViewController.js"></script>
-	
-	<!-- 
-	
-	<script src="js/providerViewController.js"></script>
-	<script src="js/messengerController.js"></script  -->	
-	
+
+	<script>
+
+		// Juno POJO namespace
+		window.Juno = {};
+
+		Juno.contextPath = '<%= request.getContextPath() %>';
+
+		Juno.Models = {};
+		Juno.Common = {};
+		Juno.Context = {};
+
+	</script>
+
+	<%-- third party libraries, managed with bower, combined and minified for production --%>
+	<!-- build:component js/components.js -->
+	<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-resource/angular-resource.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+	<script type="text/javascript" src="bower_components/bootstrap-timepicker/js/bootstrap-timepicker.js"></script>
+	<script type="text/javascript" src="bower_components/angular-loading-bar/build/loading-bar.min.js"></script>
+	<script type="text/javascript" src="bower_components/ng-table-bundle/ng-table.min.js"></script>
+	<script type="text/javascript" src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
+	<script type="text/javascript" src="bower_components/pym.js/dist/pym.v1.min.js"></script>
+	<script type="text/javascript" src="bower_components/hogan.js/web/builds/3.0.2/hogan-3.0.2.min.js"></script>
+	<script type="text/javascript" src="bower_components/typeahead.js/dist/typeahead.bundle.js"></script>
+	<!-- endbuild -->
+
+
+	<%-- JunoUI application code, to be combined and minified for production --%>
+	<!-- build:js js/scripts.js -->
 	<script type="text/javascript" src="../share/javascript/Oscar.js"></script>
 
-	<script type="text/javascript" src="../js/bootstrap-timepicker.min.js"></script>
+	<script type="text/javascript" src="common/demographicServices.js"></script>
+	<script type="text/javascript" src="common/programServices.js"></script>
+	<script type="text/javascript" src="common/scheduleServices.js"></script>
+	<script type="text/javascript" src="common/securityServices.js"></script>
+	<script type="text/javascript" src="common/staticDataServices.js"></script>
+	<script type="text/javascript" src="common/billingServices.js"></script>
+	<script type="text/javascript" src="common/ticklerServices.js"></script>
+	<script type="text/javascript" src="common/formServices.js"></script>
+	<script type="text/javascript" src="common/noteServices.js"></script>
+	<script type="text/javascript" src="common/providerServices.js"></script>
+	<script type="text/javascript" src="common/patientDetailStatusServices.js"></script>
+	<script type="text/javascript" src="common/uxServices.js"></script>
+	<script type="text/javascript" src="common/messageServices.js"></script>
+	<script type="text/javascript" src="common/inboxServices.js"></script>
+	<script type="text/javascript" src="common/k2aServices.js"></script>
+	<script type="text/javascript" src="common/personaServices.js"></script>
+	<script type="text/javascript" src="common/consultServices.js"></script>
+	<script type="text/javascript" src="common/appServices.js"></script>
+	<script type="text/javascript" src="common/diseaseRegistryServices.js"></script>
+
+	<script type="text/javascript" src="filters.js"></script>
+	<script type="text/javascript" src="app.js"></script>
+
+	<script type="text/javascript" src="oscarController.js"></script>
+	<script type="text/javascript" src="dashboard/dashboardController.js"></script>
+	<script type="text/javascript" src="common/navBarController.js"></script>
+	<script type="text/javascript" src="patientlist/patientListController.js"></script>
+	<script type="text/javascript" src="record/recordController.js"></script>
+	<script type="text/javascript" src="record/summary/summaryController.js"></script>
+	<script type="text/javascript" src="record/forms/formsController.js"></script>
+	<script type="text/javascript" src="record/details/detailsController.js"></script>
+	<script type="text/javascript" src="record/phr/phrController.js"></script>
+	<script type="text/javascript" src="record/tracker/trackerController.js"></script>
+
+	<script type="text/javascript" src="tickler/ticklerController.js"></script>
+	<script type="text/javascript" src="tickler/ticklerViewController.js"></script>
+	<script type="text/javascript" src="tickler/ticklerAddController.js"></script>
+
+	<script type="text/javascript" src="schedule/scheduleController.js"></script>
+	<script type="text/javascript" src="admin/adminController.js"></script>
+	<script type="text/javascript" src="billing/billingController.js"></script>
+	<script type="text/javascript" src="consults/consultRequestListController.js"></script>
+	<script type="text/javascript" src="consults/consultRequestController.js"></script>
+	<script type="text/javascript" src="consults/consultResponseListController.js"></script>
+	<script type="text/javascript" src="consults/consultResponseController.js"></script>
+	<script type="text/javascript" src="inbox/inboxController.js"></script>
+	<script type="text/javascript" src="patientsearch/patientSearchController.js"></script>
+
+	<script type="text/javascript" src="report/reportsController.js"></script>
+	<script type="text/javascript" src="document/documentsController.js"></script>
+	<script type="text/javascript" src="settings/settingsController.js"></script>
+	<script type="text/javascript" src="help/supportController.js"></script>
+	<script type="text/javascript" src="help/helpController.js"></script>
+
+	<script type="text/javascript" src="schedule/appointmentAddController.js"></script>
+	<script type="text/javascript" src="schedule/appointmentViewController.js"></script>
+	<!-- endbuild -->
 
 <script>
 
@@ -359,7 +362,7 @@ $(document).ready(function(){
 		name: 'patients',
 		valueKey:'name',
 		limit: 11,
-		
+
 		remote: {
 	        url: '../ws/rs/demographics/quickSearch?query=%QUERY',
 	        cache:false,
@@ -375,7 +378,7 @@ $(document).ready(function(){
 	            		if(tmp.formattedDOB != null && tmp.formattedDOB == '') {
 	            			tmp.formattedDOB = null;
 	            		}
-	            		
+
 	            		tmp.name = tmp.lastName + ", " + tmp.firstName;
 	            		tmp.blah = "";
 	            		retval.push(tmp);
@@ -383,20 +386,20 @@ $(document).ready(function(){
 	            } else {
 	            	retval.push(parsedResponse.content);
 	            }
-	            
+
 	            console.log("total:"+parsedResponse.total);
 	            var scope = angular.element($("#demographicQuickSearch")).scope();
 	            scope.setQuickSearchTerm("");
-	            
+
 	            if(parsedResponse.total > 10) {
 	            	retval.push({name:"<bean:message key="navbar.moreResults" bundle="ui"/>",hin:parsedResponse.total+" total","demographicNo":-1,"more":true});
 	            	scope.setQuickSearchTerm(parsedResponse.query);
 	            }
-	            
+
 	            return retval;
 	        }
 	    },
-	    
+
 		template: [
 		        "<p class='demo-quick-name'>{{name}}</p>",
 		        '{{#hin}}<p class="demo-quick-hin">&nbsp;<em>{{hin}}</em></p>{{/hin}}',
@@ -407,13 +410,13 @@ $(document).ready(function(){
 			$('input#demographicQuickSearch').on('blur',function(event){$("#demographicQuickSearch").val("");});
 
 			var scope = angular.element($("#demographicQuickSearch")).scope();
-						
+
 			if(datum.more != null && datum.more == true) {
 				scope.switchToAdvancedView();
 			} else {
 				scope.loadRecord(datum.demographicNo);
 			}
-			
+
 	});
 });
 

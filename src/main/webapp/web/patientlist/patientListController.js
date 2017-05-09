@@ -24,14 +24,14 @@
 
 */
 
-oscarApp.controller('PatientListCtrl', function ($scope,$http,$state,Navigation,personaService,$modal) {
-	
+oscarApp.controller('PatientListCtrl', function ($scope,$http,$state,Navigation,personaService,$uibModal) {
+
 	$scope.sidebar = Navigation;
-	
+
     $scope.showFilter=true;
     $scope.patientListConfig = {};
 
-	
+
 	 $scope.goToRecord = function(patient){
 		 if(patient.demographicNo != 0){
 			 var params = {demographicNo:patient.demographicNo};
@@ -69,10 +69,10 @@ $scope.hidePatientList = function() {
 $scope.changeMoreTab = function(temp,filter){
 	var beforeChangeTab = $scope.currentmoretab;
 	$scope.currentmoretab = $scope.moreTabItems[temp];
-	
+
 	$scope.showFilter=true;
 	$scope.currenttab=null;
-	$scope.refresh(filter);		
+	$scope.refresh(filter);
 }
 
 $scope.changeTab = function(temp,filter){
@@ -81,10 +81,10 @@ $scope.changeTab = function(temp,filter){
 	$scope.showFilter=true;
 	$scope.currentmoretab=null;
     $scope.refresh(filter);
-	
-}	 
 
-	$scope.getMoreTabClass = function(id){ 
+}
+
+	$scope.getMoreTabClass = function(id){
 		if($scope.currentmoretab != null && id == $scope.currentmoretab.id) {
 			return "more-tab-highlight";
 		}
@@ -94,36 +94,36 @@ $scope.changeTab = function(temp,filter){
 	$scope.currentPage = 0;
 	$scope.pageSize = 8;
 	$scope.patients = null;
-	
+
 	$scope.numberOfPages=function(){
 		if($scope.nPages == null || $scope.nPages == 0) {
 			return 1;
 		}
-		return $scope.nPages;       
+		return $scope.nPages;
 	}
-	
+
 
     $scope.$on('updatePatientListPagination', function (event, data) {
-        console.log('updatePatientListPagination='+data); 
+        console.log('updatePatientListPagination='+data);
         $scope.nPages=Math.ceil(data/$scope.pageSize);
         console.log('nPages='+$scope.nPages);
       });
-      
-    
+
+
     $scope.changePage = function(pageNum) {
     	$scope.currentPage = pageNum;
     	//broadcast the change page
     	$scope.$broadcast('updatePatientList', {currentPage:$scope.currentPage,pageSize:$scope.pageSize});
-    	
+
     }
-    
- 
-    
+
+
+
   //  $scope.$watch("currentPage", function(newValue, oldValue) {
    //     console.log('currentPage changes from ' + oldValue + ' to ' + newValue);
    //   });
-    
-  	
+
+
 	$scope.$on('togglePatientListFilter', function (event, data) {
 		console.log("received a togglePatientListFilter event:"+ data);
 		$scope.showFilter = data;
@@ -132,12 +132,12 @@ $scope.changeTab = function(temp,filter){
 
 	$scope.process = function(tab,filter) {
 		if(tab.url != null) {
-			
+
 			var d = undefined;
 			if(tab.httpType == 'POST') {
 				d = filter!=null?JSON.stringify(filter):{}
 			}
-				
+
 			$http({
 			    url: tab.url,
 			    dataType: 'json',
@@ -146,32 +146,35 @@ $scope.changeTab = function(temp,filter){
 			    headers: {
 			        "Content-Type": "application/json"
 			    }
-			}).success(function(response){
-				
-				
-				$scope.template = tab.template;
-				Navigation.load($scope.template);
-				
-				$scope.currentPage = 0;
-				
-				if (response.patients instanceof Array) {
-					$scope.patients = response.patients;
-				} else if(response.patients == undefined) { 
-					$scope.patients = [];
-				} else {
-					var arr = new Array();
-					arr[0] = response.patients;
-					$scope.patients = arr;
-				}
-				
-				$scope.nPages = 1;
-				if($scope.patients != null && $scope.patients.length>0) {
-					$scope.nPages=Math.ceil($scope.patients.length/$scope.pageSize);
-				} 
-			 
-			}).error(function(error){
-			   alert('error loading data for patient list:' + error);
-			});	
+			}).then(
+				function success(response)
+				{
+
+					$scope.template = tab.template;
+					Navigation.load($scope.template);
+
+					$scope.currentPage = 0;
+
+					if (response.patients instanceof Array) {
+						$scope.patients = response.patients;
+					} else if(response.patients == undefined) {
+						$scope.patients = [];
+					} else {
+						var arr = new Array();
+						arr[0] = response.patients;
+						$scope.patients = arr;
+					}
+
+					$scope.nPages = 1;
+					if($scope.patients != null && $scope.patients.length>0) {
+						$scope.nPages=Math.ceil($scope.patients.length/$scope.pageSize);
+					}
+
+				},
+				function error(error)
+				{
+					alert('error loading data for patient list:' + error);
+				});
 		} else {
 			$scope.changePage($scope.currentPage);
 			$scope.currentPage = 0;
@@ -180,16 +183,16 @@ $scope.changeTab = function(temp,filter){
 			Navigation.load($scope.template);
 		}
 	}
-	
+
 	$scope.refresh = function(filter) {
-	
+
 		if($scope.currenttab != null) {
 			$scope.process($scope.currenttab,filter);
 		}
 		if($scope.currentmoretab != null) {
 			$scope.process($scope.currentmoretab,filter);
 		}
-		
+
 	}
 
 	personaService.getPatientLists().then(function(persona){
@@ -203,16 +206,16 @@ $scope.changeTab = function(temp,filter){
 	},function(reason){
 		alert(reason);
 	});
-	
+
 	personaService.getPatientListConfig().then(function(patientListConfig){
 		$scope.patientListConfig = patientListConfig;
 		$scope.pageSize = $scope.patientListConfig.numberOfApptstoShow;
 	},function(reason){
 		alert(reason);
 	});
-	
-	
-	
+
+
+
 
 
 	$scope.manageConfiguration = function() {
@@ -223,7 +226,7 @@ $scope.changeTab = function(temp,filter){
             size: 'lg',
             resolve: {config: function() {return $scope.patientListConfig;}}
         });
-        
+
         modalInstance.result.then(function(patientListConfig){
         	personaService.setPatientListConfig(patientListConfig).then(function(patientListConfig){
         		$scope.patientListConfig = patientListConfig;
@@ -232,197 +235,215 @@ $scope.changeTab = function(temp,filter){
         	},function(reason){
         		alert(reason);
         	});
-        	
+
         },function(reason){
         	console.log(reason);
         });
 	};
-	
-});
-
-
-oscarApp.controller('PatientListDemographicSetCtrl', function($scope, Navigation,$http) {	
-	   $http({
-	        url: '../ws/rs/reporting/demographicSets/list',
-	        method: "GET",
-	        headers: {'Content-Type': 'application/json'}
-	      }).success(function (data, status, headers, config) {
-	    	  $scope.sets = data.content;
-	      }).error(function (data, status, headers, config) {
-	          alert('Failed to get sets lists.');
-	      });
 
 });
 
-oscarApp.controller('PatientListAppointmentListCtrl', function($scope, Navigation,$http, scheduleService,$q,$filter,$modal,providerService) {	
-	 
-	scheduleService.getStatuses().then(function(data){
-		$scope.statuses = data.content;
-	},function(reason){
-		alert(reason);
-	});
-	
-	$scope.getAppointmentTextStyle  = function(patient){
-		if(patient.demographicNo == 0){
-			 return {'color':'white'};
-		 }
+
+oscarApp.controller('PatientListDemographicSetCtrl', [
+	'$scope', 'Navigation', '$http',
+	function($scope, Navigation, $http)
+	{
+		$http({
+			url: '../ws/rs/reporting/demographicSets/list',
+			method: "GET",
+			headers: {'Content-Type': 'application/json'}
+		}).then(
+			function success(response)
+			{
+				$scope.sets = response.data.content;
+			},
+			function error(error)
+			{
+				alert('Failed to get sets lists.');
+			});
 	}
+]);
 
-	//TODO:this gets called alot..should switch to a dictionary.
-	 $scope.getAppointmentStyle = function(patient){ 
-		 if(patient.demographicNo == 0){
-			 return {'background-color':'black'};
+oscarApp.controller('PatientListAppointmentListCtrl', [
+
+	'$scope', 'Navigation', '$http', 'scheduleService',
+	'$q', '$filter', '$uibModal', 'providerService',
+
+	function($scope, Navigation, $http, scheduleService,
+		$q, $filter, $uibModal, providerService)
+	{
+
+		scheduleService.getStatuses().then(function(data){
+			$scope.statuses = data.content;
+		},function(reason){
+			alert(reason);
+		});
+
+		$scope.getAppointmentTextStyle  = function(patient){
+			if(patient.demographicNo == 0){
+				 return {'color':'white'};
+			 }
+		}
+
+		//TODO:this gets called alot..should switch to a dictionary.
+		 $scope.getAppointmentStyle = function(patient){
+			 if(patient.demographicNo == 0){
+				 return {'background-color':'black'};
+			 }
+
+			 if($scope.statuses != null) {
+				for(var i=0;i<$scope.statuses.length;i++) {
+					 if($scope.statuses[i].status == patient.status) {
+		    			return {'background-color':$scope.statuses[i].color};
+		    		 }
+		    	 }
+			}
+
+			 return {};
 		 }
-		 
-		 if($scope.statuses != null) {
-			for(var i=0;i<$scope.statuses.length;i++) {
-				 if($scope.statuses[i].status == patient.status) {
-	    			return {'background-color':$scope.statuses[i].color};
-	    		 }
-	    	 }
-		}
-		 
-		 return {};	 
-	 }
-	 
-	
-     $scope.today = function() {
-	    $scope.appointmentDate = new Date();
-	  };
-	  
-	  $scope.today();
 
-	  $scope.clear = function () {
-	    $scope.appointmentDate = null;
-	  };
-	  
-	  $scope.open = function($event) {
-		    $event.preventDefault();
-		    $event.stopPropagation();
-		    $scope.opened = true;
-	  };
-	  
-	  Date.prototype.AddDays = function(noOfDays) {
-		    this.setTime(this.getTime() + (noOfDays * (1000 * 60 * 60 * 24)));
-		    return this;
+
+	     $scope.today = function() {
+		    $scope.appointmentDate = new Date();
+		  };
+
+		  $scope.today();
+
+		  $scope.clear = function () {
+		    $scope.appointmentDate = null;
+		  };
+
+		  $scope.open = function($event) {
+			    $event.preventDefault();
+			    $event.stopPropagation();
+			    $scope.opened = true;
+		  };
+
+		  Date.prototype.AddDays = function(noOfDays) {
+			    this.setTime(this.getTime() + (noOfDays * (1000 * 60 * 60 * 24)));
+			    return this;
+			}
+
+		  $scope.switchDay = function (n) {
+			    var dateNew = $scope.appointmentDate;
+		        dateNew.AddDays(n);
+
+		        $scope.appointmentDate = dateNew;
+
+		        var formattedDate = $filter('date')(dateNew,'yyyy-MM-dd');
+
+		        $scope.changeApptList(formattedDate);
+
+
+		  };
+
+		$scope.changeApptDate = function(){
+			if($scope.appointmentDate == undefined) {
+				$scope.today();
+			}
+			var formattedDate = $filter('date')($scope.appointmentDate,'yyyy-MM-dd');
+			$scope.changeApptList(formattedDate);
+		};
+
+		$scope.changeApptList = function(day){
+
+			temp = 0;
+
+			$scope.currenttab = $scope.tabItems[temp];
+			var lastIndx = $scope.currenttab.url.lastIndexOf("/");
+			$scope.currenttab.url =  $scope.currenttab.url.slice(0,lastIndx+1)+day;
+			$scope.showFilter=true;
+			$scope.refresh();
+
 		}
 
-	  $scope.switchDay = function (n) {
-		    var dateNew = $scope.appointmentDate;
-	        dateNew.AddDays(n);
-	        
-	        $scope.appointmentDate = dateNew; 
-	               
-	        var formattedDate = $filter('date')(dateNew,'yyyy-MM-dd');	        
-	        
-	        $scope.changeApptList(formattedDate);
-	        
-	        
-	  };
-	  
-	$scope.changeApptDate = function(){
-		if($scope.appointmentDate == undefined) {
-			$scope.today();
+		$scope.addNewAppointment = function() {
+		       var modalInstance = $modal.open({
+		        	templateUrl: 'schedule/appointmentAdd.jsp',
+		            controller: 'AppointmentAddController',
+		            backdrop: false,
+		            size: 'lg',
+		            resolve: {
+		            	me: function() {return providerService.getMe();},
+		       			apptDate: function() {return $scope.appointmentDate;}
+		            }
+		        });
+
+		        modalInstance.result.then(function(data){
+		        	$scope.switchDay(0);
+		        },function(reason){
+		        	alert(reason);
+		        });
 		}
-		var formattedDate = $filter('date')($scope.appointmentDate,'yyyy-MM-dd');
-		$scope.changeApptList(formattedDate);
-	};
-	
-	$scope.changeApptList = function(day){
-		
-		temp = 0;
-		
-		$scope.currenttab = $scope.tabItems[temp];
-		var lastIndx = $scope.currenttab.url.lastIndexOf("/");
-		$scope.currenttab.url =  $scope.currenttab.url.slice(0,lastIndx+1)+day;
-		$scope.showFilter=true;
-		$scope.refresh();
-		
-	}
-	
-	$scope.addNewAppointment = function() {
-	       var modalInstance = $modal.open({
-	        	templateUrl: 'schedule/appointmentAdd.jsp',
-	            controller: 'AppointmentAddController',
+
+		$scope.viewAppointment = function(apptNo) {
+			var modalInstance = $modal.open({
+	        	templateUrl: 'schedule/appointmentView.jsp',
+	            controller: 'AppointmentViewController',
 	            backdrop: false,
 	            size: 'lg',
 	            resolve: {
 	            	me: function() {return providerService.getMe();},
-	       			apptDate: function() {return $scope.appointmentDate;}
+	            	appointment: function() {return scheduleService.getAppointment(apptNo);},
+	            	statusList: function() {return scheduleService.getStatuses();}
 	            }
 	        });
-	        
+
 	        modalInstance.result.then(function(data){
 	        	$scope.switchDay(0);
+
 	        },function(reason){
 	        	alert(reason);
 	        });
+		}
 	}
-
-	$scope.viewAppointment = function(apptNo) {
-		var modalInstance = $modal.open({
-        	templateUrl: 'schedule/appointmentView.jsp',
-            controller: 'AppointmentViewController',
-            backdrop: false,
-            size: 'lg',
-            resolve: {
-            	me: function() {return providerService.getMe();},
-            	appointment: function() {return scheduleService.getAppointment(apptNo);},
-            	statusList: function() {return scheduleService.getStatuses();}
-            }
-        });
-        
-        modalInstance.result.then(function(data){
-        	$scope.switchDay(0);
-        	
-        },function(reason){
-        	alert(reason);
-        });
-	}
-	
-});
+]);
 
 
-oscarApp.controller('PatientListProgramCtrl', function($scope,$http) {	
-	  
-	
+oscarApp.controller('PatientListProgramCtrl', function($scope,$http) {
+
+
 	 $scope.$on('updatePatientList', function (event, data) {
-	        console.log('updatePatientList='+JSON.stringify(data)); 
+	        console.log('updatePatientList='+JSON.stringify(data));
 	        $scope.updateData(data.currentPage,data.pageSize);
 	 });
-	 
-	 
+
+
 	 //the currentPage is 0 based
-	 $scope.updateData = function(currentPage,pageSize) {
-		 
+	 $scope.updateData = function(currentPage,pageSize)
+	 {
 		 var startIndex = currentPage*pageSize;
-		 
+
 	   $http({
-	        url: '../ws/rs/program/patientList?startIndex='+startIndex+'&numToReturn='+pageSize,
-	        method: "GET",
-	        headers: {'Content-Type': 'application/json'}
-	      }).success(function (data, status, headers, config) {
-	    	  $scope.admissions = data.content;
-	    	  $scope.$emit('updatePatientListPagination', data.total);
-	      }).error(function (data, status, headers, config) {
-	          alert('Failed to get sets lists.');
-	      });
+	   	url: '../ws/rs/program/patientList?startIndex='+startIndex+'&numToReturn='+pageSize,
+	   	method: "GET",
+	   	headers: {'Content-Type': 'application/json'}
+	   }).then(
+	   	function (response)
+	   	{
+	   		$scope.admissions = response.data.content;
+	   		$scope.$emit('updatePatientListPagination', response.data.total);
+			},
+			function error(error)
+	   	{
+	   		alert('Failed to get sets lists.');
+			});
 	 }
-	
+
 	 //initialize..
 	 $scope.updateData(0,$scope.pageSize);
 	 $scope.$emit('togglePatientListFilter', false);
-	 
+
 });
 
 oscarApp.controller('PatientListConfigController',function($scope, $modalInstance, config) {
-	
-	$scope.patientListConfig= config; 
-	
+
+	$scope.patientListConfig= config;
+
 	$scope.cancel = function(){
 		$modalInstance.dismiss();
 	};
-	
+
 	$scope.saveConfiguration =function(){
     	$modalInstance.close($scope.patientListConfig);
     };

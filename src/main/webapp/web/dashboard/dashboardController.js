@@ -23,31 +23,31 @@
     Ontario, Canada
 
 */
-oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerService,messageService, inboxService, k2aService, $modal,noteService, securityService, personaService) {
-	
-	//header	
+oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerService,messageService, inboxService, k2aService, $uibModal,noteService, securityService, personaService) {
+
+	//header
 	$scope.displayDate= function() {return new Date();}
-	
+
 	$scope.me = null;
 
 	$scope.busyLoadingData = false;
-	
+
 	personaService.getDashboardPreferences().then(function(data){
 		$scope.prefs = data.dashboardPreferences;
 	});
-	
+
 	securityService.hasRights({items:[{objectName:'_tickler',privilege:'w'},{objectName:'_tickler',privilege:'r'}]}).then(function(result){
 		if(result.content != null && result.content.length == 2) {
 			$scope.ticklerWriteAccess = result.content[0];
 			$scope.ticklerReadAccess = result.content[1];
 		}
 	});
-		
+
 	$scope.openInbox = function() {
 		 newwindow=window.open('../dms/inboxManage.do?method=prepareForIndexPage','inbox','height=700,width=1000');
 		 if (window.focus) {
 			 newwindow.focus();
-		 }	
+		 }
 	}
 
 	$scope.loadMoreK2aFeed = function() {
@@ -63,13 +63,13 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
 			k2aService.removeK2AComment(item.agreeId).then(function(response){
 				item.agree = false;
 				item.agreeCount--;
-				item.agreeId = '';			
+				item.agreeId = '';
 			},function(reason){
 				alert(reason);
 			});
 		} else if(!(item.agree || item.disagree)) {
 			if(typeof item.newComment === 'undefined') {
-				item.newComment = {};		
+				item.newComment = {};
 			}
 			item.newComment.agree = true;
 			item.newComment.body = '';
@@ -83,13 +83,13 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
 			k2aService.removeK2AComment(item.agreeId).then(function(response){
 				item.disagree = false;
 				item.disagreeCount--;
-				item.agreeId = '';			
+				item.agreeId = '';
 			},function(reason){
 				alert(reason);
 			});
-		} if(!(item.agree || item.disagree)) {		
+		} if(!(item.agree || item.disagree)) {
 			if(typeof item.newComment === 'undefined') {
-				item.newComment = {};		
+				item.newComment = {};
 			}
 			item.newComment.agree = false;
 			item.newComment.body = '';
@@ -104,7 +104,7 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
 			item.newComment.body = '';
 			item.newComment.agree = '';
 			item.agreeId = response.agreeId;
-			if(!(typeof response.post[0].agree === 'undefined')) {			
+			if(!(typeof response.post[0].agree === 'undefined')) {
 				if(response.post[0].agree) {
 					item.agree = true;
 					item.agreeId = response.post[0].agreeId;
@@ -122,7 +122,7 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
 			alert(reason);
 		});
 	}
-	
+
 	$scope.updateTicklers = function() {
 		//consider the option to have overdue only or not
 		ticklerService.search({priority:'',status:'A',assignee:$scope.me.providerNo,overdueOnly:'property'},0,6).then(function(response){
@@ -130,47 +130,47 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
 			if(response.tickler == null) {
 				return;
 			}
-				
+
 			if (response.tickler instanceof Array) {
 				$scope.ticklers = response.tickler;
 			} else {
 				var arr = new Array();
 				arr[0] = response.tickler;
 				$scope.ticklers = arr;
-			}	
+			}
 		},function(reason){
 			alert(reason);
 		});
 	}
-	
+
 	$scope.updateMessages = function() {
 		messageService.getUnread(6).then(function(response){
 			$scope.totalMessages = response.total;
-			
+
 			if(response.message == null) {
 				return;
 			}
-			
+
 			if (response.message instanceof Array) {
 				$scope.messages = response.message;
 			} else {
 				var arr = new Array();
 				arr[0] = response.message;
 				$scope.messages = arr;
-			}			
+			}
 		},function(reason){
 			alert(reason);
 		});
-		
+
 	}
-	
+
 	$scope.updateReports = function() {
 //TODO: changed to return 5 since that is all we are using at the moment
 		inboxService.getDashboardItems(5).then(function(response){
 			if(response.inbox == null) {
 				return;
 			}
-						
+
 			if (response.inbox instanceof Array) {
 				$scope.inbox = response.inbox;
 			} else {
@@ -183,7 +183,7 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
 			alert(reason);
 		});
 	}
-	
+
 	$scope.updateFeed = function(startPoint,numberOfRows) {
 		if ($scope.busyLoadingData) return;
   		$scope.busyLoadingData = true;
@@ -191,21 +191,21 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
 			if(response.post == null) {
 				return;
 			}
-			
+
 			if (response.post instanceof Array) {
 				for(var i=0; i < response.post.length; i++) {
 					if(!Array.isArray(response.post[i].comments)) {
 						var arr = new Array();
 						arr[0] = response.post[i].comments;
-						response.post[i].comments = arr;						
-					}					
+						response.post[i].comments = arr;
+					}
 				}
 				if(typeof $scope.k2afeed === 'undefined') {
 					$scope.k2afeed = response.post;
 				} else {
 					$scope.k2afeed = $scope.k2afeed.concat(response.post);
 				}
-				$scope.busyLoadingData = false;	
+				$scope.busyLoadingData = false;
 			} else {
 				if(response.post.authenticatek2a) {
 					$scope.authenticatek2a = response.post.description;
@@ -214,32 +214,32 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
 					arr[0] = response.post;
 					$scope.k2afeed = arr;
 				}
-			}	
+			}
 		},function(reason){
 			alert(reason);
-			$scope.busyLoadingData = false;	
+			$scope.busyLoadingData = false;
 		});
 	}
-	
+
 	$scope.updateDashboard = function() {
 		$scope.updateTicklers();
 		$scope.updateMessages();
 		$scope.updateReports();
 		$scope.updateFeed(0,10);
-		
+
 	}
-	
+
 	$scope.$watch(function() {
 		  return securityService.getUser();
 		}, function(newVal) {
 			$scope.me = newVal;
-			
+
 			if(newVal != null) {
 				$scope.updateDashboard();
 			}
 		}, true);
-	
-	
+
+
 	$scope.isTicklerExpiredOrHighPriority = function(tickler) {
 		var ticklerDate = Date.parse(tickler.serviceDate);
 		var now = new Date();
@@ -250,28 +250,28 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
 		if(tickler.priority == 'High') {
 			result=true;
 		}
-			
+
 		return result;
 	}
-	
+
 	$scope.isTicklerHighPriority = function(tickler) {
 		var ticklerDate = Date.parse(tickler.serviceDate);
 		var now = new Date();
 		var result = false;
-		
+
 		if(tickler.priority == 'High') {
 			result=true;
 		}
-			
+
 		return result;
 	}
-	
+
 	$scope.openClassicMessenger = function() {
 		if($scope.me != null) {
 			window.open('../oscarMessenger/DisplayMessages.do?providerNo='+$scope.me.providerNo,'msgs','height=700,width=1024,scrollbars=1');
 		}
-	}	
-	
+	}
+
 	$scope.viewMessage = function(message) {
 		window.open('../oscarMessenger/ViewMessage.do?messageID='+message.id+'&boxType=0','msg'+message.id,'height=700,width=1024,scrollbars=1');
 	}
@@ -297,7 +297,7 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
                 }
             }
         });
-        
+
         modalInstance.result.then(function(data){
         	//console.log('data from modalInstance '+data);
         	if(data != null && data == true) {
@@ -306,9 +306,9 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
         },function(reason){
         	alert(reason);
         });
-        
+
 	}
-	
+
 	$scope.configureTicklers = function() {
         var modalInstance = $modal.open({
         	templateUrl: 'tickler/configureDashboard.jsp',
@@ -321,7 +321,7 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
                 }
             }
         });
-        
+
         modalInstance.result.then(function(data){
         	if(data == true ) {
         		$scope.updateTicklers();
@@ -332,27 +332,27 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
         },function(reason){
         	alert(reason);
         });
-        
+
 	}
 });
 
 
 oscarApp.controller('TicklerConfigureController',function($scope,$modalInstance,personaService,prefs) {
-	
+
 	$scope.prefs = prefs.dashboardPreferences;
-	
+
 	   $scope.close = function () {
-		   $modalInstance.close(false);		
+		   $modalInstance.close(false);
 	    }
 	    $scope.save = function () {
-	    	
+
 	    	personaService.updateDashboardPreferences($scope.prefs).then(function(data){
     			$modalInstance.close(true);
-    			
-    			
+
+
     		}, function(reason){
     			$modalInstance.close(false);
     		});
-	    	
+
 	    }
 });

@@ -24,66 +24,112 @@
 
 */
 angular.module("securityServices", [])
-	.service("securityService", function ($http,$q,$log) {
-		return {
-		apiPath:'../ws/rs/',
-		configHeaders: {headers: {"Content-Type": "application/json","Accept":"application/json"}},
-		configHeadersWithCache: {headers: {"Content-Type": "application/json","Accept":"application/json"},cache: true},
-		user:null,
-        
-		getUser: function() {
-			return this.user;
-		},
-		
-		setUser: function(u) {
-			this.user = u;
-		},
-        
-        hasRight: function (objectName, privilege, demographicNo) {
-            var deferred = $q.defer();
-            $http.get(this.apiPath+'persona/hasRight?objectName='+objectName+'&privilege='+privilege+'&demographicNo='+demographicNo,this.configHeadersWithCache).success(function(data){
-            	console.log(data);
-            	deferred.resolve(data.success);
-            }).error(function(){
-            	console.log("error fetching rights");
-            	deferred.reject("An error occured while fetching access right");
-            });
-     
-          return deferred.promise;
-        },
-        
-        hasRights: function (listOfItems) {
-        	var deferred = $q.defer();
-            
-            $http({
-                url: this.apiPath+'persona/hasRights',
-                method: "POST",
-                data: JSON.stringify(listOfItems),
-                headers: {'Content-Type': 'application/json'}
-             }).success(function (data, status, headers, config) {
-            	 deferred.resolve(data);
-             }).error(function (data, status, headers, config) {
-            	 deferred.reject("An error occured while fetching access rights");
-             });
+.service("securityService", [
+	'$http', '$q',
+	function ($http, $q)
+	{
+		var service = {};
 
-          return deferred.promise;
-        },
-        isAllowedAccessToPatientRecord: function (demographicNo) {
-        	console.log('in isAllowedAccessToPatientRecord');
-        	var deferred = $q.defer();
-            
-            $http({
-                url: this.apiPath+'persona/isAllowedAccessToPatientRecord',
-                method: "POST",
-                data: JSON.stringify({"demographicNo":demographicNo}),   
-                headers: {'Content-Type': 'application/json'}
-             }).success(function (data, status, headers, config) {
-            	 deferred.resolve(data);
-             }).error(function (data, status, headers, config) {
-            	 deferred.reject("An error occured while fetching access rights");
-             });
+		service.apiPath = '../ws/rs/';
 
-          return deferred.promise;
-        }
+		service.configHeaders = {
+			headers: {
+				"Content-Type": "application/json",
+				"Accept":"application/json"
+			}
+		};
+
+		service.configHeadersWithCache = {
+			headers: {
+				"Content-Type": "application/json",
+				"Accept":"application/json"
+			},
+			cache: true
+		};
+
+		service.user = null;
+
+		service.getUser = function getUser()
+		{
+			return service.user;
+		};
+
+		service.setUser = function setUser(u)
+		{
+			service.user = u;
+		};
+
+		service.hasRight = function hasRight(objectName, privilege, demographicNo)
+		{
+			var deferred = $q.defer();
+
+			var url = service.apiPath + 'persona/hasRight?objectName=' +
+				encodeURIComponent(objectName) +
+				'&privilege='+
+				encodeURIComponent(privilege) +
+				'&demographicNo=' +
+				encodeURIComponent(demographicNo);
+
+			$http.get(url, service.configHeadersWithCache).then(
+				function success(response)
+				{
+					deferred.resolve(response.data.success);
+	      },
+	      function error(error)
+	      {
+	      	console.log("securityService::hasRight error", error);
+	      	deferred.reject("An error occured while fetching access right");
+	      });
+
+      return deferred.promise;
     };
-});
+
+    service.hasRights = function hasRights(listOfItems)
+    {
+    	var deferred = $q.defer();
+
+      $http({
+      	url: service.apiPath + 'persona/hasRights',
+        method: "POST",
+        data: JSON.stringify(listOfItems),
+        headers: {'Content-Type': 'application/json'}
+      }).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+    	 	},
+    	 	function error(error)
+    	 	{
+    	 		console.log("securityService::hasRights error", error);
+    	 		deferred.reject("An error occured while fetching access rights");
+    	 	});
+
+      return deferred.promise;
+    };
+
+    service.isAllowedAccessToPatientRecord = function isAllowedAccessToPatientRecord(demographicNo)
+    {
+    	var deferred = $q.defer();
+
+			$http({
+				url: service.apiPath + 'persona/isAllowedAccessToPatientRecord',
+				method: "POST",
+				data: JSON.stringify({"demographicNo":demographicNo}),
+				headers: {'Content-Type': 'application/json'}
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("securityService::isAllowedAccessToPatientRecord error", error);
+					deferred.reject("An error occured while fetching access rights");
+				});
+
+      return deferred.promise;
+    };
+
+		return service;
+	}
+]);

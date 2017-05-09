@@ -29,7 +29,7 @@ angular.module("appServices", [])
 		apiPath:'../ws/rs/app',
 		configHeaders: {headers: {"Content-Type": "application/json","Accept":"application/json"}},
 		configHeadersWithCache: {headers: {"Content-Type": "application/json","Accept":"application/json"},cache: true},
-	      
+
         getApps: function () {
         	var deferred = $q.defer();
         	$http({

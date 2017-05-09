@@ -23,39 +23,74 @@
     Ontario, Canada
 
 */
+
 angular.module("inboxServices", [])
-	.service("inboxService", function ($http,$q,$log) {
-		return {
-		apiPath:'../ws/rs/inbox',
-		configHeaders: {headers: {"Content-Type": "application/json","Accept":"application/json"}},
-		configHeadersWithCache: {headers: {"Content-Type": "application/json","Accept":"application/json"},cache: true},
-	      
-        getDashboardItems: function (limit) {
-        	var deferred = $q.defer();
-        	$http({
-                url: this.apiPath+'/mine?limit='+limit,
-                method: "GET",
-                headers: this.configHeaders,
-              }).success(function (data) {
-            	  deferred.resolve(data);
-                }).error(function (data, status, headers) {
-                	deferred.reject("An error occured while getting inbox content");
-                });
-           return deferred.promise;
-        },
-        
-        getUnAckLabDocCount: function () {
-        	var deferred = $q.defer();
-        	$http({
-                url: this.apiPath+'/mine/count',
-                method: "GET",
-                headers: this.configHeaders,
-              }).success(function (data) {
-            	  deferred.resolve(data);
-                }).error(function (data, status, headers) {
-                	deferred.reject("An error occured while getting inbox content");
-                });
-           return deferred.promise;
-        }
-    };
-});
+.service("inboxService", [
+	'$http', '$q',
+	function ($http, $q)
+	{
+		var service = {};
+
+		service.apiPath = '../ws/rs/inbox';
+
+		service.configHeaders = {
+			headers: {
+				"Content-Type": "application/json",
+				"Accept":"application/json"
+			}
+		};
+
+		service.configHeadersWithCache = {
+			headers: {
+				"Content-Type": "application/json",
+				"Accept":"application/json"
+			},
+			cache: true
+		};
+
+		service.getDashboardItems = function getDashboardItems(limit)
+		{
+			var deferred = $q.defer();
+
+			$http({
+				url: service.apiPath+'/mine?limit=' + encodeURIComponent(limit),
+				method: "GET",
+				headers: service.configHeaders
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("inboxService::getDashboardItems error", error);
+					deferred.reject("An error occured while getting inbox content");
+				});
+
+			return deferred.promise;
+		};
+
+		service.getUnAckLabDocCount = function getUnAckLabDocCount()
+		{
+			var deferred = $q.defer();
+
+			$http({
+				url: service.apiPath+'/mine/count',
+				method: "GET",
+				headers: service.configHeaders
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("inboxService::getUnAckLabDocCount error", error);
+					deferred.reject("An error occured while getting inbox content");
+				});
+			return deferred.promise;
+		};
+
+		return service;
+	}
+]);

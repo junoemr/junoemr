@@ -24,41 +24,86 @@
 
 */
 angular.module("billingServices", [])
-	.service("billingService", function ($http,$q,$log) {
-		return {
-		apiPath:'../ws/rs/',
-		configHeaders: {headers: {"Content-Type": "application/json","Accept":"application/json"}},
-		configHeadersWithCache: {headers: {"Content-Type": "application/json","Accept":"application/json"},cache: true},
-		getUniqueServiceTypes: function () {
+.service("billingService", [
+	'$http', '$q',
+	function ($http, $q)
+	{
+		var service = {};
+
+		service.apiPath = '../ws/rs/';
+
+		service.configHeaders = {
+			headers: {
+				"Content-Type": "application/json",
+				"Accept":"application/json"
+			}
+		};
+
+		service.configHeadersWithCache = {
+			headers: {
+				"Content-Type": "application/json",
+				"Accept":"application/json"
+			},
+			cache: true
+		};
+
+		service.getUniqueServiceTypes = function getUniqueServiceTypes()
+		{
 			var deferred = $q.defer();
-			$http.get(this.apiPath+'billing/uniqueServiceTypes',this.configHeadersWithCache).success(function(data){
-				console.log(data);
-				deferred.resolve(data.content);
-			}).error(function(){
-				console.log("error fetching billing service types");
-				deferred.reject("An error occured while fetching billing service types");
-			});
+
+			$http.get(service.apiPath + 'billing/uniqueServiceTypes',
+					service.configHeadersWithCache).then(
+				function success(response)
+				{
+					deferred.resolve(response.data.content);
+				},
+				function error(error)
+				{
+					console.log("billingService::getUniqueServiceTypes error", error);
+					deferred.reject("An error occured while fetching billing service types");
+				});
+
+			return deferred.promise;
+		};
+
+		service.getBillingRegion = function getBillingRegion()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'billing/billingRegion',
+					service.configHeadersWithCache).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("billingService::getBillingRegion error", error);
+					deferred.reject("An error occured while setting billingRegion");
+				});
+
 			return deferred.promise;
 		},
-		
-		getBillingRegion: function () {
+
+		service.getDefaultView = function getDefaultView()
+		{
 			var deferred = $q.defer();
-			$http.get(this.apiPath+'billing/billingRegion',this.configHeadersWithCache).success(function (data) {
-				deferred.resolve(data);
-			}).error(function (data, status, headers, config) {
-				deferred.reject("An error occured while setting bilingRegion");
-			});
+
+			$http.get(service.apiPath + 'billing/defaultView',
+					service.configHeadersWithCache).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("billingService::getDefaultView error", error);
+					deferred.reject("An error occured while setting defaultView");
+				});
+
 			return deferred.promise;
-		},
-		
-		getDefaultView: function () {
-			var deferred = $q.defer();
-			$http.get(this.apiPath+'billing/defaultView',this.configHeadersWithCache).success(function (data) {
-				deferred.resolve(data);
-			}).error(function (data, status, headers, config) {
-				deferred.reject("An error occured while setting defaultView");
-			});
-			return deferred.promise;
-		},
-	};
-});
+		};
+
+		return service;
+	}
+]);

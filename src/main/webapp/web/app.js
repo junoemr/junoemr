@@ -58,7 +58,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider',function($stateProvider,
   		  url: '/ticklers',
   		  templateUrl: 'tickler/ticklerList.jsp',
 			controller: 'TicklerListCtrl',
-			resolve: { 
+			resolve: {
 				providers: function(providerService) { return providerService.searchProviders({active:true}); },
 			}
   		})
@@ -66,13 +66,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider',function($stateProvider,
   		  url: '/search',
   		  templateUrl: 'patientsearch/patientSearch.jsp',
 			controller: 'PatientSearchCtrl'
-  		}) 
+  		})
   		.state('reports', {
   		  url: '/reports',
   		  templateUrl: 'report/reports.jsp',
   		  //templateUrl: 'report/reports_classic.jsp',
 			controller: 'ReportsCtrl'
-  		}) 
+  		})
   		.state('documents', {
   		  url: '/documents',
   		  templateUrl: 'document/documents_classic.jsp',
@@ -82,7 +82,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider',function($stateProvider,
   		  url: '/settings',
   		  templateUrl: 'settings/settings.jsp',
 			controller: 'SettingsCtrl',
-			resolve: { 
+			resolve: {
 				user: function(providerService) { return providerService.getMe(); },
 				billingServiceTypes: function(billingService) { return billingService.getUniqueServiceTypes(); },
 				providerList: function(providerService) { return providerService.searchProviders({'active':true});},
@@ -103,36 +103,36 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider',function($stateProvider,
   		  url: '/help',
   		  templateUrl: 'help/help.jsp',
 			controller: 'HelpCtrl'
-  		}) 
+  		})
 		.state('record', {
-			url: '/record/:demographicNo', 
+			url: '/record/:demographicNo',
 			templateUrl: 'record/record.jsp',
 			controller: 'RecordCtrl',
-			resolve: { 
+			resolve: {
 				demo: function($stateParams, demographicService) { return demographicService.getDemographic($stateParams.demographicNo); },
 				user: function(providerService) { return providerService.getMe(); }
 			}
 		})
 		.state('record.details', {
-			url: '/details', 
+			url: '/details',
 			templateUrl: 'record/details/details.jsp',
 			controller: 'DetailsCtrl'
 		})
 		.state('record.summary', {
-			url: '/summary?appointmentNo&encType', 
+			url: '/summary?appointmentNo&encType',
 			templateUrl: 'record/summary/summary.jsp',
 			controller: 'SummaryCtrl'
 		})
 		.state('record.forms', {
-			url: '/forms', 
+			url: '/forms',
 			templateUrl: 'record/forms/forms.jsp',
 			controller: 'FormCtrl'
 		}).state('record.forms.new', {
-			url: '/:type/:id', 
+			url: '/:type/:id',
 			templateUrl: 'record/forms/forms.jsp',
 			controller: 'FormCtrl'
 		}).state('record.forms.existing', {
-			url: '/:type/id/:id', 
+			url: '/:type/id/:id',
 			templateUrl: 'record/forms/forms.jsp',
 			controller: 'FormCtrl'
 		})
@@ -165,31 +165,31 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider',function($stateProvider,
 			}
 		})
 		.state('record.tickler', {
-			url: '/tickler', 
+			url: '/tickler',
 			templateUrl: 'tickler/ticklerList.jsp',
 			controller: 'TicklerListCtrl',
-			resolve: { 
+			resolve: {
 				providers: function(providerService) { return providerService.searchProviders({active:true}); }
 			}
 		}).state('record.tracker', {
-			url: '/tracker', 
+			url: '/tracker',
 			templateUrl: 'record/tracker/tracker.jsp',
 			controller: 'TrackerCtrl'
 		})
 		.state('record.phr', {
-			url: '/phr', 
+			url: '/phr',
 			templateUrl: 'record/phr/phr.jsp',
 			controller: 'PHRCtrl'
 		})
-	   
-		
-		
+
+
+
 }]);
 
 // For debugging purposes
 /*
 oscarApp.run( function($rootScope, $location) {
-	
+
 $rootScope.$on('$stateChangeStart',function(event, toState, toParams, fromState, fromParams){
 	  console.log('$stateChangeStart to '+toState.to+'- fired when the transition begins. toState,toParams : \n',toState, toParams);
 	});
@@ -226,7 +226,7 @@ $rootScope.$on('$stateChangeStart',function(event, toState, toParams, fromState,
 	});
 
 /*
- 
+
  user: function($stateParams, UserService) {
 	  return UserService.find($stateParams.id);
 	},
@@ -245,7 +245,7 @@ oscarApp.config(['$routeProvider',
 							templateUrl: 'partials/help.jsp',
 							controller: 'HelpCtrl'
 						}).
-						
+
 						when('/messenger', {
 							templateUrl: 'partials/messenger.jsp',
 							controller: 'MessengerCtrl'
@@ -258,7 +258,7 @@ oscarApp.config(['$routeProvider',
 							templateUrl: 'partials/eform2.jsp',
 							controller: 'EformFull2Ctrl'
 						}).
-					   
+
 					}
 ]);
 */
@@ -282,7 +282,7 @@ oscarApp.run( function($rootScope, $location) {
 		$("#left_pane").show();
 		$("#right_pane").removeClass("col-md-12");
 		$("#right_pane").addClass("col-md-10");
-	});  
+	});
 });
 
 */
@@ -303,7 +303,7 @@ oscarApp.filter('offset', function() {
 oscarApp.factory('Navigation', function($rootScope) {
   return {
 	location: '',
-	
+
 	load: function(msg) {
 	  this.location = msg;
 	}
@@ -316,12 +316,12 @@ angular.module('oscarProviderViewModule').directive('oscarSecurityShow', functio
 	  return function(scope, element, attr) {
 			scope.$watch(attr.oscarSecurityShow, function ngShowWatchAction(value){
 				//console.log('valuee='+value.toSource());
-				
+
 				if(value.objectName != null && value.privilege != null) {
 					//securityService.hasHigh(value.objectName,value.privilege,null);
 					console.log('gtg');
 				}
-				
+
 			  //set value to true to show, or else hide
 			  $animate[value ? 'removeClass' : 'addClass'](element, 'ng-hide');
 			});

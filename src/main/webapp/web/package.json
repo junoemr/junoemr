@@ -1,0 +1,8 @@
+{
+  "name": "juno",
+  "version": "0.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "bower": "^1.8.0"
+  }
+}

@@ -23,135 +23,242 @@
     Ontario, Canada
 
 */
+
 angular.module("k2aServices", [])
-	.service("k2aService", function ($http,$q,$log) {
-		return {
-		apiPath:'../ws/rs',
-		configHeaders: {headers: {"Content-Type": "application/json","Accept":"application/json"}},
-		configHeadersWithCache: {headers: {"Content-Type": "application/json","Accept":"application/json"},cache: true},
-	      
-        getK2aFeed: function (startPoint,numberOfRows) {
-        	var deferred = $q.defer();
-        	$http({
-                url: this.apiPath+'/rssproxy/rss?key=k2a&startPoint=' + startPoint + '&numberOfRows=' + numberOfRows,
-                method: "GET",
-                headers: this.configHeaders,
-              }).success(function (data) {
-            	  deferred.resolve(data);
-                }).error(function (data, status, headers) {
-                	deferred.reject("An error occured while getting k2a content");
-                });
-           return deferred.promise;
-        },
-        isK2AInit: function () {
-        	var deferred = $q.defer();
-        	$http({
-                url: this.apiPath+'/app/K2AActive',
-                method: "GET",
-                headers: this.configHeaders,
-              }).success(function (data) {
-            	  deferred.resolve(data);
-                }).error(function (data, status, headers) {
-                	deferred.reject("An error occured while getting k2a content");
-                });
-           return deferred.promise;
-        },
-        initK2A: function(clinicName){
-           	var deferred = $q.defer();
-           	 $http.post(this.apiPath+'/app/K2AInit',clinicName,this.configHeaders).success(function(data){
-               	console.log("returned from /K2AInit",data);
-               	deferred.resolve(data);
-               }).error(function(){
-               	console.log("error initializing k2a");
-               	deferred.reject("An error occured while trying to initialize k2a");
-               });
-        
-             return deferred.promise;
-        },
-	postK2AComment: function(post) {
-		var deferred = $q.defer();
-		var commentItem = {post};
-		$http.post(this.apiPath+'/app/comment',commentItem).success(function(data){
-		console.log("return from /comment",data);
-		deferred.resolve(data);
-		}).error(function(){
-		  console.log("error posting comment to k2a");
-		  deferred.reject("An error occured while trying to post a comment to k2a");
-		});
-	      return deferred.promise;
-	},
-	removeK2AComment: function(commentId) {
-		var deferred = $q.defer();
-		$http.delete(this.apiPath+'/app/comment/' + commentId).success(function(data){
-		console.log("return from /comment/" + commentId,data);
-		deferred.resolve(data);
-		}).error(function(){
-		  console.log("error removing comment from k2a");
-		  deferred.reject("An error occured while trying to remove a comment from k2a");
-		});
-	      return deferred.promise;
-	},
-	preventionRulesList: function() {
-		var deferred = $q.defer();
-		$http.get(this.apiPath+'/resources/preventionRulesList').success(function(data){
-		console.log("return from /preventionRulesList",data);
-		deferred.resolve(data);
-		}).error(function(){
-		  console.log("error getting preventionRulesList");
-		  deferred.reject("An error occured while trying to remove a comment from k2a");
-		});
-	      return deferred.promise;
-	},loadPreventionRuleById: function(id) {
-		var deferred = $q.defer();
-		
-		$http.post(this.apiPath+'/resources/loadPreventionRulesById/'+id.id,id,this.configHeaders).success(function(data){
-		console.log("return from /loadPreventionRulesById",data);
-		deferred.resolve(data);
-		}).error(function(){
-		  console.log("error loading loadPreventionRulesById from k2a");
-		  deferred.reject("An error occured while trying to loadPreventionRulesById");
-		});
-	      return deferred.promise;
-	},
-	getCurrentPreventionRulesVersion: function() {
-		var deferred = $q.defer();
-		$http.get(this.apiPath+'/resources/currentPreventionRulesVersion').success(function(data){
-		console.log("return from /getCurrentPreventionRulesVersion",data);
-		deferred.resolve(data);
-		}).error(function(){
-		  console.log("error getCurrentPreventionRulesVersion");
-		  deferred.reject("An error occured while trying to getCurrentPreventionRulesVersion");
-		});
-	      return deferred.promise;
-	},
-	getNotifications: function() {
-		var deferred = $q.defer();
-		$http.get(this.apiPath+'/resources/notifications').success(function(data){
-		deferred.resolve(data);
-		}).error(function(){
-		  deferred.reject("An error occured while trying to getCurrentPreventionRulesVersion");
-		});
-	      return deferred.promise;
-	},
-	getMoreNotification: function(id) {
-		var deferred = $q.defer();
-		
-		$http.post(this.apiPath+'/resources/notifications/readmore',id,this.configHeaders).success(function(data){
-		deferred.resolve(data);
-		}).error(function(){
-		  deferred.reject("An error occured while trying to /resources/notifications/readmore");
-		});
-	      return deferred.promise;
-	},
-	ackNotification: function(id) {
-		var deferred = $q.defer();
-		$http.post(this.apiPath+'/resources/notifications/ack',id,this.configHeaders).success(function(data){
-		deferred.resolve(data);
-		}).error(function(){
-		  deferred.reject("An error occured while trying to /resources/notifications/ack");
-		});
-	      return deferred.promise;
-	}
-	
+.service("k2aService", [
+	'$http', '$q',
+	function ($http, $q)
+	{
+		var service = {};
+
+		service.apiPath = '../ws/rs';
+
+		service.configHeaders = {
+			headers: {
+				"Content-Type": "application/json",
+				"Accept":"application/json"
+			}
+		};
+
+		service.configHeadersWithCache = {
+			headers: {
+				"Content-Type": "application/json",
+				"Accept":"application/json"
+			},
+			cache: true
+		};
+
+		service.getK2aFeed = function getK2aFeed(startPoint, numberOfRows)
+		{
+			var deferred = $q.defer();
+
+			$http({
+				url: service.apiPath + '/rssproxy/rss?key=k2a&startPoint=' +
+					encodeURIComponent(startPoint) +
+					'&numberOfRows=' +
+					encodeURIComponent(numberOfRows),
+				method: "GET",
+				headers: service.configHeaders
+    	}).then(
+    		function success(response)
+    		{
+    			deferred.resolve(response.data);
+    		},
+    		function error(error)
+    		{
+    			console.log("k2aService::getK2aFeed error", error);
+    			deferred.reject("An error occured while getting k2a content");
+    		});
+    	return deferred.promise;
     };
-});
+
+    service.isK2AInit = function isK2AInit()
+    {
+    	var deferred = $q.defer();
+
+    	$http({
+    		url: service.apiPath + '/app/K2AActive',
+    		method: "GET",
+    		headers: service.configHeaders
+    	}).then(
+    		function success(response)
+    		{
+    			deferred.resolve(response.data);
+    		},
+    		function error(error)
+    		{
+    			console.log("k2aService::isK2AInit error", error);
+    			deferred.reject("An error occured while getting k2a content");
+    		});
+
+    	return deferred.promise;
+    };
+
+		service.initK2A = function initK2A(clinicName)
+		{
+			var deferred = $q.defer();
+
+			$http.post(service.apiPath + '/app/K2AInit',
+					clinicName, service.configHeaders).then(
+    		function success(response)
+    		{
+    			deferred.resolve(response.data);
+    		},
+    		function error(error)
+    		{
+    			console.log("k2aService::initK2A error", error);
+    			deferred.reject("An error occured while trying to initialize k2a");
+    		});
+
+    	return deferred.promise;
+    };
+
+		service.postK2AComment = function postK2AComment(post)
+		{
+			var deferred = $q.defer();
+
+			var commentItem = {post};
+			$http.post(service.apiPath + '/app/comment', commentItem).then(
+    		function success(response)
+    		{
+    			deferred.resolve(response.data);
+    		},
+    		function error(error)
+    		{
+    			console.log("k2aService::postK2AComment error", error);
+			  	deferred.reject("An error occured while trying to post a comment to k2a");
+				});
+
+		  return deferred.promise;
+		};
+
+		service.removeK2AComment = function removeK2AComment(commentId)
+		{
+			var deferred = $q.defer();
+
+			$http.delete(service.apiPath + '/app/comment/' +
+					encodeURIComponent(commentId)).then(
+    		function success(response)
+    		{
+    			deferred.resolve(response.data);
+    		},
+    		function error(error)
+    		{
+    			console.log("k2aService::removeK2AComment error", error);
+			  	deferred.reject("An error occured while trying to remove a comment from k2a");
+				});
+
+		  return deferred.promise;
+		};
+
+		service.preventionRulesList = function preventionRulesList()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + '/resources/preventionRulesList').then(
+    		function success(response)
+    		{
+    			deferred.resolve(response.data);
+    		},
+    		function error(error)
+    		{
+			  	console.log("k2aService::preventionRulesList error", error);
+			  	deferred.reject("An error occured while trying to remove a comment from k2a");
+				});
+
+		  return deferred.promise;
+		};
+
+		service.loadPreventionRuleById = function loadPreventionRuleById(id)
+		{
+			var deferred = $q.defer();
+
+			$http.post(service.apiPath + '/resources/loadPreventionRulesById/' +
+					encodeURIComponent(id.id), id, service.configHeaders).then(
+    		function success(response)
+    		{
+    			deferred.resolve(response.data);
+    		},
+    		function error(error)
+    		{
+    			console.log("k2aService::loadPreventionRuleById error", error);
+			  	deferred.reject("An error occured while trying to loadPreventionRulesById");
+				});
+
+		  return deferred.promise;
+		};
+
+		service.getCurrentPreventionRulesVersion = function getCurrentPreventionRulesVersion()
+		{
+			var deferred = $q.defer();
+			$http.get(service.apiPath + '/resources/currentPreventionRulesVersion').then(
+    		function success(response)
+    		{
+    			deferred.resolve(response.data);
+    		},
+    		function error(error)
+    		{
+    			console.log("k2aService::getCurrentPreventionRulesVersion error", error);
+			  	deferred.reject("An error occured while trying to getCurrentPreventionRulesVersion");
+				});
+
+		  return deferred.promise;
+		};
+
+		service.getNotifications = function getNotifications()
+		{
+			var deferred = $q.defer();
+			$http.get(service.apiPath + '/resources/notifications').then(
+    		function success(response)
+    		{
+    			deferred.resolve(response.data);
+    		},
+    		function error(error)
+    		{
+    			console.log("k2aService::getNotifications error", error);
+			  	deferred.reject("An error occured while trying to getCurrentPreventionRulesVersion");
+				});
+
+		  return deferred.promise;
+		};
+
+		service.getMoreNotification = function getMoreNotification(id)
+		{
+			var deferred = $q.defer();
+
+			$http.post(service.apiPath + '/resources/notifications/readmore',
+					id, service.configHeaders).then(
+    		function success(response)
+    		{
+    			deferred.resolve(response.data);
+    		},
+    		function error(error)
+    		{
+    			console.log("k2aService::getMoreNotification error", error);
+			  	deferred.reject("An error occured while trying to /resources/notifications/readmore");
+				});
+
+		  return deferred.promise;
+		};
+
+		service.ackNotification = function ackNotification(id)
+		{
+			var deferred = $q.defer();
+			$http.post(service.apiPath + '/resources/notifications/ack',
+					id, service.configHeaders).then(
+    		function success(response)
+    		{
+    			deferred.resolve(response.data);
+    		},
+    		function error(error)
+    		{
+    			console.log("k2aService::ackNotification error", error);
+			  	deferred.reject("An error occured while trying to /resources/notifications/ack");
+				});
+
+		  return deferred.promise;
+		};
+
+		return service;
+	}
+]);

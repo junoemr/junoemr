@@ -23,95 +23,157 @@
     Ontario, Canada
 
 */
+
 angular.module("providerServices", [])
-	.service("providerService", function ($http,$q,$log) {
-		return {
-		apiPath:'../ws/rs/providerService',
-		configHeaders: {headers: {"Content-Type": "application/json","Accept":"application/json"}},
-		configHeadersWithCache: {headers: {"Content-Type": "application/json","Accept":"application/json"},cache: true},
-        getMe: function(){
-        	var deferred = $q.defer();
-        	 $http.get(this.apiPath+'/provider/me',this.configHeaders).success(function(data){
-            	console.log("me "+data);
-            	deferred.resolve(data);
-            }).error(function(){
-            	console.log("error fetching myself");
-            	deferred.reject("An error occured while getting user data");
-            });
-     
-          return deferred.promise;
-        },
-		getProvider: function(id){
-			var deferred = $q.defer();
-			$http.get(this.apiPath+'/provider/'+id,this.configHeaders).success(function(data){
-				console.log("get provider: "+data);
-				deferred.resolve(data);
-			}).error(function(){
-				console.log("error fetching provider "+id);
-				deferred.reject("An error occured while getting user data");
-			});
-			
-			return deferred.promise;
-		},
-        searchProviders: function (filter) {
-        	var deferred = $q.defer();
-            
-            $http({
-                url: this.apiPath+'/providers/search',
-                method: "POST",
-                data: JSON.stringify(filter),
-                headers: {'Content-Type': 'application/json'}
-             }).success(function (data, status, headers, config) {
-            	 deferred.resolve(data.content);
-             }).error(function (data, status, headers, config) {
-            	 deferred.reject("An error occured while fetching provider list");
-             });
+.service("providerService", [
+	'$http', '$q',
+	function ($http, $q)
+	{
 
-          return deferred.promise;
-        },
-        getSettings: function () {
-        	var deferred = $q.defer();
-            
-            $http({
-                url: this.apiPath+'/settings/get',
-                method: "GET"
-             }).success(function (data, status, headers, config) {
-            	 deferred.resolve(data.content[0]);
-             }).error(function (data, status, headers, config) {
-            	 deferred.reject("An error occured while fetching provider settings");
-             });
+		var service = {};
 
-          return deferred.promise;
-        },
-        saveSettings: function (providerNo,settings) {
-        	var deferred = $q.defer();
-            
-            $http({
-                url: this.apiPath+'/settings/'+providerNo+'/save',
-                method: "POST",
-                data: JSON.stringify(settings),
-                headers: {'Content-Type': 'application/json'}
-             }).success(function (data, status, headers, config) {
-            	 deferred.resolve(data);
-             }).error(function (data, status, headers, config) {
-            	 deferred.reject("An error occured while saving settings");
-             });
+		service.apiPath = '../ws/rs/providerService';
 
-          return deferred.promise;
-        },
-        getActiveTeams: function () {
-        	var deferred = $q.defer();
-            
-            $http({
-                url: this.apiPath+'/getActiveTeams',
-                method: "GET"
-             }).success(function (data, status, headers, config) {
-            	 deferred.resolve(data.content);
-             }).error(function (data, status, headers, config) {
-            	 deferred.reject("An error occured while fetching provider teams");
-             });
+		service.configHeaders = {
+			headers: {
+				"Content-Type": "application/json",
+				"Accept":"application/json"
+			}
+		};
 
-          return deferred.promise;
-        }
+		service.configHeadersWithCache = {
+			headers: {
+				"Content-Type": "application/json",
+				"Accept":"application/json"
+			},
+			cache: true
+		};
+
+    service.getMe = function getMe()
+    {
+      var deferred = $q.defer();
+
+      $http.get(service.apiPath + '/provider/me', service.configHeaders).then(
+       	function success(response)
+        {
+          deferred.resolve(response.data);
+        },
+        function error()
+        {
+          console.log("providerService::getMe error", error);
+          deferred.reject("An error occured while getting user data");
+        });
+
+      return deferred.promise;
     };
-});
+
+    service.getProvider = function getProvider(id)
+    {
+      var deferred = $q.defer();
+
+      $http.get(service.apiPath + '/provider/' + encodeURIComponent(id),
+      		service.configHeaders).then(
+       	function success(response)
+        {
+          deferred.resolve(response.data);
+        },
+        function error()
+        {
+          console.log("providerService::getProvider error", error);
+        	deferred.reject("An error occured while getting user data");
+      	});
+
+      return deferred.promise;
+    };
+
+		service.searchProviders = function searchProviders(filter)
+		{
+		  var deferred = $q.defer();
+
+	    $http({
+	        url: service.apiPath + '/providers/search',
+	        method: "POST",
+	        data: JSON.stringify(filter),
+	        headers: {'Content-Type': 'application/json'}
+	     }).then(
+	     	function success(response)
+        {
+          deferred.resolve(response.data.content);
+        },
+        function error()
+        {
+        	console.log("providerService::searchProviders error", error);
+        	deferred.reject("An error occured while fetching provider list");
+	     	});
+
+		  return deferred.promise;
+		};
+
+		service.getSettings = function getSettings()
+		{
+		  var deferred = $q.defer();
+
+	    $http({
+	    	url: service.apiPath + '/settings/get',
+	    	method: "GET"
+	    }).then(
+	    	function success(response)
+        {
+          deferred.resolve(response.data.content[0]);
+        },
+        function error()
+        {
+        	console.log("providerService::getSettings error", error);
+        	deferred.reject("An error occured while fetching provider settings");
+        });
+
+			return deferred.promise;
+		};
+
+		service.saveSettings = function saveSettings(providerNo, settings)
+		{
+		  var deferred = $q.defer();
+
+	    $http({
+	        url: service.apiPath+'/settings/'+providerNo+'/save',
+	        method: "POST",
+	        data: JSON.stringify(settings),
+	        headers: {'Content-Type': 'application/json'}
+	    }).then(
+	    	function success(response)
+	      {
+	        deferred.resolve(response.data);
+	      },
+	      function error()
+	      {
+	      	console.log("providerService::saveSettings error", error);
+	      	deferred.reject("An error occured while saving settings");
+	      });
+
+		  return deferred.promise;
+		};
+
+		service.getActiveTeams = function getActiveTeams()
+		{
+		  var deferred = $q.defer();
+
+	    $http({
+	        url: service.apiPath+'/getActiveTeams',
+	        method: "GET"
+	     }).then(
+	    	function success(response)
+	      {
+	        deferred.resolve(response.data.content);
+	      },
+	      function error()
+	      {
+	      	console.log("providerService::getActiveTeams error", error);
+	      	deferred.reject("An error occured while fetching provider teams");
+	      });
+
+		  return deferred.promise;
+		};
+
+		return service;
+	}
+]);
