@@ -16,10 +16,7 @@ gulp.task('sass', function () {
 			sourceComments: 'map',
 		  sourceMap: 'sass',
 		  outputStyle: 'nested' }).on('error', sass.logError))
-		.pipe(gulp.dest(paths.dest));
-
-	// minifies juno.css to juno.min.css
-	gulp.src(paths.dest + 'juno.css')
+		.pipe(gulp.dest(paths.dest))
 		.pipe(cssmin({noRebase: true}))
 		.pipe(rename({suffix: '.min'}))
 		.pipe(gulp.dest(paths.dest));

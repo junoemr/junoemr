@@ -1731,7 +1731,7 @@
 				<!-- override with -Dmaven.tomcat.hostname=the-host-name -->
 				<maven.tomcat.hostname>${env.HOSTNAME}</maven.tomcat.hostname>
 				<!-- make the context reloadable to allow hot deploy -->
-				<maven.tomcat.contextReloadable>true</maven.tomcat.contextReloadable>
+				<maven.tomcat.contextReloadable>false</maven.tomcat.contextReloadable>
   			</properties>
 			<build>
 				<plugins>
