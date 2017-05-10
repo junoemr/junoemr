@@ -1706,17 +1706,14 @@
 				</property>
 			</activation>
 			<properties>
-				<!-- default location for external properties file -->
-				<!-- override with -Dtomcat7.embedded.instanceProperties=path-to-file -->
-				<tomcat7.embedded.instanceProperties>
-					/usr/share/tomcat/dev_instance.properties
-				</tomcat7.embedded.instanceProperties>
 				<!-- default port for embedded tomcat -->
 				<!-- override with -Dmaven.tomcat.port=the-port -->
 				<maven.tomcat.port>9090</maven.tomcat.port>
 				<!-- default context path for embedded tomcat -->
 				<!-- override with -Dmaven.tomcat.path=/the-path -->
-				<maven.tomcat.path>/</maven.tomcat.path>
+				<!-- the external properties file will be loaded using this name -->
+				<!-- from the ${user.home} directory, e.g. ~/junodev.properties -->
+				<maven.tomcat.path>/junodev</maven.tomcat.path>
 				<!-- default host name for embedded tomcat -->
 				<!-- override with -Dmaven.tomcat.hostname=the-host-name -->
 				<maven.tomcat.hostname>${env.HOSTNAME}</maven.tomcat.hostname>
@@ -1725,24 +1722,6 @@
   			</properties>
 			<build>
 				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>properties-maven-plugin</artifactId>
-						<version>1.0.0</version>
-						<executions>
-							<execution>
-								<phase>initialize</phase>
-								<goals>
-									<goal>read-project-properties</goal>
-								</goals>
-								<configuration>
-									<files>
-										<file>${tomcat7.embedded.instanceProperties}</file>
-									</files>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
 					<plugin>
 						<groupId>org.apache.tomcat.maven</groupId>
 						<artifactId>tomcat7-maven-plugin</artifactId>
