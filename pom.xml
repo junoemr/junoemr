@@ -1459,7 +1459,7 @@
 						</goals>
 						<configuration>
 							<files>
-								<file>/usr/share/tomcat/my_instance.properties</file>
+								<file>/usr/share/tomcat/nickdev.properties</file>
 							</files>
 						</configuration>
 					</execution>
