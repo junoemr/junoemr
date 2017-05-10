@@ -72,6 +72,11 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 <link href="./css/patient-list.css" rel="stylesheet">
 <link href="./css/record.css" rel="stylesheet">
 
+<!-- TODO remove other CSS files -->
+
+<!-- combined and minified CSS from compiled SCSS -->
+<link href="./dist/juno.min.css" rel="stylesheet">
+
 </head>
 
 <body ng-controller="OscarCtrl">
