@@ -49,33 +49,23 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 <title><bean:message key="global.title" bundle="ui"/></title>
 
-<link href="../library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
-<link href="../css/font-awesome.css" rel="stylesheet">
-<link href="../css/loading-bar.css" rel="stylesheet">
+<%-- 3rd party CSS --%>
+<link href="bower_components/ng-table-bundle/ng-table.min.css" rel="stylesheet">
+<link href="bower_components/angular-loading-bar/build/loading-bar.min.css" rel="stylesheet">
+<link href="bower_components/components-font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
+<%-- combined and minified CSS from compiled SCSS --%>
+<link href="dist/juno.min.css" rel="stylesheet">
 
-<!-- we will combine/minify later -->
+<%-- TODO include in Juno SCSS/CSS --%>
 <link href="css/navbar-fixed-top.css" rel="stylesheet">
 <link href="css/navbar-demo-search.css" rel="stylesheet">
 <link href="css/patient-list.css" rel="stylesheet">
-
-<link href="../library/ng-table/ng-table.css" rel="stylesheet">
-
-<link href="../library/bootstrap2-datepicker/datepicker3.css" rel="stylesheet">
-
-<link href="../css/bootstrap-timepicker.min.css" rel="stylesheet">
-
+<link href="css/index.css" rel="stylesheet">
+<link href="css/patient-list.css" rel="stylesheet">
+<link href="css/record.css" rel="stylesheet">
 <link href="../library/bootstrap/3.0.0/assets/css/bootstrap3_badge_colours.css" rel="stylesheet">
 
-<%--Place custom styles here to override bootstap styles--%>
-<link href="./css/index.css" rel="stylesheet">
-<link href="./css/patient-list.css" rel="stylesheet">
-<link href="./css/record.css" rel="stylesheet">
-
-<!-- TODO remove other CSS files -->
-
-<!-- combined and minified CSS from compiled SCSS -->
-<link href="./dist/juno.min.css" rel="stylesheet">
 
 </head>
 
@@ -229,7 +219,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							</div>
 					</div>
 				</div>
-				<div class="container">
+				<div class="container-fluid">
 					<div class="row" ng-cloak>
 						<%--<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>">
 							<span class="glyphicon glyphicon-refresh"></span>

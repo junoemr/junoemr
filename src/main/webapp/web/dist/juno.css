@@ -295,8 +295,8 @@ th {
 
 @font-face {
   font-family: 'Glyphicons Halflings';
-  src: url("../fonts/bootstrap/glyphicons-halflings-regular.eot");
-  src: url("../fonts/bootstrap/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("../fonts/bootstrap/glyphicons-halflings-regular.woff2") format("woff2"), url("../fonts/bootstrap/glyphicons-halflings-regular.woff") format("woff"), url("../fonts/bootstrap/glyphicons-halflings-regular.ttf") format("truetype"), url("../fonts/bootstrap/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg"); }
+  src: url("../bower_components/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.eot");
+  src: url("../bower_components/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("../bower_components/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2") format("woff2"), url("../bower_components/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff") format("woff"), url("../bower_components/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf") format("truetype"), url("../bower_components/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg"); }
 
 /* line 24, bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_glyphicons.scss */
 .glyphicon {
@@ -7268,229 +7268,167 @@ button.close {
   .hidden-print {
     display: none !important; } }
 
-/**
+/*!
+ * Timepicker Component for Twitter Bootstrap
+ *
+ * Copyright 2013 Joris de Wit
+ *
+ * Contributors https://github.com/jdewit/bootstrap-timepicker/graphs/contributors
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+/* This file is copied from
+ * bower_components/bootstrap-timepicker/css/timepicker.less
+ * and included in the SCSS build of juno
+ * because no CSS file is provided in the bower distribution and we dont use less
+ */
+/* line 18, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker {
+  position: relative; }
+  /* line 23, scss/bootstrap-timepicker/_timepicker.scss */
+  .bootstrap-timepicker.pull-right .bootstrap-timepicker-widget.dropdown-menu {
+    left: auto;
+    right: 0; }
+    /* line 27, scss/bootstrap-timepicker/_timepicker.scss */
+    .bootstrap-timepicker.pull-right .bootstrap-timepicker-widget.dropdown-menu:before {
+      left: auto;
+      right: 12px; }
+    /* line 31, scss/bootstrap-timepicker/_timepicker.scss */
+    .bootstrap-timepicker.pull-right .bootstrap-timepicker-widget.dropdown-menu:after {
+      left: auto;
+      right: 13px; }
+  /* line 39, scss/bootstrap-timepicker/_timepicker.scss */
+  .bootstrap-timepicker .input-group-addon {
+    cursor: pointer; }
+    /* line 41, scss/bootstrap-timepicker/_timepicker.scss */
+    .bootstrap-timepicker .input-group-addon i {
+      display: inline-block;
+      width: 16px;
+      height: 16px; }
 
-    Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
-    This software is published under the GPL GNU General Public License.
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-    This software was written for the
-    Department of Family Medicine
-    McMaster University
-    Hamilton
-    Ontario, Canada
-
-**/
-/* line 28, dashboard/_dashboard.scss */
-.flag-column {
-  width: 10px; }
-
-/* line 32, dashboard/_dashboard.scss */
-.overdue {
-  background-color: pink; }
-
-/* line 36, dashboard/_dashboard.scss */
-.significance-high {
-  border-color: red !important; }
-
-/* line 40, dashboard/_dashboard.scss */
-.significance-medium {
-  border-color: yellow !important; }
-
-/* line 44, dashboard/_dashboard.scss */
-.significance-low {
-  border-color: green !important; }
-
-@CHARSET "UTF-8";
-@MEDIA print {
-  /* line 50, dashboard/_dashboard.scss */
-  body {
-    margin: 0;
-    padding: 0;
-    line-height: 1em;
-    word-spacing: 1px;
-    letter-spacing: 0.2px;
-    font: 11px Arial, Helvetica, "Lucida Grande", serif;
-    color: #000;
-    background-image: none; }
-  /* line 60, dashboard/_dashboard.scss */
-  #logo,
-  tfoot,
-  #catnavi,
-  .topnavi,
-  .more-link,
-  .navigation,
-  #sidebartop,
-  #related,
-  #social,
-  #sponsors,
-  .tabs,
-  #allpost,
-  .toolbar,
-  .splitbox,
-  #commentform,
-  #commentabs .idTabs,
-  .postmeta-content .comments,
-  #respond h3,
-  .tag,
-  .footerlinks {
-    display: none; }
-  /* line 82, dashboard/_dashboard.scss */
-  .donotprint,
-  .dataTables_length,
-  .dataTables_filter,
-  .dataTables_info,
-  .dataTables_paginate {
-    display: none; }
-  /* line 89, dashboard/_dashboard.scss */
-  table {
-    border-collapse: collapse; }
-  /* line 92, dashboard/_dashboard.scss */
-  table th {
-    font: 13px Arial, Helvetica, "Lucida Grande", serif; }
-  /* line 95, dashboard/_dashboard.scss */
-  table td,
-  table th {
-    padding: 0px;
-    margin: 0px; }
-  /* line 100, dashboard/_dashboard.scss */
-  .printonly {
-    display: block; } }
-
-@MEDIA screen {
-  /* line 106, dashboard/_dashboard.scss */
-  .indicatorHeading div {
-    min-height: 40px !important;
-    text-align: left !important; }
-  /* line 110, dashboard/_dashboard.scss */
-  .glyphicon-refresh-animate {
-    -animation: spin .7s infinite linear;
-    -webkit-animation: spin2 .7s infinite linear;
-    margin: 0px !important;
-    padding: 0px !important;
-    height: 17px !important; }
-  @-webkit-keyframes spin2 {
-    from {
-      -webkit-transform: rotate(0deg); }
-    to {
-      -webkit-transform: rotate(360deg); } }
-  @keyframes spin {
-    from {
-      transform: scale(1) rotate(0deg); }
-    to {
-      transform: scale(1) rotate(360deg); } }
-  /* line 133, dashboard/_dashboard.scss */
-  .printonly {
-    display: none; }
-  /* line 136, dashboard/_dashboard.scss */
-  #libraryTable_length,
-  #drilldownTable_length {
-    float: left; }
-  @-moz-document url-prefix () {
-    /* line 141, dashboard/_dashboard.scss */
-    fieldset {
-      display: table-cell; } }
-  /* line 145, dashboard/_dashboard.scss */
-  .indicatorDefinition {
-    height: 100px;
-    overflow-y: hidden; }
-  /* line 149, dashboard/_dashboard.scss */
-  .img-responsive {
-    display: block;
-    height: auto;
-    max-width: 100%; }
-  /* line 154, dashboard/_dashboard.scss */
-  .indicatorWrapper {
-    border: thin solid #F5F5F5;
-    border-radius: 5px;
-    margin: 0.5%; }
-  /* line 159, dashboard/_dashboard.scss */
-  .indicatorHeading {
-    border-bottom: thin solid #F5F5F5;
-    background-color: #F5F5F5;
-    margin-bottom: 5px; }
-  /* line 164, dashboard/_dashboard.scss */
-  .indicatorFooter {
-    margin-top: 5px;
-    border-top: thin solid #F5F5F5;
-    background-color: #F5F5F5; }
-  /* line 169, dashboard/_dashboard.scss */
-  .content {
-    margin-top: 50px; }
-  /* line 172, dashboard/_dashboard.scss */
-  #libraryTableContainer {
-    margin-top: 80px; }
-  /* line 175, dashboard/_dashboard.scss */
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px; }
-  /* line 181, dashboard/_dashboard.scss */
-  .switch input {
-    display: none; }
-  /* line 184, dashboard/_dashboard.scss */
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s; }
-  /* line 195, dashboard/_dashboard.scss */
-  .slider:before {
-    position: absolute;
+/* line 49, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker-widget.dropdown-menu {
+  padding: 4px; }
+  /* line 51, scss/bootstrap-timepicker/_timepicker.scss */
+  .bootstrap-timepicker-widget.dropdown-menu.open {
+    display: inline-block; }
+  /* line 54, scss/bootstrap-timepicker/_timepicker.scss */
+  .bootstrap-timepicker-widget.dropdown-menu:before {
+    border-bottom: 7px solid rgba(0, 0, 0, 0.2);
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
     content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s; }
-  /* line 206, dashboard/_dashboard.scss */
-  input:checked + .slider {
-    background-color: #2196F3; }
-  /* line 209, dashboard/_dashboard.scss */
-  input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3; }
-  /* line 212, dashboard/_dashboard.scss */
-  input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px); }
-  /* line 217, dashboard/_dashboard.scss */
-  .slider.round {
-    border-radius: 34px; }
-  /* line 220, dashboard/_dashboard.scss */
-  .slider.round:before {
-    border-radius: 50%; }
-  /* line 223, dashboard/_dashboard.scss */
-  table.dataTable tfoot th,
-  table.dataTable tfoot td {
-    padding: 5px 0px !important; }
-  /* line 227, dashboard/_dashboard.scss */
-  #ticklerMenu,
-  #ticklerMenu .btn {
-    padding: 0px !important;
-    margin: 0px !important; }
-  /* line 232, dashboard/_dashboard.scss */
-  .dataTables_wrapper .dataTables_filter input {
-    margin-left: 0 !important; } }
+    display: inline-block;
+    position: absolute; }
+  /* line 62, scss/bootstrap-timepicker/_timepicker.scss */
+  .bootstrap-timepicker-widget.dropdown-menu:after {
+    border-bottom: 6px solid #FFFFFF;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    content: "";
+    display: inline-block;
+    position: absolute; }
+
+/* line 72, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker-widget.timepicker-orient-left:before {
+  left: 6px; }
+
+/* line 75, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker-widget.timepicker-orient-left:after {
+  left: 7px; }
+
+/* line 80, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker-widget.timepicker-orient-right:before {
+  right: 6px; }
+
+/* line 83, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker-widget.timepicker-orient-right:after {
+  right: 7px; }
+
+/* line 88, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker-widget.timepicker-orient-top:before {
+  top: -7px; }
+
+/* line 91, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker-widget.timepicker-orient-top:after {
+  top: -6px; }
+
+/* line 96, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker-widget.timepicker-orient-bottom:before {
+  bottom: -7px;
+  border-bottom: 0;
+  border-top: 7px solid #999; }
+
+/* line 101, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker-widget.timepicker-orient-bottom:after {
+  bottom: -6px;
+  border-bottom: 0;
+  border-top: 6px solid #ffffff; }
+
+/* line 107, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker-widget a.btn, .bootstrap-timepicker-widget input {
+  border-radius: 4px; }
+
+/* line 111, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker-widget table {
+  width: 100%;
+  margin: 0; }
+  /* line 115, scss/bootstrap-timepicker/_timepicker.scss */
+  .bootstrap-timepicker-widget table td {
+    text-align: center;
+    height: 30px;
+    margin: 0;
+    padding: 2px; }
+    /* line 121, scss/bootstrap-timepicker/_timepicker.scss */
+    .bootstrap-timepicker-widget table td:not(.separator) {
+      min-width: 30px; }
+    /* line 125, scss/bootstrap-timepicker/_timepicker.scss */
+    .bootstrap-timepicker-widget table td span {
+      width: 100%; }
+    /* line 128, scss/bootstrap-timepicker/_timepicker.scss */
+    .bootstrap-timepicker-widget table td a {
+      border: 1px transparent solid;
+      width: 100%;
+      display: inline-block;
+      margin: 0;
+      padding: 8px 0;
+      outline: 0;
+      color: #333; }
+      /* line 137, scss/bootstrap-timepicker/_timepicker.scss */
+      .bootstrap-timepicker-widget table td a:hover {
+        text-decoration: none;
+        background-color: #eee;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+        border-color: #ddd; }
+      /* line 146, scss/bootstrap-timepicker/_timepicker.scss */
+      .bootstrap-timepicker-widget table td a i {
+        margin-top: 2px;
+        font-size: 18px; }
+    /* line 151, scss/bootstrap-timepicker/_timepicker.scss */
+    .bootstrap-timepicker-widget table td input {
+      width: 25px;
+      margin: 0;
+      text-align: center; }
+
+/* line 160, scss/bootstrap-timepicker/_timepicker.scss */
+.bootstrap-timepicker-widget .modal-content {
+  padding: 4px; }
+
+@media (min-width: 767px) {
+  /* line 165, scss/bootstrap-timepicker/_timepicker.scss */
+  .bootstrap-timepicker-widget.modal {
+    width: 200px;
+    margin-left: -100px; } }
+
+@media (max-width: 767px) {
+  /* line 172, scss/bootstrap-timepicker/_timepicker.scss */
+  .bootstrap-timepicker {
+    width: 100%; }
+    /* line 175, scss/bootstrap-timepicker/_timepicker.scss */
+    .bootstrap-timepicker .dropdown-menu {
+      width: 100%; } }
 
 /*# sourceMappingURL=../sass */

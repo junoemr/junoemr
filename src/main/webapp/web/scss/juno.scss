@@ -6,6 +6,9 @@
 @import "bootstrap/bootstrap";
 @import "../bower_components/bootstrap-sass/assets/stylesheets/bootstrap";
 
+// bootstrap-timepicker does not provide a CSS file so compile as SCSS
+@import "bootstrap-timepicker/timepicker";
+
 // Global stuff
 @import "global";
 
