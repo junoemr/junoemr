@@ -1313,7 +1313,7 @@ if (curProvider_no[provIndex].equals(provNum)) {
 	}
 	}
 
-	for(Provider p : providerDao.getActiveProviders()) {
+	for(Provider p : providerDao.getActiveProvidersByType("doctor")) {
 		boolean skip = checkRestriction(restrictions,p.getProviderNo());
 
 		if (!skip && (!bMultisites || siteProviderNos  == null || siteProviderNos.size() == 0 || siteProviderNos.contains(p.getProviderNo()))) {
@@ -1814,7 +1814,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
         	<security:oscarSec roleName="<%=roleName$%>" objectName="_tickler" rights="r">
 	        	<% if (tickler_no.compareTo("") != 0) {%>
 		        	<caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
-	        			<a href="#" onClick="popupPage(700,1024, '../tickler/ticklerDemoMain.jsp?demoview=0');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: <%=UtilMisc.htmlEscape(tickler_note)%>"><font color="red">!</font></a>
+	        			<a href="#" onClick="popupPage(700,1024, '../tickler/ticklerMain.jsp?demoview=0');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: <%=UtilMisc.htmlEscape(tickler_note)%>"><font color="red">!</font></a>
 	    			</caisi:isModuleLoad>
 	    			<caisi:isModuleLoad moduleName="ticklerplus">
 	    				<a href="../ticklerPlus/index.jsp" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: <%=UtilMisc.htmlEscape(tickler_note)%>"><font color="red">!</font></a>
@@ -1849,7 +1849,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
         			} else {
 				%>	<% if (tickler_no.compareTo("") != 0) {%>
 			        	<caisi:isModuleLoad moduleName="ticklerplus" reverse="true">
-                                        <a href="#" onClick="popupPage(700,1024, '../tickler/ticklerDemoMain.jsp?demoview=<%=demographic_no%>');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: <%=UtilMisc.htmlEscape(tickler_note)%>"><font color="red">!</font></a>
+                                        <a href="#" onClick="popupPage(700,1024, '../tickler/ticklerMain.jsp?demoview=<%=demographic_no%>');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: <%=UtilMisc.htmlEscape(tickler_note)%>"><font color="red">!</font></a>
     					</caisi:isModuleLoad>
     					<caisi:isModuleLoad moduleName="ticklerplus">
 		    				<!--  <a href="../Tickler.do?method=filter&filter.client=<%=demographic_no %>" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: <%=UtilMisc.htmlEscape(tickler_note)%>"><font color="red">!</font></a> -->
@@ -1923,7 +1923,7 @@ start_time += iSm + ":00";
 	notes: <%=notes%>"
 </oscar:oscarPropertiesCheck> ><%=(view==0) ? (name.length()>len?name.substring(0,len) : name) :name%></a>
 
-<% if(len==lenLimitedL || view!=0 || numAvailProvider==1 ) {%>
+<% if(len==lenLimitedL || view!=0 || numAvailProvider==1 || oscar.OscarProperties.getInstance().isPropertyActive("APPT_ALWAYS_SHOW_LINKS")) {%>
 
 <security:oscarSec roleName="<%=roleName$%>" objectName="_eChart" rights="r">
 <oscar:oscarPropertiesCheck property="eform_in_appointment" value="yes">

@@ -24,6 +24,7 @@
 
 package oscar.oscarRx.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -103,7 +104,7 @@ public class RxPatientData {
 		return age;
 	}
 
-	public static class Patient {
+	public static class Patient implements Serializable {
 		private Demographic demographic = null;
 		private static AllergyDao allergyDao = (AllergyDao) SpringUtils.getBean("allergyDao");
 		private PartialDateDao partialDateDao = (PartialDateDao) SpringUtils.getBean("partialDateDao");

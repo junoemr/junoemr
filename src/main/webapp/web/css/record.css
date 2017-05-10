@@ -80,6 +80,30 @@
 }
 
 
+/* Summary Page */
+
+legend {
+    /*color: #636363;*/
+    color: #3963c2;
+    font-size: 16px;
+}
+
+legend a {
+    color: #636363;
+    font-size: 13px;
+}
+
+.summary-section {
+    border-bottom: 1px solid;
+    border-bottom-color: #e9e9e9;
+}
+
+.summary-section-heading {
+    color: #1c56af;
+    font-weight: bold;
+}
+
+
 /*for patient header*/
 
 @media (max-width: 1320px) {

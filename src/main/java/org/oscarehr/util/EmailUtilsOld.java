@@ -36,8 +36,10 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailAttachment;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
+import org.apache.commons.mail.MultiPartEmail;
 import org.apache.log4j.Logger;
 import org.apache.commons.validator.EmailValidator;
 import oscar.OscarProperties;
@@ -120,6 +122,71 @@ public final class EmailUtilsOld
 	}
 
 	/**
+	 * This method will return a MultiPartEmail object populated with
+	 * the smtpServer/smtpUser/smtpPassword from the config xml file.
+	 * @throws EmailException
+	 */
+	public static MultiPartEmail getMultiPartEmail() throws EmailException
+	{
+		String smtpHost = OscarProperties.getInstance().getProperty(CATEGORY+SMTP_HOST_KEY);
+		String smtpSslPort = OscarProperties.getInstance().getProperty(CATEGORY+SMTP_SSL_PORT_KEY);
+		String smtpUser = OscarProperties.getInstance().getProperty(CATEGORY+SMTP_USER_KEY);
+		String smtpPassword = OscarProperties.getInstance().getProperty(CATEGORY+SMTP_PASSWORD_KEY);
+		String smtpConnectionSecurity = OscarProperties.getInstance().getProperty(CATEGORY+SMTP_CONNECTION_SECURITY);
+
+		return getMultiPartEmail(smtpHost, smtpSslPort, smtpUser, smtpPassword, smtpConnectionSecurity);
+
+		//return getMultiPartEmail();
+	}
+
+	/**
+	 * This method will return a MultiPart object populated with
+	 * the values passed in, ignoring the parameters in the configuration file.
+	 */
+	public static MultiPartEmail getMultiPartEmail(String smtpServer, String smtpPort, String smtpUser, String smtpPassword, String connectionSecurity) throws EmailException
+	{
+		logger.debug("smtpServer="+smtpServer+", smtpSslPort="+smtpPort+", smtpUser="+smtpUser+", smtpPassword="+smtpPassword + ",connectionSecurity="+connectionSecurity);
+		MultiPartEmail email = null;
+
+		if (recipientOverride!=null || printInsteadOfSend){
+			logger.debug(RECIPIENT_OVERRIDE_KEY);
+			logger.debug(printInsteadOfSend);
+			return email;
+		}else{
+			email = new MultiPartEmail();
+		}
+
+		email.setHostName(smtpServer);
+
+		if (smtpUser != null && smtpPassword != null) email.setAuthentication(smtpUser, smtpPassword);
+
+		Session session = email.getMailSession();
+
+		if (connectionSecurity != null) {
+			if (connectionSecurity.equals(CONNECTION_SECURITY_STARTTLS)){
+				session.getProperties().setProperty(Email.MAIL_TRANSPORT_TLS, "true");
+				email.setTLS(true);
+			} else if (connectionSecurity.equals(CONNECTION_SECURITY_SSL)) {
+				email.setSSL(true);
+			}
+		}
+
+		if (smtpPort != null)
+		{
+			email.setSslSmtpPort(smtpPort);
+		}
+
+
+		Properties properties = session.getProperties();
+		properties.setProperty("mail.smtp.connectiontimeout", "20000");
+		properties.setProperty("mail.smtp.timeout", "20000");
+		properties.setProperty("mail.smtp.auth", "true");
+
+		return(email);
+
+	}
+
+	/**
 	 * This method will return an HtmlEmail object populated with 
 	 * the values passed in, ignoring the parameters in the configuration file.
 	 */
@@ -192,6 +259,42 @@ public final class EmailUtilsOld
 		if (htmlContents != null) htmlEmail.setHtmlMsg(htmlContents);
 
 		htmlEmail.send();
+	}
+
+	/**
+	 * This is a convenience method for sending and email to 1 recipient using the configuration file settings.
+	 * @throws EmailException
+	 */
+	public static void sendEmailWithAttachment(String toEmailAddress, String toName, String fromEmailAddress, String fromName, String subject, String textContents, String attachmentPath) throws EmailException
+	{
+		MultiPartEmail email = getMultiPartEmail();
+
+
+		email.addTo(toEmailAddress, toName);
+		email.setFrom(fromEmailAddress, fromName);
+
+		email.setSubject(subject);
+		if (textContents != null){
+			email.setMsg(textContents);
+		}else{
+			// A blank string is not valid for some reason
+			//email.setMsg("");
+		}
+
+
+		EmailAttachment attachment = new EmailAttachment();
+
+		logger.debug("path: " + attachmentPath);
+
+		attachment.setPath(attachmentPath);
+		attachment.setDisposition(EmailAttachment.ATTACHMENT);
+		//attachment.setDescription("Email Attachment");
+
+		logger.debug("Attachment: "+attachmentPath);
+		email.attach(attachment);
+
+
+		email.send();
 	}
 
 	/**

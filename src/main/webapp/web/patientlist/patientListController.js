@@ -114,9 +114,7 @@ $scope.changeTab = function(temp,filter){
     	$scope.currentPage = pageNum;
     	//broadcast the change page
     	$scope.$broadcast('updatePatientList', {currentPage:$scope.currentPage,pageSize:$scope.pageSize});
-
     }
-
 
 
   //  $scope.$watch("currentPage", function(newValue, oldValue) {
@@ -224,7 +222,7 @@ $scope.changeTab = function(temp,filter){
             controller: 'PatientListConfigController',
             backdrop: false,
             size: 'lg',
-            resolve: {config: function() {return $scope.patientListConfig;}}
+            resolve: { config: function() { return $scope.patientListConfig; } }
         });
 
         modalInstance.result.then(function(patientListConfig){
@@ -265,7 +263,6 @@ oscarApp.controller('PatientListDemographicSetCtrl', [
 ]);
 
 oscarApp.controller('PatientListAppointmentListCtrl', [
-
 	'$scope', 'Navigation', '$http', 'scheduleService',
 	'$q', '$filter', '$uibModal', 'providerService',
 
@@ -446,6 +443,10 @@ oscarApp.controller('PatientListConfigController',function($scope, $modalInstanc
 
 	$scope.saveConfiguration =function(){
     	$modalInstance.close($scope.patientListConfig);
+    };
+
+    $scope.saveConfiguration = function() {
+        $modalInstance.close($scope.patientListConfig);
     };
 
 });

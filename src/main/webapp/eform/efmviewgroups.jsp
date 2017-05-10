@@ -74,11 +74,15 @@ if (patientGroups.equals("1")) {
                 String selected = "";
                 HashMap curhash = (HashMap) groups.get(i);
                 String group = (String) curhash.get("groupName");
-                String size = (String) curhash.get("count");
+				String sizeString = "";
+				if(curhash.containsKey("count"))
+				{
+                	String size = (String) curhash.get("count");
+					sizeString = " (" + size + ")";
+				}
                 if (group.equals(groupView)) selected = "selected";%>
 	<li class="<%=selected%>"><a href="#"
-		onclick="document.getElementById('group_view').value='<%=group%>'; document.forms['groupselect'].submit();"><%=group%>
-	(<%=size%>)</a></li>
+		onclick="document.getElementById('group_view').value='<%=group%>'; document.forms['groupselect'].submit();"><%=group%><%=sizeString%></a></li>
 	<% } %>
 </ul>
 <security:oscarSec roleName="<%=roleName$%>"

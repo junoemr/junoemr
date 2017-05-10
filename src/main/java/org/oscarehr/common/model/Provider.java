@@ -127,8 +127,18 @@ public class Provider implements Serializable, Comparable<Provider>{
 
 	}
 
+	/** same as getDisplayName */
 	public String getFormattedName() {
-		return getLastName() + ", " + getFirstName();
+		return getDisplayName();
+	}
+	/** returns a formatted name String in the form of 'first_name, last_name' */
+	public String getDisplayName() {
+		String lastName  = (getLastName()  == null) ? "" : getLastName().trim();
+		String firstName = (getFirstName() == null) ? "" : getFirstName().trim();
+		if(!lastName.isEmpty() && !firstName.isEmpty()) {
+			lastName += ", ";
+		}
+		return lastName + firstName;
 	}
 
 	public String getFullName() {

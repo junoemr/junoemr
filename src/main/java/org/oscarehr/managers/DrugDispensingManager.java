@@ -55,7 +55,7 @@ public class DrugDispensingManager {
 	 * 
 	 * there's some extra code in here to be used later to get info about doses remaining/available/dispensed
 	 * @param drugId
-	 * @return
+	 * @return String status
 	 */
 	public String getStatus(Integer drugId) {
 		

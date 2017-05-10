@@ -392,8 +392,10 @@ public class DrugDao extends AbstractDao<Drug> {
 	@NativeSql("drugs")
 	@SuppressWarnings("unchecked")
 	public List<Object[]> findByParameter(String parameter, String value) {
-		String sql = "select special ,special_instruction from drugs where " + parameter + " = '" + value + "' order by drugid desc";
+		String sql = "select special, special_instruction from drugs where :parameter = :value order by drugid desc";
 		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("parameter", parameter);
+		query.setParameter("value", value);
 		return query.getResultList();
 	}
 

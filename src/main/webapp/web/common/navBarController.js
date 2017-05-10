@@ -253,21 +253,18 @@ oscarApp.controller('NavBarCtrl', function ($scope,$location,$uibModal, $state, 
     }
 
     $scope.switchToAdvancedView = function() {
-    	$rootScope.$apply(function() {
-
+        $rootScope.$apply(function() {
             $location.path("/search");
             $location.search('term',$scope.quickSearchTerm);
-
           });
-
     }
 
     $scope.setQuickSearchTerm = function(term) {
-    	$scope.quickSearchTerm = term;
+        $scope.quickSearchTerm = term;
     }
 
     $scope.showPatientList = function() {
-    	$scope.$emit('configureShowPatientList', true);
+        $scope.$emit('configureShowPatientList', true);
     }
 
 

@@ -162,9 +162,6 @@ li.cpp-note-list:last-child {
     color: #999999 !important;
 }
 
-
-/*Updated styling below*/
-
 p {
     color: #636363;
 }
@@ -247,6 +244,10 @@ p {
     color: #ebebeb;
 }
 
+#left-pane-header a:hover {
+    color: #fff;
+}
+
 #left-pane-header h1 {
     margin: 0;
 }
@@ -283,6 +284,10 @@ p {
 
 #patient-search {
     padding: 20px;
+}
+
+.hidden-1380 {
+    display: none;
 }
 
 
@@ -328,6 +333,18 @@ p {
         padding-bottom: 10px;
     }
     .collapse.in {
+        display: block !important;
+    }
+}
+
+
+/*Show or hide an element on screens with < 1380px width*/
+
+@media (max-width: 1500px) {
+    .hidden-1500 {
+        display: none !important;
+    }
+    .visible-1500 {
         display: block !important;
     }
 }

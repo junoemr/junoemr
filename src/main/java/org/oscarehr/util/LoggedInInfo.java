@@ -46,7 +46,7 @@ public final class LoggedInInfo implements Serializable {
 	
 	public final String LOGGED_IN_INFO_KEY = LoggedInInfo.class.getName() + ".LOGGED_IN_INFO_KEY";
 	
-	private HttpSession session = null;
+	private transient HttpSession session = null;
 	private Facility currentFacility = null;
 	private Provider loggedInProvider = null;
 	private String initiatingCode = null;

@@ -27,19 +27,15 @@ import java.math.BigInteger;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.upload.FormFile;
-import org.oscarehr.util.MiscUtils;
 
 public class UploadForm extends ActionForm {
 
 	private static final long serialVersionUID = 1L;
-    
-    private static final Logger logger = MiscUtils.getLogger();
     
 	private String description;
 	private String resourceType;

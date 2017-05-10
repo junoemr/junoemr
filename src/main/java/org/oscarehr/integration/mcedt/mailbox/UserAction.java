@@ -26,7 +26,6 @@ package org.oscarehr.integration.mcedt.mailbox;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -39,7 +38,6 @@ import oscar.OscarProperties;
 import oscar.login.LoginForm;
 
 public class UserAction extends DispatchAction{
-	private static Logger logger = Logger.getLogger(UserAction.class);
 	private UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
 
 	@Override
@@ -56,7 +54,7 @@ public class UserAction extends DispatchAction{
 	}		
 	
 	public ActionForward changePassword(ActionMapping mapping, ActionForm form, HttpServletRequest request, 
-			HttpServletResponse response) throws Exception {
+			HttpServletResponse response) {
 		LoginForm resourceForm = (LoginForm) form;
 		try {
 		
@@ -76,7 +74,7 @@ public class UserAction extends DispatchAction{
 	}
 	
 	public ActionForward cancel(ActionMapping mapping, ActionForm form, 
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
+			HttpServletRequest request, HttpServletResponse response) {
 		if(request.getSession().getAttribute("isPassChange")!=null){
 			request.getSession().removeAttribute("isPassChange");
 		}		

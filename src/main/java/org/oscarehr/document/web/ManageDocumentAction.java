@@ -183,28 +183,20 @@ public class ManageDocumentAction extends DispatchAction {
 	
 			documentDao.merge(d);
 		}
-
 		
 		try {
 
 			CtlDocument ctlDocument = ctlDocumentDao.getCtrlDocument(Integer.parseInt(documentId));
 			if(ctlDocument != null) {
 				
-				CtlDocument matchedCtlDocument = new CtlDocument();
-				matchedCtlDocument.getId().setDocumentNo(ctlDocument.getId().getDocumentNo());
-				matchedCtlDocument.getId().setModule(ctlDocument.getId().getModule());
-				matchedCtlDocument.getId().setModuleId(Integer.parseInt(demog));
-				matchedCtlDocument.setStatus(ctlDocument.getStatus());
-				
-				ctlDocumentDao.persist(matchedCtlDocument);
-				
-				ctlDocumentDao.remove(ctlDocument.getId());
-				
+				ctlDocument.getId().setModuleId(Integer.parseInt(demog));
+				ctlDocumentDao.merge(ctlDocument);
 				// save a document created note
 				if (ctlDocument.isDemographicDocument()) {
 					// save note
 					saveDocNote(request, d.getDocdesc(), demog, documentId);
 				}
+				
 			}
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("Error", e);
@@ -214,7 +206,7 @@ public class ManageDocumentAction extends DispatchAction {
 		if (ret != null && !ret.equals("")) {
 			// response.getOutputStream().print(ret);
 		}
-		HashMap hm = new HashMap();
+		HashMap<String, String> hm = new HashMap<String, String>();
 		hm.put("patientId", demog);
 		JSONObject jsonObject = JSONObject.fromObject(hm);
 		try {
@@ -234,7 +226,7 @@ public class ManageDocumentAction extends DispatchAction {
         	throw new SecurityException("missing required security object (_demographic)");
         }
 		
-		HashMap hm = new HashMap();
+		HashMap<String, String> hm = new HashMap<String, String>();
 		hm.put("demoName", getDemoName(LoggedInInfo.getLoggedInInfoFromSession(request), dn));
 		JSONObject jsonObject = JSONObject.fromObject(hm);
 		try {
@@ -258,7 +250,7 @@ public class ManageDocumentAction extends DispatchAction {
 		
 
 		providerInboxRoutingDAO.removeLinkFromDocument(docType, Integer.parseInt(docId), providerNo);
-		HashMap hm = new HashMap();
+		HashMap<String, List> hm = new HashMap<String, List>();
 		hm.put("linkedProviders", providerInboxRoutingDAO.getProvidersWithRoutingForDocument(docType, Integer.parseInt(docId)));
 
 		JSONObject jsonObject = JSONObject.fromObject(hm);
@@ -643,7 +635,7 @@ public class ManageDocumentAction extends DispatchAction {
 			log.debug("about to Print to stream");
 			ServletOutputStream outs = response.getOutputStream();
 
-			response.setHeader("Content-Disposition", "attachment;filename=" + d.getDocfilename());
+			response.setHeader("Content-Disposition", "attachment;filename=\"" + d.getDocfilename() + "\"");
 			BufferedInputStream bfis = null;
 			try {
 				bfis = new BufferedInputStream(new FileInputStream(outfile));
@@ -700,7 +692,7 @@ public class ManageDocumentAction extends DispatchAction {
 			}
 			response.setContentType("image/png");
 			ServletOutputStream outs = response.getOutputStream();
-			response.setHeader("Content-Disposition", "attachment;filename=" + d.getDocfilename());
+			response.setHeader("Content-Disposition", "attachment;filename=\"" + d.getDocfilename() + "\"");
 
 			BufferedInputStream bfis = null;
 			try {
@@ -827,7 +819,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 		response.setContentType(contentType);
 		response.setContentLength(contentBytes.length);
-		response.setHeader("Content-Disposition", "inline; filename=" + filename);
+		response.setHeader("Content-Disposition", "inline; filename=\"" + filename + "\"");
 		log.debug("about to Print to stream");
 		ServletOutputStream outs = response.getOutputStream();
 		outs.write(contentBytes);
@@ -943,7 +935,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 		response.setContentType(contentType);
 		response.setContentLength(contentBytes.length);
-		response.setHeader("Content-Disposition", "inline; filename=" + filename);
+		response.setHeader("Content-Disposition", "inline; filename=\"" + filename + "\"");
 		log.debug("about to Print to stream");
 		ServletOutputStream outs = response.getOutputStream();
 		outs.write(contentBytes);
@@ -1231,7 +1223,7 @@ public class ManageDocumentAction extends DispatchAction {
 
         response.setContentType(contentType);
         response.setContentLength((int) file.length());
-        response.setHeader("Content-Disposition", "inline; filename=" + pdfName);
+        response.setHeader("Content-Disposition", "inline; filename=\"" + pdfName + "\"");
 
         BufferedInputStream bfis = null;
         ServletOutputStream outs = response.getOutputStream();
@@ -1283,7 +1275,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 
                 response.setContentType("image/png");
-                response.setHeader("Content-Disposition", "inline;filename=" + pdfName);
+                response.setHeader("Content-Disposition", "inline;filename=\"" + pdfName + "\"");
                 org.apache.commons.io.IOUtils.copy(bfis,outs);
                 outs.flush();
                 

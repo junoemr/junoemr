@@ -318,8 +318,8 @@ public class PDFController {
 	 * 
 	 * See test class with same name for example.
 	 * 
-	 * @param Data : object or bean containing data to stamp.
-	 * @param Pages : page numbers to stamp data onto
+	 * @param data : object or bean containing data to stamp.
+	 * @param pages : page numbers to stamp data onto
 	 * @param fileId : An id, such as demographic number, to identify the file.
 	 */
 	public void writeDataToPDF( Object data, String[] pages, String fileId ) {
@@ -343,10 +343,11 @@ public class PDFController {
 	 * 
 	 * See test class with same name for example.
 	 * 
-	 * @param Data : object or bean containing data to stamp.
-	 * @param Pages : page numbers to stamp data onto
-	 * @param outPath : outPut path for completed PDF.
 	 * @param pdfPath : the absolute path to an editable pdf template. 
+	 * @param outPath : outPut path for completed PDF.
+	 * @param data : object or bean containing data to stamp.
+	 * @param pages : page numbers to stamp data onto
+	 * @param fileId : An id, such as demographic number, to identify the file.
 	 */
 	public void writeDataToPDF( String pdfPath, String outPath, Object data, String[] pages, String fileId ) {
 
@@ -556,8 +557,8 @@ public class PDFController {
 	 * Method Map and POJO Object set in current Object state.  
 	 * ie: demographic.phoneNumber
 	 * 
-	 * @param key
-	 * @return
+	 * @param methodName
+	 * @return String value
 	 */
 	public String invokeValue(String methodName) {
 		String value = "";
@@ -571,11 +572,10 @@ public class PDFController {
 
 	/**
 	 * String return values only.
-	 * @param <E>
 	 * @param methodName
 	 * @param methodMap
 	 * @param data
-	 * @returns generic Object, null on error.
+	 * @return generic Object, null on error.
 	 */
 	protected static Object invokeValue(String methodName, Map<String, Method> methodMap, Object data) {
 

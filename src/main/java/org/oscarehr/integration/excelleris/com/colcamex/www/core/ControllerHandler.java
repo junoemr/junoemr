@@ -174,7 +174,6 @@ public class ControllerHandler {
 	
 	/**
 	 * Stop the timer
-	 * @param pollTimer
 	 */
 	public void stop() {
 		if(PollTimer.isRunning()) {	
@@ -195,7 +194,6 @@ public class ControllerHandler {
     
 	/**
 	 * Start the timer to execute timed lab downloads
-	 * @param pollTimer
 	 */
     public void start() {
     	

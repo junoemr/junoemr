@@ -83,7 +83,7 @@ public class SSLSocket {
 	/**
 	 * Constructor.
 	 * @param trustSource
-	 * @param trustStoreType
+	 * @param storeType
 	 * @param pass
 	 * @param httpsProtocol
 	 * @param keySource

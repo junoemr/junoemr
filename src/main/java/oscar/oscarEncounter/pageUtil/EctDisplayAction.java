@@ -91,8 +91,8 @@ public class EctDisplayAction extends Action {
 			Actions.put("success", "/oscarEncounter/LeftNavBarDisplay.jsp");
 			Actions.put("error", "/oscarEncounter/LeftNavBarError.jsp");
 			Actions.put("HRM", "/oscarEncounter/displayHRM.do");
-			Actions.put("myoscar", "/oscarEncounter/displayMyOscar.do");
-			Actions.put("eaaps", "/eaaps/displayEctEaaps.do");
+			//Actions.put("myoscar", "/oscarEncounter/displayMyOscar.do");
+			//Actions.put("eaaps", "/eaaps/displayEctEaaps.do");
 			
 			if (logger.isDebugEnabled()) {
 				logger.debug("Instantiated encounter display actions: " + Actions);
@@ -283,10 +283,10 @@ public class EctDisplayAction extends Action {
 	 * 
 	 * @param title
 	 * 		Title to be displayed for the item
+	 * @param url
+	 * 		Target URL to be opened with link is clicked
 	 * @param color
 	 * 		Color of the link to be displayed in the item (e.g. "red", or "green")
-	 * @param link
-	 * 		Targer URL to be opened with link is clicked
 	 * @return
 	 * 		Returns the new item.
 	 */

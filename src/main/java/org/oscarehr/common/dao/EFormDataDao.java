@@ -485,7 +485,7 @@ public class EFormDataDao extends AbstractDao<EFormData> {
 	 * 
 	 * @param fid
 	 * @param varName
-	 * @return
+	 * @return List of type Integer
 	 */
 	public List<Integer> getDemographicNosMissingVarName(int fid, String varName) {
 

@@ -75,14 +75,14 @@ public class BedDemographicManager {
 
 	
 	/**
-	 * @see org.oscarehr.PMmodule.service.BedDemographicManager#demographicExists(java.lang.Integer)
+	 * see org.oscarehr.PMmodule.service.BedDemographicManager#demographicExists(java.lang.Integer)
 	 */
 	public boolean demographicExists(Integer bedId) {
 		return bedDemographicDao.demographicExists(bedId);
 	}
 
 	/**
-	 * @see org.oscarehr.PMmodule.service.BedDemographicManager#getBedDemographicByBed(java.lang.Integer)
+	 * see org.oscarehr.PMmodule.service.BedDemographicManager#getBedDemographicByBed(java.lang.Integer)
 	 */
 	public BedDemographic getBedDemographicByBed(Integer bedId) {
 		if (bedId == null) {
@@ -133,7 +133,7 @@ public class BedDemographicManager {
 	}
 
 	/**
-	 * @see org.oscarehr.PMmodule.service.BedDemographicManager#getDefaultBedDemographicStatus()
+	 * see org.oscarehr.PMmodule.service.BedDemographicManager#getDefaultBedDemographicStatus()
 	 */
 	public BedDemographicStatus getDefaultBedDemographicStatus() {
 		for (BedDemographicStatus status : getBedDemographicStatuses()) {
@@ -148,14 +148,14 @@ public class BedDemographicManager {
 	}
 
 	/**
-	 * @see org.oscarehr.PMmodule.service.BedDemographicManager#getBedDemographicStatuses()
+	 * see org.oscarehr.PMmodule.service.BedDemographicManager#getBedDemographicStatuses()
 	 */
 	public BedDemographicStatus[] getBedDemographicStatuses() {
 		return bedDemographicStatusDao.getBedDemographicStatuses();
 	}
 
 	/**
-	 * @see org.oscarehr.PMmodule.service.BedDemographicManager#getExpiredReservations()
+	 * see org.oscarehr.PMmodule.service.BedDemographicManager#getExpiredReservations()
 	 */
 	public BedDemographicHistorical[] getExpiredReservations() {
 		BedDemographicHistorical[] bedDemographicHistoricals = bedDemographicHistoricalDao.getBedDemographicHistoricals(new Date());
@@ -171,7 +171,7 @@ public class BedDemographicManager {
 	}
 
 	/**
-	 * @see org.oscarehr.PMmodule.service.BedDemographicManager#saveBedDemographic(org.oscarehr.PMmodule.model.BedDemographic)
+	 * see org.oscarehr.PMmodule.service.BedDemographicManager#saveBedDemographic(org.oscarehr.PMmodule.model.BedDemographic)
 	 */
 	public void saveBedDemographic(BedDemographic bedDemographic) {
 		if (bedDemographic == null) {
@@ -182,7 +182,7 @@ public class BedDemographicManager {
 	}
 
 	/**
-	 * @see org.oscarehr.PMmodule.service.BedDemographicManager#deleteBedDemographic(BedDemographic)
+	 * see org.oscarehr.PMmodule.service.BedDemographicManager#deleteBedDemographic(BedDemographic)
 	 */
 	public void deleteBedDemographic(BedDemographic bedDemographic) {
 		if (bedDemographic == null) {

@@ -1791,6 +1791,7 @@
 		</action>
 		<action input="/oscarPrevention/PreventionReporting.jsp" name="PreventionReportForm" path="/oscarPrevention/PreventionReport" scope="request" type="oscar.oscarPrevention.pageUtil.PreventionReportAction">
 			<forward name="success" path="/oscarPrevention/PreventionReporting.jsp" />
+			<forward name="failure" path="/oscarPrevention/PreventionReporting.jsp" />
 		</action>
 
 		<action path="/oscarPrevention/printPrevention" scope="request" type="oscar.oscarPrevention.pageUtil.PreventionPrintAction">
@@ -2000,6 +2001,21 @@
 			<forward name="success" path="/dms/documentReport.jsp"></forward>
 			<forward name="failed" path="/dms/documentReport.jsp"></forward>
 		</action>
+		<action input="/dms/documentReport.jsp" name="FrmForm" path="/dms/faxPDFs" type="oscar.dms.actions.FaxPDFAction" scope="request" validate="false">
+			<forward name="success" path="/dms/faxPDFs.jsp"></forward>
+		</action>
+		<action input="/dms/faxPDFs.jsp" name="FrmForm" path="/dms/sendFaxPDFs" type="oscar.dms.actions.SendFaxPDFAction" scope="request" validate="false">
+			<forward name="success" path="/dms/sendFaxPDFs.jsp"></forward>
+			<forward name="failed" path="/dms/closeWindow.html"></forward>
+		</action>
+		<action input="/dms/documentReport.jsp" name="FrmForm" path="/dms/emailPDFs" type="oscar.dms.actions.EmailPDFAction" scope="request" validate="false">
+			<forward name="success" path="/dms/emailPDFs.jsp"></forward>
+		</action>
+		<action input="/dms/emailPDFs.jsp" name="FrmForm" path="/dms/sendEmailPDFs" type="oscar.dms.actions.SendEmailPDFAction" scope="request" validate="false">
+			<forward name="success" path="/dms/sendEmailPDFs.jsp"></forward>
+			<forward name="failed" path="/dms/closeWindow.html"></forward>
+		</action>
+
 		<action input="/dms/addedithtmldocument.jsp" name="addEditHtmlDoc" path="/dms/addEditHtml" type="oscar.dms.actions.AddEditHtmlAction" scope="request" validate="false">
 			<forward name="success" path="/dms/closeWindow.html" />
 			<forward name="failed" path="/dms/addedithtmldocument.jsp" />
@@ -2559,14 +2575,6 @@
 		<action path="/Provider/showPersonal" type="org.oscarehr.provider.web.DisplayPersonalInfoAppointmentAction" parameter="method" validate="false" scope="request">
 		</action>
 
-		<action path="/admin/faxStatus" scope="request" parameter="method" validate="false" type="oscar.util.FaxStatusAction">
-			<forward name="success" path="/admin/faxStatus.jsp" />
-		</action>
-		
-		<action path="/admin/oscarStatus" scope="request" parameter="method" validate="false" type="oscar.util.OscarStatusAction">
-			<forward name="success" path="/admin/oscarStatus.jsp" />
-		</action>
-
 		<action path="/OcanIarSubmit" type="org.oscarehr.web.OcanIarSubmitAction" parameter="method" scope="request">
         </action>
 
@@ -2700,13 +2708,8 @@
 		</action>
 		
 		<action path="/renal/Renal" type="org.oscarehr.renal.web.RenalAction" parameter="method">
-			
 		</action>
-		<action path="/admin/GenerateTraceAction" type="org.oscarehr.admin.traceability.GenerateTraceAction">
-        </action>
-		<action path="/admin/GenerateTraceabilityReportAction" type="org.oscarehr.admin.traceability.GenerateTraceabilityReportAction">
-        </action>
-        
+			
                 <!-- Sharing Center Actions/Servlets -->
                 <action path="/sharingcenter/affinitydomain/AffinityDomain"
                         type="org.oscarehr.sharingcenter.actions.AffinityDomainServlet"

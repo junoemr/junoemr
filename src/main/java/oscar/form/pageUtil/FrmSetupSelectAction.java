@@ -64,29 +64,27 @@ public class FrmSetupSelectAction extends Action {
     	TreeMap<Integer, EncounterForm> formShownVector=new TreeMap<Integer, EncounterForm>();
     	ArrayList<EncounterForm> formHiddenVector=new ArrayList<EncounterForm>();
     	
-    	for (EncounterForm encounterForm : forms)
-    	{	if (encounterForm.getFormName().equalsIgnoreCase("Discharge Summary")) {
-			String caisiProperty = OscarProperties.getInstance().getProperty("caisi");
-			if (caisiProperty != null && (caisiProperty.equalsIgnoreCase("yes")
-					||caisiProperty.equalsIgnoreCase("true")
-					||caisiProperty.equalsIgnoreCase("on"))) {
-				; // form in
+		boolean caisiEnabled = OscarProperties.getInstance().isPropertyActive("caisi");
+
+		for (EncounterForm encounterForm : forms) {
+			/* only include this form if caisi enabled */
+			if (!caisiEnabled && encounterForm.getFormName().equalsIgnoreCase("Discharge Summary")) {
+				continue; // form out
 			}
-			else {	
-				continue; //form out
+			/* populate the available forms list */
+			if (encounterForm.isHidden()) {
+				formHiddenVector.add(encounterForm);
+			}
+			/* populate the selected forms list */
+			else {
+				formShownVector.put(encounterForm.getDisplayOrder(), encounterForm);
 			}
 		}
-    		if (encounterForm.isHidden()) formHiddenVector.add(encounterForm);
-    		else formShownVector.put(encounterForm.getDisplayOrder(),encounterForm);
-    	}
     	
         HttpSession session = request.getSession();
         session.setAttribute( "formShownVector", formShownVector.values() );   
         session.setAttribute( "formHiddenVector", formHiddenVector ); 
         
         return mapping.findForward("continue");
-                      
-
     }
-
 }

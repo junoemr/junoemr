@@ -113,7 +113,7 @@ public class ReportingService extends AbstractServiceImpl {
 	/**
 	 * EFromReportTool is a utility for taking a snapshot of key-value pair data from saved eforms
 	 * to a new table for easier querying. need _admin.eformreporttool security object.
-	 * @return
+	 * @return AbstractSearchResponse
 	 */
 	@GET
 	@Path("/eformReportTool/list")

@@ -161,7 +161,7 @@ public class W3CDocumentHandler {
 	/**
 	 * Parse and set a new Document object from an InputStream.
 	 * @param is
-	 * @return
+	 * @return Document
 	 * @throws SAXException
 	 * @throws IOException
 	 */
@@ -179,7 +179,7 @@ public class W3CDocumentHandler {
 	/**
 	 * Overloaded parse from file path.
 	 * @param documentPath
-	 * @return
+	 * @return Document
 	 * @throws SAXException
 	 * @throws IOException
 	 */

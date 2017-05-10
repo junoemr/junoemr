@@ -50,8 +50,8 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	/**
 	 * aka update
 	 */
-	public void merge(AbstractModel<?> o) {
-		entityManager.merge(o);
+	public AbstractModel<?> merge(AbstractModel<?> o) {
+		return entityManager.merge(o);
 	}
 
 	/**

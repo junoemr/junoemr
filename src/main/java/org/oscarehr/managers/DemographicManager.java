@@ -567,7 +567,7 @@ public class DemographicManager {
 	}
 
 	/**
-	 * @see DemographicDao.findByAttributes for parameter details
+	 * see DemographicDao.findByAttributes for parameter details
 	 */
 	public List<Demographic> searchDemographicsByAttributes(LoggedInInfo loggedInInfo, String hin, String firstName, String lastName, Gender gender, Calendar dateOfBirth, String city, String province, String phone, String email, String alias, int startIndex, int itemsToReturn) {
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
@@ -604,7 +604,7 @@ public class DemographicManager {
 	}
 
 	/**
-	 * @programId can be null for all/any program
+	 * programId can be null for all/any program
 	 */
 	public List<Integer> getAdmittedDemographicIdsByProgramAndProvider(LoggedInInfo loggedInInfo, Integer programId, String providerNo) {
 		if (loggedInInfo == null) throw (new SecurityException("user not logged in?"));

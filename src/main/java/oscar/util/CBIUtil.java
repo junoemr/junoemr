@@ -512,7 +512,7 @@ public class CBIUtil
 	 * generate tree structure to be display in admin screen
 	 * 
 	 * @param list
-	 * @return
+	 * @return html string
 	 */
 	public StringBuffer generateTree(List<Date> list)
 	{

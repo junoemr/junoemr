@@ -120,7 +120,6 @@ public class HL7LabHandler {
 	 * @param hl7labs
 	 * @param fileName
 	 * @param providerNumber
-	 * @param webServiceEndpoint
 	 * @throws MalformedURLException
 	 * @throws ServiceException
 	 */
@@ -249,8 +248,7 @@ public class HL7LabHandler {
 	/**
 	 * Overloaded super method to simplify trigger. 
 	 * This overload returns an HTTP server status of 200 for OK 
-	 * and 100 for error. The super method returns boolean.  
-	 * @return ExpediusHL7LabHandler.HTTP_WEBSERVICE_ERROR [100] for error. ExpediusHL7LabHandler.OK [200] for success.
+	 * and 100 for error. The super method returns boolean.
 	 * @throws RemoteException
 	 */
 	public void parseHL7() {
@@ -282,7 +280,6 @@ public class HL7LabHandler {
 
 	/**
 	 * Overloaded to allow quick save based on settings.
-	 * @return
 	 * @throws TransformerException
 	 * @throws IOException
 	 * @throws RemoteException
@@ -301,7 +298,6 @@ public class HL7LabHandler {
 	 * Parse and persist HL7 file to Oscar database for viewing in 
 	 * Oscars inbox.
 	 * 
-	 * @return False if file failed save. 
 	 * @throws TransformerException 
 	 * @throws IOException 
 	 */
@@ -350,8 +346,6 @@ public class HL7LabHandler {
 	
 	/**
 	 * Overloaded to accept default setting in this class.
-	 * @param filePath
-	 * @return
 	 * @throws IOException
 	 * @throws TransformerException 
 	 */
@@ -364,7 +358,6 @@ public class HL7LabHandler {
 	 * Save path is determined in the properties file.
 	 * 
 	 * @param filePath
-	 * @return
 	 * @throws IOException
 	 * @throws TransformerException 
 	 */
@@ -437,7 +430,7 @@ public class HL7LabHandler {
 	 * Make sure the directory exists and is writable.
 	 * 
 	 * @param filePath
-	 * @return
+	 * @return true if directory check succeeds, false otherwise
 	 */
 	private boolean confirmDirectory(String filePath, String savedFile) {		
 		

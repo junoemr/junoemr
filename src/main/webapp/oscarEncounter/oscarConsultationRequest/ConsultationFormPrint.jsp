@@ -70,6 +70,7 @@ if(!authed) {
     oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestUtil reqFrm;
     reqFrm = new oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestUtil ();
     reqFrm.estRequestFromId(LoggedInInfo.getLoggedInInfoFromSession(request), (String)request.getAttribute("reqId"));
+    OscarProperties props = OscarProperties.getInstance();
 
 	String selectedSite = reqFrm.siteName;
 
@@ -89,7 +90,13 @@ if(!authed) {
         reqFrm.specAddr = new String();
     }
 
-    OscarProperties props = OscarProperties.getInstance();
+    String familyDoctorOhip = reqFrm.getFamilyDoctorOhipNo();
+    String familyDoctorAndOhip = reqFrm.getFamilyDoctor() + (familyDoctorOhip.isEmpty() ? "" : " (" + familyDoctorOhip +")");
+    
+    String providerNo = reqFrm.providerNo;
+    String providerOhipNo = reqFrm.getProviderOhipNo(providerNo);
+    String providerNameAndOhip = reqFrm.getProviderName(providerNo) + (providerOhipNo.isEmpty() ? "" : " (" + providerOhipNo +")");
+    
     ClinicData clinic = new ClinicData();
     String strPhones = clinic.getClinicDelimPhone();
 
@@ -780,7 +787,7 @@ for(ConsultationRequestExt ext:exts) {
             
 	    <tr>		
 		<td class="subTitles">		
-		<bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgAssociated"/> : <%=reqFrm.getFamilyDoctor() %>		
+		<bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgAssociated"/> : <%=familyDoctorAndOhip%>
 		&nbsp;<br>		
 		</td>		
 	    </tr>           
@@ -796,7 +803,7 @@ for(ConsultationRequestExt ext:exts) {
 	   <% } else { %>
                 <bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgFamilyDoc"/>
        <% } %>
-                : <%=reqFrm.getProviderName(reqFrm.providerNo) %>
+                : <%=providerNameAndOhip%>
                         &nbsp;<br>
                     </td>
                 </tr>

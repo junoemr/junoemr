@@ -24,6 +24,7 @@
 
 --%>
 <%@ page import="oscar.oscarProvider.data.*, oscar.oscarRx.data.*,oscar.OscarProperties, oscar.oscarClinic.ClinicData, java.util.*"%>
+<%@ page import="java.io.File" %>
 <%@ page import="org.oscarehr.common.model.PharmacyInfo" %>
 <%@ page import="org.oscarehr.common.model.DemographicPharmacy" %>
 <%@ page import="org.oscarehr.common.dao.DemographicPharmacyDao" %>
@@ -651,13 +652,25 @@ function toggleView(form) {
 					<% if (OscarProperties.getInstance().isRxFaxEnabled()) {
 					    	FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 					    	List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
-					    
+
+                        // enable the fax button if there is a pre-set signature
+					    String disabled = "disabled";
+                        if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures"))
+                        {
+                            String imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image","")+"doctor_signature_"+bean.getProviderNo()+".png";
+                            File f = new File(imgFile);
+                            if(f.exists() && !f.isDirectory())
+                            {
+                                disabled = "";
+                            }
+                        }
 					    %>
 					<tr>                            
                             <td><span><input type=button value="Fax & Paste into EMR"
                                     class="ControlPushButton" id="faxButton" style="width: 150px"
-                                    onClick="printPaste2Parent(false);sendFax();" disabled/></span>
-                                    
+                                    onClick="printPaste2Parent(false);sendFax();" <%= disabled %> /></span>
+
+
                                  <span>
                                  	<select id="faxNumber" name="faxNumber">
                                  	<%

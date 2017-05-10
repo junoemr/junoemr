@@ -292,10 +292,10 @@ function popupPage(vheight,vwidth,varpage) { //open a new popup window
 						readonly="true" size="30"
 						value="<%= props.getProperty("pName", "") %>" /></td>
 					<td><b>Age:</b> <input type="text" class="Input"
-						readonly="true" name="age" size="11"
+						readonly="true" name="age" size="11" maxlength="2"
 						value="<%= props.getProperty("age", "") %>" /></td>
 					<td><b>Date</b><small>(yyyy/mm/dd)</small>: <input type="text"
-						class="Input" name="formDate" size="11"
+						class="Input" name="formDate" size="11" maxlength="10"
 						value="<%=props.getProperty("formDate", "") %>" /></td>
 				</tr>
 			</table>

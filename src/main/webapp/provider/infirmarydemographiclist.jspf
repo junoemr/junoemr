@@ -95,7 +95,7 @@ if ((k/2)*2==k){ %>
     if (tickler_no.compareTo("") != 0) { %> <caisi:isModuleLoad
 					moduleName="ticklerplus" reverse="true">
 					<a href="#"
-						onClick="popupPage(700,1000, '../tickler/ticklerDemoMain.jsp?demoview=0');return false;"
+						onClick="popupPage(700,1000, '../tickler/ticklerMain.jsp?demoview=0');return false;"
 						title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: <%=UtilMisc.htmlEscape(tickler_note)%>">
 					<font color="red">!</font></a>
 				</caisi:isModuleLoad> <caisi:isModuleLoad moduleName="ticklerplus">
@@ -107,7 +107,7 @@ if ((k/2)*2==k){ %>
     if (tickler_no.compareTo("") != 0) { %> <caisi:isModuleLoad
 					moduleName="ticklerplus" reverse="true">
 					<a href="#"
-						onClick="popupPage(700,1000, '../tickler/ticklerDemoMain.jsp?demoview=<%=demographic_no%>');return false;"
+						onClick="popupPage(700,1000, '../tickler/ticklerMain.jsp?demoview=<%=demographic_no%>');return false;"
 						title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: <%=UtilMisc.htmlEscape(tickler_note)%>">
 					<font color="red">!</font></a>
 				</caisi:isModuleLoad> <caisi:isModuleLoad moduleName="ticklerplus">

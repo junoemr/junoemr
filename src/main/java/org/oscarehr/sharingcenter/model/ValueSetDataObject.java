@@ -80,7 +80,7 @@ public class ValueSetDataObject extends AbstractModel<Integer> implements Serial
 	}
 
 	/**
-	 * @param setId the setId to set
+	 * @param valueSetId the setId to set
 	 */
 	public void setSetId(String valueSetId) {
 		this.valueSetId = valueSetId;

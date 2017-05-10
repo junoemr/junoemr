@@ -25,6 +25,7 @@
 
 package oscar;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -34,7 +35,7 @@ import oscar.oscarDB.DBPreparedHandler;
 import oscar.oscarDB.DBPreparedHandlerParam;
 import oscar.util.UtilDict;
 
-public class AppointmentMainBean {
+public class AppointmentMainBean implements Serializable {
 	
   private DBPreparedHandler dbPH=null;
   private UtilDict toFile=null;

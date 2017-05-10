@@ -64,7 +64,7 @@
 	MiscUtils.getLogger().debug("Search parameters, searchMode="+searchMode+", keyword="+keyword);
 
   if(searchMode!=null) {
-	  if(keyword.indexOf("*")!=-1 || keyword.indexOf("%")!=-1) regularexp="like";
+	  if(keyword.contains("*") || keyword.contains("%")) regularexp="like";
 
     if(searchMode.equals("search_address")) fieldname="address";
     if(searchMode.equals("search_phone")) fieldname="phone";
@@ -94,18 +94,22 @@
     if(searchMode.equals("search_chart_no")) fieldname="chart_no";
     if(searchMode.equals("search_name")) {
 	  	matchingDemographicParameters=new MatchingDemographicParameters();
-	  	String[] lastfirst = keyword.split(",");
-
+	  	String[] lastfirst = keyword.trim().split(",");
+		if(lastfirst.length < 1) {
+			lastfirst = new String[] {""};
+		}
+		else if(lastfirst.length > 2) {
+	  		lastfirst = new String[] {lastfirst[0],lastfirst[1]};
+	  	}	  	
+        
+	  	fieldname="lower(last_name)";
+	  	matchingDemographicParameters.setLastName(lastfirst[0].trim());
+	  	if(lastfirst[0].trim().equals("")) lastfirst[0] = (regularexp.equals("regexp")) ? ".*" : "%";
+	  	
         if (lastfirst.length > 1) {
-            matchingDemographicParameters.setLastName(lastfirst[0].trim());
             matchingDemographicParameters.setFirstName(lastfirst[1].trim());
-        }else{
-            matchingDemographicParameters.setLastName(lastfirst[0].trim());
+            fieldname += " "+regularexp+" ?"+" and lower(first_name) ";
         }
-
-    	if(keyword.indexOf(",")==-1)  fieldname="lower(last_name)";
-      else if(keyword.trim().indexOf(",")==(keyword.trim().length()-1)) fieldname="lower(last_name)";
-      else fieldname="lower(last_name) "+regularexp+" ?"+" and lower(first_name) ";
     }
   }
 

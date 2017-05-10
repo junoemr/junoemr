@@ -674,17 +674,34 @@ public class EFormUtil {
 
 	public static ArrayList<HashMap<String, String>> getEFormGroups(String demographic_no) {
 		String sql;
-		sql = "SELECT eform_groups.group_name, count(*)-1 AS 'count' FROM eform_groups " 
-				+ "LEFT JOIN eform_data ON eform_data.fid=eform_groups.fid " 
-				+ "WHERE (eform_data.status=1 AND eform_data.demographic_no=" + demographic_no 
-				+ ") OR eform_groups.fid=0 " + "GROUP BY eform_groups.group_name";
+
+		if(OscarProperties.getInstance().isPropertyActive("disable_eform_group_count"))
+		{
+			sql = "  SELECT eg.group_name "
+  					+ "FROM eform_groups AS eg "
+					+ "WHERE eg.fid = 0 "
+					+ "GROUP BY eg.group_name ";
+		}
+		else
+		{
+			sql = "SELECT eform_groups.group_name, count(*)-1 AS 'count' FROM eform_groups " 
+					+ "LEFT JOIN eform_data ON eform_data.fid=eform_groups.fid " 
+					+ "WHERE (eform_data.status=1 AND eform_data.demographic_no=" + demographic_no 
+					+ ") OR eform_groups.fid=0 " + "GROUP BY eform_groups.group_name";
+		}
+
+
+
 		ArrayList<HashMap<String, String>> al = new ArrayList<HashMap<String, String>>();
 		try {
 			ResultSet rs = getSQL(sql);
 			while (rs.next()) {
 				HashMap<String, String> curhash = new HashMap<String, String>();
 				curhash.put("groupName", oscar.Misc.getString(rs, "group_name"));
-				curhash.put("count", oscar.Misc.getString(rs, "count"));
+				if(!OscarProperties.getInstance().isPropertyActive("disable_eform_group_count"))
+				{
+					curhash.put("count", oscar.Misc.getString(rs, "count"));
+				}
 				al.add(curhash);
 			}
 		} catch (SQLException sqe) {
@@ -1589,5 +1606,8 @@ public class EFormUtil {
 			if (str.trim().equalsIgnoreCase(strLst.trim())) return strLst.trim();
 		}
 		return null;
+	}
+	public static boolean blank(String s) {
+		return (s == null || s.trim().equals(""));
 	}
 }

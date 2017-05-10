@@ -37,7 +37,7 @@ public class FilterUtility {
     /**
      * Trim the crap
      * @param input
-     * @return
+     * @return String
      */
     public static String filter(String input) {
     	if(input == null) {

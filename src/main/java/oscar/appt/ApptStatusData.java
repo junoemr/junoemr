@@ -108,7 +108,7 @@ public final class ApptStatusData {
     /**
      * Converts the title which is the reference to the resource file to the actual value for this locale
      * 
-     * @return
+     * @return String
      */
     public String getTitleString(Locale locale) {
     	ResourceBundle bundle = ResourceBundle.getBundle("oscarResources",locale);
@@ -134,8 +134,8 @@ public final class ApptStatusData {
 	/**
 	 *  Pulls in the short letters which represent the appointment status.
 	 *  
-	 *	@Author Trimara Corp.
-	 *	@Return Short letters or null
+	 *	author Trimara Corp.
+	 *	@return Short letters or null
 	 *
 	 **/
 	public String getShortLetters(){
@@ -145,8 +145,8 @@ public final class ApptStatusData {
 	/**
 	 * Pulls in the colour for the short letters of the appointment.
 	 *
-	 * @Author Trimara Corp.
-	 * @Return An integer representing the hex code for the colour. Null if there is no colour.
+	 * author Trimara Corp.
+	 * @return An integer representing the hex code for the colour. Null if there is no colour.
 	 *
 	 **/
 	public String getShortLetterColour(){

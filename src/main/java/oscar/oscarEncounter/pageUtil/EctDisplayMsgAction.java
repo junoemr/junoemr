@@ -76,7 +76,7 @@ public class EctDisplayMsgAction extends EctDisplayAction {
             int hash;
             Date date;
             for( int i=0; i<msgList.size(); i++) {    
-                msgId = (String) msgList.get(i);
+                msgId = msgList.get(i);
                 msgData = new MsgMessageData(msgId);
                 msgSubject = StringUtils.maxLenString(msgData.getSubject(), MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
                 msgDate = msgData.getDate();

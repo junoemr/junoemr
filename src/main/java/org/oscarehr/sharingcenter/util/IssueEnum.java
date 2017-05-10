@@ -27,6 +27,9 @@ package org.oscarehr.sharingcenter.util;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Nityan Khanna
+ */
 public enum IssueEnum {
 
 	OngoingConcerns(68), MedicalHistory(67), FamilyMedicalHistory(70), SocialHistory(66);
@@ -42,7 +45,6 @@ public enum IssueEnum {
 	}
 
 	/**
-	 * @author Nityan Khanna
 	 * Gets all the issue values for easy iteration and further use.
 	 * @return Returns the issue enum values as a list.
 	 */

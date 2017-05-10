@@ -158,6 +158,10 @@ public class HL7A04Data
     public void setClinicData(ClinicData clinicData) {
 		this.clinicData = clinicData;
 	}
+    
+    public ClinicData getClinicData() {
+    	return this.clinicData;
+    }
 	
 	/**
 	 * 
