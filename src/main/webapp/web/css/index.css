@@ -2,6 +2,25 @@ body {
     padding: 50px 0 0 0;
 }
 
+
+/* Useful global classes */
+
+.vertical-align {
+    display: flex;
+    align-items: center;
+}
+
+.p-inline p {
+    display: inline-block;
+}
+
+.margin-bottom {
+    margin-bottom: 20px;
+}
+
+
+/*-----------------------*/
+
 .hand-hover {
     cursor: pointer;
     cursor: hand;
@@ -277,15 +296,6 @@ p {
     color: #ebebeb;
 }
 
-.vertical-align {
-    display: flex;
-    align-items: center;
-}
-
-.p-inline p {
-    display: inline-block;
-}
-
 #patient-search {
     padding: 20px;
 }
@@ -350,5 +360,11 @@ p {
     }
     .visible-1500 {
         display: block !important;
+    }
+}
+
+@media (max-width: 991px) {
+    #left-pane .list-group-item {
+        border-right: 1px solid #dddddd;
     }
 }
