@@ -124,7 +124,8 @@ oscarApp.controller('NavBarCtrl', function ($scope,$location,$uibModal, $state, 
 	//to help ng-clicks on buttons
 	$scope.transition = function (item) {
 
-		if(angular.isDefined(item) && angular.isDefined(item.state)){
+		if(angular.isDefined(item) && angular.isDefined(item.state) && item.state !== null){
+
 			url = "";
 			wname="";
 			if(item.label=="Inbox"){
