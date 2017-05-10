@@ -282,6 +282,10 @@ p {
     align-items: center;
 }
 
+.p-inline p {
+    display: inline-block;
+}
+
 #patient-search {
     padding: 20px;
 }
