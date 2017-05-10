@@ -41,8 +41,8 @@ public class ConsentDao extends AbstractDao<Consent> {
 	
 	/**
 	 * This query should never return more than one consentType. 
-	 * @param int demographic_no
-	 * @param int consentTypeId
+	 * @param demographic_no
+	 * @param consentTypeId
 	 */
 	public Consent findByDemographicAndConsentTypeId( int demographic_no, int consentTypeId ) {
 		String sql = "select x from "+modelClass.getSimpleName()+" x where x.demographicNo=?1 and x.consentTypeId=?2";

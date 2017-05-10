@@ -70,20 +70,34 @@ public class ProviderLabRoutingDao extends AbstractDao<ProviderLabRoutingModel> 
 
 		query.executeUpdate();
 	}
-
-	public ProviderLabRoutingModel findByLabNo(int labNo) {
-		Query query = entityManager.createQuery("select x from " + modelClass.getName() + " x where x.labNo=?");
-		query.setParameter(1, labNo);
-
-		return this.getSingleResultOrNull(query);
+    /**
+     * Retrieves a single ProviderLabRoutingModel from the database of type DOC, with the given lab id
+     * @param labNo
+     * @return ProviderLabRoutingModel or null
+     */
+	public ProviderLabRoutingModel findSingleDocRoute(Integer labNo) {
+		return findByLabNoAndLabType(labNo, "DOC");
 	}
-	
+    /**
+     * Retrieves a single ProviderLabRoutingModel from the database of type HL7, with the given lab id
+     * @param labNo
+     * @return ProviderLabRoutingModel or null
+     */
+    public ProviderLabRoutingModel findSingleLabRoute(Integer labNo) {
+    	return findByLabNoAndLabType(labNo, "HL7");
+    }
+    /**
+     * Retrieves a single ProviderLabRoutingModel from the database with the given lab id and type
+     * @param labNo
+     * @param labType
+     * @return ProviderLabRoutingModel or null
+     */
 	public ProviderLabRoutingModel findByLabNoAndLabType(int labNo, String labType) {
-		Query query = entityManager.createQuery("select x from " + modelClass.getName() + " x where x.labNo=? and x.labType = ?");
-		query.setParameter(1, labNo);
-		query.setParameter(2, labType);
-		
-		return this.getSingleResultOrNull(query);
+		String sqlCommand="SELECT x FROM "+ this.modelClass.getName() +" x WHERE x.labType=:labType AND x.labNo=:labNo";
+		Query query = entityManager.createQuery(sqlCommand);
+		query.setParameter("labType", labType);
+		query.setParameter("labNo", labNo);
+		return(getSingleResultOrNull(query));
 	}
 
 	/**

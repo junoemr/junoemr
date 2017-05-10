@@ -110,11 +110,7 @@ public class DSDemographicAccess {
     private List<Prescription> prescriptionData;
 
     private LoggedInInfo loggedInInfo;
-    
-    private DSDemographicAccess() {
-    	
-    }
-    
+       
     public DSDemographicAccess(LoggedInInfo loggedInInfo, String demographicNo) {
     	this.loggedInInfo = loggedInInfo;
         this.demographicNo = demographicNo;

@@ -441,7 +441,8 @@ public class SharingCenterUtil {
      * patient is shared with.
      *
      * @param demographicId The id of the patient to find all folders for.
-     * @return
+     * @param purposeOfUse - CodeValue
+     * @return List of type AffinityDomainFolderMetaData
      * @throws CommunicationsException
      * @throws PixApplicationException
      */
@@ -505,7 +506,7 @@ public class SharingCenterUtil {
      * @param affinityDomainId
      * @param providerId
      * @param purposeOfUse
-     * @return
+     * @return List of type DocumentConsentWrapper
      * @throws CommunicationsException
      * @throws PixApplicationException
      */
@@ -585,7 +586,9 @@ public class SharingCenterUtil {
      * the patient is shared with.
      *
      * @param demographicId
-     * @return
+     * @param providerId
+     * @param purposeOfUse CodeValue
+     * @return List of type DocumentConsentWrapper
      * @throws PixApplicationException
      * @throws CommunicationsException
      */
@@ -1013,7 +1016,7 @@ public class SharingCenterUtil {
      * @param domain
      * @param documents
      * @param policies
-     * @return
+     * @return List of type DocumentMetaData
      */
     public static List<DocumentMetaData> createDocumentsFromEforms(int demographicId, int authorId, int authenticator, AffinityDomainDataObject domain, String[] documents, String[] policies) {
         List<DocumentMetaData> retVal = new ArrayList<DocumentMetaData>();

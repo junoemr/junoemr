@@ -37,7 +37,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -122,22 +121,6 @@ public class ProviderLabRouting {
 			}
 		}
 
-	}
-
-	public static Hashtable<String, Object> getInfo(String lab_no) {
-		Hashtable<String, Object> info = new Hashtable<String, Object>();
-		ProviderLabRoutingDao dao = SpringUtils.getBean(ProviderLabRoutingDao.class);
-		ProviderLabRoutingModel r = dao.findByLabNo(ConversionUtils.fromIntString(lab_no));
-		if (r != null) {
-			info.put("lab_no", lab_no);
-			info.put("provider_no", r.getProviderNo());
-			info.put("status", r.getStatus());
-			info.put("comment", r.getComment());
-			info.put("timestamp", r.getTimestamp());
-			info.put("lab_type", r.getLabType());
-			info.put("id", r.getId());
-		}
-		return info;
 	}
 
 	public void route(String labId, String provider_no, String labType) throws SQLException {

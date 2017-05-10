@@ -75,6 +75,7 @@ function hideDiv() {
   thisEForm.setupInputFields();
   thisEForm.setImagePath();
   thisEForm.setDatabaseAPs();
+  thisEForm.setDatabaseUpdateAPs();
   thisEForm.setOscarOPEN(request.getRequestURI());
   thisEForm.setAction();
   thisEForm.setSource(source);

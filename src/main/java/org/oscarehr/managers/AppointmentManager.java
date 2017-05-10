@@ -138,11 +138,8 @@ public class AppointmentManager {
 	/**
 	 * Returns appointment for display.
 	 * 
-	
-	 * @param appointment				appointment data
 	 * @param loggedInInfo
-	 * @return							appointment data
-	 * 
+	 * @param appointment - appointment data
 	 */
 	public void addAppointment(LoggedInInfo loggedInInfo, Appointment appointment) {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {

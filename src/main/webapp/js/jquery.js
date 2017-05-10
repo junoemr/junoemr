@@ -2423,7 +2423,7 @@ jQuery.sibling = function(n, elem){
 
 return;
 
-window.Sizzle = Sizzle;
+//window.Sizzle = Sizzle;
 
 })();
 /*

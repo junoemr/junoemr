@@ -29,7 +29,7 @@ public interface HCValidator {
      * Validates swipe card of demographics
      * @param healthCardNumber number of health card
      * @param versionCode version code
-     * @return 
+     * @return HCValidationResult
      */
     HCValidationResult validate(String healthCardNumber, String versionCode);
 }

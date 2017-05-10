@@ -41,8 +41,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
 
-        public static final Integer UNMATCHED = 0;
+	public static final Integer UNMATCHED = 0;
 	public static final String HL7 = "HL7";
+	public static final String DOC = "DOC";
 
 	public PatientLabRoutingDao() {
 		super(PatientLabRouting.class);
@@ -84,16 +85,38 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
     	Query q = entityManager.createQuery(query);
 
     	q.setParameter(1, docNum);
-    	q.setParameter(2, "DOC");
+    	q.setParameter(2, DOC);
 
     	return q.getResultList();
     }
-    
-    public PatientLabRouting findByLabNo(int labNo) {
-    	String query = "select x from " + modelClass.getName() + " x where x.labNo=?";
-    	Query q = entityManager.createQuery(query);
-    	q.setParameter(1, labNo);
-    	return this.getSingleResultOrNull(q);
+    /**
+     * Retrieves a single PatientLabRoute from the database of type DOC, with the given lab id
+     * @param labNo
+     * @return PatientLabRoute or null
+     */
+	public PatientLabRouting findSingleDocRoute(Integer labNo) {
+		return findSingleRoute(labNo, DOC);
+	}
+    /**
+     * Retrieves a single PatientLabRoute from the database of type HL7, with the given lab id
+     * @param labNo
+     * @return PatientLabRoute or null
+     */
+    public PatientLabRouting findSingleLabRoute(Integer labNo) {
+    	return findSingleRoute(labNo, HL7);
+    }
+    /**
+     * Retrieves a single PatientLabRoute from the database with the given lab id and type
+     * @param labNo
+     * @param labType
+     * @return PatientLabRoute or null
+     */
+    public PatientLabRouting findSingleRoute(Integer labNo, String labType) {
+		String sqlCommand="SELECT x FROM "+ this.modelClass.getName() +" x WHERE x.labType=:labType AND x.labNo=:labNo";
+		Query query = entityManager.createQuery(sqlCommand);
+		query.setParameter("labType", labType);
+		query.setParameter("labNo", labNo);
+		return(getSingleResultOrNull(query));
     }
     
     @SuppressWarnings("unchecked")

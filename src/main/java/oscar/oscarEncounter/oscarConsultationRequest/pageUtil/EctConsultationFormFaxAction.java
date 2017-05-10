@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -212,7 +211,8 @@ public class EctConsultationFormFaxAction extends Action {
 					IOUtils.closeQuietly(fos);
 				}
 				
-				String tempPath = System.getProperty("java.io.tmpdir");
+				String tempPath = OscarProperties.getInstance().getProperty(
+					"fax_file_location", System.getProperty("java.io.tmpdir"));
                 String faxClinicId = OscarProperties.getInstance().getProperty("fax_clinic_id","");
 
 				
@@ -256,6 +256,7 @@ public class EctConsultationFormFaxAction extends Action {
 						throw new DocumentException("Unable to create files for fax of consultation request " + reqId + ".");
 					}
 					
+					/*
 				    validFaxNumber = false;
 				    
 				    faxJob = new FaxJob();
@@ -290,6 +291,7 @@ public class EctConsultationFormFaxAction extends Action {
 				    }
 				    				    
 				    faxJobDao.persist(faxJob);
+					*/
 				}
 
 				LogAction.addLog(provider_no, LogConst.SENT, LogConst.CON_FAX, "CONSULT "+ reqId);

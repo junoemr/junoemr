@@ -348,7 +348,7 @@ public class BORN18MConnector {
 	 * Only goes to formDate level, not time.
 	 * 
 	 * @param demoNo
-	 * @return
+	 * @return Date
 	 */
 	public Date getLatestDateForTrio(Integer demoNo) {
 		String rourkeFormName = oscarProperties.getProperty("born18m_eform_rourke", "Rourke Baby Record");

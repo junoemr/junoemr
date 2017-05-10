@@ -32,7 +32,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -156,14 +156,13 @@ public class AddEditDocumentAction extends DispatchAction {
 
 	}
 
-	public static int countNumOfPages(String fileName) {// count number of pages in a local pdf file
-
+	/** count number of pages in a local pdf file */
+	public static int countNumOfPages(String fileName) {
 		int numOfPage = 0;
 		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-                if (!docdownload.endsWith(File.separator))
-                {
-                    docdownload += File.separator; 
-                }
+		if (!docdownload.endsWith(File.separator)) {
+			docdownload += File.separator;
+		}
 		String filePath = docdownload + fileName;
 
 		try {
@@ -171,7 +170,8 @@ public class AddEditDocumentAction extends DispatchAction {
 			numOfPage = reader.getNumberOfPages();
 			reader.close();
 
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			MiscUtils.getLogger().error("Error", e);
 		}
 		return numOfPage;
@@ -184,7 +184,7 @@ public class AddEditDocumentAction extends DispatchAction {
 			throw new SecurityException("missing required security object (_edoc)");
 		}
 		
-		Hashtable errors = new Hashtable();
+		HashMap<String, String> errors = new HashMap<String, String>();
 		FormFile docFile = fm.getDocFile();
 		String fileName = docFile.getFileName();
 		String user = (String) request.getSession().getAttribute("user");
@@ -232,13 +232,14 @@ public class AddEditDocumentAction extends DispatchAction {
 		
 		if (fm.getMode().equals("") && fm.getFunction().equals("") && fm.getFunctionId().equals("")) {
 			// file size exceeds the upload limit
-			Hashtable errors = new Hashtable();
+			HashMap<String, String> errors = new HashMap<String, String>();
 			errors.put("uploaderror", "dms.error.uploadError");
 			request.setAttribute("docerrors", errors);
 			request.setAttribute("completedForm", fm);
 			request.setAttribute("editDocumentNo", "");
 			return mapping.findForward("failEdit");
-		} else if (fm.getMode().equals("add")) {
+		}
+		else if (fm.getMode().equals("add")) {
 			// if add/edit success then send redirect, if failed send a forward (need the formdata and errors hashtables while trying to avoid POSTDATA messages)
 			if (addDocument(fm, mapping, request) == true) { // if success
 				ActionRedirect redirect = new ActionRedirect(mapping.findForward("successAdd"));
@@ -262,223 +263,244 @@ public class AddEditDocumentAction extends DispatchAction {
 				request.setAttribute("appointmentNo",request.getParameter("appointmentNo"));
 				return mapping.findForward("failAdd");
 			}
-		} else {
+		}
+		else {
 			ActionForward forward = editDocument(fm, mapping, request);
 			return forward;
 		}
 	}
 
-	// returns true if successful
+	/** 
+	 * Add a new Document
+	 * @param fm
+	 * @param mapping
+	 * @param request
+	 * @return true if successful, false otherwise */
 	private boolean addDocument(AddEditDocumentForm fm, ActionMapping mapping, HttpServletRequest request) {
 
-		Hashtable errors = new Hashtable();
+		HashMap<String, String> errors = new HashMap<String, String>();
+		boolean documentValid = true;
 		try {
 			if ((fm.getDocDesc().length() == 0) || (fm.getDocDesc().equals("Enter Title"))) {
 				errors.put("descmissing", "dms.error.descriptionInvalid");
-				throw new Exception();
+				documentValid = false;
 			}
 			if (fm.getDocType().length() == 0) {
 				errors.put("typemissing", "dms.error.typeMissing");
-				throw new Exception();
+				documentValid = false;
 			}
 			FormFile docFile = fm.getDocFile();
 			if (docFile.getFileSize() == 0) {
 				errors.put("uploaderror", "dms.error.uploadError");
-				throw new FileNotFoundException();
-			}
-			// original file name
-			String fileName1 = docFile.getFileName();
-
-			EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName1, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), "", "", fm.getFunction(), fm.getFunctionId());
-			newDoc.setDocPublic(fm.getDocPublic());
-
-			newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
-                        newDoc.setDocClass(fm.getDocClass());
-                        newDoc.setDocSubClass(fm.getDocSubClass());
-			// new file name with date attached
-			String fileName2 = newDoc.getFileName();
-			// save local file
-			File file = writeLocalFile(docFile, fileName2);
-			newDoc.setContentType(docFile.getContentType());
-                        if (fileName2.toLowerCase().endsWith(".pdf")) {
-                            newDoc.setContentType("application/pdf");
-                            int numberOfPages = countNumOfPages(fileName2);
-                            newDoc.setNumberOfPages(numberOfPages);                        
-                        }
-		
-
-			// if the document was added in the context of a program
-			ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
-			LoggedInInfo loggedInInfo  = LoggedInInfo.getLoggedInInfoFromSession(request);
-			ProgramProvider pp = programManager.getCurrentProgramInDomain(loggedInInfo, loggedInInfo.getLoggedInProviderNo());
-			if(pp != null && pp.getProgramId() != null) {
-				newDoc.setProgramId(pp.getProgramId().intValue());
+				documentValid = false;
 			}
 			
-			String restrictToProgramStr = request.getParameter("restrictToProgram");
-			newDoc.setRestrictToProgram("on".equals(restrictToProgramStr));
-			
-			// if the document was added in the context of an appointment
-			if(fm.getAppointmentNo() != null && fm.getAppointmentNo().length()>0) {
+			if(documentValid) {
+				// original file name
+				String fileName1 = docFile.getFileName();
+	
+				EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName1, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), "", "", fm.getFunction(), fm.getFunctionId());
+				newDoc.setDocPublic(fm.getDocPublic());
 				newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
-			}
-			
-		 	// If a new document type is added, include it in the database to create filters 
-		 	if (!EDocUtil.getDoctypes(fm.getFunction()).contains(fm.getDocType())){ 
-		 		EDocUtil.addDocTypeSQL(fm.getDocType(),fm.getFunction());
-		 	} 
-		 	
-			
-			// ---
-			String doc_no = EDocUtil.addDocumentSQL(newDoc);
-			if(ConformanceTestHelper.enableConformanceOnlyTestFeatures){
-				storeDocumentInDatabase(file, Integer.parseInt(doc_no));
-			}
-			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
-			// add note if document is added under a patient
-			String module = fm.getFunction().trim();
-			String moduleId = fm.getFunctionId().trim();
-			if (module.equals("demographic")) {// doc is uploaded under a patient,moduleId become demo no.
-
-				Date now = EDocUtil.getDmsDateTimeAsDate();
-
-				String docDesc = EDocUtil.getLastDocumentDesc();
-
-				CaseManagementNote cmn = new CaseManagementNote();
-				cmn.setUpdate_date(now);
-				java.sql.Date od1 = MyDateFormat.getSysDate(newDoc.getObservationDate());
-				cmn.setObservation_date(od1);
-				cmn.setDemographic_no(moduleId);
-				HttpSession se = request.getSession();
-				String user_no = (String) se.getAttribute("user");
-				String prog_no = new EctProgram(se).getProgram(user_no);
-				WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(se.getServletContext());
-				CaseManagementManager cmm = (CaseManagementManager) ctx.getBean("caseManagementManager");
-				cmn.setProviderNo("-1");// set the provider no to be -1 so the editor appear as 'System'.
-
-				Provider provider = EDocUtil.getProvider(fm.getDocCreator());
-				String provFirstName = "";
-				String provLastName = "";
-				if(provider!=null) {
-					provFirstName=provider.getFirstName();
-					provLastName=provider.getLastName();
+	                        newDoc.setDocClass(fm.getDocClass());
+	                        newDoc.setDocSubClass(fm.getDocSubClass());
+				// new file name with date attached
+				String fileName2 = newDoc.getFileName();
+				// save local file
+				File file = writeLocalFile(docFile, fileName2);
+				newDoc.setContentType(docFile.getContentType());
+				int numberOfPages = 0;
+				if (fileName2.toLowerCase().endsWith(".pdf")) {
+					newDoc.setContentType("application/pdf");
+					// get number of pages when document is pdf;
+					numberOfPages = countNumOfPages(fileName2);
 				}
+				newDoc.setNumberOfPages(numberOfPages);
+				MiscUtils.getLogger().info("Content Type:" + newDoc.getContentType());
 
-				String strNote = "Document" + " " + docDesc + " " + "created at " + now + " by " + provFirstName + " " + provLastName + ".";
-
-				cmn.setNote(strNote);
-				cmn.setSigned(true);
-				cmn.setSigning_provider_no("-1");
-				cmn.setProgram_no(prog_no);
+				// if the document was added in the context of a program
+				ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
+				LoggedInInfo loggedInInfo  = LoggedInInfo.getLoggedInInfoFromSession(request);
+				ProgramProvider pp = programManager.getCurrentProgramInDomain(loggedInInfo, loggedInInfo.getLoggedInProviderNo());
+				if(pp != null && pp.getProgramId() != null) {
+					newDoc.setProgramId(pp.getProgramId().intValue());
+				}
+				String restrictToProgramStr = request.getParameter("restrictToProgram");
+				newDoc.setRestrictToProgram("on".equals(restrictToProgramStr));
 				
-				SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-				SecRole doctorRole = secRoleDao.findByName("doctor");		
-				cmn.setReporter_caisi_role(doctorRole.getId().toString());
-								
-				cmn.setReporter_program_team("0");
-				cmn.setPassword("NULL");
-				cmn.setLocked(false);
-				cmn.setHistory(strNote);
-				cmn.setPosition(0);
+				// if the document was added in the context of an appointment
+				if(fm.getAppointmentNo() != null && fm.getAppointmentNo().length()>0) {
+					newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
+				}
 				
-				Long note_id = cmm.saveNoteSimpleReturnID(cmn);
-				 
-				// Add a noteLink to casemgmt_note_link
-				CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
-				cmnl.setTableName(CaseManagementNoteLink.DOCUMENT);
-				cmnl.setTableId(Long.parseLong(EDocUtil.getLastDocumentNo()));
-				cmnl.setNoteId(note_id);
-
-				EDocUtil.addCaseMgmtNoteLink(cmnl);
+			 	// If a new document type is added, include it in the database to create filters
+			 	if (!EDocUtil.getDoctypes(fm.getFunction()).contains(fm.getDocType())){
+			 		EDocUtil.addDocTypeSQL(fm.getDocType(),fm.getFunction());
+			 	}
+	
+				String doc_no = EDocUtil.addDocumentSQL(newDoc);
+				if(ConformanceTestHelper.enableConformanceOnlyTestFeatures){
+					storeDocumentInDatabase(file, Integer.parseInt(doc_no));
+				}
+				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+				// add note if document is added under a patient
+				String module = fm.getFunction().trim();
+				String moduleId = fm.getFunctionId().trim();
+				if (module.equals("demographic")) {// doc is uploaded under a patient,moduleId become demo no.
+	
+					Date now = EDocUtil.getDmsDateTimeAsDate();
+	
+					String docDesc = EDocUtil.getLastDocumentDesc();
+	
+					CaseManagementNote cmn = new CaseManagementNote();
+					cmn.setUpdate_date(now);
+					java.sql.Date od1 = MyDateFormat.getSysDate(newDoc.getObservationDate());
+					cmn.setObservation_date(od1);
+					cmn.setDemographic_no(moduleId);
+					HttpSession se = request.getSession();
+					String user_no = (String) se.getAttribute("user");
+					String prog_no = new EctProgram(se).getProgram(user_no);
+					WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(se.getServletContext());
+					CaseManagementManager cmm = (CaseManagementManager) ctx.getBean("caseManagementManager");
+					cmn.setProviderNo("-1");// set the provider no to be -1 so the editor appear as 'System'.
+	
+					Provider provider = EDocUtil.getProvider(fm.getDocCreator());
+					String provFirstName = "";
+					String provLastName = "";
+					if(provider!=null) {
+						provFirstName=provider.getFirstName();
+						provLastName=provider.getLastName();
+					}
+	
+					String strNote = "Document" + " " + docDesc + " " + "created at " + now + " by " + provFirstName + " " + provLastName + ".";
+	
+					cmn.setNote(strNote);
+					cmn.setSigned(true);
+					cmn.setSigning_provider_no("-1");
+					cmn.setProgram_no(prog_no);
+	
+					SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
+					SecRole doctorRole = secRoleDao.findByName("doctor");
+					cmn.setReporter_caisi_role(doctorRole.getId().toString());
+	
+					cmn.setReporter_program_team("0");
+					cmn.setPassword("NULL");
+					cmn.setLocked(false);
+					cmn.setHistory(strNote);
+					cmn.setPosition(0);
+	
+					Long note_id = cmm.saveNoteSimpleReturnID(cmn);
+	
+					// Debugging purposes on the live server
+					MiscUtils.getLogger().info("Document Note ID: "+note_id.toString());
+	
+					// Add a noteLink to casemgmt_note_link
+					CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
+					cmnl.setTableName(CaseManagementNoteLink.DOCUMENT);
+					cmnl.setTableId(Long.parseLong(EDocUtil.getLastDocumentNo()));
+					cmnl.setNoteId(note_id);
+	
+					request.setAttribute("document_no", doc_no);
+					MiscUtils.getLogger().info(" document no"+doc_no);
+	
+					EDocUtil.addCaseMgmtNoteLink(cmnl);
+				}
 			}
-
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("Error", e);
+		} 
+		catch (Exception e) {
+			MiscUtils.getLogger().error("Error Adding Document", e);
+			errors.put("uploaderror", "dms.error.uploadError");
+			documentValid = false;
+		}
+		if(!documentValid) {
 			// ActionRedirect redirect = new ActionRedirect(mapping.findForward("failAdd"));
 			request.setAttribute("docerrors", errors);
 			request.setAttribute("completedForm", fm);
-			return false;
 		}
-
-		return true;
+		return documentValid;
 	}
 
 	private ActionForward editDocument(AddEditDocumentForm fm, ActionMapping mapping, HttpServletRequest request) {
-		Hashtable errors = new Hashtable();
 		
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
 			throw new SecurityException("missing required security object (_edoc)");
 		}
 		
+		HashMap<String, String> errors = new HashMap<String, String>();
+		boolean documentValid = true;
 		try {
 			if (fm.getDocDesc().length() == 0) {
 				errors.put("descmissing", "dms.error.descriptionInvalid");
-				throw new Exception();
+				documentValid = false;
 			}
 			if (fm.getDocType().length() == 0) {
 				errors.put("typemissing", "dms.error.typeMissing");
-				throw new Exception();
+				documentValid = false;
 			}
-			FormFile docFile = fm.getDocFile();
-                        String fileName = ""; 
-                        
-                        if(oscar.OscarProperties.getInstance().getBooleanProperty("ALLOW_UPDATE_DOCUMENT_CONTENT", "true"))
-                        {
-                            fileName=docFile.getFileName();
-                        }
-                        
-			String reviewerId = filled(fm.getReviewerId()) ? fm.getReviewerId() : "";
-			String reviewDateTime = filled(fm.getReviewDateTime()) ? fm.getReviewDateTime() : "";
-
-			if (!filled(reviewerId) && fm.getReviewDoc()) {
-				reviewerId = (String) request.getSession().getAttribute("user");
-				reviewDateTime = UtilDateUtilities.DateToString(new Date(), EDocUtil.REVIEW_DATETIME_FORMAT);
+			if(documentValid) {
+				FormFile docFile = fm.getDocFile();
+				String fileName = "";
+				if(oscar.OscarProperties.getInstance().isPropertyActive("ALLOW_UPDATE_DOCUMENT_CONTENT")) {
+					fileName = docFile.getFileName();
+				}
+				String reviewerId = filled(fm.getReviewerId()) ? fm.getReviewerId() : "";
+				String reviewDateTime = filled(fm.getReviewDateTime()) ? fm.getReviewDateTime() : "";
+	
+				if (!filled(reviewerId) && fm.getReviewDoc()) {
+					reviewerId = (String) request.getSession().getAttribute("user");
+					reviewDateTime = UtilDateUtilities.DateToString(new Date(), EDocUtil.REVIEW_DATETIME_FORMAT);
+					if (fm.getFunction() != null && fm.getFunction().equals("demographic")) {
+						LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.REVIEWED, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr(), fm.getFunctionId());
+					} else {
+						LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.REVIEWED, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr());
+	
+					}
+				}
+				EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), reviewerId, reviewDateTime, fm.getFunction(), fm.getFunctionId());
+				newDoc.setSourceFacility(fm.getSourceFacility());
+				newDoc.setDocId(fm.getMode());
+				newDoc.setDocPublic(fm.getDocPublic());
+				newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
+				newDoc.setDocClass(fm.getDocClass());
+				newDoc.setDocSubClass(fm.getDocSubClass());
+				String programIdStr = (String) request.getSession().getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
+				if (programIdStr != null) {
+					newDoc.setProgramId(Integer.valueOf(programIdStr));
+				}
+				fileName = newDoc.getFileName();
+				if (docFile.getFileSize() != 0 && fileName.length() != 0) {
+					// save local file
+					writeLocalFile(docFile, fileName);
+					newDoc.setContentType(docFile.getContentType());
+					if (fileName.toLowerCase().endsWith(".pdf")) {
+						newDoc.setContentType("application/pdf");
+						int numberOfPages = countNumOfPages(fileName);
+						newDoc.setNumberOfPages(numberOfPages);
+					}
+					// ---
+				} else if (docFile.getFileName().length() != 0) {
+					errors.put("uploaderror", "dms.error.uploadError");
+					throw new FileNotFoundException();
+				}
+				if(fm.getReviewDoc()) {
+					newDoc.setReviewDateTime(UtilDateUtilities.DateToString(new Date(), EDocUtil.REVIEW_DATETIME_FORMAT));
+				}
+				EDocUtil.editDocumentSQL(newDoc, fm.getReviewDoc());
+	
 				if (fm.getFunction() != null && fm.getFunction().equals("demographic")) {
-					LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.REVIEWED, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr(), fm.getFunctionId());
+					LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr(), fm.getFunctionId());
 				} else {
-					LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.REVIEWED, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr());
-
+					LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr());
+	
 				}
 			}
-			EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), reviewerId, reviewDateTime, fm.getFunction(), fm.getFunctionId());
-			newDoc.setSourceFacility(fm.getSourceFacility());
-			newDoc.setDocId(fm.getMode());
-			newDoc.setDocPublic(fm.getDocPublic());
-			newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
-            newDoc.setDocClass(fm.getDocClass());
-            newDoc.setDocSubClass(fm.getDocSubClass());
-            String programIdStr = (String) request.getSession().getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
-            if (programIdStr != null) newDoc.setProgramId(Integer.valueOf(programIdStr));
-
-            			
-			fileName = newDoc.getFileName();
-			if (docFile.getFileSize() != 0 && fileName.length()!=0) {
-				// save local file
-				writeLocalFile(docFile, fileName);
-				newDoc.setContentType(docFile.getContentType());
-                                if (fileName.toLowerCase().endsWith(".pdf")) {
-                                    newDoc.setContentType("application/pdf");
-                                    int numberOfPages = countNumOfPages(fileName);
-                                    newDoc.setNumberOfPages(numberOfPages);                        
-                                }
-				// ---
-			} else if (docFile.getFileName().length() != 0) {
-				errors.put("uploaderror", "dms.error.uploadError");
-				throw new FileNotFoundException();
-			}
-			if(fm.getReviewDoc()) {
-				newDoc.setReviewDateTime(UtilDateUtilities.DateToString(new Date(), EDocUtil.REVIEW_DATETIME_FORMAT));
-			}
-			EDocUtil.editDocumentSQL(newDoc, fm.getReviewDoc());
-
-			if (fm.getFunction() != null && fm.getFunction().equals("demographic")) {
-				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr(), fm.getFunctionId());
-			} else {
-				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr());
-
-			}
-
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
+			MiscUtils.getLogger().error("Error Editing Document", e);
+			errors.put("uploaderror", "dms.error.uploadError");
+			documentValid = false;
+		}
+		if(!documentValid) {
 			request.setAttribute("docerrors", errors);
 			request.setAttribute("completedForm", fm);
 			request.setAttribute("editDocumentNo", fm.getMode());

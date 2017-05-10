@@ -70,7 +70,7 @@ public class MedicationUtil {
      * demographicId given.
      *
      * @param demographicId
-     * @return
+     * @return List of type Drug
      */
     public static List<Drug> getMedications(int demographicId) {
         return getMedications(demographicId, false);
@@ -82,7 +82,7 @@ public class MedicationUtil {
      *
      * @param demographicId	Not Null
      * @param archived TRUE = not active, FALSE = active, null = all
-     * @return
+     * @return List of type Drug
      */
     public static List<Drug> getMedications(int demographicId, boolean archived) {
         return drugDao.findByDemographicId(demographicId, archived);
@@ -95,7 +95,7 @@ public class MedicationUtil {
      *
      * @param demographicId	Not Null
      * @param archived TRUE = not active, FALSE = active, null = all
-     * @return
+     * @return List of type Drug
      */
     public static List<Drug> getMedicationsOrderByDate(int demographicId, boolean archived) {
         //Gets the list of drugs
@@ -121,7 +121,7 @@ public class MedicationUtil {
      * given.
      *
      * @param ATC
-     * @return
+     * @return List of type Drug
      */
     public static List<Drug> getMedicationsByATC(String ATC) {
         return drugDao.findByAtc(ATC);
@@ -133,7 +133,7 @@ public class MedicationUtil {
      *
      * @param demographicId Not Null
      * @param ATC
-     * @return
+     * @return List of type Drug
      */
     public static List<Drug> getMedicationsByATC(int demographicId, String ATC) {
         return drugDao.findByDemographicIdAndAtc(demographicId, ATC);
@@ -145,7 +145,7 @@ public class MedicationUtil {
      *
      * @param demographicId Not Null
      * @param drugId
-     * @return
+     * @return List of type Drug
      */
     public static List<Drug> getMedicationsByDrug(int demographicId, int drugId) {
         return drugDao.findByDemographicIdAndDrugId(demographicId, drugId);
@@ -157,7 +157,7 @@ public class MedicationUtil {
      *
      * @param demographicId Not Null
      * @param regionalIdentifier
-     * @return
+     * @return List of type Drug
      */
     public static List<Drug> getMedicationsByRegion(int demographicId, String regionalIdentifier) {
         return drugDao.findByDemographicIdAndRegion(demographicId, regionalIdentifier);
@@ -168,7 +168,7 @@ public class MedicationUtil {
      * prescriptionID given.
      *
      * @param prescriptionId
-     * @return
+     * @return List of type Drug
      */
     public static List<Drug> getMedicationsByPrescription(int prescriptionId) {
         return drugDao.findByPrescriptionId(prescriptionId);
@@ -180,7 +180,7 @@ public class MedicationUtil {
      *
      * @param demographicId
      * @param prescriptionId
-     * @return
+     * @return List of type Drug
      */
     public static List<Drug> getMedicationsByPrescription(int demographicId, int prescriptionId) {
         List<Drug> drugList = getMedicationsByPrescription(prescriptionId);
@@ -197,7 +197,7 @@ public class MedicationUtil {
      * given.
      *
      * @param drugId
-     * @return
+     * @return List of type Drug
      */
     public static List<DrugReason> getMedicationReasons(int drugId) {
         return drugReasonDao.getReasonsForDrugID(drugId, true);

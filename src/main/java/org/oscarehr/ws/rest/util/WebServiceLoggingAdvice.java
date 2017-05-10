@@ -23,6 +23,9 @@
  */
 package org.oscarehr.ws.rest.util;
 
+import java.util.Arrays;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.message.Message;
@@ -75,7 +78,7 @@ public class WebServiceLoggingAdvice {
 			Object result = joinpoint.proceed();
 			duration = System.currentTimeMillis() - duration;
 
-			logAccess("REST WS: " + getServiceCallDescription(joinpoint));
+			logAccess("REST WS: " +getServiceCallDescription(joinpoint));
 			return result;
 		} catch (Throwable t) {
 			logger.debug("WS Failure", t);
@@ -96,9 +99,21 @@ public class WebServiceLoggingAdvice {
 
 		log.setIp(request.getRemoteAddr());
 		log.setContent(request.getRequestURL().toString());
-		log.setData(request.getParameterMap().toString());
+		log.setData(printableParameterMap(request.getParameterMap()));
 
 		LogAction.addLogSynchronous(log);
 	}
-
+	/** display a map with values in a readable way */
+	private String printableParameterMap(Map<?, ?> map) {
+		String printable = "{";
+	
+		for(Object key: map.keySet())
+	    {
+	            String keyStr = (String)key;
+	            String[] value = (String[])map.get(keyStr);
+	            printable += keyStr + "=" + Arrays.toString(value) + ",";
+	    }
+		printable += "}";
+		return printable;
+	}
 }

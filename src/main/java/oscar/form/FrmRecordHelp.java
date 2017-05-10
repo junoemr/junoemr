@@ -149,6 +149,9 @@ public class FrmRecordHelp {
             }
 
             String value = props.getProperty(name, null);
+            if(value != null && value.trim().equals("")) { //trim to null
+            	value = null;
+            }
 
             if (md.getColumnTypeName(i).startsWith("TINY")) {
                 if (value != null) {
@@ -165,7 +168,7 @@ public class FrmRecordHelp {
             }
 
             if (md.getColumnTypeName(i).equalsIgnoreCase("date")) {
-            java.util.Date d;
+            	java.util.Date d;
                 if (md.getColumnName(i).equalsIgnoreCase("formEdited")) {
                     d = new Date();
                 } else {

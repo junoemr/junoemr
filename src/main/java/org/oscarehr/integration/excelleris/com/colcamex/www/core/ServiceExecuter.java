@@ -109,7 +109,7 @@ public class ServiceExecuter implements Runnable {
 
 	/**
 	 * Checks if the service host is available.
-	 * @return
+	 * @return boolean
 	 */
 	public boolean checkHostStatus() {
 		return execute(AbstractConnectionController.LOGIN_MODE);
@@ -118,7 +118,7 @@ public class ServiceExecuter implements Runnable {
 	/**
 	 * Performs a login routine for each of the lab distribution services 
 	 * to confirm connection status.
-	 * @return
+	 * @return boolean
 	 */
 	public boolean checkClientStatus() {
 

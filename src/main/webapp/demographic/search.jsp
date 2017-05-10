@@ -115,6 +115,10 @@
 </div>
     <!-- Search Box -->
     <%@ include file="zdemographicfulltitlesearch.jsp"%>
+<div>
+	<a href="../demographic/demographicaddarecordhtm.jsp"><bean:message
+		key="demographic.search.btnCreateNew" /></a>
+</div>
 <p>
 <!-- we may want to not allow students to create new patients? -->
 <!-- <security:oscarSec roleName="<%=roleName$%>" objectName="_demographic.addnew" rights="r">  -->

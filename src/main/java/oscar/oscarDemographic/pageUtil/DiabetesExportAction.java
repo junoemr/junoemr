@@ -702,7 +702,7 @@ public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServlet
             if (StringUtils.filled(annotation)) labResults.setPhysiciansNotes(annotation);
 
 	    	HashMap<String,Object> labRoutingInfo = new HashMap<String,Object>();
-	    	labRoutingInfo.putAll(ProviderLabRouting.getInfo(lab_no));
+	    	labRoutingInfo.putAll(ProviderLabRouting.getInfo(lab_no, "HL7"));
 
 	    	String info = (String)labRoutingInfo.get("provider_no");
 	    	if (info!=null && !"0".equals(info)) {

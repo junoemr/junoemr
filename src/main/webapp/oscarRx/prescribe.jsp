@@ -110,6 +110,10 @@ if(listRxDrugs!=null){
          //for display
          if(drugName==null || drugName.equalsIgnoreCase("null"))
              drugName="" ;
+         // prevent displaying null when there is an invalid string retrieved.
+         if(instructions == null || instructions.equalsIgnoreCase("null") ){
+        	 instructions = "";
+         }
 
          String comment  = rx.getComment();
          if(rx.getComment() == null) {

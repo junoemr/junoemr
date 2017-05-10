@@ -100,7 +100,7 @@ public class MessageHandler {
 	/**
 	 * Indicates that the serviceExecuter completed correctly and is
 	 * still running.
-	 * @return
+	 * @return boolean
 	 */
 	public boolean isServiceStatus() {
 		return serviceStatus;

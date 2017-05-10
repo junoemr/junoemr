@@ -179,7 +179,8 @@ if(!authed) {
 	String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF" ;
 	String str = null;
 	int nStrShowLen = 20;
-	String prov= (oscarVariables.getProperty("billregion","")).trim().toUpperCase();
+	String billRegion = (oscarVariables.getProperty("billregion","")).trim().toUpperCase();
+	String prov = (oscarVariables.getProperty("hctype","")).trim().toUpperCase();
 
 	CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 	List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.DEMOGRAPHIC, Long.valueOf(demographic_no));
@@ -262,12 +263,16 @@ if(!authed) {
 <!-- calendar stylesheet -->
 <link rel="stylesheet" type="text/css" media="all"
 	href="../share/calendar/calendar.css" title="win2k-cold-1" />
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-1.7.1.min.js"></script>
 <% if (OscarProperties.getInstance().getBooleanProperty("workflow_enhance", "true")) { %>
 <script language="javascript" src="<%=request.getContextPath() %>/hcHandler/hcHandler.js"></script>
 <script language="javascript" src="<%=request.getContextPath() %>/hcHandler/hcHandlerUpdateDemographic.js"></script>
 <link rel="stylesheet" href="<%=request.getContextPath() %>/hcHandler/hcHandler.css" type="text/css" />
 <link rel="stylesheet" href="<%=request.getContextPath() %>/demographic/demographiceditdemographic.css" type="text/css" />
+<% } %>
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
+<link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/blitzer/jquery-ui.css"/>
+<link rel="stylesheet" href="../css/jquery.autocomplete.css" type="text/css">
 <% } %>
 
 <!-- main calendar program -->
@@ -912,7 +917,7 @@ if(wLReadonly.equals("")){
 			<tr>
 				<td>
 					<% 
-					if ("CLINICAID".equals(prov)) 
+					if ("CLINICAID".equals(billRegion)) 
 					{
 						%>
 							<a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">
@@ -920,7 +925,7 @@ if(wLReadonly.equals("")){
 							</a>
 						<%
 					}
-					else if("ON".equals(prov)) 
+					else if("ON".equals(billRegion)) 
 					{
 					%>
 						<a href="javascript: function myFunction() {return false; }"
@@ -948,11 +953,11 @@ if(wLReadonly.equals("")){
 			<tr>
 				<td><a
 					href="javascript: function myFunction() {return false; }"
-					onClick="popupPage(700, 1000, '../billing.do?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
+					onClick="popupPage(700, 1000, '../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>
 			<%
-			if("ON".equals(prov)) {
+			if("ON".equals(billRegion)) {
 				String default_view = oscarVariables.getProperty("default_view", "");
 
 				if (!oscarProps.getProperty("clinic_no", "").startsWith("1022")) { // part 2 of quick hack to make Dr. Hunter happy
@@ -967,7 +972,7 @@ if(wLReadonly.equals("")){
 				<tr>
 					<td><a
 						href="javascript: function myFunction() {return false; }"
-						onClick="popupS('../billing/CA/ON/billingShortcutPg1.jsp?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("hospital_view", default_view))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
+						onClick="popupS('../billing/CA/ON/billingShortcutPg1.jsp?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("hospital_view", default_view))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
 						title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgHospitalBilling"/></a></td>
 				</tr>
 				<tr>
@@ -1090,7 +1095,7 @@ if(wLReadonly.equals("")){
 				<% }else { %>
 				<a
 					href="javascript: function myFunction() {return false; }"
-					onClick="popupPage(700,1000,'../tickler/ticklerDemoMain.jsp?demoview=<%=demographic_no%>');return false;">
+					onClick="popupPage(700,1000,'../tickler/ticklerMain.jsp?demoview=<%=demographic_no%>');return false;">
 				<bean:message key="global.tickler" /></a>
 				<% } %>
 				</td>
@@ -3630,6 +3635,37 @@ jQuery(document).ready(function(){
 }
 %>
 </script>
+
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
+
+<script src="https://www.google.com/jsapi"></script>
+<script>
+	// already load jquery 1.7.1
+    google.load("jqueryui", "1");
+</script>
+<script type="text/javascript">
+jQuery.noConflict();
+jQuery(document).ready(function(){
+    // AJAX autocomplete referrer doctors
+    jQuery("input[name=r_doctor]").keypress(function(){
+    	jQuery("input[name=r_doctor]").autocomplete({
+            source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
+            select: function( event, ui){
+            	jQuery("input[name=r_doctor_ohip]").val(ui.item.referral_no);
+            }
+        });
+    });
+    jQuery("input[name=r_doctor_ohip]").keypress(function(){
+    	jQuery("input[name=r_doctor_ohip]").autocomplete({
+            source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+            select: function( event, ui){
+            	jQuery("input[name=r_doctor]").val(ui.item.namedesc);
+            }
+        });
+    });
+});
+</script>
+<% } %>
 </body>
 </html:html>
 

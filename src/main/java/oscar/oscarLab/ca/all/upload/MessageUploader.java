@@ -553,7 +553,7 @@ public final class MessageUploader {
 			}
 			
 
-			ProviderLabRoutingModel plr = providerLabRoutingDao.findByLabNo(lab_id);
+			ProviderLabRoutingModel plr = providerLabRoutingDao.findSingleLabRoute(lab_id);
 			if(plr != null) {
 				RecycleBin rb = new RecycleBin();
 				rb.setProviderNo("0");
@@ -567,7 +567,7 @@ public final class MessageUploader {
 				providerLabRoutingDao.remove(plr.getId());
 			}
 				
-			PatientLabRouting lr = patientLabRoutingDao.findByLabNo(lab_id);
+			PatientLabRouting lr = patientLabRoutingDao.findSingleLabRoute(lab_id);
 			if(lr != null) {
 				RecycleBin rb = new RecycleBin();
 				rb.setProviderNo("0");

@@ -384,8 +384,7 @@ public class DemographicService extends AbstractServiceImpl {
 	 * 
 	 * Currently supports LastName[,FirstName] and address searches.
 	 * 
-	 * @param id
-	 * 		Id of the demographic to get data for 
+	 * @param query
 	 * @return
 	 * 		Returns data for the demographic provided 
 	 */

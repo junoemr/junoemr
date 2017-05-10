@@ -202,7 +202,7 @@ public abstract class AbstractConnectionController implements Runnable {
      * Connection controllers start method executes the run method in 
      * all service controllers.
      * @param mode
-     * @return
+     * @return status
      */
     public boolean start(int mode) {
 
@@ -242,7 +242,7 @@ public abstract class AbstractConnectionController implements Runnable {
 
     /**
 	 * SSL Socket Factor for secure connection socket.
-	 * @return
+	 * @return SSLSocketFactory
 	 */
 	protected SSLSocketFactory getSSLSocketFactory() {
 
@@ -276,7 +276,7 @@ public abstract class AbstractConnectionController implements Runnable {
 	
 	/**
 	 * SSL Context for secure server connections.
-	 * @return
+	 * @return SSLContext
 	 */
 	protected SSLContext getSSLContext() {
 		
@@ -443,7 +443,6 @@ public abstract class AbstractConnectionController implements Runnable {
 	 * @param message
 	 * @param exception
 	 * @param errorLevel
-	 * @param sendEmail
 	 */
 	protected void handleError(String message, Exception exception, int errorLevel) {
 	

@@ -199,7 +199,7 @@ public class RecordUxService extends AbstractServiceImpl {
 			if( org.oscarehr.common.IsPropertiesOn.isTicklerPlusEnable()) {
 				morelist.add(new MenuItemTo1(idCounter++, "Tickler", "../Tickler.do?filter.demographicNo="+demographicNo));
 			}else {
-				morelist.add(new MenuItemTo1(idCounter++, "Tickler", "..//tickler/ticklerDemoMain.jsp?demoview="+demographicNo));
+				morelist.add(new MenuItemTo1(idCounter++, "Tickler", "..//tickler/ticklerMain.jsp?demoview="+demographicNo));
 			}
 		}*/
 		

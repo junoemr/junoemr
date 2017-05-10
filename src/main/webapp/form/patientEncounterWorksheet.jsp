@@ -65,14 +65,15 @@
     int provNo = Integer.parseInt((String) session.getAttribute("user"));
     LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
     
+    // load DAO's
     ClinicDAO clinicDao = SpringUtils.getBean(ClinicDAO.class);
     DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
     AllergyDao allergyDao = SpringUtils.getBean(AllergyDao.class);
     ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
     OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
     
+    // format clinic info
     Clinic clinic = clinicDao.getClinic();
-    Demographic demographic = demographicDao.getDemographicById(demoNo);
     StringBuilder allergyString = new StringBuilder();
     List<Allergy> allergies = allergyDao.findActiveAllergies(demoNo);
 	for(int x=0;x<allergies.size();x++) {
@@ -81,27 +82,43 @@
 			allergyString.append(",");
     	allergyString.append(allergy.getDescription());
     }
-
-    String providerName = providerDao.getProvider(demographic.getProviderNo()).getFormattedName();
-    
-    Appointment appt = null;
-    if(request.getParameter("appointmentNo") != null)
-    	appt = appointmentDao.find(Integer.parseInt(request.getParameter("appointmentNo")));
-    
     SimpleDateFormat dateFormatter =new SimpleDateFormat("yyyy-MM-dd");
     SimpleDateFormat timeFormatter =new SimpleDateFormat("HH:mm");
     
-    //get a few things we need.
-    //family doc
-    //referring doc
-    //allergies
-    //clinic info
-    
-    
-   // FrmRecord rec = (new FrmRecordFactory()).factory(formClass);
-   //java.util.Properties props = rec.getFormRecord(demoNo, formId);
+    // format demographic info
+    Demographic demographic = demographicDao.getDemographicById(demoNo);
+    String demo_name = demographic.getDisplayName();
+    String demo_sex = demographic.getSex().toUpperCase();
+    String demo_addr_1 = (demographic.getAddress() == null)? "" : demographic.getAddress();
+    String demo_addr_2 = ((demographic.getCity()==null)? "" : demographic.getCity() + ", ")
+    		+ ((demographic.getProvince()==null)? "" : demographic.getProvince() + ", ")
+    		+ ((demographic.getPostal()==null)? "" : demographic.getPostal());
+    String demo_bday = demographic.getBirthDayAsString() + " (" + demographic.getAgeInYears() + ")";
+    String demo_hin_hc = (demographic.getHin()==null)? "": demographic.getHin()
+    		+ ((demographic.getHcType()==null)? "" : " (" + demographic.getHcType() + ")");
 
-    //FrmData fd = new FrmData();    String resource = fd.getResource(); resource = resource + "ob/riskinfo/";
+
+    // format provider info
+    Provider patientProvider = providerDao.getProvider(demographic.getProviderNo());
+    String providerName = "";
+    if(patientProvider != null) {
+    	providerName = patientProvider.getDisplayName();
+    }
+    
+    // format appointment info
+    String appt_date = "";
+    String appt_time = "";
+    String appt_type = "";
+    String appt_reason = "";
+    if(request.getParameter("appointmentNo") != null) {
+    	Appointment appt = appointmentDao.find(Integer.parseInt(request.getParameter("appointmentNo")));
+    	if(appt != null) {
+    		appt_date = dateFormatter.format(appt.getAppointmentDate());
+    		appt_time = timeFormatter.format(appt.getStartTime());
+    		appt_type = appt.getType();
+    	    appt_reason = appt.getReason();
+    	}
+    }
 
     //get project_home
     String project_home = request.getContextPath().substring(1);	
@@ -131,8 +148,8 @@
 
 	<div align="center">
 	<form action="../form/createpdf" method="POST">
-	<input type="hidden" name="demographic_no" value="<%=request.getParameter("demographic_no") %>" />
-	<input type="hidden" name="form_id" value="<%=request.getParameter("form_id") %>" />
+	<input type="hidden" name="demographic_no" value="<%=demoNo%>" />
+	<input type="hidden" name="form_id" value="<%=formId%>" />
 	<input type="hidden" name="__title" value="PatientEcounterWorksheet" />
 	<input type="hidden" name="__cfgfile" value="patientEncounterWorksheetCfg" />
 	<input type="hidden" name="__template" value="patientEncounterWorksheet" />
@@ -169,18 +186,18 @@
 			</td>
 			<td valign="top" width="50%">
 				<table border="0" cellspacing="2" cellpadding="2">
-					<input type="hidden" name="demo_name" value="<%=demographic.getFormattedName() + " (" + demographic.getSex().toUpperCase()  + ")" %>"/>
-					<input type="hidden" name="demo_address1" value="<%=demographic.getAddress() %>"/>
-					<input type="hidden" name="demo_address2" value="<%=demographic.getCity() + ", " + demographic.getProvince() + ", " + demographic.getPostal() %>"/>
-					<input type="hidden" name="demo_id" value="<%=demographic.getDemographicNo() %>"/>
-					<input type="hidden" name="demo_bday" value="<%=demographic.getBirthDayAsString() + " (" + demographic.getAgeInYears() + ")" %>"/>
-					<input type="hidden" name="demo_hin" value="<%=demographic.getHin() + " (" + demographic.getHcType() + ")" %>"/>
+					<input type="hidden" name="demo_name" value="<%=demo_name + " (" + demo_sex + ")" %>"/>
+					<input type="hidden" name="demo_address1" value="<%=demo_addr_1 %>"/>
+					<input type="hidden" name="demo_address2" value="<%=demo_addr_2%>"/>
+					<input type="hidden" name="demo_id" value="<%=demoNo%>"/>
+					<input type="hidden" name="demo_bday" value="<%=demo_bday%>"/>
+					<input type="hidden" name="demo_hin" value="<%=demo_hin_hc%>"/>
 					<tr>
 						<td valign="top"><b>Patient:</b></td>
 						<td>
-						<b><%=demographic.getFormattedName() %></b> (<%=demographic.getSex().toUpperCase() %>)<br/>
-						<%=demographic.getAddress() %><br/>
-						<%=demographic.getCity() %>, <%=demographic.getProvince() %>, <%=demographic.getPostal() %>
+						<b><%=demo_name%></b> (<%=demo_sex%>)<br/>
+						<%=demo_addr_1%><br/>
+						<%=demo_addr_2%>
 						</td>
 					</tr>
 					<tr>
@@ -189,11 +206,11 @@
 					</tr>
 					<tr>
 						<td>DOB:</td>
-						<td><%=demographic.getBirthDayAsString() %>(<%=demographic.getAgeInYears() %>)</td>
+						<td><%=demo_bday%></td>
 					</tr>
 					<tr>
 						<td>HC #:</td>
-						<td><%=demographic.getHin() %> (<%=demographic.getHcType() %>)</td>
+						<td><%=demo_hin_hc%></td>
 					</tr>
 				</table>
 			</td>
@@ -223,21 +240,21 @@
 			</td>
 			<td valign="top" width="50%">
 				<table border="0" cellspacing="2" cellpadding="2">
-					<input type="hidden" name="appt_date" value="<%=dateFormatter.format(appt.getAppointmentDate()) + " " + timeFormatter.format(appt.getStartTime()) %>"/>
-					<input type="hidden" name="appt_type" value="<%=appt.getType() %>"/>
-					<input type="hidden" name="appt_reason" value="<%=appt.getReason() %>"/>
+					<input type="hidden" name="appt_date" value="<%=appt_date + " " + appt_time%>"/>
+					<input type="hidden" name="appt_type" value="<%=appt_type%>"/>
+					<input type="hidden" name="appt_reason" value="<%=appt_reason%>"/>
 					
 					<tr>
 						<td>Appt. Date:</td>
-						<td><%=dateFormatter.format(appt.getAppointmentDate()) %>&nbsp;<%=timeFormatter.format(appt.getStartTime()) %></td>
+						<td><%=appt_date%>&nbsp;<%=appt_time%></td>
 					</tr>
 					<tr>
 						<td>Appt. Type:</td>
-						<td><%=appt.getType() %></td>
+						<td><%=appt_type%></td>
 					</tr>
 					<tr>
 						<td>Reason:</td>
-						<td><%=appt.getReason() %></td>
+						<td><%=appt_reason%></td>
 					</tr>
 				</table>
 			</td>

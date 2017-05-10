@@ -102,6 +102,7 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 			boolean isFax = method.equals("oscarRxFax");
 			baosPDF = generatePDFDocumentBytes(req, this.getServletContext());
 			if (isFax) {
+
 				res.setContentType("text/html");
 				PrintWriter writer = res.getWriter();
 				String faxNo = req.getParameter("pharmaFax").trim().replaceAll("\\D", "");
@@ -109,18 +110,21 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 					writer.println("<script>alert('Error: No fax number found!');window.close();</script>");
 				} else {
 		                	// write to file
-		                	String pdfFile = "prescription_"+Long.parseLong(req.getParameter("pdfId"), 10)+".pdf";
+		                	String pdfFile = "prescription_"+req.getParameter("pdfId")+".pdf";
 		                	String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "/";
 		                	FileOutputStream fos = new FileOutputStream(path+pdfFile);
 		                	baosPDF.writeTo(fos);
 		                	fos.close();
+
+							String tempPath = OscarProperties.getInstance().getProperty(
+								"fax_file_location", System.getProperty("java.io.tmpdir"));
 		                	
 		                	// write to file
-		                	String tempPdf = System.getProperty("java.io.tmpdir")+"/prescription_"+req.getParameter("pdfId")+".pdf";
+		                	String tempPdf = tempPath + "/prescription_" + req.getParameter("pdfId") + ".pdf";
 		                	// Copying the fax pdf.
 							FileUtils.copyFile(new File(path+pdfFile), new File(tempPdf));
 
-			                String txtFile = System.getProperty("java.io.tmpdir")+"/prescription_"+req.getParameter("pdfId")+".txt";
+			                String txtFile = tempPath + "/prescription_" + req.getParameter("pdfId") + ".txt";
 		                	FileWriter fstream = new FileWriter(txtFile);
 		                	BufferedWriter out = new BufferedWriter(fstream);
 			                try {

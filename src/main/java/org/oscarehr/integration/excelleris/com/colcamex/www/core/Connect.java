@@ -161,19 +161,18 @@ public class Connect {
 	 * 
 	 * @param excellerisUri
 	 * @param protocol
-	 * @return
 	 * @throws SocketTimeoutException 
 	 * @throws HttpException
 	 * @throws IOException
 	 * @throws SAXException 
 	 * @throws ParserConfigurationException 
 	 */
-	public void connect(URL httpsUri, SSLSocketFactory sf) throws SocketTimeoutException, IOException {	
+	public void connect(URL excellerisUri, SSLSocketFactory protocol) throws SocketTimeoutException, IOException {	
 		
 		setHasResponse(Boolean.FALSE);
-		setSocketFactory(sf);	
+		setSocketFactory(protocol);	
 
-		in = execute(httpsUri);	
+		in = execute(excellerisUri);	
 		
 		if(in != null) {
 			
@@ -201,7 +200,6 @@ public class Connect {
 	 * @param username
 	 * @param password
 	 * @param httpsUri
-	 * @return
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
@@ -238,10 +236,7 @@ public class Connect {
 	/**
 	 * Login method parses the login script with a login username and password.
 	 * 
-	 * @param username
-	 * @param password
 	 * @param query
-	 * @return
 	 * @throws IOException 
 	 * @throws MalformedURLException 
 	 * @throws SocketTimeoutException 
@@ -285,7 +280,6 @@ public class Connect {
 	/**
 	 * Overload for string input.
 	 * @param httpsUri
-	 * @return
 	 * @throws MalformedURLException 
 	 * @throws SocketTimeoutException 
 	 * @throws IOException
@@ -309,8 +303,7 @@ public class Connect {
 	
 	/**
 	 * Fetch the xml file. (HL7)
-	 * @param query
-	 * @return HTTP response code
+	 * @param httpsUri
 	 * @throws SocketTimeoutException 
 	 * @throws IOException
 	 * @throws SAXException
@@ -354,7 +347,6 @@ public class Connect {
 	/**
 	 * Option to acknowledge batches of labs. As for the IHA POI.
 	 * @param httpsUriList
-	 * @return
 	 * @throws SocketTimeoutException
 	 * @throws MalformedURLException
 	 * @throws IOException
@@ -392,8 +384,7 @@ public class Connect {
 	 * Send an acknowledge signal that the labs were 
 	 * retrieved.  This way the same labs will not get down loaded again
 	 * 
-	 * @return HTTP response code.
-	 * @param query
+	 * @param httpsUri
 	 * @throws IOException
 	 * @throws SAXException 
 	 */
@@ -426,7 +417,6 @@ public class Connect {
 	/**
 	 * 
 	 * @param httpsUri
-	 * @return
 	 * @throws SocketTimeoutException
 	 * @throws MalformedURLException
 	 * @throws IOException
@@ -451,7 +441,7 @@ public class Connect {
 	 * Logout and close the connection.
 	 * Is is important to logout to maintain security.
 	 * 
-	 * @param query
+	 * @param httpsUri
 	 * @throws MalformedURLException
 	 * @throws IOException
 	 * @throws SAXException 
@@ -514,9 +504,8 @@ public class Connect {
 
 	/**
 	 * A Switch for when there are lab results to retrieve.
-	 * @return
+	 * @return boolean
 	 */
-
 	public boolean hasResponse() {
 		return hasResponse;
 	}
@@ -557,8 +546,8 @@ public class Connect {
 	/**
 	 * Execute get and post commands to the server
 	 * Returns an input stream.
-	 * @param query
-	 * @return
+	 * @param httpsUri
+	 * @return InputStream
 	 * @throws IOException
 	 */
 	private InputStream execute(URL httpsUri) throws IOException {

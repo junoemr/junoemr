@@ -92,12 +92,14 @@
 		<property name="dataStoreFilename" value="utils/TrackingRegexpCheck_java_jsp.data.xml"/>
 	</module>
 
+	<!--
 	<module name="org.oscarehr.util.checkstyle.TrackingRegexpCheck">
 		<property name="fileExtensions" value=".java,.jsp,.jspf,.jsf"/>
 		<property name="illegalRegex" value=".*StringBuffer.*|.*Hashtable.*|.*Vector.*"/>
 		<property name="violationDescription" value="not really an error, but 99% of the time StringBuilder/HashMap/ArrayList is a better choice unless mandated by another API."/>
 		<property name="dataStoreFilename" value="utils/TrackingRegexpCheck_java_jsp.data.xml"/>
-	</module>
+	</module> 
+	-->
 
 	<module name="org.oscarehr.util.checkstyle.TrackingRegexpCheck">
 		<property name="fileExtensions" value=".java"/>

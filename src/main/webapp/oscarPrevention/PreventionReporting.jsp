@@ -340,6 +340,11 @@ table.ele thead {
     font-size: x-small;
     cursor: default;
 }
+.error {
+	color: red;
+	font-size: 24px;
+	padding: 10px;
+}
 </style>
 
 <style type="text/css" media="print">
@@ -352,7 +357,6 @@ table.ele thead {
 .shownInPrint{
     display:block;
 }
-
 </style>
 
 
@@ -449,8 +453,15 @@ table.ele thead {
                   ArrayList list = (ArrayList) request.getAttribute("returnReport");
                   Date asDate = (Date) request.getAttribute("asDate");
                   if (asDate == null){ asDate = Calendar.getInstance().getTime(); }
+                  
+                  String error = (String) request.getAttribute("error");
 
-                  if (list != null ){ %>
+                  if(error != null) {
+                	  %>
+                	  <span class="error"><%=error%></span>
+                	  <%
+                  }
+                  else if (list != null ){ %>
                   <form name="frmBatchBill" action="" method="post">
                       <input type="hidden" name="clinic_view" value="<%=OscarProperties.getInstance().getProperty("clinic_view","")%>">
                       <input type="hidden" name="followUpType" value="<%=followUpType%>">

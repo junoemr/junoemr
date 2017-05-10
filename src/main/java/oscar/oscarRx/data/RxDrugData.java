@@ -502,7 +502,7 @@ public class RxDrugData {
 	 * Get drug list by partial search string.
 	 * All drugs, All classes, All activity
 	 * @param searchStr
-	 * @return
+	 * @return DrugSearch
 	 */
 	public DrugSearch listDrug(String searchStr){
 		DrugSearch drugSearch = new DrugSearch();
@@ -525,7 +525,7 @@ public class RxDrugData {
 	 * Get drug list by partial search string Version 2.
 	 * All drugs, All classes, All activity
 	 * @param searchStr
-	 * @return
+	 * @return DrugSearch
 	 */
 	public DrugSearch listDrug2(String searchStr){
 		DrugSearch drugSearch = new DrugSearch();
@@ -548,7 +548,7 @@ public class RxDrugData {
 	 * Get all drugs by search string and specific route.
 	 * @param searchStr
 	 * @param searchRoute
-	 * @return
+	 * @return DrugSearch
 	 */
 	public DrugSearch listDrugByRoute(String searchStr, String searchRoute){
 		DrugSearch drugSearch = new DrugSearch();
@@ -570,7 +570,7 @@ public class RxDrugData {
 	/**
 	 * Get all drugs that contain specific Element (partial)
 	 * @param searchStr
-	 * @return
+	 * @return DrugSearch
 	 */
 	public DrugSearch listDrugFromElement(String searchStr){
 		DrugSearch drugSearch = new DrugSearch();
@@ -591,7 +591,7 @@ public class RxDrugData {
 	/**
 	 * Get drug with DrugRef ID key
 	 * @param pKey
-	 * @return
+	 * @return DrugMonograph
 	 * @throws Exception
 	 */
 	public DrugMonograph getDrug(String pKey) throws Exception{
@@ -603,7 +603,7 @@ public class RxDrugData {
 	/**
 	 * Get drug with DrugRef ID key. Version 2
 	 * @param pKey
-	 * @return
+	 * @return DrugMonograph
 	 * @throws Exception
 	 */
 	public DrugMonograph getDrug2(String pKey) throws Exception{
@@ -614,7 +614,7 @@ public class RxDrugData {
 	/**
 	 * Get the drug package data by a Regional DIN number.
 	 * @param DIN
-	 * @return
+	 * @return DrugMonograph
 	 * @throws Exception
 	 */
 	public DrugMonograph getDrugByDIN(String DIN) throws Exception{
@@ -627,7 +627,7 @@ public class RxDrugData {
 	/**
 	 * Get the drug form (packaging) with DrugRef ID.
 	 * @param pKey
-	 * @return
+	 * @return String
 	 * @throws Exception
 	 */
 	public String getDrugForm(String pKey) throws Exception {
@@ -641,7 +641,7 @@ public class RxDrugData {
 	 * Be careful. A Generic Drug will not have a accurate 
 	 * Generic Name.
 	 * @param pKey
-	 * @return
+	 * @return String
 	 * @throws Exception
 	 */
 	public String getGenericName(String pKey) throws Exception{
@@ -655,7 +655,7 @@ public class RxDrugData {
 	 * Get drug Generic Name with DrugRef ID.
 	 * Overload method.
 	 * @param pKey
-	 * @return
+	 * @return String
 	 * @throws Exception
 	 */
 	public String getGenericName(int pKey) throws Exception{
@@ -665,7 +665,7 @@ public class RxDrugData {
 	/**
 	 * Get the drug form (packaging) with Drug Code??.
 	 * @param drugCode
-	 * @return
+	 * @return ArrayList
 	 */
 	@Deprecated
 	public ArrayList getFormFromDrugCode(String drugCode){
@@ -840,7 +840,7 @@ public class RxDrugData {
 	/**
 	 * Get a list of Interactions from a list of ATC Codes.
 	 * @param atcCodes
-	 * @return
+	 * @return Interaction[]
 	 * @throws Exception
 	 */
 	public Interaction[] getInteractions(Vector atcCodes) throws Exception{
