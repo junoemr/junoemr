@@ -148,18 +148,19 @@ $scope.changeTab = function(temp,filter){
 				function success(response)
 				{
 
+
 					$scope.template = tab.template;
 					Navigation.load($scope.template);
 
 					$scope.currentPage = 0;
 
-					if (response.patients instanceof Array) {
-						$scope.patients = response.patients;
-					} else if(response.patients == undefined) {
+					if (response.data.patients instanceof Array) {
+						$scope.patients = response.data.patients;
+					} else if(response.data.patients == undefined) {
 						$scope.patients = [];
 					} else {
 						var arr = new Array();
-						arr[0] = response.patients;
+						arr[0] = response.data.patients;
 						$scope.patients = arr;
 					}
 
