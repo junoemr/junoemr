@@ -31,7 +31,7 @@
 		</div>
 	</div>
 
-	<div class="row">
+	<div class="row margin-bottom">
 		<div class="col-md-12" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 			<ul class="nav nav-pills">
 				<li ng-class="isCurrentStatus('none')"><a data-target="#all" ng-click="removeFilter(0)" data-toggle="tab" class="hand-hover">All</a></li>
@@ -43,7 +43,7 @@
 		</div><!-- middleSpace -->
 	</div>
 	<div class="row">
-		<div class="col-md-3" ng-show="page.canRead">
+		<div class="col-md-3 margin-bottom" ng-show="page.canRead">
 			<fieldset class="summary-section" ng-repeat="mod in page.columnOne.modules">
 				<div class="row vertical-align">
 					<div class="col-md-8 col-sm-8">
@@ -100,27 +100,77 @@
 		<div class="col-md-6" id="middleSpace" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 			<div class="tab-content">
 				<div class="tab-pane active" id="all">
-					<dl infinite-scroll="addMoreItems()">
+					<%--<dl infinite-scroll="addMoreItems()">
 						<dt ng-style="setColor(note)" ng-repeat-start="note in page.notes.notelist" ng-show="showNoteHeader(note)">
-							<%-- div class="btn-group btn-group-xs pull-right">
-							<button class="btn btn-default btn-xs" type="button">
-								edit 
-							</button>
-							<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
-								<span class="caret"></span>
-								<span class="sr-only">Toggle Dropdown</span>
-							</button>
-							<ul class="dropdown-menu" role="menu">
-								<li><a href="#">print</a></li> <li><a href="#">annotate</a></li><li><a href="#">set Encounter Date</a></li><li><a href="#">set Encounter Type</a></li>
-							</ul>
-							</div --%>{{note.observationDate | date : 'dd-MMM-yyyy'}} {{firstLine(note)}} <input type="checkbox" ng-model="note.isSelected" class="pull-right" style="margin-right:3px;"/>
+								<div class="btn-group btn-group-xs pull-right">
+								<button class="btn btn-default btn-xs" type="button">
+										edit 
+								</button>
+								<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+										<span class="caret"></span>
+										<span class="sr-only">Toggle Dropdown</span>
+								</button>
+								<ul class="dropdown-menu" role="menu">
+										<li><a href="#">print</a></li> <li><a href="#">annotate</a></li><li><a href="#">set Encounter Date</a></li><li><a href="#">set Encounter Type</a></li>
+								</ul>
+								</div>{{note.observationDate | date : 'dd-MMM-yyyy'}} {{firstLine(note)}} <input type="checkbox" ng-model="note.isSelected" class="pull-right" style="margin-right:3px;"/>
 						</dt>
 						<dd ng-repeat-end  ng-show="showNote(note)"><pre ng-class="isNoteBeingEdited(note)" style="margin-bottom:0px;" ng-show="showNote(note)" ng-hide="note.cpp==true" ng-dblclick="editNote(note)">{{note.note}}</pre>
-							<h6 style="margin-top:1px;margin-bottom:0px;"><bean:message key="oscarEncounter.editors.title"/>: <small>{{note.editorNames}}</small> <span class="pull-right"><bean:message key="oscarEncounter.encounterDate.title"/>: <small>{{note.observationDate | date: 'medium'}}</small> <bean:message key="oscarEncounter.noteRev.title"/>: <small ng-click="openRevisionHistory(note)" class="hand-hover">{{note.revision}}</small></span></h6>
+								<h6 style="margin-top:1px;margin-bottom:0px;"><bean:message key="oscarEncounter.editors.title"/>: <small>{{note.editorNames}}</small> <span class="pull-right"><bean:message key="oscarEncounter.encounterDate.title"/>: <small>{{note.observationDate | date: 'medium'}}</small> <bean:message key="oscarEncounter.noteRev.title"/>: <small ng-click="openRevisionHistory(note)" class="hand-hover">{{note.revision}}</small></span></h6>
 
-							<h6 style="margin-top:0px;"><bean:message key="oscarEncounter.assignedIssues.title"/>: <small>{{note.issueDescriptions}}</small> <span class="pull-right"><bean:message key="oscarEncounter.encType.title"/>: <small>{{note.encounterType}}</small></span></h6>
-						</dd>					
-					</dl>
+								<h6 style="margin-top:0px;"><bean:message key="oscarEncounter.assignedIssues.title"/>: <small>{{note.issueDescriptions}}</small> <span class="pull-right"><bean:message key="oscarEncounter.encType.title"/>: <small>{{note.encounterType}}</small></span></h6>
+						</dd>                                   
+					</dl>--%>
+
+					<div class="container" infinite-scroll="addMoreItems()">
+						
+						<div class="container note" ng-repeat="note in page.notes.notelist" >
+							<div class="row note-header" ng-show="showNoteHeader(note)">
+								<div class="col-md-1 pull-left">
+									<input type="checkbox" ng-model="note.isSelected"/> 
+								</div>
+								<div class="col-md-6 pull-left note-header-name">
+									<h5>{{firstLine(note)}}</h5>
+								</div>
+								<div class="col-md-4 note-header-date pull-right">
+									<h6>{{note.observationDate | date : 'dd-MMM-yyyy'}}</h6>
+								</div>
+							</div>
+							<div class="row note-body" ng-class="isNoteBeingEdited(note)" ng-show="showNote(note)"  ng-hide="note.cpp==true" ng-dblclick="editNote(note)">
+								<p >
+									{{note.note}}
+								</p>
+								<hr class="note-divider">
+							</div>
+
+							<div class="row note-footer" ng-show="showNote(note)">
+								<div class="col-md-9">
+									<div class="p-inline">
+										<p class="text-muted"><bean:message key="oscarEncounter.editors.title"/>:</p>
+										<p>{{note.editorNames}}</p>
+									</div>
+
+									<div class="p-inline">
+										<p class="text-muted"><bean:message key="oscarEncounter.assignedIssues.title"/>:</p> 
+										<p>{{note.issueDescriptions}}</p> 
+									</div>
+								</div>
+
+								<div class="col-md-3 note-footer-right">
+									<div class="p-inline">
+										<p class="text-muted"><bean:message key="oscarEncounter.noteRev.title"/>:</p>
+										<p ng-click="openRevisionHistory(note)" class="hand-hover">{{note.revision}}</p>
+									</div>
+
+									<div class="p-inline">
+										<p class="text-muted"><bean:message key="oscarEncounter.encType.title"/>:</p> 
+										<p>{{note.encounterType}}</p>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+					</div>
 				</div>
 
 				<div class="tab-pane" id="tracker">
