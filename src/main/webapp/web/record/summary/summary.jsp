@@ -65,7 +65,7 @@
 							ng-if="mod.summaryCode=='othermeds' || mod.summaryCode=='ongoingconcerns' || 
 							mod.summaryCode=='medhx' || mod.summaryCode=='sochx' || mod.summaryCode=='famhx' || 
 							mod.summaryCode=='reminders' || mod.summaryCode=='riskfactors' || mod.summaryCode=='riskfactors' ">
-								Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
+							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</a>
 
 						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" ng-click="openRx(demographicNo)" ng-if="mod.summaryCode=='meds'">
@@ -85,7 +85,7 @@
 
 				<ul class="list-unstyled" style="padding-left:5px;">
 					<%-- href="{{item.action}}" --%>
-					<li ng-repeat="item in mod.summaryItem" ng-show="$index < mod.displaySize"><p><span class="pull-right">{{item.date | date : 'dd MMM yyyy'}}</span></p><a ng-click="gotoState(item,mod,item.id)" href="javascript:void(0)" ng-class="item.indicatorClass" popover="{{item.displayName}} {{item.warning}}" popover-trigger="mouseenter">{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}<small ng-show="item.classification">({{item.classification}})</small></a> </li> 			
+					<li ng-repeat="item in mod.summaryItem" ng-show="$index < mod.displaySize"><p><span class="pull-right">{{item.date | date : 'dd MMM yyyy'}}</span></p><a ng-click="gotoState(item,mod,item.id)" href="javascript:void(0)" ng-class="item.indicatorClass">{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}<small ng-show="item.classification">({{item.classification}})</small></a> </li> 			
 					<%--<a href="#" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-click="openPreventions(demographicNo)" ng-show="mod.summaryCode=='preventions'"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>
 					<a href="#" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-click="gotoState('add', mod)" ng-hide="mod.summaryCode=='meds' || mod.summaryCode=='assessments' || mod.summaryCode=='allergies' || mod.summaryCode=='preventions' || page.cannotAdd"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>
 					<a href="#" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-click="openRx(demographicNo)" ng-show="mod.summaryCode=='meds'"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>
