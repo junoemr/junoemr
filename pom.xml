@@ -1725,8 +1725,9 @@
 				<!-- default context path for embedded tomcat -->
 				<!-- override with -Dmaven.tomcat.path=/the-path -->
 				<!-- the external properties file will be loaded using this name -->
-				<!-- from the ${user.home} directory, e.g. ~/junodev.properties -->
-				<maven.tomcat.path>/junodev</maven.tomcat.path>
+				<!-- from the ${user.home} directory, e.g. ~/the-path.properties -->
+				<!-- with / context path it uses ~/localhost.properties) -->
+				<maven.tomcat.path>/</maven.tomcat.path>
 				<!-- default host name for embedded tomcat -->
 				<!-- override with -Dmaven.tomcat.hostname=the-host-name -->
 				<maven.tomcat.hostname>${env.HOSTNAME}</maven.tomcat.hostname>
