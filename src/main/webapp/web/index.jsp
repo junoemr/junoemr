@@ -57,15 +57,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 <%-- combined and minified CSS from compiled SCSS --%>
 <link href="dist/juno.min.css" rel="stylesheet">
 
-<%-- TODO include in Juno SCSS/CSS --%>
-<link href="css/navbar-fixed-top.css" rel="stylesheet">
-<link href="css/navbar-demo-search.css" rel="stylesheet">
-<link href="css/patient-list.css" rel="stylesheet">
-<link href="css/index.css" rel="stylesheet">
-<link href="css/patient-list.css" rel="stylesheet">
-<link href="css/record.css" rel="stylesheet">
+<%-- TODO move to a SCSS file and include in Juno SCSS/CSS --%>
 <link href="../library/bootstrap/3.0.0/assets/css/bootstrap3_badge_colours.css" rel="stylesheet">
-
 
 </head>
 

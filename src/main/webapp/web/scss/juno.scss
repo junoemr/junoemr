@@ -12,6 +12,13 @@
 // Global stuff
 @import "global";
 
+// TODO: pre-existing CSS files, need to be reorganized
+@import "navbar-fixed-top";
+@import "navbar-demo-search";
+@import "patient-list";
+@import "index";
+@import "record";
+
 // Section-specific things
 @import "../dashboard/dashboard";
 
