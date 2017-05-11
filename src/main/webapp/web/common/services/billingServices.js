@@ -1,3 +1,5 @@
+'use strict';
+
 /*
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
@@ -23,8 +25,7 @@
     Ontario, Canada
 
 */
-angular.module("billingServices", [])
-.service("billingService", [
+angular.module("billingServices", []).service("billingService", [
 	'$http', '$q',
 	function ($http, $q)
 	{

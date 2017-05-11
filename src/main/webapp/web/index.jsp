@@ -86,7 +86,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 			 				<span class="input-group-addon btn-default hand-hover" ng-click="goToPatientSearch()" title="<bean:message key="navbar.searchPatients" bundle="ui"/>"><span class="glyphicon glyphicon-search" ></span></span>
 						</div>
 					</div>
-					<a class="btn btn btn-success hand-hover" id="add-patient" ng-click="newDemographic('sm')" title="<bean:message key="navbar.newPatient" bundle="ui"/>">Add Patient</a>
+					<a class="btn btn btn-success hand-hover" id="add-patient" ng-click="newDemographic()" title="<bean:message key="navbar.newPatient" bundle="ui"/>">Add Patient</a>
 				</form>
 
 				<!-- large view -->
@@ -309,6 +309,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 	<script type="text/javascript" src="common/bodyController.js"></script>
 	<script type="text/javascript" src="common/navBarController.js"></script>
+
+	<script type="text/javascript" src="patient/newPatientController.js"></script>
 
 	<script type="text/javascript" src="dashboard/dashboardController.js"></script>
 	<script type="text/javascript" src="patientlist/patientListController.js"></script>

@@ -1,3 +1,5 @@
+'use strict';
+
 /*
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
@@ -23,25 +25,49 @@
     Ontario, Canada
 
 */
-angular.module("programServices", [])
-	.service("programService", function ($http,$q,$log) {
-		return {
-		apiPath:'../ws/rs/',
-		configHeaders: {headers: {"Content-Type": "application/json","Accept":"application/json"}},
-		configHeadersWithCache: {headers: {"Content-Type": "application/json","Accept":"application/json"},cache: true},
-		
-        getPrograms: function () {
-            var deferred = $q.defer();
-            $http.get(this.apiPath+'program/programList',this.configHeadersWithCache).success(function(data){
-            	console.log(data);
-            	deferred.resolve(data.content);
-            }).error(function(){
-            	console.log("error fetching program list");
-            	deferred.reject("An error occured while fetching program list");
-            });
-     
-          return deferred.promise;
-            
-        }
-    };
-});
+angular.module("programServices", []).service("programService", [
+	'$http', '$q',
+	function ($http, $q)
+	{
+		var service = {};
+
+		service.apiPath = '../ws/rs/';
+
+		service.configHeaders = {
+			headers: {
+				"Content-Type": "application/json",
+				"Accept":"application/json"
+			}
+		};
+
+		service.configHeadersWithCache = {
+			headers: {
+				"Content-Type": "application/json",
+				"Accept":"application/json"
+			},
+			cache: true
+		};
+
+		service.getPrograms = function getPrograms()
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'program/programList',
+				service.configHeadersWithCache).then(
+				function success(response)
+				{
+        	console.log(response.data);
+        	deferred.resolve(response.data.content);
+        },
+        function error(error)
+        {
+        	console.log("error fetching program list");
+        	deferred.reject("An error occured while fetching program list");
+        });
+
+			return deferred.promise;
+		};
+
+    return service;
+  }
+]);
