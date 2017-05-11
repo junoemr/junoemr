@@ -62,7 +62,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 </head>
 
-<body ng-controller="OscarCtrl">
+<body ng-controller="BodyCtrl">
 
 	<!-- Fixed navbar -->
 	<div class="navbar navbar-default navbar-fixed-top" ng-controller="NavBarCtrl" ng-show="me != null" ng-cloak>
@@ -283,6 +283,10 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<!-- build:js js/scripts.js -->
 	<script type="text/javascript" src="../share/javascript/Oscar.js"></script>
 
+	<script type="text/javascript" src="app.js"></script>
+
+	<script type="text/javascript" src="common/filters.js"></script>
+
 	<script type="text/javascript" src="common/services/demographicServices.js"></script>
 	<script type="text/javascript" src="common/services/programServices.js"></script>
 	<script type="text/javascript" src="common/services/scheduleServices.js"></script>
@@ -303,12 +307,10 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="common/services/appServices.js"></script>
 	<script type="text/javascript" src="common/services/diseaseRegistryServices.js"></script>
 
-	<script type="text/javascript" src="filters.js"></script>
-	<script type="text/javascript" src="app.js"></script>
-
-	<script type="text/javascript" src="oscarController.js"></script>
-	<script type="text/javascript" src="dashboard/dashboardController.js"></script>
+	<script type="text/javascript" src="common/bodyController.js"></script>
 	<script type="text/javascript" src="common/navBarController.js"></script>
+
+	<script type="text/javascript" src="dashboard/dashboardController.js"></script>
 	<script type="text/javascript" src="patientlist/patientListController.js"></script>
 	<script type="text/javascript" src="record/recordController.js"></script>
 	<script type="text/javascript" src="record/summary/summaryController.js"></script>
