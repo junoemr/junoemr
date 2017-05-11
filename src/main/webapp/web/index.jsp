@@ -283,25 +283,25 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<!-- build:js js/scripts.js -->
 	<script type="text/javascript" src="../share/javascript/Oscar.js"></script>
 
-	<script type="text/javascript" src="common/demographicServices.js"></script>
-	<script type="text/javascript" src="common/programServices.js"></script>
-	<script type="text/javascript" src="common/scheduleServices.js"></script>
-	<script type="text/javascript" src="common/securityServices.js"></script>
-	<script type="text/javascript" src="common/staticDataServices.js"></script>
-	<script type="text/javascript" src="common/billingServices.js"></script>
-	<script type="text/javascript" src="common/ticklerServices.js"></script>
-	<script type="text/javascript" src="common/formServices.js"></script>
-	<script type="text/javascript" src="common/noteServices.js"></script>
-	<script type="text/javascript" src="common/providerServices.js"></script>
-	<script type="text/javascript" src="common/patientDetailStatusServices.js"></script>
-	<script type="text/javascript" src="common/uxServices.js"></script>
-	<script type="text/javascript" src="common/messageServices.js"></script>
-	<script type="text/javascript" src="common/inboxServices.js"></script>
-	<script type="text/javascript" src="common/k2aServices.js"></script>
-	<script type="text/javascript" src="common/personaServices.js"></script>
-	<script type="text/javascript" src="common/consultServices.js"></script>
-	<script type="text/javascript" src="common/appServices.js"></script>
-	<script type="text/javascript" src="common/diseaseRegistryServices.js"></script>
+	<script type="text/javascript" src="common/services/demographicServices.js"></script>
+	<script type="text/javascript" src="common/services/programServices.js"></script>
+	<script type="text/javascript" src="common/services/scheduleServices.js"></script>
+	<script type="text/javascript" src="common/services/securityServices.js"></script>
+	<script type="text/javascript" src="common/services/staticDataServices.js"></script>
+	<script type="text/javascript" src="common/services/billingServices.js"></script>
+	<script type="text/javascript" src="common/services/ticklerServices.js"></script>
+	<script type="text/javascript" src="common/services/formServices.js"></script>
+	<script type="text/javascript" src="common/services/noteServices.js"></script>
+	<script type="text/javascript" src="common/services/providerServices.js"></script>
+	<script type="text/javascript" src="common/services/patientDetailStatusServices.js"></script>
+	<script type="text/javascript" src="common/services/uxServices.js"></script>
+	<script type="text/javascript" src="common/services/messageServices.js"></script>
+	<script type="text/javascript" src="common/services/inboxServices.js"></script>
+	<script type="text/javascript" src="common/services/k2aServices.js"></script>
+	<script type="text/javascript" src="common/services/personaServices.js"></script>
+	<script type="text/javascript" src="common/services/consultServices.js"></script>
+	<script type="text/javascript" src="common/services/appServices.js"></script>
+	<script type="text/javascript" src="common/services/diseaseRegistryServices.js"></script>
 
 	<script type="text/javascript" src="filters.js"></script>
 	<script type="text/javascript" src="app.js"></script>
