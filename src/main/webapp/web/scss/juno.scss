@@ -1,24 +1,17 @@
-
 // Less Variables
 @import "variables";
-
 // Custom Bootstrap
-@import "bootstrap/bootstrap";
+@import "bootstrap/bootstrap_variables";
 @import "../bower_components/bootstrap-sass/assets/stylesheets/bootstrap";
-
 // bootstrap-timepicker does not provide a CSS file so compile as SCSS
 @import "bootstrap-timepicker/timepicker";
-
 // Global stuff
 @import "global";
-
 // TODO: pre-existing CSS files, need to be reorganized
 @import "navbar-fixed-top";
 @import "navbar-demo-search";
 @import "patient-list";
 @import "index";
 @import "record";
-
 // Section-specific things
 @import "../dashboard/dashboard";
-
