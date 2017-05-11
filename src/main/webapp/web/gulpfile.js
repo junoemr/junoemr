@@ -8,18 +8,19 @@ var paths = {
     dest: './dist/'
 };
 
-gulp.task('sass', function () {
+gulp.task('sass', function() {
 
-	// compiles juno.scss to juno.css
-	gulp.src(paths.scss)
-		.pipe(sass({
-			sourceComments: 'map',
-		  sourceMap: 'sass',
-		  outputStyle: 'nested' }).on('error', sass.logError))
-		.pipe(gulp.dest(paths.dest))
-		.pipe(cssmin({noRebase: true}))
-		.pipe(rename({suffix: '.min'}))
-		.pipe(gulp.dest(paths.dest));
+    // compiles juno.scss to juno.css
+    gulp.src(paths.scss)
+        .pipe(sass({
+            sourceComments: 'map',
+            sourceMap: 'sass',
+            outputStyle: 'nested'
+        }).on('error', sass.logError))
+        .pipe(gulp.dest(paths.dest));
+    // .pipe(cssmin({noRebase: true}))
+    // .pipe(rename({suffix: '.min'}))
+    // .pipe(gulp.dest(paths.dest));
 });
 
-gulp.task('default', [ 'sass' ], function () {});
+gulp.task('default', ['sass'], function() {});

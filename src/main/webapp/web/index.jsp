@@ -54,8 +54,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 <link href="bower_components/angular-loading-bar/build/loading-bar.min.css" rel="stylesheet">
 <link href="bower_components/components-font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
-<%-- combined and minified CSS from compiled SCSS --%>
-<link href="dist/juno.min.css" rel="stylesheet">
+<%-- combined CSS from compiled SCSS --%>
+<link href="dist/juno.css" rel="stylesheet">
 
 <%-- TODO move to a SCSS file and include in Juno SCSS/CSS --%>
 <link href="../library/bootstrap/3.0.0/assets/css/bootstrap3_badge_colours.css" rel="stylesheet">
