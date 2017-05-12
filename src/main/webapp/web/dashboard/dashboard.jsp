@@ -30,12 +30,12 @@
 
 <div ng-if="me != null">
 	<div id="dashboard-header" class="row">
-		<div class="col-md-9 col-sm-9">
+		<div class="col-md-9 col-xs-7">
 			<h3>
 				<bean:message key="dashboard.welcome" bundle="ui" /> to your dashboard, {{me.firstName}}!
 			</h3>
 		</div>
-		<div class="col-md-3 col-sm-3 pull-right">
+		<div class="col-md-3 col-xs-5 pull-right">
 			<p class="text-right">Today is {{displayDate() | date:'MMMM d, y'}}</p>
 		</div>
 	</div>
