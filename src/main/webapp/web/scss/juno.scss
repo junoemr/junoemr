@@ -3,6 +3,7 @@
 // Custom Bootstrap
 @import "bootstrap/bootstrap_variables";
 @import "../bower_components/bootstrap-sass/assets/stylesheets/bootstrap";
+@import "bootstrap/navbar";
 // bootstrap-timepicker does not provide a CSS file so compile as SCSS
 @import "bootstrap-timepicker/timepicker";
 // Global stuff
