@@ -277,7 +277,7 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
 	}
 
 	$scope.viewTickler = function(tickler) {
-        var modalInstance = $modal.open({
+        var modalInstance = $uibModal.open({
         	templateUrl: 'tickler/ticklerView.jsp',
             controller: 'TicklerViewController',
             backdrop: false,
@@ -310,7 +310,7 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
 	}
 
 	$scope.configureTicklers = function() {
-        var modalInstance = $modal.open({
+        var modalInstance = $uibModal.open({
         	templateUrl: 'tickler/configureDashboard.jsp',
             controller: 'TicklerConfigureController',
             backdrop: false,
@@ -337,21 +337,21 @@ oscarApp.controller('DashboardCtrl', function ($scope,providerService,ticklerSer
 });
 
 
-oscarApp.controller('TicklerConfigureController',function($scope,$modalInstance,personaService,prefs) {
+oscarApp.controller('TicklerConfigureController',function($scope,$uibModalInstance,personaService,prefs) {
 
 	$scope.prefs = prefs.dashboardPreferences;
 
 	   $scope.close = function () {
-		   $modalInstance.close(false);
+		   $uibModalInstance.close(false);
 	    }
 	    $scope.save = function () {
 
 	    	personaService.updateDashboardPreferences($scope.prefs).then(function(data){
-    			$modalInstance.close(true);
+    			$uibModalInstance.close(true);
 
 
     		}, function(reason){
-    			$modalInstance.close(false);
+    			$uibModalInstance.close(false);
     		});
 
 	    }

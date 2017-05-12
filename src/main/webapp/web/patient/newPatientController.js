@@ -105,7 +105,7 @@ oscarApp.controller('NewPatientCtrl', [
 					{
 						console.log(data);
 						$scope.demoRetVal = data;
-						$modalInstance.close(data);
+						$uibModalInstance.close(data);
 			    },
 			    function(errorMessage)
 			    {

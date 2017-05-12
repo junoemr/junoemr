@@ -1,5 +1,5 @@
-oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$location,$modal,consultService,demographicService,securityService,summaryService,staticDataService,consult,user) {
-	
+oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$location,$uibModal,consultService,demographicService,securityService,summaryService,staticDataService,consult,user) {
+
 	//get access rights
 	securityService.hasRight("_con", "r").then(function(data){
 		$scope.consultReadAccess=data;
@@ -10,19 +10,19 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 	securityService.hasRight("_con", "w").then(function(data){
 		$scope.consultWriteAccess=data;
 	});
-	
+
 	$scope.consult = consult;
-	
+
 	consult.letterheadList = toArray(consult.letterheadList);
 	consult.referringDoctorList = toArray(consult.referringDoctorList);
 	consult.faxList = toArray(consult.faxList);
 	consult.sendToList = toArray(consult.sendToList);
 	if (consult.referringDoctor==null) consult.referringDoctor = {};
-	
+
 	//set attachments
 	consult.attachments = toArray(consult.attachments);
 	sortAttachmentDocs(consult.attachments);
-	
+
 	//set default letterhead
 	if (consult.letterheadName==null) {
 		for (var i=0; i<consult.letterheadList.length; i++) {
@@ -34,19 +34,19 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 			}
 		}
 	}
-	
+
 	//set default fax if there's only 1
 	if (consult.letterheadFax==null && consult.faxList.length==1) {
 		consult.letterheadFax = consult.faxList[0].faxNumber;
 	}
-	
+
 	//show referringDoctor in list
 	angular.forEach(consult.referringDoctorList, function(referringDoc) {
 		if (referringDoc.id == consult.referringDoctor.id) {
 			consult.referringDoctor = referringDoc;
 		}
 	});
-	
+
 	//set patient cell phone
 	consult.demographic.extras = toArray(consult.demographic.extras);
 	for (var i=0; i<consult.demographic.extras.length; i++) {
@@ -55,7 +55,7 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 			break;
 		}
 	}
-	
+
 	//set appointment time
 	if (consult.appointmentTime!=null) {
 		var apptTime = new Date(consult.appointmentTime);
@@ -67,13 +67,13 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 	$scope.statuses = staticDataService.getConsultResponseStatuses();
 	$scope.hours = staticDataService.getHours();
 	$scope.minutes = staticDataService.getMinutes();
-	
+
 	//monitor data changed
 	$scope.consultChanged = -1;
 	$scope.$watchCollection("consult", function(){
 		$scope.consultChanged++;
 	});
-	
+
 	//remind user of unsaved data
 	$scope.$on("$stateChangeStart", function(event){
 		if ($scope.consultChanged>0) {
@@ -81,11 +81,11 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 			if (!discard) event.preventDefault();
 		}
 	});
-	
+
 	$scope.changeLetterhead = function(){
 		var index = $("#letterhead").val();
 		if (index==null) return;
-		
+
 		consult.letterheadAddress = consult.letterheadList[index].address;
 		consult.letterheadPhone = consult.letterheadList[index].phone;
 	};
@@ -100,7 +100,7 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 		else if (boxId=="concurrentProblems") consult.concurrentProblems = addNewLine(boxData, consult.concurrentProblems);
 		else if (boxId=="currentMeds") consult.currentMeds = addNewLine(boxData, consult.currentMeds);
 	}
-	
+
 	$scope.getFamilyHistory = function(boxId){
 		summaryService.getFamilyHistory(consult.demographic.demographicNo).then(function(data){ $scope.writeToBox(data, boxId); });
 	}
@@ -116,7 +116,7 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 	$scope.getReminders = function(boxId){
 		summaryService.getReminders(consult.demographic.demographicNo).then(function(data){ $scope.writeToBox(data, boxId); });
 	}
-	
+
 	$scope.invalidData = function(){
 		if ($scope.urgencies[$("#urgency").val()]==null) {
 			alert("Please select an Urgency"); return true;
@@ -132,7 +132,7 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 		}
 		return false;
 	}
-	
+
 	$scope.setAppointmentTime = function(){
 		if (consult.appointmentHour!=null && consult.appointmentMinute!=null) {
 			var apptTime = new Date();
@@ -143,18 +143,18 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 			consult.appointmentTime = apptTime;
 		}
 	}
-	
+
 	$scope.openAttach = function(attachment){
 		window.open("../"+attachment.url);
 	}
 
 	$scope.attachFiles = function(){
-		var modalInstance = $modal.open({
+		var modalInstance = $uibModal.open({
 			templateUrl: "consults/consultAttachment.jsp",
 			controller: AttachmentCtrl,
 			windowClass: "attachment-modal-window"
 		});
-		
+
 		modalInstance.result.then(function(){
 			if (consult.attachmentsChanged) {
 				$scope.consultChanged++;
@@ -164,13 +164,13 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 	}
 
 	//attachment modal controller
-	function AttachmentCtrl($scope, $modalInstance) {
+	function AttachmentCtrl($scope, $uibModalInstance) {
 		$scope.atth = {};
 		$scope.atth.patientName = consult.demographic.lastName + ", " + consult.demographic.firstName;
-		
+
 		$scope.atth.attachedDocs = consult.attachments;
 		if ($scope.atth.attachedDocs[0]!=null) $scope.atth.selectedAttachedDoc = $scope.atth.attachedDocs[0];
-		
+
 		var consultId = 0;
 		if (consult.id!=null) consultId = consult.id;
 		consultService.getResponseAttachments(consultId, consult.demographic.demographicNo).then(function(data){
@@ -179,11 +179,11 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 			sortAttachmentDocs($scope.atth.availableDocs);
 			if ($scope.atth.availableDocs[0]!=null) $scope.atth.selectedAvailableDoc = $scope.atth.availableDocs[0];
 		});
-		
+
 		$scope.openDoc = function(doc){
 			window.open("../"+doc.url);
 		}
-		
+
 		$scope.attach = function(){
 			if ($scope.atth.selectedAvailableDoc==null) return;
 
@@ -191,38 +191,38 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 			$scope.atth.selectedAttachedDoc = $scope.atth.selectedAvailableDoc;
 			$scope.atth.selectedAttachedDoc.attached = true;
 			sortAttachmentDocs($scope.atth.attachedDocs);
-			
+
 			var x = $("#selAvailDoc").val();
 			$scope.atth.availableDocs.splice(x, 1);
 			if (x>=$scope.atth.availableDocs.length) x = $scope.atth.availableDocs.length-1;
 			$scope.atth.selectedAvailableDoc = $scope.atth.availableDocs[x];
-			
+
 			consult.attachmentsChanged = true;
 		}
-		
+
 		$scope.detach = function(){
 			if ($scope.atth.selectedAttachedDoc==null) return;
-			
+
 			$scope.atth.availableDocs.push($scope.atth.selectedAttachedDoc);
 			$scope.atth.selectedAvailableDoc = $scope.atth.selectedAttachedDoc;
 			$scope.atth.selectedAvailableDoc.attached = false;
 			sortAttachmentDocs($scope.atth.availableDocs);
-			
+
 			var x = $("#selAttachDoc").val();
 			$scope.atth.attachedDocs.splice(x, 1);
 			if (x>=$scope.atth.attachedDocs.length) x = $scope.atth.attachedDocs.length-1;
 			$scope.atth.selectedAttachedDoc = $scope.atth.attachedDocs[x];
-			
+
 			consult.attachmentsChanged = true;
 		}
-		
+
 		$scope.done = function() {
-			$modalInstance.close();
+			$uibModalInstance.close();
 		}
 	}
 	//end modal controller
-	
-	
+
+
 	$scope.save = function(){
 		if (!$scope.consultWriteAccess && consult.id==null) {
 			alert("You don't have right to save new consult");
@@ -232,12 +232,12 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 			alert("You don't have right to update consult");
 			return false;
 		}
-		
+
 		if ($scope.invalidData()) return false;
 
 		$scope.consultSaving = true; //show saving banner
 		$scope.setAppointmentTime();
-		
+
 		consultService.saveResponse(consult).then(function(data){
 			//update url for new consultation
 			if (consult.id==null) $location.path("/record/"+consult.demographic.demographicNo+"/consultResponse/"+data.id);
@@ -246,29 +246,29 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 		$scope.consultChanged = -1; //reset change count
 		return true;
 	}
-	
+
 	$scope.close = function(){
 		if ($location.search().list=="patient") $location.path("/record/"+consult.demographic.demographicNo+"/consultResponses");
 		else $location.path("/consultResponses");
 	}
-	
+
 	//fax & print functions
 	var p_page1 = "<html><style>body{width:800px;font-family:arial,verdana,tahoma,helvetica,sans serif}table{width:100%}th{text-align:left;font-weight:bold;width:1;white-space:nowrap}td{vertical-align:top}label{font-weight:bold}em{font-size:small}.large{font-size:large}.center{text-align:center}</style><style media='print'>button{display:none}.noprint{display:none}</style><script>function printAttachments(url){window.open('../'+url);}</script><body>";
-	
+
 	$scope.sendFax = function(){
 		var p_urgency = noNull($scope.urgencies[$("#urgency").val()].name);
 		var p_letterheadName = noNull(consult.letterheadList[$("#letterhead").val()].name);
 		var p_page2 = getPrintPage2(p_urgency, p_letterheadName, consult, user);
-		
+
 		var consultResponsePage = encodeURIComponent(p_page1 + p_page2);
 		var reqId = consult.id;
 		var demographicNo = consult.demographic.demographicNo;
 		var letterheadFax = noNull(consult.letterheadFax);
 		var fax = noNull(consult.referringDoctor.faxNumber);
-		
+
 		window.open("../fax/CoverPage.jsp?consultResponsePage="+consultResponsePage+"&reqId="+reqId+"&demographicNo="+demographicNo+"&letterheadFax="+letterheadFax+"&fax="+fax);
 	}
-	
+
 	$scope.printPreview = function(){
 		if ($scope.invalidData()) return;
 
@@ -280,11 +280,11 @@ oscarApp.controller('ConsultResponseCtrl', function ($scope,$http,$resource,$loc
 		for (var i=0; i<consult.attachments.length; i++) {
 			p_attachments += "<div class='noprint'><button onclick=printAttachments('"+consult.attachments[i].url+"')>Print attachment</button> "+consult.attachments[i].displayName+"</div>";
 		}
-		
+
 		var p_urgency = noNull($scope.urgencies[$("#urgency").val()].name);
 		var p_letterheadName = noNull(consult.letterheadList[$("#letterhead").val()].name);
 		var p_page2 = getPrintPage2(p_urgency, p_letterheadName, consult, user);
-		
+
 		printWin.document.write(p_page1 + p_buttons + p_attachments + p_page2);
 		printWin.document.close();
 	}
@@ -342,10 +342,10 @@ function sortAttachmentDocs(arrayOfDocs) {
 
 function addNewLine(line, mssg) {
 	if (line==null || line.trim()=="") return mssg;
-	
+
 	if (mssg==null || mssg.trim()=="") mssg = line.trim();
 	else mssg += "\n" + line.trim();
-	
+
 	return mssg;
 }
 
@@ -382,7 +382,7 @@ function getPrintPage2(p_urgency, p_letterheadName, consult, user) {
 	var p_currentMeds = noNull(consult.currentMeds);
 	var p_allergies = noNull(consult.allergies);
 	var p_provider = noNull(user.lastName)+", "+noNull(user.firstName);
-	
+
 	return "<div class='center'><label class='large'>"+p_clinicName+"</label><br/><label>Consultation Response</label><br/></div><br/><table><tr><td><label>Date: </label>"+p_responseDate+"</td><td rowspan=6 width=10></td><td><label>Status: </label>"+p_urgency+"</td></tr><tr><td colspan=2></td></tr><tr><th>FROM:</th><th>TO:</th></tr><tr><td><p class='large'>"+p_letterheadName+"</p>"+p_letterheadAddress+"<br/><label>Tel: </label>"+p_letterheadPhone+"<br/><label>Fax: </label>"+p_letterheadFax+"</td><td><table><tr><th>Referring Doctor:</th><td>"+p_consultantName+"</td></tr><tr><th>Phone:</th><td>"+p_consultantPhone+"</td></tr><tr><th>Fax:</th><td>"+p_consultantFax+"</td></tr><tr><th>Address:</th><td>"+p_consultantAddress+"</td></tr></table></td></tr><tr><td colspan=2></td></tr><tr><td><table><tr><th>Patient:</th><td>"+p_patientName+"</td></tr><tr><th>Address:</th><td>"+p_patientAddress+"</td></tr><tr><th>Phone:</th><td>"+p_patientPhone+"</td></tr><tr><th>Work Phone:</th><td>"+p_patientWorkPhone+"</td></tr><tr><th>Birthdate:</th><td>"+p_patientBirthdate+"</td></tr></table></td><td><table><tr><th>Sex:</th><td>"+p_patientSex+"</td></tr><tr><th>Health Card No:</th><td>"+p_patientHealthCardNo+"</td></tr><tr><th>Appointment date:</th><td>"+p_appointmentDate+"</td></tr><tr><th>Appointment time:</th><td>"+p_appointmentTime+"</td></tr><tr><th>Chart No:</th><td>"+p_patientChartNo+"</td></tr></table></td></tr></table><br/><table><tr><th>Examination:</th></tr><tr><td>"+p_examination+"<hr></td></tr><tr><th>Impression:</th></tr><tr><td>"+p_impression+"<hr></td></tr><tr><th>Plan:</th></tr><tr><td>"+p_plan+"<hr></td></tr><tr><td></td></tr><tr><th>Reason for consultation: (Date: "+p_referralDate+")</th></tr><tr><td>"+p_reason+"<hr></td></tr><tr><th>Pertinent Clinical Information:</th></tr><tr><td>"+p_clinicalInfo+"<hr></td></tr><tr><th>Significant Concurrent Problems:</th></tr><tr><td>"+p_concurrentProblems+"<hr></td></tr><tr><th>Current Medications:</th></tr><tr><td>"+p_currentMeds+"<hr></td></tr><tr><th>Allergies:</th></tr><tr><td>"+p_allergies+"<hr></td></tr><tr><td><label>Consultant: </label>"+p_provider+"</td></tr><tr><td></td></tr><tr><td><div class='center'><em>Created by: OSCAR The open-source EMR www.oscarcanada.org</em></div></td></tr></table></body></html>";
 }
 /* html for fax & print, kept here for easy reference
@@ -413,14 +413,14 @@ function getPrintPage2(p_urgency, p_letterheadName, consult, user) {
 	<button onclick='window.print()'>Print</button>
 	<button onclick='window.close()'>Close</button>
 	<!-- p_buttons -->
-	
+
 	<!-- p_attachments, 1 or more -->
 	<div class='noprint'>
 		<button onclick=printAttachments('"+consult.attachments[i].url+"')>Print attachment</button> "+consult.attachments[i].displayName+"
 	</div>
 	<!-- p_attachments -->
 <!-- Print preview page exclusive -->
-	
+
 	<div class='center'>
 		<label class='large'>"+p_clinicName+"</label><br/>
 		<label>Consultation Response</label><br/>

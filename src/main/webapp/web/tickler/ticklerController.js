@@ -1,21 +1,21 @@
-oscarApp.controller('TicklerListCtrl', function($scope, $timeout, $resource, ngTableParams, securityService, $modal, $http, ticklerService, noteService, providers, providerService,$stateParams) {
+oscarApp.controller('TicklerListCtrl', function($scope, $timeout, $resource, ngTableParams, securityService, $uibModal, $http, ticklerService, noteService, providers, providerService,$stateParams) {
     var ticklerAPI = $resource('../ws/rs/tickler/ticklers');
-         
+
     $scope.lastResponse = "";
     $scope.providers = providers;
-    
-    
+
+
     securityService.hasRights({items:[{objectName:'_tickler',privilege:'w'},{objectName:'_tickler',privilege:'r'}]}).then(function(result){
     	if(result.content != null && result.content.length == 2) {
     		 $scope.ticklerWriteAccess = result.content[0];
         	 $scope.ticklerReadAccess = result.content[1];
-        	 
+
         	 if($scope.ticklerReadAccess) {
 
         		//object which represents all the filters, initialize status.
         		    $scope.search = {status:'A'};
-        		    
-        		    
+
+
         		    $scope.tableParams = new ngTableParams({
         		        page: 1,            // show first page
         		        count: 10
@@ -29,19 +29,19 @@ oscarApp.controller('TicklerListCtrl', function($scope, $timeout, $resource, ngT
         		        	$scope.search.includeComments='true';
         		        	$scope.search.includeUpdates='true';
         		        	$scope.search.includeProgram=true;
-        		        	
+
         		        	if(angular.isDefined($stateParams.demographicNo)){
         		        		$scope.search.demographicNo = $stateParams.demographicNo;
         		        	}
-        		        	
+
         		        	ticklerAPI.get($scope.search, function(data) {
         		                $timeout(function() {
-        		                	
+
         		                    // update table params
         		                    params.total(data.total);
         		                    // set new data
         		                    $defer.resolve(data.tickler);
-        		                    
+
         		                    $scope.lastResponse = data.tickler;
         		                }, 500);
         		            });
@@ -54,33 +54,33 @@ oscarApp.controller('TicklerListCtrl', function($scope, $timeout, $resource, ngT
     },function(reason){
     	alert(reason);
     });
-  
 
-    
-    
+
+
+
     $scope.doSearch = function() {
     	$scope.tableParams.reload();
     }
-    
+
     $scope.clear = function() {
     	$scope.search = angular.copy({status:'A'});
     	$scope.tableParams.reload();
     }
-    
-   
-    
+
+
+
     $scope.checkAll = function() {
         angular.forEach($scope.lastResponse, function (item) {
             item.checked = true;
         });
     }
-    
+
     $scope.checkNone = function() {
     	angular.forEach($scope.lastResponse, function (item) {
             item.checked = false;
         })
     }
-    
+
     $scope.completeTicklers = function() {
     	var selectedTicklers = new Array();
         angular.forEach($scope.lastResponse, function (item) {
@@ -88,7 +88,7 @@ oscarApp.controller('TicklerListCtrl', function($scope, $timeout, $resource, ngT
             	selectedTicklers.push(item.id);
             }
         });
-  
+
         ticklerService.setCompleted(selectedTicklers).then(function(data){
         	$scope.tableParams.reload();
         },function(reason){
@@ -102,26 +102,26 @@ oscarApp.controller('TicklerListCtrl', function($scope, $timeout, $resource, ngT
             	selectedTicklers.push(item.id);
             }
         });
-        
+
         ticklerService.setDeleted(selectedTicklers).then(function(data){
         	$scope.tableParams.reload();
         },function(reason){
         	alert(reason);
         });
-        
+
     }
-    
+
     $scope.addTickler = function() {
     	var windowProps = "height=400,width=600,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
     	//window.open('../tickler/ticklerAdd.jsp','ticklerAdd',windowProps);
-    	
-      	var modalInstance = $modal.open({
+
+      	var modalInstance = $uibModal.open({
         	templateUrl: 'tickler/ticklerAdd.jsp',
             controller: 'TicklerAddController',
             backdrop: false,
             size: 'lg'
         });
-        
+
         modalInstance.result.then(function(data){
         	console.log('data from modalInstance '+data);
         	if(data != null && data == true) {
@@ -130,13 +130,13 @@ oscarApp.controller('TicklerListCtrl', function($scope, $timeout, $resource, ngT
         },function(reason){
         	alert(reason);
         });
-        
-        
+
+
     }
-    
+
     $scope.editTickler = function(tickler) {
-    	
-        var modalInstance = $modal.open({
+
+        var modalInstance = $uibModal.open({
         	templateUrl: 'tickler/ticklerView.jsp',
             controller: 'TicklerViewController',
             backdrop: false,
@@ -156,7 +156,7 @@ oscarApp.controller('TicklerListCtrl', function($scope, $timeout, $resource, ngT
                 }
             }
         });
-        
+
         modalInstance.result.then(function(data){
         	console.log('data from modalInstance '+data);
         	if(data != null && data == true) {
@@ -165,11 +165,11 @@ oscarApp.controller('TicklerListCtrl', function($scope, $timeout, $resource, ngT
         },function(reason){
         	alert(reason);
         });
-        
+
     }
-    
+
     $scope.editNote2 = function (tickler) {
-    	
+
     	noteService.getTicklerNote(tickler.id).then(function(data){
     		if(data.ticklerNote != null) {
         		$scope.ticklerNote = data.ticklerNote;
@@ -177,7 +177,7 @@ oscarApp.controller('TicklerListCtrl', function($scope, $timeout, $resource, ngT
         		$scope.ticklerNote = {"editor":"you","note":"","noteId":0,"observationDate":"now","revision":0};
 
         	}
-            var modalInstance = $modal.open({
+            var modalInstance = $uibModal.open({
             	templateUrl: 'tickler/ticklerNote.jsp',
                 controller: 'TicklerNoteController',
                 resolve: {
@@ -192,12 +192,12 @@ oscarApp.controller('TicklerListCtrl', function($scope, $timeout, $resource, ngT
     	},function(reason){
     		alert(reason);
     	});
-    	
+
     };
-    
+
     $scope.showComments = function(tickler){
     	$scope.tickler = tickler;
-        var modalInstance = $modal.open({
+        var modalInstance = $uibModal.open({
         	templateUrl: 'tickler/ticklerComments.jsp',
             controller: 'TicklerCommentController',
             resolve: {
@@ -207,40 +207,40 @@ oscarApp.controller('TicklerListCtrl', function($scope, $timeout, $resource, ngT
             }
         });
     };
-    
+
     $scope.printArea = function() {
     	window.print();
     }
-   
-    
+
+
 });
 
 
-oscarApp.controller('TicklerNoteController',function($scope, $modalInstance, ticklerNote, tickler, $http, noteService) {
+oscarApp.controller('TicklerNoteController',function($scope, $uibModalInstance, ticklerNote, tickler, $http, noteService) {
     $scope.ticklerNote = ticklerNote;
     $scope.originalNote = ticklerNote.note;
     $scope.tickler = tickler;
-    
+
     $scope.close = function () {
-        $modalInstance.close("Someone Closed Me");
+        $uibModalInstance.close("Someone Closed Me");
     };
     $scope.save = function () {
     	var updatedNote = $scope.ticklerNote.note;
     	$scope.ticklerNote.tickler = $scope.tickler;
-    	
+
     	noteService.saveTicklerNote($scope.ticklerNote).then(function(data){
-    		 $modalInstance.close("Someone Saved Me");
+    		 $uibModalInstance.close("Someone Saved Me");
     	},function(reason){
     		alert(reason);
     	});
     };
 });
 
-oscarApp.controller('TicklerCommentController',function($scope, $modalInstance, tickler) {
+oscarApp.controller('TicklerCommentController',function($scope, $uibModalInstance, tickler) {
 	   $scope.tickler = tickler;
-	    
+
 	    $scope.close = function () {
-	        $modalInstance.close("Someone Closed Me");
+	        $uibModalInstance.close("Someone Closed Me");
 	    };
 });
 

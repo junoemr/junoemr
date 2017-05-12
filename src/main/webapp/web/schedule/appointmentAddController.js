@@ -1,15 +1,15 @@
-oscarApp.controller('AppointmentAddController',function($scope, $filter, $modalInstance, $timeout, demographicService,me,providerService,scheduleService,apptDate) {
+oscarApp.controller('AppointmentAddController',function($scope, $filter, $uibModalInstance, $timeout, demographicService,me,providerService,scheduleService,apptDate) {
 
 	$scope.types = [];
-	
+
 	$scope.urgencies = [{value:'',label:'Normal'},{value:'critical',label:'Critical'}];
-	
+
 	$scope.me = me;
 
 	$scope.appointment= {status:'t', appointmentDate:$filter('date')(apptDate,'yyyy-MM-dd'),startTime:'09:00 AM',type:'',
 			duration:15,providerName:me.formattedName,providerNo:me.providerNo,reason:'',notes:'',
 			location:'',resources:'',critical:''};
-	
+
 	scheduleService.getTypes().then(function(data){
 		$scope.types = data.types;
 		$scope.types.unshift({name:'',duration:15,location:'',notes:'',reason:'',resources:''});
@@ -17,10 +17,10 @@ oscarApp.controller('AppointmentAddController',function($scope, $filter, $modalI
 	},function(error){
 		alert(error);
 	});
-	
+
 	$scope.selectType = function() {
 		var type = null;
-		
+
 		for(var x=0;x<$scope.types.length;x++) {
 			if($scope.types[x].name == $scope.appointment.type) {
 				type = $scope.types[x];
@@ -33,27 +33,27 @@ oscarApp.controller('AppointmentAddController',function($scope, $filter, $modalI
 			$scope.appointment.notes = type.notes;
 			$scope.appointment.reason = type.reason;
 			$scope.appointment.resources = type.resources;
-			
+
 		}
-		
+
 	}
-	
+
 	$scope.close = function () {
     	if($scope.needsUpdate) {
     		if(confirm("You have unsaved changes, are you sure?")) {
-    			$modalInstance.close(false);
+    			$uibModalInstance.close(false);
     		}
     	} else {
-    		$modalInstance.close(false);
+    		$uibModalInstance.close(false);
     	}
-        
+
     }
-	
+
 	$scope.validate = function() {
 		var t = $scope.appointment;
-		
+
 		$scope.errors = [];
-		
+
 		if(t.demographic == null) {
 			$scope.errors.push('You must select a patient');
 		}
@@ -66,19 +66,19 @@ oscarApp.controller('AppointmentAddController',function($scope, $filter, $modalI
 		if(t.duration == null || t.duration.length == 0) {
 			$scope.errors.push('start time is required');
 		}
-		
+
 		if($scope.errors.length>0) {
 			return false;
 		}
 		return true;
 	}
-    
+
     $scope.save = function () {
     	$scope.showErrors=true;
     	if(!$scope.validate()) {
     		return;
     	}
-    	 	
+
     	var x = {};
     	x.status = $scope.appointment.status;
     	x.appointmentDate = $scope.appointment.appointmentDate ;
@@ -92,29 +92,29 @@ oscarApp.controller('AppointmentAddController',function($scope, $filter, $modalI
     	x.resources = $scope.appointment.resources ;
     	x.urgency = $scope.appointment.critical ;
     	x.demographicNo = $scope.appointment.demographicNo;
-    	
+
     	console.log(JSON.stringify(x));
     	scheduleService.addAppointment(x).then(function(data){
-    		$modalInstance.close(true);
+    		$uibModalInstance.close(true);
     	},function(reason){
     		alert(reason);
     	});
-    	
-    	
+
+
     }
 
-    
+
     $scope.updateDemographicNo = function(item, model, label) {
-    	
+
     	demographicService.getDemographic(model).then(function(data){
     		$scope.appointment.demographicNo=data.demographicNo;
     		$scope.appointment.demographicName = '';
         	$scope.appointment.demographic = data;
-        	
+
     	});
-    	
+
     }
-    
+
     $scope.searchPatients  = function(term) {
     	var search = {type:'Name','term':term,active:true,integrator:false,outofdomain:true};
     	return demographicService.search(search,0,25).then(function(response){
@@ -125,7 +125,7 @@ oscarApp.controller('AppointmentAddController',function($scope, $filter, $modalI
     		return resp;
     	});
     }
-    
+
     $scope.searchProviders = function(val) {
     	var search = {searchTerm:val,active:true};
     	return providerService.searchProviders(search,0,10).then(function(response){
@@ -136,12 +136,12 @@ oscarApp.controller('AppointmentAddController',function($scope, $filter, $modalI
     		return resp;
     	});
     }
-    
-    
+
+
     $scope.updateProviderNo = function(item,model,label) {
     	$scope.appointment.providerNo = model;
     	$scope.appointment.providerName = label;
     }
-    
-   
+
+
 });

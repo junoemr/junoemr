@@ -218,7 +218,7 @@ $scope.changeTab = function(temp,filter){
 
 
 	$scope.manageConfiguration = function() {
-		var modalInstance = $modal.open({
+		var modalInstance = $uibModal.open({
         	templateUrl: 'patientlist/patientListConfiguration.jsp',
             controller: 'PatientListConfigController',
             backdrop: false,
@@ -356,7 +356,7 @@ oscarApp.controller('PatientListAppointmentListCtrl', [
 		}
 
 		$scope.addNewAppointment = function() {
-		       var modalInstance = $modal.open({
+		       var modalInstance = $uibModal.open({
 		        	templateUrl: 'schedule/appointmentAdd.jsp',
 		            controller: 'AppointmentAddController',
 		            backdrop: false,
@@ -375,7 +375,7 @@ oscarApp.controller('PatientListAppointmentListCtrl', [
 		}
 
 		$scope.viewAppointment = function(apptNo) {
-			var modalInstance = $modal.open({
+			var modalInstance = $uibModal.open({
 	        	templateUrl: 'schedule/appointmentView.jsp',
 	            controller: 'AppointmentViewController',
 	            backdrop: false,
@@ -434,20 +434,20 @@ oscarApp.controller('PatientListProgramCtrl', function($scope,$http) {
 
 });
 
-oscarApp.controller('PatientListConfigController',function($scope, $modalInstance, config) {
+oscarApp.controller('PatientListConfigController',function($scope, $uibModalInstance, config) {
 
 	$scope.patientListConfig= config;
 
 	$scope.cancel = function(){
-		$modalInstance.dismiss();
+		$uibModalInstance.dismiss();
 	};
 
 	$scope.saveConfiguration =function(){
-    	$modalInstance.close($scope.patientListConfig);
+    	$uibModalInstance.close($scope.patientListConfig);
     };
 
     $scope.saveConfiguration = function() {
-        $modalInstance.close($scope.patientListConfig);
+        $uibModalInstance.close($scope.patientListConfig);
     };
 
 });
