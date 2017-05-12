@@ -64,8 +64,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 <body ng-controller="BodyCtrl">
 
-	<!-- Fixed navbar -->
-	<div class="navbar navbar-default navbar-fixed-top" ng-controller="NavBarCtrl" ng-show="me != null" ng-cloak>
+	<!-- Navbar -->
+	<nav class="navbar navbar-default navbar-fixed-top" ng-controller="NavBarCtrl" ng-show="me != null" ng-cloak>
 		<div class="container-fluid">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -91,7 +91,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 				<!-- large view -->
 				<ul class="nav navbar-nav visible-lg hidden-1500 ">
-					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover"
+					<li><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover"
 						ng-show="showPtList === false" ng-click="showPatientList()"
 						title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
 
@@ -100,7 +100,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							<span ng-if="item.label=='Inbox' && unAckLabDocTotal>0" class="badge badge-danger">{{unAckLabDocTotal}}</span>
 						</a>
 						<a href="javascript:void(0)" ng-if="item.dropdown"  class="dropdown-toggle" data-toggle="dropdown">{{item.label}}
-							<span class="caret more"></span>
+							<span class="caret"></span>
 						</a>
 						<ul ng-if="item.dropdown" class="dropdown-menu" role="menu">
 							<li ng-repeat="dropdownItem in item.dropdownItems" >
@@ -112,7 +112,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 				<!-- more condensed version -->
 				<ul class="nav navbar-nav hidden-lg visible-1500 visible-md visible-sm visible-xs">
-					<li style="margin-right:5px"><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover" ng-show="showPtList === false" ng-click="showPatientList()" title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
+					<li><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover" ng-show="showPtList === false" ng-click="showPatientList()" title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
 
 					<li class="dropdown hand-hover"><a href="void()" class="dropdown-toggle"><bean:message key="navbar.modules" bundle="ui"/><b class="caret"></b></a>
 						<ul class="dropdown-menu">
@@ -130,36 +130,31 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				</ul>
 
 
-				<div class="navbar-text pull-right" style="line-height:20px">
-					<a onClick="popup(700,1024,'../scratch/index.jsp','scratch')" title="<bean:message key="navbar.scratchpad" bundle="ui"/>" class="hand-hover">
-					 	<span class="glyphicon glyphicon-edit"></span>
-					</a>
-					&nbsp;&nbsp;
+				<div class="navbar-text pull-right">
+						<a onClick="popup(700,1024,'../scratch/index.jsp','scratch')" title="<bean:message key="navbar.scratchpad" bundle="ui"/>" class="hand-hover">
+							<span class="glyphicon glyphicon-edit"></span>
+						</a>
+						&nbsp;&nbsp;
 					<span ng-show="messageRights === true">
 						<a ng-click="openMessenger()" title="<bean:message key="navbar.messenger" bundle="ui"/>" class="hand-hover">
 							<span  class="glyphicon glyphicon-envelope"></span>
 						</a>
-						<%--Remove demographic message icon; Awaiting JSON fix so that a list
-						with one item is returned instead of an object. After fix we can use ng-repeat and refer change messengerMenu to item--%>
-						<%--<span ng-repeat="item in messengerMenu">--%>
-						   <a ng-click="openMessenger(messengerMenu)"  title="{{messengerMenu.label}}" class="hand-hover">{{messengerMenu.extra}}</a> <%--<span ng-if="!$last">|</span>--%>
-						<%--</span>--%>
+						&nbsp;&nbsp;
+						<a ng-click="openMessenger(messengerMenu)"  title="{{messengerMenu.label}}" class="hand-hover">{{messengerMenu.extra}}</a> <span ng-if="!$last"></span>
+
 					</span>
-					&nbsp; &nbsp;
 
 					<span class="dropdown">
 						<ul class="dropdown-menu" role="menu">
 	                    	<li ng-repeat="item in programDomain">
 	                        	<a ng-click="changeProgram(item.program.id)">
 						    		<span ng-if="item.program.id === currentProgram.id">&#10004;</span>
-						    		<span ng-if="item.program.id != currentProgram.id">&nbsp;&nbsp;</span>
+						    		<span ng-if="item.program.id != currentProgram.id"></span>
 									{{item.program.name}}
 						    	</a>
 						    </li>
 					 	</ul>
 				 	</span>
-
-					&nbsp;
 
 					<span class="dropdown-toggle hand-hover" data-toggle="dropdown" title="<bean:message key="navbar.user" bundle="ui"/>"><span class="glyphicon glyphicon-user"></span>{{me.firstName}}</span>
 					<ul class="dropdown-menu" role="menu">
@@ -172,16 +167,14 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 			</div>
 			<!--/.nav-collapse -->
 		</div>
-	</div>
+	</nav>
 
 	<!-- nav bar is done here -->
 
-
 	 <!-- Start patient List template -->
-
 	<div class="container-fluid" ng-controller="PatientListCtrl" >
 		<div class="row" >
-			<div id="left-pane" class="col-md-3 noprint" ng-controller="PatientListAppointmentListCtrl" ng-if="showPatientList()">
+			<div id="left-pane" class="col-lg-3 col-md-4 col-sm-4 hidden-xs" ng-controller="PatientListAppointmentListCtrl" ng-if="showPatientList()">
 
 				<%--<ul class="nav nav-tabs">
 					<li ng-repeat="item in tabItems" ng-class="{'active': isActive(item.id)}" class="hand-hover">
@@ -196,22 +189,22 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					</li>
 
 				</ul>--%>
-				<div class="container-fluid">
-					<div id="left-pane-header" class="row vertical-align">
-							<div class="col-md-2 ">
-								<button id="hide-patient-list-button" type="button" class="pull-left" ng-click="hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
-									<span class="glyphicon glyphicon-chevron-left"></span>
-								</button>
-							</div>
-							<div class="col-md-7 col-md-offset-1">
-								<h1 id="left-pane-header-title">Your Appointments</h1>
-							</div>
-							<%--NOTE: Need to give this controller access to the addNewAppointment() function before this button can be used here --%>
-							<div class="col-md-2">
-								<a class="hand-hover" ng-click="addNewAppointment()"><span class="glyphicon glyphicon-plus" title="Add appointment"></span></a>
-							</div>
-					</div>
+				
+				<div id="left-pane-header" class="row vertical-align">
+						<div class="col-md-2 col-sm-2">
+							<button id="hide-patient-list-button" type="button" class="pull-left" ng-click="hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
+								<span class="glyphicon glyphicon-chevron-left"></span>
+							</button>
+						</div>
+						<div class="col-md-7 col-sm-7 col-md-offset-1 col-sm-offset-1">
+							<h1 id="left-pane-header-title">Your Appointments</h1>
+						</div>
+						<%--NOTE: Need to give this controller access to the addNewAppointment() function before this button can be used here --%>
+						<div class="col-md-2">
+							<a class="hand-hover" ng-click="addNewAppointment()"><span class="glyphicon glyphicon-plus" title="Add appointment"></span></a>
+						</div>
 				</div>
+
 				<div class="container-fluid">
 					<div class="row" ng-cloak>
 						<%--<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>">
@@ -229,7 +222,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 						<form id="patient-search" class="form-search" role="search">
 
-								<span ng-show="showFilter === true" class="form-group twitter-typeahead">
+								<span ng-show="showFilter === true" class="form-group ">
 									<input type="text"  class="form-control" placeholder="<bean:message key="patientList.search" bundle="ui"/>" ng-model="query"/>
 								</span>
 						</form>
@@ -244,7 +237,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 		</div>
 		<!-- End patient List template -->
 
-		<div id="right_pane" class="col-md-9" ui-view ng-cloak></div>
+		<div id="right_pane" class="col-lg-9 col-lg-offset-3 col-md-8 col-md-offset-4 col-sm-8 col-sm-offset-4" ui-view ng-cloak></div>
 	</div>
 
 
@@ -275,7 +268,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
 	<script type="text/javascript" src="bower_components/pym.js/dist/pym.v1.min.js"></script>
 	<script type="text/javascript" src="bower_components/hogan.js/web/builds/3.0.2/hogan-3.0.2.min.js"></script>
-	<script type="text/javascript" src="bower_components/typeahead.js/dist/typeahead.min.js"></script>
+	<%--<script type="text/javascript" src="bower_components/typeahead.js/dist/typeahead.min.js"></script>--%>
 	<!-- endbuild -->
 
 
