@@ -7,7 +7,8 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'ngTable',
 	'Common',
 	'Common.Services',
-	'Common.Filters'
+	'Common.Filters',
+	'Layout'
 ]);
 
 oscarApp.config(['$stateProvider', '$urlRouterProvider',function($stateProvider, $urlRouterProvider) {

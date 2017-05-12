@@ -62,10 +62,15 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 </head>
 
-<body ng-controller="BodyCtrl">
+<body ng-controller="Layout.BodyCtrl as bodyCtrl"
+			ng-init="bodyCtrl.init()">
 
 	<!-- Navbar -->
-	<nav class="navbar navbar-default navbar-fixed-top" ng-controller="NavBarCtrl" ng-show="me != null" ng-cloak>
+	<nav ng-controller="Layout.NavBarCtrl as navBarCtrl"
+			 ng-init="navBarCtrl.init()"
+			 ng-show="navBarCtrl.me != null"
+			 class="navbar navbar-default navbar-fixed-top"
+			 ng-cloak>
 		<div class="container-fluid">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -73,38 +78,63 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				</button>
 
 				<!-- link back to 'classic' view -->
-				<a  href="../provider/providercontrol.jsp"><img id="navbarlogo" src="../images/logo-white.png" title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0" /></a>
+				<a  href="../provider/providercontrol.jsp">
+					<img id="navbarlogo" src="../images/logo-white.png"
+						 title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0" />
+				</a>
 			</div>
-
 
 			<div class="navbar-collapse collapse">
 
 				<form class="navbar-form navbar-left" role="search">
 	 				<div class="form-group">
 		 				<div class="input-group">
-			 				<input type="text" class="form-control search-query" placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>" id="demographicQuickSearch" autocomplete="off" value="">
-			 				<span class="input-group-addon btn-default hand-hover" ng-click="goToPatientSearch()" title="<bean:message key="navbar.searchPatients" bundle="ui"/>"><span class="glyphicon glyphicon-search" ></span></span>
+			 				<input type="text"
+										 class="form-control search-query"
+										 placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"
+										 id="demographicQuickSearch" autocomplete="off" value="">
+			 				<span class="input-group-addon btn-default hand-hover"
+										ng-click="navBarCtrl.goToPatientSearch()"
+										title="<bean:message key="navbar.searchPatients" bundle="ui"/>">
+								<span class="glyphicon glyphicon-search" ></span>
+							</span>
 						</div>
 					</div>
-					<a class="btn btn btn-success hand-hover" id="add-patient" ng-click="newDemographic()" title="<bean:message key="navbar.newPatient" bundle="ui"/>">Add Patient</a>
+					<a class="btn btn btn-success hand-hover" id="add-patient"
+						 ng-click="navBarCtrl.newDemographic()"
+						 title="<bean:message key="navbar.newPatient" bundle="ui"/>">Add Patient</a>
 				</form>
 
 				<!-- large view -->
 				<ul class="nav navbar-nav visible-lg hidden-1500 ">
 					<li><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover"
-						ng-show="showPtList === false" ng-click="showPatientList()"
-						title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
+										ng-show="!bodyCtrl.showPatientList"
+										ng-click="navBarCtrl.showPatientList()"
+										title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
 
-					<li ng-repeat="item in menuItems" ng-class="isActive(item)">
-						<a href="javascript:void(0)" ng-if="!item.dropdown" ng-click="transition(item)" >{{item.label}}
-							<span ng-if="item.label=='Inbox' && unAckLabDocTotal>0" class="badge badge-danger">{{unAckLabDocTotal}}</span>
+					<li ng-repeat="item in navBarCtrl.menuItems"
+							ng-class="{'active': navBarCtrl.isActive(item) }">
+
+						<a href="#"
+							 ng-if="!item.dropdown"
+							 ng-click="navBarCtrl.transition(item)" >{{item.label}}
+							<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
+										class="label label-danger">{{unAckLabDocTotal}}</span>
 						</a>
-						<a href="javascript:void(0)" ng-if="item.dropdown"  class="dropdown-toggle" data-toggle="dropdown">{{item.label}}
+
+						<a href="#"
+							 ng-if="item.dropdown"
+							 class="dropdown-toggle"
+							 data-toggle="dropdown">{{item.label}}
 							<span class="caret"></span>
 						</a>
-						<ul ng-if="item.dropdown" class="dropdown-menu" role="menu">
-							<li ng-repeat="dropdownItem in item.dropdownItems" >
-								<a href="javascript:void(0)" ng-click="transition(dropdownItem)" >{{dropdownItem.label}}</a>
+
+						<ul ng-if="item.dropdown"
+								class="dropdown-menu"
+								role="menu">
+							<li ng-repeat="dropdownItem in item.dropdownItems">
+								<a href="#"
+									 ng-click="navBarCtrl.transition(dropdownItem)" >{{dropdownItem.label}}</a>
 							</li>
 						</ul>
 					</li>
@@ -112,55 +142,77 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 				<!-- more condensed version -->
 				<ul class="nav navbar-nav hidden-lg visible-1500 visible-md visible-sm visible-xs">
-					<li><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover" ng-show="showPtList === false" ng-click="showPatientList()" title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
+					<li><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover"
+										ng-show="!bodyCtrl.showPatientList"
+										ng-click="navBarCtrl.showPatientList()"
+										title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
 
-					<li class="dropdown hand-hover"><a href="void()" class="dropdown-toggle"><bean:message key="navbar.modules" bundle="ui"/><b class="caret"></b></a>
+					<li class="dropdown hand-hover">
+						<a href="#" class="dropdown-toggle">
+							<bean:message key="navbar.modules" bundle="ui"/><b class="caret"></b></a>
+
 						<ul class="dropdown-menu">
-							<li ng-repeat="item in menuItems"  ng-class="{'active': isActive(item) }">
-								<a ng-click="transition(item)" data-toggle="tab" >{{item.label}}
+							<li ng-repeat="item in navBarCtrl.menuItems"
+									ng-class="{'active': navBarCtrl.isActive(item) }">
+								<a ng-click="navBarCtrl.transition(item)" data-toggle="tab" >{{item.label}}
 									<span ng-if="item.extra.length>0">({{item.extra}})</span>
 								</a>
 							</li>
-							<li ng-repeat="item in moreMenuItems">
-								<a ng-class="{'active': isActive(item) }" ng-click="transition(item)">{{item.label}}
-								<span ng-if="item.extra.length>0" class="badge">{{item.extra}}</span></a>
+							<li ng-repeat="item in navBarCtrl.moreMenuItems">
+								<a ng-class="{'active': isActive(item) }"
+									 ng-click="navBarCtrl.transition(item)">{{item.label}}
+								<span ng-if="item.extra.length>0" class="label">{{item.extra}}</span></a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 
-
 				<div class="navbar-text pull-right">
-						<a onClick="popup(700,1024,'../scratch/index.jsp','scratch')" title="<bean:message key="navbar.scratchpad" bundle="ui"/>" class="hand-hover">
-							<span class="glyphicon glyphicon-edit"></span>
-						</a>
+					<a onClick="popup(700,1024,'../scratch/index.jsp','scratch')"
+						 title="<bean:message key="navbar.scratchpad" bundle="ui"/>"
+						 class="hand-hover">
+						<span class="glyphicon glyphicon-edit"></span>
+					</a>
 						&nbsp;&nbsp;
-					<span ng-show="messageRights === true">
-						<a ng-click="openMessenger()" title="<bean:message key="navbar.messenger" bundle="ui"/>" class="hand-hover">
+					<span ng-show="navBarCtrl.messageRights === true">
+						<a ng-click="navBarCtrl.openMessenger()"
+							 title="<bean:message key="navbar.messenger" bundle="ui"/>"
+							 class="hand-hover">
 							<span  class="glyphicon glyphicon-envelope"></span>
 						</a>
 						&nbsp;&nbsp;
-						<a ng-click="openMessenger(messengerMenu)"  title="{{messengerMenu.label}}" class="hand-hover">{{messengerMenu.extra}}</a> <span ng-if="!$last"></span>
+						<a ng-click="navBarCtrl.openMessenger(navBarCtrl.messengerMenu)"
+							 title="{{navBarCtrl.messengerMenu.label}}"
+							 class="hand-hover">{{navBarCtrl.messengerMenu.extra}}</a>
 
+						<span ng-if="!$last"></span>
 					</span>
 
 					<span class="dropdown">
 						<ul class="dropdown-menu" role="menu">
-	                    	<li ng-repeat="item in programDomain">
-	                        	<a ng-click="changeProgram(item.program.id)">
-						    		<span ng-if="item.program.id === currentProgram.id">&#10004;</span>
-						    		<span ng-if="item.program.id != currentProgram.id"></span>
+							<li ng-repeat="item in navBarCtrl.programDomain">
+								<a ng-click="navBarCtrl.changeProgram(item.program.id)">
+									<span ng-if="item.program.id === navBarCtrl.currentProgram.id">&#10004;</span>
+									<span ng-if="item.program.id != navBarCtrl.currentProgram.id"></span>
 									{{item.program.name}}
-						    	</a>
-						    </li>
+								</a>
+							</li>
 					 	</ul>
 				 	</span>
 
-					<span class="dropdown-toggle hand-hover" data-toggle="dropdown" title="<bean:message key="navbar.user" bundle="ui"/>"><span class="glyphicon glyphicon-user"></span>{{me.firstName}}</span>
+					<span class="dropdown-toggle hand-hover"
+								data-toggle="dropdown"
+								title="<bean:message key="navbar.user" bundle="ui"/>">
+						<span class="glyphicon glyphicon-user"></span>{{me.firstName}}
+					</span>
 					<ul class="dropdown-menu" role="menu">
-						<li ng-repeat="item in userMenuItems">
-							<a ng-click="transition(item)" ng-class="{'more-tab-highlight': isActive(item) }" class="hand-hover" >{{item.label}}</a>
-							<a ng-if="item.url" href="{{item.url}}" target="_blank">{{dropdownItem.label}}</a>
+						<li ng-repeat="item in navBarCtrl.userMenuItems">
+							<a ng-click="navBarCtrl.transition(item)"
+								 ng-class="{'more-tab-highlight': isActive(item) }"
+								 class="hand-hover" >{{item.label}}</a>
+							<a ng-if="item.url"
+								 href="{{item.url}}"
+								 target="_blank">{{dropdownItem.label}}</a>
 						</li>
 				  	</ul>
 				</div>
@@ -174,7 +226,10 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	 <!-- Start patient List template -->
 	<div class="container-fluid" ng-controller="PatientListCtrl" >
 		<div class="row" >
-			<div id="left-pane" class="col-lg-3 col-md-4 col-sm-4 hidden-xs" ng-controller="PatientListAppointmentListCtrl" ng-if="showPatientList()">
+			<div id="left-pane"
+					 class="col-lg-3 col-md-4 col-sm-4 hidden-xs"
+					 ng-controller="PatientListAppointmentListCtrl"
+					 ng-if="bodyCtrl.showPatientList">
 
 				<%--<ul class="nav nav-tabs">
 					<li ng-repeat="item in tabItems" ng-class="{'active': isActive(item.id)}" class="hand-hover">
@@ -184,12 +239,12 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					<li class="dropdown" ng-class="{'active': currentmoretab != null}"><a class="dropdown-toggle hand-hover" ><b class="caret"></b></a>
 							<ul class="dropdown-menu">
 								<li ng-repeat="item in moreTabItems">
-								<a ng-class="getMoreTabClass(item.id)" ng-click="changeMoreTab(item.id)" class="hand-hover">{{item.label}}<span ng-if="item.extra.length>0" class="badge">{{item.extra}}</span></a></li>
+								<a ng-class="getMoreTabClass(item.id)" ng-click="changeMoreTab(item.id)" class="hand-hover">{{item.label}}<span ng-if="item.extra.length>0" class="label">{{item.extra}}</span></a></li>
 							</ul>
 					</li>
 
 				</ul>--%>
-				
+
 				<div id="left-pane-header" class="row vertical-align">
 						<div class="col-md-2 col-sm-2">
 							<button id="hide-patient-list-button" type="button" class="pull-left" ng-click="hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
@@ -237,7 +292,12 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 		</div>
 		<!-- End patient List template -->
 
-		<div id="right_pane" class="col-lg-9 col-lg-offset-3 col-md-8 col-md-offset-4 col-sm-8 col-sm-offset-4" ui-view ng-cloak></div>
+		<div id="right_pane"
+				 ng-class="{
+				 	'col-lg-9 col-lg-offset-3 col-sm-8 col-sm-offset-4 col-xs-12': bodyCtrl.showPatientList,
+				 	'col-xs-12': !bodyCtrl.showPatientList }"
+				 ui-view
+				 ng-cloak></div>
 	</div>
 
 
@@ -264,7 +324,9 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
 	<script type="text/javascript" src="bower_components/pym.js/dist/pym.v1.min.js"></script>
 	<script type="text/javascript" src="bower_components/hogan.js/web/builds/3.0.2/hogan-3.0.2.min.js"></script>
-	<%--<script type="text/javascript" src="bower_components/typeahead.js/dist/typeahead.min.js"></script>--%>
+	<%--
+	<script type="text/javascript" src="bower_components/typeahead.js/dist/typeahead.min.js"></script>
+	--%>
 	<!-- endbuild -->
 
 
@@ -276,9 +338,9 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 	<script type="text/javascript" src="app.js"></script>
 
-    <script type="text/javascript" src="common/module.js"></script>
+	<script type="text/javascript" src="common/module.js"></script>
 
-    <script type="text/javascript" src="common/services/module.js"></script>
+	<script type="text/javascript" src="common/services/module.js"></script>
 	<script type="text/javascript" src="common/services/appService.js"></script>
 	<script type="text/javascript" src="common/services/billingService.js"></script>
 	<script type="text/javascript" src="common/services/consultService.js"></script>
@@ -301,14 +363,15 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="common/services/uxService.js"></script>
 
 	<script type="text/javascript" src="common/filters/module.js"></script>
-    <script type="text/javascript" src="common/filters/age.js"></script>
-    <script type="text/javascript" src="common/filters/cut.js"></script>
-    <script type="text/javascript" src="common/filters/offset.js"></script>
-    <script type="text/javascript" src="common/filters/startFrom.js"></script>
-    <script type="text/javascript" src="common/filters/ticklerLink.js"></script>
+	<script type="text/javascript" src="common/filters/age.js"></script>
+	<script type="text/javascript" src="common/filters/cut.js"></script>
+	<script type="text/javascript" src="common/filters/offset.js"></script>
+	<script type="text/javascript" src="common/filters/startFrom.js"></script>
+	<script type="text/javascript" src="common/filters/ticklerLink.js"></script>
 
-	<script type="text/javascript" src="common/bodyController.js"></script>
-	<script type="text/javascript" src="common/navBarController.js"></script>
+	<script type="text/javascript" src="layout/module.js"></script>
+	<script type="text/javascript" src="layout/bodyController.js"></script>
+	<script type="text/javascript" src="layout/navBarController.js"></script>
 
 	<script type="text/javascript" src="patient/newPatientController.js"></script>
 
@@ -347,69 +410,71 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 <script>
 
-$(document).ready(function(){
+// TODO: refactor into NavBarCtrl and use uibTypeahead
 
-	$('#demographicQuickSearch').typeahead({
-		name: 'patients',
-		valueKey:'name',
-		limit: 11,
-
-		remote: {
-	        url: '../ws/rs/demographics/quickSearch?query=%QUERY',
-	        cache:false,
-	        //I needed to override this to handle the differences in the JSON when it's a single result as opposed to multiple.
-	        filter: function (parsedResponse) {
-	            retval = [];
-	            if(parsedResponse.content instanceof Array) {
-	            	for (var i = 0;  i < parsedResponse.content.length;  i++) {
-	            		var tmp = parsedResponse.content[i];
-	            		if(tmp.hin != null && tmp.hin == '') {
-	            			tmp.hin = null;
-	            		}
-	            		if(tmp.formattedDOB != null && tmp.formattedDOB == '') {
-	            			tmp.formattedDOB = null;
-	            		}
-
-	            		tmp.name = tmp.lastName + ", " + tmp.firstName;
-	            		tmp.blah = "";
-	            		retval.push(tmp);
-	                 }
-	            } else {
-	            	retval.push(parsedResponse.content);
-	            }
-
-	            console.log("total:"+parsedResponse.total);
-	            var scope = angular.element($("#demographicQuickSearch")).scope();
-	            scope.setQuickSearchTerm("");
-
-	            if(parsedResponse.total > 10) {
-	            	retval.push({name:"<bean:message key="navbar.moreResults" bundle="ui"/>",hin:parsedResponse.total+" total","demographicNo":-1,"more":true});
-	            	scope.setQuickSearchTerm(parsedResponse.query);
-	            }
-
-	            return retval;
-	        }
-	    },
-
-		template: [
-		        "<p class='demo-quick-name'>{{name}}</p>",
-		        '{{#hin}}<p class="demo-quick-hin">&nbsp;<em>{{hin}}</em></p>{{/hin}}',
-		       	'{{#dob}}<p class="demo-quick-dob">&nbsp;{{formattedDOB}}</p>{{/dob}}'
-		 ].join(''),
-		       	engine: Hogan
-		}).on('typeahead:selected', function (obj, datum) {
-			$('input#demographicQuickSearch').on('blur',function(event){$("#demographicQuickSearch").val("");});
-
-			var scope = angular.element($("#demographicQuickSearch")).scope();
-
-			if(datum.more != null && datum.more == true) {
-				scope.switchToAdvancedView();
-			} else {
-				scope.loadRecord(datum.demographicNo);
-			}
-
-	});
-});
+//$(document).ready(function(){
+//
+//	$('#demographicQuickSearch').typeahead({
+//		name: 'patients',
+//		valueKey:'name',
+//		limit: 11,
+//
+//		remote: {
+//	        url: '../ws/rs/demographics/quickSearch?query=%QUERY',
+//	        cache:false,
+//	        //I needed to override this to handle the differences in the JSON when it's a single result as opposed to multiple.
+//	        filter: function (parsedResponse) {
+//	            retval = [];
+//	            if(parsedResponse.content instanceof Array) {
+//	            	for (var i = 0;  i < parsedResponse.content.length;  i++) {
+//	            		var tmp = parsedResponse.content[i];
+//	            		if(tmp.hin != null && tmp.hin == '') {
+//	            			tmp.hin = null;
+//	            		}
+//	            		if(tmp.formattedDOB != null && tmp.formattedDOB == '') {
+//	            			tmp.formattedDOB = null;
+//	            		}
+//
+//	            		tmp.name = tmp.lastName + ", " + tmp.firstName;
+//	            		tmp.blah = "";
+//	            		retval.push(tmp);
+//	                 }
+//	            } else {
+//	            	retval.push(parsedResponse.content);
+//	            }
+//
+//	            console.log("total:"+parsedResponse.total);
+//	            var scope = angular.element($("#demographicQuickSearch")).scope();
+//	            scope.setQuickSearchTerm("");
+//
+//	            if(parsedResponse.total > 10) {
+//	            	retval.push({name:"<bean:message key="navbar.moreResults" bundle="ui"/>",hin:parsedResponse.total+" total","demographicNo":-1,"more":true});
+//	            	scope.setQuickSearchTerm(parsedResponse.query);
+//	            }
+//
+//	            return retval;
+//	        }
+//	    },
+//
+//		template: [
+//		        "<p class='demo-quick-name'>{{name}}</p>",
+//		        '{{#hin}}<p class="demo-quick-hin">&nbsp;<em>{{hin}}</em></p>{{/hin}}',
+//		       	'{{#dob}}<p class="demo-quick-dob">&nbsp;{{formattedDOB}}</p>{{/dob}}'
+//		 ].join(''),
+//		       	engine: Hogan
+//		}).on('typeahead:selected', function (obj, datum) {
+//			$('input#demographicQuickSearch').on('blur',function(event){$("#demographicQuickSearch").val("");});
+//
+//			var scope = angular.element($("#demographicQuickSearch")).scope();
+//
+//			if(datum.more != null && datum.more == true) {
+//				scope.switchToAdvancedView();
+//			} else {
+//				scope.loadRecord(datum.demographicNo);
+//			}
+//
+//	});
+//});
 
 </script>
 </body>
