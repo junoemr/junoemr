@@ -76,7 +76,7 @@
 		</div>
 		
 		<div class="modal-footer">
-			<button ng-show="hasRight" ng-click="saver(newDemographic)" type="button" class="btn btn-primary"><bean:message key="modal.newPatient.submit" bundle="ui"/></button>
-			<button ng-hide="hasRight" ng-click="cancel()" type="button" class="btn"><bean:message key="modal.newPatient.close" bundle="ui"/></button>
+			<button ng-show="hasRight" ng-click="saver(newDemographic)" type="button" class="btn btn-success"><bean:message key="modal.newPatient.submit" bundle="ui"/></button>
+			<button ng-show="hasRight" ng-click="cancel()" type="button" class="btn btn-danger"><bean:message key="modal.newPatient.close" bundle="ui"/></button>
 		</div>
 	</div>
