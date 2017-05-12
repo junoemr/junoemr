@@ -1,14 +1,13 @@
 .patient-header-name {
-    margin: 0;
-    color: #1c56af;
+    color: $primary-blue-text;
 }
 
-.patient-header-ext p {
-    margin: 0;
+.patient-header-ext {
+    margin-top: 20px;
 }
 
 .patient-header-ext b {
-    color: #1c56af;
+    color: $primary-blue-text;
 }
 
 .sub-nav .dropdown-menu {

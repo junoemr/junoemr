@@ -24,30 +24,25 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<div class="container no-margin-left-md">
-	<div class="page-header">
-		<div class="row">
-			<div class="col-md-4">	
-				<h2 class="patient-header-name" ng-cloak>
-					{{demographic.lastName}}, {{demographic.firstName}}  <span ng-show="demographic.alias">({{demographic.alias}})</span> 
-				</h2>
-			</div>
-			<div class="col-md-8">	
-				<div class="patient-header-ext pull-right"> 
-					<p><b><bean:message key="demographic.patient.context.born"/>:</b>
-					{{demographic.dobYear}}-{{demographic.dobMonth}}-{{demographic.dobDay}} ({{demographic.age | age}})  
-					<b><bean:message key="demographic.patient.context.sex"/>:</b> {{demographic.sex}}
-					<b><bean:message key="Appointment.msgTelephone"/>:</b> {{demographic.phone}}</p>
-					<!-- <span class="glyphicon glyphicon-new-window"></span>-->
-				</div>
+<div> 
+	<div class="row vertical-align">
+		<div class="col-xs-4">	
+			<h2 class="patient-header-name" ng-cloak>
+				{{demographic.lastName}}, {{demographic.firstName}}  <span ng-show="demographic.alias">({{demographic.alias}})</span> 
+			</h2>
+		</div>
+		<div class="col-xs-8">	
+			<div class="patient-header-ext pull-right"> 
+				<p><b><bean:message key="demographic.patient.context.born"/>:</b>
+				{{demographic.dobYear}}-{{demographic.dobMonth}}-{{demographic.dobDay}} ({{demographic.age | age}})  
+				<b><bean:message key="demographic.patient.context.sex"/>:</b> {{demographic.sex}}
+				<b><bean:message key="Appointment.msgTelephone"/>:</b> {{demographic.phone}}</p>
+				<!-- <span class="glyphicon glyphicon-new-window"></span>-->
 			</div>
 		</div>
 	</div>
-
-
 	
-	<nav class="navbar navbar-default" role="navigation"
-		style="padding-top: 0px;margin-bottom:3px;">
+	<nav class="navbar navbar-default" role="navigation">
 		<!-- Brand and toggle get grouped for better mobile display -->
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse"

@@ -150,8 +150,8 @@
 </div>
 <div class="modal-footer">
 
-    <button class="btn btn-primary" ng-click="save()">Save</button>
-    <button class="btn btn-default" ng-click="close()">
+    <button class="btn btn-success" ng-click="save()">Save</button>
+    <button class="btn btn-danger" ng-click="close()">
         <bean:message key="global.close" bundle="ui"/>
     </button>
 </div>

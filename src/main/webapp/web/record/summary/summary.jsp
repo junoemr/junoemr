@@ -24,7 +24,8 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<div class="container">
+
+<div class="col-xs-12">
 	<div class="row">
 		<div class="col-lg-12" ng-hide="page.canRead">
 			<bean:message key="oscarEncounter.accessDenied"/>
