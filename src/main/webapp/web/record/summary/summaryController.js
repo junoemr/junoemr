@@ -42,7 +42,7 @@ oscarApp.controller('SummaryCtrl', function ($rootScope,$scope,$http,$location,$
 	$scope.page.noteFilter = {};
 	$scope.page.currentFilter = 'none';
 	$scope.page.onlyNotes = false;
-    
+
 	//get access rights
 	securityService.hasRight("_eChart", "r", $stateParams.demographicNo).then(function(data){
 		$scope.page.canRead = data;
@@ -53,7 +53,7 @@ oscarApp.controller('SummaryCtrl', function ($rootScope,$scope,$http,$location,$
 	securityService.hasRight("_eChart", "w", $stateParams.demographicNo).then(function(data){
 		$scope.page.cannotAdd = !data;
 	});
-	
+
 	//disable click and keypress if user only has read-access
 	$scope.checkAction = function(event){
 		if ($scope.page.cannotChange) {
@@ -61,8 +61,8 @@ oscarApp.controller('SummaryCtrl', function ($rootScope,$scope,$http,$location,$
 			event.stopPropagation();
 		}
 	}
-   
-    // Note list filtering functions   
+
+    // Note list filtering functions
     $scope.setOnlyNotes = function(){
 	   if($scope.page.onlyNotes){
 		   $scope.page.onlyNotes = false;
@@ -71,7 +71,7 @@ oscarApp.controller('SummaryCtrl', function ($rootScope,$scope,$http,$location,$
 	   }
 	   console.log("$scope.page.onlyNotes ",$scope.page.onlyNotes );
    	}
-   
+
    	$scope.isOnlyNotesStatus = function(){
 	   if($scope.page.onlyNotes){
 		   return "active";
@@ -80,37 +80,37 @@ oscarApp.controller('SummaryCtrl', function ($rootScope,$scope,$http,$location,$
 	   }
 
    	}
-   	
-   	
+
+
    	$scope.openRevisionHistory = function(note){
    		//var rnd = Math.round(Math.random() * 1000);
 		win = "revision";
 		var url = "../CaseManagementEntry.do?method=notehistory&noteId=" + note.noteId;
-		window.open(url,win,"scrollbars=yes, location=no, width=647, height=600","");   			
+		window.open(url,win,"scrollbars=yes, location=no, width=647, height=600","");
    	}
 
    	$scope.openRx = function(demoNo){
 		win = "Rx"+demoNo;
 		var url = "../oscarRx/choosePatient.do?demographicNo=" + demoNo;
-		window.open(url,win,"scrollbars=yes, location=no, width=900, height=600","");   			
+		window.open(url,win,"scrollbars=yes, location=no, width=900, height=600","");
    	}
-   	
+
    	$scope.openAllergies = function(demoNo){
 		win = "Allergy"+demoNo;
 		var url = "../oscarRx/showAllergy.do?demographicNo=" + demoNo;
-		window.open(url,win,"scrollbars=yes, location=no, width=900, height=600","");   
+		window.open(url,win,"scrollbars=yes, location=no, width=900, height=600","");
 		return false;
    	}
 
    	$scope.openPreventions = function(demoNo){
 		win = "prevention"+demoNo;
 		var url = "../oscarPrevention/index.jsp?demographic_no=" + demoNo;
-		window.open(url,win,"scrollbars=yes, location=no, width=900, height=600","");   
+		window.open(url,win,"scrollbars=yes, location=no, width=900, height=600","");
 		return false;
-   	}   	
+   	}
 
-      	
-   
+
+
    	$scope.isCurrentStatus = function(stat){
 	   //console.log("stat",stat);
 	   if(stat == $scope.page.currentFilter){
@@ -120,7 +120,7 @@ oscarApp.controller('SummaryCtrl', function ($rootScope,$scope,$http,$location,$
 	   }
 
    	}
-   
+
    	// How do we handle showing what filter has been selected???
    	$scope.changeNoteFilter = function(){
 	   $scope.index = 0;
@@ -129,24 +129,24 @@ oscarApp.controller('SummaryCtrl', function ($rootScope,$scope,$http,$location,$
 	   $scope.page.currentFilter = 'Just My Notes';
 	   $scope.addMoreItems();
    	}
-   
+
    	$scope.removeFilter = function(){
 	   $scope.index = 0;
 	   $scope.page.noteFilter = {};
 	   $scope.page.notes.notelist = [];
 	   $scope.addMoreItems();
 	   $scope.page.currentFilter = 'none';
-	   
+
    	}
-   
-   	
+
+
    	//Note display functions
     $scope.addMoreItems = function(){
     	console.log($scope.busy);
     	if ($scope.busy) return;
-    	
+
     	$scope.busy = true;
-    	
+
     	noteService.getNotesFrom($stateParams.demographicNo,$scope.index,20,$scope.page.noteFilter).then(function(data) {
             console.debug('whats the data',angular.isUndefined(data.notelist),data.notelist);
             if(angular.isDefined(data.notelist)){
@@ -169,31 +169,31 @@ oscarApp.controller('SummaryCtrl', function ($rootScope,$scope,$http,$location,$
     	       $scope.busy = false;
      		}
         );
-    	
+
     };
-    
+
     //$scope.addMoreItems();
-    
+
     $scope.editNote = function(note){
     	$rootScope.$emit('loadNoteForEdit',note);
     }
-    
+
     $scope.page.currentEditNote = {};
-    
+
     $scope.isNoteBeingEdited = function(note){
-    	
+
     	if(note.uuid == $scope.page.currentEditNote.uuid ){
     		return "noteInEdit";
     	}
-    	
+
     	return ""
     }
-    
+
     $rootScope.$on('currentlyEditingNote',function(event,data) {
     	$scope.page.currentEditNote = data;
     });
-    
-    
+
+
     $rootScope.$on('noteSaved', function(event,data) {
     	console.log('new data coming in',data);
     	var noteFound = false;
@@ -205,16 +205,16 @@ oscarApp.controller('SummaryCtrl', function ($rootScope,$scope,$http,$location,$
     			break;
     		}
     	}
-    	
+
     	if(noteFound == false){
     		$scope.page.notes.notelist.unshift(data);
     	}
     	$scope.index =  $scope.page.notes.notelist.length ;
 	 });
-    
-    
-        
-    //Note display functions   
+
+
+
+    //Note display functions
     $scope.setColor = function(note){
     	if(note.eformData){
     		return { 'background-color': '#DFF0D8' };
@@ -230,32 +230,32 @@ oscarApp.controller('SummaryCtrl', function ($rootScope,$scope,$http,$location,$
 			return { 'background-color': '#FF6600' };
 		}else if(note.cpp){
 			return { 'background-color': '#996633', 'color' : 'white' };
-		} 	
+		}
     };
-    
+
     $scope.showNoteHeader = function(note){
     	if($scope.page.onlyNotes){
     		if(note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp){
     			return false;
     		}
-    	} 
+    	}
     	return true;
     }
-    
+
     $scope.showNote = function(note){
     	if($scope.page.onlyNotes){
     		if(note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp){
     			return false;
     		}
-    	} 
-    	
+    	}
+
     	if(note.eformData || note.document ){
     		return false;
     	}
     	return true;
     };
-    
-    
+
+
     $scope.firstLine = function(note){
     	var firstL = note.note.trim().split('\n')[0];
     	var dateStr = $filter('date')(note.observationDate, 'dd-MMM-yyyy');
@@ -270,13 +270,13 @@ oscarApp.controller('SummaryCtrl', function ($rootScope,$scope,$http,$location,$
     $scope.trackerUrl="";
 
     $scope.getTrackerUrl = function(demographicNo) {
-      $scope.trackerUrl = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo + '&numEle=4&tracker=slim';    
+      $scope.trackerUrl = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo + '&numEle=4&tracker=slim';
     };
-    
-var initialDisplayLimit = 5;  
+
+var initialDisplayLimit = 5;
 $scope.toggleList = function(mod){
-	i = initialDisplayLimit; 
-	
+	i = initialDisplayLimit;
+
 	if(mod.summaryItem.length>i){
 		if(mod.displaySize>i){
 			mod.displaySize = i;
@@ -291,25 +291,25 @@ $scope.showMoreItems = function(mod){
 	if(!angular.isDefined(mod.summaryItem)){
 		return false;
 	}
-	
+
 	if(mod.summaryItem.length == 0){
 		return false;
 	}
-	
+
 	return true;
 }
 
-$scope.showMoreItemsSymbol = function(mod){	
+$scope.showMoreItemsSymbol = function(mod){
 	if(!angular.isDefined(mod.summaryItem)){
 		return "";
 	}
-	
+
 	if ( (mod.displaySize < mod.summaryItem.length) && mod.displaySize == initialDisplayLimit ) {
 		return "glyphicon glyphicon-chevron-down hand-hover pull-right";
 	}else if ( (mod.displaySize == mod.summaryItem.length) && mod.displaySize != initialDisplayLimit ){
-		return "glyphicon glyphicon-chevron-up hand-hover pull-right";	
+		return "glyphicon glyphicon-chevron-up hand-hover pull-right";
 	}else if ( mod.summaryItem.length <= initialDisplayLimit ) {
-		return "glyphicon glyphicon-chevron-down glyphicon-chevron-down-disabled pull-right";	
+		return "glyphicon glyphicon-chevron-down glyphicon-chevron-down-disabled pull-right";
 	}else{
 		return "";
 	}
@@ -353,7 +353,7 @@ function fillItems(itemsToFill){
 	for (var i = 0; i < itemsToFill.length; i++) {
 		console.log(itemsToFill[i].summaryCode);
 		summaryLists[itemsToFill[i].summaryCode] = itemsToFill[i];
-	 
+
 		summaryService.getFullSummary($stateParams.demographicNo,itemsToFill[i].summaryCode).then(function(data){
 			console.log("FullSummary returned ",data);
 				if(angular.isDefined(data.summaryItem)){
@@ -365,9 +365,9 @@ function fillItems(itemsToFill){
 				}
 			},
 			function(errorMessage){
-				console.log("fillItems"+errorMessage); 
+				console.log("fillItems"+errorMessage);
 			}
-			 
+
 		);
 	}
 }
@@ -391,7 +391,7 @@ editGroupedNotes = function(size,mod,action){
 			}
 		}
 	});
-	
+
 	modalInstance.result.then(function (selectedItem) {
 		console.log(selectedItem);
 	}, function () {
@@ -403,23 +403,23 @@ editGroupedNotes = function(size,mod,action){
 			itvCheck = null;
 			editingNoteId = null;
 		}
-		
+
 		console.log('Modal dismissed at: ' + new Date());
 	});
-	
+
 	console.log($('#myModal'));
 }
 
 
 $scope.gotoState = function(item,mod,itemId){
-	
+
 	if(item=="add"){
 		editGroupedNotes('lg',mod,null);
-		
+
 	}else if(item.action == 'add' && item.type == 'dx_reg'){
-		
+
 		editGroupedNotes('lg',mod,itemId);
-		
+
 	}else if(item.type == 'lab' || item.type == 'document'  || item.type == 'rx'|| item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline'  ){
 
 		if(item.type == 'rx'){
@@ -433,19 +433,19 @@ $scope.gotoState = function(item,mod,itemId){
 			//var rnd = Math.round(Math.random() * 1000);
 			win = "win_item.type_";
 		}
-		
-		window.open(item.action,win,"scrollbars=yes, location=no, width=900, height=600","");  
+
+		window.open(item.action,win,"scrollbars=yes, location=no, width=900, height=600","");
 		return false;
 	}else if(item.action == 'action'){
 		editGroupedNotes('lg',mod,itemId);
 
-	}else{	
+	}else{
 		$state.transitionTo(item.action,{demographicNo:$stateParams.demographicNo, type: item.type ,id: item.id},{location:'replace',notify:true});
 	}
 
 };
 
-	 
+
 	 $scope.showPrintModal = function(mod,action){
 		 var size = 'lg';
 		 var modalInstance = $modal.open({
@@ -456,16 +456,16 @@ $scope.gotoState = function(item,mod,itemId){
 		          mod: function () {
 		            return mod;
 		          },
-		          
+
 		          action: function (){
 		        	  return action;
 		          }
 		        }
 		    });
-		
+
 		modalInstance.result.then(function (selectedItem) {
 		      console.log(selectedItem);
-		      
+
 		    }, function () {
 		      console.log('Modal dismissed at: ' + new Date());
 		    });
@@ -474,7 +474,7 @@ $scope.gotoState = function(item,mod,itemId){
 });
 
 
-GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$stateParams,$state,$interval,noteService,securityService,diseaseRegistryServices){
+GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$stateParams,$state,$interval,noteService,securityService,diseaseRegistryService){
 
 
 	$scope.page = {};
@@ -484,41 +484,41 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 
 	//$scope.action = action;
 	$scope.page.code = mod.summaryCode;
-	
+
 	$scope.groupNotesForm = {assignedCMIssues:[]};
 	$scope.groupNotesForm.encounterNote = {position:1};
-	
-	
+
+
 	//set hidden which can can move out of hidden to $scope values
 	var now = new Date();
     $scope.groupNotesForm.annotation_attrib = "anno"+now.getTime();
 
-    
+
 	//get access rights
 	securityService.hasRight("_eChart", "u", $stateParams.demographicNo).then(function(data){
 		$scope.page.cannotChange = !data;
 	});
-	
-	diseaseRegistryServices.getQuickLists().then(function(data){
+
+	diseaseRegistryService.getQuickLists().then(function(data){
 		console.log(data);
 		$scope.page.quickLists = data;
 	});
-	
+
 	$scope.addDxItem = function(item){
 		for(var x=0;x<$scope.groupNotesForm.assignedCMIssues.length;x++) {
     		if($scope.groupNotesForm.assignedCMIssues[x].issue.code === item.code && $scope.groupNotesForm.assignedCMIssues[x].issue.type === item.codingSystem) {
     			return;
     		}
     	}
-		
-		diseaseRegistryServices.findLikeIssue(item).then(function(response){
+
+		diseaseRegistryService.findLikeIssue(item).then(function(response){
     		var cmIssue = {acute:false,certain:false,issue:response,issue_id:response.issueId,major:false,resolved:false,unsaved:true};
         	$scope.groupNotesForm.assignedCMIssues.push(cmIssue);
     	});
-		
-		
+
+
 	}
-	
+
 	//disable click and keypress if user only has read-access
 	$scope.checkAction = function(event){
 		if ($scope.page.cannotChange) {
@@ -526,7 +526,7 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 			event.stopPropagation();
 		}
 	}
-    
+
     displayIssueId = function(issueCode){
     	noteService.getIssueId(issueCode).then(function(data){
     		$scope.page.issueId = data.id;
@@ -544,9 +544,9 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 					$scope.groupNotesForm.encounterNote = iNote.encounterNote;
 					$scope.groupNotesForm.groupNoteExt = iNote.groupNoteExt;
 					$scope.groupNotesForm.assignedCMIssues = iNote.assignedCMIssues;
-					
+
 					$scope.groupNotesForm.assignedCMIssues = [];
-					
+
 					if(iNote.assignedCMIssues instanceof Array) {
 						$scope.groupNotesForm.assignedCMIssues = iNote.assignedCMIssues;
 					} else {
@@ -554,22 +554,22 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 							$scope.groupNotesForm.assignedCMIssues.push(iNote.assignedCMIssues);
 						}
 					}
-					
+
 					action = itemId;
 					$scope.setAvailablePositions();
-									
+
 					$scope.removeEditingNoteFlag();
-									
+
 					if($scope.groupNotesForm.encounterNote.position<1){
 						$scope.groupNotesForm.encounterNote.position=1;
 					}
-					
+
 				},function(reason){
 					alert(reason);
 				});
 			}else if($scope.page.items[itemId].type === "dx_reg"){
 				$scope.groupNotesForm.assignedCMIssues = [];
-				diseaseRegistryServices.findLikeIssue($scope.page.items[itemId].extra).then(function(response){
+				diseaseRegistryService.findLikeIssue($scope.page.items[itemId].extra).then(function(response){
 		    		var cmIssue = {acute:false,certain:false,issue:response,issue_id:response.issueId,major:false,resolved:false,unsaved:true};
 		    		console.log("find like issue ", cmIssue, response);
 		        	$scope.groupNotesForm.assignedCMIssues.push(cmIssue);
@@ -580,14 +580,14 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 		    	});
 			}
 	};
-	
+
 	//action is NULL when new , action is some id when not
 	if(action!=null){
 		displayGroupNote($scope.page.items,action);
 	}else{
 		//new entry
 	}
-	
+
 	$scope.setAvailablePositions = function() {
 		$scope.availablePositions = [];
 		if($scope.page.items == null || $scope.page.items.length == 0) {
@@ -602,7 +602,7 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 			}
 		}
 	}
-	
+
 	$scope.setAvailablePositions();
 
 	$scope.changeNote = function(item, itemId){
@@ -622,11 +622,11 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 		$scope.groupNotesForm.encounterNote.appointmentNo=$stateParams.appointmentNo; //TODO: make this dynamic so it changes on edit
 		$scope.groupNotesForm.encounterNote.encounterType="";
 		$scope.groupNotesForm.encounterNote.encounterTime="";
-		
+
 		$scope.groupNotesForm.encounterNote.summaryCode = $scope.page.code; //'ongoingconcerns';
 
 		$scope.groupNotesForm.assignedIssues = [];
-		
+
 		noteService.saveIssueNote($stateParams.demographicNo, $scope.groupNotesForm).then(function(data){
     		$modalInstance.dismiss('cancel');
     		$state.transitionTo($state.current, $stateParams, { reload: true, inherit: false, notify: true });
@@ -635,7 +635,7 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 	    	alert(reason);
 	    });
 	}
-	
+
 	/*
 	 * handle concurrent note edit - EditingNoteFlag
 	 */
@@ -647,19 +647,19 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 			}
 		});
 	}
- 
+
 	$scope.setEditingNoteFlag = function(){
 		if ($scope.groupNotesForm.encounterNote.uuid==null) return;
-		
+
 		$scope.removeEditingNoteFlag(); //remove any previous flag actions
 		editingNoteId = $scope.groupNotesForm.encounterNote.uuid;
-		
+
 		itvSet = $interval($scope.doSetEditingNoteFlag(), 30000); //set flag every 5 min
 		itvCheck = $interval(function(){
 			noteService.checkEditNoteNew(editingNoteId, user.providerNo).then(function(resp){
 				if (!resp.success) { //someone else wants to edit this note
 					alert("Warning! Another user tries to edit this note. Your update may be replaced by later revision(s).");
-					
+
 					//cancel 10sec check after 1st time warning when another user tries to edit this note
 					$interval.cancel(itvCheck);
 					itvCheck = null;
@@ -667,7 +667,7 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 			});
 		}, 10000); //check for new edit every 10 sec
 	}
-	
+
 	$scope.removeEditingNoteFlag = function(){
 		if (editingNoteId!=null) {
 			noteService.removeEditingNoteFlag(editingNoteId, user.providerNo);
@@ -678,8 +678,8 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 			editingNoteId = null;
 		}
 	}
-	
-	
+
+
 	$scope.removeIssue = function(i) {
 		i.unchecked=true;
 	}
@@ -692,7 +692,7 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 		$scope.groupNotesForm.encounterNote.archived = true;
 		$scope.saveGroupNotes();
 	}
-		
+
 	$scope.cancel = function () {
   		$modalInstance.dismiss('cancel');
   	};
@@ -702,7 +702,7 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
 		var rnd = Math.round(Math.random() * 1000);
 		win = "win" + rnd;
 		var url = "../CaseManagementEntry.do?method=notehistory&noteId=" + note.noteId;
-		window.open(url,win,"scrollbars=yes, location=no, width=647, height=600","");   			
+		window.open(url,win,"scrollbars=yes, location=no, width=647, height=600","");
    	}
 
     $scope.searchIssues  = function(term) {
@@ -718,49 +718,49 @@ GroupNotesCtrl = function ($scope,$modal,$modalInstance,mod,action,user,$statePa
     		return resp;
     	});
     }
-    
+
     $scope.assignIssue = function(item, model, label) {
     	for(var x=0;x<$scope.groupNotesForm.assignedCMIssues.length;x++) {
     		if($scope.groupNotesForm.assignedCMIssues[x].issue.id == model) {
     			return;
     		}
     	}
-    	
+
     	noteService.getIssue(model).then(function(response){
     		var cmIssue = {acute:false,certain:false,issue:response,issue_id:item.issueId,major:false,resolved:false,unsaved:true};
         	$scope.groupNotesForm.assignedCMIssues.push(cmIssue);
     	});
     }
-    
+
     $scope.isSelected = function(item) {
     	if(item.id == action) {
     		return "group-note-selected";
     	}
     }
-    
+
     $scope.addToDxRegistry = function(issue){
-    	diseaseRegistryServices.addToDxRegistry($stateParams.demographicNo,issue).then(function(data){
+			diseaseRegistryService.addToDxRegistry($stateParams.demographicNo,issue).then(function(data){
     		console.log(data);
     	});
-    	
+
     }
-    
+
 };
 var itvSet = null;
 var itvCheck = null;
 var editingNoteId = null;
 
 RecordPrintCtrl = function($scope,$modal,$modalInstance,mod,action,$stateParams,summaryService,$filter){
-	
+
 	$scope.pageOptions = {};
 	$scope.pageOptions.printType = {};
 	$scope.pageOptions.dates = {};
-	$scope.page = {}; 
+	$scope.page = {};
 	$scope.page.selectedWarning = false;
-	
-	/* 
+
+	/*
 	 *If mod length > 0 than the user has selected a note. = Default to Note
-	 *Other wise default to All 
+	 *Other wise default to All
 	 */
 	var atleastOneSelected = false;
 	for(var i = 0; i < mod.length; i++){
@@ -769,7 +769,7 @@ RecordPrintCtrl = function($scope,$modal,$modalInstance,mod,action,$stateParams,
 			i = mod.length;
 		}
 	}
-	
+
 	if(atleastOneSelected){
 		console.log("mod len ",mod.length);
 		$scope.pageOptions.printType = 'selected';
@@ -777,24 +777,24 @@ RecordPrintCtrl = function($scope,$modal,$modalInstance,mod,action,$stateParams,
 		console.log("printType = all");
 		$scope.pageOptions.printType = 'all';
 	}
-	
+
 	$scope.printToday = function(){
 		$scope.pageOptions.printType = 'dates';
 		var date = new Date();
 		$scope.pageOptions.dates.start = date;
 		$scope.pageOptions.dates.end = date;
 	}
-	
+
 	$scope.cancelPrint = function(){
 		$modalInstance.dismiss('cancel');
 	}
-	
+
 	$scope.clearPrint = function(){
 		$scope.pageOptions = {};
 		$scope.pageOptions.printType = {};
 	}
-	
-	
+
+
 	$scope.sendToPhr = function(){
 		var queryString = "demographic_no="+$stateParams.demographicNo;
 		queryString = queryString + "&module=echart";
@@ -815,7 +815,7 @@ RecordPrintCtrl = function($scope,$modal,$modalInstance,mod,action,$stateParams,
 			queryString = queryString + '&startDate='+$scope.pageOptions.dates.start.getTime();
 			queryString = queryString + '&endDate='+$scope.pageOptions.dates.end.getTime();
 		}
-		
+
 		if($scope.pageOptions.cpp){
 			queryString = queryString + '&printCPP=true';
 		}
@@ -826,17 +826,17 @@ RecordPrintCtrl = function($scope,$modal,$modalInstance,mod,action,$stateParams,
 			queryString = queryString + '&printLabs=true';
 		}
 		console.log("QS"+queryString);
-		
+
 		if($scope.pageOptions.printType === 'selected' && selectedList.length ==0 ){
 			$scope.page.selectedWarning = true;
 			return;
 		}else{
 			$scope.page.selectedWarning = false;
 		}
-		
+
 		window.open('../SendToPhr.do?'+queryString,'_blank');
 	}
-	
+
 	$scope.print = function(){
 		//console.log('processList',mod);
 		console.log($scope.pageOptions);
@@ -847,19 +847,19 @@ RecordPrintCtrl = function($scope,$modal,$modalInstance,mod,action,$stateParams,
 			}
 		}
 		console.log("selected list",selectedList);
-				
+
 		if($scope.pageOptions.printType === 'selected' && selectedList.length ==0 ){
 			$scope.page.selectedWarning = true;
 			return;
 		}else{
 			$scope.page.selectedWarning = false;
 		}
-		
+
 		$scope.pageOptions.selectedList = selectedList;
 		var ops = encodeURIComponent(JSON.stringify($scope.pageOptions));
 		window.open('../ws/rs/recordUX/'+$stateParams.demographicNo+'/print?printOps='+ops,'_blank');
-	
-		
-		
+
+
+
 	}
 };

@@ -255,10 +255,6 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 		Juno.contextPath = '<%= request.getContextPath() %>';
 
-		Juno.Models = {};
-		Juno.Common = {};
-		Juno.Context = {};
-
 	</script>
 
 	<%-- third party libraries, managed with bower, combined and minified for production --%>
@@ -283,29 +279,34 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<!-- build:js js/scripts.js -->
 	<script type="text/javascript" src="../share/javascript/Oscar.js"></script>
 
+	<script type="text/javascript" src="common/util/serviceHelper.js"></script>
+
 	<script type="text/javascript" src="app.js"></script>
 
+    <script type="text/javascript" src="common/module.js"></script>
 	<script type="text/javascript" src="common/filters.js"></script>
 
-	<script type="text/javascript" src="common/services/demographicServices.js"></script>
-	<script type="text/javascript" src="common/services/programServices.js"></script>
-	<script type="text/javascript" src="common/services/scheduleServices.js"></script>
-	<script type="text/javascript" src="common/services/securityServices.js"></script>
-	<script type="text/javascript" src="common/services/staticDataServices.js"></script>
-	<script type="text/javascript" src="common/services/billingServices.js"></script>
-	<script type="text/javascript" src="common/services/ticklerServices.js"></script>
-	<script type="text/javascript" src="common/services/formServices.js"></script>
-	<script type="text/javascript" src="common/services/noteServices.js"></script>
-	<script type="text/javascript" src="common/services/providerServices.js"></script>
-	<script type="text/javascript" src="common/services/patientDetailStatusServices.js"></script>
-	<script type="text/javascript" src="common/services/uxServices.js"></script>
-	<script type="text/javascript" src="common/services/messageServices.js"></script>
-	<script type="text/javascript" src="common/services/inboxServices.js"></script>
-	<script type="text/javascript" src="common/services/k2aServices.js"></script>
-	<script type="text/javascript" src="common/services/personaServices.js"></script>
-	<script type="text/javascript" src="common/services/consultServices.js"></script>
-	<script type="text/javascript" src="common/services/appServices.js"></script>
-	<script type="text/javascript" src="common/services/diseaseRegistryServices.js"></script>
+    <script type="text/javascript" src="common/services/module.js"></script>
+	<script type="text/javascript" src="common/services/appService.js"></script>
+	<script type="text/javascript" src="common/services/billingService.js"></script>
+	<script type="text/javascript" src="common/services/consultService.js"></script>
+	<script type="text/javascript" src="common/services/demographicService.js"></script>
+	<script type="text/javascript" src="common/services/diseaseRegistryService.js"></script>
+	<script type="text/javascript" src="common/services/formService.js"></script>
+	<script type="text/javascript" src="common/services/inboxService.js"></script>
+	<script type="text/javascript" src="common/services/k2aService.js"></script>
+	<script type="text/javascript" src="common/services/messageService.js"></script>
+	<script type="text/javascript" src="common/services/noteService.js"></script>
+	<script type="text/javascript" src="common/services/patientDetailStatusService.js"></script>
+	<script type="text/javascript" src="common/services/personaService.js"></script>
+	<script type="text/javascript" src="common/services/programService.js"></script>
+	<script type="text/javascript" src="common/services/providerService.js"></script>
+	<script type="text/javascript" src="common/services/scheduleService.js"></script>
+	<script type="text/javascript" src="common/services/securityService.js"></script>
+	<script type="text/javascript" src="common/services/staticDataService.js"></script>
+	<script type="text/javascript" src="common/services/summaryService.js"></script>
+	<script type="text/javascript" src="common/services/ticklerService.js"></script>
+	<script type="text/javascript" src="common/services/uxService.js"></script>
 
 	<script type="text/javascript" src="common/bodyController.js"></script>
 	<script type="text/javascript" src="common/navBarController.js"></script>
