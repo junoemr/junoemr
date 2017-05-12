@@ -6,7 +6,8 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'angular-loading-bar',
 	'ngTable',
 	'Common',
-	'Common.Services'
+	'Common.Services',
+	'Common.Filters'
 ]);
 
 oscarApp.config(['$stateProvider', '$urlRouterProvider',function($stateProvider, $urlRouterProvider) {
@@ -218,15 +219,7 @@ $rootScope.$on('$stateChangeStart',function(event, toState, toParams, fromState,
 });
 */
 
-	//We already have a limitTo filter built-in to angular,
-	//let's make a startFrom filter
-	oscarApp.filter('startFrom', function() {
-	  return function(input, start) {
-		  start = +start; //parse to int
-		  // return input.slice(start);
-		  return input;
-	  }
-	});
+
 
 /*
 
@@ -289,18 +282,6 @@ oscarApp.run( function($rootScope, $location) {
 });
 
 */
-
-oscarApp.filter('offset', function() {
-	  return function(input, start) {
-		 if(input == null) {
-			 return 0;
-		 }
-		start = parseInt(start, 10);
-		return input.slice(start);
-	  };
-	});
-
-
 
 //this is for the patient list control. Tells us which template to load
 oscarApp.factory('Navigation', function($rootScope) {

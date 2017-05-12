@@ -284,7 +284,6 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="app.js"></script>
 
     <script type="text/javascript" src="common/module.js"></script>
-	<script type="text/javascript" src="common/filters.js"></script>
 
     <script type="text/javascript" src="common/services/module.js"></script>
 	<script type="text/javascript" src="common/services/appService.js"></script>
@@ -307,6 +306,13 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="common/services/summaryService.js"></script>
 	<script type="text/javascript" src="common/services/ticklerService.js"></script>
 	<script type="text/javascript" src="common/services/uxService.js"></script>
+
+	<script type="text/javascript" src="common/filters/module.js"></script>
+    <script type="text/javascript" src="common/filters/age.js"></script>
+    <script type="text/javascript" src="common/filters/cut.js"></script>
+    <script type="text/javascript" src="common/filters/offset.js"></script>
+    <script type="text/javascript" src="common/filters/startFrom.js"></script>
+    <script type="text/javascript" src="common/filters/ticklerLink.js"></script>
 
 	<script type="text/javascript" src="common/bodyController.js"></script>
 	<script type="text/javascript" src="common/navBarController.js"></script>
