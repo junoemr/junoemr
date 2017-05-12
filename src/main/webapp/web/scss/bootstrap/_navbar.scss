@@ -1,0 +1,11 @@
+// Default navbar
+.navbar-default {
+    a {
+        color: $primary-white-text;
+        font-weight: bold;
+        &:hover,
+        {
+            color: $hover-white;
+        }
+    }
+}

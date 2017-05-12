@@ -1,79 +1,49 @@
-
 // Bootstrap Custom LESS variables - see http://getbootstrap.com/customize/#less-variables
-
-
 // Colors
-
 // Scaffolding
-
 // Typography
-
-
+$text-color: #636363;
 // Iconography
 $icon-font-path: "../bower_components/bootstrap-sass/assets/fonts/bootstrap/";
-
-
 // Components
-
 // Tables
-
 // Buttons
-
 // Forms
-
 // Dropdowns
-
+$dropdown-bg: $primary-blue;
+$dropdown-link-color: $primary-white-text;
+$dropdown-link-hover-color:$primary-white-text;
+$dropdown-link-hover-bg: $hover-blue;
 // Media queries breakpoints
-
 // Grid system
-
 // Container sizes
-
 // Navbar
-
+$navbar-default-bg: $primary-blue;
+$navbar-default-color: $primary-white-text;
+$navbar-default-link-color: $primary-white-text;
+$navbar-default-link-hover-color: $primary-white-text;
+$navbar-default-link-active-color: $primary-white-text;
+$navbar-default-link-hover-bg: #1f58ae;
 // Navs
-
 // Tabs
-
 // Pills
-
 // Pagination
-
 // Pager
-
 // Jumbotron
-
 // Form states and alerts
-
 // Tooltips
-
 // Popovers
-
 // Labels
-
 // Modals
-
 // Alerts
-
 // Progress bars
-
 // List group
-
 // Panels
-
 // Thumbnails
-
 // Wells
-
 // Badges
-
 // Breadcrumbs
-
 // Carousel
-
 // Close
-
 // Code
-
 // Type
-
