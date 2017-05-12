@@ -97,7 +97,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 					<li ng-repeat="item in menuItems" ng-class="isActive(item)">
 						<a href="javascript:void(0)" ng-if="!item.dropdown" ng-click="transition(item)" >{{item.label}}
-							<span ng-if="item.label=='Inbox' && unAckLabDocTotal>0" class="badge badge-danger">{{unAckLabDocTotal}}</span>
+							<span ng-if="item.label=='Inbox' && unAckLabDocTotal>0" class="label label-danger">{{unAckLabDocTotal}}</span>
 						</a>
 						<a href="javascript:void(0)" ng-if="item.dropdown"  class="dropdown-toggle" data-toggle="dropdown">{{item.label}}
 							<span class="caret"></span>
@@ -123,7 +123,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							</li>
 							<li ng-repeat="item in moreMenuItems">
 								<a ng-class="{'active': isActive(item) }" ng-click="transition(item)">{{item.label}}
-								<span ng-if="item.extra.length>0" class="badge">{{item.extra}}</span></a>
+								<span ng-if="item.extra.length>0" class="label">{{item.extra}}</span></a>
 							</li>
 						</ul>
 					</li>
@@ -184,7 +184,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					<li class="dropdown" ng-class="{'active': currentmoretab != null}"><a class="dropdown-toggle hand-hover" ><b class="caret"></b></a>
 							<ul class="dropdown-menu">
 								<li ng-repeat="item in moreTabItems">
-								<a ng-class="getMoreTabClass(item.id)" ng-click="changeMoreTab(item.id)" class="hand-hover">{{item.label}}<span ng-if="item.extra.length>0" class="badge">{{item.extra}}</span></a></li>
+								<a ng-class="getMoreTabClass(item.id)" ng-click="changeMoreTab(item.id)" class="hand-hover">{{item.label}}<span ng-if="item.extra.length>0" class="label">{{item.extra}}</span></a></li>
 							</ul>
 					</li>
 
@@ -237,7 +237,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 		</div>
 		<!-- End patient List template -->
 
-		<div id="right_pane" class="col-lg-9 col-lg-offset-3 col-md-8 col-md-offset-4 col-sm-8 col-sm-offset-4" ui-view ng-cloak></div>
+		<div id="right_pane" class="col-lg-9 col-lg-offset-3 col-sm-8 col-sm-offset-4" ui-view ng-cloak></div>
 	</div>
 
 
