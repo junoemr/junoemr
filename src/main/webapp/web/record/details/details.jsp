@@ -28,609 +28,609 @@
 <div class="col-lg-12" ng-hide="page.canRead">
 	<bean:message key="demographic.demographiceditdemographic.accessDenied"/>
 </div>
-<div class="container no-margin-left" ng-show="page.canRead">
-		<div class="row">
-			<div class="col-md-12 pull-left">
-				<div class="btn-group sub-nav">
-					<div class="btn-group">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-							<bean:message key="demographic.demographicprintdemographic.btnPrint"/> <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<li><a href="../report/GenerateEnvelopes.do?demos={{page.demo.demographicNo}}">PDF Envelope</a></li>
-							<li><a class="hand-hover" ng-click="printLabel('PDFLabel')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFLabel"/></a></li>
-							<li><a class="hand-hover" ng-click="printLabel('PDFAddress')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFAddressLabel"/></a></li>
-							<li><a class="hand-hover" ng-click="printLabel('PDFChart')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFChartLabel"/></a></li>
-							<li><a class="hand-hover" ng-click="printLabel('PrintLabel')"><bean:message key="demographic.demographiceditdemographic.btnPrintLabel"/></a></li>
-							<li><a class="hand-hover" ng-click="printLabel('ClientLab')"><bean:message key="demographic.demographiceditdemographic.btnClientLabLabel"/></a></li>
-						</ul>
-					</div>
-					<div class="btn-group">
-						<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" ng-show="page.integratorEnabled" style="color:{{page.integratorStatusColor}}" title="{{page.integratorStatusMsg}}">
-							<bean:message key="web.record.details.integrator"/> <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<li ng-show="page.integratorOffline"><a style="color:#FF5500">{{page.integratorStatusMsg}}</a></li>
-							<li ng-hide="page.integratorOffline" title="{{page.integratorStatusMsg}}"><a style="color:{{page.integratorStatusColor}}" ng-click="integratorDo('ViewCommunity')"><bean:message key="web.record.details.viewIntegratedCommunity"/></a></li>
-							<li><a ng-click="integratorDo('Linking')"><bean:message key="web.record.details.manageLinkedClients"/></a></li>
-							<div ng-show="page.conformanceFeaturesEnabled && !page.integratorOffline">
-								<li><a ng-click="integratorDo('Compare')"><bean:message key="web.record.details.compareWithIntegrator"/></a></li>
-								<li><a ng-click="integratorDo('Update')"><bean:message key="web.record.details.updateFromIntegrator"/></a></li>
-								<li><a ng-click="integratorDo('SendNote')"><bean:message key="web.record.details.sendNoteIntegrator"/></a></li>
-							</div>
-						</ul>
-					</div>
-					<div class="btn-group">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-							<bean:message key="demographic.demographiceditdemographic.msgAppt"/> <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<li><a class="hand-hover" ng-click="appointmentDo('ApptHistory')"><bean:message key="demographic.demographiceditdemographic.btnApptHist"/></a></li>
-							<li><a class="hand-hover" ng-click="appointmentDo('WaitingList')"><bean:message key="demographic.demographiceditdemographic.msgWaitList"/></a></li>
-						</ul>
-					</div>
-					<div class="btn-group">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-							<bean:message key="admin.admin.billing" /> <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<li><a class="hand-hover" ng-click="billingDo('BillingHistory')">{{page.billingHistoryLabel}}</a></li>
-							<li><a class="hand-hover" ng-click="billingDo('CreateInvoice')"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></li>
-							<li ng-hide="isClinicaidBilling()"><a class="hand-hover" ng-click="billingDo('FluBilling')"><bean:message key="demographic.demographiceditdemographic.msgFluBilling"/></a></li>
-							<li ng-hide="isClinicaidBilling()"><a class="hand-hover" ng-click="billingDo('HospitalBilling')"><bean:message key="demographic.demographiceditdemographic.msgHospitalBilling"/></a></li>
-							<li ng-hide="isClinicaidBilling()"><a class="hand-hover" ng-click="billingDo('AddBatchBilling')"><bean:message key="demographic.demographiceditdemographic.msgAddBatchBilling"/></a></li>
-							<li ng-hide="isClinicaidBilling()"><a class="hand-hover" ng-click="billingDo('AddINR')"><bean:message key="demographic.demographiceditdemographic.msgAddINR"/></a></li>
-							<li ng-hide="isClinicaidBilling()"><a class="hand-hover" ng-click="billingDo('BillINR')"><bean:message key="demographic.demographiceditdemographic.msgINRBill"/></a></li>
-						</ul>
-					</div>
-					<div class="btn-group" ng-show="page.macPHRIdsSet">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-							<bean:message key="global.personalHealthRecord"/> <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<li><a class="hand-hover" ng-click="macPHRDo('SendMessage')"><bean:message key="demographic.demographiceditdemographic.msgSendMsgPHR"/></a></li>
-							<li><a class="hand-hover" ng-click="macPHRDo('ViewRecord')"><bean:message key="web.record.details.viewPhrRecord"/></a></li>
-						</ul>
-					</div>
-					<div class="btn-group">
-						<button type="button" class="btn btn-default" ng-click="exportDemographic()"><bean:message key="export"/></button>
-					</div>
+<div class="col-xs-12" ng-show="page.canRead">
+	<div class="row">
+		<div class="col-md-12 pull-left">
+			<div class="btn-group sub-nav">
+				<div class="btn-group">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+						<bean:message key="demographic.demographicprintdemographic.btnPrint"/> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="../report/GenerateEnvelopes.do?demos={{page.demo.demographicNo}}">PDF Envelope</a></li>
+						<li><a class="hand-hover" ng-click="printLabel('PDFLabel')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFLabel"/></a></li>
+						<li><a class="hand-hover" ng-click="printLabel('PDFAddress')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFAddressLabel"/></a></li>
+						<li><a class="hand-hover" ng-click="printLabel('PDFChart')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFChartLabel"/></a></li>
+						<li><a class="hand-hover" ng-click="printLabel('PrintLabel')"><bean:message key="demographic.demographiceditdemographic.btnPrintLabel"/></a></li>
+						<li><a class="hand-hover" ng-click="printLabel('ClientLab')"><bean:message key="demographic.demographiceditdemographic.btnClientLabLabel"/></a></li>
+					</ul>
+				</div>
+				<div class="btn-group">
+					<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" ng-show="page.integratorEnabled" style="color:{{page.integratorStatusColor}}" title="{{page.integratorStatusMsg}}">
+						<bean:message key="web.record.details.integrator"/> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li ng-show="page.integratorOffline"><a style="color:#FF5500">{{page.integratorStatusMsg}}</a></li>
+						<li ng-hide="page.integratorOffline" title="{{page.integratorStatusMsg}}"><a style="color:{{page.integratorStatusColor}}" ng-click="integratorDo('ViewCommunity')"><bean:message key="web.record.details.viewIntegratedCommunity"/></a></li>
+						<li><a ng-click="integratorDo('Linking')"><bean:message key="web.record.details.manageLinkedClients"/></a></li>
+						<div ng-show="page.conformanceFeaturesEnabled && !page.integratorOffline">
+							<li><a ng-click="integratorDo('Compare')"><bean:message key="web.record.details.compareWithIntegrator"/></a></li>
+							<li><a ng-click="integratorDo('Update')"><bean:message key="web.record.details.updateFromIntegrator"/></a></li>
+							<li><a ng-click="integratorDo('SendNote')"><bean:message key="web.record.details.sendNoteIntegrator"/></a></li>
+						</div>
+					</ul>
+				</div>
+				<div class="btn-group">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+						<bean:message key="demographic.demographiceditdemographic.msgAppt"/> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a class="hand-hover" ng-click="appointmentDo('ApptHistory')"><bean:message key="demographic.demographiceditdemographic.btnApptHist"/></a></li>
+						<li><a class="hand-hover" ng-click="appointmentDo('WaitingList')"><bean:message key="demographic.demographiceditdemographic.msgWaitList"/></a></li>
+					</ul>
+				</div>
+				<div class="btn-group">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+						<bean:message key="admin.admin.billing" /> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a class="hand-hover" ng-click="billingDo('BillingHistory')">{{page.billingHistoryLabel}}</a></li>
+						<li><a class="hand-hover" ng-click="billingDo('CreateInvoice')"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></li>
+						<li ng-hide="isClinicaidBilling()"><a class="hand-hover" ng-click="billingDo('FluBilling')"><bean:message key="demographic.demographiceditdemographic.msgFluBilling"/></a></li>
+						<li ng-hide="isClinicaidBilling()"><a class="hand-hover" ng-click="billingDo('HospitalBilling')"><bean:message key="demographic.demographiceditdemographic.msgHospitalBilling"/></a></li>
+						<li ng-hide="isClinicaidBilling()"><a class="hand-hover" ng-click="billingDo('AddBatchBilling')"><bean:message key="demographic.demographiceditdemographic.msgAddBatchBilling"/></a></li>
+						<li ng-hide="isClinicaidBilling()"><a class="hand-hover" ng-click="billingDo('AddINR')"><bean:message key="demographic.demographiceditdemographic.msgAddINR"/></a></li>
+						<li ng-hide="isClinicaidBilling()"><a class="hand-hover" ng-click="billingDo('BillINR')"><bean:message key="demographic.demographiceditdemographic.msgINRBill"/></a></li>
+					</ul>
+				</div>
+				<div class="btn-group" ng-show="page.macPHRIdsSet">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+						<bean:message key="global.personalHealthRecord"/> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a class="hand-hover" ng-click="macPHRDo('SendMessage')"><bean:message key="demographic.demographiceditdemographic.msgSendMsgPHR"/></a></li>
+						<li><a class="hand-hover" ng-click="macPHRDo('ViewRecord')"><bean:message key="web.record.details.viewPhrRecord"/></a></li>
+					</ul>
+				</div>
+				<div class="btn-group">
+					<button type="button" class="btn btn-default" ng-click="exportDemographic()"><bean:message key="export"/></button>
 				</div>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-md-10 col-lg-8 ">
+	</div>
+	<div class="row">
+		<div class="col-md-10 col-lg-8 ">
+			
+
+			<button type="button" class="btn {{page.readyForSwipe}}" ng-show="page.workflowEnhance" ng-click="setSwipeReady()" title="Click for Card Swipe" style="padding-top: 0px; padding-bottom: 0px; font-size: small">
+				{{page.swipecardMsg}}
+			</button>
+			<input type="text" id="swipecard" title="<bean:message key="web.record.details.clickCardSwipe"/>" ng-model="page.swipecard" ng-show="page.workflowEnhance" ng-focus="setSwipeReady()" ng-blur="setSwipeReady('off')" ng-keypress="healthCardHandler($event.keyCode)" style="width:0px; border:none"/>
+
+			<div id="pd1" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 				
+			<div class="form-horizontal">
+				<div class="row">
+					<div class="col-md-12">
+						<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.msgDemographic"/></h3>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label" title="Required Field"><bean:message key="demographic.demographiceditdemographic.formLastName"/> <span style="color:red">*</span></label>
+					<div class="col-md-4">
+						<input type="text" class="form-control form-control-details" placeholder="Family Name" title="Family Name" ng-model="page.demo.lastName" ng-change="formatLastName()" style="background-color:{{page.lastNameColor}}"/>
+					</div>
+					<label class="col-md-2 control-label" title="Required Field"><bean:message key="demographic.demographiceditdemographic.formFirstName"/> <span style="color:red">*</span></label>
+					<div class="col-md-4">
+						<input type="text" class="form-control form-control-details" placeholder="First Name" title="First Name" ng-model="page.demo.firstName" ng-change="formatFirstName()" style="background-color:{{page.firstNameColor}}"/>
+					</div>
+				</div>
 
-				<button type="button" class="btn {{page.readyForSwipe}}" ng-show="page.workflowEnhance" ng-click="setSwipeReady()" title="Click for Card Swipe" style="padding-top: 0px; padding-bottom: 0px; font-size: small">
-					{{page.swipecardMsg}}
-				</button>
-				<input type="text" id="swipecard" title="<bean:message key="web.record.details.clickCardSwipe"/>" ng-model="page.swipecard" ng-show="page.workflowEnhance" ng-focus="setSwipeReady()" ng-blur="setSwipeReady('off')" ng-keypress="healthCardHandler($event.keyCode)" style="width:0px; border:none"/>
-
-				<div id="pd1" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+				<div class="form-group">
+					<label class="col-md-2 control-label" title="Required Field"><bean:message key="web.record.details.dateOfBirth"/> <span style="color:red">*</span></label>
+					<div class="col-md-4">
+						<span class="input-group" >
+							<input id="dob-year" type="text" placeholder="YYYY" title="Birthday Year" class="form-control form-control-details" ng-model="page.demo.dobYear" ng-change="checkDate('DobY')" ng-blur="formatDate('DobY')" />
+							<input id="dob-month" type="text" placeholder="MM" title="Birthday Month" class="form-control form-control-details" ng-model="page.demo.dobMonth" ng-change="checkDate('DobM')" ng-blur="formatDate('DobM')"/>
+							<input id="dob-day" type="text" placeholder="DD" title="Birthday Day" class="form-control form-control-details" ng-model="page.demo.dobDay" ng-change="checkDate('DobD')" ng-blur="formatDate('DobD')"/>
+							<b> ({{page.demo.age}}y)</b>	
+						</span>
+						
+					</div>
 					
+					<label class="col-md-2 control-label" title="Required Field"><bean:message key="demographic.demographiceditdemographic.formSex"/> <span style="color:red">*</span></label>
+					<div class="col-md-4">
+						<select class="form-control form-control-details" title="Sex" ng-model="page.demo.sex" ng-options="sexes.value as sexes.label for sexes in page.genders"/>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.msgDemoTitle"/></label>
+					<div class="col-md-4">
+						<select class="form-control form-control-details" title="Title" ng-model="page.demo.title" ng-options="tt.value as tt.label for tt in page.titles">
+							<option value="">--</option>
+						</select>
+					</div>
+					<label class="col-md-2 control-label"><bean:message key="web.record.details.sin"/></label>
+					<div class="col-md-4">
+						<input type="text" class="form-control form-control-details" placeholder="<bean:message key="web.record.details.sin"/>" title="<bean:message key="web.record.details.sin"/>" ng-model="page.demo.sin" ng-change="checkSin()" ng-blur="validateSin()"/>
+					</div>
+				</div>
+			
+				<div class="form-group">
+					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.msgDemoLanguage"/></label>
+					<div class="col-md-4">
+						<select class="form-control form-control-details" title="Language" ng-model="page.demo.officialLanguage" ng-options="ef.value as ef.label for ef in page.engFre">
+							<option value="">--</option>
+						</select>
+					</div>
+					<label class="col-md-2 control-label">Spoken</label>
+					<div class="col-md-4">
+						<select class="form-control form-control-details" title="Spoken Language" ng-model="page.demo.spokenLanguage" ng-options="sl.value as sl.label for sl in page.spokenlangs">
+							<option value="">--</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.aboriginal"/></label>
+					<div class="col-md-4">
+						<select class="form-control form-control-details" title="Aboriginal" ng-model="page.demo.scrAboriginal">
+							<option value="">--</option>
+							<option value="Yes">Yes</option>
+							<option value="No">No</option>
+						</select>
+					</div>
+
+					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.alias"/></label>
+					<div class="col-md-4">
+						<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.alias"/>" title="<bean:message key="demographic.demographiceditdemographic.formPHRUserName"/>" ng-model="page.demo.alias"/>
+					</div>
+				</div>
+			
+				<div class="form-group">
+					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formPHRUserName"/></label>
+					<div class="col-md-4">
+						<div class="input-group">
+							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formPHRUserName"/>" title="<bean:message key="demographic.demographiceditdemographic.formPHRUserName"/>" ng-model="page.demo.myOscarUserName"/>
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-primary" ng-click="macPHRDo('Register')" ng-show="page.demo.myOscarUserName==null || page.demo.myOscarUserName==''">
+										<span class="glyphicon glyphicon-pencil"></span><%--<bean:message key="demographic.demographiceditdemographic.msgRegisterPHR"/>--%>
+								</button>
+							</span>
+						</div>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.msgCountryOfOrigin"/></label>
+					<div class="col-md-10">
+						<select class="form-control form-control-details" title="<bean:message key="demographic.demographiceditdemographic.msgCountryOfOrigin"/>" ng-model="page.demo.countryOfOrigin" ng-options="cnty.value as cnty.label for cnty in page.countries">
+							<option value="">--</option>
+						</select>
+					</div>
+				</div>
+			</div>
+				
+		
 				<div class="form-horizontal">
 					<div class="row">
 						<div class="col-md-12">
-							<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.msgDemographic"/></h3>
-						</div>
-					</div>
-					
-					<div class="form-group">
-						<label class="col-md-2 control-label" title="Required Field"><bean:message key="demographic.demographiceditdemographic.formLastName"/> <span style="color:red">*</span></label>
-						<div class="col-md-4">
-							<input type="text" class="form-control form-control-details" placeholder="Family Name" title="Family Name" ng-model="page.demo.lastName" ng-change="formatLastName()" style="background-color:{{page.lastNameColor}}"/>
-						</div>
-						<label class="col-md-2 control-label" title="Required Field"><bean:message key="demographic.demographiceditdemographic.formFirstName"/> <span style="color:red">*</span></label>
-						<div class="col-md-4">
-							<input type="text" class="form-control form-control-details" placeholder="First Name" title="First Name" ng-model="page.demo.firstName" ng-change="formatFirstName()" style="background-color:{{page.firstNameColor}}"/>
+							<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.msgContactInfo"/></h3>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="col-md-2 control-label" title="Required Field"><bean:message key="web.record.details.dateOfBirth"/> <span style="color:red">*</span></label>
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formAddr"/></label>
 						<div class="col-md-4">
-							<span class="input-group" >
-								<input id="dob-year" type="text" placeholder="YYYY" title="Birthday Year" class="form-control form-control-details" ng-model="page.demo.dobYear" ng-change="checkDate('DobY')" ng-blur="formatDate('DobY')" />
-								<input id="dob-month" type="text" placeholder="MM" title="Birthday Month" class="form-control form-control-details" ng-model="page.demo.dobMonth" ng-change="checkDate('DobM')" ng-blur="formatDate('DobM')"/>
-								<input id="dob-day" type="text" placeholder="DD" title="Birthday Day" class="form-control form-control-details" ng-model="page.demo.dobDay" ng-change="checkDate('DobD')" ng-blur="formatDate('DobD')"/>
-								<b> ({{page.demo.age}}y)</b>	
-							</span>
+							<input type="text" placeholder="<bean:message key="demographic.demographiceditdemographic.formAddr"/>" title="<bean:message key="demographic.demographiceditdemographic.formAddr"/>" class="form-control form-control-details" ng-model="page.demo.address.address"/>
+						</div>
+
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formCity"/></label>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formCity"/>" title="<bean:message key="demographic.demographiceditdemographic.formCity"/>" ng-model="page.demo.address.city"/>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formProcvince"/></label>
+						<div class="col-md-4">
+							<select class="form-control form-control-details" title="<bean:message key="demographic.demographiceditdemographic.formProcvince"/>" ng-model="page.demo.address.province" ng-options="pv.value as pv.label for pv in page.provinces">
+								<option value="">--</option>
+							</select>
+						</div>
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formPostal"/></label>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formPostal"/>" title="<bean:message key="demographic.demographiceditdemographic.formPostal"/>" ng-model="page.demo.address.postal" ng-change="checkPostal()" ng-blur="isPostalComplete()"/>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formEmail"/></label>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formEmail"/>" title="<bean:message key="demographic.demographiceditdemographic.formEmail"/>" ng-model="page.demo.email" ng-blur="checkEmail()"/>
+						</div>
+						<label class="col-md-2 control-label" style="background-color: {{page.cellPhonePreferredColor}}" title="{{page.cellPhonePreferredMsg}}">
+								<bean:message key="demographic.demographiceditdemographic.formPhoneC"/>
+								<input type="checkbox" ng-model="page.demo.scrPreferredPhone" ng-change="setPreferredPhone()" ng-true-value="C" ng-disabled="isPhoneVoid(page.demo.scrCellPhone)"/>
+							</label>
+						<div class="col-md-4">
 							
-						</div>
-						
-						<label class="col-md-2 control-label" title="Required Field"><bean:message key="demographic.demographiceditdemographic.formSex"/> <span style="color:red">*</span></label>
-						<div class="col-md-4">
-							<select class="form-control form-control-details" title="Sex" ng-model="page.demo.sex" ng-options="sexes.value as sexes.label for sexes in page.genders"/>
-						</div>
-					</div>
-					
-					<div class="form-group">
-						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.msgDemoTitle"/></label>
-						<div class="col-md-4">
-							<select class="form-control form-control-details" title="Title" ng-model="page.demo.title" ng-options="tt.value as tt.label for tt in page.titles">
-								<option value="">--</option>
-							</select>
-						</div>
-						<label class="col-md-2 control-label"><bean:message key="web.record.details.sin"/></label>
-						<div class="col-md-4">
-							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="web.record.details.sin"/>" title="<bean:message key="web.record.details.sin"/>" ng-model="page.demo.sin" ng-change="checkSin()" ng-blur="validateSin()"/>
-						</div>
-					</div>
-				
-					<div class="form-group">
-						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.msgDemoLanguage"/></label>
-						<div class="col-md-4">
-							<select class="form-control form-control-details" title="Language" ng-model="page.demo.officialLanguage" ng-options="ef.value as ef.label for ef in page.engFre">
-								<option value="">--</option>
-							</select>
-						</div>
-						<label class="col-md-2 control-label">Spoken</label>
-						<div class="col-md-4">
-							<select class="form-control form-control-details" title="Spoken Language" ng-model="page.demo.spokenLanguage" ng-options="sl.value as sl.label for sl in page.spokenlangs">
-								<option value="">--</option>
-							</select>
+							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formPhoneC"/>" title="<bean:message key="demographic.demographiceditdemographic.formPhoneC"/>" ng-model="page.demo.scrCellPhone" ng-change="checkPhone('C')"/>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.aboriginal"/></label>
-						<div class="col-md-4">
-							<select class="form-control form-control-details" title="Aboriginal" ng-model="page.demo.scrAboriginal">
-								<option value="">--</option>
-								<option value="Yes">Yes</option>
-								<option value="No">No</option>
-							</select>
-						</div>
-
-						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.alias"/></label>
-						<div class="col-md-4">
-							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.alias"/>" title="<bean:message key="demographic.demographiceditdemographic.formPHRUserName"/>" ng-model="page.demo.alias"/>
-						</div>
-					</div>
-				
-					<div class="form-group">
-						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formPHRUserName"/></label>
+						<label class="col-md-2 control-label" style="background-color: {{page.homePhonePreferredColor}}" title="{{page.homePhonePreferredMsg}}">
+								<bean:message key="demographic.demographiceditdemographic.formPhoneH"/>
+								<input type="checkbox" ng-model="page.demo.scrPreferredPhone" ng-change="setPreferredPhone()" ng-true-value="H" ng-disabled="isPhoneVoid(page.demo.scrHomePhone)"/>
+						</label>
 						<div class="col-md-4">
 							<div class="input-group">
-								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formPHRUserName"/>" title="<bean:message key="demographic.demographiceditdemographic.formPHRUserName"/>" ng-model="page.demo.myOscarUserName"/>
-								<span class="input-group-btn">
-									<button type="button" class="btn btn-success flat-btn" ng-click="macPHRDo('Register')" ng-show="page.demo.myOscarUserName==null || page.demo.myOscarUserName==''">
-											+<%--<bean:message key="demographic.demographiceditdemographic.msgRegisterPHR"/>--%>
-									</button>
-								</span>
+								<input type="text" class="form-control form-control-details phone-num" placeholder="<bean:message key="demographic.demographiceditdemographic.formPhoneH"/>" title="<bean:message key="demographic.demographiceditdemographic.formPhoneH"/>" ng-model="page.demo.scrHomePhone" ng-change="checkPhone('H')"/>
+								<input type="text" class="form-control form-control-details phone-ext" placeholder="<bean:message key="demographic.demographiceditdemographic.msgExt"/>" title="Home Phone Extension" ng-model="page.demo.scrHPhoneExt" ng-change="checkPhone('HX')"/>
+							</div>
+						</div>
+
+						<label class="col-md-2 control-label" style="background-color: {{page.workPhonePreferredColor}}" title="{{page.workPhonePreferredMsg}}">
+								<bean:message key="demographic.demographiceditdemographic.formPhoneW"/>
+								<input type="checkbox" ng-model="page.demo.scrPreferredPhone" ng-change="setPreferredPhone()" ng-true-value="W" ng-disabled="isPhoneVoid(page.demo.scrWorkPhone)"/>
+							</label>
+						<div class="col-md-4">
+							<div class="input-group">
+								<input type="text" class="form-control form-control-details phone-num" placeholder="<bean:message key="demographic.demographiceditdemographic.formPhoneW"/>" title="<bean:message key="demographic.demographiceditdemographic.formPhoneW"/>" ng-model="page.demo.scrWorkPhone" ng-change="checkPhone('W')"/>
+								<input type="text" class="form-control form-control-details phone-ext" placeholder="<bean:message key="demographic.demographiceditdemographic.msgExt"/>" title="Work Phone Extension" ng-model="page.demo.scrWPhoneExt" ng-change="checkPhone('WX')"/>
 							</div>
 						</div>
 					</div>
-					
 					<div class="form-group">
-						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.msgCountryOfOrigin"/></label>
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographicaddrecordhtm.formPhoneComment"/></label>
 						<div class="col-md-10">
-							<select class="form-control form-control-details" title="<bean:message key="demographic.demographiceditdemographic.msgCountryOfOrigin"/>" ng-model="page.demo.countryOfOrigin" ng-options="cnty.value as cnty.label for cnty in page.countries">
+							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographicaddrecordhtm.formPhoneComment"/>" title="<bean:message key="demographic.demographicaddrecordhtm.formPhoneComment"/>" ng-model="page.demo.scrPhoneComment"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formNewsLetter"/></label>
+						<div class="col-md-4">	
+							<select class="form-control form-control-details" title="<bean:message key="demographic.demographiceditdemographic.formNewsLetter"/>" ng-model="page.demo.newsletter">
 								<option value="">--</option>
+								<option value="<bean:message key="demographic.demographicaddrecordhtm.formNewsLetter.optNo"/>"><bean:message key="demographic.demographicaddrecordhtm.formNewsLetter.optNo"/></option>
+								<option value="<bean:message key="demographic.demographicaddrecordhtm.formNewsLetter.optPaper"/>"><bean:message key="demographic.demographicaddrecordhtm.formNewsLetter.optPaper"/></option>
+								<option value="<bean:message key="demographic.demographicaddrecordhtm.formNewsLetter.optElectronic"/>"><bean:message key="demographic.demographicaddrecordhtm.formNewsLetter.optElectronic"/></option>
 							</select>
 						</div>
 					</div>
 				</div>
-					
-			
-					<div class="form-horizontal">
-						<div class="row">
-							<div class="col-md-12">
-								<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.msgContactInfo"/></h3>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formAddr"/></label>
-							<div class="col-md-4">
-								<input type="text" placeholder="<bean:message key="demographic.demographiceditdemographic.formAddr"/>" title="<bean:message key="demographic.demographiceditdemographic.formAddr"/>" class="form-control form-control-details" ng-model="page.demo.address.address"/>
-							</div>
-
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formCity"/></label>
-							<div class="col-md-4">
-								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formCity"/>" title="<bean:message key="demographic.demographiceditdemographic.formCity"/>" ng-model="page.demo.address.city"/>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formProcvince"/></label>
-							<div class="col-md-4">
-								<select class="form-control form-control-details" title="<bean:message key="demographic.demographiceditdemographic.formProcvince"/>" ng-model="page.demo.address.province" ng-options="pv.value as pv.label for pv in page.provinces">
-									<option value="">--</option>
-								</select>
-							</div>
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formPostal"/></label>
-							<div class="col-md-4">
-								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formPostal"/>" title="<bean:message key="demographic.demographiceditdemographic.formPostal"/>" ng-model="page.demo.address.postal" ng-change="checkPostal()" ng-blur="isPostalComplete()"/>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formEmail"/></label>
-							<div class="col-md-4">
-								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formEmail"/>" title="<bean:message key="demographic.demographiceditdemographic.formEmail"/>" ng-model="page.demo.email" ng-blur="checkEmail()"/>
-							</div>
-							<label class="col-md-2 control-label" style="background-color: {{page.cellPhonePreferredColor}}" title="{{page.cellPhonePreferredMsg}}">
-									<bean:message key="demographic.demographiceditdemographic.formPhoneC"/>
-									<input type="checkbox" ng-model="page.demo.scrPreferredPhone" ng-change="setPreferredPhone()" ng-true-value="C" ng-disabled="isPhoneVoid(page.demo.scrCellPhone)"/>
-								</label>
-							<div class="col-md-4">
-								
-								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formPhoneC"/>" title="<bean:message key="demographic.demographiceditdemographic.formPhoneC"/>" ng-model="page.demo.scrCellPhone" ng-change="checkPhone('C')"/>
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label class="col-md-2 control-label" style="background-color: {{page.homePhonePreferredColor}}" title="{{page.homePhonePreferredMsg}}">
-									<bean:message key="demographic.demographiceditdemographic.formPhoneH"/>
-									<input type="checkbox" ng-model="page.demo.scrPreferredPhone" ng-change="setPreferredPhone()" ng-true-value="H" ng-disabled="isPhoneVoid(page.demo.scrHomePhone)"/>
-							</label>
-							<div class="col-md-4">
-								<div class="input-group">
-									<input type="text" class="form-control form-control-details phone-num" placeholder="<bean:message key="demographic.demographiceditdemographic.formPhoneH"/>" title="<bean:message key="demographic.demographiceditdemographic.formPhoneH"/>" ng-model="page.demo.scrHomePhone" ng-change="checkPhone('H')"/>
-									<input type="text" class="form-control form-control-details phone-ext" placeholder="<bean:message key="demographic.demographiceditdemographic.msgExt"/>" title="Home Phone Extension" ng-model="page.demo.scrHPhoneExt" ng-change="checkPhone('HX')"/>
-								</div>
-							</div>
-
-							<label class="col-md-2 control-label" style="background-color: {{page.workPhonePreferredColor}}" title="{{page.workPhonePreferredMsg}}">
-									<bean:message key="demographic.demographiceditdemographic.formPhoneW"/>
-									<input type="checkbox" ng-model="page.demo.scrPreferredPhone" ng-change="setPreferredPhone()" ng-true-value="W" ng-disabled="isPhoneVoid(page.demo.scrWorkPhone)"/>
-								</label>
-							<div class="col-md-4">
-								<div class="input-group">
-									<input type="text" class="form-control form-control-details phone-num" placeholder="<bean:message key="demographic.demographiceditdemographic.formPhoneW"/>" title="<bean:message key="demographic.demographiceditdemographic.formPhoneW"/>" ng-model="page.demo.scrWorkPhone" ng-change="checkPhone('W')"/>
-									<input type="text" class="form-control form-control-details phone-ext" placeholder="<bean:message key="demographic.demographiceditdemographic.msgExt"/>" title="Work Phone Extension" ng-model="page.demo.scrWPhoneExt" ng-change="checkPhone('WX')"/>
-								</div>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographicaddrecordhtm.formPhoneComment"/></label>
-							<div class="col-md-10">
-								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographicaddrecordhtm.formPhoneComment"/>" title="<bean:message key="demographic.demographicaddrecordhtm.formPhoneComment"/>" ng-model="page.demo.scrPhoneComment"/>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formNewsLetter"/></label>
-							<div class="col-md-4">	
-								<select class="form-control form-control-details" title="<bean:message key="demographic.demographiceditdemographic.formNewsLetter"/>" ng-model="page.demo.newsletter">
-									<option value="">--</option>
-									<option value="<bean:message key="demographic.demographicaddrecordhtm.formNewsLetter.optNo"/>"><bean:message key="demographic.demographicaddrecordhtm.formNewsLetter.optNo"/></option>
-									<option value="<bean:message key="demographic.demographicaddrecordhtm.formNewsLetter.optPaper"/>"><bean:message key="demographic.demographicaddrecordhtm.formNewsLetter.optPaper"/></option>
-									<option value="<bean:message key="demographic.demographicaddrecordhtm.formNewsLetter.optElectronic"/>"><bean:message key="demographic.demographicaddrecordhtm.formNewsLetter.optElectronic"/></option>
-								</select>
-							</div>
-						</div>
-					</div>
-					
-					<div class="form-horizontal">
-						<div class="row">
-							<div class="col-md-12">
-								<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.msgHealthIns"/></h3>
-							</div>
-						</div>
-						<div class="alert-warning" ng-show="page.HCValidation=='n/a'">
-							Online Health Card Validation unavailable
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label">
-								HIN
-								<span ng-show="page.HCValidation=='valid'" title="HIN Valid" style="font-size:large; color:#009900">&#10004;</span>
-								<span ng-show="page.HCValidation=='invalid'" title="HIN Invalid" style="font-size:large; color:red">&#10008;</span>
-								<span ng-show="page.HCValidation=='n/a'" title="Online Health Card Validation unavailable" style="font-size:large; color:#ff5500">?</span>
-								<button class="btn" title="Validate HIN #" ng-click="validateHC()" ng-hide="page.demo.hin==null || page.demo.hin=='' || page.demo.hcType!='ON'" style="padding: 0px 5px; font-size: small">Validate</button>
-							</label>
-							<div class="col-md-4">
-								<div class="input-group">
-									<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.msgHealthIns"/>" title="<bean:message key="demographic.demographiceditdemographic.msgHealthIns"/>" ng-model="page.demo.hin" ng-change="checkHin()" style="width:70%"/>
-									<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formVer"/>" title="HIN Version" ng-model="page.demo.ver" ng-change="checkHinVer()" style="width:30%; background-color:{{page.verColor}}"/>
-								</div>
-							</div>
-
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formHCType"/></label>
-							<div class="col-md-4">
-								<select class="form-control form-control-details" title="Health Card Type" ng-model="page.demo.hcType" ng-options="hct.value as hct.label for hct in page.provinces" style="background-color:{{page.hcTypeColor}}">
-									<option value="" >--</option>
-								</select>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formEFFDate"/></label>
-							<div class="col-md-4">
-								<input id="effDate" ng-model="page.demo.effDate" type="text" class="form-control form-control-details" title="Health Card Effective Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.effDatePicker" ng-click="page.effDatePicker = true" placeholder="YYYY-MM-DD" style="background-color:{{page.effDateColor}}" ng-change="preventManualEffDate()"/>
-							</div>
-
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formHCRenewDate"/></label>
-							<div class="col-md-4">
-								<input id="hcRenewDate" ng-model="page.demo.hcRenewDate" type="text" class="form-control form-control-details" title="Health Card Renew Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.hcRenewDatePicker" ng-click="page.hcRenewDatePicker = true" placeholder="YYYY-MM-DD" style="background-color:{{page.hcRenewDateColor}}" ng-change="preventManualHcRenewDate()"/>
-							</div>
-						</div>
-					</div>
-					
-					<div class="form-horizontal">
-						<div class="row">
-							<div class="col-md-12">
-								<h3 class="form-heading"><bean:message key="web.record.details.careTeam"/></h3>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="web.record.details.mrp"/></label>
-							<div class="col-md-4">
-								<select class="form-control form-control-details" title="MRP" ng-model="page.demo.providerNo" ng-options="mrp.providerNo as mrp.name for mrp in page.demo.doctors">
-									<option value="">--</option>
-								</select>
-							</div>
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formNurse"/></label>
-							<div class="col-md-4">
-								<select class="form-control form-control-details" title="Nurse" ng-model="page.demo.nurse" ng-options="ns.providerNo as ns.name for ns in page.demo.nurses">
-									<option value="">--</option>
-								</select>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="web.record.details.midwife"/></label>
-							<div class="col-md-4">
-								<select class="form-control form-control-details" title="Midwife" ng-model="page.demo.midwife" ng-options="mw.providerNo as mw.name for mw in page.demo.midwives">
-									<option value="">--</option>
-								</select>
-							</div>
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formResident"/></label>
-							<div class="col-md-4">
-								<select class="form-control form-control-details" title="Resident" ng-model="page.demo.resident" ng-options="res.providerNo as res.name for res in page.demo.doctors">
-									<option value="">--</option>
-								</select>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formRefDoc"/></label>
-							<div class="col-md-4">
-								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formRefDoc"/>" title="<bean:message key="demographic.demographiceditdemographic.formRefDoc"/>" ng-model="page.demo.scrReferralDoc"/>
-							</div>
-
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formRefDocNo"/></label>
-							<div class="col-md-4">
-								<div class="input-group">
-									<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formRefDocNo"/>" title="<bean:message key="demographic.demographiceditdemographic.formRefDocNo"/>" ng-model="page.demo.scrReferralDocNo" ng-change="checkReferralDocNo()"/>
-									<span class="input-group-btn">	
-										<button type="button" class="btn btn-primary" ng-click="showReferralDocList()"><bean:message key="demographic.demographiceditdemographic.btnSearch"/></button>
-									</span>
-								</div>
-								<div style="position: absolute; right: 25px; z-index: 1; background-color: white" ng-show="page.showReferralDocList">
-									<select class="form-control form-control-details" title="<bean:message key="web.record.details.pickReferralDoctor"/>" size="7" ng-model="page.referralDocObj" ng-options="rfd.label for rfd in page.demo.referralDoctors" ng-click="fillReferralDoc()">
-										<option value="">--<bean:message key="web.record.details.pickReferralDoctor"/>--</option>
-									</select>
-								</div>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formRosterStatus"/></label>
-							<div class="col-md-4">
-								<div class="input-group">
-									<select class="form-control form-control-details" title="<bean:message key="demographic.demographiceditdemographic.formRosterStatus"/>" ng-model="page.demo.rosterStatus" ng-options="rs.value as rs.label for rs in page.demo.rosterStatusList" >
-										<option value="">--</option>
-									</select>
-									<span class="input-group-btn">
-										<button type="button" class="btn btn-success" title="Add new roster status" ng-click="showAddNewRosterStatus()"><bean:message key="global.btnAdd"/></button>
-									</span>
-								</div>
-								<div class="add-status-menu" ng-show="page.showAddNewRosterStatus">
-									<input type="text" class="form-control" placeholder="New Roster Status" ng-model="page.newRosterStatus"/>
-									<button type="button" class="btn btn-sm btn-success" ng-click="addNewRosterStatus()"><bean:message key="web.record.details.addStatus"/></button>
-									<button type="button" class="btn btn-sm btn-danger" ng-click="showAddNewRosterStatus()"><bean:message key="global.btnCancel"/></button>
-								</div>
-							</div>
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.DateJoined"/></label>
-							<div class="col-md-4">
-								<input id="rosterDate" ng-model="page.demo.rosterDate" type="text" class="form-control form-control-details" title="Roster Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.rosterDatePicker" ng-click="page.rosterDatePicker = true" placeholder="YYYY-MM-DD" ng-change="preventManualRosterDate()"/>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-md-10 col-md-offset-2">
-								<button type="button" class="btn btn-primary flat-btn" ng-click="showEnrollmentHistory()"><bean:message key="demographic.demographiceditdemographic.msgEnrollmentHistory"/></button>
-							</div>
-						</div>
-						<div class="form-group" ng-show="isRosterTerminated()">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.RosterTerminationDate"/></label>
-							<div class="col-md-10" >
-								<input id="rosterTerminationDate" ng-model="page.demo.rosterTerminationDate" type="text" class="form-control form-control-details" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.rosterTerminationDatePicker" ng-click="page.rosterTerminationDatePicker=true" title="YYYY-MM-DD" placeholder="<bean:message key="web.record.details.rosterTerminationDate"/>" ng-change="preventManualRosterTerminationDate()"/>
-							</div>
-						</div>
-						<div class="form-group" ng-show="isRosterTerminated()">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.RosterTerminationReason"/></label>
-							<div class="col-md-10">
-								<select class="form-control form-control-details" title="<bean:message key="web.record.details.rosterTerminationReason"/>" ng-model="page.demo.rosterTerminationReason" ng-options="rtr.value as rtr.label for rtr in page.rosterTermReasons">
-									<option value="">--</option>
-								</select>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formPatientStatus"/></label>
-							<div class="col-md-4">
-								<div class="input-group">
-									<select class="form-control form-control-details" title="Patient Status" ng-model="page.demo.patientStatus" ng-options="ps.value as ps.label for ps in page.demo.patientStatusList" ng-blur="checkPatientStatus()">
-										<option value="">--</option>
-									</select>
-									<span class="input-group-btn">
-										<button type="button" class="btn btn-success" title="Add new patient status" ng-click="showAddNewPatientStatus()">Add</button>
-									</span>
-								</div>
-								<div class="add-status-menu" ng-show="page.showAddNewPatientStatus">
-									<input type="text" class="form-control" placeholder="New Patient Status" ng-model="page.newPatientStatus"/>
-									<button type="button" class="btn btn-sm btn-success" ng-click="addNewPatientStatus()">Save</button>
-									<button type="button" class="btn btn-sm btn-danger" ng-click="showAddNewPatientStatus()">Cancel</button>
-								</div>
-							</div>
-
-							<label class="col-md-2 control-label" ><bean:message key="demographic.demographiceditdemographic.PatientStatusDate"/></label>
-							<div class="col-md-4">
-								<input id="patientStatusDate" ng-model="page.demo.patientStatusDate" type="text" class="form-control form-control-details" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.patientStatusDatePicker" ng-click="page.patientStatusDatePicker=true" title="YYYY-MM-DD" placeholder="<bean:message key="demographic.demographiceditdemographic.PatientStatusDate"/>" ng-change="preventManualPatientStatusDate()"/>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formDateJoined1"/></label>
-							<div class="col-md-4">
-								<input id="dateJoined" ng-model="page.demo.dateJoined" type="text" class="form-control form-control-details" title="Date Joined" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.dateJoinedPicker" ng-click="page.dateJoinedPicker = true" placeholder="YYYY-MM-DD" ng-change="preventManualDateJoined()"/>
-							</div>
-
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formEndDate"/></label>
-							<div class="col-md-4">
-								<input id="endDate" ng-model="page.demo.endDate" type="text" class="form-control form-control-details" title="End Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.endDatePicker" ng-click="page.endDatePicker = true" placeholder="YYYY-MM-DD" ng-change="preventManualEndDate()"/>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formChartNo"/></label>
-							<div class="col-md-4">
-								<input type="text" class="form-control form-control-details" placeholder="Chart Number" title="Chart Number" ng-model="page.demo.chartNo" ng-change="checkChartNo()"/>
-							</div>
-
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.cytolNum"/></label>
-							<div class="col-md-4">
-								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.cytolNum"/>" title="<bean:message key="demographic.demographiceditdemographic.cytolNum"/>" ng-model="page.demo.scrCytolNum" ng-change="checkCytoNum()"/>
-							</div>
-						</div>
-					</div>
-					
-					<div class="form-horizontal">
-						<div class="row">
-							<div class="col-md-12">
-								<h3 class="form-heading"><bean:message key="web.record.details.addInformation"/></h3>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="web.record.details.archivedPaperChart"/></label>
-							<div class="col-md-4">
-								<select class="form-control form-control-details" title="Archived Paper Chart" ng-model="page.demo.scrPaperChartArchived">
-									<option value="">--</option>
-									<option value="NO"><bean:message key="demographic.demographiceditdemographic.paperChartIndicator.no"/></option>
-									<option value="YES"><bean:message key="demographic.demographiceditdemographic.paperChartIndicator.yes"/></option>
-								</select>
-							</div>
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.paperChartIndicator.dateArchived"/></label>
-							<div class="col-md-4">
-								<input id="paperChartArchivedDate" ng-model="page.demo.scrPaperChartArchivedDate" type="text" class="form-control form-control-details" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.paperChartArchivedDatePicker" ng-click="page.paperChartArchivedDatePicker=true" title="YYYY-MM-DD" placeholder="<bean:message key="demographic.demographiceditdemographic.paperChartIndicator.dateArchived"/>" ng-change="preventManualPaperChartArchivedDate()"/>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.msgWaitList"/></label>
-							<div class="col-md-4">
-								<select class="form-control form-control-details" title="Waiting List" ng-model="page.demo.waitingListID" ng-options="wln.id as wln.name for wln in page.demo.waitingListNames">
-									<option value="">--</option>
-								</select>
-							</div>
-
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographicaddarecordhtm.msgDateOfReq"/></label>
-							<div class="col-md-4">
-								<input id="onWaitingListSinceDate" ng-model="page.demo.onWaitingListSinceDate" type="text" class="form-control form-control-details" title="<bean:message key="demographic.demographicaddarecordhtm.msgDateOfReq"/>" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.onWaitingListSinceDatePicker" ng-click="page.onWaitingListSinceDatePicker = true" placeholder="YYYY-MM-DD" ng-change="preventManualOnWaitingListSinceDate()"/>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographicaddarecordhtm.msgWaitListNote"/></label>
-							<div class="col-md-10">
-								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographicaddarecordhtm.msgWaitListNote"/>" title="<bean:message key="demographic.demographicaddarecordhtm.msgWaitListNote"/>" ng-model="page.demo.waitingListNote"/>
-							</div>
-						</div>
-						<div class="form-group"> 
-							<label class="col-md-2 control-label"><bean:message key="web.record.details.privacyConsent"/></label>
-							<div class="col-md-4">
-								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.privacyConsent"/>" title="<bean:message key="demographic.demographiceditdemographic.privacyConsent"/>" ng-model="page.demo.scrPrivacyConsent"/>
-							</div>
-							<label class="col-md-2 control-label"><bean:message key="web.record.details.informedConsent"/></label>
-							<div class="col-md-4">
-								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.informedConsent"/>" title="<bean:message key="demographic.demographiceditdemographic.informedConsent"/>" ng-model="page.demo.scrInformedConsent"/>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.usConsent"/></label>
-							<div class="col-md-10">
-								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.usConsent"/>" title="<bean:message key="demographic.demographiceditdemographic.usConsent"/>" ng-model="page.demo.scrUsSigned"/>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="web.record.details.securityQuestion"/></label>
-							<div class="col-md-10">
-								<select class="form-control form-control-details" title="<bean:message key="web.record.details.selectSecurityQuestion"/>" ng-model="page.demo.scrSecurityQuestion1" ng-options="sq.value as sq.label for sq in page.securityQuestions">
-									<option value="">--</option>
-								</select>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="web.record.details.answer"/></label>
-							<div class="col-md-10">
-								<input type="text" class="form-control form-control-details" title="<bean:message key="web.record.details.answerToSecurityQuestion"/>" placeholder="<bean:message key="web.record.details.answerToSecurityQuestion"/>" ng-model="page.demo.scrSecurityAnswer1"/>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label"><bean:message key="web.record.details.rxInteractionLevel"/></label>
-							<div class="col-md-10">
-								<select class="form-control form-control-details" title="<bean:message key="web.record.details.rxInteractionLevel"/>" ng-model="page.demo.scrRxInteractionLevel" ng-options="r.value as r.name for r in page.rxInteractionLevels" />
-							</div>
-						</div>
-					</div>
-					</div>
-				</div>
-				<br/>
-
-			<div class=" col-md-10 col-lg-4">
-				<div class="clearfix col-md-12">
-					<img class="pull-left" id="photo" title="Click to upload photo" ng-click="launchPhoto()" ng-src="../imageRenderingServlet?source=local_client&clientId={{page.demo.demographicNo}}"/>
-					<%--Remove this?--%>
-					<%--<div class="pull-left" style="margin-left:5px;">
-						<address>
-							<strong>{{page.demo.lastName}}, {{page.demo.firstName}}</strong><br/>
-							{{page.demo.address.address}}<br/>
-							{{page.demo.address.city}}, {{page.demo.address.province}} {{page.demo.address.postal}}<br/>
-							<abbr title="Phone" ng-show="page.preferredPhoneNumber"><bean:message key="web.record.details.phoneShortHand"/></abbr> {{page.preferredPhoneNumber}}
-						</address>
-						<a ng-click="macPHRDo('Verification')" ng-show="page.macPHRIdsSet"><bean:message key="global.phr"/>{{page.macPHRVerificationLevel}}</a>
-					</div>--%>
-				</div>
-				<br/>
-				<div>
-					<div id="pd2" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+				
+				<div class="form-horizontal">
+					<div class="row">
 						<div class="col-md-12">
-							<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formAlert"/></h3>
-							<textarea id="alert-text-box" ng-model="page.demo.alert" class="form-control form-control-details"></textarea>
-						</div>
-						<br/>
-						<div class="col-md-12">
-							<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formNotes"/></h3>
-							<textarea id="notes-text-box" ng-model="page.demo.scrNotes" class="form-control form-control-details"></textarea>
+							<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.msgHealthIns"/></h3>
 						</div>
 					</div>
-					<hr>
-					<div class="col-md-12">
-						<h3 class="form-heading">
-							<bean:message key="global.contacts"/>
-							<button type="button" class="btn pull-right" ng-click="manageContacts()"><bean:message key="web.record.details.manage"/></button>
-						</h3>
-						<div class="form-group" ng-repeat="dc in page.demo.demoContacts">
-							<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
-							<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
-							<div class="col-md-5">{{dc.phone}}</div>
+					<div class="alert-warning" ng-show="page.HCValidation=='n/a'">
+						Online Health Card Validation unavailable
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">
+							HIN
+							<span ng-show="page.HCValidation=='valid'" title="HIN Valid" style="font-size:large; color:#009900">&#10004;</span>
+							<span ng-show="page.HCValidation=='invalid'" title="HIN Invalid" style="font-size:large; color:red">&#10008;</span>
+							<span ng-show="page.HCValidation=='n/a'" title="Online Health Card Validation unavailable" style="font-size:large; color:#ff5500">?</span>
+							<button class="btn" title="Validate HIN #" ng-click="validateHC()" ng-hide="page.demo.hin==null || page.demo.hin=='' || page.demo.hcType!='ON'" style="padding: 0px 5px; font-size: small">Validate</button>
+						</label>
+						<div class="col-md-4">
+							<div class="input-group">
+								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.msgHealthIns"/>" title="<bean:message key="demographic.demographiceditdemographic.msgHealthIns"/>" ng-model="page.demo.hin" ng-change="checkHin()" style="width:70%"/>
+								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formVer"/>" title="HIN Version" ng-model="page.demo.ver" ng-change="checkHinVer()" style="width:30%; background-color:{{page.verColor}}"/>
+							</div>
+						</div>
+
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formHCType"/></label>
+						<div class="col-md-4">
+							<select class="form-control form-control-details" title="Health Card Type" ng-model="page.demo.hcType" ng-options="hct.value as hct.label for hct in page.provinces" style="background-color:{{page.hcTypeColor}}">
+								<option value="" >--</option>
+							</select>
 						</div>
 					</div>
-					<hr>
-					<div class="col-md-12">
-						<h3 class="form-heading">
-							<bean:message key="web.record.details.proContacts"/>
-							<button type="button" class="btn pull-right" ng-click="manageContacts()"><bean:message key="web.record.details.manage"/></button>
-						</h3>
-						<div class="form-group" ng-repeat="dc in page.demo.demoContactPros">
-							<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
-							<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
-							<div class="col-md-5">{{dc.phone}}</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formEFFDate"/></label>
+						<div class="col-md-4">
+							<input id="effDate" ng-model="page.demo.effDate" type="text" class="form-control form-control-details" title="Health Card Effective Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.effDatePicker" ng-click="page.effDatePicker = true" placeholder="YYYY-MM-DD" style="background-color:{{page.effDateColor}}" ng-change="preventManualEffDate()"/>
+						</div>
+
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formHCRenewDate"/></label>
+						<div class="col-md-4">
+							<input id="hcRenewDate" ng-model="page.demo.hcRenewDate" type="text" class="form-control form-control-details" title="Health Card Renew Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.hcRenewDatePicker" ng-click="page.hcRenewDatePicker = true" placeholder="YYYY-MM-DD" style="background-color:{{page.hcRenewDateColor}}" ng-change="preventManualHcRenewDate()"/>
 						</div>
 					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-8 col-md-10">
-				<div class="alert alert-success" ng-show="page.saving">
-					<bean:message key="web.record.details.saving"/>
 				</div>
 				
-				<button id="save-button" type="button" class="btn btn-success {{needToSave()}}" ng-click="validateHCSave(true)" ng-disabled="page.dataChanged<1">Save</button>
+				<div class="form-horizontal">
+					<div class="row">
+						<div class="col-md-12">
+							<h3 class="form-heading"><bean:message key="web.record.details.careTeam"/></h3>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="web.record.details.mrp"/></label>
+						<div class="col-md-4">
+							<select class="form-control form-control-details" title="MRP" ng-model="page.demo.providerNo" ng-options="mrp.providerNo as mrp.name for mrp in page.demo.doctors">
+								<option value="">--</option>
+							</select>
+						</div>
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formNurse"/></label>
+						<div class="col-md-4">
+							<select class="form-control form-control-details" title="Nurse" ng-model="page.demo.nurse" ng-options="ns.providerNo as ns.name for ns in page.demo.nurses">
+								<option value="">--</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="web.record.details.midwife"/></label>
+						<div class="col-md-4">
+							<select class="form-control form-control-details" title="Midwife" ng-model="page.demo.midwife" ng-options="mw.providerNo as mw.name for mw in page.demo.midwives">
+								<option value="">--</option>
+							</select>
+						</div>
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formResident"/></label>
+						<div class="col-md-4">
+							<select class="form-control form-control-details" title="Resident" ng-model="page.demo.resident" ng-options="res.providerNo as res.name for res in page.demo.doctors">
+								<option value="">--</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formRefDoc"/></label>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formRefDoc"/>" title="<bean:message key="demographic.demographiceditdemographic.formRefDoc"/>" ng-model="page.demo.scrReferralDoc"/>
+						</div>
+
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formRefDocNo"/></label>
+						<div class="col-md-4">
+							<div class="input-group">
+								<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formRefDocNo"/>" title="<bean:message key="demographic.demographiceditdemographic.formRefDocNo"/>" ng-model="page.demo.scrReferralDocNo" ng-change="checkReferralDocNo()"/>
+								<span class="input-group-btn">	
+									<button type="button" class="btn btn-primary" ng-click="showReferralDocList()"><bean:message key="demographic.demographiceditdemographic.btnSearch"/></button>
+								</span>
+							</div>
+							<div style="position: absolute; right: 25px; z-index: 1; background-color: white" ng-show="page.showReferralDocList">
+								<select class="form-control form-control-details" title="<bean:message key="web.record.details.pickReferralDoctor"/>" size="7" ng-model="page.referralDocObj" ng-options="rfd.label for rfd in page.demo.referralDoctors" ng-click="fillReferralDoc()">
+									<option value="">--<bean:message key="web.record.details.pickReferralDoctor"/>--</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formRosterStatus"/></label>
+						<div class="col-md-4">
+							<div class="input-group">
+								<select class="form-control form-control-details" title="<bean:message key="demographic.demographiceditdemographic.formRosterStatus"/>" ng-model="page.demo.rosterStatus" ng-options="rs.value as rs.label for rs in page.demo.rosterStatusList" >
+									<option value="">--</option>
+								</select>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-success" title="Add new roster status" ng-click="showAddNewRosterStatus()"><bean:message key="global.btnAdd"/></button>
+								</span>
+							</div>
+							<div class="add-status-menu" ng-show="page.showAddNewRosterStatus">
+								<input type="text" class="form-control" placeholder="New Roster Status" ng-model="page.newRosterStatus"/>
+								<button type="button" class="btn btn-sm btn-success" ng-click="addNewRosterStatus()"><bean:message key="web.record.details.addStatus"/></button>
+								<button type="button" class="btn btn-sm btn-danger" ng-click="showAddNewRosterStatus()"><bean:message key="global.btnCancel"/></button>
+							</div>
+						</div>
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.DateJoined"/></label>
+						<div class="col-md-4">
+							<input id="rosterDate" ng-model="page.demo.rosterDate" type="text" class="form-control form-control-details" title="Roster Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.rosterDatePicker" ng-click="page.rosterDatePicker = true" placeholder="YYYY-MM-DD" ng-change="preventManualRosterDate()"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-md-10 col-md-offset-2">
+							<button type="button" class="btn btn-primary" ng-click="showEnrollmentHistory()"><bean:message key="demographic.demographiceditdemographic.msgEnrollmentHistory"/></button>
+						</div>
+					</div>
+					<div class="form-group" ng-show="isRosterTerminated()">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.RosterTerminationDate"/></label>
+						<div class="col-md-10" >
+							<input id="rosterTerminationDate" ng-model="page.demo.rosterTerminationDate" type="text" class="form-control form-control-details" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.rosterTerminationDatePicker" ng-click="page.rosterTerminationDatePicker=true" title="YYYY-MM-DD" placeholder="<bean:message key="web.record.details.rosterTerminationDate"/>" ng-change="preventManualRosterTerminationDate()"/>
+						</div>
+					</div>
+					<div class="form-group" ng-show="isRosterTerminated()">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.RosterTerminationReason"/></label>
+						<div class="col-md-10">
+							<select class="form-control form-control-details" title="<bean:message key="web.record.details.rosterTerminationReason"/>" ng-model="page.demo.rosterTerminationReason" ng-options="rtr.value as rtr.label for rtr in page.rosterTermReasons">
+								<option value="">--</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formPatientStatus"/></label>
+						<div class="col-md-4">
+							<div class="input-group">
+								<select class="form-control form-control-details" title="Patient Status" ng-model="page.demo.patientStatus" ng-options="ps.value as ps.label for ps in page.demo.patientStatusList" ng-blur="checkPatientStatus()">
+									<option value="">--</option>
+								</select>
+								<span class="input-group-btn">
+									<button type="button" class="btn btn-success" title="Add new patient status" ng-click="showAddNewPatientStatus()">Add</button>
+								</span>
+							</div>
+							<div class="add-status-menu" ng-show="page.showAddNewPatientStatus">
+								<input type="text" class="form-control" placeholder="New Patient Status" ng-model="page.newPatientStatus"/>
+								<button type="button" class="btn btn-sm btn-success" ng-click="addNewPatientStatus()">Save</button>
+								<button type="button" class="btn btn-sm btn-danger" ng-click="showAddNewPatientStatus()">Cancel</button>
+							</div>
+						</div>
+
+						<label class="col-md-2 control-label" ><bean:message key="demographic.demographiceditdemographic.PatientStatusDate"/></label>
+						<div class="col-md-4">
+							<input id="patientStatusDate" ng-model="page.demo.patientStatusDate" type="text" class="form-control form-control-details" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.patientStatusDatePicker" ng-click="page.patientStatusDatePicker=true" title="YYYY-MM-DD" placeholder="<bean:message key="demographic.demographiceditdemographic.PatientStatusDate"/>" ng-change="preventManualPatientStatusDate()"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formDateJoined1"/></label>
+						<div class="col-md-4">
+							<input id="dateJoined" ng-model="page.demo.dateJoined" type="text" class="form-control form-control-details" title="Date Joined" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.dateJoinedPicker" ng-click="page.dateJoinedPicker = true" placeholder="YYYY-MM-DD" ng-change="preventManualDateJoined()"/>
+						</div>
+
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formEndDate"/></label>
+						<div class="col-md-4">
+							<input id="endDate" ng-model="page.demo.endDate" type="text" class="form-control form-control-details" title="End Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.endDatePicker" ng-click="page.endDatePicker = true" placeholder="YYYY-MM-DD" ng-change="preventManualEndDate()"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formChartNo"/></label>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-details" placeholder="Chart Number" title="Chart Number" ng-model="page.demo.chartNo" ng-change="checkChartNo()"/>
+						</div>
+
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.cytolNum"/></label>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.cytolNum"/>" title="<bean:message key="demographic.demographiceditdemographic.cytolNum"/>" ng-model="page.demo.scrCytolNum" ng-change="checkCytoNum()"/>
+						</div>
+					</div>
+				</div>
+				
+				<div class="form-horizontal">
+					<div class="row">
+						<div class="col-md-12">
+							<h3 class="form-heading"><bean:message key="web.record.details.addInformation"/></h3>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="web.record.details.archivedPaperChart"/></label>
+						<div class="col-md-4">
+							<select class="form-control form-control-details" title="Archived Paper Chart" ng-model="page.demo.scrPaperChartArchived">
+								<option value="">--</option>
+								<option value="NO"><bean:message key="demographic.demographiceditdemographic.paperChartIndicator.no"/></option>
+								<option value="YES"><bean:message key="demographic.demographiceditdemographic.paperChartIndicator.yes"/></option>
+							</select>
+						</div>
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.paperChartIndicator.dateArchived"/></label>
+						<div class="col-md-4">
+							<input id="paperChartArchivedDate" ng-model="page.demo.scrPaperChartArchivedDate" type="text" class="form-control form-control-details" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.paperChartArchivedDatePicker" ng-click="page.paperChartArchivedDatePicker=true" title="YYYY-MM-DD" placeholder="<bean:message key="demographic.demographiceditdemographic.paperChartIndicator.dateArchived"/>" ng-change="preventManualPaperChartArchivedDate()"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.msgWaitList"/></label>
+						<div class="col-md-4">
+							<select class="form-control form-control-details" title="Waiting List" ng-model="page.demo.waitingListID" ng-options="wln.id as wln.name for wln in page.demo.waitingListNames">
+								<option value="">--</option>
+							</select>
+						</div>
+
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographicaddarecordhtm.msgDateOfReq"/></label>
+						<div class="col-md-4">
+							<input id="onWaitingListSinceDate" ng-model="page.demo.onWaitingListSinceDate" type="text" class="form-control form-control-details" title="<bean:message key="demographic.demographicaddarecordhtm.msgDateOfReq"/>" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.onWaitingListSinceDatePicker" ng-click="page.onWaitingListSinceDatePicker = true" placeholder="YYYY-MM-DD" ng-change="preventManualOnWaitingListSinceDate()"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographicaddarecordhtm.msgWaitListNote"/></label>
+						<div class="col-md-10">
+							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographicaddarecordhtm.msgWaitListNote"/>" title="<bean:message key="demographic.demographicaddarecordhtm.msgWaitListNote"/>" ng-model="page.demo.waitingListNote"/>
+						</div>
+					</div>
+					<div class="form-group"> 
+						<label class="col-md-2 control-label"><bean:message key="web.record.details.privacyConsent"/></label>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.privacyConsent"/>" title="<bean:message key="demographic.demographiceditdemographic.privacyConsent"/>" ng-model="page.demo.scrPrivacyConsent"/>
+						</div>
+						<label class="col-md-2 control-label"><bean:message key="web.record.details.informedConsent"/></label>
+						<div class="col-md-4">
+							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.informedConsent"/>" title="<bean:message key="demographic.demographiceditdemographic.informedConsent"/>" ng-model="page.demo.scrInformedConsent"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.usConsent"/></label>
+						<div class="col-md-10">
+							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.usConsent"/>" title="<bean:message key="demographic.demographiceditdemographic.usConsent"/>" ng-model="page.demo.scrUsSigned"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="web.record.details.securityQuestion"/></label>
+						<div class="col-md-10">
+							<select class="form-control form-control-details" title="<bean:message key="web.record.details.selectSecurityQuestion"/>" ng-model="page.demo.scrSecurityQuestion1" ng-options="sq.value as sq.label for sq in page.securityQuestions">
+								<option value="">--</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="web.record.details.answer"/></label>
+						<div class="col-md-10">
+							<input type="text" class="form-control form-control-details" title="<bean:message key="web.record.details.answerToSecurityQuestion"/>" placeholder="<bean:message key="web.record.details.answerToSecurityQuestion"/>" ng-model="page.demo.scrSecurityAnswer1"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label"><bean:message key="web.record.details.rxInteractionLevel"/></label>
+						<div class="col-md-10">
+							<select class="form-control form-control-details" title="<bean:message key="web.record.details.rxInteractionLevel"/>" ng-model="page.demo.scrRxInteractionLevel" ng-options="r.value as r.name for r in page.rxInteractionLevels" />
+						</div>
+					</div>
+				</div>
+				</div>
+			</div>
+			<br/>
+
+		<div class=" col-md-10 col-lg-4">
+			<div class="clearfix col-md-12">
+				<img class="pull-left" id="photo" title="Click to upload photo" ng-click="launchPhoto()" ng-src="../imageRenderingServlet?source=local_client&clientId={{page.demo.demographicNo}}"/>
+				<%--Remove this?--%>
+				<%--<div class="pull-left" style="margin-left:5px;">
+					<address>
+						<strong>{{page.demo.lastName}}, {{page.demo.firstName}}</strong><br/>
+						{{page.demo.address.address}}<br/>
+						{{page.demo.address.city}}, {{page.demo.address.province}} {{page.demo.address.postal}}<br/>
+						<abbr title="Phone" ng-show="page.preferredPhoneNumber"><bean:message key="web.record.details.phoneShortHand"/></abbr> {{page.preferredPhoneNumber}}
+					</address>
+					<a ng-click="macPHRDo('Verification')" ng-show="page.macPHRIdsSet"><bean:message key="global.phr"/>{{page.macPHRVerificationLevel}}</a>
+				</div>--%>
+			</div>
+			<br/>
+			<div>
+				<div id="pd2" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+					<div class="col-md-12">
+						<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formAlert"/></h3>
+						<textarea id="alert-text-box" ng-model="page.demo.alert" class="form-control form-control-details"></textarea>
+					</div>
+					<br/>
+					<div class="col-md-12">
+						<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formNotes"/></h3>
+						<textarea id="notes-text-box" ng-model="page.demo.scrNotes" class="form-control form-control-details"></textarea>
+					</div>
+				</div>
+				<hr>
+				<div class="col-md-12">
+					<h3 class="form-heading">
+						<bean:message key="global.contacts"/>
+						<button type="button" class="btn btn-primary btn-sm pull-right" ng-click="manageContacts()"><bean:message key="web.record.details.manage"/></button>
+					</h3>
+					<div class="form-group" ng-repeat="dc in page.demo.demoContacts">
+						<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
+						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
+						<div class="col-md-5">{{dc.phone}}</div>
+					</div>
+				</div>
+				<hr>
+				<div class="col-md-12">
+					<h3 class="form-heading">
+						<bean:message key="web.record.details.proContacts"/>
+						<button type="button" class="btn btn-primary btn-sm pull-right" ng-click="manageContacts()"><bean:message key="web.record.details.manage"/></button>
+					</h3>
+					<div class="form-group" ng-repeat="dc in page.demo.demoContactPros">
+						<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
+						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
+						<div class="col-md-5">{{dc.phone}}</div>
+					</div>
+				</div>
 			</div>
 		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-8 col-md-10">
+			<div class="alert alert-success" ng-show="page.saving">
+				<bean:message key="web.record.details.saving"/>
+			</div>
+			
+			<button id="save-button" type="button" class="btn btn-success {{needToSave()}}" ng-click="validateHCSave(true)" ng-disabled="page.dataChanged<1">Save</button>
+		</div>
+	</div>
 </div>
