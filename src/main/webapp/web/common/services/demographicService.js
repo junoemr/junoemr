@@ -56,8 +56,7 @@ angular.module("Common.Services").service("demographicService", [
 		{
 			var deferred = $q.defer();
 
-			var demographicTo1 = { demographicTo1: demographic };
-			$http.post(service.apiPath + 'demographics', demographicTo1).then(
+			$http.post(service.apiPath + 'demographics', demographic).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -75,8 +74,7 @@ angular.module("Common.Services").service("demographicService", [
 		{
 			var deferred = $q.defer();
 
-			var demographicTo1 = { demographicTo1: demographic };
-			$http.put(service.apiPath + 'demographics', demographicTo1).then(
+			$http.put(service.apiPath + 'demographics', demographic).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
