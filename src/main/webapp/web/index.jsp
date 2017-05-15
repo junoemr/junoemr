@@ -107,11 +107,6 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 				<!-- large view -->
 				<ul class="nav navbar-nav visible-lg hidden-1500 ">
-					<li><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover"
-										ng-show="!bodyCtrl.showPatientList"
-										ng-click="navBarCtrl.showPatientList()"
-										title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
-
 					<li ng-repeat="item in navBarCtrl.menuItems"
 							ng-class="{'active': navBarCtrl.isActive(item) }">
 
@@ -142,11 +137,6 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 				<!-- more condensed version -->
 				<ul class="nav navbar-nav hidden-lg visible-1500 visible-md visible-sm visible-xs">
-					<li><span class="navbar-text glyphicon glyphicon-chevron-right hand-hover"
-										ng-show="!bodyCtrl.showPatientList"
-										ng-click="navBarCtrl.showPatientList()"
-										title="<bean:message key="navbar.showPatientList" bundle="ui"/>"></span></li>
-
 					<li class="dropdown hand-hover">
 						<a href="#" class="dropdown-toggle">
 							<bean:message key="navbar.modules" bundle="ui"/><b class="caret"></b></a>
@@ -224,8 +214,13 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<!-- nav bar is done here -->
 
 	 <!-- Start patient List template -->
-	<div class="container-fluid" ng-controller="PatientListCtrl" >
-		<div class="row" >
+	<div class="container-fluid" ng-controller="PatientListCtrl" >	
+		<div class="row " >
+			<div class="col-xs-1 no-padding" ng-if="!bodyCtrl.showPatientList"> 
+				<button class="toggle-patient-list-button  pull-left" type="button"  ng-click="showPatientList()" title="Show Patient List">
+					<span class="glyphicon glyphicon-chevron-right"></span>
+				</button>
+			</div>
 			<div id="left-pane"
 					 class="col-lg-3 col-md-4 col-sm-4 hidden-xs"
 					 ng-controller="PatientListAppointmentListCtrl"
@@ -246,18 +241,18 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				</ul>--%>
 
 				<div id="left-pane-header" class="row vertical-align">
-						<div class="col-md-2 col-sm-2">
-							<button id="hide-patient-list-button" type="button" class="pull-left" ng-click="hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
-								<span class="glyphicon glyphicon-chevron-left"></span>
-							</button>
-						</div>
-						<div class="col-md-7 col-sm-7 col-md-offset-1 col-sm-offset-1">
-							<h1 id="left-pane-header-title">Your Appointments</h1>
-						</div>
-						<%--NOTE: Need to give this controller access to the addNewAppointment() function before this button can be used here --%>
-						<div class="col-md-2">
-							<a class="hand-hover" ng-click="addNewAppointment()"><span class="glyphicon glyphicon-plus" title="Add appointment"></span></a>
-						</div>
+					<div class="col-md-2 col-sm-2">
+						<button class="toggle-patient-list-button" type="button" class="pull-left" ng-click="hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
+							<span class="glyphicon glyphicon-chevron-left"></span>
+						</button>
+					</div>
+					<div class="col-md-7 col-sm-7 col-md-offset-1 col-sm-offset-1">
+						<h1 id="left-pane-header-title">Your Appointments</h1>
+					</div>
+					<%--NOTE: Need to give this controller access to the addNewAppointment() function before this button can be used here --%>
+					<div class="col-md-2">
+						<a class="hand-hover" ng-click="addNewAppointment()"><span class="glyphicon glyphicon-plus" title="Add appointment"></span></a>
+					</div>
 				</div>
 
 				<div class="container-fluid">
@@ -295,7 +290,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 		<div id="right_pane"
 				 ng-class="{
 				 	'col-lg-9 col-lg-offset-3 col-sm-8 col-sm-offset-4 col-xs-12': bodyCtrl.showPatientList,
-				 	'col-xs-12': !bodyCtrl.showPatientList }"
+				 	'col-xs-11': !bodyCtrl.showPatientList }"
 				 ui-view
 				 ng-cloak></div>
 	</div>
