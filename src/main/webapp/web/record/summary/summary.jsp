@@ -123,9 +123,9 @@
 						</dd>                                   
 					</dl>--%>
 
-					<div class="container" infinite-scroll="addMoreItems()">
+					<div infinite-scroll="addMoreItems()">
 						
-						<div class="container note" ng-repeat="note in page.notes.notelist" >
+						<div class="col-sm-12 note" ng-repeat="note in page.notes.notelist" >
 							<div class="row note-header" ng-show="showNoteHeader(note)">
 								<div class="col-md-1 pull-left">
 									<input type="checkbox" ng-model="note.isSelected"/> 
