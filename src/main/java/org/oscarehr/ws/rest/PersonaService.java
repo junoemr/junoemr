@@ -262,18 +262,20 @@ public class PersonaService extends AbstractServiceImpl {
 		
 		menu.addWithState(idCounter++,bundle.getString("navbar.menu.billing"),null,"billing")
 			.addWithState(idCounter++,bundle.getString("navbar.menu.tickler"),null,"ticklers")
-			
 			//.add(0,"K2A",null,"#/k2a")
-			.addWithState(idCounter++,bundle.getString("navbar.menu.admin"),null,"admin");
+			.addWithState(idCounter++,bundle.getString("navbar.menu.admin"),null,"admin")
+			.addWithState(idCounter++,bundle.getString("navbar.menu.reports"),null,"reports")
+			.addWithState(idCounter++,bundle.getString("navbar.menu.documents"),null,"documents");
 
-		MenuItemTo1 moreMenu = new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.more"), null);
-		moreMenu.setDropdown(true);
+		// MenuItemTo1 moreMenu = new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.more"), null);
+		// moreMenu.setDropdown(true);
 		
-		MenuTo1 moreMenuList = new MenuTo1()
-		.addWithState(idCounter++,bundle.getString("navbar.menu.reports"),null,"reports")
-		.addWithState(idCounter++,bundle.getString("navbar.menu.documents"),null,"documents");
-		moreMenu.setDropdownItems(moreMenuList.getItems());
-		menu.getItems().add(moreMenu);
+		// MenuTo1 moreMenuList = new MenuTo1()
+		// .addWithState(idCounter++,bundle.getString("navbar.menu.reports"),null,"reports")
+		// .addWithState(idCounter++,bundle.getString("navbar.menu.documents"),null,"documents");
+		// moreMenu.setDropdownItems(moreMenuList.getItems());
+		// menu.getItems().add(moreMenu);
+		
 		navBarMenu.setMenu(menu);
 	
 		MenuTo1 userMenu = new MenuTo1()
