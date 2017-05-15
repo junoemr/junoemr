@@ -589,12 +589,12 @@
 				<div id="pd2" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 					<div class="col-md-12">
 						<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formAlert"/></h3>
-						<textarea id="alert-text-box" ng-model="page.demo.alert" class="form-control form-control-details"></textarea>
+						<textarea id="alert-text-box" ng-model="page.demo.alert" class="form-control form-control-details text-area-fixed-width"></textarea>
 					</div>
 					<br/>
 					<div class="col-md-12">
 						<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formNotes"/></h3>
-						<textarea id="notes-text-box" ng-model="page.demo.scrNotes" class="form-control form-control-details"></textarea>
+						<textarea id="notes-text-box" ng-model="page.demo.scrNotes" class="form-control form-control-details text-area-fixed-width"></textarea>
 					</div>
 				</div>
 				<hr>
