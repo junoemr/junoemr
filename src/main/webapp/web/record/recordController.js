@@ -340,7 +340,7 @@ oscarApp.controller('RecordCtrl', function($rootScope, $scope, $http, $location,
 
 
     $scope.getIssueNote = function() {
-        if ($scope.page.encounterNote.issueDescriptions != null) {
+        if ($scope.page.encounterNote.noteId != null) {
             noteService.getIssueNote($scope.page.encounterNote.noteId).then(function(data) {
                 if (data != null) $scope.page.assignedCMIssues = toArray(data.assignedCMIssues);
             });
