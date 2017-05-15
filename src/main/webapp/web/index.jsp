@@ -138,10 +138,10 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				<!-- more condensed version -->
 				<ul class="nav navbar-nav hidden-lg visible-1500 visible-md visible-sm visible-xs">
 					<li class="dropdown hand-hover">
-						<a href="#" class="dropdown-toggle">
+						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
 							<bean:message key="navbar.modules" bundle="ui"/><b class="caret"></b></a>
 
-						<ul class="dropdown-menu">
+						<ul class="dropdown-menu" role="menu">
 							<li ng-repeat="item in navBarCtrl.menuItems"
 									ng-class="{'active': navBarCtrl.isActive(item) }">
 								<a ng-click="navBarCtrl.transition(item)" data-toggle="tab" >{{item.label}}
