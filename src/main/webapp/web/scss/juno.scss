@@ -11,8 +11,8 @@
 // TODO: pre-existing CSS files, need to be reorganized
 @import "navbar-fixed-top";
 @import "navbar-demo-search";
-@import "patient-list";
+@import "../patientlist/patient-list";
 @import "index";
-@import "record";
+@import "../record/record";
 // Section-specific things
 @import "../dashboard/dashboard";
