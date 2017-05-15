@@ -234,7 +234,7 @@ li.cpp-note-list:last-child {
     color: #ebebeb !important;
 }
 
-#hide-patient-list-button {
+.toggle-patient-list-button {
     height: 90px;
     background-color: #1c56af;
     border-style: solid;
@@ -245,12 +245,17 @@ li.cpp-note-list:last-child {
     border-left: 0;
 }
 
-#hide-patient-list-button:hover {
+.toggle-patient-list-button:hover {
     background-color: #1e65d2;
 }
 
-#hide-patient-list-button .glyphicon-chevron-left {
-    color: #ebebeb;
+.toggle-patient-list-button {
+    .glyphicon-chevron-left {
+        color: #ebebeb;
+    }
+    .glyphicon-chevron-right {
+        color: #ebebeb;
+    }
 }
 
 #patient-search {
