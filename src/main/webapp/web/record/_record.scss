@@ -10,8 +10,18 @@
     color: $primary-blue-text;
 }
 
-.sub-nav .dropdown-menu {
-    background-color: #ebebeb;
+.sub-nav {
+    .dropdown-menu {
+        background-color: #fff;
+        li {
+            a {
+                color: #636363;
+            }
+            a:hover {
+                background-color: #ebebeb;
+            }
+        }
+    }
 }
 
 .sub-nav .dropdown-toggle {
