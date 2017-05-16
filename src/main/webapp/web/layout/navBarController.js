@@ -26,7 +26,7 @@
 
 */
 
-angular.module('Layout').controller('Layout.NavBarCtrl', [
+angular.module('Layout').controller('Layout.NavBarController', [
 
     '$rootScope',
     '$scope',

@@ -62,11 +62,11 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 </head>
 
-<body ng-controller="Layout.BodyCtrl as bodyCtrl"
+<body ng-controller="Layout.BodyController as bodyCtrl"
 			ng-init="bodyCtrl.init()">
 
 	<!-- Navbar -->
-	<nav ng-controller="Layout.NavBarCtrl as navBarCtrl"
+	<nav ng-controller="Layout.NavBarController as navBarCtrl"
 			 ng-init="navBarCtrl.init()"
 			 ng-show="navBarCtrl.me != null"
 			 class="navbar navbar-default navbar-fixed-top"
@@ -382,9 +382,12 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="record/phr/phrController.js"></script>
 	<script type="text/javascript" src="record/tracker/trackerController.js"></script>
 
+	<script type="text/javascript" src="tickler/module.js"></script>
 	<script type="text/javascript" src="tickler/ticklerController.js"></script>
 	<script type="text/javascript" src="tickler/ticklerViewController.js"></script>
 	<script type="text/javascript" src="tickler/ticklerAddController.js"></script>
+	<script type="text/javascript" src="tickler/ticklerNoteController.js"></script>
+	<script type="text/javascript" src="tickler/ticklerCommentController.js"></script>
 
 	<script type="text/javascript" src="schedule/scheduleController.js"></script>
 	<script type="text/javascript" src="admin/adminController.js"></script>
@@ -408,7 +411,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 <script>
 
-// TODO: refactor into NavBarCtrl and use uibTypeahead
+// TODO: refactor into NavBarController and use uibTypeahead
 
 //$(document).ready(function(){
 //
