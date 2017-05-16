@@ -125,15 +125,15 @@
 
 					<div infinite-scroll="addMoreItems()">
 						
-						<div class="col-sm-12 note" ng-repeat="note in page.notes.notelist" >
-							<div class="row note-header" ng-show="showNoteHeader(note)">
-								<div class="col-md-1 pull-left">
+						<div class="col-sm-11 note pull-right" ng-repeat="note in page.notes.notelist" ng-style="setColor(note)" >
+							<div class="row note-header" ng-show="showNoteHeader(note)" >
+								<div class="col-xs-1 pull-left">
 									<input type="checkbox" ng-model="note.isSelected"/> 
 								</div>
-								<div class="col-md-6 pull-left note-header-name">
+								<div class="col-xs-6 pull-left note-header-name">
 									<h5>{{firstLine(note)}}</h5>
 								</div>
-								<div class="col-md-4 note-header-date pull-right">
+								<div class="col-xs-4 note-header-date pull-right">
 									<h6>{{note.observationDate | date : 'dd-MMM-yyyy'}}</h6>
 								</div>
 							</div>

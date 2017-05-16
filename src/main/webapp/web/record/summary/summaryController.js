@@ -217,19 +217,19 @@ oscarApp.controller('SummaryCtrl', function($rootScope, $scope, $http, $location
     //Note display functions
     $scope.setColor = function(note) {
         if (note.eformData) {
-            return { 'background-color': '#DFF0D8' };
+            return { 'border-left-color': '#DFF0D8', 'border-left-width': '10px' };
         } else if (note.document) {
-            return { 'background-color': '#476BB3', 'color': 'white' };
+            return { 'border-left-color': '#617CB2', 'border-left-width': '10px' };
         } else if (note.rxAnnotation) {
-            return { 'background-color': 'lightgrey' };
+            return { 'border-left-color': '#D3D3D3', 'border-left-width': '10px' };
         } else if (note.encounterForm) {
-            return { 'background-color': '#917611' };
+            return { 'border-left-color': '#BCAD75', 'border-left-width': '10px' };
         } else if (note.invoice) {
-            return { 'background-color': '#red' };
+            return { 'border-left-color': '##FF7272', 'border-left-width': '10px' };
         } else if (note.ticklerNote) {
-            return { 'background-color': '#FF6600' };
+            return { 'border-left-color': '#FFA96F', 'border-left-width': '10px' };
         } else if (note.cpp) {
-            return { 'background-color': '#996633', 'color': 'white' };
+            return { 'border-left-color': '#9B8166', 'border-left-width': '10px' };
         }
     };
 
