@@ -86,7 +86,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
         .state('settings', {
             url: '/settings',
             templateUrl: 'settings/settings.jsp',
-            controller: 'SettingsCtrl',
+            controller: 'Settings.SettingsController',
             resolve: {
                 user: function(providerService) { return providerService.getMe(); },
                 billingServiceTypes: function(billingService) { return billingService.getUniqueServiceTypes(); },
@@ -232,7 +232,7 @@ oscarApp.config(['$routeProvider',
 
 						when('/settings', {
 							templateUrl: 'partials/settings-classic.jsp',
-							controller: 'SettingsCtrl'
+							controller: 'Settings.SettingsController'
 						}).
 						when('/support', {
 							templateUrl: 'partials/support.jsp',
