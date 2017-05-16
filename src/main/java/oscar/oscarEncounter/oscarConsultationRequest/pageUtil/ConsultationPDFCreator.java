@@ -30,8 +30,6 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
 import oscar.oscarClinic.ClinicData;
-import oscar.oscarRx.data.RxProviderData;
-import oscar.oscarRx.data.RxProviderData.Provider;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -197,21 +195,7 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 			ProgramDao programDao = (ProgramDao) SpringUtils.getBean("programDao");
 			Integer programNo = Integer.parseInt(reqFrm.letterheadName.substring(5));
 			letterheadName = programDao.getProgramName(programNo);
-		} else if (!reqFrm.letterheadName.equals("-1") && !reqFrm.letterheadName.equals(clinic.getClinicName())) {
-			Provider letterheadNameProvider = (reqFrm.letterheadName != null ? new RxProviderData().getProvider(reqFrm.letterheadName) : null);
-			if (letterheadNameProvider != null && letterheadNameProvider.getSurname() != null){			
-				String firstName = "";
-				if(reqFrm.letterheadTitle!=null && reqFrm.letterheadTitle.equals("Dr")){
-					firstName = letterheadNameProvider.getFirstName();
-				}else{
-					firstName = letterheadNameProvider.getFirstName().replace("Dr. ", "");
-				}
-				
-				letterheadName = firstName + " " + letterheadNameProvider.getSurname();
-			}else{
-				letterheadName = clinic.getClinicName();
-			}
-		} else {
+		}  else {
 			letterheadName = clinic.getClinicName();
 		}
 
