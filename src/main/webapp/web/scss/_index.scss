@@ -234,6 +234,18 @@ li.cpp-note-list:last-child {
     color: #ebebeb !important;
 }
 
+#left-pane-hidden {
+    position: fixed;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    overflow-x: hidden;
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .toggle-patient-list-button {
     height: 90px;
     background-color: #1c56af;

@@ -215,12 +215,15 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 	 <!-- Start patient List template -->
 	<div class="container-fluid" ng-controller="PatientListCtrl" >	
-		<div class="row " >
-			<div class="col-xs-1 no-padding" ng-if="!bodyCtrl.showPatientList"> 
-				<button class="toggle-patient-list-button  pull-left" type="button"  ng-click="showPatientList()" title="Show Patient List">
+		<div class="row" >
+			
+
+			<div id="left-pane-hidden" class="col-xs-1 hidden-xs" ng-if="!bodyCtrl.showPatientList"> 
+				<button class="toggle-patient-list-button" type="button"  ng-click="showPatientList()" title="Show Patient List">
 					<span class="glyphicon glyphicon-chevron-right"></span>
-				</button>
+				</button>	
 			</div>
+
 			<div id="left-pane"
 					 class="col-lg-3 col-md-4 col-sm-4 hidden-xs"
 					 ng-controller="PatientListAppointmentListCtrl"
@@ -290,7 +293,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 		<div id="right_pane"
 				 ng-class="{
 				 	'col-lg-9 col-lg-offset-3 col-sm-8 col-sm-offset-4 col-xs-12': bodyCtrl.showPatientList,
-				 	'col-xs-11': !bodyCtrl.showPatientList }"
+				 	'col-sm-10 col-sm-offset-1': !bodyCtrl.showPatientList }"
 				 ui-view
 				 ng-cloak></div>
 	</div>
