@@ -1,3 +1,3 @@
-oscarApp.controller('HelpCtrl', function ($scope,$http) {
+oscarApp.controller('HelpCtrl', function($scope, $http) {
 
 });

@@ -26,70 +26,60 @@
 
  */
 angular.module("Common.Services").service("billingService", [
-	'$http', '$q',
-	function ($http, $q)
-	{
-		var service = {};
+    '$http', '$q',
+    function($http, $q) {
+        var service = {};
 
-		service.apiPath = '../ws/rs/';
+        service.apiPath = '../ws/rs/';
 
-		service.getUniqueServiceTypes = function getUniqueServiceTypes()
-		{
-			var deferred = $q.defer();
+        service.getUniqueServiceTypes = function getUniqueServiceTypes() {
+            var deferred = $q.defer();
 
-			$http.get(service.apiPath + 'billing/uniqueServiceTypes',
-				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-				function success(response)
-				{
-					deferred.resolve(response.data.content);
-				},
-				function error(error)
-				{
-					console.log("billingService::getUniqueServiceTypes error", error);
-					deferred.reject("An error occured while fetching billing service types");
-				});
+            $http.get(service.apiPath + 'billing/uniqueServiceTypes',
+                Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+                function success(response) {
+                    deferred.resolve(response.data.content);
+                },
+                function error(error) {
+                    console.log("billingService::getUniqueServiceTypes error", error);
+                    deferred.reject("An error occured while fetching billing service types");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.getBillingRegion = function getBillingRegion()
-		{
-			var deferred = $q.defer();
+        service.getBillingRegion = function getBillingRegion() {
+                var deferred = $q.defer();
 
-			$http.get(service.apiPath + 'billing/billingRegion',
-				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("billingService::getBillingRegion error", error);
-					deferred.reject("An error occured while setting billingRegion");
-				});
+                $http.get(service.apiPath + 'billing/billingRegion',
+                    Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+                    function success(response) {
+                        deferred.resolve(response.data);
+                    },
+                    function error(error) {
+                        console.log("billingService::getBillingRegion error", error);
+                        deferred.reject("An error occured while setting billingRegion");
+                    });
 
-			return deferred.promise;
-		},
+                return deferred.promise;
+            },
 
-			service.getDefaultView = function getDefaultView()
-			{
-				var deferred = $q.defer();
+            service.getDefaultView = function getDefaultView() {
+                var deferred = $q.defer();
 
-				$http.get(service.apiPath + 'billing/defaultView',
-					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-					function success(response)
-					{
-						deferred.resolve(response.data);
-					},
-					function error(error)
-					{
-						console.log("billingService::getDefaultView error", error);
-						deferred.reject("An error occured while setting defaultView");
-					});
+                $http.get(service.apiPath + 'billing/defaultView',
+                    Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+                    function success(response) {
+                        deferred.resolve(response.data);
+                    },
+                    function error(error) {
+                        console.log("billingService::getDefaultView error", error);
+                        deferred.reject("An error occured while setting defaultView");
+                    });
 
-				return deferred.promise;
-			};
+                return deferred.promise;
+            };
 
-		return service;
-	}
+        return service;
+    }
 ]);

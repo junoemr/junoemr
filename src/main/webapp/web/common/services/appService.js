@@ -26,36 +26,32 @@
 
  */
 angular.module("Common.Services").service("appService", [
-	'$http', '$q',
-	function ($http, $q)
-	{
-		var service = {};
+    '$http', '$q',
+    function($http, $q) {
+        var service = {};
 
-		service.apiPath = '../ws/rs/app';
+        service.apiPath = '../ws/rs/app';
 
-		service.getApps = function getApps()
-		{
-			var deferred = $q.defer();
+        service.getApps = function getApps() {
+            var deferred = $q.defer();
 
-			$http({
-				url: service.apiPath + '/getApps',
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("appServices::getApps error", error);
-					deferred.reject("An error occured while getting app content");
-				});
+            $http({
+                url: service.apiPath + '/getApps',
+                method: "GET",
+                headers: Juno.Common.ServiceHelper.configHeaders()
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("appServices::getApps error", error);
+                    deferred.reject("An error occured while getting app content");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		return service;
-	}
+        return service;
+    }
 
 ]);

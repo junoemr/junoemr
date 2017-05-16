@@ -26,190 +26,167 @@
 
  */
 angular.module("Common.Services").service("personaService", [
-	'$http', '$q',
-	function ($http, $q)
-	{
-		var service = {};
+    '$http', '$q',
+    function($http, $q) {
+        var service = {};
 
-		service.apiPath = '../ws/rs/persona';
+        service.apiPath = '../ws/rs/persona';
 
-		service.getDashboardMenu = function getDashboardMenu()
-		{
-			var deferred = $q.defer();
+        service.getDashboardMenu = function getDashboardMenu() {
+            var deferred = $q.defer();
 
-			$http({
-				url: service.apiPath + '/dashboardMenu',
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				}, function error(error)
-				{
-					console.log("personaService::getDashboardMenu error", error);
-					deferred.reject("An error occured while getting the dashboard menu from persona");
-				});
+            $http({
+                url: service.apiPath + '/dashboardMenu',
+                method: "GET",
+                headers: Juno.Common.ServiceHelper.configHeaders()
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("personaService::getDashboardMenu error", error);
+                    deferred.reject("An error occured while getting the dashboard menu from persona");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.getNavBar = function getNavBar()
-		{
-			var deferred = $q.defer();
-			$http({
-				url: service.apiPath + '/navbar',
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("personaService::getNavBar error", error);
-					deferred.reject("An error occured while getting navbar from persona");
-				});
+        service.getNavBar = function getNavBar() {
+            var deferred = $q.defer();
+            $http({
+                url: service.apiPath + '/navbar',
+                method: "GET",
+                headers: Juno.Common.ServiceHelper.configHeaders()
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("personaService::getNavBar error", error);
+                    deferred.reject("An error occured while getting navbar from persona");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.getPatientLists = function getPatientLists()
-		{
-			var deferred = $q.defer();
+        service.getPatientLists = function getPatientLists() {
+            var deferred = $q.defer();
 
-			$http({
-				url: service.apiPath + '/patientLists',
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("personaService::getPatientLists error", error);
-					deferred.reject("An error occured while getting patient lists from persona");
-				});
+            $http({
+                url: service.apiPath + '/patientLists',
+                method: "GET",
+                headers: Juno.Common.ServiceHelper.configHeaders()
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("personaService::getPatientLists error", error);
+                    deferred.reject("An error occured while getting patient lists from persona");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.getPatientListConfig = function getPatientListConfig()
-		{
-			var deferred = $q.defer();
+        service.getPatientListConfig = function getPatientListConfig() {
+            var deferred = $q.defer();
 
-			$http({
-				url: service.apiPath + '/patientList/config',
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("personaService::getPatientListConfig error", error);
-					deferred.reject("An error occured while getting getPatientListConfig from persona");
-				});
+            $http({
+                url: service.apiPath + '/patientList/config',
+                method: "GET",
+                headers: Juno.Common.ServiceHelper.configHeaders()
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("personaService::getPatientListConfig error", error);
+                    deferred.reject("An error occured while getting getPatientListConfig from persona");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.setPatientListConfig = function setPatientListConfig(patientListConfig)
-		{
-			var deferred = $q.defer();
+        service.setPatientListConfig = function setPatientListConfig(patientListConfig) {
+            var deferred = $q.defer();
 
-			$http({
-				url: service.apiPath + '/patientList/config',
-				method: "POST",
-				data: patientListConfig,
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("personaService::setPatientListConfig error", error);
-					deferred.reject("An error occured while setting setPatientListConfig from persona");
-				});
+            $http({
+                url: service.apiPath + '/patientList/config',
+                method: "POST",
+                data: patientListConfig,
+                headers: Juno.Common.ServiceHelper.configHeaders()
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("personaService::setPatientListConfig error", error);
+                    deferred.reject("An error occured while setting setPatientListConfig from persona");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.setCurrentProgram = function setCurrentProgram(programId)
-		{
-			var deferred = $q.defer();
+        service.setCurrentProgram = function setCurrentProgram(programId) {
+            var deferred = $q.defer();
 
-			$http({
-				url: service.apiPath +
-				'/setDefaultProgramInDomain?programId=' +
-				encodeURIComponent(programId),
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("personaService::setCurrentProgram error", error);
-					deferred.reject("An error occured while setting current");
-				});
+            $http({
+                url: service.apiPath +
+                    '/setDefaultProgramInDomain?programId=' +
+                    encodeURIComponent(programId),
+                method: "GET",
+                headers: Juno.Common.ServiceHelper.configHeaders()
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("personaService::setCurrentProgram error", error);
+                    deferred.reject("An error occured while setting current");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.getDashboardPreferences = function getDashboardPreferences()
-		{
-			var deferred = $q.defer();
+        service.getDashboardPreferences = function getDashboardPreferences() {
+            var deferred = $q.defer();
 
-			$http({
-				url: service.apiPath + '/preferences',
-				method: "POST",
-				data: { type: 'dashboard' },
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("personaService::getDashboardPreferences error", error);
-					deferred.reject("An error occured while getting preferences from persona");
-				});
+            $http({
+                url: service.apiPath + '/preferences',
+                method: "POST",
+                data: { type: 'dashboard' },
+                headers: Juno.Common.ServiceHelper.configHeaders()
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("personaService::getDashboardPreferences error", error);
+                    deferred.reject("An error occured while getting preferences from persona");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.updateDashboardPreferences = function updateDashboardPreferences(prefs)
-		{
-			var deferred = $q.defer();
+        service.updateDashboardPreferences = function updateDashboardPreferences(prefs) {
+            var deferred = $q.defer();
 
-			$http({
-				url: service.apiPath + '/updatePreferences',
-				method: "POST",
-				data: JSON.stringify(prefs),
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("personaService::updateDashboardPreferences error", error);
-					deferred.reject("An error occured while updating preferences");
-				});
-			return deferred.promise;
-		};
+            $http({
+                url: service.apiPath + '/updatePreferences',
+                method: "POST",
+                data: JSON.stringify(prefs),
+                headers: Juno.Common.ServiceHelper.configHeaders()
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("personaService::updateDashboardPreferences error", error);
+                    deferred.reject("An error occured while updating preferences");
+                });
+            return deferred.promise;
+        };
 
-		return service;
-	} ]);
+        return service;
+    }
+]);

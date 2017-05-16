@@ -26,222 +26,189 @@
 
  */
 angular.module("Common.Services").service("consultService", [
-	'$http', '$q',
-	function ($http, $q)
-	{
-		var service = {};
+    '$http', '$q',
+    function($http, $q) {
+        var service = {};
 
-		service.apiPath = '../ws/rs/consults/';
+        service.apiPath = '../ws/rs/consults/';
 
-		service.searchRequests = function searchRequests(search)
-		{
-			var deferred = $q.defer();
+        service.searchRequests = function searchRequests(search) {
+            var deferred = $q.defer();
 
-			$http.post(service.apiPath + 'searchRequests', search).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("consultService::searchRequests error", error);
-					deferred.reject("An error occured while searching consult requests");
-				});
+            $http.post(service.apiPath + 'searchRequests', search).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("consultService::searchRequests error", error);
+                    deferred.reject("An error occured while searching consult requests");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.getRequest = function getRequest(requestId, demographicId)
-		{
-			var deferred = $q.defer();
+        service.getRequest = function getRequest(requestId, demographicId) {
+            var deferred = $q.defer();
 
-			if (requestId === "new")
-			{
-				requestId = 0;
-			}
+            if (requestId === "new") {
+                requestId = 0;
+            }
 
-			$http.get(service.apiPath + 'getRequest', {
-				params: { requestId: requestId, demographicId: demographicId }
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("consultService::getRequest error", error);
-					deferred.reject(
-						"An error occurred while getting consult request (requestId=" + requestId + ")");
-				});
+            $http.get(service.apiPath + 'getRequest', {
+                params: { requestId: requestId, demographicId: demographicId }
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("consultService::getRequest error", error);
+                    deferred.reject(
+                        "An error occurred while getting consult request (requestId=" + requestId + ")");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.getRequestAttachments = function getRequestAttachments(
-			requestId, demographicId, attached)
-		{
-			var deferred = $q.defer();
+        service.getRequestAttachments = function getRequestAttachments(
+            requestId, demographicId, attached) {
+            var deferred = $q.defer();
 
-			$http.get(service.apiPath + 'getRequestAttachments?requestId=' +
-				encodeURIComponent(requestId) + '&demographicId=' +
-				encodeURIComponent(demographicId) + '&attached=' +
-				encodeURIComponent(attached)
-			).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("consultService::getRequestAttachments error", error);
-					deferred.reject(
-						"An error occured while getting consult attachments (requestId=" + requestId + ")");
-				});
+            $http.get(service.apiPath + 'getRequestAttachments?requestId=' +
+                encodeURIComponent(requestId) + '&demographicId=' +
+                encodeURIComponent(demographicId) + '&attached=' +
+                encodeURIComponent(attached)
+            ).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("consultService::getRequestAttachments error", error);
+                    deferred.reject(
+                        "An error occured while getting consult attachments (requestId=" + requestId + ")");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.saveRequest = function saveRequest(request)
-		{
-			var deferred = $q.defer();
+        service.saveRequest = function saveRequest(request) {
+            var deferred = $q.defer();
 
-			var requestTo1 = { consultationRequestTo1: request };
-			$http.post(service.apiPath + 'saveRequest', requestTo1).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("consultService::saveRequest error", error);
-					deferred.reject("An error occurred while fetching consult request after save");
-				});
+            var requestTo1 = { consultationRequestTo1: request };
+            $http.post(service.apiPath + 'saveRequest', requestTo1).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("consultService::saveRequest error", error);
+                    deferred.reject("An error occurred while fetching consult request after save");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.eSendRequest = function eSendRequest(requestId)
-		{
-			var deferred = $q.defer();
+        service.eSendRequest = function eSendRequest(requestId) {
+            var deferred = $q.defer();
 
-			$http.get(service.apiPath + 'eSendRequest?requestId=' + encodeURIComponent(requestId)).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("consultService::eSendRequest error", error);
-					deferred.reject(
-						"An error occurred while e-sending consult request (requestId=" + requestId + ")");
-				});
+            $http.get(service.apiPath + 'eSendRequest?requestId=' + encodeURIComponent(requestId)).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("consultService::eSendRequest error", error);
+                    deferred.reject(
+                        "An error occurred while e-sending consult request (requestId=" + requestId + ")");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.searchResponses = function searchResponses(search)
-		{
-			var deferred = $q.defer();
-			$http.post(service.apiPath + 'searchResponses', search).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("consultService::searchResponses error", error);
-					deferred.reject("An error occurred while searching consult responses");
-				});
+        service.searchResponses = function searchResponses(search) {
+            var deferred = $q.defer();
+            $http.post(service.apiPath + 'searchResponses', search).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("consultService::searchResponses error", error);
+                    deferred.reject("An error occurred while searching consult responses");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.getResponse = function getResponse(responseId, demographicNo)
-		{
-			var deferred = $q.defer();
+        service.getResponse = function getResponse(responseId, demographicNo) {
+            var deferred = $q.defer();
 
-			if (responseId === "new")
-			{
-				responseId = 0;
-			}
+            if (responseId === "new") {
+                responseId = 0;
+            }
 
-			$http.get(service.apiPath + 'getResponse', {
-				params: { responseId: responseId, demographicNo: demographicNo }
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("consultService::getResponse error", error);
-					deferred.reject(
-						"An error occurred while getting consult response (responseId=" + responseId + ")");
-				});
+            $http.get(service.apiPath + 'getResponse', {
+                params: { responseId: responseId, demographicNo: demographicNo }
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("consultService::getResponse error", error);
+                    deferred.reject(
+                        "An error occurred while getting consult response (responseId=" + responseId + ")");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.getResponseAttachments = function getResponseAttachments(
-			responseId, demographicNo, attached)
-		{
-			var deferred = $q.defer();
-			$http.get(
-				service.apiPath + 'getResponseAttachments?responseId=' + encodeURIComponent(responseId) +
-				'&demographicNo=' + encodeURIComponent(demographicNo) +
-				'&attached=' + encodeURIComponent(attached)).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("consultService::getResponseAttachments error", error);
-					deferred.reject(
-						"An error occurred while getting consult response attachments (responseId=" +
-						responseId + ")");
-				});
+        service.getResponseAttachments = function getResponseAttachments(
+            responseId, demographicNo, attached) {
+            var deferred = $q.defer();
+            $http.get(
+                service.apiPath + 'getResponseAttachments?responseId=' + encodeURIComponent(responseId) +
+                '&demographicNo=' + encodeURIComponent(demographicNo) +
+                '&attached=' + encodeURIComponent(attached)).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("consultService::getResponseAttachments error", error);
+                    deferred.reject(
+                        "An error occurred while getting consult response attachments (responseId=" +
+                        responseId + ")");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.saveResponse = function saveResponse(response)
-		{
-			var deferred = $q.defer();
+        service.saveResponse = function saveResponse(response) {
+            var deferred = $q.defer();
 
-			var responseTo1 = { consultationResponseTo1: response };
-			$http.post(service.apiPath + 'saveResponse', responseTo1).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("consultService::saveResponse error", error);
-					deferred.reject("An error occurred while fetching consult response after save");
-				});
+            var responseTo1 = { consultationResponseTo1: response };
+            $http.post(service.apiPath + 'saveResponse', responseTo1).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("consultService::saveResponse error", error);
+                    deferred.reject("An error occurred while fetching consult response after save");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.getReferralPathwaysByService = function getReferralPathwaysByService(serviceName)
-		{
-			var deferred = $q.defer();
-			$http.get(service.apiPath + 'getReferralPathwaysByService?serviceName=' +
-				encodeURIComponent(serviceName)).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("consultService::getReferralPathwaysByService error", error);
-					deferred.reject("An error occured while fetching referral pathways");
-				});
+        service.getReferralPathwaysByService = function getReferralPathwaysByService(serviceName) {
+            var deferred = $q.defer();
+            $http.get(service.apiPath + 'getReferralPathwaysByService?serviceName=' +
+                encodeURIComponent(serviceName)).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("consultService::getReferralPathwaysByService error", error);
+                    deferred.reject("An error occured while fetching referral pathways");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		return service;
-	}
+        return service;
+    }
 ]);

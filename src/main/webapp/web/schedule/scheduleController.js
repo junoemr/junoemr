@@ -1,5 +1,3 @@
-oscarApp.controller('ScheduleCtrl', function ($scope) {
+oscarApp.controller('ScheduleCtrl', function($scope) {
 
 });
-
-

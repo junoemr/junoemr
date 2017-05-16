@@ -27,35 +27,31 @@
  */
 
 angular.module("Common.Services").service("messageService", [
-	'$http', '$q',
-	function ($http, $q)
-	{
-		var service = {};
+    '$http', '$q',
+    function($http, $q) {
+        var service = {};
 
-		service.apiPath = '../ws/rs/messaging';
+        service.apiPath = '../ws/rs/messaging';
 
-		service.getUnread = function getUnread(limit)
-		{
-			var deferred = $q.defer();
+        service.getUnread = function getUnread(limit) {
+            var deferred = $q.defer();
 
-			$http({
-				url: service.apiPath + '/unread?startIndex=0&limit=' + encodeURIComponent(limit),
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("messageService::getUnread error", error);
-					deferred.reject("An error occurred while getting messages");
-				});
+            $http({
+                url: service.apiPath + '/unread?startIndex=0&limit=' + encodeURIComponent(limit),
+                method: "GET",
+                headers: Juno.Common.ServiceHelper.configHeaders()
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("messageService::getUnread error", error);
+                    deferred.reject("An error occurred while getting messages");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		return service;
-	}
+        return service;
+    }
 ]);

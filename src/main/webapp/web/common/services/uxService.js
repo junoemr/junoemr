@@ -26,69 +26,59 @@
 
  */
 angular.module("Common.Services").service("uxService", [
-	'$http', '$q',
-	function ($http, $q)
-	{
-		var service = {};
+    '$http', '$q',
+    function($http, $q) {
+        var service = {};
 
-		service.apiPath = '../ws/rs/recordUX';
+        service.apiPath = '../ws/rs/recordUX';
 
-		service.menu = function menu(demographicNo)
-		{
-			var deferred = $q.defer();
+        service.menu = function menu(demographicNo) {
+            var deferred = $q.defer();
 
-			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
-				'/recordMenu').then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("uxService::menu error", error);
-					deferred.reject("An error occurred while fetching menu");
-				});
+            $http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
+                '/recordMenu').then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("uxService::menu error", error);
+                    deferred.reject("An error occurred while fetching menu");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.searchTemplates = function searchTemplates(search, startIndex, itemsToReturn)
-		{
-			var deferred = $q.defer();
+        service.searchTemplates = function searchTemplates(search, startIndex, itemsToReturn) {
+            var deferred = $q.defer();
 
-			$http.post(service.apiPath + '/searchTemplates?startIndex=' +
-				encodeURIComponent(startIndex) + "&itemsToReturn=" +
-				encodeURIComponent(itemsToReturn), search).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("uxService::searchTemplates error", error);
-					deferred.reject("An error occurred while searching templates");
-				});
+            $http.post(service.apiPath + '/searchTemplates?startIndex=' +
+                encodeURIComponent(startIndex) + "&itemsToReturn=" +
+                encodeURIComponent(itemsToReturn), search).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("uxService::searchTemplates error", error);
+                    deferred.reject("An error occurred while searching templates");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.getTemplate = function getTemplate(name)
-		{
-			var deferred = $q.defer();
-			$http.post(service.apiPath + '/template', name).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("uxService::getTemplate error", error);
-					deferred.reject("An error occurred while fetching template");
-				});
+        service.getTemplate = function getTemplate(name) {
+            var deferred = $q.defer();
+            $http.post(service.apiPath + '/template', name).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("uxService::getTemplate error", error);
+                    deferred.reject("An error occurred while fetching template");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		return service;
-	}
+        return service;
+    }
 ]);

@@ -1,2 +1,1 @@
-oscarApp.controller('InboxCtrl', function ($scope,$http) {
-});
+oscarApp.controller('InboxCtrl', function($scope, $http) {});

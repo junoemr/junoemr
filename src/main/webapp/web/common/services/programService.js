@@ -26,33 +26,29 @@
 
  */
 angular.module("Common.Services").service("programService", [
-	'$http', '$q',
-	function ($http, $q)
-	{
-		var service = {};
+    '$http', '$q',
+    function($http, $q) {
+        var service = {};
 
-		service.apiPath = '../ws/rs/';
+        service.apiPath = '../ws/rs/';
 
-		service.getPrograms = function getPrograms()
-		{
-			var deferred = $q.defer();
+        service.getPrograms = function getPrograms() {
+            var deferred = $q.defer();
 
-			$http.get(service.apiPath + 'program/programList',
-				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-				function success(response)
-				{
-					console.log(response.data);
-					deferred.resolve(response.data.content);
-				},
-				function error(error)
-				{
-					console.log("error fetching program list");
-					deferred.reject("An error occured while fetching program list");
-				});
+            $http.get(service.apiPath + 'program/programList',
+                Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+                function success(response) {
+                    console.log(response.data);
+                    deferred.resolve(response.data.content);
+                },
+                function error(error) {
+                    console.log("error fetching program list");
+                    deferred.reject("An error occured while fetching program list");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		return service;
-	}
+        return service;
+    }
 ]);

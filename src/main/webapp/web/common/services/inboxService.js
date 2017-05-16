@@ -27,56 +27,49 @@
  */
 
 angular.module("Common.Services").service("inboxService", [
-	'$http', '$q',
-	function ($http, $q)
-	{
-		var service = {};
+    '$http', '$q',
+    function($http, $q) {
+        var service = {};
 
-		service.apiPath = '../ws/rs/inbox';
+        service.apiPath = '../ws/rs/inbox';
 
-		service.getDashboardItems = function getDashboardItems(limit)
-		{
-			var deferred = $q.defer();
+        service.getDashboardItems = function getDashboardItems(limit) {
+            var deferred = $q.defer();
 
-			$http({
-				url: service.apiPath + '/mine?limit=' + encodeURIComponent(limit),
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("inboxService::getDashboardItems error", error);
-					deferred.reject("An error occured while getting inbox content");
-				});
+            $http({
+                url: service.apiPath + '/mine?limit=' + encodeURIComponent(limit),
+                method: "GET",
+                headers: Juno.Common.ServiceHelper.configHeaders()
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("inboxService::getDashboardItems error", error);
+                    deferred.reject("An error occured while getting inbox content");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.getUnAckLabDocCount = function getUnAckLabDocCount()
-		{
-			var deferred = $q.defer();
+        service.getUnAckLabDocCount = function getUnAckLabDocCount() {
+            var deferred = $q.defer();
 
-			$http({
-				url: service.apiPath + '/mine/count',
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("inboxService::getUnAckLabDocCount error", error);
-					deferred.reject("An error occured while getting inbox content");
-				});
-			return deferred.promise;
-		};
+            $http({
+                url: service.apiPath + '/mine/count',
+                method: "GET",
+                headers: Juno.Common.ServiceHelper.configHeaders()
+            }).then(
+                function success(response) {
+                    deferred.resolve(response.data);
+                },
+                function error(error) {
+                    console.log("inboxService::getUnAckLabDocCount error", error);
+                    deferred.reject("An error occured while getting inbox content");
+                });
+            return deferred.promise;
+        };
 
-		return service;
-	}
+        return service;
+    }
 ]);
