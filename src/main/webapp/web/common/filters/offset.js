@@ -29,8 +29,10 @@
 angular.module('Common.Filters').filter('offset', [
 	function()
 	{
-		return function(input, start) {
-			if(input === null) {
+		return function(input, start)
+		{
+			if (input === null)
+			{
 				return 0;
 			}
 			start = parseInt(start, 10);

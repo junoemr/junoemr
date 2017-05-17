@@ -25,7 +25,7 @@
 --%>
 <h1>Patient Chart List</h1>
 
-<div class="row" ng-controller="ReportPatientChartListCtrl">
+<div class="row" ng-controller="Report.ReportPatientChartListController">
 	<div class="col-md-4">
 		<form role="form">
 			<div class="form-group">

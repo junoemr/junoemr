@@ -25,7 +25,7 @@
 --%>
 <h1>No Show Appointment Sheet</h1>
 
-<div class="row" ng-controller="ReportNoShowAppointmentSheetCtrl">
+<div class="row" ng-controller="Report.ReportNoShowAppointmentSheetController">
 	<div class="col-md-4">
 		<form role="form">
  			<div class="form-group">

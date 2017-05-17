@@ -25,7 +25,7 @@
 --%>
 <h1>Follow Up Intake Report</h1>
 
-<div class="row" ng-controller="ReportFollowUpIntakeCtrl">
+<div class="row" ng-controller="Report.ReportFollowUpIntakeController">
 	<div class="col-md-4">
 <form role="form">
   <div class="form-group">

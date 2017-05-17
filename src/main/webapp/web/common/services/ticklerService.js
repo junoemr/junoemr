@@ -26,133 +26,164 @@
 
  */
 angular.module("Common.Services").service("ticklerService", [
-    '$http', '$q',
-    function($http, $q) {
-        var service = {};
+	'$http', '$q',
+	function($http, $q)
+	{
+		var service = {};
 
-        service.apiPath = '../ws/rs/tickler';
+		service.apiPath = '../ws/rs/tickler';
 
-        service.setCompleted = function setCompleted(ticklerIds) {
-            var deferred = $q.defer();
+		service.setCompleted = function setCompleted(ticklerIds)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + '/complete',
-                method: "POST",
-                data: JSON.stringify({ "ticklers": ticklerIds }),
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("ticklerService::setCompleted error", error);
-                    deferred.reject("An error occurred while setting ticklers to completed status");
-                });
+			$http(
+			{
+				url: service.apiPath + '/complete',
+				method: "POST",
+				data: JSON.stringify(
+				{
+					"ticklers": ticklerIds
+				}),
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("ticklerService::setCompleted error", error);
+					deferred.reject("An error occurred while setting ticklers to completed status");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.setDeleted = function setDeleted(ticklerIds) {
-            var deferred = $q.defer();
+		service.setDeleted = function setDeleted(ticklerIds)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + '/delete',
-                method: "POST",
-                data: JSON.stringify({ "ticklers": ticklerIds }),
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("ticklerService::setDeleted error", error);
-                    deferred.reject("An error occurred while setting ticklers to deleted status");
-                });
+			$http(
+			{
+				url: service.apiPath + '/delete',
+				method: "POST",
+				data: JSON.stringify(
+				{
+					"ticklers": ticklerIds
+				}),
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("ticklerService::setDeleted error", error);
+					deferred.reject("An error occurred while setting ticklers to deleted status");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.search = function search(filter, startIndex, limit) {
-            var deferred = $q.defer();
+		service.search = function search(filter, startIndex, limit)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + '/search?startIndex=' +
-                    encodeURIComponent(startIndex) +
-                    '&limit=' +
-                    encodeURIComponent(limit),
-                method: "POST",
-                data: JSON.stringify(filter),
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("ticklerService::search error", error);
-                    deferred.reject("An error occurred while searching ticklers");
-                });
+			$http(
+			{
+				url: service.apiPath + '/search?startIndex=' +
+					encodeURIComponent(startIndex) +
+					'&limit=' +
+					encodeURIComponent(limit),
+				method: "POST",
+				data: JSON.stringify(filter),
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("ticklerService::search error", error);
+					deferred.reject("An error occurred while searching ticklers");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.update = function update(tickler) {
-            var deferred = $q.defer();
+		service.update = function update(tickler)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + '/update',
-                method: "POST",
-                data: JSON.stringify(tickler),
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("ticklerService::update error", error);
-                    deferred.reject("An error occurred while updating tickler");
-                });
+			$http(
+			{
+				url: service.apiPath + '/update',
+				method: "POST",
+				data: JSON.stringify(tickler),
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("ticklerService::update error", error);
+					deferred.reject("An error occurred while updating tickler");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getTextSuggestions = function getTextSuggestions() {
-            var deferred = $q.defer();
+		service.getTextSuggestions = function getTextSuggestions()
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + '/textSuggestions',
-                method: "GET"
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("ticklerService::getTextSuggestions error", error);
-                    deferred.reject("An error occurred while getting tickler text suggestions");
-                });
+			$http(
+			{
+				url: service.apiPath + '/textSuggestions',
+				method: "GET"
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("ticklerService::getTextSuggestions error", error);
+					deferred.reject("An error occurred while getting tickler text suggestions");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.add = function add(tickler) {
-            var deferred = $q.defer();
+		service.add = function add(tickler)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + '/add',
-                method: "POST",
-                data: JSON.stringify(tickler),
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("ticklerService::add error", error);
-                    deferred.reject("An error occurred while saving tickler");
-                });
+			$http(
+			{
+				url: service.apiPath + '/add',
+				method: "POST",
+				data: JSON.stringify(tickler),
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("ticklerService::add error", error);
+					deferred.reject("An error occurred while saving tickler");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        return service;
-    }
+		return service;
+	}
 ]);

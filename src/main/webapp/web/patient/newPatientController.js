@@ -28,113 +28,130 @@
 
 oscarApp.controller('NewPatientCtrl', [
 
-    '$scope',
-    '$uibModal',
-    '$uibModalInstance',
-    'demographicService',
-    'securityService',
-    'programService',
-    'staticDataService',
+	'$scope',
+	'$uibModal',
+	'$uibModalInstance',
+	'demographicService',
+	'securityService',
+	'programService',
+	'staticDataService',
 
-    function(
-        $scope,
-        $uibModal,
-        $uibModalInstance,
-        demographicService,
-        securityService,
-        programService,
-        staticDataService) {
+	function(
+		$scope,
+		$uibModal,
+		$uibModalInstance,
+		demographicService,
+		securityService,
+		programService,
+		staticDataService)
+	{
 
-        $scope.demographic = {};
+		$scope.demographic = {};
 
-        //get access right for creating new patient
-        securityService.hasRight("_demographic", "w").then(function(data) {
-            $scope.hasRight = data;
-        });
+		//get access right for creating new patient
+		securityService.hasRight("_demographic", "w").then(function(data)
+		{
+			$scope.hasRight = data;
+		});
 
-        //get programs to be selected
-        programService.getPrograms().then(
-            function success(data) {
-                $scope.programs = data;
-                if ($scope.programs.length == 1) {
-                    $scope.demographic.admissionProgramId = $scope.programs[0].id;
-                }
-            });
+		//get programs to be selected
+		programService.getPrograms().then(
+			function success(data)
+			{
+				$scope.programs = data;
+				if ($scope.programs.length == 1)
+				{
+					$scope.demographic.admissionProgramId = $scope.programs[0].id;
+				}
+			});
 
-        //get genders to be selected
-        $scope.genders = staticDataService.getGenders();
+		//get genders to be selected
+		$scope.genders = staticDataService.getGenders();
 
-        $scope.saver = function saver(ngModelContoller) {
-            console.log($scope.demographic.lastName);
-            console.log($scope.demographic.firstName);
-            console.log($scope.demographic.dobYear);
-            console.log($scope.demographic.dobMonth);
-            console.log($scope.demographic.dobDay);
-            console.log($scope.demographic.sex);
-            console.log($scope.demographic);
-            console.log(ngModelContoller.$valid);
-            console.log($scope);
+		$scope.saver = function saver(ngModelContoller)
+		{
+			console.log($scope.demographic.lastName);
+			console.log($scope.demographic.firstName);
+			console.log($scope.demographic.dobYear);
+			console.log($scope.demographic.dobMonth);
+			console.log($scope.demographic.dobDay);
+			console.log($scope.demographic.sex);
+			console.log($scope.demographic);
+			console.log(ngModelContoller.$valid);
+			console.log($scope);
 
-            if (ngModelContoller.$valid) {
-                console.log("Saving...");
+			if (ngModelContoller.$valid)
+			{
+				console.log("Saving...");
 
-                if (!$scope.isCorrectDate($scope.demographic.dobYear,
-                        $scope.demographic.dobMonth, $scope.demographic.dobDay)) {
-                    alert("Incorrect Date of Birth!");
-                    return;
-                }
+				if (!$scope.isCorrectDate($scope.demographic.dobYear,
+						$scope.demographic.dobMonth, $scope.demographic.dobDay))
+				{
+					alert("Incorrect Date of Birth!");
+					return;
+				}
 
-                $scope.demographic.dateOfBirth =
-                    $scope.demographic.dobYear + '-' +
-                    $scope.demographic.dobMonth + "-" +
-                    $scope.demographic.dobDay;
+				$scope.demographic.dateOfBirth =
+					$scope.demographic.dobYear + '-' +
+					$scope.demographic.dobMonth + "-" +
+					$scope.demographic.dobDay;
 
-                $scope.demographic.patientStatusDate = new Date();
-                $scope.demographic.dateJoined = new Date();
-                $scope.demoRetVal = {};
+				$scope.demographic.patientStatusDate = new Date();
+				$scope.demographic.dateJoined = new Date();
+				$scope.demoRetVal = {};
 
-                demographicService.saveDemographic($scope.demographic).then(
-                    function success(data) {
-                        console.log(data);
-                        $scope.demoRetVal = data;
-                        $uibModalInstance.close(data);
-                    },
-                    function(errorMessage) {
-                        console.log("saveDemo " + errorMessage);
-                    });
+				demographicService.saveDemographic($scope.demographic).then(
+					function success(data)
+					{
+						console.log(data);
+						$scope.demoRetVal = data;
+						$uibModalInstance.close(data);
+					},
+					function(errorMessage)
+					{
+						console.log("saveDemo " + errorMessage);
+					});
 
-            } else {
-                console.log("ERR!!");
-            }
-        };
+			}
+			else
+			{
+				console.log("ERR!!");
+			}
+		};
 
-        $scope.ok = function() {
-            $uibModalInstance.close($scope.selected.item);
-        };
+		$scope.ok = function()
+		{
+			$uibModalInstance.close($scope.selected.item);
+		};
 
-        $scope.cancel = function() {
-            $uibModalInstance.dismiss('cancel');
-        };
+		$scope.cancel = function()
+		{
+			$uibModalInstance.dismiss('cancel');
+		};
 
-        $scope.capName = function() {
-            if ($scope.demographic.lastName != null) {
-                $scope.demographic.lastName = $scope.demographic.lastName.toUpperCase();
-            }
+		$scope.capName = function()
+		{
+			if ($scope.demographic.lastName != null)
+			{
+				$scope.demographic.lastName = $scope.demographic.lastName.toUpperCase();
+			}
 
-            if ($scope.demographic.firstName != null) {
-                $scope.demographic.firstName = $scope.demographic.firstName.toUpperCase();
-            }
-        };
+			if ($scope.demographic.firstName != null)
+			{
+				$scope.demographic.firstName = $scope.demographic.firstName.toUpperCase();
+			}
+		};
 
-        $scope.isCorrectDate = function isCorrectDate(year, month, day) {
-            var d = new Date(year, month - 1, day);
+		$scope.isCorrectDate = function isCorrectDate(year, month, day)
+		{
+			var d = new Date(year, month - 1, day);
 
-            if (d == "Invalid Date") return false;
-            if (d.getFullYear() != year) return false;
-            if (d.getMonth() != month - 1) return false;
-            if (d.getDate() != day) return false;
+			if (d == "Invalid Date") return false;
+			if (d.getFullYear() != year) return false;
+			if (d.getMonth() != month - 1) return false;
+			if (d.getDate() != day) return false;
 
-            return true;
-        };
-    }
+			return true;
+		};
+	}
 ]);

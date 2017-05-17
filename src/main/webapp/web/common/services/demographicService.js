@@ -26,89 +26,105 @@
 
  */
 angular.module("Common.Services").service("demographicService", [
-    '$http', '$q',
-    function($http, $q) {
-        var service = {};
+	'$http', '$q',
+	function($http, $q)
+	{
+		var service = {};
 
-        service.apiPath = '../ws/rs/';
+		service.apiPath = '../ws/rs/';
 
-        service.getDemographic = function getDemographic(demographicNo) {
-            var deferred = $q.defer();
+		service.getDemographic = function getDemographic(demographicNo)
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + 'demographics/' + encodeURIComponent(demographicNo),
-                Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("demographicServices::getDemographic error", error);
-                    deferred.reject("An error occurred while fetching demographic");
-                });
+			$http.get(service.apiPath + 'demographics/' + encodeURIComponent(demographicNo),
+				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("demographicServices::getDemographic error", error);
+					deferred.reject("An error occurred while fetching demographic");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.saveDemographic = function saveDemographic(demographic) {
-            var deferred = $q.defer();
+		service.saveDemographic = function saveDemographic(demographic)
+		{
+			var deferred = $q.defer();
 
-            $http.post(service.apiPath + 'demographics', demographic).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("demographicServices::updateDemographic error", error);
-                    deferred.reject("An error occurred while saving demographic");
-                });
+			$http.post(service.apiPath + 'demographics', demographic).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("demographicServices::updateDemographic error", error);
+					deferred.reject("An error occurred while saving demographic");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.updateDemographic = function updateDemographic(demographic) {
-            var deferred = $q.defer();
+		service.updateDemographic = function updateDemographic(demographic)
+		{
+			var deferred = $q.defer();
 
-            $http.put(service.apiPath + 'demographics', demographic).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("demographicServices::updateDemographic error", error);
-                    deferred.reject("An error occurred while updating demographic");
-                });
+			$http.put(service.apiPath + 'demographics', demographic).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("demographicServices::updateDemographic error", error);
+					deferred.reject("An error occurred while updating demographic");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.search = function search(search, startIndex, itemsToReturn) {
-            var deferred = $q.defer();
-            $http.post(service.apiPath + 'demographics/search?startIndex=' +
-                encodeURIComponent(startIndex) + "&itemsToReturn=" +
-                encodeURIComponent(itemsToReturn), search).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("demographicServices::search error", error);
-                    deferred.reject("An error occurred while searching");
-                });
+		service.search = function search(search, startIndex, itemsToReturn)
+		{
+			var deferred = $q.defer();
+			$http.post(service.apiPath + 'demographics/search?startIndex=' +
+				encodeURIComponent(startIndex) + "&itemsToReturn=" +
+				encodeURIComponent(itemsToReturn), search).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("demographicServices::search error", error);
+					deferred.reject("An error occurred while searching");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.searchIntegrator = function searchIntegrator(search, itemsToReturn) {
-            var deferred = $q.defer();
-            $http.post(service.apiPath + 'demographics/searchIntegrator?itemsToReturn=' +
-                encodeURIComponent(itemsToReturn), search).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("demographicServices::searchIntegrator error", error);
-                    deferred.reject("An error occurred while searching");
-                });
+		service.searchIntegrator = function searchIntegrator(search, itemsToReturn)
+		{
+			var deferred = $q.defer();
+			$http.post(service.apiPath + 'demographics/searchIntegrator?itemsToReturn=' +
+				encodeURIComponent(itemsToReturn), search).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("demographicServices::searchIntegrator error", error);
+					deferred.reject("An error occurred while searching");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        return service;
-    }
+		return service;
+	}
 ]);

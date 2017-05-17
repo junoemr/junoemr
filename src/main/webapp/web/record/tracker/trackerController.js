@@ -24,25 +24,29 @@
 
 */
 
-oscarApp.controller('TrackerCtrl', function ($rootScope,$scope,$http,$location,$stateParams,demographicService,demo,$state,noteService,$timeout,uxService) {
+oscarApp.controller('TrackerCtrl', function($rootScope, $scope, $http, $location, $stateParams, demographicService, demo, $state, noteService, $timeout, uxService)
+{
 
-$scope.getTrackerUrl = function(demographicNo) {
-    	
-        url = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo;
-      	
-        return url;  
-        
-};
+	$scope.getTrackerUrl = function(demographicNo)
+	{
 
-	
+		url = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo;
+
+		return url;
+
+	};
+
+
 });
 
-function resizeIframe(iframe) {
-	
+function resizeIframe(iframe)
+{
+
 	var h = iframe.contentWindow.document.body.scrollHeight;
-	if(h>0){
-    iframe.height =  h + "px";
-    //alert("h > 0");
+	if (h > 0)
+	{
+		iframe.height = h + "px";
+		//alert("h > 0");
 	}
-    //alert("h" + h);
-  }
+	//alert("h" + h);
+}

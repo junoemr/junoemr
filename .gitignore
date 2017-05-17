@@ -22,6 +22,7 @@ src/main/resources/uiResources_*.properties
 *.DS_Store
 .classpath
 .vscode/*
+.jsbeautifyrc
 /oscarhost_setup_files*
 .project
 .settings/

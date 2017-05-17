@@ -114,14 +114,14 @@
                     <label class="col-sm-2 control-label">Reason</label>
                     <div class="col-sm-4">
                         <textarea ng-model="appointment.reason" placeholder="Reason"
-                            class="form-control text-area-fixed-width" rows="5">
+                            class="form-control" rows="5">
                         </textarea>
                     </div>
 
                     <label class="col-sm-2 control-label">Notes</label>
                     <div class="col-sm-4">
                         <textarea ng-model="appointment.notes" type="text"
-                            placeholder="Notes" class="form-control text-area-fixed-width" rows="5">
+                            placeholder="Notes" class="form-control" rows="5">
                         </textarea>
                     </div>
                 </div>

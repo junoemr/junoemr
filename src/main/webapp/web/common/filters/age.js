@@ -31,22 +31,22 @@ angular.module('Common.Filters').filter('age', [
 	{
 		return function(input)
 		{
-		  if(input !== null && input.years !== null)
-		  {
-		  	if(input.years < 1 && input.months < 1)
-		  	{
-		  		return input.days + "d";
-		  	}
+			if (input !== null && input.years !== null)
+			{
+				if (input.years < 1 && input.months < 1)
+				{
+					return input.days + "d";
+				}
 
-		  	if(input.years < 2)
-		  	{
-		  		return input.months + "m";
-		  	}
+				if (input.years < 2)
+				{
+					return input.months + "m";
+				}
 
-		  	return input.years + " y";
-		  }
+				return input.years + " y";
+			}
 
-	    return "";
-	  };
+			return "";
+		};
 	}
 ]);

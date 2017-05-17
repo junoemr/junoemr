@@ -26,182 +26,228 @@
 
  */
 angular.module("Common.Services").service("scheduleService", [
-    '$http', '$q',
-    function($http, $q) {
-        var service = {};
+	'$http', '$q',
+	function($http, $q)
+	{
+		var service = {};
 
-        service.apiPath = '../ws/rs/';
+		service.apiPath = '../ws/rs/';
 
-        service.getStatuses = function getStatuses() {
-            var deferred = $q.defer();
+		service.getStatuses = function getStatuses()
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + 'schedule/statuses',
-                service.configHeadersWithCache).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("scheduleService::getStatuses error", error);
-                    deferred.reject("An error occured while fetching statuses");
-                });
+			$http.get(service.apiPath + 'schedule/statuses',
+				service.configHeadersWithCache).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("scheduleService::getStatuses error", error);
+					deferred.reject("An error occured while fetching statuses");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getTypes = function getTypes() {
-            var deferred = $q.defer();
+		service.getTypes = function getTypes()
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + 'schedule/types',
-                Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("scheduleService::getStatuses error", error);
-                    deferred.reject("An error occured while fetching types");
-                });
+			$http.get(service.apiPath + 'schedule/types',
+				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("scheduleService::getStatuses error", error);
+					deferred.reject("An error occured while fetching types");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getAppointments = function getAppointments(day) {
-            var deferred = $q.defer();
+		service.getAppointments = function getAppointments(day)
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + 'schedule/day/' +
-                encodeURIComponent(day)).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("scheduleService::getAppointments error", error);
-                    deferred.reject("An error occured while getting appointments");
-                });
+			$http.get(service.apiPath + 'schedule/day/' +
+				encodeURIComponent(day)).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("scheduleService::getAppointments error", error);
+					deferred.reject("An error occured while getting appointments");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.addAppointment = function addAppointment(appointment) {
-            var deferred = $q.defer();
+		service.addAppointment = function addAppointment(appointment)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + 'schedule/add',
-                method: "POST",
-                data: JSON.stringify(appointment),
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("scheduleService::addAppointment error", error);
-                    deferred.reject("An error occured while saving appointment");
-                });
+			$http(
+			{
+				url: service.apiPath + 'schedule/add',
+				method: "POST",
+				data: JSON.stringify(appointment),
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("scheduleService::addAppointment error", error);
+					deferred.reject("An error occured while saving appointment");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getAppointment = function getAppointment(apptNo) {
-            var deferred = $q.defer();
+		service.getAppointment = function getAppointment(apptNo)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + 'schedule/getAppointment',
-                method: "POST",
-                data: { 'id': apptNo },
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data.appointment);
-                },
-                function error(error) {
-                    console.log("scheduleService::getAppointment error", error);
-                    deferred.reject("An error occured while getting appointment");
-                });
+			$http(
+			{
+				url: service.apiPath + 'schedule/getAppointment',
+				method: "POST",
+				data:
+				{
+					'id': apptNo
+				},
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data.appointment);
+				},
+				function error(error)
+				{
+					console.log("scheduleService::getAppointment error", error);
+					deferred.reject("An error occured while getting appointment");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.deleteAppointment = function deleteAppointment(apptNo) {
-            var deferred = $q.defer();
+		service.deleteAppointment = function deleteAppointment(apptNo)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + 'schedule/deleteAppointment',
-                method: "POST",
-                data: { 'id': apptNo },
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("scheduleService::deleteAppointment error", error);
-                    deferred.reject("An error occured while deleting appointment");
-                });
+			$http(
+			{
+				url: service.apiPath + 'schedule/deleteAppointment',
+				method: "POST",
+				data:
+				{
+					'id': apptNo
+				},
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("scheduleService::deleteAppointment error", error);
+					deferred.reject("An error occured while deleting appointment");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.appointmentHistory = function appointmentHistory(demoNo) {
-            var deferred = $q.defer();
+		service.appointmentHistory = function appointmentHistory(demoNo)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + 'schedule/' +
-                    encodeURIComponent(demoNo) + "/appointmentHistory",
-                method: "POST",
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("scheduleService::appointmentHistory error", error);
-                    deferred.reject("An error occured while getting appointment history");
-                });
+			$http(
+			{
+				url: service.apiPath + 'schedule/' +
+					encodeURIComponent(demoNo) + "/appointmentHistory",
+				method: "POST",
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("scheduleService::appointmentHistory error", error);
+					deferred.reject("An error occured while getting appointment history");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.cancelAppointment = function cancelAppointment(apptNo) {
-            var deferred = $q.defer();
+		service.cancelAppointment = function cancelAppointment(apptNo)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + 'schedule/appointment/' +
-                    encodeURIComponent(apptNo) + "/updateStatus",
-                method: "POST",
-                data: { status: 'C' },
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("scheduleService::cancelAppointment error", error);
-                    deferred.reject("An error occured while cancelling appointment");
-                });
+			$http(
+			{
+				url: service.apiPath + 'schedule/appointment/' +
+					encodeURIComponent(apptNo) + "/updateStatus",
+				method: "POST",
+				data:
+				{
+					status: 'C'
+				},
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("scheduleService::cancelAppointment error", error);
+					deferred.reject("An error occured while cancelling appointment");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.noShowAppointment = function noShowAppointment(apptNo) {
-            var deferred = $q.defer();
+		service.noShowAppointment = function noShowAppointment(apptNo)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + 'schedule/appointment/' +
-                    encodeURIComponent(apptNo) + "/updateStatus",
-                method: "POST",
-                data: { status: 'N' },
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("scheduleService::noShowAppointment error", error);
-                    deferred.reject("An error occured while setting no show appointment");
-                });
+			$http(
+			{
+				url: service.apiPath + 'schedule/appointment/' +
+					encodeURIComponent(apptNo) + "/updateStatus",
+				method: "POST",
+				data:
+				{
+					status: 'N'
+				},
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("scheduleService::noShowAppointment error", error);
+					deferred.reject("An error occured while setting no show appointment");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        return service;
-    }
+		return service;
+	}
 ]);

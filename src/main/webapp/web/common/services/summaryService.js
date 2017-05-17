@@ -26,140 +26,165 @@
 
  */
 angular.module("Common.Services").service("summaryService", [
-    '$http', '$q',
-    function($http, $q) {
-        var service = {};
+	'$http', '$q',
+	function($http, $q)
+	{
+		var service = {};
 
-        service.apiPath = '../ws/rs/recordUX';
+		service.apiPath = '../ws/rs/recordUX';
 
-        service.getSummaryHeaders = function(demographicNo, key) {
-            var deferred = $q.defer();
+		service.getSummaryHeaders = function(demographicNo, key)
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
-                '/summary/' + key).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("summaryService::getSummaryHeaders error", error);
-                    deferred.reject("An error occurred while fetching summary headers");
-                });
+			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
+				'/summary/' + key).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("summaryService::getSummaryHeaders error", error);
+					deferred.reject("An error occurred while fetching summary headers");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getFullSummary = function(demographicNo, summaryCode) {
-            var deferred = $q.defer();
+		service.getFullSummary = function(demographicNo, summaryCode)
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
-                '/fullSummary/' + summaryCode).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("summaryService::getFullSummary error", error);
-                    deferred.reject("An error occurred while fetching full summary");
-                });
+			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
+				'/fullSummary/' + summaryCode).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("summaryService::getFullSummary error", error);
+					deferred.reject("An error occurred while fetching full summary");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getFamilyHistory = function(demographicNo) {
-            var deferred = $q.defer();
+		service.getFamilyHistory = function(demographicNo)
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
-                '/getFamilyHistory').then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("summaryService::getFamilyHistory error", error);
-                    deferred.reject("An error occurred while fetching family history");
-                });
+			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
+				'/getFamilyHistory').then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("summaryService::getFamilyHistory error", error);
+					deferred.reject("An error occurred while fetching family history");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getMedicalHistory = function(demographicNo) {
-            var deferred = $q.defer();
+		service.getMedicalHistory = function(demographicNo)
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
-                '/getMedicalHistory').then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("summaryService::getMedicalHistory error", error);
-                    deferred.reject("An error occurred while fetching medical history");
-                });
+			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
+				'/getMedicalHistory').then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("summaryService::getMedicalHistory error", error);
+					deferred.reject("An error occurred while fetching medical history");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getOngoingConcerns = function(demographicNo) {
-            var deferred = $q.defer();
+		service.getOngoingConcerns = function(demographicNo)
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
-                '/getOngoingConcerns').then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("summaryService::getOngoingConcerns error", error);
-                    deferred.reject("An error occurred while fetching ongoing concerns");
-                });
+			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
+				'/getOngoingConcerns').then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("summaryService::getOngoingConcerns error", error);
+					deferred.reject("An error occurred while fetching ongoing concerns");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getOtherMeds = function getOtherMeds(demographicNo) {
-            var deferred = $q.defer();
+		service.getOtherMeds = function getOtherMeds(demographicNo)
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
-                '/getOtherMeds').then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("summaryService::getOtherMeds error", error);
-                    deferred.reject("An error occurred while fetching other meds");
-                });
+			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
+				'/getOtherMeds').then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("summaryService::getOtherMeds error", error);
+					deferred.reject("An error occurred while fetching other meds");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getReminders = function getReminders(demographicNo) {
-            var deferred = $q.defer();
+		service.getReminders = function getReminders(demographicNo)
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
-                '/getReminders').then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("summaryService::getReminders error", error);
-                    deferred.reject("An error occurred while fetching reminders");
-                });
+			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
+				'/getReminders').then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("summaryService::getReminders error", error);
+					deferred.reject("An error occurred while fetching reminders");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getRiskFactors = function getRiskFactors(demographicNo) {
-            var deferred = $q.defer();
+		service.getRiskFactors = function getRiskFactors(demographicNo)
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
-                '/getRiskFactors').then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("summaryService::getRiskFactors error", error);
-                    deferred.reject("An error occurred while fetching risk factors");
-                });
+			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
+				'/getRiskFactors').then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("summaryService::getRiskFactors error", error);
+					deferred.reject("An error occurred while fetching risk factors");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        return service;
-    }
+		return service;
+	}
 ]);
