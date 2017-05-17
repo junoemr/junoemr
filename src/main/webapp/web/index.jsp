@@ -372,7 +372,9 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="patient/module.js"></script>
 	<script type="text/javascript" src="patient/newPatientController.js"></script>
 
+	<script type="text/javascript" src="dashboard/module.js"></script>
 	<script type="text/javascript" src="dashboard/dashboardController.js"></script>
+	<script type="text/javascript" src="dashboard/ticklerConfigureController.js"></script>
 
 	<script type="text/javascript" src="patientlist/module.js"></script>	
 	<script type="text/javascript" src="patientlist/patientListController.js"></script>

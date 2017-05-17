@@ -23,7 +23,8 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'PatientList',
 	'Inbox',
 	'Help',
-	'Document'
+	'Document',
+	'Dashboard'
 ]);
 
 oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider)
@@ -44,7 +45,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/dashboard',
 			templateUrl: 'dashboard/dashboard.jsp',
-			controller: 'DashboardCtrl'
+			controller: 'Dashboard.DashboardController'
 		})
 		.state('inbox',
 		{
