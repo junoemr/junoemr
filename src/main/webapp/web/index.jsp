@@ -388,8 +388,14 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="tickler/ticklerAddController.js"></script>
 	<script type="text/javascript" src="tickler/ticklerNoteController.js"></script>
 	<script type="text/javascript" src="tickler/ticklerCommentController.js"></script>
-
+	
+	<script type="text/javascript" src="schedule/module.js"></script>
 	<script type="text/javascript" src="schedule/scheduleController.js"></script>
+	<script type="text/javascript" src="schedule/appointmentAddController.js"></script>
+	<script type="text/javascript" src="schedule/appointmentViewController.js"></script>
+	
+	
+
 	<script type="text/javascript" src="admin/adminController.js"></script>
 	<script type="text/javascript" src="billing/billingController.js"></script>
 	<script type="text/javascript" src="consults/consultRequestListController.js"></script>
@@ -399,9 +405,25 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="inbox/inboxController.js"></script>
 	<script type="text/javascript" src="patientsearch/patientSearchController.js"></script>
 
+	<script type="text/javascript" src="report/module.js"></script>
 	<script type="text/javascript" src="report/reportsController.js"></script>
+	<script type="text/javascript" src="report/reportBadAppointmentSheetController.js"></script>
+	<script type="text/javascript" src="report/reportDaySheetController.js"></script>
+	<script type="text/javascript" src="report/reportEdbListController.js"></script>
+	<script type="text/javascript" src="report/reportFollowUpIntakeController.js"></script>
+	<script type="text/javascript" src="report/reportNoShowAppointmentSheetController.js"></script>
+	<script type="text/javascript" src="report/reportOldPatientsController.js"></script>
+	<script type="text/javascript" src="report/reportOldPatientChartListController.js"></script>
+	<script type="text/javascript" src="report/reportRegistrationIntakeController.js"></script>
+	<script type="text/javascript" src="report/reportSHMentalHealthController.js"></script>
+
 	<script type="text/javascript" src="document/documentsController.js"></script>
+
+	<script type="text/javascript" src="settings/module.js"></script>
 	<script type="text/javascript" src="settings/settingsController.js"></script>
+	<script type="text/javascript" src="tickler/changePasswordController.js"></script>
+	<script type="text/javascript" src="tickler/quickLinkController.js"></script>
+
 	<script type="text/javascript" src="help/supportController.js"></script>
 	<script type="text/javascript" src="help/helpController.js"></script>
 
