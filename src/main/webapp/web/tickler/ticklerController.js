@@ -3,6 +3,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 	'$scope',
 	'$timeout',
 	'$resource',
+	'$defer',
 	'NgTableParams',
 	'securityService',
 	'$uibModal',
@@ -18,6 +19,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		$scope,
 		$timeout,
 		$resource,
+		$defer,
 		NgTableParams,
 		securityService,
 		$uibModal,
@@ -69,7 +71,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 					},
 					{
 						total: 0, // length of data
-						getData: function($defer, params)
+						getData: function(params)
 						{
 							// ajax request to api
 							$scope.search.count = params.url().count;
