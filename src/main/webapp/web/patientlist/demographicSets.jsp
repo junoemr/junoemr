@@ -25,7 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<div ng-controller="PatientListDemographicSetCtrl">
+<div ng-controller="PatientList.PatientListDemographicSetController">
 <form class="form-horizontal">
 <select ng-model="filter.name" class="form-control" ng-change="changeMoreTab(currentmoretab.id,filter)" ng-init="filter.name=''">
 	<option value=""><bean:message key="patientList.demographicSets.select" bundle="ui"/></option>

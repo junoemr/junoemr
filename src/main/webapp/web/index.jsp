@@ -215,9 +215,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<!-- nav bar is done here -->
 
 	 <!-- Start patient List template -->
-	<div class="container-fluid" ng-controller="PatientListCtrl" >
+	<div class="container-fluid" ng-controller="PatientList.PatientListController" >
 		<div class="row" >
-
 			<div id="left-pane-hidden" class="col-xs-1 hidden-xs" ng-if="!bodyCtrl.showPatientList">
 				<button class="toggle-patient-list-button" type="button"  ng-click="showPatientList()" title="Show Patient List">
 					<span class="glyphicon glyphicon-chevron-right"></span>
@@ -226,7 +225,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 			<div id="left-pane"
 					 class="col-lg-3 col-md-4 col-sm-4 hidden-xs"
-					 ng-controller="PatientListAppointmentListCtrl"
+					 ng-controller="PatientList.PatientListAppointmentListController"
 					 ng-if="bodyCtrl.showPatientList">
 
 				<%--<ul class="nav nav-tabs">
@@ -370,10 +369,17 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="layout/bodyController.js"></script>
 	<script type="text/javascript" src="layout/navBarController.js"></script>
 
+	<script type="text/javascript" src="patient/module.js"></script>
 	<script type="text/javascript" src="patient/newPatientController.js"></script>
 
 	<script type="text/javascript" src="dashboard/dashboardController.js"></script>
+
+	<script type="text/javascript" src="patientlist/module.js"></script>	
 	<script type="text/javascript" src="patientlist/patientListController.js"></script>
+	<script type="text/javascript" src="patientlist/patientListAppointmentListController.js"></script>
+	<script type="text/javascript" src="patientlist/patientListConfigController.js"></script>
+	<script type="text/javascript" src="patientlist/patientListDemographicSetController.js"></script>
+	<script type="text/javascript" src="patientlist/patientListProgramController.js"></script>
 	
 	<script type="text/javascript" src="record/module.js"></script>
 	<script type="text/javascript" src="record/recordController.js"></script>
@@ -403,16 +409,19 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="schedule/appointmentAddController.js"></script>
 	<script type="text/javascript" src="schedule/appointmentViewController.js"></script>
 
-
-
 	<script type="text/javascript" src="admin/adminController.js"></script>
 	<script type="text/javascript" src="billing/billingController.js"></script>
 	<script type="text/javascript" src="consults/consultRequestListController.js"></script>
 	<script type="text/javascript" src="consults/consultRequestController.js"></script>
 	<script type="text/javascript" src="consults/consultResponseListController.js"></script>
 	<script type="text/javascript" src="consults/consultResponseController.js"></script>
+
+	<script type="text/javascript" src="inbox/module.js"></script>
 	<script type="text/javascript" src="inbox/inboxController.js"></script>
+
+	<script type="text/javascript" src="patientsearch/module.js"></script>
 	<script type="text/javascript" src="patientsearch/patientSearchController.js"></script>
+	<script type="text/javascript" src="patientsearch/remotePatientResultsController.js"></script>
 
 	<script type="text/javascript" src="report/module.js"></script>
 	<script type="text/javascript" src="report/reportsController.js"></script>
@@ -426,6 +435,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="report/reportRegistrationIntakeController.js"></script>
 	<script type="text/javascript" src="report/reportSHMentalHealthController.js"></script>
 
+	<script type="text/javascript" src="document/module.js"></script>
 	<script type="text/javascript" src="document/documentsController.js"></script>
 
 	<script type="text/javascript" src="settings/module.js"></script>
@@ -433,11 +443,10 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="settings/changePasswordController.js"></script>
 	<script type="text/javascript" src="settings/quickLinkController.js"></script>
 
+	<script type="text/javascript" src="help/module.js"></script>
 	<script type="text/javascript" src="help/supportController.js"></script>
 	<script type="text/javascript" src="help/helpController.js"></script>
 
-	<script type="text/javascript" src="schedule/appointmentAddController.js"></script>
-	<script type="text/javascript" src="schedule/appointmentViewController.js"></script>
 	<!-- endbuild -->
 
 	<jsp:include page="dist/templates.jsp"/>

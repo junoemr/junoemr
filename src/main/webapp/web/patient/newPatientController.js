@@ -26,7 +26,7 @@
 
 */
 
-oscarApp.controller('NewPatientCtrl', [
+angular.module('Patient').controller('Patient.NewPatientController', [
 
 	'$scope',
 	'$uibModal',

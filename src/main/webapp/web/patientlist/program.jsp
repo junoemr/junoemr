@@ -24,7 +24,7 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<div ng-controller="PatientListProgramCtrl">
+<div ng-controller="PatientList.PatientListProgramController">
 
 <a ng-repeat="admission in admissions | filter:query" ng-click="goToRecord(admission.demographic)" class="list-group-item hand-hover" class="default">	
 	<h5 class="list-group-item-heading">{{admission.demographic.lastName}},{{admission.demographic.firstName}}</h5>

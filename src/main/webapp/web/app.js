@@ -17,7 +17,13 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Details',
 	'PHR',
 	'Forms',
-	'Report'
+	'Report',
+	'Patient',
+	'PatientSearch',
+	'PatientList',
+	'Inbox',
+	'Help',
+	'Document'
 ]);
 
 oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider)
@@ -45,7 +51,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			url: '/inbox',
 			templateUrl: 'inbox/inbox_popup.jsp',
 			// templateUrl: 'inbox/inbox.jsp',
-			controller: 'InboxCtrl'
+			controller: 'Inbox.InboxController'
 		})
 		.state('consultRequests',
 		{
@@ -97,7 +103,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/search',
 			templateUrl: 'patientsearch/patientSearch.jsp',
-			controller: 'PatientSearchCtrl'
+			controller: 'PatientSearch.PatientSearchController'
 		})
 		.state('reports',
 		{
@@ -110,7 +116,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/documents',
 			templateUrl: 'document/documents_classic.jsp',
-			controller: 'DocumentsCtrl'
+			controller: 'Document.DocumentsController'
 		})
 		.state('settings',
 		{
@@ -164,13 +170,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/support',
 			templateUrl: 'help/support.jsp',
-			controller: 'SupportCtrl'
+			controller: 'Help.SupportController'
 		})
 		.state('help',
 		{
 			url: '/help',
 			templateUrl: 'help/help.jsp',
-			controller: 'HelpCtrl'
+			controller: 'Help.HelpController'
 		})
 		.state('record',
 		{
@@ -340,11 +346,11 @@ oscarApp.config(['$routeProvider',
 						}).
 						when('/support', {
 							templateUrl: 'partials/support.jsp',
-							controller: 'SupportCtrl'
+							controller: 'Help.SupportController'
 						}).
 						when('/help', {
 							templateUrl: 'partials/help.jsp',
-							controller: 'HelpCtrl'
+							controller: 'Help.HelpController'
 						}).
 
 						when('/messenger', {
