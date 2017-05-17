@@ -23,6 +23,14 @@
     Ontario, Canada
 
 --%>
+
+<%--
+    TODO: This template must be refactored to use angular
+    instead of opening a window this way
+    because this template is preloaded in index.jsp via templates.jsp
+
+    COMMENTING OUT UNTIL REFACTOR
+
 <script>
 function newWindow(url) {
     newwindow=window.open(url,'name','height=700,width=1000');
@@ -37,3 +45,4 @@ newWindow('../report/reportindex.jsp','reportPage');
 
 <p><a ng-click="transition('dashboard')">Go to your dashboard</a></p>
 
+--%>

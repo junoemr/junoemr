@@ -23,6 +23,14 @@
     Ontario, Canada
 
 --%>
+
+<%--
+    TODO: This template must be refactored to use angular
+    instead of opening a window this way
+    because this template is preloaded in index.jsp via templates.jsp
+
+    COMMENTING OUT UNTIL REFACTOR
+
 <script>
 function newWindow(url) {
     newwindow=window.open(url,'inbox','height=700,width=1000');
@@ -36,4 +44,6 @@ newWindow('../dms/inboxManage.do?method=prepareForIndexPage','inbox');
 <p class="info">Inbox Panel is popped-out..ensure you do not have a popup blocker running.</p>
 
 <p><a href="#/dashboard">Go to your dashboard</a></p>
+
+--%>
 
