@@ -1,3 +1,9 @@
-oscarApp.controller('ScheduleCtrl', function($scope) {
+angular.module('Schedule').controller('Schedule.ScheduleController', [
 
-});
+    '$scope',
+
+    function(
+        $scope) {
+
+    }
+]);

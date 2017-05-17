@@ -52,7 +52,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
         .state('schedule', {
             url: '/schedule',
             templateUrl: 'schedule/classic.jsp',
-            controller: 'ScheduleCtrl'
+            controller: 'Schedule.ScheduleController'
         })
         .state('admin', {
             url: '/admin',
@@ -76,7 +76,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
             url: '/reports',
             templateUrl: 'report/reports.jsp',
             //templateUrl: 'report/reports_classic.jsp',
-            controller: 'ReportsCtrl'
+            controller: 'Report.ReportsController'
         })
         .state('documents', {
             url: '/documents',

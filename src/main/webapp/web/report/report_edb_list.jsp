@@ -25,7 +25,7 @@
 --%>
 <h1>EDB List</h1>
 
-<div class="row" ng-controller="ReportEdbListCtrl">
+<div class="row" ng-controller="Report.ReportEdbListController">
 	<div class="col-md-4">
 <form role="form">
   <div class="form-group">

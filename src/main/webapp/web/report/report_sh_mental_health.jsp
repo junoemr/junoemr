@@ -25,7 +25,7 @@
 --%>
 <h1>Street Health Mental Health Report</h1>
 
-<div class="row" ng-controller="ReportSHMentalHealthCtrl">
+<div class="row" ng-controller="Report.ReportSHMentalHealthController">
 	<div class="col-md-4">
 <form role="form">
   <div class="form-group">

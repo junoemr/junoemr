@@ -32,7 +32,7 @@ a.bg-danger:hover {
   background-color: #e4b9b9;
 }
 </style>
-<div ng-controller="ReportDaySheetCtrl">
+<div ng-controller="Report.ReportDaySheetController">
 <div class="row">
 	<form role="form">
 

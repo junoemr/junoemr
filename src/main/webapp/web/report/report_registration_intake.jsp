@@ -25,7 +25,7 @@
 --%>
 <h1>Registration Intake Report</h1>
 
-<div class="row" ng-controller="ReportRegistrationIntakeCtrl">
+<div class="row" ng-controller="Report.ReportRegistrationIntakeController">
 	<div class="col-md-4">
 <form role="form">
   <div class="form-group">

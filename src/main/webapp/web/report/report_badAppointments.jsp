@@ -25,7 +25,7 @@
 --%>
 <h1>Bad Appointment Sheet</h1>
 
-<div class="row" ng-controller="ReportBadAppointmentSheetCtrl">
+<div class="row" ng-controller="Report.ReportBadAppointmentSheetController">
 	<div class="col-md-4">
 		<form role="form">
  			<div class="form-group">

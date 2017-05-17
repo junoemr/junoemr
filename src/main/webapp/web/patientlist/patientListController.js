@@ -356,7 +356,7 @@ oscarApp.controller('PatientListAppointmentListCtrl', [
         $scope.addNewAppointment = function() {
             var modalInstance = $uibModal.open({
                 templateUrl: 'schedule/appointmentAdd.jsp',
-                controller: 'AppointmentAddController',
+                controller: 'Schedule.AppointmentAddController',
                 backdrop: false,
                 size: 'lg',
                 resolve: {
@@ -375,7 +375,7 @@ oscarApp.controller('PatientListAppointmentListCtrl', [
         $scope.viewAppointment = function(apptNo) {
             var modalInstance = $uibModal.open({
                 templateUrl: 'schedule/appointmentView.jsp',
-                controller: 'AppointmentViewController',
+                controller: 'Schedule.AppointmentViewController',
                 backdrop: false,
                 size: 'lg',
                 resolve: {
