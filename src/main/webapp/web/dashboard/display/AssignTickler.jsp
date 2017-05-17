@@ -23,7 +23,20 @@
     Ontario, Canada
 
 --%>
+
+<%--
+	TODO: This template must be refactored to not use jstl taglibs,
+	e.g. c:forEach c:set c:redirect c:out
+	Replace with angular
+--%>
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+
+<%--
+	TODO: Use angular datepickers instead of jquery
+	Replace with angular
+
 <script type="text/javascript">
 
 //--> Date picker
@@ -39,6 +52,8 @@ $(function(){
 });
 
 </script>
+--%>
+
 <form name="ticklerAddForm" id="ticklerAddForm" action="${ pageContext.request.contextPath }/web/dashboard/display/AssignTickler.do" method="POST" novalidate >
 	<input type="hidden" value="saveTickler" name="method" />
 		<div class="row">
@@ -57,11 +72,11 @@ $(function(){
 				</div>
 			</div>
 		</div>
-		
+
 		<div class="row">
 			<div class="col-xs-12">
 				<div class="form-group">
-					<label>Action:</label> 
+					<label>Action:</label>
 					<select class="form-control required" name="ticklerCategoryId" >
 						<c:forEach items="${ ticklerCategories }" var="ticklerCategory" >
 							<option title="${ ticklerCategory.description }" value="${ ticklerCategory.id }" >
@@ -76,7 +91,7 @@ $(function(){
 		<div class="row">
 			<div class="col-xs-6">
 				<div class="form-group">
-					<label>Assign to:</label> 
+					<label>Assign to:</label>
 					<select class="form-control required" name="taskAssignedTo" >
 					<option value=""></option>
 						<c:forEach items="${ providers }" var="provider">
@@ -91,9 +106,9 @@ $(function(){
 			<div class="col-xs-6">
 				<div class="form-group">
 					<label>Priority:</label>
-					
+
 					<select class="form-control required" name="priority" >
-					<option value=""></option> 
+					<option value=""></option>
 						<option value="Low" >Low</option>
 						<option value="Normal" >Normal</option>
 						<option value="High" >High</option>
@@ -109,7 +124,7 @@ $(function(){
 					Date:</label>
 				<div class="controls">
 					<div class="input-group">
-						<input name="serviceDate" id="datePickerServiceDate" type="text" class="date-picker form-control required" /> 
+						<input name="serviceDate" id="datePickerServiceDate" type="text" class="date-picker form-control required" />
 							<label for="datePickerServiceDate" class="input-group-addon btn">
 							<span class="glyphicon glyphicon-calendar"></span>
 						</label>
@@ -133,7 +148,7 @@ $(function(){
 		<div class="row">
 			<div class="col-xs-12">
 			<div class="form-group">
-					<label>Message:</label> 
+					<label>Message:</label>
 					<select class="form-control" name="message" >
 					<option value=""></option>
 						<c:forEach items="${ textSuggestions }" var="textSuggestion" >

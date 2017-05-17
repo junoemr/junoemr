@@ -25,6 +25,7 @@
 --%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
 <%
 // Force the page to un-cache itself so user cannot go back after logout
@@ -214,14 +215,13 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<!-- nav bar is done here -->
 
 	 <!-- Start patient List template -->
-	<div class="container-fluid" ng-controller="PatientListCtrl" >	
+	<div class="container-fluid" ng-controller="PatientListCtrl" >
 		<div class="row" >
-			
 
-			<div id="left-pane-hidden" class="col-xs-1 hidden-xs" ng-if="!bodyCtrl.showPatientList"> 
+			<div id="left-pane-hidden" class="col-xs-1 hidden-xs" ng-if="!bodyCtrl.showPatientList">
 				<button class="toggle-patient-list-button" type="button"  ng-click="showPatientList()" title="Show Patient List">
 					<span class="glyphicon glyphicon-chevron-right"></span>
-				</button>	
+				</button>
 			</div>
 
 			<div id="left-pane"
@@ -285,19 +285,18 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							<span title="<bean:message key="patientList.pagination" bundle="ui"/>">{{currentPage+1}}/{{numberOfPages()}}</span>
 						</div>
 					</div>
-
 				</div>
-		</div>
+			</div>
 		<!-- End patient List template -->
 
-		<div id="right_pane"
-				 ng-class="{
-				 	'col-lg-9 col-lg-offset-3 col-sm-8 col-sm-offset-4 col-xs-12': bodyCtrl.showPatientList,
-				 	'col-sm-10 col-sm-offset-1': !bodyCtrl.showPatientList }"
-				 ui-view
-				 ng-cloak></div>
+			<div id="right_pane"
+					 ng-class="{
+						'col-lg-9 col-lg-offset-3 col-sm-8 col-sm-offset-4 col-xs-12': bodyCtrl.showPatientList,
+						'col-sm-10 col-sm-offset-1': !bodyCtrl.showPatientList }"
+					 ui-view
+					 ng-cloak></div>
+		</div>
 	</div>
-
 
 	<script>
 
@@ -388,13 +387,13 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="tickler/ticklerAddController.js"></script>
 	<script type="text/javascript" src="tickler/ticklerNoteController.js"></script>
 	<script type="text/javascript" src="tickler/ticklerCommentController.js"></script>
-	
+
 	<script type="text/javascript" src="schedule/module.js"></script>
 	<script type="text/javascript" src="schedule/scheduleController.js"></script>
 	<script type="text/javascript" src="schedule/appointmentAddController.js"></script>
 	<script type="text/javascript" src="schedule/appointmentViewController.js"></script>
-	
-	
+
+
 
 	<script type="text/javascript" src="admin/adminController.js"></script>
 	<script type="text/javascript" src="billing/billingController.js"></script>
@@ -430,6 +429,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="schedule/appointmentAddController.js"></script>
 	<script type="text/javascript" src="schedule/appointmentViewController.js"></script>
 	<!-- endbuild -->
+
+	<jsp:include page="dist/templates.jsp"/>
 
 <script>
 

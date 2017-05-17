@@ -23,16 +23,22 @@
     Ontario, Canada
 
 --%>
+
+<%--
+	TODO: This template must be refactored to not use security or jstl taglibs,
+	e.g. security:oscarSec c:forEach c:set c:redirect c:out fn:containsIgnoreCase.
+	Replace with angular
+--%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<%-- COMMENTING OUT NON-TEMPLATE CODE, SHOULD BE REMOVED WHEN REFACTORED
 
 <security:oscarSec roleName='${ sessionScope[userrole] }, ${ sessionScope[user] }' rights="w" objectName="_dashboardDisplay">
 	<c:redirect url="securityError.jsp?type=_dashboardDisplay" />
 </security:oscarSec>
 
-<!DOCTYPE html > 
+<!DOCTYPE html >
 <html lang="" >
 <head>
 	<meta charset="utf-8">
@@ -45,8 +51,8 @@
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/web/css/dashboard.css" />
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/js/jqplot/jquery.jqplot2.min.css" />
 	<script>var ctx = "${pageContext.request.contextPath}"</script>
-	<script type="text/javascript" src="${ pageContext.request.contextPath }/js/jquery-1.9.1.min.js"></script>		
-	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/bootstrap/3.0.0/js/bootstrap.min.js" ></script>	
+	<script type="text/javascript" src="${ pageContext.request.contextPath }/js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/bootstrap/3.0.0/js/bootstrap.min.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/web/dashboard/display/dashboardDisplayController.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/js/jqplot/jquery.jqplot2.min.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/js/jqplot/plugins/jqplot.pieRenderer.js" ></script>
@@ -54,6 +60,7 @@
 </head>
 
 <body>
+--%>
 
 <div class="container">
 <div class="row" id="dashboardPanel" >
@@ -68,7 +75,7 @@
 	</div>
 	<div class="row dashboardSubHeading" >
 		<div class="col-md-6">
-			Last loaded: 
+			Last loaded:
 			<c:out value="${ dashboard.lastChecked }" />
 			<a href="#" title="refresh" class="reloadDashboardBtn" id="getDashboard_${ dashboard.id }" >
 				<span class="glyphicon glyphicon-refresh"></span>
@@ -81,60 +88,63 @@
 		</div>
 	</div>
 	<!-- end Dashboard Heading -->
-	
-	<div class="row dashboardBody">	
-	
+
+	<div class="row dashboardBody">
+
 		<!-- dashboardPanels - by category.  -->
 		<c:forEach items="${ dashboard.panelBeans }" var="panelBean" >
-		
+
 			<div class="panel panel-primary categoryPanel" >
-	
-				<div class="panel-heading">				
-					<strong><c:out value="${ panelBean.category }" /></strong>				
+
+				<div class="panel-heading">
+					<strong><c:out value="${ panelBean.category }" /></strong>
 				</div>
-				
+
 				<div class="panel-body" >
-				
+
 				<c:forEach items="${ panelBean.indicatorPanelBeans }" var="indicatorPanel" >
-					
+
 					<!-- Begin display of Indicator Panel -->
 					<div class="panel panel-default indicatorPanel" >
-		
+
 						<!-- Indicator panel heading - by sub category -->
-						<div class="panel-heading">									
-							<c:out value="${ indicatorPanel.category }" />						
+						<div class="panel-heading">
+							<c:out value="${ indicatorPanel.category }" />
 						</div>
-	
-						<div class="panel-body" >							
-							<c:forEach items="${ indicatorPanel.indicatorIdList }" var="indicatorId" >																
-								<div class="col-md-3 indicatorWrapper" id="indicatorId_${ indicatorId }">				
+
+						<div class="panel-body" >
+							<c:forEach items="${ indicatorPanel.indicatorIdList }" var="indicatorId" >
+								<div class="col-md-3 indicatorWrapper" id="indicatorId_${ indicatorId }">
 									<div>
-										<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> 
+										<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
 										Loading...
 									</div>
 								</div>
 							</c:forEach>
 							<!-- end indicator loop -->
-						</div> 
+						</div>
 						<!-- end indicatorPanel body -->
-					</div>	
+					</div>
 					<!-- end indicatorPanel -->
-					
-				</c:forEach> 
+
+				</c:forEach>
 				<!-- end indicatorPanel loop -->
-				</div>			
-			</div> 	
-			<!--  end dashboardPanels -->	
-		</c:forEach> 
+				</div>
+			</div>
+			<!--  end dashboardPanels -->
+		</c:forEach>
 		<!-- end Dashboard Panel loop -->
-		
+
 	</div>
 	<!-- End dashboard body -->
 
-</div>	
-</div> 	
-</div> 
+</div>
+</div>
+</div>
 <!-- end container -->
 
+
+<%-- COMMENTING OUT NON-TEMPLATE CODE, SHOULD BE REMOVED
 </body>
 </html>
+--%>
