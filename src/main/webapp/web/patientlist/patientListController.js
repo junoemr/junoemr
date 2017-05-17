@@ -340,6 +340,10 @@ oscarApp.controller('PatientListAppointmentListCtrl', [
 		$q, $filter, $uibModal, providerService)
 	{
 
+		$scope.dateOptions = {
+			showWeeks: false
+		};
+
 		scheduleService.getStatuses().then(function(data)
 		{
 			$scope.statuses = data.content;
@@ -426,7 +430,7 @@ oscarApp.controller('PatientListAppointmentListCtrl', [
 
 		$scope.changeApptDate = function()
 		{
-			if ($scope.appointmentDate == undefined)
+			if (typeof $scope.appointmentDate === 'undefined')
 			{
 				$scope.today();
 			}
