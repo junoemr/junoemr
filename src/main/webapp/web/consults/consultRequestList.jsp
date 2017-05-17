@@ -102,7 +102,7 @@
 				<div class="input-group">
 					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="removeDemographicAssignment()"></span></div>
 					<input type="text" ng-model="consult.demographicName" placeholder="<bean:message key="consult.list.patient" bundle="ui"/>"
-						typeahead="pt.demographicNo as pt.name for pt in searchPatients($viewValue)"
+						uib-typeahead="pt.demographicNo as pt.name for pt in searchPatients($viewValue)"
 						typeahead-on-select="updateDemographicNo($item, $model, $label)"
 						class="form-control"/>
 				</div>
@@ -112,7 +112,7 @@
 				<div class="input-group">
 					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="removeMrpAssignment()"></span></div>
 					<input type="text" ng-model="consult.mrpName" placeholder="<bean:message key="consult.list.mrp" bundle="ui"/>"
-						typeahead="pvd as pvd.name for pvd in searchMrps($viewValue)"
+						uib-typeahead="pvd as pvd.name for pvd in searchMrps($viewValue)"
 						typeahead-on-select="updateMrpNo($model)"
 						class="form-control"/>
 				</div>

@@ -238,7 +238,7 @@
 				<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.Index.assnIssue" /></label>			
 				<div class="col-sm-4"><!-- TODO: most likely a typeahead and display assigned issues below using the badges or labels-->
 					<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.Index.assnIssue" />"
-						typeahead="i.issueId as i.code for i in searchIssues($viewValue)" 
+						uib-typeahead="i.issueId as i.code for i in searchIssues($viewValue)" 
 						typeahead-on-select="assignIssue($item, $model, $label);selectedIssue='';" 
 						ng-model="selectedIssue" 
 						typeahead-loading="loadingIssues"

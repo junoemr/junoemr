@@ -46,7 +46,7 @@
                     <div class="col-sm-4">
                         <input type="text"
                             ng-model="appointment.demographicName" placeholder="Patient"
-                            typeahead="pt.demographicNo as pt.name for pt in searchPatients($viewValue)"
+                            uib-typeahead="pt.demographicNo as pt.name for pt in searchPatients($viewValue)"
                             typeahead-on-select="updateDemographicNo($item, $model, $label)"
                             class="form-control form-control-details">
                     </div>
@@ -56,7 +56,7 @@
                         <input type="text"
                             ng-model="appointment.providerName"
                             placeholder="Provider"
-                            typeahead="pt.providerNo as pt.name for pt in searchProviders($viewValue)"
+                            uib-typeahead="pt.providerNo as pt.name for pt in searchProviders($viewValue)"
                             typeahead-on-select="updateProviderNo($item, $model, $label)"
                             class="form-control">
                     </div>

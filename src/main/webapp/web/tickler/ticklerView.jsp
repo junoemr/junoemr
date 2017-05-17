@@ -47,7 +47,7 @@
     <div class="input-group">
       <div class="input-group-addon"><span class="glyphicon glyphicon-remove" ng-click="cancelTaskAssignedToUpdate()"></span></div>
       <input type="text" ng-model="ticklerUpdate.taskAssignedToName" placeholder="<bean:message key="tickler.view.provider.placeholder" bundle="ui"/>" 
-				typeahead="pt.providerNo as pt.name for pt in searchProviders($viewValue)" 
+				uib-typeahead="pt.providerNo as pt.name for pt in searchProviders($viewValue)" 
 				typeahead-on-select="updateTaskAssignedTo($item, $model, $label)"
 				class="form-control input-sm">
     </div>

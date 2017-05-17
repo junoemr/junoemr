@@ -43,7 +43,7 @@
 				<div class="form-group">
 				  <label>Patient:</label>
 				 <input type="text" ng-model="tickler.demographicName" placeholder="<bean:message key="tickler.add.patient" bundle="ui"/>" 
-				typeahead="pt.demographicNo as pt.name for pt in searchPatients($viewValue)" 
+				uib-typeahead="pt.demographicNo as pt.name for pt in searchPatients($viewValue)" 
 				typeahead-on-select="updateDemographicNo($item, $model, $label)"
 				class="form-control">
 				
