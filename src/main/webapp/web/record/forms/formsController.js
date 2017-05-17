@@ -23,7 +23,7 @@
     Ontario, Canada
 
 */
-angular.module('Forms').controller('Forms.FormController', [
+angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 	'$scope',
 	'$http',
@@ -41,9 +41,9 @@ angular.module('Forms').controller('Forms.FormController', [
 		$http,
 		$location,
 		$stateParams,
+		$state,
 		demographicService,
 		demo,
-		$state,
 		formService,
 		user,
 		securityService)
@@ -421,7 +421,6 @@ angular.module('Forms').controller('Forms.FormController', [
 		{
 			console.log(errorMessage);
 		}
-
 
 		if ($state.current.name == 'record.forms.new')
 		{

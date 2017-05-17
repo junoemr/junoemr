@@ -1,4 +1,4 @@
-angular.module('Summary').controller('Summary.GroupNotesController', [
+angular.module('Record.Summary').controller('Record.Summary.GroupNotesController', [
 
 	'$scope',
 	'$uibModal',

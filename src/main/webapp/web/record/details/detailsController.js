@@ -23,7 +23,7 @@
     Ontario, Canada
 
 */
-angular.module('Details').controller('Details.DetailsController', [
+angular.module('Record.Details').controller('Record.Details.DetailsController', [
 
 	'$scope',
 	'$http',

@@ -1,4 +1,4 @@
-angular.module('Summary').controller('Summary.RecordPrintController', [
+angular.module('Record.Summary').controller('Record.Summary.RecordPrintController', [
 
 	'$scope',
 	'$uibModal',

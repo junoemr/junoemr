@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('PHR', ['Common', 'Common.Services']);
+angular.module('Record.PHR', ['Common', 'Common.Services']);

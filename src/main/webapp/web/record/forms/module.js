@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('Forms', ['Common', 'Common.Services']);
+angular.module('Record.Forms', ['Common', 'Common.Services']);

@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('Tracker', ['Common', 'Common.Services']);
+angular.module('Record.Tracker', ['Common', 'Common.Services']);

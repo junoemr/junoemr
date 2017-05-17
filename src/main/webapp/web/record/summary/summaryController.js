@@ -23,7 +23,7 @@
     Ontario, Canada
 
 */
-angular.module('Summary').controller('Summary.SummaryController', [
+angular.module('Record.Summary').controller('Record.Summary.SummaryController', [
 
 	'$rootScope',
 	'$scope',
@@ -524,7 +524,7 @@ angular.module('Summary').controller('Summary.SummaryController', [
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'record/summary/groupNotes.jsp',
-				controller: 'Summary.GroupNotesController',
+				controller: 'Recor.Summary.GroupNotesController',
 				size: size,
 				resolve:
 				{
@@ -632,7 +632,7 @@ angular.module('Summary').controller('Summary.SummaryController', [
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'record/print.jsp',
-				controller: 'Summary.RecordPrintController',
+				controller: 'Record.Summary.RecordPrintController',
 				size: size,
 				resolve:
 				{

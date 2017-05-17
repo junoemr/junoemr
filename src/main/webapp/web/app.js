@@ -10,13 +10,13 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Layout',
 	'Tickler',
 	'Record',
-	'Summary',
+	'Record.Summary',
+	'Record.Tracker',
+	'Record.Details',
+	'Record.PHR',
+	'Record.Forms',
 	'Schedule',
 	'Settings',
-	'Tracker',
-	'Details',
-	'PHR',
-	'Forms',
 	'Report',
 	'Patient',
 	'PatientSearch',
@@ -199,29 +199,29 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/details',
 			templateUrl: 'record/details/details.jsp',
-			controller: 'Details.DetailsController'
+			controller: 'Record.Details.DetailsController'
 		})
 		.state('record.summary',
 		{
 			url: '/summary?appointmentNo&encType',
 			templateUrl: 'record/summary/summary.jsp',
-			controller: 'Summary.SummaryController'
+			controller: 'Record.Summary.SummaryController'
 		})
 		.state('record.forms',
 		{
 			url: '/forms',
 			templateUrl: 'record/forms/forms.jsp',
-			controller: 'Forms.FormController'
+			controller: 'Record.Forms.FormController'
 		}).state('record.forms.new',
 		{
 			url: '/:type/:id',
 			templateUrl: 'record/forms/forms.jsp',
-			controller: 'Forms.FormController'
+			controller: 'Record.Forms.FormController'
 		}).state('record.forms.existing',
 		{
 			url: '/:type/id/:id',
 			templateUrl: 'record/forms/forms.jsp',
-			controller: 'Forms.FormController'
+			controller: 'Record.Forms.FormController'
 		})
 		.state('record.consultRequests',
 		{
@@ -288,13 +288,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/tracker',
 			templateUrl: 'record/tracker/tracker.jsp',
-			controller: 'Tracker.TrackerController'
+			controller: 'Record.Tracker.TrackerController'
 		})
 		.state('record.phr',
 		{
 			url: '/phr',
 			templateUrl: 'record/phr/phr.jsp',
-			controller: 'PHR.PHRController'
+			controller: 'Record.PHR.PHRController'
 		});
 
 

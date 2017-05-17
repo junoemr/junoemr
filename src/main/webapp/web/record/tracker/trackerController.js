@@ -24,7 +24,7 @@
 
 */
 
-angular.module('Tracker').controller('Tracker.TrackerController', [
+angular.module('Record.Tracker').controller('Record.Tracker.TrackerController', [
 
 	'$rootScope',
 	'$scope',

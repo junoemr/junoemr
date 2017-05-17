@@ -23,7 +23,7 @@
     Ontario, Canada
 
 */
-angular.module('PHR').controller('PHRController', [
+angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 
 	'$scope',
 	'$http',

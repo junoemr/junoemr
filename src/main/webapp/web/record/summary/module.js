@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('Summary', ['Common', 'Common.Services']);
+angular.module('Record.Summary', ['Common', 'Common.Services']);
