@@ -251,18 +251,18 @@
 						<div class="col-md-4">
 							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formEmail"/>" title="<bean:message key="demographic.demographiceditdemographic.formEmail"/>" ng-model="page.demo.email" ng-blur="checkEmail()"/>
 						</div>
-						<label class="col-md-2 control-label" style="background-color: {{page.cellPhonePreferredColor}}" title="{{page.cellPhonePreferredMsg}}">
+
+						<label class="col-md-2 control-label" title="{{page.cellPhonePreferredMsg}}">
 							<bean:message key="demographic.demographiceditdemographic.formPhoneC"/>
 							<input type="checkbox" ng-model="page.demo.scrPreferredPhone" ng-change="setPreferredPhone()" ng-true-value="'C'" ng-disabled="isPhoneVoid(page.demo.scrCellPhone)"/>
 						</label>
 						<div class="col-md-4">
-							
 							<input type="text" class="form-control form-control-details" placeholder="<bean:message key="demographic.demographiceditdemographic.formPhoneC"/>" title="<bean:message key="demographic.demographiceditdemographic.formPhoneC"/>" ng-model="page.demo.scrCellPhone" ng-change="checkPhone('C')"/>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="col-md-2 control-label" style="background-color: {{page.homePhonePreferredColor}}" title="{{page.homePhonePreferredMsg}}">
+						<label class="col-md-2 control-label" title="{{page.homePhonePreferredMsg}}">
 								<bean:message key="demographic.demographiceditdemographic.formPhoneH"/>
 								<input type="checkbox" ng-model="page.demo.scrPreferredPhone" ng-change="setPreferredPhone()" ng-true-value="'H'" ng-disabled="isPhoneVoid(page.demo.scrHomePhone)"/>
 						</label>
@@ -273,7 +273,7 @@
 							</div>
 						</div>
 
-						<label class="col-md-2 control-label" style="background-color: {{page.workPhonePreferredColor}}" title="{{page.workPhonePreferredMsg}}">
+						<label class="col-md-2 control-label" title="{{page.workPhonePreferredMsg}}">
 								<bean:message key="demographic.demographiceditdemographic.formPhoneW"/>
 								<input type="checkbox" ng-model="page.demo.scrPreferredPhone" ng-change="setPreferredPhone()" ng-true-value="'W'" ng-disabled="isPhoneVoid(page.demo.scrWorkPhone)"/>
 							</label>
