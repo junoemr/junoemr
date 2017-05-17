@@ -1,4 +1,4 @@
-angular.module('Report').oscarApp.controller('Report.ReportEdbListController', [
+angular.module('Report').controller('Report.ReportEdbListController', [
 
 	'$scope',
 	'$log',

@@ -1,4 +1,4 @@
-angular.module('Report').oscarApp.controller('Report.ReportPatientChartListController', [
+angular.module('Report').controller('Report.ReportPatientChartListController', [
 
 	'$scope',
 	'$log',

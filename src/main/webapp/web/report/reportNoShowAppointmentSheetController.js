@@ -1,4 +1,4 @@
-angular.module('Report').oscarApp.controller('Report.ReportNoShowAppointmentSheetController', [
+angular.module('Report').controller('Report.ReportNoShowAppointmentSheetController', [
 
 	'$scope',
 	'$log',

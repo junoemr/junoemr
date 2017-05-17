@@ -1,4 +1,4 @@
-angular.module('Report').oscarApp.controller('Report.ReportSHMentalHealthController',
+angular.module('Report').controller('Report.ReportSHMentalHealthController',
 
 	'$scope',
 	'$log',

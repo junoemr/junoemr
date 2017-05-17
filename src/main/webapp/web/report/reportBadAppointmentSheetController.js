@@ -1,4 +1,4 @@
-angular.module('Report').oscarApp.controller('Report.ReportBadAppointmentSheetController', [
+angular.module('Report').controller('Report.ReportBadAppointmentSheetController', [
 
 	'$scope',
 	'$log',

@@ -1,4 +1,4 @@
-angular.module('Report').oscarApp.controller('Report.ReportDaySheetController', [
+angular.module('Report').controller('Report.ReportDaySheetController', [
 
 	'$scope',
 	'$log',

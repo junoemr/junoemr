@@ -1,4 +1,4 @@
-angular.module('Report').oscarApp.controller('Report.ReportFollowUpIntakeController', [
+angular.module('Report').controller('Report.ReportFollowUpIntakeController', [
 
 	'$scope',
 	'$log',
