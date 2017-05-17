@@ -524,7 +524,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'record/summary/groupNotes.jsp',
-				controller: 'Recor.Summary.GroupNotesController',
+				controller: 'Record.Summary.GroupNotesController',
 				size: size,
 				resolve:
 				{
