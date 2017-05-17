@@ -24,7 +24,8 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Inbox',
 	'Help',
 	'Document',
-	'Dashboard'
+	'Dashboard',
+	'Consults',
 ]);
 
 oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider)
@@ -58,13 +59,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/consults',
 			templateUrl: 'consults/consultRequestList.jsp',
-			controller: 'ConsultRequestListCtrl'
+			controller: 'Consults.ConsultRequestListController'
 		})
 		.state('consultResponses',
 		{
 			url: '/consultResponses',
 			templateUrl: 'consults/consultResponseList.jsp',
-			controller: 'ConsultResponseListCtrl'
+			controller: 'Consults.ConsultResponseListController'
 		})
 		.state('billing',
 		{
@@ -228,19 +229,19 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/consults',
 			templateUrl: 'consults/consultRequestList.jsp',
-			controller: 'ConsultRequestListCtrl'
+			controller: 'Consults.ConsultRequestListController'
 		})
 		.state('record.consultResponses',
 		{
 			url: '/consultResponses',
 			templateUrl: 'consults/consultResponseList.jsp',
-			controller: 'ConsultResponseListCtrl'
+			controller: 'Consults.ConsultResponseListController'
 		})
 		.state('record.consultRequest',
 		{
 			url: '/consult/:requestId',
 			templateUrl: 'consults/consultRequest.jsp',
-			controller: 'ConsultRequestCtrl',
+			controller: 'Consults.ConsultRequestController',
 			resolve:
 			{
 				consult: function($stateParams, consultService)
@@ -257,7 +258,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/consultResponse/:responseId',
 			templateUrl: 'consults/consultResponse.jsp',
-			controller: 'ConsultResponseCtrl',
+			controller: 'Consults.ConsultResponseController',
 			resolve:
 			{
 				consult: function($stateParams, consultService)
