@@ -164,7 +164,6 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		//     console.log('currentPage changes from ' + oldValue + ' to ' + newValue);
 		//   });
 
-
 		$scope.$on('togglePatientListFilter', function(event, data)
 		{
 			console.log("received a togglePatientListFilter event:" + data);

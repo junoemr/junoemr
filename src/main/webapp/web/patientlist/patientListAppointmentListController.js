@@ -20,6 +20,10 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 		providerService)
 	{
 
+		$scope.dateOptions = {
+			showWeeks: false
+		};
+
 		scheduleService.getStatuses().then(function(data)
 		{
 			$scope.statuses = data.content;
