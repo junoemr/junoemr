@@ -1,18 +1,20 @@
 angular.module('Tickler').controller('Tickler.TicklerCommentController', [
 
-    '$scope',
-    '$uibModalInstance',
-    'tickler',
+	'$scope',
+	'$uibModalInstance',
+	'tickler',
 
-    function(
-        $scope,
-        $uibModalInstance,
-        tickler) {
+	function(
+		$scope,
+		$uibModalInstance,
+		tickler)
+	{
 
-        $scope.tickler = tickler;
+		$scope.tickler = tickler;
 
-        $scope.close = function() {
-            $uibModalInstance.close("Someone Closed Me");
-        };
-    }
+		$scope.close = function()
+		{
+			$uibModalInstance.close("Someone Closed Me");
+		};
+	}
 ]);

@@ -27,190 +27,228 @@
  */
 
 angular.module("Common.Services").service("k2aService", [
-    '$http', '$q',
-    function($http, $q) {
-        var service = {};
+	'$http', '$q',
+	function($http, $q)
+	{
+		var service = {};
 
-        service.apiPath = '../ws/rs';
+		service.apiPath = '../ws/rs';
 
-        service.getK2aFeed = function getK2aFeed(startPoint, numberOfRows) {
-            var deferred = $q.defer();
+		service.getK2aFeed = function getK2aFeed(startPoint, numberOfRows)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + '/rssproxy/rss?key=k2a&startPoint=' +
-                    encodeURIComponent(startPoint) +
-                    '&numberOfRows=' +
-                    encodeURIComponent(numberOfRows),
-                method: "GET",
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("k2aService::getK2aFeed error", error);
-                    deferred.reject("An error occured while getting k2a content");
-                });
-            return deferred.promise;
-        };
+			$http(
+			{
+				url: service.apiPath + '/rssproxy/rss?key=k2a&startPoint=' +
+					encodeURIComponent(startPoint) +
+					'&numberOfRows=' +
+					encodeURIComponent(numberOfRows),
+				method: "GET",
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("k2aService::getK2aFeed error", error);
+					deferred.reject("An error occured while getting k2a content");
+				});
+			return deferred.promise;
+		};
 
-        service.isK2AInit = function isK2AInit() {
-            var deferred = $q.defer();
+		service.isK2AInit = function isK2AInit()
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + '/app/K2AActive',
-                method: "GET",
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("k2aService::isK2AInit error", error);
-                    deferred.reject("An error occured while getting k2a content");
-                });
+			$http(
+			{
+				url: service.apiPath + '/app/K2AActive',
+				method: "GET",
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("k2aService::isK2AInit error", error);
+					deferred.reject("An error occured while getting k2a content");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.initK2A = function initK2A(clinicName) {
-            var deferred = $q.defer();
+		service.initK2A = function initK2A(clinicName)
+		{
+			var deferred = $q.defer();
 
-            $http.post(service.apiPath + '/app/K2AInit',
-                clinicName, Juno.Common.ServiceHelper.configHeaders()).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("k2aService::initK2A error", error);
-                    deferred.reject("An error occured while trying to initialize k2a");
-                });
+			$http.post(service.apiPath + '/app/K2AInit',
+				clinicName, Juno.Common.ServiceHelper.configHeaders()).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("k2aService::initK2A error", error);
+					deferred.reject("An error occured while trying to initialize k2a");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.postK2AComment = function postK2AComment(post) {
-            var deferred = $q.defer();
+		service.postK2AComment = function postK2AComment(post)
+		{
+			var deferred = $q.defer();
 
-            var commentItem = { post };
-            $http.post(service.apiPath + '/app/comment', commentItem).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("k2aService::postK2AComment error", error);
-                    deferred.reject("An error occured while trying to post a comment to k2a");
-                });
+			var commentItem = {
+				post
+			};
+			$http.post(service.apiPath + '/app/comment', commentItem).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("k2aService::postK2AComment error", error);
+					deferred.reject("An error occured while trying to post a comment to k2a");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.removeK2AComment = function removeK2AComment(commentId) {
-            var deferred = $q.defer();
+		service.removeK2AComment = function removeK2AComment(commentId)
+		{
+			var deferred = $q.defer();
 
-            $http.delete(service.apiPath + '/app/comment/' +
-                encodeURIComponent(commentId)).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("k2aService::removeK2AComment error", error);
-                    deferred.reject("An error occured while trying to remove a comment from k2a");
-                });
+			$http.delete(service.apiPath + '/app/comment/' +
+				encodeURIComponent(commentId)).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("k2aService::removeK2AComment error", error);
+					deferred.reject("An error occured while trying to remove a comment from k2a");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.preventionRulesList = function preventionRulesList() {
-            var deferred = $q.defer();
+		service.preventionRulesList = function preventionRulesList()
+		{
+			var deferred = $q.defer();
 
-            $http.get(service.apiPath + '/resources/preventionRulesList').then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("k2aService::preventionRulesList error", error);
-                    deferred.reject("An error occured while trying to remove a comment from k2a");
-                });
+			$http.get(service.apiPath + '/resources/preventionRulesList').then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("k2aService::preventionRulesList error", error);
+					deferred.reject("An error occured while trying to remove a comment from k2a");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.loadPreventionRuleById = function loadPreventionRuleById(id) {
-            var deferred = $q.defer();
+		service.loadPreventionRuleById = function loadPreventionRuleById(id)
+		{
+			var deferred = $q.defer();
 
-            $http.post(service.apiPath + '/resources/loadPreventionRulesById/' +
-                encodeURIComponent(id.id), id, Juno.Common.ServiceHelper.configHeaders()).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("k2aService::loadPreventionRuleById error", error);
-                    deferred.reject("An error occured while trying to loadPreventionRulesById");
-                });
+			$http.post(service.apiPath + '/resources/loadPreventionRulesById/' +
+				encodeURIComponent(id.id), id, Juno.Common.ServiceHelper.configHeaders()).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("k2aService::loadPreventionRuleById error", error);
+					deferred.reject("An error occured while trying to loadPreventionRulesById");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getCurrentPreventionRulesVersion = function getCurrentPreventionRulesVersion() {
-            var deferred = $q.defer();
-            $http.get(service.apiPath + '/resources/currentPreventionRulesVersion').then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("k2aService::getCurrentPreventionRulesVersion error", error);
-                    deferred.reject("An error occured while trying to getCurrentPreventionRulesVersion");
-                });
+		service.getCurrentPreventionRulesVersion = function getCurrentPreventionRulesVersion()
+		{
+			var deferred = $q.defer();
+			$http.get(service.apiPath + '/resources/currentPreventionRulesVersion').then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("k2aService::getCurrentPreventionRulesVersion error", error);
+					deferred.reject("An error occured while trying to getCurrentPreventionRulesVersion");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getNotifications = function getNotifications() {
-            var deferred = $q.defer();
-            $http.get(service.apiPath + '/resources/notifications').then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("k2aService::getNotifications error", error);
-                    deferred.reject("An error occured while trying to getCurrentPreventionRulesVersion");
-                });
+		service.getNotifications = function getNotifications()
+		{
+			var deferred = $q.defer();
+			$http.get(service.apiPath + '/resources/notifications').then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("k2aService::getNotifications error", error);
+					deferred.reject("An error occured while trying to getCurrentPreventionRulesVersion");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getMoreNotification = function getMoreNotification(id) {
-            var deferred = $q.defer();
+		service.getMoreNotification = function getMoreNotification(id)
+		{
+			var deferred = $q.defer();
 
-            $http.post(service.apiPath + '/resources/notifications/readmore',
-                id, Juno.Common.ServiceHelper.configHeaders()).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("k2aService::getMoreNotification error", error);
-                    deferred.reject("An error occured while trying to /resources/notifications/readmore");
-                });
+			$http.post(service.apiPath + '/resources/notifications/readmore',
+				id, Juno.Common.ServiceHelper.configHeaders()).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("k2aService::getMoreNotification error", error);
+					deferred.reject("An error occured while trying to /resources/notifications/readmore");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.ackNotification = function ackNotification(id) {
-            var deferred = $q.defer();
-            $http.post(service.apiPath + '/resources/notifications/ack',
-                id, Juno.Common.ServiceHelper.configHeaders()).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("k2aService::ackNotification error", error);
-                    deferred.reject("An error occured while trying to /resources/notifications/ack");
-                });
+		service.ackNotification = function ackNotification(id)
+		{
+			var deferred = $q.defer();
+			$http.post(service.apiPath + '/resources/notifications/ack',
+				id, Juno.Common.ServiceHelper.configHeaders()).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("k2aService::ackNotification error", error);
+					deferred.reject("An error occured while trying to /resources/notifications/ack");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        return service;
-    }
+		return service;
+	}
 ]);

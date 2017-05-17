@@ -24,6 +24,6 @@ angular.module('Report').controller('Report.ReportRegistrationIntakeController',
 			var url = '../PMmodule/GenericIntake/Report.do?method=report&type=quick&startDate=' + startDate + '&endDate=' + endDate + '&includePast=' + $scope.params.includePastForms;
 			window.open(url, 'report_registration_intake', 'height=900,width=700');
 
-		}
+		};
 	}
 ]);

@@ -1,19 +1,22 @@
 angular.module('Settings').controller('Settings.ChangePasswordController', [
 
-    '$scope',
-    '$uibModalInstance',
+	'$scope',
+	'$uibModalInstance',
 
-    function(
-        $scope,
-        $uibModalInstance) {
+	function(
+		$scope,
+		$uibModalInstance)
+	{
 
-        $scope.close = function() {
-            $uibModalInstance.close("Someone Closed Me");
-        }
+		$scope.close = function()
+		{
+			$uibModalInstance.close("Someone Closed Me");
+		};
 
-        $scope.changePassword = function() {
-            console.log('password saved - NOT');
-            $uibModalInstance.close("Someone Saved Me");
-        }
-    }
+		$scope.changePassword = function()
+		{
+			console.log('password saved - NOT');
+			$uibModalInstance.close("Someone Saved Me");
+		};
+	}
 ]);

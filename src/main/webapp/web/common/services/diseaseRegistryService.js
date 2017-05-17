@@ -26,63 +26,73 @@
 
  */
 angular.module("Common.Services").service("diseaseRegistryService", [
-    '$http', '$q',
-    function($http, $q) {
-        var service = {};
+	'$http', '$q',
+	function($http, $q)
+	{
+		var service = {};
 
-        service.apiPath = '../ws/rs/dxRegisty/';
+		service.apiPath = '../ws/rs/dxRegisty/';
 
-        service.getQuickLists = function getQuickLists() {
-            var deferred = $q.defer();
-            $http.get(service.apiPath + 'quickLists/',
-                Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("diseaseRegistryService::getQuickLists error", error);
-                    deferred.reject("An error occurred while fetching quick lists");
-                });
+		service.getQuickLists = function getQuickLists()
+		{
+			var deferred = $q.defer();
+			$http.get(service.apiPath + 'quickLists/',
+				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("diseaseRegistryService::getQuickLists error", error);
+					deferred.reject("An error occurred while fetching quick lists");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.addToDxRegistry = function addToDxRegistry(demographicNo, disease) {
-            var deferred = $q.defer();
+		service.addToDxRegistry = function addToDxRegistry(demographicNo, disease)
+		{
+			var deferred = $q.defer();
 
-            var issueToSend = {};
-            issueToSend.id = disease.id;
-            issueToSend.type = disease.type;
-            issueToSend.code = disease.code;
-            issueToSend.description = disease.description;
+			var issueToSend = {};
+			issueToSend.id = disease.id;
+			issueToSend.type = disease.type;
+			issueToSend.code = disease.code;
+			issueToSend.description = disease.description;
 
-            $http.post(service.apiPath + encodeURIComponent(demographicNo) + '/add', issueToSend).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("diseaseRegistryService::addToDxRegistry error", error);
-                    deferred.reject("An error occurred while adding to dx registry");
-                });
+			$http.post(service.apiPath + encodeURIComponent(demographicNo) + '/add', issueToSend).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("diseaseRegistryService::addToDxRegistry error", error);
+					deferred.reject("An error occurred while adding to dx registry");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.findLikeIssue = function findLikeIssue(diagnosis) {
-            var deferred = $q.defer();
+		service.findLikeIssue = function findLikeIssue(diagnosis)
+		{
+			var deferred = $q.defer();
 
-            $http.post(service.apiPath + 'findLikeIssue', diagnosis).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("diseaseRegistryService::findLikeIssue error", error);
-                    deferred.reject("An error occurred while posting find like issue");
-                });
+			$http.post(service.apiPath + 'findLikeIssue', diagnosis).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("diseaseRegistryService::findLikeIssue error", error);
+					deferred.reject("An error occurred while posting find like issue");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        return service;
-    }
+		return service;
+	}
 ]);

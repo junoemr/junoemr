@@ -26,88 +26,105 @@
 
  */
 angular.module("Common.Services").service("reportByTemplateService", [
-    '$http', '$q',
-    function($http, $q) {
-        var service = {};
+	'$http', '$q',
+	function($http, $q)
+	{
+		var service = {};
 
-        service.apiPath = '../../ws/rs';
+		service.apiPath = '../../ws/rs';
 
-        service.isK2AInit = function isK2AInit() {
-            var deferred = $q.defer();
+		service.isK2AInit = function isK2AInit()
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + '/reportByTemplate/K2AActive',
-                method: "GET",
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("reportByTemplateService::isK2AInit error", error);
-                    deferred.reject("An error occurred while fetching k2a content");
-                });
+			$http(
+			{
+				url: service.apiPath + '/reportByTemplate/K2AActive',
+				method: "GET",
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("reportByTemplateService::isK2AInit error", error);
+					deferred.reject("An error occurred while fetching k2a content");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getAllK2AReports = function getAllK2AReports() {
-            var deferred = $q.defer();
+		service.getAllK2AReports = function getAllK2AReports()
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + '/reportByTemplate/allReports',
-                method: "GET",
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("reportByTemplateService::getAllK2AReports error", error);
-                    deferred.reject("An error occurred while fetching k2a reports");
-                });
+			$http(
+			{
+				url: service.apiPath + '/reportByTemplate/allReports',
+				method: "GET",
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("reportByTemplateService::getAllK2AReports error", error);
+					deferred.reject("An error occurred while fetching k2a reports");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getK2AReportById = function getK2AReportById(id) {
-            var deferred = $q.defer();
+		service.getK2AReportById = function getK2AReportById(id)
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + '/reportByTemplate/getReportById/' + encodeURIComponent(id),
-                method: "POST",
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("reportByTemplateService::getK2AReportById error", error);
-                    deferred.reject("An error occurred while fetching k2a report");
-                });
+			$http(
+			{
+				url: service.apiPath + '/reportByTemplate/getReportById/' + encodeURIComponent(id),
+				method: "POST",
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("reportByTemplateService::getK2AReportById error", error);
+					deferred.reject("An error occurred while fetching k2a report");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.getK2AUrl = function getK2AUrl() {
-            var deferred = $q.defer();
+		service.getK2AUrl = function getK2AUrl()
+		{
+			var deferred = $q.defer();
 
-            $http({
-                url: service.apiPath + '/reportByTemplate/K2AUrl/',
-                method: "GET",
-                headers: Juno.Common.ServiceHelper.configHeaders()
-            }).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("reportByTemplateService::getK2AUrl error", error);
-                    deferred.reject("An error occurred while fetching k2a url");
-                });
+			$http(
+			{
+				url: service.apiPath + '/reportByTemplate/K2AUrl/',
+				method: "GET",
+				headers: Juno.Common.ServiceHelper.configHeaders()
+			}).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("reportByTemplateService::getK2AUrl error", error);
+					deferred.reject("An error occurred while fetching k2a url");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        return service;
-    }
+		return service;
+	}
 ]);

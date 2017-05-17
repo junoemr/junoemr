@@ -26,61 +26,71 @@
 
  */
 angular.module("Common.Services").service("patientDetailStatusService", [
-    '$http', '$q',
-    function($http, $q) {
+	'$http', '$q',
+	function($http, $q)
+	{
 
-        var service = {};
+		var service = {};
 
-        service.apiPath = '../ws/rs/patientDetailStatusService';
+		service.apiPath = '../ws/rs/patientDetailStatusService';
 
-        service.getStatus = function getStatus(demographicNo) {
-            var deferred = $q.defer();
-            $http.get(service.apiPath + "/getStatus?demographicNo=" + encodeURIComponent(demographicNo),
-                Juno.Common.ServiceHelper.configHeaders()).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("patientDetailStatusService::getStatus error", error);
-                    deferred.reject("An error occurred while fetching status");
-                });
+		service.getStatus = function getStatus(demographicNo)
+		{
+			var deferred = $q.defer();
+			$http.get(service.apiPath + "/getStatus?demographicNo=" + encodeURIComponent(demographicNo),
+				Juno.Common.ServiceHelper.configHeaders()).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("patientDetailStatusService::getStatus error", error);
+					deferred.reject("An error occurred while fetching status");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.validateHC = function validateHC(healthCardNo, versionCode) {
-            var deferred = $q.defer();
-            $http.get(service.apiPath + "/validateHC?hin=" + encodeURIComponent(healthCardNo) +
-                "&ver=" + encodeURIComponent(versionCode),
-                Juno.Common.ServiceHelper.configHeaders()).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("patientDetailStatusService::validateHC error", error);
-                    deferred.reject("An error occurred while fetching health card validation info");
-                });
+		service.validateHC = function validateHC(healthCardNo, versionCode)
+		{
+			var deferred = $q.defer();
+			$http.get(service.apiPath + "/validateHC?hin=" + encodeURIComponent(healthCardNo) +
+				"&ver=" + encodeURIComponent(versionCode),
+				Juno.Common.ServiceHelper.configHeaders()).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("patientDetailStatusService::validateHC error", error);
+					deferred.reject("An error occurred while fetching health card validation info");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        service.isUniqueHC = function isUniqueHC(healthCardNo, demographicNo) {
-            var deferred = $q.defer();
-            $http.get(service.apiPath + "/isUniqueHC?hin=" +
-                encodeURIComponent(healthCardNo) + "&demographicNo=" +
-                encodeURIComponent(demographicNo),
-                Juno.Common.ServiceHelper.configHeaders()).then(
-                function success(response) {
-                    deferred.resolve(response.data);
-                },
-                function error(error) {
-                    console.log("patientDetailStatusService::isUniqueHC error", error);
-                    deferred.reject("An error occurred while checking health card uniqueness");
-                });
+		service.isUniqueHC = function isUniqueHC(healthCardNo, demographicNo)
+		{
+			var deferred = $q.defer();
+			$http.get(service.apiPath + "/isUniqueHC?hin=" +
+				encodeURIComponent(healthCardNo) + "&demographicNo=" +
+				encodeURIComponent(demographicNo),
+				Juno.Common.ServiceHelper.configHeaders()).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("patientDetailStatusService::isUniqueHC error", error);
+					deferred.reject("An error occurred while checking health card uniqueness");
+				});
 
-            return deferred.promise;
-        };
+			return deferred.promise;
+		};
 
-        return service;
-    }
+		return service;
+	}
 ]);

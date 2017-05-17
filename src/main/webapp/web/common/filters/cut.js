@@ -29,7 +29,7 @@
 angular.module('Common.Filters').filter('cut', [
 	function()
 	{
-		return function (value, wordwise, max, tail)
+		return function(value, wordwise, max, tail)
 		{
 			if (!value) return '';
 
@@ -40,11 +40,11 @@ angular.module('Common.Filters').filter('cut', [
 			value = value.substr(0, max);
 			if (wordwise)
 			{
-			  var lastspace = value.lastIndexOf(' ');
-			  if (lastspace !== -1)
-			  {
-			    value = value.substr(0, lastspace);
-			  }
+				var lastspace = value.lastIndexOf(' ');
+				if (lastspace !== -1)
+				{
+					value = value.substr(0, lastspace);
+				}
 			}
 
 			return value + (tail || ' …');
