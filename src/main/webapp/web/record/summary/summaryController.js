@@ -23,1135 +23,645 @@
     Ontario, Canada
 
 */
-oscarApp.controller('SummaryCtrl', function($rootScope, $scope, $http, $location, $stateParams, $state, $filter, $uibModal, $interval, user, noteService, summaryService, securityService)
-{
-	console.log("in summary Ctrl ", $stateParams);
+angular.module('Summary').controller('Summary.SummaryController', [
 
-	$scope.page = {};
-	$scope.page.columnOne = {};
-	$scope.page.columnOne.modules = {};
+	'$rootScope',
+	'$scope',
+	'$http',
+	'$location',
+	'$stateParams',
+	'$state',
+	'$filter',
+	'$uibModal',
+	'$interval',
+	'user',
+	'noteService',
+	'summaryService',
+	'securityService',
 
-	$scope.page.columnThree = {};
-	$scope.page.columnThree.modules = {};
-	$scope.page.selectedNotes = [];
-
-	$scope.page.notes = {};
-	$scope.index = 0;
-	$scope.page.notes = {};
-	$scope.page.notes.notelist = [];
-	$scope.busy = false;
-	$scope.page.noteFilter = {};
-	$scope.page.currentFilter = 'none';
-	$scope.page.onlyNotes = false;
-
-	//get access rights
-	securityService.hasRight("_eChart", "r", $stateParams.demographicNo).then(function(data)
+	function(
+		$rootScope,
+		$scope,
+		$http,
+		$location,
+		$stateParams,
+		$state,
+		$filter,
+		$uibModal,
+		$interval,
+		user,
+		noteService,
+		summaryService,
+		securityService)
 	{
-		$scope.page.canRead = data;
-	});
-	securityService.hasRight("_eChart", "u", $stateParams.demographicNo).then(function(data)
-	{
-		$scope.page.cannotChange = !data;
-	});
-	securityService.hasRight("_eChart", "w", $stateParams.demographicNo).then(function(data)
-	{
-		$scope.page.cannotAdd = !data;
-	});
+		console.log("in summary Ctrl ", $stateParams);
 
-	//disable click and keypress if user only has read-access
-	$scope.checkAction = function(event)
-	{
-		if ($scope.page.cannotChange)
-		{
-			event.preventDefault();
-			event.stopPropagation();
-		}
-	};
+		$scope.page = {};
+		$scope.page.columnOne = {};
+		$scope.page.columnOne.modules = {};
 
-	// Note list filtering functions
-	$scope.setOnlyNotes = function()
-	{
-		if ($scope.page.onlyNotes)
-		{
-			$scope.page.onlyNotes = false;
-		}
-		else
-		{
-			$scope.page.onlyNotes = true;
-		}
-		console.log("$scope.page.onlyNotes ", $scope.page.onlyNotes);
-	};
+		$scope.page.columnThree = {};
+		$scope.page.columnThree.modules = {};
+		$scope.page.selectedNotes = [];
 
-	$scope.isOnlyNotesStatus = function()
-	{
-		if ($scope.page.onlyNotes)
-		{
-			return "active";
-		}
-		else
-		{
-			return "";
-		}
-
-	};
-
-
-	$scope.openRevisionHistory = function(note)
-	{
-		//var rnd = Math.round(Math.random() * 1000);
-		win = "revision";
-		var url = "../CaseManagementEntry.do?method=notehistory&noteId=" + note.noteId;
-		window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
-	};
-
-	$scope.openRx = function(demoNo)
-	{
-		win = "Rx" + demoNo;
-		var url = "../oscarRx/choosePatient.do?demographicNo=" + demoNo;
-		window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
-	};
-
-	$scope.openAllergies = function(demoNo)
-	{
-		win = "Allergy" + demoNo;
-		var url = "../oscarRx/showAllergy.do?demographicNo=" + demoNo;
-		window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
-		return false;
-	};
-
-	$scope.openPreventions = function(demoNo)
-	{
-		win = "prevention" + demoNo;
-		var url = "../oscarPrevention/index.jsp?demographic_no=" + demoNo;
-		window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
-		return false;
-	};
-
-
-
-	$scope.isCurrentStatus = function(stat)
-	{
-		//console.log("stat",stat);
-		if (stat == $scope.page.currentFilter)
-		{
-			return "active";
-		}
-		else
-		{
-			return "";
-		}
-
-	};
-
-	// How do we handle showing what filter has been selected???
-	$scope.changeNoteFilter = function()
-	{
+		$scope.page.notes = {};
 		$scope.index = 0;
-		$scope.page.noteFilter.filterProviders = [user.providerNo]; //<- need to fix this?
+		$scope.page.notes = {};
 		$scope.page.notes.notelist = [];
-		$scope.page.currentFilter = 'Just My Notes';
-		$scope.addMoreItems();
-	};
-
-	$scope.removeFilter = function()
-	{
-		$scope.index = 0;
+		$scope.busy = false;
 		$scope.page.noteFilter = {};
-		$scope.page.notes.notelist = [];
-		$scope.addMoreItems();
 		$scope.page.currentFilter = 'none';
+		$scope.page.onlyNotes = false;
 
-	};
+		//get access rights
+		securityService.hasRight("_eChart", "r", $stateParams.demographicNo).then(function(data)
+		{
+			$scope.page.canRead = data;
+		});
+		securityService.hasRight("_eChart", "u", $stateParams.demographicNo).then(function(data)
+		{
+			$scope.page.cannotChange = !data;
+		});
+		securityService.hasRight("_eChart", "w", $stateParams.demographicNo).then(function(data)
+		{
+			$scope.page.cannotAdd = !data;
+		});
 
-
-	//Note display functions
-	$scope.addMoreItems = function()
-	{
-		console.log($scope.busy);
-		if ($scope.busy) return;
-
-		$scope.busy = true;
-
-		noteService.getNotesFrom($stateParams.demographicNo, $scope.index, 20, $scope.page.noteFilter).then(function(data)
+		//disable click and keypress if user only has read-access
+		$scope.checkAction = function(event)
+		{
+			if ($scope.page.cannotChange)
 			{
-				console.log('whats the data', angular.isUndefined(data.notelist), data.notelist);
-				if (angular.isDefined(data.notelist))
-				{
-					//$scope.page.notes = data;
-					if (data.notelist instanceof Array)
-					{
-						console.log("ok its in an array", $scope.busy);
-						for (var i = 0; i < data.notelist.length; i++)
-						{
-							$scope.page.notes.notelist.push(data.notelist[i]);
-						}
-					}
-					else
-					{
-						$scope.page.notes.notelist.push(data.notelist);
-					}
-					$scope.index = $scope.page.notes.notelist.length;
-				}
-				$scope.busy = false;
-			},
-			function(errorMessage)
-			{
-				console.log("notes:" + errorMessage);
-				$scope.error = errorMessage;
-				$scope.busy = false;
+				event.preventDefault();
+				event.stopPropagation();
 			}
-		);
+		};
 
-	};
-
-	$scope.addMoreItems();
-
-	$scope.editNote = function(note)
-	{
-		$rootScope.$emit('loadNoteForEdit', note);
-	};
-
-	$scope.page.currentEditNote = {};
-
-	$scope.isNoteBeingEdited = function(note)
-	{
-
-		if (note.uuid == $scope.page.currentEditNote.uuid)
+		// Note list filtering functions
+		$scope.setOnlyNotes = function()
 		{
-			return "noteInEdit";
-		}
-
-		return "";
-	};
-
-	$rootScope.$on('currentlyEditingNote', function(event, data)
-	{
-		$scope.page.currentEditNote = data;
-	});
-
-
-	$rootScope.$on('noteSaved', function(event, data)
-	{
-		console.log('new data coming in', data);
-		var noteFound = false;
-		for (var notecount = 0; notecount < $scope.page.notes.notelist.length; notecount++)
-		{
-			if (data.uuid == $scope.page.notes.notelist[notecount].uuid)
+			if ($scope.page.onlyNotes)
 			{
-				console.log('uuid ' + data.uuid + ' notecount ' + notecount, data, $scope.page.notes.notelist[notecount]);
-				$scope.page.notes.notelist[notecount] = data;
-				noteFound = true;
-				break;
-			}
-		}
-
-		if (noteFound == false)
-		{
-			$scope.page.notes.notelist.unshift(data);
-		}
-		$scope.index = $scope.page.notes.notelist.length;
-	});
-
-
-
-	//Note display functions
-	$scope.setColor = function(note)
-	{
-		if (note.eformData)
-		{
-			return {
-				'border-left-color': '#DFF0D8',
-				'border-left-width': '10px'
-			};
-		}
-		else if (note.document)
-		{
-			return {
-				'border-left-color': '#617CB2',
-				'border-left-width': '10px'
-			};
-		}
-		else if (note.rxAnnotation)
-		{
-			return {
-				'border-left-color': '#D3D3D3',
-				'border-left-width': '10px'
-			};
-		}
-		else if (note.encounterForm)
-		{
-			return {
-				'border-left-color': '#BCAD75',
-				'border-left-width': '10px'
-			};
-		}
-		else if (note.invoice)
-		{
-			return {
-				'border-left-color': '##FF7272',
-				'border-left-width': '10px'
-			};
-		}
-		else if (note.ticklerNote)
-		{
-			return {
-				'border-left-color': '#FFA96F',
-				'border-left-width': '10px'
-			};
-		}
-		else if (note.cpp)
-		{
-			return {
-				'border-left-color': '#9B8166',
-				'border-left-width': '10px'
-			};
-		}
-	};
-
-	$scope.showNoteHeader = function(note)
-	{
-		if ($scope.page.onlyNotes)
-		{
-			if (note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp)
-			{
-				return false;
-			}
-		}
-		return true;
-	};
-
-	$scope.showNote = function(note)
-	{
-		if ($scope.page.onlyNotes)
-		{
-			if (note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp)
-			{
-				return false;
-			}
-		}
-
-		if (note.eformData || note.document)
-		{
-			return false;
-		}
-		return true;
-	};
-
-
-	$scope.firstLine = function(note)
-	{
-		var firstL = note.note.trim().split('\n')[0];
-		var dateStr = $filter('date')(note.observationDate, 'dd-MMM-yyyy');
-		dateStr = "[" + dateStr;
-		//console.log(firstL + " --"+dateStr+"-- " + firstL.indexOf(dateStr));
-		if (firstL.indexOf(dateStr) == 0)
-		{
-			firstL = firstL.substring(dateStr.length);
-		}
-		return firstL;
-	};
-
-	$scope.trackerUrl = "";
-
-	$scope.getTrackerUrl = function(demographicNo)
-	{
-		$scope.trackerUrl = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo + '&numEle=4&tracker=slim';
-	};
-
-	var initialDisplayLimit = 5;
-	$scope.toggleList = function(mod)
-	{
-		i = initialDisplayLimit;
-
-		if (mod.summaryItem.length > i)
-		{
-			if (mod.displaySize > i)
-			{
-				mod.displaySize = i;
+				$scope.page.onlyNotes = false;
 			}
 			else
 			{
-				mod.displaySize = mod.summaryItem.length;
+				$scope.page.onlyNotes = true;
 			}
-		}
-	};
+			console.log("$scope.page.onlyNotes ", $scope.page.onlyNotes);
+		};
 
-	$scope.showMoreItems = function(mod)
-	{
-
-		if (!angular.isDefined(mod.summaryItem))
+		$scope.isOnlyNotesStatus = function()
 		{
+			if ($scope.page.onlyNotes)
+			{
+				return "active";
+			}
+			else
+			{
+				return "";
+			}
+
+		};
+
+
+		$scope.openRevisionHistory = function(note)
+		{
+			//var rnd = Math.round(Math.random() * 1000);
+			win = "revision";
+			var url = "../CaseManagementEntry.do?method=notehistory&noteId=" + note.noteId;
+			window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
+		};
+
+		$scope.openRx = function(demoNo)
+		{
+			win = "Rx" + demoNo;
+			var url = "../oscarRx/choosePatient.do?demographicNo=" + demoNo;
+			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
+		};
+
+		$scope.openAllergies = function(demoNo)
+		{
+			win = "Allergy" + demoNo;
+			var url = "../oscarRx/showAllergy.do?demographicNo=" + demoNo;
+			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
 			return false;
-		}
+		};
 
-		if (mod.summaryItem.length == 0)
+		$scope.openPreventions = function(demoNo)
 		{
+			win = "prevention" + demoNo;
+			var url = "../oscarPrevention/index.jsp?demographic_no=" + demoNo;
+			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
 			return false;
-		}
+		};
 
-		return true;
-	};
 
-	$scope.showMoreItemsSymbol = function(mod)
-	{
-		if (!angular.isDefined(mod.summaryItem))
-		{
-			return "";
-		}
 
-		if ((mod.displaySize < mod.summaryItem.length) && mod.displaySize == initialDisplayLimit)
+		$scope.isCurrentStatus = function(stat)
 		{
-			return "glyphicon glyphicon-chevron-down hand-hover pull-right";
-		}
-		else if ((mod.displaySize == mod.summaryItem.length) && mod.displaySize != initialDisplayLimit)
-		{
-			return "glyphicon glyphicon-chevron-up hand-hover pull-right";
-		}
-		else if (mod.summaryItem.length <= initialDisplayLimit)
-		{
-			return "glyphicon glyphicon-chevron-down glyphicon-chevron-down-disabled pull-right";
-		}
-		else
-		{
-			return "";
-		}
-
-	};
-
-	function getLeftItems()
-	{
-		summaryService.getSummaryHeaders($stateParams.demographicNo, 'left').then(function(data)
+			//console.log("stat",stat);
+			if (stat == $scope.page.currentFilter)
 			{
-				console.log("left", data);
-				$scope.page.columnOne.modules = data;
-				fillItems($scope.page.columnOne.modules);
-			},
-			function(errorMessage)
-			{
-				console.log("left" + errorMessage);
-				$scope.error = errorMessage;
+				return "active";
 			}
-		);
-	}
-
-	getLeftItems();
-
-
-	function getRightItems()
-	{
-		summaryService.getSummaryHeaders($stateParams.demographicNo, 'right').then(function(data)
+			else
 			{
-				console.log("right", data);
-				$scope.page.columnThree.modules = data;
-				fillItems($scope.page.columnThree.modules);
-			},
-			function(errorMessage)
-			{
-				console.log("left" + errorMessage);
-				$scope.error = errorMessage;
+				return "";
 			}
-		);
-	}
 
-	getRightItems();
+		};
 
-	var summaryLists = {};
-
-	function fillItems(itemsToFill)
-	{
-		for (var i = 0; i < itemsToFill.length; i++)
+		// How do we handle showing what filter has been selected???
+		$scope.changeNoteFilter = function()
 		{
-			console.log(itemsToFill[i].summaryCode);
-			summaryLists[itemsToFill[i].summaryCode] = itemsToFill[i];
+			$scope.index = 0;
+			$scope.page.noteFilter.filterProviders = [user.providerNo]; //<- need to fix this?
+			$scope.page.notes.notelist = [];
+			$scope.page.currentFilter = 'Just My Notes';
+			$scope.addMoreItems();
+		};
 
-			summaryService.getFullSummary($stateParams.demographicNo, itemsToFill[i].summaryCode).then(function(data)
+		$scope.removeFilter = function()
+		{
+			$scope.index = 0;
+			$scope.page.noteFilter = {};
+			$scope.page.notes.notelist = [];
+			$scope.addMoreItems();
+			$scope.page.currentFilter = 'none';
+
+		};
+
+
+		//Note display functions
+		$scope.addMoreItems = function()
+		{
+			console.log($scope.busy);
+			if ($scope.busy) return;
+
+			$scope.busy = true;
+
+			noteService.getNotesFrom($stateParams.demographicNo, $scope.index, 20, $scope.page.noteFilter).then(function(data)
 				{
-					console.log("FullSummary returned ", data);
-					if (angular.isDefined(data.summaryItem))
+					console.log('whats the data', angular.isUndefined(data.notelist), data.notelist);
+					if (angular.isDefined(data.notelist))
 					{
-						if (data.summaryItem instanceof Array)
+						//$scope.page.notes = data;
+						if (data.notelist instanceof Array)
 						{
-							summaryLists[data.summaryCode].summaryItem = data.summaryItem;
+							console.log("ok its in an array", $scope.busy);
+							for (var i = 0; i < data.notelist.length; i++)
+							{
+								$scope.page.notes.notelist.push(data.notelist[i]);
+							}
 						}
 						else
 						{
-							summaryLists[data.summaryCode].summaryItem = [data.summaryItem];
+							$scope.page.notes.notelist.push(data.notelist);
 						}
+						$scope.index = $scope.page.notes.notelist.length;
 					}
+					$scope.busy = false;
 				},
 				function(errorMessage)
 				{
-					console.log("fillItems" + errorMessage);
+					console.log("notes:" + errorMessage);
+					$scope.error = errorMessage;
+					$scope.busy = false;
 				}
-
 			);
-		}
-	}
 
+		};
 
-	editGroupedNotes = function(size, mod, action)
-	{
+		$scope.addMoreItems();
 
-		var modalInstance = $uibModal.open(
+		$scope.editNote = function(note)
 		{
-			templateUrl: 'record/summary/groupNotes.jsp',
-			controller: GroupNotesCtrl,
-			size: size,
-			resolve:
+			$rootScope.$emit('loadNoteForEdit', note);
+		};
+
+		$scope.page.currentEditNote = {};
+
+		$scope.isNoteBeingEdited = function(note)
+		{
+
+			if (note.uuid == $scope.page.currentEditNote.uuid)
 			{
-				mod: function()
+				return "noteInEdit";
+			}
+
+			return "";
+		};
+
+		$rootScope.$on('currentlyEditingNote', function(event, data)
+		{
+			$scope.page.currentEditNote = data;
+		});
+
+
+		$rootScope.$on('noteSaved', function(event, data)
+		{
+			console.log('new data coming in', data);
+			var noteFound = false;
+			for (var notecount = 0; notecount < $scope.page.notes.notelist.length; notecount++)
+			{
+				if (data.uuid == $scope.page.notes.notelist[notecount].uuid)
 				{
-					return mod;
-				},
-				action: function()
-				{
-					return action;
-				},
-				user: function()
-				{
-					return user;
+					console.log('uuid ' + data.uuid + ' notecount ' + notecount, data, $scope.page.notes.notelist[notecount]);
+					$scope.page.notes.notelist[notecount] = data;
+					noteFound = true;
+					break;
 				}
 			}
+
+			if (noteFound == false)
+			{
+				$scope.page.notes.notelist.unshift(data);
+			}
+			$scope.index = $scope.page.notes.notelist.length;
 		});
 
-		modalInstance.result.then(function(selectedItem)
+
+
+		//Note display functions
+		$scope.setColor = function(note)
 		{
-			console.log(selectedItem);
-		}, function()
-		{
-			if (editingNoteId != null)
+			if (note.eformData)
 			{
-				noteService.removeEditingNoteFlag(editingNoteId, user.providerNo);
-				$interval.cancel(itvSet);
-				itvSet = null;
-				$interval.cancel(itvCheck);
-				itvCheck = null;
-				editingNoteId = null;
+				return {
+					'border-left-color': '#DFF0D8',
+					'border-left-width': '10px'
+				};
 			}
-
-			console.log('Modal dismissed at: ' + new Date());
-		});
-
-		console.log($('#myModal'));
-	};
-
-
-	$scope.gotoState = function(item, mod, itemId)
-	{
-
-		if (item == "add")
-		{
-			editGroupedNotes('lg', mod, null);
-
-		}
-		else if (item.action == 'add' && item.type == 'dx_reg')
-		{
-
-			editGroupedNotes('lg', mod, itemId);
-
-		}
-		else if (item.type == 'lab' || item.type == 'document' || item.type == 'rx' || item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline')
-		{
-
-			if (item.type == 'rx')
+			else if (note.document)
 			{
-				win = "Rx" + $stateParams.demographicNo;
+				return {
+					'border-left-color': '#617CB2',
+					'border-left-width': '10px'
+				};
 			}
-			else if (item.type == 'allergy')
+			else if (note.rxAnnotation)
 			{
-				win = "Allergy" + $stateParams.demographicNo;
+				return {
+					'border-left-color': '#D3D3D3',
+					'border-left-width': '10px'
+				};
 			}
-			else if (item.type == 'prevention')
+			else if (note.encounterForm)
 			{
-				win = "prevention" + $stateParams.demographicNo;
+				return {
+					'border-left-color': '#BCAD75',
+					'border-left-width': '10px'
+				};
 			}
-			else
+			else if (note.invoice)
 			{
-				//item.type == 'lab' || item.type == 'document'
-				//var rnd = Math.round(Math.random() * 1000);
-				win = "win_item.type_";
+				return {
+					'border-left-color': '##FF7272',
+					'border-left-width': '10px'
+				};
 			}
-
-			window.open(item.action, win, "scrollbars=yes, location=no, width=900, height=600", "");
-			return false;
-		}
-		else if (item.action == 'action')
-		{
-			editGroupedNotes('lg', mod, itemId);
-
-		}
-		else
-		{
-			$state.transitionTo(item.action,
+			else if (note.ticklerNote)
 			{
-				demographicNo: $stateParams.demographicNo,
-				type: item.type,
-				id: item.id
-			},
+				return {
+					'border-left-color': '#FFA96F',
+					'border-left-width': '10px'
+				};
+			}
+			else if (note.cpp)
 			{
-				location: 'replace',
-				notify: true
-			});
-		}
+				return {
+					'border-left-color': '#9B8166',
+					'border-left-width': '10px'
+				};
+			}
+		};
 
-	};
-
-
-	$scope.showPrintModal = function(mod, action)
-	{
-		var size = 'lg';
-		var modalInstance = $uibModal.open(
+		$scope.showNoteHeader = function(note)
 		{
-			templateUrl: 'record/print.jsp',
-			controller: RecordPrintCtrl,
-			size: size,
-			resolve:
+			if ($scope.page.onlyNotes)
 			{
-				mod: function()
+				if (note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp)
 				{
-					return mod;
-				},
-
-				action: function()
-				{
-					return action;
+					return false;
 				}
 			}
-		});
+			return true;
+		};
 
-		modalInstance.result.then(function(selectedItem)
+		$scope.showNote = function(note)
 		{
-			console.log(selectedItem);
-
-		}, function()
-		{
-			console.log('Modal dismissed at: ' + new Date());
-		});
-	};
-
-});
-
-GroupNotesCtrl = function($scope, $uibModal, $uibModalInstance, mod, action, user, $stateParams, $state, $interval, noteService, securityService, diseaseRegistryService)
-{
-
-
-	$scope.page = {};
-	$scope.page.title = mod.displayName;
-	$scope.page.items = mod.summaryItem;
-	$scope.page.quickLists = [];
-
-	//$scope.action = action;
-	$scope.page.code = mod.summaryCode;
-
-	$scope.groupNotesForm = {
-		assignedCMIssues: []
-	};
-	$scope.groupNotesForm.encounterNote = {
-		position: 1
-	};
-
-
-	//set hidden which can can move out of hidden to $scope values
-	var now = new Date();
-	$scope.groupNotesForm.annotation_attrib = "anno" + now.getTime();
-
-
-	//get access rights
-	securityService.hasRight("_eChart", "u", $stateParams.demographicNo).then(function(data)
-	{
-		$scope.page.cannotChange = !data;
-	});
-
-	diseaseRegistryService.getQuickLists().then(function(data)
-	{
-		console.log(data);
-		$scope.page.quickLists = data;
-	});
-
-	$scope.addDxItem = function(item)
-	{
-		for (var x = 0; x < $scope.groupNotesForm.assignedCMIssues.length; x++)
-		{
-			if ($scope.groupNotesForm.assignedCMIssues[x].issue.code === item.code && $scope.groupNotesForm.assignedCMIssues[x].issue.type === item.codingSystem)
+			if ($scope.page.onlyNotes)
 			{
-				return;
-			}
-		}
-
-		diseaseRegistryService.findLikeIssue(item).then(function(response)
-		{
-			var cmIssue = {
-				acute: false,
-				certain: false,
-				issue: response,
-				issue_id: response.issueId,
-				major: false,
-				resolved: false,
-				unsaved: true
-			};
-			$scope.groupNotesForm.assignedCMIssues.push(cmIssue);
-		});
-
-
-	};
-
-	//disable click and keypress if user only has read-access
-	$scope.checkAction = function(event)
-	{
-		if ($scope.page.cannotChange)
-		{
-			event.preventDefault();
-			event.stopPropagation();
-		}
-	};
-
-	displayIssueId = function(issueCode)
-	{
-		noteService.getIssueId(issueCode).then(function(data)
-		{
-			$scope.page.issueId = data.id;
-		}, function(reason)
-		{
-			alert(reason);
-		});
-	};
-
-	displayIssueId($scope.page.code);
-
-	displayGroupNote = function(item, itemId)
-	{
-		console.log('Display note: ', $scope.page.items[itemId].noteId)
-		if ($scope.page.items[itemId].noteId != null)
-		{
-			noteService.getIssueNote($scope.page.items[itemId].noteId).then(function(iNote)
-			{
-				//$scope.master = angular.copy( "iNote----" +  JSON.stringify(iNote) );
-				$scope.groupNotesForm.encounterNote = iNote.encounterNote;
-				$scope.groupNotesForm.groupNoteExt = iNote.groupNoteExt;
-				$scope.groupNotesForm.assignedCMIssues = iNote.assignedCMIssues;
-
-				$scope.groupNotesForm.assignedCMIssues = [];
-
-				if (iNote.assignedCMIssues instanceof Array)
+				if (note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp)
 				{
-					$scope.groupNotesForm.assignedCMIssues = iNote.assignedCMIssues;
+					return false;
+				}
+			}
+
+			if (note.eformData || note.document)
+			{
+				return false;
+			}
+			return true;
+		};
+
+
+		$scope.firstLine = function(note)
+		{
+			var firstL = note.note.trim().split('\n')[0];
+			var dateStr = $filter('date')(note.observationDate, 'dd-MMM-yyyy');
+			dateStr = "[" + dateStr;
+			//console.log(firstL + " --"+dateStr+"-- " + firstL.indexOf(dateStr));
+			if (firstL.indexOf(dateStr) == 0)
+			{
+				firstL = firstL.substring(dateStr.length);
+			}
+			return firstL;
+		};
+
+		$scope.trackerUrl = "";
+
+		$scope.getTrackerUrl = function(demographicNo)
+		{
+			$scope.trackerUrl = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo + '&numEle=4&tracker=slim';
+		};
+
+		var initialDisplayLimit = 5;
+		$scope.toggleList = function(mod)
+		{
+			i = initialDisplayLimit;
+
+			if (mod.summaryItem.length > i)
+			{
+				if (mod.displaySize > i)
+				{
+					mod.displaySize = i;
 				}
 				else
 				{
-					if (iNote.assignedCMIssues != null)
+					mod.displaySize = mod.summaryItem.length;
+				}
+			}
+		};
+
+		$scope.showMoreItems = function(mod)
+		{
+
+			if (!angular.isDefined(mod.summaryItem))
+			{
+				return false;
+			}
+
+			if (mod.summaryItem.length == 0)
+			{
+				return false;
+			}
+
+			return true;
+		};
+
+		$scope.showMoreItemsSymbol = function(mod)
+		{
+			if (!angular.isDefined(mod.summaryItem))
+			{
+				return "";
+			}
+
+			if ((mod.displaySize < mod.summaryItem.length) && mod.displaySize == initialDisplayLimit)
+			{
+				return "glyphicon glyphicon-chevron-down hand-hover pull-right";
+			}
+			else if ((mod.displaySize == mod.summaryItem.length) && mod.displaySize != initialDisplayLimit)
+			{
+				return "glyphicon glyphicon-chevron-up hand-hover pull-right";
+			}
+			else if (mod.summaryItem.length <= initialDisplayLimit)
+			{
+				return "glyphicon glyphicon-chevron-down glyphicon-chevron-down-disabled pull-right";
+			}
+			else
+			{
+				return "";
+			}
+
+		};
+
+		function getLeftItems()
+		{
+			summaryService.getSummaryHeaders($stateParams.demographicNo, 'left').then(function(data)
+				{
+					console.log("left", data);
+					$scope.page.columnOne.modules = data;
+					fillItems($scope.page.columnOne.modules);
+				},
+				function(errorMessage)
+				{
+					console.log("left" + errorMessage);
+					$scope.error = errorMessage;
+				}
+			);
+		}
+
+		getLeftItems();
+
+
+		function getRightItems()
+		{
+			summaryService.getSummaryHeaders($stateParams.demographicNo, 'right').then(function(data)
+				{
+					console.log("right", data);
+					$scope.page.columnThree.modules = data;
+					fillItems($scope.page.columnThree.modules);
+				},
+				function(errorMessage)
+				{
+					console.log("left" + errorMessage);
+					$scope.error = errorMessage;
+				}
+			);
+		}
+
+		getRightItems();
+
+		var summaryLists = {};
+
+		function fillItems(itemsToFill)
+		{
+			for (var i = 0; i < itemsToFill.length; i++)
+			{
+				console.log(itemsToFill[i].summaryCode);
+				summaryLists[itemsToFill[i].summaryCode] = itemsToFill[i];
+
+				summaryService.getFullSummary($stateParams.demographicNo, itemsToFill[i].summaryCode).then(function(data)
 					{
-						$scope.groupNotesForm.assignedCMIssues.push(iNote.assignedCMIssues);
+						console.log("FullSummary returned ", data);
+						if (angular.isDefined(data.summaryItem))
+						{
+							if (data.summaryItem instanceof Array)
+							{
+								summaryLists[data.summaryCode].summaryItem = data.summaryItem;
+							}
+							else
+							{
+								summaryLists[data.summaryCode].summaryItem = [data.summaryItem];
+							}
+						}
+					},
+					function(errorMessage)
+					{
+						console.log("fillItems" + errorMessage);
+					}
+
+				);
+			}
+		}
+
+
+		editGroupedNotes = function(size, mod, action)
+		{
+
+			var modalInstance = $uibModal.open(
+			{
+				templateUrl: 'record/summary/groupNotes.jsp',
+				controller: 'Summary.GroupNotesController',
+				size: size,
+				resolve:
+				{
+					mod: function()
+					{
+						return mod;
+					},
+					action: function()
+					{
+						return action;
+					},
+					user: function()
+					{
+						return user;
 					}
 				}
+			});
 
-				action = itemId;
-				$scope.setAvailablePositions();
-
-				$scope.removeEditingNoteFlag();
-
-				if ($scope.groupNotesForm.encounterNote.position < 1)
+			modalInstance.result.then(function(selectedItem)
+			{
+				console.log(selectedItem);
+			}, function()
+			{
+				if (editingNoteId != null)
 				{
-					$scope.groupNotesForm.encounterNote.position = 1;
-				}
-
-			}, function(reason)
-			{
-				alert(reason);
-			});
-		}
-		else if ($scope.page.items[itemId].type === "dx_reg")
-		{
-			$scope.groupNotesForm.assignedCMIssues = [];
-			diseaseRegistryService.findLikeIssue($scope.page.items[itemId].extra).then(function(response)
-			{
-				var cmIssue = {
-					acute: false,
-					certain: false,
-					issue: response,
-					issue_id: response.issueId,
-					major: false,
-					resolved: false,
-					unsaved: true
-				};
-				console.log("find like issue ", cmIssue, response);
-				$scope.groupNotesForm.assignedCMIssues.push(cmIssue);
-				$scope.groupNotesForm.encounterNote = {};
-				$scope.groupNotesForm.groupNoteExt = {};
-				$scope.groupNotesForm.encounterNote = {
-					position: 1
-				};
-				action = itemId;
-			});
-		}
-	};
-
-	//action is NULL when new , action is some id when not
-	if (action != null)
-	{
-		displayGroupNote($scope.page.items, action);
-	}
-	else
-	{
-		//new entry
-	}
-
-	$scope.setAvailablePositions = function()
-	{
-		$scope.availablePositions = [];
-		if ($scope.page.items == null || $scope.page.items.length == 0)
-		{
-			$scope.availablePositions.push(1);
-		}
-		else
-		{
-			var x = 0;
-			for (x = 0; x < $scope.page.items.length; x++)
-			{
-				$scope.availablePositions.push(x + 1);
-			}
-			if (action == null)
-			{
-				$scope.availablePositions.push(x + 1);
-			}
-		}
-	};
-
-	$scope.setAvailablePositions();
-
-	$scope.changeNote = function(item, itemId)
-	{
-		return displayGroupNote(item, itemId);
-	};
-
-	$scope.saveGroupNotes = function()
-	{
-		if ($scope.groupNotesForm.encounterNote.noteId == null)
-		{
-			$scope.groupNotesForm.encounterNote.noteId = 0;
-		}
-
-		$scope.groupNotesForm.encounterNote.noteId = $scope.groupNotesForm.encounterNote.noteId; //tmp crap
-		$scope.groupNotesForm.encounterNote.cpp = true;
-		$scope.groupNotesForm.encounterNote.editable = true;
-		$scope.groupNotesForm.encounterNote.isSigned = true;
-		$scope.groupNotesForm.encounterNote.observationDate = new Date();
-		$scope.groupNotesForm.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO: make this dynamic so it changes on edit
-		$scope.groupNotesForm.encounterNote.encounterType = "";
-		$scope.groupNotesForm.encounterNote.encounterTime = "";
-
-		$scope.groupNotesForm.encounterNote.summaryCode = $scope.page.code; //'ongoingconcerns';
-
-		$scope.groupNotesForm.assignedIssues = [];
-
-		noteService.saveIssueNote($stateParams.demographicNo, $scope.groupNotesForm).then(function(data)
-		{
-			$uibModalInstance.dismiss('cancel');
-			$state.transitionTo($state.current, $stateParams,
-			{
-				reload: true,
-				inherit: false,
-				notify: true
-			});
-
-		}, function(reason)
-		{
-			alert(reason);
-		});
-	};
-
-	/*
-	 * handle concurrent note edit - EditingNoteFlag
-	 */
-	$scope.doSetEditingNoteFlag = function()
-	{
-		noteService.setEditingNoteFlag(editingNoteId, user.providerNo).then(function(resp)
-		{
-			if (!resp.success)
-			{
-				if (resp.message == "Parameter error") alert("Parameter Error: noteUUID[" + editingNoteId + "] userId[" + user.providerNo + "]");
-				else alert("Warning! Another user is editing this note now.");
-			}
-		});
-	};
-
-	$scope.setEditingNoteFlag = function()
-	{
-		if ($scope.groupNotesForm.encounterNote.uuid == null) return;
-
-		$scope.removeEditingNoteFlag(); //remove any previous flag actions
-		editingNoteId = $scope.groupNotesForm.encounterNote.uuid;
-
-		itvSet = $interval($scope.doSetEditingNoteFlag(), 30000); //set flag every 5 min
-		itvCheck = $interval(function()
-		{
-			noteService.checkEditNoteNew(editingNoteId, user.providerNo).then(function(resp)
-			{
-				if (!resp.success)
-				{ //someone else wants to edit this note
-					alert("Warning! Another user tries to edit this note. Your update may be replaced by later revision(s).");
-
-					//cancel 10sec check after 1st time warning when another user tries to edit this note
+					noteService.removeEditingNoteFlag(editingNoteId, user.providerNo);
+					$interval.cancel(itvSet);
+					itvSet = null;
 					$interval.cancel(itvCheck);
 					itvCheck = null;
+					editingNoteId = null;
 				}
+
+				console.log('Modal dismissed at: ' + new Date());
 			});
-		}, 10000); //check for new edit every 10 sec
-	};
 
-	$scope.removeEditingNoteFlag = function()
-	{
-		if (editingNoteId != null)
-		{
-			noteService.removeEditingNoteFlag(editingNoteId, user.providerNo);
-			$interval.cancel(itvSet);
-			$interval.cancel(itvCheck);
-			itvSet = null;
-			itvCheck = null;
-			editingNoteId = null;
-		}
-	};
-
-
-	$scope.removeIssue = function(i)
-	{
-		i.unchecked = true;
-	};
-	$scope.restoreIssue = function(i)
-	{
-		i.unchecked = false;
-	};
-
-	$scope.archiveGroupNotes = function()
-	{
-		//$scope.master = angular.copy($scope.groupNotesForm);
-		$scope.groupNotesForm.encounterNote.archived = true;
-		$scope.saveGroupNotes();
-	};
-
-	$scope.cancel = function()
-	{
-		$uibModalInstance.dismiss('cancel');
-	};
-
-	//temp load into pop-up
-	$scope.openRevisionHistory = function(note)
-	{
-		var rnd = Math.round(Math.random() * 1000);
-		win = "win" + rnd;
-		var url = "../CaseManagementEntry.do?method=notehistory&noteId=" + note.noteId;
-		window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
-	};
-
-	$scope.searchIssues = function(term)
-	{
-		var search = {
-			'term': term
+			console.log($('#myModal'));
 		};
-		return noteService.searchIssues(search, 0, 100).then(function(response)
+
+
+		$scope.gotoState = function(item, mod, itemId)
 		{
-			var resp = [];
-			for (var x = 0; x < response.content.length; x++)
+
+			if (item == "add")
 			{
-				resp.push(
+				editGroupedNotes('lg', mod, null);
+
+			}
+			else if (item.action == 'add' && item.type == 'dx_reg')
+			{
+
+				editGroupedNotes('lg', mod, itemId);
+
+			}
+			else if (item.type == 'lab' || item.type == 'document' || item.type == 'rx' || item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline')
+			{
+
+				if (item.type == 'rx')
 				{
-					issueId: response.content[x].id,
-					code: response.content[x].description + '(' + response.content[x].code + ')'
+					win = "Rx" + $stateParams.demographicNo;
+				}
+				else if (item.type == 'allergy')
+				{
+					win = "Allergy" + $stateParams.demographicNo;
+				}
+				else if (item.type == 'prevention')
+				{
+					win = "prevention" + $stateParams.demographicNo;
+				}
+				else
+				{
+					//item.type == 'lab' || item.type == 'document'
+					//var rnd = Math.round(Math.random() * 1000);
+					win = "win_item.type_";
+				}
+
+				window.open(item.action, win, "scrollbars=yes, location=no, width=900, height=600", "");
+				return false;
+			}
+			else if (item.action == 'action')
+			{
+				editGroupedNotes('lg', mod, itemId);
+
+			}
+			else
+			{
+				$state.transitionTo(item.action,
+				{
+					demographicNo: $stateParams.demographicNo,
+					type: item.type,
+					id: item.id
+				},
+				{
+					location: 'replace',
+					notify: true
 				});
 			}
-			if (response.total > response.content.length)
+
+		};
+
+
+		$scope.showPrintModal = function(mod, action)
+		{
+			var size = 'lg';
+			var modalInstance = $uibModal.open(
 			{
-				//warn user there's more results somehow?
-			}
-			return resp;
-		});
-	};
+				templateUrl: 'record/print.jsp',
+				controller: 'Summary.RecordPrintController',
+				size: size,
+				resolve:
+				{
+					mod: function()
+					{
+						return mod;
+					},
 
-	$scope.assignIssue = function(item, model, label)
-	{
-		for (var x = 0; x < $scope.groupNotesForm.assignedCMIssues.length; x++)
-		{
-			if ($scope.groupNotesForm.assignedCMIssues[x].issue.id == model)
+					action: function()
+					{
+						return action;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(selectedItem)
 			{
-				return;
-			}
-		}
+				console.log(selectedItem);
 
-		noteService.getIssue(model).then(function(response)
-		{
-			var cmIssue = {
-				acute: false,
-				certain: false,
-				issue: response,
-				issue_id: item.issueId,
-				major: false,
-				resolved: false,
-				unsaved: true
-			};
-			$scope.groupNotesForm.assignedCMIssues.push(cmIssue);
-		});
-	};
+			}, function()
+			{
+				console.log('Modal dismissed at: ' + new Date());
+			});
+		};
 
-	$scope.isSelected = function(item)
-	{
-		if (item.id == action)
-		{
-			return "group-note-selected";
-		}
-	};
+	}
+]);
 
-	$scope.addToDxRegistry = function(issue)
-	{
-		diseaseRegistryService.addToDxRegistry($stateParams.demographicNo, issue).then(function(data)
-		{
-			console.log(data);
-		});
 
-	};
-
-};
 var itvSet = null;
 var itvCheck = null;
 var editingNoteId = null;
-
-RecordPrintCtrl = function($scope, $uibModal, $uibModalInstance, mod, action, $stateParams, summaryService, $filter)
-{
-
-	$scope.pageOptions = {};
-	$scope.pageOptions.printType = {};
-	$scope.pageOptions.dates = {};
-	$scope.page = {};
-	$scope.page.selectedWarning = false;
-
-	/*
-	 *If mod length > 0 than the user has selected a note. = Default to Note
-	 *Other wise default to All
-	 */
-	var atleastOneSelected = false;
-	for (var i = 0; i < mod.length; i++)
-	{
-		if (mod[i].isSelected)
-		{
-			atleastOneSelected = true;
-			i = mod.length;
-		}
-	}
-
-	if (atleastOneSelected)
-	{
-		console.log("mod len ", mod.length);
-		$scope.pageOptions.printType = 'selected';
-	}
-	else
-	{
-		console.log("printType = all");
-		$scope.pageOptions.printType = 'all';
-	}
-
-	$scope.printToday = function()
-	{
-		$scope.pageOptions.printType = 'dates';
-		var date = new Date();
-		$scope.pageOptions.dates.start = date;
-		$scope.pageOptions.dates.end = date;
-	};
-
-	$scope.cancelPrint = function()
-	{
-		$uibModalInstance.dismiss('cancel');
-	};
-
-	$scope.clearPrint = function()
-	{
-		$scope.pageOptions = {};
-		$scope.pageOptions.printType = {};
-	};
-
-
-	$scope.sendToPhr = function()
-	{
-		var queryString = "demographic_no=" + $stateParams.demographicNo;
-		queryString = queryString + "&module=echart";
-
-		if ($scope.pageOptions.printType == 'all')
-		{
-			queryString = queryString + '&notes2print=ALL_NOTES';
-		}
-		else if ($scope.pageOptions.printType == 'selected')
-		{
-			//get array
-			var selectedList = [];
-			for (var i = 0; i < mod.length; i++)
-			{
-				if (mod[i].isSelected)
-				{
-					selectedList.push(mod[i].noteId);
-				}
-			}
-			queryString = queryString + '&notes2print=' + selectedList.join();
-		}
-		else if ($scope.pageOptions.printType == 'dates')
-		{
-			queryString = queryString + '&notes2print=ALL_NOTES';
-			queryString = queryString + '&startDate=' + $scope.pageOptions.dates.start.getTime();
-			queryString = queryString + '&endDate=' + $scope.pageOptions.dates.end.getTime();
-		}
-
-		if ($scope.pageOptions.cpp)
-		{
-			queryString = queryString + '&printCPP=true';
-		}
-		if ($scope.pageOptions.cpp)
-		{
-			queryString = queryString + '&printRx=true';
-		}
-		if ($scope.pageOptions.cpp)
-		{
-			queryString = queryString + '&printLabs=true';
-		}
-		console.log("QS" + queryString);
-
-		if ($scope.pageOptions.printType === 'selected' && selectedList.length == 0)
-		{
-			$scope.page.selectedWarning = true;
-			return;
-		}
-		else
-		{
-			$scope.page.selectedWarning = false;
-		}
-
-		window.open('../SendToPhr.do?' + queryString, '_blank');
-	};
-
-	$scope.print = function()
-	{
-		//console.log('processList',mod);
-		console.log($scope.pageOptions);
-		var selectedList = [];
-		for (var i = 0; i < mod.length; i++)
-		{
-			if (mod[i].isSelected)
-			{
-				selectedList.push(mod[i].noteId);
-			}
-		}
-		console.log("selected list", selectedList);
-
-		if ($scope.pageOptions.printType === 'selected' && selectedList.length == 0)
-		{
-			$scope.page.selectedWarning = true;
-			return;
-		}
-		else
-		{
-			$scope.page.selectedWarning = false;
-		}
-
-		$scope.pageOptions.selectedList = selectedList;
-		var ops = encodeURIComponent(JSON.stringify($scope.pageOptions));
-		window.open('../ws/rs/recordUX/' + $stateParams.demographicNo + '/print?printOps=' + ops, '_blank');
-
-
-
-	};
-};

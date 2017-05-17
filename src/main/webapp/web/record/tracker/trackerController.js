@@ -24,20 +24,46 @@
 
 */
 
-oscarApp.controller('TrackerCtrl', function($rootScope, $scope, $http, $location, $stateParams, demographicService, demo, $state, noteService, $timeout, uxService)
-{
+angular.module('Tracker').controller('Tracker.TrackerController', [
 
-	$scope.getTrackerUrl = function(demographicNo)
+	'$rootScope',
+	'$scope',
+	'$http',
+	'$location',
+	'$stateParams',
+	'$state',
+	'$timeout',
+	'demographicService',
+	'demo',
+	'noteService',
+	'uxService',
+
+	function(
+		$rootScope,
+		$scope,
+		$http,
+		$location,
+		$stateParams,
+		$state,
+		$timeout,
+		demographicService,
+		demo,
+		noteService,
+		uxService)
 	{
 
-		url = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo;
+		$scope.getTrackerUrl = function(demographicNo)
+		{
 
-		return url;
+			url = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo;
 
-	};
+			return url;
+
+		};
 
 
-});
+	}
+]);
 
 function resizeIframe(iframe)
 {

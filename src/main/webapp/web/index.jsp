@@ -375,11 +375,21 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 	<script type="text/javascript" src="dashboard/dashboardController.js"></script>
 	<script type="text/javascript" src="patientlist/patientListController.js"></script>
+	
+	<script type="text/javascript" src="record/module.js"></script>
 	<script type="text/javascript" src="record/recordController.js"></script>
+	<script type="text/javascript" src="record/summary/module.js"></script>
 	<script type="text/javascript" src="record/summary/summaryController.js"></script>
+	<script type="text/javascript" src="record/summary/recordPrintController.js"></script>
+	<script type="text/javascript" src="record/summary/groupNotesController.js"></script>
+	<script type="text/javascript" src="record/forms/module.js"></script>
 	<script type="text/javascript" src="record/forms/formsController.js"></script>
+	<script type="text/javascript" src="record/details/module.js"></script>	
 	<script type="text/javascript" src="record/details/detailsController.js"></script>
+	<script type="text/javascript" src="record/phr/module.js"></script>
 	<script type="text/javascript" src="record/phr/phrController.js"></script>
+
+	<script type="text/javascript" src="record/tracker/module.js"></script>
 	<script type="text/javascript" src="record/tracker/trackerController.js"></script>
 
 	<script type="text/javascript" src="tickler/module.js"></script>
@@ -413,7 +423,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="report/reportFollowUpIntakeController.js"></script>
 	<script type="text/javascript" src="report/reportNoShowAppointmentSheetController.js"></script>
 	<script type="text/javascript" src="report/reportOldPatientsController.js"></script>
-	<script type="text/javascript" src="report/reportOldPatientChartListController.js"></script>
+	<script type="text/javascript" src="report/reportPatientChartListController.js"></script>
 	<script type="text/javascript" src="report/reportRegistrationIntakeController.js"></script>
 	<script type="text/javascript" src="report/reportSHMentalHealthController.js"></script>
 
@@ -421,8 +431,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 	<script type="text/javascript" src="settings/module.js"></script>
 	<script type="text/javascript" src="settings/settingsController.js"></script>
-	<script type="text/javascript" src="tickler/changePasswordController.js"></script>
-	<script type="text/javascript" src="tickler/quickLinkController.js"></script>
+	<script type="text/javascript" src="settings/changePasswordController.js"></script>
+	<script type="text/javascript" src="settings/quickLinkController.js"></script>
 
 	<script type="text/javascript" src="help/supportController.js"></script>
 	<script type="text/javascript" src="help/helpController.js"></script>
