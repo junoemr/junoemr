@@ -113,7 +113,7 @@
 						<input type="text" class="form-control" id="problemdescription"	name="problemdescription" ng-model="groupNotesForm.groupNoteExt.problemDesc" placeholder="<bean:message key="oscarEncounter.problemdescription.title" />" />
 					</div>
 
-					<div class="form-group col-xs-6 ng-if="page.code == 'ongoingconcerns' "">
+					<div class="form-group col-xs-6" ng-if="page.code == 'ongoingconcerns' "">
 						<label class="control-label"><bean:message key="oscarEncounter.problemStatus.title" /><span class="glyphicon glyphicon-info-sign" tooltip="Examples: <bean:message key="oscarEncounter.problemStatusExample.msg" />"> </span></label>
 						<input type="text" class="form-control" id="problemstatus" name="problemstatus" ng-model="groupNotesForm.groupNoteExt.problemStatus" placeholder="<bean:message key="oscarEncounter.problemStatus.title" /> " />
 						<!-- example: <bean:message key="oscarEncounter.problemStatusExample.msg" /> -->
