@@ -85,215 +85,411 @@
 			</div>
 		</div>  
 		
-		
-		<form class="form-horizontal" id="frmIssueNotes"> 
-		
-			<div class="form-group"> 
-				<label class="col-sm-2 control-label">Note</label>
-				<div class="col-sm-10">
-					<textarea class="form-control" rows="5" placeholder="Enter Note" ng-model="groupNotesForm.encounterNote.note" ng-change="setEditingNoteFlag()" style="margin-bottom:6px;" required></textarea>
-				</div>	
-			</div>
+		<div class="row">
+			<div class="col-sm-10 col-sm-offset-1">
+				<form id="frmIssueNotes"> 
+					<div class="form-group col-xs-12"> 
+						<label class=" control-label">Note</label>
+						<textarea class="form-control" rows="5" placeholder="Enter Note" ng-model="groupNotesForm.encounterNote.note" ng-change="setEditingNoteFlag()" style="margin-bottom:6px;" required></textarea>
+							
+					</div>
+							
+					<%--<div class="form-group col-xs-6" ng-if="groupNotesForm.assignedCMIssues != null && groupNotesForm.assignedCMIssues.length > 0">
+						<label class="control-label">Assigned Issues</label>
+						<table class="table">
+							<tr ng-repeat="i in groupNotesForm.assignedCMIssues">
+								<td>
+									<input type="button" value="restore" ng-click="restoreIssue(i)" ng-if="i.unchecked!=null && i.unchecked"/>
+									<input type="button" value="remove" ng-click="removeIssue(i)" ng-if="i.unchecked==null || i.unchecked==false"/>
+								</td>
+								<td>{{i.issue.description}} ({{i.issue.code}})  <a ng-click="addToDxRegistry(i.issue)">( add to dx registry )</a></td>
+							</tr>
+						</table>
+						
+					</div>--%>
+						
+					<div class="form-group col-xs-6" ng-if="page.code == 'ongoingconcerns' " >
+						<label class="control-label"><bean:message key="oscarEncounter.problemdescription.title" /></label>				
+						<input type="text" class="form-control" id="problemdescription"	name="problemdescription" ng-model="groupNotesForm.groupNoteExt.problemDesc" placeholder="<bean:message key="oscarEncounter.problemdescription.title" />" />
+					</div>
+
+					<div class="form-group col-xs-6 ng-if="page.code == 'ongoingconcerns' "">
+						<label class="control-label"><bean:message key="oscarEncounter.problemStatus.title" /><span class="glyphicon glyphicon-info-sign" tooltip="Examples: <bean:message key="oscarEncounter.problemStatusExample.msg" />"> </span></label>
+						<input type="text" class="form-control" id="problemstatus" name="problemstatus" ng-model="groupNotesForm.groupNoteExt.problemStatus" placeholder="<bean:message key="oscarEncounter.problemStatus.title" /> " />
+						<!-- example: <bean:message key="oscarEncounter.problemStatusExample.msg" /> -->
+					</div><!-- row -->
 				
+				
+					<div class="form-group col-xs-6">		    
+						<label class="control-label"><bean:message key="oscarEncounter.startdate.title" /></label>
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.startdate.title" />"  
+							ng-model="groupNotesForm.groupNoteExt.startDate" 
+							datepicker-popup="yyyy-MM-dd" 
+							datepicker-append-to-body="false" 
+							is-open="startDatePicker" 
+							ng-click="startDatePicker = true" 
+							placeholder="YYYY-MM-DD"
+							/>
+							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+						</div>
+					</div>	
+							
+					<div class="form-group col-xs-6">
+						<label class="control-label"><bean:message key="oscarEncounter.resolutionDate.title" /></label>			  
+						<div class="input-group">	
+							<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.resolutionDate.title" />"  
+							ng-model="groupNotesForm.groupNoteExt.resolutionDate" 
+							datepicker-popup="yyyy-MM-dd" 
+							datepicker-append-to-body="false" 
+							is-open="resolutionDatePicker" 
+							ng-click="resolutionDatePicker = true" 
+							placeholder="YYYY-MM-DD"
+							/>
+							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+						</div>
+					</div>		    
+
+					<div class="form-group col-xs-6" ng-if="page.code == 'famhx' || page.code == 'riskfactors'">
+						<label class="control-label"><bean:message key="oscarEncounter.ageAtOnset.title" /></label>
+						<input type="text" class="form-control" id="ageatonset" name="ageatonset" ng-model="groupNotesForm.groupNoteExt.ageAtOnset" placeholder="<bean:message key="oscarEncounter.ageAtOnset.title" />" />
+
+					</div>
+
+					<div class="form-group col-xs-6" ng-if="page.code == 'famhx'">
+						<label><bean:message key="oscarEncounter.relationship.title" /></label>
+						<input type="text" class="form-control" id="relationship" name="relationship" ng-model="groupNotesForm.groupNoteExt.relationship" placeholder="<bean:message key="oscarEncounter.relationship.title" />" />
+						
+					</div>
+
+					<div class="form-group col-xs-6" ng-if="page.code == 'medhx'">
+						<div ng-if="page.code == 'medhx' || page.code == 'famhx' " > 
+							<label class="control-label"><bean:message key="oscarEncounter.treatment.title" /></label>
+							<input  type="text" class="form-control" id="treatment" name="treatment" ng-model="groupNotesForm.groupNoteExt.treatment" placeholder="<bean:message key="oscarEncounter.treatment.title" />" />
+						</div>
+					</div>
+
+					<div class="form-group col-xs-6" ng-if="page.code == 'medhx'" >	
+						<label class="control-label"><bean:message key="oscarEncounter.procedureDate.title" /></label>	 
+						<div class="input-group">   	
+							<input type="text" class="form-control" id="proceduredate" name="proceduredate" placeholder="<bean:message key="oscarEncounter.procedureDate.title" />" 
+							ng-model="groupNotesForm.groupNoteExt.procedureDate" 
+							datepicker-popup="yyyy-MM-dd" 
+							datepicker-append-to-body="false" 
+							is-open="procedureDatePicker" 
+							ng-click="procedureDatePicker = true" 
+							placeholder="YYYY-MM-DD"
+							/>
+							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+						</div>
+					</div>
+
+					<div class="form-group col-xs-6"  ng-if="page.code == 'riskfactors' ">
+						<label class="control-label"><bean:message key="oscarEncounter.exposureDetail.title" /></label>				    							
+						<input  type="text" class="form-control" id="exposuredetail" name="exposuredetail" ng-model="groupNotesForm.groupNoteExt.exposureDetail" placeholder="<bean:message key="oscarEncounter.exposureDetail.title" />" />
+					</div>		
+				
+					<div class="form-group col-xs-6" ng-if="page.code == 'medhx' || page.code == 'famhx' || page.code == 'ongoingconcerns' || page.code == 'riskfactors' ">		    
+						<label class="control-label"><bean:message key="oscarEncounter.lifestage.title" /></label>
+						
+						<select class="form-control" name="lifestage" id="lifestage" ng-model="groupNotesForm.groupNoteExt.lifeStage">
+							<option value="">
+								<bean:message key="oscarEncounter.lifestage.opt.notset" />
+							</option>
+							<option value="N">
+								<bean:message key="oscarEncounter.lifestage.opt.newborn" />
+							</option>
+							<option value="I">
+								<bean:message key="oscarEncounter.lifestage.opt.infant" />
+							</option>
+							<option value="C">
+								<bean:message key="oscarEncounter.lifestage.opt.child" />
+							</option>
+							<option value="T">
+								<bean:message key="oscarEncounter.lifestage.opt.adolescent" />
+							</option>
+							<option value="A">
+								<bean:message key="oscarEncounter.lifestage.opt.adult" />
+							</option>
+						</select>
+
+					</div>
+				
+					<div class="form-group col-xs-6">
+						<label class="control-label"><bean:message key="oscarEncounter.Index.assnIssue" /></label>			
+						<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.Index.assnIssue" />"
+							uib-typeahead="i.issueId as i.code for i in searchIssues($viewValue)" 
+							typeahead-on-select="assignIssue($item, $model, $label);selectedIssue='';" 
+							ng-model="selectedIssue" 
+							typeahead-loading="loadingIssues"
+							typeahead-min-length="3"
+							/>
+					</div>
+
+					<div class="form-group col-xs-6">
+						<label class="control-label"><bean:message key="oscarEncounter.Index.btnPosition" /></label>
+						<select class="form-control" id="position" ng-model="groupNotesForm.encounterNote.position" >
+							<option ng-value="i" ng-repeat="i in availablePositions" >{{i}}</option>
+						</select>	
+					</div> <!-- row -->
+
+					<div class="form-group col-xs-6">
+						<label class="control-label"><bean:message key="oscarEncounter.hideFromPrint.title" /></label>
+						<!--shouldn't this just be a single checkbox and the answer is always no unless checked?-->				    
+						<div ng-init="groupNotesForm.groupNoteExt.hideCpp=0">
+							<label class="radio-inline" id="hidecpp" name="hidecpp">
+								<input type="radio" id="hidecpp" name="hidecpp" ng-model="groupNotesForm.groupNoteExt.hideCpp" value="0"> No
+							</label>
+							<label class="radio-inline" >
+								<input type="radio" id="hidecpp" name="hidecpp" ng-model="groupNotesForm.groupNoteExt.hideCpp" value="1"> Yes
+							</label>
+						</div><!-- form-group -->
+					</div>
+
+					<div class="form-group col-xs-12">
+						<label class="control-label"><bean:message key="oscarEncounter.addFromDxReg.title" /></label>
+						<div class="btn-group dropdown" ng-repeat="qlist in page.quickLists">
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								{{qlist.label}} <span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu">
+								<li><a ng-repeat="item in qlist.dxList" ng-click="addDxItem(item)" >{{item.description}}</a></li>
+							</ul>
+						</div>
+					</div>
+						<!-- 
+					<div class="row">
+						<div class="col-lg-12" style="margin-top:6px;">
+							<div class="checkbox" >
+								<label>
+								<input type="checkbox" ng-model="groupNotesForm.issue.issueId" ng-checked="true" ng-true-value="'{{page.issueId}}'" ng-false-value="'0'">  <em>{{page.title}}</em>  as part of cpp
+
+								</label>
+							</div>				
+						</div>
+					</div> -->
+				</form>
+
+
+
+
+
+
+
+
+
+				<%--Old Horizontal version of the form--%>
+
+				<%--<form class="form-horizontal" id="frmIssueNotes"> 
 					
+					<div class="form-group"> 
+						<label class="col-sm-2 control-label">Note</label>
+						<div class="col-sm-10">
+							<textarea class="form-control" rows="5" placeholder="Enter Note" ng-model="groupNotesForm.encounterNote.note" ng-change="setEditingNoteFlag()" style="margin-bottom:6px;" required></textarea>
+						</div>	
+					</div>
+						
+							
+						
+					<div class="form-group" ng-if="groupNotesForm.assignedCMIssues != null && groupNotesForm.assignedCMIssues.length > 0">
+						<label class="col-md-2 control-label">Assigned Issues</label>
+						<div class="col-md-4">
+							<table class="table">
+								<tr ng-repeat="i in groupNotesForm.assignedCMIssues">
+									<td>
+										<input type="button" value="restore" ng-click="restoreIssue(i)" ng-if="i.unchecked!=null && i.unchecked"/>
+										<input type="button" value="remove" ng-click="removeIssue(i)" ng-if="i.unchecked==null || i.unchecked==false"/>
+									</td>
+									<td>{{i.issue.description}} ({{i.issue.code}})  <a ng-click="addToDxRegistry(i.issue)">( add to dx registry )</a></td>
+								</tr>
+							</table>
+						</div>
+						
+					</div>
+						
+					<div ng-if="page.code == 'ongoingconcerns' " class="form-group">
+						<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.problemdescription.title" /></label>
+						<div class="col-sm-4">					
+							<input type="text" class="form-control" id="problemdescription"	name="problemdescription" ng-model="groupNotesForm.groupNoteExt.problemDesc" placeholder="<bean:message key="oscarEncounter.problemdescription.title" />" />
+						</div>
+						
+						<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.problemStatus.title" /><span class="glyphicon glyphicon-info-sign" tooltip="Examples: <bean:message key="oscarEncounter.problemStatusExample.msg" />"> </span></label>
+						<div class="col-sm-4">	
+							<input type="text" class="form-control" id="problemstatus" name="problemstatus" ng-model="groupNotesForm.groupNoteExt.problemStatus" placeholder="<bean:message key="oscarEncounter.problemStatus.title" /> " />
+							<!-- example: <bean:message key="oscarEncounter.problemStatusExample.msg" /> -->
+						</div>
+					</div><!-- row -->
 				
-			<div class="form-group" ng-if="groupNotesForm.assignedCMIssues != null && groupNotesForm.assignedCMIssues.length > 0">
-				<label class="col-sm-2 control-label">Assigned Issues</label>
-				<div class="col-sm-4">
-					<table class="table">
-						<tr ng-repeat="i in groupNotesForm.assignedCMIssues">
-							<td>
-								<input type="button" value="restore" ng-click="restoreIssue(i)" ng-if="i.unchecked!=null && i.unchecked"/>
-								<input type="button" value="remove" ng-click="removeIssue(i)" ng-if="i.unchecked==null || i.unchecked==false"/>
-							</td>
-							<td>{{i.issue.description}} ({{i.issue.code}})  <a ng-click="addToDxRegistry(i.issue)">( add to dx registry )</a></td>
-						</tr>
-					</table>
-				</div>
 				
-			</div>
+					<div class="form-group">		    
+						<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.startdate.title" /></label>
+						<div class="col-sm-4">
+							<div class="input-group">
+								<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.startdate.title" />"  
+								ng-model="groupNotesForm.groupNoteExt.startDate" 
+								datepicker-popup="yyyy-MM-dd" 
+								datepicker-append-to-body="false" 
+								is-open="startDatePicker" 
+								ng-click="startDatePicker = true" 
+								placeholder="YYYY-MM-DD"
+								/>
+								<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+							</div>
+						</div><!-- col-lg-6 -->		
+							
+
+						<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.resolutionDate.title" /></label>			  
+						<div class="col-sm-4">
+							<div class="input-group">	
+								<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.resolutionDate.title" />"  
+								ng-model="groupNotesForm.groupNoteExt.resolutionDate" 
+								datepicker-popup="yyyy-MM-dd" 
+								datepicker-append-to-body="false" 
+								is-open="resolutionDatePicker" 
+								ng-click="resolutionDatePicker = true" 
+								placeholder="YYYY-MM-DD"
+								/>
+								<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+							</div>
+						</div>
+					</div>		    
+
+					<div class="form-group" ng-if="page.code == 'famhx'">
+						<div ng-if="page.code == 'famhx' || page.code == 'riskfactors'" >
+							<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.ageAtOnset.title" /></label>
+							<div class="col-sm-4"> 
+								<input ng-if="page.code == 'famhx' || page.code == 'riskfactors' " type="text" class="form-control" id="ageatonset" name="ageatonset" ng-model="groupNotesForm.groupNoteExt.ageAtOnset" placeholder="<bean:message key="oscarEncounter.ageAtOnset.title" />" />
+							</div>
+						</div>
+
+						<div ng-if="page.code == 'famhx'" class="col-lg-6">
+							<label><bean:message key="oscarEncounter.relationship.title" /></label>
+							<input type="text" class="form-control" id="relationship" name="relationship" ng-model="groupNotesForm.groupNoteExt.relationship" placeholder="<bean:message key="oscarEncounter.relationship.title" />" />
+						</div>
+
+						
+					</div>
+
+					<div class="form-group" ng-if="page.code == 'medhx'">
+						<div ng-if="page.code == 'medhx' || page.code == 'famhx' " > 
+							<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.treatment.title" /></label>
+							<div class="col-sm-4">				    	
+								<input  type="text" class="form-control" id="treatment" name="treatment" ng-model="groupNotesForm.groupNoteExt.treatment" placeholder="<bean:message key="oscarEncounter.treatment.title" />" />
+							</div>
+						</div>
+
+						<div ng-if="page.code == 'medhx'" >	
+							<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.procedureDate.title" /></label>	 
+							<div class="input-group col-sm-4>   	
+								<input type="text" class="form-control" id="proceduredate" name="proceduredate" placeholder="<bean:message key="oscarEncounter.procedureDate.title" />" 
+								ng-model="groupNotesForm.groupNoteExt.procedureDate" 
+								datepicker-popup="yyyy-MM-dd" 
+								datepicker-append-to-body="false" 
+								is-open="procedureDatePicker" 
+								ng-click="procedureDatePicker = true" 
+								placeholder="YYYY-MM-DD"
+								/>
+								<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+							</div>
+						</div>
+					</div><!--row-->	
+
+					<div class="form-group"  ng-if="page.code == 'riskfactors' ">
+						<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.exposureDetail.title" /></label>				    	
+						<div class="col-sm-4"> 
+							<input  type="text" class="form-control" id="exposuredetail" name="exposuredetail" ng-model="groupNotesForm.groupNoteExt.exposureDetail" placeholder="<bean:message key="oscarEncounter.exposureDetail.title" />" />
+						</div>
+					</div>		
+
 				
-			<div ng-if="page.code == 'ongoingconcerns' " class="form-group">
-				<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.problemdescription.title" /></label>
-				<div class="col-sm-4">					
-					<input type="text" class="form-control" id="problemdescription"	name="problemdescription" ng-model="groupNotesForm.groupNoteExt.problemDesc" placeholder="<bean:message key="oscarEncounter.problemdescription.title" />" />
-				</div>
+					<div class="form-group" ng-if="page.code == 'medhx' || page.code == 'famhx' || page.code == 'ongoingconcerns' || page.code == 'riskfactors' ">		    
+						<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.lifestage.title" /></label>
+						<div class="col-sm-4">
+							<select class="form-control" name="lifestage" id="lifestage" ng-model="groupNotesForm.groupNoteExt.lifeStage">
+								<option value="">
+									<bean:message key="oscarEncounter.lifestage.opt.notset" />
+								</option>
+								<option value="N">
+									<bean:message key="oscarEncounter.lifestage.opt.newborn" />
+								</option>
+								<option value="I">
+									<bean:message key="oscarEncounter.lifestage.opt.infant" />
+								</option>
+								<option value="C">
+									<bean:message key="oscarEncounter.lifestage.opt.child" />
+								</option>
+								<option value="T">
+									<bean:message key="oscarEncounter.lifestage.opt.adolescent" />
+								</option>
+								<option value="A">
+									<bean:message key="oscarEncounter.lifestage.opt.adult" />
+								</option>
+							</select>
+						</div>
+					</div>
 				
-				<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.problemStatus.title" /><span class="glyphicon glyphicon-info-sign" tooltip="Examples: <bean:message key="oscarEncounter.problemStatusExample.msg" />"> </span></label>
-				<div class="col-sm-4">	
-					<input type="text" class="form-control" id="problemstatus" name="problemstatus" ng-model="groupNotesForm.groupNoteExt.problemStatus" placeholder="<bean:message key="oscarEncounter.problemStatus.title" /> " />
-					<!-- example: <bean:message key="oscarEncounter.problemStatusExample.msg" /> -->
-				</div>
-			</div><!-- row -->
-		
-		
-			<div class="form-group">		    
-				<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.startdate.title" /></label>
-				<div class="col-sm-4">
-					<div class="input-group">
-						<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.startdate.title" />"  
-						ng-model="groupNotesForm.groupNoteExt.startDate" 
-						datepicker-popup="yyyy-MM-dd" 
-						datepicker-append-to-body="false" 
-						is-open="startDatePicker" 
-						ng-click="startDatePicker = true" 
-						placeholder="YYYY-MM-DD"
-						/>
-						<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.Index.assnIssue" /></label>			
+						<div class="col-sm-4"><!-- TODO: most likely a typeahead and display assigned issues below using the badges or labels-->
+							<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.Index.assnIssue" />"
+								uib-typeahead="i.issueId as i.code for i in searchIssues($viewValue)" 
+								typeahead-on-select="assignIssue($item, $model, $label);selectedIssue='';" 
+								ng-model="selectedIssue" 
+								typeahead-loading="loadingIssues"
+								typeahead-min-length="3"
+								/>
+						</div>
+
+						<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.Index.btnPosition" /></label>
+						<div class="col-sm-4">		   
+							<select class="form-control" id="position" ng-model="groupNotesForm.encounterNote.position" >
+								<option ng-value="i" ng-repeat="i in availablePositions" >{{i}}</option>
+							</select>	
+						</div> <!-- col-lg-4 -->
+					</div> <!-- row -->
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.hideFromPrint.title" /></label>
+						<div class="col-sm-4">
+							<!--shouldn't this just be a single checkbox and the answer is always no unless checked?-->				    
+							<div ng-init="groupNotesForm.groupNoteExt.hideCpp=0">
+								<label class="radio-inline" id="hidecpp" name="hidecpp">
+									<input type="radio" id="hidecpp" name="hidecpp" ng-model="groupNotesForm.groupNoteExt.hideCpp" value="0"> No
+								</label>
+								<label class="radio-inline" >
+									<input type="radio" id="hidecpp" name="hidecpp" ng-model="groupNotesForm.groupNoteExt.hideCpp" value="1"> Yes
+								</label>
+							</div><!-- form-group -->
+						</div><!-- col-lg-4 -->
 					</div>
-				</div><!-- col-lg-6 -->		
-					
 
-				<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.resolutionDate.title" /></label>			  
-				<div class="col-sm-4">
-					<div class="input-group">	
-						<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.resolutionDate.title" />"  
-						ng-model="groupNotesForm.groupNoteExt.resolutionDate" 
-						datepicker-popup="yyyy-MM-dd" 
-						datepicker-append-to-body="false" 
-						is-open="resolutionDatePicker" 
-						ng-click="resolutionDatePicker = true" 
-						placeholder="YYYY-MM-DD"
-						/>
-						<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.addFromDxReg.title" /></label>
+						<div class="col-sm-10">
+							<div class="btn-group dropdown" ng-repeat="qlist in page.quickLists">
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								{{qlist.label}} <span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu">
+								<li><a ng-repeat="item in qlist.dxList" ng-click="addDxItem(item)" >{{item.description}}</a></li>
+							</ul>
+							</div>
+						</div>
 					</div>
-				</div>
-			</div>		    
+						<!-- 
+					<div class="row">
+						<div class="col-lg-12" style="margin-top:6px;">
+							<div class="checkbox" >
+								<label>
+								<input type="checkbox" ng-model="groupNotesForm.issue.issueId" ng-checked="true" ng-true-value="'{{page.issueId}}'" ng-false-value="'0'">  <em>{{page.title}}</em>  as part of cpp
 
-			<div class="form-group" ng-if="page.code == 'famhx'">
-				<div ng-if="page.code == 'famhx' || page.code == 'riskfactors'" >
-					<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.ageAtOnset.title" /></label>
-					<div class="col-sm-4"> 
-						<input ng-if="page.code == 'famhx' || page.code == 'riskfactors' " type="text" class="form-control" id="ageatonset" name="ageatonset" ng-model="groupNotesForm.groupNoteExt.ageAtOnset" placeholder="<bean:message key="oscarEncounter.ageAtOnset.title" />" />
-					</div>
-				</div>
-
-				<div ng-if="page.code == 'famhx'" class="col-lg-6">
-					<label><bean:message key="oscarEncounter.relationship.title" /></label>
-					<input type="text" class="form-control" id="relationship" name="relationship" ng-model="groupNotesForm.groupNoteExt.relationship" placeholder="<bean:message key="oscarEncounter.relationship.title" />" />
-				</div>
-
-				
-			</div>
-
-			<div class="form-group" ng-if="page.code == 'medhx'">
-				<div ng-if="page.code == 'medhx' || page.code == 'famhx' " > 
-					<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.treatment.title" /></label>
-					<div class="col-sm-4">				    	
-						<input  type="text" class="form-control" id="treatment" name="treatment" ng-model="groupNotesForm.groupNoteExt.treatment" placeholder="<bean:message key="oscarEncounter.treatment.title" />" />
-					</div>
-				</div>
-
-				<div ng-if="page.code == 'medhx'" >	
-					<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.procedureDate.title" /></label>	 
-					<div class="input-group col-sm-4>   	
-						<input type="text" class="form-control" id="proceduredate" name="proceduredate" placeholder="<bean:message key="oscarEncounter.procedureDate.title" />" 
-						ng-model="groupNotesForm.groupNoteExt.procedureDate" 
-						datepicker-popup="yyyy-MM-dd" 
-						datepicker-append-to-body="false" 
-						is-open="procedureDatePicker" 
-						ng-click="procedureDatePicker = true" 
-						placeholder="YYYY-MM-DD"
-						/>
-						<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-					</div>
-				</div>
-			</div><!--row-->	
-
-			<div class="form-group"  ng-if="page.code == 'riskfactors' ">
-				<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.exposureDetail.title" /></label>				    	
-				<div class="col-sm-4"> 
-					<input  type="text" class="form-control" id="exposuredetail" name="exposuredetail" ng-model="groupNotesForm.groupNoteExt.exposureDetail" placeholder="<bean:message key="oscarEncounter.exposureDetail.title" />" />
-				</div>
-			</div>		
-
-		
-			<div class="form-group" ng-if="page.code == 'medhx' || page.code == 'famhx' || page.code == 'ongoingconcerns' || page.code == 'riskfactors' ">		    
-				<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.lifestage.title" /></label>
-				<div class="col-sm-4">
-					<select class="form-control" name="lifestage" id="lifestage" ng-model="groupNotesForm.groupNoteExt.lifeStage">
-						<option value="">
-							<bean:message key="oscarEncounter.lifestage.opt.notset" />
-						</option>
-						<option value="N">
-							<bean:message key="oscarEncounter.lifestage.opt.newborn" />
-						</option>
-						<option value="I">
-							<bean:message key="oscarEncounter.lifestage.opt.infant" />
-						</option>
-						<option value="C">
-							<bean:message key="oscarEncounter.lifestage.opt.child" />
-						</option>
-						<option value="T">
-							<bean:message key="oscarEncounter.lifestage.opt.adolescent" />
-						</option>
-						<option value="A">
-							<bean:message key="oscarEncounter.lifestage.opt.adult" />
-						</option>
-					</select>
-				</div>
-			</div>
-		
-			<div class="form-group">
-				<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.Index.assnIssue" /></label>			
-				<div class="col-sm-4"><!-- TODO: most likely a typeahead and display assigned issues below using the badges or labels-->
-					<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.Index.assnIssue" />"
-						uib-typeahead="i.issueId as i.code for i in searchIssues($viewValue)" 
-						typeahead-on-select="assignIssue($item, $model, $label);selectedIssue='';" 
-						ng-model="selectedIssue" 
-						typeahead-loading="loadingIssues"
-						typeahead-min-length="3"
-						/>
-				</div>
-
-				<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.Index.btnPosition" /></label>
-				<div class="col-sm-4">		   
-					<select class="form-control" id="position" ng-model="groupNotesForm.encounterNote.position" >
-						<option ng-value="i" ng-repeat="i in availablePositions" >{{i}}</option>
-					</select>	
-				</div> <!-- col-lg-4 -->
-			</div> <!-- row -->
-
-			<div class="form-group">
-				<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.hideFromPrint.title" /></label>
-				<div class="col-sm-4">
-					<!--shouldn't this just be a single checkbox and the answer is always no unless checked?-->				    
-					<div ng-init="groupNotesForm.groupNoteExt.hideCpp=0">
-						<label class="radio-inline" id="hidecpp" name="hidecpp">
-							<input type="radio" id="hidecpp" name="hidecpp" ng-model="groupNotesForm.groupNoteExt.hideCpp" value="0"> No
-						</label>
-						<label class="radio-inline" >
-							<input type="radio" id="hidecpp" name="hidecpp" ng-model="groupNotesForm.groupNoteExt.hideCpp" value="1"> Yes
-						</label>
-					</div><!-- form-group -->
-				</div><!-- col-lg-4 -->
-			</div>
-
-			<div class="form-group">
-				<label class="col-sm-2 control-label"><bean:message key="oscarEncounter.addFromDxReg.title" /></label>
-				<div class="col-sm-10">
-					<div class="btn-group dropdown" ng-repeat="qlist in page.quickLists">
-					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						{{qlist.label}} <span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu">
-						<li><a ng-repeat="item in qlist.dxList" ng-click="addDxItem(item)" >{{item.description}}</a></li>
-					</ul>
-					</div>
-				</div>
-			</div>
-				<!-- 
-			<div class="row">
-				<div class="col-lg-12" style="margin-top:6px;">
-					<div class="checkbox" >
-						<label>
-						<input type="checkbox" ng-model="groupNotesForm.issue.issueId" ng-checked="true" ng-true-value="'{{page.issueId}}'" ng-false-value="'0'">  <em>{{page.title}}</em>  as part of cpp
-
-						</label>
-					</div>				
-				</div>
-			</div> -->
-		</form>  	
+								</label>
+							</div>				
+						</div>
+					</div> -->
+				</form> --%>
+			</div> 
+		</div>	
 	</div><!-- modal-body -->		
 		
 	<div class="modal-footer">
