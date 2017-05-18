@@ -1,0 +1,28 @@
+// Date picker overrides
+.uib-datepicker-popup {
+	background-color: $primary-white;
+	padding: 10px;
+	.uib-daypicker {
+		&:focus {
+			outline: none;
+		}
+		background-color: $primary-white;
+		table {
+			border: none;
+		}
+	}
+	.dropdown-menu {
+		background-color: $primary-white;
+	}
+	.btn-info {
+		&.active {
+			.text-info {
+				color: $primary-white-text;
+			}
+		}
+		.text-info {
+			color: $primary-blue-text;
+		}
+		background-color: $primary-blue;
+	}
+}
