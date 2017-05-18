@@ -1,49 +1,49 @@
 body {
-    // padding: 70px 0 0 0;
-    padding-top: 50px;
+	// padding: 70px 0 0 0;
+	padding-top: 50px;
 }
 
 
 /*-----------------------*/
 
 .hand-hover {
-    cursor: pointer;
-    cursor: hand;
+	cursor: pointer;
+	cursor: hand;
 }
 
 .hand-hover:hover {
-    text-decoration: none;
+	text-decoration: none;
 }
 
 #parent {
-    position: fixed;
-    bottom: 0px;
-    width: 100%;
-    /*width should be 100%*/
+	position: fixed;
+	bottom: 0px;
+	width: 100%;
+	/*width should be 100%*/
 }
 
 #child {
-    width: 100px;
-    /*min width should give to center the div.*/
-    margin: 0px auto;
-    /*here it will make center */
+	width: 100px;
+	/*min width should give to center the div.*/
+	margin: 0px auto;
+	/*here it will make center */
 }
 
 #noteInput,
 #noteInput2 {
-    position: fixed;
-    bottom: 0;
-    font-family: sans-serif;
-    margin-bottom: 0px;
-    font-weight: bold;
-    bottom: 0;
-    z-index: 999;
+	position: fixed;
+	bottom: 0;
+	font-family: sans-serif;
+	margin-bottom: 0px;
+	font-weight: bold;
+	bottom: 0;
+	z-index: 999;
 }
 
 #noteInput {
-    line-height: 2;
-    font-size: 30px;
-    /*text-shadow: 0 1px 0 #84BAFF;
+	line-height: 2;
+	font-size: 30px;
+	/*text-shadow: 0 1px 0 #84BAFF;
     //box-shadow: 0 0 15px #00214B
     //background: #ccccFF;
     //text-align: center;
@@ -52,28 +52,28 @@ body {
 }
 
 .absolute-left {
-    left: 0px;
+	left: 0px;
 }
 
 .absolute-right {
-    right: 0px;
+	right: 0px;
 }
 
 #noteInput ul.dropdown-menu {
-    max-height: 220px;
-    overflow-y: auto;
-    overflow-x: none;
+	max-height: 220px;
+	overflow-y: auto;
+	overflow-x: none;
 }
 
 pre.noteInEdit {
-    border-color: rgba(126, 239, 104, 0.8);
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
-    outline: 0 none;
+	border-color: rgba(126, 239, 104, 0.8);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
+	outline: 0 none;
 }
 
 #navbarlogo {
-    height: 50px;
-    padding: 10px;
+	height: 50px;
+	padding: 10px;
 }
 
 // .navbar-form .input-group-btn,
@@ -84,61 +84,52 @@ pre.noteInEdit {
 /*needed to fix the broken nav dropdown*/
 
 .add-summary:hover {
-    color: #333 !important;
-    text-decoration: none;
+	color: #333 !important;
+	text-decoration: none;
 }
 
 li.cpp-note-list {
-    background: #fff;
-    border: none;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
-    padding-top: 4px;
-    padding-bottom: 10px;
-    cursor: pointer;
+	background: #fff;
+	border: none;
+	border-bottom: 1px solid #ddd;
+	text-align: left;
+	padding-top: 4px;
+	padding-bottom: 10px;
+	cursor: pointer;
 }
 
 li.cpp-note-list:last-child {
-    border-bottom: none;
-}
-
-.well-note {
-    border-color: #d2d2d2;
-    box-shadow: 0 1px 0 #cfcfcf;
-    border-radius: 3px;
-    /*not sure if this will stay*/
-    max-height: 300px;
-    overflow-y: auto;
+	border-bottom: none;
 }
 
 .more {
-    border-top-color: #727272 !important;
-    border-bottom-color: #727272 !important;
+	border-top-color: #727272 !important;
+	border-bottom-color: #727272 !important;
 }
 
 .more:hover {
-    border-top-color: #333 !important;
-    border-bottom-color: #333 !important;
+	border-top-color: #333 !important;
+	border-bottom-color: #333 !important;
 }
 
 .highlight,
 .highlight:hover {
-    color: #FF0000;
+	color: #FF0000;
 }
 
 .refused,
 .refused:hover {
-    color: #EAACAC;
+	color: #EAACAC;
 }
 
 .ineligible,
 .ineligible:hover {
-    color: #FFCC24;
+	color: #FFCC24;
 }
 
 .pending,
 .pending:hover {
-    color: #FF00FF;
+	color: #FF00FF;
 }
 
 
@@ -146,16 +137,16 @@ li.cpp-note-list:last-child {
 
 .abnormal-prev,
 .abnormal-prev:hover {
-    color: #FF4D4D;
+	color: #FF4D4D;
 }
 
 .abnormal,
 .abnormal:hover {
-    color: red;
+	color: red;
 }
 
 .glyphicon-chevron-down-disabled {
-    color: #999999 !important;
+	color: #999999 !important;
 }
 
 
@@ -190,92 +181,92 @@ li.cpp-note-list:last-child {
 //     background-color: #1c56af;
 // }
 #left-pane {
-    position: fixed;
-    top: 51px;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    display: block;
-    overflow-x: hidden;
-    overflow-y: auto;
-    background-color: #ebebeb;
-    padding-left: 0;
-    padding-right: 0;
+	position: fixed;
+	top: 51px;
+	bottom: 0;
+	left: 0;
+	z-index: 1000;
+	display: block;
+	overflow-x: hidden;
+	overflow-y: auto;
+	background-color: #ebebeb;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 #left-pane li {
-    color: #ebebeb;
+	color: #ebebeb;
 }
 
 #left-pane .list-group-item {
-    border-right: 0;
+	border-right: 0;
 }
 
 #left-pane-header {
-    background-color: #1c56af;
-    margin-right: 0px;
+	background-color: #1c56af;
+	margin-right: 0px;
 }
 
 #left-pane-header a {
-    color: #ebebeb;
+	color: #ebebeb;
 }
 
 #left-pane-header a:hover {
-    color: #fff;
+	color: #fff;
 }
 
 #left-pane-header h1 {
-    margin: 0;
+	margin: 0;
 }
 
 #left-pane-header-title {
-    text-align: center;
-    font-size: 20px;
-    color: #ebebeb !important;
+	text-align: center;
+	font-size: 20px;
+	color: #ebebeb !important;
 }
 
 #left-pane-hidden {
-    position: fixed;
-    top: 51px;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    display: block;
-    overflow-x: hidden;
-    padding-left: 0;
-    padding-right: 0;
+	position: fixed;
+	top: 51px;
+	bottom: 0;
+	left: 0;
+	z-index: 1000;
+	display: block;
+	overflow-x: hidden;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 .toggle-patient-list-button {
-    height: 90px;
-    background-color: #1c56af;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #ebebeb;
-    border-bottom: 0;
-    border-top: 0;
-    border-left: 0;
+	height: 90px;
+	background-color: #1c56af;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #ebebeb;
+	border-bottom: 0;
+	border-top: 0;
+	border-left: 0;
 }
 
 .toggle-patient-list-button:hover {
-    background-color: #1e65d2;
+	background-color: #1e65d2;
 }
 
 .toggle-patient-list-button {
-    .glyphicon-chevron-left {
-        color: #ebebeb;
-    }
-    .glyphicon-chevron-right {
-        color: #ebebeb;
-    }
+	.glyphicon-chevron-left {
+		color: #ebebeb;
+	}
+	.glyphicon-chevron-right {
+		color: #ebebeb;
+	}
 }
 
 #patient-search {
-    padding: 20px;
+	padding: 20px;
 }
 
 .hidden-1380 {
-    display: none;
+	display: none;
 }
 
 
@@ -327,19 +318,19 @@ li.cpp-note-list:last-child {
 /*Show or hide an element on screens with < 1380px width*/
 
 @media (max-width: 1500px) {
-    .hidden-1500 {
-        display: none !important;
-    }
-    .visible-1500 {
-        display: block !important;
-    }
+	.hidden-1500 {
+		display: none !important;
+	}
+	.visible-1500 {
+		display: block !important;
+	}
 }
 
 @media (max-width: 991px) {
-    #left-pane .list-group-item {
-        border-right: 1px solid #dddddd;
-    }
-    #left-pane-header-title {
-        font-size: 18px;
-    }
+	#left-pane .list-group-item {
+		border-right: 1px solid #dddddd;
+	}
+	#left-pane-header-title {
+		font-size: 18px;
+	}
 }
