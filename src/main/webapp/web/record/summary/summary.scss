@@ -1,0 +1,13 @@
+#middle-space {
+	overflow-y: auto;
+	height: 70vh;
+}
+
+.well-note {
+	border-color: #d2d2d2;
+	box-shadow: 0 1px 0 #cfcfcf;
+	border-radius: 3px;
+	/*not sure if this will stay*/
+	max-height: 200px;
+	overflow-y: auto;
+}
