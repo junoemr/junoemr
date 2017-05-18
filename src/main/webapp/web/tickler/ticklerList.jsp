@@ -28,7 +28,7 @@
 <div ng-show="ticklerReadAccess" class="col-lg-12">
  	
 <form name="searchForm" id="searchForm" class="noprint">
-    <div class="row">
+    <div class="row margin-bottom">
 		<div class="col-xs-2">
 			<input ng-model="search.serviceStartDate" type="text" id="serviceStartDate" name="serviceStartDate" class="form-control" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="data.isOpen" ng-click="data.isOpen = true" placeholder="<bean:message key="tickler.list.serviceStartDate" bundle="ui"/>">
 		</div>
@@ -53,32 +53,28 @@
 		</div> 
     </div>
 
-
-  	<div style="height:5px"></div>
-
-	<div class="row">
+	<div class="row margin-bottom">
 		<div class="col-xs-2">
-		<select ng-model="search.taskAssignedTo" name="taskAssignedTo" id="taskAssignedTo" class="form-control"
-						ng-model="search.taskAssignedTo" data-ng-options="a.providerNo as a.name for a in providers" ng-init="search.taskAssignedTo=''">
-						<option value=""><bean:message key="tickler.list.assignee" bundle="ui"/></option> 	
-				</select>
+			<select ng-model="search.taskAssignedTo" name="taskAssignedTo" id="taskAssignedTo" class="form-control"
+					ng-model="search.taskAssignedTo" data-ng-options="a.providerNo as a.name for a in providers" ng-init="search.taskAssignedTo=''">
+					<option value=""><bean:message key="tickler.list.assignee" bundle="ui"/></option> 	
+			</select>
 		</div>
 		<div class="col-xs-2">
-	<select ng-model="search.creator" name="creator" id="creator" class="form-control"
-						ng-model="search.creator" data-ng-options="a.providerNo as a.name for a in providers" ng-init="search.creator=''">
-						<option value=""><bean:message key="tickler.list.creator" bundle="ui"/></option> 	
-				</select>
+			<select ng-model="search.creator" name="creator" id="creator" class="form-control"
+					ng-model="search.creator" data-ng-options="a.providerNo as a.name for a in providers" ng-init="search.creator=''">
+				<option value=""><bean:message key="tickler.list.creator" bundle="ui"/></option> 	
+			</select>
 		</div>
 		<div class="col-xs-2">
 			<select ng-model="search.mrp" name="mrp" id="mrp" class="form-control"
 					ng-model="search.mrp" data-ng-options="a.providerNo as a.name for a in providers" ng-init="search.mrp=''">
-					<option value=""><bean:message key="tickler.list.allMRP" bundle="ui"/></option> 	
+				<option value=""><bean:message key="tickler.list.allMRP" bundle="ui"/></option> 	
 			</select>
 		</div>
-		
 	</div>
 
-	<div class="row">
+	<div class="row margin-bottom">
 		<div class="col-xs-6">
 			<button class="btn btn-primary" type="button" ng-click="doSearch()" ><bean:message key="global.search" bundle="ui"/></button>
 			<button class="btn btn-default" type="button" ng-click="clear()" ><bean:message key="global.clear" bundle="ui"/></button>
@@ -87,8 +83,6 @@
 		</div>
 	</div>        	
 </form>
-
-<div style="height:15px"></div>
 
 <table ng-table="tableParams" show-filter="false" class="table">
   <tbody>
