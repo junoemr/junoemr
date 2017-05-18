@@ -11,3 +11,13 @@
 	max-height: 200px;
 	overflow-y: auto;
 }
+
+.note-container {
+	&:hover {
+		// border: 2px solid $primary-blue;
+		// box-shadow: 5px 5px 2px #888888;
+		box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
+		transition: box-shadow 0.1s ease-in-out;
+	}
+	cursor: pointer;
+}
