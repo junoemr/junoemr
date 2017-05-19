@@ -564,7 +564,7 @@ function refreshTabAlerts(id) {
 				objectName="_admin,_admin.userAdmin,_admin.schedule,_admin.billing,_admin.resource,_admin.reporting,_admin.backup,_admin.messenger,_admin.eform,_admin.encounter,_admin.misc"
 				rights="r">
 				<li><a HREF="#"
-					ONCLICK="popupOscarRx(700,687,'../admin/admin.jsp', 'Admin');return false;"><bean:message
+					ONCLICK="newWindow('<% request.getContextPath() %>/administration/', 'admin');return false;"><bean:message
 					key="global.admin" /></a></li>
 			</security:oscarSec>
 
