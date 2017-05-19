@@ -84,7 +84,7 @@
 	</div>        	
 </form>
 
-<table ng-table="tableParams" show-filter="false" class="table table-striped">
+<table ng-table="tableParams" show-filter="false" class="table table-striped tickler-table">
   <tbody>
 
     <tr ng-repeat="tickler in $data">
