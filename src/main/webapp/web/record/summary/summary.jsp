@@ -36,8 +36,8 @@
 		<div class="col-md-12" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 			<ul class="nav nav-pills">
 				<li ng-class="isCurrentStatus('none')"><a data-target="#all" ng-click="removeFilter(0)" data-toggle="tab" class="hand-hover">All</a></li>
-				<li ng-class="isCurrentStatus('Just My Notes')"><a ng-click="changeNoteFilter('Just My Notes')" class="hand-hover">Just My Notes</a></li>
-				<li ng-class="isOnlyNotesStatus()"><a ng-click="setOnlyNotes()" class="hand-hover">Just Notes</a></li>
+				<li ng-class="isCurrentStatus('Just My Notes')"><a ng-click="changeNoteFilter('Just My Notes')" class="hand-hover">Just My Encounter Notes</a></li>
+				<li ng-class="isOnlyNotesStatus()"><a ng-click="setOnlyNotes()" class="hand-hover">Just Encounter Notes</a></li>
 				<li><a href="#" data-target="#tracker" role="tab" data-toggle="tab" ng-click="getTrackerUrl(demographicNo)" >Tracker</a></li>
 				<li class="pull-right"><span style="margin-top:12px;" class="glyphicon glyphicon-print" ng-click="showPrintModal(page.notes.notelist)"></span></li>
 			</ul>
@@ -149,7 +149,8 @@
 						<div class="note-container col-sm-11 note pull-right" 
 								ng-repeat="note in page.notes.notelist" 
 								ng-style="setColor(note)" 
-								ng-click="editNote(note)">
+								ng-click="editNote(note)"
+								ng-show="showNote(note)">
 							<div class="row note-header" ng-show="showNoteHeader(note)" >
 								<div class="col-xs-1 pull-left">
 									<input type="checkbox" ng-model="note.isSelected"/> 
@@ -173,7 +174,7 @@
 							</div>
 
 							<div class="row note-footer" ng-show="showNote(note)">
-								<div class="col-md-9">
+								<div class="col-md-7">
 									<div class="p-inline">
 										<p class="text-muted"><bean:message key="oscarEncounter.editors.title"/>:</p>
 										<p>{{note.editorNames}}</p>
@@ -185,7 +186,7 @@
 									</div>
 								</div>
 
-								<div class="col-md-3 note-footer-right">
+								<div class="col-md-5 note-footer-right">
 									<div class="p-inline">
 										<p class="text-muted"><bean:message key="oscarEncounter.noteRev.title"/>:</p>
 										<p ng-click="openRevisionHistory(note)" class="hand-hover">{{note.revision}}</p>
