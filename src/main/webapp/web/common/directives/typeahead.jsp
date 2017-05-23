@@ -18,7 +18,7 @@
 				 typeahead-editable="true"
 				 typeahead-select-on-blur="false"
 				 typeahead-focus-first="false"
-				 typeahead-append-to-body="true"
+				 typeahead-append-to-body="false"
 				 placeholder="{{placeholder}}"/>
 
 	<input ng-if="!hasTemplateUrl()"
