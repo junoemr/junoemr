@@ -7,6 +7,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Common',
 	'Common.Services',
 	'Common.Filters',
+	'Common.Directives',
 	'Layout',
 	'Tickler',
 	'Record',
@@ -19,7 +20,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Settings',
 	'Report',
 	'Patient',
-	'PatientSearch',
+	'Patient.Search',
 	'PatientList',
 	'Inbox',
 	'Help',
@@ -103,9 +104,9 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		})
 		.state('search',
 		{
-			url: '/search',
-			templateUrl: 'patientsearch/patientSearch.jsp',
-			controller: 'PatientSearch.PatientSearchController'
+			url: '/search?term',
+			templateUrl: 'patient/search/patientSearch.jsp',
+			controller: 'Patient.Search.PatientSearchController'
 		})
 		.state('reports',
 		{

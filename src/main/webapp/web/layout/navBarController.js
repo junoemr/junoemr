@@ -30,6 +30,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 	'$rootScope',
 	'$scope',
+	'$q',
 	'$location',
 	'$state',
 	'$uibModal',
@@ -38,7 +39,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 	'billingService',
 	'inboxService',
 
-	function($rootScope, $scope, $location, $state, $uibModal,
+	function($rootScope, $scope, $q, $location, $state, $uibModal,
 		securityService, personaService, billingService, inboxService)
 	{
 		var controller = {};
@@ -50,6 +51,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		controller.init = function init()
 		{
 			controller.unAckLabDocTotal = 0;
+			controller.demographicSearch = null;
 
 			billingService.getBillingRegion().then(
 				function success(response)
@@ -144,6 +146,29 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			},
 			true);
 
+		$scope.$watch(function() { return controller.demographicSearch; },
+			function(new_value)
+			{
+				console.log('NavBarController::watch demographicSearch', controller.demographicSearch);
+
+				if(new_value != null && !new_value.isTypeaheadSearchQuery)
+				{
+					// selection from the patient search typeahead changed
+					if(new_value.moreResults)
+					{
+						// the 'more results' option was selected
+						controller.goToPatientSearch(new_value.searchQuery);
+					}
+					else
+					{
+						// patient was selected
+						controller.goToPatientRecord(new_value.demographicNo);
+					}
+
+					// clear the selection
+					controller.demographicSearch = null;
+				}
+			}, true);
 
 		//=========================================================================
 		// Methods
@@ -190,18 +215,39 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				});
 		};
 
-		controller.loadRecord = function loadRecord(demographicNo)
+		// when patient typeahead search button is clicked
+		controller.onPatientSearch = function onPatientSearch(search)
+		{
+			// should only happen when search isTypeaheadSearchQuery
+			if(search.isTypeaheadSearchQuery)
+			{
+				controller.goToPatientSearch(search.searchQuery);
+			}
+
+			// clear the selection
+			controller.demographicSearch = null;
+		};
+
+		controller.goToPatientSearch = function goToPatientSearch(search)
+		{
+			$state.go('search', { term: search }, { reload: 'search' });
+		};
+
+		controller.goToPatientRecord = function goToPatientRecord(demographicNo)
 		{
 			$state.go('record.details',
-			{
-				demographicNo: demographicNo,
-				hideNote: true
-			});
+				{
+					demographicNo: demographicNo,
+					hideNote: true
+				},
+				{ reload: 'record.details' });
 		};
 
 		//to help ng-clicks on buttons
 		controller.transition = function transition(item)
 		{
+			console.log('transition', item);
+
 			var newWindow;
 
 			if (angular.isDefined(item) &&
@@ -290,16 +336,6 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					window.location = item.url;
 				}
 			}
-		};
-
-		controller.goHome = function goHome()
-		{
-			$state.go('dashboard');
-		};
-
-		controller.goToPatientSearch = function goToPatientSearch()
-		{
-			$state.go('search');
 		};
 
 		controller.openMessenger = function(item)
@@ -395,20 +431,6 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				{
 					console.log(reason);
 				});
-		};
-
-		controller.switchToAdvancedView = function()
-		{
-			$rootScope.$apply(function()
-			{
-				$location.path("/search");
-				$location.search('term', controller.quickSearchTerm);
-			});
-		};
-
-		controller.setQuickSearchTerm = function(term)
-		{
-			controller.quickSearchTerm = term;
 		};
 
 		return controller;
