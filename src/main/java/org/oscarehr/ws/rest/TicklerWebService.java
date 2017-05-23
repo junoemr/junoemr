@@ -335,7 +335,8 @@ public class TicklerWebService extends AbstractServiceImpl {
 		//tickler.setUpdateDate(new Date());
 		
 		String dt = json.getString("serviceDate");
-		tickler.setServiceDate(javax.xml.bind.DatatypeConverter.parseDateTime(dt).getTime());
+		// tickler.setServiceDate(javax.xml.bind.DatatypeConverter.parseDateTime(dt).getTime());
+		tickler.setServiceDate(new Date(Long.parseLong(dt)));
 		
 		response.setSuccess(ticklerManager.updateTickler(getLoggedInInfo(), tickler));
 		
