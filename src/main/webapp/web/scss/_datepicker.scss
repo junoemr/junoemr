@@ -1,18 +1,18 @@
 // Date picker overrides
 .uib-datepicker-popup {
-	background-color: $primary-white;
+	background-color: $primary-white-text;
 	padding: 10px;
 	.uib-daypicker {
 		&:focus {
 			outline: none;
 		}
-		background-color: $primary-white;
+		background-color: $primary-white-text;
 		table {
 			border: none;
 		}
 	}
 	.dropdown-menu {
-		background-color: $primary-white;
+		background-color: $primary-white-text;
 	}
 	.btn-info {
 		&.active {

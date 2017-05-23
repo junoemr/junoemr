@@ -89,17 +89,12 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 				<form class="navbar-form navbar-left" role="search">
 	 				<div class="form-group">
-		 				<div class="input-group">
-			 				<input type="text"
-										 class="form-control search-query"
-										 placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"
-										 id="demographicQuickSearch" autocomplete="off" value="">
-			 				<span class="input-group-addon btn-default hand-hover"
-										ng-click="navBarCtrl.goToPatientSearch()"
-										title="<bean:message key="navbar.searchPatients" bundle="ui"/>">
-								<span class="glyphicon glyphicon-search" ></span>
-							</span>
-						</div>
+						<juno-patient-search-typeahead
+								juno-model="navBarCtrl.demographicSearch"
+								juno-placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"
+								juno-on-search-fn="navBarCtrl.onPatientSearch"
+								juno-search-title="<bean:message key="navbar.searchPatients" bundle="ui"/>">
+						</juno-patient-search-typeahead>
 					</div>
 					<a class="btn btn btn-success hand-hover" id="add-patient"
 						 ng-click="navBarCtrl.newDemographic()"
@@ -365,6 +360,10 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="common/filters/startFrom.js"></script>
 	<script type="text/javascript" src="common/filters/ticklerLink.js"></script>
 
+	<script type="text/javascript" src="common/directives/module.js"></script>
+	<script type="text/javascript" src="common/directives/typeaheadHelper.js"></script>
+	<script type="text/javascript" src="common/directives/patientSearchTypeahead.js"></script>
+
 	<script type="text/javascript" src="layout/module.js"></script>
 	<script type="text/javascript" src="layout/bodyController.js"></script>
 	<script type="text/javascript" src="layout/navBarController.js"></script>
@@ -376,13 +375,13 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="dashboard/dashboardController.js"></script>
 	<script type="text/javascript" src="dashboard/ticklerConfigureController.js"></script>
 
-	<script type="text/javascript" src="patientlist/module.js"></script>	
+	<script type="text/javascript" src="patientlist/module.js"></script>
 	<script type="text/javascript" src="patientlist/patientListController.js"></script>
 	<script type="text/javascript" src="patientlist/patientListAppointmentListController.js"></script>
 	<script type="text/javascript" src="patientlist/patientListConfigController.js"></script>
 	<script type="text/javascript" src="patientlist/patientListDemographicSetController.js"></script>
 	<script type="text/javascript" src="patientlist/patientListProgramController.js"></script>
-	
+
 	<script type="text/javascript" src="record/module.js"></script>
 	<script type="text/javascript" src="record/recordController.js"></script>
 	<script type="text/javascript" src="record/summary/module.js"></script>
@@ -391,7 +390,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="record/summary/groupNotesController.js"></script>
 	<script type="text/javascript" src="record/forms/module.js"></script>
 	<script type="text/javascript" src="record/forms/formsController.js"></script>
-	<script type="text/javascript" src="record/details/module.js"></script>	
+	<script type="text/javascript" src="record/details/module.js"></script>
 	<script type="text/javascript" src="record/details/detailsController.js"></script>
 	<script type="text/javascript" src="record/phr/module.js"></script>
 	<script type="text/javascript" src="record/phr/phrController.js"></script>
@@ -423,9 +422,9 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="inbox/module.js"></script>
 	<script type="text/javascript" src="inbox/inboxController.js"></script>
 
-	<script type="text/javascript" src="patientsearch/module.js"></script>
-	<script type="text/javascript" src="patientsearch/patientSearchController.js"></script>
-	<script type="text/javascript" src="patientsearch/remotePatientResultsController.js"></script>
+	<script type="text/javascript" src="patient/search/module.js"></script>
+	<script type="text/javascript" src="patient/search/patientSearchController.js"></script>
+	<script type="text/javascript" src="patient/search/remotePatientResultsController.js"></script>
 
 	<script type="text/javascript" src="report/module.js"></script>
 	<script type="text/javascript" src="report/reportsController.js"></script>
@@ -455,74 +454,5 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 	<jsp:include page="dist/templates.jsp"/>
 
-<script>
-
-// TODO: refactor into NavBarController and use uibTypeahead
-
-//$(document).ready(function(){
-//
-//	$('#demographicQuickSearch').typeahead({
-//		name: 'patients',
-//		valueKey:'name',
-//		limit: 11,
-//
-//		remote: {
-//	        url: '../ws/rs/demographics/quickSearch?query=%QUERY',
-//	        cache:false,
-//	        //I needed to override this to handle the differences in the JSON when it's a single result as opposed to multiple.
-//	        filter: function (parsedResponse) {
-//	            retval = [];
-//	            if(parsedResponse.content instanceof Array) {
-//	            	for (var i = 0;  i < parsedResponse.content.length;  i++) {
-//	            		var tmp = parsedResponse.content[i];
-//	            		if(tmp.hin != null && tmp.hin == '') {
-//	            			tmp.hin = null;
-//	            		}
-//	            		if(tmp.formattedDOB != null && tmp.formattedDOB == '') {
-//	            			tmp.formattedDOB = null;
-//	            		}
-//
-//	            		tmp.name = tmp.lastName + ", " + tmp.firstName;
-//	            		tmp.blah = "";
-//	            		retval.push(tmp);
-//	                 }
-//	            } else {
-//	            	retval.push(parsedResponse.content);
-//	            }
-//
-//	            console.log("total:"+parsedResponse.total);
-//	            var scope = angular.element($("#demographicQuickSearch")).scope();
-//	            scope.setQuickSearchTerm("");
-//
-//	            if(parsedResponse.total > 10) {
-//	            	retval.push({name:"<bean:message key="navbar.moreResults" bundle="ui"/>",hin:parsedResponse.total+" total","demographicNo":-1,"more":true});
-//	            	scope.setQuickSearchTerm(parsedResponse.query);
-//	            }
-//
-//	            return retval;
-//	        }
-//	    },
-//
-//		template: [
-//		        "<p class='demo-quick-name'>{{name}}</p>",
-//		        '{{#hin}}<p class="demo-quick-hin">&nbsp;<em>{{hin}}</em></p>{{/hin}}',
-//		       	'{{#dob}}<p class="demo-quick-dob">&nbsp;{{formattedDOB}}</p>{{/dob}}'
-//		 ].join(''),
-//		       	engine: Hogan
-//		}).on('typeahead:selected', function (obj, datum) {
-//			$('input#demographicQuickSearch').on('blur',function(event){$("#demographicQuickSearch").val("");});
-//
-//			var scope = angular.element($("#demographicQuickSearch")).scope();
-//
-//			if(datum.more != null && datum.more == true) {
-//				scope.switchToAdvancedView();
-//			} else {
-//				scope.loadRecord(datum.demographicNo);
-//			}
-//
-//	});
-//});
-
-</script>
 </body>
 </html>

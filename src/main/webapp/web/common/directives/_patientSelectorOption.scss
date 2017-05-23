@@ -1,0 +1,18 @@
+
+.patient-selector-option {
+
+	&:hover { cursor: pointer; }
+
+  border-bottom: 1px solid $primary-white-text;
+
+  .name {
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+	.hin, .dob, .more-total {
+		margin-left: 5px;
+		font-style: italic;
+	}
+
+}

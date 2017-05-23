@@ -13,11 +13,15 @@
 @import "global";
 // TODO: pre-existing CSS files, need to be reorganized
 @import "navbar-fixed-top";
-@import "navbar-demo-search";
 @import "../patientlist/patient-list";
 @import "index";
 // Section-specific things
+@import "../common/directives/patientSelectorOption";
 @import "../dashboard/dashboard";
 @import "../record/record";
 @import "../record/summary/summary";
+<<<<<<< HEAD
 @import "../tickler/tickler";
+=======
+
+>>>>>>> origin/juno
