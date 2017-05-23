@@ -76,7 +76,7 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.hasTemplateUrl = function hasTemplateUrl()
 			{
-				return $scope.optionsTemplateUrl != null;
+				return Juno.Common.Util.exists($scope.optionsTemplateUrl);
 			};
 
 			$scope.findMatches = function findMatches($viewValue)
@@ -86,7 +86,7 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.formatMatch = function formatMatch($model)
 			{
-				if($model == null)
+				if(!Juno.Common.Util.exists($model))
 				{
 					return null;
 				}
@@ -140,7 +140,7 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.isDummySelection = function isDummySelection(match)
 			{
-				return match != null && match.isTypeaheadSearchQuery;
+				return Juno.Common.Util.exists(match) && match.isTypeaheadSearchQuery;
 			};
 
 		};

@@ -325,6 +325,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<!-- build:js js/scripts.js -->
 	<script type="text/javascript" src="../share/javascript/Oscar.js"></script>
 
+	<script type="text/javascript" src="common/util/util.js"></script>
 	<script type="text/javascript" src="common/util/serviceHelper.js"></script>
 
 	<script type="text/javascript" src="app.js"></script>
