@@ -27,7 +27,7 @@
 <form name="ticklerAddForm" novalidate>
 
 <div class="modal-header">
-    <h4><bean:message key="tickler.add.title" bundle="ui"/></h4>
+    <h3><bean:message key="tickler.add.title" bundle="ui"/></h3>
 </div>  
 <div class="modal-body">
 	<div class="row" ng-show="showErrors === true">
@@ -40,14 +40,13 @@
 
 	<div class="row">
 		<div class="col-xs-7">
-				<div class="form-group">
-				  <label>Patient:</label>
-				 <input type="text" ng-model="tickler.demographicName" placeholder="<bean:message key="tickler.add.patient" bundle="ui"/>" 
+			<div class="form-group">
+				<label>Patient:</label>
+				<input type="text" ng-model="tickler.demographicName" placeholder="<bean:message key="tickler.add.patient" bundle="ui"/>" 
 				uib-typeahead="pt.demographicNo as pt.name for pt in searchPatients($viewValue)" 
 				typeahead-on-select="updateDemographicNo($item, $model, $label)"
 				class="form-control">
-				
-				</div>
+			</div>
 		
 		</div>
 		<div class="col-xs-5">
@@ -56,9 +55,9 @@
 					<img width="60px" ng-src="../imageRenderingServlet?source=local_client&clientId={{tickler.demographic.demographicNo}}"/>
 				</div>
 				<div class="col-xs-9">
-				<div>{{tickler.demographic.lastName}}, {{tickler.demographic.firstName}}</div>
-				<div>{{tickler.demographic.hin}}</div>
-				<div>{{tickler.demographic.dateOfBirth | date : 'yyyy-MM-dd'}}</div>
+					<div class="blue-text"><h4 class="no-margin">{{tickler.demographic.lastName}}, {{tickler.demographic.firstName}}</h4></div>
+					<div>{{tickler.demographic.hin}}</div>
+					<div>{{tickler.demographic.dateOfBirth | date : 'yyyy-MM-dd'}}</div>
 				</div>
 			</div>
 	
@@ -67,23 +66,22 @@
 
 	<div class="row">
 		<div class="col-xs-7">
-				<div class="form-group">
-				  <label>Assign to:</label>
-				 <input type="text" ng-model="tickler.taskAssignedToName" placeholder="<bean:message key="tickler.add.provider" bundle="ui"/>" 
-				typeahead="pt.providerNo as pt.name for pt in searchProviders($viewValue)" 
+			<div class="form-group">
+				<label>Assign to:</label>
+				<input type="text" ng-model="tickler.taskAssignedToName" placeholder="<bean:message key="tickler.add.provider" bundle="ui"/>" 
+				uib-typeahead="pt.providerNo as pt.name for pt in searchProviders($viewValue)" 
 				typeahead-on-select="updateProviderNo($item, $model, $label)"
 				class="form-control">
-				
-				</div>
+			</div>
 			
 		</div>
 		
 		<div class="col-xs-5">
-		<div class="form-group">
-				  <label><bean:message key="tickler.add.priority" bundle="ui"/>:</label>
-				  <select ng-model="tickler.priority" ng-init="tickler.priority='Normal'" ng-options="p for p in priorities" class="form-control">
-				  </select>
-				</div>
+			<div class="form-group">
+				<label><bean:message key="tickler.add.priority" bundle="ui"/>:</label>
+				<select ng-model="tickler.priority" ng-init="tickler.priority='Normal'" ng-options="p for p in priorities" class="form-control">
+				</select>
+			</div>
 		</div>
 	</div>	
 	
@@ -128,8 +126,8 @@
 
 </div>
 <div class="modal-footer">
-    <button class="btn" ng-click="save()"><bean:message key="global.save" bundle="ui"/></button>
-    <button class="btn" ng-click="close()"><bean:message key="global.close" bundle="ui"/></button>
+    <button class="btn btn-default" ng-click="close()"><bean:message key="global.close" bundle="ui"/></button>
+	 <button class="btn btn-success" ng-click="save()"><bean:message key="global.save" bundle="ui"/></button>
 </div>
 </form>
 

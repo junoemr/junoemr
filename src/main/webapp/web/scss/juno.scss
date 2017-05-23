@@ -5,6 +5,8 @@
 @import "../bower_components/bootstrap-sass/assets/stylesheets/bootstrap";
 @import "bootstrap/forms";
 @import "bootstrap/navbar";
+// Non-bootstrap overrides
+@import "datepicker";
 // bootstrap-timepicker does not provide a CSS file so compile as SCSS
 @import "bootstrap-timepicker/timepicker";
 // Global stuff
@@ -13,7 +15,9 @@
 @import "navbar-fixed-top";
 @import "../patientlist/patient-list";
 @import "index";
-@import "../record/record";
 // Section-specific things
 @import "../common/directives/patientSelectorOption";
 @import "../dashboard/dashboard";
+@import "../record/record";
+@import "../record/summary/summary";
+

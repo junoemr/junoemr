@@ -387,21 +387,31 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			$scope.trackerUrl = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo + '&numEle=4&tracker=slim';
 		};
 
-		var initialDisplayLimit = 5;
+		// var initialDisplayLimit = 5;
+
 		$scope.toggleList = function(mod)
 		{
-			i = initialDisplayLimit;
+			// i = initialDisplayLimit;
 
-			if (mod.summaryItem.length > i)
+			// if (mod.summaryItem.length > i)
+			// {
+			// 	if (mod.displaySize > i)
+			// 	{
+			// 		mod.displaySize = i;
+			// 	}
+			// 	else
+			// 	{
+			// 		mod.displaySize = mod.summaryItem.length;
+			// 	}
+			// }
+
+			if (mod.displaySize >= mod.summaryItem.length)
 			{
-				if (mod.displaySize > i)
-				{
-					mod.displaySize = i;
-				}
-				else
-				{
-					mod.displaySize = mod.summaryItem.length;
-				}
+				mod.displaySize = 0;
+			}
+			else
+			{
+				mod.displaySize = mod.summaryItem.length;
 			}
 		};
 
@@ -421,31 +431,60 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return true;
 		};
 
-		$scope.showMoreItemsSymbol = function(mod)
+		// Return true if a given section is expanded, otherwise return false
+		$scope.isSectionExpanded = function(mod)
 		{
-			if (!angular.isDefined(mod.summaryItem))
+			if (mod.displaySize > 0)
 			{
-				return "";
+				return true;
 			}
 
-			if ((mod.displaySize < mod.summaryItem.length) && mod.displaySize == initialDisplayLimit)
-			{
-				return "glyphicon glyphicon-chevron-down hand-hover pull-right";
-			}
-			else if ((mod.displaySize == mod.summaryItem.length) && mod.displaySize != initialDisplayLimit)
-			{
-				return "glyphicon glyphicon-chevron-up hand-hover pull-right";
-			}
-			else if (mod.summaryItem.length <= initialDisplayLimit)
-			{
-				return "glyphicon glyphicon-chevron-down glyphicon-chevron-down-disabled pull-right";
-			}
-			else
-			{
-				return "";
-			}
-
+			return false;
 		};
+
+		// Return true if a given section is empty, otherwise return false
+		$scope.isSectionEmpty = function(mod)
+		{
+			if (mod.summaryItem.length <= 0)
+			{
+				return true;
+			}
+
+			return false;
+		};
+
+		// $scope.showMoreItemsSymbol = function(mod)
+		// {
+		// 	if (!angular.isDefined(mod.summaryItem))
+		// 	{
+		// 		return "";
+		// 	}
+
+		// 	if ((mod.displaySize < mod.summaryItem.length) && mod.displaySize == initialDisplayLimit)
+		// 	{
+		// 		return "glyphicon glyphicon-chevron-down hand-hover pull-right";
+		// 	}
+		// 	else if ((mod.displaySize == mod.summaryItem.length) && mod.displaySize != initialDisplayLimit)
+		// 	{
+		// 		return "glyphicon glyphicon-chevron-up hand-hover pull-right";
+		// 	}
+		// 	else if (mod.summaryItem.length <= initialDisplayLimit)
+		// 	{
+		// 		return "glyphicon glyphicon-chevron-down glyphicon-chevron-down-disabled pull-right";
+		// 	}
+		// 	else
+		// 	{
+		// 		return "";
+		// 	}
+
+		// 	if ($scope.isSectionExpanded(mod))
+		// 	{
+		// 		return "glyphicon glyphicon-chevron-up hand-hover pull-right";
+		// 	}
+
+		// 	return "glyphicon glyphicon-chevron-down hand-hover pull-right";
+
+		// };
 
 		function getLeftItems()
 		{

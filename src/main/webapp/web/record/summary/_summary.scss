@@ -1,0 +1,85 @@
+#middle-space {
+	overflow-y: auto;
+	height: 70vh;
+}
+
+.well-note {
+	border-color: #d2d2d2;
+	box-shadow: 0 1px 0 #cfcfcf;
+	border-radius: 3px;
+	/*not sure if this will stay*/
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+.note-container {
+	&:hover {
+		// border: 2px solid $primary-blue;
+		// box-shadow: 5px 5px 2px #888888;
+		box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
+		transition: box-shadow 0.1s ease-in-out;
+	}
+	cursor: pointer;
+}
+
+legend {
+	/*color: #636363;*/
+	color: #3963c2;
+	font-size: 16px;
+	a {
+		color: #636363;
+		font-size: 13px;
+	}
+}
+
+.summary-section {
+	border-bottom: 1px solid;
+	border-bottom-color: #e9e9e9;
+}
+
+.summary-section-heading {
+	color: #1c56af;
+	font-weight: bold;
+	&:hover {
+		cursor: pointer;
+	}
+}
+
+.note-header-name {
+	font-weight: bold;
+	color: #3963c2;
+}
+
+.note {
+	border: 1px solid #e9e9e9;
+	border-radius: 5px;
+	margin-bottom: 20px;
+}
+
+.note-header-date {
+	color: #636363;
+	text-align: right;
+}
+
+.note-header {
+	background-color: #f3f3f3;
+	/*border-bottom: 1px solid #e9e9e9;*/
+	/*padding: 10px;*/
+}
+
+.note-body {
+	padding: 10px;
+}
+
+.note-footer {
+	/*border-top: 1px solid #e9e9e9;*/
+	font-size: 11px;
+}
+
+.note-footer-right {
+	text-align: right;
+}
+
+.note-divider {
+	margin-bottom: 10px;
+}

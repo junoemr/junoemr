@@ -48,12 +48,14 @@
 			<fieldset class="summary-section" ng-repeat="mod in page.columnOne.modules">
 				<div class="row vertical-align">
 					<div class="col-md-8 col-sm-8">
-						<h5 class="summary-section-heading">
+						<h5 class="summary-section-heading" ng-click="toggleList(mod)">
 							{{mod.displayName}} 
 						</h5>
 					</div>
 					<div class="col-md-4 col-sm-4">
-						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" ng-click="openPreventions(demographicNo)" ng-if="mod.summaryCode=='preventions'">
+						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" 
+							ng-click="openPreventions(demographicNo)" 
+							ng-if="mod.summaryCode=='preventions'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</a>
 
@@ -62,22 +64,29 @@
 								Add <span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>
 						</a>--%>
 
-						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" ng-click="gotoState('add', mod)" ng-disabled="page.cannotAdd" 
+						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" 
+							ng-click="gotoState('add', mod)" 
+							ng-disabled="page.cannotAdd" 
 							ng-if="mod.summaryCode=='othermeds' || mod.summaryCode=='ongoingconcerns' || 
-							mod.summaryCode=='medhx' || mod.summaryCode=='sochx' || mod.summaryCode=='famhx' || 
-							mod.summaryCode=='reminders' || mod.summaryCode=='riskfactors' || mod.summaryCode=='riskfactors' ">
-							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
+								mod.summaryCode=='medhx' || mod.summaryCode=='sochx' || mod.summaryCode=='famhx' || 
+								mod.summaryCode=='reminders' || mod.summaryCode=='riskfactors' || mod.summaryCode=='riskfactors' ">
+								Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</a>
 
-						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" ng-click="openRx(demographicNo)" ng-if="mod.summaryCode=='meds'">
+						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" 
+							ng-click="openRx(demographicNo)" 
+							ng-if="mod.summaryCode=='meds'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</a>
 						
-						<a href="javascript:void(0)"  class=" btn btn-xs btn-success pull-right" ng-click="openAllergies(demographicNo)" ng-if="mod.summaryCode=='allergies'">
+						<a href="javascript:void(0)"  class=" btn btn-xs btn-success pull-right" 
+							ng-click="openAllergies(demographicNo)" 
+							ng-if="mod.summaryCode=='allergies'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</a>
 
-						<a href="#/record/{{demographicNo}}/forms" class="btn btn-xs btn-success pull-right" ng-if="mod.summaryCode=='assessments'">
+						<a href="#/record/{{demographicNo}}/forms" class="btn btn-xs btn-success pull-right" 
+							ng-if="mod.summaryCode=='assessments'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</a>
 					</div>
@@ -86,19 +95,31 @@
 
 				<ul class="list-unstyled" style="padding-left:5px;">
 					<%-- href="{{item.action}}" --%>
-					<li ng-repeat="item in mod.summaryItem" ng-show="$index < mod.displaySize"><p><span class="pull-right">{{item.date | date : 'dd MMM yyyy'}}</span></p><a ng-click="gotoState(item,mod,item.id)" href="javascript:void(0)" ng-class="item.indicatorClass">{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}<small ng-show="item.classification">({{item.classification}})</small></a> </li> 			
+					<li ng-repeat="item in mod.summaryItem" ng-show="isSectionExpanded(mod)" >
+						<p><span class="pull-right">{{item.date | date : 'dd MMM yyyy'}}</span></p>
+						<a ng-click="gotoState(item,mod,item.id)" href="javascript:void(0)" ng-class="item.indicatorClass">{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}
+							<small ng-show="item.classification">({{item.classification}})</small>
+						</a> 
+					</li> 			
 					<%--<a href="#" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-click="openPreventions(demographicNo)" ng-show="mod.summaryCode=='preventions'"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>
 					<a href="#" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-click="gotoState('add', mod)" ng-hide="mod.summaryCode=='meds' || mod.summaryCode=='assessments' || mod.summaryCode=='allergies' || mod.summaryCode=='preventions' || page.cannotAdd"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>
 					<a href="#" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-click="openRx(demographicNo)" ng-show="mod.summaryCode=='meds'"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>
 					<a href="#" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-click="openAllergies(demographicNo)" ng-show="mod.summaryCode=='allergies'"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>
 					<a href="#/record/{{demographicNo}}/forms" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-show="mod.summaryCode=='assessments'"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>--%>
 				</ul>
+				<span class="glyphicon hand-hover pull-right glyphicon-chevron-up"  
+						ng-click="toggleList(mod)" 
+						ng-show="isSectionExpanded(mod) && !isSectionEmpty(mod)" >
+				</span>
+				<span class="glyphicon hand-hover pull-right glyphicon-chevron-down" 
+						ng-click="toggleList(mod)"
+						ng-show="!isSectionExpanded(mod) && !isSectionEmpty(mod)">
+				</span>
 
-			<span ng-class="showMoreItemsSymbol(mod)" ng-click="toggleList(mod)" ng-show="showMoreItems(mod)"></span>
 		</fieldset>   
 		</div>
 
-		<div class="col-md-6" id="middleSpace" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+		<div class="col-md-6" id="middle-space" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 			<div class="tab-content">
 				<div class="tab-pane active" id="all">
 					<%--<dl infinite-scroll="addMoreItems()">
@@ -125,7 +146,10 @@
 
 					<div infinite-scroll="addMoreItems()">
 						
-						<div class="col-sm-11 note pull-right" ng-repeat="note in page.notes.notelist" ng-style="setColor(note)" >
+						<div class="note-container col-sm-11 note pull-right" 
+								ng-repeat="note in page.notes.notelist" 
+								ng-style="setColor(note)" 
+								ng-click="editNote(note)">
 							<div class="row note-header" ng-show="showNoteHeader(note)" >
 								<div class="col-xs-1 pull-left">
 									<input type="checkbox" ng-model="note.isSelected"/> 
@@ -137,7 +161,11 @@
 									<h6>{{note.observationDate | date : 'dd-MMM-yyyy'}}</h6>
 								</div>
 							</div>
-							<div class="row note-body" ng-class="isNoteBeingEdited(note)" ng-show="showNote(note)"  ng-hide="note.cpp==true" ng-dblclick="editNote(note)">
+							<div class="row note-body" 
+									ng-class="isNoteBeingEdited(note)" 
+									ng-show="showNote(note)"  
+									ng-hide="note.cpp==true" 
+									ng-dblclick="editNote(note)">
 								<p >
 									{{note.note}}
 								</p>
@@ -197,7 +225,7 @@
 				</legend>
 				<ul style="padding-left:12px;">
 					<%-- href="{{item.action}}" --%>
-					<li ng-repeat="item in mod.summaryItem | filter:incomingQ" ng-show="$index < mod.displaySize"  >
+					<li ng-repeat="item in mod.summaryItem | filter:incomingQ" ng-show="isSectionExpanded(mod)"  >
 						<span class="pull-right">{{item.date | date : 'dd-MMM-yyyy'}}</span>
 						<a ng-click="gotoState(item)" class="hand-hover" ng-class="{true: 'abnormal', false: ''}[item.abnormalFlag]">{{item.displayName}}
 							<small ng-show="item.classification">({{item.classification}})</small>
@@ -205,7 +233,15 @@
 					</li> 
 				</ul>
 						
-				<span ng-class="showMoreItemsSymbol(mod)" ng-click="toggleList(mod)" ng-show="showMoreItems(mod)"></span>
+				<%--<span ng-class="showMoreItemsSymbol(mod)" ng-click="toggleList(mod)" ng-show="showMoreItems(mod)"></span>--%>
+				<span class="glyphicon hand-hover pull-right glyphicon-chevron-up"  
+						ng-click="toggleList(mod)" 
+						ng-show="isSectionExpanded(mod) && !isSectionEmpty(mod)" >
+				</span>
+				<span class="glyphicon hand-hover pull-right glyphicon-chevron-down" 
+						ng-click="toggleList(mod)"
+						ng-show="!isSectionExpanded(mod) && !isSectionEmpty(mod)">
+				</span>
 			</fieldset>
 			
 		<%-- 
