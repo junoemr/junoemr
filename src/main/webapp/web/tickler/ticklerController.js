@@ -3,7 +3,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 	'$scope',
 	'$timeout',
 	'$resource',
-	'$defer',
 	'NgTableParams',
 	'securityService',
 	'$uibModal',
@@ -19,7 +18,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		$scope,
 		$timeout,
 		$resource,
-		$defer,
 		NgTableParams,
 		securityService,
 		$uibModal,
@@ -32,6 +30,8 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 	{
 
 		var ticklerAPI = $resource('../ws/rs/tickler/ticklers');
+
+		console.log("Params: ", $resource);
 
 		$scope.lastResponse = "";
 		$scope.providers = providers;
@@ -70,7 +70,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 						count: 10
 					},
 					{
-						total: 0, // length of data
+						// total: 0, // length of data
 						getData: function(params)
 						{
 							// ajax request to api
@@ -86,19 +86,28 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 								$scope.search.demographicNo = $stateParams.demographicNo;
 							}
 
-							ticklerAPI.get($scope.search, function(data)
+							return ticklerAPI.get($scope.search).$promise.then(function(data)
 							{
-								$timeout(function()
-								{
-
-									// update table params
-									params.total(data.total);
-									// set new data
-									$defer.resolve(data.tickler);
-
-									$scope.lastResponse = data.tickler;
-								}, 500);
+								params.total(data.total); // recal. page nav controls
+								return data.content;
 							});
+
+							// ticklerAPI.get($scope.search, function(data)
+							// {
+							// 	console.log("DATA: ", data);
+							// 	$timeout(function()
+							// 	{
+
+							// 		// update table params
+							// 		params.total(data.total);
+							// 		// set new data
+							// 		// $defer.resolve(data.tickler);
+
+							// 		$scope.lastResponse = data.tickler;
+							// 	}, 500);
+							// });
+
+
 						}
 					});
 				}
@@ -129,21 +138,28 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			$scope.tableParams.reload();
 		};
 
-
-
-		$scope.checkAll = function()
+		$scope.checkAll = function checkAll(data)
 		{
-			angular.forEach($scope.lastResponse, function(item)
+			angular.forEach(data, function(tickler)
 			{
-				item.checked = true;
+				tickler.checked = true;
 			});
 		};
 
-		$scope.checkNone = function()
+		// $scope.checkAll = function()
+		// {
+
+		// 	angular.forEach($scope.lastResponse, function(item)
+		// 	{
+		// 		item.checked = true;
+		// 	});
+		// };
+
+		$scope.checkNone = function checkNone(data)
 		{
-			angular.forEach($scope.lastResponse, function(item)
+			angular.forEach(data, function(tickler)
 			{
-				item.checked = false;
+				tickler.checked = false;
 			});
 		};
 
@@ -196,7 +212,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'tickler/ticklerAdd.jsp',
-				controller: 'TicklerAddController',
+				controller: 'Tickler.TicklerAddController',
 				backdrop: false,
 				size: 'lg'
 			});
@@ -283,7 +299,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 				var modalInstance = $uibModal.open(
 				{
 					templateUrl: 'tickler/ticklerNote.jsp',
-					controller: 'TicklerNoteController',
+					controller: 'Tickler.TicklerNoteController',
 					resolve:
 					{
 						ticklerNote: function()
@@ -309,7 +325,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'tickler/ticklerComments.jsp',
-				controller: 'TicklerCommentController',
+				controller: 'Tickler.TicklerCommentController',
 				resolve:
 				{
 					tickler: function()

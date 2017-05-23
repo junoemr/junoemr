@@ -31,12 +31,12 @@
     </div>
     <div class="modal-body">
         <div class="row margin-bottom" ng-if="appointment.demographic != null">
-            <div class="col-md-12 col-xs-11">
-                <div class="col-xs-2 pull-right">
+            <div class="col-sm-10 col-sm-offset-1">
+                <div class="col-sm-2 pull-right">
                     <img class="img-rounded" 
                         ng-src="../imageRenderingServlet?source=local_client&clientId={{appointment.demographic.demographicNo}}"/>
                 </div>
-                <div class="col-xs-2 text-right pull-right">
+                <div class="col-sm-2 text-right pull-right">
                     <div class="row blue-text"><h4 class="no-margin">{{appointment.demographic.lastName}},
                         {{appointment.demographic.firstName}}</h4>
                     </div>

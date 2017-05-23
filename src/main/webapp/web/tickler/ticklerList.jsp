@@ -84,9 +84,9 @@
 	</div>        	
 </form>
 
-<table ng-table="tableParams" show-filter="false" class="table">
+<table ng-table="tableParams" show-filter="false" class="table table-striped tickler-table">
   <tbody>
-  
+
     <tr ng-repeat="tickler in $data">
  		<td ng-show="ticklerWriteAccess">
  			<input type="checkbox" ng-model="tickler.checked" class="noprint">
@@ -94,9 +94,10 @@
     	<td ng-show="ticklerWriteAccess" >
     		<button ng-click="editTickler(tickler)" class="btn btn-xs btn-primary noprint"><bean:message key="global.edit" bundle="ui"/></button> 		
     	</td>
-    	<td ng-show="!ticklerWriteAccess" >
+		<%--Remove this?--%>
+    	<%--<td ng-show="!ticklerWriteAccess" >
     		<a ng-click="editTickler(tickler)" class="hand-hover"><bean:message key="global.view" bundle="ui"/></a> 		
-    	</td>
+    	</td>--%>
 		<td data-title="'<bean:message key="tickler.list.header.patientName" bundle="ui"/>'">
               {{tickler.demographicName}}
         </td>
@@ -128,17 +129,18 @@
 		 	</span>
         </td>      
         <td ng-show="ticklerWriteAccess" data-title="''">     
-    		<a ng-click="editNote2(tickler)" class="hand-hover noprint"><img src="../images/notepad.gif" border="0"></a>
+    		<a ng-click="editNote2(tickler)" class="hand-hover noprint"><span class="glyphicon glyphicon-edit" ></span></a>
     	</td>  
     </tr>
   </tbody>
 
     <tfoot ng-show="ticklerWriteAccess" class="noprint">   
         <tr><td colspan="11" class="white">
-        	<a ng-click="checkAll()"><bean:message key="tickler.list.checkAll" bundle="ui"/></a> - <a ng-click="checkNone()"><bean:message key="tickler.list.checkNone" bundle="ui"/></a> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            <button class="btn btn-success" name="button" type="button" ng-click="addTickler()"><bean:message key="tickler.list.add" bundle="ui"/></button>
-             <button class="btn btn-default" type="button" ng-click="completeTicklers()"><bean:message key="tickler.list.complete" bundle="ui"/></button>
-             <button class="btn btn-default"  type="button" ng-click="deleteTicklers()"><bean:message key="tickler.list.delete" bundle="ui"/></button>
+        	<a ng-click="checkAll($data)"><bean:message key="tickler.list.checkAll" bundle="ui"/></a> - 
+			<a ng-click="checkNone($data)"><bean:message key="tickler.list.checkNone" bundle="ui"/></a> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+			<button class="btn btn-danger"  type="button" ng-click="deleteTicklers()"><bean:message key="tickler.list.delete" bundle="ui"/></button>
+			<button class="btn btn-warning" type="button" ng-click="completeTicklers()"><bean:message key="tickler.list.complete" bundle="ui"/></button>
+			<button class="btn btn-success" name="button" type="button" ng-click="addTickler()"><bean:message key="tickler.list.add" bundle="ui"/></button>
            </td>
        </tr>
    </tfoot>

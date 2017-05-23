@@ -20,6 +20,16 @@
 	padding: 0;
 }
 
+.max-width {
+	width: 100%;
+}
+
 .blue-text {
 	color: $primary-blue-text;
+}
+
+a {
+	&:hover {
+		cursor: pointer;
+	}
 }

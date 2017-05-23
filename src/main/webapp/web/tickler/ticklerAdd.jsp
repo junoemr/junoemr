@@ -27,6 +27,7 @@
 <form name="ticklerAddForm" novalidate>
 
 <div class="modal-header">
+	<button type="button" class="close" ng-click="close()" aria-label="Close">&times;</button>
     <h3><bean:message key="tickler.add.title" bundle="ui"/></h3>
 </div>  
 <div class="modal-body">

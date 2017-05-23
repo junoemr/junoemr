@@ -40,7 +40,8 @@
 	</div>
 
 	<div class="modal-body">
-		<div class="row">			
+		<%--Remove this?--%>
+		<%--<div class="row">			
 			<!-- TODO: what happens here if there is a long list of notes??? -->
 			<div class="col-sm-10 col-sm-offset-1">
 				<div class="well well-note">
@@ -83,15 +84,24 @@
 				</div>
 				<hr>	
 			</div>
-		</div>  
+		</div>  --%>
 		
 		<div class="row">
 			<div class="col-sm-10 col-sm-offset-1">
 				<form id="frmIssueNotes"> 
 					<div class="form-group col-xs-12"> 
 						<label class=" control-label">Note</label>
-						<textarea class="form-control" rows="5" placeholder="Enter Note" ng-model="groupNotesForm.encounterNote.note" ng-change="setEditingNoteFlag()" style="margin-bottom:6px;" required></textarea>
-							
+						<textarea class="form-control" rows="8" placeholder="Enter Note" ng-model="groupNotesForm.encounterNote.note" ng-change="setEditingNoteFlag()" style="margin-bottom:6px;" required></textarea>
+						<em><small><bean:message key="oscarEncounter.editors.title"/>: <span>{{ groupNotesForm.encounterNote.providerName }}</span></small></em>  
+						<div class="pull-right">
+							<em>
+								<small>
+									<bean:message key="oscarEncounter.encounterDate.title"/>: <span>{{groupNotesForm.encounterNote.updateDate | date : 'dd-MMM-yyyy'}}</span>  
+									<bean:message key="oscarEncounter.noteRev.title"/>: <a href="javascript:void(0)" ng-click="openRevisionHistory(groupNotesForm.encounterNote)">{{groupNotesForm.encounterNote.revision}}</a>
+								</small>
+							</em>
+						</div>
+						<hr>
 					</div>
 							
 					<%--<div class="form-group col-xs-6" ng-if="groupNotesForm.assignedCMIssues != null && groupNotesForm.assignedCMIssues.length > 0">
