@@ -364,6 +364,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="common/directives/module.js"></script>
 	<script type="text/javascript" src="common/directives/typeaheadHelper.js"></script>
 	<script type="text/javascript" src="common/directives/patientSearchTypeahead.js"></script>
+	<script type="text/javascript" src="common/directives/datepickerPopup.js"></script>
+	<script type="text/javascript" src="common/directives/timepickerPopup.js"></script>
 
 	<script type="text/javascript" src="layout/module.js"></script>
 	<script type="text/javascript" src="layout/bodyController.js"></script>
