@@ -88,9 +88,29 @@ angular.module("Common.Services").service("demographicService", [
 			return deferred.promise;
 		};
 
+		service.quickSearch = function quickSearch(search)
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + 'demographics/quickSearch?query=' +
+				encodeURIComponent(search)).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("demographicServices::quickSearch error", error);
+					deferred.reject("An error occurred while searching");
+				});
+
+			return deferred.promise;
+		};
+
 		service.search = function search(search, startIndex, itemsToReturn)
 		{
 			var deferred = $q.defer();
+
 			$http.post(service.apiPath + 'demographics/search?startIndex=' +
 				encodeURIComponent(startIndex) + "&itemsToReturn=" +
 				encodeURIComponent(itemsToReturn), search).then(
@@ -107,27 +127,10 @@ angular.module("Common.Services").service("demographicService", [
 			return deferred.promise;
 		};
 
-		service.quickSearch = function quickSearch(search)
-		{
-			var deferred = $q.defer();
-			$http.get(service.apiPath + 'demographics/quickSearch?query=' +
-				encodeURIComponent(search)).then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("demographicServices::quickSearch error", error);
-					deferred.reject("An error occurred while searching");
-				});
-
-			return deferred.promise;
-		};
-
 		service.searchIntegrator = function searchIntegrator(search, itemsToReturn)
 		{
 			var deferred = $q.defer();
+
 			$http.post(service.apiPath + 'demographics/searchIntegrator?itemsToReturn=' +
 				encodeURIComponent(itemsToReturn), search).then(
 				function success(response)

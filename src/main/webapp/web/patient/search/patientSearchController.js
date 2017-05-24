@@ -26,134 +26,138 @@
 
  */
 angular.module('Patient.Search').controller('Patient.Search.PatientSearchController', [
-	'$uibModal',
-	'$http',
-	'$scope',
-	'$timeout',
-	'$resource',
+
+	'$q',
 	'$state',
 	'$stateParams',
-	'$location',
+	'$uibModal',
 	'NgTableParams',
 	'securityService',
 	'demographicService',
 
 	function(
-		$uibModal,
-		$http,
-		$scope,
-		$timeout,
-		$resource,
+		$q,
 		$state,
 		$stateParams,
-		$location,
+		$uibModal,
 		NgTableParams,
 		securityService,
 		demographicService)
 	{
+		var controller = {};
 
-		var quickSearchTerm = ($location.search()).term;
+		//=========================================================================
+		// Initialization
+		//=========================================================================
 
-		//type and term for now
-		$scope.search = {
-			type: 'Name',
-			term: "",
-			active: true,
-			integrator: false,
-			outofdomain: true
+		controller.demographicReadAccess = null;
+		controller.search = null;
+
+		controller.init = function init()
+		{
+			controller.clearParams();
+			if(Juno.Common.Util.exists($stateParams.term))
+			{
+				controller.search.term = $stateParams.term;
+			}
+
+			securityService.hasRights({
+				items: [
+					{
+						objectName: '_demographic',
+						privilege: 'r'
+					}]
+			}).then(
+				function(result)
+				{
+					if (Juno.Common.Util.exists(result.content) && result.content.length === 1)
+					{
+						controller.demographicReadAccess = result.content[0];
+						if (controller.demographicReadAccess)
+						{
+							controller.initTable();
+						}
+					}
+					else
+					{
+						console.log('failed to load rights', result);
+						controller.demographicReadAccess = false;
+					}
+				},
+				function error(error)
+				{
+					console.log('failed to load rights', error);
+					controller.demographicReadAccess = false;
+				});
 		};
 
-		$scope.lastResponse = '';
+		//=========================================================================
+		// Methods
+		//=========================================================================
 
-		securityService.hasRights(
+		controller.initTable = function initTable()
 		{
-			items: [
-			{
-				objectName: '_demographic',
-				privilege: 'w'
-			},
-			{
-				objectName: '_demographic',
-				privilege: 'r'
-			}]
-		}).then(function(result)
-		{
-			if (result.content != null && result.content.length == 2)
-			{
-				$scope.demographicWriteAccess = result.content[0];
-				$scope.demographicReadAccess = result.content[1];
-
-				if ($scope.demographicReadAccess)
+			controller.tableParams = new NgTableParams(
 				{
-					$scope.tableParams = new NgTableParams(
+					page: 1,
+					count: 10,
+					sorting: {
+						Name: 'asc'
+					}
+				},
+				{
+					getData: function(params)
 					{
-						page: 1, // show first page
-						count: 10,
-						sorting:
+						var deferred = $q.defer();
+
+						var count = params.url().count;
+						var page = params.url().page;
+
+						controller.search.params = params.url();
+
+						var promiseArray = [];
+						promiseArray.push(demographicService.search(
+							controller.search, ((page - 1) * count), count));
+
+						controller.integratorResults = null;
+						if(controller.search.integrator)
 						{
-							Name: 'asc' // initial sorting
+							promiseArray.push(demographicService.searchIntegrator(
+								controller.search, 100));
 						}
-					},
-					{
-						getData: function(params)
-						{
-							$scope.integratorResults = null;
-							var count = params.url().count;
-							var page = params.url().page;
 
-							$scope.search.params = params.url();
+						$q.all(promiseArray).then(
+							function success(promiseResults)
+							{
+								var demographicSearchResults = promiseResults[0];
+								params.total(demographicSearchResults.total);
 
-							demographicService.search($scope.search, ((page - 1) * count), count).then(function(result)
+								if(controller.search.integrator)
+								{
+									controller.integratorResults = promiseResults[1];
+								}
+
+								deferred.resolve(demographicSearchResults.content);
+							},
+							function error(promiseErrors)
 							{
-								params.total(result.total);
-								// $defer.resolve(result.content);
-								$scope.lastResponse = result.content;
-							}, function(reason)
-							{
-								alert("demo-service:" + reason);
+								console.log('patient search failed', promiseErrors);
+								deferred.reject();
 							});
 
-							if ($scope.search.integrator == true)
-							{
-								//Note - I put in this arbitrary maximum
-								demographicService.searchIntegrator($scope.search, 100).then(function(result)
-								{
-									$scope.integratorResults = result;
-								}, function(reason)
-								{
-									alert("remote-demo-service:" + reason);
-								});
-							}
-						}
-					});
-					if (quickSearchTerm != null)
-					{
-						$scope.search.term = quickSearchTerm;
-						$scope.tableParams.reload();
+						return deferred.promise;
 					}
-				}
-			}
-			else
-			{
-				alert('failed to load rights');
-			}
-		}, function(reason)
+				});
+		};
+
+		controller.searchPatients = function searchPatients()
 		{
-			alert(reason);
-		});
-
-
-
-
-		$scope.doSearch = function()
-		{
-			if ($scope.search.type == "DOB")
+			if(controller.search.type === "DOB")
 			{
-				if ($scope.search.term.match("^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$") || $scope.search.term.match("^[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}$"))
+				var dobMoment = moment(controller.search.term, ["YYYY-MM-DD", "YYYY/MM/DD"], true);
+				if(dobMoment.isValid())
 				{
-					$scope.search.term = $scope.search.term.replace(/\//g, "-");
-					var datePart = $scope.search.term.split("-");
-					$scope.search.term = datePart[0] + "-" + pad0(datePart[1]) + "-" + pad0(datePart[2]);
+					controller.search.term = dobMoment.format("YYYY-MM-DD");
 				}
 				else
 				{
@@ -161,73 +165,83 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 					return;
 				}
 			}
-			$scope.tableParams.reload();
+			controller.tableParams.reload();
 		};
 
-		$scope.doClear = function()
+		controller.clearParams = function(searchType)
 		{
-			$scope.search = {
-				type: 'Name',
-				term: "",
+			// default search type
+			if(!Juno.Common.Util.exists(searchType))
+			{
+				searchType = 'Name';
+			}
+
+			// reset the parameters
+			controller.search = {
+				type: searchType,
+				term: '',
 				active: true,
 				integrator: false,
 				outofdomain: true
 			};
-			$scope.tableParams.reload();
+
+			// update the placeholder
+			controller.searchTermPlaceHolder = (controller.search.type === "DOB") ?
+				"YYYY-MM-DD" : "Search Term";
+
+			// do the search (if initialized)
+			if(Juno.Common.Util.exists(controller.tableParams))
+			{
+				controller.tableParams.reload();
+			}
 		};
 
-		$scope.clearButMaintainSearchType = function()
+		controller.toggleParam = function toggleParam(param)
 		{
-			$scope.search = {
-				type: $scope.search.type,
-				term: "",
-				active: true,
-				integrator: false,
-				outofdomain: true
-			};
-			$scope.tableParams.reload();
-
-			if ($scope.search.type == "DOB") $scope.searchTermPlaceHolder = "YYYY-MM-DD";
-			else $scope.searchTermPlaceHolder = "Search Term";
+			if(['active', 'integrator', 'outofdomain'].indexOf(param) > -1)
+			{
+				controller.search[param] = !controller.search[param];
+			}
 		};
 
-		$scope.searchTermPlaceHolder = "Search Term";
-
-		$scope.loadRecord = function(demographicNo)
+		controller.loadRecord = function(demographicNo)
 		{
 			$state.go('record.details',
-			{
-				demographicNo: demographicNo,
-				hideNote: true
-			});
+				{
+					demographicNo: demographicNo,
+					hideNote: true
+				});
 		};
 
-		$scope.showIntegratorResults = function()
+		controller.showIntegratorResults = function()
 		{
-			var result = ($scope.integratorResults != null && $scope.integratorResults.total > 0) ? $scope.integratorResults.content : [];
-			var total = ($scope.integratorResults != null) ? $scope.integratorResults.total : 0;
-			var modalInstance = $uibModal.open(
+			var results = [];
+			var total = 0;
+
+			if(Juno.Common.Util.exists(controller.integratorResults))
 			{
-				templateUrl: 'patientsearch/remotePatientResults.jsp',
-				controller: 'RemotePatientResultsController',
-				resolve:
+				results = controller.integratorResults.content;
+				total = controller.integratorResults.total;
+			}
+
+			$uibModal.open(
 				{
-					results: function()
-					{
-						return result;
-					},
-					total: function()
-					{
-						return total;
-					}
-				}
-			});
+					templateUrl: 'patientsearch/remotePatientResults.jsp',
+					controller: 'RemotePatientResultsController',
+					resolve:
+						{
+							results: function()
+							{
+								return results;
+							},
+							total: function()
+							{
+								return total;
+							}
+						}
+				});
 		};
+
+		return controller;
 	}
 ]);
-
-function pad0(n)
-{
-	if (n.length > 1) return n;
-	else return "0" + n;
-}

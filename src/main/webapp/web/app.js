@@ -104,9 +104,12 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		})
 		.state('search',
 		{
-			url: '/search?term',
+			url: '/search',
 			templateUrl: 'patient/search/patientSearch.jsp',
-			controller: 'Patient.Search.PatientSearchController'
+			controller: 'Patient.Search.PatientSearchController as patientSearchCtrl',
+			params: {
+				term: null
+			}
 		})
 		.state('reports',
 		{

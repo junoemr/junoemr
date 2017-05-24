@@ -15,7 +15,8 @@
     "bootstrap-timepicker": "^0.5.2",
     "hogan.js": "hogan#^3.0.2",
     "typeahead.js": "^0.9.3",
-    "components-font-awesome": "^4.7.0"
+    "components-font-awesome": "^4.7.0",
+    "moment": "^2.18.1"
   },
   "resolutions": {
     "angular": "~1.6.0",
