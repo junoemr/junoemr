@@ -315,13 +315,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
 	<script type="text/javascript" src="bower_components/pym.js/dist/pym.v1.min.js"></script>
 	<script type="text/javascript" src="bower_components/moment/min/moment-with-locales.min.js"></script>
-
-	<script type="text/javascript" src="bower_components/hogan.js/web/builds/3.0.2/hogan-3.0.2.min.js"></script>
-	<%--
-	<script type="text/javascript" src="bower_components/typeahead.js/dist/typeahead.min.js"></script>
-	--%>
 	<!-- endbuild -->
-
 
 	<%-- JunoUI application code, to be combined and minified for production --%>
 	<!-- build:js js/scripts.js -->
