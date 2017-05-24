@@ -25,6 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <div class="modal-header">
+    <button type="button" class="close" ng-click="close()" aria-label="Close">&times;</button>
     <h4><bean:message key="tickler.comments.title" bundle="ui"/></h4>
 </div>  
 <div class="modal-body">
@@ -45,7 +46,7 @@
 
 </div>
 <div class="modal-footer">
-    <button class="btn" ng-click="close()"><bean:message key="global.close" bundle="ui"/></button>
+    <button class="btn btn-default" ng-click="close()"><bean:message key="global.close" bundle="ui"/></button>
 </div>
 
 
