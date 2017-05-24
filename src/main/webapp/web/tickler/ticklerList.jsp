@@ -84,7 +84,7 @@
 	</div>        	
 </form>
 
-<table ng-table="tableParams" show-filter="false" class="table table-striped tickler-table">
+<table ng-table="tableParams" show-filter="false" class="table table-striped table-bordered tickler-table">
   <tbody>
 
     <tr ng-repeat="tickler in $data">
@@ -124,18 +124,23 @@
 		 	<span ng-if="tickler.ticklerLinks != null">
 		 		<a target="lab" href="{{tickler.ticklerLinks | ticklerLink}}">ATT</a>
 		 	</span>
-		 	<span ng-if="tickler.ticklerComments != null">
+		 	<%--<span ng-if="tickler.ticklerComments != null">
 		 		<span class="glyphicon glyphicon-comment" ng-click="showComments(tickler)"></span>
+		 	</span>--%>
+        </td>  
+		<td data-title="'<bean:message key="tickler.list.header.comments" bundle="ui"/>'">
+		 	<span ng-if="tickler.ticklerComments != null">
+		 		<a><span class="glyphicon glyphicon-comment" ng-click="showComments(tickler)"></span></a>
 		 	</span>
-        </td>      
-        <td ng-show="ticklerWriteAccess" data-title="''">     
+        </td>    
+        <td ng-show="ticklerWriteAccess" data-title="'<bean:message key="tickler.list.header.note" bundle="ui"/>'">     
     		<a ng-click="editNote2(tickler)" class="hand-hover noprint"><span class="glyphicon glyphicon-edit" ></span></a>
     	</td>  
     </tr>
   </tbody>
 
     <tfoot ng-show="ticklerWriteAccess" class="noprint">   
-        <tr><td colspan="11" class="white">
+        <tr><td colspan="12" class="white">
         	<a ng-click="checkAll($data)"><bean:message key="tickler.list.checkAll" bundle="ui"/></a> - 
 			<a ng-click="checkNone($data)"><bean:message key="tickler.list.checkNone" bundle="ui"/></a> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 			<button class="btn btn-danger"  type="button" ng-click="deleteTicklers()"><bean:message key="tickler.list.delete" bundle="ui"/></button>
