@@ -31,6 +31,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 	'$rootScope',
 	'$scope',
 	'$q',
+	'$timeout',
 	'$location',
 	'$state',
 	'$uibModal',
@@ -39,7 +40,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 	'billingService',
 	'inboxService',
 
-	function($rootScope, $scope, $q, $location, $state, $uibModal,
+	function($rootScope, $scope, $q, $timeout, $location, $state, $uibModal,
 		securityService, personaService, billingService, inboxService)
 	{
 		var controller = {};
@@ -282,7 +283,9 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				}
 				else
 				{
-					$state.go(item.state);
+					$timeout(function() {
+						$state.go(item.state);
+					});
 				}
 
 				if (url !== "" && wname !== "")
