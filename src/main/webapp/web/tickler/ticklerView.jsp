@@ -25,8 +25,9 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <div class="modal-header">
-		<h3 class="modal-title p-inline"><bean:message key="tickler.view.title" bundle="ui"/>: <span><p class="blue-text">{{tickler.demographicName}}</p></span></h3>
-	</div>
+	<button type="button" class="close" ng-click="close()" aria-label="Close">&times;</button>
+	<h3 class="modal-title p-inline"><bean:message key="tickler.view.title" bundle="ui"/>: <span><p class="blue-text">{{ticklerUpdate.demographicName}}</p></span></h3>
+		
 </div>
 <div class="modal-body">
 	
@@ -64,36 +65,96 @@
 	
 
   <div class="row">
-  	<div class="col-xs-6">
-  		<textarea rows="5" ng-model="ticklerUpdate.message" class="form-control" ng-readonly="!ticklerWriteAccess">{{tickler.message}}</textarea>
-  		
-  	</div>
-  	<div class="col-sm-5">
-		<%--<form>
-			<div class="form-group col-sm-6">
-				<textarea rows="10" ng-model="ticklerUpdate.message" class="form-control" ng-readonly="!ticklerWriteAccess">{{tickler.message}}</textarea>
+  	<%--<div class="col-xs-5">
+	  	<label>Message</label>
+  		<textarea rows="5" ng-model="ticklerUpdate.message" class="form-control" ng-readonly="!ticklerWriteAccess">{{tickler.message}}</textarea>	
+  	</div>--%>
+  	<div class="col-sm-10 col-sm-offset-1">
+		<form>
+			<div class="form-group col-sm-12">
+			<label>Message</label>
+  			<textarea rows="5" ng-model="ticklerUpdate.message" class="form-control" ng-readonly="!ticklerWriteAccess">{{ticklerUpdate.message}}</textarea>
 			</div>
 			<div class="form-group col-sm-6">
-				<label><bean:message key="tickler.view.assignTo" bundle="ui"/>:</label>
-				<div >
-					{{tickler.taskAssignedToName}} <span ng-show="ticklerWriteAccess" class="glyphicon glyphicon-pencil" ng-click="editTaskAssignedTo()"></span>
-				</div>
+				<label><bean:message key="tickler.view.assignTo" bundle="ui"/></label>
+				<input type="text" ng-click="editTaskAssignedTo()" ng-model="ticklerUpdate.taskAssignedToName" 
+					placeholder="<bean:message key="tickler.view.provider.placeholder" bundle="ui"/>" 
+					uib-typeahead="pt.name for pt in searchProviders($viewValue)" 
+					typeahead-on-select="updateTaskAssignedTo($item, $model, $label)"
+					class="form-control"></input>
+			</div>
+			
+			<div class="form-group col-sm-6">
+				<label><bean:message key="tickler.view.priority" bundle="ui"/></label>
+				<input type="text" typeahead-on-select="updatePriority($item, $model, $label)" 
+				placeholder="<bean:message key="tickler.view.priority" bundle="ui"/>" 
+				ng-model="ticklerUpdate.priority" 
+				uib-typeahead="p for p in priorities | filter:$viewValue" 
+				class="form-control">
 			</div>	
-		</form>--%>
-  		<table class="table">
+
+			<div class="form-group col-sm-6">
+				<label><bean:message key="tickler.view.lastUpdated" bundle="ui"/></label>
+				<input disabled type="text" class="form-control" ng-model="ticklerUpdate.updateDate " ></input>
+				<%--<p>{{ticklerUpdate.updateDate | date :'yyyy-MM-dd HH:mm'}}</p>--%>
+
+			</div>
+
+			<div class="form-group col-sm-6">
+				<label><bean:message key="tickler.view.serviceDate" bundle="ui"/></label>
+				<%--<span class="input-group">
+					<input  ng-model="ticklerUpdate.serviceDate" type="text" class="form-control">
+					<input  ng-model="ticklerUpdate.serviceTime" type="text" class="form-control">
+				</span>
+				<button class="btn btn-xs btn-default" ng-click="cancelServiceDateAndTimeUpdate()" ><bean:message key="global.cancel" bundle="ui"/></button>
+				<button class="btn btn-xs btn-success" ng-click="updateServiceDateAndTime()" ><bean:message key="tickler.view.date.set" bundle="ui"/></button>--%>
+				<juno-datepicker-popup juno-model="ticklerUpdate.serviceDate"> </juno-datepicker-popup>
+
+			</div>
+
+			<div class="form-group col-sm-6">
+				<label><bean:message key="tickler.view.serviceTime" bundle="ui"/></label>
+				<%--<juno-timepicker-popup juno-model="ticklerUpdate.serviceTime"></juno-timepicker-popup>--%>
+				<%--<div class="input-group bootstrap-timepicker timepicker">
+					<input id="timepicker" class="form-control" data-provide="timepicker" data-template="modal" data-minute-step="1" data-modal-backdrop="true" type="text"/>
+				</div>--%>
+				<div class="input-group bootstrap-timepicker timepicker">
+					<input id="timepicker1" type="text" class="form-control input-small" data-provide="timepicker" ng-model="ticklerUpdate.serviceTime">
+					<span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+				</div>
+			</div>
+
+			<div class="form-group col-sm-6">
+				<label><bean:message key="tickler.view.status" bundle="ui"/></label>
+				<input type="text" typeahead-on-select="updateStatus($item, $model, $label)" 
+					placeholder="Status" 
+					ng-model="ticklerUpdate.statusName" 
+					uib-typeahead="s.id as s.label for s in statuses | filter:$viewValue" 
+					class="form-control">
+			</div>
+
+			<div class="form-group col-sm-12">
+				<label><bean:message key="tickler.view.status" bundle="ui"/></label>
+				<input type="text" typeahead-on-select="updateStatus($item, $model, $label)" 
+					placeholder="Status" 
+					ng-model="ticklerUpdate.statusName" 
+					uib-typeahead="s.id as s.label for s in statuses | filter:$viewValue" 
+					class="form-control">
+			</div>	
+		</form>
+  		<%--<table class="table tickler-modal-table">
 		  	<tr>
-			  	<td ng-show="!showTaskAssignedToFormControl"><strong><bean:message key="tickler.view.assignTo" bundle="ui"/>:</strong></td>
-				<td ng-show="!showTaskAssignedToFormControl">{{tickler.taskAssignedToName}} <span ng-show="ticklerWriteAccess" class="glyphicon glyphicon-pencil" ng-click="editTaskAssignedTo()"></span></td>
-				<td ng-show="showTaskAssignedToFormControl" colspan="2" > 
-					<div class="form-group" >
-						<div class="input-group">
-							<div class="input-group-addon">
-								<span class="glyphicon glyphicon-remove" ng-click="cancelTaskAssignedToUpdate()"></span>
-							</div>
-							<input type="text" ng-model="ticklerUpdate.taskAssignedToName" placeholder="<bean:message key="tickler.view.provider.placeholder" bundle="ui"/>" 
-									uib-typeahead="pt.providerNo as pt.name for pt in searchProviders($viewValue)" 
-									typeahead-on-select="updateTaskAssignedTo($item, $model, $label)"
-									class="form-control input-sm">
+			  	<td ><strong><bean:message key="tickler.view.assignTo" bundle="ui"/>:</strong></td>
+				<td ng-show="!showTaskAssignedToFormControl">{{tickler.taskAssignedToName}} </td>
+				<td ng-show="!showTaskAssignedToFormControl"><span ng-show="ticklerWriteAccess" class="glyphicon glyphicon-pencil" ng-click="editTaskAssignedTo()"></span></td>
+				<td ng-show="showTaskAssignedToFormControl" colspan="4" > 
+					<div class="input-group">
+						<input type="text" ng-model="ticklerUpdate.taskAssignedToName" placeholder="<bean:message key="tickler.view.provider.placeholder" bundle="ui"/>" 
+								uib-typeahead="pt.providerNo as pt.name for pt in searchProviders | filter:$viewValue" 
+								typeahead-on-select="updateTaskAssignedTo($item, $model, $label)"
+								class="form-control">
+						<div class="input-group-btn">
+							<a href="#" class="btn btn-default" ng-click="cancelTaskAssignedToUpdate()"><span class="glyphicon glyphicon-remove" ></span></a>
 						</div>
 					</div>
 				
@@ -105,13 +166,14 @@
 				<td></td>
 		  	</tr>
   			<tr>
-  				<td ng-show="!showServiceDateAndTimeFormControl"><strong><bean:message key="tickler.view.serviceDate" bundle="ui"/>:</strong></td>
+  				<td><strong><bean:message key="tickler.view.serviceDate" bundle="ui"/>:</strong></td>
   				<td ng-show="!showServiceDateAndTimeFormControl">{{tickler.serviceDate |date: 'yyyy-MM-dd HH:mm'}}  <span ng-show="ticklerWriteAccess" class="glyphicon glyphicon-pencil" ng-click="editServiceDateAndTime()"></span></td>
+				<td ng-show="!showTaskAssignedToFormControl"></td>
 				<td ng-show="showServiceDateAndTimeFormControl" colspan="2">
-					 <input  ng-model="ticklerUpdate.serviceDate" type="text" class="form-control">
-					 <input  ng-model="ticklerUpdate.serviceTime" type="text" class="form-control">
-					 <button class="btn btn-default" ng-click="cancelServiceDateAndTimeUpdate()" ><bean:message key="global.cancel" bundle="ui"/></button>
-					<button class="btn btn-success" ng-click="updateServiceDateAndTime()" ><bean:message key="tickler.view.date.set" bundle="ui"/></button>
+					<input  ng-model="ticklerUpdate.serviceDate" type="text" class="form-control">
+					<input  ng-model="ticklerUpdate.serviceTime" type="text" class="form-control">
+					<button class="btn btn-xs btn-default" ng-click="cancelServiceDateAndTimeUpdate()" ><bean:message key="global.cancel" bundle="ui"/></button>
+					<button class="btn btn-xs btn-success" ng-click="updateServiceDateAndTime()" ><bean:message key="tickler.view.date.set" bundle="ui"/></button>
 				</td>
   			</tr>
   			<tr>
@@ -127,7 +189,7 @@
 							<div class="input-group-addon">
 								<span class="glyphicon glyphicon-remove" ng-click="cancelPriorityUpdate()"></span>
 							</div>
-							<input type="text" typeahead-on-select="updatePriority($item, $model, $label)" placeholder="<bean:message key="tickler.view.priority" bundle="ui"/>" ng-model="ticklerUpdate.priority" typeahead="p for p in priorities | filter:$viewValue" class="form-control">
+							<input type="text" typeahead-on-select="updatePriority($item, $model, $label)" placeholder="<bean:message key="tickler.view.priority" bundle="ui"/>" ng-model="ticklerUpdate.priority" uib-typeahead="p for p in priorities | filter:$viewValue" class="form-control">
 						</div>
 					</div>
   				</td>
@@ -141,7 +203,7 @@
 							<div class="input-group-addon">
 								<span class="glyphicon glyphicon-remove" ng-click="cancelStatusUpdate()"></span>
 							</div>
-							<input type="text" typeahead-on-select="updateStatus($item, $model, $label)" placeholder="Status" ng-model="ticklerUpdate.status" typeahead="s.id as s.label for s in statuses | filter:$viewValue" class="form-control">
+							<input type="text" typeahead-on-select="updateStatus($item, $model, $label)" placeholder="Status" ng-model="ticklerUpdate.status" uib-typeahead="s.id as s.label for s in statuses | filter:$viewValue" class="form-control">
 						</div>
 					</div>
 				</td>
@@ -159,53 +221,53 @@
   				<td ng-if="tickler.ticklerLinks == null || tickler.ticklerLinks.length == 0"><bean:message key="tickler.view.lab.none" bundle="ui"/></td>
   				<td ng-if="tickler.ticklerLinks != null"><a target="lab" href="{{tickler.ticklerLinks | ticklerLink}}"><bean:message key="tickler.view.lab.attachment" bundle="ui"/></a></td>
   			</tr>
-  		</table>
+  		</table>--%>
   	</div>
   </div>
     
-  <div class="row">
-	<div class="col-xs-12">
-		<strong>
-			<span  ng-click="showComments = !showComments"><bean:message key="tickler.view.comments" bundle="ui"/></span> 
-			({{tickler.ticklerComments != null && tickler.ticklerComments.length || 0}}) 
-			<span class="glyphicon glyphicon-pencil" ng-show="ticklerWriteAccess" ng-click="addComment()"></span>
-		</strong>
-		<div ng-if="showComments">
-			
-			<div class="form-group" ng-show="showCommentFormControl">
-				<div class="input-group">
-					<div class="input-group-addon"><span class="glyphicon glyphicon-remove" ng-click="cancelCommentUpdate()"></span></div>
-					<div class="input-group-addon"><span class="glyphicon glyphicon-ok" ng-click="saveComment()"></span></div>
-					<input  type="text" ng-model="ticklerUpdate.comment" class="form-control"/>			
-				</div>
-			</div>	  		
-			<hr ng-if="tickler.ticklerComments == null || tickler.ticklerComments.length == 0"/>
-			<table ng-if="tickler.ticklerComments != null && tickler.ticklerComments.length > 0" class="table">
-				<tr ng-repeat="tc in tickler.ticklerComments">
-					<td>{{tc.updateDate | date : 'yyyy-MM-dd'}}</td>
-					<td>{{tc.providerName}}</td>
-					<td>{{tc.message}}</td>
-				</tr>
-			</table>
+	<div class="row">
+		<div class="col-xs-12">
+			<strong>
+				<span  ng-click="showComments = !showComments"><bean:message key="tickler.view.comments" bundle="ui"/></span> 
+				({{ticklerUpdate.ticklerComments != null && ticklerUpdate.ticklerComments.length || 0}}) 
+				<%--<span class="glyphicon glyphicon-pencil" ng-show="ticklerWriteAccess" ng-click="addComment()"></span>--%>
+				<button class="btn btn-xs btn-success" ng-show="ticklerWriteAccess" ng-click="addComment()">Add</button>
+			</strong>
+			<div ng-if="showComments">	
+				<div class="form-group" ng-show="showCommentFormControl">
+					<div class="input-group">
+						<div class="input-group-addon"><span class="glyphicon glyphicon-remove" ng-click="cancelCommentUpdate()"></span></div>
+						<div class="input-group-addon"><span class="glyphicon glyphicon-ok" ng-click="saveComment()"></span></div>
+						<input  type="text" ng-model="ticklerUpdate.comment" class="form-control"/>			
+					</div>
+				</div>	  		
+				<hr ng-if="ticklerUpdate.ticklerComments == null || ticklerUpdate.ticklerComments.length == 0"/>
+				<table ng-if="ticklerUpdate.ticklerComments != null && ticklerUpdate.ticklerComments.length > 0" class="table">
+					<tr ng-repeat="tc in ticklerUpdate.ticklerComments">
+						<td>{{tc.updateDate | date : 'yyyy-MM-dd'}}</td>
+						<td>{{tc.providerName}}</td>
+						<td>{{tc.message}}</td>
+					</tr>
+				</table>
+			</div>
 		</div>
 	</div>
-  </div>
 
   
     <div class="row">
-  	<div class="col-xs-12">
-  		<strong ng-click="showUpdates = !showUpdates"><bean:message key="tickler.view.updates" bundle="ui"/> ({{tickler.ticklerUpdates != null && tickler.ticklerUpdates.length || 0}})</strong>
-  		<div ng-if="showUpdates">
-  			<hr ng-if="tickler.ticklerUpdates == null || tickler.ticklerUpdates.length == 0"/>
-	  		<table ng-if="tickler.ticklerUpdates != null && tickler.ticklerUpdates.length > 0" class="table">
-	  			<tr ng-repeat="tc in tickler.ticklerUpdates">
-	  				<td>{{tc.updateDate | date : 'yyyy-MM-dd HH:mm'}}</td>
-	  				<td>{{tc.providerName}}</td>
-	  			</tr>
-	  		</table>
-  		</div>
+		<div class="col-xs-12">
+			<strong ng-click="showUpdates = !showUpdates"><bean:message key="tickler.view.updates" bundle="ui"/> ({{ticklerUpdate.ticklerUpdates != null && ticklerUpdate.ticklerUpdates.length || 0}})</strong>
+			<div ng-if="showUpdates">
+				<hr ng-if="ticklerUpdate.ticklerUpdates == null || ticklerUpdate.ticklerUpdates.length == 0"/>
+				<table ng-if="ticklerUpdate.ticklerUpdates != null && ticklerUpdate.ticklerUpdates.length > 0" class="table">
+					<tr ng-repeat="tc in ticklerUpdate.ticklerUpdates">
+						<td>{{tc.updateDate | date : 'yyyy-MM-dd HH:mm'}}</td>
+						<td>{{tc.providerName}}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
   	</div>
-  </div>
   
   
 
@@ -221,7 +283,7 @@
 -->
 	<div class="pull-left">
 		<button class="btn btn-warning" ng-click="completeTickler()" ng-show="ticklerWriteAccess"><bean:message key="tickler.view.complete" bundle="ui"/></button>
-		<button class="btn btn-danger" ng-click="deleteTickler()" ng-show="ticklerWriteAccess"><span class="glyphicon glyphicon-trash"></span><bean:message key="global.delete" bundle="ui"/></button>
+		<button class="btn btn-danger" ng-click="deleteTickler()" ng-show="ticklerWriteAccess"><bean:message key="global.delete" bundle="ui"/></button>
 	</div>
 	<button class="btn btn-default" ng-click="close()"><bean:message key="global.close" bundle="ui"/></button>
 	<button class="btn btn-primary" ng-click="printTickler()"><bean:message key="global.print" bundle="ui"/></button>
