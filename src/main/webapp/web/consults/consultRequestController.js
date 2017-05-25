@@ -147,15 +147,26 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			consult.letterheadPhone = consult.letterheadList[index].phone;
 		};
 
-		$scope.changeService = function()
+		$scope.changeService = function(id)
 		{
-			var index = $("#serviceId").val();
-			if (index == null)
+			if (id == null)
 			{
 				$scope.specialists = null;
 				return;
 			}
-			$scope.specialists = toArray(consult.serviceList[index].specialists);
+
+			console.log('consult: ', consult);
+
+			// Find the service with a matching id 
+			var selectedService = consult.serviceList.find(function(service)
+			{
+				return service.serviceId == id;
+			});
+
+			console.log('serv: ', selectedService);
+
+			$scope.specialists = selectedService.specialists;
+
 			consult.professionalSpecialist = null;
 		};
 
@@ -208,6 +219,17 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		$scope.getReminders = function(boxId)
 		{
 			summaryService.getReminders(consult.demographicId).then(function(data)
+			{
+				$scope.writeToBox(data, boxId);
+			});
+		};
+
+		// New function, doesn't work
+		$scope.getAllergies = function(boxId)
+		{
+			console.log('CONSULT: ', consult);
+
+			summaryService.getAllergies(consult.demographicId).then(function(data)
 			{
 				$scope.writeToBox(data, boxId);
 			});
@@ -360,6 +382,8 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		$scope.save = function()
 		{
+			console.log('CONSULT: ', consult);
+
 			if (!$scope.consultWriteAccess && consult.id == null)
 			{
 				alert("You don't have right to save new consult");
