@@ -28,6 +28,12 @@
 	margin: 0;
 }
 
+// Makes checkbox flush with input (as long as checkbox margin is 0)
+.big-checkbox {
+	height: 34px;
+	width: 34px;
+}
+
 .no-padding {
 	padding: 0;
 }
