@@ -25,7 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<div ng-show="ticklerReadAccess" class="col-xs-12">
+<div ng-show="ticklerReadAccess" class="col-xs-12 margin-top">
  	
 	<form name="searchForm" id="searchForm" class="noprint">
 		<div class="row">
