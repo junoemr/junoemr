@@ -1,2 +1,7 @@
-
-.dropdown
+.dropdown-menu {
+	.active {
+		a {
+			background-color: $hover-blue;
+		}
+	}
+}
