@@ -39,6 +39,8 @@ angular.module('Common.Directives').directive('junoPatientTypeahead', [
 		{
 			typeaheadHelper.initTypeahead($scope);
 
+			$scope.forceSelection = true;
+
 			$scope.findMatches = function findMatches(search)
 			{
 				var deferred = $q.defer();

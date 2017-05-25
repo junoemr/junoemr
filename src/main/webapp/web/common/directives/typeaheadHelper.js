@@ -51,7 +51,33 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 		helper.initTypeahead = function initTypeahead($scope)
 		{
+			//=========================================================================
+			// typeahead directives must define/override these
+			//=========================================================================
+
+			$scope.findMatches = function findMatches($viewValue)
+			{
+				console.log('findMatches function must be defined by the typeahead implementation');
+			};
+
+			$scope.formatMatchSelection = function formatMatchSelection($model)
+			{
+				console.log('formatMatch function must be defined by the typeahead implementation');
+			};
+
+			//=========================================================================
+			// typeahead directives may define/override these
+			//=========================================================================
+
+			$scope.optionsTemplateUrl = null;
+			$scope.forceSelection = false;
+
+			//=========================================================================
 			// common initialization for $scope, for use on all typeahead directives
+			//=========================================================================
+
+			// the internal ng-model
+			$scope.searchField = null;
 
 			// ng-model-options
 			$scope.typeaheadModelOptions = {
@@ -79,9 +105,9 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 				return Juno.Common.Util.exists($scope.optionsTemplateUrl);
 			};
 
-			$scope.findMatches = function findMatches($viewValue)
+			$scope.hasForceSelectionEnabled = function hasForceSelectionEnabled()
 			{
-				console.log('findMatches function should be defined by the typeahead implementation');
+				return Juno.Common.Util.exists($scope.forceSelection) && $scope.forceSelection;
 			};
 
 			$scope.formatMatch = function formatMatch($model)
@@ -99,23 +125,32 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 				return $scope.formatMatchSelection($model);
 			};
 
-			$scope.formatMatchSelection = function formatMatchSelection($model)
-			{
-				console.log('formatMatch function should be defined by the typeahead implementation');
-			};
-
 			$scope.onSelect = function onSelect($item, $model, $label, $event)
 			{
-				console.log('typeaheadHelper::onSelect', $item);
+				console.log('typeaheadHelper::onSelect - setting model', $item);
 				$scope.model = $item;
+			};
+
+			$scope.onBlur = function onBlur()
+			{
+				if($scope.hasForceSelectionEnabled() && angular.isString($scope.searchField))
+				{
+					console.log('typeaheadHelper::onBlur - setting model to null (forceSelectionEnabled)');
+					// the searchField is not a valid selection and force selection is enabled
+					// if there is a select, onSelect will fire after
+					$scope.model = null;
+				}
 			};
 
 			$scope.onChange = function onChange()
 			{
-				// as user types into the typeahead, save a 'dummy' selection object to the model
-				// some consumers will want to process non-selected values from the typeahead;
-				// they need to check the isTypeaheadSearchQuery property
-				$scope.onSelect($scope.createDummySelection());
+				if(!$scope.hasForceSelectionEnabled())
+				{
+					console.log('typeaheadHelper::onChange - setting model (isTypeaheadSearchQuery)');
+					// as user types into the typeahead, select a 'dummy' selection;
+					// consumers need to check the isTypeaheadSearchQuery property
+					$scope.onSelect($scope.createDummySelection());
+				}
 			};
 
 			$scope.onSearch = function onSearch()
@@ -134,7 +169,7 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 			{
 				return {
 					isTypeaheadSearchQuery: true,
-					searchQuery: $scope.model
+					searchQuery: $scope.searchField
 				};
 			};
 
@@ -142,6 +177,12 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 			{
 				return Juno.Common.Util.exists(match) && match.isTypeaheadSearchQuery;
 			};
+
+			$scope.$watch('model', function()
+			{
+				// when the 'external' model is updated, update the 'internal' model
+				$scope.searchField = $scope.model;
+			});
 
 		};
 

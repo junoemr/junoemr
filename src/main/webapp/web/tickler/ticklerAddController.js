@@ -17,28 +17,27 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		providerService,
 		ticklerService)
 	{
+
+		// holds the patient typeahead selection
+		$scope.demographicSearch = null;
+
 		//=========================================================================
 		// Watches
 		//=========================================================================
 
 		$scope.$watch('demographicSearch',
-
 			function(new_value)
 			{
-				console.log('new val ', new_value);
+				console.log('watching demographicSearch: ', new_value);
 
-				if (new_value != null)
+				if(Juno.Common.Util.exists(new_value))
 				{
-					if (!new_value.isTypeaheadSearchQuery) // Patient selected, grab data
-					{
-						$scope.updateDemographicNo(new_value.demographicNo);
-					}
-					else // Still typing
-					{
-						$scope.tickler.demographicNo = null;
-						$scope.tickler.demographicName = null;
-						$scope.tickler.demographic = null;
-					}
+					$scope.updateDemographicNo(new_value.demographicNo);
+				}
+				else
+				{
+					// no selection
+					$scope.updateDemographicNo(null);
 				}
 			}, true);
 
@@ -133,22 +132,33 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 
 		$scope.updateDemographicNo = function(demographicNo)
 		{
-			// console.log('stuff', item, model, label);
-			// console.log('demo name', $scope.tickler.demographicName);
-			demographicService.getDemographic(demographicNo).then(function(data)
+			if(Juno.Common.Util.exists(demographicNo))
 			{
-				$scope.tickler.demographicNo = data.demographicNo;
-				$scope.tickler.demographicName = data.demographicName;
-				$scope.tickler.demographic = data;
-				console.log('data: ', data);
-
-			});
-
+				demographicService.getDemographic(demographicNo).then(function(data)
+				{
+					// update the selected value on the tickler object
+					$scope.tickler.demographic = data;
+					console.log('set $scope.tickler.demographic: ', $scope.tickler.demographic);
+				});
+			}
+			else
+			{
+				$scope.tickler.demographic = null;
+			}
 		};
 
-		if (angular.isDefined($stateParams) && angular.isDefined($stateParams.demographicNo))
+		// initialization
+		if (Juno.Common.Util.exists($stateParams.demographicNo))
 		{
-			$scope.updateDemographicNo($stateParams.demographicNo);
+			console.log('initializing demographicSearch pre-selected', $stateParams.demographicNo);
+			demographicService.getDemographic($stateParams.demographicNo).then(function(data)
+			{
+				$scope.demographicSearch = {
+					demographicNo: $stateParams.demographicNo,
+					firstName: data.firstName,
+					lastName: data.lastName
+				};
+			});
 		}
 
 		$scope.searchProviders = function(val)
@@ -171,31 +181,6 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				return resp;
 			});
 		};
-
-		// Replaced with neat new directive!
-		// $scope.searchPatients = function(term)
-		// {
-		// 	var search = {
-		// 		type: 'Name',
-		// 		'term': term,
-		// 		active: true,
-		// 		integrator: false,
-		// 		outofdomain: true
-		// 	};
-		// 	return demographicService.search(search, 0, 25).then(function(response)
-		// 	{
-		// 		var resp = [];
-		// 		for (var x = 0; x < response.content.length; x++)
-		// 		{
-		// 			resp.push(
-		// 			{
-		// 				demographicNo: response.content[x].demographicNo,
-		// 				name: response.content[x].lastName + ',' + response.content[x].firstName
-		// 			});
-		// 		}
-		// 		return resp;
-		// 	});
-		// };
 
 		$scope.updateProviderNo = function(item, model, label)
 		{
