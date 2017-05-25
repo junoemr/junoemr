@@ -1,4 +1,4 @@
-<p class="input-group">
+<div class="input-group">
     <input type="text" 
         class="form-control" 
         ng-model="model" 
@@ -14,4 +14,4 @@
             <i class="glyphicon glyphicon-calendar"></i>
         </button>
     </span>
-</p>
+</div>
