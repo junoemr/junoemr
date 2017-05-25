@@ -143,9 +143,10 @@ public class RecordUxService extends AbstractServiceImpl {
 		
 		menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Health Tracker", "record.tracker"));
 		
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.prescriptions", "r", null)) {
-			menulist.add(new MenuItemTo1(idCounter++, "Rx", "../oscarRx/choosePatient.do?demographicNo="+demographicNo));
-		}
+		// Remove from navbar?
+		// if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.prescriptions", "r", null)) {
+		// 	menulist.add(new MenuItemTo1(idCounter++, "Rx", "../oscarRx/choosePatient.do?demographicNo="+demographicNo));
+		// }
 		
 		//PHR
 		if( ProviderMyOscarIdData.idIsSet(loggedInInfo.getLoggedInProviderNo())) {
@@ -185,11 +186,32 @@ public class RecordUxService extends AbstractServiceImpl {
 			}
 		}
 		//END PHR
+		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.DxRegistry", "r", null)) {
+			menulist.add(new MenuItemTo1(idCounter++, "Disease Registry", "../oscarResearch/oscarDxResearch/setupDxResearch.do?quickList=&demographicNo="+demographicNo));
+		}
+			
+		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.oscarMsg", "r", null)) {
+			menulist.add(new MenuItemTo1(idCounter++, "Messenger", "../oscarMessenger/DisplayDemographicMessages.do?orderby=date&boxType=3&demographic_no="+demographicNo));
+		}
 		
-		MenuItemTo1 moreMenu = new MenuItemTo1(idCounter++, "More", null);
-		moreMenu.setDropdown(true);
+		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.oscarMsg", "r", null)) {
+			menulist.add(new MenuItemTo1(idCounter++, "Create Message", "../oscarMessenger/SendDemoMessage.do?demographic_no="+demographicNo));
+		}		
+				
+		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.documents", "r", null)) {
+			menulist.add(new MenuItemTo1(idCounter++, "Documents", "../dms/documentReport.jsp?function=demographic&doctype=lab&functionid="+demographicNo));
+		}
+		
+		// Remove from navbar?
+		// if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.decisionSupportAlerts", "r", null)) {
+		// 	menulist.add(new MenuItemTo1(idCounter++, "DS Guidelines", "../oscarEncounter/decisionSupport/guidelineAction.do?method=list&provider_no=" + loggedInInfo.getLoggedInProviderNo() + "&demographic_no="+demographicNo));
+		// }
+		
+		// MORE MENU
+		// MenuItemTo1 moreMenu = new MenuItemTo1(idCounter++, "More", null);
+		// moreMenu.setDropdown(true);
 	
-		List<MenuItemTo1> morelist = new ArrayList<MenuItemTo1>();
+		// List<MenuItemTo1> morelist = new ArrayList<MenuItemTo1>();
 		
 		/*if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.preventions", "r", null)) {
 			morelist.add(new MenuItemTo1(idCounter++, "Preventions", "../oscarPrevention/index.jsp?demographic_no="+demographicNo));
@@ -203,39 +225,40 @@ public class RecordUxService extends AbstractServiceImpl {
 			}
 		}*/
 		
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.DxRegistry", "r", null)) {
-			morelist.add(new MenuItemTo1(idCounter++, "Disease Registry", "../oscarResearch/oscarDxResearch/setupDxResearch.do?quickList=&demographicNo="+demographicNo));
-		}
+		// if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.DxRegistry", "r", null)) {
+		// 	morelist.add(new MenuItemTo1(idCounter++, "Disease Registry", "../oscarResearch/oscarDxResearch/setupDxResearch.do?quickList=&demographicNo="+demographicNo));
+		// }
 			
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.oscarMsg", "r", null)) {
-			morelist.add(new MenuItemTo1(idCounter++, "Messenger", "../oscarMessenger/DisplayDemographicMessages.do?orderby=date&boxType=3&demographic_no="+demographicNo));
-		}
+		// if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.oscarMsg", "r", null)) {
+		// 	morelist.add(new MenuItemTo1(idCounter++, "Messenger", "../oscarMessenger/DisplayDemographicMessages.do?orderby=date&boxType=3&demographic_no="+demographicNo));
+		// }
 		
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.oscarMsg", "r", null)) {
-			morelist.add(new MenuItemTo1(idCounter++, "Create Message", "../oscarMessenger/SendDemoMessage.do?demographic_no="+demographicNo));
-		}		
+		// if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.oscarMsg", "r", null)) {
+		// 	morelist.add(new MenuItemTo1(idCounter++, "Create Message", "../oscarMessenger/SendDemoMessage.do?demographic_no="+demographicNo));
+		// }		
 		// Requires EctSession bean to open the window.  I think it's best to just redo measurements in a better interface in the record with angular
 		//if(checkPermissions("_newCasemgmt.measurements", roleName)){
 		//	morelist.add(new MenuItemTo1(2, "Measurements", "../oscarEncounter/oscarMeasurements/SetupHistoryIndex.do?demographic_no="+demographicNo));
 		//}
 				
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.documents", "r", null)) {
-			morelist.add(new MenuItemTo1(idCounter++, "Documents", "../dms/documentReport.jsp?function=demographic&doctype=lab&functionid="+demographicNo));
-		}
+		// if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.documents", "r", null)) {
+		// 	morelist.add(new MenuItemTo1(idCounter++, "Documents", "../dms/documentReport.jsp?function=demographic&doctype=lab&functionid="+demographicNo));
+		// }
 		
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.decisionSupportAlerts", "r", null)) {
-			morelist.add(new MenuItemTo1(idCounter++, "DS Guidelines", "../oscarEncounter/decisionSupport/guidelineAction.do?method=list&provider_no=" + loggedInInfo.getLoggedInProviderNo() + "&demographic_no="+demographicNo));
-		}
+		// if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.decisionSupportAlerts", "r", null)) {
+		// 	morelist.add(new MenuItemTo1(idCounter++, "DS Guidelines", "../oscarEncounter/decisionSupport/guidelineAction.do?method=list&provider_no=" + loggedInInfo.getLoggedInProviderNo() + "&demographic_no="+demographicNo));
+		// }
 		
 		/*measurements,<a onclick="popupPage(600,1000,'measurements69','/oscar/oscarEncounter/oscarMeasurements/SetupHistoryIndex.do'); return false;" href="#">Measurements</a>
 		 <a onclick="popupPage(500,900,'episode69','/oscar/Episode.do?method=list&amp;demographicNo=69'); return false;" href="#">Episodes</a>
 		 <a onclick="popupPage(500,900,'pregnancy69','/oscar/Pregnancy.do?method=list&amp;demographicNo=69'); return false;" href="#">Pregnancies</a>
 		 */ 
-		if(!morelist.isEmpty()){  // If the more list is empty no sense in displaying it.
-			moreMenu.setDropdownItems(morelist);
-			menulist.add(moreMenu);
-		}
-		
+		// if(!morelist.isEmpty()){  // If the more list is empty no sense in displaying it.
+		// 	moreMenu.setDropdownItems(morelist);
+		// 	menulist.add(moreMenu);
+		// }
+		// END OF MORE MENU
+
 		return menulist;
 		/*
 		 * ADD A WAY TO CHECK IF THE USER HAS AUTHORIZATION to specific modules.
@@ -264,9 +287,9 @@ public class RecordUxService extends AbstractServiceImpl {
 				summaryList.add(new SummaryTo1("Incoming",count++,SummaryTo1.INCOMING_CODE));
 			}
 			
-			if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.decisionSupportAlerts", "r", null) && preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.DS_SUPPORT_POS)) {
-				summaryList.add(new SummaryTo1("Decision Support",count++,SummaryTo1.DECISIONSUPPORT_CODE)); 
-			}
+			// if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.decisionSupportAlerts", "r", null) && preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.DS_SUPPORT_POS)) {
+			// 	summaryList.add(new SummaryTo1("Decision Support",count++,SummaryTo1.DECISIONSUPPORT_CODE)); 
+			// }
 		}else if("left".equals(summaryName )){
 			summaryList = new ArrayList<SummaryTo1>();
 			if (securityInfoManager.hasPrivilege(loggedInInfo, "_prevention", "r", null)&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.PREVENTION_POS)) {
