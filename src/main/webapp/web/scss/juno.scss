@@ -5,8 +5,9 @@
 @import "../bower_components/bootstrap-sass/assets/stylesheets/bootstrap";
 @import "bootstrap/forms";
 @import "bootstrap/navbar";
-// Non-bootstrap overrides
-@import "datepicker";
+@import "bootstrap/dropdowns";
+// UIB overrides
+@import "uib-datepicker";
 // bootstrap-timepicker does not provide a CSS file so compile as SCSS
 @import "bootstrap-timepicker/timepicker";
 // Global stuff
