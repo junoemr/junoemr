@@ -32,7 +32,7 @@
 		</div>
 	</div>
 
-	<div class="row margin-bottom">
+	<div class="row margin-bottom-20 margin-top-20">
 		<div class="col-md-12" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 			<ul class="nav nav-pills">
 				<li ng-class="isCurrentStatus('none')"><a data-target="#all" ng-click="removeFilter(0)" data-toggle="tab" class="hand-hover">All</a></li>
@@ -44,7 +44,7 @@
 		</div><!-- middleSpace -->
 	</div>
 	<div class="row">
-		<div class="col-md-3 margin-bottom" ng-show="page.canRead">
+		<div class="col-md-3 margin-bottom-20" ng-show="page.canRead">
 			<fieldset class="summary-section" ng-repeat="mod in page.columnOne.modules">
 				<div class="row vertical-align">
 					<div class="col-md-8 col-sm-8">
