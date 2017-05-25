@@ -131,15 +131,6 @@
 					ng-model="ticklerUpdate.statusName" 
 					uib-typeahead="s.id as s.label for s in statuses | filter:$viewValue" 
 					class="form-control">
-			</div>
-
-			<div class="form-group col-sm-12">
-				<label><bean:message key="tickler.view.status" bundle="ui"/></label>
-				<input type="text" typeahead-on-select="updateStatus($item, $model, $label)" 
-					placeholder="Status" 
-					ng-model="ticklerUpdate.statusName" 
-					uib-typeahead="s.id as s.label for s in statuses | filter:$viewValue" 
-					class="form-control">
 			</div>	
 		</form>
   		<%--<table class="table tickler-modal-table">
@@ -227,13 +218,15 @@
     
 	<div class="row">
 		<div class="col-xs-12">
-			<strong>
-				<span  ng-click="showComments = !showComments"><bean:message key="tickler.view.comments" bundle="ui"/></span> 
-				({{ticklerUpdate.ticklerComments != null && ticklerUpdate.ticklerComments.length || 0}}) 
-				<%--<span class="glyphicon glyphicon-pencil" ng-show="ticklerWriteAccess" ng-click="addComment()"></span>--%>
-				<button class="btn btn-xs btn-success" ng-show="ticklerWriteAccess" ng-click="addComment()">Add</button>
-			</strong>
-			<div ng-if="showComments">	
+			<div class="row margin-bottom-10">
+				<strong>
+					<span  ng-click="showComments = !showComments"><bean:message key="tickler.view.comments" bundle="ui"/></span> 
+					({{ticklerUpdate.ticklerComments != null && ticklerUpdate.ticklerComments.length || 0}}) 
+					<%--<span class="glyphicon glyphicon-pencil" ng-show="ticklerWriteAccess" ng-click="addComment()"></span>--%>
+					<button class="btn btn-xs btn-success" ng-show="ticklerWriteAccess" ng-click="addComment()">Add</button>
+				</strong>
+			</div>
+			<div class="row" ng-if="showComments">	
 				<div class="form-group" ng-show="showCommentFormControl">
 					<div class="input-group">
 						<div class="input-group-addon"><span class="glyphicon glyphicon-remove" ng-click="cancelCommentUpdate()"></span></div>
