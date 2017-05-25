@@ -24,26 +24,97 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 		me)
 	{
 
-		$scope.tickler = angular.copy(tickler);
+		$scope.ticklerUpdate = angular.copy(tickler);
+		console.log("TICKLER", $scope.ticklerUpdate);
+		if (Juno.Common.Util.exists($scope.ticklerUpdate.serviceDate))
+		{
+			$scope.ticklerUpdate.serviceDate = new Date($scope.ticklerUpdate.serviceDate);
+		}
+
+		if (Juno.Common.Util.exists($scope.ticklerUpdate.updateDate))
+		{
+			$scope.ticklerUpdate.updateDate = new Date($scope.ticklerUpdate.updateDate);
+		}
+
+
+
 		$scope.me = me;
 		$scope.ticklerWriteAccess = ticklerWriteAccess;
 
 		//this object keeps track of the changes being made
-		$scope.ticklerUpdate = {
-			message: $scope.tickler.message
-		};
+		// $scope.ticklerUpdate = {
+		// 	message: $scope.tickler.message,
 
+		// 	taskAssignedTo: $scope.tickler.taskAssignedTo,
+		// 	taskAssignedToName: $scope.tickler.taskAssignedName,
+		// 	serviceDate: $filter('date')($scope.tickler.serviceDate, 'yyyy-MM-dd'),
+		// 	serviceTime: $filter('date')($scope.tickler.serviceDate, 'HH:mm'),
 
+		// };
+		// $scope.ticklerUpdate.message = "TESSST";
+		// console.log("TicklerUpdate", $scope.ticklerUpdate.message);
+		// console.log("Tickler message", tickler.message);
 		$scope.needsUpdate = false;
 
 
 		$scope.showUpdates = false;
 		$scope.showComments = true;
 
+		// console.log("Tickler Update status", $scope.tickler.taskAssignedTo);
+		// console.log("Tickler Update status", $scope.tickler.priority);
+
+		// $scope.taskAssignedToName = $scope.tickler.taskAssignedName;
+		$scope.priorities = ['Low', 'Normal', 'High'];
+		$scope.statuses = [
+		{
+			id: 'A',
+			label: 'Active'
+		},
+		{
+			id: 'C',
+			label: 'Completed'
+		},
+		{
+			id: 'D',
+			label: 'Deleted'
+		}];
+
+
 		if (ticklerNote != null)
 		{
 			$scope.ticklerNote = ticklerNote.ticklerNote;
 		}
+
+		$scope.$watch('ticklerUpdate.serviceDate',
+			function(new_value)
+			{
+				console.log('change', new_value);
+
+				if ($scope.ticklerUpdate.serviceDate instanceof Date && $scope.ticklerUpdate.serviceTime instanceof Date)
+				{
+
+					$scope.ticklerUpdate.serviceDate = new Date($scope.ticklerUpdate.serviceDate.getTime() + $scope.ticklerUpdate.serviceTime.getTime());
+
+					console.log('new val', $scope.ticklerUpdate.serviceDate);
+				}
+
+
+			}
+		);
+
+		$scope.$watch('ticklerUpdate.serviceTime',
+			function(new_value)
+			{
+				console.log('change', new_value);
+
+				if ($scope.ticklerUpdate.serviceDate instanceof Date && $scope.ticklerUpdate.serviceTime instanceof Date)
+				{
+					$scope.ticklerUpdate.serviceDate = new Date($scope.ticklerUpdate.serviceDate.getTime() + $scope.ticklerUpdate.serviceTime.getTime());
+				}
+
+
+			}
+		);
 
 		$scope.close = function()
 		{
@@ -69,8 +140,8 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 		$scope.editTaskAssignedTo = function()
 		{
 			$scope.showTaskAssignedToFormControl = true;
-			$scope.ticklerUpdate.taskAssignedTo = $scope.tickler.taskAssignedTo;
-			$scope.ticklerUpdate.taskAssignedToName = $scope.tickler.taskAssignedName;
+			// $scope.ticklerUpdate.taskAssignedTo = $scope.tickler.taskAssignedTo;
+			// $scope.ticklerUpdate.taskAssignedToName = $scope.tickler.taskAssignedName;
 		}
 
 		$scope.updateTaskAssignedTo = function(item, model, label)
@@ -92,8 +163,8 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		$scope.editServiceDateAndTime = function()
 		{
-			$scope.ticklerUpdate.serviceDate = $filter('date')($scope.tickler.serviceDate, 'yyyy-MM-dd');
-			$scope.ticklerUpdate.serviceTime = $filter('date')($scope.tickler.serviceDate, 'HH:mm');
+			// $scope.ticklerUpdate.serviceDate = $filter('date')($scope.tickler.serviceDate, 'yyyy-MM-dd');
+			// $scope.ticklerUpdate.serviceTime = $filter('date')($scope.tickler.serviceDate, 'HH:mm');
 
 			$scope.showServiceDateAndTimeFormControl = true;
 		}
@@ -130,7 +201,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		$scope.editPriority = function()
 		{
-			$scope.ticklerUpdate.priority = $scope.tickler.priority;
+			// $scope.ticklerUpdate.priority = $scope.tickler.priority;
 			$scope.priorities = ['Low', 'Normal', 'High'];
 
 			$scope.showPriorityFormControl = true;
@@ -139,7 +210,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 		$scope.updatePriority = function(item, model, label)
 		{
 			$scope.needsUpdate = true;
-			$scope.tickler.priority = model;
+			$scope.ticklerUpdate.priority = model;
 			$scope.showPriorityFormControl = false;
 		}
 
@@ -152,8 +223,8 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		$scope.editStatus = function()
 		{
-			$scope.ticklerUpdate.statusName = $scope.tickler.statusName;
-			$scope.ticklerUpdate.status = $scope.tickler.statusName;
+			// $scope.ticklerUpdate.statusName = $scope.tickler.statusName;
+			// $scope.ticklerUpdate.status = $scope.tickler.statusName;
 			$scope.statuses = [
 			{
 				id: 'A',
@@ -174,8 +245,8 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 		$scope.updateStatus = function(item, model, label)
 		{
 			$scope.needsUpdate = true;
-			$scope.tickler.status = model;
-			$scope.tickler.statusName = label;
+			$scope.ticklerUpdate.status = model;
+			$scope.ticklerUpdate.statusName = label;
 			$scope.showStatusFormControl = false;
 		}
 
@@ -190,17 +261,18 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		$scope.addComment = function()
 		{
-			$scope.ticklerUpdate.comment = '';
+			// $scope.ticklerUpdate.comment = '';
 			$scope.showCommentFormControl = true;
 
 		}
 
 		$scope.saveComment = function()
 		{
+			console.log('Comment: ', $scope.ticklerUpdate.comment);
 			$scope.needsUpdate = true;
-			if ($scope.tickler.ticklerComments == null)
+			if ($scope.ticklerUpdate.ticklerComments == null)
 			{
-				$scope.tickler.ticklerComments = [];
+				$scope.ticklerUpdate.ticklerComments = [];
 			}
 			var comment = {
 				message: $scope.ticklerUpdate.comment,
@@ -209,7 +281,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 				updateDate: new Date(),
 				newComment: true
 			};
-			$scope.tickler.ticklerComments.unshift(comment);
+			$scope.ticklerUpdate.ticklerComments.unshift(comment);
 			$scope.showCommentFormControl = false;
 			$scope.showComments = true;
 		}
@@ -244,14 +316,24 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		$scope.saveChanges = function()
 		{
-			if ($scope.tickler.message != $scope.ticklerUpdate.message)
+			if (tickler.message != $scope.ticklerUpdate.message)
+			{
+				$scope.needsUpdate = true;
+			}
+			if (tickler.serviceDate != $scope.ticklerUpdate.serviceDate.getTime())
 			{
 				$scope.needsUpdate = true;
 			}
 			if ($scope.needsUpdate)
 			{
-				$scope.tickler.message = $scope.ticklerUpdate.message;
-				ticklerService.update($scope.tickler).then(function(data)
+				var postData = angular.copy($scope.ticklerUpdate);
+
+				if (Juno.Common.Util.exists(postData.serviceDate))
+				{
+					postData.serviceDate = postData.serviceDate.getTime();
+				}
+
+				ticklerService.update(postData).then(function(data)
 				{
 					$uibModalInstance.close(true);
 				});

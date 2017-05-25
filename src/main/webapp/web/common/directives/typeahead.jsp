@@ -30,14 +30,14 @@
 				 ng-model-options="typeaheadModelOptions"
 				 ng-change="onChange()"
 				 ng-blur="onBlur()"
-				 uib-typeahead="match for match in findMatches($viewValue)"
+				 uib-typeahead="match as typeaheadLabel(match) for match in findMatches($viewValue)"
 				 typeahead-input-formatter="formatMatch($model)"
 				 typeahead-on-select="onSelect($item, $model, $label, $event)"
 				 typeahead-min-length="1"
 				 typeahead-editable="true"
 				 typeahead-select-on-blur="false"
 				 typeahead-focus-first="false"
-				 typeahead-append-to-body="true"
+				 typeahead-append-to-body="false"
 				 placeholder="{{placeholder}}"/>
 
 	<span ng-if="hasButtons()"
