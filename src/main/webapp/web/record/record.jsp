@@ -42,7 +42,7 @@
 		</div>
 	</div>
 	
-	<nav class="navbar navbar-default" role="navigation">
+	<nav class="navbar navbar-default record-navbar" role="navigation">
 		<!-- Brand and toggle get grouped for better mobile display -->
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse"
@@ -55,8 +55,7 @@
 		</div>
 
 		<!-- Collect the nav links, forms, and other content for toggling   removed data-toggle="tab"  from a ngclick changeTab3 -->
-		<div class="collapse navbar-collapse navbar-ex1-collapse"
-			style="padding-left: 0px;">
+		<div class="collapse navbar-collapse navbar-ex1-collapse">
 			<ul class="nav navbar-nav" id="myTabs">
 				<li ng-repeat="tab in recordtabs2" ng-class="isTabActive(tab)">
 					<a href="javascript:void(0)" ng-if="!tab.dropdown" ng-click="changeTab(tab)" >{{tab.label}} <strong class="text-danger" ng-show="tab.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong></a>
@@ -68,6 +67,32 @@
 						</ul>
 				</li>
 			</ul>
+
+			<%--<ul class="nav navbar-nav hidden-lg visible-1200">
+					<li class="dropdown hand-hover">
+						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
+							Menu <b class="caret"></b>
+						</a>
+
+						<ul class="dropdown-menu" role="menu">
+							<li ng-repeat="tab in recordtabs2" ng-class="isTabActive(tab)">
+								<a href="javascript:void(0)" ng-if="!tab.dropdown" ng-click="changeTab(tab)" >{{tab.label}} 
+									<strong class="text-danger" ng-show="tab.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
+								</a>
+								<a href="javascript:void(0)" ng-if="tab.dropdown"  class="dropdown-toggle" data-toggle="dropdown">{{tab.label}} 
+									<strong class="text-danger" ng-show="tab.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!
+									</strong>
+									<span class="caret"></span>
+								</a>
+								<ul ng-if="tab.dropdown" class="dropdown-menu" role="menu">
+									<li ng-repeat="dropdownItem in tab.dropdownItems" >
+										<a href="javascript:void(0)" ng-click="changeTab(dropdownItem)" >{{dropdownItem.label}} <strong class="text-danger" ng-show="dropdownItem.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong></a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>--%>
 		</div>
 		<!-- /.navbar-collapse -->
 	</nav>

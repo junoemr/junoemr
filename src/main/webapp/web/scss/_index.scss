@@ -314,18 +314,6 @@ li.cpp-note-list:last-child {
 //         display: block !important;
 //     }
 // }
-
-/*Show or hide an element on screens with < 1380px width*/
-
-@media (max-width: 1500px) {
-	.hidden-1500 {
-		display: none !important;
-	}
-	.visible-1500 {
-		display: block !important;
-	}
-}
-
 @media (max-width: 991px) {
 	#left-pane .list-group-item {
 		border-right: 1px solid #dddddd;

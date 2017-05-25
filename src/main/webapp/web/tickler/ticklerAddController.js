@@ -17,6 +17,30 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		providerService,
 		ticklerService)
 	{
+		//=========================================================================
+		// Watches
+		//=========================================================================
+
+		$scope.$watch('demographicSearch',
+
+			function(new_value)
+			{
+				console.log('new val ', new_value);
+
+				if (new_value != null)
+				{
+					if (!new_value.isTypeaheadSearchQuery) // Patient selected, grab data
+					{
+						$scope.updateDemographicNo(new_value.demographicNo);
+					}
+					else // Still typing
+					{
+						$scope.tickler.demographicNo = null;
+						$scope.tickler.demographicName = null;
+						$scope.tickler.demographic = null;
+					}
+				}
+			}, true);
 
 		$scope.tickler = {
 			template:
@@ -28,6 +52,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			serviceDateTime: new Date(),
 			suggestedTextId: 0
 		};
+
 		$scope.priorities = ['Low', 'Normal', 'High'];
 
 		ticklerService.getTextSuggestions().then(function(data)
@@ -106,14 +131,16 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 
 		};
 
-		$scope.updateDemographicNo = function(item, model, label)
+		$scope.updateDemographicNo = function(demographicNo)
 		{
-
-			demographicService.getDemographic(model).then(function(data)
+			// console.log('stuff', item, model, label);
+			// console.log('demo name', $scope.tickler.demographicName);
+			demographicService.getDemographic(demographicNo).then(function(data)
 			{
 				$scope.tickler.demographicNo = data.demographicNo;
-				$scope.tickler.demographicName = '';
+				$scope.tickler.demographicName = data.demographicName;
 				$scope.tickler.demographic = data;
+				console.log('data: ', data);
 
 			});
 
@@ -121,8 +148,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 
 		if (angular.isDefined($stateParams) && angular.isDefined($stateParams.demographicNo))
 		{
-			$scope.tickler.demographicNo = $stateParams.demographicNo;
-			$scope.updateDemographicNo(null, $scope.tickler.demographicNo, null);
+			$scope.updateDemographicNo($stateParams.demographicNo);
 		}
 
 		$scope.searchProviders = function(val)
@@ -146,29 +172,30 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			});
 		};
 
-		$scope.searchPatients = function(term)
-		{
-			var search = {
-				type: 'Name',
-				'term': term,
-				active: true,
-				integrator: false,
-				outofdomain: true
-			};
-			return demographicService.search(search, 0, 25).then(function(response)
-			{
-				var resp = [];
-				for (var x = 0; x < response.content.length; x++)
-				{
-					resp.push(
-					{
-						demographicNo: response.content[x].demographicNo,
-						name: response.content[x].lastName + ',' + response.content[x].firstName
-					});
-				}
-				return resp;
-			});
-		};
+		// Replaced with neat new directive!
+		// $scope.searchPatients = function(term)
+		// {
+		// 	var search = {
+		// 		type: 'Name',
+		// 		'term': term,
+		// 		active: true,
+		// 		integrator: false,
+		// 		outofdomain: true
+		// 	};
+		// 	return demographicService.search(search, 0, 25).then(function(response)
+		// 	{
+		// 		var resp = [];
+		// 		for (var x = 0; x < response.content.length; x++)
+		// 		{
+		// 			resp.push(
+		// 			{
+		// 				demographicNo: response.content[x].demographicNo,
+		// 				name: response.content[x].lastName + ',' + response.content[x].firstName
+		// 			});
+		// 		}
+		// 		return resp;
+		// 	});
+		// };
 
 		$scope.updateProviderNo = function(item, model, label)
 		{
