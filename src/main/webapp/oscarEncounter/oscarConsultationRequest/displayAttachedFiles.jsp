@@ -35,7 +35,7 @@
   String requestId = request.getParameter("requestId");
 %>
 <ul id="attachedList"
-	style="background-color: white; padding-left: 20px; list-style-position: outside; list-style-type: lower-roman;">
+	style="background-color: white; padding: 7px 0; list-style-position: outside; list-style-type: lower-roman;">
 	<%
             ArrayList privatedocs = new ArrayList();
             privatedocs = EDocUtil.listDocs(demo, requestId, EDocUtil.ATTACHED);
