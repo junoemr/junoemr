@@ -24,10 +24,10 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<form name="ticklerAddForm" novalidate>
+<form name="ticklerAddForm" ng-submit="save()" novalidate>
 
 <div class="modal-header">
-	<button type="button" class="close" ng-click="close()" aria-label="Close">&times;</button>
+	<button type="button" class="close" ng-click="close()" aria-label="Close">&times;</button>	
     <h3><bean:message key="tickler.add.title" bundle="ui"/></h3>
 </div>
 <div class="modal-body">
@@ -130,8 +130,8 @@
 	</div>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-default" ng-click="close()"><bean:message key="global.close" bundle="ui"/></button>
-	 <button class="btn btn-success" ng-click="save()"><bean:message key="global.save" bundle="ui"/></button>
+    <button class="btn btn-default" type="button" ng-click="close()"><bean:message key="global.close" bundle="ui"/></button>
+	 <button class="btn btn-success" type="submit" ><bean:message key="global.save" bundle="ui"/></button>
 </div>
 </form>
 
