@@ -25,17 +25,17 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<div ng-show="ticklerReadAccess" class="col-xs-12 margin-top">
+<div ng-show="ticklerReadAccess" class="col-xs-12 margin-top tickler-list-section">
  	
-	<form name="searchForm" id="searchForm" class="noprint">
-		<div class="row">
-			<div class="col-lg-2 col-sm-4 col-xs-6 margin-bottom-20">
+	<form name="searchForm" id="search-form" class="noprint">
+		<div class="row search-filters">
+			<div class="col-lg-2 col-sm-4 col-xs-6">
 				<input ng-model="search.serviceStartDate" type="text" id="serviceStartDate" name="serviceStartDate" class="form-control" uib-datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="data.isOpen" ng-click="data.isOpen = true" placeholder="<bean:message key="tickler.list.serviceStartDate" bundle="ui"/>">
 			</div>
-			<div class="col-lg-2 col-sm-4 col-xs-6 margin-bottom-20">
+			<div class="col-lg-2 col-sm-4 col-xs-6">
 				<input ng-model="search.serviceEndDate" type="text" id="serviceEndDate" name="serviceEndDate" class="form-control" uib-datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="data2.isOpen" ng-click="data2.isOpen = true" placeholder="<bean:message key="tickler.list.serviceEndDate" bundle="ui"/>">
 			</div>
-			<div class="col-lg-2 col-sm-3 col-xs-6 margin-bottom-20">
+			<div class="col-lg-2 col-sm-3 col-xs-6">
 				<select ng-model="search.status" name="status" id="status" class="form-control" >
 				<option value=""><bean:message key="tickler.list.status" bundle="ui"/></option>
 				<option value="A"><bean:message key="tickler.list.status.active" bundle="ui"/></option>
@@ -43,7 +43,7 @@
 				<option value="D"><bean:message key="tickler.list.status.deleted" bundle="ui"/></option>
 				</select>     
 			</div>
-			<div class="col-lg-2 col-sm-3  col-xs-6 margin-bottom-20">
+			<div class="col-lg-2 col-sm-3 col-xs-6">
 				<select ng-model="search.priority" name="priority" id="priority" class="form-control" ng-init="search.priority=''">
 				<option value=""><bean:message key="tickler.list.priority" bundle="ui"/></option>
 				<option value="Normal"><bean:message key="tickler.list.priority.normal" bundle="ui"/></option>
@@ -52,19 +52,19 @@
 				</select>           
 			</div>
 
-			<div class="col-lg-2 col-sm-3 col-xs-6 margin-bottom-20">
+			<div class="col-lg-2 col-sm-3 col-xs-6">
 				<select ng-model="search.taskAssignedTo" name="taskAssignedTo" id="taskAssignedTo" class="form-control"
 						ng-model="search.taskAssignedTo" data-ng-options="a.providerNo as a.name for a in providers" ng-init="search.taskAssignedTo=''">
 						<option value=""><bean:message key="tickler.list.assignee" bundle="ui"/></option> 	
 				</select>
 			</div>
-			<div class="col-lg-2 col-sm-3 col-xs-6 margin-bottom-20">
+			<div class="col-lg-2 col-sm-3 col-xs-6">
 				<select ng-model="search.creator" name="creator" id="creator" class="form-control"
 						ng-model="search.creator" data-ng-options="a.providerNo as a.name for a in providers" ng-init="search.creator=''">
 					<option value=""><bean:message key="tickler.list.creator" bundle="ui"/></option> 	
 				</select>
 			</div>
-			<div class="col-lg-2 col-sm-3 col-xs-6 margin-bottom-20">
+			<div class="col-lg-2 col-sm-3 col-xs-6">
 				<select ng-model="search.mrp" name="mrp" id="mrp" class="form-control"
 						ng-model="search.mrp" data-ng-options="a.providerNo as a.name for a in providers" ng-init="search.mrp=''">
 					<option value=""><bean:message key="tickler.list.allMRP" bundle="ui"/></option> 	
@@ -72,8 +72,8 @@
 			</div> 
 		</div>
 
-		<div class="row margin-bottom-20">
-			<div class="col-xs-6">
+		<div class="row search-buttons">
+			<div class="col-xs-12">
 				<button class="btn btn-primary" type="button" ng-click="doSearch()" ><bean:message key="global.search" bundle="ui"/></button>
 				<button class="btn btn-default" type="button" ng-click="clear()" ><bean:message key="global.clear" bundle="ui"/></button>
 

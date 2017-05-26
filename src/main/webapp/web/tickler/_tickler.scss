@@ -1,12 +1,16 @@
 .tickler-list-section {
 	#search-form {
-		.search-filter {
+		.search-filters>div {
 			margin-bottom: $margin-sm;
 		}
-	}
-	.tickler-table {
-		tbody {
-			text-align: center;
+		.search-buttons {
+			margin-bottom: $margin-md;
 		}
+	}
+}
+
+.tickler-table {
+	tbody {
+		text-align: center;
 	}
 }
