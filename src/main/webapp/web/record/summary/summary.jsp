@@ -25,14 +25,14 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<div class="col-xs-12">
+<div class="col-xs-12 summary-section">
 	<div class="row">
 		<div class="col-lg-12" ng-hide="page.canRead">
 			<bean:message key="oscarEncounter.accessDenied"/>
 		</div>
 	</div>
 
-	<div class="row margin-bottom-20">
+	<div class="row filter-bar">
 		<div class="col-md-12" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 			<ul class="nav nav-pills">
 				<li ng-class="isCurrentStatus('none')"><a data-target="#all" ng-click="removeFilter(0)" data-toggle="tab" class="hand-hover">All</a></li>
@@ -44,8 +44,8 @@
 		</div><!-- middleSpace -->
 	</div>
 	<div class="row">
-		<div class="col-md-3 margin-bottom-20" ng-show="page.canRead">
-			<fieldset class="summary-section" ng-repeat="mod in page.columnOne.modules">
+		<div class="col-md-3" ng-show="page.canRead">
+			<fieldset class="module-list" ng-repeat="mod in page.columnOne.modules">
 				<div class="row vertical-align">
 					<div class="col-md-8 col-sm-8">
 						<h5 class="summary-section-heading" ng-click="toggleList(mod)">
@@ -116,7 +116,7 @@
 						ng-show="!isSectionExpanded(mod) && !isSectionEmpty(mod)">
 				</span>
 
-		</fieldset>   
+			</fieldset>   
 		</div>
 
 		<div class="col-md-6" id="middle-space" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
