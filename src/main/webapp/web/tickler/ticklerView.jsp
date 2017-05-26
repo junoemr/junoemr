@@ -86,11 +86,20 @@
 			
 			<div class="form-group col-sm-6">
 				<label><bean:message key="tickler.view.priority" bundle="ui"/></label>
-				<input type="text" typeahead-on-select="updatePriority($item, $model, $label)" 
-				placeholder="<bean:message key="tickler.view.priority" bundle="ui"/>" 
-				ng-model="ticklerUpdate.priority" 
-				uib-typeahead="p for p in priorities | filter:$viewValue" 
-				class="form-control">
+				
+				<%--<input type="text" typeahead-on-select="updatePriority($item, $model, $label)" 
+					placeholder="<bean:message key="tickler.view.priority" bundle="ui"/>" 
+					ng-model="ticklerUpdate.priority" 
+					uib-typeahead="p for p in priorities | filter:$viewValue" 
+					class="form-control">--%>
+
+				<select ng-model="ticklerUpdate.priority"
+					ng-options="p for p in priorities"
+					ng-change="updatePriority(ticklerUpdate.priority)" 
+					class="form-control ng-pristine ng-valid ng-not-empty ng-touched">
+				</select>
+
+
 			</div>	
 
 			<div class="form-group col-sm-6">
@@ -126,11 +135,17 @@
 
 			<div class="form-group col-sm-6">
 				<label><bean:message key="tickler.view.status" bundle="ui"/></label>
-				<input type="text" typeahead-on-select="updateStatus($item, $model, $label)" 
+				<%--<input type="text" typeahead-on-select="updateStatus($item, $model, $label)" 
 					placeholder="Status" 
 					ng-model="ticklerUpdate.statusName" 
 					uib-typeahead="s.id as s.label for s in statuses | filter:$viewValue" 
-					class="form-control">
+					class="form-control">--%>
+
+				<select ng-model="selectedStatus"
+					ng-options="s.label for s in statuses"
+					ng-change="updateStatus(selectedStatus)" 
+					class="form-control ng-pristine ng-valid ng-not-empty ng-touched">
+				</select>
 			</div>	
 		</form>
   		<%--<table class="table tickler-modal-table">
@@ -218,9 +233,9 @@
     
 	<div class="row">
 		<div class="col-xs-12">
-			<div class="row margin-bottom-10">
-				<strong>
-					<span  ng-click="showComments = !showComments"><bean:message key="tickler.view.comments" bundle="ui"/></span> 
+			<div class="margin-bottom-10">
+				<strong ng-click="showComments = !showComments">
+					<bean:message key="tickler.view.comments" bundle="ui"/>
 					({{ticklerUpdate.ticklerComments != null && ticklerUpdate.ticklerComments.length || 0}}) 
 					<%--<span class="glyphicon glyphicon-pencil" ng-show="ticklerWriteAccess" ng-click="addComment()"></span>--%>
 					<button class="btn btn-xs btn-success" ng-show="ticklerWriteAccess" ng-click="addComment()">Add</button>
