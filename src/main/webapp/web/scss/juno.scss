@@ -14,11 +14,12 @@
 @import "global";
 // TODO: pre-existing CSS files, need to be reorganized
 @import "navbar-fixed-top";
-@import "../patientlist/patient-list";
 @import "index";
+@import "note-editor";
 // Section-specific things
 @import "../common/directives/patientSelectorOption";
 @import "../dashboard/dashboard";
+@import "../patientlist/patient-list";
 @import "../record/record";
 @import "../record/summary/summary";
 @import "../tickler/tickler";
