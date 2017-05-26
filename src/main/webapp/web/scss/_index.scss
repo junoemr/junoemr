@@ -29,56 +29,9 @@ body {
 	/*here it will make center */
 }
 
-#noteInput,
-#noteInput2 {
-	position: fixed;
-	bottom: 0;
-	font-family: sans-serif;
-	margin-bottom: 0px;
-	font-weight: bold;
-	bottom: 0;
-	z-index: 999;
-}
-
-#noteInput {
-	line-height: 2;
-	font-size: 30px;
-	/*text-shadow: 0 1px 0 #84BAFF;
-    //box-shadow: 0 0 15px #00214B
-    //background: #ccccFF;
-    //text-align: center;
-    //color: #042E64;
-    */
-}
-
-.absolute-left {
-	left: 0px;
-}
-
-.absolute-right {
-	right: 0px;
-}
-
-#noteInput ul.dropdown-menu {
-	max-height: 220px;
-	overflow-y: auto;
-	overflow-x: none;
-}
-
-pre.noteInEdit {
-	border-color: rgba(126, 239, 104, 0.8);
-	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(126, 239, 104, 0.6);
-	outline: 0 none;
-}
-
 #navbarlogo {
 	height: 50px;
 	padding: 10px;
-}
-
-.add-summary:hover {
-	color: #333 !important;
-	text-decoration: none;
 }
 
 li.cpp-note-list {
@@ -93,16 +46,6 @@ li.cpp-note-list {
 
 li.cpp-note-list:last-child {
 	border-bottom: none;
-}
-
-.more {
-	border-top-color: #727272 !important;
-	border-bottom-color: #727272 !important;
-}
-
-.more:hover {
-	border-top-color: #333 !important;
-	border-bottom-color: #333 !important;
 }
 
 .highlight,
@@ -138,10 +81,6 @@ li.cpp-note-list:last-child {
 	color: red;
 }
 
-.glyphicon-chevron-down-disabled {
-	color: #999999 !important;
-}
-
 #left-pane {
 	position: fixed;
 	top: 51px;
@@ -154,37 +93,53 @@ li.cpp-note-list:last-child {
 	background-color: #ebebeb;
 	padding-left: 0;
 	padding-right: 0;
+	li {
+		color: #ebebeb;
+	}
+	.list-group-item {
+		border-right: 0;
+	}
+	#left-pane-header {
+		background-color: #1c56af;
+		margin-right: 0px;
+		h1 {
+			margin: 0;
+		}
+		a {
+			color: #ebebeb;
+			&:hover {
+				color: #fff;
+			}
+		}
+		#left-pane-header-title {
+			text-align: center;
+			font-size: 20px;
+			color: #ebebeb;
+		}
+	}
+	#patient-search {
+		padding: 20px;
+	}
 }
 
-#left-pane li {
-	color: #ebebeb;
-}
-
-#left-pane .list-group-item {
-	border-right: 0;
-}
-
-#left-pane-header {
+.toggle-patient-list-button {
+	height: 90px;
 	background-color: #1c56af;
-	margin-right: 0px;
-}
-
-#left-pane-header a {
-	color: #ebebeb;
-}
-
-#left-pane-header a:hover {
-	color: #fff;
-}
-
-#left-pane-header h1 {
-	margin: 0;
-}
-
-#left-pane-header-title {
-	text-align: center;
-	font-size: 20px;
-	color: #ebebeb !important;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #ebebeb;
+	border-bottom: 0;
+	border-top: 0;
+	border-left: 0;
+	&:hover {
+		background-color: #1e65d2;
+	}
+	.glyphicon-chevron-left {
+		color: #ebebeb;
+	}
+	.glyphicon-chevron-right {
+		color: #ebebeb;
+	}
 }
 
 #left-pane-hidden {
@@ -197,34 +152,6 @@ li.cpp-note-list:last-child {
 	overflow-x: hidden;
 	padding-left: 0;
 	padding-right: 0;
-}
-
-.toggle-patient-list-button {
-	height: 90px;
-	background-color: #1c56af;
-	border-style: solid;
-	border-width: 1px;
-	border-color: #ebebeb;
-	border-bottom: 0;
-	border-top: 0;
-	border-left: 0;
-}
-
-.toggle-patient-list-button:hover {
-	background-color: #1e65d2;
-}
-
-.toggle-patient-list-button {
-	.glyphicon-chevron-left {
-		color: #ebebeb;
-	}
-	.glyphicon-chevron-right {
-		color: #ebebeb;
-	}
-}
-
-#patient-search {
-	padding: 20px;
 }
 
 .hidden-1380 {
