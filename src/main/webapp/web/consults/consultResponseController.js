@@ -44,14 +44,14 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 		$scope.consult = consult;
 
-		consult.letterheadList = toArray(consult.letterheadList);
-		consult.referringDoctorList = toArray(consult.referringDoctorList);
-		consult.faxList = toArray(consult.faxList);
-		consult.sendToList = toArray(consult.sendToList);
+		consult.letterheadList = Juno.Common.Util.toArray(consult.letterheadList);
+		consult.referringDoctorList = Juno.Common.Util.toArray(consult.referringDoctorList);
+		consult.faxList = Juno.Common.Util.toArray(consult.faxList);
+		consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
 		if (consult.referringDoctor == null) consult.referringDoctor = {};
 
 		//set attachments
-		consult.attachments = toArray(consult.attachments);
+		consult.attachments = Juno.Common.Util.toArray(consult.attachments);
 		sortAttachmentDocs(consult.attachments);
 
 		//set default letterhead
@@ -85,7 +85,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		});
 
 		//set patient cell phone
-		consult.demographic.extras = toArray(consult.demographic.extras);
+		consult.demographic.extras = Juno.Common.Util.toArray(consult.demographic.extras);
 		for (var i = 0; i < consult.demographic.extras.length; i++)
 		{
 			if (consult.demographic.extras[i].key == "demo_cell")
@@ -99,8 +99,8 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		if (consult.appointmentTime != null)
 		{
 			var apptTime = new Date(consult.appointmentTime);
-			consult.appointmentHour = pad0(apptTime.getHours());
-			consult.appointmentMinute = pad0(apptTime.getMinutes());
+			consult.appointmentHour = Juno.Common.Util.pad0(apptTime.getHours());
+			consult.appointmentMinute = Juno.Common.Util.pad0(apptTime.getMinutes());
 		}
 
 		$scope.urgencies = staticDataService.getConsultUrgencies();
@@ -136,15 +136,15 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 		$scope.writeToBox = function(data, boxId)
 		{
-			var items = toArray(data.summaryItem);
+			var items = Juno.Common.Util.toArray(data.summaryItem);
 			var boxData = null;
 			for (var i = 0; i < items.length; i++)
 			{
-				boxData = addNewLine(items[i].displayName, boxData);
+				boxData = Juno.Common.Util.addNewLine(items[i].displayName, boxData);
 			}
-			if (boxId == "clinicalInfo") consult.clinicalInfo = addNewLine(boxData, consult.clinicalInfo);
-			else if (boxId == "concurrentProblems") consult.concurrentProblems = addNewLine(boxData, consult.concurrentProblems);
-			else if (boxId == "currentMeds") consult.currentMeds = addNewLine(boxData, consult.currentMeds);
+			if (boxId == "clinicalInfo") consult.clinicalInfo = Juno.Common.Util.addNewLine(boxData, consult.clinicalInfo);
+			else if (boxId == "concurrentProblems") consult.concurrentProblems = Juno.Common.Util.addNewLine(boxData, consult.concurrentProblems);
+			else if (boxId == "currentMeds") consult.currentMeds = Juno.Common.Util.addNewLine(boxData, consult.currentMeds);
 		};
 
 		$scope.getFamilyHistory = function(boxId)
@@ -258,9 +258,9 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			if (consult.id != null) consultId = consult.id;
 			consultService.getResponseAttachments(consultId, consult.demographic.demographicNo).then(function(data)
 			{
-				if (consult.availableDocs == null) consult.availableDocs = toArray(data);
+				if (consult.availableDocs == null) consult.availableDocs = Juno.Common.Util.toArray(data);
 				$scope.atth.availableDocs = consult.availableDocs;
-				sortAttachmentDocs($scope.atth.availableDocs);
+				Juno.Common.Util.sortAttachmentDocs($scope.atth.availableDocs);
 				if ($scope.atth.availableDocs[0] != null) $scope.atth.selectedAvailableDoc = $scope.atth.availableDocs[0];
 			});
 
@@ -276,7 +276,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				$scope.atth.attachedDocs.push($scope.atth.selectedAvailableDoc);
 				$scope.atth.selectedAttachedDoc = $scope.atth.selectedAvailableDoc;
 				$scope.atth.selectedAttachedDoc.attached = true;
-				sortAttachmentDocs($scope.atth.attachedDocs);
+				Juno.Common.Util.sortAttachmentDocs($scope.atth.attachedDocs);
 
 				var x = $("#selAvailDoc").val();
 				$scope.atth.availableDocs.splice(x, 1);
@@ -293,7 +293,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				$scope.atth.availableDocs.push($scope.atth.selectedAttachedDoc);
 				$scope.atth.selectedAvailableDoc = $scope.atth.selectedAttachedDoc;
 				$scope.atth.selectedAvailableDoc.attached = false;
-				sortAttachmentDocs($scope.atth.availableDocs);
+				Juno.Common.Util.sortAttachmentDocs($scope.atth.availableDocs);
 
 				var x = $("#selAttachDoc").val();
 				$scope.atth.attachedDocs.splice(x, 1);
@@ -350,15 +350,15 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 		$scope.sendFax = function()
 		{
-			var p_urgency = noNull($scope.urgencies[$("#urgency").val()].name);
-			var p_letterheadName = noNull(consult.letterheadList[$("#letterhead").val()].name);
-			var p_page2 = getPrintPage2(p_urgency, p_letterheadName, consult, user);
+			var p_urgency = Juno.Common.Util.noNull($scope.urgencies[$("#urgency").val()].name);
+			var p_letterheadName = Juno.Common.Util.noNull(consult.letterheadList[$("#letterhead").val()].name);
+			var p_page2 = Juno.Common.Util.getPrintPage2(p_urgency, p_letterheadName, consult, user);
 
 			var consultResponsePage = encodeURIComponent(p_page1 + p_page2);
 			var reqId = consult.id;
 			var demographicNo = consult.demographic.demographicNo;
-			var letterheadFax = noNull(consult.letterheadFax);
-			var fax = noNull(consult.referringDoctor.faxNumber);
+			var letterheadFax = Juno.Common.Util.noNull(consult.letterheadFax);
+			var fax = Juno.Common.Util.noNull(consult.referringDoctor.faxNumber);
 
 			window.open("../fax/CoverPage.jsp?consultResponsePage=" + consultResponsePage + "&reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&fax=" + fax);
 		};
@@ -377,9 +377,9 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				p_attachments += "<div class='noprint'><button onclick=printAttachments('" + consult.attachments[i].url + "')>Print attachment</button> " + consult.attachments[i].displayName + "</div>";
 			}
 
-			var p_urgency = noNull($scope.urgencies[$("#urgency").val()].name);
-			var p_letterheadName = noNull(consult.letterheadList[$("#letterhead").val()].name);
-			var p_page2 = getPrintPage2(p_urgency, p_letterheadName, consult, user);
+			var p_urgency = Juno.Common.Util.noNull($scope.urgencies[$("#urgency").val()].name);
+			var p_letterheadName = Juno.Common.Util.noNull(consult.letterheadList[$("#letterhead").val()].name);
+			var p_page2 = Juno.Common.Util.getPrintPage2(p_urgency, p_letterheadName, consult, user);
 
 			printWin.document.write(p_page1 + p_buttons + p_attachments + p_page2);
 			printWin.document.close();
@@ -387,114 +387,6 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 	}
 ]);
 
-
-
-function toArray(obj)
-{ //convert single object to array
-	if (obj instanceof Array) return obj;
-	else if (obj == null) return [];
-	else return [obj];
-}
-
-function pad0(n)
-{
-	var s = n.toString();
-	if (s.length == 1) s = "0" + s;
-	return s;
-}
-
-function noNull(s)
-{
-	if (s == null) s = "";
-	if (s instanceof String) s = s.trim();
-	return s;
-}
-
-function formatDate(d)
-{
-	d = noNull(d);
-	if (d)
-	{
-		if (!(d instanceof Date)) d = new Date(d);
-		d = d.getFullYear() + "-" + pad0(d.getMonth() + 1) + "-" + pad0(d.getDate());
-	}
-	return d;
-}
-
-function formatTime(d)
-{
-	d = noNull(d);
-	if (d)
-	{
-		if (!(d instanceof Date)) d = new Date(d);
-		d = pad0(d.getHours()) + ":" + pad0(d.getMinutes());
-	}
-	return d;
-}
-
-function sortAttachmentDocs(arrayOfDocs)
-{
-	arrayOfDocs.sort(function(doc1, doc2)
-	{
-		if (doc1.documentType < doc2.documentType) return -1;
-		else if (doc1.documentType > doc2.documentType) return 1;
-		else
-		{
-			if (doc1.displayName < doc2.displayName) return -1;
-			else if (doc1.displayName > doc2.displayName) return 1;
-		}
-		return 0;
-	});
-}
-
-function addNewLine(line, mssg)
-{
-	if (line == null || line.trim() == "") return mssg;
-
-	if (mssg == null || mssg.trim() == "") mssg = line.trim();
-	else mssg += "\n" + line.trim();
-
-	return mssg;
-}
-
-function getPrintPage2(p_urgency, p_letterheadName, consult, user)
-{
-	var p_clinicName = noNull(consult.letterheadList[0].name);
-	var p_responseDate = formatDate(consult.responseDate);
-	var p_referralDate = formatDate(consult.referralDate);
-	var p_letterheadAddress = noNull(consult.letterheadAddress);
-	var p_letterheadPhone = noNull(consult.letterheadPhone);
-	var p_letterheadFax = noNull(consult.letterheadFax);
-	var p_consultantName = noNull(consult.referringDoctor.name);
-	var p_consultantPhone = noNull(consult.referringDoctor.phoneNumber);
-	var p_consultantFax = noNull(consult.referringDoctor.faxNumber);
-	var p_consultantAddress = noNull(consult.referringDoctor.streetAddress);
-	var p_patientName = noNull(consult.demographic.lastName) + ", " + noNull(consult.demographic.firstName);
-	var p_patientPhone = noNull(consult.demographic.phone);
-	var p_patientWorkPhone = noNull(consult.demographic.alternativePhone);
-	var p_patientBirthdate = formatDate(consult.demographic.dateOfBirth);
-	var p_patientSex = noNull(consult.demographic.sexDesc);
-	var p_patientHealthCardNo = noNull(consult.demographic.hin) + "-" + noNull(consult.demographic.ver);
-	var p_patientChartNo = noNull(consult.demographic.chartNo);
-	var p_patientAddress = "";
-	if (consult.demographic.address != null)
-	{
-		p_patientAddress = noNull(consult.demographic.address.address) + ", " + noNull(consult.demographic.address.city) + ", " + noNull(consult.demographic.address.province) + " " + noNull(consult.demographic.address.postal);
-	}
-	var p_appointmentDate = formatDate(consult.appointmentDate);
-	var p_appointmentTime = formatTime(consult.appointmentTime);
-	var p_reason = noNull(consult.reasonForReferral);
-	var p_examination = noNull(consult.examination);
-	var p_impression = noNull(consult.impression);
-	var p_plan = noNull(consult.plan);
-	var p_clinicalInfo = noNull(consult.clinicalInfo);
-	var p_concurrentProblems = noNull(consult.concurrentProblems);
-	var p_currentMeds = noNull(consult.currentMeds);
-	var p_allergies = noNull(consult.allergies);
-	var p_provider = noNull(user.lastName) + ", " + noNull(user.firstName);
-
-	return "<div class='center'><label class='large'>" + p_clinicName + "</label><br/><label>Consultation Response</label><br/></div><br/><table><tr><td><label>Date: </label>" + p_responseDate + "</td><td rowspan=6 width=10></td><td><label>Status: </label>" + p_urgency + "</td></tr><tr><td colspan=2></td></tr><tr><th>FROM:</th><th>TO:</th></tr><tr><td><p class='large'>" + p_letterheadName + "</p>" + p_letterheadAddress + "<br/><label>Tel: </label>" + p_letterheadPhone + "<br/><label>Fax: </label>" + p_letterheadFax + "</td><td><table><tr><th>Referring Doctor:</th><td>" + p_consultantName + "</td></tr><tr><th>Phone:</th><td>" + p_consultantPhone + "</td></tr><tr><th>Fax:</th><td>" + p_consultantFax + "</td></tr><tr><th>Address:</th><td>" + p_consultantAddress + "</td></tr></table></td></tr><tr><td colspan=2></td></tr><tr><td><table><tr><th>Patient:</th><td>" + p_patientName + "</td></tr><tr><th>Address:</th><td>" + p_patientAddress + "</td></tr><tr><th>Phone:</th><td>" + p_patientPhone + "</td></tr><tr><th>Work Phone:</th><td>" + p_patientWorkPhone + "</td></tr><tr><th>Birthdate:</th><td>" + p_patientBirthdate + "</td></tr></table></td><td><table><tr><th>Sex:</th><td>" + p_patientSex + "</td></tr><tr><th>Health Card No:</th><td>" + p_patientHealthCardNo + "</td></tr><tr><th>Appointment date:</th><td>" + p_appointmentDate + "</td></tr><tr><th>Appointment time:</th><td>" + p_appointmentTime + "</td></tr><tr><th>Chart No:</th><td>" + p_patientChartNo + "</td></tr></table></td></tr></table><br/><table><tr><th>Examination:</th></tr><tr><td>" + p_examination + "<hr></td></tr><tr><th>Impression:</th></tr><tr><td>" + p_impression + "<hr></td></tr><tr><th>Plan:</th></tr><tr><td>" + p_plan + "<hr></td></tr><tr><td></td></tr><tr><th>Reason for consultation: (Date: " + p_referralDate + ")</th></tr><tr><td>" + p_reason + "<hr></td></tr><tr><th>Pertinent Clinical Information:</th></tr><tr><td>" + p_clinicalInfo + "<hr></td></tr><tr><th>Significant Concurrent Problems:</th></tr><tr><td>" + p_concurrentProblems + "<hr></td></tr><tr><th>Current Medications:</th></tr><tr><td>" + p_currentMeds + "<hr></td></tr><tr><th>Allergies:</th></tr><tr><td>" + p_allergies + "<hr></td></tr><tr><td><label>Consultant: </label>" + p_provider + "</td></tr><tr><td></td></tr><tr><td><div class='center'><em>Created by: OSCAR The open-source EMR www.oscarcanada.org</em></div></td></tr></table></body></html>";
-}
 /* html for fax & print, kept here for easy reference
 <html>
 <style>
