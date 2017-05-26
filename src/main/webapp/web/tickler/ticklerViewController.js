@@ -25,7 +25,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 	{
 
 		$scope.ticklerUpdate = angular.copy(tickler);
-		console.log("TICKLER", $scope.ticklerUpdate);
+		console.log("TICKLER", tickler);
 		if (Juno.Common.Util.exists($scope.ticklerUpdate.serviceDate))
 		{
 			$scope.ticklerUpdate.serviceDate = new Date($scope.ticklerUpdate.serviceDate);
@@ -79,10 +79,18 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			label: 'Deleted'
 		}];
 
-
 		if (ticklerNote != null)
 		{
 			$scope.ticklerNote = ticklerNote.ticklerNote;
+		}
+
+		// Keep track of the current status as an object containing id and label
+		if (tickler != null)
+		{
+			$scope.selectedStatus = $scope.statuses.find(function(status)
+			{
+				return status.id == tickler.status;
+			});
 		}
 
 		$scope.$watch('ticklerUpdate.serviceDate',
@@ -131,18 +139,19 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 				$uibModalInstance.close(false);
 			}
 
-		}
+		};
+
 		$scope.save = function()
 		{
 			$uibModalInstance.close("Someone Saved Me");
-		}
+		};
 
 		$scope.editTaskAssignedTo = function()
 		{
 			$scope.showTaskAssignedToFormControl = true;
 			// $scope.ticklerUpdate.taskAssignedTo = $scope.tickler.taskAssignedTo;
 			// $scope.ticklerUpdate.taskAssignedToName = $scope.tickler.taskAssignedName;
-		}
+		};
 
 		$scope.updateTaskAssignedTo = function(item, model, label)
 		{
@@ -150,7 +159,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			$scope.tickler.taskAssignedTo = model;
 			$scope.tickler.taskAssignedToName = label;
 			$scope.showTaskAssignedToFormControl = false;
-		}
+		};
 
 		$scope.cancelTaskAssignedToUpdate = function()
 		{
@@ -159,7 +168,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 			$scope.showTaskAssignedToFormControl = false;
 
-		}
+		};
 
 		$scope.editServiceDateAndTime = function()
 		{
@@ -167,7 +176,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			// $scope.ticklerUpdate.serviceTime = $filter('date')($scope.tickler.serviceDate, 'HH:mm');
 
 			$scope.showServiceDateAndTimeFormControl = true;
-		}
+		};
 
 
 		$scope.updateServiceDateAndTime = function()
@@ -191,13 +200,13 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			$scope.needsUpdate = true;
 			$scope.tickler.serviceDate = d;
 			$scope.showServiceDateAndTimeFormControl = false;
-		}
+		};
 
 		$scope.cancelServiceDateAndTimeUpdate = function()
 		{
 			$scope.ticklerUpdate.serviceDate = null;
 			$scope.showServiceDateAndTimeFormControl = false;
-		}
+		};
 
 		$scope.editPriority = function()
 		{
@@ -205,50 +214,40 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			$scope.priorities = ['Low', 'Normal', 'High'];
 
 			$scope.showPriorityFormControl = true;
-		}
+		};
 
-		$scope.updatePriority = function(item, model, label)
+		$scope.updatePriority = function(newPriority)
 		{
+			console.log('updatePriority: ', newPriority);
+			console.log('TicklerUpdate ', $scope.ticklerUpdate);
 			$scope.needsUpdate = true;
-			$scope.ticklerUpdate.priority = model;
+			// $scope.ticklerUpdate.priority = newPriority; // Don't need this anymore?
 			$scope.showPriorityFormControl = false;
-		}
+		};
 
 
 		$scope.cancelPriorityUpdate = function()
 		{
 			$scope.ticklerUpdate.priority = null;
 			$scope.showPriorityFormControl = false;
-		}
+		};
 
 		$scope.editStatus = function()
 		{
 			// $scope.ticklerUpdate.statusName = $scope.tickler.statusName;
 			// $scope.ticklerUpdate.status = $scope.tickler.statusName;
-			$scope.statuses = [
-			{
-				id: 'A',
-				label: 'Active'
-			},
-			{
-				id: 'C',
-				label: 'Completed'
-			},
-			{
-				id: 'D',
-				label: 'Deleted'
-			}];
-
 			$scope.showStatusFormControl = true;
-		}
+		};
 
-		$scope.updateStatus = function(item, model, label)
+		$scope.updateStatus = function(selectedStatus)
 		{
+			console.log('STATUS: ', selectedStatus);
+			console.log('TicklerUpdate ', $scope.ticklerUpdate);
 			$scope.needsUpdate = true;
-			$scope.ticklerUpdate.status = model;
-			$scope.ticklerUpdate.statusName = label;
+			$scope.ticklerUpdate.status = selectedStatus.id;
+			$scope.ticklerUpdate.statusName = selectedStatus.label;
 			$scope.showStatusFormControl = false;
-		}
+		};
 
 		$scope.cancelStatusUpdate = function()
 		{
@@ -257,14 +256,14 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 			$scope.showStatusFormControl = false;
 
-		}
+		};
 
 		$scope.addComment = function()
 		{
 			// $scope.ticklerUpdate.comment = '';
 			$scope.showCommentFormControl = true;
 
-		}
+		};
 
 		$scope.saveComment = function()
 		{
@@ -284,13 +283,13 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			$scope.ticklerUpdate.ticklerComments.unshift(comment);
 			$scope.showCommentFormControl = false;
 			$scope.showComments = true;
-		}
+		};
 
 		$scope.cancelCommentUpdate = function()
 		{
 			$scope.ticklerUpdate.comment = null;
 			$scope.showCommentFormControl = false;
-		}
+		};
 
 
 		$scope.searchProviders = function(val)
@@ -312,7 +311,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 				}
 				return resp;
 			});
-		}
+		};
 
 		$scope.saveChanges = function()
 		{
@@ -324,6 +323,11 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			{
 				$scope.needsUpdate = true;
 			}
+			if (tickler.serviceTime != $scope.ticklerUpdate.serviceTime)
+			{
+				console.log('updating time. old time: ', tickler.serviceTime);
+				$scope.needsUpdate = true;
+			}
 			if ($scope.needsUpdate)
 			{
 				var postData = angular.copy($scope.ticklerUpdate);
@@ -332,6 +336,8 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 				{
 					postData.serviceDate = postData.serviceDate.getTime();
 				}
+
+				console.log('Post DATA: ', postData);
 
 				ticklerService.update(postData).then(function(data)
 				{
@@ -343,7 +349,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 				$uibModalInstance.close(false);
 			}
 
-		}
+		};
 
 
 		$scope.completeTickler = function()
@@ -356,7 +362,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 				alert(reason);
 			});
 
-		}
+		};
 
 		$scope.deleteTickler = function()
 		{
@@ -368,12 +374,12 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 				alert(reason);
 			});
 
-		}
+		};
 
 		$scope.printTickler = function()
 		{
 			window.open('../Tickler.do?method=print&id=' + tickler.id);
 
-		}
+		};
 	}
 ]);
