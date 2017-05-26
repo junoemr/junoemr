@@ -1,11 +1,12 @@
-.tickler-table {
-	tbody {
-		text-align: center;
+.tickler-list-section {
+	#search-form {
+		.search-filter {
+			margin-bottom: $margin-sm;
+		}
 	}
-}
-
-.tickler-modal-table {
-	.input-group {
-		width: 100%;
+	.tickler-table {
+		tbody {
+			text-align: center;
+		}
 	}
 }
