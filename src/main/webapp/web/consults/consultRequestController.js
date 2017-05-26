@@ -138,7 +138,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			}
 		});
 
-		$scope.changeLetterhead = function()
+		$scope.changeLetterhead = function changeLetterhead()
 		{
 			var index = $("#letterhead").val();
 			if (index == null) return;
@@ -147,7 +147,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			consult.letterheadPhone = consult.letterheadList[index].phone;
 		};
 
-		$scope.changeService = function(id)
+		$scope.changeService = function changeService(id)
 		{
 			if (id == null)
 			{
@@ -170,7 +170,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			consult.professionalSpecialist = null;
 		};
 
-		$scope.writeToBox = function(data, boxId)
+		$scope.changeAppointmentTime = function changeAppointmentTime()
+		{
+			console.log('consult: ', consult);
+		};
+
+		$scope.writeToBox = function writeToBox(data, boxId)
 		{
 			var items = toArray(data.summaryItem);
 			var boxData = null;
@@ -184,7 +189,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		};
 
 
-		$scope.getFamilyHistory = function(boxId)
+		$scope.getFamilyHistory = function getFamilyHistory(boxId)
 		{
 			summaryService.getFamilyHistory(consult.demographicId).then(function(data)
 			{
@@ -192,7 +197,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			});
 		};
 
-		$scope.getMedicalHistory = function(boxId)
+		$scope.getMedicalHistory = function getMedicalHistory(boxId)
 		{
 			summaryService.getMedicalHistory(consult.demographicId).then(function(data)
 			{
@@ -200,7 +205,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			});
 		};
 
-		$scope.getOngoingConcerns = function(boxId)
+		$scope.getOngoingConcerns = function getOngoingConcerns(boxId)
 		{
 			summaryService.getOngoingConcerns(consult.demographicId).then(function(data)
 			{
@@ -208,7 +213,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			});
 		};
 
-		$scope.getOtherMeds = function(boxId)
+		$scope.getOtherMeds = function getOtherMeds(boxId)
 		{
 			summaryService.getOtherMeds(consult.demographicId).then(function(data)
 			{
@@ -216,7 +221,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			});
 		};
 
-		$scope.getReminders = function(boxId)
+		$scope.getReminders = function getReminders(boxId)
 		{
 			summaryService.getReminders(consult.demographicId).then(function(data)
 			{
@@ -225,7 +230,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		};
 
 		// New function, doesn't work
-		$scope.getAllergies = function(boxId)
+		$scope.getAllergies = function getAllergies(boxId)
 		{
 			console.log('CONSULT: ', consult);
 
@@ -235,7 +240,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			});
 		};
 
-		$scope.invalidData = function()
+		$scope.invalidData = function invalidData()
 		{
 			if ($scope.urgencies[$("#urgency").val()] == null)
 			{
@@ -265,7 +270,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			return false;
 		};
 
-		$scope.setAppointmentTime = function()
+		$scope.setAppointmentTime = function setAppointmentTime()
 		{
 			if (consult.appointmentHour != null && consult.appointmentMinute != null && !consult.patientWillBook)
 			{
@@ -282,12 +287,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			}
 		};
 
-		$scope.openAttach = function(attachment)
+		$scope.openAttach = function openAttach(attachment)
 		{
 			window.open("../" + attachment.url);
 		};
 
-		$scope.attachFiles = function()
+		$scope.attachFiles = function attachFiles()
 		{
 			var modalInstance = $uibModal.open(
 			{
@@ -325,12 +330,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				if ($scope.atth.availableDocs[0] != null) $scope.atth.selectedAvailableDoc = $scope.atth.availableDocs[0];
 			});
 
-			$scope.openDoc = function(doc)
+			$scope.openDoc = function openDoc(doc)
 			{
 				window.open("../" + doc.url);
 			};
 
-			$scope.attach = function()
+			$scope.attach = function attach()
 			{
 				if ($scope.atth.selectedAvailableDoc == null) return;
 
@@ -347,7 +352,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				consult.attachmentsChanged = true;
 			};
 
-			$scope.detach = function()
+			$scope.detach = function detach()
 			{
 				if ($scope.atth.selectedAttachedDoc == null) return;
 
@@ -364,7 +369,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				consult.attachmentsChanged = true;
 			};
 
-			$scope.done = function()
+			$scope.done = function done()
 			{
 				$uibModalInstance.close();
 			};
@@ -373,14 +378,14 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 
 		//show/hide e-send button
-		$scope.setESendEnabled = function()
+		$scope.setESendEnabled = function setESendEnabled()
 		{
 			$scope.eSendEnabled = consult.professionalSpecialist != null && consult.professionalSpecialist.eDataUrl != null && consult.professionalSpecialist.eDataUrl.trim() != "";
 		};
 
 		$scope.setESendEnabled(); //execute once on form open
 
-		$scope.save = function()
+		$scope.save = function save()
 		{
 			console.log('CONSULT: ', consult);
 
@@ -410,13 +415,13 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			return true;
 		};
 
-		$scope.close = function()
+		$scope.close = function close()
 		{
 			if ($location.search().list == "patient") $location.path("/record/" + consult.demographicId + "/consults");
 			else $location.path("/consults");
 		};
 
-		$scope.sendFax = function()
+		$scope.sendFax = function sendFax()
 		{
 			var reqId = consult.id;
 			var demographicNo = consult.demographicId;
@@ -427,7 +432,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			window.open("../fax/CoverPage.jsp?reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&fax=" + fax);
 		};
 
-		$scope.eSend = function()
+		$scope.eSend = function eSend()
 		{
 			if ($scope.eSendEnabled)
 			{
@@ -438,7 +443,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			}
 		};
 
-		$scope.printPreview = function()
+		$scope.printPreview = function printPreview()
 		{
 			if ($scope.invalidData()) return;
 
