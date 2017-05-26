@@ -53,12 +53,13 @@
 	width: 45px;
 }
 
-.phone-num {
-	width: 70% !important;
-}
-
-.phone-ext {
-	width: 30% !important;
+.input-group {
+	.phone-num {
+		width: 70%;
+	}
+	.phone-ext {
+		width: 30%;
+	}
 }
 
 #photo {
