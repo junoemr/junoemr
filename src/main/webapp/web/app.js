@@ -8,6 +8,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Common.Services',
 	'Common.Filters',
 	'Common.Directives',
+	'Common.Util',
 	'Layout',
 	'Tickler',
 	'Record',
@@ -107,7 +108,8 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			url: '/search',
 			templateUrl: 'patient/search/patientSearch.jsp',
 			controller: 'Patient.Search.PatientSearchController as patientSearchCtrl',
-			params: {
+			params:
+			{
 				term: null
 			}
 		})
