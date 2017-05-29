@@ -42,7 +42,7 @@
 	<hr>
 	<div class="row">
 		<div class="col-md-9" ng-controller="Dashboard.DashboardController">
-			<div class="container">
+			<div class="col-md-12">
 				<div class="row">
 					<!-- il18n problem here -->
 					<p>You have {{(totalInbox>0) && totalInbox || "no"}} report{{(totalInbox>1) && "s" || ""}}{{(totalInbox==0) && "s" || ""}}{{(totalInbox==null)
