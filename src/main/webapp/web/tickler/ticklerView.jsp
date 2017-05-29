@@ -129,7 +129,10 @@
 				</div>--%>
 				<div class="input-group bootstrap-timepicker timepicker">
 					<input id="timepicker1" type="text" class="form-control input-small" data-provide="timepicker" ng-model="ticklerUpdate.serviceTime">
-					<span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+					<span class="input-group-addon">
+						<i class="glyphicon glyphicon-time"></i>
+					</span>
+					
 				</div>
 			</div>
 
