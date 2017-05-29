@@ -149,25 +149,26 @@
 			
 			<div class="col-md-12"><!-- Referral -->
 				<form class="consult-request-form">
-					<fieldset>
-						<div class="form-group col-md-6">
-							<label class="control-label">Referral Date</label>
-							<input id="dp-referralDate" type="text" class="form-control" ng-model="consult.referralDate" placeholder="Referral Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.refDatePicker" ng-click="page.refDatePicker=true"/>
-						</div>
-						<div class="form-group col-md-6">
-							<label class="control-label">Urgency</label>
-							<select id="urgency" class="form-control" ng-model="consult.urgency" ng-required="true" ng-options="urgency.value as urgency.name for urgency in urgencies"/>
-						</div>
-						<div class="form-group col-md-6">
-							<label class="control-label">Send To</label>
-							<select id="sendTo" class="form-control" ng-model="consult.sendTo" ng-required="true" ng-options="sendTo for sendTo in consult.sendToList"/>
-						</div>
-						<div class="form-group col-md-6">
-							<label class="control-label">Referrer Instructions</label>
-							<textarea cols="80" rows="4" class="form-control" readOnly>{{consult.professionalSpecialist.annotation}}</textarea>
-						</div>
-					</fieldset>
 					
+					<div class="form-group col-md-6">
+						<label class="control-label">Referral Date</label>
+						<%--<input id="dp-referralDate" type="text" class="form-control" ng-model="consult.referralDate" placeholder="Referral Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.refDatePicker" ng-click="page.refDatePicker=true"/>--%>
+						<juno-datepicker-popup juno-model="consult.referralDate"> </juno-datepicker-popup>
+
+					</div>
+					<div class="form-group col-md-6">
+						<label class="control-label">Urgency</label>
+						<select id="urgency" class="form-control" ng-model="consult.urgency" ng-required="true" ng-options="urgency.value as urgency.name for urgency in urgencies"/>
+					</div>
+					<div class="form-group col-md-6">
+						<label class="control-label">Send To</label>
+						<select id="sendTo" class="form-control" ng-model="consult.sendTo" ng-required="true" ng-options="sendTo for sendTo in consult.sendToList"/>
+					</div>
+					<div class="form-group col-md-6">
+						<label class="control-label">Referrer Instructions</label>
+						<textarea cols="80" rows="4" class="form-control" readOnly>{{consult.professionalSpecialist.annotation}}</textarea>
+					</div>
+		
 					<div class="form-group col-md-6">
 						<label class="control-label">Appointment Date</label>
 						<%--<input id="dp-appointmentDate" 
@@ -180,7 +181,7 @@
 							is-open="page.aptDatePicker"
 							ng-click="page.aptDatePicker=true" 
 							ng-disabled="consult.patientWillBook"/>--%>
-						<%--<juno-datepicker-popup juno-model="consult.appointmentDate"> </juno-datepicker-popup>--%>
+						<juno-datepicker-popup juno-model="consult.appointmentDate"> </juno-datepicker-popup>
 					</div>
 					<div class="form-group col-md-6">
 						<label class="control-label">Appointment Time</label>
