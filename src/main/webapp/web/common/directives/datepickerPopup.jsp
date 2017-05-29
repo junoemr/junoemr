@@ -7,11 +7,7 @@
         datepicker-options="dateOptions" 
         ng-required="true" 
         close-text="Close"/>
-    <span class="input-group-btn">
-        <button type="button" 
-            class="btn btn-default" 
-            ng-click="openDatepicker()">
-            <i class="glyphicon glyphicon-calendar"></i>
-        </button>
+    <span class="input-group-addon clickable"  ng-click="openDatepicker()">        
+        <i class="glyphicon glyphicon-calendar"></i>
     </span>
 </p>
