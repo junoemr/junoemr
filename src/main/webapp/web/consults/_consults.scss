@@ -1,5 +1,12 @@
-.consult-request-form {
-	input[type="checkbox"] {
-		margin: 0;
+#consult-request-section {
+	.consult-request-form {
+		input[type="checkbox"] {
+			margin: 0;
+		}
+	}
+	.info-add-buttons {
+		button {
+			margin-bottom: $margin-sm;
+		}
 	}
 }
