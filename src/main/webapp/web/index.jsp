@@ -79,10 +79,10 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				</button>
 
 				<!-- link back to 'classic' view -->
-				<a  href="../provider/providercontrol.jsp">
+				<%--<a  href="../provider/providercontrol.jsp">
 					<img id="navbarlogo" src="../images/logo-white.png"
 						 title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0" />
-				</a>
+				</a>--%>
 			</div>
 
 			<div class="navbar-collapse collapse">
@@ -219,7 +219,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 			</div>
 
 			<div id="left-pane"
-					 class="col-lg-3 col-md-4 col-sm-4 hidden-xs"
+					 class="col-lg-2 col-md-3 col-sm-4 hidden-xs"
 					 ng-controller="PatientList.PatientListAppointmentListController"
 					 ng-if="bodyCtrl.showPatientList">
 
@@ -285,8 +285,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 			<div id="right_pane"
 					 ng-class="{
-						'col-lg-9 col-lg-offset-3 col-sm-8 col-sm-offset-4 col-xs-12': bodyCtrl.showPatientList,
-						'col-sm-10 col-sm-offset-1': !bodyCtrl.showPatientList }"
+						'col-lg-10 col-lg-offset-2 col-md-9 col-md-offset-3 col-sm-8 col-sm-offset-4 col-xs-12': bodyCtrl.showPatientList,
+						'col-sm-11 col-sm-offset-1half col-lg-offset-1third': !bodyCtrl.showPatientList }"
 					 ui-view
 					 ng-cloak></div>
 		</div>
