@@ -318,12 +318,15 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<!-- endbuild -->
 
 	<%-- JunoUI application code, to be combined and minified for production --%>
+	<%--IMPORTANT: Import non-angular javascript files before angular javacript--%>
 	<!-- build:js js/scripts.js -->
 	<script type="text/javascript" src="../share/javascript/Oscar.js"></script>
 
+	<%--Non-angular scripts--%>
 	<script type="text/javascript" src="common/util/util.js"></script>
 	<script type="text/javascript" src="common/util/serviceHelper.js"></script>
 
+	<%--Angular scripts--%>
 	<script type="text/javascript" src="app.js"></script>
 
 	<script type="text/javascript" src="common/module.js"></script>
