@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,17 +54,18 @@ public class LabUploadWs extends AbstractWs {
 	private static final String LAB_TYPE_GAMMADYNACARE = "GDML";
 	private static final String LAB_TYPE_CDL = "CDL";
 	private static final String LAB_TYPE_CLS = "CLS";
+    private static final String LAB_TYPE_EPSILON_MHL = "EPSILON";
 
     private static final Logger logger=MiscUtils.getLogger();
 
     public String uploadCLS(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
-            @WebParam(name="oscar_provider_no") String oscarProviderNo 
+            @WebParam(name="oscar_provider_no") String oscarProviderNo
             )
     {
         String returnMessage, audit;
-        
+
         try {
             audit = importLab(fileName, contents, LAB_TYPE_CLS, oscarProviderNo);
 
@@ -82,11 +83,11 @@ public class LabUploadWs extends AbstractWs {
     public String uploadCML(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
-            @WebParam(name="oscar_provider_no") String oscarProviderNo 
+            @WebParam(name="oscar_provider_no") String oscarProviderNo
             )
     {
         String returnMessage, audit;
-        
+
         try {
             audit = importLab(fileName, contents, LAB_TYPE_CML, oscarProviderNo);
 
@@ -104,11 +105,11 @@ public class LabUploadWs extends AbstractWs {
     public String uploadLifelabs(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
-            @WebParam(name="oscar_provider_no") String oscarProviderNo 
+            @WebParam(name="oscar_provider_no") String oscarProviderNo
             )
     {
         String returnMessage, audit;
-        
+
         try {
         	audit = importLab(fileName, contents, LAB_TYPE_LIFELABS, oscarProviderNo);
         } catch(Exception e)
@@ -125,11 +126,11 @@ public class LabUploadWs extends AbstractWs {
     public String uploadExcelleris(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
-            @WebParam(name="oscar_provider_no") String oscarProviderNo 
+            @WebParam(name="oscar_provider_no") String oscarProviderNo
             )
     {
         String returnMessage, audit;
-        
+
 		long startTime = System.nanoTime();
         try {
         	audit = importLab(fileName, contents, LAB_TYPE_EXCELLERIS, oscarProviderNo);
@@ -141,7 +142,7 @@ public class LabUploadWs extends AbstractWs {
 
 			long endTime = System.nanoTime();
 
-			logger.info("Excelleris upload attempt took " + 
+			logger.info("Excelleris upload attempt took " +
 				String.valueOf((((float)(endTime - startTime))/1000000)) + " milliseconds");
 
             return returnMessage;
@@ -150,20 +151,20 @@ public class LabUploadWs extends AbstractWs {
 
 		long endTime = System.nanoTime();
 
-		logger.info("Excelleris upload took " + 
+		logger.info("Excelleris upload took " +
 			String.valueOf((((float)(endTime - startTime))/1000000)) + " milliseconds");
 
         return returnMessage;
     }
-    
+
     public String uploadIHA(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
-            @WebParam(name="oscar_provider_no") String oscarProviderNo 
+            @WebParam(name="oscar_provider_no") String oscarProviderNo
             )
     {
         String returnMessage, audit;
-        
+
         try {
         	audit = importLab(fileName, contents, LAB_TYPE_IHA, oscarProviderNo);
         } catch(Exception e)
@@ -176,15 +177,15 @@ public class LabUploadWs extends AbstractWs {
         returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
         return returnMessage;
     }
-    
+
     public String uploadGammaDynacare(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
-            @WebParam(name="oscar_provider_no") String oscarProviderNo 
+            @WebParam(name="oscar_provider_no") String oscarProviderNo
             )
     {
         String returnMessage, audit;
-        
+
         try {
             audit = importLab(fileName, contents, LAB_TYPE_GAMMADYNACARE, oscarProviderNo);
         } catch(Exception e)
@@ -201,13 +202,33 @@ public class LabUploadWs extends AbstractWs {
     public String uploadCDL(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
-            @WebParam(name="oscar_provider_no") String oscarProviderNo 
+            @WebParam(name="oscar_provider_no") String oscarProviderNo
             )
     {
         String returnMessage, audit;
-        
+
         try {
             audit = importLab(fileName, contents, LAB_TYPE_CDL, oscarProviderNo);
+        } catch(Exception e)
+        {
+            logger.error(e.getMessage());
+            returnMessage = "{\"success\":0,\"message\":\"" +
+                e.getMessage() + "\", \"audit\":\"\"}";
+            return returnMessage;
+        }
+        returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
+        return returnMessage;
+    }
+
+    public String uploadMHL(
+            @WebParam(name="file_name") String fileName,
+            @WebParam(name="contents") String contents,
+            @WebParam(name="oscar_provider_no") String oscarProviderNo)
+    {
+        String returnMessage, audit;
+
+        try {
+            audit = importLab(fileName, contents, LAB_TYPE_EPSILON_MHL, oscarProviderNo);
         } catch(Exception e)
         {
             logger.error(e.getMessage());
@@ -243,10 +264,10 @@ public class LabUploadWs extends AbstractWs {
         // Save a copy of the lab locally. This is done to mimic the manual lab
         // upload process.
         FileUtils.writeStringToFile(new File(labFilePath), labContent);
-        
+
         // Upload lab info and hash to DB to check for duplicates
         FileInputStream is = new FileInputStream(labFilePath);
-        int checkFileUploadedSuccessfully = FileUploadCheck.addFileLogged(fileName, is, oscarProviderNo, labType);            
+        int checkFileUploadedSuccessfully = FileUploadCheck.addFileLogged(fileName, is, oscarProviderNo, labType);
         is.close();
 
         if (checkFileUploadedSuccessfully != FileUploadCheck.UNSUCCESSFUL_SAVE){
@@ -254,16 +275,16 @@ public class LabUploadWs extends AbstractWs {
             logger.info("Type :" + labType);
             MessageHandler msgHandler = HandlerClassFactory.getHandler(labType);
             logger.info("MESSAGE HANDLER "+msgHandler.getClass().getName());
-            
+
             // Parse and handle the lab
             if((retVal = msgHandler.parse(getClass().getSimpleName(), labFilePath,checkFileUploadedSuccessfully)) == null) {
             	throw new ParseException("Failed to parse lab: " + fileName + " of type: " + labType, 0);
             }
         }
-        
+
         // This will always contain one line, so let's just remove the newline characters
         retVal = retVal.replace("\n", "").replace("\r", "");
-        
+
         return retVal;
     }
 }
