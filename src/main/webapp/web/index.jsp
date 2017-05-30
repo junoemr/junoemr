@@ -210,18 +210,18 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<!-- nav bar is done here -->
 
 	 <!-- Start patient List template -->
-	<div class="container-fluid" ng-controller="PatientList.PatientListController" >
-		<div class="row" >
-			<div id="left-pane-hidden" class="col-xs-1 hidden-xs" ng-if="!bodyCtrl.showPatientList">
+	<div class="container-fluid" id="patient-list-template" ng-controller="PatientList.PatientListController" >
+		<div class="row">
+			<div id="left-pane-hidden" class="col-xs-1" ng-if="!bodyCtrl.showPatientList">
 				<button class="toggle-patient-list-button" type="button"  ng-click="showPatientList()" title="Show Patient List">
 					<span class="glyphicon glyphicon-chevron-right"></span>
 				</button>
 			</div>
 
 			<div id="left-pane"
-					 class="col-lg-2 col-md-3 col-sm-4 hidden-xs"
-					 ng-controller="PatientList.PatientListAppointmentListController"
-					 ng-if="bodyCtrl.showPatientList">
+					class="col-lg-2 col-md-3 col-sm-4 col-xs-7"
+					ng-controller="PatientList.PatientListAppointmentListController"
+					ng-if="bodyCtrl.showPatientList">
 
 				<%--<ul class="nav nav-tabs">
 					<li ng-repeat="item in tabItems" ng-class="{'active': isActive(item.id)}" class="hand-hover">
@@ -238,13 +238,18 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				</ul>--%>
 
 				<div id="left-pane-header" class="row vertical-align">
-					<div class="col-md-2 col-sm-2">
+					<div class="col-sm-2 col-xs-3">
 						<button class="toggle-patient-list-button" type="button" class="pull-left" ng-click="hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
 							<span class="glyphicon glyphicon-chevron-left"></span>
 						</button>
 					</div>
-					<div class="col-md-7 col-sm-7 col-md-offset-1 col-sm-offset-1">
-						<h1 id="left-pane-header-title">Your Appointments</h1>
+					<div class="col-sm-9">
+						<%--<h3 class="no-margin-top" id="left-pane-header-title">Appointments</h3>--%>
+						<%--<form id="patient-search" class="form-search" role="search">--%>
+								<%--<span ng-show="showFilter === true" class="form-group ">--%>
+									<input type="text"  class="form-control" placeholder="<bean:message key="patientList.search" bundle="ui"/>" ng-model="query"/>
+								<%--</span>--%>
+						<%--</form>--%>
 					</div>
 					<%--NOTE: Need to give this controller access to the addNewAppointment() function before this button can be used here --%>
 					<div class="col-md-2">
@@ -252,7 +257,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					</div>
 				</div>
 
-				<div class="container-fluid">
+				<div class="col-sm-12">
 					<div class="row" ng-cloak>
 						<%--<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>">
 							<span class="glyphicon glyphicon-refresh"></span>
@@ -267,12 +272,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							<span class="glyphicon glyphicon-circle-arrow-down"></span>
 						</button>--%>
 
-						<form id="patient-search" class="form-search" role="search">
-
-								<span ng-show="showFilter === true" class="form-group ">
-									<input type="text"  class="form-control" placeholder="<bean:message key="patientList.search" bundle="ui"/>" ng-model="query"/>
-								</span>
-						</form>
+						
 
 						<div ng-include="sidebar.location"></div>
 						<div class="col-md-2 pull-right">
@@ -281,16 +281,20 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					</div>
 				</div>
 			</div>
+
+		
 		<!-- End patient List template -->
 
-			<div id="right_pane"
-					 ng-class="{
+			<div id="right-pane"
+					ng-class="{
 						'col-lg-10 col-lg-offset-2 col-md-9 col-md-offset-3 col-sm-8 col-sm-offset-4 col-xs-12': bodyCtrl.showPatientList,
-						'col-sm-11 col-sm-offset-1half col-lg-offset-1third': !bodyCtrl.showPatientList }"
-					 ui-view
-					 ng-cloak></div>
+						'col-xs-12 right-pane-padded': !bodyCtrl.showPatientList }"
+					ui-view
+					ng-cloak>
+			</div>
 		</div>
 	</div>
+</div>
 
 	<script>
 
@@ -331,6 +335,11 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 	<script type="text/javascript" src="common/module.js"></script>
 
+	<%--Angular Util Functions--%>
+	<script type="text/javascript" src="common/util/module.js"></script>
+	<script type="text/javascript" src="common/util/angular-util.js"></script>
+
+	<%--Angular Services--%>
 	<script type="text/javascript" src="common/services/module.js"></script>
 	<script type="text/javascript" src="common/services/appService.js"></script>
 	<script type="text/javascript" src="common/services/billingService.js"></script>
