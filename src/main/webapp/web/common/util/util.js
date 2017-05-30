@@ -1,9 +1,9 @@
 'use strict';
 
-window.Juno = window.Juno ||
-{};
-Juno.Common = Juno.Common ||
-{};
+if (!window.Juno) window.Juno = {};
+
+
+if (!Juno.Common) Juno.Common = {};
 
 Juno.Common.Util = {};
 
