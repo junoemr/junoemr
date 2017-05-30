@@ -91,11 +91,11 @@ li.cpp-note-list:last-child {
 		display: block;
 		overflow-x: hidden;
 		overflow-y: auto;
-		background-color: #ebebeb;
+		background-color: $light-grey;
 		padding-left: 0;
 		padding-right: 0;
 		li {
-			color: #ebebeb;
+			color: $secondary-white;
 		}
 		.list-group-item {
 			border-right: 0;
@@ -107,15 +107,15 @@ li.cpp-note-list:last-child {
 				margin: 0;
 			}
 			a {
-				color: #ebebeb;
+				color: $secondary-white;
 				&:hover {
-					color: #fff;
+					color: $hover-white;
 				}
 			}
 			#left-pane-header-title {
 				text-align: center;
 				font-size: 20px;
-				color: #ebebeb;
+				color: $secondary-white;
 			}
 		}
 		#patient-search {
@@ -128,7 +128,7 @@ li.cpp-note-list:last-child {
 		background-color: #1c56af;
 		border-style: solid;
 		border-width: 1px;
-		border-color: #ebebeb;
+		border-color: $secondary-white;
 		border-bottom: 0;
 		border-top: 0;
 		border-left: 0;
@@ -136,10 +136,10 @@ li.cpp-note-list:last-child {
 			background-color: #1e65d2;
 		}
 		.glyphicon-chevron-left {
-			color: #ebebeb;
+			color: $secondary-white;
 		}
 		.glyphicon-chevron-right {
-			color: #ebebeb;
+			color: $secondary-white;
 		}
 	}
 	#left-pane-hidden {
@@ -152,6 +152,8 @@ li.cpp-note-list:last-child {
 		overflow-x: hidden;
 		padding-left: 0;
 		padding-right: 0;
+		background-color: $light-grey;
+		width: $toggle-patient-list-btn-width;
 	} // When the left-pane is hidden we need to account for the fixed toggle button
 	.right-pane-padded {
 		padding-left: $toggle-patient-list-btn-width + 10px;
