@@ -81,77 +81,81 @@ li.cpp-note-list:last-child {
 	color: red;
 }
 
-#left-pane {
-	position: fixed;
-	top: 51px;
-	bottom: 0;
-	left: 0;
-	z-index: 1000;
-	display: block;
-	overflow-x: hidden;
-	overflow-y: auto;
-	background-color: #ebebeb;
-	padding-left: 0;
-	padding-right: 0;
-	li {
-		color: #ebebeb;
-	}
-	.list-group-item {
-		border-right: 0;
-	}
-	#left-pane-header {
-		background-color: #1c56af;
-		margin-right: 0px;
-		h1 {
-			margin: 0;
-		}
-		a {
+#patient-list-template {
+	#left-pane {
+		position: fixed;
+		top: 51px;
+		bottom: 0;
+		left: 0;
+		z-index: 1000;
+		display: block;
+		overflow-x: hidden;
+		overflow-y: auto;
+		background-color: #ebebeb;
+		padding-left: 0;
+		padding-right: 0;
+		li {
 			color: #ebebeb;
-			&:hover {
-				color: #fff;
+		}
+		.list-group-item {
+			border-right: 0;
+		}
+		#left-pane-header {
+			background-color: #1c56af;
+			margin-right: 0px;
+			h1 {
+				margin: 0;
+			}
+			a {
+				color: #ebebeb;
+				&:hover {
+					color: #fff;
+				}
+			}
+			#left-pane-header-title {
+				text-align: center;
+				font-size: 20px;
+				color: #ebebeb;
 			}
 		}
-		#left-pane-header-title {
-			text-align: center;
-			font-size: 20px;
+		#patient-search {
+			padding: 20px;
+		}
+	}
+	.toggle-patient-list-button {
+		height: 90px;
+		width: $toggle-patient-list-btn-width;
+		background-color: #1c56af;
+		border-style: solid;
+		border-width: 1px;
+		border-color: #ebebeb;
+		border-bottom: 0;
+		border-top: 0;
+		border-left: 0;
+		&:hover {
+			background-color: #1e65d2;
+		}
+		.glyphicon-chevron-left {
+			color: #ebebeb;
+		}
+		.glyphicon-chevron-right {
 			color: #ebebeb;
 		}
 	}
-	#patient-search {
-		padding: 20px;
+	#left-pane-hidden {
+		position: fixed;
+		top: 51px;
+		bottom: 0;
+		left: 0;
+		z-index: 1000;
+		display: block;
+		overflow-x: hidden;
+		padding-left: 0;
+		padding-right: 0;
+	} // When the left-pane is hidden we need to account for the fixed toggle button
+	.right-pane-padded {
+		padding-left: $toggle-patient-list-btn-width + 10px;
 	}
-}
-
-.toggle-patient-list-button {
-	height: 90px;
-	background-color: #1c56af;
-	border-style: solid;
-	border-width: 1px;
-	border-color: #ebebeb;
-	border-bottom: 0;
-	border-top: 0;
-	border-left: 0;
-	&:hover {
-		background-color: #1e65d2;
-	}
-	.glyphicon-chevron-left {
-		color: #ebebeb;
-	}
-	.glyphicon-chevron-right {
-		color: #ebebeb;
-	}
-}
-
-#left-pane-hidden {
-	position: fixed;
-	top: 51px;
-	bottom: 0;
-	left: 0;
-	z-index: 1000;
-	display: block;
-	overflow-x: hidden;
-	padding-left: 0;
-	padding-right: 0;
 }
 
 .hidden-1380 {
