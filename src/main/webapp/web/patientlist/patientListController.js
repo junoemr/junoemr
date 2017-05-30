@@ -297,7 +297,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'patientlist/patientListConfiguration.jsp',
-				controller: 'PatientListConfigController',
+				controller: 'PatientList.PatientListConfigController',
 				backdrop: false,
 				size: 'lg',
 				resolve:
