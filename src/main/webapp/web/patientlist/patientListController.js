@@ -30,6 +30,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 	'$http',
 	'$state',
 	'$uibModal',
+	'angularUtil',
 	'Navigation',
 	'personaService',
 
@@ -38,6 +39,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		$http,
 		$state,
 		$uibModal,
+		angularUtil,
 		Navigation,
 		personaService)
 	{
@@ -59,6 +61,12 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 				{
 					params.appointmentNo = patient.appointmentNo;
 					params.encType = "face to face encounter with client";
+
+					if (angularUtil.inMobileView())
+					{
+						$scope.hidePatientList();
+						console.log('hiding patientlist');
+					}
 				}
 				console.log("params", params);
 				$state.go('record.summary', params);
