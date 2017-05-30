@@ -28,7 +28,7 @@
 <%--Place csutom styles here to override bootstap styles--%>
 
 
-<div ng-if="me != null">
+<div id="dashboard-page" ng-if="me != null">
 	<div id="dashboard-header" class="row">
 		<div class="col-md-9 col-xs-7">
 			<h3>
@@ -39,7 +39,6 @@
 			<p class="text-right">Today is {{displayDate() | date:'MMMM d, y'}}</p>
 		</div>
 	</div>
-	<hr>
 	<div class="row">
 		<div class="col-md-9" ng-controller="Dashboard.DashboardController">
 			<div class="col-md-12">
