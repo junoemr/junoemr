@@ -33,7 +33,7 @@
 	</div>
 
 	<div class="row filter-bar">
-		<div class="col-md-12" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+		<div class="col-sm-12" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 			<ul class="nav nav-pills">
 				<li ng-class="isCurrentStatus('none')"><a data-target="#all" ng-click="removeFilter(0)" data-toggle="tab" class="hand-hover">All</a></li>
 				<li ng-class="isCurrentStatus('Just My Notes')"><a ng-click="changeNoteFilter('Just My Notes')" class="hand-hover">Just My Encounter Notes</a></li>
@@ -44,7 +44,7 @@
 		</div><!-- middleSpace -->
 	</div>
 	<div class="row">
-		<div class="col-md-3" ng-show="page.canRead">
+		<div class="col-md-3 col-sm-4 col-xs-12" ng-show="page.canRead">
 			<fieldset class="module-list" ng-repeat="mod in page.columnOne.modules">
 				<div class="row vertical-align">
 					<div class="col-md-8 col-sm-8">
@@ -119,7 +119,7 @@
 			</fieldset>   
 		</div>
 
-		<div class="col-sm-6 col-xs-10 col-sm-offset-0 col-xs-offset-1 note-list" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+		<div class="col-md-6 col-sm-7 col-xs-10 col-sm-offset-0 col-xs-offset-1 note-list" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 			<div class="tab-content">
 				<div class="tab-pane active" id="all">
 					<%--<dl infinite-scroll="addMoreItems()">
@@ -217,7 +217,7 @@
 			</div><!-- tab content -->  
 		</div>
 		
-		<div class="col-sm-3 col-xs-10 col-sm-offset-0 col-xs-offset-1" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+		<div class="col-md-3 col-xs-10 col-sm-offset-0 col-xs-offset-1" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 			<fieldset ng-repeat="mod in page.columnThree.modules">
 				<legend style="margin-bottom:0px;">{{mod.displayName}}
 					<div class="form-group">
