@@ -62,21 +62,6 @@ Juno.Common.Util.formatTime = function formatTime(d)
 	return d;
 };
 
-Juno.Common.Util.sortAttachmentDocs = function sortAttachmentDocs(arrayOfDocs)
-{
-	arrayOfDocs.sort(function(doc1, doc2)
-	{
-		if (doc1.documentType < doc2.documentType) return -1;
-		else if (doc1.documentType > doc2.documentType) return 1;
-		else
-		{
-			if (doc1.displayName < doc2.displayName) return -1;
-			else if (doc1.displayName > doc2.displayName) return 1;
-		}
-		return 0;
-	});
-};
-
 Juno.Common.Util.addNewLine = function addNewLine(line, mssg)
 {
 	if (line == null || line.trim() == "") return mssg;

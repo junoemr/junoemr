@@ -106,7 +106,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		//set attachments
 		consult.attachments = Juno.Common.Util.toArray(consult.attachments);
-		Juno.Common.Util.sortAttachmentDocs(consult.attachments);
+		Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
 
 		//set appointment time
 		if (consult.appointmentTime != null)
@@ -342,7 +342,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				$scope.atth.attachedDocs.push($scope.atth.selectedAvailableDoc);
 				$scope.atth.selectedAttachedDoc = $scope.atth.selectedAvailableDoc;
 				$scope.atth.selectedAttachedDoc.attached = true;
-				Juno.Common.Util.sortAttachmentDocs($scope.atth.attachedDocs);
+				Juno.Consults.Common.sortAttachmentDocs($scope.atth.attachedDocs);
 
 				var x = $("#selAvailDoc").val();
 				$scope.atth.availableDocs.splice(x, 1);
@@ -359,7 +359,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				$scope.atth.availableDocs.push($scope.atth.selectedAttachedDoc);
 				$scope.atth.selectedAvailableDoc = $scope.atth.selectedAttachedDoc;
 				$scope.atth.selectedAvailableDoc.attached = false;
-				Juno.Common.Util.sortAttachmentDocs($scope.atth.availableDocs);
+				Juno.Consults.Common.sortAttachmentDocs($scope.atth.availableDocs);
 
 				var x = $("#selAttachDoc").val();
 				$scope.atth.attachedDocs.splice(x, 1);

@@ -325,6 +325,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<%--Non-angular scripts--%>
 	<script type="text/javascript" src="common/util/util.js"></script>
 	<script type="text/javascript" src="common/util/serviceHelper.js"></script>
+	<script type="text/javascript" src="consults/common.js"></script>
 
 	<%--Angular scripts--%>
 	<script type="text/javascript" src="app.js"></script>

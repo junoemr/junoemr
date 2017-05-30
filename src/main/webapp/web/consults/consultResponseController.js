@@ -52,7 +52,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 		//set attachments
 		consult.attachments = Juno.Common.Util.toArray(consult.attachments);
-		Juno.Common.Util.sortAttachmentDocs(consult.attachments);
+		Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
 
 		//set default letterhead
 		if (consult.letterheadName == null)
@@ -260,7 +260,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			{
 				if (consult.availableDocs == null) consult.availableDocs = Juno.Common.Util.toArray(data);
 				$scope.atth.availableDocs = consult.availableDocs;
-				Juno.Common.Util.sortAttachmentDocs($scope.atth.availableDocs);
+				Juno.Consults.Common.sortAttachmentDocs($scope.atth.availableDocs);
 				if ($scope.atth.availableDocs[0] != null) $scope.atth.selectedAvailableDoc = $scope.atth.availableDocs[0];
 			});
 
@@ -276,7 +276,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				$scope.atth.attachedDocs.push($scope.atth.selectedAvailableDoc);
 				$scope.atth.selectedAttachedDoc = $scope.atth.selectedAvailableDoc;
 				$scope.atth.selectedAttachedDoc.attached = true;
-				Juno.Common.Util.sortAttachmentDocs($scope.atth.attachedDocs);
+				Juno.Consults.Common.sortAttachmentDocs($scope.atth.attachedDocs);
 
 				var x = $("#selAvailDoc").val();
 				$scope.atth.availableDocs.splice(x, 1);
@@ -293,7 +293,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				$scope.atth.availableDocs.push($scope.atth.selectedAttachedDoc);
 				$scope.atth.selectedAvailableDoc = $scope.atth.selectedAttachedDoc;
 				$scope.atth.selectedAvailableDoc.attached = false;
-				Juno.Common.Util.sortAttachmentDocs($scope.atth.availableDocs);
+				Juno.Consults.Common.sortAttachmentDocs($scope.atth.availableDocs);
 
 				var x = $("#selAttachDoc").val();
 				$scope.atth.attachedDocs.splice(x, 1);
