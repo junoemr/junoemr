@@ -29,7 +29,7 @@
 	<h3 class="modal-title p-inline"><bean:message key="tickler.view.title" bundle="ui"/>: <span><p class="blue-text">{{ticklerUpdate.demographicName}}</p></span></h3>
 		
 </div>
-<div class="modal-body">
+<div class="modal-body" id="tickler-edit-body">
   <div class="row">
   	<div class="col-sm-10 col-sm-offset-1">
 		<form>
@@ -107,7 +107,7 @@
     
 	<div class="row">
 		<div class="col-xs-12">
-			<div class="margin-bottom-10">
+			<div class="tickler-edit-comments-header">
 				<strong ng-click="showComments = !showComments">
 					<bean:message key="tickler.view.comments" bundle="ui"/>
 					({{ticklerUpdate.ticklerComments != null && ticklerUpdate.ticklerComments.length || 0}}) 
