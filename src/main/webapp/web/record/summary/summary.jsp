@@ -119,7 +119,7 @@
 			</fieldset>   
 		</div>
 
-		<div class="col-md-6" id="middle-space" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+		<div class="col-sm-6 col-xs-10 col-sm-offset-0 col-xs-offset-1 note-list" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 			<div class="tab-content">
 				<div class="tab-pane active" id="all">
 					<%--<dl infinite-scroll="addMoreItems()">
@@ -146,7 +146,7 @@
 
 					<div infinite-scroll="addMoreItems()">
 						
-						<div class="note-container col-sm-11 note pull-right" 
+						<div class="note-container col-xs-12 note" 
 								ng-repeat="note in page.notes.notelist" 
 								ng-style="setColor(note)" 
 								ng-click="editNote(note)"
@@ -217,7 +217,7 @@
 			</div><!-- tab content -->  
 		</div>
 		
-		<div class="col-sm-3" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+		<div class="col-sm-3 col-xs-10 col-sm-offset-0 col-xs-offset-1" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
 			<fieldset ng-repeat="mod in page.columnThree.modules">
 				<legend style="margin-bottom:0px;">{{mod.displayName}}
 					<div class="form-group">

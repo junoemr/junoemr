@@ -3,7 +3,7 @@
 		border-bottom: 1px solid;
 		border-bottom-color: #e9e9e9;
 	}
-	#middle-space {
+	.note-list {
 		overflow-y: auto;
 		height: 70vh;
 	}
@@ -73,5 +73,13 @@
 	}
 	.filter-bar {
 		margin-bottom: $margin-md;
+	}
+}
+
+@media (max-width: 768px) {
+	.summary-section {
+		.note-list {
+			margin-top: $margin-md;
+		}
 	}
 }
