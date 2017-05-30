@@ -365,6 +365,8 @@ public class Hl7textResultsData {
 		"WHERE patientLabRouting.id = consultdocs.document_no AND " +
 		"consultdocs.requestId = " + consultationId + " AND consultdocs.doctype = 'L' AND consultdocs.deleted IS NULL ORDER BY consultdocs.document_no";
 
+
+
 		ArrayList<LabResultData> labResults = new ArrayList<LabResultData>();
 		ArrayList<LabResultData> attachedLabs = new ArrayList<LabResultData>();
 		try {
@@ -392,9 +394,15 @@ public class Hl7textResultsData {
 				lbData.finalResultsCount = rs.getInt("final_result_count");
 				lbData.label = oscar.Misc.getString(rs,"label");
 
+				String lab_no = lbData.segmentID;
+				MessageHandler h = Factory.getHandler(lab_no);
+
+
 				if( attached && Collections.binarySearch(attachedLabs, lbData, c) >= 0 )
 					labResults.add(lbData);
 				else if( !attached && Collections.binarySearch(attachedLabs, lbData, c) < 0 )
+					labResults.add(lbData);
+				else if( h.getMsgType().equals("GDML") )
 					labResults.add(lbData);
 
 				lbData = new LabResultData(LabResultData.HL7TEXT);

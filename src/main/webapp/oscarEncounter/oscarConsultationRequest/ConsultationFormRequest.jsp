@@ -253,6 +253,8 @@ input.btn{
 
 .lab {
     color: #CC0099;
+    width: 117px;
+    word-wrap: break-word;
 }
 td.tite {
 
