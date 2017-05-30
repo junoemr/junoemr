@@ -29,25 +29,24 @@
 
 
 <div id="dashboard-page" ng-if="me != null">
-	<div id="dashboard-header" class="row">
-		<div class="col-md-9 col-xs-7">
+	<div class="row" id="dashboard-header" >
+		<div class="col-md-9 col-xs-8">
 			<h3>
 				<bean:message key="dashboard.welcome" bundle="ui" /> to your dashboard, {{me.firstName}}!
 			</h3>
 		</div>
-		<div class="col-md-3 col-xs-5 pull-right">
+		<div class="col-md-3 col-xs-4 pull-right">
 			<p class="text-right">Today is {{displayDate() | date:'MMMM d, y'}}</p>
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-md-9" ng-controller="Dashboard.DashboardController">
-			<div class="col-md-12">
-				<div class="row">
+		<div class="col-xs-12" ng-controller="Dashboard.DashboardController">
+			<div class="row">
+				<div class="col-xs-12">
 					<!-- il18n problem here -->
 					<p>You have {{(totalInbox>0) && totalInbox || "no"}} report{{(totalInbox>1) && "s" || ""}}{{(totalInbox==0) && "s" || ""}}{{(totalInbox==null)
-						&& "s" || ""}} which are not yet acknowledged.</p>
-
-
+						&& "s" || ""}} which are not yet acknowledged.
+					</p>
 					<div ng-if="inbox.length > 0">
 						<table class="table table-condensed table-hover">
 							<thead>
@@ -89,12 +88,12 @@
 						</table>
 					</div>
 				</div>
+			</div>
 
-				<div class="row">
+			<div class="row">
+				<div class="col-xs-12">
 					<!-- il18n problem here -->
 					<p>You have {{(totalMessages > 0) && totalMessages || "no"}} unread message{{(totalMessages != 1) && "s" || ""}}.</p>
-
-
 					<div ng-if="totalMessages > 0">
 						<table class="table table-condensed  table-hover">
 							<thead>
@@ -135,8 +134,10 @@
 						</table>
 					</div>
 				</div>
-				
-				<div class="row">
+			</div>
+			
+			<div class="row">
+				<div class="col-xs-12">
 					<!-- this is a bit of a problem for il18n -->
 					<p >You have {{(totalTicklers > 0) && totalTicklers || "no"}} active tickler{{(totalTicklers != 1) && "s" || ""}}. 
 						<span class="label label-danger" ng-if="prefs.expiredTicklersOnly == true">(Overdue)</span>
@@ -182,8 +183,10 @@
 						</table>
 					</div>
 				</div>
+			</div>
 
-				<div class="row">
+			<div class="row">
+				<div class="col-xs-12">
 					<p>
 						<bean:message key="dashboard.k2a.header" bundle="ui" />
 					</p>
