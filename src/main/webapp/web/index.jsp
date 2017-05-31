@@ -93,12 +93,11 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 								juno-model="navBarCtrl.demographicSearch"
 								juno-placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"
 								juno-on-search-fn="navBarCtrl.onPatientSearch"
-								juno-search-title="<bean:message key="navbar.searchPatients" bundle="ui"/>">
+								juno-on-add-fn="navBarCtrl.newDemographic"
+								juno-search-button-title="<bean:message key="navbar.searchPatients" bundle="ui"/>"
+								juno-add-button-title="<bean:message key="navbar.newPatient" bundle="ui"/>">
 						</juno-patient-search-typeahead>
 					</div>
-					<a class="btn btn btn-success hand-hover" id="add-patient"
-						 ng-click="navBarCtrl.newDemographic()"
-						 title="<bean:message key="navbar.newPatient" bundle="ui"/>">Add Patient</a>
 				</form>
 
 				<!-- large view -->

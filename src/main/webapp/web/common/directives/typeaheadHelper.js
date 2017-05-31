@@ -43,8 +43,12 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			// called when the search button is clicked (search button will only appear if defined)
 			scope.onSearchFn = '&junoOnSearchFn';
+
+			scope.onAddFn = '&junoOnAddFn';
 			// title for the search button
-			scope.searchTitle = '@junoSearchTitle';
+			scope.searchButtonTitle = '@junoSearchButtonTitle';
+
+			scope.addButtonTitle = '@junoAddButtonTitle';
 
 			return scope;
 		};
@@ -81,14 +85,15 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			// ng-model-options
 			$scope.typeaheadModelOptions = {
-				debounce: {
+				debounce:
+				{
 					default: 250,
 					blur: 250
 				}
 			};
 
 			// the passed-in model that holds the selection
-			if(!angular.isDefined($scope.model))
+			if (!angular.isDefined($scope.model))
 			{
 				$scope.model = null;
 			}
@@ -97,7 +102,17 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.hasButtons = function hasButtons()
 			{
-				return angular.isFunction($scope.onSearchFn());
+				return $scope.hasSearchButton() || $scope.hasAddButton();
+			};
+
+			$scope.hasSearchButton = function hasSearchButton()
+			{
+				return angular.isFunction($scope.onAddFn());
+			};
+
+			$scope.hasAddButton = function hasAddButton()
+			{
+				return angular.isFunction($scope.onAddFn());
 			};
 
 			$scope.hasTemplateUrl = function hasTemplateUrl()
@@ -112,12 +127,12 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.formatMatch = function formatMatch($model)
 			{
-				if(!Juno.Common.Util.exists($model))
+				if (!Juno.Common.Util.exists($model))
 				{
 					return null;
 				}
 
-				if($scope.isDummySelection($model))
+				if ($scope.isDummySelection($model))
 				{
 					return $model.searchQuery;
 				}
@@ -133,7 +148,7 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.onBlur = function onBlur()
 			{
-				if($scope.hasForceSelectionEnabled() && angular.isString($scope.searchField))
+				if ($scope.hasForceSelectionEnabled() && angular.isString($scope.searchField))
 				{
 					console.log('typeaheadHelper::onBlur - setting model to null (forceSelectionEnabled)');
 					// the searchField is not a valid selection and force selection is enabled
@@ -144,7 +159,7 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.onChange = function onChange()
 			{
-				if(!$scope.hasForceSelectionEnabled())
+				if (!$scope.hasForceSelectionEnabled())
 				{
 					console.log('typeaheadHelper::onChange - setting model (isTypeaheadSearchQuery)');
 					// as user types into the typeahead, select a 'dummy' selection;
@@ -157,10 +172,24 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 			{
 				// must be in a $timeout because model may not be populated yet
 				// because of delay specified by ng-model-options
-				$timeout(function() {
-					if(angular.isFunction($scope.onSearchFn()))
+				$timeout(function()
+				{
+					if (angular.isFunction($scope.onSearchFn()))
 					{
 						$scope.onSearchFn()($scope.model);
+					}
+				});
+			};
+
+			$scope.onAdd = function onAdd()
+			{
+				// must be in a $timeout because model may not be populated yet
+				// because of delay specified by ng-model-options
+				$timeout(function()
+				{
+					if (angular.isFunction($scope.onAddFn()))
+					{
+						$scope.onAddFn()($scope.model);
 					}
 				});
 			};

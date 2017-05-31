@@ -42,12 +42,22 @@
 
 	<span ng-if="hasButtons()"
 				class="input-group-btn">
-		<button type="button"
-						class="btn btn-default btn-search"
-						ng-click="onSearch()"
-						title="{{searchTitle}}">
-		<span class="glyphicon glyphicon-search" ></span>
+		<button ng-if="hasSearchButton()"
+			type="button"
+			class="btn btn-default btn-search"
+			ng-click="onSearch()"
+			title="{{searchButtonTitle}}">
+			<span class="glyphicon glyphicon-search" ></span>
+		</button>
+
+		<button ng-if="hasAddButton()" 
+			type="button"
+			class="btn btn-default" 
+			ng-click="onAdd()"
+			title="{{addButtonTitle}}">
+			<span class="glyphicon glyphicon-plus"></span>
 		</button>
 	</span>
+
 
 </div>
