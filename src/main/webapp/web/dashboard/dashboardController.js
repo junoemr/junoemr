@@ -257,19 +257,21 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			//TODO: changed to return 5 since that is all we are using at the moment
 			inboxService.getDashboardItems(5).then(function(response)
 			{
-				if (response.inbox == null)
+				console.log('REPORTS', response);
+				if (response.content == null)
 				{
+					console.log('inbox is null');
 					return;
 				}
 
-				if (response.inbox instanceof Array)
+				if (response.content instanceof Array)
 				{
-					$scope.inbox = response.inbox;
+					$scope.inbox = response.content;
 				}
 				else
 				{
 					var arr = new Array();
-					arr[0] = response.inbox;
+					arr[0] = response.content;
 					$scope.inbox = arr;
 				}
 				$scope.totalInbox = response.total;
