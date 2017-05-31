@@ -52,16 +52,10 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		// };
 		// $scope.ticklerUpdate.message = "TESSST";
-		// console.log("TicklerUpdate", $scope.ticklerUpdate.message);
-		// console.log("Tickler message", tickler.message);
 		$scope.needsUpdate = false;
-
 
 		$scope.showUpdates = false;
 		$scope.showComments = true;
-
-		// console.log("Tickler Update status", $scope.tickler.taskAssignedTo);
-		// console.log("Tickler Update status", $scope.tickler.priority);
 
 		// $scope.taskAssignedToName = $scope.tickler.taskAssignedName;
 		$scope.priorities = ['Low', 'Normal', 'High'];
@@ -218,8 +212,6 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		$scope.updatePriority = function(newPriority)
 		{
-			console.log('updatePriority: ', newPriority);
-			console.log('TicklerUpdate ', $scope.ticklerUpdate);
 			$scope.needsUpdate = true;
 			// $scope.ticklerUpdate.priority = newPriority; // Don't need this anymore?
 			$scope.showPriorityFormControl = false;
@@ -241,8 +233,6 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		$scope.updateStatus = function(selectedStatus)
 		{
-			console.log('STATUS: ', selectedStatus);
-			console.log('TicklerUpdate ', $scope.ticklerUpdate);
 			$scope.needsUpdate = true;
 			$scope.ticklerUpdate.status = selectedStatus.id;
 			$scope.ticklerUpdate.statusName = selectedStatus.label;
@@ -267,7 +257,6 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		$scope.saveComment = function()
 		{
-			console.log('Comment: ', $scope.ticklerUpdate.comment);
 			$scope.needsUpdate = true;
 			if ($scope.ticklerUpdate.ticklerComments == null)
 			{
