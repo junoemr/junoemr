@@ -44,9 +44,18 @@
 			
 			<div class="row dashboard-row">
 				<div class="col-xs-12">
-					<!-- il18n problem here -->
-					<p>You have {{(totalInbox>0) && totalInbox || "no"}} report{{(totalInbox>1) && "s" || ""}}{{(totalInbox==0) && "s" || ""}}{{(totalInbox==null)
-						&& "s" || ""}} which are not yet acknowledged.
+					<p>
+						You have
+						<span ng-if="totalInbox > 0" class="badge badge-danger">
+							{{totalInbox}}
+						</span>
+						<ng-pluralize count="totalInbox"
+									when="{
+										'0':'reports which are not yet acknowledged.',
+										'1':'report which is not yet acknowledged.',
+										'other': 'reports which are not yet acknowledged.'
+									}">
+						</ng-pluralize>
 					</p>
 					<div ng-if="inbox.length > 0">
 						<table class="table table-condensed table-hover">
@@ -94,14 +103,19 @@
 			<div class="row dashboard-row">
 				<div class="col-xs-12">
 					<!-- il18n problem here -->
-					<p>You have 
+					<p>
+						You have 
 						<span ng-if="totalMessages > 0" class="badge badge-danger">
 							{{totalMessages}}
 						</span>
-						<span ng-if="totalMessages == 0">
-							no
-						</span>	
-						unread message{{(totalMessages != 1) && "s" || ""}}.</p>
+						<ng-pluralize count="totalMessages"
+									when="{
+										'0':'no unread messages.',
+										'1':'unread message.',
+										'other': 'unread messages.'
+									}">
+						</ng-pluralize>
+					</p>
 					<div ng-if="totalMessages > 0">
 						<table class="table table-condensed  table-hover">
 							<thead>
@@ -147,7 +161,18 @@
 			<div class="row dashboard-row">
 				<div class="col-xs-12">
 					<!-- this is a bit of a problem for il18n -->
-					<p >You have {{(totalTicklers > 0) && totalTicklers || "no"}} active tickler{{(totalTicklers != 1) && "s" || ""}}. 
+					<p >
+						You have
+						<span ng-if="totalTicklers > 0" class="badge badge-danger">
+							{{totalTicklers}}
+						</span>
+						<ng-pluralize count="totalTicklers"
+									when="{
+										'0':'no active ticklers.',
+										'1':'active tickler.',
+										'other': 'active ticklers.'
+									}">
+						</ng-pluralize> 
 						<span class="label label-danger" ng-if="prefs.expiredTicklersOnly == true">(Overdue)</span>
 					</p>
 
