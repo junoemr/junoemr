@@ -29,6 +29,12 @@
 			margin-top: 20px;
 		}
 	}
+
+	#dashboard-body {
+		.dashboard-row {
+			margin-bottom: $margin-sm;
+		}
+	}
 }
 
 @media (max-width: 672px) {
