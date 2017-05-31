@@ -222,8 +222,12 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		// when patient typeahead search button is clicked
 		controller.onPatientSearch = function onPatientSearch(search)
 		{
-			// should only happen when search isTypeaheadSearchQuery
-			if (search.isTypeaheadSearchQuery)
+			if (search === null)
+			{
+				controller.goToPatientSearch();
+
+			}
+			else if (search.isTypeaheadSearchQuery) // should only happen when search isTypeaheadSearchQuery
 			{
 				controller.goToPatientSearch(search.searchQuery);
 			}
