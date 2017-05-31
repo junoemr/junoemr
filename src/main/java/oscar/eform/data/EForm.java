@@ -193,19 +193,38 @@ public class EForm extends EFormBase {
 	}
 
 	// ------------------Saving the Form (inserting value= statements)---------------------
-	public void setValues(ArrayList<String> names, ArrayList<String> values) {
+	public void setValues(ArrayList<String> names, ArrayList<String> values, ArrayList<String> allNames, ArrayList<String> allValues) {
 		if (names.size() != values.size()) return;
 		StringBuilder html = new StringBuilder(this.formHtml);
 		int pointer = -1;
 		while ((pointer = getFieldIndex(html, pointer+1)) >= 0) {
 			String fieldHeader = getFieldHeader(html, pointer);
 			String fieldName = EFormUtil.removeQuotes(EFormUtil.getAttribute("name", fieldHeader));
-			int i;
-			if ((i = names.indexOf(fieldName)) < 0) continue;
+			String fieldType = getFieldType(fieldHeader);
+			String checkboxFieldName = "";
+			String val = "";
 
-			String val = values.get(i);
+			if(fieldType.equals("checkbox")) {
+				checkboxFieldName = fieldName;
+			}
+
+			int i = allNames.indexOf(fieldName);
+			if(i < 0) {
+				if( !fieldHeader.contains("checked=\"checked\""))
+					continue;
+			}
+
+			if ( !fieldType.equals("checkbox") )
+				val = allValues.get(i);
+
+			if( val == null )
+				val = "";
+
+			if( checkboxFieldName != null && !checkboxFieldName.equals("") && !allNames.contains(checkboxFieldName) )
+				val = "prechecked";
+
 			pointer = nextSpot(html, pointer);
-			html = putValue(val, getFieldType(fieldHeader), pointer, html);
+			html = putValue(val, fieldType, pointer, html);
 		}
 		this.formHtml = html.toString();
 	}
@@ -601,7 +620,12 @@ public class EForm extends EFormBase {
 			html.delete(pointer, endPointer);
 			html.insert(pointer, value);
 		} else if (type.equals("checkbox")) {
-			html.insert(pointer, " checked");
+			if( value.equals("prechecked") ) {
+				pointer = html.indexOf("checked=\"checked\"", pointer);
+				html.delete(pointer, pointer + 17);
+			} else {
+				html.insert(pointer, " checked");
+			}
 		} else if (type.equals("select")) {
 			int endindex = StringBuilderUtils.indexOfIgnoreCase(html, "</select>", pointer);
 			if (endindex < 0) return html; // if closing tag not found
