@@ -1593,7 +1593,7 @@ jQuery(document).ready(function(){
 <%
 }
 %>
-<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true") && "BC".equals(prov)) { %>
 </script>
 <script src="https://www.google.com/jsapi"></script>
 <script>
