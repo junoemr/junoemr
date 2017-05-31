@@ -57,6 +57,7 @@
 <%@page import="org.oscarehr.common.model.Site"%>
 
 <%@ page import="org.apache.commons.lang.StringEscapeUtils,oscar.oscarProvider.data.ProviderBillCenter"%>
+<%@page import="org.apache.commons.lang.StringUtils"%>
 
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
@@ -107,13 +108,14 @@ p.setOhipNo(request.getParameter("ohip_no"));
 p.setRmaNo(request.getParameter("rma_no"));
 p.setBillingNo(request.getParameter("billing_no"));
 p.setHsoNo(request.getParameter("hso_no"));
+p.setAlbertaTakNo(StringUtils.trimToNull(request.getParameter("alberta_tak_no")));
 p.setStatus(request.getParameter("status"));
 p.setComments(SxmlMisc.createXmlDataString(request,"xml_p"));
 p.setProviderActivity(request.getParameter("provider_activity"));
 p.setPractitionerNo(request.getParameter("practitionerNo"));
 p.setLastUpdateUser((String)session.getAttribute("user"));
 p.setLastUpdateDate(new java.util.Date());
-p.setSupervisor(request.getParameter("supervisor"));
+p.setSupervisor(StringUtils.trimToNull(request.getParameter("supervisor")));
 
 //multi-office provide id formalize check, can be turn off on properties multioffice.formalize.provider.id
 boolean isProviderFormalize = true;

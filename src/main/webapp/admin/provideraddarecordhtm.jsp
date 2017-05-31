@@ -177,7 +177,7 @@ jQuery(document).ready( function() {
  	} else {
  %> <input type="text"
 			name="provider_no" maxlength="6"> <input type="button" value=<bean:message key="admin.provideraddrecordhtm.suggest"/>
-                        onclick="provider_no.value='<%=suggestProviderNo%>'"<%}%>
+                        onclick="provider_no.value='<%=suggestProviderNo%>'"><%}%>
 		</td>
 	</tr>
 	<tr>
@@ -357,6 +357,15 @@ for (int i=0; i<sites.size(); i++) {
 			</td>
 			<td><input type="text" name="hso_no" maxlength="10"></td>
 		</tr>
+		<%
+			if (OscarProperties.getInstance().getProperty("hctype").equals("AB")) {
+		%>
+		<tr>
+			<td align="right"><bean:message key="admin.provider.formAlbertaTakNo" />:
+			</td>
+			<td><input type="text" name="alberta_tak_no" maxlength="20"></td>
+		</tr>
+		<%} %>
 		<tr>
 			<td align="right"><bean:message
 				key="admin.provider.formSpecialtyCode" />:</td>
