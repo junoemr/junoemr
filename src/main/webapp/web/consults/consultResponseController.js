@@ -381,7 +381,6 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			var p_letterheadName = Juno.Common.Util.toTrimmedString(consult.letterheadList[$("#letterhead").val()].name);
 			var p_page2 = $scope.getPrintPage2(p_urgency, p_letterheadName, consult, user);
 
-
 			printWin.document.write(p_page1 + p_buttons + p_attachments + p_page2);
 			printWin.document.close();
 		};
