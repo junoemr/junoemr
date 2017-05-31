@@ -94,7 +94,14 @@
 			<div class="row dashboard-row">
 				<div class="col-xs-12">
 					<!-- il18n problem here -->
-					<p>You have {{(totalMessages > 0) && totalMessages || "no"}} unread message{{(totalMessages != 1) && "s" || ""}}.</p>
+					<p>You have 
+						<span ng-if="totalMessages > 0" class="badge badge-danger">
+							{{totalMessages}}
+						</span>
+						<span ng-if="totalMessages == 0">
+							no
+						</span>	
+						unread message{{(totalMessages != 1) && "s" || ""}}.</p>
 					<div ng-if="totalMessages > 0">
 						<table class="table table-condensed  table-hover">
 							<thead>
