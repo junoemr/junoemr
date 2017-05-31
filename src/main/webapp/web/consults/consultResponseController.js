@@ -350,15 +350,15 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 		$scope.sendFax = function()
 		{
-			var p_urgency = Juno.Common.Util.noNull($scope.urgencies[$("#urgency").val()].name);
-			var p_letterheadName = Juno.Common.Util.noNull(consult.letterheadList[$("#letterhead").val()].name);
+			var p_urgency = Juno.Common.Util.toTrimmedString($scope.urgencies[$("#urgency").val()].name);
+			var p_letterheadName = Juno.Common.Util.toTrimmedString(consult.letterheadList[$("#letterhead").val()].name);
 			var p_page2 = Juno.Common.Util.getPrintPage2(p_urgency, p_letterheadName, consult, user);
 
 			var consultResponsePage = encodeURIComponent(p_page1 + p_page2);
 			var reqId = consult.id;
 			var demographicNo = consult.demographic.demographicNo;
-			var letterheadFax = Juno.Common.Util.noNull(consult.letterheadFax);
-			var fax = Juno.Common.Util.noNull(consult.referringDoctor.faxNumber);
+			var letterheadFax = Juno.Common.Util.toTrimmedString(consult.letterheadFax);
+			var fax = Juno.Common.Util.toTrimmedString(consult.referringDoctor.faxNumber);
 
 			window.open("../fax/CoverPage.jsp?consultResponsePage=" + consultResponsePage + "&reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&fax=" + fax);
 		};
@@ -377,8 +377,9 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				p_attachments += "<div class='noprint'><button onclick=printAttachments('" + consult.attachments[i].url + "')>Print attachment</button> " + consult.attachments[i].displayName + "</div>";
 			}
 
-			var p_urgency = Juno.Common.Util.noNull($scope.urgencies[$("#urgency").val()].name);
-			var p_letterheadName = Juno.Common.Util.noNull(consult.letterheadList[$("#letterhead").val()].name);
+
+			var p_urgency = Juno.Common.Util.toTrimmedString($scope.urgencies[$("#urgency").val()].name);
+			var p_letterheadName = Juno.Common.Util.toTrimmedString(consult.letterheadList[$("#letterhead").val()].name);
 			var p_page2 = $scope.getPrintPage2(p_urgency, p_letterheadName, consult, user);
 
 			printWin.document.write(p_page1 + p_buttons + p_attachments + p_page2);

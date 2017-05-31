@@ -33,7 +33,7 @@ Juno.Common.Util.pad0 = function pad0(n)
 	return s;
 };
 
-Juno.Common.Util.noNull = function noNull(s)
+Juno.Common.Util.toTrimmedString = function toTrimmedString(s)
 {
 	if (s == null) s = "";
 	if (s instanceof String) s = s.trim();
@@ -42,7 +42,7 @@ Juno.Common.Util.noNull = function noNull(s)
 
 Juno.Common.Util.formatDate = function formatDate(d)
 {
-	d = Juno.Common.Util.noNull(d);
+	d = Juno.Common.Util.toTrimmedString(d);
 	if (d)
 	{
 		if (!(d instanceof Date)) d = new Date(d);
@@ -53,7 +53,7 @@ Juno.Common.Util.formatDate = function formatDate(d)
 
 Juno.Common.Util.formatTime = function formatTime(d)
 {
-	d = Juno.Common.Util.noNull(d);
+	d = Juno.Common.Util.toTrimmedString(d);
 	if (d)
 	{
 		if (!(d instanceof Date)) d = new Date(d);
