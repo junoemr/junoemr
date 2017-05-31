@@ -13,7 +13,9 @@ $icon-font-path: "../bower_components/bootstrap-sass/assets/fonts/bootstrap/";
 $dropdown-bg: $primary-blue;
 $dropdown-link-color: $primary-white-text;
 $dropdown-link-hover-color:$primary-white-text;
-$dropdown-link-hover-bg: $hover-blue;
+$dropdown-link-hover-bg: $primary-hover-blue;
+$dropdown-link-active-bg: $primary-hover-blue;
+;
 // Media queries breakpoints
 // Grid system
 // Container sizes
@@ -21,9 +23,9 @@ $dropdown-link-hover-bg: $hover-blue;
 $navbar-default-bg: $primary-blue;
 $navbar-default-color: $primary-white-text;
 $navbar-default-link-color: $primary-white-text;
-$navbar-default-link-hover-color: $primary-white-text;
+$navbar-default-link-hover-color: $hover-white;
 $navbar-default-link-active-color: $primary-white-text;
-$navbar-default-link-hover-bg: #1f58ae;
+$navbar-default-link-hover-bg: $primary-hover-blue;
 $navbar-default-toggle-icon-bar-bg: $primary-white-text;
 // Navs
 // Tabs

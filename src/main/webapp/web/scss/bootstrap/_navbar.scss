@@ -1,16 +1,12 @@
 // Default navbar
 .navbar-default {
-    a {
-        color: $primary-white-text;
-        font-weight: bold;
-        &:hover,
-        {
-            color: $hover-white;
-        }
-    }
-    .dropdown-menu {
-        a {
-            font-weight: bold;
-        }
-    }
+	.navbar-text {
+		.glyphicon {
+			color: $primary-white-text;
+			&:hover,
+			{
+				color: $hover-white;
+			}
+		}
+	}
 }
