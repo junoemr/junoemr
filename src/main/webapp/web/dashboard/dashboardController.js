@@ -203,19 +203,19 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			}, 0, 6).then(function(response)
 			{
 				$scope.totalTicklers = response.total;
-				if (response.tickler == null)
+				if (response.content == null)
 				{
 					return;
 				}
 
-				if (response.tickler instanceof Array)
+				if (response.content instanceof Array)
 				{
-					$scope.ticklers = response.tickler;
+					$scope.ticklers = response.content;
 				}
 				else
 				{
 					var arr = new Array();
-					arr[0] = response.tickler;
+					arr[0] = response.content;
 					$scope.ticklers = arr;
 				}
 			}, function(reason)
@@ -230,19 +230,19 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			{
 				$scope.totalMessages = response.total;
 
-				if (response.message == null)
+				if (response.content == null)
 				{
 					return;
 				}
 
-				if (response.message instanceof Array)
+				if (response.content instanceof Array)
 				{
-					$scope.messages = response.message;
+					$scope.messages = response.content;
 				}
 				else
 				{
 					var arr = new Array();
-					arr[0] = response.message;
+					arr[0] = response.content;
 					$scope.messages = arr;
 				}
 			}, function(reason)
@@ -257,10 +257,8 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			//TODO: changed to return 5 since that is all we are using at the moment
 			inboxService.getDashboardItems(5).then(function(response)
 			{
-				console.log('REPORTS', response);
 				if (response.content == null)
 				{
-					console.log('inbox is null');
 					return;
 				}
 
