@@ -78,13 +78,17 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					<span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
 				</button>
 
+				<div class="navbar-text">
+					<a  href="../provider/providercontrol.jsp" style="color: white;">
+						Switch UI
+					</a>
+				</div>
 				<!-- link back to 'classic' view -->
 				<%--<a  href="../provider/providercontrol.jsp">
 					<img id="navbarlogo" src="../images/logo-white.png"
 						 title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0" />
 				</a>--%>
 			</div>
-
 			<div class="navbar-collapse collapse">
 
 				<form class="navbar-form navbar-left" role="search">
