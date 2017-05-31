@@ -281,8 +281,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				}
 				else if (item.label === "Billing")
 				{
-					url = "../billing/CA/" + encodeURIComponent(controller.billRegion) +
-						"/billingReportCenter.jsp?displaymode=billreport";
+					url = "../billing.do?billRegion=CLINICAID&action=invoice_reports";
 					wname = "billing";
 				}
 				else if (item.label === "Admin")
