@@ -147,15 +147,18 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			},
 			true);
 
-		$scope.$watch(function() { return controller.demographicSearch; },
+		$scope.$watch(function()
+			{
+				return controller.demographicSearch;
+			},
 			function(new_value)
 			{
 				console.log('NavBarController::watch demographicSearch', controller.demographicSearch);
 
-				if(new_value != null && !new_value.isTypeaheadSearchQuery)
+				if (new_value != null && !new_value.isTypeaheadSearchQuery)
 				{
 					// selection from the patient search typeahead changed
-					if(new_value.moreResults)
+					if (new_value.moreResults)
 					{
 						// the 'more results' option was selected
 						controller.goToPatientSearch(new_value.searchQuery);
@@ -220,7 +223,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		controller.onPatientSearch = function onPatientSearch(search)
 		{
 			// should only happen when search isTypeaheadSearchQuery
-			if(search.isTypeaheadSearchQuery)
+			if (search.isTypeaheadSearchQuery)
 			{
 				controller.goToPatientSearch(search.searchQuery);
 			}
@@ -231,17 +234,25 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 		controller.goToPatientSearch = function goToPatientSearch(search)
 		{
-			$state.go('search', { term: search }, { reload: 'search' });
+			$state.go('search',
+			{
+				term: search
+			},
+			{
+				reload: 'search'
+			});
 		};
 
 		controller.goToPatientRecord = function goToPatientRecord(demographicNo)
 		{
 			$state.go('record.details',
-				{
-					demographicNo: demographicNo,
-					hideNote: true
-				},
-				{ reload: 'record.details' });
+			{
+				demographicNo: demographicNo,
+				hideNote: true
+			},
+			{
+				reload: 'record.details'
+			});
 		};
 
 		//to help ng-clicks on buttons
@@ -283,7 +294,8 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				}
 				else
 				{
-					$timeout(function() {
+					$timeout(function()
+					{
 						$state.go(item.state);
 					});
 				}
