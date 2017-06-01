@@ -123,17 +123,15 @@ public class LabUploadAction extends Action {
 				logger.debug("Validated Successfully");
 				MessageHandler msgHandler = HandlerClassFactory.getHandler(type);
 
-				if (type.equals("HHSEMR") && OscarProperties.getInstance()
-						.getProperty("lab.hhsemr.filter_ordering_provider", "false").equals("true")) {
+				if (type.equals("HHSEMR") && OscarProperties.getInstance().getProperty("lab.hhsemr.filter_ordering_provider", "false").equals("true")) {
 					logger.info("Applying filter to HHS EMR lab");
 					String hl7Data = FileUtils.readFileToString(file, "UTF-8");
 					HHSEmrDownloadHandler filterHandler = new HHSEmrDownloadHandler();
 					filterHandler.init(hl7Data);
-					OtherId providerOtherId = OtherIdManager.searchTable(OtherIdManager.PROVIDER, "STAR",
-							filterHandler.getClientRef());
+					OtherId providerOtherId = OtherIdManager.searchTable(OtherIdManager.PROVIDER, "STAR", filterHandler.getClientRef());
+					
 					if (providerOtherId == null) {
-						logger.info("Filtering out this message, as we don't have client ref "
-								+ filterHandler.getClientRef() + " in our database (" + file + ")");
+						logger.info("Filtering out this message, as we don't have client ref " + filterHandler.getClientRef() + " in our database (" + file + ")");
 						outcome = "uploaded";
 						request.setAttribute("outcome", outcome);
 						return mapping.findForward("success");
