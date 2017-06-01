@@ -280,6 +280,9 @@ public class LabUploadWs extends AbstractWs {
 			if (retVal == null) {
 				throw new ParseException("Failed to parse lab: " + fileName + " of type: " + labType, 0);
 			}
+			else if (retVal.equals("duplicate")) {
+				throw new Exception("Duplicate lab upload");
+			}
 		}
 		else {
 			throw new SQLException( "Failed insert lab into DB (Likely duplicate lab): " + fileName + " of type: " + labType);
