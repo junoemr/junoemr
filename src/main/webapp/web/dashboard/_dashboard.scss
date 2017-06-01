@@ -34,6 +34,13 @@
 		.dashboard-row {
 			margin-bottom: $margin-sm;
 		}
+		.dashboard-table {
+			.dashboard-table-row {
+				&:hover {
+					background-color: $light-grey;
+				}
+			}
+		}
 	}
 }
 

@@ -57,11 +57,31 @@
 									}">
 						</ng-pluralize>
 					</p>
-					<div ng-if="inbox.length > 0">
-						<table class="table table-condensed table-hover">
-							<thead>
+					<div ng-if="totalInbox > 0">
+						<%--Keeping incase we want to switch to using ngTable--%>
+						<%--<table ng-table="inboxTableParams" class="table table-striped table-bordered table-condensed dashboard-table">
+							<tbody>
+								<tr ng-repeat="item in $data" ng-click="openInbox()" class="hand-hover dashboard-table-row">
+									<td title="'Patient'">
+										{{item.demographicName}}
+									</td>
+									<td title="'Category'">
+										{{item.discipline}}
+									</td>
+									<td title="'Date'">
+										{{item.discipline}}
+									</td>
+									<td title="'Status'">
+										{{item.discipline}}
+									</td>
+								</tr>
+							</tbody>
+						</table>--%>
+
+						<table class="table table-condensed table-striped table-bordered table-hover">
+							<thead class="text-center">
 								<tr>
-									<th class="flag-column"></th>
+									<th class="flag-column">Priority</th>
 									<th>
 										<bean:message key="dashboard.inbox.header.patient" bundle="ui" />
 									</th>
@@ -117,7 +137,7 @@
 						</ng-pluralize>
 					</p>
 					<div ng-if="totalMessages > 0">
-						<table class="table table-condensed  table-hover">
+						<table class="table table-condensed table-striped table-bordered table-hover">
 							<thead>
 								<tr>
 									<!-- 	<th class="flag-column"></th> -->
@@ -177,7 +197,7 @@
 					</p>
 
 					<div ng-if="totalTicklers>0">
-						<table class="table table-condensed  table-hover">
+						<table class="table table-condensed table-striped table-bordered table-hover">
 							<thead>
 								<tr>
 									<th class="flag-column">
