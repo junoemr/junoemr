@@ -40,8 +40,18 @@ angular.module('Layout').controller('Layout.NavBarController', [
 	'billingService',
 	'inboxService',
 
-	function($rootScope, $scope, $q, $timeout, $location, $state, $uibModal,
-		securityService, personaService, billingService, inboxService)
+	function(
+		$rootScope,
+		$scope,
+		$q,
+		$timeout,
+		$location,
+		$state,
+		$uibModal,
+		securityService,
+		personaService,
+		billingService,
+		inboxService)
 	{
 		var controller = {};
 
