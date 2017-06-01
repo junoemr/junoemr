@@ -73,25 +73,20 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 			 class="navbar navbar-default navbar-fixed-top"
 			 ng-cloak>
 		<div class="container-fluid">
-			<%--<div class="navbar-header">
+			<div class="navbar-header">
 				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 					<span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
 				</button>
 
-				<div class="navbar-text">
+				<%--<div class="navbar-text">
 					<a  href="../provider/providercontrol.jsp" style="color: white;">
 						Switch UI
 					</a>
-				</div>
+				</div>--%>
 				<!-- link back to 'classic' view -->
 				<a  href="../provider/providercontrol.jsp">
-					<img id="navbarlogo" src="../images/logo-white.png"
+					<img id="navbarlogo" src="../images/Oscar.ico"
 						 title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0" />
-				</a>
-			</div>--%>
-			<div class="navbar-text">
-				<a  href="../provider/providercontrol.jsp" style="color: white;">
-					Switch UI
 				</a>
 			</div>
 			<div class="navbar-collapse collapse">
