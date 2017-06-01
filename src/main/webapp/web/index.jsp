@@ -118,7 +118,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							 ng-if="!item.dropdown"
 							 ng-click="navBarCtrl.transition(item)" >{{item.label}}
 							<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
-										class="label label-danger">{{unAckLabDocTotal}}</span>
+										class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
 						</a>
 
 						<a href="#"
@@ -173,6 +173,9 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							 title="<bean:message key="navbar.messenger" bundle="ui"/>"
 							 class="hand-hover">
 							<span  class="glyphicon glyphicon-envelope"></span>
+							<span 
+									class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}
+							</span>
 						</a>
 						&nbsp;&nbsp;
 						<a ng-click="navBarCtrl.openMessenger(navBarCtrl.messengerMenu)"
