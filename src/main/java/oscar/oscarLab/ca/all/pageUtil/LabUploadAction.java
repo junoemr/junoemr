@@ -86,10 +86,11 @@ public class LabUploadAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		/*
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_lab", "w", null)) {
-			throw new SecurityException("missing required security object (_lab)");
-		}*/
-		
+		 * if(!securityInfoManager.hasPrivilege(LoggedInInfo.
+		 * getLoggedInInfoFromSession(request), "_lab", "w", null)) { throw new
+		 * SecurityException("missing required security object (_lab)"); }
+		 */
+
 		LabUploadForm frm = (LabUploadForm) form;
 		FormFile importFile = frm.getImportFile();
 
@@ -108,58 +109,67 @@ public class LabUploadAction extends Action {
 
 			InputStream is = decryptMessage(importFile.getInputStream(), key, clientKey);
 			String fileName = importFile.getFileName();
-                        String filePath = null;
-                        if (type.equals("PDFDOC")) {
-                            filePath = Utilities.savePdfFile(is,fileName);
-                        } else {
-                            filePath = Utilities.saveFile(is, fileName);
-                        }
+			String filePath = null;
+			if (type.equals("PDFDOC")) {
+				filePath = Utilities.savePdfFile(is, fileName);
+			}
+			else {
+				filePath = Utilities.saveFile(is, fileName);
+			}
 			importFile.getInputStream().close();
 			File file = new File(filePath);
 
 			if (validateSignature(clientKey, signature, file)) {
 				logger.debug("Validated Successfully");
 				MessageHandler msgHandler = HandlerClassFactory.getHandler(type);
-                                
-				if(type.equals("HHSEMR") && OscarProperties.getInstance().getProperty("lab.hhsemr.filter_ordering_provider", "false").equals("true")) {
-                	logger.info("Applying filter to HHS EMR lab");
-                	String hl7Data = FileUtils.readFileToString(file, "UTF-8");
-                	HHSEmrDownloadHandler filterHandler = new HHSEmrDownloadHandler();
-                	filterHandler.init(hl7Data);
-                	OtherId providerOtherId = OtherIdManager.searchTable(OtherIdManager.PROVIDER, "STAR", filterHandler.getClientRef());
-                	if(providerOtherId == null) {
-                		logger.info("Filtering out this message, as we don't have client ref " + filterHandler.getClientRef() + " in our database (" + file + ")");
-                		outcome="uploaded";
-                		request.setAttribute("outcome", outcome);
-                		return mapping.findForward("success");
-                	}
-                }
 
+				if (type.equals("HHSEMR") && OscarProperties.getInstance()
+						.getProperty("lab.hhsemr.filter_ordering_provider", "false").equals("true")) {
+					logger.info("Applying filter to HHS EMR lab");
+					String hl7Data = FileUtils.readFileToString(file, "UTF-8");
+					HHSEmrDownloadHandler filterHandler = new HHSEmrDownloadHandler();
+					filterHandler.init(hl7Data);
+					OtherId providerOtherId = OtherIdManager.searchTable(OtherIdManager.PROVIDER, "STAR",
+							filterHandler.getClientRef());
+					if (providerOtherId == null) {
+						logger.info("Filtering out this message, as we don't have client ref "
+								+ filterHandler.getClientRef() + " in our database (" + file + ")");
+						outcome = "uploaded";
+						request.setAttribute("outcome", outcome);
+						return mapping.findForward("success");
+					}
+				}
 
 				is = new FileInputStream(file);
 				try {
 					int check = FileUploadCheck.addFile(file.getName(), is, "0");
 					if (check != FileUploadCheck.UNSUCCESSFUL_SAVE) {
-						if ((audit = msgHandler.parse(loggedInInfo, service, filePath, check, request.getRemoteAddr())) != null) {
+						if ((audit = msgHandler.parse(loggedInInfo, service, filePath, check,
+								request.getRemoteAddr())) != null) {
 							outcome = "uploaded";
 							httpCode = HttpServletResponse.SC_OK;
-						} else {
+						}
+						else {
 							outcome = "upload failed";
 							httpCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 						}
-					} else {
+					}
+					else {
 						outcome = "uploaded previously";
 						httpCode = HttpServletResponse.SC_CONFLICT;
 					}
-				} finally {
+				}
+				finally {
 					is.close();
 				}
-			} else {
+			}
+			else {
 				logger.info("failed to validate");
 				outcome = "validation failed";
 				httpCode = HttpServletResponse.SC_NOT_ACCEPTABLE;
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			MiscUtils.getLogger().error("Error", e);
 			outcome = "exception";
 			httpCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
@@ -169,12 +179,14 @@ public class LabUploadAction extends Action {
 
 		if (request.getParameter("use_http_response_code") != null) {
 			try {
-	            response.sendError(httpCode, outcome);
-            } catch (IOException e) {
-	            logger.error("Error", e);
-            }
+				response.sendError(httpCode, outcome);
+			}
+			catch (IOException e) {
+				logger.error("Error", e);
+			}
 			return (null);
-		} else return mapping.findForward("success");
+		}
+		else return mapping.findForward("success");
 	}
 
 	public LabUploadAction() {
