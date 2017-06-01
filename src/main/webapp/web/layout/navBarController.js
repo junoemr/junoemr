@@ -39,6 +39,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 	'personaService',
 	'billingService',
 	'inboxService',
+	'messageService',
 
 	function(
 		$rootScope,
@@ -51,9 +52,10 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		securityService,
 		personaService,
 		billingService,
-		inboxService)
+		inboxService,
+		messageService)
 	{
-		var controller = {};
+		var controller = this;
 
 		//=========================================================================
 		// Initialization
@@ -62,6 +64,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		controller.init = function init()
 		{
 			controller.unAckLabDocTotal = 0;
+			controller.unreadMessageTotal = 0;
 			controller.demographicSearch = null;
 
 			billingService.getBillingRegion().then(
@@ -130,6 +133,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					controller.unreadMessagesCount = response.unreadMessagesCount;
 					controller.unreadPatientMessagesCount = response.unreadPatientMessagesCount;
 					controller.getUnAckLabDocCount();
+					controller.getUnreadMessageCount();
 					controller.demographicSearchDropDownItems = response.menus.patientSearchMenu.items;
 					controller.menuItems = response.menus.menu.items;
 					controller.userMenuItems = response.menus.userMenu.items;
@@ -199,6 +203,21 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				{
 					console.log(reason);
 				});
+		};
+
+		controller.getUnreadMessageCount = function getUnreadMessageCount()
+		{
+			messageService.getUnreadCount().then(
+				// Change "response" to "data"
+				function success(response)
+				{
+					controller.unreadMessageTotal = response;
+				},
+				function error(reason)
+				{
+					console.log(reason);
+				});
+
 		};
 
 		controller.getNavBar = function getNavBar()
@@ -460,7 +479,5 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					console.log(reason);
 				});
 		};
-
-		return controller;
 	}
 ]);
