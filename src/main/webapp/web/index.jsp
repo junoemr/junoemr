@@ -121,7 +121,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 										class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
 						</a>
 
-						<a href="#"
+						<a href="javascript:void(0)"
 							 ng-if="item.dropdown"
 							 class="dropdown-toggle"
 							 data-toggle="dropdown">{{item.label}}
@@ -143,7 +143,9 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 				<ul class="nav navbar-nav hidden-lg visible-1500 visible-md visible-sm visible-xs">
 					<li class="dropdown hand-hover">
 						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
-							<bean:message key="navbar.modules" bundle="ui"/><b class="caret"></b></a>
+							<bean:message key="navbar.modules" bundle="ui"/>
+							<b class="caret"></b>
+						</a>
 
 						<ul class="dropdown-menu" role="menu">
 							<li ng-repeat="item in navBarCtrl.menuItems"
