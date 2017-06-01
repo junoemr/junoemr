@@ -146,12 +146,16 @@ public class LabUploadAction extends Action {
 					if (check != FileUploadCheck.UNSUCCESSFUL_SAVE) {
 						
 						audit = msgHandler.parse(loggedInInfo, service, filePath, check, request.getRemoteAddr());
-						if (audit.equals("success")) {
+						if(audit == null) {
+							outcome = "upload failed";
+							httpCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+						}
+						else if (audit.equals("success")) {
 							outcome = "uploaded";
 							httpCode = HttpServletResponse.SC_OK;
 						}
 						else if (audit.equals("duplicate")) {
-							outcome = "duplicated lab results";
+							outcome = "uploaded previously";
 							httpCode = HttpServletResponse.SC_CONFLICT;
 						}
 						else {
