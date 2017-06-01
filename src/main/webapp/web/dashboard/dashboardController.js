@@ -27,6 +27,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
 	'$scope',
 	'$uibModal',
+	'NgTableParams',
 	'providerService',
 	'ticklerService',
 	'messageService',
@@ -39,6 +40,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 	function(
 		$scope,
 		$uibModal,
+		NgTableParams,
 		providerService,
 		ticklerService,
 		messageService,
@@ -54,15 +56,16 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 		{
 			return new Date();
 		};
-
+		console.log('TABLE PARAMS', NgTableParams);
 		$scope.me = null;
 
 		$scope.busyLoadingData = false;
 
-		personaService.getDashboardPreferences().then(function(data)
-		{
-			$scope.prefs = data.dashboardPreferences;
-		});
+		personaService.getDashboardPreferences().then(
+			function(data)
+			{
+				$scope.prefs = data.dashboardPreferences;
+			});
 
 		securityService.hasRights(
 		{
@@ -75,12 +78,34 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 				objectName: '_tickler',
 				privilege: 'r'
 			}]
-		}).then(function(result)
-		{
-			if (result.content != null && result.content.length == 2)
+		}).then(
+			function(result)
 			{
-				$scope.ticklerWriteAccess = result.content[0];
-				$scope.ticklerReadAccess = result.content[1];
+				if (result.content != null && result.content.length == 2)
+				{
+					$scope.ticklerWriteAccess = result.content[0];
+					$scope.ticklerReadAccess = result.content[1];
+				}
+			});
+
+		$scope.inboxTableParams = new NgTableParams(
+		{
+			page: 1, // show first page
+			count: 10
+		},
+		{
+			// total: 0, // length of data
+			getData: function(params)
+			{
+
+
+				return inboxService.getDashboardItems(params.count()).then(
+					function(data)
+					{
+						console.log('INBOX DATA: ', data);
+						params.total(data.total); // recal. page nav controls
+						return data.content;
+					});
 			}
 		});
 
@@ -107,15 +132,17 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 		{
 			if (item.agree)
 			{
-				k2aService.removeK2AComment(item.agreeId).then(function(response)
-				{
-					item.agree = false;
-					item.agreeCount--;
-					item.agreeId = '';
-				}, function(reason)
-				{
-					alert(reason);
-				});
+				k2aService.removeK2AComment(item.agreeId).then(
+					function(response)
+					{
+						item.agree = false;
+						item.agreeCount--;
+						item.agreeId = '';
+					},
+					function(reason)
+					{
+						alert(reason);
+					});
 			}
 			else if (!(item.agree || item.disagree))
 			{
@@ -134,15 +161,17 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 		{
 			if (item.disagree)
 			{
-				k2aService.removeK2AComment(item.agreeId).then(function(response)
-				{
-					item.disagree = false;
-					item.disagreeCount--;
-					item.agreeId = '';
-				}, function(reason)
-				{
-					alert(reason);
-				});
+				k2aService.removeK2AComment(item.agreeId).then(
+					function(response)
+					{
+						item.disagree = false;
+						item.disagreeCount--;
+						item.agreeId = '';
+					},
+					function(reason)
+					{
+						alert(reason);
+					});
 			}
 			if (!(item.agree || item.disagree))
 			{
@@ -160,35 +189,37 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 		$scope.commentOnK2aPost = function(item)
 		{
 			item.newComment.postId = item.id;
-			k2aService.postK2AComment(item.newComment).then(function(response)
-			{
-				item.newComment.body = '';
-				item.newComment.agree = '';
-				item.agreeId = response.agreeId;
-				if (!(typeof response.post[0].agree === 'undefined'))
+			k2aService.postK2AComment(item.newComment).then(
+				function(response)
 				{
-					if (response.post[0].agree)
+					item.newComment.body = '';
+					item.newComment.agree = '';
+					item.agreeId = response.agreeId;
+					if (!(typeof response.post[0].agree === 'undefined'))
 					{
-						item.agree = true;
-						item.agreeId = response.post[0].agreeId;
-						item.agreeCount++;
+						if (response.post[0].agree)
+						{
+							item.agree = true;
+							item.agreeId = response.post[0].agreeId;
+							item.agreeCount++;
+						}
+						else
+						{
+							item.disagree = true;
+							item.agreeId = response.post[0].agreeId;
+							item.disagreeCount++;
+						}
 					}
 					else
 					{
-						item.disagree = true;
-						item.agreeId = response.post[0].agreeId;
-						item.disagreeCount++;
+						item.commentCount++;
+						item.comments.unshift(response.post[0]);
 					}
-				}
-				else
+				},
+				function(reason)
 				{
-					item.commentCount++;
-					item.comments.unshift(response.post[0]);
-				}
-			}, function(reason)
-			{
-				alert(reason);
-			});
+					alert(reason);
+				});
 		};
 
 		$scope.updateTicklers = function()
@@ -200,135 +231,143 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 				status: 'A',
 				assignee: $scope.me.providerNo,
 				overdueOnly: 'property'
-			}, 0, 6).then(function(response)
-			{
-				$scope.totalTicklers = response.total;
-				if (response.content == null)
+			}, 0, 6).then(
+				function(response)
 				{
-					return;
-				}
+					$scope.totalTicklers = response.total;
+					if (response.content == null)
+					{
+						return;
+					}
 
-				if (response.content instanceof Array)
+					if (response.content instanceof Array)
+					{
+						$scope.ticklers = response.content;
+					}
+					else
+					{
+						var arr = new Array();
+						arr[0] = response.content;
+						$scope.ticklers = arr;
+					}
+				},
+				function(reason)
 				{
-					$scope.ticklers = response.content;
-				}
-				else
-				{
-					var arr = new Array();
-					arr[0] = response.content;
-					$scope.ticklers = arr;
-				}
-			}, function(reason)
-			{
-				alert(reason);
-			});
+					alert(reason);
+				});
 		};
 
 		$scope.updateMessages = function()
 		{
-			messageService.getUnread(6).then(function(response)
-			{
-				$scope.totalMessages = response.total;
+			messageService.getUnread(6).then(
+				function(response)
+				{
+					$scope.totalMessages = response.total;
 
-				if (response.content == null)
-				{
-					return;
-				}
+					if (response.content == null)
+					{
+						return;
+					}
 
-				if (response.content instanceof Array)
+					if (response.content instanceof Array)
+					{
+						$scope.messages = response.content;
+					}
+					else
+					{
+						var arr = new Array();
+						arr[0] = response.content;
+						$scope.messages = arr;
+					}
+				},
+				function(reason)
 				{
-					$scope.messages = response.content;
-				}
-				else
-				{
-					var arr = new Array();
-					arr[0] = response.content;
-					$scope.messages = arr;
-				}
-			}, function(reason)
-			{
-				alert(reason);
-			});
+					alert(reason);
+				});
 
 		};
 
 		$scope.updateReports = function()
 		{
 			//TODO: changed to return 5 since that is all we are using at the moment
-			inboxService.getDashboardItems(5).then(function(response)
-			{
-				if (response.content == null)
+			inboxService.getDashboardItems(5).then(
+				function(response)
 				{
-					return;
-				}
+					if (response.content == null)
+					{
+						return;
+					}
 
-				if (response.content instanceof Array)
+					if (response.content instanceof Array)
+					{
+						$scope.inbox = response.content;
+					}
+					else
+					{
+						var arr = new Array();
+						arr[0] = response.content;
+						$scope.inbox = arr;
+					}
+					$scope.totalInbox = response.total;
+				},
+				function(reason)
 				{
-					$scope.inbox = response.content;
-				}
-				else
-				{
-					var arr = new Array();
-					arr[0] = response.content;
-					$scope.inbox = arr;
-				}
-				$scope.totalInbox = response.total;
-			}, function(reason)
-			{
-				alert(reason);
-			});
+					alert(reason);
+				});
 		};
 
 		$scope.updateFeed = function(startPoint, numberOfRows)
 		{
 			if ($scope.busyLoadingData) return;
 			$scope.busyLoadingData = true;
-			k2aService.getK2aFeed(startPoint, numberOfRows).then(function(response)
-			{
-				if (response.post == null)
+			k2aService.getK2aFeed(startPoint, numberOfRows).then(
+				function(response)
 				{
-					return;
-				}
-
-				if (response.post instanceof Array)
-				{
-					for (var i = 0; i < response.post.length; i++)
+					if (response.post == null)
 					{
-						if (!Array.isArray(response.post[i].comments))
+						return;
+					}
+
+					if (response.post instanceof Array)
+					{
+						for (var i = 0; i < response.post.length; i++)
+						{
+							if (!Array.isArray(response.post[i].comments))
+							{
+								var arr = new Array();
+								arr[0] = response.post[i].comments;
+								response.post[i].comments = arr;
+							}
+						}
+						if (typeof $scope.k2afeed === 'undefined')
+						{
+							$scope.k2afeed = response.post;
+						}
+						else
+						{
+							$scope.k2afeed = $scope.k2afeed.concat(response.post);
+						}
+						$scope.busyLoadingData = false;
+					}
+					else
+					{
+						if (response.post.authenticatek2a)
+						{
+							$scope.authenticatek2a = response.post.description;
+						}
+						else
 						{
 							var arr = new Array();
-							arr[0] = response.post[i].comments;
-							response.post[i].comments = arr;
+							arr[0] = response.post;
+							$scope.k2afeed = arr;
 						}
 					}
-					if (typeof $scope.k2afeed === 'undefined')
-					{
-						$scope.k2afeed = response.post;
-					}
-					else
-					{
-						$scope.k2afeed = $scope.k2afeed.concat(response.post);
-					}
-					$scope.busyLoadingData = false;
-				}
-				else
+				},
+				function(reason)
 				{
-					if (response.post.authenticatek2a)
-					{
-						$scope.authenticatek2a = response.post.description;
-					}
-					else
-					{
-						var arr = new Array();
-						arr[0] = response.post;
-						$scope.k2afeed = arr;
-					}
-				}
-			}, function(reason)
-			{
-				alert(reason);
-				$scope.busyLoadingData = false;
-			});
+					alert(reason);
+					$scope.busyLoadingData = false;
+				});
 		};
 
 		$scope.updateDashboard = function()
@@ -427,17 +466,19 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 				}
 			});
 
-			modalInstance.result.then(function(data)
-			{
-				//console.log('data from modalInstance '+data);
-				if (data != null && data == true)
+			modalInstance.result.then(
+				function(data)
 				{
-					$scope.updateTicklers();
-				}
-			}, function(reason)
-			{
-				alert(reason);
-			});
+					//console.log('data from modalInstance '+data);
+					if (data != null && data == true)
+					{
+						$scope.updateTicklers();
+					}
+				},
+				function(reason)
+				{
+					alert(reason);
+				});
 
 		};
 
@@ -458,20 +499,23 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 				}
 			});
 
-			modalInstance.result.then(function(data)
-			{
-				if (data == true)
+			modalInstance.result.then(
+				function(data)
 				{
-					$scope.updateTicklers();
-					personaService.getDashboardPreferences().then(function(data)
+					if (data == true)
 					{
-						$scope.prefs = data.dashboardPreferences;
-					});
-				}
-			}, function(reason)
-			{
-				alert(reason);
-			});
+						$scope.updateTicklers();
+						personaService.getDashboardPreferences().then(
+							function(data)
+							{
+								$scope.prefs = data.dashboardPreferences;
+							});
+					}
+				},
+				function(reason)
+				{
+					alert(reason);
+				});
 
 		};
 	}
