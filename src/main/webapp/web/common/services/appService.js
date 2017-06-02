@@ -43,13 +43,13 @@ angular.module("Common.Services").service("appService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("appServices::getApps error", error);
+					console.log("appServices::getApps error", errors);
 					deferred.reject("An error occured while getting app content");
 				});
 

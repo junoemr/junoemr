@@ -15,7 +15,7 @@ angular.module('Report').controller('Report.ReportRegistrationIntakeController',
 			includePastForms: true
 		};
 
-		$scope.generateReport = function()
+		$scope.generateReport = function generateReport()
 		{
 			$log.log('run registration intake report');
 			var startDate = $filter('date')($scope.params.startDate, 'yyyy-MM-dd');

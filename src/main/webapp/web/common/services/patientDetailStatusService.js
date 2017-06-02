@@ -39,13 +39,13 @@ angular.module("Common.Services").service("patientDetailStatusService", [
 			var deferred = $q.defer();
 			$http.get(service.apiPath + "/getStatus?demographicNo=" + encodeURIComponent(demographicNo),
 				Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("patientDetailStatusService::getStatus error", error);
+					console.log("patientDetailStatusService::getStatus error", errors);
 					deferred.reject("An error occurred while fetching status");
 				});
 
@@ -58,13 +58,13 @@ angular.module("Common.Services").service("patientDetailStatusService", [
 			$http.get(service.apiPath + "/validateHC?hin=" + encodeURIComponent(healthCardNo) +
 				"&ver=" + encodeURIComponent(versionCode),
 				Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("patientDetailStatusService::validateHC error", error);
+					console.log("patientDetailStatusService::validateHC error", errors);
 					deferred.reject("An error occurred while fetching health card validation info");
 				});
 
@@ -78,13 +78,13 @@ angular.module("Common.Services").service("patientDetailStatusService", [
 				encodeURIComponent(healthCardNo) + "&demographicNo=" +
 				encodeURIComponent(demographicNo),
 				Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("patientDetailStatusService::isUniqueHC error", error);
+					console.log("patientDetailStatusService::isUniqueHC error", errors);
 					deferred.reject("An error occurred while checking health card uniqueness");
 				});
 

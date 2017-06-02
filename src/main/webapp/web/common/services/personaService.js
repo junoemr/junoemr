@@ -43,13 +43,13 @@ angular.module("Common.Services").service("personaService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("personaService::getDashboardMenu error", error);
+					console.log("personaService::getDashboardMenu error", errors);
 					deferred.reject("An error occured while getting the dashboard menu from persona");
 				});
 
@@ -65,13 +65,13 @@ angular.module("Common.Services").service("personaService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("personaService::getNavBar error", error);
+					console.log("personaService::getNavBar error", errors);
 					deferred.reject("An error occured while getting navbar from persona");
 				});
 
@@ -88,13 +88,13 @@ angular.module("Common.Services").service("personaService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("personaService::getPatientLists error", error);
+					console.log("personaService::getPatientLists error", errors);
 					deferred.reject("An error occured while getting patient lists from persona");
 				});
 
@@ -111,13 +111,13 @@ angular.module("Common.Services").service("personaService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("personaService::getPatientListConfig error", error);
+					console.log("personaService::getPatientListConfig error", errors);
 					deferred.reject("An error occured while getting getPatientListConfig from persona");
 				});
 
@@ -135,13 +135,13 @@ angular.module("Common.Services").service("personaService", [
 				data: patientListConfig,
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(result)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(result.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("personaService::setPatientListConfig error", error);
+					console.log("personaService::setPatientListConfig error", errors);
 					deferred.reject("An error occured while setting setPatientListConfig from persona");
 				});
 
@@ -160,13 +160,13 @@ angular.module("Common.Services").service("personaService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(result)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(result.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("personaService::setCurrentProgram error", error);
+					console.log("personaService::setCurrentProgram error", errors);
 					deferred.reject("An error occured while setting current");
 				});
 
@@ -187,13 +187,13 @@ angular.module("Common.Services").service("personaService", [
 				},
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(result)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(result.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("personaService::getDashboardPreferences error", error);
+					console.log("personaService::getDashboardPreferences error", errors);
 					deferred.reject("An error occured while getting preferences from persona");
 				});
 
@@ -211,13 +211,13 @@ angular.module("Common.Services").service("personaService", [
 				data: JSON.stringify(prefs),
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(result)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(result.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("personaService::updateDashboardPreferences error", error);
+					console.log("personaService::updateDashboardPreferences error", errors);
 					deferred.reject("An error occured while updating preferences");
 				});
 			return deferred.promise;

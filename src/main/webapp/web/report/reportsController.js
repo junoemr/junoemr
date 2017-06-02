@@ -170,7 +170,7 @@ angular.module('Report').controller('Report.ReportsController', [
 		];
 
 
-		$scope.editDemographicSet = function()
+		$scope.editDemographicSet = function editDemographicSet()
 		{
 			$scope.selectReport(
 			{
@@ -180,7 +180,7 @@ angular.module('Report').controller('Report.ReportsController', [
 			});
 		};
 
-		$scope.getReports = function()
+		$scope.getReports = function getReports()
 		{
 			if ($scope.reportGroup != null && $scope.reportGroup.length > 0)
 			{
@@ -194,7 +194,7 @@ angular.module('Report').controller('Report.ReportsController', [
 			return $scope.reports;
 		};
 
-		$scope.getReportGroups = function()
+		$scope.getReportGroups = function getReportGroups()
 		{
 			var groups = [
 			{
@@ -223,7 +223,7 @@ angular.module('Report').controller('Report.ReportsController', [
 			return groups;
 		};
 
-		$scope.selectReport = function(report)
+		$scope.selectReport = function selectReport(report)
 		{
 			$scope.currentReport = report;
 
@@ -240,9 +240,9 @@ angular.module('Report').controller('Report.ReportsController', [
 
 		$scope.selectReport($scope.reports[0]);
 
-		$scope.openReportWindow = function(url, name)
+		$scope.openReportWindow = function openReportWindow(url, name)
 		{
 			window.open(url, name, 'height=900,width=700');
-		}
+		};
 	}
 ]);

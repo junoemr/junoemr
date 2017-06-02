@@ -25,18 +25,33 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 	{
 
 		//get access rights
-		securityService.hasRight("_con", "r").then(function(data)
-		{
-			$scope.consultReadAccess = data;
-		});
-		securityService.hasRight("_con", "u").then(function(data)
-		{
-			$scope.consultUpdateAccess = data; //to be used with batch operations (not yet implemented)
-		});
-		securityService.hasRight("_con", "w").then(function(data)
-		{
-			$scope.consultWriteAccess = data;
-		});
+		securityService.hasRight("_con", "r").then(
+			function success(results)
+			{
+				$scope.consultReadAccess = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
+		securityService.hasRight("_con", "u").then(
+			function success(results)
+			{
+				$scope.consultUpdateAccess = results; //to be used with batch operations (not yet implemented)
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
+		securityService.hasRight("_con", "w").then(
+			function success(results)
+			{
+				$scope.consultWriteAccess = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
 
 		//set search statuses
 		$scope.statuses = staticDataService.getConsultResponseStatuses();
@@ -55,17 +70,19 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 			numToReturn: 10
 		};
 
-		providerService.getActiveTeams().then(function(data)
-		{
-			$scope.teams = data;
-			$scope.teams.unshift(allTeams);
-			console.log(JSON.stringify(data));
-		}, function(reason)
-		{
-			alert(reason);
-		});
+		providerService.getActiveTeams().then(
+			function success(results)
+			{
+				$scope.teams = results;
+				$scope.teams.unshift(allTeams);
+				console.log(JSON.stringify(results));
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
 
-		$scope.searchPatients = function(term)
+		$scope.searchPatients = function searchPatients(term)
 		{
 			var search = {
 				type: 'Name',
@@ -74,43 +91,53 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 				integrator: false,
 				outofdomain: true
 			};
-			return demographicService.search(search, 0, 25).then(function(response)
-			{
-				var resp = [];
-				for (var x = 0; x < response.content.length; x++)
+			return demographicService.search(search, 0, 25).then(
+				function success(results)
 				{
-					resp.push(
+					var resp = [];
+					for (var x = 0; x < results.content.length; x++)
 					{
-						demographicNo: response.content[x].demographicNo,
-						name: response.content[x].lastName + ', ' + response.content[x].firstName
-					});
-				}
-				return resp;
-			});
+						resp.push(
+						{
+							demographicNo: results.content[x].demographicNo,
+							name: results.content[x].lastName + ', ' + results.content[x].firstName
+						});
+					}
+					return resp;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
-		$scope.searchMrps = function(term)
+		$scope.searchMrps = function searchMrps(term)
 		{
 			var search = {
 				searchTerm: term,
 				active: true
 			};
-			return providerService.searchProviders(search).then(function(response)
-			{
-				var resp = [];
-				for (var x = 0; x < response.length; x++)
+			return providerService.searchProviders(search).then(
+				function success(results)
 				{
-					resp.push(
+					var resp = [];
+					for (var x = 0; x < results.length; x++)
 					{
-						mrpNo: response[x].providerNo,
-						name: response[x].name
-					});
-				}
-				return resp;
-			});
+						resp.push(
+						{
+							mrpNo: results[x].providerNo,
+							name: results[x].name
+						});
+					}
+					return resp;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
-		$scope.updateMrpNo = function(model)
+		$scope.updateMrpNo = function updateMrpNo(model)
 		{
 			if (model instanceof Object)
 			{
@@ -119,16 +146,21 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 			}
 			else
 			{
-				providerService.getProvider(model).then(function(data)
-				{
-					$scope.search.mrpNo = Number(model);
-					$scope.consult.mrpName = data.lastName + ", " + data.firstName;
-					$scope.doSearch(true);
-				});
+				providerService.getProvider(model).then(
+					function success(results)
+					{
+						$scope.search.mrpNo = Number(model);
+						$scope.consult.mrpName = results.lastName + ", " + results.firstName;
+						$scope.doSearch(true);
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
 			}
 		};
 
-		$scope.updateDemographicNo = function(item, model, label)
+		$scope.updateDemographicNo = function updateDemographicNo(item, model, label)
 		{
 			if (item != null)
 			{
@@ -137,16 +169,21 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 			}
 			else
 			{
-				demographicService.getDemographic(model).then(function(data)
-				{
-					$scope.search.demographicNo = data.demographicNo;
-					$scope.consult.demographicName = data.lastName + ", " + data.firstName;
-					$scope.doSearch(true);
-				});
+				demographicService.getDemographic(model).then(
+					function success(results)
+					{
+						$scope.search.demographicNo = results.demographicNo;
+						$scope.consult.demographicName = results.lastName + ", " + results.firstName;
+						$scope.doSearch(true);
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
 			}
 		};
 
-		$scope.checkAll = function()
+		$scope.checkAll = function checkAll()
 		{
 			angular.forEach($scope.lastResponse, function(item)
 			{
@@ -154,7 +191,7 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 			});
 		};
 
-		$scope.checkNone = function()
+		$scope.checkNone = function checkNone()
 		{
 			angular.forEach($scope.lastResponse, function(item)
 			{
@@ -162,7 +199,7 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 			});
 		};
 
-		$scope.editConsult = function(consult)
+		$scope.editConsult = function editConsult(consult)
 		{
 			var url = "/record/" + $scope.search.demographicNo + "/consultResponse/new";
 			if (consult != "new") url = "/record/" + consult.demographic.demographicNo + "/consultResponse/" + consult.id;
@@ -170,7 +207,7 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 			$location.path(url).search($scope.searchParams);
 		};
 
-		$scope.addConsult = function()
+		$scope.addConsult = function addConsult()
 		{
 			if (!$scope.consultWriteAccess)
 			{
@@ -181,19 +218,19 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 			$scope.editConsult("new");
 		};
 
-		$scope.removeDemographicAssignment = function()
+		$scope.removeDemographicAssignment = function removeDemographicAssignment()
 		{
 			$scope.search.demographicNo = null;
 			$scope.consult.demographicName = null;
 		};
 
-		$scope.removeMrpAssignment = function()
+		$scope.removeMrpAssignment = function removeMrpAssignment()
 		{
 			$scope.search.mrpNo = null;
 			$scope.consult.mrpName = null;
 		};
 
-		$scope.clear = function()
+		$scope.clear = function clear()
 		{
 			$scope.removeDemographicAssignment();
 			$scope.removeMrpAssignment();
@@ -206,7 +243,7 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 			$scope.doSearch();
 		};
 
-		$scope.doSearch = function(init)
+		$scope.doSearch = function doSearch(init)
 		{
 			if (init)
 			{
@@ -221,7 +258,7 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 		};
 
 		//retain search & filters for users to go back
-		$scope.setSearchParams = function()
+		$scope.setSearchParams = function setSearchParams()
 		{
 			$scope.searchParams = {};
 			if ($state.$current == "record.consultResponses") $scope.searchParams.list = "patient";
@@ -276,47 +313,49 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 					search1.team = null;
 				}
 
-				consultService.searchResponses(search1).then(function(result)
-				{
-					params.total(result.total);
-					$defer.resolve(result.content);
-
-					for (var i = 0; i < result.content.length; i++)
+				consultService.searchResponses(search1).then(
+					function success(results)
 					{
-						var consult = result.content[i];
+						params.total(results.total);
+						$defer.resolve(results.content);
 
-						//add statusDescription
-						for (var j = 0; j < $scope.statuses.length; j++)
+						for (var i = 0; i < results.content.length; i++)
 						{
-							if (consult.status == $scope.statuses[j].value)
+							var consult = results.content[i];
+
+							//add statusDescription
+							for (var j = 0; j < $scope.statuses.length; j++)
 							{
-								consult.statusDescription = $scope.statuses[j].name;
-								break;
+								if (consult.status == $scope.statuses[j].value)
+								{
+									consult.statusDescription = $scope.statuses[j].name;
+									break;
+								}
+							}
+
+							//add urgencyDescription
+							for (var j = 0; j < $scope.urgencies.length; j++)
+							{
+								if (consult.urgency == $scope.urgencies[j].value)
+								{
+									consult.urgencyDescription = $scope.urgencies[j].name;
+									break;
+								}
+							}
+
+							//add urgencyColor if consult urgency=Urgent(1)
+							if (consult.urgency == 1)
+							{
+								consult.urgencyColor = "text-danger"; //= red text
 							}
 						}
+						$scope.lastResponse = results.content;
 
-						//add urgencyDescription
-						for (var j = 0; j < $scope.urgencies.length; j++)
-						{
-							if (consult.urgency == $scope.urgencies[j].value)
-							{
-								consult.urgencyDescription = $scope.urgencies[j].name;
-								break;
-							}
-						}
-
-						//add urgencyColor if consult urgency=Urgent(1)
-						if (consult.urgency == 1)
-						{
-							consult.urgencyColor = "text-danger"; //= red text
-						}
-					}
-					$scope.lastResponse = result.content;
-
-				}, function(reason)
-				{
-					alert(reason);
-				});
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
 			}
 		});
 

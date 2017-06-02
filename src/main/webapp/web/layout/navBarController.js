@@ -68,13 +68,13 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			controller.demographicSearch = null;
 
 			billingService.getBillingRegion().then(
-				function success(response)
+				function success(results)
 				{
-					controller.billRegion = response.message;
+					controller.billRegion = results.message;
 				},
-				function error(reason)
+				function error(errors)
 				{
-					console.log(reason);
+					console.log(errors);
 				});
 
 			securityService.hasRights(
@@ -93,55 +93,59 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					privilege: 'r'
 				}]
 			}).then(
-				function success(result)
+				function success(results)
 				{
-					if (result.content !== null)
+					if (results.content !== null)
 					{
-						controller.searchRights = result.content[0];
-						controller.newDemographicRights = result.content[1];
-						controller.messageRights = result.content[2];
+						controller.searchRights = results.content[0];
+						controller.newDemographicRights = results.content[1];
+						controller.messageRights = results.content[2];
 					}
+				},
+				function error(errors)
+				{
+					console.log(errors);
 				});
 
 			personaService.getDashboardMenu().then(
-				function success(response)
+				function success(results)
 				{
-					if (response.menus)
+					if (results.menus)
 					{
-						controller.dashboardMenu = response.menus.menu;
+						controller.dashboardMenu = results.menus.menu;
 					}
 				},
-				function error(reason)
+				function error(errors)
 				{
-					console.log(reason);
+					console.log(errors);
 				});
 
 			personaService.getNavBar().then(
-				function success(response)
+				function success(results)
 				{
-					controller.currentProgram = response.currentProgram.program;
+					controller.currentProgram = results.currentProgram.program;
 
-					if (response.programDomain.program instanceof Array)
+					if (results.programDomain.program instanceof Array)
 					{
-						controller.programDomain = response.programDomain.program;
+						controller.programDomain = results.programDomain.program;
 					}
 					else
 					{
-						controller.programDomain = [response.programDomain.program];
+						controller.programDomain = [results.programDomain.program];
 					}
 
-					controller.unreadMessagesCount = response.unreadMessagesCount;
-					controller.unreadPatientMessagesCount = response.unreadPatientMessagesCount;
+					controller.unreadMessagesCount = results.unreadMessagesCount;
+					controller.unreadPatientMessagesCount = results.unreadPatientMessagesCount;
 					controller.getUnAckLabDocCount();
 					controller.getUnreadMessageCount();
-					controller.demographicSearchDropDownItems = response.menus.patientSearchMenu.items;
-					controller.menuItems = response.menus.menu.items;
-					controller.userMenuItems = response.menus.userMenu.items;
-					controller.messengerMenu = response.menus.messengerMenu.items;
+					controller.demographicSearchDropDownItems = results.menus.patientSearchMenu.items;
+					controller.menuItems = results.menus.menu.items;
+					controller.userMenuItems = results.menus.userMenu.items;
+					controller.messengerMenu = results.menus.messengerMenu.items;
 				},
-				function error(reason)
+				function error(errors)
 				{
-					console.log(reason);
+					console.log(errors);
 				});
 
 		};
@@ -195,27 +199,26 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		controller.getUnAckLabDocCount = function getUnAckLabDocCount()
 		{
 			inboxService.getUnAckLabDocCount().then(
-				function success(response)
+				function success(results)
 				{
-					controller.unAckLabDocTotal = response;
+					controller.unAckLabDocTotal = results;
 				},
-				function error(reason)
+				function error(errors)
 				{
-					console.log(reason);
+					console.log(errors);
 				});
 		};
 
 		controller.getUnreadMessageCount = function getUnreadMessageCount()
 		{
 			messageService.getUnreadCount().then(
-				// Change "response" to "data"
-				function success(response)
+				function success(results)
 				{
-					controller.unreadMessageTotal = response;
+					controller.unreadMessageTotal = results;
 				},
-				function error(reason)
+				function error(errors)
 				{
-					console.log(reason);
+					console.log(errors);
 				});
 
 		};
@@ -223,28 +226,28 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		controller.getNavBar = function getNavBar()
 		{
 			personaService.getNavBar().then(
-				function success(response)
+				function success(results)
 				{
-					controller.currentProgram = response.currentProgram.program;
-					if (response.programDomain.program instanceof Array)
+					controller.currentProgram = results.currentProgram.program;
+					if (results.programDomain.program instanceof Array)
 					{
-						controller.programDomain = response.programDomain.program;
+						controller.programDomain = results.programDomain.program;
 					}
 					else
 					{
-						controller.programDomain = [response.programDomain.program];
+						controller.programDomain = [results.programDomain.program];
 					}
 
-					controller.unreadMessagesCount = response.unreadMessagesCount;
-					controller.unreadPatientMessagesCount = response.unreadPatientMessagesCount;
-					controller.demographicSearchDropDownItems = response.menus.patientSearchMenu.items;
-					controller.menuItems = response.menus.menu.items;
-					controller.userMenuItems = response.menus.userMenu.items;
-					controller.messengerMenu = response.menus.messengerMenu.items;
+					controller.unreadMessagesCount = results.unreadMessagesCount;
+					controller.unreadPatientMessagesCount = results.unreadPatientMessagesCount;
+					controller.demographicSearchDropDownItems = results.menus.patientSearchMenu.items;
+					controller.menuItems = results.menus.menu.items;
+					controller.userMenuItems = results.menus.userMenu.items;
+					controller.messengerMenu = results.menus.messengerMenu.items;
 				},
-				function error(reason)
+				function error(errors)
 				{
-					console.log(reason);
+					console.log(errors);
 				});
 		};
 
@@ -426,7 +429,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			}
 		};
 
-		controller.newDemographic = function(size)
+		controller.newDemographic = function newDemographic(size)
 		{
 			var modalInstance = $uibModal.open(
 			{
@@ -436,27 +439,28 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			});
 
 			modalInstance.result.then(
-				function success(selectedItem)
+				function success(results)
 				{
-					console.log(selectedItem);
-					console.log('patient #: ', selectedItem.demographicNo);
+					console.log(results);
+					console.log('patient #: ', results.demographicNo);
 					console.log($location.path());
 
 					$location.path('/record/' +
-						encodeURIComponent(selectedItem.demographicNo) +
+						encodeURIComponent(results.demographicNo) +
 						'/details');
 
 					console.log($location.path());
 				},
-				function error()
+				function error(errors)
 				{
 					console.log('Modal dismissed at: ' + new Date());
+					console.log(errors);
 				});
 
 			console.log($('#myModal'));
 		};
 
-		controller.isActive = function(item)
+		controller.isActive = function isActive(item)
 		{
 			if (angular.isDefined(item) &&
 				angular.isDefined(item.state) &&
@@ -467,16 +471,16 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			return false;
 		};
 
-		controller.changeProgram = function(programId)
+		controller.changeProgram = function changeProgram(programId)
 		{
 			personaService.setCurrentProgram(programId).then(
-				function success(response)
+				function success(results)
 				{
 					controller.getNavBar();
 				},
-				function error(reason)
+				function error(errors)
 				{
-					console.log(reason);
+					console.log(errors);
 				});
 		};
 

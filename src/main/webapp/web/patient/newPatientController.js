@@ -49,20 +49,29 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 		$scope.demographic = {};
 
 		//get access right for creating new patient
-		securityService.hasRight("_demographic", "w").then(function(data)
-		{
-			$scope.hasRight = data;
-		});
+		securityService.hasRight("_demographic", "w").then(
+			function success(results)
+			{
+				$scope.hasRight = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
 
 		//get programs to be selected
 		programService.getPrograms().then(
-			function success(data)
+			function success(results)
 			{
-				$scope.programs = data;
+				$scope.programs = results;
 				if ($scope.programs.length == 1)
 				{
 					$scope.demographic.admissionProgramId = $scope.programs[0].id;
 				}
+			},
+			function error(errors)
+			{
+				console.log(errors);
 			});
 
 		//get genders to be selected
@@ -101,15 +110,15 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 				$scope.demoRetVal = {};
 
 				demographicService.saveDemographic($scope.demographic).then(
-					function success(data)
+					function success(results)
 					{
-						console.log(data);
-						$scope.demoRetVal = data;
-						$uibModalInstance.close(data);
+						console.log(results);
+						$scope.demoRetVal = results;
+						$uibModalInstance.close(results);
 					},
-					function(errorMessage)
+					function error(errors)
 					{
-						console.log("saveDemo " + errorMessage);
+						console.log(errors);
 					});
 
 			}
@@ -119,17 +128,17 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 			}
 		};
 
-		$scope.ok = function()
+		$scope.ok = function ok()
 		{
 			$uibModalInstance.close($scope.selected.item);
 		};
 
-		$scope.cancel = function()
+		$scope.cancel = function cancel()
 		{
 			$uibModalInstance.dismiss('cancel');
 		};
 
-		$scope.capName = function()
+		$scope.capName = function capName()
 		{
 			if ($scope.demographic.lastName != null)
 			{

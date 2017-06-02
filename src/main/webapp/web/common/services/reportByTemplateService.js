@@ -43,13 +43,13 @@ angular.module("Common.Services").service("reportByTemplateService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("reportByTemplateService::isK2AInit error", error);
+					console.log("reportByTemplateService::isK2AInit error", errors);
 					deferred.reject("An error occurred while fetching k2a content");
 				});
 
@@ -66,13 +66,13 @@ angular.module("Common.Services").service("reportByTemplateService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("reportByTemplateService::getAllK2AReports error", error);
+					console.log("reportByTemplateService::getAllK2AReports error", errors);
 					deferred.reject("An error occurred while fetching k2a reports");
 				});
 
@@ -89,13 +89,13 @@ angular.module("Common.Services").service("reportByTemplateService", [
 				method: "POST",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("reportByTemplateService::getK2AReportById error", error);
+					console.log("reportByTemplateService::getK2AReportById error", errors);
 					deferred.reject("An error occurred while fetching k2a report");
 				});
 
@@ -112,13 +112,13 @@ angular.module("Common.Services").service("reportByTemplateService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("reportByTemplateService::getK2AUrl error", error);
+					console.log("reportByTemplateService::getK2AUrl error", errors);
 					deferred.reject("An error occurred while fetching k2a url");
 				});
 

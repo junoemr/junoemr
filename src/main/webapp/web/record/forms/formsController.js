@@ -71,25 +71,27 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 				objectName: '_admin.eform',
 				privilege: 'w'
 			}]
-		}).then(function(result)
-		{
-			$scope.adminAccess = result.content[0];
-			$scope.adminEformAccess = result.content[1];
-			if (result.content != null && result.content.length == 2)
+		}).then(
+			function success(results)
 			{
-				if ($scope.adminAccess || $scope.adminEformAccess)
+				$scope.adminAccess = results.content[0];
+				$scope.adminEformAccess = results.content[1];
+				if (results.content != null && results.content.length == 2)
 				{
-					$scope.hasAdminAccess = true;
+					if ($scope.adminAccess || $scope.adminEformAccess)
+					{
+						$scope.hasAdminAccess = true;
+					}
 				}
-			}
-			else
+				else
+				{
+					alert('failed to load rights');
+				}
+			},
+			function error(errors)
 			{
-				alert('failed to load rights');
-			}
-		}, function(reason)
-		{
-			alert(reason);
-		});
+				console.log(errors);
+			});
 
 
 		$scope.page.formlists = [
@@ -105,114 +107,149 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		$scope.page.formlists.forEach(function(item, index)
 		{
 			console.log('What is the item ', item);
-			formService.getAllFormsByHeading($stateParams.demographicNo, item.label).then(function(data)
-			{
-				console.debug('whats the index' + index, data);
-				$scope.page.currentFormList[index] = toArray(data.list);
-			});
+			formService.getAllFormsByHeading($stateParams.demographicNo, item.label).then(
+				function success(results)
+				{
+					console.debug('whats the index' + index, results);
+					$scope.page.currentFormList[index] = Juno.Common.Util.toArray(results.list);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		});
 
 
 		$scope.page.encounterFormlist = [];
 		$scope.page.formGroups = [];
-		$scope.getFormGroups = function()
+		$scope.getFormGroups = function getFormGroups()
 		{
-			formService.getFormGroups().then(function(data)
-			{
-				if (data instanceof Array)
+			formService.getFormGroups().then(
+				function success(results)
 				{
-					$scope.page.formGroups = data;
-				}
-				else
-				{
-					$scope.page.formGroups.push(data);
-				}
-
-				for (var i = 0; i < $scope.page.formGroups.length; i++)
-				{
-					if (!($scope.page.formGroups[i].summaryItem instanceof Array))
+					if (results instanceof Array)
 					{
-						$scope.page.formGroups[i].summaryItem = [$scope.page.formGroups[i].summaryItem];
+						$scope.page.formGroups = results;
 					}
-				}
-			});
+					else
+					{
+						$scope.page.formGroups.push(results);
+					}
+
+					for (var i = 0; i < $scope.page.formGroups.length; i++)
+					{
+						if (!($scope.page.formGroups[i].summaryItem instanceof Array))
+						{
+							$scope.page.formGroups[i].summaryItem = [$scope.page.formGroups[i].summaryItem];
+						}
+					}
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 		$scope.getFormGroups();
 		$scope.page.formOptions = [];
 		$scope.favouriteGroup = null;
 
-		getFavouriteFormGroup = function()
+		getFavouriteFormGroup = function getFavouriteFormGroup()
 		{
-			formService.getFavouriteFormGroup().then(function(data)
-			{
-				$scope.favouriteGroup = data;
-
-				if (!($scope.favouriteGroup.summaryItem instanceof Array))
+			formService.getFavouriteFormGroup().then(
+				function success(results)
 				{
-					$scope.favouriteGroup.summaryItem = [$scope.favouriteGroup.summaryItem];
-				}
+					$scope.favouriteGroup = results;
 
-			});
+					if (!($scope.favouriteGroup.summaryItem instanceof Array))
+					{
+						$scope.favouriteGroup.summaryItem = [$scope.favouriteGroup.summaryItem];
+					}
+
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 		getFavouriteFormGroup();
 
-		formService.getFormOptions($scope.demographicNo).then(function(data)
-		{
-			console.log("data", data);
-
-			if (data.items instanceof Array)
+		formService.getFormOptions($scope.demographicNo).then(
+			function success(results)
 			{
-				$scope.page.formOptions = data.items;
-			}
-			else
+				console.log("data", results);
+
+				if (results.items instanceof Array)
+				{
+					$scope.page.formOptions = results.items;
+				}
+				else
+				{
+					$scope.page.formOptions.push(results.items);
+				}
+
+
+				console.log("form options", $scope.page.formOptions);
+			},
+			function error(errors)
 			{
-				$scope.page.formOptions.push(data.items);
-			}
+				console.log(errors);
+			});
 
-
-			console.log("form options", $scope.page.formOptions);
-		});
-
-		formService.getCompletedEncounterForms($stateParams.demographicNo).then(function(data)
-		{
-			if (data.list instanceof Array)
+		formService.getCompletedEncounterForms($stateParams.demographicNo).then(
+			function success(results)
 			{
-				$scope.page.encounterFormlist[0] = data.list;
-			}
-			else
+				if (results.list instanceof Array)
+				{
+					$scope.page.encounterFormlist[0] = results.list;
+				}
+				else
+				{
+					var arr = new Array();
+					arr[0] = results.list;
+					$scope.page.encounterFormlist[0] = arr;
+				}
+
+				//$scope.page.encounterFormlist[0] = results.list;
+				//console.log("completed list as is:" + JSON.stringify($scope.page.encounterFormlist[0]) );
+			},
+			function error(errors)
 			{
-				var arr = new Array();
-				arr[0] = data.list;
-				$scope.page.encounterFormlist[0] = arr;
-			}
+				console.log(errors);
+			});
 
-			//$scope.page.encounterFormlist[0] = data.list;
-			//console.log("completed list as is:" + JSON.stringify($scope.page.encounterFormlist[0]) );
-		});
+		formService.getSelectedEncounterForms().then(
+			function success(results)
+			{
+				$scope.page.encounterFormlist[1] = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
 
-		formService.getSelectedEncounterForms().then(function(data)
-		{
-			$scope.page.encounterFormlist[1] = data;
-		});
 
-
-		$scope.changeTo = function(listId)
+		$scope.changeTo = function changeTo(listId)
 		{
 			$scope.page.currentlistId = listId;
 			console.log('set currentlist to ' + listId);
 			if (listId == 0)
 			{
-				formService.getAllFormsByHeading($stateParams.demographicNo, 'Completed').then(function(data)
-				{
-					console.debug('whats the index' + 0, data);
-					$scope.page.currentFormList[0] = toArray(data.list);
-				});
+				formService.getAllFormsByHeading($stateParams.demographicNo, 'Completed').then(
+					function success(results)
+					{
+						console.debug('whats the index' + 0, results);
+						$scope.page.currentFormList[0] = Juno.Common.Util.toArray(results.list);
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
 			}
 		};
 
-		$scope.viewFormState = function(item, view)
+		$scope.viewFormState = function changeTo(item, view)
 		{
 
 			while (document.getElementById('formInViewFrame').hasChildNodes())
@@ -328,7 +365,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 		}
 
-		$scope.isEmpty = function(obj)
+		$scope.isEmpty = function isEmpty(obj)
 		{
 			for (var i in obj)
 				if (obj.hasOwnProperty(i)) return false;
@@ -337,12 +374,12 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 		$scope.currentEformGroup = {};
 
-		$scope.setCurrentEFormGroup = function(mod)
+		$scope.setCurrentEFormGroup = function setCurrentEFormGroup(mod)
 		{
 			$scope.currentEformGroup = mod;
 		};
 
-		$scope.openFormFromGroups = function(item)
+		$scope.openFormFromGroups = function openFormFromGroups(item)
 		{
 			console.log("group item", item);
 			item.formId = item.id;
@@ -350,7 +387,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			$scope.viewFormState(item, 2);
 		};
 
-		$scope.formOption = function(opt)
+		$scope.formOption = function formOption(opt)
 		{
 			var atleastOneItemSelected = false;
 			if (opt.extra == "send2PHR")
@@ -383,7 +420,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		/*
 		 * Used to make the left side list tab be active
 		 */
-		$scope.getListClass = function(listId)
+		$scope.getListClass = function getListClass(listId)
 		{
 			if (listId === $scope.page.currentlistId)
 			{
@@ -394,7 +431,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		/*
 		 * Used to make group setting active 
 		 */
-		$scope.getGroupListClass = function(grp)
+		$scope.getGroupListClass = function getGroupListClass(grp)
 		{
 			if (grp === $scope.currentEformGroup)
 			{
@@ -405,7 +442,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		/*
 		 * Used to mark which form is active.
 		 */
-		$scope.getActiveFormClass = function(item)
+		$scope.getActiveFormClass = function getActiveFormClass(item)
 		{
 			if (item.type == $scope.page.currentForm.type && item.id == $scope.page.currentForm.id && angular.isDefined(item.id))
 			{
@@ -417,6 +454,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			}
 		};
 
+		// Remove?
 		function handleError(errorMessage)
 		{
 			console.log(errorMessage);
@@ -444,7 +482,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		/*
 		 * This still needs to be tested
 		 */
-		$scope.keypress = function(event)
+		$scope.keypress = function keypress(event)
 		{
 			if (event.altKey == true && event.keyCode == 38)
 			{ //up
@@ -477,10 +515,3 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 	}
 ]);
-
-function toArray(obj)
-{ //convert single object to array
-	if (obj instanceof Array) return obj;
-	else if (obj == null) return [];
-	else return [obj];
-}

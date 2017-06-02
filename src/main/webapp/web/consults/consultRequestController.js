@@ -29,18 +29,33 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 	{
 
 		//get access rights
-		securityService.hasRight("_con", "r").then(function(data)
-		{
-			$scope.consultReadAccess = data;
-		});
-		securityService.hasRight("_con", "u").then(function(data)
-		{
-			$scope.consultUpdateAccess = data;
-		});
-		securityService.hasRight("_con", "w").then(function(data)
-		{
-			$scope.consultWriteAccess = data;
-		});
+		securityService.hasRight("_con", "r").then(
+			function success(results)
+			{
+				$scope.consultReadAccess = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
+		securityService.hasRight("_con", "u").then(
+			function success(results)
+			{
+				$scope.consultUpdateAccess = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
+		securityService.hasRight("_con", "w").then(
+			function success(results)
+			{
+				$scope.consultWriteAccess = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
 
 		$scope.consult = consult;
 
@@ -50,21 +65,26 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
 
 		//set demographic info
-		demographicService.getDemographic(consult.demographicId).then(function(data)
-		{
-			consult.demographic = data;
-
-			//set cell phone
-			consult.demographic.extras = Juno.Common.Util.toArray(consult.demographic.extras);
-			for (var i = 0; i < consult.demographic.extras.length; i++)
+		demographicService.getDemographic(consult.demographicId).then(
+			function success(results)
 			{
-				if (consult.demographic.extras[i].key == "demo_cell")
+				consult.demographic = results;
+
+				//set cell phone
+				consult.demographic.extras = Juno.Common.Util.toArray(consult.demographic.extras);
+				for (var i = 0; i < consult.demographic.extras.length; i++)
 				{
-					consult.demographic.cellPhone = consult.demographic.extras[i].value;
-					break;
+					if (consult.demographic.extras[i].key == "demo_cell")
+					{
+						consult.demographic.cellPhone = consult.demographic.extras[i].value;
+						break;
+					}
 				}
-			}
-		});
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
 
 		//set default letterhead
 		if (consult.letterheadName == null)
@@ -175,9 +195,9 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			console.log('consult: ', consult);
 		};
 
-		$scope.writeToBox = function writeToBox(data, boxId)
+		$scope.writeToBox = function writeToBox(results, boxId)
 		{
-			var items = Juno.Common.Util.toArray(data.summaryItem);
+			var items = Juno.Common.Util.toArray(results.summaryItem);
 			var boxData = null;
 			for (var i = 0; i < items.length; i++)
 			{
@@ -191,42 +211,67 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		$scope.getFamilyHistory = function getFamilyHistory(boxId)
 		{
-			summaryService.getFamilyHistory(consult.demographicId).then(function(data)
-			{
-				$scope.writeToBox(data, boxId);
-			});
+			summaryService.getFamilyHistory(consult.demographicId).then(
+				function success(results)
+				{
+					$scope.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 		$scope.getMedicalHistory = function getMedicalHistory(boxId)
 		{
-			summaryService.getMedicalHistory(consult.demographicId).then(function(data)
-			{
-				$scope.writeToBox(data, boxId);
-			});
+			summaryService.getMedicalHistory(consult.demographicId).then(
+				function success(results)
+				{
+					$scope.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 		$scope.getOngoingConcerns = function getOngoingConcerns(boxId)
 		{
-			summaryService.getOngoingConcerns(consult.demographicId).then(function(data)
-			{
-				$scope.writeToBox(data, boxId);
-			});
+			summaryService.getOngoingConcerns(consult.demographicId).then(
+				function success(results)
+				{
+					$scope.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 		$scope.getOtherMeds = function getOtherMeds(boxId)
 		{
-			summaryService.getOtherMeds(consult.demographicId).then(function(data)
-			{
-				$scope.writeToBox(data, boxId);
-			});
+			summaryService.getOtherMeds(consult.demographicId).then(
+				function success(results)
+				{
+					$scope.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 		$scope.getReminders = function getReminders(boxId)
 		{
-			summaryService.getReminders(consult.demographicId).then(function(data)
-			{
-				$scope.writeToBox(data, boxId);
-			});
+			summaryService.getReminders(consult.demographicId).then(
+				function success(results)
+				{
+					$scope.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 		// New function, doesn't work
@@ -234,10 +279,15 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		{
 			console.log('CONSULT: ', consult);
 
-			summaryService.getAllergies(consult.demographicId).then(function(data)
-			{
-				$scope.writeToBox(data, boxId);
-			});
+			summaryService.getAllergies(consult.demographicId).then(
+				function success(results)
+				{
+					$scope.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 		$scope.invalidData = function invalidData()
@@ -301,14 +351,19 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				windowClass: "attachment-modal-window"
 			});
 
-			modalInstance.result.then(function()
-			{
-				if (consult.attachmentsChanged)
+			modalInstance.result.then(
+				function success()
 				{
-					$scope.consultChanged++;
-					consult.attachmentsChanged = false;
-				}
-			});
+					if (consult.attachmentsChanged)
+					{
+						$scope.consultChanged++;
+						consult.attachmentsChanged = false;
+					}
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 		//attachment modal controller
@@ -322,13 +377,18 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 			var consultId = 0;
 			if (consult.id != null) consultId = consult.id;
-			consultService.getRequestAttachments(consultId, consult.demographicId).then(function(data)
-			{
-				if (consult.availableDocs == null) consult.availableDocs = Juno.Common.Util.toArray(data);
-				$scope.atth.availableDocs = consult.availableDocs;
-				Juno.Common.Util.sortAttachmentDocs($scope.atth.availableDocs);
-				if ($scope.atth.availableDocs[0] != null) $scope.atth.selectedAvailableDoc = $scope.atth.availableDocs[0];
-			});
+			consultService.getRequestAttachments(consultId, consult.demographicId).then(
+				function success(results)
+				{
+					if (consult.availableDocs == null) consult.availableDocs = Juno.Common.Util.toArray(results);
+					$scope.atth.availableDocs = consult.availableDocs;
+					Juno.Common.Util.sortAttachmentDocs($scope.atth.availableDocs);
+					if ($scope.atth.availableDocs[0] != null) $scope.atth.selectedAvailableDoc = $scope.atth.availableDocs[0];
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 
 			$scope.openDoc = function openDoc(doc)
 			{
@@ -405,10 +465,15 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			$scope.consultSaving = true; //show saving banner
 			$scope.setAppointmentTime();
 
-			consultService.saveRequest(consult).then(function(data)
-			{
-				if (consult.id == null) $location.path("/record/" + consult.demographicId + "/consult/" + data.id);
-			});
+			consultService.saveRequest(consult).then(
+				function success(results)
+				{
+					if (consult.id == null) $location.path("/record/" + consult.demographicId + "/consult/" + results.id);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 			$scope.setESendEnabled();
 			$scope.consultSaving = false; //hide saving banner
 			$scope.consultChanged = -1; //reset change count
@@ -436,10 +501,15 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		{
 			if ($scope.eSendEnabled)
 			{
-				consultService.eSendRequest(consult.id).then(function(data)
-				{
-					alert(data.message);
-				});
+				consultService.eSendRequest(consult.id).then(
+					function success(results)
+					{
+						alert(results.message);
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
 			}
 		};
 

@@ -74,21 +74,36 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		$scope.page.onlyNotes = false;
 
 		//get access rights
-		securityService.hasRight("_eChart", "r", $stateParams.demographicNo).then(function(data)
-		{
-			$scope.page.canRead = data;
-		});
-		securityService.hasRight("_eChart", "u", $stateParams.demographicNo).then(function(data)
-		{
-			$scope.page.cannotChange = !data;
-		});
-		securityService.hasRight("_eChart", "w", $stateParams.demographicNo).then(function(data)
-		{
-			$scope.page.cannotAdd = !data;
-		});
+		securityService.hasRight("_eChart", "r", $stateParams.demographicNo).then(
+			function success(results)
+			{
+				$scope.page.canRead = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
+		securityService.hasRight("_eChart", "u", $stateParams.demographicNo).then(
+			function success(results)
+			{
+				$scope.page.cannotChange = !results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
+		securityService.hasRight("_eChart", "w", $stateParams.demographicNo).then(
+			function success(results)
+			{
+				$scope.page.cannotAdd = !results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
 
 		//disable click and keypress if user only has read-access
-		$scope.checkAction = function(event)
+		$scope.checkAction = function checkAction(event)
 		{
 			if ($scope.page.cannotChange)
 			{
@@ -98,7 +113,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		};
 
 		// Note list filtering functions
-		$scope.setOnlyNotes = function()
+		$scope.setOnlyNotes = function setOnlyNotes()
 		{
 			if ($scope.page.onlyNotes)
 			{
@@ -111,7 +126,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			console.log("$scope.page.onlyNotes ", $scope.page.onlyNotes);
 		};
 
-		$scope.isOnlyNotesStatus = function()
+		$scope.isOnlyNotesStatus = function isOnlyNotesStatus()
 		{
 			if ($scope.page.onlyNotes)
 			{
@@ -125,7 +140,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		};
 
 
-		$scope.openRevisionHistory = function(note)
+		$scope.openRevisionHistory = function openRevisionHistory(note)
 		{
 			//var rnd = Math.round(Math.random() * 1000);
 			win = "revision";
@@ -133,14 +148,14 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
 		};
 
-		$scope.openRx = function(demoNo)
+		$scope.openRx = function openRx(demoNo)
 		{
 			win = "Rx" + demoNo;
 			var url = "../oscarRx/choosePatient.do?demographicNo=" + demoNo;
 			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
 		};
 
-		$scope.openAllergies = function(demoNo)
+		$scope.openAllergies = function openAllergies(demoNo)
 		{
 			win = "Allergy" + demoNo;
 			var url = "../oscarRx/showAllergy.do?demographicNo=" + demoNo;
@@ -148,7 +163,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return false;
 		};
 
-		$scope.openPreventions = function(demoNo)
+		$scope.openPreventions = function openPreventions(demoNo)
 		{
 			win = "prevention" + demoNo;
 			var url = "../oscarPrevention/index.jsp?demographic_no=" + demoNo;
@@ -158,7 +173,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 
 
-		$scope.isCurrentStatus = function(stat)
+		$scope.isCurrentStatus = function isCurrentStatus(stat)
 		{
 			//console.log("stat",stat);
 			if (stat == $scope.page.currentFilter)
@@ -173,7 +188,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		};
 
 		// How do we handle showing what filter has been selected???
-		$scope.changeNoteFilter = function()
+		$scope.changeNoteFilter = function changeNoteFilter()
 		{
 			$scope.index = 0;
 			$scope.page.noteFilter.filterProviders = [user.providerNo]; //<- need to fix this?
@@ -182,7 +197,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			$scope.addMoreItems();
 		};
 
-		$scope.removeFilter = function()
+		$scope.removeFilter = function removeFilter()
 		{
 			$scope.index = 0;
 			$scope.page.noteFilter = {};
@@ -194,39 +209,40 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 
 		//Note display functions
-		$scope.addMoreItems = function()
+		$scope.addMoreItems = function addMoreItems()
 		{
 			console.log($scope.busy);
 			if ($scope.busy) return;
 
 			$scope.busy = true;
 
-			noteService.getNotesFrom($stateParams.demographicNo, $scope.index, 20, $scope.page.noteFilter).then(function(data)
+			noteService.getNotesFrom($stateParams.demographicNo, $scope.index, 20, $scope.page.noteFilter).then(
+				function success(results)
 				{
-					console.log('whats the data', angular.isUndefined(data.notelist), data.notelist);
-					if (angular.isDefined(data.notelist))
+					console.log('whats the data', angular.isUndefined(results.notelist), results.notelist);
+					if (angular.isDefined(results.notelist))
 					{
 						//$scope.page.notes = data;
-						if (data.notelist instanceof Array)
+						if (results.notelist instanceof Array)
 						{
 							console.log("ok its in an array", $scope.busy);
-							for (var i = 0; i < data.notelist.length; i++)
+							for (var i = 0; i < results.notelist.length; i++)
 							{
-								$scope.page.notes.notelist.push(data.notelist[i]);
+								$scope.page.notes.notelist.push(results.notelist[i]);
 							}
 						}
 						else
 						{
-							$scope.page.notes.notelist.push(data.notelist);
+							$scope.page.notes.notelist.push(results.notelist);
 						}
 						$scope.index = $scope.page.notes.notelist.length;
 					}
 					$scope.busy = false;
 				},
-				function(errorMessage)
+				function error(errors)
 				{
-					console.log("notes:" + errorMessage);
-					$scope.error = errorMessage;
+					console.log(errors);
+					$scope.error = errors;
 					$scope.busy = false;
 				}
 			);
@@ -235,14 +251,14 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		$scope.addMoreItems();
 
-		$scope.editNote = function(note)
+		$scope.editNote = function editNote(note)
 		{
 			$rootScope.$emit('loadNoteForEdit', note);
 		};
 
 		$scope.page.currentEditNote = {};
 
-		$scope.isNoteBeingEdited = function(note)
+		$scope.isNoteBeingEdited = function isNoteBeingEdited(note)
 		{
 
 			if (note.uuid == $scope.page.currentEditNote.uuid)
@@ -284,7 +300,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 
 		//Note display functions
-		$scope.setColor = function(note)
+		$scope.setColor = function setColor(note)
 		{
 			if (note.eformData)
 			{
@@ -337,7 +353,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 		};
 
-		$scope.showNoteHeader = function(note)
+		$scope.showNoteHeader = function showNoteHeader(note)
 		{
 			if ($scope.page.onlyNotes)
 			{
@@ -349,7 +365,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return true;
 		};
 
-		$scope.showNote = function(note)
+		$scope.showNote = function showNote(note)
 		{
 			if ($scope.page.onlyNotes)
 			{
@@ -367,7 +383,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		};
 
 
-		$scope.firstLine = function(note)
+		$scope.firstLine = function firstLine(note)
 		{
 			var firstL = note.note.trim().split('\n')[0];
 			var dateStr = $filter('date')(note.observationDate, 'dd-MMM-yyyy');
@@ -382,14 +398,14 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		$scope.trackerUrl = "";
 
-		$scope.getTrackerUrl = function(demographicNo)
+		$scope.getTrackerUrl = function getTrackerUrl(demographicNo)
 		{
 			$scope.trackerUrl = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo + '&numEle=4&tracker=slim';
 		};
 
 		// var initialDisplayLimit = 5;
 
-		$scope.toggleList = function(mod)
+		$scope.toggleList = function toggleList(mod)
 		{
 			// i = initialDisplayLimit;
 
@@ -415,7 +431,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 		};
 
-		$scope.showMoreItems = function(mod)
+		$scope.showMoreItems = function showMoreItems(mod)
 		{
 
 			if (!angular.isDefined(mod.summaryItem))
@@ -432,7 +448,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		};
 
 		// Return true if a given section is expanded, otherwise return false
-		$scope.isSectionExpanded = function(mod)
+		$scope.isSectionExpanded = function isSectionExpanded(mod)
 		{
 			if (mod.displaySize > 0)
 			{
@@ -443,7 +459,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		};
 
 		// Return true if a given section is empty, otherwise return false
-		$scope.isSectionEmpty = function(mod)
+		$scope.isSectionEmpty = function isSectionEmpty(mod)
 		{
 			if (mod.summaryItem.length <= 0)
 			{
@@ -488,18 +504,18 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		function getLeftItems()
 		{
-			summaryService.getSummaryHeaders($stateParams.demographicNo, 'left').then(function(data)
+			summaryService.getSummaryHeaders($stateParams.demographicNo, 'left').then(
+				function success(results)
 				{
-					console.log("left", data);
-					$scope.page.columnOne.modules = data;
+					console.log("left", results);
+					$scope.page.columnOne.modules = results;
 					fillItems($scope.page.columnOne.modules);
 				},
-				function(errorMessage)
+				function error(errors)
 				{
-					console.log("left" + errorMessage);
-					$scope.error = errorMessage;
-				}
-			);
+					console.log(errors);
+					$scope.error = errors;
+				});
 		}
 
 		getLeftItems();
@@ -507,18 +523,18 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		function getRightItems()
 		{
-			summaryService.getSummaryHeaders($stateParams.demographicNo, 'right').then(function(data)
+			summaryService.getSummaryHeaders($stateParams.demographicNo, 'right').then(
+				function success(results)
 				{
-					console.log("right", data);
-					$scope.page.columnThree.modules = data;
+					console.log("right", results);
+					$scope.page.columnThree.modules = results;
 					fillItems($scope.page.columnThree.modules);
 				},
-				function(errorMessage)
+				function error(errors)
 				{
-					console.log("left" + errorMessage);
-					$scope.error = errorMessage;
-				}
-			);
+					console.log(errors);
+					$scope.error = errors;
+				});
 		}
 
 		getRightItems();
@@ -527,37 +543,37 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		function fillItems(itemsToFill)
 		{
+
 			for (var i = 0; i < itemsToFill.length; i++)
 			{
 				console.log(itemsToFill[i].summaryCode);
 				summaryLists[itemsToFill[i].summaryCode] = itemsToFill[i];
 
-				summaryService.getFullSummary($stateParams.demographicNo, itemsToFill[i].summaryCode).then(function(data)
+				summaryService.getFullSummary($stateParams.demographicNo, itemsToFill[i].summaryCode).then(
+					function success(results)
 					{
-						console.log("FullSummary returned ", data);
-						if (angular.isDefined(data.summaryItem))
+						console.log("FullSummary returned ", results);
+						if (angular.isDefined(results.summaryItem))
 						{
-							if (data.summaryItem instanceof Array)
+							if (results.summaryItem instanceof Array)
 							{
-								summaryLists[data.summaryCode].summaryItem = data.summaryItem;
+								summaryLists[results.summaryCode].summaryItem = results.summaryItem;
 							}
 							else
 							{
-								summaryLists[data.summaryCode].summaryItem = [data.summaryItem];
+								summaryLists[results.summaryCode].summaryItem = [results.summaryItem];
 							}
 						}
 					},
-					function(errorMessage)
+					function error(errors)
 					{
-						console.log("fillItems" + errorMessage);
-					}
-
-				);
+						console.log(errors);
+					});
 			}
 		}
 
 
-		editGroupedNotes = function(size, mod, action)
+		editGroupedNotes = function editGroupedNotes(size, mod, action)
 		{
 
 			var modalInstance = $uibModal.open(
@@ -582,29 +598,31 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				}
 			});
 
-			modalInstance.result.then(function(selectedItem)
-			{
-				console.log(selectedItem);
-			}, function()
-			{
-				if (editingNoteId != null)
+			modalInstance.result.then(
+				function success(results)
 				{
-					noteService.removeEditingNoteFlag(editingNoteId, user.providerNo);
-					$interval.cancel(itvSet);
-					itvSet = null;
-					$interval.cancel(itvCheck);
-					itvCheck = null;
-					editingNoteId = null;
-				}
-
-				console.log('Modal dismissed at: ' + new Date());
-			});
+					console.log(results);
+				},
+				function error(errors)
+				{
+					if (editingNoteId != null)
+					{
+						noteService.removeEditingNoteFlag(editingNoteId, user.providerNo);
+						$interval.cancel(itvSet);
+						itvSet = null;
+						$interval.cancel(itvCheck);
+						itvCheck = null;
+						editingNoteId = null;
+					}
+					console.log('Modal dismissed at: ' + new Date());
+					console.log(errors);
+				});
 
 			console.log($('#myModal'));
 		};
 
 
-		$scope.gotoState = function(item, mod, itemId)
+		$scope.gotoState = function gotoState(item, mod, itemId)
 		{
 
 			if (item == "add")
@@ -665,7 +683,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		};
 
 
-		$scope.showPrintModal = function(mod, action)
+		$scope.showPrintModal = function showPrintModal(mod, action)
 		{
 			var size = 'lg';
 			var modalInstance = $uibModal.open(
@@ -687,14 +705,17 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				}
 			});
 
-			modalInstance.result.then(function(selectedItem)
-			{
-				console.log(selectedItem);
+			modalInstance.result.then(
+				function success(results)
+				{
+					console.log(results);
 
-			}, function()
-			{
-				console.log('Modal dismissed at: ' + new Date());
-			});
+				},
+				function error(errors)
+				{
+					console.log('Modal dismissed at: ' + new Date());
+					console.log(errors);
+				});
 		};
 
 	}

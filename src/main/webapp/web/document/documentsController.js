@@ -23,7 +23,7 @@ angular.module('Document').controller('Document.DocumentsController', [
 		}, true);
 
 
-		$scope.openPopup = function()
+		$scope.openPopup = function openPopup()
 		{
 			window.open('../dms/documentReport.jsp?function=provider&functionid=' + $scope.me.providerNo, 'edocView', 'height=700,width=1024');
 		};

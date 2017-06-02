@@ -14,23 +14,24 @@ angular.module('Dashboard').controller('Dashboard.TicklerConfigureController', [
 
 		$scope.prefs = prefs.dashboardPreferences;
 
-		$scope.close = function()
+		$scope.close = function close()
 		{
 			$uibModalInstance.close(false);
 		};
 
-		$scope.save = function()
+		$scope.save = function save()
 		{
 
-			personaService.updateDashboardPreferences($scope.prefs).then(function(data)
-			{
-				$uibModalInstance.close(true);
-
-
-			}, function(reason)
-			{
-				$uibModalInstance.close(false);
-			});
+			personaService.updateDashboardPreferences($scope.prefs).then(
+				function success(results)
+				{
+					$uibModalInstance.close(true);
+				},
+				function error(errors)
+				{
+					$uibModalInstance.close(false);
+					console.log(errors);
+				});
 
 		};
 	}

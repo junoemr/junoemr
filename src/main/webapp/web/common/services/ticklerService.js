@@ -47,13 +47,13 @@ angular.module("Common.Services").service("ticklerService", [
 				}),
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("ticklerService::setCompleted error", error);
+					console.log("ticklerService::setCompleted error", errors);
 					deferred.reject("An error occurred while setting ticklers to completed status");
 				});
 
@@ -74,13 +74,13 @@ angular.module("Common.Services").service("ticklerService", [
 				}),
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("ticklerService::setDeleted error", error);
+					console.log("ticklerService::setDeleted error", errors);
 					deferred.reject("An error occurred while setting ticklers to deleted status");
 				});
 
@@ -101,13 +101,13 @@ angular.module("Common.Services").service("ticklerService", [
 				data: JSON.stringify(filter),
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("ticklerService::search error", error);
+					console.log("ticklerService::search error", errors);
 					deferred.reject("An error occurred while searching ticklers");
 				});
 
@@ -125,13 +125,13 @@ angular.module("Common.Services").service("ticklerService", [
 				data: JSON.stringify(tickler),
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("ticklerService::update error", error);
+					console.log("ticklerService::update error", errors);
 					deferred.reject("An error occurred while updating tickler");
 				});
 
@@ -147,13 +147,13 @@ angular.module("Common.Services").service("ticklerService", [
 				url: service.apiPath + '/textSuggestions',
 				method: "GET"
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("ticklerService::getTextSuggestions error", error);
+					console.log("ticklerService::getTextSuggestions error", errors);
 					deferred.reject("An error occurred while getting tickler text suggestions");
 				});
 
@@ -171,13 +171,13 @@ angular.module("Common.Services").service("ticklerService", [
 				data: JSON.stringify(tickler),
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("ticklerService::add error", error);
+					console.log("ticklerService::add error", errors);
 					deferred.reject("An error occurred while saving tickler");
 				});
 

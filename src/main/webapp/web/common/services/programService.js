@@ -39,14 +39,14 @@ angular.module("Common.Services").service("programService", [
 
 			$http.get(service.apiPath + 'program/programList',
 				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-				function success(response)
+				function success(results)
 				{
-					console.log(response.data);
-					deferred.resolve(response.data.content);
+					console.log(results.data);
+					deferred.resolve(results.data.content);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("error fetching program list");
+					console.log("error fetching program list:", errors);
 					deferred.reject("An error occured while fetching program list");
 				});
 

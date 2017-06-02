@@ -44,13 +44,13 @@ angular.module("Common.Services").service("messageService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("messageService::getUnread error", error);
+					console.log("messageService::getUnread error", errors);
 					deferred.reject("An error occurred while getting messages");
 				});
 
@@ -67,13 +67,13 @@ angular.module("Common.Services").service("messageService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("messageService::getUnreadCount error", error);
+					console.log("messageService::getUnreadCount error", errors);
 					deferred.reject("An error occurred while getting messages");
 				});
 

@@ -51,7 +51,7 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 			$scope.pageOptions.printType = 'all';
 		}
 
-		$scope.printToday = function()
+		$scope.printToday = function printToday()
 		{
 			$scope.pageOptions.printType = 'dates';
 			var date = new Date();
@@ -59,19 +59,19 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 			$scope.pageOptions.dates.end = date;
 		};
 
-		$scope.cancelPrint = function()
+		$scope.cancelPrint = function cancelPrint()
 		{
 			$uibModalInstance.dismiss('cancel');
 		};
 
-		$scope.clearPrint = function()
+		$scope.clearPrint = function clearPrint()
 		{
 			$scope.pageOptions = {};
 			$scope.pageOptions.printType = {};
 		};
 
 
-		$scope.sendToPhr = function()
+		$scope.sendToPhr = function sendToPhr()
 		{
 			var queryString = "demographic_no=" + $stateParams.demographicNo;
 			queryString = queryString + "&module=echart";
@@ -127,7 +127,7 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 			window.open('../SendToPhr.do?' + queryString, '_blank');
 		};
 
-		$scope.print = function()
+		$scope.print = function print()
 		{
 			//console.log('processList',mod);
 			console.log($scope.pageOptions);

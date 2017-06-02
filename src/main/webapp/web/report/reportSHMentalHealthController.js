@@ -13,7 +13,7 @@ angular.module('Report').controller('Report.ReportSHMentalHealthController',
 			startDate: new Date()
 		};
 
-		$scope.generateReport = function()
+		$scope.generateReport = function generateReport()
 		{
 			$log.log('run sh mental health report');
 			var startDate = $filter('date')($scope.params.startDate, 'yyyy-MM-dd');

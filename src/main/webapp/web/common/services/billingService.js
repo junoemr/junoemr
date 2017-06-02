@@ -39,13 +39,13 @@ angular.module("Common.Services").service("billingService", [
 
 			$http.get(service.apiPath + 'billing/uniqueServiceTypes',
 				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data.content);
+					deferred.resolve(results.data.content);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("billingService::getUniqueServiceTypes error", error);
+					console.log("billingService::getUniqueServiceTypes error", errors);
 					deferred.reject("An error occured while fetching billing service types");
 				});
 
@@ -53,42 +53,42 @@ angular.module("Common.Services").service("billingService", [
 		};
 
 		service.getBillingRegion = function getBillingRegion()
-			{
-				var deferred = $q.defer();
+		{
+			var deferred = $q.defer();
 
-				$http.get(service.apiPath + 'billing/billingRegion',
-					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-					function success(response)
-					{
-						deferred.resolve(response.data);
-					},
-					function error(error)
-					{
-						console.log("billingService::getBillingRegion error", error);
-						deferred.reject("An error occured while setting billingRegion");
-					});
+			$http.get(service.apiPath + 'billing/billingRegion',
+				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("billingService::getBillingRegion error", errorsz);
+					deferred.reject("An error occured while setting billingRegion");
+				});
 
-				return deferred.promise;
-			},
+			return deferred.promise;
+		};
 
-			service.getDefaultView = function getDefaultView()
-			{
-				var deferred = $q.defer();
+		service.getDefaultView = function getDefaultView()
+		{
+			var deferred = $q.defer();
 
-				$http.get(service.apiPath + 'billing/defaultView',
-					Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-					function success(response)
-					{
-						deferred.resolve(response.data);
-					},
-					function error(error)
-					{
-						console.log("billingService::getDefaultView error", error);
-						deferred.reject("An error occured while setting defaultView");
-					});
+			$http.get(service.apiPath + 'billing/defaultView',
+				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("billingService::getDefaultView error", errors);
+					deferred.reject("An error occured while setting defaultView");
+				});
 
-				return deferred.promise;
-			};
+			return deferred.promise;
+		};
 
 		return service;
 	}

@@ -48,23 +48,23 @@ angular.module('Patient.Search').controller('Patient.Search.RemotePatientResults
 		$scope.startIndex = 0;
 
 
-		$scope.close = function()
+		$scope.close = function close()
 		{
 			$uibModalInstance.close("Someone Closed Me");
 		};
 
-		$scope.doImport = function(d)
+		$scope.doImport = function doImport(d)
 		{
 			var myUrl = '../appointment/copyRemoteDemographic.jsp?remoteFacilityId=' + d.remoteFacilityId + '&demographic_no=' + d.demographicNo;
 			window.open(myUrl, "ImportDemo", "width=700, height=1027");
 		};
 
-		$scope.save = function()
+		$scope.save = function save()
 		{
 			$uibModalInstance.close("Someone Saved Me");
 		};
 
-		$scope.prevPage = function()
+		$scope.prevPage = function prevPage()
 		{
 			if ($scope.startIndex == 0)
 			{
@@ -75,7 +75,7 @@ angular.module('Patient.Search').controller('Patient.Search.RemotePatientResults
 
 		};
 
-		$scope.nextPage = function()
+		$scope.nextPage = function nextPage()
 		{
 			if ($scope.startIndex + $scope.pageSize > $scope.total)
 			{

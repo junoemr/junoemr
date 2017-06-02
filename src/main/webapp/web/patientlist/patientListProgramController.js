@@ -17,7 +17,7 @@ angular.module('PatientList').controller('PatientList.PatientListProgramControll
 
 
 		//the currentPage is 0 based
-		$scope.updateData = function(currentPage, pageSize)
+		$scope.updateData = function updateData(currentPage, pageSize)
 		{
 			var startIndex = currentPage * pageSize;
 
@@ -30,14 +30,14 @@ angular.module('PatientList').controller('PatientList.PatientListProgramControll
 					'Content-Type': 'application/json'
 				}
 			}).then(
-				function(response)
+				function success(results)
 				{
-					$scope.admissions = response.data.content;
-					$scope.$emit('updatePatientListPagination', response.data.total);
+					$scope.admissions = results.data.content;
+					$scope.$emit('updatePatientListPagination', results.data.total);
 				},
-				function error(error)
+				function error(errors)
 				{
-					alert('Failed to get sets lists.');
+					console.log(errors);
 				});
 		};
 

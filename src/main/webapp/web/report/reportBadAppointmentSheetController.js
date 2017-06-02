@@ -17,33 +17,38 @@ angular.module('Report').controller('Report.ReportBadAppointmentSheetController'
 			startDate: new Date()
 		};
 
-		$scope.searchProviders = function(val)
+		$scope.searchProviders = function searchProviders(val)
 		{
 			var search = {
 				searchTerm: val,
 				active: true
 			};
-			return providerService.searchProviders(search, 0, 10).then(function(response)
-			{
-				var resp = [];
-				for (var x = 0; x < response.length; x++)
+			return providerService.searchProviders(search, 0, 10).then(
+				function success(results)
 				{
-					resp.push(
+					var resp = [];
+					for (var x = 0; x < results.length; x++)
 					{
-						providerNo: response[x].providerNo,
-						name: response[x].firstName + ' ' + response[x].lastName
-					});
-				}
-				return resp;
-			});
+						resp.push(
+						{
+							providerNo: results[x].providerNo,
+							name: results[x].firstName + ' ' + results[x].lastName
+						});
+					}
+					return resp;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
-		$scope.updateProviderNo = function(item, model, label)
+		$scope.updateProviderNo = function updateProviderNo(item, model, label)
 		{
 			$scope.params.providerNo = model;
 			$scope.data.providerNo = label;
 		};
 
-		$scope.generateReport = function()
+		$scope.generateReport = function generateReport()
 		{
 			var p = $scope.params;
 			var startDate = $filter('date')(p.startDate, 'yyyy-MM-dd');

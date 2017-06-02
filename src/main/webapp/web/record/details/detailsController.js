@@ -57,17 +57,27 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		$scope.page.demo = demo;
 
 		//get access rights
-		securityService.hasRight("_demographic", "r", demo.demographicNo).then(function(data)
-		{
-			page.canRead = data;
-		});
-		securityService.hasRight("_demographic", "u", demo.demographicNo).then(function(data)
-		{
-			page.cannotChange = !data;
-		});
+		securityService.hasRight("_demographic", "r", demo.demographicNo).then(
+			function success(results)
+			{
+				page.canRead = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
+		securityService.hasRight("_demographic", "u", demo.demographicNo).then(
+			function success(results)
+			{
+				page.cannotChange = !results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
 
 		//disable click and keypress if user only has read-access
-		$scope.checkAction = function(event)
+		$scope.checkAction = function checkAction(event)
 		{
 			if (page.cannotChange)
 			{
@@ -89,39 +99,44 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		page.rxInteractionLevels = staticDataService.getRxInteractionLevels();
 
 		//get patient detail status
-		patientDetailStatusService.getStatus(demo.demographicNo).then(function(data)
-		{
-			page.macPHRLoggedIn = data.macPHRLoggedIn;
-			page.macPHRIdsSet = data.macPHRIdsSet;
-			page.macPHRVerificationLevel = data.macPHRVerificationLevel;
-
-			page.integratorEnabled = data.integratorEnabled;
-			page.integratorOffline = data.integratorOffline;
-			page.integratorAllSynced = data.integratorAllSynced;
-
-			page.conformanceFeaturesEnabled = data.conformanceFeaturesEnabled;
-			page.workflowEnhance = data.workflowEnhance;
-			page.billregion = data.billregion;
-			page.defaultView = data.defaultView;
-			page.hospitalView = data.hospitalView;
-
-			if (page.integratorEnabled)
+		patientDetailStatusService.getStatus(demo.demographicNo).then(
+			function success(results)
 			{
-				if (page.integratorOffline)
-				{
-					page.integratorStatusColor = "#ff5500";
-					page.integratorStatusMsg = "NOTE: Integrator is not available at this time";
-				}
-				else if (!page.integratorAllSynced)
-				{
-					page.integratorStatusColor = "#ff5500";
-					page.integratorStatusMsg = "NOTE: Integrated Community is not synced";
-				}
-			}
+				page.macPHRLoggedIn = results.macPHRLoggedIn;
+				page.macPHRIdsSet = results.macPHRIdsSet;
+				page.macPHRVerificationLevel = results.macPHRVerificationLevel;
 
-			page.billingHistoryLabel = "Invoice List";
-			if (page.billregion == "ON") page.billingHistoryLabel = "Billing History";
-		});
+				page.integratorEnabled = results.integratorEnabled;
+				page.integratorOffline = results.integratorOffline;
+				page.integratorAllSynced = results.integratorAllSynced;
+
+				page.conformanceFeaturesEnabled = results.conformanceFeaturesEnabled;
+				page.workflowEnhance = results.workflowEnhance;
+				page.billregion = results.billregion;
+				page.defaultView = results.defaultView;
+				page.hospitalView = results.hospitalView;
+
+				if (page.integratorEnabled)
+				{
+					if (page.integratorOffline)
+					{
+						page.integratorStatusColor = "#ff5500";
+						page.integratorStatusMsg = "NOTE: Integrator is not available at this time";
+					}
+					else if (!page.integratorAllSynced)
+					{
+						page.integratorStatusColor = "#ff5500";
+						page.integratorStatusMsg = "NOTE: Integrated Community is not synced";
+					}
+				}
+
+				page.billingHistoryLabel = "Invoice List";
+				if (page.billregion == "ON") page.billingHistoryLabel = "Billing History";
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
 
 
 		//show notes
@@ -341,7 +356,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			});
 		}
 
-		$scope.needToSave = function()
+		$scope.needToSave = function needToSave()
 		{
 			if (page.dataChanged > 0) return "btn-primary";
 		}
@@ -357,29 +372,31 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		});
 
 		//format lastname, firstname
-		$scope.formatLastName = function()
+		$scope.formatLastName = function formatLastName()
 		{
 			demo.lastName = demo.lastName.toUpperCase();
 		};
-		$scope.formatFirstName = function()
+		$scope.formatFirstName = function formatFirstName()
 		{
 			demo.firstName = demo.firstName.toUpperCase();
 		};
+
 		$scope.formatLastName(); //done on page load
 		$scope.formatFirstName(); //done on page load
 
 		//calculate age
 		var now = new Date();
-		$scope.calculateAge = function()
+		$scope.calculateAge = function calculateAge()
 		{
 			demo.age = now.getFullYear() - demo.dobYear;
 			if (now.getMonth() < demo.dobMonth - 1) demo.age--;
 			else if (now.getMonth() == demo.dobMonth - 1 && now.getDate() < demo.dobDay) demo.age--;
-		}
+		};
+
 		$scope.calculateAge(); //done on page load
 
 		//set ready for swipe card
-		$scope.setSwipeReady = function(status)
+		$scope.setSwipeReady = function setSwipeReady(status)
 		{
 			if (status == "off")
 			{
@@ -402,7 +419,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		//Health card verification
 		var hcParts = {};
-		$scope.healthCardHandler = function(keycode)
+		$scope.healthCardHandler = function healthCardHandler(keycode)
 		{
 			if (keycode == 13)
 			{ //carriage-return
@@ -460,7 +477,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 		};
 
-		$scope.healthCardUpdateDemographics = function()
+		$scope.healthCardUpdateDemographics = function healthCardUpdateDemographics()
 		{
 			if (demo.hcType != hcParts["issuer"])
 			{
@@ -542,29 +559,34 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//HCValidation
-		$scope.validateHC = function()
+		$scope.validateHC = function validateHC()
 		{
 			if (demo.hcType != "ON" || demo.hin == null || demo.hin == "") return;
 			if (demo.ver == null) demo.ver = "";
-			patientDetailStatusService.validateHC(demo.hin, demo.ver).then(function(data)
-			{
-				if (data.valid == null)
+			patientDetailStatusService.validateHC(demo.hin, demo.ver).then(
+				function success(results)
 				{
-					page.HCValidation = "n/a";
-					page.swipecardMsg = "Done Health Card Action";
-				}
-				else
+					if (results.valid == null)
+					{
+						page.HCValidation = "n/a";
+						page.swipecardMsg = "Done Health Card Action";
+					}
+					else
+					{
+						page.HCValidation = results.valid ? "valid" : "invalid";
+						page.swipecardMsg = results.responseDescription + " (" + results.responseCode + ")";
+					}
+				},
+				function error(errors)
 				{
-					page.HCValidation = data.valid ? "valid" : "invalid";
-					page.swipecardMsg = data.responseDescription + " (" + data.responseCode + ")";
-				}
-			});
+					console.log(errors);
+				});
 		}
 
 		//manage hin/hinVer entries
 		var hin0 = demo.hin;
 		var ver0 = demo.ver;
-		$scope.checkHin = function()
+		$scope.checkHin = function checkHin()
 		{
 			if (demo.hcType == "ON" && demo.hin != null && demo.hin != "")
 			{
@@ -574,7 +596,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			hin0 = demo.hin;
 			page.HCValidation = null;
 		}
-		$scope.checkHinVer = function()
+		$scope.checkHinVer = function checkHinVer()
 		{
 			if (demo.hcType == "ON")
 			{
@@ -586,14 +608,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//manage date entries
-		$scope.checkDate = function(id)
+		$scope.checkDate = function checkDate(id)
 		{
 			if (id == "DobY") demo.dobYear = checkYear(demo.dobYear);
 			else if (id == "DobM") demo.dobMonth = checkMonth(demo.dobMonth);
 			else if (id == "DobD") demo.dobDay = checkDay(demo.dobDay, demo.dobMonth, demo.dobYear);
 		}
 
-		$scope.formatDate = function(id)
+		$scope.formatDate = function formatDate(id)
 		{
 			$scope.calculateAge();
 
@@ -610,7 +632,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		$scope.formatDate("DobD"); //done on page load
 
 		//check Patient Status if endDate is entered
-		$scope.checkPatientStatus = function()
+		$scope.checkPatientStatus = function checkPatientStatus()
 		{
 			if (demo.patientStatus == "AC")
 			{
@@ -633,7 +655,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		//check&format postal code (Canada provinces only)
 		var postal0 = demo.address.postal;
-		$scope.checkPostal = function()
+		$scope.checkPostal = function checkPostal()
 		{
 			if (demo.address.province == null || demo.address.province == "OT" || demo.address.province.indexOf("US") == 0)
 				return;
@@ -654,7 +676,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			postal0 = demo.address.postal;
 		}
 
-		$scope.isPostalComplete = function()
+		$scope.isPostalComplete = function isPostalComplete()
 		{
 			var province = demo.address.province;
 			if (province != null && province != "OT" && province.indexOf("US") != 0)
@@ -668,7 +690,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return true;
 		}
 
-		$scope.invalidPostal = function()
+		$scope.invalidPostal = function invalidPostal()
 		{
 			var postal = demo.address.postal;
 			if (postal != null && postal != "")
@@ -692,7 +714,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//check email
-		$scope.checkEmail = function()
+		$scope.checkEmail = function checkEmail()
 		{
 			if (demo.email == null || demo.email == "") return true;
 
@@ -715,7 +737,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		//check Chart No (length)
 		var chartNo0 = demo.chartNo;
-		$scope.checkChartNo = function()
+		$scope.checkChartNo = function checkChartNo()
 		{
 			if (demo.chartNo == null || demo.chartNo == "")
 			{
@@ -728,7 +750,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		//check Cytology Number
 		var cytolNum0 = demo.scrCytolNum;
-		$scope.checkCytoNum = function()
+		$scope.checkCytoNum = function checkCytoNum()
 		{
 			if (demo.scrCytolNum == null || demo.scrCytolNum == "")
 			{
@@ -741,7 +763,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		//check Referral Doctor No
 		var referralDocNo0 = demo.scrReferralDocNo;
-		$scope.checkReferralDocNo = function()
+		$scope.checkReferralDocNo = function checkReferralDocNo()
 		{
 			if (demo.scrReferralDocNo == null || demo.scrReferralDocNo == "")
 			{
@@ -752,7 +774,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			else referralDocNo0 = demo.scrReferralDocNo;
 		}
 
-		$scope.validateReferralDocNo = function()
+		$scope.validateReferralDocNo = function validateReferralDocNo()
 		{
 			if (demo.scrReferralDocNo == null || demo.scrReferralDocNo == "") return true;
 
@@ -766,7 +788,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		//check SIN
 		var sin0 = demo.sin;
-		$scope.checkSin = function()
+		$scope.checkSin = function checkSin()
 		{
 			if (demo.sin == null || demo.sin == "")
 			{
@@ -793,7 +815,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 		}
 
-		$scope.validateSin = function()
+		$scope.validateSin = function validateSin()
 		{
 			if (demo.sin == null || demo.sin == "") return true;
 
@@ -823,74 +845,74 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		var onWaitingListSinceDate0 = demo.onWaitingListSinceDate;
 		var paperChartArchivedDate0 = demo.scrPaperChartArchivedDate;
 
-		$scope.preventManualEffDate = function()
+		$scope.preventManualEffDate = function preventManualEffDate()
 		{
 			if (demo.effDate == null) demo.effDate = effDate0;
 			else effDate0 = demo.effDate;
 		}
-		$scope.preventManualHcRenewDate = function()
+		$scope.preventManualHcRenewDate = function preventManualHcRenewDate()
 		{
 			if (demo.hcRenewDate == null) demo.hcRenewDate = hcRenewDate0;
 			else hcRenewDate0 = demo.hcRenewDate;
 		}
-		$scope.preventManualRosterDate = function()
+		$scope.preventManualRosterDate = function preventManualRosterDate()
 		{
 			if (demo.rosterDate == null) demo.rosterDate = rosterDate0;
 			else rosterDate0 = demo.rosterDate;
 		}
-		$scope.preventManualRosterTerminationDate = function()
+		$scope.preventManualRosterTerminationDate = function preventManualRosterTerminationDate()
 		{
 			if (demo.rosterTerminationDate == null) demo.rosterTerminationDate = rosterTerminationDate0;
 			else rosterTerminationDate0 = demo.rosterTerminationDate;
 		}
-		$scope.preventManualPatientStatusDate = function()
+		$scope.preventManualPatientStatusDate = function preventManualPatientStatusDate()
 		{
 			if (demo.patientStatusDate == null) demo.patientStatusDate = patientStatusDate0;
 			else patientStatusDate0 = demo.patientStatusDate;
 		}
-		$scope.preventManualDateJoined = function()
+		$scope.preventManualDateJoined = function preventManualDateJoined()
 		{
 			if (demo.dateJoined == null) demo.dateJoined = dateJoined0;
 			else dateJoined0 = demo.dateJoined;
 		}
-		$scope.preventManualEndDate = function()
+		$scope.preventManualEndDate = function preventManualEndDate()
 		{
 			if (demo.endDate == null) demo.endDate = endDate0;
 			else endDate0 = demo.endDate;
 		}
-		$scope.preventManualOnWaitingListSinceDate = function()
+		$scope.preventManualOnWaitingListSinceDate = function preventManualOnWaitingListSinceDate()
 		{
 			if (demo.onWaitingListSinceDate == null) demo.onWaitingListSinceDate = onWaitingListSinceDate0;
 			else onWaitingListSinceDate0 = demo.onWaitingListSinceDate;
 		}
-		$scope.preventManualPaperChartArchivedDate = function()
+		$scope.preventManualPaperChartArchivedDate = function preventManualPaperChartArchivedDate()
 		{
 			if (demo.scrPaperChartArchivedDate == null) demo.scrPaperChartArchivedDate = paperChartArchivedDate0;
 			else paperChartArchivedDate0 = demo.scrPaperChartArchivedDate;
 		}
 
 		//show/hide items
-		$scope.isRosterTerminated = function()
+		$scope.isRosterTerminated = function isRosterTerminated()
 		{
 			return (demo.rosterStatus == "TE");
 		}
-		$scope.showReferralDocList = function()
+		$scope.showReferralDocList = function showReferralDocList()
 		{
 			page.showReferralDocList = !page.showReferralDocList;
 		}
-		$scope.showAddNewRosterStatus = function()
+		$scope.showAddNewRosterStatus = function showAddNewRosterStatus()
 		{
 			page.showAddNewRosterStatus = !page.showAddNewRosterStatus;
 			page.newRosterStatus = null;
 		}
-		$scope.showAddNewPatientStatus = function()
+		$scope.showAddNewPatientStatus = function showAddNewPatientStatus()
 		{
 			page.showAddNewPatientStatus = !page.showAddNewPatientStatus;
 			page.newPatientStatus = null;
 		}
 
 		//fill referral doc from list
-		$scope.fillReferralDoc = function()
+		$scope.fillReferralDoc = function fillReferralDoc()
 		{
 			if (page.referralDocObj != null)
 			{
@@ -901,7 +923,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//add new Roster Status
-		$scope.addNewRosterStatus = function()
+		$scope.addNewRosterStatus = function addNewRosterStatus()
 		{
 			if (page.newRosterStatus != null && page.newRosterStatus != "")
 			{
@@ -916,7 +938,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//add new Patient Status
-		$scope.addNewPatientStatus = function()
+		$scope.addNewPatientStatus = function addNewPatientStatus()
 		{
 			if (page.newPatientStatus != null && page.newPatientStatus != "")
 			{
@@ -938,7 +960,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		phoneNum["HX"] = demo.scrHPhoneExt;
 		phoneNum["WX"] = demo.scrWPhoneExt;
 
-		$scope.checkPhone = function(type)
+		$scope.checkPhone = function checkPhone(type)
 		{
 			if (type == "C")
 			{
@@ -968,7 +990,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//set preferred contact phone number
-		$scope.setPreferredPhone = function()
+		$scope.setPreferredPhone = function setPreferredPhone()
 		{
 			page.cellPhonePreferredMsg = defPhTitle;
 			page.cellPhonePreferredColor = "";
@@ -998,27 +1020,27 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//disable set-preferred if phone number empty
-		$scope.isPhoneVoid = function(phone)
+		$scope.isPhoneVoid = function isPhoneVoid(phone)
 		{
 			return (phone == null || phone == "");
 		}
 
 		//show enrollment history (roster staus history)
-		$scope.showEnrollmentHistory = function()
+		$scope.showEnrollmentHistory = function showEnrollmentHistory()
 		{
 			var url = "../demographic/EnrollmentHistory.jsp?demographicNo=" + demo.demographicNo;
 			window.open(url, "enrollmentHistory", "width=650, height=1000");
 		}
 
 		//upload photo
-		$scope.launchPhoto = function()
+		$scope.launchPhoto = function launchPhoto()
 		{
 			var url = "../casemgmt/uploadimage.jsp?demographicNo=" + demo.demographicNo;
 			window.open(url, "uploadWin", "width=500, height=300");
 		}
 
 		//manage contacts
-		$scope.manageContacts = function()
+		$scope.manageContacts = function manageContacts()
 		{
 			var discard = true;
 			if (page.dataChanged > 0)
@@ -1033,7 +1055,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//print buttons
-		$scope.printLabel = function(label)
+		$scope.printLabel = function printLabel(label)
 		{
 			var url = null;
 			if (label == "PDFLabel") url = "../demographic/printDemoLabelAction.do?appointment_no=null&demographic_no=" + demo.demographicNo;
@@ -1045,7 +1067,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//integrator buttons
-		$scope.integratorDo = function(func)
+		$scope.integratorDo = function integratorDo(func)
 		{
 			var url = null;
 			if (func == "ViewCommunity") url = "../admin/viewIntegratedCommunity.jsp";
@@ -1057,7 +1079,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//MacPHR buttons
-		$scope.macPHRDo = function(func)
+		$scope.macPHRDo = function macPHRDo(func)
 		{
 			var url = null;
 			if (func == "Register")
@@ -1085,7 +1107,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//appointment buttons
-		$scope.appointmentDo = function(func)
+		$scope.appointmentDo = function appointmentDo(func)
 		{
 			var url = null;
 			if (func == "ApptHistory") url = "../demographic/demographiccontrol.jsp?displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&orderby=appttime&demographic_no=" + demo.demographicNo + "&last_name=" + encodeURI(demo.lastName) + "&first_name=" + encodeURI(demo.firstName);
@@ -1093,13 +1115,13 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			window.open(url, "Appointment", "width=960, height=700");
 		}
 
-		$scope.isClinicaidBilling = function()
+		$scope.isClinicaidBilling = function isClinicaidBilling()
 		{
 			return page.billregion == "CLINICAID";
 		}
 
 		//billing buttons
-		$scope.billingDo = function(func)
+		$scope.billingDo = function billingDo(func)
 		{
 			var url = null;
 			if (func == "BillingHistory")
@@ -1145,14 +1167,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//export demographic
-		$scope.exportDemographic = function()
+		$scope.exportDemographic = function exportDemographic()
 		{
 			var url = "../demographic/demographicExport.jsp?demographicNo=" + demo.demographicNo;
 			window.open(url, "DemographicExport", "width=960, height=700");
 		}
 
 		//HCValidation on open & save
-		$scope.validateHCSave = function(doSave)
+		$scope.validateHCSave = function validateHCSave(doSave)
 		{
 			if (demo.hin == null || demo.hin == "")
 			{
@@ -1160,34 +1182,44 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			else
 			{
-				patientDetailStatusService.isUniqueHC(demo.hin, demo.demographicNo).then(function(data)
-				{
-					if (!data.success)
+				patientDetailStatusService.isUniqueHC(demo.hin, demo.demographicNo).then(
+					function success(results)
 					{
-						alert("HIN is already in use!");
-					}
-					else if (demo.hcType != "ON")
-					{
-						if (doSave) $scope.save();
-					}
-					else
-					{
-						if (demo.ver == null) demo.ver = "";
-						patientDetailStatusService.validateHC(demo.hin, demo.ver).then(function(data)
+						if (!results.success)
 						{
-							if (data.valid == null)
-							{
-								page.HCValidation = "n/a";
-							}
-							else if (!data.valid)
-							{
-								alert("Health Card Validation failed: " + data.responseDescription + " (" + data.responseCode + ")");
-								doSave = false;
-							}
+							alert("HIN is already in use!");
+						}
+						else if (demo.hcType != "ON")
+						{
 							if (doSave) $scope.save();
-						});
-					}
-				});
+						}
+						else
+						{
+							if (demo.ver == null) demo.ver = "";
+							patientDetailStatusService.validateHC(demo.hin, demo.ver).then(
+								function success(results)
+								{
+									if (results.valid == null)
+									{
+										page.HCValidation = "n/a";
+									}
+									else if (!results.valid)
+									{
+										alert("Health Card Validation failed: " + results.responseDescription + " (" + results.responseCode + ")");
+										doSave = false;
+									}
+									if (doSave) $scope.save();
+								},
+								function error(errors)
+								{
+									console.log(errors);
+								});
+						}
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
 			}
 		}
 		$scope.validateHCSave();
@@ -1196,7 +1228,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//-----------------//
 		// save operations //
 		//-----------------//
-		$scope.save = function()
+		$scope.save = function save()
 		{
 			//check required fields
 			if (demo.lastName == null || demo.lastName == "")
@@ -1288,6 +1320,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	}
 ]);
 
+
+// Move these?
 function updateDemoExtras(extKey, newVal, posExtras, oldExtras, newExtras)
 {
 	if (newVal == null) return newExtras;

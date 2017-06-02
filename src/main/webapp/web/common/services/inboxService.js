@@ -44,13 +44,13 @@ angular.module("Common.Services").service("inboxService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("inboxService::getDashboardItems error", error);
+					console.log("inboxService::getDashboardItems error", errors);
 					deferred.reject("An error occured while getting inbox content");
 				});
 
@@ -67,13 +67,13 @@ angular.module("Common.Services").service("inboxService", [
 				method: "GET",
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("inboxService::getUnAckLabDocCount error", error);
+					console.log("inboxService::getUnAckLabDocCount error", errors);
 					deferred.reject("An error occured while getting inbox content");
 				});
 			return deferred.promise;

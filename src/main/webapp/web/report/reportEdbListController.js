@@ -17,7 +17,7 @@ angular.module('Report').controller('Report.ReportEdbListController', [
 			region: 'ON'
 		}; //todo: grab region from somewhere
 
-		$scope.generateReport = function()
+		$scope.generateReport = function generateReport()
 		{
 			$log.log('run edb report');
 			var startDate = $filter('date')($scope.params.startDate, 'yyyy-MM-dd');

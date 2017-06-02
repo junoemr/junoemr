@@ -39,13 +39,13 @@ angular.module("Common.Services").service("demographicService", [
 
 			$http.get(service.apiPath + 'demographics/' + encodeURIComponent(demographicNo),
 				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("demographicServices::getDemographic error", error);
+					console.log("demographicServices::getDemographic error", errors);
 					deferred.reject("An error occurred while fetching demographic");
 				});
 
@@ -57,13 +57,13 @@ angular.module("Common.Services").service("demographicService", [
 			var deferred = $q.defer();
 
 			$http.post(service.apiPath + 'demographics', demographic).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("demographicServices::updateDemographic error", error);
+					console.log("demographicServices::updateDemographic error", errors);
 					deferred.reject("An error occurred while saving demographic");
 				});
 
@@ -75,13 +75,13 @@ angular.module("Common.Services").service("demographicService", [
 			var deferred = $q.defer();
 
 			$http.put(service.apiPath + 'demographics', demographic).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("demographicServices::updateDemographic error", error);
+					console.log("demographicServices::updateDemographic error", errors);
 					deferred.reject("An error occurred while updating demographic");
 				});
 
@@ -94,13 +94,13 @@ angular.module("Common.Services").service("demographicService", [
 
 			$http.get(service.apiPath + 'demographics/quickSearch?query=' +
 				encodeURIComponent(search)).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("demographicServices::quickSearch error", error);
+					console.log("demographicServices::quickSearch error", errors);
 					deferred.reject("An error occurred while searching");
 				});
 
@@ -114,13 +114,13 @@ angular.module("Common.Services").service("demographicService", [
 			$http.post(service.apiPath + 'demographics/search?startIndex=' +
 				encodeURIComponent(startIndex) + "&itemsToReturn=" +
 				encodeURIComponent(itemsToReturn), search).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("demographicServices::search error", error);
+					console.log("demographicServices::search error", errors);
 					deferred.reject("An error occurred while searching");
 				});
 
@@ -133,13 +133,13 @@ angular.module("Common.Services").service("demographicService", [
 
 			$http.post(service.apiPath + 'demographics/searchIntegrator?itemsToReturn=' +
 				encodeURIComponent(itemsToReturn), search).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("demographicServices::searchIntegrator error", error);
+					console.log("demographicServices::searchIntegrator error", errors);
 					deferred.reject("An error occurred while searching");
 				});
 

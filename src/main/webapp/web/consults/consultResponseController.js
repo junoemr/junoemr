@@ -30,19 +30,31 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 		//get access rights
 		securityService.hasRight("_con", "r").then(
-			function(data)
+			function success(results)
 			{
-				$scope.consultReadAccess = data;
+				$scope.consultReadAccess = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
 			});
 		securityService.hasRight("_con", "u").then(
-			function(data)
+			function success(results)
 			{
-				$scope.consultUpdateAccess = data;
+				$scope.consultUpdateAccess = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
 			});
 		securityService.hasRight("_con", "w").then(
-			function(data)
+			function success(results)
 			{
-				$scope.consultWriteAccess = data;
+				$scope.consultWriteAccess = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
 			});
 
 		$scope.consult = consult;
@@ -128,7 +140,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			}
 		});
 
-		$scope.changeLetterhead = function()
+		$scope.changeLetterhead = function changeLetterhead()
 		{
 			var index = $("#letterhead").val();
 			if (index == null) return;
@@ -137,9 +149,9 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			consult.letterheadPhone = consult.letterheadList[index].phone;
 		};
 
-		$scope.writeToBox = function(data, boxId)
+		$scope.writeToBox = function writeToBox(results, boxId)
 		{
-			var items = Juno.Common.Util.toArray(data.summaryItem);
+			var items = Juno.Common.Util.toArray(results.summaryItem);
 			var boxData = null;
 			for (var i = 0; i < items.length; i++)
 			{
@@ -150,48 +162,68 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			else if (boxId == "currentMeds") consult.currentMeds = Juno.Common.Util.addNewLine(boxData, consult.currentMeds);
 		};
 
-		$scope.getFamilyHistory = function(boxId)
+		$scope.getFamilyHistory = function getFamilyHistory(boxId)
 		{
 			summaryService.getFamilyHistory(consult.demographic.demographicNo).then(
-				function(data)
+				function success(results)
 				{
-					$scope.writeToBox(data, boxId);
+					$scope.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					console.log(errors);
 				});
 		};
-		$scope.getMedicalHistory = function(boxId)
+		$scope.getMedicalHistory = function getMedicalHistory(boxId)
 		{
 			summaryService.getMedicalHistory(consult.demographic.demographicNo).then(
-				function(data)
+				function success(results)
 				{
-					$scope.writeToBox(data, boxId);
+					$scope.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					console.log(errors);
 				});
 		};
-		$scope.getOngoingConcerns = function(boxId)
+		$scope.getOngoingConcerns = function getOngoingConcerns(boxId)
 		{
 			summaryService.getOngoingConcerns(consult.demographic.demographicNo).then(
-				function(data)
+				function success(results)
 				{
-					$scope.writeToBox(data, boxId);
+					$scope.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					console.log(errors);
 				});
 		};
-		$scope.getOtherMeds = function(boxId)
+		$scope.getOtherMeds = function getOtherMeds(boxId)
 		{
 			summaryService.getOtherMeds(consult.demographic.demographicNo).then(
-				function(data)
+				function success(results)
 				{
-					$scope.writeToBox(data, boxId);
+					$scope.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					console.log(errors);
 				});
 		};
-		$scope.getReminders = function(boxId)
+		$scope.getReminders = function getReminders(boxId)
 		{
 			summaryService.getReminders(consult.demographic.demographicNo).then(
-				function(data)
+				function success(results)
 				{
-					$scope.writeToBox(data, boxId);
+					$scope.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					console.log(errors);
 				});
 		};
 
-		$scope.invalidData = function()
+		$scope.invalidData = function invalidData()
 		{
 			if ($scope.urgencies[$("#urgency").val()] == null)
 			{
@@ -216,7 +248,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			return false;
 		};
 
-		$scope.setAppointmentTime = function()
+		$scope.setAppointmentTime = function setAppointmentTime()
 		{
 			if (consult.appointmentHour != null && consult.appointmentMinute != null)
 			{
@@ -229,12 +261,12 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			}
 		};
 
-		$scope.openAttach = function(attachment)
+		$scope.openAttach = function openAttach(attachment)
 		{
 			window.open("../" + attachment.url);
 		};
 
-		$scope.attachFiles = function()
+		$scope.attachFiles = function attachFiles()
 		{
 			var modalInstance = $uibModal.open(
 			{
@@ -244,13 +276,17 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			});
 
 			modalInstance.result.then(
-				function()
+				function success(results)
 				{
 					if (consult.attachmentsChanged)
 					{
 						$scope.consultChanged++;
 						consult.attachmentsChanged = false;
 					}
+				},
+				function error(errors)
+				{
+					console.log(errors);
 				});
 		};
 
@@ -266,20 +302,24 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			var consultId = 0;
 			if (consult.id != null) consultId = consult.id;
 			consultService.getResponseAttachments(consultId, consult.demographic.demographicNo).then(
-				function(data)
+				function success(results)
 				{
-					if (consult.availableDocs == null) consult.availableDocs = Juno.Common.Util.toArray(data);
+					if (consult.availableDocs == null) consult.availableDocs = Juno.Common.Util.toArray(results);
 					$scope.atth.availableDocs = consult.availableDocs;
 					Juno.Consults.Common.sortAttachmentDocs($scope.atth.availableDocs);
 					if ($scope.atth.availableDocs[0] != null) $scope.atth.selectedAvailableDoc = $scope.atth.availableDocs[0];
+				},
+				function error(errors)
+				{
+					console.log(errors);
 				});
 
-			$scope.openDoc = function(doc)
+			$scope.openDoc = function openDoc(doc)
 			{
 				window.open("../" + doc.url);
 			};
 
-			$scope.attach = function()
+			$scope.attach = function attach()
 			{
 				if ($scope.atth.selectedAvailableDoc == null) return;
 
@@ -296,7 +336,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				consult.attachmentsChanged = true;
 			};
 
-			$scope.detach = function()
+			$scope.detach = function detach()
 			{
 				if ($scope.atth.selectedAttachedDoc == null) return;
 
@@ -313,7 +353,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				consult.attachmentsChanged = true;
 			};
 
-			$scope.done = function()
+			$scope.done = function done()
 			{
 				$uibModalInstance.close();
 			};
@@ -321,7 +361,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		//end modal controller
 
 
-		$scope.save = function()
+		$scope.save = function save()
 		{
 			if (!$scope.consultWriteAccess && consult.id == null)
 			{
@@ -340,17 +380,21 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			$scope.setAppointmentTime();
 
 			consultService.saveResponse(consult).then(
-				function(data)
+				function success(results)
 				{
 					//update url for new consultation
-					if (consult.id == null) $location.path("/record/" + consult.demographic.demographicNo + "/consultResponse/" + data.id);
+					if (consult.id == null) $location.path("/record/" + consult.demographic.demographicNo + "/consultResponse/" + results.id);
+				},
+				function error(errors)
+				{
+					console.log(errors);
 				});
 			$scope.consultSaving = false; //hide saving banner
 			$scope.consultChanged = -1; //reset change count
 			return true;
 		};
 
-		$scope.close = function()
+		$scope.close = function close()
 		{
 			if ($location.search().list == "patient") $location.path("/record/" + consult.demographic.demographicNo + "/consultResponses");
 			else $location.path("/consultResponses");
@@ -359,7 +403,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		//fax & print functions
 		var p_page1 = "<html><style>body{width:800px;font-family:arial,verdana,tahoma,helvetica,sans serif}table{width:100%}th{text-align:left;font-weight:bold;width:1;white-space:nowrap}td{vertical-align:top}label{font-weight:bold}em{font-size:small}.large{font-size:large}.center{text-align:center}</style><style media='print'>button{display:none}.noprint{display:none}</style><script>function printAttachments(url){window.open('../'+url);}</script><body>";
 
-		$scope.sendFax = function()
+		$scope.sendFax = function sendFax()
 		{
 			var p_urgency = Juno.Common.Util.toTrimmedString($scope.urgencies[$("#urgency").val()].name);
 			var p_letterheadName = Juno.Common.Util.toTrimmedString(consult.letterheadList[$("#letterhead").val()].name);
@@ -374,7 +418,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			window.open("../fax/CoverPage.jsp?consultResponsePage=" + consultResponsePage + "&reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&fax=" + fax);
 		};
 
-		$scope.printPreview = function()
+		$scope.printPreview = function printPreview()
 		{
 			if ($scope.invalidData()) return;
 

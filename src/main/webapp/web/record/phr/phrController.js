@@ -109,26 +109,31 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 		});
 		*/
 
-		$scope.changeTo = function(listId)
+		$scope.changeTo = function changeTo(listId)
 		{
 			$scope.page.currentlistId = listId;
 			console.log('set currentlist to ' + listId);
 			if (listId == 0)
 			{
-				formService.getAllFormsByHeading($stateParams.demographicNo, 'Completed').then(function(data)
-				{
-					console.debug('whats the index' + 0, data);
-					$scope.page.currentFormList[0] = data.list;
-				});
+				formService.getAllFormsByHeading($stateParams.demographicNo, 'Completed').then(
+					function success(results)
+					{
+						console.debug('whats the index' + 0, results);
+						$scope.page.currentFormList[0] = results.list;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
 			}
 		};
 
-		$scope.viewFormState = function(item)
+		$scope.viewFormState = function viewFormState(item)
 		{
 
 			while (document.getElementById('formInViewFrame').hasChildNodes())
 			{
-				document.getElementById('formInViewFrame').removeChild(document.getElementById('formInViewFrame').firstChild)
+				document.getElementById('formInViewFrame').removeChild(document.getElementById('formInViewFrame').firstChild);
 			}
 
 			var url = item.url + $stateParams.demographicNo;
@@ -157,7 +162,7 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 		/*
 		 * Used to make the left side list tab be active
 		 */
-		$scope.getListClass = function(listId)
+		$scope.getListClass = function getListClass(listId)
 		{
 			if (listId === $scope.page.currentlistId)
 			{
@@ -168,7 +173,7 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 		/*
 		 * Used to mark which form is active.
 		 */
-		$scope.getActiveFormClass = function(item)
+		$scope.getActiveFormClass = function getActiveFormClass(item)
 		{
 			if (item.type == $scope.page.currentForm.type && item.id == $scope.page.currentForm.id && angular.isDefined(item.id))
 			{
@@ -180,19 +185,16 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 			}
 		};
 
+		// Remove this?
 		function handleError(errorMessage)
 		{
 			console.log(errorMessage);
 		}
 
-
-
-
-
 		/*
 		 * This still needs to be tested
 		 */
-		$scope.keypress = function(event)
+		$scope.keypress = function keypress(event)
 		{
 			if (event.altKey == true && event.key == "Up")
 			{
@@ -221,7 +223,5 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 				console.log("keypress", event.altKey, event.key, event);
 			}
 		};
-
-
 	}
 ]);

@@ -39,13 +39,13 @@ angular.module("Common.Services").service("formService", [
 			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/all?heading=' + encodeURIComponent(heading),
 				Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("formService::getAllFormsByHeading error", error);
+					console.log("formService::getAllFormsByHeading error", errors);
 					deferred.reject("An error occurred while fetching forms");
 				});
 
@@ -57,13 +57,13 @@ angular.module("Common.Services").service("formService", [
 			var deferred = $q.defer();
 			$http.get(service.apiPath + '/allEncounterForms',
 				Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("formService::getAllEncounterForms error", error);
+					console.log("formService::getAllEncounterForms error", errors);
 					deferred.reject("An error occurred while fetching encounter forms");
 				});
 
@@ -75,13 +75,13 @@ angular.module("Common.Services").service("formService", [
 			var deferred = $q.defer();
 			$http.get(service.apiPath + '/selectedEncounterForms',
 				Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("formService::getSelectedEncounterForms error", error);
+					console.log("formService::getSelectedEncounterForms error", errors);
 					deferred.reject("An error occurred while fetching selected encounter forms");
 				});
 
@@ -93,13 +93,13 @@ angular.module("Common.Services").service("formService", [
 			var deferred = $q.defer();
 			$http.get(service.apiPath + '/' + demographicNo + '/completedEncounterForms',
 				Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("formService::getCompletedEncounterForms error", error);
+					console.log("formService::getCompletedEncounterForms error", errors);
 					deferred.reject("An error occurred while fetching completed encounter forms");
 				});
 
@@ -111,13 +111,13 @@ angular.module("Common.Services").service("formService", [
 			var deferred = $q.defer();
 			$http.get(service.apiPath + '/allEForms',
 				Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data.content);
+					deferred.resolve(results.data.content);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("formService::getAllEForms error", error);
+					console.log("formService::getAllEForms error", errors);
 					deferred.reject("An error occurred while fetching eforms");
 				});
 
@@ -129,13 +129,13 @@ angular.module("Common.Services").service("formService", [
 			var deferred = $q.defer();
 			$http.get(service.apiPath + '/groupNames',
 				Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data.content);
+					deferred.resolve(results.data.content);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("formService::getGroupNames error", error);
+					console.log("formService::getGroupNames error", errors);
 					deferred.reject("An error occurred while fetching group names");
 				});
 
@@ -147,13 +147,13 @@ angular.module("Common.Services").service("formService", [
 			var deferred = $q.defer();
 			$http.get(service.apiPath + '/getFormGroups',
 				Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("formService::getFormGroups error", error);
+					console.log("formService::getFormGroups error", errors);
 					deferred.reject("An error occurred while fetching form groups");
 				});
 
@@ -165,13 +165,13 @@ angular.module("Common.Services").service("formService", [
 			var deferred = $q.defer();
 			$http.get(service.apiPath + '/getFavouriteFormGroup',
 				Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("formService::getFavouriteFormGroup error", error);
+					console.log("formService::getFavouriteFormGroup error", errors);
 					deferred.reject("An error occurred while fetching favourite form groups");
 				});
 
@@ -183,13 +183,13 @@ angular.module("Common.Services").service("formService", [
 			var deferred = $q.defer();
 			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) + '/formOptions',
 				Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("formService::getFormOptions error", error);
+					console.log("formService::getFormOptions error", errors);
 					deferred.reject("An error occurred while fetching form options");
 				});
 

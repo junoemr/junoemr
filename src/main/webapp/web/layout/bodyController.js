@@ -14,13 +14,13 @@ angular.module('Layout').controller('Layout.BodyController', [
 		controller.init = function init()
 		{
 			providerService.getMe().then(
-				function success(data)
+				function success(results)
 				{
-					securityService.setUser(data);
+					securityService.setUser(results);
 				},
-				function error(reason)
+				function error(errors)
 				{
-					console.log(reason);
+					console.log(errors);
 				});
 		};
 

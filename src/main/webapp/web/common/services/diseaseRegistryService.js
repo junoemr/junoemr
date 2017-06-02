@@ -38,13 +38,13 @@ angular.module("Common.Services").service("diseaseRegistryService", [
 			var deferred = $q.defer();
 			$http.get(service.apiPath + 'quickLists/',
 				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("diseaseRegistryService::getQuickLists error", error);
+					console.log("diseaseRegistryService::getQuickLists error", errors);
 					deferred.reject("An error occurred while fetching quick lists");
 				});
 
@@ -62,13 +62,13 @@ angular.module("Common.Services").service("diseaseRegistryService", [
 			issueToSend.description = disease.description;
 
 			$http.post(service.apiPath + encodeURIComponent(demographicNo) + '/add', issueToSend).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("diseaseRegistryService::addToDxRegistry error", error);
+					console.log("diseaseRegistryService::addToDxRegistry error", errors);
 					deferred.reject("An error occurred while adding to dx registry");
 				});
 
@@ -80,13 +80,13 @@ angular.module("Common.Services").service("diseaseRegistryService", [
 			var deferred = $q.defer();
 
 			$http.post(service.apiPath + 'findLikeIssue', diagnosis).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("diseaseRegistryService::findLikeIssue error", error);
+					console.log("diseaseRegistryService::findLikeIssue error", errors);
 					deferred.reject("An error occurred while posting find like issue");
 				});
 
