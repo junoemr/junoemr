@@ -12,20 +12,14 @@ angular.module('PatientList').controller('PatientList.PatientListConfigControlle
 
 		$scope.patientListConfig = config;
 
-		$scope.cancel = function()
+		$scope.cancel = function cancel()
 		{
 			$uibModalInstance.dismiss();
 		};
 
-		$scope.saveConfiguration = function()
+		$scope.saveConfiguration = function saveConfiguration()
 		{
 			$uibModalInstance.close($scope.patientListConfig);
 		};
-
-		$scope.saveConfiguration = function()
-		{
-			$uibModalInstance.close($scope.patientListConfig);
-		};
-
 	}
 ]);
