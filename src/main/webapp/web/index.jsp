@@ -71,6 +71,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 			 ng-init="navBarCtrl.init()"
 			 ng-show="navBarCtrl.me != null"
 			 class="navbar navbar-default navbar-fixed-top"
+			 id="main-nav"
 			 ng-cloak>
 		<div class="container-fluid">
 			<div class="navbar-header">
@@ -104,8 +105,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					</div>
 				</form>
 
-				<!-- large view -->
-				<ul class="nav navbar-nav visible-lg hidden-1500 ">
+				<!-- Large view -->
+				<ul class="nav navbar-nav visible-nav-lg">
 					<li ng-repeat="item in navBarCtrl.menuItems"
 							ng-class="{'active': navBarCtrl.isActive(item) }">
 
@@ -123,37 +124,80 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							<span class="caret"></span>
 						</a>
 
-						<ul ng-if="item.dropdown"
+						<%--<ul ng-if="item.dropdown"
 								class="dropdown-menu"
 								role="menu">
 							<li ng-repeat="dropdownItem in item.dropdownItems">
 								<a href="#"
 									 ng-click="navBarCtrl.transition(dropdownItem)" >{{dropdownItem.label}}</a>
 							</li>
-						</ul>
+						</ul>--%>
 					</li>
 				</ul>
 
-				<!-- more condensed version -->
-				<ul class="nav navbar-nav hidden-lg visible-1500 visible-md visible-sm visible-xs">
+				<!-- Medium view -->
+				<ul class="nav navbar-nav visible-nav-md">
+					<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.mediumNavItemFilter(false)"
+							ng-class="{'active': navBarCtrl.isActive(item) }">
+
+						<%--<a ng-click="navBarCtrl.transition(item)" data-toggle="tab" >{{item.label}}
+							<span ng-if="item.extra.length>0">({{item.extra}})</span>
+						</a>--%>
+
+						<a href="#"
+							 ng-if="!item.dropdown"
+							 ng-click="navBarCtrl.transition(item)" >{{item.label}}
+							<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
+									class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
+						</a>
+
+					</li>
 					<li class="dropdown hand-hover">
 						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
-							<bean:message key="navbar.modules" bundle="ui"/>
+							More
 							<b class="caret"></b>
 						</a>
 
 						<ul class="dropdown-menu" role="menu">
-							<li ng-repeat="item in navBarCtrl.menuItems"
+							<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.mediumNavItemFilter(true)"
 									ng-class="{'active': navBarCtrl.isActive(item) }">
 								<a ng-click="navBarCtrl.transition(item)" data-toggle="tab" >{{item.label}}
 									<span ng-if="item.extra.length>0">({{item.extra}})</span>
 								</a>
 							</li>
-							<li ng-repeat="item in navBarCtrl.moreMenuItems">
+						</ul>
+					</li>
+				</ul>
+
+				<%--Small View--%>
+				<ul class="nav navbar-nav visible-nav-sm">
+					<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.smallNavItemFilter(false)"
+							ng-class="{'active': navBarCtrl.isActive(item) }">
+						<a ng-click="navBarCtrl.transition(item)" data-toggle="tab" >{{item.label}}
+							<span ng-if="item.extra.length>0">({{item.extra}})</span>
+						</a>
+					</li>
+					<li class="dropdown hand-hover">
+						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
+							More
+							<b class="caret"></b>
+						</a>
+
+						<ul class="dropdown-menu" role="menu">
+							<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.smallNavItemFilter(true)"
+									ng-class="{'active': navBarCtrl.isActive(item) }">
+								<a href="#"
+									ng-if="!item.dropdown"
+									ng-click="navBarCtrl.transition(item)" >{{item.label}}
+									<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
+											class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
+								</a>
+							</li>
+							<%--<li ng-repeat="item in navBarCtrl.moreMenuItems">
 								<a ng-class="{'active': isActive(item) }"
 									 ng-click="navBarCtrl.transition(item)">{{item.label}}
 								<span ng-if="item.extra.length>0" class="label">{{item.extra}}</span></a>
-							</li>
+							</li>--%>
 						</ul>
 					</li>
 				</ul>

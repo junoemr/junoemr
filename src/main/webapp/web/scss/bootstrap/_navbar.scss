@@ -10,3 +10,50 @@
 		}
 	}
 }
+
+// Media queries for hiding navbar links depending on screen size
+// Could also use angular to do this
+// Have to use !important because bootstrap uses important for their 
+// .visible-* and .hidden-* classes, which we must override
+// If screen width >= $screen-nav-lg
+@media(min-width: $nav-lg) {
+	.visible-nav-md {
+		display: none !important;
+	}
+	.visible-nav-sm {
+		display: none !important;
+	}
+}
+
+// If screen width <= $screen-nav-lg
+@media(max-width: $screen-nav-lg) {
+	.visible-nav-md {
+		display: block !important;
+	}
+	.visible-nav-lg {
+		display: none !important;
+	}
+	.visible-nav-sm {
+		display: none !important;
+	}
+}
+
+// If screen width <= $screen-nav-md
+@media(max-width: $screen-nav-md) {
+	.visible-nav-md {
+		display: none !important;
+	}
+	.visible-nav-sm {
+		display: block !important;
+	}
+}
+
+// If screen width <= $screen-nav-sm
+@media(max-width: $screen-nav-sm) {
+	.visible-nav-sm {
+		display: none !important;
+	}
+	.visible-nav-lg {
+		display: block !important;
+	}
+}
