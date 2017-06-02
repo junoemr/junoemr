@@ -3,9 +3,6 @@ body {
 	padding-top: 50px;
 }
 
-
-/*-----------------------*/
-
 .hand-hover {
 	cursor: pointer;
 	cursor: hand;
@@ -67,9 +64,6 @@ li.cpp-note-list:last-child {
 .pending:hover {
 	color: #FF00FF;
 }
-
-
-/*think of changing this to be consistent*/
 
 .abnormal-prev,
 .abnormal-prev:hover {
@@ -158,10 +152,6 @@ li.cpp-note-list:last-child {
 	.right-pane-padded {
 		padding-left: $toggle-patient-list-btn-width + 10px;
 	}
-}
-
-.hidden-1380 {
-	display: none;
 }
 
 @media (max-width: 991px) {
