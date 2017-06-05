@@ -75,6 +75,7 @@ public class EForm extends EFormBase {
 	private static final String TABLE_ID = "table_id";
 	private static final String OTHER_KEY = "other_key";
 	private static final String OPENER_VALUE = "link$eform";
+	private static final String PRECHECKED = "checked=\"checked\"";
 
 	public EForm() {
 	}
@@ -197,31 +198,28 @@ public class EForm extends EFormBase {
 		if (names.size() != values.size()) return;
 		StringBuilder html = new StringBuilder(this.formHtml);
 		int pointer = -1;
+		// Iterates through every relevant html tag in 'this.formHtml'
 		while ((pointer = getFieldIndex(html, pointer+1)) >= 0) {
 			String fieldHeader = getFieldHeader(html, pointer);
+			// fieldName is set to the 'name' attribute of the current html tag the while loop is on
 			String fieldName = EFormUtil.removeQuotes(EFormUtil.getAttribute("name", fieldHeader));
 			String fieldType = getFieldType(fieldHeader);
-			String checkboxFieldName = "";
-			String val = "";
+			String val;
 
-			if(fieldType.equals("checkbox")) {
-				checkboxFieldName = fieldName;
-			}
-
+			// allNames is an array of all the values submitted from the form
 			int i = allNames.indexOf(fieldName);
+			// If the current fieldName isn't in allNames, it wasn't submitted in the form.
 			if(i < 0) {
-				if( !fieldHeader.contains("checked=\"checked\""))
-					continue;
-			}
-
-			if ( !fieldType.equals("checkbox") )
+				// If this fieldName doesn't contain checked="checked", it's not a prechecked checkbox
+				if( !fieldHeader.contains(PRECHECKED)) {
+					continue; // Continue to next iteration of while loop
+				} else {
+					// putValue method needs to know if the current fieldHeader is prechecked or not
+					val = "prechecked";
+				}
+			} else {
 				val = allValues.get(i);
-
-			if( val == null )
-				val = "";
-
-			if( checkboxFieldName != null && !checkboxFieldName.equals("") && !allNames.contains(checkboxFieldName) )
-				val = "prechecked";
+			}
 
 			pointer = nextSpot(html, pointer);
 			html = putValue(val, fieldType, pointer, html);
@@ -621,8 +619,8 @@ public class EForm extends EFormBase {
 			html.insert(pointer, value);
 		} else if (type.equals("checkbox")) {
 			if( value.equals("prechecked") ) {
-				pointer = html.indexOf("checked=\"checked\"", pointer);
-				html.delete(pointer, pointer + 17);
+				pointer = html.indexOf(PRECHECKED, pointer);
+				html.delete(pointer, pointer + PRECHECKED.length());
 			} else {
 				html.insert(pointer, " checked");
 			}
