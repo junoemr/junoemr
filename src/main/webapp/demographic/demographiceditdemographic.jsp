@@ -2832,7 +2832,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 								<td align="right" nowrap><b><bean:message
 									key="demographic.demographiceditdemographic.formRefDocNo" />: </b></td>
 								<td align="left"><input type="text" name="r_doctor_ohip" <%=getDisabled("r_doctor_ohip")%>
-									size="20" maxlength="6" value="<%=rdohip%>"> <% if("ON".equals(prov)) { %>
+									size="20" maxlength="6" value="<%=rdohip%>"> <% if(!"BC".equals(prov)) { %>
 								<a
 									href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
 								#</a> <% } %>
