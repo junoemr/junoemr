@@ -12,17 +12,19 @@ angular.module('Dashboard').controller('Dashboard.TicklerConfigureController', [
 		prefs)
 	{
 
-		$scope.prefs = prefs.dashboardPreferences;
+		var controller = this;
 
-		$scope.close = function close()
+		controller.prefs = prefs.dashboardPreferences;
+
+		controller.close = function close()
 		{
 			$uibModalInstance.close(false);
 		};
 
-		$scope.save = function save()
+		controller.save = function save()
 		{
 
-			personaService.updateDashboardPreferences($scope.prefs).then(
+			personaService.updateDashboardPreferences(controller.prefs).then(
 				function success(results)
 				{
 					$uibModalInstance.close(true);

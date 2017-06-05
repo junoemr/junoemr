@@ -24,37 +24,39 @@ angular.module('Schedule').controller('Schedule.AppointmentViewController', [
 		statusList)
 	{
 
-		$scope.me = me;
-		$scope.appointment = appointment;
-		$scope.statusList = statusList.content;
-		$scope.appointmentUpdate = {};
+		var controller = this;
 
-		$scope.appointmentWriteAccess = false;
+		controller.me = me;
+		controller.appointment = appointment;
+		controller.statusList = statusList.content;
+		controller.appointmentUpdate = {};
 
-		$scope.getStatus = function getStatus(status)
+		controller.appointmentWriteAccess = false;
+
+		controller.getStatus = function getStatus(status)
 		{
 
-			for (var x = 0; x < $scope.statusList.length; x++)
+			for (var x = 0; x < controller.statusList.length; x++)
 			{
-				console.log(JSON.stringify($scope.statusList[x]));
-				if ($scope.statusList[x].status == status)
+				console.log(JSON.stringify(controller.statusList[x]));
+				if (controller.statusList[x].status == status)
 				{
-					return $scope.statusList[x].description;
+					return controller.statusList[x].description;
 				}
 			}
 			return status;
 		};
 
-		$scope.close = function close()
+		controller.close = function close()
 		{
 			$uibModalInstance.close(false);
 		};
 
-		$scope.deleteAppointment = function deleteAppointment()
+		controller.deleteAppointment = function deleteAppointment()
 		{
 			if (confirm('Are you sure you want to delete this appointment?'))
 			{
-				scheduleService.deleteAppointment($scope.appointment.id).then(
+				scheduleService.deleteAppointment(controller.appointment.id).then(
 					function success(results)
 					{
 						$uibModalInstance.close(true);
@@ -66,7 +68,7 @@ angular.module('Schedule').controller('Schedule.AppointmentViewController', [
 			}
 		};
 
-		$scope.searchProviders = function searchProviders(val)
+		controller.searchProviders = function searchProviders(val)
 		{
 			var search = {
 				searchTerm: val,
@@ -93,40 +95,40 @@ angular.module('Schedule').controller('Schedule.AppointmentViewController', [
 		};
 
 
-		$scope.updateProviderNo = function updateProviderNo(item, model, label)
+		controller.updateProviderNo = function updateProviderNo(item, model, label)
 		{
-			$scope.appointment.providerNo = model;
-			$scope.appointment.providerName = label;
+			controller.appointment.providerNo = model;
+			controller.appointment.providerName = label;
 		};
 
 
-		$scope.editProvider = function editProvider()
+		controller.editProvider = function editProvider()
 		{
-			$scope.showProviderFormControl = true;
-			$scope.appointmentUpdate.providerNo = $scope.appointment.providerNo;
-			$scope.appointmentUpdate.providerName = $scope.appointment.provider.lastName + "," + $scope.appointment.provider.lastName;
+			controller.showProviderFormControl = true;
+			controller.appointmentUpdate.providerNo = controller.appointment.providerNo;
+			controller.appointmentUpdate.providerName = controller.appointment.provider.lastName + "," + controller.appointment.provider.lastName;
 		};
 
-		$scope.updateProvider = function updateProvider(item, model, label)
+		controller.updateProvider = function updateProvider(item, model, label)
 		{
-			$scope.needsUpdate = true;
-			$scope.appointment.providerNo = model;
-			$scope.appointment.providerName = label;
-			$scope.showProviderFormControl = false;
+			controller.needsUpdate = true;
+			controller.appointment.providerNo = model;
+			controller.appointment.providerName = label;
+			controller.showProviderFormControl = false;
 		};
 
-		$scope.cancelProviderUpdate = function cancelProviderUpdate()
+		controller.cancelProviderUpdate = function cancelProviderUpdate()
 		{
-			$scope.appointmentUpdate.providerNo = null;
-			$scope.appointmentUpdate.providerName = null;
+			controller.appointmentUpdate.providerNo = null;
+			controller.appointmentUpdate.providerName = null;
 
-			$scope.showProviderFormControl = false;
+			controller.showProviderFormControl = false;
 
 		};
 
-		$scope.showAppointmentHistory = function showAppointmentHistory()
+		controller.showAppointmentHistory = function showAppointmentHistory()
 		{
-			scheduleService.appointmentHistory($scope.appointment.demographicNo).then(
+			scheduleService.appointmentHistory(controller.appointment.demographicNo).then(
 				function success(results)
 				{
 					alert(JSON.stringify(results));
@@ -137,9 +139,9 @@ angular.module('Schedule').controller('Schedule.AppointmentViewController', [
 				});
 		};
 
-		$scope.noShowAppointment = function noShowAppointment()
+		controller.noShowAppointment = function noShowAppointment()
 		{
-			scheduleService.noShowAppointment($scope.appointment.id).then(
+			scheduleService.noShowAppointment(controller.appointment.id).then(
 				function success(results)
 				{
 					$uibModalInstance.close(true);
@@ -151,9 +153,9 @@ angular.module('Schedule').controller('Schedule.AppointmentViewController', [
 
 		};
 
-		$scope.cancelAppointment = function cancelAppointment()
+		controller.cancelAppointment = function cancelAppointment()
 		{
-			scheduleService.cancelAppointment($scope.appointment.id).then(
+			scheduleService.cancelAppointment(controller.appointment.id).then(
 				function success(results)
 				{
 					$uibModalInstance.close(true);

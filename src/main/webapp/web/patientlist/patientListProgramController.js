@@ -8,16 +8,18 @@ angular.module('PatientList').controller('PatientList.PatientListProgramControll
 		$http)
 	{
 
+		var controller = this;
+
 
 		$scope.$on('updatePatientList', function(event, data)
 		{
 			console.log('updatePatientList=' + JSON.stringify(data));
-			$scope.updateData(data.currentPage, data.pageSize);
+			controller.updateData(data.currentPage, data.pageSize);
 		});
 
 
 		//the currentPage is 0 based
-		$scope.updateData = function updateData(currentPage, pageSize)
+		controller.updateData = function updateData(currentPage, pageSize)
 		{
 			var startIndex = currentPage * pageSize;
 
@@ -32,7 +34,7 @@ angular.module('PatientList').controller('PatientList.PatientListProgramControll
 			}).then(
 				function success(results)
 				{
-					$scope.admissions = results.data.content;
+					controller.admissions = results.data.content;
 					$scope.$emit('updatePatientListPagination', results.data.total);
 				},
 				function error(errors)
@@ -42,7 +44,7 @@ angular.module('PatientList').controller('PatientList.PatientListProgramControll
 		};
 
 		//initialize..
-		$scope.updateData(0, $scope.pageSize);
+		controller.updateData(0, controller.pageSize);
 		$scope.$emit('togglePatientListFilter', false);
 
 	}

@@ -27,11 +27,13 @@ angular.module('Report').controller('Report.ReportsController', [
 		ReportNavigation)
 	{
 
-		$scope.reportSidebar = ReportNavigation;
+		var controller = this;
+
+		controller.reportSidebar = ReportNavigation;
 
 		$scope.$emit('configureShowPatientList', false);
 
-		$scope.reports = [
+		controller.reports = [
 			{
 				name: 'Daysheets',
 				templateUrl: 'report/report_daysheet.jsp'
@@ -170,9 +172,9 @@ angular.module('Report').controller('Report.ReportsController', [
 		];
 
 
-		$scope.editDemographicSet = function editDemographicSet()
+		controller.editDemographicSet = function editDemographicSet()
 		{
-			$scope.selectReport(
+			controller.selectReport(
 			{
 				name: 'Demographic Set Edit',
 				templateUrl: 'report/report_iframe.jsp',
@@ -180,21 +182,21 @@ angular.module('Report').controller('Report.ReportsController', [
 			});
 		};
 
-		$scope.getReports = function getReports()
+		controller.getReports = function getReports()
 		{
-			if ($scope.reportGroup != null && $scope.reportGroup.length > 0)
+			if (controller.reportGroup != null && controller.reportGroup.length > 0)
 			{
-				var filtered = $filter('filter')($scope.reports,
+				var filtered = $filter('filter')(controller.reports,
 				{
-					group: $scope.reportGroup
+					group: controller.reportGroup
 				});
 				return filtered;
 
 			}
-			return $scope.reports;
+			return controller.reports;
 		};
 
-		$scope.getReportGroups = function getReportGroups()
+		controller.getReportGroups = function getReportGroups()
 		{
 			var groups = [
 			{
@@ -203,11 +205,11 @@ angular.module('Report').controller('Report.ReportsController', [
 			}];
 			var groupMap = {};
 
-			for (var i = 0; i < $scope.reports.length; i++)
+			for (var i = 0; i < controller.reports.length; i++)
 			{
-				if ($scope.reports[i].group != null)
+				if (controller.reports[i].group != null)
 				{
-					groupMap[$scope.reports[i].group] = $scope.reports[i].group;
+					groupMap[controller.reports[i].group] = controller.reports[i].group;
 				}
 			}
 
@@ -223,9 +225,9 @@ angular.module('Report').controller('Report.ReportsController', [
 			return groups;
 		};
 
-		$scope.selectReport = function selectReport(report)
+		controller.selectReport = function selectReport(report)
 		{
-			$scope.currentReport = report;
+			controller.currentReport = report;
 
 			if (report.direct === true)
 			{
@@ -238,9 +240,9 @@ angular.module('Report').controller('Report.ReportsController', [
 		};
 
 
-		$scope.selectReport($scope.reports[0]);
+		controller.selectReport(controller.reports[0]);
 
-		$scope.openReportWindow = function openReportWindow(url, name)
+		controller.openReportWindow = function openReportWindow(url, name)
 		{
 			window.open(url, name, 'height=900,width=700');
 		};

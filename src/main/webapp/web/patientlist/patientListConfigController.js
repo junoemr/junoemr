@@ -9,17 +9,18 @@ angular.module('PatientList').controller('PatientList.PatientListConfigControlle
 		$uibModalInstance,
 		config)
 	{
+		var controller = this;
 
-		$scope.patientListConfig = config;
+		controller.patientListConfig = config;
 
-		$scope.cancel = function cancel()
+		controller.cancel = function cancel()
 		{
 			$uibModalInstance.dismiss();
 		};
 
-		$scope.saveConfiguration = function saveConfiguration()
+		controller.saveConfiguration = function saveConfiguration()
 		{
-			$uibModalInstance.close($scope.patientListConfig);
+			$uibModalInstance.close(controller.patientListConfig);
 		};
 	}
 ]);

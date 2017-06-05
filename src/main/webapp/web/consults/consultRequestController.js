@@ -28,11 +28,13 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		user)
 	{
 
+		var controller = this;
+
 		//get access rights
 		securityService.hasRight("_con", "r").then(
 			function success(results)
 			{
-				$scope.consultReadAccess = results;
+				controller.consultReadAccess = results;
 			},
 			function error(errors)
 			{
@@ -41,7 +43,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		securityService.hasRight("_con", "u").then(
 			function success(results)
 			{
-				$scope.consultUpdateAccess = results;
+				controller.consultUpdateAccess = results;
 			},
 			function error(errors)
 			{
@@ -50,14 +52,14 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		securityService.hasRight("_con", "w").then(
 			function success(results)
 			{
-				$scope.consultWriteAccess = results;
+				controller.consultWriteAccess = results;
 			},
 			function error(errors)
 			{
 				console.log(errors);
 			});
 
-		$scope.consult = consult;
+		controller.consult = consult;
 
 		consult.letterheadList = Juno.Common.Util.toArray(consult.letterheadList);
 		consult.faxList = Juno.Common.Util.toArray(consult.faxList);
@@ -112,11 +114,11 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		{
 			if (consult.serviceList[i].serviceId == consult.serviceId)
 			{
-				$scope.specialists = Juno.Common.Util.toArray(consult.serviceList[i].specialists);
+				controller.specialists = Juno.Common.Util.toArray(consult.serviceList[i].specialists);
 				break;
 			}
 		}
-		angular.forEach($scope.specialists, function(spec)
+		angular.forEach(controller.specialists, function(spec)
 		{
 			if (spec.id == consult.professionalSpecialist.id)
 			{
@@ -136,29 +138,29 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			consult.appointmentMinute = Juno.Common.Util.pad0(apptTime.getMinutes());
 		}
 
-		$scope.urgencies = staticDataService.getConsultUrgencies();
-		$scope.statuses = staticDataService.getConsultRequestStatuses();
-		$scope.hours = staticDataService.getHours();
-		$scope.minutes = staticDataService.getMinutes();
+		controller.urgencies = staticDataService.getConsultUrgencies();
+		controller.statuses = staticDataService.getConsultRequestStatuses();
+		controller.hours = staticDataService.getHours();
+		controller.minutes = staticDataService.getMinutes();
 
 		//monitor data changed
-		$scope.consultChanged = -1;
+		controller.consultChanged = -1;
 		$scope.$watchCollection("consult", function()
 		{
-			$scope.consultChanged++;
+			controller.consultChanged++;
 		});
 
 		//remind user of unsaved data
 		$scope.$on("$stateChangeStart", function(event)
 		{
-			if ($scope.consultChanged > 0)
+			if (controller.consultChanged > 0)
 			{
 				var discard = confirm("You may have unsaved data. Are you sure to leave?");
 				if (!discard) event.preventDefault();
 			}
 		});
 
-		$scope.changeLetterhead = function changeLetterhead()
+		controller.changeLetterhead = function changeLetterhead()
 		{
 			var index = $("#letterhead").val();
 			if (index == null) return;
@@ -167,11 +169,11 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			consult.letterheadPhone = consult.letterheadList[index].phone;
 		};
 
-		$scope.changeService = function changeService(id)
+		controller.changeService = function changeService(id)
 		{
 			if (id == null)
 			{
-				$scope.specialists = null;
+				controller.specialists = null;
 				return;
 			}
 
@@ -185,17 +187,17 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 			console.log('serv: ', selectedService);
 
-			$scope.specialists = selectedService.specialists;
+			controller.specialists = selectedService.specialists;
 
 			consult.professionalSpecialist = null;
 		};
 
-		$scope.changeAppointmentTime = function changeAppointmentTime()
+		controller.changeAppointmentTime = function changeAppointmentTime()
 		{
 			console.log('consult: ', consult);
 		};
 
-		$scope.writeToBox = function writeToBox(results, boxId)
+		controller.writeToBox = function writeToBox(results, boxId)
 		{
 			var items = Juno.Common.Util.toArray(results.summaryItem);
 			var boxData = null;
@@ -209,12 +211,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		};
 
 
-		$scope.getFamilyHistory = function getFamilyHistory(boxId)
+		controller.getFamilyHistory = function getFamilyHistory(boxId)
 		{
 			summaryService.getFamilyHistory(consult.demographicId).then(
 				function success(results)
 				{
-					$scope.writeToBox(results, boxId);
+					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
@@ -222,12 +224,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				});
 		};
 
-		$scope.getMedicalHistory = function getMedicalHistory(boxId)
+		controller.getMedicalHistory = function getMedicalHistory(boxId)
 		{
 			summaryService.getMedicalHistory(consult.demographicId).then(
 				function success(results)
 				{
-					$scope.writeToBox(results, boxId);
+					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
@@ -235,12 +237,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				});
 		};
 
-		$scope.getOngoingConcerns = function getOngoingConcerns(boxId)
+		controller.getOngoingConcerns = function getOngoingConcerns(boxId)
 		{
 			summaryService.getOngoingConcerns(consult.demographicId).then(
 				function success(results)
 				{
-					$scope.writeToBox(results, boxId);
+					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
@@ -248,12 +250,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				});
 		};
 
-		$scope.getOtherMeds = function getOtherMeds(boxId)
+		controller.getOtherMeds = function getOtherMeds(boxId)
 		{
 			summaryService.getOtherMeds(consult.demographicId).then(
 				function success(results)
 				{
-					$scope.writeToBox(results, boxId);
+					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
@@ -261,12 +263,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				});
 		};
 
-		$scope.getReminders = function getReminders(boxId)
+		controller.getReminders = function getReminders(boxId)
 		{
 			summaryService.getReminders(consult.demographicId).then(
 				function success(results)
 				{
-					$scope.writeToBox(results, boxId);
+					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
@@ -275,14 +277,14 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		};
 
 		// New function, doesn't work
-		$scope.getAllergies = function getAllergies(boxId)
+		controller.getAllergies = function getAllergies(boxId)
 		{
 			console.log('CONSULT: ', consult);
 
 			summaryService.getAllergies(consult.demographicId).then(
 				function success(results)
 				{
-					$scope.writeToBox(results, boxId);
+					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
@@ -290,9 +292,9 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				});
 		};
 
-		$scope.invalidData = function invalidData()
+		controller.invalidData = function invalidData()
 		{
-			if ($scope.urgencies[$("#urgency").val()] == null)
+			if (controller.urgencies[$("#urgency").val()] == null)
 			{
 				alert("Please select an Urgency");
 				return true;
@@ -320,7 +322,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			return false;
 		};
 
-		$scope.setAppointmentTime = function setAppointmentTime()
+		controller.setAppointmentTime = function setAppointmentTime()
 		{
 			if (consult.appointmentHour != null && consult.appointmentMinute != null && !consult.patientWillBook)
 			{
@@ -337,12 +339,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			}
 		};
 
-		$scope.openAttach = function openAttach(attachment)
+		controller.openAttach = function openAttach(attachment)
 		{
 			window.open("../" + attachment.url);
 		};
 
-		$scope.attachFiles = function attachFiles()
+		controller.attachFiles = function attachFiles()
 		{
 			var modalInstance = $uibModal.open(
 			{
@@ -356,7 +358,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				{
 					if (consult.attachmentsChanged)
 					{
-						$scope.consultChanged++;
+						controller.consultChanged++;
 						consult.attachmentsChanged = false;
 					}
 				},
@@ -369,11 +371,11 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		//attachment modal controller
 		function AttachmentCtrl($scope, $uibModalInstance)
 		{
-			$scope.atth = {};
-			$scope.atth.patientName = consult.demographic.lastName + ", " + consult.demographic.firstName;
+			controller.atth = {};
+			controller.atth.patientName = consult.demographic.lastName + ", " + consult.demographic.firstName;
 
-			$scope.atth.attachedDocs = consult.attachments;
-			if ($scope.atth.attachedDocs[0] != null) $scope.atth.selectedAttachedDoc = $scope.atth.attachedDocs[0];
+			controller.atth.attachedDocs = consult.attachments;
+			if (controller.atth.attachedDocs[0] != null) controller.atth.selectedAttachedDoc = controller.atth.attachedDocs[0];
 
 			var consultId = 0;
 			if (consult.id != null) consultId = consult.id;
@@ -381,55 +383,55 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function success(results)
 				{
 					if (consult.availableDocs == null) consult.availableDocs = Juno.Common.Util.toArray(results);
-					$scope.atth.availableDocs = consult.availableDocs;
-					Juno.Common.Util.sortAttachmentDocs($scope.atth.availableDocs);
-					if ($scope.atth.availableDocs[0] != null) $scope.atth.selectedAvailableDoc = $scope.atth.availableDocs[0];
+					controller.atth.availableDocs = consult.availableDocs;
+					Juno.Common.Util.sortAttachmentDocs(controller.atth.availableDocs);
+					if (controller.atth.availableDocs[0] != null) controller.atth.selectedAvailableDoc = controller.atth.availableDocs[0];
 				},
 				function error(errors)
 				{
 					console.log(errors);
 				});
 
-			$scope.openDoc = function openDoc(doc)
+			controller.openDoc = function openDoc(doc)
 			{
 				window.open("../" + doc.url);
 			};
 
-			$scope.attach = function attach()
+			controller.attach = function attach()
 			{
-				if ($scope.atth.selectedAvailableDoc == null) return;
+				if (controller.atth.selectedAvailableDoc == null) return;
 
-				$scope.atth.attachedDocs.push($scope.atth.selectedAvailableDoc);
-				$scope.atth.selectedAttachedDoc = $scope.atth.selectedAvailableDoc;
-				$scope.atth.selectedAttachedDoc.attached = true;
-				Juno.Consults.Common.sortAttachmentDocs($scope.atth.attachedDocs);
+				controller.atth.attachedDocs.push(controller.atth.selectedAvailableDoc);
+				controller.atth.selectedAttachedDoc = controller.atth.selectedAvailableDoc;
+				controller.atth.selectedAttachedDoc.attached = true;
+				Juno.Consults.Common.sortAttachmentDocs(controller.atth.attachedDocs);
 
 				var x = $("#selAvailDoc").val();
-				$scope.atth.availableDocs.splice(x, 1);
-				if (x >= $scope.atth.availableDocs.length) x = $scope.atth.availableDocs.length - 1;
-				$scope.atth.selectedAvailableDoc = $scope.atth.availableDocs[x];
+				controller.atth.availableDocs.splice(x, 1);
+				if (x >= controller.atth.availableDocs.length) x = controller.atth.availableDocs.length - 1;
+				controller.atth.selectedAvailableDoc = controller.atth.availableDocs[x];
 
 				consult.attachmentsChanged = true;
 			};
 
-			$scope.detach = function detach()
+			controller.detach = function detach()
 			{
-				if ($scope.atth.selectedAttachedDoc == null) return;
+				if (controller.atth.selectedAttachedDoc == null) return;
 
-				$scope.atth.availableDocs.push($scope.atth.selectedAttachedDoc);
-				$scope.atth.selectedAvailableDoc = $scope.atth.selectedAttachedDoc;
-				$scope.atth.selectedAvailableDoc.attached = false;
-				Juno.Consults.Common.sortAttachmentDocs($scope.atth.availableDocs);
+				controller.atth.availableDocs.push(controller.atth.selectedAttachedDoc);
+				controller.atth.selectedAvailableDoc = controller.atth.selectedAttachedDoc;
+				controller.atth.selectedAvailableDoc.attached = false;
+				Juno.Consults.Common.sortAttachmentDocs(controller.atth.availableDocs);
 
 				var x = $("#selAttachDoc").val();
-				$scope.atth.attachedDocs.splice(x, 1);
-				if (x >= $scope.atth.attachedDocs.length) x = $scope.atth.attachedDocs.length - 1;
-				$scope.atth.selectedAttachedDoc = $scope.atth.attachedDocs[x];
+				controller.atth.attachedDocs.splice(x, 1);
+				if (x >= controller.atth.attachedDocs.length) x = controller.atth.attachedDocs.length - 1;
+				controller.atth.selectedAttachedDoc = controller.atth.attachedDocs[x];
 
 				consult.attachmentsChanged = true;
 			};
 
-			$scope.done = function done()
+			controller.done = function done()
 			{
 				$uibModalInstance.close();
 			};
@@ -438,32 +440,32 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 
 		//show/hide e-send button
-		$scope.setESendEnabled = function setESendEnabled()
+		controller.setESendEnabled = function setESendEnabled()
 		{
-			$scope.eSendEnabled = consult.professionalSpecialist != null && consult.professionalSpecialist.eDataUrl != null && consult.professionalSpecialist.eDataUrl.trim() != "";
+			controller.eSendEnabled = consult.professionalSpecialist != null && consult.professionalSpecialist.eDataUrl != null && consult.professionalSpecialist.eDataUrl.trim() != "";
 		};
 
-		$scope.setESendEnabled(); //execute once on form open
+		controller.setESendEnabled(); //execute once on form open
 
-		$scope.save = function save()
+		controller.save = function save()
 		{
 			console.log('CONSULT: ', consult);
 
-			if (!$scope.consultWriteAccess && consult.id == null)
+			if (!controller.consultWriteAccess && consult.id == null)
 			{
 				alert("You don't have right to save new consult");
 				return false;
 			}
-			if (!$scope.consultUpdateAccess)
+			if (!controller.consultUpdateAccess)
 			{
 				alert("You don't have right to update consult");
 				return false;
 			}
 
-			if ($scope.invalidData()) return false;
+			if (controller.invalidData()) return false;
 
-			$scope.consultSaving = true; //show saving banner
-			$scope.setAppointmentTime();
+			controller.consultSaving = true; //show saving banner
+			controller.setAppointmentTime();
 
 			consultService.saveRequest(consult).then(
 				function success(results)
@@ -474,19 +476,19 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				{
 					console.log(errors);
 				});
-			$scope.setESendEnabled();
-			$scope.consultSaving = false; //hide saving banner
-			$scope.consultChanged = -1; //reset change count
+			controller.setESendEnabled();
+			controller.consultSaving = false; //hide saving banner
+			controller.consultChanged = -1; //reset change count
 			return true;
 		};
 
-		$scope.close = function close()
+		controller.close = function close()
 		{
 			if ($location.search().list == "patient") $location.path("/record/" + consult.demographicId + "/consults");
 			else $location.path("/consults");
 		};
 
-		$scope.sendFax = function sendFax()
+		controller.sendFax = function sendFax()
 		{
 			var reqId = consult.id;
 			var demographicNo = consult.demographicId;
@@ -497,9 +499,9 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			window.open("../fax/CoverPage.jsp?reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&fax=" + fax);
 		};
 
-		$scope.eSend = function eSend()
+		controller.eSend = function eSend()
 		{
-			if ($scope.eSendEnabled)
+			if (controller.eSendEnabled)
 			{
 				consultService.eSendRequest(consult.id).then(
 					function success(results)
@@ -513,9 +515,9 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			}
 		};
 
-		$scope.printPreview = function printPreview()
+		controller.printPreview = function printPreview()
 		{
-			if ($scope.invalidData()) return;
+			if (controller.invalidData()) return;
 
 			window.open("../oscarEncounter/oscarConsultationRequest/printPdf2.do?reqId=" + consult.id + "&demographicNo=" + consult.demographicId);
 			/*
@@ -530,7 +532,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 						replyTo += " by fax or by phone with appointment";
 					}
 
-					var urgency = noNull($scope.urgencies[$("#urgency").val()].name);
+					var urgency = noNull(controller.urgencies[$("#urgency").val()].name);
 					var referralDate = formatDate(consult.referralDate);
 					var letterheadName = noNull(consult.letterheadList[$("#letterhead").val()].name);
 					var letterheadAddress = noNull(consult.letterheadAddress);

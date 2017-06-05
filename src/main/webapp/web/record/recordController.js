@@ -62,24 +62,25 @@ angular.module('Record').controller('Record.RecordController', [
 		billingService)
 	{
 
+		var controller = this;
 
 		console.log("in patient Ctrl ", demo);
 		console.log("in RecordCtrl state params ", $stateParams, $location.search());
 
-		$scope.demographicNo = $stateParams.demographicNo;
-		$scope.demographic = demo;
-		$scope.page = {};
-		$scope.page.assignedCMIssues = [];
+		controller.demographicNo = $stateParams.demographicNo;
+		controller.demographic = demo;
+		controller.page = {};
+		controller.page.assignedCMIssues = [];
 
-		$scope.hideNote = false;
+		controller.hideNote = false;
 
 		//this doesn't actually work, hideNote is note showing up in the $stateParams
 		if ($stateParams.hideNote != null)
 		{
-			$scope.hideNote = $stateParams.hideNote;
+			controller.hideNote = $stateParams.hideNote;
 		}
 		/*
-		$scope.recordtabs2 = [ 
+		controller.recordtabs2 = [ 
 		 {id : 0,name : 'Master',url : 'partials/master.html'},
 		 {id : 1,name : 'Summary',url : 'partials/summary.html'},
 		 {id : 2,name : 'Rx',url : 'partials/rx.jsp'},
@@ -95,7 +96,7 @@ angular.module('Record').controller('Record.RecordController', [
 		 {id : 12,name : 'Labs/Docs',url : 'partials/labview.html'},
 		 {id : 13,name : 'Billing',url : 'partials/billing.jsp'}	
 		*/
-		$scope.recordtabs2 = [];
+		controller.recordtabs2 = [];
 		/*
 		                 	 {id : 0,displayName : 'Details'  ,path : 'record.details'},
 		                 	 {id : 1,displayName : 'Summary'  ,path : 'record.summary'},
@@ -105,10 +106,10 @@ angular.module('Record').controller('Record.RecordController', [
 		*/
 
 		//get access rights
-		securityService.hasRight("_eChart", "w", $scope.demographicNo).then(
+		securityService.hasRight("_eChart", "w", controller.demographicNo).then(
 			function success(results)
 			{
-				$scope.page.cannotChange = !results;
+				controller.page.cannotChange = !results;
 			},
 			function error(errors)
 			{
@@ -116,21 +117,21 @@ angular.module('Record').controller('Record.RecordController', [
 			});
 
 		//disable click and keypress if user only has read-access
-		$scope.checkAction = function checkAction(event)
+		controller.checkAction = function checkAction(event)
 		{
-			if ($scope.page.cannotChange)
+			if (controller.page.cannotChange)
 			{
 				event.preventDefault();
 				event.stopPropagation();
 			}
 		};
 
-		$scope.fillMenu = function fillMenu()
+		controller.fillMenu = function fillMenu()
 		{
 			uxService.menu($stateParams.demographicNo).then(
 				function success(results)
 				{
-					$scope.recordtabs2 = results;
+					controller.recordtabs2 = results;
 				},
 				function error(errors)
 				{
@@ -138,14 +139,14 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
-		$scope.fillMenu();
+		controller.fillMenu();
 
-		//var transitionP = $state.transitionTo($scope.recordtabs2[0].path,$stateParams,{location:'replace',notify:true});
+		//var transitionP = $state.transitionTo(controller.recordtabs2[0].path,$stateParams,{location:'replace',notify:true});
 		//console.log("transition ",transitionP);
 
-		$scope.changeTab = function changeTab(temp)
+		controller.changeTab = function changeTab(temp)
 		{
-			$scope.currenttab2 = $scope.recordtabs2[temp.id];
+			controller.currenttab2 = controller.recordtabs2[temp.id];
 
 			if (angular.isDefined(temp.state) && temp.state != null)
 			{
@@ -166,7 +167,7 @@ angular.module('Record').controller('Record.RecordController', [
 			{
 				if (temp.label == "Rx")
 				{
-					win = temp.label + $scope.demographicNo;
+					win = temp.label + controller.demographicNo;
 				}
 				else
 				{
@@ -175,12 +176,12 @@ angular.module('Record').controller('Record.RecordController', [
 				}
 				window.open(temp.url, win, "scrollbars=yes, location=no, width=1000, height=600", "");
 			}
-			//console.log($scope.recordtabs2[temp].path);
+			//console.log(controller.recordtabs2[temp].path);
 
 
 		};
 
-		$scope.isTabActive = function isTabActive(tab)
+		controller.isTabActive = function isTabActive(tab)
 		{
 			//console.log('current state '+$state.current.name.substring(0,tab.path.length)+" -- "+($state.current.name.substring(0,tab.path.length) == tab.path),$state.current.name,tab);
 			//console.log('ddd '+$state.current.name.length+"  eee "+tab.path.length);
@@ -200,10 +201,10 @@ angular.module('Record').controller('Record.RecordController', [
 
 		$scope.$on('$destroy', function()
 		{
-			console.log("save the last note!!", $scope.page.encounterNote, noteDirty);
+			console.log("save the last note!!", controller.page.encounterNote, noteDirty);
 			if (noteDirty)
 			{
-				noteService.tmpSave($stateParams.demographicNo, $scope.page.encounterNote);
+				noteService.tmpSave($stateParams.demographicNo, controller.page.encounterNote);
 			}
 
 		});
@@ -214,10 +215,10 @@ angular.module('Record').controller('Record.RecordController', [
 		var timeout = null;
 		var saveUpdates = function saveUpdates()
 		{
-			if ($scope.page.encounterNote.note == $scope.page.initNote) return; //user did not input anything, don't save
+			if (controller.page.encounterNote.note == controller.page.initNote) return; //user did not input anything, don't save
 
-			console.log("save", $scope.page.encounterNote);
-			noteService.tmpSave($stateParams.demographicNo, $scope.page.encounterNote);
+			console.log("save", controller.page.encounterNote);
+			noteService.tmpSave($stateParams.demographicNo, controller.page.encounterNote);
 		};
 		var skipTmpSave = false;
 		var noteDirty = false;
@@ -253,7 +254,7 @@ angular.module('Record').controller('Record.RecordController', [
 		var totalSeconds = 0;
 		var myVar = setInterval(setTime, 1000);
 
-		$scope.getCurrentTimerToggle = function getCurrentTimerToggle()
+		controller.getCurrentTimerToggle = function getCurrentTimerToggle()
 		{
 			if (angular.isDefined(myVar))
 			{
@@ -262,7 +263,7 @@ angular.module('Record').controller('Record.RecordController', [
 			return "glyphicon-play";
 		};
 
-		$scope.toggleTimer = function toggleTimer()
+		controller.toggleTimer = function toggleTimer()
 		{
 			if ($("#aToggle").hasClass("glyphicon-pause"))
 			{
@@ -278,10 +279,10 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		$scope.pasteTimer = function pasteTimer()
+		controller.pasteTimer = function pasteTimer()
 		{
 			var ed = new Date();
-			$scope.page.encounterNote.note += "\n" + document.getElementById("startTag").value + ": " + d.getHours() + ":" + pad(d.getMinutes()) + "\n" + document.getElementById("endTag").value + ": " + ed.getHours() + ":" + pad(ed.getMinutes()) + "\n" + pad(parseInt(totalSeconds / 3600)) + ":" + pad(parseInt((totalSeconds / 60) % 60)) + ":" + pad(totalSeconds % 60);
+			controller.page.encounterNote.note += "\n" + document.getElementById("startTag").value + ": " + d.getHours() + ":" + pad(d.getMinutes()) + "\n" + document.getElementById("endTag").value + ": " + ed.getHours() + ":" + pad(ed.getMinutes()) + "\n" + pad(parseInt(totalSeconds / 3600)) + ":" + pad(parseInt((totalSeconds / 60) % 60)) + ":" + pad(totalSeconds % 60);
 		};
 
 		function setTime()
@@ -318,19 +319,19 @@ angular.module('Record').controller('Record.RecordController', [
 
 
 		// Note Input Logic
-		$scope.toggleNote = function()
+		controller.toggleNote = function()
 		{
-			if ($scope.hideNote == true)
+			if (controller.hideNote == true)
 			{
-				$scope.hideNote = false;
+				controller.hideNote = false;
 			}
 			else
 			{
-				$scope.hideNote = true;
+				controller.hideNote = true;
 			}
 		};
 
-		$scope.moveNote = function(p)
+		controller.moveNote = function(p)
 		{
 			noteEditor = $("[id^=noteInput]");
 
@@ -357,61 +358,61 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		$scope.saveNote = function()
+		controller.saveNote = function()
 		{
-			console.log("This is the note" + $scope.page.encounterNote);
-			$scope.page.encounterNote.observationDate = new Date();
-			$scope.page.encounterNote.assignedIssues = $scope.page.assignedCMIssues;
-			$scope.page.encounterNote.issueDescriptions = null;
-			for (var i = 0; i < $scope.page.assignedCMIssues.length; i++)
+			console.log("This is the note" + controller.page.encounterNote);
+			controller.page.encounterNote.observationDate = new Date();
+			controller.page.encounterNote.assignedIssues = controller.page.assignedCMIssues;
+			controller.page.encounterNote.issueDescriptions = null;
+			for (var i = 0; i < controller.page.assignedCMIssues.length; i++)
 			{
-				if ($scope.page.encounterNote.issueDescriptions == null)
+				if (controller.page.encounterNote.issueDescriptions == null)
 				{
-					$scope.page.encounterNote.issueDescriptions = $scope.page.assignedCMIssues[i].issue.description;
+					controller.page.encounterNote.issueDescriptions = controller.page.assignedCMIssues[i].issue.description;
 				}
 				else
 				{
-					$scope.page.encounterNote.issueDescriptions += "," + $scope.page.assignedCMIssues[i].issue.description;
+					controller.page.encounterNote.issueDescriptions += "," + controller.page.assignedCMIssues[i].issue.description;
 				}
 			}
-			noteService.saveNote($stateParams.demographicNo, $scope.page.encounterNote).then(
+			noteService.saveNote($stateParams.demographicNo, controller.page.encounterNote).then(
 				function success(results)
 				{
 					$rootScope.$emit('noteSaved', results);
 					skipTmpSave = true;
-					$scope.page.encounterNote = results;
+					controller.page.encounterNote = results;
 					console.debug('whats the index', results);
-					if ($scope.page.encounterNote.isSigned)
+					if (controller.page.encounterNote.isSigned)
 					{
-						$scope.hideNote = false;
-						$scope.getCurrentNote(false);
-						$scope.page.assignedCMIssues = [];
+						controller.hideNote = false;
+						controller.getCurrentNote(false);
+						controller.page.assignedCMIssues = [];
 					}
 				},
 				function error(errors)
 				{
 					console.log(errors);
 				});
-			$scope.removeEditingNoteFlag();
+			controller.removeEditingNoteFlag();
 		};
 
-		$scope.saveSignNote = function saveSignNote()
+		controller.saveSignNote = function saveSignNote()
 		{
-			$scope.page.encounterNote.isSigned = true;
-			$scope.saveNote();
+			controller.page.encounterNote.isSigned = true;
+			controller.saveNote();
 		};
 
-		$scope.saveSignVerifyNote = function saveSignVerifyNote()
+		controller.saveSignVerifyNote = function saveSignVerifyNote()
 		{
-			$scope.page.encounterNote.isVerified = true;
-			$scope.page.encounterNote.isSigned = true;
-			$scope.saveNote();
+			controller.page.encounterNote.isVerified = true;
+			controller.page.encounterNote.isSigned = true;
+			controller.saveNote();
 		};
 
 		billingService.getBillingRegion().then(
 			function success(results)
 			{
-				$scope.page.billregion = results.message;
+				controller.page.billregion = results.message;
 			},
 			function error(errors)
 			{
@@ -420,7 +421,7 @@ angular.module('Record').controller('Record.RecordController', [
 		billingService.getDefaultView().then(
 			function success(results)
 			{
-				$scope.page.defaultView = results.message;
+				controller.page.defaultView = results.message;
 			},
 			function error(errors)
 			{
@@ -431,7 +432,7 @@ angular.module('Record').controller('Record.RecordController', [
 			scheduleService.getAppointment($location.search().appointmentNo).then(
 				function success(results)
 				{
-					$scope.page.appointment = results;
+					controller.page.appointment = results;
 				},
 				function error(errors)
 				{
@@ -439,34 +440,34 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		}
 
-		$scope.saveSignBillNote = function saveSignBillNote()
+		controller.saveSignBillNote = function saveSignBillNote()
 		{
-			$scope.page.encounterNote.isSigned = true;
-			$scope.saveNote();
+			controller.page.encounterNote.isSigned = true;
+			controller.saveNote();
 
 			var dxCode = "";
-			for (var i = 0; i < $scope.page.assignedCMIssues.length; i++)
+			for (var i = 0; i < controller.page.assignedCMIssues.length; i++)
 			{
-				dxCode += "&dxCode=" + $scope.page.assignedCMIssues[i].issue.code.substring(0, 3);
+				dxCode += "&dxCode=" + controller.page.assignedCMIssues[i].issue.code.substring(0, 3);
 			}
 
 			var apptNo = "",
 				apptProvider = "",
 				apptDate = "",
 				apptStartTime = "";
-			if ($scope.page.appointment != null)
+			if (controller.page.appointment != null)
 			{
-				apptNo = $scope.page.appointment.id;
-				apptProvider = $scope.page.appointment.providerNo;
+				apptNo = controller.page.appointment.id;
+				apptProvider = controller.page.appointment.providerNo;
 
-				var dt = new Date($scope.page.appointment.appointmentDate);
+				var dt = new Date(controller.page.appointment.appointmentDate);
 				apptDate = dt.getFullYear() + "-" + zero(dt.getMonth() + 1) + "-" + zero(dt.getDate());
-				dt = new Date($scope.page.appointment.startTime);
+				dt = new Date(controller.page.appointment.startTime);
 				apptStartTime = zero(dt.getHours()) + ":" + zero(dt.getMinutes()) + ":" + zero(dt.getSeconds());
 			}
 
-			var url = "../billing.do?billRegion=" + encodeURIComponent($scope.page.billregion);
-			url += "&billForm=" + encodeURIComponent($scope.page.defaultView);
+			var url = "../billing.do?billRegion=" + encodeURIComponent(controller.page.billregion);
+			url += "&billForm=" + encodeURIComponent(controller.page.defaultView);
 			url += "&demographic_name=" + encodeURIComponent(demo.lastName + "," + demo.firstName);
 			url += "&demographic_no=" + demo.demographicNo;
 			url += "&providerview=" + user.providerNo + "&user_no=" + user.providerNo;
@@ -480,17 +481,17 @@ angular.module('Record').controller('Record.RecordController', [
 
 		console.log('RecordCtrlEnd', $state);
 
-		$scope.page.currentNoteConfig = {};
+		controller.page.currentNoteConfig = {};
 
 
-		$scope.getIssueNote = function getIssueNote()
+		controller.getIssueNote = function getIssueNote()
 		{
-			if ($scope.page.encounterNote.noteId != null)
+			if (controller.page.encounterNote.noteId != null)
 			{
-				noteService.getIssueNote($scope.page.encounterNote.noteId).then(
+				noteService.getIssueNote(controller.page.encounterNote.noteId).then(
 					function success(results)
 					{
-						if (results != null) $scope.page.assignedCMIssues = toArray(results.assignedCMIssues);
+						if (results != null) controller.page.assignedCMIssues = toArray(results.assignedCMIssues);
 					},
 					function error(errors)
 					{
@@ -499,17 +500,17 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		$scope.getCurrentNote = function getCurrentNote(showNoteAfterLoadingFlag)
+		controller.getCurrentNote = function getCurrentNote(showNoteAfterLoadingFlag)
 		{
 			noteService.getCurrentNote($stateParams.demographicNo, $location.search()).then(
 				function success(results)
 				{
-					$scope.page.encounterNote = results;
-					$scope.page.initNote = results.note; //compare this with current note content to determine tmpsave or not
-					$scope.getIssueNote();
-					console.log($scope.page.encounterNote);
-					$scope.hideNote = showNoteAfterLoadingFlag;
-					$rootScope.$emit('currentlyEditingNote', $scope.page.encounterNote);
+					controller.page.encounterNote = results;
+					controller.page.initNote = results.note; //compare this with current note content to determine tmpsave or not
+					controller.getIssueNote();
+					console.log(controller.page.encounterNote);
+					controller.hideNote = showNoteAfterLoadingFlag;
+					$rootScope.$emit('currentlyEditingNote', controller.page.encounterNote);
 					initAppendNoteEditor();
 				},
 				function error(errors)
@@ -518,11 +519,11 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
-		$scope.getCurrentNote(true);
+		controller.getCurrentNote(true);
 
 
 
-		$scope.editNote = function editNote(note)
+		controller.editNote = function editNote(note)
 		{
 			$rootScope.$emit('', note);
 		};
@@ -530,14 +531,14 @@ angular.module('Record').controller('Record.RecordController', [
 		$rootScope.$on('loadNoteForEdit', function(event, data)
 		{
 			console.log('loadNoteForEdit ', data);
-			$scope.page.encounterNote = data;
-			$scope.getIssueNote();
+			controller.page.encounterNote = data;
+			controller.getIssueNote();
 
 			//Need to check if note has been saved yet.
-			$scope.hideNote = true;
-			$rootScope.$emit('currentlyEditingNote', $scope.page.encounterNote);
+			controller.hideNote = true;
+			$rootScope.$emit('currentlyEditingNote', controller.page.encounterNote);
 
-			$scope.removeEditingNoteFlag();
+			controller.removeEditingNoteFlag();
 		});
 
 
@@ -545,7 +546,7 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			if ($location.search().noteEditorText != null)
 			{
-				$scope.page.encounterNote.note = $scope.page.encounterNote.note + $location.search().noteEditorText;
+				controller.page.encounterNote.note = controller.page.encounterNote.note + $location.search().noteEditorText;
 			}
 		};
 
@@ -558,10 +559,10 @@ angular.module('Record').controller('Record.RecordController', [
 
 		$rootScope.$on("$stateChangeStart", function()
 		{
-			$scope.removeEditingNoteFlag();
+			controller.removeEditingNoteFlag();
 		});
 
-		$scope.doSetEditingNoteFlag = function doSetEditingNoteFlag()
+		controller.doSetEditingNoteFlag = function doSetEditingNoteFlag()
 		{
 			noteService.setEditingNoteFlag(editingNoteId, user.providerNo).then(
 				function success(results)
@@ -578,14 +579,14 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
-		$scope.setEditingNoteFlag = function setEditingNoteFlag()
+		controller.setEditingNoteFlag = function setEditingNoteFlag()
 		{
-			if ($scope.page.encounterNote.uuid == null) return;
+			if (controller.page.encounterNote.uuid == null) return;
 
-			editingNoteId = $scope.page.encounterNote.uuid;
+			editingNoteId = controller.page.encounterNote.uuid;
 			if (itvSet == null)
 			{
-				itvSet = $interval($scope.doSetEditingNoteFlag(), 30000); //set flag every 5 min until canceled
+				itvSet = $interval(controller.doSetEditingNoteFlag(), 30000); //set flag every 5 min until canceled
 			}
 			if (itvCheck == null)
 			{ //warn once only when the 1st time another user tries to edit this note
@@ -609,7 +610,7 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		$scope.removeEditingNoteFlag = function removeEditingNoteFlag()
+		controller.removeEditingNoteFlag = function removeEditingNoteFlag()
 		{
 			if (editingNoteId != null)
 			{
@@ -623,7 +624,7 @@ angular.module('Record').controller('Record.RecordController', [
 		};
 
 
-		$scope.searchTemplates = function searchTemplates(term)
+		controller.searchTemplates = function searchTemplates(term)
 		{
 			var search = {
 				name: term
@@ -648,7 +649,7 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
-		$scope.insertTemplate = function insertTemplate(item, model, label)
+		controller.insertTemplate = function insertTemplate(item, model, label)
 		{
 
 			uxService.getTemplate(
@@ -659,9 +660,9 @@ angular.module('Record').controller('Record.RecordController', [
 				{
 					if (results.templates != null)
 					{
-						//	$scope.page.encounterNote.note = $scope.page.encounterNote.note + "\n\n" + results.templates.encounterTemplateValue;
-						$scope.page.encounterNote.note = $scope.page.encounterNote.note + results.templates.encounterTemplateValue;
-						$scope.options = {
+						//	controller.page.encounterNote.note = controller.page.encounterNote.note + "\n\n" + results.templates.encounterTemplateValue;
+						controller.page.encounterNote.note = controller.page.encounterNote.note + results.templates.encounterTemplateValue;
+						controller.options = {
 							magicVal: ''
 						};
 					}
@@ -673,7 +674,7 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
-		$scope.searchIssues = function searchIssues(term)
+		controller.searchIssues = function searchIssues(term)
 		{
 			var search = {
 				'term': term
@@ -702,11 +703,11 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
-		$scope.assignIssue = function assignIssue(item, model, label)
+		controller.assignIssue = function assignIssue(item, model, label)
 		{
-			for (var x = 0; x < $scope.page.assignedCMIssues.length; x++)
+			for (var x = 0; x < controller.page.assignedCMIssues.length; x++)
 			{
-				if ($scope.page.assignedCMIssues[x].issue.id == model)
+				if (controller.page.assignedCMIssues[x].issue.id == model)
 				{
 					return;
 				}
@@ -724,7 +725,7 @@ angular.module('Record').controller('Record.RecordController', [
 						resolved: false,
 						unsaved: true
 					};
-					$scope.page.assignedCMIssues.push(cmIssue);
+					controller.page.assignedCMIssues.push(cmIssue);
 				},
 				function error(errors)
 				{
@@ -732,18 +733,18 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
-		$scope.removeIssue = function removeIssue(i)
+		controller.removeIssue = function removeIssue(i)
 		{
 			i.unchecked = true;
 			var newList = [];
-			for (var x = 0; x < $scope.page.assignedCMIssues.length; x++)
+			for (var x = 0; x < controller.page.assignedCMIssues.length; x++)
 			{
-				if ($scope.page.assignedCMIssues[x].issue_id != i.issue_id)
+				if (controller.page.assignedCMIssues[x].issue_id != i.issue_id)
 				{
-					newList.push($scope.page.assignedCMIssues[x]);
+					newList.push(controller.page.assignedCMIssues[x]);
 				}
 			}
-			$scope.page.assignedCMIssues = newList;
+			controller.page.assignedCMIssues = newList;
 		};
 
 

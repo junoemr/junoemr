@@ -18,8 +18,10 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		ticklerService)
 	{
 
+		var controller = this;
+
 		// holds the patient typeahead selection
-		$scope.demographicSearch = null;
+		controller.demographicSearch = null;
 
 		//=========================================================================
 		// Watches
@@ -30,18 +32,18 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			{
 				console.log('watching demographicSearch: ', new_value);
 
-				if(Juno.Common.Util.exists(new_value))
+				if (Juno.Common.Util.exists(new_value))
 				{
-					$scope.updateDemographicNo(new_value.demographicNo);
+					controller.updateDemographicNo(new_value.demographicNo);
 				}
 				else
 				{
 					// no selection
-					$scope.updateDemographicNo(null);
+					controller.updateDemographicNo(null);
 				}
 			}, true);
 
-		$scope.tickler = {
+		controller.tickler = {
 			template:
 			{
 				id: 1,
@@ -52,12 +54,12 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			suggestedTextId: 0
 		};
 
-		$scope.priorities = ['Low', 'Normal', 'High'];
+		controller.priorities = ['Low', 'Normal', 'High'];
 
 		ticklerService.getTextSuggestions().then(function(data)
 		{
-			$scope.textSuggestions = data.content;
-			$scope.textSuggestions.unshift(
+			controller.textSuggestions = data.content;
+			controller.textSuggestions.unshift(
 			{
 				id: 0,
 				suggestedText: ''
@@ -67,53 +69,53 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			alert(reason);
 		});
 
-		$scope.close = function()
+		controller.close = function()
 		{
 			$uibModalInstance.close(false);
 		};
 
-		$scope.validate = function()
+		controller.validate = function()
 		{
-			var t = $scope.tickler;
-			$scope.errors = [];
+			var t = controller.tickler;
+			controller.errors = [];
 
 			if (t.demographic == null)
 			{
-				$scope.errors.push('You must select a patient');
+				controller.errors.push('You must select a patient');
 			}
 			if (t.taskAssignedTo == null || t.taskAssignedTo.length == 0)
 			{
-				$scope.errors.push('You must assign a provider');
+				controller.errors.push('You must assign a provider');
 			}
 			if (t.message == null || t.message.length == 0)
 			{
-				$scope.errors.push('Message is required');
+				controller.errors.push('Message is required');
 			}
-			if ($scope.errors.length > 0)
+			if (controller.errors.length > 0)
 			{
 				return false;
 			}
 			return true;
 		};
 
-		$scope.save = function()
+		controller.save = function()
 		{
-			$scope.showErrors = true;
-			if (!$scope.validate())
+			controller.showErrors = true;
+			if (!controller.validate())
 			{
 				return;
 			}
 
 			var t = {};
-			t.demographicNo = $scope.tickler.demographicNo;
-			t.taskAssignedTo = $scope.tickler.taskAssignedTo;
-			t.priority = $scope.tickler.priority;
+			t.demographicNo = controller.tickler.demographicNo;
+			t.taskAssignedTo = controller.tickler.taskAssignedTo;
+			t.priority = controller.tickler.priority;
 			t.status = 'A';
-			t.message = $scope.tickler.message;
+			t.message = controller.tickler.message;
 
 
-			var givenDate = $scope.tickler.serviceDateDate;
-			var givenTime = $scope.tickler.serviceDateTime;
+			var givenDate = controller.tickler.serviceDateDate;
+			var givenTime = controller.tickler.serviceDateTime;
 			givenDate.setHours(givenTime.getHours());
 			givenDate.setMinutes(givenTime.getMinutes());
 
@@ -130,20 +132,20 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 
 		};
 
-		$scope.updateDemographicNo = function(demographicNo)
+		controller.updateDemographicNo = function(demographicNo)
 		{
-			if(Juno.Common.Util.exists(demographicNo))
+			if (Juno.Common.Util.exists(demographicNo))
 			{
 				demographicService.getDemographic(demographicNo).then(function(data)
 				{
 					// update the selected value on the tickler object
-					$scope.tickler.demographic = data;
-					console.log('set $scope.tickler.demographic: ', $scope.tickler.demographic);
+					controller.tickler.demographic = data;
+					console.log('set controller.tickler.demographic: ', controller.tickler.demographic);
 				});
 			}
 			else
 			{
-				$scope.tickler.demographic = null;
+				controller.tickler.demographic = null;
 			}
 		};
 
@@ -153,7 +155,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			console.log('initializing demographicSearch pre-selected', $stateParams.demographicNo);
 			demographicService.getDemographic($stateParams.demographicNo).then(function(data)
 			{
-				$scope.demographicSearch = {
+				controller.demographicSearch = {
 					demographicNo: $stateParams.demographicNo,
 					firstName: data.firstName,
 					lastName: data.lastName
@@ -161,7 +163,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			});
 		}
 
-		$scope.searchProviders = function(val)
+		controller.searchProviders = function(val)
 		{
 			var search = {
 				searchTerm: val,
@@ -182,22 +184,22 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			});
 		};
 
-		$scope.updateProviderNo = function(item, model, label)
+		controller.updateProviderNo = function(item, model, label)
 		{
-			$scope.tickler.taskAssignedTo = model;
-			$scope.tickler.taskAssignedToName = label;
+			controller.tickler.taskAssignedTo = model;
+			controller.tickler.taskAssignedToName = label;
 		};
 
-		$scope.setSuggestedText = function()
+		controller.setSuggestedText = function()
 		{
-			var results = $filter('filter')($scope.textSuggestions,
+			var results = $filter('filter')(controller.textSuggestions,
 			{
-				id: $scope.tickler.suggestedTextId
+				id: controller.tickler.suggestedTextId
 			}, true);
 
 			if (results != null)
 			{
-				$scope.tickler.message = results[0].suggestedText;
+				controller.tickler.message = results[0].suggestedText;
 			}
 		};
 	}

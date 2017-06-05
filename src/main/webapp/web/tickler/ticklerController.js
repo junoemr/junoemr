@@ -29,12 +29,14 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		$stateParams)
 	{
 
+		var controller = this;
+
 		var ticklerAPI = $resource('../ws/rs/tickler/ticklers');
 
 		console.log("Params: ", $resource);
 
-		$scope.lastResponse = "";
-		$scope.providers = providers;
+		controller.lastResponse = "";
+		controller.providers = providers;
 
 
 		securityService.hasRights(
@@ -52,19 +54,19 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		{
 			if (result.content != null && result.content.length == 2)
 			{
-				$scope.ticklerWriteAccess = result.content[0];
-				$scope.ticklerReadAccess = result.content[1];
+				controller.ticklerWriteAccess = result.content[0];
+				controller.ticklerReadAccess = result.content[1];
 
-				if ($scope.ticklerReadAccess)
+				if (controller.ticklerReadAccess)
 				{
 
 					//object which represents all the filters, initialize status.
-					$scope.search = {
+					controller.search = {
 						status: 'A'
 					};
 
 
-					$scope.tableParams = new NgTableParams(
+					controller.tableParams = new NgTableParams(
 					{
 						page: 1, // show first page
 						count: 10
@@ -74,25 +76,25 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 						getData: function(params)
 						{
 							// ajax request to api
-							$scope.search.count = params.url().count;
-							$scope.search.page = params.url().page;
-							$scope.search.includeLinks = 'true';
-							$scope.search.includeComments = 'true';
-							$scope.search.includeUpdates = 'true';
-							$scope.search.includeProgram = true;
+							controller.search.count = params.url().count;
+							controller.search.page = params.url().page;
+							controller.search.includeLinks = 'true';
+							controller.search.includeComments = 'true';
+							controller.search.includeUpdates = 'true';
+							controller.search.includeProgram = true;
 
 							if (angular.isDefined($stateParams.demographicNo))
 							{
-								$scope.search.demographicNo = $stateParams.demographicNo;
+								controller.search.demographicNo = $stateParams.demographicNo;
 							}
 
-							return ticklerAPI.get($scope.search).$promise.then(function(data)
+							return ticklerAPI.get(controller.search).$promise.then(function(data)
 							{
 								params.total(data.total); // recal. page nav controls
 								return data.content;
 							});
 
-							// ticklerAPI.get($scope.search, function(data)
+							// ticklerAPI.get(controller.search, function(data)
 							// {
 							// 	console.log("DATA: ", data);
 							// 	$timeout(function()
@@ -103,7 +105,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 							// 		// set new data
 							// 		// $defer.resolve(data.tickler);
 
-							// 		$scope.lastResponse = data.tickler;
+							// 		controller.lastResponse = data.tickler;
 							// 	}, 500);
 							// });
 
@@ -124,21 +126,21 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 
 
-		$scope.doSearch = function()
+		controller.doSearch = function()
 		{
-			$scope.tableParams.reload();
+			controller.tableParams.reload();
 		};
 
-		$scope.clear = function()
+		controller.clear = function()
 		{
-			$scope.search = angular.copy(
+			controller.search = angular.copy(
 			{
 				status: 'A'
 			});
-			$scope.tableParams.reload();
+			controller.tableParams.reload();
 		};
 
-		$scope.checkAll = function checkAll(data)
+		controller.checkAll = function checkAll(data)
 		{
 			angular.forEach(data, function(tickler)
 			{
@@ -146,16 +148,16 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			});
 		};
 
-		// $scope.checkAll = function()
+		// controller.checkAll = function()
 		// {
 
-		// 	angular.forEach($scope.lastResponse, function(item)
+		// 	angular.forEach(controller.lastResponse, function(item)
 		// 	{
 		// 		item.checked = true;
 		// 	});
 		// };
 
-		$scope.checkNone = function checkNone(data)
+		controller.checkNone = function checkNone(data)
 		{
 			angular.forEach(data, function(tickler)
 			{
@@ -163,10 +165,10 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			});
 		};
 
-		$scope.completeTicklers = function()
+		controller.completeTicklers = function()
 		{
 			var selectedTicklers = new Array();
-			angular.forEach($scope.lastResponse, function(item)
+			angular.forEach(controller.lastResponse, function(item)
 			{
 				if (item.checked)
 				{
@@ -176,17 +178,17 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 			ticklerService.setCompleted(selectedTicklers).then(function(data)
 			{
-				$scope.tableParams.reload();
+				controller.tableParams.reload();
 			}, function(reason)
 			{
 				alert(reason);
 			});
 		};
 
-		$scope.deleteTicklers = function()
+		controller.deleteTicklers = function()
 		{
 			var selectedTicklers = new Array();
-			angular.forEach($scope.lastResponse, function(item)
+			angular.forEach(controller.lastResponse, function(item)
 			{
 				if (item.checked)
 				{
@@ -196,7 +198,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 			ticklerService.setDeleted(selectedTicklers).then(function(data)
 			{
-				$scope.tableParams.reload();
+				controller.tableParams.reload();
 			}, function(reason)
 			{
 				alert(reason);
@@ -204,7 +206,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		};
 
-		$scope.addTickler = function()
+		controller.addTickler = function()
 		{
 			var windowProps = "height=400,width=600,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
 			//window.open('../tickler/ticklerAdd.jsp','ticklerAdd',windowProps);
@@ -222,7 +224,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 				console.log('data from modalInstance ' + data);
 				if (data != null && data == true)
 				{
-					$scope.tableParams.reload();
+					controller.tableParams.reload();
 				}
 			}, function(reason)
 			{
@@ -232,7 +234,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		};
 
-		$scope.editTickler = function(tickler)
+		controller.editTickler = function(tickler)
 		{
 
 			var modalInstance = $uibModal.open(
@@ -253,7 +255,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 					},
 					ticklerWriteAccess: function()
 					{
-						return $scope.ticklerWriteAccess;
+						return controller.ticklerWriteAccess;
 					},
 					me: function()
 					{
@@ -267,7 +269,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 				console.log('data from modalInstance ' + data);
 				if (data != null && data == true)
 				{
-					$scope.tableParams.reload();
+					controller.tableParams.reload();
 				}
 			}, function(reason)
 			{
@@ -276,18 +278,18 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		};
 
-		$scope.editNote2 = function(tickler)
+		controller.editNote2 = function(tickler)
 		{
 
 			noteService.getTicklerNote(tickler.id).then(function(data)
 			{
 				if (data.ticklerNote != null)
 				{
-					$scope.ticklerNote = data.ticklerNote;
+					controller.ticklerNote = data.ticklerNote;
 				}
 				else
 				{
-					$scope.ticklerNote = {
+					controller.ticklerNote = {
 						"editor": "you",
 						"note": "",
 						"noteId": 0,
@@ -304,7 +306,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 					{
 						ticklerNote: function()
 						{
-							return $scope.ticklerNote;
+							return controller.ticklerNote;
 						},
 						tickler: function()
 						{
@@ -319,9 +321,9 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		};
 
-		$scope.showComments = function(tickler)
+		controller.showComments = function(tickler)
 		{
-			$scope.tickler = tickler;
+			controller.tickler = tickler;
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'tickler/ticklerComments.jsp',
@@ -330,13 +332,13 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 				{
 					tickler: function()
 					{
-						return $scope.tickler;
+						return controller.tickler;
 					}
 				}
 			});
 		};
 
-		$scope.printArea = function()
+		controller.printArea = function()
 		{
 			window.print();
 		};

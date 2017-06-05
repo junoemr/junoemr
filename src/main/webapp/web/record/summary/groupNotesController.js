@@ -28,33 +28,35 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		diseaseRegistryService)
 	{
 
+		var controller = this;
 
-		$scope.page = {};
-		$scope.page.title = mod.displayName;
-		$scope.page.items = mod.summaryItem;
-		$scope.page.quickLists = [];
 
-		//$scope.action = action;
-		$scope.page.code = mod.summaryCode;
+		controller.page = {};
+		controller.page.title = mod.displayName;
+		controller.page.items = mod.summaryItem;
+		controller.page.quickLists = [];
 
-		$scope.groupNotesForm = {
+		//controller.action = action;
+		controller.page.code = mod.summaryCode;
+
+		controller.groupNotesForm = {
 			assignedCMIssues: []
 		};
-		$scope.groupNotesForm.encounterNote = {
+		controller.groupNotesForm.encounterNote = {
 			position: 1
 		};
 
 
 		//set hidden which can can move out of hidden to $scope values
 		var now = new Date();
-		$scope.groupNotesForm.annotation_attrib = "anno" + now.getTime();
+		controller.groupNotesForm.annotation_attrib = "anno" + now.getTime();
 
 
 		//get access rights
 		securityService.hasRight("_eChart", "u", $stateParams.demographicNo).then(
 			function success(results)
 			{
-				$scope.page.cannotChange = !results;
+				controller.page.cannotChange = !results;
 			},
 			function error(errors)
 			{
@@ -65,18 +67,18 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			function success(results)
 			{
 				console.log(results);
-				$scope.page.quickLists = results;
+				controller.page.quickLists = results;
 			},
 			function error(errors)
 			{
 				console.log(errors);
 			});
 
-		$scope.addDxItem = function addDxItem(item)
+		controller.addDxItem = function addDxItem(item)
 		{
-			for (var x = 0; x < $scope.groupNotesForm.assignedCMIssues.length; x++)
+			for (var x = 0; x < controller.groupNotesForm.assignedCMIssues.length; x++)
 			{
-				if ($scope.groupNotesForm.assignedCMIssues[x].issue.code === item.code && $scope.groupNotesForm.assignedCMIssues[x].issue.type === item.codingSystem)
+				if (controller.groupNotesForm.assignedCMIssues[x].issue.code === item.code && controller.groupNotesForm.assignedCMIssues[x].issue.type === item.codingSystem)
 				{
 					return;
 				}
@@ -94,7 +96,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 						resolved: false,
 						unsaved: true
 					};
-					$scope.groupNotesForm.assignedCMIssues.push(cmIssue);
+					controller.groupNotesForm.assignedCMIssues.push(cmIssue);
 				},
 				function error(errors)
 				{
@@ -105,9 +107,9 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		};
 
 		//disable click and keypress if user only has read-access
-		$scope.checkAction = function checkAction(event)
+		controller.checkAction = function checkAction(event)
 		{
-			if ($scope.page.cannotChange)
+			if (controller.page.cannotChange)
 			{
 				event.preventDefault();
 				event.stopPropagation();
@@ -119,7 +121,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			noteService.getIssueId(issueCode).then(
 				function success(results)
 				{
-					$scope.page.issueId = results.id;
+					controller.page.issueId = results.id;
 				},
 				function error(errors)
 				{
@@ -127,43 +129,43 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				});
 		};
 
-		displayIssueId($scope.page.code);
+		displayIssueId(controller.page.code);
 
 		displayGroupNote = function displayGroupNote(item, itemId)
 		{
-			console.log('Display note: ', $scope.page.items[itemId].noteId)
-			if ($scope.page.items[itemId].noteId != null)
+			console.log('Display note: ', controller.page.items[itemId].noteId)
+			if (controller.page.items[itemId].noteId != null)
 			{
-				noteService.getIssueNote($scope.page.items[itemId].noteId).then(
+				noteService.getIssueNote(controller.page.items[itemId].noteId).then(
 					function success(results)
 					{
-						//$scope.master = angular.copy( "iNote----" +  JSON.stringify(iNote) );
-						$scope.groupNotesForm.encounterNote = results.encounterNote;
-						$scope.groupNotesForm.groupNoteExt = results.groupNoteExt;
-						$scope.groupNotesForm.assignedCMIssues = results.assignedCMIssues;
+						//controller.master = angular.copy( "iNote----" +  JSON.stringify(iNote) );
+						controller.groupNotesForm.encounterNote = results.encounterNote;
+						controller.groupNotesForm.groupNoteExt = results.groupNoteExt;
+						controller.groupNotesForm.assignedCMIssues = results.assignedCMIssues;
 
-						$scope.groupNotesForm.assignedCMIssues = [];
+						controller.groupNotesForm.assignedCMIssues = [];
 
 						if (results.assignedCMIssues instanceof Array)
 						{
-							$scope.groupNotesForm.assignedCMIssues = results.assignedCMIssues;
+							controller.groupNotesForm.assignedCMIssues = results.assignedCMIssues;
 						}
 						else
 						{
 							if (results.assignedCMIssues != null)
 							{
-								$scope.groupNotesForm.assignedCMIssues.push(results.assignedCMIssues);
+								controller.groupNotesForm.assignedCMIssues.push(results.assignedCMIssues);
 							}
 						}
 
 						action = itemId;
-						$scope.setAvailablePositions();
+						controller.setAvailablePositions();
 
-						$scope.removeEditingNoteFlag();
+						controller.removeEditingNoteFlag();
 
-						if ($scope.groupNotesForm.encounterNote.position < 1)
+						if (controller.groupNotesForm.encounterNote.position < 1)
 						{
-							$scope.groupNotesForm.encounterNote.position = 1;
+							controller.groupNotesForm.encounterNote.position = 1;
 						}
 
 					},
@@ -172,10 +174,10 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 						console.log(errors);
 					});
 			}
-			else if ($scope.page.items[itemId].type === "dx_reg")
+			else if (controller.page.items[itemId].type === "dx_reg")
 			{
-				$scope.groupNotesForm.assignedCMIssues = [];
-				diseaseRegistryService.findLikeIssue($scope.page.items[itemId].extra).then(
+				controller.groupNotesForm.assignedCMIssues = [];
+				diseaseRegistryService.findLikeIssue(controller.page.items[itemId].extra).then(
 					function success(results)
 					{
 						var cmIssue = {
@@ -188,10 +190,10 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 							unsaved: true
 						};
 						console.log("find like issue ", cmIssue, results);
-						$scope.groupNotesForm.assignedCMIssues.push(cmIssue);
-						$scope.groupNotesForm.encounterNote = {};
-						$scope.groupNotesForm.groupNoteExt = {};
-						$scope.groupNotesForm.encounterNote = {
+						controller.groupNotesForm.assignedCMIssues.push(cmIssue);
+						controller.groupNotesForm.encounterNote = {};
+						controller.groupNotesForm.groupNoteExt = {};
+						controller.groupNotesForm.encounterNote = {
 							position: 1
 						};
 						action = itemId;
@@ -206,62 +208,62 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		//action is NULL when new , action is some id when not
 		if (action != null)
 		{
-			displayGroupNote($scope.page.items, action);
+			displayGroupNote(controller.page.items, action);
 		}
 		else
 		{
 			//new entry
 		}
 
-		$scope.setAvailablePositions = function setAvailablePositions()
+		controller.setAvailablePositions = function setAvailablePositions()
 		{
-			$scope.availablePositions = [];
-			if ($scope.page.items == null || $scope.page.items.length == 0)
+			controller.availablePositions = [];
+			if (controller.page.items == null || controller.page.items.length == 0)
 			{
-				$scope.availablePositions.push(1);
+				controller.availablePositions.push(1);
 			}
 			else
 			{
 				var x = 0;
-				for (x = 0; x < $scope.page.items.length; x++)
+				for (x = 0; x < controller.page.items.length; x++)
 				{
-					$scope.availablePositions.push(x + 1);
+					controller.availablePositions.push(x + 1);
 				}
 				if (action == null)
 				{
-					$scope.availablePositions.push(x + 1);
+					controller.availablePositions.push(x + 1);
 				}
 			}
 		};
 
-		$scope.setAvailablePositions();
+		controller.setAvailablePositions();
 
-		$scope.changeNote = function changeNote(item, itemId)
+		controller.changeNote = function changeNote(item, itemId)
 		{
 			return displayGroupNote(item, itemId);
 		};
 
-		$scope.saveGroupNotes = function saveGroupNotes()
+		controller.saveGroupNotes = function saveGroupNotes()
 		{
-			if ($scope.groupNotesForm.encounterNote.noteId == null)
+			if (controller.groupNotesForm.encounterNote.noteId == null)
 			{
-				$scope.groupNotesForm.encounterNote.noteId = 0;
+				controller.groupNotesForm.encounterNote.noteId = 0;
 			}
 
-			$scope.groupNotesForm.encounterNote.noteId = $scope.groupNotesForm.encounterNote.noteId; //tmp crap
-			$scope.groupNotesForm.encounterNote.cpp = true;
-			$scope.groupNotesForm.encounterNote.editable = true;
-			$scope.groupNotesForm.encounterNote.isSigned = true;
-			$scope.groupNotesForm.encounterNote.observationDate = new Date();
-			$scope.groupNotesForm.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO: make this dynamic so it changes on edit
-			$scope.groupNotesForm.encounterNote.encounterType = "";
-			$scope.groupNotesForm.encounterNote.encounterTime = "";
+			controller.groupNotesForm.encounterNote.noteId = controller.groupNotesForm.encounterNote.noteId; //tmp crap
+			controller.groupNotesForm.encounterNote.cpp = true;
+			controller.groupNotesForm.encounterNote.editable = true;
+			controller.groupNotesForm.encounterNote.isSigned = true;
+			controller.groupNotesForm.encounterNote.observationDate = new Date();
+			controller.groupNotesForm.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO: make this dynamic so it changes on edit
+			controller.groupNotesForm.encounterNote.encounterType = "";
+			controller.groupNotesForm.encounterNote.encounterTime = "";
 
-			$scope.groupNotesForm.encounterNote.summaryCode = $scope.page.code; //'ongoingconcerns';
+			controller.groupNotesForm.encounterNote.summaryCode = controller.page.code; //'ongoingconcerns';
 
-			$scope.groupNotesForm.assignedIssues = [];
+			controller.groupNotesForm.assignedIssues = [];
 
-			noteService.saveIssueNote($stateParams.demographicNo, $scope.groupNotesForm).then(
+			noteService.saveIssueNote($stateParams.demographicNo, controller.groupNotesForm).then(
 				function success(results)
 				{
 					$uibModalInstance.dismiss('cancel');
@@ -282,7 +284,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		/*
 		 * handle concurrent note edit - EditingNoteFlag
 		 */
-		$scope.doSetEditingNoteFlag = function doSetEditingNoteFlag()
+		controller.doSetEditingNoteFlag = function doSetEditingNoteFlag()
 		{
 			noteService.setEditingNoteFlag(editingNoteId, user.providerNo).then(
 				function success(results)
@@ -299,14 +301,14 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				});
 		};
 
-		$scope.setEditingNoteFlag = function setEditingNoteFlag()
+		controller.setEditingNoteFlag = function setEditingNoteFlag()
 		{
-			if ($scope.groupNotesForm.encounterNote.uuid == null) return;
+			if (controller.groupNotesForm.encounterNote.uuid == null) return;
 
-			$scope.removeEditingNoteFlag(); //remove any previous flag actions
-			editingNoteId = $scope.groupNotesForm.encounterNote.uuid;
+			controller.removeEditingNoteFlag(); //remove any previous flag actions
+			editingNoteId = controller.groupNotesForm.encounterNote.uuid;
 
-			itvSet = $interval($scope.doSetEditingNoteFlag(), 30000); //set flag every 5 min
+			itvSet = $interval(controller.doSetEditingNoteFlag(), 30000); //set flag every 5 min
 			itvCheck = $interval(function()
 			{
 				noteService.checkEditNoteNew(editingNoteId, user.providerNo).then(
@@ -328,7 +330,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			}, 10000); //check for new edit every 10 sec
 		};
 
-		$scope.removeEditingNoteFlag = function removeEditingNoteFlag()
+		controller.removeEditingNoteFlag = function removeEditingNoteFlag()
 		{
 			if (editingNoteId != null)
 			{
@@ -342,29 +344,29 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		};
 
 
-		$scope.removeIssue = function removeIssue(i)
+		controller.removeIssue = function removeIssue(i)
 		{
 			i.unchecked = true;
 		};
-		$scope.restoreIssue = function restoreIssue(i)
+		controller.restoreIssue = function restoreIssue(i)
 		{
 			i.unchecked = false;
 		};
 
-		$scope.archiveGroupNotes = function archiveGroupNotes()
+		controller.archiveGroupNotes = function archiveGroupNotes()
 		{
-			//$scope.master = angular.copy($scope.groupNotesForm);
-			$scope.groupNotesForm.encounterNote.archived = true;
-			$scope.saveGroupNotes();
+			//controller.master = angular.copy(controller.groupNotesForm);
+			controller.groupNotesForm.encounterNote.archived = true;
+			controller.saveGroupNotes();
 		};
 
-		$scope.cancel = function cancel()
+		controller.cancel = function cancel()
 		{
 			$uibModalInstance.dismiss('cancel');
 		};
 
 		//temp load into pop-up
-		$scope.openRevisionHistory = function openRevisionHistory(note)
+		controller.openRevisionHistory = function openRevisionHistory(note)
 		{
 			var rnd = Math.round(Math.random() * 1000);
 			win = "win" + rnd;
@@ -372,7 +374,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
 		};
 
-		$scope.searchIssues = function searchIssues(term)
+		controller.searchIssues = function searchIssues(term)
 		{
 			var search = {
 				'term': term
@@ -401,11 +403,11 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				});
 		};
 
-		$scope.assignIssue = function assignIssue(item, model, label)
+		controller.assignIssue = function assignIssue(item, model, label)
 		{
-			for (var x = 0; x < $scope.groupNotesForm.assignedCMIssues.length; x++)
+			for (var x = 0; x < controller.groupNotesForm.assignedCMIssues.length; x++)
 			{
-				if ($scope.groupNotesForm.assignedCMIssues[x].issue.id == model)
+				if (controller.groupNotesForm.assignedCMIssues[x].issue.id == model)
 				{
 					return;
 				}
@@ -423,7 +425,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 						resolved: false,
 						unsaved: true
 					};
-					$scope.groupNotesForm.assignedCMIssues.push(cmIssue);
+					controller.groupNotesForm.assignedCMIssues.push(cmIssue);
 				},
 				function error(errors)
 				{
@@ -431,7 +433,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				});
 		};
 
-		$scope.isSelected = function isSelected(item)
+		controller.isSelected = function isSelected(item)
 		{
 			if (item.id == action)
 			{
@@ -439,7 +441,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			}
 		};
 
-		$scope.addToDxRegistry = function addToDxRegistry(issue)
+		controller.addToDxRegistry = function addToDxRegistry(issue)
 		{
 			diseaseRegistryService.addToDxRegistry($stateParams.demographicNo, issue).then(
 				function success(results)

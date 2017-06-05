@@ -45,14 +45,15 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 		programService,
 		staticDataService)
 	{
+		var controller = this;
 
-		$scope.demographic = {};
+		controller.demographic = {};
 
 		//get access right for creating new patient
 		securityService.hasRight("_demographic", "w").then(
 			function success(results)
 			{
-				$scope.hasRight = results;
+				controller.hasRight = results;
 			},
 			function error(errors)
 			{
@@ -63,10 +64,10 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 		programService.getPrograms().then(
 			function success(results)
 			{
-				$scope.programs = results;
-				if ($scope.programs.length == 1)
+				controller.programs = results;
+				if (controller.programs.length == 1)
 				{
-					$scope.demographic.admissionProgramId = $scope.programs[0].id;
+					controller.demographic.admissionProgramId = controller.programs[0].id;
 				}
 			},
 			function error(errors)
@@ -75,17 +76,17 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 			});
 
 		//get genders to be selected
-		$scope.genders = staticDataService.getGenders();
+		controller.genders = staticDataService.getGenders();
 
-		$scope.saver = function saver(ngModelContoller)
+		controller.saver = function saver(ngModelContoller)
 		{
-			console.log($scope.demographic.lastName);
-			console.log($scope.demographic.firstName);
-			console.log($scope.demographic.dobYear);
-			console.log($scope.demographic.dobMonth);
-			console.log($scope.demographic.dobDay);
-			console.log($scope.demographic.sex);
-			console.log($scope.demographic);
+			console.log(controller.demographic.lastName);
+			console.log(controller.demographic.firstName);
+			console.log(controller.demographic.dobYear);
+			console.log(controller.demographic.dobMonth);
+			console.log(controller.demographic.dobDay);
+			console.log(controller.demographic.sex);
+			console.log(controller.demographic);
 			console.log(ngModelContoller.$valid);
 			console.log($scope);
 
@@ -93,27 +94,27 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 			{
 				console.log("Saving...");
 
-				if (!$scope.isCorrectDate($scope.demographic.dobYear,
-						$scope.demographic.dobMonth, $scope.demographic.dobDay))
+				if (!controller.isCorrectDate(controller.demographic.dobYear,
+						controller.demographic.dobMonth, controller.demographic.dobDay))
 				{
 					alert("Incorrect Date of Birth!");
 					return;
 				}
 
-				$scope.demographic.dateOfBirth =
-					$scope.demographic.dobYear + '-' +
-					$scope.demographic.dobMonth + "-" +
-					$scope.demographic.dobDay;
+				controller.demographic.dateOfBirth =
+					controller.demographic.dobYear + '-' +
+					controller.demographic.dobMonth + "-" +
+					controller.demographic.dobDay;
 
-				$scope.demographic.patientStatusDate = new Date();
-				$scope.demographic.dateJoined = new Date();
-				$scope.demoRetVal = {};
+				controller.demographic.patientStatusDate = new Date();
+				controller.demographic.dateJoined = new Date();
+				controller.demoRetVal = {};
 
-				demographicService.saveDemographic($scope.demographic).then(
+				demographicService.saveDemographic(controller.demographic).then(
 					function success(results)
 					{
 						console.log(results);
-						$scope.demoRetVal = results;
+						controller.demoRetVal = results;
 						$uibModalInstance.close(results);
 					},
 					function error(errors)
@@ -128,30 +129,30 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 			}
 		};
 
-		$scope.ok = function ok()
+		controller.ok = function ok()
 		{
-			$uibModalInstance.close($scope.selected.item);
+			$uibModalInstance.close(controller.selected.item);
 		};
 
-		$scope.cancel = function cancel()
+		controller.cancel = function cancel()
 		{
 			$uibModalInstance.dismiss('cancel');
 		};
 
-		$scope.capName = function capName()
+		controller.capName = function capName()
 		{
-			if ($scope.demographic.lastName != null)
+			if (controller.demographic.lastName != null)
 			{
-				$scope.demographic.lastName = $scope.demographic.lastName.toUpperCase();
+				controller.demographic.lastName = controller.demographic.lastName.toUpperCase();
 			}
 
-			if ($scope.demographic.firstName != null)
+			if (controller.demographic.firstName != null)
 			{
-				$scope.demographic.firstName = $scope.demographic.firstName.toUpperCase();
+				controller.demographic.firstName = controller.demographic.firstName.toUpperCase();
 			}
 		};
 
-		$scope.isCorrectDate = function isCorrectDate(year, month, day)
+		controller.isCorrectDate = function isCorrectDate(year, month, day)
 		{
 			var d = new Date(year, month - 1, day);
 

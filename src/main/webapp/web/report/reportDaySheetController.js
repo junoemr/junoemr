@@ -12,7 +12,9 @@ angular.module('Report').controller('Report.ReportDaySheetController', [
 		providerService)
 	{
 
-		$scope.getTime = function getTime(hour, minutes)
+		var controller = this.
+
+		controller.getTime = function getTime(hour, minutes)
 		{
 			var d = new Date();
 			d.setHours(hour);
@@ -20,16 +22,16 @@ angular.module('Report').controller('Report.ReportDaySheetController', [
 			return d;
 		};
 
-		$scope.params = {
+		controller.params = {
 			providerNo: '',
 			type: '',
 			startDate: new Date(),
 			endDate: new Date(),
-			startTime: $scope.getTime(8, 0),
-			endTime: $scope.getTime(18, 0)
+			startTime: controller.getTime(8, 0),
+			endTime: controller.getTime(18, 0)
 		};
 
-		$scope.searchProviders = function searchProviders(val)
+		controller.searchProviders = function searchProviders(val)
 		{
 			var search = {
 				searchTerm: val,
@@ -54,15 +56,15 @@ angular.module('Report').controller('Report.ReportDaySheetController', [
 					console.log(errors);
 				});
 		};
-		$scope.updateProviderNo = function updateProviderNo(item, model, label)
+		controller.updateProviderNo = function updateProviderNo(item, model, label)
 		{
-			$scope.params.providerNo = model;
-			$scope.data.providerNo = label;
+			controller.params.providerNo = model;
+			controller.data.providerNo = label;
 		};
 
-		$scope.generateReport = function generateReport()
+		controller.generateReport = function generateReport()
 		{
-			var p = $scope.params;
+			var p = controller.params;
 			if (p.type === 'all' || p.type === 'all-nr')
 			{
 				var startDate = $filter('date')(p.startDate, 'yyyy-MM-dd');
@@ -108,15 +110,15 @@ angular.module('Report').controller('Report.ReportDaySheetController', [
 			}
 		};
 
-		$scope.reset = function reset()
+		controller.reset = function reset()
 		{
-			$scope.params = {
+			controller.params = {
 				providerNo: '',
 				type: '',
 				startDate: new Date(),
 				endDate: new Date(),
-				startTime: $scope.getTime(8, 0),
-				endTime: $scope.getTime(18, 0)
+				startTime: controller.getTime(8, 0),
+				endTime: controller.getTime(18, 0)
 			};
 		};
 	}

@@ -9,12 +9,15 @@ angular.module('Report').controller('Report.ReportOldPatientsController', [
 		$log,
 		providerService)
 	{
-		$scope.params = {
+
+		var controller = this;
+
+		controller.params = {
 			providerNo: '',
 			age: 65
 		};
 
-		$scope.searchProviders = function searchProviders(val)
+		controller.searchProviders = function searchProviders(val)
 		{
 			var search = {
 				searchTerm: val,
@@ -39,15 +42,15 @@ angular.module('Report').controller('Report.ReportOldPatientsController', [
 					console.log(errors);
 				});
 		};
-		$scope.updateProviderNo = function updateProviderNo(item, model, label)
+		controller.updateProviderNo = function updateProviderNo(item, model, label)
 		{
-			$scope.params.providerNo = model;
-			$scope.data.providerNo = label;
+			controller.params.providerNo = model;
+			controller.data.providerNo = label;
 		};
 
-		$scope.generateReport = function generateReport()
+		controller.generateReport = function generateReport()
 		{
-			var p = $scope.params;
+			var p = controller.params;
 			var url = '../report/reportpatientchartlistspecial.jsp?provider_no=' + (p.providerNo === '' ? '*' : p.providerNo) + '&age=' + p.age;
 			window.open(url, 'report_oldpatients', 'height=900,width=700');
 		};

@@ -26,11 +26,13 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 		staticDataService)
 	{
 
+		var controller = this;
+
 		//get access rights
 		securityService.hasRight("_con", "r").then(
 			function success(results)
 			{
-				$scope.consultReadAccess = results;
+				controller.consultReadAccess = results;
 			},
 			function error(errors)
 			{
@@ -39,7 +41,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 		securityService.hasRight("_con", "u").then(
 			function success(results)
 			{
-				$scope.consultUpdateAccess = results; //to be used with batch operations (not yet implemented)
+				controller.consultUpdateAccess = results; //to be used with batch operations (not yet implemented)
 			},
 			function error(errors)
 			{
@@ -48,7 +50,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 		securityService.hasRight("_con", "w").then(
 			function success(results)
 			{
-				$scope.consultWriteAccess = results;
+				controller.consultWriteAccess = results;
 			},
 			function error(errors)
 			{
@@ -56,17 +58,17 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 			});
 
 		//set search statuses
-		$scope.statuses = staticDataService.getConsultRequestStatuses();
+		controller.statuses = staticDataService.getConsultRequestStatuses();
 
 		//get urgencies list
-		$scope.urgencies = staticDataService.getConsultUrgencies();
+		controller.urgencies = staticDataService.getConsultUrgencies();
 
-		$scope.lastResponse = "";
-		$scope.teams = [];
-		$scope.consult = {};
+		controller.lastResponse = "";
+		controller.teams = [];
+		controller.consult = {};
 
 		var allTeams = "All Teams";
-		$scope.search = {
+		controller.search = {
 			team: allTeams,
 			startIndex: 0,
 			numToReturn: 10
@@ -75,16 +77,17 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 		providerService.getActiveTeams().then(
 			function success(results)
 			{
-				$scope.teams = results;
-				$scope.teams.unshift(allTeams);
+				controller.teams = results;
+				controller.teams.unshift(allTeams);
 				console.log(JSON.stringify(results));
 			},
 			function error(errors)
 			{
+				alert(errors);
 				console.log(errors);
 			});
 
-		$scope.searchPatients = function searchPatients(term)
+		controller.searchPatients = function searchPatients(term)
 		{
 			var search = {
 				type: 'Name',
@@ -113,7 +116,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				});
 		};
 
-		$scope.searchMrps = function searchMrps(term)
+		controller.searchMrps = function searchMrps(term)
 		{
 			var search = {
 				searchTerm: term,
@@ -139,19 +142,19 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				});
 		};
 
-		$scope.updateMrpNo = function updateMrpNo(model)
+		controller.updateMrpNo = function updateMrpNo(model)
 		{
 			if (model instanceof Object)
 			{ //mrp set in search box
-				$scope.search.mrpNo = Number(model.mrpNo);
-				$scope.consult.mrpName = model.name;
+				controller.search.mrpNo = Number(model.mrpNo);
+				controller.consult.mrpName = model.name;
 			}
 			else
 			{ //mrp specified in url (come back from another consults) 
 				providerService.getProvider(model).then(
 					function success(results)
 					{
-						$scope.consult.mrpName = results.lastName + ", " + results.firstName;
+						controller.consult.mrpName = results.lastName + ", " + results.firstName;
 					},
 					function error(errors)
 					{
@@ -160,19 +163,19 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 			}
 		};
 
-		$scope.updateDemographicNo = function updateDemographicNo(item, model)
+		controller.updateDemographicNo = function updateDemographicNo(item, model)
 		{
 			if (item != null)
 			{ //demo set in search box
-				$scope.search.demographicNo = item.demographicNo;
-				$scope.consult.demographicName = item.name;
+				controller.search.demographicNo = item.demographicNo;
+				controller.consult.demographicName = item.name;
 			}
 			else
 			{ //demo specified in url (come back from another consults)
 				demographicService.getDemographic(model).then(
 					function success(results)
 					{
-						$scope.consult.demographicName = results.lastName + ", " + results.firstName;
+						controller.consult.demographicName = results.lastName + ", " + results.firstName;
 					},
 					function error(errors)
 					{
@@ -181,101 +184,101 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 			}
 		};
 
-		$scope.checkAll = function checkAll()
+		controller.checkAll = function checkAll()
 		{
-			angular.forEach($scope.lastResponse, function(item)
+			angular.forEach(controller.lastResponse, function(item)
 			{
 				item.checked = true;
 			});
 		};
 
-		$scope.checkNone = function checkNone()
+		controller.checkNone = function checkNone()
 		{
-			angular.forEach($scope.lastResponse, function(item)
+			angular.forEach(controller.lastResponse, function(item)
 			{
 				item.checked = false;
 			});
 		};
 
-		$scope.editConsult = function editConsult(consult)
+		controller.editConsult = function editConsult(consult)
 		{
-			var url = "/record/" + $scope.search.demographicNo + "/consult/new";
+			var url = "/record/" + controller.search.demographicNo + "/consult/new";
 			if (consult != "new") url = "/record/" + consult.demographic.demographicNo + "/consult/" + consult.id;
 
-			$location.path(url).search($scope.searchParams);
+			$location.path(url).search(controller.searchParams);
 		};
 
-		$scope.addConsult = function addConsult()
+		controller.addConsult = function addConsult()
 		{
-			if (!$scope.consultWriteAccess)
+			if (!controller.consultWriteAccess)
 			{
 				alert("You don't have right to create new consult");
 				return false;
 			}
 
-			$scope.editConsult("new");
+			controller.editConsult("new");
 		};
 
-		$scope.removeDemographicAssignment = function removeDemographicAssignment()
+		controller.removeDemographicAssignment = function removeDemographicAssignment()
 		{
-			$scope.search.demographicNo = null;
-			$scope.consult.demographicName = null;
+			controller.search.demographicNo = null;
+			controller.consult.demographicName = null;
 		};
 
-		$scope.removeMrpAssignment = function removeMrpAssignment()
+		controller.removeMrpAssignment = function removeMrpAssignment()
 		{
-			$scope.search.mrpNo = null;
-			$scope.consult.mrpName = null;
+			controller.search.mrpNo = null;
+			controller.consult.mrpName = null;
 		};
 
-		$scope.doSearch = function doSearch()
+		controller.doSearch = function doSearch()
 		{
-			$scope.tableParams.page = 1;
-			$scope.tableParams.reload();
+			controller.tableParams.page = 1;
+			controller.tableParams.reload();
 		};
 
-		$scope.clear = function clear()
+		controller.clear = function clear()
 		{
-			$scope.removeDemographicAssignment();
-			$scope.removeMrpAssignment();
+			controller.removeDemographicAssignment();
+			controller.removeMrpAssignment();
 
 			var searchDemoNo = $state.params.demographicNo == null ? null : Number($state.params.demographicNo);
-			$scope.search = {
+			controller.search = {
 				team: allTeams,
 				startIndex: 0,
 				numToReturn: 10,
 				demographicNo: searchDemoNo
 			};
-			$scope.doSearch();
+			controller.doSearch();
 		};
 
 		//retain search & filters for users to come back
-		$scope.setSearchParams = function setSearchParams()
+		controller.setSearchParams = function setSearchParams()
 		{
-			$scope.searchParams = {};
-			if ($state.$current == "record.consultRequests") $scope.searchParams.list = "patient";
-			else if ($scope.search.demographicNo != null) $scope.searchParams.srhDemoNo = $scope.search.demographicNo;
+			controller.searchParams = {};
+			if ($state.$current == "record.consultRequests") controller.searchParams.list = "patient";
+			else if (controller.search.demographicNo != null) controller.searchParams.srhDemoNo = controller.search.demographicNo;
 
-			if ($scope.search.mrpNo != null) $scope.searchParams.srhMrpNo = $scope.search.mrpNo;
-			if ($scope.search.status != null) $scope.searchParams.srhStatus = $scope.search.status;
-			if ($scope.search.team != allTeams) $scope.searchParams.srhTeam = $scope.search.team;
-			if ($scope.search.referralStartDate != null) $scope.searchParams.srhRefStartDate = $scope.search.referralStartDate.getTime();
-			if ($scope.search.referralEndDate != null) $scope.searchParams.srhRefEndDate = $scope.search.referralEndDate.getTime();
-			if ($scope.search.appointmentStartDate != null) $scope.searchParams.srhApptStartDate = $scope.search.appointmentStartDate.getTime();
-			if ($scope.search.appointmentEndDate != null) $scope.searchParams.srhApptEndDate = $scope.search.appointmentEndDate.getTime();
+			if (controller.search.mrpNo != null) controller.searchParams.srhMrpNo = controller.search.mrpNo;
+			if (controller.search.status != null) controller.searchParams.srhStatus = controller.search.status;
+			if (controller.search.team != allTeams) controller.searchParams.srhTeam = controller.search.team;
+			if (controller.search.referralStartDate != null) controller.searchParams.srhRefStartDate = controller.search.referralStartDate.getTime();
+			if (controller.search.referralEndDate != null) controller.searchParams.srhRefEndDate = controller.search.referralEndDate.getTime();
+			if (controller.search.appointmentStartDate != null) controller.searchParams.srhApptStartDate = controller.search.appointmentStartDate.getTime();
+			if (controller.search.appointmentEndDate != null) controller.searchParams.srhApptEndDate = controller.search.appointmentEndDate.getTime();
 
-			if ($scope.tableParams.page > 1) $scope.searchParams.srhToPage = $scope.tableParams.$params.page;
-			if ($scope.tableParams.count > 10) $scope.searchParams.srhCountPerPage = $scope.tableParams.$params.count;
-			if ($scope.tableParams.sorting["ReferralDate"] != "desc")
+			if (controller.tableParams.page > 1) controller.searchParams.srhToPage = controller.tableParams.$params.page;
+			if (controller.tableParams.count > 10) controller.searchParams.srhCountPerPage = controller.tableParams.$params.count;
+			if (controller.tableParams.sorting["ReferralDate"] != "desc")
 			{
-				$scope.searchParams.srhSortMode = Object.keys($scope.tableParams.sorting);
-				$scope.searchParams.srhSortDir = $scope.tableParams.sorting[$scope.searchParams.srhSortMode];
+				controller.searchParams.srhSortMode = Object.keys(controller.tableParams.sorting);
+				controller.searchParams.srhSortDir = controller.tableParams.sorting[controller.searchParams.srhSortMode];
 			}
 		};
 
-		$scope.justOpen = true;
+		controller.justOpen = true;
 
-		$scope.tableParams = new NgTableParams(
+		controller.tableParams = new NgTableParams(
 		{
 			page: 1, // show first page
 			count: 10, // initial count per page
@@ -288,56 +291,56 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 			total: 0, // length of data
 			getData: function(params)
 			{
-				if ($scope.justOpen)
+				if (controller.justOpen)
 				{
 					//process demographicNo in url, run only once
 					if ($state.params.demographicNo != null)
 					{
 						//called from patient record
-						$scope.hideSearchPatient = true;
-						$scope.search.demographicNo = Number($state.params.demographicNo);
+						controller.hideSearchPatient = true;
+						controller.search.demographicNo = Number($state.params.demographicNo);
 					}
 					else if ($location.search().srhDemoNo != null)
 					{
 						//come back from another consults
-						$scope.search.demographicNo = Number($location.search().srhDemoNo);
-						$scope.updateDemographicNo(null, $location.search().srhDemoNo);
+						controller.search.demographicNo = Number($location.search().srhDemoNo);
+						controller.updateDemographicNo(null, $location.search().srhDemoNo);
 					}
 
 					//process other search parameters in url
 					if ($location.search().srhMrpNo != null)
 					{
-						$scope.search.mrpNo = Number($location.search().srhMrpNo);
-						$scope.updateMrpNo($location.search().srhMrpNo);
+						controller.search.mrpNo = Number($location.search().srhMrpNo);
+						controller.updateMrpNo($location.search().srhMrpNo);
 					}
-					if ($location.search().srhRefStartDate != null) $scope.search.referralStartDate = new Date(Number($location.search().srhRefStartDate));
-					if ($location.search().srhRefEndDate != null) $scope.search.referralEndDate = new Date(Number($location.search().srhRefEndDate));
-					if ($location.search().srhApptStartDate != null) $scope.search.appointmentStartDate = new Date(Number($location.search().srhApptStartDate));
-					if ($location.search().srhApptEndDate != null) $scope.search.appointmentEndDate = new Date(Number($location.search().srhApptEndDate));
-					if ($location.search().srhStatus != null) $scope.search.status = Number($location.search().srhStatus);
-					if ($location.search().srhTeam != null) $scope.search.team = $location.search().srhTeam;
+					if ($location.search().srhRefStartDate != null) controller.search.referralStartDate = new Date(Number($location.search().srhRefStartDate));
+					if ($location.search().srhRefEndDate != null) controller.search.referralEndDate = new Date(Number($location.search().srhRefEndDate));
+					if ($location.search().srhApptStartDate != null) controller.search.appointmentStartDate = new Date(Number($location.search().srhApptStartDate));
+					if ($location.search().srhApptEndDate != null) controller.search.appointmentEndDate = new Date(Number($location.search().srhApptEndDate));
+					if ($location.search().srhStatus != null) controller.search.status = Number($location.search().srhStatus);
+					if ($location.search().srhTeam != null) controller.search.team = $location.search().srhTeam;
 
-					if ($location.search().srhCountPerPage != null) $scope.tableParams.$params.count = $location.search().srhCountPerPage;
-					if ($location.search().srhToPage != null) $scope.tableParams.$params.page = $location.search().srhToPage;
+					if ($location.search().srhCountPerPage != null) controller.tableParams.$params.count = $location.search().srhCountPerPage;
+					if ($location.search().srhToPage != null) controller.tableParams.$params.page = $location.search().srhToPage;
 
 					if ($location.search().srhSortMode != null && $location.search().srhSortDir != null)
 					{
-						$scope.sortMode = {};
-						$scope.sortMode[$location.search().srhSortMode] = $location.search().srhSortDir;
-						$scope.tableParams.$params.sorting = $scope.sortMode;
+						controller.sortMode = {};
+						controller.sortMode[$location.search().srhSortMode] = $location.search().srhSortDir;
+						controller.tableParams.$params.sorting = controller.sortMode;
 					}
-					$scope.justOpen = false;
+					controller.justOpen = false;
 				}
 
-				$scope.setSearchParams();
+				controller.setSearchParams();
 
 				var count = params.url().count;
 				var page = params.url().page;
 
-				$scope.search.startIndex = ((page - 1) * count);
-				$scope.search.numToReturn = parseInt(count);
+				controller.search.startIndex = ((page - 1) * count);
+				controller.search.numToReturn = parseInt(count);
 
-				var search1 = angular.copy($scope.search);
+				var search1 = angular.copy(controller.search);
 				search1.params = params.url();
 
 				if (search1.team === allTeams)
@@ -356,21 +359,21 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 							var consult = result.content[i];
 
 							//add statusDescription
-							for (var j = 0; j < $scope.statuses.length; j++)
+							for (var j = 0; j < controller.statuses.length; j++)
 							{
-								if (consult.status == $scope.statuses[j].value)
+								if (consult.status == controller.statuses[j].value)
 								{
-									consult.statusDescription = $scope.statuses[j].name;
+									consult.statusDescription = controller.statuses[j].name;
 									break;
 								}
 							}
 
 							//add urgencyDescription
-							for (var j = 0; j < $scope.urgencies.length; j++)
+							for (var j = 0; j < controller.urgencies.length; j++)
 							{
-								if (consult.urgency == $scope.urgencies[j].value)
+								if (consult.urgency == controller.urgencies[j].value)
 								{
-									consult.urgencyDescription = $scope.urgencies[j].name;
+									consult.urgencyDescription = controller.urgencies[j].name;
 									break;
 								}
 							}
@@ -390,17 +393,18 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 								if ((new Date()) >= rDate) consult.outstanding = true;
 							}
 						}
-						$scope.lastResponse = result.content;
+						controller.lastResponse = result.content;
 
 					},
 					function error(errors)
 					{
+						alert(errors);
 						console.log(errors);
 					});
 			}
 		});
 
-		$scope.popup = function popup(vheight, vwidth, varpage, winname)
+		controller.popup = function popup(vheight, vwidth, varpage, winname)
 		{
 			var page = varpage;
 			windowprops = "height=" + vheight + ",width=" + vwidth + ",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=0,left=0";

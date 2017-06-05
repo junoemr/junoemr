@@ -10,9 +10,11 @@ angular.module('Tickler').controller('Tickler.TicklerCommentController', [
 		tickler)
 	{
 
-		$scope.tickler = tickler;
+		var controller = this;
 
-		$scope.close = function()
+		controller.tickler = tickler;
+
+		controller.close = function()
 		{
 			$uibModalInstance.close("Someone Closed Me");
 		};

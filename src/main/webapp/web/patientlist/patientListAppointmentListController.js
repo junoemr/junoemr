@@ -20,21 +20,23 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 		providerService)
 	{
 
-		$scope.dateOptions = {
+		var controller = this;
+
+		controller.dateOptions = {
 			showWeeks: false
 		};
 
 		scheduleService.getStatuses().then(
 			function success(results)
 			{
-				$scope.statuses = results.content;
+				controller.statuses = results.content;
 			},
 			function error(errors)
 			{
 				console.log(errors);
 			});
 
-		$scope.getAppointmentTextStyle = function getAppointmentTextStyle(patient)
+		controller.getAppointmentTextStyle = function getAppointmentTextStyle(patient)
 		{
 			if (patient.demographicNo == 0)
 			{
@@ -45,7 +47,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 		};
 
 		//TODO:this gets called alot..should switch to a dictionary.
-		$scope.getAppointmentStyle = function getAppointmentStyle(patient)
+		controller.getAppointmentStyle = function getAppointmentStyle(patient)
 		{
 			if (patient.demographicNo == 0)
 			{
@@ -54,14 +56,14 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 				};
 			}
 
-			if ($scope.statuses != null)
+			if (controller.statuses != null)
 			{
-				for (var i = 0; i < $scope.statuses.length; i++)
+				for (var i = 0; i < controller.statuses.length; i++)
 				{
-					if ($scope.statuses[i].status == patient.status)
+					if (controller.statuses[i].status == patient.status)
 					{
 						return {
-							'background-color': $scope.statuses[i].color
+							'background-color': controller.statuses[i].color
 						};
 					}
 				}
@@ -71,23 +73,23 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 		};
 
 
-		$scope.today = function today()
+		controller.today = function today()
 		{
-			$scope.appointmentDate = new Date();
+			controller.appointmentDate = new Date();
 		};
 
-		$scope.today();
+		controller.today();
 
-		$scope.clear = function clear()
+		controller.clear = function clear()
 		{
-			$scope.appointmentDate = null;
+			controller.appointmentDate = null;
 		};
 
-		$scope.open = function open($event)
+		controller.open = function open($event)
 		{
 			$event.preventDefault();
 			$event.stopPropagation();
-			$scope.opened = true;
+			controller.opened = true;
 		};
 
 		Date.prototype.AddDays = function AddDays(noOfDays)
@@ -96,44 +98,44 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 			return this;
 		};
 
-		$scope.switchDay = function switchDay(n)
+		controller.switchDay = function switchDay(n)
 		{
-			var dateNew = $scope.appointmentDate;
+			var dateNew = controller.appointmentDate;
 			dateNew.AddDays(n);
 
-			$scope.appointmentDate = dateNew;
+			controller.appointmentDate = dateNew;
 
 			var formattedDate = $filter('date')(dateNew, 'yyyy-MM-dd');
 
-			$scope.changeApptList(formattedDate);
+			controller.changeApptList(formattedDate);
 
 
 		};
 
-		$scope.changeApptDate = function changeApptDate()
+		controller.changeApptDate = function changeApptDate()
 		{
-			if ($scope.appointmentDate == undefined)
+			if (controller.appointmentDate == undefined)
 			{
-				$scope.today();
+				controller.today();
 			}
-			var formattedDate = $filter('date')($scope.appointmentDate, 'yyyy-MM-dd');
-			$scope.changeApptList(formattedDate);
+			var formattedDate = $filter('date')(controller.appointmentDate, 'yyyy-MM-dd');
+			controller.changeApptList(formattedDate);
 		};
 
-		$scope.changeApptList = function changeApptList(day)
+		controller.changeApptList = function changeApptList(day)
 		{
 
 			temp = 0;
 
-			$scope.currenttab = $scope.tabItems[temp];
-			var lastIndx = $scope.currenttab.url.lastIndexOf("/");
-			$scope.currenttab.url = $scope.currenttab.url.slice(0, lastIndx + 1) + day;
-			$scope.showFilter = true;
-			$scope.refresh();
+			controller.currenttab = controller.tabItems[temp];
+			var lastIndx = controller.currenttab.url.lastIndexOf("/");
+			controller.currenttab.url = controller.currenttab.url.slice(0, lastIndx + 1) + day;
+			controller.showFilter = true;
+			controller.refresh();
 
 		};
 
-		$scope.addNewAppointment = function addNewAppointment()
+		controller.addNewAppointment = function addNewAppointment()
 		{
 			var modalInstance = $uibModal.open(
 			{
@@ -149,7 +151,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 					},
 					apptDate: function()
 					{
-						return $scope.appointmentDate;
+						return controller.appointmentDate;
 					}
 				}
 			});
@@ -157,7 +159,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 			modalInstance.result.then(
 				function success(results)
 				{
-					$scope.switchDay(0);
+					controller.switchDay(0);
 				},
 				function error(errors)
 				{
@@ -165,7 +167,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 				});
 		};
 
-		$scope.viewAppointment = function viewAppointment(apptNo)
+		controller.viewAppointment = function viewAppointment(apptNo)
 		{
 			var modalInstance = $uibModal.open(
 			{
@@ -193,7 +195,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 			modalInstance.result.then(
 				function success(results)
 				{
-					$scope.switchDay(0);
+					controller.switchDay(0);
 
 				},
 				function error(errors)

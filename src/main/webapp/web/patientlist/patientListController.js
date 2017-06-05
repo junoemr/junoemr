@@ -44,13 +44,15 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		personaService)
 	{
 
-		$scope.sidebar = Navigation;
+		var controller = this;
+		console.log("TEST");
+		controller.sidebar = Navigation;
 
-		$scope.showFilter = true;
-		$scope.patientListConfig = {};
+		controller.showFilter = true;
+		controller.patientListConfig = {};
 
 
-		$scope.goToRecord = function goToRecord(patient)
+		controller.goToRecord = function goToRecord(patient)
 		{
 			if (patient.demographicNo != 0)
 			{
@@ -64,7 +66,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 					if (angularUtil.inMobileView())
 					{
-						$scope.hidePatientList();
+						controller.hidePatientList();
 						console.log('hiding patientlist');
 					}
 				}
@@ -74,112 +76,112 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		};
 
 		//for filter box
-		$scope.query = '';
+		controller.query = '';
 
 
-		$scope.isActive = function isActive(temp)
+		controller.isActive = function isActive(temp)
 		{
-			if ($scope.currenttab === null)
+			if (controller.currenttab === null)
 			{
 				return false;
 			}
-			return temp === $scope.currenttab.id;
+			return temp === controller.currenttab.id;
 		};
 
-		$scope.isMoreActive = function isMoreActive(temp)
+		controller.isMoreActive = function isMoreActive(temp)
 		{
-			if ($scope.currentmoretab === null)
+			if (controller.currentmoretab === null)
 			{
 				return false;
 			}
-			return temp === $scope.currentmoretab.id;
+			return temp === controller.currentmoretab.id;
 		};
 
-		$scope.showPatientList = function showPatientList()
+		controller.showPatientList = function showPatientList()
 		{
 			$scope.$emit('configureShowPatientList', true);
 		};
 
-		$scope.hidePatientList = function hidePatientList()
+		controller.hidePatientList = function hidePatientList()
 		{
 			$scope.$emit('configureShowPatientList', false);
 		};
 
-		$scope.changeMoreTab = function changeMoreTab(temp, filter)
+		controller.changeMoreTab = function changeMoreTab(temp, filter)
 		{
-			var beforeChangeTab = $scope.currentmoretab;
-			$scope.currentmoretab = $scope.moreTabItems[temp];
+			var beforeChangeTab = controller.currentmoretab;
+			controller.currentmoretab = controller.moreTabItems[temp];
 
-			$scope.showFilter = true;
-			$scope.currenttab = null;
-			$scope.refresh(filter);
+			controller.showFilter = true;
+			controller.currenttab = null;
+			controller.refresh(filter);
 		};
 
-		$scope.changeTab = function changeTab(temp, filter)
+		controller.changeTab = function changeTab(temp, filter)
 		{
 			console.log('change tab - ' + temp);
-			$scope.currenttab = $scope.tabItems[temp];
-			$scope.showFilter = true;
-			$scope.currentmoretab = null;
-			$scope.refresh(filter);
+			controller.currenttab = controller.tabItems[temp];
+			controller.showFilter = true;
+			controller.currentmoretab = null;
+			controller.refresh(filter);
 
 		};
 
-		$scope.getMoreTabClass = function getMoreTabClass(id)
+		controller.getMoreTabClass = function getMoreTabClass(id)
 		{
-			if ($scope.currentmoretab != null && id == $scope.currentmoretab.id)
+			if (controller.currentmoretab != null && id == controller.currentmoretab.id)
 			{
 				return "more-tab-highlight";
 			}
 			return "";
 		};
 
-		$scope.currentPage = 0;
-		$scope.pageSize = 8;
-		$scope.patients = null;
+		controller.currentPage = 0;
+		controller.pageSize = 8;
+		controller.patients = null;
 
-		$scope.numberOfPages = function numberOfPages()
+		controller.numberOfPages = function numberOfPages()
 		{
-			if ($scope.nPages == null || $scope.nPages == 0)
+			if (controller.nPages == null || controller.nPages == 0)
 			{
 				return 1;
 			}
-			return $scope.nPages;
+			return controller.nPages;
 		};
 
 
 		$scope.$on('updatePatientListPagination', function(event, data)
 		{
 			console.log('updatePatientListPagination=' + data);
-			$scope.nPages = Math.ceil(data / $scope.pageSize);
-			console.log('nPages=' + $scope.nPages);
+			controller.nPages = Math.ceil(data / controller.pageSize);
+			console.log('nPages=' + controller.nPages);
 		});
 
 
-		$scope.changePage = function changePage(pageNum)
+		controller.changePage = function changePage(pageNum)
 		{
-			$scope.currentPage = pageNum;
+			controller.currentPage = pageNum;
 			//broadcast the change page
 			$scope.$broadcast('updatePatientList',
 			{
-				currentPage: $scope.currentPage,
-				pageSize: $scope.pageSize
+				currentPage: controller.currentPage,
+				pageSize: controller.pageSize
 			});
 		};
 
 
-		//  $scope.$watch("currentPage", function(newValue, oldValue) {
+		//  controller.$watch("currentPage", function(newValue, oldValue) {
 		//     console.log('currentPage changes from ' + oldValue + ' to ' + newValue);
 		//   });
 
 		$scope.$on('togglePatientListFilter', function(event, data)
 		{
 			console.log("received a togglePatientListFilter event:" + data);
-			$scope.showFilter = data;
+			controller.showFilter = data;
 		});
 
 
-		$scope.process = function process(tab, filter)
+		controller.process = function process(tab, filter)
 		{
 			if (tab.url != null)
 			{
@@ -204,30 +206,30 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 				}).then(
 					function success(results)
 					{
-						$scope.template = tab.template;
-						Navigation.load($scope.template);
+						controller.template = tab.template;
+						Navigation.load(controller.template);
 
-						$scope.currentPage = 0;
+						controller.currentPage = 0;
 
 						if (results.data.patients instanceof Array)
 						{
-							$scope.patients = results.data.patients;
+							controller.patients = results.data.patients;
 						}
 						else if (results.data.patients == undefined)
 						{
-							$scope.patients = [];
+							controller.patients = [];
 						}
 						else
 						{
 							var arr = new Array();
 							arr[0] = results.data.patients;
-							$scope.patients = arr;
+							controller.patients = arr;
 						}
 
-						$scope.nPages = 1;
-						if ($scope.patients != null && $scope.patients.length > 0)
+						controller.nPages = 1;
+						if (controller.patients != null && controller.patients.length > 0)
 						{
-							$scope.nPages = Math.ceil($scope.patients.length / $scope.pageSize);
+							controller.nPages = Math.ceil(controller.patients.length / controller.pageSize);
 						}
 
 					},
@@ -238,24 +240,24 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			}
 			else
 			{
-				$scope.changePage($scope.currentPage);
-				$scope.currentPage = 0;
-				$scope.nPages = 1;
-				$scope.template = tab.template;
-				Navigation.load($scope.template);
+				controller.changePage(controller.currentPage);
+				controller.currentPage = 0;
+				controller.nPages = 1;
+				controller.template = tab.template;
+				Navigation.load(controller.template);
 			}
 		};
 
-		$scope.refresh = function refresh(filter)
+		controller.refresh = function refresh(filter)
 		{
 
-			if ($scope.currenttab != null)
+			if (controller.currenttab != null)
 			{
-				$scope.process($scope.currenttab, filter);
+				controller.process(controller.currenttab, filter);
 			}
-			if ($scope.currentmoretab != null)
+			if (controller.currentmoretab != null)
 			{
-				$scope.process($scope.currentmoretab, filter);
+				controller.process(controller.currentmoretab, filter);
 			}
 
 		};
@@ -265,14 +267,14 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			{
 				if (results.patientListTabItems.length == undefined)
 				{
-					$scope.tabItems = [results.patientListTabItems];
+					controller.tabItems = [results.patientListTabItems];
 				}
 				else
 				{
-					$scope.tabItems = results.patientListTabItems;
+					controller.tabItems = results.patientListTabItems;
 				}
-				$scope.moreTabItems = results.patientListMoreTabItems;
-				$scope.changeTab(0);
+				controller.moreTabItems = results.patientListMoreTabItems;
+				controller.changeTab(0);
 			},
 			function error(errors)
 			{
@@ -282,8 +284,8 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		personaService.getPatientListConfig().then(
 			function success(results)
 			{
-				$scope.patientListConfig = results;
-				$scope.pageSize = $scope.patientListConfig.numberOfApptstoShow;
+				controller.patientListConfig = results;
+				controller.pageSize = controller.patientListConfig.numberOfApptstoShow;
 			},
 			function error(errors)
 			{
@@ -294,7 +296,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 
 
-		$scope.manageConfiguration = function manageConfiguration()
+		controller.manageConfiguration = function manageConfiguration()
 		{
 			var modalInstance = $uibModal.open(
 			{
@@ -306,7 +308,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 				{
 					config: function()
 					{
-						return $scope.patientListConfig;
+						return controller.patientListConfig;
 					}
 				}
 			});
@@ -317,9 +319,9 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 					personaService.setPatientListConfig(results).then(
 						function success(results)
 						{
-							$scope.patientListConfig = results;
-							$scope.pageSize = $scope.patientListConfig.numberOfApptstoShow;
-							$scope.$emit('updatePatientListPagination', $scope.patients.length);
+							controller.patientListConfig = results;
+							controller.pageSize = controller.patientListConfig.numberOfApptstoShow;
+							$scope.$emit('updatePatientListPagination', controller.patients.length);
 						},
 						function error(errors)
 						{
