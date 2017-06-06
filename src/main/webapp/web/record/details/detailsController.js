@@ -362,7 +362,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.needToSave = function needToSave()
 		{
 			if (page.dataChanged > 0) return "btn-primary";
-		}
+		};
 
 		//remind user of unsaved data
 		$scope.$on("$stateChangeStart", function(event)
