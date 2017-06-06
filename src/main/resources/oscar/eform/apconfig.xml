@@ -17,6 +17,35 @@
         <ap-sql>SELECT appointment_date from appointment WHERE appointment_no=${appt_no}</ap-sql>
         <ap-output>${appointment_date}</ap-output>
     </databaseap>
+    <databaseap>
+        <ap-name>appt_start_time</ap-name>
+        <ap-sql>SELECT start_time from appointment WHERE appointment_no=${appt_no}</ap-sql>
+        <ap-output>${start_time}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>appt_end_time</ap-name>
+        <ap-sql>SELECT end_time from appointment WHERE appointment_no=${appt_no}</ap-sql>
+        <ap-output>${end_time}</ap-output>
+    </databaseap>
+    <!-- Next booked appointment date -->
+    <databaseap>
+        <ap-name>next_appt_date</ap-name>
+        <ap-sql>SELECT appointment_date, start_time from appointment WHERE demographic_no = ${demographic} AND `status` NOT IN('C', 'N', 'NS') AND appointment_date >= CURDATE( )
+                  ORDER BY appointment_date LIMIT 1 </ap-sql>
+        <ap-output>${appointment_date}, ${start_time}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>next_appt_time</ap-name>
+        <ap-sql>SELECT LEFT(start_time,5) AS start_time from appointment WHERE demographic_no = ${demographic} AND `status` NOT IN('C', 'N', 'NS') AND appointment_date >= CURDATE( )
+                  ORDER BY appointment_date LIMIT 1 </ap-sql>
+        <ap-output>${start_time}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>nextf_appt_date</ap-name>
+        <ap-sql>SELECT DATE_FORMAT(appointment_date, '%Y-%b-%d' ) as nextf_appt_date from appointment WHERE demographic_no = ${demographic} AND `status` NOT IN('C', 'N', 'NS') AND appointment_date >= CURDATE( )
+                  ORDER BY appointment_date LIMIT 1 </ap-sql>
+        <ap-output>${nextf_appt_date}</ap-output>
+    </databaseap>
 
 <!-- Current eform information -->
     <databaseap>
@@ -46,6 +75,11 @@
         <ap-sql>SELECT provider.ohip_no FROM provider WHERE provider.provider_no='${provider}' </ap-sql>
         <ap-output>${ohip_no}</ap-output>
     </databaseap>
+    <databaseap>
+        <ap-name>current_user_specialty</ap-name>
+        <ap-sql>SELECT provider.specialty FROM provider WHERE provider.provider_no='${provider}'</ap-sql>
+        <ap-output>${specialty}</ap-output>
+    </databaseap>
      <databaseap>
         <ap-name>current_user_specialty_code</ap-name>
         <ap-sql>SELECT
@@ -71,6 +105,26 @@
 	<ap-sql>SELECT providerExt.signature FROM providerExt WHERE providerExt.provider_no='${provider}' </ap-sql>
 	<ap-output>${signature}</ap-output>
     </databaseap>
+   	<databaseap>
+		<ap-name>current_logged_in_user</ap-name>
+		<ap-sql>SELECT provider.first_name, provider.last_name FROM provider WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
+		<ap-output>${last_name}, ${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_logged_in_user_roles</ap-name>
+		<ap-sql>SELECT group_concat(role_name) as roles FROM secUserRole where provider_no='${loggedInProvider}'</ap-sql>
+		<ap-output>${roles}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_logged_in_user_type</ap-name>
+		<ap-sql>SELECT provider_type FROM provider where provider_no='${loggedInProvider}'</ap-sql>
+		<ap-output>${provider_type}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_logged_in_user_id</ap-name>
+		<ap-sql>SELECT '${loggedInProvider}' as id </ap-sql>
+		<ap-output>${id}</ap-output>
+	</databaseap>
     <databaseap>
 		<ap-name>current_user_takno</ap-name>
 		<ap-sql>SELECT p.alberta_tak_no as takno FROM provider p WHERE p.provider_no='${provider}' </ap-sql>
@@ -265,6 +319,18 @@
         <ap-output>${ageComplex}</ap-output>
     </databaseap>
     <databaseap>
+        <ap-name>ageComplex2</ap-name>
+        <ap-sql>SELECT (IF ( (TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate))&lt; 365,<!--IF  Less than one year Old -->
+                          (IF ((TO_DAYS(CURRENT_DATE)-TO_DAYS(@bdate))&lt; 31,<!-- {IF less than 31 days old -->
+                            CONCAT((TO_DAYS(CURRENT_DATE)-TO_DAYS(@bdate)), ' days old'),<!-- {Print Age in Days} -->
+                            (IF ((DAY(CURRENT_DATE)-DAY(@bdate))&lt;0,<!-- ELSE { print in  months and week}} -->
+                               CONCAT((((YEAR(CURRENT_DATE) - 1) * 12 + MONTH(CURRENT_DATE)-1) - ((YEAR(@bdate) - 1) * 12 + MONTH(@bdate))) - (MID(@bdate, 9, 2) &lt;  MID(@bdate, 9, 2)),' months ',FLOOR((DAY(CURRENT_DATE)/7)),' weeks old'),
+                                CONCAT((((YEAR(CURRENT_DATE) - 1) * 12 + MONTH(CURRENT_DATE)) - ((YEAR(@bdate) - 1) * 12 + MONTH(@bdate))) - (MID(@bdate, 9, 2) &lt;  MID(@bdate, 9, 2)),' month old ',FLOOR(((DAY(CURRENT_DATE)-DAY(@bdate))/7)),' weeks old'))))),
+                            CONCAT(TIMESTAMPDIFF(YEAR,@bdate,CURRENT_DATE)," years ",MOD(TIMESTAMPDIFF(MONTH,@bdate,CURRENT_DATE),12)," Months"))) as ageComplex2 from (SELECT @bdate:=
+                DATE_FORMAT(CONCAT((demographic.year_of_birth), '-', (demographic.month_of_birth), '-', (demographic.date_of_birth)),'%Y-%m-%d') AS birthdate FROM demographic WHERE demographic_no=${demographic}) as t</ap-sql>
+        <ap-output>${ageComplex2}</ap-output>
+    </databaseap>
+    <databaseap>
         <ap-name>sex</ap-name>
         <ap-sql>SELECT sex FROM demographic WHERE demographic_no=${demographic}</ap-sql>
         <ap-output>${sex}</ap-output>
@@ -273,6 +339,84 @@
         <ap-name>sin</ap-name>
         <ap-sql>SELECT sin FROM demographic WHERE demographic_no=${demographic}</ap-sql>
         <ap-output>${sin}</ap-output>
+    </databaseap>
+    
+    <!-- Multisite Information -->
+    <databaseap>
+        <ap-name>multisite_name_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(REPLACE(name,';','') SEPARATOR ';') AS name_list FROM site WHERE status=1 ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${name_list}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>multisite_fax_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(REPLACE(fax,';','') SEPARATOR ';') AS fax_list FROM site WHERE status=1 ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${fax_list}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>multisite_phone_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(REPLACE(phone,';','') SEPARATOR ';') AS phone_list FROM site WHERE status=1 ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${phone_list}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>multisite_full_address_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(
+					REPLACE(address,';',''), ' ', 
+					REPLACE(city,';',''), ' ', 
+					REPLACE(province,';',''), ' ', 
+					REPLACE(postal,';','')
+					SEPARATOR ';') AS address_list
+					FROM site
+					WHERE status=1
+					ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${address_list}</ap-output>
+    </databaseap>
+	<databaseap>
+        <ap-name>multisite_address_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(
+					REPLACE(address,';','')
+					SEPARATOR ';') AS address_list
+					FROM site
+					WHERE status=1
+					ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${address_list}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>multisite_city_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(
+					REPLACE(city,';','')
+					SEPARATOR ';') AS city_list
+					FROM site
+					WHERE status=1
+					ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${city_list}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>multisite_province_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(
+					REPLACE(province,';','')
+					SEPARATOR ';') AS province_list
+					FROM site
+					WHERE status=1
+					ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${province_list}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>multisite_postal_list</ap-name>
+        <ap-sql>SELECT GROUP_CONCAT(
+					REPLACE(postal,';','')
+					SEPARATOR ';') AS postal_list
+					FROM site
+					WHERE status=1
+					ORDER BY site_id;
+       	</ap-sql>
+        <ap-output>${postal_list}</ap-output>
     </databaseap>
 
 <!-- Patient medical information -->
@@ -293,7 +437,7 @@
         <ap-output>${omeds}</ap-output>
     </databaseap>
     <databaseap>
-        <ap-name>social_family_historyc</ap-name>
+        <ap-name>social_family_history</ap-name>
         <ap-sql>SELECT GROUP_CONCAT(t.socialHistory SEPARATOR ', ') as socialHistories FROM( SELECT notes.note as socialHistory FROM (SELECT cn.position, iss.id, iss.demographic_no as demo, iss.issue_id, cin.note_id, cn.note
 		FROM casemgmt_issue iss, casemgmt_issue_notes cin, casemgmt_note cn, issue i
 		WHERE iss.id = cin.id AND iss.issue_id=i.issue_id AND i.code='SocHistory' AND cin.note_id = cn.note_id AND iss.demographic_no =${demographic} 
@@ -388,6 +532,22 @@
                 FROM drugs d WHERE d.demographic_no=${demographic} AND d.end_date &gt; DATE_ADD(CURDATE(), INTERVAL -1 WEEK) AND d.archived='0';</ap-sql>
         <ap-output>${rxlist}</ap-output>
     </databaseap>
+    <databaseap>
+    	<!-- get the latest note uuid by observation_date. Then the latest revision by update_date -->
+        <ap-name>latest_echart_note</ap-name>
+        <ap-sql>SELECT cmn.note AS note FROM casemgmt_note cmn
+				JOIN (SELECT DISTINCT a.uuid FROM casemgmt_note a
+					WHERE a.demographic_no=${demographic}
+					AND a.include_issue_innote='0'
+					ORDER BY a.observation_date DESC LIMIT 1)
+				AS A ON (cmn.uuid = A.uuid)
+				WHERE cmn.demographic_no=${demographic}
+				AND include_issue_innote='0'
+				ORDER BY update_date
+				DESC LIMIT 1;
+		</ap-sql>
+        <ap-output>${note}</ap-output>
+    </databaseap>
 
 <!-- Prenatal information -->
     <databaseap>
@@ -462,10 +622,27 @@
         <ap-output>${first_init}. ${last_name}</ap-output>
     </databaseap>
     <databaseap>
+        <ap-name>provider_specialty</ap-name>
+        <ap-sql>SELECT provider.specialty FROM provider, demographic
+                WHERE demographic_no=${demographic} AND demographic.provider_no=provider.provider_no</ap-sql>
+        <ap-output>${specialty}</ap-output>
+    </databaseap>
+    <databaseap>
         <ap-name>doctor_work_phone</ap-name>
         <ap-sql>SELECT provider.work_phone FROM provider, demographic
                 WHERE demographic.demographic_no=${demographic} AND demographic.provider_no=provider.provider_no</ap-sql>
         <ap-output>${work_phone}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>doctor_fax</ap-name>
+       	<ap-sql>SELECT SUBSTR(p.comments,
+       				LOCATE('&lt;xml_p_fax&gt;', p.comments )+11,
+       				LOCATE('&lt;/xml_p_fax&gt;', p.comments )-(LOCATE('&lt;xml_p_fax&gt;', p.comments )+11)
+    				) as fax 
+				FROM provider p JOIN demographic d ON(d.provider_no=p.provider_no)
+				WHERE d.demographic_no = ${demographic};
+   		</ap-sql>
+        <ap-output>${fax}</ap-output>
     </databaseap>
     <databaseap>
 	<ap-name>doctor_signature</ap-name>
@@ -478,6 +655,13 @@
         <ap-sql>SELECT p.last_name, p.first_name FROM provider p, appointment a
                 WHERE p.provider_no=a.provider_no AND a.appointment_no=${appt_no}</ap-sql>
         <ap-output>${last_name}, ${first_name}</ap-output>
+    </databaseap>
+    <databaseap>
+        <ap-name>appt_provider_ohip_no</ap-name>
+        <ap-sql>SELECT p.ohip_no
+				FROM provider p INNER JOIN appointment a ON (p.provider_no=a.provider_no)
+				WHERE a.appointment_no=${appt_no}</ap-sql>
+        <ap-output>${ohip_no}</ap-output>
     </databaseap>
     <databaseap>
         <ap-name>appt_provider_id</ap-name>
