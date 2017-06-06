@@ -69,7 +69,8 @@ public class LoginFilter implements Filter {
 		"/EFormImageViewForPdfGenerationServlet",
 		"/EFormResourceViewForPdfGenerationServlet",
 		"/eform/efmformemail_form.jsp",
-		"/share/javascript/jquery/"
+		"/share/javascript/jquery/",
+		"/share//javascript/jquery/"
 	};
 
 	/*
