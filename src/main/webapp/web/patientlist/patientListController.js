@@ -33,6 +33,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 	'angularUtil',
 	'Navigation',
 	'personaService',
+	'patientListState',
 
 	function(
 		$scope,
@@ -41,11 +42,11 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		$uibModal,
 		angularUtil,
 		Navigation,
-		personaService)
+		personaService,
+		patientListState)
 	{
 
 		var controller = this;
-		console.log("TEST");
 		controller.sidebar = Navigation;
 
 		controller.showFilter = true;
@@ -119,12 +120,10 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 		controller.changeTab = function changeTab(temp, filter)
 		{
-			console.log('change tab - ' + temp);
-			controller.currenttab = controller.tabItems[temp];
+			controller.currenttab = patientListState.tabItems[temp];
 			controller.showFilter = true;
 			controller.currentmoretab = null;
 			controller.refresh(filter);
-
 		};
 
 		controller.getMoreTabClass = function getMoreTabClass(id)
@@ -262,17 +261,15 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 		};
 
+		$scope.$on('juno:patientListRefresh', function()
+		{
+			controller.refresh();
+		});
+
 		personaService.getPatientLists().then(
 			function success(results)
 			{
-				if (results.patientListTabItems.length == undefined)
-				{
-					controller.tabItems = [results.patientListTabItems];
-				}
-				else
-				{
-					controller.tabItems = results.patientListTabItems;
-				}
+				patientListState.tabItems = results.patientListTabItems;
 				controller.moreTabItems = results.patientListMoreTabItems;
 				controller.changeTab(0);
 			},
@@ -301,7 +298,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'patientlist/patientListConfiguration.jsp',
-				controller: 'PatientList.PatientListConfigController',
+				controller: 'PatientList.PatientListConfigController as patientListConfigCtrl',
 				backdrop: false,
 				size: 'lg',
 				resolve:
