@@ -241,7 +241,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					<span class="dropdown-toggle hand-hover"
 								data-toggle="dropdown"
 								title="<bean:message key="navbar.user" bundle="ui"/>">
-						<span class="glyphicon glyphicon-user"></span>{{me.firstName}}
+						<span class="glyphicon glyphicon-user"></span>{{navBarCtrl.me.firstName}}
 					</span>
 					<ul class="dropdown-menu" role="menu">
 						<li ng-repeat="item in navBarCtrl.userMenuItems">
@@ -262,17 +262,17 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<!-- nav bar is done here -->
 
 	 <!-- Start patient List template -->
-	<div class="container-fluid" id="patient-list-template" ng-controller="PatientList.PatientListController" >
+	<div class="container-fluid" id="patient-list-template" ng-controller="PatientList.PatientListController as patientListCtrl" >
 		<div class="row">
 			<div id="left-pane-hidden" class="col-xs-1" ng-if="!bodyCtrl.showPatientList">
-				<button class="toggle-patient-list-button" type="button"  ng-click="showPatientList()" title="Show Patient List">
+				<button class="toggle-patient-list-button" type="button"  ng-click="patientListCtrl.showPatientList()" title="Show Patient List">
 					<span class="glyphicon glyphicon-chevron-right"></span>
 				</button>
 			</div>
 
 			<div id="left-pane"
 					class="col-lg-2 col-md-3 col-sm-4 col-xs-7"
-					ng-controller="PatientList.PatientListAppointmentListController"
+					ng-controller="PatientList.PatientListAppointmentListController as patientListAppointmentListCtrl"
 					ng-if="bodyCtrl.showPatientList">
 
 				<%--<ul class="nav nav-tabs">
@@ -291,7 +291,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 				<div id="left-pane-header" class="row vertical-align">
 					<div class="col-sm-2 col-xs-3">
-						<button class="toggle-patient-list-button" type="button" class="pull-left" ng-click="hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
+						<button class="toggle-patient-list-button" type="button" class="pull-left" ng-click="patientListCtrl.hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
 							<span class="glyphicon glyphicon-chevron-left"></span>
 						</button>
 					</div>
@@ -305,7 +305,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					</div>
 					<%--NOTE: Need to give this controller access to the addNewAppointment() function before this button can be used here --%>
 					<div class="col-md-2">
-						<a class="hand-hover" ng-click="addNewAppointment()"><span class="glyphicon glyphicon-plus" title="Add appointment"></span></a>
+						<a class="hand-hover" ng-click="patientListAppointmentListCtrl.addNewAppointment()"><span class="glyphicon glyphicon-plus" title="Add appointment"></span></a>
 					</div>
 				</div>
 
@@ -326,9 +326,9 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 						
 
-						<div ng-include="sidebar.location"></div>
+						<div ng-include="patientListCtrl.sidebar.location"></div>
 						<div class="col-md-2 pull-right">
-							<span title="<bean:message key="patientList.pagination" bundle="ui"/>">{{currentPage+1}}/{{numberOfPages()}}</span>
+							<span title="<bean:message key="patientList.pagination" bundle="ui"/>">{{patientListCtrl.currentPage+1}}/{{patientListCtrl.numberOfPages()}}</span>
 						</div>
 					</div>
 				</div>
@@ -441,6 +441,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="dashboard/ticklerConfigureController.js"></script>
 
 	<script type="text/javascript" src="patientlist/module.js"></script>
+	<script type="text/javascript" src="patientlist/patientListState.js"></script>
 	<script type="text/javascript" src="patientlist/patientListController.js"></script>
 	<script type="text/javascript" src="patientlist/patientListAppointmentListController.js"></script>
 	<script type="text/javascript" src="patientlist/patientListConfigController.js"></script>
@@ -464,7 +465,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="record/tracker/trackerController.js"></script>
 
 	<script type="text/javascript" src="tickler/module.js"></script>
-	<script type="text/javascript" src="tickler/ticklerController.js"></script>
+	<script type="text/javascript" src="tickler/ticklerListController.js"></script>
 	<script type="text/javascript" src="tickler/ticklerViewController.js"></script>
 	<script type="text/javascript" src="tickler/ticklerAddController.js"></script>
 	<script type="text/javascript" src="tickler/ticklerNoteController.js"></script>
