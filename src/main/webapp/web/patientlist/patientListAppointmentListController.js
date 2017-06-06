@@ -8,6 +8,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 	'Navigation',
 	'scheduleService',
 	'providerService',
+	'patientListState',
 
 	function(
 		$scope,
@@ -17,7 +18,8 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 		$uibModal,
 		Navigation,
 		scheduleService,
-		providerService)
+		providerService,
+		patientListState)
 	{
 
 		var controller = this;
@@ -127,12 +129,11 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 
 			temp = 0;
 
-			controller.currenttab = controller.tabItems[temp];
+			controller.currenttab = patientListState.tabItems[temp];
 			var lastIndx = controller.currenttab.url.lastIndexOf("/");
 			controller.currenttab.url = controller.currenttab.url.slice(0, lastIndx + 1) + day;
 			controller.showFilter = true;
-			controller.refresh();
-
+			$scope.$emit('juno:patientListRefresh');
 		};
 
 		controller.addNewAppointment = function addNewAppointment()
@@ -140,7 +141,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'schedule/appointmentAdd.jsp',
-				controller: 'Schedule.AppointmentAddController',
+				controller: 'Schedule.AppointmentAddController as appointmentAddCtrl',
 				backdrop: false,
 				size: 'lg',
 				resolve:
@@ -172,7 +173,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'schedule/appointmentView.jsp',
-				controller: 'Schedule.AppointmentViewController',
+				controller: 'Schedule.AppointmentViewController as appointmentViewCtrl',
 				backdrop: false,
 				size: 'lg',
 				resolve:
