@@ -480,6 +480,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="billing/billingController.js"></script>
 
 	<script type="text/javascript" src="consults/module.js"></script>
+	<script type="text/javascript" src="consults/consultRequestAttachmentController.js"></script>
+	<script type="text/javascript" src="consults/consultResponseAttachmentController.js"></script>
 	<script type="text/javascript" src="consults/consultRequestListController.js"></script>
 	<script type="text/javascript" src="consults/consultRequestController.js"></script>
 	<script type="text/javascript" src="consults/consultResponseListController.js"></script>
