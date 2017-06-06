@@ -169,7 +169,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		};
 
 
-		//  controller.$watch("currentPage", function(newValue, oldValue) {
+		//  $scope.$watch("currentPage", function(newValue, oldValue) {
 		//     console.log('currentPage changes from ' + oldValue + ' to ' + newValue);
 		//   });
 
