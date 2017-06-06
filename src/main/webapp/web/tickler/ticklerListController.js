@@ -214,7 +214,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'tickler/ticklerAdd.jsp',
-				controller: 'Tickler.TicklerAddController',
+				controller: 'Tickler.TicklerAddController as ticklerAddCtrl',
 				backdrop: false,
 				size: 'lg'
 			});
@@ -240,7 +240,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'tickler/ticklerView.jsp',
-				controller: 'Tickler.TicklerViewController',
+				controller: 'Tickler.TicklerViewController as ticklerViewCtrl',
 				backdrop: false,
 				size: 'lg',
 				resolve:
@@ -301,7 +301,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 				var modalInstance = $uibModal.open(
 				{
 					templateUrl: 'tickler/ticklerNote.jsp',
-					controller: 'Tickler.TicklerNoteController',
+					controller: 'Tickler.TicklerNoteController as ticklerNoteCtrl',
 					resolve:
 					{
 						ticklerNote: function()
@@ -327,7 +327,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'tickler/ticklerComments.jsp',
-				controller: 'Tickler.TicklerCommentController',
+				controller: 'Tickler.TicklerCommentController as ticklerCommentCtrl',
 				resolve:
 				{
 					tickler: function()
