@@ -76,6 +76,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.page.currentFilter = 'none';
 		controller.page.onlyNotes = false;
 
+		controller.demographicNo = $stateParams.demographicNo;
+
 		//get access rights
 		securityService.hasRight("_eChart", "r", $stateParams.demographicNo).then(
 			function success(results)
@@ -582,7 +584,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'record/summary/groupNotes.jsp',
-				controller: 'Record.Summary.GroupNotesController',
+				controller: 'Record.Summary.GroupNotesController as groupNotesCtrl',
 				size: size,
 				resolve:
 				{
