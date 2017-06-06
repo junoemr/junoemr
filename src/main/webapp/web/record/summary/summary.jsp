@@ -27,34 +27,44 @@
 
 <div class="col-xs-12 summary-section">
 	<div class="row">
-		<div class="col-lg-12" ng-hide="page.canRead">
+		<div class="col-lg-12" ng-hide="summaryCtrl.page.canRead">
 			<bean:message key="oscarEncounter.accessDenied"/>
 		</div>
 	</div>
 
 	<div class="row filter-bar">
-		<div class="col-sm-12" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+		<div class="col-sm-12" ng-show="summaryCtrl.page.canRead" ng-click="summaryCtrl.checkAction($event)" ng-keypress="summaryCtrl.checkAction($event)">
 			<ul class="nav nav-pills">
-				<li ng-class="isCurrentStatus('none')"><a data-target="#all" ng-click="removeFilter(0)" data-toggle="tab" class="hand-hover">All</a></li>
-				<li ng-class="isCurrentStatus('Just My Notes')"><a ng-click="changeNoteFilter('Just My Notes')" class="hand-hover">Just My Encounter Notes</a></li>
-				<li ng-class="isOnlyNotesStatus()"><a ng-click="setOnlyNotes()" class="hand-hover">Just Encounter Notes</a></li>
-				<li><a href="#" data-target="#tracker" role="tab" data-toggle="tab" ng-click="getTrackerUrl(demographicNo)" >Tracker</a></li>
-				<li class="pull-right"><span style="margin-top:12px;" class="glyphicon glyphicon-print" ng-click="showPrintModal(page.notes.notelist)"></span></li>
+				<li ng-class="summaryCtrl.isCurrentStatus('none')">
+					<a data-target="#all" ng-click="summaryCtrl.removeFilter(0)" data-toggle="tab" class="hand-hover">All</a>
+				</li>
+				<li ng-class="summaryCtrl.isCurrentStatus('Just My Notes')">
+					<a ng-click="summaryCtrl.changeNoteFilter('Just My Notes')" class="hand-hover">Just My Encounter Notes</a>
+				</li>
+				<li ng-class="summaryCtrl.isOnlyNotesStatus()">
+					<a ng-click="summaryCtrl.setOnlyNotes()" class="hand-hover">Just Encounter Notes</a>
+				</li>
+				<li>
+					<a href="#" data-target="#tracker" role="tab" data-toggle="tab" ng-click="summaryCtrl.getTrackerUrl(summaryCtrl.demographicNo)" >Tracker</a>
+				</li>
+				<li class="pull-right">
+					<span class="glyphicon glyphicon-print" ng-click="summaryCtrl.showPrintModal(summaryCtrl.page.notes.notelist)"></span>
+				</li>
 			</ul>
 		</div><!-- middleSpace -->
 	</div>
 	<div class="row">
-		<div class="col-md-3 col-sm-4 col-xs-12" ng-show="page.canRead">
-			<fieldset class="module-list" ng-repeat="mod in page.columnOne.modules">
+		<div class="col-md-3 col-sm-4 col-xs-12" ng-show="summaryCtrl.page.canRead">
+			<fieldset class="module-list" ng-repeat="mod in summaryCtrl.page.columnOne.modules">
 				<div class="row vertical-align">
 					<div class="col-md-8 col-sm-8">
-						<h5 class="summary-section-heading" ng-click="toggleList(mod)">
+						<h5 class="summary-section-heading" ng-click="summaryCtrl.toggleList(mod)">
 							{{mod.displayName}} 
 						</h5>
 					</div>
 					<div class="col-md-4 col-sm-4">
 						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" 
-							ng-click="openPreventions(demographicNo)" 
+							ng-click="summaryCtrl.openPreventions(summaryCtrl.demographicNo)" 
 							ng-if="mod.summaryCode=='preventions'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</a>
@@ -65,8 +75,8 @@
 						</a>--%>
 
 						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" 
-							ng-click="gotoState('add', mod)" 
-							ng-disabled="page.cannotAdd" 
+							ng-click="summaryCtrl.gotoState('add', mod)" 
+							ng-disabled="summaryCtrl.page.cannotAdd" 
 							ng-if="mod.summaryCode=='othermeds' || mod.summaryCode=='ongoingconcerns' || 
 								mod.summaryCode=='medhx' || mod.summaryCode=='sochx' || mod.summaryCode=='famhx' || 
 								mod.summaryCode=='reminders' || mod.summaryCode=='riskfactors' || mod.summaryCode=='riskfactors' ">
@@ -74,30 +84,37 @@
 						</a>
 
 						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" 
-							ng-click="openRx(demographicNo)" 
+							ng-click="summaryCtrl.openRx(summaryCtrl.demographicNo)" 
 							ng-if="mod.summaryCode=='meds'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</a>
 						
 						<a href="javascript:void(0)"  class=" btn btn-xs btn-success pull-right" 
-							ng-click="openAllergies(demographicNo)" 
+							ng-click="summaryCtrl.openAllergies(summaryCtrl.demographicNo)" 
 							ng-if="mod.summaryCode=='allergies'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</a>
 
-						<a href="#/record/{{demographicNo}}/forms" class="btn btn-xs btn-success pull-right" 
+						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" 
+							ng-click="summaryCtrl.gotoState('add', mod)"
 							ng-if="mod.summaryCode=='assessments'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</a>
+
+						<%--<a href="#/record/{{summaryCtrl.demographicNo}}/forms" class="btn btn-xs btn-success pull-right" 
+							ng-if="mod.summaryCode=='assessments'">
+							Add <span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>
+						</a>--%>
 					</div>
 				</div>
 				
 
-				<ul class="list-unstyled" style="padding-left:5px;">
+				<ul class="list-unstyled">
 					<%-- href="{{item.action}}" --%>
-					<li ng-repeat="item in mod.summaryItem" ng-show="isSectionExpanded(mod)" >
+					<li ng-repeat="item in mod.summaryItem" ng-show="summaryCtrl.isSectionExpanded(mod)" >
 						<p><span class="pull-right">{{item.date | date : 'dd MMM yyyy'}}</span></p>
-						<a ng-click="gotoState(item,mod,item.id)" href="javascript:void(0)" ng-class="item.indicatorClass">{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}
+						<a ng-click="summaryCtrl.gotoState(item,mod,item.id)" href="javascript:void(0)" ng-class="item.indicatorClass">
+							{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}
 							<small ng-show="item.classification">({{item.classification}})</small>
 						</a> 
 					</li> 			
@@ -108,18 +125,21 @@
 					<a href="#/record/{{demographicNo}}/forms" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-show="mod.summaryCode=='assessments'"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>--%>
 				</ul>
 				<span class="glyphicon hand-hover pull-right glyphicon-chevron-up"  
-						ng-click="toggleList(mod)" 
-						ng-show="isSectionExpanded(mod) && !isSectionEmpty(mod)" >
+						ng-click="summaryCtrl.toggleList(mod)" 
+						ng-show="summaryCtrl.isSectionExpanded(mod) && !summaryCtrl.isSectionEmpty(mod)" >
 				</span>
 				<span class="glyphicon hand-hover pull-right glyphicon-chevron-down" 
-						ng-click="toggleList(mod)"
-						ng-show="!isSectionExpanded(mod) && !isSectionEmpty(mod)">
+						ng-click="summaryCtrl.toggleList(mod)"
+						ng-show="!summaryCtrl.isSectionExpanded(mod) && !summaryCtrl.isSectionEmpty(mod)">
 				</span>
 
 			</fieldset>   
 		</div>
 
-		<div class="col-md-6 col-sm-7 col-xs-10 col-sm-offset-0 col-xs-offset-1 note-list" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+		<div class="col-md-6 col-sm-7 col-xs-10 col-sm-offset-0 col-xs-offset-1 note-list" n
+				ng-show="summaryCtrl.page.canRead" 
+				ng-click="summaryCtrl.checkAction($event)" 
+				ng-keypress="summaryCtrl.checkAction($event)">
 			<div class="tab-content">
 				<div class="tab-pane active" id="all">
 					<%--<dl infinite-scroll="addMoreItems()">
@@ -144,36 +164,36 @@
 						</dd>                                   
 					</dl>--%>
 
-					<div infinite-scroll="addMoreItems()">
+					<div infinite-scroll="summaryCtrl.addMoreItems()">
 						
 						<div class="note-container col-xs-12 note" 
-								ng-repeat="note in page.notes.notelist" 
-								ng-style="setColor(note)" 
-								ng-click="editNote(note)"
-								ng-show="showNote(note)">
-							<div class="row note-header" ng-show="showNoteHeader(note)" >
+								ng-repeat="note in summaryCtrl.page.notes.notelist" 
+								ng-style="summaryCtrl.setColor(note)" 
+								ng-click="summaryCtrl.editNote(note)"
+								ng-show="summaryCtrl.showNote(note)">
+							<div class="row note-header" ng-show="summaryCtrl.showNoteHeader(note)" >
 								<div class="col-xs-1 pull-left">
 									<input type="checkbox" ng-model="note.isSelected"/> 
 								</div>
 								<div class="col-xs-6 pull-left note-header-name">
-									<h5>{{firstLine(note)}}</h5>
+									<h5>{{summaryCtrl.firstLine(note)}}</h5>
 								</div>
 								<div class="col-xs-4 note-header-date pull-right">
 									<h6>{{note.observationDate | date : 'dd-MMM-yyyy'}}</h6>
 								</div>
 							</div>
 							<div class="row note-body" 
-									ng-class="isNoteBeingEdited(note)" 
-									ng-show="showNote(note)"  
+									ng-class="summaryCtrl.isNoteBeingEdited(note)" 
+									ng-show="summaryCtrl.showNote(note)"  
 									ng-hide="note.cpp==true" 
-									ng-dblclick="editNote(note)">
-								<p >
+									ng-dblclick="summaryCtrl.editNote(note)">
+								<p>
 									{{note.note}}
 								</p>
 								<hr class="note-divider">
 							</div>
 
-							<div class="row note-footer" ng-show="showNote(note)">
+							<div class="row note-footer" ng-show="summaryCtrl.showNote(note)">
 								<div class="col-md-7">
 									<div class="p-inline">
 										<p class="text-muted"><bean:message key="oscarEncounter.editors.title"/>:</p>
@@ -189,7 +209,7 @@
 								<div class="col-md-5 note-footer-right">
 									<div class="p-inline">
 										<p class="text-muted"><bean:message key="oscarEncounter.noteRev.title"/>:</p>
-										<p ng-click="openRevisionHistory(note)" class="hand-hover">{{note.revision}}</p>
+										<p ng-click="summaryCtrl.openRevisionHistory(note)" class="hand-hover">{{note.revision}}</p>
 									</div>
 
 									<div class="p-inline">
@@ -208,7 +228,7 @@
 					id="trackerSlim"
 					scrolling="No"
 					frameborder="0"
-					ng-src="{{ trackerUrl }}"
+					ng-src="{{ summaryCtrl.trackerUrl }}"
 					width="100%"
 					style="min-height:820px"
 					></iframe>
@@ -217,8 +237,10 @@
 			</div><!-- tab content -->  
 		</div>
 		
-		<div class="col-md-3 col-xs-10 col-sm-offset-0 col-xs-offset-1" ng-show="page.canRead" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
-			<fieldset ng-repeat="mod in page.columnThree.modules">
+		<div class="col-md-3 col-xs-10 col-sm-offset-0 col-xs-offset-1" ng-show="summaryCtrl.page.canRead" 
+				ng-click="summaryCtrl.checkAction($event)" 
+				ng-keypress="summaryCtrl.checkAction($event)">
+			<fieldset ng-repeat="mod in summaryCtrl.page.columnThree.modules">
 				<legend style="margin-bottom:0px;">{{mod.displayName}}
 					<div class="form-group">
 						<input type="text" class="form-control search-query" ng-model="incomingQ" placeholder="Search">
@@ -226,9 +248,9 @@
 				</legend>
 				<ul style="padding-left:12px;">
 					<%-- href="{{item.action}}" --%>
-					<li ng-repeat="item in mod.summaryItem | filter:incomingQ" ng-show="isSectionExpanded(mod)"  >
+					<li ng-repeat="item in mod.summaryItem | filter:incomingQ" ng-show="summaryCtrl.isSectionExpanded(mod)"  >
 						<span class="pull-right">{{item.date | date : 'dd-MMM-yyyy'}}</span>
-						<a ng-click="gotoState(item)" class="hand-hover" ng-class="{true: 'abnormal', false: ''}[item.abnormalFlag]">{{item.displayName}}
+						<a ng-click="summaryCtrl.gotoState(item)" class="hand-hover" ng-class="{true: 'abnormal', false: ''}[item.abnormalFlag]">{{item.displayName}}
 							<small ng-show="item.classification">({{item.classification}})</small>
 						</a> 
 					</li> 
@@ -236,12 +258,12 @@
 						
 				<%--<span ng-class="showMoreItemsSymbol(mod)" ng-click="toggleList(mod)" ng-show="showMoreItems(mod)"></span>--%>
 				<span class="glyphicon hand-hover pull-right glyphicon-chevron-up"  
-						ng-click="toggleList(mod)" 
-						ng-show="isSectionExpanded(mod) && !isSectionEmpty(mod)" >
+						ng-click="summaryCtrl.toggleList(mod)" 
+						ng-show="summaryCtrl.isSectionExpanded(mod) && !summaryCtrl.isSectionEmpty(mod)" >
 				</span>
 				<span class="glyphicon hand-hover pull-right glyphicon-chevron-down" 
-						ng-click="toggleList(mod)"
-						ng-show="!isSectionExpanded(mod) && !isSectionEmpty(mod)">
+						ng-click="summaryCtrl.toggleList(mod)"
+						ng-show="!summaryCtrl.isSectionExpanded(mod) && !summaryCtrl.isSectionEmpty(mod)">
 				</span>
 			</fieldset>
 			

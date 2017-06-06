@@ -26,22 +26,22 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <div class="modal-content">
     <div class="modal-header">
-        <button type="button" class="close" ng-click="close()" aria-label="Close">&times;</button>
+        <button type="button" class="close" ng-click="appointmentAddCtrl.close()" aria-label="Close">&times;</button>
         <h3 class="modal-title">Create an appointment</h3>
     </div>
     <div class="modal-body">
-        <div class="row margin-bottom" ng-if="appointment.demographic != null">
+        <div class="row margin-bottom" ng-if="appointmentAddCtrl.appointment.demographic != null">
             <div class="col-sm-10 col-sm-offset-1">
                 <div class="col-sm-2 pull-right">
                     <img class="img-rounded" 
-                        ng-src="../imageRenderingServlet?source=local_client&clientId={{appointment.demographic.demographicNo}}"/>
+                        ng-src="../imageRenderingServlet?source=local_client&clientId={{appointmentAddCtrl.appointment.demographic.demographicNo}}"/>
                 </div>
                 <div class="col-sm-2 text-right pull-right">
-                    <div class="row blue-text"><h4 class="no-margin">{{appointment.demographic.lastName}},
-                        {{appointment.demographic.firstName}}</h4>
+                    <div class="row blue-text"><h4 class="no-margin">{{appointmentAddCtrl.appointment.demographic.lastName}},
+                        {{appointmentAddCtrl.appointment.demographic.firstName}}</h4>
                     </div>
-                    <div class="row">{{appointment.demographic.hin}}</div>
-                    <div class="row">{{appointment.demographic.dateOfBirth | date :
+                    <div class="row">{{appointmentAddCtrl.appointment.demographic.hin}}</div>
+                    <div class="row">{{appointmentAddCtrl.appointment.demographic.dateOfBirth | date :
                         'yyyy-MM-dd'}}
                     </div>
                 </div>
@@ -61,45 +61,45 @@
                     <div class="form-group col-sm-6">
                         <label class="control-label">Patient</label>
                         <input type="text"
-                            ng-model="appointment.demographicName" placeholder="Patient"
-                            uib-typeahead="pt.demographicNo as pt.name for pt in searchPatients($viewValue)"
-                            typeahead-on-select="updateDemographicNo($item, $model, $label)"
+                            ng-model="appointmentAddCtrl.appointment.demographicName" placeholder="Patient"
+                            uib-typeahead="pt.demographicNo as pt.name for pt in appointmentAddCtrl.searchPatients($viewValue)"
+                            typeahead-on-select="appointmentAddCtrl.updateDemographicNo($item, $model, $label)"
                             class="form-control form-control-details">
                     </div>
 
                     <div class="form-group col-sm-6">
                         <label class="control-label">Provider</label> 
                         <input type="text"
-                            ng-model="appointment.providerName"
+                            ng-model="appointmentAddCtrl.appointment.providerName"
                             placeholder="Provider"
-                            uib-typeahead="pt.providerNo as pt.name for pt in searchProviders($viewValue)"
-                            typeahead-on-select="updateProviderNo($item, $model, $label)"
+                            uib-typeahead="pt.providerNo as pt.name for pt in appointmentAddCtrl.searchProviders($viewValue)"
+                            typeahead-on-select="appointmentAddCtrl.updateProviderNo($item, $model, $label)"
                             class="form-control">
                     </div>
 
                     <div class="form-group col-sm-6">
                         <label class="control-label">Start Time</label>
                         <%--<div class="bootstrap-timepicker"> --%>
-                            <input ng-model="appointment.startTime" id="startTime"
+                            <input ng-model="appointmentAddCtrl.appointment.startTime" id="startTime"
                                 placeholder="Start Time" class="form-control form-control-details"/>
                         <%--</div>--%>
                     </div>
 
                     <div class="form-group col-sm-6">
                         <label class="control-label">Duration</label> 
-                        <input ng-model="appointment.duration"
+                        <input ng-model="appointmentAddCtrl.appointment.duration"
                             placeholder="Duration" class="form-control"/>
                     </div>
 
                     <div class="form-group col-sm-6">
                         <label class="control-label">Type</label>
-                        <select ng-model="appointment.type" ng-init="appointment.type=''"
-                            ng-options="p.name as p.name for p in types" class="form-control" ng-change="selectType()">
+                        <select ng-model="appointmentAddCtrl.appointment.type" ng-init="appointmentAddCtrl.appointment.type=''"
+                            ng-options="p.name as p.name for p in appointmentAddCtrl.types" class="form-control" ng-change="appointmentAddCtrl.selectType()">
                         </select>
                     </div>
                     <div class="form-group col-sm-6">
                         <label class="control-label">Critical</label>
-                        <select ng-model="appointment.critical" ng-options="p.value as p.label for p in urgencies"
+                        <select ng-model="appointmentAddCtrl.appointment.critical" ng-options="p.value as p.label for p in appointmentAddCtrl.urgencies"
                             class="form-control">
                         </select>
                     </div>
@@ -107,27 +107,27 @@
 
                     <div class="form-group col-sm-6">
                         <label class="control-label">Reason</label>
-                        <textarea ng-model="appointment.reason" placeholder="Reason"
+                        <textarea ng-model="appointmentAddCtrl.appointment.reason" placeholder="Reason"
                             class="form-control" rows="5">
                         </textarea>
                     </div>
 
                     <div class="form-group col-sm-6">
                         <label class="control-label">Notes</label>
-                        <textarea ng-model="appointment.notes" type="text"
+                        <textarea ng-model="appointmentAddCtrl.appointment.notes" type="text"
                             placeholder="Notes" class="form-control" rows="5">
                         </textarea>
                     </div>
 
                     <div class="form-group col-sm-6">
                         <label class="control-label">Location</label> 
-                        <input ng-model="appointment.location"
+                        <input ng-model="appointmentAddCtrl.appointment.location"
                             placeholder="Location" class="form-control"/>
                     </div>
 
                     <div class="form-group col-sm-6">
                         <label class="control-label">Resources</label> 
-                        <input ng-model="appointment.resources"
+                        <input ng-model="appointmentAddCtrl.appointment.resources"
                             type="text" placeholder="Resources" class="form-control"/>
                     </div>
                 </form>
@@ -229,10 +229,10 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-default" ng-click="close()">
+        <button class="btn btn-default" ng-click="appointmentAddCtrl.close()">
             <bean:message key="global.cancel" bundle="ui"/>
         </button>
-        <button class="btn btn-success" ng-click="save()">Save</button>
+        <button class="btn btn-success" ng-click="appointmentAddCtrl.save()">Save</button>
     </div>
 </div>
 

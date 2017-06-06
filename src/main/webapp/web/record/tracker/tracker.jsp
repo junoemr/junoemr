@@ -30,17 +30,17 @@
 </div>
 -->
 
-<div style="margin-left:15px;margin-right:15px;">
-			  <iframe
-			  	id="trackerSlim"
-			  	name="trackerSlim"
-			  	scrolling="No"
-			  	frameborder="0"
-			  	ng-src="{{getTrackerUrl(demographicNo)}}"
-			  	width="100%"
-			  	onload="resizeIframe(this)"
-				style="min-height:820px"
-			  ></iframe>
+<div>
+    <iframe
+        id="trackerSlim"
+        name="trackerSlim"
+        scrolling="No"
+        frameborder="0"
+        ng-src="{{trackerCtrl.getTrackerUrl(demographicNo)}}"
+        width="100%"
+        onload="trackerCtrl.resizeIframe(this)"
+        style="min-height:820px">
+    </iframe>
 </div>
 
 <%-- TODO replace with angular

@@ -91,7 +91,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/ticklers',
 			templateUrl: 'tickler/ticklerList.jsp',
-			controller: 'Tickler.TicklerListController',
+			controller: 'Tickler.TicklerListController as ticklerListCtrl',
 			resolve:
 			{
 				providers: function(providerService)
@@ -190,7 +190,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/record/:demographicNo',
 			templateUrl: 'record/record.jsp',
-			controller: 'Record.RecordController',
+			controller: 'Record.RecordController as recordCtrl',
 			resolve:
 			{
 				demo: function($stateParams, demographicService)
@@ -207,47 +207,47 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/details',
 			templateUrl: 'record/details/details.jsp',
-			controller: 'Record.Details.DetailsController'
+			controller: 'Record.Details.DetailsController as detailsCtrl'
 		})
 		.state('record.summary',
 		{
 			url: '/summary?appointmentNo&encType',
 			templateUrl: 'record/summary/summary.jsp',
-			controller: 'Record.Summary.SummaryController'
+			controller: 'Record.Summary.SummaryController as summaryCtrl'
 		})
 		.state('record.forms',
 		{
 			url: '/forms',
 			templateUrl: 'record/forms/forms.jsp',
-			controller: 'Record.Forms.FormController'
+			controller: 'Record.Forms.FormController as formCtrl'
 		}).state('record.forms.new',
 		{
 			url: '/:type/:id',
 			templateUrl: 'record/forms/forms.jsp',
-			controller: 'Record.Forms.FormController'
+			controller: 'Record.Forms.FormController as formCtrl'
 		}).state('record.forms.existing',
 		{
 			url: '/:type/id/:id',
 			templateUrl: 'record/forms/forms.jsp',
-			controller: 'Record.Forms.FormController'
+			controller: 'Record.Forms.FormController as formCtrl'
 		})
 		.state('record.consultRequests',
 		{
 			url: '/consults',
 			templateUrl: 'consults/consultRequestList.jsp',
-			controller: 'Consults.ConsultRequestListController'
+			controller: 'Consults.ConsultRequestListController as consultRequestListCtrl'
 		})
 		.state('record.consultResponses',
 		{
 			url: '/consultResponses',
 			templateUrl: 'consults/consultResponseList.jsp',
-			controller: 'Consults.ConsultResponseListController'
+			controller: 'Consults.ConsultResponseListController as consultResponseListCtrl'
 		})
 		.state('record.consultRequest',
 		{
 			url: '/consult/:requestId',
 			templateUrl: 'consults/consultRequest.jsp',
-			controller: 'Consults.ConsultRequestController',
+			controller: 'Consults.ConsultRequestController as consultRequestCtrl',
 			resolve:
 			{
 				consult: function($stateParams, consultService)
@@ -264,7 +264,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/consultResponse/:responseId',
 			templateUrl: 'consults/consultResponse.jsp',
-			controller: 'Consults.ConsultResponseController',
+			controller: 'Consults.ConsultResponseController as consultResponseCtrl',
 			resolve:
 			{
 				consult: function($stateParams, consultService)
@@ -281,7 +281,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/tickler',
 			templateUrl: 'tickler/ticklerList.jsp',
-			controller: 'Tickler.TicklerListController',
+			controller: 'Tickler.TicklerListController as ticklerListCtrl',
 			resolve:
 			{
 				providers: function(providerService)
@@ -296,13 +296,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/tracker',
 			templateUrl: 'record/tracker/tracker.jsp',
-			controller: 'Record.Tracker.TrackerController'
+			controller: 'Record.Tracker.TrackerController as trackerCtrl'
 		})
 		.state('record.phr',
 		{
 			url: '/phr',
 			templateUrl: 'record/phr/phr.jsp',
-			controller: 'Record.PHR.PHRController'
+			controller: 'Record.PHR.PHRController as phrCtrl'
 		});
 
 

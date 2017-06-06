@@ -32,11 +32,13 @@
 
 <!-- make div layout more fluid see medical history as an example -->
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<div class="modal-content" ng-click="checkAction($event)" ng-keypress="checkAction($event)">
+<div class="modal-content" ng-click="groupNotesCtrl.checkAction($event)" ng-keypress="groupNotesCtrl.checkAction($event)">
 
 	<div class="modal-header"> <!-- ng-style="setColor(note.cpp)" -->
-		<button type="button" class="close" data-dismiss="modal" aria-label="<bean:message key="global.close"/>" ng-click="cancel()"><span aria-hidden="true" >&times;</span></button>
-		<h3 class="modal-title">{{page.title}}</h3>
+		<button type="button" class="close" data-dismiss="modal" aria-label="<bean:message key="global.close"/>" ng-click="groupNotesCtrl.cancel()">
+			<span aria-hidden="true" >&times;</span>
+		</button>
+		<h3 class="modal-title">{{groupNotesCtrl.page.title}}</h3>
 	</div>
 
 	<div class="modal-body">
@@ -91,13 +93,23 @@
 				<form id="frmIssueNotes"> 
 					<div class="form-group col-xs-12"> 
 						<label class=" control-label">Note</label>
-						<textarea class="form-control" rows="8" placeholder="Enter Note" ng-model="groupNotesForm.encounterNote.note" ng-change="setEditingNoteFlag()" style="margin-bottom:6px;" required></textarea>
-						<em><small><bean:message key="oscarEncounter.editors.title"/>: <span>{{ groupNotesForm.encounterNote.providerName }}</span></small></em>  
+						<textarea class="form-control" rows="8" placeholder="Enter Note" 
+							ng-model="groupNotesCtrl.groupNotesForm.encounterNote.note" 
+							ng-change="groupNotesCtrl.setEditingNoteFlag()" 
+							required>
+						</textarea>
+						<em><small><bean:message key="oscarEncounter.editors.title"/>: 
+							<span>{{ groupNotesCtrl.groupNotesForm.encounterNote.providerName }}</span>
+						</small></em>  
 						<div class="pull-right">
 							<em>
 								<small>
-									<bean:message key="oscarEncounter.encounterDate.title"/>: <span>{{groupNotesForm.encounterNote.updateDate | date : 'dd-MMM-yyyy'}}</span>  
-									<bean:message key="oscarEncounter.noteRev.title"/>: <a href="javascript:void(0)" ng-click="openRevisionHistory(groupNotesForm.encounterNote)">{{groupNotesForm.encounterNote.revision}}</a>
+									<bean:message key="oscarEncounter.encounterDate.title"/>: 
+									<span>{{groupNotesCtrl.groupNotesForm.encounterNote.updateDate | date : 'dd-MMM-yyyy'}}</span>  
+									<bean:message key="oscarEncounter.noteRev.title"/>: 
+									<a href="javascript:void(0)" ng-click="groupNotesCtrl.openRevisionHistory(groupNotesForm.encounterNote)">
+										{{groupNotesCtrl.groupNotesForm.encounterNote.revision}}
+									</a>
 								</small>
 							</em>
 						</div>
@@ -118,28 +130,37 @@
 						
 					</div>--%>
 						
-					<div class="form-group col-xs-6" ng-if="page.code == 'ongoingconcerns' " >
-						<label class="control-label"><bean:message key="oscarEncounter.problemdescription.title" /></label>				
-						<input type="text" class="form-control" id="problemdescription"	name="problemdescription" ng-model="groupNotesForm.groupNoteExt.problemDesc" placeholder="<bean:message key="oscarEncounter.problemdescription.title" />" />
+					<div class="form-group col-xs-6" ng-if="groupNotesCtrl.page.code == 'ongoingconcerns' " >
+						<label class="control-label">
+							<bean:message key="oscarEncounter.problemdescription.title" />
+						</label>				
+						<input type="text" class="form-control" id="problemdescription"	name="problemdescription" 
+							ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.problemDesc" 
+							placeholder="<bean:message key="oscarEncounter.problemdescription.title" />" />
 					</div>
 
-					<div class="form-group col-xs-6" ng-if="page.code == 'ongoingconcerns' "">
-						<label class="control-label"><bean:message key="oscarEncounter.problemStatus.title" /><span class="glyphicon glyphicon-info-sign" tooltip="Examples: <bean:message key="oscarEncounter.problemStatusExample.msg" />"> </span></label>
-						<input type="text" class="form-control" id="problemstatus" name="problemstatus" ng-model="groupNotesForm.groupNoteExt.problemStatus" placeholder="<bean:message key="oscarEncounter.problemStatus.title" /> " />
+					<div class="form-group col-xs-6" ng-if="groupNotesCtrl.page.code == 'ongoingconcerns' ">
+						<label class="control-label">
+							<bean:message key="oscarEncounter.problemStatus.title" />
+							<span class="glyphicon glyphicon-info-sign" tooltip="Examples: <bean:message key="oscarEncounter.problemStatusExample.msg" />"> </span>
+						</label>
+						<input type="text" class="form-control" id="problemstatus" name="problemstatus" 
+							ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.problemStatus" 
+							placeholder="<bean:message key="oscarEncounter.problemStatus.title" /> " 
+						/>
 						<!-- example: <bean:message key="oscarEncounter.problemStatusExample.msg" /> -->
 					</div><!-- row -->
-				
 				
 					<div class="form-group col-xs-6">		    
 						<label class="control-label"><bean:message key="oscarEncounter.startdate.title" /></label>
 						<div class="input-group">
 							<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.startdate.title" />"  
-							ng-model="groupNotesForm.groupNoteExt.startDate" 
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="false" 
-							is-open="startDatePicker" 
-							ng-click="startDatePicker = true" 
-							placeholder="YYYY-MM-DD"
+								ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.startDate" 
+								datepicker-popup="yyyy-MM-dd" 
+								datepicker-append-to-body="false" 
+								is-open="startDatePicker" 
+								ng-click="startDatePicker = true" 
+								placeholder="YYYY-MM-DD"
 							/>
 							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
 						</div>
@@ -149,60 +170,79 @@
 						<label class="control-label"><bean:message key="oscarEncounter.resolutionDate.title" /></label>			  
 						<div class="input-group">	
 							<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.resolutionDate.title" />"  
-							ng-model="groupNotesForm.groupNoteExt.resolutionDate" 
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="false" 
-							is-open="resolutionDatePicker" 
-							ng-click="resolutionDatePicker = true" 
-							placeholder="YYYY-MM-DD"
+								ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.resolutionDate" 
+								datepicker-popup="yyyy-MM-dd" 
+								datepicker-append-to-body="false" 
+								is-open="resolutionDatePicker" 
+								ng-click="resolutionDatePicker = true" 
+								placeholder="YYYY-MM-DD"
 							/>
 							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
 						</div>
 					</div>		    
 
-					<div class="form-group col-xs-6" ng-if="page.code == 'famhx' || page.code == 'riskfactors'">
+					<div class="form-group col-xs-6" ng-if="groupNotesCtrl.page.code == 'famhx' || groupNotesCtrl.page.code == 'riskfactors'">
 						<label class="control-label"><bean:message key="oscarEncounter.ageAtOnset.title" /></label>
-						<input type="text" class="form-control" id="ageatonset" name="ageatonset" ng-model="groupNotesForm.groupNoteExt.ageAtOnset" placeholder="<bean:message key="oscarEncounter.ageAtOnset.title" />" />
-
+						<input type="text" class="form-control" id="ageatonset" 
+							name="ageatonset" 
+							ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.ageAtOnset" 
+							placeholder="<bean:message key="oscarEncounter.ageAtOnset.title" />" 
+						/>
 					</div>
 
-					<div class="form-group col-xs-6" ng-if="page.code == 'famhx'">
+					<div class="form-group col-xs-6" ng-if="groupNotesCtrl.page.code == 'famhx'">
 						<label><bean:message key="oscarEncounter.relationship.title" /></label>
-						<input type="text" class="form-control" id="relationship" name="relationship" ng-model="groupNotesForm.groupNoteExt.relationship" placeholder="<bean:message key="oscarEncounter.relationship.title" />" />
-						
+						<input type="text" class="form-control" id="relationship" 
+							name="relationship" 
+							ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.relationship" 
+							placeholder="<bean:message key="oscarEncounter.relationship.title" />" 
+						/>
 					</div>
 
-					<div class="form-group col-xs-6" ng-if="page.code == 'medhx'">
-						<div ng-if="page.code == 'medhx' || page.code == 'famhx' " > 
+					<div class="form-group col-xs-6" ng-if="groupNotesCtrl.page.code == 'medhx'">
+						<div ng-if="groupNotesCtrl.page.code == 'medhx' || groupNotesCtrl.page.code == 'famhx' " > 
 							<label class="control-label"><bean:message key="oscarEncounter.treatment.title" /></label>
-							<input  type="text" class="form-control" id="treatment" name="treatment" ng-model="groupNotesForm.groupNoteExt.treatment" placeholder="<bean:message key="oscarEncounter.treatment.title" />" />
+							<input  type="text" class="form-control" id="treatment" 
+								name="treatment" 
+								ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.treatment" 
+								placeholder="<bean:message key="oscarEncounter.treatment.title" />" 
+							/>
 						</div>
 					</div>
 
-					<div class="form-group col-xs-6" ng-if="page.code == 'medhx'" >	
+					<div class="form-group col-xs-6" ng-if="groupNotesCtrl.page.code == 'medhx'" >	
 						<label class="control-label"><bean:message key="oscarEncounter.procedureDate.title" /></label>	 
 						<div class="input-group">   	
-							<input type="text" class="form-control" id="proceduredate" name="proceduredate" placeholder="<bean:message key="oscarEncounter.procedureDate.title" />" 
-							ng-model="groupNotesForm.groupNoteExt.procedureDate" 
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="false" 
-							is-open="procedureDatePicker" 
-							ng-click="procedureDatePicker = true" 
-							placeholder="YYYY-MM-DD"
+							<input type="text" class="form-control" 
+								id="proceduredate" 
+								name="proceduredate" 
+								placeholder="<bean:message key="oscarEncounter.procedureDate.title" />" 
+								ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.procedureDate" 
+								datepicker-popup="yyyy-MM-dd" 
+								datepicker-append-to-body="false" 
+								is-open="procedureDatePicker" 
+								ng-click="procedureDatePicker = true" 
+								placeholder="YYYY-MM-DD"
 							/>
 							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
 						</div>
 					</div>
 
-					<div class="form-group col-xs-6"  ng-if="page.code == 'riskfactors' ">
+					<div class="form-group col-xs-6"  ng-if="groupNotesCtrl.page.code == 'riskfactors' ">
 						<label class="control-label"><bean:message key="oscarEncounter.exposureDetail.title" /></label>				    							
-						<input  type="text" class="form-control" id="exposuredetail" name="exposuredetail" ng-model="groupNotesForm.groupNoteExt.exposureDetail" placeholder="<bean:message key="oscarEncounter.exposureDetail.title" />" />
+						<input  type="text" class="form-control" id="exposuredetail" 
+							name="exposuredetail" 
+							ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.exposureDetail" 
+							placeholder="<bean:message key="oscarEncounter.exposureDetail.title" />" 
+						/>
 					</div>		
 				
-					<div class="form-group col-xs-6" ng-if="page.code == 'medhx' || page.code == 'famhx' || page.code == 'ongoingconcerns' || page.code == 'riskfactors' ">		    
+					<div class="form-group col-xs-6" ng-if="groupNotesCtrl.page.code == 'medhx' || groupNotesCtrl.page.code == 'famhx' || groupNotesCtrl.page.code == 'ongoingconcerns' || groupNotesCtrl.page.code == 'riskfactors' ">		    
 						<label class="control-label"><bean:message key="oscarEncounter.lifestage.title" /></label>
 						
-						<select class="form-control" name="lifestage" id="lifestage" ng-model="groupNotesForm.groupNoteExt.lifeStage">
+						<select class="form-control" name="lifestage" 
+								id="lifestage" 
+								ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.lifeStage">
 							<option value="">
 								<bean:message key="oscarEncounter.lifestage.opt.notset" />
 							</option>
@@ -228,9 +268,9 @@
 					<div class="form-group col-xs-6">
 						<label class="control-label"><bean:message key="oscarEncounter.Index.assnIssue" /></label>			
 						<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.Index.assnIssue" />"
-							uib-typeahead="i.issueId as i.code for i in searchIssues($viewValue)" 
-							typeahead-on-select="assignIssue($item, $model, $label);selectedIssue='';" 
-							ng-model="selectedIssue" 
+							uib-typeahead="i.issueId as i.code for i in groupNotesCtrl.searchIssues($viewValue)" 
+							typeahead-on-select="groupNotesCtrl.assignIssue($item, $model, $label); groupNotesCtrl.selectedIssue='';" 
+							ng-model="groupNotesCtrl.selectedIssue" 
 							typeahead-loading="loadingIssues"
 							typeahead-min-length="3"
 							/>
@@ -246,24 +286,24 @@
 					<div class="form-group col-xs-6">
 						<label class="control-label"><bean:message key="oscarEncounter.hideFromPrint.title" /></label>
 						<!--shouldn't this just be a single checkbox and the answer is always no unless checked?-->				    
-						<div ng-init="groupNotesForm.groupNoteExt.hideCpp=0">
+						<div ng-init="groupNotesCtrl.groupNotesForm.groupNoteExt.hideCpp=0">
 							<label class="radio-inline" id="hidecpp" name="hidecpp">
-								<input type="radio" id="hidecpp" name="hidecpp" ng-model="groupNotesForm.groupNoteExt.hideCpp" value="0"> No
+								<input type="radio" id="hidecpp" name="hidecpp" ng-model="ggroupNotesCtrl.roupNotesForm.groupNoteExt.hideCpp" value="0"> No
 							</label>
 							<label class="radio-inline" >
-								<input type="radio" id="hidecpp" name="hidecpp" ng-model="groupNotesForm.groupNoteExt.hideCpp" value="1"> Yes
+								<input type="radio" id="hidecpp" name="hidecpp" ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.hideCpp" value="1"> Yes
 							</label>
 						</div><!-- form-group -->
 					</div>
 
 					<div class="form-group col-xs-12">
 						<label class="control-label"><bean:message key="oscarEncounter.addFromDxReg.title" /></label>
-						<div class="btn-group dropdown" ng-repeat="qlist in page.quickLists">
+						<div class="btn-group dropdown" ng-repeat="qlist in groupNotesCtrl.page.quickLists">
 							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								{{qlist.label}} <span class="caret"></span>
 							</button>
 							<ul class="dropdown-menu">
-								<li><a ng-repeat="item in qlist.dxList" ng-click="addDxItem(item)" >{{item.description}}</a></li>
+								<li><a ng-repeat="item in qlist.dxList" ng-click="groupNotesCtrl.addDxItem(item)" >{{item.description}}</a></li>
 							</ul>
 						</div>
 					</div>
@@ -279,14 +319,6 @@
 						</div>
 					</div> -->
 				</form>
-
-
-
-
-
-
-
-
 
 				<%--Old Horizontal version of the form--%>
 
@@ -507,8 +539,12 @@
 		<input type="image"	src="<c:out value="${ctx}/oscarEncounter/graphics/copy.png"/>" title='<bean:message key="oscarEncounter.Index.btnCopy"/>' onclick="copyCppToCurrentNote(); return false;"> 
 		<input type="image"	src="<c:out value="${ctx}/oscarEncounter/graphics/annotation.png"/>" title='<bean:message key="oscarEncounter.Index.btnAnnotation"/>' id="anno" style="padding-right: 10px;"> 
 		<input type="image"	src="<c:out value="${ctx}/oscarEncounter/graphics/edit-cut.png"/>" title='<bean:message key="oscarEncounter.Index.btnArchive"/>' onclick="$('archived').value='true';" style="padding-right: 10px;">-->
-		<button ng-click="cancel()" type="button" class="btn"><bean:message key="modal.newPatient.cancel" bundle="ui"/></button>
-		<button ng-click="archiveGroupNotes()" type="button" class="btn btn-danger" ng-hide="page.cannotChange"><bean:message key="oscarEncounter.Index.btnArchive"/></button>	
-		<button ng-click="saveGroupNotes()" type="button" class="btn btn-success" ng-hide="page.cannotChange"><bean:message key="oscarEncounter.Index.btnSignSave"/></button>	
+		<button ng-click="groupNotesCtrl.cancel()" type="button" class="btn"><bean:message key="modal.newPatient.cancel" bundle="ui"/></button>
+		<button ng-click="groupNotesCtrl.archiveGroupNotes()" type="button" class="btn btn-danger" ng-hide="groupNotesCtrl.page.cannotChange">
+			<bean:message key="oscarEncounter.Index.btnArchive"/>
+		</button>	
+		<button ng-click="groupNotesCtrl.saveGroupNotes()" type="button" class="btn btn-success" ng-hide="groupNotesCtrl.page.cannotChange">
+			<bean:message key="oscarEncounter.Index.btnSignSave"/>
+		</button>	
 	</div>
 </div>
