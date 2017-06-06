@@ -76,7 +76,7 @@
 	}
 }
 
-@media (max-width: 768px) {
+@media (max-width: $screen-sm) {
 	.summary-section {
 		.note-list {
 			margin-top: $margin-md;
