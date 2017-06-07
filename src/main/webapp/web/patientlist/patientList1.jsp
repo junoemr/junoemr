@@ -43,20 +43,20 @@
 						</h6>
 					</th>
 					<th class="list-patient-date-cell">
-						<%--<span class="glyphicon glyphicon-calendar"></span>--%>
 						<a href="javascript:void(0)"
-							 ng-model="patientListAppointmentListCtrl.appointmentDate"
-							 ng-change="patientListAppointmentListCtrl.changeApptDate()"
-							 ng-click="appointmentDatePicker = true"
-							 uib-datepicker-popup="yyyy-MM-dd"
-							 datepicker-append-to-body="true"
-							 is-open="appointmentDatePicker"
-							 datepicker-options="patientListAppointmentListCtrl.dateOptions"
-							 show-button-bar="false"
-							 popup-placement="bottom"
-							 bundle="ui"
-							 title="{{patientListAppointmentListCtrl.appointmentDate | date:'yyyy-MM-dd' }}"
-						>{{patientListAppointmentListCtrl.appointmentDate | date:'yyyy-MM-dd' }}</a>
+							ng-model="patientListAppointmentListCtrl.appointmentDate"
+							ng-change="patientListAppointmentListCtrl.changeApptDate()"
+							ng-click="appointmentDatePicker = true"
+							uib-datepicker-popup="yyyy-MM-dd"
+							datepicker-append-to-body="true"
+							is-open="appointmentDatePicker"
+							datepicker-options="patientListAppointmentListCtrl.dateOptions"
+							show-button-bar="true"
+							popup-placement="bottom"
+							bundle="ui"
+							title="{{patientListAppointmentListCtrl.appointmentDate | date:'yyyy-MM-dd' }}">
+							{{patientListAppointmentListCtrl.appointmentDate | date:'yyyy-MM-dd' }}
+						</a>
 					</th>
 					<th class="pull-left">
 						<h6>
