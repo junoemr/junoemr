@@ -39,13 +39,13 @@ angular.module("Common.Services").service("uxService", [
 
 			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/recordMenu').then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("uxService::menu error", error);
+					console.log("uxService::menu error", errors);
 					deferred.reject("An error occurred while fetching menu");
 				});
 
@@ -59,13 +59,13 @@ angular.module("Common.Services").service("uxService", [
 			$http.post(service.apiPath + '/searchTemplates?startIndex=' +
 				encodeURIComponent(startIndex) + "&itemsToReturn=" +
 				encodeURIComponent(itemsToReturn), search).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("uxService::searchTemplates error", error);
+					console.log("uxService::searchTemplates error", errors);
 					deferred.reject("An error occurred while searching templates");
 				});
 
@@ -76,13 +76,13 @@ angular.module("Common.Services").service("uxService", [
 		{
 			var deferred = $q.defer();
 			$http.post(service.apiPath + '/template', name).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("uxService::getTemplate error", error);
+					console.log("uxService::getTemplate error", errors);
 					deferred.reject("An error occurred while fetching template");
 				});
 

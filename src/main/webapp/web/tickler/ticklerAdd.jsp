@@ -24,16 +24,16 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<form name="ticklerAddForm" ng-submit="save()" novalidate>
+<form name="ticklerAddForm" ng-submit="ticklerAddCtrl.save()" novalidate>
 
 <div class="modal-header">
-	<button type="button" class="close" ng-click="close()" aria-label="Close">&times;</button>	
+	<button type="button" class="close" ng-click="ticklerAddCtrl.close()" aria-label="Close">&times;</button>	
     <h3><bean:message key="tickler.add.title" bundle="ui"/></h3>
 </div>
 <div class="modal-body">
 	<div class="row">
 		<div class="col-sm-10 col-sm-offset-1">
-			<div class="row" ng-show="showErrors === true">
+			<div class="row" ng-show="ticklerAddCtrl.showErrors === true">
 				<div class="col-xs-12">
 					<ul>
 						<li class="text-danger" ng-repeat="error in errors">{{error}}</li>
@@ -46,21 +46,23 @@
 					<div class="form-group">
 						<label>Patient:</label>
 						<juno-patient-typeahead
-								juno-model="demographicSearch"
+								juno-model="ticklerAddCtrl.demographicSearch"
 								juno-placeholder="<bean:message key="tickler.add.patient" bundle="ui"/>">
 						</juno-patient-typeahead>
 					</div>
 
 				</div>
 				<div class="col-xs-5">
-					<div class="row" ng-if="tickler.demographic != null">
+					<div class="row" ng-if="ticklerAddCtrl.tickler.demographic != null">
 						<div class="col-xs-3">
-							<img width="60px" ng-src="../imageRenderingServlet?source=local_client&clientId={{tickler.demographic.demographicNo}}"/>
+							<img width="60px" ng-src="../imageRenderingServlet?source=local_client&clientId={{ticklerAddCtrl.tickler.demographic.demographicNo}}"/>
 						</div>
 						<div class="col-xs-9">
-							<div class="blue-text"><h4 class="no-margin">{{tickler.demographic.lastName}}, {{tickler.demographic.firstName}}</h4></div>
-							<div>{{tickler.demographic.hin}}</div>
-							<div>{{tickler.demographic.dateOfBirth | date : 'yyyy-MM-dd'}}</div>
+							<div class="blue-text">
+								<h4 class="no-margin">{{ticklerAddCtrl.tickler.demographic.lastName}}, {{ticklerAddCtrl.tickler.demographic.firstName}}</h4>
+							</div>
+							<div>{{ticklerAddCtrl.tickler.demographic.hin}}</div>
+							<div>{{ticklerAddCtrl.tickler.demographic.dateOfBirth | date : 'yyyy-MM-dd'}}</div>
 						</div>
 					</div>
 
@@ -71,10 +73,11 @@
 				<div class="col-xs-7">
 					<div class="form-group">
 						<label>Assign to:</label>
-						<input type="text" ng-model="tickler.taskAssignedToName" placeholder="<bean:message key="tickler.add.provider" bundle="ui"/>"
-						uib-typeahead="pt.providerNo as pt.name for pt in searchProviders($viewValue)"
-						typeahead-on-select="updateProviderNo($item, $model, $label)"
-						class="form-control">
+						<input type="text" ng-model="ticklerAddCtrl.tickler.taskAssignedToName" placeholder="<bean:message key="tickler.add.provider" bundle="ui"/>"
+							uib-typeahead="pt.providerNo as pt.name for pt in ticklerAddCtrl.searchProviders($viewValue)"
+							typeahead-on-select="ticklerAddCtrl.updateProviderNo($item, $model, $label)"
+							class="form-control"
+						>
 					</div>
 
 				</div>
@@ -82,7 +85,9 @@
 				<div class="col-xs-5">
 					<div class="form-group">
 						<label><bean:message key="tickler.add.priority" bundle="ui"/>:</label>
-						<select ng-model="tickler.priority" ng-init="tickler.priority='Normal'" ng-options="p for p in priorities" class="form-control">
+						<select ng-model="ticklerAddCtrl.tickler.priority" ng-init="ticklerAddCtrl.tickler.priority='Normal'" 
+							ng-options="p for p in ticklerAddCtrl.priorities" 
+							class="form-control">
 						</select>
 					</div>
 				</div>
@@ -90,21 +95,22 @@
 
 
 
-			<div class="row" ng-hide="showServiceDateEditor === true" ng-click="showServiceDateEditor=true">
+			<div class="row" ng-hide="ticklerAddCtrl.showServiceDateEditor === true" ng-click="ticklerAddCtrl.showServiceDateEditor=true">
 				<div class="col-xs-6">
-					<strong><bean:message key="tickler.add.serviceDate" bundle="ui"/>:</strong> {{tickler.serviceDateDate | date : 'yyyy-MM-dd'}} {{tickler.serviceDateTime | date : 'HH:mm'}}
+					<strong><bean:message key="tickler.add.serviceDate" bundle="ui"/>:</strong> 
+					{{ticklerAddCtrl.tickler.serviceDateDate | date : 'yyyy-MM-dd'}} {{ticklerAddCtrl.tickler.serviceDateTime | date : 'HH:mm'}}
 					<br/><br/>
 				</div>
 			</div>
 
-			<div class="row" ng-show="showServiceDateEditor === true">
+			<div class="row" ng-show="ticklerAddCtrl.showServiceDateEditor === true">
 				<div class="col-xs-6">
-					<strong ng-click="showServiceDateEditor=false"><bean:message key="tickler.add.serviceDate" bundle="ui"/>:</strong>
-					<datepicker ng-model="tickler.serviceDateDate" show-weeks="true" class="well well-sm"></datepicker>
+					<strong ng-click="ticklerAddCtrl.showServiceDateEditor=false"><bean:message key="tickler.add.serviceDate" bundle="ui"/>:</strong>
+					<datepicker ng-model="ticklerAddCtrl.tickler.serviceDateDate" show-weeks="true" class="well well-sm"></datepicker>
 
 				</div>
 				<div class="col-xs-6">
-					<timepicker ng-model="tickler.serviceDateTime"  hour-step="1" minute-step="1" show-meridian="true"></timepicker>
+					<timepicker ng-model="ticklerAddCtrl.tickler.serviceDateTime"  hour-step="1" minute-step="1" show-meridian="true"></timepicker>
 
 				</div>
 			</div>
@@ -115,7 +121,10 @@
 				<div class="col-xs-12">
 						<div class="form-group">
 						<label><bean:message key="tickler.add.templates" bundle="ui"/>:</label>
-						<select ng-model="tickler.suggestedTextId" ng-change="setSuggestedText()" ng-options="a.id as a.suggestedText for a in textSuggestions" class="form-control">
+						<select ng-model="ticklerAddCtrl.tickler.suggestedTextId" 
+							ng-change="ticklerAddCtrl.setSuggestedText()" 
+							ng-options="a.id as a.suggestedText for a in ticklerAddCtrl.textSuggestions" 
+							class="form-control">
 						</select>
 						</div>
 				</div>
@@ -123,14 +132,14 @@
 
 			<div class="row">
 				<div class="col-xs-12">
-						<textarea ng-model="tickler.message" class="form-control" rows="6" required></textarea>
+						<textarea ng-model="ticklerAddCtrl.tickler.message" class="form-control" rows="6" required></textarea>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-default" type="button" ng-click="close()"><bean:message key="global.close" bundle="ui"/></button>
+    <button class="btn btn-default" type="button" ng-click="ticklerAddCtrl.close()"><bean:message key="global.close" bundle="ui"/></button>
 	 <button class="btn btn-success" type="submit" ><bean:message key="global.save" bundle="ui"/></button>
 </div>
 </form>

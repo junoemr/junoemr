@@ -57,13 +57,13 @@ angular.module("Common.Services").service("securityService", [
 				encodeURIComponent(demographicNo);
 
 			$http.get(url, service.configHeadersWithCache).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data.success);
+					deferred.resolve(results.data.success);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("securityService::hasRight error", error);
+					console.log("securityService::hasRight error", errors);
 					deferred.reject("An error occured while fetching access right");
 				});
 
@@ -81,13 +81,13 @@ angular.module("Common.Services").service("securityService", [
 				data: JSON.stringify(listOfItems),
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("securityService::hasRights error", error);
+					console.log("securityService::hasRights error", errors);
 					deferred.reject("An error occured while fetching access rights");
 				});
 
@@ -108,13 +108,13 @@ angular.module("Common.Services").service("securityService", [
 				}),
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("securityService::isAllowedAccessToPatientRecord error", error);
+					console.log("securityService::isAllowedAccessToPatientRecord error", errors);
 					deferred.reject("An error occured while fetching access rights");
 				});
 

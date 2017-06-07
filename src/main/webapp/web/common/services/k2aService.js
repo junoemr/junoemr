@@ -26,6 +26,7 @@
 
  */
 
+// Remove this?
 angular.module("Common.Services").service("k2aService", [
 	'$http', '$q',
 	function($http, $q)

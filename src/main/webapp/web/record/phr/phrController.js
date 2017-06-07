@@ -44,23 +44,26 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 		demo,
 		formService)
 	{
+
+		var controller = this;
+
 		console.log("phr ctrl ", $stateParams, $state);
 
-		$scope.page = {};
-		$scope.page.currentFormList = [];
-		$scope.page.currentForm = {};
-		$scope.page.currentlistId = 0;
+		controller.page = {};
+		controller.page.currentFormList = [];
+		controller.page.currentForm = {};
+		controller.page.currentlistId = 0;
 
 		console.log("What is the state " + $state.params.type + " : " + angular.isUndefined($state.params.type) + " id " + $state.params.id, $state); // Use this to load the current form if the page is refreshed
 
 
-		$scope.page.formlists = [
+		controller.page.formlists = [
 		{
 			id: 0,
 			label: 'Data'
 		}]; //,{id:1,label:'Msgs'}];  //Need to get this from the server.
 
-		$scope.page.currentFormList[0] = [
+		controller.page.currentFormList[0] = [
 		{
 			id: 0,
 			name: 'Glucose',
@@ -100,35 +103,40 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 
 
 
-		/*$scope.page.formlists.forEach(function (item, index) {
+		/*controller.page.formlists.forEach(function (item, index) {
 			console.log('What is the item ',item);
 			formService.getAllFormsByHeading($stateParams.demographicNo,item.label).then(function(data) {
 		        console.debug('whats the index'+index,data);
-		        $scope.page.currentFormList[index] = data.list;
+		        controller.page.currentFormList[index] = data.list;
 		    });
 		});
 		*/
 
-		$scope.changeTo = function(listId)
+		controller.changeTo = function changeTo(listId)
 		{
-			$scope.page.currentlistId = listId;
+			controller.page.currentlistId = listId;
 			console.log('set currentlist to ' + listId);
 			if (listId == 0)
 			{
-				formService.getAllFormsByHeading($stateParams.demographicNo, 'Completed').then(function(data)
-				{
-					console.debug('whats the index' + 0, data);
-					$scope.page.currentFormList[0] = data.list;
-				});
+				formService.getAllFormsByHeading($stateParams.demographicNo, 'Completed').then(
+					function success(results)
+					{
+						console.debug('whats the index' + 0, results);
+						controller.page.currentFormList[0] = results.list;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
 			}
 		};
 
-		$scope.viewFormState = function(item)
+		controller.viewFormState = function viewFormState(item)
 		{
 
 			while (document.getElementById('formInViewFrame').hasChildNodes())
 			{
-				document.getElementById('formInViewFrame').removeChild(document.getElementById('formInViewFrame').firstChild)
+				document.getElementById('formInViewFrame').removeChild(document.getElementById('formInViewFrame').firstChild);
 			}
 
 			var url = item.url + $stateParams.demographicNo;
@@ -136,10 +144,10 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 
 			if (item.type == 'frame')
 			{
-				$scope.page.currentForm = item;
+				controller.page.currentForm = item;
 				var pymParent = new pym.Parent('formInViewFrame', url,
 				{});
-				$scope.pymParent = pymParent;
+				controller.pymParent = pymParent;
 			}
 			else
 			{
@@ -157,9 +165,9 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 		/*
 		 * Used to make the left side list tab be active
 		 */
-		$scope.getListClass = function(listId)
+		controller.getListClass = function getListClass(listId)
 		{
-			if (listId === $scope.page.currentlistId)
+			if (listId === controller.page.currentlistId)
 			{
 				return "active";
 			}
@@ -168,52 +176,49 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 		/*
 		 * Used to mark which form is active.
 		 */
-		$scope.getActiveFormClass = function(item)
+		controller.getActiveFormClass = function getActiveFormClass(item)
 		{
-			if (item.type == $scope.page.currentForm.type && item.id == $scope.page.currentForm.id && angular.isDefined(item.id))
+			if (item.type == controller.page.currentForm.type && item.id == controller.page.currentForm.id && angular.isDefined(item.id))
 			{
 				return "active";
 			}
-			else if (item.type == $scope.page.currentForm.type && angular.isUndefined(item.id) && item.formId == $scope.page.currentForm.formId)
+			else if (item.type == controller.page.currentForm.type && angular.isUndefined(item.id) && item.formId == controller.page.currentForm.formId)
 			{
 				return "active";
 			}
 		};
 
+		// Remove this?
 		function handleError(errorMessage)
 		{
 			console.log(errorMessage);
 		}
 
-
-
-
-
 		/*
 		 * This still needs to be tested
 		 */
-		$scope.keypress = function(event)
+		controller.keypress = function keypress(event)
 		{
 			if (event.altKey == true && event.key == "Up")
 			{
 				console.log("up", event);
-				console.log($scope.page.currentFormList[$scope.page.currentlistId].indexOf($scope.page.currentForm));
-				var currIdx = $scope.page.currentFormList[$scope.page.currentlistId].indexOf($scope.page.currentForm);
+				console.log(controller.page.currentFormList[controller.page.currentlistId].indexOf(controller.page.currentForm));
+				var currIdx = controller.page.currentFormList[controller.page.currentlistId].indexOf(controller.page.currentForm);
 				if (currIdx > 0)
 				{
-					$scope.page.currentForm = $scope.page.currentFormList[$scope.page.currentlistId][currIdx - 1];
-					$scope.viewFormState($scope.page.currentForm);
+					controller.page.currentForm = controller.page.currentFormList[controller.page.currentlistId][currIdx - 1];
+					controller.viewFormState(controller.page.currentForm);
 				}
 			}
 			else if (event.altKey == true && event.key == "Down")
 			{
 				console.log("down", event);
-				var currIdx = $scope.page.currentFormList[$scope.page.currentlistId].indexOf($scope.page.currentForm);
-				console.log(currIdx, $scope.page.currentFormList[$scope.page.currentlistId].length);
-				if (currIdx <= $scope.page.currentFormList[$scope.page.currentlistId].length)
+				var currIdx = controller.page.currentFormList[controller.page.currentlistId].indexOf(controller.page.currentForm);
+				console.log(currIdx, controller.page.currentFormList[controller.page.currentlistId].length);
+				if (currIdx <= controller.page.currentFormList[controller.page.currentlistId].length)
 				{
-					$scope.page.currentForm = $scope.page.currentFormList[$scope.page.currentlistId][currIdx + 1];
-					$scope.viewFormState($scope.page.currentForm);
+					controller.page.currentForm = controller.page.currentFormList[controller.page.currentlistId][currIdx + 1];
+					controller.viewFormState(controller.page.currentForm);
 				}
 			}
 			else
@@ -221,7 +226,5 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 				console.log("keypress", event.altKey, event.key, event);
 			}
 		};
-
-
 	}
 ]);

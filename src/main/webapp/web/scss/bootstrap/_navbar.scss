@@ -16,7 +16,7 @@
 // Have to use !important because bootstrap uses important for their 
 // .visible-* and .hidden-* classes, which we must override
 // If screen width >= $screen-nav-lg
-@media(min-width: $nav-lg) {
+@media(min-width: $screen-nav-lg) {
 	.visible-nav-md {
 		display: none !important;
 	}

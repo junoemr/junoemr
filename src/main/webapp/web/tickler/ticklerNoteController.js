@@ -16,20 +16,22 @@ angular.module('Tickler').controller('Tickler.TicklerNoteController', [
 		noteService)
 	{
 
-		$scope.ticklerNote = ticklerNote;
-		$scope.originalNote = ticklerNote.note;
-		$scope.tickler = tickler;
+		var controller = this;
 
-		$scope.close = function()
+		controller.ticklerNote = ticklerNote;
+		controller.originalNote = ticklerNote.note;
+		controller.tickler = tickler;
+
+		controller.close = function()
 		{
 			$uibModalInstance.close("Someone Closed Me");
 		};
-		$scope.save = function()
+		controller.save = function()
 		{
-			var updatedNote = $scope.ticklerNote.note;
-			$scope.ticklerNote.tickler = $scope.tickler;
+			var updatedNote = controller.ticklerNote.note;
+			controller.ticklerNote.tickler = controller.tickler;
 
-			noteService.saveTicklerNote($scope.ticklerNote).then(function(data)
+			noteService.saveTicklerNote(controller.ticklerNote).then(function(data)
 			{
 				$uibModalInstance.close("Someone Saved Me");
 			}, function(reason)

@@ -48,33 +48,35 @@
 }		
 </style>
 
-<div ng-show="consultReadAccess" class="col-lg-12">
+<div ng-show="consultRequestListCtrl.consultReadAccess" class="col-lg-12">
 
 	<form name="searchForm" id="searchForm">
 
 		<div class="row">
 			<div class="col-xs-2">
-				<input ng-model="search.referralStartDate" type="text"
+				<input ng-model="consultRequestListCtrl.search.referralStartDate" type="text"
 					id="referralStartDate" name="referralStartDate"
 					class="form-control" datepicker-popup="yyyy-MM-dd"
 					datepicker-append-to-body="true" is-open="data.isOpen"
 					ng-click="data.isOpen = true" placeholder="<bean:message key="consult.list.referralStartDate" bundle="ui"/>">
 			</div>
 			<div class="col-xs-2">
-				<input ng-model="search.referralEndDate" type="text"
+				<input ng-model="consultRequestListCtrl.search.referralEndDate" type="text"
 					id="referralEndDate" name="referralEndDate" class="form-control"
 					datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true"
 					is-open="data2.isOpen" ng-click="data2.isOpen = true"
 					placeholder="<bean:message key="consult.list.referralEndDate" bundle="ui"/>">
 			</div>
 			<div class="col-xs-2">
-				<select class="form-control" ng-model="search.status" name="status" id="status" ng-options="status.value as status.name for status in statuses">
+				<select class="form-control" ng-model="consultRequestListCtrl.search.status" 
+						name="status" id="status" 
+						ng-options="status.value as status.name for status in consultRequestListCtrl.statuses">
 					<option value=""><bean:message key="consult.list.status.all" bundle="ui"/></option>
 				</select>
 			</div>
 			<div class="col-xs-2">
-				<select ng-model="search.team" name="team" id="team"
-					class="form-control" ng-options="t for t in teams">
+				<select ng-model="consultRequestListCtrl.search.team" name="team" id="team"
+					class="form-control" ng-options="t for t in consultRequestListCtrl.teams">
 				</select>
 			</div>
 		</div>
@@ -84,36 +86,36 @@
 
 		<div class="row">
 			<div class="col-xs-2">
-				<input ng-model="search.appointmentStartDate" type="text"
+				<input ng-model="consultRequestListCtrl.search.appointmentStartDate" type="text"
 					id="appointmentStartDate" name="appointmentStartDate"
 					class="form-control" datepicker-popup="yyyy-MM-dd"
 					datepicker-append-to-body="true" is-open="data3.isOpen"
 					ng-click="data3.isOpen = true" placeholder="<bean:message key="consult.list.appointmentStartDate" bundle="ui"/>">
 			</div>
 			<div class="col-xs-2">
-				<input ng-model="search.appointmentEndDate" type="text"
+				<input ng-model="consultRequestListCtrl.search.appointmentEndDate" type="text"
 					id="appointmentEndDate" name="appointmentEndDate"
 					class="form-control" datepicker-popup="yyyy-MM-dd"
 					datepicker-append-to-body="true" is-open="data4.isOpen"
 					ng-click="data4.isOpen = true" placeholder="<bean:message key="consult.list.appointmentEndDate" bundle="ui"/>">
 			</div>
 			
-			<div class="col-xs-2" ng-hide="hideSearchPatient">
+			<div class="col-xs-2" ng-hide="consultRequestListCtrl.hideSearchPatient">
 				<div class="input-group">
-					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="removeDemographicAssignment()"></span></div>
+					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="consultRequestListCtrl.removeDemographicAssignment()"></span></div>
 					<input type="text" ng-model="consult.demographicName" placeholder="<bean:message key="consult.list.patient" bundle="ui"/>"
-						uib-typeahead="pt.demographicNo as pt.name for pt in searchPatients($viewValue)"
-						typeahead-on-select="updateDemographicNo($item, $model, $label)"
+						uib-typeahead="pt.demographicNo as pt.name for pt in consultRequestListCtrl.searchPatients($viewValue)"
+						typeahead-on-select="consultRequestListCtrl.updateDemographicNo($item, $model, $label)"
 						class="form-control"/>
 				</div>
 			</div>
 			
 			<div class="col-xs-2">
 				<div class="input-group">
-					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="removeMrpAssignment()"></span></div>
-					<input type="text" ng-model="consult.mrpName" placeholder="<bean:message key="consult.list.mrp" bundle="ui"/>"
-						uib-typeahead="pvd as pvd.name for pvd in searchMrps($viewValue)"
-						typeahead-on-select="updateMrpNo($model)"
+					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="consultRequestListCtrl.removeMrpAssignment()"></span></div>
+					<input type="text" ng-model="consultRequestListCtrl.consult.mrpName" placeholder="<bean:message key="consult.list.mrp" bundle="ui"/>"
+						uib-typeahead="pvd as pvd.name for pvd in consultRequestListCtrl.searchMrps($viewValue)"
+						typeahead-on-select="consultRequestListCtrl.updateMrpNo($model)"
 						class="form-control"/>
 				</div>
 			</div>
@@ -123,30 +125,38 @@
 
 		<div class="row">
 			<div class="col-xs-12">
-				<button class="btn btn-primary" type="button" ng-click="doSearch()"><bean:message key="global.search" bundle="ui"/></button>
-				<button class="btn btn-default" type="button" ng-click="clear()"><bean:message key="global.clear" bundle="ui"/></button>
-				<button class="btn btn-success" type="button" title=<bean:message key="consult.list.newRemindFill" bundle="ui"/> ng-click="addConsult()" ng-disabled="search.demographicNo==null">
+				<button class="btn btn-primary" type="button" ng-click="consultRequestListCtrl.doSearch()">
+					<bean:message key="global.search" bundle="ui"/>
+				</button>
+				<button class="btn btn-default" type="button" ng-click="consultRequestListCtrl.clear()">
+					<bean:message key="global.clear" bundle="ui"/>
+				</button>
+				<button class="btn btn-success" type="button" ng-click="consultRequestListCtrl.addConsult()" 
+						ng-disabled="consultRequestListCtrl.search.demographicNo==null" 
+						title="<bean:message key="consult.list.newRemindFill" bundle="ui"/>">
 					<bean:message key="consult.list.new" bundle="ui"/>
 				</button>
-				
-				<button class="btn btn-default" type="button" ng-click="popup(700,960,'<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/ShowAllServices.jsp','<bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgConsConfig"/>')"><bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgEditSpecialists"/></button>
+				<button class="btn btn-default" type="button" 
+					ng-click="popup(700,960,'<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/ShowAllServices.jsp','<bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgConsConfig"/>')">
+					<bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgEditSpecialists"/>
+				</button>
 			</div>
 		</div>
 	</form>
 
 	<div style="height: 15px"></div>
 
-	<table ng-table="tableParams" show-filter="false" class="table">
+	<table ng-table="consultRequestListCtrl.tableParams" show-filter="false" class="table">
 		<tbody>
 
 			<tr ng-repeat="consult in $data" ng-mouseover="consult.$selected=true" ng-mouseout="consult.$selected=false"
-    	 ng-class="{'active': consult.$selected}" class="state{{consult.status}}">
+    	 			ng-class="{'active': consult.$selected}" class="state{{consult.status}}">
 				<td>
 <!-- Ronnie: Temporarily hidden until batch operations is created
 					<input type="checkbox" ng-model="consult.checked">
  -->
 				</td>
-				<td><a ng-click="editConsult(consult)" class="hand-hover"><bean:message key="global.edit" bundle="ui"/></a></td>
+				<td><a ng-click="consultRequestListCtrl.editConsult(consult)" class="hand-hover"><bean:message key="global.edit" bundle="ui"/></a></td>
 				<td data-title="'<bean:message key="consult.list.header.patient" bundle="ui"/>'" sortable="'Demographic'">
 					{{consult.demographic.formattedName}}</td>
 				<td data-title="'<bean:message key="consult.list.header.service" bundle="ui"/>'" sortable="'Service'">{{consult.serviceName}}</td>
@@ -185,7 +195,7 @@
 
 
 
-<div ng-show="consultReadAccess != null && consultReadAccess == false"
+<div ng-show="consultRequestListCtrl.consultReadAccess != null && consultRequestListCtrl.consultReadAccess == false"
 	class="col-lg-12">
 	<h3 class="text-danger">
 		<span class="glyphicon glyphicon-warning-sign"></span><bean:message key="consult.list.access_denied" bundle="ui"/>

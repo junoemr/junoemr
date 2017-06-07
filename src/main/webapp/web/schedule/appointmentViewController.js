@@ -24,128 +24,146 @@ angular.module('Schedule').controller('Schedule.AppointmentViewController', [
 		statusList)
 	{
 
-		$scope.me = me;
-		$scope.appointment = appointment;
-		$scope.statusList = statusList.content;
-		$scope.appointmentUpdate = {};
+		var controller = this;
 
-		$scope.appointmentWriteAccess = false;
+		controller.me = me;
+		controller.appointment = appointment;
+		controller.statusList = statusList.content;
+		controller.appointmentUpdate = {};
 
-		$scope.getStatus = function(status)
+		controller.appointmentWriteAccess = false;
+
+		controller.getStatus = function getStatus(status)
 		{
 
-			for (var x = 0; x < $scope.statusList.length; x++)
+			for (var x = 0; x < controller.statusList.length; x++)
 			{
-				console.log(JSON.stringify($scope.statusList[x]));
-				if ($scope.statusList[x].status == status)
+				console.log(JSON.stringify(controller.statusList[x]));
+				if (controller.statusList[x].status == status)
 				{
-					return $scope.statusList[x].description;
+					return controller.statusList[x].description;
 				}
 			}
 			return status;
 		};
 
-		$scope.close = function()
+		controller.close = function close()
 		{
 			$uibModalInstance.close(false);
 		};
 
-		$scope.deleteAppointment = function()
+		controller.deleteAppointment = function deleteAppointment()
 		{
 			if (confirm('Are you sure you want to delete this appointment?'))
 			{
-				scheduleService.deleteAppointment($scope.appointment.id).then(function(data)
-				{
-					$uibModalInstance.close(true);
-				});
+				scheduleService.deleteAppointment(controller.appointment.id).then(
+					function success(results)
+					{
+						$uibModalInstance.close(true);
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
 			}
 		};
 
-		$scope.searchProviders = function(val)
+		controller.searchProviders = function searchProviders(val)
 		{
 			var search = {
 				searchTerm: val,
 				active: true
 			};
-			return providerService.searchProviders(search, 0, 10).then(function(response)
-			{
-				var resp = [];
-				for (var x = 0; x < response.length; x++)
+			return providerService.searchProviders(search, 0, 10).then(
+				function success(results)
 				{
-					resp.push(
+					var resp = [];
+					for (var x = 0; x < results.length; x++)
 					{
-						providerNo: response[x].providerNo,
-						name: response[x].firstName + ' ' + response[x].lastName
-					});
-				}
-				return resp;
-			});
+						resp.push(
+						{
+							providerNo: results[x].providerNo,
+							name: results[x].firstName + ' ' + results[x].lastName
+						});
+					}
+					return resp;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 
-		$scope.updateProviderNo = function(item, model, label)
+		controller.updateProviderNo = function updateProviderNo(item, model, label)
 		{
-			$scope.appointment.providerNo = model;
-			$scope.appointment.providerName = label;
+			controller.appointment.providerNo = model;
+			controller.appointment.providerName = label;
 		};
 
 
-		$scope.editProvider = function()
+		controller.editProvider = function editProvider()
 		{
-			$scope.showProviderFormControl = true;
-			$scope.appointmentUpdate.providerNo = $scope.appointment.providerNo;
-			$scope.appointmentUpdate.providerName = $scope.appointment.provider.lastName + "," + $scope.appointment.provider.lastName;
+			controller.showProviderFormControl = true;
+			controller.appointmentUpdate.providerNo = controller.appointment.providerNo;
+			controller.appointmentUpdate.providerName = controller.appointment.provider.lastName + "," + controller.appointment.provider.lastName;
 		};
 
-		$scope.updateProvider = function(item, model, label)
+		controller.updateProvider = function updateProvider(item, model, label)
 		{
-			$scope.needsUpdate = true;
-			$scope.appointment.providerNo = model;
-			$scope.appointment.providerName = label;
-			$scope.showProviderFormControl = false;
+			controller.needsUpdate = true;
+			controller.appointment.providerNo = model;
+			controller.appointment.providerName = label;
+			controller.showProviderFormControl = false;
 		};
 
-		$scope.cancelProviderUpdate = function()
+		controller.cancelProviderUpdate = function cancelProviderUpdate()
 		{
-			$scope.appointmentUpdate.providerNo = null;
-			$scope.appointmentUpdate.providerName = null;
+			controller.appointmentUpdate.providerNo = null;
+			controller.appointmentUpdate.providerName = null;
 
-			$scope.showProviderFormControl = false;
-
-		};
-
-		$scope.showAppointmentHistory = function()
-		{
-			scheduleService.appointmentHistory($scope.appointment.demographicNo).then(function(data)
-			{
-				alert(JSON.stringify(data));
-			}, function(error)
-			{
-				alert(error);
-			});
-		};
-
-		$scope.noShowAppointment = function()
-		{
-			scheduleService.noShowAppointment($scope.appointment.id).then(function(data)
-			{
-				$uibModalInstance.close(true);
-			}, function(error)
-			{
-				alert(error);
-			});
+			controller.showProviderFormControl = false;
 
 		};
 
-		$scope.cancelAppointment = function()
+		controller.showAppointmentHistory = function showAppointmentHistory()
 		{
-			scheduleService.cancelAppointment($scope.appointment.id).then(function(data)
-			{
-				$uibModalInstance.close(true);
-			}, function(error)
-			{
-				alert(error);
-			});
+			scheduleService.appointmentHistory(controller.appointment.demographicNo).then(
+				function success(results)
+				{
+					alert(JSON.stringify(results));
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
+		};
+
+		controller.noShowAppointment = function noShowAppointment()
+		{
+			scheduleService.noShowAppointment(controller.appointment.id).then(
+				function success(results)
+				{
+					$uibModalInstance.close(true);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
+
+		};
+
+		controller.cancelAppointment = function cancelAppointment()
+		{
+			scheduleService.cancelAppointment(controller.appointment.id).then(
+				function success(results)
+				{
+					$uibModalInstance.close(true);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 	}

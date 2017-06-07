@@ -1,9 +1,11 @@
 angular.module('Schedule').controller('Schedule.ScheduleController', [
 
-    '$scope',
+	'$scope',
 
-    function(
-        $scope) {
+	function(
+		$scope)
+	{
+		var controller = this;
 
-    }
+	}
 ]);

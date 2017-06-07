@@ -38,13 +38,13 @@ angular.module("Common.Services").service("consultService", [
 			var deferred = $q.defer();
 
 			$http.post(service.apiPath + 'searchRequests', search).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("consultService::searchRequests error", error);
+					console.log("consultService::searchRequests error", errors);
 					deferred.reject("An error occured while searching consult requests");
 				});
 
@@ -68,13 +68,13 @@ angular.module("Common.Services").service("consultService", [
 					demographicId: demographicId
 				}
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("consultService::getRequest error", error);
+					console.log("consultService::getRequest error", errors);
 					deferred.reject(
 						"An error occurred while getting consult request (requestId=" + requestId + ")");
 				});
@@ -92,13 +92,13 @@ angular.module("Common.Services").service("consultService", [
 				encodeURIComponent(demographicId) + '&attached=' +
 				encodeURIComponent(attached)
 			).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("consultService::getRequestAttachments error", error);
+					console.log("consultService::getRequestAttachments error", errors);
 					deferred.reject(
 						"An error occured while getting consult attachments (requestId=" + requestId + ")");
 				});
@@ -114,11 +114,11 @@ angular.module("Common.Services").service("consultService", [
 				consultationRequestTo1: request
 			};
 			$http.post(service.apiPath + 'saveRequest', requestTo1).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
 					console.log("consultService::saveRequest error", error);
 					deferred.reject("An error occurred while fetching consult request after save");
@@ -132,13 +132,13 @@ angular.module("Common.Services").service("consultService", [
 			var deferred = $q.defer();
 
 			$http.get(service.apiPath + 'eSendRequest?requestId=' + encodeURIComponent(requestId)).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("consultService::eSendRequest error", error);
+					console.log("consultService::eSendRequest error", errors);
 					deferred.reject(
 						"An error occurred while e-sending consult request (requestId=" + requestId + ")");
 				});
@@ -150,13 +150,13 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 			$http.post(service.apiPath + 'searchResponses', search).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("consultService::searchResponses error", error);
+					console.log("consultService::searchResponses error", errors);
 					deferred.reject("An error occurred while searching consult responses");
 				});
 
@@ -180,13 +180,13 @@ angular.module("Common.Services").service("consultService", [
 					demographicNo: demographicNo
 				}
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("consultService::getResponse error", error);
+					console.log("consultService::getResponse error", errors);
 					deferred.reject(
 						"An error occurred while getting consult response (responseId=" + responseId + ")");
 				});
@@ -202,13 +202,13 @@ angular.module("Common.Services").service("consultService", [
 				service.apiPath + 'getResponseAttachments?responseId=' + encodeURIComponent(responseId) +
 				'&demographicNo=' + encodeURIComponent(demographicNo) +
 				'&attached=' + encodeURIComponent(attached)).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("consultService::getResponseAttachments error", error);
+					console.log("consultService::getResponseAttachments error", errors);
 					deferred.reject(
 						"An error occurred while getting consult response attachments (responseId=" +
 						responseId + ")");
@@ -225,13 +225,13 @@ angular.module("Common.Services").service("consultService", [
 				consultationResponseTo1: response
 			};
 			$http.post(service.apiPath + 'saveResponse', responseTo1).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("consultService::saveResponse error", error);
+					console.log("consultService::saveResponse error", errors);
 					deferred.reject("An error occurred while fetching consult response after save");
 				});
 
@@ -243,13 +243,13 @@ angular.module("Common.Services").service("consultService", [
 			var deferred = $q.defer();
 			$http.get(service.apiPath + 'getReferralPathwaysByService?serviceName=' +
 				encodeURIComponent(serviceName)).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("consultService::getReferralPathwaysByService error", error);
+					console.log("consultService::getReferralPathwaysByService error", errors);
 					deferred.reject("An error occured while fetching referral pathways");
 				});
 

@@ -48,15 +48,18 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		user,
 		securityService)
 	{
+
+		var controller = this;
+
 		console.log("form ctrl ", $stateParams, $state);
 
-		$scope.demographicNo = $stateParams.demographicNo;
-		$scope.providerNo = user.providerNo;
+		controller.demographicNo = $stateParams.demographicNo;
+		controller.providerNo = user.providerNo;
 
-		$scope.page = {};
-		$scope.page.currentFormList = [];
-		$scope.page.currentForm = {};
-		$scope.page.currentlistId = 0;
+		controller.page = {};
+		controller.page.currentFormList = [];
+		controller.page.currentForm = {};
+		controller.page.currentlistId = 0;
 
 		console.log("What is the state " + $state.params.type + " : " + angular.isUndefined($state.params.type) + " id " + $state.params.id, $state); // Use this to load the current form if the page is refreshed
 
@@ -71,28 +74,30 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 				objectName: '_admin.eform',
 				privilege: 'w'
 			}]
-		}).then(function(result)
-		{
-			$scope.adminAccess = result.content[0];
-			$scope.adminEformAccess = result.content[1];
-			if (result.content != null && result.content.length == 2)
+		}).then(
+			function success(results)
 			{
-				if ($scope.adminAccess || $scope.adminEformAccess)
+				controller.adminAccess = results.content[0];
+				controller.adminEformAccess = results.content[1];
+				if (results.content != null && results.content.length == 2)
 				{
-					$scope.hasAdminAccess = true;
+					if (controller.adminAccess || controller.adminEformAccess)
+					{
+						controller.hasAdminAccess = true;
+					}
 				}
-			}
-			else
+				else
+				{
+					alert('failed to load rights');
+				}
+			},
+			function error(errors)
 			{
-				alert('failed to load rights');
-			}
-		}, function(reason)
-		{
-			alert(reason);
-		});
+				console.log(errors);
+			});
 
 
-		$scope.page.formlists = [
+		controller.page.formlists = [
 		{
 			id: 0,
 			label: 'Completed'
@@ -102,117 +107,152 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			label: 'Library'
 		}]; //Need to get this from the server.
 
-		$scope.page.formlists.forEach(function(item, index)
+		controller.page.formlists.forEach(function(item, index)
 		{
 			console.log('What is the item ', item);
-			formService.getAllFormsByHeading($stateParams.demographicNo, item.label).then(function(data)
-			{
-				console.debug('whats the index' + index, data);
-				$scope.page.currentFormList[index] = toArray(data.list);
-			});
+			formService.getAllFormsByHeading($stateParams.demographicNo, item.label).then(
+				function success(results)
+				{
+					console.debug('whats the index' + index, results);
+					controller.page.currentFormList[index] = Juno.Common.Util.toArray(results.list);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		});
 
 
-		$scope.page.encounterFormlist = [];
-		$scope.page.formGroups = [];
-		$scope.getFormGroups = function()
+		controller.page.encounterFormlist = [];
+		controller.page.formGroups = [];
+		controller.getFormGroups = function getFormGroups()
 		{
-			formService.getFormGroups().then(function(data)
-			{
-				if (data instanceof Array)
+			formService.getFormGroups().then(
+				function success(results)
 				{
-					$scope.page.formGroups = data;
-				}
-				else
-				{
-					$scope.page.formGroups.push(data);
-				}
-
-				for (var i = 0; i < $scope.page.formGroups.length; i++)
-				{
-					if (!($scope.page.formGroups[i].summaryItem instanceof Array))
+					if (results instanceof Array)
 					{
-						$scope.page.formGroups[i].summaryItem = [$scope.page.formGroups[i].summaryItem];
+						controller.page.formGroups = results;
 					}
-				}
-			});
+					else
+					{
+						controller.page.formGroups.push(results);
+					}
+
+					for (var i = 0; i < controller.page.formGroups.length; i++)
+					{
+						if (!(controller.page.formGroups[i].summaryItem instanceof Array))
+						{
+							controller.page.formGroups[i].summaryItem = [controller.page.formGroups[i].summaryItem];
+						}
+					}
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
-		$scope.getFormGroups();
-		$scope.page.formOptions = [];
-		$scope.favouriteGroup = null;
+		controller.getFormGroups();
+		controller.page.formOptions = [];
+		controller.favouriteGroup = null;
 
-		getFavouriteFormGroup = function()
+		getFavouriteFormGroup = function getFavouriteFormGroup()
 		{
-			formService.getFavouriteFormGroup().then(function(data)
-			{
-				$scope.favouriteGroup = data;
-
-				if (!($scope.favouriteGroup.summaryItem instanceof Array))
+			formService.getFavouriteFormGroup().then(
+				function success(results)
 				{
-					$scope.favouriteGroup.summaryItem = [$scope.favouriteGroup.summaryItem];
-				}
+					controller.favouriteGroup = results;
 
-			});
+					if (!(controller.favouriteGroup.summaryItem instanceof Array))
+					{
+						controller.favouriteGroup.summaryItem = [controller.favouriteGroup.summaryItem];
+					}
+
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 		getFavouriteFormGroup();
 
-		formService.getFormOptions($scope.demographicNo).then(function(data)
-		{
-			console.log("data", data);
-
-			if (data.items instanceof Array)
+		formService.getFormOptions(controller.demographicNo).then(
+			function success(results)
 			{
-				$scope.page.formOptions = data.items;
-			}
-			else
+				console.log("data", results);
+
+				if (results.items instanceof Array)
+				{
+					controller.page.formOptions = results.items;
+				}
+				else
+				{
+					controller.page.formOptions.push(results.items);
+				}
+
+
+				console.log("form options", controller.page.formOptions);
+			},
+			function error(errors)
 			{
-				$scope.page.formOptions.push(data.items);
-			}
+				console.log(errors);
+			});
 
-
-			console.log("form options", $scope.page.formOptions);
-		});
-
-		formService.getCompletedEncounterForms($stateParams.demographicNo).then(function(data)
-		{
-			if (data.list instanceof Array)
+		formService.getCompletedEncounterForms($stateParams.demographicNo).then(
+			function success(results)
 			{
-				$scope.page.encounterFormlist[0] = data.list;
-			}
-			else
+				if (results.list instanceof Array)
+				{
+					controller.page.encounterFormlist[0] = results.list;
+				}
+				else
+				{
+					var arr = new Array();
+					arr[0] = results.list;
+					controller.page.encounterFormlist[0] = arr;
+				}
+
+				//controller.page.encounterFormlist[0] = results.list;
+				//console.log("completed list as is:" + JSON.stringify(controller.page.encounterFormlist[0]) );
+			},
+			function error(errors)
 			{
-				var arr = new Array();
-				arr[0] = data.list;
-				$scope.page.encounterFormlist[0] = arr;
-			}
+				console.log(errors);
+			});
 
-			//$scope.page.encounterFormlist[0] = data.list;
-			//console.log("completed list as is:" + JSON.stringify($scope.page.encounterFormlist[0]) );
-		});
+		formService.getSelectedEncounterForms().then(
+			function success(results)
+			{
+				controller.page.encounterFormlist[1] = results;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
 
-		formService.getSelectedEncounterForms().then(function(data)
+
+		controller.changeTo = function changeTo(listId)
 		{
-			$scope.page.encounterFormlist[1] = data;
-		});
-
-
-		$scope.changeTo = function(listId)
-		{
-			$scope.page.currentlistId = listId;
+			controller.page.currentlistId = listId;
 			console.log('set currentlist to ' + listId);
 			if (listId == 0)
 			{
-				formService.getAllFormsByHeading($stateParams.demographicNo, 'Completed').then(function(data)
-				{
-					console.debug('whats the index' + 0, data);
-					$scope.page.currentFormList[0] = toArray(data.list);
-				});
+				formService.getAllFormsByHeading($stateParams.demographicNo, 'Completed').then(
+					function success(results)
+					{
+						console.debug('whats the index' + 0, results);
+						controller.page.currentFormList[0] = Juno.Common.Util.toArray(results.list);
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
 			}
 		};
 
-		$scope.viewFormState = function(item, view)
+		controller.viewFormState = function changeTo(item, view)
 		{
 
 			while (document.getElementById('formInViewFrame').hasChildNodes())
@@ -310,10 +350,10 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 			}
 
-			$scope.page.currentForm = item;
+			controller.page.currentForm = item;
 			var pymParent = new pym.Parent('formInViewFrame', url,
 			{});
-			$scope.pymParent = pymParent;
+			controller.pymParent = pymParent;
 
 			/*if(item.type != 'eform' && view==1){
 				document.getElementById('formInViewFrame').firstChild.style.height = "1600px"; //temp hack for the forms
@@ -328,39 +368,39 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 		}
 
-		$scope.isEmpty = function(obj)
+		controller.isEmpty = function isEmpty(obj)
 		{
 			for (var i in obj)
 				if (obj.hasOwnProperty(i)) return false;
 			return true;
 		};
 
-		$scope.currentEformGroup = {};
+		controller.currentEformGroup = {};
 
-		$scope.setCurrentEFormGroup = function(mod)
+		controller.setCurrentEFormGroup = function setCurrentEFormGroup(mod)
 		{
-			$scope.currentEformGroup = mod;
+			controller.currentEformGroup = mod;
 		};
 
-		$scope.openFormFromGroups = function(item)
+		controller.openFormFromGroups = function openFormFromGroups(item)
 		{
 			console.log("group item", item);
 			item.formId = item.id;
 			delete item.id;
-			$scope.viewFormState(item, 2);
+			controller.viewFormState(item, 2);
 		};
 
-		$scope.formOption = function(opt)
+		controller.formOption = function formOption(opt)
 		{
 			var atleastOneItemSelected = false;
 			if (opt.extra == "send2PHR")
 			{
 				var docIds = "";
-				for (var i = 0; i < $scope.page.currentFormList[$scope.page.currentlistId].length; i++)
+				for (var i = 0; i < controller.page.currentFormList[controller.page.currentlistId].length; i++)
 				{
-					if ($scope.page.currentFormList[$scope.page.currentlistId][i].isChecked)
+					if (controller.page.currentFormList[controller.page.currentlistId][i].isChecked)
 					{
-						docIds = docIds + '&sendToPhr=' + $scope.page.currentFormList[$scope.page.currentlistId][i].id;
+						docIds = docIds + '&sendToPhr=' + controller.page.currentFormList[controller.page.currentlistId][i].id;
 						atleastOneItemSelected = true;
 					}
 				}
@@ -368,7 +408,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 				{
 					var rnd = Math.round(Math.random() * 1000);
 					win = "win" + rnd;
-					var url = '../eform/efmpatientformlistSendPhrAction.jsp?clientId=' + $scope.demographicNo + docIds;
+					var url = '../eform/efmpatientformlistSendPhrAction.jsp?clientId=' + controller.demographicNo + docIds;
 					window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
 				}
 			}
@@ -383,9 +423,9 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		/*
 		 * Used to make the left side list tab be active
 		 */
-		$scope.getListClass = function(listId)
+		controller.getListClass = function getListClass(listId)
 		{
-			if (listId === $scope.page.currentlistId)
+			if (listId === controller.page.currentlistId)
 			{
 				return "active";
 			}
@@ -394,9 +434,9 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		/*
 		 * Used to make group setting active 
 		 */
-		$scope.getGroupListClass = function(grp)
+		controller.getGroupListClass = function getGroupListClass(grp)
 		{
-			if (grp === $scope.currentEformGroup)
+			if (grp === controller.currentEformGroup)
 			{
 				return "active";
 			}
@@ -405,18 +445,19 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		/*
 		 * Used to mark which form is active.
 		 */
-		$scope.getActiveFormClass = function(item)
+		controller.getActiveFormClass = function getActiveFormClass(item)
 		{
-			if (item.type == $scope.page.currentForm.type && item.id == $scope.page.currentForm.id && angular.isDefined(item.id))
+			if (item.type == controller.page.currentForm.type && item.id == controller.page.currentForm.id && angular.isDefined(item.id))
 			{
 				return "active";
 			}
-			else if (item.type == $scope.page.currentForm.type && angular.isUndefined(item.id) && item.formId == $scope.page.currentForm.formId)
+			else if (item.type == controller.page.currentForm.type && angular.isUndefined(item.id) && item.formId == controller.page.currentForm.formId)
 			{
 				return "active";
 			}
 		};
 
+		// Remove?
 		function handleError(errorMessage)
 		{
 			console.log(errorMessage);
@@ -427,8 +468,8 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			var item = {};
 			item.type = $state.params.type;
 			item.formId = $state.params.id;
-			$scope.viewFormState(item);
-			$scope.changeTo(1);
+			controller.viewFormState(item);
+			controller.changeTo(1);
 
 		}
 		else if ($state.current.name == 'record.forms.existing')
@@ -436,36 +477,36 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			var item = {};
 			item.type = $state.params.type;
 			item.id = $state.params.id;
-			$scope.viewFormState(item);
-			$scope.changeTo(0);
+			controller.viewFormState(item);
+			controller.changeTo(0);
 		}
 
 
 		/*
 		 * This still needs to be tested
 		 */
-		$scope.keypress = function(event)
+		controller.keypress = function keypress(event)
 		{
 			if (event.altKey == true && event.keyCode == 38)
 			{ //up
 				console.log("up", event);
-				console.log($scope.page.currentFormList[$scope.page.currentlistId].indexOf($scope.page.currentForm));
-				var currIdx = $scope.page.currentFormList[$scope.page.currentlistId].indexOf($scope.page.currentForm);
+				console.log(controller.page.currentFormList[controller.page.currentlistId].indexOf(controller.page.currentForm));
+				var currIdx = controller.page.currentFormList[controller.page.currentlistId].indexOf(controller.page.currentForm);
 				if (currIdx > 0)
 				{
-					$scope.page.currentForm = $scope.page.currentFormList[$scope.page.currentlistId][currIdx - 1];
-					$scope.viewFormState($scope.page.currentForm);
+					controller.page.currentForm = controller.page.currentFormList[controller.page.currentlistId][currIdx - 1];
+					controller.viewFormState(controller.page.currentForm);
 				}
 			}
 			else if (event.altKey == true && event.keyCode == 40)
 			{ //Down
 				console.log("down", event);
-				var currIdx = $scope.page.currentFormList[$scope.page.currentlistId].indexOf($scope.page.currentForm);
-				console.log(currIdx, $scope.page.currentFormList[$scope.page.currentlistId].length);
-				if (currIdx <= $scope.page.currentFormList[$scope.page.currentlistId].length)
+				var currIdx = controller.page.currentFormList[controller.page.currentlistId].indexOf(controller.page.currentForm);
+				console.log(currIdx, controller.page.currentFormList[controller.page.currentlistId].length);
+				if (currIdx <= controller.page.currentFormList[controller.page.currentlistId].length)
 				{
-					$scope.page.currentForm = $scope.page.currentFormList[$scope.page.currentlistId][currIdx + 1];
-					$scope.viewFormState($scope.page.currentForm);
+					controller.page.currentForm = controller.page.currentFormList[controller.page.currentlistId][currIdx + 1];
+					controller.viewFormState(controller.page.currentForm);
 				}
 			}
 			else
@@ -477,10 +518,3 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 	}
 ]);
-
-function toArray(obj)
-{ //convert single object to array
-	if (obj instanceof Array) return obj;
-	else if (obj == null) return [];
-	else return [obj];
-}

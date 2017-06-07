@@ -11,40 +11,48 @@ angular.module('Report').controller('Report.ReportNoShowAppointmentSheetControll
 		$filter,
 		providerService)
 	{
-		$scope.params = {
+
+		var controller = this;
+
+		controller.params = {
 			providerNo: '',
 			startDate: new Date()
 		};
 
-		$scope.searchProviders = function(val)
+		controller.searchProviders = function searchProviders(val)
 		{
 			var search = {
 				searchTerm: val,
 				active: true
 			};
-			return providerService.searchProviders(search, 0, 10).then(function(response)
-			{
-				var resp = [];
-				for (var x = 0; x < response.length; x++)
+			return providerService.searchProviders(search, 0, 10).then(
+				function success(results)
 				{
-					resp.push(
+					var resp = [];
+					for (var x = 0; x < results.length; x++)
 					{
-						providerNo: response[x].providerNo,
-						name: response[x].firstName + ' ' + response[x].lastName
-					});
-				}
-				return resp;
-			});
+						resp.push(
+						{
+							providerNo: results[x].providerNo,
+							name: results[x].firstName + ' ' + results[x].lastName
+						});
+					}
+					return resp;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
-		$scope.updateProviderNo = function(item, model, label)
+		controller.updateProviderNo = function updateProviderNo(item, model, label)
 		{
-			$scope.params.providerNo = model;
-			$scope.data.providerNo = label;
+			controller.params.providerNo = model;
+			controller.data.providerNo = label;
 		};
 
-		$scope.generateReport = function()
+		controller.generateReport = function generateReport()
 		{
-			var p = $scope.params;
+			var p = controller.params;
 			var startDate = $filter('date')(p.startDate, 'yyyy-MM-dd');
 			var url = '../report/reportnoshowapptlist.jsp?provider_no=' + p.providerNo + '&sdate=' + startDate;
 			window.open(url, 'report_noShowApptSheet', 'height=900,width=700');

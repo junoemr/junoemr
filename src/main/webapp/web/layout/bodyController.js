@@ -5,7 +5,7 @@ angular.module('Layout').controller('Layout.BodyController', [
 	'securityService',
 	function($rootScope, $scope, providerService, securityService)
 	{
-		var controller = {};
+		var controller = this;
 
 		//=========================================================================
 		// Initialization
@@ -14,13 +14,13 @@ angular.module('Layout').controller('Layout.BodyController', [
 		controller.init = function init()
 		{
 			providerService.getMe().then(
-				function success(data)
+				function success(results)
 				{
-					securityService.setUser(data);
+					securityService.setUser(results);
 				},
-				function error(reason)
+				function error(errors)
 				{
-					console.log(reason);
+					console.log(errors);
 				});
 		};
 
@@ -43,7 +43,5 @@ angular.module('Layout').controller('Layout.BodyController', [
 				console.log("Layout.BodyController $stateChangeStart setting showPatientList to true");
 				controller.showPatientList = true;
 			});
-
-		return controller;
 	}
 ]);

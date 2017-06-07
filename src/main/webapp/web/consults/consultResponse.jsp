@@ -56,53 +56,53 @@
 <div class="col-md-12">
 	<h2>Consultation Response</h2>
 </div>
-<div class="col-md-12 alert alert-success" ng-show="consultSaving">
+<div class="col-md-12 alert alert-success" ng-show="consultResponseCtrl.consultSaving">
 	Saving...
 </div>
 
-<div id="left_pane" class="col-md-2" ng-show="consultReadAccess">
+<div id="left_pane" class="col-md-2" ng-show="consultResponseCtrl.consultReadAccess">
 	<label class="control-label">Patient Details:</label>
 	<div class="demographic">
-		<p>{{consult.demographic.lastName}}, {{consult.demographic.firstName}} ({{consult.demographic.title}})</p>
-		<p>DOB: {{consult.demographic.dateOfBirth | date:'yyyy-MM-dd'}} ({{consult.demographic.age.years}})</p> 		
-		<p>Sex: {{consult.demographic.sexDesc}}</p> 
-		<p>HIN: {{consult.demographic.hin}} - {{consult.demographic.ver}}</p> 
+		<p>{{consultResponseCtrl.consult.demographic.lastName}}, {{consultResponseCtrl.consult.demographic.firstName}} ({{consultResponseCtrl.consult.demographic.title}})</p>
+		<p>DOB: {{consultResponseCtrl.consult.demographic.dateOfBirth | date:'yyyy-MM-dd'}} ({{consultResponseCtrl.consult.demographic.age.years}})</p> 		
+		<p>Sex: {{consultResponseCtrl.consult.demographic.sexDesc}}</p> 
+		<p>HIN: {{consultResponseCtrl.consult.demographic.hin}} - {{consultResponseCtrl.consult.demographic.ver}}</p> 
 		<p>Address:</p> 
 		<address>
-		{{consult.demographic.address.address}}<br/>
-		{{consult.demographic.address.city}}, {{consult.demographic.address.province}}, {{consult.demographic.address.postal}}<br>
+		{{consultResponseCtrl.consult.demographic.address.address}}<br/>
+		{{consultResponseCtrl.consult.demographic.address.city}}, {{consultResponseCtrl.consult.demographic.address.province}}, {{consultResponseCtrl.consult.demographic.address.postal}}<br>
 		</address>
-		<p>Phone (H): {{consult.demographic.phone}}</p>
-		<p>Phone (W): {{consult.demographic.alternativePhone}}</p>
-		<p>Phone (C): {{consult.demographic.cellPhone}}</p>
-		<p>Email: {{consult.demographic.email}}</p>
-		<p>MRP: {{consult.demographic.provider.firstName}}, {{consult.demographic.provider.lastName}}</p>
+		<p>Phone (H): {{consultResponseCtrl.consult.demographic.phone}}</p>
+		<p>Phone (W): {{consultResponseCtrl.consult.demographic.alternativePhone}}</p>
+		<p>Phone (C): {{consultResponseCtrl.consult.demographic.cellPhone}}</p>
+		<p>Email: {{consultResponseCtrl.consult.demographic.email}}</p>
+		<p>MRP: {{consultResponseCtrl.consult.demographic.provider.firstName}}, {{consultResponseCtrl.consult.demographic.provider.lastName}}</p>
 	</div>
 	<br/>
 	<div id="consult_status">
 		<label class="control-label">Consultation Status:</label>
 		<div class="form-group">
-			<select class="form-control" ng-model="consult.status" ng-required="true" ng-options="status.value as status.name for status in statuses"/>
+			<select class="form-control" ng-model="consultResponseCtrl.consult.status" ng-required="true" ng-options="status.value as status.name for status in consultResponseCtrl.statuses"/>
 		</div>
 	</div>
 	<br/>
-	<button type="button" class="btn btn-small btn-primary" ng-click="attachFiles()">Attachments</button>
+	<button type="button" class="btn btn-small btn-primary" ng-click="consultResponseCtrl.attachFiles()">Attachments</button>
 	<ol style="padding-left:20px;">
-		<li ng-repeat="attachment in consult.attachments">
-			<a ng-click="openAttach(attachment)" title="{{attachment.displayName}}">{{attachment.shortName}}</a>
+		<li ng-repeat="attachment in consultResponseCtrl.consult.attachments">
+			<a ng-click="consultResponseCtrl.openAttach(attachment)" title="{{consultResponseCtrl.attachment.displayName}}">{{attachment.shortName}}</a>
 		</li>
 	</ol>
 </div><!-- Left pane End -->
 
-<div id="right_pane" class="col-md-10" ng-show="consultReadAccess">
+<div id="right_pane" class="col-md-10" ng-show="consultResponseCtrl.consultReadAccess">
 	<div class="col-md-6"><!-- Letterhead -->
 		<h4>Letterhead:</h4>
 		<div class="well">
 			<div>
 				<select id="letterhead" class="form-control" 
 						ng-model="consult.letterheadName" 
-						ng-options="letterhead.id as letterhead.name for letterhead in consult.letterheadList"
-						ng-change="changeLetterhead()">
+						ng-options="letterhead.id as letterhead.name for letterhead in consultResponseCtrl.consult.letterheadList"
+						ng-change="consultResponseCtrl.changeLetterhead()">
 				</select>
 			</div>
 			<p class="letterheadDetails">
@@ -111,8 +111,8 @@
 					<label>Phone:</label> {{consult.letterheadPhone}} <br/>
 					<label>Fax:</label>
 					<select id="letterheadFax" class="form-control inline" style="width: auto;"
-							ng-model="consult.letterheadFax"
-							ng-options="fax.faxNumber as fax.faxUser for fax in consult.faxList">
+							ng-model="consultResponseCtrl.consult.letterheadFax"
+							ng-options="fax.faxNumber as fax.faxUser for fax in consultResponseCtrl.consult.faxList">
 					</select>
 				</address>
 			</p>
@@ -124,15 +124,15 @@
 			<div>
 				<select id="refDocId" class="form-control"
 						title="Referring Doctor"
-						ng-model="consult.referringDoctor"
-						ng-options="refDoc.name for refDoc in consult.referringDoctorList">
+						ng-model="consultResponseCtrl.consult.referringDoctor"
+						ng-options="refDoc.name for refDoc in consultResponseCtrl.consult.referringDoctorList">
 				</select>
 			</div>
 			<p class="referringDoctorDetails">
 				<address>
-					<label>Address:</label> {{consult.referringDoctor.streetAddress}}<br/>
-					<label>Phone:</label> {{consult.referringDoctor.phoneNumber}} <br/>
-					<label>Fax:</label> {{consult.referringDoctor.faxNumber}}<br />
+					<label>Address:</label> {{consultResponseCtrl.consult.referringDoctor.streetAddress}}<br/>
+					<label>Phone:</label> {{consultResponseCtrl.consult.referringDoctor.phoneNumber}} <br/>
+					<label>Fax:</label> {{consultResponseCtrl.consult.referringDoctor.faxNumber}}<br />
 				</address>
 			</p>
 		</div>
@@ -144,13 +144,27 @@
 			<div class="col-md-6">
 				<div class="form-group">
 					<label class="control-label">Response Date:</label>
-					<input id="dp-responseDate" type="text" class="form-control inline" style="width:60%" ng-model="consult.responseDate" placeholder="Response Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.respDatePicker" ng-click="page.respDatePicker=true"/>
+					<input id="dp-responseDate" type="text" 
+						class="form-control inline" 
+						style="width:60%" 
+						ng-model="consultResponseCtrl.consult.responseDate" 
+						placeholder="Response Date" 
+						datepicker-popup="yyyy-MM-dd" 
+						datepicker-append-to-body="true" 
+						is-open="consultResponseCtrl.page.respDatePicker" 
+						ng-click="consultResponseCtrl.page.respDatePicker=true"
+					/>
 				</div>
 			</div>
 			<div class="col-md-6">
 				<div class="form-group">
 					<label class="control-label">Send To:</label>
-					<select id="sendTo" class="form-control inline" style="width:70%" ng-model="consult.sendTo" ng-required="true" ng-options="sendTo for sendTo in consult.sendToList"/>
+					<select id="sendTo" class="form-control inline" 
+						style="width:70%" 
+						ng-model="consultResponseCtrl.consult.sendTo" 
+						ng-required="true" 
+						ng-options="sendTo for sendTo in consultResponseCtrl.consult.sendToList"
+					/>
 				</div>
 			</div>
 			<div class="clear"></div>
@@ -161,23 +175,37 @@
 			<div class="col-md-6">
 				<div class="form-group">
 					<label class="control-label">Referral Date:</label>
-					<input id="dp-referralDate" type="text" class="form-control inline" style="width:60%" ng-model="consult.referralDate" placeholder="Referral Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.refDatePicker" ng-click="page.refDatePicker=true"/>
+					<input id="dp-referralDate" type="text" 
+						class="form-control inline" 
+						style="width:60%" 
+						ng-model="consultResponseCtrl.consult.referralDate" 
+						placeholder="Referral Date" 
+						datepicker-popup="yyyy-MM-dd" 
+						datepicker-append-to-body="true" 
+						is-open="consultResponseCtrl.page.refDatePicker" 
+						ng-click="consultResponseCtrl.page.refDatePicker=true"
+					/>
 				</div>
 				<div class="form-group">
 					<label class="control-label">Urgency:</label>
-					<select id="urgency" class="form-control inline" style="width:70%" ng-model="consult.urgency" ng-required="true" ng-options="urgency.value as urgency.name for urgency in urgencies"/>
+					<select id="urgency" 
+						class="form-control inline" 
+						style="width:70%" 
+						ng-model="consultResponseCtrl.consult.urgency" 
+						ng-required="true" 
+						ng-options="urgency.value as urgency.name for urgency in consultResponseCtrl.urgencies"/>
 				</div>
 			</div>
 			<div class="col-md-6">
 				<div class="form-group">
 					<label class="control-label">Referrer Instructions:</label>
-					<textarea cols="80" rows="2" class="form-control" readOnly>{{consult.referringDoctor.annotation}}</textarea>
+					<textarea cols="80" rows="2" class="form-control" readOnly>{{consultResponseCtrl.consult.referringDoctor.annotation}}</textarea>
 				</div>
 			</div>
 			<div class="clear"></div>
 			<div class="col-md-12"><!-- Reason for Consultation -->
 				<label class="control-label">Reason for Consultation:</label>
-				<textarea cols="120" rows="2" class="form-control" ng-model="consult.reasonForReferral"></textarea>
+				<textarea cols="120" rows="2" class="form-control" ng-model="consultResponseCtrl.consult.reasonForReferral"></textarea>
 			</div><!-- Reason End -->
 		</div>
 	</div><!-- Referral End -->
@@ -188,32 +216,50 @@
 			<div class="col-md-6">
 				<div class="form-group">
 					<label class="control-label">Appointment Date:</label>
-					<input id="dp-appointmentDate" type="text" class="form-control inline" style="width:50%" ng-model="consult.appointmentDate" placeholder="Appointment Date"  datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.aptDatePicker" ng-click="page.aptDatePicker=true"/>
+					<input id="dp-appointmentDate" type="text" 
+						class="form-control inline" 
+						style="width:50%" 
+						ng-model="consultResponseCtrl.consult.appointmentDate" 
+						placeholder="Appointment Date"  
+						datepicker-popup="yyyy-MM-dd" 
+						datepicker-append-to-body="true" 
+						is-open="consultResponseCtrl.page.aptDatePicker" 
+						ng-click="consultResponseCtrl.page.aptDatePicker=true"/>
 				</div>
 				<div class="form-group">
 					<label class="control-label">Appointment Time:</label>
 					<span style="white-space:nowrap;">
 						<select class="form-control inline" style="width:20%;" 
-								ng-model="consult.appointmentHour"
-								ng-options="hour for hour in hours"
-								ng-change="changeAppointmentTime()">
+								ng-model="consultResponseCtrl.consult.appointmentHour"
+								ng-options="hour for hour in consultResponseCtrl.hours"
+								ng-change="consultResponseCtrl.changeAppointmentTime()">
 						</select> :
 						<select class="form-control inline" style="width:20%;" 
-								ng-model="consult.appointmentMinute"
-								ng-options="minute for minute in minutes"
-								ng-change="changeAppointmentTime()">
+								ng-model="consultResponseCtrl.consult.appointmentMinute"
+								ng-options="minute for minute in consultResponseCtrl.minutes"
+								ng-change="consultResponseCtrl.changeAppointmentTime()">
 						</select>
 					</span>
 				</div>
 				<div class="form-group">
 					<label class="control-label">Last Follow-up Date:</label>
-					<input id="dp-followUpDate" type="text" class="form-control inline" style="width:50%" ng-model="consult.followUpDate" placeholder="Follow Up Date"  datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.lfdDatePicker" ng-click="page.lfdDatePicker=true"/>
+					<input id="dp-followUpDate" type="text" 
+						class="form-control inline" 
+						style="width:50%" 
+						ng-model="consultResponseCtrl.consult.followUpDate" 
+						placeholder="Follow Up Date"  
+						datepicker-popup="yyyy-MM-dd" 
+						datepicker-append-to-body="true" 
+						is-open="consultResponseCtrl.page.lfdDatePicker" 
+						ng-click="consultResponseCtrl.page.lfdDatePicker=true"/>
 				</div>
 			</div>
 			<div class="col-md-6">
 				<label class="control-label">Appointment Notes:</label>
 				<div class="form-group">
-					<textarea cols="80" rows="4" class="form-control" ng-model="consult.appointmentNote"></textarea>
+					<textarea cols="80" rows="4" 
+						class="form-control" 
+						ng-model="consultResponseCtrl.consult.appointmentNote"></textarea>
 				</div>
 			</div>
 			<div class="clear"></div>
@@ -223,15 +269,15 @@
 	<div class="col-md-12"><!-- Consultation Response -->
 		<h4>Examination:</h4>
 		<div class="well">
-			<textarea cols="120" rows="3" class="form-control" ng-model="consult.examination"></textarea>
+			<textarea cols="120" rows="3" class="form-control" ng-model="consultResponseCtrl.consult.examination"></textarea>
 		</div>
 		<h4>Impression:</h4>
 		<div class="well">
-			<textarea cols="120" rows="3" class="form-control" ng-model="consult.impression"></textarea>
+			<textarea cols="120" rows="3" class="form-control" ng-model="consultResponseCtrl.consult.impression"></textarea>
 		</div>
 		<h4>Plan:</h4>
 		<div class="well">
-			<textarea cols="120" rows="3" class="form-control" ng-model="consult.plan"></textarea>
+			<textarea cols="120" rows="3" class="form-control" ng-model="consultResponseCtrl.consult.plan"></textarea>
 		</div>
 	</div><!-- Response End -->
 	<div class="clear"></div>
@@ -240,16 +286,17 @@
 		<div>
 			<h4>Pertinent clinical information:</h4>
 			<p>
-				<button type="button" class="btn btn-tall btn-success" ng-click="getFamilyHistory('clinicalInfo');">Family<br/>History</button>
-				<button type="button" class="btn btn-tall btn-success" ng-click="getMedicalHistory('clinicalInfo');">Medical<br/>History</button>
-				<button type="button" class="btn btn-tall btn-success" ng-click="getOngoingConcerns('clinicalInfo');">Ongoing<br/>Concerns</button>
-				<button type="button" class="btn btn-tall btn-success" ng-click="getOtherMeds('clinicalInfo');">Other<br/>Meds</button>
-				<button type="button" class="btn btn-tall btn-success" ng-click="getReminders('clinicalInfo');">Reminders</button>
+				<button type="button" class="btn btn-tall btn-success" ng-click="consultResponseCtrl.getFamilyHistory('clinicalInfo');">Family<br/>History</button>
+				<button type="button" class="btn btn-tall btn-success" ng-click="consultResponseCtrl.getMedicalHistory('clinicalInfo');">Medical<br/>History</button>
+				<button type="button" class="btn btn-tall btn-success" ng-click="consultResponseCtrl.getOngoingConcerns('clinicalInfo');">Ongoing<br/>Concerns</button>
+				<button type="button" class="btn btn-tall btn-success" ng-click="consultResponseCtrl.getOtherMeds('clinicalInfo');">Other<br/>Meds</button>
+				<button type="button" class="btn btn-tall btn-success" ng-click="consultResponseCtrl.getReminders('clinicalInfo');">Reminders</button>
 			</p>					
 			<div class="well">
 				<div>
-					<textarea id="clinicalInfo" cols="80" rows="4" class="form-control" placeholder="Use the buttons above to insert data from the patients chart"
-						ng-model="consult.clinicalInfo"></textarea>
+					<textarea id="clinicalInfo" cols="80" rows="4" class="form-control" 
+						placeholder="Use the buttons above to insert data from the patients chart"
+						ng-model="consultResponseCtrl.consult.clinicalInfo"></textarea>
 				</div>
 			</div>
 			<div class="clear"></div>
@@ -260,16 +307,18 @@
 		<div>
 			<h4>Significant Concurrent Problems:</h4>
 			<p>
-				<button type="button" class="btn btn-tall btn-success" ng-click="getFamilyHistory('concurrentProblems');">Family<br/>History</button>
-				<button type="button" class="btn btn-tall btn-success" ng-click="getMedicalHistory('concurrentProblems');">Medical<br/>History</button>
-				<button type="button" class="btn btn-tall btn-success" ng-click="getOngoingConcerns('concurrentProblems');">Ongoing<br/>Concerns</button>
-				<button type="button" class="btn btn-tall btn-success" ng-click="getOtherMeds('concurrentProblems');">Other<br/>Meds</button>
-				<button type="button" class="btn btn-tall btn-success" ng-click="getReminders('concurrentProblems');">Reminders</button>
+				<button type="button" class="btn btn-tall btn-success" ng-click="consultResponseCtrl.getFamilyHistory('concurrentProblems');">Family<br/>History</button>
+				<button type="button" class="btn btn-tall btn-success" ng-click="consultResponseCtrl.getMedicalHistory('concurrentProblems');">Medical<br/>History</button>
+				<button type="button" class="btn btn-tall btn-success" ng-click="consultResponseCtrl.getOngoingConcerns('concurrentProblems');">Ongoing<br/>Concerns</button>
+				<button type="button" class="btn btn-tall btn-success" ng-click="consultResponseCtrl.getOtherMeds('concurrentProblems');">Other<br/>Meds</button>
+				<button type="button" class="btn btn-tall btn-success" ng-click="consultResponseCtrl.getReminders('concurrentProblems');">Reminders</button>
 			</p>						
 			<div class="well">
 				<div>
-					<textarea id="concurrentProblems" cols="80" rows="4" class="form-control" placeholder="Use the buttons above to insert data from the patients chart"
-						ng-model="consult.concurrentProblems"></textarea>
+					<textarea id="concurrentProblems" cols="80" 
+						rows="4" class="form-control" 
+						placeholder="Use the buttons above to insert data from the patients chart"
+						ng-model="consultResponseCtrl.consult.concurrentProblems"></textarea>
 				</div>
 			</div>
 			<div class="clear"></div>
@@ -280,24 +329,48 @@
 	<div class="col-md-6"><!-- Alergies / Current Medications -->
 		<h4>Allergies:</h4>
 		<div class="well">
-			<textarea cols="80" rows="4" class="form-control" ng-model="consult.allergies"></textarea>
+			<textarea cols="80" rows="4" class="form-control" ng-model="consultResponseCtrl.consult.allergies"></textarea>
 		</div>
 	</div><!-- Alergies End -->	
 	<div class="col-md-6">
-		<h4>Current Medications: <button type="button" class="btn btn-success" style="padding:0px 10px;" ng-click="getOtherMeds('currentMeds');">Other Meds</button></h4>
+		<h4>Current Medications: 
+			<button type="button" class="btn btn-success" style="padding:0px 10px;" ng-click="consultResponseCtrl.getOtherMeds('currentMeds');">
+				Other Meds
+			</button>
+		</h4>
 		
 		<div class="well">
-			<textarea id="currentMeds" cols="80" rows="4" class="form-control" ng-model="consult.currentMeds" placeholder="Use the button above to insert Other Meds data from the patients chart"></textarea>
+			<textarea id="currentMeds" cols="80" 
+				rows="4" 
+				class="form-control" 
+				ng-model="consultResponseCtrl.consult.currentMeds" 
+				placeholder="Use the button above to insert Other Meds data from the patients chart">
+			</textarea>
 		</div>
 	</div><!-- Current Medications End -->	
 	<div class="clear"></div>
 </div><!-- Right pane End -->
 
 <div class="wrapper-action" ng-show="consultReadAccess"><!-- Action Buttons -->
-	<button type="button" class="btn btn-large btn-warning action" ng-click="printPreview()" ng-show="consult.id!=null && consultChanged<=0">Print Preview</button>&nbsp;
-	<button type="button" class="btn btn-large btn-warning action" ng-click="sendFax()" ng-show="consult.id!=null && consultChanged<=0">Send Fax</button>&nbsp;
-	<button type="button" class="btn btn-large btn-primary action" ng-click="save()" ng-show="consultChanged>0">Save</button>&nbsp;
-	<button type="button" class="btn btn-large btn-default action" ng-click="close()">Close</button>&nbsp;
+	<button type="button" class="btn btn-large btn-warning action" 
+			ng-click="consultResponseCtrl.printPreview()" 
+			ng-show="consultResponseCtrl.consult.id!=null && consultChanged<=0">
+		Print Preview
+	</button>&nbsp;
+	<button type="button" class="btn btn-large btn-warning action" 
+			ng-click="consultResponseCtrl.sendFax()" 
+			ng-show="consultResponseCtrl.consult.id!=null && consultChanged<=0">
+		Send Fax
+	</button>&nbsp;
+	<button type="button" class="btn btn-large btn-primary action" 
+			ng-click="consultResponseCtrl.save()" 
+			ng-show="consultResponseCtrl.consultChanged>0">
+		Save
+	</button>&nbsp;
+	<button type="button" class="btn btn-large btn-default action" 
+			ng-click="consultResponseCtrl.close()">
+		Close
+	</button>&nbsp;
 </div>
 
 <div ng-show="consultReadAccess != null && consultReadAccess == false"

@@ -40,13 +40,13 @@ angular.module("Common.Services").service("providerService", [
 			var deferred = $q.defer();
 
 			$http.get(service.apiPath + '/provider/me', service.configHeaders).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error()
+				function error(errors)
 				{
-					console.log("providerService::getMe error", error);
+					console.log("providerService::getMe error", errors);
 					deferred.reject("An error occured while getting user data");
 				});
 
@@ -59,13 +59,13 @@ angular.module("Common.Services").service("providerService", [
 
 			$http.get(service.apiPath + '/provider/' + encodeURIComponent(id),
 				service.configHeaders).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error()
+				function error(errors)
 				{
-					console.log("providerService::getProvider error", error);
+					console.log("providerService::getProvider error", errors);
 					deferred.reject("An error occured while getting user data");
 				});
 
@@ -83,13 +83,13 @@ angular.module("Common.Services").service("providerService", [
 				data: JSON.stringify(filter),
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data.content);
+					deferred.resolve(results.data.content);
 				},
-				function error()
+				function error(errors)
 				{
-					console.log("providerService::searchProviders error", error);
+					console.log("providerService::searchProviders error", errors);
 					deferred.reject("An error occured while fetching provider list");
 				});
 
@@ -105,13 +105,13 @@ angular.module("Common.Services").service("providerService", [
 				url: service.apiPath + '/settings/get',
 				method: "GET"
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data.content[0]);
+					deferred.resolve(results.data.content[0]);
 				},
-				function error()
+				function error(errors)
 				{
-					console.log("providerService::getSettings error", error);
+					console.log("providerService::getSettings error", errors);
 					deferred.reject("An error occured while fetching provider settings");
 				});
 
@@ -129,13 +129,13 @@ angular.module("Common.Services").service("providerService", [
 				data: JSON.stringify(settings),
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error()
+				function error(errors)
 				{
-					console.log("providerService::saveSettings error", error);
+					console.log("providerService::saveSettings error", errors);
 					deferred.reject("An error occured while saving settings");
 				});
 
@@ -151,13 +151,13 @@ angular.module("Common.Services").service("providerService", [
 				url: service.apiPath + '/getActiveTeams',
 				method: "GET"
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data.content);
+					deferred.resolve(results.data.content);
 				},
-				function error()
+				function error(errors)
 				{
-					console.log("providerService::getActiveTeams error", error);
+					console.log("providerService::getActiveTeams error", errors);
 					deferred.reject("An error occured while fetching provider teams");
 				});
 

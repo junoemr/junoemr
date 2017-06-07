@@ -31,42 +31,42 @@
 			<thead>
 				<tr>
 					<th>
-						<a href="javascript:void(0)" ng-click="manageConfiguration()">
+						<a href="javascript:void(0)" ng-click="patientListCtrl.manageConfiguration()">
 							<span class="glyphicon glyphicon-cog"></span>
 						</a>
 					</th>
 					<th class="pull-right">
 						<h6>
-							<a href="javascript:void(0)" ng-click="switchDay(-1)">
+							<a href="javascript:void(0)" ng-click="patientListAppointmentListCtrl.switchDay(-1)">
 								<span class="glyphicon glyphicon-chevron-left"></span>
 							</a>
 						</h6>
 					</th>
 					<th class="list-patient-date-cell">
 						<%--<span class="glyphicon glyphicon-calendar"></span>--%>
-						<a href="#"
-							 ng-model="$parent.appointmentDate"
-							 ng-change="changeApptDate()"
+						<a href="javascript:void(0)"
+							 ng-model="patientListAppointmentListCtrl.appointmentDate"
+							 ng-change="patientListAppointmentListCtrl.changeApptDate()"
 							 ng-click="appointmentDatePicker = true"
 							 uib-datepicker-popup="yyyy-MM-dd"
 							 datepicker-append-to-body="true"
 							 is-open="appointmentDatePicker"
-							 datepicker-options="dateOptions"
+							 datepicker-options="patientListAppointmentListCtrl.dateOptions"
 							 show-button-bar="false"
 							 popup-placement="bottom"
 							 bundle="ui"
-							 title="{{appointmentDate | date:'yyyy-MM-dd' }}"
-						>{{appointmentDate | date:'yyyy-MM-dd' }}</a>
+							 title="{{patientListAppointmentListCtrl.appointmentDate | date:'yyyy-MM-dd' }}"
+						>{{patientListAppointmentListCtrl.appointmentDate | date:'yyyy-MM-dd' }}</a>
 					</th>
 					<th class="pull-left">
 						<h6>
-							<a href="javascript:void(0)" ng-click="switchDay(+1)">
+							<a href="javascript:void(0)" ng-click="patientListAppointmentListCtrl.switchDay(+1)">
 								<span class="glyphicon glyphicon-chevron-right"></span>
 							</a>
 						</h6>
 					</th>
 					<th style="text-align:right">
-						<a href="javascript:void(0)" ng-click="refresh()">
+						<a href="javascript:void(0)" ng-click="patientListCtrl.refresh()">
 							<span class="glyphicon glyphicon-refresh" title="<bean:message key="patientList.refresh" bundle="ui"/>"></span>
 						</a>
 					</th>
@@ -76,15 +76,17 @@
 	</div>
 
 	<div id="patient-list">
-		<a ng-repeat="patient in patients | offset:currentPage*pageSize | limitTo:pageSize | filter:query" class="list-group-item default hand-hover"
-			ng-click="goToRecord(patient)" ng-dblclick="viewAppointment(patient.appointmentNo)">
+		<a ng-repeat="patient in patientListCtrl.patients | offset:currentPage*pageSize | limitTo:pageSize | filter:query" class="list-group-item default hand-hover"
+			ng-click="patientListCtrl.goToRecord(patient)" ng-dblclick="patientListAppointmentListCtrl.viewAppointment(patient.appointmentNo)">
 			<!--
 			<span ng-if="patient.status.length>0 && patient.status != 't'" class="badge">{{patient.status}}</span>
 			-->
 			<h5 class="list-group-item-heading pull-right patient-time" >{{patient.startTime}}</h5>
 			<h4 class="list-group-item-heading patient-name" >{{patient.name}}</h5>
 
-			<p class="list-group-item-text" ng-if="patient.demographicNo != 0" ng-show="patientListConfig.showReason" ><bean:message key="provider.appointmentProviderAdminDay.Reason"/>: {{patient.reason}}  </p>
+			<p class="list-group-item-text" ng-if="patient.demographicNo != 0" ng-show="patientListCtrl.patientListConfig.showReason">
+				<bean:message key="provider.appointmentProviderAdminDay.Reason"/>: {{patient.reason}}  
+			</p>
 		</a>
 	</div>
 

@@ -35,17 +35,22 @@
 	<div class="row" style="height: 5px"></div>
 
 
-	<div class="row" ng-if="appointment.demographic != null">
+	<div class="row" ng-if="appointmentViewCtrl.appointment.demographic != null">
 		<div class="col-xs-3">
 			<img width="60px"
-				ng-src="../imageRenderingServlet?source=local_client&clientId={{appointment.demographic.demographicNo}}" />
+				ng-src="../imageRenderingServlet?source=local_client&clientId={{appointmentViewCtrl.appointment.demographic.demographicNo}}" />
 		</div>
 		<div class="col-xs-9">
-			<div>{{appointment.demographic.lastName}},
-				{{appointment.demographic.firstName}}</div>
-			<div>{{appointment.demographic.hin}}</div>
-			<div>{{appointment.demographic.dateOfBirth | date :
-				'yyyy-MM-dd'}}</div>
+			<div>
+				{{appointmentViewCtrl.appointment.demographic.lastName}},
+				{{appointmentViewCtrl.appointment.demographic.firstName}}
+			</div>
+			<div>
+				{{appointmentViewCtrl.appointment.demographic.hin}}
+			</div>
+			<div>
+				{{appointmentViewCtrl.appointment.demographic.dateOfBirth | date : 'yyyy-MM-dd'}}
+			</div>
 		</div>
 	</div>
 
@@ -55,66 +60,63 @@
 		<div class="col-xs-2">
 			<strong>Provider:</strong>
 		</div>
-		<div class="col-xs-6" ng-show="!showProviderFormControl">
-			{{appointment.provider.lastName}},{{appointment.provider.firstName}}
-			<span ng-show="appointmentWriteAccess"
-				class="glyphicon glyphicon-pencil" ng-click="editProvider()"></span>
+		<div class="col-xs-6" ng-show="!appointmentViewCtrl.showProviderFormControl">
+			{{appointmentViewCtrl.appointment.provider.lastName}},{{appointmentViewCtrl.appointment.provider.firstName}}
+			<span ng-show="appointmentViewCtrl.appointmentWriteAccess"
+				class="glyphicon glyphicon-pencil" ng-click="appointmentViewCtrl.editProvider()"></span>
 		</div>
-		<div class="col-xs-6" ng-show="showProviderFormControl">
+		<div class="col-xs-6" ng-show="appointmentViewCtrl.showProviderFormControl">
 			<div class="form-group">
 				<div class="input-group">
 					<div class="input-group-addon">
 						<span class="glyphicon glyphicon-remove"
-							ng-click="cancelProviderUpdate()"></span>
+							ng-click="appointmentViewCtrl.cancelProviderUpdate()"></span>
 					</div>
-					<input type="text" ng-model="appointmentUpdate.providerName"
+					<input type="text" ng-model="appointmentViewCtrl.appointmentUpdate.providerName"
 						placeholder="Provider"
-						uib-typeahead="pt.providerNo as pt.name for pt in searchProviders($viewValue)"
-						typeahead-on-select="updateProvider($item, $model, $label)"
+						uib-typeahead="pt.providerNo as pt.name for pt in appointmentViewCtrl.searchProviders($viewValue)"
+						typeahead-on-select="appointmentViewCtrl.updateProvider($item, $model, $label)"
 						class="form-control input-sm">
 				</div>
 			</div>
 		</div>
-
-
 	</div>
-
 
 	<div class="row">
 		<div class="col-xs-4">
-			<b>Date:</b>{{appointment.appointmentDate | date: 'yyyy-MM-dd'}}
+			<b>Date:</b>{{appointmentViewCtrl.appointment.appointmentDate | date: 'yyyy-MM-dd'}}
 		</div>
 
 		<div class="col-xs-4">
-			<b>Start Time:</b>{{appointment.startTime | date: 'hh:mm a'}}
+			<b>Start Time:</b>{{appointmentViewCtrl.appointment.startTime | date: 'hh:mm a'}}
 		</div>
 
 		<div class="col-xs-4">
-			<b>Duration:</b>{{appointment.duration}} mins
+			<b>Duration:</b>{{appointmentViewCtrl.appointment.duration}} mins
 		</div>
 	</div>
 
 	<div class="row">
 		<div class="col-xs-4">
-			<b>Status:</b>{{getStatus(appointment.status)}}
+			<b>Status:</b>{{appointmentViewCtrl.getStatus(appointment.status)}}
 		</div>
 
 		<div class="col-xs-4">
-			<b>Type:</b>{{appointment.type}}
+			<b>Type:</b>{{appointmentViewCtrl.appointment.type}}
 		</div>
 
 		<div class="col-xs-4">
-			<b>Critical:</b>{{appointment.urgency}}
+			<b>Critical:</b>{{appointmentViewCtrl.appointment.urgency}}
 		</div>
 	</div>
 
 	<div class="row">
 		<div class="col-xs-4">
-			<b>Location:</b>{{appointment.location}}
+			<b>Location:</b>{{appointmentViewCtrl.appointment.location}}
 		</div>
 
 		<div class="col-xs-4">
-			<b>Resources:</b>{{appointment.resources}}
+			<b>Resources:</b>{{appointmentViewCtrl.appointment.resources}}
 		</div>
 
 		<div class="col-xs-4"></div>
@@ -122,11 +124,11 @@
 
 	<div class="row">
 		<div class="col-xs-4">
-			<b>Reason:</b>{{appointment.reason}}
+			<b>Reason:</b>{{appointmentViewCtrl.appointment.reason}}
 		</div>
 
 		<div class="col-xs-4">
-			<b>Notes:</b>{{appointment.notes}}
+			<b>Notes:</b>{{appointmentViewCtrl.appointment.notes}}
 		</div>
 
 		<div class="col-xs-4"></div>
@@ -147,27 +149,27 @@
 <div class="modal-footer">
 	<!-- 
     <button class="btn" ng-click="save()">Save</button>
-    
--->
+	-->
 
-<button class="btn btn-default" ng-click="noShowAppointment()">
-		No Show</button>
-		<button class="btn btn-warning" ng-click="cancelAppointment()">
-		Cancel Appointment</button>
-		
-	<button class="btn btn-danger" ng-click="deleteAppointment()">
-		<span class="glyphicon glyphicon-trash"></span>Delete
+	<button class="btn btn-default" ng-click="appointmentViewCtrl.noShowAppointment()">
+		No Show
 	</button>
-
-
+	<button class="btn btn-warning" ng-click="appointmentViewCtrl.cancelAppointment()">
+		Cancel Appointment
+	</button>
+		
+	<button class="btn btn-danger" ng-click="appointmentViewCtrl.deleteAppointment()">
+		<span class="glyphicon glyphicon-trash"></span>
+		Delete
+	</button>
 
 	<!-- 
 	<button class="btn btn-primary" ng-click="showAppointmentHistory()">
 		Appt History
 	</button>
--->
+	-->
 
-	<button class="btn btn-primary" ng-click="close()">
+	<button class="btn btn-primary" ng-click="appointmentViewCtrl.close()">
 		<bean:message key="global.close" bundle="ui" />
 	</button>
 </div>

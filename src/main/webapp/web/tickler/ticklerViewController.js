@@ -24,42 +24,44 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 		me)
 	{
 
-		$scope.ticklerUpdate = angular.copy(tickler);
+		var controller = this;
+
+		controller.ticklerUpdate = angular.copy(tickler);
 		console.log("TICKLER", tickler);
-		if (Juno.Common.Util.exists($scope.ticklerUpdate.serviceDate))
+		if (Juno.Common.Util.exists(controller.ticklerUpdate.serviceDate))
 		{
-			$scope.ticklerUpdate.serviceDate = new Date($scope.ticklerUpdate.serviceDate);
+			controller.ticklerUpdate.serviceDate = new Date(controller.ticklerUpdate.serviceDate);
 		}
 
-		if (Juno.Common.Util.exists($scope.ticklerUpdate.updateDate))
+		if (Juno.Common.Util.exists(controller.ticklerUpdate.updateDate))
 		{
-			$scope.ticklerUpdate.updateDate = new Date($scope.ticklerUpdate.updateDate);
+			controller.ticklerUpdate.updateDate = new Date(controller.ticklerUpdate.updateDate);
 		}
 
 
 
-		$scope.me = me;
-		$scope.ticklerWriteAccess = ticklerWriteAccess;
+		controller.me = me;
+		controller.ticklerWriteAccess = ticklerWriteAccess;
 
 		//this object keeps track of the changes being made
-		// $scope.ticklerUpdate = {
-		// 	message: $scope.tickler.message,
+		// controller.ticklerUpdate = {
+		// 	message: controller.tickler.message,
 
-		// 	taskAssignedTo: $scope.tickler.taskAssignedTo,
-		// 	taskAssignedToName: $scope.tickler.taskAssignedName,
-		// 	serviceDate: $filter('date')($scope.tickler.serviceDate, 'yyyy-MM-dd'),
-		// 	serviceTime: $filter('date')($scope.tickler.serviceDate, 'HH:mm'),
+		// 	taskAssignedTo: controller.tickler.taskAssignedTo,
+		// 	taskAssignedToName: controller.tickler.taskAssignedName,
+		// 	serviceDate: $filter('date')(controller.tickler.serviceDate, 'yyyy-MM-dd'),
+		// 	serviceTime: $filter('date')(controller.tickler.serviceDate, 'HH:mm'),
 
 		// };
-		// $scope.ticklerUpdate.message = "TESSST";
-		$scope.needsUpdate = false;
+		// controller.ticklerUpdate.message = "TESSST";
+		controller.needsUpdate = false;
 
-		$scope.showUpdates = false;
-		$scope.showComments = true;
+		controller.showUpdates = false;
+		controller.showComments = true;
 
-		// $scope.taskAssignedToName = $scope.tickler.taskAssignedName;
-		$scope.priorities = ['Low', 'Normal', 'High'];
-		$scope.statuses = [
+		// controller.taskAssignedToName = controller.tickler.taskAssignedName;
+		controller.priorities = ['Low', 'Normal', 'High'];
+		controller.statuses = [
 		{
 			id: 'A',
 			label: 'Active'
@@ -75,13 +77,13 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		if (ticklerNote != null)
 		{
-			$scope.ticklerNote = ticklerNote.ticklerNote;
+			controller.ticklerNote = ticklerNote.ticklerNote;
 		}
 
 		// Keep track of the current status as an object containing id and label
 		if (tickler != null)
 		{
-			$scope.selectedStatus = $scope.statuses.find(function(status)
+			controller.selectedStatus = controller.statuses.find(function(status)
 			{
 				return status.id == tickler.status;
 			});
@@ -92,12 +94,12 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			{
 				console.log('change', new_value);
 
-				if ($scope.ticklerUpdate.serviceDate instanceof Date && $scope.ticklerUpdate.serviceTime instanceof Date)
+				if (controller.ticklerUpdate.serviceDate instanceof Date && controller.ticklerUpdate.serviceTime instanceof Date)
 				{
 
-					$scope.ticklerUpdate.serviceDate = new Date($scope.ticklerUpdate.serviceDate.getTime() + $scope.ticklerUpdate.serviceTime.getTime());
+					controller.ticklerUpdate.serviceDate = new Date(controller.ticklerUpdate.serviceDate.getTime() + controller.ticklerUpdate.serviceTime.getTime());
 
-					console.log('new val', $scope.ticklerUpdate.serviceDate);
+					console.log('new val', controller.ticklerUpdate.serviceDate);
 				}
 
 
@@ -109,18 +111,18 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			{
 				console.log('change', new_value);
 
-				if ($scope.ticklerUpdate.serviceDate instanceof Date && $scope.ticklerUpdate.serviceTime instanceof Date)
+				if (controller.ticklerUpdate.serviceDate instanceof Date && controller.ticklerUpdate.serviceTime instanceof Date)
 				{
-					$scope.ticklerUpdate.serviceDate = new Date($scope.ticklerUpdate.serviceDate.getTime() + $scope.ticklerUpdate.serviceTime.getTime());
+					controller.ticklerUpdate.serviceDate = new Date(controller.ticklerUpdate.serviceDate.getTime() + controller.ticklerUpdate.serviceTime.getTime());
 				}
 
 
 			}
 		);
 
-		$scope.close = function()
+		controller.close = function()
 		{
-			if ($scope.needsUpdate)
+			if (controller.needsUpdate)
 			{
 				if (confirm("You have unsaved changes, are you sure?"))
 				{
@@ -129,54 +131,54 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			}
 			else
 			{
-				$scope.ticklerUpdate = undefined;
+				controller.ticklerUpdate = undefined;
 				$uibModalInstance.close(false);
 			}
 
 		};
 
-		$scope.save = function()
+		controller.save = function()
 		{
 			$uibModalInstance.close("Someone Saved Me");
 		};
 
-		$scope.editTaskAssignedTo = function()
+		controller.editTaskAssignedTo = function()
 		{
-			$scope.showTaskAssignedToFormControl = true;
-			// $scope.ticklerUpdate.taskAssignedTo = $scope.tickler.taskAssignedTo;
-			// $scope.ticklerUpdate.taskAssignedToName = $scope.tickler.taskAssignedName;
+			controller.showTaskAssignedToFormControl = true;
+			// controller.ticklerUpdate.taskAssignedTo = controller.tickler.taskAssignedTo;
+			// controller.ticklerUpdate.taskAssignedToName = controller.tickler.taskAssignedName;
 		};
 
-		$scope.updateTaskAssignedTo = function(item, model, label)
+		controller.updateTaskAssignedTo = function(item, model, label)
 		{
-			$scope.needsUpdate = true;
-			$scope.tickler.taskAssignedTo = model;
-			$scope.tickler.taskAssignedToName = label;
-			$scope.showTaskAssignedToFormControl = false;
+			controller.needsUpdate = true;
+			controller.tickler.taskAssignedTo = model;
+			controller.tickler.taskAssignedToName = label;
+			controller.showTaskAssignedToFormControl = false;
 		};
 
-		$scope.cancelTaskAssignedToUpdate = function()
+		controller.cancelTaskAssignedToUpdate = function()
 		{
-			$scope.ticklerUpdate.taskAssignedTo = null;
-			$scope.ticklerUpdate.taskAssignedToName = null;
+			controller.ticklerUpdate.taskAssignedTo = null;
+			controller.ticklerUpdate.taskAssignedToName = null;
 
-			$scope.showTaskAssignedToFormControl = false;
+			controller.showTaskAssignedToFormControl = false;
 
 		};
 
-		$scope.editServiceDateAndTime = function()
+		controller.editServiceDateAndTime = function()
 		{
-			// $scope.ticklerUpdate.serviceDate = $filter('date')($scope.tickler.serviceDate, 'yyyy-MM-dd');
-			// $scope.ticklerUpdate.serviceTime = $filter('date')($scope.tickler.serviceDate, 'HH:mm');
+			// controller.ticklerUpdate.serviceDate = $filter('date')(controller.tickler.serviceDate, 'yyyy-MM-dd');
+			// controller.ticklerUpdate.serviceTime = $filter('date')(controller.tickler.serviceDate, 'HH:mm');
 
-			$scope.showServiceDateAndTimeFormControl = true;
+			controller.showServiceDateAndTimeFormControl = true;
 		};
 
 
-		$scope.updateServiceDateAndTime = function()
+		controller.updateServiceDateAndTime = function()
 		{
-			var dp = $scope.ticklerUpdate.serviceDate.split("-");
-			var tp = $scope.ticklerUpdate.serviceTime.split(":");
+			var dp = controller.ticklerUpdate.serviceDate.split("-");
+			var tp = controller.ticklerUpdate.serviceTime.split(":");
 
 			if (dp.length != 3 || tp.length != 2)
 			{
@@ -191,97 +193,97 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 				alert('Invalid Date/time. Please use yyyy-MM-dd and HH:mm formats');
 				return;
 			}
-			$scope.needsUpdate = true;
-			$scope.tickler.serviceDate = d;
-			$scope.showServiceDateAndTimeFormControl = false;
+			controller.needsUpdate = true;
+			controller.tickler.serviceDate = d;
+			controller.showServiceDateAndTimeFormControl = false;
 		};
 
-		$scope.cancelServiceDateAndTimeUpdate = function()
+		controller.cancelServiceDateAndTimeUpdate = function()
 		{
-			$scope.ticklerUpdate.serviceDate = null;
-			$scope.showServiceDateAndTimeFormControl = false;
+			controller.ticklerUpdate.serviceDate = null;
+			controller.showServiceDateAndTimeFormControl = false;
 		};
 
-		$scope.editPriority = function()
+		controller.editPriority = function()
 		{
-			// $scope.ticklerUpdate.priority = $scope.tickler.priority;
-			$scope.priorities = ['Low', 'Normal', 'High'];
+			// controller.ticklerUpdate.priority = controller.tickler.priority;
+			controller.priorities = ['Low', 'Normal', 'High'];
 
-			$scope.showPriorityFormControl = true;
+			controller.showPriorityFormControl = true;
 		};
 
-		$scope.updatePriority = function(newPriority)
+		controller.updatePriority = function(newPriority)
 		{
-			$scope.needsUpdate = true;
-			// $scope.ticklerUpdate.priority = newPriority; // Don't need this anymore?
-			$scope.showPriorityFormControl = false;
+			controller.needsUpdate = true;
+			// controller.ticklerUpdate.priority = newPriority; // Don't need this anymore?
+			controller.showPriorityFormControl = false;
 		};
 
 
-		$scope.cancelPriorityUpdate = function()
+		controller.cancelPriorityUpdate = function()
 		{
-			$scope.ticklerUpdate.priority = null;
-			$scope.showPriorityFormControl = false;
+			controller.ticklerUpdate.priority = null;
+			controller.showPriorityFormControl = false;
 		};
 
-		$scope.editStatus = function()
+		controller.editStatus = function()
 		{
-			// $scope.ticklerUpdate.statusName = $scope.tickler.statusName;
-			// $scope.ticklerUpdate.status = $scope.tickler.statusName;
-			$scope.showStatusFormControl = true;
+			// controller.ticklerUpdate.statusName = controller.tickler.statusName;
+			// controller.ticklerUpdate.status = controller.tickler.statusName;
+			controller.showStatusFormControl = true;
 		};
 
-		$scope.updateStatus = function(selectedStatus)
+		controller.updateStatus = function(selectedStatus)
 		{
-			$scope.needsUpdate = true;
-			$scope.ticklerUpdate.status = selectedStatus.id;
-			$scope.ticklerUpdate.statusName = selectedStatus.label;
-			$scope.showStatusFormControl = false;
+			controller.needsUpdate = true;
+			controller.ticklerUpdate.status = selectedStatus.id;
+			controller.ticklerUpdate.statusName = selectedStatus.label;
+			controller.showStatusFormControl = false;
 		};
 
-		$scope.cancelStatusUpdate = function()
+		controller.cancelStatusUpdate = function()
 		{
-			$scope.ticklerUpdate.statusName = null;
-			$scope.ticklerUpdate.status = null;
+			controller.ticklerUpdate.statusName = null;
+			controller.ticklerUpdate.status = null;
 
-			$scope.showStatusFormControl = false;
-
-		};
-
-		$scope.addComment = function()
-		{
-			// $scope.ticklerUpdate.comment = '';
-			$scope.showCommentFormControl = true;
+			controller.showStatusFormControl = false;
 
 		};
 
-		$scope.saveComment = function()
+		controller.addComment = function()
 		{
-			$scope.needsUpdate = true;
-			if ($scope.ticklerUpdate.ticklerComments == null)
+			// controller.ticklerUpdate.comment = '';
+			controller.showCommentFormControl = true;
+
+		};
+
+		controller.saveComment = function()
+		{
+			controller.needsUpdate = true;
+			if (controller.ticklerUpdate.ticklerComments == null)
 			{
-				$scope.ticklerUpdate.ticklerComments = [];
+				controller.ticklerUpdate.ticklerComments = [];
 			}
 			var comment = {
-				message: $scope.ticklerUpdate.comment,
+				message: controller.ticklerUpdate.comment,
 				providerName: me.formattedName,
 				providerNo: me.providerNo,
 				updateDate: new Date(),
 				newComment: true
 			};
-			$scope.ticklerUpdate.ticklerComments.unshift(comment);
-			$scope.showCommentFormControl = false;
-			$scope.showComments = true;
+			controller.ticklerUpdate.ticklerComments.unshift(comment);
+			controller.showCommentFormControl = false;
+			controller.showComments = true;
 		};
 
-		$scope.cancelCommentUpdate = function()
+		controller.cancelCommentUpdate = function()
 		{
-			$scope.ticklerUpdate.comment = null;
-			$scope.showCommentFormControl = false;
+			controller.ticklerUpdate.comment = null;
+			controller.showCommentFormControl = false;
 		};
 
 
-		$scope.searchProviders = function(val)
+		controller.searchProviders = function(val)
 		{
 			var search = {
 				searchTerm: val,
@@ -302,24 +304,24 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			});
 		};
 
-		$scope.saveChanges = function()
+		controller.saveChanges = function()
 		{
-			if (tickler.message != $scope.ticklerUpdate.message)
+			if (tickler.message != controller.ticklerUpdate.message)
 			{
-				$scope.needsUpdate = true;
+				controller.needsUpdate = true;
 			}
-			if (tickler.serviceDate != $scope.ticklerUpdate.serviceDate.getTime())
+			if (tickler.serviceDate != controller.ticklerUpdate.serviceDate.getTime())
 			{
-				$scope.needsUpdate = true;
+				controller.needsUpdate = true;
 			}
-			if (tickler.serviceTime != $scope.ticklerUpdate.serviceTime)
+			if (tickler.serviceTime != controller.ticklerUpdate.serviceTime)
 			{
 				console.log('updating time. old time: ', tickler.serviceTime);
-				$scope.needsUpdate = true;
+				controller.needsUpdate = true;
 			}
-			if ($scope.needsUpdate)
+			if (controller.needsUpdate)
 			{
-				var postData = angular.copy($scope.ticklerUpdate);
+				var postData = angular.copy(controller.ticklerUpdate);
 
 				if (Juno.Common.Util.exists(postData.serviceDate))
 				{
@@ -341,7 +343,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 		};
 
 
-		$scope.completeTickler = function()
+		controller.completeTickler = function()
 		{
 			ticklerService.setCompleted([tickler.id]).then(function(data)
 			{
@@ -353,7 +355,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		};
 
-		$scope.deleteTickler = function()
+		controller.deleteTickler = function()
 		{
 			ticklerService.setDeleted([tickler.id]).then(function(data)
 			{
@@ -365,7 +367,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		};
 
-		$scope.printTickler = function()
+		controller.printTickler = function()
 		{
 			window.open('../Tickler.do?method=print&id=' + tickler.id);
 

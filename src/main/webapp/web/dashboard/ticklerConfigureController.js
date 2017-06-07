@@ -12,25 +12,28 @@ angular.module('Dashboard').controller('Dashboard.TicklerConfigureController', [
 		prefs)
 	{
 
-		$scope.prefs = prefs.dashboardPreferences;
+		var controller = this;
 
-		$scope.close = function()
+		controller.prefs = prefs.dashboardPreferences;
+
+		controller.close = function close()
 		{
 			$uibModalInstance.close(false);
 		};
 
-		$scope.save = function()
+		controller.save = function save()
 		{
 
-			personaService.updateDashboardPreferences($scope.prefs).then(function(data)
-			{
-				$uibModalInstance.close(true);
-
-
-			}, function(reason)
-			{
-				$uibModalInstance.close(false);
-			});
+			personaService.updateDashboardPreferences(controller.prefs).then(
+				function success(results)
+				{
+					$uibModalInstance.close(true);
+				},
+				function error(errors)
+				{
+					$uibModalInstance.close(false);
+					console.log(errors);
+				});
 
 		};
 	}

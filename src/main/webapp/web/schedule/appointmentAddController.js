@@ -22,9 +22,11 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 		apptDate)
 	{
 
-		$scope.types = [];
+		var controller = this;
 
-		$scope.urgencies = [
+		controller.types = [];
+
+		controller.urgencies = [
 		{
 			value: '',
 			label: 'Normal'
@@ -34,9 +36,9 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 			label: 'Critical'
 		}];
 
-		$scope.me = me;
+		controller.me = me;
 
-		$scope.appointment = {
+		controller.appointment = {
 			status: 't',
 			appointmentDate: $filter('date')(apptDate, 'yyyy-MM-dd'),
 			startTime: '09:00 AM',
@@ -51,51 +53,53 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 			critical: ''
 		};
 
-		scheduleService.getTypes().then(function(data)
-		{
-			$scope.types = data.types;
-			$scope.types.unshift(
+		scheduleService.getTypes().then(
+			function success(results)
 			{
-				name: '',
-				duration: 15,
-				location: '',
-				notes: '',
-				reason: '',
-				resources: ''
+				controller.types = results.types;
+				controller.types.unshift(
+				{
+					name: '',
+					duration: 15,
+					location: '',
+					notes: '',
+					reason: '',
+					resources: ''
+				});
+				console.log(JSON.stringify(results));
+			},
+			function error(errors)
+			{
+				console.log(errors);
 			});
-			console.log(JSON.stringify(data));
-		}, function(error)
-		{
-			alert(error);
-		});
 
-		$scope.selectType = function()
+		controller.selectType = function selectType()
 		{
 			var type = null;
 
-			for (var x = 0; x < $scope.types.length; x++)
+			for (var x = 0; x < controller.types.length; x++)
 			{
-				if ($scope.types[x].name == $scope.appointment.type)
+				if (controller.types[x].name == controller.appointment.type)
 				{
-					type = $scope.types[x];
+					type = controller.types[x];
 					break;
 				}
 			}
 			if (type != null)
 			{
-				$scope.appointment.duration = type.duration;
-				$scope.appointment.location = type.location;
-				$scope.appointment.notes = type.notes;
-				$scope.appointment.reason = type.reason;
-				$scope.appointment.resources = type.resources;
+				controller.appointment.duration = type.duration;
+				controller.appointment.location = type.location;
+				controller.appointment.notes = type.notes;
+				controller.appointment.reason = type.reason;
+				controller.appointment.resources = type.resources;
 
 			}
 
 		};
 
-		$scope.close = function()
+		controller.close = function close()
 		{
-			if ($scope.needsUpdate)
+			if (controller.needsUpdate)
 			{
 				if (confirm("You have unsaved changes, are you sure?"))
 				{
@@ -109,85 +113,92 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 
 		};
 
-		$scope.validate = function()
+		controller.validate = function validate()
 		{
-			var t = $scope.appointment;
+			var t = controller.appointment;
 
-			$scope.errors = [];
+			controller.errors = [];
 
 			if (t.demographic == null)
 			{
-				$scope.errors.push('You must select a patient');
+				controller.errors.push('You must select a patient');
 			}
 			if (t.providerNo == null)
 			{
-				$scope.errors.push('You must select a provider');
+				controller.errors.push('You must select a provider');
 			}
 			if (t.startTime == null || t.startTime.length == 0)
 			{
-				$scope.errors.push('start time is required');
+				controller.errors.push('start time is required');
 			}
 			if (t.duration == null || t.duration.length == 0)
 			{
-				$scope.errors.push('start time is required');
+				controller.errors.push('start time is required');
 			}
 
-			if ($scope.errors.length > 0)
+			if (controller.errors.length > 0)
 			{
 				return false;
 			}
 			return true;
 		};
 
-		$scope.save = function()
+		controller.save = function save()
 		{
-			$scope.showErrors = true;
-			if (!$scope.validate())
+			controller.showErrors = true;
+			if (!controller.validate())
 			{
 				return;
 			}
 
 			var x = {};
-			x.status = $scope.appointment.status;
-			x.appointmentDate = $scope.appointment.appointmentDate;
-			x.startTime12hWithMedian = $scope.appointment.startTime;
-			x.type = $scope.appointment.type;
-			x.duration = $scope.appointment.duration;
-			x.providerNo = $scope.appointment.providerNo;
-			x.reason = $scope.appointment.reason;
-			x.notes = $scope.appointment.notes;
-			x.location = $scope.appointment.location;
-			x.resources = $scope.appointment.resources;
-			x.urgency = $scope.appointment.critical;
-			x.demographicNo = $scope.appointment.demographicNo;
+			x.status = controller.appointment.status;
+			x.appointmentDate = controller.appointment.appointmentDate;
+			x.startTime12hWithMedian = controller.appointment.startTime;
+			x.type = controller.appointment.type;
+			x.duration = controller.appointment.duration;
+			x.providerNo = controller.appointment.providerNo;
+			x.reason = controller.appointment.reason;
+			x.notes = controller.appointment.notes;
+			x.location = controller.appointment.location;
+			x.resources = controller.appointment.resources;
+			x.urgency = controller.appointment.critical;
+			x.demographicNo = controller.appointment.demographicNo;
 
 			console.log(JSON.stringify(x));
-			scheduleService.addAppointment(x).then(function(data)
-			{
-				$uibModalInstance.close(true);
-			}, function(reason)
-			{
-				alert(reason);
-			});
+			scheduleService.addAppointment(x).then(
+				function success(results)
+				{
+					$uibModalInstance.close(true);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 
 
 		};
 
 
-		$scope.updateDemographicNo = function(item, model, label)
+		controller.updateDemographicNo = function updateDemographicNo(item, model, label)
 		{
 
-			demographicService.getDemographic(model).then(function(data)
-			{
-				$scope.appointment.demographicNo = data.demographicNo;
-				$scope.appointment.demographicName = '';
-				$scope.appointment.demographic = data;
+			demographicService.getDemographic(model).then(
+				function success(results)
+				{
+					controller.appointment.demographicNo = results.demographicNo;
+					controller.appointment.demographicName = '';
+					controller.appointment.demographic = results;
 
-			});
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 
 		};
 
-		$scope.searchPatients = function(term)
+		controller.searchPatients = function searchPatients(term)
 		{
 			var search = {
 				type: 'Name',
@@ -196,47 +207,57 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 				integrator: false,
 				outofdomain: true
 			};
-			return demographicService.search(search, 0, 25).then(function(response)
-			{
-				var resp = [];
-				for (var x = 0; x < response.content.length; x++)
+			return demographicService.search(search, 0, 25).then(
+				function(results)
 				{
-					resp.push(
+					var resp = [];
+					for (var x = 0; x < results.content.length; x++)
 					{
-						demographicNo: response.content[x].demographicNo,
-						name: response.content[x].lastName + ',' + response.content[x].firstName
-					});
-				}
-				return resp;
-			});
+						resp.push(
+						{
+							demographicNo: results.content[x].demographicNo,
+							name: results.content[x].lastName + ',' + results.content[x].firstName
+						});
+					}
+					return resp;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
-		$scope.searchProviders = function(val)
+		controller.searchProviders = function searchProviders(val)
 		{
 			var search = {
 				searchTerm: val,
 				active: true
 			};
-			return providerService.searchProviders(search, 0, 10).then(function(response)
-			{
-				var resp = [];
-				for (var x = 0; x < response.length; x++)
+			return providerService.searchProviders(search, 0, 10).then(
+				function success(results)
 				{
-					resp.push(
+					var resp = [];
+					for (var x = 0; x < results.length; x++)
 					{
-						providerNo: response[x].providerNo,
-						name: response[x].firstName + ' ' + response[x].lastName
-					});
-				}
-				return resp;
-			});
+						resp.push(
+						{
+							providerNo: results[x].providerNo,
+							name: results[x].firstName + ' ' + results[x].lastName
+						});
+					}
+					return resp;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 		};
 
 
-		$scope.updateProviderNo = function(item, model, label)
+		controller.updateProviderNo = function updateProviderNo(item, model, label)
 		{
-			$scope.appointment.providerNo = model;
-			$scope.appointment.providerName = label;
+			controller.appointment.providerNo = model;
+			controller.appointment.providerName = label;
 		};
 	}
 ]);

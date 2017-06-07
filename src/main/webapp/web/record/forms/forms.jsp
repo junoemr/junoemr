@@ -26,17 +26,27 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <div class="col-sm-3">		
 	<ul class="nav nav-tabs nav-justified">
-		<li ng-repeat="list in page.formlists" ng-class="getListClass(list.id)" class="hand-hover"><a ng-click="changeTo(list.id)">{{list.label}}</a></li>
+		<li ng-repeat="list in formCtrl.page.formlists" 
+				ng-class="formCtrl.getListClass(list.id)" 
+				class="hand-hover">
+			<a ng-click="formCtrl.changeTo(list.id)">{{list.label}}</a>
+		</li>
 		
 		<li class="dropdown">
 		    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
 		      <span class="glyphicon glyphicon-tasks"> </span>
 		    </a>
 		    <ul class="dropdown-menu">		
-			  <li ng-show="hasAdminAccess"><a class="hand-hover" onclick="popup(600, 1200, '../administration/?show=Forms', 'manageeforms')" >Manage eForms</a></li>
-		      <li ng-show="hasAdminAccess"><a class="hand-hover" onclick="popup(600, 1200, '../administration/?show=Forms&load=Groups', 'editGroups')" >Edit Groups</a></li>
-		      <li ng-show="hasAdminAccess" class="divider"></li>
-		      <li ng-repeat="opt in page.formOptions"><a ng-click="formOption(opt)">{{opt.label}}</a></li>
+			  	<li ng-show="formCtrl.hasAdminAccess">
+			  		<a class="hand-hover" onclick="popup(600, 1200, '../administration/?show=Forms', 'manageeforms')" >Manage eForms</a>
+				</li>
+		    	<li ng-show="formCtrl.hasAdminAccess">
+			  		<a class="hand-hover" onclick="popup(600, 1200, '../administration/?show=Forms&load=Groups', 'editGroups')" >Edit Groups</a>
+				</li>
+				<li ng-show="formCtrl.hasAdminAccess" class="divider"></li>
+				<li ng-repeat="opt in formCtrl.page.formOptions">
+					<a ng-click="formCtrl.formOption(opt)">{{opt.label}}</a>
+				</li>
 		    </ul>
 		</li>
 	</ul> 	
@@ -51,63 +61,81 @@
 	 --%>
 	<div class="panel panel-success"> 
 	  	<!-- Default panel contents -->
-	  	   <input type="search" class="form-control" placeholder="Filter" ng-model="filterFormsQ">
-	  	   <ul class="list-group" tabindex="0" ng-keypress="keypress($event)">
-   				<li class="list-group-item" ng-repeat="item in page.currentFormList[page.currentlistId] | filter:filterFormsQ" ng-class="getActiveFormClass(item)">
-   					<input type="checkbox" ng-model="item.isChecked"/>
-   					<a class="list-group-item-text hand-hover" title="{{item.subject}}" ng-click="viewFormState(item,1)"><span  ng-show="item.date" class="pull-right">{{item.date | date : 'd-MMM-y'}}</span>{{item.name}}</a>
-   				</li>
+		<input type="search" class="form-control" placeholder="Filter" ng-model="formCtrl.filterFormsQ">
+		<ul class="list-group" tabindex="0" ng-keypress="formCtrl.keypress($event)">
+			<li class="list-group-item" ng-repeat="item in formCtrl.page.currentFormList[formCtrl.page.currentlistId] | filter:formCtrl.filterFormsQ" ng-class="formCtrl.getActiveFormClass(item)">
+				<input type="checkbox" ng-model="item.isChecked"/>
+				<a class="list-group-item-text hand-hover" title="{{item.subject}}" ng-click="formCtrl.viewFormState(item,1)">
+					<span  ng-show="item.date" class="pull-right">{{item.date | date : 'd-MMM-y'}}</span>
+					{{item.name}}
+				</a>
+			</li>
 
-   				<li class="list-group-item" ng-repeat="formItem2 in page.encounterFormlist[page.currentlistId] | filter:filterFormsQ" ng-hide="page.currentlistId==1">
-   					<a class="list-group-item-text hand-hover" ng-click="viewFormState(formItem2,1)">{{formItem2.name}}</a>
-   				</li>
-   				
-   				<li class="list-group-item" ng-repeat="formItem in page.encounterFormlist[page.currentlistId] | filter:filterFormsQ" ng-hide="page.currentlistId==0">
-   					<a class="list-group-item-text hand-hover" ng-click="viewFormState(formItem,1)">{{formItem.formName}} <span ng-show="formItem.date" class="pull-right">{{formItem.date | date : 'd-MMM-y'}}</span></a>
-   				</li>
-   				
-   			</ul>
+			<li class="list-group-item"	
+				ng-repeat="formItem2 in formCtrl.page.encounterFormlist[formCtrl.page.currentlistId] | filter:formCtrl.filterFormsQ" 
+				ng-hide="formCtrl.page.currentlistId==1">
+				<a class="list-group-item-text hand-hover" ng-click="formCtrl.viewFormState(formItem2,1)">{{formItem2.name}}</a>
+			</li>
+			
+			<li class="list-group-item" ng-repeat="formItem in formCtrl.page.encounterFormlist[formCtrl.page.currentlistId] | filter:formCtrl.filterFormsQ" 
+					ng-hide="formCtrl.page.currentlistId==0">
+				<a class="list-group-item-text hand-hover" ng-click="formCtrl.viewFormState(formItem,1)">
+					{{formItem.formName}} 
+					<span ng-show="formItem.date" class="pull-right">{{formItem.date | date : 'd-MMM-y'}}</span>
+				</a>
+			</li>
+			
+		</ul>
 	</div>
 </div>
 <div class="col-sm-9">
-	<a class="hand-hover pull-right" ng-show="!isEmpty(page.currentForm)" title="Open in new window" ng-click="viewFormState(page.currentForm,2)"><span class="glyphicon glyphicon-new-window"></span></a>
-	<div ng-if="isEmpty(page.currentForm)">
+	<a class="hand-hover pull-right" ng-show="!formCtrl.isEmpty(formCtrl.page.currentForm)" 
+			title="Open in new window" ng-click="formCtrl.viewFormState(formCtrl.page.currentForm,2)">
+		<span class="glyphicon glyphicon-new-window"></span>
+	</a>
+	<div ng-if="formCtrl.isEmpty(formCtrl.page.currentForm)">
 		<h2><bean:message key="forms.title.form.library" bundle="ui"/></h2>
 		<div>
 			
 			<div  class="col-sm-4">
-				<legend style="margin-bottom:0px;"> 
+				<legend> 
 					<bean:message key="forms.title.form.groups" bundle="ui"/>
 				</legend>
 				<ul class="list-group" >
-	        		<li ng-repeat="mod in page.formGroups" class="list-group-item" ng-class="getGroupListClass(mod)">
+	        		<li ng-repeat="mod in formCtrl.page.formGroups" class="list-group-item" ng-class="formCtrl.getGroupListClass(mod)">
 	        			 <span class="badge">{{mod.summaryItem.length}}</span>
-	        			<a class="list-group-item-text" ng-click="setCurrentEFormGroup(mod)" href="javascript:void(0)"> {{mod.displayName}} </a> 
+	        			<a class="list-group-item-text" ng-click="formCtrl.setCurrentEFormGroup(mod)" href="javascript:void(0)"> {{mod.displayName}} </a> 
 	        		</li> 			
 				</ul>
 			</div>
 
 			<div  class="col-sm-4">
-				<legend style="margin-bottom:0px;"> 
-					&nbsp;{{currentEformGroup.displayName}}  
+				<legend> 
+					&nbsp;{{formCtrl.currentEformGroup.displayName}}  
 				</legend>
-	        	<ul style="padding-left:12px;">
-	        		<li ng-repeat="item in currentEformGroup.summaryItem">
+	        	<ul>
+	        		<li ng-repeat="item in formCtrl.currentEformGroup.summaryItem">
 	        			<span class="pull-right">{{item.date | date : 'dd-MMM-yyyy'}}</span>
-	        			<a ng-click="openFormFromGroups(item)" href="javascript:void(0)" ng-class="item.indicatorClass" >{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}<small ng-show="item.classification">({{item.classification}})</small></a> 
+	        			<a ng-click="formCtrl.openFormFromGroups(item)" href="javascript:void(0)" ng-class="item.indicatorClass" >
+							{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}
+							<small ng-show="item.classification">({{item.classification}})</small>
+						</a> 
 	        		</li> 			
 				</ul>
 			</div>
 
-			<div ng-if="favouriteGroup"  class="col-sm-4">
-				<legend style="margin-bottom:0px;"> 
-					<bean:message key="forms.title.form.favourite" bundle="ui"/>: {{favouriteGroup.displayName}}
+			<div ng-if="formCtrl.favouriteGroup"  class="col-sm-4">
+				<legend> 
+					<bean:message key="forms.title.form.favourite" bundle="ui"/>: {{formCtrl.favouriteGroup.displayName}}
 				</legend>
 				
-				<ul style="padding-left:12px;">
-	        		<li ng-repeat="item in favouriteGroup.summaryItem">
+				<ul>
+	        		<li ng-repeat="item in formCtrl.favouriteGroup.summaryItem">
 	        			<span class="pull-right">{{item.date | date : 'dd-MMM-yyyy'}}</span>
-	        			<a ng-click="openFormFromGroups(item)" href="javascript:void(0)" ng-class="item.indicatorClass" >{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}<small ng-show="item.classification">({{item.classification}})</small></a> 
+	        			<a ng-click="formCtrl.openFormFromGroups(item)" href="javascript:void(0)" ng-class="item.indicatorClass" >
+							{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}
+							<small ng-show="item.classification">({{item.classification}})</small>
+						</a> 
 	        		</li> 			
 				</ul>
 			</div>

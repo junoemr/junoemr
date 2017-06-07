@@ -28,21 +28,22 @@
 	<form>
 		<div class="form-group">
 		    <label for="numAppt2Show"><bean:message key="patientList.config.numAppt2Show" bundle="ui"/></label>
-	    	<input type="number" class="form-control" id="numAppt2Show" ng-model="patientListConfig.numberOfApptstoShow"  />
+	    	<input type="number" class="form-control" id="numAppt2Show" ng-model="patientListConfigCtrl.patientListConfig.numberOfApptstoShow"  />
 	  	</div>
 
 	 	<br/>
 	  	
 	  	<div class="checkbox">
 	    	<label>
-	    		<input type="checkbox" ng-model="patientListConfig.showReason"> <b><bean:message key="patientList.config.showReason" bundle="ui"/></b>
+	    		<input type="checkbox" ng-model="patientListConfigCtrl.patientListConfig.showReason"> 
+                <b><bean:message key="patientList.config.showReason" bundle="ui"/></b>
 		    </label>
 	  	</div>
 		  
 	</form>  
 </div>
 <div class="modal-footer">  
-    <button type="button" class="btn btn-default" ng-click="cancel()"><bean:message key="global.cancel" bundle="ui"/></button>
-    <button type="button" class="btn btn-success"  ng-click="saveConfiguration()"><bean:message key="global.save" bundle="ui"/></button>
+    <button type="button" class="btn btn-default" ng-click="patientListConfigCtrl.cancel()"><bean:message key="global.cancel" bundle="ui"/></button>
+    <button type="button" class="btn btn-success"  ng-click="patientListConfigCtrl.saveConfiguration()"><bean:message key="global.save" bundle="ui"/></button>
 </div>
     

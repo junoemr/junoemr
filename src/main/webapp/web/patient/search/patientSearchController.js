@@ -56,23 +56,24 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 		controller.init = function init()
 		{
 			controller.clearParams();
-			if(Juno.Common.Util.exists($stateParams.term))
+			if (Juno.Common.Util.exists($stateParams.term))
 			{
 				controller.search.term = $stateParams.term;
 			}
 
-			securityService.hasRights({
+			securityService.hasRights(
+			{
 				items: [
-					{
-						objectName: '_demographic',
-						privilege: 'r'
-					}]
-			}).then(
-				function(result)
 				{
-					if (Juno.Common.Util.exists(result.content) && result.content.length === 1)
+					objectName: '_demographic',
+					privilege: 'r'
+				}]
+			}).then(
+				function success(results)
+				{
+					if (Juno.Common.Util.exists(results.content) && results.content.length === 1)
 					{
-						controller.demographicReadAccess = result.content[0];
+						controller.demographicReadAccess = results.content[0];
 						if (controller.demographicReadAccess)
 						{
 							controller.initTable();
@@ -80,13 +81,13 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 					}
 					else
 					{
-						console.log('failed to load rights', result);
+						console.log('failed to load rights', results);
 						controller.demographicReadAccess = false;
 					}
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log('failed to load rights', error);
+					console.log(errors);
 					controller.demographicReadAccess = false;
 				});
 		};
@@ -98,64 +99,65 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 		controller.initTable = function initTable()
 		{
 			controller.tableParams = new NgTableParams(
+			{
+				page: 1,
+				count: 10,
+				sorting:
 				{
-					page: 1,
-					count: 10,
-					sorting: {
-						Name: 'asc'
-					}
-				},
+					Name: 'asc'
+				}
+			},
+			{
+				getData: function(params)
 				{
-					getData: function(params)
+					var deferred = $q.defer();
+
+					var count = params.url().count;
+					var page = params.url().page;
+
+					controller.search.params = params.url();
+
+					var promiseArray = [];
+					promiseArray.push(demographicService.search(
+						controller.search, ((page - 1) * count), count));
+
+					controller.integratorResults = null;
+					if (controller.search.integrator)
 					{
-						var deferred = $q.defer();
-
-						var count = params.url().count;
-						var page = params.url().page;
-
-						controller.search.params = params.url();
-
-						var promiseArray = [];
-						promiseArray.push(demographicService.search(
-							controller.search, ((page - 1) * count), count));
-
-						controller.integratorResults = null;
-						if(controller.search.integrator)
-						{
-							promiseArray.push(demographicService.searchIntegrator(
-								controller.search, 100));
-						}
-
-						$q.all(promiseArray).then(
-							function success(promiseResults)
-							{
-								var demographicSearchResults = promiseResults[0];
-								params.total(demographicSearchResults.total);
-
-								if(controller.search.integrator)
-								{
-									controller.integratorResults = promiseResults[1];
-								}
-
-								deferred.resolve(demographicSearchResults.content);
-							},
-							function error(promiseErrors)
-							{
-								console.log('patient search failed', promiseErrors);
-								deferred.reject();
-							});
-
-						return deferred.promise;
+						promiseArray.push(demographicService.searchIntegrator(
+							controller.search, 100));
 					}
-				});
+
+					$q.all(promiseArray).then(
+						function success(results)
+						{
+							var demographicSearchResults = results[0];
+							params.total(demographicSearchResults.total);
+
+							if (controller.search.integrator)
+							{
+								controller.integratorResults = results[1];
+							}
+
+							deferred.resolve(demographicSearchResults.content);
+						},
+						function error(promiseErrors)
+						{
+							console.log('patient search failed', promiseErrors);
+							deferred.reject();
+						});
+
+					return deferred.promise;
+				}
+			});
 		};
 
 		controller.searchPatients = function searchPatients()
 		{
-			if(controller.search.type === "DOB")
+			if (controller.search.type === "DOB")
 			{
 				var dobMoment = moment(controller.search.term, ["YYYY-MM-DD", "YYYY/MM/DD"], true);
-				if(dobMoment.isValid())
+				if (dobMoment.isValid())
 				{
 					controller.search.term = dobMoment.format("YYYY-MM-DD");
 				}
@@ -171,7 +173,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 		controller.clearParams = function(searchType)
 		{
 			// default search type
-			if(!Juno.Common.Util.exists(searchType))
+			if (!Juno.Common.Util.exists(searchType))
 			{
 				searchType = 'Name';
 			}
@@ -190,7 +192,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 				"YYYY-MM-DD" : "Search Term";
 
 			// do the search (if initialized)
-			if(Juno.Common.Util.exists(controller.tableParams))
+			if (Juno.Common.Util.exists(controller.tableParams))
 			{
 				controller.tableParams.reload();
 			}
@@ -198,48 +200,48 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 
 		controller.toggleParam = function toggleParam(param)
 		{
-			if(['active', 'integrator', 'outofdomain'].indexOf(param) > -1)
+			if (['active', 'integrator', 'outofdomain'].indexOf(param) > -1)
 			{
 				controller.search[param] = !controller.search[param];
 			}
 		};
 
-		controller.loadRecord = function(demographicNo)
+		controller.loadRecord = function loadRecord(demographicNo)
 		{
 			$state.go('record.details',
-				{
-					demographicNo: demographicNo,
-					hideNote: true
-				});
+			{
+				demographicNo: demographicNo,
+				hideNote: true
+			});
 		};
 
-		controller.showIntegratorResults = function()
+		controller.showIntegratorResults = function showIntegratorResults()
 		{
 			var results = [];
 			var total = 0;
 
-			if(Juno.Common.Util.exists(controller.integratorResults))
+			if (Juno.Common.Util.exists(controller.integratorResults))
 			{
 				results = controller.integratorResults.content;
 				total = controller.integratorResults.total;
 			}
 
 			$uibModal.open(
+			{
+				templateUrl: 'patientsearch/remotePatientResults.jsp',
+				controller: 'RemotePatientResultsController',
+				resolve:
 				{
-					templateUrl: 'patientsearch/remotePatientResults.jsp',
-					controller: 'RemotePatientResultsController',
-					resolve:
-						{
-							results: function()
-							{
-								return results;
-							},
-							total: function()
-							{
-								return total;
-							}
-						}
-				});
+					results: function()
+					{
+						return results;
+					},
+					total: function()
+					{
+						return total;
+					}
+				}
+			});
 		};
 
 		return controller;

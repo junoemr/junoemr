@@ -7,25 +7,26 @@ angular.module('Document').controller('Document.DocumentsController', [
 		$scope,
 		securityService)
 	{
-		$scope.me = null;
+		var controller = this;
+		controller.me = null;
 
 		$scope.$watch(function()
 		{
 			return securityService.getUser();
 		}, function(newVal)
 		{
-			$scope.me = newVal;
+			controller.me = newVal;
 
 			if (newVal != null)
 			{
-				window.open('../dms/documentReport.jsp?function=provider&functionid=' + $scope.me.providerNo, 'edocView', 'height=700,width=1024');
+				window.open('../dms/documentReport.jsp?function=provider&functionid=' + controller.me.providerNo, 'edocView', 'height=700,width=1024');
 			}
 		}, true);
 
 
-		$scope.openPopup = function()
+		controller.openPopup = function openPopup()
 		{
-			window.open('../dms/documentReport.jsp?function=provider&functionid=' + $scope.me.providerNo, 'edocView', 'height=700,width=1024');
+			window.open('../dms/documentReport.jsp?function=provider&functionid=' + controller.me.providerNo, 'edocView', 'height=700,width=1024');
 		};
 	}
 ]);

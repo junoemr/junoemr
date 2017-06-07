@@ -41,13 +41,13 @@ angular.module("Common.Services").service("noteService", [
 				'/all?offset=' + encodeURIComponent(offset) +
 				'&numToReturn=' + encodeURIComponent(numberToReturn),
 				noteConfig, Juno.Common.ServiceHelper.configHeaders()).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::getNotesFrom error", error);
+					console.log("noteService::getNotesFrom error", errors);
 					deferred.reject("An error occurred while fetching notes");
 				});
 
@@ -63,13 +63,13 @@ angular.module("Common.Services").service("noteService", [
 			};
 			$http.post(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/save', noteToSave).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::saveNote error", error);
+					console.log("noteService::saveNote error", errors);
 					deferred.reject("An error occurred while saving note");
 				});
 
@@ -82,13 +82,13 @@ angular.module("Common.Services").service("noteService", [
 
 			$http.post(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/saveIssueNote', note).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::saveIssueNote error", error);
+					console.log("noteService::saveIssueNote error", errors);
 					deferred.reject("An error occurred while saving issue note");
 				});
 
@@ -101,13 +101,13 @@ angular.module("Common.Services").service("noteService", [
 
 			$http.post(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/getCurrentNote', config).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::getCurrentNote error", error);
+					console.log("noteService::getCurrentNote error", errors);
 					deferred.reject("An error occurred while fetching current note");
 				});
 
@@ -120,13 +120,13 @@ angular.module("Common.Services").service("noteService", [
 
 			$http.post(service.apiPath + '/' +
 				encodeURIComponent(demographicNo) + '/tmpSave', note).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::tmpSave error", error);
+					console.log("noteService::tmpSave error", errors);
 					deferred.reject("An error occurred while posting tmp save");
 				});
 
@@ -138,13 +138,13 @@ angular.module("Common.Services").service("noteService", [
 			var deferred = $q.defer();
 
 			$http.post(service.apiPath + '/getGroupNoteExt/' + encodeURIComponent(noteId)).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::getNoteExt error", error);
+					console.log("noteService::getNoteExt error", errors);
 					deferred.reject("An error occurred while fetching note ext");
 				});
 
@@ -156,13 +156,13 @@ angular.module("Common.Services").service("noteService", [
 			var deferred = $q.defer();
 
 			$http.post(service.apiPath + '/getIssueNote/' + encodeURIComponent(noteId)).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::getIssueNote error", error);
+					console.log("noteService::getIssueNote error", errors);
 					deferred.reject("An error occurred while fetching issue note");
 				});
 
@@ -174,13 +174,13 @@ angular.module("Common.Services").service("noteService", [
 			var deferred = $q.defer();
 
 			$http.post(service.apiPath + '/getIssueId/' + encodeURIComponent(issueCode)).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::getIssueId error", error);
+					console.log("noteService::getIssueId error", errors);
 					deferred.reject("An error occurred while fetching issue id");
 				});
 
@@ -195,13 +195,13 @@ angular.module("Common.Services").service("noteService", [
 			{
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::getTicklerNote error", error);
+					console.log("noteService::getTicklerNote error", errors);
 					deferred.reject("An error occurred while fetching tickler note");
 				});
 
@@ -218,13 +218,13 @@ angular.module("Common.Services").service("noteService", [
 				data: JSON.stringify(ticklerNote),
 				headers: Juno.Common.ServiceHelper.configHeaders()
 			}).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::saveTicklerNote error", error);
+					console.log("noteService::saveTicklerNote error", errors);
 					deferred.reject("An error occurred while saving tickler note");
 				});
 
@@ -238,13 +238,13 @@ angular.module("Common.Services").service("noteService", [
 			$http.post(service.apiPath + '/searchIssues?startIndex=' +
 				encodeURIComponent(startIndex) + "&itemsToReturn=" +
 				encodeURIComponent(itemsToReturn), search).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::searchIssues error", error);
+					console.log("noteService::searchIssues error", errors);
 					deferred.reject("An error occurred while searching issues");
 				});
 
@@ -256,13 +256,13 @@ angular.module("Common.Services").service("noteService", [
 			var deferred = $q.defer();
 
 			$http.post(service.apiPath + '/getIssueById/' + encodeURIComponent(issueId)).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::getIssue error", error);
+					console.log("noteService::getIssue error", errors);
 					deferred.reject("An error occurred while fetching issue");
 				});
 
@@ -276,13 +276,13 @@ angular.module("Common.Services").service("noteService", [
 			$http.post(service.apiPath + '/setEditingNoteFlag?noteUUID=' +
 				encodeURIComponent(noteUUID) + "&userId=" +
 				encodeURIComponent(userId)).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::setEditingNoteFlag error", error);
+					console.log("noteService::setEditingNoteFlag error", errors);
 					deferred.reject("An error occurred while setting editing note flag");
 				});
 
@@ -296,13 +296,13 @@ angular.module("Common.Services").service("noteService", [
 			$http.post(service.apiPath + '/checkEditNoteNew?noteUUID=' +
 				encodeURIComponent(noteUUID) + "&userId=" +
 				encodeURIComponent(userId)).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::checkEditNoteNew error", error);
+					console.log("noteService::checkEditNoteNew error", errors);
 					deferred.reject("An error occurred while checking edit note new");
 				});
 
@@ -316,13 +316,13 @@ angular.module("Common.Services").service("noteService", [
 			$http.post(service.apiPath + '/removeEditingNoteFlag?noteUUID=' +
 				encodeURIComponent(noteUUID) + "&userId=" +
 				encodeURIComponent(userId)).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("noteService::removeEditingNoteFlag error", error);
+					console.log("noteService::removeEditingNoteFlag error", errors);
 					deferred.reject("An error occurred while removing editing note flag");
 				});
 

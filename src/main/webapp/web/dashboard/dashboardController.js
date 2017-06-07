@@ -51,20 +51,26 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 		personaService)
 	{
 
+		var controller = this;
+
 		//header
-		$scope.displayDate = function()
+		controller.displayDate = function displayDate()
 		{
 			return new Date();
 		};
 		console.log('TABLE PARAMS', NgTableParams);
-		$scope.me = null;
+		controller.me = null;
 
-		$scope.busyLoadingData = false;
+		controller.busyLoadingData = false;
 
 		personaService.getDashboardPreferences().then(
-			function(data)
+			function success(results)
 			{
-				$scope.prefs = data.dashboardPreferences;
+				controller.prefs = results.dashboardPreferences;
+			},
+			function error(errors)
+			{
+				console.log(errors);
 			});
 
 		securityService.hasRights(
@@ -79,16 +85,20 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 				privilege: 'r'
 			}]
 		}).then(
-			function(result)
+			function success(results)
 			{
-				if (result.content != null && result.content.length == 2)
+				if (results.content != null && results.content.length == 2)
 				{
-					$scope.ticklerWriteAccess = result.content[0];
-					$scope.ticklerReadAccess = result.content[1];
+					controller.ticklerWriteAccess = results.content[0];
+					controller.ticklerReadAccess = results.content[1];
 				}
+			},
+			function error(errors)
+			{
+				console.log(errors);
 			});
 
-		$scope.inboxTableParams = new NgTableParams(
+		controller.inboxTableParams = new NgTableParams(
 		{
 			page: 1, // show first page
 			count: 10
@@ -100,16 +110,20 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
 
 				return inboxService.getDashboardItems(params.count()).then(
-					function(data)
+					function success(results)
 					{
-						console.log('INBOX DATA: ', data);
-						params.total(data.total); // recal. page nav controls
-						return data.content;
+						console.log('INBOX DATA: ', results);
+						params.total(results.total); // recal. page nav controls
+						return results.content;
+					},
+					function error(errors)
+					{
+						console.log(errors);
 					});
 			}
 		});
 
-		$scope.openInbox = function()
+		controller.openInbox = function openInbox()
 		{
 			newwindow = window.open('../dms/inboxManage.do?method=prepareForIndexPage', 'inbox', 'height=700,width=1000');
 			if (window.focus)
@@ -118,17 +132,18 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			}
 		};
 
-		$scope.loadMoreK2aFeed = function()
+		// Remove? 
+		controller.loadMoreK2aFeed = function()
 		{
-			$scope.updateFeed($scope.k2afeed.length, 10);
+			controller.updateFeed(controller.k2afeed.length, 10);
 		};
 
-		$scope.authenticateK2A = function(id)
+		controller.authenticateK2A = function(id)
 		{
 			window.open('../apps/oauth1.jsp?id=' + id, 'appAuth', 'width=700,height=450');
 		};
 
-		$scope.agreeWithK2aPost = function(item)
+		controller.agreeWithK2aPost = function(item)
 		{
 			if (item.agree)
 			{
@@ -153,11 +168,11 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 				item.newComment.agree = true;
 				item.newComment.body = '';
 
-				$scope.commentOnK2aPost(item);
+				controller.commentOnK2aPost(item);
 			}
 		};
 
-		$scope.disagreeWithK2aPost = function(item)
+		controller.disagreeWithK2aPost = function(item)
 		{
 			if (item.disagree)
 			{
@@ -182,11 +197,11 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 				item.newComment.agree = false;
 				item.newComment.body = '';
 
-				$scope.commentOnK2aPost(item);
+				controller.commentOnK2aPost(item);
 			}
 		};
 
-		$scope.commentOnK2aPost = function(item)
+		controller.commentOnK2aPost = function(item)
 		{
 			item.newComment.postId = item.id;
 			k2aService.postK2AComment(item.newComment).then(
@@ -222,104 +237,105 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 				});
 		};
 
-		$scope.updateTicklers = function()
+		controller.updateTicklers = function updateTicklers()
 		{
 			//consider the option to have overdue only or not
 			ticklerService.search(
 			{
 				priority: '',
 				status: 'A',
-				assignee: $scope.me.providerNo,
+				assignee: controller.me.providerNo,
 				overdueOnly: 'property'
 			}, 0, 6).then(
-				function(response)
+				function success(results)
 				{
-					$scope.totalTicklers = response.total;
-					if (response.content == null)
+					controller.totalTicklers = results.total;
+					if (results.content == null)
 					{
 						return;
 					}
 
-					if (response.content instanceof Array)
+					if (results.content instanceof Array)
 					{
-						$scope.ticklers = response.content;
+						controller.ticklers = results.content;
 					}
 					else
 					{
 						var arr = new Array();
-						arr[0] = response.content;
-						$scope.ticklers = arr;
+						arr[0] = results.content;
+						controller.ticklers = arr;
 					}
 				},
-				function(reason)
+				function error(errors)
 				{
-					alert(reason);
+					console.log(errors);
 				});
 		};
 
-		$scope.updateMessages = function()
+		controller.updateMessages = function updateMessages()
 		{
 			messageService.getUnread(6).then(
-				function(response)
+				function success(results)
 				{
-					$scope.totalMessages = response.total;
+					controller.totalMessages = results.total;
 
-					if (response.content == null)
+					if (results.content == null)
 					{
 						return;
 					}
 
-					if (response.content instanceof Array)
+					if (results.content instanceof Array)
 					{
-						$scope.messages = response.content;
+						controller.messages = results.content;
 					}
 					else
 					{
 						var arr = new Array();
-						arr[0] = response.content;
-						$scope.messages = arr;
+						arr[0] = results.content;
+						controller.messages = arr;
 					}
 				},
-				function(reason)
+				function error(errors)
 				{
-					alert(reason);
+					console.log(errors);
 				});
 
 		};
 
-		$scope.updateReports = function()
+		controller.updateReports = function updateReports()
 		{
 			//TODO: changed to return 5 since that is all we are using at the moment
 			inboxService.getDashboardItems(5).then(
-				function(response)
+				function success(results)
 				{
-					if (response.content == null)
+					if (results.content == null)
 					{
 						return;
 					}
 
-					if (response.content instanceof Array)
+					if (results.content instanceof Array)
 					{
-						$scope.inbox = response.content;
+						controller.inbox = results.content;
 					}
 					else
 					{
 						var arr = new Array();
-						arr[0] = response.content;
-						$scope.inbox = arr;
+						arr[0] = results.content;
+						controller.inbox = arr;
 					}
-					$scope.totalInbox = response.total;
+					controller.totalInbox = results.total;
 				},
-				function(reason)
+				function error(errors)
 				{
-					alert(reason);
+					console.log(errors);
 				});
 		};
 
-		$scope.updateFeed = function(startPoint, numberOfRows)
+		// Remove? 
+		controller.updateFeed = function updateFeed(startPoint, numberOfRows)
 		{
-			if ($scope.busyLoadingData) return;
-			$scope.busyLoadingData = true;
+			if (controller.busyLoadingData) return;
+			controller.busyLoadingData = true;
 			k2aService.getK2aFeed(startPoint, numberOfRows).then(
 				function(response)
 				{
@@ -339,43 +355,43 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 								response.post[i].comments = arr;
 							}
 						}
-						if (typeof $scope.k2afeed === 'undefined')
+						if (typeof controller.k2afeed === 'undefined')
 						{
-							$scope.k2afeed = response.post;
+							controller.k2afeed = response.post;
 						}
 						else
 						{
-							$scope.k2afeed = $scope.k2afeed.concat(response.post);
+							controller.k2afeed = controller.k2afeed.concat(response.post);
 						}
-						$scope.busyLoadingData = false;
+						controller.busyLoadingData = false;
 					}
 					else
 					{
 						if (response.post.authenticatek2a)
 						{
-							$scope.authenticatek2a = response.post.description;
+							controller.authenticatek2a = response.post.description;
 						}
 						else
 						{
 							var arr = new Array();
 							arr[0] = response.post;
-							$scope.k2afeed = arr;
+							controller.k2afeed = arr;
 						}
 					}
 				},
 				function(reason)
 				{
 					alert(reason);
-					$scope.busyLoadingData = false;
+					controller.busyLoadingData = false;
 				});
 		};
 
-		$scope.updateDashboard = function()
+		controller.updateDashboard = function updateDashboard()
 		{
-			$scope.updateTicklers();
-			$scope.updateMessages();
-			$scope.updateReports();
-			$scope.updateFeed(0, 10);
+			controller.updateTicklers();
+			controller.updateMessages();
+			controller.updateReports();
+			controller.updateFeed(0, 10);
 
 		};
 
@@ -384,16 +400,16 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			return securityService.getUser();
 		}, function(newVal)
 		{
-			$scope.me = newVal;
+			controller.me = newVal;
 
 			if (newVal != null)
 			{
-				$scope.updateDashboard();
+				controller.updateDashboard();
 			}
 		}, true);
 
 
-		$scope.isTicklerExpiredOrHighPriority = function(tickler)
+		controller.isTicklerExpiredOrHighPriority = function isTicklerExpiredOrHighPriority(tickler)
 		{
 			var ticklerDate = Date.parse(tickler.serviceDate);
 			var now = new Date();
@@ -410,7 +426,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			return result;
 		};
 
-		$scope.isTicklerHighPriority = function(tickler)
+		controller.isTicklerHighPriority = function isTicklerHighPriority(tickler)
 		{
 			var ticklerDate = Date.parse(tickler.serviceDate);
 			var now = new Date();
@@ -424,20 +440,20 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			return result;
 		};
 
-		$scope.openClassicMessenger = function()
+		controller.openClassicMessenger = function openClassicMessenger()
 		{
-			if ($scope.me != null)
+			if (controller.me != null)
 			{
-				window.open('../oscarMessenger/DisplayMessages.do?providerNo=' + $scope.me.providerNo, 'msgs', 'height=700,width=1024,scrollbars=1');
+				window.open('../oscarMessenger/DisplayMessages.do?providerNo=' + controller.me.providerNo, 'msgs', 'height=700,width=1024,scrollbars=1');
 			}
 		};
 
-		$scope.viewMessage = function(message)
+		controller.viewMessage = function viewMessage(message)
 		{
 			window.open('../oscarMessenger/ViewMessage.do?messageID=' + message.id + '&boxType=0', 'msg' + message.id, 'height=700,width=1024,scrollbars=1');
 		};
 
-		$scope.viewTickler = function(tickler)
+		controller.viewTickler = function viewTickler(tickler)
 		{
 			var modalInstance = $uibModal.open(
 			{
@@ -457,32 +473,32 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 					},
 					ticklerWriteAccess: function()
 					{
-						return $scope.ticklerWriteAccess;
+						return controller.ticklerWriteAccess;
 					},
 					me: function()
 					{
-						return $scope.me;
+						return controller.me;
 					}
 				}
 			});
 
 			modalInstance.result.then(
-				function(data)
+				function success(results)
 				{
 					//console.log('data from modalInstance '+data);
-					if (data != null && data == true)
+					if (results != null && results == true)
 					{
-						$scope.updateTicklers();
+						controller.updateTicklers();
 					}
 				},
-				function(reason)
+				function error(errors)
 				{
-					alert(reason);
+					console.log(errors);
 				});
 
 		};
 
-		$scope.configureTicklers = function()
+		controller.configureTicklers = function configureTicklers()
 		{
 			var modalInstance = $uibModal.open(
 			{
@@ -500,21 +516,21 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			});
 
 			modalInstance.result.then(
-				function(data)
+				function success(results)
 				{
-					if (data == true)
+					if (results == true)
 					{
-						$scope.updateTicklers();
+						controller.updateTicklers();
 						personaService.getDashboardPreferences().then(
-							function(data)
+							function(results)
 							{
-								$scope.prefs = data.dashboardPreferences;
+								controller.prefs = results.dashboardPreferences;
 							});
 					}
 				},
-				function(reason)
+				function error(errors)
 				{
-					alert(reason);
+					console.log(errors);
 				});
 
 		};

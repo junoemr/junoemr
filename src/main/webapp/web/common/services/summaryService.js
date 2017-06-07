@@ -39,13 +39,13 @@ angular.module("Common.Services").service("summaryService", [
 
 			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/summary/' + key).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("summaryService::getSummaryHeaders error", error);
+					console.log("summaryService::getSummaryHeaders error", errors);
 					deferred.reject("An error occurred while fetching summary headers");
 				});
 
@@ -58,13 +58,13 @@ angular.module("Common.Services").service("summaryService", [
 
 			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/fullSummary/' + summaryCode).then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("summaryService::getFullSummary error", error);
+					console.log("summaryService::getFullSummary error", errors);
 					deferred.reject("An error occurred while fetching full summary");
 				});
 
@@ -77,13 +77,13 @@ angular.module("Common.Services").service("summaryService", [
 
 			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/getFamilyHistory').then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("summaryService::getFamilyHistory error", error);
+					console.log("summaryService::getFamilyHistory error", errors);
 					deferred.reject("An error occurred while fetching family history");
 				});
 
@@ -96,13 +96,13 @@ angular.module("Common.Services").service("summaryService", [
 
 			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/getMedicalHistory').then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("summaryService::getMedicalHistory error", error);
+					console.log("summaryService::getMedicalHistory error", errors);
 					deferred.reject("An error occurred while fetching medical history");
 				});
 
@@ -115,13 +115,13 @@ angular.module("Common.Services").service("summaryService", [
 
 			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/getOngoingConcerns').then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("summaryService::getOngoingConcerns error", error);
+					console.log("summaryService::getOngoingConcerns error", errors);
 					deferred.reject("An error occurred while fetching ongoing concerns");
 				});
 
@@ -134,13 +134,13 @@ angular.module("Common.Services").service("summaryService", [
 
 			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/getOtherMeds').then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("summaryService::getOtherMeds error", error);
+					console.log("summaryService::getOtherMeds error", errors);
 					deferred.reject("An error occurred while fetching other meds");
 				});
 
@@ -153,13 +153,13 @@ angular.module("Common.Services").service("summaryService", [
 
 			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/getReminders').then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("summaryService::getReminders error", error);
+					console.log("summaryService::getReminders error", errors);
 					deferred.reject("An error occurred while fetching reminders");
 				});
 
@@ -172,13 +172,13 @@ angular.module("Common.Services").service("summaryService", [
 
 			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/getRiskFactors').then(
-				function success(response)
+				function success(results)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(results.data);
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.log("summaryService::getRiskFactors error", error);
+					console.log("summaryService::getRiskFactors error", errors);
 					deferred.reject("An error occurred while fetching risk factors");
 				});
 

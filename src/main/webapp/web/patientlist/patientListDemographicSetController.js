@@ -9,6 +9,9 @@ angular.module('PatientList').controller('PatientList.PatientListDemographicSetC
 		$http,
 		Navigation)
 	{
+
+		var controller = this;
+
 		$http(
 		{
 			url: '../ws/rs/reporting/demographicSets/list',
@@ -18,9 +21,9 @@ angular.module('PatientList').controller('PatientList.PatientListDemographicSetC
 				'Content-Type': 'application/json'
 			}
 		}).then(
-			function success(response)
+			function success(results)
 			{
-				$scope.sets = response.data.content;
+				controller.sets = results.data.content;
 			},
 			function error(error)
 			{

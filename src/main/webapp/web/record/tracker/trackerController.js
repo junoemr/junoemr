@@ -52,7 +52,9 @@ angular.module('Record.Tracker').controller('Record.Tracker.TrackerController', 
 		uxService)
 	{
 
-		$scope.getTrackerUrl = function(demographicNo)
+		var controller = this;
+
+		controller.getTrackerUrl = function getTrackerUrl(demographicNo)
 		{
 
 			url = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo;
