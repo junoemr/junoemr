@@ -434,7 +434,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'patient/newPatient.jsp',
-				controller: 'Patient.NewPatientController',
+				controller: 'Patient.NewPatientController as newPatientCtrl',
 				size: size
 			});
 
