@@ -33,21 +33,31 @@
 			</h2>
 		</div>
 		<div class="col-xs-8">	
-			<div class="patient-header-ext pull-right"> 
-				<p><b><bean:message key="demographic.patient.context.born"/>:</b>
-				{{recordCtrl.demographic.dobYear}}-{{recordCtrl.demographic.dobMonth}}-{{recordCtrl.demographic.dobDay}} ({{recordCtrl.demographic.age | age}})  
-				<b><bean:message key="demographic.patient.context.sex"/>:</b> {{recordCtrl.demographic.sex}}
-				<b><bean:message key="Appointment.msgTelephone"/>:</b> {{recordCtrl.demographic.phone}}</p>
+			<div class="pull-right"> 
+				<p>
+					<span class="patient-header-text">
+						<bean:message key="demographic.patient.context.born"/>:
+					</span>
+					{{recordCtrl.demographic.dobYear}}-{{recordCtrl.demographic.dobMonth}}-{{recordCtrl.demographic.dobDay}} ({{recordCtrl.demographic.age | age}})  
+					<span class="patient-header-text">
+						<bean:message key="demographic.patient.context.sex"/>: 
+					</span>
+					{{recordCtrl.demographic.sex}}
+					<span class="patient-header-text">
+						<bean:message key="Appointment.msgTelephone"/>:
+					</span>
+					{{recordCtrl.demographic.phone}}
+				</p>
 				<!-- <span class="glyphicon glyphicon-new-window"></span>-->
 			</div>
 		</div>
 	</div>
 	
-	<nav class="navbar navbar-default record-navbar" role="navigation">
+	<nav class="navbar navbar-default record-navbar" role="navigation" id="record-nav">
 		<!-- Brand and toggle get grouped for better mobile display -->
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse"
-				data-target=".navbar-ex1-collapse">
+				data-target="#record-nav-collapse">
 				<span class="sr-only">Toggle navigation</span> <span
 					class="icon-bar"></span> <span class="icon-bar"></span> <span
 					class="icon-bar"></span>
@@ -55,55 +65,61 @@
 		</div>
 
 		<!-- Collect the nav links, forms, and other content for toggling   removed data-toggle="tab"  from a ngclick changeTab3 -->
-		<div class="collapse navbar-collapse navbar-ex1-collapse">
-			<ul class="nav navbar-nav" id="myTabs">
+
+		<div class="collapse navbar-collapse" id="record-nav-collapse">
+
+				<%-- Large view --%>
+			<ul class="nav navbar-nav visible-nav-lg" id="myTabs">
 				<li ng-repeat="tab in recordCtrl.recordtabs2" ng-class="recordCtrl.isTabActive(tab)">
-					<a href="javascript:void(0)" ng-if="!tab.dropdown" ng-click="recordCtrl.changeTab(tab)" >{{tab.label}} 
+					<a href="javascript:void(0)" ng-click="recordCtrl.changeTab(tab)">
+						{{tab.label}} 
 						<strong class="text-danger" ng-show="tab.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
 					</a>
-					<a href="javascript:void(0)" ng-if="tab.dropdown"  class="dropdown-toggle" data-toggle="dropdown">{{tab.label}} 
-						<strong class="text-danger" ng-show="tab.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">
-							!
-						</strong>
-						<span class="caret"></span>
-					</a>
-						<ul ng-if="tab.dropdown" class="dropdown-menu" role="menu">
-							<li ng-repeat="dropdownItem in tab.dropdownItems" >
-								<a href="javascript:void(0)" ng-click="recordCtrl.changeTab(dropdownItem)" >{{dropdownItem.label}} 
-									<strong class="text-danger" ng-show="dropdownItem.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">
-										!
-									</strong>
-								</a>
-							</li>
-						</ul>
 				</li>
 			</ul>
+	
+			<%-- Medium view --%>
+			<ul class="nav navbar-nav visible-nav-md">
+					<li ng-repeat="tab in recordCtrl.recordtabs2 | filter: recordCtrl.mediumNavItemFilter(false)"
+							ng-class="recordCtrl.isTabActive(tab)">
+						<a href="javascript:void(0)" ng-click="recordCtrl.changeTab(tab)">
+							 {{tab.label}}
+						</a>
 
-			<%--<ul class="nav navbar-nav hidden-lg visible-1200">
+					</li>
+
+					<li class="dropdown hand-hover">
+						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
+							More <b class="caret"></b>
+						</a>
+
+						<ul class="dropdown-menu" role="menu">
+							<li ng-repeat="tab in recordCtrl.recordtabs2 | filter: recordCtrl.mediumNavItemFilter(true)" ng-class="recordCtrl.isTabActive(tab)">
+								<a href="javascript:void(0)" ng-if="!tab.dropdown" ng-click="recordCtrl.changeTab(tab)" >{{tab.label}} 
+									<strong class="text-danger" ng-show="tab.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
+								</a>
+								
+							</li>
+						</ul>
+					</li>
+				</ul>
+
+				<%-- Small view --%>
+				<ul class="nav navbar-nav visible-nav-sm">
 					<li class="dropdown hand-hover">
 						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
 							Menu <b class="caret"></b>
 						</a>
 
 						<ul class="dropdown-menu" role="menu">
-							<li ng-repeat="tab in recordtabs2" ng-class="isTabActive(tab)">
-								<a href="javascript:void(0)" ng-if="!tab.dropdown" ng-click="changeTab(tab)" >{{tab.label}} 
+							<li ng-repeat="tab in recordCtrl.recordtabs2" ng-class="recordCtrl.isTabActive(tab)">
+								<a href="javascript:void(0)" ng-if="!tab.dropdown" ng-click="recordCtrl.changeTab(tab)" >{{tab.label}} 
 									<strong class="text-danger" ng-show="tab.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
 								</a>
-								<a href="javascript:void(0)" ng-if="tab.dropdown"  class="dropdown-toggle" data-toggle="dropdown">{{tab.label}} 
-									<strong class="text-danger" ng-show="tab.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!
-									</strong>
-									<span class="caret"></span>
-								</a>
-								<ul ng-if="tab.dropdown" class="dropdown-menu" role="menu">
-									<li ng-repeat="dropdownItem in tab.dropdownItems" >
-										<a href="javascript:void(0)" ng-click="changeTab(dropdownItem)" >{{dropdownItem.label}} <strong class="text-danger" ng-show="dropdownItem.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong></a>
-									</li>
-								</ul>
 							</li>
 						</ul>
 					</li>
-				</ul>--%>
+				</ul>
 		</div>
 		<!-- /.navbar-collapse -->
 	</nav>
