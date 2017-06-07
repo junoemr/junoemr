@@ -88,14 +88,13 @@
 	width: 100%;
 }
 
+#details-page {
+	.form-divider {
+		margin-top: $margin-lg;
+	}
+}
 
-
-
-
-
-
-/*for patient header*/
-
+// for patient header
 .patient-header-text {
 	color: $primary-blue-text;
 }
