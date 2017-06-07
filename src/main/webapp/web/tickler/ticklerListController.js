@@ -3,30 +3,30 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 	'$scope',
 	'$timeout',
 	'$resource',
-	'NgTableParams',
-	'securityService',
 	'$uibModal',
 	'$http',
+	'$stateParams',
+	'NgTableParams',
+	'securityService',
 	'ticklerService',
 	'noteService',
-	'providers',
 	'providerService',
-	'$stateParams',
+	'providers',
 
 
 	function(
 		$scope,
 		$timeout,
 		$resource,
-		NgTableParams,
-		securityService,
 		$uibModal,
 		$http,
+		$stateParams,
+		NgTableParams,
+		securityService,
 		ticklerService,
 		noteService,
-		providers,
 		providerService,
-		$stateParams)
+		providers)
 	{
 
 		var controller = this;
