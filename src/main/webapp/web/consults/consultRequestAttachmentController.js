@@ -1,12 +1,10 @@
 angular.module('Consults').controller('Consults.ConsultRequestAttachmentController', [
 
-	'$scope',
 	'$uibModalInstance',
 	'consultService',
 	'consult',
 
 	function(
-		$scope,
 		$uibModalInstance,
 		consultService,
 		consult)
