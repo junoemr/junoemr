@@ -63,43 +63,43 @@
 						</h5>
 					</div>
 					<div class="col-md-4 col-sm-4">
-						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" 
+						<button class="btn btn-xs btn-success pull-right" 
 							ng-click="summaryCtrl.openPreventions(summaryCtrl.demographicNo)" 
 							ng-if="mod.summaryCode=='preventions'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
-						</a>
+						</button>
 
 						<%--<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" ng-click="gotoState('add', mod)" ng-disabled="page.cannotAdd" 
 							ng-hide="mod.summaryCode=='meds' || mod.summaryCode=='assessments' || mod.summaryCode=='allergies' || mod.summaryCode=='preventions' || page.cannotAdd">
 								Add <span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>
 						</a>--%>
 
-						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" 
+						<button class="btn btn-xs btn-success pull-right" 
 							ng-click="summaryCtrl.gotoState('add', mod)" 
 							ng-disabled="summaryCtrl.page.cannotAdd" 
 							ng-if="mod.summaryCode=='othermeds' || mod.summaryCode=='ongoingconcerns' || 
 								mod.summaryCode=='medhx' || mod.summaryCode=='sochx' || mod.summaryCode=='famhx' || 
 								mod.summaryCode=='reminders' || mod.summaryCode=='riskfactors' || mod.summaryCode=='riskfactors' ">
 								Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
-						</a>
+						</button>
 
-						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" 
+						<button class="btn btn-xs btn-success pull-right" 
 							ng-click="summaryCtrl.openRx(summaryCtrl.demographicNo)" 
 							ng-if="mod.summaryCode=='meds'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
-						</a>
+						</button>
 						
-						<a href="javascript:void(0)"  class=" btn btn-xs btn-success pull-right" 
+						<button class=" btn btn-xs btn-success pull-right" 
 							ng-click="summaryCtrl.openAllergies(summaryCtrl.demographicNo)" 
 							ng-if="mod.summaryCode=='allergies'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
-						</a>
+						</button>
 
-						<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" 
+						<button class="btn btn-xs btn-success pull-right" 
 							ng-click="summaryCtrl.gotoState('add', mod)"
 							ng-if="mod.summaryCode=='assessments'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
-						</a>
+						</button>
 
 						<%--<a href="#/record/{{summaryCtrl.demographicNo}}/forms" class="btn btn-xs btn-success pull-right" 
 							ng-if="mod.summaryCode=='assessments'">
@@ -110,7 +110,6 @@
 				
 
 				<ul class="list-unstyled">
-					<%-- href="{{item.action}}" --%>
 					<li ng-repeat="item in mod.summaryItem" ng-show="summaryCtrl.isSectionExpanded(mod)" >
 						<p><span class="pull-right">{{item.date | date : 'dd MMM yyyy'}}</span></p>
 						<a ng-click="summaryCtrl.gotoState(item,mod,item.id)" href="javascript:void(0)" ng-class="item.indicatorClass">
