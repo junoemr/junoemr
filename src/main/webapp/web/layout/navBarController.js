@@ -491,7 +491,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		{
 			return function(item)
 			{
-				var filterValue = (item.label === 'Dashboard' || item.label === 'Schedule' || item.label === 'Inbox' || item.label === 'Consultations' || item.label === 'All Ticklers');
+				var filterValue = (item.label === 'Dashboard' || item.label === 'Schedule' || item.label === 'Inbox' || item.label === 'Consultations' || item.label === 'Ticklers');
 
 				if (inverse === true)
 				{
