@@ -9,6 +9,12 @@
 			}
 		}
 	}
+	.navbar-toggle {
+		&:hover,
+		&:focus {
+			background-color: $primary-hover-blue;
+		}
+	}
 }
 
 // Media queries for hiding navbar links depending on screen size
