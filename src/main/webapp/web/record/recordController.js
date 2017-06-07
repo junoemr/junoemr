@@ -747,7 +747,50 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.page.assignedCMIssues = newList;
 		};
 
+		// For some reason Angular does not allow for the evaluation of the inverse of custom filters, thus, we have the the following masterpiece
+		// If inverse === false, return true if the given item is supposed to be shown outisde the 'more' dropdown on the medium view
+		// If inverse === true, return the inverse of the above statement,
+		controller.mediumNavItemFilter = function mediumNavItemFilter(inverse)
+		{
+			return function(item)
+			{
+				var filterValue =
+					(item.label === 'Details' || item.label === 'Summary' ||
+						item.label === 'Forms' || item.label === 'Tickler' ||
+						item.label === 'Health Tracker' || item.label === 'Rx' ||
+						item.label === 'Consultations');
 
+				if (inverse === true)
+				{
+					return !filterValue;
+				}
+				else
+				{
+					return filterValue;
+				}
+			};
+		};
+
+		controller.mediumNavItemFilter = function mediumNavItemFilter(inverse)
+		{
+			return function(item)
+			{
+				var filterValue =
+					(item.label === 'Details' || item.label === 'Summary' ||
+						item.label === 'Forms' || item.label === 'Tickler' ||
+						item.label === 'Health Tracker' || item.label === 'Rx' ||
+						item.label === 'Consultations');
+
+				if (inverse === true)
+				{
+					return !filterValue;
+				}
+				else
+				{
+					return filterValue;
+				}
+			};
+		};
 	}
 ]);
 
