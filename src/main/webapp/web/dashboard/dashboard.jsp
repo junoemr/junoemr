@@ -46,17 +46,19 @@
 				<div class="row dashboard-row">
 					<div class="col-xs-12">
 						<p>
-							You have
-							<span ng-if="dashboardCtrl.totalInbox > 0" class="badge badge-danger">
-								{{dashboardCtrl.totalInbox}}
-							</span>
-							<ng-pluralize count="dashboardCtrl.totalInbox"
-										when="{
-											'0':'reports which are not yet acknowledged.',
-											'1':'report which is not yet acknowledged.',
-											'other': 'reports which are not yet acknowledged.'
-										}">
-							</ng-pluralize>
+							<a ng-click="dashboardCtrl.openInbox()">
+								You have
+								<span ng-if="dashboardCtrl.totalInbox > 0" class="badge badge-danger">
+									{{dashboardCtrl.totalInbox}}
+								</span>
+								<ng-pluralize count="dashboardCtrl.totalInbox"
+											when="{
+												'0':'reports which are not yet acknowledged.',
+												'1':'report which is not yet acknowledged.',
+												'other': 'reports which are not yet acknowledged.'
+											}">
+								</ng-pluralize>
+							</a>
 						</p>
 						<div ng-if="dashboardCtrl.totalInbox > 0">
 							<%--Keeping incase we want to switch to using ngTable--%>
@@ -125,17 +127,19 @@
 					<div class="col-xs-12">
 						<!-- il18n problem here -->
 						<p>
-							You have 
-							<span ng-if="dashboardCtrl.totalMessages > 0" class="badge badge-danger">
-								{{dashboardCtrl.totalMessages}}
-							</span>
-							<ng-pluralize count="dashboardCtrl.totalMessages"
-										when="{
-											'0':'no unread messages.',
-											'1':'unread message.',
-											'other': 'unread messages.'
-										}">
-							</ng-pluralize>
+							<a ng-click="dashboardCtrl.openClassicMessenger()">
+								You have 
+								<span ng-if="dashboardCtrl.totalMessages > 0" class="badge badge-danger">
+									{{dashboardCtrl.totalMessages}}
+								</span>
+								<ng-pluralize count="dashboardCtrl.totalMessages"
+											when="{
+												'0':'no unread messages.',
+												'1':'unread message.',
+												'other': 'unread messages.'
+											}">
+								</ng-pluralize>
+							</a>
 						</p>
 						<div ng-if="dashboardCtrl.totalMessages > 0">
 							<table class="table table-condensed table-striped table-bordered table-hover">
@@ -182,19 +186,21 @@
 				<div class="row dashboard-row">
 					<div class="col-xs-12">
 						<!-- this is a bit of a problem for il18n -->
-						<p >
-							You have
-							<span ng-if="dashboardCtrl.totalTicklers > 0" class="badge badge-danger">
-								{{dashboardCtrl.totalTicklers}}
-							</span>
-							<ng-pluralize count="dashboardCtrl.totalTicklers"
-										when="{
-											'0':'no active ticklers.',
-											'1':'active tickler.',
-											'other': 'active ticklers.'
-										}">
-							</ng-pluralize> 
-							<span class="label label-danger" ng-if="prefs.expiredTicklersOnly == true">(Overdue)</span>
+						<p>
+							<a href="../web/#!/ticklers"> <%-- Not a permanent solution, figure out better way to link to ticklers --%>
+								You have
+								<span ng-if="dashboardCtrl.totalTicklers > 0" class="badge badge-danger">
+									{{dashboardCtrl.totalTicklers}}
+								</span>
+								<ng-pluralize count="dashboardCtrl.totalTicklers"
+											when="{
+												'0':'no active ticklers.',
+												'1':'active tickler.',
+												'other': 'active ticklers.'
+											}">
+								</ng-pluralize> 
+								<span class="label label-danger" ng-if="prefs.expiredTicklersOnly == true">(Overdue)</span>
+							</a>
 						</p>
 
 						<div ng-if="dashboardCtrl.totalTicklers>0">
