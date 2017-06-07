@@ -29,8 +29,7 @@
 }
 
 .form-heading {
-	color: #1e65d2;
-	font-weight: bold;
+	color: $primary-blue-text;
 }
 
 #dob-year {
@@ -90,7 +89,16 @@
 }
 
 
+
+
+
+
+
 /*for patient header*/
+
+.patient-header-text {
+	color: $primary-blue-text;
+}
 
 @media (max-width: 1320px) {
 	.patient-header-name {
@@ -106,9 +114,6 @@
 		display: none;
 	}
 	.patient-header-name {
-		font-size: 16px;
-	}
-	.patient-header-ext {
 		font-size: 16px;
 	}
 }
