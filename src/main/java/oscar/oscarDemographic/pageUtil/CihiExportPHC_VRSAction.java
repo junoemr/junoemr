@@ -91,7 +91,7 @@ import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
-import oscar.oscarReport.data.DemographicSets;
+import oscar.oscarReport.data.DemographicSetManager;
 import oscar.oscarRx.data.RxPrescriptionData;
 import oscar.util.StringUtils;
 import oscar.util.UtilDateUtilities;
@@ -286,7 +286,7 @@ public class CihiExportPHC_VRSAction extends DispatchAction {
 
 
 	    //grab patient list from set
-	    DemographicSets demoSets = new DemographicSets();
+	    DemographicSetManager demoSets = new DemographicSetManager();
 		List<String> patientList = demoSets.getDemographicSet(frm.getString("patientSet"));
 
 		//make all xml files, zip them and save to document directory

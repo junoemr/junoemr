@@ -43,7 +43,7 @@
 <%@page import="org.oscarehr.common.dao.DataExportDao"%>
 <%@page import="org.apache.commons.lang.time.DateFormatUtils"%>
 <%@page import="oscar.util.StringUtils"%>
-<%@page import="oscar.oscarReport.data.DemographicSets" %>
+<%@page import="oscar.oscarReport.data.DemographicSetManager" %>
 <%@page import="org.apache.struts.validator.DynaValidatorForm" %>
 <%@page import="java.util.ArrayList, java.util.List" %>
 <%@page import="org.oscarehr.common.model.DataExport" %>
@@ -54,7 +54,7 @@ String demographic_no = request.getParameter("demographic_no");
 %>
 
 <%
-DemographicSets  ds = new DemographicSets();
+DemographicSetManager  ds = new DemographicSetManager();
 List<String> setsList = ds.getDemographicSets();
 
 %>

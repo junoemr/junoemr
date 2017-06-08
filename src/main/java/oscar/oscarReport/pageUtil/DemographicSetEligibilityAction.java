@@ -36,7 +36,7 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.oscarReport.data.DemographicSets;
+import oscar.oscarReport.data.DemographicSetManager;
 
 /**
  *
@@ -54,7 +54,7 @@ public class DemographicSetEligibilityAction extends Action {
 	   
         String[] s = request.getParameterValues("demoNo") ;
         String setName = request.getParameter("setName");
-        DemographicSets dsets = new DemographicSets();
+        DemographicSetManager dsets = new DemographicSetManager();
         
         if (request.getParameter("delete")!= null && request.getParameter("delete").equals("Delete")){
             for (int i = 0; i < s.length;i++){

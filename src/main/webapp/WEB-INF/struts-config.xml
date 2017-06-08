@@ -1836,6 +1836,10 @@
 		<action input="/oscarReport/demographicSetEdit.jsp" name="DemographicSetEditForm" path="/report/DemographicSetEdit" scope="request" type="oscar.oscarReport.pageUtil.DemographicSetEditAction">
 			<forward name="success" path="/oscarReport/demographicSetEdit.jsp" />
 		</action>
+		<action input="/oscarReport/demographicSetEdit.jsp" name="DemographicSetEditForm" path="/report/DemographicSetDelete" scope="request" type="oscar.oscarReport.pageUtil.DemographicSetDeleteAction">
+			<forward name="success" path="/oscarReport/demographicSetEdit.jsp" />
+			<forward name="failure" path="/oscarReport/demographicSetEdit.jsp" />
+		</action>
 		<action input="/oscarReport/demographicSetEdit.jsp" name="FrmForm" path="/report/SetEligibility" scope="request" type="oscar.oscarReport.pageUtil.DemographicSetEligibilityAction">
 			<forward name="success" path="/oscarReport/demographicSetEdit.jsp" />
 		</action>

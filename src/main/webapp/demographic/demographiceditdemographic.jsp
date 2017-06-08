@@ -106,7 +106,7 @@ if(!authed) {
 }
 
 %>
-<%@ page import="java.util.*, java.sql.*, java.net.*,java.text.DecimalFormat, oscar.*, oscar.oscarDemographic.data.ProvinceNames, oscar.oscarWaitingList.WaitingList, oscar.oscarReport.data.DemographicSets,oscar.log.*"%>
+<%@ page import="java.util.*, java.sql.*, java.net.*,java.text.DecimalFormat, oscar.*, oscar.oscarDemographic.data.ProvinceNames, oscar.oscarWaitingList.WaitingList, oscar.oscarReport.data.DemographicSetManager,oscar.log.*"%>
 <%@ page import="oscar.oscarDemographic.data.*"%>
 <%@ page import="oscar.oscarDemographic.pageUtil.Util" %>
 <%@ page import="org.springframework.web.context.*,org.springframework.web.context.support.*" %>

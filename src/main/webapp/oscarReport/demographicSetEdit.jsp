@@ -42,8 +42,8 @@ if(!authed) {
 <!-- page updated to support better use of CRUD operations -->
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page
-	import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarProvider.data.*,oscar.util.*,oscar.oscarReport.data.*,oscar.oscarPrevention.pageUtil.*"%>
+<%@page import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarProvider.data.*,oscar.util.*,oscar.oscarPrevention.pageUtil.*"%>
+<%@page	import="oscar.oscarReport.data.*, org.oscarehr.common.model.DemographicSets, org.oscarehr.common.model.Demographic"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
@@ -55,8 +55,8 @@ if(!authed) {
   //int demographic_no = Integer.parseInt(request.getParameter("demographic_no"));
   String demographic_no = request.getParameter("demographic_no");
 
-  DemographicSets  ds = new DemographicSets();
-  List<String> sets = ds.getDemographicSets();
+  DemographicSetManager  ds = new DemographicSetManager();
+  List<String> setNames = ds.getDemographicSets();
 
   DemographicData dd = new DemographicData();
 
@@ -142,24 +142,22 @@ function disableifchecked(ele,nextDate){
 		<% } %>
 		<div class="row">
 		<div class="span12">
-		<html:form styleClass="form-horizontal well form-search" 
-			action="/report/DemographicSetEdit">
+		<html:form styleClass="form-horizontal well form-search" action="/report/DemographicSetEdit">
 			<div><bean:message key="oscarReport.oscarReportDemoSetEdit.msgPatientSet"/>: <html:select property="patientSet">
 				<html:option value="-1"><bean:message key="oscarReport.oscarReportDemoSetEdit.msgOptionSet"/></html:option>
-				<% for ( int i = 0 ; i < sets.size(); i++ ){
-                            String s = sets.get(i);%>
+				<% for ( int i = 0 ; i < setNames.size(); i++ ){
+                            String s = setNames.get(i);%>
 				<html:option value="<%=s%>"><%=s%></html:option>
 				<%}%>
 			</html:select> <input type="submit" value="<bean:message key="oscarReport.oscarReportDemoSetEdit.btnDisplaySet"/>" /></div>
 
 		</html:form> <%if( request.getAttribute("SET") != null ) {
-                   List<Map<String,String>> list = (List<Map<String,String>>) request.getAttribute("SET");
+                   List<DemographicSets> list = (List<DemographicSets>) request.getAttribute("SET");
                    String setName = (String) request.getAttribute("setname");%>
 		<div><html:form action="/report/SetEligibility">
 			<input type="submit" value="<bean:message key="oscarReport.oscarReportDemoSetEdit.btnSetIneligible"/>" /> <bean:message key="oscarReport.oscarReportDemoSetEdit.msgIneligible"/><br>
-                        <input type="submit" name="delete" value="<bean:message key="oscarReport.oscarReportDemoSetEdit.btnDelete"/>"/><bean:message key="oscarReport.oscarReportDemoSetEdit.msgDelete"/>
-                   <input type="hidden" name="setName"
-				value="<%=setName%>" />
+			<input type="submit" name="delete" value="<bean:message key="oscarReport.oscarReportDemoSetEdit.btnDelete"/>"/><bean:message key="oscarReport.oscarReportDemoSetEdit.msgDelete"/>
+			<input type="hidden" name="setName" value="<%=setName%>" />
 			<table class="ele">
 				<tr>
 					<th>&nbsp;</th>
@@ -172,18 +170,18 @@ function disableifchecked(ele,nextDate){
 					<th><bean:message key="oscarReport.oscarReportDemoSetEdit.msgEligibility" /></th>
 				</tr>
 				<%for (int i=0; i < list.size(); i++){
-                     Map<String,String> h = list.get(i);
-                     org.oscarehr.common.model.Demographic demo = dd.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), h.get("demographic_no"));  %>
+					DemographicSets h = list.get(i);
+					String demoNoStr = String.valueOf(h.getDemographicNo());
+                    Demographic demo = h.getDemographic();%>
 				<tr>
-					<td><input type="checkbox" name="demoNo"
-						value="<%=h.get("demographic_no")%>" />
-					<td><%=h.get("demographic_no")%></td>
-					<td><%=demo.getLastName()%>, <%=demo.getFirstName()%></td>
-					<td><%=oscar.oscarDemographic.data.DemographicData.getDob(demo,"-")%></td>
+					<td><input type="checkbox" name="demoNo" value="<%=demoNoStr%>" />
+					<td><%=demoNoStr%></td>
+					<td><%=demo.getDisplayName()%></td>
+					<td><%=demo.getFormattedDob()%></td>
 					<td><%=demo.getAge()%></td>
 					<td><%=demo.getRosterStatus()%></td>
 					<td><%=providerBean.getProperty(demo.getProviderNo(),"")%></td>
-					<td><%=elle(h.get("eligibility"))%></td>
+					<td><%=elle(h.getEligibility())%></td>
 				</tr>
 				<%}%>
 			</table>
@@ -196,6 +194,12 @@ function disableifchecked(ele,nextDate){
 		<td class="MainTableBottomRowRightColumn" valign="top">&nbsp;</td>
 	</tr>
 </table>
+
+<html:form styleClass="form-horizontal well form-search" action="/report/DemographicSetDelete">
+
+</html:form>
+
+
 <script type="text/javascript">
     //Calendar.setup( { inputField : "asofDate", ifFormat : "%Y-%m-%d", showsTime :false, button : "date", singleClick : true, step : 1 } );
 </script>
