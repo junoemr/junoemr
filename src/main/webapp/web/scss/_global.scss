@@ -24,6 +24,15 @@
 	margin: 0;
 }
 
+// Displays a red asterisk next to form labels if they are marked as required
+.form-group {
+	.required:after {
+		content: "*";
+		color: red;
+	}
+}
+
+
 // Makes checkbox flush with input (as long as checkbox margin is 0)
 .big-checkbox {
 	height: 34px;

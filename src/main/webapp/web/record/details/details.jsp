@@ -133,9 +133,8 @@
 				</div>
 				
 				<div class="form-group">
-					<label class="col-md-2 control-label" title="Required Field">
+					<label class="col-md-2 control-label required" title="Required Field">
 						<bean:message key="demographic.demographiceditdemographic.formLastName"/> 
-						<span style="color:red">*</span>
 					</label>
 					<div class="col-md-4">
 						<input type="text" class="form-control form-control-details" 
@@ -145,9 +144,8 @@
 							style="background-color:{{detailsCtrl.page.lastNameColor}}"
 						/>
 					</div>
-					<label class="col-md-2 control-label" title="Required Field">
+					<label class="col-md-2 control-label required" title="Required Field">
 						<bean:message key="demographic.demographiceditdemographic.formFirstName"/> 
-						<span style="color:red">*</span>
 					</label>
 					<div class="col-md-4">
 						<input type="text" class="form-control form-control-details" 
@@ -160,12 +158,11 @@
 				</div>
 
 				<div class="form-group">
-					<label class="col-md-2 control-label" title="Required Field">
-						<bean:message key="web.record.details.dateOfBirth"/> 
-						<span style="color:red">*</span>
+					<label class="col-md-2 control-label required" title="Required Field">
+						<bean:message key="web.record.details.dateOfBirth" /> 	
 					</label>
 					<div class="col-md-4">
-						<span class="input-group" >
+						<div class="input-group vertical-align">
 							<input id="dob-year" type="text" placeholder="YYYY" 
 								title="Birthday Year" class="form-control form-control-details" 
 								ng-model="detailsCtrl.page.demo.dobYear" 
@@ -184,15 +181,14 @@
 								ng-model="detailsCtrl.page.demo.dobDay" 
 								ng-change=detailsCtrl."checkDate('DobD')" 
 								ng-blur="detailsCtrl.formatDate('DobD')"
-							/>
-							<b> ({{detailsCtrl.page.demo.age}}y)</b>	
-						</span>
-						
+							/>	
+							<div>&nbsp;({{detailsCtrl.page.demo.age}}y)</div>
+						</div>
 					</div>
 					
-					<label class="col-md-2 control-label" title="Required Field">
+					
+					<label class="col-md-2 control-label required" title="Required Field">
 						<bean:message key="demographic.demographiceditdemographic.formSex"/> 
-						<span style="color:red">*</span>
 					</label>
 					<div class="col-md-4">
 						<select class="form-control form-control-details" title="Sex" 
