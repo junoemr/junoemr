@@ -771,26 +771,10 @@ angular.module('Record').controller('Record.RecordController', [
 			};
 		};
 
-		controller.mediumNavItemFilter = function mediumNavItemFilter(inverse)
+		$("#note-editor").resizable(
 		{
-			return function(item)
-			{
-				var filterValue =
-					(item.label === 'Details' || item.label === 'Summary' ||
-						item.label === 'Forms' || item.label === 'Tickler' ||
-						item.label === 'Health Tracker' || item.label === 'Rx' ||
-						item.label === 'Consultations');
-
-				if (inverse === true)
-				{
-					return !filterValue;
-				}
-				else
-				{
-					return filterValue;
-				}
-			};
-		};
+			handles: "n, e, s, w"
+		});
 	}
 ]);
 
