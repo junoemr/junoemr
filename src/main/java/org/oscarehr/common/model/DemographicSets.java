@@ -41,9 +41,6 @@ public class DemographicSets extends AbstractModel<Integer> {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-
-	//@Column(name="demographic_no")
-	//private int demographicNo;
 	
 	@ManyToOne(optional=false)
 	@JoinColumn(name="demographic_no")

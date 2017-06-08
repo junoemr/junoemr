@@ -208,6 +208,7 @@
 		<form-bean name="DemographicExportForm" type="oscar.oscarDemographic.pageUtil.DemographicExportForm" />
 		<form-bean name="DiabetesExportForm" type="oscar.oscarDemographic.pageUtil.DiabetesExportForm" />
 		<form-bean name="DemographicSetEditForm" type="oscar.oscarReport.pageUtil.DemographicSetEditForm" />
+		<form-bean name="DemographicSetDeleteForm" type="oscar.oscarReport.pageUtil.DemographicSetDeleteForm" />
 		<form-bean name="eFormHtmlUpload" type="oscar.eform.upload.HtmlUploadForm" />
 		<form-bean name="eFormEdit" type="oscar.eform.data.HtmlEditForm" />
 		<form-bean name="eFormImageUpload" type="oscar.eform.upload.ImageUploadForm" />
@@ -1836,7 +1837,7 @@
 		<action input="/oscarReport/demographicSetEdit.jsp" name="DemographicSetEditForm" path="/report/DemographicSetEdit" scope="request" type="oscar.oscarReport.pageUtil.DemographicSetEditAction">
 			<forward name="success" path="/oscarReport/demographicSetEdit.jsp" />
 		</action>
-		<action input="/oscarReport/demographicSetEdit.jsp" name="DemographicSetEditForm" path="/report/DemographicSetDelete" scope="request" type="oscar.oscarReport.pageUtil.DemographicSetDeleteAction">
+		<action input="/oscarReport/demographicSetEdit.jsp" name="DemographicSetDeleteForm" path="/report/DemographicSetDelete" scope="request" type="oscar.oscarReport.pageUtil.DemographicSetDeleteAction">
 			<forward name="success" path="/oscarReport/demographicSetEdit.jsp" />
 			<forward name="failure" path="/oscarReport/demographicSetEdit.jsp" />
 		</action>

@@ -77,10 +77,26 @@ if(!authed) {
 <script type="text/javascript"
 	src="../share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>
 <script type="text/javascript" src="../share/calendar/calendar-setup.js"></script>
-
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
 
-<SCRIPT LANGUAGE="JavaScript">
+<!-- Added for delete functionality 2017 -->
+<script type="text/javascript" src="../share/javascript/jquery/jquery-2.2.4.min.js"></script>
+<script src="../share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
+<link rel="stylesheet" href="../share/javascript/jquery/jquery-ui-1.12.0.min.css">
+
+<style>
+	.alert {
+	float:left;
+	margin:12px 12px 20px 0;
+	}
+	.deleteSuccess {
+		background-color:#6fdb6f;
+	}
+	.deleteError {
+	background-color: red;
+	}
+</style>
+<script>
 
 function showHideItem(id){
     if(document.getElementById(id).style.display == 'none')
@@ -116,7 +132,50 @@ function disableifchecked(ele,nextDate){
     }
 }
 
-</SCRIPT>
+CONFIRM_SET_DELETE_TITLE="Confirm Set Delete";
+CONFIRM_SET_DELETE_MESSAGE="This will permanently delete the set. The process is irreversible. Do you want to continue?";
+
+/** create a confirmation dialogue box element
+ *  call jquery dialog constructor on the returned div element selector */
+function createConfirmationDialogueElements(title, message) {
+    return $("<div>", {
+        title: title,
+        class: "alert"
+    }).append($("<p>", {
+        text: message
+    }));
+}
+// run on page load
+$(function () {
+	$("#set_delete").click(function(event) {
+		if($("#patientSetToDelete").val() != "-1") { // a set is selected
+	        var $confirm = createConfirmationDialogueElements(CONFIRM_SET_DELETE_TITLE, CONFIRM_SET_DELETE_MESSAGE);
+	        $confirm.dialog({
+	            resizable: false,
+	            height: "auto",
+	            width: 400,
+	            modal: true,
+	            position: { my: 'top', at: 'top+150' },
+	            buttons: {
+	                "Delete Set": function() {
+	                	$(this).dialog("close");
+	                	// submit form to delete the set.
+	                	$("#demographicSetDeleteForm").submit();
+	                },
+	                "Cancel": function() {
+	                    $(this).dialog("close");
+	                }
+	            },
+	            close: function() {
+	                $(this).remove();
+	            }
+	        });
+	        event.preventDefault();
+		}
+	})
+});
+
+</script>
 
 
 
@@ -126,20 +185,26 @@ function disableifchecked(ele,nextDate){
 
 <body class="preview" id="top" data-spy="scroll" data-target=".subnav" data-offset="180">
 
-  <div class="container">
-  
   <div class="page-header">
     <h1><bean:message key="oscarReport.oscarReportDemoSetEdit.msgDemographic"/> - <bean:message key="oscarReport.oscarReportDemoSetEdit.msgSetEdit"/></h1>
   </div>
 
   	<section id="mainContent">
-		<% if(request.getAttribute("deleteSetSuccess")!=null && (Boolean)request.getAttribute("deleteSetSuccess")){ %>
-			<div class="alert alert-block alert-success fade in">
-				<button type="button" class="close" data-dismiss="alert">×</button>
-				<h4 class="alert-heading">Success!</h4>
-				<p>Patient set "${requestScope.setname}" has been successfully deleted.</p>
-			</div>
-		<% } %>
+
+		<%
+		if(request.getAttribute("deleteSuccess") != null) {
+			if((Boolean)request.getAttribute("deleteSuccess")) {
+				%>
+				<div><span class="deleteSuccess">Patient Set Deleted</span></div>
+				<%
+			}
+			else {
+				%>
+				<div><span class="deleteError">An Error Occured</span></div>
+				<%
+			}
+		}
+		%>
 		<div class="row">
 		<div class="span12">
 		<html:form styleClass="form-horizontal well form-search" action="/report/DemographicSetEdit">
@@ -187,65 +252,23 @@ function disableifchecked(ele,nextDate){
 			</table>
 		</html:form></div>
 		<%}%>
-		</td>
-	</tr>
-	<tr>
-		<td class="MainTableBottomRowLeftColumn">&nbsp;</td>
-		<td class="MainTableBottomRowRightColumn" valign="top">&nbsp;</td>
-	</tr>
-</table>
+		</div>
+	</div>
+</section>
 
-<html:form styleClass="form-horizontal well form-search" action="/report/DemographicSetDelete">
-
+<html:form styleId="demographicSetDeleteForm" method="POST" action="/report/DemographicSetDelete">
+	<div><bean:message key="oscarReport.oscarReportDemoSetEdit.msgPatientSet"/>: 
+	<select id="patientSetToDelete" name="patientSetToDelete">
+		<option value="-1"><bean:message key="oscarReport.oscarReportDemoSetEdit.msgOptionSet"/></option>
+		<% 
+		for ( int i = 0 ; i < setNames.size(); i++ ) {
+			String s = setNames.get(i);%>
+		<option value="<%=s%>"><%=s%></option>
+		<%}%>
+		</select> 
+		<button id="set_delete" type="button" >Delete Patient Set</button>
+	</div>
 </html:form>
-
-
-<script type="text/javascript">
-    //Calendar.setup( { inputField : "asofDate", ifFormat : "%Y-%m-%d", showsTime :false, button : "date", singleClick : true, step : 1 } );
-</script>
-
-	</section>
-</div>
-
-	<div id="delete-set-confirm" class="modal hide fade" tabindex="-1" role="dialog">
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal">×</button>
-			<h3>Delete Set</h3>
-		</div>
-		<div class="modal-body">
-			<p>This will permanently delete the set, this procedure is
-				irreversible.</p>
-			<p>Are you sure you want to proceed?</p>
-		</div>
-		<div class="modal-footer">
-			<a href="javascript:onDeleteConfirm()" class="btn btn-danger">Yes</a> 
-			<a href="javascript:$('#delete-set-confirm').modal('hide')" class="btn secondary">No</a>
-		</div>
-	</div>	
-
-    <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.7.1.min.js"></script>
-	<script type="text/javascript" src="${pageContext.request.contextPath}/js/bootstrap.js"></script>
-	
-	<script type="text/javascript" src="${pageContext.request.contextPath}/js/global.js"></script>
-
-	<script type="text/javascript">
-	
-	function onDeleteConfirm(){
-		$('#delete-set-confirm').modal('hide');
-    	$('#deleteSet').val('deleteSet');
-    	$('form[name="DemographicSetEditForm"]').submit();
-	}
-	
-
-	function onDeleteSetClick() {
-	    //e.preventDefault();
-	    
-	    var id = $(this).data('id');
-		$('#delete-set-confirm').modal({ backdrop: true });
-	    $('#delete-set-confirm').data('id', id).modal('show');
-	};
-	
-	</script>
 </body>
 </html:html>
 <%!

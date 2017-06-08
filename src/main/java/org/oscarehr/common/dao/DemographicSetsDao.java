@@ -99,4 +99,10 @@ public class DemographicSetsDao extends AbstractDao<DemographicSets>{
 		List<DemographicSets> results = query.getResultList();
 		return results;
 	}
+	public void deletePatientSet(String setName) {
+		String sql = "DELETE FROM DemographicSets x WHERE x.name = :setName";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("setName", setName);
+		query.executeUpdate();
+	}
 }
