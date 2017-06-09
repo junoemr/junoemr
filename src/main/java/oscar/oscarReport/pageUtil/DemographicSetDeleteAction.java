@@ -50,7 +50,7 @@ public class DemographicSetDeleteAction extends Action {
 		}
 		
 		try {
-			String setName = request.getParameter("patientSetToDelete");
+			String setName = request.getParameter("demographicSetName");
 			
 			logger.info("Deleting Patient Set '" + setName + "'");
 

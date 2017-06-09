@@ -148,7 +148,7 @@ function createConfirmationDialogueElements(title, message) {
 // run on page load
 $(function () {
 	$("#set_delete").click(function(event) {
-		if($("#patientSetToDelete").val() != "-1") { // a set is selected
+		if($("#demographicSetName").val() != "-1") { // a set is selected
 	        var $confirm = createConfirmationDialogueElements(CONFIRM_SET_DELETE_TITLE, CONFIRM_SET_DELETE_MESSAGE);
 	        $confirm.dialog({
 	            resizable: false,
@@ -258,7 +258,7 @@ $(function () {
 
 <html:form styleId="demographicSetDeleteForm" method="POST" action="/report/DemographicSetDelete">
 	<div><bean:message key="oscarReport.oscarReportDemoSetEdit.msgPatientSet"/>: 
-	<select id="patientSetToDelete" name="patientSetToDelete">
+	<select id="demographicSetName" name="demographicSetName">
 		<option value="-1"><bean:message key="oscarReport.oscarReportDemoSetEdit.msgOptionSet"/></option>
 		<% 
 		for ( int i = 0 ; i < setNames.size(); i++ ) {

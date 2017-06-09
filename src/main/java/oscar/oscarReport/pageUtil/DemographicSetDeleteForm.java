@@ -25,14 +25,14 @@
 package oscar.oscarReport.pageUtil;
 
 public class DemographicSetDeleteForm {
-	String patientSetToDelete = null;
+	String demographicSetName = null;
 
-	public String getPatientSetToDelete() {
-		return patientSetToDelete;
+	public String getDemographicSetName() {
+		return demographicSetName;
 	}
 
-	public void setPatientSetToDelete(String patientSetToDelete) {
-		this.patientSetToDelete = patientSetToDelete;
+	public void setDemographicSetName(String demographicSetName) {
+		this.demographicSetName = demographicSetName;
 	}
 
 	public DemographicSetDeleteForm() {
