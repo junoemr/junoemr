@@ -499,10 +499,8 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				{
 					return !filterValue;
 				}
-				else
-				{
-					return filterValue;
-				}
+
+				return filterValue;
 			};
 		};
 		controller.smallNavItemFilter = function mediumNavItemFilter(inverse)
@@ -516,10 +514,8 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				{
 					return !filterValue;
 				}
-				else
-				{
-					return filterValue;
-				}
+
+				return filterValue;
 			};
 		};
 	}

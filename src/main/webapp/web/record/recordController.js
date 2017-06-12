@@ -761,10 +761,8 @@ angular.module('Record').controller('Record.RecordController', [
 				{
 					return !filterValue;
 				}
-				else
-				{
-					return filterValue;
-				}
+
+				return filterValue;
 			};
 		};
 	}
