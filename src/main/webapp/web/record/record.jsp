@@ -24,7 +24,7 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<div> 
+<div id="patient-record-page"> 
 	<div class="row vertical-align">
 		<div class="col-xs-4">	
 			<h2 class="patient-header-name" ng-cloak>
@@ -35,15 +35,15 @@
 		<div class="col-xs-8">	
 			<div class="pull-right"> 
 				<p>
-					<span class="patient-header-text">
+					<span class="patient-header-label">
 						<bean:message key="demographic.patient.context.born"/>:
 					</span>
 					{{recordCtrl.demographic.dobYear}}-{{recordCtrl.demographic.dobMonth}}-{{recordCtrl.demographic.dobDay}} ({{recordCtrl.demographic.age | age}})  
-					<span class="patient-header-text">
+					<span class="patient-header-label">
 						<bean:message key="demographic.patient.context.sex"/>: 
 					</span>
 					{{recordCtrl.demographic.sex}}
-					<span class="patient-header-text">
+					<span class="patient-header-label">
 						<bean:message key="Appointment.msgTelephone"/>:
 					</span>
 					{{recordCtrl.demographic.phone}}
