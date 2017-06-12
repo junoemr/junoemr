@@ -1,8 +1,8 @@
 angular.module('PatientList').controller('PatientList.PatientListDemographicSetController', [
 
 	'$scope',
-	'Navigation',
 	'$http',
+	'Navigation',
 
 	function(
 		$scope,
