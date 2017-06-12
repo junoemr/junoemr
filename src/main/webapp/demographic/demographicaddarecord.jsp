@@ -47,6 +47,7 @@
 <%@ page import="org.oscarehr.common.model.Admission" %>
 <%@ page import="org.oscarehr.common.dao.AdmissionDao" %>
 <%@ page import="org.oscarehr.common.dao.WaitingListDao" %>
+<%@ page import="org.oscarehr.common.dao.WaitingListNameDao" %>
 
 <%@ page import="org.oscarehr.common.model.DemographicExt" %>
 <%@ page import="org.oscarehr.common.dao.DemographicExtDao" %>
@@ -83,6 +84,7 @@
 	ProgramManager pm = SpringUtils.getBean(ProgramManager.class);
 	AdmissionManager am = SpringUtils.getBean(AdmissionManager.class);
 	WaitingListDao waitingListDao = (WaitingListDao)SpringUtils.getBean("waitingListDao");
+	WaitingListNameDao waitingListNameDao = (WaitingListNameDao)SpringUtils.getBean("waitingListNameDao");
 	DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
 	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
@@ -367,8 +369,9 @@
                     String listId = request.getParameter("list_id");
                     if(listId != null && !listId.equals("") && !listId.equals("0")) {
 	                    org.oscarehr.common.model.WaitingList waitingList = new org.oscarehr.common.model.WaitingList();
-	                    waitingList.setListId(Integer.parseInt(request.getParameter("list_id")));
-	                    waitingList.setDemographicNo(demographic.getDemographicNo());
+	                    org.oscarehr.common.model.WaitingListName waitingListName =  waitingListNameDao.find(Integer.parseInt(listId));
+	                    waitingList.setWaitingListName(waitingListName);
+	                    waitingList.setDemographic(demographic);
 	                    waitingList.setNote(request.getParameter("waiting_list_note"));
 	                    waitingList.setPosition(maxPosition.longValue()+1);
 	                    waitingList.setOnListSince(MyDateFormat.getSysDate(request.getParameter("waiting_list_referral_date")));

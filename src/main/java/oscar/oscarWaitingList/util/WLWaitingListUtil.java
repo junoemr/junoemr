@@ -27,8 +27,13 @@ package oscar.oscarWaitingList.util;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.WaitingListDao;
+import org.oscarehr.common.dao.WaitingListNameDao;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.WaitingList;
+import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -36,21 +41,25 @@ import oscar.util.ConversionUtils;
 
 public class WLWaitingListUtil {
 	
+	private static WaitingListDao waitingListDao = SpringUtils.getBean(WaitingListDao.class);
+	private static WaitingListNameDao waitingListNameDao = SpringUtils.getBean(WaitingListNameDao.class);
+	private static DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	
+	private static Logger logger = MiscUtils.getLogger();
 	
 	// Modified this method in Feb 2007 to ensure that all records cannot be deleted except hidden.
 	static public synchronized void removeFromWaitingList(String waitingListID, String demographicNo) {
-		MiscUtils.getLogger().debug("WLWaitingListUtil.removeFromWaitingList(): removing waiting list: " + waitingListID + " for patient " + demographicNo);
+		logger.debug("WLWaitingListUtil.removeFromWaitingList(): removing waiting list: " + waitingListID + " for patient " + demographicNo);
 
-		WaitingListDao dao = SpringUtils.getBean(WaitingListDao.class);
-		for (WaitingList wl : dao.findByWaitingListIdAndDemographicId(ConversionUtils.fromIntString(waitingListID), ConversionUtils.fromIntString(demographicNo))) {
+		for (WaitingList wl : waitingListDao.findByWaitingListIdAndDemographicId(ConversionUtils.fromIntString(waitingListID), ConversionUtils.fromIntString(demographicNo))) {
 			wl.setHistory(true);
-			dao.merge(wl);
+			waitingListDao.merge(wl);
 		}
 		rePositionWaitingList(waitingListID);
 	}
 
 	static public synchronized void add2WaitingList(String waitingListID, String waitingListNote, String demographicNo, String onListSince) {
-		MiscUtils.getLogger().debug("WLWaitingListUtil.add2WaitingList(): adding to waitingList: " + waitingListID + " for patient " + demographicNo);
+		logger.debug("WLWaitingListUtil.add2WaitingList(): adding to waitingList: " + waitingListID + " for patient " + demographicNo);
 
 		boolean emptyIds = waitingListID.equalsIgnoreCase("0") || demographicNo.equalsIgnoreCase("0");
 		if (emptyIds) {
@@ -58,12 +67,13 @@ public class WLWaitingListUtil {
 			return;
 		}
 
-		WaitingListDao dao = SpringUtils.getBean(WaitingListDao.class);
-		int maxPosition = dao.getMaxPosition(ConversionUtils.fromIntString(waitingListID));
+		int maxPosition = waitingListDao.getMaxPosition(ConversionUtils.fromIntString(waitingListID));
+		WaitingListName maxPositionList = waitingListNameDao.find(maxPosition);
+		Demographic demographic = demographicDao.getDemographic(demographicNo);
 
 		WaitingList list = new WaitingList();
-		list.setListId(maxPosition);
-		list.setDemographicNo(ConversionUtils.fromIntString(demographicNo));
+		list.setWaitingListName(maxPositionList);
+		list.setDemographic(demographic);
 		list.setNote(waitingListNote);
 		if (onListSince == null || onListSince.length() <= 0) {
 			list.setOnListSince(new Date());
@@ -73,17 +83,17 @@ public class WLWaitingListUtil {
 		list.setPosition(maxPosition + 1);
 		list.setHistory(false);
 
-		dao.persist(list);
+		waitingListDao.persist(list);
 
 		// update the waiting list positions
 		rePositionWaitingList(waitingListID);
 	}
 
-	/*
+	/**
 	 * This method adds the Waiting List note to the same position in the waitingList table but do not delete previous ones - later on DisplayWaitingList.jsp will display only the most current Waiting List Note record.
 	 */
 	static public synchronized void updateWaitingListRecord(String waitingListID, String waitingListNote, String demographicNo, String onListSince) {
-		MiscUtils.getLogger().debug("WLWaitingListUtil.updateWaitingListRecord(): waitingListID: " + waitingListID + " for patient " + demographicNo);
+		logger.debug("WLWaitingListUtil.updateWaitingListRecord(): waitingListID: " + waitingListID + " for patient " + demographicNo);
 		boolean isWatingIdSet = !waitingListID.equalsIgnoreCase("0") && !demographicNo.equalsIgnoreCase("0");
 		if (!isWatingIdSet) return;
 
@@ -101,10 +111,14 @@ public class WLWaitingListUtil {
 			wl.setHistory(true);
 			dao.merge(wl);
 		}
+		
+		int maxPosition = waitingListDao.getMaxPosition(ConversionUtils.fromIntString(waitingListID));
+		WaitingListName maxPositionList = waitingListNameDao.find(maxPosition);
+		Demographic demographic = demographicDao.getDemographic(demographicNo);
 
 		WaitingList wl = new WaitingList();
-		wl.setListId(ConversionUtils.fromIntString(waitingListID));
-		wl.setDemographicNo(ConversionUtils.fromIntString(demographicNo));
+		wl.setWaitingListName(maxPositionList);
+		wl.setDemographic(demographic);
 		wl.setNote(waitingListNote);
 		wl.setPosition(pos);
 		if (onListSince == null || onListSince.length() <= 0) {
@@ -120,11 +134,11 @@ public class WLWaitingListUtil {
 		rePositionWaitingList(waitingListID);
 	}
 
-	/*
+	/**
 	 * This method adds the Waiting List note to the same position in the waitingList table but do not delete previous ones - later on DisplayWaitingList.jsp will display only the most current Waiting List Note record.
 	 */
 	static public synchronized void updateWaitingList(String id, String waitingListID, String waitingListNote, String demographicNo, String onListSince) {
-		MiscUtils.getLogger().debug("WLWaitingListUtil.updateWaitingList(): waitingListID: " + waitingListID + " for patient " + demographicNo);
+		logger.debug("WLWaitingListUtil.updateWaitingList(): waitingListID: " + waitingListID + " for patient " + demographicNo);
 		boolean idsSet = !waitingListID.equalsIgnoreCase("0") && !demographicNo.equalsIgnoreCase("0");
 		if (!idsSet) {
 			MiscUtils.getLogger().debug("Ids are not set - exiting");
@@ -137,26 +151,26 @@ public class WLWaitingListUtil {
 			return;
 		}
 
-		WaitingListDao dao = SpringUtils.getBean(WaitingListDao.class);
-		WaitingList waitingListEntry = dao.find(ConversionUtils.fromIntString(id));
+		WaitingList waitingListEntry = waitingListDao.find(ConversionUtils.fromIntString(id));
 		if (waitingListEntry == null) {
 			MiscUtils.getLogger().debug("Unable to fetch waiting list with id " + id);
 			return;
 		}
 
-		waitingListEntry.setListId(ConversionUtils.fromIntString(waitingListID));
+		WaitingListName maxPositionList = waitingListNameDao.find(waitingListID);
+		
+		waitingListEntry.setWaitingListName(maxPositionList);
 		waitingListEntry.setNote(waitingListNote);
 		waitingListEntry.setOnListSince(ConversionUtils.fromDateString(onListSince));
 
-		dao.merge(waitingListEntry);
+		waitingListDao.merge(waitingListEntry);
 	}
 
 	public static void rePositionWaitingList(String waitingListID) {
 		int i = 1;
-		WaitingListDao dao = SpringUtils.getBean(WaitingListDao.class);
-		for (WaitingList waitingList : dao.findByWaitingListId(ConversionUtils.fromIntString(waitingListID))) {
+		for (WaitingList waitingList : waitingListDao.findByWaitingListId(ConversionUtils.fromIntString(waitingListID))) {
 			waitingList.setPosition(i);
-			dao.merge(waitingList);
+			waitingListDao.merge(waitingList);
 			i++;
 		}
 	}

@@ -32,6 +32,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -46,12 +48,14 @@ public class WaitingList extends AbstractModel<Integer> {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
+	
+	@ManyToOne(optional=true)
+	@JoinColumn(name="listID")
+	private WaitingListName waitingListName;
 
-	@Column(name="listID")
-	private int listId;
-
-	@Column(name="demographic_no")
-	private int demographicNo;
+	@ManyToOne(optional=false)
+	@JoinColumn(name="demographic_no")
+	private Demographic demographic;
 
 	private String note;
 
@@ -71,21 +75,37 @@ public class WaitingList extends AbstractModel<Integer> {
     	this.id = id;
     }
 
-	public int getListId() {
-    	return listId;
+	/**
+	 * Use getWaitingListName() to get the object instead
+	 * @return id associated with the waitingListName object, or null if not linked to a valid waitingListName
+	 */
+	@Deprecated
+	public Integer getListId() {
+		if(waitingListName == null) {
+			return 0;
+		}
+    	return waitingListName.getId();
     }
+	
+	public WaitingListName getWaitingListName() {
+		return waitingListName;
+	}
 
-	public void setListId(int listId) {
-    	this.listId = listId;
-    }
+	public void setWaitingListName(WaitingListName waitingListName) {
+		this.waitingListName = waitingListName;
+	}
 
 	public int getDemographicNo() {
-    	return demographicNo;
+    	return demographic.getDemographicNo();
     }
-
-	public void setDemographicNo(int demographicNo) {
-    	this.demographicNo = demographicNo;
-    }
+	
+	public Demographic getDemographic() {
+		return demographic;
+	}
+	
+	public void setDemographic(Demographic demographic) {
+		this.demographic = demographic;
+	}
 
 	public String getNote() {
     	return note;

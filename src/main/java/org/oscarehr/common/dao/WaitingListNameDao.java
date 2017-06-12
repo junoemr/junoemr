@@ -36,7 +36,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class WaitingListNameDao extends AbstractDao<WaitingListName> {
 
-	
 	public WaitingListNameDao() {
 		super(WaitingListName.class);
 	}
@@ -44,53 +43,51 @@ public class WaitingListNameDao extends AbstractDao<WaitingListName> {
 	/**
 	 * Gets the number of waiting list names where history flag is set to "N".
 	 * 
-	 * @return
-	 * 		Gets the number of waiting lists.
+	 * @return Gets the number of waiting lists.
 	 */
 	public long countActiveWatingListNames() {
 		Query query = entityManager.createQuery("SELECT COUNT(*) FROM WaitingListName n WHERE n.isHistory = 'N'");
 		query.setMaxResults(1);
 		return (Long) query.getSingleResult();
 	}
-	
-	
-	 public List<WaitingListName> findCurrentByNameAndGroup(String name, String group) {
-	    	
-	    	String sql = "select x from WaitingListName x where x.name = ? AND x.groupNo = ? and x.isHistory='N'";
-	    	Query query = entityManager.createQuery(sql);
-	    	query.setParameter(1,name);
-	    	query.setParameter(2,group);
 
-	        @SuppressWarnings("unchecked")
-	        List<WaitingListName> results = query.getResultList();
-	        return results;
-	    }
+	public List<WaitingListName> findCurrentByNameAndGroup(String name, String group) {
 
-    public List<WaitingListName> findByMyGroups(List<MyGroup> myGroups) {
-    	List<String> groupIds = new ArrayList<String>();
-    	for(MyGroup mg:myGroups) {
-    		groupIds.add(mg.getId().getMyGroupNo());
-    	}
-    	groupIds.add(".default");
-    	
-    	String sql = "select x from WaitingListName x where x.groupNo IN (:groupNo) and x.isHistory='N' order by x.name ASC";
-    	Query query = entityManager.createQuery(sql);
-    	query.setParameter("groupNo",groupIds);
+		String sql = "SELECT x FROM WaitingListName x WHERE x.name = ? AND x.groupNo = ? AND x.isHistory='N'";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter(1, name);
+		query.setParameter(2, group);
 
-        @SuppressWarnings("unchecked")
-        List<WaitingListName> results = query.getResultList();
-        return results;
-    }
-    
-	 public List<WaitingListName> findCurrentByGroup(String group) {
-	    	
-	    	String sql = "select x from WaitingListName x where x.groupNo = ? and x.isHistory='N' order by x.name";
-	    	Query query = entityManager.createQuery(sql);
-	    	query.setParameter(1,group);
+		@SuppressWarnings("unchecked")
+		List<WaitingListName> results = query.getResultList();
+		return results;
+	}
 
-	        @SuppressWarnings("unchecked")
-	        List<WaitingListName> results = query.getResultList();
-	        return results;
-	    }
-    
+	public List<WaitingListName> findByMyGroups(List<MyGroup> myGroups) {
+		List<String> groupIds = new ArrayList<String>();
+		for (MyGroup mg : myGroups) {
+			groupIds.add(mg.getId().getMyGroupNo());
+		}
+		groupIds.add(".default");
+
+		String sql = "SELECT x FROM WaitingListName x WHERE x.groupNo IN (:groupNo) AND x.isHistory='N' ORDER BY x.name ASC";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("groupNo", groupIds);
+
+		@SuppressWarnings("unchecked")
+		List<WaitingListName> results = query.getResultList();
+		return results;
+	}
+
+	public List<WaitingListName> findCurrentByGroup(String groupNo) {
+
+		String sql = "SELECT x FROM WaitingListName x WHERE x.groupNo = :groupNo AND x.isHistory='N' ORDER BY x.name";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("groupNo", groupNo);
+
+		@SuppressWarnings("unchecked")
+		List<WaitingListName> results = query.getResultList();
+		return results;
+	}
+
 }

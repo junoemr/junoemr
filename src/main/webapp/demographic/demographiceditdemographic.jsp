@@ -3268,7 +3268,8 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 											<%} %>
 											<%
 											
-									List<WaitingListName> wlns = waitingListNameDao.findCurrentByGroup(((org.oscarehr.common.model.ProviderPreference)session.getAttribute(org.oscarehr.util.SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo());
+									//List<WaitingListName> wlns = waitingListNameDao.findCurrentByGroup(((org.oscarehr.common.model.ProviderPreference)session.getAttribute(org.oscarehr.util.SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo());
+									List<WaitingListName> wlns = waitingListNameDao.findAll(0, 0);
                                      for(WaitingListName wln:wlns) {
                                     %>
 											<option value="<%=wln.getId()%>"

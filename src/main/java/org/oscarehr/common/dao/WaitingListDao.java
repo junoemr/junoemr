@@ -40,38 +40,27 @@ public class WaitingListDao extends AbstractDao<WaitingList> {
 	}
 
 	/**
-	 * Finds all waiting lists for the specified demographic 
+	 * Finds all waiting lists for the specified demographic
 	 * 
-	 * @param demographicNo
-	 * 		Demographic to find the lists for
-	 * @return
-	 * 		Returns a list of all matching {@link org.oscarehr.common.model.WaitingListName}, {@link org.oscarehr.common.model.WaitingList} pairs.
+	 * @param demographicNo Demographic to find the lists for
+	 * @return A list of all matching {@link org.oscarehr.common.model.WaitingList} objects.
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Object[]> findByDemographic(Integer demographicNo) {
-		Query query = entityManager.createQuery("FROM WaitingListName wn, WaitingList w WHERE wn.id = w.listId AND w.demographicNo = :demoNo AND w.isHistory != 'Y'");
+	public List<WaitingList> findByDemographic(Integer demographicNo) {
+		Query query = entityManager.createQuery("SELECT w FROM WaitingList w WHERE w.demographic.DemographicNo = :demoNo AND w.isHistory != 'Y'");
 		query.setParameter("demoNo", demographicNo);
 		return query.getResultList();
 	}
 
 	/**
-	 * Finds all waiting lists and demographics for the specified list id 
+	 * Finds all waiting lists and demographics for the specified list id
 	 * 
-	 * @param listId
-	 * 		List ID to get gemographics for
-	 * @return
-	 * 		Returns a list of WaitingList, Demographic pairs.
+	 * @param listId List ID find by
+	 * @return A list of WaitingList ordered by onListSince date
 	 */
 	@SuppressWarnings("unchecked")
-    public List<Object[]> findWaitingListsAndDemographics(Integer listId) {
-		Query query = entityManager.createQuery("FROM WaitingList w, Demographic d WHERE w.demographicNo = d.DemographicNo AND  w.listId = :listId AND w.isHistory = 'N' ORDER BY w.position");
-		query.setParameter("listId", listId);
-		return query.getResultList();
-	}
-
-	@SuppressWarnings("unchecked")
     public List<WaitingList> findByWaitingListId(Integer listId) {
-		Query query = entityManager.createQuery("FROM WaitingList w WHERE w.listId = :listId AND w.isHistory = 'N' ORDER BY w.onListSince");
+		Query query = entityManager.createQuery("SELECT w FROM WaitingList w WHERE w.listId = :listId AND w.isHistory = 'N' ORDER BY w.onListSince");
 		query.setParameter("listId", listId);
 		return query.getResultList();
     }
@@ -79,16 +68,14 @@ public class WaitingListDao extends AbstractDao<WaitingList> {
 	/**
 	 * Finds appointments that take place after the demographic has been placed onto the waiting list. 
 	 * 
-	 * @param waitingList
-	 * 		Waiting list entry
-	 * @return
-	 * 		Returns all available appointments for the specified waiting list entry.
+	 * @param waitingList Waiting list entry
+	 * @return All available appointments for the specified waiting list entry.
 	 */
 	@SuppressWarnings("unchecked")
     public List<Appointment> findAppointmentFor(WaitingList waitingList) {
 		// this is a translation attempt of this query
 		// sql = "select a.demographic_no, a.appointment_date, wl.onListSince from appointment a, waitingList wl where a.appointment_date >= wl.onListSince AND a.demographic_no=wl.demographic_no AND a.demographic_no=" + oscar.Misc.getString(rs, "demographic_no") + "";  
-		Query query = entityManager.createQuery("From Appointment a where a.appointmentDate >= :onListSince AND a.demographicNo = :demographicNo");
+		Query query = entityManager.createQuery("FROM Appointment a WHERE a.appointmentDate >= :onListSince AND a.demographicNo = :demographicNo");
 		query.setParameter("onListSince", waitingList.getOnListSince());
 		query.setParameter("demographicNo", waitingList.getDemographicNo());
 	    return query.getResultList();
@@ -97,16 +84,13 @@ public class WaitingListDao extends AbstractDao<WaitingList> {
 	/**
 	 * Finds all waiting list entries for the specified waiting list and demographic IDs
 	 * 
-	 * @param waitingListId
-	 * 		Waiting list id to be searched for
-	 * @param demographicId
-	 * 		Demographic id to be searched for
-	 * @return
-	 * 		Returns all matching waiting list entries.
+	 * @param waitingListId Waiting list id to be searched for
+	 * @param demographicId Demographic id to be searched for
+	 * @return All matching waiting list entries.
 	 */
 	@SuppressWarnings("unchecked")
     public List<WaitingList> findByWaitingListIdAndDemographicId(Integer waitingListId, Integer demographicId) {
-		Query query = createQuery("wl", "wl.demographicNo = :demoNo AND wl.listId = :listId");
+		Query query = entityManager.createQuery("SELECT w FROM WaitingList w WHERE w.demographic.DemographiNo = :demoNo AND w.listId = :listId");
 		query.setParameter("demoNo", demographicId);
 		query.setParameter("listId", waitingListId);
 	    return query.getResultList();
@@ -115,13 +99,11 @@ public class WaitingListDao extends AbstractDao<WaitingList> {
 	/**
 	 * Gets max position form the specified waiting list 
 	 * 
-	 * @param listId
-	 * 		Waiting list to find max position for
-	 * @return
-	 * 		Returns the position for the specified list.
+	 * @param listId Waiting list to find max position for
+	 * @return The position for the specified list.
 	 */
 	public Integer getMaxPosition(Integer listId) {
-		Query query = entityManager.createQuery("select max(w.position) from WaitingList w where w.listId = :listId AND w.isHistory = 'N'");
+		Query query = entityManager.createQuery("SELECT max(w.position) FROM WaitingList w WHERE w.listId = :listId AND w.isHistory = 'N'");
 		query.setParameter("listId", listId);
 		Integer result = (Integer) query.getSingleResult();
 		if (result == null) {
@@ -132,9 +114,8 @@ public class WaitingListDao extends AbstractDao<WaitingList> {
 	
 	@SuppressWarnings("unchecked")
     public List<WaitingList> search_wlstatus(Integer demographicId) {
-		Query query = entityManager.createQuery("select wl from WaitingList wl where wl.demographicNo = :demoNo AND wl.isHistory = 'N' order BY wl.onListSince desc");
+		Query query = entityManager.createQuery("SELECT w FROM WaitingList w WHERE w.demographic.DemographicNo = :demoNo AND w.isHistory = 'N' ORDER BY w.onListSince DESC");
 		query.setParameter("demoNo", demographicId);
-
 	    return query.getResultList();
     }
 }
