@@ -441,7 +441,7 @@
 			List<Appointment> apptList = appointmentDao.findNonCancelledFutureAppointments(new Integer(wlDemoId));
 			if(!apptList.isEmpty()){
 %>
-			<script language="JavaScript">
+			<script>
 				var add2List = confirm("The patient already has an appointment, do you still want to add him/her to the waiting list?");
 				if(add2List){
 					document.add2WLFrm.action = "../oscarWaitingList/Add2WaitingList.jsp?demographicNo=<%=request.getParameter("demographic_no")%>&listId=<%=request.getParameter("list_id")%>&waitingListNote=<%=request.getParameter("waiting_list_note")==null?"":request.getParameter("waiting_list_note")%>&onListSince=<%=request.getParameter("waiting_list_referral_date")==null?"":request.getParameter("waiting_list_referral_date")%>";
@@ -450,7 +450,7 @@
 					document.add2WLFrm.action ="demographiccontrol.jsp?demographic_no=<%=request.getParameter("demographic_no")%>&displaymode=edit&dboperation=search_detail";
 				}
 				document.add2WLFrm.submit();
-		</script> 
+			</script> 
 <%
 			}
 			else{

@@ -60,7 +60,7 @@ public class WaitingListDao extends AbstractDao<WaitingList> {
 	 */
 	@SuppressWarnings("unchecked")
     public List<WaitingList> findByWaitingListId(Integer listId) {
-		Query query = entityManager.createQuery("SELECT w FROM WaitingList w WHERE w.listId = :listId AND w.isHistory = 'N' ORDER BY w.onListSince");
+		Query query = entityManager.createQuery("SELECT w FROM WaitingList w WHERE w.waitingListName.id = :listId AND w.isHistory = 'N' ORDER BY w.onListSince");
 		query.setParameter("listId", listId);
 		return query.getResultList();
     }
@@ -90,7 +90,7 @@ public class WaitingListDao extends AbstractDao<WaitingList> {
 	 */
 	@SuppressWarnings("unchecked")
     public List<WaitingList> findByWaitingListIdAndDemographicId(Integer waitingListId, Integer demographicId) {
-		Query query = entityManager.createQuery("SELECT w FROM WaitingList w WHERE w.demographic.DemographiNo = :demoNo AND w.listId = :listId");
+		Query query = entityManager.createQuery("SELECT w FROM WaitingList w WHERE w.demographic.DemographicNo = :demoNo AND w.waitingListName.id = :listId AND w.isHistory = 'N'");
 		query.setParameter("demoNo", demographicId);
 		query.setParameter("listId", waitingListId);
 	    return query.getResultList();
@@ -102,13 +102,13 @@ public class WaitingListDao extends AbstractDao<WaitingList> {
 	 * @param listId Waiting list to find max position for
 	 * @return The position for the specified list.
 	 */
-	public Integer getMaxPosition(Integer listId) {
-		Query query = entityManager.createQuery("SELECT max(w.position) FROM WaitingList w WHERE w.listId = :listId AND w.isHistory = 'N'");
+	public Long getMaxPosition(Integer listId) {
+		Query query = entityManager.createQuery("SELECT max(w.position) FROM WaitingList w WHERE w.waitingListName.id = :listId AND w.isHistory = 'N'");
 		query.setParameter("listId", listId);
-		Integer result = (Integer) query.getSingleResult();
+		Long result = (Long) query.getSingleResult();
 		if (result == null) {
-			return 0;
-		} 
+			return 0L;
+		}
 		return result;
     }
 	

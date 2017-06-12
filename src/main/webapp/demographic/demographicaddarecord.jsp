@@ -39,15 +39,14 @@
 %>
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="java.sql.*, java.util.*, java.net.URLEncoder, oscar.oscarDB.*, oscar.MyDateFormat, oscar.oscarWaitingList.WaitingList, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
+<%@ page import="java.sql.*, java.util.*, java.net.URLEncoder, oscar.oscarDB.*, oscar.MyDateFormat, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
 <%@ page import="oscar.log.*"%>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 
 <%@ page import="org.oscarehr.common.model.Admission" %>
 <%@ page import="org.oscarehr.common.dao.AdmissionDao" %>
-<%@ page import="org.oscarehr.common.dao.WaitingListDao" %>
-<%@ page import="org.oscarehr.common.dao.WaitingListNameDao" %>
+<%@ page import="oscar.oscarWaitingList.util.WLWaitingListUtil" %>
 
 <%@ page import="org.oscarehr.common.model.DemographicExt" %>
 <%@ page import="org.oscarehr.common.dao.DemographicExtDao" %>
@@ -83,8 +82,6 @@
 	AdmissionDao admissionDao = (AdmissionDao)SpringUtils.getBean("admissionDao");
 	ProgramManager pm = SpringUtils.getBean(ProgramManager.class);
 	AdmissionManager am = SpringUtils.getBean(AdmissionManager.class);
-	WaitingListDao waitingListDao = (WaitingListDao)SpringUtils.getBean("waitingListDao");
-	WaitingListNameDao waitingListNameDao = (WaitingListNameDao)SpringUtils.getBean("waitingListNameDao");
 	DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
 	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
@@ -342,50 +339,11 @@
 			archive.setValue(request.getParameter(archive.getKey()));
 			demographicExtArchiveDao.saveEntity(archive);	
 		}	
-		
-        //add to waiting list if the waiting_list parameter in the property file is set to true
         
+        // Assign the patient to a waitlist if necessary
+        String waitListIdStr = request.getParameter("list_id");
+        WLWaitingListUtil.add2WaitingList(waitListIdStr, request.getParameter("waiting_list_note"), demographic.getDemographicNo().toString(), request.getParameter("waiting_list_referral_date"));
 
-        WaitingList wL = WaitingList.getInstance();
-        if(wL.getFound()){
-
-            String[] paramWLPosition = new String[1];
-            paramWLPosition[0] = request.getParameter("list_id");
-            if(paramWLPosition[0].compareTo("")!=0){
-
-                List<Long> positionList = new ArrayList<Long>();
-                List<org.oscarehr.common.model.WaitingList> waitingListList = waitingListDao.findByWaitingListId(new Integer(1));
-
-                if(waitingListList != null) {
-                	
-	                for(org.oscarehr.common.model.WaitingList waitingList : waitingListList) {
-	                	positionList.add(waitingList.getPosition());
-	                }
-	                Long maxPosition = 0L;
-	                if(positionList.size()> 0) {
-	                	maxPosition = Collections.max(positionList);
-	                }
-            	
-                    String listId = request.getParameter("list_id");
-                    if(listId != null && !listId.equals("") && !listId.equals("0")) {
-	                    org.oscarehr.common.model.WaitingList waitingList = new org.oscarehr.common.model.WaitingList();
-	                    org.oscarehr.common.model.WaitingListName waitingListName =  waitingListNameDao.find(Integer.parseInt(listId));
-	                    waitingList.setWaitingListName(waitingListName);
-	                    waitingList.setDemographic(demographic);
-	                    waitingList.setNote(request.getParameter("waiting_list_note"));
-	                    waitingList.setPosition(maxPosition.longValue()+1);
-	                    waitingList.setOnListSince(MyDateFormat.getSysDate(request.getParameter("waiting_list_referral_date")));
-	                    waitingList.setIsHistory("N");
-	                    waitingList.setOnListSince(new java.util.Date());
-	                    waitingListDao.persist(waitingList);
-                    }
-                }
-            }
-
-
-        } //end of waitingl list
-
-        //if(request.getParameter("fromAppt")!=null && request.getParameter("provider_no").equals("1")) {
         if(start_time2!=null && !start_time2.equals("null")) {
 	%>
 	<script language="JavaScript">

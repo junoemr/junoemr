@@ -49,7 +49,7 @@ public class WLWaitingListUtil {
 	
 	// Modified this method in Feb 2007 to ensure that all records cannot be deleted except hidden.
 	static public synchronized void removeFromWaitingList(String waitingListID, String demographicNo) {
-		logger.debug("WLWaitingListUtil.removeFromWaitingList(): removing waiting list: " + waitingListID + " for patient " + demographicNo);
+		logger.info("Removing patient # " + demographicNo + " from waitingList " + waitingListID);
 
 		for (WaitingList wl : waitingListDao.findByWaitingListIdAndDemographicId(ConversionUtils.fromIntString(waitingListID), ConversionUtils.fromIntString(demographicNo))) {
 			wl.setHistory(true);
@@ -58,88 +58,89 @@ public class WLWaitingListUtil {
 		rePositionWaitingList(waitingListID);
 	}
 
-	static public synchronized void add2WaitingList(String waitingListID, String waitingListNote, String demographicNo, String onListSince) {
-		logger.debug("WLWaitingListUtil.add2WaitingList(): adding to waitingList: " + waitingListID + " for patient " + demographicNo);
-
-		boolean emptyIds = waitingListID.equalsIgnoreCase("0") || demographicNo.equalsIgnoreCase("0");
+	/**
+	 * This is now an alias for addToWaitingList but all inputs are Strings
+	 */
+	static public synchronized void add2WaitingList(String waitingListIDStr, String waitingListNote, String demographicNoStr, String onListSince) {
+		
+		boolean emptyIds = waitingListIDStr == null || waitingListIDStr.equalsIgnoreCase("0") && !demographicNoStr.equalsIgnoreCase("0");
 		if (emptyIds) {
-			MiscUtils.getLogger().debug("Ids are not proper - exiting");
+			logger.error("Waitlist Ids are not valid (listId=" + waitingListIDStr + ",demoNo=" + demographicNoStr + "). Failed to update patient waitlist");
+			return;
+		}
+		Integer waitingListID = Integer.parseInt(waitingListIDStr);
+		Integer demographicNo = Integer.parseInt(demographicNoStr);
+		addToWaitingList(waitingListID, demographicNo, onListSince, waitingListNote);
+	}
+	
+	/**
+	 * Adds a new waitinlist entry for the given demographic 
+	 * @param waitingListID - Id of waitListName to add to
+	 * @param demographicNo - demographic id
+	 * @param onListSince - String representing the date patient was added to the wait list
+	 * @param waitingListNote - Note string
+	 */
+	static public synchronized void addToWaitingList(Integer waitingListID, Integer demographicNo, String onListSince, String waitingListNote) {
+		logger.info("Adding patient #" + demographicNo + " to waitingList " + waitingListID);
+
+		boolean emptyIds = waitingListID == null || waitingListID <= 0 || demographicNo <= 0;
+		if (emptyIds) {
+			logger.error("Waitlist Ids are not valid (listId=" + waitingListID + ",demoNo=" + demographicNo + "). Failed to add patient to waitlist");
+			return;
+		}
+		
+		Date onListSinceDate = (onListSince == null || onListSince.isEmpty()) ? new Date() : ConversionUtils.fromDateString(onListSince);
+
+		WaitingList waitListEntry  = new WaitingList();
+		Demographic demographic = demographicDao.getDemographic(demographicNo.toString());
+		WaitingListName waitingListName = waitingListNameDao.find(waitingListID);
+		long position = waitingListDao.getMaxPosition(waitingListID) + 1;
+		
+		waitListEntry.setDemographic(demographic);
+		waitListEntry.setHistory(false);
+		waitListEntry.setWaitingListName(waitingListName);
+		waitListEntry.setPosition(position);
+		waitListEntry.setOnListSince(onListSinceDate);
+		waitListEntry.setNote(waitingListNote);
+		
+		// save changes to database
+		waitingListDao.persist(waitListEntry);
+	}
+
+	/**
+	 * This method adds the Waiting List note to the same position in the waitingList table but do not delete previous ones - later on DisplayWaitingList.jsp will display only the most current Waiting List Note record.
+	 */
+	static public synchronized void updateWaitingListRecord(String waitingListIDStr, String waitingListNote, String demographicNoStr, String onListSince) {
+		logger.info("Updating patient #" + demographicNoStr + " on waitingList " + waitingListIDStr);
+		boolean emptyIds = waitingListIDStr == null || waitingListIDStr.equalsIgnoreCase("0") && !demographicNoStr.equalsIgnoreCase("0");
+		if (emptyIds) {
+			logger.error("Waitlist Ids are not valid (listId=" + waitingListIDStr + ",demoNo=" + demographicNoStr + "). Failed to update patient waitlist");
+			return;
+		}
+		
+		Integer waitingListID = Integer.parseInt(waitingListIDStr);
+		Integer demographicNo = Integer.parseInt(demographicNoStr);
+
+		List<WaitingList> waitingLists = waitingListDao.findByWaitingListIdAndDemographicId(waitingListID, demographicNo);
+		if (waitingLists.isEmpty()) {
+			logger.warn("Demographic Waitlist Id returned 0 results (listId=" + waitingListIDStr + ",demoNo=" + demographicNoStr + "). Unable to update patient waitlist");
 			return;
 		}
 
-		int maxPosition = waitingListDao.getMaxPosition(ConversionUtils.fromIntString(waitingListID));
-		WaitingListName maxPositionList = waitingListNameDao.find(maxPosition);
-		Demographic demographic = demographicDao.getDemographic(demographicNo);
-
-		WaitingList list = new WaitingList();
-		list.setWaitingListName(maxPositionList);
-		list.setDemographic(demographic);
-		list.setNote(waitingListNote);
-		if (onListSince == null || onListSince.length() <= 0) {
-			list.setOnListSince(new Date());
-		} else {
-			list.setOnListSince(ConversionUtils.fromDateString(onListSince));
-		}
-		list.setPosition(maxPosition + 1);
-		list.setHistory(false);
-
-		waitingListDao.persist(list);
-
-		// update the waiting list positions
-		rePositionWaitingList(waitingListID);
-	}
-
-	/**
-	 * This method adds the Waiting List note to the same position in the waitingList table but do not delete previous ones - later on DisplayWaitingList.jsp will display only the most current Waiting List Note record.
-	 */
-	static public synchronized void updateWaitingListRecord(String waitingListID, String waitingListNote, String demographicNo, String onListSince) {
-		logger.debug("WLWaitingListUtil.updateWaitingListRecord(): waitingListID: " + waitingListID + " for patient " + demographicNo);
-		boolean isWatingIdSet = !waitingListID.equalsIgnoreCase("0") && !demographicNo.equalsIgnoreCase("0");
-		if (!isWatingIdSet) return;
-
-		WaitingListDao dao = SpringUtils.getBean(WaitingListDao.class);
-		List<WaitingList> waitingLists = dao.findByWaitingListIdAndDemographicId(ConversionUtils.fromIntString(waitingListID), ConversionUtils.fromIntString(demographicNo));
-		if (waitingLists.isEmpty()) return;
-
-		long pos = 1;
-		for (WaitingList wl : waitingLists) {
-			pos = wl.getPosition();
-		}
-
-		// set all previous records 'is_history' fielf to 'N' --> to keep as record but never display
+		// set all previous records 'is_history' field to 'Y' --> to keep as record but never display
 		for (WaitingList wl : waitingLists) {
 			wl.setHistory(true);
-			dao.merge(wl);
+			waitingListDao.merge(wl);
 		}
-		
-		int maxPosition = waitingListDao.getMaxPosition(ConversionUtils.fromIntString(waitingListID));
-		WaitingListName maxPositionList = waitingListNameDao.find(maxPosition);
-		Demographic demographic = demographicDao.getDemographic(demographicNo);
-
-		WaitingList wl = new WaitingList();
-		wl.setWaitingListName(maxPositionList);
-		wl.setDemographic(demographic);
-		wl.setNote(waitingListNote);
-		wl.setPosition(pos);
-		if (onListSince == null || onListSince.length() <= 0) {
-			wl.setOnListSince(new Date());
-		} else {
-			wl.setOnListSince(ConversionUtils.fromDateString(onListSince));
-		}
-		wl.setHistory(false);
-
-		dao.saveEntity(wl);
-
-		// update the waiting list positions
-		rePositionWaitingList(waitingListID);
+		addToWaitingList(waitingListID, demographicNo, onListSince, waitingListNote);
 	}
 
 	/**
 	 * This method adds the Waiting List note to the same position in the waitingList table but do not delete previous ones - later on DisplayWaitingList.jsp will display only the most current Waiting List Note record.
 	 */
-	static public synchronized void updateWaitingList(String id, String waitingListID, String waitingListNote, String demographicNo, String onListSince) {
-		logger.debug("WLWaitingListUtil.updateWaitingList(): waitingListID: " + waitingListID + " for patient " + demographicNo);
-		boolean idsSet = !waitingListID.equalsIgnoreCase("0") && !demographicNo.equalsIgnoreCase("0");
+	static public synchronized void updateWaitingList(String id, String waitingListIDStr, String waitingListNote, String demographicNoStr, String onListSince) {
+		logger.info("Updating patient #" + demographicNoStr + " on waitingList " + waitingListIDStr);
+		boolean idsSet = !waitingListIDStr.equalsIgnoreCase("0") && !demographicNoStr.equalsIgnoreCase("0");
 		if (!idsSet) {
 			MiscUtils.getLogger().debug("Ids are not set - exiting");
 			return;
@@ -157,7 +158,7 @@ public class WLWaitingListUtil {
 			return;
 		}
 
-		WaitingListName maxPositionList = waitingListNameDao.find(waitingListID);
+		WaitingListName maxPositionList = waitingListNameDao.find(waitingListIDStr);
 		
 		waitingListEntry.setWaitingListName(maxPositionList);
 		waitingListEntry.setNote(waitingListNote);

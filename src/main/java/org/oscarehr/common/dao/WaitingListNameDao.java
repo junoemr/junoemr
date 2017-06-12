@@ -50,6 +50,17 @@ public class WaitingListNameDao extends AbstractDao<WaitingListName> {
 		query.setMaxResults(1);
 		return (Long) query.getSingleResult();
 	}
+	
+	/**
+	 * @return list of all WaitingListName objects that have not been archived/deleted
+	 */
+	public List<WaitingListName> findActiveWatingListNames() {
+		Query query = entityManager.createQuery("SELECT x FROM WaitingListName x WHERE x.isHistory = 'N' ORDER BY x.name ASC");
+		
+		@SuppressWarnings("unchecked")
+		List<WaitingListName> results = query.getResultList();
+		return results;
+	}
 
 	public List<WaitingListName> findCurrentByNameAndGroup(String name, String group) {
 
