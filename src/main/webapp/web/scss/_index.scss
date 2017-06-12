@@ -116,6 +116,9 @@ li.cpp-note-list:last-child {
 			padding: 20px;
 		}
 	}
+	#right-pane {
+		margin-top: $margin-lg;
+	}
 	.toggle-patient-list-button {
 		height: 90px;
 		width: $toggle-patient-list-btn-width;
