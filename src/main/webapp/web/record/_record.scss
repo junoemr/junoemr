@@ -1,124 +1,44 @@
-.patient-header-name {
-	color: $primary-blue-text;
-}
+#patient-record-page {
+	.patient-header-name {
+		color: $primary-blue-text;
+	} // for patient header
+	.patient-header-text {
+		color: $primary-blue-text;
+	}
 
-.patient-header-ext {
-	margin-top: 20px;
-}
-
-.patient-header-ext b {
-	color: $primary-blue-text;
-}
-
-.sub-nav {
-	.dropdown-menu {
-		background-color: #fff;
-		li {
-			a {
-				color: #636363;
-			}
-			a:hover {
-				background-color: #ebebeb;
+	.sub-nav {
+		.dropdown-menu {
+			background-color: #fff;
+			li {
+				a {
+					color: #636363;
+				}
+				a:hover {
+					background-color: #ebebeb;
+				}
 			}
 		}
 	}
-}
 
-.sub-nav .dropdown-toggle {
-	color: #333333;
-}
+	@media (max-width: 1320px) {
 
-.form-heading {
-	color: $primary-blue-text;
-}
-
-#dob-year {
-	width: 65px;
-}
-
-#dob-month {
-	width: 45px;
-}
-
-#dob-day {
-	width: 45px;
-}
-
-.input-group {
-	.phone-num {
-		width: 70%;
+		.patient-header-name {
+			font-size: 26px
+		}
 	}
-	.phone-ext {
-		width: 30%;
+
+	@media print {
+		.noprint {
+			display: none;
+		}
+		.patient-header-name {
+			font-size: 16px;
+		}
 	}
-}
 
-#photo {
-	height: 150px;
-	width: auto;
-	cursor: pointer;
-}
-
-.add-status-menu {
-	right: 55px;
-	top: 0px;
-	z-index: 1;
-	background-color: #EEEEEE;
-	padding: 5px;
-}
-
-.add-status-menu button {
-	margin-top: 10px;
-}
-
-#save-button {
-	width: 100%;
-	margin-top: 50px;
-	margin-bottom: 50px;
-}
-
-#alert-text-box {
-	height: 55px;
-	width: 100%;
-	color: #df4646;
-}
-
-#notes-text-box {
-	height: 55px;
-	width: 100%;
-}
-
-#details-page {
-	.form-divider {
-		margin-top: $margin-lg;
-	}
-}
-
-// for patient header
-.patient-header-text {
-	color: $primary-blue-text;
-}
-
-@media (max-width: 1320px) {
-	.patient-header-name {
-		font-size: 26px
-	}
-	.patientHeaderExt {
-		font-size: 20px
-	}
-}
-
-@media print {
-	.noprint {
-		display: none;
-	}
-	.patient-header-name {
-		font-size: 16px;
-	}
-}
-
-@media (min-width: 992px) {
-	.no-margin-left-md {
-		margin-left: 0;
+	@media (min-width: 992px) {
+		.no-margin-left-md {
+			margin-left: 0;
+		}
 	}
 }
