@@ -73,7 +73,7 @@
 				<li ng-repeat="tab in recordCtrl.recordtabs2" ng-class="recordCtrl.isTabActive(tab)">
 					<a href="javascript:void(0)" ng-click="recordCtrl.changeTab(tab)">
 						{{tab.label}} 
-						<strong class="text-danger" ng-show="tab.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
+						<strong class="text-danger" ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
 					</a>
 				</li>
 			</ul>
@@ -96,7 +96,7 @@
 						<ul class="dropdown-menu" role="menu">
 							<li ng-repeat="tab in recordCtrl.recordtabs2 | filter: recordCtrl.mediumNavItemFilter(true)" ng-class="recordCtrl.isTabActive(tab)">
 								<a href="javascript:void(0)" ng-if="!tab.dropdown" ng-click="recordCtrl.changeTab(tab)" >{{tab.label}} 
-									<strong class="text-danger" ng-show="tab.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
+									<strong class="text-danger" ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
 								</a>
 								
 							</li>
@@ -114,7 +114,7 @@
 						<ul class="dropdown-menu" role="menu">
 							<li ng-repeat="tab in recordCtrl.recordtabs2" ng-class="recordCtrl.isTabActive(tab)">
 								<a href="javascript:void(0)" ng-if="!tab.dropdown" ng-click="recordCtrl.changeTab(tab)" >{{tab.label}} 
-									<strong class="text-danger" ng-show="tab.extra=='outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
+									<strong class="text-danger" ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
 								</a>
 							</li>
 						</ul>
@@ -178,7 +178,7 @@
 				<table class="table">
 					<tr ng-repeat="i in recordCtrl.page.assignedCMIssues">
 						<td>
-							<input type="button" value="remove" ng-click="recordCtrl.removeIssue(i)" ng-if="i.unchecked==null || i.unchecked==false"/>
+							<input type="button" value="remove" ng-click="recordCtrl.removeIssue(i)" ng-if="i.unchecked == null || i.unchecked == false"/>
 						</td>
 						<td>{{i.issue.description}} ({{i.issue.code}})</td>
 					</tr>
