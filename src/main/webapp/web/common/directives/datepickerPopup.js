@@ -41,7 +41,9 @@ angular.module('Common.Directives').directive('junoDatepickerPopup', [
 		{
 			$scope.format = 'yyyy-MM-dd';
 
-			$scope.dateOptions = {};
+			$scope.dateOptions = {
+				showWeeks: false
+			};
 
 			$scope.opened = false;
 
