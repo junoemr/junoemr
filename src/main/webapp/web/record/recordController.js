@@ -754,11 +754,8 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			return function(item)
 			{
-				var filterValue =
-					(item.label === 'Details' || item.label === 'Summary' ||
-						item.label === 'Forms' || item.label === 'Tickler' ||
-						item.label === 'Health Tracker' || item.label === 'Rx' ||
-						item.label === 'Consultations');
+				var labelsToShow = ['Details', 'Summary', 'Forms', 'Tickler', 'Health Tracker', 'Rx', 'Consultations'];
+				var filterValue = $.inArray(item.label, labelsToShow) != -1;
 
 				if (inverse === true)
 				{

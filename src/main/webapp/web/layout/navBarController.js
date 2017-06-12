@@ -491,7 +491,9 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		{
 			return function(item)
 			{
-				var filterValue = (item.label === 'Dashboard' || item.label === 'Schedule' || item.label === 'Inbox' || item.label === 'Consultations' || item.label === 'Ticklers');
+
+				var labelsToShow = ['Dashboard', 'Schedule', 'Inbox', 'Consultations', 'Ticklers'];
+				var filterValue = $.inArray(item.label, labelsToShow) != -1;
 
 				if (inverse === true)
 				{
@@ -503,12 +505,12 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				}
 			};
 		};
-
 		controller.smallNavItemFilter = function mediumNavItemFilter(inverse)
 		{
 			return function(item)
 			{
-				var filterValue = (item.label === 'Dashboard');
+				var labelsToShow = ['Dashboard'];
+				var filterValue = $.inArray(item.label, labelsToShow) != -1;
 
 				if (inverse === true)
 				{
