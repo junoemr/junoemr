@@ -258,23 +258,23 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			if (angular.isDefined(myVar))
 			{
-				return "glyphicon-pause"
+				return "fa-pause";
 			}
-			return "glyphicon-play";
+			return "fa-play";
 		};
 
 		controller.toggleTimer = function toggleTimer()
 		{
-			if ($("#aToggle").hasClass("glyphicon-pause"))
+			if ($("#aToggle").hasClass("fa-pause"))
 			{
-				$("#aToggle").removeClass("glyphicon-pause");
-				$("#aToggle").addClass("glyphicon-play");
+				$("#aToggle").removeClass("fa-pause");
+				$("#aToggle").addClass("fa-play");
 				clearInterval(myVar);
 			}
 			else
 			{
-				$("#aToggle").removeClass("glyphicon-play");
-				$("#aToggle").addClass("glyphicon-pause");
+				$("#aToggle").removeClass("fa-play");
+				$("#aToggle").addClass("fa-pause");
 				myVar = setInterval(setTime, 1000);
 			}
 		};
@@ -770,11 +770,6 @@ angular.module('Record').controller('Record.RecordController', [
 				}
 			};
 		};
-
-		$("#note-editor").resizable(
-		{
-			handles: "n, e, s, w"
-		});
 	}
 ]);
 

@@ -127,43 +127,55 @@
 	<div class="row">
         <div class="include-record-peice" ui-view></div>
     </div>
-    
-    <div class="row noprint">
-    	<div id="noteInput2" class="center-block well col-md-4 col-md-offset-3 text-center hand-hover" style="padding:0px;" ng-click="toggleNote();" ng-show="!hideNote">
-    		<span class="glyphicon glyphicon-chevron-up"></span><span class="glyphicon glyphicon-chevron-up"></span><span class="glyphicon glyphicon-chevron-up"></span>
-    	</div>
-    	<div id="noteInput" class="center-block well col-md-4 col-md-offset-3" ng-show="hideNote" ng-click="recordCtrl.checkAction($event)" ng-keypress="recordCtrl.checkAction($event)">
-			<div style="position:absolute;top:0px;Right:0px;font-size:10px">
-			<span class="glyphicon glyphicon-arrow-left hand-hover" ng-click="recordCtrl.moveNote('l');" title="move left"></span>  			
-			<span class="glyphicon glyphicon-stop hand-hover" ng-click="recordCtrl.moveNote('c');" title="center"></span>   
-			<span class="glyphicon glyphicon-arrow-right hand-hover" ng-click="recordCtrl.moveNote('r');" title="move right"></span>
+
+	<div class="row" id="note-editor-container">
+		<div id="note-editor-minimized"
+			draggable 
+			class="col-sm-3 col-xs-12 text-center hand-hover" 
+			ng-click="recordCtrl.toggleNote();" 
+			ng-show="!recordCtrl.hideNote">
+			Open note editor <span class="fa fa-chevron-up"></span>
+		</div>
+	
+		<div id="note-editor"
+				class="col-sm-5"
+				resizable
+				draggable
+				ng-show="recordCtrl.hideNote" 
+				ng-click="recordCtrl.checkAction($event)" 
+				ng-keypress="recordCtrl.checkAction($event)">
+			<div class="row" id="note-editor-header">
+				<div class="col-sm-12 text-center hand-hover" ng-click="recordCtrl.toggleNote();"  >
+					Minimize
+					<span class="fa fa-chevron-down"></span>
+				</div>
 			</div>
-			<div class="col-xs-4">
-			
-			    
-			    <input type="text" ng-model="recordCtrl.options.magicVal" placeholder="Template" 
-				uib-typeahead="t.encounterTemplateName as t.encounterTemplateName for t in recordCtrl.searchTemplates($viewValue)" 
-				typeahead-on-select="recordCtrl.insertTemplate($item, $model, $label)"
-				class="form-control">
-				
-				
-		    </div>
-			<div class="col-xs-3 text-center hand-hover" ng-click="recordCtrl.toggleNote();"  >
-				<span class="glyphicon glyphicon-chevron-down"></span>
-				<span class="glyphicon glyphicon-chevron-down"></span>
-				<span class="glyphicon glyphicon-chevron-down"></span>
-			
+			<div class="row">
+				<div class="col-sm-4">
+					<input type="text" ng-model="recordCtrl.options.magicVal" placeholder="Template" 
+					uib-typeahead="t.encounterTemplateName as t.encounterTemplateName for t in recordCtrl.searchTemplates($viewValue)" 
+					typeahead-on-select="recordCtrl.insertTemplate($item, $model, $label)"
+					class="form-control">	
+				</div>
+				<div class="col-sm-4 " >
+					<input type="text" class="form-control" placeholder="Search" data-ng-disabled="true">
+				</div>
 			</div>
-			<div class="col-xs-4 " >
-			    <input type="text" class="form-control" placeholder="Search" data-ng-disabled="true">
-			</div>
-    		
-    		
-    		<textarea class="form-control input-lg col-lg-4" rows="6" ng-model="recordCtrl.page.encounterNote.note" ng-disabled="recordCtrl.page.cannotChange" id="noteEditor{{demographicNo}}" ng-change="recordCtrl.setEditingNoteFlag()"></textarea>
-    		
-    		<div style="font-size:8pt" ng-if="recordCtrl.page.assignedCMIssues != null  && recordCtrl.page.assignedCMIssues.length > 0">
-			    <label>Assigned Issues:</label>
-			    <table class="table">
+			<div class="row">
+				<div class="col-sm-12">
+					<textarea class="form-control input-md col-lg-4 note-editor-textarea"
+						rows="6"
+						ng-model="recordCtrl.page.encounterNote.note"
+						ng-disabled="recordCtrl.page.cannotChange" 
+						id="noteEditor{{recordCtrl.demographicNo}}" 
+						ng-change="recordCtrl.setEditingNoteFlag()">
+					</textarea>
+				</div>
+
+			</div>    		
+			<div class="row" ng-if="recordCtrl.page.assignedCMIssues != null  && recordCtrl.page.assignedCMIssues.length > 0">
+				<label>Assigned Issues:</label>
+				<table class="table">
 					<tr ng-repeat="i in recordCtrl.page.assignedCMIssues">
 						<td>
 							<input type="button" value="remove" ng-click="recordCtrl.removeIssue(i)" ng-if="i.unchecked==null || i.unchecked==false"/>
@@ -173,42 +185,42 @@
 					
 				</table>
 			</div>
-			
-			<div class="pull-left">
-				<input type="text" class="form-control" placeholder="Assign Issue"  
-					uib-typeahead="i.issueId as i.code for i in recordCtrl.searchIssues($viewValue)" 
-					typeahead-on-select="recordCtrl.assignIssue($item, $model, $label);selectedIssue='';" 
-					ng-model="selectedIssue" 
-					typeahead-loading="loadingIssues"
-					typeahead-min-length="3" typeahead-append-to-body="true"/>
+			<div class="row" id="note-editor-footer">
+				<div class="col-sm-12">
+					<div class="pull-left">
+						<input type="text" class="form-control" placeholder="Assign Issue"  
+							uib-typeahead="i.issueId as i.code for i in recordCtrl.searchIssues($viewValue)" 
+							typeahead-on-select="recordCtrl.assignIssue($item, $model, $label);selectedIssue='';" 
+							ng-model="selectedIssue" 
+							typeahead-loading="loadingIssues"
+							typeahead-min-length="3" typeahead-append-to-body="true"/>
+					</div>
+					<input type="hidden" id="startTag" value="<bean:message key="oscarEncounter.Index.startTime"/>">
+					<input type="hidden" id="endTag" value="<bean:message key="oscarEncounter.Index.endTime"/>">
+					
+					<div class="btn-group btn-group-md pull-right">
+						<button type="button" class="btn btn-default" ng-click="recordCtrl.pasteTimer()" id="aTimer" title="<bean:message key="oscarEncounter.Index.pasteTimer"/>">
+							00:00
+						</button>
+						<button type="button" class="btn btn-default" ng-click="recordCtrl.toggleTimer()" title="<bean:message key="oscarEncounter.Index.toggleTimer"/>">
+							<span class="fa fa-pause"  id="aToggle"></span>
+						</button>
+						<button type="button" class="btn btn-success" ng-click="recordCtrl.saveNote()" id="saveButton" data-ng-disabled="recordCtrl.page.encounterNote.isSigned" title="<bean:message key="oscarEncounter.Index.btnSave"/>">
+							<span class="fa fa-save"  id="theSave"></span>
+						</button>
+						<button type="button" class="btn btn-success" ng-click="recordCtrl.saveSignNote()" title="<bean:message key="oscarEncounter.Index.btnSignSave"/>">
+							<span class="fa fa-pencil-square-o"  id="Sign"></span>
+						</button>
+						<button type="button" class="btn btn-success" ng-click="recordCtrl.saveSignVerifyNote()" title="<bean:message key="oscarEncounter.Index.btnSign"/>">
+							<span class="fa fa-thumbs-o-up"  id="SaveSignVerify"></span>
+						</button>
+						<button type="button" class="btn btn-success" ng-click="recordCtrl.saveSignBillNote()" title="<bean:message key="oscarEncounter.Index.btnSignSaveBill"/>">
+							<span class="fa fa-dollar"  id="bill"></span>
+						</button>
+					</div>
+				</div>
 			</div>
-			
-			
-			<input type="hidden" id="startTag" value="<bean:message key="oscarEncounter.Index.startTime"/>">
-			<input type="hidden" id="endTag" value="<bean:message key="oscarEncounter.Index.endTime"/>">
-			
-    		<div class="btn-group btn-group-sm pull-right">
-				<button type="button" class="btn btn-default" ng-click="recordCtrl.pasteTimer()" id="aTimer" title="<bean:message key="oscarEncounter.Index.pasteTimer"/>">
-					00:00
-				</button>
-				<button type="button" class="btn btn-default" ng-click="recordCtrl.toggleTimer()" title="<bean:message key="oscarEncounter.Index.toggleTimer"/>">
-					<span class="glyphicon glyphicon-pause"  id="aToggle"></span>
-				</button>
-				<button type="button" class="btn btn-default" ng-click="recordCtrl.saveNote()" id="saveButton"  data-ng-disabled="recordCtrl.page.encounterNote.isSigned" title="<bean:message key="oscarEncounter.Index.btnSave"/>">
-					<span class="glyphicon glyphicon-save"  id="theSave"></span>
-				</button>
-				<button type="button" class="btn btn-default" ng-click="recordCtrl.saveSignNote()" title="<bean:message key="oscarEncounter.Index.btnSignSave"/>">
-					<span class="glyphicon glyphicon-pencil"  id="Sign"></span>
-				</button>
-				<button type="button" class="btn btn-default" ng-click="recordCtrl.saveSignVerifyNote()" title="<bean:message key="oscarEncounter.Index.btnSign"/>">
-					<span class="glyphicon glyphicon-thumbs-up"  id="SaveSignVerify"></span>
-				</button>
-				<button type="button" class="btn btn-default" ng-click="recordCtrl.saveSignBillNote()" title="<bean:message key="oscarEncounter.Index.btnSignSaveBill"/>">
-					<span class="glyphicon glyphicon-usd"  id="bill"></span>
-				</button>
-			</div>
-    		
-    	</div>
-    </div>
+		</div>
+	</div>
 </div>
     
