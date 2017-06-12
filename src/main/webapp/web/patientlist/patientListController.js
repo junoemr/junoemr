@@ -48,7 +48,6 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 		var controller = this;
 		controller.sidebar = Navigation;
-
 		controller.showFilter = true;
 		controller.patientListConfig = {};
 
@@ -270,7 +269,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			function success(results)
 			{
 				patientListState.tabItems = results.patientListTabItems;
-				controller.moreTabItems = results.patientListMoreTabItems;
+				controller.moreTabItems = results.patientListMoreTabItems; // Doesn't need to be stored in patientListState, should we put it there anyways?
 				controller.changeTab(0);
 			},
 			function error(errors)
@@ -290,8 +289,10 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			});
 
 
-
-
+		controller.getTabItems = function getTabItems()
+		{
+			return patientListState.tabItems;
+		};
 
 		controller.manageConfiguration = function manageConfiguration()
 		{
