@@ -54,6 +54,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 <link href="bower_components/ng-table-bundle/ng-table.min.css" rel="stylesheet">
 <link href="bower_components/angular-loading-bar/build/loading-bar.min.css" rel="stylesheet">
 <link href="bower_components/components-font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<link href="bower_components/jquery-ui/themes/base/jquery-ui.min.css" rel="stylesheet">
 
 <%-- combined CSS from compiled SCSS --%>
 <link href="dist/juno.css" rel="stylesheet">
@@ -64,7 +65,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 </head>
 
 <body ng-controller="Layout.BodyController as bodyCtrl"
-			ng-init="bodyCtrl.init()">
+			ng-init="bodyCtrl.init()"
+			id="main-body">
 
 	<!-- Navbar -->
 	<nav ng-controller="Layout.NavBarController as navBarCtrl"
@@ -75,7 +77,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 			 ng-cloak>
 		<div class="container-fluid">
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-nav-collapse">
 					<span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
 				</button>
 
@@ -90,7 +92,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 						 title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0" />
 				</a>
 			</div>
-			<div class="navbar-collapse collapse">
+			<div class="navbar-collapse collapse" id="main-nav-collapse">
 
 				<form class="navbar-form navbar-left" role="search">
 	 				<div class="form-group">
@@ -110,7 +112,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					<li ng-repeat="item in navBarCtrl.menuItems"
 							ng-class="{'active': navBarCtrl.isActive(item) }">
 
-						<a href="#"
+						<a href="javascript:void(0)"
 							 ng-if="!item.dropdown"
 							 ng-click="navBarCtrl.transition(item)" >{{item.label}}
 							<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
@@ -275,20 +277,6 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					ng-controller="PatientList.PatientListAppointmentListController as patientListAppointmentListCtrl"
 					ng-if="bodyCtrl.showPatientList">
 
-				<%--<ul class="nav nav-tabs">
-					<li ng-repeat="item in tabItems" ng-class="{'active': isActive(item.id)}" class="hand-hover">
-						<a ng-click="changeTab(item.id)" data-toggle="tab">{{item.label}}</a>
-					</li>
-
-					<li class="dropdown" ng-class="{'active': currentmoretab != null}"><a class="dropdown-toggle hand-hover" ><b class="caret"></b></a>
-							<ul class="dropdown-menu">
-								<li ng-repeat="item in moreTabItems">
-								<a ng-class="getMoreTabClass(item.id)" ng-click="changeMoreTab(item.id)" class="hand-hover">{{item.label}}<span ng-if="item.extra.length>0" class="label">{{item.extra}}</span></a></li>
-							</ul>
-					</li>
-
-				</ul>--%>
-
 				<div id="left-pane-header" class="row vertical-align">
 					<div class="col-sm-2 col-xs-3">
 						<button class="toggle-patient-list-button" type="button" class="pull-left" ng-click="patientListCtrl.hidePatientList()" title="<bean:message key="patientList.hide" bundle="ui"/>">
@@ -323,9 +311,26 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 						<button type="button" class="btn btn-default" ng-disabled="currentPage == nPages-1"  ng-click="changePage(currentPage+1)" title="<bean:message key="patientList.pageDown" bundle="ui"/>">
 							<span class="glyphicon glyphicon-circle-arrow-down"></span>
 						</button>--%>
+						<ul class="nav nav-tabs">
+							<li ng-repeat="item in patientListCtrl.getTabItems()" ng-class="{'active': patientListCtrl.isActive(item.id)}" class="hand-hover">
+								<a ng-click="patientListCtrl.changeTab(item.id)" data-toggle="tab">{{item.label}}</a>
+							</li>
 
-						
+							<li class="dropdown" ng-class="{'active': patientListCtrl.currentmoretab != null}">
+								<a class="dropdown-toggle hand-hover" data-toggle="dropdown"><b class="caret"></b></a>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu">
+									<li ng-repeat="item in patientListCtrl.moreTabItems">
+										<a ng-class="patientListCtrl.getMoreTabClass(item.id)" 
+											ng-click="patientListCtrl.changeMoreTab(item.id)" 
+											class="hand-hover">
+											{{item.label}}
+											<span ng-if="item.extra.length>0" class="label">{{item.extra}}</span>
+										</a>
+									</li>
+								</ul>
+							</li>
 
+						</ul>
 						<div ng-include="patientListCtrl.sidebar.location"></div>
 						<div class="col-md-2 pull-right">
 							<span title="<bean:message key="patientList.pagination" bundle="ui"/>">{{patientListCtrl.currentPage+1}}/{{patientListCtrl.numberOfPages()}}</span>
@@ -360,6 +365,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<%-- third party libraries, managed with bower, combined and minified for production --%>
 	<!-- build:component js/components.js -->
 	<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.min.js"></script>
 	<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
 	<script type="text/javascript" src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
@@ -370,7 +376,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="bower_components/ng-table-bundle/ng-table.min.js"></script>
 	<script type="text/javascript" src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
 	<script type="text/javascript" src="bower_components/pym.js/dist/pym.v1.min.js"></script>
-	<script type="text/javascript" src="bower_components/moment/min/moment-with-locales.min.js"></script>
+	<script type="text/javascript" src="bower_components/moment/min/moment-with-locales.min.js"></script>	
 	<!-- endbuild -->
 
 	<%-- JunoUI application code, to be combined and minified for production --%>
@@ -428,6 +434,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="common/directives/patientTypeahead.js"></script>
 	<script type="text/javascript" src="common/directives/datepickerPopup.js"></script>
 	<script type="text/javascript" src="common/directives/timepickerPopup.js"></script>
+	<script type="text/javascript" src="common/directives/jqueryUIResizable.js"></script>
+	<script type="text/javascript" src="common/directives/jqueryUIDraggable.js"></script>
 
 	<script type="text/javascript" src="layout/module.js"></script>
 	<script type="text/javascript" src="layout/bodyController.js"></script>
