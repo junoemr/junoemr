@@ -28,7 +28,7 @@
 <div class="col-lg-12" ng-hide="detailsCtrl.page.canRead">
 	<bean:message key="demographic.demographiceditdemographic.accessDenied"/>
 </div>
-<div class="col-xs-12" ng-show="detailsCtrl.page.canRead" id="details-page">
+<div class="col-xs-12" ng-show="detailsCtrl.page.canRead" id="patient-details-page">
 	<div class="row">
 		<div class="col-md-12 pull-left">
 			<div class="btn-group sub-nav">
