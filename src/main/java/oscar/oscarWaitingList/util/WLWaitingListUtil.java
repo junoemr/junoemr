@@ -48,10 +48,13 @@ public class WLWaitingListUtil {
 	private static Logger logger = MiscUtils.getLogger();
 	
 	// Modified this method in Feb 2007 to ensure that all records cannot be deleted except hidden.
-	static public synchronized void removeFromWaitingList(String waitingListID, String demographicNo) {
-		logger.info("Removing patient # " + demographicNo + " from waitingList " + waitingListID);
+	static public synchronized void removeFromWaitingList(String waitingListIDStr, String demographicNoStr) {
+		logger.info("Removing patient # " + demographicNoStr + " from waitingList " + waitingListIDStr);
+		
+		Integer waitingListID = ConversionUtils.fromIntString(waitingListIDStr);
+		Integer demographicNo = ConversionUtils.fromIntString(demographicNoStr);
 
-		for (WaitingList wl : waitingListDao.findByWaitingListIdAndDemographicId(ConversionUtils.fromIntString(waitingListID), ConversionUtils.fromIntString(demographicNo))) {
+		for (WaitingList wl : waitingListDao.findByWaitingListIdAndDemographicId(waitingListID, demographicNo)) {
 			wl.setHistory(true);
 			waitingListDao.merge(wl);
 		}
@@ -105,6 +108,7 @@ public class WLWaitingListUtil {
 		
 		// save changes to database
 		waitingListDao.persist(waitListEntry);
+		rePositionWaitingList(waitingListID);
 		return waitListEntry;
 	}
 
@@ -163,9 +167,9 @@ public class WLWaitingListUtil {
 		waitingListDao.merge(waitingListEntry);
 	}
 
-	public static void rePositionWaitingList(String waitingListID) {
+	public static void rePositionWaitingList(Integer waitingListID) {
 		int i = 1;
-		for (WaitingList waitingList : waitingListDao.findByWaitingListId(ConversionUtils.fromIntString(waitingListID))) {
+		for (WaitingList waitingList : waitingListDao.findByWaitingListId(waitingListID)) {
 			waitingList.setPosition(i);
 			waitingListDao.merge(waitingList);
 			i++;

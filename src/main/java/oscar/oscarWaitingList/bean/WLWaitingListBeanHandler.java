@@ -27,12 +27,14 @@ package oscar.oscarWaitingList.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.WaitingListDao;
 import org.oscarehr.common.dao.WaitingListNameDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarWaitingList.util.WLWaitingListUtil;
@@ -42,6 +44,7 @@ public class WLWaitingListBeanHandler {
 	
 	private static WaitingListDao waitingListDao = SpringUtils.getBean(WaitingListDao.class);
 	private static WaitingListNameDao waitingListNameDao = SpringUtils.getBean(WaitingListNameDao.class);
+	private static Logger logger = MiscUtils.getLogger();
 
 	List<WLPatientWaitingListBean> waitingListArrayList = new ArrayList<WLPatientWaitingListBean>();
 	private String waitingListName = "";
@@ -56,6 +59,10 @@ public class WLWaitingListBeanHandler {
 		return init(ConversionUtils.fromIntString(waitingListID));
 	}
 	public boolean init(Integer waitingListID) {
+		if(waitingListID == null || waitingListID <= 0) {
+			logger.error("Invalid Wait List Id: " + waitingListID);
+			return false;
+		}
 		List<WaitingList> waitingListEntries = waitingListDao.findByWaitingListId(waitingListID);
 
 		String onListSinceDateOnly = "";

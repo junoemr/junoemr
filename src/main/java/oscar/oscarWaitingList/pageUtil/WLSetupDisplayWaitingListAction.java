@@ -117,7 +117,7 @@ public final class WLSetupDisplayWaitingListAction extends Action {
 		        		WLWaitingListUtil.updateWaitingListRecord(waitingListId, waitingListNote, demographicNo, onListSince);
 		        	}
 		        	else{
-		        		WLWaitingListUtil.rePositionWaitingList(waitingListId);
+		        		WLWaitingListUtil.rePositionWaitingList(Integer.parseInt(waitingListId));
 		        	}
 	
 		        }catch(Exception ex){
@@ -127,7 +127,7 @@ public final class WLSetupDisplayWaitingListAction extends Action {
         	}
     	}else if(( update == null  ||  update.equals(""))  &&  remove == null ){ 
     		if(waitingListId != null  &&  waitingListId.length() > 0){
-    			WLWaitingListUtil.rePositionWaitingList(waitingListId);
+    			WLWaitingListUtil.rePositionWaitingList(Integer.parseInt(waitingListId));
     		}
     	}//end of if( !update.equalsIgnoreCase("Y") ) -- could be remove also ???
         
