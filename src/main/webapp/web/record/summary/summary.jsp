@@ -45,7 +45,7 @@
 					<a ng-click="summaryCtrl.setOnlyNotes()" class="hand-hover">Just Encounter Notes</a>
 				</li>
 				<li>
-					<a href="#" data-target="#tracker" role="tab" data-toggle="tab" ng-click="summaryCtrl.getTrackerUrl(summaryCtrl.demographicNo)" >Tracker</a>
+					<a ng-click="summaryCtrl.getTrackerUrl(summaryCtrl.demographicNo)" data-target="#tracker" role="tab" data-toggle="tab" >Tracker</a>
 				</li>
 				<li class="pull-right">
 					<span class="glyphicon glyphicon-print" ng-click="summaryCtrl.showPrintModal(summaryCtrl.page.notes.notelist)"></span>
