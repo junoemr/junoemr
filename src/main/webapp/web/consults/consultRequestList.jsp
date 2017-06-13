@@ -53,58 +53,75 @@
 	<form name="searchForm" id="search-form">
 
 		<div class="row search-filters">
-			<div class="col-lg-2 col-sm-4 col-xs-6">
-				<input ng-model="consultRequestListCtrl.search.referralStartDate" type="text"
+			<div class="col-lg-3 col-xs-6">
+				<%--<input ng-model="consultRequestListCtrl.search.referralStartDate" type="text"
 					id="referralStartDate" name="referralStartDate"
-					class="form-control" datepicker-popup="yyyy-MM-dd"
+					class="form-control" uib-datepicker-popup="yyyy-MM-dd"
 					datepicker-append-to-body="true" is-open="data.isOpen"
-					ng-click="data.isOpen = true" placeholder="<bean:message key="consult.list.referralStartDate" bundle="ui"/>">
+					ng-click="data.isOpen = true" placeholder="<bean:message key="consult.list.referralStartDate" bundle="ui"/>">--%>
+				<juno-datepicker-popup juno-model="consultRequestListCtrl.search.referralStartDate" 
+					placeholder="<bean:message key="consult.list.referralStartDate" bundle="ui"/>"
+					show-icon="true"> 
+				</juno-datepicker-popup>
 			</div>
-			<div class="col-lg-2 col-sm-4 col-xs-6">
-				<input ng-model="consultRequestListCtrl.search.referralEndDate" type="text"
+			<div class="col-lg-3 col-xs-6">
+				<%--<input ng-model="consultRequestListCtrl.search.referralEndDate" type="text"
 					id="referralEndDate" name="referralEndDate" class="form-control"
-					datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true"
+					uib-datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true"
 					is-open="data2.isOpen" ng-click="data2.isOpen = true"
-					placeholder="<bean:message key="consult.list.referralEndDate" bundle="ui"/>">
+					placeholder="<bean:message key="consult.list.referralEndDate" bundle="ui"/>">--%>
+				<juno-datepicker-popup juno-model="consultRequestListCtrl.search.referralEndDate" 
+					placeholder="<bean:message key="consult.list.referralEndDate" bundle="ui"/>"
+					show-icon="true"> 
+				</juno-datepicker-popup>
 			</div>
-			<div class="col-lg-2 col-sm-4 col-xs-6">
+			<div class="col-lg-3 col-xs-6">
 				<select class="form-control" ng-model="consultRequestListCtrl.search.status" 
 						name="status" id="status" 
 						ng-options="status.value as status.name for status in consultRequestListCtrl.statuses">
 					<option value=""><bean:message key="consult.list.status.all" bundle="ui"/></option>
 				</select>
 			</div>
-			<div class="col-lg-2 col-sm-4 col-xs-6">
+			<div class="col-lg-3 col-xs-6">
 				<select ng-model="consultRequestListCtrl.search.team" name="team" id="team"
 					class="form-control" ng-options="t for t in consultRequestListCtrl.teams">
 				</select>
 			</div>
-			<div class="col-lg-2 col-sm-4 col-xs-6">
-				<input ng-model="consultRequestListCtrl.search.appointmentStartDate" type="text"
+			<div class="col-lg-3 col-xs-6">
+				<%--<input ng-model="consultRequestListCtrl.search.appointmentStartDate" type="text"
 					id="appointmentStartDate" name="appointmentStartDate"
-					class="form-control" datepicker-popup="yyyy-MM-dd"
+					class="form-control" uib-datepicker-popup="yyyy-MM-dd"
 					datepicker-append-to-body="true" is-open="data3.isOpen"
-					ng-click="data3.isOpen = true" placeholder="<bean:message key="consult.list.appointmentStartDate" bundle="ui"/>">
+					ng-click="data3.isOpen = true" placeholder="<bean:message key="consult.list.appointmentStartDate" bundle="ui"/>">--%>
+				<juno-datepicker-popup juno-model="consultRequestListCtrl.search.appointmentStartDate" 
+					placeholder="<bean:message key="consult.list.appointmentStartDate" bundle="ui"/>"
+					show-icon="true"> 
+				</juno-datepicker-popup>
 			</div>
-			<div class="col-lg-2 col-sm-4 col-xs-6">
-				<input ng-model="consultRequestListCtrl.search.appointmentEndDate" type="text"
+			<div class="col-lg-3 col-xs-6">
+				<%--<input ng-model="consultRequestListCtrl.search.appointmentEndDate" type="text"
 					id="appointmentEndDate" name="appointmentEndDate"
-					class="form-control" datepicker-popup="yyyy-MM-dd"
+					class="form-control" uib-datepicker-popup="yyyy-MM-dd"
 					datepicker-append-to-body="true" is-open="data4.isOpen"
-					ng-click="data4.isOpen = true" placeholder="<bean:message key="consult.list.appointmentEndDate" bundle="ui"/>">
+					ng-click="data4.isOpen = true" placeholder="<bean:message key="consult.list.appointmentEndDate" bundle="ui"/>">--%>
+				<juno-datepicker-popup juno-model="consultRequestListCtrl.search.appointmentEndDate" 
+					placeholder="<bean:message key="consult.list.appointmentEndDate" bundle="ui"/>"
+					show-icon="true"> 
+				</juno-datepicker-popup>
 			</div>
 			
-			<div class="col-lg-2 col-sm-4 col-xs-6" ng-hide="consultRequestListCtrl.hideSearchPatient">
+			<div class="col-lg-3 col-xs-6" ng-hide="consultRequestListCtrl.hideSearchPatient">
 				<div class="input-group">
 					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="consultRequestListCtrl.removeDemographicAssignment()"></span></div>
-					<input type="text" ng-model="consult.demographicName" placeholder="<bean:message key="consult.list.patient" bundle="ui"/>"
+					<input type="text" ng-model="consultRequestListCtrl.consult.demographicName" 
+						placeholder="<bean:message key="consult.list.patient" bundle="ui"/>"
 						uib-typeahead="pt.demographicNo as pt.name for pt in consultRequestListCtrl.searchPatients($viewValue)"
 						typeahead-on-select="consultRequestListCtrl.updateDemographicNo($item, $model, $label)"
 						class="form-control"/>
 				</div>
 			</div>
 			
-			<div class="col-lg-2 col-sm-4 col-xs-6">
+			<div class="col-lg-3 col-xs-6">
 				<div class="input-group">
 					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="consultRequestListCtrl.removeMrpAssignment()"></span></div>
 					<input type="text" ng-model="consultRequestListCtrl.consult.mrpName" placeholder="<bean:message key="consult.list.mrp" bundle="ui"/>"
