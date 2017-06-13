@@ -112,22 +112,35 @@
 			
 			<div class="col-lg-3 col-xs-6" ng-hide="consultRequestListCtrl.hideSearchPatient">
 				<div class="input-group">
-					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="consultRequestListCtrl.removeDemographicAssignment()"></span></div>
+					
 					<input type="text" ng-model="consultRequestListCtrl.consult.demographicName" 
 						placeholder="<bean:message key="consult.list.patient" bundle="ui"/>"
 						uib-typeahead="pt.demographicNo as pt.name for pt in consultRequestListCtrl.searchPatients($viewValue)"
 						typeahead-on-select="consultRequestListCtrl.updateDemographicNo($item, $model, $label)"
-						class="form-control"/>
+						class="form-control"
+					/>
+					<span class="input-group-btn">
+						<button class="btn btn-default" ng-click="consultRequestListCtrl.removeDemographicAssignment()">
+							<span class="glyphicon glyphicon-remove">
+							</span>
+						</button>
+					</span>
 				</div>
 			</div>
 			
 			<div class="col-lg-3 col-xs-6">
 				<div class="input-group">
-					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="consultRequestListCtrl.removeMrpAssignment()"></span></div>
 					<input type="text" ng-model="consultRequestListCtrl.consult.mrpName" placeholder="<bean:message key="consult.list.mrp" bundle="ui"/>"
 						uib-typeahead="pvd as pvd.name for pvd in consultRequestListCtrl.searchMrps($viewValue)"
 						typeahead-on-select="consultRequestListCtrl.updateMrpNo($model)"
-						class="form-control"/>
+						class="form-control"
+					/>
+					<span class="input-group-btn">
+						<button class="btn btn-default" ng-click="consultRequestListCtrl.removeMrpAssignment()">
+							<span class="glyphicon glyphicon-remove">
+							</span>
+						</button>
+					</span>
 				</div>
 			</div>
 		</div>
