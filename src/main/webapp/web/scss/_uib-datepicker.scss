@@ -25,4 +25,13 @@
 		}
 		background-color: $primary-blue;
 	}
+	.uib-button-bar {
+		.uib-datepicker-current {
+			border-color: $primary-blue;
+		}
+	}
+}
+
+.datepicker-wrapper {
+	margin: 0;
 }
