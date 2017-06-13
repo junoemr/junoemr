@@ -50,49 +50,43 @@
 
 <div ng-show="consultRequestListCtrl.consultReadAccess" class="col-lg-12">
 
-	<form name="searchForm" id="searchForm">
+	<form name="searchForm" id="search-form">
 
-		<div class="row">
-			<div class="col-xs-2">
+		<div class="row search-filters">
+			<div class="col-lg-2 col-sm-4 col-xs-6">
 				<input ng-model="consultRequestListCtrl.search.referralStartDate" type="text"
 					id="referralStartDate" name="referralStartDate"
 					class="form-control" datepicker-popup="yyyy-MM-dd"
 					datepicker-append-to-body="true" is-open="data.isOpen"
 					ng-click="data.isOpen = true" placeholder="<bean:message key="consult.list.referralStartDate" bundle="ui"/>">
 			</div>
-			<div class="col-xs-2">
+			<div class="col-lg-2 col-sm-4 col-xs-6">
 				<input ng-model="consultRequestListCtrl.search.referralEndDate" type="text"
 					id="referralEndDate" name="referralEndDate" class="form-control"
 					datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true"
 					is-open="data2.isOpen" ng-click="data2.isOpen = true"
 					placeholder="<bean:message key="consult.list.referralEndDate" bundle="ui"/>">
 			</div>
-			<div class="col-xs-2">
+			<div class="col-lg-2 col-sm-4 col-xs-6">
 				<select class="form-control" ng-model="consultRequestListCtrl.search.status" 
 						name="status" id="status" 
 						ng-options="status.value as status.name for status in consultRequestListCtrl.statuses">
 					<option value=""><bean:message key="consult.list.status.all" bundle="ui"/></option>
 				</select>
 			</div>
-			<div class="col-xs-2">
+			<div class="col-lg-2 col-sm-4 col-xs-6">
 				<select ng-model="consultRequestListCtrl.search.team" name="team" id="team"
 					class="form-control" ng-options="t for t in consultRequestListCtrl.teams">
 				</select>
 			</div>
-		</div>
-
-
-		<div style="height: 5px"></div>
-
-		<div class="row">
-			<div class="col-xs-2">
+			<div class="col-lg-2 col-sm-4 col-xs-6">
 				<input ng-model="consultRequestListCtrl.search.appointmentStartDate" type="text"
 					id="appointmentStartDate" name="appointmentStartDate"
 					class="form-control" datepicker-popup="yyyy-MM-dd"
 					datepicker-append-to-body="true" is-open="data3.isOpen"
 					ng-click="data3.isOpen = true" placeholder="<bean:message key="consult.list.appointmentStartDate" bundle="ui"/>">
 			</div>
-			<div class="col-xs-2">
+			<div class="col-lg-2 col-sm-4 col-xs-6">
 				<input ng-model="consultRequestListCtrl.search.appointmentEndDate" type="text"
 					id="appointmentEndDate" name="appointmentEndDate"
 					class="form-control" datepicker-popup="yyyy-MM-dd"
@@ -100,7 +94,7 @@
 					ng-click="data4.isOpen = true" placeholder="<bean:message key="consult.list.appointmentEndDate" bundle="ui"/>">
 			</div>
 			
-			<div class="col-xs-2" ng-hide="consultRequestListCtrl.hideSearchPatient">
+			<div class="col-lg-2 col-sm-4 col-xs-6" ng-hide="consultRequestListCtrl.hideSearchPatient">
 				<div class="input-group">
 					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="consultRequestListCtrl.removeDemographicAssignment()"></span></div>
 					<input type="text" ng-model="consult.demographicName" placeholder="<bean:message key="consult.list.patient" bundle="ui"/>"
@@ -110,7 +104,7 @@
 				</div>
 			</div>
 			
-			<div class="col-xs-2">
+			<div class="col-lg-2 col-sm-4 col-xs-6">
 				<div class="input-group">
 					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="consultRequestListCtrl.removeMrpAssignment()"></span></div>
 					<input type="text" ng-model="consultRequestListCtrl.consult.mrpName" placeholder="<bean:message key="consult.list.mrp" bundle="ui"/>"
@@ -121,9 +115,44 @@
 			</div>
 		</div>
 
-		<div style="height: 5px"></div>
+		<%--<div class="row search-filters">
+			<div class="col-lg-2 col-sm-4 col-xs-6">
+				<input ng-model="consultRequestListCtrl.search.appointmentStartDate" type="text"
+					id="appointmentStartDate" name="appointmentStartDate"
+					class="form-control" datepicker-popup="yyyy-MM-dd"
+					datepicker-append-to-body="true" is-open="data3.isOpen"
+					ng-click="data3.isOpen = true" placeholder="<bean:message key="consult.list.appointmentStartDate" bundle="ui"/>">
+			</div>
+			<div class="col-lg-2 col-sm-4 col-xs-6">
+				<input ng-model="consultRequestListCtrl.search.appointmentEndDate" type="text"
+					id="appointmentEndDate" name="appointmentEndDate"
+					class="form-control" datepicker-popup="yyyy-MM-dd"
+					datepicker-append-to-body="true" is-open="data4.isOpen"
+					ng-click="data4.isOpen = true" placeholder="<bean:message key="consult.list.appointmentEndDate" bundle="ui"/>">
+			</div>
+			
+			<div class="col-lg-2 col-sm-4 col-xs-6" ng-hide="consultRequestListCtrl.hideSearchPatient">
+				<div class="input-group">
+					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="consultRequestListCtrl.removeDemographicAssignment()"></span></div>
+					<input type="text" ng-model="consult.demographicName" placeholder="<bean:message key="consult.list.patient" bundle="ui"/>"
+						uib-typeahead="pt.demographicNo as pt.name for pt in consultRequestListCtrl.searchPatients($viewValue)"
+						typeahead-on-select="consultRequestListCtrl.updateDemographicNo($item, $model, $label)"
+						class="form-control"/>
+				</div>
+			</div>
+			
+			<div class="col-lg-2 col-sm-4 col-xs-6">
+				<div class="input-group">
+					<div class="input-group-addon"><span class="glyphicon glyphicon-remove hand-hover" ng-click="consultRequestListCtrl.removeMrpAssignment()"></span></div>
+					<input type="text" ng-model="consultRequestListCtrl.consult.mrpName" placeholder="<bean:message key="consult.list.mrp" bundle="ui"/>"
+						uib-typeahead="pvd as pvd.name for pvd in consultRequestListCtrl.searchMrps($viewValue)"
+						typeahead-on-select="consultRequestListCtrl.updateMrpNo($model)"
+						class="form-control"/>
+				</div>
+			</div>
+		</div>--%>
 
-		<div class="row">
+		<div class="row search-buttons">
 			<div class="col-xs-12">
 				<button class="btn btn-primary" type="button" ng-click="consultRequestListCtrl.doSearch()">
 					<bean:message key="global.search" bundle="ui"/>

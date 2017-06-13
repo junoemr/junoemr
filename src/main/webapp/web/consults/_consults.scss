@@ -10,3 +10,12 @@
 		}
 	}
 }
+
+#search-form {
+	.search-filters>div {
+		margin-bottom: $margin-sm;
+	}
+	.search-buttons {
+		margin-bottom: $margin-md;
+	}
+}
