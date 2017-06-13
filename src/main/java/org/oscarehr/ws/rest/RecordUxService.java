@@ -175,6 +175,11 @@ public class RecordUxService extends AbstractServiceImpl {
 				menulist.add(new MenuItemTo1(idCounter++, "Consultations", "record.consultRequests."+demographicNo, outstanding));
 			}
 		}
+
+		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.prescriptions", "r", null)) {
+			menulist.add(new MenuItemTo1(idCounter++, "Rx", "../oscarRx/choosePatient.do?demographicNo="+demographicNo));
+		}
+
 		//END PHR
 		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.DxRegistry", "r", null)) {
 			menulist.add(new MenuItemTo1(idCounter++, "Disease Registry", "../oscarResearch/oscarDxResearch/setupDxResearch.do?quickList=&demographicNo="+demographicNo));
