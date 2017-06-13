@@ -1,7 +1,8 @@
 <p class="input-group">
     <input type="text" 
         class="form-control" 
-        ng-model="model" 
+        ng-model="model"
+        ng-click="openDatepicker()" 
         uib-datepicker-popup="{{format}}" 
         is-open="opened" 
         datepicker-options="dateOptions" 
