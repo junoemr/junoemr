@@ -32,6 +32,15 @@
 	}
 }
 
+// Hides wrapping buttons, allowing for icon buttons
+.icon-button {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	outline: none;
+	border: 0;
+	background: transparent;
+}
 
 // Makes checkbox flush with input (as long as checkbox margin is 0)
 .big-checkbox {
