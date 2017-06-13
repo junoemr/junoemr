@@ -174,7 +174,7 @@ String date = UtilDateUtilities.getToday("yyyy-MM-dd");
 	<script type="text/javascript" src="<%=request.getContextPath() %>/share/javascript/Oscar.js"></script>
 
 	<script src="<%=request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>   
-	
+
 	<script>
 	//sparklines $.browser patch to use with jquery-1.9.1
 	(function(jQuery){jQuery.browser||"1.3.2"==jQuery.fn.jquery||(jQuery.extend({browser:{}}),jQuery.browser.init=function(){var b={};try{navigator.vendor?/Chrome/.test(navigator.userAgent)?(b.browser="Chrome",b.version=parseFloat(navigator.userAgent.split("Chrome/")[1].split("Safari")[0])):/Safari/.test(navigator.userAgent)?(b.browser="Safari",b.version=parseFloat(navigator.userAgent.split("Version/")[1].split("Safari")[0])):/Opera/.test(navigator.userAgent)&&(b.Opera="Safari",b.version=parseFloat(navigator.userAgent.split("Version/")[1])):
@@ -184,7 +184,7 @@ String date = UtilDateUtilities.getToday("yyyy-MM-dd");
 	 
     <script type="text/javascript" src="<%=request.getContextPath() %>/share/javascript/jquery/jquery.sparkline.js"></script>     
         	    
-	<oscar:customInterface section="health_tracker"/>
+	<oscar:customInterface name="renal" section="health_tracker"/>
  
     <link href="<%=request.getContextPath() %>/css/datepicker.css" rel="stylesheet">
     <link class="include" rel="stylesheet" type="text/css" href="<%=request.getContextPath() %>/js/jqplot/jquery.jqplot.min.css" />
