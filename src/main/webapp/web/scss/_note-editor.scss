@@ -1,7 +1,6 @@
 #note-editor-container {
 	display: flex;
-	justify-content: center;
-	height: 10vh; // Figure out why JqueryUI resizable breaks without this height attribute
+	justify-content: center; // height: 20vh; // Figure out why JqueryUI resizable breaks without this height attribute
 	#note-editor,
 	#note-editor-minimized {
 		position: fixed;
@@ -29,8 +28,12 @@
 			color: $primary-white-text;
 			background-color: $secondary-blue;
 			margin-bottom: $margin-md;
-			&:hover {
-				background-color: $secondary-hover-blue;
+			#note-editor-minimize-button {
+				&:hover {
+					span {
+						color: $secondary-hover-blue;
+					}
+				}
 			}
 		}
 		.row {

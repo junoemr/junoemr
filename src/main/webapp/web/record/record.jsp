@@ -138,26 +138,31 @@
 		</div>
 	
 		<div id="note-editor"
-				class="col-sm-5"
+				class="col-sm-5 col-xs-12"
 				resizable
 				draggable
 				ng-show="recordCtrl.hideNote" 
 				ng-click="recordCtrl.checkAction($event)" 
 				ng-keypress="recordCtrl.checkAction($event)">
-			<div class="row" id="note-editor-header">
-				<div class="col-sm-12 text-center hand-hover" ng-click="recordCtrl.toggleNote();"  >
+			<div class="row hand-hover" id="note-editor-header">
+				<%--<div class="col-sm-12 text-center hand-hover" ng-click="recordCtrl.toggleNote();"  >
 					Minimize
 					<span class="fa fa-chevron-down"></span>
+				</div>--%>
+				<div class="pull-right text-right" >
+					<button class="icon-button" id="note-editor-minimize-button" ng-click="recordCtrl.toggleNote();">
+						<span class="btn btn-xs fa fa-window-minimize" role="button"></span>
+					</button>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-sm-4">
+				<div class="col-xs-4">
 					<input type="text" ng-model="recordCtrl.options.magicVal" placeholder="Template" 
 					uib-typeahead="t.encounterTemplateName as t.encounterTemplateName for t in recordCtrl.searchTemplates($viewValue)" 
 					typeahead-on-select="recordCtrl.insertTemplate($item, $model, $label)"
 					class="form-control">	
 				</div>
-				<div class="col-sm-4 " >
+				<div class="col-xs-4 " >
 					<input type="text" class="form-control" placeholder="Search" data-ng-disabled="true">
 				</div>
 			</div>
