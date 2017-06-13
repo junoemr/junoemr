@@ -88,7 +88,7 @@
 		<button ng-click="newPatientCtrl.cancel()" type="button" class="btn btn-default">
 			<bean:message key="modal.newPatient.cancel" bundle="ui"/>
 		</button>
-		<button ng-show="newPatientCtrl.hasRight" ng-click="newPatientCtrl.newPatientCtrl.saver(newDemographic)" type="button" class="btn btn-success">
+		<button ng-show="newPatientCtrl.hasRight" ng-click="newPatientCtrl.saver(newDemographic)" type="button" class="btn btn-success">
 			<bean:message key="modal.newPatient.submit" bundle="ui"/>
 		</button>
 	</div>
