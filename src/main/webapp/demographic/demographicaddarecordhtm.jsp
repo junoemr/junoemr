@@ -1316,7 +1316,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
 							</option>
 							<%} %>
 							<%
-							for(WaitingListName wln : waitingListNameDao.findCurrentByGroup(((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo())) {
+							for(WaitingListName wln : waitingListNameDao.findActiveWatingListNames()) {
                                     
                                     %>
 							<option value="<%=wln.getId()%>"><%=wln.getName()%></option>

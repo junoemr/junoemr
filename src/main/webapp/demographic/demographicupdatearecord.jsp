@@ -412,70 +412,16 @@
     
     //add to waiting list if the waiting_list parameter in the property file is set to true
     oscar.oscarWaitingList.WaitingList wL = oscar.oscarWaitingList.WaitingList.getInstance();
-    if(wL.getFound()){
- 	  WLWaitingListUtil.updateWaitingListRecord(
- 	  request.getParameter("list_id"), request.getParameter("waiting_list_note"),
- 	  request.getParameter("demographic_no"), request.getParameter("waiting_list_referral_date"));
-
-%>
-
-		<form name="add2WLFrm" action="../oscarWaitingList/Add2WaitingList.jsp">
-		<input type="hidden" name="listId" value="<%=request.getParameter("list_id")%>" /> 
-		<input type="hidden" name="demographicNo" value="<%=request.getParameter("demographic_no")%>" /> 
-		<input type="hidden" name="demographic_no" value="<%=request.getParameter("demographic_no")%>" /> 
-		<input type="hidden" name="waitingListNote" value="<%=request.getParameter("waiting_list_note")%>" /> 
-		<input type="hidden" name="onListSince" value="<%=request.getParameter("waiting_list_referral_date")%>" /> 
-		<input type="hidden" name="displaymode" value="edit" /> 
-		<input type="hidden" name="dboperation" value="search_detail" /> 
-
-<%
-	if(!request.getParameter("list_id").equalsIgnoreCase("0")){
-		String wlDemoId = request.getParameter("demographic_no");
-		String wlId = request.getParameter("list_id");
-	
-        List<WaitingList> waitingListList = waitingListDao.findByWaitingListIdAndDemographicId(new Integer(wlId), new Integer(wlDemoId));
-
-		//check if patient has already added to the waiting list and check if the patient already has an appointment in the future
-		if(waitingListList.isEmpty()){
-			
-			List<Appointment> apptList = appointmentDao.findNonCancelledFutureAppointments(new Integer(wlDemoId));
-			if(!apptList.isEmpty()){
-%>
-			<script language="JavaScript">
-				var add2List = confirm("The patient already has an appointment, do you still want to add him/her to the waiting list?");
-				if(add2List){
-					document.add2WLFrm.action = "../oscarWaitingList/Add2WaitingList.jsp?demographicNo=<%=request.getParameter("demographic_no")%>&listId=<%=request.getParameter("list_id")%>&waitingListNote=<%=request.getParameter("waiting_list_note")==null?"":request.getParameter("waiting_list_note")%>&onListSince=<%=request.getParameter("waiting_list_referral_date")==null?"":request.getParameter("waiting_list_referral_date")%>";
-				}
-				else{
-					document.add2WLFrm.action ="demographiccontrol.jsp?demographic_no=<%=request.getParameter("demographic_no")%>&displaymode=edit&dboperation=search_detail";
-				}
-				document.add2WLFrm.submit();
-		</script> 
-<%
-			}
-			else{
-%> 
-			<script language="JavaScript">
-				document.add2WLFrm.action = "../oscarWaitingList/Add2WaitingList.jsp?demographicNo=<%=request.getParameter("demographic_no")%>&listId=<%=request.getParameter("list_id")%>&waitingListNote=<%=request.getParameter("waiting_list_note")==null?"":request.getParameter("waiting_list_note")%>&onListSince=<%=request.getParameter("waiting_list_referral_date")==null?"":request.getParameter("waiting_list_referral_date")%>";
-				document.add2WLFrm.submit();
-			</script> 
-<%
-			}
-		}
-		else{
-			response.sendRedirect("demographiccontrol.jsp?demographic_no=" + request.getParameter("demographic_no") + "&displaymode=edit&dboperation=search_detail");
+    if(wL.getFound()) {
+    	String waitListId 	= request.getParameter("list_id");
+    	String waitListDate = request.getParameter("waiting_list_referral_date");
+    	String waitListNote = request.getParameter("waiting_list_note");
+		
+		if(waitListId != null && !waitListId.equals("0")) {
+			WLWaitingListUtil.updateWaitingListRecord(waitListId, waitListNote, demoNo, waitListDate);
 		}
 	}
-	else{
-		response.sendRedirect("demographiccontrol.jsp?demographic_no=" + request.getParameter("demographic_no") + "&displaymode=edit&dboperation=search_detail");
-	}
-%>
-		</form>
-<%
-	}
-	else{
-		response.sendRedirect("demographiccontrol.jsp?demographic_no=" + request.getParameter("demographic_no") + "&displaymode=edit&dboperation=search_detail");
-	}
+	response.sendRedirect("demographiccontrol.jsp?demographic_no=" + request.getParameter("demographic_no") + "&displaymode=edit&dboperation=search_detail");
 %>
 
 <h2>Update a Provider Record Successfully !
