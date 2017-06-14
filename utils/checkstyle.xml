@@ -122,12 +122,12 @@
 		<property name="dataStoreFilename" value="utils/TrackingRegexpCheck_java_jsp.data.xml"/>
 	</module>
 
-	<module name="org.oscarehr.util.checkstyle.TrackingRegexpCheck">
+	<!-- <module name="org.oscarehr.util.checkstyle.TrackingRegexpCheck">
 		<property name="fileExtensions" value=".sql"/>
 		<property name="illegalRegex" value=".*\s+default\s+.*|.*\s+DEFAULT\s+.*|.*\s+Default\s+.*"/>
 		<property name="violationDescription" value="Don't put defaults in table definitions, put them in the JPA objects."/>
 		<property name="dataStoreFilename" value="utils/TrackingRegexpCheck_sql.data.xml"/>
-	</module>
+	</module> -->
 
 	<module name="org.oscarehr.util.checkstyle.TrackingRegexpCheck">
 		<property name="fileExtensions" value=".sql"/>
