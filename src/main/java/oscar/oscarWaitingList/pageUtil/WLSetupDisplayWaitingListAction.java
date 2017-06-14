@@ -42,6 +42,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SessionConstants;
+import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarProvider.bean.ProviderNameBean;
 import oscar.oscarProvider.bean.ProviderNameBeanHandler;
@@ -54,6 +55,8 @@ import oscar.util.UtilDateUtilities;
 public final class WLSetupDisplayWaitingListAction extends Action {
 
 	private Logger log = Logger.getLogger(WLSetupDisplayWaitingListAction.class);
+	private WLWaitingListNameBeanHandler waitListNameManager = SpringUtils.getBean(WLWaitingListNameBeanHandler.class);
+	
     public ActionForward execute(ActionMapping mapping,
                                  ActionForm form,
                                  HttpServletRequest request,
@@ -101,9 +104,6 @@ public final class WLSetupDisplayWaitingListAction extends Action {
             demographicNo = request.getParameter(demographicNumSelected);
             waitingListNote = request.getParameter(wlNoteSelected);
             onListSince = request.getParameter(onListSinceSelected);
-//	        demographicNo = (String)wlForm.get(demographicNumSelected);
-//	        waitingListNote = (String)wlForm.get(wlNoteSelected);
-//	        onListSince =  (String)wlForm.get(onListSinceSelected);
 
         	if(waitingListId == null && wlForm.get("selectedWL") != null){
         		waitingListId = (String)wlForm.get("selectedWL");
@@ -149,7 +149,6 @@ public final class WLSetupDisplayWaitingListAction extends Action {
         log.debug("WLSetupDisplayWaitingListAction/execute(): onListSince = "+ onListSince);
 
         WLWaitingListBeanHandler hd = null;
-        WLWaitingListNameBeanHandler wlNameHd = null;
         Collection allProviders = null;
         String nbPatients = "";
         String today = "";
@@ -162,9 +161,6 @@ public final class WLSetupDisplayWaitingListAction extends Action {
         	hd = new WLWaitingListBeanHandler(waitingListId);
         }
         
-        if(groupNo != null  &&  providerNo != null){
-        	wlNameHd = new WLWaitingListNameBeanHandler(groupNo, providerNo);
-        }
         ProviderNameBeanHandler phd = new ProviderNameBeanHandler();
         
         
@@ -203,11 +199,8 @@ public final class WLSetupDisplayWaitingListAction extends Action {
         }else{
         	session.setAttribute("waitingListName", null);
         }
-        if(wlNameHd != null){
-        	session.setAttribute("waitingListNames", wlNameHd.getWaitingListNames());
-        }else{
-        	session.setAttribute("waitingListNames", null);
-        }
+        session.setAttribute("waitingListNames", waitListNameManager.getWaitingListNames());
+
         session.setAttribute("allProviders", allProviders);
         
         session.setAttribute("nbPatients", nbPatients);

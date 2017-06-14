@@ -84,11 +84,9 @@ public class WLWaitingListBeanHandler {
 			waitingListArrayList.add(wLBean);
 		}
 
-		if (waitingListID > 0) {
-			WaitingListName name = waitingListNameDao.find(waitingListID);
-			if (name != null) {
-				waitingListName = name.getName();
-			}
+		WaitingListName name = waitingListNameDao.find(waitingListID);
+		if (name != null) {
+			waitingListName = name.getName();
 		}
 		return true;
 	}

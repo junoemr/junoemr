@@ -32,6 +32,7 @@ import org.apache.struts.validator.LazyValidatorForm;
 import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SessionConstants;
+import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarWaitingList.bean.WLWaitingListNameBeanHandler;
 import oscar.oscarWaitingList.util.WLWaitingListNameUtil;
@@ -39,6 +40,8 @@ import oscar.util.UtilDateUtilities;
 
 public final class WLEditWaitingListNameAction extends Action {
 
+	private WLWaitingListNameBeanHandler waitListNameManager = SpringUtils.getBean(WLWaitingListNameBeanHandler.class);
+	
 	private String message ="";
     public ActionForward execute(ActionMapping mapping,
                                  ActionForm form,
@@ -170,13 +173,10 @@ public final class WLEditWaitingListNameAction extends Action {
         MiscUtils.getLogger().debug("WLEditWaitingListNameAction/execute(): groupNo = "+ groupNo);
         MiscUtils.getLogger().debug("WLEditWaitingListNameAction/execute(): providerNo = "+ providerNo);
         MiscUtils.getLogger().debug("WLEditWaitingListNameAction/execute(): wlNewName = "+ wlNewName);
-
-
-        WLWaitingListNameBeanHandler wlNameHd = new WLWaitingListNameBeanHandler(groupNo, providerNo);
         
         String today = UtilDateUtilities.DateToString(new Date(), "yyyy-MM-dd");
         
-        session.setAttribute("waitingListNames", wlNameHd.getWaitingListNameList());
+        session.setAttribute("waitingListNames", waitListNameManager.getWaitingListNames());
         
         session.setAttribute("today", today);
         

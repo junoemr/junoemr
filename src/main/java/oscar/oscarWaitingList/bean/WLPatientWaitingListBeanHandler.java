@@ -30,28 +30,29 @@ import java.util.List;
 import org.oscarehr.common.dao.WaitingListDao;
 import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import oscar.util.ConversionUtils;
 
+@Service
 public class WLPatientWaitingListBeanHandler {
 
-	List<WLPatientWaitingListBean> patientWaitingList = new ArrayList<WLPatientWaitingListBean>();
+	@Autowired
+	private WaitingListDao waitingListDao;
+	
+	@Transactional
+	public List<WLPatientWaitingListBean> getPatientWaitingList(Integer demographicNo) {
+		
+		List<WaitingList> waitingListEntries = waitingListDao.findByDemographic(demographicNo);
+		List<WLPatientWaitingListBean> patientWaitingList = new ArrayList<WLPatientWaitingListBean>();
 
-	public WLPatientWaitingListBeanHandler(String demographicNo) {
-		init(demographicNo);
-	}
-
-	public boolean init(String demographicNo) {
-		WaitingListDao waitingListDao = SpringUtils.getBean(WaitingListDao.class);
-		List<WaitingList> waitingListEntries = waitingListDao.findByDemographic(ConversionUtils.fromIntString(demographicNo));
-
-		boolean verdict = true;
 		for (WaitingList entry : waitingListEntries) {
 			WaitingListName name = entry.getWaitingListName();
 			
 			WLPatientWaitingListBean wLBean = new WLPatientWaitingListBean(
-					demographicNo, 
+					demographicNo.toString(), 
 					name.getId().toString(), 
 					name.getName(),
 					String.valueOf(entry.getPosition()),
@@ -59,11 +60,6 @@ public class WLPatientWaitingListBeanHandler {
 					ConversionUtils.toDateString(entry.getOnListSince()));
 			patientWaitingList.add(wLBean);
 		}
-
-		return verdict;
-	}
-
-	public List<WLPatientWaitingListBean> getPatientWaitingList() {
 		return patientWaitingList;
 	}
 }

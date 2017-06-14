@@ -29,6 +29,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+//import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -49,10 +50,12 @@ public class WaitingList extends AbstractModel<Integer> {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@ManyToOne(optional=true)
+//	@ManyToOne(optional=false, fetch=FetchType.LAZY)
+	@ManyToOne(optional=false)
 	@JoinColumn(name="listID")
 	private WaitingListName waitingListName;
 
+//	@ManyToOne(optional=false, fetch=FetchType.LAZY)
 	@ManyToOne(optional=false)
 	@JoinColumn(name="demographic_no")
 	private Demographic demographic;
@@ -77,7 +80,7 @@ public class WaitingList extends AbstractModel<Integer> {
 
 	/**
 	 * Use getWaitingListName() to get the object instead
-	 * @return id associated with the waitingListName object, or null if not linked to a valid waitingListName
+	 * @return id associated with the waitingListName object, or 0 if not correctly linked to a valid waitingListName
 	 */
 	@Deprecated
 	public Integer getListId() {

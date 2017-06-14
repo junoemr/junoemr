@@ -29,7 +29,7 @@ package oscar.oscarWaitingList.bean;
 public class WLWaitingListNameBean{
 
        String waitingListName;
-       String ID;
+       String Id;
        String groupNo;
        String providerNo;
        String createdDate;
@@ -37,7 +37,7 @@ public class WLWaitingListNameBean{
        public WLWaitingListNameBean(String nameId, String waitingListName, String groupNo,
     		                        String providerNo, String createdDate ){
            this.waitingListName = waitingListName;
-           this.ID = nameId;
+           this.Id = nameId;
            this.groupNo = groupNo;
            this.providerNo = providerNo;
            this.createdDate = createdDate;
@@ -48,7 +48,7 @@ public class WLWaitingListNameBean{
        }
     
        public String getId(){
-           return ID;
+           return Id;
        }
 
 		public String getGroupNo() {

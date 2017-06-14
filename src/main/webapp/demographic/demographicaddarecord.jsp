@@ -342,7 +342,10 @@
         
         // Assign the patient to a waitlist if necessary
         String waitListIdStr = request.getParameter("list_id");
-        WLWaitingListUtil.add2WaitingList(waitListIdStr, request.getParameter("waiting_list_note"), demographic.getDemographicNo().toString(), request.getParameter("waiting_list_referral_date"));
+        if(waitListIdStr != null) {
+        	int waitingListID = Integer.parseInt(waitListIdStr);
+            WLWaitingListUtil.addToWaitingList(waitingListID, demographic.getDemographicNo(), request.getParameter("waiting_list_referral_date"), request.getParameter("waiting_list_note"));
+        }
 
         if(start_time2!=null && !start_time2.equals("null")) {
 	%>
