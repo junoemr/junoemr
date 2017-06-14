@@ -370,6 +370,7 @@ public class InboxResultsDao {
 				else {
 					sql = sql + "AND (result_status IS NULL OR result_status != 'A') ";
 				}
+				sql = sql + "AND lab.id IS NOT NULL ";
 			}
 
 			sql = sql + "GROUP BY "
