@@ -74,7 +74,8 @@ public class EForm extends EFormBase {
 	private static final String TABLE_NAME = "table_name";
 	private static final String TABLE_ID = "table_id";
 	private static final String OTHER_KEY = "other_key";
-        private static final String OPENER_VALUE = "link$eform";
+	private static final String LOGGED_IN_PROVIDER = "loggedInProvider";
+	private static final String OPENER_VALUE = "link$eform";
 
 	public EForm() {
 	}
@@ -768,6 +769,7 @@ public class EForm extends EFormBase {
 		sql = DatabaseAP.parserReplace(TABLE_NAME, getSqlParams(TABLE_NAME), sql);
 		sql = DatabaseAP.parserReplace(TABLE_ID, getSqlParams(TABLE_ID), sql);
 		sql = DatabaseAP.parserReplace(OTHER_KEY, getSqlParams(OTHER_KEY), sql);
+		sql = DatabaseAP.parserReplace(LOGGED_IN_PROVIDER, getSqlParams(LOGGED_IN_PROVIDER), sql);
 		return sql;
 	}
 
