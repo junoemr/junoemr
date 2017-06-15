@@ -118,7 +118,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			url: '/reports',
 			templateUrl: 'report/reports.jsp',
 			//templateUrl: 'report/reports_classic.jsp',
-			controller: 'Report.ReportsController'
+			controller: 'Report.ReportsController as reportsCtrl',
 		})
 		.state('documents',
 		{
@@ -130,7 +130,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/settings',
 			templateUrl: 'settings/settings.jsp',
-			controller: 'Settings.SettingsController',
+			controller: 'Settings.SettingsController as settingsCtrl',
 			resolve:
 			{
 				user: function(providerService)
