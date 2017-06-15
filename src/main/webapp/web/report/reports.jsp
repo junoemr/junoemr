@@ -24,16 +24,18 @@
 
 --%>
 
-<div class="row">
+<div class="row" ng-init="reportsCtrl.init()">
 	<div class="col-md-2">
 		<h1>Reporting</h1>
 	</div>
 	<div class="col-md-10">
 		<div class="pull-right">
-			<span class="dropdown-toggle hand-hover" data-toggle="dropdown"><h2><span class="glyphicon glyphicon-cog hand-hover"></span></h2></span>
+			<span class="dropdown-toggle hand-hover" data-toggle="dropdown">
+				<h2><span class="glyphicon glyphicon-cog hand-hover"></span></h2>
+			</span>
 			<ul class="dropdown-menu" role="menu">
 				<li>
-					<a ng-click="editDemographicSet()">Demographic Set Edit</a>
+					<a ng-click="reportsCtrl.editDemographicSet()">Demographic Set Edit</a>
 				</li>
 			</ul>
 		</div>
@@ -47,20 +49,22 @@
 				
 		<form class="form-search" role="search">
 			<span class="form-group" class="twitter-typeahead">
-				<select class="form-control" data-ng-options="a.value as a.label for a in getReportGroups()" ng-model="reportGroup" ng-init="reportGroup=''">
+				<%-- Why do we use data-n--%>
+				<select class="form-control" ng-options="a.value as a.label for a in reportsCtrl.reportGroups" 
+					ng-model="reportsCtrl.reportGroup">
 				</select>
 			</span>
 			<span class="form-group" class="twitter-typeahead">
-				<input type="text"  class="form-control" placeholder="Filter" ng-model="reportFilter" ng-init="reportFilter=''"/>
+				<input type="text"  class="form-control" placeholder="Filter" ng-model="reportsCtrl.reportFilter" ng-init="reportsCtrl.reportFilter=''"/>
 			</span>
 		</form>
 		<div class="list-group">		
-			<a  ng-repeat="report in getReports() | filter: reportFilter "
-			 class="list-group-item default" ng-click="selectReport(report)">{{report.name}}</a>
+			<a  ng-repeat="report in reportsCtrl.getReports() | filter: reportFilter "
+			 class="list-group-item default" ng-click="reportsCtrl.selectReport(report)">{{report.name}}</a>
 		</div>
 	</div>
 
 	<div class="col-md-8">
-		<div ng-init="test=reportSidebar.url" ng-include="reportSidebar.location"></div>
+		<div ng-include="reportsCtrl.reportSidebar.location"></div>
 	</div>
 </div>
