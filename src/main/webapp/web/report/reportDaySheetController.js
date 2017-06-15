@@ -12,7 +12,7 @@ angular.module('Report').controller('Report.ReportDaySheetController', [
 		providerService)
 	{
 
-		var controller = this.
+		var controller = this;
 
 		controller.getTime = function getTime(hour, minutes)
 		{
