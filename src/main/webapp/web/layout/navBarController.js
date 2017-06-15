@@ -321,7 +321,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					url = "../administration/";
 					wname = "admin";
 				}
-				else if (item.label === "Documents")
+				else if (item.label === "eDocs")
 				{
 					url = "../dms/documentReport.jsp?function=provider&functionid=" +
 						encodeURIComponent(controller.me.providerNo);
