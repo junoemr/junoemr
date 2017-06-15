@@ -29,8 +29,6 @@ angular.module('Report').controller('Report.ReportsController', [
 
 		var controller = this;
 
-		controller.reportSidebar = ReportNavigation;
-
 		$scope.$emit('configureShowPatientList', false);
 
 		controller.reports = [
@@ -171,6 +169,13 @@ angular.module('Report').controller('Report.ReportsController', [
 
 		];
 
+		controller.init = function init()
+		{
+			controller.reportGroup = "";
+			controller.reportGroups = controller.getReportGroups();
+			controller.reportSidebar = ReportNavigation;
+			controller.test = controller.reportSidebar.url;
+		};
 
 		controller.editDemographicSet = function editDemographicSet()
 		{
@@ -240,11 +245,11 @@ angular.module('Report').controller('Report.ReportsController', [
 		};
 
 
-		controller.selectReport(controller.reports[0]);
+		// controller.selectReport(controller.reports[0]);
 
-		controller.openReportWindow = function openReportWindow(url, name)
-		{
-			window.open(url, name, 'height=900,width=700');
-		};
+		// controller.openReportWindow = function openReportWindow(url, name)
+		// {
+		// 	window.open(url, name, 'height=900,width=700');
+		// };
 	}
 ]);
