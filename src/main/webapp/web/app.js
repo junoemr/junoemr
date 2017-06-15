@@ -59,7 +59,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		})
 		.state('consultRequests',
 		{
-			url: '/consults',
+			url: '/consultRequests',
 			templateUrl: 'consults/consultRequestList.jsp',
 			controller: 'Consults.ConsultRequestListController as consultRequestListCtrl'
 		})
@@ -233,7 +233,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		})
 		.state('record.consultRequests',
 		{
-			url: '/consults',
+			url: '/consultRequests',
 			templateUrl: 'consults/consultRequestList.jsp',
 			controller: 'Consults.ConsultRequestListController as consultRequestListCtrl'
 		})
