@@ -64,6 +64,8 @@ public class EForm extends EFormBase {
 	private HashMap<String, String> fieldValues = new HashMap<String, String>();
 	private int needValueInForm = 0;
 	private boolean setAP2nd = false;
+	
+	private String loggedInProvider = null;
 
 	private static final String EFORM_DEMOGRAPHIC = "eform_demographic";
 	private static final String VAR_NAME = "var_name";
@@ -74,7 +76,6 @@ public class EForm extends EFormBase {
 	private static final String TABLE_NAME = "table_name";
 	private static final String TABLE_ID = "table_id";
 	private static final String OTHER_KEY = "other_key";
-	private static final String LOGGED_IN_PROVIDER = "loggedInProvider";
 	private static final String OPENER_VALUE = "link$eform";
 
 	public EForm() {
@@ -133,6 +134,10 @@ public class EForm extends EFormBase {
 	}
 	public void setAppointmentNo(String appt_no) {
             this.appointment_no = StringUtils.isBlank(appt_no) ? "-1" : appt_no;
+	}
+	
+	public void setLoggedInProvider( String providerNo ) {
+		this.loggedInProvider = providerNo;
 	}
 
 	public String getEformLink() {
@@ -758,6 +763,7 @@ public class EForm extends EFormBase {
 	public String replaceAllFields(String sql) {
 		sql = DatabaseAP.parserReplace("demographic", demographicNo, sql);
 		sql = DatabaseAP.parserReplace("provider", providerNo, sql);
+		sql = DatabaseAP.parserReplace("loggedInProvider", loggedInProvider, sql);
 		sql = DatabaseAP.parserReplace("appt_no", appointment_no, sql);
 
 		sql = DatabaseAP.parserReplace(EFORM_DEMOGRAPHIC, getSqlParams(EFORM_DEMOGRAPHIC), sql);
@@ -769,7 +775,6 @@ public class EForm extends EFormBase {
 		sql = DatabaseAP.parserReplace(TABLE_NAME, getSqlParams(TABLE_NAME), sql);
 		sql = DatabaseAP.parserReplace(TABLE_ID, getSqlParams(TABLE_ID), sql);
 		sql = DatabaseAP.parserReplace(OTHER_KEY, getSqlParams(OTHER_KEY), sql);
-		sql = DatabaseAP.parserReplace(LOGGED_IN_PROVIDER, getSqlParams(LOGGED_IN_PROVIDER), sql);
 		return sql;
 	}
 

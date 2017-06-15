@@ -25,14 +25,16 @@
 --%>
 <%@ page import="java.sql.*, oscar.eform.data.*"%>
 <%
-	String id = request.getParameter("fid");
-	String messageOnFailure = "No eform or appointment is available";
+  String id = request.getParameter("fid");
+  String messageOnFailure = "No eform or appointment is available";
+  String providerNo = (String) session.getValue("user");
   if (id == null) {  // form exists in patient
       id = request.getParameter("fdid");
       String appointmentNo = request.getParameter("appointment");
       String eformLink = request.getParameter("eform_link");
 
       EForm eForm = new EForm(id);
+      eForm.setLoggedInProvider(providerNo);
       eForm.setContextPath(request.getContextPath());
       eForm.setOscarOPEN(request.getRequestURI());
       if ( appointmentNo != null ) eForm.setAppointmentNo(appointmentNo);
@@ -44,6 +46,7 @@
       out.print(eForm.getFormHtml());
   } else {  //if form is viewed from admin screen
       EForm eForm = new EForm(id, "-1"); //form cannot be submitted, demographic_no "-1" indicate this specialty
+      eForm.setLoggedInProvider(providerNo);
       eForm.setContextPath(request.getContextPath());
       eForm.setupInputFields();
       eForm.setOscarOPEN(request.getRequestURI());

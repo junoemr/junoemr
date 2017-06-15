@@ -51,7 +51,7 @@ function hideDiv() {
 <% } %>
 
 <%
-	String provider_no = (String) session.getValue("user");
+  String provider_no = (String) session.getValue("user");
   String demographic_no = request.getParameter("demographic_no");
   String appointment_no = request.getParameter("appointment");
   String fid = request.getParameter("fid");
@@ -71,6 +71,7 @@ function hideDiv() {
 
   if (appointment_no!=null) thisEForm.setAppointmentNo(appointment_no);
   if (eform_link!=null) thisEForm.setEformLink(eform_link);
+  thisEForm.setLoggedInProvider(provider_no);
   thisEForm.setContextPath(request.getContextPath());
   thisEForm.setupInputFields();
   thisEForm.setImagePath();
