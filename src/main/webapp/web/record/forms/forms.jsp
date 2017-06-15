@@ -24,7 +24,7 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<div class="col-sm-3">		
+<div class="col-lg-3 col-md-4">		
 	<ul class="nav nav-tabs nav-justified">
 		<li ng-repeat="list in formCtrl.page.formlists" 
 				ng-class="formCtrl.getListClass(list.id)" 
@@ -88,7 +88,7 @@
 		</ul>
 	</div>
 </div>
-<div class="col-sm-9">
+<div class="col-lg-9 col-md-8">
 	<a class="hand-hover pull-right" ng-show="!formCtrl.isEmpty(formCtrl.page.currentForm)" 
 			title="Open in new window" ng-click="formCtrl.viewFormState(formCtrl.page.currentForm,2)">
 		<span class="glyphicon glyphicon-new-window"></span>
