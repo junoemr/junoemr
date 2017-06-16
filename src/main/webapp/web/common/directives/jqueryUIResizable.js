@@ -17,8 +17,8 @@ angular.module('Common.Directives').directive('resizable', [
 				{
 					handles: 'n, e, w, nw, ne',
 					minHeight: 140 + $(".note-editor-textarea").height(),
-					maxHeight: window.innerHeight,
 					minWidth: 490,
+					maxHeight: window.innerHeight / 1.5,
 					containment: "#main-body"
 				});
 				elem.on('resizestop', function(evt, ui)
@@ -31,8 +31,6 @@ angular.module('Common.Directives').directive('resizable', [
 				});
 				elem.on('resize', function()
 				{
-					// console.log('RIGHT-PANE WIDTH = ', $("#right-pane").width());
-					// console.log('MAX HEIGHT = ', window.innerHeight);
 					$(".note-editor-textarea").css('height', elem.height() - 140);
 				});
 			}
