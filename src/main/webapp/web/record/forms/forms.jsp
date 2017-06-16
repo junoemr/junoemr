@@ -63,7 +63,7 @@
 	  	<!-- Default panel contents -->
 		<input type="search" class="form-control" placeholder="Filter" ng-model="formCtrl.filterFormsQ">
 		<ul class="list-group" tabindex="0" ng-keypress="formCtrl.keypress($event)">
-			<li class="list-group-item" ng-repeat="item in formCtrl.page.currentFormList[formCtrl.page.currentlistId] | filter:formCtrl.filterFormsQ" ng-class="formCtrl.getActiveFormClass(item)">
+			<li class="list-group-item" ng-repeat="item in formCtrl.page.currentFormList[formCtrl.page.currentlistId].content | filter:formCtrl.filterFormsQ" ng-class="formCtrl.getActiveFormClass(item)">
 				<input type="checkbox" ng-model="item.isChecked"/>
 				<a class="list-group-item-text hand-hover" title="{{item.subject}}" ng-click="formCtrl.viewFormState(item,1)">
 					<span  ng-show="item.date" class="pull-right">{{item.date | date : 'd-MMM-y'}}</span>
@@ -72,12 +72,12 @@
 			</li>
 
 			<li class="list-group-item"	
-				ng-repeat="formItem2 in formCtrl.page.encounterFormlist[formCtrl.page.currentlistId] | filter:formCtrl.filterFormsQ" 
+				ng-repeat="formItem2 in formCtrl.page.encounterFormlist[formCtrl.page.currentlistId].content | filter:formCtrl.filterFormsQ" 
 				ng-hide="formCtrl.page.currentlistId==1">
 				<a class="list-group-item-text hand-hover" ng-click="formCtrl.viewFormState(formItem2,1)">{{formItem2.name}}</a>
 			</li>
 			
-			<li class="list-group-item" ng-repeat="formItem in formCtrl.page.encounterFormlist[formCtrl.page.currentlistId] | filter:formCtrl.filterFormsQ" 
+			<li class="list-group-item" ng-repeat="formItem in formCtrl.page.encounterFormlist[formCtrl.page.currentlistId].content | filter:formCtrl.filterFormsQ" 
 					ng-hide="formCtrl.page.currentlistId==0">
 				<a class="list-group-item-text hand-hover" ng-click="formCtrl.viewFormState(formItem,1)">
 					{{formItem.formName}} 
