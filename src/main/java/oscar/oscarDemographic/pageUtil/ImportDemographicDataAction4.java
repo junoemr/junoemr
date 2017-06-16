@@ -695,6 +695,7 @@ import cdsDt.PersonNameStandard.OtherNames;
         } else { //add patient!
             demoRes = dd.addDemographic(loggedInInfo, title, lastName, firstName, address, city, province, postalCode, homePhone, workPhone, year_of_birth, month_of_birth, date_of_birth, hin, versionCode, rosterStatus, rosterDate, termDate, termReason, patient_status, psDate, ""/*date_joined*/, chart_no, official_lang, spoken_lang, primaryPhysician, sex, ""/*end_date*/, ""/*eff_date*/, ""/*pcn_indicator*/, hc_type, hc_renew_date, ""/*family_doctor*/, email, ""/*pin*/, ""/*alias*/, ""/*previousAddress*/, ""/*children*/, ""/*sourceOfIncome*/, ""/*citizenship*/, sin);
             demographicNo = demoRes.getId();
+            logger.info("Created a new demographic with id #" + demographicNo);
         }
 
         if (StringUtils.filled(demographicNo))
@@ -723,14 +724,6 @@ import cdsDt.PersonNameStandard.OtherNames;
 
             //Patient notes
             if (StringUtils.filled(dNote)) dd.addDemographiccust(demographicNo, dNote);
-
-            //to dumpsite: Extra demographic data
-            /*if (StringUtils.filled(extra)) {
-	            extra = Util.addLine("imported.cms4.2011.06", extra);
-	            CaseManagementNote dmNote = prepareCMNote("2",null);
-	            dmNote.setNote(extra);
-	            saveLinkNote(dmNote, CaseManagementNoteLink.DEMOGRAPHIC, Long.valueOf(demographicNo));
-            }*/
 
             if (!workExt.equals("")) demographicExtDao.addKey(primaryPhysician, Integer.parseInt(demographicNo), "wPhoneExt", workExt);
             if (!homeExt.equals("")) demographicExtDao.addKey(primaryPhysician, Integer.parseInt(demographicNo), "hPhoneExt", homeExt);
@@ -1145,20 +1138,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                     cmNote.setNote(note);
                     saveLinkNote(hostNoteId, cmNote);
 
-                    //to dumpsite
-                    //String dump = "imported.cms4.2011.06";
-                    /*
-                    String summary = rFactors[i].getCategorySummaryLine();
-                    if (StringUtils.empty(summary)) {
-                        err_summ.add("No Summary for Risk Factors ("+(i+1)+")");
-                    }
-                    dump = Util.addLine(dump, summary);
-                    */
-                    /*dump = Util.addLine(dump, getResidual(rFactors[i].getResidualInfo()));
-                    cmNote = prepareCMNote("2",null);
-                    cmNote.setNote(dump);
-                    saveLinkNote(hostNoteId, cmNote);*/
-
                     //extra fields
                     CaseManagementNoteExt cme = new CaseManagementNoteExt();
                     cme.setNoteId(hostNoteId);
@@ -1218,20 +1197,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                     String note = alerts[i].getNotes();
                     cmNote.setNote(note);
                     saveLinkNote(hostNoteId, cmNote);
-
-                    //to dumpsite
-                    //String dump = "imported.cms4.2011.06";
-                    /*
-                    String summary = alerts[i].getCategorySummaryLine();
-                    if (StringUtils.empty(summary)) {
-                            err_summ.add("No Summary for Alerts & Special Needs ("+(i+1)+")");
-                    }
-                    dump = Util.addLine(dump, summary);
-                    */
-                    /*dump = Util.addLine(dump, getResidual(alerts[i].getResidualInfo()));
-                    cmNote = prepareCMNote("2",null);
-                    cmNote.setNote(dump);
-                    saveLinkNote(hostNoteId, cmNote);*/
 
                     //extra fields
                     CaseManagementNoteExt cme = new CaseManagementNoteExt();
@@ -1341,17 +1306,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                         if (p==0) {
                             addOneEntry(CLINICALNOTE);
                             uuid = cmNote.getUuid();
-
-                            //create "header", cms4 only
-                        	/*if (cNotes[i].getEnteredDateTime()!=null && !createDate.equals(cmNote.getUpdate_date())) {
-                        		CaseManagementNote headNote = prepareCMNote("2",null);
-                        		headNote.setCreate_date(createDate);
-                        		headNote.setUpdate_date(createDate);
-                        		headNote.setObservation_date(observeDate);
-                        		headNote.setNote("imported.cms4.2011.06"+uuid);
-                        		caseManagementManager.saveNoteSimple(headNote);
-                        	}*/
-
                         }
                     }
                     if (p_total==0) {
@@ -1433,7 +1387,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                     duration = medArray[i].getDuration();
                     if (StringUtils.filled(duration)) {
                     	duration = duration.trim();
-                    	if (duration.endsWith("days")) duration = Util.leadingNum(duration);
+                    	if (duration.toLowerCase().endsWith("days")) duration = Util.leadingNum(duration);
                     	if (NumberUtils.isDigits(duration)) {
                     		drug.setDuration(duration);
     	                    drug.setDurUnit("D");
@@ -1479,7 +1433,7 @@ import cdsDt.PersonNameStandard.OtherNames;
                     duration = medArray[i].getRefillDuration();
                     if (StringUtils.filled(duration)) {
                     	duration = duration.trim();
-                    	if (duration.endsWith("days")) duration = Util.leadingNum(duration);
+                    	if (duration.toLowerCase().endsWith("days")) duration = Util.leadingNum(duration);
                     	if (NumberUtils.isDigits(duration)) drug.setRefillDuration(Integer.valueOf(duration));
                     	else err_data.add("Error! Invalid Refill Duration ["+medArray[i].getRefillDuration()+"] for Medications");
                     }
@@ -1492,18 +1446,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                     }
 
                     drug.setETreatmentType(medArray[i].getTreatmentType());
-                    //no need: DrugReason drugReason = new DrugReason();
-                    //no need: drug.setRxStatus(medArray[i].getPrescriptionStatus());
-
-                    //no need: String nosub = medArray[i].getSubstitutionNotAllowed();
-                    //no need: if (nosub!=null) drug.setNoSubs(nosub.equalsIgnoreCase("Y"));
-
-                    //no need: String non_auth = medArray[i].getNonAuthoritativeIndicator();
-                    //no need: if (non_auth!=null) drug.setNonAuthoritative(non_auth.equalsIgnoreCase("Y"));
-                    //no need: else  err_data.add("Error! No non-authoritative indicator for Medications & Treatments ("+(i+1)+")");
-
-                    //no need: if (NumberUtils.isDigits(medArray[i].getDispenseInterval())) drug.setDispenseInterval(Integer.parseInt(medArray[i].getDispenseInterval()));
-                    //no need: else err_data.add("Error! Invalid Dispense Interval for Medications & Treatments ("+(i+1)+")");
 
                     String take = StringUtils.noNull(medArray[i].getDosage()).trim();
                     drug.setTakeMin(Util.leadingNumF(take));
@@ -1551,13 +1493,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                     }
                     drug.setSpecial(special);
 
-                    //no need: special = Util.addLine(special, "Prescription Status: ", medArray[i].getPrescriptionStatus());
-                    //no need: special = Util.addLine(special, "Dispense Interval: ", medArray[i].getDispenseInterval());
-                    //no need: special = Util.addLine(special, "Protocol Id: ", medArray[i].getProtocolIdentifier());
-                    //no need: special = Util.addLine(special, "Prescription Id: ", medArray[i].getPrescriptionIdentifier());
-                    //no need: special = Util.addLine(special, "Prior Prescription Id: ", medArray[i].getPriorPrescriptionReferenceIdentifier());
-
-
                     if (StringUtils.filled(medArray[i].getPrescriptionInstructions())) {
                     	drug.setSpecialInstruction(medArray[i].getPrescriptionInstructions());
                     }
@@ -1585,19 +1520,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                     drugDao.persist(drug);
                     addOneEntry(MEDICATION);
 
-                    /* no need:
-                    if (medArray[i].getProblemCode()!=null) {
-                        drugReason.setCode(medArray[i].getProblemCode());
-                        drugReason.setDemographicNo(Integer.valueOf(demographicNo));
-                        drugReason.setDrugId(drug.getId());
-                        drugReason.setProviderNo(drug.getProviderNo());
-                        drugReason.setPrimaryReasonFlag(true);
-                        drugReason.setArchivedFlag(false);
-                        drugReasonDao.persist(drugReason);
-                    }
-                     *
-                     */
-
                     //partial date
                     partialDateDao.setPartialDate(PartialDate.DRUGS, drug.getId(), PartialDate.DRUGS_WRITTENDATE, writtenDateFormat);
 
@@ -1606,21 +1528,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                     String note = StringUtils.noNull(medArray[i].getNotes());
                     cmNote.setNote(note);
                     saveLinkNote(cmNote, CaseManagementNoteLink.DRUGS, (long)drug.getId());
-
-                    //to dumpsite
-                    //String dump = "imported.cms4.2011.06";
-                    /*
-                    String summary = medArray[i].getCategorySummaryLine();
-                    if (StringUtils.empty(summary)) {
-                        err_summ.add("No Summary for Medications & Treatments ("+(i+1)+")");
-                    }
-                    dump = Util.addLine(dump, summary);
-                    */
-                    /*dump = Util.addLine(dump, getResidual(medArray[i].getResidualInfo()));
-
-                    cmNote = prepareCMNote("2",null);
-                    cmNote.setNote(dump);
-                    saveLinkNote(cmNote, CaseManagementNoteLink.DRUGS, (long)drug.getId());*/
                 }
 
 
@@ -1684,21 +1591,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                     preventionDate = dateFPtoString(immuArray[i].getDate(), timeShiftInDays);
                     refused = getYN(immuArray[i].getRefusedFlag()).equals("Yes") ? "1" : "0";
                     if (immuArray[i].getRefusedFlag()==null) err_data.add("Error! No Refused Flag for Immunizations ("+(i+1)+")");
-/*
-                    String iSummary="";
-                    if (immuArray[i].getCategorySummaryLine()!=null) {
-                        iSummary = immuArray[i].getCategorySummaryLine().trim();
-                    } else {
-                        err_summ.add("No Summary for Immunizations ("+(i+1)+")");
-                    }
-
-
-                    if (StringUtils.filled(iSummary)) {
-                        comments = Util.addLine(comments, "Summary: ", iSummary);
-                        err_note.add("Immunization Summary imported in [comments] ("+(i+1)+")");
-                    }
- *
- */
 
                     immExtra = Util.addLine(immExtra, getCode(immuArray[i].getImmunizationCode(),"Immunization Code"));
                     immExtra = Util.addLine(immExtra, "Instructions: ", immuArray[i].getInstructions());
@@ -1706,14 +1598,6 @@ import cdsDt.PersonNameStandard.OtherNames;
 
                     Integer preventionId = PreventionData.insertPreventionData(admProviderNo, demographicNo, preventionDate, defaultProviderNo(), "", preventionType, refused, "", "", preventionExt);
                     addOneEntry(IMMUNIZATION);
-
-                    //to dumpsite: Extra immunization data
-                    /*if (StringUtils.filled(immExtra) && preventionId>=0) {
-        	            immExtra = Util.addLine("imported.cms4.2011.06", immExtra);
-        	            CaseManagementNote imNote = prepareCMNote("2",null);
-        	            imNote.setNote(immExtra);
-        	            saveLinkNote(imNote, CaseManagementNoteLink.PREVENTIONS, Long.valueOf(preventionId));
-                    }*/
                 }
 
                 //LABORATORY RESULTS
@@ -1822,12 +1706,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                         }
                     }
                 }
-                /*
-                String labEverything = getLabDline(labResultArr[i]);
-                if (StringUtils.filled(labEverything)){
-                    LabResultImport.SaveLabDesc(labEverything,patiPhysId);
-                }
-                */
 
                 // Save to measurements, measurementsExt
                 for (LaboratoryResults labResults : labResultArr) {
@@ -1934,15 +1812,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                             cmNote.setNote(annotation);
                             saveLinkNote(cmNote, CaseManagementNoteLink.LABTEST2, Long.valueOf(lab_ppid), "0-0");
                         }
-
-                        //to dumpsite
-                        /*String testResultsInfo = labResults.getTestResultsInformationReportedByTheLab();
-                        if (StringUtils.filled(testResultsInfo)) {
-                            String dump = Util.addLine("imported.cms4.2011.06", "Test Results Info: ", testResultsInfo);
-                            CaseManagementNote cmNote = prepareCMNote("2",null);
-                            cmNote.setNote(dump);
-                            saveLinkNote(cmNote, CaseManagementNoteLink.LABTEST2, Long.valueOf(lab_ppid), "0-0");
-                        }*/
                     } else {
                         logger.error("No lab no! (demo="+demographicNo+")");
                     }
@@ -2154,14 +2023,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                                 if (docNum==null) docNum = 0;
                                 if (binaryFormat) addOneEntry(REPORTBINARY);
                                 else addOneEntry(REPORTTEXT);
-
-                                //to dumpsite: Extra report data
-                                /*if (StringUtils.filled(reportExtra)) {
-                    	            reportExtra = Util.addLine("imported.cms4.2011.06", reportExtra);
-                    	            CaseManagementNote rpNote = prepareCMNote("2",null);
-                    	            rpNote.setNote(reportExtra);
-                    	            saveLinkNote(rpNote, CaseManagementNoteLink.DOCUMENT, Long.valueOf(docNum));
-                                }*/
                             }
                         }
                     }
@@ -2651,7 +2512,9 @@ import cdsDt.PersonNameStandard.OtherNames;
 				cmIssue.setDemographic_no(demographicNo);
 				cmIssue.setIssue(issue);
 				cmIssue.setIssue_id(issue.getId());
-				cmIssue.setType(issue.getType());
+				String type = issue.getType();
+				// casemgmt_issue likes empty strings over null values...apparently
+				cmIssue.setType((type != null)? type : "");
 				caseManagementIssueDAO.saveIssue(cmIssue);
 			}
 		}
