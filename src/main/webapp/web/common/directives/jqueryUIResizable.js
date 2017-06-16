@@ -18,8 +18,9 @@ angular.module('Common.Directives').directive('resizable', [
 					handles: 'n, e, w, nw, ne',
 					minHeight: 140 + $(".note-editor-textarea").height(),
 					minWidth: 490,
+					maxWidth: window.innerWidth,
 					maxHeight: window.innerHeight / 1.5,
-					containment: "#main-body"
+					// containment: "#main-body"
 				});
 				elem.on('resizestop', function(evt, ui)
 				{
