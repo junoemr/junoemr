@@ -146,9 +146,9 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							<span ng-if="item.extra.length>0">({{item.extra}})</span>
 						</a>--%>
 
-						<a href="#"
-							 ng-if="!item.dropdown"
-							 ng-click="navBarCtrl.transition(item)" >{{item.label}}
+						<a href="javascript:void(0)"
+							ng-if="!item.dropdown"
+							ng-click="navBarCtrl.transition(item)" >{{item.label}}
 							<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
 									class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
 						</a>
@@ -162,8 +162,10 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 						<ul class="dropdown-menu" role="menu">
 							<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.mediumNavItemFilter(true)"
-									ng-class="{'active': navBarCtrl.isActive(item) }">
-								<a ng-click="navBarCtrl.transition(item)" data-toggle="tab" >{{item.label}}
+								ng-class="{'active': navBarCtrl.isActive(item) }">
+								<a href="javascript:void(0)"
+									 
+									ng-click="navBarCtrl.transition(item)" data-toggle="tab" >{{item.label}}
 									<span ng-if="item.extra.length>0">({{item.extra}})</span>
 								</a>
 							</li>
@@ -188,7 +190,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 						<ul class="dropdown-menu" role="menu">
 							<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.smallNavItemFilter(true)"
 									ng-class="{'active': navBarCtrl.isActive(item) }">
-								<a href="#"
+								<a href="javascript:void(0)"
 									ng-if="!item.dropdown"
 									ng-click="navBarCtrl.transition(item)" >{{item.label}}
 									<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
