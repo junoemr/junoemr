@@ -70,7 +70,8 @@
 
 				<%-- Large view --%>
 			<ul class="nav navbar-nav visible-nav-lg" id="myTabs">
-				<li ng-repeat="tab in recordCtrl.recordtabs2" ng-class="recordCtrl.isTabActive(tab)">
+				<li ng-repeat="tab in recordCtrl.recordtabs2" 
+					ng-class="{'active': recordCtrl.isActive(tab) }">
 					<a href="javascript:void(0)" ng-click="recordCtrl.changeTab(tab)">
 						{{tab.label}} 
 						<strong class="text-danger" ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
@@ -81,7 +82,7 @@
 			<%-- Medium view --%>
 			<ul class="nav navbar-nav visible-nav-md">
 					<li ng-repeat="tab in recordCtrl.recordtabs2 | filter: recordCtrl.mediumNavItemFilter(false)"
-							ng-class="recordCtrl.isTabActive(tab)">
+							ng-class="{'active': recordCtrl.isActive(tab) }">
 						<a href="javascript:void(0)" ng-click="recordCtrl.changeTab(tab)">
 							 {{tab.label}}
 						</a>
@@ -94,7 +95,8 @@
 						</a>
 
 						<ul class="dropdown-menu" role="menu">
-							<li ng-repeat="tab in recordCtrl.recordtabs2 | filter: recordCtrl.mediumNavItemFilter(true)" ng-class="recordCtrl.isTabActive(tab)">
+							<li ng-repeat="tab in recordCtrl.recordtabs2 | filter: recordCtrl.mediumNavItemFilter(true)" 
+								ng-class="{'active': recordCtrl.isActive(tab) }">
 								<a href="javascript:void(0)" ng-if="!tab.dropdown" ng-click="recordCtrl.changeTab(tab)" >{{tab.label}} 
 									<strong class="text-danger" ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
 								</a>
@@ -112,7 +114,8 @@
 						</a>
 
 						<ul class="dropdown-menu" role="menu">
-							<li ng-repeat="tab in recordCtrl.recordtabs2" ng-class="recordCtrl.isTabActive(tab)">
+							<li ng-repeat="tab in recordCtrl.recordtabs2" 
+								ng-class="{'active': recordCtrl.isActive(tab) }">
 								<a href="javascript:void(0)" ng-if="!tab.dropdown" ng-click="recordCtrl.changeTab(tab)" >{{tab.label}} 
 									<strong class="text-danger" ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
 								</a>
@@ -130,7 +133,6 @@
 
 	<div class="row" id="note-editor-container">
 		<div id="note-editor-minimized"
-			draggable 
 			class="col-sm-3 col-xs-12 text-center hand-hover" 
 			ng-click="recordCtrl.toggleNote();" 
 			ng-show="!recordCtrl.hideNote">
