@@ -1358,24 +1358,15 @@ import cdsDt.PersonNameStandard.OtherNames;
                         err_note.add("Clinical notes have no author; assigned to \"doctor oscardoc\" ("+(i+1)+")");
                     	caseManagementManager.saveNoteSimple(cmNote);
                     }
-
-                    //to dumpsite
-                    /*String noteType = cNotes[i].getNoteType();
-                    if (StringUtils.filled(noteType)) {
-                    	noteType = Util.addLine("imported.cms4.2011.06", "Note Type: ", noteType);
-                    }
-
-                    CaseManagementNote dumpNote = prepareCMNote("2",null);
-                    dumpNote.setNote(noteType);
-                    saveLinkNote(cmNote.getId(), dumpNote);*/
                 }
 
                 //ALLERGIES & ADVERSE REACTIONS
                 AllergiesAndAdverseReactions[] aaReactArray = patientRec.getAllergiesAndAdverseReactionsArray();
                 logger.info("IMPORT ALLERGIES & ADVERSE REACTIONS: " + aaReactArray.length + " entries found");
                 for (int i=0; i<aaReactArray.length; i++) {
-                    String description="", regionalId="", reaction="", severity="", entryDate="", startDate="", typeCode="", lifeStage="", alg_extra="";
+                    String description="", regionalId="", reaction="", severity="", entryDate="", startDate="", lifeStage="", alg_extra="";
                     String entryDateFormat=null, startDateFormat=null;
+                    int typeCode=0;
 
                     reaction = StringUtils.noNull(aaReactArray[i].getReaction());
                     description = StringUtils.noNull(aaReactArray[i].getOffendingAgentDescription());
@@ -1392,10 +1383,10 @@ import cdsDt.PersonNameStandard.OtherNames;
                     alg_extra = Util.addLine(alg_extra,"Offending Agent Description: ",aaReactArray[i].getOffendingAgentDescription());
                     if (aaReactArray[i].getReactionType()!=null) alg_extra = Util.addLine(alg_extra,"Reaction Type: ",aaReactArray[i].getReactionType().toString());
 
-                    if (typeCode.equals("") && aaReactArray[i].getPropertyOfOffendingAgent()!=null) {
-                        if (aaReactArray[i].getPropertyOfOffendingAgent()==cdsDt.PropertyOfOffendingAgent.DR) typeCode="13"; //drug
-                        else if (aaReactArray[i].getPropertyOfOffendingAgent()==cdsDt.PropertyOfOffendingAgent.ND) typeCode="0"; //non-drug
-                    else if (aaReactArray[i].getPropertyOfOffendingAgent()==cdsDt.PropertyOfOffendingAgent.UK) typeCode="0"; //unknown
+                    if (aaReactArray[i].getPropertyOfOffendingAgent()!=null) {
+                        if (aaReactArray[i].getPropertyOfOffendingAgent()==cdsDt.PropertyOfOffendingAgent.DR) typeCode=13; //drug
+                        else if (aaReactArray[i].getPropertyOfOffendingAgent()==cdsDt.PropertyOfOffendingAgent.ND) typeCode=0; //non-drug
+                    else if (aaReactArray[i].getPropertyOfOffendingAgent()==cdsDt.PropertyOfOffendingAgent.UK) typeCode=0; //unknown
                     }
                     if (aaReactArray[i].getSeverity()!=null) {
                         if (aaReactArray[i].getSeverity()==cdsDt.AdverseReactionSeverity.MI) severity="1"; //mild
@@ -1411,7 +1402,7 @@ import cdsDt.PersonNameStandard.OtherNames;
 
                     Date entryDateDate=toDateFromString(entryDate);
                     Date startDateDate=toDateFromString(startDate);
-                    Integer allergyId = saveRxAllergy(Integer.valueOf(demographicNo), entryDateDate, description, Integer.parseInt(typeCode), reaction, startDateDate, severity, regionalId, lifeStage);
+                    Integer allergyId = saveRxAllergy(Integer.valueOf(demographicNo), entryDateDate, description, typeCode, reaction, startDateDate, severity, regionalId, lifeStage);
                     addOneEntry(ALLERGY);
 
                     //write partial dates
@@ -1423,22 +1414,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                     CaseManagementNote cmNote = prepareCMNote("2",null);
                     cmNote.setNote(note);
                     saveLinkNote(cmNote, CaseManagementNoteLink.ALLERGIES, Long.valueOf(allergyId));
-
-                    //to dumpsite
-                    //String dump = "imported.cms4.2011.06";
-                    /*
-                    String summary = aaReactArray[i].getCategorySummaryLine();
-                    if (StringUtils.empty(summary)) {
-                        err_summ.add("No Summary for Allergies & Adverse Reactions ("+(i+1)+")");
-                    }
-                    dump = Util.addLine(dump, summary);
-                    */
-                    /*dump = Util.addLine(dump, alg_extra);
-                    dump = Util.addLine(dump, getResidual(aaReactArray[i].getResidualInfo()));
-
-                    cmNote = prepareCMNote("2",null);
-                    cmNote.setNote(dump);
-                    saveLinkNote(cmNote, CaseManagementNoteLink.ALLERGIES, Long.valueOf(allergyId));*/
                 }
 
 
