@@ -181,22 +181,9 @@ angular.module('Record').controller('Record.RecordController', [
 
 		};
 
-		controller.isTabActive = function isTabActive(tab)
+		controller.isActive = function(tab)
 		{
-			//console.log('current state '+$state.current.name.substring(0,tab.path.length)+" -- "+($state.current.name.substring(0,tab.path.length) == tab.path),$state.current.name,tab);
-			//console.log('ddd '+$state.current.name.length+"  eee "+tab.path.length);
-			//if($state.current.name.length < tab.path.length) return "";
-
-			if (tab.dropdown)
-			{
-				return "dropdown";
-			}
-
-			if (tab.state != null && ($state.current.name.substring(0, tab.state.length) == tab.state))
-			{
-				return "active";
-			}
-
+			return ($state.current.name == tab.state);
 		};
 
 		$scope.$on('$destroy', function()

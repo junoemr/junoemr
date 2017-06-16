@@ -460,15 +460,9 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			console.log($('#myModal'));
 		};
 
-		controller.isActive = function isActive(item)
+		controller.isActive = function(tab)
 		{
-			if (angular.isDefined(item) &&
-				angular.isDefined(item.state) &&
-				item.state !== null)
-			{
-				return $state.is(item.state);
-			}
-			return false;
+			return ($state.current.name === tab.state);
 		};
 
 		controller.changeProgram = function changeProgram(programId)
