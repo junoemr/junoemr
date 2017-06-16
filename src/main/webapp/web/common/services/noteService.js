@@ -54,15 +54,12 @@ angular.module("Common.Services").service("noteService", [
 			return deferred.promise;
 		};
 
-		service.saveNote = function saveNote(demographicNo, notea)
+		service.saveNote = function saveNote(demographicNo, note)
 		{
 			var deferred = $q.defer();
 
-			var noteToSave = {
-				encounterNote: notea
-			};
 			$http.post(service.apiPath + '/' + encodeURIComponent(demographicNo) +
-				'/save', noteToSave).then(
+				'/save', note).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
