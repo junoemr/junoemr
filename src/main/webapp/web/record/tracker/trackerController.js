@@ -34,7 +34,6 @@ angular.module('Record.Tracker').controller('Record.Tracker.TrackerController', 
 	'$state',
 	'$timeout',
 	'demographicService',
-	'demo',
 	'noteService',
 	'uxService',
 
@@ -47,34 +46,30 @@ angular.module('Record.Tracker').controller('Record.Tracker.TrackerController', 
 		$state,
 		$timeout,
 		demographicService,
-		demo,
 		noteService,
 		uxService)
 	{
 
 		var controller = this;
-
-		controller.getTrackerUrl = function getTrackerUrl(demographicNo)
+		controller.getTrackerUrl = function getTrackerUrl()
 		{
 
-			url = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo;
+			url = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + $stateParams.demographicNo;
 
 			return url;
 
 		};
 
+		controller.resizeIframe = function resizeIframe(iframe)
+		{
 
+			var h = iframe.contentWindow.document.body.scrollHeight;
+			if (h > 0)
+			{
+				iframe.height = h + "px";
+				//alert("h > 0");
+			}
+			//alert("h" + h);
+		};
 	}
 ]);
-
-function resizeIframe(iframe)
-{
-
-	var h = iframe.contentWindow.document.body.scrollHeight;
-	if (h > 0)
-	{
-		iframe.height = h + "px";
-		//alert("h > 0");
-	}
-	//alert("h" + h);
-}
