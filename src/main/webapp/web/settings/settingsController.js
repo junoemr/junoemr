@@ -36,30 +36,32 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		appService)
 	{
 
+		var controller = this;
+
 		$scope.$emit('configureShowPatientList', false);
 
-		$scope.providerList = providerList;
-		$scope.user = user;
-		$scope.billingServiceTypes = billingServiceTypes;
-		$scope.pref = loadedSettings;
-		$scope.encounterForms = encounterForms;
-		$scope.eforms = eforms;
-		$scope.loadedApps = loadedApps;
+		controller.providerList = providerList;
+		controller.user = user;
+		controller.billingServiceTypes = billingServiceTypes;
+		controller.pref = loadedSettings;
+		controller.encounterForms = encounterForms;
+		controller.eforms = eforms;
+		controller.loadedApps = loadedApps;
 
-		if ($scope.pref.recentPatients == null)
+		if (controller.pref.recentPatients == null)
 		{
-			$scope.pref.recentPatients = "8";
+			controller.pref.recentPatients = "8";
 		}
 
 		//convert to value/label object list from string array
-		$scope.formGroupNames = [
+		controller.formGroupNames = [
 		{
 			"value": "",
 			"label": "None"
 		}];
 		for (var i = 0; i < groupNames.length; i++)
 		{
-			$scope.formGroupNames.push(
+			controller.formGroupNames.push(
 			{
 				"value": groupNames[i],
 				"label": groupNames[i]
@@ -68,46 +70,46 @@ angular.module('Settings').controller('Settings.SettingsController', [
 
 
 		//convert to value/label obj list. Add all/none
-		$scope.teams = [
+		controller.teams = [
 		{
 			"value": "-1",
 			"label": "All"
 		}];
 		for (var i = 0; i < teams.length; i++)
 		{
-			$scope.teams.push(
+			controller.teams.push(
 			{
 				"value": teams[i],
 				"label": teams[i]
 			});
 		}
-		$scope.teams.push(
+		controller.teams.push(
 		{
 			"value": "",
 			"label": "None"
 		});
 
 		//add none -option to start.
-		$scope.billingServiceTypesMod = [];
-		angular.copy($scope.billingServiceTypes, $scope.billingServiceTypesMod);
-		$scope.billingServiceTypesMod.splice(0, 0,
+		controller.billingServiceTypesMod = [];
+		angular.copy(controller.billingServiceTypes, controller.billingServiceTypesMod);
+		controller.billingServiceTypesMod.splice(0, 0,
 		{
 			"type": "no",
 			"name": "--None--"
 		});
 
 		//this needs to be done to do the weird checkbox lists. basically add a property to each encounterList object called checked:[true|false]
-		for (var i = 0; i < $scope.pref.appointmentScreenForms.length; i++)
+		for (var i = 0; i < controller.pref.appointmentScreenForms.length; i++)
 		{
-			var selected = $filter('filter')($scope.encounterForms,
+			var selected = $filter('filter')(controller.encounterForms,
 			{
-				formName: $scope.pref.appointmentScreenForms[i]
+				formName: controller.pref.appointmentScreenForms[i]
 			});
 			if (selected != null)
 			{
 				for (var x = 0; x < selected.length; x++)
 				{
-					if (selected[x].formName === $scope.pref.appointmentScreenForms[i])
+					if (selected[x].formName === controller.pref.appointmentScreenForms[i])
 					{
 						selected[x].checked = true;
 					}
@@ -116,17 +118,17 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		}
 
 		//this needs to be done to do the weird checkbox lists. basically add a property to each encounterList object called checked:[true|false]
-		for (var i = 0; i < $scope.pref.appointmentScreenEforms.length; i++)
+		for (var i = 0; i < controller.pref.appointmentScreenEforms.length; i++)
 		{
-			var selected = $filter('filter')($scope.eforms,
+			var selected = $filter('filter')(controller.eforms,
 			{
-				id: $scope.pref.appointmentScreenEforms[i]
+				id: controller.pref.appointmentScreenEforms[i]
 			});
 			if (selected != null)
 			{
 				for (var x = 0; x < selected.length; x++)
 				{
-					if (selected[x].id === $scope.pref.appointmentScreenEforms[i])
+					if (selected[x].id === controller.pref.appointmentScreenEforms[i])
 					{
 						selected[x].checked = true;
 					}
@@ -135,7 +137,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		}
 
 
-		$scope.tabs = [
+		controller.tabs = [
 		{
 			id: 0,
 			displayName: 'Persona',
@@ -201,7 +203,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			displayName: 'Integration',
 			path: 'integration'
 		}, ];
-		$scope.pageSizes = [
+		controller.pageSizes = [
 		{
 			value: 'PageSize.A4',
 			label: 'A4'
@@ -211,7 +213,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			label: 'A6'
 		}];
 
-		$scope.rxInteractionWarningLevels = [
+		controller.rxInteractionWarningLevels = [
 		{
 			value: '0',
 			label: 'Not Specified'
@@ -233,7 +235,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			label: 'None'
 		}];
 
-		$scope.staleDates = [
+		controller.staleDates = [
 		{
 			value: 'A',
 			label: 'All'
@@ -387,7 +389,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			label: '36'
 		}, ];
 
-		$scope.olisLabs = [
+		controller.olisLabs = [
 		{
 			value: '',
 			label: ''
@@ -405,7 +407,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			label: 'LifeLabs'
 		}];
 
-		$scope.pasteFormats = [
+		controller.pasteFormats = [
 		{
 			value: 'single',
 			label: 'Single Line'
@@ -415,7 +417,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			label: 'Multi Line'
 		}];
 
-		$scope.letterHeadNameDefaults = [
+		controller.letterHeadNameDefaults = [
 		{
 			value: '1',
 			label: 'Provider (user)'
@@ -429,56 +431,56 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			label: 'Clinic'
 		}];
 
-		if ($scope.pref.consultationLetterHeadNameDefault == null)
+		if (controller.pref.consultationLetterHeadNameDefault == null)
 		{
-			$scope.pref.consultationLetterHeadNameDefault = "1";
+			controller.pref.consultationLetterHeadNameDefault = "1";
 		}
 
 
-		$scope.currentTab = $scope.tabs[0];
+		controller.currentTab = controller.tabs[0];
 
-		$scope.isActive = function(tab)
+		controller.isActive = function(tab)
 		{
-			return (tab != null && $scope.currentTab != null && tab.id == $scope.currentTab.id);
+			return (tab != null && controller.currentTab != null && tab.id == controller.currentTab.id);
 		};
 
-		$scope.changeTab = function(tab)
+		controller.changeTab = function(tab)
 		{
-			$scope.currentTab = tab;
+			controller.currentTab = tab;
 		};
 
-		$scope.save = function()
+		controller.save = function()
 		{
 			var newList = [];
-			for (var i = 0; i < $scope.pref.appointmentScreenQuickLinks.length; i++)
+			for (var i = 0; i < controller.pref.appointmentScreenQuickLinks.length; i++)
 			{
-				if ($scope.pref.appointmentScreenQuickLinks[i].checked == null || $scope.pref.appointmentScreenQuickLinks[i].checked == false)
+				if (controller.pref.appointmentScreenQuickLinks[i].checked == null || controller.pref.appointmentScreenQuickLinks[i].checked == false)
 				{
 					newList.push(
 					{
-						name: $scope.pref.appointmentScreenQuickLinks[i].name,
-						url: $scope.pref.appointmentScreenQuickLinks[i].url
+						name: controller.pref.appointmentScreenQuickLinks[i].name,
+						url: controller.pref.appointmentScreenQuickLinks[i].url
 					});
 				}
 			}
-			$scope.pref.appointmentScreenQuickLinks = newList;
+			controller.pref.appointmentScreenQuickLinks = newList;
 
-			providerService.saveSettings($scope.user.providerNo, $scope.pref).then(function(data)
+			providerService.saveSettings(controller.user.providerNo, controller.pref).then(function(data)
 			{
 				alert('saved');
 			});
 
 		};
 
-		$scope.cancel = function()
+		controller.cancel = function()
 		{
-			$scope.pref = {};
+			controller.pref = {};
 			$state.go('dashboard');
 		};
 
-		$scope.selectEncounterForms = function()
+		controller.selectEncounterForms = function()
 		{
-			var selected = $filter('filter')($scope.encounterForms,
+			var selected = $filter('filter')(controller.encounterForms,
 			{
 				checked: true
 			});
@@ -487,12 +489,12 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			{
 				tmp.push(selected[i].formName);
 			}
-			$scope.pref.appointmentScreenForms = tmp;
+			controller.pref.appointmentScreenForms = tmp;
 		};
 
-		$scope.selectEForms = function()
+		controller.selectEForms = function()
 		{
-			var selected = $filter('filter')($scope.eforms,
+			var selected = $filter('filter')(controller.eforms,
 			{
 				checked: true
 			});
@@ -501,25 +503,25 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			{
 				tmp.push(selected[i].id);
 			}
-			$scope.pref.appointmentScreenEforms = tmp;
+			controller.pref.appointmentScreenEforms = tmp;
 		};
 
-		$scope.removeQuickLinks = function()
+		controller.removeQuickLinks = function()
 		{
 			var newList = [];
 
-			for (var i = 0; i < $scope.pref.appointmentScreenQuickLinks.length; i++)
+			for (var i = 0; i < controller.pref.appointmentScreenQuickLinks.length; i++)
 			{
-				if ($scope.pref.appointmentScreenQuickLinks[i].checked == null || $scope.pref.appointmentScreenQuickLinks[i].checked == false)
+				if (controller.pref.appointmentScreenQuickLinks[i].checked == null || controller.pref.appointmentScreenQuickLinks[i].checked == false)
 				{
-					newList.push($scope.pref.appointmentScreenQuickLinks[i]);
+					newList.push(controller.pref.appointmentScreenQuickLinks[i]);
 				}
 			}
-			$scope.pref.appointmentScreenQuickLinks = newList;
+			controller.pref.appointmentScreenQuickLinks = newList;
 		};
 
 
-		$scope.openChangePasswordModal = function()
+		controller.openChangePasswordModal = function()
 		{
 			/*
         var modalInstance = $uibModal.open({
@@ -531,7 +533,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		};
 
 
-		$scope.openQuickLinkModal = function()
+		controller.openQuickLinkModal = function()
 		{
 			var modalInstance = $uibModal.open(
 			{
@@ -545,53 +547,53 @@ angular.module('Settings').controller('Settings.SettingsController', [
 				{
 					if (selectedItem != null && selectedItem.name != null && selectedItem.url != null)
 					{
-						$scope.pref.appointmentScreenQuickLinks.push(selectedItem);
+						controller.pref.appointmentScreenQuickLinks.push(selectedItem);
 					}
 				}
 			});
 		};
 
-		$scope.editDocumentTemplates = function()
+		controller.editDocumentTemplates = function()
 		{
 			window.open('../admin/displayDocumentDescriptionTemplate.jsp', 'document_templates', 'width=700,height=450');
 		};
 
-		$scope.showProviderColourPopup = function()
+		controller.showProviderColourPopup = function()
 		{
 			window.open('../provider/providerColourPicker.jsp', 'provider_colour', 'width=700,height=450');
 		};
 
-		$scope.showDefaultEncounterWindowSizePopup = function()
+		controller.showDefaultEncounterWindowSizePopup = function()
 		{
 			window.open('../setProviderStaleDate.do?method=viewEncounterWindowSize', 'encounter_window_sz', 'width=700,height=450');
 		};
 
-		$scope.openConfigureEChartCppPopup = function()
+		controller.openConfigureEChartCppPopup = function()
 		{
 			window.open('../provider/CppPreferences.do', 'configure_echart_cpp', 'width=700,height=450');
 		};
 
-		$scope.openManageAPIClientPopup = function()
+		controller.openManageAPIClientPopup = function()
 		{
 			window.open('../provider/clients.jsp', 'api_clients', 'width=700,height=450');
 		};
 
-		$scope.openMyOscarUsernamePopup = function()
+		controller.openMyOscarUsernamePopup = function()
 		{
 			window.open('../provider/providerIndivoIdSetter.jsp', 'invivo_setter', 'width=700,height=450');
 		};
 
-		$scope.authenticate = function(app)
+		controller.authenticate = function(app)
 		{
 			window.open('../apps/oauth1.jsp?id=' + app.id, 'appAuth', 'width=700,height=450');
 		};
 
-		$scope.refreshAppList = function()
+		controller.refreshAppList = function()
 		{
-			console.log("refresh", $scope.loadedApps);
+			console.log("refresh", controller.loadedApps);
 			appService.getApps().then(function(data)
 				{
-					$scope.loadedApps = data;
+					controller.loadedApps = data;
 				},
 				function(errorMessage)
 				{
@@ -599,7 +601,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 				}
 			);
 			///
-			console.log("refresh", $scope.loadedApps);
+			console.log("refresh", controller.loadedApps);
 		};
 	}
 ]);
