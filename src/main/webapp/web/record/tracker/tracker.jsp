@@ -30,15 +30,15 @@
 </div>
 -->
 
-<div>
+<div >
     <iframe
         id="trackerSlim"
         name="trackerSlim"
         scrolling="No"
         frameborder="0"
-        ng-src="{{trackerCtrl.getTrackerUrl(demographicNo)}}"
+        ng-src="{{trackerCtrl.getTrackerUrl()}}"
         width="100%"
-        onload="trackerCtrl.resizeIframe(this)"
+        <%--onload="trackerCtrl.resizeIframe(this)"--%>
         style="min-height:820px">
     </iframe>
 </div>
