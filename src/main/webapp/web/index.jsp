@@ -210,7 +210,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					<a onClick="popup(700,1024,'../scratch/index.jsp','scratch')"
 						 title="<bean:message key="navbar.scratchpad" bundle="ui"/>"
 						 class="hand-hover">
-						<span class="fa fa-edit"></span>
+						<span class="fa fa-pencil-square"></span>
 					</a>
 						&nbsp;
 					<span ng-show="navBarCtrl.messageRights === true">
