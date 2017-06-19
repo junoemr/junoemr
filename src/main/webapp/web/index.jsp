@@ -206,18 +206,18 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					</li>
 				</ul>
 
-				<div class="navbar-text pull-right">
+				<div class="navbar-text pull-right navbar-right-menu">
 					<a onClick="popup(700,1024,'../scratch/index.jsp','scratch')"
 						 title="<bean:message key="navbar.scratchpad" bundle="ui"/>"
 						 class="hand-hover">
-						<span class="glyphicon glyphicon-edit"></span>
+						<span class="fa fa-edit"></span>
 					</a>
-						&nbsp;&nbsp;
+						&nbsp;
 					<span ng-show="navBarCtrl.messageRights === true">
 						<a ng-click="navBarCtrl.openMessenger()"
 							 title="<bean:message key="navbar.messenger" bundle="ui"/>"
 							 class="hand-hover">
-							<span  class="glyphicon glyphicon-envelope"></span>
+							<span class="fa fa-envelope"></span>
 							<span 
 									class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}
 							</span>
@@ -245,12 +245,12 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 					<span class="dropdown-toggle hand-hover"
 								data-toggle="dropdown"
 								title="<bean:message key="navbar.user" bundle="ui"/>">
-						<span class="glyphicon glyphicon-user"></span>{{navBarCtrl.me.firstName}}
+						<span class="fa fa-user"></span>&nbsp;{{navBarCtrl.me.firstName}}
 					</span>
 					<ul class="dropdown-menu" role="menu">
 						<li ng-repeat="item in navBarCtrl.userMenuItems">
 							<a ng-click="navBarCtrl.transition(item)"
-								 ng-class="{'more-tab-highlight': isActive(item) }"
+								 ng-class="{'more-tab-highlight':  navBarCtrl.isActive(item) }"
 								 class="hand-hover" >{{item.label}}</a>
 							<a ng-if="item.url"
 								 href="{{item.url}}"
