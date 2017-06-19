@@ -242,9 +242,8 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			//consider the option to have overdue only or not
 			ticklerService.search(
 			{
-				priority: '',
 				status: 'A',
-				assignee: controller.me.providerNo,
+				creator: controller.me.providerNo,
 				overdueOnly: 'property'
 			}, 0, 6).then(
 				function success(results)
@@ -458,7 +457,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'tickler/ticklerView.jsp',
-				controller: 'Tickler.TicklerViewCtrl',
+				controller: 'Tickler.TicklerViewController as  ticklerViewCtrl',
 				backdrop: false,
 				size: 'lg',
 				resolve:
@@ -503,9 +502,9 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'tickler/configureDashboard.jsp',
-				controller: 'TicklerConfigureController',
+				controller: 'Dashboard.TicklerConfigureController as ticklerConfigureCtrl',
 				backdrop: false,
-				size: 'lg',
+				size: 'md',
 				resolve:
 				{
 					prefs: function()
