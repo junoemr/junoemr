@@ -181,7 +181,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		};
 
-		controller.isActive = function(tab)
+		controller.isActive = function isActive(tab)
 		{
 			return ($state.current.name == tab.state);
 		};
@@ -306,7 +306,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 
 		// Note Input Logic
-		controller.toggleNote = function()
+		controller.toggleNote = function toggleNote()
 		{
 			if (controller.hideNote == true)
 			{
@@ -318,36 +318,8 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		controller.moveNote = function(p)
+		controller.saveNote = function saveNote()
 		{
-			noteEditor = $("[id^=noteInput]");
-
-			if (p == "l")
-			{
-				$(noteEditor).removeClass('col-md-offset-3');
-				$(noteEditor).removeClass('absolute-right');
-
-				$(noteEditor).addClass('absolute-left');
-			}
-			else if (p == "r")
-			{
-				$(noteEditor).removeClass('col-md-offset-3');
-				$(noteEditor).removeClass('absolute-left');
-
-				$(noteEditor).addClass('absolute-right');
-			}
-			else
-			{
-				$(noteEditor).removeClass('absolute-left');
-				$(noteEditor).removeClass('absolute-right');
-
-				$(noteEditor).addClass('col-md-offset-3');
-			}
-		};
-
-		controller.saveNote = function()
-		{
-			console.log("This is the note" + controller.page.encounterNote);
 			controller.page.encounterNote.observationDate = new Date();
 			controller.page.encounterNote.assignedIssues = controller.page.assignedCMIssues;
 			controller.page.encounterNote.issueDescriptions = null;
