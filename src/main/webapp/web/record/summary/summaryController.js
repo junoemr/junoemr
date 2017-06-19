@@ -268,7 +268,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 			if (note.uuid == controller.page.currentEditNote.uuid)
 			{
-				return "noteInEdit";
+				return "note-in-edit";
 			}
 
 			return "";
@@ -551,13 +551,11 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 			for (var i = 0; i < itemsToFill.length; i++)
 			{
-				console.log(itemsToFill[i].summaryCode);
 				summaryLists[itemsToFill[i].summaryCode] = itemsToFill[i];
 
 				summaryService.getFullSummary($stateParams.demographicNo, itemsToFill[i].summaryCode).then(
 					function success(results)
 					{
-						console.log("FullSummary returned ", results);
 						if (angular.isDefined(results.summaryItem))
 						{
 							if (results.summaryItem instanceof Array)

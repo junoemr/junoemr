@@ -166,7 +166,8 @@
 					<div infinite-scroll="summaryCtrl.addMoreItems()">
 						
 						<div class="note-container col-xs-12 note" 
-								ng-repeat="note in summaryCtrl.page.notes.notelist" 
+								ng-repeat="note in summaryCtrl.page.notes.notelist"
+								ng-class="summaryCtrl.isNoteBeingEdited(note)"  
 								ng-style="summaryCtrl.setColor(note)" 
 								ng-click="summaryCtrl.editNote(note)"
 								ng-show="summaryCtrl.showNote(note)">
@@ -182,7 +183,6 @@
 								</div>
 							</div>
 							<div class="row note-body" 
-									ng-class="summaryCtrl.isNoteBeingEdited(note)" 
 									ng-show="summaryCtrl.showNote(note)"  
 									ng-hide="note.cpp==true" 
 									ng-dblclick="summaryCtrl.editNote(note)">
