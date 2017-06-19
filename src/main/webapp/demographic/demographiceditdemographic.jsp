@@ -147,7 +147,7 @@ if(!authed) {
 %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties"	scope="session" />
-<% java.util.Properties oscarVariables = OscarProperties.getInstance(); %>
+<% OscarProperties oscarVariables = OscarProperties.getInstance(); %>
 
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/phr-tag.tld" prefix="phr"%>
@@ -179,8 +179,8 @@ if(!authed) {
 	String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF" ;
 	String str = null;
 	int nStrShowLen = 20;
-	String billRegion = (oscarVariables.getProperty("billregion","")).trim().toUpperCase();
-	String prov = (oscarVariables.getProperty("hctype","")).trim().toUpperCase();
+	String billRegion = oscarVariables.getBillingTypeUpperCase();
+	String prov = oscarVariables.getBillingTypeUpperCase();
 
 	CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 	List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.DEMOGRAPHIC, Long.valueOf(demographic_no));

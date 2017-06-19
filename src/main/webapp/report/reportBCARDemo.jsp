@@ -16,10 +16,10 @@ if(!authed) {
 
 <%@ page import="java.util.*, oscar.oscarDemographic.data.ProvinceNames"
 	errorPage="errorpage.jsp"%>
-<% java.util.Properties oscarVariables = oscar.OscarProperties.getInstance(); %>
+<% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
 <% 
   ProvinceNames pNames = ProvinceNames.getInstance();
-  String prov= ((String ) oscarVariables.getProperty("billregion","")).trim().toUpperCase();
+  String prov = oscarVariables.getInstanceTypeUpperCase();
 
   String billingCentre = ((String ) oscarVariables.getProperty("billcenter","")).trim().toUpperCase();
 %>

@@ -43,23 +43,18 @@ public class OscarProperties extends Properties {
 	private static final long serialVersionUID = -5965807410049845132L;
 	private static OscarProperties oscarProperties = new OscarProperties();
 	private static final Set<String> activeMarkers = new HashSet<String>(Arrays.asList(new String[] { "true", "yes", "on" }));
-
-	/**
-	 * @return OscarProperties the instance of OscarProperties
-	 */
-	public static OscarProperties getInstance() {
-		return oscarProperties;
-	}
-
-	/* If cant find the file, inform and continue */
-	/*
-	 * private OscarProperties() {
-	 * 
-	 * InputStream is = getClass().getResourceAsStream("/oscar_mcmaster.properties"); try { load(is); } catch (Exception e) { MiscUtils.getLogger().debug("Error, file oscar_mcmaster.properties not found.");
-	 * MiscUtils.getLogger().debug("This file must be placed at WEB-INF/classes."); }
-	 * 
-	 * try{ is.close(); } catch (IOException e) { MiscUtils.getLogger().debug("IO error."); MiscUtils.getLogger().error("Error", e); } } //OscarProperties - end
-	 */
+	
+	// Put property names here
+	private static final String KEY_INSTANCE_TYPE = "instance_type";
+	private static final String KEY_BILLING_TYPE = "billing_type";
+	
+	private static final String BILLING_TYPE_ONTARIO = "ON";
+	private static final String BILLING_TYPE_BC = "BC";
+	private static final String BILLING_TYPE_CLINICAID = "CLINICAID";
+	
+	private static final String INSTANCE_TYPE_ONTARIO = "ON";
+	private static final String INSTANCE_TYPE_BC = "BC";
+	private static final String INSTANCE_TYPE_ALBERTA = "AB";
 
 	/* Do not use this constructor. Use getInstance instead */
 	private OscarProperties() {
@@ -78,6 +73,13 @@ public class OscarProperties extends Properties {
 		}
 	}
 
+	/**
+	 * @return OscarProperties the instance of OscarProperties
+	 */
+	public static OscarProperties getInstance() {
+		return oscarProperties;
+	}
+
 	public void readFromFile(String url) throws IOException {
 		InputStream is = getClass().getResourceAsStream(url);
 		if (is == null) is = new FileInputStream(url);
@@ -89,8 +91,41 @@ public class OscarProperties extends Properties {
 		}
 	}
 
-	/*
+	
+	// =========================================================================
+	// Methods for accessing general properties in various ways
+	// TODO: make these private and access all properties through the specific 
+	//       methods below
+	// =========================================================================
+	
+	/**
+	 * Get the value of a property.  Trims output.
+	 * 
+	 * @param key The key for the property
+	 * @return String
+	 */
+	public String getProperty(String key) {
+		String property = super.getProperty(key);
+		return property == null ? property : property.trim();
+	}
+
+	/**
+	 * Get the uppercase value of a property.  Trims output.
+	 * 
+	 * @param key The key for the property
+	 * @return String
+	 */
+	public String getPropertyUpperCase(String key) {
+		String property = this.getProperty(key);
+		return property == null ? property : property.toUpperCase();
+	}
+
+
+	/**
 	 * Check to see if the properties to see if that property exists.
+	 * 
+	 * @param key key of property
+	 * @return boolean
 	 */
 	public boolean hasProperty(String key) {
 		boolean prop = false;
@@ -99,6 +134,38 @@ public class OscarProperties extends Properties {
 			prop = true;
 		}
 		return prop;
+	}
+
+	/**
+	 * Will check the properties to see if that property is set and if it's 
+	 * set to the given value.  If it is method returns true if not method 
+	 * returns false. 
+	 * 
+	 * @param key key of property
+	 * @param val value that will cause a true value to be returned
+	 * @return boolean
+	 */
+	public boolean isPropertyEqual(String key, String val) {
+		key = key==null ? null : key.trim();
+		val = val==null ? null : val.trim();
+		
+		return getProperty(key, "").trim().equals(val);
+	}
+
+	/**
+	 * Will check the properties to see if that property is set and if it's 
+	 * set to the given value, ignoring case.  If it is method returns true if 
+	 * not method returns false. 
+	 * 
+	 * @param key key of property
+	 * @param val value that will cause a true value to be returned
+	 * @return boolean
+	 */
+	public boolean isPropertyEqualCaseInsensitive(String key, String val) {
+		key = key==null ? null : key.trim();
+		val = val==null ? null : val.trim();
+		
+		return getProperty(key, "").trim().equalsIgnoreCase(val);
 	}
 
 	/**
@@ -133,14 +200,10 @@ public class OscarProperties extends Properties {
 		return activeMarkers.contains(getProperty(key, "").trim().toLowerCase());
 	}
 
-	/*
-	 * Comma delimited spring configuration modules Options: Caisi,Indivo Caisi - Required to run the Caisi Shelter Management System Indivo - Indivo PHR record. Required for integration with Indivo.
-	 */
-
-	/*
-	 * not being used - commenting out public final String ModuleNames = "ModuleNames";
-	 */
-
+	
+	// =========================================================================
+	// Methods for getting specific property values
+	// =========================================================================
 	public Date getStartTime() {
 		String str = getProperty("OSCAR_START_TIME");
 		Date ret = null;
@@ -183,16 +246,44 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("ENABLE_ACCOUNT_LOCKING");
 	}
 	
-	public boolean isOntarioBillingRegion() {
-		return ( "ON".equals( getProperty("billregion") ) );
+	public String getInstanceType() {
+		return getProperty(KEY_INSTANCE_TYPE);
+	}
+
+	public String getInstanceTypeUpperCase() {
+		return getPropertyUpperCase(KEY_INSTANCE_TYPE);
 	}
 	
-	public boolean isBritishColumbiaBillingRegion() {
-		return ( "BC".equals( getProperty("billregion") ) );
+	public boolean isOntarioInstanceType() {
+		return ( INSTANCE_TYPE_ONTARIO.equalsIgnoreCase( getProperty(KEY_INSTANCE_TYPE) ) );
 	}
 	
-	public boolean isAlbertaBillingRegion() {
-		return ( "AB".equals( getProperty("billregion") ) );
+	public boolean isBritishColumbiaInstanceType() {
+		return ( INSTANCE_TYPE_BC.equalsIgnoreCase( getProperty(KEY_INSTANCE_TYPE) ) );
+	}
+	
+	public boolean isAlbertaInstanceType() {
+		return ( INSTANCE_TYPE_ALBERTA.equalsIgnoreCase( getProperty(KEY_INSTANCE_TYPE) ) );
+	}
+	
+	public String getBillingType() {
+		return getProperty(KEY_BILLING_TYPE);
+	}
+	
+	public String getBillingTypeUpperCase() {
+		return getPropertyUpperCase(KEY_BILLING_TYPE);
+	}
+	
+	public boolean isOntarioBillingType() {
+		return ( BILLING_TYPE_ONTARIO.equalsIgnoreCase( getProperty(KEY_BILLING_TYPE) ) );
+	}
+	
+	public boolean isBritishColumbiaBillingType() {
+		return ( BILLING_TYPE_BC.equalsIgnoreCase( getProperty(KEY_BILLING_TYPE) ) );
+	}
+	
+	public boolean isClinicaidBillingType() {
+		return ( BILLING_TYPE_CLINICAID.equalsIgnoreCase( getProperty(KEY_BILLING_TYPE) ) );
 	}
 
 	public boolean isCaisiLoaded() {
@@ -332,6 +423,11 @@ public class OscarProperties extends Properties {
 		String prop = getProperty("EMERALD_HL7_A04_TRANSPORT_PORT", "3987"); // default to port 3987
 		return Integer.parseInt(prop);
 	}
+
+
+	// =========================================================================
+	// Static methods for getting specific property values
+	// =========================================================================
 
 	public static String getIntakeProgramAccessServiceId() {
 		return oscarProperties.getProperty("form_intake_program_access_service_id");

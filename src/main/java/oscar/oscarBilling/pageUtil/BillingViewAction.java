@@ -27,7 +27,6 @@ package oscar.oscarBilling.pageUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -61,9 +60,9 @@ public final class BillingViewAction extends Action {
         MessageResources messages = getResources(request);
 
         // Setup variables
-        Properties oscarVars = OscarProperties.getInstance();
+        OscarProperties oscarVars = OscarProperties.getInstance();
 
-        if (oscarVars.getProperty("billregion").equals("ON")){
+        if (oscarVars.isOntarioBillingType()){
             String newURL = mapping.findForward("ON").getPath();
             newURL = newURL + "?"+request.getQueryString();
             return (new ActionForward(newURL));

@@ -90,7 +90,7 @@ public class EctDisplayPregnancyAction extends EctDisplayAction {
 		        Dao.addPopUpText("Ectopic");
 		   	    
 		        //check to see if they have an onar2005 form
-		        if(OscarProperties.getInstance().getProperty("billregion", "ON").equals("ON")) {
+		        if(OscarProperties.getInstance().isOntarioInstanceType()) {
 			        EctFormData.PatientForm[] pforms = EctFormData.getPatientForms(bean.demographicNo, "formONAR");
 			        EctFormData.PatientForm[] eforms = EctFormData.getPatientForms(bean.demographicNo, "formONAREnhancedRecord");
 					

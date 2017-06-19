@@ -56,7 +56,7 @@
 %>
 
 <%@ page errorPage="errorpage.jsp"%>
-<% java.util.Properties oscarVariables = OscarProperties.getInstance(); %>
+<% OscarProperties oscarVariables = OscarProperties.getInstance(); %>
 <%
 	String country = request.getLocale().getCountry();
 %>
@@ -256,7 +256,7 @@ div.logoutBox {
             <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.billing" rights="r" reverse="<%=false%>">
 			<%
 				// Only show link to Clinicaid admin if Clinicaid Billing is enabled
-				if (oscarVariables.getProperty("billregion", "").equals("CLINICAID"))
+				if (oscarVariables.isClinicaidBillingType())
 				{ 
 			%>
 					<li>
@@ -275,7 +275,7 @@ div.logoutBox {
 					</li> <%
 					}
 				}
-				else if (oscarVariables.getProperty("billregion", "").equals("BC"))
+				else if (oscarVariables.isBritishColumbiaBillingType())
 				{
 			%>
 			<li><a href="#"
@@ -331,8 +331,8 @@ div.logoutBox {
 			
 			<%
 				}
-								else if (oscarVariables.getProperty("billregion", "").equals("ON"))
-								{
+				else if (oscarVariables.isOntarioBillingType())
+				{
 			%>
 			<li><a href="#"
 				onclick='popupPage(700,1000,&quot;<html:rewrite page="/billing/CA/ON/ScheduleOfBenefitsUpload.jsp"/>&quot;);return false;'><bean:message key="admin.admin.scheduleOfBenefits"/></a></li>
@@ -397,7 +397,7 @@ div.logoutBox {
 			%>
             </security:oscarSec>
                         
-                <% if (oscarVariables.getProperty("billregion","").equals("ON")) { %>                	
+                <% if (oscarVariables.isOntarioBillingType()) { %>                	
                         <li><a href="#" onclick="popupPage(800,1000,&quot;<html:rewrite page='/billing/CA/ON/billingONPayment.jsp'/>&quot;);return false;"><bean:message key="admin.admin.paymentReceived"/></a></li>
                 <% } %>
 		</ul>
@@ -541,8 +541,8 @@ div.logoutBox {
 					</li>
                         </caisi:isModuleLoad>
 			<%
-				if (oscarVariables.getProperty("billregion", "").equals("ON"))
-								{
+				if (oscarVariables.isOntarioBillingType())
+				{
 			%>
 			<li><a href="#"
 				onclick='popupPage(660,1000,&quot;<html:rewrite page="/report/reportonbilledphcp.jsp"/>&quot;);return false;'><bean:message key="admin.admin.PHCP"/></a>

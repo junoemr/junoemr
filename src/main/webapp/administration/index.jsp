@@ -45,13 +45,13 @@ if (session.getAttribute("userrole") == null) response.sendRedirect(request.getC
 
 UserPropertyDAO userPropertyDao = SpringUtils.getBean(UserPropertyDAO.class);
     		
-Properties oscarVariables = OscarProperties.getInstance();
+OscarProperties oscarVariables = OscarProperties.getInstance();
 
 String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 String curUser_no = (String) session.getAttribute("user");
 String userfirstname = (String) session.getAttribute("userfirstname");
 String userlastname = (String) session.getAttribute("userlastname");
-String prov= (oscarVariables.getProperty("billregion","")).trim().toUpperCase();
+String prov = (oscarVariables.getBillingType()).trim().toUpperCase();
 
 String resourcebaseurl =  oscarVariables.getProperty("resource_base_url");
 

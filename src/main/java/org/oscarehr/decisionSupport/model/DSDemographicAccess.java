@@ -644,7 +644,7 @@ public class DSDemographicAccess {
         	logger.debug("PAYER:MSP ");
             ServiceCodeValidationLogic bcCodeValidation = null;
             BillingONCHeader1Dao billingONCHeader1Dao = null;
-            String billregion = OscarProperties.getInstance().getProperty("billregion", "");
+            String billregion = OscarProperties.getInstance().getBillingType();
             if( billregion.equalsIgnoreCase("BC") ) {
                 bcCodeValidation = new ServiceCodeValidationLogic();
             }

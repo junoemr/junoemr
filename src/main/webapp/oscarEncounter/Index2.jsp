@@ -100,7 +100,7 @@ You have no rights to access the data!
 <%@page
 	import="oscar.eform.*, oscar.dms.*, org.apache.commons.lang.StringEscapeUtils"%>
 
-<% java.util.Properties oscarVariables = oscar.OscarProperties.getInstance(); %>
+<% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
 
 <%
 	String ip = request.getRemoteAddr();
@@ -219,7 +219,7 @@ if (request.getParameter("casetoEncounter")==null)
   String pAge = Integer.toString(dateConvert.calcAge(bean.yearOfBirth,bean.monthOfBirth,bean.dateOfBirth));
   java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
 
-  String province = (oscarVariables.getProperty("billregion","")).trim().toUpperCase();
+  String province = oscarVariables.getBillingTypeUpperCase();
   Properties windowSizes = oscar.oscarEncounter.pageUtil.EctWindowSizes.getWindowSizes(provNo);
 
   MsgDemoMap msgDemoMap = new MsgDemoMap();
@@ -1674,7 +1674,7 @@ function grabEnterGetTemplate(event){
 								value="<bean:message key="oscarEncounter.Index.btnSignSave"/>"
 								class="ControlPushButton2"
 								onclick="document.forms['encForm'].btnPressed.value='Sign,Save and Exit'; document.forms['encForm'].submit();">
-							<oscar:oscarPropertiesCheck property="billregion" value="BC">
+							<oscar:oscarPropertiesCheck property="billing_type" value="BC">
 								<input type="button" style="height: 20px"
 									value="<bean:message key="oscarEncounter.Index.btnSignSaveBill"/>"
 									class="ControlPushButton2"

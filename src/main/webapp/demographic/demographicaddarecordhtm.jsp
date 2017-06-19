@@ -114,7 +114,7 @@
   OscarProperties oscarProps = OscarProperties.getInstance();
 
   ProvinceNames pNames = ProvinceNames.getInstance();
-  String prov= (props.getProperty("hctype","")).trim().toUpperCase();
+  String prov = props.getBillingTypeUpperCase();
 
   String billingCentre = (props.getProperty("billcenter","")).trim().toUpperCase();
   String defaultCity = prov.equals("ON")&&billingCentre.equals("N") ? "Toronto":"";
@@ -137,7 +137,7 @@
      HCType = props.getProperty("hctype","");
      if (HCType == null || HCType.equals("")) {
            // The system property is not activated, so use the billregion
-           String billregion = props.getProperty("billregion", "");
+           String billregion = props.getBillingType();
            HCType = billregion;
      }
   }

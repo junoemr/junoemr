@@ -25,7 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%
-String prov= (oscar.OscarProperties.getInstance().getProperty("billregion","")).trim().toUpperCase();
+String prov = oscar.OscarProperties.getInstance().getBillingTypeUpperCase();
 %>
 
 <script>

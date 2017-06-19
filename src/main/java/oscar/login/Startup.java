@@ -125,7 +125,7 @@ public class Startup implements ServletContextListener {
 					sc.getServletContext().setAttribute("useNewEchart", true);
 				}
 
-				logger.info("BILLING REGION : " + p.getProperty("billregion", "NOTSET"));
+				logger.info("BILLING REGION : " + p.getBillingType());
 				logger.info("DB PROPS: Username :" + p.getProperty("db_username", "NOTSET") + " db name: " + p.getProperty("db_name", "NOTSET"));
 				p.setProperty("OSCAR_START_TIME", "" + System.currentTimeMillis());
 

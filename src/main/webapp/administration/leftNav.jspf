@@ -100,7 +100,7 @@ String curProvider_no = (String)session.getAttribute("user");
 				<ul>
 		            <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.billing" rights="r" reverse="<%=false%>">
 		            
-		            <oscar:oscarPropertiesCheck property="billregion" value="CLINICAID">
+		            <oscar:oscarPropertiesCheck property="billing_type" value="CLINICAID">
 
 					<li><a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">Manage Invoices</a></li>
 					
@@ -113,7 +113,7 @@ String curProvider_no = (String)session.getAttribute("user");
 					</oscar:oscarPropertiesCheck>
 
 
-		            <oscar:oscarPropertiesCheck property="billregion" value="BC">
+		            <oscar:oscarPropertiesCheck property="billing_type" value="BC">
 
 					<li><a href='javascript:void(0);'
 						class="xlink" rel="${ctx}/billing/manageBillingform.jsp"><bean:message key="admin.admin.ManageBillFrm"/></a></li>
@@ -166,7 +166,7 @@ String curProvider_no = (String)session.getAttribute("user");
 						class="xlink" rel="${ctx}/billing/CA/BC/settleBG.jsp"><bean:message key="admin.admin.settlePaidClaims"/></a></li>
 					</oscar:oscarPropertiesCheck>
 			
-					<oscar:oscarPropertiesCheck property="billregion" value="ON">
+					<oscar:oscarPropertiesCheck property="billing_type" value="ON">
 					<li><a href='javascript:void(0);'
 						class="xlink" rel="${ctx}/billing/CA/ON/ScheduleOfBenefitsUpload.jsp"><bean:message key="admin.admin.scheduleOfBenefits"/></a></li>
 					<li><a href='javascript:void(0);'
@@ -244,7 +244,7 @@ String curProvider_no = (String)session.getAttribute("user");
 		            </security:oscarSec>
 		                        
 		               
-		                <oscar:oscarPropertiesCheck property="billregion" value="ON">             	
+		                <oscar:oscarPropertiesCheck property="billing_type" value="ON">             	
 		                        <li><a href='javascript:void(0);' class="xlink" rel='${ctx}/billing/CA/ON/billingONPayment.jsp'><bean:message key="admin.admin.paymentReceived"/></a></li>
 		                        <li><a href='javascript:void(0);' class="xlink" rel='${ctx}/billing/CA/ON/managePaymentType.do'><bean:message key="admin.admin.managePaymentType"/></a></li>
 		                </oscar:oscarPropertiesCheck>
@@ -408,7 +408,7 @@ String curProvider_no = (String)session.getAttribute("user");
 				        </caisi:isModuleLoad>
 
 			<%
-				if (oscarVariables.getProperty("billregion", "").equals("ON"))
+				if (oscarVariables.isOntarioBillingType())
 								{
 			%>
 			<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/report/reportonbilledphcp.jsp"><bean:message key="admin.admin.PHCP"/></a>

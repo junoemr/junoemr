@@ -218,7 +218,7 @@ if (bMultisites) {
 	import="java.lang.*, java.util.*, java.text.*,java.net.*,java.sql.*,oscar.*"
 	errorPage="errorpage.jsp"%>
 <% 
-	java.util.Properties oscarVariables = OscarProperties.getInstance();
+	oscar.OscarProperties oscarVariables = OscarProperties.getInstance();
 %>
 	
 <jsp:useBean id="scheduleHolidayBean" class="java.util.Hashtable"
@@ -228,7 +228,7 @@ if (bMultisites) {
 
 
 <%
-	String prov=  oscarVariables.getProperty("billregion","").trim().toUpperCase();
+	String prov =  oscarVariables.getBillingTypeUpperCase();
 	String resourcebaseurl =  oscarVariables.getProperty("resource_base_url");
 	
 	UserProperty rbu = userPropertyDao.getProp("resource_baseurl");

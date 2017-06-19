@@ -131,7 +131,7 @@
     ApptData apptObj = ApptUtil.getAppointmentFromSession(request);
 
  List<BillingONCHeader1> cheader1s = null;
- if("ON".equals(OscarProperties.getInstance().getProperty("billregion", "ON"))) {
+ if(OscarProperties.getInstance().isOntarioBillingType()) {
  	cheader1s = cheader1Dao.getBillCheader1ByDemographicNo(Integer.parseInt(demographic_nox));
  }
  

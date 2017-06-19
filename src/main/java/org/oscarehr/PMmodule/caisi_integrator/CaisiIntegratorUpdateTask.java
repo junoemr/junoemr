@@ -706,7 +706,7 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 				benchTimer.tag("pushDxresearchs");
 				
 				// TODO Need additional methods for other billing regions here.
-				if( OscarProperties.getInstance().isOntarioBillingRegion() ) {
+				if( OscarProperties.getInstance().isOntarioBillingType() ) {
 					pushBillingItems(lastDataUpdated, facility, demographicService, demographicId);
 					benchTimer.tag("pushBillingItems");
 				}
@@ -1187,7 +1187,7 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 
 		// TODO add additional methods for other forms here
 		
-		if( OscarProperties.getInstance().isOntarioBillingRegion() ) {
+		if( OscarProperties.getInstance().isOntarioInstanceType() ) {
 			// LabReq2007 and up is only used in Ontario
 			pushLabReq2007(lastDataUpdated, facility, demographicWs, demographicId);	
 		}

@@ -66,7 +66,7 @@ public class BillingService extends AbstractServiceImpl {
     @Produces("application/json")
     public GenericRESTResponse billingRegion() {
         boolean billRegionSet = true;
-        String billRegion = oscarProperties.getProperty("billregion", "").trim().toUpperCase();
+        String billRegion = oscarProperties.getBillingType().trim().toUpperCase();
         if(billRegion.isEmpty()){
             billRegionSet = false;
         }

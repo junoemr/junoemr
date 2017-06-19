@@ -235,7 +235,7 @@ private HashMap<String,String> CurrentSiteMap = new HashMap<String,String>();%>
 <jsp:useBean id="as" class="oscar.appt.ApptStatusData" scope="page" />
 <jsp:useBean id="dateTimeCodeBean" class="java.util.Hashtable" scope="page" />
 <%
-	Properties oscarVariables = OscarProperties.getInstance();
+	OscarProperties oscarVariables = OscarProperties.getInstance();
 %>
 
 <!-- Struts for i18n -->
@@ -274,7 +274,7 @@ public boolean patientHasOutstandingPrivateBills(String demographicNo){
     }
     String userfirstname = (String) session.getAttribute("userfirstname");
     String userlastname = (String) session.getAttribute("userlastname");
-    String prov= (oscarVariables.getProperty("billregion","")).trim().toUpperCase();
+    String prov = oscarVariables.getBillingTypeUpperCase();
 
     int startHour=providerPreference2.getStartHour();
     int endHour=providerPreference2.getEndHour();

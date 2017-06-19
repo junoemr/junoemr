@@ -1318,7 +1318,7 @@ int i;
 										<li><bean:message key="WriteScript.msgWarning"/></li>
 									</ul>
 									</div>
-									<oscar:oscarPropertiesCheck property="billregion" value="ON">
+									<oscar:oscarPropertiesCheck property="instance_type" value="ON">
 										<a target="_new"
 											href="https://www.healthinfo.moh.gov.on.ca/formulary/SearchServlet?searchType=drugID&keywords=<%=regionalIdentifier%>">ODB
 										lookup</a>

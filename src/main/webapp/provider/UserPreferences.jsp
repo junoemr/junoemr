@@ -279,7 +279,7 @@ function dxScriptAttach(name2) {
 								</td>
 							</tr>
 			
-							<oscar:oscarPropertiesCheck property="billregion" value="BC">
+							<oscar:oscarPropertiesCheck property="billing_type" value="BC">
 								<tr>
 									<td nowrap="nowrap"><bean:message key="provider.pref.billing.bc.referral_type" />:</td>
 									<td>
@@ -293,7 +293,7 @@ function dxScriptAttach(name2) {
 									</td>
 								</tr>
 							</oscar:oscarPropertiesCheck>
-							<oscar:oscarPropertiesCheck property="billregion" value="ON">
+							<oscar:oscarPropertiesCheck property="billing_type" value="ON">
 								<tr>
 									<td nowrap="nowrap"><bean:message key="provider.pref.billing.on.form" />:</td>
 									<td>

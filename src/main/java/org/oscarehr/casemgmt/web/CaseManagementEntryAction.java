@@ -222,7 +222,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		String url = "";
 		if ("casemgmt".equals(request.getAttribute("from"))) {
 
-			String province = OscarProperties.getInstance().getProperty("billregion", "").trim().toUpperCase();
+			String province = OscarProperties.getInstance().getBillingTypeUpperCase();
 
 			String strBeanName = "casemgmt_oscar_bean" + demono;
 			EctSessionBean bean = (EctSessionBean) session.getAttribute(strBeanName);
