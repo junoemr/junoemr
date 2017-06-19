@@ -24,44 +24,41 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+
+<div class="modal-header">
+	<button type="button" class="close" ng-click="ticklerConfigureCtrl.close()" aria-label="Close">&times;</button>
+	<h4>Configure Ticklers</h4>
+</div>
 <div class="modal-body">
 	<div class="row">
-		<div class="col-xs-12">
-			 <h4>Configure Ticklers</h4>
-		</div>
-	</div>
-
-<div class="row" style="margin-left:4px">
-
-	<div class="col-md-12">
-		<div class="form-group">
-		  <label >Display overdue ticklers only:</label>
-		  <div class="controls">
-		    <label class="radio inline" for="radios-per-0">
-		      <input ng-model="prefs.expiredTicklersOnly" name="radios-per-0" id="radios-per-0" ng-value="true" type="radio">
-		      Enable
-		    </label>
-		    <label class="radio inline" for="radios-1">
-		      <input ng-model="prefs.expiredTicklersOnly" name="radios-per-0" id="radios-per-1" ng-value="false" type="radio">
-		      Disable
-		    </label>  
-		  </div>
-		  
-		</div>
-				
-		
-	</div>
-</div>
-	
-	
+		<form>
+			<div class="form-group col-sm-4 col-sm-offset-4">
+				<label >Display overdue ticklers only</label>
+				<div class="controls">
+					<label class="radio-inline" for="radios-per-0">
+						<input ng-model="ticklerConfigureCtrl.prefs.expiredTicklersOnly" 
+							name="radios-per-0" id="radios-per-0" 
+							ng-value="true" 
+							type="radio">
+						Enable
+					</label>
+					<label class="radio-inline" for="radios-1">
+						<input ng-model="ticklerConfigureCtrl.prefs.expiredTicklersOnly" 
+							name="radios-per-0" 
+							id="radios-per-1" 
+							ng-value="false" 
+							type="radio">
+						Disable
+					</label>  
+				</div>		  
+			</div>		
+		</form>
+	</div>		
 </div>
   
-
-  
-</div>
 <div class="modal-footer">
-	<button class="btn btn-primary" ng-click="save()">Save Changes</button>
-	<button class="btn btn-default" ng-click="close()"><bean:message key="global.close" bundle="ui"/></button>
+	<button class="btn btn-default" ng-click="ticklerConfigureCtrl.close()"><bean:message key="global.close" bundle="ui"/></button>
+	<button class="btn btn-success" ng-click="ticklerConfigureCtrl.save()">Save Changes</button>
 </div>
 
 
