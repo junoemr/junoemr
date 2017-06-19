@@ -78,7 +78,7 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 		//get genders to be selected
 		controller.genders = staticDataService.getGenders();
 
-		controller.saver = function saver(ngModelContoller)
+		controller.save = function save(ngModelContoller)
 		{
 			console.log(controller.demographic.lastName);
 			console.log(controller.demographic.firstName);

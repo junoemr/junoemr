@@ -24,7 +24,7 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<div class="modal-content">
+<div class="modal-content" id="new-patient-page">
 	<div class="modal-header">
 		<button type="button" class="close" ng-click="newPatientCtrl.cancel()" aria-label="Close">&times;</button>
 		<h3 class="modal-title"><bean:message key="modal.newPatient.title" bundle="ui"/></h3>
@@ -35,11 +35,11 @@
 	</div>
 
 	<div class="modal-body" ng-show="newPatientCtrl.hasRight">
-		<div class="container-fluid">
-			<form class="form-horizontal" role="form" name="newDemographic">
-				<div class="form-group">
-					<label for="lastName" class="col-sm-3 control-label"><bean:message key="modal.newPatient.lastName" bundle="ui"/></label>
-					<div class="col-sm-8">
+		<div class="row">
+			<div class="col-sm-6 col-sm-offset-3">
+				<form name="newDemographic">
+					<div class="form-group col-sm-12">
+						<label for="lastName" class="control-label"><bean:message key="modal.newPatient.lastName" bundle="ui"/></label>
 						<input type="text" class="form-control" 
 							id="lastName" 
 							placeholder="<bean:message key="modal.newPatient.lastName" bundle="ui"/>" 
@@ -48,39 +48,50 @@
 							ng-change="newPatientCtrl.capName()" 
 							required>
 					</div>
-				</div>
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><bean:message key="modal.newPatient.firstName" bundle="ui"/></label>
-					<div class="col-sm-8">
+					<div class="form-group col-sm-12">
+						<label class="control-label"><bean:message key="modal.newPatient.firstName" bundle="ui"/></label>
 						<input type="text" class="form-control" placeholder="<bean:message key="modal.newPatient.firstName" bundle="ui"/>" ng-model="newPatientCtrl.demographic.firstName" ng-change="newPatientCtrl.capName()" required>
 					</div>
-				</div>
-				<div class="form-group">
-					<label for="birthYear" class="col-sm-3 control-label"><bean:message key="modal.newPatient.birth" bundle="ui"/></label>
-					<div class="col-sm-2">
-						<input type="text" class="form-control" id="birthYear" placeholder="<bean:message key="modal.newPatient.year" bundle="ui"/>" ng-model="newPatientCtrl.demographic.dobYear" required>
-					</div>
-					<div class="col-sm-2">
-						<input type="text" class="form-control" placeholder="<bean:message key="modal.newPatient.month" bundle="ui"/>" ng-model="newPatientCtrl.demographic.dobMonth" required>
-					</div>
-					<div class="col-sm-2">
-						<input type="text" class="form-control" placeholder="<bean:message key="modal.newPatient.day" bundle="ui"/>" ng-model="newPatientCtrl.demographic.dobDay" required>
-					</div>
-			
-				</div> 
-				<div class="form-group">
-					<label class="col-sm-3 control-label"><bean:message key="modal.newPatient.gender" bundle="ui"/></label>
-					<div class="col-sm-5">
-					<select class="form-control form-control-details" title="Sex" ng-model="newPatientCtrl.demographic.sex" ng-options="sexes.value as sexes.label for sexes in newPatientCtrl.genders" required/>
-					</div>
-				</div> 
-				<div class="form-group" ng-show="programs.length>1">
-					<label class="col-sm-3 control-label"><bean:message key="modal.newPatient.program" bundle="ui"/></label>
-					<div class="col-sm-5">
-					<select class="form-control form-control-details" title="Program" ng-model="newPatientCtrl.demographic.admissionProgramId" ng-options="pg.id as pg.name for pg in newPatientCtrl.programs" required/>
-					</div>
-				</div> 
-			</form>
+					<div class="form-group col-sm-12">
+						<label for="birthYear" class="control-label" ><bean:message key="modal.newPatient.birth" bundle="ui"/></label>
+						<div class="input-group">
+							<input type="text" id="new-patient-dob-month"
+								class="form-control" 
+								placeholder="MM" 
+								ng-model="newPatientCtrl.demographic.dobMonth" 
+								required
+								maxlength="2">
+							<input type="text" id="new-patient-dob-day"
+								class="form-control" 
+								placeholder="DD" 
+								ng-model="newPatientCtrl.demographic.dobDay" 
+								required
+								maxlength="2">
+							<input type="text"  id="new-patient-dob-year"
+								class="form-control" 
+								id="birthYear" 
+								placeholder="YYYY" 
+								ng-model="newPatientCtrl.demographic.dobYear" 
+								required
+								maxlength="4">
+						</div>
+					</div> 
+					<div class="form-group col-sm-12">
+						<label class="control-label"><bean:message key="modal.newPatient.gender" bundle="ui"/></label>
+						<select class="form-control form-control-details" title="Sex" 
+							ng-model="newPatientCtrl.demographic.sex" 
+							ng-options="sexes.value as sexes.label for sexes in newPatientCtrl.genders" 
+							required/>
+					</div> 
+					<div class="form-group col-sm-12" ng-show="newPatientCtrl.programs.length>1">
+						<label class="control-label"><bean:message key="modal.newPatient.program" bundle="ui"/></label>
+						<select class="form-control form-control-details" title="Program" 
+							ng-model="newPatientCtrl.demographic.admissionProgramId" 
+							ng-options="pg.id as pg.name for pg in newPatientCtrl.programs" 
+							required/>
+					</div> 
+				</form>
+			</div>
 		</div>
 	</div>
 	
@@ -88,7 +99,7 @@
 		<button ng-click="newPatientCtrl.cancel()" type="button" class="btn btn-default">
 			<bean:message key="modal.newPatient.cancel" bundle="ui"/>
 		</button>
-		<button ng-show="newPatientCtrl.hasRight" ng-click="newPatientCtrl.saver(newDemographic)" type="button" class="btn btn-success">
+		<button ng-show="newPatientCtrl.hasRight" ng-click="newPatientCtrl.save(newDemographic)" type="button" class="btn btn-success">
 			<bean:message key="modal.newPatient.submit" bundle="ui"/>
 		</button>
 	</div>
