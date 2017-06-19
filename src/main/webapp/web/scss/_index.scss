@@ -75,6 +75,14 @@ li.cpp-note-list:last-child {
 	color: red;
 }
 
+#main-nav {
+	.navbar-right-menu {
+		.fa {
+			color: $primary-white-text;
+		}
+	}
+}
+
 #patient-list-template {
 	#left-pane {
 		position: fixed;
