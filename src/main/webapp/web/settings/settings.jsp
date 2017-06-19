@@ -690,11 +690,11 @@
 						<label>Use MyMeds:</label>
 						<div class="controls">
 							<label class="radio-inline" for="enable-use-my-meds">
-								<input name="enable-use-my-meds" id="enable-use-my-meds" ng-model="settingsCtrl.pref.useMyMeds" ng-value="true" type="radio">
+								<input name="enableUseMyMeds" id="enable-use-my-meds" ng-model="settingsCtrl.pref.useMyMeds" ng-value="true" type="radio">
 								Enable
 							</label>
 							<label class="radio-inline" for="disable-use-my-meds">
-								<input name="disable-use-my-meds" id="disable-use-my-meds" ng-model="settingsCtrl.pref.useMyMeds" ng-value="false" type="radio">
+								<input name="disableUseMyMeds" id="disable-use-my-meds" ng-model="settingsCtrl.pref.useMyMeds" ng-value="false" type="radio">
 								Disable
 							</label>
 						</div>
@@ -704,11 +704,11 @@
 						<label>BORN prompts in RBR/NDDS:</label>
 						<div class="controls">
 							<label class="radio-inline" for="enable-born-prompt">
-								<input name="enable-born-prompt" id="enable-born-prompt" ng-model="settingsCtrl.pref.disableBornPrompts" ng-value="false" type="radio">
+								<input name="enableBornPrompt" id="enable-born-prompt" ng-model="settingsCtrl.pref.disableBornPrompts" ng-value="false" type="radio">
 								Enable
 							</label>
 							<label class="radio-inline" for="disable-born-prompt">
-								<input name="disable-born-prompt" id="disable-born-prompt" ng-model="settingsCtrl.pref.disableBornPrompts" ng-value="true" type="radio">
+								<input name="disableBornPrompt" id="disable-born-prompt" ng-model="settingsCtrl.pref.disableBornPrompts" ng-value="true" type="radio">
 								Disable
 							</label>
 						</div>
