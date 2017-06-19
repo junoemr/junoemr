@@ -163,25 +163,25 @@
 					</label>
 					<div class="col-md-4">
 						<div class="input-group vertical-align">
-							<input id="dob-year" type="text" placeholder="YYYY" 
-								title="Birthday Year" class="form-control form-control-details" 
-								ng-model="detailsCtrl.page.demo.dobYear" 
-								ng-change="detailsCtrl.checkDate('DobY')" 
-								ng-blur="detailsCtrl.formatDate('DobY')" 
-							/>
-							<input id="dob-month" type="text" placeholder="MM" 
+							<input id="details-dob-month" type="text" placeholder="MM" 
 								title="Birthday Month" class="form-control form-control-details" 
 								ng-model="detailsCtrl.page.demo.dobMonth" 
 								ng-change="detailsCtrl.checkDate('DobM')" 
 								ng-blur="detailsCtrl.formatDate('DobM')"
 							/>
-							<input id="dob-day" type="text" placeholder="DD" 
+							<input id="details-dob-day" type="text" placeholder="DD" 
 								title="Birthday Day" 
 								class="form-control form-control-details" 
 								ng-model="detailsCtrl.page.demo.dobDay" 
 								ng-change=detailsCtrl."checkDate('DobD')" 
 								ng-blur="detailsCtrl.formatDate('DobD')"
 							/>	
+							<input id="details-dob-year" type="text" placeholder="YYYY" 
+								title="Birthday Year" class="form-control form-control-details" 
+								ng-model="detailsCtrl.page.demo.dobYear" 
+								ng-change="detailsCtrl.checkDate('DobY')" 
+								ng-blur="detailsCtrl.formatDate('DobY')" 
+							/>
 							<div>&nbsp;({{detailsCtrl.page.demo.age}}y)</div>
 						</div>
 					</div>
