@@ -671,12 +671,14 @@
 			<div class="col-lg-6 col-sm-10 col-lg-offset-3 col-sm-offset-1">
 					<div class="form-group col-sm-6">
 						<label>OLIS Default Reporting Laboratory:</label>
-						<select class="form-control" ng-model="settingsCtrl.pref.olisDefaultReportingLab" ng-options="item.value as item.label for item in olisLabs">
+						<select class="form-control" ng-model="settingsCtrl.pref.olisDefaultReportingLab" 
+							ng-options="item.value as item.label for item in settingsCtrl.olisLabs">
 						</select>
 					</div>
 					<div class="form-group col-sm-6">
 						<label>OLIS Default Exclude Reporting Laboratory:</label>
-						<select class="form-control" ng-model="settingsCtrl.pref.olisDefaultExcludeReportingLab" ng-options="item.value as item.label for item in olisLabs">
+						<select class="form-control" ng-model="settingsCtrl.pref.olisDefaultExcludeReportingLab" 
+							ng-options="item.value as item.label for item in settingsCtrl.olisLabs">
 						</select>
 					</div>
 
@@ -687,12 +689,12 @@
 					<div class="form-group col-sm-6">
 						<label>Use MyMeds:</label>
 						<div class="controls">
-							<label class="radio-inline" for="radios-int-0">
-								<input name="radios-int-0" id="radios-int-0" ng-model="settingsCtrl.pref.useMyMeds" ng-value="true" type="radio">
+							<label class="radio-inline" for="enable-use-my-meds">
+								<input name="enable-use-my-meds" id="enable-use-my-meds" ng-model="settingsCtrl.pref.useMyMeds" ng-value="true" type="radio">
 								Enable
 							</label>
-							<label class="radio-inline" for="radios-int-1">
-								<input name="radios-int-1" id="radios-int-1" ng-model="settingsCtrl.pref.useMyMeds" ng-value="false" type="radio">
+							<label class="radio-inline" for="disable-use-my-meds">
+								<input name="disable-use-my-meds" id="disable-use-my-meds" ng-model="settingsCtrl.pref.useMyMeds" ng-value="false" type="radio">
 								Disable
 							</label>
 						</div>
@@ -701,13 +703,13 @@
 					<div class="form-group col-sm-6">
 						<label>BORN prompts in RBR/NDDS:</label>
 						<div class="controls">
-							<label class="radio-inline" for="radios-int-0">
-								<input name="radios-int-0" id="radios-int-0" ng-model="settingsCtrl.pref.disableBornPrompts" ng-value="true" type="radio">
-								Disable
-							</label>
-							<label class="radio-inline" for="radios-int-1">
-								<input name="radios-int-1" id="radios-int-1" ng-model="settingsCtrl.pref.disableBornPrompts" ng-value="false" type="radio">
+							<label class="radio-inline" for="enable-born-prompt">
+								<input name="enable-born-prompt" id="enable-born-prompt" ng-model="settingsCtrl.pref.disableBornPrompts" ng-value="false" type="radio">
 								Enable
+							</label>
+							<label class="radio-inline" for="disable-born-prompt">
+								<input name="disable-born-prompt" id="disable-born-prompt" ng-model="settingsCtrl.pref.disableBornPrompts" ng-value="true" type="radio">
+								Disable
 							</label>
 						</div>
 					</div>
