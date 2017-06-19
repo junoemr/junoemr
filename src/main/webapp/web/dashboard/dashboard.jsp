@@ -199,8 +199,8 @@
 												'other': 'active ticklers.'
 											}">
 								</ng-pluralize> 
-								<span class="label label-danger" ng-if="dashboardCtrl.prefs.expiredTicklersOnly == true">(Overdue)</span>
 							</a>
+							<span class="label label-danger" ng-if="dashboardCtrl.prefs.expiredTicklersOnly == true">(Overdue)</span>
 						</p>
 
 						<div ng-if="dashboardCtrl.totalTicklers>0">
