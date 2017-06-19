@@ -27,7 +27,7 @@
 
 <div class="modal-header">
 	<button type="button" class="close" ng-click="ticklerConfigureCtrl.close()" aria-label="Close">&times;</button>
-	<h4>Configure Ticklers</h4>
+	<h3>Configure Ticklers</h3>
 </div>
 <div class="modal-body">
 	<div class="row">
