@@ -167,7 +167,7 @@
 						
 						<div class="note-container col-xs-12 note" 
 								ng-repeat="note in summaryCtrl.page.notes.notelist"
-								ng-class="summaryCtrl.isNoteBeingEdited(note)"  
+								ng-class="{'note-in-edit': summaryCtrl.isNoteBeingEdited(note)}"  
 								ng-style="summaryCtrl.setColor(note)" 
 								ng-click="summaryCtrl.editNote(note)"
 								ng-show="summaryCtrl.showNote(note)">

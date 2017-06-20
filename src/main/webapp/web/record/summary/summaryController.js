@@ -268,10 +268,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 			if (note.uuid == controller.page.currentEditNote.uuid)
 			{
-				return "note-in-edit";
+				return true;
 			}
 
-			return "";
+			return false;
 		};
 
 		$rootScope.$on('currentlyEditingNote', function(event, data)
