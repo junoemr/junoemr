@@ -17,13 +17,43 @@
 		overflow-y: auto;
 	}
 	.note-container {
-		&:hover {
-			// border: 2px solid $primary-blue;
-			// box-shadow: 5px 5px 2px #888888;
-			box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
-			transition: box-shadow 0.1s ease-in-out;
+		.note-header {
+			background-color: #f4f4f4;
+
+			.note-header-info {
+				color: #636363;
+				padding-left: 10px;
+				.note-header-title {
+					color: #3963c2;
+					margin-left: 5px;
+				}
+			}
+
+			.note-header-buttons {
+				padding-right: 5px;
+			}
 		}
-		cursor: pointer;
+		.note-body {
+			padding: 10px 10px 0 10px;
+		}
+		.note-footer {
+			/*border-top: 1px solid #e9e9e9;*/
+			font-size: 11px;
+
+			.note-footer-right {
+				text-align: right;
+			}
+
+			p {
+				margin: 0;
+			}
+		}
+	}
+
+	.note {
+		border: 1px solid #e9e9e9;
+		border-radius: 5px;
+		margin-bottom: 20px;
 	}
 
 	.note-list {
@@ -49,44 +79,13 @@
 			cursor: pointer;
 		}
 	}
-	.note-header-name {
-		color: #3963c2;
-	}
-	.note {
-		border: 1px solid #e9e9e9;
-		border-radius: 5px;
-		margin-bottom: 20px;
-	}
-	.note-header-info {
-		color: #636363;
-		padding: 0 0 0 5px;
-	}
-	.note-header {
-		background-color: #f4f4f4;
-		/*border-bottom: 1px solid #e9e9e9;*/
-		/*padding: 10px;*/
-	}
-	.note-body {
-		padding: 10px 10px 0 10px;
-	}
-	.note-footer {
-		/*border-top: 1px solid #e9e9e9;*/
-		font-size: 11px;
-
-		.note-footer-right {
-			text-align: right;
-		}
-
-		p {
-			margin: 0;
-		}
-	}
 
 	.note-divider {
 		margin-bottom: 4px;
 	}
 	.filter-bar {
 		margin-bottom: $margin-md;
+		padding: 0;
 	}
 }
 
