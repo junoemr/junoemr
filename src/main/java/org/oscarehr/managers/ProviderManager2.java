@@ -381,7 +381,7 @@ public class ProviderManager2 {
 			if(map.get(PreferenceManager.DS_SUPPORT_POS) != null) {
 				settings.setSummaryItemDisplayDsSupport("on".equals(map.get(PreferenceManager.DS_SUPPORT_POS).getValue())?true:false);
 			}else{
-				settings.setSummaryItemDisplayDsSupport(true);
+				settings.setSummaryItemDisplayDsSupport(false);
 			}
 
 		if(map.get("cme_note_date") != null) {
