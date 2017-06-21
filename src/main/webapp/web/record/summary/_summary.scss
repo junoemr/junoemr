@@ -50,7 +50,6 @@
 		}
 	}
 	.note-header-name {
-		font-weight: bold;
 		color: #3963c2;
 	}
 	.note {
@@ -58,9 +57,9 @@
 		border-radius: 5px;
 		margin-bottom: 20px;
 	}
-	.note-header-date {
+	.note-header-info {
 		color: #636363;
-		text-align: right;
+		padding: 0 0 0 5px;
 	}
 	.note-header {
 		background-color: #f4f4f4;
@@ -68,17 +67,23 @@
 		/*padding: 10px;*/
 	}
 	.note-body {
-		padding: 10px;
+		padding: 10px 10px 0 10px;
 	}
 	.note-footer {
 		/*border-top: 1px solid #e9e9e9;*/
 		font-size: 11px;
+
+		.note-footer-right {
+			text-align: right;
+		}
+
+		p {
+			margin: 0;
+		}
 	}
-	.note-footer-right {
-		text-align: right;
-	}
+
 	.note-divider {
-		margin-bottom: 10px;
+		margin-bottom: 4px;
 	}
 	.filter-bar {
 		margin-bottom: $margin-md;
