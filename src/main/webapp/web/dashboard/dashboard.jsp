@@ -53,7 +53,7 @@
 								</span>
 								<ng-pluralize count="dashboardCtrl.totalInbox"
 											when="{
-												'0':'reports which are not yet acknowledged.',
+												'0':'no reports which are not yet acknowledged.',
 												'1':'report which is not yet acknowledged.',
 												'other': 'reports which are not yet acknowledged.'
 											}">
