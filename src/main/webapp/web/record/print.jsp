@@ -29,97 +29,77 @@
 	<div class="modal-content">
 
 		<div class="modal-header"  > 
-		<button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="cancelPrint()"><span aria-hidden="true" >&times;</span></button>
-			<h4 class="modal-title"><bean:message key="oscarEncounter.Index.PrintDialog" /></h4>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="recordPrintCtrl.cancelPrint()"><span aria-hidden="true" >&times;</span></button>
+			<h3 class="modal-title"><bean:message key="oscarEncounter.Index.PrintDialog" /></h3>
 		</div>
 
 		<div class="modal-body">			
 	        	<div class="row">
-		        	<div class="alert alert-danger" ng-show="page.selectedWarning">
-	  					<strong><bean:message key="global.warning" /></strong> <bean:message key="oscarEncounter.nothingToPrint.msg" />
+		        	<div class="alert alert-danger" ng-show="recordPrintCtrl.page.selectedWarning">
+	  					<strong><bean:message key="global.warning" /></strong> 
+						<bean:message key="oscarEncounter.nothingToPrint.msg" />
 					</div>
 	        	
-	        		<div class="col-xs-6">
-	        			<div class="radio">
-						  <label>
-						    <input type="radio" ng-model="pageOptions.printType" id="printopSelected" value="selected">
-						    <bean:message key="oscarEncounter.Index.PrintSelect" />
-						  </label>
-						</div>
-						<div class="radio">
-						  <label>
-						    <input type="radio" ng-model="pageOptions.printType" id="printopAll" value="all">
-						    <bean:message key="oscarEncounter.Index.PrintAll" />
-						  </label>
-						</div>
-	        			<div class="radio">
-						  <label>
-						    <input type="radio" ng-model="pageOptions.printType" id="printopDates" value="dates">
-						    <bean:message key="oscarEncounter.Index.PrintDates" />&nbsp;
-						    <a ng-click="printToday()" ><bean:message key="oscarEncounter.Index.PrintToday" /></a><br>
-						  </label>
-						
-						<div class="form-group">
-    							<label for="exampleInputEmail1"><bean:message key="oscarEncounter.startdate.title" /></label>
-  							    <div class="input-group">
-									<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.startdate.title" />"  
-									ng-model="pageOptions.dates.start" 
-									datepicker-popup="yyyy-MM-dd" 
-									datepicker-append-to-body="false" 
-									is-open="startDatePrintPicker" 
-									ng-click="startDatePrintPicker = true" 
-									placeholder="YYYY-MM-DD"
-									/>
-									<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+	        		<div class="col-xs-10 col-xs-offset-1">
+						<form>
+							<div class="form-group col-sm-6">
+								<label></label>
+								<div class="controls">
+									<label class="radio-inline">
+										<input type="radio" ng-model="recordPrintCtrl.pageOptions.printType" id="printopSelected" value="selected">
+										<bean:message key="oscarEncounter.Index.PrintSelect" />
+									</label>
+									<label class="radio-inline">
+										<input type="radio" ng-model="recordPrintCtrl.pageOptions.printType" id="printopAll" value="all">
+										<bean:message key="oscarEncounter.Index.PrintAll" />
+									</label>
+									<label class="radio-inline">
+										<input type="radio" ng-model="recordPrintCtrl.pageOptions.printType" id="printopDates" value="dates">
+										<bean:message key="oscarEncounter.Index.PrintDates" />&nbsp;
+										<a ng-click="recordPrintCtrl.printToday()" ><bean:message key="oscarEncounter.Index.PrintToday" /></a><br>
+									</label>
 								</div>
-						</div>
-						<div class="form-group">
-    							<label for="exampleInputEmail1"><bean:message key="global.enddate" /></label>
-  							    
-							    <div class="input-group">
-									<input type="text" class="form-control" placeholder="<bean:message key="global.enddate" />"  
-									ng-model="pageOptions.dates.end" 
-									datepicker-popup="yyyy-MM-dd" 
-									datepicker-append-to-body="false" 
-									is-open="endDatePrintPicker" 
-									ng-click="endDatePrintPicker = true" 
-									placeholder="YYYY-MM-DD"
-									/>
-									<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+							</div>
+							<div class="form-group col-sm-6">
+								<label></label>
+								<div class="controls">
+									<label class="checkbox-inline">
+										<input type="checkbox" value="true" ng-model="recordPrintCtrl.pageOptions.cpp" alt="<bean:message key="oscarEncounter.togglePrintCPP.title"/>" id="imgPrintCPP"  >
+										<bean:message key="oscarEncounter.cpp.title" />
+									</label>
+									<label class="checkbox-inline">
+										<input type="checkbox" value="true" ng-model="recordPrintCtrl.pageOptions.rx" alt="<bean:message key="oscarEncounter.togglePrintRx.title"/>" id="imgPrintRx"  >
+										<bean:message key="oscarEncounter.Rx.title" />
+									</label>
+									<label class="checkbox-inline">
+										<input type="checkbox" value="true" ng-model="recordPrintCtrl.pageOptions.labs" alt="<bean:message key="oscarEncounter.togglePrintLabs.title"/>" id="imgPrintLabs"  >
+										<bean:message key="oscarEncounter.Labs.title" />
+									</label>
 								</div>
-					 	</div>
-						</div>
-					
-	        			
-					
-	        		</div>
-	        		<div class="col-xs-6">
-		        		<div class="checkbox">
-						  <label>
-						    <input type="checkbox" value="true" ng-model="pageOptions.cpp" alt="<bean:message key="oscarEncounter.togglePrintCPP.title"/>" id="imgPrintCPP"  >
-						    <bean:message key="oscarEncounter.cpp.title" />
-						  </label>
-						</div>
-						<div class="checkbox">
-						  <label>
-						    <input type="checkbox" value="true" ng-model="pageOptions.rx" alt="<bean:message key="oscarEncounter.togglePrintRx.title"/>" id="imgPrintRx"  >
-						    <bean:message key="oscarEncounter.Rx.title" />
-						  </label>
-						</div>
-						<div class="checkbox">
-						  <label>
-						    <input type="checkbox" value="true" ng-model="pageOptions.labs" alt="<bean:message key="oscarEncounter.togglePrintLabs.title"/>" id="imgPrintLabs"  >
-						    <bean:message key="oscarEncounter.Labs.title" />
-						  </label>
-						</div>
+							</div>		
+							<div class="form-group col-sm-6">
+								<label for="exampleInputEmail1"><bean:message key="oscarEncounter.startdate.title" /></label>
+								<juno-datepicker-popup  juno-model="recordPrintCtrl.pageOptions.dates.start" 
+									placeholder="Start Date"
+									show-icon="true"> 
+								</juno-datepicker-popup>
+							</div>
+							<div class="form-group col-sm-6">
+								<label for="exampleInputEmail1"><bean:message key="global.enddate" /></label>
+								<juno-datepicker-popup  juno-model="recordPrintCtrl.pageOptions.dates.end" 
+									placeholder="End Date"
+									show-icon="true"> 
+								</juno-datepicker-popup>
+							</div>		
+						</form>
 	        		</div>
 	        	</div>
 	        	
 		</div><!-- modal-body -->		
-		<div class="modal-footer">
-			<input type="button" class="btn" ng-click="print();" value="<bean:message key="global.btnPrint"/>" >		
-			<input type="button" class="btn" ng-click="sendToPhr();" value="<bean:message key="global.btnSendToPHR"/>">
-			<input type="button" class="btn" ng-click="cancelPrint()" value="<bean:message key="global.btnCancel"/>"> 
-			<input type="button" class="btn" ng-click="clearPrint()" value="<bean:message key="global.clear"/>">
+		<div class="modal-footer">		
+			<input type="button" class="btn btn-default" ng-click="recordPrintCtrl.cancelPrint()" value="<bean:message key="global.btnCancel"/>"> 
+			<input type="button" class="btn btn-default" ng-click="recordPrintCtrl.clearPrint()" value="<bean:message key="global.clear"/>">
+			<input type="button" class="btn btn-default" ng-click="recordPrintCtrl.sendToPhr();" value="<bean:message key="global.btnSendToPHR"/>">
+			<input type="button" class="btn btn-default" ng-click="recordPrintCtrl.print();" value="<bean:message key="global.btnPrint"/>" >
 		</div>
 	</div>
