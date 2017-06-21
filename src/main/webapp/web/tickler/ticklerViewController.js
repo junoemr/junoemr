@@ -28,17 +28,9 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		controller.ticklerUpdate = angular.copy(tickler);
 		console.log("TICKLER", tickler);
-		if (Juno.Common.Util.exists(controller.ticklerUpdate.serviceDate))
-		{
-			controller.ticklerUpdate.serviceDate = new Date(controller.ticklerUpdate.serviceDate);
-		}
 
-		if (Juno.Common.Util.exists(controller.ticklerUpdate.updateDate))
-		{
-			controller.ticklerUpdate.updateDate = new Date(controller.ticklerUpdate.updateDate);
-		}
-
-
+		controller.serviceDateInput = moment(controller.ticklerUpdate.serviceDate).toDate();
+		controller.serviceTimeInput = moment(controller.ticklerUpdate.serviceDate).format("hh:mm A");
 
 		controller.me = me;
 		controller.ticklerWriteAccess = ticklerWriteAccess;
@@ -53,9 +45,8 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 		// 	serviceTime: $filter('date')(controller.tickler.serviceDate, 'HH:mm'),
 
 		// };
-		// controller.ticklerUpdate.message = "TESSST";
-		controller.needsUpdate = false;
 
+		controller.needsUpdate = false;
 		controller.showUpdates = false;
 		controller.showComments = true;
 
@@ -89,34 +80,48 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			});
 		}
 
-		$scope.$watch('ticklerUpdate.serviceDate',
-			function(new_value)
+		// $scope.$watch('controller.ticklerUpdate.serviceDate',
+		// 	function(new_value)
+		// 	{
+		// 		console.log('change', new_value);
+
+		// 		if (controller.ticklerUpdate.serviceDate instanceof Date && controller.ticklerUpdate.serviceTime instanceof Date)
+		// 		{
+
+		// 			controller.ticklerUpdate.serviceDate = new Date(controller.ticklerUpdate.serviceDate.getTime() + controller.ticklerUpdate.serviceTime.getTime());
+
+		// 			console.log('new val', controller.ticklerUpdate.serviceDate);
+		// 		}
+
+
+		// 	}
+		// );
+
+		// Watches the date input and updates serviceDate when a change is made
+		$scope.$watch(function()
 			{
-				console.log('change', new_value);
+				return controller.serviceDateInput;
+			},
+			function(newValue)
+			{
+				var newDate = moment(newValue.getTime()).format("MM DD YYYY");
+				var finalVal = moment(newDate + "-" + controller.serviceTimeInput).toDate().getTime();
 
-				if (controller.ticklerUpdate.serviceDate instanceof Date && controller.ticklerUpdate.serviceTime instanceof Date)
-				{
-
-					controller.ticklerUpdate.serviceDate = new Date(controller.ticklerUpdate.serviceDate.getTime() + controller.ticklerUpdate.serviceTime.getTime());
-
-					console.log('new val', controller.ticklerUpdate.serviceDate);
-				}
-
-
+				controller.ticklerUpdate.serviceDate = finalVal;
 			}
 		);
 
-		$scope.$watch('ticklerUpdate.serviceTime',
-			function(new_value)
+		// Watches the time input and updates serviceDate when a change is made
+		$scope.$watch(function()
 			{
-				console.log('change', new_value);
+				return controller.serviceTimeInput;
+			},
+			function(newValue)
+			{
+				var date = moment(controller.serviceDateInput.getTime()).format("MM DD YYYY");
+				var finalVal = moment(date + "-" + newValue).toDate().getTime();
 
-				if (controller.ticklerUpdate.serviceDate instanceof Date && controller.ticklerUpdate.serviceTime instanceof Date)
-				{
-					controller.ticklerUpdate.serviceDate = new Date(controller.ticklerUpdate.serviceDate.getTime() + controller.ticklerUpdate.serviceTime.getTime());
-				}
-
-
+				controller.ticklerUpdate.serviceDate = finalVal;
 			}
 		);
 
@@ -310,23 +315,24 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			{
 				controller.needsUpdate = true;
 			}
-			if (tickler.serviceDate != controller.ticklerUpdate.serviceDate.getTime())
+			// if (tickler.serviceDate != controller.ticklerUpdate.serviceDate.getTime())
+			// {
+			// 	controller.needsUpdate = true;
+			// }
+
+			if (tickler.serviceDate != controller.ticklerUpdate.serviceDate)
 			{
 				controller.needsUpdate = true;
 			}
-			if (tickler.serviceTime != controller.ticklerUpdate.serviceTime)
-			{
-				console.log('updating time. old time: ', tickler.serviceTime);
-				controller.needsUpdate = true;
-			}
+
 			if (controller.needsUpdate)
 			{
 				var postData = angular.copy(controller.ticklerUpdate);
-
-				if (Juno.Common.Util.exists(postData.serviceDate))
-				{
-					postData.serviceDate = postData.serviceDate.getTime();
-				}
+				// if (Juno.Common.Util.exists(postData.serviceDate))
+				// {
+				// 	// postData.serviceDate = postData.serviceDate.getTime();
+				// 	console.log('POST DATA: ', postData);
+				// }
 
 				console.log('Post DATA: ', postData);
 
