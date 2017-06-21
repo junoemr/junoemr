@@ -32,27 +32,6 @@
 		</div>
 	</div>
 
-	<div class="row filter-bar">
-		<div class="col-sm-12" ng-show="summaryCtrl.page.canRead" ng-click="summaryCtrl.checkAction($event)" ng-keypress="summaryCtrl.checkAction($event)">
-			<ul class="nav nav-pills">
-				<li ng-class="summaryCtrl.isCurrentStatus('none')">
-					<a data-target="#all" ng-click="summaryCtrl.removeFilter(0)" data-toggle="tab" class="hand-hover">All</a>
-				</li>
-				<li ng-class="summaryCtrl.isCurrentStatus('Just My Notes')">
-					<a ng-click="summaryCtrl.changeNoteFilter('Just My Notes')" class="hand-hover">Just My Encounter Notes</a>
-				</li>
-				<li ng-class="summaryCtrl.isOnlyNotesStatus()">
-					<a ng-click="summaryCtrl.setOnlyNotes()" class="hand-hover">Just Encounter Notes</a>
-				</li>
-				<li>
-					<a ng-click="summaryCtrl.getTrackerUrl(summaryCtrl.demographicNo)" data-target="#tracker" role="tab" data-toggle="tab" >Tracker</a>
-				</li>
-				<li class="pull-right">
-					<span class="glyphicon glyphicon-print" ng-click="summaryCtrl.showPrintModal(summaryCtrl.page.notes.notelist)"></span>
-				</li>
-			</ul>
-		</div><!-- middleSpace -->
-	</div>
 	<div class="row">
 		<div class="col-md-3 col-sm-4 col-xs-12" ng-show="summaryCtrl.page.canRead">
 			<fieldset class="module-list" ng-repeat="mod in summaryCtrl.page.columnOne.modules">
@@ -135,105 +114,135 @@
 			</fieldset>   
 		</div>
 
-		<div class="col-md-6 col-sm-7 col-xs-10 col-sm-offset-0 col-xs-offset-1 note-list" n
+		<div class="col-md-6 col-sm-7 col-xs-10 col-sm-offset-0 col-xs-offset-1"
 				ng-show="summaryCtrl.page.canRead" 
 				ng-click="summaryCtrl.checkAction($event)" 
 				ng-keypress="summaryCtrl.checkAction($event)">
-			<div class="tab-content">
-				<div class="tab-pane active" id="all">
-					<%--<dl infinite-scroll="addMoreItems()">
-						<dt ng-style="setColor(note)" ng-repeat-start="note in page.notes.notelist" ng-show="showNoteHeader(note)">
-								<div class="btn-group btn-group-xs pull-right">
-								<button class="btn btn-default btn-xs" type="button">
-										edit 
-								</button>
-								<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
-										<span class="caret"></span>
-										<span class="sr-only">Toggle Dropdown</span>
-								</button>
-								<ul class="dropdown-menu" role="menu">
-										<li><a href="#">print</a></li> <li><a href="#">annotate</a></li><li><a href="#">set Encounter Date</a></li><li><a href="#">set Encounter Type</a></li>
-								</ul>
-								</div>{{note.observationDate | date : 'dd-MMM-yyyy'}} {{firstLine(note)}} <input type="checkbox" ng-model="note.isSelected" class="pull-right" style="margin-right:3px;"/>
-						</dt>
-						<dd ng-repeat-end  ng-show="showNote(note)"><pre ng-class="isNoteBeingEdited(note)" style="margin-bottom:0px;" ng-show="showNote(note)" ng-hide="note.cpp==true" ng-dblclick="editNote(note)">{{note.note}}</pre>
-								<h6 style="margin-top:1px;margin-bottom:0px;"><bean:message key="oscarEncounter.editors.title"/>: <small>{{note.editorNames}}</small> <span class="pull-right"><bean:message key="oscarEncounter.encounterDate.title"/>: <small>{{note.observationDate | date: 'medium'}}</small> <bean:message key="oscarEncounter.noteRev.title"/>: <small ng-click="openRevisionHistory(note)" class="hand-hover">{{note.revision}}</small></span></h6>
-
-								<h6 style="margin-top:0px;"><bean:message key="oscarEncounter.assignedIssues.title"/>: <small>{{note.issueDescriptions}}</small> <span class="pull-right"><bean:message key="oscarEncounter.encType.title"/>: <small>{{note.encounterType}}</small></span></h6>
-						</dd>                                   
-					</dl>--%>
-
-					<div infinite-scroll="summaryCtrl.addMoreItems()">
+			<div class="col-sm-12 filter-bar" ng-show="summaryCtrl.page.canRead" ng-click="summaryCtrl.checkAction($event)" ng-keypress="summaryCtrl.checkAction($event)">
+				<ul class="nav nav-pills">
+					<li ng-class="summaryCtrl.isCurrentStatus('none')">
+						<a data-target="#all" ng-click="summaryCtrl.removeFilter(0)" data-toggle="tab" class="hand-hover">All</a>
+					</li>
+					<li ng-class="summaryCtrl.isCurrentStatus('Just My Notes')">
+						<a ng-click="summaryCtrl.changeNoteFilter('Just My Notes')" class="hand-hover">Just My Notes</a>
+					</li>
+					<li ng-class="summaryCtrl.isOnlyNotesStatus()">
+						<a ng-click="summaryCtrl.setOnlyNotes()" class="hand-hover">Just Notes</a>
+					</li>
+					<li>
+						<a ng-click="summaryCtrl.getTrackerUrl(summaryCtrl.demographicNo)" data-target="#tracker" role="tab" data-toggle="tab" >Tracker</a>
+					</li>
+					<li class="pull-right">
+					<button class="btn btn-sm btn-primary" ng-click="summaryCtrl.showPrintModal(summaryCtrl.page.notes.notelist)">
+						<span class="fa fa-print"></span>
+						Print
+					</button>
 						
-						<div class="note-container col-xs-12 note" 
-								ng-repeat="note in summaryCtrl.page.notes.notelist"
-								ng-class="{'note-in-edit': summaryCtrl.isNoteBeingEdited(note)}"  
-								ng-style="summaryCtrl.setColor(note)" 
-								ng-click="summaryCtrl.editNote(note)"
-								ng-show="summaryCtrl.showNote(note)">
-							<div class="row note-header" ng-show="summaryCtrl.showNoteHeader(note)" >
-								<div class="col-xs-1 pull-left">
-									<input type="checkbox" ng-model="note.isSelected"/> 
-								</div>
-								<div class="col-xs-6 pull-left note-header-name">
-									<h5>{{summaryCtrl.firstLine(note)}}</h5>
-								</div>
-								<div class="col-xs-4 note-header-date pull-right">
-									<h6>{{note.observationDate | date : 'dd-MMM-yyyy'}}</h6>
-								</div>
-							</div>
-							<div class="row note-body" 
-									ng-show="summaryCtrl.showNote(note)"  
-									ng-hide="note.cpp==true" 
-									ng-dblclick="summaryCtrl.editNote(note)">
-								<p>
-									{{note.note}}
-								</p>
-								<hr class="note-divider">
-							</div>
+					</li>
+				</ul>
+			</div>
+			<div class="col-md-12 note-list">
+				<div class="tab-content">
+					<div class="tab-pane active" id="all">
+						<%--<dl infinite-scroll="addMoreItems()">
+							<dt ng-style="setColor(note)" ng-repeat-start="note in page.notes.notelist" ng-show="showNoteHeader(note)">
+									<div class="btn-group btn-group-xs pull-right">
+									<button class="btn btn-default btn-xs" type="button">
+											edit 
+									</button>
+									<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+											<span class="caret"></span>
+											<span class="sr-only">Toggle Dropdown</span>
+									</button>
+									<ul class="dropdown-menu" role="menu">
+											<li><a href="#">print</a></li> <li><a href="#">annotate</a></li><li><a href="#">set Encounter Date</a></li><li><a href="#">set Encounter Type</a></li>
+									</ul>
+									</div>{{note.observationDate | date : 'dd-MMM-yyyy'}} {{firstLine(note)}} <input type="checkbox" ng-model="note.isSelected" class="pull-right" style="margin-right:3px;"/>
+							</dt>
+							<dd ng-repeat-end  ng-show="showNote(note)"><pre ng-class="isNoteBeingEdited(note)" style="margin-bottom:0px;" ng-show="showNote(note)" ng-hide="note.cpp==true" ng-dblclick="editNote(note)">{{note.note}}</pre>
+									<h6 style="margin-top:1px;margin-bottom:0px;"><bean:message key="oscarEncounter.editors.title"/>: <small>{{note.editorNames}}</small> <span class="pull-right"><bean:message key="oscarEncounter.encounterDate.title"/>: <small>{{note.observationDate | date: 'medium'}}</small> <bean:message key="oscarEncounter.noteRev.title"/>: <small ng-click="openRevisionHistory(note)" class="hand-hover">{{note.revision}}</small></span></h6>
 
-							<div class="row note-footer" ng-show="summaryCtrl.showNote(note)">
-								<div class="col-md-7">
-									<div class="p-inline">
-										<p class="text-muted"><bean:message key="oscarEncounter.editors.title"/>:</p>
-										<p>{{note.editorNames}}</p>
+									<h6 style="margin-top:0px;"><bean:message key="oscarEncounter.assignedIssues.title"/>: <small>{{note.issueDescriptions}}</small> <span class="pull-right"><bean:message key="oscarEncounter.encType.title"/>: <small>{{note.encounterType}}</small></span></h6>
+							</dd>                                   
+						</dl>--%>
+
+						<div infinite-scroll="summaryCtrl.addMoreItems()">
+							
+							<div class="note-container col-xs-12 note" 
+									ng-repeat="note in summaryCtrl.page.notes.notelist"
+									ng-class="{'note-in-edit': summaryCtrl.isNoteBeingEdited(note)}"  
+									ng-style="summaryCtrl.setColor(note)" 
+									ng-show="summaryCtrl.showNote(note)">
+								<div class="row note-header vertical-align" ng-show="summaryCtrl.showNoteHeader(note)" >
+									<div class="col-md-9 col-xs-8 pull-left note-header-info">
+										<h6>{{note.observationDate | date : 'dd-MMM-yyyy'}} 
+											<span class=" note-header-title">{{summaryCtrl.firstLine(note)}}</span>
+										</h6>
+									</div>
+									<div class="col-md-3 col-xs-4 pull-right text-right note-header-buttons">
+										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editNote(note)">
+											Edit
+										</button>
+										<%--<input type="checkbox" ng-model="note.isSelected"/> --%>
+										<button class="btn btn-default btn-xs" 
+											ng-click="summaryCtrl.toggleIsSelectedForPrint(note)"
+											ng-class="{'btn-success': note.isSelected, 'btn-default': !note.isSelected }"
+											title="Add note to print list">
+											<span class="fa fa-print" aria-hidden="true"></span>
+										</button>
+									</div>
+								</div>
+								<div class="row note-body" 
+										ng-show="summaryCtrl.showNote(note)"  
+										ng-hide="note.cpp==true" 
+										ng-dblclick="summaryCtrl.editNote(note)">
+									<p>
+										{{note.note}}
+									</p>
+									<hr class="note-divider">
+								</div>
+
+								<div class="row note-footer" ng-show="summaryCtrl.showNote(note)">
+									<div class="col-md-7">
+										<div class="p-inline">
+											<p class="text-muted"><bean:message key="oscarEncounter.editors.title"/>:</p>
+											<p>{{note.editorNames}}</p>
+										</div>
+
+										<div class="p-inline">
+											<p class="text-muted"><bean:message key="oscarEncounter.assignedIssues.title"/>:</p> 
+											<p>{{note.issueDescriptions}}</p> 
+										</div>
 									</div>
 
-									<div class="p-inline">
-										<p class="text-muted"><bean:message key="oscarEncounter.assignedIssues.title"/>:</p> 
-										<p>{{note.issueDescriptions}}</p> 
-									</div>
-								</div>
+									<div class="col-md-5 note-footer-right">
+										<div class="p-inline">
+											<p class="text-muted"><bean:message key="oscarEncounter.noteRev.title"/>:</p>
+											<p ng-click="summaryCtrl.openRevisionHistory(note)" class="hand-hover">{{note.revision}}</p>
+										</div>
 
-								<div class="col-md-5 note-footer-right">
-									<div class="p-inline">
-										<p class="text-muted"><bean:message key="oscarEncounter.noteRev.title"/>:</p>
-										<p ng-click="summaryCtrl.openRevisionHistory(note)" class="hand-hover">{{note.revision}}</p>
-									</div>
-
-									<div class="p-inline">
-										<p class="text-muted"><bean:message key="oscarEncounter.encType.title"/>:</p> 
-										<p>{{note.encounterType}}</p>
+										<div class="p-inline">
+											<p class="text-muted"><bean:message key="oscarEncounter.encType.title"/>:</p> 
+											<p>{{note.encounterType}}</p>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-						
 					</div>
-				</div>
 
-				<div class="tab-pane" id="tracker">
-					<iframe
-					id="trackerSlim"
-					scrolling="No"
-					frameborder="0"
-					ng-src="{{ summaryCtrl.trackerUrl }}"
-					width="100%"
-					style="min-height:820px"
-					></iframe>
-				</div>
-
-			</div><!-- tab content -->  
+					<div class="tab-pane" id="tracker">
+						<iframe
+						id="trackerSlim"
+						scrolling="No"
+						frameborder="0"
+						ng-src="{{ summaryCtrl.trackerUrl }}"
+						width="100%"
+						style="min-height:820px"
+						></iframe>
+					</div>
+				</div><!-- tab content --> 
+			</div>		 
 		</div>
 		
 		<div class="col-md-3 col-xs-10 col-sm-offset-0 col-xs-offset-1" ng-show="summaryCtrl.page.canRead" 
@@ -265,21 +274,6 @@
 						ng-show="!summaryCtrl.isSectionExpanded(mod) && !summaryCtrl.isSectionEmpty(mod)">
 				</span>
 			</fieldset>
-			
-		<%-- 
-			<fieldset>
-				<legend style="margin-bottom:0px;">Incoming 
-					<div class="form-group">
-						<input type="text" class="form-control search-query" ng-model="incomingQ" placeholder="Search">
-					</div>
-				</legend>     		
-				
-				<h5 ng-repeat="item in documentlabs | filter:incomingQ" ng-show="$index < documentlabsSize" ><a ng-click="changeTab(12)" >{{item.desc}}<small>({{item.type}})</small></a><span class="pull-right">{{item.date}}</span></h5>
-					<a ng-click="expandlist()" ng-show="showMoreDocuments()" ><span class="glyphicon glyphicon-chevron-down pull-right"></span></a>
-					<a ng-click="expandlist()" ng-hide="showMoreDocuments()" ><span class="glyphicon glyphicon-chevron-up pull-right"></span></a>
-			</fieldset>
-		
-		--%>	
 		</div>
 	</div>
 </div>
