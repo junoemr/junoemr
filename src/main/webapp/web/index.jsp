@@ -218,8 +218,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 							 title="<bean:message key="navbar.messenger" bundle="ui"/>"
 							 class="hand-hover">
 							<span class="fa fa-envelope"></span>
-							<span 
-									class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}
+							<span ng-show="navBarCtrl.unreadMessageTotal > 0"
+								class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}
 							</span>
 						</a>
 						&nbsp;&nbsp;
@@ -435,7 +435,6 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="common/directives/patientSearchTypeahead.js"></script>
 	<script type="text/javascript" src="common/directives/patientTypeahead.js"></script>
 	<script type="text/javascript" src="common/directives/datepickerPopup.js"></script>
-	<script type="text/javascript" src="common/directives/timepickerPopup.js"></script>
 	<script type="text/javascript" src="common/directives/jqueryUIResizable.js"></script>
 	<script type="text/javascript" src="common/directives/jqueryUIDraggable.js"></script>
 
