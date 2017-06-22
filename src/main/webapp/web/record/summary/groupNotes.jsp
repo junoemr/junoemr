@@ -153,17 +153,10 @@
 				
 					<div class="form-group col-xs-6">		    
 						<label class="control-label"><bean:message key="oscarEncounter.startdate.title" /></label>
-						<%--<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.startdate.title" />"  
-							ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.startDate" 
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="false" 
-							is-open="startDatePicker" 
-							ng-click="startDatePicker = true" 
-							placeholder="YYYY-MM-DD"
-						/>--%>
 						<juno-datepicker-popup juno-model="groupNotesCtrl.groupNotesForm.groupNoteExt.startDate" 
 							show-icon="true"
-							placeholder="Start Date"> 
+							placeholder="Start Date"
+							type="Input"> 
 						</juno-datepicker-popup>
 					</div>	
 							
@@ -179,7 +172,8 @@
 							/>--%>
 						<juno-datepicker-popup juno-model="groupNotesCtrl.groupNotesForm.groupNoteExt.resolutionDate" 
 							show-icon="true"
-							placeholder="Resolution Date"> 
+							placeholder="Resolution Date"
+							type="Input"> 
 						</juno-datepicker-popup>
 					</div>		    
 
@@ -214,20 +208,10 @@
 
 					<div class="form-group col-xs-6" ng-if="groupNotesCtrl.page.code == 'medhx'" >	
 						<label class="control-label"><bean:message key="oscarEncounter.procedureDate.title" /></label>	 
-						<%--<input type="text" class="form-control" 
-							id="proceduredate" 
-							name="proceduredate" 
-							placeholder="<bean:message key="oscarEncounter.procedureDate.title" />" 
-							ng-model="groupNotesCtrl.groupNotesForm.groupNoteExt.procedureDate" 
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="false" 
-							is-open="procedureDatePicker" 
-							ng-click="procedureDatePicker = true" 
-							placeholder="YYYY-MM-DD"
-						/>--%>
 						<juno-datepicker-popup juno-model="groupNotesCtrl.groupNotesForm.groupNoteExt.procedureDate" 
 							show-icon="true"
-							placeholder="Procedure Date"> 
+							placeholder="Procedure Date"
+							type="Input"> 
 						</juno-datepicker-popup>
 							
 					</div>
