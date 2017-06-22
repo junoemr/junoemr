@@ -563,7 +563,7 @@ div.leftBox li { /*padding-right: 15px;*/
     text-decoration: underline;
 }
 #mainContent {
-    background-color: #FFFFFF; width: 100%; margin-right: -2px; display: inline; float: left;
+    background-color: #FFFFFF; width: 100%; margin-right: -2px; display: inline; float: left; position: relative; z-index: 0;
 }
 #notCpp {
     height: 70%; margin-left: 2px; background-color: #FFFFFF;

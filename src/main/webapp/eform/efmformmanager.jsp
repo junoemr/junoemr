@@ -178,7 +178,7 @@ else if (orderByRequest.equals("file_name")) orderBy = EFormUtil.FILE_NAME;
                                         <%}%>
                                         <tr><td class="fieldLabel">Zip File: </td></tr>
                                         <tr><td colspan="2" style="text-align: left;"><input type="file" name="zippedForm" size="50"></td></tr>
-                                        <tr><td colspan="2" style="text-align: left;"><input type="submit" name="subm" value="Import" onclick="this.value = 'Importing...'; this.disabled = true;"></td>
+                                        <tr><td colspan="2" style="text-align: left;"><input type="submit" name="subm" value="Import" onclick="this.form.submit()"></td>
                                         </tr>
                                         <tr><td> </td></tr>
                                         </tr>
