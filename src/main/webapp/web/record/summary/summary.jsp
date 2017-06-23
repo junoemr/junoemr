@@ -175,14 +175,15 @@
 									ng-show="summaryCtrl.showNote(note)">
 								<div class="row note-header vertical-align" ng-show="summaryCtrl.showNoteHeader(note)" >
 									<div class="col-md-9 col-xs-8 pull-left note-header-info vertical-align">
-										<juno-datepicker-popup juno-model="note.observationDate" type="Link"
-											ng-model="note.observationDate"
-											callback-fn="summaryCtrl.dateChanged">
-										</juno-datepicker-popup>
-										<span class=" note-header-title">{{summaryCtrl.firstLine(note)}}</span>
+										<h6>{{note.observationDate | date : 'dd-MMM-yyyy'}}
+											<span class=" note-header-title">{{summaryCtrl.firstLine(note)}}</span>
+										</h6>
 									</div>
 									<div class="col-md-3 col-xs-4 pull-right text-right note-header-buttons">
-										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editNote(note)">
+										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editNote(note)" ng-show="note.editable && summaryCtrl.isRegularNote(note)">
+											Edit
+										</button>
+										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editGroupNote(note)" ng-show="note.editable && note.cpp">
 											Edit
 										</button>
 										<%--<input type="checkbox" ng-model="note.isSelected"/> --%>
