@@ -78,7 +78,7 @@ public class SummaryTo1 {
 	Integer id;
 	String displayName;
 	String summaryCode;
-	String displaySize = "0"; //Set initial display size to 0, should be set to summaryItem.length. Figure out if this safe to do
+	String displaySize = "5";
 	List<SummaryItemTo1> summaryItem = new ArrayList<SummaryItemTo1>(); // Should be renamed to summaryItems
 	
 	public SummaryTo1(){

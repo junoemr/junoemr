@@ -89,7 +89,7 @@
 				
 
 				<ul class="list-unstyled">
-					<li ng-repeat="item in mod.summaryItem" ng-show="summaryCtrl.isSectionExpanded(mod)" >
+					<li ng-repeat="item in mod.summaryItem | limitTo: mod.displaySize">
 						<p><span class="pull-right">{{item.date | date : 'dd MMM yyyy'}}</span></p>
 						<a ng-click="summaryCtrl.gotoState(item,mod,item.id)" href="javascript:void(0)" ng-class="item.indicatorClass">
 							{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}
@@ -174,10 +174,12 @@
 									ng-style="summaryCtrl.setColor(note)" 
 									ng-show="summaryCtrl.showNote(note)">
 								<div class="row note-header vertical-align" ng-show="summaryCtrl.showNoteHeader(note)" >
-									<div class="col-md-9 col-xs-8 pull-left note-header-info">
-										<h6>{{note.observationDate | date : 'dd-MMM-yyyy'}} 
-											<span class=" note-header-title">{{summaryCtrl.firstLine(note)}}</span>
-										</h6>
+									<div class="col-md-9 col-xs-8 pull-left note-header-info vertical-align">
+										<juno-datepicker-popup juno-model="note.observationDate" type="Link"
+											ng-model="note.observationDate"
+											callback-fn="summaryCtrl.dateChanged">
+										</juno-datepicker-popup>
+										<span class=" note-header-title">{{summaryCtrl.firstLine(note)}}</span>
 									</div>
 									<div class="col-md-3 col-xs-4 pull-right text-right note-header-buttons">
 										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editNote(note)">
@@ -193,12 +195,9 @@
 									</div>
 								</div>
 								<div class="row note-body" 
-										ng-show="summaryCtrl.showNote(note)"  
-										ng-hide="note.cpp==true" 
-										ng-dblclick="summaryCtrl.editNote(note)">
-									<p>
-										{{note.note}}
-									</p>
+									ng-show="summaryCtrl.showNote(note)"  
+									ng-hide="note.cpp==true">
+									<p>{{note.note}}</p>
 									<hr class="note-divider">
 								</div>
 
