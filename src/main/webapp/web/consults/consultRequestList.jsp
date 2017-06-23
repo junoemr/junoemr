@@ -56,13 +56,15 @@
 			<div class="col-lg-3 col-xs-6">
 				<juno-datepicker-popup juno-model="consultRequestListCtrl.search.referralStartDate" 
 					placeholder="<bean:message key="consult.list.referralStartDate" bundle="ui"/>"
-					show-icon="true"> 
+					show-icon="true"
+					type="Input"> 
 				</juno-datepicker-popup>
 			</div>
 			<div class="col-lg-3 col-xs-6">
 				<juno-datepicker-popup juno-model="consultRequestListCtrl.search.referralEndDate" 
 					placeholder="<bean:message key="consult.list.referralEndDate" bundle="ui"/>"
-					show-icon="true"> 
+					show-icon="true"
+					type="Input"> 
 				</juno-datepicker-popup>
 			</div>
 			<div class="col-lg-3 col-xs-6">
@@ -80,13 +82,15 @@
 			<div class="col-lg-3 col-xs-6">
 				<juno-datepicker-popup juno-model="consultRequestListCtrl.search.appointmentStartDate" 
 					placeholder="<bean:message key="consult.list.appointmentStartDate" bundle="ui"/>"
-					show-icon="true"> 
+					show-icon="true"
+					type="Input"> 
 				</juno-datepicker-popup>
 			</div>
 			<div class="col-lg-3 col-xs-6">
 				<juno-datepicker-popup juno-model="consultRequestListCtrl.search.appointmentEndDate" 
 					placeholder="<bean:message key="consult.list.appointmentEndDate" bundle="ui"/>"
-					show-icon="true"> 
+					show-icon="true"
+					type="Input"> 
 				</juno-datepicker-popup>
 			</div>
 			

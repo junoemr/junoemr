@@ -82,7 +82,7 @@
 				</span>
 				<button class="btn btn-xs btn-default" ng-click="cancelServiceDateAndTimeUpdate()" ><bean:message key="global.cancel" bundle="ui"/></button>
 				<button class="btn btn-xs btn-success" ng-click="updateServiceDateAndTime()" ><bean:message key="tickler.view.date.set" bundle="ui"/></button>--%>
-				<juno-datepicker-popup  juno-model="ticklerViewCtrl.serviceDateInput" show-icon="true"> </juno-datepicker-popup>
+				<juno-datepicker-popup  juno-model="ticklerViewCtrl.serviceDateInput" show-icon="true" type="Input"> </juno-datepicker-popup>
 
 			</div>
 
