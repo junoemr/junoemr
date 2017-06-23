@@ -266,8 +266,8 @@
 
 					<div class="form-group col-xs-6">
 						<label class="control-label"><bean:message key="oscarEncounter.Index.btnPosition" /></label>
-						<select class="form-control" id="position" ng-model="groupNotesForm.encounterNote.position" >
-							<option ng-value="i" ng-repeat="i in availablePositions" >{{i}}</option>
+						<select class="form-control" id="position" ng-model="groupNotesCtrl.groupNotesForm.encounterNote.position" >
+							<option ng-value="i" ng-repeat="i in groupNotesCtrl.availablePositions" >{{i}}</option>
 						</select>	
 					</div> <!-- row -->
 
