@@ -158,6 +158,17 @@
 				</div>
 			</div>
 			<div class="row">
+				<div class="col-sm-12">
+					<p>Encounter Date:
+						<span>
+							<juno-datepicker-popup juno-model="recordCtrl.page.encounterNote.observationDate" type="Link"
+								ng-model="recordCtrl.page.encounterNote.observationDate">
+							</juno-datepicker-popup>
+						<span>
+					</p>
+				</div>
+			</div>
+			<div class="row">
 				<div class="col-xs-4">
 					<input type="text" ng-model="recordCtrl.options.magicVal" placeholder="Template" 
 					uib-typeahead="t.encounterTemplateName as t.encounterTemplateName for t in recordCtrl.searchTemplates($viewValue)" 
