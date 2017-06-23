@@ -167,6 +167,14 @@
 				<div class="col-xs-4 " >
 					<input type="text" class="form-control" placeholder="Search" data-ng-disabled="true">
 				</div>
+				<div class="col-xs-4">
+					<input type="text" class="form-control" placeholder="Assign Issue"  
+						uib-typeahead="i.issueId as i.code for i in recordCtrl.searchIssues($viewValue)" 
+						typeahead-on-select="recordCtrl.assignIssue($item, $model, $label);selectedIssue='';" 
+						ng-model="selectedIssue" 
+						typeahead-loading="loadingIssues"
+						typeahead-min-length="3" typeahead-append-to-body="true"/>
+				</div>
 			</div>
 			<div class="row">
 				<div class="col-sm-12">
@@ -194,17 +202,14 @@
 			</div>
 			<div class="row" id="note-editor-footer">
 				<div class="col-sm-12">
-					<div class="pull-left">
-						<input type="text" class="form-control" placeholder="Assign Issue"  
-							uib-typeahead="i.issueId as i.code for i in recordCtrl.searchIssues($viewValue)" 
-							typeahead-on-select="recordCtrl.assignIssue($item, $model, $label);selectedIssue='';" 
-							ng-model="selectedIssue" 
-							typeahead-loading="loadingIssues"
-							typeahead-min-length="3" typeahead-append-to-body="true"/>
-					</div>
+					
 					<input type="hidden" id="startTag" value="<bean:message key="oscarEncounter.Index.startTime"/>">
 					<input type="hidden" id="endTag" value="<bean:message key="oscarEncounter.Index.endTime"/>">
-					
+					<div class="pull-left">
+						<button class="btn btn-danger" ng-click="recordCtrl.cancelNoteEdit()"> 
+							Cancel
+						</button>
+					</div>
 					<div class="btn-group btn-group-md pull-right">
 						<button type="button" class="btn btn-default" ng-click="recordCtrl.pasteTimer()" id="aTimer" title="<bean:message key="oscarEncounter.Index.pasteTimer"/>">
 							00:00
@@ -212,7 +217,11 @@
 						<button type="button" class="btn btn-default" ng-click="recordCtrl.toggleTimer()" title="<bean:message key="oscarEncounter.Index.toggleTimer"/>">
 							<span class="fa fa-pause"  id="aToggle"></span>
 						</button>
-						<button type="button" class="btn btn-success" ng-click="recordCtrl.saveNote()" id="saveButton" data-ng-disabled="recordCtrl.page.encounterNote.isSigned" title="<bean:message key="oscarEncounter.Index.btnSave"/>">
+						<button type="button" class="btn btn-success" 
+							ng-click="recordCtrl.saveNote()" 
+							id="saveButton" 
+							data-ng-disabled="recordCtrl.page.encounterNote.isSigned || recordCtrl.page.encounterNote.isSaved" 
+							title="<bean:message key="oscarEncounter.Index.btnSave"/>">
 							<span class="fa fa-save"  id="theSave"></span>
 						</button>
 						<button type="button" class="btn btn-success" ng-click="recordCtrl.saveSignNote()" title="<bean:message key="oscarEncounter.Index.btnSignSave"/>">
