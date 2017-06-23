@@ -59,7 +59,10 @@ angular.module('Common.Directives').directive('junoDatepickerPopup', [
 		return {
 			restrict: 'E',
 			scope: scope,
-			templateUrl: 'common/directives/datepickerPopup.jsp',
+			templateUrl: function(elem, attribute)
+			{
+				return 'common/directives/datepickerPopup' + attribute.type + '.jsp';
+			},
 			replace: true,
 			link: linkFunction
 		};
