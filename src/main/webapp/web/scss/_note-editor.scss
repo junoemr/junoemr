@@ -1,6 +1,6 @@
 #note-editor-container {
 	display: flex;
-	justify-content: center; // height: 20vh; // Figure out why JqueryUI resizable breaks without this height attribute
+	justify-content: center;
 	#note-editor,
 	#note-editor-minimized {
 		position: fixed;
@@ -24,6 +24,7 @@
 		/* pre-emptively set the left edge due to a weird jqueryui bug 
 		in which the left edge is not set if the user resizes the element from the right before doing any other resizing actions*/
 		left: 30%;
+		padding-bottom: 40px; // Temporary padding, TO BE FIXED: Figure out why note-editor moves down on resize event
 		#note-editor-header {
 			color: $primary-white-text;
 			background-color: $secondary-blue;
