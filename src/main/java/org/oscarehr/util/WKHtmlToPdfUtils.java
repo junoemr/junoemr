@@ -40,6 +40,7 @@ public class WKHtmlToPdfUtils {
 	private static final int MAX_NO_CHANGE_COUNT = 40000 / PROCESS_COMPLETION_CYCLE_CHECK_PERIOD;
 	private static final String CONVERT_COMMAND;
 	private static final String CONVERT_ARGS;
+	private static final String CONVERT_ARGS_LABEL;
 	static {
 		String convertCommand = OscarProperties.getInstance().getProperty("WKHTMLTOPDF_COMMAND");
 		if (convertCommand != null) CONVERT_COMMAND = convertCommand;
@@ -48,6 +49,10 @@ public class WKHtmlToPdfUtils {
 		String convertParameters = OscarProperties.getInstance().getProperty("WKHTMLTOPDF_ARGS");
 		if (convertParameters != null) CONVERT_ARGS = convertParameters;
 		else CONVERT_ARGS = null;
+		
+		String convertParametersLabel = OscarProperties.getInstance().getProperty("WKHTMLTOPDF_ARGS_LABEL");
+		if (convertParametersLabel != null) CONVERT_ARGS_LABEL = convertParametersLabel;
+		else CONVERT_ARGS_LABEL= null;
 	}
 
 	private WKHtmlToPdfUtils() {
@@ -93,6 +98,27 @@ public class WKHtmlToPdfUtils {
 		command.add(CONVERT_COMMAND);
 		if (CONVERT_ARGS != null) {
 			for(String arg : CONVERT_ARGS.split("\\s"))
+				command.add(arg);
+		}
+		command.add(sourceUrl);
+		command.add(outputFilename);
+
+		logger.info(command);
+		runtimeExec(command, outputFilename);
+	}
+	/**
+	 * This method should convert the html page at the sourceUrl into a pdf (of label size) written to the outputFile. This method requires wkhtmltopdf to be installed on the machine. In general the outputFile should be a unique temp file. If you're not sure what you're
+	 * doing don't call this method as you will leave lingering data everywhere or you may overwrite important files...
+	 * @throws Exception 
+	 */
+	public static void convertToPdfLabel(String sourceUrl, File outputFile) throws IOException {
+		String outputFilename = outputFile.getCanonicalPath();
+
+		// example command : wkhtmltopdf-i386 "https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&parentAjaxId=eforms" /tmp/out.pdf
+		ArrayList<String> command = new ArrayList<String>();
+		command.add(CONVERT_COMMAND);
+		if (CONVERT_ARGS_LABEL != null) {
+			for(String arg : CONVERT_ARGS_LABEL.split("\\s"))
 				command.add(arg);
 		}
 		command.add(sourceUrl);
