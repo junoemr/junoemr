@@ -27,21 +27,22 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		// Watches
 		//=========================================================================
 
-		$scope.$watch('demographicSearch',
-			function(new_value)
-			{
-				console.log('watching demographicSearch: ', new_value);
+		// $scope.$watch('controller.demographicSearch',
 
-				if (Juno.Common.Util.exists(new_value))
-				{
-					controller.updateDemographicNo(new_value.demographicNo);
-				}
-				else
-				{
-					// no selection
-					controller.updateDemographicNo(null);
-				}
-			}, true);
+		// 	function(new_value)
+		// 	{
+		// 		console.log('watching demographicSearch: ', new_value);
+
+		// 		if (Juno.Common.Util.exists(new_value))
+		// 		{
+		// 			controller.updateDemographicNo(new_value);
+		// 		}
+		// 		else
+		// 		{
+		// 			// no selection
+		// 			controller.updateDemographicNo(null);
+		// 		}
+		// 	}, true);
 
 		controller.tickler = {
 			template:
@@ -55,6 +56,26 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 		};
 
 		controller.priorities = ['Low', 'Normal', 'High'];
+
+		// initialization
+		controller.init = function init()
+		{
+			if (Juno.Common.Util.exists($stateParams.demographicNo))
+			{
+				console.log('initializing demographicSearch pre-selected', $stateParams.demographicNo);
+				demographicService.getDemographic($stateParams.demographicNo).then(function(data)
+				{
+					controller.demographicSearch = {
+						demographicNo: data.demographicNo,
+						firstName: data.firstName,
+						lastName: data.lastName,
+						name: data.lastName + "," + data.firstName // For display purposes
+					};
+					controller.updateDemographicNo(data);
+				});
+			}
+
+		};
 
 		ticklerService.getTextSuggestions().then(function(data)
 		{
@@ -107,7 +128,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			}
 
 			var t = {};
-			t.demographicNo = controller.tickler.demographicNo;
+			t.demographicNo = controller.tickler.demographic.demographicNo;
 			t.taskAssignedTo = controller.tickler.taskAssignedTo;
 			t.priority = controller.tickler.priority;
 			t.status = 'A';
@@ -120,7 +141,6 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			givenDate.setMinutes(givenTime.getMinutes());
 
 			t.serviceDate = givenDate;
-
 			ticklerService.add(t).then(function(data)
 			{
 				$uibModalInstance.close(true);
@@ -132,11 +152,11 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 
 		};
 
-		controller.updateDemographicNo = function(demographicNo)
+		controller.updateDemographicNo = function updateDemographicNo(demo)
 		{
-			if (Juno.Common.Util.exists(demographicNo))
+			if (Juno.Common.Util.exists(demo))
 			{
-				demographicService.getDemographic(demographicNo).then(function(data)
+				demographicService.getDemographic(demo.demographicNo).then(function(data)
 				{
 					// update the selected value on the tickler object
 					controller.tickler.demographic = data;
@@ -149,19 +169,34 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			}
 		};
 
-		// initialization
-		if (Juno.Common.Util.exists($stateParams.demographicNo))
+		controller.searchPatients = function searchPatients(term)
 		{
-			console.log('initializing demographicSearch pre-selected', $stateParams.demographicNo);
-			demographicService.getDemographic($stateParams.demographicNo).then(function(data)
-			{
-				controller.demographicSearch = {
-					demographicNo: $stateParams.demographicNo,
-					firstName: data.firstName,
-					lastName: data.lastName
-				};
-			});
-		}
+			var search = {
+				type: 'Name',
+				'term': term,
+				active: true,
+				integrator: false,
+				outofdomain: true
+			};
+			return demographicService.search(search, 0, 25).then(
+				function(results)
+				{
+					var resp = [];
+					for (var x = 0; x < results.content.length; x++)
+					{
+						resp.push(
+						{
+							demographicNo: results.content[x].demographicNo,
+							name: results.content[x].lastName + ',' + results.content[x].firstName
+						});
+					}
+					return resp;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
+		};
 
 		controller.searchProviders = function(val)
 		{
