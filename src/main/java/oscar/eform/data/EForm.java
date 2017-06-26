@@ -60,7 +60,7 @@ public class EForm extends EFormBase {
 	private String appointment_no = "-1";
 	private HashMap<String,String> sql_params = new HashMap<String, String>();
 	private String parentAjaxId = null;
-        private String eform_link = null;
+	private String eform_link = null;
 	private HashMap<String, String> fieldValues = new HashMap<String, String>();
 	private int needValueInForm = 0;
 	private boolean setAP2nd = false;
@@ -77,6 +77,7 @@ public class EForm extends EFormBase {
 	private static final String TABLE_ID = "table_id";
 	private static final String OTHER_KEY = "other_key";
 	private static final String OPENER_VALUE = "link$eform";
+	private static final String PRECHECKED = "checked=\"checked\"";
 
 	public EForm() {
 	}
@@ -92,26 +93,26 @@ public class EForm extends EFormBase {
 	}
 
 	public EForm(String fdid) {
-	    if(!StringUtils.isBlank(fdid) && !"null".equalsIgnoreCase(fdid)) {
-		EFormData eFormData = eFormDataDao.find(new Integer(fdid));
-		if (eFormData != null) {
-			this.fdid = fdid;
-			this.fid = eFormData.getFormId().toString();
-			this.providerNo = eFormData.getProviderNo();
-			this.demographicNo = eFormData.getDemographicId().toString();
-			this.formName = eFormData.getFormName();
-			this.formSubject = eFormData.getSubject();
-			this.formDate = eFormData.getFormDate().toString();
-			this.formHtml = eFormData.getFormData();
-			this.showLatestFormOnly = eFormData.isShowLatestFormOnly();
-			this.patientIndependent = eFormData.isPatientIndependent();
-			this.roleType = eFormData.getRoleType();
-		} 
-	    } else {
-		this.formName = "";
-		this.formSubject = "";
-		this.formHtml = "No Such Form in Database";
-            }
+		if(!StringUtils.isBlank(fdid) && !"null".equalsIgnoreCase(fdid)) {
+			EFormData eFormData = eFormDataDao.find(new Integer(fdid));
+			if (eFormData != null) {
+				this.fdid = fdid;
+				this.fid = eFormData.getFormId().toString();
+				this.providerNo = eFormData.getProviderNo();
+				this.demographicNo = eFormData.getDemographicId().toString();
+				this.formName = eFormData.getFormName();
+				this.formSubject = eFormData.getSubject();
+				this.formDate = eFormData.getFormDate().toString();
+				this.formHtml = eFormData.getFormData();
+				this.showLatestFormOnly = eFormData.isShowLatestFormOnly();
+				this.patientIndependent = eFormData.isPatientIndependent();
+				this.roleType = eFormData.getRoleType();
+			}
+		} else {
+			this.formName = "";
+			this.formSubject = "";
+			this.formHtml = "No Such Form in Database";
+		}
 	}
 
 	public void loadEForm(String fid, String demographicNo) {
@@ -130,10 +131,10 @@ public class EForm extends EFormBase {
 	}
 
 	public String getAppointmentNo() {
-            return this.appointment_no;
+		return this.appointment_no;
 	}
 	public void setAppointmentNo(String appt_no) {
-            this.appointment_no = StringUtils.isBlank(appt_no) ? "-1" : appt_no;
+		this.appointment_no = StringUtils.isBlank(appt_no) ? "-1" : appt_no;
 	}
 	
 	public void setLoggedInProvider( String providerNo ) {
@@ -141,10 +142,10 @@ public class EForm extends EFormBase {
 	}
 
 	public String getEformLink() {
-            return this.eform_link;
+		return this.eform_link;
 	}
 	public void setEformLink(String el) {
-            this.eform_link = el;
+		this.eform_link = el;
 	}
 
 	public void setAction(String pAjaxId) {
@@ -199,21 +200,37 @@ public class EForm extends EFormBase {
 	}
 
 	// ------------------Saving the Form (inserting value= statements)---------------------
-	public void setValues(ArrayList<String> names, ArrayList<String> values) {
-            if (names.size() != values.size()) return;
-            StringBuilder html = new StringBuilder(this.formHtml);
-            int pointer = -1;
-            while ((pointer = getFieldIndex(html, pointer+1)) >= 0) {
-                String fieldHeader = getFieldHeader(html, pointer);
-                String fieldName = EFormUtil.removeQuotes(EFormUtil.getAttribute("name", fieldHeader));
-                int i;
-                if ((i = names.indexOf(fieldName)) < 0) continue;
+	public void setValues(ArrayList<String> names, ArrayList<String> values, ArrayList<String> allNames, ArrayList<String> allValues) {
+		if (names.size() != values.size()) return;
+		StringBuilder html = new StringBuilder(this.formHtml);
+		int pointer = -1;
+		// Iterates through every relevant html tag in 'this.formHtml'
+		while ((pointer = getFieldIndex(html, pointer+1)) >= 0) {
+			String fieldHeader = getFieldHeader(html, pointer);
+			// fieldName is set to the 'name' attribute of the current html tag the while loop is on
+			String fieldName = EFormUtil.removeQuotes(EFormUtil.getAttribute("name", fieldHeader));
+			String fieldType = getFieldType(fieldHeader);
+			String val;
 
-                String val = values.get(i);
-                pointer = nextSpot(html, pointer);
-                html = putValue(val, getFieldType(fieldHeader), pointer, html);
-            }
-            this.formHtml = html.toString();
+			// allNames is an array of all the values submitted from the form
+			int i = allNames.indexOf(fieldName);
+			// If the current fieldName isn't in allNames, it wasn't submitted in the form.
+			if(i < 0) {
+				// If this fieldName doesn't contain checked="checked", it's not a prechecked checkbox
+				if( !fieldHeader.contains(PRECHECKED)) {
+					continue; // Continue to next iteration of while loop
+				} else {
+					// putValue method needs to know if the current fieldHeader is prechecked or not
+					val = "prechecked";
+				}
+			} else {
+				val = allValues.get(i);
+			}
+
+			pointer = nextSpot(html, pointer);
+			html = putValue(val, fieldType, pointer, html);
+		}
+		this.formHtml = html.toString();
 	}
 
 	// ------------------Saving the Form (inserting fdid$value= statements)---------------------
@@ -221,29 +238,29 @@ public class EForm extends EFormBase {
 		StringBuilder html = new StringBuilder(this.formHtml);
 		EFormLoader.getInstance();
 		String opener = EFormLoader.getOpener(); // default: opener: "oscarOPEN="
-                int markerLoc = -1;
-                while ((markerLoc = getFieldIndex(html, markerLoc + 1)) >= 0) {
-                        String fieldHeader = getFieldHeader(html, markerLoc);
-                        if (StringUtils.isBlank(EFormUtil.getAttribute(opener, fieldHeader))) continue;
+		int markerLoc = -1;
+		while ((markerLoc = getFieldIndex(html, markerLoc + 1)) >= 0) {
+			String fieldHeader = getFieldHeader(html, markerLoc);
+			if (StringUtils.isBlank(EFormUtil.getAttribute(opener, fieldHeader))) continue;
 
-                        String fieldName = EFormUtil.removeQuotes(EFormUtil.getAttribute("name", fieldHeader));
-                        int i;
-                        if (StringUtils.isBlank(fieldName)) continue;
+			String fieldName = EFormUtil.removeQuotes(EFormUtil.getAttribute("name", fieldHeader));
+			int i;
+			if (StringUtils.isBlank(fieldName)) continue;
 			if ((i = names.indexOf(fieldName)) < 0) continue;
-                        if (StringUtils.isBlank(values.get(i))) continue;
+			if (StringUtils.isBlank(values.get(i))) continue;
 
-                        // sets up the pointer where to write the value
-                        int pointer = nextSpot(html, markerLoc+EFormUtil.getAttributePos(opener,fieldHeader));
-                        int offset = EFormUtil.getAttributePos(OPENER_VALUE, fieldHeader);
-                        if (offset>=0) {
-                            //delete current OPENER_VALUE
-                            pointer = markerLoc+offset;
-                            int valueEnd = nextSpot(html, pointer);
-                            html.delete(pointer-1, valueEnd);
-                        }
-                        html = putValue(values.get(i), OPENER_VALUE, pointer, html);
-                }
-                formHtml = html.toString();
+			// sets up the pointer where to write the value
+			int pointer = nextSpot(html, markerLoc+EFormUtil.getAttributePos(opener,fieldHeader));
+			int offset = EFormUtil.getAttributePos(OPENER_VALUE, fieldHeader);
+			if (offset>=0) {
+				//delete current OPENER_VALUE
+				pointer = markerLoc+offset;
+				int valueEnd = nextSpot(html, pointer);
+				html.delete(pointer-1, valueEnd);
+			}
+			html = putValue(values.get(i), OPENER_VALUE, pointer, html);
+		}
+		formHtml = html.toString();
 	}
 
 	// --------------------------Setting APs utilities----------------------------------------
@@ -278,7 +295,7 @@ public class EForm extends EFormBase {
 				}
 				EFormLoader.getInstance();
 				DatabaseAP curAP = EFormLoader.getAP(apName);
-				
+
 				if (curAP == null) curAP = getAPExtra(apName, fieldHeader);
 				if (curAP == null) continue;
 				if (!setAP2nd) { // 1st run
@@ -394,7 +411,7 @@ public class EForm extends EFormBase {
 					"<input type='hidden' id='_oscarfid' name='_oscarfid' value='" + this.fid + "' />");
 
 			this.formHtml = html.insert(scriptEndLoc, "<script type='text/javascript' src='../share/javascript/jquery/jquery-1.4.2.js'></script>" +
-			"<script type='text/javascript' src='../js/eform_highlight.js'></script>").toString();
+					"<script type='text/javascript' src='../js/eform_highlight.js'></script>").toString();
 		}
 	}
 
@@ -403,34 +420,34 @@ public class EForm extends EFormBase {
 		StringBuilder html = new StringBuilder(this.formHtml);
 		EFormLoader.getInstance();
 		String opener = EFormLoader.getOpener(); // default: opener: "oscarOPEN="
-                int markerLoc = -1;
-                while ((markerLoc = getFieldIndex(html, markerLoc + 1)) >= 0) {
-                        log.debug("=============START OPENER CYCLE===========");
-                        String fieldHeader = getFieldHeader(html, markerLoc);
-                        String efmName = EFormUtil.getAttribute(opener, fieldHeader); // gets eform name from oscarOPEN=rname
-                        if (StringUtils.isBlank(efmName)) continue;
+		int markerLoc = -1;
+		while ((markerLoc = getFieldIndex(html, markerLoc + 1)) >= 0) {
+			log.debug("=============START OPENER CYCLE===========");
+			String fieldHeader = getFieldHeader(html, markerLoc);
+			String efmName = EFormUtil.getAttribute(opener, fieldHeader); // gets eform name from oscarOPEN=rname
+			if (StringUtils.isBlank(efmName)) continue;
 
-                        String fieldName = EFormUtil.removeQuotes(EFormUtil.getAttribute("name", fieldHeader));
-                        if (StringUtils.isBlank(fieldName)) continue;
+			String fieldName = EFormUtil.removeQuotes(EFormUtil.getAttribute("name", fieldHeader));
+			if (StringUtils.isBlank(fieldName)) continue;
 
-                        log.debug("OPEN ==== " + efmName);
-                        // sets up the pointer where to write the value
-                        String fdid = EFormUtil.removeQuotes(EFormUtil.getAttribute(OPENER_VALUE, fieldHeader));
-                        EFormLoader.getInstance();
-						String onclick = EFormLoader.getOpenEform(requestURI, fdid, EFormUtil.removeQuotes(efmName), fieldName, this);
-                        int pointer = EFormUtil.getAttributePos("onclick", fieldHeader);
-                        String type = pointer<0 ? "onclick" : "onclick_append";
-                        if (pointer<0) {
-                            pointer = nextSpot(html, markerLoc+EFormUtil.getAttributePos(opener,fieldHeader));
-                        } else {
-                            pointer = nextSpot(html, markerLoc+pointer);
-                        }
-                        html = putValue(onclick, type, pointer, html);
+			log.debug("OPEN ==== " + efmName);
+			// sets up the pointer where to write the value
+			String fdid = EFormUtil.removeQuotes(EFormUtil.getAttribute(OPENER_VALUE, fieldHeader));
+			EFormLoader.getInstance();
+			String onclick = EFormLoader.getOpenEform(requestURI, fdid, EFormUtil.removeQuotes(efmName), fieldName, this);
+			int pointer = EFormUtil.getAttributePos("onclick", fieldHeader);
+			String type = pointer<0 ? "onclick" : "onclick_append";
+			if (pointer<0) {
+				pointer = nextSpot(html, markerLoc+EFormUtil.getAttributePos(opener,fieldHeader));
+			} else {
+				pointer = nextSpot(html, markerLoc+pointer);
+			}
+			html = putValue(onclick, type, pointer, html);
 
-                        log.debug("Opener ==== " + markerLoc);
-                        log.debug("=================End Opener Cycle==============");
-                }
-                formHtml = html.toString();
+			log.debug("Opener ==== " + markerLoc);
+			log.debug("=================End Opener Cycle==============");
+		}
+		formHtml = html.toString();
 	}
 
 	public void setNowDateTime() {
@@ -448,30 +465,30 @@ public class EForm extends EFormBase {
 		String oscarJS = contextPath + "/share/javascript/";
 		this.formHtml = this.formHtml.replace(jsMarker, oscarJS);
 	}
-	
+
 	public void setSource(String source) {
 		if (StringUtils.isBlank(source)) source="";
 
 		this.formHtml = this.formHtml.replace(sourceMarker, source);
 	}
-	
 
-        public ArrayList<String> getOpenerNames() {
-            ArrayList<String> openerNames = new ArrayList<String>();
-            EFormLoader.getInstance();
-			String opener = EFormLoader.getOpener(); // default: opener: "oscarOPEN="
-            StringBuilder html = new StringBuilder(this.formHtml);
-            int markerLoc = -1;
-            while ((markerLoc = getFieldIndex(html, markerLoc + 1)) >= 0) {
-                String fieldHeader = getFieldHeader(html, markerLoc);
-                String efmName = EFormUtil.getAttribute(opener, fieldHeader); // gets eform name from oscarOPEN=rname
-                if (StringUtils.isBlank(efmName)) continue;
 
-                String fieldName = EFormUtil.removeQuotes(EFormUtil.getAttribute("name", fieldHeader));
-                if (!StringUtils.isBlank(fieldName)) openerNames.add(fieldName);
-            }
-            return openerNames;
-        }
+	public ArrayList<String> getOpenerNames() {
+		ArrayList<String> openerNames = new ArrayList<String>();
+		EFormLoader.getInstance();
+		String opener = EFormLoader.getOpener(); // default: opener: "oscarOPEN="
+		StringBuilder html = new StringBuilder(this.formHtml);
+		int markerLoc = -1;
+		while ((markerLoc = getFieldIndex(html, markerLoc + 1)) >= 0) {
+			String fieldHeader = getFieldHeader(html, markerLoc);
+			String efmName = EFormUtil.getAttribute(opener, fieldHeader); // gets eform name from oscarOPEN=rname
+			if (StringUtils.isBlank(efmName)) continue;
+
+			String fieldName = EFormUtil.removeQuotes(EFormUtil.getAttribute("name", fieldHeader));
+			if (!StringUtils.isBlank(fieldName)) openerNames.add(fieldName);
+		}
+		return openerNames;
+	}
 
 	public String getTemplate() {
 		// Get content between "<!-- <template>" & "</template> -->"
@@ -500,11 +517,11 @@ public class EForm extends EFormBase {
 
 	// ----------------------------------private -----------------------------------------
 	private DatabaseAP getAPExtra(String apName, String fieldHeader) {
-	// --------------------------Process extra attributes for APs --------------------------------
+		// --------------------------Process extra attributes for APs --------------------------------
 		Pattern p = Pattern.compile("\\b[a-z]\\$[^ \\$#]+#[^\n]+");
 		Matcher m = p.matcher(apName);
 		if (!m.matches()) return null;
-		
+
 		String module = apName.substring(0, apName.indexOf("$"));
 		String type = apName.substring(apName.indexOf("$") + 1, apName.indexOf("#"));
 		String field = apName.substring(apName.indexOf("#") + 1, apName.length());
@@ -522,10 +539,10 @@ public class EForm extends EFormBase {
 			String eform_name = EFormUtil.removeQuotes(EFormUtil.getAttribute("eform$name", fieldHeader));
 			String var_value = EFormUtil.removeQuotes(EFormUtil.getAttribute("var$value", fieldHeader));
 			String ref = EFormUtil.removeQuotes(EFormUtil.getAttribute("ref$", fieldHeader, true));
-			
+
 			String eform_demographic = this.demographicNo;
 			if (this.patientIndependent) eform_demographic = "%";
-			
+
 			String ref_name = null, ref_value = null, ref_fid = fid;
 			if (!StringUtils.isBlank(ref) && ref.contains("=")) {
 				ref_name = ref.substring(4, ref.indexOf("="));
@@ -544,7 +561,7 @@ public class EForm extends EFormBase {
 					return null;
 				}
 			}
-			
+
 			if (type.equalsIgnoreCase("count") && var_value == null) {
 				type = "countname";
 			}
@@ -555,10 +572,10 @@ public class EForm extends EFormBase {
 				type += "_ref";
 				if (ref_value == null) type += "name";
 			}
-			
+
 			EFormLoader.getInstance();
 			curAP = EFormLoader.getAP("_eform_values_" + type);
-			
+
 			if (curAP != null) {
 				setSqlParams(EFORM_DEMOGRAPHIC, eform_demographic);
 				setSqlParams(VAR_NAME, field);
@@ -589,25 +606,30 @@ public class EForm extends EFormBase {
 
 	private StringBuilder putValue(String value, String type, int pointer, StringBuilder html) {
 		// inserts value= into tag or textarea
-                if (type.equals("onclick") || type.equals("onclick_append")) {
-                        if (type.equals("onclick_append")) {
-                            if (html.charAt(pointer-1)=='"') pointer -= 1;
-                            if (html.charAt(pointer-1)!=';') value = ";"+value;
-                        } else {
-                            value = "onclick=\"" + value + "\"";
-                        }
+		if (type.equals("onclick") || type.equals("onclick_append")) {
+			if (type.equals("onclick_append")) {
+				if (html.charAt(pointer-1)=='"') pointer -= 1;
+				if (html.charAt(pointer-1)!=';') value = ";"+value;
+			} else {
+				value = "onclick=\"" + value + "\"";
+			}
 			html.insert(pointer, " " + value);
-                } else if (type.equals(OPENER_VALUE)) {
+		} else if (type.equals(OPENER_VALUE)) {
 			html.insert(pointer, " "+OPENER_VALUE+"=\""+value+"\"");
 		} else if (type.equals("text") || type.equals("hidden")) {
 			html.insert(pointer, " value=\""+value+"\"");
-                } else if(type.equals("textarea")) {
+		} else if(type.equals("textarea")) {
 			pointer = html.indexOf(">", pointer) + 1;
 			int endPointer = html.indexOf("<", pointer);
 			html.delete(pointer, endPointer);
 			html.insert(pointer, value);
 		} else if (type.equals("checkbox")) {
-			html.insert(pointer, " checked");
+			if( value.equals("prechecked") ) {
+				pointer = html.indexOf(PRECHECKED, pointer);
+				html.delete(pointer, pointer + PRECHECKED.length());
+			} else {
+				html.insert(pointer, " checked");
+			}
 		} else if (type.equals("select")) {
 			int endindex = StringBuilderUtils.indexOfIgnoreCase(html, "</select>", pointer);
 			if (endindex < 0) return html; // if closing tag not found
@@ -634,10 +656,10 @@ public class EForm extends EFormBase {
 	}
 
 	private int nextIndex(StringBuilder text, String option1, String option2, int pointer) {
-                // converts text content to lowercase
-                text = new StringBuilder(text.toString().toLowerCase());
-                option1 = option1.toLowerCase();
-                option2 = option2.toLowerCase();
+		// converts text content to lowercase
+		text = new StringBuilder(text.toString().toLowerCase());
+		option1 = option1.toLowerCase();
+		option2 = option2.toLowerCase();
 
 		// returns the index of option1 or option2 whichever one is closer and exists
 		int index;
@@ -650,13 +672,13 @@ public class EForm extends EFormBase {
 	}
 
 	private int nextSpot(StringBuilder text, int pointer) {
-            //nextSport: \n, \r, >, ' '
+		//nextSport: \n, \r, >, ' '
 		int end = nextIndex(text, "\n", "\r", pointer);
 		if (end < 0) end = text.length();
 		int index = text.substring(pointer, end).indexOf('=');
 		if (index >= 0) {
 			index = pointer + index;
-                    //deal with cases of quoted values with spaces ("xx xx" / 'xx xx')
+			//deal with cases of quoted values with spaces ("xx xx" / 'xx xx')
 			if (text.charAt(index + 1) == '"') {
 				int close = text.substring(index + 2, end).indexOf("\"") + (index + 2);
 				if (close > 0) return close + 1;
@@ -670,19 +692,19 @@ public class EForm extends EFormBase {
 		return nextIndex(text, " ", ">", pointer);
 	}
 
-        private String getFieldType(String fieldHeader) {
-            if (fieldHeader.substring(1, 9).equalsIgnoreCase("textarea")) return "textarea";
-            if (fieldHeader.substring(1, 7).equalsIgnoreCase("select")) return "select";
+	private String getFieldType(String fieldHeader) {
+		if (fieldHeader.substring(1, 9).equalsIgnoreCase("textarea")) return "textarea";
+		if (fieldHeader.substring(1, 7).equalsIgnoreCase("select")) return "select";
 
-			String type = EFormUtil.removeQuotes(EFormUtil.getAttribute("type", fieldHeader));
+		String type = EFormUtil.removeQuotes(EFormUtil.getAttribute("type", fieldHeader));
 
-			if(null == type) {
-				// Browsers should default to text if type is missing
-				type = "text";
-			}
+		if(null == type) {
+			// Browsers should default to text if type is missing
+			type = "text";
+		}
 
-            return type;
-        }
+		return type;
+	}
 /*
 	private String getFieldType(StringBuilder html, int pointer) {
 		// pointer can be any place in the tag - isolates tag and sends back field type
@@ -717,7 +739,7 @@ public class EForm extends EFormBase {
  */
 
 	private StringBuilder putValuesFromAP(DatabaseAP ap, String type, int pointer, StringBuilder html) {
-                //prepare all sql & output
+		//prepare all sql & output
 		String sql = ap.getApSQL();
 		String output = ap.getApOutput();
 		if (!StringUtils.isBlank(sql)) {
@@ -725,7 +747,7 @@ public class EForm extends EFormBase {
 			log.debug("SQL----" + sql);
 			ArrayList<String> names = DatabaseAP.parserGetNames(output); // a list of ${apName} --> apName
 			sql = DatabaseAP.parserClean(sql); // replaces all other ${apName} expressions with 'apName'
-			
+
 			if (ap.isJsonOutput()) {
 				JSONArray values = EFormUtil.getJsonValues(names, sql);
 				output = values.toString(); //in case of JsonOutput, return the whole JSONArray and let the javascript deal with it
@@ -741,7 +763,7 @@ public class EForm extends EFormBase {
 				}
 			}
 		}
-                //put values into according controls
+		//put values into according controls
 		if (type.equals("textarea")) {
 			pointer = html.indexOf(">", pointer) + 1;
 			html.insert(pointer, output);
@@ -780,8 +802,8 @@ public class EForm extends EFormBase {
 
 	private String getSqlParams(String key) {
 		if (sql_params.containsKey(key)) {
-		    String val =  sql_params.get(key);
-		    return val==null ? "" : StringEscapeUtils.escapeSql(val);
+			String val =  sql_params.get(key);
+			return val==null ? "" : StringEscapeUtils.escapeSql(val);
 		}
 		return "";
 	}
@@ -875,7 +897,7 @@ public class EForm extends EFormBase {
 	}
 
 	private String getFieldHeader(StringBuilder html, int fieldIndex) {
-            //fieldHeader: <input name=... type=... ... >, <select name=... ...>, etc.
+		//fieldHeader: <input name=... type=... ... >, <select name=... ...>, etc.
 		if (html == null || fieldIndex < 0) return "";
 		if (html.charAt(fieldIndex) != '<') return ""; // field header must be "<...>"
 
@@ -893,7 +915,7 @@ public class EForm extends EFormBase {
 		}
 		return html.substring(fieldIndex, end);
 	}
-	
+
 	private StringBuilder replaceFieldValueFromAP(DatabaseAP ap, String type, int pointer, StringBuilder html) {
 		// prepare all sql & output
 		String sql = ap.getApSQL();
@@ -915,7 +937,7 @@ public class EForm extends EFormBase {
 					output = DatabaseAP.parserReplace(names.get(i), values.get(i), output);
 				}
 			}
-			 //put values into according controls
+			//put values into according controls
 
 			if (type.equals("textarea")) {
 				pointer = html.indexOf(">", pointer) + 1;
@@ -934,17 +956,17 @@ public class EForm extends EFormBase {
 			}
 			else {
 				int end_value, start_value;
-                start_value = html.indexOf("value=\"", pointer);
-                end_tag = html.indexOf(">", pointer);
-                String quote = output.contains("\"") ? "'" : "\"";
+				start_value = html.indexOf("value=\"", pointer);
+				end_tag = html.indexOf(">", pointer);
+				String quote = output.contains("\"") ? "'" : "\"";
 
-                if(start_value > 0 && start_value < end_tag) {
-                        end_value = html.indexOf("\"", start_value + 7 ) + 1;
-                        log.debug(start_value);
-                        log.debug(end_tag);
-                        log.debug(end_value);
-                        html.replace(start_value, end_value, "value="+quote+output+quote);
-                }
+				if(start_value > 0 && start_value < end_tag) {
+					end_value = html.indexOf("\"", start_value + 7 ) + 1;
+					log.debug(start_value);
+					log.debug(end_tag);
+					log.debug(end_value);
+					html.replace(start_value, end_value, "value="+quote+output+quote);
+				}
 				else {
 					start_value = html.indexOf(">", pointer);
 					html.insert(start_value, " value=" + quote + output + quote);
@@ -999,7 +1021,7 @@ public class EForm extends EFormBase {
 		if (StringUtils.isBlank(refFid)) refFid = fid;
 		return refFid;
 	}
-	
+
 	public void setSignatureCode(String contextPath, String userAgent, String demographicNo, String providerId) {
 		String signatureRequestId = DigitalSignatureUtils.generateSignatureRequestId(providerId);
 		String imageUrl = contextPath+"/imageRenderingServlet?source="+ImageRenderingServlet.Source.signature_preview.name()+"&"+DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
@@ -1019,16 +1041,16 @@ public class EForm extends EFormBase {
 			}
 
 			String signatureCode = "<script type='text/javascript' src='${oscar_javascript_path}../jquery/jquery-1.4.2.js'></script>" +
-			"<script type='text/javascript' src='${oscar_javascript_path}signature.js'></script>" +
-			"<script type='text/javascript'>\n" +
-			"var _signatureRequestId = '" + signatureRequestId + "';\n" + 
-			"var _imageUrl = '" + imageUrl + "';\n" +
-			"var _storedImgUrl = '" + storedImgUrl + "';\n" +
-			"var _contextPath = '" + contextPath + "';\n" + 
-			"var _digitalSignatureRequestIdKey = '" + DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY + "';\n" +
-			"var _browserType = '" + browserType + "';\n" +
-			"var _demographicNo = '" + demographicNo + "';\n" +
-			"</script>";
+					"<script type='text/javascript' src='${oscar_javascript_path}signature.js'></script>" +
+					"<script type='text/javascript'>\n" +
+					"var _signatureRequestId = '" + signatureRequestId + "';\n" +
+					"var _imageUrl = '" + imageUrl + "';\n" +
+					"var _storedImgUrl = '" + storedImgUrl + "';\n" +
+					"var _contextPath = '" + contextPath + "';\n" +
+					"var _digitalSignatureRequestIdKey = '" + DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY + "';\n" +
+					"var _browserType = '" + browserType + "';\n" +
+					"var _demographicNo = '" + demographicNo + "';\n" +
+					"</script>";
 
 
 			html.replace(signatureLoc, signatureLoc + signatureMarker.length(), signatureCode);
