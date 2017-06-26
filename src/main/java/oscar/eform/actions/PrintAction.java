@@ -43,6 +43,7 @@ public class PrintAction extends Action {
 	private String localUri = null;
 	
 	private boolean skipSave = false;
+	private boolean printLabel = false;
 	
 	private HttpServletResponse response;
 	
@@ -60,10 +61,11 @@ public class PrintAction extends Action {
 		String id  = (String)request.getAttribute("fdid");
 		String providerId = request.getParameter("providerId");
 		skipSave = "true".equals(request.getParameter("skipSave"));
+		printLabel = "true".equalsIgnoreCase(request.getParameter("labelSizing"));
 		try {
 			printForm(id, providerId);
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("",e);
+			MiscUtils.getLogger().error("Error printing eForm",e);
 			return mapping.findForward("error");
 		}
 		return mapping.findForward("success");
@@ -120,9 +122,13 @@ public class PrintAction extends Action {
 
 			// convert to PDF
 			String viewUri = localUri + formId;
-			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
+			if(printLabel) {
+				WKHtmlToPdfUtils.convertToPdfLabel(viewUri, tempFile);
+			}
+			else {
+				WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
+			}
 			logger.info("Writing pdf to : "+tempFile.getCanonicalPath());
-			
 			
 			InputStream is = new BufferedInputStream(new FileInputStream(tempFile));
 			ByteOutputStream bos = new ByteOutputStream();
@@ -164,7 +170,7 @@ public class PrintAction extends Action {
 			}
 		} catch (IOException e) {
 			//logger.error("Error converting and sending eform. id=" + eFormId, e);
-			MiscUtils.getLogger().error("",e);
+			MiscUtils.getLogger().error("Error printing eForm",e);
 		}
 	}
 
