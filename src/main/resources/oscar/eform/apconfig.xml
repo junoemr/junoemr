@@ -145,8 +145,8 @@
 	</databaseap>
 	<databaseap>
 		<ap-name>current_logged_in_user_id</ap-name>
-		<ap-sql>SELECT '${loggedInProvider}' as id </ap-sql>
-		<ap-output>${id}</ap-output>
+		<ap-sql>SELECT '${loggedInProvider}' as loggedInProviderId </ap-sql>
+		<ap-output>${loggedInProviderId}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_user_takno</ap-name>
