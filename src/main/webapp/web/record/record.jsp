@@ -34,7 +34,7 @@
 		</div>
 		<div class="col-xs-8">	
 			<div class="pull-right"> 
-				<p>
+				<h4 class="patient-header-info">
 					<span class="patient-header-label">
 						<bean:message key="demographic.patient.context.born"/>:
 					</span>
@@ -47,7 +47,7 @@
 						<bean:message key="Appointment.msgTelephone"/>:
 					</span>
 					{{recordCtrl.demographic.phone}}
-				</p>
+				</h4>
 				<!-- <span class="glyphicon glyphicon-new-window"></span>-->
 			</div>
 		</div>

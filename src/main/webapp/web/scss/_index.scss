@@ -125,7 +125,10 @@ li.cpp-note-list:last-child {
 		}
 	}
 	#right-pane {
-		margin-top: $margin-lg;
+		margin-top: $margin-sm;
+		.patient-header-info {
+			margin-bottom: -$margin-sm;
+		}
 	}
 	.toggle-patient-list-button {
 		height: 90px;
