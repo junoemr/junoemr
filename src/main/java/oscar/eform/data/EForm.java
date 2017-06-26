@@ -209,7 +209,6 @@ public class EForm extends EFormBase {
 			String fieldHeader = getFieldHeader(html, pointer);
 			// fieldName is set to the 'name' attribute of the current html tag the while loop is on
 			String fieldName = EFormUtil.removeQuotes(EFormUtil.getAttribute("name", fieldHeader));
-			String fieldType = getFieldType(fieldHeader);
 			String val;
 
 			// allNames is an array of all the values submitted from the form
@@ -228,7 +227,7 @@ public class EForm extends EFormBase {
 			}
 
 			pointer = nextSpot(html, pointer);
-			html = putValue(val, fieldType, pointer, html);
+			html = putValue(val, getFieldType(fieldHeader), pointer, html);
 		}
 		this.formHtml = html.toString();
 	}
