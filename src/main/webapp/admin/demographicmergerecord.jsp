@@ -193,11 +193,11 @@ Search:
 <input type="radio" name="search_mode" value="search_address" <%=searchMode.equals("search_address")?"checked":""%>> Address
 <input type="radio" name="search_mode" value="search_hin" <%=searchMode.equals("search_hin")?"checked":""%>> HIN
 
-<input type="text" NAME="keyword" class="span6" MAXLENGTH="100" value="<%=(keyword != null)?keyword:""%>"> 
-			<INPUT TYPE="hidden" NAME="orderby" VALUE="last_name"> 
-			<INPUT TYPE="hidden" NAME="limit1" VALUE="0"> 
-			<INPUT TYPE="hidden" NAME="limit2" VALUE="10"> 
-
+<input type="text" NAME="keyword" class="span6" MAXLENGTH="100" value="<%=(keyword != null)?keyword:""%>">
+<INPUT TYPE="hidden" NAME="orderby" VALUE="last_name">
+<INPUT TYPE="hidden" NAME="limit1" VALUE="0">
+<INPUT TYPE="hidden" NAME="limit2" VALUE="10">
+<input type="hidden" name="dboperation" value="demographic_search_titlename">
 <INPUT class="btn" TYPE="SUBMIT" NAME="button" VALUE="Search"> 
 <input class="btn" type="submit" name="mergebutton" value="Search Merged Records" onclick="searchMerged()">
 </form>
