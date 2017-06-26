@@ -35,7 +35,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		console.log("Params: ", $resource);
 
-		controller.lastResponse = "";
+		controller.lastResponse = ""; // Can be removed?
 		controller.providers = providers;
 
 
@@ -123,9 +123,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			alert(reason);
 		});
 
-
-
-
 		controller.doSearch = function()
 		{
 			controller.tableParams.reload();
@@ -167,8 +164,8 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		controller.completeTicklers = function()
 		{
-			var selectedTicklers = new Array();
-			angular.forEach(controller.lastResponse, function(item)
+			var selectedTicklers = [];
+			angular.forEach(controller.tableParams.data, function(item)
 			{
 				if (item.checked)
 				{
@@ -187,8 +184,8 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		controller.deleteTicklers = function()
 		{
-			var selectedTicklers = new Array();
-			angular.forEach(controller.lastResponse, function(item)
+			var selectedTicklers = [];
+			angular.forEach(controller.tableParams.data, function(item)
 			{
 				if (item.checked)
 				{
