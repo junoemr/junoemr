@@ -1357,29 +1357,40 @@ function changeToView(id) {
     //check if case note has been changed
     //if so, warn user that changes will be lost if not saved
 
-    if( origCaseNote != $F(id)  || origObservationDate != $("observationDate").value) {
-        if( !confirm(unsavedNoteWarning))
+    var noteDate = reason.trim();
+    var fullNote = $F(id).trim();
+    // Replace the date variable in the full text area with nothing
+    // to get the value of the entered text
+    var noteText = fullNote.replace(noteDate, '').trim();
+
+    if( noteText == '') {
+        return false;
+    }
+
+    if( noteText != ''  || origObservationDate != $("observationDate").value) {
+    // If the value of the current text area is not the same as the saved value, ask to save
+        if( !confirm(unsavedNoteWarning) )
             return false;
         else {
-       	// Prevent saving of note if the current note isn't properly assigned to a program and role. (note_program_ui_enabled = true)
+        // Prevent saving of note if the current note isn't properly assigned to a program and role. (note_program_ui_enabled = true)
             if ((typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() != "undefined") &&
-        			(typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() != "undefined")) {
-        		if (jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val().trim().length == 0 ||
-        				jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val().trim().length == 0) {
-        			// For weird cases where the role id or program number is missing.
-        			_missingRoleProgramIdError();
-        			return false;
-        		} else if (jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() == "-2" ||
-        				jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() == "-2") {
-        			// For the case where you're trying to save a note with no available programs or roles
-        			_noVisibleProgramsError();
-        			return false;
-        		}
-        	}        
-            saving = true;
-            if( ajaxSaveNote(sig,nId,tmp) == false)
-                return false;
+                    (typeof jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() != "undefined")) {
+                if (jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val().trim().length == 0 ||
+                        jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val().trim().length == 0) {
+                    // For weird cases where the role id or program number is missing.
+                    _missingRoleProgramIdError();
+                    return false;
+                } else if (jQuery("form[name='caseManagementEntryForm'] input[name='_note_program_no']").val() == "-2" ||
+                        jQuery("form[name='caseManagementEntryForm'] input[name='_note_role_id']").val() == "-2") {
+                    // For the case where you're trying to save a note with no available programs or roles
+                    _noVisibleProgramsError();
+                    return false;
+                }
+            }
         }
+        saving = true;
+        if( ajaxSaveNote(sig,nId,tmp) == false)
+            return false;
    }
 
 	//remove lock from note
