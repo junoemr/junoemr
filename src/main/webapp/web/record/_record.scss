@@ -1,9 +1,14 @@
 #patient-record-page {
 	.patient-header-name {
 		color: $primary-blue-text;
+		margin-top: $margin-sm;
 	} // for patient header
 	.patient-header-label {
 		color: $primary-blue-text;
+	}
+
+	.patient-header-info {
+		margin-bottom: -$margin-sm;
 	}
 
 	.sub-nav {
