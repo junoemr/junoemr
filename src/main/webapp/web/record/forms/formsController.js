@@ -366,7 +366,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 				document.getElementById('formInViewFrame').firstChild.style.height = maxheight;
 			});
 
-		}
+		};
 
 		controller.isEmpty = function isEmpty(obj)
 		{
