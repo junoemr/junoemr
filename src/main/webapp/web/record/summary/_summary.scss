@@ -4,8 +4,8 @@
 		border-bottom-color: #e9e9e9;
 	}
 	.note-list {
-		overflow-y: auto;
-		height: 70vh;
+		// overflow-y: auto;
+		// height: 70vh;
 		padding-top: 5px;
 	}
 	.well-note {
@@ -35,6 +35,9 @@
 		}
 		.note-body {
 			padding: 10px 10px 0 10px;
+			p {
+				white-space: pre-wrap;
+			}
 		}
 		.note-footer {
 			/*border-top: 1px solid #e9e9e9;*/
