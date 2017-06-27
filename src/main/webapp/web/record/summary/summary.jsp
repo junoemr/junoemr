@@ -197,12 +197,14 @@
 								</div>
 								<div class="row note-body" 
 									ng-show="summaryCtrl.showNote(note)"  
-									ng-hide="note.cpp==true">
+									ng-hide="note.cpp==true || note.document==true">
 									<p>{{note.note}}</p>
 									<hr class="note-divider">
 								</div>
 
-								<div class="row note-footer" ng-show="summaryCtrl.showNote(note)">
+								<div class="row note-footer" 
+									ng-show="summaryCtrl.showNote(note)"
+									ng-hide="note.document==true">
 									<div class="col-md-7">
 										<div class="p-inline">
 											<p class="text-muted"><bean:message key="oscarEncounter.editors.title"/>:</p>
