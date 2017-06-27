@@ -118,7 +118,7 @@
 	 //we have a problem!
 	}
 
-    String hin = request.getParameter("hin").replaceAll("[^0-9a-zA-Z]", "");
+	String hin = request.getParameter("hin").replaceAll("[^0-9a-zA-Z]", "");
 
 	demographic.setLastName(request.getParameter("last_name").trim());
 	demographic.setFirstName(request.getParameter("first_name").trim());
