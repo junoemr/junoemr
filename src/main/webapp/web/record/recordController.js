@@ -516,7 +516,7 @@ angular.module('Record').controller('Record.RecordController', [
 		$rootScope.$on('loadNoteForEdit', function(event, data)
 		{
 			console.log('loadNoteForEdit ', data);
-			controller.page.encounterNote = data;
+			controller.page.encounterNote = angular.copy(data);
 			controller.getIssueNote();
 
 			//Need to check if note has been saved yet.
