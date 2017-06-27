@@ -25,13 +25,14 @@
 
 package oscar.oscarMDS.data;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 
-import org.oscarehr.util.DbConnectionFilter;
+import org.oscarehr.common.dao.InboxResultsDao;
+import org.oscarehr.util.SpringUtils;
+
+import oscar.oscarLab.ca.on.LabSummaryData;
 
 public class CategoryData {
 
@@ -81,11 +82,13 @@ public class CategoryData {
 	private String status;
 	private String patientFirstName;
 	private String patientHealthNumber;
+	private Date startDate;
+	private Date endDate;
 	private boolean patientSearch;
 	private boolean providerSearch;
 
 	public CategoryData(String patientLastName, String patientFirstName, String patientHealthNumber, boolean patientSearch,
-					    boolean providerSearch, String searchProviderNo, String status)  {
+			boolean providerSearch, String searchProviderNo, String status, Date startDate, Date endDate)  {
 
 		this.patientLastName = patientLastName;
 		this.searchProviderNo = searchProviderNo;
@@ -94,6 +97,8 @@ public class CategoryData {
 		this.patientHealthNumber = patientHealthNumber;
 		this.patientSearch = patientSearch;
 		this.providerSearch = providerSearch;
+		this.startDate = startDate;
+		this.endDate = endDate;
 
     	totalDocs = 0;
 		totalLabs = 0;
@@ -108,188 +113,34 @@ public class CategoryData {
 	}
 	public void populateCountsAndPatients() throws SQLException {
 
+		InboxResultsDao inboxResultsDao = (InboxResultsDao) SpringUtils.getBean("inboxResultsDao");
+		LabSummaryData result = inboxResultsDao.getInboxSummary(searchProviderNo, null, patientFirstName,
+			patientLastName, patientHealthNumber, status, false, 0, 0, false, null, null, 
+			false, null, startDate, endDate);
+		
+		this.patients = result.getPatients();
+
 		// Retrieving documents and labs.
-		totalDocs += getDocumentCountForPatientSearch();
-        totalLabs += getLabCountForPatientSearch();
+		totalDocs = result.getDocumentCount();
+        totalLabs = result.getLabCount();
 
         // If this is not a patient search, then we need to find the unmatched documents.
         if (!patientSearch) {
-            unmatchedDocs += getDocumentCountForUnmatched();
-            unmatchedLabs += getLabCountForUnmatched();
+            unmatchedDocs += result.getUnmatchedDocumentCount();
+            unmatchedLabs += result.getUnmatchedLabCount();
             totalDocs += unmatchedDocs;
             totalLabs += unmatchedLabs;
         }
 
         // The total overall items is the sum of docs and labs.
-        totalNumDocs = totalDocs + totalLabs;
+        totalNumDocs = result.getTotalCount();
 
         // Retrieving abnormal labs.
-        abnormalCount = getAbnormalCount(true);
+        abnormalCount = result.getAbnormalCount();
 
         // Cheaper to subtract abnormal from total to find the number of normal docs.
         normalCount = totalNumDocs - abnormalCount;
 	}
-
-	public int getLabCountForUnmatched()
-			throws SQLException {
-		String sql;
-		              sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
-				                       + " FROM patientLabRouting plr2, providerLabRouting plr  "
-				                       + " WHERE plr.lab_no = plr2.lab_no "
-				                       + (providerSearch ? " AND plr.provider_no = '"+searchProviderNo+"' " : "")
-				
-				                        + "   AND plr.lab_type = 'HL7' "
-				                        + "   AND plr.status like '%"+status+"%' "
-				                       + "   AND plr2.lab_type = 'HL7'"
-				                       + "   AND plr2.demographic_no = '0' ";
-				
-
-			
-		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
-		PreparedStatement ps = c.prepareStatement(sql);
-		ResultSet rs= ps.executeQuery(sql);
-
-		return (rs.next() ? rs.getInt("count") : 0);
-	}
-
-	public int getAbnormalCount(boolean isAbnormal) throws SQLException {
-		ResultSet rs;
-		String sql;
-		if (patientSearch) {
-        	sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
-        		+ " FROM patientLabRouting cd, demographic d, providerLabRouting plr, hl7TextInfo info "
-        		+ " WHERE d.last_name like '%"+patientLastName+"%'  "
-        		+ " 	AND d.first_name like '%"+patientFirstName+"%' "
-        		+ " 	AND d.hin like '%"+patientHealthNumber+"%' "
-        		+ " 	AND plr.status like '%"+status+"%' "
-        		+ (providerSearch ? "AND plr.provider_no = '"+searchProviderNo+"' " : "")
-        		+ " 	AND plr.lab_type = 'HL7' "
-        		+ " 	AND cd.lab_type = 'HL7' "
-        		+ " 	AND cd.lab_no = plr.lab_no "
-        		+ " 	AND cd.demographic_no = d.demographic_no "
-        		+ " 	AND info.lab_no = plr.lab_no "
-        		+ " 	AND result_status "+(isAbnormal ? "" : "!")+"= 'A' ";
-        }
-        else if (providerSearch || !"".equals(status)){ // providerSearch
-        	sql = "SELECT HIGH_PRIORITY COUNT(1) as count "
-				+ " FROM providerLabRouting plr, hl7TextInfo info "
-				+ " WHERE plr.status like '%"+status+"%' "
-				+ (providerSearch ? " AND plr.provider_no = '"+searchProviderNo+"' " : " ")
-				+ " AND plr.lab_type = 'HL7'  "
-				+ " AND info.lab_no = plr.lab_no"
-				+ " AND result_status "+(isAbnormal ? "" : "!")+"= 'A' ";
-        }
-        else {
-        	sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
-            	+ " FROM hl7TextInfo info "
-            	+ " WHERE result_status "+(isAbnormal ? "" : "!")+"= 'A' ";
-        }
-		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
-		PreparedStatement ps = c.prepareStatement(sql);
-		rs= ps.executeQuery(sql);
-        return (rs.next() ? rs.getInt("count") : 0);
-	}
-
-	public int getDocumentCountForUnmatched()
-			throws SQLException {
-		String sql = " SELECT HIGH_PRIORITY COUNT(1) as count "
-					+ " FROM ctl_document cd, providerLabRouting plr "
-					+ " WHERE plr.lab_type = 'DOC' AND plr.status like '%"+status+"%' "
-					+ (providerSearch ? " AND plr.provider_no ='"+searchProviderNo+"' " : "")
-					+ "	AND plr.lab_no = cd.document_no"
-					+ " AND 	cd.module_id = -1 ";
-		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
-		PreparedStatement ps = c.prepareStatement(sql);
-		ResultSet rs= ps.executeQuery(sql);
-		return (rs.next() ? rs.getInt("count") : 0);
-	}
-
-	public int getLabCountForPatientSearch() throws SQLException {
-		PatientInfo info;
-		String sql = " SELECT HIGH_PRIORITY d.demographic_no, last_name, first_name, COUNT(1) as count "
-        	+ " FROM patientLabRouting cd,  demographic d, providerLabRouting plr "
-        	+ " WHERE   d.last_name like '%"+patientLastName+"%' "
-        	+ " 	AND d.first_name like '%"+patientFirstName+"%' "
-        	+ " 	AND d.hin like '%"+patientHealthNumber+"%' "
-        	+ " 	AND cd.demographic_no = d.demographic_no "
-        	+ " 	AND cd.lab_no = plr.lab_no "
-        	+ " 	AND plr.lab_type = 'HL7' "
-        	+ " 	AND cd.lab_type = 'HL7' "
-        	+ " 	AND plr.status like '%"+status+"%' "
-        	+ (providerSearch ? "AND plr.provider_no = '"+searchProviderNo+"' " : "")
-        	+ " GROUP BY demographic_no ";
-
-		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
-		PreparedStatement ps = c.prepareStatement(sql);
-		ResultSet rs= ps.executeQuery(sql);
-        int count = 0;
-        while(rs.next()){
-        	int id = rs.getInt("demographic_no");
-        	// Updating patient info if it already exists.
-        	if (patients.containsKey(id)) {
-        		info = patients.get(id);
-        		info.setLabCount(rs.getInt("count"));
-        	}
-        	// Otherwise adding a new patient record.
-        	else {
-        		info = new PatientInfo(id, rs.getString("first_name"), rs.getString("last_name"));
-        		info.setLabCount(rs.getInt("count"));
-        		patients.put(info.id, info);
-        	}
-        	count += info.getLabCount();
-        }
-        return count;
-	}
-
-	public int getLabCountForDemographic(String demographicNo) throws SQLException {
-		String sql = " SELECT HIGH_PRIORITY d.demographic_no, last_name, first_name, COUNT(1) as count "
-        	+ " FROM patientLabRouting cd,  demographic d, providerLabRouting plr "
-        	+ " WHERE   d.demographic_no = " + demographicNo
-        	+ " 	AND cd.demographic_no = d.demographic_no "
-        	+ " 	AND cd.lab_no = plr.lab_no "
-        	+ " 	AND plr.lab_type = 'HL7' "
-        	+ " 	AND cd.lab_type = 'HL7' "
-        	+ " 	AND plr.status like '%"+status+"%' "
-        	+ (providerSearch ? "AND plr.provider_no = '"+searchProviderNo+"' " : "")
-        	+ " GROUP BY demographic_no ";
-
-		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
-		PreparedStatement ps = c.prepareStatement(sql);
-		ResultSet rs= ps.executeQuery(sql);
-        return (rs.next() ? rs.getInt("count") : 0);
-	}
-
-	/*
-	 * This will return the total documents found for this patients.
-	 * it will also add to the patients map (demographicNo, PatientInfo) with a document count for the patient.
-	 * 
-	 */
-	public int getDocumentCountForPatientSearch() throws SQLException {
-		PatientInfo info;
-		String sql = " SELECT HIGH_PRIORITY demographic_no, last_name, first_name, COUNT( distinct cd.document_no) as count "
-					+ " FROM ctl_document cd, demographic d, providerLabRouting plr "
-					+ " WHERE   d.last_name like '%"+patientLastName+"%'  "
-					+ " 	AND d.hin like '%"+patientHealthNumber+"%' "
-					+ " 	AND d.first_name like '%"+patientFirstName+"%' "
-					+ " 	AND cd.module_id = d.demographic_no "
-					+ " 	AND cd.document_no = plr.lab_no "
-					+ " 	AND plr.lab_type = 'DOC' "
-					+ " 	AND plr.status like '%"+status+"%' "
-					+ (providerSearch ? "AND plr.provider_no = '"+searchProviderNo+"' " : "")
-					+ " GROUP BY demographic_no ";
-		Connection c  = DbConnectionFilter.getThreadLocalDbConnection();
-		PreparedStatement ps = c.prepareStatement(sql);
-		ResultSet rs= ps.executeQuery(sql);
-        int count = 0;
-        while(rs.next()){
-        	info = new PatientInfo(rs.getInt("demographic_no"), rs.getString("first_name"), rs.getString("last_name"));
-        	info.setDocCount(rs.getInt("count"));
-        	patients.put(info.id, info);
-        	count += info.getDocCount();
-        }
-        return count;
-	}
-
 
 	public Long getCategoryHash() {
 		return Long.valueOf("" + (int)'A' + totalNumDocs)

@@ -77,6 +77,20 @@ function onSubmitCheck(){
 	
 }
 
+function clearProvider(){
+
+    setTimeout(function() {
+        radios = $( "input[name=searchProviderAll]" );
+        for(var i = 0; i < radios.length; i++) {
+            if(radios[i].checked) {
+                $( "#autocompleteprov" ).val(null);
+                $( "#provfind" ).val(null);
+            }
+        }
+    });
+}
+
+
 $(function() {
  
     $( "#autocompleteprov" ).autocomplete({
@@ -89,6 +103,15 @@ $(function() {
       select: function(event, ui) {    	  
     	  $( "#autocompleteprov" ).val(ui.item.label);
     	  $( "#provfind" ).val(ui.item.value);
+
+          // Uncheck the radios when a doctor is selected
+          setTimeout(function() {
+              radios = $( "input[name=searchProviderAll]" )
+              for(var i = 0; i < radios.length; i++) {
+                  radios[i].checked = false;
+              }
+          });
+
     	  return false;
       }      
     })
@@ -171,8 +194,8 @@ $(function() {
 			<tr>
 				<td valign="top"><bean:message
 					key="oscarMDS.search.formPhysician" />:</td>
-				<td><input type="radio" name="searchProviderAll" value="-1" ondblclick="this.checked = false;">&nbsp;<bean:message key="oscarMDS.search.formPhysicianAll" />
-					<input type="radio" name="searchProviderAll" value="0" ondblclick="this.checked = false;">&nbsp;<bean:message key="oscarMDS.search.formPhysicianUnclaimed" />
+				<td><input type="radio" name="searchProviderAll" value="-1" onclick="clearProvider();" ondblclick="this.checked = false;">&nbsp;<bean:message key="oscarMDS.search.formPhysicianAll" />
+					<input type="radio" name="searchProviderAll" value="0" onclick="clearProvider();" ondblclick="this.checked = false;">&nbsp;<bean:message key="oscarMDS.search.formPhysicianUnclaimed" />
 					<input type="hidden" name="providerNo" value="<%= request.getParameter("providerNo") %>">
 				</td>
 			</tr>

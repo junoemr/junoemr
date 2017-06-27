@@ -66,7 +66,7 @@ public class InboxService extends AbstractServiceImpl {
 		query.setStatus("N");
 		query.setScannedDocStatus("I");
 		query.setPage(0);
-		query.setPageSize(20);
+		query.setPageSize(40);
 		query.setView("all");
 		query.setPatientFirstName("");
 		query.setPatientLastName("");
