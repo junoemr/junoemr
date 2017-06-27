@@ -64,7 +64,6 @@ angular.module('Record').controller('Record.RecordController', [
 
 		var controller = this;
 
-		console.log("in patient Ctrl ", demo);
 		console.log("in RecordCtrl state params ", $stateParams, $location.search());
 
 		controller.demographicNo = $stateParams.demographicNo;
@@ -231,7 +230,7 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 			skipTmpSave = false; // only skip once
 		};
-		$scope.$watch('page.encounterNote.note', delayTmpSave);
+		$scope.$watch('controller.page.encounterNote.note', delayTmpSave);
 
 		//////
 
@@ -318,9 +317,36 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
+		// TODO
+		controller.cancelNoteEdit = function cancelNoteEdit()
+		{
+			console.log('CANCELLING EDIT');
+
+			controller.page.encounterNote = null;
+
+			$rootScope.$emit('stopEditingNote');
+			skipTmpSave = true;
+			controller.getCurrentNote(false);
+			controller.removeEditingNoteFlag();
+		};
+
 		controller.saveNote = function saveNote()
 		{
-			controller.page.encounterNote.observationDate = new Date();
+			// Don't let users save an empty note
+			if (controller.page.encounterNote.note.length === 0)
+			{
+				alert("Can't save a blank note!"); // Placeholder error handling
+				return;
+			}
+			console.log('SAVING NOTE:', controller.page.encounterNote);
+			// Check if this is a new note, if it isn't, we don't want to overwrite the existing observationDate
+			// Need to find a better way of preventing this date overwrite
+			if (controller.page.encounterNote.observationDate instanceof Date)
+			{
+				console.log('Setting encounter date');
+				controller.page.encounterNote.observationDate = new Date();
+			}
+
 			controller.page.encounterNote.assignedIssues = controller.page.assignedCMIssues;
 			controller.page.encounterNote.issueDescriptions = null;
 			for (var i = 0; i < controller.page.assignedCMIssues.length; i++)
@@ -347,6 +373,7 @@ angular.module('Record').controller('Record.RecordController', [
 						controller.getCurrentNote(false);
 						controller.page.assignedCMIssues = [];
 					}
+					controller.page.encounterNote.isSaved = true; // Mark the note as saved, but not signed or verified
 				},
 				function error(errors)
 				{
@@ -467,7 +494,6 @@ angular.module('Record').controller('Record.RecordController', [
 					controller.page.encounterNote = results;
 					controller.page.initNote = results.note; //compare this with current note content to determine tmpsave or not
 					controller.getIssueNote();
-					console.log(controller.page.encounterNote);
 					controller.hideNote = showNoteAfterLoadingFlag;
 					$rootScope.$emit('currentlyEditingNote', controller.page.encounterNote);
 					initAppendNoteEditor();
@@ -499,7 +525,6 @@ angular.module('Record').controller('Record.RecordController', [
 
 			controller.removeEditingNoteFlag();
 		});
-
 
 		var initAppendNoteEditor = function initAppendNoteEditor()
 		{
