@@ -111,68 +111,71 @@ public class PrintAction extends Action {
 	 * This method will take eforms and send them to a PHR.
 	 */
 	public void printForm(String formId, String providerId) {
-		
+
 		File tempFile = null;
 
 		try {
 			logger.info("Generating PDF for eform with fdid = " + formId);
 
 			tempFile = File.createTempFile("EFormPrint." + formId, ".pdf");
-			//tempFile.deleteOnExit();
 
 			// convert to PDF
 			String viewUri = localUri + formId;
-			if(printLabel) {
+			if (printLabel) {
 				WKHtmlToPdfUtils.convertToPdfLabel(viewUri, tempFile);
 			}
 			else {
 				WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
 			}
-			logger.info("Writing pdf to : "+tempFile.getCanonicalPath());
-			
+			logger.info("Writing pdf to : " + tempFile.getCanonicalPath());
+
 			InputStream is = new BufferedInputStream(new FileInputStream(tempFile));
 			ByteOutputStream bos = new ByteOutputStream();
 			byte buffer[] = new byte[1024];
 			int read;
 			while (is.available() != 0) {
-				read = is.read(buffer,0,1024);
-				bos.write(buffer,0, read);
+				read = is.read(buffer, 0, 1024);
+				bos.write(buffer, 0, read);
 			}
-			
+			is.close();
+
 			bos.flush();
-			// byte[] pdf = HtmlToPdfServlet.appendFooter(bos.getBytes());
 			byte[] pdf;
-            try {
-	            pdf = HtmlToPdfServlet.stamp(bos.getBytes());
-            } catch (Exception e) {
-            	throw new RuntimeException(e);
-            }
-			
-			//while (fos.read() != -1)
-			response.setContentType("application/pdf");  //octet-stream
-            response.setHeader("Content-Disposition", "attachment; filename=\"EForm-"
-            				+ formId + "-"
-							+ UtilDateUtilities.getToday("yyyy-mm-dd.hh.mm.ss")
-							+ ".pdf\"");
-			// response.getOutputStream().write(bos.getBytes(), 0, bos.getCount());
-            HtmlToPdfServlet.stream(response, pdf, false);
-            // response.getOutputStream().write(pdf);
-			
+			if (printLabel) {
+				pdf = bos.getBytes();
+				bos.close();
+			}
+			else {
+				try {
+					// append page number & confidentiality warning
+					pdf = HtmlToPdfServlet.stamp(bos.getBytes());
+				}
+				catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+				finally {
+					bos.close();
+				}
+			}
+
+			response.setContentType("application/pdf"); // octet-stream
+			response.setHeader("Content-Disposition", "attachment; filename=\"EForm-" + formId + "-"
+					+ UtilDateUtilities.getToday("yyyy-mm-dd.hh.mm.ss") + ".pdf\"");
+			HtmlToPdfServlet.stream(response, pdf, false);
+
 			// Removing the consulation pdf.
-			tempFile.delete();	
-			
+			tempFile.delete();
+
 			// Removing the eform
 			if (skipSave) {
-	        	 EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
-	        	 EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));
-	        	 eFormData.setCurrent(false);
-	        	 eFormDataDao.merge(eFormData);
+				EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean("EFormDataDao");
+				EFormData eFormData = eFormDataDao.find(Integer.parseInt(formId));
+				eFormData.setCurrent(false);
+				eFormDataDao.merge(eFormData);
 			}
-		} catch (IOException e) {
-			//logger.error("Error converting and sending eform. id=" + eFormId, e);
-			MiscUtils.getLogger().error("Error printing eForm",e);
+		}
+		catch (IOException e) {
+			MiscUtils.getLogger().error("Error printing eForm", e);
 		}
 	}
-
-	
 }
