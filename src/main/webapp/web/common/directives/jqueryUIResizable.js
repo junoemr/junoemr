@@ -15,9 +15,9 @@ angular.module('Common.Directives').directive('resizable', [
 				console.log('RESIZABLE DIRECTIVE HEIGHT ', $(".note-editor-textarea").height());
 				elem.resizable(
 				{
-					handles: 'n, e, w, nw, ne',
+					handles: 'n, nw, ne',
 					minHeight: 160 + $(".note-editor-textarea").height(),
-					minWidth: 490,
+					minWidth: 500,
 					maxWidth: window.innerWidth,
 					maxHeight: window.innerHeight / 1.5,
 					// containment: "#main-body"
