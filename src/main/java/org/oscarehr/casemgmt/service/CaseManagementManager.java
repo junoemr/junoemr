@@ -1961,7 +1961,8 @@ public class CaseManagementManager {
 				Appointment appointment = appointmentDao.find(apptNo);
 				if(appointment != null) {
 					note.setAppointmentNo(apptNo);
-					encounterText = "[" + oscar.util.UtilDateUtilities.DateToString(appointment.getAppointmentDate(), "dd-MMM-yyyy", locale) + " .: " + appointment.getReason() + "] \n";
+					// encounterText = "[" + oscar.util.UtilDateUtilities.DateToString(appointment.getAppointmentDate(), "dd-MMM-yyyy", locale) + " .: " + appointment.getReason() + "] \n";
+					// Do we wan't to add this to the encounter text?
 				}
 			}
 			catch(Exception e){
