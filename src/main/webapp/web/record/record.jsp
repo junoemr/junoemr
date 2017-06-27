@@ -25,7 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <div id="patient-record-page"> 
-	<div class="row vertical-align">
+	<div class="row vertical-align patient-record-header">
 		<div class="col-xs-4">	
 			<h2 class="patient-header-name" ng-cloak>
 				{{recordCtrl.demographic.lastName}}, {{recordCtrl.demographic.firstName}}  
@@ -157,9 +157,9 @@
 					</button>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-sm-12">
-					<p>Encounter Date:
+			<div class="row vertical-align">
+				<div class="col-xs-4" id="note-editor-enc-date">
+					<p>Encounter:
 						<span>
 							<juno-datepicker-popup juno-model="recordCtrl.page.encounterNote.observationDate" type="Link"
 								ng-model="recordCtrl.page.encounterNote.observationDate">
@@ -167,16 +167,11 @@
 						<span>
 					</p>
 				</div>
-			</div>
-			<div class="row">
 				<div class="col-xs-4">
 					<input type="text" ng-model="recordCtrl.options.magicVal" placeholder="Template" 
 					uib-typeahead="t.encounterTemplateName as t.encounterTemplateName for t in recordCtrl.searchTemplates($viewValue)" 
 					typeahead-on-select="recordCtrl.insertTemplate($item, $model, $label)"
 					class="form-control">	
-				</div>
-				<div class="col-xs-4 " >
-					<input type="text" class="form-control" placeholder="Search" data-ng-disabled="true">
 				</div>
 				<div class="col-xs-4">
 					<input type="text" class="form-control" placeholder="Assign Issue"  
