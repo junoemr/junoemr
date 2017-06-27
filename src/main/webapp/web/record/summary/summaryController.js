@@ -261,6 +261,40 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			$rootScope.$emit('loadNoteForEdit', note);
 		};
 
+		// Call the findGroupNote function and search for the given note, if found, open the groupNote editor
+		controller.editGroupNote = function editGroupNote(note)
+		{
+			var obj = controller.findGroupNote(note);
+
+			if (obj !== null)
+			{
+				controller.gotoState(obj.note, obj.module, obj.note.id);
+				return;
+			}
+		};
+
+		// There is probably a better way of doing this
+		controller.findGroupNote = function findGroupNote(note)
+		{
+			var moduleList = controller.page.columnOne.modules;
+			for (var i = 0; i < moduleList.length; i++)
+			{
+
+				var summaryItems = moduleList[i].summaryItem;
+				for (var k = 0; k < summaryItems.length; k++)
+				{
+					if (summaryItems[k].noteId === note.noteId)
+					{
+						return {
+							note: summaryItems[k],
+							module: moduleList[i]
+						};
+					}
+				}
+			}
+			return null;
+		};
+
 		controller.page.currentEditNote = {};
 
 		controller.isNoteBeingEdited = function isNoteBeingEdited(note)
@@ -279,6 +313,12 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			controller.page.currentEditNote = data;
 		});
 
+		// TODO
+		$rootScope.$on('stopEditingNote', function()
+		{
+			console.log('stopEditingNote');
+			controller.page.currentEditNote = {};
+		});
 
 		$rootScope.$on('noteSaved', function(event, data)
 		{
@@ -302,7 +342,16 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			controller.index = controller.page.notes.notelist.length;
 		});
 
+		// Check if note regular note, if not, we must either display the group note edit window or have no edit option
+		controller.isRegularNote = function isRegularNote(note)
+		{
+			if (note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp)
+			{
+				return false;
+			}
 
+			return true;
+		};
 
 		//Note display functions
 		controller.setColor = function setColor(note)
@@ -311,49 +360,42 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			{
 				return {
 					'border-left-color': '#DFF0D8',
-					'border-left-width': '10px'
 				};
 			}
 			else if (note.document)
 			{
 				return {
 					'border-left-color': '#617CB2',
-					'border-left-width': '10px'
 				};
 			}
 			else if (note.rxAnnotation)
 			{
 				return {
 					'border-left-color': '#D3D3D3',
-					'border-left-width': '10px'
 				};
 			}
 			else if (note.encounterForm)
 			{
 				return {
 					'border-left-color': '#BCAD75',
-					'border-left-width': '10px'
 				};
 			}
 			else if (note.invoice)
 			{
 				return {
 					'border-left-color': '##FF7272',
-					'border-left-width': '10px'
 				};
 			}
 			else if (note.ticklerNote)
 			{
 				return {
 					'border-left-color': '#FFA96F',
-					'border-left-width': '10px'
 				};
 			}
 			else if (note.cpp)
 			{
 				return {
 					'border-left-color': '#9B8166',
-					'border-left-width': '10px'
 				};
 			}
 		};
@@ -379,11 +421,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					return false;
 				}
 			}
-
-			if (note.eformData || note.document)
-			{
-				return false;
-			}
 			return true;
 		};
 
@@ -408,27 +445,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			controller.trackerUrl = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo + '&numEle=4&tracker=slim';
 		};
 
-		// var initialDisplayLimit = 5;
-
 		controller.toggleList = function toggleList(mod)
 		{
-			// i = initialDisplayLimit;
 
-			// if (mod.summaryItem.length > i)
-			// {
-			// 	if (mod.displaySize > i)
-			// 	{
-			// 		mod.displaySize = i;
-			// 	}
-			// 	else
-			// 	{
-			// 		mod.displaySize = mod.summaryItem.length;
-			// 	}
-			// }
-
+			// If all the items are displayed, reset displaySize to 5 (min), else, show all the items
 			if (mod.displaySize >= mod.summaryItem.length)
 			{
-				mod.displaySize = 0;
+				mod.displaySize = 5;
 			}
 			else
 			{
@@ -455,7 +478,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		// Return true if a given section is expanded, otherwise return false
 		controller.isSectionExpanded = function isSectionExpanded(mod)
 		{
-			if (mod.displaySize > 0)
+			if (mod.displaySize > 5)
 			{
 				return true;
 			}
@@ -466,7 +489,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		// Return true if a given section is empty, otherwise return false
 		controller.isSectionEmpty = function isSectionEmpty(mod)
 		{
-			if (mod.summaryItem.length <= 0)
+			if (mod.summaryItem.length <= 5)
 			{
 				return true;
 			}
@@ -627,6 +650,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		controller.gotoState = function gotoState(item, mod, itemId)
 		{
+			console.log('ITEM: ', item);
+			console.log('MOD: ', mod);
 
 			if (item == "add")
 			{
@@ -692,7 +717,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'record/print.jsp',
-				controller: 'Record.Summary.RecordPrintController',
+				controller: 'Record.Summary.RecordPrintController as recordPrintCtrl',
 				size: size,
 				resolve:
 				{
@@ -719,6 +744,21 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					console.log('Modal dismissed at: ' + new Date());
 					console.log(errors);
 				});
+		};
+
+		// Toggle whether the note is selected for printing
+		controller.toggleIsSelectedForPrint = function toggleIsSelectedForPrint(note)
+		{
+			if (note.isSelected === true)
+			{
+				note.isSelected = false;
+			}
+			else
+			{
+				note.isSelected = true;
+			}
+
+
 		};
 
 	}
