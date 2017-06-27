@@ -88,9 +88,9 @@
 				</div>
 				
 
-				<ul class="list-unstyled">
+				<ul>
 					<li ng-repeat="item in mod.summaryItem | limitTo: mod.displaySize">
-						<p><span class="pull-right">{{item.date | date : 'dd MMM yyyy'}}</span></p>
+						<span class="pull-right">{{item.date | date : 'dd MMM yyyy'}}</span>
 						<a ng-click="summaryCtrl.gotoState(item,mod,item.id)" href="javascript:void(0)" ng-class="item.indicatorClass">
 							{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}
 							<small ng-show="item.classification">({{item.classification}})</small>
