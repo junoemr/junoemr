@@ -220,7 +220,7 @@
 									<div class="col-md-5 note-footer-right">
 										<div class="p-inline">
 											<p class="text-muted"><bean:message key="oscarEncounter.noteRev.title"/>:</p>
-											<p ng-click="summaryCtrl.openRevisionHistory(note)" class="hand-hover">{{note.revision}}</p>
+											<a ng-click="summaryCtrl.openRevisionHistory(note)" class="hand-hover">{{note.revision}}</a>
 										</div>
 
 										<div class="p-inline">
