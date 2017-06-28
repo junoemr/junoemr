@@ -749,16 +749,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		// Toggle whether the note is selected for printing
 		controller.toggleIsSelectedForPrint = function toggleIsSelectedForPrint(note)
 		{
-			if (note.isSelected === true)
-			{
-				note.isSelected = false;
-			}
-			else
-			{
-				note.isSelected = true;
-			}
-
-
+			note.isSelected = !note.isSelected;
 		};
 
 	}
