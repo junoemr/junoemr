@@ -490,7 +490,8 @@ angular.module('Record').controller('Record.RecordController', [
 					controller.getIssueNote();
 					controller.hideNote = showNoteAfterLoadingFlag;
 					$rootScope.$emit('currentlyEditingNote', controller.page.encounterNote);
-					initAppendNoteEditor();
+					controller.initAppendNoteEditor();
+					controller.initObservationDate();
 				},
 				function error(errors)
 				{
@@ -499,8 +500,6 @@ angular.module('Record').controller('Record.RecordController', [
 		};
 
 		controller.getCurrentNote(true);
-
-
 
 		controller.editNote = function editNote(note)
 		{
@@ -520,11 +519,20 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.removeEditingNoteFlag();
 		});
 
-		var initAppendNoteEditor = function initAppendNoteEditor()
+		controller.initAppendNoteEditor = function initAppendNoteEditor()
 		{
 			if ($location.search().noteEditorText != null)
 			{
 				controller.page.encounterNote.note = controller.page.encounterNote.note + $location.search().noteEditorText;
+			}
+		};
+
+		// Initialize the observationDate for new notes
+		controller.initObservationDate = function initObservationDate()
+		{
+			if (controller.page.encounterNote.observationDate === null)
+			{
+				controller.page.encounterNote.observationDate = new Date();
 			}
 		};
 
