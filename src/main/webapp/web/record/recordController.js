@@ -341,11 +341,6 @@ angular.module('Record').controller('Record.RecordController', [
 			console.log('SAVING NOTE:', controller.page.encounterNote);
 			// Check if this is a new note, if it isn't, we don't want to overwrite the existing observationDate
 			// Need to find a better way of preventing this date overwrite
-			if (controller.page.encounterNote.observationDate instanceof Date)
-			{
-				console.log('Setting encounter date');
-				controller.page.encounterNote.observationDate = new Date();
-			}
 
 			controller.page.encounterNote.assignedIssues = controller.page.assignedCMIssues;
 			controller.page.encounterNote.issueDescriptions = null;
@@ -373,7 +368,6 @@ angular.module('Record').controller('Record.RecordController', [
 						controller.getCurrentNote(false);
 						controller.page.assignedCMIssues = [];
 					}
-					controller.page.encounterNote.isSaved = true; // Mark the note as saved, but not signed or verified
 				},
 				function error(errors)
 				{
@@ -660,6 +654,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.searchIssues = function searchIssues(term)
 		{
+			console.log('SEARCHING FOR ISSUE: ', term);
 			var search = {
 				'term': term
 			};
