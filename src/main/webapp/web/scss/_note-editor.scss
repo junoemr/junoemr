@@ -25,7 +25,7 @@
 		This causes the element to expand from both sides when resizing to the right*/
 		left: 30%;
 		position: fixed;
-		top: auto;
+		top: auto !important;
 		bottom: 0;
 		#note-editor-header {
 			color: $primary-white-text;
