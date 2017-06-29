@@ -4,8 +4,7 @@
 	#note-editor,
 	#note-editor-minimized {
 		position: fixed;
-		bottom: 0;
-		top: auto !important; // Using !important to override the JqueryUI styling
+		bottom: 0; // top: auto !important; // Using !important to override the JqueryUI styling
 		z-index: 1040;
 	}
 
@@ -25,6 +24,9 @@
 		in which the left edge is not set if the user resizes the element from the right before doing any other resizing actions.
 		This causes the element to expand from both sides when resizing to the right*/
 		left: 30%;
+		position: fixed;
+		top: auto;
+		bottom: 0;
 		#note-editor-header {
 			color: $primary-white-text;
 			background-color: $secondary-blue;
@@ -42,6 +44,7 @@
 		}
 		.note-editor-textarea {
 			resize: none;
+			min-height: 50px;
 		}
 		#note-editor-enc-date {
 			padding-right: 0;
@@ -49,6 +52,12 @@
 				margin: 0;
 			}
 		}
+	}
+
+	[uib-typeahead-popup].dropdown-menu {
+		/* Needs to be !important in order to override the inline styles set with ng-style.
+    	   We need to do this override to allow for dropup menuys */
+		top: auto !important;
 	}
 }
 
