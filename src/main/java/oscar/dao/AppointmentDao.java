@@ -110,7 +110,6 @@ public class AppointmentDao extends OscarSuperDao {
 				appData.setOhipNo( 				apptInfo.get(0).get("ohip_no").toString() );
 				appData.setUrgency( 			apptInfo.get(0).get("urgency").toString() );
 				appData.setPartialBooking( 		"1".equals(apptInfo.get(0).get("partial_booking").toString() ));
-//				appData.setPartialBooking( 		(Integer)apptInfo.get(0).get("partial_booking") == 1 );
 			}
 				
 			// get demographic data

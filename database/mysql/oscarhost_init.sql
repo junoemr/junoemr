@@ -198,3 +198,7 @@ ALTER TABLE `providerArchive` ADD COLUMN `e_delivery_ids` text;
 ALTER TABLE `provider` ADD COLUMN `tak_no` VARCHAR(20);
 ALTER TABLE `providerArchive` ADD COLUMN `tak_no` VARCHAR(20);
 
+-- OHSUPPORT-4004 - add partial booking flag to appointments
+ALTER TABLE appointment ADD COLUMN partial_booking tinyint(1) NOT NULL DEFAULT 0;
+ALTER TABLE appointmentArchive ADD COLUMN partial_booking tinyint(1) NOT NULL DEFAULT 0;
+
