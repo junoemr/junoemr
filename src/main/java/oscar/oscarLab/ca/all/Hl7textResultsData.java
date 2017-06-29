@@ -359,8 +359,10 @@ public class Hl7textResultsData {
 		String sql = "SELECT hl7.label,hl7.lab_no, hl7.obr_date, hl7.discipline, hl7.accessionNum, hl7.final_result_count, patientLabRouting.id " +
 		"FROM hl7TextInfo hl7, patientLabRouting " +
 		"WHERE patientLabRouting.lab_no = hl7.lab_no "+
-		"AND patientLabRouting.lab_type = 'HL7' AND patientLabRouting.demographic_no=" + demographicNo+" GROUP BY hl7.lab_no";
-
+		"AND patientLabRouting.lab_type = 'HL7' AND patientLabRouting.demographic_no=" + demographicNo+" GROUP BY hl7.lab_no "+
+		"ORDER BY obr_date DESC";
+		// Ordering by `obr_date`, so it queries newest labs first. Otherwise multiLabs array will only contain the newest version of the labs
+		// because the older version are queried first, and the older version are never attached to the consultation
 		String attachQuery = "SELECT consultdocs.document_no FROM consultdocs, patientLabRouting " +
 		"WHERE patientLabRouting.id = consultdocs.document_no AND " +
 		"consultdocs.requestId = " + consultationId + " AND consultdocs.doctype = 'L' AND consultdocs.deleted IS NULL ORDER BY consultdocs.document_no";
@@ -384,6 +386,8 @@ public class Hl7textResultsData {
 			LabResultData.CompareId c = lbData.getComparatorId();
 			rs = DBHandler.GetSQL(sql);
 
+			ArrayList<String> multiLabs = new ArrayList<String>();
+
 			while(rs.next()){
 
 				lbData.segmentID = oscar.Misc.getString(rs, "lab_no");
@@ -398,12 +402,19 @@ public class Hl7textResultsData {
 				MessageHandler h = Factory.getHandler(lab_no);
 
 
-				if( attached && Collections.binarySearch(attachedLabs, lbData, c) >= 0 )
+				int attachedResult = Collections.binarySearch(attachedLabs, lbData, c);
+
+				if( attached && attachedResult >= 0 ) {
 					labResults.add(lbData);
-				else if( !attached && Collections.binarySearch(attachedLabs, lbData, c) < 0 )
+					// If current lab version is attached, store accessionNumber into array
+					multiLabs.add(lbData.accessionNumber);
+				} else if( !attached && attachedResult < 0 ) {
 					labResults.add(lbData);
-				else if( h.getMsgType().equals("GDML") )
+				} else if( h.getMsgType().equals("GDML") && multiLabs.contains(lbData.accessionNumber) ) {
+					// If current lab accessionNumber is already in the array, then there are multiple versions
+					// Add the second version to labResults array if labType is GDML
 					labResults.add(lbData);
+				}
 
 				lbData = new LabResultData(LabResultData.HL7TEXT);
 			}
