@@ -140,12 +140,12 @@
 		</div>
 	
 		<div id="note-editor"
-				class="col-sm-5 col-xs-12"
-				resizable
-				draggable
-				ng-show="recordCtrl.hideNote" 
-				ng-click="recordCtrl.checkAction($event)" 
-				ng-keypress="recordCtrl.checkAction($event)">
+			class="col-sm-5 col-xs-12"
+			resizable
+			draggable
+			ng-show="recordCtrl.hideNote" 
+			ng-click="recordCtrl.checkAction($event)" 
+			ng-keypress="recordCtrl.checkAction($event)">
 			<div class="row hand-hover" id="note-editor-header">
 				<%--<div class="col-sm-12 text-center hand-hover" ng-click="recordCtrl.toggleNote();"  >
 					Minimize
@@ -161,25 +161,24 @@
 				<div class="col-xs-4" id="note-editor-enc-date">
 					<p>Encounter:
 						<span>
-							<juno-datepicker-popup juno-model="recordCtrl.page.encounterNote.observationDate" type="Link"
-								ng-model="recordCtrl.page.encounterNote.observationDate">
+							<juno-datepicker-popup juno-model="recordCtrl.page.encounterNote.observationDate" type="Link">
 							</juno-datepicker-popup>
 						<span>
 					</p>
 				</div>
-				<div class="col-xs-4">
+				<div class="col-xs-4 dropup">
 					<input type="text" ng-model="recordCtrl.options.magicVal" placeholder="Template" 
 					uib-typeahead="t.encounterTemplateName as t.encounterTemplateName for t in recordCtrl.searchTemplates($viewValue)" 
 					typeahead-on-select="recordCtrl.insertTemplate($item, $model, $label)"
 					class="form-control">	
 				</div>
-				<div class="col-xs-4">
+				<div class="col-xs-4 dropup">
 					<input type="text" class="form-control" placeholder="Assign Issue"  
 						uib-typeahead="i.issueId as i.code for i in recordCtrl.searchIssues($viewValue)" 
-						typeahead-on-select="recordCtrl.assignIssue($item, $model, $label);selectedIssue='';" 
-						ng-model="selectedIssue" 
+						typeahead-on-select="recordCtrl.assignIssue($item, $model, $label);recordCtrl.selectedIssue='';" 
+						ng-model="recordCtrl.selectedIssue" 
 						typeahead-loading="loadingIssues"
-						typeahead-min-length="3" typeahead-append-to-body="true"/>
+						typeahead-min-length="3" />
 				</div>
 			</div>
 			<div class="row">
@@ -194,17 +193,19 @@
 				</div>
 
 			</div>    		
-			<div class="row" ng-if="recordCtrl.page.assignedCMIssues != null  && recordCtrl.page.assignedCMIssues.length > 0">
-				<label>Assigned Issues:</label>
-				<table class="table">
-					<tr ng-repeat="i in recordCtrl.page.assignedCMIssues">
-						<td>
-							<input type="button" value="remove" ng-click="recordCtrl.removeIssue(i)" ng-if="i.unchecked == null || i.unchecked == false"/>
-						</td>
-						<td>{{i.issue.description}} ({{i.issue.code}})</td>
-					</tr>
-					
-				</table>
+			<div class="row note-editor-issues">
+				<div class="col-sm-12">
+					<label >Assigned Issues:</label>
+					<table class="table table-condensed">
+						<tr ng-repeat="i in recordCtrl.page.assignedCMIssues" class="note-editor-issue-row">
+							<td>{{i.issue.description}} ({{i.issue.code}})</td>
+							<td class="text-right">
+								<button class="btn btn-xs btn-danger" type="button" ng-click="recordCtrl.removeIssue(i)" ng-if="i.unchecked == null || i.unchecked == false">Remove</button>
+							</td>
+						</tr>
+						
+					</table>
+				</div>
 			</div>
 			<div class="row" id="note-editor-footer">
 				<div class="col-sm-12">
