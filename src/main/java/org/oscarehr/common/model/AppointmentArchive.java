@@ -102,6 +102,10 @@ public class AppointmentArchive extends AbstractModel<Integer>  {
 	@Column(name = "imported_status")
 	private String importedStatus;
 	private String urgency;
+	
+	@Column(name = "partial_booking")
+	private Integer partialBooking ;
+	
 	private Integer creatorSecurityId;	
 
 	@Enumerated(EnumType.STRING)
@@ -308,6 +312,20 @@ public class AppointmentArchive extends AbstractModel<Integer>  {
 	public void setUrgency(String urgency) {
     	this.urgency = urgency;
     }
+	
+	public Integer getPartialBooking() {
+		return partialBooking;
+	}
+	public boolean isPartialBooking() {
+		return partialBooking == 1;
+	}
+
+	public void setPartialBooking(Integer partialBooking) {
+		setPartialBooking(partialBooking != 0);
+	}
+	public void setPartialBooking(boolean partialBooking) {
+		this.partialBooking = (partialBooking)? 1 : 0;
+	}
 
 	public BookingSource getBookingSource() {
     	return (bookingSource);

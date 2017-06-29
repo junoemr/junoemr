@@ -25,29 +25,24 @@ package oscar.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
-import org.springframework.jdbc.core.RowMapper;
-
-import oscar.OscarProperties;
-
-import oscar.appt.ApptData;
-
-import oscar.oscarClinic.ClinicData;
-
-import org.oscarehr.common.hl7.v2.HL7A04Data;
-
-import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.dao.DemographicDao;
-
-import oscar.oscarDemographic.data.DemographicData;
+import org.oscarehr.common.hl7.v2.HL7A04Data;
+import org.oscarehr.common.model.Demographic;
 
 //import org.oscarehr.PMmodule.model.Program;
 //import org.oscarehr.PMmodule.dao.ProgramDao;
 
 import org.oscarehr.util.SpringUtils;
+import org.springframework.jdbc.core.RowMapper;
+
+import oscar.OscarProperties;
+import oscar.appt.ApptData;
+import oscar.oscarClinic.ClinicData;
+import oscar.oscarDemographic.data.DemographicData;
 
 /**
  * Oscar Appointment DAO implementation created to extract database access code
@@ -113,7 +108,9 @@ public class AppointmentDao extends OscarSuperDao {
 				appData.setProviderFirstName( 	apptInfo.get(0).get("first_name").toString() );
 				appData.setProviderLastName( 	apptInfo.get(0).get("last_name").toString() );
 				appData.setOhipNo( 				apptInfo.get(0).get("ohip_no").toString() );
-				appData.setUrgency( 			apptInfo.get(0).get("urgency").toString() );				
+				appData.setUrgency( 			apptInfo.get(0).get("urgency").toString() );
+				appData.setPartialBooking( 		"1".equals(apptInfo.get(0).get("partial_booking").toString() ));
+//				appData.setPartialBooking( 		(Integer)apptInfo.get(0).get("partial_booking") == 1 );
 			}
 				
 			// get demographic data
@@ -153,11 +150,11 @@ public class AppointmentDao extends OscarSuperDao {
             
             {"search_appt_data", "select app.*, prov.first_name, prov.last_name, prov.ohip_no, adm.program_id as adm_program_id from provider prov, appointment app left join admission adm on app.demographic_no = adm.client_id where app.provider_no = prov.provider_no and app.provider_no=? and app.appointment_date=? and app.start_time=? and app.end_time=? and app.createdatetime=? and app.creator=? and app.demographic_no=? order by app.appointment_no desc limit 1"},
 
-            {"add_apptrecord", "insert into appointment (provider_no,appointment_date,start_time,end_time,name, notes,reason,location,resources,type, style,billing,status,createdatetime,creator, remarks, demographic_no, program_id,urgency) values(?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?)" },
+            {"add_apptrecord", "insert into appointment (provider_no,appointment_date,start_time,end_time,name, notes,reason,location,resources,type, style,billing,status,createdatetime,creator, remarks, demographic_no, program_id,urgency,partial_booking) values(?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?)" },
             {"search_waitinglist", "select wl.listID, wln.name from waitingList wl, waitingListName wln where wl.demographic_no=? and wln.ID=wl.listID and wl.is_history ='N' order by wl.listID"},
             {"appendremarks", "update appointment set remarks=CONCAT(remarks,?) where appointment_no=?"},
             {"updatestatusc", "update appointment set status=?, lastupdateuser=?, updatedatetime=now() where appointment_no=?"},
-            {"update_apptrecord", "update appointment set demographic_no=?,appointment_date=?,start_time=?,end_time=?,name=?, notes=?,reason =?,location=?, resources=?, type=?,style=?,billing =?,status=?,lastupdateuser=?,remarks=?,updatedatetime=now(),urgency=? where appointment_no=? "},
+            {"update_apptrecord", "update appointment set demographic_no=?,appointment_date=?,start_time=?,end_time=?,name=?, notes=?,reason =?,location=?, resources=?, type=?,style=?,billing =?,status=?,lastupdateuser=?,remarks=?,updatedatetime=now(),urgency=?,partial_booking=? where appointment_no=? "},
 
             {"search", "select * from appointment where appointment_no=?"},
             {"search_detail", "select * from demographic where demographic_no=?"},
@@ -170,7 +167,7 @@ public class AppointmentDao extends OscarSuperDao {
 
             {"cancel_appt", "update appointment set status = ?, updatedatetime = ?, lastupdateuser = ? where appointment_date=? and provider_no=? and start_time=? and end_time=? and name=? and notes=? and reason=? and createdatetime like ?  and creator=? and demographic_no=? " },
             {"delete_appt", "delete from appointment where appointment_date=? and provider_no=? and start_time=? and end_time=? and name=? and notes=? and reason=? and createdatetime like ?  and creator=? and demographic_no=? " },
-            {"update_appt", "update appointment set start_time=?, end_time=?, name=?, demographic_no=?, notes=?, reason=?, location=?, resources=?, updatedatetime=?, lastupdateuser=?, urgency=? where appointment_date=? and provider_no=? and start_time=? and end_time=? and name=? and notes=? and reason=? and createdatetime like ?  and creator=? and demographic_no=?" },
+            {"update_appt", "update appointment set start_time=?, end_time=?, name=?, demographic_no=?, notes=?, reason=?, location=?, resources=?, updatedatetime=?, lastupdateuser=?, urgency=?, partial_booking=? where appointment_date=? and provider_no=? and start_time=? and end_time=? and name=? and notes=? and reason=? and createdatetime like ?  and creator=? and demographic_no=?" },
 
             {"search_group_day_appt", "select count(appointment_no) as numAppts from appointment, mygroup where mygroup.provider_no=appointment.provider_no and appointment.status != 'C' and mygroup.mygroup_no=? and  appointment.demographic_no=? and  appointment.appointment_date=?"},
             {"search_formtbl","select * from encounterForm where form_table= ?"},
@@ -199,6 +196,7 @@ public class AppointmentDao extends OscarSuperDao {
 			ad.setProviderLastName(rs.getString("prov.last_name"));
 			ad.setOhipNo(rs.getString("prov.ohip_no"));
 			ad.setUrgency(rs.getString("urgency"));
+			ad.setPartialBooking("1".equals(rs.getString("partial_booking")));
 			return ad;
         }
     }

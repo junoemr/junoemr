@@ -733,22 +733,30 @@ if (bMultisites) { %>
             <div class="label"><bean:message key="Appointment.formCritical" />:</div>
             <div class="input">
             	<%
-           			String urgencyChecked=new String();
-            		if(bFirstDisp) {
-            			if(appt.get("urgency") != null && appt.get("urgency").equals("critical")) {
-            				urgencyChecked=" checked=\"checked\" ";
-            			}
-            		} else {
-            			if(request.getParameter("urgency") != null) {
-            				if(request.getParameter("urgency").equals("critical")) {
-            					urgencyChecked=" checked=\"checked\" ";
-            				}
-            			}
-            		}
+            		String urgencyChecked="";
+                	if("critical".equals(appt.get("urgency"))) {
+                		urgencyChecked=" checked=\"checked\" ";
+        			}
             	%>
             	<input type="checkbox" name="urgency" value="critical" <%=urgencyChecked%>/>
             </div>
         </li>
+        <%if(props.isPropertyActive("appt.partial_booking_flag_enable")) { 
+        	String partialBookingChecked="";
+        	if((Integer)appt.get("partial_booking") == 1) {
+        		partialBookingChecked=" checked=\"checked\" ";
+			}
+        	%>
+            <li class="row weak">
+	            <div class="label"></div>
+	            <div class="input"></div>
+	            <div class="space">&nbsp;</div>
+	            <div class="label"><bean:message key="Appointment.formPartialBooking" />:</div>
+	            <div class="input">
+	            	<input type="checkbox" name="partial_booking" value="1" <%=partialBookingChecked%>/>
+	            </div>
+            </li> <%
+        }%>
         <li class="row weak">
 			<div class="label"></div>
             <div class="input"></div>

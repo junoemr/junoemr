@@ -166,7 +166,7 @@ if (request.getParameter("year")!=null && request.getParameter("month")!=null &&
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 <jsp:useBean id="as" class="oscar.appt.ApptStatusData" scope="page" />
 <jsp:useBean id="dateTimeCodeBean" class="java.util.Hashtable" scope="page" />
-<% Properties oscarVariables = OscarProperties.getInstance(); %>
+<% OscarProperties oscarVariables = OscarProperties.getInstance(); %>
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 
 <!-- Struts for i18n -->
@@ -1734,6 +1734,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
           	  String sitename = String.valueOf(appointment.get("location")).trim();
           	  String urgency = (String)appointment.get("urgency");
           	  String apptType = (String)appointment.get("type");
+          	  Integer partialBooking = (Integer)appointment.get("partial_booking");
 
           	  bFirstTimeRs=true;
 			    as.setApptStatus(status);
@@ -1773,8 +1774,12 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
             if(urgency != null && urgency.equals("critical")) {
             %>
             	<img src="../images/warning-icon.png" border="0" width="14" height="14" title="Critical Appointment"/>
+            <% }
+            if(oscarVariables.isPropertyActive("appt.partial_booking_flag_enable") && partialBooking != null && partialBooking == 1) {
+            %>
+            	<img src="../images/icons/partial_booking.png" border="0" width="14" height="14" title="Partial Booking"/>
             <% } %>
-<%--|--%>
+            
 
         <%
         			if(demographic_no==0) {
