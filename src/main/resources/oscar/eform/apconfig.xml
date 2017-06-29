@@ -545,133 +545,154 @@
 	<databaseap>
 		<ap-name>medical_history</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(cn.note SEPARATOR ', ') AS medicalHistories
-			FROM (
-			SELECT cn.position, MAX(cin.note_id) AS note_id
-			FROM casemgmt_note cn
-			JOIN casemgmt_issue_notes cin ON cin.note_id = cn.note_id
-			JOIN casemgmt_issue iss ON iss.id = cin.id
-			JOIN issue i ON iss.issue_id = i.issue_id
-			WHERE i.code = 'MedHistory'
-			AND iss.demographic_no = ${demographic}
-			GROUP BY cn.position
-			ORDER BY cn.position
-			) AS latest_notes
-			JOIN casemgmt_note cn ON cn.note_id = latest_notes.note_id
+			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS medicalHistories 
+			FROM casemgmt_note s1, (
+			  SELECT
+				MAX(cn.note_id) as note_id 
+				FROM casemgmt_note cn, casemgmt_issue_notes cin
+			  WHERE cn.note_id = cin.note_id 
+			  AND cin.id = (
+				SELECT id FROM casemgmt_issue
+				WHERE demographic_no = ${demographic} 
+				AND issue_id = (
+				  SELECT issue_id FROM issue WHERE code='MedHistory' LIMIT 1
+				) LIMIT 1
+			  ) GROUP BY cn.uuid
+			) s2
+			WHERE s1.note_id = s2.note_id 
+			AND s1.archived=0;
 		</ap-sql>
 		<ap-output>${medicalHistories}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>other_medications_history</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(cn.note SEPARATOR ', ') AS omeds
-			FROM (
-			SELECT cn.position, MAX(cin.note_id) AS note_id
-			FROM casemgmt_note cn
-			JOIN casemgmt_issue_notes cin ON cin.note_id = cn.note_id
-			JOIN casemgmt_issue iss ON iss.id = cin.id
-			JOIN issue i ON iss.issue_id = i.issue_id
-			WHERE i.code = 'OMeds'
-			AND iss.demographic_no = ${demographic}
-			GROUP BY cn.position
-			ORDER BY cn.position
-			) AS latest_notes
-			JOIN casemgmt_note cn ON cn.note_id = latest_notes.note_id;
+			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS omeds
+			FROM casemgmt_note s1, (
+			  SELECT
+				MAX(cn.note_id) as note_id 
+				FROM casemgmt_note cn, casemgmt_issue_notes cin
+			  WHERE cn.note_id = cin.note_id 
+			  AND cin.id = (
+				SELECT id FROM casemgmt_issue
+				WHERE demographic_no = ${demographic} 
+				AND issue_id = (
+				  SELECT issue_id FROM issue WHERE code='OMeds' LIMIT 1
+				) LIMIT 1
+			  ) GROUP BY cn.uuid
+			) s2
+			WHERE s1.note_id = s2.note_id 
+			AND s1.archived=0;
 		</ap-sql>
 		<ap-output>${omeds}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>social_family_history</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(cn.note SEPARATOR ', ') AS socialHistories
-			FROM (
-			SELECT cn.position, MAX(cin.note_id) AS note_id
-			FROM casemgmt_note cn
-			JOIN casemgmt_issue_notes cin ON cin.note_id = cn.note_id
-			JOIN casemgmt_issue iss ON iss.id = cin.id
-			JOIN issue i ON iss.issue_id = i.issue_id
-			WHERE i.code = 'SocHistory'
-			AND iss.demographic_no = ${demographic}
-			GROUP BY cn.position
-			ORDER BY cn.position
-			) AS latest_notes
-			JOIN casemgmt_note cn ON cn.note_id = latest_notes.note_id;
+			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS socialHistories
+			FROM casemgmt_note s1, (
+			  SELECT
+				MAX(cn.note_id) as note_id 
+				FROM casemgmt_note cn, casemgmt_issue_notes cin
+			  WHERE cn.note_id = cin.note_id 
+			  AND cin.id = (
+				SELECT id FROM casemgmt_issue
+				WHERE demographic_no = ${demographic} 
+				AND issue_id = (
+				  SELECT issue_id FROM issue WHERE code='SocHistory' LIMIT 1
+				) LIMIT 1
+			  ) GROUP BY cn.uuid
+			) s2
+			WHERE s1.note_id = s2.note_id 
+			AND s1.archived=0;
 		</ap-sql>
 		<ap-output>${socialHistories}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>ongoingconcerns</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(cn.note SEPARATOR ', ') AS concerns
-			FROM (
-			SELECT cn.position, MAX(cin.note_id) AS note_id
-			FROM casemgmt_note cn
-			JOIN casemgmt_issue_notes cin ON cin.note_id = cn.note_id
-			JOIN casemgmt_issue iss ON iss.id = cin.id
-			JOIN issue i ON iss.issue_id = i.issue_id
-			WHERE i.code = 'Concerns'
-			AND iss.demographic_no = ${demographic}
-			GROUP BY cn.position
-			ORDER BY cn.position
-			) AS latest_notes
-			JOIN casemgmt_note cn ON cn.note_id = latest_notes.note_id;
+			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS concerns
+			FROM casemgmt_note s1, (
+			  SELECT
+				MAX(cn.note_id) as note_id 
+				FROM casemgmt_note cn, casemgmt_issue_notes cin
+			  WHERE cn.note_id = cin.note_id 
+			  AND cin.id = (
+				SELECT id FROM casemgmt_issue
+				WHERE demographic_no = ${demographic} 
+				AND issue_id = (
+				  SELECT issue_id FROM issue WHERE code='Concerns' LIMIT 1
+				) LIMIT 1
+			  ) GROUP BY cn.uuid
+			) s2
+			WHERE s1.note_id = s2.note_id 
+			AND s1.archived=0;
 		</ap-sql>
 		<ap-output>${concerns}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>reminders</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(cn.note SEPARATOR ', ') AS reminders
-			FROM (
-			SELECT cn.position, MAX(cin.note_id) AS note_id
-			FROM casemgmt_note cn
-			JOIN casemgmt_issue_notes cin ON cin.note_id = cn.note_id
-			JOIN casemgmt_issue iss ON iss.id = cin.id
-			JOIN issue i ON iss.issue_id = i.issue_id
-			WHERE i.code = 'Reminders'
-			AND iss.demographic_no = ${demographic}
-			GROUP BY cn.position
-			ORDER BY cn.position
-			) AS latest_notes
-			JOIN casemgmt_note cn ON cn.note_id = latest_notes.note_id;
+			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS reminders
+			FROM casemgmt_note s1, (
+			  SELECT
+				MAX(cn.note_id) as note_id 
+				FROM casemgmt_note cn, casemgmt_issue_notes cin
+			  WHERE cn.note_id = cin.note_id 
+			  AND cin.id = (
+				SELECT id FROM casemgmt_issue
+				WHERE demographic_no = ${demographic} 
+				AND issue_id = (
+				  SELECT issue_id FROM issue WHERE code='Reminders' LIMIT 1
+				) LIMIT 1
+			  ) GROUP BY cn.uuid
+			) s2
+			WHERE s1.note_id = s2.note_id 
+			AND s1.archived=0;
 		</ap-sql>
 		<ap-output>${reminders}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>risk_factors</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(cn.note SEPARATOR ', ') AS risk_factors
-			FROM (
-			SELECT cn.position, MAX(cin.note_id) AS note_id
-			FROM casemgmt_note cn
-			JOIN casemgmt_issue_notes cin ON cin.note_id = cn.note_id
-			JOIN casemgmt_issue iss ON iss.id = cin.id
-			JOIN issue i ON iss.issue_id = i.issue_id
-			WHERE i.code = 'riskfactors'
-			AND iss.demographic_no = ${demographic}
-			GROUP BY cn.position
-			ORDER BY cn.position
-			) AS latest_notes
-			JOIN casemgmt_note cn ON cn.note_id = latest_notes.note_id;
+			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS risk_factors
+			FROM casemgmt_note s1, (
+			  SELECT
+				MAX(cn.note_id) as note_id 
+				FROM casemgmt_note cn, casemgmt_issue_notes cin
+			  WHERE cn.note_id = cin.note_id 
+			  AND cin.id = (
+				SELECT id FROM casemgmt_issue
+				WHERE demographic_no = ${demographic} 
+				AND issue_id = (
+				  SELECT issue_id FROM issue WHERE code='riskfactors' LIMIT 1
+				) LIMIT 1
+			  ) GROUP BY cn.uuid
+			) s2
+			WHERE s1.note_id = s2.note_id 
+			AND s1.archived=0;
 		</ap-sql>
 		<ap-output>${risk_factors}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>family_history</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(cn.note SEPARATOR ', ') AS family_history
-			FROM (
-			SELECT cn.position, MAX(cin.note_id) AS note_id
-			FROM casemgmt_note cn
-			JOIN casemgmt_issue_notes cin ON cin.note_id = cn.note_id
-			JOIN casemgmt_issue iss ON iss.id = cin.id
-			JOIN issue i ON iss.issue_id = i.issue_id
-			WHERE i.code = 'famhistory'
-			AND iss.demographic_no = ${demographic}
-			GROUP BY cn.position
-			ORDER BY cn.position
-			) AS latest_notes
-			JOIN casemgmt_note cn ON cn.note_id = latest_notes.note_id;
+			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS family_history
+			FROM casemgmt_note s1, (
+			  SELECT
+				MAX(cn.note_id) as note_id 
+				FROM casemgmt_note cn, casemgmt_issue_notes cin
+			  WHERE cn.note_id = cin.note_id 
+			  AND cin.id = (
+				SELECT id FROM casemgmt_issue
+				WHERE demographic_no = ${demographic} 
+				AND issue_id = (
+				  SELECT issue_id FROM issue WHERE code='famhistory' LIMIT 1
+				) LIMIT 1
+			  ) GROUP BY cn.uuid
+			) s2
+			WHERE s1.note_id = s2.note_id 
+			AND s1.archived=0;
 		</ap-sql>
 		<ap-output>${family_history}</ap-output>
 	</databaseap>
