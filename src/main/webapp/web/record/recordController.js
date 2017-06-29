@@ -713,6 +713,8 @@ angular.module('Record').controller('Record.RecordController', [
 						unsaved: true
 					};
 					controller.page.assignedCMIssues.push(cmIssue);
+
+					$scope.$broadcast('noteIssueAdded');
 				},
 				function error(errors)
 				{
@@ -732,9 +734,10 @@ angular.module('Record').controller('Record.RecordController', [
 				}
 			}
 			controller.page.assignedCMIssues = newList;
+
+			$scope.$broadcast('noteIssueRemoved');
 		};
 
-		// For some reason Angular does not allow for the evaluation of the inverse of custom filters, thus, we have the the following masterpiece
 		// If inverse === false, return true if the given item is supposed to be shown outisde the 'more' dropdown on the medium view
 		// If inverse === true, return the inverse of the above statement,
 		controller.mediumNavItemFilter = function mediumNavItemFilter(inverse)
