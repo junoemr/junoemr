@@ -36,37 +36,31 @@ public class CasemgmtNoteLockDao extends AbstractDao<CasemgmtNoteLock> {
 		super(CasemgmtNoteLock.class);
 	}
 	
-	public CasemgmtNoteLock findByNoteDemo(Integer demographicNo, Long note_id) {
-		Query query = entityManager.createQuery("select lock from CasemgmtNoteLock lock where lock.demographicNo = :demo and lock.noteId = :noteId");
-		
-		query.setParameter("demo", demographicNo);		
-		query.setParameter("noteId", note_id);
-		
-		return getSingleResultOrNull(query);
-	}
-	
-	public void remove(String providerNo, Integer demographicNo, Long note_id) {
-		Query query = entityManager.createQuery("select lock from CasemgmtNoteLock lock where lock.demographicNo = :demo and lock.providerNo = :providerNo" +
-				" and lock.noteId = :note_id");
-		
+	public int remove(String providerNo, Integer demographicNo, Long noteId) {
+		Query query = entityManager.createQuery("DELETE FROM CasemgmtNoteLock x WHERE x.demographicNo = :demo AND x.providerNo = :providerNo AND x.noteId = :noteId");
 		query.setParameter("demo", demographicNo);
 		query.setParameter("providerNo", providerNo);
-		query.setParameter("note_id", note_id);
-		
-		CasemgmtNoteLock casemgmtNoteLock = getSingleResultOrNull(query);
-		
-		if( casemgmtNoteLock != null ) {
-			remove(casemgmtNoteLock);
-		}
+		query.setParameter("noteId", noteId);
+
+		return query.executeUpdate();
 	}
-	
+
+	public CasemgmtNoteLock findByNoteDemo(Integer demographicNo, Long note_id) {
+		Query query = entityManager.createQuery("SELECT x FROM CasemgmtNoteLock x WHERE x.demographicNo = :demo AND x.noteId = :noteId");
+
+		query.setParameter("demo", demographicNo);
+		query.setParameter("noteId", note_id);
+
+		return getSingleResultOrNull(query);
+	}
+
 	public List<CasemgmtNoteLock> findBySession(String sessionId) {
-		Query query = entityManager.createQuery("select lock from CasemgmtNoteLock lock where lock.sessionId = :sessionId");
-		
+		Query query = entityManager.createQuery("SELECT x FROM CasemgmtNoteLock x WHERE x.sessionId = :sessionId");
 		query.setParameter("sessionId", sessionId);
-		
+
+		@SuppressWarnings("unchecked")
 		List<CasemgmtNoteLock> results = query.getResultList();
-		
+
 		return results;
 	}
 }

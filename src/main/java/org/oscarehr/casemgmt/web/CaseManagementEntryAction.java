@@ -1888,30 +1888,38 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
 
-		String demoNo = getDemographicNo(request);
-		String noteId = request.getParameter("noteId");
-		String forceRelease = request.getParameter("force");
+		String demoNoStr = getDemographicNo(request);
+		String noteIdStr = request.getParameter("noteId");
+		boolean forceRelease = "true".equalsIgnoreCase(request.getParameter("force"));
 		HttpSession session = request.getSession();
-		String sessionFrmName = "caseManagementEntryForm" + demoNo;
+		// String sessionFrmName = "caseManagementEntryForm" + demoNoStr;
 
 		try {
+			Integer demoNo = Integer.parseInt(demoNoStr);
+			Long noteId = Long.parseLong(noteIdStr);
+			
 			CasemgmtNoteLock casemgmtNoteLockSession = (CasemgmtNoteLock) session.getAttribute("casemgmtNoteLock" + demoNo);
-			//If browser is exiting check to see if we should release lock.  It may be held by same user in another window so we check			
-			if (request.getRequestedSessionId().equals(casemgmtNoteLockSession.getSessionId()) && casemgmtNoteLockSession.getNoteId() == Long.parseLong(noteId)) {
-				releaseNoteLock(providerNo, Integer.parseInt(demoNo), Long.parseLong(noteId));
-				session.removeAttribute("casemgmtNoteLock" + demoNo);
-			}
-			//If we clicked on a note to edit we want to release old note's lock.  Session lock has already been updated with new note id
-			//so we force removal of old note lock 
-			else if (forceRelease != null && forceRelease.equalsIgnoreCase("true")) {
-				releaseNoteLock(providerNo, Integer.parseInt(demoNo), Long.parseLong(noteId));
-			}
 
-		} catch (Exception e) {
-			//nothing to do. lock was not found 
+			if (casemgmtNoteLockSession != null) { // lock found!
+				
+				// If browser is exiting check to see if we should release lock.
+				// It may be held by same user in another window so we check
+				boolean sessionMatch = request.getRequestedSessionId().equals(casemgmtNoteLockSession.getSessionId());
+				boolean noteIdMatch = casemgmtNoteLockSession.getNoteId() == noteId;
+				// If we clicked on a note to edit we want to release old note's
+				// lock. Session lock has already been updated with new note id
+				// so we force removal of old note lock
+				
+				if (sessionMatch && noteIdMatch || forceRelease) {
+					
+					releaseNoteLock(providerNo, demoNo, noteId);
+					session.removeAttribute("casemgmtNoteLock" + demoNo);
+				}
+			}
 		}
-
-		
+		catch (Exception e) {
+			logger.error("Error Releasing Note Lock", e);
+		}
 		return null;
 	}
 
