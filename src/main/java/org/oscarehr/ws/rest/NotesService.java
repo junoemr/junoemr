@@ -1714,16 +1714,25 @@ public class NotesService extends AbstractServiceImpl {
 		String term = json.getString("term");
 		
 		if(json.getString("term").length() >= 1) {
+
+			// Program used to be set by the user on the front end using a button on the navbar. As of now this feature has been disabled indefinitely, thus, "pp" will be null
+			// We are keeping this functionality in the event that we decide to add back the ability for users to select a program.
+			ProgramProvider pp = programManager2.getCurrentProgramInDomain(getLoggedInInfo(), getLoggedInInfo().getLoggedInProviderNo());
+			String programId = null;
 		
-			ProgramProvider pp = programManager2.getCurrentProgramInDomain(getLoggedInInfo(),getLoggedInInfo().getLoggedInProviderNo());
-			
+			if(pp !=null && pp.getProgramId() != null){
+				programId = String.valueOf(pp.getProgramId());
+			}else{
+				programId = String.valueOf(programMgr.getProgramIdByProgramName("OSCAR")); //Default to the oscar program if provider hasn't been assigned to a program
+			}
+
 			CaseManagementManager caseManagementManager = SpringUtils.getBean(CaseManagementManager.class);
-			
+
 			//change to get count, and get the slice
-			Integer issuesCount = caseManagementManager.searchIssuesCount(getLoggedInInfo().getLoggedInProviderNo(), (pp!=null)?String.valueOf(pp.getProgramId()):null, term);
+			Integer issuesCount = caseManagementManager.searchIssuesCount(getLoggedInInfo().getLoggedInProviderNo(), programId, term);
 			
-			List<Issue> issues = caseManagementManager.searchIssues(getLoggedInInfo().getLoggedInProviderNo(), (pp!=null)?String.valueOf(pp.getProgramId()):null, term, startIndex, itemsToReturn);
-			
+			List<Issue> issues = caseManagementManager.searchIssues(getLoggedInInfo().getLoggedInProviderNo(), programId, term, startIndex, itemsToReturn);
+						
 			List<IssueTo1> results = new IssueConverter().getAllAsTransferObjects(getLoggedInInfo(), issues);
 			
 			response.setContent(results);
