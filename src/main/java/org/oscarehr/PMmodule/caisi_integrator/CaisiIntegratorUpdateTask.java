@@ -1188,13 +1188,8 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 		logger.debug("pushing demographic forms facilityId:" + facility.getId() + ", demographicId:" + demographicId);
 
 		// TODO add additional methods for other forms here
-<<<<<<< HEAD
-
-		if( OscarProperties.getInstance().isOntarioBillingRegion() ) {
-=======
 		
 		if( OscarProperties.getInstance().isOntarioInstanceType() ) {
->>>>>>> RELEASE_15_BETA
 			// LabReq2007 and up is only used in Ontario
 			pushLabReq2007(lastDataUpdated, facility, demographicWs, demographicId);
 		}
