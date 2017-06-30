@@ -41,17 +41,17 @@ public class DemographicSetsDao extends AbstractDao<DemographicSets>{
 	}
 
 	public List<DemographicSets> findBySetName(String setName) {
-		String sql = "select x from DemographicSets x where x.archive != ? and x.name=?";
+		String sql = "SELECT x FROM DemographicSets x WHERE x.archive != :archive AND x.name = :setName";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, "1");
-		query.setParameter(2, setName);
+		query.setParameter("archive", "1");
+		query.setParameter("setName", setName);
 		@SuppressWarnings("unchecked")
 		List<DemographicSets> results = query.getResultList();
 		return results;
 	}
 
 	public List<DemographicSets> findBySetNames(Collection<String> setNameList) {
-		String sql = "select x from DemographicSets x where x.archive != :archive and x.name in (:nameList)";
+		String sql = "SELECT x FROM DemographicSets x WHERE x.archive != :archive AND x.name IN (:nameList)";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("archive", "1");
 		query.setParameter("nameList", setNameList);
@@ -61,27 +61,28 @@ public class DemographicSetsDao extends AbstractDao<DemographicSets>{
 	}
 
 	public List<DemographicSets> findBySetNameAndEligibility(String setName, String eligibility) {
-		String sql = "select x from DemographicSets x where x.name = ? and x.eligibility=?";
+		String sql = "SELECT x FROM DemographicSets x WHERE x.archive != :archive AND x.name = :setName AND x.eligibility = :eligiblity";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, setName);
-		query.setParameter(2, eligibility);
+		query.setParameter("archive", "1");
+		query.setParameter("setName", setName);
+		query.setParameter("eligiblity", eligibility);
 		@SuppressWarnings("unchecked")
 		List<DemographicSets> results = query.getResultList();
 		return results;
 	}
 
 	public List<String> findSetNamesByDemographicNo(Integer demographicNo) {
-		String sql = "select distinct(x.name) from DemographicSets x where x.archive = ? and x.demographicNo=?";
+		String sql = "SELECT distinct(x.name) FROM DemographicSets x JOIN x.demographic d WHERE x.archive != :archive AND d.DemographicNo = :demoNo";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, "1");
-		query.setParameter(2, demographicNo);
+		query.setParameter("archive", "1");
+		query.setParameter("demoNo", demographicNo);
 		@SuppressWarnings("unchecked")
 		List<String> results = query.getResultList();
 		return results;
 	}
 
 	public List<String> findSetNames() {
-		String sql = "select distinct(x.name) from DemographicSets x";
+		String sql = "SELECT distinct(x.name) FROM DemographicSets x";
 		Query query = entityManager.createQuery(sql);
 		@SuppressWarnings("unchecked")
 		List<String> results = query.getResultList();
@@ -89,12 +90,19 @@ public class DemographicSetsDao extends AbstractDao<DemographicSets>{
 	}
 
 	public List<DemographicSets> findBySetNameAndDemographicNo(String setName, int demographicNo) {
-		String sql = "select x from DemographicSets x where x.name = ? and x.demographicNo=?";
+		String sql = "SELECT x FROM DemographicSets x WHERE x.archive != :archive AND x.name = :setName AND x.demographic.DemographicNo = :demoNo";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, setName);
-		query.setParameter(2, demographicNo);
+		query.setParameter("archive", "1");
+		query.setParameter("setName", setName);
+		query.setParameter("demoNo", demographicNo);
 		@SuppressWarnings("unchecked")
 		List<DemographicSets> results = query.getResultList();
 		return results;
+	}
+	public void deletePatientSet(String setName) {
+		String sql = "DELETE FROM DemographicSets x WHERE x.name = :setName";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("setName", setName);
+		query.executeUpdate();
 	}
 }

@@ -38,7 +38,7 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 
-<% java.util.Properties oscarVariables = oscar.OscarProperties.getInstance(); %>
+<% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
 
 <%
     if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.jsp");
@@ -57,7 +57,7 @@ int endHour=providerPreference.getEndHour();
 int everyMin=providerPreference.getEveryMin();
 
 String curUser_no = (String) session.getAttribute("user");
-String prov= (oscarVariables.getProperty("billregion","")).trim().toUpperCase();
+String prov = oscarVariables.getBillingTypeUpperCase();
 String userfirstname = (String) session.getAttribute("userfirstname");
 String userlastname = (String) session.getAttribute("userlastname");
 String mygroupno = providerPreference.getMyGroupNo();

@@ -121,7 +121,7 @@ import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.oscarPrevention.PreventionData;
 import oscar.oscarProvider.data.ProviderData;
-import oscar.oscarReport.data.DemographicSets;
+import oscar.oscarReport.data.DemographicSetManager;
 import oscar.oscarReport.data.RptDemographicQueryBuilder;
 import oscar.oscarReport.data.RptDemographicQueryLoader;
 import oscar.oscarReport.pageUtil.RptDemographicReportForm;
@@ -210,7 +210,7 @@ public class DemographicExportAction4 extends Action {
 
 		List<String> list = new ArrayList<String>();
 		if (demographicNo==null) {
-			list = new DemographicSets().getDemographicSet(setName);
+			list = new DemographicSetManager().getDemographicSet(setName);
 		if (list.isEmpty()) {
 			Date asofDate = new Date();
 			RptDemographicReportForm frm = new RptDemographicReportForm ();

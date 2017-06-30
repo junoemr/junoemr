@@ -220,17 +220,17 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    public String uploadMHL(
-            @WebParam(name="file_name") String fileName,
-            @WebParam(name="contents") String contents,
-            @WebParam(name="oscar_provider_no") String oscarProviderNo)
-    {
-        String returnMessage, audit;
+	public String uploadMHL(
+			@WebParam(name = "file_name") String fileName, 
+			@WebParam(name = "contents") String contents,
+			@WebParam(name = "oscar_provider_no") String oscarProviderNo) {
+		
+		String returnMessage, audit;
 
         try {
-            audit = importLab(fileName, contents, LAB_TYPE_EPSILON_MHL, oscarProviderNo);
-        } catch(Exception e)
-        {
+			audit = importLab(fileName, contents, LAB_TYPE_EPSILON_MHL, oscarProviderNo);
+		}
+		catch (Exception e) {
             logger.error(e.getMessage());
             returnMessage = "{\"success\":0,\"message\":\"" +
                 e.getMessage() + "\", \"audit\":\"\"}";
@@ -245,24 +245,20 @@ public class LabUploadWs extends AbstractWs {
     {
 		HttpServletRequest request = getHttpServletRequest();
 
-        OscarProperties props = OscarProperties.getInstance();
-        String labFolderPath = props.getProperty("DOCUMENT_DIR") + "labs";
-        String retVal = "";
+		OscarProperties props = OscarProperties.getInstance();
+		String labFolderPath = props.getProperty("DOCUMENT_DIR") + "labs";
+		String retVal = "";
 
-    	LoggedInInfo loggedInInfo =
-			LoggedInInfo.getLoggedInInfoFromSession(request);
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String ipAddr = request.getRemoteAddr();
-
 
         File labFolder = new File(labFolderPath);
 
-        if(!labFolder.exists())
-        {
-            if(!labFolder.mkdir())
-            {
-                throw new IOException("Failed to create lab upload folder! " + labFolderPath);
-            }
-        }
+		if (!labFolder.exists()) {
+			if (!labFolder.mkdir()) {
+				throw new IOException("Failed to create lab upload folder! " + labFolderPath);
+			}
+		}
 
         // Use same naming convention as manually uploaded labs, but place in the labs folder
         fileName = "LabUpload."+fileName.replaceAll(".enc", "")+"."+(new Date()).getTime();
@@ -282,20 +278,18 @@ public class LabUploadWs extends AbstractWs {
             MessageHandler msgHandler = HandlerClassFactory.getHandler(labType);
             logger.info("MESSAGE HANDLER "+msgHandler.getClass().getName());
 
-            // Parse and handle the lab
-            if((retVal = msgHandler.parse(
-				loggedInInfo,
-				getClass().getSimpleName(),
-				labFilePath,
-				checkFileUploadedSuccessfully,
-				ipAddr
-			)) == null) {
-            	throw new ParseException("Failed to parse lab: " + fileName + " of type: " + labType, 0);
-            }
-
-        }else{
-        	throw new SQLException("Failed insert lab into DB (Likely duplicate lab): " + fileName + " of type: " + labType);
-        }
+			// Parse and handle the lab
+            retVal = msgHandler.parse(loggedInInfo, getClass().getSimpleName(), labFilePath, checkFileUploadedSuccessfully, ipAddr);
+			if (retVal == null) {
+				throw new ParseException("Failed to parse lab: " + fileName + " of type: " + labType, 0);
+			}
+			else if (retVal.equals("duplicate")) {
+				throw new Exception("Duplicate lab upload");
+			}
+		}
+		else {
+			throw new SQLException( "Failed insert lab into DB (Likely duplicate lab): " + fileName + " of type: " + labType);
+		}
 
         // This will always contain one line, so let's just remove the newline characters
         retVal = retVal.replace("\n", "").replace("\r", "");

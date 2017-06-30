@@ -382,6 +382,16 @@ for (int i=0; i<sites.size(); i++) {
 			<td><input type="text" name="hso_no"
 				value="<%= provider.getHsoNo()==null ? "" : provider.getHsoNo() %>" maxlength="10"></td>
 		</tr>
+		<%
+			if (OscarProperties.getInstance().getProperty("hctype").equals("AB")) {
+		%>
+		<tr>
+			<td align="right"><bean:message key="admin.provider.formAlbertaTakNo" />:
+			</td>
+			<td><input type="text" name="alberta_tak_no"
+			value="<%= provider.getAlbertaTakNo()==null ? "" : provider.getAlbertaTakNo() %>" maxlength="20"></td>
+		</tr>
+		<%} %>
 		<tr>
 			<td align="right"><bean:message key="admin.provider.formStatus" />:
 			</td>

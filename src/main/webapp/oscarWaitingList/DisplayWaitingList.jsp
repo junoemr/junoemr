@@ -63,13 +63,9 @@
 <!-- the following script defines the Calendar.setup helper function, which makes
        adding a calendar a matter of 1 or 2 lines of code. -->
 <script type="text/javascript" src="../share/calendar/calendar-setup.js"></script>
-
 </head>
 
-<script language="JavaScript">
-
-
-
+<script>
 function goToPage(){
 	document.forms[0].waitingListId.value = 
 				document.forms[0].selectedWL.options[document.forms[0].selectedWL.selectedIndex].value;
@@ -156,9 +152,17 @@ function removePatient(demographicNo, waitingList){
         
     
 }
+// function to set the selected value of the wait list drop down
+function setSelectedWaitingListName() {
+	var wlId = "<%=wlid%>";
+	var selectedWL = document.getElementById("selectedWL");
+	if(wlId !== "0") {
+		selectedWL.value = wlId;
+	}
+}
 </script>
 <body class="BodyStyle" vlink="#0000FF"
-	onload='window.resizeTo(900,400)'>
+	onload='window.resizeTo(900,400); setSelectedWaitingListName();'>
 <!--  -->
 <html:form
 	action="/oscarWaitingList/SetupDisplayWaitingList.do?update=Y">
@@ -183,25 +187,11 @@ function removePatient(demographicNo, waitingList){
 					<td align="right"></td>
 
 					<td align="left">Please Select a Waiting List:</td>
-					<td><html:select property="selectedWL">
+					<td><html:select styleId="selectedWL" property="selectedWL">
 						<option value=""></option>
-						<%
-                                	String providerNo = (String)session.getAttribute("user");
-                                	String groupNo = "";
-                                	ProviderPreference providerPreference=(ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
-                                    if(providerPreference.getMyGroupNo() != null){
-                                    	groupNo = providerPreference.getMyGroupNo();
-                                    }
-                                    WLWaitingListNameBeanHandler wlNameHd = new WLWaitingListNameBeanHandler(groupNo, providerNo);
-                                    List allWaitingListName = wlNameHd.getWaitingListNameList();
-                                    for(int i=0; i<allWaitingListName.size(); i++){
-                                        WLWaitingListNameBean wLBean = (WLWaitingListNameBean) allWaitingListName.get(i);
-                                        String id = wLBean.getId();
-                                        String name = wLBean.getWaitingListName();                                       
-                                        String selected = id.compareTo((String) request.getAttribute("WLId")==null?"0":(String) request.getAttribute("WLId"))==0?"SELECTED":"";                                        
-                                %>
-						<option value="<%=id%>" <%=selected%>><%=name%></option>
-						<%}%>
+						<logic:iterate id="WLWaitingListNameBean" name="waitingListNames">
+							<option value="<bean:write name="WLWaitingListNameBean" property="id"/>"><bean:write name="WLWaitingListNameBean" property="waitingListName" /></option>
+						</logic:iterate>
 					</html:select> <INPUT type="button" onClick="goToPage()" value="Generate Report">
 					<%
         String userRole = "";

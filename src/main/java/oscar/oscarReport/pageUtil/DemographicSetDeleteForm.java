@@ -22,44 +22,19 @@
  * Ontario, Canada
  */
 
+package oscar.oscarReport.pageUtil;
 
-package oscar.oscarWaitingList.bean;
+public class DemographicSetDeleteForm {
+	String demographicSetName = null;
 
+	public String getDemographicSetName() {
+		return demographicSetName;
+	}
 
-public class WLWaitingListNameBean{
+	public void setDemographicSetName(String demographicSetName) {
+		this.demographicSetName = demographicSetName;
+	}
 
-       String waitingListName;
-       String Id;
-       String groupNo;
-       String providerNo;
-       String createdDate;
-       
-       public WLWaitingListNameBean(String nameId, String waitingListName, String groupNo,
-    		                        String providerNo, String createdDate ){
-           this.waitingListName = waitingListName;
-           this.Id = nameId;
-           this.groupNo = groupNo;
-           this.providerNo = providerNo;
-           this.createdDate = createdDate;
-       }
-              
-       public String getWaitingListName(){
-           return waitingListName;
-       }
-    
-       public String getId(){
-           return Id;
-       }
-
-		public String getGroupNo() {
-			return groupNo;
-		}
-       
-		public String getProviderNo() {
-			return providerNo;
-		}
-
-		public String getCreatedDate() {
-			return createdDate;
-		}
+	public DemographicSetDeleteForm() {
+	}
 }

@@ -80,7 +80,7 @@ import oscar.OscarProperties;
 import oscar.oscarEncounter.oscarMeasurements.data.ImportExportMeasurements;
 import oscar.oscarEncounter.oscarMeasurements.data.LabMeasurements;
 import oscar.oscarEncounter.oscarMeasurements.data.Measurements;
-import oscar.oscarReport.data.DemographicSets;
+import oscar.oscarReport.data.DemographicSetManager;
 import oscar.oscarRx.data.RxPrescriptionData;
 import oscar.util.StringUtils;
 import oscar.util.UtilDateUtilities;
@@ -257,7 +257,7 @@ public class CihiExportAction extends DispatchAction {
 
 
 	    //grab patient list from set
-	    DemographicSets demoSets = new DemographicSets();
+	    DemographicSetManager demoSets = new DemographicSetManager();
 		List<String> patientList = demoSets.getDemographicSet(frm.getString("patientSet"));
 
 		//make all xml files, zip them and save to document directory

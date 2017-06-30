@@ -67,7 +67,7 @@
   session.setAttribute("pgp_ready", pgp_ready);
 
   String demographicNo = request.getParameter("demographicNo");
-  DemographicSets  ds = new DemographicSets();
+  DemographicSetManager  ds = new DemographicSetManager();
   List<String> sets = ds.getDemographicSets();
 
 //  oscar.oscarReport.data.RptSearchData searchData  = new oscar.oscarReport.data.RptSearchData();

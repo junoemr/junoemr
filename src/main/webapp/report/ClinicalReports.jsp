@@ -41,7 +41,7 @@ if(!authed) {
 %>
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="oscar.oscarReport.data.DemographicSets, oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarProvider.data.*,oscar.util.*,oscar.oscarReport.ClinicalReports.*,oscar.oscarEncounter.oscarMeasurements.*,oscar.oscarEncounter.oscarMeasurements.bean.*"%>
+<%@page import="oscar.oscarReport.data.DemographicSetManager, oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarProvider.data.*,oscar.util.*,oscar.oscarReport.ClinicalReports.*,oscar.oscarEncounter.oscarMeasurements.*,oscar.oscarEncounter.oscarMeasurements.bean.*"%>
 <%@page import="com.Ostermiller.util.CSVPrinter,java.io.*"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -74,7 +74,7 @@ if(!authed) {
             }
 
 
-            DemographicSets demoSets = new DemographicSets();
+            DemographicSetManager demoSets = new DemographicSetManager();
             List<String> demoSetList = demoSets.getDemographicSets();
 
             List<Map<String,String>> providers = ProviderData.getProviderList();

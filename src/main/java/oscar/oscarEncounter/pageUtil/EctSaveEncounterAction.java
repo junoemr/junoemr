@@ -286,8 +286,7 @@ public class EctSaveEncounterAction extends Action {
     if (httpservletrequest.getParameter("btnPressed").equals(
         "Sign,Save and Bill")) {
 
-      String billRegion = OscarProperties.getInstance().getProperty(
-          "billregion");
+      String billRegion = OscarProperties.getInstance().getBillingType();
       //
       oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean bean = new oscar.
           oscarBilling.ca.bc.pageUtil.BillingSessionBean();

@@ -50,7 +50,7 @@
   if(session.getAttribute("user") == null) response.sendRedirect("../logout.jsp");
   String demographic_no = request.getParameter("demographic_no");
 
-  DemographicSets  ds = new DemographicSets();
+  DemographicSetManager  ds = new DemographicSetManager();
   List<String> sets = ds.getDemographicSets();
 
   RptSearchData searchData  = new RptSearchData();

@@ -64,7 +64,7 @@ public class GDMLHandler implements MessageHandler {
 
 				String msg = messages.get(i);
 				if(isDuplicate(loggedInInfo, msg)) {
-					return ("success");
+					return ("duplicate");
 				}
 				
 				routeResults = new RouteReportResults();
@@ -127,24 +127,31 @@ public class GDMLHandler implements MessageHandler {
 					i++;
 				}
 			}
-
 			n--;
 		}
 	}
-
 	private boolean isDuplicate(LoggedInInfo loggedInInfo, String msg) {
 		//OLIS requirements - need to see if this is a duplicate
 		oscar.oscarLab.ca.all.parsers.MessageHandler h = Factory.getHandler("GDML", msg);
 		//if final		
-		if(h.getOrderStatus().equals("F")) {			
+		if(h.getOrderStatus().equals("F")) {
+			String fullAcc = h.getAccessionNum();
 			String acc = h.getAccessionNum();
-			
+			if(acc.indexOf("-")!=-1) {
+				acc = acc.substring(acc.indexOf("-")+1);
+			}
 			//do we have this?
 			List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(acc);
-			if( !dupResults.isEmpty() ) {
-                            OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate lab skipped - accession " + acc + "\n" + msg);
-                            return true;
-                        }
+			for(Hl7TextInfo dupResult:dupResults) {
+				if(dupResult.equals(fullAcc)) {
+					OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate lab skipped - accession " + fullAcc + "\n" + msg);
+					return true;
+				}
+				if(dupResult.getAccessionNumber().length()>4 && dupResult.getAccessionNumber().substring(4).equals(acc)) {
+					OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate lab skipped - accession " + fullAcc + "\n" + msg);
+					return true;
+				}
+			}
 		}
 		return false;	
 	}

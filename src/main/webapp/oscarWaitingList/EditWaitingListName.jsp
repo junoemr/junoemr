@@ -58,9 +58,6 @@ function resetFields(actionType){
 	if(providerPreference.getMyGroupNo() != null){
 		groupNo = providerPreference.getMyGroupNo();
 	}
-	WLWaitingListNameBeanHandler wlNameHd = new WLWaitingListNameBeanHandler(groupNo, (String)session.getAttribute("user"));
-
-   	List allWaitingListName = wlNameHd.getWaitingListNameList();
 %>
 <body bgproperties="fixed" " topmargin="0" leftmargin="0"
 	rightmargin="0">
@@ -87,15 +84,9 @@ function resetFields(actionType){
 			Waiting List name to be changed:</td>
 			<td align="right"><html:select property="selectedWL">
 				<option value=""></option>
-				<%
-                             for(int i=0; i<allWaitingListName.size(); i++){
-                                 WLWaitingListNameBean wLBean = (WLWaitingListNameBean) allWaitingListName.get(i);
-                                 String id = wLBean.getId();
-                                 String name = wLBean.getWaitingListName();                                       
-                                 String selected = id.compareTo((String) request.getAttribute("WLId")==null?"0":(String) request.getAttribute("WLId"))==0?"SELECTED":"";                                        
-                         %>
-				<option value="<%=id%>" <%=selected%>><%=name%></option>
-				<%}%>
+				<logic:iterate id="waitingListNameBean" name="waitingListNames">
+					<option value="<bean:write name="waitingListNameBean" property="id"/>"><bean:write name="waitingListNameBean" property="waitingListName" /></option>
+				</logic:iterate>
 			</html:select></td>
 			<td align="left"><html:text property="wlChangedName" size="45"
 				maxlength="255" /></td>
@@ -121,15 +112,9 @@ function resetFields(actionType){
 			Waiting List name to be removed:</td>
 			<td align="right"><html:select property="selectedWL2">
 				<option value=""></option>
-				<%
-                             for(int i=0; i<allWaitingListName.size(); i++){
-                                 WLWaitingListNameBean wLBean2 = (WLWaitingListNameBean) allWaitingListName.get(i);
-                                 String id = wLBean2.getId();
-                                 String name = wLBean2.getWaitingListName();                                       
-                                 String selected = id.compareTo((String) request.getAttribute("WLId")==null?"0":(String) request.getAttribute("WLId"))==0?"SELECTED":"";                                        
-                         %>
-				<option value="<%=id%>" <%=selected%>><%=name%></option>
-				<%}%>
+				<logic:iterate id="waitingListNameBean2" name="waitingListNames">
+					<option value="<bean:write name="waitingListNameBean2" property="id"/>"><bean:write name="waitingListNameBean2" property="waitingListName" /></option>
+				</logic:iterate>
 			</html:select></td>
 			<td colspan="2" align="left"><input type="submit"
 				value="Remove Name"

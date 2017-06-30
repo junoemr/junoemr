@@ -32,17 +32,13 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Properties;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.SecUserRoleDao;
 import org.oscarehr.PMmodule.model.SecUserRole;
 import org.oscarehr.PMmodule.utility.UtilDateUtilities;
-import org.oscarehr.common.dao.DocumentResultsDao;
 import org.oscarehr.common.dao.InboxResultsDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
-import org.oscarehr.common.model.Queue;
 import org.oscarehr.common.model.QueueDocumentLink;
 import org.oscarehr.inbox.InboxManagerQuery;
 import org.oscarehr.inbox.InboxManagerResponse;
@@ -55,7 +51,7 @@ import org.springframework.stereotype.Service;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.HRMResultsData;
 import oscar.oscarLab.ca.on.LabResultData;
-import oscar.util.OscarRoleObjectPrivilege;
+import oscar.OscarProperties;
 
 @Service
 public class InboxManager {
@@ -148,67 +144,36 @@ public class InboxManager {
 
 		ArrayList<LabResultData> labdocs = new ArrayList<LabResultData>();
 
-		if (!LABS.equals(view) && !ABNORMAL.equals(view)) {
-			labdocs = inboxResultsDao.populateDocumentResultsData(searchProviderNo, demographicNo, patientFirstName,
-					patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal);
+		if(OscarProperties.getInstance().isPropertyActive("use_combined_inbox_query")) {
+			String labType = null;
+
+			if(LABS.equals(view)) {
+				labType = "HL7";
+			}
+			else if(DOCUMENTS.equals(view)) {
+				labType = "DOC";
+			}
+
+			labdocs = inboxResultsDao.getInboxResults(loggedInInfo, searchProviderNo, demographicNo, patientFirstName,
+				patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal, 
+				null, false, labType, startDate, endDate);
 		}
-		if (!DOCUMENTS.equals(view)) {
-			labdocs.addAll(comLab.populateLabResultsData(loggedInInfo, searchProviderNo, demographicNo, patientFirstName,
-					patientLastName, patientHealthNumber, ackStatus, scannedDocStatus, true, page, pageSize,
-					mixLabsAndDocs, isAbnormal));
-		}
-
-		ArrayList<LabResultData> validlabdocs = new ArrayList<LabResultData>();
-
-		DocumentResultsDao documentResultsDao = (DocumentResultsDao) SpringUtils.getBean("documentResultsDao");
-		// check privilege for documents only
-		for (LabResultData data : labdocs) {
-			if (data.isDocument()) {
-				String docid = data.getSegmentID();
-
-				String queueid = docQueue.get(docid);
-				if (queueid != null) {
-					queueid = queueid.trim();
-
-					int queueIdInt = Integer.parseInt(queueid);
-
-					// if doc sent to default queue and no valid provider, do NOT include it
-					if (queueIdInt == Queue.DEFAULT_QUEUE_ID && !documentResultsDao.isSentToValidProvider(docid) && isSegmentIDUnique(validlabdocs, data)) {
-						// validlabdocs.add(data);
-					}
-					// if doc sent to default queue && valid provider, check if it's sent to this provider, if yes include it
-					else if (queueIdInt == Queue.DEFAULT_QUEUE_ID && documentResultsDao.isSentToValidProvider(docid) && documentResultsDao.isSentToProvider(docid, searchProviderNo) && isSegmentIDUnique(validlabdocs, data)) {
-						validlabdocs.add(data);
-					}
-					// if doc setn to non-default queue and valid provider, check if provider is in the queue or equal to the provider
-					else if (queueIdInt != Queue.DEFAULT_QUEUE_ID && documentResultsDao.isSentToValidProvider(docid)) {
-						Vector<Object> vec = OscarRoleObjectPrivilege.getPrivilegeProp("_queue." + queueid);
-						if (OscarRoleObjectPrivilege.checkPrivilege(roleName, (Properties) vec.get(0), (Vector) vec.get(1)) || documentResultsDao.isSentToProvider(docid, searchProviderNo)) {
-							// labs is in provider's queue,do nothing
-							if (isSegmentIDUnique(validlabdocs, data)) {
-								validlabdocs.add(data);
-							}
-						}
-					}
-					// if doc sent to non default queue and no valid provider, check if provider is in the non default queue
-					else if (!queueid.equals(Queue.DEFAULT_QUEUE_ID) && !documentResultsDao.isSentToValidProvider(docid)) {
-						Vector<Object> vec = OscarRoleObjectPrivilege.getPrivilegeProp("_queue." + queueid);
-						if (OscarRoleObjectPrivilege.checkPrivilege(roleName, (Properties) vec.get(0), (Vector) vec.get(1))) {
-							// labs is in provider's queue,do nothing
-							if (isSegmentIDUnique(validlabdocs, data)) {
-								validlabdocs.add(data);
-							}
-
-						}
-					}
-				}
-			} else {// add lab
-				if (isSegmentIDUnique(validlabdocs, data)) {
-					validlabdocs.add(data);
-				}
+		else {
+			if (!LABS.equals(view) && !ABNORMAL.equals(view)) {
+				labdocs = inboxResultsDao.populateDocumentResultsData(searchProviderNo, demographicNo, patientFirstName,
+						patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal);
+			}
+			if (!DOCUMENTS.equals(view)) {
+				labdocs.addAll(comLab.populateLabResultsData(loggedInInfo, searchProviderNo, demographicNo, patientFirstName,
+						patientLastName, patientHealthNumber, ackStatus, scannedDocStatus, true, page, pageSize,
+						mixLabsAndDocs, isAbnormal));
 			}
 		}
+		
 
+
+		
+		
 		// Find the oldest lab returned in labdocs, use that as the limit date for the HRM query
 		Date oldestLab = null;
 		Date newestLab = query.getNewestDate();
@@ -222,19 +187,26 @@ public class InboxManager {
 			}
 		}
 
-		HRMResultsData hrmResult = new HRMResultsData();
+		
+		
+		
+		if(OscarProperties.getInstance().isPropertyActive("use_combined_inbox_query")) {
 
-		Collection<LabResultData> hrmDocuments = hrmResult.populateHRMdocumentsResultsData(loggedInInfo, searchProviderNo, ackStatus, newestLab, oldestLab);
-		if (oldestLab == null) {
-			for (LabResultData hrmDocument : hrmDocuments) {
-				if (oldestLab == null || (hrmDocument.getDateObj() != null && oldestLab.compareTo(hrmDocument.getDateObj()) > 0))
-					oldestLab = hrmDocument.getDateObj();
+			HRMResultsData hrmResult = new HRMResultsData();
+
+			Collection<LabResultData> hrmDocuments = hrmResult.populateHRMdocumentsResultsData(loggedInInfo, searchProviderNo, ackStatus, newestLab, oldestLab);
+			if (oldestLab == null) {
+				for (LabResultData hrmDocument : hrmDocuments) {
+					if (oldestLab == null || (hrmDocument.getDateObj() != null && oldestLab.compareTo(hrmDocument.getDateObj()) > 0))
+						oldestLab = hrmDocument.getDateObj();
+				}
 			}
+
+			labdocs.addAll(hrmDocuments);
+			Collections.sort(labdocs);
 		}
 
-		labdocs.addAll(hrmDocuments);
-		Collections.sort(labdocs);
-
+		
 		HashMap<String,LabResultData> labMap = new HashMap<String,LabResultData>();
 		LinkedHashMap<String,ArrayList<String>> accessionMap = new LinkedHashMap<String,ArrayList<String>>();
 
@@ -265,9 +237,9 @@ public class InboxManager {
 				labNums.add(segmentId);
 				accessionMap.put(result.accessionNumber + result.labType, labNums);
 
-				// Different MDS Labs may have the same accession Number if they are seperated
+				// Different MDS Labs may have the same accession Number if they are separated
 				// by two years. So accession numbers are limited to matching only if their
-				// labs are within one year of eachother
+				// labs are within one year of each other
 			} else {
 				labNums = accessionMap.get(result.accessionNumber + result.labType);
 				boolean matchFlag = false;
@@ -307,6 +279,7 @@ public class InboxManager {
 		}
 		logger.debug("labdocs.size()="+labdocs.size());
 
+		
 		/* find all data for the index.jsp page */
 		Hashtable patientDocs = new Hashtable();
 		Hashtable patientIdNames = new Hashtable();

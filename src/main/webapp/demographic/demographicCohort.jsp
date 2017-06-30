@@ -40,7 +40,7 @@
 %>
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="oscar.oscarReport.data.DemographicSets, oscar.oscarDemographic.data.DemographicData" %>
+<%@ page import="oscar.oscarReport.data.DemographicSetManager, oscar.oscarDemographic.data.DemographicData" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ include file="/casemgmt/taglibs.jsp" %>
 
@@ -106,7 +106,7 @@
         <div class="demographicSection">
             <%
             String demoNo = request.getParameter("demographic_no");
-            DemographicSets demoSets = new DemographicSets();
+            DemographicSetManager demoSets = new DemographicSetManager();
             java.util.List<String> arrCurDemoSets = demoSets.getDemographicSets(demoNo);
             ArrayList arrDemo = new ArrayList();
             arrDemo.add(demoNo);

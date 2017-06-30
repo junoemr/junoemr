@@ -106,7 +106,7 @@ if(!authed) {
 }
 
 %>
-<%@ page import="java.util.*, java.sql.*, java.net.*,java.text.DecimalFormat, oscar.*, oscar.oscarDemographic.data.ProvinceNames, oscar.oscarWaitingList.WaitingList, oscar.oscarReport.data.DemographicSets,oscar.log.*"%>
+<%@ page import="java.util.*, java.sql.*, java.net.*,java.text.DecimalFormat, oscar.*, oscar.oscarDemographic.data.ProvinceNames, oscar.oscarWaitingList.WaitingList, oscar.oscarReport.data.DemographicSetManager,oscar.log.*"%>
 <%@ page import="oscar.oscarDemographic.data.*"%>
 <%@ page import="oscar.oscarDemographic.pageUtil.Util" %>
 <%@ page import="org.springframework.web.context.*,org.springframework.web.context.support.*" %>
@@ -147,7 +147,7 @@ if(!authed) {
 %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties"	scope="session" />
-<% java.util.Properties oscarVariables = OscarProperties.getInstance(); %>
+<% OscarProperties oscarVariables = OscarProperties.getInstance(); %>
 
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/phr-tag.tld" prefix="phr"%>
@@ -179,8 +179,8 @@ if(!authed) {
 	String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF" ;
 	String str = null;
 	int nStrShowLen = 20;
-	String billRegion = (oscarVariables.getProperty("billregion","")).trim().toUpperCase();
-	String prov = (oscarVariables.getProperty("hctype","")).trim().toUpperCase();
+	String billRegion = oscarVariables.getBillingTypeUpperCase();
+	String prov = oscarVariables.getBillingTypeUpperCase();
 
 	CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 	List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.DEMOGRAPHIC, Long.valueOf(demographic_no));
@@ -2832,7 +2832,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 								<td align="right" nowrap><b><bean:message
 									key="demographic.demographiceditdemographic.formRefDocNo" />: </b></td>
 								<td align="left"><input type="text" name="r_doctor_ohip" <%=getDisabled("r_doctor_ohip")%>
-									size="20" maxlength="6" value="<%=rdohip%>"> <% if("ON".equals(prov)) { %>
+									size="20" maxlength="6" value="<%=rdohip%>"> <% if(!"BC".equals(prov)) { %>
 								<a
 									href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
 								#</a> <% } %>
@@ -3241,47 +3241,26 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 										<td align="right" width="16%" nowrap><b>
 										<bean:message key="demographic.demographiceditdemographic.msgWaitList"/>:</b></td>
 										<td align="left" width="31%">
-										<%
-										
-										List<org.oscarehr.common.model.WaitingList> wls = waitingListDao.search_wlstatus(Integer.parseInt(demographic_no));
-									
- 	                        String wlId="", listID="", wlnote="";
- 	                        String wlReferralDate="";
-                                if (wls.size()>0){
-                                	org.oscarehr.common.model.WaitingList wl = wls.get(0);
-                                    wlId = wl.getId().toString();
-                                    listID =String.valueOf(wl.getListId());
-                                    wlnote =wl.getNote();
-                                    wlReferralDate =oscar.util.ConversionUtils.toDateString(wl.getOnListSince());
-                                    if(wlReferralDate != null  &&  wlReferralDate.length()>10){
-                                        wlReferralDate = wlReferralDate.substring(0, 11);
-                                    }
-                                }
-                               
-                               %> <input type="hidden" name="wlId"
-											value="<%=wlId%>"> <select name="list_id">
+										<input type="hidden" name="wlId" value=""> 
+										<select name="list_id">
 											<%if("".equals(wLReadonly)){%>
 											<option value="0"><bean:message key="demographic.demographiceditdemographic.optSelectWaitList"/></option>
 											<%}else{%>
-											<option value="0">
-											<bean:message key="demographic.demographiceditdemographic.optCreateWaitList"/></option>
+											<option value="0"><bean:message key="demographic.demographiceditdemographic.optCreateWaitList"/></option>
 											<%} %>
 											<%
-											
-									List<WaitingListName> wlns = waitingListNameDao.findCurrentByGroup(((org.oscarehr.common.model.ProviderPreference)session.getAttribute(org.oscarehr.util.SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo());
-                                     for(WaitingListName wln:wlns) {
-                                    %>
-											<option value="<%=wln.getId()%>"
-												<%=wln.getId().toString().equals(listID)?" selected":""%>>
-											<%=wln.getName()%></option>
-											<%
-                                      }
-                                     
-                                    %>
+											// these waitlist fields should not be filled when editing.
+											// if the user selects a waitlist value the patient is always assigned to it on submit.
+											List<WaitingListName> wlns = waitingListNameDao.findActiveWatingListNames();
+											for(WaitingListName wln:wlns) {
+	                                    		%>
+												<option value="<%=wln.getId()%>"><%=wln.getName()%></option>
+												<%
+											} %>
 										</select></td>
 										<td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.msgWaitListNote"/>: </b></td>
 										<td align="left"><input type="text"
-											name="waiting_list_note" value="<%=wlnote%>" size="34"
+											name="waiting_list_note" value="" size="34"
 											<%=wLReadonly%>></td>
 									</tr>
 									<tr>
@@ -3290,7 +3269,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 										<td align="left"><input type="text"
 											name="waiting_list_referral_date"
 											id="waiting_list_referral_date" size="11"
-											value="<%=wlReferralDate%>" <%=wLReadonly%>><img
+											value="" <%=wLReadonly%>><img
 											src="../images/cal.gif" id="referral_date_cal"><bean:message key="schedule.scheduletemplateapplying.msgDateFormat"/>
 										</td>
 
@@ -3636,7 +3615,7 @@ jQuery(document).ready(function(){
 %>
 </script>
 
-<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true") && "BC".equals(prov)) { %>
 
 <script src="https://www.google.com/jsapi"></script>
 <script>

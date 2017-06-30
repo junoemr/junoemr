@@ -157,7 +157,7 @@ public class BillingReProcessBillAction extends Action {
     String hcType = demo.getHcType(); //d
 
     String messageNotes = frm.getMessageNotes();
-    String billRegion = OscarProperties.getInstance().getProperty("billregion");
+    String billRegion = OscarProperties.getInstance().getBillingType();
     String submit = frm.getSubmit();
     String secondSQL = null;
 

@@ -26,7 +26,6 @@
 package oscar.oscarReport.pageUtil;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,11 +34,11 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.common.model.DemographicSets;
+import org.oscarehr.common.dao.DemographicSetsDao;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
-
-import oscar.oscarReport.data.DemographicSets;
 
 /**
  *
@@ -48,24 +47,22 @@ import oscar.oscarReport.data.DemographicSets;
 public class DemographicSetEditAction extends Action {
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
-   public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
-	   if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_report", "r", null)) {
-	  		  throw new SecurityException("missing required security object (_report)");
-	  	  	}
-	   
-      String setName = request.getParameter("patientSet");
+	private DemographicSetsDao demographicSetsDao = SpringUtils.getBean(DemographicSetsDao.class);
 
-      DemographicSets dsets = new DemographicSets();
-      List<Map<String,String>> list = dsets.getDemographicSetExt(setName);
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_report", "r", null)) {
+			throw new SecurityException("missing required security object (_report)");
+		}
 
-      request.setAttribute("SET", list);
-      request.setAttribute("setname",setName);
+		String setName = request.getParameter("patientSet");
+		List<DemographicSets> list = demographicSetsDao.findBySetName(setName);
 
-      return mapping.findForward("success");
-   }
+		request.setAttribute("SET", list);
+		request.setAttribute("setname", setName);
 
-   public DemographicSetEditAction() {
-   }
+		return mapping.findForward("success");
+	}
 
+	public DemographicSetEditAction() {
+	}
 }

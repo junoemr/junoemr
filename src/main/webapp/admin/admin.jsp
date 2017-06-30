@@ -23,6 +23,9 @@
     Ontario, Canada
 
 --%>
+
+
+<!-- DEPRECATED: OLD OSCAR 12 ADMIN. See leftNav.jspf -->
 <%@page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@ taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi"%>
@@ -34,7 +37,7 @@
 	boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>"
-	objectName="_admin,_admin.userAdmin,_admin.schedule,_admin.billing,_admin.invoices,_admin.resource,_admin.reporting,_admin.backup,_admin.messenger,_admin.eform,_admin.encounter,_admin.misc,_admin.torontoRfq"
+	objectName="_admin,_admin.userAdmin,_admin.schedule,_admin.billing,_admin.invoices,_admin.resource,_admin.reporting,_admin.backup,_admin.messenger,_admin.eform,_admin.encounter,_admin.consult,_admin.misc,_admin.torontoRfq"
 	rights="r" reverse="<%=true%>">
 		<%authed=false; %>
 	<%response.sendRedirect("../securityError.jsp?type=_admin&type=_admin.*");%>
@@ -56,7 +59,7 @@
 %>
 
 <%@ page errorPage="errorpage.jsp"%>
-<% java.util.Properties oscarVariables = OscarProperties.getInstance(); %>
+<% OscarProperties oscarVariables = OscarProperties.getInstance(); %>
 <%
 	String country = request.getLocale().getCountry();
 %>
@@ -256,7 +259,7 @@ div.logoutBox {
             <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.billing" rights="r" reverse="<%=false%>">
 			<%
 				// Only show link to Clinicaid admin if Clinicaid Billing is enabled
-				if (oscarVariables.getProperty("billregion", "").equals("CLINICAID"))
+				if (oscarVariables.isClinicaidBillingType())
 				{ 
 			%>
 					<li>
@@ -275,7 +278,7 @@ div.logoutBox {
 					</li> <%
 					}
 				}
-				else if (oscarVariables.getProperty("billregion", "").equals("BC"))
+				else if (oscarVariables.isBritishColumbiaBillingType())
 				{
 			%>
 			<li><a href="#"
@@ -331,8 +334,8 @@ div.logoutBox {
 			
 			<%
 				}
-								else if (oscarVariables.getProperty("billregion", "").equals("ON"))
-								{
+				else if (oscarVariables.isOntarioBillingType())
+				{
 			%>
 			<li><a href="#"
 				onclick='popupPage(700,1000,&quot;<html:rewrite page="/billing/CA/ON/ScheduleOfBenefitsUpload.jsp"/>&quot;);return false;'><bean:message key="admin.admin.scheduleOfBenefits"/></a></li>
@@ -397,7 +400,7 @@ div.logoutBox {
 			%>
             </security:oscarSec>
                         
-                <% if (oscarVariables.getProperty("billregion","").equals("ON")) { %>                	
+                <% if (oscarVariables.isOntarioBillingType()) { %>                	
                         <li><a href="#" onclick="popupPage(800,1000,&quot;<html:rewrite page='/billing/CA/ON/billingONPayment.jsp'/>&quot;);return false;"><bean:message key="admin.admin.paymentReceived"/></a></li>
                 <% } %>
 		</ul>
@@ -541,8 +544,8 @@ div.logoutBox {
 					</li>
                         </caisi:isModuleLoad>
 			<%
-				if (oscarVariables.getProperty("billregion", "").equals("ON"))
-								{
+				if (oscarVariables.isOntarioBillingType())
+				{
 			%>
 			<li><a href="#"
 				onclick='popupPage(660,1000,&quot;<html:rewrite page="/report/reportonbilledphcp.jsp"/>&quot;);return false;'><bean:message key="admin.admin.PHCP"/></a>
@@ -663,7 +666,7 @@ div.logoutBox {
 
 <caisi:isModuleLoad moduleName="TORONTO_RFQ" reverse="true">
 
-<!-- #Schedule Management -->
+	<!-- #Schedule Management -->
 	<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.schedule" rights="r" reverse="<%=false%>">
 		<div class="adminBox">
 		<h3>&nbsp;<bean:message key="admin.admin.ScheduleManagement" /></h3>
@@ -698,23 +701,23 @@ div.logoutBox {
 		</ul>
 		</div>
 	</security:oscarSec>
-<!-- #Schedule Management END-->
-
-<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.document" rights="r" reverse="<%=false%>">
-<div class="adminBox">
-		<h3>&nbsp;Document Management</h3>
-		<ul>
-<li><a href="#"
-				onclick='popupPage(550,800,&quot;<html:rewrite page="/admin/displayDocumentCategories.jsp"/>&quot;);return false;'><bean:message key="admin.admin.DocumentCategories"/></a></li>
-<li><a href="#"
-				onclick='popupPage(550,800,&quot;<html:rewrite page="/admin/displayDocumentDescriptionTemplate.jsp?setDefault=true"/>&quot;);return false;'><bean:message key="admin.admin.DocumentDescriptionTemplate"/></a></li>
-        </ul>
-</div>
-</security:oscarSec>
+	<!-- #Schedule Management END-->
+	
+	<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.document" rights="r" reverse="<%=false%>">
+	<div class="adminBox">
+			<h3>&nbsp;Document Management</h3>
+			<ul>
+	<li><a href="#"
+					onclick='popupPage(550,800,&quot;<html:rewrite page="/admin/displayDocumentCategories.jsp"/>&quot;);return false;'><bean:message key="admin.admin.DocumentCategories"/></a></li>
+	<li><a href="#"
+					onclick='popupPage(550,800,&quot;<html:rewrite page="/admin/displayDocumentDescriptionTemplate.jsp?setDefault=true"/>&quot;);return false;'><bean:message key="admin.admin.DocumentDescriptionTemplate"/></a></li>
+	        </ul>
+	</div>
+	</security:oscarSec>
                                       
                         
-<!-- #SYSTEM Management-->
-	<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">
+	<!-- #SYSTEM Management-->
+	<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.consult" rights="r" reverse="<%=false%>">
 		<div class="adminBox">
 		<h3>&nbsp;<bean:message key="admin.admin.SystemManagement" /></h3>
 		<ul>

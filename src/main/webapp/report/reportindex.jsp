@@ -47,7 +47,7 @@ ProviderPreference providerPreference=(ProviderPreference)session.getAttribute(S
 String curUser_no = (String) session.getAttribute("user");
 String mygroupno = providerPreference.getMyGroupNo();
 mygroupno = StringUtils.trimToEmpty(mygroupno);
-String billingRegion = (oscar.OscarProperties.getInstance()).getProperty("billregion");
+String billingRegion = oscar.OscarProperties.getInstance().getInstanceTypeUpperCase();
 %>
 <%@ page
 	import="java.util.*, oscar.*, java.sql.*, java.text.*, java.net.*"

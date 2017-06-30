@@ -100,7 +100,7 @@ String curProvider_no = (String)session.getAttribute("user");
 				<ul>
 		            <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.billing" rights="r" reverse="<%=false%>">
 		            
-		            <oscar:oscarPropertiesCheck property="billregion" value="CLINICAID">
+		            <oscar:oscarPropertiesCheck property="billing_type" value="CLINICAID">
 
 					<li><a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">Manage Invoices</a></li>
 					
@@ -113,7 +113,7 @@ String curProvider_no = (String)session.getAttribute("user");
 					</oscar:oscarPropertiesCheck>
 
 
-		            <oscar:oscarPropertiesCheck property="billregion" value="BC">
+		            <oscar:oscarPropertiesCheck property="billing_type" value="BC">
 
 					<li><a href='javascript:void(0);'
 						class="xlink" rel="${ctx}/billing/manageBillingform.jsp"><bean:message key="admin.admin.ManageBillFrm"/></a></li>
@@ -166,7 +166,7 @@ String curProvider_no = (String)session.getAttribute("user");
 						class="xlink" rel="${ctx}/billing/CA/BC/settleBG.jsp"><bean:message key="admin.admin.settlePaidClaims"/></a></li>
 					</oscar:oscarPropertiesCheck>
 			
-					<oscar:oscarPropertiesCheck property="billregion" value="ON">
+					<oscar:oscarPropertiesCheck property="billing_type" value="ON">
 					<li><a href='javascript:void(0);'
 						class="xlink" rel="${ctx}/billing/CA/ON/ScheduleOfBenefitsUpload.jsp"><bean:message key="admin.admin.scheduleOfBenefits"/></a></li>
 					<li><a href='javascript:void(0);'
@@ -244,7 +244,7 @@ String curProvider_no = (String)session.getAttribute("user");
 		            </security:oscarSec>
 		                        
 		               
-		                <oscar:oscarPropertiesCheck property="billregion" value="ON">             	
+		                <oscar:oscarPropertiesCheck property="billing_type" value="ON">             	
 		                        <li><a href='javascript:void(0);' class="xlink" rel='${ctx}/billing/CA/ON/billingONPayment.jsp'><bean:message key="admin.admin.paymentReceived"/></a></li>
 		                        <li><a href='javascript:void(0);' class="xlink" rel='${ctx}/billing/CA/ON/managePaymentType.do'><bean:message key="admin.admin.managePaymentType"/></a></li>
 		                </oscar:oscarPropertiesCheck>
@@ -408,7 +408,7 @@ String curProvider_no = (String)session.getAttribute("user");
 				        </caisi:isModuleLoad>
 
 			<%
-				if (oscarVariables.getProperty("billregion", "").equals("ON"))
+				if (oscarVariables.isOntarioBillingType())
 								{
 			%>
 			<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/report/reportonbilledphcp.jsp"><bean:message key="admin.admin.PHCP"/></a>
@@ -606,7 +606,7 @@ String curProvider_no = (String)session.getAttribute("user");
 <!-- #CAISI END-->
 
 <!-- #SYSTEM Management-->
-	<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.measurements,_admin.document" rights="r" reverse="<%=false%>">
+	<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.measurements,_admin.document,_admin.consult" rights="r" reverse="<%=false%>">
 				<div class="accordion-heading">
 				<a class="accordion-toggle" data-toggle="collapse" data-parent="#adminNav" href="#collapseEight">
 				<bean:message key="admin.admin.SystemManagement" />
@@ -648,47 +648,47 @@ String curProvider_no = (String)session.getAttribute("user");
 					<%
 						}
 					%>
-		            <li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp"><bean:message key="admin.admin.consultationSettings"/></a></li>
-<!--
-		            <li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp"><bean:message key="admin.admin.professionalSpecialistAdmin"/></a></li>
- -->
 					<li><a href='javascript:void(0);'
 						class="xlink" rel="${ctx}/oscarResearch/oscarDxResearch/dxResearchCustomization.jsp"><bean:message
 						key="oscarEncounter.Index.btnCustomize" /> <bean:message
 						key="oscar.admin.diseaseRegistryQuickList" /></a></li>
-					</security:oscarSec>
-					
-					<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.measurements" rights="r" reverse="<%=false%>">	
+				</security:oscarSec>
+				
+				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.consult" rights="r" reverse="<%=false%>">
+				<!-- Allow edit consultation specialists & services -->
+		            <li><a href='javascript:void(0);'
+						class="xlink" rel="${ctx}/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp"><bean:message key="admin.admin.consultationSettings"/></a></li>
+				</security:oscarSec>
+				
+				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.measurements" rights="r" reverse="<%=false%>">	
 					<li><a href='javascript:void(0);'
 						class="xlink" rel="${ctx}/oscarEncounter/oscarMeasurements/Customization.jsp"><bean:message
 						key="oscarEncounter.Index.btnCustomize" /> <bean:message
 						key="admin.admin.oscarMeasurements" /></a></li>
-					</security:oscarSec>
+				</security:oscarSec>
 
-					<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">	
+				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">	
 					<li><a href='javascript:void(0);' class="xlink" rel="${ctx}/oscarPrevention/PreventionListManager.jsp">
 						<bean:message key="oscarprevention.preventionlistmanager.title" /></a></li>
 					</security:oscarSec>
 										
-					<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">	
+				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">	
 					<li><a href='javascript:void(0);'
 						class="xlink" rel="${ctx}/admin/resourcebaseurl.jsp"
 						title='<bean:message key="admin.admin.baseURLSettingTitle"/>'><bean:message
 						key="admin.admin.btnBaseURLSetting" /></a></li>
-					</security:oscarSec>	
+				</security:oscarSec>	
 				
-					<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.messenger" rights="r" reverse="<%=false%>">
+				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.messenger" rights="r" reverse="<%=false%>">
 							<li><a href='javascript:void(0);'
 								class="xlink" rel="${ctx}/oscarMessenger/DisplayMessages.do?providerNo=<%=curProvider_no%>&amp;userName=<%=userfirstname%>%20<%=userlastname%>"><bean:message
 								key="admin.admin.messages" /></a></li>
 							<li><a href='javascript:void(0);'
 								class="xlink" rel="${ctx}/oscarMessenger/config/MessengerAdmin.jsp"><bean:message
 								key="admin.admin.btnMessengerAdmin" /></a></li>
-					</security:oscarSec>
+				</security:oscarSec>
 					
-					<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">
+				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">
 					<li><a href='javascript:void(0);' class="xlink" rel="${ctx}/admin/keygen/keyManager.jsp"><bean:message key="admin.admin.keyPairGen" /></a></li>
 					<li><a href='javascript:void(0);' class="xlink" rel="${ctx}/FacilityManager.do"><bean:message key="admin.admin.manageFacilities" /></a></li>
 					<li><a href='javascript:void(0);' class="xlink" rel="${ctx}/oscarEncounter/oscarMeasurements/adminFlowsheet/NewFlowsheet.jsp">Create New Flowsheet</a></li>
@@ -705,13 +705,13 @@ String curProvider_no = (String)session.getAttribute("user");
 			            class="xlink" rel="${ctx}/admin/uploadEntryText.jsp"><bean:message key="admin.admin.uploadEntryTxt"/></a>
 			            </li>
 		            </oscar:oscarPropertiesCheck>	
-		            </security:oscarSec>
+	            </security:oscarSec>
 		            
 				 	<%
 						if (oscar.oscarSecurity.CRHelper.isCRFrameworkEnabled())
 								{
 					%>
-					<security:oscarSec roleName="<%=roleName$%>" objectName="_admin.cookieRevolver" rights="r">
+				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin.cookieRevolver" rights="r">
 						<li>&nbsp; <bean:message key="admin.admin.titleFactorAuth"/>
 						<ul>
 							<li><a href='javascript:void(0);'
@@ -732,7 +732,7 @@ String curProvider_no = (String)session.getAttribute("user");
 								class="xlink" rel='${ctx}/gatekeeper/matrixadmin/show'><bean:message key="admin.admin.genMatrixCards"/></a></li>
 						</ul>
 						</li>
-					</security:oscarSec>
+				</security:oscarSec>
 					<%
 						}
 					%>           	

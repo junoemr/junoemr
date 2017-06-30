@@ -22,58 +22,49 @@
  * Ontario, Canada
  */
 
-
 package oscar.oscarReport.pageUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.common.dao.DemographicSetsDao;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.oscarReport.data.DemographicSetManager;
-
-/**
- *
- * @author Jay Gallagher
- */
-public class DemographicSetEligibilityAction extends Action {
-   
+public class DemographicSetDeleteAction extends Action {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private DemographicSetsDao demographicSetsDao = SpringUtils.getBean(DemographicSetsDao.class);
 	
-   public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
-   
-	   if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_report", "w", null)) {
-	  		  throw new SecurityException("missing required security object (_report)");
-	  	  	}
-	   
-        String[] s = request.getParameterValues("demoNo") ;
-        String setName = request.getParameter("setName");
-        DemographicSetManager dsets = new DemographicSetManager();
-        
-        if (request.getParameter("delete")!= null && request.getParameter("delete").equals("Delete")){
-            for (int i = 0; i < s.length;i++){
-              dsets.setDemographicDelete(setName, s[i]);
-           }
-        }else{
-        
-            if(s != null){
-               for (int i = 0; i < s.length;i++){
-                  dsets.setDemographicIneligible(setName, s[i]);
-               }
-            }
-        
-        }
-                
-        return mapping.findForward("success");
-   }
-  
-   public DemographicSetEligibilityAction() {
-   }
-   
+	private static Logger logger = MiscUtils.getLogger();
+
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+		if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_report", "r", null)) {
+			throw new SecurityException("missing required security object (_report)");
+		}
+		
+		try {
+			String setName = request.getParameter("demographicSetName");
+			
+			logger.info("Deleting Patient Set '" + setName + "'");
+
+			demographicSetsDao.deletePatientSet(setName);
+			
+			request.setAttribute("deleteSuccess", true);
+		}
+		catch(Exception e) {
+			logger.error("Error Deleting Patient Set", e);
+			request.setAttribute("deleteSuccess", false);
+			return mapping.findForward("failure");
+		}
+		return mapping.findForward("success");
+	}
+	public DemographicSetDeleteAction() {
+	}
 }

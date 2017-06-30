@@ -39,13 +39,13 @@
 	}
 %>
 
-<%@page import="oscar.oscarReport.data.DemographicSets,java.util.ArrayList"%>
+<%@page import="oscar.oscarReport.data.DemographicSetManager,java.util.ArrayList"%>
 
 <%
     String demoNo = request.getParameter("demoNo");
     String patientSet = request.getParameter("patientSet");
 
-    DemographicSets ds = new DemographicSets();
+    DemographicSetManager ds = new DemographicSetManager();
     java.util.List<String> demoSet = ds.getDemographicSet(patientSet);
 
     if (!demoSet.contains(demoNo)) {

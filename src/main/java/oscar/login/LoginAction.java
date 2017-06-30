@@ -30,7 +30,6 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -275,7 +274,7 @@ public final class LoginAction extends DispatchAction {
             LogAction.addLog(strAuth[0], LogConst.LOGIN, LogConst.CON_LOGIN, "", ip);
 
             // initial db setting
-            Properties pvar = OscarProperties.getInstance();
+            OscarProperties pvar = OscarProperties.getInstance();
             MyOscarUtils.setDeterministicallyMangledPasswordSecretKeyIntoSession(session, password);
             
 
@@ -348,7 +347,7 @@ public final class LoginAction extends DispatchAction {
              * if (OscarProperties.getInstance().isTorontoRFQ()) { where = "caisiPMM"; }
              */
             // Lazy Loads AlertTimer instance only once, will run as daemon for duration of server runtime
-            if (pvar.getProperty("billregion").equals("BC")) {
+            if (pvar.isBritishColumbiaInstanceType()) {
                 String alertFreq = pvar.getProperty("ALERT_POLL_FREQUENCY");
                 if (alertFreq != null) {
                     Long longFreq = new Long(alertFreq);

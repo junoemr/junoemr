@@ -199,7 +199,7 @@ public class DefaultNoteService implements NoteService {
 		intTime = System.currentTimeMillis();
 
 		List<Map<String, Object>> bills = null;
-		if (oscar.OscarProperties.getInstance().getProperty("billregion", "").equalsIgnoreCase("ON")) {
+		if (oscar.OscarProperties.getInstance().isOntarioBillingType()) {
 			bills = billingONCHeader1Dao.getInvoicesMeta(Integer.parseInt(demoNo));
 			for (Map<String, Object> h1 : bills) {
 				EChartNoteEntry e = new EChartNoteEntry();

@@ -32,7 +32,7 @@
     COMMENTING OUT UNTIL REFACTOR
 
 <%
-String prov= (oscar.OscarProperties.getInstance().getProperty("billregion","")).trim().toUpperCase();
+String prov = oscar.OscarProperties.getInstance().getBillingTypeUpperCase();
 %>
 
 <script>
