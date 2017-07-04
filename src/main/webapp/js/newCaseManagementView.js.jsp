@@ -1357,18 +1357,7 @@ function changeToView(id) {
     //check if case note has been changed
     //if so, warn user that changes will be lost if not saved
 
-    var noteDate = reason.trim();
-    var fullNote = $F(id).trim();
-    // Replace the date variable in the full text area with nothing
-    // to get the value of the entered text
-    var noteText = fullNote.replace(noteDate, '').trim();
-
-    if( noteText == '') {
-        return false;
-    }
-
-    if( noteText != ''  || origObservationDate != $("observationDate").value) {
-    // If the value of the current text area is not the same as the saved value, ask to save
+    if( origCaseNote != $F(id)  || origObservationDate != $("observationDate").value) {
         if( !confirm(unsavedNoteWarning) )
             return false;
         else {
@@ -1389,8 +1378,9 @@ function changeToView(id) {
             }
         }
         saving = true;
-        if( ajaxSaveNote(sig,nId,tmp) == false)
+        if( ajaxSaveNote(sig,nId,tmp) == false) {
             return false;
+        }
    }
 
 	//remove lock from note
