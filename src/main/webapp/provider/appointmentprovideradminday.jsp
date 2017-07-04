@@ -1735,6 +1735,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
           	  String urgency = (String)appointment.get("urgency");
           	  String apptType = (String)appointment.get("type");
           	  Integer partialBooking = (Integer)appointment.get("partial_booking");
+          	  Boolean isPartialBooking = (partialBooking != null && partialBooking == 1);
 
           	  bFirstTimeRs=true;
 			    as.setApptStatus(status);
@@ -1775,9 +1776,9 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
             %>
             	<img src="../images/warning-icon.png" border="0" width="14" height="14" title="Critical Appointment"/>
             <% }
-            if(oscarVariables.isPropertyActive("appt.partial_booking_flag_enable") && partialBooking != null && partialBooking == 1) {
+            if(oscarVariables.isPropertyActive("appt.partial_booking_flag_enable") && isPartialBooking) {
             %>
-            	<img src="../images/icons/partial_booking.png" border="0" width="14" height="14" title="Partial Booking"/>
+            	<img src="../images/icons/warning-icon-green.png" border="0" width="14" height="14" title="Partial Booking"/>
             <% } %>
             
 

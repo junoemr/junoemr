@@ -104,7 +104,7 @@ public class AppointmentArchive extends AbstractModel<Integer>  {
 	private String urgency;
 	
 	@Column(name = "partial_booking")
-	private Integer partialBooking ;
+	private Boolean partialBooking ;
 	
 	private Integer creatorSecurityId;	
 
@@ -313,18 +313,14 @@ public class AppointmentArchive extends AbstractModel<Integer>  {
     	this.urgency = urgency;
     }
 	
-	public Integer getPartialBooking() {
+	public boolean getPartialBooking() {
 		return partialBooking;
 	}
 	public boolean isPartialBooking() {
-		return partialBooking == 1;
-	}
-
-	public void setPartialBooking(Integer partialBooking) {
-		setPartialBooking(partialBooking != 0);
+		return partialBooking;
 	}
 	public void setPartialBooking(boolean partialBooking) {
-		this.partialBooking = (partialBooking)? 1 : 0;
+		this.partialBooking = partialBooking;
 	}
 
 	public BookingSource getBookingSource() {
