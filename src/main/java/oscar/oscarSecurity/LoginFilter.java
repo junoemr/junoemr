@@ -35,10 +35,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.cookierevolver.CRFactory;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
+
+import net.sf.cookierevolver.CRFactory;
 
 /**
  * @author Dennis Langdeau
@@ -69,6 +69,8 @@ public class LoginFilter implements Filter {
 		"/EFormImageViewForPdfGenerationServlet",
 		"/EFormResourceViewForPdfGenerationServlet",
 		"/eform/efmformemail_form.jsp",
+		"/share/javascript/jquery/",
+		"/share//javascript/jquery/"
 	};
 
 	/*

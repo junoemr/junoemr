@@ -1888,7 +1888,7 @@ function editNote(e) {
     Element.observe(caseNote, 'click', getActiveText);
 
     if( passwordEnabled ) {
-           input = "<p style='background-color:#CCCCFF; display:none; margin:0px;' id='notePasswd'>Password:&nbsp;<input type='password' name='caseNote.password'/><\/p>";
+           input = "<p style='background-color:#CCCCFF; display:none; margin:0px;' id='notePasswd'>Password:&nbsp;<input type='password' name='caseNote.password'/> Confirmation: <input readonly name='caseNote.passwordConfirm' autocomplete='off' type='password'/><\/p>";
            new Insertion.Bottom(txt, input);
     }
 

@@ -601,21 +601,21 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
         }
         function confirmAck(){
 		<% if (props.getProperty("confirmAck", "").equals("yes")) { %>
-            		return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledge"/>');
+            		return confirm("<bean:message key='oscarMDS.index.msgConfirmAcknowledge'/>");
             	<% } else { %>
             		return true;
             	<% } %>
 	}
 
         function confirmCommentUnmatched(){
-            return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledgeUnmatched"/>');
+            return confirm("<bean:message key='oscarMDS.index.msgConfirmAcknowledgeUnmatched'/>");
         }
 
         function confirmAckUnmatched(){
-            return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledgeUnmatched"/>');
+            return confirm("<bean:message key='oscarMDS.index.msgConfirmAcknowledgeUnmatched'/>");
         }
         function updateStatus(formid,labid){
-            var url='<%=request.getContextPath()%>'+"/oscarMDS/UpdateStatus.do";
+            var url="<%=request.getContextPath()%>"+"/oscarMDS/UpdateStatus.do";
             var data=$(formid).serialize(true);
 
             new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){

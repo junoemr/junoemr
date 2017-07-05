@@ -150,7 +150,14 @@ public class DemographicWs extends AbstractWs {
 		while(demographicListIterator.hasNext())
 		{
 			Demographic demographic = demographicListIterator.next();
-			out.add(DemographicTransfer.toTransfer(demographic));
+
+			DemographicCust custResult = demographicCustManager.getDemographicCust(demographic.getDemographicNo());
+
+			DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
+			if(custResult != null) {
+				transfer.setNotes(custResult.getParsedNotes());
+			}
+			out.add(transfer);
 		}
 
 		return(out);

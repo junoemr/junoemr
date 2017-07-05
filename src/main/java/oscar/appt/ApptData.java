@@ -48,6 +48,7 @@ public class ApptData implements Serializable {
 	String providerFirstName;
 	String ohipNo;
 	String urgency;
+	Boolean partialBooking;
 
 	/**
 	 * Default empty constructor
@@ -264,6 +265,14 @@ public class ApptData implements Serializable {
 	public void setUrgency(String urgency) {
     	this.urgency = urgency;
     }
-	
-	
+
+	public boolean getPartialBooking() {
+		return partialBooking;
+	}
+	public boolean isPartialBooking() {
+		return partialBooking;
+	}
+	public void setPartialBooking(boolean isPartialBooking) {
+		this.partialBooking = isPartialBooking;
+	}
 }

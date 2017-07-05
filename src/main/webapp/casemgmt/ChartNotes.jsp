@@ -498,8 +498,11 @@ try
 			<input tabindex="20" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/verify-sign.png"/>" id="signVerifyImg" onclick="document.forms['caseManagementEntryForm'].sign.value='on';document.forms['caseManagementEntryForm'].verify.value='on';Event.stop(event);return savePage('saveAndExit', '');" title='<bean:message key="oscarEncounter.Index.btnSign"/>'>&nbsp;
 			<%
 				if(bean.source == null)  {
+					String roleName = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 				%>
-					<input tabindex="21" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>" onclick="document.forms['caseManagementEntryForm'].sign.value='on';document.forms['caseManagementEntryForm'].toBill.value='true';Event.stop(event);<%if (Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", ""))){%> window.opener.location.reload(true);<% } %> return savePage('saveAndExit', '');" title='<bean:message key="oscarEncounter.Index.btnBill"/>'>&nbsp;
+					<security:oscarSec roleName="<%=roleName%>" objectName="_billing" rights="r" reverse="false">
+						<input tabindex="21" type='image' src="<c:out value="${ctx}/oscarEncounter/graphics/dollar-sign-icon.png"/>" onclick="document.forms['caseManagementEntryForm'].sign.value='on';document.forms['caseManagementEntryForm'].toBill.value='true';Event.stop(event);<%if (Boolean.parseBoolean(OscarProperties.getInstance().getProperty("clinicaid_billing", ""))){%> window.opener.location.reload(true);<% } %> return savePage('saveAndExit', '');" title='<bean:message key="oscarEncounter.Index.btnBill"/>'>&nbsp;
+					</security:oscarSec>
 				<%
 				}
 			%>

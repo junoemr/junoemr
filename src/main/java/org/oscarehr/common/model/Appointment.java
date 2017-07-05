@@ -103,6 +103,10 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	private String remarks;
 	private String urgency;
+	
+	@Column(name = "partial_booking")
+	private Boolean partialBooking ;
+	
 	private Integer creatorSecurityId;
 	
 	@Enumerated(EnumType.STRING)
@@ -285,6 +289,16 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	public void setUrgency(String urgency) {
 		this.urgency = urgency;
+	}
+
+	public boolean getPartialBooking() {
+		return partialBooking;
+	}
+	public boolean isPartialBooking() {
+		return partialBooking;
+	}
+	public void setPartialBooking(boolean partialBooking) {
+		this.partialBooking = partialBooking;
 	}
 
 	public Integer getCreatorSecurityId() {

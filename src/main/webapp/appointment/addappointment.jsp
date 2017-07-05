@@ -786,6 +786,17 @@ function pasteAppt(multipleSameDayGroupAppt) {
             	<input type="checkbox" name="urgency" value="critical"/>
             </div>
         </li>
+        <%if(props.isPropertyActive("appt.partial_booking_flag_enable")) { %>
+            <li class="row weak">
+	            <div class="label"></div>
+	            <div class="input"></div>
+	            <div class="space">&nbsp;</div>
+	            <div class="label"><bean:message key="Appointment.formPartialBooking" />:</div>
+	            <div class="input">
+	            	<input type="checkbox" name="partial_booking" value="1"/>
+	            </div>
+            </li> <%
+        }%>
     </ul>
 </div>
 <%String demoNo = request.getParameter("demographic_no");%>
