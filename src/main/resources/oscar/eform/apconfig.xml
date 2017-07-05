@@ -1047,6 +1047,18 @@
 		<ap-output>${fax}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>referral_no</ap-name>
+		<ap-sql>
+			SELECT professionalSpecialists.referralNo AS referral_no
+			FROM professionalSpecialists, demographic
+			WHERE demographic.demographic_no=${demographic} AND
+			LENGTH(professionalSpecialists.referralNo) > 0
+			AND
+			SUBSTRING(demographic.family_doctor,9,(LENGTH(professionalSpecialists.referralNo)))=professionalSpecialists.referralNo
+		</ap-sql>
+		<ap-output>${referral_no}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>bc_referral_name</ap-name>
 		<ap-sql>SELECT billingreferral.last_name, billingreferral.first_name
 			FROM billingreferral, demographic
