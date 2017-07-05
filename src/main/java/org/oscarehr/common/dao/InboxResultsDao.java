@@ -440,7 +440,11 @@ public class InboxResultsDao {
 			if ("0".equals(demographicNo)) {
 				sql += "AND NOT CAST(CASE     WHEN d1.demographic_no IS NULL AND d2.demographic_no IS NULL THEN false     ELSE true END AS int) ";
 			} else if (demographicNo != null && !"".equals(demographicNo)) {
-				sql += "AND NOT CAST(CASE     WHEN d1.demographic_no IS NULL AND d2.demographic_no IS NULL THEN false     ELSE true END AND demographic_no = :demographic_no ";
+				sql += "AND CAST(CASE     WHEN d1.demographic_no IS NULL AND d2.demographic_no IS NULL THEN false     ELSE true END AS int) ";
+				sql += "AND CASE ";
+				sql += "  WHEN d1.demographic_no IS NOT NULL THEN d1.demographic_no ";
+				sql += "  WHEN d2.demographic_no IS NOT NULL THEN d2.demographic_no ";
+				sql += "  ELSE 0 END = :demographic_no ";
 				qp_demographic_no = true;
 			}
 
