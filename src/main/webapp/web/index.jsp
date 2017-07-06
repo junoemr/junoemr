@@ -229,8 +229,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 
 						<span ng-if="!$last"></span>
 					</span>
-
-					<span class="dropdown">
+					<%--As of now we are not letting users change their program from the front end--%>
+					<%--<span class="dropdown">
 						<ul class="dropdown-menu" role="menu">
 							<li ng-repeat="item in navBarCtrl.programDomain">
 								<a ng-click="navBarCtrl.changeProgram(item.program.id)">
@@ -240,7 +240,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 								</a>
 							</li>
 					 	</ul>
-				 	</span>
+				 	</span>--%>
 
 					<span class="dropdown-toggle hand-hover"
 								data-toggle="dropdown"
