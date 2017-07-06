@@ -103,8 +103,8 @@ public class AppointmentArchive extends AbstractModel<Integer>  {
 	private String importedStatus;
 	private String urgency;
 	
-	@Column(name = "partial_booking")
-	private Boolean partialBooking ;
+	@Column(name = "partial_booking", nullable = false)
+	private Boolean partialBooking = false;
 	
 	private Integer creatorSecurityId;	
 

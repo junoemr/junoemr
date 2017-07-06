@@ -48,7 +48,7 @@ public class ApptData implements Serializable {
 	String providerFirstName;
 	String ohipNo;
 	String urgency;
-	Boolean partialBooking;
+	Boolean partialBooking = false;
 
 	/**
 	 * Default empty constructor

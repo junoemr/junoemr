@@ -64,6 +64,7 @@ public final class AppointmentTransfer {
 	private String remarks;
 	private String urgency;
 	private BookingSource bookingSource;
+	private Boolean partialBooking = false;
 
 	public Integer getId() {
 		return (id);
@@ -231,6 +232,16 @@ public final class AppointmentTransfer {
 
 	public void setUrgency(String urgency) {
 		this.urgency = urgency;
+	}
+	
+	public boolean getPartialBooking() {
+		return partialBooking;
+	}
+	public boolean isPartialBooking() {
+		return partialBooking;
+	}
+	public void setPartialBooking(boolean isPartialBooking) {
+		this.partialBooking = isPartialBooking;
 	}
 
 	public BookingSource getBookingSource() {
