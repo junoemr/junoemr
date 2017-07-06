@@ -338,30 +338,29 @@ angular.module('Record').controller('Record.RecordController', [
 				alert("Can't save a blank note!"); // Placeholder error handling
 				return;
 			}
-			console.log('SAVING NOTE:', controller.page.encounterNote);
 			// Check if this is a new note, if it isn't, we don't want to overwrite the existing observationDate
 			// Need to find a better way of preventing this date overwrite
-
 			controller.page.encounterNote.assignedIssues = controller.page.assignedCMIssues;
-			controller.page.encounterNote.issueDescriptions = null;
+			controller.page.encounterNote.issueDescriptions = [];
 			for (var i = 0; i < controller.page.assignedCMIssues.length; i++)
 			{
-				if (controller.page.encounterNote.issueDescriptions == null)
-				{
-					controller.page.encounterNote.issueDescriptions = controller.page.assignedCMIssues[i].issue.description;
-				}
-				else
-				{
-					controller.page.encounterNote.issueDescriptions += "," + controller.page.assignedCMIssues[i].issue.description;
-				}
+				// if (controller.page.encounterNote.issueDescriptions == null)
+				// {
+				// 	controller.page.encounterNote.issueDescriptions = controller.page.assignedCMIssues[i].issue.description;
+				// }
+				// else
+				// {
+				// 	controller.page.encounterNote.issueDescriptions += "," + controller.page.assignedCMIssues[i].issue.description;
+				// }
+				controller.page.encounterNote.issueDescriptions.push(controller.page.assignedCMIssues[i].issue.description);
 			}
+
 			noteService.saveNote($stateParams.demographicNo, controller.page.encounterNote).then(
 				function success(results)
 				{
 					$rootScope.$emit('noteSaved', results);
 					skipTmpSave = true;
 					controller.page.encounterNote = results;
-					console.debug('whats the index', results);
 					if (controller.page.encounterNote.isSigned)
 					{
 						controller.hideNote = false;
@@ -508,7 +507,6 @@ angular.module('Record').controller('Record.RecordController', [
 
 		$rootScope.$on('loadNoteForEdit', function(event, data)
 		{
-			console.log('loadNoteForEdit ', data);
 			controller.page.encounterNote = angular.copy(data);
 			controller.getIssueNote();
 
