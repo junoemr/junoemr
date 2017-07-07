@@ -360,11 +360,12 @@ public class NotesService extends AbstractServiceImpl {
 		caseMangementNote.setNote(noteTxt);
 		logger.debug("enc TYPE " +note.getEncounterType());
 		caseMangementNote.setEncounter_type(note.getEncounterType());
-		
-		// set uuid
-		if(uuid != null && uuid.trim().equals("")){
+		// If uuid is not null and is not an empty string this note already exists and we must keep its uuid
+		if(uuid != null && !uuid.trim().equals(""))
+		{
 			caseMangementNote.setUuid(uuid);
 		}
+		
 		// set signed & signing provider
 		//Need to check some how that if a note is signed that it must stay signed, currently this is done in the interface where the save button is not available.
 		if(note.getIsSigned()){
@@ -456,7 +457,6 @@ public class NotesService extends AbstractServiceImpl {
 		note.setObservationDate(caseMangementNote.getObservation_date());
 		logger.debug("note should return like this " + note.getNote() );
 		logger.info("NOTE ID #"+caseMangementNote.getId()+" SAVED");
-		logger.debug("NOTE VAL: " + note);
 		return note;
 	}
 	
@@ -1237,7 +1237,7 @@ public class NotesService extends AbstractServiceImpl {
 		//get all note values NoteDisplay nd = new NoteDisplayLocal(loggedInInfo,note);
 		CaseManagementNote casemgmtNote = null;
 		casemgmtNote = caseManagementMgr.getNote(String.valueOf(noteId));
-		
+
 		NoteTo1 note = new NoteTo1();
 		note.setNoteId(noteId);
 		note.setIsSigned(casemgmtNote.isSigned());
