@@ -36,22 +36,22 @@ public class CaseManagementIssueConverter extends AbstractConverter<CaseManageme
 	}
 
 	@Override
-	public CaseManagementIssueTo1 getAsTransferObject(LoggedInInfo loggedInInfo, CaseManagementIssue d) throws ConversionException {
-		CaseManagementIssueTo1 t = new CaseManagementIssueTo1();		
+	public CaseManagementIssueTo1 getAsTransferObject(LoggedInInfo loggedInInfo, CaseManagementIssue issue) throws ConversionException {
+		CaseManagementIssueTo1 issueTo = new CaseManagementIssueTo1();		
 		IssueConverter issueConverter = new IssueConverter();
-		t.setAcute(d.isAcute());
-		t.setCertain(d.isCertain());
-		t.setDemographic_no(""+d.getDemographic_no());
-		t.setId(d.getId());
-		t.setIssue(issueConverter.getAsTransferObject(loggedInInfo, d.getIssue()));
-		t.setIssue_id(d.getIssue_id());
-		t.setMajor(d.isMajor());
-		t.setProgram_id(d.getProgram_id());
-		t.setResolved(d.isResolved());
-		t.setType(d.getType());
-		// Not sure what this one links to t.setUnchecked(d.);
-		t.setUpdate_date(d.getUpdate_date());
-		return t;
+		issueTo.setAcute(issue.isAcute());
+		issueTo.setCertain(issue.isCertain());
+		issueTo.setDemographic_no(""+issue.getDemographic_no());
+		issueTo.setId(issue.getId());
+		issueTo.setIssue(issueConverter.getAsTransferObject(loggedInInfo, issue.getIssue()));
+		issueTo.setIssue_id(issue.getIssue_id());
+		issueTo.setMajor(issue.isMajor());
+		issueTo.setProgram_id(issue.getProgram_id());
+		issueTo.setResolved(issue.isResolved());
+		issueTo.setType(issue.getType());
+		// Not sure what this one links to t.setUnchecked(issue.);
+		issueTo.setUpdate_date(issue.getUpdate_date());
+		return issueTo;
 	}
 
 	
