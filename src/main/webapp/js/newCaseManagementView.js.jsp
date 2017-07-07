@@ -38,7 +38,6 @@
    	var defaultDiv;
    	var changeIssueFunc;
    	var addIssueFunc;
-   	var needToReleaseLock = true;
 
        var X       = 10;
     var small   = 60;
@@ -153,21 +152,6 @@
                      if( !measurementWindows[idx].closed )
                          measurementWindows[idx].parentChanged = true;
                  }
-            
-                if( needToReleaseLock ) {								
-				//release lock on note
-				var url = ctx + "/CaseManagementEntry.do";
-				var nId = document.forms['caseManagementEntryForm'].noteId.value;
-				var params = "method=releaseNoteLock&providerNo=" + providerNo + "&demographicNo=" + demographicNo + "&noteId=" + nId;
-				new Ajax.Request (
-					url,
-					{
-						method: 'post',
-						postBody: params,
-						asynchronous: false						
-					}
-				);				
-                }
             }
 
         var numMenus = 3;
@@ -853,10 +837,10 @@ cppNames[5] = "Reminders";
 cppNames[6] = "Other Meds";
 
 function getCPP(issueCode) {
-    for (var i=0; i<cppIssues.length; i++) {
-	if (issueCode==cppIssues[i]) {
-	    return cppNames[i];
-	}
+    for (var i=0; i < cppIssues.length; i++) {
+		if (issueCode==cppIssues[i]) {
+		    return cppNames[i];
+		}
     }
     return "";
 }
@@ -890,22 +874,22 @@ function prepareExtraFields(cpp,exts) {
 	//commented out..this causes a problem in Firefox
 	//console.log("prepare Extra Fields");
     var rowIDs = new Array(10);
-    for (var i=2; i<exFields.length; i++) {
-	rowIDs[i] = "Item"+exFields[i];
-	$(rowIDs[i]).hide();
+    for (var i=2; i < exFields.length; i++) {
+		rowIDs[i] = "Item"+exFields[i];
+		$(rowIDs[i]).hide();
     }
     if (cpp==cppNames[1]) $(rowIDs[2],rowIDs[4],rowIDs[8],rowIDs[9]).invoke("show");
     if (cpp==cppNames[2]) $(rowIDs[3],rowIDs[4],rowIDs[7],rowIDs[8],rowIDs[9]).invoke("show");
     if (cpp==cppNames[3]) $(rowIDs[5],rowIDs[8],rowIDs[9],rowIDs[10]).invoke("show");
     if (cpp==cppNames[4]) $(rowIDs[3],rowIDs[6],rowIDs[8],rowIDs[9]).invoke("show");
 
-    for (var i=0; i<exFields.length; i++) {
-	$(exFields[i]).value = "";
+    for (var i=0; i < exFields.length; i++) {
+		$(exFields[i]).value = "";
     }
 
     var extsArr = exts.split(";");
-    for (var i=0; i<extsArr.length; i+=2) {
-    	for (var j=0; j<exFields.length; j++) {
+    for (var i=0; i < extsArr.length; i+=2) {
+    	for (var j=0; j < exFields.length; j++) {
 			if (extsArr[i]==exKeys[j]) {
 				$(exFields[j]).value = extsArr[i+1];
 				continue;
@@ -1165,44 +1149,44 @@ function loadDiv(div,url,limit) {
           return true;
     }
 
-    function setCaretPosition(inpu, pos){
-	if(inpu.setSelectionRange){
-		inpu.focus();
-		inpu.setSelectionRange(pos,pos);
-		if(inpu.value.trim().length == 0) {
-			inpu.value=inpu.value.trim();
+	function setCaretPosition(inpu, pos) {
+		if(inpu.setSelectionRange){
+			inpu.focus();
+			inpu.setSelectionRange(pos,pos);
+			if(inpu.value.trim().length == 0) {
+				inpu.value=inpu.value.trim();
+			}
+	                var ev;
+	                try {
+	                    ev = document.createEvent('KeyEvents');
+	                    ev.initKeyEvent('keypress', true, true, window,false, false, false, false, 0,0);
+	                }
+	                catch(e) {
+	                    ev = document.createEvent("UIEvents");
+	                    ev.initEvent("keypress",true,true);
+	                    /*
+	                    Safari doesn't support these funcs but seems to scroll without them
+	                    ev.initUIEvent( 'keypress', true, true, window, 1 );
+	                    ev.keyCode = inpu.value.charCodeAt(pos-1);
+	                    */
+	
+	                }
+	
+	                inpu.dispatchEvent(ev); // causes the scrolling
+	
 		}
-                var ev;
-                try {
-                    ev = document.createEvent('KeyEvents');
-                    ev.initKeyEvent('keypress', true, true, window,false, false, false, false, 0,0);
-                }
-                catch(e) {
-                    ev = document.createEvent("UIEvents");
-                    ev.initEvent("keypress",true,true);
-                    /*
-                    Safari doesn't support these funcs but seems to scroll without them
-                    ev.initUIEvent( 'keypress', true, true, window, 1 );
-                    ev.keyCode = inpu.value.charCodeAt(pos-1);
-                    */
-
-                }
-
-                inpu.dispatchEvent(ev); // causes the scrolling
-
-	}else if (inpu.createTextRange) {
-		var range = inpu.createTextRange();
-		range.collapse(true);
-		range.moveEnd('character', pos);
-		range.moveStart('character', pos);
-		range.select();
-
-                var ev = document.createEventObject();
-                ev.keyCode = inpu.value.charCodeAt(pos-1);
-                inpu.fireEvent("onkeydown", ev);
+		else if (inpu.createTextRange) {
+			var range = inpu.createTextRange();
+			range.collapse(true);
+			range.moveEnd('character', pos);
+			range.moveStart('character', pos);
+			range.select();
+	
+			var ev = document.createEventObject();
+			ev.keyCode = inpu.value.charCodeAt(pos-1);
+			inpu.fireEvent("onkeydown", ev);
+		}
 	}
-
-    }
 
     function pasteToEncounterNote(txt) {
         $(caseNote).value += "\n" + txt;
@@ -1279,13 +1263,13 @@ function loadDiv(div,url,limit) {
     }
 
 function grabEnterGetTemplate(event){
-
-
-  if(window.event && window.event.keyCode == 13){
-      return false;
-  }else if (event && event.which == 13){
-      return false;
-  }
+	// enter key (keycode 13)
+	if(window.event && window.event.keyCode == 13) {
+		return false;
+	}
+	else if (event && event.which == 13) {
+		return false;
+	}
 }
 
 function largeNote(note) {
@@ -1322,28 +1306,12 @@ function resetView(frm, error, e) {
     Element.observe(parent, 'click', unlockNote);
 }
 
-function removeLock(id) {
-	var regEx = /\d+/;
-    var nId = regEx.exec(id);
-	var url = ctx + "/CaseManagementEntry.do";
-	params = "method=releaseNoteLock&providerNo=" + providerNo + "&demographicNo=" + demographicNo + "&noteId=" + nId + "&force=true";
-	
-	new Ajax.Request(
-		url,
-		{
-			method: 'post',
-			postBody: params,
-			asynchronous: true
-		}
-	);	
-}
-
-
 var updatedNoteId = -1;  //used to store id of ajax saved note used below
 var selectBoxes = new Object();
 var unsavedNoteWarning;
 var editLabel;
 function changeToView(id) {
+	console.info("Change To View", id);
     var parent = $(id).parentNode.id;
     var nId = parent.substr(1);
 
@@ -1358,6 +1326,7 @@ function changeToView(id) {
     //if so, warn user that changes will be lost if not saved
 
     if( origCaseNote != $F(id)  || origObservationDate != $("observationDate").value) {
+    	console.info("Unsaved Note");
         if( !confirm(unsavedNoteWarning) )
             return false;
         else {
@@ -1378,15 +1347,13 @@ function changeToView(id) {
             }
         }
         saving = true;
+        console.info("Attempt Save Note");
         if( ajaxSaveNote(sig,nId,tmp) == false) {
+        	console.info("Save Note Failed");
             return false;
         }
    }
-
-	//remove lock from note
-	removeLock(id);
-
-
+   
     //cancel updating of issues
     //IE destroys innerHTML of sig div when calling ajax update
     //so we have to restore it here if the ajax call is aborted
@@ -1525,6 +1492,7 @@ function changeToView(id) {
         $(parent).style.height = "auto";
 
     }
+    console.info("End Change To View");
     return true;
 }
 
@@ -1861,32 +1829,10 @@ function unlockNote(e) {
     Element.stopObserving(txt, 'click', unlockNote);
 }
 
-function NoteisLocked(nId) {
-
-	var noteIsLocked = "";
-	var url = ctx + "/CaseManagementEntry.do";
-	params = "method=isNoteEdited&providerNo=" + providerNo + "&demographicNo=" + demographicNo + "&noteId=" + nId;
-	
-	new Ajax.Request(
-		url,
-		{
-			method: 'post',
-			postBody: params,
-			evalScripts: true,
-			asynchronous: false,
-			onSuccess: function(request) {										
-					var json = request.responseText.evalJSON();								
-					noteIsLocked = json.isNoteEdited;
-			}
-		}
-	);	
-	
-	return noteIsLocked;
-}
-
 var sigCache = "";
 //place Note text in textarea for editing and add save, sign etc buttons for this note
 function editNote(e) {
+	console.info("Begin Edit Note");
     var divHeight = 14;
     var normalFont = 12;
     var lineHeight = 1.2;
@@ -1900,37 +1846,6 @@ function editNote(e) {
     var txt = "n" + nId;
     var xpandId = "xpImg" + nId;
     var sig = "sig" + nId;
-    
-    var noteLockStatus = NoteisLocked(nId);
-    if(noteLockStatus == "user") {
-    	var viewEditedNote = confirm("You have started to edit this note in another window.\nDo you wish to continue?");
-    	if( viewEditedNote ) {    	
-    		var parent = $(caseNote).parentNode.id;
-    		var oldNoteId = parent.substr(1);	    		
-    		var params = "method=releaseNoteLock&demographicNo=" + demographicNo + "&providerNo=" + providerNo  + "&noteId=" + oldNoteId + "&force=true";
-    		jQuery.ajax({
-				type: "POST",
-				url:  ctx + "/CaseManagementEntry.do",
-				data: params
-			});
-    		    		
-    		params = "method=updateNoteLock&demographicNo=" + demographicNo + "&noteId=" + nId;
-			jQuery.ajax({
-				type: "POST",
-				url:  ctx + "/CaseManagementEntry.do",
-				data: params
-			});
-    	}  
-    	else {
-    		Event.stop(e);
-    		return false;
-    	}
-    }
-    else if( noteLockStatus == "other" ) {
-    	Event.stop(e);
-    	alert("This note is being edited by another user.  Try again later");
-    	return false;
-    }
 
     if( $(xpandId) != null ) {
         xpandView(e);
@@ -1939,9 +1854,11 @@ function editNote(e) {
         Event.stop(e);
     }
 
+	console.info("Attempt close open textarea");
     //if we have an edit textarea already open, close it
     if($(caseNote) !=null && $(caseNote).parentNode.id != $(txt).id) {
         if( !changeToView(caseNote) ) {
+        	console.info("Unable to change view");
             $(caseNote).focus();
             return;
         }
@@ -2062,6 +1979,7 @@ function editNote(e) {
 
     //start AutoSave
     setTimer();
+    console.info("End Edit Note");
 }
 
 function collapseView(e) {
@@ -2682,13 +2600,6 @@ function savePage(method, chain) {
 
     clearAutoSaveTimer();
 
-    if( method == "saveAndExit" ) {
-    	needToReleaseLock = false;
-    }
-    else {
-    	needToReleaseLock = true;
-    }
-
 	origCaseNote = $F(caseNote);
     caseMgtEntryfrm.submit();
 
@@ -3144,14 +3055,14 @@ var numChars = 0;
 function monitorCaseNote(e) {
 	
 	//if we have lost the lock on the note alert the user
-	if( lostNoteLock ) {
+	/*if( lostNoteLock ) {
 		var openAgain = confirm("You have saved/edited this note in another window\nPlease reopen the Chart if you wish to continue editing this note" +
 			"\n Do you wish to reopen the chart now?");
 			
 	    if( openAgain ) {
 	    	window.location.reload(true);
 	    }
-	}
+	}*/
 
     var MAXCHARS = 78;
     var MINCHARS = -10;
