@@ -495,22 +495,29 @@
 	<databaseap>
         <ap-name>medical_historyc</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS medicalHistories
-			FROM casemgmt_note s1, (
+			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS medicalHistories 
+			FROM casemgmt_note s1
+			JOIN (
 			  SELECT
 				MAX(cn.note_id) as note_id 
-				FROM casemgmt_note cn, casemgmt_issue_notes cin
+			  FROM casemgmt_note cn, casemgmt_issue_notes cin
 			  WHERE cn.note_id = cin.note_id 
 			  AND cin.id = (
 				SELECT id FROM casemgmt_issue
-				WHERE demographic_no = ${demographic} 
+				WHERE demographic_no = ${demographic}
 				AND issue_id = (
 				  SELECT issue_id FROM issue WHERE code='MedHistory' LIMIT 1
 				) LIMIT 1
 			  ) GROUP BY cn.uuid
-			) s2
-			WHERE s1.note_id = s2.note_id 
-			AND s1.archived=0;	
+			) s2 ON s1.note_id = s2.note_id 
+			JOIN (
+			  SELECT n1.uuid, n1.update_date
+			  FROM casemgmt_note n1
+			  LEFT JOIN casemgmt_note n2 on n1.uuid = n2.uuid and (n1.note_id &lt; n2.note_id)
+			  WHERE n2.note_id IS NULL
+			) note_filter ON s1.uuid = note_filter.uuid
+			WHERE note_filter.update_date &lt;= s1.update_date
+			AND s1.archived=0;
 	    </ap-sql>
         <ap-output>${medicalHistories}</ap-output>
     </databaseap>
@@ -522,22 +529,29 @@
 	<databaseap>
         <ap-name>other_medications_historyc</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS omeds
-			FROM casemgmt_note s1, (
+			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS omeds 
+			FROM casemgmt_note s1
+			JOIN (
 			  SELECT
 				MAX(cn.note_id) as note_id 
-				FROM casemgmt_note cn, casemgmt_issue_notes cin
+			  FROM casemgmt_note cn, casemgmt_issue_notes cin
 			  WHERE cn.note_id = cin.note_id 
 			  AND cin.id = (
 				SELECT id FROM casemgmt_issue
-				WHERE demographic_no = ${demographic} 
+				WHERE demographic_no = ${demographic}
 				AND issue_id = (
 				  SELECT issue_id FROM issue WHERE code='OMeds' LIMIT 1
 				) LIMIT 1
 			  ) GROUP BY cn.uuid
-			) s2
-			WHERE s1.note_id = s2.note_id 
-			AND s1.archived=0;	
+			) s2 ON s1.note_id = s2.note_id 
+			JOIN (
+			  SELECT n1.uuid, n1.update_date
+			  FROM casemgmt_note n1
+			  LEFT JOIN casemgmt_note n2 on n1.uuid = n2.uuid and (n1.note_id &lt; n2.note_id)
+			  WHERE n2.note_id IS NULL
+			) note_filter ON s1.uuid = note_filter.uuid
+			WHERE note_filter.update_date &lt;= s1.update_date
+			AND s1.archived=0;
 	    </ap-sql>
         <ap-output>${omeds}</ap-output>
     </databaseap>
@@ -549,22 +563,29 @@
 	<databaseap>
         <ap-name>social_family_historyc</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS socialHistories
-			FROM casemgmt_note s1, (
+			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS socialHistories 
+			FROM casemgmt_note s1
+			JOIN (
 			  SELECT
 				MAX(cn.note_id) as note_id 
-				FROM casemgmt_note cn, casemgmt_issue_notes cin
+			  FROM casemgmt_note cn, casemgmt_issue_notes cin
 			  WHERE cn.note_id = cin.note_id 
 			  AND cin.id = (
 				SELECT id FROM casemgmt_issue
-				WHERE demographic_no = ${demographic} 
+				WHERE demographic_no = ${demographic}
 				AND issue_id = (
 				  SELECT issue_id FROM issue WHERE code='SocHistory' LIMIT 1
 				) LIMIT 1
 			  ) GROUP BY cn.uuid
-			) s2
-			WHERE s1.note_id = s2.note_id 
-			AND s1.archived=0;	
+			) s2 ON s1.note_id = s2.note_id 
+			JOIN (
+			  SELECT n1.uuid, n1.update_date
+			  FROM casemgmt_note n1
+			  LEFT JOIN casemgmt_note n2 on n1.uuid = n2.uuid and (n1.note_id &lt; n2.note_id)
+			  WHERE n2.note_id IS NULL
+			) note_filter ON s1.uuid = note_filter.uuid
+			WHERE note_filter.update_date &lt;= s1.update_date
+			AND s1.archived=0;
 	    </ap-sql>
         <ap-output>${socialHistories}</ap-output>
 	</databaseap>
@@ -576,22 +597,29 @@
     <databaseap>
         <ap-name>ongoingconcernsc</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS concerns
-			FROM casemgmt_note s1, (
+			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS concerns 
+			FROM casemgmt_note s1
+			JOIN (
 			  SELECT
 				MAX(cn.note_id) as note_id 
-				FROM casemgmt_note cn, casemgmt_issue_notes cin
+			  FROM casemgmt_note cn, casemgmt_issue_notes cin
 			  WHERE cn.note_id = cin.note_id 
 			  AND cin.id = (
 				SELECT id FROM casemgmt_issue
-				WHERE demographic_no = ${demographic} 
+				WHERE demographic_no = ${demographic}
 				AND issue_id = (
 				  SELECT issue_id FROM issue WHERE code='Concerns' LIMIT 1
 				) LIMIT 1
 			  ) GROUP BY cn.uuid
-			) s2
-			WHERE s1.note_id = s2.note_id 
-			AND s1.archived=0;	
+			) s2 ON s1.note_id = s2.note_id 
+			JOIN (
+			  SELECT n1.uuid, n1.update_date
+			  FROM casemgmt_note n1
+			  LEFT JOIN casemgmt_note n2 on n1.uuid = n2.uuid and (n1.note_id &lt; n2.note_id)
+			  WHERE n2.note_id IS NULL
+			) note_filter ON s1.uuid = note_filter.uuid
+			WHERE note_filter.update_date &lt;= s1.update_date
+			AND s1.archived=0;
 	    </ap-sql>
         <ap-output>${concerns}</ap-output>
     </databaseap>
@@ -603,22 +631,29 @@
     <databaseap>
         <ap-name>remindersc</ap-name>
 		<ap-sql>
-			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS reminders
-			FROM casemgmt_note s1, (
+			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS reminders 
+			FROM casemgmt_note s1
+			JOIN (
 			  SELECT
 				MAX(cn.note_id) as note_id 
-				FROM casemgmt_note cn, casemgmt_issue_notes cin
+			  FROM casemgmt_note cn, casemgmt_issue_notes cin
 			  WHERE cn.note_id = cin.note_id 
 			  AND cin.id = (
 				SELECT id FROM casemgmt_issue
-				WHERE demographic_no = ${demographic} 
+				WHERE demographic_no = ${demographic}
 				AND issue_id = (
 				  SELECT issue_id FROM issue WHERE code='Reminders' LIMIT 1
 				) LIMIT 1
 			  ) GROUP BY cn.uuid
-			) s2
-			WHERE s1.note_id = s2.note_id 
-			AND s1.archived=0;	
+			) s2 ON s1.note_id = s2.note_id 
+			JOIN (
+			  SELECT n1.uuid, n1.update_date
+			  FROM casemgmt_note n1
+			  LEFT JOIN casemgmt_note n2 on n1.uuid = n2.uuid and (n1.note_id &lt; n2.note_id)
+			  WHERE n2.note_id IS NULL
+			) note_filter ON s1.uuid = note_filter.uuid
+			WHERE note_filter.update_date &lt;= s1.update_date
+			AND s1.archived=0;
 	    </ap-sql>
         <ap-output>${reminders}</ap-output>
     </databaseap>
