@@ -32,8 +32,10 @@ package oscar.log;
  * @author yilee18
  */
 public class LogConst {
-    public static final String LOGIN = "log in";
-    public static final String LOGOUT = "log out";
+	/* Action constants 
+	 * These should describe what user action was done */
+    public static final String ACTION_LOGIN = "log in";
+    public static final String ACTION_LOGOUT = "log out";
     public static final String SHELTER_SELECTION="select shelter";
     public static final String READ = "read";
     public static final String ADD = "add";
@@ -53,8 +55,13 @@ public class LogConst {
     public static final String UNLINK = "unlink";
     public static final String SENT = "sent";
 
+    /* Content/Module constants 
+     * These should describe what module the action applies to.
+     * Example: action ADD module CON_DOCUMENT */
     public static final String CON_LOGIN_AGREEMENT = "login agreement";
-    public static final String CON_LOGIN = "login";
+    public static final String CON_LOGIN = "user login";
+    public static final String CON_LOGOUT = "user logout";
+    public static final String CON_SHELTER_SELECTION="select shelter";
     public static final String CON_APPT = "appointment";
     public static final String CON_ECHART = "eChart";
     public static final String CON_DEMOGRAPHIC = "demographic";
@@ -85,4 +92,12 @@ public class LogConst {
     public static final String CON_FAX  = "fax";
     public static final String CON_PHARMACY  = "pharmacy";
     
+    /* Status constants
+     * These should describe the outcome of the action */
+    public static final String STATUS_OK = "OK";
+    public static final String STATUS_SUCCESS = "success";
+    public static final String STATUS_FAILURE = "failed";
+    public static final String STATUS_LOGIN_SUCCESS = "login";
+    public static final String STATUS_LOGIN_FAILURE = "failed";
+    public static final String STAUTS_LOGIN_EXPIRED = "expired";
 }
