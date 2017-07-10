@@ -1311,7 +1311,6 @@ var selectBoxes = new Object();
 var unsavedNoteWarning;
 var editLabel;
 function changeToView(id) {
-	console.info("Change To View", id);
     var parent = $(id).parentNode.id;
     var nId = parent.substr(1);
 
@@ -1326,7 +1325,6 @@ function changeToView(id) {
     //if so, warn user that changes will be lost if not saved
 
     if( origCaseNote != $F(id)  || origObservationDate != $("observationDate").value) {
-    	console.info("Unsaved Note");
         if( !confirm(unsavedNoteWarning) )
             return false;
         else {
@@ -1347,9 +1345,7 @@ function changeToView(id) {
             }
         }
         saving = true;
-        console.info("Attempt Save Note");
         if( ajaxSaveNote(sig,nId,tmp) == false) {
-        	console.info("Save Note Failed");
             return false;
         }
    }
@@ -1492,7 +1488,6 @@ function changeToView(id) {
         $(parent).style.height = "auto";
 
     }
-    console.info("End Change To View");
     return true;
 }
 
@@ -1832,7 +1827,6 @@ function unlockNote(e) {
 var sigCache = "";
 //place Note text in textarea for editing and add save, sign etc buttons for this note
 function editNote(e) {
-	console.info("Begin Edit Note");
     var divHeight = 14;
     var normalFont = 12;
     var lineHeight = 1.2;
@@ -1854,11 +1848,9 @@ function editNote(e) {
         Event.stop(e);
     }
 
-	console.info("Attempt close open textarea");
     //if we have an edit textarea already open, close it
     if($(caseNote) !=null && $(caseNote).parentNode.id != $(txt).id) {
         if( !changeToView(caseNote) ) {
-        	console.info("Unable to change view");
             $(caseNote).focus();
             return;
         }
@@ -1979,7 +1971,6 @@ function editNote(e) {
 
     //start AutoSave
     setTimer();
-    console.info("End Edit Note");
 }
 
 function collapseView(e) {
@@ -2699,7 +2690,7 @@ function changeDiagnosisUnresolved(issueId) {
     var closeWithoutSaveMsg;
     function closeEnc(e) {
         Event.stop(e);
-        if( !lostNoteLock && (origCaseNote != $F(caseNote)  || origObservationDate != $("observationDate").value)) {
+        if(origCaseNote != $F(caseNote)  || origObservationDate != $("observationDate").value) {
             if( confirm(closeWithoutSaveMsg) ) {
                 var frm = document.forms["caseManagementEntryForm"];
                 origCaseNote = $F(caseNote);
@@ -2947,7 +2938,6 @@ function deleteAutoSave() {
 }
 var month=new Array(12);
 var msgDraftSaved;
-var lostNoteLock = false;
 function autoSave(async) {
 
     var url = ctx + "/CaseManagementEntry.do";
@@ -2966,15 +2956,7 @@ function autoSave(async) {
                                         okToClose = true;
 				},
                                 onSuccess: function(req) {
-                                                /*var nId = caseNote.substr(13);
-                                                var sig = "sig" + nId;
 
-                                                if( $("autosaveTime") == null )
-                                                    new Insertion.Bottom(sig, "<div id='autosaveTime' class='sig' style='text-align:center; margin:0px;'><\/div>");
-                                                    */
-                                                    
-                                                
-                                                
                                                 var d = new Date();
                                                 var min = d.getMinutes();
                                                 min = min < 10 ? "0" + min : min;
@@ -2988,12 +2970,9 @@ function autoSave(async) {
 
                                            },
                                  onFailure: function(req) {
-                                 	if( req.status == 403 ) {
-                                                	lostNoteLock = true;
-                                                	var msg = "<i>Autosave cancelled due to note being edited in another window</i>";
-                                                	$("autosaveTime").update(msg);
-                                    }
-                                 
+                                 				console.error("Autosave error", req);
+                                             	var msg = "<i>Autosave Failure</i>";
+                                             	$("autosaveTime").update(msg);
                                  }
                             }
                      );
@@ -3006,10 +2985,7 @@ function backup() {
     if(origCaseNote != $(caseNote).value || origObservationDate != $("observationDate").value) {
         autoSave(true);        
     }
-
-	if( !lostNoteLock ) {
-    	setTimer();
-    }
+    setTimer();
 }
 
 var autoSaveTimer;
@@ -3053,16 +3029,6 @@ function showIssueHistory(demoNo, issueIds) {
 var caseNote = "";  //contains id of note text area; system permits only 1 text area at a time to be created
 var numChars = 0;
 function monitorCaseNote(e) {
-	
-	//if we have lost the lock on the note alert the user
-	/*if( lostNoteLock ) {
-		var openAgain = confirm("You have saved/edited this note in another window\nPlease reopen the Chart if you wish to continue editing this note" +
-			"\n Do you wish to reopen the chart now?");
-			
-	    if( openAgain ) {
-	    	window.location.reload(true);
-	    }
-	}*/
 
     var MAXCHARS = 78;
     var MINCHARS = -10;
