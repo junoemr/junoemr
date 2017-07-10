@@ -28,6 +28,7 @@
 <%@ page import="java.util.*"%>
 <%@ page import="java.sql.*"%>
 <%@ page import="oscar.login.*, oscar.oscarDB.*, oscar.MyDateFormat"%>
+<%@ page import="oscar.log.LogConst"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -200,7 +201,7 @@ label{margin-top:6px;margin-bottom:0px;}
 	  providerNo = request.getParameter("providerNo");
 	  String action = request.getParameter("submit");
 	  String content = request.getParameter("content");
-	  if(content.equals("login")) content = "login";
+	  if(content.equals("login")) content = LogConst.CON_LOGIN;
 	  if(content.equals("admin")) content = "%";
 	  
 	  String sDate = request.getParameter("startDate");
@@ -240,6 +241,7 @@ label{margin-top:6px;margin-bottom:0px;}
         prop.setProperty("provider_no", Misc.getString(rs,"provider_no"));
         prop.setProperty("demographic_no",Misc.getString(rs,"demographic_no"));
         prop.setProperty("data", Misc.getString(rs, "data"));
+        prop.setProperty("status", Misc.getString(rs, "status"));
         vec.add(prop);
       }
 
@@ -258,15 +260,17 @@ label{margin-top:6px;margin-bottom:0px;}
 <table class="table table-bordered table-striped table-hover table-condensed">
 	<tr bgcolor="<%=tdTitleColor%>">
 		<TH>Time</TH>
-		<TH>Action</TH>
-		<TH>Content</TH>
-		<TH>Keyword</TH>
-		<TH>IP</TH>
 		<% if(bAll) { %>
 		<TH>Provider</TH>
 		<% } %>
-                <TH>Demo</TH>
-                <TH>Data</TH>
+		<TH>Action</TH>
+		<TH>Content</TH>
+		<TH>Status</TH>
+		<TH>Keyword</TH>
+		<TH>IP</TH>
+
+		<TH>Demo</TH>
+		<TH>Data</TH>
 	</tr>
 	<%
 String catName = "";
@@ -279,13 +283,14 @@ for (int i = 0; i < vec.size(); i++) {
 %>
 	<tr bgcolor="<%=color %>" align="center">
 		<td><%=prop.getProperty("dateTime")%>&nbsp;</td>
-		<td><%=prop.getProperty("action")%>&nbsp;</td>
-		<td><%=prop.getProperty("content")%>&nbsp;</td>
-		<td><%=prop.getProperty("contentId")%>&nbsp;</td>
-		<td><%=prop.getProperty("ip")%>&nbsp;</td>
 		<% if(bAll) { %>
 		<td><%=propName.getProperty(prop.getProperty("provider_no"), "")%>&nbsp;</td>
 		<% } %>
+		<td><%=prop.getProperty("action")%>&nbsp;</td>
+		<td><%=prop.getProperty("content")%>&nbsp;</td>
+		<td><%=prop.getProperty("status")%>&nbsp;</td>
+		<td><%=prop.getProperty("contentId")%>&nbsp;</td>
+		<td><%=prop.getProperty("ip")%>&nbsp;</td>
         <td><%=prop.getProperty("demographic_no")%>&nbsp;</td>
         <td><%=prop.getProperty("data") %>&nbsp;</td>
 	</tr>

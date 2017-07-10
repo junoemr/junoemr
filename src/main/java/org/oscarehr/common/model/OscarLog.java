@@ -58,6 +58,7 @@ public class OscarLog extends AbstractModel<Long> implements Serializable {
 	private String content;
 	private String contentId;
 	private String ip;
+	private String status;
 
 	@Column(name = "demographic_no")
 	private Integer demographicId;
@@ -119,6 +120,14 @@ public class OscarLog extends AbstractModel<Long> implements Serializable {
 
 	public void setIp(String ip) {
 		this.ip = StringUtils.trimToNull(ip);
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public Integer getDemographicId() {

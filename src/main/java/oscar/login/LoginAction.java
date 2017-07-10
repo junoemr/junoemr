@@ -231,7 +231,7 @@ public final class LoginAction extends DispatchAction {
             Provider p = providerDao.getProvider(strAuth[0]);
             if(p == null || (p.getStatus() != null && p.getStatus().equals("0"))) {
             	logger.info(LOG_PRE + " Inactive: " + userName);
-            	LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_FAILURE, "inactive");
+            	LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_LOGIN_INACTIVE, "inactive");
             	
                 String newURL = mapping.findForward("error").getPath();
                 newURL = newURL + "?errormsg=Your account is inactive. Please contact your administrator to activate.";

@@ -95,10 +95,10 @@ public class LogConst {
     /* Status constants
      * These should describe the outcome of the action */
     public static final String STATUS_OK = "OK";
-    public static final String STATUS_SUCCESS = "success";
-    public static final String STATUS_FAILURE = "failure";
-    public static final String STATUS_LOGIN_SUCCESS = "success";
-    public static final String STATUS_LOGIN_FAILURE = "failed";
-    public static final String STAUTS_LOGIN_EXPIRED = "expired";
-    public static final String STAUTS_LOGIN_INACTIVE = "inactive";
+    public static final String STATUS_SUCCESS = "SUCCESS";
+    public static final String STATUS_FAILURE = "FAILURE";
+    public static final String STATUS_LOGIN_SUCCESS = "SUCCESS";
+    public static final String STATUS_LOGIN_FAILURE = "FAILURE";
+    public static final String STATUS_LOGIN_EXPIRED = "EXPIRED";
+    public static final String STATUS_LOGIN_INACTIVE = "INACTIVE";
 }

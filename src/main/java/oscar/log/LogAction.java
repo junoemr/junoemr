@@ -118,7 +118,7 @@ public class LogAction {
 		oscarLog.setDemographicId(demographicNo);
 		oscarLog.setAction(action);
 		oscarLog.setContent(module);
-		// TODO add a status to the log entry
+		oscarLog.setStatus(status);
 		oscarLog.setContentId(contentId);
 		oscarLog.setIp(ip);
 		oscarLog.setSecurityId(securityId);
@@ -130,19 +130,51 @@ public class LogAction {
 		addLogEntry(providerNo, demographicNo, action, module, status, contentId, ip, null, null);
 	}
 	public static void addLogEntry(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip) {
-		addLogEntry(providerNo, demographicNo, action, module, status, contentId, ip, null);
+		addLogEntry(providerNo, demographicNo, action, module, status, contentId, ip, null, null);
 	}
 	public static void addLogEntry(String providerNo, Integer demographicNo, String action, String module, String status, String data) {
-		addLogEntry(providerNo, demographicNo, action, module, status, null, null, data);
+		addLogEntry(providerNo, demographicNo, action, module, status, null, null, data, null);
 	}
 	public static void addLogEntry(String providerNo, String action, String module, String status, String contentId, String ip) {
-		addLogEntry(providerNo, null, action, module, status, contentId, ip, null);
+		addLogEntry(providerNo, null, action, module, status, contentId, ip, null, null);
 	}
 	public static void addLogEntry(String providerNo, String action, String module, String status, String data) {
-		addLogEntry(providerNo, null, action, module, status, null, null, data);
+		addLogEntry(providerNo, null, action, module, status, null, null, data, null);
 	}
 
 
+	public static void addLogEntrySyncronous(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip, String data, Integer securityId) {
+		OscarLog oscarLog = new OscarLog();
+
+		oscarLog.setProviderNo(providerNo);
+		oscarLog.setDemographicId(demographicNo);
+		oscarLog.setAction(action);
+		oscarLog.setContent(module);
+		oscarLog.setStatus(status);
+		oscarLog.setContentId(contentId);
+		oscarLog.setIp(ip);
+		oscarLog.setSecurityId(securityId);
+		oscarLog.setData(data);
+
+		addLogSynchronous(oscarLog);
+	}
+	public static void addLogEntrySyncronous(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip, String data) {
+		addLogEntrySyncronous(providerNo, demographicNo, action, module, status, contentId, ip, data, null);
+	}
+	public static void addLogEntrySyncronous(String providerNo, String action, String module, String status, String contentId, String ip, String data) {
+		addLogEntrySyncronous(providerNo, null, action, module, status, contentId, ip, data, null);
+	}
+	public static void addLogEntrySyncronous(String providerNo, String action, String module, String status, String contentId, String ip) {
+		addLogEntrySyncronous(providerNo, null, action, module, status, contentId, ip, null, null);
+	}
+	public static void addLogEntrySyncronous(String providerNo, String action, String module, String status, String data) {
+		addLogEntrySyncronous(providerNo, null, action, module, status, null, null, data, null);
+	}
+	
+	/**
+	 * @deprecated - use addLogEntrySyncronous instead
+	 */
+	@Deprecated
 	public static void addLogSynchronous(LoggedInInfo loggedInInfo, String action, String data)
 	{
 		OscarLog logEntry=new OscarLog();
@@ -154,7 +186,9 @@ public class LogAction {
 	}
 	/**
 	 * This method will add a log entry in the same thread and can participate in the same transaction if one exists.
+	 * @deprecated - use addLogEntrySyncronous instead
 	 */
+	@Deprecated
 	public static void addLogSynchronous(String provider_no, String action, String content, String contentId, String ip) {
 		OscarLog oscarLog = new OscarLog();
 
