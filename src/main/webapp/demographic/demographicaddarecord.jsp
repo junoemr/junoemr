@@ -328,7 +328,7 @@
 
 		// add log
 		String ip = request.getRemoteAddr();
-		LogAction.addLog(curUser_no, "add", "demographic", param2[0], ip,param2[0]);
+		LogAction.addLogEntry(curUser_no, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, param2[0], ip);
 
 		//archive the original too
 		Long archiveId = demographicArchiveDao.archiveRecord(demographicDao.getDemographic(dem));

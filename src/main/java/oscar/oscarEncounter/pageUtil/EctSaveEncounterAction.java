@@ -235,7 +235,7 @@ public class EctSaveEncounterAction extends Action {
             // add log here
             String ip = httpservletrequest.getRemoteAddr();
             LogAction.addLog( (String) httpservletrequest.getSession().getAttribute(
-                "user"), LogConst.ADD, LogConst.CON_ECHART,
+                "user"), LogConst.ACTION_ADD, LogConst.CON_ECHART,
                              sessionbean.demographicNo, ip);
 
             //change the appt status

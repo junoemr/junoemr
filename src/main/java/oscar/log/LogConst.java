@@ -37,7 +37,7 @@ public class LogConst {
     public static final String ACTION_LOGIN = "log in";
     public static final String ACTION_LOGOUT = "log out";
     public static final String ACTION_READ = "read";
-    public static final String ADD = "add";
+    public static final String ACTION_ADD = "add";
     public static final String UPDATE = "update";
     public static final String DELETE = "delete";
     public static final String DISCONTINUE = "discontinue";
@@ -66,6 +66,7 @@ public class LogConst {
     public static final String CON_DEMOGRAPHIC = "demographic";
     public static final String CON_DEMOGRAPHIC_RELATION = "demographic_relations";
     public static final String CON_ROLE = "role";
+    public static final String CON_PROVIDER = "provider";
     public static final String CON_PRIVILEGE = "privilege";
     public static final String CON_FORM = "form";
     public static final String CON_PRESCRIPTION = "prescription";

@@ -174,7 +174,7 @@ public class FrmFormRHPreventionAction extends Action{
 
                 props.setProperty("provider_no", providerNo);
                 newID = rec.saveFormRecord(props);
-                LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, request.getParameter("form_class"), "" + newID, ip);
+                LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, request.getParameter("form_class"), "" + newID, ip);
             }catch(Exception factEx){
             	MiscUtils.getLogger().error("Error", factEx);
             }

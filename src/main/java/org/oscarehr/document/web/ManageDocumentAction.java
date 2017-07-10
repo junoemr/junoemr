@@ -135,7 +135,7 @@ public class ManageDocumentAction extends DispatchAction {
         	throw new SecurityException("missing required security object (_edoc)");
         }
 		
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
+		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
 
 		String demog = request.getParameter("demog");
 
@@ -292,7 +292,7 @@ public class ManageDocumentAction extends DispatchAction {
         	throw new SecurityException("missing required security object (_edoc)");
         }
 		
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
+		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
 
 		String demog = request.getParameter("demog");
 
@@ -1082,7 +1082,7 @@ public class ManageDocumentAction extends DispatchAction {
             }
             newDoc.setNumberOfPages(numberOfPages);
             doc_no = EDocUtil.addDocumentSQL(newDoc);
-            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 
 
             if (flagproviders != null && flagproviders.length > 0) { 

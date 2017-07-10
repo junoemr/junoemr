@@ -206,7 +206,7 @@ if (isOk && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 if (isOk) {
 	String proId = p.getPractitionerNo();
 	String ip = request.getRemoteAddr();
-	LogAction.addLog(curUser_no, LogConst.ADD, "adminAddUser", proId, ip);
+	LogAction.addLogEntry(curUser_no, LogConst.ACTION_ADD, LogConst.CON_PROVIDER, LogConst.STATUS_SUCCESS, proId, ip);
 
 	ProviderBillCenter billCenter = new ProviderBillCenter();
 	billCenter.addBillCenter(request.getParameter("provider_no"),request.getParameter("billcenter"));

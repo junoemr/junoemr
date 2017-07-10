@@ -193,7 +193,7 @@ if (request.getParameter("submit") != null && request.getParameter("submit").equ
 	    secUserRole.setActiveyn(1);
 	    secUserRoleDao.save(secUserRole);
 	    msg = "Role " + roleNew + " is added. (" + number + ")";
-	    LogAction.addLog(curUser_no, LogConst.ADD, LogConst.CON_ROLE, number +"|"+ roleNew, ip);
+	    LogAction.addLog(curUser_no, LogConst.ACTION_ADD, LogConst.CON_ROLE, number +"|"+ roleNew, ip);
 	    if( newCaseManagement ) {
             ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
             if(programProvider == null) {

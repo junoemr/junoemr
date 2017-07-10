@@ -1074,7 +1074,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		caseManagementMgr.getEditors(note);
 
 		if (newNote) {
-			logAction = LogConst.ADD;
+			logAction = LogConst.ACTION_ADD;
 		} else if (note.isArchived()) {
 			logAction = LogConst.ARCHIVE;
 		} else {
@@ -1718,7 +1718,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 		String logAction;
 		if (newNote) {
-			logAction = LogConst.ADD;
+			logAction = LogConst.ACTION_ADD;
 		} else {
 			logAction = LogConst.UPDATE;
 		}

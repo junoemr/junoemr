@@ -91,7 +91,7 @@ public class DocumentDescriptionTemplateAction extends DispatchAction {
         documentDescriptionTemplate.setDocType(docType);
         documentDescriptionTemplate.setProviderNo(providerNo);
         this.documentDescriptionTemplateDao.persist(documentDescriptionTemplate);
-        LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENTDESCRIPTIONTEMPLATE, providerNo, request.getRemoteAddr(),null,"["+docType+"] "+descriptionShortcut+" | " +description);
+        LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_DOCUMENTDESCRIPTIONTEMPLATE, providerNo, request.getRemoteAddr(),null,"["+docType+"] "+descriptionShortcut+" | " +description);
         return null;
     }
 

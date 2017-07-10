@@ -132,7 +132,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		}
 		newDoc.setNumberOfPages(numberOfPages);
 		String doc_no = EDocUtil.addDocumentSQL(newDoc);
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 		String providerId = request.getParameter("provider");
 
 		if (providerId != null) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
@@ -342,7 +342,7 @@ public class AddEditDocumentAction extends DispatchAction {
 				if(ConformanceTestHelper.enableConformanceOnlyTestFeatures){
 					storeDocumentInDatabase(file, Integer.parseInt(doc_no));
 				}
-				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 				// add note if document is added under a patient
 				String module = fm.getFunction().trim();
 				String moduleId = fm.getFunctionId().trim();

@@ -166,7 +166,7 @@ if (request.getParameter("submit") != null && request.getParameter("submit").equ
 			msg += secExceptionMsg;
 		else
 			msg += "Role/Obj/Rights " + roleUserGroup + "/" + objectName + "/" + privilege + " is added. ";
-	    LogAction.addLog(curUser_no, LogConst.ADD, LogConst.CON_PRIVILEGE, roleUserGroup +"|"+ objectName +"|"+privilege, ip);
+	    LogAction.addLog(curUser_no, LogConst.ACTION_ADD, LogConst.CON_PRIVILEGE, roleUserGroup +"|"+ objectName +"|"+privilege, ip);
 	}
 }
 

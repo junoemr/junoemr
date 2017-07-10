@@ -83,7 +83,7 @@ public class PDFHandler  implements MessageHandler{
             
             String doc_no = EDocUtil.addDocumentSQL(newDoc);
 
-            LogAction.addLog(providerNo, LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, ipAddr,"","DocUpload");
+            LogAction.addLog(providerNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, doc_no, ipAddr,"","DocUpload");
             
             //Get provider to route document to
             String batchPDFProviderNo = OscarProperties.getInstance().getProperty("batch_pdf_provider_no");            

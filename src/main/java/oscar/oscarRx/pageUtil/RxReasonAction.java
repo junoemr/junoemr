@@ -127,7 +127,7 @@ public final class RxReasonAction extends DispatchAction {
             drugReasonDao.addNewDrugReason(dr);
 
             String ip = request.getRemoteAddr();
-            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DRUGREASON, ""+dr.getId() , ip,demographicNo,dr.getAuditString());
+            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_DRUGREASON, ""+dr.getId() , ip,demographicNo,dr.getAuditString());
 
             return (mapping.findForward("close"));
     }
