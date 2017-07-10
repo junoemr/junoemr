@@ -353,8 +353,8 @@ public class InboxResultsDao {
 				+ "LEFT JOIN patientLabRouting patLR ON ( proLR.lab_type = patLR.lab_type AND proLR.lab_no = patLR.lab_no ) "
 				+ "LEFT JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no AND doc.status <> 'D' ) "
 				+ "LEFT JOIN provider creator ON ( doc.doccreator = creator.provider_no ) "
-				+ "LEFT JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' ) "
-				+ "LEFT JOIN demographic d2 ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id > 0 AND cdoc.module_id = d2.demographic_no ) "
+				+ "LEFT JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' AND cdoc.module_id > 0) "
+				+ "LEFT JOIN demographic d2 ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id = d2.demographic_no ) "
 				
 				+ "LEFT JOIN hl7TextInfo lab ON ( proLR.lab_type = 'HL7' AND lab.lab_no = proLR.lab_no ) "
 				+ "LEFT JOIN hl7TextInfo lab_filter ON ( "
