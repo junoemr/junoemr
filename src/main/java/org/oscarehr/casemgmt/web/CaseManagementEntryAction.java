@@ -2584,7 +2584,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 		cform.setCaseNote_history(note.getHistory());
 
-		LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_CME_NOTE, noteid, request.getRemoteAddr(), note.getAuditString());
+		LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_CME_NOTE, noteid, request.getRemoteAddr(), note.getAuditString());
 
 		return mapping.findForward("historyview");
 	}

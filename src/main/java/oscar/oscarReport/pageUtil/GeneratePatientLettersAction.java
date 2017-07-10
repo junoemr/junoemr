@@ -173,7 +173,6 @@ public class GeneratePatientLettersAction extends Action {
         }
 
 
-        //LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_JASPERREPORTLETER, demographic$, request.getRemoteAddr());
         manageLetters.logLetterCreated( providerNo, id,demos);
         MiscUtils.getLogger().debug("Add Follow Up "+request.getParameter("addFollowUp"));
         if (request.getParameter("addFollowUp") != null && request.getParameter("addFollowUp").equals("ON")){

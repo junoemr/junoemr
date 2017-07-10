@@ -46,11 +46,11 @@ List<HRMDocumentToProvider> providerLinkList = (List<HRMDocumentToProvider>) req
 LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
 
+Integer demoNo = null;
 if(demographicLink != null){
-    LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_HRM, ""+hrmReportId, request.getRemoteAddr(),""+demographicLink.getDemographicNo());
-}else{           
-    LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_HRM, ""+hrmReportId, request.getRemoteAddr());
+	demoNo = Integer.parseInt(demographicLink.getDemographicNo());
 }
+LogAction.addLogEntry((String) session.getAttribute("user"), demoNo, LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_OK, ""+hrmReportId, request.getRemoteAddr());
 
 %>
 
