@@ -39,7 +39,7 @@
 	}
 %>
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@ page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ page import="oscar.util.*, oscar.form.*, oscar.form.data.*"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -55,11 +55,11 @@
     int provNo = Integer.parseInt((String) session.getAttribute("user"));
     FrmRecord rec = (new FrmRecordFactory()).factory(formClass);
     java.util.Properties props = rec.getFormRecord(LoggedInInfo.getLoggedInInfoFromSession(request),demoNo, formId);
-
-    //FrmData fd = new FrmData();    String resource = fd.getResource(); resource = resource + "ob/riskinfo/";
+    
+	//FrmData fd = new FrmData();    String resource = fd.getResource(); resource = resource + "ob/riskinfo/";
 
     //get project_home
-    String project_home = request.getContextPath().substring(1);	
+    String project_home = request.getContextPath();	
 %>
 <%
   boolean bView = false;
