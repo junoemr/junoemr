@@ -23,10 +23,16 @@
     Ontario, Canada
 
 --%>
-<a ng-repeat="patient in patients | offset:currentPage*pageSize | limitTo:pageSize | filter:query" class="list-group-item hand-hover" ng-click="goToRecord(patient)" class="default">
-	
-	<h5 class="list-group-item-heading">{{patient.name}}</h5>
-	<h5 class="list-group-item-heading pull-right" style="padding-bottom:2px">{{patient.date | date : 'yyyy-MM-dd HH:mm'}}</h5>
-	<div style="height:5px"></div>
-</a>
+<div id="patient-list">
+    <a ng-repeat="patient in patientListCtrl.patients | offset: patientListCtrl.currentPage * patientListCtrl.pageSize" 
+        class="list-group-item hand-hover" 
+        ng-click="patientListCtrl.goToRecord(patient)" 
+        class="default">
+        <h5 class="list-group-item-heading pull-right patient-time" >{{patient.date | date : 'yyyy-MM-dd HH:mm'}}</h5>
+        <h4 class="list-group-item-heading patient-name" >{{patient.name}}</h5>
+
+        <p class="list-group-item-text" ng-if="patient.demographicNo != 0" ng-show="patientListCtrl.patientListConfig.showReason">
+        </p>
+    </a>
+</div>
 		
