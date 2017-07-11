@@ -2216,7 +2216,7 @@ private String updateApptStatus(String status, String type) {
 		if (newNote) {
 			logAction = LogConst.ACTION_ADD;
 		} else {
-			logAction = LogConst.UPDATE;
+			logAction = LogConst.ACTION_UPDATE;
 		}
 		LogAction.addLog(user, logAction, LogConst.CON_CME_NOTE, "" + Long.valueOf(note.getId()).intValue(), remoteAddr, note.getDemographic_no(), note.getAuditString());
 		

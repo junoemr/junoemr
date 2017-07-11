@@ -102,7 +102,7 @@ public final class RxDeleteRxAction extends DispatchAction {
                 Drug drug = drugDao.find(drugId);
                 setDrugDelete(drug);
                 drugDao.merge(drug);
-                LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.DELETE, LogConst.CON_PRESCRIPTION, drugArr[i], ip,""+bean.getDemographicNo(), drug.getAuditString());
+                LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_DELETE, LogConst.CON_PRESCRIPTION, drugArr[i], ip,""+bean.getDemographicNo(), drug.getAuditString());
             }
         }
         catch (Exception e) {
@@ -137,7 +137,7 @@ public final class RxDeleteRxAction extends DispatchAction {
             Drug drug = drugDao.find(Integer.parseInt(deleteRxId));
             setDrugDelete(drug);
             drugDao.merge(drug);
-            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.DELETE, LogConst.CON_PRESCRIPTION, deleteRxId, ip,""+bean.getDemographicNo(), drug.getAuditString());
+            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_DELETE, LogConst.CON_PRESCRIPTION, deleteRxId, ip,""+bean.getDemographicNo(), drug.getAuditString());
         }
         catch (Exception e) {
             MiscUtils.getLogger().error("Error", e);
@@ -171,7 +171,7 @@ public final class RxDeleteRxAction extends DispatchAction {
                     Drug drug = drugDao.find(drugId);
                     setDrugDelete(drug);
                     drugDao.merge(drug);
-                    LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.DELETE, LogConst.CON_PRESCRIPTION, drugId.toString(), ip,""+bean.getDemographicNo(), drug.getAuditString());
+                    LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_DELETE, LogConst.CON_PRESCRIPTION, drugId.toString(), ip,""+bean.getDemographicNo(), drug.getAuditString());
                 }
                 catch (Exception e) {
                     MiscUtils.getLogger().error("Error", e);

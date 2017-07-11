@@ -94,7 +94,7 @@ public final class RxManagePharmacyAction extends DispatchAction {
     	
     	LoggedInInfo loggedInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
     	
-    	LogAction.addLog(loggedInfo.getLoggedInProviderNo(), LogConst.DELETE, LogConst.CON_PHARMACY, pharmacyId);
+    	LogAction.addLog(loggedInfo.getLoggedInProviderNo(), LogConst.ACTION_DELETE, LogConst.CON_PHARMACY, pharmacyId);
     }
     catch( Exception e) {
     	MiscUtils.getLogger().error("CANNOT DELETE PHARMACY ",e);

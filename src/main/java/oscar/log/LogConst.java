@@ -38,8 +38,8 @@ public class LogConst {
     public static final String ACTION_LOGOUT = "log out";
     public static final String ACTION_READ = "read";
     public static final String ACTION_ADD = "add";
-    public static final String UPDATE = "update";
-    public static final String DELETE = "delete";
+    public static final String ACTION_UPDATE = "update";
+    public static final String ACTION_DELETE = "delete";
     public static final String DISCONTINUE = "discontinue";
     public static final String ARCHIVE = "archive";
     public static final String REPRINT = "reprint";
@@ -68,6 +68,8 @@ public class LogConst {
     public static final String CON_ROLE = "role";
     public static final String CON_PROVIDER = "provider";
     public static final String CON_PRIVILEGE = "privilege";
+    public static final String CON_PASSWORD = "password/pin";
+    public static final String CON_ADMIN = "admin";
     public static final String CON_FORM = "form";
     public static final String CON_PRESCRIPTION = "prescription";
     public static final String CON_MEDICATION = "medication";

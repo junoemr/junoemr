@@ -449,7 +449,7 @@ public class PHRUserManagementAction extends DispatchAction {
 			//... and add the email address, if present
 			if(email != null && !"".equals(email)){
 				dd.setDemographicEmail(LoggedInInfo.getLoggedInInfoFromSession(request), demographicNo, email);
-				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, LogConst.CON_DEMOGRAPHIC,   demographicNo , request.getRemoteAddr(),demographicNo);	
+				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC,   demographicNo , request.getRemoteAddr(),demographicNo);	
 			}
 			//Then create the record in the demographic file for record.
 			boas = generateUserRegistrationLetter(demographicNo, newAccount.getUserName(), request.getParameter("password"));

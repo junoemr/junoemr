@@ -75,7 +75,7 @@
 			msg = role_name + " is updated.<br>" + "Type in a role name and search it first to see if it is available.";
   			action = "search";
 		    prop.setProperty("role_name", role_name);
-		    LogAction.addLog(curUser_no, LogConst.UPDATE, LogConst.CON_ROLE, role_name, ip);
+		    LogAction.addLog(curUser_no, LogConst.ACTION_UPDATE, LogConst.CON_ROLE, role_name, ip);
 		} else {
 			msg = role_name + " is <font color='red'>NOT</font> updated. Action failed! Try edit it again." ;
 		    action = "edit" + role_name;

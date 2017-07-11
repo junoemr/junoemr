@@ -117,7 +117,7 @@ public class dxResearchAction extends Action {
 					dao.save(r);
 					
 					String ip = request.getRemoteAddr();
-			        LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, "DX", ""+r.getId() , ip,"");
+			        LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_UPDATE, "DX", ""+r.getId() , ip,"");
 
 				}
 

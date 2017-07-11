@@ -85,7 +85,7 @@ public class dxResearchUpdateAction extends Action {
 		forward.addParameter("quickList", "");
 
 		String ip = request.getRemoteAddr();
-        LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, "DX", ""+research.getId() , ip,"");
+        LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_UPDATE, "DX", ""+research.getId() , ip,"");
 
         
 		return forward;

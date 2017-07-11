@@ -1078,7 +1078,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		} else if (note.isArchived()) {
 			logAction = LogConst.ARCHIVE;
 		} else {
-			logAction = LogConst.UPDATE;
+			logAction = LogConst.ACTION_UPDATE;
 		}
 
 		LogAction.addLog((String) session.getAttribute("user"), logAction, LogConst.CON_CME_NOTE, String.valueOf(note.getId()), request.getRemoteAddr(), demo, note.getAuditString());
@@ -1720,7 +1720,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		if (newNote) {
 			logAction = LogConst.ACTION_ADD;
 		} else {
-			logAction = LogConst.UPDATE;
+			logAction = LogConst.ACTION_UPDATE;
 		}
 
 		LogAction.addLog((String) session.getAttribute("user"), logAction, LogConst.CON_CME_NOTE, String.valueOf(note.getId()), request.getRemoteAddr(), demo, note.getAuditString());

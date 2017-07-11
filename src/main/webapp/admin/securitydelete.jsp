@@ -69,7 +69,7 @@ if(!authed) {
 	if(s != null) {
 		securityDao.remove(s.getId());
 		rowsAffected=1;
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.DELETE, LogConst.CON_SECURITY,
+		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_DELETE, LogConst.CON_SECURITY,
         		request.getParameter("keyword"), request.getRemoteAddr());
 	}
 

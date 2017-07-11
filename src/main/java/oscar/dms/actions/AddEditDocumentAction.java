@@ -488,9 +488,9 @@ public class AddEditDocumentAction extends DispatchAction {
 				EDocUtil.editDocumentSQL(newDoc, fm.getReviewDoc());
 	
 				if (fm.getFunction() != null && fm.getFunction().equals("demographic")) {
-					LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr(), fm.getFunctionId());
+					LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr(), fm.getFunctionId());
 				} else {
-					LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr());
+					LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr());
 	
 				}
 			}
