@@ -24,6 +24,7 @@
 package org.oscarehr.managers;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.DashboardDao;
 import org.oscarehr.common.dao.IndicatorTemplateDao;
 import org.oscarehr.common.model.Dashboard;
@@ -44,12 +45,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import net.sf.json.JSONObject;
-import oscar.log.LogAction;
 
 @Service
 public class DashboardManager {
 
 	public static final boolean MULTI_THREAD_ON = Boolean.TRUE;
+	private static final Logger logger = MiscUtils.getLogger();
 	
 	public static enum ObjectName { IndicatorTemplate, Dashboard }
 	@Autowired
@@ -80,18 +81,11 @@ public class DashboardManager {
 	 * that is stored in the indicatorTemplate db table.
 	 */
 	public List<IndicatorTemplate> getIndicatorLibrary( LoggedInInfo loggedInInfo ) {
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.WRITE, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorLibrary", null, null, null, "User missing _dashboardManager role with write access");
+		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ)) {
 			return null;
-        }
+		}
 		
 		List<IndicatorTemplate> indicatorTemplates = indicatorTemplateDao.getIndicatorTemplates();
-		
-		if( indicatorTemplates != null) {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorLibrary", null, null, null, "returning Indicator Template entries");
-		} else {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorLibrary", null, null, null, "Failed to find any Indicator Templates");	
-		}
 		
 		return indicatorTemplates;
 	}
@@ -100,9 +94,7 @@ public class DashboardManager {
 	 * Toggles the Indicator active boolean switch.  True for active, false for not active.
 	 */
 	public void toggleIndicatorActive( LoggedInInfo loggedInInfo, int indicatorId, Boolean state ) {
-		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.toggleIndicatorActive", null, null, null, "User missing _dashboardManager role with write access");
+		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ)) {
 			return;
 		}
 		
@@ -110,7 +102,6 @@ public class DashboardManager {
 		
 		if( indicator != null ) {
 			indicator.setActive(state);
-			LogAction.addLog(loggedInInfo, "DashboardManager.toggleIndicatorActive", "Active", state+"", null, "Indicator Active state set to " );			
 			indicatorTemplateDao.merge(indicator);
 		}
 	}
@@ -120,19 +111,11 @@ public class DashboardManager {
 	 * 
 	 */
 	public List<Dashboard> getDashboards( LoggedInInfo loggedInInfo ) {
-
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.getDashboards", null, null, null, "User missing _dashboardManager role with read access");
+		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ)) {
 			return null;
-        }
+		}
 		
 		List<Dashboard> dashboards = dashboardDao.getDashboards();
-		
-		if( dashboards != null) {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getDashboards", null, null, null, "returning dashboard entries");
-		} else {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getDashboards", null, null, null, "Failed to find any Dashboards");	
-		}
 		
 		return dashboards;
 	}
@@ -141,18 +124,11 @@ public class DashboardManager {
 	 * Returns Dashboards that are active.
 	 */
 	public List<Dashboard> getActiveDashboards( LoggedInInfo loggedInInfo ) {
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.getActiveDashboards", null, null, null, "User missing _dashboardManager role with read access");
+		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ)) {
 			return null;
-        }
+		}
 		
 		List<Dashboard> dashboards = dashboardDao.getActiveDashboards();
-		
-		if( dashboards != null) {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getActiveDashboards", null, null, null, "returning dashboard entries");
-		} else {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getActiveDashboards", null, null, null, "Failed to find any Dashboards");	
-		}
 		
 		return dashboards;
 	}
@@ -165,10 +141,9 @@ public class DashboardManager {
 		
 		boolean success = Boolean.FALSE;
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.addDashboard", null, null, null, "User missing _dashboardManager role with write access");
+		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ)) {
 			return success;
-        }
+		}
 		
 		if( dashboard.getId() == null ) {
 			// all new Dashboards are active.
@@ -179,7 +154,6 @@ public class DashboardManager {
 		}
 		
 		if( dashboard.getId() > 0 ) {
-			LogAction.addLog(loggedInInfo, "DashboardManager.addDashboard", "Dashboard", dashboard.getId()+"", null, "New Dashboard added with id");
 			success = Boolean.TRUE;
 		}
 		
@@ -191,8 +165,7 @@ public class DashboardManager {
 	 */
 	public void toggleDashboardActive( LoggedInInfo loggedInInfo, int dashboardId, Boolean state ) {
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.toggleDashboardActive", null, null, null, "User missing _dashboardManager role with write access");
+		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ)) {
 			return;
 		}
 		
@@ -200,7 +173,6 @@ public class DashboardManager {
 		
 		if( dashboard != null ) {
 			dashboard.setActive(state);
-			LogAction.addLog(loggedInInfo, "DashboardManager.toggleIndicatorActive", "Active State", state+"", null, "Dashboard Active state set to " );	
 			dashboardDao.merge(dashboard);
 		}
 	}
@@ -216,15 +188,12 @@ public class DashboardManager {
 	public String importIndicatorTemplate( LoggedInInfo loggedInInfo, byte[] bytearray ) {
 		JSONObject message = new JSONObject();
 		IndicatorTemplate indicatorTemplate = null;
-		// Boolean isValid = Boolean.FALSE;
-		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.WRITE, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.importIndicatorTemplate", null, null, null, "User missing _dashboardManager role with write access");			
+
+		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.WRITE)) {
 			message.put("status", "error");
 			message.put("message", "User missing _dashboardManager role with write access");
-
 			return message.toString();
-        }
+		}
 
 		if( bytearray != null && bytearray.length > 0) {
 			
@@ -282,10 +251,9 @@ public class DashboardManager {
 	 */
 	public boolean assignIndicatorToDashboard(LoggedInInfo loggedInInfo, int dashboardId, int indicatorId ) {
 		boolean success = Boolean.FALSE;
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.WRITE, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.assignIndicatorToDashboard", null, null, null, "User missing _dashboardManager role with write access");
+		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.WRITE)) {
 			return success;
-        }
+		}
 		
 		IndicatorTemplate indicatorTemplate = null;
 		
@@ -305,7 +273,6 @@ public class DashboardManager {
 			
 			if( indicatorTemplate.getId() > 0 ) {	
 				success = Boolean.TRUE;
-				LogAction.addLog(loggedInInfo, "DashboardManager.assignIndicatorToDashboard", "Indicator id: ", indicatorId+"", null, " assigned to Dashboard id: " + dashboardId);					
 			}
 		}
 
@@ -320,21 +287,15 @@ public class DashboardManager {
 		
 		String template = null;
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.exportIndicatorTemplate", null, null, null,"User missing _dashboardManager role with write access");
+		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.READ)) {
 			return template;
-        }
+		}
+		
 		
 		IndicatorTemplate indicatorTemplate = indicatorTemplateDao.find(indicatorId);
 		
 		if( indicatorTemplate != null ) {			
 			template = indicatorTemplate.getTemplate();
-		}
-		
-		if( template != null ) {
-			LogAction.addLog(loggedInInfo, "DashboardManager.exportIndicatorTemplate", "Indicator Template", indicatorTemplate.getId()+"", null, "Exporting Indicator Template " + indicatorTemplate.getName() );			
-		} else {
-			LogAction.addLog(loggedInInfo, "DashboardManager.exportIndicatorTemplate", "Indicator Template", indicatorTemplate.getId()+"", null, "Failed to export Indicator Template " + indicatorTemplate.getName() );			
 		}
 		
 		return template;
@@ -345,15 +306,13 @@ public class DashboardManager {
 	 */
 	public List<IndicatorTemplate> getIndicatorTemplatesByDashboardId( LoggedInInfo loggedInInfo, int dashboardId ) {
 		List<IndicatorTemplate> indicatorTemplates = null; 
-		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardDisplay", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorTemplatesByDashboardId", null, null, null,"User missing _dashboardManager role with write access");
+
+		if(!securityCheck(loggedInInfo, "_dashboardDisplay", SecurityInfoManager.READ)) {
 			return indicatorTemplates;
-        }
+		}
 		
 		if( dashboardId > 0 ) {
 			indicatorTemplates = indicatorTemplateDao.getIndicatorTemplatesByDashboardId( dashboardId );
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorTemplatesByDashboardId", "Indicator Template by Dashboard Id", dashboardId+"", null, "Returning Indicator List ");			
 		}
 		
 		return indicatorTemplates;
@@ -366,10 +325,9 @@ public class DashboardManager {
 		
 		DashboardBean dashboardBean = null;
 
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardDisplay", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.getDashboard", null, null, null,"User missing _dashboardManager role with write access");
+		if(!securityCheck(loggedInInfo, "_dashboardDisplay", SecurityInfoManager.READ)) {
 			return dashboardBean;
-        }
+		}
 		
 		Dashboard dashboardEntity = null;
 		DashboardBeanFactory dashboardBeanFactory = null;
@@ -387,12 +345,6 @@ public class DashboardManager {
 
 		if( dashboardBeanFactory != null ) {
 			dashboardBean = dashboardBeanFactory.getDashboardBean();
-		} 
-		
-		if( dashboardBean != null ) {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getDashboard", null, null, null,"Returning Dashboard results for Dashboard ID " + dashboardId );
-		} else {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getDashboard", null, null, null,"Failed to return results for Dashboard ID " + dashboardId );
 		}
 
 		return dashboardBean;
@@ -405,18 +357,11 @@ public class DashboardManager {
 		
 		IndicatorTemplate indicatorTemplate = null; 
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardDrilldown", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorTemplate", null, null, null,"User missing _dashboardDrilldown role with read access");
+		if(!securityCheck(loggedInInfo, "_dashboardDrilldown", SecurityInfoManager.READ)) {
 			return indicatorTemplate;
-        }
+		}
 		
 		indicatorTemplate = indicatorTemplateDao.find( indicatorTemplateId );
-		
-		if( indicatorTemplate != null ) {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorTemplate", null, null, null,"Returning Indicator Template Id " + indicatorTemplateId );			
-		} else {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorTemplate", null, null, null,"Indicator Template Id " + indicatorTemplateId + " not found." );			
-		}
 		
 		return indicatorTemplate;
 	}
@@ -428,20 +373,13 @@ public class DashboardManager {
 		
 		IndicatorTemplateXML indicatorTemplateXML = null;
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardDrilldown", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorTemplateXML", null, null, null,"User missing _dashboardDrilldown role with read access");
+		if(!securityCheck(loggedInInfo, "_dashboardDrilldown", SecurityInfoManager.READ)) {
 			return indicatorTemplateXML;
-        }
+		}
 		
 		IndicatorTemplate indicatorTemplate = getIndicatorTemplate( loggedInInfo, indicatorTemplateId );
 		IndicatorTemplateHandler templateHandler = new IndicatorTemplateHandler( loggedInInfo, indicatorTemplate.getTemplate().getBytes() );
 		indicatorTemplateXML = templateHandler.getIndicatorTemplateXML();
-		
-		if( indicatorTemplateXML != null ) {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorTemplateXML", null, null, null,"Returning IndicatorTemplateXML Id " + indicatorTemplateId );			
-		} else {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorTemplateXML", null, null, null,"IndicatorTemplateXML Id " + indicatorTemplateId + " not found." );			
-		}
 		
 		return indicatorTemplateXML;
 	}
@@ -454,10 +392,9 @@ public class DashboardManager {
 		DrilldownBean drilldownBean = null; 
 		DrilldownBeanFactory drilldownBeanFactory = null;
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardDrilldown", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.getDrilldownData", null, null, null,"User missing _dashboardDrilldown role with read access");
+		if(!securityCheck(loggedInInfo, "_dashboardDrilldown", SecurityInfoManager.READ)) {
 			return drilldownBean;
-        }
+		}
 		
 		IndicatorTemplate indicatorTemplate = getIndicatorTemplate( loggedInInfo, indicatorTemplateId );
 		
@@ -469,22 +406,15 @@ public class DashboardManager {
 			drilldownBean = drilldownBeanFactory.getDrilldownBean();
 		}
 		
-		if( drilldownBean != null ) {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getDrilldownData", null, null, null,"Returning Drill Down data for Indicator ID " + indicatorTemplateId );	
-		} else {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getDrilldownData", null, null, null,"Indicator Drill Down data for Indicator ID " + indicatorTemplateId + " not found." );			
-		}
-		
 		return drilldownBean;
 
 	}
 	
 	public String exportDrilldownQueryResultsToCSV( LoggedInInfo loggedInInfo, int indicatorId ) {
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardDrilldown", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.exportDrilldownQueryResultsToCSV", null, null, null,"User missing _dashboardDrilldown role with read access");
+		if(!securityCheck(loggedInInfo, "_dashboardDrilldown", SecurityInfoManager.READ)) {
 			return null;
-        }
+		}
 		
 		IndicatorTemplateXML templateXML = getIndicatorTemplateXML( loggedInInfo, indicatorId );
 
@@ -508,10 +438,9 @@ public class DashboardManager {
 		IndicatorBean indicatorBean = null;
 		IndicatorBeanFactory indicatorBeanFactory = null;
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardDrilldown", SecurityInfoManager.READ, null ) ) {	
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorPanel", null, null, null,"User missing _dashboardDrilldown role with read access");
+		if(!securityCheck(loggedInInfo, "_dashboardDrilldown", SecurityInfoManager.READ)) {
 			return indicatorBean;
-        }
+		}
 		
 		IndicatorTemplateXML indicatorTemplateXML = getIndicatorTemplateXML( loggedInInfo, indicatorId );
 		
@@ -524,13 +453,6 @@ public class DashboardManager {
 		if( indicatorBeanFactory != null ) {
 			indicatorBean = indicatorBeanFactory.getIndicatorBean();
 		}
-		
-		if( indicatorBean != null ) {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorPanel", null, null, null,"Returning IndicatorBean ID " + indicatorId );	
-		} else {
-			LogAction.addLog(loggedInInfo, "DashboardManager.getIndicatorPanel", null, null, null,"Failed to return IndicatorBean ID " + indicatorId );			
-		}
-		
 		return indicatorBean;
 	}
 	
@@ -542,5 +464,13 @@ public class DashboardManager {
 	// TODO add duplicate Indicator Template upload check.
 	
 	// TODO add duplicate Dashboard name check.
+	
+	private boolean securityCheck(LoggedInInfo loggedInInfo, String module, String access_rights) {
+		boolean pass = securityInfoManager.hasPrivilege(loggedInInfo, module, access_rights, null);
+		if(!pass) {
+			logger.warn("User missing "+ module +" role with "+access_rights+" access");
+		}
+		return pass;
+	}
 	
 }
