@@ -131,8 +131,6 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 
 		controller.print = function print()
 		{
-			//console.log('processList',mod);
-			console.log(controller.pageOptions);
 			var selectedList = [];
 			for (var i = 0; i < mod.length; i++)
 			{
@@ -141,7 +139,6 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 					selectedList.push(mod[i].noteId);
 				}
 			}
-			console.log("selected list", selectedList);
 
 			if (controller.pageOptions.printType === 'selected' && selectedList.length == 0)
 			{
