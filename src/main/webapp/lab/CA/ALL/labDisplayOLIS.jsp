@@ -50,9 +50,9 @@ String demographicID = preview || plr.getDemographicNo() == null ? "" : plr.getD
 
 
 if(demographicID != null && !demographicID.equals("")){
-    LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_HL7_LAB, segmentID, request.getRemoteAddr(),demographicID);
+    LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_HL7_LAB, segmentID, request.getRemoteAddr(),demographicID);
 }else{
-    LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_HL7_LAB, segmentID, request.getRemoteAddr());
+    LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_HL7_LAB, segmentID, request.getRemoteAddr());
 }
 
 

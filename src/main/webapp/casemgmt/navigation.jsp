@@ -40,9 +40,9 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Vector" %>
 
-<% java.util.Properties oscarVariables = oscar.OscarProperties.getInstance(); %>
+<% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
 <%
-    String province = ((String ) oscarVariables.getProperty("billregion","")).trim().toUpperCase();
+    String province = oscarVariables.getBillingTypeUpperCase();
     oscar.oscarEncounter.pageUtil.EctSessionBean bean=null;
     if ("true".equalsIgnoreCase((String)session.getAttribute("casemgmt_bean_flag"))){
         oscar.oscarEncounter.pageUtil.EctSessionBean bean1=(oscar.oscarEncounter.pageUtil.EctSessionBean)session.getAttribute("EctSessionBean");

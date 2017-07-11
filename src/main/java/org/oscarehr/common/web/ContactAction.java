@@ -407,7 +407,7 @@ public class ContactAction extends DispatchAction {
 		ContactSpecialtyDao specialtyDao = SpringUtils.getBean(ContactSpecialtyDao.class);
 		List<ContactSpecialty> specialties = specialtyDao.findAll();
 		OscarProperties prop = OscarProperties.getInstance();
-		request.setAttribute( "region", prop.getProperty("billregion") );
+		request.setAttribute( "region", prop.getInstanceType() );
 		request.setAttribute( "specialties", specialties );
 		request.setAttribute( "pcontact.lastName", request.getParameter("keyword") );
 		request.setAttribute( "contactRole", request.getParameter("contactRole")  );

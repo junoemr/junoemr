@@ -81,7 +81,7 @@ public class BillingGuidelines  {
     }
 
     static public BillingGuidelines getInstance() {
-        String tmpRegion = OscarProperties.getInstance().getProperty("billregion","");
+        String tmpRegion = OscarProperties.getInstance().getBillingType();
         if (measurementTemplateFlowSheetConfig.billingGuideLines == null || !tmpRegion.equals(region)) {
                 region = tmpRegion;
                 measurementTemplateFlowSheetConfig.loadGuidelines(region);

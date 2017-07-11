@@ -422,7 +422,7 @@ public class CaseloadContentAction extends DispatchAction {
 
 	    String monthDay = String.format("%02d", month) + "-" + String.format("%02d", day);
 
-	    String prov= oscarProperties.getProperty("billregion","").trim().toUpperCase();
+	    String prov = oscarProperties.getBillingTypeUpperCase();
 
 		for (Integer result : demoSearchResult) {
 

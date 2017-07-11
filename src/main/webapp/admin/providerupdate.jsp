@@ -52,12 +52,13 @@ if(!authed) {
 <%@page import="org.oscarehr.common.model.ProviderArchive"%>
 <%@page import="org.oscarehr.common.dao.ProviderArchiveDao"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.apache.commons.beanutils.BeanUtils"%>
 <%@page import="org.oscarehr.common.model.ProviderSite"%>
 <%@page import="org.oscarehr.common.model.ProviderSitePK"%>
 <%@page import="org.oscarehr.common.dao.ProviderSiteDao"%>
 <%@page import="org.oscarehr.common.dao.UserPropertyDAO"%>
 <%@page import="org.oscarehr.common.model.UserProperty"%>
+<%@page import="org.apache.commons.beanutils.BeanUtils"%>
+<%@page import="org.apache.commons.lang.StringUtils"%>
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
 	ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
@@ -173,20 +174,19 @@ if(!authed) {
 		  p.setRmaNo(request.getParameter("rma_no"));
 		  p.setBillingNo(request.getParameter("billing_no"));
 		  p.setHsoNo(request.getParameter("hso_no"));
+		  p.setAlbertaTakNo(StringUtils.trimToNull(request.getParameter("alberta_tak_no")));
 		  p.setStatus(request.getParameter("status"));
 		  p.setComments(SxmlMisc.createXmlDataString(request,"xml_p"));
 		  p.setProviderActivity(request.getParameter("provider_activity"));
 		  p.setPractitionerNo(request.getParameter("practitionerNo"));
 		  p.setLastUpdateUser((String)session.getAttribute("user"));
 		  p.setLastUpdateDate(new java.util.Date());
-                  String supervisor = request.getParameter("supervisor");
-                  
-                  if( supervisor == null || supervisor.equalsIgnoreCase("null") || supervisor.equals("")) {
-                      p.setSupervisor(null);
-                  }
-                  else {
-                    p.setSupervisor(supervisor);
-                  }
+		  
+		  String supervisor = request.getParameter("supervisor");
+          if(supervisor.equalsIgnoreCase("null")) {
+        	  supervisor = null;
+          }
+          p.setSupervisor(StringUtils.trimToNull(supervisor));
 		  
 		  providerDao.updateProvider(p);
 		  

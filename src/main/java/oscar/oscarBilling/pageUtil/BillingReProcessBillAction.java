@@ -138,7 +138,7 @@ public class BillingReProcessBillAction extends Action {
         String oinPostalcode = demo.getPostal();//d
 
         String hcType = demo.getHcType(); //d
-        String billRegion =OscarProperties.getInstance().getProperty("billregion");
+        String billRegion = OscarProperties.getInstance().getBillingType();
         ////
 
         String submit = frm.getSubmit();

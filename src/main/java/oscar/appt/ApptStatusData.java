@@ -213,119 +213,105 @@ public final class ApptStatusData {
 		return temp;
 	}
 
-    private String getStr(String kind) {
-        String rstr = null;
-        String strOtherIcon = "";
-        String strStatus = "";
-        
-        
-        List<AppointmentStatus> apptStatuses = AppointmentStatusMgrImpl.getCachedActiveStatuses();
-        
+	private String getStr(String kind) {
+		String strReturn = null;
+		String strOtherIcon = "";
+		String strStatus = "";
 
-       // Collections.sort(apptStatuses, new BeanComparator("id"));
-        
-        if (apptStatus.length()>=2){
-            strOtherIcon = apptStatus.substring(1,2);
-            strStatus = apptStatus.substring(0,1);
-        }
-        else {
-            strStatus = apptStatus;
-        }
-            
-	    int i = 0;
-	    while(i < apptStatuses.size()) {
-	    	AppointmentStatus s = apptStatuses.get(i); 
-	    	
-	        if (kind.equals("nextstatus")) {
-	            if (strStatus.equals("C")){
-	                i = 0;
-	                s = apptStatuses.get(i);
-	                
-	                rstr = s.getStatus();
-	                if (strOtherIcon.length()==1)
-	                    return rstr + strOtherIcon;
-	                else
-	                    return rstr;
-	            }
-	            
-	            if (strStatus.equals("B")){
-	                return "";
-	            }
-	            
-	            if (strStatus.equals(s.getStatus())){
-	                i++;
-	                s = apptStatuses.get(i);
-	                
-	                while (s.getActive() == 0 && i < apptStatuses.size()) {
-	                	i++;
-	                	s = apptStatuses.get(i);
-	                }
-	                
-	                rstr = s.getStatus();
-	                
-	                if (strOtherIcon.length()==1) {
-	                    return rstr + strOtherIcon;
-	                } else {
-	                    return rstr;
-	                }
-	            }
-	                 
-	        }
+		List<AppointmentStatus> apptStatuses = AppointmentStatusMgrImpl.getCachedActiveStatuses();
 
-	        if (kind.equals("desc")) {
-	            if (strStatus.equals(s.getStatus())){
-	                rstr = s.getDescription();
-	                if (strOtherIcon.length()==1)
-	                    return rstr + "/" + (strOtherIcon.equals("S")?"Signed":"Verified") ;
-	                else   
-	                    return rstr;
-	            }
-	        }
-	        
-	        if (kind.equals("icon")) {
-	            if (strStatus.equals(s.getStatus())){
-	                rstr = s.getIcon();
-	                if (strOtherIcon.length()==1)
-	                    return strOtherIcon + rstr;
-	                else
-	                    return rstr;
-	            }
-	        }
-			// get the short letters, they're just a string
-			if (kind.equals("short_letters")) {
-	            if (strStatus.equals(s.getStatus())){
-	                rstr = s.getShortLetters();
-	                return rstr;
-	            }
+		// Collections.sort(apptStatuses, new BeanComparator("id"));
+
+		if (apptStatus.length() >= 2) {
+			strOtherIcon = apptStatus.substring(1, 2);
+			strStatus = apptStatus.substring(0, 1);
+		}
+		else {
+			strStatus = apptStatus;
+		}
+
+		int i = 0;
+		while (i < apptStatuses.size()) {
+			AppointmentStatus s = apptStatuses.get(i);
+
+			if (kind.equals("nextstatus")) {
+				if (strStatus.equals("C")) {
+					i = 0;
+					s = apptStatuses.get(i);
+
+					strReturn = s.getStatus();
+
+					return (strOtherIcon.length() == 1) ? strReturn + strOtherIcon : strReturn;
+				}
+
+				if (strStatus.equals("B")) {
+					return "";
+				}
+
+				if (strStatus.equals(s.getStatus())) {
+					i++;
+					if(i >= apptStatuses.size()) {
+						i=0; //don't go off the end of the array, go back to the beginning
+					}
+					s = apptStatuses.get(i);
+
+					strReturn = s.getStatus();
+
+					return (strOtherIcon.length() == 1) ? strReturn + strOtherIcon : strReturn;
+				}
+
 			}
 
-			// get the short letter colour.  It comes back as an int.
+			if (kind.equals("desc")) {
+				if (strStatus.equals(s.getStatus())) {
+					strReturn = s.getDescription();
+					if (strOtherIcon.length() == 1) {
+						return strReturn + "/" + (strOtherIcon.equals("S") ? "Signed" : "Verified");
+					}
+					else return strReturn;
+				}
+			}
+
+			if (kind.equals("icon")) {
+				if (strStatus.equals(s.getStatus())) {
+					strReturn = s.getIcon();
+					if (strOtherIcon.length() == 1) { 
+						return strOtherIcon + strReturn;
+					}
+					else return strReturn;
+				}
+			}
+			// get the short letters, they're just a string
+			if (kind.equals("short_letters")) {
+				if (strStatus.equals(s.getStatus())) {
+					strReturn = s.getShortLetters();
+					return strReturn;
+				}
+			}
+
+			// get the short letter colour. It comes back as an int.
 			if (kind.equals("short_letter_colour")) {
-	            if (strStatus.equals(s.getStatus())){
-	                Integer colour = Integer.valueOf(s.getShortLetterColour());
-			
+				if (strStatus.equals(s.getStatus())) {
+					Integer colour = Integer.valueOf(s.getShortLetterColour());
+
 					// return null if it's null
-	                if(colour == null){
+					if (colour == null) {
 						return null;
 					}
 
 					// convert it to a hex number and add a hex code in front
 					return "#" + Integer.toHexString(colour).toUpperCase();
-			
-	            }
+
+				}
 			}
 			if (kind.equals("color")) {
-			    if (strStatus.equals(s.getStatus())){
-			        rstr = s.getColor();
-			        return rstr;
-			    }
-			} 
-            i++;
-        }
-        
-
-        return rstr;
-    }
-    
-
+				if (strStatus.equals(s.getStatus())) {
+					strReturn = s.getColor();
+					return strReturn;
+				}
+			}
+			i++;
+		}
+		return strReturn;
+	}
 }

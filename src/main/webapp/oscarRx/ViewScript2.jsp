@@ -417,8 +417,6 @@ function refreshImage()
 
 function sendFax()
 {
-	var faxNumber = document.getElementById('faxNumber');
-	frames['preview'].document.getElementById('finalFax').value = faxNumber.options[faxNumber.selectedIndex].value;
 	frames['preview'].document.getElementById('pdfId').value='<%=signatureRequestId%>';	
 	frames['preview'].onPrint2('oscarRxFax');
 	frames['preview'].document.FrmForm.submit();	
@@ -669,19 +667,6 @@ function toggleView(form) {
                             <td><span><input type=button value="Fax & Paste into EMR"
                                     class="ControlPushButton" id="faxButton" style="width: 150px"
                                     onClick="printPaste2Parent(false);sendFax();" <%= disabled %> /></span>
-
-
-                                 <span>
-                                 	<select id="faxNumber" name="faxNumber">
-                                 	<%
-                                 		for( FaxConfig faxConfig : faxConfigs ) {
-                                 	%>
-                                 			<option value="<%=faxConfig.getFaxNumber()%>"><%=faxConfig.getFaxUser()%></option>
-                                 	<%	    
-                                 		}                                 	
-                                 	%>
-                                 	</select>
-                                 </span>
                            </td>
                     </tr>
                     <% } %>

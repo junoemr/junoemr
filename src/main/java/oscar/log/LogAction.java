@@ -44,7 +44,137 @@ public class LogAction {
 	private static Logger logger = MiscUtils.getLogger();
 	private static OscarLogDao oscarLogDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
 	private static ExecutorService executorService = Executors.newCachedThreadPool(new DeamonThreadFactory(LogAction.class.getSimpleName()+".executorService", Thread.MAX_PRIORITY));
+	
+	/**
+	 * This method will add a log entry asynchronously in a separate thread.
+	 * @deprecated - use addLogEntry instead
+	 */
+	@Deprecated
+	public static void addLog(String provider_no, String action, String content, String data) {
+		addLog(provider_no, action, content, null, null, null, data);
+	}
 
+	/**
+	 * This method will add a log entry asynchronously in a separate thread.
+	 * @deprecated - use addLogEntry instead
+	 */
+	@Deprecated
+	public static void addLog(String provider_no, String action, String content, String contentId, String ip) {
+		addLog(provider_no, action, content, contentId, ip, null, null);
+	}
+
+	/**
+	 * This method will add a log entry asynchronously in a separate thread.
+	 * @deprecated - use addLogEntry instead
+	 */
+	@Deprecated
+	public static void addLog(String provider_no, String action, String content, String contentId, String ip, String demographicNo) {
+		addLog(provider_no, action, content, contentId, ip, demographicNo, null);
+	}
+
+	/**
+	 * @deprecated - use addLogEntry instead
+	 */
+	@Deprecated
+	public static void addLog(LoggedInInfo loggedInInfo, String action, String content, String contentId, String demographicNoStr, String data)
+	{
+		String providerNo = loggedInInfo.getLoggedInProvider()!=null ? loggedInInfo.getLoggedInProviderNo() : null;
+		Integer securityId = loggedInInfo.getLoggedInProvider()!=null ? loggedInInfo.getLoggedInSecurity().getSecurityNo() : null;
+		Integer demographicNo = null;
+		try {
+			demographicNoStr=StringUtils.trimToNull(demographicNoStr);
+			if (demographicNoStr != null) demographicNo = Integer.parseInt(demographicNoStr);
+		}
+		catch (Exception e) {
+			logger.error("Unexpected error", e);
+		}
+		
+		addLogEntry(providerNo, demographicNo, action, content, null, contentId, loggedInInfo.getIp(), data, securityId);
+	}
+	
+	/**
+	 * This method will add a log entry asynchronously in a separate thread.
+	 * @deprecated - use addLogEntry instead
+	 */
+	@Deprecated
+	public static void addLog(String providerNo, String action, String content, String contentId, String ip, String demographicNoStr, String data) {
+		Integer demographicNo = null;
+		try {
+			demographicNoStr=StringUtils.trimToNull(demographicNoStr);
+			if (demographicNoStr != null) demographicNo = Integer.parseInt(demographicNoStr);
+		}
+		catch (Exception e) {
+			logger.error("Unexpected error", e);
+		}
+		addLogEntry(providerNo, demographicNo, action, content, null, contentId, ip, data, null);
+	}
+	/**
+	 * This method will add a log entry asynchronously in a separate thread.
+	 */
+	public static void addLogEntry(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip, String data, Integer securityId) {
+		OscarLog oscarLog = new OscarLog();
+
+		oscarLog.setProviderNo(providerNo);
+		oscarLog.setDemographicId(demographicNo);
+		oscarLog.setAction(action);
+		oscarLog.setContent(module);
+		oscarLog.setStatus(status);
+		oscarLog.setContentId(contentId);
+		oscarLog.setIp(ip);
+		oscarLog.setSecurityId(securityId);
+		oscarLog.setData(data);
+
+		executorService.execute(new AddLogExecutorTask(oscarLog));
+	}
+	public static void addLogEntry(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip, String data) {
+		addLogEntry(providerNo, demographicNo, action, module, status, contentId, ip, null, null);
+	}
+	public static void addLogEntry(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip) {
+		addLogEntry(providerNo, demographicNo, action, module, status, contentId, ip, null, null);
+	}
+	public static void addLogEntry(String providerNo, Integer demographicNo, String action, String module, String status, String data) {
+		addLogEntry(providerNo, demographicNo, action, module, status, null, null, data, null);
+	}
+	public static void addLogEntry(String providerNo, String action, String module, String status, String contentId, String ip) {
+		addLogEntry(providerNo, null, action, module, status, contentId, ip, null, null);
+	}
+	public static void addLogEntry(String providerNo, String action, String module, String status, String data) {
+		addLogEntry(providerNo, null, action, module, status, null, null, data, null);
+	}
+
+
+	public static void addLogEntrySyncronous(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip, String data, Integer securityId) {
+		OscarLog oscarLog = new OscarLog();
+
+		oscarLog.setProviderNo(providerNo);
+		oscarLog.setDemographicId(demographicNo);
+		oscarLog.setAction(action);
+		oscarLog.setContent(module);
+		oscarLog.setStatus(status);
+		oscarLog.setContentId(contentId);
+		oscarLog.setIp(ip);
+		oscarLog.setSecurityId(securityId);
+		oscarLog.setData(data);
+
+		addLogSynchronous(oscarLog);
+	}
+	public static void addLogEntrySyncronous(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip, String data) {
+		addLogEntrySyncronous(providerNo, demographicNo, action, module, status, contentId, ip, data, null);
+	}
+	public static void addLogEntrySyncronous(String providerNo, String action, String module, String status, String contentId, String ip, String data) {
+		addLogEntrySyncronous(providerNo, null, action, module, status, contentId, ip, data, null);
+	}
+	public static void addLogEntrySyncronous(String providerNo, String action, String module, String status, String contentId, String ip) {
+		addLogEntrySyncronous(providerNo, null, action, module, status, contentId, ip, null, null);
+	}
+	public static void addLogEntrySyncronous(String providerNo, String action, String module, String status, String data) {
+		addLogEntrySyncronous(providerNo, null, action, module, status, null, null, data, null);
+	}
+	
+	/**
+	 * @deprecated - use addLogEntrySyncronous instead
+	 */
+	@Deprecated
 	public static void addLogSynchronous(LoggedInInfo loggedInInfo, String action, String data)
 	{
 		OscarLog logEntry=new OscarLog();
@@ -54,75 +184,11 @@ public class LogAction {
 		logEntry.setData(data);
 		LogAction.addLogSynchronous(logEntry);		
 	}
-	
-	/**
-	 * This method will add a log entry asynchronously in a separate thread.
-	 */
-	public static void addLog(String provider_no, String action, String content, String data) {
-		addLog(provider_no, action, content, null, null, null, data);
-	}
-
-	/**
-	 * This method will add a log entry asynchronously in a separate thread.
-	 */
-	public static void addLog(String provider_no, String action, String content, String contentId, String ip) {
-		addLog(provider_no, action, content, contentId, ip, null, null);
-	}
-
-	/**
-	 * This method will add a log entry asynchronously in a separate thread.
-	 */
-	public static void addLog(String provider_no, String action, String content, String contentId, String ip, String demographicNo) {
-		addLog(provider_no, action, content, contentId, ip, demographicNo, null);
-	}
-
-	public static void addLog(LoggedInInfo loggedInInfo, String action, String content, String contentId, String demographicNo, String data)
-	{
-		OscarLog logEntry=new OscarLog();
-		if (loggedInInfo.getLoggedInSecurity()!=null) logEntry.setSecurityId(loggedInInfo.getLoggedInSecurity().getSecurityNo());
-		if (loggedInInfo.getLoggedInProvider()!=null) logEntry.setProviderNo(loggedInInfo.getLoggedInProviderNo());
-		logEntry.setAction(action);
-		logEntry.setContent(content);
-		logEntry.setContentId(contentId);
-		logEntry.setIp(loggedInInfo.getIp()); 
-
-		try {
-			demographicNo=StringUtils.trimToNull(demographicNo);
-			if (demographicNo != null) logEntry.setDemographicId(Integer.parseInt(demographicNo));
-		} catch (Exception e) {
-			logger.error("Unexpected error", e);
-		}
-		logEntry.setData(data);
-		executorService.execute(new AddLogExecutorTask(logEntry));
-	}
-	
-	/**
-	 * This method will add a log entry asynchronously in a separate thread.
-	 */
-	public static void addLog(String provider_no, String action, String content, String contentId, String ip, String demographicNo, String data) {
-		OscarLog oscarLog = new OscarLog();
-
-		oscarLog.setProviderNo(provider_no);
-		oscarLog.setAction(action);
-		oscarLog.setContent(content);
-		oscarLog.setContentId(contentId);
-		oscarLog.setIp(ip);
-
-		try {
-			demographicNo=StringUtils.trimToNull(demographicNo);
-			if (demographicNo != null) oscarLog.setDemographicId(Integer.parseInt(demographicNo));
-		} catch (Exception e) {
-			logger.error("Unexpected error", e);
-		}
-
-		oscarLog.setData(data);
-
-		executorService.execute(new AddLogExecutorTask(oscarLog));
-	}
-
 	/**
 	 * This method will add a log entry in the same thread and can participate in the same transaction if one exists.
+	 * @deprecated - use addLogEntrySyncronous instead
 	 */
+	@Deprecated
 	public static void addLogSynchronous(String provider_no, String action, String content, String contentId, String ip) {
 		OscarLog oscarLog = new OscarLog();
 

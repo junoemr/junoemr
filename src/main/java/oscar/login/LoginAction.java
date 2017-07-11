@@ -30,7 +30,6 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -168,7 +167,7 @@ public final class LoginAction extends DispatchAction {
 	            Facility facility=facilityDao.find(Integer.parseInt(facilityIdString));
 	            request.getSession().setAttribute(SessionConstants.CURRENT_FACILITY, facility);
 	            String username=(String)request.getSession().getAttribute("user");
-	            LogAction.addLog(username, LogConst.LOGIN, LogConst.CON_LOGIN, "facilityId="+facilityIdString, ip);
+	            LogAction.addLogEntry(username, LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_OK, "facilityId="+facilityIdString, ip);
 	            if(facility.isEnableOcanForms()) {
 	            	request.getSession().setAttribute("ocanWarningWindow", OcanForm.getOcanWarningMessage(facility.getId()));
 	            }
@@ -231,8 +230,8 @@ public final class LoginAction extends DispatchAction {
         	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
             Provider p = providerDao.getProvider(strAuth[0]);
             if(p == null || (p.getStatus() != null && p.getStatus().equals("0"))) {
-            	logger.info(LOG_PRE + " Inactive: " + userName);           
-            	LogAction.addLog(strAuth[0], "login", "failed", "inactive");
+            	logger.info(LOG_PRE + " Inactive: " + userName);
+            	LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_LOGIN_INACTIVE, "inactive");
             	
                 String newURL = mapping.findForward("error").getPath();
                 newURL = newURL + "?errormsg=Your account is inactive. Please contact your administrator to activate.";
@@ -272,10 +271,10 @@ public final class LoginAction extends DispatchAction {
             session = request.getSession(); // Create a new session for this user
 
             logger.debug("Assigned new session for: " + strAuth[0] + " : " + strAuth[3] + " : " + strAuth[4]);
-            LogAction.addLog(strAuth[0], LogConst.LOGIN, LogConst.CON_LOGIN, "", ip);
+            LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_LOGIN_SUCCESS, null, ip);
 
             // initial db setting
-            Properties pvar = OscarProperties.getInstance();
+            OscarProperties pvar = OscarProperties.getInstance();
             MyOscarUtils.setDeterministicallyMangledPasswordSecretKeyIntoSession(session, password);
             
 
@@ -348,7 +347,7 @@ public final class LoginAction extends DispatchAction {
              * if (OscarProperties.getInstance().isTorontoRFQ()) { where = "caisiPMM"; }
              */
             // Lazy Loads AlertTimer instance only once, will run as daemon for duration of server runtime
-            if (pvar.getProperty("billregion").equals("BC")) {
+            if (pvar.isBritishColumbiaInstanceType()) {
                 String alertFreq = pvar.getProperty("ALERT_POLL_FREQUENCY");
                 if (alertFreq != null) {
                     Long longFreq = new Long(alertFreq);
@@ -383,7 +382,7 @@ public final class LoginAction extends DispatchAction {
                 // set current facility
                 Facility facility=facilityDao.find(facilityIds.get(0));
                 request.getSession().setAttribute("currentFacility", facility);
-                LogAction.addLog(strAuth[0], LogConst.LOGIN, LogConst.CON_LOGIN, "facilityId="+facilityIds.get(0), ip);
+                LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_OK, "facilityId="+facilityIds.get(0), ip);
                 if(facility.isEnableOcanForms()) {
                 	request.getSession().setAttribute("ocanWarningWindow", OcanForm.getOcanWarningMessage(facility.getId()));
                 }
@@ -399,7 +398,7 @@ public final class LoginAction extends DispatchAction {
         			ProviderDao.addProviderToFacility(providerNo, first_id);
         			Facility facility=facilityDao.find(first_id);
         			request.getSession().setAttribute("currentFacility", facility);
-        			LogAction.addLog(strAuth[0], LogConst.LOGIN, LogConst.CON_LOGIN, "facilityId="+first_id, ip);
+        			LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_OK, "facilityId="+first_id, ip);
             	}
             }
 
@@ -438,7 +437,6 @@ public final class LoginAction extends DispatchAction {
 
         	// go to normal directory
             // request.setAttribute("login", "failed");
-            // LogAction.addLog(userName, "failed", LogConst.CON_LOGIN, "", ip);
             cl.updateLoginList(ip, userName);
             CRHelper.recordLoginFailure(userName, request);
             

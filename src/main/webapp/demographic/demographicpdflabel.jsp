@@ -86,6 +86,8 @@ if(!authed) {
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
 <%
+	OscarProperties oscarProps = OscarProperties.getInstance();
+
 	String curProvider_no = (String) session.getAttribute("user");
 	String demographic_no = request.getParameter("demographic_no") ;
 	String userfirstname = (String) session.getAttribute("userfirstname");
@@ -93,11 +95,10 @@ if(!authed) {
 	String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF" ;
 	String str = null;
 	int nStrShowLen = 20;
-        String prov= (oscarVariables.getProperty("billregion","")).trim().toUpperCase();
 
-        OscarProperties oscarProps = OscarProperties.getInstance();
+	String prov = oscarProps.getBillingTypeUpperCase();
 
-        ProvinceNames pNames = ProvinceNames.getInstance();
+	ProvinceNames pNames = ProvinceNames.getInstance();
 
 %>
 

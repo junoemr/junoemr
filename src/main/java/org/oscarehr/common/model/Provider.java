@@ -27,11 +27,15 @@ package org.oscarehr.common.model;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
-
 /**
  * This is the object class that relates to the provider table. Any customizations belong here.
  */
 public class Provider implements Serializable, Comparable<Provider>{
+
+	/**
+	 * default serial version id for serializable
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public static final String SYSTEM_PROVIDER_NO = "-1";
 
@@ -65,6 +69,8 @@ public class Provider implements Serializable, Comparable<Provider>{
     private String lastUpdateUser;
     private Date lastUpdateDate = new Date();
     private String supervisor;
+    /* -- Province specific -- */
+	private String albertaTakNo;
 
 	public String getPractitionerNo() {
 		return practitionerNo;
@@ -123,8 +129,8 @@ public class Provider implements Serializable, Comparable<Provider>{
 		title = provider.title;
 		lastUpdateUser = provider.lastUpdateUser;
 		lastUpdateDate = provider.lastUpdateDate;
-                supervisor = provider.supervisor;
-
+		supervisor = provider.supervisor;
+		albertaTakNo = provider.albertaTakNo;
 	}
 
 	/** same as getDisplayName */
@@ -326,18 +332,27 @@ public class Provider implements Serializable, Comparable<Provider>{
     }
 
 	public Date getLastUpdateDate() {
-    	return lastUpdateDate;
-    }
-        public String getSupervisor() {
-            return this.supervisor;
-        }
+		return lastUpdateDate;
+	}
+	public String getSupervisor() {
+		return this.supervisor;
+	}
 
 	public void setLastUpdateDate(Date lastUpdateDate) {
-    	this.lastUpdateDate = lastUpdateDate;
-    }
-        public void setSupervisor( String supervisor ) {
-            this.supervisor = supervisor;
-        }
+		this.lastUpdateDate = lastUpdateDate;
+	}
+	public void setSupervisor(String supervisor) {
+		this.supervisor = supervisor;
+	}
+	
+	/* -- Province specific getters/setters -- */
+	
+	public String getAlbertaTakNo() {
+		return albertaTakNo;
+	}
+	public void setAlbertaTakNo(String takNo) {
+		albertaTakNo = takNo;
+	}
 
 	public ComparatorName ComparatorName() {
 		return new ComparatorName();
@@ -358,6 +373,11 @@ public class Provider implements Serializable, Comparable<Provider>{
 	}
 
 	public class ComparatorName implements Comparator<Provider>, Serializable {
+
+		/**
+		 * default serial version id for serializable
+		 */
+		private static final long serialVersionUID = 1L;
 
 		public int compare(Provider o1, Provider o2) {
 			Provider bp1 = o1;

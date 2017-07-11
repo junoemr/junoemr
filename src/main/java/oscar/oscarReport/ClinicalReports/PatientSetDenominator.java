@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import oscar.oscarReport.data.DemographicSets;
+import oscar.oscarReport.data.DemographicSetManager;
 
 /**
  *
@@ -56,7 +56,7 @@ public class PatientSetDenominator implements Denominator {
 
     public List getDenominatorList() {
        List<String> list = new ArrayList<String>();
-       DemographicSets demoSets = new DemographicSets();
+       DemographicSetManager demoSets = new DemographicSetManager();
        List<String> strNames = null;
        if( this.hasReplaceableValues() ) {
            strNames = new ArrayList<String>(replaceableValues.values());

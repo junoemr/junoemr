@@ -305,7 +305,7 @@ if(listRxDrugs!=null){
            <oscar:oscarPropertiesCheck property="RENAL_DOSING_DS" value="yes">
             <script type="text/javascript">getRenalDosingInformation('renalDosing_<%=rand%>','<%=rx.getAtcCode()%>');</script>
             </oscar:oscarPropertiesCheck>
-           <oscar:oscarPropertiesCheck property="billregion" value="ON" >
+           <oscar:oscarPropertiesCheck property="instance_type" value="ON" >
                <script type="text/javascript">getLUC('luc_<%=rand%>','<%=rand%>','<%=rx.getRegionalIdentifier()%>');</script>
             </oscar:oscarPropertiesCheck>
 </fieldset>
@@ -487,7 +487,7 @@ if(listRxDrugs!=null){
            <oscar:oscarPropertiesCheck property="RENAL_DOSING_DS" value="yes">
             <script type="text/javascript">getRenalDosingInformation('renalDosing_<%=rand%>','<%=rx.getAtcCode()%>');</script>
             </oscar:oscarPropertiesCheck>
-           <oscar:oscarPropertiesCheck property="billregion" value="ON" >
+           <oscar:oscarPropertiesCheck property="instance_type" value="ON" >
                <script type="text/javascript">getLUC('luc_<%=rand%>','<%=rand%>','<%=rx.getRegionalIdentifier()%>');</script>
             </oscar:oscarPropertiesCheck>
 

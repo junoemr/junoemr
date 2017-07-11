@@ -40,6 +40,10 @@ import javax.persistence.TemporalType;
 @Table(name="providerArchive")
 public class ProviderArchive extends AbstractModel<Integer> {
 
+	/**
+	 * default serial version id for serializable
+	 */
+	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -82,6 +86,11 @@ public class ProviderArchive extends AbstractModel<Integer> {
 	private Date lastUpdateDate;
 	@Column(name="signed_confidentiality")
     private Date SignedConfidentiality;
+    /* -- Province specific -- */
+	@Column(name = "alberta_tak_no")
+	private String albertaTakNo = null;
+	
+	
 	public Integer getId() {
     	return id;
     }
@@ -244,6 +253,15 @@ public class ProviderArchive extends AbstractModel<Integer> {
 	public void setSignedConfidentiality(Date signedConfidentiality) {
     	SignedConfidentiality = signedConfidentiality;
     }
+	
+	/* -- Province specific getters/setters -- */
+	
+	public String getAlbertaTakNo() {
+		return albertaTakNo;
+	}
+	public void setAlbertaTakNo(String takNo) {
+		albertaTakNo = takNo;
+	}
 
 
 

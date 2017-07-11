@@ -90,30 +90,86 @@ if(!authed) {
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
 
 <script>
-function updateDepartments(i) {
-<%
-for(Institution i: institutionDao.findAll()) {
-	%> if(i == '<%=i.getId()%>') {
-		$('#department').empty();
-		$('#department').append($("<option></option>").attr("value", '0').text('Select Below'));
-	<%
-	for(InstitutionDepartment id : idDao.findByInstitutionId(i.getId())) {
-		
-		int deptId = id.getId().getDepartmentId();
-		Department d = departmentDao.find(deptId);
-		if(d != null) {
-		%>
-			$('#department').append($("<option></option>").attr("value", '<%=deptId%>').text('<%=d.getName()%>'));
-		<%
-	} }
-	%>}<%
-}
-%>
-}
-</script>
+	var province = "<%=oscarVariables.getProperty("hctype")%>";
+	var refnoinuse = <%=request.getAttribute("refnoinuse") != null%>;
+	var refnoinvalid = <%=request.getAttribute("refnoinvalid") != null%>;
+	
+	var refNoInvalidAB = '<bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalidAB" />';
+	var refNoInvalidBC = '<bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalidBC" />';
+	var refNoInvalidON = '<bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalidON" />';
+	var refNoInUseMessage = '<bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInUse" />';
+	var refNoValidationFailed = '<bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalid" />';
 
-<script>
+	var warnColour = "#e97600";
+	var errorColour = "red";
+	
+	function updateRefNoWarning(element) {
+
+		var messageBox = document.getElementById("refNoWarn");
+		var refNoLen = element.value.length;
+		
+		var messageString = "";
+
+		if(refNoLen > 0) {
+			if(province === "BC") {
+				if(refNoLen < 5 || refNoLen > 6) {
+					messageString = refNoInvalidBC;
+				}
+			}
+			else if(province === "ON") {
+				if(refNoLen < 5 || refNoLen > 6) {
+					messageString = refNoInvalidON;
+				}		
+			}
+			else if(province === "AB") {
+				if(refNoLen < 9 || refNoLen > 9) {
+					messageString = refNoInvalidAB;
+				}
+			}
+		}
+		messageBox.innerHTML = messageString;
+		messageBox.style.color = warnColour;
+	}
+	function onDocumentLoad() {
+		var refNoWarnElem = document.getElementById("refNoWarn");
+		var refNoInputElem = document.getElementById("EctConAddSpecialistForm");
+		refNoWarnElem.style.color = errorColour;
+		
+		if (refnoinuse) {
+			refNoWarnElem.innerHTML = refNoInUseMessage;
+		}
+		else if (refnoinvalid) {
+			refNoWarnElem.innerHTML = refNoValidationFailed;
+		}
+		else {
+			updateRefNoWarning(refNoInputElem);
+		}
+	}
+	
+	function updateDepartments(i) {
+		<%
+		for(Institution i: institutionDao.findAll()) {
+			%> 
+			if(i == '<%=i.getId()%>') {
+				$('#department').empty();
+				$('#department').append($("<option></option>").attr("value", '0').text('Select Below'));
+				<%
+				for(InstitutionDepartment id : idDao.findByInstitutionId(i.getId())) {
+					
+					int deptId = id.getId().getDepartmentId();
+					Department d = departmentDao.find(deptId);
+					if(d != null) {
+					%>
+						$('#department').append($("<option></option>").attr("value", '<%=deptId%>').text('<%=d.getName()%>'));
+					<%
+					} 
+				} %>
+			} <%
+		}
+		%>
+	}
 	$(document).ready(function(){
+		onDocumentLoad();
 		$('#institution').change(function(){
 			changeInstitution();
 		});	
@@ -128,19 +184,16 @@ for(Institution i: institutionDao.findAll()) {
 			updateDepartments(id);
 		}
 	}
+	function BackToOscar() {
+	       window.close();
+	}
 </script>
 </head>
-<script language="javascript">
-function BackToOscar() {
-       window.close();
-}
-</script>
 
 <link rel="stylesheet" type="text/css" href="../../encounterStyles.css">
 <body class="BodyStyle" vlink="#0000FF">
 
 <html:errors />
-<!--  -->
 <table class="MainTable" id="scrollNumber1" name="encounterTable">
 	<tr class="MainTableTopRow">
 		<td class="MainTableTopRowLeftColumn">Consultation</td>
@@ -168,8 +221,8 @@ function BackToOscar() {
                    String added = (String) request.getAttribute("Added");
                    if (added != null){  %>
 			<tr>
-				<td><font color="red"> <bean:message
-					key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.msgSpecialistAdded"
+				<td><font color="white" style="background-color: rgb(0,115,0); padding: 2px;">
+				<bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.msgSpecialistAdded"
 					arg0="<%=added%>" /> </font></td>
 			</tr>
 			<%}%>
@@ -178,35 +231,34 @@ function BackToOscar() {
 
 				<html:form action="/oscarEncounter/AddSpecialist">
 						<%
-						   if (request.getAttribute("specId") != null ){
-							   EctConAddSpecialistForm thisForm;
-							   thisForm = (EctConAddSpecialistForm) request.getAttribute("EctConAddSpecialistForm");
-							   thisForm.setFirstName( (String) request.getAttribute("fName"));
-							   thisForm.setLastName( (String) request.getAttribute("lName"));
-							   thisForm.setProLetters( (String) request.getAttribute("proLetters"));
-							   thisForm.setAddress( (String) request.getAttribute("address"));
-							   thisForm.setPhone( (String) request.getAttribute("phone"));
-							   thisForm.setFax( (String) request.getAttribute("fax"));
-							   thisForm.setWebsite( (String) request.getAttribute("website"));
-							   thisForm.setEmail( (String) request.getAttribute("email"));
-							   thisForm.setSpecType( (String) request.getAttribute("specType"));
-							   thisForm.setSpecId( (String) request.getAttribute("specId"));
-							   thisForm.seteDataUrl( (String) request.getAttribute("eDataUrl"));
-							   thisForm.seteDataOscarKey( (String) request.getAttribute("eDataOscarKey"));
-							   thisForm.seteDataServiceKey( (String) request.getAttribute("eDataServiceKey"));
-							   thisForm.seteDataServiceName( (String) request.getAttribute("eDataServiceName"));
-							   thisForm.setAnnotation((String)request.getAttribute("annotation"));
-							   thisForm.setReferralNo((String)request.getAttribute("referralNo"));
-							   thisForm.setInstitution((String)request.getAttribute("institution"));
-							   thisForm.setDepartment((String)request.getAttribute("department"));
-				                           thisForm.setPrivatePhoneNumber((String)request.getAttribute("privatePhoneNumber"));
-                          				   thisForm.setCellPhoneNumber((String)request.getAttribute("cellPhoneNumber"));
-				                           thisForm.setPagerNumber((String)request.getAttribute("pagerNumber"));
-				                           thisForm.setSalutation((String)request.getAttribute("salutation"));
-				                           thisForm.setHideFromView((Boolean) request.getAttribute("hideFromView"));
-				                           thisForm.setEformId((Integer)request.getAttribute("eformId"));
-
-						   %>
+							if (request.getAttribute("specId") != null) {
+								EctConAddSpecialistForm thisForm;
+								thisForm = (EctConAddSpecialistForm) request.getAttribute("EctConAddSpecialistForm");
+								thisForm.setFirstName((String) request.getAttribute("fName"));
+								thisForm.setLastName((String) request.getAttribute("lName"));
+								thisForm.setProLetters((String) request.getAttribute("proLetters"));
+								thisForm.setAddress((String) request.getAttribute("address"));
+								thisForm.setPhone((String) request.getAttribute("phone"));
+								thisForm.setFax((String) request.getAttribute("fax"));
+								thisForm.setWebsite((String) request.getAttribute("website"));
+								thisForm.setEmail((String) request.getAttribute("email"));
+								thisForm.setSpecType((String) request.getAttribute("specType"));
+								thisForm.setSpecId((String) request.getAttribute("specId"));
+								thisForm.seteDataUrl((String) request.getAttribute("eDataUrl"));
+								thisForm.seteDataOscarKey((String) request.getAttribute("eDataOscarKey"));
+								thisForm.seteDataServiceKey((String) request.getAttribute("eDataServiceKey"));
+								thisForm.seteDataServiceName((String) request.getAttribute("eDataServiceName"));
+								thisForm.setAnnotation((String) request.getAttribute("annotation"));
+								thisForm.setReferralNo((String) request.getAttribute("referralNo"));
+								thisForm.setInstitution((String) request.getAttribute("institution"));
+								thisForm.setDepartment((String) request.getAttribute("department"));
+								thisForm.setPrivatePhoneNumber((String) request.getAttribute("privatePhoneNumber"));
+								thisForm.setCellPhoneNumber((String) request.getAttribute("cellPhoneNumber"));
+								thisForm.setPagerNumber((String) request.getAttribute("pagerNumber"));
+								thisForm.setSalutation((String) request.getAttribute("salutation"));
+								thisForm.setHideFromView((Boolean) request.getAttribute("hideFromView"));
+								thisForm.setEformId((Integer) request.getAttribute("eformId"));
+						%>
 						   	<script>
 						   		$(document).ready(function(){
 						   		$('#institution').val('<%=request.getAttribute("institution")%>');
@@ -281,14 +333,10 @@ function BackToOscar() {
 							<td><html:text name="EctConAddSpecialistForm" property="specType" /></td>
 							<td><bean:message key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNo" /></td>
 							<td colspan="4">
-								<% if (request.getAttribute("refnoinuse") != null) { %>
-									<span style="color: red;"><bean:message
-										key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInUse" /></span><br />
-								<% } else if (request.getAttribute("refnoinvalid") != null) { %>
-									<span style="color: red;"><bean:message
-										key="oscarEncounter.oscarConsultationRequest.config.AddSpecialist.referralNoInvalid" /></span><br />
-								<% } %>
-								<html:text name="EctConAddSpecialistForm" property="referralNo" maxlength="6" />
+								<span id="refNoWarn" style="color: red;"></span><br />
+								<html:text styleId="EctConAddSpecialistForm" name="EctConAddSpecialistForm" property="referralNo" maxlength="9"
+										onkeyup="updateRefNoWarning(this)" 
+										onchange="updateRefNoWarning(this)"/>
 							</td>
 						</tr>
 						<tr>

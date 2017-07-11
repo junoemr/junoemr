@@ -46,6 +46,7 @@ import org.oscarehr.util.SpringUtils;
 public class EctConAddSpecialistAction extends Action {
 
 	private static final Logger logger=MiscUtils.getLogger();
+	private static final int[] refNoLengthRange = {4, 9}; // inclusive
 
 	private ProfessionalSpecialistDao professionalSpecialistDao=(ProfessionalSpecialistDao) SpringUtils.getBean("professionalSpecialistDao");
 	private static SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
@@ -120,14 +121,22 @@ public class EctConAddSpecialistAction extends Action {
 		return (specialist != null && (specialist.getId().intValue() != specId.intValue()));
 	}
 
+	/** 
+	 * Check that the given string is a valid referral number.
+	 * @param referralNo a String representing the referral number
+	 * @return true if string contains a valid referral number, false otherwise
+	 */
 	private boolean referralNoValid(String referralNo) {
 		try {
-			if (referralNo.length() == 6 &&	referralNo.matches("\\d*"))
-				return true;
-		} catch (Exception e) {
+			// confirm that refno is valid integer value
+			// Ensure referral number is within a valid length range
+			return (   referralNo.matches("\\d*") 
+					&& referralNo.length() >= refNoLengthRange[0] 
+					&& referralNo.length() <= refNoLengthRange[1]);
+		}
+		catch (Exception e) {
 			MiscUtils.getLogger().info("Specified referral number invalid (" + referralNo + ")", e);
 		}
-
 		return false;
 	}
 

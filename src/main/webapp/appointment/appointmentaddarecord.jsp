@@ -47,6 +47,8 @@
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.model.Appointment" %>
 <%@page import="org.oscarehr.common.dao.WaitingListDao" %>
+<%@page import="org.oscarehr.common.model.WaitingList" %>
+<%@page import="org.oscarehr.common.model.WaitingListName" %>
 <%@page import="oscar.util.ConversionUtils" %>
 <%@page import="oscar.util.UtilDateUtilities"%>
 <%@ page import="org.oscarehr.event.EventService"%>
@@ -185,26 +187,26 @@ if (request.getParameter("demographic_no") != null && !(request.getParameter("de
 			   String demographicNo = request.getParameter("demographic_no");
 			   if( demographicNo != null && !"".equals(demographicNo)) {
 			    
-					List<Object[]> wl = waitingListDao.findByDemographic(Integer.parseInt(demographicNo));
+					List<WaitingList> wl = waitingListDao.findByDemographic(Integer.parseInt(demographicNo));
 					if(wl.size() > 0) {
-						org.oscarehr.common.model.WaitingListName wln = (org.oscarehr.common.model.WaitingListName)wl.get(0)[0];
-						org.oscarehr.common.model.WaitingList wl1 = (org.oscarehr.common.model.WaitingList)wl.get(0)[1];
+						WaitingList wl1 = wl.get(0);
+						WaitingListName wln = wl1.getWaitingListName();
 					
-%>
-<form name="updateWLFrm"
-	action="../oscarWaitingList/RemoveFromWaitingList.jsp"><input
-	type="hidden" name="listId"
-	value="<%=wl1.getListId()%>" /><input
-	type="hidden" name="demographicNo"
-	value="<%=request.getParameter("demographic_no")%>" /><script
-	LANGUAGE="JavaScript">
-		var removeList = confirm("Click OK to remove patient from the waiting list: <%=wln.getName()%>");
-		if (removeList) {
-			document.forms[0].action = "../oscarWaitingList/RemoveFromWaitingList.jsp?demographicNo=<%=request.getParameter("demographic_no")%>&listID=<%=wl1.getListId()%>";
-			document.forms[0].submit();
-		}
-</script></form>
-<%
+				%>
+				<form name="updateWLFrm"
+					action="../oscarWaitingList/RemoveFromWaitingList.jsp"><input
+					type="hidden" name="listId"
+					value="<%=wl1.getListId()%>" /><input
+					type="hidden" name="demographicNo"
+					value="<%=request.getParameter("demographic_no")%>" /><script
+					LANGUAGE="JavaScript">
+						var removeList = confirm("Click OK to remove patient from the waiting list: <%=wln.getName()%>");
+						if (removeList) {
+							document.forms[0].action = "../oscarWaitingList/RemoveFromWaitingList.jsp?demographicNo=<%=request.getParameter("demographic_no")%>&listID=<%=wl1.getListId()%>";
+							document.forms[0].submit();
+						}
+				</script></form>
+				<%
 				}
 			}
 		}

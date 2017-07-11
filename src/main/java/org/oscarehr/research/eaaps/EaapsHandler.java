@@ -309,7 +309,7 @@ public class EaapsHandler extends DefaultGenericHandler implements oscar.oscarLa
 		try {
 			String doc_no = EDocUtil.addDocumentSQL(doc);
 			documentId = Integer.parseInt(doc_no);
-			LogAction.addLog(provider, LogConst.ADD, "eaap", doc_no, "", "", "EaapDocUpload");
+			LogAction.addLog(provider, LogConst.ACTION_ADD, "eaap", doc_no, "", "", "EaapDocUpload");
 		} catch (Exception e) {
 			logger.error("Unable to persist document", e);
 			throw new RuntimeException("Unable to persist document", e);

@@ -29,44 +29,28 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.oscarehr.common.dao.MyGroupDao;
 import org.oscarehr.common.dao.WaitingListNameDao;
 import org.oscarehr.common.model.WaitingListName;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
 public class WLWaitingListNameBeanHandler {
+	
+	@Autowired
+	private WaitingListNameDao waitingListNameDao;
     
-    List<WLWaitingListNameBean> waitingListNameList = new ArrayList<WLWaitingListNameBean>();
-    List<String> waitingListNames = new ArrayList<String>();
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    
-    private MyGroupDao myGroupDao = SpringUtils.getBean(MyGroupDao.class);
-    private WaitingListNameDao waitingListNameDao = SpringUtils.getBean(WaitingListNameDao.class);
-    
-    public WLWaitingListNameBeanHandler(String groupNo, String providerNo) {
-        init(groupNo, providerNo);
-    }
-
-    public boolean init(String groupNo, String providerNo) {
-        List<WaitingListName> wlNames = waitingListNameDao.findByMyGroups(myGroupDao.getProviderGroups(providerNo));
+    @Transactional
+    public List<WLWaitingListNameBean> getWaitingListNames(){
+    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	List<WLWaitingListNameBean> waitingListNameList = new ArrayList<WLWaitingListNameBean>();
+    	
+        List<WaitingListName> wlNames = waitingListNameDao.findActiveWatingListNames();
     	for(WaitingListName tmp:wlNames) {
-    		WLWaitingListNameBean wLBean =
-    				new WLWaitingListNameBean(String.valueOf(tmp.getId()), tmp.getName(), tmp.getGroupNo(), tmp.getProviderNo(), formatter.format(tmp.getCreateDate()));                   
-    			
+    		WLWaitingListNameBean wLBean = new WLWaitingListNameBean(String.valueOf(tmp.getId()), tmp.getName(), tmp.getGroupNo(), tmp.getProviderNo(), formatter.format(tmp.getCreateDate()));                   
     		waitingListNameList.add(wLBean);
-    		waitingListNames.add(tmp.getName());
     	}
-        
-      
-    	return true;
-    }
-        
-    public List<WLWaitingListNameBean> getWaitingListNameList(){
         return waitingListNameList;
-    }    
-        
-    public List<String> getWaitingListNames(){
-        return waitingListNames;
-    }    
-
+    }
 }

@@ -70,7 +70,7 @@ public class EctDisplayBillingAction extends EctDisplayAction {
             //set text for lefthand module title
             Dao.setLeftHeading("Billing History");
 
-            String billRegion = OscarProperties.getInstance().getProperty("billregion","ON");
+            String billRegion = OscarProperties.getInstance().getBillingType();
 
             if (billRegion.equals("ON")){
 

@@ -42,7 +42,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
 
-import oscar.OscarProperties;
 
 /**
  * Filter class for handling confidentiality note printing. This class works by appending a confidentiality note
@@ -75,22 +74,8 @@ public class PrivacyStatementAppendingFilter implements Filter {
 
 	private Set<String> exclusions = Collections.synchronizedSet(new HashSet<String>());
 	
-	private String getPrivacyStatement() { 
-			return "<style type=\"text/css\"><!--\n" +
-			".yesprint {\n" + 
-			"	display: none;        \n" + 
-			"}\n" +  
-			"@media print {\n" + 
-			"	.yesprint {\n" + 
-			"		display:block;\n" + 
-			"	}\n" + 
-			"}\n" +
-			"--></style>" +
-			"<p class=\"yesprint\"><b>\n" + 
-			OscarProperties.getConfidentialityStatement() +
-			"</b><br/>" +
-			"<b>END OF PRINTED DOCUMENT</b>" +
-			"</p>";
+	private String getPrivacyStatement() {
+		return "";
 	}
 	
 	@Override

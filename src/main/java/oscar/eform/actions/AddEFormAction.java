@@ -88,6 +88,8 @@ public class AddEFormAction extends Action {
 		//for each name="fieldname" value="myval"
 		ArrayList<String> paramNames = new ArrayList<String>();  //holds "fieldname, ...."
 		ArrayList<String> paramValues = new ArrayList<String>(); //holds "myval, ...."
+		ArrayList<String> eformFields = new ArrayList<String>();
+		ArrayList<String> eformValues = new ArrayList<String>();
 		String fid = request.getParameter("efmfid");
 		String demographic_no = request.getParameter("efmdemographic_no");
 		String eform_link = request.getParameter("eform_link");
@@ -156,6 +158,8 @@ public class AddEFormAction extends Action {
 		String curField = "";
 		while (paramNamesE.hasMoreElements()) {
 			curField = paramNamesE.nextElement();
+			eformFields.add(curField);
+			eformValues.add(request.getParameter(curField));
 			if( curField.equalsIgnoreCase("parentAjaxId"))
 				continue;
 			if(request.getParameter(curField) != null && (!request.getParameter(curField).trim().equals("")) )
@@ -181,7 +185,7 @@ public class AddEFormAction extends Action {
 		//----names parsed
 		ActionMessages errors = curForm.setMeasurements(paramNames, paramValues);
 		curForm.setFormSubject(subject);
-		curForm.setValues(paramNames, paramValues);
+		curForm.setValues(paramNames, paramValues, eformFields, eformValues);
 		if (!openerNames.isEmpty()) curForm.setOpenerValues(openerNames, openerValues);
 		if (eform_link!=null) curForm.setEformLink(eform_link);
 		curForm.setImagePath();

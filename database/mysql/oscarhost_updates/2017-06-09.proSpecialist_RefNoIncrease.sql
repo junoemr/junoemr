@@ -1,0 +1,1 @@
+ALTER TABLE `professionalSpecialists` MODIFY `referralNo` VARCHAR(9);

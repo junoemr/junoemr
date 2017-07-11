@@ -114,7 +114,7 @@
   OscarProperties oscarProps = OscarProperties.getInstance();
 
   ProvinceNames pNames = ProvinceNames.getInstance();
-  String prov= (props.getProperty("hctype","")).trim().toUpperCase();
+  String prov = props.getBillingTypeUpperCase();
 
   String billingCentre = (props.getProperty("billcenter","")).trim().toUpperCase();
   String defaultCity = prov.equals("ON")&&billingCentre.equals("N") ? "Toronto":"";
@@ -137,7 +137,7 @@
      HCType = props.getProperty("hctype","");
      if (HCType == null || HCType.equals("")) {
            // The system property is not activated, so use the billregion
-           String billregion = props.getProperty("billregion", "");
+           String billregion = props.getBillingType();
            HCType = billregion;
      }
   }
@@ -1223,7 +1223,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				<td id="referralDocNoLbl" align="right" nowrap height="10"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formReferalDoctorN" />:</b></td>
 				<td id="referralDocNoCell" align="left" height="10"><input type="text"
-					name="r_doctor_ohip" maxlength="6"> <% if("ON".equals(prov)) { %>
+					name="r_doctor_ohip" maxlength="6"> <% if(!"BC".equals(prov)) { %>
 								<a
 									href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
 								#</a> <% } %>
@@ -1316,7 +1316,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
 							</option>
 							<%} %>
 							<%
-							for(WaitingListName wln : waitingListNameDao.findCurrentByGroup(((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo())) {
+							for(WaitingListName wln : waitingListNameDao.findActiveWatingListNames()) {
                                     
                                     %>
 							<option value="<%=wln.getId()%>"><%=wln.getName()%></option>
@@ -1593,7 +1593,7 @@ jQuery(document).ready(function(){
 <%
 }
 %>
-<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true") && "BC".equals(prov)) { %>
 </script>
 <script src="https://www.google.com/jsapi"></script>
 <script>

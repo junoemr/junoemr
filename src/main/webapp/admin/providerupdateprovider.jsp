@@ -157,8 +157,7 @@ jQuery(document).ready( function() {
 	    out.println("failed");
 	} 
 	else {
-		LogAction.addLog((String)session.getAttribute("user"), LogConst.UPDATE, "adminUpdateUser",
-			request.getParameter("keyword"), request.getRemoteAddr());
+		LogAction.addLogEntry((String)session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS, request.getParameter("keyword"), request.getRemoteAddr());
 %>
 
 			<table cellspacing="0" cellpadding="2" width="100%" border="0"
@@ -382,6 +381,16 @@ for (int i=0; i<sites.size(); i++) {
 			<td><input type="text" name="hso_no"
 				value="<%= provider.getHsoNo()==null ? "" : provider.getHsoNo() %>" maxlength="10"></td>
 		</tr>
+		<%
+			if (OscarProperties.getInstance().getProperty("hctype").equals("AB")) {
+		%>
+		<tr>
+			<td align="right"><bean:message key="admin.provider.formAlbertaTakNo" />:
+			</td>
+			<td><input type="text" name="alberta_tak_no"
+			value="<%= provider.getAlbertaTakNo()==null ? "" : provider.getAlbertaTakNo() %>" maxlength="20"></td>
+		</tr>
+		<%} %>
 		<tr>
 			<td align="right"><bean:message key="admin.provider.formStatus" />:
 			</td>

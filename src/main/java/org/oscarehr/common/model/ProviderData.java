@@ -41,6 +41,10 @@ import javax.persistence.TemporalType;
 @Table(name = "provider")
 public class ProviderData extends AbstractModel<String> implements Serializable {
 
+	/**
+	 * default serial version id for serializable
+	 */
+	private static final long serialVersionUID = 1L;
 	@Id
 	@Column(name = "provider_no")
 	private String id = null;
@@ -97,12 +101,17 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	@Column(name = "signed_confidentiality")
 	@Temporal(TemporalType.DATE)
 	private Date signedConfidentiality = null;
-        @Column(name = "supervisor")
-        private String supervisor;
-      
-	public ProviderData() {}
-	
-        @Override
+    @Column(name = "supervisor")
+    private String supervisor;
+    
+    /* -- Province specific -- */
+	@Column(name = "alberta_tak_no")
+	private String albertaTakNo = null;
+
+	public ProviderData() {
+	}
+
+	@Override
 	public String getId() {
 		return id;
 	}
@@ -285,24 +294,35 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public void setSignedConfidentiality(Date d) {
 		signedConfidentiality = d;
 	}
-	 
-        public String getSupervisor() {
-            return supervisor;
-        }
+
+	public String getSupervisor() {
+		return supervisor;
+	}
+
+	public void setSupervisor(String supervisor) {
+		this.supervisor = supervisor;
+	}
+
+	public boolean equals(Object object) {
+		if (!(object instanceof ProviderData)) {
+			return false;
+		}
+
+		ProviderData other = (ProviderData) object;
+		return ProviderData.ProviderNoComparator.compare(this, other) == 0;
+	}
+	
+	/* -- Province specific getters/setters -- */
+	
+	public String getAlbertaTakNo() {
+		return albertaTakNo;
+	}
+	public void setAlbertaTakNo(String takNo) {
+		albertaTakNo = takNo;
+	}
         
-        public void setSupervisor(String supervisor) {
-            this.supervisor = supervisor;
-        }
-        
-        public boolean equals(Object object) {
-            if( !(object instanceof ProviderData) ) {
-                return false;
-            }
-            
-            ProviderData other = (ProviderData) object;
-            return ProviderData.ProviderNoComparator.compare(this, other) == 0;
-        }
-        
+	/* -- Comparators -- */
+	
 	public static final Comparator<ProviderData> LastNameComparator = new Comparator<ProviderData>() {
         public int compare(ProviderData pd1, ProviderData pd2) {
         	return pd1.getLastName().compareTo(pd2.getLastName());

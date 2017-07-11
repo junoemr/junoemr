@@ -82,11 +82,11 @@ You have no rights to access the data!
 	import="oscar.oscarMDS.data.MDSResultsData,oscar.oscarLab.ca.on.*, oscar.oscarMessenger.util.MsgDemoMap, oscar.oscarMessenger.data.MsgMessageData"%>
 <%@page
 	import="oscar.oscarEncounter.oscarMeasurements.*,oscar.oscarResearch.oscarDxResearch.bean.*"%>
-<% java.util.Properties oscarVariables = oscar.OscarProperties.getInstance(); %>
+<% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
 
 <%
 	String ip = request.getRemoteAddr();
- 	LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_ECHART, demographic$, ip);
+ 	LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_ECHART, demographic$, ip);
 %>
 <%
   //The oscarEncounter session manager, if the session bean is not in the context it looks for a session cookie with the appropriate name and value, if the required cookie is not available
@@ -148,7 +148,7 @@ if (request.getParameter("casetoEncounter")==null)
   ArrayList labs = comLab.populateLabResultsData(loggedInInfo,"",demoNo, "", "","","U");
   Collections.sort(labs);
 
-  String province = ((String ) oscarVariables.getProperty("billregion","")).trim().toUpperCase();
+  String province = oscarVariables.getBillingTypeUpperCase();
   Properties windowSizes = oscar.oscarEncounter.pageUtil.EctWindowSizes.getWindowSizes(provNo);
 
   MsgDemoMap msgDemoMap = new MsgDemoMap();
@@ -1571,7 +1571,7 @@ function removeSaveFeedback()  {
 								value="<bean:message key="oscarEncounter.Index.btnSignSave"/>"
 								class="ControlPushButton"
 								onclick="document.forms['encForm'].btnPressed.value='Sign,Save and Exit'; document.forms['encForm'].submit();">
-							<oscar:oscarPropertiesCheck property="billregion" value="BC">
+							<oscar:oscarPropertiesCheck property="billing_type" value="BC">
 								<input type="button" style="height: 20px"
 									value="<bean:message key="oscarEncounter.Index.btnSignSaveBill"/>"
 									class="ControlPushButton"

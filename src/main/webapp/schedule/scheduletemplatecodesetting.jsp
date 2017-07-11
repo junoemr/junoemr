@@ -39,36 +39,32 @@
 <%@ page import="org.oscarehr.common.dao.ScheduleTemplateCodeDao" %>
 <%
 	ScheduleTemplateCodeDao scheduleTemplateCodeDao = SpringUtils.getBean(ScheduleTemplateCodeDao.class);
-%>
-<%
-  int rowsAffected = 0;
-  if (request.getParameter("dboperation") != null)
-  {
-	  if (request.getParameter("dboperation").compareTo(" Save ")==0 )
-	  {
-	    ScheduleTemplateCode code = scheduleTemplateCodeDao.getByCode(request.getParameter("code").toCharArray()[0]);
-	    if(code != null) {
-	    	scheduleTemplateCodeDao.remove(code.getId());
-	    }
 
-	    code = new ScheduleTemplateCode();
-	    code.setCode(request.getParameter("code").toCharArray()[0]);
-	    code.setDescription(request.getParameter("description"));
-	    code.setDuration(request.getParameter("duration"));
-	    code.setColor(request.getParameter("color"));
-		code.setConfirm(request.getParameter("confirm"));
-		code.setBookinglimit(Integer.parseInt(request.getParameter("bookinglimit")));
-		scheduleTemplateCodeDao.persist(code);
+	String dbOperation = request.getParameter("dboperation");
+	String codeStr = request.getParameter("code");
 
-	  }
-	  if (request.getParameter("dboperation").equals("Delete") )
-	  {
-		  ScheduleTemplateCode code = scheduleTemplateCodeDao.getByCode(request.getParameter("code").toCharArray()[0]);
-		    if(code != null) {
-		    	scheduleTemplateCodeDao.remove(code.getId());
-		    }
-	  }
-  }
+	if(dbOperation != null && codeStr != null && !codeStr.isEmpty()) {
+		ScheduleTemplateCode code = scheduleTemplateCodeDao.getByCode(codeStr.toCharArray()[0]);
+		if(dbOperation.equals(" Save ")) {
+			if (code != null) {
+				scheduleTemplateCodeDao.remove(code.getId());
+			}
+
+			code = new ScheduleTemplateCode();
+			code.setCode(codeStr.toCharArray()[0]);
+			code.setDescription(request.getParameter("description"));
+			code.setDuration(request.getParameter("duration"));
+			code.setColor(request.getParameter("color"));
+			code.setConfirm(request.getParameter("confirm"));
+			code.setBookinglimit(Integer.parseInt(request.getParameter("bookinglimit")));
+			scheduleTemplateCodeDao.persist(code);
+		}
+		else if (dbOperation.equals("Delete")) {
+			if (code != null) {
+				scheduleTemplateCodeDao.remove(code.getId());
+			}
+		}
+	}
 %>
 <html:html locale="true">
 <head>
@@ -77,38 +73,35 @@
 	key="schedule.scheduletemplatecodesetting.title" /></title>
 <link rel="stylesheet" href="../web.css" />
 <script language="JavaScript">
-<!--
 
-function validateNum() {
-    var node = document.getElementById("bookinglimit");
+	function validateNum() {
+		var node = document.getElementById("bookinglimit");
 
-    if( isNaN(node.value) ) {
-        alert("<bean:message key="schedule.scheduletemplatecodesetting.msgCheckInput"/>");
-        node.focus();
-        return false;
-    }
+		if (isNaN(node.value)) {
+			alert("<bean:message key="schedule.scheduletemplatecodesetting.msgCheckInput"/>");
+			node.focus();
+			return false;
+		}
 
-    return true;
-}
-
-function setfocus() {
-  this.focus();
-  document.addtemplatecode.code.focus();
-  document.addtemplatecode.code.select();
-}
-function upCaseCtrl(ctrl) {
-	ctrl.value = ctrl.value.toUpperCase();
-}
-function checkInput() {
-	if(document.schedule.holiday_name.value == "") {
-	  alert("<bean:message key="schedule.scheduletemplatecodesetting.msgCheckInput"/>");
-	  return false;
-	} else {
-	  return true;
+		return true;
 	}
-}
 
-//-->
+	function setfocus() {
+		this.focus();
+		document.addtemplatecode.code.focus();
+		document.addtemplatecode.code.select();
+	}
+	function upCaseCtrl(ctrl) {
+		ctrl.value = ctrl.value.toUpperCase();
+	}
+	function checkInput() {
+		if (document.schedule.holiday_name.value == "") {
+			alert("<bean:message key="schedule.scheduletemplatecodesetting.msgCheckInput"/>");
+			return false;
+		} else {
+			return true;
+		}
+	}
 </script>
 <script type="text/javascript" src="../share/javascript/picker.js"></script>
 </head>
@@ -154,7 +147,7 @@ function checkInput() {
 			<form name="addtemplatecode" method="post"
 				action="scheduletemplatecodesetting.jsp">
 			<%
-	boolean bEdit = request.getParameter("dboperation")!=null&&request.getParameter("dboperation").equals(" Edit ");
+	boolean bEdit = (dbOperation!=null && dbOperation.equals(" Edit "));
 	if (bEdit)
 	{
 		ScheduleTemplateCode stc = scheduleTemplateCodeDao.findByCode(request.getParameter("code"));
@@ -165,7 +158,7 @@ function checkInput() {
 			dataBean.setProperty("duration", stc.getDuration()==null?"":stc.getDuration() );
 			dataBean.setProperty("color", stc.getColor()==null?"":stc.getColor() );
 			dataBean.setProperty("confirm", stc.getConfirm()==null?"No":stc.getConfirm() );
-                        dataBean.setProperty("bookinglimit", String.valueOf(stc.getBookinglimit()));
+            dataBean.setProperty("bookinglimit", String.valueOf(stc.getBookinglimit()));
 		}
 	}
 %>

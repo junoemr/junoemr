@@ -110,7 +110,7 @@
         	 
         	 //Log the action
         	 String ip = request.getRemoteAddr();
-        	 LogAction.addLog(curUser_no, LogConst.UPDATE, "Password/PIN update.", "", ip);
+        	 LogAction.addLogEntry(curUser_no, LogConst.ACTION_UPDATE, LogConst.CON_PASSWORD, LogConst.STATUS_SUCCESS, s.getProviderNo(), ip);
          }
 	     
 	     //In case of the error for any reason go back.

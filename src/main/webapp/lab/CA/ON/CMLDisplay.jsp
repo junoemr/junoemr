@@ -78,9 +78,9 @@ CaseManagementManager caseManagementManager = (CaseManagementManager) SpringUtil
     }    
     
 if(lab.demographicNo != null && !lab.demographicNo.equals("null")){
-    LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_HL7_LAB, segmentID, request.getRemoteAddr(),lab.demographicNo);
+    LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_HL7_LAB, segmentID, request.getRemoteAddr(),lab.demographicNo);
 }else{           
-    LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_HL7_LAB, segmentID, request.getRemoteAddr());
+    LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_HL7_LAB, segmentID, request.getRemoteAddr());
 }
 %>
 </oscar:oscarPropertiesCheck>

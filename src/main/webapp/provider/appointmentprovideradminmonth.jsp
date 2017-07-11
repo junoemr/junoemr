@@ -218,7 +218,7 @@ if (bMultisites) {
 	import="java.lang.*, java.util.*, java.text.*,java.net.*,java.sql.*,oscar.*"
 	errorPage="errorpage.jsp"%>
 <% 
-	java.util.Properties oscarVariables = OscarProperties.getInstance();
+	oscar.OscarProperties oscarVariables = OscarProperties.getInstance();
 %>
 	
 <jsp:useBean id="scheduleHolidayBean" class="java.util.Hashtable"
@@ -228,7 +228,7 @@ if (bMultisites) {
 
 
 <%
-	String prov=  oscarVariables.getProperty("billregion","").trim().toUpperCase();
+	String prov =  oscarVariables.getBillingTypeUpperCase();
 	String resourcebaseurl =  oscarVariables.getProperty("resource_base_url");
 	
 	UserProperty rbu = userPropertyDao.getProp("resource_baseurl");
@@ -564,7 +564,7 @@ function refreshTabAlerts(id) {
 				objectName="_admin,_admin.userAdmin,_admin.schedule,_admin.billing,_admin.resource,_admin.reporting,_admin.backup,_admin.messenger,_admin.eform,_admin.encounter,_admin.misc"
 				rights="r">
 				<li><a HREF="#"
-					ONCLICK="popupOscarRx(700,687,'../admin/admin.jsp', 'Admin');return false;"><bean:message
+					ONCLICK="newWindow('<%= request.getContextPath() %>/administration/', 'admin');return false;"><bean:message
 					key="global.admin" /></a></li>
 			</security:oscarSec>
 

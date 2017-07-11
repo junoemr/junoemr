@@ -863,7 +863,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 				notesToDisplay.add(new NoteDisplayNonNote(patientForm));
 			}
 
-			if (oscar.OscarProperties.getInstance().getProperty("billregion", "").equalsIgnoreCase("ON")) {
+			if (oscar.OscarProperties.getInstance().isOntarioBillingType()) {
 				fetchInvoices(notesToDisplay, demoNo);
 			}
 		}

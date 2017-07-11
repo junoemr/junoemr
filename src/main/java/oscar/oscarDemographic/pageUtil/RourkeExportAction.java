@@ -56,7 +56,7 @@ import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 import oscar.form.dao.Rourke2009DAO;
 import oscar.form.model.FormRourke2009;
-import oscar.oscarReport.data.DemographicSets;
+import oscar.oscarReport.data.DemographicSetManager;
 import oscar.util.StringUtils;
 import oscar.util.UtilDateUtilities;
 import cdsrourke.PatientDocument;
@@ -154,7 +154,7 @@ public class RourkeExportAction extends DispatchAction {
 
 
 	    //grab patient list from set
-	    DemographicSets demoSets = new DemographicSets();
+	    DemographicSetManager demoSets = new DemographicSetManager();
 		List<String> patientList = demoSets.getDemographicSet(frm.getString("patientSet"));
 
 		log.info("Exporting Rourke 2009 " + patientList.size() + " patients");

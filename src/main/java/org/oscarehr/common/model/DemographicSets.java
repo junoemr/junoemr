@@ -30,6 +30,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -39,9 +41,10 @@ public class DemographicSets extends AbstractModel<Integer> {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-
-	@Column(name="demographic_no")
-	private int demographicNo;
+	
+	@ManyToOne(optional=false)
+	@JoinColumn(name="demographic_no")
+	private Demographic demographic;
 
 	@Column(name="set_name")
 	private String name;
@@ -59,12 +62,14 @@ public class DemographicSets extends AbstractModel<Integer> {
     }
 
 	public int getDemographicNo() {
-    	return demographicNo;
+    	return demographic.getDemographicNo();
     }
-
-	public void setDemographicNo(int demographicNo) {
-    	this.demographicNo = demographicNo;
-    }
+	public Demographic getDemographic() {
+		return demographic;
+	}
+	public void setDemographic(Demographic d) {
+		demographic = d;
+	}
 
 	public String getName() {
     	return name;
@@ -89,7 +94,4 @@ public class DemographicSets extends AbstractModel<Integer> {
 	public void setArchive(String archive) {
     	this.archive = archive;
     }
-
-
-
 }

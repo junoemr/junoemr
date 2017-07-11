@@ -493,7 +493,7 @@ try
 	<html:hidden property="appointmentNo" value="<%=apptNo%>" />
 	<html:hidden property="appointmentDate" value="<%=apptDate%>" />
 	<html:hidden property="start_time" value="<%=startTime%>" />
-	<html:hidden property="billRegion" value="<%=(OscarProperties.getInstance().getProperty(\"billregion\",\"\")).trim().toUpperCase()%>" />
+	<html:hidden property="billRegion" value="<%=(OscarProperties.getInstance().getBillingType()).trim().toUpperCase()%>" />
 	<html:hidden property="apptProvider" value="<%=apptProv%>" />
 	<html:hidden property="providerview" value="<%=provView%>" />
 	<input type="hidden" name="toBill" id="toBill" value="false">

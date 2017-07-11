@@ -82,7 +82,7 @@ import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.oscarPrevention.PreventionData;
 import oscar.oscarPrevention.PreventionDisplayConfig;
 import oscar.oscarProvider.data.ProviderData;
-import oscar.oscarReport.data.DemographicSets;
+import oscar.oscarReport.data.DemographicSetManager;
 import oscar.oscarRx.data.RxPrescriptionData;
 import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
@@ -135,7 +135,7 @@ public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServlet
     getListOfDINS();
 
     //Create Patient List from Patient Set
-    List<String> patientList = new DemographicSets().getDemographicSet(setName);
+    List<String> patientList = new DemographicSetManager().getDemographicSet(setName);
 
     //Create export files
     String tmpDir = OscarProperties.getInstance().getProperty("TMP_DIR");

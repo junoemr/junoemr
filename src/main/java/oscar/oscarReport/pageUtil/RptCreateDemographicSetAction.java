@@ -35,7 +35,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import oscar.oscarReport.data.DemographicSets;
+import oscar.oscarReport.data.DemographicSetManager;
 
 /**
  *
@@ -62,7 +62,7 @@ public class RptCreateDemographicSetAction extends Action {
       }
             
       if (list.size() > 0 ){
-         DemographicSets demoSet = new DemographicSets();
+         DemographicSetManager demoSet = new DemographicSetManager();
          demoSet.addDemographicSet(setName,list);
       }                                       
       return (mapping.findForward("success"));

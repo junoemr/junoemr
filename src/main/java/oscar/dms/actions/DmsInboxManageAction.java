@@ -37,7 +37,6 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,7 +54,6 @@ import org.oscarehr.PMmodule.dao.SecUserRoleDao;
 import org.oscarehr.PMmodule.model.SecUserRole;
 import org.oscarehr.PMmodule.utility.UtilDateUtilities;
 import org.oscarehr.common.dao.DocumentDao;
-import org.oscarehr.common.dao.DocumentResultsDao;
 import org.oscarehr.common.dao.InboxResultsDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.QueueDao;
@@ -69,6 +67,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
+import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
@@ -221,8 +220,19 @@ public class DmsInboxManageAction extends DispatchAction {
 		String patientFirstName = request.getParameter("fname");
 		String patientLastName = request.getParameter("lname");
 		String patientHealthNumber = request.getParameter("hnum");
-		String startDate = request.getParameter("startDate");
-		String endDate = request.getParameter("endDate");
+		String startDateStr = request.getParameter("startDate");
+		String endDateStr = request.getParameter("endDate");
+
+		Date startDate = null;
+		Date endDate = null;
+
+		try {
+			startDate = UtilDateUtilities.StringToDate(startDateStr);
+			endDate = UtilDateUtilities.StringToDate(endDateStr);
+		} catch (Exception e) {
+			startDate = null;
+			endDate = null;
+		}
 
 		if (patientFirstName == null) {
 			patientFirstName = "";
@@ -237,7 +247,7 @@ public class DmsInboxManageAction extends DispatchAction {
 				|| !"".equals(patientHealthNumber);
 		try {
 			CategoryData cData = new CategoryData(patientLastName, patientFirstName, patientHealthNumber,
-					patientSearch, providerSearch, searchProviderNo, status);
+					patientSearch, providerSearch, searchProviderNo, status, startDate, endDate);
 			cData.populateCountsAndPatients();
 			MiscUtils.getLogger().debug("LABS " + cData.getTotalLabs());
 			request.setAttribute("patientFirstName", patientFirstName);
@@ -255,8 +265,8 @@ public class DmsInboxManageAction extends DispatchAction {
 			request.setAttribute("searchProviderNo", searchProviderNo);
 			request.setAttribute("ackStatus", status);
 			request.setAttribute("categoryHash", cData.getCategoryHash());
-			request.setAttribute("startDate", startDate);
-			request.setAttribute("endDate", endDate);
+			request.setAttribute("startDate", startDateStr);
+			request.setAttribute("endDate", endDateStr);
 			return mapping.findForward("dms_index");
 		} catch (SQLException e) {
 			return mapping.findForward("error");
@@ -265,7 +275,9 @@ public class DmsInboxManageAction extends DispatchAction {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
     public ActionForward prepareForContentPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+
 		HttpSession session = request.getSession();
 		try {
 			if (session.getAttribute("userrole") == null) response.sendRedirect("../logout.jsp");
@@ -292,12 +304,12 @@ public class DmsInboxManageAction extends DispatchAction {
 		} catch (NumberFormatException nfe) {
 			page = 0;
 		}
-		Integer pageSize = 20;
+		Integer pageSize = 40;
 		try {
 			String tmp = request.getParameter("pageSize");
 			pageSize = Integer.parseInt(tmp);
 		} catch (NumberFormatException nfe) {
-			pageSize = 20;
+			pageSize = 40;
 		}
 		scannedDocStatus = "I";
 
@@ -368,16 +380,33 @@ public class DmsInboxManageAction extends DispatchAction {
 
 		ArrayList<LabResultData> labdocs = new ArrayList<LabResultData>();
 
-		if (!"labs".equals(view) && !"abnormal".equals(view)) {
-			labdocs = inboxResultsDao.populateDocumentResultsData(searchProviderNo, demographicNo, patientFirstName,
-					patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal);
-		}
-		if (!"documents".equals(view)) {
-			labdocs.addAll(comLab.populateLabResultsData(loggedInInfo, searchProviderNo, demographicNo, patientFirstName,
-					patientLastName, patientHealthNumber, ackStatus, scannedDocStatus, true, page, pageSize,
-					mixLabsAndDocs, isAbnormal));
-		}
+		if(OscarProperties.getInstance().isPropertyActive("use_combined_inbox_query")) {
+			String labType = null;
+			if("labs".equals(view)) {
+				labType = "HL7";
+			}
+			else if("documents".equals(view)) {
+				labType = "DOC";
+			}
 
+			labdocs = inboxResultsDao.getInboxResults(loggedInInfo, searchProviderNo, demographicNo, patientFirstName,
+				patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal, 
+				null, false, labType, startDate, endDate);
+		}
+		else {
+			if (!"labs".equals(view) && !"abnormal".equals(view)) {
+				labdocs = inboxResultsDao.populateDocumentResultsData(searchProviderNo, demographicNo, patientFirstName,
+						patientLastName, patientHealthNumber, ackStatus, true, page, pageSize, mixLabsAndDocs, isAbnormal);
+			}
+			if (!"documents".equals(view)) {
+				labdocs.addAll(comLab.populateLabResultsData(loggedInInfo, searchProviderNo, demographicNo, patientFirstName,
+						patientLastName, patientHealthNumber, ackStatus, scannedDocStatus, true, page, pageSize,
+						mixLabsAndDocs, isAbnormal));
+			}
+		}
+		
+
+		/*
 		ArrayList<LabResultData> validlabdocs = new ArrayList<LabResultData>();
 
 		DocumentResultsDao documentResultsDao = (DocumentResultsDao) SpringUtils.getBean("documentResultsDao");
@@ -428,6 +457,7 @@ public class DmsInboxManageAction extends DispatchAction {
 				}
 			}
 		}
+		*/
 
 		// Find the oldest lab returned in labdocs, use that as the limit date for the HRM query
 		Date oldestLab = null;
@@ -450,18 +480,27 @@ public class DmsInboxManageAction extends DispatchAction {
 			}
 		}
 
-		HRMResultsData hrmResult = new HRMResultsData();
+		if(!OscarProperties.getInstance().isPropertyActive("use_combined_inbox_query")) {
 
-		Collection<LabResultData> hrmDocuments = hrmResult.populateHRMdocumentsResultsData(loggedInInfo, searchProviderNo, ackStatus, newestLab, oldestLab);
-		if (oldestLab == null) {
-			for (LabResultData hrmDocument : hrmDocuments) {
-				if (oldestLab == null || (hrmDocument.getDateObj() != null && oldestLab.compareTo(hrmDocument.getDateObj()) > 0))
-					oldestLab = hrmDocument.getDateObj();
+			HRMResultsData hrmResult = new HRMResultsData();
+
+			Collection<LabResultData> hrmDocuments = hrmResult.populateHRMdocumentsResultsData(loggedInInfo, 
+				searchProviderNo, ackStatus, newestLab, oldestLab);
+			if (oldestLab == null) {
+
+				for (LabResultData hrmDocument : hrmDocuments) {
+
+					if (oldestLab == null || (hrmDocument.getDateObj() != null && 
+						oldestLab.compareTo(hrmDocument.getDateObj()) > 0)) {
+
+						oldestLab = hrmDocument.getDateObj();
+					}
+				}
 			}
-		}
 
-		labdocs.addAll(hrmDocuments);
-		Collections.sort(labdocs);
+			labdocs.addAll(hrmDocuments);
+			Collections.sort(labdocs);
+		}
 
 		HashMap<String,LabResultData> labMap = new HashMap<String,LabResultData>();
 		LinkedHashMap<String,ArrayList<String>> accessionMap = new LinkedHashMap<String,ArrayList<String>>();
@@ -469,6 +508,8 @@ public class DmsInboxManageAction extends DispatchAction {
 		int accessionNumCount = 0;
 		for (LabResultData result : labdocs) {
 			if (startDate != null && startDate.after(result.getDateObj())) {
+				logger.info("result: " + result.getDateObj());
+				logger.info("limit: " + startDate);
 				continue;
 			}
 
