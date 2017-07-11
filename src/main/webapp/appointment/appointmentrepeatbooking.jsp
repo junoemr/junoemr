@@ -66,7 +66,7 @@
             //if (strbuf.toString().indexOf("one")==-1 && strbuf.toString().indexOf("two")==-1) continue;
 		    //datano=Integer.parseInt(request.getParameter(strbuf.toString()) );
 
-		    String[] param=new String[19];
+		    String[] param=new String[20];
      	    param[0]=request.getParameter("provider_no");
 	        param[1]=request.getParameter("appointment_date");
     	    param[2]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"));
@@ -89,7 +89,8 @@
 		    } else param[16]="0";
 
 	  	  	param[17]=(String)request.getSession().getAttribute("programId_oscarView");
-	  	 	param[18]=null;
+	  	  	param[18]=(request.getParameter("urgency")!=null)?request.getParameter("urgency"):"";
+	  	 	param[19]=(request.getParameter("partial_booking")!=null)?request.getParameter("partial_booking"):"0";
         //}
 
         // repeat adding
