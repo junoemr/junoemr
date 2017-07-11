@@ -50,7 +50,7 @@ Integer demoNo = null;
 if(demographicLink != null){
 	demoNo = Integer.parseInt(demographicLink.getDemographicNo());
 }
-LogAction.addLogEntry((String) session.getAttribute("user"), demoNo, LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_OK, ""+hrmReportId, request.getRemoteAddr());
+LogAction.addLogEntry((String) session.getAttribute("user"), demoNo, LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_SUCCESS, ""+hrmReportId, request.getRemoteAddr());
 
 %>
 

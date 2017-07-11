@@ -78,12 +78,12 @@ public class WebServiceLoggingAdvice {
 			Object result = joinpoint.proceed();
 			duration = System.currentTimeMillis() - duration;
 
-			logAccess("REST WS: " +getServiceCallDescription(joinpoint));
+//			logAccess("REST WS: " +getServiceCallDescription(joinpoint));
 			return result;
 		} catch (Throwable t) {
 			logger.debug("WS Failure", t);
 
-			logAccess("REST WS: FAILURE: " + getServiceCallDescription(joinpoint));
+//			logAccess("REST WS: FAILURE: " + getServiceCallDescription(joinpoint));
 			throw t;
 		}
 	}
