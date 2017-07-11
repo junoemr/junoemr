@@ -59,7 +59,7 @@
 			</span>
 		</form>
 		<div class="list-group">		
-			<a  ng-repeat="report in reportsCtrl.getReports() | filter: reportFilter "
+			<a  ng-repeat="report in reportsCtrl.getReports() | filter: reportsCtrl.reportFilter "
 			 class="list-group-item default" ng-click="reportsCtrl.selectReport(report)">{{report.name}}</a>
 		</div>
 	</div>

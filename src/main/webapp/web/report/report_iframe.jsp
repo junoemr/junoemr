@@ -29,7 +29,7 @@
 	 	id="currentReportFrame" 
 	 	scrolling="yes" 
 	 	frameborder="0" 
-	 	ng-src="{{currentReport.iframeUrl}}" 
+	 	ng-src="{{reportsCtrl.currentReport.iframeUrl}}" 
 	 	width="100%"
 	 	
 	style="min-height:820px"
