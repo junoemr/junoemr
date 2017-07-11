@@ -408,10 +408,8 @@ Flowsheet: <span style="font-weight:normal"><%=flowsheet.toUpperCase()%></span>
 	</div><!-- custom tab -->
 	
 	<!-- ADD NEW MEAS -->
-<div class="tab-pane" id="add">
-
-
-<form name="FlowSheetCustomActionForm" id="FlowSheetCustomActionForm" class="well" action="FlowSheetCustomAction.do" method="post">
+<div class="col-xs-12 tab-pane" id="add">
+	<form name="FlowSheetCustomActionForm" id="FlowSheetCustomActionForm" class="well" action="FlowSheetCustomAction.do" method="post">
 		    <%if(request.getParameter("htracker")!=null){ %>
 		    <input type="hidden" name="htracker" value="<%=module%>">
 		    <%}%>   
@@ -420,8 +418,6 @@ Flowsheet: <span style="font-weight:normal"><%=flowsheet.toUpperCase()%></span>
             <%if (demographic !=null){%>
                     <input type="hidden" name="demographic" value="<%=demographic%>"/>
             <%}%>
-          
-	
 		<h4>Select a Measurement</h4>
 		<select name="measurement" class="measurement-select">
                 	<option value="0">choose:</option>
