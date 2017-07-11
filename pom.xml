@@ -1025,31 +1025,6 @@
 		</dependency>
 	</dependencies>
 	<build>
-<<<<<<< HEAD
-		<resources>
-			<resource>
-				<directory>${basedir}/src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<nonFilteredFileExtensions>
-						<nonFilteredFileExtension>pdf</nonFilteredFileExtension>
-						<nonFilteredFileExtension>jar</nonFilteredFileExtension>
-						<nonFilteredFileExtension>xls</nonFilteredFileExtension>
-						<nonFilteredFileExtension>dat</nonFilteredFileExtension>
-						<nonFilteredFileExtension>xsd</nonFilteredFileExtension>
-						<nonFilteredFileExtension>jasper</nonFilteredFileExtension>
-						<nonFilteredFileExtension>doc</nonFilteredFileExtension>
-					</nonFilteredFileExtensions>
-				</configuration>
-			</plugin>
-=======
 	 <resources>
           <resource>
             <directory>${basedir}/src/main/resources</directory>
@@ -1285,7 +1260,6 @@
 			</executions>
 		        </plugin>
 
->>>>>>> RELEASE_15_BETA
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
