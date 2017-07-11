@@ -45,32 +45,62 @@ public class FrmBCAR2007Record extends FrmRecord {
 
     public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException {
         
-    	Demographic demo = null;
+    	Demographic demo = demographicManager.getDemographic(loggedInInfo, demographicNo);
     	Properties props = new Properties();
 
+        String demographicNoStr = Integer.toString(demographicNo);
+        String formCreated = UtilDateUtilities.DateToString(new Date(),_dateFormat);
+        String surname = demo.getLastName();
+        String firstname = demo.getFirstName();
+        String address = demo.getAddress();
+        String city = demo.getCity();
+        String province = demo.getProvince();
+        String postal = demo.getPostal();
+        String phn = demo.getHin();
+        String dateOfBirth = UtilDateUtilities.DateToString(date, _dateFormat);
+        String age = String.valueOf(UtilDateUtilities.calcAge(date));
+        String phone = demo.getPhone();
+        String phoneAlt = demo.getPhone2();
+        String pg1FormDate = UtilDateUtilities.DateToString(new Date(), _dateFormat);
+        String pg2FormDate = UtilDateUtilities.DateToString(new Date(), _dateFormat);
+        String pg3FormDate = UtilDateUtilities.DateToString(new Date(), _dateFormat);
+
         if (existingID <= 0) {
-
-            demo = demographicManager.getDemographic(loggedInInfo, demographicNo);
-
             if (demo != null) {
                 java.util.Date date = UtilDateUtilities.calcDate(demo.getYearOfBirth(), demo.getMonthOfBirth(), demo.getDateOfBirth());
-                props.setProperty("demographic_no", demo.getDemographicNo().toString());
-                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(),_dateFormat));
 
-                props.setProperty("c_surname", demo.getLastName());
-                props.setProperty("c_givenName", demo.getFirstName());
-                props.setProperty("c_address", demo.getAddress());
-                props.setProperty("c_city", demo.getCity());
-                props.setProperty("c_province", demo.getProvince());
-                props.setProperty("c_postal", demo.getPostal());
-                props.setProperty("c_phn", demo.getHin());
-                props.setProperty("pg1_dateOfBirth", UtilDateUtilities.DateToString(date, _dateFormat));
-                props.setProperty("pg1_age", String.valueOf(UtilDateUtilities.calcAge(date)));
-                props.setProperty("c_phone", demo.getPhone());
-                props.setProperty("c_phoneAlt1", demo.getPhone2());
-                props.setProperty("pg1_formDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));
-                props.setProperty("pg2_formDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));
-                props.setProperty("pg3_formDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));
+                if(demographicNoStr != null)
+                    props.setProperty("demographic_no", demographicNoStr);
+                if(formCreated != null)
+                    props.setProperty("formCreated", formCreated);
+                if(surname != null)
+                    props.setProperty("c_surname", surname);
+                if(firstname != null)
+                    props.setProperty("c_givenName", firstname);
+                if(address != null)
+                    props.setProperty("c_address", address);
+                if(city != null)
+                    props.setProperty("c_city", city);
+                if(province != null)
+                    props.setProperty("c_province", province);
+                if(postal != null)
+                    props.setProperty("c_postal", postal);
+                if(phn != null)
+                    props.setProperty("c_phn", postal);
+                if(dateOfBirth != null)
+                    props.setProperty("pg1_dateOfBirth", dateOfBirth);
+                if(age != null)
+                    props.setProperty("pg1_age", age);
+                if(phone != null)
+                    props.setProperty("c_phone", phone);
+                if(phoneAlt != null)
+                    props.setProperty("c_phoneAlt1", phoneAlt);
+                if(pg1FormDate != null)
+                    props.setProperty("pg1_formDate", pg1FormDate);
+                if(pg2FormDate != null)
+                    props.setProperty("pg2_formDate", pg2FormDate);
+                if(pg2FormDate != null)
+                    props.setProperty("pg3_formDate", pg2FormDate);
                 
                 String rd = SxmlMisc.getXmlContent(demo.getFamilyDoctor(), "rd");
                 rd = rd != null ? rd : "";
@@ -87,19 +117,27 @@ public class FrmBCAR2007Record extends FrmRecord {
             FrmRecordHelp frh = new FrmRecordHelp();
             frh.setDateFormat(_dateFormat);
             props = (frh).getFormRecord(sql);
-
-            demo = demographicManager.getDemographic(loggedInInfo, demographicNo);
             
             if (demo != null) {
-                props.setProperty("c_surname_cur", demo.getLastName());
-                props.setProperty("c_givenName_cur", demo.getFirstName());
-                props.setProperty("c_address_cur", demo.getAddress());
-                props.setProperty("c_city_cur", demo.getCity());
-                props.setProperty("c_province_cur", demo.getProvince());
-                props.setProperty("c_postal_cur", demo.getPostal());
-                props.setProperty("c_phn_cur", demo.getHin());
-                props.setProperty("c_phone_cur", demo.getPhone());
-                props.setProperty("c_phoneAlt1_cur", demo.getPhone2());
+                if(surname != null)
+                    props.setProperty("c_surname_cur", surname);
+                if(firstname != null)
+                    props.setProperty("c_givenName_cur", firstname);
+                if(address != null)
+                    props.setProperty("c_address_cur", address);
+                if(city != null)
+                    props.setProperty("c_city_cur", city);
+                if(province != null)
+                    props.setProperty("c_province_cur", province);
+                if(postal != null)
+                    props.setProperty("c_postal_cur", postal);
+                if(phn != null)
+                    props.setProperty("c_phn_cur", phn);
+                if(phone != null)
+                    props.setProperty("c_phone_cur", phone);
+                if(phoneAlt != null)
+                    props.setProperty("c_phoneAlt1_cur", phoneAlt);
+                
                 Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographicNo);
                 String cell = demoExt.get("demo_cell");
                 if ( cell != null ){

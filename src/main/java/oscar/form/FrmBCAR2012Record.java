@@ -105,16 +105,37 @@ public class FrmBCAR2012Record extends FrmRecord{
      * @ OSCARprn
      */
     private void setDemographicProperties() {
+
+        String surname = demographic.getLastName();
+        String firstname = demographic.getFirstName();
+        String address = demographic.getAddress();
+        String city = demographic.getCity();
+        String province = demographic.getProvince();
+        String postal = demographic.getPostal();
+        String phn = demographic.getHin();
+        String dateOfBirth = UtilDateUtilities.DateToString(date, _dateFormat);
+        String age = String.valueOf(UtilDateUtilities.calcAge(date));
+        String phone = demographic.getPhone();
+        String phoneAlt = demographic.getPhone2();
     	
-        props.setProperty("c_surname", demographic.getLastName());
-        props.setProperty("c_givenName", demographic.getFirstName());
-        props.setProperty("c_address", demographic.getAddress());
-        props.setProperty("c_city", demographic.getCity());
-        props.setProperty("c_province", demographic.getProvince());
-        props.setProperty("c_postal", demographic.getPostal());
-        props.setProperty("c_phn", demographic.getHin()); 
-        props.setProperty("c_phone", demographic.getPhone());
-        props.setProperty("c_phoneAlt1", demographic.getPhone2());
+        if(surname != null)
+            props.setProperty("c_surname", surname);
+        if(firstname != null)
+            props.setProperty("c_surname", firstname);
+        if(address != null)
+            props.setProperty("c_address", address);
+        if(city != null)
+            props.setProperty("c_city", city);
+        if(province != null)
+            props.setProperty("c_province", province);
+        if(postal != null)
+            props.setProperty("c_postal", postal);
+        if(phn != null)
+            props.setProperty("c_phn", phn); 
+        if(phone != null)
+            props.setProperty("c_phone", phone);
+        if(phoneAlt != null)
+            props.setProperty("c_phoneAlt1", demographic.getPhone2());
         
         String cell = null;  
  
