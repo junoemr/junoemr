@@ -252,7 +252,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			}
 		};
 
-		controller.viewFormState = function changeTo(item, view)
+		controller.viewFormState = function viewFormState(item, view)
 		{
 
 			while (document.getElementById('formInViewFrame').hasChildNodes())
@@ -328,7 +328,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 					{
 						demographicNo: $stateParams.demographicNo,
 						type: 'form',
-						id: item.id
+						location: false
 					});
 					$("html, body").animate(
 					{
