@@ -28,15 +28,20 @@ package org.oscarehr.ws.transfer_objects;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.DemographicExtDao;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.BeanUtils;
 
 public final class DemographicTransfer {
 
 	private Integer demographicNo;
 	private String phone;
+	private String cellPhone;
 	private String patientStatus;
 	private Date patientStatusDate;
 	private String rosterStatus;
@@ -101,6 +106,14 @@ public final class DemographicTransfer {
 
 	public void setPhone(String phone) {
     	this.phone = phone;
+    }
+
+	public String getCellPhone() {
+    	return (cellPhone);
+    }
+
+	public void setCellPhone(String cellPhone) {
+    	this.cellPhone = cellPhone;
     }
 
 	public String getPatientStatus() {
@@ -493,6 +506,19 @@ public final class DemographicTransfer {
 		DemographicTransfer demographicTransfer = new DemographicTransfer();
 
 		BeanUtils.copyProperties(demographic, demographicTransfer);
+		
+		// Attempt to set extra demographic fields
+		try
+		{
+			DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
+			Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographic.getDemographicNo());
+			demographicTransfer.setCellPhone(demoExt.get("demo_cell"));
+			//demographicTransfer.setCellPhone(apptMainBean.getString(demoExt.get("demo_cell")));
+		} catch (Exception e)
+		{
+			Logger logger = Logger.getLogger(DemographicTransfer.class);
+			logger.error("Failed to get extended demographic data into DemographicTransform.", e);
+		}
 
 		return (demographicTransfer);
 	}

@@ -32,13 +32,14 @@ package oscar.log;
  * @author yilee18
  */
 public class LogConst {
-    public static final String LOGIN = "log in";
-    public static final String LOGOUT = "log out";
-    public static final String SHELTER_SELECTION="select shelter";
-    public static final String READ = "read";
-    public static final String ADD = "add";
-    public static final String UPDATE = "update";
-    public static final String DELETE = "delete";
+	/* Action constants 
+	 * These should describe what user action was done */
+    public static final String ACTION_LOGIN = "log in";
+    public static final String ACTION_LOGOUT = "log out";
+    public static final String ACTION_READ = "read";
+    public static final String ACTION_ADD = "add";
+    public static final String ACTION_UPDATE = "update";
+    public static final String ACTION_DELETE = "delete";
     public static final String DISCONTINUE = "discontinue";
     public static final String ARCHIVE = "archive";
     public static final String REPRINT = "reprint";
@@ -53,14 +54,22 @@ public class LogConst {
     public static final String UNLINK = "unlink";
     public static final String SENT = "sent";
 
+    /* Content/Module constants 
+     * These should describe what module the action applies to.
+     * Example: action ADD module CON_DOCUMENT */
     public static final String CON_LOGIN_AGREEMENT = "login agreement";
     public static final String CON_LOGIN = "login";
+    public static final String CON_LOGOUT = "logout";
+    public static final String CON_SHELTER_SELECTION="select shelter";
     public static final String CON_APPT = "appointment";
     public static final String CON_ECHART = "eChart";
     public static final String CON_DEMOGRAPHIC = "demographic";
     public static final String CON_DEMOGRAPHIC_RELATION = "demographic_relations";
     public static final String CON_ROLE = "role";
+    public static final String CON_PROVIDER = "provider";
     public static final String CON_PRIVILEGE = "privilege";
+    public static final String CON_PASSWORD = "password/pin";
+    public static final String CON_ADMIN = "admin";
     public static final String CON_FORM = "form";
     public static final String CON_PRESCRIPTION = "prescription";
     public static final String CON_MEDICATION = "medication";
@@ -85,4 +94,13 @@ public class LogConst {
     public static final String CON_FAX  = "fax";
     public static final String CON_PHARMACY  = "pharmacy";
     
+    /* Status constants
+     * These should describe the outcome of the action */
+    public static final String STATUS_OK = "OK";
+    public static final String STATUS_SUCCESS = "SUCCESS";
+    public static final String STATUS_FAILURE = "FAILURE";
+    public static final String STATUS_LOGIN_SUCCESS = "SUCCESS";
+    public static final String STATUS_LOGIN_FAILURE = "FAILURE";
+    public static final String STATUS_LOGIN_EXPIRED = "EXPIRED";
+    public static final String STATUS_LOGIN_INACTIVE = "INACTIVE";
 }

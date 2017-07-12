@@ -157,8 +157,7 @@ jQuery(document).ready( function() {
 	    out.println("failed");
 	} 
 	else {
-		LogAction.addLog((String)session.getAttribute("user"), LogConst.UPDATE, "adminUpdateUser",
-			request.getParameter("keyword"), request.getRemoteAddr());
+		LogAction.addLogEntry((String)session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS, request.getParameter("keyword"), request.getRemoteAddr());
 %>
 
 			<table cellspacing="0" cellpadding="2" width="100%" border="0"

@@ -95,7 +95,6 @@ if( rePrint != null && rePrint.equalsIgnoreCase("true") ) {
     provider = new oscar.oscarRx.data.RxProviderData().getProvider(signingProvider);
     session.setAttribute("tmpBeanRX", null);
     String ip = request.getRemoteAddr();
-    //LogAction.addLog((String) session.getAttribute("user"), LogConst.UPDATE, LogConst.CON_PRESCRIPTION, String.valueOf(bean.getDemographicNo()), ip);
 }
 else {
     bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");

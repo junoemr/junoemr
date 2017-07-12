@@ -143,14 +143,14 @@ public class FrmFormRHPreventionAction extends Action{
                 WorkFlowState wfs = new WorkFlowState();
                 
                 wfs.updateWorkFlowState( workflowId, state,endDate );
-                LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, "WF_"+workflowType, state, ip);
+                LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_UPDATE, "WF_"+workflowType, state, ip);
             }
         } else{  
             //if none are found open, offer to create a new one  (could be existing but closed)
             request.setAttribute("newWorkFlowNeeded","true");   
           
             workId = flow.addToWorkFlow(providerNo, demographicNo, endDate);        
-            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, "WF_"+workflowType, state, ip);
+            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_UPDATE, "WF_"+workflowType, state, ip);
         
         }
         
@@ -174,7 +174,7 @@ public class FrmFormRHPreventionAction extends Action{
 
                 props.setProperty("provider_no", providerNo);
                 newID = rec.saveFormRecord(props);
-                LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, request.getParameter("form_class"), "" + newID, ip);
+                LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, request.getParameter("form_class"), "" + newID, ip);
             }catch(Exception factEx){
             	MiscUtils.getLogger().error("Error", factEx);
             }

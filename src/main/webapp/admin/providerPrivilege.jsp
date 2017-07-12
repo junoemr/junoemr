@@ -166,7 +166,7 @@ if (request.getParameter("submit") != null && request.getParameter("submit").equ
 			msg += secExceptionMsg;
 		else
 			msg += "Role/Obj/Rights " + roleUserGroup + "/" + objectName + "/" + privilege + " is added. ";
-	    LogAction.addLog(curUser_no, LogConst.ADD, LogConst.CON_PRIVILEGE, roleUserGroup +"|"+ objectName +"|"+privilege, ip);
+	    LogAction.addLog(curUser_no, LogConst.ACTION_ADD, LogConst.CON_PRIVILEGE, roleUserGroup +"|"+ objectName +"|"+privilege, ip);
 	}
 }
 
@@ -218,7 +218,7 @@ if (request.getParameter("buttonUpdate") != null && request.getParameter("button
     	sop.setPriority(Integer.parseInt(priority));
     	secObjPrivilegeDao.merge(sop);
     	msg = "Role/Obj/Rights " + roleUserGroup + "/" + objectName + "/" + privilege + " is updated. ";
-	    LogAction.addLog(curUser_no, LogConst.UPDATE, LogConst.CON_PRIVILEGE, roleUserGroup +"|"+ objectName, ip);
+	    LogAction.addLog(curUser_no, LogConst.ACTION_UPDATE, LogConst.CON_PRIVILEGE, roleUserGroup +"|"+ objectName, ip);
     } else {
     	msg = "Role/Obj/Rights " + roleUserGroup + "/" + objectName + "/" + privilege + " is <font color='red'>NOT</font> updated!!! ";
     }
@@ -253,7 +253,7 @@ if (request.getParameter("submit") != null && request.getParameter("submit").equ
     	xml += "<provider_no>" + provider_no + "</provider_no>";
     	recycleBin.setTableContent(xml);
     	recycleBinDao.persist(recycleBin);
-    	LogAction.addLog(curUser_no, LogConst.DELETE, LogConst.CON_PRIVILEGE, roleUserGroup +"|"+ objectName, ip);
+    	LogAction.addLog(curUser_no, LogConst.ACTION_DELETE, LogConst.CON_PRIVILEGE, roleUserGroup +"|"+ objectName, ip);
     } else {
     	msg = "Role/Obj/Rights " + roleUserGroup + "/" + objectName + "/" + privilege + " is <font color='red'>NOT</font> deleted!!! ";
     }

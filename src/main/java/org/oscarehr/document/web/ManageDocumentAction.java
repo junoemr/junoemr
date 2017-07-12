@@ -135,7 +135,7 @@ public class ManageDocumentAction extends DispatchAction {
         	throw new SecurityException("missing required security object (_edoc)");
         }
 		
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
+		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
 
 		String demog = request.getParameter("demog");
 
@@ -292,7 +292,7 @@ public class ManageDocumentAction extends DispatchAction {
         	throw new SecurityException("missing required security object (_edoc)");
         }
 		
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
+		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
 
 		String demog = request.getParameter("demog");
 
@@ -619,7 +619,7 @@ public class ManageDocumentAction extends DispatchAction {
 			String doc_no = request.getParameter("doc_no");
 			log.debug("Document No :" + doc_no);
 
-			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 
 			Document d = documentDao.getDocument(doc_no);
 			log.debug("Document Name :" + d.getDocfilename());
@@ -672,7 +672,7 @@ public class ManageDocumentAction extends DispatchAction {
 			}
 			Integer pn = Integer.parseInt(pageNum);
 			log.debug("Document No :" + doc_no);
-			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 
 			Document d = documentDao.getDocument(doc_no);
 			log.debug("Document Name :" + d.getDocfilename());
@@ -731,7 +731,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String doc_no = request.getParameter("doc_no");
 		log.debug("Document No :" + doc_no);
 
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 
 		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 		File documentDir = new File(docdownload);
@@ -852,9 +852,9 @@ public class ManageDocumentAction extends DispatchAction {
 		if (remoteFacilityId == null) {
 			CtlDocument ctld = ctlDocumentDao.getCtrlDocument(Integer.parseInt(doc_no));
 			if (ctld.isDemographicDocument()) {
-				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr(), "" + ctld.getId().getModuleId());
+				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr(), "" + ctld.getId().getModuleId());
 			} else {
-				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 			}
 
 			String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
@@ -1082,7 +1082,7 @@ public class ManageDocumentAction extends DispatchAction {
             }
             newDoc.setNumberOfPages(numberOfPages);
             doc_no = EDocUtil.addDocumentSQL(newDoc);
-            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 
 
             if (flagproviders != null && flagproviders.length > 0) { 

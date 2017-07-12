@@ -54,7 +54,7 @@
     <security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="r" reverse="<%=true%>">
         "You have no right to access this page!"
         <%
-    	LogAction.addLog((String) session.getAttribute("user"), LogConst.NORIGHT+LogConst.READ, LogConst.CON_FLOWSHEET,  temp , request.getRemoteAddr(),demographic_no);
+    	LogAction.addLog((String) session.getAttribute("user"), LogConst.NORIGHT+LogConst.ACTION_READ, LogConst.CON_FLOWSHEET,  temp , request.getRemoteAddr(),demographic_no);
             response.sendRedirect("../../noRights.html");
     %>
     </security:oscarSec>
@@ -79,7 +79,7 @@
 %>
 
 <%
-	LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_FLOWSHEET,  temp , request.getRemoteAddr(),demographic_no);
+	LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_FLOWSHEET,  temp , request.getRemoteAddr(),demographic_no);
 
 
     int numElementsToShow = 4;

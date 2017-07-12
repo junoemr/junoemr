@@ -26,10 +26,7 @@ package org.oscarehr.web;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import org.oscarehr.common.dao.CasemgmtNoteLockDao;
-import org.oscarehr.common.model.CasemgmtNoteLock;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
 
 public class OscarSessionListener implements HttpSessionListener {
 
@@ -43,14 +40,5 @@ public class OscarSessionListener implements HttpSessionListener {
 	public void sessionDestroyed(HttpSessionEvent se) {
 		String id = se.getSession().getId();
 		MiscUtils.getLogger().info("session is being destroyed - " + id);
-		
-		CasemgmtNoteLockDao casemgmtNoteLockDao = SpringUtils.getBean(CasemgmtNoteLockDao.class);
-		
-		for(CasemgmtNoteLock lock:casemgmtNoteLockDao.findBySession(id)) {
-			MiscUtils.getLogger().info("removing note locks for this session - " + lock);
-			
-			casemgmtNoteLockDao.remove(lock.getId());
-		}
 	}
-
 }

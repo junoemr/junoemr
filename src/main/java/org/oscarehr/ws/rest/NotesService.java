@@ -269,25 +269,7 @@ public class NotesService extends AbstractServiceImpl {
 		}catch(Exception e){
 			noteId = null;
 		}
-		
-		/* NOT SURE HOW TO HANDLE LOCKS YET!!
-		//compare locks and see if they are the same
-		CasemgmtNoteLock casemgmtNoteLockSession = (CasemgmtNoteLock)request.getSession().getAttribute("casemgmtNoteLock"+demographicNo);
-		try {
-			//if other window has acquired lock don't save
-			CasemgmtNoteLock casemgmtNoteLock = casemgmtNoteLockDao.find(casemgmtNoteLockSession.getId());
-			if( !casemgmtNoteLock.getSessionId().equals(casemgmtNoteLockSession.getSessionId()) ) {
-				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-				return null;
-			}
-		}
-		catch(Exception e ) {
-			//Exception thrown if other window has saved and exited so lock is gone
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return null;
 
-		}		
-		*/
 		if (noteStr == null || noteStr.length() == 0) {
 			return null;
 		}		
@@ -1139,25 +1121,6 @@ public class NotesService extends AbstractServiceImpl {
 
 //		boolean passwd = caseManagementMgr.getEnabled();
 //		String chain = request.getParameter("chain");
-
-		
-
-//		LogAction.addLog((String) session.getAttribute("user"), LogConst.EDIT, LogConst.CON_CME_NOTE, String.valueOf(note.getId()), request.getRemoteAddr(), demono, note.getAuditString());
-
-		//check to see if someone else is editing note in this chart
-//		String ipAddress = request.getRemoteAddr();
-//		CasemgmtNoteLock casemgmtNoteLock;
-//		Long note_id = note.getId() != null && note.getId() >= 0 ? note.getId() : 0L;
-//		casemgmtNoteLock = isNoteEdited(note_id, demographicNo, providerNo, ipAddress, request.getRequestedSessionId());
-		
-//		if( casemgmtNoteLock.isLocked() ) {
-//			note = makeNewNote(providerNo, demono, request);
-//			cform.setCaseNote(note);
-//		}
-		
-//		session.setAttribute("casemgmtNoteLock"+demono, casemgmtNoteLock);		
-		
-		
 
 		/*
 		 ///Is it a specific thats being requested to edit

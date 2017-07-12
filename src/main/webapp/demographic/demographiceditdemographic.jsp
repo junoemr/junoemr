@@ -187,7 +187,7 @@ if(!authed) {
 	boolean hasImportExtra = (cml.size()>0);
 	String annotation_display = CaseManagementNoteLink.DISP_DEMO;
 
-	LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_DEMOGRAPHIC,  demographic_no , request.getRemoteAddr(),demographic_no);
+	LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC,  demographic_no , request.getRemoteAddr(),demographic_no);
 
 
 	OscarProperties oscarProps = OscarProperties.getInstance();

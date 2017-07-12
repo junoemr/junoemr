@@ -434,7 +434,7 @@
 
     String ip = request.getRemoteAddr();
     String user = (String)session.getAttribute("user");
-    LogAction.addLog((String) session.getAttribute("user"), LogConst.UPDATE, LogConst.CON_DEMOGRAPHIC,  request.getParameter("demographic_no") , request.getRemoteAddr(),request.getParameter("demographic_no"));
+    LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC,  request.getParameter("demographic_no") , request.getRemoteAddr(),request.getParameter("demographic_no"));
 %>
 <p></p>
 

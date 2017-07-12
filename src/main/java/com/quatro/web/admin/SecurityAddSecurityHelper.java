@@ -102,7 +102,7 @@ public class SecurityAddSecurityHelper {
 		
 		securityDao.persist(s);
 
-		LogAction.addLog((String) pageContext.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_SECURITY, request.getParameter("user_name"), request.getRemoteAddr());
+		LogAction.addLog((String) pageContext.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_SECURITY, request.getParameter("user_name"), request.getRemoteAddr());
 
 		// hurrah - it worked
 		return "admin.securityaddsecurity.msgAdditionSuccess";

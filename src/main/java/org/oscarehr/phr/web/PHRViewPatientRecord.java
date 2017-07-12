@@ -122,7 +122,7 @@ public class PHRViewPatientRecord extends DispatchAction {
     		Demographic demographic = demographicDao.getDemographicById(Integer.parseInt(demographicNo));
             Long myOscarUserId = AccountManager.getUserId(myOscarLoggedInInfo, demographic.getMyOscarUserName());
 
-            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_PHR, String.valueOf(myOscarUserId), request.getRemoteAddr(), demographicNo, "");
+            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_PHR, String.valueOf(myOscarUserId), request.getRemoteAddr(), demographicNo, "");
 //            request.setAttribute("userid", auth.getUserId());
 //            request.setAttribute("ticket", auth.getToken());
             request.setAttribute("userName", myOscarLoggedInInfo.getLoggedInPerson().getUserName());

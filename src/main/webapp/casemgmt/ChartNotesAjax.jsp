@@ -62,7 +62,6 @@
 <%@page import="org.oscarehr.casemgmt.web.NoteDisplayNonNote"%>
 <%@page import="org.oscarehr.common.dao.EncounterTemplateDao"%>
 <%@page import="org.oscarehr.casemgmt.web.CheckBoxBean"%>
-<%@page import="org.oscarehr.common.model.CasemgmtNoteLock"%>
 
 <%
     String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -131,9 +130,6 @@ if (request.getParameter("caseManagementEntryForm") == null)
 
 Integer offset = Integer.parseInt(request.getParameter("offset"));
 int maxId = 0;
-
-//We determine the lock status of the note
-CasemgmtNoteLock casemgmtNoteLock = (CasemgmtNoteLock)session.getAttribute("casemgmtNoteLock"+demographicNo);
 %>
 
 <c:if test="${not empty notesToDisplay}">
@@ -848,38 +844,6 @@ CasemgmtNoteLock casemgmtNoteLock = (CasemgmtNoteLock)session.getAttribute("case
 	caseNote = "caseNote_note" + "<%=savedId%>";
 	//save initial note to determine whether save is necessary
 	origCaseNote = $F(caseNote);
-<%
-
-	if( casemgmtNoteLock.isLocked() ) {
-    //note is locked so display message
-%>
-		alert("Another user is currently editing this note.  Please try again later.");
-<%
-	}
-	else if( casemgmtNoteLock.isLockedBySameUser() && !casemgmtNoteLock.getSessionId().equals(request.getRequestedSessionId()) ) {
-    	//note is locked by same user so offer to unlock note and view locked note in progress    	    
-%>
-		var viewEditedNote = confirm("You have started to edit this note in another window at <%=casemgmtNoteLock.getIpAddress()%>.\nDo you wish to continue?");
-		if( viewEditedNote ) {	
-			doscroll();
-			var params = "method=updateNoteLock&demographicNo=" + demographicNo;
-			jQuery.ajax({
-				type: "POST",
-				url:  "<%=ctx%>/CaseManagementEntry.do",
-				data: params,
-				success: function() {
-					//force save when exiting chart in case we loaded edited note in other chart
-					origCaseNote += ".";
-					tmpSaveNeeded = true;
-				}
-			});
-		}
-		else {
-			window.close();
-		}
-<%
-	}
-%>
 
 	jQuery(document).ready(function() {
 		<%

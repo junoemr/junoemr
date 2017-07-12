@@ -298,7 +298,7 @@ public class ManageFaxes extends DispatchAction {
 			}
 			Integer pn = Integer.parseInt(pageNum);
 			log.debug("Document No :" + doc_no);
-			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 
 			FaxJobDao faxJobDao = SpringUtils.getBean(FaxJobDao.class);
 			FaxJob faxJob = faxJobDao.find(Integer.parseInt(doc_no));
