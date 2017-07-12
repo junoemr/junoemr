@@ -511,7 +511,7 @@ public final class DemographicTransfer {
 		try
 		{
 			DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
-			Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographic.getDemographicNo().toString());
+			Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographic.getDemographicNo());
 			demographicTransfer.setCellPhone(demoExt.get("demo_cell"));
 			//demographicTransfer.setCellPhone(apptMainBean.getString(demoExt.get("demo_cell")));
 		} catch (Exception e)
