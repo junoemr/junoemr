@@ -127,7 +127,7 @@ public class LogAction {
 		executorService.execute(new AddLogExecutorTask(oscarLog));
 	}
 	public static void addLogEntry(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip, String data) {
-		addLogEntry(providerNo, demographicNo, action, module, status, contentId, ip, null, null);
+		addLogEntry(providerNo, demographicNo, action, module, status, contentId, ip, data, null);
 	}
 	public static void addLogEntry(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip) {
 		addLogEntry(providerNo, demographicNo, action, module, status, contentId, ip, null, null);

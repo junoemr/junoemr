@@ -444,7 +444,8 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		logger.debug("The End of Edit " + String.valueOf(current - beginning));
 		start = current;
 
-		LogAction.addLog((String) session.getAttribute("user"), LogConst.EDIT, LogConst.CON_CME_NOTE, String.valueOf(note.getId()), request.getRemoteAddr(), demono, note.getAuditString());
+		LogAction.addLogEntry(providerNo, Integer.parseInt(demono), LogConst.ACTION_EDIT, LogConst.CON_CME_NOTE, LogConst.STATUS_SUCCESS,
+				String.valueOf(note.getId()), request.getRemoteAddr(), note.getAuditString());
 
 		String frmName = "caseManagementEntryForm" + demono;
 		logger.debug("Setting session form - " + frmName + " - " + String.valueOf(cform != null));
@@ -1326,6 +1327,10 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		note = caseManagementMgr.saveCaseManagementNote(loggedInInfo, note,issuelist, cpp, ongoing,verify, request.getLocale(),now,annotationNote,userName,(String) session.getAttribute("user"),request.getRemoteAddr(), lastSavedNoteString) ;
 		caseManagementMgr.getEditors(note);
 		cform.setCaseNote(note);
+		String saveStatus = (note.getId() != null) ? LogConst.STATUS_SUCCESS: LogConst.STATUS_FAILURE;
+		Integer noteDemoNo = Integer.parseInt(note.getDemographic_no());
+		LogAction.addLogEntry(providerNo, noteDemoNo, LogConst.ACTION_ADD, LogConst.CON_CME_NOTE, saveStatus,
+				String.valueOf(note.getId()), request.getRemoteAddr(), note.getAuditString());
 
 		return note.getId();
 	}

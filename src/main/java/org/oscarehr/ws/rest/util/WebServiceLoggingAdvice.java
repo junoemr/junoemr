@@ -36,10 +36,10 @@ import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.oscarehr.common.model.OscarLog;
+import org.oscarehr.util.LoggedInInfo;
 import org.springframework.stereotype.Component;
 
-import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 
 // TODO Consider moving this configuration into XML
@@ -72,36 +72,42 @@ public class WebServiceLoggingAdvice {
 		if (logger.isInfoEnabled()) {
 			logger.info("Logging access for " + joinpoint);
 		}
+		Object result = null;
+		String status = LogConst.STATUS_SUCCESS;
 
 		try {
 			long duration = System.currentTimeMillis();
-			Object result = joinpoint.proceed();
+			result = joinpoint.proceed();
 			duration = System.currentTimeMillis() - duration;
-
-//			logAccess("REST WS: " +getServiceCallDescription(joinpoint));
-			return result;
-		} catch (Throwable t) {
-			logger.debug("WS Failure", t);
-
-//			logAccess("REST WS: FAILURE: " + getServiceCallDescription(joinpoint));
+		}
+		catch (Throwable t) {
+			logger.error("WS Failure", t);
+			status = LogConst.STATUS_FAILURE;
 			throw t;
 		}
+		finally {
+			logAccess(joinpoint, status);
+		}
+		return result;
 	}
-
-	private void logAccess(String action) {
-		OscarLog log = new OscarLog();
-		log.setAction(action);
-		log.setProviderNo("N/A");
-		
+	private void logAccess(ProceedingJoinPoint joinpoint, String satus) {
 		Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
-		
 		HttpServletRequest request = (HttpServletRequest) currentMessage.get("HTTP.REQUEST");
-
-		log.setIp(request.getRemoteAddr());
-		log.setContent(request.getRequestURL().toString());
-		log.setData(printableParameterMap(request.getParameterMap()));
-
-		LogAction.addLogSynchronous(log);
+		
+		Signature signature = joinpoint.getSignature();
+		String type = signature.getDeclaringType().getSimpleName();
+		String methodName = signature.getName();
+		
+		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		
+		@SuppressWarnings("unchecked")
+		Map<String,String[]> params = request.getParameterMap();
+		
+		String url = request.getRequestURL().toString();
+		
+		//TODO log all rest service calls to their own log
+		logger.info("REST WS: " + getServiceCallDescription(joinpoint) + "("+url+"): " + printableParameterMap(params));
+		
 	}
 	/** display a map with values in a readable way */
 	private String printableParameterMap(Map<?, ?> map) {
