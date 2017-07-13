@@ -89,6 +89,7 @@ public abstract class FrmRecord {
 		this.setDemographic(loggedInInfo, demographicNo);
 		
         date = UtilDateUtilities.calcDate(demographic.getYearOfBirth(), demographic.getMonthOfBirth(), demographic.getDateOfBirth());
+		dateFormat = "dd/MM/yyyy";
         demoProps.setProperty("demographic_no", demographic.getDemographicNo().toString());
 
         demoProps.setProperty("c_surname", StringUtils.trimToEmpty(demographic.getLastName()));
