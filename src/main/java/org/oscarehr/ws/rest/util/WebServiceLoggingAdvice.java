@@ -39,6 +39,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.stereotype.Component;
 
+import oscar.log.LogAction;
 import oscar.log.LogConst;
 
 
@@ -90,7 +91,7 @@ public class WebServiceLoggingAdvice {
 		}
 		return result;
 	}
-	private void logAccess(ProceedingJoinPoint joinpoint, String satus) {
+	private void logAccess(ProceedingJoinPoint joinpoint, String status) {
 		Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
 		HttpServletRequest request = (HttpServletRequest) currentMessage.get("HTTP.REQUEST");
 		
@@ -106,18 +107,18 @@ public class WebServiceLoggingAdvice {
 		String url = request.getRequestURL().toString();
 		
 		//TODO log all rest service calls to their own log
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),  null, getServiceCallDescription(joinpoint), "REST WS", status, null, request.getRemoteAddr(), url+" : " + printableParameterMap(params));
 		logger.info("REST WS: " + getServiceCallDescription(joinpoint) + "("+url+"): " + printableParameterMap(params));
 		
 	}
 	/** display a map with values in a readable way */
-	private String printableParameterMap(Map<?, ?> map) {
+	private String printableParameterMap(Map<String,String[]> map) {
 		String printable = "{";
 	
-		for(Object key: map.keySet())
+		for(String key: map.keySet())
 	    {
-	            String keyStr = (String)key;
-	            String[] value = (String[])map.get(keyStr);
-	            printable += keyStr + "=" + Arrays.toString(value) + ",";
+	            String[] value = map.get(key);
+	            printable += key + "=" + Arrays.toString(value) + ",";
 	    }
 		printable += "}";
 		return printable;
