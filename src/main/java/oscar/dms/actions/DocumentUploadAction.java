@@ -137,7 +137,7 @@ public class DocumentUploadAction extends DispatchAction {
 			}
 			newDoc.setNumberOfPages(numberOfPages);
 			String doc_no = EDocUtil.addDocumentSQL(newDoc);
-			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr(), fileName);
 	
 			String providerId = request.getParameter("provider");
 			if (providerId != null) { 

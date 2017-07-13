@@ -43,7 +43,7 @@ public class LogConst {
     public static final String DISCONTINUE = "discontinue";
     public static final String ARCHIVE = "archive";
     public static final String REPRINT = "reprint";
-    public static final String REVIEWED = "reviewed";
+    public static final String ACTION_REVIEWED = "reviewed";
     public static final String ACK = "acknowledge";
     public static final String NORIGHT= "no right";
     public static final String ACTION_EDIT = "edit";
