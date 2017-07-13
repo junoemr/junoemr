@@ -61,9 +61,7 @@ public class SecurityInfoManager {
 	public List<Secuserrole> getRoles(LoggedInInfo loggedInInfo) {
 		@SuppressWarnings("unchecked")
         List<Secuserrole> results =  secUserRoleDao.findByProviderNo(loggedInInfo.getLoggedInProviderNo());
-		
-	//	LogAction.addLogSynchronous(loggedInInfo, "SecurityInfoManager.getRoles", loggedInInfo.getLoggedInProviderNo());
-			
+					
 		return results;
 	}
 	
@@ -76,9 +74,7 @@ public class SecurityInfoManager {
 		roleNames.add(loggedInInfo.getLoggedInProviderNo());
 		
 		List<Secobjprivilege> results = secobjprivilegeDao.getByRoles(roleNames);
-		
-	//	LogAction.addLogSynchronous(loggedInInfo, "SecurityInfoManager.getSecurityObjects", loggedInInfo.getLoggedInProviderNo());
-			
+					
 		return results;
 	}
 	

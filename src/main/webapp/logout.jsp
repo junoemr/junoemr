@@ -37,7 +37,7 @@
       session.invalidate();
       request.getSession();
       String ip = request.getRemoteAddr();
-	  LogAction.addLogEntry((String)user, LogConst.ACTION_LOGOUT, LogConst.CON_LOGOUT, LogConst.STATUS_OK, null, ip);
+	  LogAction.addLogEntry((String)user, LogConst.ACTION_LOGOUT, LogConst.CON_LOGOUT, LogConst.STATUS_SUCCESS, null, ip);
     }
   }
   String param = "";

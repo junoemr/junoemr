@@ -112,7 +112,7 @@ public final class ShelterSelectionAction extends DispatchAction {
         SecurityManager secManager = userAccessManager.getUserSecurityManager(providerNo,shelterId,lookupManager);
         request.getSession(true).setAttribute(KeyConstants.SESSION_KEY_SECURITY_MANAGER, secManager);
         String ip = request.getRemoteAddr();
-        LogAction.addLogEntry(providerNo, LogConst.ACTION_LOGIN, LogConst.CON_SHELTER_SELECTION, LogConst.STATUS_OK, shelterId.toString(), ip);
+        LogAction.addLogEntry(providerNo, LogConst.ACTION_LOGIN, LogConst.CON_SHELTER_SELECTION, LogConst.STATUS_SUCCESS, shelterId.toString(), ip);
         
         return mapping.findForward("home");
     }

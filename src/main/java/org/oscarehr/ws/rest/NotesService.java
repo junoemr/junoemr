@@ -92,6 +92,8 @@ import org.springframework.stereotype.Component;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import oscar.OscarProperties;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
 
 
@@ -314,8 +316,6 @@ public class NotesService extends AbstractServiceImpl {
 	public NoteTo1 saveNote(@PathParam("demographicNo") Integer demographicNo, NoteTo1 note) throws Exception {
 		logger.debug("saveNote "+note);
 		
-		//TODO -- note locking
-		
 		String noteTxt = StringUtils.trimToNull(note.getNote());
 		// if there is not a note to save, exit immediately
 		if (noteTxt == null || noteTxt.equals("")) {
@@ -344,7 +344,7 @@ public class NotesService extends AbstractServiceImpl {
 		caseMangementNote.setEncounter_type(note.getEncounterType());
 		
 		// set uuid
-		if(uuid != null && uuid.trim().equals("")){
+		if(uuid != null && !uuid.trim().equals("")){
 			caseMangementNote.setUuid(uuid);
 		}
 		// set signed & signing provider
@@ -408,7 +408,6 @@ public class NotesService extends AbstractServiceImpl {
 			} 
 		}
 		
-		note.setIssues(new HashSet<CaseManagementIssue>(issuelist));
 		caseMangementNote.setIssues(new HashSet<CaseManagementIssue>(issuelist));
 
 		// update appointment and add verify message to note if verified
@@ -438,6 +437,10 @@ public class NotesService extends AbstractServiceImpl {
 		note.setObservationDate(caseMangementNote.getObservation_date());
 		logger.debug("note should return like this " + note.getNote() );
 		logger.info("NOTE ID #"+caseMangementNote.getId()+" SAVED");
+		
+		String saveStatus = (caseMangementNote.getId() != null) ? LogConst.STATUS_SUCCESS: LogConst.STATUS_FAILURE;
+		LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_CME_NOTE, saveStatus, 
+				String.valueOf(caseMangementNote.getId()), getLoggedInInfo().getIp(),caseMangementNote.getAuditString());
 		return note;
 	}
 	
@@ -870,6 +873,9 @@ public class NotesService extends AbstractServiceImpl {
 		noteIssue.setEncounterNote(note);	
 		noteIssue.setGroupNoteExt(noteExt);
 		
+		String saveStatus = (caseMangementNote.getId() != null) ? LogConst.STATUS_SUCCESS: LogConst.STATUS_FAILURE;
+		LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_CME_NOTE, saveStatus, 
+				String.valueOf(caseMangementNote.getId()), getLoggedInInfo().getIp(), caseMangementNote.getAuditString());
 		return noteIssue;
 	}
 	

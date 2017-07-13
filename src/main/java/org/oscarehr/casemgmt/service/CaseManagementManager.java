@@ -2171,16 +2171,15 @@ private String updateApptStatus(String status, String type) {
 			logger.warn("warn", e);
 		}
 
-		
-		
 		if (annotationNote != null) {
 			// new annotation created and got it in session attribute
 
 			saveNoteSimple(annotationNote);
 			CaseManagementNoteLink cml = new CaseManagementNoteLink(CaseManagementNoteLink.CASEMGMTNOTE, note.getId(), annotationNote.getId());
 			saveNoteLink(cml);
-			LogAction.addLog(annotationNote.getDemographic_no(), LogConst.ANNOTATE, LogConst.CON_CME_NOTE, String.valueOf(annotationNote.getId()), remoteAddr, annotationNote.getDemographic_no(), annotationNote.getNote());
-			
+			Integer annotationDemoNo = Integer.parseInt(annotationNote.getDemographic_no());
+			LogAction.addLogEntry(user, annotationDemoNo, LogConst.ANNOTATE, LogConst.CON_CME_NOTE, LogConst.STATUS_SUCCESS,
+					String.valueOf(annotationNote.getId()), remoteAddr, annotationNote.getNote());
 		}
 		
 		
@@ -2211,15 +2210,6 @@ private String updateApptStatus(String status, String type) {
 				saveNoteLink(cml_n);
 			}
 		}
-
-		String logAction;
-		if (newNote) {
-			logAction = LogConst.ACTION_ADD;
-		} else {
-			logAction = LogConst.ACTION_UPDATE;
-		}
-		LogAction.addLog(user, logAction, LogConst.CON_CME_NOTE, "" + Long.valueOf(note.getId()).intValue(), remoteAddr, note.getDemographic_no(), note.getAuditString());
-		
 		return note;
 	}
 	

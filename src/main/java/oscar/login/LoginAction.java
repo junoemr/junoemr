@@ -167,7 +167,7 @@ public final class LoginAction extends DispatchAction {
 	            Facility facility=facilityDao.find(Integer.parseInt(facilityIdString));
 	            request.getSession().setAttribute(SessionConstants.CURRENT_FACILITY, facility);
 	            String username=(String)request.getSession().getAttribute("user");
-	            LogAction.addLogEntry(username, LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_OK, "facilityId="+facilityIdString, ip);
+	            LogAction.addLogEntry(username, LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_SUCCESS, "facilityId="+facilityIdString, ip);
 	            if(facility.isEnableOcanForms()) {
 	            	request.getSession().setAttribute("ocanWarningWindow", OcanForm.getOcanWarningMessage(facility.getId()));
 	            }
@@ -231,7 +231,7 @@ public final class LoginAction extends DispatchAction {
             Provider p = providerDao.getProvider(strAuth[0]);
             if(p == null || (p.getStatus() != null && p.getStatus().equals("0"))) {
             	logger.info(LOG_PRE + " Inactive: " + userName);
-            	LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_LOGIN_INACTIVE, "inactive");
+            	LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_FAILURE, "inactive");
             	
                 String newURL = mapping.findForward("error").getPath();
                 newURL = newURL + "?errormsg=Your account is inactive. Please contact your administrator to activate.";
@@ -271,7 +271,7 @@ public final class LoginAction extends DispatchAction {
             session = request.getSession(); // Create a new session for this user
 
             logger.debug("Assigned new session for: " + strAuth[0] + " : " + strAuth[3] + " : " + strAuth[4]);
-            LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_LOGIN_SUCCESS, null, ip);
+            LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_SUCCESS, null, ip);
 
             // initial db setting
             OscarProperties pvar = OscarProperties.getInstance();
@@ -382,7 +382,7 @@ public final class LoginAction extends DispatchAction {
                 // set current facility
                 Facility facility=facilityDao.find(facilityIds.get(0));
                 request.getSession().setAttribute("currentFacility", facility);
-                LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_OK, "facilityId="+facilityIds.get(0), ip);
+                LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_SUCCESS, "facilityId="+facilityIds.get(0), ip);
                 if(facility.isEnableOcanForms()) {
                 	request.getSession().setAttribute("ocanWarningWindow", OcanForm.getOcanWarningMessage(facility.getId()));
                 }
@@ -398,7 +398,7 @@ public final class LoginAction extends DispatchAction {
         			ProviderDao.addProviderToFacility(providerNo, first_id);
         			Facility facility=facilityDao.find(first_id);
         			request.getSession().setAttribute("currentFacility", facility);
-        			LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_OK, "facilityId="+first_id, ip);
+        			LogAction.addLogEntry(strAuth[0], LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_SUCCESS, "facilityId="+first_id, ip);
             	}
             }
 

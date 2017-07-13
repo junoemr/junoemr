@@ -43,10 +43,10 @@ public class LogConst {
     public static final String DISCONTINUE = "discontinue";
     public static final String ARCHIVE = "archive";
     public static final String REPRINT = "reprint";
-    public static final String REVIEWED = "reviewed";
+    public static final String ACTION_REVIEWED = "reviewed";
     public static final String ACK = "acknowledge";
     public static final String NORIGHT= "no right";
-    public static final String EDIT = "edit";
+    public static final String ACTION_EDIT = "edit";
     public static final String REPRESCRIBE = "represcribe";
     public static final String ANNOTATE = "annotate";
     public static final String VERIFY = "verify";
@@ -78,7 +78,7 @@ public class LogConst {
     public static final String CON_ALLERGY = "allergy";
     public static final String CON_JASPERREPORTLETER = "jr_letter";
     public static final String CON_TICKLER = "tickler";
-    public static final String CON_CME_NOTE = "CME note";
+    public static final String CON_CME_NOTE = "encounter note";
     public static final String CON_DOCUMENT = "document";
     public static final String CON_HL7_LAB = "lab";
     public static final String CON_HRM = "hrm";
@@ -96,11 +96,6 @@ public class LogConst {
     
     /* Status constants
      * These should describe the outcome of the action */
-    public static final String STATUS_OK = "OK";
     public static final String STATUS_SUCCESS = "SUCCESS";
     public static final String STATUS_FAILURE = "FAILURE";
-    public static final String STATUS_LOGIN_SUCCESS = "SUCCESS";
-    public static final String STATUS_LOGIN_FAILURE = "FAILURE";
-    public static final String STATUS_LOGIN_EXPIRED = "EXPIRED";
-    public static final String STATUS_LOGIN_INACTIVE = "INACTIVE";
 }

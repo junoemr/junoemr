@@ -86,6 +86,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import oscar.OscarProperties;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarWaitingList.util.WLWaitingListUtil;
 
 
@@ -301,6 +303,7 @@ public class DemographicService extends AbstractServiceImpl {
 				result.getRosterStatusList().add(value);
 			}
 		}
+		LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), demo.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,getLoggedInInfo().getIp());
 		return result;
 	}
 
@@ -318,6 +321,8 @@ public class DemographicService extends AbstractServiceImpl {
 	public DemographicTo1 createDemographicData(DemographicTo1 data) {
 		Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
 		demographicManager.createDemographic(getLoggedInInfo(), demographic, data.getAdmissionProgramId());
+		
+		LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,getLoggedInInfo().getIp());
 	    return demoConverter.getAsTransferObject(getLoggedInInfo(), demographic);
 	}
 
@@ -355,6 +360,7 @@ public class DemographicService extends AbstractServiceImpl {
 		Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(),data);
 	    demographicManager.updateDemographic(getLoggedInInfo(),demographic);
 	    
+		LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), demographic.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,getLoggedInInfo().getIp());
 	    return demoConverter.getAsTransferObject(getLoggedInInfo(),demographic);
 	}
 
@@ -376,6 +382,7 @@ public class DemographicService extends AbstractServiceImpl {
     	}
     	
 		demographicManager.deleteDemographic(getLoggedInInfo(),demo);
+		LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), demo.getDemographicNo(), LogConst.ACTION_DELETE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,getLoggedInInfo().getIp());
 	    return result;
 	}
 

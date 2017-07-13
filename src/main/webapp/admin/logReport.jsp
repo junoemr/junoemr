@@ -161,8 +161,11 @@ label{margin-top:6px;margin-bottom:0px;}
 			<div class="span4">
 			<label>Content Type:</label>
 			<select name="content" >
-				<option value="admin">Admin</option>
+				<option value="all">All</option>
 				<option value="login">Log in</option>
+				<option value="cme_notes">Encounter Note</option>
+				<option value="demographic">Demographic</option>
+				<option value="document">Document</option>
 			</select>
 			</div>
 		
@@ -202,7 +205,10 @@ label{margin-top:6px;margin-bottom:0px;}
 	  String action = request.getParameter("submit");
 	  String content = request.getParameter("content");
 	  if(content.equals("login")) content = LogConst.CON_LOGIN;
-	  if(content.equals("admin")) content = "%";
+	  if(content.equals("document")) content = LogConst.CON_DOCUMENT;
+	  if(content.equals("demographic")) content = LogConst.CON_DEMOGRAPHIC;
+	  if(content.equals("cme_notes")) content = LogConst.CON_CME_NOTE;
+	  if(content.equals("all")) content = "%";
 	  
 	  String sDate = request.getParameter("startDate");
 	  String eDate = request.getParameter("endDate");
