@@ -263,6 +263,9 @@ public final class MessageUploader {
 					orderByLength = true;
 					search = "provider_no";
 				}
+				else if (type.equals("CLS")) {
+					search = "hso_no";
+				}
 				providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
 			}
 			retVal = h.audit();
