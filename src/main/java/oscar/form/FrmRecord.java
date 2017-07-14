@@ -88,31 +88,31 @@ public abstract class FrmRecord {
 		
 		this.setDemographic(loggedInInfo, demographicNo);
 		
-        date = UtilDateUtilities.calcDate(demographic.getYearOfBirth(), demographic.getMonthOfBirth(), demographic.getDateOfBirth());
+		date = UtilDateUtilities.calcDate(demographic.getYearOfBirth(), demographic.getMonthOfBirth(), demographic.getDateOfBirth());
 		dateFormat = "dd/MM/yyyy";
-        demoProps.setProperty("demographic_no", demographic.getDemographicNo().toString());
+		demoProps.setProperty("demographic_no", demographic.getDemographicNo().toString());
 
-        demoProps.setProperty("c_surname", StringUtils.trimToEmpty(demographic.getLastName()));
-        demoProps.setProperty("c_givenName", StringUtils.trimToEmpty(demographic.getFirstName()));
-        demoProps.setProperty("c_address", StringUtils.trimToEmpty(demographic.getAddress()));
-        demoProps.setProperty("c_city", StringUtils.trimToEmpty(demographic.getCity()));
-        demoProps.setProperty("c_province", StringUtils.trimToEmpty(demographic.getProvince()));
-        demoProps.setProperty("c_postal", StringUtils.trimToEmpty(demographic.getPostal()));
-        demoProps.setProperty("c_phn", StringUtils.trimToEmpty(demographic.getHin()));
-        demoProps.setProperty("pg1_dateOfBirth", UtilDateUtilities.DateToString(date, dateFormat));
-        demoProps.setProperty("pg1_age", String.valueOf(UtilDateUtilities.getNumYears(date, GregorianCalendar.getInstance().getTime())));
-        demoProps.setProperty("c_phone", StringUtils.trimToEmpty(demographic.getPhone()));
-        demoProps.setProperty("c_phoneAlt1", StringUtils.trimToEmpty(demographic.getPhone2()));
-        
-        String rd = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(), "rd");
-        rd = rd != null ? rd : "";
-        demoProps.setProperty("pg1_famPhy", rd);
+		demoProps.setProperty("c_surname", StringUtils.trimToEmpty(demographic.getLastName()));
+		demoProps.setProperty("c_givenName", StringUtils.trimToEmpty(demographic.getFirstName()));
+		demoProps.setProperty("c_address", StringUtils.trimToEmpty(demographic.getAddress()));
+		demoProps.setProperty("c_city", StringUtils.trimToEmpty(demographic.getCity()));
+		demoProps.setProperty("c_province", StringUtils.trimToEmpty(demographic.getProvince()));
+		demoProps.setProperty("c_postal", StringUtils.trimToEmpty(demographic.getPostal()));
+		demoProps.setProperty("c_phn", StringUtils.trimToEmpty(demographic.getHin()));
+		demoProps.setProperty("pg1_dateOfBirth", UtilDateUtilities.DateToString(date, dateFormat));
+		demoProps.setProperty("pg1_age", String.valueOf(UtilDateUtilities.getNumYears(date, GregorianCalendar.getInstance().getTime())));
+		demoProps.setProperty("c_phone", StringUtils.trimToEmpty(demographic.getPhone()));
+		demoProps.setProperty("c_phoneAlt1", StringUtils.trimToEmpty(demographic.getPhone2()));
+		
+		String rd = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(), "rd");
+		rd = rd != null ? rd : "";
+		demoProps.setProperty("pg1_famPhy", rd);
 
-        Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographicNo);
-        String cell = demoExt.get("demo_cell");
-        if ( cell != null ){
-        	demoProps.setProperty("c_phoneAlt2",cell );
-        }
+		Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographicNo);
+		String cell = demoExt.get("demo_cell");
+		if ( cell != null ){
+			demoProps.setProperty("c_phoneAlt2",cell );
+		}
 	}
 	
 	protected void setDemoCurProperties(LoggedInInfo loggedInInfo, int demographicNo, Properties demoProps) {
