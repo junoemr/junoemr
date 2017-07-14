@@ -966,9 +966,9 @@
 			</div>
 			
 			<button id="save-button" type="button" 
-				class="btn btn-success {{detailsCtrl.needToSave()}}" 
+				class="btn btn-success" 
 				ng-click="detailsCtrl.validateHCSave(true)" 
-				ng-disabled="detailsCtrl.page.dataChanged<1">
+				ng-disabled="detailsCtrl.page.dataChanged === false">
 				Save
 			</button>
 		</div>
