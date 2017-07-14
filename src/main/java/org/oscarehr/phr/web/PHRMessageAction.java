@@ -410,6 +410,6 @@ public class PHRMessageAction extends DispatchAction {
 		if (ConformanceTestHelper.enableConformanceOnlyTestFeatures) {
 			AddEditDocumentAction.storeDocumentInDatabase(file, Integer.parseInt(doc_no));
 		}
-		LogAction.addLog(loggedInInfo.getLoggedInProviderNo(), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no);
+		LogAction.addLog(loggedInInfo.getLoggedInProviderNo(), LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, doc_no);
 	}
 }

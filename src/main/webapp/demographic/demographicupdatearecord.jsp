@@ -117,7 +117,9 @@
 	if(demographic == null) {
 	 //we have a problem!
 	}
-	
+
+	String hin = request.getParameter("hin").replaceAll("[^0-9a-zA-Z]", "");
+
 	demographic.setLastName(request.getParameter("last_name").trim());
 	demographic.setFirstName(request.getParameter("first_name").trim());
 	demographic.setAddress(request.getParameter("address"));
@@ -131,7 +133,7 @@
 	demographic.setYearOfBirth(request.getParameter("year_of_birth"));
 	demographic.setMonthOfBirth(request.getParameter("month_of_birth")!=null && request.getParameter("month_of_birth").length()==1 ? "0"+request.getParameter("month_of_birth") : request.getParameter("month_of_birth"));
 	demographic.setDateOfBirth(request.getParameter("date_of_birth")!=null && request.getParameter("date_of_birth").length()==1 ? "0"+request.getParameter("date_of_birth") : request.getParameter("date_of_birth"));
-	demographic.setHin(request.getParameter("hin"));
+	demographic.setHin(hin);
 	demographic.setVer(request.getParameter("ver"));
 	demographic.setRosterStatus(request.getParameter("roster_status"));
 	demographic.setPatientStatus(request.getParameter("patient_status"));
@@ -434,7 +436,7 @@
 
     String ip = request.getRemoteAddr();
     String user = (String)session.getAttribute("user");
-    LogAction.addLog((String) session.getAttribute("user"), LogConst.UPDATE, LogConst.CON_DEMOGRAPHIC,  request.getParameter("demographic_no") , request.getRemoteAddr(),request.getParameter("demographic_no"));
+    LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC,  request.getParameter("demographic_no") , request.getRemoteAddr(),request.getParameter("demographic_no"));
 %>
 <p></p>
 

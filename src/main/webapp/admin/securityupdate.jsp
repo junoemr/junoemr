@@ -107,7 +107,7 @@
 
 
   if (rowsAffected ==1) {
-      LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, LogConst.CON_SECURITY,
+      LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_SECURITY,
     		request.getParameter("security_no") + "->" + request.getParameter("user_name"), request.getRemoteAddr());
 %>
 <p>

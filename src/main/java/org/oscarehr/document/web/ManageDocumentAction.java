@@ -130,12 +130,12 @@ public class ManageDocumentAction extends DispatchAction {
 		String documentDescription = request.getParameter("documentDescription");// :test2<
 		String documentId = request.getParameter("documentId");// :29<
 		String docType = request.getParameter("docType");// :consult<
+		String providerId = (String) request.getSession().getAttribute("user");
+		Integer demographicNo = Integer.parseInt(request.getParameter("demog"));
 
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
         	throw new SecurityException("missing required security object (_edoc)");
         }
-		
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
 
 		String demog = request.getParameter("demog");
 
@@ -163,7 +163,7 @@ public class ManageDocumentAction extends DispatchAction {
 		List<PatientLabRouting>patientLabRoutingList = patientLabRoutingDao.findByLabNoAndLabType(Integer.parseInt(documentId), docType);
 		if( patientLabRoutingList == null || patientLabRoutingList.size() == 0 ) {
 			PatientLabRouting patientLabRouting = new PatientLabRouting();
-			patientLabRouting.setDemographicNo(Integer.parseInt(demog));
+			patientLabRouting.setDemographicNo(demographicNo);
 			patientLabRouting.setLabNo(Integer.parseInt(documentId));
 			patientLabRouting.setLabType("DOC");
 			patientLabRoutingDao.persist(patientLabRouting);
@@ -182,6 +182,7 @@ public class ManageDocumentAction extends DispatchAction {
 			}
 	
 			documentDao.merge(d);
+			LogAction.addLogEntry(providerId, demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, documentId, request.getRemoteAddr());
 		}
 		
 		try {
@@ -189,7 +190,7 @@ public class ManageDocumentAction extends DispatchAction {
 			CtlDocument ctlDocument = ctlDocumentDao.getCtrlDocument(Integer.parseInt(documentId));
 			if(ctlDocument != null) {
 				
-				ctlDocument.getId().setModuleId(Integer.parseInt(demog));
+				ctlDocument.getId().setModuleId(demographicNo);
 				ctlDocumentDao.merge(ctlDocument);
 				// save a document created note
 				if (ctlDocument.isDemographicDocument()) {
@@ -287,13 +288,12 @@ public class ManageDocumentAction extends DispatchAction {
 		String documentDescription = request.getParameter("documentDescription");// :test2<
 		String documentId = request.getParameter("documentId");// :29<
 		String docType = request.getParameter("docType");// :consult<
+		String providerId = (String) request.getSession().getAttribute("user");
+		Integer demographicNo = Integer.parseInt(request.getParameter("demog"));
 
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
         	throw new SecurityException("missing required security object (_edoc)");
         }
-		
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, documentId, request.getRemoteAddr());
-
 		String demog = request.getParameter("demog");
 
 		String[] flagproviders = request.getParameterValues("flagproviders");
@@ -323,13 +323,14 @@ public class ManageDocumentAction extends DispatchAction {
 			}
 	
 			documentDao.merge(d);
+			LogAction.addLogEntry(providerId, demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, documentId, request.getRemoteAddr());
 		}
 
 		try {
 
 			CtlDocument ctlDocument = ctlDocumentDao.getCtrlDocument(Integer.parseInt(documentId));
 			if(ctlDocument != null) {
-				ctlDocument.getId().setModuleId(Integer.parseInt(demog));
+				ctlDocument.getId().setModuleId(demographicNo);
 				ctlDocumentDao.merge(ctlDocument);
 				// save a document created note
 				if (ctlDocument.isDemographicDocument()) {
@@ -619,7 +620,7 @@ public class ManageDocumentAction extends DispatchAction {
 			String doc_no = request.getParameter("doc_no");
 			log.debug("Document No :" + doc_no);
 
-			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
 			Document d = documentDao.getDocument(doc_no);
 			log.debug("Document Name :" + d.getDocfilename());
@@ -672,7 +673,7 @@ public class ManageDocumentAction extends DispatchAction {
 			}
 			Integer pn = Integer.parseInt(pageNum);
 			log.debug("Document No :" + doc_no);
-			LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
 			Document d = documentDao.getDocument(doc_no);
 			log.debug("Document Name :" + d.getDocfilename());
@@ -731,7 +732,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String doc_no = request.getParameter("doc_no");
 		log.debug("Document No :" + doc_no);
 
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+		LogAction.addLogEntry((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
 		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 		File documentDir = new File(docdownload);
@@ -851,11 +852,8 @@ public class ManageDocumentAction extends DispatchAction {
 		// local document
 		if (remoteFacilityId == null) {
 			CtlDocument ctld = ctlDocumentDao.getCtrlDocument(Integer.parseInt(doc_no));
-			if (ctld.isDemographicDocument()) {
-				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr(), "" + ctld.getId().getModuleId());
-			} else {
-				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
-			}
+			Integer demographicNo = ctld.isDemographicDocument() ? ctld.getId().getModuleId() : null;
+			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demographicNo, LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
 			String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 
@@ -1036,6 +1034,8 @@ public class ManageDocumentAction extends DispatchAction {
         	throw new SecurityException("missing required security object (_edoc)");
         }
         
+        Integer demographicNo = demographic_no != null ? Integer.parseInt(demographic_no) : null;
+        
         String savePath = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
         if (!savePath.endsWith(File.separator)) {
             savePath += File.separator;
@@ -1082,8 +1082,6 @@ public class ManageDocumentAction extends DispatchAction {
             }
             newDoc.setNumberOfPages(numberOfPages);
             doc_no = EDocUtil.addDocumentSQL(newDoc);
-            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
-
 
             if (flagproviders != null && flagproviders.length > 0) { 
                 try {
@@ -1121,6 +1119,8 @@ public class ManageDocumentAction extends DispatchAction {
                 MiscUtils.getLogger().error("Error", e);
             }
         }
+        String logStatus = success ? LogConst.STATUS_SUCCESS : LogConst.STATUS_FAILURE;
+        LogAction.addLogEntry(user, demographicNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, logStatus, doc_no, request.getRemoteAddr(), fileName);
 
         return (mapping.findForward("nextIncomingDoc"));
     }

@@ -107,7 +107,7 @@
                 DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
                 Demographic demographic = demographicDao.getDemographic(demographicID);  
 				demoName = demographic.getLastName()+","+demographic.getFirstName();
-				LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_DOCUMENT, documentNo, request.getRemoteAddr(),demographicID);
+				LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, documentNo, request.getRemoteAddr(),demographicID);
             }
             
             String docId = curdoc.getDocId();

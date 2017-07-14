@@ -345,16 +345,15 @@ public class InboxResultsDao {
 			}
 
 			sql += "LEFT JOIN providerLabRouting proLR_filter ON ("
-				+ "  proLR_filter.lab_type = 'HL7' "
-				+ "  AND proLR.lab_no = proLR_filter.lab_no "
+				+ "  proLR.lab_no = proLR_filter.lab_no "
 				+ "  AND ( "
-				+ "    proLR.provider_no > proLR_filter.provider_no OR ( "
-				+ "      proLR.provider_no = proLR_filter.provider_no AND proLR.id < proLR_filter.id))) "
+				+ "    proLR.timestamp < proLR_filter.timestamp OR ( "
+				+ "      proLR.timestamp = proLR_filter.timestamp AND proLR.id < proLR_filter.id))) "
 				+ "LEFT JOIN patientLabRouting patLR ON ( proLR.lab_type = patLR.lab_type AND proLR.lab_no = patLR.lab_no ) "
 				+ "LEFT JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no AND doc.status <> 'D' ) "
 				+ "LEFT JOIN provider creator ON ( doc.doccreator = creator.provider_no ) "
-				+ "LEFT JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' ) "
-				+ "LEFT JOIN demographic d2 ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id > 0 AND cdoc.module_id = d2.demographic_no ) "
+				+ "LEFT JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' AND cdoc.module_id > 0) "
+				+ "LEFT JOIN demographic d2 ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id = d2.demographic_no ) "
 				
 				+ "LEFT JOIN hl7TextInfo lab ON ( proLR.lab_type = 'HL7' AND lab.lab_no = proLR.lab_no ) "
 				+ "LEFT JOIN hl7TextInfo lab_filter ON ( "
@@ -366,7 +365,8 @@ public class InboxResultsDao {
 				+ "WHERE proLR.lab_type IN ('DOC', 'HL7')"
 				+ "AND proLR_filter.id IS NULL "
 				+ "AND lab_filter.id IS NULL "
-				+ "AND (doc.document_no IS NOT NULL OR lab.id IS NOT NULL) ";
+				+ "AND (doc.document_no IS NOT NULL OR lab.id IS NOT NULL) "
+				+ "AND proLR.status != 'X'";
 				
 				//+ "AND doc.status <> 'D' ";
 			

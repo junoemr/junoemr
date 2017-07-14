@@ -83,7 +83,6 @@ public final class ShelterSelectionAction extends DispatchAction {
              LookupCodeValue shelter=lookupManager.GetLookupCode("SHL",String.valueOf(shelterId));
              request.getSession(true).setAttribute(KeyConstants.SESSION_KEY_SHELTERID , shelterId);
              request.getSession(true).setAttribute(KeyConstants.SESSION_KEY_SHELTER, shelter);             
-            // LogAction.addLog(strAuth[0], LogConst.LOGIN, LogConst.CON_LOGIN, "shelterId="+shelterId, ip);
          }
          else {
              request.getSession(true).setAttribute(KeyConstants.SESSION_KEY_SHELTERID, new Integer(0));
@@ -113,7 +112,7 @@ public final class ShelterSelectionAction extends DispatchAction {
         SecurityManager secManager = userAccessManager.getUserSecurityManager(providerNo,shelterId,lookupManager);
         request.getSession(true).setAttribute(KeyConstants.SESSION_KEY_SECURITY_MANAGER, secManager);
         String ip = request.getRemoteAddr();
-        LogAction.addLog(providerNo, LogConst.CON_LOGIN, LogConst.SHELTER_SELECTION, shelterId.toString(), ip);
+        LogAction.addLogEntry(providerNo, LogConst.ACTION_LOGIN, LogConst.CON_SHELTER_SELECTION, LogConst.STATUS_SUCCESS, shelterId.toString(), ip);
         
         return mapping.findForward("home");
     }

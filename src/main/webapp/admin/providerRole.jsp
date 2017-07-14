@@ -160,7 +160,7 @@ if (request.getParameter("buttonUpdate") != null && request.getParameter("button
 			recycleBin.setTableContent("<provider_no>" + number + "</provider_no>" + "<role_name>" + roleOld + "</role_name>"  + "<role_id>" + roleId + "</role_id>");
 			recycleBinDao.persist(recycleBin);
 
-			LogAction.addLog(curUser_no, LogConst.UPDATE, LogConst.CON_ROLE, number +"|"+ roleOld +">"+ roleNew, ip);
+			LogAction.addLog(curUser_no, LogConst.ACTION_UPDATE, LogConst.CON_ROLE, number +"|"+ roleOld +">"+ roleNew, ip);
 
 			if( newCaseManagement ) {
                 ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
@@ -193,7 +193,7 @@ if (request.getParameter("submit") != null && request.getParameter("submit").equ
 	    secUserRole.setActiveyn(1);
 	    secUserRoleDao.save(secUserRole);
 	    msg = "Role " + roleNew + " is added. (" + number + ")";
-	    LogAction.addLog(curUser_no, LogConst.ADD, LogConst.CON_ROLE, number +"|"+ roleNew, ip);
+	    LogAction.addLog(curUser_no, LogConst.ACTION_ADD, LogConst.CON_ROLE, number +"|"+ roleNew, ip);
 	    if( newCaseManagement ) {
             ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
             if(programProvider == null) {
@@ -230,7 +230,7 @@ if (request.getParameter("submit") != null && request.getParameter("submit").equ
 		recycleBin.setTableContent("<provider_no>" + number + "</provider_no>" + "<role_name>" + roleOld + "</role_name>");
 		recycleBinDao.persist(recycleBin);
 
-		LogAction.addLog(curUser_no, LogConst.DELETE, LogConst.CON_ROLE, number +"|"+ roleOld, ip);
+		LogAction.addLog(curUser_no, LogConst.ACTION_DELETE, LogConst.CON_ROLE, number +"|"+ roleOld, ip);
 
         if( newCaseManagement ) {
             ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));

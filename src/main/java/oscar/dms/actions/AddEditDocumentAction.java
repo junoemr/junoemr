@@ -132,7 +132,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		}
 		newDoc.setNumberOfPages(numberOfPages);
 		String doc_no = EDocUtil.addDocumentSQL(newDoc);
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+		LogAction.addLogEntry(user, null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr(), fileName);
 		String providerId = request.getParameter("provider");
 
 		if (providerId != null) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
@@ -342,10 +342,14 @@ public class AddEditDocumentAction extends DispatchAction {
 				if(ConformanceTestHelper.enableConformanceOnlyTestFeatures){
 					storeDocumentInDatabase(file, Integer.parseInt(doc_no));
 				}
-				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
 				// add note if document is added under a patient
 				String module = fm.getFunction().trim();
 				String moduleId = fm.getFunctionId().trim();
+				
+				Integer demoNo = module.equals("demographic") ? Integer.parseInt(moduleId) : null;
+				LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demoNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr(), fileName1);
+
+				
 				if (module.equals("demographic")) {// doc is uploaded under a patient,moduleId become demo no.
 	
 					Date now = EDocUtil.getDmsDateTimeAsDate();
@@ -445,16 +449,14 @@ public class AddEditDocumentAction extends DispatchAction {
 				}
 				String reviewerId = filled(fm.getReviewerId()) ? fm.getReviewerId() : "";
 				String reviewDateTime = filled(fm.getReviewDateTime()) ? fm.getReviewDateTime() : "";
+				Integer demographicNo = "demographic".equals(fm.getFunction()) ? Integer.parseInt(fm.getFunctionId()) : null;
 	
 				if (!filled(reviewerId) && fm.getReviewDoc()) {
 					reviewerId = (String) request.getSession().getAttribute("user");
 					reviewDateTime = UtilDateUtilities.DateToString(new Date(), EDocUtil.REVIEW_DATETIME_FORMAT);
-					if (fm.getFunction() != null && fm.getFunction().equals("demographic")) {
-						LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.REVIEWED, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr(), fm.getFunctionId());
-					} else {
-						LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.REVIEWED, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr());
-	
-					}
+
+					LogAction.addLogEntry(reviewerId, demographicNo, LogConst.ACTION_REVIEWED, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+							fm.getMode(), request.getRemoteAddr(), fileName);
 				}
 				EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), reviewerId, reviewDateTime, fm.getFunction(), fm.getFunctionId());
 				newDoc.setSourceFacility(fm.getSourceFacility());
@@ -487,12 +489,8 @@ public class AddEditDocumentAction extends DispatchAction {
 				}
 				EDocUtil.editDocumentSQL(newDoc, fm.getReviewDoc());
 	
-				if (fm.getFunction() != null && fm.getFunction().equals("demographic")) {
-					LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr(), fm.getFunctionId());
-				} else {
-					LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.UPDATE, LogConst.CON_DOCUMENT, fm.getMode(), request.getRemoteAddr());
-	
-				}
+				LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+						fm.getMode(), request.getRemoteAddr(), fileName);
 			}
 		} 
 		catch (Exception e) {

@@ -70,7 +70,7 @@ public class DeleteDemographicRelationshipAction extends Action {
       demo.deleteDemographicRelationship(idRel);
 
       String ip = request.getRemoteAddr();
-      LogAction.addLog( (String) request.getSession().getAttribute("user"), LogConst.DELETE, LogConst.CON_DEMOGRAPHIC_RELATION, id, ip);
+      LogAction.addLog( (String) request.getSession().getAttribute("user"), LogConst.ACTION_DELETE, LogConst.CON_DEMOGRAPHIC_RELATION, id, ip);
       request.setAttribute("demo", origDemo);
       return mapping.findForward("success");
    }

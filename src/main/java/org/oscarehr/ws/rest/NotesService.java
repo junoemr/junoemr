@@ -92,6 +92,8 @@ import org.springframework.stereotype.Component;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import oscar.OscarProperties;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
 
 
@@ -269,25 +271,7 @@ public class NotesService extends AbstractServiceImpl {
 		}catch(Exception e){
 			noteId = null;
 		}
-		
-		/* NOT SURE HOW TO HANDLE LOCKS YET!!
-		//compare locks and see if they are the same
-		CasemgmtNoteLock casemgmtNoteLockSession = (CasemgmtNoteLock)request.getSession().getAttribute("casemgmtNoteLock"+demographicNo);
-		try {
-			//if other window has acquired lock don't save
-			CasemgmtNoteLock casemgmtNoteLock = casemgmtNoteLockDao.find(casemgmtNoteLockSession.getId());
-			if( !casemgmtNoteLock.getSessionId().equals(casemgmtNoteLockSession.getSessionId()) ) {
-				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-				return null;
-			}
-		}
-		catch(Exception e ) {
-			//Exception thrown if other window has saved and exited so lock is gone
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return null;
 
-		}		
-		*/
 		if (noteStr == null || noteStr.length() == 0) {
 			return null;
 		}		
@@ -332,8 +316,6 @@ public class NotesService extends AbstractServiceImpl {
 	public NoteTo1 saveNote(@PathParam("demographicNo") Integer demographicNo, NoteTo1 note) throws Exception {
 		logger.debug("saveNote "+note);
 		
-		//TODO -- note locking
-		
 		String noteTxt = StringUtils.trimToNull(note.getNote());
 		// if there is not a note to save, exit immediately
 		if (noteTxt == null || noteTxt.equals("")) {
@@ -360,9 +342,15 @@ public class NotesService extends AbstractServiceImpl {
 		caseMangementNote.setNote(noteTxt);
 		logger.debug("enc TYPE " +note.getEncounterType());
 		caseMangementNote.setEncounter_type(note.getEncounterType());
+<<<<<<< HEAD
 		// If uuid is not null and is not an empty string this note already exists and we must keep its uuid
 		if(uuid != null && !uuid.trim().equals(""))
 		{
+=======
+		
+		// set uuid
+		if(uuid != null && !uuid.trim().equals("")){
+>>>>>>> RELEASE_15_BETA
 			caseMangementNote.setUuid(uuid);
 		}
 		
@@ -427,7 +415,10 @@ public class NotesService extends AbstractServiceImpl {
 			} 
 		}
 		
+<<<<<<< HEAD
 		// note.setIssues(new HashSet<CaseManagementIssue>(issuelist));
+=======
+>>>>>>> RELEASE_15_BETA
 		caseMangementNote.setIssues(new HashSet<CaseManagementIssue>(issuelist));
 
 		// update appointment and add verify message to note if verified
@@ -457,6 +448,10 @@ public class NotesService extends AbstractServiceImpl {
 		note.setObservationDate(caseMangementNote.getObservation_date());
 		logger.debug("note should return like this " + note.getNote() );
 		logger.info("NOTE ID #"+caseMangementNote.getId()+" SAVED");
+		
+		String saveStatus = (caseMangementNote.getId() != null) ? LogConst.STATUS_SUCCESS: LogConst.STATUS_FAILURE;
+		LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_CME_NOTE, saveStatus, 
+				String.valueOf(caseMangementNote.getId()), getLoggedInInfo().getIp(),caseMangementNote.getAuditString());
 		return note;
 	}
 	
@@ -889,6 +884,9 @@ public class NotesService extends AbstractServiceImpl {
 		noteIssue.setEncounterNote(note);	
 		noteIssue.setGroupNoteExt(noteExt);
 		
+		String saveStatus = (caseMangementNote.getId() != null) ? LogConst.STATUS_SUCCESS: LogConst.STATUS_FAILURE;
+		LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_CME_NOTE, saveStatus, 
+				String.valueOf(caseMangementNote.getId()), getLoggedInInfo().getIp(), caseMangementNote.getAuditString());
 		return noteIssue;
 	}
 	
@@ -1140,25 +1138,6 @@ public class NotesService extends AbstractServiceImpl {
 
 //		boolean passwd = caseManagementMgr.getEnabled();
 //		String chain = request.getParameter("chain");
-
-		
-
-//		LogAction.addLog((String) session.getAttribute("user"), LogConst.EDIT, LogConst.CON_CME_NOTE, String.valueOf(note.getId()), request.getRemoteAddr(), demono, note.getAuditString());
-
-		//check to see if someone else is editing note in this chart
-//		String ipAddress = request.getRemoteAddr();
-//		CasemgmtNoteLock casemgmtNoteLock;
-//		Long note_id = note.getId() != null && note.getId() >= 0 ? note.getId() : 0L;
-//		casemgmtNoteLock = isNoteEdited(note_id, demographicNo, providerNo, ipAddress, request.getRequestedSessionId());
-		
-//		if( casemgmtNoteLock.isLocked() ) {
-//			note = makeNewNote(providerNo, demono, request);
-//			cform.setCaseNote(note);
-//		}
-		
-//		session.setAttribute("casemgmtNoteLock"+demono, casemgmtNoteLock);		
-		
-		
 
 		/*
 		 ///Is it a specific thats being requested to edit
