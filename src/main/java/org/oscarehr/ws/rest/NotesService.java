@@ -342,15 +342,9 @@ public class NotesService extends AbstractServiceImpl {
 		caseMangementNote.setNote(noteTxt);
 		logger.debug("enc TYPE " +note.getEncounterType());
 		caseMangementNote.setEncounter_type(note.getEncounterType());
-<<<<<<< HEAD
 		// If uuid is not null and is not an empty string this note already exists and we must keep its uuid
 		if(uuid != null && !uuid.trim().equals(""))
 		{
-=======
-		
-		// set uuid
-		if(uuid != null && !uuid.trim().equals("")){
->>>>>>> RELEASE_15_BETA
 			caseMangementNote.setUuid(uuid);
 		}
 		
