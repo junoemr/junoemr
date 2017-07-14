@@ -28,6 +28,7 @@ package org.oscarehr.common.model;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,6 +36,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.apache.commons.lang.StringUtils;
 
 
 @Entity
@@ -107,6 +110,8 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
     /* -- Province specific -- */
 	@Column(name = "alberta_tak_no")
 	private String albertaTakNo = null;
+	@Column(name = "alberta_e_delivery_ids")
+	private String albertaEDeliveryIds = null;
 
 	public ProviderData() {
 	}
@@ -319,6 +324,15 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	}
 	public void setAlbertaTakNo(String takNo) {
 		albertaTakNo = takNo;
+	}
+	public String getAlbertaEDeliveryIds() {
+		return albertaEDeliveryIds;
+	}
+	public void setAlbertaEDeliveryIds(String albertaEDeliveryIds) {
+		this.albertaEDeliveryIds = StringUtils.trimToNull(albertaEDeliveryIds);
+	}
+	public void setAlbertaEDeliveryIds(List<String> idList) {
+		setAlbertaEDeliveryIds(StringUtils.join(idList, ","));
 	}
         
 	/* -- Comparators -- */

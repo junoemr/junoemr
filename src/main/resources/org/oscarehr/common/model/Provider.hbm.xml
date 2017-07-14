@@ -39,5 +39,6 @@
 		<property name="lastUpdateDate" type="timestamp" />
         <property name="supervisor" type="string" />
         <property column="alberta_tak_no" name="AlbertaTakNo" not-null="false" type="string" />
+        <property column="alberta_e_delivery_ids" name="AlbertaEDeliveryIds" not-null="false" type="string" />
 	</class>
 </hibernate-mapping>

@@ -186,6 +186,11 @@ if(!authed) {
           if(supervisor.equalsIgnoreCase("null")) {
         	  supervisor = null;
           }
+          String albertaEDeliveryIds = StringUtils.trimToNull(request.getParameter("alberta_e_delivery_ids"));
+          if(albertaEDeliveryIds != null) {
+          	albertaEDeliveryIds = albertaEDeliveryIds.replaceAll("[^0-9.,]", ""); // strip non-numbers
+          }
+          p.setAlbertaEDeliveryIds(albertaEDeliveryIds);
           p.setSupervisor(StringUtils.trimToNull(supervisor));
 		  
 		  providerDao.updateProvider(p);

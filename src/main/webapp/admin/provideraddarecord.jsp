@@ -117,6 +117,12 @@ p.setLastUpdateUser((String)session.getAttribute("user"));
 p.setLastUpdateDate(new java.util.Date());
 p.setSupervisor(StringUtils.trimToNull(request.getParameter("supervisor")));
 
+String albertaEDeliveryIds = StringUtils.trimToNull(request.getParameter("alberta_e_delivery_ids"));
+if(albertaEDeliveryIds != null) {
+	albertaEDeliveryIds = albertaEDeliveryIds.replaceAll("[^0-9.,]", ""); // strip non-numbers
+}
+p.setAlbertaEDeliveryIds(albertaEDeliveryIds);
+
 //multi-office provide id formalize check, can be turn off on properties multioffice.formalize.provider.id
 boolean isProviderFormalize = true;
 String  errMsgProviderFormalize = "admin.provideraddrecord.msgAdditionFailure";

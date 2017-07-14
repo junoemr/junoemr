@@ -382,8 +382,14 @@ for (int i=0; i<sites.size(); i++) {
 				value="<%= provider.getHsoNo()==null ? "" : provider.getHsoNo() %>" maxlength="10"></td>
 		</tr>
 		<%
-			if (OscarProperties.getInstance().getProperty("hctype").equals("AB")) {
+			if (OscarProperties.getInstance().getProperty("instance_type").equals("AB")) {
 		%>
+		<tr>
+			<td align="right"><bean:message key="admin.provider.formAlbertaEDeliveryIds" />:
+			</td>
+			<td><input type="text" name="alberta_e_delivery_ids"
+			value="<%= provider.getAlbertaEDeliveryIds()==null ? "" : provider.getAlbertaEDeliveryIds() %>"></td>
+		</tr>
 		<tr>
 			<td align="right"><bean:message key="admin.provider.formAlbertaTakNo" />:
 			</td>

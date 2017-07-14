@@ -27,6 +27,9 @@ package org.oscarehr.common.model;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 /**
  * This is the object class that relates to the provider table. Any customizations belong here.
  */
@@ -71,6 +74,7 @@ public class Provider implements Serializable, Comparable<Provider>{
     private String supervisor;
     /* -- Province specific -- */
 	private String albertaTakNo;
+	private String albertaEDeliveryIds;
 
 	public String getPractitionerNo() {
 		return practitionerNo;
@@ -353,6 +357,19 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public void setAlbertaTakNo(String takNo) {
 		albertaTakNo = takNo;
 	}
+
+	public String getAlbertaEDeliveryIds() {
+		return albertaEDeliveryIds;
+	}
+
+	public void setAlbertaEDeliveryIds(String albertaEDeliveryIds) {
+		this.albertaEDeliveryIds = StringUtils.trimToNull(albertaEDeliveryIds);
+	}
+	public void setAlbertaEDeliveryIds(List<String> idList) {
+		setAlbertaEDeliveryIds(StringUtils.join(idList, ","));
+	}
+	
+	/* -- other methods --*/
 
 	public ComparatorName ComparatorName() {
 		return new ComparatorName();
