@@ -415,10 +415,6 @@ public class NotesService extends AbstractServiceImpl {
 			} 
 		}
 		
-<<<<<<< HEAD
-		// note.setIssues(new HashSet<CaseManagementIssue>(issuelist));
-=======
->>>>>>> RELEASE_15_BETA
 		caseMangementNote.setIssues(new HashSet<CaseManagementIssue>(issuelist));
 
 		// update appointment and add verify message to note if verified
