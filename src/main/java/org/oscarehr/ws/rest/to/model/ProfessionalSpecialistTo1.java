@@ -23,8 +23,11 @@
 
 package org.oscarehr.ws.rest.to.model;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import java.io.Serializable;
 
+@JsonIgnoreProperties(ignoreUnknown=true) // Ignore properties that are not defined in this class
 public class ProfessionalSpecialistTo1 implements Serializable {
 
     private static final long serialVersionUID = 1L;

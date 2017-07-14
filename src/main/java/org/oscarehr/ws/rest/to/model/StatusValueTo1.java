@@ -25,9 +25,12 @@ package org.oscarehr.ws.rest.to.model;
 
 import java.io.Serializable;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown=true) // Ignore properties that are not defined in this class
 public class StatusValueTo1 implements Serializable {
 
 	private static final long serialVersionUID = 1L;

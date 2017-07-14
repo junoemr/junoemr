@@ -28,9 +28,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown=true) // Ignore properties that are not defined in this class
 public class DemographicTo1 implements Serializable {
 
 	private static final long serialVersionUID = 1L;
