@@ -176,19 +176,24 @@ public class DemographicExportAction4 extends Action {
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		logger.info("BEGIN DEMOGRAPHIC EXPORT ...");
+
 		String strEditable = oscarProperties.getProperty("ENABLE_EDIT_APPT_STATUS");
 
-		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_demographic", "r", null)) {
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+
+		if (!securityInfoManager
+				.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_demographic", "r", null)) {
 			throw new SecurityException("missing required security object (_demographic)");
 		}
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_demographicExport", "r", null)) {
+
+		if (!securityInfoManager
+				.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_demographicExport", "r", null)) {
 			throw new SecurityException("missing required security object (_demographicExport)");
 		}
-		
-		DemographicExportForm defrm = (DemographicExportForm)form;
+
+		DemographicExportForm defrm = (DemographicExportForm) form;
 		String demographicNo = defrm.getDemographicNo();
 		String setName = defrm.getPatientSet();
 		String pgpReady = defrm.getPgpReady();
@@ -209,18 +214,19 @@ public class DemographicExportAction4 extends Action {
 		boolean exCareElements = WebUtils.isChecked(request, "exCareElements");
 
 		List<String> list = new ArrayList<String>();
-		if (demographicNo==null) {
+		if (demographicNo == null) {
 			list = new DemographicSetManager().getDemographicSet(setName);
-		if (list.isEmpty()) {
-			Date asofDate = new Date();
-			RptDemographicReportForm frm = new RptDemographicReportForm ();
-			frm.setSavedQuery(setName);
-			RptDemographicQueryLoader demoL = new RptDemographicQueryLoader();
-			frm = demoL.queryLoader(frm);
-			frm.addDemoIfNotPresent();
-			frm.setAsofDate(UtilDateUtilities.DateToString(asofDate));
-			RptDemographicQueryBuilder demoQ = new RptDemographicQueryBuilder();
-			ArrayList<ArrayList<String>> list2 = demoQ.buildQuery(loggedInInfo, frm,UtilDateUtilities.DateToString(asofDate));
+			if (list.isEmpty()) {
+				Date asofDate = new Date();
+				RptDemographicReportForm frm = new RptDemographicReportForm();
+				frm.setSavedQuery(setName);
+				RptDemographicQueryLoader demoL = new RptDemographicQueryLoader();
+				frm = demoL.queryLoader(frm);
+				frm.addDemoIfNotPresent();
+				frm.setAsofDate(UtilDateUtilities.DateToString(asofDate));
+				RptDemographicQueryBuilder demoQ = new RptDemographicQueryBuilder();
+				ArrayList<ArrayList<String>> list2 = demoQ
+						.buildQuery(loggedInInfo, frm, UtilDateUtilities.DateToString(asofDate));
 			for (ArrayList<String> listDemo : list2) {
 				list.add(listDemo.get(0));
 			}
@@ -2220,139 +2226,141 @@ public class DemographicExportAction4 extends Action {
 }
 
 	File makeReadMe(ArrayList<File> fs) throws IOException {
-	File readMe = new File(fs.get(0).getParentFile(), "ReadMe.txt");
-	BufferedWriter out = new BufferedWriter(new FileWriter(readMe));
-	out.write("Physician Group					: ");
-	out.write(new ClinicData().getClinicName());
-	out.newLine();
-	out.write("CMS Vendor, Product & Version	  : ");
-	String vendor = oscarProperties.getProperty("Vendor_Product");
-	if (StringUtils.empty(vendor)) {
-		exportError.add("Error! Vendor_Product not defined in oscar.properties");
-	} else {
-		out.write(vendor);
-	}
-	out.newLine();
-	out.write("Application Support Contact		: ");
-	String support = oscarProperties.getProperty("Support_Contact");
-	if (StringUtils.empty(support)) {
-		exportError.add("Error! Support_Contact not defined in oscar.properties");
-	} else {
-		out.write(support);
-	}
-	out.newLine();
-	out.write("Date and Time stamp				: ");
-	out.write(UtilDateUtilities.getToday("yyyy-MM-dd hh:mm:ss aa"));
-	out.newLine();
-	out.write("Total patients files extracted	 : ");
-	out.write(String.valueOf(fs.size()));
-	out.newLine();
-	out.write("Number of errors				   : ");
-	out.write(String.valueOf(exportError.size()));
-	if (exportError.size()>0) out.write(" (See ExportEvent.log for detail)");
-	out.newLine();
-	out.write("Patient ID range				   : ");
-	out.write(getIDInExportFilename(fs.get(0).getName()));
-	out.write("-");
-	out.write(getIDInExportFilename(fs.get(fs.size()-1).getName()));
-	out.newLine();
-	out.close();
+		File readMe = new File(fs.get(0).getParentFile(), "ReadMe.txt");
+		BufferedWriter out = new BufferedWriter(new FileWriter(readMe));
+		out.write("Physician Group					: ");
+		out.write(new ClinicData().getClinicName());
+		out.newLine();
+		out.write("CMS Vendor, Product & Version	  : ");
+		String vendor = oscarProperties.getProperty("Vendor_Product");
+		if (StringUtils.empty(vendor)) {
+			exportError.add("Error! Vendor_Product not defined in oscar.properties");
+		}
+		else {
+			out.write(vendor);
+		}
+		out.newLine();
+		out.write("Application Support Contact		: ");
+		String support = oscarProperties.getProperty("Support_Contact");
+		if (StringUtils.empty(support)) {
+			exportError.add("Error! Support_Contact not defined in oscar.properties");
+		}
+		else {
+			out.write(support);
+		}
+		out.newLine();
+		out.write("Date and Time stamp				: ");
+		out.write(UtilDateUtilities.getToday("yyyy-MM-dd hh:mm:ss aa"));
+		out.newLine();
+		out.write("Total patients files extracted	 : ");
+		out.write(String.valueOf(fs.size()));
+		out.newLine();
+		out.write("Number of errors				   : ");
+		out.write(String.valueOf(exportError.size()));
+		if (exportError.size() > 0) out.write(" (See ExportEvent.log for detail)");
+		out.newLine();
+		out.write("Patient ID range				   : ");
+		out.write(getIDInExportFilename(fs.get(0).getName()));
+		out.write("-");
+		out.write(getIDInExportFilename(fs.get(fs.size() - 1).getName()));
+		out.newLine();
+		out.close();
 
-	return readMe;
+		return readMe;
 	}
 
 	File makeExportLog(File dir) throws IOException {
-			String[][] keyword = new String[2][16];
-			keyword[0][0] = PATIENTID;
-			keyword[1][0] = "ID";
-			keyword[0][1] = " "+PERSONALHISTORY;
-			keyword[1][1] = " History";
-			keyword[0][2] = " "+FAMILYHISTORY;
-			keyword[1][2] = " History";
-			keyword[0][3] = " "+PASTHEALTH;
-			keyword[1][3] = " Health";
-			keyword[0][4] = " "+PROBLEMLIST;
-			keyword[1][4] = " List";
-			keyword[0][5] = " "+RISKFACTOR;
-			keyword[1][5] = " Factor";
-			keyword[0][6] = " "+ALLERGY;
-			keyword[0][7] = " "+MEDICATION;
-			keyword[0][8] = " "+IMMUNIZATION;
-			keyword[0][9] = " "+LABS;
-			keyword[0][10] = " "+APPOINTMENT;
-			keyword[0][11] = " "+CLINICALNOTE;
-			keyword[1][11] = " Note";
-			keyword[0][12] = "	Report	";
-			keyword[1][12] = " "+REPORTTEXT;
-			keyword[1][13] = " "+REPORTBINARY;
-			keyword[0][14] = " "+CAREELEMENTS;
-			keyword[1][14] = " Elements";
-			keyword[0][15] = " "+ALERT;
+		String[][] keyword = new String[2][16];
+		keyword[0][0] = PATIENTID;
+		keyword[1][0] = "ID";
+		keyword[0][1] = " "+PERSONALHISTORY;
+		keyword[1][1] = " History";
+		keyword[0][2] = " "+FAMILYHISTORY;
+		keyword[1][2] = " History";
+		keyword[0][3] = " "+PASTHEALTH;
+		keyword[1][3] = " Health";
+		keyword[0][4] = " "+PROBLEMLIST;
+		keyword[1][4] = " List";
+		keyword[0][5] = " "+RISKFACTOR;
+		keyword[1][5] = " Factor";
+		keyword[0][6] = " "+ALLERGY;
+		keyword[0][7] = " "+MEDICATION;
+		keyword[0][8] = " "+IMMUNIZATION;
+		keyword[0][9] = " "+LABS;
+		keyword[0][10] = " "+APPOINTMENT;
+		keyword[0][11] = " "+CLINICALNOTE;
+		keyword[1][11] = " Note";
+		keyword[0][12] = "	Report	";
+		keyword[1][12] = " "+REPORTTEXT;
+		keyword[1][13] = " "+REPORTBINARY;
+		keyword[0][14] = " "+CAREELEMENTS;
+		keyword[1][14] = " Elements";
+		keyword[0][15] = " "+ALERT;
 
-			for (int i=0; i<keyword[0].length; i++) {
-				if (keyword[0][i].contains("Report")) {
-					keyword[0][i+1] = "Report2";
-					i++;
-					continue;
-				}
-				if (keyword[1][i]==null) keyword[1][i] = " ";
-				if (keyword[0][i].length()>keyword[1][i].length()) keyword[1][i] = fillUp(keyword[1][i], ' ', keyword[0][i].length());
-				if (keyword[0][i].length()<keyword[1][i].length()) keyword[0][i] = fillUp(keyword[0][i], ' ', keyword[1][i].length());
+		for (int i=0; i<keyword[0].length; i++) {
+			if (keyword[0][i].contains("Report")) {
+				keyword[0][i+1] = "Report2";
+				i++;
+				continue;
 			}
+			if (keyword[1][i]==null) keyword[1][i] = " ";
+			if (keyword[0][i].length()>keyword[1][i].length()) keyword[1][i] = fillUp(keyword[1][i], ' ', keyword[0][i].length());
+			if (keyword[0][i].length()<keyword[1][i].length()) keyword[0][i] = fillUp(keyword[0][i], ' ', keyword[1][i].length());
+		}
 
-			File exportLog = new File(dir, "ExportEvent.log");
-			BufferedWriter out = new BufferedWriter(new FileWriter(exportLog));
-			int tableWidth = 0;
-			for (int i=0; i<keyword.length; i++) {
-				for (int j=0; j<keyword[i].length; j++) {
-					out.write(keyword[i][j]+" |");
-					if (keyword[i][j].trim().equals("Report")) j++;
-					if (i==1) tableWidth += keyword[i][j].length()+2;
-				}
+		File exportLog = new File(dir, "ExportEvent.log");
+		BufferedWriter out = new BufferedWriter(new FileWriter(exportLog));
+		int tableWidth = 0;
+		for (int i=0; i<keyword.length; i++) {
+			for (int j=0; j<keyword[i].length; j++) {
+				out.write(keyword[i][j]+" |");
+				if (keyword[i][j].trim().equals("Report")) j++;
+				if (i==1) tableWidth += keyword[i][j].length()+2;
+			}
+			out.newLine();
+		}
+		out.write(fillUp("",'-',tableWidth)); out.newLine();
+
+		//general log data
+		if (exportNo==0) exportNo = 1;
+		for (int i=0; i<exportNo; i++) {
+
+			for (int j=0; j<keyword[0].length; j++) {
+				String category = keyword[0][j].trim();
+				if (category.contains("Report")) category = keyword[1][j].trim();
+				Integer occurs = entries.get(category+i);
+				if (occurs==null) occurs = 0;
+				out.write(fillUp(occurs.toString(), ' ', keyword[1][j].length()));
+				out.write(" |");
+			}
+			out.newLine();
+			out.write(fillUp("",'-',tableWidth)); out.newLine();
+		}
+		out.newLine();
+		out.newLine();
+		out.newLine();
+
+		//error log
+		out.write("Errors/Notes");
+		out.newLine();
+		out.write(fillUp("",'-',tableWidth)); out.newLine();
+
+		//write any error that has occurred
+		if (exportError.size()>0) {
+			out.write(exportError.get(0));
+			out.newLine();
+			for (int j=1; j<exportError.size(); j++) {
+				out.write("	 ");
+				out.write(exportError.get(j));
 				out.newLine();
 			}
 			out.write(fillUp("",'-',tableWidth)); out.newLine();
+		}
+		out.write(fillUp("",'-',tableWidth)); out.newLine();
 
-			//general log data
-			if (exportNo==0) exportNo = 1;
-			for (int i=0; i<exportNo; i++) {
-
-				for (int j=0; j<keyword[0].length; j++) {
-					String category = keyword[0][j].trim();
-					if (category.contains("Report")) category = keyword[1][j].trim();
-					Integer occurs = entries.get(category+i);
-					if (occurs==null) occurs = 0;
-					out.write(fillUp(occurs.toString(), ' ', keyword[1][j].length()));
-					out.write(" |");
-				}
-				out.newLine();
-				out.write(fillUp("",'-',tableWidth)); out.newLine();
-			}
-			out.newLine();
-			out.newLine();
-			out.newLine();
-
-			//error log
-			out.write("Errors/Notes");
-			out.newLine();
-			out.write(fillUp("",'-',tableWidth)); out.newLine();
-
-			//write any error that has occurred
-			if (exportError.size()>0) {
-				out.write(exportError.get(0));
-				out.newLine();
-				for (int j=1; j<exportError.size(); j++) {
-					out.write("	 ");
-					out.write(exportError.get(j));
-					out.newLine();
-				}
-				out.write(fillUp("",'-',tableWidth)); out.newLine();
-			}
-			out.write(fillUp("",'-',tableWidth)); out.newLine();
-
-			out.close();
-			exportNo = 0;
-			return exportLog;
+		out.close();
+		exportNo = 0;
+		return exportLog;
 	}
 
 
