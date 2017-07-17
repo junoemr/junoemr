@@ -61,7 +61,7 @@ java.util.Properties props = rec.getFormRecord(LoggedInInfo.getLoggedInInfoFromS
 FrmData fd = new FrmData();
 String resource = fd.getResource();
 
-String project_home = request.getContextPath();
+String project_home = request.getContextPath().replace("/", "");
 boolean bSync = false;
 if(!props.getProperty("c_surname_cur", "").equals("") && !(props.getProperty("c_surname_cur", "").equals(props.getProperty("c_surname", ""))
         && props.getProperty("c_givenName_cur", "").equals(props.getProperty("c_givenName", ""))

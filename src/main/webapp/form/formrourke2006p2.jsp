@@ -71,7 +71,7 @@
     props.setProperty("c_lastVisited", "p2");
 
     //get project_home
-    String project_home = request.getContextPath().substring(1);
+    String project_home = request.getContextPath().replace("/", "");
     
 %>
 <%

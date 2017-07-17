@@ -58,7 +58,7 @@ FrmRecord rec = (new FrmRecordFactory()).factory(formClass);
 java.util.Properties props = rec.getFormRecord(LoggedInInfo.getLoggedInInfoFromSession(request),demoNo, formId);
 
 //get project_home
-String project_home = request.getContextPath().substring(1);
+String project_home = request.getContextPath().replace("/", "");
 
 boolean bView = false;
 if (request.getParameter("view") != null && request.getParameter("view").equals("1")) bView = true; 

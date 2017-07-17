@@ -62,7 +62,7 @@
     props.setProperty("provNo", ""+provNo);
     int i, k;
     String doctor, bill;
-    String project_home = request.getContextPath().substring(1);
+    String project_home = request.getContextPath().replace("/", "");
 %>
 
 

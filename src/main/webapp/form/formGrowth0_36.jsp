@@ -32,7 +32,7 @@
     FrmData fd = new FrmData();
 
 	//get project_home
-	String project_home = request.getContextPath().substring(1);
+	String project_home = request.getContextPath().replace("/", "");
 
 	// boy/girl color
 	String boyColor = "#99CCFF";

@@ -55,7 +55,7 @@
 <%
     String formClass = "SelfAssessment";
     String formLink = "formSelfAssessment.jsp";
-    String projectHome = request.getContextPath().substring(1);
+    String projectHome = request.getContextPath().replace("/", "");
 
     int formId = Integer.parseInt(request.getParameter("formId"));    
     int demoNo = Integer.parseInt(request.getParameter("demographic_no"));

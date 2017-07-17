@@ -66,7 +66,7 @@
     props.setProperty("c_lastVisited", "pg1");
 
     //get project_home
-    String project_home = request.getContextPath().substring(1);   
+    String project_home = request.getContextPath().replace("/", "");   
     
     //load eform groups
     List<LabelValueBean> cytologyForms = PregnancyAction.getEformsByGroup("Cytology");
@@ -2299,7 +2299,7 @@ $(document).ready(function(){
 						<option value="NDE">North Ndebele</option>
 						<option value="SME">Northern Sami</option>
 						<option value="NOR">Norwegian</option>
-						<option value="NOB">Norwegian Bokmål</option>
+						<option value="NOB">Norwegian Bokmï¿½l</option>
 						<option value="NNO">Norwegian Nynorsk</option>
 						<option value="NYA">Nyanja</option>
 						<option value="OCI">Occitan (post 1500)</option>

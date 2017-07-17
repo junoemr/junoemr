@@ -35,7 +35,7 @@
     FrmData fd = new FrmData();
 
 	//get project_home
-	String project_home = request.getContextPath().substring(1);
+	String project_home = request.getContextPath().replace("/", "");
 	//get provider name
 	String providerName = providerBean.getProperty(""+provNo, "");
 	String[] temp = providerName.split(",");

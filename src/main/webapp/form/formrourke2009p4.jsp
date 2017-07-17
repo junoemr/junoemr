@@ -70,7 +70,7 @@
     String resource = fd.getResource();    
     
     //get project_home
-    String project_home = request.getContextPath().substring(1); 
+    String project_home = request.getContextPath().replace("/", ""); 
     
     String formTable = "formGrowth0_36";
     String formName = "Growth 0-36m";
