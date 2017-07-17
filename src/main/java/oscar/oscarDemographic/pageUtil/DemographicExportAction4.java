@@ -173,11 +173,18 @@ public class DemographicExportAction4 extends Action {
 	ArrayList<String> exportError = null;
 	HashMap<String, Integer> entries = new HashMap<String, Integer>();
 	OscarProperties oscarProperties = OscarProperties.getInstance();
+	
+	private HttpServletRequest request = null;
+	private HttpServletResponse response = null;
+	private DemographicExportForm demoExportForm = null;
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		logger.info("BEGIN DEMOGRAPHIC EXPORT ...");
+		this.request = request;
+		this.response = response;
+		this.demoExportForm = (DemographicExportForm)form;
 
 		String strEditable = oscarProperties.getProperty("ENABLE_EDIT_APPT_STATUS");
 
@@ -277,6 +284,8 @@ public class DemographicExportAction4 extends Action {
 						org.oscarehr.common.model.Demographic demographic = d.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demoNo);
 
 						if (demographic.getPatientStatus() != null && demographic.getPatientStatus().equals("Contact-only")) continue;
+						
+						logger.info("EXPORT Demographic #" + demoNo);
 
 						HashMap<String, String> demoExt = new HashMap<String, String>();
 						demoExt.putAll(demographicExtDao.getAllValuesForDemo(Integer.parseInt(demoNo)));
@@ -575,18 +584,9 @@ public class DemographicExportAction4 extends Action {
 								}
 								else continue;
 							}
-							if (!systemIssue && cmm.getLinkByNote(cmn.getId()).isEmpty()) { // this
-																							// is
-																							// not
-																							// an
-																							// annotation
+							if (!systemIssue && cmm.getLinkByNote(cmn.getId()).isEmpty()) { // this is not an annotation
 								encounter = cmn.getNote();
-								if (encounter.startsWith("imported.cms4.2011.06")) continue; // this
-																								// is
-																								// a
-																								// "header",
-																								// cms4
-																								// only
+								if (encounter.startsWith("imported.cms4.2011.06")) continue; // this is a "header", cms4 only
 							}
 
 							annotation = getNonDumpNote(CaseManagementNoteLink.CASEMGMTNOTE, cmn.getId(), null);
@@ -1273,22 +1273,12 @@ public class DemographicExportAction4 extends Action {
 									String[] strength = arr[p].getDosage().split(" ");
 
 									cdsDt.DrugMeasure drugM = medi.addNewStrength();
-									if (Util.leadingNum(strength[0]).equals(strength[0])) {// amount
-																							// &
-																							// unit
-																							// separated
-																							// by
-																							// space
+									if (Util.leadingNum(strength[0]).equals(strength[0])) {// amount & unit separated by space
 										drugM.setAmount(strength[0]);
 										if (strength.length > 1) drugM.setUnitOfMeasure(strength[1]);
-										else drugM.setUnitOfMeasure("unit"); // UnitOfMeasure
-																				// cannot
-																				// be
-																				// null
-
+										else drugM.setUnitOfMeasure("unit"); // UnitOfMeasure cannot be null
 									}
-									else {// amount & unit not separated,
-											// probably e.g. 50mg / 2tablet
+									else {// amount & unit not separated, probably e.g. 50mg / 2tablet
 										if (strength.length > 1 && strength[1].equals("/")) {
 											if (strength.length > 2) {
 												String unit1 = Util.leadingNum(strength[2]).equals("") ? "1" : Util.leadingNum(strength[2]);
@@ -1321,10 +1311,8 @@ public class DemographicExportAction4 extends Action {
 								String drugUnit = StringUtils.noNull(arr[p].getUnit());
 
 								if (drugUnit.equalsIgnoreCase(getDosageUnit(arr[p].getDosage()))) {
-									// drug unit should not be same as dosage
-									// unit
-									// check drug form to see if it matches the
-									// following list
+									// drug unit should not be same as dosage unit
+									// check drug form to see if it matches the following list
 
 									if (StringUtils.containsIgnoreCase(drugForm, "capsule")) drugUnit = "capsule";
 									else if (StringUtils.containsIgnoreCase(drugForm, "drop")) drugUnit = "drop";
@@ -2182,25 +2170,31 @@ public class DemographicExportAction4 extends Action {
 						exportNo++;
 
 						// export file to temp directory
+						File patientTempFile = null;
 						try {
 							File directory = new File(tmpDir);
 							if (!directory.exists()) {
 								throw new Exception("Temporary Export Directory does not exist!");
 							}
+							
+							// remove all spaces from xml file names
+							String first_name = (demographic.getFirstName() != null) ? demographic.getFirstName().trim().replace(' ', '-') : "";
+							String last_name = (demographic.getLastName() != null) ? demographic.getLastName().trim().replace(' ', '-') : "";
 
 							// Standard format for xml exported file :
 							// PatientFN_PatientLN_PatientUniqueID_DOB (DOB:
 							// ddmmyyyy)
-							String expFile = demographic.getFirstName() + "_" + demographic.getLastName();
+							String expFile = first_name + "_" + last_name;
 							expFile += "_" + demoNo;
 							expFile += "_" + demographic.getDateOfBirth() + demographic.getMonthOfBirth() + demographic.getYearOfBirth();
-							files.add(new File(directory, expFile + ".xml"));
+							patientTempFile = new File(directory, expFile + ".xml");
 						}
 						catch (Exception e) {
 							logger.error("Error", e);
 						}
 						try {
-							omdCdsDoc.save(files.get(files.size() - 1), options);
+							omdCdsDoc.save(patientTempFile, options);
+							files.add(patientTempFile);
 						}
 						catch (IOException ex) {
 							logger.error("Error", ex);
@@ -2212,76 +2206,17 @@ public class DemographicExportAction4 extends Action {
 					files.add(makeReadMe(files));
 					files.add(makeExportLog(files.get(0).getParentFile()));
 
-					// zip all export files
-					String zipName = files.get(0).getName().replace(".xml", ".zip");
-					if (setName != null) zipName = "export_" + setName.replace(" ", "") + "_" + UtilDateUtilities.getToday("yyyyMMddHHmmss") + ".zip";
-					// if (setName!=null) zipName = "export_"+setName.replace("
-					// ","")+"_"+UtilDateUtilities.getToday("yyyyMMddHHmmss")+".pgp";
-					if (!Util.zipFiles(files, zipName, tmpDir)) {
-						logger.debug("Error! Failed to zip export files");
+					// do something for special affinity domain
+					if(request.getParameter("SendToAffinityDomain") != null) {
+						documentExportId = exportPatientFilesAffinity(files);
+						ffwd = "sendToAffinityDomain";
 					}
-
-					if (pgpReady.equals("Yes")) {
-						// PGP encrypt zip file
-						PGPEncrypt pgp = new PGPEncrypt();
-						if (pgp.encrypt(zipName, tmpDir)) {
-
-							// Sharing Center - Skip download if sharing with
-							// affinity domain
-							if (request.getParameter("SendToAffinityDomain") == null) {
-								Util.downloadFile(zipName + ".pgp", tmpDir, response);
-								Util.cleanFile(zipName + ".pgp", tmpDir);
-								ffwd = "success";
-							}
-							else {
-								// Sharing Center - Change the forward
-								// (redirect) to the affinity domain export page
-								ffwd = "sendToAffinityDomain";
-							}
-
-						}
-						else {
-							request.getSession().setAttribute("pgp_ready", "No");
-						}
-					}
+					// do normal download
 					else {
-						logger.info("Warning: PGP Encryption NOT available - unencrypted file exported!");
-
-						// Sharing Center - Skip download if sharing with
-						// affinity domain
-						if (request.getParameter("SendToAffinityDomain") == null) {
-							Util.downloadFile(zipName, tmpDir, response);
+						if(exportPatientFilesZip(files)) {
 							ffwd = "success";
 						}
-						else {
-							// Sharing Center - Change the forward (redirect) to
-							// the affinity domain export page
-							ffwd = "sendToAffinityDomain";
-						}
-
 					}
-
-					// Sharing Center - Store the exported data for later
-					// retrieval while sending to the affinity domain
-					if (ffwd.equalsIgnoreCase("sendToAffinityDomain")) {
-						String exportFile = Util.fixDirName(tmpDir) + zipName;
-
-						DemographicExportDao demographicExportDao = SpringUtils.getBean(DemographicExportDao.class);
-						DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-
-						DemographicExport demographicExport = new DemographicExport();
-						byte[] data = FileUtils.readFileToByteArray(new File(exportFile));
-						demographicExport.setDocument(data);
-						demographicExport.setDemographic(demographicManager.getDemographic(loggedInInfo, demographicNo));
-						demographicExport.setDocumentType(DocumentType.CDS.name());
-
-						DemographicExport export = demographicExportDao.saveEntity(demographicExport);
-						documentExportId = export.getId();
-					}
-
-					// Remove zip & export files from temp dir
-					Util.cleanFile(zipName, tmpDir);
-					Util.cleanFiles(files);
 				}
 				break;
 			case E2E :
@@ -2368,44 +2303,16 @@ public class DemographicExportAction4 extends Action {
 						logger.error("Error", e);
 						throw new Exception("Cannot write .xml file(s) to export directory.\nPlease check directory permissions.");
 					}
-
-					// Zip all export files
-					String zipName = files.get(0).getName().replace(".xml", ".zip");
-					if (setName != null) zipName = "export_" + setName.replace(" ", "") + "_" + UtilDateUtilities.getToday("yyyyMMddHHmmss") + ".zip";
-					// if (setName!=null) zipName = "export_"+setName.replace("
-					// ","")+"_"+UtilDateUtilities.getToday("yyyyMMddHHmmss")+".pgp";
-					if (!Util.zipFiles(files, zipName, tmpDir)) {
-						logger.debug("Error! Failed to zip export files");
-					}
-
-					// Apply PGP if installed
-					if (pgpReady.equals("Yes")) {
-						// PGP encrypt zip file
-						PGPEncrypt pgp = new PGPEncrypt();
-						if (pgp.encrypt(zipName, tmpDir)) {
-							Util.downloadFile(zipName + ".pgp", tmpDir, response);
-							Util.cleanFile(zipName + ".pgp", tmpDir);
-							ffwd = "success";
-						}
-						else {
-							request.getSession().setAttribute("pgp_ready", "No");
-						}
-					}
-					else {
-						logger.info("Warning: PGP Encryption NOT available - unencrypted file exported!");
-						Util.downloadFile(zipName, tmpDir, response);
+					if(exportPatientFilesZip(files)) {
 						ffwd = "success";
 					}
-
-					// Remove zip & export files from temp dir
-					Util.cleanFile(zipName, tmpDir);
-					Util.cleanFiles(files);
 				}
 				break;
 			default :
 				break;
 		}
-
+		logger.info("DEMOGRAPHIC EXPORT COMPLETE");
+		
 		if (ffwd.equalsIgnoreCase("sendToAffinityDomain")) {
 			return new ActionForward(mapping.findForward("sendToAffinityDomain").getPath() + "?affinityDomain=" + request.getParameter("affinityDomain") + "&demoId="
 					+ demographicNo + "&docNo=" + documentExportId + "&type=" + DocumentType.CDS.name(), false);
@@ -2413,6 +2320,128 @@ public class DemographicExportAction4 extends Action {
 		else {
 			return mapping.findForward(ffwd);
 		}
+	}
+	
+	/**
+	 * zips files in file list to zip file and attempts download request.
+	 * does not clean zip files in failure case
+	 * @param filesToZip
+	 * @return true if download was successful, false otherwise
+	 */
+	private boolean exportPatientFilesZip(ArrayList<File> filesToZip) {
+		
+		DemographicExportForm defrm = (DemographicExportForm) demoExportForm;
+		String setName = defrm.getPatientSet();
+		String pgpReady = defrm.getPgpReady();
+		String tmpDir = oscarProperties.getProperty("TMP_DIR");
+		
+		boolean downloadSuccess = false;
+		
+		try {
+			// Zip all export files
+			String zipName = filesToZip.get(0).getName().replace(".xml", ".zip");
+			if (setName != null){
+				zipName = "export_" + setName.replace(" ", "") + "_" + UtilDateUtilities.getToday("yyyyMMddHHmmss") + ".zip";
+			}
+			if (!Util.zipFiles(filesToZip, zipName, tmpDir)) {
+				logger.debug("Error! Failed to zip export files");
+			}
+			
+			
+			// Apply PGP if installed
+			if (pgpReady.equals("Yes")) {
+				// PGP encrypt zip file
+				PGPEncrypt pgp = new PGPEncrypt();
+				if (pgp.encrypt(zipName, tmpDir)) {
+					downloadSuccess = Util.downloadFile(zipName + ".pgp", tmpDir, response);
+					if (downloadSuccess) Util.cleanFile(zipName + ".pgp", tmpDir);
+				}
+				else {
+					request.getSession().setAttribute("pgp_ready", "No");
+				}
+			}
+			else {
+				logger.warn("PGP Encryption NOT available - unencrypted file exported!");
+				downloadSuccess = Util.downloadFile(zipName, tmpDir, response);
+				// remove zip file if it was downloaded. Otherwise leave it in the temp directory for OSP
+				if(downloadSuccess) Util.cleanFile(zipName, tmpDir);
+			}
+			
+			if(!downloadSuccess) logger.error("Demographic Export Files were not downloaded properly. Zip file not removed from temp directory.");
+			// remove temp files
+			Util.cleanFiles(filesToZip);
+		}
+		catch(Exception e) {
+			logger.error("Error Exporting Demographic zip file", e);
+			downloadSuccess = false;
+		}
+		return downloadSuccess;
+	}
+	/*
+	 * translated to its own method during refactor.
+	 */
+	private int exportPatientFilesAffinity(ArrayList<File> filesToZip) {
+		
+		DemographicExportForm defrm = (DemographicExportForm) demoExportForm;
+		String setName = defrm.getPatientSet();
+		String pgpReady = defrm.getPgpReady();
+		String demographicNo = defrm.getDemographicNo();
+		String tmpDir = oscarProperties.getProperty("TMP_DIR");
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		
+		boolean success = false;
+		int documentExportId = 0;
+		
+		try {
+			// Zip all export files
+			String zipName = filesToZip.get(0).getName().replace(".xml", ".zip");
+			if (setName != null){
+				zipName = "export_" + setName.replace(" ", "") + "_" + UtilDateUtilities.getToday("yyyyMMddHHmmss") + ".zip";
+			}
+			if (!Util.zipFiles(filesToZip, zipName, tmpDir)) {
+				logger.debug("Error! Failed to zip export files");
+			}
+			
+			// Apply PGP if installed
+			if (pgpReady.equals("Yes")) {
+				// PGP encrypt zip file
+				PGPEncrypt pgp = new PGPEncrypt();
+				if (pgp.encrypt(zipName, tmpDir)) {
+					success = true;
+				}
+				else {
+					request.getSession().setAttribute("pgp_ready", "No");
+				}
+			}
+			else {
+				logger.warn("PGP Encryption NOT available - unencrypted file exported!");
+				success = true;
+			}
+			if(success) {
+				Util.cleanFiles(filesToZip);
+				
+				String exportFile = Util.fixDirName(tmpDir) + zipName;
+
+				DemographicExportDao demographicExportDao = SpringUtils.getBean(DemographicExportDao.class);
+				DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+
+				DemographicExport demographicExport = new DemographicExport();
+				byte[] data = FileUtils.readFileToByteArray(new File(exportFile));
+				demographicExport.setDocument(data);
+				demographicExport.setDemographic(demographicManager.getDemographic(loggedInInfo, demographicNo));
+				demographicExport.setDocumentType(DocumentType.CDS.name());
+
+				DemographicExport export = demographicExportDao.saveEntity(demographicExport);
+				documentExportId = export.getId();
+			}
+			Util.cleanFile(zipName, tmpDir);
+			Util.cleanFiles(filesToZip);
+		}
+		catch(Exception e) {
+			logger.error("Error Exporting Demographic zip file Affinity", e);
+			success = false;
+		}
+		return documentExportId;
 	}
 
 	File makeReadMe(ArrayList<File> fs) throws IOException {

@@ -181,25 +181,29 @@ public class Util {
 	return ret;
     }
 
-    static public void downloadFile(String fileName, String dirName, HttpServletResponse rsp) {
-        try {
-            dirName = fixDirName(dirName);
-            if (rsp==null) return;
+	static public boolean downloadFile(String fileName, String dirName, HttpServletResponse rsp) {
+		try {
+			dirName = fixDirName(dirName);
+			if (rsp == null) return false;
 
-            rsp.setContentType("application/octet-stream");
-            rsp.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-            InputStream in = new FileInputStream(dirName + fileName);
-            OutputStream out = rsp.getOutputStream();
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            in.close();
-            out.close();
-        } catch (IOException ex) {logger.error("Error", ex);
-        }
-    }
+			rsp.setContentType("application/octet-stream");
+			rsp.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+			InputStream in = new FileInputStream(dirName + fileName);
+			OutputStream out = rsp.getOutputStream();
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+			return true;
+		}
+		catch (IOException ex) {
+			logger.error("Error", ex);
+			return false;
+		}
+	}
 
     static public String fixDirName(String dirName) {
         if (StringUtils.filled(dirName)) {
