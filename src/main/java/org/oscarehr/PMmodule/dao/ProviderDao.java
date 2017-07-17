@@ -43,6 +43,7 @@ import org.oscarehr.common.model.ProviderFacility;
 import org.oscarehr.common.model.ProviderFacilityPK;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import oscar.OscarProperties;
@@ -598,6 +599,27 @@ public class ProviderDao extends HibernateDaoSupport {
 			} finally {
 				this.releaseSession(session);
 			}
+		}
+		public List<Provider> getProvidersByFieldId(String docNo, String labType, String searchOn, Integer limit, boolean orderByLength) {
+			
+			HibernateTemplate template = getHibernateTemplate();
+			String sql = "FROM Provider p WHERE " + searchOn + " = ? ";
+			Object[] params = {docNo};
+			// Allow multiple route ids to be used for lab matching
+			if (labType.equals("CLS")) {
+				sql += " OR p.AlbertaEDeliveryIds = ? OR p.AlbertaEDeliveryIds like ? OR p.AlbertaEDeliveryIds like ? OR p.AlbertaEDeliveryIds like ? ";
+				params = new String[] {docNo, docNo, docNo + ",%", "%," + docNo + ",%", "%," + docNo};
+			}
+			if (orderByLength) {
+				sql += " order by length(p.FirstName)";
+			}
+			if(limit != null && limit > 0) {
+				template.setMaxResults(limit);
+			}
+			log.debug(sql);
+			
+			List<Provider> providerList = template.find(sql, params);
+			return providerList;
 		}
 		
 		@SuppressWarnings("unchecked")
