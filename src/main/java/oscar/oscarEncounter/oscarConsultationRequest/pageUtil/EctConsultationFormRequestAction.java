@@ -306,11 +306,14 @@ public class EctConsultationFormRequestAction extends Action {
 				}
 			}
 		}
+
+		if (consult.getProviderNo() == null || consult.getProviderNo().equals("")) {
+			consult.setProviderNo(frm.getProviderNo());
+		}
 		consult.setReasonForReferral(frm.getReasonForConsultation());
 		consult.setClinicalInfo(frm.getClinicalInformation());
 		consult.setCurrentMeds(frm.getCurrentMedications());
 		consult.setAllergies(frm.getAllergies());
-		consult.setProviderNo(frm.getProviderNo());
 		consult.setDemographicId(new Integer(frm.getDemographicNo()));
 		consult.setStatus(frm.getStatus());
 		consult.setStatusText(frm.getAppointmentNotes());
