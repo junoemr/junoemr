@@ -508,8 +508,7 @@ function popupStart(vheight,vwidth,varpage,windowname) {
                           if (thisResult.notes != null){%>
 			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>"
 				class="<%=lineClass%>">
-				<td valign="top" align="left" colspan="8"><pre
-					style="margin-left: 100px;"><%=thisResult.notes %></pre></td>
+				<td valign="top" align="left" colspan="8"><pre style="margin-left: 100px; white-space: pre-wrap;"><%=thisResult.notes %></pre></td>
 
 			</tr>
 
@@ -521,8 +520,7 @@ function popupStart(vheight,vwidth,varpage,windowname) {
                           String msg = (String) headerRes.get(h);  %>
 			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>"
 				class="NormalRes">
-				<td valign="top" align="left" colspan="8"><pre
-					style="margin-left: 100px;"><%=msg%></pre></td>
+				<td valign="top" align="left" colspan="8"><pre style="margin-left: 100px; white-space: pre-wrap;"><%=msg%></pre></td>
 
 			</tr>
 			<%}%>
