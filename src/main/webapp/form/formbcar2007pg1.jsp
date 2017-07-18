@@ -61,7 +61,7 @@ resource = resource + "ob/riskinfo/";
 props.setProperty("c_lastVisited", "pg1");
 
 //get project_home
-String project_home = request.getContextPath().replace("/", "");
+String project_home = request.getContextPath().replaceAll("^/|/$", "");
 //sync
 boolean bSync = false;
 if(!props.getProperty("c_surname_cur", "").equals("") && !(props.getProperty("c_surname_cur", "").equals(props.getProperty("c_surname", ""))

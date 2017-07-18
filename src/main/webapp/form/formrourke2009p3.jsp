@@ -71,7 +71,7 @@
     
 
     //get project_home
-    String project_home = request.getContextPath().replace("/", "");
+    String project_home = request.getContextPath().replaceAll("^/|/$", "");
      
     String formTable = "formGrowth0_36";
     String formName = "Growth 0-36m";

@@ -59,7 +59,7 @@
 	//FrmData fd = new FrmData();    String resource = fd.getResource(); resource = resource + "ob/riskinfo/";
 
     //get project_home
-    String project_home = request.getContextPath().replace("/", "");	
+    String project_home = request.getContextPath().replaceAll("^/|/$", "");
 %>
 <%
   boolean bView = false;

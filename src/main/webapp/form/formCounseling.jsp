@@ -58,7 +58,7 @@
 <%
     String formClass = "Counseling";
     String formLink = "formCounseling.jsp";
-    String projectHome = request.getContextPath().replace("/", "");
+    String projectHome = request.getContextPath().replaceAll("^/|/$", "");
     
     int formId = Integer.parseInt(request.getParameter("formId"));
     int demoNo = Integer.parseInt(request.getParameter("demographic_no"));

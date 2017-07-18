@@ -57,7 +57,7 @@
     FrmRecord rec = (new FrmRecordFactory()).factory(formClass);
     java.util.Properties props = rec.getFormRecord(LoggedInInfo.getLoggedInInfoFromSession(request),demoNo, formId);
     
-    String projectHome = request.getContextPath().replace("/", "");
+    String projectHome = request.getContextPath().replaceAll("^/|/$", "");
     ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
     String providerNo = props.getProperty("provider_no","");
     String providerName = "";

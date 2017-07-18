@@ -62,7 +62,7 @@
     props.setProperty("c_lastVisited", "pg2");
 
     //get project_home
-    String project_home = request.getContextPath().substring(1);    
+    String project_home = request.getContextPath().replaceAll("^/|/$", "");    
     
     // calculate A
     if(props.getProperty("ar2_etss", "").equals("") && props.getProperty("pg1_ectopicBox", "0").matches("\\d*") 
