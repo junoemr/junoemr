@@ -328,7 +328,6 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 					{
 						demographicNo: $stateParams.demographicNo,
 						type: 'form',
-						location: false
 					});
 					$("html, body").animate(
 					{
