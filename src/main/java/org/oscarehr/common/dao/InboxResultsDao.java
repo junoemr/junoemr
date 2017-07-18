@@ -348,8 +348,13 @@ public class InboxResultsDao {
 				+ "  proLR.lab_no = proLR_filter.lab_no "
 				+ "  AND ( "
 				+ "    proLR.timestamp < proLR_filter.timestamp OR ( "
-				+ "      proLR.timestamp = proLR_filter.timestamp AND proLR.id < proLR_filter.id))) "
+				+ "      proLR.timestamp = proLR_filter.timestamp AND proLR.id < proLR_filter.id)) "
+				+ "  AND proLR_filter.status != 'X') "
 				+ "LEFT JOIN patientLabRouting patLR ON ( proLR.lab_type = patLR.lab_type AND proLR.lab_no = patLR.lab_no ) "
+				+ "LEFT JOIN patientLabRouting patLR_filter ON ( "
+				+ "  proLR.lab_type = patLR_filter.lab_type "
+				+ "  AND patLR.lab_no = patLR_filter.lab_no "
+				+ "  AND (patLR.dateModified < patLR_filter.dateModified OR (patLR.dateModified = patLR_filter.dateModified AND patLR.id < patLR_filter.id))) "
 				+ "LEFT JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no AND doc.status <> 'D' ) "
 				+ "LEFT JOIN provider creator ON ( doc.doccreator = creator.provider_no ) "
 				+ "LEFT JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' AND cdoc.module_id > 0) "
@@ -362,11 +367,12 @@ public class InboxResultsDao {
 				+ "    lab.obr_date = lab_filter.obr_date AND lab.id < lab_filter.id))) "
 				+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no) "
 				
-				+ "WHERE proLR.lab_type IN ('DOC', 'HL7')"
+				+ "WHERE proLR.lab_type IN ('DOC', 'HL7') "
 				+ "AND proLR_filter.id IS NULL "
+				+ "AND patLR_filter.id IS NULL "
 				+ "AND lab_filter.id IS NULL "
 				+ "AND (doc.document_no IS NOT NULL OR lab.id IS NOT NULL) "
-				+ "AND proLR.status != 'X'";
+				+ "AND proLR.status != 'X' ";
 				
 				//+ "AND doc.status <> 'D' ";
 			
