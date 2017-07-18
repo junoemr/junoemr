@@ -264,8 +264,10 @@ public class EpsilonHandler  extends CMLHandler implements MessageHandler {
 	            // leave the name blank if the value type is 'FT' this is because it
 	            // is a comment, if the name is blank the obx segment will not be displayed
 	            OBX obxSeg = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX();
-	            if ((obxSeg.getValueType().getValue()!=null) && (!obxSeg.getValueType().getValue().equals("FT")))
-	                ret = getString(obxSeg.getObservationIdentifier().getText().getValue());
+	            if ((obxSeg.getValueType().getValue()!=null) && (!obxSeg.getValueType().getValue().equals("FT"))) {
+	            	// OBR 3.2 is used by MedHealth as internal test code, OBR 3.3 has the test name
+	                ret = getString(obxSeg.getObservationIdentifier().getNameOfCodingSystem().getValue());
+	            }
 	        }catch(Exception e){
 	            logger.error("Error returning OBX name", e);
 	        }
