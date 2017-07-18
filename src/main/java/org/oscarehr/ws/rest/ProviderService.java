@@ -24,7 +24,6 @@
 package org.oscarehr.ws.rest;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -40,13 +39,13 @@ import javax.ws.rs.core.Response.Status;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import net.sf.json.processors.JsDateJsonBeanProcessor;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.security.SecurityContext;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.OscarLogManager;
@@ -191,17 +190,16 @@ public class ProviderService extends AbstractServiceImpl {
 	@Path("/getRecentDemographicsViewed")
 	@Produces("application/json")
 	public PatientListApptBean getRecentDemographicsViewed(@QueryParam("startIndex") Integer startIndex,@QueryParam("itemsToReturn") Integer itemsToReturn ) {	
-		List<Object[]> results = oscarLogManager.getRecentDemographicsViewedByProvider(getLoggedInInfo(), getLoggedInInfo().getLoggedInProviderNo(), startIndex, itemsToReturn);
-		
+		List<OscarLog> results = oscarLogManager.getRecentDemographicsViewedByProvider(getLoggedInInfo(), getLoggedInInfo().getLoggedInProviderNo(), startIndex, itemsToReturn);
 		PatientListApptBean response = new PatientListApptBean();
 		
-		for(Object[] r:results) {
-			Demographic d = demographicManager.getDemographic(getLoggedInInfo(), (Integer)r[0]);
+		for(OscarLog logItem : results) {
+			Demographic d = demographicManager.getDemographic(getLoggedInInfo(), logItem.getDemographicId());
 			
 			if(d != null) {
 				PatientListApptItemBean item = new PatientListApptItemBean();
-				item.setDemographicNo((Integer)r[0]);
-				item.setDate((Date)r[1]);
+				item.setDemographicNo(logItem.getDemographicId());
+				item.setDate(logItem.getCreated());
 				item.setName(d.getFormattedName());
 				response.getPatients().add(item);
 			}
