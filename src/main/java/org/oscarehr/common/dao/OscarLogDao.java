@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import oscar.log.LogConst;
+
 import javax.persistence.Query;
 
 import org.oscarehr.common.model.AbstractModel;
@@ -118,18 +120,22 @@ public class OscarLogDao extends AbstractDao<OscarLog> {
 	 * @param itemsToReturn
 	 * @return List of Object array [demographicId (Integer), lastDateViewed Date]
 	 */
-	public List<Object[]> getRecentDemographicsViewedByProvider(String providerNo, int startPosition, int itemsToReturn) {
-		String sqlCommand="select l.demographicId,MAX(l.created) as dt from "+modelClass.getSimpleName()+" l where l.providerNo = ?1 and l.demographicId is not null and l.demographicId != '-1' group by l.demographicId order by MAX(l.created) desc";
+	public List<OscarLog> getRecentDemographicsViewedByProvider(String providerNo, int startPosition, int itemsToReturn) {
+		String sqlCommand = "SELECT log1 FROM " + modelClass.getSimpleName() + " log1 " +
+							"WHERE log1.created = (SELECT MAX(log2.created) FROM " + modelClass.getSimpleName() + " log2 WHERE log2.demographicId = log1.demographicId) " +
+							"AND log1.content = :content AND log1.providerNo = :providerNo " +
+							"ORDER BY log1.created DESC";
 
 		Query query = entityManager.createQuery(sqlCommand);
-		query.setParameter(1, providerNo);
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("content", LogConst.CON_DEMOGRAPHIC);
 		query.setFirstResult(startPosition);
 		setLimit(query,itemsToReturn);
 
 		@SuppressWarnings("unchecked")
-		List<Object[]> results=query.getResultList();
+		List<OscarLog> results = query.getResultList();
 		
-		return(results);
+		return results;
 	}
 
 	@Override
