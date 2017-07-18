@@ -227,7 +227,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			controller: 'Record.Forms.FormController as formCtrl'
 		}).state('record.forms.existing',
 		{
-			url: '/:type',
+			// url: '/:type',
 			templateUrl: 'record/forms/forms.jsp',
 			controller: 'Record.Forms.FormController as formCtrl'
 		})
