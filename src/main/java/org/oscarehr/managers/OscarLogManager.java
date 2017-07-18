@@ -26,6 +26,7 @@ package org.oscarehr.managers;
 import java.util.List;
 
 import org.oscarehr.common.dao.OscarLogDao;
+import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,9 +39,9 @@ public class OscarLogManager {
 	@Autowired 
 	private OscarLogDao oscarLogDao;
 	
-	public List<Object[]> getRecentDemographicsViewedByProvider(LoggedInInfo loggedInInfo, String providerNo, int startPosition, int itemsToReturn) {
-		List<Object[]> results = oscarLogDao.getRecentDemographicsViewedByProvider(providerNo, startPosition, itemsToReturn);
-		
+	public List<OscarLog> getRecentDemographicsViewedByProvider(LoggedInInfo loggedInInfo, String providerNo, int startPosition, int itemsToReturn) {
+		List<OscarLog> results = oscarLogDao.getRecentDemographicsViewedByProvider(providerNo, startPosition, itemsToReturn);
+
 		LogAction.addLogSynchronous(loggedInInfo,"OscarLogManager.getRecentDemographicsViewedByProvider", "providerNo"+providerNo);
 		
 		return results;
