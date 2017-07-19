@@ -33,6 +33,7 @@
  */
 package oscar.oscarLab.ca.all.upload.handlers;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +55,8 @@ public class GDMLHandler implements MessageHandler {
 	Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
 	
 
-	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr) {
+	public String parse(LoggedInInfo loggedInInfo, String serviceName,
+						String fileName, int fileId, String ipAddr) throws Exception {
 
 		int i = 0;
 		RouteReportResults routeResults;
@@ -64,7 +66,7 @@ public class GDMLHandler implements MessageHandler {
 
 				String msg = messages.get(i);
 				if(isDuplicate(loggedInInfo, msg)) {
-					return ("duplicate");
+					throw new FileAlreadyExistsException(fileName);
 				}
 				
 				routeResults = new RouteReportResults();
@@ -73,7 +75,6 @@ public class GDMLHandler implements MessageHandler {
 				oscar.oscarLab.ca.all.parsers.MessageHandler msgHandler = Factory.getHandler(String.valueOf(routeResults.segmentId));
 				
 				if( msgHandler == null ) {
-					MessageUploader.clean(fileId);
 					logger.error("Saved lab but could not parse base64 value");
 					return null;
 				}
@@ -86,7 +87,6 @@ public class GDMLHandler implements MessageHandler {
 			updateLabStatus(messages.size());
 			logger.debug("Parsed OK");
 		} catch (Exception e) {
-			MessageUploader.clean(fileId);
 			logger.error("Could not upload message", e);
 			return null;
 		}

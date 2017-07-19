@@ -24,7 +24,8 @@
 
 package oscar.oscarLab;
 
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -85,6 +86,19 @@ public final class FileUploadCheck {
 	}
 
 	public static final int UNSUCCESSFUL_SAVE = -1;
+
+	public static synchronized int addFile(String filePath, String provider) throws IOException
+	{
+		File file = new File(filePath);
+		FileInputStream fileInputStream = new FileInputStream(filePath);
+		int fileId = addFile(file.getName(), fileInputStream, provider);
+		fileInputStream.close();
+		if(fileId == FileUploadCheck.UNSUCCESSFUL_SAVE)
+		{
+			throw new FileAlreadyExistsException(filePath);
+		}
+		return fileId;
+	}
 
 	/**
 	 *Used to add a new file to the database, checks to see if it already has been added

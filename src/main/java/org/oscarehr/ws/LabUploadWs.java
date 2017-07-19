@@ -25,9 +25,8 @@
 package org.oscarehr.ws;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.SQLException;
+import java.nio.file.FileAlreadyExistsException;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -41,13 +40,11 @@ import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.LoggedInInfo;
 
+import org.oscarehr.util.SpringUtils;
 import org.springframework.stereotype.Component;
 
 import oscar.OscarProperties;
-import oscar.oscarLab.FileUploadCheck;
-import oscar.oscarLab.ca.all.upload.HandlerClassFactory;
-import oscar.oscarLab.ca.all.upload.handlers.MessageHandler;
-
+import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 
 @WebService
 @Component
@@ -241,7 +238,7 @@ public class LabUploadWs extends AbstractWs {
     }
 
     private String importLab(String fileName, String labContent, String labType, String oscarProviderNo)
-		throws ParseException, SQLException, Exception
+		throws ParseException, Exception
     {
 		HttpServletRequest request = getHttpServletRequest();
 
@@ -268,28 +265,26 @@ public class LabUploadWs extends AbstractWs {
         // upload process.
         FileUtils.writeStringToFile(new File(labFilePath), labContent);
 
-        // Upload lab info and hash to DB to check for duplicates
-        FileInputStream is = new FileInputStream(labFilePath);
-        int checkFileUploadedSuccessfully = FileUploadCheck.addFile(fileName,is,oscarProviderNo);
-        is.close();
-        if (checkFileUploadedSuccessfully != FileUploadCheck.UNSUCCESSFUL_SAVE){
-            logger.info("filePath" + labFilePath);
-            logger.info("Type :" + labType);
-            MessageHandler msgHandler = HandlerClassFactory.getHandler(labType);
-            logger.info("MESSAGE HANDLER "+msgHandler.getClass().getName());
+        try
+        {
+            logger.debug("Lab Type: " + labType);
+            logger.debug("Lab file path: " + labFilePath);
+            String serviceName = getClass().getSimpleName();
+            LabHandlerService labHandlerService = SpringUtils.getBean(LabHandlerService.class);
+            retVal = labHandlerService.importLab(
+                    labType,
+                    loggedInInfo,
+                    serviceName,
+                    labFilePath,
+                    oscarProviderNo,
+                    request.getRemoteAddr()
+            );
 
-			// Parse and handle the lab
-            retVal = msgHandler.parse(loggedInInfo, getClass().getSimpleName(), labFilePath, checkFileUploadedSuccessfully, ipAddr);
-			if (retVal == null) {
-				throw new ParseException("Failed to parse lab: " + fileName + " of type: " + labType, 0);
-			}
-			else if (retVal.equals("duplicate")) {
-				throw new Exception("Duplicate lab upload");
-			}
-		}
-		else {
-			throw new SQLException( "Failed insert lab into DB (Likely duplicate lab): " + fileName + " of type: " + labType);
-		}
+        } catch(FileAlreadyExistsException e) {
+            throw new Exception("Duplicate lab file");
+        } catch(Exception e) {
+            throw new Exception( "Failed insert lab into DB: " + fileName + " of type: " + labType);
+        }
 
         // This will always contain one line, so let's just remove the newline characters
         retVal = retVal.replace("\n", "").replace("\r", "");

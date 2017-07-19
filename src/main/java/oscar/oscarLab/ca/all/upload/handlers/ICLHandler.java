@@ -53,7 +53,6 @@ public class ICLHandler implements MessageHandler {
 			updateLabStatus(messages.size());
 		} catch (Exception e) {
 
-			MessageUploader.clean(fileId);
 			logger.error("Could not upload message", e);
 			return null;
 		}

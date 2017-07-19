@@ -35,8 +35,8 @@
 package oscar.oscarLab.ca.all.pageUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,17 +52,16 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.oscarLab.FileUploadCheck;
-import oscar.oscarLab.ca.all.upload.HandlerClassFactory;
-import oscar.oscarLab.ca.all.upload.handlers.MessageHandler;
+import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 import oscar.oscarLab.ca.all.util.Utilities;
 
 public class InsideLabUploadAction extends Action {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
     Logger logger = Logger.getLogger(InsideLabUploadAction.class);
-    
+
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
+        logger.debug("Uploading lab file");
     	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
     	if(!securityInfoManager.hasPrivilege(loggedInInfo, "_lab", "w", null)) {
     		throw new SecurityException("missing required security object (_lab)");
@@ -71,13 +70,11 @@ public class InsideLabUploadAction extends Action {
     	LabUploadForm frm = (LabUploadForm) form;
         FormFile importFile = frm.getImportFile();
         String filename = importFile.getFileName();
-        String proNo = (String) request.getSession().getAttribute("user");
+        String providerNumber = (String) request.getSession().getAttribute("user");
         String outcome = "failure";
         
         InputStream formFileIs=null;
-        InputStream localFileIs=null;
-        
-        try{
+        try {
             formFileIs = importFile.getInputStream();
             
             
@@ -88,32 +85,35 @@ public class InsideLabUploadAction extends Action {
             String filePath = Utilities.saveFile(formFileIs, filename);
             File file = new File(filePath);
             
-            localFileIs = new FileInputStream(filePath);
-            int checkFileUploadedSuccessfully = FileUploadCheck.addFile(file.getName(),localFileIs,proNo);            
-            
-            if (checkFileUploadedSuccessfully != FileUploadCheck.UNSUCCESSFUL_SAVE){
-                logger.debug("filePath"+filePath);
-                logger.debug("Type :"+type);
-                MessageHandler msgHandler = HandlerClassFactory.getHandler(type);
-                if(msgHandler != null){
-                   logger.debug("MESSAGE HANDLER "+msgHandler.getClass().getName());
-                }
-                if((msgHandler.parse(loggedInInfo, getClass().getSimpleName(), filePath,checkFileUploadedSuccessfully, request.getRemoteAddr())) != null)
-                    outcome = "success";
-                
-            }else{
-                outcome = "uploaded previously";
-            }
-            
-        }catch(Exception e){
+
+			logger.info("Lab Type: " + type);
+			logger.info("Lab file path: " + filePath);
+			String serviceName = getClass().getSimpleName();
+			LabHandlerService labHandlerService = SpringUtils.getBean(LabHandlerService.class);
+
+			outcome = labHandlerService.importLab(
+					type,
+					loggedInInfo,
+					serviceName,
+					filePath,
+					providerNumber,
+					request.getRemoteAddr()
+			);
+
+			// Set outcome to success in manual lab uploader as some handlers return an HL7 audit record
+			// and the frontend JSP thinks any message other than "success" is an error
+			outcome = "success";
+		} catch(FileAlreadyExistsException e) {
+			logger.error("Error: ",e);
+			outcome = "uploaded previously";
+        } catch(Exception e) {
             logger.error("Error: ",e);
             outcome = "exception";
         }
         finally {
         	IOUtils.closeQuietly(formFileIs);
-        	IOUtils.closeQuietly(localFileIs);
         }
-        
+
         request.setAttribute("outcome", outcome);
         return mapping.findForward("success");
     }

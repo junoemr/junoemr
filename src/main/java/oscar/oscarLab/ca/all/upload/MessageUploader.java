@@ -37,34 +37,24 @@ package oscar.oscarLab.ca.all.upload;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.OtherIdManager;
-import org.oscarehr.common.dao.FileUploadCheckDao;
-import org.oscarehr.common.dao.Hl7TextInfoDao;
-import org.oscarehr.common.dao.Hl7TextMessageDao;
-import org.oscarehr.common.dao.MeasurementDao;
-import org.oscarehr.common.dao.MeasurementsExtDao;
-import org.oscarehr.common.dao.PatientLabRoutingDao;
-import org.oscarehr.common.dao.ProviderLabRoutingDao;
-import org.oscarehr.common.dao.RecycleBinDao;
+import org.oscarehr.common.dao.*;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.FileUploadCheck;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
-import org.oscarehr.common.model.Measurement;
-import org.oscarehr.common.model.MeasurementsExt;
 import org.oscarehr.common.model.OtherId;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.ProviderLabRoutingModel;
-import org.oscarehr.common.model.RecycleBin;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
@@ -95,8 +85,7 @@ public final class MessageUploader {
 	private static FileUploadCheckDao fileUploadCheckDao = SpringUtils.getBean(FileUploadCheckDao.class);
 	private static DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
 	private static ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
-
-
+	private static DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 
 	private MessageUploader() {
 		// there's no reason to instantiate a class with no fields.
@@ -114,27 +103,27 @@ public final class MessageUploader {
 		
 		String retVal = "";
 		try {
-			MessageHandler h = Factory.getHandler(type, hl7Body);
+			MessageHandler messageHandler = Factory.getHandler(type, hl7Body);
 
-			String firstName = h.getFirstName();
-			String lastName = h.getLastName();
-			String dob = h.getDOB();
-			String sex = h.getSex();
-			String hin = h.getHealthNum();
+			String firstName = messageHandler.getFirstName();
+			String lastName = messageHandler.getLastName();
+			String dob = messageHandler.getDOB();
+			String sex = messageHandler.getSex();
+			String hin = messageHandler.getHealthNum();
 			String resultStatus = "";
-			String priority = h.getMsgPriority();
-			String requestingClient = h.getDocName();
-			String reportStatus = h.getOrderStatus();
-			String accessionNum = h.getAccessionNum();
-			String fillerOrderNum = h.getFillerOrderNumber();
-			String sendingFacility = h.getPatientLocation();
-			ArrayList<String> docNums = h.getDocNums();
-			int finalResultCount = h.getOBXFinalResultCount();
-			String obrDate = h.getMsgDate();
+			String priority = messageHandler.getMsgPriority();
+			String requestingClient = messageHandler.getDocName();
+			String reportStatus = messageHandler.getOrderStatus();
+			String accessionNum = messageHandler.getAccessionNum();
+			String fillerOrderNum = messageHandler.getFillerOrderNumber();
+			String sendingFacility = messageHandler.getPatientLocation();
+			ArrayList docNums = messageHandler.getDocNums();
+			int finalResultCount = messageHandler.getOBXFinalResultCount();
+			String obrDate = messageHandler.getMsgDate();
 
-			if(h instanceof HHSEmrDownloadHandler) {
+			if(messageHandler instanceof HHSEmrDownloadHandler) {
 				try{
-	            	String chartNo = ((HHSEmrDownloadHandler)h).getPatientIdByType("MR");
+	            	String chartNo = ((HHSEmrDownloadHandler)messageHandler).getPatientIdByType("MR");
 	            	if(chartNo != null) {
 	            		//let's get the hin
 	            		List<Demographic> clients = demographicManager.getDemosByChartNo(loggedInInfo, chartNo);
@@ -148,8 +137,8 @@ public final class MessageUploader {
             }
             
             // get actual ohip numbers based on doctor first and last name for spire lab
-            if(h instanceof SpireHandler) {
-				List<String> docNames = ((SpireHandler)h).getDocNames();
+            if(messageHandler instanceof SpireHandler) {
+				List<String> docNames = ((SpireHandler)messageHandler).getDocNames();
 				//logger.debug("docNames:");
 	            for (int i=0; i < docNames.size(); i++) {
 					logger.info(i + " " + docNames.get(i));
@@ -174,16 +163,16 @@ public final class MessageUploader {
 
 			int i = 0;
 			int j = 0;
-			while (resultStatus.equals("") && i < h.getOBRCount()) {
+			while (resultStatus.equals("") && i < messageHandler.getOBRCount()) {
 				j = 0;
-				while (resultStatus.equals("") && j < h.getOBXCount(i)) {
-					if (h.isOBXAbnormal(i, j)) resultStatus = "A";
+				while (resultStatus.equals("") && j < messageHandler.getOBXCount(i)) {
+					if (messageHandler.isOBXAbnormal(i, j)) resultStatus = "A";
 					j++;
 				}
 				i++;
 			}
 
-			ArrayList<String> disciplineArray = h.getHeaders();
+			ArrayList<String> disciplineArray = messageHandler.getHeaders();
 			String next = "";
 			if (disciplineArray != null && disciplineArray.size() > 0) next = disciplineArray.get(0);
 
@@ -245,7 +234,16 @@ public final class MessageUploader {
 				hl7TextInfoDao.persist(hl7TextInfo);
 			}
 
-			String demProviderNo = patientRouteReport(loggedInInfo, insertID, lastName, firstName, sex, dob, hin, DbConnectionFilter.getThreadLocalDbConnection());
+			String demProviderNo = "0";
+			try
+			{
+				demProviderNo = patientRouteReport(loggedInInfo, insertID, lastName,
+						firstName, sex, dob, hin);
+			} catch (Exception ignored)
+			{
+
+			}
+
 			if(type.equals("OLIS_HL7") && demProviderNo.equals("0")) {
 				OLISSystemPreferencesDao olisPrefDao = (OLISSystemPreferencesDao)SpringUtils.getBean("OLISSystemPreferencesDao");
 			    OLISSystemPreferences olisPreferences =  olisPrefDao.getPreferences();
@@ -269,7 +267,7 @@ public final class MessageUploader {
 				}
 				providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
 			}
-			retVal = h.audit();
+			retVal = messageHandler.audit();
 			if(results != null) {
 				results.segmentId = insertID;
 			}
@@ -394,226 +392,76 @@ public final class MessageUploader {
 	/**
 	 * Attempt to match the patient from the lab to a demographic, return the patients provider which is to be used then no other provider can be found to match the patient to.
 	 */
-	private static String patientRouteReport(LoggedInInfo loggedInInfo, int labId, String lastName, String firstName, String sex, String dob, String hin, Connection conn) throws SQLException {
-		PatientLabRoutingResult result = null;
-		
-			String sql;
-			String demo = "0";
-			String provider_no = "0";
-			// 19481015
-			String dobYear = "%";
-			String dobMonth = "%";
-			String dobDay = "%";
-			String hinMod = "%";
-	
-			
-			try {
-	
-				if (hin != null) {
-					hinMod = new String(hin);
-					if (hinMod.length() == 12) {
-						hinMod = hinMod.substring(0, 10);
-					}
-				}
-	
-				if (dob != null && !dob.equals("")) {
-					String[] dobArray = dob.trim().split("-");
-					dobYear = dobArray[0];
-					dobMonth = dobArray[1];
-					dobDay = dobArray[2];
-				}
-	
-				if (!firstName.equals("")) firstName = firstName.substring(0, 1);
-				if (!lastName.equals("")) lastName = lastName.substring(0, 1);
-	
-				if (hinMod.equals("%")) {
-					sql = "select demographic_no, provider_no from demographic where" + " last_name like '" + lastName + "%' and " + " first_name like '" + firstName + "%' and " + " year_of_birth like '" + dobYear + "' and " + " month_of_birth like '" + dobMonth + "' and " + " date_of_birth like '" + dobDay + "' and " + " sex like '" + sex + "%' ";
-				} else if (OscarProperties.getInstance().getBooleanProperty("LAB_NOMATCH_NAMES", "yes")) {
-					sql = "select demographic_no, provider_no from demographic where hin='" + hinMod + "' and " + " year_of_birth like '" + dobYear + "' and " + " month_of_birth like '" + dobMonth + "' and " + " date_of_birth like '" + dobDay + "' and " + " sex like '" + sex + "%' ";
-				} else {
-					sql = "select demographic_no, provider_no from demographic where hin='" + hinMod + "' and " + " last_name like '" + lastName + "%' and " + " first_name like '" + firstName + "%' and " + " year_of_birth like '" + dobYear + "' and " + " month_of_birth like '" + dobMonth + "' and " + " date_of_birth like '" + dobDay + "' and " + " sex like '" + sex + "%' ";
-				}
-	
-				logger.debug(sql);
-				PreparedStatement pstmt = conn.prepareStatement(sql);
-				ResultSet rs = pstmt.executeQuery();
-				int count = 0;
-				
-				while (rs.next()) {
-					result = new PatientLabRoutingResult();
-					demo = oscar.Misc.getString(rs, "demographic_no");
-					provider_no = oscar.Misc.getString(rs, "provider_no");
-					result.setDemographicNo(Integer.parseInt(demo));
-					result.setProviderNo(provider_no);
-					count++;
-				}
-				rs.close();
-				pstmt.close();
-				if(count > 1) {
-					result = null;
-				}
-			} catch (SQLException sqlE) {
-				throw sqlE;
-			}
+	private static String patientRouteReport(LoggedInInfo loggedInInfo, int labId,
+											 String lastName, String firstName,
+											 String sex, String dob, String hin) throws Exception {
 
-		
-		try {
-			//did this link a merged patient? if so, we need to make sure we are the head record, or update
-			//result to be the head record.
-			if(result != null) {
-				DemographicMerged dm = new DemographicMerged();
-				Integer headDemo = dm.getHead(result.getDemographicNo());
-				if(headDemo != null && headDemo.intValue() != result.getDemographicNo()) {
-					Demographic demoTmp = demographicManager.getDemographic(loggedInInfo, headDemo);
-					if(demoTmp != null) {
-						result.setDemographicNo(demoTmp.getDemographicNo());
-						result.setProviderNo(demoTmp.getProviderNo());
-					} else {
-						logger.info("Unable to load the head record of this patient record. (" + result.getDemographicNo()  + ")");
-						result = null;
-					}
-				}
+		PatientLabRoutingResult patientLabRoutingResult = null;
+		Integer demographicNumber = 0;
+		String providerNumber = "0";
+		GregorianCalendar dateOfBirth = null;
+
+		if (hin != null) {
+			// This is for one of the Ontario labs I think??
+			if (hin.length() == 12) {
+				hin = hin.substring(0, 10);
 			}
-			
-			
-			if (result == null) {
-				logger.info("Could not find patient for lab: " + labId);
+		}
+
+		if (dob != null && !dob.trim().equals("")) {
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			Date date = dateFormat.parse(dob.trim());
+			dateOfBirth = new GregorianCalendar();
+			dateOfBirth.setTime(date);
+		}
+
+		// Only match against first chars of patient name
+		if (!firstName.equals("")) firstName = firstName.substring(0, 1);
+		if (!lastName.equals("")) lastName = lastName.substring(0, 1);
+
+		Demographic demographic = demographicDao.findMatchingLab(
+				hin, firstName, lastName, sex, dateOfBirth);
+
+		patientLabRoutingResult = new PatientLabRoutingResult();
+		demographicNumber = demographic.getDemographicNo();
+		providerNumber = demographic.getProviderNo();
+		patientLabRoutingResult.setDemographicNo(demographicNumber);
+		patientLabRoutingResult.setProviderNo(providerNumber);
+		
+		//did this link a merged patient? if so, we need to make sure we are the head record,
+		// or update result to be the head record.
+		DemographicMerged demographicMerged = new DemographicMerged();
+		Integer headDemo = demographicMerged.getHead(demographicNumber);
+		if(headDemo != null && headDemo.intValue() != demographicNumber.intValue()) {
+			Demographic demoTmp = demographicManager.getDemographic(loggedInInfo, headDemo);
+			if(demoTmp != null) {
+				patientLabRoutingResult.setDemographicNo(demoTmp.getDemographicNo());
+				patientLabRoutingResult.setProviderNo(demoTmp.getProviderNo());
 			} else {
-				Hl7textResultsData.populateMeasurementsTable("" + labId, result.getDemographicNo().toString());
+				String message = "Unable to load the head record of this patient record. (" +
+						patientLabRoutingResult.getDemographicNo()  + ")";
+				logger.info(message);
+				throw new Exception(message);
 			}
-
-			if(result != null) {
-				sql = "insert into patientLabRouting (demographic_no, lab_no,lab_type,dateModified,created) values ('" + ((result != null && result.getDemographicNo()!=null)?result.getDemographicNo().toString():"0") + "', '" + labId + "','HL7',now(),now())";
-				PreparedStatement pstmt = conn.prepareStatement(sql);
-				pstmt.executeUpdate();
-				pstmt.close();
-			}
-		} catch (SQLException sqlE) {
-			logger.info("NO MATCHING PATIENT FOR LAB id =" + labId);
-			throw sqlE;
 		}
 
-		return (result != null)?result.getProviderNo():"0";
-	}
+		Hl7textResultsData.populateMeasurementsTable(
+				Integer.toString(labId), patientLabRoutingResult.getDemographicNo().toString());
 
-	/**
-	 * Used when errors occur to clean the database of labs that have not been inserted into all of the necessary tables
-	 */
-	public static void clean(int fileId) {
-		
-		List<Hl7TextMessage> results = hl7TextMessageDao.findByFileUploadCheckId(fileId);
-		
-
-		for (Hl7TextMessage result:results) {
-			int lab_id = result.getId();
-			
-			Hl7TextInfo hti = hl7TextInfoDao.findLabId(lab_id);
-			if(hti != null) {
-				RecycleBin rb = new RecycleBin();
-				rb.setProviderNo("0");
-				rb.setUpdateDateTime(new Date());
-				rb.setTableName("hl7TextInfo");
-				rb.setKeyword(String.valueOf(lab_id));
-				rb.setTableContent("<id>" + hti.getId() + "</id>" + "<lab_no>" + lab_id + "</lab_no>" + "<sex>" + hti.getSex() + "</sex>" + "<health_no>" +hti.getHealthNumber() + "</health_no>" + "<result_status>"
-				        + hti.getResultStatus() + "</result_status>" + "<final_result_count>" + hti.getFinalResultCount() + "</final_result_count>" + "<obr_date>" + hti.getObrDate() + "</obr_date>" + "<priority>" + hti.getPriority() + "</priority>" + "<requesting_client>" + hti.getRequestingProvider() + "</requesting_client>" + "<discipline>" + hti.getDiscipline() + "</discipline>"
-				        + "<last_name>" + hti.getLastName() + "</last_name>" + "<first_name>" + hti.getFirstName() + "</first_name>" + "<report_status>" + hti.getReportStatus() + "</report_status>" + "<accessionNum>" + hti.getAccessionNumber() + "</accessionNum>'");
-				recycleBinDao.persist(rb);
-				
-				hl7TextInfoDao.remove(hl7TextInfoDao.findLabId(lab_id).getId());
-			}
-				
-
-			Hl7TextMessage htm = hl7TextMessageDao.find(lab_id);
-			if(htm != null) {
-				RecycleBin rb = new RecycleBin();
-				rb.setProviderNo("0");
-				rb.setUpdateDateTime(new Date());
-				rb.setTableName("hl7TextMessage");
-				rb.setKeyword(String.valueOf(lab_id));
-				rb.setTableContent("<lab_id>" + htm.getId() + "</lab_id>" + "<message>" + htm.getBase64EncodedeMessage() + "</message>" + "<type>" + htm.getType() + "</type>" + "<fileUploadCheck_id>" + htm.getFileUploadCheckId() + "</fileUploadCheck_id>");
-				recycleBinDao.persist(rb);
-				
-				hl7TextMessageDao.remove(lab_id);
-			}
-			
-
-			ProviderLabRoutingModel plr = providerLabRoutingDao.findSingleLabRoute(lab_id);
-			if(plr != null) {
-				RecycleBin rb = new RecycleBin();
-				rb.setProviderNo("0");
-				rb.setUpdateDateTime(new Date());
-				rb.setTableName("providerLabRouting");
-				rb.setKeyword(String.valueOf(lab_id));
-				rb.setTableContent("<provider_no>" + plr.getProviderNo() + "</provider_no>" + "<lab_no>" + plr.getLabNo() + "</lab_no>" + "<status>" +plr.getStatus() + "</status>" + "<comment>" + plr.getComment()
-				        + "</comment>" + "<timestamp>" + plr.getTimestamp() + "</timestamp>" + "<lab_type>" + plr.getLabType() + "</lab_type>" + "<id>" + plr.getId() + "</id>");
-				recycleBinDao.persist(rb);
-				
-				providerLabRoutingDao.remove(plr.getId());
-			}
-				
-			PatientLabRouting lr = patientLabRoutingDao.findSingleLabRoute(lab_id);
-			if(lr != null) {
-				RecycleBin rb = new RecycleBin();
-				rb.setProviderNo("0");
-				rb.setUpdateDateTime(new Date());
-				rb.setTableName("patientLabRouting");
-				rb.setKeyword(String.valueOf(lab_id));
-				rb.setTableContent("<demographic_no>" + lr.getDemographicNo() + "</demographic_no>" + "<lab_no>" + lr.getLabNo() + "</lab_no>" + "<lab_type>" + lr.getLabType() + "</lab_type>" + "<id>" + lr.getId() + "</id>");
-				recycleBinDao.persist(rb);
-
-				patientLabRoutingDao.remove(lr.getId());
-			}
-
-			List<MeasurementsExt> measurementExts = measurementsExtDao.findByKeyValue("lab_no", String.valueOf(lab_id));
-			for(MeasurementsExt me:measurementExts) {
-				Measurement m = measurementDao.find(me.getMeasurementId());
-				if(m != null) {
-					RecycleBin rb = new RecycleBin();
-					rb.setProviderNo("0");
-					rb.setUpdateDateTime(new Date());
-					rb.setTableName("measurements");
-					rb.setKeyword(String.valueOf(me.getMeasurementId()));
-					rb.setTableContent("<id>" +m.getId() + "</id>" + "<type>" + m.getType() + "</type>" + "<demographicNo>" +m.getDemographicId() + "</demographicNo>" + "<providerNo>" + m.getProviderNo() + "</providerNo>" + "<dataField>"
-						        + m.getDataField() + "</dataField>" + "<measuringInstruction>" + m.getMeasuringInstruction() + "</measuringInstruction>" + "<comments>" + m.getComments() + "</comments>" + "<dateObserved>" + m.getDateObserved() + "</dateObserved>" + "<dateEntered>" + m.getCreateDate()+ "</dateEntered>");
-					recycleBinDao.persist(rb);
-					
-					measurementDao.remove(m.getId());
-				}
-				
-				List<MeasurementsExt> mes = measurementsExtDao.getMeasurementsExtByMeasurementId(me.getMeasurementId());
-				for(MeasurementsExt me1:mes) {
-					RecycleBin rb = new RecycleBin();
-					rb.setProviderNo("0");
-					rb.setUpdateDateTime(new Date());
-					rb.setTableName("measurementsExt");
-					rb.setKeyword(String.valueOf(me.getMeasurementId()));
-					rb.setTableContent("<id>" + me1.getId() + "</id>" + "<measurement_id>" + me1.getMeasurementId() + "</measurement_id>" + "<keyval>" + me1.getKeyVal() + "</keyval>" + "<val>" + me1.getVal() + "</val>");
-					recycleBinDao.persist(rb);
-					
-					measurementsExtDao.remove(me1.getId());
-				}
-				
-			}
-			
-			
-
-		}
-		
-		
-		FileUploadCheck fuc = fileUploadCheckDao.find(fileId);
-		if(fuc != null) {
-			RecycleBin rb = new RecycleBin();
-			rb.setProviderNo("0");
-			rb.setUpdateDateTime(new Date());
-			rb.setTableName("fileUploadCheck");
-			rb.setKeyword(String.valueOf(fileId));
-			rb.setTableContent("<id>" + fuc.getId() + "</id>" + "<provider_no>" + fuc.getProviderNo() + "</provider_no>" + "<filename>" + fuc.getFilename() + "</filename>" + "<md5sum>" + fuc.getMd5sum() + "</md5sum>" + "<datetime>" +fuc.getDateTime() + "</datetime>");
-			recycleBinDao.persist(rb);	
-			
-			fileUploadCheckDao.remove(fuc.getId());
+		PatientLabRouting patientLabRouting = new PatientLabRouting();
+		Integer demographicNo = patientLabRoutingResult.getDemographicNo();
+		if(demographicNo == null)
+		{
+			demographicNo = PatientLabRoutingDao.UNMATCHED;
 		}
 
-			
-			
+		patientLabRouting.setDemographicNo(demographicNo);
+		patientLabRouting.setLabNo(labId);
+		patientLabRouting.setLabType(PatientLabRoutingDao.HL7);
+		patientLabRouting.setCreated(new Date());
+		patientLabRouting.setDateModified(new Date());
+		patientLabRoutingDao.persist(patientLabRouting);
+
+		return patientLabRoutingResult.getProviderNo();
 	}
 }

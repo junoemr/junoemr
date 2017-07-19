@@ -58,53 +58,49 @@ public class Utilities {
     	// utils shouldn't be instantiated
     }
     
-    public static ArrayList<String> separateMessages(String fileName) throws Exception{
+    public static ArrayList<String> separateMessages(String fileName) throws IOException {
                 
         ArrayList<String> messages = new ArrayList<String>();
-        try{
-            InputStream is = new FileInputStream(fileName);
-            
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            
-            String line = null;
-            boolean firstPIDflag = false; //true if the first PID segment has been processed false otherwise
-            boolean firstMSHflag = false; //true if the first MSH segment has been processed false otherwise
-            //String mshSeg = br.readLine();
-            
-            StringBuilder sb = new StringBuilder();
-            String mshSeg = "";
-            
-            while ((line = br.readLine()) != null) {
-                if (line.length() > 3){
-                    if (line.substring(0, 3).equals("MSH")){
-                        if (firstMSHflag){
-                            messages.add(sb.toString());
-                            sb.delete(0, sb.length());
-                        }
-                        mshSeg = line;
-                        firstMSHflag = true;
-                        firstPIDflag = false;
-                    } else if (line.substring(0, 3).equals("PID")){
-                        if (firstPIDflag){
-                            messages.add(sb.toString());
-                            sb.delete(0, sb.length());
-                            sb.append(mshSeg + "\r\n");
-                        }
-                        firstPIDflag = true;
-                    }
-                    sb.append(line + "\r\n");
-                }
-            }
-                       
-            // add the last message
-            messages.add(sb.toString());
-            
-            is.close();
-            br.close();
-        }catch(Exception e){
-            throw e;
-        }
-        
+		InputStream is = new FileInputStream(fileName);
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+		String line = null;
+		boolean firstPIDflag = false; //true if the first PID segment has been processed false otherwise
+		boolean firstMSHflag = false; //true if the first MSH segment has been processed false otherwise
+		//String mshSeg = br.readLine();
+
+		StringBuilder sb = new StringBuilder();
+		String mshSeg = "";
+
+		while ((line = br.readLine()) != null) {
+			if (line.length() > 3){
+				if (line.substring(0, 3).equals("MSH")){
+					if (firstMSHflag){
+						messages.add(sb.toString());
+						sb.delete(0, sb.length());
+					}
+					mshSeg = line;
+					firstMSHflag = true;
+					firstPIDflag = false;
+				} else if (line.substring(0, 3).equals("PID")){
+					if (firstPIDflag){
+						messages.add(sb.toString());
+						sb.delete(0, sb.length());
+						sb.append(mshSeg + "\r\n");
+					}
+					firstPIDflag = true;
+				}
+				sb.append(line + "\r\n");
+			}
+		}
+
+		// add the last message
+		messages.add(sb.toString());
+
+		is.close();
+		br.close();
+
         return(messages);
     }
     
