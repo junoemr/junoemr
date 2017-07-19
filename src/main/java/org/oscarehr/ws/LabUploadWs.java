@@ -286,32 +286,6 @@ public class LabUploadWs extends AbstractWs {
             throw new Exception( "Failed insert lab into DB: " + fileName + " of type: " + labType);
         }
 
-        /*
-
-        // Upload lab info and hash to DB to check for duplicates
-        FileInputStream is = new FileInputStream(labFilePath);
-        int checkFileUploadedSuccessfully = FileUploadCheck.addFile(fileName,is,oscarProviderNo);
-        is.close();
-        if (checkFileUploadedSuccessfully != FileUploadCheck.UNSUCCESSFUL_SAVE){
-            logger.info("filePath" + labFilePath);
-            logger.info("Type :" + labType);
-            MessageHandler msgHandler = HandlerClassFactory.getHandler(labType);
-            logger.info("MESSAGE HANDLER "+msgHandler.getClass().getName());
-
-			// Parse and handle the lab
-            retVal = msgHandler.parse(loggedInInfo, getClass().getSimpleName(), labFilePath, checkFileUploadedSuccessfully, ipAddr);
-			if (retVal == null) {
-				throw new ParseException("Failed to parse lab: " + fileName + " of type: " + labType, 0);
-			}
-			else if (retVal.equals("duplicate")) {
-				throw new Exception("Duplicate lab upload");
-			}
-		}
-		else {
-			throw new SQLException( "Failed insert lab into DB (Likely duplicate lab): " + fileName + " of type: " + labType);
-		}
-
-*/
         // This will always contain one line, so let's just remove the newline characters
         retVal = retVal.replace("\n", "").replace("\r", "");
 
