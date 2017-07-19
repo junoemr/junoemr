@@ -30,11 +30,12 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.oscarehr.common.model.AbstractModel;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import oscar.util.ParamAppender;
 
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED)
 public abstract class AbstractDao<T extends AbstractModel<?>> {
 	public static final int MAX_LIST_RETURN_SIZE = 5000;
 

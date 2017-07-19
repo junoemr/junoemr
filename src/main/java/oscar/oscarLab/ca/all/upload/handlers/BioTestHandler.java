@@ -65,7 +65,6 @@ public class BioTestHandler implements MessageHandler {
 				oscar.oscarLab.ca.all.parsers.MessageHandler msgHandler = Factory.getHandler(String.valueOf(routeResults.segmentId));
 				
 				if( msgHandler == null ) {
-					MessageUploader.clean(fileId);
 					logger.error("Saved lab but could not parse base64 value");
 					return null;
 				}
@@ -78,7 +77,6 @@ public class BioTestHandler implements MessageHandler {
 			updateLabStatus(messages.size());
 			logger.info("Parsed OK");
 		} catch (Exception e) {
-			MessageUploader.clean(fileId);
 			logger.error("Could not upload message", e);
 			return null;
 		}

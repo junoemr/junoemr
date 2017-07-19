@@ -32,17 +32,229 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.common.model.*;
+import org.oscarehr.util.MiscUtils;
+
 import javax.persistence.Query;
 
 import org.oscarehr.common.NativeSql;
-import org.oscarehr.common.model.Measurement;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import oscar.util.UtilDateUtilities;
+
+import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 @Repository
 public class MeasurementDao extends AbstractDao<Measurement> {
 
+	@Autowired
+	private MeasurementsDeletedDao measurementsDeletedDao;
+
+	@Autowired
+	private MeasurementMapDao measurementMapDao;
+
+	@Autowired
+	private MeasurementsExtDao measurementsExtDao;
+
 	public MeasurementDao() {
 		super(Measurement.class);
+	}
+
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void deleteMatchingLabs(String[] matchingLabs, String lab_no)
+	{
+		int k = 0;
+		while (k < matchingLabs.length && !matchingLabs[k].equals(lab_no)) {
+			k++;
+		}
+
+		if (k != 0) {
+			for (Measurement measurement : findByValue("lab_no", matchingLabs[k - 1])) {
+				MeasurementsDeleted measurementsDeleted = new MeasurementsDeleted(measurement);
+				measurementsDeletedDao.persist(measurementsDeleted);
+				remove(measurement.getId());
+			}
+		}
+	}
+
+	@Transactional(propagation = Propagation.REQUIRED)
+	public void populateMeasurements(
+			MessageHandler messageHandler, String lab_no, String demographic_no, String dateEntered) {
+
+		Logger logger = MiscUtils.getLogger();
+
+		for (int i = 0; i < messageHandler.getOBRCount(); i++) {
+			for (int j = 0; j < messageHandler.getOBXCount(i); j++) {
+
+				String result = messageHandler.getOBXResult(i, j);
+
+				// only add if there is a result and it is supposed to be viewed
+				if (result.equals("") || result.equals("DNR") || messageHandler.getOBXName(i, j).equals("") || messageHandler.getOBXResultStatus(i, j).equals("DNS")) continue;
+				logger.debug("obx(" + j + ") should be added");
+				String identifier = messageHandler.getOBXIdentifier(i, j);
+				String name = messageHandler.getOBXName(i, j);
+				String unit = messageHandler.getOBXUnits(i, j);
+				String labname = messageHandler.getPatientLocation();
+				String accession = messageHandler.getAccessionNum();
+				String req_datetime = messageHandler.getRequestDate(i);
+				String datetime = messageHandler.getTimeStamp(i, j);
+				String olis_status = messageHandler.getOBXResultStatus(i, j);
+				String abnormal = messageHandler.getOBXAbnormalFlag(i, j);
+				if (abnormal != null && (abnormal.equals("A") || abnormal.startsWith("H"))) {
+					abnormal = "A";
+				} else if (abnormal != null && abnormal.startsWith("L")) {
+					abnormal = "L";
+				} else {
+					abnormal = "N";
+				}
+				String[] refRange = splitRefRange(messageHandler.getOBXReferenceRange(i, j));
+				String comments = "";
+				for (int l = 0; l < messageHandler.getOBXCommentCount(i, j); l++) {
+					comments += comments.length() > 0 ? "\n" + messageHandler.getOBXComment(i, j, l) : messageHandler.getOBXComment(i, j, l);
+				}
+
+				String measType = "";
+				String measInst = "";
+
+				List<Object[]> measurements = measurementMapDao.findMeasurements("FLOWSHEET", identifier);
+				if (measurements.isEmpty()) {
+					logger.warn("CODE:" + identifier + " needs to be mapped");
+				} else {
+					for (Object[] o : measurements) {
+						MeasurementMap mm = (MeasurementMap) o[1];
+						MeasurementType type = (MeasurementType) o[2];
+
+						measType = mm.getIdentCode();
+						measInst = type.getMeasuringInstruction();
+					}
+				}
+
+
+				Measurement m = new Measurement();
+				m.setType(measType);
+				m.setDemographicId(Integer.parseInt(demographic_no));
+				m.setProviderNo("0");
+				m.setDataField(result);
+				m.setMeasuringInstruction(measInst);
+				logger.info("DATETIME FOR MEASUREMENT " + datetime);
+				if(datetime != null && datetime.length()>0) {
+					m.setDateObserved(UtilDateUtilities.StringToDate(datetime, "yyyy-MM-dd hh:mm:ss"));
+				}
+
+				if( m.getDateObserved() == null && datetime != null && datetime.length() > 0 ) {
+					m.setDateObserved(UtilDateUtilities.StringToDate(datetime, "yyyy-MM-dd"));
+				}
+
+				if( m.getDateObserved() == null ){
+					m.setDateObserved(UtilDateUtilities.StringToDate(dateEntered, "yyyy-MM-dd hh:mm:ss"));
+				}
+				m.setAppointmentNo(0);
+
+				persist(m);
+
+				int mId = m.getId();
+
+				ArrayList<MeasurementsExt> measurementsExts = new ArrayList<MeasurementsExt>();
+
+				MeasurementsExt me = new MeasurementsExt();
+				me.setMeasurementId(mId);
+				me.setKeyVal("lab_no");
+				me.setVal(lab_no);
+				measurementsExts.add(me);
+
+				me = new MeasurementsExt();
+				me.setMeasurementId(mId);
+				me.setKeyVal("abnormal");
+				me.setVal(abnormal);
+				measurementsExts.add(me);
+
+				me = new MeasurementsExt();
+				me.setMeasurementId(mId);
+				me.setKeyVal("identifier");
+				me.setVal(identifier);
+				measurementsExts.add(me);
+
+				me = new MeasurementsExt();
+				me.setMeasurementId(mId);
+				me.setKeyVal("name");
+				me.setVal(name);
+				measurementsExts.add(me);
+
+				me = new MeasurementsExt();
+				me.setMeasurementId(mId);
+				me.setKeyVal("labname");
+				me.setVal(labname);
+				measurementsExts.add(me);
+
+				me = new MeasurementsExt();
+				me.setMeasurementId(mId);
+				me.setKeyVal("accession");
+				me.setVal(accession);
+				measurementsExts.add(me);
+
+				me = new MeasurementsExt();
+				me.setMeasurementId(mId);
+				me.setKeyVal("request_datetime");
+				me.setVal(req_datetime);
+				measurementsExts.add(me);
+
+				me = new MeasurementsExt();
+				me.setMeasurementId(mId);
+				me.setKeyVal("datetime");
+				me.setVal(datetime);
+				measurementsExts.add(me);
+
+				if (olis_status != null && olis_status.length() > 0) {
+					me = new MeasurementsExt();
+					me.setMeasurementId(mId);
+					me.setKeyVal("olis_status");
+					me.setVal(olis_status);
+					measurementsExts.add(me);
+				}
+
+				if (unit != null && unit.length() > 0) {
+					me = new MeasurementsExt();
+					me.setMeasurementId(mId);
+					me.setKeyVal("unit");
+					me.setVal(unit);
+					measurementsExts.add(me);
+				}
+
+				if (refRange[0].length() > 0) {
+					me = new MeasurementsExt();
+					me.setMeasurementId(mId);
+					me.setKeyVal("range");
+					me.setVal(refRange[0]);
+					measurementsExts.add(me);
+				} else {
+					if (refRange[1].length() > 0) {
+						me = new MeasurementsExt();
+						me.setMeasurementId(mId);
+						me.setKeyVal("minimum");
+						me.setVal(refRange[1]);
+						measurementsExts.add(me);
+					}
+					if (refRange[2].length() > 0) {
+						me = new MeasurementsExt();
+						me.setMeasurementId(mId);
+						me.setKeyVal("maximum");
+						me.setVal(refRange[2]);
+						measurementsExts.add(me);
+					}
+				}
+
+				me = new MeasurementsExt();
+				me.setMeasurementId(mId);
+				me.setKeyVal("other_id");
+				me.setVal(i + "-" + j);
+				measurementsExts.add(me);
+				measurementsExtDao.setMeasurementsExts(measurementsExts);
+			}
+		}
+
 	}
 
 	public List<Measurement> findByDemographicIdUpdatedAfterDate(Integer demographicId, Date updatedAfterThisDate) {
@@ -732,4 +944,38 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 		return query.getResultList();
 	}
 
+	private String[] splitRefRange(String refRangeTxt) {
+		refRangeTxt = refRangeTxt.trim();
+		String[] refRange = { "", "", "" };
+		String numeric = "-. 0123456789";
+		boolean textual = false;
+		if (refRangeTxt == null || refRangeTxt.length() == 0) return refRange;
+
+		for (int i = 0; i < refRangeTxt.length(); i++) {
+			if (!numeric.contains(refRangeTxt.subSequence(i, i + 1))) {
+				if (i > 0 || (refRangeTxt.charAt(i) != '>' && refRangeTxt.charAt(i) != '<')) {
+					textual = true;
+					break;
+				}
+			}
+		}
+		if (textual) {
+			refRange[0] = refRangeTxt;
+		} else {
+			if (refRangeTxt.charAt(0) == '>') {
+				refRange[1] = refRangeTxt.substring(1).trim();
+			} else if (refRangeTxt.charAt(0) == '<') {
+				refRange[2] = refRangeTxt.substring(1).trim();
+			} else {
+				String[] tmp = refRangeTxt.split("-");
+				if (tmp.length == 2) {
+					refRange[1] = tmp[0].trim();
+					refRange[2] = tmp[1].trim();
+				} else {
+					refRange[0] = refRangeTxt;
+				}
+			}
+		}
+		return refRange;
+	}
 }

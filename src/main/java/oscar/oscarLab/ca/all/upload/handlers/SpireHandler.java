@@ -65,7 +65,6 @@ public class SpireHandler implements MessageHandler {
 
 			}
 		} catch (Exception e) {
-			MessageUploader.clean(fileId);
 			logger.error("Could not upload message: ", e);
 			MiscUtils.getLogger().error("Error", e);
 			return null;

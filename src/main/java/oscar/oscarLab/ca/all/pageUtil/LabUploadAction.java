@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -72,10 +73,8 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
-import oscar.oscarLab.FileUploadCheck;
 import oscar.oscarLab.ca.all.parsers.HHSEmrDownloadHandler;
-import oscar.oscarLab.ca.all.upload.HandlerClassFactory;
-import oscar.oscarLab.ca.all.upload.handlers.MessageHandler;
+import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 import oscar.oscarLab.ca.all.util.Utilities;
 
 public class LabUploadAction extends Action {
@@ -121,8 +120,6 @@ public class LabUploadAction extends Action {
 
 			if (validateSignature(clientKey, signature, file)) {
 				logger.debug("Validated Successfully");
-				MessageHandler msgHandler = HandlerClassFactory.getHandler(type);
-
 				if (type.equals("HHSEMR") && OscarProperties.getInstance().getProperty("lab.hhsemr.filter_ordering_provider", "false").equals("true")) {
 					logger.info("Applying filter to HHS EMR lab");
 					String hl7Data = FileUtils.readFileToString(file, "UTF-8");
@@ -139,32 +136,27 @@ public class LabUploadAction extends Action {
 				}
 
 				is = new FileInputStream(file);
+				String providerNumber = "0";
 				try {
-					int check = FileUploadCheck.addFile(file.getName(), is, "0");
-					if (check != FileUploadCheck.UNSUCCESSFUL_SAVE) {
-						
-						audit = msgHandler.parse(loggedInInfo, service, filePath, check, request.getRemoteAddr());
-						if(audit == null) {
-							outcome = "upload failed";
-							httpCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-						}
-						else if (audit.equals("success")) {
-							outcome = "uploaded";
-							httpCode = HttpServletResponse.SC_OK;
-						}
-						else if (audit.equals("duplicate")) {
-							outcome = "uploaded previously";
-							httpCode = HttpServletResponse.SC_CONFLICT;
-						}
-						else {
-							outcome = "upload failed";
-							httpCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-						}
-					}
-					else {
-						outcome = "uploaded previously";
-						httpCode = HttpServletResponse.SC_CONFLICT;
-					}
+					LabHandlerService labHandlerService = SpringUtils.getBean(LabHandlerService.class);
+					audit = labHandlerService.importLab(
+							type,
+							loggedInInfo,
+							service,
+							filePath,
+							providerNumber,
+							request.getRemoteAddr()
+					);
+
+					outcome = "uploaded";
+					httpCode = HttpServletResponse.SC_OK;
+
+				} catch(FileAlreadyExistsException e) {
+					outcome = "uploaded previously";
+					httpCode = HttpServletResponse.SC_CONFLICT;
+				} catch(Exception e) {
+					outcome = "upload failed";
+					httpCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 				}
 				finally {
 					is.close();

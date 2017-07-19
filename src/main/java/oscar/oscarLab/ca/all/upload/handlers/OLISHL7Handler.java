@@ -72,7 +72,6 @@ public class OLISHL7Handler implements MessageHandler {
 			}
 			logger.info("Parsed OK");
 		} catch (Exception e) {
-			MessageUploader.clean(fileId);
 			logger.error("Could not upload message", e);
 			return null;
 		}

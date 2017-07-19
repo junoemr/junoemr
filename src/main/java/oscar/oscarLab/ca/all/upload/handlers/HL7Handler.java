@@ -76,7 +76,6 @@ public class HL7Handler implements MessageHandler {
 			updateLabStatus(messages.size());
 			logger.info("Parsed OK");
 		} catch (Exception e) {
-			MessageUploader.clean(fileId);
 			logger.error("Could not upload message", e);
 			return null;
 		}

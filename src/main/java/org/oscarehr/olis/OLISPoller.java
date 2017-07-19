@@ -9,8 +9,7 @@
 package org.oscarehr.olis;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,10 +34,10 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.oscarLab.FileUploadCheck;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
+import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 import oscar.oscarLab.ca.all.util.Utilities;
 
 import com.indivica.olis.Driver;
@@ -229,25 +228,30 @@ public class OLISPoller {
 		for (String uuidToAdd: resultList) {
 	
 			String fileLocation = System.getProperty("java.io.tmpdir") + "/olis_" + uuidToAdd + ".response";
-			File file = new File(fileLocation);
-			oscar.oscarLab.ca.all.upload.handlers.MessageHandler msgHandler = oscar.oscarLab.ca.all.upload.HandlerClassFactory.getHandler("OLIS_HL7");
-	
-			try {
-				InputStream is = new FileInputStream(fileLocation);
-				int check = FileUploadCheck.addFile(file.getName(), is, "0");
-				if (check != FileUploadCheck.UNSUCCESSFUL_SAVE) {
-					if (msgHandler.parse(loggedInInfo, "OLIS_HL7",fileLocation, check,null) != null) {
-						logger.info("Lab successfully added.");
-					} else {
-						logger.info("Error adding lab.");
-					}
-				} else {
-					logger.info("Lab already in system.");
-				}
-				is.close();
-	
-			} catch (Exception e) {
-				MiscUtils.getLogger().error("Couldn't add requested OLIS lab to Inbox.", e);
+			String labType = "OLIS_HL7";
+			String serviceName = "OLIS_HL7";
+			String providerNumber = "0";
+			String timeStringForNextStartDate = null;
+			try
+			{
+				logger.debug("Lab Type: " + labType);
+				logger.debug("Lab file path: " + fileLocation);
+
+				LabHandlerService labHandlerService = SpringUtils.getBean(LabHandlerService.class);
+				timeStringForNextStartDate = labHandlerService.importLab(
+						labType,
+						loggedInInfo,
+						serviceName,
+						fileLocation,
+						providerNumber,
+						null
+				);
+				logger.info("Lab successfully added.");
+
+			} catch(FileAlreadyExistsException e) {
+				logger.warn("Lab already in system.");
+			} catch(Exception e) {
+				logger.error( "Failed insert lab into DB: " + fileLocation + " of type: " + labType);
 			}
 		}
 	}

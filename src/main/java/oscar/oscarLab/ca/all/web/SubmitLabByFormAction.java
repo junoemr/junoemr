@@ -27,7 +27,7 @@ package oscar.oscarLab.ca.all.web;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -46,9 +46,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.oscarLab.FileUploadCheck;
-import oscar.oscarLab.ca.all.upload.HandlerClassFactory;
-import oscar.oscarLab.ca.all.upload.handlers.MessageHandler;
+import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 import oscar.oscarLab.ca.all.util.Utilities;
 
 public class SubmitLabByFormAction extends DispatchAction {
@@ -158,29 +156,35 @@ public class SubmitLabByFormAction extends DispatchAction {
     	is.close();
         File file = new File(filePath);
 
-        FileInputStream fis = new FileInputStream(filePath);
-        int checkFileUploadedSuccessfully = FileUploadCheck.addFile(file.getName(),fis,providerNo);
-        fis.close();
+		String outcome = null;
+		String labType = "CML";
+		String serviceName = getClass().getSimpleName();
+		try
+		{
+			logger.debug("Lab Type: " + labType);
+			logger.debug("Lab file path: " + filePath);
 
-        String outcome = null;
+			LabHandlerService labHandlerService = SpringUtils.getBean(LabHandlerService.class);
+			labHandlerService.importLab(
+					labType,
+					loggedInInfo,
+					serviceName,
+					filePath,
+					providerNo,
+					ipAddr
+			);
+			logger.info("Lab successfully added.");
+			outcome = "success";
 
-        if (checkFileUploadedSuccessfully != FileUploadCheck.UNSUCCESSFUL_SAVE){
-            logger.info("filePath"+filePath);
-            logger.info("Type :"+"CML");
-            MessageHandler msgHandler = HandlerClassFactory.getHandler("CML");
-            if(msgHandler != null){
-               logger.info("MESSAGE HANDLER "+msgHandler.getClass().getName());
-            }
-            if((msgHandler.parse(loggedInInfo, getClass().getSimpleName(), filePath,checkFileUploadedSuccessfully,ipAddr)) != null)
-                outcome = "success";
-
-        }else{
-            outcome = "uploaded previously";
-        }
+		} catch(FileAlreadyExistsException e) {
+			logger.warn("Lab already in system.");
+			outcome = "uploaded previously";
+		} catch(Exception e) {
+			logger.error( "Failed insert lab into DB: " + filePath + " of type: " + labType);
+			throw e;
+		}
 
         logger.info("outcome="+outcome);
-
-
 		return manage(mapping,form,request,response);
 	}
 
