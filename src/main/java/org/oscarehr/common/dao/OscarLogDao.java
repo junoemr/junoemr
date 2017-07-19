@@ -122,7 +122,8 @@ public class OscarLogDao extends AbstractDao<OscarLog> {
 	 */
 	public List<OscarLog> getRecentDemographicsViewedByProvider(String providerNo, int startPosition, int itemsToReturn) {
 		String sqlCommand = "SELECT log1 FROM " + modelClass.getSimpleName() + " log1 " +
-							"WHERE log1.created = (SELECT MAX(log2.created) FROM " + modelClass.getSimpleName() + " log2 WHERE log2.demographicId = log1.demographicId) " +
+							"WHERE log1.created = (SELECT MAX(log2.created) FROM " + modelClass.getSimpleName() + " log2 " +
+							"WHERE log2.demographicId = log1.demographicId AND log2.content = :content AND log2.providerNo = :providerNo) " +
 							"AND log1.content = :content AND log1.providerNo = :providerNo " +
 							"ORDER BY log1.created DESC";
 
