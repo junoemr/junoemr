@@ -104,27 +104,27 @@ public final class MessageUploader {
 		
 		String retVal = "";
 		try {
-			MessageHandler h = Factory.getHandler(type, hl7Body);
+			MessageHandler messageHandler = Factory.getHandler(type, hl7Body);
 
-			String firstName = h.getFirstName();
-			String lastName = h.getLastName();
-			String dob = h.getDOB();
-			String sex = h.getSex();
-			String hin = h.getHealthNum();
+			String firstName = messageHandler.getFirstName();
+			String lastName = messageHandler.getLastName();
+			String dob = messageHandler.getDOB();
+			String sex = messageHandler.getSex();
+			String hin = messageHandler.getHealthNum();
 			String resultStatus = "";
-			String priority = h.getMsgPriority();
-			String requestingClient = h.getDocName();
-			String reportStatus = h.getOrderStatus();
-			String accessionNum = h.getAccessionNum();
-			String fillerOrderNum = h.getFillerOrderNumber();
-			String sendingFacility = h.getPatientLocation();
-			ArrayList docNums = h.getDocNums();
-			int finalResultCount = h.getOBXFinalResultCount();
-			String obrDate = h.getMsgDate();
+			String priority = messageHandler.getMsgPriority();
+			String requestingClient = messageHandler.getDocName();
+			String reportStatus = messageHandler.getOrderStatus();
+			String accessionNum = messageHandler.getAccessionNum();
+			String fillerOrderNum = messageHandler.getFillerOrderNumber();
+			String sendingFacility = messageHandler.getPatientLocation();
+			ArrayList docNums = messageHandler.getDocNums();
+			int finalResultCount = messageHandler.getOBXFinalResultCount();
+			String obrDate = messageHandler.getMsgDate();
 
-			if(h instanceof HHSEmrDownloadHandler) {
+			if(messageHandler instanceof HHSEmrDownloadHandler) {
 				try{
-	            	String chartNo = ((HHSEmrDownloadHandler)h).getPatientIdByType("MR");
+	            	String chartNo = ((HHSEmrDownloadHandler)messageHandler).getPatientIdByType("MR");
 	            	if(chartNo != null) {
 	            		//let's get the hin
 	            		List<Demographic> clients = demographicManager.getDemosByChartNo(loggedInInfo, chartNo);
@@ -138,8 +138,8 @@ public final class MessageUploader {
             }
             
             // get actual ohip numbers based on doctor first and last name for spire lab
-            if(h instanceof SpireHandler) {
-				List<String> docNames = ((SpireHandler)h).getDocNames();
+            if(messageHandler instanceof SpireHandler) {
+				List<String> docNames = ((SpireHandler)messageHandler).getDocNames();
 				//logger.debug("docNames:");
 	            for (int i=0; i < docNames.size(); i++) {
 					logger.info(i + " " + docNames.get(i));
@@ -164,16 +164,16 @@ public final class MessageUploader {
 
 			int i = 0;
 			int j = 0;
-			while (resultStatus.equals("") && i < h.getOBRCount()) {
+			while (resultStatus.equals("") && i < messageHandler.getOBRCount()) {
 				j = 0;
-				while (resultStatus.equals("") && j < h.getOBXCount(i)) {
-					if (h.isOBXAbnormal(i, j)) resultStatus = "A";
+				while (resultStatus.equals("") && j < messageHandler.getOBXCount(i)) {
+					if (messageHandler.isOBXAbnormal(i, j)) resultStatus = "A";
 					j++;
 				}
 				i++;
 			}
 
-			ArrayList<String> disciplineArray = h.getHeaders();
+			ArrayList<String> disciplineArray = messageHandler.getHeaders();
 			String next = "";
 			if (disciplineArray != null && disciplineArray.size() > 0) next = disciplineArray.get(0);
 
@@ -265,7 +265,7 @@ public final class MessageUploader {
 				}
 				providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
 			}
-			retVal = h.audit();
+			retVal = messageHandler.audit();
 			if(results != null) {
 				results.segmentId = insertID;
 			}

@@ -86,8 +86,8 @@ public class InsideLabUploadAction extends Action {
             File file = new File(filePath);
             
 
-			logger.debug("Lab Type: " + type);
-			logger.debug("Lab file path: " + filePath);
+			logger.info("Lab Type: " + type);
+			logger.info("Lab file path: " + filePath);
 			String serviceName = getClass().getSimpleName();
 			LabHandlerService labHandlerService = SpringUtils.getBean(LabHandlerService.class);
 
@@ -100,6 +100,9 @@ public class InsideLabUploadAction extends Action {
 					request.getRemoteAddr()
 			);
 
+			// Set outcome to success in manual lab uploader as some handlers return an HL7 audit record
+			// and the frontend JSP thinks any message other than "success" is an error
+			outcome = "success";
 		} catch(FileAlreadyExistsException e) {
 			logger.error("Error: ",e);
 			outcome = "uploaded previously";
@@ -110,7 +113,7 @@ public class InsideLabUploadAction extends Action {
         finally {
         	IOUtils.closeQuietly(formFileIs);
         }
-        
+
         request.setAttribute("outcome", outcome);
         return mapping.findForward("success");
     }

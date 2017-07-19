@@ -79,9 +79,9 @@ public class MDSHandler implements MessageHandler {
 				audit.append(auditLine);
 
 			}
-			logger.info("Parsed OK");
+			logger.info("Parsed OK: " + audit.toString());
 
-			return (audit.toString());
+			return audit.toString();
 
 		} catch (Exception e) {
 			logger.error("Could not parse message", e);

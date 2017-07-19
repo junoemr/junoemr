@@ -32,9 +32,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.oscarLab.FileUploadCheck;
 import oscar.oscarLab.ca.all.upload.HandlerClassFactory;
+import org.apache.log4j.Logger;
 
 @Service
 public class LabHandlerService {
+
+	Logger logger = Logger.getLogger(MDSHandler.class);
 
 	@Transactional(propagation = Propagation.REQUIRED)
 	public String importLab(String type,
@@ -53,6 +56,7 @@ public class LabHandlerService {
 		{
 			throw new Exception("Lab parsing returned null");
 		}
+		logger.debug("Lab service Audit: " + audit);
 		return audit;
 	}
 }
