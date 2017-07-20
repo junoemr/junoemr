@@ -33,8 +33,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.OscarLogDao;
+import org.oscarehr.common.dao.RestServiceLogDao;
 import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.RestServiceLog;
 import org.oscarehr.util.DeamonThreadFactory;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -43,6 +45,7 @@ import org.oscarehr.util.SpringUtils;
 public class LogAction {
 	private static Logger logger = MiscUtils.getLogger();
 	private static OscarLogDao oscarLogDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
+	private static RestServiceLogDao restServiceLogDao = (RestServiceLogDao) SpringUtils.getBean("restServiceLogDao");
 	private static ExecutorService executorService = Executors.newCachedThreadPool(new DeamonThreadFactory(LogAction.class.getSimpleName()+".executorService", Thread.MAX_PRIORITY));
 	
 	/**
@@ -229,5 +232,42 @@ public class LogAction {
 		log.setIp(request.getRemoteAddr());
 	
 		oscarLogDao.persist(log);
+	}
+	
+	/**
+	 * Add a new log entry to the REST WS log
+	 * @param request
+	 * @param providerNo
+	 * @param serviceType
+	 * @param methodName
+	 * @param returnData
+	 * @param duration
+	 */
+	public static void addRestLogEntry(HttpServletRequest request, String providerNo, String serviceType, String methodName, String postData, String returnData, Long duration) {
+		RestServiceLog restLog = new RestServiceLog();
+		
+		
+		String userAgent = request.getHeader("User-Agent");
+		String url = request.getRequestURL().toString();
+		String queryString = request.getQueryString();
+
+		restLog.setProviderNo(providerNo);
+		restLog.setDuration(duration);
+		restLog.setIp(request.getRemoteAddr());
+		restLog.setUserAgent(userAgent);
+		restLog.setServiceType(serviceType);
+		restLog.setMethodName(methodName);
+		restLog.setUrl(url);
+		restLog.setRawQueryString(queryString);
+		restLog.setRawPost(postData);
+		restLog.setRawOutput(returnData);
+		
+		restServiceLogDao.persist(restLog);
+	}
+	public static void saveRestLogEntry(RestServiceLog restLog) {
+		restServiceLogDao.persist(restLog);
+	}
+	public static void updateRestLogEntry(RestServiceLog restLog) {
+		restServiceLogDao.merge(restLog);
 	}
 }

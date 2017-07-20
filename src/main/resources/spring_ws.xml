@@ -136,6 +136,10 @@
 		<jaxrs:inInterceptors>
 			<bean name="authInInterceptor"
 				class="org.oscarehr.ws.rest.util.AuthenticationInInterceptor" />
+			<bean name="restLoggingInInterceptor"
+				class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" />
+			<bean name="restLoggingOutInterceptor"
+				class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" />
 		</jaxrs:inInterceptors>
 		
 		<jaxrs:providers>

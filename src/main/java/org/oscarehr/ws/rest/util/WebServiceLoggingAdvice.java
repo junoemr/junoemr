@@ -23,9 +23,6 @@
  */
 package org.oscarehr.ws.rest.util;
 
-import java.util.Arrays;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.message.Message;
@@ -39,17 +36,11 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.stereotype.Component;
 
-import oscar.log.LogAction;
-import oscar.log.LogConst;
-
-
-// TODO Consider moving this configuration into XML
-// TODO Consider dropping this in favour of POJO aspects
-// This needs a bit of work. The output looks like
-//  "2013-04-25 14:44:34,884 INFO  [WebServiceLoggingAdvice:66] Logging access for execution(OscarSearchResponse org.oscarehr.ws.rest.PharmacyService.getPharmacies(Integer,Integer))"
-// which isn't very informative..but it's a first stab.
-
-
+/**
+ * Service for logging Web service data
+ * @author robert
+ *
+ */
 @Aspect
 @Component
 public class WebServiceLoggingAdvice {
@@ -60,67 +51,47 @@ public class WebServiceLoggingAdvice {
 	public void pointcut() {
 		logger.info("called pointcut");
 	}
-	
-	private String getServiceCallDescription(ProceedingJoinPoint joinpoint) {
-		Signature signature = joinpoint.getSignature();
-		String type = signature.getDeclaringType().getSimpleName();
-		String methodName = signature.getName();
-		return type + "." + methodName;
-	}
-	
+
+	/**
+	 * this wraps all rest ws calls and logs them
+	 * @param joinpoint
+	 * @return Object
+	 * @throws Throwable
+	 */
 	@Around("execution(public * org.oscarehr.ws.rest.*.*(..))")
 	public Object logAccess(ProceedingJoinPoint joinpoint) throws Throwable {
-		if (logger.isInfoEnabled()) {
-			logger.info("Logging access for " + joinpoint);
-		}
+
 		Object result = null;
-		String status = LogConst.STATUS_SUCCESS;
+		long duration = 0;
 
 		try {
-			long duration = System.currentTimeMillis();
+			duration = System.currentTimeMillis();
 			result = joinpoint.proceed();
 			duration = System.currentTimeMillis() - duration;
 		}
 		catch (Throwable t) {
 			logger.error("WS Failure", t);
-			status = LogConst.STATUS_FAILURE;
+			duration = 0;
 			throw t;
 		}
 		finally {
-			logAccess(joinpoint, status);
+			logAccess(joinpoint, result, duration);
 		}
 		return result;
 	}
-	private void logAccess(ProceedingJoinPoint joinpoint, String status) {
-		Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
-		HttpServletRequest request = (HttpServletRequest) currentMessage.get("HTTP.REQUEST");
+	private void logAccess(ProceedingJoinPoint joinpoint, Object response, long duration) {
 		
 		Signature signature = joinpoint.getSignature();
 		String type = signature.getDeclaringType().getSimpleName();
 		String methodName = signature.getName();
 		
-		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
+		HttpServletRequest request = (HttpServletRequest) currentMessage.get("HTTP.REQUEST");
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
 		
-		@SuppressWarnings("unchecked")
-		Map<String,String[]> params = request.getParameterMap();
+		//LogAction.addRestLogEntry(request, providerNo, type, methodName, response.toString(), duration);
+		logger.info("REST WS: " + type + "." + methodName);
 		
-		String url = request.getRequestURL().toString();
-		
-		//TODO log all rest service calls to their own log
-		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(),  null, getServiceCallDescription(joinpoint), "REST WS", status, null, request.getRemoteAddr(), url+" : " + printableParameterMap(params));
-		logger.info("REST WS: " + getServiceCallDescription(joinpoint) + "("+url+"): " + printableParameterMap(params));
-		
-	}
-	/** display a map with values in a readable way */
-	private String printableParameterMap(Map<String,String[]> map) {
-		String printable = "{";
-	
-		for(String key: map.keySet())
-	    {
-	            String[] value = map.get(key);
-	            printable += key + "=" + Arrays.toString(value) + ",";
-	    }
-		printable += "}";
-		return printable;
 	}
 }
