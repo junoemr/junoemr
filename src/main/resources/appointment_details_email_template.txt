@@ -1,13 +1,12 @@
 Dear ${demographic.firstName} ${demographic.lastName},
  
 You have booked the following appointment with Dr. ${provider.firstName} ${provider.lastName}:
- 
+
 ${appointmentDateTime}
   
-You are required to confirm, change or cancel your appointment via email/phone or on our website kensingtonmedicalclinic.com within 48 hours of your visit.  Failure to do so will result in a no show fee being applied to your account.
+You are required to confirm, change or cancel your appointment via email/phone or on our website kensingtonmedicalclinic.com between 7 days and 48 hours before your appointment.  No shows and late cancellations will result in a fee being applied to your account.
 
-Please note, Strollers are not Permitted in the clinic.  Car seats are allowed.
-
+Please note, strollers are not permitted in the clinic.  However, we have a Stroller Parking area outside our office with wire combination locks which you may borrow from us if you wish. A piece of ID is required to borrow these locks.
 
 Sincerely,
 Kensington Medical Clinic Staff
