@@ -86,7 +86,7 @@ else if (orderByRequest.equals("file_name")) orderBy = EFormUtil.FILE_NAME;
         document.forms[1].del.value="<bean:message key="eform.uploadimages.processing"/>";
         document.forms[1].del.disabled = true;
         var groupName = document.forms[1].group_view.value;
-        document.location = "../eforms/delGroup.do?group_name=" + groupName;
+        document.location = "../eforms/delGroup.do?group_name=" + encodeURIComponent(groupName);
       }
   }
 </script>
