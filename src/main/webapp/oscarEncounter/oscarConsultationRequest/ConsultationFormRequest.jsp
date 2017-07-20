@@ -114,6 +114,7 @@ if(!authed) {
 
 	String demo = request.getParameter("de");
 		String requestId = request.getParameter("requestId");
+		boolean isNewConsultation = (requestId == null);
 		// segmentId is != null when viewing a remote consultation request from an hl7 source
 		String segmentId = request.getParameter("segmentId");
 		String team = request.getParameter("teamVar");
@@ -1734,7 +1735,7 @@ function updateFaxButton() {
 								<% }
 								}
 
-								if (OscarProperties.getInstance().getBooleanProperty("consultation_program_letterhead_enabled", "true")) {
+								if (props.isPropertyActive("consultation_program_letterhead_enabled")) {
 								for (Program p : programList) {
 								%>
 									<option value="prog_<%=p.getId() %>" <%=(consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase("prog_" + p.getId()) ? "selected='selected'"  : "") %>>
@@ -1743,8 +1744,14 @@ function updateFaxButton() {
 								<% }
 								}%>
 								</select>
-								<%if ( props.getBooleanProperty("consultation_fax_enabled", "true") ) {%>
-									<div style="font-size:12px"><input type="checkbox" name="ext_letterheadTitle" value="Dr" <%=(consultUtil.letterheadTitle != null && consultUtil.letterheadTitle.equals("Dr") ? "checked"  : "") %>>Include Dr. with name</div>
+								<%if ( props.isPropertyActive("consultation_fax_enabled")) {
+										// This checkbox adds the doctor name to the letterhead when checked. 
+										// Because of how it gets stored in a key value table, the entry only exists when it is checked:
+										boolean defaultChecked = props.isPropertyActive("consultation_letterhead_title.include_dr_by_default");
+										boolean savedCheckState = (consultUtil.letterheadTitle != null && consultUtil.letterheadTitle.equals("Dr"));
+										String checked = (savedCheckState || isNewConsultation && defaultChecked) ? "checked" : "";
+									%>
+									<div style="font-size:12px"><input type="checkbox" name="ext_letterheadTitle" value="Dr" <%=checked%> >Include Dr. with name</div>
 								<%}%>
 							</td>
 						</tr>
