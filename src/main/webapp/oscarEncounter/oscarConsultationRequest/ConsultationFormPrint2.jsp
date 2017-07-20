@@ -51,7 +51,7 @@ if(!authed) {
 <%@ taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi" %>
 <%@ taglib uri="/WEB-INF/special_tag.tld" prefix="special" %>
 <!-- end -->
-<%@ page import="oscar.OscarProperties, oscar.oscarClinic.ClinicData, java.util.*, oscar.util.StringUtils" %>
+<%@ page import="oscar.OscarProperties, oscar.oscarClinic.ClinicData, java.util.*, oscar.util.StringUtils, org.oscarehr.util.SpringUtils" %>
 
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
@@ -376,8 +376,7 @@ if(!authed) {
 <!-- Clinic Name -->
 							<%
 							if (reqFrm.letterheadName != null && !reqFrm.letterheadName.equals("-1")) {
-								ProviderDao proDao = (ProviderDao) SpringUtils.getBean("providerDao");
-								out.println(proDao.getProviderName(reqFrm.letterheadName));
+								out.println(providerDao.getProviderName(reqFrm.letterheadName));
 							} else {
 								out.println(clinic.getClinicName());
 							}
