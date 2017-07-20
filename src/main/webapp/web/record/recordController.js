@@ -34,6 +34,7 @@ angular.module('Record').controller('Record.RecordController', [
 	'$stateParams',
 	'$timeout',
 	'$interval',
+	'$uibModal',
 	'demographicService',
 	'demo',
 	'user',
@@ -52,6 +53,7 @@ angular.module('Record').controller('Record.RecordController', [
 		$stateParams,
 		$timeout,
 		$interval,
+		$uibModal,
 		demographicService,
 		demo,
 		user,
@@ -70,6 +72,13 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.demographic = demo;
 		controller.page = {};
 		controller.page.assignedCMIssues = [];
+
+		/*
+		 * handle concurrent note edit - EditingNoteFlag
+		 */
+		controller.page.itvSet = null;
+		controller.page.itvCheck = null;
+		controller.page.editingNoteId = null;
 
 		controller.hideNote = false;
 
@@ -507,6 +516,13 @@ angular.module('Record').controller('Record.RecordController', [
 
 		$rootScope.$on('loadNoteForEdit', function(event, data)
 		{
+			// Check if another note is currently being edited
+			if (controller.page.editingNoteId !== null)
+			{
+				console.log('Note is already being edited! Do you want to save changes?');
+				controller.displayWarning(data);
+				return;
+			}
 			controller.page.encounterNote = angular.copy(data);
 			controller.getIssueNote();
 
@@ -534,12 +550,6 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		/*
-		 * handle concurrent note edit - EditingNoteFlag
-		 */
-		var itvSet = null;
-		var itvCheck = null;
-		var editingNoteId = null;
 
 		$rootScope.$on("$stateChangeStart", function()
 		{
@@ -548,12 +558,12 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.doSetEditingNoteFlag = function doSetEditingNoteFlag()
 		{
-			noteService.setEditingNoteFlag(editingNoteId, user.providerNo).then(
+			noteService.setEditingNoteFlag(controller.page.editingNoteId, user.providerNo).then(
 				function success(results)
 				{
 					if (!results.success)
 					{
-						if (results.message == "Parameter error") alert("Parameter Error: noteUUID[" + editingNoteId + "] userId[" + user.providerNo + "]");
+						if (results.message == "Parameter error") alert("Parameter Error: noteUUID[" + controller.page.editingNoteId + "] userId[" + user.providerNo + "]");
 						else alert("Warning! Another user is editing this note now.");
 					}
 				},
@@ -567,23 +577,23 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			if (controller.page.encounterNote.uuid == null) return;
 
-			editingNoteId = controller.page.encounterNote.uuid;
-			if (itvSet == null)
+			controller.page.editingNoteId = controller.page.encounterNote.uuid;
+			if (controller.page.itvSet == null)
 			{
-				itvSet = $interval(controller.doSetEditingNoteFlag(), 30000); //set flag every 5 min until canceled
+				controller.page.itvSet = $interval(controller.doSetEditingNoteFlag(), 30000); //set flag every 5 min until canceled
 			}
-			if (itvCheck == null)
+			if (controller.page.itvCheck == null)
 			{ //warn once only when the 1st time another user tries to edit this note
-				itvCheck = $interval(function()
+				controller.page.itvCheck = $interval(function()
 				{
-					noteService.checkEditNoteNew(editingNoteId, user.providerNo).then(
+					noteService.checkEditNoteNew(controller.page.editingNoteId, user.providerNo).then(
 						function success(results)
 						{
 							if (!results.success)
 							{ //someone else wants to edit this note
 								alert("Warning! Another user tries to edit this note. Your update may be replaced by later revision(s).");
-								$interval.cancel(itvCheck);
-								itvCheck = null;
+								$interval.cancel(controller.page.itvCheck);
+								controller.page.itvCheck = null;
 							}
 						},
 						function error(errors)
@@ -596,14 +606,14 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.removeEditingNoteFlag = function removeEditingNoteFlag()
 		{
-			if (editingNoteId != null)
+			if (controller.page.editingNoteId != null)
 			{
-				noteService.removeEditingNoteFlag(editingNoteId, user.providerNo);
-				$interval.cancel(itvSet);
-				$interval.cancel(itvCheck);
-				itvSet = null;
-				itvCheck = null;
-				editingNoteId = null;
+				noteService.removeEditingNoteFlag(controller.page.editingNoteId, user.providerNo);
+				$interval.cancel(controller.page.itvSet);
+				$interval.cancel(controller.page.itvCheck);
+				controller.page.itvSet = null;
+				controller.page.itvCheck = null;
+				controller.page.editingNoteId = null;
 			}
 		};
 
@@ -654,6 +664,39 @@ angular.module('Record').controller('Record.RecordController', [
 				},
 				function error(errors)
 				{
+					console.log(errors);
+				});
+		};
+
+		controller.displayWarning = function displayWarning(noteToEdit)
+		{
+			var modalInstance = $uibModal.open(
+			{
+				templateUrl: 'record/summary/saveWarning.jsp',
+				controller: 'Record.Summary.SaveWarningController as saveWarningCtrl',
+				backdrop: true,
+				size: 'md',
+				resolve:
+				{
+					saveSignNote: function()
+					{
+						return controller.saveSignNote;
+					},
+					cancelNoteEdit: function()
+					{
+						return controller.cancelNoteEdit;
+					}
+				}
+			});
+
+			modalInstance.result.then(
+				function success(results)
+				{
+					console.log(results);
+				},
+				function error(errors)
+				{
+					console.log('Modal dismissed at: ' + new Date());
 					console.log(errors);
 				});
 		};
