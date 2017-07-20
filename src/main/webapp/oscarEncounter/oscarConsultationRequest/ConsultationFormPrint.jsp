@@ -416,8 +416,7 @@ if(!authed) {
 	                                <b>
 										<%
 										if (reqFrm.letterheadName != null && !reqFrm.letterheadName.equals("-1")) {
-											ProviderDao proDao = (ProviderDao) SpringUtils.getBean("providerDao");
-											out.println(proDao.getProviderName(reqFrm.letterheadName));
+											out.println(providerDao.getProviderName(reqFrm.letterheadName));
 										} else {
 											out.println(clinic.getClinicName());
 										}
