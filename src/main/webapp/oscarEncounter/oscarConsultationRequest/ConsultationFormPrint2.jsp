@@ -53,7 +53,7 @@ if(!authed) {
 <!-- end -->
 <%@ page import="oscar.OscarProperties, oscar.oscarClinic.ClinicData, java.util.*, oscar.util.StringUtils" %>
 
-
+<%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.oscarehr.common.model.Site"%><html:html locale="true">
@@ -62,6 +62,8 @@ if(!authed) {
 	oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestUtil reqFrm;
 	reqFrm = new oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestUtil ();
 	reqFrm.estRequestFromId(LoggedInInfo.getLoggedInInfoFromSession(request), (String)request.getAttribute("reqId"));
+
+	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 
 	reqFrm.specPhone = request.getParameter("phone");
 
@@ -372,7 +374,14 @@ if(!authed) {
 					<TR>
 						<TD class="doctorName" id="clinicName" valign="top">
 <!-- Clinic Name -->
-							<%=clinic.getClinicName()%>
+							<%
+							if (reqFrm.letterheadName != null && !reqFrm.letterheadName.equals("-1")) {
+								ProviderDao proDao = (ProviderDao) SpringUtils.getBean("providerDao");
+								out.println(proDao.getProviderName(reqFrm.letterheadName));
+							} else {
+								out.println(clinic.getClinicName());
+							}
+							%>
 						</TD>
 						<TD>
 						</TD>
