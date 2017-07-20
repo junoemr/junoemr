@@ -110,6 +110,24 @@
 		<ap-output>${last_name}, ${first_name}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>current_logged_in_user_address</ap-name>
+		<ap-sql>SELECT provider.address FROM provider
+			WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
+		<ap-output>${address}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_logged_in_user_fax</ap-name>
+		<ap-sql>SELECT ExtractValue(provider.comments, '/xml_p_fax') AS fax FROM provider
+			WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
+		<ap-output>${fax}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_logged_in_user_work_phone</ap-name>
+		<ap-sql>SELECT provider.work_phone FROM provider
+			WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
+		<ap-output>${work_phone}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>current_logged_in_user_roles</ap-name>
 		<ap-sql>SELECT group_concat(role_name) as roles FROM secUserRole where provider_no='${loggedInProvider}'</ap-sql>
 		<ap-output>${roles}</ap-output>
@@ -257,6 +275,12 @@
         <ap-sql>SELECT ver FROM demographic WHERE demographic_no=${demographic}</ap-sql>
         <ap-output>${ver}</ap-output>
     </databaseap>
+	<databaseap>
+		<ap-name>hc_type</ap-name>
+		<ap-sql>SELECT hc_type FROM demographic WHERE
+			demographic_no=${demographic}</ap-sql>
+		<ap-output>${hc_type}</ap-output>
+	</databaseap>
     <databaseap>
         <ap-name>hc_renew_date</ap-name>
         <ap-sql>SELECT hc_renew_date FROM demographic WHERE demographic_no=${demographic}</ap-sql>
