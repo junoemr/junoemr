@@ -24,13 +24,8 @@
 
 package org.oscarehr.ws.rest.util;
 
-import java.io.FilterWriter;
 import java.io.OutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -39,12 +34,17 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.RestServiceLog;
 
 import oscar.log.LogAction;
 
+/**
+ * This class is responsible for intercepting and logging webservice responses from REST services.
+ * Messages passed will be logged to the matching rest log entry created by the InInterceptor before being passed to the client
+ * This class pairs with the RestLoggingInInterceptor to log the full webservice post and response.
+ * @author robert
+ */
 public class RestLoggingOutInterceptor extends AbstractLoggingInterceptor {
 	
 	private static Logger logger = Logger.getLogger(RestLoggingOutInterceptor.class);
@@ -52,52 +52,43 @@ public class RestLoggingOutInterceptor extends AbstractLoggingInterceptor {
 	public RestLoggingOutInterceptor() {
 		super(Phase.PRE_STREAM);
 	}
+	
+	/**
+	 * This method accepts the outgoing webservice response as a Message object
+	 * The message object contents depend on the Phase and the actions of any preceding interceptors
+	 * @param message
+	 */
 	@Override
 	public void handleMessage(Message message) throws Fault {
 		
         final OutputStream os = message.getContent(OutputStream.class);
-        final Writer iowriter = message.getContent(Writer.class);
-        if (os == null && iowriter == null) {
-        	logger.info("Null Writer and OutputStream");
-            return;
-        }
         // Write the output while caching it for the log message
         if (os != null) {
             final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
             if (threshold > 0) {
                 newOut.setThreshold(threshold);
             }
+            // message content has to be set to a new stream, as streams can only be read once
             message.setContent(OutputStream.class, newOut);
+            // use the callback to perform logging once the stream closes
             newOut.registerCallback(new LoggingOutCallback(logger, message, os));
-        } 
-        else {
-            message.setContent(Writer.class, new RestLogOutWriter(logger, message, iowriter));
         }
 	}
 
+	/**
+	 * We don't use this, but it is a required method for any logging interceptor
+	 */
 	@Override
 	protected java.util.logging.Logger getLogger() {
 		return null;
 	}
 }
-
-class RestLogOutWriter extends FilterWriter {
-    StringWriter out2;
-    int count;
-    Logger logger; //NOPMD
-    Message message;
-    
-    public RestLogOutWriter(Logger logger, Message message, Writer writer) {
-        super(writer);
-        this.logger = logger;
-        this.message = message;
-        if (!(writer instanceof StringWriter)) {
-            out2 = new StringWriter();
-        }
-        logger.info("REST LOGGING IN RestLogOutWriter!!!");
-    }
-}
-
+/**
+ * Customized implementation of the CachedOutputStreamCallback
+ * This allows the interceptor to only log data after the output stream is closed.
+ * @author robert
+ *
+ */
 class LoggingOutCallback implements CachedOutputStreamCallback {
 	
     private final Message message;
@@ -115,14 +106,14 @@ class LoggingOutCallback implements CachedOutputStreamCallback {
 
 	public void onClose(CachedOutputStream cos) {
 		
-		logger.info("REST LOGGING IN LoggingOutCallback!!!");
+		logger.info("REST LOGGING OUT!!!");
 		
 		try {
 			StringBuilder builder = new StringBuilder();
 			cos.writeCacheTo(builder);
 			// get the message body
 			String messageBody = builder.toString();
-			logger.info("REST LOGGING!!!\n" + messageBody);
+			logger.debug("REST LOGGING!!!\n" + messageBody);
 			logMessage(message, messageBody);
 		}
 		catch (Exception e) {
@@ -131,18 +122,19 @@ class LoggingOutCallback implements CachedOutputStreamCallback {
 	}
 	
 	private void logMessage(Message message, String messageBody) {
-		HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
 		
-		RestServiceLog restLog = (RestServiceLog)message.getExchange().get("org.oscarehr.ws.rest.util.RestLoggingInInterceptor");
+		RestServiceLog restLog = (RestServiceLog)message.getExchange().get(RestLoggingInInterceptor.class.getName());
 		
-		Date createdAt = restLog.getCreatedAt();
-		long duration  = new Date().getTime() - createdAt.getTime();
-		
-		restLog.setDuration(duration);
-		restLog.setRawOutput(messageBody);
-		
-		
-		LogAction.updateRestLogEntry(restLog);
+		if(restLog != null) {
+			Date createdAt = restLog.getCreatedAt();
+			long duration  = new Date().getTime() - createdAt.getTime();
+			
+			restLog.setDuration(duration);
+			restLog.setRawOutput(messageBody);
+			
+			
+			LogAction.updateRestLogEntry(restLog);
+		}
 	}
 }
 

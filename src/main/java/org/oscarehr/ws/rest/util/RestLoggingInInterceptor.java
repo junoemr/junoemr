@@ -41,6 +41,12 @@ import org.oscarehr.util.LoggedInInfo;
 
 import oscar.log.LogAction;
 
+/**
+ * This class is responsible for intercepting and logging webservice calls to REST services.
+ * Messages passed will be logged to the rest log before being handled by the regular endpoints
+ * This class pairs with the RestLoggingOutInterceptor to log the full webservice post and response.
+ * @author robert
+ */
 public class RestLoggingInInterceptor extends AbstractLoggingInterceptor {
 	
 	private static Logger logger = Logger.getLogger(RestLoggingInInterceptor.class);
@@ -49,10 +55,15 @@ public class RestLoggingInInterceptor extends AbstractLoggingInterceptor {
 		super(Phase.RECEIVE);
 	}
 
+	/**
+	 * This method accepts the incoming webservice call as a Message object
+	 * The message object contents depend on the Phase and the actions of any preceding interceptors
+	 * @param message
+	 */
 	@Override
-	public void handleMessage(Message message) throws Fault {				
+	public void handleMessage(Message message) throws Fault {	
 		try {
-			logger.info("REST LOGGING IN RestLoggingInInterceptor!!!");
+			logger.info("REST LOGGING IN!!! ");
 			// now get the request body
 			InputStream is = message.getContent(InputStream.class);
 			CachedOutputStream os = new CachedOutputStream();
@@ -62,7 +73,7 @@ public class RestLoggingInInterceptor extends AbstractLoggingInterceptor {
 			is.close();
 
 			String postData = IOUtils.toString(os.getInputStream());
-			logger.info("The request is:\n" + postData);
+			logger.debug("The request is:\n" + postData);
 			os.close();
 			
 			addNewLogEntry(message, postData);
@@ -92,11 +103,15 @@ public class RestLoggingInInterceptor extends AbstractLoggingInterceptor {
 		restLog.setRawQueryString(queryString);
 		restLog.setRawPost(postData);
 		restLog.setRawOutput(null);
-		
+		// save a new log entry to the rest logging table
 		LogAction.saveRestLogEntry(restLog);
-		message.getExchange().put("org.oscarehr.ws.rest.util.RestLoggingInInterceptor", restLog);
+		// save the entry object to the exchange so it can be accessed by the loggingOutInterceptor
+		message.getExchange().put(RestLoggingInInterceptor.class.getName(), restLog);
 	}
 
+	/**
+	 * We don't use this, but it is a required method for any logging interceptor
+	 */
 	@Override
 	protected java.util.logging.Logger getLogger() {
 		return null;
