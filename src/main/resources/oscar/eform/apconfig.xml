@@ -1272,6 +1272,16 @@
 		<ap-sql>SELECT * FROM clinic</ap-sql>
 		<ap-output>${clinic_postal}</ap-output>
 	</databaseap>
+	<databaseap>
+		<ap-name>clinic_multi_phone</ap-name>
+		<ap-sql>SELECT clinic_delim_phone AS clinic_multi_phone FROM clinic</ap-sql>
+		<ap-output>${clinic_multi_phone}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>clinic_multi_fax</ap-name>
+		<ap-sql>SELECT clinic_delim_fax AS clinic_multi_fax FROM clinic</ap-sql>
+		<ap-output>${clinic_multi_fax}</ap-output>
+	</databaseap>
 
 	<!-- Extended eform tags, cannot be directly called -->
 	<databaseap>
