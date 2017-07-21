@@ -56,10 +56,10 @@ public class RestServiceLog extends AbstractModel<Long> implements Serializable 
 	private String providerNo;
 	@Column(name = "ip")
 	private String ip;
-	@Column(name = "service_type")
+	/*@Column(name = "service_type")
 	private String serviceType;
 	@Column(name = "method_name")
-	private String methodName;
+	private String methodName;*/
 	@Column(name = "url")
 	private String url;
 	@Column(name = "user_agent")
@@ -124,7 +124,7 @@ public class RestServiceLog extends AbstractModel<Long> implements Serializable 
 		this.ip = ip;
 	}
 
-	public String getServiceType() {
+	/*public String getServiceType() {
 		return serviceType;
 	}
 
@@ -138,7 +138,7 @@ public class RestServiceLog extends AbstractModel<Long> implements Serializable 
 
 	public void setMethodName(String methodName) {
 		this.methodName = methodName;
-	}
+	}*/
 
 	public String getUrl() {
 		return url;

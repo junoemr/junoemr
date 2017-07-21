@@ -24,12 +24,20 @@
 
 package org.oscarehr.ws.rest.util;
 
+import java.io.FilterWriter;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.io.CacheAndWriteOutputStream;
+import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.log4j.Logger;
@@ -37,39 +45,107 @@ import org.oscarehr.common.model.RestServiceLog;
 
 import oscar.log.LogAction;
 
-public class RestLoggingOutInterceptor extends AbstractPhaseInterceptor<Message> {
+public class RestLoggingOutInterceptor extends AbstractLoggingInterceptor {
 	
 	private static Logger logger = Logger.getLogger(RestLoggingOutInterceptor.class);
 
-
 	public RestLoggingOutInterceptor() {
 		super(Phase.PRE_STREAM);
-		addAfter(LoggingOutInterceptor.class.getName());
+	}
+	@Override
+	public void handleMessage(Message message) throws Fault {
+		
+        final OutputStream os = message.getContent(OutputStream.class);
+        final Writer iowriter = message.getContent(Writer.class);
+        if (os == null && iowriter == null) {
+        	logger.info("Null Writer and OutputStream");
+            return;
+        }
+        // Write the output while caching it for the log message
+        if (os != null) {
+            final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
+            if (threshold > 0) {
+                newOut.setThreshold(threshold);
+            }
+            message.setContent(OutputStream.class, newOut);
+            newOut.registerCallback(new LoggingOutCallback(logger, message, os));
+        } 
+        else {
+            message.setContent(Writer.class, new RestLogOutWriter(logger, message, iowriter));
+        }
 	}
 
 	@Override
-	public void handleMessage(Message message) throws Fault {
-		logger.info("TEST OUT INTERCEPTOR MESSAGE");
-		
-		/*final OutputStream os = message.getContent(OutputStream.class);
+	protected java.util.logging.Logger getLogger() {
+		return null;
+	}
+}
 
-        if (os != null && !(os instanceof CachedOutputStream) ) {
-            final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
-            message.setContent(OutputStream.class, newOut);
-        }*/
+class RestLogOutWriter extends FilterWriter {
+    StringWriter out2;
+    int count;
+    Logger logger; //NOPMD
+    Message message;
+    
+    public RestLogOutWriter(Logger logger, Message message, Writer writer) {
+        super(writer);
+        this.logger = logger;
+        this.message = message;
+        if (!(writer instanceof StringWriter)) {
+            out2 = new StringWriter();
+        }
+        logger.info("REST LOGGING IN RestLogOutWriter!!!");
+    }
+}
+
+class LoggingOutCallback implements CachedOutputStreamCallback {
+	
+    private final Message message;
+    private final OutputStream origStream;
+    private final Logger logger; //NOPMD
+    
+    public LoggingOutCallback(Logger logger, Message message, OutputStream os) {
+        this.logger = logger;
+        this.message = message;
+        this.origStream = os;
+    }
+	
+	public void onFlush(CachedOutputStream cos) {
+	}
+
+	public void onClose(CachedOutputStream cos) {
 		
+		logger.info("REST LOGGING IN LoggingOutCallback!!!");
 		
-		
+		try {
+			StringBuilder builder = new StringBuilder();
+			cos.writeCacheTo(builder);
+			// get the message body
+			String messageBody = builder.toString();
+			logger.info("REST LOGGING!!!\n" + messageBody);
+			logMessage(message, messageBody);
+		}
+		catch (Exception e) {
+			logger.error("Error in outgoing REST Interceptor", e);
+		}
+	}
+	
+	private void logMessage(Message message, String messageBody) {
 		HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
 		
 		RestServiceLog restLog = (RestServiceLog)message.getExchange().get("org.oscarehr.ws.rest.util.RestLoggingInInterceptor");
 		
-		restLog.setDuration(1L);//TODO
-		String returnData = null;
-		restLog.setRawOutput(returnData);
+		Date createdAt = restLog.getCreatedAt();
+		long duration  = new Date().getTime() - createdAt.getTime();
+		
+		restLog.setDuration(duration);
+		restLog.setRawOutput(messageBody);
 		
 		
 		LogAction.updateRestLogEntry(restLog);
-		
 	}
 }
+
+
+
+

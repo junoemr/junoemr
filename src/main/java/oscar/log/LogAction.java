@@ -233,37 +233,6 @@ public class LogAction {
 	
 		oscarLogDao.persist(log);
 	}
-	
-	/**
-	 * Add a new log entry to the REST WS log
-	 * @param request
-	 * @param providerNo
-	 * @param serviceType
-	 * @param methodName
-	 * @param returnData
-	 * @param duration
-	 */
-	public static void addRestLogEntry(HttpServletRequest request, String providerNo, String serviceType, String methodName, String postData, String returnData, Long duration) {
-		RestServiceLog restLog = new RestServiceLog();
-		
-		
-		String userAgent = request.getHeader("User-Agent");
-		String url = request.getRequestURL().toString();
-		String queryString = request.getQueryString();
-
-		restLog.setProviderNo(providerNo);
-		restLog.setDuration(duration);
-		restLog.setIp(request.getRemoteAddr());
-		restLog.setUserAgent(userAgent);
-		restLog.setServiceType(serviceType);
-		restLog.setMethodName(methodName);
-		restLog.setUrl(url);
-		restLog.setRawQueryString(queryString);
-		restLog.setRawPost(postData);
-		restLog.setRawOutput(returnData);
-		
-		restServiceLogDao.persist(restLog);
-	}
 	public static void saveRestLogEntry(RestServiceLog restLog) {
 		restServiceLogDao.persist(restLog);
 	}
