@@ -413,7 +413,15 @@ if(!authed) {
                             </td>
                             <td colspan="2" class="title4" id="clinicName">
                             	<c:if test="${empty infirmaryView_programAddress}">                            	
-	                                <b><%=clinic.getClinicName()%></b>
+	                                <b>
+										<%
+										if (reqFrm.letterheadName != null && !reqFrm.letterheadName.equals("-1")) {
+											out.println(providerDao.getProviderName(reqFrm.letterheadName));
+										} else {
+											out.println(clinic.getClinicName());
+										}
+										%>
+									</b>
                                 </c:if>
                             </td>	
 <% if(vecAddressBillingNo != null) {%>

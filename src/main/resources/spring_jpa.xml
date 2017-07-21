@@ -73,5 +73,6 @@
 	<context:component-scan base-package="org.oscarehr.PMmodule.dao" />
 	<!-- Sharing Center -->
 	<context:component-scan base-package="org.oscarehr.sharingcenter.dao" />
+	<context:component-scan base-package="oscar.oscarLab.ca.all.upload.handlers"/>
 
 </beans>

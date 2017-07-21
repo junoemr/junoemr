@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 
-import oscar.oscarLab.ca.all.upload.MessageUploader;
 import oscar.oscarLab.ca.all.upload.handlers.MessageHandler;
 
 public class PhsStarHandler implements MessageHandler {
@@ -57,7 +56,6 @@ public class PhsStarHandler implements MessageHandler {
 			return ("success");
 		}catch(Exception e) {
 	        logger.error("Unexpected error.", e);
-	        MessageUploader.clean(fileId);
 	        throw(new RuntimeException(e));
 		}
 		

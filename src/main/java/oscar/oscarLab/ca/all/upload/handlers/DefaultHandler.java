@@ -79,7 +79,6 @@ public class DefaultHandler implements MessageHandler {
                     }
                 }
             }catch(Exception e){
-            	MessageUploader.clean(fileId);
                 logger.error("ERROR:", e);
                 return null;
             }
@@ -93,7 +92,6 @@ public class DefaultHandler implements MessageHandler {
                     MessageUploader.routeReport(loggedInInfo, serviceName, getHl7Type(), msg,fileId);
                 }
             }catch(Exception e){
-            	MessageUploader.clean(fileId);
                 logger.error("ERROR:", e);
                 return null;
             }

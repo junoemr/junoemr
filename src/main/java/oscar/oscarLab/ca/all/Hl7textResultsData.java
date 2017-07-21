@@ -24,31 +24,18 @@
 
 package oscar.oscarLab.ca.all;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ConsultDocsDao;
 import org.oscarehr.common.dao.ConsultResponseDocDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
-import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.MeasurementDao;
-import org.oscarehr.common.dao.MeasurementMapDao;
-import org.oscarehr.common.dao.MeasurementsDeletedDao;
-import org.oscarehr.common.dao.MeasurementsExtDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.model.ConsultDocs;
 import org.oscarehr.common.model.ConsultResponseDoc;
 import org.oscarehr.common.model.Hl7TextInfo;
-//import org.oscarehr.common.model.Hl7TextMessage;
-import org.oscarehr.common.model.Measurement;
-import org.oscarehr.common.model.MeasurementMap;
-import org.oscarehr.common.model.MeasurementType;
-import org.oscarehr.common.model.MeasurementsDeleted;
-import org.oscarehr.common.model.MeasurementsExt;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -62,14 +49,10 @@ import oscar.util.UtilDateUtilities;
 public class Hl7textResultsData {
 
 	private static Logger logger = MiscUtils.getLogger();
-	private static MeasurementsDeletedDao measurementsDeletedDao = (MeasurementsDeletedDao) SpringUtils.getBean("measurementsDeletedDao");
 	private static MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
-	private static MeasurementsExtDao measurementsExtDao = SpringUtils.getBean(MeasurementsExtDao.class);
-	private static MeasurementMapDao measurementMapDao = SpringUtils.getBean(MeasurementMapDao.class);
 	private static ConsultDocsDao consultDocsDao = SpringUtils.getBean(ConsultDocsDao.class);
 	private static ConsultResponseDocDao consultResponseDocDao = SpringUtils.getBean(ConsultResponseDocDao.class);
 	private static Hl7TextInfoDao hl7TxtInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
-	private static Hl7TextMessageDao hl7TxtMsgDao = SpringUtils.getBean(Hl7TextMessageDao.class);
 	private static PatientLabRoutingDao patientLabRoutingDao = SpringUtils.getBean(PatientLabRoutingDao.class);
 
 	private Hl7textResultsData() {
@@ -77,7 +60,7 @@ public class Hl7textResultsData {
 	}
 
 	public static void populateMeasurementsTable(String lab_no, String demographic_no) {
-		MessageHandler h = Factory.getHandler(lab_no);
+		MessageHandler messageHandler = Factory.getHandler(lab_no);
 
 		java.util.Calendar calender = java.util.Calendar.getInstance();
 		String day = Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
@@ -92,250 +75,16 @@ public class Hl7textResultsData {
 		String[] matchingLabs = getMatchingLabs(lab_no).split(",");
 		//if this lab is the latest version delete the measurements from the previous version and add the new ones
 
-		int k = 0;
-		while (k < matchingLabs.length && !matchingLabs[k].equals(lab_no)) {
-			k++;
-		}
-
-		if (k != 0) {
-			MeasurementsDeleted measurementsDeleted;
-			for (Measurement m : measurementDao.findByValue("lab_no", matchingLabs[k - 1])) {
-				measurementsDeleted = new MeasurementsDeleted(m);
-				measurementsDeletedDao.persist(measurementsDeleted);
-				measurementDao.remove(m.getId());
-			}
-		}
-		// loop through the measurements for the lab and add them
-
-		for (int i = 0; i < h.getOBRCount(); i++) {
-			for (int j = 0; j < h.getOBXCount(i); j++) {
-
-				String result = h.getOBXResult(i, j);
-
-				// only add if there is a result and it is supposed to be viewed
-				if (result.equals("") || result.equals("DNR") || h.getOBXName(i, j).equals("") || h.getOBXResultStatus(i, j).equals("DNS")) continue;
-				logger.debug("obx(" + j + ") should be added");
-				String identifier = h.getOBXIdentifier(i, j);
-				String name = h.getOBXName(i, j);
-				String unit = h.getOBXUnits(i, j);
-				String labname = h.getPatientLocation();
-				String accession = h.getAccessionNum();
-				String req_datetime = h.getRequestDate(i);
-				String datetime = h.getTimeStamp(i, j);
-				String olis_status = h.getOBXResultStatus(i, j);
-				String abnormal = h.getOBXAbnormalFlag(i, j);
-				if (abnormal != null && (abnormal.equals("A") || abnormal.startsWith("H"))) {
-					abnormal = "A";
-				} else if (abnormal != null && abnormal.startsWith("L")) {
-					abnormal = "L";
-				} else {
-					abnormal = "N";
-				}
-				String[] refRange = splitRefRange(h.getOBXReferenceRange(i, j));
-				String comments = "";
-				for (int l = 0; l < h.getOBXCommentCount(i, j); l++) {
-					comments += comments.length() > 0 ? "\n" + h.getOBXComment(i, j, l) : h.getOBXComment(i, j, l);
-				}
-
-				String measType = "";
-				String measInst = "";
-				
-				List<Object[]> measurements = measurementMapDao.findMeasurements("FLOWSHEET", identifier);
-				if (measurements.isEmpty()) {
-					logger.warn("CODE:" + identifier + " needs to be mapped");
-				} else {
-					for (Object[] o : measurements) {
-						MeasurementMap mm = (MeasurementMap) o[1];
-						MeasurementType type = (MeasurementType) o[2];
-
-						measType = mm.getIdentCode();
-						measInst = type.getMeasuringInstruction();
-					}
-				}
-				
-				
-				Measurement m = new Measurement();
-				m.setType(measType);
-				m.setDemographicId(Integer.parseInt(demographic_no));
-				m.setProviderNo("0");
-				m.setDataField(result);
-				m.setMeasuringInstruction(measInst);
-				logger.info("DATETIME FOR MEASUREMENT " + datetime);
-				if(datetime != null && datetime.length()>0) {
-					m.setDateObserved(UtilDateUtilities.StringToDate(datetime, "yyyy-MM-dd hh:mm:ss"));
-				} 
-				
-				if( m.getDateObserved() == null && datetime != null && datetime.length() > 0 ) {
-					m.setDateObserved(UtilDateUtilities.StringToDate(datetime, "yyyy-MM-dd"));
-				}
-				
-				if( m.getDateObserved() == null ){
-					m.setDateObserved(UtilDateUtilities.StringToDate(dateEntered, "yyyy-MM-dd hh:mm:ss"));
-				}
-				m.setAppointmentNo(0);
-
-				measurementDao.persist(m);
-
-				int mId = m.getId();
-
-				MeasurementsExt me = new MeasurementsExt();
-				me.setMeasurementId(mId);
-				me.setKeyVal("lab_no");
-				me.setVal(lab_no);
-				measurementsExtDao.persist(me);
-
-				me = new MeasurementsExt();
-				me.setMeasurementId(mId);
-				me.setKeyVal("abnormal");
-				me.setVal(abnormal);
-				measurementsExtDao.persist(me);
-
-				me = new MeasurementsExt();
-				me.setMeasurementId(mId);
-				me.setKeyVal("identifier");
-				me.setVal(identifier);
-				measurementsExtDao.persist(me);
-
-				me = new MeasurementsExt();
-				me.setMeasurementId(mId);
-				me.setKeyVal("name");
-				me.setVal(name);
-				measurementsExtDao.persist(me);
-
-				me = new MeasurementsExt();
-				me.setMeasurementId(mId);
-				me.setKeyVal("labname");
-				me.setVal(labname);
-				measurementsExtDao.persist(me);
-
-				me = new MeasurementsExt();
-				me.setMeasurementId(mId);
-				me.setKeyVal("accession");
-				me.setVal(accession);
-				measurementsExtDao.persist(me);
-
-				me = new MeasurementsExt();
-				me.setMeasurementId(mId);
-				me.setKeyVal("request_datetime");
-				me.setVal(req_datetime);
-				measurementsExtDao.persist(me);
-
-				me = new MeasurementsExt();
-				me.setMeasurementId(mId);
-				me.setKeyVal("datetime");
-				me.setVal(datetime);
-				measurementsExtDao.persist(me);
-
-				if (olis_status != null && olis_status.length() > 0) {
-					me = new MeasurementsExt();
-					me.setMeasurementId(mId);
-					me.setKeyVal("olis_status");
-					me.setVal(olis_status);
-					measurementsExtDao.persist(me);
-				}
-
-				if (unit != null && unit.length() > 0) {
-					me = new MeasurementsExt();
-					me.setMeasurementId(mId);
-					me.setKeyVal("unit");
-					me.setVal(unit);
-					measurementsExtDao.persist(me);
-				}
-
-				if (refRange[0].length() > 0) {
-					me = new MeasurementsExt();
-					me.setMeasurementId(mId);
-					me.setKeyVal("range");
-					me.setVal(refRange[0]);
-					measurementsExtDao.persist(me);
-				} else {
-					if (refRange[1].length() > 0) {
-						me = new MeasurementsExt();
-						me.setMeasurementId(mId);
-						me.setKeyVal("minimum");
-						me.setVal(refRange[1]);
-						measurementsExtDao.persist(me);
-					}
-					if (refRange[2].length() > 0) {
-						me = new MeasurementsExt();
-						me.setMeasurementId(mId);
-						me.setKeyVal("maximum");
-						me.setVal(refRange[2]);
-						measurementsExtDao.persist(me);
-					}
-				}
-				
-				me = new MeasurementsExt();
-				me.setMeasurementId(mId);
-				me.setKeyVal("other_id");
-				me.setVal(i + "-" + j);
-				measurementsExtDao.persist(me);
-			}
-		}
-		
-
+		measurementDao.deleteMatchingLabs(matchingLabs, lab_no);
+	 	measurementDao.populateMeasurements( messageHandler, lab_no, demographic_no, dateEntered);
 	}
 
-	/*
-	public static String getMatchingLabs_CLS(String lab_no) {
-		String ret = "";
-		Hl7TextInfo self = null;
-		List<Integer> idList = new ArrayList<Integer>();
-		
-		for (Object[] o : hl7TxtInfoDao.findByLabIdViaMagic(ConversionUtils.fromIntString(lab_no))) {
-			Hl7TextInfo a = (Hl7TextInfo) o[0];
-			//Hl7TextInfo b = (Hl7TextInfo) o[1];
-
-			int labNo = a.getLabNumber();
-			if(lab_no.equals(String.valueOf(labNo))) {
-				self = a;
-			}
-			ret = ret + "," + labNo;
-			idList.add(labNo);
-		}
-		
-		//nothing but itself was found, but we have a special case for glucose tolerance tests
-		//they come in with different accessions but same filler order no.
-		if(self != null && ret.length()>0 && ret.substring(1).indexOf(",") == -1) {
-			ret = "";
-			for(Hl7TextInfo info : hl7TxtInfoDao.findByFillerOrderNumber(self.getFillerOrderNum())) {
-				ret = ret + "," + info.getLabNumber();
-				idList.add(info.getLabNumber());
-			}
-		}
-		
-		if(idList.isEmpty()) {
-			idList.add(Integer.parseInt(lab_no));
-		}
-		
-		Collections.sort(idList);
-		
-		StringBuilder sb = new StringBuilder();
-		for(Integer id:idList) {
-			if(sb.length() > 0) {
-				sb.append(",");
-			}
-			sb.append(String.valueOf(id));
-		}
-		
-		return sb.toString();
-	//	if (ret.equals("")) return (lab_no);
-	//	else return (ret.substring(1));
-	}
-	*/
-	
 	public static String getMatchingLabs(String lab_no) {
 		String ret = "";
 		int monthsBetween = 0;
-		
-		/*
-		Hl7TextMessage hl7Msg = hl7TxtMsgDao.find(Integer.parseInt(lab_no));
-		if(hl7Msg != null && "CLS".equals(hl7Msg.getType())) {
-			return getMatchingLabs_CLS(lab_no);
-		}
-		*/
 
-		for (Object[] o : hl7TxtInfoDao.findByLabIdViaMagic(ConversionUtils.fromIntString(lab_no))) {
+		for (Object[] o : hl7TxtInfoDao.findByLabIdViaMagic(ConversionUtils.fromIntString(lab_no)))
+		{
 			Hl7TextInfo a = (Hl7TextInfo) o[0];
 			Hl7TextInfo b = (Hl7TextInfo) o[1];
 
@@ -756,40 +505,5 @@ public class Hl7textResultsData {
 		}
 
 		return labResults;
-	}
-
-	private static String[] splitRefRange(String refRangeTxt) {
-		refRangeTxt = refRangeTxt.trim();
-		String[] refRange = { "", "", "" };
-		String numeric = "-. 0123456789";
-		boolean textual = false;
-		if (refRangeTxt == null || refRangeTxt.length() == 0) return refRange;
-
-		for (int i = 0; i < refRangeTxt.length(); i++) {
-			if (!numeric.contains(refRangeTxt.subSequence(i, i + 1))) {
-				if (i > 0 || (refRangeTxt.charAt(i) != '>' && refRangeTxt.charAt(i) != '<')) {
-					textual = true;
-					break;
-				}
-			}
-		}
-		if (textual) {
-			refRange[0] = refRangeTxt;
-		} else {
-			if (refRangeTxt.charAt(0) == '>') {
-				refRange[1] = refRangeTxt.substring(1).trim();
-			} else if (refRangeTxt.charAt(0) == '<') {
-				refRange[2] = refRangeTxt.substring(1).trim();
-			} else {
-				String[] tmp = refRangeTxt.split("-");
-				if (tmp.length == 2) {
-					refRange[1] = tmp[0].trim();
-					refRange[2] = tmp[1].trim();
-				} else {
-					refRange[0] = refRangeTxt;
-				}
-			}
-		}
-		return refRange;
 	}
 }

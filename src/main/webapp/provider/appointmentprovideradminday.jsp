@@ -572,6 +572,20 @@ function review(key) {
 
 </script>
 
+<style type="text/css">
+
+<% // NavBar always visible when scrolling down page
+if (oscarVariables.isPropertyActive("navigation_always_on_top")) { %>
+
+	#firstTable{
+	    position: fixed;
+	    background-color: #EEEEFF;
+	}
+	#appointmentTable {
+		padding-top:17px;
+	}
+<% } %>
+</style>
 
 <%
 	if (OscarProperties.getInstance().getBooleanProperty("indivica_hc_read_enabled", "true")) {
@@ -1101,7 +1115,7 @@ java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.stru
 	} else {
 %>
 
-<table BORDER="0" CELLPADDING="1" CELLSPACING="0" WIDTH="100%" BGCOLOR="#C0C0C0">
+<table id="appointmentTable" BORDER="0" CELLPADDING="1" CELLSPACING="0" WIDTH="100%" BGCOLOR="#C0C0C0">
 <tr id="ivoryBar">
 <td id="dateAndCalendar" BGCOLOR="ivory" width="33%">
  <a class="redArrow" href="providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=<%=isWeekView?(day-7):(day-1)%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+URLEncoder.encode(request.getParameter("curProviderName"),"UTF-8") )%>&displaymode=day&dboperation=searchappointmentday<%=isWeekView?"&provider_no="+provNum:""%>&viewall=<%=viewall%>">

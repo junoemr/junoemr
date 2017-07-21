@@ -152,7 +152,6 @@ public class IHAHandler extends DefaultGenericHandler implements MessageHandler 
                 	}
                 }
             }catch(Exception e){
-                MessageUploader.clean(fileId);
                 logger.error("ERROR:", e);
                 return null;
             }

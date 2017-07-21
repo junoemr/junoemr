@@ -28,16 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 import javax.persistence.PersistenceException;
 
@@ -740,6 +731,89 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
             List<Demographic> results =  query.list();
 
 			return (results);
+		} finally {
+			this.releaseSession(session);
+		}
+	}
+
+	public Demographic findMatchingLab(
+			String hin, String firstName, String lastName, String gender, Calendar dateOfBirth) {
+
+		// here we build the sql where clause, to simplify the logic we just append all parameters, then after we'll strip out the first " and" as the logic is easier then checking if we have to add "and" for every parameter.
+		String sqlCommand=null;
+		StringBuilder sqlParameters = new StringBuilder();
+
+		if (hin != null  && !hin.trim().equals("")) {
+
+			sqlParameters.append(" and d.Hin like :hin");
+			// Remove names, if health number exists and client has name matching turned off
+			if(OscarProperties.getInstance().getBooleanProperty(
+				"LAB_NOMATCH_NAMES", "yes"))
+			{
+				firstName = null;
+				lastName = null;
+			}
+		}
+
+		if (hin != null && !hin.trim().equals("")) {
+			sqlParameters.append(" and d.Hin like :hin");
+		}
+		if (firstName != null && !firstName.trim().equals("")) {
+			sqlParameters.append(" and d.FirstName like :firstName");
+		}
+		if (lastName != null && !lastName.trim().equals("")) {
+			sqlParameters.append(" and d.LastName like :lastName");
+		}
+		if (gender != null && !gender.trim().equals("")) {
+			sqlParameters.append(" and d.Sex = :gender");
+		}
+
+		if (dateOfBirth != null) {
+			sqlParameters.append(" and d.YearOfBirth = :yearOfBirth");
+			sqlParameters.append(" and d.MonthOfBirth = :monthOfBirth");
+			sqlParameters.append(" and d.DateOfBirth = :dateOfBirth");
+		}
+
+		// at least 1 parameter must exist
+		// we remove the first " and" because the first clause is after the "where" in the sql statement.
+		if (hin == null && (firstName == null && lastName == null && dateOfBirth == null)) {
+			String message = "Health number or name and date of birth are required to match a lab to a patient";
+			logger.info(message);
+			throw (new IllegalArgumentException(message));
+		}
+		else {
+			sqlCommand = "from Demographic d where" +
+					sqlParameters.substring(" and".length(), sqlParameters.length());
+		}
+
+		Session session = this.getSession();
+		try {
+			Query query = session.createQuery(sqlCommand);
+
+			if (hin != null) query.setParameter("hin", "%" + hin + "%");
+			if (firstName != null) query.setParameter("firstName", "%" + firstName + "%");
+			if (lastName != null) query.setParameter("lastName", "%" + lastName + "%");
+			if (gender != null) query.setParameter("gender", gender);
+
+			if (dateOfBirth != null) {
+				query.setParameter("yearOfBirth", ensure2DigitDateHack(dateOfBirth.get(Calendar.YEAR)));
+				query.setParameter("monthOfBirth", ensure2DigitDateHack(dateOfBirth.get(Calendar.MONTH)+1));
+				query.setParameter("dateOfBirth", ensure2DigitDateHack(dateOfBirth.get(Calendar.DAY_OF_MONTH)));
+			}
+
+			query.setFirstResult(0);
+			query.setMaxResults(10);
+
+			@SuppressWarnings("unchecked")
+			List<Demographic> results =  query.list();
+			if(results.size() != 1) {
+				String message = "Found (" + Integer.toString(results.size()) +
+						") demographics matching lab. Expected 1.";
+				logger.info(message);
+				throw new NoSuchElementException(message);
+			}
+
+			return results.get(0);
 		} finally {
 			this.releaseSession(session);
 		}

@@ -23,6 +23,7 @@
  */
 package org.oscarehr.common.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -36,7 +37,16 @@ public class MeasurementsExtDao extends AbstractDao<MeasurementsExt>{
 	public MeasurementsExtDao() {
 		super(MeasurementsExt.class);
 	}
-	
+
+	void setMeasurementsExts(ArrayList<MeasurementsExt> measurementExts) {
+		for(MeasurementsExt measurementsExt : measurementExts)
+		{
+			if(measurementsExt.getVal() != null && measurementsExt.getKeyVal() != null) {
+				persist(measurementsExt);
+			}
+		}
+	}
+
 	public List<MeasurementsExt> getMeasurementsExtByMeasurementId(Integer measurementId) {
 		String queryStr = "select m FROM MeasurementsExt m WHERE m.measurementId = ?1";
 		Query q = entityManager.createQuery(queryStr);
