@@ -1248,8 +1248,7 @@
 	<databaseap>
 		<ap-name>clinic_addressLineFull</ap-name>
 		<ap-sql>SELECT * FROM clinic</ap-sql>
-		<ap-output>${clinic_address}, ${clinic_city}, ${clinic_province},
-			${clinic_postal}</ap-output>
+		<ap-output>${clinic_address}, ${clinic_city}, ${clinic_province}, ${clinic_postal}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>clinic_address</ap-name>
