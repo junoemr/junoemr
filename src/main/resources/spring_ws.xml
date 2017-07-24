@@ -34,18 +34,15 @@
 			<entry key="ws-security.ut.validator" value="org.oscarehr.ws.OscarUsernameTokenValidator" />
 		</cxf:properties>
 		
-		<!-- BORN XDS Soap Header Interceptor (Adds endpointID node to header) -->
-		
-				<!-- logging interceptors -->
+		<!-- logging interceptors -->
 		<cxf:outInterceptors>
+			<!-- BORN XDS Soap Header Interceptor (Adds endpointID node to header) -->
 			<bean id="bornSOAPHeaderInterceptor" class="org.oscarehr.integration.born.BornSOAPHeaderInterceptor" />
 			<ref bean="loggingOutInterceptor" />
-			<ref bean="restLoggingOutInterceptor" />
 		</cxf:outInterceptors>
 
 		<cxf:inInterceptors>
 			<ref bean="loggingInInterceptor" />
-			<ref bean="restLoggingInInterceptor" />
 		</cxf:inInterceptors>
 		
 		<cxf:outFaultInterceptors>
@@ -137,9 +134,12 @@
 	<jaxrs:server address="/rs" id="jaxrServer">
 
 		<jaxrs:inInterceptors>
-			<bean name="authInInterceptor"
-				class="org.oscarehr.ws.rest.util.AuthenticationInInterceptor" />
+			<bean name="authInInterceptor" class="org.oscarehr.ws.rest.util.AuthenticationInInterceptor" />
+			<ref bean="restLoggingInInterceptor" />
 		</jaxrs:inInterceptors>
+		<jaxrs:outInterceptors>
+			<ref bean="restLoggingOutInterceptor" />
+		</jaxrs:outInterceptors>
 		
 		<jaxrs:providers>
 		    <ref bean="jaxb"/>
