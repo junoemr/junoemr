@@ -226,6 +226,25 @@ public class SecuserroleDao extends HibernateDaoSupport {
 	public List findByRoleName(Object roleName) {
 		return findByProperty(ROLE_NAME, roleName);
 	}
+	
+	public List<Secuserrole> findByProviderAndRoleName(String providerNo, String roleName) {
+		Session session = getSession();
+		try {
+			String queryString = "FROM Secuserrole AS model WHERE model.providerNo = :providerNo AND model.roleName = :roleName";
+			Query queryObject = session.createQuery(queryString);
+			queryObject.setParameter("providerNo", providerNo);
+			queryObject.setParameter("roleName", roleName);
+
+			return queryObject.list();
+		}
+		catch (RuntimeException re) {
+			logger.error("findByProviderAndRoleName failed", re);
+			throw re;
+		}
+		finally {
+			this.releaseSession(session);
+		}
+	}
 
 	public List findByOrgcd(Object orgcd, boolean activeOnly) {
 		//return findByProperty(ORGCD, orgcd);

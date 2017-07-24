@@ -102,7 +102,7 @@ if( newCaseManagement ) {
 }
 
 // get role from database
-Vector vecRoleName = new Vector();
+Vector<String> vecRoleName = new Vector<String>();
 String	sql;
 String adminRoleName = "";
 
@@ -147,7 +147,9 @@ if (request.getParameter("buttonUpdate") != null && request.getParameter("button
 
     if(!"-".equals(roleNew)) {
 		Secuserrole secUserRole = secUserRoleDao.findById(Integer.parseInt(roleId));
-		if(secUserRole != null) {
+    	List<Secuserrole> existingRoles = secUserRoleDao.findByProviderAndRoleName(number, roleNew);
+    	// prevent saving a role already assigned
+		if(secUserRole != null && existingRoles.isEmpty()) {
 			secUserRole.setRoleName(roleNew);
 			secUserRoleDao.updateRoleName(Integer.parseInt(roleId),roleNew);
 			msg = "Role " + roleNew + " is updated. (" + number + ")";
@@ -160,7 +162,7 @@ if (request.getParameter("buttonUpdate") != null && request.getParameter("button
 			recycleBin.setTableContent("<provider_no>" + number + "</provider_no>" + "<role_name>" + roleOld + "</role_name>"  + "<role_id>" + roleId + "</role_id>");
 			recycleBinDao.persist(recycleBin);
 
-			LogAction.addLog(curUser_no, LogConst.ACTION_UPDATE, LogConst.CON_ROLE, number +"|"+ roleOld +">"+ roleNew, ip);
+			LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_UPDATE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, roleId, ip, number +"|" + roleOld +">"+ roleNew);
 
 			if( newCaseManagement ) {
                 ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
@@ -187,24 +189,30 @@ if (request.getParameter("submit") != null && request.getParameter("submit").equ
     String roleNew = request.getParameter("roleNew");
 
     if(!"-".equals(roleNew)) {
-	    Secuserrole secUserRole = new Secuserrole();
-	    secUserRole.setProviderNo(number);
-	    secUserRole.setRoleName(roleNew);
-	    secUserRole.setActiveyn(1);
-	    secUserRoleDao.save(secUserRole);
-	    msg = "Role " + roleNew + " is added. (" + number + ")";
-	    LogAction.addLog(curUser_no, LogConst.ACTION_ADD, LogConst.CON_ROLE, number +"|"+ roleNew, ip);
-	    if( newCaseManagement ) {
-            ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
-            if(programProvider == null) {
-            	programProvider = new ProgramProvider();
-            }
-            programProvider.setProgramId( Long.valueOf(caisiProgram));
-            programProvider.setProviderNo(number);
-            programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleNew).getId()));
-            programProviderDao.saveProgramProvider(programProvider);
-	    }
-    } else {
+    	List<Secuserrole> existingRoles = secUserRoleDao.findByProviderAndRoleName(number, roleNew);
+    	// prevent saving a role already assigned
+    	if(existingRoles.isEmpty()) {
+		    Secuserrole secUserRole = new Secuserrole();
+		    secUserRole.setProviderNo(number);
+		    secUserRole.setRoleName(roleNew);
+		    secUserRole.setActiveyn(1);
+		    secUserRoleDao.save(secUserRole);
+		    msg = "Role " + roleNew + " is added. (" + number + ")";
+			LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_ADD, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, String.valueOf(secUserRole.getId()), ip, number +"|"+ roleNew);
+	
+		    if( newCaseManagement ) {
+	            ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
+	            if(programProvider == null) {
+	            	programProvider = new ProgramProvider();
+	            }
+	            programProvider.setProgramId( Long.valueOf(caisiProgram));
+	            programProvider.setProviderNo(number);
+	            programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleNew).getId()));
+	            programProviderDao.saveProgramProvider(programProvider);
+		    }
+    	}
+    }
+    else {
     	msg = "Role " + roleNew + " is <font color='red'>NOT</font> added!!! (" + number + ")";
     }
 
@@ -230,7 +238,8 @@ if (request.getParameter("submit") != null && request.getParameter("submit").equ
 		recycleBin.setTableContent("<provider_no>" + number + "</provider_no>" + "<role_name>" + roleOld + "</role_name>");
 		recycleBinDao.persist(recycleBin);
 
-		LogAction.addLog(curUser_no, LogConst.ACTION_DELETE, LogConst.CON_ROLE, number +"|"+ roleOld, ip);
+		LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, roleId, ip, number +"|"+ roleOld);
+
 
         if( newCaseManagement ) {
             ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
@@ -312,7 +321,7 @@ if(newCaseManagement) {
       <link rel="stylesheet" href="../css/receptionistapptstyle.css">
        <script src="../js/jquery-1.7.1.min.js"></script>
       
-      <script language="JavaScript">
+      <script>
 <!--
 function setfocus() {
 	this.focus();
