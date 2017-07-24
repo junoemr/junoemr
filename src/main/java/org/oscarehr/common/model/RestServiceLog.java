@@ -33,6 +33,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PreRemove;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -56,10 +57,6 @@ public class RestServiceLog extends AbstractModel<Long> implements Serializable 
 	private String providerNo;
 	@Column(name = "ip")
 	private String ip;
-	/*@Column(name = "service_type")
-	private String serviceType;
-	@Column(name = "method_name")
-	private String methodName;*/
 	@Column(name = "url")
 	private String url;
 	@Column(name = "user_agent")
@@ -70,16 +67,18 @@ public class RestServiceLog extends AbstractModel<Long> implements Serializable 
 	private String rawPost;
 	@Column(name = "raw_output")
 	private String rawOutput;
+	@Column(name = "error_message")
+	private String errorMessage;
 	
 	@PreRemove
 	protected void jpaPreventDelete() {
 		throw (new UnsupportedOperationException("Remove is not allowed for this type of item."));
 	}
 
-//	@PreUpdate
-//	protected void jpaPreventUpdate() {
-//		throw (new UnsupportedOperationException("Update is not allowed for this type of item."));
-//	}
+	@PreUpdate
+	protected void jpaPreventUpdate() {
+		throw (new UnsupportedOperationException("Update is not allowed for this type of item."));
+	}
 	
 	@Override
 	public Long getId() {
@@ -124,22 +123,6 @@ public class RestServiceLog extends AbstractModel<Long> implements Serializable 
 		this.ip = ip;
 	}
 
-	/*public String getServiceType() {
-		return serviceType;
-	}
-
-	public void setServiceType(String serviceType) {
-		this.serviceType = serviceType;
-	}
-
-	public String getMethodName() {
-		return methodName;
-	}
-
-	public void setMethodName(String methodName) {
-		this.methodName = methodName;
-	}*/
-
 	public String getUrl() {
 		return url;
 	}
@@ -178,5 +161,13 @@ public class RestServiceLog extends AbstractModel<Long> implements Serializable 
 
 	public void setRawOutput(String rawOutput) {
 		this.rawOutput = rawOutput;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
 	}
 }

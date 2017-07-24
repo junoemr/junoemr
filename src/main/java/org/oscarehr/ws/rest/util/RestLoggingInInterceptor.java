@@ -24,7 +24,9 @@
 
 package org.oscarehr.ws.rest.util;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -62,27 +64,45 @@ public class RestLoggingInInterceptor extends AbstractLoggingInterceptor {
 	 */
 	@Override
 	public void handleMessage(Message message) throws Fault {	
+		// now get the request body
+		InputStream is = message.getContent(InputStream.class);
+		CachedOutputStream os = new CachedOutputStream();
 		try {
-			logger.info("REST LOGGING IN!!! ");
-			// now get the request body
-			InputStream is = message.getContent(InputStream.class);
-			CachedOutputStream os = new CachedOutputStream();
 			IOUtils.copy(is, os);
 			os.flush();
+			
 			message.setContent(InputStream.class, os.getInputStream());
 			is.close();
 
 			String postData = IOUtils.toString(os.getInputStream());
-			logger.debug("The request is:\n" + postData);
+			logger.debug("REST LOGGING IN:\n" + postData);
 			os.close();
 			
 			addNewLogEntry(message, postData);
 		}
-
-		catch (Exception e) {
-			logger.error("Error in incoming REST Interceptor", e);
+		catch (IOException e) {
+			logger.error("IO Error in incoming REST Interceptor", e);
 		}
 	}
+	@Override
+	public void handleFault(Message message) {
+		Exception e = message.getContent(Exception.class);
+		
+		logger.error("Incoming Interceptor Fault", e);
+		
+		// ensure we log something if the fault occurs after the interceptor stores the incoming data
+		RestServiceLog restLog = (RestServiceLog)message.getExchange().get(RestLoggingInInterceptor.class.getName());
+		if(restLog != null) {
+			Date createdAt = restLog.getCreatedAt();
+			long duration  = new Date().getTime() - createdAt.getTime();
+			
+			restLog.setDuration(duration);
+			restLog.setErrorMessage(e.getMessage());
+			
+			LogAction.saveRestLogEntry(restLog);
+		}
+	}
+
 	private void addNewLogEntry(Message message, String postData) {
 		HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
 
@@ -103,8 +123,6 @@ public class RestLoggingInInterceptor extends AbstractLoggingInterceptor {
 		restLog.setRawQueryString(queryString);
 		restLog.setRawPost(postData);
 		restLog.setRawOutput(null);
-		// save a new log entry to the rest logging table
-		LogAction.saveRestLogEntry(restLog);
 		// save the entry object to the exchange so it can be accessed by the loggingOutInterceptor
 		message.getExchange().put(RestLoggingInInterceptor.class.getName(), restLog);
 	}

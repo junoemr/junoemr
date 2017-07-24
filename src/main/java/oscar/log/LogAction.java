@@ -233,10 +233,11 @@ public class LogAction {
 	
 		oscarLogDao.persist(log);
 	}
+	/**
+	 * persists the rest log using the restServiceLogDAO
+	 * @param restLog
+	 */
 	public static void saveRestLogEntry(RestServiceLog restLog) {
 		restServiceLogDao.persist(restLog);
-	}
-	public static void updateRestLogEntry(RestServiceLog restLog) {
-		restServiceLogDao.merge(restLog);
 	}
 }

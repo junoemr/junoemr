@@ -35,15 +35,14 @@
 		</cxf:properties>
 		
 		<!-- logging interceptors -->
+		<cxf:inInterceptors>
+			<ref bean="loggingInInterceptor" />
+		</cxf:inInterceptors>
 		<cxf:outInterceptors>
 			<!-- BORN XDS Soap Header Interceptor (Adds endpointID node to header) -->
 			<bean id="bornSOAPHeaderInterceptor" class="org.oscarehr.integration.born.BornSOAPHeaderInterceptor" />
 			<ref bean="loggingOutInterceptor" />
 		</cxf:outInterceptors>
-
-		<cxf:inInterceptors>
-			<ref bean="loggingInInterceptor" />
-		</cxf:inInterceptors>
 		
 		<cxf:outFaultInterceptors>
 			<ref bean="loggingOutInterceptor" />
@@ -140,6 +139,13 @@
 		<jaxrs:outInterceptors>
 			<ref bean="restLoggingOutInterceptor" />
 		</jaxrs:outInterceptors>
+		
+		<jaxrs:inFaultInterceptors>
+			<ref bean="restLoggingInInterceptor" />
+		</jaxrs:inFaultInterceptors>
+		<jaxrs:outFaultInterceptors>
+			<ref bean="restLoggingOutInterceptor" />
+		</jaxrs:outFaultInterceptors>
 		
 		<jaxrs:providers>
 		    <ref bean="jaxb"/>

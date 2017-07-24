@@ -10,6 +10,7 @@ CREATE TABLE `log_ws_rest` (
   raw_query_string  text,
   raw_post          text,
   raw_output        text,
+  error_message     text,
 
   PRIMARY KEY (`id`),
   INDEX `idx_created_at` (`created_at`),

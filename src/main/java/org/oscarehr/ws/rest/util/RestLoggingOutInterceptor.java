@@ -71,8 +71,14 @@ public class RestLoggingOutInterceptor extends AbstractLoggingInterceptor {
             // message content has to be set to a new stream, as streams can only be read once
             message.setContent(OutputStream.class, newOut);
             // use the callback to perform logging once the stream closes
-            newOut.registerCallback(new LoggingOutCallback(logger, message, os));
+            newOut.registerCallback(new RestLoggingOutCallback(logger, message, os));
         }
+	}
+	@Override
+	public void handleFault(Message message) {
+		Exception e = message.getContent(Exception.class);
+		
+		logger.error("Outgoing Interceptor Fault", e);
 	}
 
 	/**
@@ -89,13 +95,13 @@ public class RestLoggingOutInterceptor extends AbstractLoggingInterceptor {
  * @author robert
  *
  */
-class LoggingOutCallback implements CachedOutputStreamCallback {
+class RestLoggingOutCallback implements CachedOutputStreamCallback {
 	
     private final Message message;
     private final OutputStream origStream;
     private final Logger logger; //NOPMD
     
-    public LoggingOutCallback(Logger logger, Message message, OutputStream os) {
+    public RestLoggingOutCallback(Logger logger, Message message, OutputStream os) {
         this.logger = logger;
         this.message = message;
         this.origStream = os;
@@ -105,15 +111,13 @@ class LoggingOutCallback implements CachedOutputStreamCallback {
 	}
 
 	public void onClose(CachedOutputStream cos) {
-		
-		logger.info("REST LOGGING OUT!!!");
-		
+				
 		try {
 			StringBuilder builder = new StringBuilder();
 			cos.writeCacheTo(builder);
 			// get the message body
 			String messageBody = builder.toString();
-			logger.debug("REST LOGGING!!!\n" + messageBody);
+			logger.debug("REST LOGGING OUT:\n" + messageBody);
 			logMessage(message, messageBody);
 		}
 		catch (Exception e) {
@@ -132,8 +136,7 @@ class LoggingOutCallback implements CachedOutputStreamCallback {
 			restLog.setDuration(duration);
 			restLog.setRawOutput(messageBody);
 			
-			
-			LogAction.updateRestLogEntry(restLog);
+			LogAction.saveRestLogEntry(restLog);
 		}
 	}
 }
