@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -75,8 +76,6 @@ import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.util.UtilDateUtilities;
-
-import com.lowagie.text.pdf.PdfReader;
 
 public class AddEditDocumentAction extends DispatchAction {
 	
@@ -166,10 +165,9 @@ public class AddEditDocumentAction extends DispatchAction {
 		String filePath = docdownload + fileName;
 
 		try {
-			PdfReader reader = new PdfReader(filePath);
-			numOfPage = reader.getNumberOfPages();
-			reader.close();
-
+			
+			PDDocument doc = PDDocument.load(new File(filePath));
+			numOfPage = doc.getNumberOfPages();
 		}
 		catch (IOException e) {
 			MiscUtils.getLogger().error("Error", e);
