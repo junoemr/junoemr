@@ -158,15 +158,10 @@ public class AddEditDocumentAction extends DispatchAction {
 	/** count number of pages in a local pdf file */
 	public static int countNumOfPages(String fileName) {
 		int numOfPage = 0;
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		if (!docdownload.endsWith(File.separator)) {
-			docdownload += File.separator;
-		}
-		String filePath = docdownload + fileName;
+		String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 
 		try {
-			
-			PDDocument doc = PDDocument.load(new File(filePath));
+			PDDocument doc = PDDocument.load(new File(documentDir, fileName));
 			numOfPage = doc.getNumberOfPages();
 		}
 		catch (IOException e) {
