@@ -1070,7 +1070,7 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 		<div>
 			<label><b><bean:message key="demographic.demographicaddrecordhtm.formReferalDoctorN" />:</b></label>
 			<input type="text" name="r_doctor_ohip" maxlength="6">
-			<% if("ON".equals(prov)) { %>
+			<% if(!"BC".equals(prov)) { %>
                  <!--add more if-else statements to include other languages for now if en and fr-->
                  <% 
 				String custom_link_en = oscarProps.getProperty("cust_demographic_refdoc_link_en");
