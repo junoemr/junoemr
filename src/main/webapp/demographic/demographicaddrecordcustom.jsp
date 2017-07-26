@@ -1072,12 +1072,19 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 			<input type="text" name="r_doctor_ohip" maxlength="6">
 			<% if("ON".equals(prov)) { %>
                  <!--add more if-else statements to include other languages for now if en and fr-->
-                 <% if (vLocale.getLanguage().equals("en")) {%>
-					<a href=# onClick ="popupPage(600,750,'<%=protocol%>www.cmq.org/en/RepertoireMembres/Recherche.aspx');return false;"> <bean:message key="demographic.demographicaddrecordhtm.Search"/></a>
-                 <% }else if (vLocale.getLanguage().equals("fr")){%>
-                     <a href=# onClick ="popupPage(600,750,'<%=protocol%>www.cmq.org/fr/RepertoireMembres/Recherche.aspx');return false;"> <bean:message key="demographic.demographicaddrecordhtm.Search"/></a>
-                 <%}%>
-            <% } %>
+                 <% 
+				String custom_link_en = oscarProps.getProperty("cust_demographic_refdoc_link_en");
+				String custom_link_fr = oscarProps.getProperty("cust_demographic_refdoc_link_fr");
+				if (vLocale.getLanguage().equals("en") && custom_link_en != null) {%>
+					<a href=# onClick ="popupPage(600,750,'<%=protocol + custom_link_en%>');return false;"> <bean:message key="demographic.demographicaddrecordhtm.Search"/></a>
+                 <% }
+				else if (vLocale.getLanguage().equals("fr") && custom_link_fr != null) {%>
+                     <a href=# onClick ="popupPage(600,750,'<%=protocol + custom_link_fr%>');return false;"> <bean:message key="demographic.demographicaddrecordhtm.Search"/></a>
+                 <%}
+				else {%>
+					<a href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographicaddrecordhtm.Search"/></a>
+				<%}
+				}%>
 		</div>
 		<%
 	}else if(custom_demographic_fields.get(i).equals("roster_status")){
