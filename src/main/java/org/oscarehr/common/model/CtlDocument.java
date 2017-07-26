@@ -31,6 +31,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name="ctl_document")
 public class CtlDocument extends AbstractModel<CtlDocumentPK> {
+	
+	public static final String MODULE_DEMOGRAPHIC = "demographic";
+	public static final String MODULE_PROVIDER = "provider";
 
 	@EmbeddedId
 	private CtlDocumentPK id;

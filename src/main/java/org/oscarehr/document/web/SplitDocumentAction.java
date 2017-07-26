@@ -20,39 +20,38 @@ import javax.servlet.http.HttpServletResponse;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.common.dao.CtlDocumentDao;
 import org.oscarehr.common.dao.DocumentDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
-import org.oscarehr.common.model.CtlDocument;
-import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.Document;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 
-
-
 public class SplitDocumentAction extends DispatchAction {
+	
+	private static Logger logger = Logger.getLogger(SplitDocumentAction.class);
 
 	private DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
+	private ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) SpringUtils.getBean("providerInboxRoutingDAO");
+	private ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean("providerLabRoutingDao");
+	private PatientLabRoutingDao patientLabRoutingDao = (PatientLabRoutingDao) SpringUtils.getBean("patientLabRoutingDao");
+	private QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) SpringUtils.getBean("queueDocumentLinkDAO");
 
 	public ActionForward split(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String docNum = request.getParameter("document");
@@ -93,44 +92,38 @@ public class SplitDocumentAction extends DispatchAction {
 
 			if (newPdf.getNumberOfPages() > 0) {
 
+				/* Save the new pdf */
 				EDoc newDoc = new EDoc("", "", newFilename, "", providerNo, doc.getDoccreator(), "", 'A', 
 						DateFormatUtils.format(new Date(), "yyyy-MM-dd"), "", "", "demographic", "-1", 0);
 				newDoc.setDocPublic("0");
 				newDoc.setContentType("application/pdf");
 				newDoc.setNumberOfPages(newPdf.getNumberOfPages());
 
+				// Saves the document and adds links in ctl_document
 				String newDocNo = EDocUtil.addDocumentSQL(newDoc);
 
 				newPdf.save(documentDir + newDoc.getFileName());
 				newPdf.close();
 
-				WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
-				ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) ctx.getBean("providerInboxRoutingDAO");
-				// providerInboxRoutingDao.addToProviderInbox("0",
-				// Integer.parseInt(newDocNo), "DOC");
-
+				/* add link in providerInbox */
 				List<ProviderInboxItem> routeList = providerInboxRoutingDao.getProvidersWithRoutingForDocument("DOC", Integer.parseInt(docNum));
 				for (ProviderInboxItem i : routeList) {
 					providerInboxRoutingDao.addToProviderInbox(i.getProviderNo(), Integer.parseInt(newDocNo), "DOC");
 				}
-
 				providerInboxRoutingDao.addToProviderInbox(providerNo, Integer.parseInt(newDocNo), "DOC");
 
-				QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) ctx.getBean("queueDocumentLinkDAO");
+				/* add link in document queue */
 				Integer qid = (queueId == null || queueId.equalsIgnoreCase("null")) ? 1 : Integer.parseInt(queueId);
 				Integer did = Integer.parseInt(newDocNo.trim());
 				queueDocumentLinkDAO.addActiveQueueDocumentLink(qid, did);
-
-				ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean("providerLabRoutingDao");
 
 				List<ProviderLabRoutingModel> result = providerLabRoutingDao.getProviderLabRoutingDocuments(Integer.parseInt(docNum));
 				if (!result.isEmpty()) {
 					new ProviderLabRouting().route(newDocNo, result.get(0).getProviderNo(), "DOC");
 				}
 
-				PatientLabRoutingDao patientLabRoutingDao = (PatientLabRoutingDao) SpringUtils.getBean("patientLabRoutingDao");
+				/* add link in patientLabRouting */
 				List<PatientLabRouting> result2 = patientLabRoutingDao.findDocByDemographic(Integer.parseInt(docNum));
-
 				if (!result2.isEmpty()) {
 					PatientLabRouting newPatientRoute = new PatientLabRouting();
 
@@ -140,19 +133,7 @@ public class SplitDocumentAction extends DispatchAction {
 
 					patientLabRoutingDao.persist(newPatientRoute);
 				}
-
-				CtlDocumentDao ctlDocumentDao = SpringUtils.getBean(CtlDocumentDao.class);
-				CtlDocument result3 = ctlDocumentDao.getCtrlDocument(Integer.parseInt(docNum));
-
-				if (result3 != null) {
-					CtlDocumentPK ctlDocumentPK = new CtlDocumentPK(Integer.parseInt(newDocNo), "demographic");
-					CtlDocument newCtlDocument = new CtlDocument();
-					newCtlDocument.setId(ctlDocumentPK);
-					newCtlDocument.getId().setModuleId(result3.getId().getModuleId());
-					newCtlDocument.setStatus(result3.getStatus());
-					documentDao.persist(newCtlDocument);
-				}
-
+				
 				if (result.isEmpty() || result2.isEmpty()) {
 					String json = "{newDocNum:" + newDocNo + "}";
 					JSONObject jsonObject = JSONObject.fromObject(json);
@@ -161,20 +142,18 @@ public class SplitDocumentAction extends DispatchAction {
 					printWriter.print(jsonObject);
 					printWriter.flush();
 					return null;
-
 				}
 
 			}
 
 		}
 		catch (Exception e) {
-			MiscUtils.getLogger().error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			return null;
 		}
 		finally {
 			try {
 				if (pdf != null) pdf.close();
-
 			}
 			catch (IOException e) {
 				// do nothing
@@ -215,9 +194,9 @@ public class SplitDocumentAction extends DispatchAction {
 	public ActionForward removeFirstPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Document doc = documentDao.getDocument(request.getParameter("document"));
 
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+		String docDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 		
-		File pdfFile = new File(docdownload + doc.getDocfilename());
+		File pdfFile = new File(docDir, doc.getDocfilename());
 		PDDocument pdf = PDDocument.load(pdfFile);
 
 		// Documents must have at least 2 pages, for the first page to be removed.
