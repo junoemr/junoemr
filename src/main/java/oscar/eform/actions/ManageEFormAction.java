@@ -54,7 +54,7 @@ import oscar.eform.data.EForm;
 
 public class ManageEFormAction extends DispatchAction {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
+
     public ActionForward exportEForm(ActionMapping mapping, ActionForm form,
             HttpServletRequest request, HttpServletResponse response) throws Exception {
     	
@@ -86,10 +86,18 @@ public class ManageEFormAction extends DispatchAction {
         EFormExportZip eFormExportZip = new EFormExportZip();
         List<String> errors = eFormExportZip.importForm(zippedForm.getInputStream());
         request.setAttribute("importErrors", errors);
-        if(errors.size() > 0){
+		boolean formFailed = false;
+
+		for(int i = 0; i < errors.size(); i++) {
+			if(!errors.get(i).startsWith("Image '")) {
+        		formFailed = true;
+			}
+		}
+
+        if(formFailed) {
         	return mapping.findForward("fail");
-        }else{
-	        request.setAttribute("status", "success");	
+        } else {
+	        request.setAttribute("status", "success");
 	        return mapping.findForward("success");
         }
     }
