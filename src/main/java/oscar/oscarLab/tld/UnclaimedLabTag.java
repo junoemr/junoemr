@@ -30,7 +30,6 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
-import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.util.SpringUtils;
 
 /**
@@ -47,7 +46,7 @@ public class UnclaimedLabTag extends TagSupport {
 
 	public int doStartTag() throws JspException    {
 	   ProviderLabRoutingDao dao = SpringUtils.getBean(ProviderLabRoutingDao.class);
-	   List<ProviderLabRoutingModel> rs = dao.findByProviderNo("0", "N");
+	   List<Object[]> rs = dao.findByProviderNo("0", "N");
 	   numNewLabs = rs.size();
         
         if(numNewLabs > 0){
