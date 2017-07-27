@@ -32,7 +32,9 @@
 package oscar.oscarReport.reportByTemplate;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -109,8 +111,8 @@ public class ReportManager {
                     Document doc = parser.build(new java.io.ByteArrayInputStream(paramXML.getBytes()));
                     Element root = doc.getRootElement();
                     List<Element> paramsXml = root.getChildren("param");
-                    for (int i=0; i<paramsXml.size(); i++) {
-                        Element param = paramsXml.get(i);
+                    // handle parameter tags
+                    for(Element param : paramsXml) {
                         String paramid = param.getAttributeValue("id");
                         if (paramid == null) return new ReportObjectGeneric(templateid, "Error: Param id not found");
                         String paramtype = param.getAttributeValue("type");
@@ -139,6 +141,18 @@ public class ReportManager {
                             choices.add(curchoice);
                         }
                         Parameter curparam = new Parameter(paramid, paramtype, paramdescription, choices);
+                        
+                        // only calendar use for now
+                        // add the default parameter
+                        //TODO it would be nice to iterate all parameters
+                        String paramDefault = param.getAttributeValue("default");
+                        if(paramDefault != null) {
+                        	// cheap and dirty way to always use the current date
+                        	if(paramDefault.equalsIgnoreCase("CURDATE") || paramDefault.equalsIgnoreCase("TODAY")) {
+                        		paramDefault = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+                        	}
+                        	curparam.addAttribute("default", paramDefault);
+                        }
                         params.add(curparam);
                     }
                 }

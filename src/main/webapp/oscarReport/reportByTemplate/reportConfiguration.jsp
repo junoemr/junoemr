@@ -115,22 +115,35 @@
 					<th class="stepRC">Step <%=step%>:</th>
 					<td class="descriptionRC" style="max-width: 550px"><%=curparam.getParamDescription()%>
 					</td>
-					<td id="enclosingCol<%=i%>"><%-- If LIST field --%> <%if (curparam.getParamType().equals(curparam.LIST)) {%>
+					<td id="enclosingCol<%=i%>">
+					
+					<%-- If LIST field --%>
+					<%if (curparam.getParamType().equals(curparam.LIST)) {%>
 					<select name="<%=curparam.getParamId()%>">
 						<%ArrayList paramChoices = curparam.getParamChoices();
                                          for (int i2=0; i2<paramChoices.size(); i2++) { 
                                          Choice curchoice = (Choice) paramChoices.get(i2);%>
 						<option value="<%=curchoice.getChoiceId()%>"><%=curchoice.getChoiceText()%></option>
 						<%}%>
-					</select> <%--If TEXT field --%> <% } else if (curparam.getParamType().equals(curparam.TEXT)) {%>
+					</select> 
+					
+					<%--If TEXT field --%> 
+					<% } else if (curparam.getParamType().equals(curparam.TEXT)) {%>
 					<input type="text" size="20" name="<%=curparam.getParamId()%>">
-					<%--If DATE field --%> <% } else if (curparam.getParamType().equals(curparam.DATE)) {%>
+					
+					<%--If DATE field --%> 
+					<% } else if (curparam.getParamType().equals(curparam.DATE)) {%>
 					<input type="text" class="datefield" id="datefield<%=i%>"
-						name="<%=curparam.getParamId()%>"><a id="obsdate<%=i%>"><img
-						title="Calendar" src="../../images/cal.gif" alt="Calendar"
-						border="0" /></a> <script type="text/javascript">
-                                    Calendar.setup( { inputField : "datefield<%=i%>", ifFormat : "%Y-%m-%d", showsTime :false, button : "obsdate<%=i%>", singleClick : true, step : 1 } );
-                                 </script> <%--If CHECK field --%> <% } else if (curparam.getParamType().equals(curparam.CHECK)) {%>
+						<%if(curparam.hasAttribute("default")){%>
+							value="<%=curparam.getAttribute("default")%>"<%
+						}%>
+						name="<%=curparam.getParamId()%>"><a id="obsdate<%=i%>">
+						<img title="Calendar" src="../../images/cal.gif" alt="Calendar"border="0" /></a> 
+						<script type="text/javascript">
+                        	Calendar.setup( { inputField : "datefield<%=i%>", ifFormat : "%Y-%m-%d", showsTime :false, button : "obsdate<%=i%>", singleClick : true, step : 1 } );
+                        </script>
+                                 
+                    <%--If CHECK field --%> <% } else if (curparam.getParamType().equals(curparam.CHECK)) {%>
 					<input type="hidden" name="<%=curparam.getParamId()%>:check"
 						value=""> <input type="checkbox" name="mastercheck"
 						onclick="checkAll(this, 'enclosingCol<%=i%>', 'checkclass<%=i%>')"><br />
