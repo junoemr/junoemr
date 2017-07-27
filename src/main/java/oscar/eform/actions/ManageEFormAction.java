@@ -80,35 +80,24 @@ public class ManageEFormAction extends DispatchAction {
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null)) {
 			throw new SecurityException("missing required security object (_eform)");
 		}
+    	
+        FormFile zippedForm = (FormFile) form.getMultipartRequestHandler().getFileElements().get("zippedForm");
+        request.setAttribute("input", "import");
+        EFormExportZip eFormExportZip = new EFormExportZip();
+        List<String> errors = eFormExportZip.importForm(zippedForm.getInputStream());
+        request.setAttribute("importErrors", errors);
+		request.setAttribute("status", "upload");
 
-		FormFile zippedForm = (FormFile) form.getMultipartRequestHandler().getFileElements().get("zippedForm");
-		request.setAttribute("input", "import");
-		EFormExportZip eFormExportZip = new EFormExportZip();
-		List<String> errors = eFormExportZip.importForm(zippedForm.getInputStream());
-		request.setAttribute("importErrors", errors);
-		boolean formFailed = false;
+		return mapping.findForward("upload");
+    }
 
-		for(int i = 0; i < errors.size(); i++) {
-			if(!errors.get(i).startsWith("Image '")) {
-				formFailed = true;
-			}
-		}
-
-		if(formFailed) {
-			return mapping.findForward("fail");
-		} else {
-			request.setAttribute("status", "success");
-			return mapping.findForward("success");
-		}
-	}
-
-	/*
-	 *Import's from mydrugref right now. This should be redone to have the eform repository dynamic.  There could be mulitple.
-	 */
-	public ActionForward importEFormFromRemote(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null)) {
+    /*
+     *Import's from mydrugref right now. This should be redone to have the eform repository dynamic.  There could be mulitple.
+     */
+    public ActionForward importEFormFromRemote(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	
+    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null)) {
 			throw new SecurityException("missing required security object (_eform)");
 		}
 

@@ -39,8 +39,18 @@ String status = (String) request.getAttribute("status");
 
 <script>
 $(function() {
-    //x$( document ).tooltip();
-  });
+	//x$( document ).tooltip();
+});
+
+function reload() {
+    var url = "<%= request.getContextPath() %>/eform/efmformmanager.jsp"
+    $("#eformTbl", window.parent.document).load(url + " #eformTbl");
+}
+
+function getHeight() {
+    window.frames.frameElement.height = "210";
+}
+
 </script>
 </head>
 
@@ -50,42 +60,42 @@ body{background-color:#f5f5f5;}
 
 <body>
 
-<%if(status != null){ %>
-    <div class="alert alert-success">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <strong>Success!</strong> Your eform was imported.
-    </div>
-
-<script>
-window.top.location.href = "<%=request.getContextPath()%>/administration/?show=Forms";
-</script>
-
-<%}else{%>
 <form action="<%=request.getContextPath()%>/eform/manageEForm.do" method="POST" enctype="multipart/form-data" id="eformImportForm">
-    <input type="hidden" name="method" value="importEForm">
-		Import eForm:		
-        <%List<String> importErrors = (List<String>) request.getAttribute("importErrors");
-        if (importErrors != null && importErrors.size() > 0) {%>
-       		<span class="text-error"> <html:errors /> 
-                <%for (String importError: importErrors) {%>
-                - <%=importError%>
-                <%}%>
-           </span>
-        <%}%>
-        
-        
-       
-         <br>
-        
-        
-        <input type="file" name="zippedForm" size="50">
-        <span title="<bean:message key="global.uploadWarningBody"/>" style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer"><img border="0" src="../../images/icon_alertsml.gif"/></span></span>
-                                        
-        <input type="submit" name="subm" value="Import" class="btn" onclick="this.value = 'Importing...'; this.disabled = true;"><br>
-        <span class="label label-info">Info: </span> <strong>When importing the file format is required to be a zip file.</strong>
+	<input type="hidden" name="method" value="importEForm">
+    Import eForm:<br/>
+    <%
+    if(status != null) {
+    %>
+        <script>reload();</script>
+    <%
+        List<String> importErrors = (List<String>) request.getAttribute("importErrors");
+        if (importErrors != null && importErrors.size() > 0) {
+            for (String importError: importErrors) { %>
+                <span class="text-error">
+                    <%
+                    if( importError.startsWith("Skipped")) {
+                        out.write("<b>" + importError + "</b>");
+                    } else {
+                        out.write(importError);
+                    }
+                    %>
+                </span><br>
+    <%      }
+        } else { %>
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>Success!</strong> Your eform was imported.
+            </div>
+    <%  }
+    } %>
+
+    <input type="file" name="zippedForm" size="50">
+    <span title="<bean:message key='global.uploadWarningBody'/>" style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer"><img border="0" src="../../images/icon_alertsml.gif"/></span></span>
+
+    <input type="button" name="subm" value="Import" class="btn" onclick="this.value = 'Importing...'; this.disabled = true; this.form.submit(); getHeight();"><br>
+    <span class="label label-info">Info: </span> <strong>When importing the file format is required to be a zip file.</strong>
 </form>
 
-<%}%>
 
 </body>
 </html>
