@@ -83,7 +83,7 @@ public class Hl7textResultsData {
                 k++;
             }
 
-            if(k != 0){
+            if(k != 0 && !h.getMsgType().equals("GDML")){
             	MeasurementsDeleted measurementsDeleted;
 
                 String sql = "SELECT m.* FROM measurements m LEFT JOIN measurementsExt e ON m.id = measurement_id AND e.keyval='lab_no' WHERE e.val='"+matchingLabs[k-1]+"'";
@@ -154,7 +154,6 @@ public class Hl7textResultsData {
                     }else{
                        logger.debug("CODE:"+identifier+ " needs to be mapped");
                     }
-
 
                     sql = "INSERT INTO measurements (type, demographicNo, providerNo, dataField, measuringInstruction, dateObserved, dateEntered )VALUES (?, ?, '0', ?, ?, ?, ?)";
                     logger.debug("QUERY: " + sql);
