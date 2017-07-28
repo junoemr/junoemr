@@ -1118,14 +1118,15 @@ function ignoreDuplicates() {
         <select name="staff">
 					<option value=""></option>
 					<%
+						String defaultProvider = oscarProps.getProperty("demographic.new_demographic_default_provider_no");
 						for (Provider p : providerDao.getActiveProvidersByRole("doctor")) {
 								String docProviderNo = p.getProviderNo();
+								String selected = (docProviderNo.equals(defaultProvider)) ? "selected" : "";
 					%>
-					<option id="doc<%=docProviderNo%>" value="<%=docProviderNo%>"><%=Misc.getShortStr((p.getFormattedName()), "", 12)%></option>
+					<option id="doc<%=docProviderNo%>" value="<%=docProviderNo%>" <%=selected%> ><%=Misc.getShortStr((p.getFormattedName()), "", 12)%></option>
 					<%
 						}
 					%>
-					<option value=""></option>
 				</select></td>
 				<td id="nurseLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formNurse" />: </b></td>
