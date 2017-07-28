@@ -359,8 +359,8 @@ public class BillingBillingManager {
         }
         else {
           sql = "SELECT b.service_code, b.description , b.value, b.percentage "
-              + "FROM billingservice b WHERE b.service_code='" + service_code +
-              "'";
+              + "FROM billingservice b WHERE b.service_code='" + service_code
+              + "' AND b.billingservice_date <= CURDATE() ORDER BY b.billingservice_date DESC LIMIT 1";
         }
         MiscUtils.getLogger().debug(sql);
         rs = DBHandler.GetSQL(sql);
