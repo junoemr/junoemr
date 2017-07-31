@@ -26,24 +26,23 @@
 	</bean>
 	<bean id="loggingInInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor" parent="abstractLoggingInterceptor" />
 	<bean id="loggingOutInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor" parent="abstractLoggingInterceptor" />
+	<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>
+	<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>
 
     <cxf:bus>
 		<cxf:properties>
 			<entry key="ws-security.ut.validator" value="org.oscarehr.ws.OscarUsernameTokenValidator" />
 		</cxf:properties>
 		
-		<!-- BORN XDS Soap Header Interceptor (Adds endpointID node to header) -->
-		
-		<cxf:outInterceptors>
-			<bean id="bornSOAPHeaderInterceptor" class="org.oscarehr.integration.born.BornSOAPHeaderInterceptor" />
-			<ref bean="loggingOutInterceptor" />
-		</cxf:outInterceptors>
-		
 		<!-- logging interceptors -->
-		 
 		<cxf:inInterceptors>
 			<ref bean="loggingInInterceptor" />
 		</cxf:inInterceptors>
+		<cxf:outInterceptors>
+			<!-- BORN XDS Soap Header Interceptor (Adds endpointID node to header) -->
+			<bean id="bornSOAPHeaderInterceptor" class="org.oscarehr.integration.born.BornSOAPHeaderInterceptor" />
+			<ref bean="loggingOutInterceptor" />
+		</cxf:outInterceptors>
 		
 		<cxf:outFaultInterceptors>
 			<ref bean="loggingOutInterceptor" />
@@ -134,9 +133,19 @@
 	<jaxrs:server address="/rs" id="jaxrServer">
 
 		<jaxrs:inInterceptors>
-			<bean name="authInInterceptor"
-				class="org.oscarehr.ws.rest.util.AuthenticationInInterceptor" />
+			<bean name="authInInterceptor" class="org.oscarehr.ws.rest.util.AuthenticationInInterceptor" />
+			<ref bean="restLoggingInInterceptor" />
 		</jaxrs:inInterceptors>
+		<jaxrs:outInterceptors>
+			<ref bean="restLoggingOutInterceptor" />
+		</jaxrs:outInterceptors>
+		
+		<jaxrs:inFaultInterceptors>
+			<ref bean="restLoggingInInterceptor" />
+		</jaxrs:inFaultInterceptors>
+		<jaxrs:outFaultInterceptors>
+			<ref bean="restLoggingOutInterceptor" />
+		</jaxrs:outFaultInterceptors>
 		
 		<jaxrs:providers>
 		    <ref bean="jaxb"/>

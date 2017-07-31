@@ -40,6 +40,7 @@ public class LogConst {
     public static final String ACTION_ADD = "add";
     public static final String ACTION_UPDATE = "update";
     public static final String ACTION_DELETE = "delete";
+    public static final String ACTION_ACCESS = "access";
     public static final String DISCONTINUE = "discontinue";
     public static final String ARCHIVE = "archive";
     public static final String REPRINT = "reprint";
@@ -93,6 +94,7 @@ public class LogConst {
     public static final String CON_DOCUMENTDESCRIPTIONTEMPLATEPREFERENCE = "documentDescriptionTemplatePreference";
     public static final String CON_FAX  = "fax";
     public static final String CON_PHARMACY  = "pharmacy";
+    public static final String CON_SYSTEM  = "system";
     
     /* Status constants
      * These should describe the outcome of the action */

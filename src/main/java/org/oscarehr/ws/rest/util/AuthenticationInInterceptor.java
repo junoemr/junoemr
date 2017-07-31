@@ -38,6 +38,7 @@ import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.util.LoggedInInfo;
 
 import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 public class AuthenticationInInterceptor extends AbstractPhaseInterceptor<Message> {
 
@@ -64,8 +65,8 @@ public class AuthenticationInInterceptor extends AbstractPhaseInterceptor<Messag
 		if (isAuthenticated) {
 			return;
 		}
-
-		logAccessError(message);
+		
+		logAccessError(info, message);
 
 		ResponseBuilder builder = Response.status(Status.UNAUTHORIZED);
 		builder.type(MediaType.TEXT_XML);
@@ -73,16 +74,27 @@ public class AuthenticationInInterceptor extends AbstractPhaseInterceptor<Messag
 		message.getExchange().put(Response.class, builder.build());
 	}
 
-	private void logAccessError(Message message) {
+	private void logAccessError(LoggedInInfo info, Message message) {
 		OscarLog oscarLog = new OscarLog();
-		oscarLog.setAction("REST WS: NOT AUTHORIZED");
+		oscarLog.setAction(LogConst.ACTION_ACCESS);
+		oscarLog.setContent(LogConst.CON_SYSTEM);
+		oscarLog.setStatus(LogConst.STATUS_FAILURE);
+		
+		if(info != null) {
+			oscarLog.setProviderNo(info.getLoggedInProviderNo());
+		}
+		
+		String data = "NOT AUTHORIZED";
+		
 		HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
 		if (request != null) {
 			oscarLog.setIp(request.getRemoteAddr());
-			oscarLog.setContent(request.getRequestURL().toString());
-			oscarLog.setData(request.getParameterMap().toString());
+			oscarLog.setContentId(request.getRequestURL().toString());
+			data += "\n" + request.getParameterMap().toString();
 		}
+		oscarLog.setData(data);
 
 		LogAction.addLogSynchronous(oscarLog);
+		
 	}
 }
