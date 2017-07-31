@@ -287,7 +287,7 @@ public class InboxResultsDao {
 						+ "WHEN d1.demographic_no IS NOT NULL THEN d1.first_name "
 						+ "WHEN d2.demographic_no IS NOT NULL THEN d2.first_name "
 						+ "ELSE lab.first_name END LIKE :first_name) ";
-				proLrSql += "AND (CASE "
+				labSql += "AND (CASE "
 						+ "WHEN d1.demographic_no IS NOT NULL THEN d1.first_name "
 						+ "WHEN d2.demographic_no IS NOT NULL THEN d2.first_name "
 						+ "ELSE lab_filter.first_name END LIKE :first_name) ";
@@ -467,14 +467,14 @@ public class InboxResultsDao {
 				+ "LEFT JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' AND cdoc.module_id > 0) "
 				+ "LEFT JOIN demographic d2 ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id = d2.demographic_no ) "
 				
+				+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no) "
 				+ "LEFT JOIN hl7TextInfo lab ON ( proLR.lab_type = 'HL7' AND lab.lab_no = proLR.lab_no ) "
 				+ "LEFT JOIN hl7TextInfo lab_filter ON  "
 				+ "  lab.accessionNum = lab_filter.accessionNum "
 				+ "  AND (lab.obr_date < lab_filter.obr_date OR ("
 				+ "    lab.obr_date = lab_filter.obr_date AND lab.id < lab_filter.id)) "
 				+ labSql
-				+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no) "
-				
+
 				+ "WHERE proLR.lab_type IN ('DOC', 'HL7') "
 				+ "AND proLR_filter.id IS NULL "
 				+ "AND patLR_filter.id IS NULL "
