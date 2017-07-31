@@ -28,8 +28,11 @@ package oscar.oscarEncounter.oscarMeasurements.pageUtil;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.validator.GenericValidator;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -44,20 +48,23 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.oscarehr.common.dao.FlowSheetCustomizationDao;
+import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.model.FlowSheetCustomization;
-import org.oscarehr.util.MiscUtils;
+import org.oscarehr.common.model.Measurement;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import oscar.OscarProperties;
-import oscar.oscarDB.DBHandler;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
-import oscar.oscarMessenger.util.MsgStringQuote;
 
 
 public class EctMeasurementsAction extends Action {
+	
+	private static Logger logger = Logger.getLogger(EctMeasurementsAction.class);
+	
+	private static MeasurementDao measurementDao = (MeasurementDao) SpringUtils.getBean("measurementDao");
 
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
@@ -65,19 +72,22 @@ public class EctMeasurementsAction extends Action {
         EctMeasurementsForm frm = (EctMeasurementsForm) form;
 
         HttpSession session = request.getSession();
-        //request.getSession().setAttribute("EctMeasurementsForm", frm);
 
-        EctSessionBean bean = (EctSessionBean)request.getSession().getAttribute("EctSessionBean");
+        EctSessionBean bean = (EctSessionBean)session.getAttribute("EctSessionBean");
 
 
-        String demographicNo = null;
+        String demographicNoStr = (String)frm.getValue("demographicNo");
         String providerNo = (String) session.getAttribute("user");
-
+        	
         //if form has demo use it since session bean could have been overwritten
-        if( (demographicNo = (String)frm.getValue("demographicNo")) == null ) {
-            if ( bean != null)
-                demographicNo = bean.getDemographicNo();
-        }
+		if (demographicNoStr == null && bean != null) {
+			logger.warn("Demographic Not in form getValue. value is " + demographicNoStr);
+			demographicNoStr = bean.getDemographicNo();
+		}
+		Integer demographicNo = Integer.parseInt(demographicNoStr);
+		if(demographicNo <= 0) {
+			throw new IllegalArgumentException("Demographic Number Invalid: " + demographicNo);
+		}
 
         String template = request.getParameter("template");
         MeasurementFlowSheet mFlowsheet = null;
@@ -86,35 +96,12 @@ public class EctMeasurementsAction extends Action {
             FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
             MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
 
-            List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( template,(String) session.getAttribute("user"),demographicNo);
+            List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( template,(String) session.getAttribute("user"),demographicNoStr);
             mFlowsheet = templateConfig.getFlowSheet(template,custList);
         }
 
-
-
-        //request.getSession().setAttribute("EctSessionBean", bean);
-        //TODO replace with a date format call.  Actually revamp to use hibernate
-        java.util.Calendar calender = java.util.Calendar.getInstance();
-        String day =  Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
-        String month =  Integer.toString(calender.get(java.util.Calendar.MONTH)+1);
-        String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
-        String hour = Integer.toString(calender.get(java.util.Calendar.HOUR_OF_DAY));
-        String min = Integer.toString(calender.get(java.util.Calendar.MINUTE));
-        String second = Integer.toString(calender.get(java.util.Calendar.SECOND));
-        String dateEntered = year+"-"+month+"-"+day+" " + hour + ":" + min + ":" + second ;
-
         String numType = (String) frm.getValue("numType");
         int iType = Integer.parseInt(numType);
-
-
-
-        MsgStringQuote str = new MsgStringQuote();
-
-        Properties p = (Properties) session.getAttribute("providerBean");
-        String by = "";
-        if (p != null ){
-           by = p.getProperty(providerNo,"");
-        }
 
         String textOnEncounter = ""; //"**"+StringUtils.rightPad(by,80,"*")+"\\n";
 
@@ -124,15 +111,14 @@ public class EctMeasurementsAction extends Action {
         request.setAttribute("parentChanged", parentChanged);
 
         boolean valid = true;
-        try
-            {
+        try {
 
                 EctValidation ectValidation = new EctValidation();
                 ActionMessages errors = new ActionMessages();
 
                 String inputValueName, inputTypeName, inputTypeDisplayName, mInstrcName, commentsName;
                 String dateName,validationName, inputValue, inputType, inputTypeDisplay, mInstrc;
-                String comments, dateObserved, validation;
+                String comments, dateObservedStr, validation;
 
                 String regExp = null;
                 double dMax = 0;
@@ -141,7 +127,6 @@ public class EctMeasurementsAction extends Action {
                 int iMin = 0;
 
                 ResultSet rs;
-                String regCharExp;
                 //goes through each type to check if the input value is valid
                 for(int i=0; i<iType; i++){
                     inputValueName = "inputValue-" + i;
@@ -155,7 +140,7 @@ public class EctMeasurementsAction extends Action {
                     inputTypeDisplay = (String) frm.getValue(inputTypeDisplayName);
                     mInstrc = (String) frm.getValue(mInstrcName);
                     comments = (String) frm.getValue(commentsName);
-                    dateObserved = (String) frm.getValue(dateName);
+                    dateObservedStr = (String) frm.getValue(dateName);
 
 
                     regExp = null;
@@ -165,8 +150,6 @@ public class EctMeasurementsAction extends Action {
                     iMin = 0;
 
                     rs = ectValidation.getValidationType(inputType, mInstrc);
-                    regCharExp = ectValidation.getRegCharacterExp();
-
                     if (rs.next()){
                         dMax = rs.getDouble("maxValue");
                         dMin = rs.getDouble("minValue");
@@ -204,93 +187,79 @@ public class EctMeasurementsAction extends Action {
                         saveErrors(request, errors);
                         valid = false;
                     }
-                    if(!ectValidation.isDate(dateObserved)&&inputValue.compareTo("")!=0){
+                    if(!ectValidation.isDate(dateObservedStr)&&inputValue.compareTo("")!=0){
                         errors.add(dateName,
                         new ActionMessage("errors.invalidDate", inputTypeDisplay));
                         saveErrors(request, errors);
                         valid = false;
                     }
-                }
+			}
 
-                //Write to database and to encounter form if all the input values are valid
-                if(valid){
-                    for(int i=0; i<iType; i++){
+			// Write to database and to encounter form if all the input values are valid
+			if (valid) {
+				for (int i = 0; i < iType; i++) {
 
-                        inputValueName = "inputValue-" + i;
-                        inputTypeName = "inputType-" + i;
-                        mInstrcName = "inputMInstrc-" + i;
-                        commentsName = "comments-" + i;
-                        validationName = "validation-" + i;
-                        dateName = "date-" + i;
+					inputValueName = "inputValue-" + i;
+					inputTypeName = "inputType-" + i;
+					mInstrcName = "inputMInstrc-" + i;
+					commentsName = "comments-" + i;
+					validationName = "validation-" + i;
+					dateName = "date-" + i;
 
-                        inputValue = (String) frm.getValue(inputValueName);
-                        inputType = (String) frm.getValue(inputTypeName);
-                        mInstrc = (String) frm.getValue(mInstrcName);
-                        comments = (String) frm.getValue(commentsName);
-                        comments = org.apache.commons.lang.StringEscapeUtils.escapeSql(comments);
-                        validation = (String) frm.getValue(validationName);
-                        dateObserved = (String) frm.getValue(dateName);
+					inputValue = (String) frm.getValue(inputValueName);
+					inputType = (String) frm.getValue(inputTypeName);
+					mInstrc = (String) frm.getValue(mInstrcName);
+					comments = (String) frm.getValue(commentsName);
+					comments = org.apache.commons.lang.StringEscapeUtils.escapeSql(comments);
+					validation = (String) frm.getValue(validationName);
+					dateObservedStr = (String) frm.getValue(dateName);
 
-                        org.apache.commons.validator.GenericValidator gValidator = new org.apache.commons.validator.GenericValidator();
-                        if(!GenericValidator.isBlankOrNull(inputValue)){
-                            //Find if the same data has already been entered into the system
-                            String sql = "SELECT * FROM measurements WHERE demographicNo='"+demographicNo+ "' AND dataField='"+inputValue
-                                        +"' AND measuringInstruction='" + mInstrc + "' AND comments='" + comments
-                                        + "' AND dateObserved='" + dateObserved + "' and type = '"+inputType+"'";
+					DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+					Date dateObserved = format.parse(dateObservedStr);
 
-                            rs = DBHandler.GetSQL(sql);
-                            if(!rs.next()){
-                                //Write to the Dababase if all input values are valid
-                                sql = "INSERT INTO measurements"
-                                        +"(type, demographicNo, providerNo, dataField, measuringInstruction, comments, dateObserved, dateEntered)"
-                                        +" VALUES ('"+str.q(inputType)+"','"+str.q(demographicNo)+"','"+str.q(providerNo)+"','"+str.q(inputValue)+"','"
-                                        + str.q(mInstrc)+"','"+str.q(comments)+"','"+str.q(dateObserved)+"','"+str.q(dateEntered)+"')";
+					if (!GenericValidator.isBlankOrNull(inputValue)) {
 
-                                DBHandler.RunSQL(sql);
-                                //prepare input values for writing to the encounter form
-                                if (mFlowsheet == null){
-                                    textOnEncounter =  textOnEncounter + inputType + "    " + inputValue + " " + mInstrc + " " + comments + "\\n";
-                                }else{
-                                    textOnEncounter += mFlowsheet.getFlowSheetItem(inputType).getDisplayName()+"    "+inputValue + " " +  comments + "\\n";
-                                }
-                            }
-                            rs.close();
-                        }
+						Measurement measurement = new Measurement();
+						measurement.setType(inputType);
+						measurement.setDemographicId(demographicNo);
+						measurement.setProviderNo(providerNo);
+						measurement.setDataField(inputValue);
+						measurement.setMeasuringInstruction(mInstrc);
+						measurement.setComments(comments);
+						measurement.setDateObserved(dateObserved);
+						
+						List<Measurement> matches = measurementDao.findMatching(measurement);
+						if(matches.isEmpty()) {
+							measurementDao.persist(measurement);
+						}
 
-                    }
-                    // textOnEncounter = textOnEncounter + "**********************************************************************************\\n";
+						if (mFlowsheet == null) {
+							textOnEncounter = textOnEncounter + inputType + "    " + inputValue + " " + mInstrc + " " + comments + "\\n";
+						}
+						else {
+							textOnEncounter += mFlowsheet.getFlowSheetItem(inputType).getDisplayName() + "    " + inputValue + " " + comments + "\\n";
+						}
+					}
+				}
+			}
+			else {
+				String groupName = (String) frm.getValue("groupName");
+				String css = (String) frm.getValue("css");
+				request.setAttribute("groupName", groupName);
+				request.setAttribute("css", css);
+				return (new ActionForward(mapping.getInput()));
+			}
+		}
+		catch (SQLException e) {
+			logger.error("Sql Error", e);
+		}
+		catch (ParseException e) {
+			logger.error("Parse Error", e);
+		}
 
-                }
-                else{
-                    String groupName = (String) frm.getValue("groupName");
-                    String css = (String) frm.getValue("css");
-                    request.setAttribute("groupName", groupName);
-                    request.setAttribute("css", css);
-                    return (new ActionForward(mapping.getInput()));
-                }
-                /* select the correct db specific command */
-                String db_type = OscarProperties.getInstance().getProperty("db_type").trim();
-                String dbSpecificCommand;
-                if (db_type.equalsIgnoreCase("mysql")) {
-                    dbSpecificCommand = "SELECT LAST_INSERT_ID()";
-                }
-                else if (db_type.equalsIgnoreCase("postgresql")){
-                    dbSpecificCommand = "SELECT CURRVAL('consultationrequests_numeric')";
-                }
-                else
-                    throw new SQLException("ERROR: Database " + db_type + " unrecognized.");
-            }
-            catch(SQLException e)
-            {
-                MiscUtils.getLogger().error("Error", e);
-            }
+		// put the inputvalue to the encounter form
+		session.setAttribute("textOnEncounter", textOnEncounter);
 
-
-        //put the inputvalue to the encounter form
-        session.setAttribute( "textOnEncounter", textOnEncounter );
-
-        return mapping.findForward("success");
-    }
-
-
+		return mapping.findForward("success");
+	}
 }

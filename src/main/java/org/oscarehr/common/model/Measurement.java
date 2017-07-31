@@ -48,13 +48,13 @@ public class Measurement extends AbstractModel<Integer> implements Serializable 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@Column(name = "type")
+	@Column(name = "type", nullable=false)
 	private String type;
 
-	@Column(name = "demographicNo")
+	@Column(name = "demographicNo", nullable=false)
 	private Integer demographicId;
 
-	@Column(name = "providerNo")
+	@Column(name = "providerNo", nullable=false, length=6)
 	private String providerNo;
 	
 	@Column(name = "dataField", nullable=false, length=255)
@@ -67,11 +67,11 @@ public class Measurement extends AbstractModel<Integer> implements Serializable 
 	private String comments;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "dateObserved")
+	@Column(name = "dateObserved", nullable=false)
 	private Date dateObserved;
 
-	@Column(name = "appointmentNo")
-	private Integer appointmentNo;
+	@Column(name = "appointmentNo", nullable=false)
+	private Integer appointmentNo = 0;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "dateEntered")
