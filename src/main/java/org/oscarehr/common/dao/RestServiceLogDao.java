@@ -33,18 +33,18 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class RestServiceLogDao  extends AbstractDao<RestServiceLog> {
+public class RestServiceLogDao extends AbstractDao<RestServiceLog> {
 
 	public RestServiceLogDao() {
 		super(RestServiceLog.class);
 	}
 	public List<RestServiceLog> findByProvider(String providerNo) {
-    	String sqlCommand="SELECT x FROM "+modelClass.getSimpleName()+" x WHERE x.providerNo = :providerNo";
-    	
-    	Query query = entityManager.createQuery(sqlCommand);
+		String sqlCommand = "SELECT x FROM " + modelClass.getSimpleName() + " x WHERE x.providerNo = :providerNo";
+
+		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter("providerNo", providerNo);
 
-		List<RestServiceLog> results=query.getResultList();
-		return(results);
+		List<RestServiceLog> results = query.getResultList();
+		return (results);
 	}
 }

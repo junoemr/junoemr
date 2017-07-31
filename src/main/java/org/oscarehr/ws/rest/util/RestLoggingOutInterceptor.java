@@ -86,7 +86,16 @@ public class RestLoggingOutInterceptor extends AbstractLoggingInterceptor {
 	 */
 	@Override
 	protected java.util.logging.Logger getLogger() {
-		return null;
+		return new RestLoggingOutLogger("RestLoggingOutLogger", null);
+	}
+}
+/**
+ * Dummy Logger, Needed for the getLogger method we aren't using
+ */
+class RestLoggingOutLogger extends java.util.logging.Logger {
+
+	protected RestLoggingOutLogger(String name, String resourceBundleName) {
+		super(name, resourceBundleName);
 	}
 }
 /**
@@ -137,6 +146,9 @@ class RestLoggingOutCallback implements CachedOutputStreamCallback {
 			restLog.setRawOutput(messageBody);
 			
 			LogAction.saveRestLogEntry(restLog);
+		}
+		else {
+			logger.error("Missing RestServiceLog Object in outgoing interceptor");
 		}
 	}
 }
