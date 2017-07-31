@@ -103,10 +103,9 @@ public class EctMeasurementsAction extends Action {
         String numType = (String) frm.getValue("numType");
         int iType = Integer.parseInt(numType);
 
-        String textOnEncounter = ""; //"**"+StringUtils.rightPad(by,80,"*")+"\\n";
+        String textOnEncounter = "";
 
-        //if parent window content has changed then we need to propagate change so
-        //we do not write to parent
+        //if parent window content has changed then we need to propagate change so we do not write to parent
         String parentChanged = (String)frm.getValue("parentChanged");
         request.setAttribute("parentChanged", parentChanged);
 
@@ -247,6 +246,7 @@ public class EctMeasurementsAction extends Action {
 				String css = (String) frm.getValue("css");
 				request.setAttribute("groupName", groupName);
 				request.setAttribute("css", css);
+				request.setAttribute("demographicNo", demographicNoStr);
 				return (new ActionForward(mapping.getInput()));
 			}
 		}
