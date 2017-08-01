@@ -1010,6 +1010,3 @@ auto_populate_billingreferral_bc=true
 #document_email_body=Document Sent From Oscar
 #document_email_name=Oscar                                    
 #document_email_from_address=test@test.com
-
-# always show the E|B|M etc. links in appointment view
-APPT_ALWAYS_SHOW_LINKS=true

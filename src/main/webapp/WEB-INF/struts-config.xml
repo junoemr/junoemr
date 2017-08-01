@@ -1172,6 +1172,7 @@
 		</action>
 		<action input="/oscarConsultationRequest/attachConsultation.jsp" name="attachConsultation" path="/oscarConsultationRequest/attachDoc" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationAttachDocsAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/attachSuccessfull.jsp" />
+			<forward name="failure" path="/oscarEncounter/oscarConsultationRequest/attachSuccessfull.jsp" />
 		</action>
 		<action input="/oscarConsultationRequest/ViewConsultationRequests.jsp" name="EctViewConsultationRequestsForm" path="/oscarEncounter/ViewConsultation" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctViewConsultationRequestsAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ViewConsultationRequests.jsp" />

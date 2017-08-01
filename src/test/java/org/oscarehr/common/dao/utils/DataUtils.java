@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -51,6 +52,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.all.upload.HandlerClassFactory;
+import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 import oscar.oscarLab.ca.all.upload.handlers.MessageHandler;
 import oscar.util.ConversionUtils;
 
@@ -182,7 +184,23 @@ public class DataUtils {
 				
 				String savePath = getCanonicalPath(labId);
 				save(savePath, lab.getBytes());
-				String status = msgHandler.parse(DaoTestFixtures.getLoggedInInfo(),"", savePath, 99, "127.0.0.1");
+
+				String status;
+				try
+				{
+					LabHandlerService labMsgHandler = SpringUtils.getBean(LabHandlerService.class);
+					status = labMsgHandler.parse(
+							type,
+							DaoTestFixtures.getLoggedInInfo(),
+							"",
+							savePath,
+							"99",
+							"127.0.0.1");
+
+				} catch(Exception ignored) {
+					status = "failed";
+				}
+
 				if (logger.isInfoEnabled()) {
 					if ("success".equals(status)) {
 						logger.info("Added lab: " + labId);

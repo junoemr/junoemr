@@ -28,12 +28,9 @@ package oscar.oscarLab.ca.all.upload.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
-import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.util.SpringUtils;
 
@@ -46,61 +43,48 @@ import ca.uhn.hl7v2.model.v23.segment.ORC;
 
 public class CLSHandler implements MessageHandler {
 
-	String lineDelimiter = "\r";
-	Logger logger = Logger.getLogger(CLSHandler.class);	
-	Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
-	
-	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr) {
+	public String parse(LoggedInInfo loggedInInfo, String serviceName,
+						String fileName, int fileId, String ipAddr) throws Exception {
 
 		int i = 0;
         oscar.oscarLab.ca.all.parsers.CLSHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler();
         
         Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
-        Hl7TextMessage hl7TextMessage = new Hl7TextMessage();
-		
-		try {
-			ArrayList<String> messages = Utilities.separateMessages(fileName);
-			for (i = 0; i < messages.size(); i++) {
-				String msg = messages.get(i);
-				/*
-				if(isDuplicate(msg)) {
-					return ("success");
-				}
-				*/
-                newVersionCLSParser.init(msg);
-                String accessionNumber = newVersionCLSParser.getAccessionNum();
-                String fillerOrderNumber = newVersionCLSParser.getFillerOrderNumber(); 
-                Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNumberOrFillerNumber(
-                		accessionNumber, fillerOrderNumber);
-                
-                // Glucose labs come back with different accession numbers, but the same filler number.
-                // We are going to replace any successive accession numbers with the originals as
-                // suggested in the CLS conformance documentation
-                if(hl7TextInfo != null && hl7TextInfo.getFillerOrderNum().equals(fillerOrderNumber) && 
-                		!hl7TextInfo.getAccessionNumber().equals(accessionNumber)) {
-
-                	msg = this.ReplaceAccessionNumber(msg, accessionNumber, hl7TextInfo.getAccessionNumber());
-                }
-
-                if(hl7TextInfo != null) {
-                	String lastVersionLab = oscar.oscarLab.ca.all.parsers.Factory.getHL7Body(Integer.toString(hl7TextInfo.getLabNumber()));
-                	msg = mergeLabs(lastVersionLab, msg);
-                }
-				MessageUploader.routeReport(loggedInInfo, serviceName, "CLS", msg, fileId);
-
+		ArrayList<String> messages = Utilities.separateMessages(fileName);
+		for (i = 0; i < messages.size(); i++) {
+			String msg = messages.get(i);
+			/*
+			if(isDuplicate(msg)) {
+				return ("success");
 			}
-		} catch (Exception e) {
-			MessageUploader.clean(fileId);
-			logger.error("Could not upload message: ", e);
-			MiscUtils.getLogger().error("Error", e);
-			return null;
+			*/
+			newVersionCLSParser.init(msg);
+			String accessionNumber = newVersionCLSParser.getAccessionNum();
+			String fillerOrderNumber = newVersionCLSParser.getFillerOrderNumber();
+			Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNumberOrFillerNumber(
+					accessionNumber, fillerOrderNumber);
+
+			// Glucose labs come back with different accession numbers, but the same filler number.
+			// We are going to replace any successive accession numbers with the originals as
+			// suggested in the CLS conformance documentation
+			if(hl7TextInfo != null && hl7TextInfo.getFillerOrderNum().equals(fillerOrderNumber) &&
+					!hl7TextInfo.getAccessionNumber().equals(accessionNumber)) {
+
+				msg = this.ReplaceAccessionNumber(msg, accessionNumber, hl7TextInfo.getAccessionNumber());
+			}
+
+			if(hl7TextInfo != null) {
+				String lastVersionLab = oscar.oscarLab.ca.all.parsers.Factory.getHL7Body(Integer.toString(hl7TextInfo.getLabNumber()));
+				msg = mergeLabs(lastVersionLab, msg);
+			}
+			MessageUploader.routeReport(loggedInInfo, serviceName, "CLS", msg, fileId);
 		}
 		return ("success");
-
 	}
 	
 	private String mergeLabs(String oldVersion, String newVersion) throws HL7Exception
 	{
+		String lineDelimiter = "\r";
 		String outLabString = newVersion;
 		StringBuilder test = new StringBuilder(newVersion);
 
@@ -127,30 +111,30 @@ public class CLSHandler implements MessageHandler {
                 tempObr = tempObr.substring(tempObr.indexOf('|') + 1);
 
         		// Set the OBR index
-                outLabString += this.lineDelimiter + "OBR|" + Integer.toString(currentObrCount) + "|" + tempObr;
+                outLabString += lineDelimiter + "OBR|" + Integer.toString(currentObrCount) + "|" + tempObr;
 
                 // Get OBR NTE records
                 int obrNteCount = oldVersionCLSParser.getOBRCommentCount(obrIndex);
                 for(int obrNteIndex = 0; obrNteIndex < obrNteCount; obrNteIndex++) {
-					outLabString += this.lineDelimiter + oldVersionCLSParser.getOBRNTE(obrIndex, obrNteIndex).encode();
+					outLabString += lineDelimiter + oldVersionCLSParser.getOBRNTE(obrIndex, obrNteIndex).encode();
                 }
 
         		// Get Previous version OBX records
                 int obxCount = oldVersionCLSParser.getOBXCount(obrIndex);
                 for(int obxIndex = 0; obxIndex < obxCount; obxIndex++) {
-                    outLabString += this.lineDelimiter + oldVersionCLSParser.getOBX(obrIndex, obxIndex).encode();
+                    outLabString += lineDelimiter + oldVersionCLSParser.getOBX(obrIndex, obxIndex).encode();
 
                     // Get Previous version OBX NTE records
                     int nteCount = oldVersionCLSParser.getOBXCommentCount(obrIndex, obxIndex);
                     for(int nteIndex = 0; nteIndex < nteCount; nteIndex++) {
-                        outLabString += this.lineDelimiter + oldVersionCLSParser.getNTE(obrIndex, obxIndex, nteIndex).encode();
+                        outLabString += lineDelimiter + oldVersionCLSParser.getNTE(obrIndex, obxIndex, nteIndex).encode();
                     }
                 }
 
         		// Get Previous version ORC record if one exists
                 ORC orc = oldVersionCLSParser.getORC(obrIndex);
                 if(orc != null && orc.encode().length() > 5) {
-                    test.append(outLabString += this.lineDelimiter + orc.encode());
+                    test.append(outLabString += lineDelimiter + orc.encode());
                 }
         	}
         	obrIndex++;
@@ -194,6 +178,7 @@ public class CLSHandler implements MessageHandler {
     }
 
 	private boolean isDuplicate(LoggedInInfo loggedInInfo, String msg) {
+		Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
 		//OLIS requirements - need to see if this is a duplicate
 		oscar.oscarLab.ca.all.parsers.MessageHandler h = Factory.getHandler("CLS", msg);
 		//if final

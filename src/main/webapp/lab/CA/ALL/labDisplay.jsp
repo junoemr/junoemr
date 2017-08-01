@@ -1143,11 +1143,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                <td width="6%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formAnnotate"/></td>
                            </tr>
 	                        <tr class="TDISRes">
-		                      	<td valign="top" align="left" colspan="8" ><pre  style="margin:0px 0px 0px 100px;"><b>Radiologist: </b><b><%=handler.getRadiologistInfo()%></b></pre></td>
+		                      	<td valign="top" align="left" colspan="8" ><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><b>Radiologist: </b><b><%=handler.getRadiologistInfo()%></b></pre></td>
 		                      	</td>
 	                     	 </tr>
 	                        <tr class="TDISRes">
-		                       	<td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px;"><b><%=handler.getOBXComment(1, 1, 1)%></b></pre></td>
+		                       	<td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><b><%=handler.getOBXComment(1, 1, 1)%></b></pre></td>
 		                       	</td>
 		                       	<td align="center" valign="top">
                                     <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(1) + "-" + String.valueOf(1) %>','anwin','width=400,height=500');">
@@ -1326,7 +1326,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                                       		</tr>
 	                                       <% } else if (handler.getOBXIdentifier(j,k).equals(headers.get(i)) && obxName.equals("")) { %>
 	                                       			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
-	                                                    <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px;"><%=handler.getOBXResult( j, k)%></pre></td>
+	                                                    <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXResult( j, k)%></pre></td>
 
 	                                                </tr>
 	                                       	<% }
@@ -1359,7 +1359,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                            <%}%>
                                            <%for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>
                                                <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes" >
-                                                   <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px;"><%=handler.getOBXComment(j, k, l)%></pre></td>
+                                                   <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXComment(j, k, l)%></pre></td>
                                                </tr>
                                            <%}
                                    
@@ -1389,18 +1389,18 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                    	 	<%} else { %>
                                    		   <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
-	      	                                     <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px;"><%=handler.getOBXResult( j, k)%></pre></td>
+	      	                                     <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXResult( j, k)%></pre></td>
 
 	      	                                   </tr>
                                    	 	<%}
 	                                    	if (!handler.getNteForOBX(j,k).equals("") && handler.getNteForOBX(j,k)!=null) { %>
 		                                       <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
-		                                       		<td valign="top" align="left"colspan="8"><pre  style="margin:0px 0px 0px 100px;"><%=handler.getNteForOBX(j,k)%></pre></td>
+		                                       		<td valign="top" align="left"colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getNteForOBX(j,k)%></pre></td>
 		                                       </tr>
 		                                    <% }
 			                                for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>
 			                                     <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
-			                                        <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px;"><%=handler.getOBXComment(j, k, l)%></pre></td>
+			                                        <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXComment(j, k, l)%></pre></td>
 			                                     </tr>
 			                                <%}
 
@@ -1457,7 +1457,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                        <%for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>
                                             <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
-                                               <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px;"><%=handler.getOBXComment(j, k, l)%></pre></td>
+                                               <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXComment(j, k, l)%></pre></td>
                                             </tr>
                                        <%}
 
@@ -1527,7 +1527,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                         for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>
                                         <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
-                                           <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px;"><%=handler.getOBXComment(j, k, l)%></pre></td>
+                                           <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXComment(j, k, l)%></pre></td>
                                         </tr>
                                    <%}
 
@@ -1537,7 +1537,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                        			if (!handler.getOBXComment(j, k, l).equals("")) {
                                        		%>
                                             <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="TDISRes">
-                                               <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px;"><%=handler.getOBXComment(j, k, l)%></pre></td>
+                                               <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXComment(j, k, l)%></pre></td>
                                             	<td align="center" valign="top">
 	                                                <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(1) + "-" + String.valueOf(1) %>','anwin','width=400,height=500');">
 	                                                	<%if(!isPrevAnnotation){ %><img src="../../../images/notes.gif" alt="rxAnnotation" height="16" width="13" border="0"/><%}else{ %><img src="../../../images/filledNotes.gif" alt="rxAnnotation" height="16" width="13" border="0"/> <%} %>
@@ -1572,7 +1572,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                        <%obrFlag = true;
                                    }%>
                                <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
-                                   <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px;"><%=handler.getOBRComment(j, k)%></pre></td>
+                                   <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBRComment(j, k)%></pre></td>
                                </tr>
                                <% if  (!handler.getMsgType().equals("HHSEMR") || !handler.getMsgType().equals("TRUENORTH")) {
                                		if(handler.getOBXName(j,k).equals("")){

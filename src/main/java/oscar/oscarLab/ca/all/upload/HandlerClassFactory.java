@@ -52,7 +52,7 @@ public final class HandlerClassFactory {
     private HandlerClassFactory(){
     	// don't instantiate
     }
-    
+
     /*
      *  Create and return the message handler corresponding to the message type
      */

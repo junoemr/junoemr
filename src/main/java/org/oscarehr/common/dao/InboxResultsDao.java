@@ -225,6 +225,112 @@ public class InboxResultsDao {
             //
 			// If do_counts is set, the whole query is wrapped in a select and summed up for
 			// each demographic.  A null demographic id means the counts are for unassigned labs/documents.
+			//
+			// The providerLabRouting, patientLabRouting and hl7TextInfo tables are joined twice each to perform a
+			// join only the row with the most recent date.  The joins with the *_filter aliases
+			// are the second join.  To get the row with the most recent date, only rows with a smaller date are joined
+			// from the second table and then only the row that has nothing joined to it is kept.
+			//
+			// Most of the where clause is built before the rest of the query because some of the sections need to be
+			// added to the *_filter joins.
+
+
+			// Filters to add to the where clause
+			String filterSql = "";
+			String proLrSql = "";
+			String labSql = "";
+
+			if(labType != null && !"".equals(labType)) {
+				filterSql += "AND proLR.lab_type = :lab_type";
+				proLrSql += "AND proLR_filter.lab_type = :lab_type ";
+				qp_lab_type = true;
+			}
+
+			if(isAbnormal != null) {
+				if(isAbnormal) {
+					filterSql += "AND lab.result_status = 'A' ";
+					labSql += "AND lab_filter.result_status = 'A' ";
+				}
+				else {
+					filterSql += "AND (lab.result_status IS NULL OR lab.result_status != 'A') ";
+					labSql += "AND (lab_filter.result_status IS NULL OR lab_filter.result_status != 'A') ";
+				}
+				filterSql += "AND lab.id IS NOT NULL ";
+				labSql += "AND lab_filter.id IS NOT NULL ";
+			}
+
+			if ("-1".equals(providerNo) || "".equals(providerNo)) {
+				// any provider
+			} else if ("0".equals(providerNo)) {
+				// unclaimed
+				filterSql += "AND (proLR.provider_no = '0') ";
+				proLrSql += "AND (proLR_filter.provider_no = '0') ";
+			} else {
+				filterSql += "AND (proLR.provider_no = :provider_no) ";
+				proLrSql += "AND (proLR_filter.provider_no = :provider_no) ";
+				qp_provider_no = true;
+			}
+
+			if(providerNoList != null && !providerNoList.equals("")){
+				filterSql += "AND (proLR.provider_no IN ("+providerNoList+") ) ";
+				proLrSql += "AND (proLR_filter.provider_no IN ("+providerNoList+") ) ";
+			}
+
+			if ("N".equals(status) || "A".equals(status) || "F".equals(status)) {
+				filterSql += "AND (proLR.status = :status) ";
+				proLrSql += "AND (proLR_filter.status = :status) ";
+				qp_status = true;
+			}
+
+			if (!"".equals(patientFirstName)) {
+				filterSql += "AND (CASE "
+						+ "WHEN d1.demographic_no IS NOT NULL THEN d1.first_name "
+						+ "WHEN d2.demographic_no IS NOT NULL THEN d2.first_name "
+						+ "ELSE lab.first_name END LIKE :first_name) ";
+				labSql += "AND (CASE "
+						+ "WHEN d1.demographic_no IS NOT NULL THEN d1.first_name "
+						+ "WHEN d2.demographic_no IS NOT NULL THEN d2.first_name "
+						+ "ELSE lab_filter.first_name END LIKE :first_name) ";
+				qp_first_name = true;
+			}
+
+			if (!"".equals(patientLastName)) {
+				filterSql += "AND (CASE     WHEN d1.demographic_no IS NOT NULL THEN d1.last_name     WHEN d2.demographic_no IS NOT NULL THEN d2.last_name      ELSE lab.last_name END LIKE :last_name) ";
+				labSql += "AND (CASE     WHEN d1.demographic_no IS NOT NULL THEN d1.last_name     WHEN d2.demographic_no IS NOT NULL THEN d2.last_name      ELSE lab_filter.last_name END LIKE :last_name) ";
+				qp_last_name = true;
+			}
+
+			if (!"".equals(patientHealthNumber)) {
+				filterSql += "AND (CASE     WHEN d1.demographic_no IS NOT NULL THEN d1.hin     WHEN d2.demographic_no IS NOT NULL THEN d2.hin     ELSE lab.health_no END LIKE :hin) ";
+				labSql += "AND (CASE     WHEN d1.demographic_no IS NOT NULL THEN d1.hin     WHEN d2.demographic_no IS NOT NULL THEN d2.hin     ELSE lab_filter.health_no END LIKE :hin) ";
+				qp_hin = true;
+			}
+
+			if (startDate != null) {
+				filterSql += "AND COALESCE(doc.observationdate, lab.obr_date) >= :start_date ";
+				labSql += "AND COALESCE(doc.observationdate, lab_filter.obr_date) >= :start_date ";
+				qp_start_date = true;
+			}
+
+			if (endDate != null) {
+				filterSql += "AND COALESCE(doc.observationdate, lab.obr_date) <= :end_date ";
+				labSql += "AND COALESCE(doc.observationdate, lab_filter.obr_date) <= :end_date ";
+				qp_end_date = true;
+			}
+
+			if ("0".equals(demographicNo)) {
+				filterSql += "AND NOT CAST(CASE     WHEN d1.demographic_no IS NULL AND d2.demographic_no IS NULL THEN false     ELSE true END AS int) ";
+			} else if (demographicNo != null && !"".equals(demographicNo)) {
+				filterSql += "AND CAST(CASE     WHEN d1.demographic_no IS NULL AND d2.demographic_no IS NULL THEN false     ELSE true END AS int) ";
+				filterSql += "AND CASE ";
+				filterSql += "  WHEN d1.demographic_no IS NOT NULL THEN d1.demographic_no ";
+				filterSql += "  WHEN d2.demographic_no IS NOT NULL THEN d2.demographic_no ";
+				filterSql += "  ELSE 0 END = :demographic_no ";
+				qp_demographic_no = true;
+			}
+
+
+
 			sql = "";
 			
 			if(do_counts) {
@@ -344,109 +450,39 @@ public class InboxResultsDao {
 				sql = sql + "FROM providerLabRouting proLR ";
 			}
 
-			sql += "LEFT JOIN providerLabRouting proLR_filter ON ("
+			sql += "LEFT JOIN providerLabRouting proLR_filter ON "
 				+ "  proLR.lab_no = proLR_filter.lab_no "
 				+ "  AND ( "
 				+ "    proLR.timestamp < proLR_filter.timestamp OR ( "
-				+ "      proLR.timestamp = proLR_filter.timestamp AND proLR.id < proLR_filter.id))) "
+				+ "      proLR.timestamp = proLR_filter.timestamp AND proLR.id < proLR_filter.id)) "
+				+ "  AND proLR_filter.status != 'X' "
+				+ proLrSql
 				+ "LEFT JOIN patientLabRouting patLR ON ( proLR.lab_type = patLR.lab_type AND proLR.lab_no = patLR.lab_no ) "
+				+ "LEFT JOIN patientLabRouting patLR_filter ON ( "
+				+ "  proLR.lab_type = patLR_filter.lab_type "
+				+ "  AND patLR.lab_no = patLR_filter.lab_no "
+				+ "  AND (patLR.dateModified < patLR_filter.dateModified OR (patLR.dateModified = patLR_filter.dateModified AND patLR.id < patLR_filter.id))) "
 				+ "LEFT JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no AND doc.status <> 'D' ) "
 				+ "LEFT JOIN provider creator ON ( doc.doccreator = creator.provider_no ) "
 				+ "LEFT JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' AND cdoc.module_id > 0) "
 				+ "LEFT JOIN demographic d2 ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id = d2.demographic_no ) "
 				
+				+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no) "
 				+ "LEFT JOIN hl7TextInfo lab ON ( proLR.lab_type = 'HL7' AND lab.lab_no = proLR.lab_no ) "
-				+ "LEFT JOIN hl7TextInfo lab_filter ON ( "
+				+ "LEFT JOIN hl7TextInfo lab_filter ON  "
 				+ "  lab.accessionNum = lab_filter.accessionNum "
 				+ "  AND (lab.obr_date < lab_filter.obr_date OR ("
-				+ "    lab.obr_date = lab_filter.obr_date AND lab.id < lab_filter.id))) "
-				+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no) "
-				
-				+ "WHERE proLR.lab_type IN ('DOC', 'HL7')"
+				+ "    lab.obr_date = lab_filter.obr_date AND lab.id < lab_filter.id)) "
+				+ labSql
+
+				+ "WHERE proLR.lab_type IN ('DOC', 'HL7') "
 				+ "AND proLR_filter.id IS NULL "
+				+ "AND patLR_filter.id IS NULL "
 				+ "AND lab_filter.id IS NULL "
 				+ "AND (doc.document_no IS NOT NULL OR lab.id IS NOT NULL) "
-				+ "AND proLR.status != 'X'";
+				+ "AND proLR.status != 'X' "
+				+ filterSql;
 				
-				//+ "AND doc.status <> 'D' ";
-			
-			if(labType != null && !"".equals(labType)) {
-				sql = sql + "AND proLR.lab_type = :lab_type ";
-				qp_lab_type = true;
-			}
-
-			if(isAbnormal != null) {
-				if(isAbnormal) {
-					sql = sql + "AND result_status = 'A' ";
-				}
-				else {
-					sql = sql + "AND (result_status IS NULL OR result_status != 'A') ";
-				}
-				sql = sql + "AND lab.id IS NOT NULL ";
-			}
-
-			/*
-			sql = sql + "GROUP BY "
-				+ "  IFNULL(lab.accessionNum, CONCAT('NOT_AN_ACCESSION_NUMBER', doc.document_no)), "
-				+ "  proLR.lab_type, "
-				+ "  doc.document_no "
-				+ "HAVING TRUE ";
-				*/
-
-			if ("-1".equals(providerNo) || "".equals(providerNo)) {
-				// any provider
-			} else if ("0".equals(providerNo)) {
-				// unclaimed
-				sql = sql + "AND (proLR.provider_no = '0') ";
-			} else {
-				sql = sql + "AND (proLR.provider_no = :provider_no) ";
-				qp_provider_no = true;
-			}
-
-			if(providerNoList != null && !providerNoList.equals("")){
-				sql = sql + "AND (proLR.provider_no IN ("+providerNoList+") ) ";
-			}
-
-			if ("N".equals(status) || "A".equals(status) || "F".equals(status)) {
-				sql = sql + "AND (proLR.status = :status) ";
-				qp_status = true;
-			}
-
-			if (!"".equals(patientFirstName)) {
-				sql = sql + "AND (CASE     WHEN d1.demographic_no IS NOT NULL THEN d1.first_name     WHEN d2.demographic_no IS NOT NULL THEN d2.first_name      ELSE lab.first_name END LIKE :first_name) ";
-				qp_first_name = true;
-			}
-
-			if (!"".equals(patientLastName)) {
-				sql = sql + "AND (CASE     WHEN d1.demographic_no IS NOT NULL THEN d1.last_name     WHEN d2.demographic_no IS NOT NULL THEN d2.last_name      ELSE lab.last_name END LIKE :last_name) ";
-				qp_last_name = true;
-			}
-
-			if (!"".equals(patientHealthNumber)) {
-				sql = sql + "AND (CASE     WHEN d1.demographic_no IS NOT NULL THEN d1.hin     WHEN d2.demographic_no IS NOT NULL THEN d2.hin     ELSE lab.health_no END LIKE :hin) ";
-				qp_hin = true;
-			}
-
-			if (startDate != null) {
-				sql = sql + "AND COALESCE(doc.observationdate, lab.obr_date) >= :start_date ";
-				qp_start_date = true;
-			}
-			
-			if (endDate != null) {
-				sql = sql + "AND COALESCE(doc.observationdate, lab.obr_date) <= :end_date ";
-				qp_end_date = true;
-			}
-
-			if ("0".equals(demographicNo)) {
-				sql += "AND NOT CAST(CASE     WHEN d1.demographic_no IS NULL AND d2.demographic_no IS NULL THEN false     ELSE true END AS int) ";
-			} else if (demographicNo != null && !"".equals(demographicNo)) {
-				sql += "AND CAST(CASE     WHEN d1.demographic_no IS NULL AND d2.demographic_no IS NULL THEN false     ELSE true END AS int) ";
-				sql += "AND CASE ";
-				sql += "  WHEN d1.demographic_no IS NOT NULL THEN d1.demographic_no ";
-				sql += "  WHEN d2.demographic_no IS NOT NULL THEN d2.demographic_no ";
-				sql += "  ELSE 0 END = :demographic_no ";
-				qp_demographic_no = true;
-			}
 
 			sql += " UNION ALL "
 					

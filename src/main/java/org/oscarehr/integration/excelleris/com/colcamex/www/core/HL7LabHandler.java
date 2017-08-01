@@ -120,8 +120,6 @@ public class HL7LabHandler {
 	 * @param hl7labs
 	 * @param fileName
 	 * @param providerNumber
-	 * @throws MalformedURLException
-	 * @throws ServiceException
 	 */
 	public HL7LabHandler(
 			Document hl7labs, 
@@ -249,7 +247,6 @@ public class HL7LabHandler {
 	 * Overloaded super method to simplify trigger. 
 	 * This overload returns an HTTP server status of 200 for OK 
 	 * and 100 for error. The super method returns boolean.
-	 * @throws RemoteException
 	 */
 	public void parseHL7() {
 
@@ -270,8 +267,12 @@ public class HL7LabHandler {
 			MessageHandler msgHandler = HandlerClassFactory.getHandler(labType);
 			LoggedInInfo loggedininfo = new LoggedInInfo();
 
-			if(msgHandler.parse( loggedininfo, serviceName, savePath + fileName, fileId, "127.0.0.1") != null) {
-				setResponseCode(OK);
+			try {
+				if(msgHandler.parse( loggedininfo, serviceName, savePath + fileName, fileId, "127.0.0.1") != null) {
+					setResponseCode(OK);
+				}
+			} catch (Exception e) {
+				logger.error("Error parsing lab: " + e);
 			}
 
 		}
@@ -282,7 +283,6 @@ public class HL7LabHandler {
 	 * Overloaded to allow quick save based on settings.
 	 * @throws TransformerException
 	 * @throws IOException
-	 * @throws RemoteException
 	 */
 	public void saveHL7() {
 

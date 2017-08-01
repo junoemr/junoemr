@@ -25,6 +25,7 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -49,8 +50,6 @@ import oscar.dms.IncomingDocUtil;
 import oscar.dms.data.DocumentUploadForm;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
-
-import com.lowagie.text.pdf.PdfReader;
 
 public class DocumentUploadAction extends DispatchAction {
 	
@@ -176,18 +175,16 @@ public class DocumentUploadAction extends DispatchAction {
 	 * @param fileName the name of the file
 	 * @return the number of pages in the file
 	 */
-	public int countNumOfPages(String fileName) {// count number of pages in a
-													// local pdf file
+	public int countNumOfPages(String fileName) {
 		int numOfPage = 0;
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		String filePath = docdownload + fileName;
+		String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 
 		try {
-			PdfReader reader = new PdfReader(filePath);
-			numOfPage = reader.getNumberOfPages();
-			reader.close();
-		} catch (IOException e) {
-			logger.debug(e.toString());
+			PDDocument doc = PDDocument.load(new File(documentDir, fileName));
+			numOfPage = doc.getNumberOfPages();
+		}
+		catch (IOException e) {
+			MiscUtils.getLogger().error("Error", e);
 		}
 		return numOfPage;
 	}

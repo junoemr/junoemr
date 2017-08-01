@@ -62,7 +62,6 @@ public class OscarToOscarHl7V2Handler implements MessageHandler {
 			return("success");
 		} catch (Exception e) {
 	        logger.error("Unexpected error.", e);
-	        MessageUploader.clean(fileId);
 	        throw(new RuntimeException(e));
         }
     }

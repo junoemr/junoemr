@@ -79,7 +79,6 @@ public class EpsilonHandler implements MessageHandler {
 			return (audit.toString());
 
 		} catch (Exception e) {
-			MessageUploader.clean(fileId);
 			logger.error("Could not parse message", e);
 			return null;
 		}

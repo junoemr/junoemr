@@ -89,6 +89,8 @@ public class ProviderArchive extends AbstractModel<Integer> {
     /* -- Province specific -- */
 	@Column(name = "alberta_tak_no")
 	private String albertaTakNo = null;
+	@Column(name = "alberta_e_delivery_ids")
+	private String albertaEDeliveryIds;
 	
 	
 	public Integer getId() {
@@ -262,8 +264,10 @@ public class ProviderArchive extends AbstractModel<Integer> {
 	public void setAlbertaTakNo(String takNo) {
 		albertaTakNo = takNo;
 	}
-
-
-
-
+	public String getAlbertaEDeliveryIds() {
+		return albertaEDeliveryIds;
+	}
+	public void setAlbertaEDeliveryIds(String albertaEDeliveryIds) {
+		this.albertaEDeliveryIds = albertaEDeliveryIds;
+	}
 }

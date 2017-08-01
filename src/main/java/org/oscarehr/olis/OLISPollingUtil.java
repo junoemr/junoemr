@@ -23,9 +23,7 @@ package org.oscarehr.olis;
  * Ontario, Canada
  */
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +44,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
-import oscar.oscarLab.FileUploadCheck;
+import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 import oscar.oscarLab.ca.all.util.Utilities;
 
 import com.indivica.olis.Driver;
@@ -219,31 +217,35 @@ public class OLISPollingUtil {
 
 		//Get HL7 Content from xml
 		String responseContent =  OLISUtils.getOLISResponseContent(response);
-		
 		//Write HL7 file to disk.
-		String fileLocation = Utilities.saveFile(new ByteArrayInputStream(responseContent.getBytes("UTF-8")), hl7Filename);
-		logger.debug(fileLocation);
-		File file = new File(fileLocation);
-		oscar.oscarLab.ca.all.upload.handlers.MessageHandler msgHandler = oscar.oscarLab.ca.all.upload.HandlerClassFactory.getHandler("OLIS_HL7");
-		try {
-			InputStream is = new FileInputStream(fileLocation);
-			int check = FileUploadCheck.addFile(file.getName(), is, "0");
-			if (check != FileUploadCheck.UNSUCCESSFUL_SAVE) {
-				timeStampForNextStartDate = msgHandler.parse(loggedInInfo, "OLIS_HL7",fileLocation, check,null);
-				
-				if (timeStampForNextStartDate != null) {
-					logger.info("Lab successfully added.");
-				} else {
-					logger.info("Error adding lab.");
-				}
-			} else {
-				logger.info("Lab already in system.");
-			}
-			is.close();
+		String fileLocation = Utilities.saveFile(
+				new ByteArrayInputStream(responseContent.getBytes("UTF-8")), hl7Filename);
 
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("Couldn't add requested OLIS lab to Inbox.", e);
+		String labType = "OLIS_HL7";
+		String serviceName = "OLIS_HL7";
+		String providerNumber = "0";
+		String timeStringForNextStartDate = null;
+		try
+		{
+			logger.debug("Lab Type: " + labType);
+			logger.debug("Lab file path: " + fileLocation);
+
+			LabHandlerService labHandlerService = SpringUtils.getBean(LabHandlerService.class);
+			timeStringForNextStartDate = labHandlerService.importLab(
+					labType,
+					loggedInInfo,
+					serviceName,
+					fileLocation,
+					providerNumber,
+					null
+			);
+			logger.info("Lab successfully added.");
+
+		} catch(FileAlreadyExistsException e) {
+			logger.warn("Lab already in system.");
+		} catch(Exception e) {
+			logger.error( "Failed insert lab into DB: " + fileLocation + " of type: " + labType);
 		}
-		return timeStampForNextStartDate;
+		return timeStringForNextStartDate;
 	}
 }

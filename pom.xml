@@ -263,11 +263,13 @@
 			<version>lgpl</version>
 		</dependency>
 		<!--  pdfbox -->
-		<dependency>
-			<groupId>org.apache.pdfbox</groupId>
-			<artifactId>pdfbox</artifactId>
-			<version>1.2.1</version>
-		</dependency>
+		 <dependency>
+	      <groupId>org.apache.pdfbox</groupId>
+	      <artifactId>pdfbox</artifactId>
+	      <!-- version 2.0.7 released 2017-07-20 -->
+	      <version>2.0.7</version>
+	    </dependency>
+
 		<!-- google collections lib -->
 		<dependency>
 			<groupId>com.google.guava</groupId>

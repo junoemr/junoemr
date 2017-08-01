@@ -33,7 +33,7 @@ import org.oscarehr.util.LoggedInInfo;
  */
 public interface MessageHandler {
     
-    
+
     /**
      *  The flat file specified by 'fileName' will be parsed and each hl7 message
      *  contained within the file will be uploaded to the database seperately.
@@ -49,6 +49,6 @@ public interface MessageHandler {
      *  If any exceptions are encountered the method should return 'null'
      *  otherwise it should return the String "success"
      */
-    public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName,int fileId, String ipAddr);
-    
+    public String parse(LoggedInInfo loggedInInfo, String serviceName,
+						String fileName,int fileId, String ipAddr) throws Exception;
 }

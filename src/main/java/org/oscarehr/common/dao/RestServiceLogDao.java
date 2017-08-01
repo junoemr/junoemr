@@ -22,44 +22,29 @@
  * Ontario, Canada
  */
 
-package oscar.oscarLab.tld;
+package org.oscarehr.common.dao;
 
 import java.util.List;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
+import javax.persistence.Query;
 
-import org.oscarehr.common.dao.ProviderLabRoutingDao;
-import org.oscarehr.util.SpringUtils;
+import org.oscarehr.common.model.RestServiceLog;
+import org.springframework.stereotype.Repository;
 
-/**
- *
- * @author Jay Gallagher
- */
-public class UnclaimedLabTag extends TagSupport {
+@Repository
+@SuppressWarnings("unchecked")
+public class RestServiceLogDao extends AbstractDao<RestServiceLog> {
 
-    private static final long serialVersionUID = 1L;
-
-	public UnclaimedLabTag() {
-		numNewLabs = 0;
+	public RestServiceLogDao() {
+		super(RestServiceLog.class);
 	}
+	public List<RestServiceLog> findByProvider(String providerNo) {
+		String sqlCommand = "SELECT x FROM " + modelClass.getSimpleName() + " x WHERE x.providerNo = :providerNo";
 
-	public int doStartTag() throws JspException    {
-	   ProviderLabRoutingDao dao = SpringUtils.getBean(ProviderLabRoutingDao.class);
-	   List<Object[]> rs = dao.findByProviderNo("0", "N");
-	   numNewLabs = rs.size();
-        
-        if(numNewLabs > 0){
-           return EVAL_BODY_INCLUDE;
-        }else{
+		Query query = entityManager.createQuery(sqlCommand);
+		query.setParameter("providerNo", providerNo);
 
-           return SKIP_BODY;
-        }
-    }
-
-	public int doEndTag() throws JspException {
-		return EVAL_PAGE;
+		List<RestServiceLog> results = query.getResultList();
+		return (results);
 	}
-
-	private int numNewLabs;
 }
