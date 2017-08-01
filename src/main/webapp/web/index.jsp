@@ -463,6 +463,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="record/summary/summaryController.js"></script>
 	<script type="text/javascript" src="record/summary/recordPrintController.js"></script>
 	<script type="text/javascript" src="record/summary/groupNotesController.js"></script>
+	<script type="text/javascript" src="record/summary/saveWarningController.js"></script>
 	<script type="text/javascript" src="record/forms/module.js"></script>
 	<script type="text/javascript" src="record/forms/formsController.js"></script>
 	<script type="text/javascript" src="record/details/module.js"></script>
