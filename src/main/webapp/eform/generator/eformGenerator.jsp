@@ -51,6 +51,7 @@
 			document.write("\x3cscript src='signature_pad.min.js'\x3e\x3c\/script\x3e");
 			runStandaloneVersion = true;
 		}
+		console.info("Run as standalone version: " + runStandaloneVersion);
 	</script>
 
 	<style>
@@ -668,14 +669,14 @@
 			var source = "<html><head>";
 			source += "\<META http-equiv='Content-Type' content='text/html; charset=UTF-8'\>";
 			source += "<title>" + eformName + "</title>";
-			source += "\<script src='${oscar_javascript_path}jquery/jquery-2.2.4.min.js'\>\<\/script\>";
+			source += "\<script src='\$\{oscar_javascript_path\}jquery/jquery-2.2.4.min.js'\>\<\/script\>";
 			source += "\<script\>window.jQuery || document.write(\"\\x3cscript src='https://code.jquery.com/jquery-2.2.4.min.js'\\x3e\\x3c\\/script\\x3e\");\<\/script\>";
 
 			if (include_fax) {
-				source += "\<script src='${oscar_javascript_path}eforms/faxControl.js'\>\<\/script\>";
+				source += "\<script src='\$\{oscar_javascript_path\}eforms/faxControl.js'\>\<\/script\>";
 			}
 			if ($signature_data.length > 0) {
-				source += "\<script src='${oscar_image_path}signature_pad.min.js'\>\<\/script\>";
+				source += "\<script src='\$\{oscar_image_path\}signature_pad.min.js'\>\<\/script\>";
 			}
 			source += "<style>";
 			var baseStyle = document.getElementById('eform_style');
@@ -1855,6 +1856,19 @@
 						event.preventDefault();
 					}
 				}).button({icon: "ui-icon-print"}));
+			
+			// button for saving directly to oscar eforms
+			if(!runStandaloneVersion) {
+				$element.append($('<button>', {
+					id: "saveToOscar",
+					text: "Save To Oscar Eforms",
+					click: function (event) {
+						alert("TODO");
+						//showSource($("#toggleFaxControls").is(':checked'));
+						event.preventDefault();
+					}
+				}).button({icon: "ui-icon-disk"}));
+			}
 		}
 		function addSnapGuidesTo($element) {
 			var $vertSnapBox = $("<div>", {
@@ -2058,9 +2072,6 @@
 			 * so we override the functions here to disable/change their actions within the e-form generator! */
 			onEformSubmit = function () {
 				alert('This would submit the eform');
-				if (event) {
-					event.preventDefault();
-				}
 				return false;
 			};
 			onEformPrint = function () {
@@ -2237,6 +2248,7 @@
 		/** This function is called when the eform submit button is clicked */
 		function onEformSubmit() {
 			releaseDirtyFlag();
+			document.forms[0].submit();
 		}
 		/** This function is called when the eform print & submit button is clicked */
 		function onEformPrintSubmit() {
@@ -2255,11 +2267,9 @@
 					<!-- Form Control Buttons -->
 					<label for="subject">Subject:</label>
 					<input name="subject" id="subject" size="40" type="text">
-					<input value="Submit" name="SubmitButton" id="SubmitButton" type="submit"
-					       onclick="onEformSubmit();">
+					<input value="Submit" name="SubmitButton" id="SubmitButton" type="button" onclick="onEformSubmit();">
 					<input value="Print" name="PrintButton" id="PrintButton" type="button" onclick="onEformPrint();">
-					<input value="Print & Submit" name="PrintSubmitButton"
-					       id="PrintSubmitButton" type="button" onclick="onEformPrintSubmit();">
+					<input value="Print & Submit" name="PrintSubmitButton" id="PrintSubmitButton" type="button" onclick="onEformPrintSubmit();">
 				</div>
 			</form>
 		</div>
