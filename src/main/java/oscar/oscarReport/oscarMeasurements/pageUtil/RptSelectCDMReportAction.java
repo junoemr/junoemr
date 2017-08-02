@@ -58,7 +58,7 @@ public final class RptSelectCDMReportAction extends Action {
     	}
     	
         RptSelectCDMReportForm frm = (RptSelectCDMReportForm) form;    
-        HttpSession session = request.getSession();        
+        HttpSession session = request.getSession();
         String CDMgroup = (String) frm.getValue("CDMgroup");
         String forward = frm.getForward();
         
@@ -69,7 +69,7 @@ public final class RptSelectCDMReportAction extends Action {
         for(int i=0; i<mInstrcVector.size(); i++){
             RptMeasuringInstructionBeanHandler mInstrcs = (RptMeasuringInstructionBeanHandler) mInstrcVector.elementAt(i);
             String mInstrcName = "mInstrcs" + i;
-            session.setAttribute(mInstrcName, mInstrcs);
+            request.setAttribute(mInstrcName, mInstrcs);
             
         }
         MiscUtils.getLogger().debug("the value of forward is :" + forward);
@@ -80,7 +80,8 @@ public final class RptSelectCDMReportAction extends Action {
         String today = now.get(Calendar.YEAR)+"-"+(now.get(Calendar.MONTH)+1)+"-"+now.get(Calendar.DATE) ;        
         String lastYear = now.get(Calendar.YEAR)-1+"-"+(now.get(Calendar.MONTH)+1)+"-"+now.get(Calendar.DATE) ; 
         
-        session.setAttribute("measurementTypes", hd);        
+        request.setAttribute("measurementTypes", hd);
+
         session.setAttribute("CDMGroup", CDMgroup);
         session.setAttribute("today", today);
         session.setAttribute("lastYear", lastYear);

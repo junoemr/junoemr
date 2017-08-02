@@ -29,7 +29,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -70,8 +69,7 @@ public final class EctSetupHistoryIndexAction extends Action {
 				oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler.addRemoteMeasurementsTypes(loggedInInfo, measureTypes,demo);
 			}
 
-			HttpSession session = request.getSession();
-			session.setAttribute("measurementsData", hd);
+			request.setAttribute("measurementsData", hd);
 
 			return (mapping.findForward("continue"));
 

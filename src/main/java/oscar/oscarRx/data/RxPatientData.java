@@ -107,12 +107,19 @@ public class RxPatientData {
 	public static class Patient implements Serializable {
 		private Demographic demographic = null;
 		private static AllergyDao allergyDao = (AllergyDao) SpringUtils.getBean("allergyDao");
-		private PartialDateDao partialDateDao = (PartialDateDao) SpringUtils.getBean("partialDateDao");
+		private transient PartialDateDao partialDateDao = null;
 
 		public Patient(Demographic demographic) {
 			this.demographic = demographic;
 
 			if (demographic == null) MiscUtils.getLogger().warn("Demographic is not set!");
+		}
+
+		private PartialDateDao getPartialDateDao() {
+			if(this.partialDateDao == null) {
+				this.partialDateDao = (PartialDateDao) SpringUtils.getBean("partialDateDao");
+			}
+			return this.partialDateDao;
 		}
 
 		public Demographic getDemographic() {
@@ -262,10 +269,9 @@ public class RxPatientData {
 		}
 
 		public org.oscarehr.common.model.Allergy addAllergy(java.util.Date entryDate, org.oscarehr.common.model.Allergy allergy) {
-
 			allergy.setEntryDate(entryDate);
 			allergyDao.persist(allergy);
-			partialDateDao.setPartialDate(PartialDate.ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
+			this.getPartialDateDao().setPartialDate(PartialDate.ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
 			return allergy;
 		}
 

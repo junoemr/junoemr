@@ -789,7 +789,7 @@
         <ViolationValue>/src/main/java/org/oscarehr/casemgmt/dao/CaseManagementNoteExtDAO.java:import org.springframework.orm.hibernate3.support.HibernateDaoSupport;</ViolationValue>
         <ViolationValue>/src/main/java/org/oscarehr/casemgmt/dao/CaseManagementNoteExtDAO.java:public class CaseManagementNoteExtDAO extends HibernateDaoSupport {</ViolationValue>
         <ViolationValue>/src/main/java/org/oscarehr/casemgmt/dao/CaseManagementNoteLinkDAO.java:import org.springframework.orm.hibernate3.support.HibernateDaoSupport;</ViolationValue>
-        <ViolationValue>/src/main/java/org/oscarehr/casemgmt/dao/CaseManagementNoteLinkDAO.java:public class CaseManagementNoteLinkDAO extends HibernateDaoSupport {</ViolationValue>
+        <ViolationValue>/src/main/java/org/oscarehr/casemgmt/dao/CaseManagementNoteLinkDAO.java:public class CaseManagementNoteLinkDAO extends HibernateDaoSupport implements Serializable {</ViolationValue>
         <ViolationValue>/src/main/java/org/oscarehr/casemgmt/dao/ClientImageDAO.java:import org.springframework.orm.hibernate3.support.HibernateDaoSupport;</ViolationValue>
         <ViolationValue>/src/main/java/org/oscarehr/casemgmt/dao/ClientImageDAO.java:public class ClientImageDAO extends HibernateDaoSupport {</ViolationValue>
         <ViolationValue>/src/main/java/org/oscarehr/casemgmt/dao/IssueDAO.java:import org.springframework.orm.hibernate3.support.HibernateDaoSupport;</ViolationValue>
@@ -928,7 +928,7 @@
         <ViolationValue>/src/main/java/oscar/oscarDB/DBPreparedHandler.java:else if(param[i].getParamType().equals(DBPreparedHandlerParam.PARAM_DATE)){</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarDB/DBPreparedHandler.java:else if(param[i].getParamType().equals(DBPreparedHandlerParam.PARAM_INT)){</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarDB/DBPreparedHandler.java:if(param[i].getParamType().equals(DBPreparedHandlerParam.PARAM_STRING)){</ViolationValue>
-        <ViolationValue>/src/main/java/oscar/oscarDB/DBPreparedHandler.java:public final class DBPreparedHandler {</ViolationValue>
+        <ViolationValue>/src/main/java/oscar/oscarDB/DBPreparedHandler.java:public final class DBPreparedHandler implements Serializable {</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarDB/DBPreparedHandler.java:synchronized public ResultSet queryResults(String preparedSQL, DBPreparedHandlerParam[] param) throws SQLException {</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarDB/DBPreparedHandler.java:synchronized public ResultSet queryResults_paged(String preparedSQL, DBPreparedHandlerParam[] param, int iOffSet) throws SQLException {</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarDB/DBPreparedHandlerParam.java:public DBPreparedHandlerParam(Date dateValue){</ViolationValue>

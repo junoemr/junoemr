@@ -29,7 +29,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -54,8 +53,7 @@ public class dxResearchLoadQuickListAction extends Action {
     	
         dxQuickListBeanHandler quicklistHd = new dxQuickListBeanHandler();
         
-        HttpSession session = request.getSession();
-        session.setAttribute("allQuickLists", quicklistHd);
+        request.setAttribute("allQuickLists", quicklistHd);
         
         return mapping.findForward("success");
     }

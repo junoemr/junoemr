@@ -25,7 +25,9 @@
 
 package oscar;
 
-public class HScheduleHoliday {
+import java.io.Serializable;
+
+public class HScheduleHoliday implements Serializable {
   public String holiday_name = "";
 
   //constructor

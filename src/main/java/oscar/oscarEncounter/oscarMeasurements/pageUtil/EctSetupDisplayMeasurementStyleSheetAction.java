@@ -27,7 +27,6 @@ package oscar.oscarEncounter.oscarMeasurements.pageUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -52,8 +51,7 @@ public final class EctSetupDisplayMeasurementStyleSheetAction extends Action {
     	if( securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_admin", "w", null) || securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_admin.measurements", "w", null) )  {
   
         EctStyleSheetBeanHandler hd = new EctStyleSheetBeanHandler();           
-        HttpSession session = request.getSession();
-        session.setAttribute( "styleSheets", hd );            
+        request.setAttribute( "styleSheets", hd );
        
         return (mapping.findForward("continue"));
         

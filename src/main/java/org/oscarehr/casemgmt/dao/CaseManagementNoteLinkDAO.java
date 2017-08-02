@@ -24,12 +24,13 @@
 
 package org.oscarehr.casemgmt.dao;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-public class CaseManagementNoteLinkDAO extends HibernateDaoSupport {
+public class CaseManagementNoteLinkDAO extends HibernateDaoSupport implements Serializable {
 
 	public CaseManagementNoteLink getNoteLink(Long id) {
 		CaseManagementNoteLink noteLink = this.getHibernateTemplate().get(CaseManagementNoteLink.class, id);

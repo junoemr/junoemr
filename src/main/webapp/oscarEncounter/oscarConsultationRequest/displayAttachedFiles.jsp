@@ -30,59 +30,59 @@
       boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_con" rights="r" reverse="<%=true%>">
-	<%authed=false; %>
-	<%response.sendRedirect("../../securityError.jsp?type=_con");%>
+    <%authed=false; %>
+    <%response.sendRedirect("../../securityError.jsp?type=_con");%>
 </security:oscarSec>
 <%
 if(!authed) {
-	return;
+    return;
 }
 %>
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page
-	import="java.util.ArrayList, oscar.dms.*, oscar.oscarLab.ca.on.*, oscar.util.StringUtils"%>
+    import="java.util.ArrayList, oscar.dms.*, oscar.oscarLab.ca.on.*, oscar.util.StringUtils"%>
 <%@page import="org.oscarehr.util.SessionConstants"%>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 
 <%
-	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-  String demo = request.getParameter("demo") ;
-  String requestId = request.getParameter("requestId");
+    LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+    String demo = request.getParameter("demo") ;
+    String requestId = request.getParameter("requestId");
+    String displayValue = "display: none;";
 %>
 <ul id="attachedList"
-	style="background-color: white; padding-left: 20px; list-style-position: outside; list-style-type: lower-roman;">
-	<%
+    style="background-color: white; padding-left: 20px; list-style-position: outside; list-style-type: lower-roman;">
+    <%
             ArrayList privatedocs = new ArrayList();
             privatedocs = EDocUtil.listDocs(loggedInInfo, demo, requestId, EDocUtil.ATTACHED);
-            EDoc curDoc;                                        
+            EDoc curDoc;
             for(int idx = 0; idx < privatedocs.size(); ++idx)
-            {                    
-                curDoc = (EDoc)privatedocs.get(idx);                                            
+            {
+                curDoc = (EDoc)privatedocs.get(idx);
         %>
-	<li class="doc"><%=StringUtils.maxLenString(curDoc.getDescription(),19,16,"...")%></li>
-	<%                                           
+    <li class="doc"><%=StringUtils.maxLenString(curDoc.getDescription(),19,16,"...")%></li>
+    <%
             }
 
                 CommonLabResultData labData = new CommonLabResultData();
                 ArrayList labs = labData.populateLabResultsData(loggedInInfo, demo, requestId, CommonLabResultData.ATTACHED);
                 LabResultData resData;
-                for(int idx = 0; idx < labs.size(); ++idx) 
+                for(int idx = 0; idx < labs.size(); ++idx)
                 {
                     resData = (LabResultData)labs.get(idx);
         %>
-	<li class="lab"><%=resData.getDiscipline()+" "+resData.getDateTime()%></li>
-	<%
+    <li class="lab"><%=resData.getDiscipline()+" "+resData.getDateTime()%></li>
+    <%
                 }
         %>
 </ul>
 <%
-           if( privatedocs.size() == 0 && labs.size() == 0 ) {
-        %>
+    if( privatedocs.size() == 0 && labs.size() == 0 ) {
+        displayValue = "";
+    }
+%>
 <p id="attachDefault"
-	style="background-color: white; text-align: center;"><bean:message
-	key="oscarEncounter.oscarConsultationRequest.AttachDoc.Empty" /></p>
-<%
-           }
-         %>
+    style="background-color: white; text-align: center; <%= displayValue %>"><bean:message
+    key="oscarEncounter.oscarConsultationRequest.AttachDoc.Empty" /></p>

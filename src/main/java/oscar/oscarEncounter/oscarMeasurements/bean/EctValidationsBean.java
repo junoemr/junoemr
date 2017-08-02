@@ -25,10 +25,11 @@
 
 package oscar.oscarEncounter.oscarMeasurements.bean;
 
+import java.io.Serializable;
 import org.oscarehr.common.model.Validations;
 
 
-public class EctValidationsBean{
+public class EctValidationsBean implements Serializable {
 
        int id;
        String name;
