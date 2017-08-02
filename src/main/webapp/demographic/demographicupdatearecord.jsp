@@ -315,13 +315,10 @@
         hinDupCheckException = true;
      }
 
-     if(request.getParameter("hin")!=null && request.getParameter("hin").length()>5 && !hinDupCheckException) {
-		String paramNameHin =new String();
-		paramNameHin=request.getParameter("hin").trim();
-		
+     if( hin != null && hin.length()>5 && !hinDupCheckException) {
 		boolean outOfDomain = true;
 		
-		List<Demographic> hinDemoList = demographicDao.searchDemographicByHIN(paramNameHin, 100, 0, loggedInInfo.getLoggedInProviderNo(),outOfDomain);
+		List<Demographic> hinDemoList = demographicDao.searchDemographicByHIN(hin, 100, 0, loggedInInfo.getLoggedInProviderNo(),outOfDomain);
 		for(Demographic hinDemo : hinDemoList) {
         
             if (!(hinDemo.getDemographicNo().toString().equals(request.getParameter("demographic_no")))) {
