@@ -1866,8 +1866,7 @@
 			<forward name="success" path="/eform/efmformmanager.jsp" />
 		</action>
 		<action input="/eform/partials/import.jsp" name="FrmForm" path="/eform/manageEForm" scope="request" type="oscar.eform.actions.ManageEFormAction" parameter="method">
-			<forward name="fail" path="/eform/partials/import.jsp" />
-			<forward name="success" path="/eform/partials/import.jsp" />
+			<forward name="upload" path="/eform/partials/import.jsp" />
 		</action>
 		<action input="/eform/efmformrtl_config.jsp" path="/eform/IndivicaRichTextLetterSettings" scope="request" type="oscar.eform.actions.RTLSettingsAction">
 			<forward name="success" path="/eform/efmformrtl_config.jsp" />

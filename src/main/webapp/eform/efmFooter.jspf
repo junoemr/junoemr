@@ -72,7 +72,7 @@ $("#dataConfirmOK").on("click", function(e) {
 	);
 });
 
-$("a.contentLink").on("click", function(e) {
+$("body").on("click", "a.contentLink", function(e) {
 	e.preventDefault();
 	$("#dynamic-content").load($(this).attr("href"), 
 		function(response, status, xhr) {
