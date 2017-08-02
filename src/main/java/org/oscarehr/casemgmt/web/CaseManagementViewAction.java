@@ -25,6 +25,7 @@ package org.oscarehr.casemgmt.web;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -515,7 +516,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		}
 	}
 
-	public static class IssueDisplay {
+	public static class IssueDisplay implements Serializable {
 		public boolean writeAccess = true;
 		public String codeType = null;
 		public String code = null;

@@ -25,6 +25,7 @@
 
 package oscar.oscarDB;
 
+import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,11 +38,11 @@ import org.oscarehr.util.DbConnectionFilter;
  * deprecated Use JPA instead, no new code should be written against this class.
  */
 @Deprecated
-public final class DBPreparedHandler {
+public final class DBPreparedHandler implements Serializable {
     
-    ResultSet rs = null;
-    Statement stmt = null;
-    PreparedStatement preparedStmt = null;
+    transient ResultSet rs = null;
+    transient Statement stmt = null;
+    transient PreparedStatement preparedStmt = null;
 
     synchronized public void procExecute(String procName, String[] param) throws SQLException {
     	String sql = "{call " + procName ;

@@ -67,21 +67,25 @@ public class DxresearchReportAction extends DispatchAction {
         this.dxresearchdao = dxresearchdao;
     }
 
+    private void setRequestAttributes(HttpServletRequest request) {
+        request.setAttribute("listview", new DxRegistedPTInfo());
+        dxQuickListBeanHandler quicklistHd = new dxQuickListBeanHandler();
+        request.setAttribute("allQuickLists", quicklistHd);
+        dxResearchCodingSystem codingSys = new dxResearchCodingSystem();
+        request.setAttribute("codingSystem", codingSys);
+        request.getSession().setAttribute("radiovaluestatus", request.getSession().getAttribute("radiovaluestatus"));
+    }
 
     @Override
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        request.getSession().setAttribute("listview", new DxRegistedPTInfo());
-        dxQuickListBeanHandler quicklistHd = new dxQuickListBeanHandler();
-        request.getSession().setAttribute("allQuickLists", quicklistHd);
-        dxResearchCodingSystem codingSys = new dxResearchCodingSystem();
-        request.getSession().setAttribute("codingSystem", codingSys);
-        request.getSession().setAttribute("radiovaluestatus", request.getSession().getAttribute("radiovaluestatus"));
+        this.setRequestAttributes(request);
         return mapping.findForward(SUCCESS);
     }
 
     public ActionForward patientRegistedAll(ActionMapping mapping, ActionForm  form,
             HttpServletRequest request, HttpServletResponse response)
              {
+        this.setRequestAttributes(request);
 
         List<String> providerNoList = new ArrayList<String>();
         String providerNo = request.getParameter("provider_no");
@@ -107,6 +111,7 @@ public class DxresearchReportAction extends DispatchAction {
     public ActionForward patientExcelReport(ActionMapping mapping, ActionForm  form,
             HttpServletRequest request, HttpServletResponse response)
              {
+        this.setRequestAttributes(request);
         ServletOutputStream outputStream = getServletOstream(response);
 
         List<DxRegistedPTInfo> patients = null;
@@ -145,6 +150,7 @@ public class DxresearchReportAction extends DispatchAction {
     public ActionForward patientRegistedDistincted(ActionMapping mapping, ActionForm  form,
             HttpServletRequest request, HttpServletResponse response)
              {
+        this.setRequestAttributes(request);
 
         List<String> providerNoList = new ArrayList<String>();
         String providerNo = request.getParameter("provider_no");
@@ -179,6 +185,7 @@ public class DxresearchReportAction extends DispatchAction {
     public ActionForward patientRegistedDeleted(ActionMapping mapping, ActionForm  form,
             HttpServletRequest request, HttpServletResponse response)
             {
+        this.setRequestAttributes(request);
 
         List<String> providerNoList = new ArrayList<String>();
         String providerNo = request.getParameter("provider_no");
@@ -203,6 +210,7 @@ public class DxresearchReportAction extends DispatchAction {
     public ActionForward patientRegistedActive(ActionMapping mapping, ActionForm  form,
             HttpServletRequest request, HttpServletResponse response)
              {
+        this.setRequestAttributes(request);
 
         List<String> providerNoList = new ArrayList<String>();
         String providerNo = request.getParameter("provider_no");
@@ -227,6 +235,7 @@ public class DxresearchReportAction extends DispatchAction {
     public ActionForward patientRegistedResolve(ActionMapping mapping, ActionForm  form,
             HttpServletRequest request, HttpServletResponse response)
              {
+        this.setRequestAttributes(request);
 
         List<String> providerNoList = new ArrayList<String>();
         String providerNo = request.getParameter("provider_no");
@@ -252,6 +261,9 @@ public class DxresearchReportAction extends DispatchAction {
                                 HttpServletRequest request, HttpServletResponse response)
 
     {
+
+      this.setRequestAttributes(request);
+
       String editingCodeType = request.getParameter( "editingCodeType" );
       String editingCodeCode = request.getParameter( "editingCodeCode" );
       String editingCodeDesc = request.getParameter( "editingCodeDesc" );
@@ -266,6 +278,8 @@ public class DxresearchReportAction extends DispatchAction {
 
     public ActionForward addSearchCode(ActionMapping mapping, ActionForm  form,
             HttpServletRequest request, HttpServletResponse response) {
+
+        this.setRequestAttributes(request);
 
         DynaBean lazyForm = (DynaBean) form;
         String quickListName = (String)lazyForm.get("quicklistname");
@@ -315,10 +329,10 @@ public class DxresearchReportAction extends DispatchAction {
     }
 
     public ActionForward clearSearchCode(ActionMapping mapping, ActionForm  form,
-            HttpServletRequest request, HttpServletResponse response)
-             {
+            HttpServletRequest request, HttpServletResponse response) {
 
-        
+        this.setRequestAttributes(request);
+
         //String quickListName = (String)lazyForm.get("quicklistname");
         //List codeSearch = dxresearchdao.getQuickListItems(quickListName);;
         List existcodeSearch =null;
