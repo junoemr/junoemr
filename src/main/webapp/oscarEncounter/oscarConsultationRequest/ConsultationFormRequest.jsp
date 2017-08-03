@@ -918,7 +918,7 @@ function updateAttached() {
 function fetchAttached() {
     var updateElem = 'tdAttachedDocs';
     var params = "demo=<%=demo%>&requestId=<%=requestId%>";
-    var url = "<rewrite:reWrite jspPage="displayAttachedFiles.jsp" />";
+    var url = ctx + "/oscarEncounter/displayAttached.do";
 
     var objAjax = new Ajax.Request (
                 url,
