@@ -190,39 +190,59 @@ if(!authed) {
 	}
 
 	function save() {
+		var ret;
 		var ops = document.getElementsByName("attachedDocs")[0];
-		var list = window.opener.document.getElementById("attachedList");
-		var paragraph = window.opener.document.getElementById("attachDefault");
-		var saved = "";
-		var reqId = document.forms[0].requestId.value;
 
-		// Delete existing attachments on consultation page
-		while ( list.firstChild ) {
-			list.removeChild(list.firstChild);
-		}
+		if (document.forms[0].requestId.value == "null") {
+			var saved = "";
 
-		for( var idx = 0; idx < ops.options.length; idx++ ) {
-			// if the requestId is null, it's a new consultation and the
-			// documents need to be saved to the initial consultation page
-			if ( reqId == "null" ) {
+			//we don't want to initially save dummy
+			if (ops.options.length == 1 && ops.options[0].value == "0") {
+				ops.options.length = 0;
+			}
+
+			var list = window.opener.document.getElementById("attachedList");
+			var paragraph = window.opener.document
+					.getElementById("attachDefault");
+
+			//if we are saving something we need to update list on parent form
+			if (ops.options.length) {
+				paragraph.innerHTML = "";
+			}
+
+			//delete what we have before adding new docs to list
+			while (list.firstChild) {
+				list.removeChild(list.firstChild);
+			}
+
+			for ( var idx = 0; idx < ops.options.length; ++idx) {
 				saved += ops.options[idx].value;
+
 				if (idx < ops.options.length - 1) {
 					saved += "|";
 				}
-			}
 
-			ops.options[idx].selected = true;
-			if ( ops.options[0].value == "0" ) {
-				paragraph.style.display = "";
-			} else {
-				paragraph.style.display = "none";
 				listElem = window.opener.document.createElement("li");
 				listElem.innerHTML = ops.options[idx].innerHTML;
 				listElem.className = ops.options[idx].className;
 				list.appendChild(listElem);
+
+			}
+
+			window.opener.document.EctConsultationFormRequestForm.documents.value = saved;
+
+			if (list.childNodes.length == 0) {
+				paragraph.innerHTML = "<bean:message key="oscarEncounter.oscarConsultationRequest.AttachDoc.Empty"/>______$tag________________________________________________________________________";
+			}
+
+			ret = false;
+			window.close();
+		} else {
+			//but we will use dummy in updating an empty list
+			for ( var idx = 0; idx < ops.options.length; ++idx) {
+				ops.options[idx].selected = true;
 			}
 		}
-		window.opener.document.EctConsultationFormRequestForm.documents.value = saved;
 	}
 //-->
 </script>
