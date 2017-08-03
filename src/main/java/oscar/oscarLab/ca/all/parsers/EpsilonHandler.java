@@ -126,19 +126,12 @@ public class EpsilonHandler  extends CMLHandler implements MessageHandler {
 	public String getAccessionNum() {
 		String accessionNum = "";
 		try {
-			accessionNum = getString(msg.getRESPONSE().getORDER_OBSERVATION(0)
-					.getOBR().getPlacerOrderNumber(0).getEntityIdentifier()
-					.getValue());
-			if (msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR()
-					.getFillerOrderNumber().getEntityIdentifier().getValue() != null) {
-				accessionNum = accessionNum
-						+ (accessionNum != null && accessionNum.trim().length() > 0 ? ", " : "")
-						+ getString(msg.getRESPONSE().getORDER_OBSERVATION(0)
-								.getOBR().getFillerOrderNumber()
-								.getEntityIdentifier().getValue());
-			}
+			// medHealth sends the accession number in PID-3
+			accessionNum = getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalID(0).getID().getValue());
+
 			return (accessionNum);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			logger.error("Could not return accession number", e);
 			return ("");
 		}
