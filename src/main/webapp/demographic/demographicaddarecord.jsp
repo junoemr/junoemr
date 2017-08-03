@@ -138,7 +138,6 @@
     String dem = null;
 	String year, month, day;
     String curUser_no = (String)session.getAttribute("user");
-	String hin = request.getParameter("hin").replaceAll("[^0-9a-zA-Z]", "");
 
 	DBPreparedHandlerParam [] param =new DBPreparedHandlerParam[34];
 
@@ -156,7 +155,7 @@
 	demographic.setYearOfBirth(request.getParameter("year_of_birth"));
 	demographic.setMonthOfBirth(request.getParameter("month_of_birth")!=null && request.getParameter("month_of_birth").length()==1 ? "0"+request.getParameter("month_of_birth") : request.getParameter("month_of_birth"));
 	demographic.setDateOfBirth(request.getParameter("date_of_birth")!=null && request.getParameter("date_of_birth").length()==1 ? "0"+request.getParameter("date_of_birth") : request.getParameter("date_of_birth"));
-	demographic.setHin(hin);
+	demographic.setHin(request.getParameter("hin"));
 	demographic.setVer(request.getParameter("ver"));
 	demographic.setRosterStatus(request.getParameter("roster_status"));
 	demographic.setPatientStatus(request.getParameter("patient_status"));
@@ -227,10 +226,12 @@
         hinDupCheckException = true;
      }
 
-    if( hin != null && hin.length()>5 && !hinDupCheckException) {
+    if(request.getParameter("hin")!=null && request.getParameter("hin").length()>5 && !hinDupCheckException) {
   		//oscar.oscarBilling.ca.on.data.BillingONDataHelp dbObj = new oscar.oscarBilling.ca.on.data.BillingONDataHelp();
 		//String sql = "select demographic_no from demographic where hin=? and year_of_birth=? and month_of_birth=? and date_of_birth=?";
-		List<Demographic> demographics = demographicDao.searchByHealthCard(hin);
+		String paramNameHin =new String();
+		paramNameHin=request.getParameter("hin").trim();
+		List<Demographic> demographics = demographicDao.searchByHealthCard(paramNameHin);
 		if(demographics.size()>0){ 
 %>
 		***<font color='red'><bean:message key="demographic.demographicaddarecord.msgDuplicatedHIN" /></font>***<br><br>
