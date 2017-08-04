@@ -25,9 +25,10 @@
 
 package oscar.oscarEncounter.oscarMeasurements.bean;
 
+import java.io.Serializable;
 import java.util.Vector;
 
-public class EctMeasurementTypesBean{
+public class EctMeasurementTypesBean implements Serializable {
     
     int id;
     String type;
