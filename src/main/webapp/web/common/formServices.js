@@ -132,6 +132,17 @@ angular.module("formServices", [])
             });
      
           return deferred.promise;
+        },
+        saveEform: function(){
+        	var deferred = $q.defer();
+        	 $http.get(this.apiPath+'/saveEForm',this.configHeaders).success(function(data){
+            	deferred.resolve(data);
+            }).error(function(){
+            	console.log("error saving eforms");
+            	deferred.reject("An error occured while saving eforms");
+            });
+     
+          return deferred.promise;
         }
     };
 });

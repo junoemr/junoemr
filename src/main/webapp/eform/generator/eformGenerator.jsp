@@ -745,6 +745,12 @@
 			var name = stripSpecialChars(eformName).replace(/\s/g, "_") + '.html';
 			return download(generate_eform_source_html(false, include_fax), name, 'text/html');
 		}
+		function saveToOscarEforms(include_fax) {
+			var name = stripSpecialChars(eformName).replace(/\s/g, "_") + '.html';
+			var eformCode = generate_eform_source_html(false, include_fax);
+			
+			
+		}
 
 		/** make the given element draggable */
 		function makeDraggable($element, cloneable, stackClasses) {
@@ -1272,6 +1278,9 @@
 					var $fileInput = $(this);
 					reader.onload = function (e) {
 						var src = $fileInput.val().replace(/C:\\fakepath\\/i, '');
+						if(!runStandaloneVersion) {
+							src = "<%= request.getContextPath() %>/eform/displayImage.do?imagefile=" + src;
+						}
 						if ($img == null || $img.length <= 0) {
 							$img = addBackgroundImage($pageDiv, src);
 						}
@@ -1810,6 +1819,12 @@
 			var $options_menu = $("<div>", {
 				class: "gen-control-menu"
 			});
+			var $toggleFaxControls = $("<input>", {
+				id: "toggleFaxControls",
+				type: "checkbox",
+				css: {width: "16px", height: "16px"},
+				checked: defaultIncludeFaxControl
+			})
 			$options_menu.append($("<div>").append($("<label>", {
 					text: "Eform Name",
 					for: "eformNameInput"
@@ -1824,19 +1839,14 @@
 			).append($("<div>").append($("<label>", {
 					text: "Include Fax Controls",
 					for: "toggleFaxControls"
-				})).append($("<input>", {
-					id: "toggleFaxControls",
-					type: "checkbox",
-					css: {width: "16px", height: "16px"},
-					checked: defaultIncludeFaxControl
-				}))
+				})).append($toggleFaxControls)
 			);
 			$element.append($options_menu);
 			$element.append($('<button>', {
 				id: "showSource",
 				text: "View Eform Source",
 				click: function (event) {
-					showSource($("#toggleFaxControls").is(':checked'));
+					showSource($toggleFaxControls.is(':checked'));
 					event.preventDefault();
 				}
 			}).button({icon: "ui-icon-newwin"}))
@@ -1844,7 +1854,7 @@
 					id: "downloadSource",
 					text: "Download As File",
 					click: function (event) {
-						downloadSource($("#toggleFaxControls").is(':checked'));
+						downloadSource($toggleFaxControls.is(':checked'));
 						event.preventDefault();
 					}
 				}).button({icon: "ui-icon-document"}))
@@ -1863,8 +1873,7 @@
 					id: "saveToOscar",
 					text: "Save To Oscar Eforms",
 					click: function (event) {
-						alert("TODO");
-						//showSource($("#toggleFaxControls").is(':checked'));
+						saveToOscarEforms($toggleFaxControls.is(':checked'));
 						event.preventDefault();
 					}
 				}).button({icon: "ui-icon-disk"}));

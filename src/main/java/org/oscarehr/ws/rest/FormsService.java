@@ -33,7 +33,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -47,11 +52,13 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.jcs.access.exception.InvalidArgumentException;
 import org.apache.log4j.Logger;
 import org.oscarehr.app.AppOAuth1Config;
 import org.oscarehr.app.OAuth1Utils;
 import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.DemographicDao;
+import org.oscarehr.common.dao.EFormDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.dao.EFormDao.EFormSortOrder;
 import org.oscarehr.common.model.AppDefinition;
@@ -95,6 +102,9 @@ public class FormsService extends AbstractServiceImpl {
 	
 	@Autowired
 	private AppDefinitionDao appDefinitionDao;
+	
+	@Autowired
+	private EFormDao eFormDao;
 	
 	
 	@GET
@@ -350,6 +360,97 @@ public class FormsService extends AbstractServiceImpl {
 			String retval = OAuth1Utils.getOAuthGetResponse( loggedInInfo,k2aApp, k2aUser, requestURI, requestURI);
 			return retval;
 		} catch(Exception e) {
+			return null;
+		}
+	}
+	
+	/**
+	 * Saves an eform. Performs an update if the eform has an fid, otherwise it will save a new eform.
+	 * @param jsonString
+	 * @return AbstractSearchResponse
+	 */
+	@POST
+	@Path("/saveEForm")
+	@Consumes("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
+	public AbstractSearchResponse<String> saveEForm(String jsonString) {
+		try {
+			AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
+			JSONArray jsonArray = JSONArray.fromObject(jsonString);
+			List<String> errors = new ArrayList<String>();
+			
+			List<EForm> eformList = new ArrayList<EForm>();
+
+			// retrieve or create all eforms. In theory json could have multiple eforms
+			for (int i = 0; i < jsonArray.size(); i++) {
+				JSONObject eformJson = jsonArray.getJSONObject(i);
+
+				Integer fid = eformJson.getInt("fid");
+				String formName = eformJson.getString("formName");
+				String formSubject = eformJson.getString("formSubject");
+				String formHtml = eformJson.getString("formHtml");
+
+				String roleType = eformJson.getString("roleType");
+				Boolean showLatestFormOnly = eformJson.getBoolean("showLatestFormOnly");
+				Boolean patientIndependant = eformJson.getBoolean("patientIndependant");
+
+				EForm eform;
+				// try to update an existing eform
+				if (fid != null && fid > 0) {
+					eform = eFormDao.findById(fid);
+					if (eform == null) {
+						throw new InvalidArgumentException("Attempt to update eform with non-existant fid(" + fid + ")");
+					}
+					Date now = new Date();
+					eform.setFormDate(now);
+					eform.setFormTime(now);
+				}
+				// new eform
+				else {
+					eform = new EForm();
+					String creatorId = getLoggedInInfo().getLoggedInProviderNo();
+					eform.setCreator(creatorId);
+				}
+
+				eform.setFormName(formName);
+				eform.setSubject(formSubject);
+				eform.setFormHtml(formHtml);
+				eform.setCurrent(true);
+				eform.setShowLatestFormOnly(showLatestFormOnly);
+				eform.setPatientIndependent(patientIndependant);
+				eform.setRoleType(roleType);
+				
+				eformList.add(eform);
+			}
+			
+			//validate eform objects before saving
+			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+			Validator validator = factory.getValidator();
+			
+			for(EForm eform : eformList) {
+				final Set<ConstraintViolation<EForm>> formErrors = validator.validate(eform);
+				for(ConstraintViolation<EForm> violation : formErrors) {
+					errors.add(eform.getFormName() + ": " + violation.getMessage());
+				}
+			}
+			
+			// only save if no errors encountered
+			if(errors.isEmpty()) {
+				for(EForm eform : eformList) {
+					if(eform.getId() != null) {
+						eFormDao.merge(eform);
+					}
+					else {
+						eFormDao.persist(eform);
+					}
+				}
+			}
+			
+			response.setContent(errors);
+			return response;
+		}
+		catch (Exception e) {
+			MiscUtils.getLogger().error("Error saving eform - " + e);
 			return null;
 		}
 	}
