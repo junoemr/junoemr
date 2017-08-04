@@ -25,11 +25,12 @@
 
 package oscar;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.StringTokenizer;
 
-public class RscheduleBean {
+public class RscheduleBean implements Serializable {
 	
   public String provider_no = "";
   public String sdate = "";

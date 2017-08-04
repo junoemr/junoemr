@@ -27,7 +27,6 @@ package oscar.oscarResearch.oscarDxResearch.pageUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -79,13 +78,12 @@ public final class dxSetupResearchAction extends Action {
             quicklistHd = new dxQuickListBeanHandler(providerNo);
         }
         
-        HttpSession session = request.getSession();
-        session.setAttribute("codingSystem", codingSys);
-        session.setAttribute("allQuickLists", quicklistHd);
-        session.setAttribute("allQuickListItems", quicklistItemsHd);
-        session.setAttribute("allDiagnostics", hd );
-        session.setAttribute("demographicNo", demographicNo ); 
-        session.setAttribute("providerNo", providerNo ); 
+        request.setAttribute("codingSystem", codingSys);
+        request.setAttribute("allQuickLists", quicklistHd);
+        request.setAttribute("allQuickListItems", quicklistItemsHd);
+        request.setAttribute("allDiagnostics", hd );
+        request.setAttribute("demographicNo", demographicNo );
+        request.setAttribute("providerNo", providerNo );
        
         return (mapping.findForward("success"));
     }

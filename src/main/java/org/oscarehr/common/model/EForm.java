@@ -36,10 +36,16 @@ import javax.persistence.PreRemove;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "eform")
 public class EForm extends AbstractModel<Integer> implements Serializable {
+
+	/**
+	 * default serial version uid
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * This comparator sorts EForm ascending based on the formName
@@ -55,12 +61,16 @@ public class EForm extends AbstractModel<Integer> implements Serializable {
 	@Column(name = "fid")
 	private Integer id;
 
+	@Size(min=1, max=255)
 	@Column(name = "form_name")
 	private String formName;
 
+	@Size(max=255)
 	@Column(name = "file_name")
 	private String fileName;
 
+	@Size(max=255)
+	@Column(name = "subject")
 	private String subject;
 
 	@Column(name = "status")

@@ -29,7 +29,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -75,8 +74,7 @@ public final class EctSetupDisplayHistoryAction extends Action {
                 }
                 request.setAttribute("type", type);
             }            
-            HttpSession session = request.getSession();
-            session.setAttribute( "measurementsData", hd );                        
+            request.setAttribute( "measurementsData", hd );
         }
         else{
             MiscUtils.getLogger().debug("cannot get the EctSessionBean");

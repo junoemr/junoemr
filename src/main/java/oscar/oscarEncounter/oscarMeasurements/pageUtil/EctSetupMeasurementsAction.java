@@ -85,7 +85,7 @@ public final class EctSetupMeasurementsAction extends Action {
             frm.setValue("date-" + i, today);
         }
         session.setAttribute("EctMeasurementsForm", frm);            
-        session.setAttribute("measurementTypes", hd);
+        request.setAttribute("measurementTypes", hd);
         Vector mInstrcVector = hd.getMeasuringInstrcHdVector();
         for(int i=0; i<mInstrcVector.size(); i++){
             EctMeasuringInstructionBeanHandler mInstrcs = (EctMeasuringInstructionBeanHandler) mInstrcVector.elementAt(i);

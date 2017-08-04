@@ -195,6 +195,25 @@ angular.module("Common.Services").service("formService", [
 
 			return deferred.promise;
 		};
+		
+		service.saveEForm = function saveEForm()
+		{
+			var deferred = $q.defer();
+			$http.get(service.apiPath + '/saveEForm',
+				Juno.Common.ServiceHelper.configHeaders()).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("formService::saveEForm error", errors);
+					deferred.reject("An error occurred while saving an EForm");
+				});
+
+			return deferred.promise;
+		};
+		
 
 		return service;
 	}

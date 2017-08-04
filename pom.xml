@@ -256,6 +256,25 @@
 			<artifactId>cglib-nodep</artifactId>
 			<version>2.2</version>
 		</dependency>
+
+		<!-- hibernate data model validator -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.4.1.Final</version>
+		</dependency>
+		<!-- required by hibernate validator -->
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.el</artifactId>
+			<version>3.0.1-b08</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator-cdi</artifactId>
+			<version>5.4.1.Final</version>
+		</dependency>
+
 		<!-- pdf / jpedal -->
 		<dependency>
 			<groupId>org</groupId>

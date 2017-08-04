@@ -241,8 +241,8 @@ public class EFormExportZip {
                 FileInputStream fis = new FileInputStream(tempFile.getValue());
                 File imageFile = new File(ImageUploadAction.getImageFolder(), tempFile.getKey());
                 if (imageFile.exists()) {
-                    errors.add("Image '" + tempFile.getKey() + "' already exists, skipping image, but the form may still be uploaded.  Please resolve.");
-                    _log.info("EForm Import: Image with name '" + tempFile.getKey() + "' already exists, skipping image, but the form may still be uploaded.  Please resolve.");
+                    errors.add("Image '" + tempFile.getKey() + "' already exists, skipping image, but the form may still be uploaded. Please resolve.");
+                    _log.info("Eform Import: Image with name '" + tempFile.getKey() + "' already exists, skipping image, but the form may still be uploaded. Please resolve.");
                 }
                 OutputStream os = new FileOutputStream(imageFile);
                 inputToOutput(fis, os);
