@@ -1875,6 +1875,7 @@
 					click: function (event) {
 						saveToOscarEforms($toggleFaxControls.is(':checked'));
 						event.preventDefault();
+						alert("Coming Soon");
 					}
 				}).button({icon: "ui-icon-disk"}));
 			}

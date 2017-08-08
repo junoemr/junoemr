@@ -261,7 +261,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>5.4.1.Final</version>
+			<version>6.0.1.Final</version>
 		</dependency>
 		<!-- required by hibernate validator -->
 		<dependency>
@@ -272,7 +272,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator-cdi</artifactId>
-			<version>5.4.1.Final</version>
+			<version>6.0.1.Final</version>
 		</dependency>
 
 		<!-- pdf / jpedal -->
@@ -1269,6 +1269,7 @@
             <exclude>src/main/java/org/apache/xml/security/encryption/DocumentSerializer.java</exclude>
 			<exclude>src/main/webapp/library/bootstrap2-datepicker/**</exclude>
 			<exclude>src/main/webapp/library/ng-table/**</exclude>
+			<exclude>src/main/webapp/web/**</exclude>
                 </excludes>
 		<strictCheck>true</strictCheck>
             </configuration>
@@ -1461,6 +1462,7 @@
 						<exclude>src/main/java/org/apache/xml/security/encryption/DocumentSerializer.java</exclude>
 						<exclude>src/main/webapp/library/bootstrap2-datepicker/**</exclude>
 						<exclude>src/main/webapp/library/ng-table/**</exclude>
+						<exclude>src/main/webapp/web/**</exclude>
 					</excludes>
 					<strictCheck>true</strictCheck>
 				</configuration>
