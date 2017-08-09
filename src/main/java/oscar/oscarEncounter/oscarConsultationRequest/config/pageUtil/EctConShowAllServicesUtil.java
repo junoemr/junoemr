@@ -25,8 +25,6 @@
 
 package oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil;
 
-import java.io.Serializable;
-
 import java.util.List;
 import java.util.Vector;
 
@@ -34,7 +32,7 @@ import org.oscarehr.common.dao.ConsultationServiceDao;
 import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.util.SpringUtils;
 
-public class EctConShowAllServicesUtil implements Serializable
+public class EctConShowAllServicesUtil
 {
 
 	private ConsultationServiceDao consultationServiceDao = (ConsultationServiceDao)SpringUtils.getBean("consultationServiceDao");
