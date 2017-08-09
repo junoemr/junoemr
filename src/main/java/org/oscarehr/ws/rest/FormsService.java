@@ -33,12 +33,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+//import java.util.Set;
+//
+//import javax.validation.ConstraintViolation;
+//import javax.validation.Validation;
+//import javax.validation.Validator;
+//import javax.validation.ValidatorFactory;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -82,6 +82,9 @@ import org.oscarehr.ws.rest.to.model.MenuTo1;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;
 import org.oscarehr.ws.rest.to.model.SummaryTo1;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import oscar.eform.EFormExportZip;
@@ -373,58 +376,60 @@ public class FormsService extends AbstractServiceImpl {
 	@Path("/saveEForm")
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
-	public AbstractSearchResponse<String> saveEForm(String jsonString) {
+	public ResponseEntity<EFormTo1> saveEForm(String jsonString) {
+
+		ResponseEntity<EFormTo1> responseEntity;
+		HttpHeaders responseHeaders = new HttpHeaders();
+
 		try {
-			AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
-			JSONArray jsonArray = JSONArray.fromObject(jsonString);
+			JSONObject jsonObject = JSONObject.fromObject(jsonString);
+
 			List<String> errors = new ArrayList<String>();
-			
-			List<EForm> eformList = new ArrayList<EForm>();
 
-			// retrieve or create all eforms. In theory json could have multiple eforms
-			for (int i = 0; i < jsonArray.size(); i++) {
-				JSONObject eformJson = jsonArray.getJSONObject(i);
+			Integer fid = jsonObject.optInt("fid");
+			String formName = jsonObject.getString("formName");
+			String formSubject = jsonObject.optString("formSubject", null);
+			String formHtml = jsonObject.getString("formHtml");
 
-				Integer fid = eformJson.getInt("fid");
-				String formName = eformJson.getString("formName");
-				String formSubject = eformJson.getString("formSubject");
-				String formHtml = eformJson.getString("formHtml");
+			String roleType = jsonObject.optString("roleType", null);
+			Boolean showLatestFormOnly = jsonObject.optBoolean("showLatestFormOnly", false);
+			Boolean patientIndependant = jsonObject.optBoolean("patientIndependant", false);
 
-				String roleType = eformJson.getString("roleType");
-				Boolean showLatestFormOnly = eformJson.getBoolean("showLatestFormOnly");
-				Boolean patientIndependant = eformJson.getBoolean("patientIndependant");
-
-				EForm eform;
-				// try to update an existing eform
-				if (fid != null && fid > 0) {
-					eform = eFormDao.findById(fid);
-					if (eform == null) {
-						throw new InvalidArgumentException("Attempt to update eform with non-existant fid(" + fid + ")");
-					}
-					Date now = new Date();
-					eform.setFormDate(now);
-					eform.setFormTime(now);
+			EForm eform;
+			// try to update an existing eform
+			if (fid != null && fid > 0) {
+				eform = eFormDao.findById(fid);
+				if (eform == null) {
+					throw new InvalidArgumentException("Attempt to update eform with non-existant fid(" + fid + ")");
 				}
-				// new eform
-				else {
-					eform = new EForm();
-					String creatorId = getLoggedInInfo().getLoggedInProviderNo();
-					eform.setCreator(creatorId);
-				}
-
-				eform.setFormName(formName);
-				eform.setSubject(formSubject);
-				eform.setFormHtml(formHtml);
-				eform.setCurrent(true);
-				eform.setShowLatestFormOnly(showLatestFormOnly);
-				eform.setPatientIndependent(patientIndependant);
-				eform.setRoleType(roleType);
-				
-				eformList.add(eform);
+				Date now = new Date();
+				eform.setFormDate(now);
+				eform.setFormTime(now);
 			}
+			// new eform
+			else {
+				EForm nameMatch = eFormDao.findByName(formName);
+				if(nameMatch != null) {
+					logger.warn("EForm Name Already in Use. Save Aborted");
+					errors.add("EForm Name Already in Use");
+					responseHeaders.add("error","EForm Name Already in Use");
+				}
+
+				eform = new EForm();
+				String creatorId = getLoggedInInfo().getLoggedInProviderNo();
+				eform.setCreator(creatorId);
+			}
+
+			eform.setFormName(formName);
+			eform.setSubject(formSubject);
+			eform.setFormHtml(formHtml);
+			eform.setCurrent(true);
+			eform.setShowLatestFormOnly(showLatestFormOnly);
+			eform.setPatientIndependent(patientIndependant);
+			eform.setRoleType(roleType);
 			
 			//validate eform objects before saving
-			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+			/*ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 			Validator validator = factory.getValidator();
 			
 			for(EForm eform : eformList) {
@@ -432,26 +437,30 @@ public class FormsService extends AbstractServiceImpl {
 				for(ConstraintViolation<EForm> violation : formErrors) {
 					errors.add(eform.getFormName() + ": " + violation.getMessage());
 				}
-			}
-			
+			}*/
+
 			// only save if no errors encountered
 			if(errors.isEmpty()) {
-				for(EForm eform : eformList) {
-					if(eform.getId() != null) {
-						eFormDao.merge(eform);
-					}
-					else {
-						eFormDao.persist(eform);
-					}
+				if(eform.getId() != null) {
+					eFormDao.merge(eform);
 				}
+				else {
+					eFormDao.persist(eform);
+				}
+
+				EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eform);
+				responseEntity = new ResponseEntity<EFormTo1>(transferObj, responseHeaders, HttpStatus.OK);
 			}
-			
-			response.setContent(errors);
-			return response;
+			else {
+				responseEntity = new ResponseEntity<EFormTo1>(responseHeaders, HttpStatus.BAD_REQUEST);
+			}
+
 		}
 		catch (Exception e) {
-			MiscUtils.getLogger().error("Error saving eform - " + e);
-			return null;
+			logger.error("Error saving eform - " + e);
+
+			responseEntity = new ResponseEntity<EFormTo1>(responseHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+		return responseEntity;
 	}
 }

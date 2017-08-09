@@ -463,6 +463,9 @@
 		var CONFIRM_PAGE_REMOVE_MESSAGE = "You are about the remove a page from the eform. " +
 			"This will delete any work on the page and cannot be undone. Are you sure you want to delete the page?";
 
+		var OSCAR_SAVE_MESSAGE_NEW = "Save As New Eform";
+		var OSCAR_SAVE_MESSAGE_UPDATE = "Update Eform";
+
 		// make sure .page_container css matches this when modifying
 		var eFormPageWidthPortrait = 850;//850
 		var eFormPageHeightPortrait = 1100;//1100
@@ -513,6 +516,9 @@
 		var eFormPageHeight = eFormPageHeightPortrait;
 		var enableElementHighlights = false;
 		var dragAndDropEnabled = false;
+
+		// stores the current eform id. 0 if new eform.
+		var eFormFid = 0;
 
 		/** oscar db tags hardcoded for now. list update date: 2016-10-13 */
 		var oscarDatabaseTags = ["today", "appt_date", "appt_start_time", "appt_end_time", "next_appt_date",
@@ -745,11 +751,34 @@
 			var name = stripSpecialChars(eformName).replace(/\s/g, "_") + '.html';
 			return download(generate_eform_source_html(false, include_fax), name, 'text/html');
 		}
+		/** Save the eform html as a new eform */
 		function saveToOscarEforms(include_fax) {
-			var name = stripSpecialChars(eformName).replace(/\s/g, "_") + '.html';
 			var eformCode = generate_eform_source_html(false, include_fax);
-			
-			
+
+			$.ajax
+                ({
+                    type: "POST",
+                    url: '<%= request.getContextPath() %>/ws/rs/forms/saveEForm',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    async: false,
+                    data: JSON.stringify({ "fid": eFormFid, "formName": eformName, "formHtml" : eformCode }),
+                    success: function (data) {
+                        console.info(data);
+                        var statusCode = data.statusCode;
+						if(statusCode === "OK") {
+							alert("EForm Save Successful!");
+							setEformId(data.body.id);
+						}
+						else {
+							alert("Error: " + data.headers.error);
+						}
+                    },
+                    failure: function(data) {
+                        console.error(data);
+                        alert("EForm save failure!");
+                    }
+                })
 		}
 
 		/** make the given element draggable */
@@ -1356,6 +1385,18 @@
 				$wrapper.width(maxWidth);
 			}
 		}
+		function setEformId(id) {
+			var asInt = parseInt(id);
+			var $saveBtn = $("#saveToOscarButton")
+			if(Number.isInteger(asInt) && asInt > 0) {
+				eFormFid = asInt;
+				$saveBtn.button('option', 'label', OSCAR_SAVE_MESSAGE_UPDATE);
+			}
+			else {
+				eFormFid = 0;
+				$saveBtn.button('option', 'label', OSCAR_SAVE_MESSAGE_NEW);
+			}
+		}
 		function setPageOrientation(newIndex) {
 
 			var $custWidth = $("#gen-setPageWidth");
@@ -1870,12 +1911,11 @@
 			// button for saving directly to oscar eforms
 			if(!runStandaloneVersion) {
 				$element.append($('<button>', {
-					id: "saveToOscar",
-					text: "Save To Oscar Eforms",
+					id: "saveToOscarButton",
+					text: OSCAR_SAVE_MESSAGE_NEW,
 					click: function (event) {
 						saveToOscarEforms($toggleFaxControls.is(':checked'));
 						event.preventDefault();
-						alert("Coming Soon");
 					}
 				}).button({icon: "ui-icon-disk"}));
 			}
