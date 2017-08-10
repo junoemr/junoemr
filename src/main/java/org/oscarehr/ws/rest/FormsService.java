@@ -24,6 +24,7 @@
 package org.oscarehr.ws.rest;
 
 
+import java.io.File;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -87,7 +88,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import oscar.OscarProperties;
 import oscar.eform.EFormExportZip;
+import oscar.eform.actions.DisplayImageAction;
 import oscar.oscarEncounter.data.EctFormData;
 import oscar.oscarProvider.data.ProviderMyOscarIdData;
 
@@ -370,7 +373,7 @@ public class FormsService extends AbstractServiceImpl {
 	/**
 	 * Saves an eform. Performs an update if the eform has an fid, otherwise it will save a new eform.
 	 * @param jsonString
-	 * @return AbstractSearchResponse
+	 * @return ResponseEntity with data from the eform saved. response does not include html
 	 */
 	@POST
 	@Path("/saveEForm")
@@ -386,7 +389,7 @@ public class FormsService extends AbstractServiceImpl {
 
 			List<String> errors = new ArrayList<String>();
 
-			Integer fid = jsonObject.optInt("fid");
+			Integer fid = jsonObject.optInt("id");
 			String formName = jsonObject.getString("formName");
 			String formSubject = jsonObject.optString("formSubject", null);
 			String formHtml = jsonObject.getString("formHtml");
@@ -460,6 +463,102 @@ public class FormsService extends AbstractServiceImpl {
 			logger.error("Error saving eform - " + e);
 
 			responseEntity = new ResponseEntity<EFormTo1>(responseHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return responseEntity;
+	}
+
+	/**
+	 * retrieves an eform with the given id.
+	 * @param jsonString object containing id:value
+	 * @return ResponseEntity containg data for he eform. includes full html
+	 */
+	@POST
+	@Path("/loadEForm")
+	@Consumes("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ResponseEntity<EFormTo1> loadEForm(String jsonString) {
+
+		ResponseEntity<EFormTo1> responseEntity;
+		HttpHeaders responseHeaders = new HttpHeaders();
+
+		try {
+			JSONObject jsonObject = JSONObject.fromObject(jsonString);
+			Integer fid = jsonObject.optInt("id");
+
+			EForm eform = null;
+			// try to update an existing eform
+			if (fid != null && fid > 0) {
+				eform = eFormDao.findById(fid);
+			}
+			else {
+				responseHeaders.add("error","Invalid Id: " + fid);
+			}
+
+			if(eform != null) {
+				EFormTo1 transferObj = new EFormConverter(false).getAsTransferObject(getLoggedInInfo(), eform);
+				responseEntity = new ResponseEntity<EFormTo1>(transferObj, responseHeaders, HttpStatus.OK);
+			}
+			else {
+				responseEntity = new ResponseEntity<EFormTo1>(responseHeaders, HttpStatus.BAD_REQUEST);
+			}
+
+		}
+		catch (Exception e) {
+			logger.error("Error saving eform - " + e);
+
+			responseEntity = new ResponseEntity<EFormTo1>(responseHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return responseEntity;
+	}
+	/**
+	 * retrieves a list of all eforms better than the getAllEFormNames method
+	 * eform responses will not contain the eform html
+	 * @return ResponseEntity
+	 */
+	@GET
+	@Path("/getEFormList")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ResponseEntity<List<EFormTo1>> getEFormList() {
+
+		ResponseEntity<List<EFormTo1>> responseEntity;
+		HttpHeaders responseHeaders = new HttpHeaders();
+
+		try {
+			List<EFormTo1> allEforms = new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(), formsManager.findByStatus(getLoggedInInfo(), true, EFormSortOrder.NAME));
+			responseEntity = new ResponseEntity<List<EFormTo1>>(allEforms, responseHeaders, HttpStatus.OK);
+		}
+		catch (Exception e) {
+			logger.error("Error saving eform - " + e);
+
+			responseEntity = new ResponseEntity<List<EFormTo1>>(responseHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return responseEntity;
+	}
+
+	/**
+	 * retrieves a list of all eform image names as strings
+	 * @return ResponseEntity
+	 */
+	@GET
+	@Path("/getEFormImageList")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ResponseEntity<List<String>> getEFormImageList() {
+
+		ResponseEntity<List<String>> responseEntity;
+		HttpHeaders responseHeaders = new HttpHeaders();
+
+		try {
+
+			String imageHomeDir = OscarProperties.getInstance().getProperty("eform_image");
+			File directory = new File(imageHomeDir);
+
+			List<String> imagesNames = DisplayImageAction.getFiles(directory, ".*\\.(jpg|jpeg|png|gif)$", null);
+			responseEntity = new ResponseEntity<List<String>>(imagesNames, responseHeaders, HttpStatus.OK);
+		}
+		catch (Exception e) {
+			logger.error("Error saving eform - " + e);
+
+			responseEntity = new ResponseEntity<List<String>>(responseHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return responseEntity;
 	}

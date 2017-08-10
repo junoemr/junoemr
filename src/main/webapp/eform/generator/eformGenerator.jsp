@@ -502,6 +502,7 @@
 		var TEXT_INPUT_SELECTOR = ":input[type=text]:not(.xBox), textarea";
 		var CHEK_INPUT_SELECTOR = ":input[type=checkbox]";
 		var GENDER_PRECHECK_CLASS_SELECTOR = "[class*=gender_precheck_]";
+		var OSCAR_DISPLAY_IMG_SRC = "<%= request.getContextPath() %>/eform/displayImage.do?imagefile=";
 
 		/** GLOBAL VARIABLES */
 		var eformName = "Untitled eForm";
@@ -587,7 +588,17 @@
 			});
 		}
 		function addOscarImagePath(string) {
-			return string.replace(/(img.*?)src\s*=\s*(\"|\')(?!data:image\/png;base64,)/gi, "$1src=$2\${oscar_image_path}");
+			if(!runStandaloneVersion) {
+				// remove the oscar loading path
+				// have to do escape for regex because of changing context path
+				var regexFixed = OSCAR_DISPLAY_IMG_SRC.replace(/\//g, "\\/").replace(/\./g, "\\.").replace(/\?/g, "\\?");
+				console.info(regexFixed, new RegExp(regexFixed, "g"));
+				string = string.replace(new RegExp(regexFixed, "g"), "\${oscar_image_path}");
+			}
+			else {
+				string = string.replace(/(img.*?)src\s*=\s*(\"|\')(?!data:image\/png;base64,)/gi, "$1src=$2\${oscar_image_path}");
+			}
+			return string;
 		}
 		function removeOscarImagePath(string) {
 			return string.replace(/\$(%7B|\{)oscar_image_path(%7D|\})/gi, '');
@@ -762,7 +773,7 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
                     async: false,
-                    data: JSON.stringify({ "fid": eFormFid, "formName": eformName, "formHtml" : eformCode }),
+                    data: JSON.stringify({ "id": eFormFid, "formName": eformName, "formHtml" : eformCode }),
                     success: function (data) {
                         console.info(data);
                         var statusCode = data.statusCode;
@@ -778,7 +789,7 @@
                         console.error(data);
                         alert("EForm save failure!");
                     }
-                })
+                });
 		}
 
 		/** make the given element draggable */
@@ -1198,6 +1209,34 @@
 		}
 
 		function init_form_load($element) {
+
+		if(!runStandaloneVersion) {
+			$.ajax
+                ({
+                    type: "GET",
+                    url: '<%= request.getContextPath() %>/ws/rs/forms/getEFormList',
+                    dataType: 'json',
+                    async: false,
+                    success: function (data) {
+
+                        console.info(data);
+                        var statusCode = data.statusCode;
+                        if(statusCode === "OK") {
+	                        var options = [];
+	                        for(var i=0; i<data.body.length; i++) {
+	                            options.push(data.body[i].formName);
+	                        }
+
+	                        var $eFormSelect = addSelectMenu($element, "eFormSelect", "Select EForm", options);
+	                        $eFormSelect.selectmenu();
+                        }
+                    },
+                    failure: function(data) {
+                        console.error(data);
+                    }
+                });
+		}
+		else {
 			$element.append($("<input>", {
 					type: "file",
 					accept: ".html"
@@ -1282,6 +1321,7 @@
 			).append($("<div>").append(
 				$("<label>").text("Note: any custom scripts or styles in the loaded form will not be preserved")
 			));
+			}
 		}
 		function addBackgroundImage($parentElement, srcString) {
 			var id = getUniqueId(baseBackImageName);
@@ -1298,36 +1338,38 @@
 
 			var $img = $pageDiv.children("img");
 			var $root = $("<div>", {class: "page_control_item"});
-			var $fileSelector = $("<input>", {
-				type: "file",
-				accept: ".png"
-			}).change(function () {
-				if (this.files && this.files[0]) {
-					var reader = new FileReader();
-					var $fileInput = $(this);
-					reader.onload = function (e) {
-						var src = $fileInput.val().replace(/C:\\fakepath\\/i, '');
-						if(!runStandaloneVersion) {
-							src = "<%= request.getContextPath() %>/eform/displayImage.do?imagefile=" + src;
-						}
-						if ($img == null || $img.length <= 0) {
-							$img = addBackgroundImage($pageDiv, src);
-						}
-						else {
-							$img.attr('src', src);
-						}
-						$img.on('load', function () {
-							var css;
-							var ratio = $(this).width() / $(this).height();
-							var pratio = (eFormPageWidth / eFormPageHeight);
-							if (ratio < pratio) css = {width: 'auto', height: '100%'};
-							else css = {width: '100%', height: 'auto'};
-							$(this).css(css);
-						});
-					};
-					reader.readAsDataURL(this.files[0]);
-				}
-			});
+
+			var $fileSelector;
+
+			if(runStandaloneVersion) {
+				$fileSelector = $("<input>", {
+					type: "file",
+					accept: ".png"
+				}).change(function () {
+					if (this.files && this.files[0]) {
+						var reader = new FileReader();
+						var $fileInput = $(this);
+						reader.onload = function (e) {
+							var src = $fileInput.val().replace(/C:\\fakepath\\/i, '');
+							if ($img == null || $img.length <= 0) {
+								$img = addBackgroundImage($pageDiv, src);
+							}
+							else {
+								$img.attr('src', src);
+							}
+							$img.on('load', function () {
+								var css;
+								var ratio = $(this).width() / $(this).height();
+								var pratio = (eFormPageWidth / eFormPageHeight);
+								if (ratio < pratio) css = {width: 'auto', height: '100%'};
+								else css = {width: '100%', height: 'auto'};
+								$(this).css(css);
+							});
+						};
+						reader.readAsDataURL(this.files[0]);
+					}
+				});
+			}
 
 			var $clearButton = $("<button>", {
 				text: "Clear"
@@ -1368,7 +1410,64 @@
 				event.preventDefault();
 			});
 
-			$root.append($removePageButton).append($clearButton).append($fileSelector);
+			$root.append($removePageButton).append($clearButton)
+			if(!runStandaloneVersion) {
+				$fileSelector = $("<span>", {
+					text: "Failed To Load Image List"
+				});
+
+                $.ajax
+                    ({
+                        type: "GET",
+                        url: '<%= request.getContextPath() %>/ws/rs/forms/getEFormImageList',
+                        //contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        async: false,
+                        //data: JSON.stringify({ "id": eFormFid, "formName": eformName, "formHtml" : eformCode }),
+                        success: function (data) {
+
+                            console.info(data);
+                            var statusCode = data.statusCode;
+                            if(statusCode === "OK") {
+	                            var options = [""];
+	                            for(var i=0; i<data.body.length; i++) {
+	                                options.push(data.body[i]);
+	                            }
+
+	                            $fileSelector = addSelectMenu($root, "imageSelect", "Select Background Image", options);
+	                            $fileSelector.selectmenu();
+
+	                            $fileSelector.on("selectmenuchange", ( function (event, data) {
+	                                var src = OSCAR_DISPLAY_IMG_SRC + $fileSelector.val();
+									if ($img == null || $img.length <= 0) {
+										$img = addBackgroundImage($pageDiv, src);
+									}
+									else {
+										$img.attr('src', src);
+									}
+									$img.on('load', function () {
+										var css;
+										var ratio = $(this).width() / $(this).height();
+										var pratio = (eFormPageWidth / eFormPageHeight);
+										if (ratio < pratio) css = {width: 'auto', height: '100%'};
+										else css = {width: '100%', height: 'auto'};
+										$(this).css(css);
+									});
+
+                                }));
+                            }
+                            else {
+                                $root.append($fileSelector);
+                            }
+                        },
+                        failure: function(data) {
+                            console.error(data);
+                        }
+                    });
+            }
+			else {
+				$root.append($fileSelector);
+			}
 			return $root;
 		}
 		function setPageDimensions(newWidth, newHeight) {

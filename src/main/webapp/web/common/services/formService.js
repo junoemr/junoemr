@@ -213,6 +213,57 @@ angular.module("Common.Services").service("formService", [
 
 			return deferred.promise;
 		};
+		service.loadEForm = function loadEForm()
+        {
+            var deferred = $q.defer();
+            $http.get(service.apiPath + '/loadEForm',
+                Juno.Common.ServiceHelper.configHeaders()).then(
+                function success(results)
+                {
+                    deferred.resolve(results.data);
+                },
+                function error(errors)
+                {
+                    console.log("formService::loadEForm error", errors);
+                    deferred.reject("An error occurred while loading an EForm");
+                });
+
+            return deferred.promise;
+        };
+        service.getEFormList = function getEFormList()
+        {
+            var deferred = $q.defer();
+            $http.get(service.apiPath + '/getEFormList',
+                Juno.Common.ServiceHelper.configHeaders()).then(
+                function success(results)
+                {
+                    deferred.resolve(results.data);
+                },
+                function error(errors)
+                {
+                    console.log("formService::getEFormList error", errors);
+                    deferred.reject("An error occurred while retrieving the eForm List");
+                });
+
+            return deferred.promise;
+        };
+        service.getEFormImageList = function getEFormImageList()
+        {
+            var deferred = $q.defer();
+            $http.get(service.apiPath + '/getEFormImageList',
+                Juno.Common.ServiceHelper.configHeaders()).then(
+                function success(results)
+                {
+                    deferred.resolve(results.data);
+                },
+                function error(errors)
+                {
+                    console.log("formService::getEFormImageList error", errors);
+                    deferred.reject("An error occurred while retrieving the eForm Image List");
+                });
+
+            return deferred.promise;
+        };
 		
 
 		return service;
