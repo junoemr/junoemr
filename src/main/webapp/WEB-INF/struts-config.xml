@@ -1182,6 +1182,10 @@
 			<forward name="failESend" path="/oscarEncounter/ViewRequest.do" />
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" />
 		</action>
+
+		<action input="/oscarEncounter/oscarConsultationRequest/displayAttachedFiles.jsp" path="/oscarEncounter/displayAttached" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationGetAttachedAction">
+			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/displayAttachedFiles.jsp" />
+		</action>
 		
 		<action path="/oscarEncounter/myoscar/measurements_*" name="EctMyOscarFilterForm" scope="request" type="oscar.oscarEncounter.data.myoscar.EctMyOscarFilterAction">
 			<forward name="success" path="/oscarEncounter/myoscar/{1}.jsp" />
