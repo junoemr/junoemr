@@ -130,7 +130,7 @@ public class Hl7textResultsData {
 					String olis_status = h.getOBXResultStatus(i, j);
 					String abnormal = h.getOBXAbnormalFlag(i,j);
 
-					if ( datetime == null || datetime.equals("") ) {
+					if ( datetime == null || datetime.trim().equals("") ) {
 						datetime = dateEntered;
 					}
 
