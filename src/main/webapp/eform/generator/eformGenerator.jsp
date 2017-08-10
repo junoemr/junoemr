@@ -503,6 +503,7 @@
 		var CHEK_INPUT_SELECTOR = ":input[type=checkbox]";
 		var GENDER_PRECHECK_CLASS_SELECTOR = "[class*=gender_precheck_]";
 		var OSCAR_DISPLAY_IMG_SRC = "<%= request.getContextPath() %>/eform/displayImage.do?imagefile=";
+		var OSCAR_API_URL = "<%= request.getContextPath() %>/ws/rs/forms/";
 
 		/** GLOBAL VARIABLES */
 		var eformName = "Untitled eForm";
@@ -521,6 +522,8 @@
 		// stores the current eform id. 0 if new eform.
 		var eFormFid = 0;
 
+		// store the list of images on the oscar server so only one load is needed.
+		var eFormImageList = [];
 		/** oscar db tags hardcoded for now. list update date: 2016-10-13 */
 		var oscarDatabaseTags = ["today", "appt_date", "appt_start_time", "appt_end_time", "next_appt_date",
 			"next_appt_time", "nextf_appt_date", "current_form_id", "current_form_data_id", "current_user",
@@ -592,7 +595,6 @@
 				// remove the oscar loading path
 				// have to do escape for regex because of changing context path
 				var regexFixed = OSCAR_DISPLAY_IMG_SRC.replace(/\//g, "\\/").replace(/\./g, "\\.").replace(/\?/g, "\\?");
-				console.info(regexFixed, new RegExp(regexFixed, "g"));
 				string = string.replace(new RegExp(regexFixed, "g"), "\${oscar_image_path}");
 			}
 			else {
@@ -601,7 +603,14 @@
 			return string;
 		}
 		function removeOscarImagePath(string) {
-			return string.replace(/\$(%7B|\{)oscar_image_path(%7D|\})/gi, '');
+			if(!runStandaloneVersion) {
+				var regexFixed = OSCAR_DISPLAY_IMG_SRC.replace(/\//g, "\\/").replace(/\./g, "\\.").replace(/\?/g, "\\?");
+				console.info(OSCAR_DISPLAY_IMG_SRC, regexFixed);
+				return string.replace(/\\$(%7B|\{)oscar_image_path(%7D|\})/gi, OSCAR_DISPLAY_IMG_SRC);
+			}
+			else {
+				return string.replace(/\$(%7B|\{)oscar_image_path(%7D|\})/gi, '');
+			}
 		}
 		/** add or remove the current element from the DOM if it doesn't match the given state */
 		function toggleElement($root, $element, state) {
@@ -769,7 +778,7 @@
 			$.ajax
                 ({
                     type: "POST",
-                    url: '<%= request.getContextPath() %>/ws/rs/forms/saveEForm',
+                    url: OSCAR_API_URL + 'saveEForm',
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
                     async: false,
@@ -993,6 +1002,7 @@
 		/** generate a unique id for new input elements. */
 		function getUniqueId(baseId) {
 			var i = 1;
+			// if you max this out your eForm is too big anyways
 			while (i < 99999) {
 				var returnId = baseId + i;
 
@@ -1104,12 +1114,16 @@
 			});
 		}
 		/** set up a drop down menu with the items from the options Array */
-		function addSelectMenu($rootElement, menuId, label, optionsArr) {
+		function addSelectMenu($rootElement, menuId, label, optionsArr, valuesArr) {
 			var $select = $("<select>", {
 				id: menuId
 			});
 			for (var i = 0; i < optionsArr.length; i++) {
-				$select.append($("<option>").html(optionsArr[i]));
+				$option = $("<option>").html(optionsArr[i]);
+				if(valuesArr) {
+					$option.attr('value',valuesArr[i])
+				}
+				$select.append($option);
 			}
 			$rootElement.append($("<label>", {
 				for: menuId,
@@ -1208,27 +1222,130 @@
 			}));
 		}
 
+		function loadEformData(data) {
+			//TODO find a way to merge functions and css stylesheets
+			// import custom style elements
+			/*var imported_style = $($.parseHTML(data)).filter('style').text();
+			 $("#eform_style").html($("#eform_style").html() + imported_style);*/
+			// import custom script elements
+			/*var imported_script = $($.parseHTML(data)).filter('script').text();
+			 $("#eform_script").html($("#eform_script").html() + imported_script);*/
+
+			// remove oscar image paths in incoming data
+			data = removeOscarImagePath(data);
+			// import the eform name
+			eformName = $($.parseHTML(data)).filter('title').text();
+			$("#eformNameInput").val(eformName);
+
+			var $div = $(data);
+			var imported_form = $div.find("#inputForm").html();
+
+			var $inputForm = $("#inputForm");
+			$inputForm.html(imported_form);
+
+			// TODO -- combine with generic makeDraggables and addNewPage
+			var $input_elements = $(".input_elements");
+			var $pages = $(".page_container");
+			$pages.droppable({
+				accept: ".gen-layer2, .gen-layer3",
+				drop: function (event, ui) {
+					dropOnForm(ui, $(this).find(".input_elements"));
+				}
+			});
+			$("#pagesControlGroup").find(".page_control_item").remove();
+			$pages.each(function () { //add the grid to loaded pages
+				$("#pagesControlGroup").append(createPageControlDiv($(this)));
+				addSnapGuidesTo($(this));
+			});
+			$pages.find(XBOX_INPUT_SELECTOR).parent().append(createInputOverrideDiv());
+			$pages.find(CHEK_INPUT_SELECTOR).parent().append(createInputOverrideDiv());
+			$pages.find(TEXT_INPUT_SELECTOR).parent().append(createInputOverrideDiv());
+			$pages.find(".signature_data").parent().append(createInputOverrideDiv());
+			$pages.find(".signaturePad").each(function () {
+				makeSignatureCanvas($(this));
+			});
+
+			setNoborderStyle($pages.find(XBOX_INPUT_SELECTOR), xboxBordersVisibleState);
+			setNoborderStyle($pages.find(TEXT_INPUT_SELECTOR), textBordersVisibleState);
+
+			undestroy_gen_widgets($input_elements);
+			dragAndDropEnable(false);
+
+			var pageW = eFormPageWidth;
+			var pageH = eFormPageHeight;
+			$pages.each(function () {
+				pageW = $(this).width();
+				pageH = $(this).height();
+			});
+			$("#gen-setPageWidth").val(pageW);
+			$("#gen-setPageHeight").val(pageH);
+			//console.info(pageW, pageH);
+			var index = 2;
+			if (pageW === eFormPageWidthPortrait && pageH === eFormPageHeightPortrait) {
+				index = 0;
+			}
+			else if (pageW === eFormPageWidthLandscape && pageH === eFormPageHeightLandscape) {
+				index = 1;
+			}
+			setPageOrientation(index);
+			return true;
+		}
+
 		function init_form_load($element) {
 
 		if(!runStandaloneVersion) {
 			$.ajax
                 ({
+                    // populate the eform list from the server
                     type: "GET",
-                    url: '<%= request.getContextPath() %>/ws/rs/forms/getEFormList',
+                    url: OSCAR_API_URL + 'getEFormList',
                     dataType: 'json',
-                    async: false,
+                    async: true,
                     success: function (data) {
 
-                        console.info(data);
                         var statusCode = data.statusCode;
                         if(statusCode === "OK") {
 	                        var options = [];
+	                        var values = [];
+	                        var selectedId = 0;
 	                        for(var i=0; i<data.body.length; i++) {
 	                            options.push(data.body[i].formName);
+	                            values.push(data.body[i].id);
 	                        }
 
-	                        var $eFormSelect = addSelectMenu($element, "eFormSelect", "Select EForm", options);
+							var $root = $("<div>", {class: "page_control_item"}).appendTo($element);
+	                        var $eFormSelect = addSelectMenu($root, "eFormSelect", "Select EForm", options, values);
 	                        $eFormSelect.selectmenu();
+	                        var $loadButton = $("<button>", {
+                                text: "Load Selected EForm"
+                            }).button().click(function (event) {
+                                if(selectedId > 0) {
+                                    // load the selected eform from the html by id
+                                    $.ajax
+                                        ({
+						                    type: "POST",
+						                    url: OSCAR_API_URL + 'loadEForm',
+						                    contentType: "application/json; charset=utf-8",
+						                    dataType: 'json',
+						                    async: false,
+						                    data: JSON.stringify({ "id": selectedId}),
+						                    success: function (data) {
+						                        var statusCode = data.statusCode;
+                                                if(statusCode === "OK") {
+							                        // setup the generator with the existing eform data
+							                        loadEformData(data.body.formHtml);
+							                        setEformId(data.body.id);
+							                        console.info("EForm Loaded from Server");
+						                        }
+						                    }
+										});
+								}
+                                event.preventDefault();
+                            }).appendTo($root);
+
+	                        $eFormSelect.on("selectmenuchange", ( function (event, data) {
+	                            selectedId = data.item.value;
+	                        }));
                         }
                     },
                     failure: function(data) {
@@ -1246,73 +1363,8 @@
 							var reader = new FileReader();
 							reader.onload = function (e) {
 								$.get(e.target.result, function (data) {
-
-									//TODO find a way to merge functions and css stylesheets
-									// import custom style elements
-									/*var imported_style = $($.parseHTML(data)).filter('style').text();
-									 $("#eform_style").html($("#eform_style").html() + imported_style);*/
-									// import custom script elements
-									/*var imported_script = $($.parseHTML(data)).filter('script').text();
-									 $("#eform_script").html($("#eform_script").html() + imported_script);*/
-
-									// remove oscar image paths in incoming data
-									data = removeOscarImagePath(data);
-									// import the eform name
-									eformName = $($.parseHTML(data)).filter('title').text();
-									$("#eformNameInput").val(eformName);
-
-									var $div = $(data);
-									var imported_form = $div.find("#inputForm").html();
-
-									var $inputForm = $("#inputForm");
-									$inputForm.html(imported_form);
-
-									// TODO -- combine with generic makeDraggables and addNewPage
-									var $input_elements = $(".input_elements");
-									var $pages = $(".page_container");
-									$pages.droppable({
-										accept: ".gen-layer2, .gen-layer3",
-										drop: function (event, ui) {
-											dropOnForm(ui, $(this).find(".input_elements"));
-										}
-									});
-									$("#pagesControlGroup").find(".page_control_item").remove();
-									$pages.each(function () { //add the grid to loaded pages
-										$("#pagesControlGroup").append(createPageControlDiv($(this)));
-										addSnapGuidesTo($(this));
-									});
-									$pages.find(XBOX_INPUT_SELECTOR).parent().append(createInputOverrideDiv());
-									$pages.find(CHEK_INPUT_SELECTOR).parent().append(createInputOverrideDiv());
-									$pages.find(TEXT_INPUT_SELECTOR).parent().append(createInputOverrideDiv());
-									$pages.find(".signature_data").parent().append(createInputOverrideDiv());
-									$pages.find(".signaturePad").each(function () {
-										makeSignatureCanvas($(this));
-									});
-
-									setNoborderStyle($pages.find(XBOX_INPUT_SELECTOR), xboxBordersVisibleState);
-									setNoborderStyle($pages.find(TEXT_INPUT_SELECTOR), textBordersVisibleState);
-
-									undestroy_gen_widgets($input_elements);
-									dragAndDropEnable(false);
-
-									var pageW = eFormPageWidth;
-									var pageH = eFormPageHeight;
-									$pages.each(function () {
-										pageW = $(this).width();
-										pageH = $(this).height();
-									});
-									$("#gen-setPageWidth").val(pageW);
-									$("#gen-setPageHeight").val(pageH);
-									//console.info(pageW, pageH);
-									var index = 2;
-									if (pageW === eFormPageWidthPortrait && pageH === eFormPageHeightPortrait) {
-										index = 0;
-									}
-									else if (pageW === eFormPageWidthLandscape && pageH === eFormPageHeightLandscape) {
-										index = 1;
-									}
-									setPageOrientation(index);
-									console.info("E-form Loaded from File.");
+									loadEformData(data);
+									console.info("EForm Loaded from File.");
 								})
 							};
 							reader.readAsDataURL(this.files[0]);
@@ -1412,58 +1464,34 @@
 
 			$root.append($removePageButton).append($clearButton)
 			if(!runStandaloneVersion) {
-				$fileSelector = $("<span>", {
-					text: "Failed To Load Image List"
-				});
 
-                $.ajax
-                    ({
-                        type: "GET",
-                        url: '<%= request.getContextPath() %>/ws/rs/forms/getEFormImageList',
-                        //contentType: "application/json; charset=utf-8",
-                        dataType: 'json',
-                        async: false,
-                        //data: JSON.stringify({ "id": eFormFid, "formName": eformName, "formHtml" : eformCode }),
-                        success: function (data) {
+                var options = [""];
+                for(var i=0; i<eFormImageList.length; i++) {
+                    options.push(eFormImageList[i]);
+                }
 
-                            console.info(data);
-                            var statusCode = data.statusCode;
-                            if(statusCode === "OK") {
-	                            var options = [""];
-	                            for(var i=0; i<data.body.length; i++) {
-	                                options.push(data.body[i]);
-	                            }
+                $fileSelector = addSelectMenu($root, "imageSelect", "Select Background Image", options);
+                $fileSelector.selectmenu();
 
-	                            $fileSelector = addSelectMenu($root, "imageSelect", "Select Background Image", options);
-	                            $fileSelector.selectmenu();
+                $fileSelector.on("selectmenuchange", ( function (event, data) {
+                    var src = OSCAR_DISPLAY_IMG_SRC + $fileSelector.val();
+                    if($fileSelector.val().length < 1) {return;}
+					if ($img == null || $img.length <= 0) {
+						$img = addBackgroundImage($pageDiv, src);
+					}
+					else {
+						$img.attr('src', src);
+					}
+					$img.on('load', function () {
+						var css;
+						var ratio = $(this).width() / $(this).height();
+						var pratio = (eFormPageWidth / eFormPageHeight);
+						if (ratio < pratio) css = {width: 'auto', height: '100%'};
+						else css = {width: '100%', height: 'auto'};
+						$(this).css(css);
+					});
 
-	                            $fileSelector.on("selectmenuchange", ( function (event, data) {
-	                                var src = OSCAR_DISPLAY_IMG_SRC + $fileSelector.val();
-									if ($img == null || $img.length <= 0) {
-										$img = addBackgroundImage($pageDiv, src);
-									}
-									else {
-										$img.attr('src', src);
-									}
-									$img.on('load', function () {
-										var css;
-										var ratio = $(this).width() / $(this).height();
-										var pratio = (eFormPageWidth / eFormPageHeight);
-										if (ratio < pratio) css = {width: 'auto', height: '100%'};
-										else css = {width: '100%', height: 'auto'};
-										$(this).css(css);
-									});
-
-                                }));
-                            }
-                            else {
-                                $root.append($fileSelector);
-                            }
-                        },
-                        failure: function(data) {
-                            console.error(data);
-                        }
-                    });
+                }));
             }
 			else {
 				$root.append($fileSelector);
@@ -1532,6 +1560,27 @@
 			$("#gen-orientation").find("input").checkboxradio("refresh");
 		}
 		function init_setup_controls($element) {
+
+			if(!runStandaloneVersion) {
+                $.ajax
+                    ({
+                        type: "GET",
+                        url: OSCAR_API_URL + 'getEFormImageList',
+                        dataType: 'json',
+                        async: false,
+                        success: function (data) {
+                            var statusCode = data.statusCode;
+                            if(statusCode === "OK") {
+                                eFormImageList = data.body;
+                            }
+                        },
+                        failure: function(data) {
+                            console.error(data);
+                        }
+                    });
+            }
+
+
 			var $pagesControlgroup = createFieldset("pagesControlGroup", "Pages");
 			var $addPageButtonControlGroup = createFieldset("addPagesControlGroup", null);
 			var $addPageButton = $("<button>", {
@@ -1822,7 +1871,6 @@
 							console.log(img.width, img.height);
 							addDraggableImage($dragFrame2, getUniqueId(baseImageWidgetName), img.width, img.height, src, "");
 						}
-						//TODO - fix image wid/hei again...
 					};
 					reader.readAsDataURL(this.files[0]);
 
