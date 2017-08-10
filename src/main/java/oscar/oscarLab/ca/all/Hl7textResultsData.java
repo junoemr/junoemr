@@ -50,219 +50,224 @@ import oscar.util.UtilDateUtilities;
 public class Hl7textResultsData {
 
 	
-    private static Logger logger = MiscUtils.getLogger();
-    private static MeasurementsDeletedDao measurementsDeletedDao = (MeasurementsDeletedDao) SpringUtils.getBean("measurementsDeletedDao");
+	private static Logger logger = MiscUtils.getLogger();
+	private static MeasurementsDeletedDao measurementsDeletedDao = (MeasurementsDeletedDao) SpringUtils.getBean("measurementsDeletedDao");
 
-    private Hl7textResultsData() {
-    	// no one should instantiate this
-    }
+	private Hl7textResultsData() {
+		// no one should instantiate this
+	}
 
-    public static void populateMeasurementsTable(String lab_no, String demographic_no){
-    	logger.info("POPULATING HL7 MEASUREMENTS TABLE: lab_no:"+lab_no+" demographic:"+demographic_no); 
-        MessageHandler h = Factory.getHandler(lab_no);
+	public static void populateMeasurementsTable(String lab_no, String demographic_no){
+		logger.info("POPULATING HL7 MEASUREMENTS TABLE: lab_no:"+lab_no+" demographic:"+demographic_no);
+		MessageHandler h = Factory.getHandler(lab_no);
 
-        java.util.Calendar calender = java.util.Calendar.getInstance();
-        String day =  Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
-        String month =  Integer.toString(calender.get(java.util.Calendar.MONTH)+1);
-        String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
-        String hour = Integer.toString(calender.get(java.util.Calendar.HOUR));
-        String min = Integer.toString(calender.get(java.util.Calendar.MINUTE));
-        String second = Integer.toString(calender.get(java.util.Calendar.SECOND));
-        String dateEntered = year+"-"+month+"-"+day+" " + hour + ":" + min + ":" + second + ":";
+		java.util.Calendar calender = java.util.Calendar.getInstance();
+		String day =  Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
+		String month =  Integer.toString(calender.get(java.util.Calendar.MONTH)+1);
+		String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
+		String hour = Integer.toString(calender.get(java.util.Calendar.HOUR));
+		String min = Integer.toString(calender.get(java.util.Calendar.MINUTE));
+		String second = Integer.toString(calender.get(java.util.Calendar.SECOND));
+		String dateEntered = year+"-"+month+"-"+day+" " + hour + ":" + min + ":" + second + ":";
 
-        try{
+		try{
 
-            Connection conn = DbConnectionFilter.getThreadLocalDbConnection();
+			Connection conn = DbConnectionFilter.getThreadLocalDbConnection();
 
-            //Check for other versions of this lab
-            String[] matchingLabs = getMatchingLabs(lab_no).split(",");
-            //if this lab is the latest version delete the measurements from the previous version and insert the new ones
+			//Check for other versions of this lab
+			String[] matchingLabs = getMatchingLabs(lab_no).split(",");
+			//if this lab is the latest version delete the measurements from the previous version and insert the new ones
 
-            int k = 0;
-            while ( k < matchingLabs.length && !matchingLabs[k].equals(lab_no)){
-                k++;
-            }
+			int k = 0;
+			while ( k < matchingLabs.length && !matchingLabs[k].equals(lab_no)){
+				k++;
+			}
 
-            if(k != 0 && !h.getMsgType().equals("GDML")){
-            	MeasurementsDeleted measurementsDeleted;
+			if(k != 0 && !h.getMsgType().equals("GDML")){
+				MeasurementsDeleted measurementsDeleted;
 
-                String sql = "SELECT m.* FROM measurements m LEFT JOIN measurementsExt e ON m.id = measurement_id AND e.keyval='lab_no' WHERE e.val='"+matchingLabs[k-1]+"'";
-                ResultSet rs = DBHandler.GetSQL(sql);
-                while(rs.next()){
-                	measurementsDeleted  = new MeasurementsDeleted();
-                	measurementsDeleted.setType(oscar.Misc.getString(rs, "type"));
-                	measurementsDeleted.setDemographicNo(Integer.valueOf(oscar.Misc.getString(rs, "demographicNo")));
-                	measurementsDeleted.setProviderNo(oscar.Misc.getString(rs, "providerNo"));
-                	measurementsDeleted.setDataField(oscar.Misc.getString(rs, "dataField"));
-                	measurementsDeleted.setMeasuringInstruction(oscar.Misc.getString(rs, "measuringInstruction"));
-                	measurementsDeleted.setComments(oscar.Misc.getString(rs, "comments"));
-                	measurementsDeleted.setDateObserved(UtilDateUtilities.StringToDate(oscar.Misc.getString(rs, "dateObserved"), "yyyy-MM-dd hh:mm:ss"));
-                	measurementsDeleted.setDateEntered(UtilDateUtilities.StringToDate(oscar.Misc.getString(rs, "dateEntered"), "yyyy-MM-dd hh:mm:ss"));
-                	measurementsDeleted.setOriginalId(Integer.valueOf(oscar.Misc.getString(rs, "id")));
-                	measurementsDeletedDao.persist(measurementsDeleted);
+				String sql = "SELECT m.* FROM measurements m LEFT JOIN measurementsExt e ON m.id = measurement_id AND e.keyval='lab_no' WHERE e.val='"+matchingLabs[k-1]+"'";
+				ResultSet rs = DBHandler.GetSQL(sql);
+				while(rs.next()){
+					measurementsDeleted  = new MeasurementsDeleted();
+					measurementsDeleted.setType(oscar.Misc.getString(rs, "type"));
+					measurementsDeleted.setDemographicNo(Integer.valueOf(oscar.Misc.getString(rs, "demographicNo")));
+					measurementsDeleted.setProviderNo(oscar.Misc.getString(rs, "providerNo"));
+					measurementsDeleted.setDataField(oscar.Misc.getString(rs, "dataField"));
+					measurementsDeleted.setMeasuringInstruction(oscar.Misc.getString(rs, "measuringInstruction"));
+					measurementsDeleted.setComments(oscar.Misc.getString(rs, "comments"));
+					measurementsDeleted.setDateObserved(UtilDateUtilities.StringToDate(oscar.Misc.getString(rs, "dateObserved"), "yyyy-MM-dd hh:mm:ss"));
+					measurementsDeleted.setDateEntered(UtilDateUtilities.StringToDate(oscar.Misc.getString(rs, "dateEntered"), "yyyy-MM-dd hh:mm:ss"));
+					measurementsDeleted.setOriginalId(Integer.valueOf(oscar.Misc.getString(rs, "id")));
+					measurementsDeletedDao.persist(measurementsDeleted);
 
-                    sql = "DELETE FROM measurements WHERE id='"+oscar.Misc.getString(rs, "id")+"'";
-                    DBHandler.RunSQL(sql);
-                    //sql = "DELETE FROM measurementsExt WHERE measurement_id='"+oscar.Misc.getString(rs,"measurement_id")+"'";
-                    //DBHandler.RunSQL(sql);
+					sql = "DELETE FROM measurements WHERE id='"+oscar.Misc.getString(rs, "id")+"'";
+					DBHandler.RunSQL(sql);
+					//sql = "DELETE FROM measurementsExt WHERE measurement_id='"+oscar.Misc.getString(rs,"measurement_id")+"'";
+					//DBHandler.RunSQL(sql);
 
-                }
+				}
 
-            }
-            // loop through the measurements for the lab and insert them
+			}
+			// loop through the measurements for the lab and insert them
 
-            for (int i=0; i < h.getOBRCount(); i++){
-                for (int j=0; j < h.getOBXCount(i); j++){
+			for (int i=0; i < h.getOBRCount(); i++){
+				for (int j=0; j < h.getOBXCount(i); j++){
 
-                    String result = h.getOBXResult(i, j);
+					String result = h.getOBXResult(i, j);
 
-                    // only insert if there is a result and it is supposed to be viewed
-                    if (result.equals("") || result.equals("DNR") || h.getOBXName(i, j).equals("") || h.getOBXResultStatus(i, j).equals("DNS"))
-                        continue;
-                    logger.debug("obx("+j+") should be inserted");
-                    String identifier = h.getOBXIdentifier(i,j);
-                    String name = h.getOBXName(i,j);
-                    String unit = h.getOBXUnits(i,j);
-                    String labname = h.getPatientLocation();
-                    String accession = h.getAccessionNum();
-                    String req_datetime = h.getRequestDate(i);
-                    String datetime = h.getTimeStamp(i,j);
-                    String olis_status = h.getOBXResultStatus(i, j);
-                    String abnormal = h.getOBXAbnormalFlag(i,j);
-                    if ( abnormal != null && ( abnormal.equals("A") || abnormal.startsWith("H")) ){
-                        abnormal = "A";
-                    }else if ( abnormal != null && abnormal.startsWith("L")){
-                        abnormal = "L";
-                    }else{
-                        abnormal = "N";
-                    }
-                    String[] refRange = splitRefRange(h.getOBXReferenceRange(i,j));
-                    String comments = "";
-                    for (int l=0; l<h.getOBXCommentCount(i,j); l++) {
-                    	comments += comments.length()>0 ? "\n"+h.getOBXComment(i,j,l) : h.getOBXComment(i,j,l);
-                	}
+					// only insert if there is a result and it is supposed to be viewed
+					if (result.equals("") || result.equals("DNR") || h.getOBXName(i, j).equals("") || h.getOBXResultStatus(i, j).equals("DNS"))
+						continue;
+					logger.debug("obx("+j+") should be inserted");
+					String identifier = h.getOBXIdentifier(i,j);
+					String name = h.getOBXName(i,j);
+					String unit = h.getOBXUnits(i,j);
+					String labname = h.getPatientLocation();
+					String accession = h.getAccessionNum();
+					String req_datetime = h.getRequestDate(i);
+					String datetime = h.getTimeStamp(i,j);
+					String olis_status = h.getOBXResultStatus(i, j);
+					String abnormal = h.getOBXAbnormalFlag(i,j);
 
-                    String sql = "SELECT b.ident_code, type.measuringInstruction FROM measurementMap a, measurementMap b, measurementType type WHERE b.lab_type='FLOWSHEET' AND a.ident_code=? AND a.loinc_code = b.loinc_code and type.type = b.ident_code";
-                    PreparedStatement pstmt = conn.prepareStatement(sql);
-                    pstmt.setString(1, identifier);
-                    String measType="";
-                    String measInst="";
-                    ResultSet rs = pstmt.executeQuery();
-                    if(rs.next()){
-                        measType = oscar.Misc.getString(rs, "ident_code");
-                        measInst = oscar.Misc.getString(rs, "measuringInstruction");
-                    }else{
-                       logger.debug("CODE:"+identifier+ " needs to be mapped");
-                    }
+					if ( datetime == null || datetime.equals("") ) {
+						datetime = dateEntered;
+					}
 
-                    sql = "INSERT INTO measurements (type, demographicNo, providerNo, dataField, measuringInstruction, dateObserved, dateEntered )VALUES (?, ?, '0', ?, ?, ?, ?)";
-                    logger.debug("QUERY: " + sql);
-                    pstmt = conn.prepareStatement(sql);
-                    pstmt.setString(1,measType);
-                    pstmt.setString(2,demographic_no);
-                    pstmt.setString(3,result);
-                    pstmt.setString(4,measInst);
-                    pstmt.setString(5,h.getTimeStamp(i, j));
-                    pstmt.setString(6,dateEntered);
-                    pstmt.executeUpdate();
-                    rs = pstmt.getGeneratedKeys();
-                    String insertID = null;
-                    if(rs.next())
-                        insertID = oscar.Misc.getString(rs, 1);
+					if ( abnormal != null && ( abnormal.equals("A") || abnormal.startsWith("H")) ){
+						abnormal = "A";
+					}else if ( abnormal != null && abnormal.startsWith("L")){
+						abnormal = "L";
+					}else{
+						abnormal = "N";
+					}
+					String[] refRange = splitRefRange(h.getOBXReferenceRange(i,j));
+					String comments = "";
+					for (int l=0; l<h.getOBXCommentCount(i,j); l++) {
+						comments += comments.length()>0 ? "\n"+h.getOBXComment(i,j,l) : h.getOBXComment(i,j,l);
+					}
 
-                    String measurementExt = "INSERT INTO measurementsExt (measurement_id, keyval, val) VALUES (?,?,?)";
+					String sql = "SELECT b.ident_code, type.measuringInstruction FROM measurementMap a, measurementMap b, measurementType type WHERE b.lab_type='FLOWSHEET' AND a.ident_code=? AND a.loinc_code = b.loinc_code and type.type = b.ident_code";
+					PreparedStatement pstmt = conn.prepareStatement(sql);
+					pstmt.setString(1, identifier);
+					String measType="";
+					String measInst="";
+					ResultSet rs = pstmt.executeQuery();
+					if(rs.next()){
+						measType = oscar.Misc.getString(rs, "ident_code");
+						measInst = oscar.Misc.getString(rs, "measuringInstruction");
+					}else{
+					   logger.debug("CODE:"+identifier+ " needs to be mapped");
+					}
 
-                    pstmt = conn.prepareStatement(measurementExt);
+					sql = "INSERT INTO measurements (type, demographicNo, providerNo, dataField, measuringInstruction, dateObserved, dateEntered )VALUES (?, ?, '0', ?, ?, ?, ?)";
+					logger.debug("QUERY: " + sql);
+					pstmt = conn.prepareStatement(sql);
+					pstmt.setString(1,measType);
+					pstmt.setString(2,demographic_no);
+					pstmt.setString(3,result);
+					pstmt.setString(4,measInst);
+					pstmt.setString(5,datetime);
+					pstmt.setString(6,dateEntered);
+					pstmt.executeUpdate();
+					rs = pstmt.getGeneratedKeys();
+					String insertID = null;
+					if(rs.next())
+						insertID = oscar.Misc.getString(rs, 1);
 
-                    logger.debug("Inserting into measurementsExt id "+insertID+ " lab_no "+ lab_no);
-                    pstmt.setString(1, insertID);
-                    pstmt.setString(2, "lab_no");
-                    pstmt.setString(3, lab_no);
-                    pstmt.executeUpdate();
-                    pstmt.clearParameters();
+					String measurementExt = "INSERT INTO measurementsExt (measurement_id, keyval, val) VALUES (?,?,?)";
 
-                    logger.debug("Inserting into measurementsExt id "+insertID+ " abnormal "+ abnormal);
-                    pstmt.setString(1, insertID);
-                    pstmt.setString(2, "abnormal");
-                    pstmt.setString(3, abnormal);
-                    pstmt.executeUpdate();
-                    pstmt.clearParameters();
+					pstmt = conn.prepareStatement(measurementExt);
 
-                    logger.debug("Inserting into measurementsExt id "+insertID+ " identifier "+ identifier);
-                    pstmt.setString(1, insertID);
-                    pstmt.setString(2, "identifier");
-                    pstmt.setString(3, identifier);
-                    pstmt.executeUpdate();
-                    pstmt.clearParameters();
+					logger.debug("Inserting into measurementsExt id "+insertID+ " lab_no "+ lab_no);
+					pstmt.setString(1, insertID);
+					pstmt.setString(2, "lab_no");
+					pstmt.setString(3, lab_no);
+					pstmt.executeUpdate();
+					pstmt.clearParameters();
 
-                    logger.debug("Inserting into measurementsExt id "+insertID+ " name "+ name);
-                    pstmt.setString(1, insertID);
-                    pstmt.setString(2, "name");
-                    pstmt.setString(3, name);
-                    pstmt.executeUpdate();
-                    pstmt.clearParameters();
+					logger.debug("Inserting into measurementsExt id "+insertID+ " abnormal "+ abnormal);
+					pstmt.setString(1, insertID);
+					pstmt.setString(2, "abnormal");
+					pstmt.setString(3, abnormal);
+					pstmt.executeUpdate();
+					pstmt.clearParameters();
 
-                    logger.debug("Inserting into measurementsExt id "+insertID+ " labname "+ labname);
-                    pstmt.setString(1, insertID);
-                    pstmt.setString(2, "labname");
-                    pstmt.setString(3, labname);
-                    pstmt.executeUpdate();
-                    pstmt.clearParameters();
+					logger.debug("Inserting into measurementsExt id "+insertID+ " identifier "+ identifier);
+					pstmt.setString(1, insertID);
+					pstmt.setString(2, "identifier");
+					pstmt.setString(3, identifier);
+					pstmt.executeUpdate();
+					pstmt.clearParameters();
 
-                    logger.debug("Inserting into measurementsExt id "+insertID+ " accession "+ accession);
-                    pstmt.setString(1, insertID);
-                    pstmt.setString(2, "accession");
-                    pstmt.setString(3, accession);
-                    pstmt.executeUpdate();
-                    pstmt.clearParameters();
+					logger.debug("Inserting into measurementsExt id "+insertID+ " name "+ name);
+					pstmt.setString(1, insertID);
+					pstmt.setString(2, "name");
+					pstmt.setString(3, name);
+					pstmt.executeUpdate();
+					pstmt.clearParameters();
 
-                    logger.debug("Inserting into measurementsExt id "+insertID+ " request_datetime "+ req_datetime);
-                    pstmt.setString(1, insertID);
-                    pstmt.setString(2, "request_datetime");
-                    pstmt.setString(3, req_datetime);
-                    pstmt.executeUpdate();
-                    pstmt.clearParameters();
+					logger.debug("Inserting into measurementsExt id "+insertID+ " labname "+ labname);
+					pstmt.setString(1, insertID);
+					pstmt.setString(2, "labname");
+					pstmt.setString(3, labname);
+					pstmt.executeUpdate();
+					pstmt.clearParameters();
 
-                    logger.debug("Inserting into measurementsExt id "+insertID+ " datetime "+ datetime);
-                    pstmt.setString(1, insertID);
-                    pstmt.setString(2, "datetime");
-                    pstmt.setString(3, datetime);
-                    pstmt.executeUpdate();
-                    pstmt.clearParameters();
+					logger.debug("Inserting into measurementsExt id "+insertID+ " accession "+ accession);
+					pstmt.setString(1, insertID);
+					pstmt.setString(2, "accession");
+					pstmt.setString(3, accession);
+					pstmt.executeUpdate();
+					pstmt.clearParameters();
 
-                    if (olis_status!=null && olis_status.length()>0) {
-                        logger.debug("Inserting into measurementsExt id "+insertID+ " olis_status "+ olis_status);
-                        pstmt.setString(1, insertID);
-                        pstmt.setString(2, "olis_status");
-                        pstmt.setString(3, olis_status);
-                        pstmt.executeUpdate();
-                        pstmt.clearParameters();
-                    }
+					logger.debug("Inserting into measurementsExt id "+insertID+ " request_datetime "+ req_datetime);
+					pstmt.setString(1, insertID);
+					pstmt.setString(2, "request_datetime");
+					pstmt.setString(3, req_datetime);
+					pstmt.executeUpdate();
+					pstmt.clearParameters();
 
-		    if (unit!=null && unit.length()>0) {
+					logger.debug("Inserting into measurementsExt id "+insertID+ " datetime "+ datetime);
+					pstmt.setString(1, insertID);
+					pstmt.setString(2, "datetime");
+					pstmt.setString(3, datetime);
+					pstmt.executeUpdate();
+					pstmt.clearParameters();
+
+					if (olis_status!=null && olis_status.length()>0) {
+						logger.debug("Inserting into measurementsExt id "+insertID+ " olis_status "+ olis_status);
+						pstmt.setString(1, insertID);
+						pstmt.setString(2, "olis_status");
+						pstmt.setString(3, olis_status);
+						pstmt.executeUpdate();
+						pstmt.clearParameters();
+					}
+
+			if (unit!=null && unit.length()>0) {
 			logger.debug("Inserting into measurementsExt id "+insertID+ " unit "+ unit);
 			pstmt.setString(1, insertID);
 			pstmt.setString(2, "unit");
 			pstmt.setString(3, unit);
 			pstmt.executeUpdate();
 			pstmt.clearParameters();
-		    }
+			}
 
-		    if (refRange[0].length()>0) {
+			if (refRange[0].length()>0) {
 			logger.debug("Inserting into measurementsExt id "+insertID+ " range "+ refRange[0]);
 			pstmt.setString(1, insertID);
 			pstmt.setString(2, "range");
 			pstmt.setString(3, refRange[0]);
 			pstmt.executeUpdate();
 			pstmt.clearParameters();
-		    } else {
+			} else {
 			if (refRange[1].length()>0) {
-			    logger.debug("Inserting into measurementsExt id "+insertID+ " minimum "+ refRange[1]);
-			    pstmt.setString(1, insertID);
-			    pstmt.setString(2, "minimum");
-			    pstmt.setString(3, refRange[1]);
-			    pstmt.executeUpdate();
-			    pstmt.clearParameters();
+				logger.debug("Inserting into measurementsExt id "+insertID+ " minimum "+ refRange[1]);
+				pstmt.setString(1, insertID);
+				pstmt.setString(2, "minimum");
+				pstmt.setString(3, refRange[1]);
+				pstmt.executeUpdate();
+				pstmt.clearParameters();
 			}
 
 			
@@ -280,7 +285,7 @@ public class Hl7textResultsData {
 
 				}
 			}
-            }
+			}
 
 		}catch(Exception e){
 			logger.error("Exception in HL7 populateMeasurementsTable", e);
@@ -538,9 +543,9 @@ public class Hl7textResultsData {
 
 		String providerNoList = "";
 		
-        if(providerNoArr != null && providerNoArr.size() > 0){
-        	providerNoList = StringUtils.join(providerNoArr, ",");
-        }
+		if(providerNoArr != null && providerNoArr.size() > 0){
+			providerNoList = StringUtils.join(providerNoArr, ",");
+		}
 		
 		patientHealthNumber=StringUtils.trimToNull(patientHealthNumber);
 
@@ -562,8 +567,8 @@ public class Hl7textResultsData {
 				if (patientHealthNumber!=null) sql=sql+" AND info.health_no like '%"+patientHealthNumber+"%'";
 
 				if(providerNoList != ""){
-                	sql = sql + "AND providerLabRouting.provider_no IN ("+providerNoList+")";
-                }
+					sql = sql + "AND providerLabRouting.provider_no IN ("+providerNoList+")";
+				}
 				
 				sql=sql+" ORDER BY info.lab_no DESC";
 
@@ -688,9 +693,9 @@ public class Hl7textResultsData {
 
 		ArrayList<LabResultData> labResults =  new ArrayList<LabResultData>();
 		String providerNoList = "";
-        if(providerNoArr != null && providerNoArr.size() > 0){
-        	providerNoList = StringUtils.join(providerNoArr, ",");
-        }
+		if(providerNoArr != null && providerNoArr.size() > 0){
+			providerNoList = StringUtils.join(providerNoArr, ",");
+		}
 		String sql = "";
 		try {
 			// note to self: lab reports not found in the providerLabRouting table will not show up - need to ensure every lab is entered in providerLabRouting, with '0'
@@ -720,12 +725,12 @@ public class Hl7textResultsData {
 			
 			if(neverAcknowledgedItems && "N".equals(status)){
 				sql = sql + "LEFT JOIN (" +
-						    "    SELECT * FROM (" +
-						    "        SELECT plr.*" +
-						    "        FROM providerLabRouting plr" + 
-						    "        GROUP BY lab_no, status" +
-						    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
-						    ") proLR ON (hl7.lab_no = proLR.lab_no AND proLR.lab_type = 'HL7') ";
+							"    SELECT * FROM (" +
+							"        SELECT plr.*" +
+							"        FROM providerLabRouting plr" +
+							"        GROUP BY lab_no, status" +
+							"    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
+							") proLR ON (hl7.lab_no = proLR.lab_no AND proLR.lab_type = 'HL7') ";
 			}else{
 				sql = sql + "LEFT JOIN providerLabRouting proLR ON (hl7.lab_no = proLR.lab_no AND proLR.lab_type = 'HL7') ";
 			}
