@@ -33,9 +33,9 @@
 	<!-- import jQuery -->
 	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
 	<!-- import jQuery UI-->
-	<script src="<%= request.getContextPath() %>/share/javascript/jquery/ui/1.12.0/jquery-ui.min.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
 	<!-- import jQuery Theme (ui stylesheet) -->
-	<link href= "<%= request.getContextPath() %>/share/javascript/jquery/ui/1.12.0/themes/vader/jquery-ui.min.css" rel="stylesheet">
+	<link href= "<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0/themes/vader/jquery-ui.min.css" rel="stylesheet">
 
 	<!-- javascript file for the signature pads -- optional -->
 	<script src="<%= request.getContextPath() %>/eform/displayImage.do?imagefile=signature_pad.min.js"></script>
