@@ -72,6 +72,7 @@ public class LogConst {
     public static final String CON_PASSWORD = "password/pin";
     public static final String CON_ADMIN = "admin";
     public static final String CON_FORM = "form";
+    public static final String CON_EFORM = "eForm";
     public static final String CON_PRESCRIPTION = "prescription";
     public static final String CON_MEDICATION = "medication";
     public static final String CON_DRUGS="drugs";

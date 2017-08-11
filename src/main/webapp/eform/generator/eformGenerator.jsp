@@ -503,7 +503,8 @@
 		var CHEK_INPUT_SELECTOR = ":input[type=checkbox]";
 		var GENDER_PRECHECK_CLASS_SELECTOR = "[class*=gender_precheck_]";
 		var OSCAR_DISPLAY_IMG_SRC = "<%= request.getContextPath() %>/eform/displayImage.do?imagefile=";
-		var OSCAR_API_URL = "<%= request.getContextPath() %>/ws/rs/forms/";
+		var OSCAR_EFORM_ENTITY_URL = "<%= request.getContextPath() %>/ws/rs/eform/";
+		var OSCAR_EFORM_SEARCH_URL = "<%= request.getContextPath() %>/ws/rs/eforms/";
 
 		/** GLOBAL VARIABLES */
 		var eformName = "Untitled eForm";
@@ -777,7 +778,7 @@
 			$.ajax
                 ({
                     type: "POST",
-                    url: OSCAR_API_URL + 'saveEForm',
+                    url: OSCAR_EFORM_ENTITY_URL + 'saveEForm',
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
                     async: false,
@@ -1297,7 +1298,7 @@
                 ({
                     // populate the eform list from the server
                     type: "GET",
-                    url: OSCAR_API_URL + 'getEFormList',
+                    url: OSCAR_EFORM_SEARCH_URL + 'getEFormList',
                     dataType: 'json',
                     async: true,
                     success: function (data) {
@@ -1323,7 +1324,7 @@
                                     $.ajax
                                         ({
 						                    type: "GET",
-						                    url: OSCAR_API_URL + 'loadEForm/' + selectedId,
+						                    url: OSCAR_EFORM_ENTITY_URL + selectedId,
 						                    dataType: 'json',
 						                    async: true,
 						                    success: function (data) {
@@ -1565,7 +1566,7 @@
                 $.ajax
                     ({
                         type: "GET",
-                        url: OSCAR_API_URL + 'getEFormImageList',
+                        url: OSCAR_EFORM_SEARCH_URL + 'getEFormImageList',
                         dataType: 'json',
                         async: false,
                         success: function (data) {

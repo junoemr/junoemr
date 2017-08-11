@@ -23,8 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-
-import java.io.File;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -77,12 +75,9 @@ import org.oscarehr.ws.rest.to.model.MenuTo1;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;
 import org.oscarehr.ws.rest.to.model.SummaryTo1;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
-import oscar.OscarProperties;
 import oscar.eform.EFormExportZip;
-import oscar.eform.actions.DisplayImageAction;
 import oscar.oscarEncounter.data.EctFormData;
 import oscar.oscarProvider.data.ProviderMyOscarIdData;
 
@@ -360,136 +355,5 @@ public class FormsService extends AbstractServiceImpl {
 		} catch(Exception e) {
 			return null;
 		}
-	}
-	
-	/**
-	 * Saves an eform. Performs an update if the eform has an fid, otherwise it will save a new eform.
-	 * @param jsonString
-	 * @return ResponseEntity with data from the eform saved. response does not include html
-	 */
-	@POST
-	@Path("/saveEForm")
-	@Consumes("application/json")
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1, String> saveEForm(String jsonString) {
-
-		HttpHeaders responseHeaders = new HttpHeaders();
-
-		JSONObject jsonObject = JSONObject.fromObject(jsonString);
-
-		Integer fid = jsonObject.optInt("id");
-		String formName = jsonObject.getString("formName");
-		String formSubject = jsonObject.optString("formSubject", null);
-		String formHtml = jsonObject.getString("formHtml");
-
-		String roleType = jsonObject.optString("roleType", null);
-		Boolean showLatestFormOnly = jsonObject.optBoolean("showLatestFormOnly", false);
-		Boolean patientIndependant = jsonObject.optBoolean("patientIndependant", false);
-
-		EForm eform;
-		// try to update an existing eform
-		if (fid != null && fid > 0) {
-			eform = eFormDao.findById(fid);
-
-			Date now = new Date();
-			eform.setFormDate(now);
-			eform.setFormTime(now);
-		}
-		// new eform
-		else {
-			EForm nameMatch = eFormDao.findByName(formName);
-			if(nameMatch != null) {
-				logger.warn("EForm Name Already in Use. Save Aborted");
-				return RestResponse.errorResponse(responseHeaders, "EForm Name Already in Use");
-			}
-
-			eform = new EForm();
-			String creatorId = getLoggedInInfo().getLoggedInProviderNo();
-			eform.setCreator(creatorId);
-		}
-
-		eform.setFormName(formName);
-		eform.setSubject(formSubject);
-		eform.setFormHtml(formHtml);
-		eform.setCurrent(true);
-		eform.setShowLatestFormOnly(showLatestFormOnly);
-		eform.setPatientIndependent(patientIndependant);
-		eform.setRoleType(roleType);
-
-		//validate eform objects before saving
-		/*ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-		Validator validator = factory.getValidator();
-
-		for(EForm eform : eformList) {
-			final Set<ConstraintViolation<EForm>> formErrors = validator.validate(eform);
-			for(ConstraintViolation<EForm> violation : formErrors) {
-				errors.add(eform.getFormName() + ": " + violation.getMessage());
-			}
-		}*/
-
-		if(eform.getId() != null) {
-			eFormDao.merge(eform);
-		}
-		else {
-			eFormDao.persist(eform);
-		}
-
-		EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eform);
-		return RestResponse.successResponse(responseHeaders, transferObj);
-	}
-
-	/**
-	 * retrieves an eForm with the given id.
-	 * @return ResponseEntity containing data for the eForm. includes full html
-	 */
-	@GET
-	@Path("/loadEForm/{dataId}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1, String> loadEForm(@PathParam("dataId") Integer fid) {
-
-		HttpHeaders responseHeaders = new HttpHeaders();
-		EForm eform = null;
-
-		// try to update an existing eform
-		if (fid != null && fid > 0) {
-			eform = eFormDao.findById(fid);
-		}
-		if(eform == null) {
-			return RestResponse.errorResponse(responseHeaders, "Failed to find EForm");
-		}
-		EFormTo1 transferObj = new EFormConverter(false).getAsTransferObject(getLoggedInInfo(), eform);
-		return RestResponse.successResponse(responseHeaders, transferObj);
-	}
-	/**
-	 * retrieves a list of all eforms better than the getAllEFormNames method
-	 * eform responses will not contain the eform html
-	 * @return RestResponse
-	 */
-	@GET
-	@Path("/getEFormList")
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<EFormTo1>, String> getEFormList() {
-
-		HttpHeaders responseHeaders = new HttpHeaders();
-		List<EFormTo1> allEforms = new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(), formsManager.findByStatus(getLoggedInInfo(), true, EFormSortOrder.NAME));
-		return RestResponse.successResponse(responseHeaders, allEforms);
-	}
-
-	/**
-	 * retrieves a list of all eform image names as strings
-	 * @return RestResponse
-	 */
-	@GET
-	@Path("/getEFormImageList")
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<String>, String> getEFormImageList() {
-
-		HttpHeaders responseHeaders = new HttpHeaders();
-
-		String imageHomeDir = OscarProperties.getInstance().getProperty("eform_image");
-		File directory = new File(imageHomeDir);
-
-		List<String> imagesNames = DisplayImageAction.getFiles(directory, ".*\\.(jpg|jpeg|png|gif)$", null);
-		return RestResponse.successResponse(responseHeaders, imagesNames);
 	}
 }
