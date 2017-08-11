@@ -34,15 +34,15 @@ public class RestResponse<T, E> extends HttpEntity<T> {
 	private final E error;
 	private final ResponseStatus status;
 
-	public RestResponse(T body, MultiValueMap headers) {
-		this(body, headers, null, ResponseStatus.SUCCESS);
+	public RestResponse(MultiValueMap headers, T body) {
+		this(headers, body, null, ResponseStatus.SUCCESS);
 	}
 
-	public RestResponse(MultiValueMap headers, E error) {
-		this(null, headers, error, ResponseStatus.ERROR);
+	public RestResponse(MultiValueMap headers, T body, E error) {
+		this(headers, body, error, ResponseStatus.ERROR);
 	}
 
-	public RestResponse(T body, MultiValueMap headers, E error, ResponseStatus status) {
+	public RestResponse(MultiValueMap headers, T body, E error, ResponseStatus status) {
 		super(body, headers);
 		this.error = error;
 		this.status = status;
@@ -54,5 +54,12 @@ public class RestResponse<T, E> extends HttpEntity<T> {
 
 	public ResponseStatus getStatus() {
 		return status;
+	}
+
+	public static<T, E> RestResponse<T,E> successResponse(MultiValueMap headers, T body) {
+		return new RestResponse<T, E>(headers, body, null, ResponseStatus.SUCCESS);
+	}
+	public static<T, E> RestResponse<T,E> errorResponse(MultiValueMap headers, E error) {
+		return new RestResponse<T, E>(headers, null, error, ResponseStatus.ERROR);
 	}
 }

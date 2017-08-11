@@ -400,7 +400,7 @@ public class FormsService extends AbstractServiceImpl {
 			EForm nameMatch = eFormDao.findByName(formName);
 			if(nameMatch != null) {
 				logger.warn("EForm Name Already in Use. Save Aborted");
-				return new RestResponse<EFormTo1, String>(responseHeaders, "EForm Name Already in Use");
+				return RestResponse.errorResponse(responseHeaders, "EForm Name Already in Use");
 			}
 
 			eform = new EForm();
@@ -435,43 +435,30 @@ public class FormsService extends AbstractServiceImpl {
 		}
 
 		EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eform);
-		return new RestResponse<EFormTo1, String>(transferObj, responseHeaders);
+		return RestResponse.successResponse(responseHeaders, transferObj);
 	}
 
 	/**
-	 * retrieves an eform with the given id.
-	 * @param jsonString object containing id:value
-	 * @return ResponseEntity containg data for he eform. includes full html
+	 * retrieves an eForm with the given id.
+	 * @return ResponseEntity containing data for the eForm. includes full html
 	 */
-	@POST
-	@Path("/loadEForm")
-	@Consumes("application/json")
+	@GET
+	@Path("/loadEForm/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1, String> loadEForm(String jsonString) {
+	public RestResponse<EFormTo1, String> loadEForm(@PathParam("dataId") Integer fid) {
 
-		RestResponse<EFormTo1, String> responseEntity;
 		HttpHeaders responseHeaders = new HttpHeaders();
-
-		JSONObject jsonObject = JSONObject.fromObject(jsonString);
-		Integer fid = jsonObject.optInt("id");
-
 		EForm eform = null;
+
 		// try to update an existing eform
 		if (fid != null && fid > 0) {
 			eform = eFormDao.findById(fid);
 		}
-		else {
-			responseHeaders.add("error","Invalid Id: " + fid);
+		if(eform == null) {
+			return RestResponse.errorResponse(responseHeaders, "Failed to find EForm");
 		}
-
-		if(eform != null) {
-			EFormTo1 transferObj = new EFormConverter(false).getAsTransferObject(getLoggedInInfo(), eform);
-			responseEntity = new RestResponse<EFormTo1, String>(transferObj, responseHeaders);
-		}
-		else {
-			responseEntity = new RestResponse<EFormTo1, String>(responseHeaders, "Failed to find EForm");
-		}
-		return responseEntity;
+		EFormTo1 transferObj = new EFormConverter(false).getAsTransferObject(getLoggedInInfo(), eform);
+		return RestResponse.successResponse(responseHeaders, transferObj);
 	}
 	/**
 	 * retrieves a list of all eforms better than the getAllEFormNames method
@@ -483,12 +470,9 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<EFormTo1>, String> getEFormList() {
 
-		RestResponse<List<EFormTo1>, String> restResponse;
 		HttpHeaders responseHeaders = new HttpHeaders();
 		List<EFormTo1> allEforms = new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(), formsManager.findByStatus(getLoggedInInfo(), true, EFormSortOrder.NAME));
-		restResponse = new RestResponse<List<EFormTo1>, String>(allEforms, responseHeaders);
-
-		return restResponse;
+		return RestResponse.successResponse(responseHeaders, allEforms);
 	}
 
 	/**
@@ -500,15 +484,12 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<String>, String> getEFormImageList() {
 
-		RestResponse<List<String>, String> restResponse;
 		HttpHeaders responseHeaders = new HttpHeaders();
 
 		String imageHomeDir = OscarProperties.getInstance().getProperty("eform_image");
 		File directory = new File(imageHomeDir);
 
 		List<String> imagesNames = DisplayImageAction.getFiles(directory, ".*\\.(jpg|jpeg|png|gif)$", null);
-		restResponse = new RestResponse<List<String>, String>(imagesNames, responseHeaders);
-
-		return restResponse;
+		return RestResponse.successResponse(responseHeaders, imagesNames);
 	}
 }

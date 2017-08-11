@@ -1322,12 +1322,10 @@
                                     // load the selected eform from the html by id
                                     $.ajax
                                         ({
-						                    type: "POST",
-						                    url: OSCAR_API_URL + 'loadEForm',
-						                    contentType: "application/json; charset=utf-8",
+						                    type: "GET",
+						                    url: OSCAR_API_URL + 'loadEForm/' + selectedId,
 						                    dataType: 'json',
-						                    async: false,
-						                    data: JSON.stringify({ "id": selectedId}),
+						                    async: true,
 						                    success: function (data) {
 						                        var status = data.status;
 												if(status === "SUCCESS") {
@@ -1335,6 +1333,9 @@
 							                        loadEformData(data.body.formHtml);
 							                        setEformId(data.body.id);
 							                        console.info("EForm Loaded from Server");
+						                        }
+						                        else {
+						                            alert(data.error);
 						                        }
 						                    }
 										});
@@ -1845,37 +1846,68 @@
 		}
 		/** tab 4 setup */
 		function initImageTemplateTab($tab) {
-			$tab.append($("<span>", {
-				text: "Images must be in same folder as the generator",
-				css: {flex: 1}
-			}));
 
-			var $dragFrame2 = null;
-			var $fileSelector2 = $("<input>", {
-				type: "file",
-				accept: ".png"
-			}).change(function () {
-				if (this.files && this.files[0]) {
-					var reader = new FileReader();
-					var $fileInput = $(this);
-					reader.onload = function (readerEvt) {
-						if (!$dragFrame2) {
-							$dragFrame2 = createStitchFrame();
-							$tab.append($dragFrame2);
-						}
-						var img = new Image();
-						img.src = readerEvt.target.result;
-						var src = $fileInput.val().replace(/C:\\fakepath\\/i, '');
-						img.onload = function () {
-							console.log(img.width, img.height);
-							addDraggableImage($dragFrame2, getUniqueId(baseImageWidgetName), img.width, img.height, src, "");
-						}
-					};
-					reader.readAsDataURL(this.files[0]);
+			var $dragFrame2 = createStitchFrame();
 
-				}
-			})
-				.appendTo($tab);
+			if(!runStandaloneVersion) {
+                var options = [""];
+                for(var i=0; i<eFormImageList.length; i++) {
+                    options.push(eFormImageList[i]);
+                }
+
+                var $widget = null;
+
+                var $fileSelector = addSelectMenu($tab, "imageSelect2", "Select Image", options);
+                $fileSelector.selectmenu();
+                $tab.append($dragFrame2);
+
+                $fileSelector.on("selectmenuchange", ( function (event, data) {
+                    var src = OSCAR_DISPLAY_IMG_SRC + $fileSelector.val();
+                    if($fileSelector.val().length < 1) {return;}
+
+					// remove the old widget
+                    if($widget) {$widget.remove();}
+                    // create a fake element to load the image (need to get the attributes height/width)
+                    var $img = $("<img>", {
+                        src: src,
+                        hidden: "hidden"
+                    }).appendTo($dragFrame2);
+
+					$img.on('load', function () {
+                        $widget = addDraggableImage($dragFrame2, getUniqueId(baseImageWidgetName), $(this).width(), $(this).height(), src, "");
+                        $img.remove();//remove the fake, not needed now
+                    });
+
+                }));
+            }
+			else {
+
+				$tab.append($("<span>", {
+					text: "Images must be in same folder as the generator",
+					css: {flex: 1}
+				}));
+
+				var $fileSelector2 = $("<input>", {
+					type: "file",
+					accept: ".png"
+				}).change(function () {
+					if (this.files && this.files[0]) {
+						var reader = new FileReader();
+						var $fileInput = $(this);
+						reader.onload = function (readerEvt) {
+							var img = new Image();
+							img.src = readerEvt.target.result;
+							var src = $fileInput.val().replace(/C:\\fakepath\\/i, '');
+							img.onload = function () {
+								console.log(img.width, img.height);
+								addDraggableImage($dragFrame2, getUniqueId(baseImageWidgetName), img.width, img.height, src, "");
+							}
+						};
+						reader.readAsDataURL(this.files[0]);
+
+					}
+				}).appendTo($tab);
+			}
 		}
 		/** signature tab init */
 		function initSignatureTemplateTab($tab) {
@@ -1901,7 +1933,7 @@
 			initShapeTemplateTab($tabs[3]);
 			/* tab 4 -- Images */
 			initImageTemplateTab($tabs[4]);
-			/* tab 4 -- Signaure Pad */
+			/* tab 5 -- Signaure Pad */
 			initSignatureTemplateTab($tabs[5]);
 
 			for (var i = 0; i < $tabs.length; i++) {
