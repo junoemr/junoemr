@@ -605,7 +605,6 @@
 		function removeOscarImagePath(string) {
 			if(!runStandaloneVersion) {
 				var regexFixed = OSCAR_DISPLAY_IMG_SRC.replace(/\//g, "\\/").replace(/\./g, "\\.").replace(/\?/g, "\\?");
-				console.info(OSCAR_DISPLAY_IMG_SRC, regexFixed);
 				return string.replace(/\\$(%7B|\{)oscar_image_path(%7D|\})/gi, OSCAR_DISPLAY_IMG_SRC);
 			}
 			else {
@@ -785,13 +784,13 @@
                     data: JSON.stringify({ "id": eFormFid, "formName": eformName, "formHtml" : eformCode }),
                     success: function (data) {
                         console.info(data);
-                        var statusCode = data.statusCode;
-						if(statusCode === "OK") {
+                        var status = data.status;
+						if(status === "SUCCESS") {
 							alert("EForm Save Successful!");
 							setEformId(data.body.id);
 						}
 						else {
-							alert("Error: " + data.headers.error);
+							alert(data.error);
 						}
                     },
                     failure: function(data) {
@@ -857,7 +856,7 @@
 
 			if (signaturePadLoaded) {
 				$img.hide();
-				console.info("loading editable");
+				console.info("loading editable signature pads");
 				var updateSlaveSignature = function (src_canvas, dest_canvas) {
 					// write to the destination with image scaling
 					var dest_context = dest_canvas.getContext("2d");
@@ -1303,8 +1302,8 @@
                     async: true,
                     success: function (data) {
 
-                        var statusCode = data.statusCode;
-                        if(statusCode === "OK") {
+                        var status = data.status;
+						if(status === "SUCCESS") {
 	                        var options = [];
 	                        var values = [];
 	                        var selectedId = 0;
@@ -1330,8 +1329,8 @@
 						                    async: false,
 						                    data: JSON.stringify({ "id": selectedId}),
 						                    success: function (data) {
-						                        var statusCode = data.statusCode;
-                                                if(statusCode === "OK") {
+						                        var status = data.status;
+												if(status === "SUCCESS") {
 							                        // setup the generator with the existing eform data
 							                        loadEformData(data.body.formHtml);
 							                        setEformId(data.body.id);
@@ -1569,8 +1568,8 @@
                         dataType: 'json',
                         async: false,
                         success: function (data) {
-                            var statusCode = data.statusCode;
-                            if(statusCode === "OK") {
+	                        var status = data.status;
+							if(status === "SUCCESS") {
                                 eFormImageList = data.body;
                             }
                         },
