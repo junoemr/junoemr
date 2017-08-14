@@ -68,7 +68,7 @@ public class EFormService extends AbstractServiceImpl {
 
 	/**
 	 * Saves an eform. Performs an update if the eform has an fid, otherwise it will save a new eform.
-	 * @return ResponseEntity with data from the eform saved. response does not include html
+	 * @return RestResponse with data from the eform saved. response does not include html
 	 */
 	@POST
 	@Path("/")
@@ -100,7 +100,7 @@ public class EFormService extends AbstractServiceImpl {
 	/**
 	 * Saves an eform. Parses plain json instead of a transfer object
 	 * @param jsonString
-	 * @return ResponseEntity with data from the eform saved. response does not include html
+	 * @return RestResponse with data from the eform saved. response does not include html
 	 */
 	@POST
 	@Path("/json")
@@ -152,7 +152,7 @@ public class EFormService extends AbstractServiceImpl {
 
 	/**
 	 * Updates an eform with the given id.
-	 * @return ResponseEntity with data from the eform saved. response does not include html
+	 * @return RestResponse with data from the eform saved. response does not include html
 	 */
 	@PUT
 	@Path("/{dataId}")
@@ -165,6 +165,9 @@ public class EFormService extends AbstractServiceImpl {
 
 		if(isValidEformData(eForm)) {
 			eFormDao.merge(eForm);
+			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), null,
+					LogConst.ACTION_UPDATE, LogConst.CON_EFORM, LogConst.STATUS_SUCCESS,
+					String.valueOf(eForm.getId()), getLoggedInInfo().getIp(), eForm.getFormName());
 			EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eForm);
 			return RestResponse.successResponse(responseHeaders, transferObj);
 		}
@@ -174,7 +177,7 @@ public class EFormService extends AbstractServiceImpl {
 	/**
 	 * Updates an eform with the given id. Parses plain json instead of a transfer object
 	 * @param jsonString
-	 * @return
+	 * @return RestResponse with data from the eform saved. response does not include html
 	 */
 	@PUT
 	@Path("/{dataId}/json")
@@ -211,6 +214,9 @@ public class EFormService extends AbstractServiceImpl {
 
 			if(isValidEformData(eForm)) {
 				eFormDao.merge(eForm);
+				LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), null,
+						LogConst.ACTION_UPDATE, LogConst.CON_EFORM, LogConst.STATUS_SUCCESS,
+						String.valueOf(eForm.getId()), getLoggedInInfo().getIp(), eForm.getFormName());
 				EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eForm);
 				return RestResponse.successResponse(responseHeaders, transferObj);
 			}
@@ -221,7 +227,7 @@ public class EFormService extends AbstractServiceImpl {
 	/**
 	 * basic validation for eform data
 	 * @param eForm
-	 * @return
+	 * @return true if data is valid, false otherwise
 	 */
 	private boolean isValidEformData(EForm eForm) {
 		if(eForm == null)
