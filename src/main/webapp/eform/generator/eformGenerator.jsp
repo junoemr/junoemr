@@ -774,11 +774,13 @@
 		/** Save the eform html as a new eform */
 		function saveToOscarEforms(include_fax) {
 			var eformCode = generate_eform_source_html(false, include_fax);
+			var url = OSCAR_EFORM_ENTITY_URL + ((eFormFid > 0)? eFormFid + "/": "") + "json";
+			var type = (eFormFid > 0)? "PUT" : "POST";
 
 			$.ajax
                 ({
-                    type: "POST",
-                    url: OSCAR_EFORM_ENTITY_URL + 'saveEForm',
+                    type: type,
+                    url: url,
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
                     async: false,
@@ -1298,7 +1300,7 @@
                 ({
                     // populate the eform list from the server
                     type: "GET",
-                    url: OSCAR_EFORM_SEARCH_URL + 'getEFormList',
+                    url: OSCAR_EFORM_SEARCH_URL,
                     dataType: 'json',
                     async: true,
                     success: function (data) {
@@ -1566,7 +1568,7 @@
                 $.ajax
                     ({
                         type: "GET",
-                        url: OSCAR_EFORM_SEARCH_URL + 'getEFormImageList',
+                        url: OSCAR_EFORM_SEARCH_URL + 'images',
                         dataType: 'json',
                         async: false,
                         success: function (data) {

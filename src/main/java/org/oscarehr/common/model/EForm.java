@@ -36,7 +36,6 @@ import javax.persistence.PreRemove;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "eform")
@@ -61,15 +60,12 @@ public class EForm extends AbstractModel<Integer> implements Serializable {
 	@Column(name = "fid")
 	private Integer id;
 
-	@Size(min=1, max=255)
 	@Column(name = "form_name")
 	private String formName;
 
-	@Size(max=255)
 	@Column(name = "file_name")
 	private String fileName;
 
-	@Size(max=255)
 	@Column(name = "subject")
 	private String subject;
 

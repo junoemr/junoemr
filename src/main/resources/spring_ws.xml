@@ -169,8 +169,8 @@
 			<bean class="org.oscarehr.ws.rest.RSSFeedService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.PersonaService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.FormsService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.eFormService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.eFormsService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.EFormService" autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.EFormsService" autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.OscarJobService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.NotesService" autowire="byName" />
 			<bean class="org.oscarehr.ws.rest.ProductDispensingService"  autowire="byName"/>

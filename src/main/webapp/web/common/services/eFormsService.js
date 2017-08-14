@@ -25,7 +25,7 @@
  Ontario, Canada
 
  */
-angular.module("Common.Services").service("eFormsService", [
+angular.module("Common.Services").service("EFormsService", [
 	'$http', '$q',
 	function($http, $q)
 	{
@@ -36,7 +36,7 @@ angular.module("Common.Services").service("eFormsService", [
         service.getEFormList = function getEFormList()
         {
             var deferred = $q.defer();
-            $http.get(service.apiPath + '/getEFormList',
+            $http.get(service.apiPath + '/',
                 Juno.Common.ServiceHelper.configHeaders()).then(
                 function success(results)
                 {
@@ -53,7 +53,7 @@ angular.module("Common.Services").service("eFormsService", [
         service.getEFormImageList = function getEFormImageList()
         {
             var deferred = $q.defer();
-            $http.get(service.apiPath + '/getEFormImageList',
+            $http.get(service.apiPath + '/images',
                 Juno.Common.ServiceHelper.configHeaders()).then(
                 function success(results)
                 {

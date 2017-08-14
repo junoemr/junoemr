@@ -25,7 +25,7 @@
  Ontario, Canada
 
  */
-angular.module("Common.Services").service("eFormService", [
+angular.module("Common.Services").service("EFormService", [
 	'$http', '$q',
 	function($http, $q)
 	{
@@ -36,7 +36,7 @@ angular.module("Common.Services").service("eFormService", [
 		service.saveEForm = function saveEForm()
 		{
 			var deferred = $q.defer();
-			$http.get(service.apiPath + '/saveEForm',
+			$http.get(service.apiPath + '/',
 				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(results)
 				{
@@ -50,6 +50,23 @@ angular.module("Common.Services").service("eFormService", [
 
 			return deferred.promise;
 		};
+		service.updateEForm = function updateEForm(formId)
+        {
+            var deferred = $q.defer();
+            $http.get(service.apiPath + '/' + formId,
+                Juno.Common.ServiceHelper.configHeaders()).then(
+                function success(results)
+                {
+                    deferred.resolve(results.data);
+                },
+                function error(errors)
+                {
+                    console.log("formService::updateEForm error", errors);
+                    deferred.reject("An error occurred while updating an EForm");
+                });
+
+            return deferred.promise;
+        };
 		service.loadEForm = function loadEForm(formId)
         {
             var deferred = $q.defer();

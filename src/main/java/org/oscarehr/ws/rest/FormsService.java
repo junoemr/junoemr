@@ -51,7 +51,6 @@ import org.oscarehr.app.AppOAuth1Config;
 import org.oscarehr.app.OAuth1Utils;
 import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.EFormDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.dao.EFormDao.EFormSortOrder;
 import org.oscarehr.common.model.AppDefinition;
@@ -95,10 +94,6 @@ public class FormsService extends AbstractServiceImpl {
 	
 	@Autowired
 	private AppDefinitionDao appDefinitionDao;
-	
-	@Autowired
-	private EFormDao eFormDao;
-	
 	
 	@GET
 	@Path("/{demographicNo}/all")

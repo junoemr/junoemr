@@ -43,9 +43,9 @@ import java.io.File;
 import java.util.List;
 
 @Path("/eforms")
-@Component("eFormsService")
-public class eFormsService extends AbstractServiceImpl {
-	Logger logger = Logger.getLogger(eFormsService.class);
+@Component("EFormsService")
+public class EFormsService extends AbstractServiceImpl {
+	Logger logger = Logger.getLogger(EFormsService.class);
 
 	@Autowired
 	private FormsManager formsManager;
@@ -59,7 +59,7 @@ public class eFormsService extends AbstractServiceImpl {
 	 * @return RestResponse
 	 */
 	@GET
-	@Path("/getEFormList")
+	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<EFormTo1>, String> getEFormList() {
 
@@ -73,7 +73,7 @@ public class eFormsService extends AbstractServiceImpl {
 	 * @return RestResponse
 	 */
 	@GET
-	@Path("/getEFormImageList")
+	@Path("/images")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<String>, String> getEFormImageList() {
 
