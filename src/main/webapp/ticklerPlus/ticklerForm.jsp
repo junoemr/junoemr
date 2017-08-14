@@ -108,6 +108,8 @@
 
 <%
 	String demographicName = request.getParameter("tickler.demographic_webName");
+	String status = (String) request.getAttribute("status");
+
 	if(demographicName  == null || "undefined".equals(demographicName)) {
 		demographicName = (String)request.getAttribute("demographicName");
 	}
@@ -116,7 +118,13 @@
 
 <table width="60%" border="0" cellpadding="0" cellspacing="1" bgcolor="#C0C0C0">
 	<html:form action="/Tickler" focus="tickler.demographicNo" onsubmit="return validateTicklerForm(this);">
-	
+	<%
+		if ( status.equals("failed") ) {
+	%>
+		<p style="color: red;">Error: Invalid Date</p>
+	<%
+		}
+	%>
 		<input type="hidden" name="method" value="save" />
 		<html:hidden property="tickler.creator" value='<%=(String) session.getAttribute("user")%>' />
 		<html:hidden property="tickler.id" />

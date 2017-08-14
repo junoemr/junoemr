@@ -307,12 +307,21 @@ public class TicklerAction extends DispatchAction {
 	public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		log.debug("edit");
 		String programId = (String) request.getSession().getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
+		String status = "";
+
 		if (programId == null) {
 			programId = String.valueOf(programMgr.getProgramIdByProgramName("OSCAR"));
 		}
+
 		request.setAttribute("providers", providerMgr.getActiveProviders(null, programId));
 		request.setAttribute("program_name", programMgr.getProgramName(programId));
 		request.setAttribute("from", getFrom(request));
+
+		if ( request.getParameter("status") != null ) {
+			status = request.getParameter("status");
+		}
+
+		request.setAttribute("status", status);
 
 		String demographicNo = request.getParameter("tickler.demographicNo");
 		if(!StringUtils.isEmpty(demographicNo)) {
@@ -329,6 +338,9 @@ public class TicklerAction extends DispatchAction {
 	public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		log.debug("save");
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat formatter2 = new SimpleDateFormat("MM/dd/yy : hh:mm a");
+		request.setAttribute("status", "success");
 
 		Provider user = providerMgr.getProvider(getProviderNo(request));
 		DynaActionForm ticklerForm = (DynaActionForm) form;
@@ -342,11 +354,24 @@ public class TicklerAction extends DispatchAction {
 		String programIdStr = (String) request.getSession().getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
 		if (programIdStr != null) tickler.setProgramId(Integer.valueOf(programIdStr));
 
-		/* get service time */
-		String service_hour = request.getParameter("tickler.service_hour");
-		String service_minute = request.getParameter("tickler.service_minute");
-		String service_ampm = request.getParameter("tickler.service_ampm");
-		tickler.setServiceTime(service_hour + ":" + service_minute + " " + service_ampm);
+		try {
+
+			// Set the service date
+			Date service_date = formatter.parse(request.getParameter("tickler.serviceDateWeb"));
+			tickler.setServiceDate(service_date);
+
+			/* get service time */
+			String service_hour = request.getParameter("tickler.service_hour");
+			String service_minute = request.getParameter("tickler.service_minute");
+			String service_ampm = request.getParameter("tickler.service_ampm");
+			tickler.setServiceTime(service_hour + ":" + service_minute + " " + service_ampm);
+
+		} catch(Exception e) {
+			ActionForward af = new ActionForward();
+			af.setRedirect(true);
+			af.setPath("/Tickler.do?method=edit&tickler.demographic_webName=" + tickler.getDemographic_webName() + "&tickler.demographicNo=" + tickler.getDemographicNo() + "&status=failed");
+			return af;
+		}
 
 		tickler.setUpdateDate(new java.util.Date());
 		tickler.setId(null);
@@ -377,8 +402,7 @@ public class TicklerAction extends DispatchAction {
 		if (echart != null && echart.equals("true")) {
 			Provider assignee = providerMgr.getProvider(tickler.getTaskAssignedTo());
 
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			SimpleDateFormat formatter2 = new SimpleDateFormat("MM/dd/yy : hh:mm a");
+
 
 			/* get current chart */
 			EChart tempChart = echartDao.getLatestChart(tickler.getDemographicNo());
