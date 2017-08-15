@@ -1723,13 +1723,12 @@ function updateFaxButton() {
 							</td>
 							<td align="right" class="tite3">
 								<select name="letterheadName" id="letterheadName" onchange="switchProvider(this.value)">
-									<option value="-1" <%=(consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase(clinic.getClinicName()) ? "selected='selected'" : lhndType.equals("clinic") ? "selected='selected'" : "" )%>><%=clinic.getClinicName() %></option>
+									<option value="-1" <%= (consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase(clinic.getClinicName()) || requestId == null ? "selected='selected'" : lhndType.equals("clinic") ? "selected='selected'" : "" )%>><%= clinic.getClinicName() %></option>
 								<%
 									for (Provider p : prList) {
 										if (p.getProviderNo().compareTo("-1") != 0 && (p.getFirstName() != null || p.getSurname() != null)) {
 								%>
-								<option value="<%=p.getProviderNo() %>"
-								<%=(consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase(p.getProviderNo()) ? "selected='selected'"  : consultUtil.letterheadName == null && p.getProviderNo().equalsIgnoreCase(providerDefault) && lhndType.equals("provider") ? "selected='selected'"  : "") %>>
+								<option value="<%= p.getProviderNo() %>" <%= (consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase(p.getProviderNo()) ? "selected='selected'" : consultUtil.letterheadName == null && p.getProviderNo().equalsIgnoreCase(providerDefault) && lhndType.equals("provider") && requestId != null ? "selected='selected'" : "") %> >
 									<%=p.getSurname() %>, <%=p.getFirstName().replace("Dr.", "") %>
 								</option>
 								<% }
