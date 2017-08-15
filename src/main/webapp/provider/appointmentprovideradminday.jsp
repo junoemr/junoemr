@@ -1787,9 +1787,15 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
             <%
 						}
 						if (as.getNextStatus() != null) {
+
+							String statusTitle = as.getTitleString(request.getLocale());
+
+							if (statusTitle == null || statusTitle.trim().equals("")) {
+								statusTitle = as.getTitle();
+							}
+
 							if(OscarProperties.getInstance().getProperty("APPT_SHOW_SHORT_LETTERS", "false") != null 
 								&& OscarProperties.getInstance().getProperty("APPT_SHOW_SHORT_LETTERS", "false").equals("true")){
-						
 								String colour = as.getShortLetterColour();
 								if(colour == null){
 									colour = "#FFFFFF";
@@ -1805,7 +1811,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 							}else{
 				    %>
 					
-				    			<img src="../images/<%=as.getImageName()%>" border="0" height="10" title="<%=as.getTitleString(request.getLocale())%>">
+				    			<img src="../images/<%=as.getImageName()%>" border="0" height="10" title="<%= statusTitle %>">
 					
             <%
 							}
