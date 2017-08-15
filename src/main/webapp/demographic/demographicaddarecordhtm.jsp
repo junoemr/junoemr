@@ -1119,7 +1119,7 @@ function ignoreDuplicates() {
 					<option value=""></option>
 					<%
 						String defaultProvider = oscarProps.getProperty("demographic.new_demographic_default_provider_no");
-						for (Provider p : providerDao.getActiveProvidersByRole("doctor")) {
+						for (Provider p : providerDao.getActiveProvidersByType("doctor")) {
 								String docProviderNo = p.getProviderNo();
 								String selected = (docProviderNo.equals(defaultProvider)) ? "selected" : "";
 					%>
