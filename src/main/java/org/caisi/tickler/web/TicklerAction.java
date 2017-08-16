@@ -307,21 +307,15 @@ public class TicklerAction extends DispatchAction {
 	public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		log.debug("edit");
 		String programId = (String) request.getSession().getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
-		String status = "";
 
 		if (programId == null) {
 			programId = String.valueOf(programMgr.getProgramIdByProgramName("OSCAR"));
 		}
 
+		request.setAttribute("status", "");
 		request.setAttribute("providers", providerMgr.getActiveProviders(null, programId));
 		request.setAttribute("program_name", programMgr.getProgramName(programId));
 		request.setAttribute("from", getFrom(request));
-
-		if ( request.getParameter("status") != null ) {
-			status = request.getParameter("status");
-		}
-
-		request.setAttribute("status", status);
 
 		String demographicNo = request.getParameter("tickler.demographicNo");
 		if(!StringUtils.isEmpty(demographicNo)) {
@@ -333,6 +327,7 @@ public class TicklerAction extends DispatchAction {
 		
 		return mapping.findForward("edit");
 	}
+
 
 	/* save a tickler */
 	public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -348,11 +343,16 @@ public class TicklerAction extends DispatchAction {
 
 		//Set the document if it's coming from the inbox
 		String docType = request.getParameter("docType");
-		String docId = request.getParameter("docId"); 
+		String docId = request.getParameter("docId");
 		
 		// set the program which the tickler was written in if there is a program.
 		String programIdStr = (String) request.getSession().getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
-		if (programIdStr != null) tickler.setProgramId(Integer.valueOf(programIdStr));
+
+		if (programIdStr != null)  {
+			tickler.setProgramId(Integer.valueOf(programIdStr));
+		} else {
+			programIdStr = String.valueOf(programMgr.getProgramIdByProgramName("OSCAR"));
+		}
 
 		try {
 
@@ -367,10 +367,20 @@ public class TicklerAction extends DispatchAction {
 			tickler.setServiceTime(service_hour + ":" + service_minute + " " + service_ampm);
 
 		} catch(Exception e) {
-			ActionForward af = new ActionForward();
-			af.setRedirect(true);
-			af.setPath("/Tickler.do?method=edit&tickler.demographic_webName=" + tickler.getDemographic_webName() + "&tickler.demographicNo=" + tickler.getDemographicNo() + "&status=failed");
-			return af;
+			request.setAttribute("status", "failed");
+			request.setAttribute("providers", providerMgr.getActiveProviders(null, programIdStr));
+			request.setAttribute("program_name", programMgr.getProgramName(programIdStr));
+			request.setAttribute("from", getFrom(request));
+
+			String demographicNo = request.getParameter("tickler.demographicNo");
+			if(!StringUtils.isEmpty(demographicNo)) {
+				Demographic demo = demographicMgr.getDemographic(demographicNo);
+				if(demo != null) {
+					request.setAttribute("demographicName", demo.getFormattedName());
+				}
+			}
+
+			return mapping.findForward("failed");
 		}
 
 		tickler.setUpdateDate(new java.util.Date());
