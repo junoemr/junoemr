@@ -1438,7 +1438,7 @@ function changeToView(id) {
         new Insertion.After(editId, input);
         
 
-         if( nId.substr(0,1) != "0" ) {
+         if( nId.substr(0,1) != "0" && $(printImg) != null ) {
             Element.remove(printImg);
             new Insertion.Before(editId, printimg);
             new Insertion.After(editId, attribAnchor);
