@@ -80,7 +80,7 @@ public class dxResearchUpdateAction extends Action {
 			
 			dao.merge(research);
 			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), Integer.parseInt(demographicNo),
-					LogConst.ACTION_UPDATE, LogConst.CON_DISEASE_REG, LogConst.STATUS_SUCCESS, did, request.getRemoteAddr());
+					LogConst.ACTION_UPDATE, LogConst.CON_DISEASE_REG, LogConst.STATUS_SUCCESS, did, request.getRemoteAddr(), research.getDxresearchCode());
 		}
 
 		if(selectedQuickList == null || selectedQuickList.trim().isEmpty()) {
