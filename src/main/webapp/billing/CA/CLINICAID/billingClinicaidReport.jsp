@@ -191,7 +191,7 @@
 <%@page import="org.apache.commons.lang.StringUtils"%><html>
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title>Clincaid Billed Appointment Report</title>
+<title>Clinicaid Billed Appointment Report</title>
 <link rel="stylesheet" href="../../../web.css">
 <link rel="stylesheet" type="text/css" media="all" href="../../../share/css/extractedFromPages.css"  />
 <!-- calendar stylesheet -->
