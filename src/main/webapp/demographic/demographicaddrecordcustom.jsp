@@ -124,13 +124,14 @@
   if( !custom_demographic_fields.contains("hin") ){
 	  custom_demographic_fields.add(new String("hin"));
   }
-  if( !custom_demographic_fields.contains("doctor") ){
-	  custom_demographic_fields.add(new String("doctor"));
-  }
   if( !custom_demographic_fields.contains("patient_status") ){
 	  custom_demographic_fields.add(new String("patient_status"));
   }
   /*
+
+	if( !custom_demographic_fields.contains("doctor") ){
+		custom_demographic_fields.add(new String("doctor"));
+	}
   if( !custom_demographic_fields.contains("hc_type") ){
 	  hc_type_hidden = true;
   }
