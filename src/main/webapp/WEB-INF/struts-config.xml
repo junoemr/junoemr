@@ -2095,6 +2095,7 @@
 			<forward name="list" path="/ticklerPlus/ticklerList.jsp" />
 			<forward name="view" path="/ticklerPlus/ticklerView.jsp" />
 			<forward name="edit" path="/ticklerPlus/ticklerForm.jsp" />
+			<forward name="failed" path="/ticklerPlus/ticklerForm.jsp" />
 			<forward name="preparedTicklerList" path="/ticklerPlus/preparedTicklerList.jsp" />
 		</action>
 		<action path="/CustomFilter" type="org.springframework.web.struts.DelegatingActionProxy" parameter="method" scope="request" name="customFilterForm" input="/ticklerPlus/customFilterForm.jsp" validate="false">

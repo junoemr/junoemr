@@ -307,9 +307,12 @@ public class TicklerAction extends DispatchAction {
 	public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		log.debug("edit");
 		String programId = (String) request.getSession().getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
+
 		if (programId == null) {
 			programId = String.valueOf(programMgr.getProgramIdByProgramName("OSCAR"));
 		}
+
+		request.setAttribute("status", "");
 		request.setAttribute("providers", providerMgr.getActiveProviders(null, programId));
 		request.setAttribute("program_name", programMgr.getProgramName(programId));
 		request.setAttribute("from", getFrom(request));
@@ -325,10 +328,14 @@ public class TicklerAction extends DispatchAction {
 		return mapping.findForward("edit");
 	}
 
+
 	/* save a tickler */
 	public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		log.debug("save");
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat formatter2 = new SimpleDateFormat("MM/dd/yy : hh:mm a");
+		request.setAttribute("status", "success");
 
 		Provider user = providerMgr.getProvider(getProviderNo(request));
 		DynaActionForm ticklerForm = (DynaActionForm) form;
@@ -336,17 +343,45 @@ public class TicklerAction extends DispatchAction {
 
 		//Set the document if it's coming from the inbox
 		String docType = request.getParameter("docType");
-		String docId = request.getParameter("docId"); 
+		String docId = request.getParameter("docId");
 		
 		// set the program which the tickler was written in if there is a program.
 		String programIdStr = (String) request.getSession().getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
-		if (programIdStr != null) tickler.setProgramId(Integer.valueOf(programIdStr));
 
-		/* get service time */
-		String service_hour = request.getParameter("tickler.service_hour");
-		String service_minute = request.getParameter("tickler.service_minute");
-		String service_ampm = request.getParameter("tickler.service_ampm");
-		tickler.setServiceTime(service_hour + ":" + service_minute + " " + service_ampm);
+		if (programIdStr != null)  {
+			tickler.setProgramId(Integer.valueOf(programIdStr));
+		} else {
+			programIdStr = String.valueOf(programMgr.getProgramIdByProgramName("OSCAR"));
+		}
+
+		try {
+
+			// Set the service date
+			Date service_date = formatter.parse(request.getParameter("tickler.serviceDateWeb"));
+			tickler.setServiceDate(service_date);
+
+			/* get service time */
+			String service_hour = request.getParameter("tickler.service_hour");
+			String service_minute = request.getParameter("tickler.service_minute");
+			String service_ampm = request.getParameter("tickler.service_ampm");
+			tickler.setServiceTime(service_hour + ":" + service_minute + " " + service_ampm);
+
+		} catch(Exception e) {
+			request.setAttribute("status", "failed");
+			request.setAttribute("providers", providerMgr.getActiveProviders(null, programIdStr));
+			request.setAttribute("program_name", programMgr.getProgramName(programIdStr));
+			request.setAttribute("from", getFrom(request));
+
+			String demographicNo = request.getParameter("tickler.demographicNo");
+			if(!StringUtils.isEmpty(demographicNo)) {
+				Demographic demo = demographicMgr.getDemographic(demographicNo);
+				if(demo != null) {
+					request.setAttribute("demographicName", demo.getFormattedName());
+				}
+			}
+
+			return mapping.findForward("failed");
+		}
 
 		tickler.setUpdateDate(new java.util.Date());
 		tickler.setId(null);
@@ -377,8 +412,7 @@ public class TicklerAction extends DispatchAction {
 		if (echart != null && echart.equals("true")) {
 			Provider assignee = providerMgr.getProvider(tickler.getTaskAssignedTo());
 
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			SimpleDateFormat formatter2 = new SimpleDateFormat("MM/dd/yy : hh:mm a");
+
 
 			/* get current chart */
 			EChart tempChart = echartDao.getLatestChart(tickler.getDemographicNo());
