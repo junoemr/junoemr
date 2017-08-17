@@ -18,11 +18,12 @@
 
 package oscar.appt;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ApptData {
+public class ApptData implements Serializable {
 	String appointment_no;
 	String provider_no;
 	String appointment_date;

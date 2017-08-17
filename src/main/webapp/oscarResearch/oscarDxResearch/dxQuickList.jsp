@@ -36,10 +36,6 @@ Required Parameters to plug-in:
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 
-
-	<!-- html:form action="oscarResearch/oscarDxResearch/dxResearchLoadQuickListItems.do" > -->
-
-
 <table id="dxCodeQuicklist" style="width:100%;border-collapse:collapse;">
 	<tr >
 		<td class="heading">
@@ -49,38 +45,32 @@ Required Parameters to plug-in:
 	<tr>
 		<td>
 		<html:select property="quickList"
-			onchange="javascript:changeList(this,'${ demographicNo }','${ providerNo }');"  >			
-			<logic:iterate id="quickLists" name="allQuickLists" property="dxQuickListBeanVector" >				
-				<option value="${ quickLists.quickListName }" ${ quickLists.quickListName eq param.quickList ? 'selected' : '' } >			
+			onchange="javascript:changeList(this,'${ demographicNo }','${ providerNo }');"  >
+			<logic:iterate id="quickLists" name="allQuickLists" property="dxQuickListBeanVector" >
+				<option value="${ quickLists.quickListName }" ${ quickLists.quickListName eq param.quickList ? 'selected' : '' } >
 					<bean:write	name="quickLists" property="quickListName" />
 				</option>
 			</logic:iterate>
 		</html:select>
 		
 		</td>
-<%-- 		<td>
-			<html:button property="" onclick="javascript:changeList('${ param.quickList }','${ demographicNo }','${ providerNo }');" 
-				disabled="${ param.disable }">
-				<bean:message key="oscarResearch.oscarDxResearch.btnGO"/>
-			</html:button>
-		</td>	 --%>	
 	</tr>
 
-	<logic:iterate id="item" name="allQuickListItems" property="dxQuickListItemsVector">	
+	<logic:iterate id="item" name="allQuickListItems" property="dxQuickListItemsVector">
 		<tr>
-			<td class="quickList">			
+			<td class="quickList">
 				<html:link href="#" title="${ item.dxSearchCode }"
 					onclick="javascript:submitform( '${ item.dxSearchCode }', '${ item.type }' )" >
 						<bean:write name="item" property="description" />
 				</html:link>
 			</td>
-		</tr>		
+		</tr>
 	</logic:iterate>
 
 </table>
 
 <script type="text/javascript">
-	function changeList(quickList, demographicNo, providerNo){       
+	function changeList(quickList, demographicNo, providerNo){
 	    location.href = 'setupDxResearch.do?demographicNo='
 	    		+demographicNo
 	    		+'&quickList='
@@ -89,5 +79,3 @@ Required Parameters to plug-in:
 	    		+providerNo;
 	}
 </script>
-
-	<!--  /html:form>-->

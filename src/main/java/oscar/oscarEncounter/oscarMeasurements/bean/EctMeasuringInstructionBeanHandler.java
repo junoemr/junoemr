@@ -25,10 +25,11 @@
 
 package oscar.oscarEncounter.oscarMeasurements.bean;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 
-public class EctMeasuringInstructionBeanHandler {
+public class EctMeasuringInstructionBeanHandler implements Serializable {
     
     List<EctMeasuringInstructionBean> measuringInstructionList = new ArrayList<EctMeasuringInstructionBean>();
  

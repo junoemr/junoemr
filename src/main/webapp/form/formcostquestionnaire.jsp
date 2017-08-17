@@ -58,7 +58,11 @@
     //FrmData fd = new FrmData();    String resource = fd.getResource(); resource = resource + "ob/riskinfo/";
 
     //get project_home
+<<<<<<< HEAD
     String project_home = request.getContextPath().replace("/", "");	
+=======
+    String project_home = request.getContextPath().replace("/", "");
+>>>>>>> juno
 %>
 <%
   boolean bView = false;

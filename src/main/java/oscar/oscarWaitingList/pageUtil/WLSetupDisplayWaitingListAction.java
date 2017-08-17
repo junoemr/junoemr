@@ -193,15 +193,15 @@ public final class WLSetupDisplayWaitingListAction extends Action {
         today = UtilDateUtilities.DateToString(new Date(), "yyyy-MM-dd");
         
         request.setAttribute("WLId", waitingListId);
-        session.setAttribute( "waitingList", hd );     
+        request.setAttribute( "waitingList", hd );
         if(hd != null){
         	session.setAttribute("waitingListName", hd.getWaitingListName());
         }else{
         	session.setAttribute("waitingListName", null);
         }
-        session.setAttribute("waitingListNames", waitListNameManager.getWaitingListNames());
+        request.setAttribute("waitingListNames", waitListNameManager.getWaitingListNames());
 
-        session.setAttribute("allProviders", allProviders);
+        request.setAttribute("allProviders", allProviders);
         
         session.setAttribute("nbPatients", nbPatients);
 

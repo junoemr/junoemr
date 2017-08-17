@@ -1182,6 +1182,10 @@
 			<forward name="failESend" path="/oscarEncounter/ViewRequest.do" />
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" />
 		</action>
+
+		<action input="/oscarEncounter/oscarConsultationRequest/displayAttachedFiles.jsp" path="/oscarEncounter/displayAttached" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationGetAttachedAction">
+			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/displayAttachedFiles.jsp" />
+		</action>
 		
 		<action path="/oscarEncounter/myoscar/measurements_*" name="EctMyOscarFilterForm" scope="request" type="oscar.oscarEncounter.data.myoscar.EctMyOscarFilterAction">
 			<forward name="success" path="/oscarEncounter/myoscar/{1}.jsp" />
@@ -1866,8 +1870,7 @@
 			<forward name="success" path="/eform/efmformmanager.jsp" />
 		</action>
 		<action input="/eform/partials/import.jsp" name="FrmForm" path="/eform/manageEForm" scope="request" type="oscar.eform.actions.ManageEFormAction" parameter="method">
-			<forward name="fail" path="/eform/partials/import.jsp" />
-			<forward name="success" path="/eform/partials/import.jsp" />
+			<forward name="upload" path="/eform/partials/import.jsp" />
 		</action>
 		<action input="/eform/efmformrtl_config.jsp" path="/eform/IndivicaRichTextLetterSettings" scope="request" type="oscar.eform.actions.RTLSettingsAction">
 			<forward name="success" path="/eform/efmformrtl_config.jsp" />
@@ -2092,6 +2095,7 @@
 			<forward name="list" path="/ticklerPlus/ticklerList.jsp" />
 			<forward name="view" path="/ticklerPlus/ticklerView.jsp" />
 			<forward name="edit" path="/ticklerPlus/ticklerForm.jsp" />
+			<forward name="failed" path="/ticklerPlus/ticklerForm.jsp" />
 			<forward name="preparedTicklerList" path="/ticklerPlus/preparedTicklerList.jsp" />
 		</action>
 		<action path="/CustomFilter" type="org.springframework.web.struts.DelegatingActionProxy" parameter="method" scope="request" name="customFilterForm" input="/ticklerPlus/customFilterForm.jsp" validate="false">

@@ -47,7 +47,7 @@ if(!authed) {
 <html:html locale="true">
 <%//oscar.consultationRequest.pageUtil.ShowAllServicesUtil showAllServicesUtil = new oscar.consultationRequest.pageUtil.ShowAllServicesUtil();
 %>
-<jsp:useBean id="showAllServicesUtil" scope="session"
+<jsp:useBean id="showAllServicesUtil" scope="request"
 	class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConShowAllServicesUtil" />
 
 

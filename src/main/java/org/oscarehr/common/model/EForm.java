@@ -42,6 +42,11 @@ import javax.persistence.TemporalType;
 public class EForm extends AbstractModel<Integer> implements Serializable {
 
 	/**
+	 * default serial version uid
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * This comparator sorts EForm ascending based on the formName
 	 */
 	public static final Comparator<EForm> FORM_NAME_COMPARATOR = new Comparator<EForm>() {
@@ -61,6 +66,7 @@ public class EForm extends AbstractModel<Integer> implements Serializable {
 	@Column(name = "file_name")
 	private String fileName;
 
+	@Column(name = "subject")
 	private String subject;
 
 	@Column(name = "status")

@@ -129,14 +129,24 @@ public class ProviderLabRoutingDao extends AbstractDao<ProviderLabRoutingModel> 
 
 	
     public List<Object[]> findByProviderNo(String providerNo, String status) {
-		String sql = "FROM ProviderLabRoutingModel p, Document d " +
-			"WHERE d.documentNo = p.labNo " +
-			"AND (d.status IS NULL OR d.status <> 'D') " +
-			"AND p.providerNo = :pNo AND p.status = :sts ";
-		Query query = entityManager.createQuery(sql);
-	    query.setParameter("pNo", providerNo);
-	    query.setParameter("sts", status);
-	    return query.getResultList();
+	    String sql = "SELECT " +
+			" proLR.comment, " +
+			" proLR.lab_no, " +
+			" proLR.lab_type, " +
+			" proLR.provider_no, " +
+			" proLR.status, " +
+			" proLR.timestamp " +
+			"FROM providerLabRouting proLR " +
+			"LEFT JOIN document doc ON proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no AND doc.status <> 'D' " +
+			"LEFT JOIN hl7TextInfo lab ON proLR.lab_type = 'HL7' AND proLR.lab_no = lab.lab_no " +
+			"WHERE (doc.document_no IS NOT NULL OR lab.lab_no IS NOT NULL) " +
+			"AND proLR.provider_no = :provider_no " +
+			"AND proLR.status = :status ";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("provider_no", providerNo);
+		query.setParameter("status", status);
+		return query.getResultList();
     }
 
 	

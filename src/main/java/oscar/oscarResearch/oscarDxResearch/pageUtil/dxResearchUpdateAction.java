@@ -45,6 +45,7 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.log.LogAction;
 import oscar.log.LogConst;
+import oscar.oscarResearch.oscarDxResearch.bean.dxQuickListBeanHandler;
 import oscar.util.ConversionUtils;
 import oscar.util.ParameterActionForward;
 
@@ -56,12 +57,13 @@ public class dxResearchUpdateAction extends Action {
 		if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_dxresearch", "u", null)) {
 			throw new RuntimeException("missing required security object (_dxresearch)");
 		}
-		
+
 		String status = request.getParameter("status");
 		String did = request.getParameter("did");
 		String demographicNo = request.getParameter("demographicNo");
 		String providerNo = request.getParameter("providerNo");
 		String startDate = request.getParameter("startdate");
+		String selectedQuickList = request.getParameter("quickList");
 
 		partialDateDao.setPartialDate(startDate, PartialDate.DXRESEARCH, Integer.valueOf(did), PartialDate.DXRESEARCH_STARTDATE);
 		startDate = partialDateDao.getFullDate(startDate);
@@ -77,17 +79,20 @@ public class dxResearchUpdateAction extends Action {
 			research.setUpdateDate(new Date());
 			
 			dao.merge(research);
+			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), Integer.parseInt(demographicNo),
+					LogConst.ACTION_UPDATE, LogConst.CON_DISEASE_REG, LogConst.STATUS_SUCCESS, did, request.getRemoteAddr(), research.getDxresearchCode());
+		}
+
+		if(selectedQuickList == null || selectedQuickList.trim().isEmpty()) {
+			dxQuickListBeanHandler quicklistHd = new dxQuickListBeanHandler(providerNo);
+			selectedQuickList = quicklistHd.getLastUsedQuickList();
 		}
 
 		ParameterActionForward forward = new ParameterActionForward(mapping.findForward("success"));
 		forward.addParameter("demographicNo", demographicNo);
 		forward.addParameter("providerNo", providerNo);
-		forward.addParameter("quickList", "");
+		forward.addParameter("quickList", selectedQuickList);
 
-		String ip = request.getRemoteAddr();
-        LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_UPDATE, "DX", ""+research.getId() , ip,"");
-
-        
 		return forward;
 	}
 

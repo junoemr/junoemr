@@ -27,7 +27,6 @@ package oscar.oscarResearch.oscarDxResearch.pageUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -62,9 +61,8 @@ public final class dxResearchCodeSearchAction extends Action {
         String codeType = request.getParameter("codeType");
                 
         dxCodeSearchBeanHandler hd = new dxCodeSearchBeanHandler(codeType,xml_research);
-        HttpSession session = request.getSession();      
-        session.setAttribute("allMatchedCodes", hd);
-        session.setAttribute("codeType", codeType);
+        request.setAttribute("allMatchedCodes", hd);
+        request.setAttribute("codeType", codeType);
         
         return mapping.findForward("success");
     }

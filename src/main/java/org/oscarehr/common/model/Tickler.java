@@ -92,7 +92,7 @@ public class Tickler extends AbstractModel<Integer> {
 	
 	private String message;
 	
-	@Column(length=1)
+	@Column(length=1, nullable=false)
 	@Enumerated(EnumType.STRING)
 	private STATUS status = STATUS.A;
 	

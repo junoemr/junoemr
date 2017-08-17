@@ -33,7 +33,6 @@ import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -81,9 +80,8 @@ public class FrmSetupSelectAction extends Action {
 			}
 		}
     	
-        HttpSession session = request.getSession();
-        session.setAttribute( "formShownVector", formShownVector.values() );   
-        session.setAttribute( "formHiddenVector", formHiddenVector ); 
+        request.setAttribute( "formShownVector", formShownVector.values() );
+        request.setAttribute( "formHiddenVector", formHiddenVector );
         
         return mapping.findForward("continue");
     }

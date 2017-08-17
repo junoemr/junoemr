@@ -66,12 +66,14 @@ public class LogConst {
     public static final String CON_ECHART = "eChart";
     public static final String CON_DEMOGRAPHIC = "demographic";
     public static final String CON_DEMOGRAPHIC_RELATION = "demographic_relations";
+    public static final String CON_DISEASE_REG  = "DX";
     public static final String CON_ROLE = "role";
     public static final String CON_PROVIDER = "provider";
     public static final String CON_PRIVILEGE = "privilege";
     public static final String CON_PASSWORD = "password/pin";
     public static final String CON_ADMIN = "admin";
     public static final String CON_FORM = "form";
+    public static final String CON_EFORM = "eForm";
     public static final String CON_PRESCRIPTION = "prescription";
     public static final String CON_MEDICATION = "medication";
     public static final String CON_DRUGS="drugs";

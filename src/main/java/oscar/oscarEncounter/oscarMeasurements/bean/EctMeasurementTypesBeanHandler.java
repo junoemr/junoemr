@@ -25,6 +25,7 @@
 
 package oscar.oscarEncounter.oscarMeasurements.bean;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Vector;
@@ -44,7 +45,7 @@ import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 
-public class EctMeasurementTypesBeanHandler {
+public class EctMeasurementTypesBeanHandler implements Serializable {
     
     Vector measurementTypeVector = new Vector();
     Vector measuringInstrcVector = new Vector();

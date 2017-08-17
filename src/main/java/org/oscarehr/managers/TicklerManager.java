@@ -174,7 +174,17 @@ public class TicklerManager {
 		
 		return true;
     }
-        
+
+    public boolean addUpdateToTickler(Tickler tickler, TicklerUpdate update) {
+	    ticklerUpdateDao.persist(update);
+	    tickler.getUpdates().add(update);
+		return false;
+    }
+	public boolean addCommentToTickler(Tickler tickler, TicklerComment comment) {
+		ticklerCommentDao.persist(comment);
+		tickler.getComments().add(comment);
+		return false;
+	}
     public boolean updateTickler(LoggedInInfo loggedInInfo, Tickler tickler) {
     	checkPrivilege(loggedInInfo, PRIVILEGE_UPDATE);
     	

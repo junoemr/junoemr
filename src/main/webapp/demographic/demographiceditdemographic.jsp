@@ -137,7 +137,7 @@ if(!authed) {
 	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	List<Provider> providers = providerDao.getActiveProviders();
-	List<Provider> doctors = providerDao.getActiveProvidersByRole("doctor");
+	List<Provider> doctors = providerDao.getActiveProvidersByType("doctor");
 	List<Provider> nurses = providerDao.getActiveProvidersByRole("nurse");
 	List<Provider> midwifes = providerDao.getActiveProvidersByRole("midwife");
 	

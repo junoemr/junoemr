@@ -54,30 +54,30 @@ import oscar.eform.data.EForm;
 
 public class ManageEFormAction extends DispatchAction {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
-    public ActionForward exportEForm(ActionMapping mapping, ActionForm form,
-            HttpServletRequest request, HttpServletResponse response) throws Exception {
-    	
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "r", null)) {
+
+	public ActionForward exportEForm(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "r", null)) {
 			throw new SecurityException("missing required security object (_eform)");
 		}
-    	
-        String fid = request.getParameter("fid");
-        MiscUtils.getLogger().debug("fid: " + fid);
-        response.setContentType("application/zip");  //octet-stream
-        EForm eForm = new EForm(fid, "1");
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + eForm.getFormName().replaceAll("\\s", fid) + ".zip\"");
-        EFormExportZip eFormExportZip = new EFormExportZip();
-        List<EForm> eForms = new ArrayList<EForm>();
-        eForms.add(eForm);
-        eFormExportZip.exportForms(eForms, response.getOutputStream());
-        return null;
-    }
 
-    public ActionForward importEForm(ActionMapping mapping, ActionForm form,
-            HttpServletRequest request, HttpServletResponse response) throws Exception {
-    	
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null)) {
+		String fid = request.getParameter("fid");
+		MiscUtils.getLogger().debug("fid: " + fid);
+		response.setContentType("application/zip");  //octet-stream
+		EForm eForm = new EForm(fid, "1");
+		response.setHeader("Content-Disposition", "attachment; filename=\"" + eForm.getFormName().replaceAll("\\s", fid) + ".zip\"");
+		EFormExportZip eFormExportZip = new EFormExportZip();
+		List<EForm> eForms = new ArrayList<EForm>();
+		eForms.add(eForm);
+		eFormExportZip.exportForms(eForms, response.getOutputStream());
+		return null;
+	}
+
+	public ActionForward importEForm(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null)) {
 			throw new SecurityException("missing required security object (_eform)");
 		}
     	
@@ -86,12 +86,9 @@ public class ManageEFormAction extends DispatchAction {
         EFormExportZip eFormExportZip = new EFormExportZip();
         List<String> errors = eFormExportZip.importForm(zippedForm.getInputStream());
         request.setAttribute("importErrors", errors);
-        if(errors.size() > 0){
-        	return mapping.findForward("fail");
-        }else{
-	        request.setAttribute("status", "success");	
-	        return mapping.findForward("success");
-        }
+		request.setAttribute("status", "upload");
+
+		return mapping.findForward("upload");
     }
 
     /*
@@ -103,84 +100,84 @@ public class ManageEFormAction extends DispatchAction {
     	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null)) {
 			throw new SecurityException("missing required security object (_eform)");
 		}
-    	
-        String sURL = request.getParameter("url");
-        URL url = new URL("http://know2act.org/data/" + sURL);
-        url.openStream();
-        request.setAttribute("input", "import");
-        EFormExportZip eFormExportZip = new EFormExportZip();
-        List<String> errors = eFormExportZip.importForm(url.openStream());
-        request.setAttribute("importErrors", errors);
-        return mapping.findForward("success");
-    }
 
-    public ActionForward exportEFormSend(ActionMapping mapping, ActionForm form,
-            HttpServletRequest request, HttpServletResponse response) throws Exception {
-    	
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "r", null)) {
+		String sURL = request.getParameter("url");
+		URL url = new URL("http://know2act.org/data/" + sURL);
+		url.openStream();
+		request.setAttribute("input", "import");
+		EFormExportZip eFormExportZip = new EFormExportZip();
+		List<String> errors = eFormExportZip.importForm(url.openStream());
+		request.setAttribute("importErrors", errors);
+		return mapping.findForward("success");
+	}
+
+	public ActionForward exportEFormSend(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "r", null)) {
 			throw new SecurityException("missing required security object (_eform)");
 		}
-    	
-
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-
-        String fid = request.getParameter("fid");
-        MiscUtils.getLogger().debug("fid: " + fid);
-        EForm eForm = new EForm(fid, "1");
-        //===================
-        HttpClient client = new HttpClient();
-        client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
-
-        PostMethod method = new PostMethod("http://know2act.org/sessions");
 
 
+		String username = request.getParameter("username");
+		String password = request.getParameter("password");
 
-        method.addParameter("session[email]", username);
-        method.addParameter("session[password]", password);
+		String fid = request.getParameter("fid");
+		MiscUtils.getLogger().debug("fid: " + fid);
+		EForm eForm = new EForm(fid, "1");
+		//===================
+		HttpClient client = new HttpClient();
+		client.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
 
-        int statusCode = client.executeMethod(method);
-
-        //need to check if login worked
-
-        byte[] responseBody = method.getResponseBody();
-
-        MiscUtils.getLogger().debug(new String(responseBody));
+		PostMethod method = new PostMethod("http://know2act.org/sessions");
 
 
 
-        MiscUtils.getLogger().debug("--------------------------------------------------------------------------------------");
-         MultipartPostMethod eformPost = new MultipartPostMethod("http://know2act.org/e_forms/");
+		method.addParameter("session[email]", username);
+		method.addParameter("session[password]", password);
 
-        String documentDir = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-        File docDir = new File(documentDir);
-        String exportFilename = "eformExport"+System.currentTimeMillis()+""+(Math.random()*100);
-        MiscUtils.getLogger().debug("Exported file name "+exportFilename);
-        File exportFile = new File(documentDir,exportFilename);
+		int statusCode = client.executeMethod(method);
 
-        FileOutputStream fos = new FileOutputStream(exportFile);
+		//need to check if login worked
 
-        EFormExportZip eFormExportZip = new EFormExportZip();
-        List<EForm> eForms = new ArrayList<EForm>();
-        eForms.add(eForm);
-        eFormExportZip.exportForms(eForms, fos);
-        fos.close();
+		byte[] responseBody = method.getResponseBody();
 
-        eformPost.addParameter("e_form[name]", eForm.getFormName());
-        eformPost.addParameter("e_form[category]", request.getParameter("category"));
-        eformPost.addParameter("e_form[uploaded_data]", exportFile.getName(), exportFile);
-
-
-        int statusCode2 = client.executeMethod(eformPost);
-
-        byte[] responseBody2 = eformPost.getResponseBody();
-
-        MiscUtils.getLogger().debug("ST " + statusCode2);
-        MiscUtils.getLogger().debug(new String(responseBody2));
-        //TODO:Need to handle errors
+		MiscUtils.getLogger().debug(new String(responseBody));
 
 
 
-        return mapping.findForward("success");
-    }
+		MiscUtils.getLogger().debug("--------------------------------------------------------------------------------------");
+		 MultipartPostMethod eformPost = new MultipartPostMethod("http://know2act.org/e_forms/");
+
+		String documentDir = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+		File docDir = new File(documentDir);
+		String exportFilename = "eformExport"+System.currentTimeMillis()+""+(Math.random()*100);
+		MiscUtils.getLogger().debug("Exported file name "+exportFilename);
+		File exportFile = new File(documentDir,exportFilename);
+
+		FileOutputStream fos = new FileOutputStream(exportFile);
+
+		EFormExportZip eFormExportZip = new EFormExportZip();
+		List<EForm> eForms = new ArrayList<EForm>();
+		eForms.add(eForm);
+		eFormExportZip.exportForms(eForms, fos);
+		fos.close();
+
+		eformPost.addParameter("e_form[name]", eForm.getFormName());
+		eformPost.addParameter("e_form[category]", request.getParameter("category"));
+		eformPost.addParameter("e_form[uploaded_data]", exportFile.getName(), exportFile);
+
+
+		int statusCode2 = client.executeMethod(eformPost);
+
+		byte[] responseBody2 = eformPost.getResponseBody();
+
+		MiscUtils.getLogger().debug("ST " + statusCode2);
+		MiscUtils.getLogger().debug(new String(responseBody2));
+		//TODO:Need to handle errors
+
+
+
+		return mapping.findForward("success");
+	}
 }

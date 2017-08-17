@@ -23,7 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -96,7 +95,6 @@ public class FormsService extends AbstractServiceImpl {
 	@Autowired
 	private AppDefinitionDao appDefinitionDao;
 	
-	
 	@GET
 	@Path("/{demographicNo}/all")
 	@Produces("application/json")
@@ -120,7 +118,7 @@ public class FormsService extends AbstractServiceImpl {
 		}else{  // Only two options right now.  Need to change this anyways
 			List<EForm> eforms =  formsManager.findByStatus(getLoggedInInfo(),true, null);  //This will have to change to accommodate forms too.
 			Collections.sort(eforms,EForm.FORM_NAME_COMPARATOR);
-			for(EForm eform :eforms){
+			for(EForm eform : eforms){
 				int formId = eform.getId();
 				String name = eform.getFormName();
 				String subject = eform.getSubject();

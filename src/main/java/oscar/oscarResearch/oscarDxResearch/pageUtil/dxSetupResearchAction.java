@@ -27,7 +27,6 @@ package oscar.oscarResearch.oscarDxResearch.pageUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -41,52 +40,51 @@ import oscar.oscarResearch.oscarDxResearch.bean.dxQuickListBeanHandler;
 import oscar.oscarResearch.oscarDxResearch.bean.dxQuickListItemsHandler;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler;
 import oscar.oscarResearch.oscarDxResearch.util.dxResearchCodingSystem;
+import oscar.util.ParameterActionForward;
 
 public final class dxSetupResearchAction extends Action {
 	private static SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
-    public ActionForward execute(ActionMapping mapping,
-                                 ActionForm form,
-                                 HttpServletRequest request,
-                                 HttpServletResponse response)
-        throws Exception {
-    	
-    	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-    	if (!securityInfoManager.hasPrivilege(loggedInInfo, "_dxresearch", "r", null)) {
-    		throw new RuntimeException("missing required security object (_dxresearch)");
-    	}
-    	
-        dxResearchCodingSystem codingSys = new dxResearchCodingSystem();        
-        String demographicNo = request.getParameter("demographicNo");
-        String providerNo = request.getParameter("providerNo");
-        String selectedQuickList = request.getParameter("quickList");          
-        dxResearchBeanHandler hd = new dxResearchBeanHandler(demographicNo);
-        
-        dxQuickListBeanHandler quicklistHd = null;
-        dxQuickListItemsHandler quicklistItemsHd = null;
-                
-        if(providerNo == null) {
-        	providerNo = loggedInInfo.getLoggedInProviderNo();
-        }
-        if(selectedQuickList == null) {
-        	selectedQuickList="";
-        }
-        if (selectedQuickList.equals("")){
-            quicklistHd = new dxQuickListBeanHandler(providerNo);
-            quicklistItemsHd = new dxQuickListItemsHandler(quicklistHd.getLastUsedQuickList(),providerNo);
-        } else{
-            quicklistItemsHd = new dxQuickListItemsHandler(selectedQuickList,providerNo);
-            quicklistHd = new dxQuickListBeanHandler(providerNo);
-        }
-        
-        HttpSession session = request.getSession();
-        session.setAttribute("codingSystem", codingSys);
-        session.setAttribute("allQuickLists", quicklistHd);
-        session.setAttribute("allQuickListItems", quicklistItemsHd);
-        session.setAttribute("allDiagnostics", hd );
-        session.setAttribute("demographicNo", demographicNo ); 
-        session.setAttribute("providerNo", providerNo ); 
-       
-        return (mapping.findForward("success"));
-    }
+	public ActionForward execute(ActionMapping mapping,
+	                             ActionForm form,
+	                             HttpServletRequest request,
+	                             HttpServletResponse response)
+			throws Exception {
+
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_dxresearch", "r", null)) {
+			throw new RuntimeException("missing required security object (_dxresearch)");
+		}
+
+		dxResearchCodingSystem codingSys = new dxResearchCodingSystem();
+		String demographicNo = request.getParameter("demographicNo");
+		String providerNo = request.getParameter("providerNo");
+		String selectedQuickList = request.getParameter("quickList");
+		dxResearchBeanHandler hd = new dxResearchBeanHandler(demographicNo);
+
+		dxQuickListBeanHandler quicklistHd = new dxQuickListBeanHandler(providerNo);
+
+		if (providerNo == null) {
+			providerNo = loggedInInfo.getLoggedInProviderNo();
+		}
+		// if no quick list specified
+		if (selectedQuickList == null || selectedQuickList.trim().isEmpty()) {
+			// select the last one used (or default)
+			selectedQuickList = quicklistHd.getLastUsedQuickList();
+		}
+		// get the corresponding items from the selected list
+		dxQuickListItemsHandler quicklistItemsHd = new dxQuickListItemsHandler(selectedQuickList, providerNo);
+
+		request.setAttribute("codingSystem", codingSys);
+		request.setAttribute("allQuickLists", quicklistHd);
+		request.setAttribute("allQuickListItems", quicklistItemsHd);
+		request.setAttribute("allDiagnostics", hd);
+		request.setAttribute("demographicNo", demographicNo);
+		request.setAttribute("providerNo", providerNo);
+
+		ParameterActionForward forward = new ParameterActionForward(mapping.findForward("success"));
+		forward.addParameter("quickList", selectedQuickList);
+
+		return forward;
+	}
 }

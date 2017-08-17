@@ -140,7 +140,7 @@ public class EditTicklerAction extends DispatchAction{
                     emailFailed = true;
                 }
                 catch (Exception e) {
-                    logger.error("Unexpected error. Check your tickler email, and general email configuration",e);  
+                    logger.error("Unexpected error. Check your tickler email, and general email configuration",e);
                     emailFailed = true;
                 }                                   
             }
@@ -159,7 +159,7 @@ public class EditTicklerAction extends DispatchAction{
             tc.setUpdateDate(now);
             tc.setProviderNo(providerNo);
 
-            t.getComments().add(tc);
+            ticklerManager.addCommentToTickler(t, tc);
             isComment = true;
         }
 
@@ -179,7 +179,7 @@ public class EditTicklerAction extends DispatchAction{
             tuOriginal.setAssignedTo(t.getTaskAssignedTo());                                
             tuOriginal.setServiceDate(t.getServiceDate()); 
             
-            t.getUpdates().add(tuOriginal);
+            ticklerManager.addUpdateToTickler(t, tuOriginal);
         }
 
         TicklerUpdate tu = new TicklerUpdate();
@@ -221,8 +221,8 @@ public class EditTicklerAction extends DispatchAction{
            }                
         }
 
-        if (isUpdate){            
-            t.getUpdates().add(tu);
+        if (isUpdate){
+            ticklerManager.addUpdateToTickler(t, tu);
         }
 
         if (isComment || isUpdate) {            

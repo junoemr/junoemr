@@ -29,8 +29,7 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 
 <% 
-    String user_no;
-    user_no = (String) session.getAttribute("user");
+    String user_no = (String) session.getAttribute("user");
 %>
 
 <html:html locale="true">
@@ -93,7 +92,7 @@ function CodesAttach() {
 
 <table width="600" cellspacing="1">
 	<tr>
-		<td colspan="2"><h3><%=session.getAttribute("codeType").toString().toUpperCase()%> <bean:message key="oscarResearch.oscarDxResearch.dxResearchCodeSearch.msgCodeSearch" /></h3></td>
+		<td colspan="2"><h3><%=request.getAttribute("codeType").toString().toUpperCase()%> <bean:message key="oscarResearch.oscarDxResearch.dxResearchCodeSearch.msgCodeSearch" /></h3></td>
 	</tr>
 	<tr class="heading">
 		<td width="20%"><bean:message key="oscarResearch.oscarDxResearch.dxResearchCodeSearch.msgCode" /></td>
