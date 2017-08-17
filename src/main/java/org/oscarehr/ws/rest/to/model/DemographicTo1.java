@@ -96,7 +96,6 @@ public class DemographicTo1 implements Serializable {
 	private Integer waitingListID;
 	private String waitingListNote;
 	private Date onWaitingListSinceDate;
-	private AgeTo1 age;
 	private Integer admissionProgramId;
 	
 	private List<DemographicContactFewTo1> demoContacts = new ArrayList<DemographicContactFewTo1>();
@@ -653,14 +652,6 @@ public class DemographicTo1 implements Serializable {
 	
 	public void setRosterStatusList(List<StatusValueTo1> rosterStatusList) {
 		this.rosterStatusList = rosterStatusList;
-	}
-
-	public AgeTo1 getAge() {
-		return age;
-	}
-
-	public void setAge(AgeTo1 age) {
-		this.age = age;
 	}
 
 	public Integer getAdmissionProgramId() {

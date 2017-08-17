@@ -183,8 +183,7 @@ public class DemographicManager {
 
 	public DemographicCust getDemographicCust(LoggedInInfo loggedInInfo, Integer id) {
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-		DemographicCust result = null;
-		result = demographicCustDao.find(id);
+		DemographicCust result = demographicCustDao.find(id);
 
 		return result;
 	}
