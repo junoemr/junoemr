@@ -134,6 +134,11 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
+		// Is there a shared location where this could be accessed from any controller? i.e. a utils file
+		controller.isNaN = function (num) {
+			return isNaN(num)
+		};
+
 		controller.fillMenu = function fillMenu()
 		{
 			uxService.menu($stateParams.demographicNo).then(
@@ -689,6 +694,7 @@ angular.module('Record').controller('Record.RecordController', [
 				}
 			});
 
+			// Might need to keep this to continue the original edit action
 			modalInstance.result.then(
 				function success(results)
 				{
@@ -796,6 +802,9 @@ angular.module('Record').controller('Record.RecordController', [
 				return filterValue;
 			};
 		};
+
+		controller.demographic.intAge = Juno.Common.Util.calcAge(controller.demographic.dateOfBirth);
+
 	}
 ]);
 

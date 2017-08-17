@@ -77,6 +77,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				console.log(errors);
 			});
 
+		// Is there a shared location where this could be accessed from any controller? i.e. a utils file
+		controller.isNaN = function(num)
+		{
+			return isNaN(num);
+		};
+
 		//disable click and keypress if user only has read-access
 		controller.checkAction = function checkAction(event)
 		{
@@ -382,16 +388,16 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.formatLastName(); //done on page load
 		controller.formatFirstName(); //done on page load
 
-		//calculate age
-		var now = new Date();
-		controller.calculateAge = function calculateAge()
-		{
-			controller.page.demo.age = now.getFullYear() - controller.page.demo.dobYear;
-			if (now.getMonth() < controller.page.demo.dobMonth - 1) controller.page.demo.age--;
-			else if (now.getMonth() == controller.page.demo.dobMonth - 1 && now.getDate() < controller.page.demo.dobDay) controller.page.demo.age--;
-		};
-
-		controller.calculateAge(); //done on page load
+		// //calculate age
+		// var now = new Date();
+		// controller.calculateAge = function calculateAge()
+		// {
+		// 	controller.page.demo.age = now.getFullYear() - controller.page.demo.dobYear;
+		// 	if (now.getMonth() < controller.page.demo.dobMonth - 1) controller.page.demo.age--;
+		// 	else if (now.getMonth() == controller.page.demo.dobMonth - 1 && now.getDate() < controller.page.demo.dobDay) controller.page.demo.age--;
+		// };
+		//
+		// controller.calculateAge(); //done on page load
 
 		//set ready for swipe card
 		controller.setSwipeReady = function setSwipeReady(status)
@@ -608,14 +614,25 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//manage date entries
 		controller.checkDate = function checkDate(id)
 		{
-			if (id == "DobY") controller.page.demo.dobYear = checkYear(controller.page.demo.dobYear);
-			else if (id == "DobM") controller.page.demo.dobMonth = checkMonth(controller.page.demo.dobMonth);
-			else if (id == "DobD") controller.page.demo.dobDay = checkDay(controller.page.demo.dobDay, controller.page.demo.dobMonth, controller.page.demo.dobYear);
-		}
+			if (id == "DobY")
+			{
+				controller.page.demo.dobYear = checkYear(controller.page.demo.dobYear);
+			}
+			else if (id == "DobM")
+			{
+				controller.page.demo.dobMonth = checkMonth(controller.page.demo.dobMonth);
+			}
+			else if (id == "DobD")
+			{
+				controller.page.demo.dobDay = checkDay(controller.page.demo.dobDay, controller.page.demo.dobMonth, controller.page.demo.dobYear);
+			}
+			console.log('MONTH: ', controller.page.demo.dobMonth);
+			controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
+		};
 
 		controller.formatDate = function formatDate(id)
 		{
-			controller.calculateAge();
+			// controller.calculateAge();
 
 			if (id == "DobM" && controller.page.demo.dobMonth != null && String(controller.page.demo.dobMonth).length == 1)
 			{
@@ -625,9 +642,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			{
 				controller.page.demo.dobDay = "0" + controller.page.demo.dobDay;
 			}
-		}
+		};
 		controller.formatDate("DobM"); //done on page load
 		controller.formatDate("DobD"); //done on page load
+		controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
 
 		//check Patient Status if endDate is entered
 		controller.checkPatientStatus = function checkPatientStatus()
@@ -1219,7 +1237,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						console.log(errors);
 					});
 			}
-		}
+		};
 		controller.validateHCSave();
 
 

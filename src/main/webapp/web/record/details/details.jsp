@@ -173,7 +173,7 @@
 								title="Birthday Day" 
 								class="form-control form-control-details" 
 								ng-model="detailsCtrl.page.demo.dobDay" 
-								ng-change=detailsCtrl."checkDate('DobD')" 
+								ng-change="detailsCtrl.checkDate('DobD')"
 								ng-blur="detailsCtrl.formatDate('DobD')"
 							/>	
 							<input id="details-dob-year" type="text" placeholder="YYYY" 
@@ -182,7 +182,9 @@
 								ng-change="detailsCtrl.checkDate('DobY')" 
 								ng-blur="detailsCtrl.formatDate('DobY')" 
 							/>
-							<div>&nbsp;({{detailsCtrl.page.demo.age}}y)</div>
+							<div>&nbsp;
+								(<span ng-if="!detailsCtrl.isNaN(detailsCtrl.page.demo.intAge)">{{detailsCtrl.page.demo.intAge}}y</span>)
+							</div>
 						</div>
 					</div>
 					
