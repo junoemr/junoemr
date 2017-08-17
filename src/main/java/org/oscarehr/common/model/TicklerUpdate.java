@@ -53,9 +53,9 @@ public class TicklerUpdate extends AbstractModel<Integer> {
 	@Column(name="tickler_no")
 	private Integer ticklerNo;
 	
-	@Column(length=1)
+	@Column(length=1, nullable=false)
 	@Enumerated(EnumType.STRING)
-	private Tickler.STATUS status;
+	private Tickler.STATUS status = Tickler.STATUS.A;
 	
 	@Column(length=6)
 	private String assignedTo;

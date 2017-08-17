@@ -25,8 +25,9 @@
 
 package oscar.oscarEncounter.oscarMeasurements.bean;
 
+import java.io.Serializable;
 
-public class EctMeasuringInstructionBean{
+public class EctMeasuringInstructionBean implements Serializable{
 
        String measuringInstrc;
           

@@ -303,12 +303,18 @@ function update_date(did, demoNo, provNo) {
                                                                         </td>
 									<% if(!disable){ %>
 									<td class="notResolved">
-									<a href='dxResearchUpdate.do?status=C&did=<bean:write name="diagnotics" property="dxResearchNo" />&demographicNo=<bean:write name="demographicNo" />&providerNo=<bean:write name="providerNo" />'><bean:message
-										key="oscarResearch.oscarDxResearch.dxResearch.btnResolve" /></a> |
-									<a href='dxResearchUpdate.do?status=D&did=<bean:write name="diagnotics" property="dxResearchNo" />&demographicNo=<bean:write name="demographicNo" />&providerNo=<bean:write name="providerNo" />' onClick="javascript: return confirm('Are you sure you would like to delete: <bean:write name="diagnotics" property="description" /> ?')"><bean:message
-										key="oscarResearch.oscarDxResearch.dxResearch.btnDelete" /></a> |
-									<a href='#' onclick="update_date(<bean:write name="diagnotics" property="dxResearchNo" />,<bean:write name="demographicNo" />,<bean:write name="providerNo" />);"><bean:message
-										key="oscarResearch.oscarDxResearch.dxResearch.btnUpdate" /></a>
+									<a href='dxResearchUpdate.do?status=C&did=<bean:write name="diagnotics" property="dxResearchNo" />
+										&demographicNo=<bean:write name="demographicNo" />&providerNo=<bean:write name="providerNo" />'>
+										<bean:message key="oscarResearch.oscarDxResearch.dxResearch.btnResolve" />
+									</a> |
+									<a href='dxResearchUpdate.do?status=D&did=<bean:write name="diagnotics" property="dxResearchNo" />
+										&demographicNo=<bean:write name="demographicNo" />&providerNo=<bean:write name="providerNo" />'
+										onClick="javascript: return confirm('Are you sure you would like to delete: <bean:write name="diagnotics" property="description" /> ?')">
+										<bean:message key="oscarResearch.oscarDxResearch.dxResearch.btnDelete" />
+									</a> |
+									<a href='#' onclick="update_date(<bean:write name="diagnotics" property="dxResearchNo" />,<bean:write name="demographicNo" />,<bean:write name="providerNo" />);">
+										<bean:message key="oscarResearch.oscarDxResearch.dxResearch.btnUpdate" />
+									</a>
                                     </td>
                                      <%} %>                                   
 								</tr>

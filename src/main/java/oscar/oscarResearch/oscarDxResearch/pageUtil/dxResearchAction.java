@@ -144,8 +144,8 @@ public class dxResearchAction extends Action {
 						dr.setProviderNo(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo());
 						dao.persist(dr);
 						
-						String ip = request.getRemoteAddr();
-				        LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, "DX", ""+dr.getId() , ip,"");
+				        LogAction.addLogEntry((String) request.getSession().getAttribute("user"), Integer.valueOf(demographicNo),
+						        LogConst.ACTION_ADD, LogConst.CON_DISEASE_REG, LogConst.STATUS_SUCCESS, String.valueOf(dr.getId()), request.getRemoteAddr(), dr.getDxresearchCode());
 
 					}
 				}
@@ -164,7 +164,7 @@ public class dxResearchAction extends Action {
         ParameterActionForward actionforward = new ParameterActionForward(mapping.findForward(forwardTo));
         actionforward.addParameter("demographicNo", demographicNo);
         actionforward.addParameter("providerNo", providerNo);
-        actionforward.addParameter("quickList", "");        
+        actionforward.addParameter("quickList", "");
                 
         return actionforward;
     }     
