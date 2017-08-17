@@ -62,16 +62,18 @@ Juno.Common.Util.addNewLine = function addNewLine(line, mssg) {
 	return mssg;
 };
 
-Juno.Common.Util.calcAge = function (dateOfBirth) {
-	dateOfBirth = new Date(dateOfBirth);
+Juno.Common.Util.calcAge = function(dobYear, dobMonth, dobDay)
+{
+	
+	var dateOfBirth = new Date(parseInt(dobYear, 10), parseInt(dobMonth, 10), parseInt(dobDay, 10));
 	var currDate = new Date();
 
 	var years = (currDate.getFullYear() - dateOfBirth.getFullYear());
 
 	if (currDate.getMonth() < dateOfBirth.getMonth() ||
-		currDate.getMonth() == dateOfBirth.getMonth() && currDate.getDate() < dateOfBirth.getDate()) {
+		currDate.getMonth() == dateOfBirth.getMonth() && currDate.getDate() < dateOfBirth.getDate())
+	{
 		years--;
 	}
-
 	return years;
 };
