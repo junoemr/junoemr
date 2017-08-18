@@ -614,9 +614,12 @@ public class NotesService extends AbstractServiceImpl {
 		}
 		
 		//cIssue2 will be loaded with existing CaseManagementIssue if there is one for this patient
-		Issue cppIssue = caseManagementMgr.getIssueInfoByCode(issueCode);		
+		Issue cppIssue = caseManagementMgr.getIssueInfoByCode(issueCode);
+		logger.debug("CPPISSUE: " + cppIssue);
 		CaseManagementIssue cIssue2;
 		String issueAlphaCode = cppIssue.getId().toString();
+		logger.debug("issueAlphaCode: " + issueAlphaCode);
+		logger.debug("issueCode: " + issueCode);
 		if (issueAlphaCode != null && issueAlphaCode.length() > 0){
 			//load by demo,issue code
 			cIssue2 = this.caseManagementMgr.getIssueByIssueCode(demo, issueAlphaCode);
@@ -626,6 +629,7 @@ public class NotesService extends AbstractServiceImpl {
 		
 		//no issue existing for this type of CPP note..create and save it
 		if( cIssue2 == null ) {
+			logger.debug("NO ISSUE EXISTS FOR THIS NOTE, CREATE LINK: ");
 			Date creationDate = new Date();
 
 			cIssue2 = new CaseManagementIssue();
@@ -633,6 +637,7 @@ public class NotesService extends AbstractServiceImpl {
 			cIssue2.setCertain(false);
 			cIssue2.setDemographic_no(demo);
 			cIssue2.setIssue_id(cppIssue.getId());
+			cIssue2.setIssue((cppIssue));
 			cIssue2.setMajor(false);
 			cIssue2.setProgram_id(Integer.parseInt(programId));
 			cIssue2.setResolved(false);
@@ -641,6 +646,8 @@ public class NotesService extends AbstractServiceImpl {
 			
 			caseManagementMgr.saveCaseIssue(cIssue2);
 		}
+
+		logger.debug("CPPISSUE 2 (added): " + cIssue2);
 
 		//save the associations
 		issuelist.add(cIssue2);	
@@ -672,7 +679,11 @@ public class NotesService extends AbstractServiceImpl {
 		}
 		
 		caseMangementNote.setUpdate_date(now);
-		caseMangementNote.setAppointmentNo(note.getAppointmentNo());
+		if(note.getAppointmentNo() != null){
+			caseMangementNote.setAppointmentNo(note.getAppointmentNo());
+		} else {
+			caseMangementNote.setAppointmentNo(0);
+		}
 		
 		
 		//update positions
