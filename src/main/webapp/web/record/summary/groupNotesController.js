@@ -261,7 +261,10 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 			controller.groupNotesForm.encounterNote.summaryCode = controller.page.code; //'ongoingconcerns';
 
-			controller.groupNotesForm.assignedIssues = [];
+			controller.groupNotesForm.encounterNote.assignedIssues = [];
+
+			console.log('SAVING GROUP NOTE: ', controller.groupNotesForm.encounterNote);
+			console.log('STATE PARAMS ', $stateParams);
 
 			noteService.saveIssueNote($stateParams.demographicNo, controller.groupNotesForm).then(
 				function success(results)
@@ -366,11 +369,12 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		};
 
 		//temp load into pop-up
-		controller.openRevisionHistory = function openRevisionHistory(note)
+		controller.openRevisionHistory = function openRevisionHistory(encounterNote)
 		{
+			console.log(controller.groupNotesForm);
 			var rnd = Math.round(Math.random() * 1000);
 			win = "win" + rnd;
-			var url = "../CaseManagementEntry.do?method=notehistory&noteId=" + note.noteId;
+			var url = "../CaseManagementEntry.do?method=notehistory&noteId=" + encounterNote.noteId;
 			window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
 		};
 

@@ -107,7 +107,7 @@
 									<bean:message key="oscarEncounter.encounterDate.title"/>: 
 									<span>{{groupNotesCtrl.groupNotesForm.encounterNote.updateDate | date : 'dd-MMM-yyyy'}}</span>  
 									<bean:message key="oscarEncounter.noteRev.title"/>: 
-									<a href="javascript:void(0)" ng-click="groupNotesCtrl.openRevisionHistory(groupNotesForm.encounterNote)">
+									<a href="javascript:void(0)" ng-click="groupNotesCtrl.openRevisionHistory(groupNotesCtrl.groupNotesForm.encounterNote)">
 										{{groupNotesCtrl.groupNotesForm.encounterNote.revision}}
 									</a>
 								</small>
