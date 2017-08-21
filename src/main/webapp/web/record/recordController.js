@@ -804,8 +804,7 @@ angular.module('Record').controller('Record.RecordController', [
 			};
 		};
 
-		controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dateOfBirth);
-
+		controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
 	}
 ]);
 
