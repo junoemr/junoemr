@@ -56,9 +56,9 @@ public class NoteExtTo1 implements Serializable{
 	private Date dateValue;
 	
 	//keyVal's
-	private String startDate;	    	
-	private String resolutionDate;
-	private String procedureDate;
+	private Date startDate;
+	private Date resolutionDate;
+	private Date procedureDate;
 
 	private String ageAtOnset;
 	private String treatment;
@@ -105,27 +105,27 @@ public class NoteExtTo1 implements Serializable{
 	    this.dateValue = dateValue;
 	}
 	
-	public String getStartDate() {
+	public Date getStartDate() {
 	    return startDate;
     }
 	
-	public void setStartDate(String startDate) {
+	public void setStartDate(Date startDate) {
 	    this.startDate = startDate;
     }
 	
-	public String getResolutionDate() {
+	public Date getResolutionDate() {
 	    return resolutionDate;
     }
 	
-	public void setResolutionDate(String resolutionDate) {
+	public void setResolutionDate(Date resolutionDate) {
 	    this.resolutionDate = resolutionDate;
     }
 	
-	public String getProcedureDate() {
+	public Date getProcedureDate() {
 	    return procedureDate;
     }
 	
-	public void setProcedureDate(String procedureDate) {
+	public void setProcedureDate(Date procedureDate) {
 	    this.procedureDate = procedureDate;
     }
 	public String getAgeAtOnset() {

@@ -1206,11 +1206,11 @@ public class NotesService extends AbstractServiceImpl {
 			logger.debug("NOTE EXT KEY:" +l.getKeyVal() + l.getValue());
 			
 			if(l.getKeyVal().equals(CaseManagementNoteExt.STARTDATE)){
-				noteExt.setStartDate(l.getDateValueStr());
+				noteExt.setStartDate(l.getDateValue());
 			}else if(l.getKeyVal().equals(CaseManagementNoteExt.RESOLUTIONDATE)){
-				noteExt.setResolutionDate(l.getDateValueStr());
+				noteExt.setResolutionDate(l.getDateValue());
 			}else if(l.getKeyVal().equals(CaseManagementNoteExt.PROCEDUREDATE)){
-				noteExt.setProcedureDate(l.getDateValueStr());
+				noteExt.setProcedureDate(l.getDateValue());
 			}else if(l.getKeyVal().equals(CaseManagementNoteExt.AGEATONSET)){
 				noteExt.setAgeAtOnset(l.getValue());
 			}else if(l.getKeyVal().equals(CaseManagementNoteExt.TREATMENT)){
@@ -1269,11 +1269,11 @@ public class NotesService extends AbstractServiceImpl {
 			logger.debug("NOTE EXT KEY:" +l.getKeyVal() + l.getValue());
 			
 			if(l.getKeyVal().equals(CaseManagementNoteExt.STARTDATE)){
-				noteExt.setStartDate(l.getValue());
+				noteExt.setStartDate(l.getDateValue());
 			}else if(l.getKeyVal().equals(CaseManagementNoteExt.RESOLUTIONDATE)){
-				noteExt.setResolutionDate(l.getValue());
+				noteExt.setResolutionDate(l.getDateValue());
 			}else if(l.getKeyVal().equals(CaseManagementNoteExt.PROCEDUREDATE)){
-				noteExt.setProcedureDate(l.getValue());
+				noteExt.setProcedureDate(l.getDateValue());
 			}else if(l.getKeyVal().equals(CaseManagementNoteExt.AGEATONSET)){
 				noteExt.setAgeAtOnset(l.getValue());
 			}else if(l.getKeyVal().equals(CaseManagementNoteExt.TREATMENT)){
