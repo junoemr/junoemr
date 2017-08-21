@@ -39,7 +39,7 @@
 						<bean:message key="demographic.patient.context.born"/>:
 					</span>
 					{{recordCtrl.demographic.dobYear}}-{{recordCtrl.demographic.dobMonth}}-{{recordCtrl.demographic.dobDay}}
-					(<span ng-if="!recordCtrl.isNaN(recordCtrl.demographic.intAge)">{{recordCtrl.demographic.intAge}}</span>)
+					(<span ng-if="!recordCtrl.isNaN(recordCtrl.demographic.age)">{{recordCtrl.demographic.age}}</span>)
 					<span class="patient-header-label">
 						<bean:message key="demographic.patient.context.sex"/>: 
 					</span>

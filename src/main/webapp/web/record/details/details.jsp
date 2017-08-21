@@ -183,7 +183,7 @@
 								ng-blur="detailsCtrl.formatDate('DobY')" 
 							/>
 							<div>&nbsp;
-								(<span ng-if="!detailsCtrl.isNaN(detailsCtrl.page.demo.intAge)">{{detailsCtrl.page.demo.intAge}}y</span>)
+								(<span ng-if="!detailsCtrl.isNaN(detailsCtrl.page.demo.age)">{{detailsCtrl.page.demo.age}}y</span>)
 							</div>
 						</div>
 					</div>

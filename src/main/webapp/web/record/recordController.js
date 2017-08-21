@@ -135,7 +135,8 @@ angular.module('Record').controller('Record.RecordController', [
 		};
 
 		// Is there a shared location where this could be accessed from any controller? i.e. a utils file
-		controller.isNaN = function (num) {
+		controller.isNaN = function(num)
+		{
 			return isNaN(num)
 		};
 
@@ -803,7 +804,7 @@ angular.module('Record').controller('Record.RecordController', [
 			};
 		};
 
-		controller.demographic.intAge = Juno.Common.Util.calcAge(controller.demographic.dateOfBirth);
+		controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dateOfBirth);
 
 	}
 ]);
