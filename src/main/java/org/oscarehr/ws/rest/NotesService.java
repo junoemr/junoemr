@@ -65,7 +65,6 @@ import org.oscarehr.casemgmt.service.NoteService;
 import org.oscarehr.casemgmt.web.CaseManagementEntryAction;
 import org.oscarehr.casemgmt.web.NoteDisplay;
 import org.oscarehr.casemgmt.web.NoteDisplayLocal;
-import org.oscarehr.common.dao.CaseManagementIssueNotesDao;
 import org.oscarehr.common.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.managers.ProgramManager2;
@@ -353,7 +352,8 @@ public class NotesService extends AbstractServiceImpl {
 		if(note.getIsSigned()){
 			caseMangementNote.setSigning_provider_no(providerNo);
 			caseMangementNote.setSigned(true);
-		} else {
+		}
+		else {
 			caseMangementNote.setSigning_provider_no("");
 			caseMangementNote.setSigned(false);
 		}
@@ -453,57 +453,91 @@ public class NotesService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public NoteIssueTo1 saveIssueNote(@PathParam("demographicNo") Integer demographicNo ,NoteIssueTo1 noteIssue) throws Exception{
 		NoteTo1 note = noteIssue.getEncounterNote();
-		NoteExtTo1 noteExt = noteIssue.getGroupNoteExt();
-		IssueTo1 issue = noteIssue.getIssue();
-		//List<IssueTo1> assignedIssues = noteIssue.getAssignedIssues();
+		NoteExtTo1 noteExtTo1 = noteIssue.getGroupNoteExt();
+		IssueTo1 issueTo1 = noteIssue.getIssue();
 		List<CaseManagementIssueTo1> assignedCMIssues = noteIssue.getAssignedCMIssues();
-		
-		LoggedInInfo loggedInInfo = getLoggedInInfo(); //LoggedInInfo.loggedInInfo.get();
+
+		String noteTxt = StringUtils.trimToNull(note.getNote());
+		// if there is not a note to save, exit immediately
+		if (noteTxt == null) {
+			return null;
+		}
+
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		String providerNo=loggedInInfo.getLoggedInProviderNo();
 		Provider provider = loggedInInfo.getLoggedInProvider();
-		String userName = provider != null ? provider.getFullName() : "";
+		String providerName = provider != null ? provider.getFullName() : "";
 
-		String demo = ""+demographicNo;
-		String noteId = String.valueOf(note.getNoteId());
-		
+		String demographicNoStr = ""+demographicNo;
+		String noteIdStr = String.valueOf(note.getNoteId());
+		String uuid = note.getUuid();
+
 		String programId = getProgram(loggedInInfo,providerNo);
-				
+
+		/* Save a new Note*/
 		CaseManagementNote caseMangementNote  = new CaseManagementNote();
+
+		// -- set up the basic note info --
+
+		caseMangementNote.setDemographic_no(demographicNoStr);
+		caseMangementNote.setProvider(provider);
+		caseMangementNote.setProviderNo(providerNo);
+		caseMangementNote.setNote(noteTxt);
+		caseMangementNote.setEncounter_type(note.getEncounterType());
+		caseMangementNote.setProgram_no(programId);
+
+		// If uuid is not null and is not an empty string this note already exists and we must keep its uuid
+		if (uuid != null && !uuid.trim().isEmpty()) {
+			caseMangementNote.setUuid(uuid);
+		}
+		//Need to check some how that if a note is signed that it must stay signed, currently this is done in the interface where the save button is not available.
+		if(note.getIsSigned()) {
+			caseMangementNote.setSigning_provider_no(providerNo);
+			caseMangementNote.setSigned(true);
+		}
+		else {
+			caseMangementNote.setSigning_provider_no("");
+			caseMangementNote.setSigned(false);
+		}
+
+		Date now = new Date();
+
+		// set note date & time
+		Date observationDate = note.getObservationDate();
+
+		// if observation date exists and is not in future, set it.
+		if(observationDate != null && observationDate.getTime() <= now.getTime()) {
+			caseMangementNote.setObservation_date(observationDate);
+		}
+		else { //default to current date
+			caseMangementNote.setObservation_date(now);
+		}
+		caseMangementNote.setUpdate_date(now);
+
+
 		boolean newNote = false;
 		
 		// we don't want to try to remove an issue from a new note so we test here
-		if(note.getNoteId()==null || note.getNoteId()==0){		
+		if(note.getNoteId()==null || note.getNoteId()==0){
 			newNote = true;
 		}else{
 			boolean extChanged = true; //false
 			// if note has not changed don't save
-			caseManagementMgr.getNote(noteId);
-			if ( note.getNote().equals(note.getNote()) && issue.isIssueChange() && !extChanged && note.isArchived() ) return null;
+			caseManagementMgr.getNote(noteIdStr);
+			if ( note.getNote().equals(note.getNote()) && issueTo1.isIssueChange() && !extChanged && note.isArchived() ) return null;
 		}
-		
-		caseMangementNote.setDemographic_no(demo);
 
 		if(!newNote) {
 			if (note.isArchived() ){
 				caseMangementNote.setArchived(true);
 			}
-			note.setRevision(Integer.parseInt(note.getRevision())+1 + "");	
+			note.setRevision(Integer.parseInt(note.getRevision())+1 + "");
 		}
-		
-		if(note.getUuid() != null && !note.getUuid().trim().equals("")){
-			caseMangementNote.setUuid(note.getUuid());
-		}
-		
-		String noteTxt = note.getNote();
-		noteTxt = org.apache.commons.lang.StringUtils.trimToNull(noteTxt);
-		if (noteTxt == null || noteTxt.equals("")) return null;
-
-		caseMangementNote.setNote(noteTxt);
 	
-		CaseManagementCPP cpp = this.caseManagementMgr.getCPP(demo);
+		CaseManagementCPP cpp = this.caseManagementMgr.getCPP(demographicNoStr);
 		if (cpp == null) {
 			cpp = new CaseManagementCPP();
-			cpp.setDemographic_no(demo);
+			cpp.setDemographic_no(demographicNoStr);
 		}
 		
 		if(note.isCpp() && note.getSummaryCode()!=null){
@@ -531,22 +565,8 @@ public class NotesService extends AbstractServiceImpl {
 			logger.error("Error", e);
 			team = "0";
 		}
-		caseMangementNote.setReporter_program_team(team);		
-				
-		//Need to check some how that if a note is signed that it must stay signed, currently this is done in the interface where the save button is not available.
-		if(note.getIsSigned()){
-			caseMangementNote.setSigning_provider_no(providerNo);
-			caseMangementNote.setSigned(true);
-		} else {
-			caseMangementNote.setSigning_provider_no("");
-			caseMangementNote.setSigned(false);
-		}
-		
-		caseMangementNote.setProviderNo(providerNo);
-		if (provider != null) caseMangementNote.setProvider(provider);
+		caseMangementNote.setReporter_program_team(team);
 
-		
-		caseMangementNote.setProgram_no(programId);
 		
 		//this code basically updates the CPP note with which issues were removed
 		if(!newNote) {
@@ -563,129 +583,83 @@ public class NotesService extends AbstractServiceImpl {
 				caseMangementNote.setNote(caseMangementNote.getNote() + "\n" + text);
 			}
 		}
-				
-		//String issue_id = issues.getId().toString();
-		//String ongoing = new String();
+
 	
+		/* Save assigned issues & link with the note */
 		List<CaseManagementIssue> issuelist = new ArrayList<CaseManagementIssue>();
-		
-		for(CaseManagementIssueTo1 i:assignedCMIssues) {
+		for(CaseManagementIssueTo1 i:note.getAssignedIssues()) {
 			if(!i.isUnchecked()) {
-				CaseManagementIssue cmi = caseManagementMgr.getIssueByIssueCode(demo, i.getIssue().getCode());
-				if (cmi==null) {
-					//new one
+				CaseManagementIssue cmi = caseManagementMgr.getIssueByIssueCode(demographicNoStr, i.getIssue().getCode());
+				if(cmi == null) {
+					//new cmi
 					cmi = new CaseManagementIssue();
 					Issue is = issueDao.getIssue(i.getIssue_id());
 					cmi.setIssue_id(is.getId());
 					cmi.setIssue(is);
-					cmi.setProgram_id(programManager2.getCurrentProgramInDomain(getLoggedInInfo(), getLoggedInInfo().getLoggedInProviderNo()).getProgramId().intValue());
+					cmi.setProgram_id(getProgramId(getLoggedInInfo(), providerNo));
 					cmi.setType(is.getRole());
-					cmi.setDemographic_no(demo);
+					cmi.setDemographic_no(demographicNoStr);
 				}
 				cmi.setAcute(i.isAcute());
 				cmi.setCertain(i.isCertain());
 				cmi.setMajor(i.isMajor());
 				cmi.setResolved(i.isResolved());
-				
+				cmi.setUpdate_date(new Date());
+
 				issuelist.add(cmi);
-				caseManagementMgr.saveCaseIssue(cmi);
-			} 
+				// don't save issue here, the entire list is saved later
+			}
 		}
-	//	caseMangementNote.setIssues(new HashSet<CaseManagementIssue>(issuelist));
-		
 		
 		//this is actually just the issue for the main note
 		//translate summary codes
-		String issueCode = note.getSummaryCode();//set temp
-		if("ongoingconcerns".equals(issueCode)){
-			issueCode = "Concerns";
-		}else if("medhx".equals(issueCode)){
-			issueCode = "MedHistory";
-		}else if("reminders".equals(issueCode)){
-			issueCode = "Reminders"; 
-		}else if("othermeds".equals(issueCode)){
-			issueCode = "OMeds";
-		}else if("sochx".equals(issueCode)){
-			issueCode = "SocHistory";
-		}else if("famhx".equals(issueCode)){
-			issueCode = "FamHistory";
-		}else if("riskfactors".equals(issueCode)){
-			issueCode = "RiskFactors";
+		String mainIssueCode = note.getSummaryCode();//set temp
+		if("ongoingconcerns".equals(mainIssueCode)){
+			mainIssueCode = "Concerns";
+		}else if("medhx".equals(mainIssueCode)){
+			mainIssueCode = "MedHistory";
+		}else if("reminders".equals(mainIssueCode)){
+			mainIssueCode = "Reminders";
+		}else if("othermeds".equals(mainIssueCode)){
+			mainIssueCode = "OMeds";
+		}else if("sochx".equals(mainIssueCode)){
+			mainIssueCode = "SocHistory";
+		}else if("famhx".equals(mainIssueCode)){
+			mainIssueCode = "FamHistory";
+		}else if("riskfactors".equals(mainIssueCode)){
+			mainIssueCode = "RiskFactors";
 		}
-		
-		//cIssue2 will be loaded with existing CaseManagementIssue if there is one for this patient
-		Issue cppIssue = caseManagementMgr.getIssueInfoByCode(issueCode);
-		logger.debug("CPPISSUE: " + cppIssue);
-		CaseManagementIssue cIssue2;
-		String issueAlphaCode = cppIssue.getId().toString();
-		logger.debug("issueAlphaCode: " + issueAlphaCode);
-		logger.debug("issueCode: " + issueCode);
-		if (issueAlphaCode != null && issueAlphaCode.length() > 0){
-			//load by demo,issue code
-			cIssue2 = this.caseManagementMgr.getIssueByIssueCode(demo, issueAlphaCode);
-		}else{
-			cIssue2 = this.caseManagementMgr.getIssueById(demo,issueCode);
-		}
-		
+
+		// find the existing issue for the main note. create it if needed.
+		Issue cppIssue = caseManagementMgr.getIssueInfoByCode(mainIssueCode);
+		CaseManagementIssue mainIssueEntry = this.caseManagementMgr.getIssueByIssueCode(demographicNoStr,mainIssueCode);
+
 		//no issue existing for this type of CPP note..create and save it
-		if( cIssue2 == null ) {
-			logger.debug("NO ISSUE EXISTS FOR THIS NOTE, CREATE LINK: ");
+		if( mainIssueEntry == null ) {
 			Date creationDate = new Date();
 
-			cIssue2 = new CaseManagementIssue();
-			cIssue2.setAcute(false);
-			cIssue2.setCertain(false);
-			cIssue2.setDemographic_no(demo);
-			cIssue2.setIssue_id(cppIssue.getId());
-			cIssue2.setIssue((cppIssue));
-			cIssue2.setMajor(false);
-			cIssue2.setProgram_id(Integer.parseInt(programId));
-			cIssue2.setResolved(false);
-			cIssue2.setType(cppIssue.getRole()); 
-			cIssue2.setUpdate_date(creationDate);
-			
-			caseManagementMgr.saveCaseIssue(cIssue2);
+			mainIssueEntry = new CaseManagementIssue();
+			mainIssueEntry.setAcute(false);
+			mainIssueEntry.setCertain(false);
+			mainIssueEntry.setDemographic_no(demographicNoStr);
+			mainIssueEntry.setIssue_id(cppIssue.getId());
+			mainIssueEntry.setIssue((cppIssue));
+			mainIssueEntry.setMajor(false);
+			mainIssueEntry.setProgram_id(Integer.parseInt(programId));
+			mainIssueEntry.setResolved(false);
+			mainIssueEntry.setType(cppIssue.getRole());
+			mainIssueEntry.setUpdate_date(creationDate);
+
+//			caseManagementMgr.saveCaseIssue(mainIssueEntry);
+
 		}
 
-		logger.debug("CPPISSUE 2 (added): " + cIssue2);
-
-		//save the associations
-		issuelist.add(cIssue2);	
-		note.setIssues(new HashSet<CaseManagementIssue>(issuelist));
+		issuelist.add(mainIssueEntry);
 		caseMangementNote.setIssues(new HashSet<CaseManagementIssue>(issuelist));
-		
-		// remove signature and the related issues from note 
-		//String noteString = note.getNote();
-		// noteString = removeSignature(noteString);
-		// noteString = removeCurrentIssue(noteString);
-		//caseMangementNote.setNote(noteString);
-		
+		// save the issue List
+		caseManagementMgr.saveAndUpdateCaseIssues(issuelist);
 
-		// update appointment and add verify message to note if verified
-		boolean verify = false;
 
-		Date now = new Date();
-		
-		Date observationDate = note.getObservationDate();
-		if (observationDate != null && !observationDate.equals("")) {
-			if (observationDate.getTime() > now.getTime()) {
-				//request.setAttribute("DateError", props.getString("oscarEncounter.futureDate.Msg"));
-				caseMangementNote.setObservation_date(now);
-			} else{
-				caseMangementNote.setObservation_date(observationDate);
-			}
-		} else if (note.getObservationDate() == null) {
-			caseMangementNote.setObservation_date(now);
-		}
-		
-		caseMangementNote.setUpdate_date(now);
-		if(note.getAppointmentNo() != null){
-			caseMangementNote.setAppointmentNo(note.getAppointmentNo());
-		} else {
-			caseMangementNote.setAppointmentNo(0);
-		}
-		
-		
 		//update positions
 		/*
 		 * There's a few cases to handle, but basically when user is adding, editing, or archiving,
@@ -693,7 +667,7 @@ public class NotesService extends AbstractServiceImpl {
 		 * and older notes (not the latest based on uuid/id) have positions set to 0
 		 */
 		String[] strIssueId = { String.valueOf(cppIssue.getId()) };
-		List<CaseManagementNote> curCPPNotes = this.caseManagementMgr.getActiveNotes(demo, strIssueId);
+		List<CaseManagementNote> curCPPNotes = this.caseManagementMgr.getActiveNotes(demographicNoStr, strIssueId);
 		Collections.sort(curCPPNotes,CaseManagementNote.getPositionComparator());
 		
 		
@@ -755,40 +729,19 @@ public class NotesService extends AbstractServiceImpl {
 		 *  uuid, password, locked, archived, appointmentNo, hourOfEncounterTime, minuteOfEncounterTime, hourOfEncTransportationTime, minuteOfEncTransportationTime
 		 * 
 		 */
-		
-		// Save annotation 
-		CaseManagementNote annotationNote = null;// (CaseManagementNote) session.getAttribute(attrib_name);
-		//logger.error(noteIssue.getAnnotation_attrib());
-		
-		//String ongoing = null; // figure out this
-		String lastSavedNoteString = null;
-		String user = loggedInInfo.getLoggedInProvider().getProviderNo();
-		String remoteAddr = 	""; // Not sure how to get this	
-		
-		//caseMangementNote = caseManagementMgr.saveCaseManagementNote(caseMangementNote,issuelist, cpp, ongoing,verify, loggedInInfo.getLocale(),now,annotationNote,userName,user,remoteAddr, lastSavedNoteString) ;
-		
-		String savedStr = caseManagementMgr.saveNote(cpp, caseMangementNote, providerNo, userName, null, note.getRoleName());
+
+		String savedStr = caseManagementMgr.saveNote(cpp, caseMangementNote, providerNo, providerName, null, note.getRoleName());
 		caseManagementMgr.saveCPP(cpp, providerNo);
 		
 		caseManagementMgr.getEditors(caseMangementNote);
-		
-		
+
 		note.setNoteId(Integer.parseInt(""+caseMangementNote.getId()));
 		note.setUuid(caseMangementNote.getUuid());
 		note.setUpdateDate(caseMangementNote.getUpdate_date());
 		note.setObservationDate(caseMangementNote.getObservation_date());
-		logger.debug("note should return like this " + note.getNote() );
-		
-		
+
 		long newNoteId =  Long.valueOf(note.getNoteId());
-		
-		logger.debug("ISSUES LIST START for note " + newNoteId);
-		CaseManagementIssueNotesDao cmeIssueNotesDao = (CaseManagementIssueNotesDao) SpringUtils.getBean("caseManagementIssueNotesDao");
-		List<CaseManagementIssue> issuesList = cmeIssueNotesDao.getNoteIssues(note.getNoteId());
-		for (CaseManagementIssue issueItem : issuesList) {
-			logger.debug("ISSUES LIST " + issueItem + " for note " + newNoteId);
-		}
-		
+
 		if(note.getNoteId()!=0){
 			caseManagementMgr.addNewNoteLink(newNoteId);
 		}
@@ -796,94 +749,94 @@ public class NotesService extends AbstractServiceImpl {
 		/* save extra fields */
 		CaseManagementNoteExt cme = new CaseManagementNoteExt();
 		
-		if(noteExt.getStartDate()!=null){
+		if(noteExtTo1.getStartDate()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.STARTDATE);	
-			cme.setDateValue(noteExt.getStartDate());
+			cme.setDateValue(noteExtTo1.getStartDate());
 			caseManagementMgr.saveNoteExt(cme);
 		}
 		
-		if(noteExt.getResolutionDate()!=null){
+		if(noteExtTo1.getResolutionDate()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.RESOLUTIONDATE);	
-			cme.setDateValue(noteExt.getResolutionDate());
+			cme.setDateValue(noteExtTo1.getResolutionDate());
 			caseManagementMgr.saveNoteExt(cme);
 		}
 		
-		if(noteExt.getProcedureDate()!=null){
+		if(noteExtTo1.getProcedureDate()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.PROCEDUREDATE);
-			cme.setDateValue(noteExt.getProcedureDate());
+			cme.setDateValue(noteExtTo1.getProcedureDate());
 			caseManagementMgr.saveNoteExt(cme);
 		}
 			
-		if(noteExt.getAgeAtOnset()!=null){
+		if(noteExtTo1.getAgeAtOnset()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.AGEATONSET);
 			cme.setDateValue((Date) null);
-			cme.setValue(noteExt.getAgeAtOnset());
+			cme.setValue(noteExtTo1.getAgeAtOnset());
 			caseManagementMgr.saveNoteExt(cme);
 		}
 		
-		if(noteExt.getTreatment()!=null){
+		if(noteExtTo1.getTreatment()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.TREATMENT);
 			cme.setDateValue((Date) null);
-			cme.setValue(noteExt.getTreatment());
+			cme.setValue(noteExtTo1.getTreatment());
 			caseManagementMgr.saveNoteExt(cme);
 		}
 		
-		if(noteExt.getProblemStatus()!=null){
+		if(noteExtTo1.getProblemStatus()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.PROBLEMSTATUS);
 			cme.setDateValue((Date) null);
-			cme.setValue(noteExt.getProblemStatus());
+			cme.setValue(noteExtTo1.getProblemStatus());
 			caseManagementMgr.saveNoteExt(cme);
 		}
 		
-		if(noteExt.getExposureDetail()!=null){
+		if(noteExtTo1.getExposureDetail()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.EXPOSUREDETAIL);
 			cme.setDateValue((Date) null);
-			cme.setValue(noteExt.getExposureDetail());
+			cme.setValue(noteExtTo1.getExposureDetail());
 			caseManagementMgr.saveNoteExt(cme);
 		}
 		
-		if(noteExt.getRelationship()!=null){
+		if(noteExtTo1.getRelationship()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.RELATIONSHIP);
 			cme.setDateValue((Date) null);
-			cme.setValue(noteExt.getRelationship());
+			cme.setValue(noteExtTo1.getRelationship());
 			caseManagementMgr.saveNoteExt(cme);
 		}
 			
-		if(noteExt.getLifeStage()!=null){
+		if(noteExtTo1.getLifeStage()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.LIFESTAGE);
 			cme.setDateValue((Date) null);
-			cme.setValue(noteExt.getLifeStage());
+			cme.setValue(noteExtTo1.getLifeStage());
 			caseManagementMgr.saveNoteExt(cme);			
 		}
 		
-		if(noteExt.getHideCpp()!=null){
+		if(noteExtTo1.getHideCpp()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.HIDECPP);
 			cme.setDateValue((Date) null);
-			cme.setValue(noteExt.getHideCpp());
+			cme.setValue(noteExtTo1.getHideCpp());
 			caseManagementMgr.saveNoteExt(cme);			
 		}
 		
-		if(noteExt.getProblemDesc()!=null){
+		if(noteExtTo1.getProblemDesc()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.PROBLEMDESC);
 			cme.setDateValue((Date) null);
-			cme.setValue(noteExt.getProblemDesc());
+			cme.setValue(noteExtTo1.getProblemDesc());
 			caseManagementMgr.saveNoteExt(cme);
 		}
 		
 		/* save extra fields */				
-		noteIssue.setEncounterNote(note);	
-		noteIssue.setGroupNoteExt(noteExt);
+		noteIssue.setEncounterNote(note);
+		noteIssue.setGroupNoteExt(noteExtTo1);
 		
 		String saveStatus = (caseMangementNote.getId() != null) ? LogConst.STATUS_SUCCESS: LogConst.STATUS_FAILURE;
 		LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_CME_NOTE, saveStatus, 
@@ -1669,7 +1622,7 @@ public class NotesService extends AbstractServiceImpl {
 		
 		ConcurrentHashMap<String, Long> noteList = editList.get(noteUUID);
 		if (noteList!=null && noteList.containsKey(providerNo)) noteList.remove(providerNo);
-		if (noteList.isEmpty()) editList.remove(noteUUID);
+		if (noteList==null || noteList.isEmpty()) editList.remove(noteUUID);
 		else editList.put(noteUUID, noteList);
 	}
 }
