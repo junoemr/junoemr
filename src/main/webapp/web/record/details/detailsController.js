@@ -483,6 +483,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		controller.healthCardUpdateDemographics = function healthCardUpdateDemographics()
 		{
+			var now = new Date();
 			if (controller.page.demo.hcType != hcParts["issuer"])
 			{
 				controller.page.demo.hcType = hcParts["issuer"];
@@ -650,6 +651,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//check Patient Status if endDate is entered
 		controller.checkPatientStatus = function checkPatientStatus()
 		{
+			var now = new Date();
 			if (controller.page.demo.patientStatus == "AC")
 			{
 				if (controller.page.demo.endDate != null && controller.page.demo.endDate != "")
@@ -1139,6 +1141,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//billing buttons
 		controller.billingDo = function billingDo(func)
 		{
+			var now = new Date();
 			var url = null;
 			if (func == "BillingHistory")
 			{
