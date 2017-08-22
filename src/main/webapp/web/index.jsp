@@ -528,6 +528,8 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="help/supportController.js"></script>
 	<script type="text/javascript" src="help/helpController.js"></script>
 
+	<script type="text/javascript" src='https://rawgithub.com/gsklee/ngStorage/master/ngStorage.js'></script>
+
 	<!-- endbuild -->
 
 	<jsp:include page="dist/templates.jsp"/>
