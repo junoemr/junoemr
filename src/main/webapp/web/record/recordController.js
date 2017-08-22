@@ -66,8 +66,6 @@ angular.module('Record').controller('Record.RecordController', [
 
 		var controller = this;
 
-		console.log("in RecordCtrl state params ", $stateParams, $location.search());
-
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.demographic = demo;
 		controller.page = {};
@@ -680,7 +678,7 @@ angular.module('Record').controller('Record.RecordController', [
 			{
 				templateUrl: 'record/summary/saveWarning.jsp',
 				controller: 'Record.Summary.SaveWarningController as saveWarningCtrl',
-				backdrop: true,
+				backdrop: 'static',
 				size: 'md',
 				resolve:
 				{
