@@ -136,7 +136,7 @@
 		<div id="note-editor-minimized"
 			class="col-sm-3 col-xs-12 text-center hand-hover" 
 			ng-click="recordCtrl.toggleNote();" 
-			ng-show="!recordCtrl.hideNote">
+			ng-show="recordCtrl.$storage.hideNote">
 			Open note editor <span class="fa fa-chevron-up"></span>
 		</div>
 	
@@ -144,7 +144,7 @@
 			class="col-sm-5 col-xs-12"
 			resizable
 			draggable
-			ng-show="recordCtrl.hideNote" 
+			ng-show="!recordCtrl.$storage.hideNote"
 			ng-click="recordCtrl.checkAction($event)" 
 			ng-keypress="recordCtrl.checkAction($event)">
 			<div class="row hand-hover" id="note-editor-header">

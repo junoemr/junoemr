@@ -29,6 +29,7 @@ angular.module('Record').controller('Record.RecordController', [
 	'$rootScope',
 	'$scope',
 	'$http',
+	'$localStorage',
 	'$location',
 	'$state',
 	'$stateParams',
@@ -48,6 +49,7 @@ angular.module('Record').controller('Record.RecordController', [
 		$rootScope,
 		$scope,
 		$http,
+		$localStorage,
 		$location,
 		$state,
 		$stateParams,
@@ -78,13 +80,8 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.page.itvCheck = null;
 		controller.page.editingNoteId = null;
 
-		controller.hideNote = false;
+		controller.$storage = $localStorage; // Define persistent storage
 
-		//this doesn't actually work, hideNote is note showing up in the $stateParams
-		if ($stateParams.hideNote != null)
-		{
-			controller.hideNote = $stateParams.hideNote;
-		}
 		/*
 		controller.recordtabs2 = [ 
 		 {id : 0,name : 'Master',url : 'partials/master.html'},
@@ -320,13 +317,13 @@ angular.module('Record').controller('Record.RecordController', [
 		// Note Input Logic
 		controller.toggleNote = function toggleNote()
 		{
-			if (controller.hideNote == true)
+			if (controller.$storage.hideNote)
 			{
-				controller.hideNote = false;
+				controller.$storage.hideNote = false;
 			}
 			else
 			{
-				controller.hideNote = true;
+				controller.$storage.hideNote = true;
 			}
 		};
 
@@ -376,7 +373,7 @@ angular.module('Record').controller('Record.RecordController', [
 					controller.page.encounterNote = results;
 					if (controller.page.encounterNote.isSigned)
 					{
-						controller.hideNote = false;
+						controller.$storage.hideNote = true;
 						controller.getCurrentNote(false);
 						controller.page.assignedCMIssues = [];
 					}
@@ -500,7 +497,8 @@ angular.module('Record').controller('Record.RecordController', [
 					controller.page.encounterNote = results;
 					controller.page.initNote = results.note; //compare this with current note content to determine tmpsave or not
 					controller.getIssueNote();
-					controller.hideNote = showNoteAfterLoadingFlag;
+					// controller.hideNote = showNoteAfterLoadingFlag;
+					// controller.$storage.hideNote = showNoteAfterLoadingFlag;
 					$rootScope.$emit('currentlyEditingNote', controller.page.encounterNote);
 					controller.initAppendNoteEditor();
 					controller.initObservationDate();
@@ -531,7 +529,7 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.getIssueNote();
 
 			//Need to check if note has been saved yet.
-			controller.hideNote = true;
+			controller.$storage.hideNote = false;
 			$rootScope.$emit('currentlyEditingNote', controller.page.encounterNote);
 
 			controller.removeEditingNoteFlag();
