@@ -103,8 +103,8 @@ function BackToOscar()
 			</tr>
 			<tr>
 				<td><html:form action="/oscarEncounter/EditSpecialists">
-					<%-- input type="submit" name="delete"
-						value="<bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnDeleteSpecialist"/>"--%>
+					<input type="submit" name="delete"
+						value="<bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnDeleteSpecialist"/>">
 					<div class="ChooseRecipientsBox1">
 					<table>
 						<tr>
