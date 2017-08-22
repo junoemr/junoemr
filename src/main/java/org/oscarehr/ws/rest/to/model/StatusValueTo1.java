@@ -35,18 +35,33 @@ public class StatusValueTo1 implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private String value;
-	
+	private String label;
+
 	public String getValue() {
 		return value;
 	}
+
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
-	
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+
 	public StatusValueTo1() {}
-	
+
 	public StatusValueTo1(String value) {
 		setValue(value);
+		setLabel(value);
+	}
+	public StatusValueTo1(String value, String label) {
+		setValue(value);
+		setLabel(label);
 	}
 }
