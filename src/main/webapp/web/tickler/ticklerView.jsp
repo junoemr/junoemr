@@ -69,7 +69,7 @@
 
 			<div class="form-group col-sm-6">
 				<label><bean:message key="tickler.view.lastUpdated" bundle="ui"/></label>
-				<input disabled type="text" class="form-control" ng-model="ticklerViewCtrl.ticklerUpdate.updateDate " ></input>
+				<input disabled type="text" class="form-control" ng-model="ticklerViewCtrl.ticklerUpdate.updateDate | date:'yyyy-MM-dd'" ></input>
 				<%--<p>{{ticklerUpdate.updateDate | date :'yyyy-MM-dd HH:mm'}}</p>--%>
 
 			</div>
