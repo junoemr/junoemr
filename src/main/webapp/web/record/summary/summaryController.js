@@ -606,6 +606,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			{
 				templateUrl: 'record/summary/groupNotes.jsp',
 				controller: 'Record.Summary.GroupNotesController as groupNotesCtrl',
+				backdrop: 'static',
 				size: size,
 				resolve:
 				{
