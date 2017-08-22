@@ -142,7 +142,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 			{
 				templateUrl: 'schedule/appointmentAdd.jsp',
 				controller: 'Schedule.AppointmentAddController as appointmentAddCtrl',
-				backdrop: false,
+				backdrop: 'static',
 				size: 'lg',
 				resolve:
 				{
@@ -174,7 +174,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 			{
 				templateUrl: 'schedule/appointmentView.jsp',
 				controller: 'Schedule.AppointmentViewController as appointmentViewCtrl',
-				backdrop: false,
+				backdrop: 'static',
 				size: 'lg',
 				resolve:
 				{

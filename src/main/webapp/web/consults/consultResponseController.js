@@ -275,6 +275,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				templateUrl: "consults/consultAttachment.jsp",
 				controller: "Consults.ConsultResponseAttachmentController as consultAttachmentCtrl",
 				windowClass: "attachment-modal-window",
+				backdrop: "static",
 				resolve:
 				{
 					consult: function()

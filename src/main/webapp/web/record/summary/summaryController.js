@@ -719,6 +719,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			{
 				templateUrl: 'record/print.jsp',
 				controller: 'Record.Summary.RecordPrintController as recordPrintCtrl',
+				backdrop: 'static',
 				size: size,
 				resolve:
 				{

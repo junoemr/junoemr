@@ -212,7 +212,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			{
 				templateUrl: 'tickler/ticklerAdd.jsp',
 				controller: 'Tickler.TicklerAddController as ticklerAddCtrl',
-				backdrop: false,
+				backdrop: 'static',
 				size: 'lg'
 			});
 
@@ -238,7 +238,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			{
 				templateUrl: 'tickler/ticklerView.jsp',
 				controller: 'Tickler.TicklerViewController as ticklerViewCtrl',
-				backdrop: false,
+				backdrop: 'static',
 				size: 'lg',
 				resolve:
 				{
@@ -299,6 +299,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 				{
 					templateUrl: 'tickler/ticklerNote.jsp',
 					controller: 'Tickler.TicklerNoteController as ticklerNoteCtrl',
+					backdrop: 'static',
 					resolve:
 					{
 						ticklerNote: function()
@@ -325,6 +326,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			{
 				templateUrl: 'tickler/ticklerComments.jsp',
 				controller: 'Tickler.TicklerCommentController as ticklerCommentCtrl',
+				backdrop: 'static',
 				resolve:
 				{
 					tickler: function()

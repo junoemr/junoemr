@@ -458,7 +458,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			{
 				templateUrl: 'tickler/ticklerView.jsp',
 				controller: 'Tickler.TicklerViewController as  ticklerViewCtrl',
-				backdrop: false,
+				backdrop: 'static',
 				size: 'lg',
 				resolve:
 				{
@@ -503,7 +503,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 			{
 				templateUrl: 'tickler/configureDashboard.jsp',
 				controller: 'Dashboard.TicklerConfigureController as ticklerConfigureCtrl',
-				backdrop: false,
+				backdrop: 'static',
 				size: 'md',
 				resolve:
 				{

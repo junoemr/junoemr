@@ -435,6 +435,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			{
 				templateUrl: 'patient/newPatient.jsp',
 				controller: 'Patient.NewPatientController as newPatientCtrl',
+				backdrop: 'static',
 				size: size
 			});
 
