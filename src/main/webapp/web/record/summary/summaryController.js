@@ -599,7 +599,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		}
 
 
-		editGroupedNotes = function editGroupedNotes(size, mod, action)
+		controller.editGroupedNotes = function editGroupedNotes(size, mod, action)
 		{
 
 			var modalInstance = $uibModal.open(
@@ -656,13 +656,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 			if (item == "add")
 			{
-				editGroupedNotes('lg', mod, null);
+				controller.editGroupedNotes('lg', mod, null);
 
 			}
 			else if (item.action == 'add' && item.type == 'dx_reg')
 			{
 
-				editGroupedNotes('lg', mod, itemId);
+				controller.editGroupedNotes('lg', mod, itemId);
 
 			}
 			else if (item.type == 'lab' || item.type == 'document' || item.type == 'rx' || item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline')
@@ -692,7 +692,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 			else if (item.action == 'action')
 			{
-				editGroupedNotes('lg', mod, itemId);
+				controller.editGroupedNotes('lg', mod, itemId);
 
 			}
 			else
