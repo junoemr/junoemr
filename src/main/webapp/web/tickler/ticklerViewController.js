@@ -104,8 +104,8 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			},
 			function(newValue)
 			{
-				var newDate = moment(newValue.getTime()).format("MM DD YYYY");
-				var finalVal = moment(newDate + "-" + controller.serviceTimeInput).toDate().getTime();
+				var newDate = moment(newValue.getTime()).format("MM-DD-YYYY");
+				var finalVal = moment(newDate + "-" + controller.serviceTimeInput, 'MM-DD-YYYY-hh:mm A').toDate().getTime();
 
 				controller.ticklerUpdate.serviceDate = finalVal;
 			}
@@ -118,8 +118,8 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			},
 			function(newValue)
 			{
-				var date = moment(controller.serviceDateInput.getTime()).format("MM DD YYYY");
-				var finalVal = moment(date + "-" + newValue).toDate().getTime();
+				var date = moment(controller.serviceDateInput.getTime()).format("MM-DD-YYYY");
+				var finalVal = moment(date + "-" + newValue, 'MM-DD-YYYY-hh:mm A').toDate().getTime();
 
 				controller.ticklerUpdate.serviceDate = finalVal;
 			}
