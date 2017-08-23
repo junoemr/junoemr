@@ -48,7 +48,9 @@ import org.oscarehr.ws.rest.to.model.DxQuickList;
 import org.oscarehr.ws.rest.to.model.IssueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpHeaders;
 import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 @Path("/dxRegisty")
 public class DiseaseRegistryService extends AbstractServiceImpl {
@@ -100,18 +102,21 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@Path("/findLikeIssue")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response findLikeIssues(DiagnosisTo1 dx){
+	public RestResponse<IssueTo1, String> findLikeIssues(DiagnosisTo1 dx){
 		Issue issue = issueDao.findIssueByTypeAndCode(dx.getCodingSystem(), dx.getCode());
-		IssueTo1 returnIssue = new IssueTo1();
-		returnIssue.setCode(issue.getCode());
-		returnIssue.setDescription(issue.getDescription());
-		returnIssue.setId(issue.getId());
-		returnIssue.setType(issue.getType());
-		returnIssue.setPriority(issue.getPriority());
-		returnIssue.setRole(issue.getRole());
-		returnIssue.setUpdate_date(issue.getUpdate_date());
-		returnIssue.setSortOrderId(issue.getSortOrderId());
-		return Response.ok(returnIssue).build();
+		if(issue != null) {
+			IssueTo1 returnIssue = new IssueTo1();
+			returnIssue.setCode(issue.getCode());
+			returnIssue.setDescription(issue.getDescription());
+			returnIssue.setId(issue.getId());
+			returnIssue.setType(issue.getType());
+			returnIssue.setPriority(issue.getPriority());
+			returnIssue.setRole(issue.getRole());
+			returnIssue.setUpdate_date(issue.getUpdate_date());
+			returnIssue.setSortOrderId(issue.getSortOrderId());
+			return RestResponse.successResponse(new HttpHeaders(), returnIssue);
+		}
+		return RestResponse.errorResponse(new HttpHeaders(), "No Issue Found");
 	}
 	
 	@POST
@@ -130,7 +135,8 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 			dx.setStatus('A');
 			dx.setProviderNo(getCurrentProvider().getProviderNo());
 			dxresearchDao.persist(dx);
-			LogAction.addLog(getLoggedInInfo(), "Dxresearch.add", "dxresearch", ""+dx.getId(), ""+demographicNo, dx.toString());
+			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), demographicNo,
+					LogConst.ACTION_ADD, LogConst.CON_DISEASE_REG, LogConst.STATUS_SUCCESS, ""+dx.getId(), getLoggedInInfo().getIp(), dx.toString());
 		}
 		
 		return Response.ok().build();
