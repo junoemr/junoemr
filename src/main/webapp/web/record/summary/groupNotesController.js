@@ -87,21 +87,23 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			diseaseRegistryService.findLikeIssue(item).then(
 				function success(results)
 				{
-					if(results.status==="SUCCESS") {
-                        var cmIssue = {
-                            acute: false,
-                            certain: false,
-                            issue: results.body,
-                            issue_id: results.body.issueId,
-                            major: false,
-                            resolved: false,
-                            unsaved: true
-                        };
-                        controller.groupNotesForm.assignedCMIssues.push(cmIssue);
-                    }
-                    else {
+					if (results.status === "SUCCESS")
+					{
+						var cmIssue = {
+							acute: false,
+							certain: false,
+							issue: results.body,
+							issue_id: results.body.issueId,
+							major: false,
+							resolved: false,
+							unsaved: true
+						};
+						controller.groupNotesForm.assignedCMIssues.push(cmIssue);
+					}
+					else
+					{
 						alert("Error Finding Issue");
-                        console.error(results);
+						console.error(results);
 					}
 				},
 				function error(errors)
@@ -186,28 +188,30 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				diseaseRegistryService.findLikeIssue(controller.page.items[itemId].extra).then(
 					function success(results)
 					{
-						if(results.status === "SUCCESS") {
-                            var cmIssue = {
-                                acute: false,
-                                certain: false,
-                                issue: results.body,
-                                issue_id: results.body.issueId,
-                                major: false,
-                                resolved: false,
-                                unsaved: true
-                            };
-                            console.log("find like issue ", cmIssue, results.body);
-                            controller.groupNotesForm.assignedCMIssues.push(cmIssue);
-                            controller.groupNotesForm.encounterNote = {};
-                            controller.groupNotesForm.groupNoteExt = {};
-                            controller.groupNotesForm.encounterNote = {
-                                position: 1
-                            };
-                            action = itemId;
-                        }
-                        else {
-                            console.error(results.error);
-                        }
+						if (results.status === "SUCCESS")
+						{
+							var cmIssue = {
+								acute: false,
+								certain: false,
+								issue: results.body,
+								issue_id: results.body.issueId,
+								major: false,
+								resolved: false,
+								unsaved: true
+							};
+							console.log("find like issue ", cmIssue, results.body);
+							controller.groupNotesForm.assignedCMIssues.push(cmIssue);
+							controller.groupNotesForm.encounterNote = {};
+							controller.groupNotesForm.groupNoteExt = {};
+							controller.groupNotesForm.encounterNote = {
+								position: 1
+							};
+							action = itemId;
+						}
+						else
+						{
+							console.error(results.error);
+						}
 					},
 					function error(errors)
 					{
@@ -269,7 +273,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			controller.groupNotesForm.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO: make this dynamic so it changes on edit
 			controller.groupNotesForm.encounterNote.encounterType = "";
 			controller.groupNotesForm.encounterNote.encounterTime = "";
-
+			// controller.groupNotesForm.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;
 			controller.groupNotesForm.encounterNote.summaryCode = controller.page.code; //'ongoingconcerns';
 
 			controller.groupNotesForm.encounterNote.assignedIssues = [];
@@ -280,6 +284,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			noteService.saveIssueNote($stateParams.demographicNo, controller.groupNotesForm).then(
 				function success(results)
 				{
+					console.log('SAVING NOTE form: ', controller.groupNotesForm);
 					$uibModalInstance.dismiss('cancel');
 					$state.transitionTo($state.current, $stateParams,
 					{
@@ -293,6 +298,22 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				{
 					console.log(errors);
 				});
+		};
+
+		controller.removeGroupNoteIssue = function removeGroupNoteIssue(i)
+		{
+			console.log('removing issue');
+			i.unchecked = true;
+			var newList = [];
+			for (var x = 0; x < controller.groupNotesForm.assignedCMIssues.length; x++)
+			{
+				if (controller.groupNotesForm.assignedCMIssues[x].issue_id != i.issue_id)
+				{
+					newList.push(controller.groupNotesForm.assignedCMIssues[x]);
+				}
+			}
+			controller.groupNotesForm.assignedCMIssues = newList;
+			console.log('NEW LIST: ', newList);
 		};
 
 		/*
