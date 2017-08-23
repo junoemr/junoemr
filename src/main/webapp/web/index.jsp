@@ -379,6 +379,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
 	<script type="text/javascript" src="bower_components/pym.js/dist/pym.v1.min.js"></script>
 	<script type="text/javascript" src="bower_components/moment/min/moment-with-locales.min.js"></script>	
+	<script type="text/javascript" src="bower_components/ngstorage/ngStorage.js"></script>
 	<!-- endbuild -->
 
 	<%-- JunoUI application code, to be combined and minified for production --%>
@@ -527,8 +528,6 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="help/module.js"></script>
 	<script type="text/javascript" src="help/supportController.js"></script>
 	<script type="text/javascript" src="help/helpController.js"></script>
-
-	<script type="text/javascript" src='https://rawgithub.com/gsklee/ngStorage/master/ngStorage.js'></script>
 
 	<!-- endbuild -->
 

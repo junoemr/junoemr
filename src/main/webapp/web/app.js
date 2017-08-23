@@ -4,6 +4,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'ui.bootstrap',
 	'angular-loading-bar',
 	'ngTable',
+	'ngStorage',
 	'Common',
 	'Common.Services',
 	'Common.Filters',

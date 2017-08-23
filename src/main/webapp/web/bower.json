@@ -15,7 +15,8 @@
     "bootstrap-timepicker": "^0.5.2",
     "components-font-awesome": "^4.7.0",
     "moment": "^2.18.1",
-    "jquery-ui": "^1.12.1"
+    "jquery-ui": "^1.12.1",
+    "ngstorage": "^0.3.11"
   },
   "resolutions": {
     "angular": "~1.6.0",
