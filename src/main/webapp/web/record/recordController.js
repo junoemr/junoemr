@@ -331,13 +331,12 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.cancelNoteEdit = function cancelNoteEdit()
 		{
 			console.log('CANCELLING EDIT');
-
 			controller.page.encounterNote = null;
-
 			$rootScope.$emit('stopEditingNote');
 			skipTmpSave = true;
 			controller.getCurrentNote(false);
 			controller.removeEditingNoteFlag();
+			controller.$storage.hideNote = true;
 		};
 
 		controller.saveNote = function saveNote()
@@ -768,6 +767,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.removeIssue = function removeIssue(i)
 		{
+			console.log('removed issue in record ctrl');
 			i.unchecked = true;
 			var newList = [];
 			for (var x = 0; x < controller.page.assignedCMIssues.length; x++)
