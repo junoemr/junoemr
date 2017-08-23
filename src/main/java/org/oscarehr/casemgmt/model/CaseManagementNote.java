@@ -40,7 +40,6 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarRx.data.RxPrescriptionData;
 
-
 public class CaseManagementNote extends BaseObject {
 
 	private Long id;
@@ -125,19 +124,24 @@ public class CaseManagementNote extends BaseObject {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (null == obj) return false;
-		if (!(obj instanceof CaseManagementNote)) return false;
+		if (null == obj)
+			return false;
+		if (!(obj instanceof CaseManagementNote))
+			return false;
 		else {
 			CaseManagementNote mObj = (CaseManagementNote) obj;
-			if (null == this.getId() || null == mObj.getId()) return false;
-			else return (this.getId().equals(mObj.getId()));
+			if (null == this.getId() || null == mObj.getId())
+				return false;
+			else
+				return (this.getId().equals(mObj.getId()));
 		}
 	}
 
 	@Override
 	public int hashCode() {
 		if (Integer.MIN_VALUE == this.hashCode) {
-			if (null == this.getId()) return super.hashCode();
+			if (null == this.getId())
+				return super.hashCode();
 			else {
 				String hashStr = this.getClass().getName() + ":" + this.getId().hashCode();
 				this.hashCode = hashStr.hashCode();
@@ -394,7 +398,8 @@ public class CaseManagementNote extends BaseObject {
 	public static Comparator<CaseManagementNote> getProgramComparator() {
 		return new Comparator<CaseManagementNote>() {
 			public int compare(CaseManagementNote note1, CaseManagementNote note2) {
-				if (note1 == null || note1.getProgramName() == null || note2 == null || note2.getProgramName() == null) {
+				if (note1 == null || note1.getProgramName() == null || note2 == null
+						|| note2.getProgramName() == null) {
 					return 0;
 				}
 				return note1.getProgramName().compareTo(note2.getProgramName());
@@ -414,9 +419,10 @@ public class CaseManagementNote extends BaseObject {
 		};
 
 	}
+
 	public static Comparator<CaseManagementNote> noteObservationDateComparator = new Comparator<CaseManagementNote>() {
 
-            public int compare(CaseManagementNote note1, CaseManagementNote note2) {
+		public int compare(CaseManagementNote note1, CaseManagementNote note2) {
 			if (note1 == null || note2 == null) {
 				return 0;
 			}
@@ -437,7 +443,7 @@ public class CaseManagementNote extends BaseObject {
 		};
 
 	}
-	
+
 	public boolean getHasHistory() {
 		if (getHistory() != null) {
 			if (getHistory().indexOf("----------------History Record----------------") != -1) {
@@ -518,8 +524,7 @@ public class CaseManagementNote extends BaseObject {
 		return isLinkTo(CaseManagementNoteLink.DOCUMENT);
 	}
 
-
-    public boolean isRxAnnotation() {
+	public boolean isRxAnnotation() {
 		return isLinkTo(CaseManagementNoteLink.DRUGS);
 	}
 
@@ -533,27 +538,25 @@ public class CaseManagementNote extends BaseObject {
 			cmnLinkRetrieved = true;
 		}
 
-		if (cmnLink!=null && cmnLink.getTableName().equals(tableName)) {
+		if (cmnLink != null && cmnLink.getTableName().equals(tableName)) {
 			return true;
 		}
 		return false;
 	}
 
-	public RxPrescriptionData.Prescription getRxFromAnnotation(CaseManagementNoteLink cmnl){
-        if(this.isRxAnnotation()){
-            String drugId=cmnl.getTableId().toString();
+	public RxPrescriptionData.Prescription getRxFromAnnotation(CaseManagementNoteLink cmnl) {
+		if (this.isRxAnnotation()) {
+			String drugId = cmnl.getTableId().toString();
 
-            //get drug id from cmn_link table
-            RxPrescriptionData rxData = new RxPrescriptionData();
-            // create Prescription
-            RxPrescriptionData.Prescription rx = rxData.getLatestPrescriptionScriptByPatientDrugId(Integer.parseInt(this.getDemographic_no()), drugId);
-            return rx;
-        }
+			//get drug id from cmn_link table
+			RxPrescriptionData rxData = new RxPrescriptionData();
+			// create Prescription
+			RxPrescriptionData.Prescription rx = rxData.getLatestPrescriptionScriptByPatientDrugId(Integer.parseInt(this.getDemographic_no()), drugId);
+			return rx;
+		}
 
-        return null;
-    }
-
-
+		return null;
+	}
 
 	public int getAppointmentNo() {
 		return appointmentNo;
@@ -564,36 +567,35 @@ public class CaseManagementNote extends BaseObject {
 	}
 
 	public Integer getHourOfEncounterTime() {
-    	return hourOfEncounterTime;
-    }
+		return hourOfEncounterTime;
+	}
 
 	public void setHourOfEncounterTime(Integer hourOfEncounterTime) {
-    	this.hourOfEncounterTime = hourOfEncounterTime;
-    }
+		this.hourOfEncounterTime = hourOfEncounterTime;
+	}
 
 	public Integer getMinuteOfEncounterTime() {
-    	return minuteOfEncounterTime;
-    }
+		return minuteOfEncounterTime;
+	}
 
 	public void setMinuteOfEncounterTime(Integer minuteOfEncounterTime) {
-    	this.minuteOfEncounterTime = minuteOfEncounterTime;
-    }
+		this.minuteOfEncounterTime = minuteOfEncounterTime;
+	}
 
 	public Integer getHourOfEncTransportationTime() {
-    	return hourOfEncTransportationTime;
-    }
+		return hourOfEncTransportationTime;
+	}
 
 	public void setHourOfEncTransportationTime(Integer hourOfEncTransportationTime) {
-    	this.hourOfEncTransportationTime = hourOfEncTransportationTime;
-    }
+		this.hourOfEncTransportationTime = hourOfEncTransportationTime;
+	}
 
 	public Integer getMinuteOfEncTransportationTime() {
-    	return minuteOfEncTransportationTime;
-    }
+		return minuteOfEncTransportationTime;
+	}
 
 	public void setMinuteOfEncTransportationTime(Integer minuteOfEncTransportationTime) {
-    	this.minuteOfEncTransportationTime = minuteOfEncTransportationTime;
-    }
-
+		this.minuteOfEncTransportationTime = minuteOfEncTransportationTime;
+	}
 
 }
