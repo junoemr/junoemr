@@ -252,17 +252,6 @@
 						</select>
 
 					</div>
-				
-					<div class="form-group col-xs-6">
-						<label class="control-label"><bean:message key="oscarEncounter.Index.assnIssue" /></label>			
-						<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.Index.assnIssue" />"
-							uib-typeahead="i.issueId as i.code for i in groupNotesCtrl.searchIssues($viewValue)" 
-							typeahead-on-select="groupNotesCtrl.assignIssue($item, $model, $label); groupNotesCtrl.selectedIssue='';" 
-							ng-model="groupNotesCtrl.selectedIssue" 
-							typeahead-loading="loadingIssues"
-							typeahead-min-length="3"
-							/>
-					</div>
 
 					<div class="form-group col-xs-6">
 						<label class="control-label"><bean:message key="oscarEncounter.Index.btnPosition" /></label>
@@ -274,7 +263,7 @@
 					<div class="form-group col-xs-6">
 						<label class="control-label"><bean:message key="oscarEncounter.hideFromPrint.title" /></label>
 						<!--shouldn't this just be a single checkbox and the answer is always no unless checked?-->				    
-						<div ng-init="groupNotesCtrl.groupNotesForm.groupNoteExt.hideCpp=0">
+						<div class="form-control" ng-init="groupNotesCtrl.groupNotesForm.groupNoteExt.hideCpp=0">
 							<label class="radio-inline" id="hidecpp" name="hidecpp">
 								<input type="radio" id="hidecpp" name="hidecpp" ng-model="ggroupNotesCtrl.roupNotesForm.groupNoteExt.hideCpp" value="0"> No
 							</label>
@@ -284,28 +273,41 @@
 						</div><!-- form-group -->
 					</div>
 
-					<div class="form-group col-xs-12">
+					<div class="form-group col-xs-6">
+						<label class="control-label"><bean:message key="oscarEncounter.Index.assnIssue" /></label>
+						<input type="text" class="form-control" placeholder="<bean:message key="oscarEncounter.Index.assnIssue" />"
+							   uib-typeahead="i.issueId as i.code for i in groupNotesCtrl.searchIssues($viewValue)"
+							   typeahead-on-select="groupNotesCtrl.assignIssue($item, $model, $label); groupNotesCtrl.selectedIssue='';"
+							   ng-model="groupNotesCtrl.selectedIssue"
+							   typeahead-loading="loadingIssues"
+							   typeahead-min-length="3"
+						/>
+					</div>
+
+					<div class="form-group col-xs-6">
 						<label class="control-label"><bean:message key="oscarEncounter.addFromDxReg.title" /></label>
-						<div class="btn-group dropdown" ng-repeat="qlist in groupNotesCtrl.page.quickLists">
-							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								{{qlist.label}} <span class="caret"></span>
-							</button>
-							<ul class="dropdown-menu">
-								<li><a ng-repeat="item in qlist.dxList" ng-click="groupNotesCtrl.addDxItem(item)" >{{item.description}}</a></li>
-							</ul>
+						<div class="input-group">
+							<div class="btn-group" ng-repeat="qlist in groupNotesCtrl.page.quickLists">
+								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									{{qlist.label}} <span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu">
+									<li><a ng-repeat="item in qlist.dxList" ng-click="groupNotesCtrl.addDxItem(item)" >{{item.description}}</a></li>
+								</ul>
+							</div>
 						</div>
 					</div>
-						<!-- 
-					<div class="row">
-						<div class="col-lg-12" style="margin-top:6px;">
-							<div class="checkbox" >
-								<label>
-								<input type="checkbox" ng-model="groupNotesForm.issue.issueId" ng-checked="true" ng-true-value="'{{page.issueId}}'" ng-false-value="'0'">  <em>{{page.title}}</em>  as part of cpp
-
-								</label>
-							</div>				
-						</div>
-					</div> -->
+					<div class="col-sm-12">
+						<label >Assigned Issues:</label>
+						<table class="table table-condensed">
+							<tr ng-repeat="i in groupNotesCtrl.groupNotesForm.assignedCMIssues" class="note-editor-issue-row">
+								<td>{{i.issue.description}} ({{i.issue.code}})</td>
+								<td class="text-right">
+									<button class="btn btn-xs btn-danger" type="button" ng-click="groupNotesCtrl.removeGroupNoteIssue(i)" ng-if="i.unchecked == null || i.unchecked == false">Remove</button>
+								</td>
+							</tr>
+						</table>
+					</div>
 				</form>
 			</div> 
 		</div>	
