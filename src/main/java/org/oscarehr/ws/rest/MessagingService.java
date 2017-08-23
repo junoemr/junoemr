@@ -71,6 +71,7 @@ public class MessagingService extends AbstractServiceImpl {
 	
 	@GET
 	@Path("/count")
+	@Produces("application/json")
 	public int getMyUnreadMessages(@QueryParam("demoAttachedOnly") boolean demoAttachedOnly) {
 		Provider provider=getCurrentProvider();
 
