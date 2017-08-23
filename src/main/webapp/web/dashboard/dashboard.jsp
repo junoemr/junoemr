@@ -200,7 +200,7 @@
 											}">
 								</ng-pluralize> 
 							</a>
-							<span class="label label-danger" ng-if="dashboardCtrl.prefs.expiredTicklersOnly == true">(Overdue)</span>
+							<span class="label label-danger" ng-if="dashboardCtrl.prefs.expiredTicklersOnly == true && dashboardCtrl.totalTicklers > 0">(Overdue)</span>
 						</p>
 
 						<div ng-if="dashboardCtrl.totalTicklers>0">
