@@ -46,41 +46,47 @@ if(!authed) {
 <jsp:useBean id="displayServiceUtil" scope="request"
 	class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 <%
-	// parameterOffset is updated on every new page, to be a new multiple of 25
-	int parameterOffset = 0;
-	String currentPage = "1";
+	int currentPage = 1;
 	String ajaxSearch = "";
+    long numOfSpecialists;
+    int pageLimit = 25;
 
-	if ( request.getParameter("limit1") != null || request.getParameter("page") != null ) {
-		parameterOffset = Integer.parseInt(request.getParameter("limit1"));
-		currentPage = request.getParameter("page");
-	}
+    if ( request.getParameter("page") != null ) {
+        currentPage = Integer.parseInt(request.getParameter("page"));
+    }
 
-	int limit1 = 0;
-	int pageLimit = 25;
-	long numOfSpecialists;
+    if ( request.getParameter("pageLimit") != null) {
+        if ( !request.getParameter("pageLimit").trim().equals("") ) {
+            pageLimit = Integer.parseInt(request.getParameter("pageLimit"));
+        }
+    }
+
 
 	if ( request.getParameter("search") != null ) { // If the current request to the page was requested by searching via search input
-		ajaxSearch = request.getParameter("search");
-		displayServiceUtil.estSpecialistBySearch(ajaxSearch, parameterOffset, pageLimit); // Pass the search query to the DB method
-		numOfSpecialists = displayServiceUtil.getNumOfSpecialistsBySearch(ajaxSearch); // Get count of search results for pagination
-	} else {
-		numOfSpecialists = displayServiceUtil.getNumOfSpecialists(); // Get all specialists
-		displayServiceUtil.estSpecialistLimit(parameterOffset, pageLimit); // Get count of all specialists for pagination
+        ajaxSearch = request.getParameter("search");
+        if ( !ajaxSearch.trim().equals("") ) {
+            displayServiceUtil.estSpecialistVector(ajaxSearch, currentPage, pageLimit); // Pass the search query to the DB method
+            numOfSpecialists = displayServiceUtil.getNumOfSpecialists(ajaxSearch); // Get count of search results for pagination
+        } else {
+            numOfSpecialists = displayServiceUtil.getNumOfSpecialists(); // Get all specialists
+            displayServiceUtil.estSpecialistVector(currentPage, pageLimit); // Get count of all specialists for pagination
+        }
+    } else {
+        numOfSpecialists = displayServiceUtil.getNumOfSpecialists(); // Get all specialists
+        displayServiceUtil.estSpecialistVector(currentPage, pageLimit); // Get count of all specialists for pagination
 	}
 
 	int resultSize = displayServiceUtil.specIdVec.size();
 
 	double approxNumOfPages = (double) numOfSpecialists / pageLimit;
 	int numOfPages = (int) Math.ceil(approxNumOfPages);
-	int currentPageNum = Integer.parseInt(currentPage);
-	int currentPageIdx = currentPageNum - 1;
+	int currentPageIdx = currentPage - 1;
 
 	int startIdx = 0;
 	int endIdx = 10; // Controls how many pages you can select from at a time
 	int paginationLimit = endIdx;
 
-	// This block of code is intended to control the pagination functionality
+	// This set of code is intended to control the pagination functionality
 	//
 	// Intended functionality:
 	//	- We want to only show 10 pages at a time, as the alternative is having a screen with too many page options
@@ -100,13 +106,13 @@ if(!authed) {
     if ( numOfPages >= paginationLimit ) { // Logic for if there are more pages than the current page limit (10)
 		// Since we want to always show the next 5 pages from the current page, if the total number of pages minus
 		// the currently selected page is less than 5, then the page options will remain the same
-		if ( numOfPages - currentPageNum < 5 ) {
+		if ( numOfPages - currentPage < 5 ) {
             startIdx = numOfPages - paginationLimit; // Start counting pages from the maximum number of pages minus 10
             endIdx = numOfPages;
-        } else if ( currentPageNum >= paginationLimit ) { // If you're not in the last 5 page options, but you are past the first 10
+        } else if ( currentPage >= paginationLimit ) { // If you're not in the last 5 page options, but you are past the first 10
             startIdx = currentPageIdx - 4; // Start counting at current page minus 4
             endIdx = currentPageIdx + 6; // Finish at current page plus 6 to get the next 5 pages from the current page
-        } else if ( currentPageNum < paginationLimit ) { // If your current page is below your pagination limit (10)
+        } else if ( currentPage < paginationLimit ) { // If your current page is below your pagination limit (10)
             startIdx = 0;
             endIdx = 10; // Get the first 10 specialists
         }
@@ -133,10 +139,19 @@ if(!authed) {
         }
 		.ajaxSearch {
 			position: absolute;
-			top: 50px;
+			top: 20px;
 			right: 20px;
 		}
-
+        .pageLimiter {
+            padding-bottom: 8px;
+        }
+        .queryResult {
+            color: #191919;
+            font-size: 0.8em;
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+        }
     </style>
 </head>
 <script language="javascript">
@@ -174,8 +189,19 @@ function BackToOscar()
 			style="border-collapse: collapse" bordercolor="#111111" width="100%"
 			height="100%">
 			<div class="ajaxSearch">
-				<input type="text" id="searchInput" placeholder="Search specialists..." onkeyup="updateBySearch()" autofocus>
-			</div>
+                <div class="pageLimiter">
+                    <label>Page Limit:</label>
+                    <select name="limit" onchange="nextPage(this.options[this.selectedIndex].value, 1, '')">
+                        <option value="25" <%= pageLimit != 50 && pageLimit != 100 ? "selected='selected'" : "" %> >25</option>
+                        <option value="50" <%= pageLimit == 50 ? "selected='selected'" : "" %> >50</option>
+                        <option value="100" <%= pageLimit == 100 ? "selected='selected'" : "" %> >100</option>
+                    </select>
+                </div>
+                <div class="searchInput">
+                    <input type="text" id="searchInput" placeholder="Search specialists..." onkeypress="runUpdate(event)" autofocus>
+                    <input type="button" onclick="updateBySearch()" value="Search">
+                </div>
+            </div>
 			<!----Start new rows here-->
 			<tr>
                             <td><%--bean:message
@@ -211,7 +237,7 @@ function BackToOscar()
 						<tr>
 							<td><!--<div class="ChooseRecipientsBox1">--> <%
 
-                                 for(int i=limit1;i < resultSize; i++){
+                                 for(int i=0; i < resultSize; i++){
                                      String  specId     = displayServiceUtil.specIdVec.elementAt(i);
                                      String  fName      = displayServiceUtil.fNameVec.elementAt(i);
                                      String  lName      = displayServiceUtil.lNameVec.elementAt(i);
@@ -227,7 +253,7 @@ function BackToOscar()
 							<td>
 							<%
                                       out.print("<a href=\"../../EditSpecialists.do?specId="+specId+"\">");
-                                      out.print(lName+" "+fName+" "+(proLetters==null?"":proLetters));
+                                      out.print(lName+", "+fName+" "+(proLetters==null?"":proLetters));
                                       out.print("</a>");
                                     %>
 							</td>
@@ -242,9 +268,8 @@ function BackToOscar()
 					</table>
                         <div style="text-align: center; padding-top: 20px; font-size: 1.3em;">
                             <% for(int i = startIdx; i < endIdx; i++) {
-                            	int pageNum = i + 1;
-                            	limit1 = pageLimit * i;%>
-								<a href="javascript:void(0)" class="specialistPageLink" id="page<%=pageNum%>" onclick="nextPage(<%=limit1%>, <%=pageNum%>, '<%=ajaxSearch%>')"><%=pageNum%></a>
+                            	int pageNum = i + 1;%>
+								<a href="javascript:void(0)" class="specialistPageLink" id="page<%=pageNum%>" onclick="nextPage(<%=pageLimit%>, <%=pageNum%>, '<%=ajaxSearch%>')"><%=pageNum%></a>
                           	<% } %>
                         </div>
 					</div>
@@ -255,6 +280,15 @@ function BackToOscar()
 			<tr height="100%">
 				<td></td>
 			</tr>
+            <span class="queryResult">
+            <%
+                if ( !ajaxSearch.trim().equals("") ) {
+                    out.print("Showing " + resultSize + " of " + numOfSpecialists + " results for '"  + ajaxSearch + "' (" + currentPage + " of " + numOfPages + ")");
+                } else {
+                	out.print("Showing " + resultSize + " of " + numOfSpecialists + " results (" + currentPage + " of " + numOfPages + ")");
+                }
+            %>
+            </span>
 		</table>
 		</td>
 	</tr>
@@ -269,7 +303,6 @@ function BackToOscar()
     var currentPage = document.getElementById("page<%=currentPage%>");
     var searchInput = document.getElementById("searchInput");
 
-    searchInput.value = "<%= ajaxSearch %>";
     searchInput.focus();
 
     if ( currentPage != null ) {
@@ -277,16 +310,21 @@ function BackToOscar()
         currentPage.style.textDecoration = "none";
     }
 
-    function nextPage(limit1, page, searchText) {
-        $(document.body).load("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp?limit1=" + limit1 + "&page=" + page + "&search=" + searchText);
+    function nextPage(pageLimit, page, searchText) {
+        $(document.body).load("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp?pageLimit=" + pageLimit + "&page=" + page + "&search=" + searchText);
     }
 
     function updateBySearch() {
         var searchText = searchInput.value;
-        var limit1 = 0;
         var page = 1;
-		$(document.body).load("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp?limit1=" + limit1 + "&page=" + page + "&search=" + searchText);
+		$(document.body).load("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp?pageLimit=" + <%=pageLimit%> + "&page=" + page + "&search=" + searchText);
     }
+
+    function runUpdate(e) {
+        if ( e.keyCode == 13 ) {
+            updateBySearch();
+		}
+	}
 
 </script>
 </body>

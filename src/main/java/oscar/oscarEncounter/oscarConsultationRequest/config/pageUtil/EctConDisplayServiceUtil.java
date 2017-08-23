@@ -103,51 +103,31 @@ public class EctConDisplayServiceUtil
         }
     }
 
-    public void estSpecialistLimit(int start, int max)
+    public void estSpecialistVector(int currentPage, int maxResults)
     {
-        fNameVec = new Vector<String>();
-        lNameVec = new Vector<String>();
-        proLettersVec = new Vector<String>();
-        addressVec = new Vector<String>();
-        phoneVec = new Vector<String>();
-        faxVec = new Vector<String>();
-        websiteVec = new Vector<String>();
-        emailVec = new Vector<String>();
-        specTypeVec = new Vector<String>();
-        specIdVec = new Vector<String>();
-        referralNoVec = new ArrayList<String>();
-
-        ProfessionalSpecialistDao dao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
-        for(ProfessionalSpecialist ps : dao.findAll(start, max)) {
-            fNameVec.add(ps.getFirstName());
-            lNameVec.add(ps.getLastName());
-            proLettersVec.add(ps.getProfessionalLetters());
-            addressVec.add(ps.getStreetAddress());
-            phoneVec.add(ps.getPhoneNumber());
-            faxVec.add(ps.getFaxNumber());
-            websiteVec.add(ps.getWebSite());
-            emailVec.add(ps.getEmailAddress());
-            specTypeVec.add(ps.getSpecialtyType());
-            specIdVec.add(ps.getId().toString());
-        }
+		this.estSpecialistVector("", currentPage, maxResults);
     }
 
-    public void estSpecialistBySearch(String searchText, int start, int max)
+    public void estSpecialistVector(String searchText, int currentPage, int maxResults)
     {
-        fNameVec = new Vector<String>();
-        lNameVec = new Vector<String>();
-        proLettersVec = new Vector<String>();
-        addressVec = new Vector<String>();
-        phoneVec = new Vector<String>();
-        faxVec = new Vector<String>();
-        websiteVec = new Vector<String>();
-        emailVec = new Vector<String>();
-        specTypeVec = new Vector<String>();
-        specIdVec = new Vector<String>();
-        referralNoVec = new ArrayList<String>();
+		currentPage = currentPage - 1;
+    	int offset = maxResults * currentPage;
+		ProfessionalSpecialistDao dao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
+		List<ProfessionalSpecialist> specialists = dao.findBySearchName(searchText, offset, maxResults);
 
-        ProfessionalSpecialistDao dao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
-        for(ProfessionalSpecialist ps : dao.findBySearchName(searchText, start, max)) {
+		fNameVec = new Vector<String>();
+		lNameVec = new Vector<String>();
+		proLettersVec = new Vector<String>();
+		addressVec = new Vector<String>();
+		phoneVec = new Vector<String>();
+		faxVec = new Vector<String>();
+		websiteVec = new Vector<String>();
+		emailVec = new Vector<String>();
+		specTypeVec = new Vector<String>();
+		specIdVec = new Vector<String>();
+		referralNoVec = new ArrayList<String>();
+
+        for(ProfessionalSpecialist ps : specialists) {
             fNameVec.add(ps.getFirstName());
             lNameVec.add(ps.getLastName());
             proLettersVec.add(ps.getProfessionalLetters());
@@ -172,15 +152,14 @@ public class EctConDisplayServiceUtil
     }
 
     public long getNumOfSpecialists() {
-        ProfessionalSpecialistDao proSpecDao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
-        numOfSpecialists = proSpecDao.getNumOfSpecialists();
+        numOfSpecialists = this.getNumOfSpecialists("");
 
         return numOfSpecialists;
     }
 
-    public long getNumOfSpecialistsBySearch(String searchText) {
+    public long getNumOfSpecialists(String searchText) {
         ProfessionalSpecialistDao proSpecDao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
-        numOfSpecialists = proSpecDao.getNumOfSpecialistsBySearch(searchText);
+        numOfSpecialists = proSpecDao.getNumOfSpecialists(searchText);
 
         return numOfSpecialists;
     }
