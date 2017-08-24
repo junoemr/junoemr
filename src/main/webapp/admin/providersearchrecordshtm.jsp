@@ -79,7 +79,7 @@
     </script>
 </head>
 
-<body onLoad="setfocus()" topmargin="0" leftmargin="0" rightmargin="0">
+<body onLoad="setfocus(); document.forms[0].submit();" topmargin="0" leftmargin="0" rightmargin="0">
 
 <center>
 <table border="0" cellspacing="0" cellpadding="0" width="100%">
@@ -103,7 +103,7 @@
 			<input type="radio" name="search_mode" value="search_providerno" onclick="document.forms['searchprovider'].keyword.focus();">
 			<bean:message key="admin.providersearch.formNo" /></font></td>
 		<td nowrap><font size="1" face="Verdana" color="#0000FF">
-			<input type="checkbox" name="search_status" value="1">
+			<input type="checkbox" name="search_status" value="1" checked="checked">
 			<bean:message key="admin.providersearch.formActiveStatus" /><br />
 			<input type="checkbox" name="search_status" value="0">
 			<bean:message key="admin.providersearch.formInactiveStatus" /> </font></td>
@@ -116,7 +116,6 @@
 	</tr>
 	</form>
 </table>
-
 </center>
 </body>
 </html:html>
