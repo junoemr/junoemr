@@ -41,6 +41,17 @@ angular.module("Common.Services").service("demographicService", [
 				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
 				function success(results)
 				{
+					console.log('DEMO RESULTS: ', results.date);
+					// results.data.dateOfBirth = new Date(results.data.dateOfBirth);
+					results.data.effDate = new Date(results.data.effDate);
+					results.data.hcRenewDate = new Date(results.data.hcRenewDate);
+					results.data.endDate = new Date(results.data.endDate);
+                    results.data.patientStatusDate = new Date(results.data.patientStatusDate);
+                    results.data.onWaitingListSinceDate = new Date(results.data.onWaitingListSinceDate);
+                    results.data.scrPaperChartArchivedDate = new Date(results.data.scrPaperChartArchivedDate);
+					results.data.dateJoined = new Date(results.data.dateJoined);
+					results.data.rosterDate = new Date(results.data.rosterDate);
+                    console.log('converted RESULTS: ', results.data);
 					deferred.resolve(results.data);
 				},
 				function error(errors)
@@ -60,6 +71,16 @@ angular.module("Common.Services").service("demographicService", [
 				function success(results)
 				{
 					deferred.resolve(results.data);
+                    // results.data.dateOfBirth = new Date(results.data.dateOfBirth);
+                    results.data.effDate = new Date(results.data.effDate);
+                    results.data.hcRenewDate = new Date(results.data.hcRenewDate);
+                    results.data.endDate = new Date(results.data.endDate);
+                    results.data.patientStatusDate = new Date(results.data.patientStatusDate);
+                    results.data.onWaitingListSinceDate = new Date(results.data.onWaitingListSinceDate);
+                    results.data.scrPaperChartArchivedDate = new Date(results.data.scrPaperChartArchivedDate);
+                    results.data.dateJoined = new Date(results.data.dateJoined);
+                    results.data.rosterDate = new Date(results.data.rosterDate);
+                    console.log('converted RESULTS: ', results.data);
 				},
 				function error(errors)
 				{

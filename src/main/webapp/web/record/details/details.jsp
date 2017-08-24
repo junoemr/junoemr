@@ -163,29 +163,40 @@
 					</label>
 					<div class="col-md-4">
 						<div class="input-group vertical-align">
-							<input id="details-dob-month" type="text" placeholder="MM" 
-								title="Birthday Month" class="form-control form-control-details" 
-								ng-model="detailsCtrl.page.demo.dobMonth" 
-								ng-change="detailsCtrl.checkDate('DobM')" 
+							<input id="details-dob-month" type="text" placeholder="MM"
+								title="Birthday Month" class="form-control form-control-details"
+								ng-model="detailsCtrl.page.demo.dobMonth"
+								ng-change="detailsCtrl.checkDate('DobM')"
 								ng-blur="detailsCtrl.formatDate('DobM')"
 							/>
-							<input id="details-dob-day" type="text" placeholder="DD" 
-								title="Birthday Day" 
-								class="form-control form-control-details" 
-								ng-model="detailsCtrl.page.demo.dobDay" 
+							<input id="details-dob-day" type="text" placeholder="DD"
+								title="Birthday Day"
+								class="form-control form-control-details"
+								ng-model="detailsCtrl.page.demo.dobDay"
 								ng-change="detailsCtrl.checkDate('DobD')"
 								ng-blur="detailsCtrl.formatDate('DobD')"
-							/>	
-							<input id="details-dob-year" type="text" placeholder="YYYY" 
-								title="Birthday Year" class="form-control form-control-details" 
-								ng-model="detailsCtrl.page.demo.dobYear" 
-								ng-change="detailsCtrl.checkDate('DobY')" 
-								ng-blur="detailsCtrl.formatDate('DobY')" 
+							/>
+							<input id="details-dob-year" type="text" placeholder="YYYY"
+								title="Birthday Year" class="form-control form-control-details"
+								ng-model="detailsCtrl.page.demo.dobYear"
+								ng-change="detailsCtrl.checkDate('DobY')"
+								ng-blur="detailsCtrl.formatDate('DobY')"
 							/>
 							<div>&nbsp;
 								(<span ng-if="!detailsCtrl.isNaN(detailsCtrl.page.demo.age)">{{detailsCtrl.page.demo.age}}y</span>)
 							</div>
 						</div>
+							<%--<input id="effDate"--%>
+								   <%--ng-model="detailsCtrl.page.demo.dateOfBirth"--%>
+								   <%--type="date"--%>
+								   <%--class="form-control form-control-details"--%>
+								   <%--title="Health Card Effective Date"--%>
+								   <%--datepicker-popup="yyyy-MM-dd"--%>
+								   <%--datepicker-append-to-body="true"--%>
+								   <%--placeholder="YYYY-MM-DD"--%>
+								   <%--style="background-color:{{detailsCtrl.page.effDateColor}}"--%>
+							<%--/>--%>
+
 					</div>
 					
 					
@@ -498,16 +509,16 @@
 				<div class="form-group">
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formEFFDate"/></label>
 					<div class="col-md-4">
-						<input id="effDate" ng-model="detailsCtrl.page.demo.effDate" 
-							type="text" 
+						<input id="effDate" ng-model="detailsCtrl.page.demo.effDate"
+							type="date"
 							class="form-control form-control-details" 
-							title="Health Card Effective Date" 
+							title="Health Card Effective Date"
 							datepicker-popup="yyyy-MM-dd" 
 							datepicker-append-to-body="true" 
-							is-open="detailsCtrl.page.effDatePicker" 
-							ng-click="detailsCtrl.page.effDatePicker = true" 
-							placeholder="YYYY-MM-DD" 
-							style="background-color:{{detailsCtrl.page.effDateColor}}" 
+							is-open="detailsCtrl.page.effDatePicker"
+							ng-click="detailsCtrl.page.effDatePicker = true"
+							placeholder="YYYY-MM-DD"
+							style="background-color:{{detailsCtrl.page.effDateColor}}"
 							ng-change="detailsCtrl.preventManualEffDate()"
 						/>
 					</div>
@@ -515,7 +526,7 @@
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formHCRenewDate"/></label>
 					<div class="col-md-4">
 						<input id="hcRenewDate" ng-model="detailsCtrl.page.demo.hcRenewDate" 
-							type="text" 
+							type="date"
 							class="form-control form-control-details" 
 							title="Health Card Renew Date" 
 							datepicker-popup="yyyy-MM-dd" 
@@ -636,7 +647,7 @@
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.DateJoined"/></label>
 					<div class="col-md-4">
 						<input id="rosterDate" ng-model="detailsCtrl.page.demo.rosterDate" 
-							type="text" 
+							type="date"
 							class="form-control form-control-details" 
 							title="Roster Date" 
 							datepicker-popup="yyyy-MM-dd" 
@@ -703,7 +714,7 @@
 					<label class="col-md-2 control-label" ><bean:message key="demographic.demographiceditdemographic.PatientStatusDate"/></label>
 					<div class="col-md-4">
 						<input id="patientStatusDate" ng-model="detailsCtrl.page.demo.patientStatusDate" 
-							type="text" 
+							type="date"
 							class="form-control form-control-details" 
 							datepicker-popup="yyyy-MM-dd" 
 							datepicker-append-to-body="true" 
@@ -719,7 +730,7 @@
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formDateJoined1"/></label>
 					<div class="col-md-4">
 						<input id="dateJoined" ng-model="detailsCtrl.page.demo.dateJoined" 
-							type="text" 
+							type="date"
 							class="form-control form-control-details" 
 							title="Date Joined" 
 							datepicker-popup="yyyy-MM-dd" 
@@ -734,7 +745,7 @@
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formEndDate"/></label>
 					<div class="col-md-4">
 						<input id="endDate" ng-model="detailsCtrl.page.demo.endDate" 
-							type="text" 
+							type="date"
 							class="form-control form-control-details" 
 							title="End Date" 
 							datepicker-popup="yyyy-MM-dd" 
@@ -814,7 +825,7 @@
 					<div class="col-md-4">
 						<input id="onWaitingListSinceDate" 
 							ng-model="detailsCtrl.page.demo.onWaitingListSinceDate" 
-							type="text" 
+							type="date"
 							class="form-control form-control-details" 
 							title="<bean:message key="demographic.demographicaddarecordhtm.msgDateOfReq"/>" 
 							datepicker-popup="yyyy-MM-dd" 
