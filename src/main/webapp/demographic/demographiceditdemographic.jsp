@@ -180,6 +180,7 @@ if(!authed) {
 	String str = null;
 	int nStrShowLen = 20;
 	String billRegion = oscarVariables.getBillingTypeUpperCase();
+	String instanceType = oscarVariables.getInstanceTypeUpperCase();
 	String prov = oscarVariables.getBillingTypeUpperCase();
 
 	CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
@@ -924,6 +925,18 @@ if(wLReadonly.equals("")){
 							<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/>
 							</a>
 						<%
+						if ("BC".equals(instanceType))
+						{
+						    %>
+
+							<br/>
+                            <a  href="javascript: void();" onclick="return !showMenu('2', event);" onmouseover="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','returnTeleplanMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+                            <div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
+                                <span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
+                                <span id="returnTeleplanMsg"></span>
+                            </div>
+					<%
+						}
 					}
 					else if("ON".equals(billRegion)) 
 					{
