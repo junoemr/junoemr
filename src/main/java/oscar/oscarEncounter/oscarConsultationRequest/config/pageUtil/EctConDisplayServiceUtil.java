@@ -43,75 +43,75 @@ public class EctConDisplayServiceUtil
 {
 	private ConsultationServiceDao consultationServiceDao = (ConsultationServiceDao)SpringUtils.getBean("consultationServiceDao");
 	
-    public Vector<String> fNameVec;
-    public Vector<String> lNameVec;
-    public Vector<String> proLettersVec;
-    public Vector<String> addressVec;
-    public Vector<String> phoneVec;
-    public Vector<String> faxVec;
-    public Vector<String> websiteVec;
-    public Vector<String> emailVec;
-    public Vector<String> specTypeVec;
-    public Vector<String> specIdVec;
-    public Vector<String> serviceName;
-    public Vector<String> serviceId;
-    public ArrayList<String> referralNoVec;
-    public long numOfSpecialists;
+	public Vector<String> fNameVec;
+	public Vector<String> lNameVec;
+	public Vector<String> proLettersVec;
+	public Vector<String> addressVec;
+	public Vector<String> phoneVec;
+	public Vector<String> faxVec;
+	public Vector<String> websiteVec;
+	public Vector<String> emailVec;
+	public Vector<String> specTypeVec;
+	public Vector<String> specIdVec;
+	public Vector<String> serviceName;
+	public Vector<String> serviceId;
+	public ArrayList<String> referralNoVec;
+	public long numOfSpecialists;
 	
-    public String getServiceDesc(String serId)
-    {
-        String retval = new String();
+	public String getServiceDesc(String serId)
+	{
+		String retval = new String();
 
-        ConsultationServices cs = consultationServiceDao.find(Integer.parseInt(serId));
-        if(cs != null) {
-        	retval = cs.getServiceDesc();
-        }
+		ConsultationServices cs = consultationServiceDao.find(Integer.parseInt(serId));
+		if(cs != null) {
+			retval = cs.getServiceDesc();
+		}
 
-        return retval;
-    }
-    
-    public void estSpecialist() {
-    	estSpecialistVector();
-    }
+		return retval;
+	}
 
-    public void estSpecialistVector()
-    {
-        fNameVec = new Vector<String>();
-        lNameVec = new Vector<String>();
-        proLettersVec = new Vector<String>();
-        addressVec = new Vector<String>();
-        phoneVec = new Vector<String>();
-        faxVec = new Vector<String>();
-        websiteVec = new Vector<String>();
-        emailVec = new Vector<String>();
-        specTypeVec = new Vector<String>();
-        specIdVec = new Vector<String>();
-        referralNoVec = new ArrayList<String>();
-        
-        ProfessionalSpecialistDao dao = SpringUtils.getBean(ProfessionalSpecialistDao.class);        
-        for(ProfessionalSpecialist ps : dao.findAll()) {
-            fNameVec.add(ps.getFirstName());
-            lNameVec.add(ps.getLastName());
-            proLettersVec.add(ps.getProfessionalLetters());
-            addressVec.add(ps.getStreetAddress());
-            phoneVec.add(ps.getPhoneNumber());
-            faxVec.add(ps.getFaxNumber());
-            websiteVec.add(ps.getWebSite());
-            emailVec.add(ps.getEmailAddress());
-            specTypeVec.add(ps.getSpecialtyType());
-            specIdVec.add(ps.getId().toString());
-        }
-    }
+	public void estSpecialist() {
+		estSpecialistVector();
+	}
 
-    public void estSpecialistVector(int currentPage, int maxResults)
-    {
+	public void estSpecialistVector()
+	{
+		fNameVec = new Vector<String>();
+		lNameVec = new Vector<String>();
+		proLettersVec = new Vector<String>();
+		addressVec = new Vector<String>();
+		phoneVec = new Vector<String>();
+		faxVec = new Vector<String>();
+		websiteVec = new Vector<String>();
+		emailVec = new Vector<String>();
+		specTypeVec = new Vector<String>();
+		specIdVec = new Vector<String>();
+		referralNoVec = new ArrayList<String>();
+
+		ProfessionalSpecialistDao dao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
+		for(ProfessionalSpecialist ps : dao.findAll()) {
+			fNameVec.add(ps.getFirstName());
+			lNameVec.add(ps.getLastName());
+			proLettersVec.add(ps.getProfessionalLetters());
+			addressVec.add(ps.getStreetAddress());
+			phoneVec.add(ps.getPhoneNumber());
+			faxVec.add(ps.getFaxNumber());
+			websiteVec.add(ps.getWebSite());
+			emailVec.add(ps.getEmailAddress());
+			specTypeVec.add(ps.getSpecialtyType());
+			specIdVec.add(ps.getId().toString());
+		}
+	}
+
+	public void estSpecialistVector(int currentPage, int maxResults)
+	{
 		this.estSpecialistVector("", currentPage, maxResults);
-    }
+	}
 
-    public void estSpecialistVector(String searchText, int currentPage, int maxResults)
-    {
+	public void estSpecialistVector(String searchText, int currentPage, int maxResults)
+	{
 		currentPage = currentPage - 1;
-    	int offset = maxResults * currentPage;
+		int offset = maxResults * currentPage;
 		ProfessionalSpecialistDao dao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
 		List<ProfessionalSpecialist> specialists = dao.findBySearchName(searchText, offset, maxResults);
 
@@ -127,53 +127,53 @@ public class EctConDisplayServiceUtil
 		specIdVec = new Vector<String>();
 		referralNoVec = new ArrayList<String>();
 
-        for(ProfessionalSpecialist ps : specialists) {
-            fNameVec.add(ps.getFirstName());
-            lNameVec.add(ps.getLastName());
-            proLettersVec.add(ps.getProfessionalLetters());
-            addressVec.add(ps.getStreetAddress());
-            phoneVec.add(ps.getPhoneNumber());
-            faxVec.add(ps.getFaxNumber());
-            websiteVec.add(ps.getWebSite());
-            emailVec.add(ps.getEmailAddress());
-            specTypeVec.add(ps.getSpecialtyType());
-            specIdVec.add(ps.getId().toString());
-        }
-    }
+		for(ProfessionalSpecialist ps : specialists) {
+			fNameVec.add(ps.getFirstName());
+			lNameVec.add(ps.getLastName());
+			proLettersVec.add(ps.getProfessionalLetters());
+			addressVec.add(ps.getStreetAddress());
+			phoneVec.add(ps.getPhoneNumber());
+			faxVec.add(ps.getFaxNumber());
+			websiteVec.add(ps.getWebSite());
+			emailVec.add(ps.getEmailAddress());
+			specTypeVec.add(ps.getSpecialtyType());
+			specIdVec.add(ps.getId().toString());
+		}
+	}
 
-    public Vector<String> getSpecialistInField(String serviceId) {
-        Vector<String> vector = new Vector<String>();
-        ServiceSpecialistsDao dao = SpringUtils.getBean(ServiceSpecialistsDao.class);
-        
-        for(ServiceSpecialists ss : dao.findByServiceId(ConversionUtils.fromIntString(serviceId))) {
-        	vector.add("" + ss.getId().getSpecId());
-        }
-        return vector;
-    }
+	public Vector<String> getSpecialistInField(String serviceId) {
+		Vector<String> vector = new Vector<String>();
+		ServiceSpecialistsDao dao = SpringUtils.getBean(ServiceSpecialistsDao.class);
 
-    public long getNumOfSpecialists() {
-        numOfSpecialists = this.getNumOfSpecialists("");
+		for(ServiceSpecialists ss : dao.findByServiceId(ConversionUtils.fromIntString(serviceId))) {
+			vector.add("" + ss.getId().getSpecId());
+		}
+		return vector;
+	}
 
-        return numOfSpecialists;
-    }
+	public long getNumOfSpecialists() {
+		numOfSpecialists = this.getNumOfSpecialists("");
 
-    public long getNumOfSpecialists(String searchText) {
-        ProfessionalSpecialistDao proSpecDao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
-        numOfSpecialists = proSpecDao.getNumOfSpecialists(searchText);
+		return numOfSpecialists;
+	}
 
-        return numOfSpecialists;
-    }
+	public long getNumOfSpecialists(String searchText) {
+		ProfessionalSpecialistDao proSpecDao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
+		numOfSpecialists = proSpecDao.getNumOfSpecialists(searchText);
 
-    public void estServicesVectors()
-    {
-        serviceId = new Vector<String>();
-        serviceName = new Vector<String>();
+		return numOfSpecialists;
+	}
 
-        List<ConsultationServices> services = consultationServiceDao.findActive();
-        for(ConsultationServices service:services) {
-        	serviceId.add(String.valueOf(service.getServiceId()));
-        	serviceName.add(service.getServiceDesc());
-        }
+	public void estServicesVectors()
+	{
+		serviceId = new Vector<String>();
+		serviceName = new Vector<String>();
 
-    }
+		List<ConsultationServices> services = consultationServiceDao.findActive();
+		for(ConsultationServices service:services) {
+			serviceId.add(String.valueOf(service.getServiceId()));
+			serviceName.add(service.getServiceDesc());
+		}
+
+	}
 }
