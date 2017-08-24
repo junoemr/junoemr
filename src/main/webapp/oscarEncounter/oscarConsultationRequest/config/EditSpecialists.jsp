@@ -152,6 +152,10 @@ if(!authed) {
 			bottom: 10px;
 			left: 20px;
 		}
+        .navBtn {
+            text-decoration: none;
+            margin: 0 2px;
+        }
 	</style>
 </head>
 <script language="javascript">
@@ -184,7 +188,7 @@ function BackToOscar()
 				  out.print(titlebar.estBar(request));
 				  %>
 		</td>
-		<td class="MainTableRightColumn">
+		<td class="MainTableRightColumn" style="width: 90%;">
 		<table cellpadding="0" cellspacing="2"
 			style="border-collapse: collapse" bordercolor="#111111" width="100%"
 			height="100%">
@@ -267,10 +271,14 @@ function BackToOscar()
 
 					</table>
 						<div style="text-align: center; padding-top: 20px; font-size: 1.3em;">
+                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('first')"><<</a>
+                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('previous')"><</a>
 							<% for(int i = startIdx; i < endIdx; i++) {
 								int pageNum = i + 1;%>
 								<a href="javascript:void(0)" class="specialistPageLink" id="page<%=pageNum%>" onclick="nextPage(<%=pageLimit%>, <%=pageNum%>, '<%=ajaxSearch%>')"><%=pageNum%></a>
 							<% } %>
+                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('next')">></a>
+                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('last')">>></a>
 						</div>
 					</div>
 				</html:form></td>
@@ -319,6 +327,31 @@ function BackToOscar()
 		var page = 1;
 		$(document.body).load("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp?pageLimit=" + <%=pageLimit%> + "&page=" + page + "&search=" + searchText);
 	}
+
+	function toPage(toPagePosition) {
+	    var searchText = searchInput.value;
+	    var page = 1;
+	    var currentPage = <%=currentPage%>;
+
+	    switch(toPagePosition) {
+            case 'first':
+                page = 1;
+                break;
+            case 'previous':
+                page = currentPage - 1;
+                break;
+            case 'next':
+                page = currentPage + 1;
+                break;
+            case 'last':
+                page = <%=numOfPages%>
+                break;
+            default:
+                page = 1;
+        }
+
+        $(document.body).load("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp?pageLimit=" + <%=pageLimit%> + "&page=" + page + "&search=" + searchText);
+    }
 
 	function runUpdate(e) {
 		if ( e.keyCode == 13 ) {
