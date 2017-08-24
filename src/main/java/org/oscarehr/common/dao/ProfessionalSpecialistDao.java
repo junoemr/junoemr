@@ -52,6 +52,26 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		return(results);
 	}
 
+	public long getNumOfSpecialists(String searchText) {
+		Query query = entityManager.createQuery("select count(x) from " + modelClass.getSimpleName() + " x where x.firstName like ? or x.lastName like ?");
+		query.setParameter(1, searchText+"%");
+		query.setParameter(2, searchText+"%");
+
+		Long numOfSpecialists = (Long) query.getSingleResult();
+		return numOfSpecialists;
+	}
+
+	public List<ProfessionalSpecialist> findBySearchName(String searchText, int offset, int maxResults) {
+		Query query = entityManager.createQuery("select x from " + modelClass.getSimpleName() + " x where x.firstName like ? or x.lastName like ? order by x.lastName");
+		query.setParameter(1, searchText+"%");
+		query.setParameter(2, searchText+"%");
+		query.setFirstResult(offset);
+		query.setMaxResults(maxResults);
+
+		List<ProfessionalSpecialist> results = query.getResultList();
+		return results;
+	}
+
 	/**
 	 * Sorted by lastname,firstname
 	 */
