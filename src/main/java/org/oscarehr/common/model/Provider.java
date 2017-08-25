@@ -365,10 +365,10 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public void setAlbertaEDeliveryIds(String albertaEDeliveryIds) {
 		this.albertaEDeliveryIds = StringUtils.trimToNull(albertaEDeliveryIds);
 	}
-	public void setAlbertaEDeliveryIds(List<String> idList) {
-		setAlbertaEDeliveryIds(StringUtils.join(idList, ","));
-	}
-	
+//	public void setAlbertaEDeliveryIds(List<String> idList) {
+//		setAlbertaEDeliveryIds(StringUtils.join(idList, ","));
+//	}
+
 	/* -- other methods --*/
 
 	public ComparatorName ComparatorName() {
