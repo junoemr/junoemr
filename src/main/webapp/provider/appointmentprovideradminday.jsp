@@ -1788,11 +1788,7 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 						}
 						if (as.getNextStatus() != null) {
 
-							String statusTitle = as.getTitleString(request.getLocale());
-
-							if (statusTitle == null || statusTitle.trim().equals("")) {
-								statusTitle = as.getTitle();
-							}
+							String statusTitle = as.getTitle();
 
 							if(OscarProperties.getInstance().getProperty("APPT_SHOW_SHORT_LETTERS", "false") != null 
 								&& OscarProperties.getInstance().getProperty("APPT_SHOW_SHORT_LETTERS", "false").equals("true")){
