@@ -32,15 +32,11 @@
                 <label for="startDate">Start Date</label>
 
                 <input ng-model="reportSHMentalHealthCtrl.params.startDate"
-                    type="text"
+                    type="date"
                     id="startDate"
                     name="startDate"
                     class="form-control"
-                    datepicker-popup="yyyy-MM-dd"
-                    datepicker-append-to-body="true"
-                    is-open="data.isOpen"
-                    ng-click="reportSHMentalHealthCtrl.data.isOpen = true"
-                    placeholder="">
+                    ng-click="reportSHMentalHealthCtrl.data.isOpen = true">
             </div>
 
             <button type="submit" class="btn btn-default" ng-click="reportSHMentalHealthCtrl.generateReport()">Generate Report</button>
