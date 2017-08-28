@@ -26,4 +26,4 @@
 
  */
 
-angular.module('Common.Services', []);
+angular.module('Common.Services', ['Common.Util']);

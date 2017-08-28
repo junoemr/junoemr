@@ -84,25 +84,19 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				}
 			}
 
-			diseaseRegistryService.findLikeIssue(item).then(
+			diseaseRegistryService.findDxIssue(item).then(
 				function success(results)
 				{
-					if(results.status==="SUCCESS") {
-                        var cmIssue = {
-                            acute: false,
-                            certain: false,
-                            issue: results.body,
-                            issue_id: results.body.issueId,
-                            major: false,
-                            resolved: false,
-                            unsaved: true
-                        };
-                        controller.groupNotesForm.assignedCMIssues.push(cmIssue);
-                    }
-                    else {
-						alert("Error Finding Issue");
-                        console.error(results);
-					}
+					var cmIssue = {
+						acute: false,
+						certain: false,
+						issue: results,
+						issue_id: results.id,
+						major: false,
+						resolved: false,
+						unsaved: true
+					};
+					controller.groupNotesForm.assignedCMIssues.push(cmIssue);
 				},
 				function error(errors)
 				{
@@ -183,31 +177,26 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			else if (controller.page.items[itemId].type === "dx_reg")
 			{
 				controller.groupNotesForm.assignedCMIssues = [];
-				diseaseRegistryService.findLikeIssue(controller.page.items[itemId].extra).then(
+				diseaseRegistryService.findDxIssue(controller.page.items[itemId].extra).then(
 					function success(results)
 					{
-						if(results.status === "SUCCESS") {
-                            var cmIssue = {
-                                acute: false,
-                                certain: false,
-                                issue: results.body,
-                                issue_id: results.body.issueId,
-                                major: false,
-                                resolved: false,
-                                unsaved: true
-                            };
-                            console.log("find like issue ", cmIssue, results.body);
-                            controller.groupNotesForm.assignedCMIssues.push(cmIssue);
-                            controller.groupNotesForm.encounterNote = {};
-                            controller.groupNotesForm.groupNoteExt = {};
-                            controller.groupNotesForm.encounterNote = {
-                                position: 1
-                            };
-                            action = itemId;
-                        }
-                        else {
-                            console.error(results.error);
-                        }
+						var cmIssue = {
+							acute: false,
+							certain: false,
+							issue: results,
+							issue_id: results.issueId,
+							major: false,
+							resolved: false,
+							unsaved: true
+						};
+						console.log("find like issue ", cmIssue, results);
+						controller.groupNotesForm.assignedCMIssues.push(cmIssue);
+						controller.groupNotesForm.encounterNote = {};
+						controller.groupNotesForm.groupNoteExt = {};
+						controller.groupNotesForm.encounterNote = {
+							position: 1
+						};
+						action = itemId;
 					},
 					function error(errors)
 					{

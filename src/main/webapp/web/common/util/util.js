@@ -77,3 +77,15 @@ Juno.Common.Util.calcAge = function(dobYear, dobMonth, dobDay)
 	}
 	return years;
 };
+/**
+ * recursively merges two js hashes. the baseHash will be modified
+ * @param baseHash
+ * @param toMerge
+ */
+Juno.Common.Util.mergeHash = function(baseHash, toMerge) {
+	if(toMerge === 'undefined') {
+		return false;
+    }
+	$.extend(true, baseHash, toMerge);
+	return true;
+};

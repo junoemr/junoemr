@@ -29,12 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 import org.oscarehr.casemgmt.dao.IssueDAO;
@@ -97,13 +92,12 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 		List<DxQuickList> returnQuickLists = new ArrayList<DxQuickList>(quickListMap.values());
 		return returnQuickLists;
 	}
-	
-	@POST
-	@Path("/findLikeIssue")
+
+	@GET
+	@Path("/findDxIssue")
 	@Produces("application/json")
-	@Consumes("application/json")
-	public RestResponse<IssueTo1, String> findLikeIssues(DiagnosisTo1 dx){
-		Issue issue = issueDao.findIssueByTypeAndCode(dx.getCodingSystem(), dx.getCode());
+	public RestResponse<IssueTo1, String> findDxIssue(@QueryParam("codingSystem") String codingSystem, @QueryParam("code") String code) {
+		Issue issue = issueDao.findIssueByTypeAndCode(codingSystem, code);
 		if(issue != null) {
 			IssueTo1 returnIssue = new IssueTo1();
 			returnIssue.setCode(issue.getCode());
