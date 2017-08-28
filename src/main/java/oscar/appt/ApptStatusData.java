@@ -28,13 +28,14 @@
  */
 package oscar.appt;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.oscarehr.common.model.AppointmentStatus;
+import org.oscarehr.managers.AppointmentManager;
 
-import oscar.appt.status.service.impl.AppointmentStatusMgrImpl;
+import org.oscarehr.util.SpringUtils;
 
 
 /**
@@ -43,103 +44,80 @@ import oscar.appt.status.service.impl.AppointmentStatusMgrImpl;
  */
 public final class ApptStatusData {
 
-    oscar.OscarProperties pros = oscar.OscarProperties.getInstance();
-    String strEditable = pros.getProperty("ENABLE_EDIT_APPT_STATUS");
-    String apptStatus = null;
-    String[] aStatus =    {"t",            "T",        "H",       "P",          "E",            "N",          "C",          "B",          "tS",          "TS",     "HS",      "PS",      "ES",        "NS",       "CS",       "BS",        "tV",          "TV",     "HV",      "PV",      "EV",       "NV",       "CV",       "BV"};
-    String[] aNextStatus ={"T",            "H",        "P",       "E",          "N",            "C",          "t",          "",           "TS",          "HS",      "PS",     "ES",      "NS",        "CS",       "tS",       "",          "TV",          "HV",      "PV",     "EV",      "NV",       "CV",       "tV",       ""};
-    String[] aImageName = {"starbill.gif", "todo.gif", "here.gif","picked.gif", "empty.gif",    "noshow.gif", "cancel.gif", "billed.gif", "lts.gif",     "uts.gif", "hs.gif", "ps.gif",  "es.gif",    "noshow.gif","cancel.gif", "bs.gif", "ltv.gif",     "utv.gif", "hv.gif", "pv.gif",  "ev.gif",   "noshow.gif","cancel.gif", "bv.gif"};
-    /* Here we have the keys for the message on oscarResource_*.properties 
-       The page need take this String to call the i18n message             */
-    String[] aTitle =     {
-	"oscar.appt.ApptStatusData.msgTodo",
-	"oscar.appt.ApptStatusData.magDaySheetPrinted",
-	"oscar.appt.ApptStatusData.msgHere",
-	"oscar.appt.ApptStatusData.msgPicked",
-    "oscar.appt.ApptStatusData.msgEmpty",
-	"oscar.appt.ApptStatusData.msgNoShow",
-	"oscar.appt.ApptStatusData.msgCanceled",
-	"oscar.appt.ApptStatusData.msgBilled",
-	"oscar.appt.ApptStatusData.msgSignedTodo",
-	"oscar.appt.ApptStatusData.msgSignedDaysheet",
-        "oscar.appt.ApptStatusData.msgSignedHere",
-	"oscar.appt.ApptStatusData.msgSignedPicked",
-    "oscar.appt.ApptStatusData.msgSignedEmpty",
-	"oscar.appt.ApptStatusData.msgSignedNoShow",
-	"oscar.appt.ApptStatusData.msgSignedCanceled",
-	"oscar.appt.ApptStatusData.msgSignedBilled",
-	"oscar.appt.ApptStatusData.msgVerifiedTodo",
-	"oscar.appt.ApptStatusData.msgVerifiedDaySheet",
-	"oscar.appt.ApptStatusData.msgVerifiedHere",
-	"oscar.appt.ApptStatusData.msgVerifiedPicked",
-    "oscar.appt.ApptStatusData.msgVerifiedEmpty",
-	"oscar.appt.ApptStatusData.msgVerifiedNoShow",
-	"oscar.appt.ApptStatusData.msgVerifiedCanceled",
-	"oscar.appt.ApptStatusData.msgVerifiedBilled",
-                          };
-    String[] aBgColor =   {"#FDFEC7",      "#FDFEC7",  "#00ee00", "#FFBBFF",     "#FFFF33",    "#cccccc",    "#999999",    "#3ea4e1",    "#FDFEC7",     "#FDFEC7", "#00ee00", "#FFBBFF",     "#FFFF33", "#cccccc", "#999999", "#3ea4e1",    "#FDFEC7",     "#FDFEC7", "#00ee00", "#FFBBFF",     "#FFFF33", "#cccccc", "#999999", "#3ea4e1"};
-    //"S",          "V","",          "", "signed.gif", "verified.gif", "Signed", "Verified",   "#FFBBFF", "#FFBBFF",
+	private AppointmentManager apptManager = SpringUtils.getBean(AppointmentManager.class);
+	private String apptStatus;
+	private AppointmentStatus thisStatus;
+	private List<AppointmentStatus> allStatus;
+
+	public ApptStatusData() {}
+
+
+	public ApptStatusData(String status) {
+		setApptStatus(status);
+		setThisStatus();
+		setAllStatus();
+	}
+
+	public void setAllStatus() {
+		allStatus = apptManager.getAppointmentStatuses();
+	}
+
+	public void setThisStatus() {
+		thisStatus = apptManager.findByStatus(apptStatus);
+	}
 
     public void setApptStatus(String status) {
         apptStatus = status;
     }
 
+
     public String getImageName() {
-        if (strEditable!=null&&strEditable.equalsIgnoreCase("yes"))
-            return getStr("icon");
-        else
-            return getStr(aStatus, aImageName);
+        return thisStatus.getIcon();
     }
 
     public String getNextStatus() {
-        if (strEditable!=null&&strEditable.equalsIgnoreCase("yes"))
-            return getStr("nextstatus");
-        else
-            return getStr(aStatus, aNextStatus);
+    	int currentStatus = allStatus.indexOf(thisStatus);
+    	String nextStatus;
+
+    	if(thisStatus.getStatus().charAt(0) != 'B') {
+    		if(allStatus.get(currentStatus + 1).getStatus().charAt(0) == 'B') {
+    			nextStatus = allStatus.get(0).getStatus();
+			} else {
+				nextStatus = allStatus.get(currentStatus + 1).getStatus();
+			}
+		} else {
+    		nextStatus = thisStatus.getStatus();
+		}
+
+		return nextStatus;
     }
 
     public String getTitle() {
-        if (strEditable!=null&&strEditable.equalsIgnoreCase("yes"))
-            return getStr("desc");
-        else
-            return getStr(aStatus, aTitle);
+        return thisStatus.getDescription();
     }
-    
+
     /**
      * Converts the title which is the reference to the resource file to the actual value for this locale
-     * 
+     *
      * @return String
      */
     public String getTitleString(Locale locale) {
-    	ResourceBundle bundle = ResourceBundle.getBundle("oscarResources",locale);
-    	
-    	String value = "";
-    	if(bundle != null) {
-    		String keyName = getStr(aStatus, aTitle);
-    		if(keyName != null && !keyName.isEmpty()) {
-    			value = bundle.getString(keyName);
-    		}
-    	}
-    
-        return value;
+    	return thisStatus.getDescription();
     }
-    
+
     public String getBgColor() {
-        if (strEditable!=null&&strEditable.equalsIgnoreCase("yes"))
-                return getStr("color");
-        else
-            return getStr(aStatus, aBgColor);
+        return thisStatus.getColor();
     }
 
 	/**
 	 *  Pulls in the short letters which represent the appointment status.
-	 *  
+	 *
 	 *	author Trimara Corp.
 	 *	@return Short letters or null
 	 *
 	 **/
 	public String getShortLetters(){
-		return getStr("short_letters");
+		return thisStatus.getShortLetters();
 	}
 
 	/**
@@ -150,20 +128,8 @@ public final class ApptStatusData {
 	 *
 	 **/
 	public String getShortLetterColour(){
-		return getStr("short_letter_colour");
+		return thisStatus.getShortLetterColour();
 	}
-
-    private String getStr(String[] str, String[] tar) {
-        String rstr = null;
-
-        for (int i = 0; i < str.length; i++) {
-            if (apptStatus.equals(aStatus[i])) {
-                rstr = tar[i];
-                break;
-            }
-        }
-        return rstr;
-    }
 
     public String signStatus() {
         return appendStatus(apptStatus, "S");
@@ -182,11 +148,21 @@ public final class ApptStatusData {
     }
 
     public String[] getAllStatus() {
-        return this.aStatus;
+		List<String> rStatuses = new ArrayList<String>();
+		for(AppointmentStatus status : allStatus) {
+			rStatuses.add(status.getStatus());
+		}
+		String[] rStatusArray = rStatuses.toArray(new String[0]);
+		return rStatusArray;
     }
 
     public String[] getAllTitle() {
-        return this.aTitle;
+		List<String> rTitle = new ArrayList<String>();
+		for(AppointmentStatus status : allStatus) {
+			rTitle.add(status.getDescription());
+		}
+		String[] rStatusArray = rTitle.toArray(new String[0]);
+		return rStatusArray;
     }
 
 	private String appendStatus(String status, String s) {
@@ -213,105 +189,4 @@ public final class ApptStatusData {
 		return temp;
 	}
 
-	private String getStr(String kind) {
-		String strReturn = null;
-		String strOtherIcon = "";
-		String strStatus = "";
-
-		List<AppointmentStatus> apptStatuses = AppointmentStatusMgrImpl.getCachedActiveStatuses();
-
-		// Collections.sort(apptStatuses, new BeanComparator("id"));
-
-		if (apptStatus.length() >= 2) {
-			strOtherIcon = apptStatus.substring(1, 2);
-			strStatus = apptStatus.substring(0, 1);
-		}
-		else {
-			strStatus = apptStatus;
-		}
-
-		int i = 0;
-		while (i < apptStatuses.size()) {
-			AppointmentStatus s = apptStatuses.get(i);
-
-			if (kind.equals("nextstatus")) {
-				if (strStatus.equals("C")) {
-					i = 0;
-					s = apptStatuses.get(i);
-
-					strReturn = s.getStatus();
-
-					return (strOtherIcon.length() == 1) ? strReturn + strOtherIcon : strReturn;
-				}
-
-				if (strStatus.equals("B")) {
-					return "";
-				}
-
-				if (strStatus.equals(s.getStatus())) {
-					i++;
-					if(i >= apptStatuses.size()) {
-						i=0; //don't go off the end of the array, go back to the beginning
-					}
-					s = apptStatuses.get(i);
-
-					strReturn = s.getStatus();
-
-					return (strOtherIcon.length() == 1) ? strReturn + strOtherIcon : strReturn;
-				}
-
-			}
-
-			if (kind.equals("desc")) {
-				if (strStatus.equals(s.getStatus())) {
-					strReturn = s.getDescription();
-					if (strOtherIcon.length() == 1) {
-						return strReturn + "/" + (strOtherIcon.equals("S") ? "Signed" : "Verified");
-					}
-					else return strReturn;
-				}
-			}
-
-			if (kind.equals("icon")) {
-				if (strStatus.equals(s.getStatus())) {
-					strReturn = s.getIcon();
-					if (strOtherIcon.length() == 1) { 
-						return strOtherIcon + strReturn;
-					}
-					else return strReturn;
-				}
-			}
-			// get the short letters, they're just a string
-			if (kind.equals("short_letters")) {
-				if (strStatus.equals(s.getStatus())) {
-					strReturn = s.getShortLetters();
-					return strReturn;
-				}
-			}
-
-			// get the short letter colour. It comes back as an int.
-			if (kind.equals("short_letter_colour")) {
-				if (strStatus.equals(s.getStatus())) {
-					Integer colour = Integer.valueOf(s.getShortLetterColour());
-
-					// return null if it's null
-					if (colour == null) {
-						return null;
-					}
-
-					// convert it to a hex number and add a hex code in front
-					return "#" + Integer.toHexString(colour).toUpperCase();
-
-				}
-			}
-			if (kind.equals("color")) {
-				if (strStatus.equals(s.getStatus())) {
-					strReturn = s.getColor();
-					return strReturn;
-				}
-			}
-			i++;
-		}
-		return strReturn;
-	}
 }

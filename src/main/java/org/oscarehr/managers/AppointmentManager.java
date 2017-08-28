@@ -256,6 +256,10 @@ public class AppointmentManager {
 		return apptStatus;
 	}
 
+	public AppointmentStatus findByStatus(String status) {
+		return appointmentStatusDao.findByStatus(status);
+	}
+
 	public List<LookupListItem> getReasons() {
 
 		List<LookupListItem> itemsList = new ArrayList<LookupListItem>();
