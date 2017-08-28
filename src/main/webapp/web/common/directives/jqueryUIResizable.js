@@ -17,7 +17,7 @@ angular.module('Common.Directives').directive('resizable', [
 				{
 					handles: 'n, nw, ne',
 					minHeight: 250,
-					minWidth: 500,
+					minWidth: 510,
 					maxWidth: window.innerWidth,
 					maxHeight: window.innerHeight / 1.5,
 					// containment: "#main-body"
