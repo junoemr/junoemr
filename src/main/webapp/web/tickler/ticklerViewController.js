@@ -27,7 +27,6 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 		var controller = this;
 
 		controller.ticklerUpdate = angular.copy(tickler);
-		console.log("TICKLER", tickler);
 
 		controller.serviceDateInput = moment(controller.ticklerUpdate.serviceDate).toDate();
 		controller.serviceTimeInput = moment(controller.ticklerUpdate.serviceDate).format("hh:mm A");
@@ -147,18 +146,11 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			$uibModalInstance.close("Someone Saved Me");
 		};
 
-		controller.editTaskAssignedTo = function()
-		{
-			controller.showTaskAssignedToFormControl = true;
-			// controller.ticklerUpdate.taskAssignedTo = controller.tickler.taskAssignedTo;
-			// controller.ticklerUpdate.taskAssignedToName = controller.tickler.taskAssignedName;
-		};
-
 		controller.updateTaskAssignedTo = function(item, model, label)
 		{
 			controller.needsUpdate = true;
-			controller.tickler.taskAssignedTo = model;
-			controller.tickler.taskAssignedToName = label;
+			controller.ticklerUpdate.taskAssignedTo = model;
+			controller.ticklerUpdate.taskAssignedToName = label;
 			controller.showTaskAssignedToFormControl = false;
 		};
 

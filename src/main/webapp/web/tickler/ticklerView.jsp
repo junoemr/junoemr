@@ -46,10 +46,10 @@
 			</div>
 			<div class="form-group col-sm-6">
 				<label><bean:message key="tickler.view.assignTo" bundle="ui"/></label>
-				<input type="text" ng-click="ticklerViewCtrl.editTaskAssignedTo()" 
-					ng-model="ticklerViewCtrl.ticklerUpdate.taskAssignedToName" 
+				<input type="text"
+					ng-model="ticklerViewCtrl.ticklerUpdate.taskAssignedToName"
 					placeholder="<bean:message key="tickler.view.provider.placeholder" bundle="ui"/>" 
-					uib-typeahead="pt.name for pt in ticklerViewCtrl.searchProviders($viewValue)" 
+					uib-typeahead="pt.providerNo as pt.name for pt in ticklerViewCtrl.searchProviders($viewValue)"
 					typeahead-on-select="ticklerViewCtrl.updateTaskAssignedTo($item, $model, $label)"
 					class="form-control">
 				</input>
