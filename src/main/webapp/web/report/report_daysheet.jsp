@@ -91,12 +91,24 @@
 			<div class="col-md-4" >
 				<div class="form-group"  ng-show="reportDaySheetCtrl.params.type == 'all' || reportDaySheetCtrl.params.type== 'all-nr'">
 					<label for="startTime">Start Time:</label>
-					<timepicker ng-model="reportDaySheetCtrl.params.startTime" id="startTime" name="startTime" hour-step="1" minute-step="15" show-meridian="true"></timepicker>
+					<%--<timepicker ng-model="reportDaySheetCtrl.params.startTime" id="startTime" name="startTime" hour-step="1" minute-step="15" show-meridian="true"></timepicker>--%>
+					<input ng-model="reportDaySheetCtrl.params.startTime"
+						   type="time"
+						   id="startTime"
+						   name="startTime"
+						   class="form-control"
+						   placeholder="">
 				</div>
 
 				<div class="form-group"  ng-show="reportDaySheetCtrl.params.type == 'all' || reportDaySheetCtrl.params.type== 'all-nr'">
 					<label for="endTime">End Time:</label>
-					<timepicker ng-model="reportDaySheetCtrl.params.endTime" id="endTime" name="endTime" hour-step="1" minute-step="15" show-meridian="true"></timepicker>
+					<%--<timepicker ng-model="reportDaySheetCtrl.params.endTime" id="endTime" name="endTime" hour-step="1" minute-step="15" show-meridian="true"></timepicker>--%>
+					<input ng-model="reportDaySheetCtrl.params.endTime"
+						   type="time"
+						   id="endTime"
+						   name="endTime"
+						   class="form-control"
+						   placeholder="HH:mm">
 				</div>
 
 			</div>

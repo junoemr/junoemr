@@ -14,21 +14,13 @@ angular.module('Report').controller('Report.ReportDaySheetController', [
 
 		var controller = this;
 
-		controller.getTime = function getTime(hour, minutes)
-		{
-			var d = new Date();
-			d.setHours(hour);
-			d.setMinutes(minutes);
-			return d;
-		};
-
 		controller.params = {
 			providerNo: '',
 			type: '',
 			startDate: new Date(),
 			endDate: new Date(),
-			startTime: controller.getTime(8, 0),
-			endTime: controller.getTime(18, 0)
+			startTime: null,
+			endTime: null
 		};
 
 		controller.searchProviders = function searchProviders(val)
@@ -117,8 +109,8 @@ angular.module('Report').controller('Report.ReportDaySheetController', [
 				type: '',
 				startDate: new Date(),
 				endDate: new Date(),
-				startTime: controller.getTime(8, 0),
-				endTime: controller.getTime(18, 0)
+				startTime: null,
+				endTime: null
 			};
 		};
 	}
