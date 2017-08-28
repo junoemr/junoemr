@@ -29,22 +29,19 @@
 	<div class="col-md-4">
 		<form role="form">
 			<div class="form-group">
-				<label>Provider:</label> 
-				
-				<div class="input-group">
-					<input type="text"
-						ng-model="reportOldPatientsCtrl.params.name" placeholder="Provider"
-						uib-typeahead="pt.providerNo as pt.name for pt in reportOldPatientsCtrl.searchProviders($viewValue)"
-						typeahead-on-select="reportOldPatientsCtrl.updateProviderNo($item, $model, $label)"
-						class="form-control"/>
-						<%--<span class="input-group-addon"><span class="glyphicon glyphicon-remove" ng-click="params.providerNo='';data.providerNo=''"></span></span>--%>
-					</div>
+				<label>Provider:</label>
+
+				<input type="text"
+					   ng-model="reportOldPatientsCtrl.params.name" placeholder="Provider"
+					   uib-typeahead="pt.providerNo as pt.name for pt in reportOldPatientsCtrl.searchProviders($viewValue)"
+					   typeahead-on-select="reportOldPatientsCtrl.updateProviderNo($item, $model, $label)"
+					   class="form-control"/>
 			</div>
 			<div class="form-group">
 				<label for="age">Age &gt; </label>
 				<input ng-model="reportOldPatientsCtrl.params.age" ng-init="reportOldPatientsCtrl.params.age='65'" type="text" class="form-control"/>
 			</div>
-  			<button type="submit" class="btn btn-default" ng-click="reportOldPatientsCtrl.generateReport()">Generate Report</button>
+			<button type="submit" class="btn btn-default" ng-click="reportOldPatientsCtrl.generateReport()">Generate Report</button>
 		</form>
 	</div>
 </div>
