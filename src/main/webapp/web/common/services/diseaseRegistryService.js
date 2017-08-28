@@ -43,11 +43,11 @@ angular.module("Common.Services").service("diseaseRegistryService", [
 		service.getQuickLists = function getQuickLists()
 		{
 			var deferred = $q.defer();
-			$http.get(service.apiPath + 'quickLists/',
+			junoHttp.get(service.apiPath + 'quickLists/',
 				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
 				function success(results)
 				{
-					deferred.resolve(results.data);
+					deferred.resolve(results);
 				},
 				function error(errors)
 				{
@@ -57,6 +57,24 @@ angular.module("Common.Services").service("diseaseRegistryService", [
 
 			return deferred.promise;
 		};
+
+        service.getIssueQuickLists = function getIssueQuickLists()
+        {
+            var deferred = $q.defer();
+            junoHttp.get(service.apiPath + 'issueQuickLists/',
+                Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+                function success(results)
+                {
+                    deferred.resolve(results);
+                },
+                function error(errors)
+                {
+                    console.log("diseaseRegistryService::getIssueQuickLists error", errors);
+                    deferred.reject("An error occurred while fetching quick lists");
+                });
+
+            return deferred.promise;
+        };
 
 		service.addToDxRegistry = function addToDxRegistry(demographicNo, disease)
 		{

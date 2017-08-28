@@ -63,7 +63,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				console.log(errors);
 			});
 
-		diseaseRegistryService.getQuickLists().then(
+		diseaseRegistryService.getIssueQuickLists().then(
 			function success(results)
 			{
 				console.log(results);

@@ -23,21 +23,18 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.casemgmt.dao.IssueDAO;
 import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.QuickListDao;
 import org.oscarehr.common.model.Dxresearch;
-import org.oscarehr.common.model.QuickList;
+import org.oscarehr.common.model.QuickListView;
 import org.oscarehr.ws.rest.to.model.DiagnosisTo1;
 import org.oscarehr.ws.rest.to.model.DxQuickList;
 import org.oscarehr.ws.rest.to.model.IssueTo1;
@@ -49,6 +46,8 @@ import oscar.log.LogConst;
 
 @Path("/dxRegisty")
 public class DiseaseRegistryService extends AbstractServiceImpl {
+
+	private static Logger logger = Logger.getLogger(DiseaseRegistryService.class);
 	
 	@Autowired
 	QuickListDao quickListDao;
@@ -59,38 +58,47 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	
 	@Autowired
 	@Qualifier("IssueDAO")
-	private IssueDAO issueDao; 
-	
+	private IssueDAO issueDao;
+
+	/**
+	 * gets quick lists
+	 * @return List of quickList transfer objects
+	 */
 	@GET
 	@Path("/quickLists")
 	@Produces("application/json")
-	public List<DxQuickList> getQuickLists(){
-		
-		Map<String,DxQuickList> quickListMap = new HashMap<String,DxQuickList>();
-		
-		List<QuickList> quicklists =quickListDao.findAll();
-		
-		for(QuickList item : quicklists){
-			DxQuickList dxList = quickListMap.get(item.getQuickListName());
-			if(dxList == null){
-				dxList = new DxQuickList();
-				dxList.setLabel(item.getQuickListName());
-				quickListMap.put(item.getQuickListName(),dxList);
-			}
-			
-			String desc = dxresearchDao.getDescription(item.getCodingSystem(),item.getDxResearchCode());
-			if(desc != null){
-				DiagnosisTo1 dx = new DiagnosisTo1();
-				dx.setCode(item.getDxResearchCode());
-				dx.setCodingSystem(item.getCodingSystem());
-				dx.setDescription(desc);
-				dxList.getDxList().add(dx);
-			}
+	public RestResponse<List<DxQuickList>, String> getQuickLists() {
+
+		List<DxQuickList> resultList;
+		try {
+			resultList = createQuickList(quickListDao.getQuickLists());
 		}
-		
-		
-		List<DxQuickList> returnQuickLists = new ArrayList<DxQuickList>(quickListMap.values());
-		return returnQuickLists;
+		catch(Exception e) {
+			logger.error("Error", e);
+			return RestResponse.errorResponse(new HttpHeaders(), "Server Query Error");
+		}
+		return RestResponse.successResponse(new HttpHeaders(), resultList);
+	}
+
+	/**
+	 * gets quick lists but ensures that all items returned also have a corresponding entry in the issue table
+	 * This is because the database is supposed to have a copy of the dx in the issue table.
+	 * @return List of quickList transfer objects
+	 */
+	@GET
+	@Path("/issueQuickLists")
+	@Produces("application/json")
+	public RestResponse<List<DxQuickList>, String> getIssueQuickLists() {
+
+		List<DxQuickList> resultList;
+		try {
+			resultList = createQuickList(quickListDao.getIssueQuickLists());
+		}
+		catch(Exception e) {
+			logger.error("Error", e);
+			return RestResponse.errorResponse(new HttpHeaders(), "Server Query Error");
+		}
+		return RestResponse.successResponse(new HttpHeaders(), resultList);
 	}
 
 	@GET
@@ -135,5 +143,28 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 		
 		return Response.ok().build();
 	}
-	
+
+	private List<DxQuickList> createQuickList(List<QuickListView> resultList) {
+
+		Map<String,DxQuickList> quickListMap = new HashMap<String,DxQuickList>();
+
+		for(QuickListView entry : resultList) {
+			DxQuickList dxList = quickListMap.get(entry.getQuickListName());
+			// initialize quick-list list objects
+			if (dxList == null) {
+				dxList = new DxQuickList();
+				dxList.setLabel(entry.getQuickListName());
+				quickListMap.put(entry.getQuickListName(), dxList);
+			}
+			// populate each list with the diagnoses
+			DiagnosisTo1 dx = new DiagnosisTo1();
+			dx.setCode(entry.getCode());
+			dx.setCodingSystem(entry.getCodingSystem());
+			dx.setDescription(entry.getDescription());
+
+			dxList.getDxList().add(dx);
+		}
+		return new ArrayList<DxQuickList>(quickListMap.values());
+	}
+
 }

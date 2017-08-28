@@ -32,6 +32,7 @@ import javax.persistence.Query;
 
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.QuickList;
+import org.oscarehr.common.model.QuickListView;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -96,4 +97,80 @@ public class QuickListDao extends AbstractDao<QuickList>{
 		}
 		
     }
+
+	/**
+	 * gets a list of quick List entries with some data from their respective code tables
+	 * This is native since jpa has trouble with this kind of join
+	 * @return List of quickListView objects
+	 */
+	@NativeSql
+	@SuppressWarnings("unchecked")
+	public List<QuickListView> getQuickLists() {
+		String sql = "SELECT DISTINCT " +
+				"x.quickListName, " +
+				"x.dxResearchCode AS code, " +
+				"x.codingSystem, " +
+				"COALESCE(d9.description, ich.description) as description " +
+				"FROM quickList x " +
+				"LEFT JOIN icd9 d9 ON (x.dxResearchCode = d9.icd9 AND x.codingSystem='icd9') " +
+				"LEFT JOIN ichppccode ich ON (x.dxResearchCode = ich.ichppccode AND x.codingSystem='ichppc') " +
+				"ORDER BY x.quickListName" +
+				";";
+		Query query = entityManager.createNativeQuery(sql);
+		List<Object[]> queryResults = query.getResultList();
+		return toQuickListView(queryResults);
+	}
+	/**
+	 * gets a list of quick List entries with some data from their respective code tables
+	 * The results have a corresponding code entry in the issue table
+	 * This is native since jpa has trouble with this kind of join
+	 * @return List of quickListView objects
+	 */
+	@NativeSql
+	@SuppressWarnings("unchecked")
+	public List<QuickListView> getIssueQuickLists() {
+
+		String sql = "SELECT " +
+				"qlist.quickListName, " +
+				"qlist.code, " +
+				"qlist.codingSystem, " +
+				"qlist.description " +
+				"FROM (" +
+				"SELECT DISTINCT " +
+				"x.quickListName, " +
+				"x.dxResearchCode AS code, " +
+				"x.codingSystem, " +
+				"COALESCE(d9.description, ich.description) as description " +
+				"FROM quickList x " +
+				"LEFT JOIN icd9 d9 ON (x.dxResearchCode = d9.icd9 AND x.codingSystem='icd9') " +
+				"LEFT JOIN ichppccode ich ON (x.dxResearchCode = ich.ichppccode AND x.codingSystem='ichppc') " +
+				") " +
+				"AS qlist " +
+				"JOIN issue iss ON (qlist.code = iss.code AND qlist.codingSystem = iss.type) " +
+				"ORDER BY qlist.quickListName" +
+				";";
+		Query query = entityManager.createNativeQuery(sql);
+		List<Object[]> queryResults = query.getResultList();
+		return toQuickListView(queryResults);
+	}
+	/** convert native sql results directly to an object */
+	private List<QuickListView> toQuickListView(List<Object[]> queryResults) {
+
+		List<QuickListView> resultList = new ArrayList<QuickListView>();
+		for(Object[] record : queryResults) {
+			String quickListName = (String) record[0];
+			String code = (String) record[1];
+			String codingSystem = (String) record[2];
+			String description = (String) record[3];
+
+			QuickListView entry = new QuickListView();
+			entry.setQuickListName(quickListName);
+			entry.setCode(code);
+			entry.setCodingSystem(codingSystem);
+			entry.setDescription(description);
+
+			resultList.add(entry);
+		}
+		return resultList;
+	}
 }
