@@ -66,48 +66,48 @@ public final class ApptStatusData {
 		thisStatus = apptManager.findByStatus(apptStatus);
 	}
 
-    public void setApptStatus(String status) {
-        apptStatus = status;
-    }
+	public void setApptStatus(String status) {
+		apptStatus = status;
+	}
 
 
-    public String getImageName() {
-        return thisStatus.getIcon();
-    }
+	public String getImageName() {
+		return thisStatus.getIcon();
+	}
 
-    public String getNextStatus() {
-    	int currentStatus = allStatus.indexOf(thisStatus);
-    	String nextStatus;
+	public String getNextStatus() {
+		int currentStatus = allStatus.indexOf(thisStatus);
+		String nextStatus;
 
-    	if(thisStatus.getStatus().charAt(0) != 'B') {
-    		if(allStatus.get(currentStatus + 1).getStatus().charAt(0) == 'B') {
-    			nextStatus = allStatus.get(0).getStatus();
+		if(thisStatus.getStatus().charAt(0) != 'B') {
+			if(allStatus.get(currentStatus + 1).getStatus().charAt(0) == 'B') {
+				nextStatus = allStatus.get(0).getStatus();
 			} else {
 				nextStatus = allStatus.get(currentStatus + 1).getStatus();
 			}
 		} else {
-    		nextStatus = thisStatus.getStatus();
+			nextStatus = thisStatus.getStatus();
 		}
 
 		return nextStatus;
-    }
+	}
 
-    public String getTitle() {
-        return thisStatus.getDescription();
-    }
+	public String getTitle() {
+		return thisStatus.getDescription();
+	}
 
-    /**
-     * Converts the title which is the reference to the resource file to the actual value for this locale
-     *
-     * @return String
-     */
-    public String getTitleString(Locale locale) {
-    	return thisStatus.getDescription();
-    }
+	/**
+	 * Converts the title which is the reference to the resource file to the actual value for this locale
+	 *
+	 * @return String
+	 */
+	public String getTitleString(Locale locale) {
+		return thisStatus.getDescription();
+	}
 
-    public String getBgColor() {
-        return thisStatus.getColor();
-    }
+	public String getBgColor() {
+		return thisStatus.getColor();
+	}
 
 	/**
 	 *  Pulls in the short letters which represent the appointment status.
@@ -131,39 +131,39 @@ public final class ApptStatusData {
 		return thisStatus.getShortLetterColour();
 	}
 
-    public String signStatus() {
-        return appendStatus(apptStatus, "S");
-    }
+	public String signStatus() {
+		return appendStatus(apptStatus, "S");
+	}
 
-    public String verifyStatus() {
-        return appendStatus(apptStatus, "V");
-    }
+	public String verifyStatus() {
+		return appendStatus(apptStatus, "V");
+	}
 
-    public String billStatus(String fstatus) {
-        return preStatus(fstatus, "B");
-    }
+	public String billStatus(String fstatus) {
+		return preStatus(fstatus, "B");
+	}
 
-    public String unbillStatus(String fstatus) {
-        return preStatus(fstatus, "P");
-    }
+	public String unbillStatus(String fstatus) {
+		return preStatus(fstatus, "P");
+	}
 
-    public String[] getAllStatus() {
+	public String[] getAllStatus() {
 		List<String> rStatuses = new ArrayList<String>();
 		for(AppointmentStatus status : allStatus) {
 			rStatuses.add(status.getStatus());
 		}
 		String[] rStatusArray = rStatuses.toArray(new String[0]);
 		return rStatusArray;
-    }
+	}
 
-    public String[] getAllTitle() {
+	public String[] getAllTitle() {
 		List<String> rTitle = new ArrayList<String>();
 		for(AppointmentStatus status : allStatus) {
 			rTitle.add(status.getDescription());
 		}
 		String[] rStatusArray = rTitle.toArray(new String[0]);
 		return rStatusArray;
-    }
+	}
 
 	private String appendStatus(String status, String s) {
 		String temp = "";
