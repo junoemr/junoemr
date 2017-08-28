@@ -1,4 +1,4 @@
-angular.module('Report').controller('Report.ReportSHMentalHealthController',
+angular.module('Report').controller('Report.ReportSHMentalHealthController', [
 
 	'$scope',
 	'$log',
@@ -24,4 +24,5 @@ angular.module('Report').controller('Report.ReportSHMentalHealthController',
 			window.open(url, 'report_sh', 'height=900,width=700');
 
 		};
-	});
+	}
+]);
