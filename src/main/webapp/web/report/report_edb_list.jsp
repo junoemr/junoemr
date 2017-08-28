@@ -25,33 +25,42 @@
 --%>
 <h1>EDB List</h1>
 
-<div class="row" ng-controller="Report.ReportEdbListController">
-	<div class="col-md-4">
-<form role="form">
-  <div class="form-group">
-    <label for="startDate">Start Date</label>
-     <input ng-model="params.startDate" type="text" id="startDate" name="startDate" class="form-control" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="data.isOpen" ng-click="data.isOpen = true" placeholder="">
-  </div>
-  <div class="form-group">
-    <label for="endDate">End Date</label>
-    <input ng-model="params.endDate" type="text" id="endDate" name="endDate" class="form-control" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="data.isOpen2" ng-click="data.isOpen2 = true" placeholder="">
-  </div>
-  <div class="form-group">
-  	<label for="version">Version</label>
-  	<select ng-model="params.version" name="version" id="version" class="form-control" >
-	 	<option value="">Latest</option>
-	 	<option value="05">05</option>
-  	</select>
-  </div>
-    <div class="form-group">
-  	<label for="region">Region</label>
-  	<select ng-model="params.region" name="region" id="region" class="form-control" >
-	 	<option value="ON">Ontario</option>
-	 	<option value="BC">British Columbia</option>
-  	</select>
-  </div>
-  
-  <button type="submit" class="btn btn-default" ng-click="generateReport()">Generate Report</button>
-</form>
-	</div>
+<div class="row" ng-controller="Report.ReportEdbListController as reportEdbListCtrl">
+    <div class="col-md-4">
+        <form role="form">
+            <div class="form-group">
+                <label for="startDate">Start Date</label>
+                <input ng-model="reportEdbListCtrl.params.startDate"
+                       type="date" id="startDate"
+                       name="startDate"
+                       class="form-control"
+                       placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="endDate">End Date</label>
+                <input ng-model="reportEdbListCtrl.params.endDate"
+                       type="date"
+                       id="endDate"
+                       name="endDate"
+                       class="form-control"
+                       placeholder="">
+            </div>
+            <div class="form-group">
+                <label for="version">Version</label>
+                <select ng-model="reportEdbListCtrl.params.version" name="version" id="version" class="form-control" >
+                    <option value="">Latest</option>
+                    <option value="05">05</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="region">Region</label>
+                <select ng-model="reportEdbListCtrl.params.region" name="region" id="region" class="form-control" >
+                    <option value="ON">Ontario</option>
+                    <option value="BC">British Columbia</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-default" ng-click="reportEdbListCtrl.generateReport()">Generate Report</button>
+        </form>
+    </div>
 </div>

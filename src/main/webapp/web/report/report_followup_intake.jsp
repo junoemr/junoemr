@@ -25,23 +25,31 @@
 --%>
 <h1>Follow Up Intake Report</h1>
 
-<div class="row" ng-controller="Report.ReportFollowUpIntakeController">
-	<div class="col-md-4">
-<form role="form">
-  <div class="form-group">
-    <label for="startDate">Start Date</label>
-     <input ng-model="params.startDate" type="text" id="startDate" name="startDate" class="form-control" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="data.isOpen" ng-click="data.isOpen = true" placeholder="">
-  </div>
-  <div class="form-group">
-    <label for="endDate">End Date</label>
-    <input ng-model="params.endDate" type="text" id="endDate" name="endDate" class="form-control" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="data.isOpen2" ng-click="data.isOpen2 = true" placeholder="">
-  </div>
-  <div class="form-group">
-  	<label for="pastForms">Include past forms:</label>
-  	<input type="checkbox" ng-model="params.includePastForms" name="pastForms" id="pastForms" class="" />
-	 	
-  </div>
-  <button type="submit" class="btn btn-default" ng-click="generateReport()">Generate Report</button>
-</form>
-	</div>
+<div class="row" ng-controller="Report.ReportFollowUpIntakeController as reportFollowUpIntakeCtrl">
+    <div class="col-md-4">
+        <form role="form">
+            <div class="form-group">
+                <label for="startDate">Start Date</label>
+                <input ng-model="reportFollowUpIntakeCtrl.params.startDate"
+                       type="date"
+                       id="startDate"
+                       name="startDate"
+                       class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="endDate">End Date</label>
+                <input ng-model="reportFollowUpIntakeCtrl.params.endDate"
+                       type="date"
+                       id="endDate"
+                       name="endDate"
+                       class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="pastForms">Include past forms:</label>
+                <input type="checkbox" ng-model="reportFollowUpIntakeCtrl.params.includePastForms" name="pastForms" id="pastForms" class="" />
+
+            </div>
+            <button type="submit" class="btn btn-default" ng-click="reportFollowUpIntakeCtrl.generateReport()">Generate Report</button>
+        </form>
+    </div>
 </div>
