@@ -25,15 +25,25 @@
 --%>
 <h1>Street Health Mental Health Report</h1>
 
-<div class="row" ng-controller="Report.ReportSHMentalHealthController">
+<div class="row" ng-controller="Report.ReportSHMentalHealthController as reportSHMentalHealthCtrl">
 	<div class="col-md-4">
-<form role="form">
-  <div class="form-group">
-    <label for="startDate">Start Date</label>
-     <input ng-model="params.startDate" type="text" id="startDate" name="startDate" class="form-control" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="data.isOpen" ng-click="data.isOpen = true" placeholder="">
-  </div>
- 
-  <button type="submit" class="btn btn-default" ng-click="generateReport()">Generate Report</button>
-</form>
-	</div>
+        <form role="form">
+            <div class="form-group">
+                <label for="startDate">Start Date</label>
+
+                <input ng-model="reportSHMentalHealthCtrl.params.startDate"
+                    type="text"
+                    id="startDate"
+                    name="startDate"
+                    class="form-control"
+                    datepicker-popup="yyyy-MM-dd"
+                    datepicker-append-to-body="true"
+                    is-open="data.isOpen"
+                    ng-click="reportSHMentalHealthCtrl.data.isOpen = true"
+                    placeholder="">
+            </div>
+
+            <button type="submit" class="btn btn-default" ng-click="reportSHMentalHealthCtrl.generateReport()">Generate Report</button>
+        </form>
+    </div>
 </div>
