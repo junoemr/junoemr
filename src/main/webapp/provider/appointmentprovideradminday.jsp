@@ -1780,10 +1780,6 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 			 <%} %>
 
             <%
-				for(String thisStatus : as.getAllStatus()) {
-					MiscUtils.getLogger().info("Status === " + thisStatus);
-				}
-				MiscUtils.getLogger().info("next status === " + as.getNextStatus());
 				if (as.getNextStatus() != null && !as.getNextStatus().equals("")) {
             %>
 			<!-- Short letters -->
