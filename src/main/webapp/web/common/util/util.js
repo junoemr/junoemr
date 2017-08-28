@@ -62,7 +62,7 @@ Juno.Common.Util.addNewLine = function addNewLine(line, mssg) {
 	return mssg;
 };
 
-Juno.Common.Util.calcAge = function(dobYear, dobMonth, dobDay)
+Juno.Common.Util.calcAge = function calcAge(dobYear, dobMonth, dobDay)
 {
 	
 	var dateOfBirth = new Date(parseInt(dobYear, 10), parseInt(dobMonth, 10), parseInt(dobDay, 10));
@@ -76,4 +76,9 @@ Juno.Common.Util.calcAge = function(dobYear, dobMonth, dobDay)
 		years--;
 	}
 	return years;
+};
+
+Juno.Common.Util.isInArray = function isInArray(value, array)
+{
+	return array.indexOf(value) > -1;
 };
