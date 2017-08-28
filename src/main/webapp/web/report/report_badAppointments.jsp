@@ -25,7 +25,7 @@
 --%>
 <h1>Bad Appointment Sheet</h1>
 
-<div class="row" ng-controller="Report.ReportBadAppointmentSheetController">
+<div class="row" ng-controller="Report.ReportBadAppointmentSheetController as reportBadAppointmentSheetCtrl">
 	<div class="col-md-4">
 		<form role="form">
  			<div class="form-group">
@@ -33,19 +33,19 @@
 				
 				<div class="input-group">
 					<input type="text"
-						ng-model="data.providerNo" placeholder="Provider"
-						uib-typeahead="pt.providerNo as pt.name for pt in searchProviders($viewValue)"
-						typeahead-on-select="updateProviderNo($item, $model, $label)"
+						ng-model="reportBadAppointmentSheetCtrl.params.name" placeholder="Provider"
+						uib-typeahead="pt.providerNo as pt.name for pt in reportBadAppointmentSheetCtrl.searchProviders($viewValue)"
+						typeahead-on-select="reportBadAppointmentSheetCtrl.updateProviderNo($item, $model, $label)"
 						class="form-control"/>
-						<span class="input-group-addon"><span class="glyphicon glyphicon-remove" ng-click="params.providerNo='';data.providerNo=''"></span></span>
-					</div>
+						<%--<span class="input-group-addon"><span class="glyphicon glyphicon-remove" ng-click="params.providerNo='';data.providerNo=''"></span></span>--%>
+				</div>
 			</div>
 			 <div class="form-group">
 			    <label for="startDate">Start Date</label>
-			     <input ng-model="params.startDate" type="text" id="startDate" name="startDate" class="form-control" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="data.isOpen" ng-click="data.isOpen = true" placeholder="">
+			     <input ng-model="reportBadAppointmentSheetCtrl.params.startDate" type="text" id="startDate" name="startDate" class="form-control" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="data.isOpen" ng-click="data.isOpen = true" placeholder="">
 			 </div>			
 			
- 			 <button type="submit" class="btn btn-default" ng-click="generateReport()">Generate Report</button>
+ 			 <button type="submit" class="btn btn-default" ng-click="reportBadAppointmentSheetCtrl.generateReport()">Generate Report</button>
 		</form>
 	</div>
 </div>

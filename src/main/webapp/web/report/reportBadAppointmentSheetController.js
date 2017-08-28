@@ -47,7 +47,7 @@ angular.module('Report').controller('Report.ReportBadAppointmentSheetController'
 		controller.updateProviderNo = function updateProviderNo(item, model, label)
 		{
 			controller.params.providerNo = model;
-			controller.data.providerNo = label;
+			controller.params.name = label;
 		};
 
 		controller.generateReport = function generateReport()

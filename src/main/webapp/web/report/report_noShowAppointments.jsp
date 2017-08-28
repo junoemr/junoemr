@@ -25,7 +25,7 @@
 --%>
 <h1>No Show Appointment Sheet</h1>
 
-<div class="row" ng-controller="Report.ReportNoShowAppointmentSheetController">
+<div class="row" ng-controller="Report.ReportNoShowAppointmentSheetController as reportNoShowAppointmentSheetCtrl">
 	<div class="col-md-4">
 		<form role="form">
  			<div class="form-group">
@@ -33,19 +33,27 @@
 				
 				<div class="input-group">
 					<input type="text"
-						ng-model="data.providerNo" placeholder="Provider"
-						uib-typeahead="pt.providerNo as pt.name for pt in searchProviders($viewValue)"
-						typeahead-on-select="updateProviderNo($item, $model, $label)"
+						ng-model="reportNoShowAppointmentSheetCtrl.params.name"
+				   		placeholder="Provider"
+						uib-typeahead="pt.providerNo as pt.name for pt in reportNoShowAppointmentSheetCtrl.searchProviders($viewValue)"
+						typeahead-on-select="reportNoShowAppointmentSheetCtrl.updateProviderNo($item, $model, $label)"
 						class="form-control"/>
-						<span class="input-group-addon"><span class="glyphicon glyphicon-remove" ng-click="params.providerNo='';data.providerNo=''"></span></span>
+						<%--<span class="input-group-addon"><span class="glyphicon glyphicon-remove" ng-click="params.providerNo='';data.providerNo=''"></span></span>--%>
 					</div>
 			</div>
 			 <div class="form-group">
 			    <label for="startDate">Start Date</label>
-			     <input ng-model="params.startDate" type="text" id="startDate" name="startDate" class="form-control" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="data.isOpen" ng-click="data.isOpen = true" placeholder="">
+			     <input ng-model="reportNoShowAppointmentSheetCtrl.params.startDate"
+						type="text" id="startDate"
+						name="startDate"
+						class="form-control"
+						datepicker-popup="yyyy-MM-dd"
+						datepicker-append-to-body="true"
+						is-open="data.isOpen"
+						ng-click="data.isOpen = true" placeholder="">
 			 </div>			
 			
- 			 <button type="submit" class="btn btn-default" ng-click="generateReport()">Generate Report</button>
+ 			 <button type="submit" class="btn btn-default" ng-click="reportNoShowAppointmentSheetCtrl.generateReport()">Generate Report</button>
 		</form>
 	</div>
 </div>
