@@ -84,7 +84,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				}
 			}
 
-			diseaseRegistryService.findDxIssue(item).then(
+			diseaseRegistryService.findDxIssue(item.code, item.codingSystem).then(
 				function success(results)
 				{
 					var cmIssue = {
@@ -177,7 +177,8 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			else if (controller.page.items[itemId].type === "dx_reg")
 			{
 				controller.groupNotesForm.assignedCMIssues = [];
-				diseaseRegistryService.findDxIssue(controller.page.items[itemId].extra).then(
+				var itemExtra = controller.page.items[itemId].extra;
+				diseaseRegistryService.findDxIssue(itemExtra.code, itemExtra.codingSystem).then(
 					function success(results)
 					{
 						var cmIssue = {

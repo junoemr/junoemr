@@ -47,7 +47,7 @@ angular.module("Common.Services").service("diseaseRegistryService", [
 				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
 				function success(results)
 				{
-					deferred.resolve(results);
+					deferred.resolve(results.data);
 				},
 				function error(errors)
 				{
@@ -65,7 +65,7 @@ angular.module("Common.Services").service("diseaseRegistryService", [
                 Juno.Common.ServiceHelper.configHeadersWithCache()).then(
                 function success(results)
                 {
-                    deferred.resolve(results);
+                    deferred.resolve(results.data);
                 },
                 function error(errors)
                 {
@@ -100,20 +100,20 @@ angular.module("Common.Services").service("diseaseRegistryService", [
 			return deferred.promise;
 		};
 
-		service.findDxIssue = function findDxIssue(item)
+		service.findDxIssue = function findDxIssue(code, codingSystem)
 		{
 			var deferred = $q.defer();
 
 			var config = Juno.Common.ServiceHelper.configHeadersWithCache();
 			config.params = {
-				codingSystem: item.codingSystem,
-				code: item.code
+				codingSystem: codingSystem,
+				code: code
             };
 
             junoHttp.get(service.apiPath + 'findDxIssue', config).then(
 				function success(results)
 				{
-					deferred.resolve(results);
+					deferred.resolve(results.data);
 				},
 				function error(errors)
 				{

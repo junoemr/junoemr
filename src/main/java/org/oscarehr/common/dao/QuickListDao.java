@@ -130,24 +130,16 @@ public class QuickListDao extends AbstractDao<QuickList>{
 	@SuppressWarnings("unchecked")
 	public List<QuickListView> getIssueQuickLists() {
 
-		String sql = "SELECT " +
-				"qlist.quickListName, " +
-				"qlist.code, " +
-				"qlist.codingSystem, " +
-				"qlist.description " +
-				"FROM (" +
-				"SELECT DISTINCT " +
+		String sql = "SELECT DISTINCT " +
 				"x.quickListName, " +
 				"x.dxResearchCode AS code, " +
 				"x.codingSystem, " +
 				"COALESCE(d9.description, ich.description) as description " +
 				"FROM quickList x " +
+				"JOIN issue iss ON (x.dxResearchCode = iss.code AND x.codingSystem = iss.type)" +
 				"LEFT JOIN icd9 d9 ON (x.dxResearchCode = d9.icd9 AND x.codingSystem='icd9') " +
 				"LEFT JOIN ichppccode ich ON (x.dxResearchCode = ich.ichppccode AND x.codingSystem='ichppc') " +
-				") " +
-				"AS qlist " +
-				"JOIN issue iss ON (qlist.code = iss.code AND qlist.codingSystem = iss.type) " +
-				"ORDER BY qlist.quickListName" +
+				"ORDER BY x.quickListName" +
 				";";
 		Query query = entityManager.createNativeQuery(sql);
 		List<Object[]> queryResults = query.getResultList();

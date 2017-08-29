@@ -36,17 +36,30 @@ angular.module('Common.Util').service("junoHttp", [
             http_util.success_function = function success_function(response, request_hash, deferred)
             {
                 var request_result = response;
-                if( request_result &&
-                    request_result.data &&
-                    request_result.data.status &&
-                    request_result.data.status === 'SUCCESS')
-                {
-                    var results = request_result.data.body;
-                    deferred.resolve(results);
+                try {
+                    if (request_result.data.status === 'SUCCESS') {
+                        var results = {
+                            meta: request_result.data.headers,
+                            data: request_result.data.body
+                        };
+                        deferred.resolve(results);
+                    }
+                    else if (request_result.data.status === 'ERROR'){
+                        var errors = {
+                            meta: request_result.data.headers,
+                            data: request_result.data.error
+                        };
+                        deferred.reject(errors);
+                    }
+                    else {
+                        throw "Invalid Response Status";
+                    }
                 }
-                else
-                {
-                    var errors = request_result.data.error;
+                catch(e) {
+                    var errors = {
+                        meta: {},
+                        data: "An Error has occurred. please contact technical support"
+                    };
                     deferred.reject(errors);
                 }
             };
