@@ -1760,12 +1760,12 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 				}
           
           	  bFirstTimeRs=true;
-          	  ApptStatusData as = new ApptStatusData(status);
+          	  ApptStatusData apptStatusData = new ApptStatusData(status);
 
 	 //multi-site. if a site have been selected, only display appointment in that site
 	 if (!bMultisites || (selectedSite == null && CurrentSiteMap.get(sitename) != null) || sitename.equals(selectedSite)) {
 %>
-            <td class="appt" bgcolor='<%=as.getBgColor()%>' rowspan="<%=iRows%>" <%-- =view==0?(len==lenLimitedL?"nowrap":""):"nowrap"--%> nowrap>
+            <td class="appt" bgcolor='<%=apptStatusData.getBgColor()%>' rowspan="<%=iRows%>" <%-- =view==0?(len==lenLimitedL?"nowrap":""):"nowrap"--%> nowrap>
 			<%
 			   if (BookingSource.MYOSCAR_SELF_BOOKING == appointment.getBookingSource())
 				{
@@ -1780,19 +1780,19 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 			 <%} %>
 
             <%
-				if (as.getNextStatus() != null && !as.getNextStatus().equals("")) {
+				if (apptStatusData.getNextStatus() != null && !apptStatusData.getNextStatus().equals("")) {
             %>
 			<!-- Short letters -->
-            <a class="apptStatus" href=# onclick="refreshSameLoc('providercontrol.jsp?appointment_no=<%=appointment.getId()%>&provider_no=<%=curProvider_no[nProvider]%>&status=&statusch=<%=as.getNextStatus()%>&year=<%=year%>&month=<%=month%>&day=<%=day%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+URLEncoder.encode(request.getParameter("curProviderName"),"UTF-8") )%>&displaymode=addstatus&dboperation=updateapptstatus&viewall=<%=request.getParameter("viewall")==null?"0":(request.getParameter("viewall"))%><%=isWeekView?"&viewWeek=1":""%>');" title="<%=as.getTitleString(request.getLocale())%> " >
+            <a class="apptStatus" href=# onclick="refreshSameLoc('providercontrol.jsp?appointment_no=<%=appointment.getId()%>&provider_no=<%=curProvider_no[nProvider]%>&status=&statusch=<%=apptStatusData.getNextStatus()%>&year=<%=year%>&month=<%=month%>&day=<%=day%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+URLEncoder.encode(request.getParameter("curProviderName"),"UTF-8") )%>&displaymode=addstatus&dboperation=updateapptstatus&viewall=<%=request.getParameter("viewall")==null?"0":(request.getParameter("viewall"))%><%=isWeekView?"&viewWeek=1":""%>');" title="<%=apptStatusData.getTitleString(request.getLocale())%> " >
             <%
 						}
-						if (as.getNextStatus() != null) {
+						if (apptStatusData.getNextStatus() != null) {
 
-							String statusTitle = as.getTitle();
+							String statusTitle = apptStatusData.getTitleString(request.getLocale());
 
 							if(OscarProperties.getInstance().getProperty("APPT_SHOW_SHORT_LETTERS", "false") != null 
 								&& OscarProperties.getInstance().getProperty("APPT_SHOW_SHORT_LETTERS", "false").equals("true")){
-								String colour = as.getShortLetterColour();
+								String colour = apptStatusData.getShortLetterColour();
 								if(colour == null){
 									colour = "#FFFFFF";
 								}			
@@ -1801,13 +1801,13 @@ for(nProvider=0;nProvider<numProvider;nProvider++) {
 								<span 
 									class='short_letters' 
 									style='color:<%= colour%>;border:0;height:10'>
-											[<%=UtilMisc.htmlEscape(as.getShortLetters())%>]
+											[<%=UtilMisc.htmlEscape(apptStatusData.getShortLetters())%>]
 									</span>
 					<%	
 							}else{
 				    %>
 					
-				    			<img src="../images/<%=as.getImageName()%>" border="0" height="10" title="<%= statusTitle %>">
+				    			<img src="../images/<%=apptStatusData.getImageName()%>" border="0" height="10" title="<%= statusTitle %>">
 					
             <%
 							}

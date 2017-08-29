@@ -28,14 +28,16 @@
  */
 package oscar.appt;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.managers.AppointmentManager;
 
 import org.oscarehr.util.SpringUtils;
+import oscar.OscarProperties;
 
 
 /**
@@ -44,18 +46,34 @@ import org.oscarehr.util.SpringUtils;
  */
 public final class ApptStatusData {
 
+	private OscarProperties props = OscarProperties.getInstance();
+	private String strEditable = props.getProperty("ENABLE_EDIT_APPT_STATUS");
+
+	private HashMap<String, String> titleMap = new HashMap<String, String>();
 	private AppointmentManager apptManager = SpringUtils.getBean(AppointmentManager.class);
 	private String apptStatus;
-	private AppointmentStatus thisStatus;
+	private AppointmentStatus statusData;
 	private List<AppointmentStatus> allStatus;
 
 	public ApptStatusData() {}
 
 
 	public ApptStatusData(String status) {
+		setTitleMap();
 		setApptStatus(status);
 		setThisStatus();
 		setAllStatus();
+	}
+
+	public void setTitleMap() {
+		titleMap.put("t", "oscar.appt.ApptStatusData.msgTodo");
+		titleMap.put("T", "oscar.appt.ApptStatusData.msgDaySheetPrinted");
+		titleMap.put("H", "oscar.appt.ApptStatusData.msgHere");
+		titleMap.put("P", "oscar.appt.ApptStatusData.msgPicked");
+		titleMap.put("E", "oscar.appt.ApptStatusData.msgEmpty");
+		titleMap.put("N", "oscar.appt.ApptStatusData.msgNoShow");
+		titleMap.put("C", "oscar.appt.ApptStatusData.msgCanceled");
+		titleMap.put("B", "oscar.appt.ApptStatusData.msgBilled");
 	}
 
 	public void setAllStatus() {
@@ -63,7 +81,7 @@ public final class ApptStatusData {
 	}
 
 	public void setThisStatus() {
-		thisStatus = apptManager.findByStatus(apptStatus);
+		statusData = apptManager.findByStatus(apptStatus);
 	}
 
 	public void setApptStatus(String status) {
@@ -72,28 +90,40 @@ public final class ApptStatusData {
 
 
 	public String getImageName() {
-		return thisStatus.getIcon();
+		return statusData.getIcon();
 	}
 
 	public String getNextStatus() {
-		int currentStatus = allStatus.indexOf(thisStatus);
+		int currentStatus = allStatus.indexOf(statusData);
+		int currentIndexMod = (currentStatus + 1) % allStatus.size();
 		String nextStatus;
 
-		if(thisStatus.getStatus().charAt(0) != 'B') {
-			if(allStatus.get(currentStatus + 1).getStatus().charAt(0) == 'B') {
-				nextStatus = allStatus.get(0).getStatus();
-			} else {
-				nextStatus = allStatus.get(currentStatus + 1).getStatus();
-			}
+		// Return first status if current status is the last status
+		if(currentIndexMod == 0 && statusData.getStatus().charAt(0) != 'B') {
+			return allStatus.get(0).getStatus();
+		}
+
+		// If status is 'B', don't allow it to be changed from cycle
+		if(statusData.getStatus().charAt(0) == 'B') {
+			return statusData.getStatus();
 		} else {
-			nextStatus = thisStatus.getStatus();
+			nextStatus = allStatus.get(currentStatus + 1).getStatus();
+
+			// If next status is 'B' and the last status return the first status
+			if(nextStatus.charAt(0) == 'B' && (currentStatus + 2) % allStatus.size() == 0) {
+				return allStatus.get(0).getStatus();
+
+			// If next status is 'B', and not the last status, skip it
+			} else if (nextStatus.charAt(0) == 'B'){
+				nextStatus = allStatus.get(currentStatus + 2).getStatus();
+			}
 		}
 
 		return nextStatus;
 	}
 
 	public String getTitle() {
-		return thisStatus.getDescription();
+		return statusData.getDescription();
 	}
 
 	/**
@@ -102,11 +132,21 @@ public final class ApptStatusData {
 	 * @return String
 	 */
 	public String getTitleString(Locale locale) {
-		return thisStatus.getDescription();
+		ResourceBundle bundle = ResourceBundle.getBundle("oscarResources", locale);
+		String status = statusData.getStatus();
+		String localeTitle = getTitle();
+
+		if(bundle != null && !strEditable.equalsIgnoreCase("yes")) {
+			if(titleMap.containsKey(status)) {
+				localeTitle = bundle.getString(titleMap.get(status));
+			}
+		}
+
+		return localeTitle;
 	}
 
 	public String getBgColor() {
-		return thisStatus.getColor();
+		return statusData.getColor();
 	}
 
 	/**
@@ -117,7 +157,7 @@ public final class ApptStatusData {
 	 *
 	 **/
 	public String getShortLetters(){
-		return thisStatus.getShortLetters();
+		return statusData.getShortLetters();
 	}
 
 	/**
@@ -128,7 +168,7 @@ public final class ApptStatusData {
 	 *
 	 **/
 	public String getShortLetterColour(){
-		return thisStatus.getShortLetterColour();
+		return statusData.getShortLetterColour();
 	}
 
 	public String signStatus() {
@@ -148,21 +188,23 @@ public final class ApptStatusData {
 	}
 
 	public String[] getAllStatus() {
-		List<String> rStatuses = new ArrayList<String>();
+		String[] rStatus = new String[allStatus.size()];
+		int idx = 0;
 		for(AppointmentStatus status : allStatus) {
-			rStatuses.add(status.getStatus());
+			rStatus[idx] = status.getDescription();
+			idx++;
 		}
-		String[] rStatusArray = rStatuses.toArray(new String[0]);
-		return rStatusArray;
+		return rStatus;
 	}
 
 	public String[] getAllTitle() {
-		List<String> rTitle = new ArrayList<String>();
+		String[] rStatus = new String[allStatus.size()];
+		int idx = 0;
 		for(AppointmentStatus status : allStatus) {
-			rTitle.add(status.getDescription());
+			rStatus[idx] = status.getDescription();
+			idx++;
 		}
-		String[] rStatusArray = rTitle.toArray(new String[0]);
-		return rStatusArray;
+		return rStatus;
 	}
 
 	private String appendStatus(String status, String s) {
