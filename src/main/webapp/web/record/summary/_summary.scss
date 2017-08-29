@@ -88,9 +88,12 @@
 	.note-divider {
 		margin-bottom: 4px;
 	}
-	.filter-bar {
-		margin-bottom: $margin-md;
+	.summary-tabs {
+		margin-bottom: $margin-sm;
 		padding: 0;
+	}
+	#note-list-filters {
+		margin-bottom: $margin-sm;
 	}
 }
 

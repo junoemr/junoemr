@@ -74,7 +74,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.busy = false;
 		controller.page.noteFilter = {};
 		controller.page.currentFilter = 'none';
-		controller.page.onlyNotes = false;
+		controller.page.onlyNotes = false; // Filter for only showing encounter notes
+		controller.page.onlyMine = false; // Filter for only showing notes the current user has created/edited
 
 		controller.demographicNo = $stateParams.demographicNo;
 
@@ -117,34 +118,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 		};
 
-		// Note list filtering functions
-		controller.setOnlyNotes = function setOnlyNotes()
-		{
-			if (controller.page.onlyNotes)
-			{
-				controller.page.onlyNotes = false;
-			}
-			else
-			{
-				controller.page.onlyNotes = true;
-			}
-			console.log("controller.page.onlyNotes ", controller.page.onlyNotes);
-		};
-
-		controller.isOnlyNotesStatus = function isOnlyNotesStatus()
-		{
-			if (controller.page.onlyNotes)
-			{
-				return "active";
-			}
-			else
-			{
-				return "";
-			}
-
-		};
-
-
 		controller.openRevisionHistory = function openRevisionHistory(note)
 		{
 			//var rnd = Math.round(Math.random() * 1000);
@@ -175,43 +148,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
 			return false;
 		};
-
-
-
-		controller.isCurrentStatus = function isCurrentStatus(stat)
-		{
-			//console.log("stat",stat);
-			if (stat == controller.page.currentFilter)
-			{
-				return "active";
-			}
-			else
-			{
-				return "";
-			}
-
-		};
-
-		// How do we handle showing what filter has been selected???
-		controller.changeNoteFilter = function changeNoteFilter()
-		{
-			controller.index = 0;
-			controller.page.noteFilter.filterProviders = [user.providerNo]; //<- need to fix this?
-			controller.page.notes.notelist = [];
-			controller.page.currentFilter = 'Just My Notes';
-			controller.addMoreItems();
-		};
-
-		controller.removeFilter = function removeFilter()
-		{
-			controller.index = 0;
-			controller.page.noteFilter = {};
-			controller.page.notes.notelist = [];
-			controller.addMoreItems();
-			controller.page.currentFilter = 'none';
-
-		};
-
 
 		//Note display functions
 		controller.addMoreItems = function addMoreItems()
@@ -421,9 +357,14 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					return false;
 				}
 			}
+
+			if(controller.page.onlyMine)
+				// Hide note if the current user is not in the list of editors.
+				if(!Juno.Common.Util.isInArray(user.formattedName, note.editorNames))
+                    return false;
+
 			return true;
 		};
-
 
 		controller.firstLine = function firstLine(note)
 		{
