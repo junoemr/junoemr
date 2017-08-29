@@ -39,15 +39,15 @@ angular.module('Common.Util').service("junoHttp", [
                 try {
                     if (request_result.data.status === 'SUCCESS') {
                         var results = {
-                            meta: request_result.data.headers,
-                            data: request_result.data.body
+                            meta: angular.copy(request_result.data.headers),
+                            data: angular.copy(request_result.data.body)
                         };
                         deferred.resolve(results);
                     }
                     else if (request_result.data.status === 'ERROR'){
                         var errors = {
-                            meta: request_result.data.headers,
-                            data: request_result.data.error
+                            meta: angular.copy(request_result.data.headers),
+                            data: angular.copy(request_result.data.error)
                         };
                         deferred.reject(errors);
                     }
