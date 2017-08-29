@@ -77,7 +77,7 @@
 									</label>
 								</div>
 							</div>		
-							<div class="form-group col-sm-6">
+							<div class="form-group col-sm-6" ng-show="recordPrintCtrl.pageOptions.printType === 'dates'">
 								<label for="exampleInputEmail1"><bean:message key="oscarEncounter.startdate.title" /></label>
 								<juno-datepicker-popup  juno-model="recordPrintCtrl.pageOptions.dates.start" 
 									placeholder="Start Date"
@@ -85,7 +85,7 @@
 									type="Input"> 
 								</juno-datepicker-popup>
 							</div>
-							<div class="form-group col-sm-6">
+							<div class="form-group col-sm-6" ng-show="recordPrintCtrl.pageOptions.printType === 'dates'">
 								<label for="exampleInputEmail1"><bean:message key="global.enddate" /></label>
 								<juno-datepicker-popup  juno-model="recordPrintCtrl.pageOptions.dates.end" 
 									placeholder="End Date"
