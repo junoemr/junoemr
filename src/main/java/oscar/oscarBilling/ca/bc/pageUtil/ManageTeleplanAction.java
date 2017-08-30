@@ -42,6 +42,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DiagnosticCodeDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DiagnosticCode;
@@ -466,6 +467,7 @@ public class ManageTeleplanAction extends DispatchAction {
            log.debug("checkElig");
            String demographicNo = request.getParameter("demographic");
            OscarProperties prop = OscarProperties.getInstance();
+           DemographicDao dDao = (DemographicDao) SpringUtils.getBean("demographicDao");
            DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
            Demographic demo = demographicManager.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demographicNo);
 
@@ -517,6 +519,11 @@ public class ManageTeleplanAction extends DispatchAction {
                         request.setAttribute("Result","Failure");
 
                         line = "<span style=\"color:red; font-weight:bold;\">"+line+"</span>";
+                      }
+                      else if(el.equalsIgnoreCase("yes")){
+                        Date lastEligCheck = new Date();
+                        demo.setHcRenewDate(lastEligCheck);
+                        dDao.save(demo);
                       }
                   }
                   sb.append(line);
