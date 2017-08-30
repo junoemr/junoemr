@@ -400,6 +400,7 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<%--Angular Util Functions--%>
 	<script type="text/javascript" src="common/util/module.js"></script>
 	<script type="text/javascript" src="common/util/angular-util.js"></script>
+	<script type="text/javascript" src="common/util/junoHttp.js"></script>
 
 	<%--Angular Services--%>
 	<script type="text/javascript" src="common/services/module.js"></script>

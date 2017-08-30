@@ -63,8 +63,8 @@ Juno.Common.Util.addNewLine = function addNewLine(line, mssg) {
 };
 
 Juno.Common.Util.calcAge = function calcAge(dobYear, dobMonth, dobDay)
-{
-	
+ {
+
 	var dateOfBirth = new Date(parseInt(dobYear, 10), parseInt(dobMonth, 10), parseInt(dobDay, 10));
 	var currDate = new Date();
 
@@ -78,7 +78,21 @@ Juno.Common.Util.calcAge = function calcAge(dobYear, dobMonth, dobDay)
 	return years;
 };
 
-Juno.Common.Util.isInArray = function isInArray(value, array)
+Juno.Common.Util.isInArray = function isInArray(value, array) 
 {
 	return array.indexOf(value) > -1;
+};
+
+/**
+ * recursively merges two js hashes. the baseHash will be modified
+ * @param baseHash
+ * @param toMerge
+ */
+Juno.Common.Util.mergeHash = function (baseHash, toMerge) 
+{
+	if (toMerge === 'undefined') {
+		return false;
+	}
+	$.extend(true, baseHash, toMerge);
+	return true;
 };

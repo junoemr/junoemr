@@ -26,8 +26,15 @@
 
  */
 angular.module("Common.Services").service("diseaseRegistryService", [
-	'$http', '$q',
-	function($http, $q)
+	'$http',
+	'$q',
+	'junoHttp',
+
+	function(
+		$http,
+		$q,
+		junoHttp
+        )
 	{
 		var service = {};
 
@@ -36,7 +43,7 @@ angular.module("Common.Services").service("diseaseRegistryService", [
 		service.getQuickLists = function getQuickLists()
 		{
 			var deferred = $q.defer();
-			$http.get(service.apiPath + 'quickLists/',
+			junoHttp.get(service.apiPath + 'quickLists/',
 				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
 				function success(results)
 				{
@@ -50,6 +57,24 @@ angular.module("Common.Services").service("diseaseRegistryService", [
 
 			return deferred.promise;
 		};
+
+        service.getIssueQuickLists = function getIssueQuickLists()
+        {
+            var deferred = $q.defer();
+            junoHttp.get(service.apiPath + 'issueQuickLists/',
+                Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+                function success(results)
+                {
+                    deferred.resolve(results.data);
+                },
+                function error(errors)
+                {
+                    console.log("diseaseRegistryService::getIssueQuickLists error", errors);
+                    deferred.reject("An error occurred while fetching quick lists");
+                });
+
+            return deferred.promise;
+        };
 
 		service.addToDxRegistry = function addToDxRegistry(demographicNo, disease)
 		{
@@ -75,19 +100,25 @@ angular.module("Common.Services").service("diseaseRegistryService", [
 			return deferred.promise;
 		};
 
-		service.findLikeIssue = function findLikeIssue(diagnosis)
+		service.findDxIssue = function findDxIssue(code, codingSystem)
 		{
 			var deferred = $q.defer();
 
-			$http.post(service.apiPath + 'findLikeIssue', diagnosis).then(
+			var config = Juno.Common.ServiceHelper.configHeadersWithCache();
+			config.params = {
+				codingSystem: codingSystem,
+				code: code
+            };
+
+            junoHttp.get(service.apiPath + 'findDxIssue', config).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
 				},
 				function error(errors)
 				{
-					console.log("diseaseRegistryService::findLikeIssue error", errors);
-					deferred.reject("An error occurred while posting find like issue");
+					console.log("diseaseRegistryService::findDxIssue error", errors);
+					deferred.reject("An error occurred while retrieving a dx issue");
 				});
 
 			return deferred.promise;

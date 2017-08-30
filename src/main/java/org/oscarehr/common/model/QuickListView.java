@@ -21,37 +21,40 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest.to.model;
 
-import java.io.Serializable;
+package org.oscarehr.common.model;
 
-import javax.xml.bind.annotation.XmlRootElement;
+public class QuickListView {
 
-@XmlRootElement
-public class DiagnosisTo1 implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-
+	private String quickListName;
 	private String codingSystem;
 	private String code;
 	private String description;
-	
+
 	public String getCodingSystem() {
-	    return codingSystem;
-    }
+		return codingSystem;
+	}
 	public void setCodingSystem(String codingSystem) {
-	    this.codingSystem = codingSystem;
-    }
+		this.codingSystem = codingSystem;
+	}
 	public String getCode() {
-	    return code;
-    }
+		return code;
+	}
 	public void setCode(String code) {
-	    this.code = code;
-    }
+		this.code = code;
+	}
 	public String getDescription() {
-	    return description;
-    }
+		return description;
+	}
 	public void setDescription(String description) {
-	    this.description = description;
-    }
+		this.description = description;
+	}
+	public String getQuickListName() {
+		return quickListName;
+	}
+
+	public void setQuickListName(String quickListName) {
+		this.quickListName = quickListName;
+	}
+
 }
