@@ -605,10 +605,13 @@
 			JOIN (
 			  SELECT n1.uuid, n1.update_date
 			  FROM casemgmt_note n1
-			  LEFT JOIN casemgmt_note n2 on n1.uuid = n2.uuid and (n1.note_id &lt; n2.note_id)
+			  LEFT JOIN casemgmt_note n2 ON n1.uuid = n2.uuid AND (n1.note_id &lt; n2.note_id)
+              AND n2.demographic_no=${demographic}
 			  WHERE n2.note_id IS NULL
+              AND n1.demographic_no=${demographic}
 			) note_filter ON s1.uuid = note_filter.uuid
 			WHERE note_filter.update_date &lt;= s1.update_date
+            AND s1.demographic_no=${demographic}
 			AND s1.archived=0;
 	    </ap-sql>
         <ap-output>${socialHistories}</ap-output>
