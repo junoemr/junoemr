@@ -119,7 +119,7 @@ public class IHAHandler extends DefaultGenericHandler implements MessageHandler 
         Element       element;
         NamedNodeMap  nnm = null;
         String msgId = null;
-        String result = null;
+        String result = "";
 
         if(xmlDoc != null){
             String hl7Body = null;
@@ -156,6 +156,9 @@ public class IHAHandler extends DefaultGenericHandler implements MessageHandler 
                 return null;
             }
         }
+        if( result.isEmpty() ) {
+        	result = null;
+		}
         return(result);
     }
 
