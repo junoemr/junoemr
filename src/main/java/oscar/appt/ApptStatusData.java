@@ -94,11 +94,11 @@ public final class ApptStatusData {
 	}
 
 	public String getNextStatus() {
-		int currentStatus = allStatus.indexOf(statusData) + 1;
+		int currentStatusIndex = allStatus.indexOf(statusData);
 		String nextStatus;
 
 		// Return first status if current status is the last status
-		if(isLastStatus(currentStatus) && statusData.getStatus().charAt(0) != 'B') {
+		if(isLastStatus(currentStatusIndex) && statusData.getStatus().charAt(0) != 'B') {
 			return allStatus.get(0).getStatus();
 		}
 
@@ -106,22 +106,23 @@ public final class ApptStatusData {
 		if(statusData.getStatus().charAt(0) == 'B') {
 			return statusData.getStatus();
 		} else {
-			nextStatus = allStatus.get(currentStatus).getStatus();
+			nextStatus = allStatus.get(currentStatusIndex + 1).getStatus();
 
 			// If next status is 'B' and the last status return the first status
-			if(nextStatus.charAt(0) == 'B' && isLastStatus(currentStatus + 1)) {
+			if(nextStatus.charAt(0) == 'B' && isLastStatus(currentStatusIndex + 1)) {
 				return allStatus.get(0).getStatus();
 
 			// If next status is 'B', and not the last status, skip it
 			} else if (nextStatus.charAt(0) == 'B'){
-				nextStatus = allStatus.get(currentStatus + 1).getStatus();
+				nextStatus = allStatus.get(currentStatusIndex + 2).getStatus();
 			}
 		}
 
 		return nextStatus;
 	}
 
-	private boolean isLastStatus(int currentStatusPos) {
+	private boolean isLastStatus(int currentStatus) {
+		int currentStatusPos = currentStatus + 1;
 		if(currentStatusPos % allStatus.size() == 0) {
 			return true;
 		}
