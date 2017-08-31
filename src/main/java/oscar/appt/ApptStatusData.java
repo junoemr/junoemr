@@ -65,7 +65,7 @@ public final class ApptStatusData {
 		setAllStatus();
 	}
 
-	public void setTitleMap() {
+	private void setTitleMap() {
 		titleMap.put("t", "oscar.appt.ApptStatusData.msgTodo");
 		titleMap.put("T", "oscar.appt.ApptStatusData.msgDaySheetPrinted");
 		titleMap.put("H", "oscar.appt.ApptStatusData.msgHere");
@@ -76,11 +76,11 @@ public final class ApptStatusData {
 		titleMap.put("B", "oscar.appt.ApptStatusData.msgBilled");
 	}
 
-	public void setAllStatus() {
+	private void setAllStatus() {
 		allStatus = apptManager.getAppointmentStatuses();
 	}
 
-	public void setThisStatus() {
+	private void setThisStatus() {
 		statusData = apptManager.findByStatus(apptStatus);
 	}
 
@@ -94,12 +94,11 @@ public final class ApptStatusData {
 	}
 
 	public String getNextStatus() {
-		int currentStatus = allStatus.indexOf(statusData);
-		int currentIndexMod = (currentStatus + 1) % allStatus.size();
+		int currentStatus = allStatus.indexOf(statusData) + 1;
 		String nextStatus;
 
 		// Return first status if current status is the last status
-		if(currentIndexMod == 0 && statusData.getStatus().charAt(0) != 'B') {
+		if(isLastStatus(currentStatus) && statusData.getStatus().charAt(0) != 'B') {
 			return allStatus.get(0).getStatus();
 		}
 
@@ -107,19 +106,26 @@ public final class ApptStatusData {
 		if(statusData.getStatus().charAt(0) == 'B') {
 			return statusData.getStatus();
 		} else {
-			nextStatus = allStatus.get(currentStatus + 1).getStatus();
+			nextStatus = allStatus.get(currentStatus).getStatus();
 
 			// If next status is 'B' and the last status return the first status
-			if(nextStatus.charAt(0) == 'B' && (currentStatus + 2) % allStatus.size() == 0) {
+			if(nextStatus.charAt(0) == 'B' && isLastStatus(currentStatus + 1)) {
 				return allStatus.get(0).getStatus();
 
 			// If next status is 'B', and not the last status, skip it
 			} else if (nextStatus.charAt(0) == 'B'){
-				nextStatus = allStatus.get(currentStatus + 2).getStatus();
+				nextStatus = allStatus.get(currentStatus + 1).getStatus();
 			}
 		}
 
 		return nextStatus;
+	}
+
+	private boolean isLastStatus(int currentStatusPos) {
+		if(currentStatusPos % allStatus.size() == 0) {
+			return true;
+		}
+		return false;
 	}
 
 	public String getTitle() {
