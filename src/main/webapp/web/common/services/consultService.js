@@ -58,23 +58,12 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
-		service.getRequest = function getRequest(requestId, demographicId)
+		service.getRequest = function getRequest(requestId)
 		{
 			var deferred = $q.defer();
 
-			if (requestId === "new")
-			{
-				requestId = 0;
-			}
-
-			$http.get(service.apiPath + 'getRequest',
-			{
-				params:
-				{
-					requestId: requestId,
-					demographicId: demographicId
-				}
-			}).then(
+			junoHttp.get(service.apiPath + 'getRequest/' + requestId ,
+				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);

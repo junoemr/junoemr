@@ -58,8 +58,8 @@
 				<div class="form-group">
 					<select class="form-control" ng-model="consultRequestCtrl.onsult.status" 
 						ng-required="true" 
-						ng-options="status.value as status.name for status in consultRequestCtrl.statuses"
-					/>
+						    ng-options="status.value as status.name for status in consultRequestCtrl.statuses">
+					</select>
 				</div>
 			</div>
 			<br/>
@@ -82,7 +82,7 @@
 								<select id="letterhead" class="form-control" 
 										ng-model="consultRequestCtrl.consult.letterheadName" 
 										ng-options="letterhead.id as letterhead.name for letterhead in consultRequestCtrl.consult.letterheadList"
-										ng-change=consultRequestCtrl."changeLetterhead()">
+										ng-change="consultRequestCtrl.changeLetterhead()">
 								</select>
 							</div>
 						</div>

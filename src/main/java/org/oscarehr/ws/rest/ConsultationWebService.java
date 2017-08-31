@@ -193,31 +193,32 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	}
 	
 	@GET
-	@Path("/getRequest")
+	@Path("/getRequest/{requestId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ConsultationRequestTo1 getRequest(@QueryParam("requestId")Integer requestId, @QueryParam("demographicId")Integer demographicId) {
-		ConsultationRequestTo1 request = new ConsultationRequestTo1();
-		
-		if (requestId>0) {
-			request = requestConverter.getAsTransferObject(getLoggedInInfo(), consultationManager.getRequest(getLoggedInInfo(), requestId));
-			request.setAttachments(getRequestAttachments(requestId, request.getDemographicId(), ConsultationAttachmentTo1.ATTACHED));
-		} else {
-			request.setDemographicId(demographicId);
-			
-			RxInformation rx = new RxInformation();
-			String info = rx.getAllergies(getLoggedInInfo(), demographicId.toString());
-			if (StringUtils.isNotBlank(info)) request.setAllergies(info);
-			info = rx.getCurrentMedication(demographicId.toString());
-			if (StringUtils.isNotBlank(info)) request.setCurrentMeds(info);
-		}
+	public RestResponse<ConsultationRequestTo1,String> getRequest(@PathParam("requestId") Integer requestId) {
 
-		request.setLetterheadList(getLetterheadList());
-		request.setFaxList(getFaxList());
-		request.setServiceList(serviceConverter.getAllAsTransferObjects(getLoggedInInfo(), consultationManager.getConsultationServices()));
-		request.setSendToList(providerDao.getActiveTeams());
-		request.setProviderNo(getLoggedInInfo().getLoggedInProviderNo());
-		
-		return request;
+		HttpHeaders headers = new HttpHeaders();
+		ConsultationRequestTo1 request;
+		try {
+
+			ConsultationRequest consult = consultationManager.getRequest(getLoggedInInfo(), requestId);
+			if (consult == null) {
+				return RestResponse.errorResponse(headers, "No Consult found with id " + requestId);
+			}
+			request = requestConverter.getAsTransferObject(getLoggedInInfo(), consult);
+			request.setAttachments(getRequestAttachments(requestId, request.getDemographicId(), ConsultationAttachmentTo1.ATTACHED));
+
+			request.setLetterheadList(getLetterheadList());
+			request.setFaxList(getFaxList());
+			request.setServiceList(serviceConverter.getAllAsTransferObjects(getLoggedInInfo(), consultationManager.getConsultationServices()));
+			request.setSendToList(providerDao.getActiveTeams());
+			request.setProviderNo(getLoggedInInfo().getLoggedInProviderNo());
+		}
+		catch(Exception e) {
+			logger.error("Error", e);
+			return RestResponse.errorResponse(headers, "Error");
+		}
+		return RestResponse.successResponse(headers, request);
 	}
 	
 	@GET
