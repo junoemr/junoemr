@@ -26,8 +26,12 @@
 
  */
 angular.module("Common.Services").service("consultService", [
-	'$http', '$q',
-	function($http, $q)
+	'$http',
+	'$q',
+	'junoHttp',
+	function($http,
+	         $q,
+	         junoHttp)
 	{
 		var service = {};
 
@@ -37,10 +41,13 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			$http.post(service.apiPath + 'searchRequests', search).then(
+			var config = Juno.Common.ServiceHelper.configHeadersWithCache();
+			config.params = search;
+
+			junoHttp.get(service.apiPath + 'searchRequests', config).then(
 				function success(results)
 				{
-					deferred.resolve(results.data);
+					deferred.resolve(results);
 				},
 				function error(errors)
 				{

@@ -23,21 +23,19 @@
  */
 package org.oscarehr.ws.rest;
 
+import java.text.*;
+import java.time.format.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.*;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.BORNPathwayMappingDao;
@@ -81,9 +79,11 @@ import org.oscarehr.ws.rest.to.model.FaxConfigTo1;
 import org.oscarehr.ws.rest.to.model.LetterheadTo1;
 import org.oscarehr.ws.rest.to.model.ProfessionalSpecialistTo1;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
 import net.sf.json.JSONObject;
+import oscar.*;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.eform.EFormUtil;
@@ -95,6 +95,8 @@ import oscar.util.ConversionUtils;
 @Path("/consults")
 @Component("consultationWebService")
 public class ConsultationWebService extends AbstractServiceImpl {
+
+	private static Logger logger = Logger.getLogger(ConsultationWebService.class);
 
 	Pattern namePtrn = Pattern.compile("sorting\\[(\\w+)\\]");
 	
@@ -132,23 +134,62 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	/********************************
 	 * Consultation Request methods *
 	 ********************************/
-	@POST
+	@GET
 	@Path("/searchRequests")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public AbstractSearchResponse<ConsultationRequestSearchResult> searchRequests(JSONObject json) {
-		AbstractSearchResponse<ConsultationRequestSearchResult> rp = new AbstractSearchResponse<ConsultationRequestSearchResult>();
-				
-		int count = consultationManager.getConsultationCount(convertRequestJSON(json));
+	public RestResponse<List<ConsultationRequestSearchResult>, String> searchRequests(
+			@QueryParam("demographicNo") Integer demographicNo,
+			@QueryParam("mrpNo") Integer mrpNo,
+			@QueryParam("status") Integer status,
+			@QueryParam("page") @DefaultValue("1") Integer page,
+			@QueryParam("perPage") @DefaultValue("10") Integer perPage,
+			@QueryParam("referralStartDate") String referralStartDateString,
+			@QueryParam("referralEndDate") String referralEndDate,
+			@QueryParam("appointmentStartDate") String appointmentStartDate,
+			@QueryParam("appointmentEndDate") String appointmentEndDate,
+			@QueryParam("team") String team,
+			@QueryParam("sortColumn") @DefaultValue("ReferralDate") String sortColumn,
+			@QueryParam("sortDirection") @DefaultValue("desc") String sortDirection
+			) {
 
-		if(count>0) {
-			List<ConsultationRequestSearchResult> items =  consultationManager.search(getLoggedInInfo(), convertRequestJSON(json));
-			//convert items to a ConsultationRequestSearchResult object
-			rp.setContent(items);
-			rp.setTotal(count);
+		HttpHeaders headers = new HttpHeaders();
+		ConsultationRequestSearchFilter filter = new ConsultationRequestSearchFilter();
+		List<ConsultationRequestSearchResult> resultList;
+
+		if(page < 1) page = 1;
+		int offset = perPage * (page-1);
+
+		try {
+			filter.setDemographicNo(demographicNo);
+			filter.setMrpNo(mrpNo);
+			filter.setStatus(status);
+			filter.setStartIndex(offset);
+			filter.setNumToReturn(perPage);
+			filter.setReferralStartDate(toNullableLegacyDate(toNullableLocalDate(referralStartDateString)));
+			filter.setReferralEndDate(toNullableLegacyDate(toNullableLocalDate(referralEndDate)));
+			filter.setAppointmentStartDate(toNullableLegacyDate(toNullableLocalDate(appointmentStartDate)));
+			filter.setAppointmentEndDate(toNullableLegacyDate(toNullableLocalDate(appointmentEndDate)));
+			filter.setTeam(team);
+
+			filter.setSortMode(ConsultationRequestSearchFilter.SORTMODE.valueOf(sortColumn));
+			filter.setSortDir(ConsultationRequestSearchFilter.SORTDIR.valueOf(sortDirection));
+
+			int resultTotal = consultationManager.getConsultationCount(filter);
+			headers.set("total", String.valueOf(resultTotal));
+			headers.set("page", String.valueOf(page));
+			headers.set("perPage", String.valueOf(perPage));
+
+			resultList = consultationManager.search(getLoggedInInfo(), filter);
 		}
-		
-		return rp;
+		catch(DateTimeParseException e) {
+			logger.error("Unparseable Date", e);
+			return RestResponse.errorResponse(headers, "Unparseable Date");
+		}
+		catch(Exception e) {
+			logger.error("Search Error", e);
+			return RestResponse.errorResponse(headers, "Search Error");
+		}
+		return RestResponse.successResponse(headers, resultList);
 	}
 	
 	@GET

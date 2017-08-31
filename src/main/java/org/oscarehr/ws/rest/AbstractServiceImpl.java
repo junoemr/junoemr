@@ -23,8 +23,9 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.time.*;
+import java.time.format.*;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -35,6 +36,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.LoggedInInfo;
+import oscar.*;
 
 /**
  * Base class for RESTful web services
@@ -101,6 +103,23 @@ public abstract class AbstractServiceImpl {
 			throw new IllegalStateException("Authentication info is not available.");
 		}
 		return info;
+	}
+
+
+	protected LocalDate toNullableLocalDate(String dateString) {
+		if(dateString == null) return null;
+		return toLocalDate(dateString);
+	}
+	protected LocalDate toLocalDate(String dateString) {
+		ZonedDateTime result = ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
+		return result.toLocalDate();
+	}
+	protected Date toNullableLegacyDate(LocalDate localDate) {
+		if(localDate==null) return null;
+		return toLegacyDate(localDate);
+	}
+	protected Date toLegacyDate(LocalDate localDate) {
+		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 	}
 
 }
