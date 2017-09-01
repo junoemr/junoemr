@@ -625,7 +625,7 @@
 		<ap-output>${omeds}</ap-output>
 	</databaseap>
 	<databaseap>
-		<ap-name>social_history</ap-name>
+		<ap-name>social_family_history</ap-name>
 		<ap-sql>
 			SELECT GROUP_CONCAT(s1.note SEPARATOR ', ') AS socialHistories 
 			FROM casemgmt_note s1
