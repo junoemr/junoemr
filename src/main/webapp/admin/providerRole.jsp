@@ -64,15 +64,15 @@
 
 	boolean isSiteAccessPrivacy=false;
 	boolean authed=true;
-	boolean isSuperAdmin = true;
+	boolean isAuthed = true;
 
 	if(request.getParameter("providerId") != null) {
 		if(request.getParameter("providerId").equals(superAdmin) && !curUser_no.equals(superAdmin)) {
-			isSuperAdmin = false;
+			isAuthed = false;
 		}
 	} else if(request.getParameter("primaryRoleProvider") != null) {
 		if(request.getParameter("primaryRoleProvider").equals(superAdmin) && !curUser_no.equals(superAdmin)) {
-			isSuperAdmin = false;
+			isAuthed = false;
 		}
 	}
 %>
@@ -132,7 +132,7 @@ for(SecRole secRole:secRoles) {
 	}
 }
 
-if(isSuperAdmin) {
+if(isAuthed) {
 
 	//set the primary role
 	if (request.getParameter("buttonSetPrimaryRole") != null && request.getParameter("buttonSetPrimaryRole").length() > 0) {
