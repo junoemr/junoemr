@@ -45,6 +45,7 @@
 <%@ page import="org.oscarehr.common.model.RecycleBin" %>
 <%@ page import="org.oscarehr.common.dao.RecycleBinDao" %>
 <%@ page import="org.oscarehr.common.dao.ProviderDataDao" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 
 <%
 	ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
@@ -55,12 +56,25 @@
 	RecycleBinDao recycleBinDao = SpringUtils.getBean(RecycleBinDao.class);
 	ProgramProviderDAO programProviderDao = (ProgramProviderDAO) SpringUtils.getBean("programProviderDAO");
 
+    oscar.OscarProperties props = oscar.OscarProperties.getInstance();
+    String superAdmin = props.getProperty("SUPER_ADMIN");
 	
 	String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	String curUser_no = (String)session.getAttribute("user");
 
 	boolean isSiteAccessPrivacy=false;
 	boolean authed=true;
+	boolean isSuperAdmin = true;
+
+    if(request.getParameter("providerId") != null) {
+		if(request.getParameter("providerId").equals(superAdmin) && !curUser_no.equals(superAdmin)) {
+			isSuperAdmin = false;
+        }
+    } else if(request.getParameter("primaryRoleProvider") != null) {
+        if(request.getParameter("primaryRoleProvider").equals(superAdmin) && !curUser_no.equals(superAdmin)) {
+            isSuperAdmin = false;
+        }
+    }
 %>
 
 <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.userAdmin" rights="r" reverse="<%=true%>">
@@ -118,141 +132,145 @@ for(SecRole secRole:secRoles) {
 	}
 }
 
-//set the primary role
-if (request.getParameter("buttonSetPrimaryRole") != null && request.getParameter("buttonSetPrimaryRole").length() > 0) {
-      String providerNo = request.getParameter("primaryRoleProvider");
-      String roleName = request.getParameter("primaryRoleRole");
-      SecRole secRole = secRoleDao.findByName(roleName);
-      Long roleId = secRole.getId().longValue();
-      ProgramProvider pp = programProviderDao.getProgramProvider(providerNo, Long.valueOf(caisiProgram));
-      if(pp != null) {
-              pp.setRoleId(roleId);
-              programProviderDao.saveProgramProvider(pp);
-      } else {
-              pp = new ProgramProvider();
-              pp.setProgramId(Long.valueOf(caisiProgram));
-              pp.setProviderNo(providerNo);
-              pp.setRoleId(roleId);
-              programProviderDao.saveProgramProvider(pp);
-      }
-}
+if(isSuperAdmin) {
+
+    //set the primary role
+    if (request.getParameter("buttonSetPrimaryRole") != null && request.getParameter("buttonSetPrimaryRole").length() > 0) {
+        String providerNo = request.getParameter("primaryRoleProvider");
+        String roleName = request.getParameter("primaryRoleRole");
+        SecRole secRole = secRoleDao.findByName(roleName);
+        Long roleId = secRole.getId().longValue();
+        ProgramProvider pp = programProviderDao.getProgramProvider(providerNo, Long.valueOf(caisiProgram));
+        if (pp != null) {
+            pp.setRoleId(roleId);
+            programProviderDao.saveProgramProvider(pp);
+        } else {
+            pp = new ProgramProvider();
+            pp.setProgramId(Long.valueOf(caisiProgram));
+            pp.setProviderNo(providerNo);
+            pp.setRoleId(roleId);
+            programProviderDao.saveProgramProvider(pp);
+        }
+    }
 
 
-// update the role
-if (request.getParameter("buttonUpdate") != null && request.getParameter("buttonUpdate").length() > 0) {
-    String number = request.getParameter("providerId");
-    String roleId = request.getParameter("roleId");
-    String roleOld = request.getParameter("roleOld");
-    String roleNew = request.getParameter("roleNew");
+    // update the role
+    if (request.getParameter("buttonUpdate") != null && request.getParameter("buttonUpdate").length() > 0) {
+        String number = request.getParameter("providerId");
+        String roleId = request.getParameter("roleId");
+        String roleOld = request.getParameter("roleOld");
+        String roleNew = request.getParameter("roleNew");
 
-    if(!"-".equals(roleNew)) {
-		Secuserrole secUserRole = secUserRoleDao.findById(Integer.parseInt(roleId));
-    	List<Secuserrole> existingRoles = secUserRoleDao.findByProviderAndRoleName(number, roleNew);
-    	// prevent saving a role already assigned
-		if(secUserRole != null && existingRoles.isEmpty()) {
-			secUserRole.setRoleName(roleNew);
-			secUserRoleDao.updateRoleName(Integer.parseInt(roleId),roleNew);
-			msg = "Role " + roleNew + " is updated. (" + number + ")";
+        if (!"-".equals(roleNew)) {
+            Secuserrole secUserRole = secUserRoleDao.findById(Integer.parseInt(roleId));
+            List<Secuserrole> existingRoles = secUserRoleDao.findByProviderAndRoleName(number, roleNew);
+            // prevent saving a role already assigned
+            if (secUserRole != null && existingRoles.isEmpty()) {
+                secUserRole.setRoleName(roleNew);
+                secUserRoleDao.updateRoleName(Integer.parseInt(roleId), roleNew);
+                msg = "Role " + roleNew + " is updated. (" + number + ")";
 
-			RecycleBin recycleBin = new RecycleBin();
-			recycleBin.setProviderNo(curUser_no);
-			recycleBin.setUpdateDateTime(new java.util.Date());
-			recycleBin.setTableName("secUserRole");
-			recycleBin.setKeyword(number +"|"+ roleOld);
-			recycleBin.setTableContent("<provider_no>" + number + "</provider_no>" + "<role_name>" + roleOld + "</role_name>"  + "<role_id>" + roleId + "</role_id>");
-			recycleBinDao.persist(recycleBin);
+                RecycleBin recycleBin = new RecycleBin();
+                recycleBin.setProviderNo(curUser_no);
+                recycleBin.setUpdateDateTime(new java.util.Date());
+                recycleBin.setTableName("secUserRole");
+                recycleBin.setKeyword(number + "|" + roleOld);
+                recycleBin.setTableContent("<provider_no>" + number + "</provider_no>" + "<role_name>" + roleOld + "</role_name>" + "<role_id>" + roleId + "</role_id>");
+                recycleBinDao.persist(recycleBin);
 
-			LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_UPDATE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, roleId, ip, number +"|" + roleOld +">"+ roleNew);
+                LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_UPDATE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, roleId, ip, number + "|" + roleOld + ">" + roleNew);
 
-			if( newCaseManagement ) {
-                ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
-                if(programProvider == null) {
-                	programProvider = new ProgramProvider();
+                if (newCaseManagement) {
+                    ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
+                    if (programProvider == null) {
+                        programProvider = new ProgramProvider();
+                    }
+
+                    programProvider.setProgramId(Long.valueOf(caisiProgram));
+                    programProvider.setProviderNo(number);
+                    programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleNew).getId()));
+                    programProviderDao.saveProgramProvider(programProvider);
                 }
-                
-                programProvider.setProgramId( Long.valueOf(caisiProgram));
-                programProvider.setProviderNo(number);
-                programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleNew).getId()));
-                programProviderDao.saveProgramProvider(programProvider);
-			}
 
-		} else {
-			msg = "Role " + roleNew + " is <font color='red'>NOT</font> updated!!! (" + number + ")";
-		}
-    }
-
-}
-
-// add the role
-if (request.getParameter("submit") != null && request.getParameter("submit").equals("Add")) {
-    String number = request.getParameter("providerId");
-    String roleNew = request.getParameter("roleNew");
-
-    if(!"-".equals(roleNew)) {
-    	List<Secuserrole> existingRoles = secUserRoleDao.findByProviderAndRoleName(number, roleNew);
-    	// prevent saving a role already assigned
-    	if(existingRoles.isEmpty()) {
-		    Secuserrole secUserRole = new Secuserrole();
-		    secUserRole.setProviderNo(number);
-		    secUserRole.setRoleName(roleNew);
-		    secUserRole.setActiveyn(1);
-		    secUserRoleDao.save(secUserRole);
-		    msg = "Role " + roleNew + " is added. (" + number + ")";
-			LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_ADD, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, String.valueOf(secUserRole.getId()), ip, number +"|"+ roleNew);
-	
-		    if( newCaseManagement ) {
-	            ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
-	            if(programProvider == null) {
-	            	programProvider = new ProgramProvider();
-	            }
-	            programProvider.setProgramId( Long.valueOf(caisiProgram));
-	            programProvider.setProviderNo(number);
-	            programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleNew).getId()));
-	            programProviderDao.saveProgramProvider(programProvider);
-		    }
-    	}
-    }
-    else {
-    	msg = "Role " + roleNew + " is <font color='red'>NOT</font> added!!! (" + number + ")";
-    }
-
-}
-
-// delete the role
-if (request.getParameter("submit") != null && request.getParameter("submit").equals("Delete")) {
-    String number = request.getParameter("providerId");
-    String roleId = request.getParameter("roleId");
-    String roleOld = request.getParameter("roleOld");
-    String roleNew = request.getParameter("roleNew");
-
-    Secuserrole secUserRole = secUserRoleDao.findById(Integer.parseInt(roleId));
-    if(secUserRole != null) {
-    	secUserRoleDao.deleteById(secUserRole.getId());
-    	msg = "Role " + roleOld + " is deleted. (" + number + ")";
-
-    	RecycleBin recycleBin = new RecycleBin();
-		recycleBin.setProviderNo(curUser_no);
-		recycleBin.setUpdateDateTime(new java.util.Date());
-		recycleBin.setTableName("secUserRole");
-		recycleBin.setKeyword(number +"|"+ roleOld);
-		recycleBin.setTableContent("<provider_no>" + number + "</provider_no>" + "<role_name>" + roleOld + "</role_name>");
-		recycleBinDao.persist(recycleBin);
-
-		LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, roleId, ip, number +"|"+ roleOld);
-
-
-        if( newCaseManagement ) {
-            ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
-            if(programProvider != null) {
-            	programProviderDao.deleteProgramProvider(programProvider.getId());
+            } else {
+                msg = "Role " + roleNew + " is <font color='red'>NOT</font> updated!!! (" + number + ")";
             }
         }
-    } else {
-    	msg = "Role " + roleOld + " is <font color='red'>NOT</font> deleted!!! (" + number + ")";
+
     }
 
-}
+    // add the role
+    if (request.getParameter("submit") != null && request.getParameter("submit").equals("Add")) {
+        String number = request.getParameter("providerId");
+        String roleNew = request.getParameter("roleNew");
 
+        if (!"-".equals(roleNew)) {
+            List<Secuserrole> existingRoles = secUserRoleDao.findByProviderAndRoleName(number, roleNew);
+            // prevent saving a role already assigned
+            if (existingRoles.isEmpty()) {
+                Secuserrole secUserRole = new Secuserrole();
+                secUserRole.setProviderNo(number);
+                secUserRole.setRoleName(roleNew);
+                secUserRole.setActiveyn(1);
+                secUserRoleDao.save(secUserRole);
+                msg = "Role " + roleNew + " is added. (" + number + ")";
+                LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_ADD, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, String.valueOf(secUserRole.getId()), ip, number + "|" + roleNew);
+
+                if (newCaseManagement) {
+                    ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
+                    if (programProvider == null) {
+                        programProvider = new ProgramProvider();
+                    }
+                    programProvider.setProgramId(Long.valueOf(caisiProgram));
+                    programProvider.setProviderNo(number);
+                    programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleNew).getId()));
+                    programProviderDao.saveProgramProvider(programProvider);
+                }
+            }
+        } else {
+            msg = "Role " + roleNew + " is <font color='red'>NOT</font> added!!! (" + number + ")";
+        }
+
+    }
+
+    // delete the role
+    if (request.getParameter("submit") != null && request.getParameter("submit").equals("Delete")) {
+        MiscUtils.getLogger().info("Run now");
+        String number = request.getParameter("providerId");
+        String roleId = request.getParameter("roleId");
+        String roleOld = request.getParameter("roleOld");
+        String roleNew = request.getParameter("roleNew");
+
+        Secuserrole secUserRole = secUserRoleDao.findById(Integer.parseInt(roleId));
+        if (secUserRole != null) {
+            secUserRoleDao.deleteById(secUserRole.getId());
+            msg = "Role " + roleOld + " is deleted. (" + number + ")";
+
+            RecycleBin recycleBin = new RecycleBin();
+            recycleBin.setProviderNo(curUser_no);
+            recycleBin.setUpdateDateTime(new java.util.Date());
+            recycleBin.setTableName("secUserRole");
+            recycleBin.setKeyword(number + "|" + roleOld);
+            recycleBin.setTableContent("<provider_no>" + number + "</provider_no>" + "<role_name>" + roleOld + "</role_name>");
+            recycleBinDao.persist(recycleBin);
+
+            LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, roleId, ip, number + "|" + roleOld);
+
+
+            if (newCaseManagement) {
+                ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
+                if (programProvider != null) {
+                    programProviderDao.deleteProgramProvider(programProvider.getId());
+                }
+            }
+        } else {
+            msg = "Role " + roleOld + " is <font color='red'>NOT</font> deleted!!! (" + number + ")";
+        }
+
+    }
+} else {
+	out.println("<script>alert('Insufficient Privileges');</script>");
+}
 String keyword = request.getParameter("keyword")!=null?request.getParameter("keyword"):"";
 %>
 <%
@@ -360,14 +378,29 @@ function submit(form) {
     }
 
     function setPrimaryRole() {
-            var providerNo = $("#primaryRoleProvider").val();
-            var roleName = $("#primaryRoleRole").val();
-            if(providerNo != '' && roleName != '') {
-                    return true;
-            } else {
-                    alert('Please enter in a provider and a corresponding role');
-                    return false;
+        var providerNo = $("#primaryRoleProvider").val();
+        var roleName = $("#primaryRoleRole").val();
+        if(providerNo != '' && roleName != '') {
+            return true;
+        } else {
+            alert('Please enter in a provider and a corresponding role');
+            return false;
+        }
+
+    }
+
+    function updateProviderRoles(e) {
+            var curUser = "<%=curUser_no%>";
+            var superAdmin = "<%=superAdmin%>"
+            var providerNo = e.target.parentNode.children.providerId.value;
+            console.log(curUser);
+            console.log(superAdmin);
+            console.log(providerNo);
+            if(providerNo == superAdmin && curUser != superAdmin) {
+                alert("Insufficient Privileges");
+                return false;
             }
+        return true;
     }
     </script>
 
@@ -457,11 +490,11 @@ function submit(form) {
               <input type="hidden" name="providerId" value="<%=providerNo%>">
               <input type="hidden" name="roleId" value="<%= item.getProperty("role_id", "")%>">
               <input type="hidden" name="roleOld" value="<%= item.getProperty("role_name", "")%>">
-              <input type="submit" name="submit" value="Add">
+              <input type="submit" name="submit" value="Add" onclick="return updateProviderRoles(event); return false;">
               -
-              <input type="submit" name="buttonUpdate" value="Update" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
+              <input type="submit" name="buttonUpdate" value="Update" onclick="return updateProviderRoles(event); return false;" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
               -
-              <input type="submit" name="submit" value="Delete" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
+              <input type="submit" name="submit" value="Delete" onclick="return updateProviderRoles(event); return false;" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
             </td>
             </tr>
       </form>
