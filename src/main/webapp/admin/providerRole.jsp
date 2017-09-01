@@ -393,9 +393,6 @@ function submit(form) {
 			var curUser = "<%=curUser_no%>";
 			var superAdmin = "<%=superAdmin%>"
 			var providerNo = e.target.parentNode.children.providerId.value;
-			console.log(curUser);
-			console.log(superAdmin);
-			console.log(providerNo);
 			if(providerNo == superAdmin && curUser != superAdmin) {
 				alert("Insufficient Privileges");
 				return false;
