@@ -269,7 +269,7 @@ if(isAuthed) {
 
 	}
 } else {
-	out.println("<script>alert('Insufficient Privileges');</script>");
+	out.println("<script>alert('You are trying to modify a system user. This user cannot be modified.');</script>");
 }
 String keyword = request.getParameter("keyword")!=null?request.getParameter("keyword"):"";
 %>
@@ -394,7 +394,7 @@ function submit(form) {
 			var superAdmin = "<%=superAdmin%>"
 			var providerNo = e.target.parentNode.children.providerId.value;
 			if(providerNo == superAdmin && curUser != superAdmin) {
-				alert("Insufficient Privileges");
+				alert("You are trying to modify a system user. This user cannot be modified.");
 				return false;
 			}
 		return true;
