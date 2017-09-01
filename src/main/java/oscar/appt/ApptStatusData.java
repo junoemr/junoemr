@@ -94,39 +94,26 @@ public final class ApptStatusData {
 	}
 
 	public String getNextStatus() {
+
 		int currentStatusIndex = allStatus.indexOf(statusData);
-		String nextStatus;
+		int nextStatusIndex = getNextStatusIndex(currentStatusIndex);
+		String nextStatus = allStatus.get(nextStatusIndex).getStatus();
 
-		// Return first status if current status is the last status
-		if(isLastStatus(currentStatusIndex) && statusData.getStatus().charAt(0) != 'B') {
-			return allStatus.get(0).getStatus();
-		}
-
-		// If status is 'B', don't allow it to be changed from cycle
 		if(statusData.getStatus().charAt(0) == 'B') {
 			return statusData.getStatus();
-		} else {
-			nextStatus = allStatus.get(currentStatusIndex + 1).getStatus();
+		}
 
-			// If next status is 'B' and the last status return the first status
-			if(nextStatus.charAt(0) == 'B' && isLastStatus(currentStatusIndex + 1)) {
-				return allStatus.get(0).getStatus();
-
-			// If next status is 'B', and not the last status, skip it
-			} else if (nextStatus.charAt(0) == 'B'){
-				nextStatus = allStatus.get(currentStatusIndex + 2).getStatus();
-			}
+		if(nextStatus.charAt(0) == 'B') {
+			nextStatusIndex = getNextStatusIndex(nextStatusIndex);
+			nextStatus = allStatus.get(nextStatusIndex).getStatus();
 		}
 
 		return nextStatus;
 	}
 
-	private boolean isLastStatus(int currentStatus) {
-		int currentStatusPos = currentStatus + 1;
-		if(currentStatusPos % allStatus.size() == 0) {
-			return true;
-		}
-		return false;
+	private int getNextStatusIndex(int currentStatus) {
+
+		return (currentStatus + 1) % allStatus.size();
 	}
 
 	public String getTitle() {
