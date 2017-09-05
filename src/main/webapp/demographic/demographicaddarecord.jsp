@@ -223,7 +223,6 @@
     bufChart = new StringBuilder(StringUtils.trimToEmpty("chart_no"));
     bufDoctorNo = new StringBuilder( StringUtils.trimToEmpty("provider_no") );
 
-	// Patient veteran number OHSUPPORT-3523
 	if(oscarVariables.isPropertyActive("demographic_veteran_no")) {
 		demographic.setVeteranNo(StringUtils.trimToNull(request.getParameter("veteranNo")));
 	}

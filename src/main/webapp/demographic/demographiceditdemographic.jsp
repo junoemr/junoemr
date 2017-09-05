@@ -1469,7 +1469,6 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
                                                    <span class="info"><%=sp_lang%></span>
 							</li>
 						<% }
-							// Patient veteran number OHSUPPORT-3523
 							if(oscarProps.isPropertyActive("demographic_veteran_no")) {
 								String veteranNo = (demographic.getVeteranNo() != null ? demographic.getVeteranNo() : "");
 						%>
@@ -3030,7 +3029,6 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 								</td>
 							</tr>
 							<%
-							// Patient veteran number OHSUPPORT-3523
 							if(oscarProps.isPropertyActive("demographic_veteran_no")) {
 								String veteranNo = (demographic.getVeteranNo() != null ? demographic.getVeteranNo() : "");
 								%>

@@ -138,7 +138,6 @@
 	demographic.setLastUpdateUser((String)session.getAttribute("user"));
 	demographic.setLastUpdateDate(new java.util.Date());
 
-	// Patient veteran number OHSUPPORT-3523
 	if(oscarVariables.isPropertyActive("demographic_veteran_no")) {
 		demographic.setVeteranNo(StringUtils.trimToNull(request.getParameter("veteranNo")));
 	}
