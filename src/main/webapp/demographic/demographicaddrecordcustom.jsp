@@ -107,6 +107,10 @@
 	  demographic_string = "";
   }
   String all_fields = "last_name,first_name,official_lang,title,address,city,province,postal,phone,phone2,cellphone,newsletter,email,pin,dob,sex,hin,eff_date,hc_type,countryOfOrigin,sin,cytolNum,doctor,nurse,midwife,resident,referral_doc,roster_status,date_rostered,patient_status,chart_no,waiting_list,date_joined,end_date,alert,form_notes";
+  if(oscarProps.isPropertyActive("demographic_veteran_no")) {
+	  all_fields += ",veteran_no";
+  }
+
   List<String> custom_demographic_fields = new ArrayList<String>(Arrays.asList(demographic_string.split(",")));
   List<String> hidden_demographic_fields = new ArrayList<String>(Arrays.asList(all_fields.split(",")));
   if( !custom_demographic_fields.contains("last_name") ){
@@ -1216,6 +1220,14 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 			</div>
 	<% 
 	}
+	else if (custom_demographic_fields.get(i).equals("veteran_no") && oscarProps.isPropertyActive("demographic_veteran_no")) {
+		%>
+			<div>
+				<label><b><bean:message key="demographic.demographicaddrecordhtm.formVeteranNo"/>:</b></label>
+				<input type="text" name="veteranNo">
+			</div>
+		<%
+	}
 	
 	// START: Stuff that seems to be available only in Brazil that we may NEVER use
 	if(vLocale.getCountry().equals("BR")){
@@ -1506,7 +1518,12 @@ for(int i=0; i<hidden_demographic_fields.size(); i++){
 		%>
 			<input type="hidden" name="content" value=""/>
 		<%
+	}else if(hidden_demographic_fields.get(i).equals("veteran_no")){
+		%>
+			<input type="hidden" name="veteranNo" value=""/>
+		<%
 	}
+
 }
 
 
