@@ -45,7 +45,6 @@
 <%@ page import="org.oscarehr.common.model.RecycleBin" %>
 <%@ page import="org.oscarehr.common.dao.RecycleBinDao" %>
 <%@ page import="org.oscarehr.common.dao.ProviderDataDao" %>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.common.model.ProviderData" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 
@@ -249,7 +248,6 @@ if(isAuthed) {
 
 	// delete the role
 	if (request.getParameter("submit") != null && request.getParameter("submit").equals("Delete")) {
-		MiscUtils.getLogger().info("Run now");
 		String number = request.getParameter("providerId");
 		String roleId = request.getParameter("roleId");
 		String roleOld = request.getParameter("roleOld");
