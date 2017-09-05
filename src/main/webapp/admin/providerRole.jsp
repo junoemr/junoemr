@@ -47,7 +47,6 @@
 <%@ page import="org.oscarehr.common.dao.ProviderDataDao" %>
 <%@ page import="org.oscarehr.common.model.ProviderData" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
 
 <%
 	ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
@@ -300,7 +299,7 @@ providerList = providerDao.findProviderSecUserRoles(lastName, firstName);
 
 Vector<Properties> vec = new Vector<Properties>();
 for (Object[] providerSecUser : providerList) {
-	MiscUtils.getLogger().info("providerSecUser === " + providerSecUser.length);
+
 	String id = String.valueOf(providerSecUser[0]);
 	String role_name = String.valueOf(providerSecUser[1]);
 	String provider_no = String.valueOf(providerSecUser[2]);
