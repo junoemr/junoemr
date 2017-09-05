@@ -149,21 +149,9 @@ public class ProviderDataDao extends AbstractDao<ProviderData> {
     	return proList;
     }
 
-    public List<ProviderData> getAllSuperAdmins() {
-
-		String sql = "SELECT x FROM " + modelClass.getSimpleName() + " x WHERE super_admin=1";
-
-		Query query = entityManager.createQuery(sql);
-
-		@SuppressWarnings("unchecked")
-		List<ProviderData> superAdminList = query.getResultList();
-
-		return superAdminList;
-	}
-
     public List<Object[]> findProviderSecUserRoles(String lastName, String firstName) {
     	
-		String queryStr = "select u.id, u.role_name, p.provider_no, p.first_name, p.last_name from provider p LEFT JOIN secUserRole u ON  p.provider_no=u.provider_no " 
+		String queryStr = "select u.id, u.role_name, p.provider_no, p.first_name, p.last_name, p.super_admin from provider p LEFT JOIN secUserRole u ON  p.provider_no=u.provider_no "
 				+ " where p.last_name like '" + lastName + "' and p.first_name like '" + firstName + "' and p.status='1' order by p.first_name, p.last_name, u.role_name";
 
 		Query query = entityManager.createNativeQuery(queryStr);

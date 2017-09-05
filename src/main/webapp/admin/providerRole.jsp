@@ -47,6 +47,7 @@
 <%@ page import="org.oscarehr.common.dao.ProviderDataDao" %>
 <%@ page import="org.oscarehr.common.model.ProviderData" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 
 <%
 	ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
@@ -61,15 +62,9 @@
 
 	String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	String curUser_no = (String)session.getAttribute("user");
-	String updateProvider = "";
+	String updateProviderNo = "";
 
 	ProviderData currentProvider = providerDao.findByProviderNo(curUser_no);
-	List<ProviderData> superAdminList = providerDao.getAllSuperAdmins();
-	List<String> superAdminNoList = new ArrayList<String>();
-
-	for(ProviderData provider : superAdminList) {
-		superAdminNoList.add(provider.getId());
-	}
 
 	boolean isSiteAccessPrivacy=false;
 	boolean authed=true;
@@ -77,13 +72,16 @@
 	boolean isAuthed = true;
 
 	if(request.getParameter("providerId") != null) {
-		updateProvider = request.getParameter("providerId");
+		updateProviderNo = request.getParameter("providerId");
 	} else if(request.getParameter("primaryRoleProvider") != null) {
-		updateProvider = request.getParameter("primaryRoleProvider");
+		updateProviderNo = request.getParameter("primaryRoleProvider");
 	}
 
-	if(!updateProvider.equals("")) {
-		if(!isSuperAdmin && superAdminNoList.contains(updateProvider)) {
+	if(!updateProviderNo.equals("")) {
+		ProviderData updateProvider = providerDao.findByProviderNo(updateProviderNo);
+		boolean proSuperAdmin = updateProvider.getSuperAdmin();
+
+		if(proSuperAdmin && !isSuperAdmin) {
 			isAuthed = false;
 		}
 	}
@@ -302,12 +300,13 @@ providerList = providerDao.findProviderSecUserRoles(lastName, firstName);
 
 Vector<Properties> vec = new Vector<Properties>();
 for (Object[] providerSecUser : providerList) {
-	
+	MiscUtils.getLogger().info("providerSecUser === " + providerSecUser.length);
 	String id = String.valueOf(providerSecUser[0]);
 	String role_name = String.valueOf(providerSecUser[1]);
 	String provider_no = String.valueOf(providerSecUser[2]);
 	String first_name = String.valueOf(providerSecUser[3]);
 	String last_name = String.valueOf(providerSecUser[4]);
+	String super_admin = String.valueOf(providerSecUser[5]);
 
 	Properties prop = new Properties();
 	prop.setProperty("provider_no", provider_no=="null"?"":provider_no);
@@ -315,6 +314,7 @@ for (Object[] providerSecUser : providerList) {
 	prop.setProperty("last_name", last_name);
 	prop.setProperty("role_id", id!="null"?id:"");
 	prop.setProperty("role_name", role_name!="null"?role_name:"");
+	prop.setProperty("super_admin", super_admin);
 	vec.add(prop);
 }
 
@@ -365,7 +365,6 @@ function submit(form) {
 
 		<script>
 		var items = new Array();
-		var superAdminList = [];
 		<%
 				for(Properties prop:vec) {
 						%>
@@ -402,12 +401,10 @@ function submit(form) {
 
 	}
 
-	function updateProviderRoles(e) {
+	function updateProviderRoles(proSuperAdmin) {
 		var isSuperAdmin = <%=isSuperAdmin%>;
-		var providerNo = e.target.parentNode.children.providerId.value;
-		superAdminList = <%=superAdminNoList%>;
 
-		if(superAdminList.indexOf(parseInt(providerNo)) !== -1 && !isSuperAdmin) {
+		if(proSuperAdmin && !isSuperAdmin) {
 			alert("You are trying to modify a system user. This user cannot be modified.");
 			return false;
 		}
@@ -471,6 +468,7 @@ function submit(form) {
 		for (int i = 0; i < vec.size(); i++) {
 			Properties item = vec.get(i);
 			String providerNo = item.getProperty("provider_no", "");
+			boolean proSuperAdmin = Boolean.parseBoolean(item.getProperty("super_admin"));
 %>
 	  <form name="myform<%= providerNo %>" action="providerRole.jsp" method="POST">
 			<tr bgcolor="<%=colors[i%2]%>">
@@ -502,11 +500,11 @@ function submit(form) {
 			  <input type="hidden" name="providerId" value="<%=providerNo%>">
 			  <input type="hidden" name="roleId" value="<%= item.getProperty("role_id", "")%>">
 			  <input type="hidden" name="roleOld" value="<%= item.getProperty("role_name", "")%>">
-			  <input type="submit" name="submit" value="Add" onclick="return updateProviderRoles(event);">
+			  <input type="submit" name="submit" value="Add" onclick="return updateProviderRoles(<%=proSuperAdmin%>);">
 			  -
-			  <input type="submit" name="buttonUpdate" value="Update" onclick="return updateProviderRoles(event);" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
+			  <input type="submit" name="buttonUpdate" value="Update" onclick="return updateProviderRoles(<%=proSuperAdmin%>);" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
 			  -
-			  <input type="submit" name="submit" value="Delete" onclick="return updateProviderRoles(event);" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
+			  <input type="submit" name="submit" value="Delete" onclick="return updateProviderRoles(<%=proSuperAdmin%>);" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
 			</td>
 			</tr>
 	  </form>
