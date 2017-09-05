@@ -63,13 +63,13 @@
 	String curUser_no = (String)session.getAttribute("user");
 	String updateProvider = "";
 
-    ProviderData currentProvider = providerDao.findByProviderNo(curUser_no);
-    List<ProviderData> superAdminList = providerDao.getAllSuperAdmins();
-    List<String> superAdminNoList = new ArrayList<String>();
+	ProviderData currentProvider = providerDao.findByProviderNo(curUser_no);
+	List<ProviderData> superAdminList = providerDao.getAllSuperAdmins();
+	List<String> superAdminNoList = new ArrayList<String>();
 
-    for(ProviderData provider : superAdminList) {
-    	superAdminNoList.add(provider.getId());
-    }
+	for(ProviderData provider : superAdminList) {
+		superAdminNoList.add(provider.getId());
+	}
 
 	boolean isSiteAccessPrivacy=false;
 	boolean authed=true;
@@ -405,7 +405,7 @@ function submit(form) {
 	function updateProviderRoles(e) {
 		var isSuperAdmin = <%=isSuperAdmin%>;
 		var providerNo = e.target.parentNode.children.providerId.value;
-        superAdminList = <%=superAdminNoList%>;
+		superAdminList = <%=superAdminNoList%>;
 
 		if(superAdminList.indexOf(parseInt(providerNo)) !== -1 && !isSuperAdmin) {
 			alert("You are trying to modify a system user. This user cannot be modified.");
