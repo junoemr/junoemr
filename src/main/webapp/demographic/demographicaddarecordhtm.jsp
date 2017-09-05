@@ -25,7 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-    String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+    String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
     boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_demographic" rights="w" reverse="<%=true%>">
@@ -39,10 +39,8 @@
 %>
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="org.oscarehr.util.SessionConstants"%>
 <%
   String curUser_no = (String) session.getAttribute("user");
-  String str = null;
 %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -51,7 +49,7 @@
 <%@ taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page
-	import="java.util.*, java.sql.*, oscar.*, oscar.oscarDemographic.data.ProvinceNames, oscar.oscarDemographic.pageUtil.Util, oscar.oscarWaitingList.WaitingList"
+	import="java.util.*, oscar.*, oscar.oscarDemographic.data.ProvinceNames, oscar.oscarDemographic.pageUtil.Util, oscar.oscarWaitingList.WaitingList"
 	errorPage="errorpage.jsp"%>
 <%@ page
 	import="org.springframework.web.context.*,org.springframework.web.context.support.*,org.oscarehr.common.dao.*,org.oscarehr.common.model.*"%>
@@ -60,7 +58,6 @@
 <%@page import="org.oscarehr.common.dao.ProfessionalSpecialistDao" %>
 <%@page import="org.oscarehr.common.model.Provider" %>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@page import="org.oscarehr.common.model.Demographic" %>
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@page import="org.oscarehr.common.model.WaitingListName" %>
 <%@page import="org.oscarehr.PMmodule.web.GenericIntakeEditAction" %>
@@ -70,7 +67,6 @@
 <%@page import="org.oscarehr.common.dao.EFormDao" %>
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao" %>
 <%@page import="org.oscarehr.common.model.Facility" %>
-<%@page import="org.apache.commons.lang.StringUtils" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
 <%@page import="oscar.OscarProperties" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
@@ -92,7 +88,7 @@
 	ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
     String privateConsentEnabledProperty = OscarProperties.getInstance().getProperty("privateConsentEnabled");
     boolean privateConsentEnabled = privateConsentEnabledProperty != null && privateConsentEnabledProperty.equals("true");
-    
+
     LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 %>
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
@@ -127,7 +123,7 @@
   // Used to retrieve properties from user (i.e. HC_Type & default_sex)
   UserPropertyDAO userPropertyDAO = (UserPropertyDAO) ctx.getBean("UserPropertyDAO");
 
-  String HCType = "";
+  String HCType;
   // Determine if curUser has selected a default HC Type
   UserProperty HCTypeProp = userPropertyDAO.getProp(curUser_no,  UserProperty.HC_TYPE);
   if (HCTypeProp != null) {
@@ -143,8 +139,8 @@
   }
   // Use this value as the default value for province, as well
   String defaultProvince = HCType;
-		  
-		  
+
+
 	//get a list of programs the patient has consented to. 
 	if( OscarProperties.getInstance().getBooleanProperty("USE_NEW_PATIENT_CONSENT_MODULE", "true") ) {
 	    PatientConsentManager patientConsentManager = SpringUtils.getBean( PatientConsentManager.class );
@@ -154,23 +150,22 @@
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script> 
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
    <script>
-     jQuery.noConflict();     
+     jQuery.noConflict();
    </script>
 
    <script type="text/javascript">
         function aSubmit(){
             if(document.getElementById("eform_iframe")!=null)document.getElementById("eform_iframe").contentWindow.document.forms[0].submit();
-                        
+
             if(!checkFormTypeIn()) return false;
 
             if( !ignoreDuplicates() ) return false;
-            //document.getElementById("adddemographic").submit();
 
             return true;
-        }        
-        
+        }
+
    </script>
 
 
@@ -178,17 +173,17 @@
 
 <title><bean:message
 	key="demographic.demographicaddrecordhtm.title" /></title>
-	
+
 <% if (OscarProperties.getInstance().getBooleanProperty("indivica_hc_read_enabled", "true")) { %>
 	<script language="javascript" src="<%=request.getContextPath() %>/hcHandler/hcHandler.js"></script>
 	<script language="javascript" src="<%=request.getContextPath() %>/hcHandler/hcHandlerNewDemographic.js"></script>
 	<link rel="stylesheet" href="<%=request.getContextPath() %>/hcHandler/hcHandler.css" type="text/css" />
 <% } %>
-	
+
 <!-- calendar stylesheet -->
 <link rel="stylesheet" type="text/css" media="all"
 	href="../share/calendar/calendar.css" title="win2k-cold-1" />
-	
+
 <% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true")) { %>
 <link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/themes/blitzer/jquery-ui.css"/>
 <link rel="stylesheet" href="../css/jquery.autocomplete.css" type="text/css">
@@ -322,9 +317,9 @@ function checkDob() {
 	var typeInOK = false;
 	var yyyy = document.adddemographic.year_of_birth.value;
 	var selectBox = document.adddemographic.month_of_birth;
-	var mm = selectBox.options[selectBox.selectedIndex].value
+	var mm = selectBox.options[selectBox.selectedIndex].value;
 	selectBox = document.adddemographic.date_of_birth;
-	var dd = selectBox.options[selectBox.selectedIndex].value
+	var dd = selectBox.options[selectBox.selectedIndex].value;
 
 	if(checkTypeNum(yyyy) && checkTypeNum(mm) && checkTypeNum(dd) ){
         //alert(yyyy); alert(mm); alert(dd);
@@ -384,7 +379,7 @@ function checkHin() {
 
 function checkSex() {
 	var sex = document.adddemographic.sex.value;
-	
+
 	if(sex.length == 0)
 	{
 		alert ("You must select a Gender.");
@@ -489,10 +484,10 @@ function autoFillHin(){
    	  last = removeAccents(last.substring(0,3)).toUpperCase();
    	  first = removeAccents(first.substring(0,1)).toUpperCase();
    	  yob = yob.substring(2,4);
-   	  
+
    	  var sex = document.getElementById('sex').value;
    	  if(sex == 'F'){
-   		  mob = parseInt(mob) + 50; 
+   		  mob = parseInt(mob) + 50;
    	  }
 
       document.getElementById('hin').value = last + first + yob + mob + dob;
@@ -500,7 +495,7 @@ function autoFillHin(){
       hin.value = hin.value;
    }
 }
-				
+
 
 function ignoreDuplicates() {
 		//do the check
@@ -515,18 +510,18 @@ function ignoreDuplicates() {
 			success:function(data){
 				if(data.hasDuplicates != null) {
 					if(data.hasDuplicates) {
-						
+
 						if(confirm('There are other patients in this system with the same name and date of birth. Are you sure you want to create this new patient record?')) {
 							//submit the form
 							ret = true;
 						}
 					} else {
-						
+
 						//submit the form
 						ret = true;
 					}
 				} else {
-					
+
 					//submit the form
 					ret = true;
 				}
@@ -534,8 +529,8 @@ function ignoreDuplicates() {
 			dataType:'json',
 			async: false
 	});
-		
-		
+
+
 	return ret;
 }
 
@@ -591,7 +586,7 @@ function ignoreDuplicates() {
 
 <table id="addDemographicTbl" border="0" cellpadding="1" cellspacing="0" width="100%" bgcolor="#EEEEFF">
 
-    
+
     <%if (OscarProperties.getInstance().getProperty("workflow_enhance")!=null && OscarProperties.getInstance().getProperty("workflow_enhance").equals("true")) { %>
    		 <tr bgcolor="#CCCCFF">
 				<td colspan="4">
@@ -617,7 +612,7 @@ function ignoreDuplicates() {
    if (searchMode != null) {
       if (searchMode.equals("search_name")) {
         int commaIdx = keyWord.indexOf(",");
-        if (commaIdx == -1) 
+        if (commaIdx == -1)
 	   lastNameVal = keyWord.trim();
         else if (commaIdx == (keyWord.length()-1))
            lastNameVal = keyWord.substring(0,keyWord.length()-1).trim();
@@ -691,9 +686,9 @@ function ignoreDuplicates() {
 				<td id="cityCell" align="left"><input type="text" id="city" name="city"
 					value="<%=defaultCity %>" /></td>
 			</tr>
-			
+
 			<tr valign="top">
-				<td id="provLbl" align="right"><b> 
+				<td id="provLbl" align="right"><b>
 				<% if(oscarProps.getProperty("demographicLabelProvince") == null) { %>
 				<bean:message key="demographic.demographicaddrecordhtm.formprovince" />
 				<% } else {
@@ -933,20 +928,20 @@ function ignoreDuplicates() {
                                    }
                                 %>
                                 <td id="gender" align="left">
-                                
-                                
-                                
+
+
+
                                 <select  name="sex" id="sex">
 			                        <option value=""></option>
 			                		<% for(org.oscarehr.common.Gender gn : org.oscarehr.common.Gender.values()){ %>
 			                        <option value=<%=gn.name()%> <%=((sex.toUpperCase().equals(gn.name())) ? "selected" : "") %>><%=gn.getText()%></option>
 			                        <% } %>
 			                        </select>
-			                        
-			                       
+
+
                                 </select>
-                                
-                                
+
+
                                 </td>
 			</tr>
 			<tr valign="top">
@@ -963,12 +958,12 @@ function ignoreDuplicates() {
 					id="eff_date_year" name="eff_date_year" size="4" maxlength="4"> <input
 					type="text" id="eff_date_month" name="eff_date_month" size="2" maxlength="2"> <input
 					type="text" id="eff_date_date" name="eff_date_date" size="2" maxlength="2"> </b></td>
-			</tr>                       
+			</tr>
 			<tr>
 				<td id="hcTypeLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formHCType" />: </b></td>
 				<td id="hcType">
-				
+
 				<select name="hc_type" id="hc_type">
 					<option value="OT"
 						<%=HCType.equals("")||HCType.equals("OT")?" selected":""%>>Other</option>
@@ -1050,7 +1045,7 @@ function ignoreDuplicates() {
 		<option value="US-WY" <%=HCType.equals("US-WY")?" selected":""%>>US-WY-Wyoming</option>
           <% } %>
           </select>
-       
+
       </td>
       <td id="renewDateLbl" align="right"><b>*<bean:message key="demographic.demographiceditdemographic.formHCRenewDate" />:</b></td>
       <td id="renewDate" align="left"> <input type="text" id="hc_renew_date_year" name="hc_renew_date_year" size="4" maxlength="4" value="">
@@ -1082,7 +1077,7 @@ function ignoreDuplicates() {
 					}
 				}
 			}
-		
+
 			if(showConsentsThisTime) {
 		%>
 		<td colspan="2">
@@ -1095,8 +1090,8 @@ function ignoreDuplicates() {
 		<% } %>
 		</oscar:oscarPropertiesCheck>
     </tr>
-    
-    
+
+
     <tr valign="top">
 	<td  id="sinNoLbl" align="right"><b><bean:message key="demographic.demographicaddrecordhtm.msgSIN"/>:</b> </td>
 	<td id="sinNoCell" align="left"  >
@@ -1138,7 +1133,7 @@ function ignoreDuplicates() {
 					<option value="<%=p.getProviderNo()%>"><%=Misc.getShortStr( (p.getFormattedName()),"",12)%></option>
 					<%
   }
- 
+
 %>
 				</select></td>
 			</tr>
@@ -1154,7 +1149,7 @@ function ignoreDuplicates() {
 					<%=Misc.getShortStr( (p.getFormattedName()),"",12)%></option>
 					<%
   }
- 
+
 %>
 				</select></td>
 				<td id="residentLbl" align="right"><b><bean:message
@@ -1168,7 +1163,7 @@ function ignoreDuplicates() {
 					<%=Misc.getShortStr( (p.getFormattedName()),"",12)%></option>
 					<%
   }
- 
+
 %>
 				</select></td>
 			</tr>
@@ -1183,7 +1178,7 @@ function ignoreDuplicates() {
 
                                       List<ProfessionalSpecialist> specialists = professionalSpecialistDao.findAll();
                                       for(ProfessionalSpecialist specialist : specialists) {
-                                    	  
+
                                     	  if (specialist != null && specialist.getReferralNo() != null && ! specialist.getReferralNo().equals("")) {
                                     		  prop = new Properties();
                                     		  prop.setProperty("referral_no", specialist.getReferralNo());
@@ -1234,13 +1229,13 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				<td align="right" id="rosterStatusLbl" nowrap><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPCNRosterStatus" />: </b></td>
 				<td id="rosterStatus" align="left"><!--input type="text" name="roster_status" onBlur="upCaseCtrl(this)"-->
-				<select id="roster_status"  name="roster_status" style="width: 160">
+				<select id="roster_status"  name="roster_status" style="width: 160px;">
 					<option value=""></option>
 					<option value="RO"><bean:message key="demographic.demographicaddrecordhtm.RO-rostered" /></option>
 					<option value="NR"><bean:message key="demographic.demographicaddrecordhtm.NR-notrostered" /></option>
 					<option value="TE"><bean:message key="demographic.demographicaddrecordhtm.TE-terminated" /></option>
 					<option value="FS"><bean:message key="demographic.demographicaddrecordhtm.FS-feeforservice" /></option>
-					<% 
+					<%
 					for(String status : demographicDao.getRosterStatuses()) {%>
 					<option value="<%=status%>"><%=status%></option>
 					<% } // end while %>
@@ -1258,19 +1253,19 @@ document.forms[1].r_doctor_ohip.value = refNo;
                             <td id="ptStatusLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPatientStatus" />:</b></td>
 				<td id="ptStatusCell" align="left">
-				<select id="patient_status" name="patient_status" style="width: 160">
+				<select id="patient_status" name="patient_status" style="width: 160px;">
 					<option value="AC"><bean:message key="demographic.demographicaddrecordhtm.AC-Active" /></option>
 					<option value="IN"><bean:message key="demographic.demographicaddrecordhtm.IN-InActive" /></option>
 					<option value="DE"><bean:message key="demographic.demographicaddrecordhtm.DE-Deceased" /></option>
 					<option value="MO"><bean:message key="demographic.demographicaddrecordhtm.MO-Moved" /></option>
 					<option value="FI"><bean:message key="demographic.demographicaddrecordhtm.FI-Fired" /></option>
-					<% 
+					<%
 					for(String status : demographicDao.search_ptstatus()) { %>
 					<option value="<%=status%>"><%=status%></option>
 					<% } // end while %>
 				</select> <input type="button" onClick="newStatus();" value="<bean:message
 					key="demographic.demographicaddrecordhtm.AddNewPatient"/> ">
-				
+
 				</td>
 				<td id="chartNoLbl" align="right"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formChartNo" />:</b></td>
@@ -1308,23 +1303,22 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				<td id="waitListTbl" colspan="4">
 				<table border="1" width="100%">
 					<tr valign="top">
-                                            <td align="right" width="15%" nowrap><b> <bean:message key="demographic.demographicaddarecordhtm.msgWaitList"/>: </b></td>
-						<td align="left" width="38%"><select id="name_list_id" name="list_id">
-							<% if(wLReadonly.equals("")){ %>
+						<td align="right" width="15%" nowrap><b> <bean:message key="demographic.demographicaddarecordhtm.msgWaitList"/>: </b></td>
+						<td align="left" width="38%">
+							<select id="name_list_id" name="list_id">
+							<% if (wLReadonly.equals("")) { %>
 							<option value="0">--Select Waiting List--</option>
-							<%}else{ %>
-							<option value="0"><bean:message key="demographic.demographicaddarecordhtm.optCreateWaitList"/>
-							</option>
-							<%} %>
-							<%
-							for(WaitingListName wln : waitingListNameDao.findActiveWatingListNames()) {
-                                    
-                                    %>
-							<option value="<%=wln.getId()%>"><%=wln.getName()%></option>
-							<%
-                                       }
-                                     %>
-						</select></td>
+							<% }
+							else {
+							%>
+								<option value="0"><bean:message key="demographic.demographicaddarecordhtm.optCreateWaitList"/></option>
+							<%}
+								for (WaitingListName wln : waitingListNameDao.findActiveWatingListNames()) {
+							%>
+								<option value="<%=wln.getId()%>"><%=wln.getName()%></option>
+							<% } %>
+							</select>
+						</td>
 						<td align="right" nowrap><b><bean:message key="demographic.demographicaddarecordhtm.msgWaitListNote"/>: </b></td>
 						<td align="left"><input type="text" id="waiting_list_note" name="waiting_list_note"
 							size="36" <%=wLReadonly%>></td>
@@ -1344,8 +1338,8 @@ document.forms[1].r_doctor_ohip.value = refNo;
 			</tr>
 
 
-<%-- TOGGLE PRIVACY CONSENT MODULE --%>			
-<oscar:oscarPropertiesCheck property="privateConsentEnabled" value="true">			
+<%-- TOGGLE PRIVACY CONSENT MODULE --%>
+<oscar:oscarPropertiesCheck property="privateConsentEnabled" value="true">
 
 			<%
 				String[] privateConsentPrograms2 = OscarProperties.getInstance().getProperty("privateConsentPrograms","").split(",");
@@ -1358,45 +1352,45 @@ document.forms[1].r_doctor_ohip.value = refNo;
 						}
 					}
 				}
-						
+
 			if(showConsents) { %>
 			<!-- consents -->
 			<tr valign="top">
-	
+
 				<td colspan="4">
-					<input type="checkbox" name="privacyConsent" value="yes"><b>Privacy Consent (verbal) Obtained</b> 
+					<input type="checkbox" name="privacyConsent" value="yes"><b>Privacy Consent (verbal) Obtained</b>
 					<br/>
 					<input type="checkbox" name="informedConsent" value="yes"><b>Informed Consent (verbal) Obtained</b>
 					<br/>
 				</td>
 
 		  	</tr>
-		  			  	
+
 			<% } %>
 
 		  	<%-- This block of code was designed to eventually manage all of the patient consents. --%>
 			<oscar:oscarPropertiesCheck property="USE_NEW_PATIENT_CONSENT_MODULE" value="true" >
-			
+
 				<c:forEach items="${ consentTypes }" var="consentType" varStatus="count">
-				
+
 					<tr class="privacyConsentRow" id="${ count.index }" valign="top">
 						<td class="alignLeft" colspan="2" width="20%" >
 							<label style="font-weight:bold;" valign="center" for="${ consentType.type }" >
-							
+
 								<input type="checkbox" name="${ consentType.type }" id="${ consentType.type }" value="${ consentType.id }"  />
-		
+
 								<c:out value="${ consentType.name }" />
-								
+
 							</label>
 						</td>
-						
+
 						<td class="alignLeft"  colspan="2"  width="80%" >
 							<c:out value="${ consentType.description }" />
 						</td>
-		
+
 					</tr>
 				</c:forEach>
-				
+
 			</oscar:oscarPropertiesCheck>
 
 </oscar:oscarPropertiesCheck>
@@ -1440,7 +1434,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
                                         Set<Program> pset = gieat.getActiveProviderProgramsInFacility(loggedInInfo,_pvid,loggedInInfo.getCurrentFacility().getId());
                                         List<Program> bedP = gieat.getBedPrograms(pset,_pvid);
                                         List<Program> commP = gieat.getCommunityPrograms();
-                      	                
+
                                         for(Program _p:bedP){
                                     %>
                                         <option value="<%=_p.getId()%>" <%=("OSCAR".equals(_p.getName())?" selected=\"selected\" ":"")%> ><%=_p.getName()%></option>
@@ -1531,19 +1525,19 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) { out.println(os
 				<td colspan="4">
 				<div align="center"><input type="hidden" name="dboperation"
 					value="add_record"> <input type="hidden" name="displaymode" value="Add Record">
-				<input type="submit" id="btnAddRecord" name="btnAddRecord" 
+				<input type="submit" id="btnAddRecord" name="btnAddRecord"
 					value="<bean:message key="demographic.demographicaddrecordhtm.btnAddRecord"/>">
 				<input type="button" id="btnSwipeCard" name="Button"
 					value="<bean:message key="demographic.demographicaddrecordhtm.btnSwipeCard"/>"
 					onclick="window.open('zadddemographicswipe.htm','', 'scrollbars=yes,resizable=yes,width=600,height=300')";>
-				&nbsp; 
+				&nbsp;
 				<caisi:isModuleLoad moduleName="caisi" reverse="true">
 				<input type="button" name="closeButton"
 					value="<bean:message key="demographic.demographicaddrecordhtm.btnCancel"/>"
 					onclick="self.close();">
-				</caisi:isModuleLoad>				
+				</caisi:isModuleLoad>
 				</div>
-				&nbsp; 				
+				&nbsp;
 				<caisi:isModuleLoad moduleName="caisi" reverse="true">
 				<input type="button" name="closeButton"
 					value="<bean:message key="demographic.demographicaddrecordhtm.btnCancel"/>"
@@ -1558,9 +1552,9 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) { out.println(os
 			</tr>
 		</table>
 		</form>
-		
-				
-				
+
+
+
 		</td>
 	</tr>
 </table>
@@ -1581,7 +1575,7 @@ jQuery(document).ready(function(){
 	} else {
 		jQuery("#usSigned").show();
 	}
-	
+
 	jQuery("#countryOfOrigin").change(function () {
 		var countryOfOrigin = jQuery("#countryOfOrigin").val();
 		if("US" == countryOfOrigin){
@@ -1603,7 +1597,7 @@ jQuery(document).ready(function(){
 </script>
 <script type="text/javascript">
 $(document).ready(function(){
-	// AJAX autocomplete referrer doctors 
+	// AJAX autocomplete referrer doctors
 	$("input[name=r_doctor]").keypress(function(){
 		$("input[name=r_doctor]").autocomplete({
 	    	source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
@@ -1619,7 +1613,7 @@ $(document).ready(function(){
 	    		$("input[name=r_doctor]").val(ui.item.namedesc);
 	    	}
 		});
-	});	
+	});
 });
 </script>
 <!--<iframe src="../eform/efmshowform_data.jsp?fid=<%=fid%>" width="100%" height="100%"></iframe>-->

@@ -45,7 +45,10 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 
-<% Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null; %>
+<%
+Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
+OscarProperties oscarProps = OscarProperties.getInstance();
+%>
 
 <html:html locale="true">
 <head>
@@ -119,6 +122,12 @@
 	<a href="../demographic/demographicaddarecordhtm.jsp"><bean:message
 		key="demographic.search.btnCreateNew" /></a>
 </div>
+<% if (!oscarProps.isPropertyActive("hide_quickform")) { %>
+<div>
+	<a href="../demographic/demographicaddrecordcustom.jsp"><bean:message
+			key="demographic.search.btnQuickCreateNew" /></a>
+</div>
+<% } %>
 <p>
 <!-- we may want to not allow students to create new patients? -->
 <!-- <security:oscarSec roleName="<%=roleName$%>" objectName="_demographic.addnew" rights="r">  -->
