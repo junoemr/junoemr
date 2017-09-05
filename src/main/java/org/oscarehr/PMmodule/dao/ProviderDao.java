@@ -132,6 +132,15 @@ public class ProviderDao extends HibernateDaoSupport {
 		}
 		return rs;
 	}
+
+	public List<Provider> getAllSuperAdmins() {
+
+		String sql = "FROM Provider p WHERE p.super_admin=1";
+
+		List<Provider> superAdminList = getHibernateTemplate().find(sql);
+
+		return superAdminList;
+	}
 	
 	public List<Provider> getProviders(String[] providers) {
 		List<Provider> rs = getHibernateTemplate().find(

@@ -1,26 +1,26 @@
 <%--
 
-	Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
-	This software is published under the GPL GNU General Public License.
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
+    Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
+    This software is published under the GPL GNU General Public License.
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-	GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-	This software was written for the
-	Department of Family Medicine
-	McMaster University
-	Hamilton
-	Ontario, Canada
+    This software was written for the
+    Department of Family Medicine
+    McMaster University
+    Hamilton
+    Ontario, Canada
 
 --%>
 
@@ -46,6 +46,8 @@
 <%@ page import="org.oscarehr.common.dao.RecycleBinDao" %>
 <%@ page import="org.oscarehr.common.dao.ProviderDataDao" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="org.oscarehr.common.model.ProviderData" %>
+<%@ page import="org.oscarehr.common.model.Provider" %>
 
 <%
 	ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
@@ -57,24 +59,36 @@
 	ProgramProviderDAO programProviderDao = (ProgramProviderDAO) SpringUtils.getBean("programProviderDAO");
 
 	oscar.OscarProperties props = oscar.OscarProperties.getInstance();
-	String superAdmin = props.getProperty("SUPER_ADMIN");
-	
+
 	String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	String curUser_no = (String)session.getAttribute("user");
+	String updateProvider = "";
+
+    ProviderData currentProvider = providerDao.findByProviderNo(curUser_no);
+    List<ProviderData> superAdminList = providerDao.getAllSuperAdmins();
+    List<String> superAdminNoList = new ArrayList<String>();
+
+    for(ProviderData provider : superAdminList) {
+    	superAdminNoList.add(provider.getId());
+    }
 
 	boolean isSiteAccessPrivacy=false;
 	boolean authed=true;
+	boolean isSuperAdmin = currentProvider.getSuperAdmin();
 	boolean isAuthed = true;
 
 	if(request.getParameter("providerId") != null) {
-		if(request.getParameter("providerId").equals(superAdmin) && !curUser_no.equals(superAdmin)) {
-			isAuthed = false;
-		}
+		updateProvider = request.getParameter("providerId");
 	} else if(request.getParameter("primaryRoleProvider") != null) {
-		if(request.getParameter("primaryRoleProvider").equals(superAdmin) && !curUser_no.equals(superAdmin)) {
+		updateProvider = request.getParameter("primaryRoleProvider");
+	}
+
+	if(!updateProvider.equals("")) {
+		if(!isSuperAdmin && superAdminNoList.contains(updateProvider)) {
 			isAuthed = false;
 		}
 	}
+
 %>
 
 <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.userAdmin" rights="r" reverse="<%=true%>">
@@ -353,6 +367,7 @@ function submit(form) {
 
 		<script>
 		var items = new Array();
+		var superAdminList = [];
 		<%
 				for(Properties prop:vec) {
 						%>
@@ -390,13 +405,15 @@ function submit(form) {
 	}
 
 	function updateProviderRoles(e) {
-			var curUser = "<%=curUser_no%>";
-			var superAdmin = "<%=superAdmin%>"
-			var providerNo = e.target.parentNode.children.providerId.value;
-			if(providerNo == superAdmin && curUser != superAdmin) {
-				alert("You are trying to modify a system user. This user cannot be modified.");
-				return false;
-			}
+		var isSuperAdmin = <%=isSuperAdmin%>;
+		var providerNo = e.target.parentNode.children.providerId.value;
+        superAdminList = <%=superAdminNoList%>;
+
+		if(superAdminList.indexOf(parseInt(providerNo)) !== -1 && !isSuperAdmin) {
+			alert("You are trying to modify a system user. This user cannot be modified.");
+			return false;
+		}
+
 		return true;
 	}
 	</script>
