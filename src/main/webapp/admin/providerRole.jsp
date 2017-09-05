@@ -400,10 +400,10 @@ function submit(form) {
 
 	}
 
-	function updateProviderRoles(proSuperAdmin) {
+	function updateProviderRoles(isProSuperAdmin) {
 		var isSuperAdmin = <%=isSuperAdmin%>;
 
-		if(proSuperAdmin && !isSuperAdmin) {
+		if(isProSuperAdmin && !isSuperAdmin) {
 			alert("You are trying to modify a system user. This user cannot be modified.");
 			return false;
 		}
@@ -467,7 +467,7 @@ function submit(form) {
 		for (int i = 0; i < vec.size(); i++) {
 			Properties item = vec.get(i);
 			String providerNo = item.getProperty("provider_no", "");
-			boolean proSuperAdmin = Boolean.parseBoolean(item.getProperty("super_admin"));
+			boolean isProSuperAdmin = Boolean.parseBoolean(item.getProperty("super_admin"));
 %>
 	  <form name="myform<%= providerNo %>" action="providerRole.jsp" method="POST">
 			<tr bgcolor="<%=colors[i%2]%>">
@@ -499,11 +499,11 @@ function submit(form) {
 			  <input type="hidden" name="providerId" value="<%=providerNo%>">
 			  <input type="hidden" name="roleId" value="<%= item.getProperty("role_id", "")%>">
 			  <input type="hidden" name="roleOld" value="<%= item.getProperty("role_name", "")%>">
-			  <input type="submit" name="submit" value="Add" onclick="return updateProviderRoles(<%=proSuperAdmin%>);">
+			  <input type="submit" name="submit" value="Add" onclick="return updateProviderRoles(<%=isProSuperAdmin%>);">
 			  -
-			  <input type="submit" name="buttonUpdate" value="Update" onclick="return updateProviderRoles(<%=proSuperAdmin%>);" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
+			  <input type="submit" name="buttonUpdate" value="Update" onclick="return updateProviderRoles(<%=isProSuperAdmin%>);" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
 			  -
-			  <input type="submit" name="submit" value="Delete" onclick="return updateProviderRoles(<%=proSuperAdmin%>);" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
+			  <input type="submit" name="submit" value="Delete" onclick="return updateProviderRoles(<%=isProSuperAdmin%>);" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
 			</td>
 			</tr>
 	  </form>
