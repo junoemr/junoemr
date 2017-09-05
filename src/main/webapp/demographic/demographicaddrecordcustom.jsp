@@ -23,7 +23,6 @@
     Ontario, Canada
 
 --%>
-<%@page import="org.oscarehr.util.SessionConstants"%>
 <%
 	if(session.getAttribute("user") == null) response.sendRedirect("../logout.jsp");
 	String curUser_no = (String) session.getAttribute("user");
@@ -56,8 +55,7 @@
 	String [][] dbQueries=new String[][] {
 			{"search_provider", "select * from provider where provider_type='doctor' and status='1' order by last_name"},
 			{"search_rsstatus", "select distinct roster_status from demographic where roster_status != '' and roster_status != 'RO' and roster_status != 'NR' and roster_status != 'TE' and roster_status != 'FS' "},
-			{"search_ptstatus", "select distinct patient_status from demographic where patient_status != '' and patient_status != 'AC' and patient_status != 'IN' and patient_status != 'DE' and patient_status != 'MO' and patient_status != 'FI'"},
-			{"search_waiting_list", "select * from waitingListName where group_no='" + ((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo() +"' and is_history='N'  order by name"}
+			{"search_ptstatus", "select distinct patient_status from demographic where patient_status != '' and patient_status != 'AC' and patient_status != 'IN' and patient_status != 'DE' and patient_status != 'MO' and patient_status != 'FI'"}
 	};
 	String[][] responseTargets=new String[][] {  };
 	addDemoBean.doConfigure(dbQueries,responseTargets);
@@ -92,7 +90,7 @@
 
 	String HCType;
 	// Determine if curUser has selected a default HC Type
-	UserProperty HCTypeProp = userPropertyDAO.getProp(curUser_no,  UserProperty.HC_TYPE);
+	UserProperty HCTypeProp = userPropertyDAO.getProp(curUser_no, UserProperty.HC_TYPE);
 	if (HCTypeProp != null) {
 		HCType = HCTypeProp.getValue();
 	} else {
@@ -105,7 +103,7 @@
 	if(demographic_string == null){
 		demographic_string = "";
 	}
-	String all_fields = "last_name,first_name,official_lang,title,address,city,province,postal,phone,phone2,cellphone,newsletter,email,pin,dob,sex,hin,eff_date,hc_type,countryOfOrigin,sin,cytolNum,doctor,nurse,midwife,resident,referral_doc,roster_status,date_rostered,patient_status,chart_no,waiting_list,date_joined,end_date,alert,form_notes";
+	String all_fields = "last_name,first_name,official_lang,title,address,city,province,postal,phone,phone2,cellphone,newsletter,email,pin,dob,sex,hin,eff_date,hc_type,countryOfOrigin,sin,cytolNum,doctor,nurse,midwife,resident,referral_doc,roster_status,patient_status,chart_no,waiting_list,date_joined,end_date,alert,form_notes";
 	if(oscarProps.isPropertyActive("demographic_veteran_no")) {
 		all_fields += ",veteran_no";
 	}
@@ -1111,14 +1109,11 @@
 			</select>
 			<input type="button" onClick="newStatus1();" value="<bean:message key="demographic.demographicaddrecordhtm.AddNewRosterStatus"/> " />
 		</div>
-		<%
-		}else if(custom_demographic_fields.get(i).equals("date_rostered")){
-		%>
 		<div>
 			<label><b><bean:message key="demographic.demographicaddrecordhtm.formPCNDateJoined" />: </b></label>
-			<input type="text" name="hc_renew_date_year" size="4" maxlength="4">
-			<input type="text" name="hc_renew_date_month" size="2" maxlength="2">
-			<input type="text" name="hc_renew_date_date" size="2" maxlength="2">
+			<input type="text" name="roster_date_year" size="4" maxlength="4">
+			<input type="text" name="roster_date_month" size="2" maxlength="2">
+			<input type="text" name="roster_date_date" size="2" maxlength="2">
 		</div>
 		<%
 		}else if(custom_demographic_fields.get(i).equals("patient_status")){
@@ -1472,12 +1467,9 @@
 		}else if(hidden_demographic_fields.get(i).equals("roster_status")){
 		%>
 		<input type="hidden" name="roster_status" value=""/>
-		<%
-		}else if(hidden_demographic_fields.get(i).equals("date_rostered")){
-		%>
-		<input type="hidden" name="hc_renew_date_year" value=""/>
-		<input type="hidden" name="hc_renew_date_month" value=""/>
-		<input type="hidden" name="hc_renew_date_date" value=""/>
+		<input type="hidden" name="roster_date_year" value=""/>
+		<input type="hidden" name="roster_date_month" value=""/>
+		<input type="hidden" name="roster_date_date" value=""/>
 		<%
 		}else if(hidden_demographic_fields.get(i).equals("patient_status")){
 		%>

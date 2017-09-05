@@ -489,6 +489,7 @@
 <bean:message key="demographic.search.btnCreateNew" />
 </a>
 	<% if (!oscarProps.isPropertyActive("hide_quickform")) { %>
+		<br/>
 		<a href="demographicaddrecordcustom.jsp"><bean:message
 				key="demographic.search.btnQuickCreateNew" /></a>
 	<% } %>

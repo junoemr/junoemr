@@ -1468,7 +1468,16 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
                                                <li><span class="label"><bean:message key="demographic.demographiceditdemographic.msgSpokenLang"/>:</span>
                                                    <span class="info"><%=sp_lang%></span>
 							</li>
-						<% } %>
+						<% }
+							// Patient veteran number OHSUPPORT-3523
+							if(oscarProps.isPropertyActive("demographic_veteran_no")) {
+								String veteranNo = (demographic.getVeteranNo() != null ? demographic.getVeteranNo() : "");
+						%>
+							<li>
+								<span class="label"><bean:message key="demographic.demographiceditdemographic.veteranNo" />:</span>
+								<span class="info"><%= veteranNo %></span>
+							</li>
+							<% } %>
 						
 						<% String aboriginal = StringUtils.trimToEmpty(demoExt.get("aboriginal"));
 						   if (aboriginal!=null && aboriginal.length()>0) { %>
@@ -3020,6 +3029,20 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 									size="30" value="<%=StringUtils.trimToEmpty(demographic.getChartNo())%>" <%=getDisabled("chart_no")%>>
 								</td>
 							</tr>
+							<%
+							// Patient veteran number OHSUPPORT-3523
+							if(oscarProps.isPropertyActive("demographic_veteran_no")) {
+								String veteranNo = (demographic.getVeteranNo() != null ? demographic.getVeteranNo() : "");
+								%>
+								<tr>
+									<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.veteranNo" />:</b></td>
+									<td align="left">
+										<input name="veteranNo" type="text" value="<%= veteranNo %>">
+									</td>
+								</tr>
+								<%
+							}
+							%>
 							
 							<tr>
 	                            <td align="right"><b><bean:message key="web.record.details.archivedPaperChart" />: </b></td>
@@ -3142,11 +3165,11 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 			<tr>
 			<td >
 				<div id="usSigned">
-					<input type="radio" name="usSigned" id="usSigned" value="signed" <%=usSigned.equals("signed") ? "checked" : ""%>>
-						<label style="font-weight:bold;" for="usSigned">U.S. Resident Consent Form Signed </label>
+					<input type="radio" name="usSigned" id="usSigneds" value="signed" <%=usSigned.equals("signed") ? "checked" : ""%>>
+						<label style="font-weight:bold;" for="usSigneds">U.S. Resident Consent Form Signed </label>
 			
-				    <input type="radio" name="usSigned" id="usSigned" value="unsigned" <%=usSigned.equals("unsigned") ? "checked" : ""%>>
-				    	<label style="font-weight:bold;" for="usSigned">U.S. Resident Consent Form NOT Signed</label>
+				    <input type="radio" name="usSigned" id="usSignedu" value="unsigned" <%=usSigned.equals("unsigned") ? "checked" : ""%>>
+				    	<label style="font-weight:bold;" for="usSignedu">U.S. Resident Consent Form NOT Signed</label>
 			    </div>
 			</td>
 			</tr>

@@ -1272,6 +1272,15 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				<td id="chartNo" align="left"><input type="text" id="chart_no" name="chart_no" value="<%=StringEscapeUtils.escapeHtml(chartNoVal)%>">
 				</td>
 			</tr>
+			<%
+			if(oscarProps.isPropertyActive("demographic_veteran_no")) { %>
+			<tr>
+				<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.veteranNo" />:</b></td>
+				<td align="left">
+					<input name="veteranNo" type="text">
+				</td>
+			</tr> <%
+			}%>
 
 			<%if (oscarProps.getProperty("EXTRA_DEMO_FIELDS") !=null){
       String fieldJSP = oscarProps.getProperty("EXTRA_DEMO_FIELDS");

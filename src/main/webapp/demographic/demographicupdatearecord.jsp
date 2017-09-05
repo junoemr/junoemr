@@ -39,7 +39,7 @@
 %>
 
 <%@page import="org.oscarehr.provider.model.PreventionManager"%>
-<%@ page import="java.sql.*, java.util.*, oscar.MyDateFormat, oscar.oscarWaitingList.util.WLWaitingListUtil, oscar.log.*, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
+<%@ page import="java.util.*, oscar.MyDateFormat, oscar.oscarWaitingList.util.WLWaitingListUtil, oscar.log.*, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
 
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="org.oscarehr.util.MiscUtils"%>
@@ -48,7 +48,6 @@
 <%@page import="org.oscarehr.common.model.Demographic" %>
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@page import="org.oscarehr.common.dao.DemographicArchiveDao" %>
-<%@page import="org.oscarehr.common.model.DemographicArchive" %>
 <%@page import="org.oscarehr.common.model.DemographicCust" %>
 <%@page import="org.oscarehr.common.dao.DemographicCustDao" %>
 <%@page import="org.oscarehr.common.dao.DemographicExtDao" %>
@@ -57,20 +56,16 @@
 <%@page import="org.oscarehr.common.model.DemographicExtArchive" %>
 
 <%@ page import="org.oscarehr.common.dao.WaitingListDao" %>
-<%@ page import="org.oscarehr.common.model.WaitingList" %>
 
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
-<%@page import="org.oscarehr.common.model.Appointment" %>
 <%@page import="org.oscarehr.provider.model.PreventionManager" %>
 
-<%@ page import="org.oscarehr.PMmodule.dao.ProgramDao" %>
 <%@ page import="org.oscarehr.PMmodule.model.Program" %>
 <%@page import="org.oscarehr.PMmodule.web.GenericIntakeEditAction" %>
 <%@page import="org.oscarehr.PMmodule.service.ProgramManager" %>
 <%@page import="org.oscarehr.PMmodule.service.AdmissionManager" %>
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
-<%@page import="org.oscarehr.common.model.Consent" %>
 <%@page import="org.oscarehr.common.model.ConsentType" %>
 <%@page import="oscar.OscarProperties" %>
 
@@ -80,19 +75,15 @@
 
 
 <%
-	java.util.Properties oscarVariables = oscar.OscarProperties.getInstance();
+	OscarProperties oscarVariables = oscar.OscarProperties.getInstance();
 
     DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
     DemographicExtArchiveDao demographicExtArchiveDao = SpringUtils.getBean(DemographicExtArchiveDao.class);
 	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
 	DemographicArchiveDao demographicArchiveDao = (DemographicArchiveDao)SpringUtils.getBean("demographicArchiveDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
-	WaitingListDao waitingListDao = (WaitingListDao)SpringUtils.getBean("waitingListDao");
-	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
-
 	
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-	
 	
 %>
 
@@ -110,13 +101,7 @@
 </table>
 <%
 
-	ResultSet rs = null;
-	java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
-	
 	Demographic demographic = demographicDao.getDemographic(request.getParameter("demographic_no"));
-	if(demographic == null) {
-	 //we have a problem!
-	}
 
 	String hin = request.getParameter("hin").replaceAll("[^0-9a-zA-Z]", "");
 
@@ -152,6 +137,11 @@
 	demographic.setRosterTerminationReason(request.getParameter("roster_termination_reason"));
 	demographic.setLastUpdateUser((String)session.getAttribute("user"));
 	demographic.setLastUpdateDate(new java.util.Date());
+
+	// Patient veteran number OHSUPPORT-3523
+	if(oscarVariables.isPropertyActive("demographic_veteran_no")) {
+		demographic.setVeteranNo(StringUtils.trimToNull(request.getParameter("veteranNo")));
+	}
 	
 	String yearTmp=StringUtils.trimToNull(request.getParameter("date_joined_year"));
 	String monthTmp=StringUtils.trimToNull(request.getParameter("date_joined_month"));
@@ -341,7 +331,6 @@
 	for (DemographicExt extension : extensions) {
 		DemographicExtArchive archive = new DemographicExtArchive(extension);
 		archive.setArchiveId(archiveId);
-		//String oldValue = request.getParameter(archive.getKey() + "Orig");
 		archive.setValue(request.getParameter(archive.getKey()));
 		demographicExtArchiveDao.saveEntity(archive);	
 	}	
@@ -434,8 +423,6 @@
 	PreventionManager prevMgr = (PreventionManager) SpringUtils.getBean("preventionMgr");
 	prevMgr.removePrevention(request.getParameter("demographic_no"));
 
-    String ip = request.getRemoteAddr();
-    String user = (String)session.getAttribute("user");
     LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC,  request.getParameter("demographic_no") , request.getRemoteAddr(),request.getParameter("demographic_no"));
 %>
 <p></p>

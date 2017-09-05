@@ -25,7 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-    String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+    String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
     boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_demographic" rights="w" reverse="<%=true%>">
@@ -39,12 +39,11 @@
 %>
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="java.util.*, java.net.URLEncoder, oscar.oscarDB.*, oscar.MyDateFormat, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
+<%@ page import="java.util.*, java.net.URLEncoder, oscar.MyDateFormat, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
 <%@ page import="oscar.log.*"%>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 
-<%@ page import="org.oscarehr.common.dao.AdmissionDao" %>
 <%@ page import="oscar.oscarWaitingList.util.WLWaitingListUtil" %>
 
 <%@ page import="org.oscarehr.common.model.DemographicExt" %>
@@ -55,7 +54,6 @@
 <%@ page import="org.oscarehr.common.model.DemographicCust" %>
 <%@ page import="org.oscarehr.common.dao.DemographicCustDao" %>
 
-<%@ page import="org.oscarehr.PMmodule.dao.ProgramDao" %>
 <%@page import="org.oscarehr.PMmodule.web.GenericIntakeEditAction" %>
 <%@page import="org.oscarehr.PMmodule.service.ProgramManager" %>
 <%@page import="org.oscarehr.PMmodule.service.AdmissionManager" %>
@@ -67,14 +65,13 @@
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
 <%@page import="org.oscarehr.common.model.ConsentType" %>
 <%@page import="oscar.OscarProperties" %>
-<%@ page import="org.oscarehr.PMmodule.model.*" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi"%>
 
 <% 
-	java.util.Properties oscarVariables = oscar.OscarProperties.getInstance();
+	OscarProperties oscarVariables = oscar.OscarProperties.getInstance();
 
 	ProgramManager pm = SpringUtils.getBean(ProgramManager.class);
 	AdmissionManager am = SpringUtils.getBean(AdmissionManager.class);
@@ -225,6 +222,11 @@
     bufNo = new StringBuilder( (StringUtils.trimToEmpty("demographic_no")) );
     bufChart = new StringBuilder(StringUtils.trimToEmpty("chart_no"));
     bufDoctorNo = new StringBuilder( StringUtils.trimToEmpty("provider_no") );
+
+	// Patient veteran number OHSUPPORT-3523
+	if(oscarVariables.isPropertyActive("demographic_veteran_no")) {
+		demographic.setVeteranNo(StringUtils.trimToNull(request.getParameter("veteranNo")));
+	}
 
     demographicDao.save(demographic);
 

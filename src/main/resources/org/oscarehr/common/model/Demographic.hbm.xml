@@ -79,7 +79,7 @@
 
 		<property column="newsletter" name="newsletter" type="string" />
 		<property column="country_of_origin" name="countryOfOrigin" type="string" />
-
+		<property column="veteran_no" length="32" name="veteranNo" type="string" />
 
 	</class>
 </hibernate-mapping>

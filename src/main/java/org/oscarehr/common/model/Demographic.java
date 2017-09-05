@@ -121,6 +121,7 @@ public class Demographic implements Serializable {
 
     private String countryOfOrigin;
     private String newsletter;
+	private String veteranNo;
     
 
         public String getTitle() {
@@ -884,6 +885,13 @@ public class Demographic implements Serializable {
 
 	public void setSourceOfIncome(String sourceOfIncome) {
 		this.sourceOfIncome = sourceOfIncome;
+	}
+
+	public void setVeteranNo(String vetNo) {
+		veteranNo = vetNo;
+	}
+	public String getVeteranNo() {
+		return veteranNo;
 	}
 
 	@Override
