@@ -204,6 +204,11 @@ public class OscarProperties extends Properties {
 	// =========================================================================
 	// Methods for getting specific property values
 	// =========================================================================
+
+	public String getDemographicDobFormatOverride() {
+		return getProperty("demographic_dob_format_override");
+	}
+
 	public Date getStartTime() {
 		String str = getProperty("OSCAR_START_TIME");
 		Date ret = null;
