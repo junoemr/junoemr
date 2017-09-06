@@ -37,7 +37,6 @@ import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
 import oscar.oscarDB.DBHandler;
-import oscar.oscarDB.DBPreparedHandler;
 
 /**
  *This classes main function ObecGenerate collects a group of patients with health insurance number for OHIP validation in the last specified date
@@ -45,12 +44,10 @@ import oscar.oscarDB.DBPreparedHandler;
 public class ObecData {
 	private static Logger logger = MiscUtils.getLogger();
 
-	//public ArrayList demoList = null;
 	public String sql = "";
 	public String results = null;
 	public String text = null;
 	public String connect = null;
-	DBPreparedHandler accessDB = null;
 
 	public ObecData() {
 	}
@@ -67,7 +64,14 @@ public class ObecData {
 		}
 		try {
 
-			String sql = "select d.demographic_no, d.last_name, d.first_name, LEFT(d.address, 32) as address, LEFT(d.city, 30) as city, d.postal, d.hin, d.ver, d.province from appointment a, demographic d where a.demographic_no=d.demographic_no and d.hin <> '' and a.appointment_date>= '" + sDate + "' and appointment_date<='" + eDate + "' and (d.province='Ontario' or d.province='ON' or d.province='ONTARIO') group by d.demographic_no order by d.last_name";
+			String sql = "SELECT d.demographic_no, d.last_name, d.first_name, LEFT(d.address, 32) as address, LEFT(d.city, 30) as city, d.postal, d.hin, d.ver, d.province " +
+					"FROM appointment a, demographic d " +
+					"WHERE a.demographic_no=d.demographic_no " +
+					"AND d.hin <> '' " +
+					"AND a.appointment_date>= '" + sDate + "' " +
+					"AND appointment_date<='" + eDate + "' " +
+					"AND d.hc_type='ON' " +
+					"GROUP by d.demographic_no ORDER BY d.last_name";
 			ResultSet rs = DBHandler.GetSQL(sql);
 			while (rs.next()) {
 				count = count + 1;
