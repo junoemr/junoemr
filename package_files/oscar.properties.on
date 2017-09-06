@@ -1010,3 +1010,6 @@ auto_populate_billingreferral_bc=true
 #document_email_body=Document Sent From Oscar
 #document_email_name=Oscar                                    
 #document_email_from_address=test@test.com
+
+# Automatically link assigned document to demographic's provider
+link_docs_to_provider=yes
