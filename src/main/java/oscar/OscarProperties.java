@@ -28,6 +28,7 @@ package oscar;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -209,10 +210,17 @@ public class OscarProperties extends Properties {
 
 	public String getDisplayDateFormat() {
 
-		String dateFormat = getProperty("display_date_format");
+		String dateFormat;
 
-		if(dateFormat == null) {
+		try {
+			dateFormat = getProperty("display_date_format");
+			SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+		} catch(NullPointerException e) {
 			dateFormat = DEFAULT_DATE_FORMAT;
+			MiscUtils.getLogger().error("Error", e);
+		} catch(IllegalArgumentException e) {
+			dateFormat = DEFAULT_DATE_FORMAT;
+			MiscUtils.getLogger().error("Error", e);
 		}
 
 		return dateFormat;
