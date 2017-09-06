@@ -159,14 +159,14 @@ public final class LoginAction extends DispatchAction {
     	    password = ((LoginForm) form).getPassword();
     	    pin = ((LoginForm) form).getPin();
     	    nextPage=request.getParameter("nextPage");
-    		        
-	        logger.debug("nextPage: "+nextPage);
+
+		    String username=(String)request.getSession().getAttribute("user");
+		    logger.debug("nextPage: "+nextPage);
 	        if (nextPage!=null) {
 	        	// set current facility
 	            String facilityIdString=request.getParameter(SELECTED_FACILITY_ID);
 	            Facility facility=facilityDao.find(Integer.parseInt(facilityIdString));
 	            request.getSession().setAttribute(SessionConstants.CURRENT_FACILITY, facility);
-	            String username=(String)request.getSession().getAttribute("user");
 	            LogAction.addLogEntry(username, LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_SUCCESS, "facilityId="+facilityIdString, ip);
 	            if(facility.isEnableOcanForms()) {
 	            	request.getSession().setAttribute("ocanWarningWindow", OcanForm.getOcanWarningMessage(facility.getId()));
@@ -176,7 +176,8 @@ public final class LoginAction extends DispatchAction {
 	        
 	        if (cl.isBlocked(ip, userName)) {
 	        	logger.info(LOG_PRE + " Blocked: " + userName);
-	            // return mapping.findForward(where); //go to block page
+		        LogAction.addLogEntry(username, null, LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_FAILURE,
+				        null, ip, "Blocked " + userName + " for repeated login attempts");
 	            // change to block page
 	            String newURL = mapping.findForward("error").getPath();
 	            newURL = newURL + "?errormsg=Your account is locked. Please contact your administrator to unlock.";

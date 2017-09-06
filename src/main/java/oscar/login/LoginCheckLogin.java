@@ -37,19 +37,19 @@ import oscar.OscarProperties;
  */
 public final class LoginCheckLogin {
 
-	private final static OscarProperties p = OscarProperties.getInstance();
+	private final static OscarProperties oscarProps = OscarProperties.getInstance();
 	// the maximum number of failures before a lockout
-	private final static Integer maxLoginFailures = Integer.parseInt(p.getProperty("login_max_failed_times"));
+	private final static Integer maxLoginFailures = Integer.parseInt(oscarProps.getProperty("login_max_failed_times"));
 	// the time (in min) before the user can log in again after being locked out
-	private static final Integer maxLoginDuration = Integer.parseInt(p.getProperty("login_max_duration"));
+	private static final Integer maxLoginDuration = Integer.parseInt(oscarProps.getProperty("login_max_duration"));
 	// string representing the local IP address prefix (ip starts with this string, but this isn't the full IP)
-	private static final String loginLocalIp = p.getProperty("login_local_ip");
+	private static final String loginLocalIp = oscarProps.getProperty("login_local_ip");
 	// if this is set, lockout is based on usernames, otherwise IP addresses
-	private static final Boolean localLoginLock = p.isPropertyActive("login_lock");
+	private static final Boolean localLoginLock = oscarProps.isPropertyActive("login_lock");
 
 	private static Logger logger = Logger.getLogger(LoginCheckLogin.class);
 
-	private LoginCheckLoginBean lb = null;
+	private LoginCheckLoginBean loginCheckLoginBean = null;
 	private LoginList loginList = null;
 
 	public LoginCheckLogin() {
@@ -99,9 +99,9 @@ public final class LoginCheckLogin {
 
 	// authenticate is used to check password
 	public String[] auth(String user_name, String password, String pin, String ip) {
-		lb = new LoginCheckLoginBean();
-		lb.ini(user_name, password, pin, ip);
-		return lb.authenticate();
+		loginCheckLoginBean = new LoginCheckLoginBean();
+		loginCheckLoginBean.ini(user_name, password, pin, ip);
+		return loginCheckLoginBean.authenticate();
 	}
 
 	/**
@@ -109,7 +109,7 @@ public final class LoginCheckLogin {
 	 * @return the Security object
 	 */
 	public Security getSecurity() {
-		return (lb.getSecurity());
+		return (loginCheckLoginBean.getSecurity());
 	}
 
 	/**
