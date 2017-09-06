@@ -300,7 +300,8 @@
 					<div class="col-sm-12">
 						<label >Assigned Issues:</label>
 						<table class="table table-condensed">
-							<tr ng-repeat="i in groupNotesCtrl.groupNotesForm.assignedCMIssues" class="note-editor-issue-row">
+							<%-- TEMPORARILY FILTER OUT SYSTEM ISSUES UNTIL WE CAN STORE THEM IN THEIR OWN FIELD --%>
+							<tr ng-repeat="i in groupNotesCtrl.groupNotesForm.assignedCMIssues | filter: {issue: { type: '!' + 'system'} }" class="note-editor-issue-row">
 								<td>{{i.issue.description}} ({{i.issue.code}})</td>
 								<td class="text-right">
 									<button class="btn btn-xs btn-danger" type="button" ng-click="groupNotesCtrl.removeGroupNoteIssue(i)" ng-if="i.unchecked == null || i.unchecked == false">Remove</button>
