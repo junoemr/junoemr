@@ -250,8 +250,6 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
             {
                 controller.groupNotesForm.encounterNote.noteId = 0;
             }
-
-            controller.groupNotesForm.encounterNote.noteId = controller.groupNotesForm.encounterNote.noteId; //tmp crap
             controller.groupNotesForm.encounterNote.cpp = true;
             controller.groupNotesForm.encounterNote.editable = true;
             controller.groupNotesForm.encounterNote.isSigned = true;
@@ -259,18 +257,12 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
             controller.groupNotesForm.encounterNote.appointmentNo = $stateParams.appointmentNo; //TODO: make this dynamic so it changes on edit
             controller.groupNotesForm.encounterNote.encounterType = "";
             controller.groupNotesForm.encounterNote.encounterTime = "";
-            // controller.groupNotesForm.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;
+            controller.groupNotesForm.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;
             controller.groupNotesForm.encounterNote.summaryCode = controller.page.code; //'ongoingconcerns';
-
-            controller.groupNotesForm.encounterNote.assignedIssues = [];
-
-            console.log('SAVING GROUP NOTE: ', controller.groupNotesForm.encounterNote);
-            console.log('STATE PARAMS ', $stateParams);
 
             noteService.saveIssueNote($stateParams.demographicNo, controller.groupNotesForm).then(
                 function success(results)
                 {
-                    console.log('SAVING NOTE form: ', controller.groupNotesForm);
                     $uibModalInstance.dismiss('cancel');
                     $state.transitionTo($state.current, $stateParams, {
                         reload: true,
