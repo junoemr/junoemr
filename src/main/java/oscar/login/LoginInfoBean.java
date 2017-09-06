@@ -70,7 +70,7 @@ public final class LoginInfoBean {
 		}
 		//else attempts++. if attempts out, status block
 		attempts++;
-		if (attempts > maxtimes) {
+		if (attempts >= maxtimes) {
 			status = LOCKOUT_STATUS.LOCKED;
 		}
 	}
