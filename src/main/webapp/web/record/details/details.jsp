@@ -186,17 +186,6 @@
 								(<span ng-if="!detailsCtrl.isNaN(detailsCtrl.page.demo.age)">{{detailsCtrl.page.demo.age}}y</span>)
 							</div>
 						</div>
-							<%--<input id="effDate"--%>
-								   <%--ng-model="detailsCtrl.page.demo.dateOfBirth"--%>
-								   <%--type="date"--%>
-								   <%--class="form-control form-control-details"--%>
-								   <%--title="Health Card Effective Date"--%>
-								   <%--datepicker-popup="yyyy-MM-dd"--%>
-								   <%--datepicker-append-to-body="true"--%>
-								   <%--placeholder="YYYY-MM-DD"--%>
-								   <%--style="background-color:{{detailsCtrl.page.effDateColor}}"--%>
-							<%--/>--%>
-
 					</div>
 					
 					
@@ -509,34 +498,40 @@
 				<div class="form-group">
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formEFFDate"/></label>
 					<div class="col-md-4">
-						<input id="effDate" ng-model="detailsCtrl.page.demo.effDate"
-							type="date"
-							class="form-control form-control-details" 
-							title="Health Card Effective Date"
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="true" 
-							is-open="detailsCtrl.page.effDatePicker"
-							ng-click="detailsCtrl.page.effDatePicker = true"
-							placeholder="YYYY-MM-DD"
-							style="background-color:{{detailsCtrl.page.effDateColor}}"
-							ng-change="detailsCtrl.preventManualEffDate()"
-						/>
+						<%--<input id="effDate"--%>
+							   <%--ng-model="detailsCtrl.page.demo.effDate"--%>
+							   <%--&lt;%&ndash;ng-model-options="{timezone: 'utc'}"&ndash;%&gt;--%>
+							<%--type="date"--%>
+							<%--class="form-control form-control-details" --%>
+							<%--title="Health Card Effective Date"--%>
+							<%--datepicker-popup="yyyy-MM-dd" --%>
+							<%--datepicker-append-to-body="true" --%>
+							<%--is-open="detailsCtrl.page.effDatePicker"--%>
+							<%--ng-click="detailsCtrl.page.effDatePicker = true"--%>
+							<%--placeholder="YYYY-MM-DD"--%>
+							<%--style="background-color:{{detailsCtrl.page.effDateColor}}"--%>
+							<%--ng-change="detailsCtrl.preventManualEffDate()"--%>
+						<%--/>--%>
+						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.effDate" show-icon="true" type="Input"> </juno-datepicker-popup>
+
 					</div>
 
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formHCRenewDate"/></label>
 					<div class="col-md-4">
-						<input id="hcRenewDate" ng-model="detailsCtrl.page.demo.hcRenewDate" 
-							type="date"
-							class="form-control form-control-details" 
-							title="Health Card Renew Date" 
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="true" 
-							is-open="detailsCtrl.page.hcRenewDatePicker" 
-							ng-click="detailsCtrl.page.hcRenewDatePicker = true" 
-							placeholder="YYYY-MM-DD" 
-							style="background-color:{{detailsCtrl.page.hcRenewDateColor}}" 
-							ng-change="detailsCtrl.preventManualHcRenewDate()"
-						/>
+						<%--<input id="hcRenewDate" ng-model="detailsCtrl.page.demo.hcRenewDate" --%>
+							<%--type="date"--%>
+							<%--class="form-control form-control-details" --%>
+							<%--title="Health Card Renew Date" --%>
+							<%--datepicker-popup="yyyy-MM-dd" --%>
+							<%--datepicker-append-to-body="true" --%>
+							<%--is-open="detailsCtrl.page.hcRenewDatePicker" --%>
+							<%--ng-click="detailsCtrl.page.hcRenewDatePicker = true" --%>
+							<%--placeholder="YYYY-MM-DD" --%>
+							<%--style="background-color:{{detailsCtrl.page.hcRenewDateColor}}" --%>
+							<%--ng-change="detailsCtrl.preventManualHcRenewDate()"--%>
+						<%--/>--%>
+						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.hcRenewDate" show-icon="true" type="Input"> </juno-datepicker-popup>
+
 					</div>
 				</div>
 			</div>
@@ -646,17 +641,18 @@
 					</div>
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.DateJoined"/></label>
 					<div class="col-md-4">
-						<input id="rosterDate" ng-model="detailsCtrl.page.demo.rosterDate" 
-							type="date"
-							class="form-control form-control-details" 
-							title="Roster Date" 
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="true" 
-							is-open="detailsCtrl.page.rosterDatePicker" 
-							ng-click="detailsCtrl.page.rosterDatePicker = true"
-							placeholder="YYYY-MM-DD" 
-							ng-change="detailsCtrl.preventManualRosterDate()"
-						/>
+						<%--<input id="rosterDate" ng-model="detailsCtrl.page.demo.rosterDate" --%>
+							<%--type="date"--%>
+							<%--class="form-control form-control-details" --%>
+							<%--title="Roster Date" --%>
+							<%--datepicker-popup="yyyy-MM-dd" --%>
+							<%--datepicker-append-to-body="true" --%>
+							<%--is-open="detailsCtrl.page.rosterDatePicker" --%>
+							<%--ng-click="detailsCtrl.page.rosterDatePicker = true"--%>
+							<%--placeholder="YYYY-MM-DD" --%>
+							<%--ng-change="detailsCtrl.preventManualRosterDate()"--%>
+						<%--/>--%>
+						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.rosterDate" show-icon="true" type="Input"> </juno-datepicker-popup>
 					</div>
 				</div>
 				<div class="form-group">
@@ -713,48 +709,52 @@
 
 					<label class="col-md-2 control-label" ><bean:message key="demographic.demographiceditdemographic.PatientStatusDate"/></label>
 					<div class="col-md-4">
-						<input id="patientStatusDate" ng-model="detailsCtrl.page.demo.patientStatusDate" 
-							type="date"
-							class="form-control form-control-details" 
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="true" 
-							is-open="detailsCtrl.page.patientStatusDatePicker" 
-							ng-click="detailsCtrl.page.patientStatusDatePicker=true" 
-							title="YYYY-MM-DD" 
-							placeholder="<bean:message key="demographic.demographiceditdemographic.PatientStatusDate"/>" 
-							ng-change="detailsCtrl.preventManualPatientStatusDate()"
-						/>
+						<%--<input id="patientStatusDate" ng-model="detailsCtrl.page.demo.patientStatusDate" --%>
+							<%--type="date"--%>
+							<%--class="form-control form-control-details" --%>
+							<%--datepicker-popup="yyyy-MM-dd" --%>
+							<%--datepicker-append-to-body="true" --%>
+							<%--is-open="detailsCtrl.page.patientStatusDatePicker" --%>
+							<%--ng-click="detailsCtrl.page.patientStatusDatePicker=true" --%>
+							<%--title="YYYY-MM-DD" --%>
+							<%--placeholder="<bean:message key="demographic.demographiceditdemographic.PatientStatusDate"/>" --%>
+							<%--ng-change="detailsCtrl.preventManualPatientStatusDate()"--%>
+						<%--/>--%>
+						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.patientStatusDate" show-icon="true" type="Input"> </juno-datepicker-popup>
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formDateJoined1"/></label>
 					<div class="col-md-4">
-						<input id="dateJoined" ng-model="detailsCtrl.page.demo.dateJoined" 
-							type="date"
-							class="form-control form-control-details" 
-							title="Date Joined" 
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="true" 
-							is-open="detailsCtrl.page.dateJoinedPicker" 
-							ng-click="detailsCtrl.page.dateJoinedPicker = true" 
-							placeholder="YYYY-MM-DD" 
-							ng-change="detailsCtrl.preventManualDateJoined()"
-						/>
+						<%--<input id="dateJoined" ng-model="detailsCtrl.page.demo.dateJoined" --%>
+							<%--type="date"--%>
+							<%--class="form-control form-control-details" --%>
+							<%--title="Date Joined" --%>
+							<%--datepicker-popup="yyyy-MM-dd" --%>
+							<%--datepicker-append-to-body="true" --%>
+							<%--is-open="detailsCtrl.page.dateJoinedPicker" --%>
+							<%--ng-click="detailsCtrl.page.dateJoinedPicker = true" --%>
+							<%--placeholder="YYYY-MM-DD" --%>
+							<%--ng-change="detailsCtrl.preventManualDateJoined()"--%>
+						<%--/>--%>
+						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.dateJoined" show-icon="true" type="Input"> </juno-datepicker-popup>
 					</div>
 
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formEndDate"/></label>
 					<div class="col-md-4">
-						<input id="endDate" ng-model="detailsCtrl.page.demo.endDate" 
-							type="date"
-							class="form-control form-control-details" 
-							title="End Date" 
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="true" 
-							is-open="detailsCtrl.page.endDatePicker" 
-							ng-click="detailsCtrl.page.endDatePicker = true" 
-							placeholder="YYYY-MM-DD" 
-							ng-change="detailsCtrl.preventManualEndDate()"
-						/>
+						<%--<input id="endDate"--%>
+							   <%--ng-model="detailsCtrl.page.demo.endDate"--%>
+							<%--type="date"--%>
+							<%--class="form-control form-control-details"--%>
+							<%--title="End Date"--%>
+							<%--datepicker-popup="yyyy-MM-dd"--%>
+							<%--datepicker-append-to-body="true"--%>
+							<%--is-open="detailsCtrl.page.endDatePicker"--%>
+							<%--ng-click="detailsCtrl.page.endDatePicker = true"--%>
+							<%--placeholder="YYYY-MM-DD"--%>
+							<%--ng-change="detailsCtrl.preventManualEndDate()"--%>
+						<%--/>--%>
+						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.endDate" show-icon="true" type="Input"> </juno-datepicker-popup>
 					</div>
 				</div>
 				<div class="form-group">
@@ -799,16 +799,18 @@
 					</div>
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.paperChartIndicator.dateArchived"/></label>
 					<div class="col-md-4">
-						<input id="paperChartArchivedDate" ng-model="detailsCtrl.page.demo.scrPaperChartArchivedDate" 
-							type="text" 
-							class="form-control form-control-details" 
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="true" 
-							is-open="detailsCtrl.page.paperChartArchivedDatePicker" 
-							ng-click="detailsCtrl.page.paperChartArchivedDatePicker=true" 
-							title="YYYY-MM-DD" 
-							placeholder="<bean:message key="demographic.demographiceditdemographic.paperChartIndicator.dateArchived"/>" 
-							ng-change="detailsCtrl.preventManualPaperChartArchivedDate()"/>
+						<%--<input id="paperChartArchivedDate"--%>
+							   <%--ng-model="detailsCtrl.page.demo.scrPaperChartArchivedDate"--%>
+							<%--type="date"--%>
+							<%--class="form-control form-control-details" --%>
+							<%--datepicker-popup="yyyy-MM-dd" --%>
+							<%--datepicker-append-to-body="true" --%>
+							<%--is-open="detailsCtrl.page.paperChartArchivedDatePicker" --%>
+							<%--ng-click="detailsCtrl.page.paperChartArchivedDatePicker=true" --%>
+							<%--title="YYYY-MM-DD" --%>
+							<%--placeholder="<bean:message key="demographic.demographiceditdemographic.paperChartIndicator.dateArchived"/>" --%>
+							<%--ng-change="detailsCtrl.preventManualPaperChartArchivedDate()"/>--%>
+						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.extras['']" show-icon="true" type="Input"> </juno-datepicker-popup>
 					</div>
 				</div>
 				<div class="form-group">
@@ -823,18 +825,19 @@
 
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographicaddarecordhtm.msgDateOfReq"/></label>
 					<div class="col-md-4">
-						<input id="onWaitingListSinceDate" 
-							ng-model="detailsCtrl.page.demo.onWaitingListSinceDate" 
-							type="date"
-							class="form-control form-control-details" 
-							title="<bean:message key="demographic.demographicaddarecordhtm.msgDateOfReq"/>" 
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="true" 
-							is-open="detailsCtrl.page.onWaitingListSinceDatePicker" 
-							ng-click="detailsCtrl.page.onWaitingListSinceDatePicker = true" 
-							placeholder="YYYY-MM-DD" 
-							ng-change="detailsCtrl.preventManualOnWaitingListSinceDate()"
-						/>
+						<%--<input id="onWaitingListSinceDate" --%>
+							<%--ng-model="detailsCtrl.page.demo.onWaitingListSinceDate" --%>
+							<%--type="date"--%>
+							<%--class="form-control form-control-details" --%>
+							<%--title="<bean:message key="demographic.demographicaddarecordhtm.msgDateOfReq"/>" --%>
+							<%--datepicker-popup="yyyy-MM-dd" --%>
+							<%--datepicker-append-to-body="true" --%>
+							<%--is-open="detailsCtrl.page.onWaitingListSinceDatePicker" --%>
+							<%--ng-click="detailsCtrl.page.onWaitingListSinceDatePicker = true" --%>
+							<%--placeholder="YYYY-MM-DD" --%>
+							<%--ng-change="detailsCtrl.preventManualOnWaitingListSinceDate()"--%>
+						<%--/>--%>
+						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.onWaitingListSinceDate" show-icon="true" type="Input"> </juno-datepicker-popup>
 					</div>
 				</div>
 				<div class="form-group">
