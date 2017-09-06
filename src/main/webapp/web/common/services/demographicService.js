@@ -26,147 +26,136 @@
 
  */
 angular.module("Common.Services").service("demographicService", [
-	'$http', '$q',
-	function($http, $q)
-	{
-		var service = {};
+    '$http', '$q',
+    function($http, $q)
+    {
+        var service = {};
 
-		service.apiPath = '../ws/rs/';
+        service.apiPath = '../ws/rs/';
 
-		service.getDemographic = function getDemographic(demographicNo)
-		{
-			var deferred = $q.defer();
+        service.getDemographic = function getDemographic(demographicNo)
+        {
+            var deferred = $q.defer();
 
-			$http.get(service.apiPath + 'demographics/' + encodeURIComponent(demographicNo),
-				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
-				function success(results)
-				{
-					console.log('DEMO RESULTS: ', results.date);
-					// results.data.dateOfBirth = new Date(results.data.dateOfBirth);
-					results.data.effDate = new Date(results.data.effDate);
-					results.data.hcRenewDate = new Date(results.data.hcRenewDate);
-					results.data.endDate = new Date(results.data.endDate);
-                    results.data.patientStatusDate = new Date(results.data.patientStatusDate);
-                    results.data.onWaitingListSinceDate = new Date(results.data.onWaitingListSinceDate);
-                    results.data.scrPaperChartArchivedDate = new Date(results.data.scrPaperChartArchivedDate);
-					results.data.dateJoined = new Date(results.data.dateJoined);
-					results.data.rosterDate = new Date(results.data.rosterDate);
+            $http.get(service.apiPath + 'demographics/' + encodeURIComponent(demographicNo),
+                Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+                function success(results)
+                {
+                    results.data.effDate = moment(results.data.effDate).toDate();
+                    results.data.hcRenewDate = moment(results.data.hcRenewDate).toDate();
+                    results.data.endDate = moment(results.data.endDate).toDate();
+                    results.data.patientStatusDate = moment(results.data.patientStatusDate).toDate();
+                    results.data.onWaitingListSinceDate = moment(results.data.onWaitingListSinceDate).toDate();
+                    results.data.scrPaperChartArchivedDate = moment(results.data.scrPaperChartArchivedDate).toDate();
+                    results.data.dateJoined = moment(results.data.dateJoined).toDate();
+                    results.data.rosterTerminationDate = moment(results.data.rosterTerminationDate).toDate();
+                    results.data.rosterDate = moment(results.data.rosterDate).toDate();
                     console.log('converted RESULTS: ', results.data);
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("demographicServices::getDemographic error", errors);
-					deferred.reject("An error occurred while fetching demographic");
-				});
+                    deferred.resolve(results.data);
+                },
+                function error(errors)
+                {
+                    console.log("demographicServices::getDemographic error", errors);
+                    deferred.reject("An error occurred while fetching demographic");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.saveDemographic = function saveDemographic(demographic)
-		{
-			var deferred = $q.defer();
+        service.saveDemographic = function saveDemographic(demographic)
+        {
+            var deferred = $q.defer();
 
-			$http.post(service.apiPath + 'demographics', demographic).then(
-				function success(results)
-				{
-					deferred.resolve(results.data);
-                    // results.data.dateOfBirth = new Date(results.data.dateOfBirth);
-                    results.data.effDate = new Date(results.data.effDate);
-                    results.data.hcRenewDate = new Date(results.data.hcRenewDate);
-                    results.data.endDate = new Date(results.data.endDate);
-                    results.data.patientStatusDate = new Date(results.data.patientStatusDate);
-                    results.data.onWaitingListSinceDate = new Date(results.data.onWaitingListSinceDate);
-                    results.data.scrPaperChartArchivedDate = new Date(results.data.scrPaperChartArchivedDate);
-                    results.data.dateJoined = new Date(results.data.dateJoined);
-                    results.data.rosterDate = new Date(results.data.rosterDate);
-                    console.log('converted RESULTS: ', results.data);
-				},
-				function error(errors)
-				{
-					console.log("demographicServices::updateDemographic error", errors);
-					deferred.reject("An error occurred while saving demographic");
-				});
+            $http.post(service.apiPath + 'demographics', demographic).then(
+                function success(results)
+                {
+                    deferred.resolve(results.data);
+                },
+                function error(errors)
+                {
+                    console.log("demographicServices::updateDemographic error", errors);
+                    deferred.reject("An error occurred while saving demographic");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.updateDemographic = function updateDemographic(demographic)
-		{
-			var deferred = $q.defer();
+        service.updateDemographic = function updateDemographic(demographic)
+        {
+            var deferred = $q.defer();
 
-			$http.put(service.apiPath + 'demographics', demographic).then(
-				function success(results)
-				{
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("demographicServices::updateDemographic error", errors);
-					deferred.reject("An error occurred while updating demographic");
-				});
+            $http.put(service.apiPath + 'demographics', demographic).then(
+                function success(results)
+                {
+                    deferred.resolve(results.data);
+                },
+                function error(errors)
+                {
+                    console.log("demographicServices::updateDemographic error", errors);
+                    deferred.reject("An error occurred while updating demographic");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.quickSearch = function quickSearch(search)
-		{
-			var deferred = $q.defer();
+        service.quickSearch = function quickSearch(search)
+        {
+            var deferred = $q.defer();
 
-			$http.get(service.apiPath + 'demographics/quickSearch?query=' +
-				encodeURIComponent(search)).then(
-				function success(results)
-				{
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("demographicServices::quickSearch error", errors);
-					deferred.reject("An error occurred while searching");
-				});
+            $http.get(service.apiPath + 'demographics/quickSearch?query=' +
+                encodeURIComponent(search)).then(
+                function success(results)
+                {
+                    deferred.resolve(results.data);
+                },
+                function error(errors)
+                {
+                    console.log("demographicServices::quickSearch error", errors);
+                    deferred.reject("An error occurred while searching");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.search = function search(search, startIndex, itemsToReturn)
-		{
-			var deferred = $q.defer();
+        service.search = function search(search, startIndex, itemsToReturn)
+        {
+            var deferred = $q.defer();
 
-			$http.post(service.apiPath + 'demographics/search?startIndex=' +
-				encodeURIComponent(startIndex) + "&itemsToReturn=" +
-				encodeURIComponent(itemsToReturn), search).then(
-				function success(results)
-				{
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("demographicServices::search error", errors);
-					deferred.reject("An error occurred while searching");
-				});
+            $http.post(service.apiPath + 'demographics/search?startIndex=' +
+                encodeURIComponent(startIndex) + "&itemsToReturn=" +
+                encodeURIComponent(itemsToReturn), search).then(
+                function success(results)
+                {
+                    deferred.resolve(results.data);
+                },
+                function error(errors)
+                {
+                    console.log("demographicServices::search error", errors);
+                    deferred.reject("An error occurred while searching");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		service.searchIntegrator = function searchIntegrator(search, itemsToReturn)
-		{
-			var deferred = $q.defer();
+        service.searchIntegrator = function searchIntegrator(search, itemsToReturn)
+        {
+            var deferred = $q.defer();
 
-			$http.post(service.apiPath + 'demographics/searchIntegrator?itemsToReturn=' +
-				encodeURIComponent(itemsToReturn), search).then(
-				function success(results)
-				{
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("demographicServices::searchIntegrator error", errors);
-					deferred.reject("An error occurred while searching");
-				});
+            $http.post(service.apiPath + 'demographics/searchIntegrator?itemsToReturn=' +
+                encodeURIComponent(itemsToReturn), search).then(
+                function success(results)
+                {
+                    deferred.resolve(results.data);
+                },
+                function error(errors)
+                {
+                    console.log("demographicServices::searchIntegrator error", errors);
+                    deferred.reject("An error occurred while searching");
+                });
 
-			return deferred.promise;
-		};
+            return deferred.promise;
+        };
 
-		return service;
-	}
+        return service;
+    }
 ]);
