@@ -215,10 +215,7 @@ public class OscarProperties extends Properties {
 		try {
 			dateFormat = getProperty("display_date_format");
 			SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-		} catch(NullPointerException e) {
-			dateFormat = DEFAULT_DATE_FORMAT;
-			MiscUtils.getLogger().error("Error", e);
-		} catch(IllegalArgumentException e) {
+		} catch(NullPointerException | IllegalArgumentException e)  {
 			dateFormat = DEFAULT_DATE_FORMAT;
 			MiscUtils.getLogger().error("Error", e);
 		}
