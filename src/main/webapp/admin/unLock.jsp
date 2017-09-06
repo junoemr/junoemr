@@ -61,22 +61,21 @@ if(!authed) {
   String ip = request.getRemoteAddr();
   String msg = "Unlock";
   LoginCheckLogin cl = new LoginCheckLogin();
-  Vector vec = cl.findLockList();
-  if(vec == null) vec = new Vector();
-  
+  ArrayList<String> lockList = cl.findLockList();
+
   if (request.getParameter("submit") != null && request.getParameter("submit").equals("Unlock")) {
     // unlock
     if(request.getParameter("userName") != null && request.getParameter("userName").length()>0) {
       String userName = request.getParameter("userName");
-      vec.remove(userName);
+      lockList.remove(userName);
       cl.unlock(userName);
-	  LogAction.addLog(curUser_no, "unlock", "adminUnlock", userName, ip);
+	  LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_UNLOCK, LogConst.CON_ADMIN, LogConst.STATUS_SUCCESS, null, ip, userName);
       msg = "The login account " + userName + " was unlocked.";
     }
   } 
   
   //multi-office limit
-  if (isSiteAccessPrivacy && vec.size() > 0) {
+  if (isSiteAccessPrivacy && lockList.size() > 0) {
 
 	  List<String> userList = new ArrayList<String>();
 	  List<Security> securityList = securityDao.findByProviderSite(curUser_no);
@@ -85,9 +84,9 @@ if(!authed) {
 		userList.add(security.getUserName());
 	  }
 	  
-	  for(int i=0; i<vec.size(); i++) {
-		  if (!userList.contains((String)vec.get(i))) {
-			  vec.remove((String)vec.get(i));
+	  for(int i = 0; i< lockList.size(); i++) {
+		  if (!userList.contains(lockList.get(i))) {
+			  lockList.remove(lockList.get(i));
 		  }
 	  }
   }
@@ -101,15 +100,7 @@ if(!authed) {
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title>Unlock</title>
-<script type="text/javascript" language="JavaScript">
 
-      <!--
-		
-	    function onSearch() {
-	    }
-//-->
-
-      </script>
 </head>
 <body bgcolor="ivory" onLoad="setfocus()" style="margin: 0px">
 <table BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
@@ -133,8 +124,8 @@ if(!authed) {
 	<tr bgcolor="#EEEEFF">
 		<td align="right"><b>Role name</b></td>
 		<td><select name="userName">
-			<% for(int i=0; i<vec.size(); i++) { %>
-			<option value="<%=(String) vec.get(i) %>"><%=(String) vec.get(i) %></option>
+			<% for(String lock : lockList) { %>
+			<option value="<%=lock%>"><%=lock%></option>
 			<% } %>
 		</select> <input type="submit" name="submit" value="Unlock" /></td>
 	</tr>

@@ -174,7 +174,7 @@ public final class LoginAction extends DispatchAction {
 	            return mapping.findForward(nextPage);
 	        }
 	        
-	        if (cl.isBlock(ip, userName)) {
+	        if (cl.isBlocked(ip, userName)) {
 	        	logger.info(LOG_PRE + " Blocked: " + userName);
 	            // return mapping.findForward(where); //go to block page
 	            // change to block page
