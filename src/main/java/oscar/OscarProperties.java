@@ -56,6 +56,8 @@ public class OscarProperties extends Properties {
 	private static final String INSTANCE_TYPE_BC = "BC";
 	private static final String INSTANCE_TYPE_ALBERTA = "AB";
 
+	private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+
 	/* Do not use this constructor. Use getInstance instead */
 	private OscarProperties() {
 		MiscUtils.getLogger().debug("OSCAR PROPS CONSTRUCTOR");
@@ -205,8 +207,15 @@ public class OscarProperties extends Properties {
 	// Methods for getting specific property values
 	// =========================================================================
 
-	public String getDemographicDobFormatOverride() {
-		return getProperty("demographic_dob_format_override");
+	public String getDisplayDateFormat() {
+
+		String dateFormat = getProperty("display_date_format");
+
+		if(dateFormat == null) {
+			dateFormat = DEFAULT_DATE_FORMAT;
+		}
+
+		return dateFormat;
 	}
 
 	public Date getStartTime() {

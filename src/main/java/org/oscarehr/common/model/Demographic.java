@@ -1129,15 +1129,14 @@ public class Demographic implements Serializable {
 	public String getBirthDayMasterFileString() {
 
 		String result = getBirthDayAsString();
-		String dobFormatOverride = OscarProperties.getInstance().getDemographicDobFormatOverride();
-		if(dobFormatOverride != null) {
-			try {
-				SimpleDateFormat formatter = new SimpleDateFormat(dobFormatOverride);
-				formatter.setCalendar(getBirthDay());
-				result = formatter.format(getBirthDay().getTime());
-			} catch(Exception e) {
-				// do nothing; use default result
-			}
+		String dateFormat = OscarProperties.getInstance().getDisplayDateFormat();
+
+		try {
+			SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+			formatter.setCalendar(getBirthDay());
+			result = formatter.format(getBirthDay().getTime());
+		} catch(Exception e) {
+			MiscUtils.getLogger().info("Error", e);
 		}
 
 		return result;
