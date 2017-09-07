@@ -74,7 +74,7 @@ public class AppointmentStatusDAOHibernate extends HibernateDaoSupport
             apptStatus = (AppointmentStatus) allStatus.get(i);
             if (apptStatus.getActive()==1)
                 continue;
-            sql = "select count(*) as total from appointment where status like lower(:status) ";
+            sql = "select count(*) as total from appointment where status like binary :status";
             query = getSession().createSQLQuery(sql);
             query.setParameter("status", apptStatus.getStatus()+"%");
             query.addScalar("total", Hibernate.INTEGER);
