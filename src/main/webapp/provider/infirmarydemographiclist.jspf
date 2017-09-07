@@ -82,7 +82,6 @@ String reason ="";
 String notes = "";
 String status = "T";
 bFirstTimeRs=true;
-as.setApptStatus(status);
 
 String rsAppointNO="0";
 if ((k/2)*2==k){ %>
