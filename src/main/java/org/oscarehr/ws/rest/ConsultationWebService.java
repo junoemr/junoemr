@@ -23,7 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.text.*;
 import java.time.format.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,7 +67,6 @@ import org.oscarehr.ws.rest.conversion.ConsultationServiceConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
 import org.oscarehr.ws.rest.conversion.ProfessionalSpecialistConverter;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
-import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.ReferralResponse;
 import org.oscarehr.ws.rest.to.model.ConsultationAttachmentTo1;
 import org.oscarehr.ws.rest.to.model.ConsultationRequestSearchResult;
@@ -83,7 +81,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
 import net.sf.json.JSONObject;
-import oscar.*;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.eform.EFormUtil;
@@ -206,7 +203,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 				return RestResponse.errorResponse(headers, "No Consult found with id " + requestId);
 			}
 			request = requestConverter.getAsTransferObject(getLoggedInInfo(), consult);
-			request.setAttachments(getRequestAttachments(requestId, request.getDemographicId(), ConsultationAttachmentTo1.ATTACHED));
+			request.setAttachments(getRequestAttachments(requestId, request.getDemographicId(), ConsultationAttachmentTo1.ATTACHED).getBody());
 
 			request.setLetterheadList(getLetterheadList());
 			request.setFaxList(getFaxList());
@@ -222,61 +219,70 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	}
 	
 	@GET
-	@Path("/getRequestAttachments")
+	@Path("/getRequestAttachments/{requestId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<ConsultationAttachmentTo1> getRequestAttachments(@QueryParam("requestId")Integer requestId, @QueryParam("demographicId")Integer demographicIdInt, @QueryParam("attached")boolean attached) {
-		List<ConsultationAttachmentTo1> attachments = new ArrayList<ConsultationAttachmentTo1>();
-		String demographicId = demographicIdInt.toString();
-		
-		List<EDoc> edocs = EDocUtil.listDocs(getLoggedInInfo(), demographicId, requestId.toString(), attached);
-		getDocuments(edocs, attached, attachments);
-		
-		List<EFormData> eforms = EFormUtil.listPatientEFormsShowLatestOnly(demographicId);
-		getEformsForRequest(eforms, attached, attachments, requestId);
-		
-		List<LabResultData> labs = new CommonLabResultData().populateLabResultsData(getLoggedInInfo(), demographicId, requestId.toString(), attached);
-		getLabs(labs, demographicId, attached, attachments);
-		
-		return attachments;
+	public RestResponse<List<ConsultationAttachmentTo1>,String> getRequestAttachments(@PathParam("requestId")Integer requestId,
+	                                                                                  @QueryParam("demographicId")Integer demographicIdInt,
+	                                                                                  @QueryParam("attached")boolean attached) {
+		try {
+			List<ConsultationAttachmentTo1> attachments = new ArrayList<ConsultationAttachmentTo1>();
+			String demographicId = demographicIdInt.toString();
+
+			List<EDoc> edocs = EDocUtil.listDocs(getLoggedInInfo(), demographicId, requestId.toString(), attached);
+			getDocuments(edocs, attached, attachments);
+
+			List<EFormData> eforms = EFormUtil.listPatientEFormsShowLatestOnly(demographicId);
+			getEformsForRequest(eforms, attached, attachments, requestId);
+
+			List<LabResultData> labs = new CommonLabResultData().populateLabResultsData(getLoggedInInfo(), demographicId, requestId.toString(), attached);
+			getLabs(labs, demographicId, attached, attachments);
+			return RestResponse.successResponse(new HttpHeaders(), attachments);
+		}
+		catch(Exception e) {
+			logger.error("Error", e);
+			return RestResponse.errorResponse(new HttpHeaders(), "Failed to retrieve Attachments");
+		}
 	}
 
 	@POST
 	@Path("/saveRequest")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ConsultationRequestTo1 saveRequest(ConsultationRequestTo1 data) {
-		ConsultationRequest request = null;
-		
-		if (data.getId()==null) { //new consultation request
-			request = requestConverter.getAsDomainObject(getLoggedInInfo(), data);
-		} else {
-			request = requestConverter.getAsDomainObject(getLoggedInInfo(), data, consultationManager.getRequest(getLoggedInInfo(), data.getId()));
+	public RestResponse<ConsultationRequestTo1,String> saveRequest(ConsultationRequestTo1 data) {
+		try {
+			ConsultationRequest request;
+			if (data.getId() == null) { //new consultation request
+				request = requestConverter.getAsDomainObject(getLoggedInInfo(), data);
+			}
+			else {
+				request = requestConverter.getAsDomainObject(getLoggedInInfo(), data, consultationManager.getRequest(getLoggedInInfo(), data.getId()));
+			}
+			request.setProfessionalSpecialist(consultationManager.getProfessionalSpecialist(data.getProfessionalSpecialist().getId()));
+			consultationManager.saveConsultationRequest(getLoggedInInfo(), request);
+			if (data.getId() == null) data.setId(request.getId());
+
+			//save attachments
+			saveRequestAttachments(data);
+			return RestResponse.successResponse(new HttpHeaders(), data);
 		}
-		request.setProfessionalSpecialist(consultationManager.getProfessionalSpecialist(data.getProfessionalSpecialist().getId()));
-		consultationManager.saveConsultationRequest(getLoggedInInfo(), request);
-	    if (data.getId()==null) data.setId(request.getId());
-	    
-		//save attachments
-		saveRequestAttachments(data);
-		
-		return data;
+		catch(Exception e) {
+			logger.error("Error saving Consult Request", e);
+			return RestResponse.errorResponse(new HttpHeaders(), "Failed to save Consult");
+		}
 	}
 	
 	@GET
-	@Path("/eSendRequest")
+	@Path("/eSendRequest/{requestId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public GenericRESTResponse eSendRequest(@QueryParam("requestId")Integer requestId) {
-		GenericRESTResponse rp = new GenericRESTResponse();
+	public RestResponse<String,String> eSendRequest(@PathParam("requestId")Integer requestId) {
 		try {
-            consultationManager.doHl7Send(getLoggedInInfo(), requestId);
-            rp.setSuccess(true);
-            rp.setMessage("Referral Electronically Sent");
-        } catch (Exception e) {
-        	MiscUtils.getLogger().error("Error contacting remote server.", e);
-        	rp.setSuccess(false);
-        	rp.setMessage("There was an error sending electronically, please try again or manually process the referral.");
-        }
-		return rp;
+			consultationManager.doHl7Send(getLoggedInInfo(), requestId);
+			return RestResponse.successResponse(new HttpHeaders(), "Referral Electronically Sent");
+		}
+		catch (Exception e) {
+			logger.error("Error contacting remote server.", e);
+			return RestResponse.errorResponse(new HttpHeaders(), "There was an error sending electronically, please try again or manually process the referral.");
+		}
 	}
 	
 	
@@ -437,35 +443,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		}
 		return null;
 	}
-	
-	private ConsultationRequestSearchFilter convertRequestJSON(JSONObject json) {
-		ConsultationRequestSearchFilter filter = new ConsultationRequestSearchFilter();
-		
-		filter.setAppointmentEndDate(convertJSONDate((String)json.get("appointmentEndDate")));
-		filter.setAppointmentStartDate(convertJSONDate((String)json.get("appointmentStartDate")));
-		filter.setDemographicNo((Integer)json.get("demographicNo"));
-		filter.setMrpNo((Integer)json.get("mrpNo"));
-		filter.setNumToReturn((Integer)json.get("numToReturn"));
-		filter.setReferralEndDate(convertJSONDate((String)json.get("referralEndDate")));
-		filter.setReferralStartDate(convertJSONDate((String)json.get("referralStartDate")));
-		filter.setStartIndex((Integer)json.get("startIndex"));
-		filter.setStatus((Integer)json.get("status"));
-		filter.setTeam((String)json.get("team"));
-		
-		JSONObject params = json.getJSONObject("params");
-		if(params != null) {
-			for(Object key:params.keySet()) {
-				Matcher nameMtchr = namePtrn.matcher((String)key);
-				if (nameMtchr.find()) {
-				   String var = nameMtchr.group(1);
-				   filter.setSortMode(ConsultationRequestSearchFilter.SORTMODE.valueOf(var));
-				   filter.setSortDir(ConsultationRequestSearchFilter.SORTDIR.valueOf(params.getString((String)key)));
-				}
-			}
-		}
-		return filter;
-	}
-	
+
 	private ConsultationResponseSearchFilter convertResponseJSON(JSONObject json) {
 		ConsultationResponseSearchFilter filter = new ConsultationResponseSearchFilter();
 		

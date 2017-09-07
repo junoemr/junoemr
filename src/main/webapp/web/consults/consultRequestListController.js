@@ -342,7 +342,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				var count = params.url().count;
 				var page = params.url().page;
 
-				// shouldn't need these anymmore
+				// shouldn't need these anymore
 				//TODO refactor out of all uses here.
 				controller.search.startIndex = ((page - 1) * count);
 				controller.search.numToReturn = parseInt(count);

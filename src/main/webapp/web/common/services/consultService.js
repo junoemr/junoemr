@@ -62,7 +62,7 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			junoHttp.get(service.apiPath + 'getRequest/' + requestId ,
+			junoHttp.get(service.apiPath + 'getRequest/' + encodeURIComponent(requestId) ,
 				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
 				function success(results)
 				{
@@ -83,11 +83,13 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			$http.get(service.apiPath + 'getRequestAttachments?requestId=' +
-				encodeURIComponent(requestId) + '&demographicId=' +
-				encodeURIComponent(demographicId) + '&attached=' +
-				encodeURIComponent(attached)
-			).then(
+			var config = Juno.Common.ServiceHelper.configHeadersWithCache();
+			config.params = {
+				'demographicId': encodeURIComponent(demographicId),
+				'attached': encodeURIComponent(attached)
+			};
+
+			junoHttp.get(service.apiPath + 'getRequestAttachments/' + encodeURIComponent(requestId), config).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
@@ -95,8 +97,7 @@ angular.module("Common.Services").service("consultService", [
 				function error(errors)
 				{
 					console.log("consultService::getRequestAttachments error", errors);
-					deferred.reject(
-						"An error occured while getting consult attachments (requestId=" + requestId + ")");
+					deferred.reject("An error occured while getting consult attachments (requestId=" + requestId + ")");
 				});
 
 			return deferred.promise;
@@ -109,7 +110,7 @@ angular.module("Common.Services").service("consultService", [
 			var requestTo1 = {
 				consultationRequestTo1: request
 			};
-			$http.post(service.apiPath + 'saveRequest', requestTo1).then(
+			junoHttp.post(service.apiPath + 'saveRequest', requestTo1).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
@@ -127,7 +128,8 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			$http.get(service.apiPath + 'eSendRequest?requestId=' + encodeURIComponent(requestId)).then(
+			junoHttp.get(service.apiPath + 'eSendRequest/' + encodeURIComponent(requestId),
+				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
