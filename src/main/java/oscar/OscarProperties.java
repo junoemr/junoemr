@@ -28,6 +28,7 @@ package oscar;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -55,6 +56,8 @@ public class OscarProperties extends Properties {
 	private static final String INSTANCE_TYPE_ONTARIO = "ON";
 	private static final String INSTANCE_TYPE_BC = "BC";
 	private static final String INSTANCE_TYPE_ALBERTA = "AB";
+
+	private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
 
 	/* Do not use this constructor. Use getInstance instead */
 	private OscarProperties() {
@@ -204,6 +207,22 @@ public class OscarProperties extends Properties {
 	// =========================================================================
 	// Methods for getting specific property values
 	// =========================================================================
+
+	public String getDisplayDateFormat() {
+
+		String dateFormat;
+
+		try {
+			dateFormat = getProperty("display_date_format");
+			SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+		} catch(NullPointerException | IllegalArgumentException e)  {
+			dateFormat = DEFAULT_DATE_FORMAT;
+			MiscUtils.getLogger().error("Error", e);
+		}
+
+		return dateFormat;
+	}
+
 	public Date getStartTime() {
 		String str = getProperty("OSCAR_START_TIME");
 		Date ret = null;
