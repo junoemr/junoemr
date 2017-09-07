@@ -134,7 +134,7 @@ public class ManageDocumentAction extends DispatchAction {
 		String docType = request.getParameter("docType");// :consult<
 		String providerId = (String) request.getSession().getAttribute("user");
 		Integer demographicNo = Integer.parseInt(request.getParameter("demog"));
-		boolean linkToProvider = props.isPropertyActive("link_docs_to_provider");
+		boolean linkToProvider = props.isPropertyActive("assign_document.link_docs_to_provider");
 
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
         	throw new SecurityException("missing required security object (_edoc)");
