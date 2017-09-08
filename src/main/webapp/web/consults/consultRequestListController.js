@@ -233,7 +233,6 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 
 		controller.doSearch = function doSearch()
 		{
-			controller.tableParams.page = 1;
 			controller.tableParams.reload();
 		};
 
@@ -394,7 +393,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 							}
 						}
 						controller.lastResponse = result.content;
-
+						controller.consultList = result.content;
 					},
 					function error(errors)
 					{
