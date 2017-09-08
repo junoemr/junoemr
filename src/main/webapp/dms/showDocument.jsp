@@ -625,8 +625,7 @@
         
         function setupDemoAutoCompletion() {
 
-            var linkDocsToProvider = true;
-            linkDocsToProvider = <%=autoLinkDocsToProvider%>;
+            var linkDocsToProvider = <%=autoLinkDocsToProvider%>;
 
         	if(jQuery("#autocompletedemo<%=docId%>") ){
         		
