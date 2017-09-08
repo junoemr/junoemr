@@ -44,6 +44,7 @@ import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.caisi_integrator.ws.DemographicTransfer;
 import org.oscarehr.caisi_integrator.ws.DemographicWs;
 import org.oscarehr.casemgmt.dao.ClientImageDAO;
+import org.oscarehr.casemgmt.model.ClientImage;
 import org.oscarehr.common.dao.DigitalSignatureDao;
 import org.oscarehr.common.model.DigitalSignature;
 import org.oscarehr.common.model.Provider;
@@ -124,13 +125,26 @@ public final class ImageRenderingServlet extends HttpServlet {
 	 * @param imageType image sub type of the contentType, i.e. "jpeg" "png"
 	 * @throws IOException
 	 */
-	private static final void renderImage(HttpServletResponse response, byte[] image, String imageType) throws IOException {
+	private static final int renderImage(HttpServletResponse response, byte[] image, String imageType) throws IOException {
+		if(image == null) { // this method should never be called with a null image
+			return HttpServletResponse.SC_NO_CONTENT;
+		}
+		response.setContentLength(image.length);
 		response.setContentType("image/" + imageType);
-		if(image !=null)
-			response.setContentLength(image.length);
+
 		BufferedOutputStream bos = new BufferedOutputStream(response.getOutputStream());
-		bos.write(image);
-		bos.flush();
+		try {
+			bos.write(image);
+		}
+		catch(IOException e) {
+			// Once the output stream or writer has been created, errors should not be output using response.sendError,
+			// as the response has already been committed and this is an illegal state
+			logger.error("IO Error while streaming image", e);
+		}
+		finally {
+			bos.flush();
+		}
+		return HttpServletResponse.SC_OK;
 	}
 	private static byte[] getDefaultImage(HttpServletRequest request) {
 		String defaultClientImage = "/images/defaultG_img.jpg";
@@ -143,8 +157,9 @@ public final class ImageRenderingServlet extends HttpServlet {
             while ( (n = is.read(byteChunk)) > 0 ) {
             	bais.write(byteChunk, 0, n);
         	}
-        } catch (IOException e) {
-        	logger.error("Error reading default image.", e);
+        }
+        catch (IOException e) {
+	        logger.error("Error reading default image.", e);
         }
 		return bais.toByteArray();
 	}
@@ -169,11 +184,12 @@ public final class ImageRenderingServlet extends HttpServlet {
 			DemographicTransfer demographicTransfer = demographicWs.getDemographicByFacilityIdAndDemographicId(integratorFacilityId, caisiClientId);
 
 			if (demographicTransfer != null && demographicTransfer.getPhoto() != null) {
-				renderImage(response, demographicTransfer.getPhoto(), "jpeg");
-				return HttpServletResponse.SC_OK;
+				return renderImage(response, demographicTransfer.getPhoto(), "jpeg");
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			logger.error("Unexpected error.", e);
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		}
 
 		return HttpServletResponse.SC_NOT_FOUND;
@@ -197,14 +213,13 @@ public final class ImageRenderingServlet extends HttpServlet {
 			org.oscarehr.hnr.ws.Client hnrClient = CaisiIntegratorManager.getHnrClient(loggedInInfo, loggedInInfo.getCurrentFacility(),linkingId);
 
 			if (hnrClient != null && hnrClient.getImage() != null) {
-				renderImage(response, hnrClient.getImage(), "jpeg");
-				return HttpServletResponse.SC_OK;
+				return renderImage(response, hnrClient.getImage(), "jpeg");
 			}
 		}
 		catch (Exception e) {
 			logger.error("Unexpected error.", e);
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		}
-
 		return HttpServletResponse.SC_NOT_FOUND;
 	}
 
@@ -220,19 +235,20 @@ public final class ImageRenderingServlet extends HttpServlet {
 
 		try {
 			// get image
-			org.oscarehr.casemgmt.model.ClientImage clientImage = clientImageDAO.getClientImage(Integer.parseInt(request.getParameter("clientId")));
+			ClientImage clientImage = clientImageDAO.getClientImage(Integer.parseInt(request.getParameter("clientId")));
+			byte[] imageBytes;
 			if (clientImage != null && "jpg".equalsIgnoreCase(clientImage.getImage_type())) {
-				renderImage(response, clientImage.getImage_data(), "jpeg");
-				return HttpServletResponse.SC_OK;
-			} else {
-				renderImage(response, getDefaultImage(request), "jpeg");
+				imageBytes = clientImage.getImage_data();
 			}
+			else {
+				imageBytes = getDefaultImage(request);
+			}
+			return renderImage(response, imageBytes, "jpeg");
 		}
 		catch (Exception e) {
 			logger.error("Unexpected error.", e);
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		}
-
-		return HttpServletResponse.SC_NOT_FOUND;
 	}
 	
 	private int renderSignaturePreview(HttpServletRequest request, HttpServletResponse response) {
@@ -254,9 +270,8 @@ public final class ImageRenderingServlet extends HttpServlet {
 				fileInputStream = new FileInputStream(tempFilePath);
 				byte[] imageBytes = new byte[1024 * 256];
 				fileInputStream.read(imageBytes);
-				renderImage(response, imageBytes, "jpeg");
-				return HttpServletResponse.SC_OK;
-			} 
+				return renderImage(response, imageBytes, "jpeg");
+			}
 			catch (FileNotFoundException e) {
 				// no image, render a blank gif, yes this breaks the concept 
 				// of the image already exists, but it's difficult to implement the preview otherwise
@@ -264,16 +279,15 @@ public final class ImageRenderingServlet extends HttpServlet {
 				fileInputStream = new FileInputStream(tempFilePath);
 				byte[] imageBytes = new byte[1024 * 32];
 				fileInputStream.read(imageBytes);
-				renderImage(response, imageBytes, "gif");
-				return HttpServletResponse.SC_OK;
+				return renderImage(response, imageBytes, "gif");
 			} finally {
 				IOUtils.closeQuietly(fileInputStream);
 			}
-		} catch (Exception e) {
-			logger.error("Unexpected error.", e);
 		}
-
-		return HttpServletResponse.SC_NOT_FOUND;
+		catch (Exception e) {
+			logger.error("Unexpected error.", e);
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+		}
 	}
 	
 	private static final int renderSignatureStored(HttpServletRequest request, HttpServletResponse response) {
@@ -290,11 +304,11 @@ public final class ImageRenderingServlet extends HttpServlet {
 			// get image
 			DigitalSignature digitalSignature = digitalSignatureDao.find(Integer.parseInt(request.getParameter("digitalSignatureId")));
 			if (digitalSignature != null) {
-				renderImage(response, digitalSignature.getSignatureImage(), "jpeg");
-				return HttpServletResponse.SC_OK;
+				return renderImage(response, digitalSignature.getSignatureImage(), "jpeg");
 			}
 		} catch (Exception e) {
 			logger.error("Unexpected error.", e);
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		}
 
 		return HttpServletResponse.SC_NOT_FOUND;
@@ -317,13 +331,13 @@ public final class ImageRenderingServlet extends HttpServlet {
 					byte[] data = FileUtils.readFileToByteArray(f);
 					
 					if(data != null) {
-						renderImage(response, data, "jpeg");
-						return HttpServletResponse.SC_OK;
+						return renderImage(response, data, "jpeg");
 					}
 				}
 			}
 		} catch (Exception e) {
 			logger.error("Unexpected error.", e);
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		}
 
 		return HttpServletResponse.SC_NOT_FOUND;

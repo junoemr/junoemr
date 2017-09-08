@@ -27,7 +27,6 @@ package org.oscarehr.common.model;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 /**
