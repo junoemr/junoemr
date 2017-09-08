@@ -4328,17 +4328,17 @@ angular.module("Common.Services").service("staticDataService", [
 			var urgencies = [];
 			urgencies.push(
 			{
-				value: 2,
+				value: "2",
 				name: "Non-Urgent"
 			});
 			urgencies.push(
 			{
-				value: 1,
+				value: "1",
 				name: "Urgent"
 			});
 			urgencies.push(
 			{
-				value: 3,
+				value: "3",
 				name: "Return"
 			});
 			return urgencies;
@@ -4349,37 +4349,37 @@ angular.module("Common.Services").service("staticDataService", [
 			var statuses = [];
 			statuses.push(
 			{
-				value: 1,
+				value: "1",
 				name: "Not Complete"
 			});
 			statuses.push(
 			{
-				value: 2,
+				value: "2",
 				name: "Preliminary Pending Specialist"
 			});
 			statuses.push(
 			{
-				value: 3,
+				value: "3",
 				name: "Pending Callback"
 			});
 			statuses.push(
 			{
-				value: 4,
+				value: "4",
 				name: "Completed"
 			});
 			statuses.push(
 			{
-				value: 5,
+				value: "5",
 				name: "Cancelled"
 			});
 			statuses.push(
 			{
-				value: 6,
+				value: "6",
 				name: "Appointment Booked"
 			});
 			statuses.push(
 			{
-				value: 7,
+				value: "7",
 				name: "Deleted"
 			});
 			return statuses;
