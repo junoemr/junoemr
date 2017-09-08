@@ -70,6 +70,10 @@ angular.module("Common.Services").service("consultService", [
 			}).then(
 				function success(results)
 				{
+					results.data.referralDate = moment(results.data.referralDate).toDate();
+					results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
+					results.data.followUpDate = moment(results.data.followUpDate).toDate();
+
 					deferred.resolve(results.data);
 				},
 				function error(errors)
@@ -110,10 +114,7 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			var requestTo1 = {
-				consultationRequestTo1: request
-			};
-			$http.post(service.apiPath + 'saveRequest', requestTo1).then(
+			$http.post(service.apiPath + 'saveRequest', request).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
