@@ -61,10 +61,12 @@
             UserPropertyDAO userPropertyDAO = (UserPropertyDAO)SpringUtils.getBean("UserPropertyDAO");
             OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
             ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
+            OscarProperties props = OscarProperties.getInstance();
                
             String providerNo = request.getParameter("providerNo");
             UserProperty uProp = userPropertyDAO.getProp(providerNo, UserProperty.LAB_ACK_COMMENT);                        
             boolean skipComment = false;
+            boolean autoLinkDocsToProvider = props.isPropertyActive("assign_document.link_docs_to_provider");
 
             if( uProp != null && uProp.getValue().equalsIgnoreCase("yes")) {
             	skipComment = true;
@@ -622,6 +624,10 @@
         var tmp;      
         
         function setupDemoAutoCompletion() {
+
+            var linkDocsToProvider = true;
+            linkDocsToProvider = <%=autoLinkDocsToProvider%>;
+
         	if(jQuery("#autocompletedemo<%=docId%>") ){
         		
         		var url;
@@ -646,7 +652,7 @@
 	            	  jQuery( "#demofindName<%=docId%>" ).val(ui.item.formattedName);
 	            	  selectedDemos.push(ui.item.label);
 	            	  console.log(ui.item.providerNo);
-	            	  if( ui.item.providerNo != undefined && ui.item.providerNo != null &&ui.item.providerNo != "" && ui.item.providerNo != "null" ) {
+	            	  if( ui.item.providerNo != undefined && ui.item.providerNo != null &&ui.item.providerNo != "" && ui.item.providerNo != "null" && linkDocsToProvider) {
 	            		  addDocToList(ui.item.providerNo, ui.item.provider + " (MRP)", "<%=docId%>");
 	            	  }
 	            	  

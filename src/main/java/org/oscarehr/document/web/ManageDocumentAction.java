@@ -117,8 +117,7 @@ public class ManageDocumentAction extends DispatchAction {
 	private CtlDocumentDao ctlDocumentDao = SpringUtils.getBean(CtlDocumentDao.class);
 	private ProviderInboxRoutingDao providerInboxRoutingDAO = SpringUtils.getBean(ProviderInboxRoutingDao.class);
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private OscarProperties props = OscarProperties.getInstance();
-	
+
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 
 		return null;
@@ -134,7 +133,6 @@ public class ManageDocumentAction extends DispatchAction {
 		String docType = request.getParameter("docType");// :consult<
 		String providerId = (String) request.getSession().getAttribute("user");
 		Integer demographicNo = Integer.parseInt(request.getParameter("demog"));
-		boolean linkToProvider = props.isPropertyActive("assign_document.link_docs_to_provider");
 
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
         	throw new SecurityException("missing required security object (_edoc)");
@@ -148,7 +146,7 @@ public class ManageDocumentAction extends DispatchAction {
 		// TODO: if demoLink is "on", check if msp is in flagproviders, if not save to providerInboxRouting, if yes, don't save.
 
 		// DONT COPY THIS !!!
-		if ((flagproviders != null && flagproviders.length > 0) && linkToProvider) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
+		if ((flagproviders != null && flagproviders.length > 0)) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
 			try {
 				for (String proNo : flagproviders) {
 					providerInboxRoutingDAO.addToProviderInbox(proNo, Integer.parseInt(documentId), LabResultData.DOCUMENT);
