@@ -411,6 +411,7 @@
             ctx + "/CaseManagementView.do",
             {
                 method: 'post',
+                asynchronous: false,
                 postBody: params,
                 evalScripts: true,
                 insertion: Insertion.Top,
@@ -2304,6 +2305,7 @@
             url,
             {
                 method: 'post',
+                asynchronous: false,
                 evalScripts: true,
                 postBody: params,
                 onFailure: function(request) {
@@ -2775,7 +2777,10 @@
 
         var url = ctx + "/CaseManagementEntry.do";
         ajaxRequest = new Ajax.Updater( {success:div}, url, {
-            evalScripts: true, parameters: Form.serialize(frm), onSuccess: onIssueUpdate,
+            asynchronous: false,
+            evalScripts: true,
+            parameters: Form.serialize(frm),
+            onSuccess: onIssueUpdate,
             onFailure: function(response) {
                 alert( response.status + " " + updateIssueError);
             }
