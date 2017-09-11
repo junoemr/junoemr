@@ -82,6 +82,33 @@ angular.module("Common.Services").service("consultService", [
 
 			return deferred.promise;
 		};
+		service.getNewRequest = function getRequest(demographicNo)
+		{
+			var deferred = $q.defer();
+
+			var config = Juno.Common.ServiceHelper.configHeadersWithCache();
+			config.params = {
+				demographicNo: demographicNo
+			};
+
+			junoHttp.get(service.apiPath + 'getNewRequest', config).then(
+				function success(results)
+				{
+					if(results.data.referralDate) results.data.referralDate = moment(results.data.referralDate).toDate();
+					if(results.data.appointmentDate) results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
+					if(results.data.followUpDate) results.data.followUpDate = moment(results.data.followUpDate).toDate();
+
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("consultService::getNewRequest error", errors);
+					deferred.reject(
+						"An error occurred while getting new consult request");
+				});
+
+			return deferred.promise;
+		};
 
 		service.getRequestAttachments = function getRequestAttachments(
 			requestId, demographicId, attached)

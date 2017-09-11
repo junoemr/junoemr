@@ -213,7 +213,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				alert("You don't have right to create new consult");
 				return false;
 			}
-			var url = "/record/" + controller.consult.demographicNo + "/consult/new";
+			var url = "/record/" + controller.search.demographicNo + "/consult/new";
 			$location.path(url).search(controller.searchParams);
 		};
 

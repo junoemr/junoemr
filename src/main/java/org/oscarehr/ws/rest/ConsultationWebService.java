@@ -23,18 +23,25 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.time.format.*;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.*;
+import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.BORNPathwayMappingDao;
@@ -77,7 +84,7 @@ import org.oscarehr.ws.rest.to.model.FaxConfigTo1;
 import org.oscarehr.ws.rest.to.model.LetterheadTo1;
 import org.oscarehr.ws.rest.to.model.ProfessionalSpecialistTo1;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import net.sf.json.JSONObject;
@@ -212,8 +219,42 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			request.setProviderNo(getLoggedInInfo().getLoggedInProviderNo());
 		}
 		catch(Exception e) {
-			logger.error("Error", e);
-			return RestResponse.errorResponse(headers, "Error");
+			logger.error("Unexpected Error", e);
+			return RestResponse.errorResponse(headers, "Unexpected Error");
+		}
+		return RestResponse.successResponse(headers, request);
+	}
+
+	@GET
+	@Path("/getNewRequest")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<ConsultationRequestTo1,String> getNewRequest(@QueryParam("demographicNo") Integer demographicId) {
+
+		HttpHeaders headers = new HttpHeaders();
+		ConsultationRequestTo1 request;
+		try {
+			if(demographicId == null || demographicId <= 0) {
+				return RestResponse.errorResponse(headers, "Invalid demographicNo: " + demographicId);
+			}
+
+			request = new ConsultationRequestTo1();
+			request.setDemographicId(demographicId);
+
+			RxInformation rx = new RxInformation();
+			String info = rx.getAllergies(getLoggedInInfo(), demographicId.toString());
+			if (StringUtils.isNotBlank(info)) request.setAllergies(info);
+			info = rx.getCurrentMedication(demographicId.toString());
+			if (StringUtils.isNotBlank(info)) request.setCurrentMeds(info);
+
+			request.setLetterheadList(getLetterheadList());
+			request.setFaxList(getFaxList());
+			request.setServiceList(serviceConverter.getAllAsTransferObjects(getLoggedInInfo(), consultationManager.getConsultationServices()));
+			request.setSendToList(providerDao.getActiveTeams());
+			request.setProviderNo(getLoggedInInfo().getLoggedInProviderNo());
+		}
+		catch(Exception e) {
+			logger.error("Unexpected Error", e);
+			return RestResponse.errorResponse(headers, "Unexpected Error");
 		}
 		return RestResponse.successResponse(headers, request);
 	}
