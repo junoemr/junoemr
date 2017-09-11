@@ -41,7 +41,7 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			var config = Juno.Common.ServiceHelper.configHeadersWithCache();
+			var config = Juno.Common.ServiceHelper.configHeaders();
 			config.params = search;
 
 			junoHttp.get(service.apiPath + 'searchRequests', config).then(
@@ -62,7 +62,7 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			var config = Juno.Common.ServiceHelper.configHeadersWithCache();
+			var config = Juno.Common.ServiceHelper.configHeaders();
 
 			junoHttp.get(service.apiPath + 'getRequest/' + encodeURIComponent(requestId), config).then(
 				function success(results)
@@ -86,7 +86,7 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			var config = Juno.Common.ServiceHelper.configHeadersWithCache();
+			var config = Juno.Common.ServiceHelper.configHeaders();
 			config.params = {
 				demographicNo: demographicNo
 			};
@@ -115,7 +115,7 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			var config = Juno.Common.ServiceHelper.configHeadersWithCache();
+			var config = Juno.Common.ServiceHelper.configHeaders();
 			config.params = {
 				'demographicId': encodeURIComponent(demographicId),
 				'attached': encodeURIComponent(attached)
@@ -158,7 +158,7 @@ angular.module("Common.Services").service("consultService", [
 			var deferred = $q.defer();
 
 			junoHttp.get(service.apiPath + 'eSendRequest/' + encodeURIComponent(requestId),
-				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);

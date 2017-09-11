@@ -264,12 +264,12 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 			if (controller.search.appointmentStartDate != null) controller.searchParams.srhApptStartDate = controller.search.appointmentStartDate.getTime();
 			if (controller.search.appointmentEndDate != null) controller.searchParams.srhApptEndDate = controller.search.appointmentEndDate.getTime();
 
-			if (controller.search.page > 1) controller.searchParams.srhToPage = controller.search.page;
-			if (controller.search.perPage > 10) controller.searchParams.srhCountPerPage = controller.search.perPage;
-			if (controller.search.sortDirection !== "desc")
+			if (controller.search.page != null) controller.searchParams.srhToPage = controller.search.page;
+			if (controller.search.perPage != null) controller.searchParams.srhCountPerPage = controller.search.perPage;
+			if (controller.search.sortDirection != null)
 			{
-				controller.searchParams.srhSortMode = Object.keys(controller.tableParams.sorting);
-				controller.searchParams.srhSortDir = controller.tableParams.sorting[controller.searchParams.srhSortMode];
+				controller.searchParams.srhSortMode = controller.search.sortColumn;
+				controller.searchParams.srhSortDir = controller.search.sortDirection;
 			}
 		};
 
@@ -282,14 +282,9 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 		controller.tableParams = new NgTableParams(
 		{
 			page: 1, // show first page
-			count: 10, // initial count per page
-			sorting:
-			{
-				ReferralDate: 'desc' // initial sorting
-			}
+			count: 10 // initial count per page
 		},
 		{
-			total: 0, // length of data
 			getData: function(params)
 			{
 				if (controller.justOpen)
@@ -321,16 +316,19 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 					if ($location.search().srhStatus != null) controller.search.status = Number($location.search().srhStatus);
 					if ($location.search().srhTeam != null) controller.search.team = $location.search().srhTeam;
 
-					if ($location.search().srhCountPerPage != null) controller.search.perPage = $location.search().srhCountPerPage;
-					if ($location.search().srhToPage != null) controller.search.page = $location.search().srhToPage;
+					if ($location.search().srhCountPerPage != null) {
+						controller.search.perPage = $location.search().srhCountPerPage;
+						// controller.tableParams.$params.count = $location.search().srhCountPerPage;
+					}
+					if ($location.search().srhToPage != null) {
+						controller.search.page = $location.search().srhToPage;
+						// controller.tableParams.$params.page = $location.search().srhToPage;
+					}
 
 					if ($location.search().srhSortMode != null && $location.search().srhSortDir != null)
 					{
-						controller.search.sortColumn = $location.search().srhSortDir;
-						controller.search.sortDirection = controller.sortMode;
-						// controller.sortMode = {};
-						// controller.sortMode[$location.search().srhSortMode] = $location.search().srhSortDir;
-						// controller.tableParams.$params.sorting = controller.sortMode;
+						controller.search.sortColumn = $location.search().sortMode;
+						controller.search.sortDirection = $location.search().srhSortDir;
 					}
 					controller.justOpen = false;
 				}
@@ -355,11 +353,12 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 					search1.team = null;
 				}
 
-				consultService.searchRequests(search1).then(
+				return consultService.searchRequests(search1).then(
 					function success(result)
 					{
 						console.log("Search Results", result);
-						params.total(result.meta.total[0]);
+						params.total(parseInt(result.meta.total[0]));
+
 						// $defer.resolve(result.content);
 
 						for (var i = 0; i < result.data.length; i++)
@@ -402,7 +401,8 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 							}
 						}
 						controller.lastResponse = result.data;
-						controller.consultList = result.data;
+						controller.tableParams.total(parseInt(result.meta.total[0]));
+						return result.data;
 					},
 					function error(errors)
 					{
@@ -410,6 +410,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 						console.log(errors);
 					});
 			}
+
 		});
 
 		controller.popup = function popup(vheight, vwidth, varpage, winname)

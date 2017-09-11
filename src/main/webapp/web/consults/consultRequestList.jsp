@@ -149,8 +149,8 @@
 
 	<table ng-table="consultRequestListCtrl.tableParams" show-filter="false" class="table table-striped table-bordered">
 		<tbody>
-			<tr ng-repeat="consult in consultRequestListCtrl.consultList">
-				<td>
+			<tr ng-repeat="consult in $data">
+			<td>
 					<button ng-click="consultRequestListCtrl.editConsult(consult)" class="btn btn-xs btn-primary noprint">
 						<bean:message key="global.edit" bundle="ui"/>
 					</button>
