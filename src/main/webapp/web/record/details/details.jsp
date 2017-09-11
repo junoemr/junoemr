@@ -163,6 +163,12 @@
 					</label>
 					<div class="col-md-4">
 						<div class="input-group vertical-align">
+							<input id="details-dob-year" type="text" placeholder="YYYY"
+								   title="Birthday Year" class="form-control form-control-details"
+								   ng-model="detailsCtrl.page.demo.dobYear"
+								   ng-change="detailsCtrl.checkDate('DobY')"
+								   ng-blur="detailsCtrl.formatDate('DobY')"
+							/>
 							<input id="details-dob-month" type="text" placeholder="MM"
 								title="Birthday Month" class="form-control form-control-details"
 								ng-model="detailsCtrl.page.demo.dobMonth"
@@ -175,12 +181,6 @@
 								ng-model="detailsCtrl.page.demo.dobDay"
 								ng-change="detailsCtrl.checkDate('DobD')"
 								ng-blur="detailsCtrl.formatDate('DobD')"
-							/>
-							<input id="details-dob-year" type="text" placeholder="YYYY"
-								title="Birthday Year" class="form-control form-control-details"
-								ng-model="detailsCtrl.page.demo.dobYear"
-								ng-change="detailsCtrl.checkDate('DobY')"
-								ng-blur="detailsCtrl.formatDate('DobY')"
 							/>
 							<div>&nbsp;
 								(<span ng-if="!detailsCtrl.isNaN(detailsCtrl.page.demo.age)">{{detailsCtrl.page.demo.age}}y</span>)
