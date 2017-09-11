@@ -38,6 +38,7 @@ angular.module('Common.Directives').directive('junoDatepickerPopup', [
 		scope.model = '=junoModel';
 		scope.placeholder = '@';
 		scope.showIcon = '=';
+		scope.disableInput = '=';
 
 		var linkFunction = function link_function($scope, element, attribute, controller)
 		{

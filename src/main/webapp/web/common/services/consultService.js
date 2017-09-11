@@ -66,6 +66,10 @@ angular.module("Common.Services").service("consultService", [
 				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
 				function success(results)
 				{
+					results.data.referralDate = moment(results.data.referralDate).toDate();
+					results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
+					results.data.followUpDate = moment(results.data.followUpDate).toDate();
+
 					deferred.resolve(results.data);
 				},
 				function error(errors)
@@ -106,11 +110,8 @@ angular.module("Common.Services").service("consultService", [
 		service.saveRequest = function saveRequest(request)
 		{
 			var deferred = $q.defer();
+			junoHttp.post(service.apiPath + 'saveRequest', request).then(
 
-			var requestTo1 = {
-				consultationRequestTo1: request
-			};
-			junoHttp.post(service.apiPath + 'saveRequest', requestTo1).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);

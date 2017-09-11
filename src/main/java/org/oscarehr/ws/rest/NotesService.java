@@ -25,7 +25,6 @@ package org.oscarehr.ws.rest;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -100,8 +99,6 @@ import oscar.oscarEncounter.pageUtil.EctSessionBean;
 @Component("notesService")
 public class NotesService extends AbstractServiceImpl {
 
-	public static String cppCodes[] = {"OMeds", "SocHistory", "MedHistory", "Concerns", "FamHistory", "Reminders", "RiskFactors","OcularMedication","TicklerNote"};
-	
 	private static Logger logger = MiscUtils.getLogger();
 	
 	private static ConcurrentHashMap<String, ConcurrentHashMap<String, Long>> editList = new ConcurrentHashMap<String, ConcurrentHashMap<String, Long>>();
@@ -175,7 +172,7 @@ public class NotesService extends AbstractServiceImpl {
 		criteria.setUserName((String) se.getAttribute("user"));
 		
 		// Note order is not user selectable in this version yet
-		criteria.setNoteSort("observation_date_desc");  
+		criteria.setNoteSort("observation_date_desc");
 		criteria.setSliceFromEndOfList(false);
 				
 
@@ -339,6 +336,7 @@ public class NotesService extends AbstractServiceImpl {
 		caseMangementNote.setProvider(provider);
 		caseMangementNote.setProviderNo(providerNo);
 		caseMangementNote.setNote(noteTxt);
+		caseMangementNote.setEditors(note.getEditorNames());
 		logger.debug("enc TYPE " +note.getEncounterType());
 		caseMangementNote.setEncounter_type(note.getEncounterType());
 		// If uuid is not null and is not an empty string this note already exists and we must keep its uuid
@@ -516,7 +514,7 @@ public class NotesService extends AbstractServiceImpl {
 
 
 		boolean newNote = false;
-		
+
 		// we don't want to try to remove an issue from a new note so we test here
 		if(note.getNoteId()==null || note.getNoteId()==0){
 			newNote = true;
@@ -533,17 +531,17 @@ public class NotesService extends AbstractServiceImpl {
 			}
 			note.setRevision(Integer.parseInt(note.getRevision())+1 + "");
 		}
-	
+
 		CaseManagementCPP cpp = this.caseManagementMgr.getCPP(demographicNoStr);
 		if (cpp == null) {
 			cpp = new CaseManagementCPP();
 			cpp.setDemographic_no(demographicNoStr);
 		}
-		
+
 		if(note.isCpp() && note.getSummaryCode()!=null){
 		cpp = copyNote2cpp(cpp, note.getNote(), note.getSummaryCode());
 		}
-		
+
 		ProgramManager programManager = (ProgramManager) SpringUtils.getBean("programManager");
 		AdmissionManager admissionManager = (AdmissionManager) SpringUtils.getBean("admissionManager");
 
@@ -567,7 +565,7 @@ public class NotesService extends AbstractServiceImpl {
 		}
 		caseMangementNote.setReporter_program_team(team);
 
-		
+
 		//this code basically updates the CPP note with which issues were removed
 		if(!newNote) {
 			List<String> removedIssueNames = new ArrayList<String>();
@@ -577,14 +575,14 @@ public class NotesService extends AbstractServiceImpl {
 					removedIssueNames.add(cmit.getIssue().getDescription());
 				}
 			}
-			
+
 			if(!removedIssueNames.isEmpty()) {
 				String text =  new SimpleDateFormat("dd-MMM-yyyy").format(new Date()) + " " + "Removed following issue(s)" + ":\n" + StringUtils.join(removedIssueNames, ",");
 				caseMangementNote.setNote(caseMangementNote.getNote() + "\n" + text);
 			}
 		}
 
-	
+
 		/* Save assigned issues & link with the note */
 		List<CaseManagementIssue> issuelist = new ArrayList<CaseManagementIssue>();
 		for(CaseManagementIssueTo1 i:note.getAssignedIssues()) {
@@ -610,7 +608,7 @@ public class NotesService extends AbstractServiceImpl {
 				// don't save issue here, the entire list is saved later
 			}
 		}
-		
+
 		//this is actually just the issue for the main note
 		//translate summary codes
 		String mainIssueCode = note.getSummaryCode();//set temp
@@ -669,8 +667,8 @@ public class NotesService extends AbstractServiceImpl {
 		String[] strIssueId = { String.valueOf(cppIssue.getId()) };
 		List<CaseManagementNote> curCPPNotes = this.caseManagementMgr.getActiveNotes(demographicNoStr, strIssueId);
 		Collections.sort(curCPPNotes,CaseManagementNote.getPositionComparator());
-		
-		
+
+
 		if(note.isArchived()) {
 			//this one will basically assign 1,2,3,..,n to the group and ignore the one to be archived..setting it's position to 0
 			int positionToAssign=1;
@@ -684,7 +682,7 @@ public class NotesService extends AbstractServiceImpl {
 				caseManagementMgr.updateNote(curCPPNotes.get(x));
 				positionToAssign++;
 			}
-			
+
 		} else {
 			List<CaseManagementNote> curCPPNotes2 = new ArrayList<CaseManagementNote>();
 			for(CaseManagementNote cn:curCPPNotes) {
@@ -695,7 +693,7 @@ public class NotesService extends AbstractServiceImpl {
 					caseManagementMgr.updateNote(cn);
 				}
 			}
-			//we make a fake CaseManagementNoteEntry into curCPPNotes, and insert it into desired location. 
+			//we make a fake CaseManagementNoteEntry into curCPPNotes, and insert it into desired location.
 			//we then just set the positions to 1,2,...,n ignoring the fake one, but still incrementing the positionToAssign variable
 			//when the new note is saved.it will have the missing position.
 			int positionToAssign=1;
@@ -707,7 +705,7 @@ public class NotesService extends AbstractServiceImpl {
 					//update the note
 					curCPPNotes2.get(x).setPosition(positionToAssign);
 					caseManagementMgr.updateNote(curCPPNotes2.get(x));
-				} 
+				}
 				if(curCPPNotes2.get(x).getId() != -1L && curCPPNotes2.get(x).getUuid().equals(note.getUuid())) {
 					curCPPNotes2.get(x).setPosition(0);
 					caseManagementMgr.updateNote(curCPPNotes2.get(x));
@@ -719,20 +717,20 @@ public class NotesService extends AbstractServiceImpl {
 		if(!note.isArchived()) {
 			caseMangementNote.setPosition(note.getPosition());
 		}
-		
+
 		/*
-		 * 
-		 * update_date, observation_date, 
-		 * demographic_no, provider_no, note, signed, 
-		 * include_issue_innote, signing_provider_no, encounter_type, billing_code, 
+		 *
+		 * update_date, observation_date,
+		 * demographic_no, provider_no, note, signed,
+		 * include_issue_innote, signing_provider_no, encounter_type, billing_code,
 		 * program_no, reporter_caisi_role, reporter_program_team, history,
 		 *  uuid, password, locked, archived, appointmentNo, hourOfEncounterTime, minuteOfEncounterTime, hourOfEncTransportationTime, minuteOfEncTransportationTime
-		 * 
+		 *
 		 */
 
 		String savedStr = caseManagementMgr.saveNote(cpp, caseMangementNote, providerNo, providerName, null, note.getRoleName());
 		caseManagementMgr.saveCPP(cpp, providerNo);
-		
+
 		caseManagementMgr.getEditors(caseMangementNote);
 
 		note.setNoteId(Integer.parseInt(""+caseMangementNote.getId()));
@@ -745,31 +743,31 @@ public class NotesService extends AbstractServiceImpl {
 		if(note.getNoteId()!=0){
 			caseManagementMgr.addNewNoteLink(newNoteId);
 		}
-			
+
 		/* save extra fields */
 		CaseManagementNoteExt cme = new CaseManagementNoteExt();
-		
+
 		if(noteExtTo1.getStartDate()!=null){
 			cme.setNoteId(newNoteId);
-			cme.setKeyVal(NoteExtTo1.STARTDATE);	
+			cme.setKeyVal(NoteExtTo1.STARTDATE);
 			cme.setDateValue(noteExtTo1.getStartDate());
 			caseManagementMgr.saveNoteExt(cme);
 		}
-		
+
 		if(noteExtTo1.getResolutionDate()!=null){
 			cme.setNoteId(newNoteId);
-			cme.setKeyVal(NoteExtTo1.RESOLUTIONDATE);	
+			cme.setKeyVal(NoteExtTo1.RESOLUTIONDATE);
 			cme.setDateValue(noteExtTo1.getResolutionDate());
 			caseManagementMgr.saveNoteExt(cme);
 		}
-		
+
 		if(noteExtTo1.getProcedureDate()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.PROCEDUREDATE);
 			cme.setDateValue(noteExtTo1.getProcedureDate());
 			caseManagementMgr.saveNoteExt(cme);
 		}
-			
+
 		if(noteExtTo1.getAgeAtOnset()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.AGEATONSET);
@@ -777,7 +775,7 @@ public class NotesService extends AbstractServiceImpl {
 			cme.setValue(noteExtTo1.getAgeAtOnset());
 			caseManagementMgr.saveNoteExt(cme);
 		}
-		
+
 		if(noteExtTo1.getTreatment()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.TREATMENT);
@@ -785,7 +783,7 @@ public class NotesService extends AbstractServiceImpl {
 			cme.setValue(noteExtTo1.getTreatment());
 			caseManagementMgr.saveNoteExt(cme);
 		}
-		
+
 		if(noteExtTo1.getProblemStatus()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.PROBLEMSTATUS);
@@ -793,7 +791,7 @@ public class NotesService extends AbstractServiceImpl {
 			cme.setValue(noteExtTo1.getProblemStatus());
 			caseManagementMgr.saveNoteExt(cme);
 		}
-		
+
 		if(noteExtTo1.getExposureDetail()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.EXPOSUREDETAIL);
@@ -801,7 +799,7 @@ public class NotesService extends AbstractServiceImpl {
 			cme.setValue(noteExtTo1.getExposureDetail());
 			caseManagementMgr.saveNoteExt(cme);
 		}
-		
+
 		if(noteExtTo1.getRelationship()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.RELATIONSHIP);
@@ -809,23 +807,23 @@ public class NotesService extends AbstractServiceImpl {
 			cme.setValue(noteExtTo1.getRelationship());
 			caseManagementMgr.saveNoteExt(cme);
 		}
-			
+
 		if(noteExtTo1.getLifeStage()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.LIFESTAGE);
 			cme.setDateValue((Date) null);
 			cme.setValue(noteExtTo1.getLifeStage());
-			caseManagementMgr.saveNoteExt(cme);			
+			caseManagementMgr.saveNoteExt(cme);
 		}
-		
+
 		if(noteExtTo1.getHideCpp()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.HIDECPP);
 			cme.setDateValue((Date) null);
 			cme.setValue(noteExtTo1.getHideCpp());
-			caseManagementMgr.saveNoteExt(cme);			
+			caseManagementMgr.saveNoteExt(cme);
 		}
-		
+
 		if(noteExtTo1.getProblemDesc()!=null){
 			cme.setNoteId(newNoteId);
 			cme.setKeyVal(NoteExtTo1.PROBLEMDESC);
@@ -833,13 +831,13 @@ public class NotesService extends AbstractServiceImpl {
 			cme.setValue(noteExtTo1.getProblemDesc());
 			caseManagementMgr.saveNoteExt(cme);
 		}
-		
-		/* save extra fields */				
+
+		/* save extra fields */
 		noteIssue.setEncounterNote(note);
 		noteIssue.setGroupNoteExt(noteExtTo1);
-		
+
 		String saveStatus = (caseMangementNote.getId() != null) ? LogConst.STATUS_SUCCESS: LogConst.STATUS_FAILURE;
-		LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_CME_NOTE, saveStatus, 
+		LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_CME_NOTE, saveStatus,
 				String.valueOf(caseMangementNote.getId()), getLoggedInInfo().getIp(), caseMangementNote.getAuditString());
 		return noteIssue;
 	}
@@ -1165,12 +1163,10 @@ public class NotesService extends AbstractServiceImpl {
 	@Path("/getIssueNote/{noteId}")	
 	@Produces("application/json")
 	public NoteIssueTo1 getIssueNote(@PathParam("noteId") Integer noteId){
-		
 
 		//get all note values NoteDisplay nd = new NoteDisplayLocal(loggedInInfo,note);
 		CaseManagementNote casemgmtNote = null;
 		casemgmtNote = caseManagementMgr.getNote(String.valueOf(noteId));
-
 		NoteTo1 note = new NoteTo1();
 		note.setNoteId(noteId);
 		note.setIsSigned(casemgmtNote.isSigned());
@@ -1187,7 +1183,7 @@ public class NotesService extends AbstractServiceImpl {
 		note.setNote(casemgmtNote.getNote());
 		note.setRxAnnotation(casemgmtNote.isRxAnnotation());
 		note.setEncounterType(casemgmtNote.getEncounter_type());
-		//note.setEditorNames(casemgmtNote.getEditors());		
+		//note.setEditorNames(casemgmtNote.getEditors());
 		//note.setIssueDescriptions(casemgmtNote.get);
 		note.setPosition(casemgmtNote.getPosition());
 		//note.getIssueDescriptions(casemgmtNote.getIssues());
@@ -1236,11 +1232,11 @@ public class NotesService extends AbstractServiceImpl {
 		List<CaseManagementIssue> cmeIssues = new ArrayList<CaseManagementIssue>();
 		
 		for(CaseManagementIssue cmei:rawCmeIssues) {
-			if(!isCppCode(cmei)) {
+			if(!isSystemIssue(cmei)) {
 				cmeIssues.add(cmei);
 			}
 		}
-		
+
 		//set NoteIssue to return
 		NoteIssueTo1 noteIssue = new NoteIssueTo1();
 		noteIssue.setEncounterNote(note);	
@@ -1249,9 +1245,10 @@ public class NotesService extends AbstractServiceImpl {
 		return noteIssue;
 		
 	}
-	
-	private boolean isCppCode(CaseManagementIssue cmeIssue) {
-		return Arrays.asList(cppCodes).contains(cmeIssue.getIssue().getCode());
+
+	// Return true if the given issue type is 'system'
+	private boolean isSystemIssue(CaseManagementIssue cmeIssue) {
+		return cmeIssue.getIssue().getType().equalsIgnoreCase("system");
 	}
 	
 	@POST

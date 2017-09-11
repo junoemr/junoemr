@@ -24,11 +24,14 @@
 
 package org.oscarehr.ws.rest.to.model;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public class LetterheadTo1 implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -36,7 +39,7 @@ public class LetterheadTo1 implements Serializable {
 	private String name;
 	private String address;
 	private String phone;
-
+	
 	public LetterheadTo1() {}
 	public LetterheadTo1(String id, String name) {
 		setId(id);

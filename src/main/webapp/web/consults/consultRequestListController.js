@@ -66,7 +66,6 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 		controller.lastResponse = "";
 		controller.teams = [];
 		controller.consult = {};
-		controller.resultData=[]; //new data holder for results
 
 		var allTeams = "All Teams";
 		controller.search = {
@@ -232,7 +231,6 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 
 		controller.doSearch = function doSearch()
 		{
-			controller.tableParams.page = 1;
 			controller.tableParams.reload();
 		};
 
@@ -360,7 +358,6 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				consultService.searchRequests(search1).then(
 					function success(result)
 					{
-						controller.resultData = []; //clear the result list
 						console.log("Search Results", result);
 						params.total(result.meta.total[0]);
 						// $defer.resolve(result.content);
@@ -403,10 +400,9 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 								rDate.setMonth(rDate.getMonth() + 1);
 								if ((new Date()) >= rDate) consult.outstanding = true;
 							}
-							controller.resultData.push(consult);
 						}
 						controller.lastResponse = result.data;
-
+						controller.consultList = result.data;
 					},
 					function error(errors)
 					{

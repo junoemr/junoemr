@@ -33,7 +33,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-@JsonIgnoreProperties(ignoreUnknown=true) // Ignore properties that are not defined in this class
+@JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public class DemographicTo1 implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -97,7 +97,7 @@ public class DemographicTo1 implements Serializable {
 	private String waitingListNote;
 	private Date onWaitingListSinceDate;
 	private Integer admissionProgramId;
-	
+
 	private List<DemographicContactFewTo1> demoContacts = new ArrayList<DemographicContactFewTo1>();
 	private List<DemographicContactFewTo1> demoContactPros = new ArrayList<DemographicContactFewTo1>();
 	private List<DemographicExtTo1> extras = new ArrayList<DemographicExtTo1>();
@@ -108,8 +108,7 @@ public class DemographicTo1 implements Serializable {
 	private List<WaitingListNameTo1> waitingListNames = new ArrayList<WaitingListNameTo1>();
 	private List<StatusValueTo1> patientStatusList = new ArrayList<StatusValueTo1>();
 	private List<StatusValueTo1> rosterStatusList = new ArrayList<StatusValueTo1>();
-	
-	
+
 	public Integer getDemographicNo() {
 		return demographicNo;
 	}
@@ -513,19 +512,19 @@ public class DemographicTo1 implements Serializable {
 	public String getNurse() {
 		return nurse;
 	}
-	
+
 	public void setNurse(String nurse) {
 		this.nurse = nurse;
 	}
-	
+
 	public String getResident() {
 		return resident;
 	}
-	
+
 	public void setResident(String resident) {
 		this.resident = resident;
 	}
-	
+
 	public String getAlert() {
 		return alert;
 	}
@@ -533,11 +532,11 @@ public class DemographicTo1 implements Serializable {
 	public void setAlert(String alert) {
 		this.alert = alert;
 	}
-	
+
 	public String getMidwife() {
 		return midwife;
 	}
-	
+
 	public void setMidwife(String midwife) {
 		this.midwife = midwife;
 	}
@@ -549,27 +548,27 @@ public class DemographicTo1 implements Serializable {
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
-	
+
 	public Integer getWaitingListID() {
 		return waitingListID;
 	}
-	
+
 	public void setWaitingListID(Integer waitingListID) {
 		this.waitingListID = waitingListID;
 	}
-	
+
 	public String getWaitingListNote() {
 		return waitingListNote;
 	}
-	
+
 	public void setWaitingListNote(String note) {
 		this.waitingListNote = note;
 	}
-	
+
 	public Date getOnWaitingListSinceDate() {
 		return onWaitingListSinceDate;
 	}
-	
+
 	public void setOnWaitingListSinceDate(Date onWaitingListSinceDate) {
 		this.onWaitingListSinceDate = onWaitingListSinceDate;
 	}
@@ -597,59 +596,59 @@ public class DemographicTo1 implements Serializable {
 	public void setDemoContactPros(List<DemographicContactFewTo1> demoContactPros) {
 		this.demoContactPros = demoContactPros;
 	}
-	
+
 	public List<ProviderTo1> getDoctors() {
 		return doctors;
 	}
-	
+
 	public void setDoctors(List<ProviderTo1> doctors) {
 		this.doctors = doctors;
 	}
-	
+
 	public List<ProviderTo1> getNurses() {
 		return nurses;
 	}
-	
+
 	public void setNurses(List<ProviderTo1> nurses) {
 		this.nurses = nurses;
 	}
-	
+
 	public List<ProviderTo1> getMidwives() {
 		return midwives;
 	}
-	
+
 	public void setMidwives(List<ProviderTo1> midwives) {
 		this.midwives = midwives;
 	}
-	
+
 	public List<ProfessionalSpecialistTo1> getReferralDoctors() {
 		return referralDoctors;
 	}
-	
+
 	public void setReferralDoctors(List<ProfessionalSpecialistTo1> referralDoctors) {
 		this.referralDoctors = referralDoctors;
 	}
-	
+
 	public List<WaitingListNameTo1> getWaitingListNames() {
 		return waitingListNames;
 	}
-	
+
 	public void setWaitingListNames(List<WaitingListNameTo1> waitingListNames) {
 		this.waitingListNames = waitingListNames;
 	}
-	
+
 	public List<StatusValueTo1> getPatientStatusList() {
 		return patientStatusList;
 	}
-	
+
 	public void setPatientStatusList(List<StatusValueTo1> patientStatusList) {
 		this.patientStatusList = patientStatusList;
 	}
-	
+
 	public List<StatusValueTo1> getRosterStatusList() {
 		return rosterStatusList;
 	}
-	
+
 	public void setRosterStatusList(List<StatusValueTo1> rosterStatusList) {
 		this.rosterStatusList = rosterStatusList;
 	}
@@ -657,9 +656,9 @@ public class DemographicTo1 implements Serializable {
 	public Integer getAdmissionProgramId() {
 		return admissionProgramId;
 	}
-	
+
 	public void setAdmissionProgramId(Integer programId) {
 		this.admissionProgramId = programId;
 	}
-	
+
 }

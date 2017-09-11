@@ -34,7 +34,9 @@
         is-open="opened" 
         datepicker-options="dateOptions" 
         ng-required="true" 
-        close-text="Close"/>
+        close-text="Close"
+        ng-disabled="disableInput"
+    />
     <span class="input-group-addon clickable" ng-if="showIcon" ng-click="openDatepicker()">        
         <i class="glyphicon glyphicon-calendar"></i>
     </span>

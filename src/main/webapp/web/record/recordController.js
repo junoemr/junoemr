@@ -351,6 +351,9 @@ angular.module('Record').controller('Record.RecordController', [
 			// Need to find a better way of preventing this date overwrite
 			controller.page.encounterNote.assignedIssues = controller.page.assignedCMIssues;
 			controller.page.encounterNote.issueDescriptions = [];
+			if(!Juno.Common.Util.isInArray(user.displayName,  controller.page.encounterNote.editorNames))
+				controller.page.encounterNote.editorNames.push(user.displayName);
+
 			for (var i = 0; i < controller.page.assignedCMIssues.length; i++)
 			{
 				// if (controller.page.encounterNote.issueDescriptions == null)

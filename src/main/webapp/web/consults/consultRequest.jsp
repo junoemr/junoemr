@@ -56,7 +56,7 @@
 			<div id="consult_status">
 				<label class="control-label">Consultation Status:</label>
 				<div class="form-group">
-					<select class="form-control" ng-model="consultRequestCtrl.onsult.status" 
+					<select class="form-control" ng-model="consultRequestCtrl.consult.status"
 						ng-required="true" 
 						    ng-options="status.value as status.name for status in consultRequestCtrl.statuses">
 					</select>
@@ -79,21 +79,21 @@
 						<div class="form-group">
 							<%--<label class="col-sm-2 control-label">Name</label>--%>
 							<div class="col-sm-12">
-								<select id="letterhead" class="form-control" 
-										ng-model="consultRequestCtrl.consult.letterheadName" 
+								<select id="letterhead" class="form-control"
+										ng-model="consultRequestCtrl.consult.letterheadName"
 										ng-options="letterhead.id as letterhead.name for letterhead in consultRequestCtrl.consult.letterheadList"
-										ng-change="consultRequestCtrl.changeLetterhead()">
+										ng-change="consultRequestCtrl.changeLetterhead(consultRequestCtrl.consult.letterheadName)">
 								</select>
 							</div>
 						</div>
 						<div class="form-group">
 							<div class="col-sm-12">
 								<label>Address:</label> 
-								{{consult.letterheadAddress}}
+								{{consultRequestCtrl.consult.letterheadAddress}}
 							</div>
 							<div class="col-sm-12">
 								<label>Phone:</label> 
-								{{consult.letterheadPhone}}
+								{{consultRequestCtrl.consult.letterheadPhone}}
 							</div>
 							<div class="col-sm-12">
 								<label>Fax: </label>
@@ -102,7 +102,7 @@
 										ng-model="consult.letterheadFax"
 										ng-options="fax.faxNumber as fax.faxUser for fax in consult.faxList">
 								</select>--%>
-								{{consult.letterheadFax}}
+								{{consultRequestCtrl.consult.letterheadFax}}
 							</div>	
 						</div>
 					</form>
@@ -156,12 +156,15 @@
 					<div class="form-group col-md-6">
 						<label class="control-label">Referral Date</label>
 						<%--<input id="dp-referralDate" type="text" class="form-control" ng-model="consult.referralDate" placeholder="Referral Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.refDatePicker" ng-click="page.refDatePicker=true"/>--%>
-						<juno-datepicker-popup juno-model="consultRequestCtrl.consult.referralDate"> </juno-datepicker-popup>
+						<juno-datepicker-popup juno-model="consultRequestCtrl.consult.referralDate" show-icon="true" type="Input"> </juno-datepicker-popup>
 
 					</div>
 					<div class="form-group col-md-6">
 						<label class="control-label">Urgency</label>
-						<select id="urgency" class="form-control" ng-model="consultRequestCtrl.consult.urgency" ng-required="true" ng-options="urgency.value as urgency.name for urgency in consultRequestCtrl.urgencies"/>
+						<select id="urgency" class="form-control"
+								ng-model="consultRequestCtrl.consult.urgency"
+								ng-required="true"
+								ng-options="urgency.value as urgency.name for urgency in consultRequestCtrl.urgencies"></select>
 					</div>
 					<div class="form-group col-md-6">
 						<label class="control-label">Send To</label>
@@ -174,51 +177,53 @@
 		
 					<div class="form-group col-md-6">
 						<label class="control-label">Appointment Date</label>
-						<%--<input id="dp-appointmentDate" 
-							type="text" 
-							class="form-control" 
-							ng-model="consult.appointmentDate" 
-							placeholder="Appointment Date"  
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="true" 
-							is-open="page.aptDatePicker"
-							ng-click="page.aptDatePicker=true" 
-							ng-disabled="consult.patientWillBook"/>--%>
-						<juno-datepicker-popup juno-model="consultRequestCtrl.consult.appointmentDate"> </juno-datepicker-popup>
+						<%--<input id="dp-appointmentDate"--%>
+							<%--type="text"--%>
+							<%--class="form-control"--%>
+							<%--ng-model="consultRequestCtrl.consult.appointmentDate"--%>
+							<%--placeholder="Appointment Date"--%>
+							<%--datepicker-popup="yyyy-MM-dd"--%>
+							<%--datepicker-append-to-body="true"--%>
+							<%--is-open="page.aptDatePicker"--%>
+							<%--ng-click="page.aptDatePicker=true"--%>
+							<%--ng-disabled="consultRequestCtrl.consult.patientWillBook"/>--%>
+						<juno-datepicker-popup juno-model="consultRequestCtrl.consult.appointmentDate" show-icon="true" type="Input" disable-input="consultRequestCtrl.consult.patientWillBook"> </juno-datepicker-popup>
 					</div>
 					<div class="form-group col-md-6">
 						<label class="control-label">Appointment Time</label>
-						<%--<span>
+						<span>
 							<select class="form-control"
-									ng-model="consult.appointmentHour"
-									ng-options="hour for hour in hours"
-									ng-change="changeAppointmentTime()" ng-disabled="consult.patientWillBook">
+									ng-model="consultRequestCtrl.consult.appointmentHour"
+									ng-options="hour for hour in consultRequestCtrl.hours"
+									ng-change="consultRequestCtrl.setAppointmentTime()" ng-disabled="consultRequestCtrl.consult.patientWillBook">
 							</select> :
 							<select class="form-control"
-									ng-model="consult.appointmentMinute"
-									ng-options="minute for minute in minutes"
-									ng-change="changeAppointmentTime()" ng-disabled="consult.patientWillBook">
+									ng-model="consultRequestCtrl.consult.appointmentMinute"
+									ng-options="minute for minute in consultRequestCtrl.minutes"
+									ng-change="consultRequestCtrl.setAppointmentTime()" ng-disabled="consultRequestCtrl.consult.patientWillBook">
 							</select>
-						</span>--%>
-						<div class="input-group bootstrap-timepicker timepicker">
-							<input id="timepicker1" type="text" 
-								class="form-control input-small" 
-								data-provide="timepicker"
-								placeholder="Appointment Time"  
-								ng-model="consultRequestCtrl.consult.appointmentTime"
-								ng-change="consultRequestCtrl.changeAppointmentTime()">
-							<span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
-						</div>
+						</span>
+						<%--<div class="input-group bootstrap-timepicker timepicker">--%>
+							<%--<input id="timepicker1" type="text"--%>
+								<%--class="form-control input-small"--%>
+								<%--data-provide="timepicker"--%>
+								<%--placeholder="Appointment Time"--%>
+								<%--ng-model="consultRequestCtrl.appointmentTimeInput"--%>
+								<%--ng-change="consultRequestCtrl.changeAppointmentTime()">--%>
+							<%--<span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>--%>
+						<%--</div>--%>
 					</div>
 					<div class="form-group col-md-6">
 						<label class="control-label">Last Follow-up Date</label>
-						<input id="dp-followUpDate" type="text" class="form-control" 
-							ng-model="consultRequestCtrl.consult.followUpDate" 
-							placeholder="Follow Up Date"  
-							datepicker-popup="yyyy-MM-dd" 
-							datepicker-append-to-body="true" 
-							is-open="consultRequestCtrl.page.lfdDatePicker" 
-							ng-click="consultRequestCtrl.page.lfdDatePicker=true"/>
+						<%--<input id="dp-followUpDate" type="text" class="form-control" --%>
+							<%--ng-model="consultRequestCtrl.consult.followUpDate" --%>
+							<%--placeholder="Follow Up Date"  --%>
+							<%--datepicker-popup="yyyy-MM-dd" --%>
+							<%--datepicker-append-to-body="true" --%>
+							<%--is-open="consultRequestCtrl.page.lfdDatePicker" --%>
+							<%--ng-click="consultRequestCtrl.page.lfdDatePicker=true"/>--%>
+						<juno-datepicker-popup juno-model="consultRequestCtrl.consult.followUpDate" show-icon="true" type="Input"> </juno-datepicker-popup>
+
 					</div>
 					<div class="form-group col-md-6">
 						<label class="control-label">Patient Will Book</label>

@@ -43,9 +43,6 @@
 .state3 {background-color: #d9d9d9 !important;} /*#e6e6e6*/
 .state6 {background-color: #cccccc !important;} /*cccccc*/
 
-.table tbody tr:hover td, .table tbody tr:hover th {
-    background-color: #FFFFAA;
-}		
 </style>
 
 <div ng-show="consultRequestListCtrl.consultReadAccess" class="col-lg-12">
@@ -150,19 +147,14 @@
 		</div>
 	</form>
 
-	<div style="height: 15px"></div>
-
-	<table ng-table="consultRequestListCtrl.tableParams" show-filter="false" class="table">
+	<table ng-table="consultRequestListCtrl.tableParams" show-filter="false" class="table table-striped table-bordered">
 		<tbody>
-
-			<tr ng-repeat="consult in $data" ng-mouseover="consult.$selected=true" ng-mouseout="consult.$selected=false"
-    	 			ng-class="{'active': consult.$selected}" class="state{{consult.status}}">
+			<tr ng-repeat="consult in consultRequestListCtrl.consultList">
 				<td>
-<!-- Ronnie: Temporarily hidden until batch operations is created
-					<input type="checkbox" ng-model="consult.checked">
- -->
+					<button ng-click="consultRequestListCtrl.editConsult(consult)" class="btn btn-xs btn-primary noprint">
+						<bean:message key="global.edit" bundle="ui"/>
+					</button>
 				</td>
-				<td><a ng-click="consultRequestListCtrl.editConsult(consult)" class="hand-hover"><bean:message key="global.edit" bundle="ui"/></a></td>
 				<td data-title="'<bean:message key="consult.list.header.patient" bundle="ui"/>'" sortable="'Demographic'">
 					{{consult.demographic.formattedName}}</td>
 				<td data-title="'<bean:message key="consult.list.header.service" bundle="ui"/>'" sortable="'Service'">{{consult.serviceName}}</td>
