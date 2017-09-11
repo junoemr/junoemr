@@ -62,13 +62,14 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			junoHttp.get(service.apiPath + 'getRequest/' + encodeURIComponent(requestId) ,
-				Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+			var config = Juno.Common.ServiceHelper.configHeadersWithCache();
+
+			junoHttp.get(service.apiPath + 'getRequest/' + encodeURIComponent(requestId), config).then(
 				function success(results)
 				{
-					results.data.referralDate = moment(results.data.referralDate).toDate();
-					results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
-					results.data.followUpDate = moment(results.data.followUpDate).toDate();
+					if(results.data.referralDate) results.data.referralDate = moment(results.data.referralDate).toDate();
+					if(results.data.appointmentDate) results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
+					if(results.data.followUpDate) results.data.followUpDate = moment(results.data.followUpDate).toDate();
 
 					deferred.resolve(results.data);
 				},

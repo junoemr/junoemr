@@ -144,7 +144,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		}
 		angular.forEach(controller.specialists, function(spec)
 		{
-			if (spec.id == consult.professionalSpecialist.id)
+			if (consult.professionalSpecialist && spec.id == consult.professionalSpecialist.id)
 			{
 				consult.professionalSpecialist = spec;
 			}

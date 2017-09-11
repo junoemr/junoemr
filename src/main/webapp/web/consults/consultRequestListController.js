@@ -213,8 +213,8 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				alert("You don't have right to create new consult");
 				return false;
 			}
-
-			controller.editConsult("new");
+			var url = "/record/" + controller.consult.demographicNo + "/consult/new";
+			$location.path(url).search(controller.searchParams);
 		};
 
 		controller.removeDemographicAssignment = function removeDemographicAssignment()
