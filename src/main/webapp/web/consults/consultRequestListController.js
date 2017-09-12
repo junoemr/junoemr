@@ -287,7 +287,6 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 			}
 		},
 		{
-			total: 0, // length of data
 			getData: function(params)
 			{
 				if (controller.justOpen)
@@ -347,7 +346,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 					search1.team = null;
 				}
 
-				consultService.searchRequests(search1).then(
+				return consultService.searchRequests(search1).then(
 					function success(result)
 					{
 						params.total(result.total);
@@ -393,7 +392,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 							}
 						}
 						controller.lastResponse = result.content;
-						controller.consultList = result.content;
+						return result.content;
 					},
 					function error(errors)
 					{
