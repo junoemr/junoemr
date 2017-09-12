@@ -37,7 +37,7 @@
 			<fieldset class="module-list" ng-repeat="mod in summaryCtrl.page.columnOne.modules">
 				<div class="row vertical-align">
 					<div class="col-md-8 col-sm-8">
-						<h5 class="summary-section-heading" ng-click="summaryCtrl.toggleList(mod)">
+						<h5 class="summary-section-heading">
 							{{mod.displayName}}
 						</h5>
 					</div>
