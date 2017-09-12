@@ -282,7 +282,10 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 		controller.tableParams = new NgTableParams(
 		{
 			page: 1, // show first page
-			count: 10 // initial count per page
+			count: 10, // initial count per page
+			sorting: {
+				ReferralDate: 'desc'
+			}
 		},
 		{
 			getData: function(params)
@@ -315,16 +318,9 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 					if ($location.search().srhApptEndDate != null) controller.search.appointmentEndDate = new Date(Number($location.search().srhApptEndDate));
 					if ($location.search().srhStatus != null) controller.search.status = Number($location.search().srhStatus);
 					if ($location.search().srhTeam != null) controller.search.team = $location.search().srhTeam;
+					if ($location.search().srhCountPerPage != null) controller.search.perPage = $location.search().srhCountPerPage;
 
-					if ($location.search().srhCountPerPage != null) {
-						controller.search.perPage = $location.search().srhCountPerPage;
-						// controller.tableParams.$params.count = $location.search().srhCountPerPage;
-					}
-					if ($location.search().srhToPage != null) {
-						controller.search.page = $location.search().srhToPage;
-						// controller.tableParams.$params.page = $location.search().srhToPage;
-					}
-
+					if ($location.search().srhToPage != null) controller.search.page = $location.search().srhToPage;
 					if ($location.search().srhSortMode != null && $location.search().srhSortDir != null)
 					{
 						controller.search.sortColumn = $location.search().sortMode;
@@ -339,13 +335,25 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				var page = params.url().page;
 
 				// shouldn't need these anymore
-				//TODO refactor out of all uses here.
+				//TODO refactor out of all uses here (I think these are used elsewhere).
 				controller.search.startIndex = ((page - 1) * count);
 				controller.search.numToReturn = parseInt(count);
 
 				controller.search.page = params.url().page;
 				controller.search.perPage = params.url().count;
 
+				// need to parse out the ng-tables sort column/direction values
+				// for use in our get parameters.
+				var myRegexp = /sorting\[(\w+)\]/g;
+				for(var key in params.url()) {
+					var match = myRegexp.exec(String(key));
+					if(match) {
+						controller.search.sortColumn = match[1];
+						controller.search.sortDirection = params.url()[String(key)];
+					}
+				}
+
+				// copy to the get parameters hash
 				var search1 = angular.copy(controller.search);
 
 				if (search1.team === allTeams)
@@ -356,10 +364,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				return consultService.searchRequests(search1).then(
 					function success(result)
 					{
-						console.log("Search Results", result);
 						params.total(parseInt(result.meta.total[0]));
-
-						// $defer.resolve(result.content);
 
 						for (var i = 0; i < result.data.length; i++)
 						{
@@ -401,7 +406,6 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 							}
 						}
 						controller.lastResponse = result.data;
-						controller.tableParams.total(parseInt(result.meta.total[0]));
 						return result.data;
 					},
 					function error(errors)
