@@ -97,13 +97,13 @@
 							</div>
 							<div class="col-sm-12">
 								<label>Fax: </label>
-							
-								<%--<select id="letterheadFax" class="form-control inline" style="width: auto;"
-										ng-model="consult.letterheadFax"
-										ng-options="fax.faxNumber as fax.faxUser for fax in consult.faxList">
-								</select>--%>
 								{{consultRequestCtrl.consult.letterheadFax}}
-							</div>	
+								<select id="letterheadFax" class="form-control inline" style="width: auto;"
+										ng-model="consultRequestCtrl.consult.letterheadFax"
+										ng-options="fax.faxNumber as fax.faxUser for fax in consultRequestCtrl.consult.faxList">
+									<option value="" disabled selected>Select Fax</option>
+								</select>
+							</div>
 						</div>
 					</form>
 				</div>
@@ -391,20 +391,20 @@
 			<div class="clear"></div>--%>
 		</div><!-- Right pane End -->
 	</div>
-	<div class="wrapper-action" ng-show="consultRequestCtrl.consultReadAccess"><!-- Action Buttons -->
+	<div class="wrapper-action col-sm-12" ng-show="consultRequestCtrl.consultReadAccess"><!-- Action Buttons -->
 		<button type="button" class="btn btn-large btn-warning action" 
 				ng-click="consultRequestCtrl.printPreview()" 
-				ng-show="consultRequestCtrl.consult.id!=null && consultChanged<=0">
+				ng-show="consultRequestCtrl.consult.id!=null && consultRequestCtrl.consultChanged<=0">
 			Print Preview
 		</button>&nbsp;
 		<button type="button" class="btn btn-large btn-warning action" 
 				ng-click="consultRequestCtrl.sendFax()" 
-				ng-show="consultRequestCtrl.consult.id!=null && consultChanged<=0">
+				ng-show="consultRequestCtrl.consult.id!=null && consultRequestCtrl.consultChanged<=0">
 			Send Fax
 		</button>&nbsp;
 		<button type="button" class="btn btn-large btn-warning action" 
 				ng-click="consultRequestCtrl.eSend()" 
-				ng-show="consultRequestCtrl.eSendEnabled && consult.id!=null && consultChanged<=0">
+				ng-show="consultRequestCtrl.eSendEnabled && consult.id!=null && consultRequestCtrl.consultChanged<=0">
 			Send Electronically
 		</button>&nbsp;
 		<button type="button" class="btn btn-large btn-success action" 
