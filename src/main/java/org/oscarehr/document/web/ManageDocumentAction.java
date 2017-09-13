@@ -116,7 +116,7 @@ public class ManageDocumentAction extends DispatchAction {
 	private CtlDocumentDao ctlDocumentDao = SpringUtils.getBean(CtlDocumentDao.class);
 	private ProviderInboxRoutingDao providerInboxRoutingDAO = SpringUtils.getBean(ProviderInboxRoutingDao.class);
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
+
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 
 		return null;
@@ -145,7 +145,7 @@ public class ManageDocumentAction extends DispatchAction {
 		// TODO: if demoLink is "on", check if msp is in flagproviders, if not save to providerInboxRouting, if yes, don't save.
 
 		// DONT COPY THIS !!!
-		if (flagproviders != null && flagproviders.length > 0) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
+		if ((flagproviders != null && flagproviders.length > 0)) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
 			try {
 				for (String proNo : flagproviders) {
 					providerInboxRoutingDAO.addToProviderInbox(proNo, Integer.parseInt(documentId), LabResultData.DOCUMENT);
