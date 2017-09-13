@@ -58,8 +58,8 @@
 				<div class="form-group">
 					<select class="form-control" ng-model="consultRequestCtrl.consult.status"
 						ng-required="true" 
-						ng-options="status.value as status.name for status in consultRequestCtrl.statuses"
-					/>
+						    ng-options="status.value as status.name for status in consultRequestCtrl.statuses">
+					</select>
 				</div>
 			</div>
 			<br/>

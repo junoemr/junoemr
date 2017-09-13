@@ -41,15 +41,15 @@ angular.module("Common.Services").service("demographicService", [
                 Juno.Common.ServiceHelper.configHeadersWithCache()).then(
                 function success(results)
                 {
-                    results.data.effDate = moment(results.data.effDate).toDate();
-                    results.data.hcRenewDate = moment(results.data.hcRenewDate).toDate();
-                    results.data.endDate = moment(results.data.endDate).toDate();
-                    results.data.patientStatusDate = moment(results.data.patientStatusDate).toDate();
-                    results.data.onWaitingListSinceDate = moment(results.data.onWaitingListSinceDate).toDate();
-                    results.data.scrPaperChartArchivedDate = moment(results.data.scrPaperChartArchivedDate).toDate();
-                    results.data.dateJoined = moment(results.data.dateJoined).toDate();
-                    results.data.rosterTerminationDate = moment(results.data.rosterTerminationDate).toDate();
-                    results.data.rosterDate = moment(results.data.rosterDate).toDate();
+                    if(results.data.effDate) results.data.effDate = moment(results.data.effDate).toDate();
+	                if(results.data.hcRenewDate)results.data.hcRenewDate = moment(results.data.hcRenewDate).toDate();
+	                if(results.data.endDate)results.data.endDate = moment(results.data.endDate).toDate();
+	                if(results.data.patientStatusDate)results.data.patientStatusDate = moment(results.data.patientStatusDate).toDate();
+	                if(results.data.onWaitingListSinceDate)results.data.onWaitingListSinceDate = moment(results.data.onWaitingListSinceDate).toDate();
+	                if(results.data.scrPaperChartArchivedDate)results.data.scrPaperChartArchivedDate = moment(results.data.scrPaperChartArchivedDate).toDate();
+	                if(results.data.dateJoined)results.data.dateJoined = moment(results.data.dateJoined).toDate();
+	                if(results.data.rosterTerminationDate)results.data.rosterTerminationDate = moment(results.data.rosterTerminationDate).toDate();
+	                if(results.data.rosterDate)results.data.rosterDate = moment(results.data.rosterDate).toDate();
                     console.log('converted RESULTS: ', results.data);
                     deferred.resolve(results.data);
                 },

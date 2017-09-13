@@ -253,7 +253,10 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			{
 				consult: function($stateParams, consultService)
 				{
-					return consultService.getRequest($stateParams.requestId, $stateParams.demographicNo);
+					if($stateParams.requestId === "new") {
+						return consultService.getNewRequest($stateParams.demographicNo);
+					}
+					return consultService.getRequest($stateParams.requestId);
 				},
 				user: function(providerService)
 				{

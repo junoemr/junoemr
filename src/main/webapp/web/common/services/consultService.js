@@ -26,8 +26,12 @@
 
  */
 angular.module("Common.Services").service("consultService", [
-	'$http', '$q',
-	function($http, $q)
+	'$http',
+	'$q',
+	'junoHttp',
+	function($http,
+	         $q,
+	         junoHttp)
 	{
 		var service = {};
 
@@ -37,10 +41,13 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			$http.post(service.apiPath + 'searchRequests', search).then(
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.params = search;
+
+			junoHttp.get(service.apiPath + 'searchRequests', config).then(
 				function success(results)
 				{
-					deferred.resolve(results.data);
+					deferred.resolve(results);
 				},
 				function error(errors)
 				{
@@ -51,28 +58,18 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
-		service.getRequest = function getRequest(requestId, demographicId)
+		service.getRequest = function getRequest(requestId)
 		{
 			var deferred = $q.defer();
 
-			if (requestId === "new")
-			{
-				requestId = 0;
-			}
+			var config = Juno.Common.ServiceHelper.configHeaders();
 
-			$http.get(service.apiPath + 'getRequest',
-			{
-				params:
-				{
-					requestId: requestId,
-					demographicId: demographicId
-				}
-			}).then(
+			junoHttp.get(service.apiPath + 'getRequest/' + encodeURIComponent(requestId), config).then(
 				function success(results)
 				{
-					results.data.referralDate = moment(results.data.referralDate).toDate();
-					results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
-					results.data.followUpDate = moment(results.data.followUpDate).toDate();
+					if(results.data.referralDate) results.data.referralDate = moment(results.data.referralDate).toDate();
+					if(results.data.appointmentDate) results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
+					if(results.data.followUpDate) results.data.followUpDate = moment(results.data.followUpDate).toDate();
 
 					deferred.resolve(results.data);
 				},
@@ -85,17 +82,46 @@ angular.module("Common.Services").service("consultService", [
 
 			return deferred.promise;
 		};
+		service.getNewRequest = function getRequest(demographicNo)
+		{
+			var deferred = $q.defer();
+
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.params = {
+				demographicNo: demographicNo
+			};
+
+			junoHttp.get(service.apiPath + 'getNewRequest', config).then(
+				function success(results)
+				{
+					if(results.data.referralDate) results.data.referralDate = moment(results.data.referralDate).toDate();
+					if(results.data.appointmentDate) results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
+					if(results.data.followUpDate) results.data.followUpDate = moment(results.data.followUpDate).toDate();
+
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("consultService::getNewRequest error", errors);
+					deferred.reject(
+						"An error occurred while getting new consult request");
+				});
+
+			return deferred.promise;
+		};
 
 		service.getRequestAttachments = function getRequestAttachments(
 			requestId, demographicId, attached)
 		{
 			var deferred = $q.defer();
 
-			$http.get(service.apiPath + 'getRequestAttachments?requestId=' +
-				encodeURIComponent(requestId) + '&demographicId=' +
-				encodeURIComponent(demographicId) + '&attached=' +
-				encodeURIComponent(attached)
-			).then(
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.params = {
+				'demographicId': encodeURIComponent(demographicId),
+				'attached': encodeURIComponent(attached)
+			};
+
+			junoHttp.get(service.apiPath + 'getRequestAttachments/' + encodeURIComponent(requestId), config).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
@@ -103,8 +129,7 @@ angular.module("Common.Services").service("consultService", [
 				function error(errors)
 				{
 					console.log("consultService::getRequestAttachments error", errors);
-					deferred.reject(
-						"An error occured while getting consult attachments (requestId=" + requestId + ")");
+					deferred.reject("An error occured while getting consult attachments (requestId=" + requestId + ")");
 				});
 
 			return deferred.promise;
@@ -113,8 +138,8 @@ angular.module("Common.Services").service("consultService", [
 		service.saveRequest = function saveRequest(request)
 		{
 			var deferred = $q.defer();
+			junoHttp.post(service.apiPath + 'saveRequest', request).then(
 
-			$http.post(service.apiPath + 'saveRequest', request).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
@@ -132,7 +157,8 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			$http.get(service.apiPath + 'eSendRequest?requestId=' + encodeURIComponent(requestId)).then(
+			junoHttp.get(service.apiPath + 'eSendRequest/' + encodeURIComponent(requestId),
+				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
