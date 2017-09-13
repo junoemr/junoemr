@@ -1497,6 +1497,11 @@ public boolean isBirthday(String schedDate,String demBday){
 
 											ScheduleDate sd = scheduleDateDao.findByProviderNoAndDate(curProvider_no[nProvider],ConversionUtils.fromDateString(strDate));
 
+                                            List<Appointment> appointments = appointmentDao.searchappointmentday(curProvider_no[nProvider], ConversionUtils.fromDateString(year+"-"+month+"-"+day),ConversionUtils.fromIntString(programId_oscarView));
+                                            Iterator<Appointment> it = appointments.iterator();
+
+                                            boolean showApptCountForProvider = OscarProperties.getInstance().isPropertyActive("schedule.show_appointment_count");
+
 											//viewall function
 											if(request.getParameter("viewall")==null || request.getParameter("viewall").equals("0") ) {
 												if(sd == null|| "0".equals(String.valueOf(sd.getAvailable())) ) {
@@ -1511,6 +1516,13 @@ public boolean isBirthday(String schedDate,String demBday){
 										<table border="0" cellpadding="0" bgcolor="#486ebd" cellspacing="0" width="100%"><!-- for the first provider's name -->
 											<tr><td class="infirmaryView" NOWRAP ALIGN="center" BGCOLOR="<%=bColor?"#bfefff":"silver"%>">
 												<!-- caisi infirmary view extension modify ffffffffffff-->
+                                                <%
+                                                    if (showApptCountForProvider) {
+                                                %>
+                                                        <span style="padding-right: 3px;">(<%= appointments.size() %>)</span>
+                                                <%
+                                                    }
+                                                %>
 												<logic:notEqual name="infirmaryView_isOscar" value="false">
 
 												<%
@@ -1603,9 +1615,6 @@ public boolean isBirthday(String schedDate,String demBday){
 																param0[3]=request.getParameter("programIdForLocation");
 																strsearchappointmentday = "searchappointmentdaywithlocation";
 															}
-
-															List<Appointment> appointments = appointmentDao.searchappointmentday(curProvider_no[nProvider], ConversionUtils.fromDateString(year+"-"+month+"-"+day),ConversionUtils.fromIntString(programId_oscarView));
-															Iterator<Appointment> it = appointments.iterator();
 
 															Appointment appointment = null;
 															String router = "";
