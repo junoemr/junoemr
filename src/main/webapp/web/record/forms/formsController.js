@@ -113,7 +113,6 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			formService.getAllFormsByHeading($stateParams.demographicNo, item.label).then(
 				function success(results)
 				{
-					console.debug('whats the index' + index, results);
 					controller.page.currentFormList[index] = Juno.Common.Util.toArray(results.list);
 				},
 				function error(errors)
@@ -272,7 +271,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 			if (item.type == 'eform')
 			{
-				if (angular.isDefined(item.id))
+				if (!Juno.Common.Util.isUndefinedOrNull(item.id))
 				{
 					addOrShow = '../eform/efmshowform_data.jsp?fdid=' + item.id;
 				}
@@ -284,30 +283,38 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 				 * 1=frame
 				 * 2=newwindow
 				 */
-				if (view == 1)
-				{
-					url = addOrShow;
-					$state.go('record.forms.existing',
-					{
-						demographicNo: $stateParams.demographicNo,
-						type: 'eform',
-						id: item.id
-					});
-					$("html, body").animate(
-					{
-						scrollTop: 0
-					}, "slow");
-				}
-				else if (view == 2)
-				{
-					url = addOrShow;
+				// if (view == 1)
+				// {
+				// 	url = addOrShow;
+				// 	$state.go('controller.record.forms.existing',
+				// 	{
+				// 		demographicNo: $stateParams.demographicNo,
+				// 		type: 'eform',
+				// 		id: item.id
+				// 	});
+				// 	$("html, body").animate(
+				// 	{
+				// 		scrollTop: 0
+				// 	}, "slow");
+				// }
+				// else if (view == 2)
+				// {
+				// 	url = addOrShow;
+                //
+				// 	var rnd = Math.round(Math.random() * 1000);
+				// 	win = "win" + rnd;
+                //
+				// 	window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
+				// 	return;
+				// }
 
-					var rnd = Math.round(Math.random() * 1000);
-					win = "win" + rnd;
+                url = addOrShow;
 
-					window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
-					return;
-				}
+				var rnd = Math.round(Math.random() * 1000);
+				win = "win" + rnd;
+
+				window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
+				return;
 
 			}
 			else
@@ -431,7 +438,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		};
 
 		/*
-		 * Used to make group setting active 
+		 * Used to make group setting active
 		 */
 		controller.getGroupListClass = function getGroupListClass(grp)
 		{
@@ -446,11 +453,11 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		 */
 		controller.getActiveFormClass = function getActiveFormClass(item)
 		{
-			if (item.type == controller.page.currentForm.type && item.id == controller.page.currentForm.id && angular.isDefined(item.id))
+			if (item.type === controller.page.currentForm.type && item.id === controller.page.currentForm.id && !Juno.Common.Util.isUndefinedOrNull(item.id))
 			{
 				return "active";
 			}
-			else if (item.type == controller.page.currentForm.type && angular.isUndefined(item.id) && item.formId == controller.page.currentForm.formId)
+			else if (item.type === controller.page.currentForm.type && item.formId === controller.page.currentForm.formId && !Juno.Common.Util.isUndefinedOrNull(item.formId))
 			{
 				return "active";
 			}
