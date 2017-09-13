@@ -63,7 +63,10 @@
 	  	<!-- Default panel contents -->
 		<input type="search" class="form-control" placeholder="Filter" ng-model="formCtrl.filterFormsQ">
 		<ul class="list-group" tabindex="0" ng-keypress="formCtrl.keypress($event)">
-			<li class="list-group-item" ng-repeat="item in formCtrl.page.currentFormList[formCtrl.page.currentlistId].content | filter:formCtrl.filterFormsQ" ng-class="formCtrl.getActiveFormClass(item)">
+
+			<li class="list-group-item"
+				ng-repeat="item in formCtrl.page.currentFormList[formCtrl.page.currentlistId] | filter:formCtrl.filterFormsQ"
+				ng-class="formCtrl.getActiveFormClass(item)">
 				<input type="checkbox" ng-model="item.isChecked"/>
 				<a class="list-group-item-text hand-hover" title="{{item.subject}}" ng-click="formCtrl.viewFormState(item,1)">
 					<span  ng-show="item.date" class="pull-right">{{item.date | date : 'd-MMM-y'}}</span>
