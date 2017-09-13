@@ -96,3 +96,17 @@ Juno.Common.Util.mergeHash = function (baseHash, toMerge)
 	$.extend(true, baseHash, toMerge);
 	return true;
 };
+
+Juno.Common.Util.noNull = function(val)
+{
+    if (typeof val === 'string')
+    {
+        val =  val.trim();
+    }
+    else if ( val === null)
+    {
+		val = "";
+    }
+
+    return val;
+};
