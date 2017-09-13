@@ -110,7 +110,7 @@ public class DefaultNoteService implements NoteService {
 				continue;
 			}
 			filteredNotes.put((String) note.get("uuid"), true);
-			
+
 			EChartNoteEntry e = new EChartNoteEntry();
 			e.setId(note.get("id"));
 			e.setDate((Date) note.get("observation_date"));
@@ -264,7 +264,7 @@ public class DefaultNoteService implements NoteService {
 		intTime = System.currentTimeMillis();
 
 		NoteSelectionResult result = new NoteSelectionResult();
-		
+
 		List<EChartNoteEntry> slice = null;
 		if(criteria.isSliceFromEndOfList()){
 			slice = sliceFromEndOfList(criteria,entries,result);
@@ -351,18 +351,18 @@ public class DefaultNoteService implements NoteService {
 		result.getNotes().addAll(notesToDisplay);
 		return result;
 	}
-	
+
 	private static List<EChartNoteEntry> sliceFromStartOfList(NoteSelectionCriteria criteria,List<EChartNoteEntry> entries,NoteSelectionResult result){
 		List<EChartNoteEntry> slice = new ArrayList<EChartNoteEntry>();
 		int numToReturn = criteria.getMaxResults();
 		int offset = criteria.getFirstResult();
 		int startingPoint = offset;
 		int endingPoint = offset+numToReturn;
-		
+
 		if(offset < 0){
 			startingPoint = 0;
 		}
-		
+
 		if(endingPoint > (entries.size())){
 			endingPoint = entries.size() ;
 		}
@@ -376,13 +376,13 @@ public class DefaultNoteService implements NoteService {
 		}
 		return slice;
 	}
-	
-	
+
+
 	private static List<EChartNoteEntry> sliceFromEndOfList(NoteSelectionCriteria criteria,List<EChartNoteEntry> entries,NoteSelectionResult result){
 		List<EChartNoteEntry> slice = new ArrayList<EChartNoteEntry>();
 		int numToReturn = criteria.getMaxResults();
 		int offset = criteria.getFirstResult();
-		
+
 		if (offset <= 0) {
 			//this is the first fetch, we want the last items up to numToReturn
 			int endOfTheList = entries.size();
@@ -405,8 +405,8 @@ public class DefaultNoteService implements NoteService {
 		return slice;
 	}
 
-	
-	
+
+
 
 	private BillingONCHeader1 findInvoice(Integer id, List<BillingONCHeader1> invoices) {
 		for (BillingONCHeader1 invoice : invoices) {
