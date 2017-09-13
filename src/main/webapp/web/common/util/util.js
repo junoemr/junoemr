@@ -88,7 +88,7 @@ Juno.Common.Util.isInArray = function isInArray(value, array)
  * @param baseHash
  * @param toMerge
  */
-Juno.Common.Util.mergeHash = function (baseHash, toMerge) 
+Juno.Common.Util.mergeHash = function mergeHash(baseHash, toMerge)
 {
 	if (toMerge === 'undefined') {
 		return false;
@@ -97,7 +97,7 @@ Juno.Common.Util.mergeHash = function (baseHash, toMerge)
 	return true;
 };
 
-Juno.Common.Util.noNull = function(val)
+Juno.Common.Util.noNull = function noNull(val)
 {
     if (typeof val === 'string')
     {
@@ -109,4 +109,9 @@ Juno.Common.Util.noNull = function(val)
     }
 
     return val;
+};
+
+Juno.Common.Util.isUndefinedOrNull = function isUndefinedOrNull(val)
+{
+	return angular.isUndefined(val) || val === null;
 };
