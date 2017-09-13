@@ -152,7 +152,7 @@
 				</td>        
 				<td data-title="'<bean:message key="tickler.list.header.message" bundle="ui"/>'">
 					{{tickler.message | cut:true:50}}
-					<span ng-if="tickler.ticklerLinks != null">
+					<span ng-if="tickler.ticklerLinks != null && tickler.ticklerLinks.length > 0">
 						<a target="lab" href="{{tickler.ticklerLinks | ticklerLink}}">ATT</a>
 					</span>
 					<%--<span ng-if="tickler.ticklerComments != null">
