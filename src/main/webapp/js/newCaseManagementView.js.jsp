@@ -148,6 +148,12 @@
     var okToClose = false;
 
     function onClosing() {
+
+        // Save unfinished note on exit. The temp save stuff added in Oscar15 is too fragile
+        // to depend on
+        if( origCaseNote != $F(caseNote) ) {
+            saveNoteAjax('save', 'list');
+        }
         for( var idx = 0; idx < measurementWindows.length; ++idx ) {
             if( !measurementWindows[idx].closed )
                 measurementWindows[idx].parentChanged = true;
