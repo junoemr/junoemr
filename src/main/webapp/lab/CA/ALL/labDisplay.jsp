@@ -198,6 +198,8 @@ else // remote lab
 	}
 }
 
+boolean isLabCLS = ("CLS".equals(handler.getMsgType()) || "CLSDI".equals(handler.getMsgType()));
+
 
 %>                                                                              
 <%!                                                                             
@@ -957,7 +959,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                 <div class="FieldData">
                                                 <% if ("CLS".equals(handler.getMsgType())) { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateServiceCLS"/>:</strong>
-												<% } else { %>
+												<% }
+                                                else if ("CLSDI".equals(handler.getMsgType())) { %>
+                                                	<strong><bean:message key="oscarMDS.segmentDisplay.formDateServiceCLS2"/>:</strong>
+                                                <% }
+                                                else { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateService"/>:</strong>
 												<% } %>
                                                 </div>
@@ -971,9 +977,10 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         <tr>
                                         	<td>
                                         		<div class="FieldData">
-                                                <% if ("CLS".equals(handler.getMsgType())) { %>
+                                                <% if (isLabCLS) { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateReceivedCLS"/>:</strong>
-												<% } else { %>
+												<% } 
+                                                else { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateReceived"/>:</strong>
 												<% } %>
                                                 </div>
@@ -1227,6 +1234,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 							}
 						} else if(handler.getMsgType().equals("CLS")){
                             isUnstructuredDoc = ((CLSHandler) handler).isUnstructured();
+                        } else if(handler.getMsgType().equals("CLSDI")){
+                            isUnstructuredDoc = ((CLSDIHandler) handler).isUnstructured();
                         }
 						%>
 		                       <table style="page-break-inside:avoid;" bgcolor="#003399" border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -1250,9 +1259,13 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                           <tr class="Field2">
 	                               <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formTestName"/></td>
 	                               <td width="60%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formResult"/></td>
-								   <% if ("CLS".equals(handler.getMsgType())) { %>
+								   <% if (handler.getMsgType().equals("CLS")) { %>
 									   <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLS"/></td>
-								   <% } else { %>
+								   <% }
+								   else if (handler.getMsgType().equals("CLSDI")) { %>
+						   				<td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLSDI"/></td>
+								   <% }
+								   else { %>
 									   <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompleted"/></td>
 								   <% } %>
 	                           </tr><%
@@ -1264,9 +1277,13 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                <td width="5%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formAbn"/></td>
                                <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formReferenceRange"/></td>
                                <td width="10%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formUnits"/></td>
-                               <% if ("CLS".equals(handler.getMsgType())) { %>
+                               <% if (handler.getMsgType().equals("CLS")) { %>
                                    <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLS"/></td>
-							   <% } else { %>
+							   <% }
+                               else if (handler.getMsgType().equals("CLSDI")) { %>
+				   					<td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLSDI"/></td>
+							   <% }
+                               else { %>
                                    <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompleted"/></td>
 							   <% } %>
                                <td width="6%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formNew"/></td>

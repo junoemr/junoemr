@@ -76,7 +76,11 @@ public class Utilities {
             
             while ((line = br.readLine()) != null) {
                 if (line.length() > 3){
-                    if (line.substring(0, 3).equals("MSH")){
+                	// ignore the batch header segment for now.
+                	if (line.substring(0, 3).equals("BHS")){
+                		continue;
+                	}
+                	else if (line.substring(0, 3).equals("MSH")){
                         if (firstMSHflag){
                             messages.add(sb.toString());
                             sb.delete(0, sb.length());
@@ -84,7 +88,8 @@ public class Utilities {
                         mshSeg = line;
                         firstMSHflag = true;
                         firstPIDflag = false;
-                    } else if (line.substring(0, 3).equals("PID")){
+                    }
+                	else if (line.substring(0, 3).equals("PID")){
                         if (firstPIDflag){
                             messages.add(sb.toString());
                             sb.delete(0, sb.length());

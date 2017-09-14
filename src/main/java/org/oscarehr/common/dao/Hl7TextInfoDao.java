@@ -64,7 +64,7 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
     	List<Hl7TextInfo> list = query.getResultList();
     	return list;
     }
-
+    
     public List<Hl7TextInfo> searchByAccessionNumber(String acc) {
 
     	String sqlCommand="select x from Hl7TextInfo x where x.accessionNumber like ?1";
@@ -76,6 +76,16 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 		List<Hl7TextInfo> results = query.getResultList();
 
 		return results;
+    }
+    
+    public Hl7TextInfo findLatestVersionByAccessionNo(String acc) {
+    	String sqlCommand="select x from Hl7TextInfo x where x.accessionNumber = :accession " +
+    			" order by obr_date, lab_no DESC";
+
+    	Query query = entityManager.createQuery(sqlCommand);
+		query.setParameter("accession", acc);
+
+		return (getSingleResultOrNull(query));
     }
 
     // Calgary labs are associated by Accession number usually. Glucose labs are not, but can be 

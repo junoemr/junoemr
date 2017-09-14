@@ -45,9 +45,9 @@ import oscar.oscarLab.ca.all.util.Utilities;
 
 public class CLSHandler implements MessageHandler {
 
-	String lineDelimiter = "\r";
-	Logger logger = Logger.getLogger(CLSHandler.class);	
-	Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
+	protected String lineDelimiter = "\r";
+	protected Logger logger = Logger.getLogger(CLSHandler.class);	
+	protected Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
 	
 	public String parse(String serviceName, String fileName, int fileId) {
 
@@ -62,10 +62,6 @@ public class CLSHandler implements MessageHandler {
 			for (i = 0; i < messages.size(); i++) {
 				String msg = messages.get(i);
 				
-				// HACK -- some labs start with an extra line which oscar doesn't read, so skip it
-				if( i==0 && msg.startsWith("BHS")) {
-					continue;
-				}
 				/*
 				if(isDuplicate(msg)) {
 					return ("success");
@@ -162,7 +158,7 @@ public class CLSHandler implements MessageHandler {
 		return outLabString;
 	}
 	
-	private boolean obrExists(String fillerNumber, oscar.oscarLab.ca.all.parsers.CLSHandler parser)
+	protected boolean obrExists(String fillerNumber, oscar.oscarLab.ca.all.parsers.CLSHandler parser)
 	{
 		ArrayList<OBR> searchObrs = this.getObrs(parser);
 		for(OBR searchObr : searchObrs) {
@@ -173,7 +169,7 @@ public class CLSHandler implements MessageHandler {
 		return false;
 	}
 	
-	private ArrayList<OBR> getObrs( oscar.oscarLab.ca.all.parsers.CLSHandler parser)
+	protected ArrayList<OBR> getObrs( oscar.oscarLab.ca.all.parsers.CLSHandler parser)
 	{
 		ArrayList<OBR> outOBR = new ArrayList<OBR>();
         for(int obrIndex = 0; obrIndex < parser.getOBRCount(); obrIndex++) {
@@ -183,13 +179,13 @@ public class CLSHandler implements MessageHandler {
         return outOBR;
 	}
     
-    private String getObrFillerNumber(OBR obr)
+    protected String getObrFillerNumber(OBR obr)
     {
     	return obr.getFillerOrderNumber().getEi1_EntityIdentifier().getValue() + "^" +
                 obr.getFillerOrderNumber().getEi2_NamespaceID().getValue();
     }
 	
-    private String ReplaceAccessionNumber(String message, String oldAccessionNumber, String newAccessionNumber)
+    protected String ReplaceAccessionNumber(String message, String oldAccessionNumber, String newAccessionNumber)
     {
     	message = message.replace(oldAccessionNumber, newAccessionNumber);
     	return message;

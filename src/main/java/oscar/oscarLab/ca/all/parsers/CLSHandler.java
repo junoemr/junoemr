@@ -53,15 +53,15 @@ import oscar.util.UtilDateUtilities;
  */
 public class CLSHandler implements MessageHandler {
 
-	private enum NameType {
+	protected enum NameType {
 		FIRST, MIDDLE, LAST;
 	}
 
-	private static Logger logger = Logger.getLogger(CLSHandler.class);
+	protected static Logger logger = Logger.getLogger(CLSHandler.class);
 
-	private ORU_R01 msg;
+	protected ORU_R01 msg;
 
-	private Terser terser;
+	protected Terser terser;
 
 
 	public void init(String hl7Body) throws HL7Exception {
@@ -651,7 +651,7 @@ public class CLSHandler implements MessageHandler {
 		return get("/.PID-2-4");
 	}
 
-	private String get(String path) {
+	protected String get(String path) {
 		try {
 			return terser.get(path);
 		} catch (HL7Exception e) {

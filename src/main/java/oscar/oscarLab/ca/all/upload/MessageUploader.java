@@ -220,7 +220,7 @@ public final class MessageUploader {
 				hl7TextInfo.setDiscipline(discipline);
 				hl7TextInfo.setReportStatus(reportStatus);
 				hl7TextInfo.setAccessionNumber(accessionNum);
-				if("CLS".equals(type)) {
+				if("CLS".equals(type) || "CLSDI".equals(type)) {
 					hl7TextInfo.setFillerOrderNum(fillerOrderNum);
 				}
 				hl7TextInfoDao.persist(hl7TextInfo);
@@ -246,7 +246,7 @@ public final class MessageUploader {
 					limit = new Integer(1);
 					orderByLength = true;
 					search = "provider_no";
-				} else  if (type.equals("CLS")) {
+				} else  if (type.equals("CLS") || type.equals("CLSDI")) {
 					search = "hso_no";
 				}
 				else if (type.equals("PATHL7")){
