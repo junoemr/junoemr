@@ -119,14 +119,16 @@
     <!--  -->
     <table class="MainTable" id="scrollNumber1" name="encounterTable">
         <tr class="MainTableTopRow">
-            <td class="MainTableTopRowLeftColumn"><bean:message
-                    key="oscarReport.ConsultationReport.msgReport"/></td>
+            <td class="MainTableTopRowLeftColumn">
+                <bean:message key="oscarReport.ConsultationReport.msgReport"/>
+            </td>
             <td class="MainTableTopRowRightColumn">
                 <table class="TopStatusBar">
                     <form action="ConsultationReport.jsp">
                         <tr>
-                            <td><bean:message
-                                    key="oscarReport.ConsultationReport.msgTitle"/></td>
+                            <td>
+                                <bean:message key="oscarReport.ConsultationReport.msgTitle"/>
+                            </td>
                             <td><select name="numMonth">
                                 <option value="1" <%=selled("1", mons)%>>1 <bean:message
                                         key="oscarReport.ConsultationReport.formMonth"/></option>
@@ -187,6 +189,7 @@
                         oscar.oscarReport.data.RptConsultReportData.DemoConsultDataStruct demoData;
                         for (int i = 0; i < conData.demoList.size(); i++) {
                             demoData = (RptConsultReportData.DemoConsultDataStruct) conData.demoList.get(i);
+
                     %>
                     <tr>
                         <td bgcolor="#eeeeff" width=900>
