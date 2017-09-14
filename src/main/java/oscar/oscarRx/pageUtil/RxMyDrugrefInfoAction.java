@@ -5,23 +5,22 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * <p>
+ *
  * This software was written for the
  * Department of Family Medicine
  * McMaster University
  * Hamilton
  * Ontario, Canada
  */
-
 
 package oscar.oscarRx.pageUtil;
 
@@ -131,7 +130,7 @@ public final class RxMyDrugrefInfoAction extends DispatchAction {
 			UserPropertyDAO propDAO = (UserPropertyDAO) ctx.getBean("UserPropertyDAO");
 			UserDSMessagePrefsDao dsmessageDao = (UserDSMessagePrefsDao) ctx.getBean("userDSMessagePrefsDao");
 			MiscUtils.getLogger().debug("hideResources is before " + request.getSession().getAttribute("hideResources"));
-			Hashtable dsPrefs = new Hashtable();
+			Hashtable<String,Long> dsPrefs = new Hashtable<String,Long>();
 			if (request.getSession().getAttribute("hideResources") == null) {
 
 				dsPrefs = dsmessageDao.getHashofMessages(provider, UserDSMessagePrefs.MYDRUGREF);
@@ -304,8 +303,8 @@ public final class RxMyDrugrefInfoAction extends DispatchAction {
 				MiscUtils.getLogger().error("Error", npe);
 			}
 			//Vector idWarningVec=new Vector();
-			Vector<Hashtable> allRetVec = new Vector();
-			Vector<String> currentIdWarnings = new Vector();
+			Vector<Hashtable<String,String>> allRetVec = new Vector<Hashtable<String,String>>();
+			Vector<String> currentIdWarnings = new Vector<String>();
 			for (int i = 0; i < all.size(); i++) {
 				Hashtable ht = (Hashtable) all.get(i);
 				Date dt = (Date) ht.get("updated_at");
@@ -320,7 +319,7 @@ public final class RxMyDrugrefInfoAction extends DispatchAction {
 			MiscUtils.getLogger().debug("currentIdWarnings is  " + currentIdWarnings);
 			//set session attribute hiddenResources if it was null
 			if (dsPrefs != null && dsPrefs.size() > 0) {
-				Hashtable hiddenR = new Hashtable();
+				Hashtable<String,String> hiddenR = new Hashtable<String,String>();
 				Enumeration em = dsPrefs.keys();
 				while (em.hasMoreElements()) {
 					String resId = (String) em.nextElement();
@@ -337,7 +336,7 @@ public final class RxMyDrugrefInfoAction extends DispatchAction {
 			//if hideResources are not in warnings, remove them from hiddenResource and set them to archived=0 in database;
 			Hashtable hiddenResAttribute = (Hashtable) request.getSession().getAttribute("hideResources");
 			if (hiddenResAttribute == null) {
-				Hashtable emptyHiddenRes = new Hashtable();
+				Hashtable<String,String> emptyHiddenRes = new Hashtable<String,String>();
 				request.getSession().setAttribute("hideResources", emptyHiddenRes);
 			}
 			else {
