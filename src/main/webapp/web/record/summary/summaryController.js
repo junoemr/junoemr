@@ -236,7 +236,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.isNoteBeingEdited = function isNoteBeingEdited(note)
 		{
 
-			if (note.uuid == controller.page.currentEditNote.uuid)
+			if (note.uuid === controller.page.currentEditNote.uuid && note.uuid !== null)
 			{
 				return true;
 			}
@@ -252,7 +252,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		// TODO
 		$rootScope.$on('stopEditingNote', function()
 		{
-			console.log('stopEditingNote');
 			controller.page.currentEditNote = {};
 		});
 
@@ -359,9 +358,16 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 
 			if(controller.page.onlyMine)
+			{
 				// Hide note if the current user is not in the list of editors.
-				if(!Juno.Common.Util.isInArray(user.formattedName, note.editorNames))
-                    return false;
+				// TODO: Decide later if we want to filter based on this rather than the author alone
+				// if (!Juno.Common.Util.isInArray(user.formattedName, note.editorNames))
+				// 	return false;
+
+				// Hide the note if the current user's provder number does not match that of the note author
+				if (user.providerNo !== note.providerNo)
+					return false;
+			}
 
 			return true;
 		};
