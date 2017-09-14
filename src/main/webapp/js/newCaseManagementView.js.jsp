@@ -2414,6 +2414,7 @@
 			url,
 			{
 				method: 'post',
+				asynchronous: false,
 				postBody: params,
 				evalScripts: true,
 				onSuccess: function(request) {
