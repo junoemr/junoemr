@@ -114,6 +114,17 @@ You have no rights to access the data!
 	if( userNo != null && (useNewEchart != null && useNewEchart.equals(Boolean.TRUE)) ) {
         session.setAttribute("newCaseManagement", "true");
 %>
+<%!
+	public String validateParam(String param) {
+		if (param == null) {
+			param = "";
+		} else {
+			param = URLEncoder.encode(param);
+		}
+
+		return param;
+	}
+%>
 <caisi:isModuleLoad moduleName="caisi" reverse="true">
 	<%
             EctProgram prgrmMgr = new EctProgram(session);
@@ -123,15 +134,17 @@ You have no rights to access the data!
             session.setAttribute(strBeanName, bean);
             session.setAttribute("casemgmt_bean_flag", "true");
 
-            String providerView = "";
-            String apptProvider = "";
 
-            if (request.getParameter("providerview") != null)
-            	providerView = request.getParameter("providerview");
-            if (request.getParameter("apptProvider_no") != null)
-            	apptProvider = request.getParameter("apptProvider_no");
-
-            String hrefurl=request.getContextPath()+"/casemgmt/forward.jsp?action=view&demographicNo="+URLEncoder.encode(bean.demographicNo)+"&providerNo="+URLEncoder.encode(bean.providerNo)+"&providerName="+URLEncoder.encode(bean.userName)+"&appointmentNo="+URLEncoder.encode(bean.appointmentNo)+"&reason=" + URLEncoder.encode(bean.reason) + "&appointmentDate="+URLEncoder.encode(bean.appointmentDate)+"&start_time="+URLEncoder.encode(bean.startTime)+ "&apptProvider=" + URLEncoder.encode(apptProvider)+"&providerview="+ URLEncoder.encode(providerView);
+            String hrefurl=request.getContextPath()+"/casemgmt/forward.jsp?action=view" +
+					"&demographicNo="+ validateParam(bean.demographicNo)+
+					"&providerNo="+validateParam(bean.providerNo)+
+					"&providerName="+validateParam(bean.userName)+
+					"&appointmentNo="+validateParam(bean.appointmentNo)+
+					"&reason=" +validateParam(bean.reason) +
+					"&appointmentDate="+validateParam(bean.appointmentDate)+
+					"&start_time="+validateParam(bean.startTime)+
+					"&apptProvider=" +validateParam(request.getParameter("apptProvider_no"))+
+					"&providerview="+validateParam(request.getParameter("providerview"));
 
             if( request.getParameter("noteBody") != null )
                 hrefurl += "&noteBody=" + request.getParameter("noteBody");
