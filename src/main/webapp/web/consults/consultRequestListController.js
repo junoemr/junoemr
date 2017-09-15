@@ -253,7 +253,9 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 		controller.setSearchParams = function setSearchParams()
 		{
 			controller.searchParams = {};
-			if ($state.$current == "record.consultRequests") controller.searchParams.list = "patient";
+
+			if ($state.$current.name === "record.consultRequests")
+				controller.searchParams.list = "patient";
 			else if (controller.search.demographicNo != null) controller.searchParams.srhDemoNo = controller.search.demographicNo;
 
 			if (controller.search.mrpNo != null) controller.searchParams.srhMrpNo = controller.search.mrpNo;
