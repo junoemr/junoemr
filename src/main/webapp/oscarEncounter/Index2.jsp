@@ -122,7 +122,16 @@ You have no rights to access the data!
             String strBeanName = "casemgmt_oscar_bean" + bean.getDemographicNo();
             session.setAttribute(strBeanName, bean);
             session.setAttribute("casemgmt_bean_flag", "true");
-            String hrefurl=request.getContextPath()+"/casemgmt/forward.jsp?action=view&demographicNo="+URLEncoder.encode(bean.demographicNo)+"&providerNo="+URLEncoder.encode(bean.providerNo)+"&providerName="+URLEncoder.encode(bean.userName)+"&appointmentNo="+URLEncoder.encode(request.getParameter("appointmentNo"))+"&reason=" + URLEncoder.encode(request.getParameter("reason")) + "&appointmentDate="+URLEncoder.encode(request.getParameter("appointmentDate"))+"&start_time="+URLEncoder.encode(request.getParameter("startTime"))+ "&apptProvider=" + URLEncoder.encode(request.getParameter("apptProvider_no"))+"&providerview="+ URLEncoder.encode(request.getParameter("providerview"));
+
+            String providerView = "";
+            String apptProvider = "";
+
+            if (request.getParameter("providerview") != null)
+            	providerView = request.getParameter("providerview");
+            if (request.getParameter("apptProvider_no") != null)
+            	apptProvider = request.getParameter("apptProvider_no");
+
+            String hrefurl=request.getContextPath()+"/casemgmt/forward.jsp?action=view&demographicNo="+URLEncoder.encode(bean.demographicNo)+"&providerNo="+URLEncoder.encode(bean.providerNo)+"&providerName="+URLEncoder.encode(bean.userName)+"&appointmentNo="+URLEncoder.encode(bean.appointmentNo)+"&reason=" + URLEncoder.encode(bean.reason) + "&appointmentDate="+URLEncoder.encode(bean.appointmentDate)+"&start_time="+URLEncoder.encode(bean.startTime)+ "&apptProvider=" + URLEncoder.encode(apptProvider)+"&providerview="+ URLEncoder.encode(providerView);
 
             if( request.getParameter("noteBody") != null )
                 hrefurl += "&noteBody=" + request.getParameter("noteBody");
