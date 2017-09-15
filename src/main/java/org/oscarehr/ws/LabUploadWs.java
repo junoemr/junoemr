@@ -58,6 +58,7 @@ public class LabUploadWs extends AbstractWs {
 	private static final String LAB_TYPE_GAMMADYNACARE = "GDML";
 	private static final String LAB_TYPE_CDL = "CDL";
 	private static final String LAB_TYPE_CLS = "CLS";
+    private static final String LAB_TYPE_CLSDI = "CLSDI";
     private static final String LAB_TYPE_EPSILON_MHL = "EPSILON";
 
     private static final Logger logger=MiscUtils.getLogger();
@@ -84,6 +85,28 @@ public class LabUploadWs extends AbstractWs {
         returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
         return returnMessage;
     }
+	public String uploadCLSDI(
+			@WebParam(name="file_name") String fileName,
+			@WebParam(name="contents") String contents,
+			@WebParam(name="oscar_provider_no") String oscarProviderNo
+	)
+	{
+		String returnMessage, audit;
+
+		try {
+			audit = importLab(fileName, contents, LAB_TYPE_CLSDI, oscarProviderNo);
+
+		} catch(Exception e)
+		{
+			logger.error(e.getMessage());
+			returnMessage = "{\"success\":0,\"message\":\"" +
+					e.getMessage() + "\", \"audit\":\"\"}";
+			return returnMessage;
+		}
+
+		returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
+		return returnMessage;
+	}
 
     public String uploadCML(
             @WebParam(name="file_name") String fileName,

@@ -57,7 +57,7 @@ public final class HandlerClassFactory {
      *  Create and return the message handler corresponding to the message type
      */
     public static MessageHandler getHandler(String type) {
-        Document doc = null;
+        Document doc;
         String msgType;
         String msgHandler = "";
         
@@ -78,25 +78,33 @@ public final class HandlerClassFactory {
                 Element e = (Element) items.get(i);
                 msgType = e.getAttributeValue("name");
                 String className = e.getAttributeValue("className");
-                if (msgType.equals(type) && (className.indexOf(".")==-1) )
-                    msgHandler = "oscar.oscarLab.ca.all.upload.handlers."+e.getAttributeValue("className");
-                if (msgType.equals(type) && (className.indexOf(".")!=-1) )
-                	msgHandler = className;
+                if(msgType.equals(type)) {
+                    if (className.contains(".")) {
+                        msgHandler = className;
+                    }
+                    else {
+                        msgHandler = "oscar.oscarLab.ca.all.upload.handlers." + className;
+                    }
+                }
             }
-        }catch(Exception e){
+        }
+        catch(Exception e){
             logger.error("Could not parse config file", e);
         }
         // create and return the message handler
-        if (msgHandler.equals("")){
+        if (msgHandler.equals("")) {
+            logger.warn("No Lab Handler of type " + type + " in config file. Default Handler Used");
             return( new DefaultHandler() );
-        }else{
+        }
+        else {
             try {
                 @SuppressWarnings("unchecked")
                 Class classRef = Class.forName(msgHandler);
                 MessageHandler mh = (MessageHandler) classRef.newInstance();
                 logger.debug("Message handler '"+msgHandler+"' created successfully");
                 return(mh);
-            } catch (Exception e){
+            }
+            catch (Exception e){
                 logger.error("Could not create message handler: "+msgHandler+", Using default message handler instead", e);
                 return(new DefaultHandler());
             }

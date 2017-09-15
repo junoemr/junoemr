@@ -54,14 +54,14 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
 public class CLSHandler implements MessageHandler {
 
 	private enum NameType {
-		FIRST, MIDDLE, LAST;
+		FIRST, MIDDLE, LAST
 	}
 
 	private static Logger logger = Logger.getLogger(CLSHandler.class);
 
-	private ORU_R01 msg;
+	protected ORU_R01 msg;
 
-	private Terser terser;
+	protected Terser terser;
 
 
 	public void init(String hl7Body) throws HL7Exception {
@@ -347,51 +347,43 @@ public class CLSHandler implements MessageHandler {
 	}
 
 	private String getName(NameType type) {
-		// PID contains
-		// Last, First Middle
-		String name = get("/.PID-5-1");
-		if (name == null) {
+		// format is last,first middle
+		String content = get("/.PID-5-1");
+
+		String firstName = getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()).trim();
+		String middleName = getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getXpn3_MiddleInitialOrName().getValue()).trim();
+
+		if (content == null || content.trim().isEmpty() || content.trim().equals(",")) {
 			return "";
 		}
 
-		int firstLastDelimiterIndex = name.indexOf(',');
-		if (firstLastDelimiterIndex == -1) {
-			if (type == NameType.LAST) {
-				return name.trim(); // assume it's the last name
-			} else {
-				return "";
+		String[] allNames = content.trim().split(",");
+
+		String lastName = allNames[0].trim();
+		// First and middle names occur after the comma, if it exists
+		if (allNames.length > 1) {
+			String firstMiddle = allNames[1].trim();
+
+			int firstMiddleDelimiterIndex = firstMiddle.lastIndexOf(' ');
+			if (firstMiddleDelimiterIndex == -1) {
+				firstName = firstMiddle;
+			}
+			else {
+				firstName = firstMiddle.substring(0, firstMiddleDelimiterIndex).trim();
+				middleName = firstMiddle.substring(firstMiddleDelimiterIndex).trim();
 			}
 		}
 
-		String last = name.substring(0, firstLastDelimiterIndex).trim();
-		if (type == NameType.LAST) {
-			return last; // assume it's the last name
+		switch (type) {
+			case FIRST:
+				return firstName;
+			case MIDDLE:
+				return middleName;
+			case LAST:
+				return lastName;
+			default:
+				throw new IllegalArgumentException("Invalid name type " + type);
 		}
-
-		String firstMiddle = name.substring(Math.min(name.length(), firstLastDelimiterIndex + 1));
-		if (firstMiddle != null) {
-			firstMiddle = firstMiddle.trim();
-		}
-
-		int firstMiddleDelimiterIndex = firstMiddle.lastIndexOf(' ');
-		if (firstMiddleDelimiterIndex == -1) {
-			if (type == NameType.FIRST) {
-				return firstMiddle; // assume it's the first name
-			} else {
-				return "";
-			}
-		}
-
-		String result;
-		if (type == NameType.FIRST) {
-			result = firstMiddle.substring(0, firstMiddleDelimiterIndex);
-			return result.trim();
-		} else if (type == NameType.MIDDLE) {
-			result = firstMiddle.substring(firstMiddleDelimiterIndex);
-			return result.trim();
-		}
-
-		throw new IllegalArgumentException("Invalid name type " + type);
 	}
 
 	public String getLastName() {
@@ -430,11 +422,47 @@ public class CLSHandler implements MessageHandler {
 	}
 
 	public String getHomePhone() {
-		return "";
+		String phone = "";
+		int i = 0;
+		try {
+			while (!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue()).equals("")) {
+				if (i == 0) {
+					phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
+				}
+				else {
+					phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
+				}
+				i++;
+			}
+			return (phone);
+		}
+		catch (Exception e) {
+			logger.error("Could not return home phone number", e);
+
+			return ("");
+		}
 	}
 
 	public String getWorkPhone() {
-		return "";
+		String phone = "";
+		int i = 0;
+		try {
+			while (!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue()).equals("")) {
+				if (i == 0) {
+					phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
+				}
+				else {
+					phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
+				}
+				i++;
+			}
+			return (phone);
+		}
+		catch (Exception e) {
+			logger.error("Could not return work phone number", e);
+
+			return ("");
+		}
 	}
 
 	public String getPatientLocation() {
@@ -602,7 +630,7 @@ public class CLSHandler implements MessageHandler {
 	protected String getString(String retrieve) {
 		if (retrieve != null) {
 			retrieve.replaceAll("^", " ");
-			return (retrieve.trim());
+			return (retrieve.trim().replaceAll("\\\\\\.br\\\\", "<br />"));
 		} else {
 			return ("");
 		}
@@ -629,7 +657,7 @@ public class CLSHandler implements MessageHandler {
 		return get("/.PID-2-4");
 	}
 
-	private String get(String path) {
+	protected String get(String path) {
 		try {
 			return terser.get(path);
 		} catch (HL7Exception e) {

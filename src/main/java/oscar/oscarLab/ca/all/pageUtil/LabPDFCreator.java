@@ -51,6 +51,7 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
+import oscar.oscarLab.ca.all.parsers.CLSDIHandler;
 import oscar.oscarLab.ca.all.parsers.CLSHandler;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
@@ -97,6 +98,8 @@ public class LabPDFCreator extends PdfPageEventHelper{
     private Font boldFont;
    // private Font redFont;
     private String dateLabReceived;
+
+	private boolean isTypeCLS = false;
 
 	public static byte[] getPdfBytes(String segmentId, String providerNo) throws IOException, DocumentException
     {
@@ -184,6 +187,8 @@ public class LabPDFCreator extends PdfPageEventHelper{
         if (handler == null)
             throw new DocumentException();
 
+	    this.isTypeCLS = (handler.getMsgType().equals("CLS") || handler.getMsgType().equals("CLSDI"));
+
         //response.setContentType("application/pdf");  //octet-stream
         //response.setHeader("Content-Disposition", "attachment; filename=\""+handler.getPatientName().replaceAll("\\s", "_")+"_LabReport.pdf\"");
 
@@ -229,7 +234,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
         table.addCell(cell);
         cell.setBorder(15);
         cell.setBackgroundColor(new Color(210, 212, 255));
-		if(handler.getMsgType().equals("CLS")){
+		if(handler.getMsgType().equals("CLS")) { // intentionally skip CLSDI
 			cell.setPhrase(new Phrase("Legend:  A=Abnormal  L=Low  H=High  C=Critical", boldFont));
 		}
 		else
@@ -252,17 +257,20 @@ public class LabPDFCreator extends PdfPageEventHelper{
 	 * header, the test result headers and the test results for that category.
 	 */
 	private void addLabCategory(String header, MessageHandler extraHandler) throws DocumentException {
-		MessageHandler handler = (extraHandler!=null)?extraHandler:this.handler;
-		if(handler.getMsgType().equals("PATHL7")){
+		MessageHandler handler = (extraHandler != null) ? extraHandler : this.handler;
+		if (handler.getMsgType().equals("PATHL7")) {
 			this.isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(header);
-		} else if(handler.getMsgType().equals("CLS"))
-		{
+		}
+		else if (handler.getMsgType().equals("CLS")) {
 			this.isUnstructuredDoc = ((CLSHandler) handler).isUnstructured();
+		}
+		else if (handler.getMsgType().equals("CLSDI")) {
+			this.isUnstructuredDoc = ((CLSDIHandler) handler).isUnstructured();
 		}
 		
 		float[] mainTableWidths;
 		if(isUnstructuredDoc){
-			if(handler.getMsgType().equals("CLS"))
+			if(isTypeCLS)
 			{
 				mainTableWidths = new float[] { 5f, 10f, 3f, 2f};
 			} else
@@ -300,7 +308,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		table.addCell(cell);}
 
 		// table headers
-		if(isUnstructuredDoc){
+		if (isUnstructuredDoc) {
 			cell.setColspan(1);
 			cell.setBorder(15);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -309,42 +317,44 @@ public class LabPDFCreator extends PdfPageEventHelper{
 			table.addCell(cell);
 			cell.setPhrase(new Phrase("Result", boldFont));
 			table.addCell(cell);
-			if(handler.getMsgType().equals("CLS"))
-			{
-				cell.setPhrase(new Phrase("Date/Time Collected", boldFont));
+			if (isTypeCLS) {
+				String phrase = (handler.getMsgType().equals("CLSDI")) ? "Exam Date" : "Date/Time Collected";
+				cell.setPhrase(new Phrase(phrase, boldFont));
 				table.addCell(cell);
 				cell.setPhrase(new Phrase("Status", boldFont));
-				table.addCell(cell); 
-			} else 
-			{
+				table.addCell(cell);
+			}
+			else {
 				cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
 				table.addCell(cell);
 			}
-		} else{
-		cell.setColspan(1);
-		cell.setBorder(15);
-		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-		cell.setBackgroundColor(new Color(210, 212, 255));
-		cell.setPhrase(new Phrase("Test Name(s)", boldFont));
-		table.addCell(cell);
-		cell.setPhrase(new Phrase("Result", boldFont));
-		table.addCell(cell);
-		cell.setPhrase(new Phrase("Abn", boldFont));
-		table.addCell(cell);
-		cell.setPhrase(new Phrase("Reference Range", boldFont));
-		table.addCell(cell);
-		cell.setPhrase(new Phrase("Units", boldFont));
-		table.addCell(cell);
-		if(handler.getMsgType().equals("CLS")){
-			cell.setPhrase(new Phrase("Date/Time Collected", boldFont));
 		}
-		else
-		{
-			cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
+		else {
+			cell.setColspan(1);
+			cell.setBorder(15);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setBackgroundColor(new Color(210, 212, 255));
+			cell.setPhrase(new Phrase("Test Name(s)", boldFont));
+			table.addCell(cell);
+			cell.setPhrase(new Phrase("Result", boldFont));
+			table.addCell(cell);
+			cell.setPhrase(new Phrase("Abn", boldFont));
+			table.addCell(cell);
+			cell.setPhrase(new Phrase("Reference Range", boldFont));
+			table.addCell(cell);
+			cell.setPhrase(new Phrase("Units", boldFont));
+			table.addCell(cell);
+			if (isTypeCLS) {
+				String phrase = (handler.getMsgType().equals("CLSDI")) ? "Exam Date" : "Date/Time Collected";
+				cell.setPhrase(new Phrase(phrase, boldFont));
+			}
+			else {
+				cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
+			}
+			table.addCell(cell);
+			cell.setPhrase(new Phrase("Status", boldFont));
+			table.addCell(cell);
 		}
-		table.addCell(cell);
-		cell.setPhrase(new Phrase("Status", boldFont));
-		table.addCell(cell); }
 
 
 		// add test results
@@ -394,10 +404,13 @@ public class LabPDFCreator extends PdfPageEventHelper{
 								|| (handler.getMsgType().equals("PFHT") && !obxName.equals("") && header.equals(handler.getObservationHeader(j,k)))) { // <<-- DNS only needed for
 													// MDS messages
 							String obrName = handler.getOBRName(j);
+							boolean obxCountBool = ((isTypeCLS && obxCount > 0 ) || obxCount > 1);
+
 							// add the obrname if necessary
 							if (!obrFlag
 									&& !obrName.equals("")
-									&& (!(obxName.contains(obrName) && obxCount < 2 && !isUnstructuredDoc))) {
+									&& ((!(obxName.contains(obrName) || obxCountBool)
+										&& obxCount < 2 && !isUnstructuredDoc))) {
 								// cell.setBackgroundColor(getHighlightColor(linenum));
 								linenum++;
 								cell.setPhrase(new Phrase(obrName, boldFont));
@@ -435,7 +448,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 									cell.setPhrase(new Phrase(handler.getTimeStamp(j, k), lineFont));		
 									table.addCell(cell);
 								}
-								if(handler.getMsgType().equals("CLS"))
+								if(isTypeCLS)
 								{
 									cell.setPhrase(new Phrase(handler
 											.getOBXResultStatus(j, k), lineFont));
@@ -489,7 +502,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 								if(handler.getMsgType().equals("PATHL7")){
 									cell.setPhrase(new Phrase(abnFlag, lineFont));
 								} 
-								else if("CLS".equals(handler.getMsgType())) 
+								else if(isTypeCLS)
 								{
 									cell.setPhrase(new Phrase(
 										(handler.isOBXAbnormal(j, k) ?

@@ -26,12 +26,10 @@
 --%>
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="oscar.util.ConversionUtils"%>
 <%@page import="org.oscarehr.common.dao.PatientLabRoutingDao"%>
 <%@page import="org.oscarehr.common.model.PatientLabRouting"%>
 <%@page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo"%>
-<%@page import="org.oscarehr.phr.util.MyOscarUtils"%>
 <%@page import="java.net.URLEncoder"%>
 <%@page import="org.apache.commons.lang.builder.ReflectionToStringBuilder"%>
 <%@page import="org.oscarehr.util.MiscUtils"%>
@@ -40,14 +38,11 @@
 <%@page import="oscar.oscarLab.ca.all.web.LabDisplayHelper"%>
 <%@page errorPage="../../../provider/errorpage.jsp" %>
 <%@ page import="java.util.*,
-		 java.sql.*,
-		 oscar.oscarDB.*, oscar.oscarLab.FileUploadCheck, oscar.util.UtilDateUtilities,
+		 oscar.util.UtilDateUtilities,
 		 oscar.oscarLab.ca.all.*,
-		 oscar.oscarLab.ca.all.util.*,
 		 oscar.oscarLab.ca.all.parsers.*,
 		 oscar.oscarLab.LabRequestReportLink,
 		 oscar.oscarMDS.data.ReportStatus,oscar.log.*,
-		 org.apache.commons.codec.binary.Base64,
          oscar.OscarProperties" %>
 <%@ page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink"%>
 <%@ page import="org.oscarehr.casemgmt.model.CaseManagementNote"%>
@@ -212,6 +207,8 @@ else // remote lab
 		MiscUtils.getLogger().error("Error", e);
 	}
 }
+
+boolean isLabCLS = ("CLS".equals(handler.getMsgType()) || "CLSDI".equals(handler.getMsgType()));
 
 /********************** Converted to this sport *****************************/
 
@@ -916,7 +913,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                 <div class="FieldData">
                                                 <% if ("CLS".equals(handler.getMsgType())) { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateServiceCLS"/>:</strong>
-												<% } else { %>
+                                                <%}
+                                                else if ("CLSDI".equals(handler.getMsgType())) { %>
+	                                                <strong><bean:message key="oscarMDS.segmentDisplay.formDateServiceCLSDI"/>:</strong>
+                                                <% }
+												else { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateService"/>:</strong>
 												<% } %>
                                                 </div>
@@ -930,7 +931,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         <tr>
                                         	<td>
                                         		<div class="FieldData">
-                                                <% if ("CLS".equals(handler.getMsgType())) { %>
+                                                <% if (isLabCLS) { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateReceivedCLS"/>:</strong>
 												<% } else { %>
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formDateReceived"/>:</strong>
@@ -1175,6 +1176,9 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						} else if(handler.getMsgType().equals("CLS")){
                             isUnstructuredDoc = ((CLSHandler) handler).isUnstructured();
                         }
+                        else if(handler.getMsgType().equals("CLSDI")){
+                            isUnstructuredDoc = ((CLSDIHandler) handler).isUnstructured();
+                        }
 						%>
 		                       <table style="page-break-inside:avoid;" bgcolor="#003399" border="0" cellpadding="0" cellspacing="0" width="100%">
 	                           <tr>
@@ -1199,7 +1203,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                               <td width="60%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formResult"/></td>
 								   <% if ("CLS".equals(handler.getMsgType())) { %>
 									   <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLS"/></td>
-								   <% } else { %>
+		                           <% }
+		                           else if ("CLSDI".equals(handler.getMsgType())) { %>
+		                           <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLSDI"/></td>
+								   <% }
+								   else { %>
 									   <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompleted"/></td>
 								   <% } %>
 	                           </tr><%
@@ -1213,7 +1221,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                <td width="10%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formUnits"/></td>
                                <% if ("CLS".equals(handler.getMsgType())) { %>
                                    <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLS"/></td>
-							   <% } else { %>
+							   <% }
+							   else if ("CLSDI".equals(handler.getMsgType())) { %>
+	                           <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLSDI"/></td>
+	                           <% }
+	                           else { %>
                                    <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompleted"/></td>
 							   <% } %>
                                <td width="6%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formNew"/></td>
