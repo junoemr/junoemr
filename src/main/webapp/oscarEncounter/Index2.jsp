@@ -136,15 +136,15 @@ You have no rights to access the data!
 
 
             String hrefurl=request.getContextPath()+"/casemgmt/forward.jsp?action=view" +
-					"&demographicNo="+ validateParam(bean.demographicNo)+
-					"&providerNo="+validateParam(bean.providerNo)+
-					"&providerName="+validateParam(bean.userName)+
-					"&appointmentNo="+validateParam(bean.appointmentNo)+
-					"&reason=" +validateParam(bean.reason) +
-					"&appointmentDate="+validateParam(bean.appointmentDate)+
-					"&start_time="+validateParam(bean.startTime)+
-					"&apptProvider=" +validateParam(request.getParameter("apptProvider_no"))+
-					"&providerview="+validateParam(request.getParameter("providerview"));
+				"&demographicNo="+ validateParam(bean.demographicNo)+
+				"&providerNo="+validateParam(bean.providerNo)+
+				"&providerName="+validateParam(bean.userName)+
+				"&appointmentNo="+validateParam(bean.appointmentNo)+
+				"&reason=" +validateParam(bean.reason) +
+				"&appointmentDate="+validateParam(bean.appointmentDate)+
+				"&start_time="+validateParam(bean.startTime)+
+				"&apptProvider=" +validateParam(request.getParameter("apptProvider_no"))+
+				"&providerview="+validateParam(request.getParameter("providerview"));
 
             if( request.getParameter("noteBody") != null )
                 hrefurl += "&noteBody=" + request.getParameter("noteBody");
