@@ -649,17 +649,17 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.insertTemplate = function insertTemplate(item, model, label)
 		{
-
+			
 			uxService.getTemplate(
 			{
 				name: model
 			}).then(
 				function success(results)
 				{
-					if (results.templates != null)
+					if (results.templates !== null)
 					{
-						//	controller.page.encounterNote.note = controller.page.encounterNote.note + "\n\n" + results.templates.encounterTemplateValue;
-						controller.page.encounterNote.note = controller.page.encounterNote.note + results.templates.encounterTemplateValue;
+						var template = results.templates[0];
+						controller.page.encounterNote.note = controller.page.encounterNote.note + template.encounterTemplateValue;
 						controller.options = {
 							magicVal: ''
 						};
