@@ -180,7 +180,7 @@
 		<!--  end row -->
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'schedule'">
-			<div class="col-sm-6 col-sm-offset-3" >
+			<div class="col-md-8 col-md-offset-2 col-sm-12" >
 				<div class="form-group col-sm-6">
 					<label>Start Hour (0-23):</label>
 					<input ng-model="settingsCtrl.pref.startHour" placeholder="Start Hour" class="form-control" type="text">
@@ -544,7 +544,7 @@
 		</div>
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'summary'" id="summary">
-			<div class="col-sm-5 col-sm-offset-3">
+			<div class="col-md-7 col-md-offset-2">
 				<div class="col-sm-12 no-padding">
 					<h3>Notes</h3>
 					<hr>
@@ -588,7 +588,7 @@
 						<input ng-model="settingsCtrl.pref.quickChartSize" class="form-control" type="text">
 					</div>
 				</div>
-				<div class="col-sm-12 no-padding">
+				<div class="col-sm-12 no-padding" id="summary-items">
 					<h3>Patient Summary Viewable Items</h3>
 					<hr>
 					<div class="form-group col-sm-12">
@@ -608,7 +608,7 @@
 				</div>
 				<ng-include ng-if="settingsCtrl.pref.summaryItemCustomDisplay" src="'settings/partials/patientSummaryItems.html'"></ng-include>
 			</div>
-			<div class="col-sm-3 pull-right">
+			<div class="col-md-3 pull-right col-xs-12">
 				<h4>Classic Encounter Preferences:</h4>
 				<div class="well">
 					<a href="javascript:void(0)" ng-click="settingsCtrl.showDefaultEncounterWindowSizePopup()">Set Default Encounter Window Size</a><br>
@@ -743,9 +743,8 @@
 
 				</div>
 			</div>
-		</div>
 	</form>
-
+	
 	<div class="col-sm-4 col-sm-offset-4 settings-footer text-center">
 		<button class="btn btn-primary" ng-click="settingsCtrl.cancel()">Cancel</button>
 		<button class="btn btn-success" ng-click="settingsCtrl.save()">Save All Settings</button>
