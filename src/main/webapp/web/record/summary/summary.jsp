@@ -263,12 +263,12 @@
 			<fieldset ng-repeat="mod in summaryCtrl.page.columnThree.modules">
 				<legend style="margin-bottom:0px;">{{mod.displayName}}
 					<div class="form-group">
-						<input type="text" class="form-control search-query" ng-model="summaryCtrl.incomingQ" placeholder="Search">
+						<input type="text" class="form-control search-query" ng-model="incomingQ" placeholder="Search">
 					</div>
 				</legend>
 				<ul style="padding-left:12px;">
 					<%-- href="{{item.action}}" --%>
-					<li ng-repeat="item in mod.summaryItem | filter:summaryCtrl.incomingQ" ng-show="$index < mod.displaySize"  >
+					<li ng-repeat="item in mod.summaryItem | filter: incomingQ" ng-show="$index < mod.displaySize"  >
 						<span class="pull-right">{{item.date | date : 'dd-MM-yyyy'}}</span>
 						<a ng-click="summaryCtrl.gotoState(item)" class="hand-hover" ng-class="{true: 'abnormal', false: ''}[item.abnormalFlag]">{{item.displayName}}
 							<small ng-show="item.classification">({{item.classification}})</small>
