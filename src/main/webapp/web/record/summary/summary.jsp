@@ -189,9 +189,13 @@
 										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editNote(note)" ng-show="note.editable && summaryCtrl.isRegularNote(note)">
 											Edit
 										</button>
-										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editGroupNote(note)" ng-show="note.editable && note.cpp">
+										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editGroupNote(note)" ng-show="note.editable && note.cpp && !note.archived">
 											Edit
 										</button>
+										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.viewEform(note)" ng-show="note.eformData">
+											View
+										</button>
+										<button class="btn disabled btn-xs" ng-show="note.archived == true">Archived</button>
 										<%--<input type="checkbox" ng-model="note.isSelected"/> --%>
 										<button class="btn btn-default btn-xs"
 												ng-click="summaryCtrl.toggleIsSelectedForPrint(note)"
@@ -259,13 +263,13 @@
 			<fieldset ng-repeat="mod in summaryCtrl.page.columnThree.modules">
 				<legend style="margin-bottom:0px;">{{mod.displayName}}
 					<div class="form-group">
-						<input type="text" class="form-control search-query" ng-model="incomingQ" placeholder="Search">
+						<input type="text" class="form-control search-query" ng-model="summaryCtrl.incomingQ" placeholder="Search">
 					</div>
 				</legend>
 				<ul style="padding-left:12px;">
 					<%-- href="{{item.action}}" --%>
-					<li ng-repeat="item in mod.summaryItem | filter:incomingQ" ng-show="summaryCtrl.isSectionExpanded(mod)"  >
-						<span class="pull-right">{{item.date | date : 'dd-MMM-yyyy'}}</span>
+					<li ng-repeat="item in mod.summaryItem | filter:summaryCtrl.incomingQ" ng-show="$index < mod.displaySize"  >
+						<span class="pull-right">{{item.date | date : 'dd-MM-yyyy'}}</span>
 						<a ng-click="summaryCtrl.gotoState(item)" class="hand-hover" ng-class="{true: 'abnormal', false: ''}[item.abnormalFlag]">{{item.displayName}}
 							<small ng-show="item.classification">({{item.classification}})</small>
 						</a>
