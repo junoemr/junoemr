@@ -658,6 +658,20 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		};
 
+		controller.viewEform = function viewEform(eForm)
+		{
+			$state.transitionTo('record.forms.existing',
+				{
+					demographicNo: $stateParams.demographicNo,
+					type: 'eform',
+					id: eForm.noteId
+				},
+				{
+					location: 'replace',
+					notify: true
+				});
+		};
+
 
 		controller.showPrintModal = function showPrintModal(mod, action)
 		{
