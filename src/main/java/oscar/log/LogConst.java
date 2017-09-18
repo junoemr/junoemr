@@ -65,6 +65,7 @@ public class LogConst {
 	public static final String CON_SHELTER_SELECTION = "select shelter";
 	public static final String CON_APPT = "appointment";
 	public static final String CON_ECHART = "eChart";
+	public static final String CON_EFORM = "eForm";
 	public static final String CON_DEMOGRAPHIC = "demographic";
 	public static final String CON_DEMOGRAPHIC_RELATION = "demographic_relations";
 	public static final String CON_DISEASE_REG = "DX";
