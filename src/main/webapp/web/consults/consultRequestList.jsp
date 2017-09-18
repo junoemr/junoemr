@@ -140,7 +140,7 @@
 					<bean:message key="consult.list.new" bundle="ui"/>
 				</button>
 				<button class="btn btn-default" type="button" 
-					onclick="popup(700,960,'<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/ShowAllServices.jsp','<bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgConsConfig"/>')">
+					ng-click="consultRequestListCtrl.popup(700,960,'<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/ShowAllServices.jsp','<bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgConsConfig"/>')">
 					<bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgEditSpecialists"/>
 				</button>
 			</div>
