@@ -75,7 +75,10 @@
 					ng-class="{'active': recordCtrl.isActive(tab) }">
 					<a href="javascript:void(0)" ng-click="recordCtrl.changeTab(tab)">
 						{{tab.label}} 
-						<strong class="text-danger" ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
+						<%-- <strong class="text-danger" ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong> --%>
+						<span ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>" class="badge badge-danger ng-binding ng-scope">
+							!
+						</span>
 					</a>
 				</li>
 			</ul>
