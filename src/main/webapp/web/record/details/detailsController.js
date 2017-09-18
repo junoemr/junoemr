@@ -1061,7 +1061,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.manageContacts = function manageContacts()
 		{
 			var discard = true;
-			if (controller.page.dataChanged === HTMLMarqueeElementEventMap)
+			if (controller.page.dataChanged > 0)
 			{
 				discard = confirm("You may have unsaved data. Are you sure to leave?");
 			}
