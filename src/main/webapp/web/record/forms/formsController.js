@@ -283,38 +283,30 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 				 * 1=frame
 				 * 2=newwindow
 				 */
-				// if (view == 1)
-				// {
-				// 	url = addOrShow;
-				// 	$state.go('controller.record.forms.existing',
-				// 	{
-				// 		demographicNo: $stateParams.demographicNo,
-				// 		type: 'eform',
-				// 		id: item.id
-				// 	});
-				// 	$("html, body").animate(
-				// 	{
-				// 		scrollTop: 0
-				// 	}, "slow");
-				// }
-				// else if (view == 2)
-				// {
-				// 	url = addOrShow;
-                //
-				// 	var rnd = Math.round(Math.random() * 1000);
-				// 	win = "win" + rnd;
-                //
-				// 	window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
-				// 	return;
-				// }
+				if (view == 1)
+				{
+					url = addOrShow;
+					$state.go('controller.record.forms.existing',
+					{
+						demographicNo: $stateParams.demographicNo,
+						type: 'eform',
+						id: item.id
+					});
+					$("html, body").animate(
+					{
+						scrollTop: 0
+					}, "slow");
+				}
+				else if (view == 2)
+				{
+					url = addOrShow;
 
-                url = addOrShow;
+					var rnd = Math.round(Math.random() * 1000);
+					win = "win" + rnd;
 
-				var rnd = Math.round(Math.random() * 1000);
-				win = "win" + rnd;
-
-				window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
-				return;
+					window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
+					return;
+				}
 
 			}
 			else
@@ -457,7 +449,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			{
 				return "active";
 			}
-			else if (item.type === controller.page.currentForm.type && item.formId === controller.page.currentForm.formId && !Juno.Common.Util.isUndefinedOrNull(item.formId))
+			else if (item.type === controller.page.currentForm.type && item.formId === controller.page.currentForm.formId && Juno.Common.Util.isUndefinedOrNull(item.id))
 			{
 				return "active";
 			}
