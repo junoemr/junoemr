@@ -30,37 +30,36 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		var controller = this;
 
-        controller.consult = consult;
-        console.log('CONSULT: ', angular.copy(controller.consult));
+		controller.consult = consult;
+		console.log('CONSULT: ', angular.copy(controller.consult));
 
-        consult.letterheadList = Juno.Common.Util.toArray(consult.letterheadList);
-        console.log('LETTERHEAD LIST: ', consult.letterheadList);
-        consult.faxList = Juno.Common.Util.toArray(consult.faxList);
-        consult.serviceList = Juno.Common.Util.toArray(consult.serviceList);
-        consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
+		consult.letterheadList = Juno.Common.Util.toArray(consult.letterheadList);
+		console.log('LETTERHEAD LIST: ', consult.letterheadList);
+		consult.faxList = Juno.Common.Util.toArray(consult.faxList);
+		consult.serviceList = Juno.Common.Util.toArray(consult.serviceList);
+		consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
 
-        controller.urgencies = staticDataService.getConsultUrgencies();
-        controller.statuses = staticDataService.getConsultRequestStatuses();
-        controller.hours = staticDataService.getHours();
-        controller.minutes = staticDataService.getMinutes();
+		controller.urgencies = staticDataService.getConsultUrgencies();
+		controller.statuses = staticDataService.getConsultRequestStatuses();
+		controller.hours = staticDataService.getHours();
+		controller.minutes = staticDataService.getMinutes();
 
-        //set appointment time
+		//set appointment time
 		console.log('initial appointment time: ', angular.copy(consult.appointmentTime));
 
-        controller.parseTime = function parseTime(time)
+		controller.parseTime = function parseTime(time)
 		{
 			var tArray = time.split(":");
-            consult.appointmentHour = tArray[0];
-            consult.appointmentMinute =  tArray[1];
-            console.log('CONTROLLER HOURS: ', consult.appointmentHour);
+			consult.appointmentHour = tArray[0];
+			consult.appointmentMinute = tArray[1];
 		};
-        /* If appointment time is present, we must parse the hours and minutes in order to
-           populate the hour and minute selectors */
+		/* If appointment time is present, we must parse the hours and minutes in order to
+		   populate the hour and minute selectors */
 		if (consult.appointmentTime !== null)
 		{
-            controller.parseTime(consult.appointmentTime);
+			controller.parseTime(consult.appointmentTime);
 
-        }
+		}
 
 		//get access rights
 		securityService.hasRight("_con", "r").then(
@@ -121,7 +120,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			{
 				if (consult.letterheadList[i].id == user.providerNo)
 				{
-					consult.letterhead  = consult.letterheadList[i];
+					consult.letterhead = consult.letterheadList[i];
 					break;
 				}
 			}
@@ -156,14 +155,14 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		//monitor data changed
 		controller.consultChanged = -1;
-        $scope.$watchCollection(function()
-            {
-                return controller.consult;
-            },
-            function(newVal, oldVal)
-            {
-                controller.consultChanged++;
-            });
+		$scope.$watchCollection(function()
+			{
+				return controller.consult;
+			},
+			function(newVal, oldVal)
+			{
+				controller.consultChanged++;
+			});
 
 		//remind user of unsaved data
 		$scope.$on("$stateChangeStart", function(event)
@@ -177,22 +176,23 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		controller.changeLetterhead = function changeLetterhead(newLetterheadName)
 		{
-            var index = $("#letterhead")[0].selectedIndex;
-            if (index === null) return;
+			var index = $("#letterhead")[0].selectedIndex;
+			if (index === null) return;
 
-            consult.letterheadAddress = consult.letterheadList[index].address;
-            consult.letterheadPhone = consult.letterheadList[index].phone;
+			consult.letterheadAddress = consult.letterheadList[index].address;
+			consult.letterheadPhone = consult.letterheadList[index].phone;
 
 		};
 
 		controller.changeService = function changeService(id)
 		{
-            var index = $("#serviceId")[0].selectedIndex;
-            if (index === null) {
-                $scope.specialists = null;
-                return;
-            }
-            controller.specialists = toArray(consult.serviceList[index].specialists);
+			var index = $("#serviceId")[0].selectedIndex;
+			if (index === null)
+			{
+				$scope.specialists = null;
+				return;
+			}
+			controller.specialists = toArray(consult.serviceList[index].specialists);
 		};
 
 		controller.writeToBox = function writeToBox(results, boxId)
@@ -320,35 +320,35 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		// 	return false;
 		// };
 
-        controller.invalidData = function invalidData()
-        {
-        	if (!controller.consult.urgency )
-        	{
-        		alert("Please select an Urgency");
-        		return true;
-        	}
-        	if (!controller.consult.letterheadName)
-        	{
-        		alert("Please select a Letterhead");
-        		return true;
-        	}
-        	// if (!controller.consult.prof)
-        	// {
-        	// 	alert("Please select a Specialist Service");
-        	// 	return true;
-        	// }
-        	if (!controller.consult.professionalSpecialist)
-        	{
-        		alert("Please select a Specialist");
-        		return true;
-        	}
-        	if (controller.consult.demographic == null || controller.consult.demographic == "")
-        	{
-        		alert("Error! Invalid patient!");
-        		return true;
-        	}
-        	return false;
-        };
+		controller.invalidData = function invalidData()
+		{
+			if (!controller.consult.urgency)
+			{
+				alert("Please select an Urgency");
+				return true;
+			}
+			if (!controller.consult.letterheadName)
+			{
+				alert("Please select a Letterhead");
+				return true;
+			}
+			// if (!controller.consult.prof)
+			// {
+			// 	alert("Please select a Specialist Service");
+			// 	return true;
+			// }
+			if (!controller.consult.professionalSpecialist)
+			{
+				alert("Please select a Specialist");
+				return true;
+			}
+			if (controller.consult.demographic == null || controller.consult.demographic == "")
+			{
+				alert("Error! Invalid patient!");
+				return true;
+			}
+			return false;
+		};
 
 		controller.setAppointmentTime = function setAppointmentTime()
 		{
@@ -373,18 +373,18 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		controller.attachFiles = function attachFiles()
 		{
 			var modalInstance = $uibModal.open(
-			{
-				templateUrl: "consults/consultAttachment.jsp",
-				controller: 'Consults.ConsultRequestAttachmentController as consultAttachmentCtrl',
-				windowClass: "attachment-modal-window",
-				resolve:
 				{
-					consult: function()
-					{
-						return consult;
-					}
-				}
-			});
+					templateUrl: "consults/consultAttachment.jsp",
+					controller: 'Consults.ConsultRequestAttachmentController as consultAttachmentCtrl',
+					windowClass: "attachment-modal-window",
+					resolve:
+						{
+							consult: function()
+							{
+								return consult;
+							}
+						}
+				});
 
 			modalInstance.result.then(
 				function success()
