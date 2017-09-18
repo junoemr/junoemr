@@ -189,7 +189,7 @@
 										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editNote(note)" ng-show="note.editable && summaryCtrl.isRegularNote(note)">
 											Edit
 										</button>
-										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editGroupNote(note)" ng-show="note.editable && note.cpp && !note.archived">
+										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editGroupNote(note)" ng-show="note.editable && note.cpp && !note.archived && !note.ticklerNote">
 											Edit
 										</button>
 										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.viewEform(note)" ng-show="note.eformData">
