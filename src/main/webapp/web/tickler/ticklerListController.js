@@ -33,8 +33,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		var ticklerAPI = $resource('../ws/rs/tickler/ticklers');
 
-		console.log("Params: ", $resource);
-
 		controller.lastResponse = ""; // Can be removed?
 		controller.providers = providers;
 
@@ -91,25 +89,14 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 							return ticklerAPI.get(controller.search).$promise.then(function(data)
 							{
 								params.total(data.total); // recal. page nav controls
+								var ticklerList = data.content;
+								// Grab URLs for tickler links
+								for (var i = 0; i < ticklerList.length; i++){
+									if(ticklerList[i].ticklerLinks.length > 0 )
+                                        ticklerList[i].ticklerLinkUrl = controller.getLinkUrl(ticklerList[i].ticklerLinks[0]);
+								}
 								return data.content;
 							});
-
-							// ticklerAPI.get(controller.search, function(data)
-							// {
-							// 	console.log("DATA: ", data);
-							// 	$timeout(function()
-							// 	{
-
-							// 		// update table params
-							// 		params.total(data.total);
-							// 		// set new data
-							// 		// $defer.resolve(data.tickler);
-
-							// 		controller.lastResponse = data.tickler;
-							// 	}, 500);
-							// });
-
-
 						}
 					});
 				}
@@ -342,6 +329,31 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			window.print();
 		};
 
+		controller.getLinkUrl = function getLinkUrl(input)
+		{
+            if (input !== null && input.id !== null)
+            {
+                var url = "";
 
+                if (input.tableName === 'CML')
+                {
+                    url = "../lab/CA/ON/CMLDisplay.jsp?segmentID=" + input.tableId;
+                }
+                else if (input.tableName === 'MDS')
+                {
+                    url = "../oscarMDS/SegmentDisplay.jsp?segmentID=" + input.tableId;
+                }
+                else if (input.tableName === 'HL7')
+                {
+                    url = "../lab/CA/ALL/labDisplay.jsp?segmentID=" + input.tableId;
+                }
+                else if (input.tableName === 'DOC')
+                {
+                    url = "../dms/ManageDocument.do?method=display&doc_no=" + input.tableId;
+                }
+                return url;
+            }
+
+		};
 	}
 ]);

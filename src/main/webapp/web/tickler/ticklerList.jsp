@@ -152,13 +152,13 @@
 				</td>        
 				<td data-title="'<bean:message key="tickler.list.header.message" bundle="ui"/>'">
 					{{tickler.message | cut:true:50}}
-					<span ng-if="tickler.ticklerLinks != null && tickler.ticklerLinks.length > 0">
-						<a target="lab" href="{{tickler.ticklerLinks | ticklerLink}}">ATT</a>
+					<span ng-if="tickler.ticklerLinks !== null && tickler.ticklerLinks.length > 0">
+						<a target="lab" href="{{tickler.ticklerLinkUrl}}">ATT</a>
 					</span>
 					<%--<span ng-if="tickler.ticklerComments != null">
 						<span class="glyphicon glyphicon-comment" ng-click="showComments(tickler)"></span>
 					</span>--%>
-				</td>  
+				</td>
 				<td data-title="'<bean:message key="tickler.list.header.comments" bundle="ui"/>'">
 					<span ng-if="tickler.ticklerComments != null">
 						<a><span class="glyphicon glyphicon-comment" ng-click="ticklerListCtrl.showComments(tickler)"></span></a>

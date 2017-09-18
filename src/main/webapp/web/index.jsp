@@ -430,7 +430,6 @@ session.setAttribute("useIframeResizing", "true");  //Temporary Hack
 	<script type="text/javascript" src="common/filters/cut.js"></script>
 	<script type="text/javascript" src="common/filters/offset.js"></script>
 	<script type="text/javascript" src="common/filters/startFrom.js"></script>
-	<script type="text/javascript" src="common/filters/ticklerLink.js"></script>
 
 	<script type="text/javascript" src="common/directives/module.js"></script>
 	<script type="text/javascript" src="common/directives/typeaheadHelper.js"></script>
