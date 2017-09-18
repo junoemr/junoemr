@@ -40,6 +40,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
 import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.util.MiscUtils;
+import oscar.OscarProperties;
 
 /**
  * This is the object class that relates to the demographic table. Any customizations belong here.
@@ -121,6 +122,7 @@ public class Demographic implements Serializable {
 
     private String countryOfOrigin;
     private String newsletter;
+	private String veteranNo;
     
 
         public String getTitle() {
@@ -886,6 +888,13 @@ public class Demographic implements Serializable {
 		this.sourceOfIncome = sourceOfIncome;
 	}
 
+	public void setVeteranNo(String vetNo) {
+		veteranNo = vetNo;
+	}
+	public String getVeteranNo() {
+		return veteranNo;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (null == obj) return false;
@@ -1115,6 +1124,16 @@ public class Demographic implements Serializable {
 	// Returns birthday in the format yyyy-mm-dd
 	public String getBirthDayAsString() {
 		return getYearOfBirth() + "-" + getMonthOfBirth() + "-" + getDateOfBirth();
+	}
+
+	public String getBirthDayMasterFileString() {
+
+		String dateFormat = OscarProperties.getInstance().getDisplayDateFormat();
+
+		SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+		formatter.setCalendar(getBirthDay());
+
+		return formatter.format(getBirthDay().getTime());
 	}
 
 	public String getSpokenLanguage() {

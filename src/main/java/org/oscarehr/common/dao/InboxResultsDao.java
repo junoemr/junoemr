@@ -241,7 +241,7 @@ public class InboxResultsDao {
 			String labSql = "";
 
 			if(labType != null && !"".equals(labType)) {
-				filterSql += "AND proLR.lab_type = :lab_type";
+				filterSql += "AND proLR.lab_type = :lab_type ";
 				proLrSql += "AND proLR_filter.lab_type = :lab_type ";
 				qp_lab_type = true;
 			}

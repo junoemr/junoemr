@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,11 +22,6 @@
  * Ontario, Canada
  */
 
-
-/*
- *
- */
-
 package oscar.login;
 
 import java.util.Calendar;
@@ -36,72 +31,86 @@ import java.util.GregorianCalendar;
  * Class LoginInfoBean : set login status when bWAN = true 2003-01-29
  */
 public final class LoginInfoBean {
-    private GregorianCalendar starttime = null;
-    private int times = 1;
-    private int status = 1; // 1 - normal, 0 - block out
 
-    private int maxtimes = 3;
-    private int maxduration = 10;
+	public enum LOCKOUT_STATUS {OK,LOCKED}
 
-    public LoginInfoBean() {
-    }
+	private GregorianCalendar starttime = null;
+	private int attempts = 0;
+	private LOCKOUT_STATUS status = LOCKOUT_STATUS.OK;
 
-    public LoginInfoBean(GregorianCalendar starttime1, int maxtimes1, int maxduration1) {
-        starttime = starttime1;
-        maxtimes = maxtimes1-1;
-        maxduration = maxduration1;
-    }
+	private int maxtimes = 3;
+	private int maxduration = 10;
 
-    public void initialLoginInfoBean(GregorianCalendar starttime1) {
-        starttime = starttime1;
-        int times = 0;
-        int status = 1; // 1 - normal, 0 - block out
-    }
+	public LoginInfoBean() {
+		this(new GregorianCalendar(), 3, 10);
+	}
 
-    public void updateLoginInfoBean(GregorianCalendar now, int times1) {
-        //if time out, initial bean again.
-        if (getTimeOutStatus(now)) {
-            initialLoginInfoBean(now);
-            return;
-        }
-        //else times++. if times out, status block
-        ++times;
-        if (times > maxtimes)
-            status = 0; // 1 - normal, 0 - block out
-    }
+	public LoginInfoBean(GregorianCalendar starttime1, int maxtimes1, int maxduration1) {
+		maxtimes = maxtimes1;
+		maxduration = maxduration1;
+		resetLoginInfoBean(starttime1);
+	}
 
-    public boolean getTimeOutStatus(GregorianCalendar now) {
-        boolean btemp = false;
-        //if time out and status is 1, return true
-        GregorianCalendar cal = (GregorianCalendar) starttime.clone();
-        cal.add(Calendar.MINUTE, maxduration);
-        if (cal.getTimeInMillis() < now.getTimeInMillis())
-            btemp = true; //starttime = starttime1;
+	private void resetLoginInfoBean(GregorianCalendar starttime1) {
+		starttime = starttime1;
+		attempts = 0;
+		status = LOCKOUT_STATUS.OK;
+	}
 
-        return btemp;
-    }
+	/**
+	 * updates the internal login attempts counter and lockout status.
+	 * If called after the maximum lockout period it will reset the status and counter
+	 * @param now - the time to base timeout period on
+	 */
+	public void updateLoginInfoBean(GregorianCalendar now) {
+		//if time out, initial bean again.
+		if (timeoutPeriodExceeded(now)) {
+			resetLoginInfoBean(now);
+			return;
+		}
+		//else attempts++. if attempts out, status block
+		attempts++;
+		if (attempts >= maxtimes) {
+			status = LOCKOUT_STATUS.LOCKED;
+		}
+	}
 
-    public void setStarttime(GregorianCalendar starttime1) {
-        starttime = starttime1;
-    }
+	/**
+	 * @param now current time representation
+	 * @return true if 'now' time parameter is beyond the max timeout period (timeout has expired)
+	 */
+	public boolean timeoutPeriodExceeded(GregorianCalendar now) {
+		//if time out and status is 1, return true
+		GregorianCalendar cal = (GregorianCalendar) starttime.clone();
+		cal.add(Calendar.MINUTE, maxduration);
 
-    public void setTimes(int times1) {
-        times = times1;
-    }
+		return (cal.getTimeInMillis() < now.getTimeInMillis());
+	}
 
-    public void setStatus(int status1) {
-        status = status1;
-    }
+	public void setStarttime(GregorianCalendar starttime1) {
+		starttime = starttime1;
+	}
 
-    public GregorianCalendar getStarttime() {
-        return (starttime);
-    }
+	public void setAttempts(int times1) {
+		attempts = times1;
+	}
 
-    public int getTimes() {
-        return (times);
-    }
+	public void setStatus(LOCKOUT_STATUS status1) {
+		status = status1;
+	}
 
-    public int getStatus() {
-        return (status);
-    }
+	public GregorianCalendar getStarttime() {
+		return (starttime);
+	}
+
+	public int getAttempts() {
+		return (attempts);
+	}
+
+	public LOCKOUT_STATUS getStatus() {
+		return (status);
+	}
+	public boolean isLockedStatus() {
+		return (status == LOCKOUT_STATUS.LOCKED);
+	}
 }

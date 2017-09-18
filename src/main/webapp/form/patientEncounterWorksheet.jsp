@@ -110,7 +110,7 @@
     String appt_time = "";
     String appt_type = "";
     String appt_reason = "";
-    if(request.getParameter("appointmentNo") != null) {
+    if(!request.getParameter("appointmentNo").isEmpty()) {
     	Appointment appt = appointmentDao.find(Integer.parseInt(request.getParameter("appointmentNo")));
     	if(appt != null) {
     		appt_date = dateFormatter.format(appt.getAppointmentDate());

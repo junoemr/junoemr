@@ -25,7 +25,7 @@
 --%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-    String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+    String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
     boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_demographic" rights="w" reverse="<%=true%>">
@@ -39,13 +39,11 @@
 %>
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="java.sql.*, java.util.*, java.net.URLEncoder, oscar.oscarDB.*, oscar.MyDateFormat, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
+<%@ page import="java.util.*, java.net.URLEncoder, oscar.MyDateFormat, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
 <%@ page import="oscar.log.*"%>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 
-<%@ page import="org.oscarehr.common.model.Admission" %>
-<%@ page import="org.oscarehr.common.dao.AdmissionDao" %>
 <%@ page import="oscar.oscarWaitingList.util.WLWaitingListUtil" %>
 
 <%@ page import="org.oscarehr.common.model.DemographicExt" %>
@@ -56,19 +54,15 @@
 <%@ page import="org.oscarehr.common.model.DemographicCust" %>
 <%@ page import="org.oscarehr.common.dao.DemographicCustDao" %>
 
-<%@ page import="org.oscarehr.PMmodule.dao.ProgramDao" %>
-<%@ page import="org.oscarehr.PMmodule.model.Program" %>
 <%@page import="org.oscarehr.PMmodule.web.GenericIntakeEditAction" %>
 <%@page import="org.oscarehr.PMmodule.service.ProgramManager" %>
 <%@page import="org.oscarehr.PMmodule.service.AdmissionManager" %>
 
 <%@page import="org.oscarehr.common.dao.DemographicArchiveDao" %>
-<%@page import="org.oscarehr.common.model.DemographicArchive" %>
 <%@page import="org.oscarehr.common.dao.DemographicExtArchiveDao" %>
 <%@page import="org.oscarehr.common.model.DemographicExtArchive" %>
 
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
-<%@page import="org.oscarehr.common.model.Consent" %>
 <%@page import="org.oscarehr.common.model.ConsentType" %>
 <%@page import="oscar.OscarProperties" %>
 
@@ -77,17 +71,14 @@
 <%@taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi"%>
 
 <% 
-	java.util.Properties oscarVariables = oscar.OscarProperties.getInstance();
+	OscarProperties oscarVariables = oscar.OscarProperties.getInstance();
 
-	AdmissionDao admissionDao = (AdmissionDao)SpringUtils.getBean("admissionDao");
 	ProgramManager pm = SpringUtils.getBean(ProgramManager.class);
 	AdmissionManager am = SpringUtils.getBean(AdmissionManager.class);
 	DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
 	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 
-	ProgramDao programDao = (ProgramDao)SpringUtils.getBean("programDao");
-	
 	DemographicExtArchiveDao demographicExtArchiveDao = SpringUtils.getBean(DemographicExtArchiveDao.class);
 	DemographicArchiveDao demographicArchiveDao = (DemographicArchiveDao)SpringUtils.getBean("demographicArchiveDao");
 		
@@ -97,18 +88,6 @@
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <link rel="stylesheet" href="../web.css" />
-<script LANGUAGE="JavaScript">
-    <!--
-    function start(){
-      this.focus();
-      this.resizeTo(1000,700);
-    }
-    function closeit() {
-      //parent.refresh();
-      close();
-    }
-    //-->
-</script>
 </head>
 
 <body onload="start()" bgproperties="fixed" topmargin="0" leftmargin="0" rightmargin="0">
@@ -138,8 +117,6 @@
     String dem = null;
 	String year, month, day;
     String curUser_no = (String)session.getAttribute("user");
-
-	DBPreparedHandlerParam [] param =new DBPreparedHandlerParam[34];
 
 	Demographic demographic = new Demographic();
 	demographic.setLastName(request.getParameter("last_name").trim());
@@ -246,14 +223,25 @@
     bufChart = new StringBuilder(StringUtils.trimToEmpty("chart_no"));
     bufDoctorNo = new StringBuilder( StringUtils.trimToEmpty("provider_no") );
 
+	if(oscarVariables.isPropertyActive("demographic_veteran_no")) {
+		demographic.setVeteranNo(StringUtils.trimToNull(request.getParameter("veteranNo")));
+	}
+
     demographicDao.save(demographic);
 
 
-          GenericIntakeEditAction gieat = new GenericIntakeEditAction();
-          gieat.setAdmissionManager(am);
-          gieat.setProgramManager(pm);
-          String bedP = request.getParameter("rps");
-          gieat.admitBedCommunityProgram(demographic.getDemographicNo(),loggedInInfo.getLoggedInProviderNo(),Integer.parseInt(bedP),"","",null);
+	GenericIntakeEditAction gieat = new GenericIntakeEditAction();
+	gieat.setAdmissionManager(am);
+	gieat.setProgramManager(pm);
+	String residentialStatus = request.getParameter("rps");
+	Integer programId;
+	if (residentialStatus == null || residentialStatus.trim().isEmpty()) {
+		programId = pm.getProgramIdByProgramName("OSCAR"); //Default to the oscar program
+	}
+	else {
+		programId = Integer.parseInt(residentialStatus);
+	}
+	gieat.admitBedCommunityProgram(demographic.getDemographicNo(),loggedInInfo.getLoggedInProviderNo(),programId,"","",null);
 
           String[] servP = request.getParameterValues("sp");
           if(servP!=null&&servP.length>0){
@@ -275,7 +263,6 @@
     	demographicCust.setNotes("<unotes>"+ request.getParameter("content")+"</unotes>");
     	demographicCust.setId(demographic.getDemographicNo());
     	demographicCustDao.persist(demographicCust);
-        int rowsAffected=1;
 
        dem = demographic.getDemographicNo().toString();
        
@@ -285,8 +272,7 @@
 			PatientConsentManager patientConsentManager = SpringUtils.getBean( PatientConsentManager.class );
 			List<ConsentType> consentTypes = patientConsentManager.getConsentTypes();
 			String consentTypeId = null;
-			int patientConsentIdInt = 0; 
-			
+
 			for( ConsentType consentType : consentTypes ) {
 				consentTypeId = request.getParameter( consentType.getType() );
 				// checked box means add or edit consent. 

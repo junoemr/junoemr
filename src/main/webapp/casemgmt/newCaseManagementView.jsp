@@ -64,39 +64,32 @@
 <% java.util.Properties oscarVariables = OscarProperties.getInstance(); %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" scope="request" />
 
-	<div id="cppBoxes">
-		<div id="divR1" style="width: 100%; height: 75px; margin: 0px; background-color: #FFFFFF;">
-			<!-- social history -->		
-			<div id="divR1I1" class="topBox" 
-				style="float: left; width: 49%; margin-left: 3px; height: inherit;">
-			</div>
-		
-			<!-- This is the Medical History cell ...mh...-->
-			<div id="divR1I2" class="topBox"
-				style="float: right; width: 49%; margin-right: 3px; height: inherit;">
-			</div>
+<div id="cppBoxes">
+	<div id="divR1" style="width: 100%; height: 75px; margin: 0px; background-color: #FFFFFF;">
+		<!-- social history -->
+		<div id="divR1I1" class="topBox"
+			 style="float: left; width: 49%; margin-left: 3px; height: inherit;">
 		</div>
-	
-		<div id="divR2" style="width: 100%; height: 75px; margin-top: 0px; background-color: #FFFFFF;">		
-			<!--Ongoing Concerns cell -->
-			<div id="divR2I1" class="topBox"
-				style="clear: left; float: left; width: 49%; margin-left: 3px; height: inherit;">	
-			</div>	
-			<!--Reminders cell -->
-			<div id="divR2I2" class="topBox"
-				style="clear: right; float: right; width: 49%; margin-right: 3px; height: inherit;">		
-			</div>
+
+		<!-- This is the Medical History cell ...mh...-->
+		<div id="divR1I2" class="topBox"
+			 style="float: right; width: 49%; margin-right: 3px; height: inherit;">
 		</div>
-		<span style="visibility:hidden">test</span>
 	</div>
-	
-	<div id="notCPP" style="height: 70%; margin-left: 2px; background-color: #FFFFFF;">	
- 	
+
+	<div id="divR2" style="width: 100%; height: 75px; margin-top: 0px; background-color: #FFFFFF;">
+		<!--Ongoing Concerns cell -->
+		<div id="divR2I1" class="topBox"
+			 style="clear: left; float: left; width: 49%; margin-left: 3px; height: inherit;">
+		</div>
+		<!--Reminders cell -->
+		<div id="divR2I2" class="topBox"
+			 style="clear: right; float: right; width: 49%; margin-right: 3px; height: inherit;">
+		</div>
 	</div>
-<script src="../js/boomerang.js"></script>
-<script src="../js/rt.js"></script>
-<script type ="text/javascript">
-   BOOMR.init({
-        beacon_url: "<%=request.getScheme() + "://" + request.getServerName() + request.getContextPath()%>/oscarhost_pageLoadTimer.html"
-   });
-</script>
+	<span style="visibility:hidden">test</span>
+</div>
+
+<div id="notCPP" style="height: 70%; margin-left: 2px; background-color: #FFFFFF;">
+
+</div>

@@ -1010,3 +1010,11 @@ auto_populate_billingreferral_bc=true
 #document_email_body=Document Sent From Oscar
 #document_email_name=Oscar                                    
 #document_email_from_address=test@test.com
+
+display_date_format=yyyy-MM-dd
+
+# Automatically link assigned document to demographic's provider
+assign_document.link_docs_to_provider=yes
+
+# Show appointment count for providers on schedule page
+schedule.show_appointment_count=no

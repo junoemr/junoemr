@@ -63,7 +63,8 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
 <%
-     Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
+	OscarProperties oscarProps = OscarProperties.getInstance();
+	Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
 
      LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
      
@@ -487,6 +488,11 @@
 <a href="demographicaddarecordhtm.jsp?search_mode=<%=searchMode%>&keyword=<%=StringEscapeUtils.escapeHtml(keyWord)%>" title="<bean:message key="demographic.search.btnCreateNewTitle" />">
 <bean:message key="demographic.search.btnCreateNew" />
 </a>
+	<% if (!oscarProps.isPropertyActive("hide_quickform")) { %>
+		<br/>
+		<a href="demographicaddrecordcustom.jsp"><bean:message
+				key="demographic.search.btnQuickCreateNew" /></a>
+	<% } %>
 </div>
 
 <div class="goBackToSchedule">

@@ -65,7 +65,9 @@ public class EctConEditSpecialistsAction extends Action {
 			if (specialists.length > 0) {
 				for (int i = 0; i < specialists.length; i++)
 				{
-					professionalSpecialistDao.remove(Integer.parseInt(specialists[i]));
+					ProfessionalSpecialist proSpec = professionalSpecialistDao.find(Integer.parseInt(specialists[i]));
+					proSpec.setHideFromView(true);
+					professionalSpecialistDao.merge(proSpec);
 				}
 			}
 			EctConConstructSpecialistsScriptsFile constructSpecialistsScriptsFile = new EctConConstructSpecialistsScriptsFile();

@@ -34,72 +34,72 @@ package oscar.log;
 public class LogConst {
 	/* Action constants 
 	 * These should describe what user action was done */
-    public static final String ACTION_LOGIN = "log in";
-    public static final String ACTION_LOGOUT = "log out";
-    public static final String ACTION_READ = "read";
-    public static final String ACTION_ADD = "add";
-    public static final String ACTION_UPDATE = "update";
-    public static final String ACTION_DELETE = "delete";
-    public static final String ACTION_ACCESS = "access";
-    public static final String DISCONTINUE = "discontinue";
-    public static final String ARCHIVE = "archive";
-    public static final String REPRINT = "reprint";
-    public static final String ACTION_REVIEWED = "reviewed";
-    public static final String ACK = "acknowledge";
-    public static final String NORIGHT= "no right";
-    public static final String ACTION_EDIT = "edit";
-    public static final String REPRESCRIBE = "represcribe";
-    public static final String ANNOTATE = "annotate";
-    public static final String VERIFY = "verify";
-    public static final String REFUSED = "refused";
-    public static final String UNLINK = "unlink";
-    public static final String SENT = "sent";
+	public static final String ACTION_LOGIN = "log in";
+	public static final String ACTION_LOGOUT = "log out";
+	public static final String ACTION_READ = "read";
+	public static final String ACTION_ADD = "add";
+	public static final String ACTION_UPDATE = "update";
+	public static final String ACTION_DELETE = "delete";
+	public static final String ACTION_ACCESS = "access";
+	public static final String ACTION_UNLOCK = "unlock";
+	public static final String DISCONTINUE = "discontinue";
+	public static final String ARCHIVE = "archive";
+	public static final String REPRINT = "reprint";
+	public static final String ACTION_REVIEWED = "reviewed";
+	public static final String ACK = "acknowledge";
+	public static final String NORIGHT = "no right";
+	public static final String ACTION_EDIT = "edit";
+	public static final String REPRESCRIBE = "represcribe";
+	public static final String ANNOTATE = "annotate";
+	public static final String VERIFY = "verify";
+	public static final String REFUSED = "refused";
+	public static final String UNLINK = "unlink";
+	public static final String SENT = "sent";
 
-    /* Content/Module constants 
-     * These should describe what module the action applies to.
-     * Example: action ADD module CON_DOCUMENT */
-    public static final String CON_LOGIN_AGREEMENT = "login agreement";
-    public static final String CON_LOGIN = "login";
-    public static final String CON_LOGOUT = "logout";
-    public static final String CON_SHELTER_SELECTION="select shelter";
-    public static final String CON_APPT = "appointment";
-    public static final String CON_ECHART = "eChart";
-    public static final String CON_DEMOGRAPHIC = "demographic";
-    public static final String CON_DEMOGRAPHIC_RELATION = "demographic_relations";
-    public static final String CON_DISEASE_REG  = "DX";
-    public static final String CON_ROLE = "role";
-    public static final String CON_PROVIDER = "provider";
-    public static final String CON_PRIVILEGE = "privilege";
-    public static final String CON_PASSWORD = "password/pin";
-    public static final String CON_ADMIN = "admin";
-    public static final String CON_FORM = "form";
-    public static final String CON_EFORM = "eForm";
-    public static final String CON_PRESCRIPTION = "prescription";
-    public static final String CON_MEDICATION = "medication";
-    public static final String CON_DRUGS="drugs";
-    public static final String CON_DRUGREASON="drugReason";
-    public static final String CON_ALLERGY = "allergy";
-    public static final String CON_JASPERREPORTLETER = "jr_letter";
-    public static final String CON_TICKLER = "tickler";
-    public static final String CON_CME_NOTE = "encounter note";
-    public static final String CON_DOCUMENT = "document";
-    public static final String CON_HL7_LAB = "lab";
-    public static final String CON_HRM = "hrm";
-    public static final String CON_CML_LAB = "cml lab";
-    public static final String CON_MDS_LAB = "mds lab";
-    public static final String CON_PATHNET_LAB = "pathnet lab";
-    public static final String CON_FLOWSHEET = "FLWST_";
-    public static final String CON_SECURITY = "securityRecord";
-    public static final String CON_ANNOTATION = "annotation";
-    public static final String CON_PHR  = "phr";
-    public static final String CON_DOCUMENTDESCRIPTIONTEMPLATE = "documentDescriptionTemplate";
-    public static final String CON_DOCUMENTDESCRIPTIONTEMPLATEPREFERENCE = "documentDescriptionTemplatePreference";
-    public static final String CON_FAX  = "fax";
-    public static final String CON_PHARMACY  = "pharmacy";
-    public static final String CON_SYSTEM  = "system";
-    
-    /* Status constants
-     * These should describe the outcome of the action */
-    public static final String STATUS_SUCCESS = "SUCCESS";
-    public static final String STATUS_FAILURE = "FAILURE";
+	/* Content/Module constants
+	 * These should describe what module the action applies to.
+	 * Example: action ADD module CON_DOCUMENT */
+	public static final String CON_LOGIN_AGREEMENT = "login agreement";
+	public static final String CON_LOGIN = "login";
+	public static final String CON_LOGOUT = "logout";
+	public static final String CON_SHELTER_SELECTION = "select shelter";
+	public static final String CON_APPT = "appointment";
+	public static final String CON_ECHART = "eChart";
+	public static final String CON_DEMOGRAPHIC = "demographic";
+	public static final String CON_DEMOGRAPHIC_RELATION = "demographic_relations";
+	public static final String CON_DISEASE_REG = "DX";
+	public static final String CON_ROLE = "role";
+	public static final String CON_PROVIDER = "provider";
+	public static final String CON_PRIVILEGE = "privilege";
+	public static final String CON_PASSWORD = "password/pin";
+	public static final String CON_ADMIN = "admin";
+	public static final String CON_FORM = "form";
+	public static final String CON_PRESCRIPTION = "prescription";
+	public static final String CON_MEDICATION = "medication";
+	public static final String CON_DRUGS = "drugs";
+	public static final String CON_DRUGREASON = "drugReason";
+	public static final String CON_ALLERGY = "allergy";
+	public static final String CON_JASPERREPORTLETER = "jr_letter";
+	public static final String CON_TICKLER = "tickler";
+	public static final String CON_CME_NOTE = "encounter note";
+	public static final String CON_DOCUMENT = "document";
+	public static final String CON_HL7_LAB = "lab";
+	public static final String CON_HRM = "hrm";
+	public static final String CON_CML_LAB = "cml lab";
+	public static final String CON_MDS_LAB = "mds lab";
+	public static final String CON_PATHNET_LAB = "pathnet lab";
+	public static final String CON_FLOWSHEET = "FLWST_";
+	public static final String CON_SECURITY = "securityRecord";
+	public static final String CON_ANNOTATION = "annotation";
+	public static final String CON_PHR = "phr";
+	public static final String CON_DOCUMENTDESCRIPTIONTEMPLATE = "documentDescriptionTemplate";
+	public static final String CON_DOCUMENTDESCRIPTIONTEMPLATEPREFERENCE = "documentDescriptionTemplatePreference";
+	public static final String CON_FAX = "fax";
+	public static final String CON_PHARMACY = "pharmacy";
+	public static final String CON_SYSTEM = "system";
+
+	/* Status constants
+	 * These should describe the outcome of the action */
+	public static final String STATUS_SUCCESS = "SUCCESS";
+	public static final String STATUS_FAILURE = "FAILURE";
 }

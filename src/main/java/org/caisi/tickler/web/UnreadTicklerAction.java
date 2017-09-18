@@ -115,7 +115,7 @@ public class UnreadTicklerAction extends DispatchAction {
 	    }
 	    
 	    LoginCheckLogin cl = new LoginCheckLogin();	    
-	    if (cl.isBlock(ip, userName)) {
+	    if (cl.isBlocked(ip, userName)) {
 	    	String errorMsg = "Your account is locked. Please contact your administrator to unlock.";
 	        request.setAttribute("errormsg",errorMsg);
 	        return mapping.findForward("login");

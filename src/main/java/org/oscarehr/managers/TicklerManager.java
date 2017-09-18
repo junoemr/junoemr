@@ -223,12 +223,7 @@ public class TicklerManager {
         	//filter based on caisi role access
             results = filterTicklersByAccess(results,providerNo,programId);
         }    
-        
-        //--- log action ---
-        for(Tickler tickler:results) {
-        	LogAction.addLogSynchronous(loggedInInfo, "TicklerManager.getTicklers", "ticklerId="+tickler.getId());
-        }
-        
+
         return(results);
     }
     
@@ -237,11 +232,6 @@ public class TicklerManager {
     	
     	List<Tickler> results = ticklerDao.getTicklers(filter);     
         
-        //--- log action ---
-        for(Tickler tickler:results) {
-        	LogAction.addLogSynchronous(loggedInInfo, "TicklerManager.getTicklers", "ticklerId="+tickler.getId());
-        }
-        
         return(results);
     }
     
@@ -249,11 +239,6 @@ public class TicklerManager {
     	checkPrivilege(loggedInInfo, PRIVILEGE_READ);
     	
     	List<Tickler> results = ticklerDao.getTicklers(filter,offset,limit);     
-        
-        //--- log action ---
-        for(Tickler tickler:results) {
-        	LogAction.addLogSynchronous(loggedInInfo, "TicklerManager.getTicklers", "ticklerId="+tickler.getId());
-        }
         
         return(results);
     }
