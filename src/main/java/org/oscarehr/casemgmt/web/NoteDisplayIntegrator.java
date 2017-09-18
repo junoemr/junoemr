@@ -231,6 +231,8 @@ public class NoteDisplayIntegrator implements NoteDisplay {
 		return false;
 	}
 
+	public boolean isArchived() { return false; }
+
 	@Override
     public String getEncounterTime() {
 	    // TODO Auto-generated method stub

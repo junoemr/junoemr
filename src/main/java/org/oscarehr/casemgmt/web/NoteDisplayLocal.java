@@ -197,6 +197,8 @@ public class NoteDisplayLocal implements NoteDisplay {
 		return (caseManagementNote.isSigned());
 	}
 
+	public boolean isArchived() { return (caseManagementNote.isArchived()); }
+
 	public ArrayList<String> getEditorNames() {
 		ArrayList<String> editorNames = new ArrayList<String>();
 

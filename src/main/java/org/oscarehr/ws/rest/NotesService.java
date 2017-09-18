@@ -206,7 +206,7 @@ public class NotesService extends AbstractServiceImpl {
 		for(NoteDisplay nd : result.getNotes()) {
 			NoteTo1 note = new NoteTo1();
 			note.setNoteId(nd.getNoteId());
-			
+			note.setArchived(nd.isArchived());
 			note.setIsSigned(nd.isSigned());
 			note.setIsEditable(nd.isEditable());
 			note.setObservationDate(nd.getObservationDate());
@@ -1183,6 +1183,7 @@ public class NotesService extends AbstractServiceImpl {
 		note.setNote(casemgmtNote.getNote());
 		note.setRxAnnotation(casemgmtNote.isRxAnnotation());
 		note.setEncounterType(casemgmtNote.getEncounter_type());
+		note.setArchived(casemgmtNote.isArchived());
 		//note.setEditorNames(casemgmtNote.getEditors());
 		//note.setIssueDescriptions(casemgmtNote.get);
 		note.setPosition(casemgmtNote.getPosition());

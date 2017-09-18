@@ -119,6 +119,8 @@ public interface NoteDisplay {
 	public boolean isInvoice();
 
 	public boolean isTicklerNote();
+
+	public boolean isArchived();
 	
 	public CaseManagementNoteLink getNoteLink();
 
