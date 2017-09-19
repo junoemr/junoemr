@@ -66,12 +66,6 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 			$uibModalInstance.dismiss('cancel');
 		};
 
-		controller.clearPrint = function clearPrint()
-		{
-			controller.pageOptions = {};
-			controller.pageOptions.printType = {};
-		};
-
 
 		controller.sendToPhr = function sendToPhr()
 		{
