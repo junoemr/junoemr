@@ -137,27 +137,6 @@
 			<div class="col-md-12 note-list">
 				<div class="tab-content">
 					<div class="tab-pane active" id="all">
-						<%--<dl infinite-scroll="addMoreItems()">
-							<dt ng-style="setColor(note)" ng-repeat-start="note in page.notes.notelist" ng-show="showNoteHeader(note)">
-									<div class="btn-group btn-group-xs pull-right">
-									<button class="btn btn-default btn-xs" type="button">
-											edit 
-									</button>
-									<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
-											<span class="caret"></span>
-											<span class="sr-only">Toggle Dropdown</span>
-									</button>
-									<ul class="dropdown-menu" role="menu">
-											<li><a href="#">print</a></li> <li><a href="#">annotate</a></li><li><a href="#">set Encounter Date</a></li><li><a href="#">set Encounter Type</a></li>
-									</ul>
-									</div>{{note.observationDate | date : 'dd-MMM-yyyy'}} {{firstLine(note)}} <input type="checkbox" ng-model="note.isSelected" class="pull-right" style="margin-right:3px;"/>
-							</dt>
-							<dd ng-repeat-end  ng-show="showNote(note)"><pre ng-class="isNoteBeingEdited(note)" style="margin-bottom:0px;" ng-show="showNote(note)" ng-hide="note.cpp==true" ng-dblclick="editNote(note)">{{note.note}}</pre>
-									<h6 style="margin-top:1px;margin-bottom:0px;"><bean:message key="oscarEncounter.editors.title"/>: <small>{{note.editorNames}}</small> <span class="pull-right"><bean:message key="oscarEncounter.encounterDate.title"/>: <small>{{note.observationDate | date: 'medium'}}</small> <bean:message key="oscarEncounter.noteRev.title"/>: <small ng-click="openRevisionHistory(note)" class="hand-hover">{{note.revision}}</small></span></h6>
-
-									<h6 style="margin-top:0px;"><bean:message key="oscarEncounter.assignedIssues.title"/>: <small>{{note.issueDescriptions}}</small> <span class="pull-right"><bean:message key="oscarEncounter.encType.title"/>: <small>{{note.encounterType}}</small></span></h6>
-							</dd>                                   
-						</dl>--%>
 						<div id="note-list-filters">
 							<label class="checkbox-inline">
 								<input type="checkbox"
@@ -182,7 +161,7 @@
 								<div class="row note-header vertical-align" ng-show="summaryCtrl.showNoteHeader(note)" >
 									<div class="col-md-9 col-xs-8 pull-left note-header-info vertical-align">
 										<h6>{{note.observationDate | date : 'dd-MMM-yyyy'}}
-											<span class=" note-header-title">{{summaryCtrl.firstLine(note)}}</span>
+											<span class="note-header-title" style="word-break: break-all">{{summaryCtrl.getNoteHeader(note)}}</span>
 										</h6>
 									</div>
 									<div class="col-md-3 col-xs-4 pull-right text-right note-header-buttons">

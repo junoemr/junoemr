@@ -372,17 +372,15 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return true;
 		};
 
-		controller.firstLine = function firstLine(note)
+		controller.getNoteHeader = function firstLine(noteObj)
 		{
-			var firstL = note.note.trim().split('\n')[0];
-			var dateStr = $filter('date')(note.observationDate, 'dd-MMM-yyyy');
-			dateStr = "[" + dateStr;
-			//console.log(firstL + " --"+dateStr+"-- " + firstL.indexOf(dateStr));
-			if (firstL.indexOf(dateStr) == 0)
-			{
-				firstL = firstL.substring(dateStr.length);
-			}
-			return firstL;
+			var maxLen = 50; // Max character length of header
+			var text = noteObj.note.trim().split('\n')[0]; // First line of the note text, split by newline
+
+			if(text.length > maxLen)
+				return text.substring(0, maxLen) + "...";
+
+			return text.substring(0, maxLen);
 		};
 
 		controller.trackerUrl = "";
