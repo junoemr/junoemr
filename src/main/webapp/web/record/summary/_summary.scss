@@ -3,10 +3,15 @@
 	#summary-section-left{
 		margin-bottom: $margin-md;
 	}
-
+	#summary-section-right{
+		margin-bottom: $margin-lg;
+	}
 	.module-list {
 		border-bottom: 1px solid;
 		border-bottom-color: #e9e9e9;
+		.glyphicon-chevron-up, .glyphicon-chevron-down {
+			margin-bottom: $margin-sm;
+		}
 	}
 	.note-list {
 		// overflow-y: auto;
