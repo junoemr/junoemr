@@ -153,12 +153,15 @@ public class CaseManagementPrint {
 		//How should i filter out observation dates?
 		if(startDate != null && endDate != null){
 			List<CaseManagementNote> dateFilteredList = new ArrayList<CaseManagementNote>();
-			logger.debug("start date "+startDate);
-			logger.debug("end date "+endDate);
-			
+
 			for (CaseManagementNote cmn : notes){
 				logger.debug("cmn "+cmn.getId()+"  -- "+cmn.getObservation_date()+ " ? start date "+startDate.getTime().before(cmn.getObservation_date())+" end date "+endDate.getTime().after(cmn.getObservation_date()));
-				if(startDate.getTime().before(cmn.getObservation_date()) && endDate.getTime().after(cmn.getObservation_date())){
+				Date start = removeTime(startDate.getTime()); // Start date with hours/mins/secs set to 0
+				Date end = removeTime(endDate.getTime()); // End date with hours/mins/secs set to 0
+				Date observation = removeTime(cmn.getObservation_date()); // Observation date with hours/mins/secs set to 0
+				if ((start.before(observation) || start.equals(observation))
+						&& (end.after(observation) || end.equals(observation))
+						) {
 					dateFilteredList.add(cmn);
 				}
 			}
@@ -429,6 +432,18 @@ public class CaseManagementPrint {
 		}
 
 		return strNewDate;
+	}
+
+	private Date removeTime(Date date)
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+
+		return cal.getTime();
 	}
 	
 }
