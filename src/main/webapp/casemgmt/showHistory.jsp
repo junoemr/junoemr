@@ -42,7 +42,7 @@
 <nested:iterate indexId="idx" id="note" name="history">
 	<div
 		style="width: 99%; background-color: #EFEFEF; font-size: 12px; border-left: thin groove #000000; border-bottom: thin groove #000000; border-right: thin groove #000000;">
-	<pre><nested:write name="note" property="note" /></pre>
+	<pre style="white-space:pre-line"><nested:write name="note" property="note" /></pre>
 	<div style="color: #0000FF;"><nested:notEmpty name="current">
 		<c:if test="${current[idx] == false}">
 			<div style="color: #FF0000;">REMOVED</div>
