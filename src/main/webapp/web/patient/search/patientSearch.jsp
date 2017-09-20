@@ -26,7 +26,7 @@
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<div ng-init="patientSearchCtrl.init()">
+<div id="patient-search-page" ng-init="patientSearchCtrl.init()">
 
 	<div ng-show="patientSearchCtrl.demographicReadAccess">
 
@@ -125,8 +125,9 @@
 		</div>
 
 		<table ng-table="patientSearchCtrl.tableParams"
-					 show-filter="false"
-					 class="table">
+			   show-filter="false"
+			   class="table table-hover table-striped"
+				id="patient-search-table">
 			<tbody>
 			<tr ng-repeat="patient in $data"
 					ng-mouseover="patient.$selected=true"

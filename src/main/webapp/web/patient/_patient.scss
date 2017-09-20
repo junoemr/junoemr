@@ -9,3 +9,11 @@
 		width: 50%;
 	}
 }
+
+#patient-search-page {
+	#patient-search-table {
+		tr {
+			cursor: pointer;
+		}
+	}
+}
