@@ -181,7 +181,6 @@ if(!authed) {
 	int nStrShowLen = 20;
 	String billRegion = oscarVariables.getBillingTypeUpperCase();
 	String instanceType = oscarVariables.getInstanceTypeUpperCase();
-	String prov = oscarVariables.getBillingTypeUpperCase();
 
 	CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 	List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.DEMOGRAPHIC, Long.valueOf(demographic_no));
@@ -2855,7 +2854,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 								<td align="right" nowrap><b><bean:message
 									key="demographic.demographiceditdemographic.formRefDocNo" />: </b></td>
 								<td align="left"><input type="text" name="r_doctor_ohip" <%=getDisabled("r_doctor_ohip")%>
-									size="20" maxlength="6" value="<%=rdohip%>"> <% if(!"BC".equals(prov)) { %>
+									size="20" maxlength="6" value="<%=rdohip%>"> <% if(!"BC".equals(instanceType)) { %>
 								<a
 									href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
 								#</a> <% } %>
@@ -3651,7 +3650,7 @@ jQuery(document).ready(function(){
 %>
 </script>
 
-<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true") && "BC".equals(prov)) { %>
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true") && "BC".equals(instanceType)) { %>
 
 <script src="https://www.google.com/jsapi"></script>
 <script>

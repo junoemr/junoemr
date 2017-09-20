@@ -84,7 +84,6 @@
 	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 	WaitingListNameDao waitingListNameDao = SpringUtils.getBean(WaitingListNameDao.class);
 	EFormDao eformDao = (EFormDao)SpringUtils.getBean("EFormDao");
-	ProgramDao programDao = (ProgramDao)SpringUtils.getBean("programDao");
 	ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
     String privateConsentEnabledProperty = OscarProperties.getInstance().getProperty("privateConsentEnabled");
     boolean privateConsentEnabled = privateConsentEnabledProperty != null && privateConsentEnabledProperty.equals("true");
@@ -110,10 +109,10 @@
   OscarProperties oscarProps = OscarProperties.getInstance();
 
   ProvinceNames pNames = ProvinceNames.getInstance();
-  String prov = props.getBillingTypeUpperCase();
+	String instanceType = oscarProps.getInstanceTypeUpperCase();
 
   String billingCentre = (props.getProperty("billcenter","")).trim().toUpperCase();
-  String defaultCity = prov.equals("ON")&&billingCentre.equals("N") ? "Toronto":"";
+  String defaultCity = instanceType.equals("ON")&&billingCentre.equals("N") ? "Toronto":"";
 
   WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
   CountryCodeDao ccDAO =  (CountryCodeDao) ctx.getBean("countryCodeDao");
@@ -125,7 +124,7 @@
 
   String HCType;
   // Determine if curUser has selected a default HC Type
-  UserProperty HCTypeProp = userPropertyDAO.getProp(curUser_no,  UserProperty.HC_TYPE);
+  UserProperty HCTypeProp = userPropertyDAO.getProp(curUser_no, UserProperty.HC_TYPE);
   if (HCTypeProp != null) {
      HCType = HCTypeProp.getValue();
   } else {
@@ -1219,7 +1218,7 @@ document.forms[1].r_doctor_ohip.value = refNo;
 				<td id="referralDocNoLbl" align="right" nowrap height="10"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formReferalDoctorN" />:</b></td>
 				<td id="referralDocNoCell" align="left" height="10"><input type="text"
-					name="r_doctor_ohip" maxlength="6"> <% if(!"BC".equals(prov)) { %>
+					name="r_doctor_ohip" maxlength="6"> <% if(!"BC".equals(instanceType)) { %>
 								<a
 									href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
 								#</a> <% } %>
@@ -1597,7 +1596,7 @@ jQuery(document).ready(function(){
 <%
 }
 %>
-<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true") && "BC".equals(prov)) { %>
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true") && "BC".equals(instanceType)) { %>
 </script>
 <script src="https://www.google.com/jsapi"></script>
 <script>
