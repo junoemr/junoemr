@@ -34,11 +34,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicSets;
 import org.oscarehr.util.SpringUtils;
 
 public class DemographicSetsDaoTest extends DaoTestFixtures {
 	protected DemographicSetsDao dao = SpringUtils.getBean(DemographicSetsDao.class);
+	protected DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 
 	public DemographicSetsDaoTest() {
 	}
@@ -119,16 +121,17 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 	@Test
 	public void testFindSetNamesByDemographicNo() throws Exception {
 		DemographicSets entity = new DemographicSets();
+		Demographic demographic = demographicDao.getDemographic("1");
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setName("a");
-		entity.setDemographicNo(1);
+		entity.setDemographic(demographic);
 		entity.setArchive("1");
 		dao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setName("b");
-		entity.setDemographicNo(1);
+		entity.setDemographic(demographic);
 		entity.setArchive("1");
 		dao.persist(entity);
 
