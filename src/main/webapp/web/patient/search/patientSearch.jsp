@@ -37,12 +37,12 @@
 		<div class="row">
 			<div class="col-xs-6">
 				<form role="form"
-							class="form-inline"
-							ng-submit="patientSearchCtrl.searchPatients()">
+					  class="form-inline"
+					  ng-submit="patientSearchCtrl.searchPatients()">
 					<div class="form-group">
 						<select ng-model="patientSearchCtrl.search.type"
-										ng-change="patientSearchCtrl.clearParams(patientSearchCtrl.search.type)"
-										class="form-control">
+								ng-change="patientSearchCtrl.clearParams(patientSearchCtrl.search.type)"
+								class="form-control">
 							<option value="Name">
 								<bean:message key="patientsearch.type.name" bundle="ui"/>
 							</option>
@@ -73,24 +73,24 @@
 								<li>
 									<a ng-click="patientSearchCtrl.toggleParam('active'); $event.stopPropagation();">
 										<input ng-model="patientSearchCtrl.search.active"
-													 type="checkbox"
-													 ng-click="$event.stopPropagation();"/>
+											   type="checkbox"
+											   ng-click="$event.stopPropagation();"/>
 										<bean:message key="patientsearch.showActiveOnly" bundle="ui"/>
 									</a>
 								</li>
 								<li>
 									<a ng-click="patientSearchCtrl.toggleParam('integrator'); $event.stopPropagation();">
 										<input ng-model="patientSearchCtrl.search.integrator"
-													 type="checkbox"
-													 ng-click="$event.stopPropagation();"/>
+											   type="checkbox"
+											   ng-click="$event.stopPropagation();"/>
 										<bean:message key="patientsearch.includeIntegrator" bundle="ui"/>
 									</a>
 								</li>
 								<li>
 									<a ng-click="patientSearchCtrl.toggleParam('outofdomain'); $event.stopPropagation();">
 										<input ng-model="patientSearchCtrl.search.outofdomain"
-													 type="checkbox"
-													 ng-click="$event.stopPropagation();"/>
+											   type="checkbox"
+											   ng-click="$event.stopPropagation();"/>
 										<bean:message key="patientsearch.outOfDomain" bundle="ui"/>
 									</a>
 								</li>
@@ -98,16 +98,16 @@
 						</div>
 
 						<input ng-model="patientSearchCtrl.search.term"
-									 type="text"
-									 class="form-control"
-									 placeholder="{{patientSearchCtrl.searchTermPlaceHolder}}"/>
+							   type="text"
+							   class="form-control"
+							   placeholder="{{patientSearchCtrl.searchTermPlaceHolder}}"/>
 						<button class="btn btn-primary"
-										type="submit">
+								type="submit">
 							<bean:message key="global.search" bundle="ui"/>
 						</button>
 						<button class="btn"
-										type="button"
-										ng-click="patientSearchCtrl.clearParams()">
+								type="button"
+								ng-click="patientSearchCtrl.clearParams()">
 							<bean:message key="global.clear" bundle="ui"/>
 						</button>
 
@@ -116,8 +116,8 @@
 			</div>
 			<div class="col-xs-6">
 				<button class="btn btn-warning"
-								ng-show="patientSearchCtrl.integratorResults != null && patientSearchCtrl.integratorResults.total > 0"
-								ng-click="patientSearchCtrl.showIntegratorResults()"><span
+						ng-show="patientSearchCtrl.integratorResults != null && patientSearchCtrl.integratorResults.total > 0"
+						ng-click="patientSearchCtrl.showIntegratorResults()"><span
 						class="glyphicon glyphicon-exclamation-sign"></span>
 					<bean:message key="patientsearch.remoteMatches" bundle="ui"/>
 				</button>
@@ -127,53 +127,53 @@
 		<table ng-table="patientSearchCtrl.tableParams"
 			   show-filter="false"
 			   class="table table-hover table-striped"
-				id="patient-search-table">
+			   id="patient-search-table">
 			<tbody>
 			<tr ng-repeat="patient in $data"
-					ng-mouseover="patient.$selected=true"
-					ng-mouseout="patient.$selected=false"
-					ng-class="{'active': patient.$selected}"
-					ng-click="patientSearchCtrl.loadRecord(patient.demographicNo)">
+				ng-mouseover="patient.$selected=true"
+				ng-mouseout="patient.$selected=false"
+				ng-class="{'active': patient.$selected}"
+				ng-click="patientSearchCtrl.loadRecord(patient.demographicNo)">
 
 				<td data-title="'<bean:message key="patientsearch.header.id" bundle="ui"/>'"
-						sortable="'DemographicNo'">
-				{{patient.demographicNo}}
+					sortable="'DemographicNo'">
+					{{patient.demographicNo}}
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.name" bundle="ui"/>'"
-						sortable="'Name'">
-				{{patient.lastName}}, {{patient.firstName}}
+					sortable="'Name'">
+					{{patient.lastName}}, {{patient.firstName}}
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.chartNo" bundle="ui"/>'"
-						sortable="'ChartNo'">
-				{{patient.chartNo}}
+					sortable="'ChartNo'">
+					{{patient.chartNo}}
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.gender" bundle="ui"/>'"
-						class="text-center"
-						sortable="'Sex'">
-				{{patient.sex}}
+					class="text-center"
+					sortable="'Sex'">
+					{{patient.sex}}
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.dob" bundle="ui"/>'"
-						class="text-center"
-						sortable="'DOB'">
-				{{patient.dob| date: 'yyyy-MM-dd'}}
+					class="text-center"
+					sortable="'DOB'">
+					{{patient.dob| date: 'yyyy-MM-dd'}}
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.doctor" bundle="ui"/>'"
-						sortable="'ProviderName'">
-				{{patient.providerName}}
+					sortable="'ProviderName'">
+					{{patient.providerName}}
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.rosterStatus" bundle="ui"/>'"
-						class="text-center"
-						sortable="'RS'">
-				{{patient.rosterStatus}}
+					class="text-center"
+					sortable="'RS'">
+					{{patient.rosterStatus}}
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.patientStatus" bundle="ui"/>'"
-						class="text-center"
-						sortable="'PS'">
-				{{patient.patientStatus}}
+					class="text-center"
+					sortable="'PS'">
+					{{patient.patientStatus}}
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.phone" bundle="ui"/>'"
-						sortable="'Phone'">
-				{{patient.phone}}
+					sortable="'Phone'">
+					{{patient.phone}}
 				</td>
 			</tr>
 			</tbody>
