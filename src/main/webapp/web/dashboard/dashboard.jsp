@@ -208,7 +208,10 @@
 								<thead>
 									<tr>
 										<th class="flag-column">
-											<span class="glyphicon glyphicon-cog hand-hover" ng-click="dashboardCtrl.configureTicklers()"></span>
+											<span class="glyphicon glyphicon-cog hand-hover"
+												  ng-click="dashboardCtrl.configureTicklers()"
+												  title="Configure tickler list">
+											</span>
 										</th>
 										<th>
 											<bean:message key="dashboard.tickler.header.demographicName" bundle="ui" />
@@ -225,7 +228,11 @@
 								<tbody>
 									<tr ng-repeat="item in dashboardCtrl.ticklers" ng-hide="$index >= 5" ng-click="dashboardCtrl.viewTickler(item)" class="hand-hover">
 										<td>
-											<span ng-if="dashboardCtrl.isTicklerHighPriority(item)" class="glyphicon glyphicon-flag" style="color:red"></span>
+											<span ng-if="dashboardCtrl.isTicklerHighPriority(item)"
+												  class="glyphicon glyphicon-flag"
+												  style="color:red"
+												  title="High priority tickler">
+											</span>
 										</td>
 										<td>{{item.demographicName}}</td>
 										<td>{{item.serviceDate | date:'yyyy-MM-dd'}}</td>
