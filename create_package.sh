@@ -7,7 +7,7 @@ BASE=$(git merge-base HEAD "$UPSTREAM")
 
 
 SOURCE_BASE=.
-RELEASE_NAME=oscarhost_setup_files.`date +'%Y-%m-%d'`.RELEASE_15
+RELEASE_NAME=oscarhost_setup_files.`date +'%Y-%m-%d'`.JUNO
 PACKAGE_LOCATION=/tmp
 PACKAGE_BASE=$PACKAGE_LOCATION/$RELEASE_NAME
 ARCHIVE_NAME=$SOURCE_BASE/$RELEASE_NAME.tar.gz
