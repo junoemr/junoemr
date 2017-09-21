@@ -68,7 +68,7 @@ public class RSSFeedService extends AbstractServiceImpl {
 	@GET
 	@Path("/rss")
 	@Produces("application/json")
-	public org.oscarehr.ws.rest.to.RSSResponse getRSS(@QueryParam("key") String key,@QueryParam("startPoint") String startPoint, @QueryParam("numberOfRows") String numberOfRows, @Context HttpServletRequest request) {
+	public RestResponse<RSSResponse, String> getRSS(@QueryParam("key") String key,@QueryParam("startPoint") String startPoint, @QueryParam("numberOfRows") String numberOfRows, @Context HttpServletRequest request) {
 		RSSResponse response = new RSSResponse();
 		response.setTimestamp(new Date());
 		try {
@@ -168,12 +168,12 @@ public class RSSFeedService extends AbstractServiceImpl {
 			    	}
 	    		}
 			} else {
-				return response;
+				return RestResponse.successResponse(response);
 			}
 		}catch(Exception e) {
 			logger.error("error",e);
 			return null;
 		}
-		return response;
+		return RestResponse.successResponse(response);
 	}
 }

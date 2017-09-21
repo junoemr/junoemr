@@ -25,6 +25,7 @@
 package org.oscarehr.ws.rest;
 
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 
 public class RestResponse<T, E> extends HttpEntity<T> {
@@ -59,7 +60,14 @@ public class RestResponse<T, E> extends HttpEntity<T> {
 	public static<T, E> RestResponse<T,E> successResponse(MultiValueMap headers, T body) {
 		return new RestResponse<T, E>(headers, body, null, ResponseStatus.SUCCESS);
 	}
+	public static<T, E> RestResponse<T,E> successResponse(T body) {
+		return successResponse(new HttpHeaders(), body);
+	}
+
 	public static<T, E> RestResponse<T,E> errorResponse(MultiValueMap headers, E error) {
 		return new RestResponse<T, E>(headers, null, error, ResponseStatus.ERROR);
+	}
+	public static<T, E> RestResponse<T,E> errorResponse(E error) {
+		return errorResponse(new HttpHeaders(), error);
 	}
 }

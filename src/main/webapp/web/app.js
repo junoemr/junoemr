@@ -29,6 +29,8 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Document',
 	'Dashboard',
 	'Consults',
+	'Admin',
+	'Admin.Integration'
 ]);
 
 oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider)
@@ -307,9 +309,15 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			url: '/phr',
 			templateUrl: 'record/phr/phr.jsp',
 			controller: 'Record.PHR.PHRController as phrCtrl'
+		})
+		// .state('admin.integration',
+		.state('k2a',
+			{
+			// url: '/admin/integration',
+			url:'/k2a',
+			templateUrl: 'admin/integration/Know2actConfiguration.jsp',
+			controller: 'Admin.Integration.k2aController as k2aCtrl'
 		});
-
-
 
 }]);
 

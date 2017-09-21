@@ -26,10 +26,11 @@
 
  */
 
-// Remove this?
 angular.module("Common.Services").service("k2aService", [
-	'$http', '$q',
-	function($http, $q)
+	'$http',
+	'$q',
+	'junoHttp',
+	function($http, $q, junoHttp)
 	{
 		var service = {};
 
@@ -38,22 +39,18 @@ angular.module("Common.Services").service("k2aService", [
 		service.getK2aFeed = function getK2aFeed(startPoint, numberOfRows)
 		{
 			var deferred = $q.defer();
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.params = {
+				key:'k2a',
+				startPoint:encodeURIComponent(startPoint),
+				numberOfRows:encodeURIComponent(numberOfRows)
+			};
 
-			$http(
-			{
-				url: service.apiPath + '/rssproxy/rss?key=k2a&startPoint=' +
-					encodeURIComponent(startPoint) +
-					'&numberOfRows=' +
-					encodeURIComponent(numberOfRows),
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
+			junoHttp.get(service.apiPath + '/rssproxy/rss', config).then(
+				function success(response) {
 					deferred.resolve(response.data);
 				},
-				function error(error)
-				{
+				function error(error) {
 					console.log("k2aService::getK2aFeed error", error);
 					deferred.reject("An error occured while getting k2a content");
 				});
@@ -64,12 +61,9 @@ angular.module("Common.Services").service("k2aService", [
 		{
 			var deferred = $q.defer();
 
-			$http(
-			{
-				url: service.apiPath + '/app/K2AActive',
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
+			var config = Juno.Common.ServiceHelper.configHeaders();
+
+			$http.get(service.apiPath + '/app/K2AActive', config).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -107,7 +101,7 @@ angular.module("Common.Services").service("k2aService", [
 			var deferred = $q.defer();
 
 			var commentItem = {
-				post
+				post:post
 			};
 			$http.post(service.apiPath + '/app/comment', commentItem).then(
 				function success(response)

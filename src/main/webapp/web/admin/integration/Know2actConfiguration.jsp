@@ -30,8 +30,7 @@
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	boolean authed = true;
 %>
-<security:oscarSec roleName="<%=roleName$%>"
-                   objectName="_admin,_admin.misc" rights="r" reverse="<%=true%>">
+<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.misc" rights="r" reverse="<%=true%>">
 	<%authed = false; %>
 	<%response.sendRedirect("../securityError.jsp?type=_admin&type=_admin.misc");%>
 </security:oscarSec>
@@ -44,17 +43,16 @@
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<html ng-app="k2aConfig">
-<head>
-	<title><bean:message key="admin.admin.Know2ActConfig"/></title>
-	<link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
-	<link rel="stylesheet" href="<%=request.getContextPath() %>/css/font-awesome.min.css">
-	<script type="text/javascript" src="<%=request.getContextPath() %>/library/angular.min.js"></script>
-	<script src="<%=request.getContextPath() %>/web/common/k2aServices.js"></script>
-</head>
-
-<body vlink="#0000FF" class="BodyStyle">
-<div ng-controller="k2aConfig">
+<!-- Hide the main program nav as a fix for having angular in an iframe -->
+<style>
+	#left-pane,#left-pane-hidden,#main-nav,#main-nav-collapse {
+		display:none !important;
+	}
+</style>
+<title><bean:message key="admin.admin.Know2ActConfig"/></title>
+<link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
+<link rel="stylesheet" href="<%=request.getContextPath() %>/css/font-awesome.min.css">
+<div>
 	<div class="page-header">
 		<h4><bean:message key="admin.admin.Know2ActConfig"/>
 			<small data-ng-show="k2aActive"><bean:message key="admin.k2a.active"/></small>
@@ -82,7 +80,6 @@
 		</table>
 		<button class="btn btn-default btn-sm pull-right" ng-click="increasePrevListQuantity()"><bean:message key="admin.k2a.loadMore"/></button>
 
-
 	</div>
 	<div data-ng-hide="k2aActive">
 		<form action="Know2actConfiguration.jsp" method="POST">
@@ -92,84 +89,16 @@
 						<small>(<bean:message key="admin.k2a.clinicName.reason"/>)</small>
 					</label>
 					<div class="controls">
-						<input class="form-control" name="clinicName" ng-model="clinicName" type="text" maxlength="255"/> <br/>
+						<input class="form-control" name="clinicName" ng-model="clinicName" type="text" maxlength="255"/>
 					</div>
-					<input type="button" class="btn btn-primary" ng-disabled="clinicName==null || clinicName==''" value="<bean:message key="admin.k2a.initbtn"/>"
-					       ng-click="initK2A()"/>
+					<p>TEST</p>
+					<input type="button" class="btn btn-primary" ng-disabled="clinicName==null || clinicName==''"
+					       value="<bean:message key="admin.k2a.initbtn"/>"
+					       ng-click="k2aCtrl.initK2A()"/>
 				</div>
 			</fieldset>
 		</form>
 	</div>
 </div>
-
-<script>
-	var app = angular.module("k2aConfig", ['k2aServices']);
-
-	app.controller("k2aConfig", function ($scope, k2aService) {
-		checkStatus = function () {
-			k2aService.isK2AInit().then(function (data) {
-				console.log("data coming back", data);
-				$scope.k2aActive = data.success;
-				console.log($scope.k2aActive);
-				if ($scope.k2aActive) {
-					getPreventionRulesList();
-					getCurrentPreventionRulesVersion();
-				}
-			});
-		};
-		checkStatus();
-
-		$scope.availablePreventionRuleSets = [];
-		$scope.currentPreventionRulesSet = "";
-
-		getPreventionRulesList = function () {
-			k2aService.preventionRulesList().then(function (data) {
-				console.log("data coming back", data);
-				$scope.availablePreventionRuleSets = data;
-				console.log("prev rules ", $scope.availablePreventionRuleSets);
-			});
-		};
-
-		getCurrentPreventionRulesVersion = function () {
-			k2aService.getCurrentPreventionRulesVersion().then(function (data) {
-				console.log("data coming back", data);
-				$scope.currentPreventionRulesSet = data;
-				console.log("prev rules ", $scope.availablePreventionRuleSets);
-			});
-		};
-
-		$scope.loadPreventionRuleById = function (prevSet) {
-
-			if (confirm("<bean:message key="admin.k2a.confirmation"/>")) {
-				console.log("prev", prevSet);
-				prevSet.agreement = "<bean:message key="admin.k2a.confirmation"/>";
-				k2aService.loadPreventionRuleById(prevSet).then(function (data) {
-					console.log("data coming back", data);
-					getCurrentPreventionRulesVersion();
-					console.log("prev rules ", $scope.availablePreventionRuleSets);
-				});
-			}
-		};
-
-		$scope.PrevListQuantity = 10;
-
-		$scope.increasePrevListQuantity = function () {
-			$scope.PrevListQuantity = $scope.availablePreventionRuleSets.length;
-		};
-
-		//
-
-
-		$scope.initK2A = function () {
-			console.log($scope.clinicName);
-			var clinic = {};
-			clinic.name = $scope.clinicName;
-			k2aService.initK2A(clinic).then(function (data) {
-				checkStatus();
-			});
-		}
-	});
-
-</script>
-</body>
-</html>
+<%--</body>--%>
+<%--</html>--%>
