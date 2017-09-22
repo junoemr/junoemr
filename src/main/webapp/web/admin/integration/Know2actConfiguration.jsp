@@ -61,12 +61,12 @@
 <div>
 	<div class="page-header">
 		<h4><bean:message key="admin.admin.Know2ActConfig"/>
-			<small data-ng-show="k2aCtrl.k2aActive"><bean:message key="admin.k2a.active"/></small>
+			<small data-ng-show="k2aConfigCtrl.k2aActive"><bean:message key="admin.k2a.active"/></small>
 		</h4>
 	</div>
-	<div data-ng-show="k2aCtrl.k2aActive">
+	<div data-ng-show="k2aConfigCtrl.k2aActive">
 		<h4><bean:message key="admin.k2a.preventionsListTitle"/>
-			<small>{{k2aCtrl.currentPreventionRulesSet}}</small>
+			<small>{{k2aConfigCtrl.currentPreventionRulesSet}}</small>
 		</h4>
 		<table class="table table-bordered table-condensed">
 			<tr>
@@ -75,7 +75,7 @@
 				<th><bean:message key="admin.k2a.table.createdBy"/></th>
 				<th>&nbsp;</th>
 			</tr>
-			<tr data-ng-repeat="preventionRuleSet in k2aCtrl.availablePreventionRuleSets | limitTo:k2aCtrl.PrevListQuantity">
+			<tr data-ng-repeat="preventionRuleSet in k2aConfigCtrl.availablePreventionRuleSets | limitTo:k2aConfigCtrl.PrevListQuantity">
 				<td>{{preventionRuleSet.name}}</td>
 				<td>{{preventionRuleSet.created_at}}</td>
 				<td>{{preventionRuleSet.author}}</td>
@@ -87,7 +87,7 @@
 		<button class="btn btn-default btn-sm pull-right" ng-click="increasePrevListQuantity()"><bean:message key="admin.k2a.loadMore"/></button>
 
 	</div>
-	<div data-ng-hide="k2aCtrl.k2aActive">
+	<div data-ng-hide="k2aConfigCtrl.k2aActive">
 		<form action="Know2actConfiguration.jsp" method="POST">
 			<fieldset>
 				<div class="form-group col-xs-5">
@@ -99,11 +99,9 @@
 					</div>
 					<input type="button" class="btn btn-primary" ng-disabled="clinicName==null || clinicName==''"
 					       value="<bean:message key="admin.k2a.initbtn"/>"
-					       ng-click="k2aCtrl.initK2A()"/>
+					       ng-click="k2aConfigCtrl.initK2A()"/>
 				</div>
 			</fieldset>
 		</form>
 	</div>
 </div>
-<%--</body>--%>
-<%--</html>--%>

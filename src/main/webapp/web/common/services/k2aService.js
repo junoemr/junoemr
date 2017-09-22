@@ -27,10 +27,9 @@
  */
 
 angular.module("Common.Services").service("k2aService", [
-	'$http',
 	'$q',
 	'junoHttp',
-	function($http, $q, junoHttp)
+	function($q, junoHttp)
 	{
 		var service = {};
 
@@ -104,7 +103,7 @@ angular.module("Common.Services").service("k2aService", [
 			var commentItem = {
 				post:post
 			};
-			$http.post(service.apiPath + '/app/comment', commentItem).then(
+			junoHttp.post(service.apiPath + '/app/comment', commentItem).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -195,7 +194,7 @@ angular.module("Common.Services").service("k2aService", [
 		service.getNotifications = function getNotifications()
 		{
 			var deferred = $q.defer();
-			$http.get(service.apiPath + '/resources/notifications',
+			junoHttp.get(service.apiPath + '/resources/notifications',
 				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(response)
 				{
@@ -204,7 +203,7 @@ angular.module("Common.Services").service("k2aService", [
 				function error(error)
 				{
 					console.log("k2aService::getNotifications error", error);
-					deferred.reject("An error occured while trying to getCurrentPreventionRulesVersion");
+					deferred.reject("An error occured while trying to getNotifications");
 				});
 
 			return deferred.promise;
@@ -214,7 +213,7 @@ angular.module("Common.Services").service("k2aService", [
 		{
 			var deferred = $q.defer();
 
-			$http.post(service.apiPath + '/resources/notifications/readmore',
+			junoHttp.post(service.apiPath + '/resources/notifications/readmore',
 				id, Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(response)
 				{
@@ -232,7 +231,7 @@ angular.module("Common.Services").service("k2aService", [
 		service.ackNotification = function ackNotification(id)
 		{
 			var deferred = $q.defer();
-			$http.post(service.apiPath + '/resources/notifications/' + id + '/ack',
+			junoHttp.post(service.apiPath + '/resources/notifications/' + id + '/ack',
 				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(response)
 				{

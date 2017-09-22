@@ -491,7 +491,8 @@
 <script type="text/javascript" src="admin/module.js"></script>
 <script type="text/javascript" src="admin/adminController.js"></script>
 <script type="text/javascript" src="admin/integration/module.js"></script>
-<script type="text/javascript" src="admin/integration/Know2actController.js"></script>
+<script type="text/javascript" src="admin/integration/Know2actConfigController.js"></script>
+<script type="text/javascript" src="admin/integration/Know2actNotificationController.js"></script>
 
 <script type="text/javascript" src="billing/billingController.js"></script>
 

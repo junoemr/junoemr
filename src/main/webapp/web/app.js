@@ -311,12 +311,18 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			controller: 'Record.PHR.PHRController as phrCtrl'
 		})
 		// .state('admin.integration',
-		.state('k2a',
+		.state('k2aConfig',
 			{
 			// url: '/admin/integration',
-			url:'/k2a',
+			url:'/k2aConfig',
 			templateUrl: 'admin/integration/Know2actConfiguration.jsp',
-			controller: 'Admin.Integration.k2aController as k2aCtrl'
+			controller: 'Admin.Integration.k2aConfigController as k2aConfigCtrl'
+		})
+		.state('k2aNotification',
+		{
+			url:'/k2aNotification',
+			templateUrl: 'admin/integration/Know2actNotifications.jsp',
+			controller: 'Admin.Integration.k2aNotificationController as k2aNoteCtrl'
 		});
 
 }]);

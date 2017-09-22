@@ -1,4 +1,4 @@
-angular.module("Admin.Integration").controller('Admin.Integration.k2aController', [
+angular.module("Admin.Integration").controller('Admin.Integration.k2aConfigController', [
 	"$scope",
 	"k2aService",
 	function ($scope,

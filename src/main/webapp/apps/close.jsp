@@ -47,9 +47,6 @@
 					<a class="pull-right" onclick="window.close()"><bean:message key="global.btnClose"/></a>
 				  </div>
 				</div>
-		  	
-		
-		
 			</div>
 		</div>
 	</div>

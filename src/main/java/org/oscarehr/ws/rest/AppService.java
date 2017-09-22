@@ -33,6 +33,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -63,6 +64,7 @@ import org.oscarehr.ws.rest.to.model.AppDefinitionTo1;
 import org.oscarehr.ws.rest.to.model.RssItem;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.HttpHeaders;
 import oscar.OscarProperties;
 
 @Path("/app")
@@ -165,60 +167,66 @@ public class AppService extends AbstractServiceImpl {
 		}
 		return RestResponse.successResponse("K2A Active");
 	}
-	
+
 	@POST
 	@Path("/comment")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public org.oscarehr.ws.rest.to.RSSResponse postK2AComment(RssItem comment) {
+	public RestResponse<List<RssItem>, String> postK2AComment(RssItem comment) {
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("timestamp", LocalDate.now().toString());
+
 		RSSResponse response = new RSSResponse();
-		response.setTimestamp(new Date());
+		List<RssItem> itemList = new ArrayList<RssItem>();
 		try {
 			AppDefinitionDao appDefinitionDao = SpringUtils.getBean(AppDefinitionDao.class);
-	    	AppUserDao appUserDao = SpringUtils.getBean(AppUserDao.class);
-	    		
-	    	AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
-			
-	    	if(k2aApp != null) {
-		    	AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(),getLoggedInInfo().getLoggedInProviderNo());
-		    		
-		    	if(k2aUser != null) {
-		    		String jsonString = OAuth1Utils.getOAuthPostResponse(getLoggedInInfo(),k2aApp, k2aUser, "/ws/api/posts/comment", "/ws/api/posts/comment", OAuth1Utils.getProviderK2A(), comment);
-			    		
-			    	if(jsonString != null && !jsonString.isEmpty()) {
-			    		org.codehaus.jettison.json.JSONObject post = new org.codehaus.jettison.json.JSONObject(jsonString);
-	    	        	
-	    	        	RssItem commentItem = new RssItem();
-	    	        	commentItem.setId(Long.parseLong(post.getString("id")));
-	    	        	commentItem.setAuthor(post.getString("author"));
-	    				Date date = null;
-	    				if(post.has("createdAt")) {
-		    				try {
-			    				DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-	    	        			date = formatter.parse(post.getString("createdAt"));
-		    				} catch(ParseException e) {
-		    					DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-	    	        			date = formatter.parse(post.getString("createdAt"));
-		    				}
-	    				}
-	    				commentItem.setPublishedDate(date);
-	    				commentItem.setBody(post.getString("body"));
-	    				if(post.has("agree")) {
-	    					commentItem.setAgree(post.getBoolean("agree"));
-	    				}
-	    				if(post.has("agreeId")) {
-	    					commentItem.setAgreeId(Long.parseLong(post.getString("agreeId")));
-	    				}
-	    				response.getContent().add(commentItem);
-			    	}
-			    	response.setTotal(response.getContent().size());
-		    	}
-	    	}
-		} catch(Exception e) {
-			logger.error("error",e);
-			return null;
+			AppUserDao appUserDao = SpringUtils.getBean(AppUserDao.class);
+
+			AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
+
+			if (k2aApp != null) {
+				AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(), getLoggedInInfo().getLoggedInProviderNo());
+
+				if (k2aUser != null) {
+					String jsonString = OAuth1Utils.getOAuthPostResponse(getLoggedInInfo(), k2aApp, k2aUser, "/ws/api/posts/comment", "/ws/api/posts/comment", OAuth1Utils.getProviderK2A(), comment);
+
+					if (jsonString != null && !jsonString.isEmpty()) {
+						org.codehaus.jettison.json.JSONObject post = new org.codehaus.jettison.json.JSONObject(jsonString);
+
+						RssItem commentItem = new RssItem();
+						commentItem.setId(Long.parseLong(post.getString("id")));
+						commentItem.setAuthor(post.getString("author"));
+						Date date = null;
+						if (post.has("createdAt")) {
+							try {
+								DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+								date = formatter.parse(post.getString("createdAt"));
+							}
+							catch (ParseException e) {
+								DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+								date = formatter.parse(post.getString("createdAt"));
+							}
+						}
+						commentItem.setPublishedDate(date);
+						commentItem.setBody(post.getString("body"));
+						if (post.has("agree")) {
+							commentItem.setAgree(post.getBoolean("agree"));
+						}
+						if (post.has("agreeId")) {
+							commentItem.setAgreeId(Long.parseLong(post.getString("agreeId")));
+						}
+						itemList.add(commentItem);
+					}
+					headers.add("total", String.valueOf(response.getContent().size()));
+				}
+			}
 		}
-		return response;
+		catch (Exception e) {
+			logger.error("error", e);
+			RestResponse.errorResponse(headers, "Unexpected Error");
+		}
+		return RestResponse.successResponse(headers, itemList);
 	}
 	
 	@DELETE
