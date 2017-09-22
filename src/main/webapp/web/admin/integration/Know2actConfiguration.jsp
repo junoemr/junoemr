@@ -48,6 +48,12 @@
 	#left-pane,#left-pane-hidden,#main-nav,#main-nav-collapse {
 		display:none !important;
 	}
+	#right-pane {
+		margin-left: 0 !important;
+	}
+	#main-body {
+		padding-top: 0 !important;
+	}
 </style>
 <title><bean:message key="admin.admin.Know2ActConfig"/></title>
 <link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
@@ -55,12 +61,12 @@
 <div>
 	<div class="page-header">
 		<h4><bean:message key="admin.admin.Know2ActConfig"/>
-			<small data-ng-show="k2aActive"><bean:message key="admin.k2a.active"/></small>
+			<small data-ng-show="k2aCtrl.k2aActive"><bean:message key="admin.k2a.active"/></small>
 		</h4>
 	</div>
-	<div data-ng-show="k2aActive">
+	<div data-ng-show="k2aCtrl.k2aActive">
 		<h4><bean:message key="admin.k2a.preventionsListTitle"/>
-			<small>{{currentPreventionRulesSet}}</small>
+			<small>{{k2aCtrl.currentPreventionRulesSet}}</small>
 		</h4>
 		<table class="table table-bordered table-condensed">
 			<tr>
@@ -69,7 +75,7 @@
 				<th><bean:message key="admin.k2a.table.createdBy"/></th>
 				<th>&nbsp;</th>
 			</tr>
-			<tr data-ng-repeat="preventionRuleSet in availablePreventionRuleSets | limitTo:PrevListQuantity">
+			<tr data-ng-repeat="preventionRuleSet in k2aCtrl.availablePreventionRuleSets | limitTo:k2aCtrl.PrevListQuantity">
 				<td>{{preventionRuleSet.name}}</td>
 				<td>{{preventionRuleSet.created_at}}</td>
 				<td>{{preventionRuleSet.author}}</td>
@@ -81,7 +87,7 @@
 		<button class="btn btn-default btn-sm pull-right" ng-click="increasePrevListQuantity()"><bean:message key="admin.k2a.loadMore"/></button>
 
 	</div>
-	<div data-ng-hide="k2aActive">
+	<div data-ng-hide="k2aCtrl.k2aActive">
 		<form action="Know2actConfiguration.jsp" method="POST">
 			<fieldset>
 				<div class="form-group col-xs-5">
@@ -91,7 +97,6 @@
 					<div class="controls">
 						<input class="form-control" name="clinicName" ng-model="clinicName" type="text" maxlength="255"/>
 					</div>
-					<p>TEST</p>
 					<input type="button" class="btn btn-primary" ng-disabled="clinicName==null || clinicName==''"
 					       value="<bean:message key="admin.k2a.initbtn"/>"
 					       ng-click="k2aCtrl.initK2A()"/>

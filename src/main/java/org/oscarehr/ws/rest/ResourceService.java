@@ -54,7 +54,6 @@ import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.model.NotificationTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -84,24 +83,17 @@ public class ResourceService extends AbstractServiceImpl {
 	
 	@Autowired
 	private PreventionDS preventionDS;
-	
+
+	// this is duplicated in AppService for some reason.
 	@GET
 	@Path("/K2AActive/")
 	@Produces("application/json")
-	public GenericRESTResponse isK2AActive(@Context HttpServletRequest request){
+	public RestResponse<Boolean, String> isK2AActive(@Context HttpServletRequest request){
 		String roleName$ = (String)request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
     	if(!com.quatro.service.security.SecurityManager.hasPrivilege("_admin", roleName$)  && !com.quatro.service.security.SecurityManager.hasPrivilege("_report", roleName$)) {
-    		throw new SecurityException("Insufficient Privileges");
+		    return RestResponse.errorResponse("Insufficient Privileges");
     	}
-		
-		GenericRESTResponse response = null;
-		AppDefinition appDef = appDefinitionDao.findByName("K2A");
-		if(appDef == null){
-			response = new GenericRESTResponse(false,"K2A active");
-		}else{
-			response = new GenericRESTResponse(true,"K2A not active");
-		}
-		return response;
+		return RestResponse.successResponse(appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null);
 	}
 	
 	private String getResource(LoggedInInfo loggedInInfo,String requestURI, String baseRequestURI) {
@@ -121,19 +113,25 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/preventionRulesList")
 	@Produces("application/json")
-	public JSONArray getPreventionRulesListFromK2A(@Context HttpServletRequest request) {
+	public RestResponse<JSONArray, String> getPreventionRulesListFromK2A(@Context HttpServletRequest request) {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null)) {
-			throw new RuntimeException("Access Denied");
+			return RestResponse.errorResponse("Access Denied");
 		}
 		JSONArray retArray = new JSONArray();
 		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-			String resource = getResource(loggedInInfo,"/ws/api/oscar/get/PREVENTION_RULES/list", "/ws/api/oscar/get/PREVENTION_RULES/list"); 
+			String resource = getResource(loggedInInfo,
+					"/ws/api/oscar/get/PREVENTION_RULES/list",
+					"/ws/api/oscar/get/PREVENTION_RULES/list");
+			if(resource == null) {
+				return RestResponse.errorResponse("Failed to load Resource");
+			}
+
 			JSONArray rulesArray = JSONArray.fromObject(resource);
-			
+
 			//id  |  type  |       created_at       |       updated_at       | created_by | updated_by |       body        |      name      | private 
-			logger.info("rules json"+rulesArray);
-			for(int i = 0; i < rulesArray.size(); i++){
+			logger.info("rules json" + rulesArray);
+			for (int i = 0; i < rulesArray.size(); i++) {
 				JSONObject jobject = new JSONObject();
 				JSONObject rule = (JSONObject) rulesArray.get(i);
 				jobject.put("id", rule.getString("id"));
@@ -141,47 +139,54 @@ public class ResourceService extends AbstractServiceImpl {
 				jobject.put("rulesXML", rule.getString("body"));
 				jobject.put("created_at", rule.getString("created_at"));
 				jobject.put("author", rule.getString("author"));
-				
+
 				retArray.add(jobject);
 			}
-			
-		} catch(Exception e) {
-			logger.error("Error retrieving prevention list",e);
-			return null;
+
 		}
-		
-		
-		return retArray;
+		catch (Exception e) {
+			logger.error("Error retrieving prevention list", e);
+			return RestResponse.errorResponse("Error retrieving prevention list");
+		}
+		return RestResponse.successResponse(retArray);
 	}
 	
 	@GET
 	@Path("/currentPreventionRulesVersion")
 	@Produces("application/json")
-	public String getCurrentPreventionRulesVersion(){
+	public RestResponse<String, String> getCurrentPreventionRulesVersion() {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "w", null)) {
-			throw new RuntimeException("Access Denied");
+			return RestResponse.errorResponse("Access Denied");
 		}
-		ResourceBundle bundle = getResourceBundle();
+		try {
+			ResourceBundle bundle = getResourceBundle();
 
-		String preventionPath = OscarProperties.getInstance().getProperty("PREVENTION_FILE");
-        if ( preventionPath != null){
-        	return bundle.getString("prevention.currentrules.propertyfile");
-        }else{
-        	ResourceStorage resourceStorage = resourceStorageDao.findActive(ResourceStorage.PREVENTION_RULES);
-        	if(resourceStorage != null){
-        		return bundle.getString("prevention.currentrules.resourceStorage")+" "+resourceStorage.getResourceName();
-        	}
-        }
-        return bundle.getString("prevention.currentrules.default");
+			String preventionPath = OscarProperties.getInstance().getProperty("PREVENTION_FILE");
+			if (preventionPath != null) {
+				return RestResponse.successResponse(bundle.getString("prevention.currentrules.propertyfile"));
+			}
+			else {
+				ResourceStorage resourceStorage = resourceStorageDao.findActive(ResourceStorage.PREVENTION_RULES);
+				if (resourceStorage != null) {
+					return RestResponse.successResponse(bundle.getString("prevention.currentrules.resourceStorage") +
+							" " + resourceStorage.getResourceName());
+				}
+			}
+			return RestResponse.successResponse(bundle.getString("prevention.currentrules.default"));
+		}
+		catch (Exception e) {
+			logger.error("Unexpected Error", e);
+			return RestResponse.errorResponse("Unexpected Error");
+		}
 	}
 	
 	@POST
 	@Path("/loadPreventionRulesById/{id}")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public String addK2AReport(@PathParam("id") String id, @Context HttpServletRequest request,JSONObject jSONObject) {
+	public RestResponse<String,String> addK2AReport(@PathParam("id") String id, @Context HttpServletRequest request,JSONObject jSONObject) {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "w", null)) {
-			throw new RuntimeException("Access Denied");
+			return RestResponse.errorResponse("Access Denied");
 		}
     	
 		try {
@@ -223,11 +228,12 @@ public class ResourceService extends AbstractServiceImpl {
 				resourceStorageDao.persist(resourceStorage);
 				preventionDS.reloadRuleBase();
 			}
-			
-		} catch(Exception e) {
-			logger.error("Error saving Resource to Storage",e);
 		}
-		return null;
+		catch (Exception e) {
+			logger.error("Error saving Resource to Storage", e);
+			return RestResponse.errorResponse("Failed to save Resource to Storage");
+		}
+		return RestResponse.successResponse("Success");
 	}
 	
 	@GET
@@ -294,7 +300,7 @@ public class ResourceService extends AbstractServiceImpl {
 	}
 	
 	@POST
-	@Path("/notifications/ack/")
+	@Path("/notifications/{id}/ack/")
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response markNotificationAsAck(@PathParam("id") String id, @Context HttpServletRequest request,JSONObject jSONObject) {

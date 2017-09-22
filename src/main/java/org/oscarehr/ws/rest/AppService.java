@@ -32,6 +32,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -57,7 +58,6 @@ import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.RSSResponse;
 import org.oscarehr.ws.rest.to.model.AppDefinitionTo1;
 import org.oscarehr.ws.rest.to.model.RssItem;
@@ -82,92 +82,88 @@ public class AppService extends AbstractServiceImpl {
 	public List<AppDefinitionTo1> getApps() {
 		return appManager.getAppDefinitions(getLoggedInInfo());		
 	}
-	
+
 	@GET
 	@Path("/K2AActive/")
 	@Produces("application/json")
-	public GenericRESTResponse isK2AActive(){
-		GenericRESTResponse response = null;
-		if( appManager.getAppDefinition(getLoggedInInfo(), "K2A") == null){
-			response = new GenericRESTResponse(false,"K2A active");
-		}else{
-			response = new GenericRESTResponse(true,"K2A not active");
-		}
-		return response;
+	public RestResponse<Boolean, String> isK2AActive() {
+		return RestResponse.successResponse(appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null);
 	}
 	
 	@POST
 	@Path("/K2AInit/")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public GenericRESTResponse initK2A(JSONObject clinicName,@Context HttpServletRequest request){
+	public RestResponse<String, String> initK2A(JSONObject k2aClinicTo1, @Context HttpServletRequest request) {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_appDefinition", "w", null)) {
-			throw new RuntimeException("Access Denied");
+			return RestResponse.errorResponse("Access Denied");
 		}
 
-		if(appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null){
-			throw new RuntimeException("K2A Already Initialized");
+		if (appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null) {
+			return RestResponse.errorResponse("K2A Already Initialized");
 		}
-		
-		String name = (String) clinicName.get("name");
-		if (name==null || name.trim().isEmpty()){
-			throw new RuntimeException("Invalid clinic name ["+name+"]");
+
+		String name = (String) k2aClinicTo1.get("name");
+		if (name == null || name.trim().isEmpty()) {
+			return RestResponse.errorResponse("Invalid clinic name [" + name + "]");
 		}
-		
+
 		URL url;
-	    HttpURLConnection connection = null;  
-	    
-	    clinicName.accumulate("url", request.getRequestURL().toString());
-					
-	    try {
-		      //Create connection
-	      url = new URL(OscarProperties.getInstance().getProperty("K2A_URL","https://www.know2act.org/ws/rs/localoauth/new"));
-	      connection = (HttpURLConnection)url.openConnection();
-	      connection.setRequestMethod("POST");   
-	      connection.setRequestProperty("Content-Type", "application/json");
-	      connection.setRequestProperty("Content-Length", "" +Integer.toString(clinicName.toString().getBytes().length));
-	      connection.setUseCaches (false);
-	      connection.setDoInput(true);
-	      connection.setDoOutput(true);
-	      logger.info("k2a json "+clinicName.toString());
-	      //Send request
-	      DataOutputStream wr = new DataOutputStream (connection.getOutputStream ());
-	      wr.writeBytes (clinicName.toString());
-	      wr.flush ();
-	      wr.close ();
+		HttpURLConnection connection = null;
 
-		      //Get Response	
-	      InputStream is = connection.getInputStream();
-	      BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
-	      String line;
-	      StringBuilder responseBuffer = new StringBuilder(); 
-	      while((line = bufferedReader.readLine()) != null) {
-	    	  responseBuffer.append(line);
-	      }
-	      bufferedReader.close();
-	      String response  = responseBuffer.toString();
-		  
-	      //Check if response is valid
-	      
-	      AppDefinition k2aNew = new AppDefinition();
-		      
-	      k2aNew.setActive(true);
-	      k2aNew.setAdded(new Date());
-	      k2aNew.setAppType(AppDefinition.OAUTH1_TYPE);
-	      k2aNew.setName("K2A");
-	      k2aNew.setConfig(response);
-	      k2aNew.setAddedBy(getLoggedInInfo().getLoggedInProviderNo());
-	      appManager.saveAppDefinition(getLoggedInInfo(),  k2aNew);
+		k2aClinicTo1.accumulate("url", request.getRequestURL().toString());
 
-	    } catch (Exception e) {
-	    	logger.error("Error processing K2A init",e);
-	    } finally {
+		try {
+			//Create connection
+			url = new URL(OscarProperties.getInstance().getProperty("K2A_URL", "https://www.know2act.org/ws/rs/localoauth/new"));
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type", "application/json");
+			connection.setRequestProperty("Content-Length", "" + Integer.toString(k2aClinicTo1.toString().getBytes().length));
+			connection.setUseCaches(false);
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+			logger.info("k2a json " + k2aClinicTo1.toString());
+			//Send request
+			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+			wr.writeBytes(k2aClinicTo1.toString());
+			wr.flush();
+			wr.close();
 
-	      if(connection != null) {
-	        connection.disconnect(); 
-	      }
-	    }
-		return  new GenericRESTResponse(false,"K2A active");
+			//Get Response
+			InputStream is = connection.getInputStream();
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+			String line;
+			StringBuilder responseBuffer = new StringBuilder();
+			while ((line = bufferedReader.readLine()) != null) {
+				responseBuffer.append(line);
+			}
+			bufferedReader.close();
+			String response = responseBuffer.toString();
+
+			//Check if response is valid
+
+			AppDefinition k2aNew = new AppDefinition();
+
+			k2aNew.setActive(true);
+			k2aNew.setAdded(new Date());
+			k2aNew.setAppType(AppDefinition.OAUTH1_TYPE);
+			k2aNew.setName("K2A");
+			k2aNew.setConfig(response);
+			k2aNew.setAddedBy(getLoggedInInfo().getLoggedInProviderNo());
+			appManager.saveAppDefinition(getLoggedInInfo(), k2aNew);
+
+		}
+		catch (Exception e) {
+			logger.error("Error processing K2A init", e);
+			return RestResponse.errorResponse("Unexpected Error");
+		}
+		finally {
+			if (connection != null) {
+				connection.disconnect();
+			}
+		}
+		return RestResponse.successResponse("K2A Active");
 	}
 	
 	@POST
@@ -229,9 +225,7 @@ public class AppService extends AbstractServiceImpl {
 	@Path("/comment/{commentId}")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public org.oscarehr.ws.rest.to.RSSResponse removeK2AComment(@PathParam("commentId") String commentId) {
-		RSSResponse response = new RSSResponse();
-		response.setTimestamp(new Date());
+	public RestResponse<Date, String> removeK2AComment(@PathParam("commentId") String commentId) {
 		try {
 			AppDefinitionDao appDefinitionDao = SpringUtils.getBean(AppDefinitionDao.class);
 	    	AppUserDao appUserDao = SpringUtils.getBean(AppUserDao.class);
@@ -245,10 +239,11 @@ public class AppService extends AbstractServiceImpl {
 		    		OAuth1Utils.getOAuthDeleteResponse(k2aApp, k2aUser, "/ws/api/posts/comment/" + commentId, "/ws/api/posts/comment/" + commentId);
 		    	}
 	    	}
-		} catch(Exception e) {
-			logger.error("error",e);
-			return null;
+			return RestResponse.successResponse(toLegacyDate(LocalDate.now()));
 		}
-		return response;
+		catch (Exception e) {
+			logger.error("error", e);
+			return RestResponse.errorResponse("Failed to Delete K2A comment");
+		}
 	}
 }
