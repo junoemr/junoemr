@@ -318,6 +318,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			templateUrl: 'admin/integration/Know2actConfiguration.jsp',
 			controller: 'Admin.Integration.k2aConfigController as k2aConfigCtrl'
 		})
+		.state('k2aTemplate',
+			{
+				// url: '/admin/integration',
+				url:'/k2aTemplate',
+				templateUrl: 'admin/integration/Know2actTemplate.jsp',
+				controller: 'Admin.Integration.k2aTemplateController as k2aTemplateCtrl'
+			})
 		.state('k2aNotification',
 		{
 			url:'/k2aNotification',

@@ -424,6 +424,7 @@
 <script type="text/javascript" src="common/services/staticDataService.js"></script>
 <script type="text/javascript" src="common/services/summaryService.js"></script>
 <script type="text/javascript" src="common/services/ticklerService.js"></script>
+<script type="text/javascript" src="common/services/reportByTemplateService.js"></script>
 <script type="text/javascript" src="common/services/uxService.js"></script>
 
 <script type="text/javascript" src="common/filters/module.js"></script>
@@ -493,6 +494,7 @@
 <script type="text/javascript" src="admin/integration/module.js"></script>
 <script type="text/javascript" src="admin/integration/Know2actConfigController.js"></script>
 <script type="text/javascript" src="admin/integration/Know2actNotificationController.js"></script>
+<script type="text/javascript" src="admin/integration/Know2actTemplateController.js"></script>
 
 <script type="text/javascript" src="billing/billingController.js"></script>
 
