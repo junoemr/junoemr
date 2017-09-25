@@ -32,8 +32,11 @@ import java.util.Set;
 import javax.persistence.Query;
 
 import org.oscarehr.common.model.CustomFilter;
+import org.oscarehr.common.model.CustomFilter.SORTCOLUMN;
+import org.oscarehr.common.model.CustomFilter.SORTDIR;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Tickler;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -205,9 +208,9 @@ public class TicklerDao extends AbstractDao<Tickler>{
 	 * @return
 	 */
 	private String getTicklerQueryString(String selectQuery, List<Object> paramList, CustomFilter filter) {
-		String tickler_date_order = filter.getSort_order();
+//		String tickler_date_order = filter.getSort_order();
         
-		String query = selectQuery + " FROM Tickler t WHERE 1=1 ";
+		String query = selectQuery + " FROM Tickler t, Demographic d where t.demographicNo = d.DemographicNo ";
 		boolean includeMRPClause = true;
 		boolean includeProviderClause = true;
 		boolean includeAssigneeClause = true;
@@ -333,9 +336,37 @@ public class TicklerDao extends AbstractDao<Tickler>{
         	query = query + " and t.message = ? ";
         	paramList.add(filter.getMessage());
         }
-		 
-		query = query + " order by t.serviceDate " + tickler_date_order;
-		 
+
+		String orderDir = "desc";
+		if (SORTDIR.asc.equals(filter.getSortDir())) {
+			orderDir = "asc";
+		}
+
+		String orderBy = "t.updateDate " + orderDir;
+
+		if (SORTCOLUMN.DemographicName.equals(filter.getSortColumn())) {
+			orderBy = "d.LastName " + orderDir + ", d.FirstName " + orderDir;
+		} else if (SORTCOLUMN.Creator.equals(filter.getSortColumn())) {
+			orderBy = "t.creator " + orderDir;
+		} else if (SORTCOLUMN.ServiceDate.equals(filter.getSortColumn())) {
+			orderBy = "t.serviceDate " + orderDir;
+		} else if (SORTCOLUMN.UpdateDate.equals(filter.getSortColumn())) {
+			orderBy = "t.updateDate " + orderDir;
+		} else if (SORTCOLUMN.Priority.equals(filter.getSortColumn())) {
+			orderBy = "t.priority " + orderDir;
+		} else if (SORTCOLUMN.TaskAssignedTo.equals(filter.getSortColumn())) {
+			orderBy = "t.taskAssignedTo " + orderDir;
+		} else if (SORTCOLUMN.Status.equals(filter.getSortColumn())) {
+			orderBy = "t.status " + orderDir;
+		} else if (SORTCOLUMN.Message.equals(filter.getSortColumn())) {
+			orderBy = "t.message " + orderDir;
+		}
+
+		orderBy = " ORDER BY " + orderBy;
+
+		query = query + orderBy;
+		MiscUtils.getLogger().debug("sql="+query);
+
 		return query;
 	}
 

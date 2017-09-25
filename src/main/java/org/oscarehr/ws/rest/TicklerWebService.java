@@ -162,7 +162,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	@Path("/ticklers")
 	@Produces("application/json")
 	public TicklerResponse getTicklerList() {
-		
+
 		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "r", null)) {
 			throw new RuntimeException("Access Denied");
 		}
@@ -171,7 +171,6 @@ public class TicklerWebService extends AbstractServiceImpl {
 	        
 	    String strCount = req.getParameter("count");
 	    String strPage = req.getParameter("page");
-	    
 	    String serviceStartDate = req.getParameter("serviceStartDate");
 	    String serviceEndDate = req.getParameter("serviceEndDate");
 	    String status = req.getParameter("status");
@@ -179,7 +178,9 @@ public class TicklerWebService extends AbstractServiceImpl {
 	    String mrp = req.getParameter("mrp");
 	    String creator = req.getParameter("creator");
 	    String priority = req.getParameter("priority");
-	    
+	    String sortColumn = req.getParameter("sortColumn");
+	    String sortDirection = req.getParameter("sortDirection");
+
 	    boolean includeLinks = Boolean.valueOf(req.getParameter("includeLinks"));
 	    boolean includeComments = Boolean.valueOf(req.getParameter("includeComments"));
 	    boolean includeUpdates = Boolean.valueOf(req.getParameter("includeUpdates"));
@@ -188,8 +189,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	    
 	    int count = Integer.parseInt(strCount);
 	    int page = Integer.parseInt(strPage);
-	    
-	    
+
 		CustomFilter cf = new CustomFilter(true);
 		
 		if(serviceStartDate != null && !"".equals(serviceStartDate)) {
@@ -229,16 +229,24 @@ public class TicklerWebService extends AbstractServiceImpl {
 		if(req.getParameter("demographicNo") != null){
 			cf.setDemographicNo(req.getParameter("demographicNo"));
 		}
+
+		if(sortColumn != null){
+			cf.setSortColumn(CustomFilter.SORTCOLUMN.valueOf(sortColumn));
+		}
+
+		if(sortDirection != null){
+			cf.setSortDir(CustomFilter.SORTDIR.valueOf(sortDirection));
+		}
 		
 		TicklerResponse result = new TicklerResponse();
 		
 
 		int total = ticklerManager.getNumTicklers(getLoggedInInfo(),cf);
 		result.setTotal(total);
-		
-		
+
+
 		List<Tickler> ticklers = ticklerManager.getTicklers(getLoggedInInfo(),cf,((page-1)*count),count);
-		
+
 		if(includeLinks) {
 			ticklerConverter.setIncludeLinks(true);
 		}
