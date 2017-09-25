@@ -87,23 +87,20 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/K2AActive/")
 	@Produces("application/json")
-	public RestResponse<Boolean, String> isK2AActive(@Context HttpServletRequest request){
+	public RestResponse<Boolean, String> isK2AActive(@Context HttpServletRequest request) {
 		String roleName$ = (String)request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
     	if(!com.quatro.service.security.SecurityManager.hasPrivilege("_admin", roleName$)  && !com.quatro.service.security.SecurityManager.hasPrivilege("_report", roleName$)) {
 		    return RestResponse.errorResponse("Insufficient Privileges");
     	}
 		return RestResponse.successResponse(appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null);
 	}
-	
-	private String getResource(LoggedInInfo loggedInInfo,String requestURI, String baseRequestURI) {
+
+	private String getK2aResource(LoggedInInfo loggedInInfo, String requestURI, String baseRequestURI) {
 		AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
-		if(k2aApp != null) {
-			AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(),loggedInInfo.getLoggedInProvider().getProviderNo());
-			
-			if(k2aUser != null) {
-				return OAuth1Utils.getOAuthGetResponse(loggedInInfo,k2aApp, k2aUser, requestURI, baseRequestURI);
-			} else {
-				return null;
+		if (k2aApp != null) {
+			AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(), loggedInInfo.getLoggedInProvider().getProviderNo());
+			if (k2aUser != null) {
+				return OAuth1Utils.getOAuthGetResponse(loggedInInfo, k2aApp, k2aUser, requestURI, baseRequestURI);
 			}
 		}
 		return null;
@@ -119,7 +116,7 @@ public class ResourceService extends AbstractServiceImpl {
 		JSONArray retArray = new JSONArray();
 		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-			String resource = getResource(loggedInInfo,
+			String resource = getK2aResource(loggedInInfo,
 					"/ws/api/oscar/get/PREVENTION_RULES/list",
 					"/ws/api/oscar/get/PREVENTION_RULES/list");
 			if(resource == null) {
@@ -202,7 +199,7 @@ public class ResourceService extends AbstractServiceImpl {
 			}
 			
 			
-			String resource = getResource(loggedInInfo,"/ws/api/oscar/get/PREVENTION_RULES/id/"+id, "/ws/api/oscar/get/PREVENTION_RULES/id/"+id); 
+			String resource = getK2aResource(loggedInInfo,"/ws/api/oscar/get/PREVENTION_RULES/id/"+id, "/ws/api/oscar/get/PREVENTION_RULES/id/"+id);
 			
 			if(resource !=null){
 				//JSONObject jSONObject = JSONObject.fromObject(resource);
@@ -242,17 +239,13 @@ public class ResourceService extends AbstractServiceImpl {
 		List<NotificationTo1> list = new ArrayList<NotificationTo1>();
 		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-			String notificationStr = getResource(loggedInInfo, "/ws/api/notification", "/ws/api/notification");
+			String notificationStr = getK2aResource(loggedInInfo, "/ws/api/notification", "/ws/api/notification");
 			if(notificationStr == null) {
 				return RestResponse.errorResponse("Failed to load Resource");
 			}
-
 			JSONObject notifyObject = JSONObject.fromObject(notificationStr);
-			try {
-				JSONObject notifyList = notifyObject.getJSONObject("notification");
-				list.add(NotificationTo1.fromJSON(notifyList));
-			}
-			catch (Exception e) {
+
+			if(notifyObject.getInt("numberOfNotifications") > 0) {
 				JSONArray notifyArrList = notifyObject.getJSONArray("notification");
 				for (int i = 0; i < notifyArrList.size(); i++) {
 					list.add(NotificationTo1.fromJSON(notifyArrList.getJSONObject(i)));
@@ -272,7 +265,7 @@ public class ResourceService extends AbstractServiceImpl {
 	public RestResponse<String, String> getNotificationsNumber(@Context HttpServletRequest request) {
 		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-			String notificationStr = getResource(loggedInInfo, "/ws/api/notification", "/ws/api/notification");
+			String notificationStr = getK2aResource(loggedInInfo, "/ws/api/notification", "/ws/api/notification");
 			if(notificationStr != null) {
 				JSONObject notifyObject = JSONObject.fromObject(notificationStr);
 				String k2aNoficationCount = notifyObject.getString("numberOfNotifications");

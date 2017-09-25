@@ -25,6 +25,7 @@ angular.module("Admin.Integration").controller('Admin.Integration.k2aNotificatio
 				},
 				function failure(error) {
 					console.error(error);
+					alert("Failed to acknowledge notification");
 				});
 		};
 		controller.getNotifications = function () {
