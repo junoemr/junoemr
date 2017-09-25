@@ -29,7 +29,11 @@
 	.note-container {
 		.note-header {
 			background-color: #f4f4f4;
-
+			h6 {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
 			.note-header-info {
 				color: #636363;
 				padding-left: 10px;

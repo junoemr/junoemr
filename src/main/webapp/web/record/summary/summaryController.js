@@ -374,13 +374,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		controller.getNoteHeader = function firstLine(noteObj)
 		{
-			var maxLen = 50; // Max character length of header
-			var text = noteObj.note.trim().split('\n')[0]; // First line of the note text, split by newline
-
-			if(text.length > maxLen)
-				return text.substring(0, maxLen) + "...";
-
-			return text.substring(0, maxLen);
+			return  noteObj.note.trim().split('\n')[0]; // First line of the note text, split by newline
 		};
 
 		controller.trackerUrl = "";
