@@ -1333,7 +1333,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				function success()
 				{
 					controller.page.saving = false;
-					$state.reload();
+					controller.page.dataChanged = false;
 				},
 
 				function error()
