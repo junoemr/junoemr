@@ -59,6 +59,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
         };
         console.log('TABLE PARAMS', NgTableParams);
         controller.me = null;
+        controller.k2aActive = false;
 
         controller.busyLoadingData = false;
 
@@ -131,7 +132,16 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
             }
         };
 
-        // Remove?
+
+	    controller.updateK2aActive = function () {
+		    var isActive = false;
+		    k2aService.isK2AInit().then(
+			    function success(data) {
+				    isActive = data;
+			    }
+		    );
+		    controller.k2aActive = isActive;
+	    };
         controller.loadMoreK2aFeed = function()
         {
             controller.updateFeed(controller.k2afeed.length, 10);
@@ -329,7 +339,6 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
                 });
         };
 
-        // Remove?
         controller.updateFeed = function updateFeed(startPoint, numberOfRows)
         {
             if (controller.busyLoadingData) return;
@@ -390,6 +399,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
             controller.updateMessages();
             controller.updateReports();
             controller.updateFeed(0, 10);
+            controller.updateK2aActive();
 
         };
 
