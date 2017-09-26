@@ -210,7 +210,8 @@ public class TicklerDao extends AbstractDao<Tickler>{
 	private String getTicklerQueryString(String selectQuery, List<Object> paramList, CustomFilter filter) {
 //		String tickler_date_order = filter.getSort_order();
         
-		String query = selectQuery + " FROM Tickler t, Demographic d where t.demographicNo = d.DemographicNo ";
+		// Equivalent to an inner join between Ticker and Demographic on demoNo
+		String query = selectQuery + " FROM Tickler as t INNER JOIN t.demographic as d where 1 = 1 "; 
 		boolean includeMRPClause = true;
 		boolean includeProviderClause = true;
 		boolean includeAssigneeClause = true;
