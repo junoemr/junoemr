@@ -79,6 +79,21 @@ public abstract class DaoTestFixtures
 	{
 		return(loggedInInfo);
 	}
+
+	public static void setupBeanFactory() {
+		if(SpringUtils.beanFactory==null) {
+			oscar.OscarProperties p = oscar.OscarProperties.getInstance();
+			p.setProperty("db_name", ConfigUtils.getProperty("db_schema") + ConfigUtils.getProperty("db_schema_properties"));
+			p.setProperty("db_username", ConfigUtils.getProperty("db_user"));
+			p.setProperty("db_password", ConfigUtils.getProperty("db_password"));
+			p.setProperty("db_uri", ConfigUtils.getProperty("db_url_prefix"));
+			p.setProperty("db_driver", ConfigUtils.getProperty("db_driver"));
+			ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
+			context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
+			context.refresh();
+			SpringUtils.beanFactory = context;
+		}
+	}
 	
 	public void beforeForInnoDB() throws Exception {
 		SchemaUtils.dropTable("IntegratorConsent","HnrDataValidation","ClientLink","IntegratorConsentComplexExitInterview",
@@ -104,18 +119,7 @@ public abstract class DaoTestFixtures
 		}
 
 		start = System.currentTimeMillis();
-		if(SpringUtils.beanFactory==null) {
-			oscar.OscarProperties p = oscar.OscarProperties.getInstance();
-			p.setProperty("db_name", ConfigUtils.getProperty("db_schema") + ConfigUtils.getProperty("db_schema_properties"));
-			p.setProperty("db_username", ConfigUtils.getProperty("db_user"));
-			p.setProperty("db_password", ConfigUtils.getProperty("db_password"));
-			p.setProperty("db_uri", ConfigUtils.getProperty("db_url_prefix"));
-			p.setProperty("db_driver", ConfigUtils.getProperty("db_driver"));
-			ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
-			context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
-			context.refresh();
-			SpringUtils.beanFactory = context;
-		}
+		DaoTestFixtures.setupBeanFactory();
 		end = System.currentTimeMillis();
 		secsTaken = (end-start)/1000;
 		logger.info("Setting up spring took " + secsTaken + " seconds.");

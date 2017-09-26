@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.ConfigUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
@@ -64,28 +65,17 @@ public class CLSHandlerIntegrationTest {
 	@BeforeClass
 	public static void init() throws Exception {
 		SchemaUtils.restoreAllTables();
-		
-		if(SpringUtils.beanFactory==null) {
-			oscar.OscarProperties p = oscar.OscarProperties.getInstance();
-			p.setProperty("db_name", ConfigUtils.getProperty("db_schema") + ConfigUtils.getProperty("db_schema_properties"));
-			p.setProperty("db_username", ConfigUtils.getProperty("db_user"));
-			p.setProperty("db_password", ConfigUtils.getProperty("db_password"));
-			p.setProperty("db_uri", ConfigUtils.getProperty("db_url_prefix"));
-			p.setProperty("db_driver", ConfigUtils.getProperty("db_driver"));
-			ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
-			context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
-			context.refresh();
-			SpringUtils.beanFactory = context;
-		}
-		
+
+		DaoTestFixtures.setupBeanFactory();
+
 		AuthUtils.initLoginContext();
 		
 	}
-	@Test
-	@Ignore
 	/*
 	 * Just used during my own testing..but thought it be useful to leave for someone else
 	 */
+	@Test
+	@Ignore
 	public void playAround() throws Exception {
 		
 		String url = "http://localhost:8080/oscar_alberta/lab/newLabUpload.do";

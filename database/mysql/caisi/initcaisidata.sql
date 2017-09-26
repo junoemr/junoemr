@@ -1,3 +1,5 @@
+BEGIN;
+
 -- default agency
 insert into agency (id, intake_quick_state, intake_indepth_state) values (0, "", "");
 
@@ -2081,6 +2083,9 @@ insert into ctl_billingservice (servicetype_name,servicetype,service_code,servic
 insert into ctl_billingservice (servicetype_name,servicetype,service_code,service_group_name,service_group,status,service_order) values('PSYCHIATRIST',	'P01','G497A','Group1','Group1','A',6);
 insert into ctl_billingservice (servicetype_name,servicetype,service_code,service_group_name,service_group,status,service_order) values('PSYCHIATRIST',	'P01','A795A','Group1','Group1','A',5);
 
+COMMIT;
 
 source init_cds_form_4_options.sql;
 source init_functional_centres.sql;
+
+

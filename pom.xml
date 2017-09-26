@@ -38,7 +38,7 @@
 	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
+	 <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
 	</properties>
 
 	<repositories>
@@ -75,10 +75,10 @@
 	</repositories>
 
 	<pluginRepositories>
-		<pluginRepository>
+       	<pluginRepository>
 			<id>local_repo</id>
 			<url>file://${basedir}/local_repo</url>
-		</pluginRepository>
+       	</pluginRepository>
 
 		<pluginRepository>
 			<id>oscar_repo</id>
@@ -93,7 +93,7 @@
 			<groupId>net.bull.javamelody</groupId>
 			<artifactId>javamelody-core</artifactId>
 			<version>1.53.0</version>
-		</dependency>
+        </dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
@@ -1529,6 +1529,7 @@
 				<configuration>
 					<skipTests>false</skipTests>
 					<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
+					<printSummary>true</printSummary>
 					<excludes>
 						<exclude>**/AR2005*.java</exclude>
 						<exclude>**/OntarioMDSpec4DataTest.java</exclude>

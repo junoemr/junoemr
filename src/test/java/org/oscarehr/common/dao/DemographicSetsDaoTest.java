@@ -45,16 +45,23 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 	public DemographicSetsDaoTest() {
 	}
 
+	Demographic demographic = null;
 
 	@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreTable("demographicSets");
+		SchemaUtils.restoreTable("demographicSets", "admission", "demographic");
+
+		demographic = new Demographic();
+		EntityDataGenerator.generateTestDataForModelClass(demographic);
+		demographic.setDemographicNo(null);
+		demographicDao.save(demographic);
 	}
 
 	@Test
 	public void testCreate() throws Exception {
 		DemographicSets entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setDemographic(demographic);
 		dao.persist(entity);
 		assertNotNull(entity.getId());
 	}
@@ -63,12 +70,14 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 	public void testFindBySetName() throws Exception {
 		DemographicSets entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setDemographic(demographic);
 		entity.setName("a");
 		entity.setArchive("0");
 		dao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setDemographic(demographic);
 		entity.setName("a");
 		entity.setArchive("0");
 		dao.persist(entity);
@@ -81,12 +90,14 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 	public void testFindBySetNames() throws Exception {
 		DemographicSets entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setDemographic(demographic);
 		entity.setName("a");
 		entity.setArchive("0");
 		dao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setDemographic(demographic);
 		entity.setName("b");
 		entity.setArchive("0");
 		dao.persist(entity);
@@ -103,12 +114,14 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 	public void testFindBySetNameAndEligibility() throws Exception {
 		DemographicSets entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setDemographic(demographic);
 		entity.setName("a");
 		entity.setEligibility("0");
 		dao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setDemographic(demographic);
 		entity.setName("a");
 		entity.setEligibility("1");
 		dao.persist(entity);
@@ -121,21 +134,22 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 	@Test
 	public void testFindSetNamesByDemographicNo() throws Exception {
 		DemographicSets entity = new DemographicSets();
-		Demographic demographic = demographicDao.getDemographic("1");
+		//Demographic demographic = demographicDao.getDemographic("1");
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setName("a");
 		entity.setDemographic(demographic);
-		entity.setArchive("1");
+		entity.setArchive("0");
 		dao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		//entity.setDemographic(new Demographic(1));
 		entity.setName("b");
 		entity.setDemographic(demographic);
-		entity.setArchive("1");
+		entity.setArchive("0");
 		dao.persist(entity);
 
-		List<String> names = dao.findSetNamesByDemographicNo(1);
+		List<String> names = dao.findSetNamesByDemographicNo(demographic.getDemographicNo());
 		assertEquals(2,names.size());
 		assertTrue(names.contains("a"));
 		assertTrue(names.contains("b"));
@@ -145,16 +159,19 @@ public class DemographicSetsDaoTest extends DaoTestFixtures {
 	public void testFindSetNames() throws Exception {
 		DemographicSets entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setDemographic(demographic);
 		entity.setName("a");
 		dao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setDemographic(demographic);
 		entity.setName("b");
 		dao.persist(entity);
 
 		entity = new DemographicSets();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setDemographic(demographic);
 		entity.setName("b");
 		dao.persist(entity);
 

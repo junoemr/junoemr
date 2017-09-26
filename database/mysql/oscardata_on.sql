@@ -1,5 +1,7 @@
 -- oscardata_on.sql
 
+BEGIN;
+
 --
 -- Dumping data for table 'FaxClientLog'
 --
@@ -15211,3 +15213,5 @@ insert into frm_labreq_preset (lab_type,prop_name,prop_value,status) values ("Pr
 insert into frm_labreq_preset (lab_type,prop_name,prop_value,status) values ("PreLithium","h_cbc","checked",'1');
 insert into frm_labreq_preset (lab_type,prop_name,prop_value,status) values ("PreLithium","o_otherTests1","GGT",'1');
 insert into frm_labreq_preset (lab_type,prop_name,prop_value,status) values ("PreLithium","o_otherTests2","ECG",'1');
+
+COMMIT;

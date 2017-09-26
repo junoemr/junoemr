@@ -24,11 +24,44 @@
 package org.oscarehr.e2e.director;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
+import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.Test;
+import org.oscarehr.common.dao.DaoTestFixtures;
+import org.oscarehr.common.dao.DemographicDao;
+import org.oscarehr.common.dao.utils.EntityDataGenerator;
+import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.e2e.constant.Constants;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 
 public class E2ECreatorTest {
+
+	private static Logger logger = MiscUtils.getLogger();
+
+	protected DemographicDao demographicDao = null;
+	Demographic demographic = null;
+
+	@Before
+	public void before() throws Exception {
+		if(!SchemaUtils.inited) {
+			logger.info("dropAndRecreateDatabase");
+			SchemaUtils.dropAndRecreateDatabase();
+		}
+		DaoTestFixtures.setupBeanFactory();
+		SchemaUtils.restoreTable("demographic");
+		demographicDao = SpringUtils.getBean(DemographicDao.class);
+
+		demographic = new Demographic();
+		EntityDataGenerator.generateTestDataForModelClass(demographic);
+		demographic.setDemographicNo(null);
+		demographic.setPatientStatus("AC");
+		demographicDao.save(demographic);
+	}
+
 	@SuppressWarnings("unused")
 	@Test(expected=UnsupportedOperationException.class)
 	public void instantiationTest() {
@@ -42,6 +75,6 @@ public class E2ECreatorTest {
 
 	@Test
 	public void emptyCreateEmrConversionDocumentTest() {
-		assertNotNull(E2ECreator.createEmrConversionDocument(Constants.Runtime.EMPTY_DEMOGRAPHIC));
+		assertNull(E2ECreator.createEmrConversionDocument(Constants.Runtime.EMPTY_DEMOGRAPHIC));
 	}
 }

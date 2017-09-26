@@ -53,7 +53,33 @@ public class EaapsHandlerTest extends DaoTestFixtures {
 	
 	@BeforeClass
 	public static void init() throws Exception {
-		SchemaUtils.restoreAllTables();
+		//SchemaUtils.restoreAllTables();
+		SchemaUtils.restoreTable(
+			"demographic_merged",
+			"admission",
+			"health_safety",
+			"demographic",
+			"lst_gender",
+			"dxresearch",
+			"provider",
+			"incomingLabRules",
+			"providerLabRouting",
+			"queue_document_link",
+			"Facility",
+			"program_queue",
+			"program",
+			"secRole",
+			"document",
+			"ctl_document",
+			"user_ds_message_prefs",
+			"messagetbl",
+			"oscarcommlocations",
+			"log",
+			"casemgmt_note",
+			"casemgmt_note_link",
+			"messagelisttbl",
+			"msgDemoMap"
+		);
 	}
 	
 	private String getHash(Demographic demo) {

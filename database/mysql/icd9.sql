@@ -19,6 +19,8 @@ CREATE TABLE icd9 (
 -- Dumping data for table `icd9`
 --
 
+BEGIN;
+
 INSERT INTO icd9 (id, icd9, description) VALUES (1,'001','CHOLERA*');
 INSERT INTO icd9 (id, icd9, description) VALUES (2,'0010','CHOLERA D/T VIB CHOLERAE');
 INSERT INTO icd9 (id, icd9, description) VALUES (3,'0011','CHOLERA D/T VIB EL TOR');
@@ -15383,3 +15385,5 @@ INSERT INTO icd9 (id, icd9, description) VALUES (15361,'V8302','SYMPT HEMOPHIL A
 INSERT INTO icd9 (id, icd9, description) VALUES (15362,'338','PAIN NOT ELSEWHERE CLASSIFIED');
 INSERT INTO icd9 (id, icd9, description) VALUES (15363,'338.2','CHRONIC PAIN');
 INSERT INTO icd9 (id, icd9, description) VALUES (15364,'780.93','MEMORY LOSS');
+
+COMMIT;

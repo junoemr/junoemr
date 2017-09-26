@@ -46,26 +46,15 @@ public class WaitingListDaoTest extends DaoTestFixtures {
 	protected WaitingListDao dao = SpringUtils.getBean(WaitingListDao.class);
 	protected DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 
+	private WaitingListName wn;
+	private Demographic demographic;
+
 	@Before
 	public void before() throws Exception {
 		beforeForInnoDB();
 		SchemaUtils.restoreTable("Facility","lst_gender","demographic_merged","admission","health_safety","program","waitingList", "waitingListName", "demographic","appointment");
-	}
 
-	@Test
-	public void testCreate() throws Exception {
-		WaitingList entity = new WaitingList();
-		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
-
-		assertNotNull(entity.getId());
-	}
-
-	@Test
-	public void testFindByDemographic() {
-		Demographic demographic = demographicDao.getDemographic("10");
-		// WaitingListNameDao wlnDao = SpringUtils.getBean(WaitingListNameDao.class);
-		WaitingListName wn = new WaitingListName();
+		wn = new WaitingListName();
 		wn.setCreateDate(new Date());
 		wn.setName("NAHBLIAYH");
 		wn.setGroupNo("1");
@@ -73,25 +62,44 @@ public class WaitingListDaoTest extends DaoTestFixtures {
 		wn.setProviderNo("1");
 		dao.persist(wn);
 
+		demographic = new Demographic();
+		EntityDataGenerator.generateTestDataForModelClass(demographic);
+		demographic.setDemographicNo(null);
+		demographicDao.save(demographic);
+	}
+
+	@Test
+	public void testCreate() throws Exception {
+		WaitingList entity = new WaitingList();
+		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setDemographic(demographic);
+		entity.setWaitingListName(wn);
+		dao.persist(entity);
+
+		assertNotNull(entity.getId());
+	}
+
+	@Test
+	public void testFindByDemographic() {
 		WaitingList w = new WaitingList();
-		w.setDemographic(demographic);
+		w.setDemographic(new Demographic(1));
 		w.setWaitingListName(wn);
 		w.setOnListSince(new Date());
 		w.setPosition(1);
 		w.setIsHistory("N");
 		dao.persist(w);
 
-		List<WaitingList> lists = dao.findByDemographic(ConversionUtils.fromIntString("10"));
+		List<WaitingList> lists = dao.findByDemographic(ConversionUtils.fromIntString(demographic.getDemographicNo().toString()));
 		assertNotNull(lists);
 		assertTrue(lists.size() == 1);
 	}
 
 	@Test
 	public void testFindAppts() {
-		Demographic demographic = demographicDao.getDemographic("1");
 		WaitingList w = new WaitingList();
 		w.setDemographic(demographic);
 		w.setOnListSince(new Date());
+		w.setWaitingListName(wn);
 		List<Appointment> appts = dao.findAppointmentFor(w);
 		assertNotNull(appts);
 	}
