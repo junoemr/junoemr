@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.*;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -39,6 +40,8 @@ import oscar.oscarWaitingList.util.WLWaitingListNameUtil;
 import oscar.util.UtilDateUtilities;
 
 public final class WLEditWaitingListNameAction extends Action {
+
+	private static final Logger logger = Logger.getLogger(WLEditWaitingListNameAction.class);
 
 	private WLWaitingListNameBeanHandler waitListNameManager = SpringUtils.getBean(WLWaitingListNameBeanHandler.class);
 	
@@ -87,6 +90,7 @@ public final class WLEditWaitingListNameAction extends Action {
 	        try{
 	        	if( actionChosen != null  &&  actionChosen.length() > 0  &&
 	        		providerNo != null  &&  providerNo.length() > 0 ){
+			        logger.info(actionChosen + " waitListName '" + wlNewName + "'");
 	        		
 	        		if(actionChosen.equalsIgnoreCase("create")){
 	        			if(wlNewName != null  &&  wlNewName.length() > 0){
@@ -94,6 +98,7 @@ public final class WLEditWaitingListNameAction extends Action {
 	        					WLWaitingListNameUtil.createWaitingListName(wlNewName, groupNo, providerNo);
 	        					successCode = 1;
 	        				}catch(Exception ex1){
+						        logger.error("Creation Error", ex1);
 	        					if(ex1.getMessage().equals("wlNameExists")){
 	        						setMessage("oscar.waitinglistname.wlNameExists");
 	        						//msgs.add(ActionMessages.GLOBAL_MESSAGE, 
@@ -112,6 +117,7 @@ public final class WLEditWaitingListNameAction extends Action {
 	        					WLWaitingListNameUtil.updateWaitingListName(selectedWL, wlNewName, groupNo, providerNo);
 	        					successCode = 2;
 	        				}catch(Exception ex2){
+						        logger.error("Edit Error", ex2);
 	        					if(ex2.getMessage().equals("wlNameExists")){
 	        						setMessage("oscar.waitinglistname.wlNameExists");
 	        						//msgs.add(ActionMessages.GLOBAL_MESSAGE, 
@@ -130,6 +136,7 @@ public final class WLEditWaitingListNameAction extends Action {
 		        				WLWaitingListNameUtil.removeFromWaitingListName(selectedWL2, groupNo);
 	        					successCode = 3;
 	        				}catch(Exception ex3){
+						        logger.error("Delete Error", ex3);
 	        					if(ex3.getMessage().equals("wlNameUsed")){
 	        						setMessage("oscar.waitinglistname.wlNameUsed");
 	        						//msgs.add(ActionMessages.GLOBAL_MESSAGE, 
