@@ -77,6 +77,7 @@ public class DefaultNoteServiceTest extends DaoTestFixtures {
 			"program",
 			"program_provider_team",
 			"casemgmt_note_ext",
+			"casemgmt_issue",
 			"casemgmt_issue_notes",
 			"eform_data",
 			"encounterForm",
@@ -139,7 +140,8 @@ public class DefaultNoteServiceTest extends DaoTestFixtures {
 			"formIntakeHx",
 			"formType2Diabetes",
 			"formTreatmentPref",
-			"formVTForm"
+			"formVTForm",
+			"program_team"
 		);
 	}
 
