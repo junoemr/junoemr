@@ -35,7 +35,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		controller.page.title = mod.displayName;
 		controller.page.items = mod.summaryItem;
 		controller.page.quickLists = [];
-
+		
 		//controller.action = action;
 		controller.page.code = mod.summaryCode;
 
@@ -133,7 +133,6 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 		displayGroupNote = function displayGroupNote(item, itemId)
 		{
-			console.log('Display note: ', controller.page.items[itemId].noteId)
 			if (controller.page.items[itemId].noteId != null)
 			{
 				noteService.getIssueNote(controller.page.items[itemId].noteId).then(
@@ -141,6 +140,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 					{
 						//controller.master = angular.copy( "iNote----" +  JSON.stringify(iNote) );
 						controller.groupNotesForm.encounterNote = results.encounterNote;
+						controller.groupNotesForm.encounterNote.editorNames = mod.editorNames; // Get editor names. TODO: Add editor names to the object on the back end
 						controller.groupNotesForm.groupNoteExt = results.groupNoteExt;
 						controller.groupNotesForm.assignedCMIssues = results.assignedCMIssues;
 

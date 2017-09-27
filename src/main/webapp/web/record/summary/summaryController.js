@@ -204,6 +204,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 			if (obj !== null)
 			{
+				obj.module.editorNames = note.editorNames;
 				controller.gotoState(obj.note, obj.module, obj.note.id);
 				return;
 			}
