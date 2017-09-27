@@ -28,6 +28,7 @@ package oscar.oscarLab.ca.all.upload.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.util.LoggedInInfo;
@@ -43,15 +44,16 @@ import ca.uhn.hl7v2.model.v23.segment.ORC;
 
 public class CLSHandler implements MessageHandler {
 
+	private Logger logger = Logger.getLogger(CLSHandler.class);
+
 	public String parse(LoggedInInfo loggedInInfo, String serviceName,
 						String fileName, int fileId, String ipAddr) throws Exception {
 
-		int i = 0;
         oscar.oscarLab.ca.all.parsers.CLSHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler();
         
         Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
 		ArrayList<String> messages = Utilities.separateMessages(fileName);
-		for (i = 0; i < messages.size(); i++) {
+		for (int i = 0; i < messages.size(); i++) {
 			String msg = messages.get(i);
 			/*
 			if(isDuplicate(msg)) {
