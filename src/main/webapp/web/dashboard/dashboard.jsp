@@ -44,7 +44,7 @@
 			<div class="col-xs-12" >
 				
 				<div class="row dashboard-row">
-					<div class="col-xs-12">
+					<div class="col-lg-8 col-xs-12">
 						<p>
 							<a ng-click="dashboardCtrl.openInbox()">
 								You have
@@ -124,7 +124,7 @@
 				</div>
 
 				<div class="row dashboard-row">
-					<div class="col-xs-12">
+					<div class="col-lg-8 col-xs-12">
 						<!-- il18n problem here -->
 						<p>
 							<a ng-click="dashboardCtrl.openClassicMessenger()">
@@ -184,7 +184,7 @@
 				</div>
 				
 				<div class="row dashboard-row">
-					<div class="col-xs-12">
+					<div class="col-lg-8 col-xs-12">
 						<!-- this is a bit of a problem for il18n -->
 						<p>
 							<a href="../web/#!/ticklers"> <%-- Not a permanent solution, figure out better way to link to ticklers --%>
