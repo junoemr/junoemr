@@ -35,7 +35,7 @@
 	</div>
 	<div class="row">
 		<div id="left_pane" class="col-md-2" ng-show="consultRequestCtrl.consultReadAccess">
-			<label class="control-label">Patient Details:</label>
+			<label class="control-label">Patient Details</label>
 			<div class="demographic">
 				<p>{{consultRequestCtrl.consult.demographic.lastName}}, {{consultRequestCtrl.consult.demographic.firstName}} ({{consultRequestCtrl.consult.demographic.title}})</p>
 				<p>DOB: {{consultRequestCtrl.consult.demographic.dateOfBirth | date:'yyyy-MM-dd'}} ({{consultRequestCtrl.consult.demographic.age.years}})</p> 		
@@ -72,82 +72,84 @@
 		</div><!-- Left pane End -->
 
 		<div id="right_pane" class="col-md-10" ng-show="consultRequestCtrl.consultReadAccess">
-			<div class="col-md-6"><!-- Letterhead -->
-				<h4>Letterhead:</h4>
-				<div class="well">
-					<form class="form-horizontal">
-						<div class="form-group">
-							<%--<label class="col-sm-2 control-label">Name</label>--%>
-							<div class="col-sm-12">
-								<select id="letterhead" class="form-control"
-										ng-model="consultRequestCtrl.consult.letterheadName"
-										ng-options="letterhead.id as letterhead.name for letterhead in consultRequestCtrl.consult.letterheadList"
-										ng-change="consultRequestCtrl.changeLetterhead(consultRequestCtrl.consult.letterheadName)">
-								</select>
+			<div class="col-md-12">
+				<div class="col-md-6"><!-- Letterhead -->
+					<label>Letterhead</label>
+					<div class="well">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<%--<label class="col-sm-2 control-label">Name</label>--%>
+								<div class="col-sm-12">
+									<select id="letterhead" class="form-control"
+											ng-model="consultRequestCtrl.consult.letterheadName"
+											ng-options="letterhead.id as letterhead.name for letterhead in consultRequestCtrl.consult.letterheadList"
+											ng-change="consultRequestCtrl.changeLetterhead(consultRequestCtrl.consult.letterheadName)">
+									</select>
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-12">
-								<label>Address:</label> 
-								{{consultRequestCtrl.consult.letterheadAddress}}
+							<div class="form-group">
+								<div class="col-sm-12">
+									<label>Address:</label>
+									{{consultRequestCtrl.consult.letterheadAddress}}
+								</div>
+								<div class="col-sm-12">
+									<label>Phone:</label>
+									{{consultRequestCtrl.consult.letterheadPhone}}
+								</div>
+								<div class="col-sm-12">
+									<label>Fax: </label>
+									{{consultRequestCtrl.consult.letterheadFax}}
+									<select id="letterheadFax" class="form-control inline" style="width: auto;"
+											ng-model="consultRequestCtrl.consult.letterheadFax"
+											ng-options="fax.faxNumber as fax.faxUser for fax in consultRequestCtrl.consult.faxList">
+										<option value="" disabled selected>Select Fax</option>
+									</select>
+								</div>
 							</div>
-							<div class="col-sm-12">
-								<label>Phone:</label> 
-								{{consultRequestCtrl.consult.letterheadPhone}}
-							</div>
-							<div class="col-sm-12">
-								<label>Fax: </label>
-								{{consultRequestCtrl.consult.letterheadFax}}
-								<select id="letterheadFax" class="form-control inline" style="width: auto;"
-										ng-model="consultRequestCtrl.consult.letterheadFax"
-										ng-options="fax.faxNumber as fax.faxUser for fax in consultRequestCtrl.consult.faxList">
-									<option value="" disabled selected>Select Fax</option>
-								</select>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div><!-- Letterhead End-->
-			<div class="col-md-6"><!-- Specialist -->
-				<h4>Specialist:</h4>
-				<div class="well">
-					<form class="form-horizontal">
-						<div class="form-group">
-							<div class="col-sm-6">
-								<select id="serviceId" class="form-control"
-										title="Service" 
-										ng-model="consultRequestCtrl.consult.serviceId" 
-										ng-options="service.serviceId as service.serviceDesc for service in consultRequestCtrl.consult.serviceList"
-										ng-required="true"
-										ng-change="consultRequestCtrl.changeService(consultRequestCtrl.consult.serviceId)">
-								</select>
-							</div>
+						</form>
+					</div>
+				</div><!-- Letterhead End-->
+				<div class="col-md-6"><!-- Specialist -->
+					<label>Specialist</label>
+					<div class="well">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<div class="col-sm-6">
+									<select id="serviceId" class="form-control"
+											title="Service"
+											ng-model="consultRequestCtrl.consult.serviceId"
+											ng-options="service.serviceId as service.serviceDesc for service in consultRequestCtrl.consult.serviceList"
+											ng-required="true"
+											ng-change="consultRequestCtrl.changeService(consultRequestCtrl.consult.serviceId)">
+									</select>
+								</div>
 
-							<div class="col-sm-6">
-								<select id="specId" class="form-control"
-										title="Consultant"
-										ng-model="consultRequestCtrl.consult.professionalSpecialist"
-										ng-options="spec.name for spec in consultRequestCtrl.specialists">
-								</select>
+								<div class="col-sm-6">
+									<select id="specId" class="form-control"
+											title="Consultant"
+											ng-model="consultRequestCtrl.consult.professionalSpecialist"
+											ng-options="spec.name for spec in consultRequestCtrl.specialists">
+									</select>
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-sm-12">
-								<label>Address:</label> 
-								{{consultRequestCtrl.consult.professionalSpecialist.streetAddress}}
+							<div class="form-group">
+								<div class="col-sm-12">
+									<label>Address:</label>
+									{{consultRequestCtrl.consult.professionalSpecialist.streetAddress}}
+								</div>
+								<div class="col-sm-12">
+									<label>Phone:</label>
+									{{consultRequestCtrl.consult.professionalSpecialist.phoneNumber}}
+								</div>
+								<div class="col-sm-12">
+									<label>Fax: </label>
+									{{consultRequestCtrl.consult.professionalSpecialist.faxNumber}}
+								</div>
 							</div>
-							<div class="col-sm-12">
-								<label>Phone:</label> 
-								{{consultRequestCtrl.consult.professionalSpecialist.phoneNumber}}
-							</div>
-							<div class="col-sm-12">
-								<label>Fax: </label>
-								{{consultRequestCtrl.consult.professionalSpecialist.faxNumber}}
-							</div>
-						</div>
-					</form>
-				</div>
-			</div><!-- Specialist End -->
+						</form>
+					</div>
+				</div><!-- Specialist End -->
+			</div>
 			<div class="clear"></div>
 			
 			<div class="col-md-12"><!-- Referral -->
