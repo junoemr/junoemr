@@ -77,7 +77,8 @@ public class LoginFilter implements Filter {
 		"/css/bootstrap",
 		"/myoscar_login_tester.jsp",
 		"/myoscar_login_tester2.jsp",
-		"/share/javascript/jquery/"
+		"/share/javascript/jquery/",
+		"/share/javascript/eforms/"
 	};
 	
 	private static final String[] EXEMPT_URLS_FOR_REQUEST_TIMEOUT = {
@@ -103,7 +104,8 @@ public class LoginFilter implements Filter {
 		"/js/jquery-1.7.1.min.js",
 		"/js/bootstrap",
 		"/css/bootstrap",
-		"/share/javascript/jquery/"
+		"/share/javascript/jquery/",
+		"/share/javascript/eforms/"
 	};
 	
 	private static final String[] EXEMPT_URLS_FOR_REQUEST_TIMEOUT_REDIRECT = {
