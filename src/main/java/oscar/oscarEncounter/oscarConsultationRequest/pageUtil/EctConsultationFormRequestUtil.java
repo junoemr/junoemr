@@ -39,6 +39,7 @@ import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.DemographicExt;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.managers.DemographicManager;
@@ -57,6 +58,7 @@ public class EctConsultationFormRequestUtil {
 	public String patientAddress;
 	public String patientPhone;
 	public String patientWPhone;
+	public String patientCPhone;
 	public String patientEmail;
 	public String patientDOB;
 	public String patientHealthNum;
@@ -137,6 +139,8 @@ public class EctConsultationFormRequestUtil {
 			mrp = demographic.getFamilyDoctor();
 
 			estPatient = true;
+			DemographicExt demoExt = demographicManager.getDemographicExt(loggedInInfo,demographic.getDemographicNo(),"demo_cell");
+			patientCPhone = (demoExt == null) ? "" : StringUtils.noNull(demoExt.getValue());
 		}
 
 		return estPatient;

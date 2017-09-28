@@ -2952,24 +2952,26 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 									<input  type="text" name="roster_date_year" size="4" maxlength="4" value="<%=rosterDateYear%>">
 									<input  type="text" name="roster_date_month" size="2" maxlength="2" value="<%=rosterDateMonth%>">
 									<input  type="text" name="roster_date_day" size="2" maxlength="2" value="<%=rosterDateDay%>">
+									<b><bean:message
+											key="demographic.demographiceditdemographic.RosterTerminationDate" />: </b>
+									<input  type="text" name="roster_termination_date_year" size="4" maxlength="4" value="<%=rosterTerminationDateYear%>">
+									<input  type="text" name="roster_termination_date_month" size="2" maxlength="2" value="<%=rosterTerminationDateMonth%>">
+									<input  type="text" name="roster_termination_date_day" size="2" maxlength="2" value="<%=rosterTerminationDateDay%>">
 								</td>
 							</tr>
-							
-							
-							<%--
 							<tr valign="top">
 								<td align="right" nowrap><b><bean:message
-									key="demographic.demographiceditdemographic.RosterTerminationReason" />: </b></td>
+										key="demographic.demographiceditdemographic.RosterTerminationReason" />: </b></td>
 								<td align="left" colspan="3">
 									<select  name="roster_termination_reason">
 										<option value="">N/A</option>
-<%for (String code : Util.rosterTermReasonProperties.getTermReasonCodes()) { %>
+										<%for (String code : Util.rosterTermReasonProperties.getTermReasonCodes()) { %>
 										<option value="<%=code %>" <%=code.equals(rosterTerminationReason)?"selected":"" %> ><%=Util.rosterTermReasonProperties.getReasonByCode(code) %></option>
-<%} %>
+										<%} %>
 									</select>
 								</td>
 							</tr>
-							--%>
+
 
 </oscar:oscarPropertiesCheck>														
 <%-- END TOGGLE OFF PATIENT ROSTERING --%>
