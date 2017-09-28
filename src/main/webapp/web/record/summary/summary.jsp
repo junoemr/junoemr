@@ -33,15 +33,15 @@
 	</div>
 
 	<div class="row">
-		<div class="col-md-3 col-sm-4 col-xs-12" ng-show="summaryCtrl.page.canRead">
+		<div class="col-md-3 col-sm-4 col-xs-12" id="summary-section-left" ng-show="summaryCtrl.page.canRead">
 			<fieldset class="module-list" ng-repeat="mod in summaryCtrl.page.columnOne.modules">
 				<div class="row vertical-align">
-					<div class="col-md-8 col-sm-8">
+					<div class="col-xs-8">
 						<h5 class="summary-section-heading">
 							{{mod.displayName}}
 						</h5>
 					</div>
-					<div class="col-md-4 col-sm-4">
+					<div class="col-xs-4">
 						<button class="btn btn-xs btn-success pull-right"
 								ng-click="summaryCtrl.openPreventions(summaryCtrl.demographicNo)"
 								ng-if="mod.summaryCode=='preventions'">
@@ -236,7 +236,7 @@
 			</div>
 		</div>
 
-		<div class="col-md-3 col-xs-10 col-sm-offset-0 col-xs-offset-1" ng-show="summaryCtrl.page.canRead"
+		<div class="col-md-3 col-md-offset-0 col-xs-10 col-xs-offset-1" id="summary-section-right" ng-show="summaryCtrl.page.canRead"
 			 ng-click="summaryCtrl.checkAction($event)"
 			 ng-keypress="summaryCtrl.checkAction($event)">
 			<fieldset ng-repeat="mod in summaryCtrl.page.columnThree.modules">

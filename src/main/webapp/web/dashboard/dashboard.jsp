@@ -44,7 +44,7 @@
 			<div class="col-xs-12" >
 				
 				<div class="row dashboard-row">
-					<div class="col-xs-12">
+					<div class="col-lg-8 col-xs-12">
 						<p>
 							<a ng-click="dashboardCtrl.openInbox()">
 								You have
@@ -124,7 +124,7 @@
 				</div>
 
 				<div class="row dashboard-row">
-					<div class="col-xs-12">
+					<div class="col-lg-8 col-xs-12">
 						<!-- il18n problem here -->
 						<p>
 							<a ng-click="dashboardCtrl.openClassicMessenger()">
@@ -184,7 +184,7 @@
 				</div>
 				
 				<div class="row dashboard-row">
-					<div class="col-xs-12">
+					<div class="col-lg-8 col-xs-12">
 						<!-- this is a bit of a problem for il18n -->
 						<p>
 							<a href="../web/#!/ticklers"> <%-- Not a permanent solution, figure out better way to link to ticklers --%>
@@ -208,7 +208,10 @@
 								<thead>
 									<tr>
 										<th class="flag-column">
-											<span class="glyphicon glyphicon-cog hand-hover" ng-click="dashboardCtrl.configureTicklers()"></span>
+											<span class="glyphicon glyphicon-cog hand-hover"
+												  ng-click="dashboardCtrl.configureTicklers()"
+												  title="Configure tickler list">
+											</span>
 										</th>
 										<th>
 											<bean:message key="dashboard.tickler.header.demographicName" bundle="ui" />
@@ -225,7 +228,11 @@
 								<tbody>
 									<tr ng-repeat="item in dashboardCtrl.ticklers" ng-hide="$index >= 5" ng-click="dashboardCtrl.viewTickler(item)" class="hand-hover">
 										<td>
-											<span ng-if="dashboardCtrl.isTicklerHighPriority(item)" class="glyphicon glyphicon-flag" style="color:red"></span>
+											<span ng-if="dashboardCtrl.isTicklerHighPriority(item)"
+												  class="glyphicon glyphicon-flag"
+												  style="color:red"
+												  title="High priority tickler">
+											</span>
 										</td>
 										<td>{{item.demographicName}}</td>
 										<td>{{item.serviceDate | date:'yyyy-MM-dd'}}</td>

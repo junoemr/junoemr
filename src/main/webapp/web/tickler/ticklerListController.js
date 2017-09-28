@@ -6,6 +6,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 	'$uibModal',
 	'$http',
 	'$stateParams',
+	'$filter',
 	'NgTableParams',
 	'securityService',
 	'ticklerService',
@@ -21,6 +22,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		$uibModal,
 		$http,
 		$stateParams,
+		$filter,
 		NgTableParams,
 		securityService,
 		ticklerService,
@@ -38,17 +40,17 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 
 		securityService.hasRights(
+		{
+			items: [
 			{
-				items: [
-					{
-						objectName: '_tickler',
-						privilege: 'w'
-					},
-					{
-						objectName: '_tickler',
-						privilege: 'r'
-					}]
-			}).then(function(result)
+				objectName: '_tickler',
+				privilege: 'w'
+			},
+			{
+				objectName: '_tickler',
+				privilege: 'r'
+			}]
+		}).then(function(result)
 		{
 			if (result.content != null && result.content.length == 2)
 			{
@@ -65,41 +67,55 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 
 					controller.tableParams = new NgTableParams(
+					{
+						page: 1, // show first page
+						count: 10,// initial count per page
+						sorting: {
+							UpdateDate: "desc"
+						}
+					},
+					{
+						// total: 0, // length of data
+						getData: function(params)
 						{
-							page: 1, // show first page
-							count: 10
-						},
-						{
-							// total: 0, // length of data
-							getData: function(params)
-							{
-								// ajax request to api
-								controller.search.count = params.url().count;
-								controller.search.page = params.url().page;
-								controller.search.includeLinks = 'true';
-								controller.search.includeComments = 'true';
-								controller.search.includeUpdates = 'true';
-								controller.search.includeProgram = true;
+							// ajax request to api
+							controller.search.count = params.url().count;
+							controller.search.page = params.url().page;
+							controller.search.includeLinks = 'true';
+							controller.search.includeComments = 'true';
+							controller.search.includeUpdates = 'true';
+							controller.search.includeProgram = true;
 
-								if (angular.isDefined($stateParams.demographicNo))
-								{
-									controller.search.demographicNo = $stateParams.demographicNo;
+							// need to parse out the ng-tables sort column/direction values
+							// for use in our get parameters.
+							var myRegexp = /sorting\[(\w+)\]/g;
+							for(var key in params.url()) {
+								var match = myRegexp.exec(String(key));
+								if(match) {
+									controller.search.sortColumn = match[1];
+									controller.search.sortDirection = params.url()[String(key)];
+								}
+							}
+
+							if (angular.isDefined($stateParams.demographicNo))
+							{
+								controller.search.demographicNo = $stateParams.demographicNo;
+							}
+
+							return ticklerAPI.get(controller.search).$promise.then(function(data)
+							{
+								params.total(data.total); // recal. page nav controls
+								var ticklerList = data.content;
+								// Grab URLs for tickler links
+								for (var i = 0; i < ticklerList.length; i++){
+									if (ticklerList[i].ticklerLinks.length > 0 )
+                                        ticklerList[i].ticklerLinkUrl = controller.getLinkUrl(ticklerList[i].ticklerLinks[0]);
 								}
 
-								return ticklerAPI.get(controller.search).$promise.then(function(data)
-								{
-									params.total(data.total); // recal. page nav controls
-									var ticklerList = data.content;
-									// Grab URLs for tickler links
-									for (var i = 0; i < ticklerList.length; i++)
-									{
-										if (ticklerList[i].ticklerLinks.length > 0)
-											ticklerList[i].ticklerLinkUrl = controller.getLinkUrl(ticklerList[i].ticklerLinks[0]);
-									}
-									return data.content;
-								});
-							}
-						});
+								return data.content;
+							});
+						}
+					});
 				}
 			}
 			else
@@ -119,9 +135,9 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		controller.clear = function()
 		{
 			controller.search = angular.copy(
-				{
-					status: 'A'
-				});
+			{
+				status: 'A'
+			});
 			controller.tableParams.reload();
 		};
 
@@ -197,12 +213,12 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			//window.open('../tickler/ticklerAdd.jsp','ticklerAdd',windowProps);
 
 			var modalInstance = $uibModal.open(
-				{
-					templateUrl: 'tickler/ticklerAdd.jsp',
-					controller: 'Tickler.TicklerAddController as ticklerAddCtrl',
-					backdrop: 'static',
-					size: 'lg'
-				});
+			{
+				templateUrl: 'tickler/ticklerAdd.jsp',
+				controller: 'Tickler.TicklerAddController as ticklerAddCtrl',
+				backdrop: 'static',
+				size: 'lg'
+			});
 
 			modalInstance.result.then(function(data)
 			{
@@ -223,31 +239,31 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		{
 
 			var modalInstance = $uibModal.open(
+			{
+				templateUrl: 'tickler/ticklerView.jsp',
+				controller: 'Tickler.TicklerViewController as ticklerViewCtrl',
+				backdrop: 'static',
+				size: 'lg',
+				resolve:
 				{
-					templateUrl: 'tickler/ticklerView.jsp',
-					controller: 'Tickler.TicklerViewController as ticklerViewCtrl',
-					backdrop: 'static',
-					size: 'lg',
-					resolve:
-						{
-							tickler: function()
-							{
-								return tickler;
-							},
-							ticklerNote: function()
-							{
-								return noteService.getTicklerNote(tickler.id);
-							},
-							ticklerWriteAccess: function()
-							{
-								return controller.ticklerWriteAccess;
-							},
-							me: function()
-							{
-								return providerService.getMe();
-							}
-						}
-				});
+					tickler: function()
+					{
+						return tickler;
+					},
+					ticklerNote: function()
+					{
+						return noteService.getTicklerNote(tickler.id);
+					},
+					ticklerWriteAccess: function()
+					{
+						return controller.ticklerWriteAccess;
+					},
+					me: function()
+					{
+						return providerService.getMe();
+					}
+				}
+			});
 
 			modalInstance.result.then(function(data)
 			{
@@ -284,22 +300,22 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 				}
 				var modalInstance = $uibModal.open(
+				{
+					templateUrl: 'tickler/ticklerNote.jsp',
+					controller: 'Tickler.TicklerNoteController as ticklerNoteCtrl',
+					backdrop: 'static',
+					resolve:
 					{
-						templateUrl: 'tickler/ticklerNote.jsp',
-						controller: 'Tickler.TicklerNoteController as ticklerNoteCtrl',
-						backdrop: 'static',
-						resolve:
-							{
-								ticklerNote: function()
-								{
-									return controller.ticklerNote;
-								},
-								tickler: function()
-								{
-									return tickler;
-								}
-							}
-					});
+						ticklerNote: function()
+						{
+							return controller.ticklerNote;
+						},
+						tickler: function()
+						{
+							return tickler;
+						}
+					}
+				});
 			}, function(reason)
 			{
 				alert(reason);
@@ -311,18 +327,18 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		{
 			controller.tickler = tickler;
 			var modalInstance = $uibModal.open(
+			{
+				templateUrl: 'tickler/ticklerComments.jsp',
+				controller: 'Tickler.TicklerCommentController as ticklerCommentCtrl',
+				backdrop: 'static',
+				resolve:
 				{
-					templateUrl: 'tickler/ticklerComments.jsp',
-					controller: 'Tickler.TicklerCommentController as ticklerCommentCtrl',
-					backdrop: 'static',
-					resolve:
-						{
-							tickler: function()
-							{
-								return controller.tickler;
-							}
-						}
-				});
+					tickler: function()
+					{
+						return controller.tickler;
+					}
+				}
+			});
 		};
 
 		controller.printArea = function()
@@ -332,28 +348,28 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		controller.getLinkUrl = function getLinkUrl(input)
 		{
-			if (input !== null && input.id !== null)
-			{
-				var url = "";
+            if (input !== null && input.id !== null)
+            {
+                var url = "";
 
-				if (input.tableName === 'CML')
-				{
-					url = "../lab/CA/ON/CMLDisplay.jsp?segmentID=" + input.tableId;
-				}
-				else if (input.tableName === 'MDS')
-				{
-					url = "../oscarMDS/SegmentDisplay.jsp?segmentID=" + input.tableId;
-				}
-				else if (input.tableName === 'HL7')
-				{
-					url = "../lab/CA/ALL/labDisplay.jsp?segmentID=" + input.tableId;
-				}
-				else if (input.tableName === 'DOC')
-				{
-					url = "../dms/ManageDocument.do?method=display&doc_no=" + input.tableId;
-				}
-				return url;
-			}
+                if (input.tableName === 'CML')
+                {
+                    url = "../lab/CA/ON/CMLDisplay.jsp?segmentID=" + input.tableId;
+                }
+                else if (input.tableName === 'MDS')
+                {
+                    url = "../oscarMDS/SegmentDisplay.jsp?segmentID=" + input.tableId;
+                }
+                else if (input.tableName === 'HL7')
+                {
+                    url = "../lab/CA/ALL/labDisplay.jsp?segmentID=" + input.tableId;
+                }
+                else if (input.tableName === 'DOC')
+                {
+                    url = "../dms/ManageDocument.do?method=display&doc_no=" + input.tableId;
+                }
+                return url;
+            }
 
 		};
 	}

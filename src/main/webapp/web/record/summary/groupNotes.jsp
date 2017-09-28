@@ -99,7 +99,7 @@
 							required>
 						</textarea>
 						<em><small><bean:message key="oscarEncounter.editors.title"/>: 
-							<span>{{ groupNotesCtrl.groupNotesForm.encounterNote.providerName }}</span>
+							<span>{{ groupNotesCtrl.groupNotesForm.encounterNote.editorNames }}</span>
 						</small></em>  
 						<div class="pull-right">
 							<em>

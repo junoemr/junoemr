@@ -26,8 +26,13 @@
 
  */
 angular.module("Common.Services").service("noteService", [
-	'$http', '$q',
-	function($http, $q)
+	'$http',
+	'$q',
+	'junoHttp',
+	function(
+		$http,
+		$q,
+		junoHttp)
 	{
 		var service = {};
 
@@ -58,7 +63,7 @@ angular.module("Common.Services").service("noteService", [
 		{
 			var deferred = $q.defer();
 
-			$http.post(service.apiPath + '/' + encodeURIComponent(demographicNo) +
+			junoHttp.post(service.apiPath + '/' + encodeURIComponent(demographicNo) +
 				'/save', note).then(
 				function success(results)
 				{
@@ -134,7 +139,7 @@ angular.module("Common.Services").service("noteService", [
 		{
 			var deferred = $q.defer();
 
-			$http.post(service.apiPath + '/getGroupNoteExt/' + encodeURIComponent(noteId)).then(
+			$http.get(service.apiPath + '/getGroupNoteExt/' + encodeURIComponent(noteId)).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
@@ -152,7 +157,8 @@ angular.module("Common.Services").service("noteService", [
 		{
 			var deferred = $q.defer();
 
-			$http.post(service.apiPath + '/getIssueNote/' + encodeURIComponent(noteId)).then(
+			junoHttp.get(service.apiPath + '/getIssueNote/' + encodeURIComponent(noteId),
+				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
@@ -170,7 +176,7 @@ angular.module("Common.Services").service("noteService", [
 		{
 			var deferred = $q.defer();
 
-			$http.post(service.apiPath + '/getIssueId/' + encodeURIComponent(issueCode)).then(
+			$http.get(service.apiPath + '/getIssueId/' + encodeURIComponent(issueCode)).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);

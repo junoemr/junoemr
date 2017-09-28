@@ -17,136 +17,134 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 --%>
-<%@page import="org.oscarehr.util.SessionConstants"%>
-<%@page import="org.oscarehr.common.model.ProviderPreference"%>
+<%@page import="org.oscarehr.util.SessionConstants" %>
+<%@page import="org.oscarehr.common.model.ProviderPreference" %>
 <%
-    if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
+	if (session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
 %>
 <%@ page
-	import="java.util.*,oscar.util.*, org.apache.struts.action.*, oscar.oscarWaitingList.bean.*"%>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
+		import="java.util.*,oscar.util.*, org.apache.struts.action.*, oscar.oscarWaitingList.bean.*" %>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 
 <link rel="stylesheet" type="text/css"
-	href="../oscarEncounter/encounterStyles.css">
+      href="../oscarEncounter/encounterStyles.css">
 <html:html locale="true">
 
-<head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title>Change Waiting List Name</title>
-</head>
-<script language="JavaScript">
+	<head>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+		<title>Change Waiting List Name</title>
+	</head>
+	<script language="JavaScript">
 
-function resetFields(actionType){
+		function resetFields(actionType) {
 
-	if(actionType == "create"){
-		document.forms[0].wlChangedName.value="";
-	}else if(actionType == "change"){
-		document.forms[0].wlNewName.value="";
-	}else if(actionType == "remove"){
-		document.forms[0].wlChangedName.value="";
-		document.forms[0].wlNewName.value="";
-	}
-}
+			if (actionType == "create") {
+				document.forms[0].wlChangedName.value = "";
+			} else if (actionType == "change") {
+				document.forms[0].wlNewName.value = "";
+			} else if (actionType == "remove") {
+				document.forms[0].wlChangedName.value = "";
+				document.forms[0].wlNewName.value = "";
+			}
+		}
 
-</script>
-<%
-	ProviderPreference providerPreference=(ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
-	
-	String groupNo = "";
-	if(providerPreference.getMyGroupNo() != null){
-		groupNo = providerPreference.getMyGroupNo();
-	}
-%>
-<body bgproperties="fixed" " topmargin="0" leftmargin="0"
-	rightmargin="0">
+	</script>
+	<%
+		ProviderPreference providerPreference = (ProviderPreference) session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
 
-<table border=0 cellspacing=0 cellpadding=0 width="100%">
-	<tr border="#CCCCFF">
-		<th><font face="Helvetica">Create/Edit Waiting List Name</font></th>
-	</tr>
-</table>
+		String groupNo = "";
+		if (providerPreference.getMyGroupNo() != null) {
+			groupNo = providerPreference.getMyGroupNo();
+		}
+	%>
+	<body bgproperties="fixed" topmargin="0" leftmargin="0"
+	      rightmargin="0">
 
-<%
-	String message = "";
-	if(request.getAttribute("message") != null){
-		message = (String)request.getAttribute("message");
-	}
-%>
-
-<html:form
-	action="/oscarWaitingList/WLEditWaitingListNameAction.do?edit=Y">
-	<html:hidden property="actionChosen" />
-	<table border="0" width="100%">
-		<tr bgcolor="#EEEEFF">
-			<td width="25%" align="right" class="data4">Please select a
-			Waiting List name to be changed:</td>
-			<td align="right"><html:select property="selectedWL">
-				<option value=""></option>
-				<logic:iterate id="waitingListNameBean" name="waitingListNames">
-					<option value="<bean:write name="waitingListNameBean" property="id"/>"><bean:write name="waitingListNameBean" property="waitingListName" /></option>
-				</logic:iterate>
-			</html:select></td>
-			<td align="left"><html:text property="wlChangedName" size="45"
-				maxlength="255" /></td>
-			<td width="30%" align="left"><input type="submit"
-				value="Change Name"
-				onclick="resetFields('change');document.forms[0].actionChosen.value='change'">
-			</td>
+	<table border=0 cellspacing=0 cellpadding=0 width="100%">
+		<tr border="#CCCCFF">
+			<th><font face="Helvetica">Create/Edit Waiting List Name</font></th>
 		</tr>
-		<tr bgcolor="#EEEEFF">
-			<td colspan="2" align="right">
-			<div align="right"><span class="data4">Create New Name:</span></div>
-			</td>
-
-			<td align="left"><html:text property="wlNewName" size="45"
-				maxlength="255" /></td>
-			<td width="30%" align="left"><input type="submit"
-				value="Create Name"
-				onclick="resetFields('create');document.forms[0].actionChosen.value='create'">
-			</td>
-		</tr>
-		<tr bgcolor="#EEEEFF">
-			<td width="25%" align="right" class="data4">Please select a
-			Waiting List name to be removed:</td>
-			<td align="right"><html:select property="selectedWL2">
-				<option value=""></option>
-				<logic:iterate id="waitingListNameBean2" name="waitingListNames">
-					<option value="<bean:write name="waitingListNameBean2" property="id"/>"><bean:write name="waitingListNameBean2" property="waitingListName" /></option>
-				</logic:iterate>
-			</html:select></td>
-			<td colspan="2" align="left"><input type="submit"
-				value="Remove Name"
-				onclick="resetFields('remove');document.forms[0].actionChosen.value='remove'">
-			</td>
-		</tr>
-
 	</table>
 
+	<%
+		String message = "";
+		if (request.getAttribute("message") != null) {
+			message = (String) request.getAttribute("message");
+		}
+	%>
+
+	<html:form
+			action="/oscarWaitingList/WLEditWaitingListNameAction.do?edit=Y">
+		<html:hidden property="actionChosen"/>
+		<table border="0" width="100%">
+			<tr bgcolor="#EEEEFF">
+				<td width="25%" align="right" class="data4">Please select a
+					Waiting List name to be changed:
+				</td>
+				<td align="right"><html:select property="selectedWL">
+					<option value=""></option>
+					<logic:iterate id="waitingListNameBean" name="waitingListNames">
+						<option value="<bean:write name="waitingListNameBean" property="id"/>"><bean:write name="waitingListNameBean" property="waitingListName"/></option>
+					</logic:iterate>
+				</html:select></td>
+				<td align="left"><html:text property="wlChangedName" size="45"
+				                            maxlength="255"/></td>
+				<td width="30%" align="left"><input type="submit"
+				                                    value="Change Name"
+				                                    onclick="resetFields('change');document.forms[0].actionChosen.value='change'">
+				</td>
+			</tr>
+			<tr bgcolor="#EEEEFF">
+				<td colspan="2" align="right">
+					<div align="right"><span class="data4">Create New Name:</span></div>
+				</td>
+
+				<td align="left"><html:text property="wlNewName" size="45"
+				                            maxlength="255"/></td>
+				<td width="30%" align="left"><input type="submit"
+				                                    value="Create Name"
+				                                    onclick="resetFields('create');document.forms[0].actionChosen.value='create'">
+				</td>
+			</tr>
+			<tr bgcolor="#EEEEFF">
+				<td width="25%" align="right" class="data4">Please select a
+					Waiting List name to be removed:
+				</td>
+				<td align="right"><html:select property="selectedWL2">
+					<option value=""></option>
+					<logic:iterate id="waitingListNameBean2" name="waitingListNames">
+						<option value="<bean:write name="waitingListNameBean2" property="id"/>"><bean:write name="waitingListNameBean2" property="waitingListName"/></option>
+					</logic:iterate>
+				</html:select></td>
+				<td colspan="2" align="left"><input type="submit"
+				                                    value="Remove Name"
+				                                    onclick="resetFields('remove');document.forms[0].actionChosen.value='remove'">
+				</td>
+			</tr>
+
+		</table>
+
+		<table width="100%">
+			<tr bgcolor="#CCCCFF">
+				<td align="center"><input type="reset" value='Close'
+				                          onClick="window.close();"></td>
+			</tr>
+		</table>
+
+	</html:form>
 	<table width="100%">
-		<tr bgcolor="#CCCCFF">
-			<td align="center"><input type="reset" value='Close'
-				onClick="window.close();"></td>
+		<tr>
+			<td align="center">
+				<span style="color: red; font-weight: bold; font-size: 14px;"> <%
+				if (message != null && !message.equals("")) {
+			%> <bean:message key="<%=message%>"/> <%
+				}
+			%> </span>
 		</tr>
 	</table>
 
-</html:form>
-<table width="100%">
-	<tr>
-		<td align="center"><span
-			style="color: red; font-weight: bold; font-size: 14;"> <%-- 								
-				<html:messages id="msg">
-					<bean:write name="msg"/><br/>
-				</html:messages>
---%> <%
-	if(message != null  &&  !message.equals("")){
-%> <bean:message key="<%=message%>" /> <%
-	}
-%> </span>
-	</tr>
-</table>
 
-
-</body>
+	</body>
 </html:html>

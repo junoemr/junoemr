@@ -129,25 +129,25 @@
 				<%--<td ng-show="!ticklerWriteAccess" >
 					<a ng-click="editTickler(tickler)" class="hand-hover"><bean:message key="global.view" bundle="ui"/></a> 		
 				</td>--%>
-				<td data-title="'<bean:message key="tickler.list.header.patientName" bundle="ui"/>'">
+				<td data-title="'<bean:message key="tickler.list.header.patientName" bundle="ui"/>'" sortable="'DemographicName'">
 					{{tickler.demographicName}}
 				</td>
-				<td data-title="'<bean:message key="tickler.list.header.creator" bundle="ui"/>'">
+				<td data-title="'<bean:message key="tickler.list.header.creator"  bundle="ui"/>'" sortable="'Creator'">
 					{{tickler.creatorName}}
 				</td>
-				<td data-title="'<bean:message key="tickler.list.header.serviceDate" bundle="ui"/>'" class="text-center">
+				<td data-title="'<bean:message key="tickler.list.header.serviceDate" bundle="ui"/>'" sortable="'ServiceDate'">
 					{{tickler.serviceDate | date: 'yyyy-MM-dd'}}
 				</td>
-				<td data-title="'<bean:message key="tickler.list.header.creationDate" bundle="ui"/>'" class="text-center">
+				<td data-title="'<bean:message key="tickler.list.header.creationDate" bundle="ui"/>'"  sortable="'UpdateDate'">
 					{{tickler.updateDate | date: 'yyyy-MM-dd HH:mm'}}
 				</td>	
-				<td data-title="'<bean:message key="tickler.list.header.priority" bundle="ui"/>'" class="text-center">
+				<td data-title="'<bean:message key="tickler.list.header.priority" bundle="ui"/>'" sortable="'Priority'">
 					{{tickler.priority}}
 				</td>        
-				<td data-title="'<bean:message key="tickler.list.header.taskAssignedTo" bundle="ui"/>'">
+				<td data-title="'<bean:message key="tickler.list.header.taskAssignedTo" bundle="ui"/>'" sortable="'TaskAssignedTo'">
 					{{tickler.taskAssignedToName}}
 				</td>        
-				<td data-title="'<bean:message key="tickler.list.header.status" bundle="ui"/>'" class="text-center">
+				<td data-title="'<bean:message key="tickler.list.header.status" bundle="ui"/>'" sortable="'Status'">
 					{{tickler.statusName}}
 				</td>        
 				<td data-title="'<bean:message key="tickler.list.header.message" bundle="ui"/>'">
