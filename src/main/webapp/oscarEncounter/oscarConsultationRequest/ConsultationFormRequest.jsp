@@ -52,13 +52,13 @@ if(!authed) {
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 
 
-<%@page import="java.util.ArrayList, java.util.Collections, java.util.List, java.util.*, oscar.util.StringUtils, oscar.dms.*, oscar.oscarEncounter.pageUtil.*,oscar.oscarEncounter.data.*, oscar.OscarProperties, oscar.oscarLab.ca.on.*"%>
+<%@page import="java.util.ArrayList, java.util.Collections, java.util.List, java.util.*, oscar.util.StringUtils, oscar.OscarProperties"%>
 <%@page import="org.oscarehr.casemgmt.service.CaseManagementManager,org.oscarehr.casemgmt.model.CaseManagementNote,org.oscarehr.casemgmt.model.Issue,org.oscarehr.common.model.UserProperty,org.oscarehr.common.dao.UserPropertyDAO,org.springframework.web.context.support.*,org.springframework.web.context.*"%>
 
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.oscarehr.common.model.Site"%>
-<%@page import="org.oscarehr.util.WebUtils, oscar.SxmlMisc"%>
+<%@page import="oscar.SxmlMisc"%>
 <%@page import="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestForm"%>
 <%@page import="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestUtil"%>
 <%@page import="oscar.oscarDemographic.data.DemographicData"%>
@@ -69,12 +69,13 @@ if(!authed) {
 <%@ page import="org.oscarehr.util.DigitalSignatureUtils"%>
 <%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.util.MiscUtils, org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager, org.oscarehr.caisi_integrator.ws.CachedDemographicNote"%>
+<%@page import="org.oscarehr.util.MiscUtils"%>
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao, org.oscarehr.PMmodule.model.Program" %>
 <%@page import="oscar.oscarDemographic.data.DemographicData, oscar.oscarRx.data.RxProviderData, oscar.oscarRx.data.RxProviderData.Provider, oscar.oscarClinic.ClinicData"%>
-<%@ page import="org.oscarehr.common.dao.FaxConfigDao, org.oscarehr.common.model.FaxConfig" %>
 <%@page import="org.oscarehr.common.dao.ConsultationServiceDao" %>
 <%@page import="org.oscarehr.common.model.ConsultationServices" %>
+<%@ page import="org.oscarehr.common.model.DemographicExt" %>
+<%@ page import="org.oscarehr.common.dao.DemographicExtDao" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
@@ -83,6 +84,8 @@ if(!authed) {
 
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+
+	DemographicExtDao demographicExtDao = (DemographicExtDao)SpringUtils.getBean("demographicExtDao");
 
 	displayServiceUtil.estSpecialist();	
 
@@ -1206,6 +1209,11 @@ function updateFaxButton() {
 			<%
 		}
 
+		int demographic_no = demographic.getDemographicNo();
+		DemographicExt demoExt = demographicExtDao.getLatestDemographicExt(demographic_no, "demo_cell");
+		String patientCPhone = (demoExt == null) ? "" : org.apache.commons.lang.StringUtils.trimToEmpty(demoExt.getValue());
+		thisForm.setPatientCPhone(patientCPhone);
+
 
 	%>
 
@@ -1602,7 +1610,13 @@ function updateFaxButton() {
 							</td>
 							<td class="tite2"><%=thisForm.getPatientWPhone()%></td>
 						</tr>
-                                                <tr>
+						<tr>
+							<td class="tite4"><bean:message
+									key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgCPhone" />:
+							</td>
+							<td class="tite2"><%=thisForm.getPatientCPhone()%></td>
+						</tr>
+						<tr>
 							<td class="tite4"><bean:message
 								key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.msgEmail" />:
 							</td>
