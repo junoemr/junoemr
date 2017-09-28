@@ -47,7 +47,8 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 		controller.needsUpdate = false;
 		controller.showUpdates = false;
-		controller.showComments = true;
+		controller.showComments = false;
+		controller.showCommentFormControl = false;
 
 		// controller.taskAssignedToName = controller.tickler.taskAssignedName;
 		controller.priorities = ['Low', 'Normal', 'High'];
