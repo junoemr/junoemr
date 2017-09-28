@@ -75,6 +75,10 @@ public class Utilities {
 
 		while ((line = br.readLine()) != null) {
 			if (line.length() > 3){
+				// ignore the batch header segment for now.
+				if (line.substring(0, 3).equals("BHS")) {
+					continue;
+				}
 				if (line.substring(0, 3).equals("MSH")){
 					if (firstMSHflag){
 						messages.add(sb.toString());
