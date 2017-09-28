@@ -36,43 +36,43 @@ public class NoteIssueTo1 {
 	private NoteExtTo1 groupNoteExt = new NoteExtTo1();
 	private IssueTo1 issue = new IssueTo1();
 	private String annotation_attrib;
-	
+
 	private List<IssueTo1> assignedIssues = new ArrayList<IssueTo1>();
 
 	private List<CaseManagementIssueTo1> assignedCMIssues = new ArrayList<CaseManagementIssueTo1>();
 
-	
+
 	public NoteTo1 getEncounterNote() {
-	    return encounterNote;
-    }
+		return encounterNote;
+	}
 
 	public void setEncounterNote(NoteTo1 encounterNote) {
-	    this.encounterNote = encounterNote;
-    }
-	
+		this.encounterNote = encounterNote;
+	}
+
 	public NoteExtTo1 getGroupNoteExt() {
-	    return groupNoteExt;
-    }
+		return groupNoteExt;
+	}
 
 	public void setGroupNoteExt(NoteExtTo1 groupNoteExt) {
-	    this.groupNoteExt = groupNoteExt;
-    }
+		this.groupNoteExt = groupNoteExt;
+	}
 
 	public IssueTo1 getIssue() {
-	    return issue;
-    }
+		return issue;
+	}
 
 	public void setIssue(IssueTo1 issue) {
-	    this.issue = issue;
-    }
+		this.issue = issue;
+	}
 
 	public String getAnnotation_attrib() {
-	    return annotation_attrib;
-    }
+		return annotation_attrib;
+	}
 
 	public void setAnnotation_attrib(String annotation_attrib) {
-	    this.annotation_attrib = annotation_attrib;
-    }
+		this.annotation_attrib = annotation_attrib;
+	}
 
 	public List<IssueTo1> getAssignedIssues() {
 		return assignedIssues;
@@ -89,6 +89,4 @@ public class NoteIssueTo1 {
 	public void setAssignedCMIssues(List<CaseManagementIssueTo1> assignedCMIssues) {
 		this.assignedCMIssues = assignedCMIssues;
 	}
-
-
 }

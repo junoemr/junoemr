@@ -55,6 +55,14 @@ import org.oscarehr.PMmodule.model.Program;
 @Table(name="custom_filter")
 public class CustomFilter extends AbstractModel<Integer> {
 
+	public enum SORTCOLUMN{
+		DemographicName, Creator,  ServiceDate, UpdateDate, Priority , TaskAssignedTo, Status, Message
+	}
+
+	public enum SORTDIR {
+		asc, desc
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -100,7 +108,6 @@ public class CustomFilter extends AbstractModel<Integer> {
     )
 	private Set<Provider> providers = new HashSet<Provider>();
 	
-	
 	@ManyToMany(fetch=FetchType.EAGER)
 	@JoinTable(name="custom_filter_assignees",
     joinColumns=
@@ -109,22 +116,24 @@ public class CustomFilter extends AbstractModel<Integer> {
         @JoinColumn(name="provider_no", referencedColumnName="provider_no")
     )
 	private Set<Provider> assignees = new HashSet<Provider>();
-	
-	
+		
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="programId", referencedColumnName="id", insertable=false, updatable=false)
 	@NotFound(action=NotFoundAction.IGNORE)
 	private Program program;
-	
 	
 	@Transient
 	private String client;
 	@Transient
 	private String mrp;
 	@Transient
-	private String sort_order = "asc";
+	private String sort_order = "asc"; // TODO: Remove this if it doesn't break the old UI
 	@Transient
 	private String demographic_webName;
+	@Transient
+	private SORTCOLUMN sortColumn = SORTCOLUMN.UpdateDate;
+	@Transient
+	private SORTDIR sortDir = SORTDIR.desc;
 	
     public static List<OptionsBean> statusList;
     public static List<OptionsBean> priorityList;
@@ -159,8 +168,8 @@ public class CustomFilter extends AbstractModel<Integer> {
 		assignees = new HashSet<Provider>();
 		setSort_order("asc");	
 	}
-	
-	
+
+
 	public Integer getId() {
 		return id;
 	}
@@ -278,6 +287,14 @@ public class CustomFilter extends AbstractModel<Integer> {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+
+	public SORTCOLUMN getSortColumn() { return sortColumn; }
+
+	public void setSortColumn(SORTCOLUMN sortColumn) { this.sortColumn = sortColumn; }
+
+	public SORTDIR getSortDir() { return sortDir; }
+
+	public void setSortDir(SORTDIR sortDir) { this.sortDir = sortDir; }
 	
 	
 	//ported over from the old object
@@ -377,7 +394,6 @@ public class CustomFilter extends AbstractModel<Integer> {
 		this.sort_order = sort_order;
 	}
 
-
 	public String getDemographic_webName() {
 		return demographic_webName;
 	}
@@ -386,7 +402,6 @@ public class CustomFilter extends AbstractModel<Integer> {
 	public void setDemographic_webName(String demographic_webName) {
 		this.demographic_webName = demographic_webName;
 	}
-
 
 	public void setShortcut(boolean shortcut) {
 		this.shortcut = shortcut;

@@ -26,14 +26,11 @@ package org.oscarehr.ws.rest.to.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.oscarehr.casemgmt.model.CaseManagementIssue;
 
 @XmlRootElement(name="encounterNote")
 public class NoteTo1 implements Serializable{
@@ -80,11 +77,7 @@ public class NoteTo1 implements Serializable{
 	
 	private Integer position;
 	
-	//???
-	private Set<CaseManagementIssue> issues = new HashSet<CaseManagementIssue>();
-	
 	private List<CaseManagementIssueTo1> assignedIssues = new ArrayList<CaseManagementIssueTo1>();
-	
 	
 	public Integer getNoteId() {
 		return noteId;
@@ -140,20 +133,6 @@ public class NoteTo1 implements Serializable{
 
 	public void setProviderNo(String providerNo) {
 		this.providerNo = providerNo;
-	}
-	
-	/**
-	 * deprecated too inefficient and too many dependencies use CaseManagementIssueNotesDao
-	 */
-	public Set<CaseManagementIssue> getIssues() {
-		return issues;
-	}
-
-	/**
-	 * deprecated too inefficient and too many dependencies use CaseManagementIssueNotesDao
-	 */
-	public void setIssues(Set issues) {
-		this.issues = issues;
 	}
 
 	public String getStatus() {

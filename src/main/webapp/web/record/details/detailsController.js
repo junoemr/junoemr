@@ -355,11 +355,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return controller.page.demo;
 		}, function(newValue, oldValue)
 		{
-			console.log('NEWVAL: ', newValue);
-			console.log('OLDVAL: ', oldValue);
 			if (newValue !== oldValue)
 			{
-				console.log("DEMO CHANGED", controller.page.demo);
 				controller.page.dataChanged = true;
 			}
 
@@ -1249,6 +1246,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//-----------------//
 		controller.save = function save()
 		{
+			controller.page.saving = true;
+
 			//check required fields
 			if (controller.page.demo.lastName == null || controller.page.demo.lastName == "")
 			{
@@ -1330,11 +1329,20 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.demo.extras = newDemoExtras;
 
 			//save to database
-			demographicService.updateDemographic(controller.page.demo);
+			demographicService.updateDemographic(controller.page.demo).then(
+				function success()
+				{
+					controller.page.saving = false;
+					controller.page.dataChanged = false;
+				},
 
-			//show Saving... message and refresh screen
-			controller.page.saving = true;
-			location.reload();
+				function error()
+				{
+					controller.page.saving = false;
+					alert('Failed to save demographic');
+					// TODO: handle error
+				}
+			);
 		}
 	}
 ]);
