@@ -127,9 +127,7 @@
 					<strong ng-click="ticklerViewCtrl.showComments = !ticklerViewCtrl.showComments"
 							title="Toggle show/hide comments">
 						<bean:message key="tickler.view.comments" bundle="ui"/>
-						({{ticklerViewCtrl.ticklerUpdate.ticklerComments != null &&
-						ticklerViewCtrl.ticklerUpdate.ticklerComments.length || 0}})
-						<%--<span class="glyphicon glyphicon-pencil" ng-show="ticklerWriteAccess" ng-click="addComment()"></span>--%>
+						({{ticklerViewCtrl.ticklerUpdate.ticklerComments.length}})
 					</strong>
 					<a class="btn btn-xs btn-default"
 					   ng-click="ticklerViewCtrl.showComments = !ticklerViewCtrl.showComments">
@@ -174,8 +172,7 @@
 			<div class="col-sm-12">
 				<strong ng-click="ticklerViewCtrl.showUpdates = !ticklerViewCtrl.showUpdates">
 					<bean:message key="tickler.view.updates" bundle="ui"/>
-					({{ticklerViewCtrl.ticklerUpdate.ticklerUpdates != null &&
-					ticklerViewCtrl.ticklerUpdate.ticklerUpdates.length || 0}})
+					({{ticklerViewCtrl.ticklerUpdate.ticklerUpdates.length}})
 				</strong>
 				<a class="btn btn-xs btn-default"
 				   ng-click="ticklerViewCtrl.showUpdates = !ticklerViewCtrl.showUpdates">
