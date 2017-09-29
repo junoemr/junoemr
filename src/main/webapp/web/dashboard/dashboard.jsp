@@ -253,16 +253,18 @@
 				</div>
 			</div>
 		</div>
-		<div ng-hide="dashboardCtrl.k2aActive">
+	</div>
+
+		<div ng-show="dashboardCtrl.k2aActive">
 			<p class="lead"><bean:message key="dashboard.k2a.header" bundle="ui"/></p>
-			<div id="rightColumn" class="col-md-3 hidden-xs" ng-hide="!dashboardCtrl.k2afeed && !dashboardCtrl.authenticatek2a" style="height:80vh;overflow-y:scroll">
+			<div id="rightColumn" class="col-md-3 hidden-xs" ng-show="dashboardCtrl.k2aFeedActive" style="height:80vh;overflow-y:scroll">
 				<div infinite-scroll="dashboardCtrl.updateFeed(dashboardCtrl.k2afeed.length,10)" infinite-scroll-parent="true">
 					<blockquote class="pull-right" ng-repeat="item in dashboardCtrl.k2afeed" ng-class="{'significance-high': item.significance === 'High', 'significance-medium': item.significance === 'Medium', 'significance-low': item.significance === 'Low'}">
 						<h4>{{item.type}}: <a target="_blank" href="{{item.link}}">{{item.title}}</a></h4>
 						<a href="" style="font-size:14px" data-toggle="modal" data-target="#expandFeed{{item.id}}" ng-if="item.link">{{item.body | cut:true:140 }}</a>
 						<a href="" ng-click="dashboardCtrl.authenticateK2A(item.id)" style="font-size:14px" ng-if="!item.link">{{item.body}}</a>
-						<small ng-hide="!item.agree">You agree with this post</small>
-						<small ng-hide="!item.disagree">You disagree with this post</small>
+						<small ng-show="item.agree">You agree with this post</small>
+						<small ng-show="item.disagree">You disagree with this post</small>
 						<small>{{item.author}} posted {{item.publishedDate | date:'yyyy-MM-dd'}}</small>
 						<small>
 							<a class="glyphicon glyphicon-thumbs-up" ng-click="dashboardCtrl.agreeWithK2aPost(item)"></a>&nbsp;{{item.agreeCount}}&nbsp;&nbsp;

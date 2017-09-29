@@ -1,9 +1,7 @@
 angular.module("Admin.Integration").controller('Admin.Integration.k2aTemplateController', [
-	"$scope",
 	"reportByTemplateService",
 	"k2aService",
-	function ($scope,
-	          reportByTemplateService,
+	function (reportByTemplateService,
 	          k2aService)
 	{
 		var controller = this;

@@ -80,11 +80,11 @@
 				<td>{{preventionRuleSet.created_at}}</td>
 				<td>{{preventionRuleSet.author}}</td>
 				<td>
-					<button class="btn btn-default btn-sm" ng-click="loadPreventionRuleById(preventionRuleSet)"><bean:message key="admin.k2a.load"/></button>
+					<button class="btn btn-default btn-sm" ng-click="k2aConfigCtrl.loadPreventionRuleById(preventionRuleSet)"><bean:message key="admin.k2a.load"/></button>
 				</td>
 			</tr>
 		</table>
-		<button class="btn btn-default btn-sm pull-right" ng-click="increasePrevListQuantity()"><bean:message key="admin.k2a.loadMore"/></button>
+		<button class="btn btn-default btn-sm pull-right" ng-click="k2aConfigCtrl.increasePrevListQuantity()"><bean:message key="admin.k2a.loadMore"/></button>
 
 	</div>
 	<div data-ng-hide="k2aConfigCtrl.k2aActive">
@@ -95,9 +95,9 @@
 						<small>(<bean:message key="admin.k2a.clinicName.reason"/>)</small>
 					</label>
 					<div class="controls">
-						<input class="form-control" name="clinicName" ng-model="clinicName" type="text" maxlength="255"/>
+						<input class="form-control" name="clinicName" ng-model="k2aConfigCtrl.clinicName" type="text" maxlength="255"/>
 					</div>
-					<input type="button" class="btn btn-primary" ng-disabled="clinicName==null || clinicName==''"
+					<input type="button" class="btn btn-primary" ng-disabled="k2aConfigCtrl.clinicName==null || k2aConfigCtrl.clinicName==''"
 					       value="<bean:message key="admin.k2a.initbtn"/>"
 					       ng-click="k2aConfigCtrl.initK2A()"/>
 				</div>

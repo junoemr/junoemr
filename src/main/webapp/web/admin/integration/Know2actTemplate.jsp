@@ -73,9 +73,12 @@
 			<h5>{{k2aTemplateCtrl.message}} {{k2aTemplateCtrl.K2A_URL}}</h5>
 		</div>
 		<h4><bean:message key="oscarReport.oscarReportByTemplate.msgDownloadFromK2A"/></h4>
-		<input type="button" value="<bean:message key="oscarReport.oscarReportByTemplate.msgK2ABrowse" />" class="btn btn-primary upload"
+		<input type="button" value="<bean:message key="oscarReport.oscarReportByTemplate.msgK2ABrowse" />"
+		       class="btn btn-primary upload"
 		       ng-click="k2aTemplateCtrl.openK2AUrl()"/>
-		<input type="button" value="<bean:message key="oscarReport.oscarReportByTemplate.msgRefresh" />" class="btn btn-primary upload" onclick="location.reload();"/>
+		<input type="button" value="<bean:message key="oscarReport.oscarReportByTemplate.msgRefresh" />"
+		       class="btn btn-primary upload"
+		       onclick="location.reload();"/>
 		<br/>
 		<table class="table table-condensed table-striped" id="k2aReportTbl" datatable="ng" dt-options="k2aTemplateCtrl.dtOptions">
 			<thead>
@@ -90,7 +93,7 @@
 			<tbody>
 			<tr ng-repeat-start="k2aReport in k2aTemplateCtrl.k2aReports">
 				<td valign="middle">
-					<button ng-if="!k2aReport.postVersions" ng-click="saveK2AReport(k2aReport.id)" title="<bean:message key="oscarReport.oscarReportByTemplate.msgDownload"/>"><i
+					<button ng-if="!k2aReport.postVersions" ng-click="k2aTemplateCtrl.saveK2AReport(k2aReport.id)" title="<bean:message key="oscarReport.oscarReportByTemplate.msgDownload"/>"><i
 							class="icon-download-alt"></i></button>
 				</td>
 				<td>{{k2aReport.name}} <a ng-if="k2aReport.postVersions" data-toggle="collapse" data-target="#k2aReport{{k2aReport.id}}" class="accordion-toggle">+</a></td>
@@ -111,7 +114,7 @@
 							</thead>
 							<tr ng-repeat="k2aReportVersion in k2aReport.postVersions">
 								<td valign="middle">
-									<button ng-click="saveK2AReport(k2aReportVersion.id)" title="<bean:message key="oscarReport.oscarReportByTemplate.msgDownload"/>"><i
+									<button ng-click="k2aTemplateCtrl.saveK2AReport(k2aReportVersion.id)" title="<bean:message key="oscarReport.oscarReportByTemplate.msgDownload"/>"><i
 											class="icon-download-alt"></i></button>
 								</td>
 								<td>{{k2aReportVersion.name}}</td>

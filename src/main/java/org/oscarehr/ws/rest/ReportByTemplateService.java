@@ -97,6 +97,7 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 			}
 			catch (Exception e) {
 				MiscUtils.getLogger().error("Error getting K2A URL", e);
+				return RestResponse.errorResponse("Error getting K2A URL");
 			}
 		}
 		return RestResponse.errorResponse("K2A integration not set up");
