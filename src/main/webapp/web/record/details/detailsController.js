@@ -350,7 +350,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		// on-screen operations //
 		//----------------------//
 		//monitor data changed
-		$scope.$watchCollection(function()
+		$scope.$watch(function()
 		{
 			return controller.page.demo;
 		}, function(newValue, oldValue)
@@ -360,7 +360,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				controller.page.dataChanged = true;
 			}
 
-		});
+		}, true);
 
 		//remind user of unsaved data
 		$scope.$on("$stateChangeStart", function(event)
@@ -668,65 +668,39 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return true;
 		}
 
-		//check&format postal code (Canada provinces only)
-		var postal0 = controller.page.demo.address.postal;
-		controller.checkPostal = function checkPostal()
-		{
-			if (controller.page.demo.address.province == null || controller.page.demo.address.province == "OT" || controller.page.demo.address.province.indexOf("US") == 0)
-				return;
-
-			controller.page.demo.address.postal = controller.page.demo.address.postal.toUpperCase();
-			if (controller.invalidPostal())
-			{
-				controller.page.demo.address.postal = postal0;
-			}
-			else
-			{
-				controller.page.demo.address.postal = controller.page.demo.address.postal.replace(/\s/g, "");
-				if (controller.page.demo.address.postal.length > 3)
-				{
-					controller.page.demo.address.postal = controller.page.demo.address.postal.substring(0, 3) + " " + controller.page.demo.address.postal.substring(3);
-				}
-			}
-			postal0 = controller.page.demo.address.postal;
-		}
-
 		controller.isPostalComplete = function isPostalComplete()
 		{
 			var province = controller.page.demo.address.province;
-			if (province != null && province != "OT" && province.indexOf("US") != 0)
+			// If Canadian province is selected, proceed with validation
+			if (province !== null && province !== "OT" && province.indexOf("US") !== 0)
 			{
-				if ((controller.invalidPostal() || controller.page.demo.address.postal.length != 7) && controller.page.demo.address.postal != "")
+				if (controller.isPostalValid())
 				{
-					alert("Invalid/Incomplete Postal Code");
-					return false;
+					return true;
 				}
+
+				controller.resetEditState();
+				return false;
 			}
+
 			return true;
-		}
+		};
 
-		controller.invalidPostal = function invalidPostal()
+		controller.isPostalValid = function isPostalValid()
 		{
-			var postal = controller.page.demo.address.postal;
-			if (postal != null && postal != "")
+			var postal = controller.page.demo.address.postal.replace(/\s/g, ""); // Trim whitespace
+
+			var regex = new RegExp(/^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/); // Match to Canadian postal code standard (minus the space)
+			if (regex.test(postal))
 			{
-				postal = postal.replace(/\s/g, "");
-				if (postal.length > 6) return true;
-
-				for (var i = 0; i < postal.length; i += 2)
-				{
-					var cc = postal.charAt(i);
-					if (/^[^A-Za-z]$/.test(cc)) return true;
-
-					if (i < postal.length - 1)
-					{
-						cc = postal.charAt(i + 1);
-						if (!isNumber(cc)) return true;
-					}
-				}
+				// Format postal code to Canadian standard
+				controller.page.demo.address.postal = postal.substring(0, 3) + " " + postal.substring(3);
+				return true;
+			}else {
+				alert("Invalid/Incomplete Postal Code"); // TODO: Display proper error message
+				return false;
 			}
-			return false;
-		}
+		};
 
 		//check email
 		controller.checkEmail = function checkEmail()
@@ -1332,8 +1306,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			demographicService.updateDemographic(controller.page.demo).then(
 				function success()
 				{
-					controller.page.saving = false;
-					controller.page.dataChanged = false;
+					controller.resetEditState();
 				},
 
 				function error()
@@ -1343,6 +1316,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					// TODO: handle error
 				}
 			);
+		};
+
+		controller.resetEditState = function resetEditState()
+		{
+			controller.page.saving = false;
+			controller.page.dataChanged = false;
 		}
 	}
 ]);
