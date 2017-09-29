@@ -26,7 +26,10 @@ package oscar.form.pharmaForms.formBPMH.pdf;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.lang.Exception;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,11 +60,13 @@ public class PDFControllerTest {
 	private static URL url;
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		ClassLoader loader = PDFController.class.getClassLoader();
 		url = loader.getResource("oscar/form/prop/bpmh_template_marked.pdf");
+		URI uri = new URI(url.toString());
 
-		pdfController = new PDFController(url.getPath());			
+
+		pdfController = new PDFController(uri.getPath());
 		pdfController.setOutputPath("/tmp");
 		
 		demographic = new Demographic();

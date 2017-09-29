@@ -1,4 +1,6 @@
 -- Header
+SET FOREIGN_KEY_CHECKS = 0;
+BEGIN;
 TRUNCATE TABLE `clinic`;
 INSERT INTO `clinic` VALUES (123456,'McMaster Hospital','Hamilton','Hamilton','L0R 4K3','555-555-5555','555-555-5555','444','A','Ontario','','');
 TRUNCATE TABLE `demographic`;
@@ -337,3 +339,5 @@ INSERT INTO `drugs` VALUES (3,'999998',1,'2014-09-27','2014-11-22','2014-09-27',
 TRUNCATE TABLE `dxresearch`;
 INSERT INTO `dxresearch` VALUES (1,1,'2013-09-26','2013-09-26','A','428','icd9',0,'999998');
 INSERT INTO `dxresearch` VALUES (2,1,'2013-09-26','2013-09-26','A','401','icd9',0,'999998');
+COMMIT;
+SET FOREIGN_KEY_CHECKS = 1;

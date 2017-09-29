@@ -63,13 +63,15 @@ public class CLSHandlerIntegrationTest {
 	private static final String CLIENT_KEY = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAMbA/Di5Xtk+4qqzAw1KkF5W8GEm k9uYvAY8H6A+6NcFV+vblPzg1WNvp5OSeqoMggvDb0r+AdAkcefkcXherQ0Fv3YCtCJt+DAGMG+0 OHmDMdKSIfNoG7gh/fV2btzyw7AZ5B/fP/cOXvjv3R2TCEHxmepnQGCRCbNFkchJwSbZAgMBAAEC gYBNOX7Gq3/m+UApAxUUfPxLK4yKsuqQUG/+HC5NnSPrJ/BZfCAPgWxoDmIWPLvchq+g0nbTtI4P yZlYeLJ+CotB7KlbAIF7xm+xE8iqkSojclJ2myU8lOpQ39GiiO+KDkfA2cHA4ftIwkDqudmnnRGs lIAWabYG1P8sgjSD2MHAAQJBAOoJ5XTPoIO9QDXV63q4GhlUIqkmZ0U51l0VjrEDW4Wu8puOw38a uO10ht+lkCbniiGEoqMZyJSD9H6U2waan9kCQQDZZ3khl6gJzaQYzQ+/XZTu6ecbc8n2k/hZB5Vk pSRQMH8RFkeB4g7xSTggvbC+JpKX5eEfeLRYyuXFSepQXV8BAkEAuWzl00q9TiMfQIggbbZ3VyIF 5CZ9I6fTYyS1TSHv3Vbi+MR/t7CgW+I7Ce7O60P/eNbxVHAVLzXs/G1Lq0vO4QJAGZ9kW10wZNdj u7iPXpJ89xuCLW4cI3+VCYknRlFgUkMk9rKVgu1NrYpfnxw8NGz/Yf+p5LepKb3gDryDbS1UAQJA cHIjxjgUrJUtRqA5fHmcu/jgt65vMjXhdG8DLs3BV9l6VYus9G+jmsRYutaF5CSYoOndMNfWL2FQ 5oNTJ6TWxw==";
 	
 	@BeforeClass
+	@Ignore
 	public static void init() throws Exception {
+		/*
 		SchemaUtils.restoreAllTables();
 
 		DaoTestFixtures.setupBeanFactory();
 
 		AuthUtils.initLoginContext();
-		
+		*/
 	}
 	/*
 	 * Just used during my own testing..but thought it be useful to leave for someone else
