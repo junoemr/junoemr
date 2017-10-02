@@ -28,83 +28,91 @@
 if (!window.Oscar) { window.Oscar = {} }
 if (!Oscar.ShowDocument) { Oscar.ShowDocument = {} }
 
+Oscar.ShowDocument.popupPatient = function popupPatient(height, width, url, windowName, docId)
+{
+	var demographicNo = document.getElementById('demofind' + docId).value;
+	var urlNew = url + demographicNo;
 
-
-Oscar.ShowDocument.popupPatient = function popupPatient(height, width, url, windowName, docId) {
-	  d = document.getElementById('demofind'+ docId).value; //demog  //attachedDemoNo
-	  var urlNew = url + d;
-	
-	  return popup2(height, width, 0, 0, urlNew, windowName);
+	return popup2(height, width, 0, 0, urlNew, windowName);
 };
 
-Oscar.ShowDocument.popupPatientTickler = function popupPatientTickler(height, width, url, windowName,docId) {
-  d = document.getElementById('demofind'+ docId).value; //demog  //attachedDemoNo
-  n = document.getElementById('demofindName' + docId).value;
-  var urlNew = url + "method=edit&tickler.demographic_webName=" + n + "&tickler.demographicNo=" +  d + "&docType=DOC&docId="+docId;
-  	
-  	  return popup2(height, width, 0, 0, urlNew, windowName);
+Oscar.ShowDocument.popupPatientTickler = function popupPatientTickler(height, width, url, windowName, docId)
+{
+	var demographicNo = document.getElementById('demofind' + docId).value;
+	var demographicName = document.getElementById('demofindName' + docId).value;
+	var urlNew = url + "method=edit" +
+		"&tickler.demographic_webName=" + demographicName +
+		"&tickler.demographicNo=" + demographicNo +
+		"&docType=DOC&docId=" + docId;
+
+	return popup2(height, width, 0, 0, urlNew, windowName);
 };
-Oscar.ShowDocument.setupDemoAutoCompletion = function setupDemoAutoCompletion(contextPath, docId,  linkDocsToProvider) {
+Oscar.ShowDocument.setupDemoAutoCompletion = function setupDemoAutoCompletion(contextPath, docId, linkDocsToProvider)
+{
 
 	console.log("Oscar.ShowDocument.setupDemoAutoCompletion");
 
-	var $autoCompleteDemo = jQuery("#autocompletedemo"+docId);
+	var $autoCompleteDemo = jQuery("#autocompletedemo" + docId);
 
-	if($autoCompleteDemo){
-
-		var url;
-
-		var activeOnly = jQuery("#activeOnly"+docId).is(":checked");
-
-		url = contextPath + "/demographic/SearchDemographic.do?jqueryJSON=true&activeOnly=" + activeOnly;
+	if ($autoCompleteDemo)
+	{
+		var activeOnly = jQuery("#activeOnly" + docId).is(":checked");
+		var url = contextPath + "/demographic/SearchDemographic.do?jqueryJSON=true&activeOnly=" + activeOnly;
 
 		$autoCompleteDemo.autocomplete({
 			source: url,
 			minLength: 2,
 
-			focus: function( event, ui ) {
-				$autoCompleteDemo.val( ui.item.label );
+			focus: function (event, ui)
+			{
+				$autoCompleteDemo.val(ui.item.label);
 				return false;
 			},
-			select: function(event, ui) {
+			select: function (event, ui)
+			{
 				$autoCompleteDemo.val(ui.item.label);
-				jQuery( "#demofind"+docId).val(ui.item.value);
-				jQuery( "#demofindName"+docId).val(ui.item.formattedName);
+				jQuery("#demofind" + docId).val(ui.item.value);
+				jQuery("#demofindName" + docId).val(ui.item.formattedName);
 				selectedDemos.push(ui.item.label);
 				console.log(ui.item.providerNo);
-				if( ui.item.providerNo != undefined && ui.item.providerNo != null &&ui.item.providerNo != "" && ui.item.providerNo != "null" && linkDocsToProvider) {
+				if (ui.item.providerNo != undefined && ui.item.providerNo != null &&
+					ui.item.providerNo != "" && ui.item.providerNo != "null" && linkDocsToProvider)
+				{
 					addDocToList(ui.item.providerNo, ui.item.provider + " (MRP)", docId);
 				}
 
 				//enable Save button whenever a selection is made
-				jQuery('#save'+docId).removeAttr('disabled');
-				jQuery('#saveNext'+docId).removeAttr('disabled');
+				jQuery('#save' + docId).removeAttr('disabled');
+				jQuery('#saveNext' + docId).removeAttr('disabled');
 
-				jQuery('#msgBtn_'+docId).removeAttr('disabled');
-				jQuery('#mainTickler_'+docId).removeAttr('disabled');
-				jQuery('#mainEchart_'+docId).removeAttr('disabled');
-				jQuery('#mainMaster_'+docId).removeAttr('disabled');
-				jQuery('#mainApptHistory_'+docId).removeAttr('disabled');
+				jQuery('#msgBtn_' + docId).removeAttr('disabled');
+				jQuery('#mainTickler_' + docId).removeAttr('disabled');
+				jQuery('#mainEchart_' + docId).removeAttr('disabled');
+				jQuery('#mainMaster_' + docId).removeAttr('disabled');
+				jQuery('#mainApptHistory_' + docId).removeAttr('disabled');
 				return false;
 			}
 		});
 	}
 };
-Oscar.ShowDocument.setupProviderAutoCompletion = function setupProviderAutoCompletion(contextPath, docId) {
+Oscar.ShowDocument.setupProviderAutoCompletion = function setupProviderAutoCompletion(contextPath, docId)
+{
 	var url = contextPath + "/provider/SearchProvider.do?method=labSearch";
 
-	var $autoCompleteProvider = jQuery( "#autocompleteprov"+docId);
-	var $provFind = jQuery("#provfind"+docId);
+	var $autoCompleteProvider = jQuery("#autocompleteprov" + docId);
+	var $provFind = jQuery("#provfind" + docId);
 
 	$autoCompleteProvider.autocomplete({
 		source: url,
 		minLength: 2,
 
-		focus: function( event, ui ) {
-			$autoCompleteProvider.val( ui.item.label );
+		focus: function (event, ui)
+		{
+			$autoCompleteProvider.val(ui.item.label);
 			return false;
 		},
-		select: function(event, ui) {
+		select: function (event, ui)
+		{
 			$autoCompleteProvider.val("");
 			$provFind.val(ui.item.value);
 			addDocToList(ui.item.value, ui.item.label, docId);
