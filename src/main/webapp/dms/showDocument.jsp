@@ -319,12 +319,12 @@
 														}
 
 														%>
-														<input type="button" id="msgBtn_<%=docId%>" value="Msg" onclick="popupPatient(700,960,'<%= request.getContextPath() %>/oscarMessenger/SendDemoMessage.do?demographic_no=','msg', '<%=docId%>')" <%=btnDisabled %>/>
+														<input type="button" id="msgBtn_<%=docId%>" value="Msg" onclick="Oscar.ShowDocument.popupPatient(700,960,'<%= request.getContextPath() %>/oscarMessenger/SendDemoMessage.do?demographic_no=','msg', '<%=docId%>')" <%=btnDisabled %>/>
 																																										<!--input type="button" id="ticklerBtn_<%=docId%>" value="Tickler" onclick="handleDocSave('<%=docId%>','addTickler')"/-->
-														<input type="button" id="mainTickler_<%=docId%>" value="Tickler" onClick="popupPatientTickler(710, 1024,'<%= request.getContextPath() %>/Tickler.do?', 'Tickler','<%=docId%>')" <%=btnDisabled %>>
-														<input type="button" id="mainEchart_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupPatient(710, 1024,'<%= request.getContextPath() %>/oscarEncounter/IncomingEncounter.do?reason=<bean:message key="oscarMDS.segmentDisplay.labResults"/>&curDate=<%=currentDate%>>&appointmentNo=&appointmentDate=&startTime=&status=&demographicNo=', 'encounter', '<%=docId%>')" <%=btnDisabled %>>
-														<input type="button" id="mainMaster_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnMaster"/>" onClick="popupPatient(710,1024,'<%= request.getContextPath() %>/demographic/demographiccontrol.jsp?displaymode=edit&dboperation=search_detail&demographic_no=','master','<%=docId%>')" <%=btnDisabled %>>
-														<input type="button" id="mainApptHistory_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnApptHist"/>" onClick="popupPatient(710,1024,'<%= request.getContextPath() %>/demographic/demographiccontrol.jsp?orderby=appttime&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&demographic_no=','ApptHist','<%=docId%>')" <%=btnDisabled %>>
+														<input type="button" id="mainTickler_<%=docId%>" value="Tickler" onClick="Oscar.ShowDocument.popupPatientTickler(710, 1024,'<%= request.getContextPath() %>/Tickler.do?', 'Tickler','<%=docId%>')" <%=btnDisabled %>>
+														<input type="button" id="mainEchart_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="Oscar.ShowDocument.popupPatient(710, 1024,'<%= request.getContextPath() %>/oscarEncounter/IncomingEncounter.do?reason=<bean:message key="oscarMDS.segmentDisplay.labResults"/>&curDate=<%=currentDate%>>&appointmentNo=&appointmentDate=&startTime=&status=&demographicNo=', 'encounter', '<%=docId%>')" <%=btnDisabled %>>
+														<input type="button" id="mainMaster_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnMaster"/>" onClick="Oscar.ShowDocument.popupPatient(710,1024,'<%= request.getContextPath() %>/demographic/demographiccontrol.jsp?displaymode=edit&dboperation=search_detail&demographic_no=','master','<%=docId%>')" <%=btnDisabled %>>
+														<input type="button" id="mainApptHistory_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnApptHist"/>" onClick="Oscar.ShowDocument.popupPatient(710,1024,'<%= request.getContextPath() %>/demographic/demographiccontrol.jsp?orderby=appttime&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&demographic_no=','ApptHist','<%=docId%>')" <%=btnDisabled %>>
 
 														<input type="button" id="refileDoc_<%=docId%>" value="<bean:message key="oscarEncounter.noteBrowser.msgRefile"/>" onclick="refileDoc('<%=docId%>');" >
 														<select  id="queueList_<%=docId%>" name="queueList">
@@ -440,7 +440,7 @@
 											<input type="hidden" name="demofindName" value="<%=demoName%>" id="demofindName<%=docId%>"/>
 
 											<input type="checkbox" id="activeOnly<%=docId%>" name="activeOnly" checked="checked" value="true"
-											       onclick="setupDemoAutoCompletion('<%=request.getContextPath()%>', '<%=docId%>',<%=autoLinkDocsToProvider%>)">Active Only<br>
+											       onclick="Oscar.ShowDocument.setupDemoAutoCompletion('<%=request.getContextPath()%>', '<%=docId%>',<%=autoLinkDocsToProvider%>)">Active Only<br>
 											<input type="text" style="width:400px;" id="autocompletedemo<%=docId%>" onchange="checkSave('<%=docId%>');" name="demographicKeyword" />
 											<div id="autocomplete_choices<%=docId%>" class="autocomplete"></div>
 
@@ -624,8 +624,8 @@
 			showPDF('<%=docId%>',contextpath);
 		}
 
-		jQuery(setupDemoAutoCompletion('<%=request.getContextPath()%>', '<%=docId%>', <%=autoLinkDocsToProvider%>));
-		jQuery(setupProviderAutoCompletion('<%=request.getContextPath()%>', '<%=docId%>'));
+		jQuery(Oscar.ShowDocument.setupDemoAutoCompletion('<%=request.getContextPath()%>', '<%=docId%>', <%=autoLinkDocsToProvider%>));
+		jQuery(Oscar.ShowDocument.setupProviderAutoCompletion('<%=request.getContextPath()%>', '<%=docId%>'));
 
 </script>
 <% if (request.getParameter("inWindow") != null && request.getParameter("inWindow").equalsIgnoreCase("true")) {  %>

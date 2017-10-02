@@ -1347,6 +1347,7 @@
             <exclude>src/main/java/org/apache/xml/security/encryption/DocumentSerializer.java</exclude>
 			<exclude>src/main/webapp/library/bootstrap2-datepicker/**</exclude>
 			<exclude>src/main/webapp/library/ng-table/**</exclude>
+            <exclude>src/main/webapp/web/dist/**</exclude>
                 </excludes>
 		<strictCheck>true</strictCheck>
             </configuration>
