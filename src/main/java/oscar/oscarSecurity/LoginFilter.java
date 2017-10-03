@@ -71,7 +71,7 @@ public class LoginFilter implements Filter {
 		"/eform/efmformemail_form.jsp",
 		"/share/javascript/jquery/",
 		"/share//javascript/jquery/",
-		"/share//javascript/eforms/"
+//		"/share//javascript/eforms/emailControl.js"
 	};
 
 	/*

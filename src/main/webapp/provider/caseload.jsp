@@ -53,6 +53,11 @@
 
 #leftSearch, #rightSearch { display: inline; }
 #rightSearch { float:right; }
+<% if (OscarProperties.getInstance().isPropertyActive("navigation_always_on_top")) { %>
+#caseloadDisplayOptions {
+	padding-top: 21px;
+}
+<% } %>
 </style>
 <%
 String[] clH = new String[] {"Demographic", "", "Age", "Sex", "Last Appt", "Next Appt", "Appts LYTD", "Lab", "Doc", "Tickler", "Msg", "BMI", "BP", "WT", "SMK", "A1C", "ACR", "SCR", "LDL", "HDL", "TCHD", "EGFR", "EYEE"};
@@ -83,10 +88,11 @@ clH = ["<bean:message key="caseload.msgDemographic" />",
 			"<bean:message key="caseload.msgEYEE" />" ];
 </script>
 <table border="1" cellpadding="0" cellspacing="0" width="100%" id="caseloadTable">
-<tr><td colspan='<%=clH.length%>'>
+<tr>
+	<td colspan='<%=clH.length%>'>
 	<table border='0' cellpadding='0' bgcolor='#fffff0' cellspacing='0' width='100%'>
 		<tr class='caseloadRow'>
-		<td colspan='<%=clH.length%>'>
+		<td colspan='<%=clH.length%>' id="caseloadDisplayOptions">
 			<div>
 				<div id="leftSearch">
 					<form>
@@ -133,9 +139,11 @@ clH = ["<bean:message key="caseload.msgDemographic" />",
 					</form>
 				</div>
 			</div>
-		</td></tr>
+		</td>
+		</tr>
 	</table>
-</td></tr>
+</td>
+</tr>
 <tr id='loadingHeader' class='caseloadRow'><td style='text-align: center;' bgcolor='#fffff0' colspan='<%=clH.length%>'><img src='../images/DMSLoader.gif' /> Loading results...</td></tr>
 <tr id='totalResults2' class='caseloadRow'><td style='text-align: center;' bgcolor='#fffff0' colspan='<%=clH.length%>'> <span id="rows2"></span>/<span id="totalRows2"></span> results retrieved </td></tr>
 <tr class='caseloadRow' id='caseloadHeader'>
