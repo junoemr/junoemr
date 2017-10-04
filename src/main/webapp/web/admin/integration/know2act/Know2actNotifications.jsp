@@ -34,14 +34,14 @@
 <!-- Hide the main program nav as a fix for having angular in an iframe/window -->
 <link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
 
-<div>
-	<h2 style="margin-left:5px"><bean:message key="admin.admin.Know2ActNotifications"/></h2>
+<div class="k2a-notification">
+	<h2><bean:message key="admin.admin.Know2ActNotifications"/></h2>
 	<div>
 		<blockquote ng-repeat="notif in k2aNoteCtrl.page.notifications" class="">
 			<h4><a href="#">{{notif.summary}}</a></h4>
 			<pre>{{notif.body}}</pre>
 
-			<small>{{notif.author}} -- {{notif.createdAt | date }}</small>
+			<span class="small">{{notif.author}} -- {{notif.createdAt | date }}</span>
 			<a class="btn btn-default" ng-click="k2aNoteCtrl.readMore(notif)" role="button"><bean:message key="admin.admin.Know2ActNotifications.readmore"/></a>
 			<a class="btn btn-default" ng-click="k2aNoteCtrl.archive(notif)" role="button"><bean:message key="admin.admin.Know2ActNotifications.archive"/></a>
 		</blockquote>

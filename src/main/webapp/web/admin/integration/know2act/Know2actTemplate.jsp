@@ -45,7 +45,7 @@
 <link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
 
-<div>
+<div class="k2a-report-template">
 	<div data-ng-hide="k2aTemplateCtrl.k2aActive">
 		A K2A instance is unavailable for this OSCAR instance.
 		Please authenticate a K2A instance or contact an administrator for support.
@@ -80,15 +80,17 @@
 			<tr ng-repeat-start="k2aReport in k2aTemplateCtrl.k2aReports">
 				<td valign="middle">
 					<button ng-if="!k2aReport.postVersions" ng-click="k2aTemplateCtrl.saveK2AReport(k2aReport.id)" title="<bean:message key="oscarReport.oscarReportByTemplate.msgDownload"/>">
-						<i class="icon-download-alt"></i>
+						<span class="icon-download-alt italic"></span>
 					</button>
 				</td>
-				<td>{{k2aReport.name}} <a ng-if="k2aReport.postVersions" data-toggle="collapse" data-target="#k2aReport{{k2aReport.id}}" class="accordion-toggle">+</a></td>
+				<td>{{k2aReport.name}}
+					<a ng-if="k2aReport.postVersions" data-toggle="collapse" data-target="#k2aReport{{k2aReport.id}}" class="accordion-toggle">+</a>
+				</td>
 				<td>{{k2aReport.author}}</td>
 				<td>{{k2aReport.createdAt | date:'yyyy-MM-dd HH:mm:ss'}}</td>
 			</tr>
 			<tr ng-repeat-end ng-if="k2aReport.postVersions">
-				<td colspan="12" style="padding:0px">
+				<td colspan="12" class="no-pad">
 					<div class="accordian-body collapse" id="k2aReport{{k2aReport.id}}">
 						<table class="table table-condensed table-striped">
 							<thead>
@@ -101,8 +103,8 @@
 							</thead>
 							<tr ng-repeat="k2aReportVersion in k2aReport.postVersions">
 								<td valign="middle">
-									<button ng-click="k2aTemplateCtrl.saveK2AReport(k2aReportVersion.id)" title="<bean:message key="oscarReport.oscarReportByTemplate.msgDownload"/>"><i
-											class="icon-download-alt"></i></button>
+									<button ng-click="k2aTemplateCtrl.saveK2AReport(k2aReportVersion.id)" title="<bean:message key="oscarReport.oscarReportByTemplate.msgDownload"/>">
+										<span class="icon-download-alt italic"></span></button>
 								</td>
 								<td>{{k2aReportVersion.name}}</td>
 								<td>{{k2aReportVersion.author}}</td>

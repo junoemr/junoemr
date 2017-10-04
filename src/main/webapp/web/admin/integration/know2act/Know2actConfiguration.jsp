@@ -51,15 +51,15 @@
 
 <title><bean:message key="admin.admin.Know2ActConfig"/></title>
 
-<div>
+<div class="k2a-config">
 	<div class="page-header">
 		<h4><bean:message key="admin.admin.Know2ActConfig"/>
-			<small data-ng-show="k2aConfigCtrl.k2aActive"><bean:message key="admin.k2a.active"/></small>
+			<span class="small" data-ng-show="k2aConfigCtrl.k2aActive"><bean:message key="admin.k2a.active"/></span>
 		</h4>
 	</div>
 	<div data-ng-show="k2aConfigCtrl.k2aActive">
 		<h4><bean:message key="admin.k2a.preventionsListTitle"/>
-			<small>{{k2aConfigCtrl.currentPreventionRulesSet}}</small>
+			<span class="small">{{k2aConfigCtrl.currentPreventionRulesSet}}</span>
 		</h4>
 		<table class="table table-bordered table-condensed">
 			<tr>
@@ -85,7 +85,7 @@
 			<fieldset>
 				<div class="form-group col-xs-5">
 					<label><bean:message key="admin.k2a.clinicName"/>
-						<small>(<bean:message key="admin.k2a.clinicName.reason"/>)</small>
+						<span class="small">(<bean:message key="admin.k2a.clinicName.reason"/>)</span>
 					</label>
 					<div class="controls">
 						<input class="form-control" name="clinicName" ng-model="k2aConfigCtrl.clinicName" type="text" maxlength="255"/>
