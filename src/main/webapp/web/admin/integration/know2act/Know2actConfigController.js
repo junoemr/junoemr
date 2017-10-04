@@ -1,4 +1,4 @@
-angular.module("Admin.Integration").controller('Admin.Integration.k2aConfigController', [
+angular.module("Admin.Integration.Know2act").controller('Admin.Integration.Know2act.k2aConfigController', [
 	"k2aService",
 	function (k2aService)
 	{
@@ -12,13 +12,10 @@ angular.module("Admin.Integration").controller('Admin.Integration.k2aConfigContr
 
 		controller.checkStatus = function ()
 		{
-			console.info("Checking status");
 			k2aService.isK2AInit().then(
 				function success(data)
 				{
-					console.log("k2aActive", data);
 					controller.k2aActive = data;
-					console.log(controller.k2aActive);
 					if (controller.k2aActive)
 					{
 						controller.getPreventionRulesList();
@@ -40,7 +37,7 @@ angular.module("Admin.Integration").controller('Admin.Integration.k2aConfigContr
 				function success(data)
 				{
 					controller.availablePreventionRuleSets = data;
-					console.log("prev rules ", controller.availablePreventionRuleSets);
+					console.log("availablePreventionRuleSets", controller.availablePreventionRuleSets);
 				},
 				function failure(error)
 				{
@@ -54,8 +51,8 @@ angular.module("Admin.Integration").controller('Admin.Integration.k2aConfigContr
 			k2aService.getCurrentPreventionRulesVersion().then(
 				function success(data)
 				{
-					console.log("currentPreventionRulesSet", data);
 					controller.currentPreventionRulesSet = data;
+					console.log("currentPreventionRulesSet", data);
 				},
 				function failure(error)
 				{
@@ -68,13 +65,10 @@ angular.module("Admin.Integration").controller('Admin.Integration.k2aConfigContr
 		{
 
 			// if (confirm("<bean:message key="admin.k2a.confirmation"/>")) {
-			console.log("loadPreventionRuleById", prevSet);
 			// prevSet.agreement = "<bean:message key="admin.k2a.confirmation"/>";
 			k2aService.loadPreventionRuleById(prevSet).then(function (data)
 			{
-				console.log("data coming back", data);
 				k2aService.getCurrentPreventionRulesVersion();
-				console.log("prev rules ", controller.availablePreventionRuleSets);
 			});
 			// }
 		};
@@ -86,7 +80,6 @@ angular.module("Admin.Integration").controller('Admin.Integration.k2aConfigContr
 
 		controller.initK2A = function ()
 		{
-			console.log("init k2a function", controller.clinicName);
 			k2aService.initK2A(controller.clinicName).then(
 				function success(response)
 				{

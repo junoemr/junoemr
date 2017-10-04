@@ -1,8 +1,6 @@
-angular.module("Admin.Integration").controller('Admin.Integration.k2aNotificationController', [
-	"$scope",
+angular.module("Admin.Integration.Know2act").controller('Admin.Integration.Know2act.k2aNotificationController', [
 	"k2aService",
-	function ($scope,
-	          k2aService)
+	function (k2aService)
 	{
 		var controller = this;
 		controller.page = {};

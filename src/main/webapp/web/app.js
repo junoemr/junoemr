@@ -30,7 +30,8 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Dashboard',
 	'Consults',
 	'Admin',
-	'Admin.Integration'
+	'Admin.Integration',
+	'Admin.Integration.Know2act'
 ]);
 
 oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider)
@@ -315,21 +316,21 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			{
 			// url: '/admin/integration',
 			url:'/k2aConfig',
-			templateUrl: 'admin/integration/Know2actConfiguration.jsp',
-			controller: 'Admin.Integration.k2aConfigController as k2aConfigCtrl'
+			templateUrl: 'admin/integration/know2act/Know2actConfiguration.jsp',
+			controller: 'Admin.Integration.Know2act.k2aConfigController as k2aConfigCtrl'
 		})
 		.state('k2aTemplate',
 			{
 				// url: '/admin/integration',
 				url:'/k2aTemplate',
-				templateUrl: 'admin/integration/Know2actTemplate.jsp',
-				controller: 'Admin.Integration.k2aTemplateController as k2aTemplateCtrl'
+				templateUrl: 'admin/integration/know2act/Know2actTemplate.jsp',
+				controller: 'Admin.Integration.Know2act.k2aTemplateController as k2aTemplateCtrl'
 			})
 		.state('k2aNotification',
 		{
 			url:'/k2aNotification',
-			templateUrl: 'admin/integration/Know2actNotifications.jsp',
-			controller: 'Admin.Integration.k2aNotificationController as k2aNoteCtrl'
+			templateUrl: 'admin/integration/know2act/Know2actNotifications.jsp',
+			controller: 'Admin.Integration.Know2act.k2aNotificationController as k2aNoteCtrl'
 		});
 
 }]);

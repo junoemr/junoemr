@@ -43,22 +43,8 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 
 <link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
+<link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
 
-<style>
-	body{
-		background-color:#f5f5f5;
-		margin: 25px;
-	}
-	#left-pane,#left-pane-hidden,#main-nav,#main-nav-collapse {
-		display:none !important;
-	}
-	#right-pane {
-		margin-left: 0 !important;
-	}
-	#main-body {
-		padding-top: 0 !important;
-	}
-</style>
 <div>
 	<div data-ng-hide="k2aTemplateCtrl.k2aActive">
 		A K2A instance is unavailable for this OSCAR instance.
@@ -93,8 +79,9 @@
 			<tbody>
 			<tr ng-repeat-start="k2aReport in k2aTemplateCtrl.k2aReports">
 				<td valign="middle">
-					<button ng-if="!k2aReport.postVersions" ng-click="k2aTemplateCtrl.saveK2AReport(k2aReport.id)" title="<bean:message key="oscarReport.oscarReportByTemplate.msgDownload"/>"><i
-							class="icon-download-alt"></i></button>
+					<button ng-if="!k2aReport.postVersions" ng-click="k2aTemplateCtrl.saveK2AReport(k2aReport.id)" title="<bean:message key="oscarReport.oscarReportByTemplate.msgDownload"/>">
+						<i class="icon-download-alt"></i>
+					</button>
 				</td>
 				<td>{{k2aReport.name}} <a ng-if="k2aReport.postVersions" data-toggle="collapse" data-target="#k2aReport{{k2aReport.id}}" class="accordion-toggle">+</a></td>
 				<td>{{k2aReport.author}}</td>

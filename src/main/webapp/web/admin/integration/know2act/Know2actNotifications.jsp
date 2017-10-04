@@ -32,17 +32,8 @@
 <link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath() %>/css/font-awesome.min.css">
 <!-- Hide the main program nav as a fix for having angular in an iframe/window -->
-<style>
-	#left-pane,#left-pane-hidden,#main-nav,#main-nav-collapse {
-		display:none !important;
-	}
-	#right-pane {
-		margin-left: 0 !important;
-	}
-	#main-body {
-		padding-top: 0 !important;
-	}
-</style>
+<link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
+
 <div>
 	<h2 style="margin-left:5px"><bean:message key="admin.admin.Know2ActNotifications"/></h2>
 	<div>

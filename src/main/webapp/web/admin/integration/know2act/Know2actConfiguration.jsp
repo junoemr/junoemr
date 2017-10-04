@@ -42,22 +42,15 @@
 
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<!-- Hide the main program nav as a fix for having angular in an iframe -->
-<style>
-	#left-pane,#left-pane-hidden,#main-nav,#main-nav-collapse {
-		display:none !important;
-	}
-	#right-pane {
-		margin-left: 0 !important;
-	}
-	#main-body {
-		padding-top: 0 !important;
-	}
-</style>
-<title><bean:message key="admin.admin.Know2ActConfig"/></title>
 <link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath() %>/css/font-awesome.min.css">
+<!-- Hide the main program nav as a fix for having angular in an iframe -->
+<link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
+
+<title><bean:message key="admin.admin.Know2ActConfig"/></title>
+
 <div>
 	<div class="page-header">
 		<h4><bean:message key="admin.admin.Know2ActConfig"/>
