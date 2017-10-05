@@ -691,6 +691,13 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		{
 			var postal = controller.page.demo.address.postal.replace(/\s/g, ""); // Trim whitespace
 
+			// If postal code is an empty string, set it to null and continue
+			if(postal.length === 0)
+			{
+				postal = null;
+				return true;
+			}
+
 			var regex = new RegExp(/^[A-Za-z]\d[A-Za-z]\d[A-Za-z]\d$/); // Match to Canadian postal code standard (minus the space)
 			if (regex.test(postal))
 			{
