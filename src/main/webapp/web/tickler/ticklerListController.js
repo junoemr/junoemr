@@ -71,7 +71,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 						page: 1, // show first page
 						count: 10,// initial count per page
 						sorting: {
-							UpdateDate: "desc"
+							ServiceDate: "desc"
 						}
 					},
 					{

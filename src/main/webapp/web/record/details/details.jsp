@@ -193,9 +193,9 @@
 						<bean:message key="demographic.demographiceditdemographic.formSex"/> 
 					</label>
 					<div class="col-md-4">
-						<select class="form-control form-control-details" title="Sex" 
-							ng-model="detailsCtrl.page.demo.sex" 
-							ng-options="sexes.value as sexes.label for sexes in detailsCtrl.page.genders"
+						<select class="form-control form-control-details" title="Sex"
+								ng-model="detailsCtrl.page.demo.sex"
+								ng-options="sexes.value as sexes.label for sexes in detailsCtrl.page.genders"
 						/>
 					</div>
 				</div>
@@ -335,9 +335,7 @@
 						<input type="text" class="form-control form-control-details" 
 							placeholder="<bean:message key="demographic.demographiceditdemographic.formPostal"/>" 
 							title="<bean:message key="demographic.demographiceditdemographic.formPostal"/>" 
-							ng-model="detailsCtrl.page.demo.address.postal" 
-							ng-change="detailsCtrl.checkPostal()" 
-							ng-blur="detailsCtrl.isPostalComplete()"
+							ng-model="detailsCtrl.page.demo.address.postal"
 						/>
 					</div>
 				</div>

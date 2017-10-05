@@ -131,7 +131,7 @@ public class CustomFilter extends AbstractModel<Integer> {
 	@Transient
 	private String demographic_webName;
 	@Transient
-	private SORTCOLUMN sortColumn = SORTCOLUMN.UpdateDate;
+	private SORTCOLUMN sortColumn = SORTCOLUMN.ServiceDate;
 	@Transient
 	private SORTDIR sortDir = SORTDIR.desc;
 	
