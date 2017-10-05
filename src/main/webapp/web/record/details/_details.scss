@@ -52,6 +52,10 @@
 		margin-top: 50px;
 		margin-bottom: 50px;
 	}
+	#save-button-top {
+		width: 100%;
+		//margin-left: 20px;
+	}
 
 
 	#alert-text-box {
@@ -67,5 +71,11 @@
 
 	.form-divider {
 		margin-top: $margin-lg;
+	}
+}
+
+@media (max-width: 768px) {
+	#save-button-top {
+		margin-top: $margin-md;
 	}
 }
