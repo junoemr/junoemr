@@ -694,7 +694,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			// If postal code is an empty string, set it to null and continue
 			if(postal.length === 0)
 			{
-				postal = null;
+				controller.page.demo.address.postal = null;
 				return true;
 			}
 
