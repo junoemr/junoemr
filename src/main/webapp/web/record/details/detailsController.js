@@ -671,8 +671,9 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.isPostalComplete = function isPostalComplete()
 		{
 			var province = controller.page.demo.address.province;
+			var postal = controller.page.demo.address.postal;
 			// If Canadian province is selected, proceed with validation
-			if (province !== null && province !== "OT" && province.indexOf("US") !== 0)
+			if (postal !== null && province !== null && province !== "OT" && province.indexOf("US") !== 0)
 			{
 				if (controller.isPostalValid())
 				{
