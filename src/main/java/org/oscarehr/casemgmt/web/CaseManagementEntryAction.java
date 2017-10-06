@@ -155,6 +155,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 	private CaseManagementNoteExtDAO caseManagementNoteExtDao = (CaseManagementNoteExtDAO) SpringUtils.getBean("CaseManagementNoteExtDAO");
 	private IssueDAO issueDao = (IssueDAO) SpringUtils.getBean("IssueDAO");
 	private AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
+	private ProgramManager programManager = (ProgramManager)SpringUtils.getBean("programManager");
 
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		return edit(mapping, form, request, response);
@@ -198,7 +199,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		logger.debug("Get demo and provider no " + String.valueOf(current - start));
 		start = current;
 
-		String programIdString = (String) session.getAttribute("case_program_id");
+		String programIdString = getProgramNo(session);
 		Integer programId = null;
 		try {
 			programId = Integer.parseInt(programIdString);
@@ -779,7 +780,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		}
 
 		logger.debug("Note archived " + note.isArchived());
-		String programId = (String) session.getAttribute("case_program_id");
+		String programId = getProgramNo(session);
 		note.setProgram_no(programId);
 
 		WebApplicationContext ctx = this.getSpringContext();
@@ -1197,7 +1198,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 		// if this is an update, don't overwrite the program id
 		if (note.getProgram_no() == null || note.getProgram_no().equals("") || !note.getProgram_no().equals("")) {
-			String programId = (String) session.getAttribute("case_program_id");
+			String programId = getProgramNo(session);
 			note.setProgram_no(programId);
 		}
 
@@ -1343,7 +1344,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		 */
 		if (inCaisi) {
 			/* get access right */
-			List accessRight = caseManagementMgr.getAccessRight(providerNo, getDemographicNo(request), (String) session.getAttribute("case_program_id"));
+			List accessRight = caseManagementMgr.getAccessRight(providerNo, getDemographicNo(request), getProgramNo(session));
 			setCPPMedicalHistory(cpp, providerNo, accessRight);
 			cpp.setUpdate_date(now);
 			caseManagementMgr.saveCPP(cpp, providerNo);
@@ -1746,7 +1747,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		note.setProviderNo(providerNo);
 		if (provider != null) note.setProvider(provider);
 
-		String programId = (String) session.getAttribute("case_program_id");
+		String programId = getProgramNo(session);
 		note.setProgram_no(programId);
 
 		WebApplicationContext ctx = this.getSpringContext();
@@ -2059,7 +2060,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		CaseManagementEntryFormBean cform = (CaseManagementEntryFormBean) form;
 		String providerNo = getProviderNo(request);
 
-		String programNo = (String) session.getAttribute("case_program_id");
+		String programNo = getProgramNo(session);
 
 		String demo = cform.getDemographicNo();
 
@@ -2113,7 +2114,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			return null;
 		}
 
-		String programId = (String) session.getAttribute("case_program_id");
+		String programId = getProgramNo(session);
 		CaseManagementEntryFormBean cform = (CaseManagementEntryFormBean) form;
 
 		String demono = request.getParameter("amp;demographicNo");
@@ -2165,7 +2166,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		logger.debug("issueSearch");
 
 		HttpSession session = request.getSession();
-		String programId = (String) session.getAttribute("case_program_id");
+		String programId = getProgramNo(session);
 
 		request.setAttribute("change_flag", "true");
 		CaseManagementEntryFormBean cform = (CaseManagementEntryFormBean) form;
@@ -2220,7 +2221,6 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 	// we need to convert single issue into checkbox array so we can play nicely with CaseManagementEntryFormBean
 	public ActionForward makeIssue(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		HttpSession session = request.getSession();
-		// String programId = (String) session.getAttribute("case_program_id");
 		// grab the issue we want to add
 		String issueId = request.getParameter("newIssueId");
 		// String providerNo = getProviderNo(request);
@@ -2307,7 +2307,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 		String programIdStr = (String) session.getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
 		if(programIdStr==null)
-			programIdStr = (String) session.getAttribute("case_program_id");
+			programIdStr = getProgramNo(session);
 		Integer programId = null;
 		if (programIdStr != null) programId = Integer.valueOf(programIdStr);
 
@@ -2609,7 +2609,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			String providerNo = this.getProviderNo(request);
 
 			// get access right
-			List accessRight = caseManagementMgr.getAccessRight(providerNo, demono, (String) session.getAttribute("case_program_id"));
+			List accessRight = caseManagementMgr.getAccessRight(providerNo, demono, getProgramNo(session));
 
 			// add medical history to CPP
 			CaseManagementCPP cpp = this.caseManagementMgr.getCPP(getDemographicNo(request));
@@ -3209,7 +3209,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		//notes = caseManagementMgr.getNotes(demono);
 		//notes = manageLockedNotes(notes, false, this.getUnlockedNotesMap(request));
 
-		String programId = (String) session.getAttribute("case_program_id");
+		String programId = getProgramNo(session);
 
 		if (programId == null || programId.length() == 0) {
 			programId = "0";
@@ -3458,5 +3458,17 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		if (s1 == null) s1 = "";
 		if (s2 == null) s2 = "";
 		return s1.trim().equals(s2.trim());
+	}
+
+	private String getProgramNo(HttpSession session)
+	{
+		String programIdString = (String) session.getAttribute("case_program_id");
+
+		if (programIdString != null && !programIdString.trim().isEmpty())
+		{
+			return programIdString;
+		}
+		//Default to the oscar program if provider hasn't been assigned to a program
+		return String.valueOf(programManager.getProgramIdByProgramName("OSCAR"));
 	}
 }
