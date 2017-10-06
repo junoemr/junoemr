@@ -1,5 +1,6 @@
 var oscarApp = angular.module('oscarProviderViewModule', [
 	'ui.router',
+	'ui.router.state.events',
 	'ngResource',
 	'ui.bootstrap',
 	'angular-loading-bar',
