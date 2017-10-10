@@ -151,14 +151,14 @@ Oscar.HealthCardParser.parseBCStandalone = function parseBCStandalone(cardData,c
 
 	subcard = subcard.substring(subcard.indexOf("^")+1);
 	var endYYMM = subcard.substring(0, 4);
-	if(!"0000".equals(endYYMM)) {
+	if("0000" !== endYYMM) {
 		dataHash.endYear = "20" + endYYMM.substring(0, 2);
 		dataHash.endMonth = endYYMM.substring(2, 4);
 		dataHash.endDay = "01";
 	}
 
 	var issuerYYMM = subcard.substring(4, 8);
-	if(!"0000".equals(issuerYYMM)) {
+	if("0000" !== issuerYYMM) {
 		dataHash.effYear = "20" + issuerYYMM.substring(0, 2);
 		dataHash.effMonth = issuerYYMM.substring(2, 4);
 		dataHash.effDay = "01";
@@ -168,6 +168,8 @@ Oscar.HealthCardParser.parseBCStandalone = function parseBCStandalone(cardData,c
 	dataHash.dobYear = dobCCYYMMDD.substring(0, 4);
 	dataHash.dobMonth = dobCCYYMMDD.substring(4, 6);
 	dataHash.dobDay = dobCCYYMMDD.substring(6, 8);
+
+	dataHash.sex = 'M'; // this is not included in spec, default to Male
 
 	return cardHash;
 };
@@ -212,28 +214,32 @@ Oscar.HealthCardParser.parseOntario = function parseOntario(cardData,cardHash)
 };
 
 
-Oscar.HealthCardParser.parse = function parse(cardData) {
-	try {
-		var cardHash = {
-			data: {},
-			meta: {}
-		};
-
-		if(cardData.startsWith("%B610043"))
+Oscar.HealthCardParser.parse = function parse(cardData)
+{
+	var cardHash = {
+		meta: {},
+		data: {}
+	};
+	try
+	{
+		if (cardData.startsWith("%B610043"))
 		{
-			return Oscar.HealthCardParser.parseBCStandalone(cardData,cardHash);
+			return Oscar.HealthCardParser.parseBCStandalone(cardData, cardHash);
 		}
-		else if(cardData.startsWith("%BC") && cardData.substring(cardData.indexOf("?")).startsWith("?;636028")) {
-			return Oscar.HealthCardParser.parseBCCombined(cardData,cardHash);
+		else if (cardData.startsWith("%BC") && cardData.substring(cardData.indexOf("?")).startsWith("?;636028"))
+		{
+			return Oscar.HealthCardParser.parseBCCombined(cardData, cardHash);
 		}
-		else {
-			return Oscar.HealthCardParser.parseOntario(cardData,cardHash);
+		else
+		{
+			return Oscar.HealthCardParser.parseOntario(cardData, cardHash);
 		}
 	}
-	catch(e) {
+	catch (e)
+	{
 		console.error("Error parsing card data", e);
 	}
-	return {};
+	return cardHash;
 };
 
 
