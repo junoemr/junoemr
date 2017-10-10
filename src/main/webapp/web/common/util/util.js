@@ -115,3 +115,8 @@ Juno.Common.Util.isUndefinedOrNull = function isUndefinedOrNull(val)
 {
 	return angular.isUndefined(val) || val === null;
 };
+
+Juno.Common.Util.isDefinedAndNotNull = function isDefinedAndNotNull(val)
+{
+	return (angular.isDefined(val) && val !== null);
+};
