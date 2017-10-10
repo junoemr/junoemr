@@ -444,6 +444,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					event.preventDefault();
 				} else {
 					demographicService.getDemographic($stateParams.demographicNo).then(
+						function success(results)
+						{
+							// TODO: Celebrate
+						},
 						function error(errors)
 						{
 							alert('Error loading demographic: ', errors) // TODO: Display actual error message
