@@ -28,6 +28,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 	'$rootScope',
 	'$scope',
+	'$window',
 	'$http',
 	'$localStorage',
 	'$location',
@@ -48,6 +49,7 @@ angular.module('Record').controller('Record.RecordController', [
 	function(
 		$rootScope,
 		$scope,
+		$window,
 		$http,
 		$localStorage,
 		$location,
@@ -79,6 +81,7 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.page.itvSet = null;
 		controller.page.itvCheck = null;
 		controller.page.editingNoteId = null;
+		controller.page.isNoteSaved = false; // Track save state of note TODO: Potentially add this to the encounterNote object on the backend
 
 		controller.$storage = $localStorage; // Define persistent storage
 
@@ -195,14 +198,32 @@ angular.module('Record').controller('Record.RecordController', [
 			return ($state.current.name == tab.state);
 		};
 
-		$scope.$on('$destroy', function()
-		{
-			console.log("save the last note!!", controller.page.encounterNote, noteDirty);
-			if (noteDirty)
+		// Check if there have been potential changes to a note, display a warning if needed
+		$window.onbeforeunload = function (event) {
+			if (Juno.Common.Util.isDefinedAndNotNull(controller.page.encounterNote))
 			{
-				noteService.tmpSave($stateParams.demographicNo, controller.page.encounterNote);
+				if(controller.page.encounterNote.note.trim().length !== 0 && controller.page.isNoteSaved === false)
+				{
+					return 'You have made changes to a note, but you did not save them yet.\nLeaving the page will revert all changes.';
+				}
 			}
+		};
 
+		// Warn user about unsaved data before a state change
+		$scope.$on("$stateChangeStart", function(event, data)
+		{
+			// If the encounter note is not null/undefined and the new state is not a child of record, continue
+			if (Juno.Common.Util.isDefinedAndNotNull(controller.page.encounterNote) && controller.page.isNoteSaved === false && data.name.indexOf('record.') === -1)
+			{
+				if(controller.page.encounterNote.note.trim().length !== 0)
+				{
+					var discard = confirm("You may have unsaved data. Are you sure to leave?");
+					if (!discard)
+					{
+						event.preventDefault();
+					}
+				}
+			}
 		});
 
 		//////AutoSave
@@ -370,6 +391,7 @@ angular.module('Record').controller('Record.RecordController', [
 			noteService.saveNote($stateParams.demographicNo, controller.page.encounterNote).then(
 				function success(results)
 				{
+					controller.page.isNoteSaved = true;
 					$rootScope.$emit('noteSaved', results);
 					skipTmpSave = true;
 					controller.page.encounterNote = results;
@@ -580,7 +602,7 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.setEditingNoteFlag = function setEditingNoteFlag()
 		{
 			if (controller.page.encounterNote.uuid == null) return;
-
+			controller.page.isNoteSaved = false;
 			controller.page.editingNoteId = controller.page.encounterNote.uuid;
 			if (controller.page.itvSet == null)
 			{
