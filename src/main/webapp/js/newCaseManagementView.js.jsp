@@ -1888,7 +1888,10 @@ function editNote(e) {
     Element.observe(caseNote, 'click', getActiveText);
 
     if( passwordEnabled ) {
-           input = "<p style='background-color:#CCCCFF; display:none; margin:0px;' id='notePasswd'>Password:&nbsp;<input type='password' name='caseNote.password'/> Confirmation: <input readonly name='caseNote.passwordConfirm' autocomplete='off' type='password'/><\/p>";
+           input = "<p style='background-color:#CCCCFF; display:none; margin:0px;' id='notePasswd'>" +
+               "Password:&nbsp;<input readonly type='password' name='caseNote.password'/> " +
+               "Confirmation: <input readonly name='caseNote.passwordConfirm' autocomplete='off' type='password'/>" +
+               "<\/p>";
            new Insertion.Bottom(txt, input);
     }
 
@@ -2522,6 +2525,8 @@ function changeDiagnosisUnresolved(issueId) {
                 document.forms['caseManagementEntryForm'].elements['caseNote.password'].focus();
             }
             else {
+	            document.forms['caseManagementEntryForm'].elements['caseNote.password'].readOnly = true;
+	            document.forms['caseManagementEntryForm'].elements['caseNote.passwordConfirm'].readOnly = true;
                 document.forms['caseManagementEntryForm'].elements[caseNote].focus();
             }
         }
@@ -2710,7 +2715,10 @@ function newNote(e) {
     var input = "<textarea tabindex='7' cols='84' rows='1' wrap='hard' class='txtArea' style='line-height:1.0em;' name='caseNote_note' id='caseNote_note" + newNoteIdx + "'>" + reason + "<\/textarea>";
     var passwd = "";
     if( passwordEnabled ) {
-        passwd = "<p style='background-color:#CCCCFF; display:none; margin:0px;' id='notePasswd'>Password:&nbsp;<input type='password' name='caseNote.password' autocomplete='off' readonly\/><\/p>";
+        passwd = "<p style='background-color:#CCCCFF; display:none; margin:0px;' id='notePasswd'>" +
+            "Password:&nbsp;<input type='password' name='caseNote.password' autocomplete='off' readonly\/>" +
+	        "Confirmation: <input type='password' name='caseNote.passwordConfirm' autocomplete='off' readonly/>" +
+            "<\/p>";
     }
 
     // the extra BR NBSP at the ends are for IE fix for selection box is out of scrolling pane view.
