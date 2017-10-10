@@ -1,0 +1,12 @@
+
+/*THIS IS A HACK. DO NOT USE IF POSSIBLE*/
+
+#left-pane,#left-pane-hidden,#main-nav,#main-nav-collapse {
+  display:none !important;
+}
+#right-pane {
+  margin-left: 0 !important;
+}
+#main-body {
+  padding-top: 0 !important;
+}

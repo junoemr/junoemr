@@ -29,6 +29,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
 import org.oscarehr.app.AppOAuth1Config;
 import org.oscarehr.app.OAuth1Utils;
@@ -47,6 +48,9 @@ import oscar.oscarReport.reportByTemplate.ReportManager;
 
 @Path("/reportByTemplate")
 public class ReportByTemplateService extends AbstractServiceImpl {
+
+	private static final Logger logger = MiscUtils.getLogger();
+
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 	
@@ -80,48 +84,49 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	@GET
 	@Path("/K2AUrl/")
 	@Produces("application/json")
-	public String getK2AUrl(){
+	public RestResponse<String, String> getK2AUrl() {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "r", null)) {
-			throw new RuntimeException("Access Denied");
+			return RestResponse.errorResponse("Access Denied");
 		}
-    	
-    	String k2aUrl = null;
-    	AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
-    	if (k2aApp!=null) {
-    		try {
-            	k2aUrl = AppOAuth1Config.fromDocument(k2aApp.getConfig()).getBaseURL();
-    		} catch(Exception e) {
-    			MiscUtils.getLogger().error("Error getting K2A URL", e);
-    		}
-    	}
-		return k2aUrl;
+
+		AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
+		if (k2aApp != null) {
+			try {
+				String k2aUrl = AppOAuth1Config.fromDocument(k2aApp.getConfig()).getBaseURL();
+				return RestResponse.successResponse(k2aUrl);
+			}
+			catch (Exception e) {
+				MiscUtils.getLogger().error("Error getting K2A URL", e);
+				return RestResponse.errorResponse("Error getting K2A URL");
+			}
+		}
+		return RestResponse.errorResponse("K2A integration not set up");
 	}
 	
 	@GET
 	@Path("/allReports")
 	@Produces("application/json")
-	public String getReportByTemplatesFromK2A() {
+	public RestResponse<String, String> getReportByTemplatesFromK2A() {
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "r", null)) {
-			throw new RuntimeException("Access Denied");
+			return RestResponse.errorResponse("Access Denied");
 		}
-    	
+
 		try {
 			AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
-			if(k2aApp != null) {
-				AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(),loggedInInfo.getLoggedInProvider().getProviderNo());
-				
-				if(k2aUser != null) {
-					return OAuth1Utils.getOAuthGetResponse(loggedInInfo,k2aApp, k2aUser, "/ws/api/reportByTemplate/getReports", "/ws/api/reportByTemplate/getReports");
-				} else {
-					return null;
+			if (k2aApp != null) {
+				AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(), loggedInInfo.getLoggedInProvider().getProviderNo());
+				if (k2aUser != null) {
+					String response = OAuth1Utils.getOAuthGetResponse(loggedInInfo, k2aApp, k2aUser, "/ws/api/reportByTemplate/getReports", "/ws/api/reportByTemplate/getReports");
+					return RestResponse.successResponse(response);
 				}
-			} else {
-				return null;
 			}
-		} catch(Exception e) {
-			return null;
 		}
+		catch (Exception e) {
+			logger.error("Unexpected Error", e);
+			return RestResponse.errorResponse("Unexpected Error");
+		}
+		return RestResponse.errorResponse("User K2A integration not set up");
 	}
 	
 	@POST

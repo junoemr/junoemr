@@ -68,7 +68,7 @@ public class RSSFeedService extends AbstractServiceImpl {
 	@GET
 	@Path("/rss")
 	@Produces("application/json")
-	public org.oscarehr.ws.rest.to.RSSResponse getRSS(@QueryParam("key") String key,@QueryParam("startPoint") String startPoint, @QueryParam("numberOfRows") String numberOfRows, @Context HttpServletRequest request) {
+	public RestResponse<RSSResponse, String> getRSS(@QueryParam("key") String key,@QueryParam("startPoint") String startPoint, @QueryParam("numberOfRows") String numberOfRows, @Context HttpServletRequest request) {
 		RSSResponse response = new RSSResponse();
 		response.setTimestamp(new Date());
 		try {
@@ -84,10 +84,9 @@ public class RSSFeedService extends AbstractServiceImpl {
 		    		if(k2aUser != null) {
 		    			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		    			String jsonString = OAuth1Utils.getOAuthGetResponse(loggedInInfo,k2aApp, k2aUser, "/ws/api/posts/userFriendsRecentPosts?startingPoint=" + startPoint + "&numberOfRows=" + numberOfRows, "/ws/api/posts/userFriendsRecentPosts");
-			    		JSONArray jsonArray = new JSONArray();
-			    		
+
 			    		if(jsonString != null && !jsonString.isEmpty()) {
-			    			jsonArray = new JSONArray(jsonString);
+						    JSONArray jsonArray = new JSONArray(jsonString);
 			    			
 			    			for (int i = 0; i < jsonArray.length(); i++) {
 			    	        	JSONObject post = jsonArray.getJSONObject(i);
@@ -167,13 +166,12 @@ public class RSSFeedService extends AbstractServiceImpl {
 			    		response.getContent().add(item);
 			    	}
 	    		}
-			} else {
-				return response;
 			}
-		}catch(Exception e) {
-			logger.error("error",e);
-			return null;
 		}
-		return response;
+		catch (Exception e) {
+			logger.error("Unexpected Error", e);
+			return RestResponse.errorResponse("Unexpected Error");
+		}
+		return RestResponse.successResponse(response);
 	}
 }
