@@ -30,6 +30,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'$location',
 	'$stateParams',
 	'$state',
+	'$window',
 	'demographicService',
 	'patientDetailStatusService',
 	'securityService',
@@ -43,6 +44,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		$location,
 		$stateParams,
 		$state,
+		$window,
 		demographicService,
 		patientDetailStatusService,
 		securityService,
@@ -52,30 +54,351 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	{
 
 		var controller = this;
-
 		controller.page = {};
-		controller.page.demo = demo;
-		controller.page.dataChanged = false;
 
-		//get access rights
-		securityService.hasRight("_demographic", "r", controller.page.demo.demographicNo).then(
-			function success(results)
-			{
-				controller.page.canRead = results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		securityService.hasRight("_demographic", "u", controller.page.demo.demographicNo).then(
-			function success(results)
-			{
-				controller.page.cannotChange = !results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
+		// Global variables
+		var posExtras = {};
+		var hcParts = {};
+		var phoneNum = {};
+		var colorAttn = "#ffff99";
+		var defPhTitle = "Check to set preferred contact number";
+		var prefPhTitle = "Preferred contact number";
+		var hin0;
+		var ver0;
+		var chartNo0;
+		var cytolNum0;
+		var referralDocNo0;
+		var sin0;
+		var effDate0;
+		var hcRenewDate0;
+		var rosterDate0;
+		var rosterTerminationDate0;
+		var patientStatusDate0;
+		var dateJoined0;
+		var endDate0;
+		var onWaitingListSinceDate0;
+		var paperChartArchivedDate0;
+
+		controller.init = function init()
+		{
+			demographicService.getDemographic($stateParams.demographicNo).then(
+				function success(results)
+				{
+					console.log('new demo: ', angular.copy(results));
+					controller.page.demo = results;
+					controller.initDemographicVars();
+					controller.checkAccess();
+
+					//show notes
+					if (controller.page.demo.notes != null)
+					{
+						controller.page.demo.scrNotes = controller.page.demo.notes;
+						if (/^<unotes>[\s\S]*/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring("<unotes>".length);
+						if (/[\s\S]*<\/unotes>$/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring(0, controller.page.demo.scrNotes.lastIndexOf("</unotes>"));
+					}
+
+					//show referral doctor
+					if (controller.page.demo.familyDoctor != null)
+					{
+						var referralDoc = controller.page.demo.familyDoctor;
+						var begin = referralDoc.indexOf("<rdohip>") + "<rdohip>".length;
+						var end = referralDoc.indexOf("</rdohip>");
+						if (end > begin && end >= 0 && begin >= 0) controller.page.demo.scrReferralDocNo = referralDoc.substring(begin, end);
+
+						begin = referralDoc.indexOf("<rd>") + "<rd>".length;
+						end = referralDoc.indexOf("</rd>");
+						if (end > begin && end >= 0 && begin >= 0) controller.page.demo.scrReferralDoc = referralDoc.substring(begin, end);
+					}
+
+					if (controller.page.demo.extras != null)
+					{
+						controller.page.demo.extras = toArray(controller.page.demo.extras);
+						for (var i = 0; i < controller.page.demo.extras.length; i++)
+						{
+							if (controller.page.demo.extras[i].key == "demo_cell") controller.page.demo.scrDemoCell = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "aboriginal") controller.page.demo.scrAboriginal = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "hPhoneExt") controller.page.demo.scrHPhoneExt = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "wPhoneExt") controller.page.demo.scrWPhoneExt = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "cytolNum") controller.page.demo.scrCytolNum = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "phoneComment") controller.page.demo.scrPhoneComment = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "paper_chart_archived") controller.page.demo.scrPaperChartArchived = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "paper_chart_archived_date") controller.page.demo.scrPaperChartArchivedDate = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "usSigned") controller.page.demo.scrUsSigned = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "privacyConsent") controller.page.demo.scrPrivacyConsent = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "informedConsent") controller.page.demo.scrInformedConsent = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "securityQuestion1") controller.page.demo.scrSecurityQuestion1 = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "securityAnswer1") controller.page.demo.scrSecurityAnswer1 = controller.page.demo.extras[i].value;
+							else if (controller.page.demo.extras[i].key == "rxInteractionWarningLevel") controller.page.demo.scrRxInteractionLevel = controller.page.demo.extras[i].value;
+
+
+							//record array position of extras by keys - to be used on saving
+							posExtras[controller.page.demo.extras[i].key] = i;
+						}
+					}
+
+					//show phone numbers with preferred check
+					controller.page.demo.scrCellPhone = getPhoneNum(controller.page.demo.scrDemoCell);
+					controller.page.demo.scrHomePhone = getPhoneNum(controller.page.demo.phone);
+					controller.page.demo.scrWorkPhone = getPhoneNum(controller.page.demo.alternativePhone);
+
+					//show waitingListNames
+					if (controller.page.demo.waitingListNames != null)
+					{
+						if (controller.page.demo.waitingListNames.id != null)
+						{ //only 1 entry, convert to array
+							var tmp = {};
+							tmp.id = controller.page.demo.waitingListNames.id;
+							tmp.name = controller.page.demo.waitingListNames.name;
+							tmp.groupNo = controller.page.demo.waitingListNames.groupNo;
+							tmp.providerNo = controller.page.demo.waitingListNames.providerNo;
+							tmp.createDate = controller.page.demo.waitingListNames.createDate;
+							tmp.isHistory = controller.page.demo.waitingListNames.isHistory;
+							controller.page.demo.waitingListNames = [tmp];
+						}
+					}
+
+
+					controller.page.cellPhonePreferredMsg = defPhTitle;
+					controller.page.homePhonePreferredMsg = defPhTitle;
+					controller.page.workPhonePreferredMsg = defPhTitle;
+					if (isPreferredPhone(controller.page.demo.scrDemoCell))
+					{
+						controller.page.demo.scrPreferredPhone = "C";
+						controller.page.preferredPhoneNumber = controller.page.demo.scrCellPhone;
+						controller.page.cellPhonePreferredMsg = prefPhTitle;
+						controller.page.cellPhonePreferredColor = colorAttn;
+					}
+					else if (isPreferredPhone(controller.page.demo.phone))
+					{
+						controller.page.demo.scrPreferredPhone = "H";
+						controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
+						controller.page.homePhonePreferredMsg = prefPhTitle;
+						controller.page.homePhonePreferredColor = colorAttn;
+					}
+					else if (isPreferredPhone(controller.page.demo.alternativePhone))
+					{
+						controller.page.demo.scrPreferredPhone = "W";
+						controller.page.preferredPhoneNumber = controller.page.demo.scrWorkPhone;
+						controller.page.workPhonePreferredMsg = prefPhTitle;
+						controller.page.workPhonePreferredColor = colorAttn;
+					}
+					else
+					{
+						controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
+					}
+
+					//show demoContacts/demoContactPros
+					if (controller.page.demo.demoContacts != null)
+					{
+						controller.page.demo.demoContacts = demoContactShow(controller.page.demo.demoContacts);
+					}
+					if (controller.page.demo.demoContactPros != null)
+					{
+						controller.page.demo.demoContactPros = demoContactShow(controller.page.demo.demoContactPros);
+					}
+
+					//show doctors/nurses/midwives
+					if (controller.page.demo.doctors != null)
+					{
+						controller.page.demo.doctors = toArray(controller.page.demo.doctors);
+					}
+					if (controller.page.demo.nurses != null)
+					{
+						controller.page.demo.nurses = toArray(controller.page.demo.nurses);
+					}
+					if (controller.page.demo.midwives != null)
+					{
+						controller.page.demo.midwives = toArray(controller.page.demo.midwives);
+					}
+
+					//show referralDoc specialties & names
+					if (controller.page.demo.referralDoctors != null)
+					{
+						if (controller.page.demo.referralDoctors.id != null)
+						{ //only 1 entry, convert to array
+							var tmp = {};
+							tmp.name = controller.page.demo.referralDoctors.name;
+							tmp.referralNo = controller.page.demo.referralDoctors.referralNo;
+							tmp.specialtyType = controller.page.demo.referralDoctors.specialtyType;
+							controller.page.demo.referralDoctors = [tmp];
+						}
+						for (var i = 0; i < controller.page.demo.referralDoctors.length; i++)
+						{
+							controller.page.demo.referralDoctors[i].label = controller.page.demo.referralDoctors[i].name;
+							if (controller.page.demo.referralDoctors[i].specialtyType != null && controller.page.demo.referralDoctors[i].specialtyType != "")
+							{
+								controller.page.demo.referralDoctors[i].label += " [" + controller.page.demo.referralDoctors[i].specialtyType + "]";
+							}
+						}
+					}
+
+					controller.page.dataChanged = false;
+
+					//get static lists to be selected
+					controller.page.genders = staticDataService.getGenders();
+					controller.page.titles = staticDataService.getTitles();
+					controller.page.provinces = staticDataService.getProvinces();
+					controller.page.countries = staticDataService.getCountries();
+					controller.page.engFre = staticDataService.getEngFre();
+					controller.page.spokenlangs = staticDataService.getSpokenLanguages();
+					controller.page.rosterTermReasons = staticDataService.getRosterTerminationReasons();
+					controller.page.securityQuestions = staticDataService.getSecurityQuestions();
+					controller.page.rxInteractionLevels = staticDataService.getRxInteractionLevels();
+
+					//get patient detail status
+					patientDetailStatusService.getStatus($stateParams.demographicNo).then(
+						function success(results)
+						{
+							controller.page.macPHRLoggedIn = results.macPHRLoggedIn;
+							controller.page.macPHRIdsSet = results.macPHRIdsSet;
+							controller.page.macPHRVerificationLevel = results.macPHRVerificationLevel;
+
+							controller.page.integratorEnabled = results.integratorEnabled;
+							controller.page.integratorOffline = results.integratorOffline;
+							controller.page.integratorAllSynced = results.integratorAllSynced;
+
+							controller.page.conformanceFeaturesEnabled = results.conformanceFeaturesEnabled;
+							controller.page.workflowEnhance = results.workflowEnhance;
+							controller.page.billregion = results.billregion;
+							controller.page.defaultView = results.defaultView;
+							controller.page.hospitalView = results.hospitalView;
+
+							if (controller.page.integratorEnabled)
+							{
+								if (controller.page.integratorOffline)
+								{
+									controller.page.integratorStatusColor = "#ff5500";
+									controller.page.integratorStatusMsg = "NOTE: Integrator is not available at this time";
+								}
+								else if (!controller.page.integratorAllSynced)
+								{
+									controller.page.integratorStatusColor = "#ff5500";
+									controller.page.integratorStatusMsg = "NOTE: Integrated Community is not synced";
+								}
+							}
+
+							controller.page.billingHistoryLabel = "Invoice List";
+							if (controller.page.billregion == "ON") controller.page.billingHistoryLabel = "Billing History";
+						},
+						function error(errors)
+						{
+							console.log(errors);
+						});
+
+					//show patientStatusList & rosterStatusList values
+					controller.page.demo.patientStatusList = toArray(controller.page.demo.patientStatusList);
+					controller.page.demo.patientStatusList.unshift(
+						{
+							"value": "FI",
+							"label": "FI - Fired"
+						});
+					controller.page.demo.patientStatusList.unshift(
+						{
+							"value": "MO",
+							"label": "MO - Moved"
+						});
+					controller.page.demo.patientStatusList.unshift(
+						{
+							"value": "DE",
+							"label": "DE - Deceased"
+						});
+					controller.page.demo.patientStatusList.unshift(
+						{
+							"value": "IN",
+							"label": "IN - Inactive"
+						});
+					controller.page.demo.patientStatusList.unshift(
+						{
+							"value": "AC",
+							"label": "AC - Active"
+						});
+
+					controller.page.demo.rosterStatusList = toArray(controller.page.demo.rosterStatusList);
+					controller.page.demo.rosterStatusList.unshift(
+						{
+							"value": "FS",
+							"label": "FS - fee for service"
+						});
+					controller.page.demo.rosterStatusList.unshift(
+						{
+							"value": "TE",
+							"label": "TE - terminated"
+						});
+					controller.page.demo.rosterStatusList.unshift(
+						{
+							"value": "NR",
+							"label": "NR - not rostered"
+						});
+					controller.page.demo.rosterStatusList.unshift(
+						{
+							"value": "RO",
+							"label": "RO - rostered"
+						});
+
+					controller.formatDate("DobM"); //done on page load
+					controller.formatDate("DobD"); //done on page load
+					controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
+					controller.formatLastName(); //done on page load
+					controller.formatFirstName(); //done on page load
+					controller.setSwipeReady(); //done on page load
+					controller.validateHCSave();
+				},
+				function error(errors)
+				{
+					alert('Error loading demographic: ', errors) // TODO: Display actual error message
+				}
+			);
+
+			// controller.page.demo = demo;
+		};
+
+		controller.initDemographicVars = function initDemographicVars()
+		{
+			phoneNum["C"] = controller.page.demo.scrCellPhone;
+			phoneNum["H"] = controller.page.demo.scrHomePhone;
+			phoneNum["W"] = controller.page.demo.scrWorkPhone;
+			phoneNum["HX"] = controller.page.demo.scrHPhoneExt;
+			phoneNum["WX"] = controller.page.demo.scrWPhoneExt;
+			hin0 = controller.page.demo.hin;
+			ver0 = controller.page.demo.ver;
+			chartNo0 = controller.page.demo.chartNo;
+			cytolNum0 = controller.page.demo.scrCytolNum;
+			referralDocNo0 = controller.page.demo.scrReferralDocNo;
+			sin0 = controller.page.demo.sin;
+			effDate0 = controller.page.demo.effDate;
+			hcRenewDate0 = controller.page.demo.hcRenewDate;
+			rosterDate0 = controller.page.demo.rosterDate;
+			rosterTerminationDate0 = controller.page.demo.rosterTerminationDate;
+			patientStatusDate0 = controller.page.demo.patientStatusDate;
+			dateJoined0 = controller.page.demo.dateJoined;
+			endDate0 = controller.page.demo.endDate;
+			onWaitingListSinceDate0 = controller.page.demo.onWaitingListSinceDate;
+			paperChartArchivedDate0 = controller.page.demo.scrPaperChartArchivedDate;
+		};
+
+		controller.checkAccess = function checkAccess()
+		{
+			//get access rights
+			securityService.hasRight("_demographic", "r", controller.page.demo.demographicNo).then(
+				function success(results)
+				{
+					controller.page.canRead = results;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
+			securityService.hasRight("_demographic", "u", controller.page.demo.demographicNo).then(
+				function success(results)
+				{
+					controller.page.cannotChange = !results;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
+
+		};
 
 		// Is there a shared location where this could be accessed from any controller? i.e. a utils file
 		controller.isNaN = function(num)
@@ -94,258 +417,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 		};
 
-		//get static lists to be selected
-		controller.page.genders = staticDataService.getGenders();
-		controller.page.titles = staticDataService.getTitles();
-		controller.page.provinces = staticDataService.getProvinces();
-		controller.page.countries = staticDataService.getCountries();
-		controller.page.engFre = staticDataService.getEngFre();
-		controller.page.spokenlangs = staticDataService.getSpokenLanguages();
-		controller.page.rosterTermReasons = staticDataService.getRosterTerminationReasons();
-		controller.page.securityQuestions = staticDataService.getSecurityQuestions();
-		controller.page.rxInteractionLevels = staticDataService.getRxInteractionLevels();
-
-		//get patient detail status
-		patientDetailStatusService.getStatus(controller.page.demo.demographicNo).then(
-			function success(results)
-			{
-				controller.page.macPHRLoggedIn = results.macPHRLoggedIn;
-				controller.page.macPHRIdsSet = results.macPHRIdsSet;
-				controller.page.macPHRVerificationLevel = results.macPHRVerificationLevel;
-
-				controller.page.integratorEnabled = results.integratorEnabled;
-				controller.page.integratorOffline = results.integratorOffline;
-				controller.page.integratorAllSynced = results.integratorAllSynced;
-
-				controller.page.conformanceFeaturesEnabled = results.conformanceFeaturesEnabled;
-				controller.page.workflowEnhance = results.workflowEnhance;
-				controller.page.billregion = results.billregion;
-				controller.page.defaultView = results.defaultView;
-				controller.page.hospitalView = results.hospitalView;
-
-				if (controller.page.integratorEnabled)
-				{
-					if (controller.page.integratorOffline)
-					{
-						controller.page.integratorStatusColor = "#ff5500";
-						controller.page.integratorStatusMsg = "NOTE: Integrator is not available at this time";
-					}
-					else if (!controller.page.integratorAllSynced)
-					{
-						controller.page.integratorStatusColor = "#ff5500";
-						controller.page.integratorStatusMsg = "NOTE: Integrated Community is not synced";
-					}
-				}
-
-				controller.page.billingHistoryLabel = "Invoice List";
-				if (controller.page.billregion == "ON") controller.page.billingHistoryLabel = "Billing History";
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-
-
-		//show notes
-		if (controller.page.demo.notes != null)
-		{
-			controller.page.demo.scrNotes = controller.page.demo.notes;
-			if (/^<unotes>[\s\S]*/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring("<unotes>".length);
-			if (/[\s\S]*<\/unotes>$/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring(0, controller.page.demo.scrNotes.lastIndexOf("</unotes>"));
-		}
-
-		//show referral doctor
-		if (controller.page.demo.familyDoctor != null)
-		{
-			var referralDoc = controller.page.demo.familyDoctor;
-			var begin = referralDoc.indexOf("<rdohip>") + "<rdohip>".length;
-			var end = referralDoc.indexOf("</rdohip>");
-			if (end > begin && end >= 0 && begin >= 0) controller.page.demo.scrReferralDocNo = referralDoc.substring(begin, end);
-
-			begin = referralDoc.indexOf("<rd>") + "<rd>".length;
-			end = referralDoc.indexOf("</rd>");
-			if (end > begin && end >= 0 && begin >= 0) controller.page.demo.scrReferralDoc = referralDoc.substring(begin, end);
-		}
-
-		//show extras
-		var posExtras = {};
-		if (controller.page.demo.extras != null)
-		{
-			controller.page.demo.extras = toArray(controller.page.demo.extras);
-			for (var i = 0; i < controller.page.demo.extras.length; i++)
-			{
-				if (controller.page.demo.extras[i].key == "demo_cell") controller.page.demo.scrDemoCell = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "aboriginal") controller.page.demo.scrAboriginal = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "hPhoneExt") controller.page.demo.scrHPhoneExt = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "wPhoneExt") controller.page.demo.scrWPhoneExt = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "cytolNum") controller.page.demo.scrCytolNum = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "phoneComment") controller.page.demo.scrPhoneComment = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "paper_chart_archived") controller.page.demo.scrPaperChartArchived = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "paper_chart_archived_date") controller.page.demo.scrPaperChartArchivedDate = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "usSigned") controller.page.demo.scrUsSigned = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "privacyConsent") controller.page.demo.scrPrivacyConsent = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "informedConsent") controller.page.demo.scrInformedConsent = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "securityQuestion1") controller.page.demo.scrSecurityQuestion1 = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "securityAnswer1") controller.page.demo.scrSecurityAnswer1 = controller.page.demo.extras[i].value;
-				else if (controller.page.demo.extras[i].key == "rxInteractionWarningLevel") controller.page.demo.scrRxInteractionLevel = controller.page.demo.extras[i].value;
-
-
-				//record array position of extras by keys - to be used on saving
-				posExtras[controller.page.demo.extras[i].key] = i;
-			}
-		}
-
-		var colorAttn = "#ffff99";
-
-		//show phone numbers with preferred check
-		controller.page.demo.scrCellPhone = getPhoneNum(controller.page.demo.scrDemoCell);
-		controller.page.demo.scrHomePhone = getPhoneNum(controller.page.demo.phone);
-		controller.page.demo.scrWorkPhone = getPhoneNum(controller.page.demo.alternativePhone);
-
-		var defPhTitle = "Check to set preferred contact number";
-		var prefPhTitle = "Preferred contact number";
-
-		controller.page.cellPhonePreferredMsg = defPhTitle;
-		controller.page.homePhonePreferredMsg = defPhTitle;
-		controller.page.workPhonePreferredMsg = defPhTitle;
-		if (isPreferredPhone(controller.page.demo.scrDemoCell))
-		{
-			controller.page.demo.scrPreferredPhone = "C";
-			controller.page.preferredPhoneNumber = controller.page.demo.scrCellPhone;
-			controller.page.cellPhonePreferredMsg = prefPhTitle;
-			controller.page.cellPhonePreferredColor = colorAttn;
-		}
-		else if (isPreferredPhone(controller.page.demo.phone))
-		{
-			controller.page.demo.scrPreferredPhone = "H";
-			controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
-			controller.page.homePhonePreferredMsg = prefPhTitle;
-			controller.page.homePhonePreferredColor = colorAttn;
-		}
-		else if (isPreferredPhone(controller.page.demo.alternativePhone))
-		{
-			controller.page.demo.scrPreferredPhone = "W";
-			controller.page.preferredPhoneNumber = controller.page.demo.scrWorkPhone;
-			controller.page.workPhonePreferredMsg = prefPhTitle;
-			controller.page.workPhonePreferredColor = colorAttn;
-		}
-		else
-		{
-			controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
-		}
-
-		//show demoContacts/demoContactPros
-		if (controller.page.demo.demoContacts != null)
-		{
-			controller.page.demo.demoContacts = demoContactShow(controller.page.demo.demoContacts);
-		}
-		if (controller.page.demo.demoContactPros != null)
-		{
-			controller.page.demo.demoContactPros = demoContactShow(controller.page.demo.demoContactPros);
-		}
-
-		//show doctors/nurses/midwives
-		if (controller.page.demo.doctors != null)
-		{
-			controller.page.demo.doctors = toArray(controller.page.demo.doctors);
-		}
-		if (controller.page.demo.nurses != null)
-		{
-			controller.page.demo.nurses = toArray(controller.page.demo.nurses);
-		}
-		if (controller.page.demo.midwives != null)
-		{
-			controller.page.demo.midwives = toArray(controller.page.demo.midwives);
-		}
-
-		//show referralDoc specialties & names
-		if (controller.page.demo.referralDoctors != null)
-		{
-			if (controller.page.demo.referralDoctors.id != null)
-			{ //only 1 entry, convert to array
-				var tmp = {};
-				tmp.name = controller.page.demo.referralDoctors.name;
-				tmp.referralNo = controller.page.demo.referralDoctors.referralNo;
-				tmp.specialtyType = controller.page.demo.referralDoctors.specialtyType;
-				controller.page.demo.referralDoctors = [tmp];
-			}
-			for (var i = 0; i < controller.page.demo.referralDoctors.length; i++)
-			{
-				controller.page.demo.referralDoctors[i].label = controller.page.demo.referralDoctors[i].name;
-				if (controller.page.demo.referralDoctors[i].specialtyType != null && controller.page.demo.referralDoctors[i].specialtyType != "")
-				{
-					controller.page.demo.referralDoctors[i].label += " [" + controller.page.demo.referralDoctors[i].specialtyType + "]";
-				}
-			}
-		}
-
-		//show waitingListNames
-		if (controller.page.demo.waitingListNames != null)
-		{
-			if (controller.page.demo.waitingListNames.id != null)
-			{ //only 1 entry, convert to array
-				var tmp = {};
-				tmp.id = controller.page.demo.waitingListNames.id;
-				tmp.name = controller.page.demo.waitingListNames.name;
-				tmp.groupNo = controller.page.demo.waitingListNames.groupNo;
-				tmp.providerNo = controller.page.demo.waitingListNames.providerNo;
-				tmp.createDate = controller.page.demo.waitingListNames.createDate;
-				tmp.isHistory = controller.page.demo.waitingListNames.isHistory;
-				controller.page.demo.waitingListNames = [tmp];
-			}
-		}
-
-		//show patientStatusList & rosterStatusList values
-		controller.page.demo.patientStatusList = toArray(controller.page.demo.patientStatusList);
-		controller.page.demo.patientStatusList.unshift(
-		{
-			"value": "FI",
-			"label": "FI - Fired"
-		});
-		controller.page.demo.patientStatusList.unshift(
-		{
-			"value": "MO",
-			"label": "MO - Moved"
-		});
-		controller.page.demo.patientStatusList.unshift(
-		{
-			"value": "DE",
-			"label": "DE - Deceased"
-		});
-		controller.page.demo.patientStatusList.unshift(
-		{
-			"value": "IN",
-			"label": "IN - Inactive"
-		});
-		controller.page.demo.patientStatusList.unshift(
-		{
-			"value": "AC",
-			"label": "AC - Active"
-		});
-
-		controller.page.demo.rosterStatusList = toArray(controller.page.demo.rosterStatusList);
-		controller.page.demo.rosterStatusList.unshift(
-		{
-			"value": "FS",
-			"label": "FS - fee for service"
-		});
-		controller.page.demo.rosterStatusList.unshift(
-		{
-			"value": "TE",
-			"label": "TE - terminated"
-		});
-		controller.page.demo.rosterStatusList.unshift(
-		{
-			"value": "NR",
-			"label": "NR - not rostered"
-		});
-		controller.page.demo.rosterStatusList.unshift(
-		{
-			"value": "RO",
-			"label": "RO - rostered"
-		});
-
-
 		//----------------------//
 		// on-screen operations //
 		//----------------------//
@@ -355,7 +426,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return controller.page.demo;
 		}, function(newValue, oldValue)
 		{
-			if (newValue !== oldValue)
+			if (newValue !== oldValue && angular.isDefined(oldValue) && angular.isDefined(newValue))
 			{
 				controller.page.dataChanged = true;
 			}
@@ -368,7 +439,18 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			if (controller.page.dataChanged === true)
 			{
 				var discard = confirm("You may have unsaved data. Are you sure to leave?");
-				if (!discard) event.preventDefault();
+				if (!discard)
+				{
+					event.preventDefault();
+				} else {
+					demographicService.getDemographic($stateParams.demographicNo).then(
+						function error(errors)
+						{
+							alert('Error loading demographic: ', errors) // TODO: Display actual error message
+						}
+					);
+				
+				}
 			}
 		});
 
@@ -382,8 +464,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.demo.firstName = controller.page.demo.firstName.toUpperCase();
 		};
 
-		controller.formatLastName(); //done on page load
-		controller.formatFirstName(); //done on page load
 
 		// //calculate age
 		// var now = new Date();
@@ -410,16 +490,13 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			else
 			{
-				$("#swipecard").focus();
 				controller.page.readyForSwipe = "btn-success";
 				controller.page.swipecardMsg = "Ready for Card Swipe";
 				controller.page.swipecard = "";
 			}
 		};
-		controller.setSwipeReady(); //done on page load
 
 		//Health card verification
-		var hcParts = {};
 		controller.healthCardHandler = function healthCardHandler(keycode)
 		{
 			if (keycode == 13)
@@ -586,8 +663,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//manage hin/hinVer entries
-		var hin0 = controller.page.demo.hin;
-		var ver0 = controller.page.demo.ver;
 		controller.checkHin = function checkHin()
 		{
 			if (controller.page.demo.hcType == "ON" && controller.page.demo.hin != null && controller.page.demo.hin != "")
@@ -641,9 +716,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				controller.page.demo.dobDay = "0" + controller.page.demo.dobDay;
 			}
 		};
-		controller.formatDate("DobM"); //done on page load
-		controller.formatDate("DobD"); //done on page load
-		controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
 
 		//check Patient Status if endDate is entered
 		controller.checkPatientStatus = function checkPatientStatus()
@@ -733,7 +805,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//check Chart No (length)
-		var chartNo0 = controller.page.demo.chartNo;
 		controller.checkChartNo = function checkChartNo()
 		{
 			if (controller.page.demo.chartNo == null || controller.page.demo.chartNo == "")
@@ -746,7 +817,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//check Cytology Number
-		var cytolNum0 = controller.page.demo.scrCytolNum;
 		controller.checkCytoNum = function checkCytoNum()
 		{
 			if (controller.page.demo.scrCytolNum == null || controller.page.demo.scrCytolNum == "")
@@ -759,7 +829,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//check Referral Doctor No
-		var referralDocNo0 = controller.page.demo.scrReferralDocNo;
 		controller.checkReferralDocNo = function checkReferralDocNo()
 		{
 			if (controller.page.demo.scrReferralDocNo == null || controller.page.demo.scrReferralDocNo == "")
@@ -784,7 +853,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//check SIN
-		var sin0 = controller.page.demo.sin;
 		controller.checkSin = function checkSin()
 		{
 			if (controller.page.demo.sin == null || controller.page.demo.sin == "")
@@ -832,16 +900,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//prevent manual input dates
-		var effDate0 = controller.page.demo.effDate;
-		var hcRenewDate0 = controller.page.demo.hcRenewDate;
-		var rosterDate0 = controller.page.demo.rosterDate;
-		var rosterTerminationDate0 = controller.page.demo.rosterTerminationDate;
-		var patientStatusDate0 = controller.page.demo.patientStatusDate;
-		var dateJoined0 = controller.page.demo.dateJoined;
-		var endDate0 = controller.page.demo.endDate;
-		var onWaitingListSinceDate0 = controller.page.demo.onWaitingListSinceDate;
-		var paperChartArchivedDate0 = controller.page.demo.scrPaperChartArchivedDate;
-
 		controller.preventManualEffDate = function preventManualEffDate()
 		{
 			if (controller.page.demo.effDate == null) controller.page.demo.effDate = effDate0;
@@ -889,10 +947,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//show/hide items
+		// TODO: FIGURE OUT BETTER WAY TO SYNCHRONIZE THIS WITH DEMOGRAPHIC LOADING
 		controller.isRosterTerminated = function isRosterTerminated()
 		{
-			return (controller.page.demo.rosterStatus == "TE");
-		}
+			if(controller.page.demo !== null && controller.page.demo !== undefined)
+				return (controller.page.demo.rosterStatus === "TE");
+
+			return null;
+		};
 		controller.showReferralDocList = function showReferralDocList()
 		{
 			controller.page.showReferralDocList = !controller.page.showReferralDocList;
@@ -950,13 +1012,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 
 		//check phone numbers
-		var phoneNum = {};
-		phoneNum["C"] = controller.page.demo.scrCellPhone;
-		phoneNum["H"] = controller.page.demo.scrHomePhone;
-		phoneNum["W"] = controller.page.demo.scrWorkPhone;
-		phoneNum["HX"] = controller.page.demo.scrHPhoneExt;
-		phoneNum["WX"] = controller.page.demo.scrWPhoneExt;
-
 		controller.checkPhone = function checkPhone(type)
 		{
 			if (type == "C")
@@ -1220,8 +1275,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					});
 			}
 		};
-		controller.validateHCSave();
-
 
 		//-----------------//
 		// save operations //
@@ -1330,7 +1383,9 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		{
 			controller.page.saving = false;
 			controller.page.dataChanged = false;
-		}
+		};
+
+		controller.init(); // Initialize the controller
 	}
 ]);
 
