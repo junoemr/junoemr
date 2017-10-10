@@ -26,12 +26,16 @@
 
  */
 angular.module("Common.Services").service("reportByTemplateService", [
-	'$http', '$q',
-	function($http, $q)
+	'$http',
+	'$q',
+	'junoHttp',
+	function($http,
+	         $q,
+	         junoHttp)
 	{
 		var service = {};
 
-		service.apiPath = '../../ws/rs';
+		service.apiPath = '../ws/rs';
 
 		service.isK2AInit = function isK2AInit()
 		{
@@ -60,12 +64,8 @@ angular.module("Common.Services").service("reportByTemplateService", [
 		{
 			var deferred = $q.defer();
 
-			$http(
-			{
-				url: service.apiPath + '/reportByTemplate/allReports',
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			junoHttp.get(service.apiPath + '/reportByTemplate/allReports', config).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
@@ -106,12 +106,8 @@ angular.module("Common.Services").service("reportByTemplateService", [
 		{
 			var deferred = $q.defer();
 
-			$http(
-			{
-				url: service.apiPath + '/reportByTemplate/K2AUrl/',
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			junoHttp.get(service.apiPath + '/reportByTemplate/K2AUrl/', config).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);

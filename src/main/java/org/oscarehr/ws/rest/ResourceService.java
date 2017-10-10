@@ -36,7 +36,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 
@@ -54,7 +53,6 @@ import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.model.NotificationTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -84,35 +82,25 @@ public class ResourceService extends AbstractServiceImpl {
 	
 	@Autowired
 	private PreventionDS preventionDS;
-	
+
+	// this is duplicated in AppService for some reason.
 	@GET
 	@Path("/K2AActive/")
 	@Produces("application/json")
-	public GenericRESTResponse isK2AActive(@Context HttpServletRequest request){
+	public RestResponse<Boolean, String> isK2AActive(@Context HttpServletRequest request) {
 		String roleName$ = (String)request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
     	if(!com.quatro.service.security.SecurityManager.hasPrivilege("_admin", roleName$)  && !com.quatro.service.security.SecurityManager.hasPrivilege("_report", roleName$)) {
-    		throw new SecurityException("Insufficient Privileges");
+		    return RestResponse.errorResponse("Insufficient Privileges");
     	}
-		
-		GenericRESTResponse response = null;
-		AppDefinition appDef = appDefinitionDao.findByName("K2A");
-		if(appDef == null){
-			response = new GenericRESTResponse(false,"K2A active");
-		}else{
-			response = new GenericRESTResponse(true,"K2A not active");
-		}
-		return response;
+		return RestResponse.successResponse(appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null);
 	}
-	
-	private String getResource(LoggedInInfo loggedInInfo,String requestURI, String baseRequestURI) {
+
+	private String getK2aResource(LoggedInInfo loggedInInfo, String requestURI, String baseRequestURI) {
 		AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
-		if(k2aApp != null) {
-			AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(),loggedInInfo.getLoggedInProvider().getProviderNo());
-			
-			if(k2aUser != null) {
-				return OAuth1Utils.getOAuthGetResponse(loggedInInfo,k2aApp, k2aUser, requestURI, baseRequestURI);
-			} else {
-				return null;
+		if (k2aApp != null) {
+			AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(), loggedInInfo.getLoggedInProvider().getProviderNo());
+			if (k2aUser != null) {
+				return OAuth1Utils.getOAuthGetResponse(loggedInInfo, k2aApp, k2aUser, requestURI, baseRequestURI);
 			}
 		}
 		return null;
@@ -121,19 +109,25 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/preventionRulesList")
 	@Produces("application/json")
-	public JSONArray getPreventionRulesListFromK2A(@Context HttpServletRequest request) {
+	public RestResponse<JSONArray, String> getPreventionRulesListFromK2A(@Context HttpServletRequest request) {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null)) {
-			throw new RuntimeException("Access Denied");
+			return RestResponse.errorResponse("Access Denied");
 		}
 		JSONArray retArray = new JSONArray();
 		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-			String resource = getResource(loggedInInfo,"/ws/api/oscar/get/PREVENTION_RULES/list", "/ws/api/oscar/get/PREVENTION_RULES/list"); 
+			String resource = getK2aResource(loggedInInfo,
+					"/ws/api/oscar/get/PREVENTION_RULES/list",
+					"/ws/api/oscar/get/PREVENTION_RULES/list");
+			if(resource == null) {
+				return RestResponse.errorResponse("Failed to load Resource");
+			}
+
 			JSONArray rulesArray = JSONArray.fromObject(resource);
-			
+
 			//id  |  type  |       created_at       |       updated_at       | created_by | updated_by |       body        |      name      | private 
-			logger.info("rules json"+rulesArray);
-			for(int i = 0; i < rulesArray.size(); i++){
+			logger.info("rules json" + rulesArray);
+			for (int i = 0; i < rulesArray.size(); i++) {
 				JSONObject jobject = new JSONObject();
 				JSONObject rule = (JSONObject) rulesArray.get(i);
 				jobject.put("id", rule.getString("id"));
@@ -141,47 +135,54 @@ public class ResourceService extends AbstractServiceImpl {
 				jobject.put("rulesXML", rule.getString("body"));
 				jobject.put("created_at", rule.getString("created_at"));
 				jobject.put("author", rule.getString("author"));
-				
+
 				retArray.add(jobject);
 			}
-			
-		} catch(Exception e) {
-			logger.error("Error retrieving prevention list",e);
-			return null;
+
 		}
-		
-		
-		return retArray;
+		catch (Exception e) {
+			logger.error("Error retrieving prevention list", e);
+			return RestResponse.errorResponse("Error retrieving prevention list");
+		}
+		return RestResponse.successResponse(retArray);
 	}
 	
 	@GET
 	@Path("/currentPreventionRulesVersion")
 	@Produces("application/json")
-	public String getCurrentPreventionRulesVersion(){
+	public RestResponse<String, String> getCurrentPreventionRulesVersion() {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "w", null)) {
-			throw new RuntimeException("Access Denied");
+			return RestResponse.errorResponse("Access Denied");
 		}
-		ResourceBundle bundle = getResourceBundle();
+		try {
+			ResourceBundle bundle = getResourceBundle();
 
-		String preventionPath = OscarProperties.getInstance().getProperty("PREVENTION_FILE");
-        if ( preventionPath != null){
-        	return bundle.getString("prevention.currentrules.propertyfile");
-        }else{
-        	ResourceStorage resourceStorage = resourceStorageDao.findActive(ResourceStorage.PREVENTION_RULES);
-        	if(resourceStorage != null){
-        		return bundle.getString("prevention.currentrules.resourceStorage")+" "+resourceStorage.getResourceName();
-        	}
-        }
-        return bundle.getString("prevention.currentrules.default");
+			String preventionPath = OscarProperties.getInstance().getProperty("PREVENTION_FILE");
+			if (preventionPath != null) {
+				return RestResponse.successResponse(bundle.getString("prevention.currentrules.propertyfile"));
+			}
+			else {
+				ResourceStorage resourceStorage = resourceStorageDao.findActive(ResourceStorage.PREVENTION_RULES);
+				if (resourceStorage != null) {
+					return RestResponse.successResponse(bundle.getString("prevention.currentrules.resourceStorage") +
+							" " + resourceStorage.getResourceName());
+				}
+			}
+			return RestResponse.successResponse(bundle.getString("prevention.currentrules.default"));
+		}
+		catch (Exception e) {
+			logger.error("Unexpected Error", e);
+			return RestResponse.errorResponse("Unexpected Error");
+		}
 	}
 	
 	@POST
 	@Path("/loadPreventionRulesById/{id}")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public String addK2AReport(@PathParam("id") String id, @Context HttpServletRequest request,JSONObject jSONObject) {
+	public RestResponse<String,String> addK2AReport(@PathParam("id") String id, @Context HttpServletRequest request,JSONObject jSONObject) {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "w", null)) {
-			throw new RuntimeException("Access Denied");
+			return RestResponse.errorResponse("Access Denied");
 		}
     	
 		try {
@@ -198,7 +199,7 @@ public class ResourceService extends AbstractServiceImpl {
 			}
 			
 			
-			String resource = getResource(loggedInInfo,"/ws/api/oscar/get/PREVENTION_RULES/id/"+id, "/ws/api/oscar/get/PREVENTION_RULES/id/"+id); 
+			String resource = getK2aResource(loggedInInfo,"/ws/api/oscar/get/PREVENTION_RULES/id/"+id, "/ws/api/oscar/get/PREVENTION_RULES/id/"+id);
 			
 			if(resource !=null){
 				//JSONObject jSONObject = JSONObject.fromObject(resource);
@@ -223,97 +224,108 @@ public class ResourceService extends AbstractServiceImpl {
 				resourceStorageDao.persist(resourceStorage);
 				preventionDS.reloadRuleBase();
 			}
-			
-		} catch(Exception e) {
-			logger.error("Error saving Resource to Storage",e);
 		}
-		return null;
+		catch (Exception e) {
+			logger.error("Error saving Resource to Storage", e);
+			return RestResponse.errorResponse("Failed to save Resource to Storage");
+		}
+		return RestResponse.successResponse("Success");
 	}
-	
+
 	@GET
 	@Path("/notifications")
 	@Produces("application/json")
-	public List<NotificationTo1> getNotifications(@Context HttpServletRequest request) {
+	public RestResponse<List<NotificationTo1>, String> getNotifications(@Context HttpServletRequest request) {
 		List<NotificationTo1> list = new ArrayList<NotificationTo1>();
-		try{
+		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-			String notificationStr = getResource(loggedInInfo,"/ws/api/notification","/ws/api/notification");
+			String notificationStr = getK2aResource(loggedInInfo, "/ws/api/notification", "/ws/api/notification");
+			if(notificationStr == null) {
+				return RestResponse.errorResponse("Failed to load Resource");
+			}
 			JSONObject notifyObject = JSONObject.fromObject(notificationStr);
-			try{
-				JSONObject notifyList = notifyObject.getJSONObject("notification");
-				list.add(NotificationTo1.fromJSON(notifyList));
-			}catch(Exception e){
+
+			if(notifyObject.getInt("numberOfNotifications") > 0) {
 				JSONArray notifyArrList = notifyObject.getJSONArray("notification");
-				for(int i=0; i < notifyArrList.size();i++){
+				for (int i = 0; i < notifyArrList.size(); i++) {
 					list.add(NotificationTo1.fromJSON(notifyArrList.getJSONObject(i)));
 				}
 			}
-		}catch(Exception e){
-			logger.error("Error geting notifcations",e);
 		}
-		return list;
+		catch (Exception e) {
+			logger.error("Error loading notifications", e);
+			return RestResponse.errorResponse("Error loading notifications");
+		}
+		return RestResponse.successResponse(list);
 	}
-	
+
 	@GET
 	@Path("/notifications/number")
 	@Produces("application/json")
-	public Response getNotificationsNumber(@Context HttpServletRequest request) {
-		String k2aNoficationCount = "-";
-		try{
+	public RestResponse<String, String> getNotificationsNumber(@Context HttpServletRequest request) {
+		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-			String notificationStr = getResource(loggedInInfo,"/ws/api/notification","/ws/api/notification");
-			JSONObject notifyObject = JSONObject.fromObject(notificationStr);
-			k2aNoficationCount = notifyObject.getString("numberOfNotifications");
-		}catch(Exception e){
-			logger.error("Error geting notifcations",e);
+			String notificationStr = getK2aResource(loggedInInfo, "/ws/api/notification", "/ws/api/notification");
+			if(notificationStr != null) {
+				JSONObject notifyObject = JSONObject.fromObject(notificationStr);
+				String k2aNoficationCount = notifyObject.getString("numberOfNotifications");
+				return RestResponse.successResponse(k2aNoficationCount);
+			}
+			return RestResponse.successResponse("-");
 		}
-		return Response.ok(k2aNoficationCount).build();
+		catch (Exception e) {
+			logger.error("Error geting notifcations", e);
+			return RestResponse.errorResponse("Failed to load Notification Count");
+		}
 	}
 	
 	@POST
 	@Path("/notifications/readmore")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response getMoreInfoNotificationURL(@Context HttpServletRequest request,JSONObject jSONObject) {
-		String retval= "";
-		try{
+	public RestResponse<String, String> getMoreInfoNotificationURL(@Context HttpServletRequest request, JSONObject jSONObject) {
+		String retval = "";
+		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 			AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
-			if(k2aApp != null) {
-				AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(),loggedInInfo.getLoggedInProvider().getProviderNo());
-				
-				if(k2aUser != null) {
-					retval = OAuth1Utils.getOAuthPostResponse(loggedInInfo,k2aApp, k2aUser, "/ws/api/notification/readmore", "/ws/api/notification/readmore",OAuth1Utils.getProviderK2A(),NotificationTo1.fromJSON(jSONObject));
+			if (k2aApp != null) {
+				AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(), loggedInInfo.getLoggedInProvider().getProviderNo());
+
+				if (k2aUser != null) {
+					retval = OAuth1Utils.getOAuthPostResponse(loggedInInfo, k2aApp, k2aUser, "/ws/api/notification/readmore", "/ws/api/notification/readmore", OAuth1Utils.getProviderK2A(), NotificationTo1.fromJSON(jSONObject));
 					logger.debug(retval);
 				}
 			}
-		}catch(Exception e){
-			logger.error("ERROR:",e);
+			return RestResponse.successResponse(retval);
 		}
-		return Response.ok(retval).build();
+		catch (Exception e) {
+			logger.error("ERROR:", e);
+			return RestResponse.errorResponse("Failed to get Notification URL");
+		}
 	}
-	
+
 	@POST
-	@Path("/notifications/ack/")
+	@Path("/notifications/{id}/ack/")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response markNotificationAsAck(@PathParam("id") String id, @Context HttpServletRequest request,JSONObject jSONObject) {
-		String retval= "";
-		try{
+	public RestResponse<String, String> markNotificationAsAck(@PathParam("id") String id, @Context HttpServletRequest request, JSONObject jSONObject) {
+		String retval = "";
+		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 			AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
-			if(k2aApp != null) {
-				AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(),loggedInInfo.getLoggedInProvider().getProviderNo());
-				
-				if(k2aUser != null) {
-					retval = OAuth1Utils.getOAuthPostResponse(loggedInInfo,k2aApp, k2aUser, "/ws/api/notification/ack", "/ws/api/notification/ack",OAuth1Utils.getProviderK2A(),NotificationTo1.fromJSON(jSONObject));
+			if (k2aApp != null) {
+				AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(), loggedInInfo.getLoggedInProvider().getProviderNo());
+
+				if (k2aUser != null) {
+					retval = OAuth1Utils.getOAuthPostResponse(loggedInInfo, k2aApp, k2aUser, "/ws/api/notification/ack", "/ws/api/notification/ack", OAuth1Utils.getProviderK2A(), NotificationTo1.fromJSON(jSONObject));
 					logger.debug(retval);
 				}
 			}
-		}catch(Exception e){
-			logger.error("ERROR:",e);
+			return RestResponse.successResponse(retval);
 		}
-		return Response.ok(retval).build();
+		catch (Exception e) {
+			logger.error("ERROR:", e);
+			return RestResponse.errorResponse("Failed to mark as Acknowledged");
+		}
 	}
-	
 }

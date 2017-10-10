@@ -26,10 +26,10 @@
 
  */
 
-// Remove this?
 angular.module("Common.Services").service("k2aService", [
-	'$http', '$q',
-	function($http, $q)
+	'$q',
+	'junoHttp',
+	function($q, junoHttp)
 	{
 		var service = {};
 
@@ -38,22 +38,18 @@ angular.module("Common.Services").service("k2aService", [
 		service.getK2aFeed = function getK2aFeed(startPoint, numberOfRows)
 		{
 			var deferred = $q.defer();
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.params = {
+				key:'k2a',
+				startPoint:encodeURIComponent(startPoint),
+				numberOfRows:encodeURIComponent(numberOfRows)
+			};
 
-			$http(
-			{
-				url: service.apiPath + '/rssproxy/rss?key=k2a&startPoint=' +
-					encodeURIComponent(startPoint) +
-					'&numberOfRows=' +
-					encodeURIComponent(numberOfRows),
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(response)
-				{
+			junoHttp.get(service.apiPath + '/rssproxy/rss', config).then(
+				function success(response) {
 					deferred.resolve(response.data);
 				},
-				function error(error)
-				{
+				function error(error) {
 					console.log("k2aService::getK2aFeed error", error);
 					deferred.reject("An error occured while getting k2a content");
 				});
@@ -63,13 +59,9 @@ angular.module("Common.Services").service("k2aService", [
 		service.isK2AInit = function isK2AInit()
 		{
 			var deferred = $q.defer();
+			var config = Juno.Common.ServiceHelper.configHeaders();
 
-			$http(
-			{
-				url: service.apiPath + '/app/K2AActive',
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
+			junoHttp.get(service.apiPath + '/app/K2AActive', config).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -86,9 +78,11 @@ angular.module("Common.Services").service("k2aService", [
 		service.initK2A = function initK2A(clinicName)
 		{
 			var deferred = $q.defer();
+			var transferObj = {
+				name: clinicName
+			};
 
-			$http.post(service.apiPath + '/app/K2AInit',
-				clinicName, Juno.Common.ServiceHelper.configHeaders()).then(
+			junoHttp.post(service.apiPath + '/app/K2AInit', transferObj).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -107,9 +101,9 @@ angular.module("Common.Services").service("k2aService", [
 			var deferred = $q.defer();
 
 			var commentItem = {
-				post
+				post:post
 			};
-			$http.post(service.apiPath + '/app/comment', commentItem).then(
+			junoHttp.post(service.apiPath + '/app/comment', commentItem).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -127,8 +121,7 @@ angular.module("Common.Services").service("k2aService", [
 		{
 			var deferred = $q.defer();
 
-			$http.delete(service.apiPath + '/app/comment/' +
-				encodeURIComponent(commentId)).then(
+			junoHttp.del(service.apiPath + '/app/comment/' + encodeURIComponent(commentId)).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -146,7 +139,8 @@ angular.module("Common.Services").service("k2aService", [
 		{
 			var deferred = $q.defer();
 
-			$http.get(service.apiPath + '/resources/preventionRulesList').then(
+			junoHttp.get(service.apiPath + '/resources/preventionRulesList',
+				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -164,8 +158,8 @@ angular.module("Common.Services").service("k2aService", [
 		{
 			var deferred = $q.defer();
 
-			$http.post(service.apiPath + '/resources/loadPreventionRulesById/' +
-				encodeURIComponent(id.id), id, Juno.Common.ServiceHelper.configHeaders()).then(
+			junoHttp.post(service.apiPath + '/resources/loadPreventionRulesById/' +
+				encodeURIComponent(id.id), id).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -182,7 +176,8 @@ angular.module("Common.Services").service("k2aService", [
 		service.getCurrentPreventionRulesVersion = function getCurrentPreventionRulesVersion()
 		{
 			var deferred = $q.defer();
-			$http.get(service.apiPath + '/resources/currentPreventionRulesVersion').then(
+			junoHttp.get(service.apiPath + '/resources/currentPreventionRulesVersion',
+				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -199,7 +194,8 @@ angular.module("Common.Services").service("k2aService", [
 		service.getNotifications = function getNotifications()
 		{
 			var deferred = $q.defer();
-			$http.get(service.apiPath + '/resources/notifications').then(
+			junoHttp.get(service.apiPath + '/resources/notifications',
+				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -207,7 +203,7 @@ angular.module("Common.Services").service("k2aService", [
 				function error(error)
 				{
 					console.log("k2aService::getNotifications error", error);
-					deferred.reject("An error occured while trying to getCurrentPreventionRulesVersion");
+					deferred.reject("An error occured while trying to getNotifications");
 				});
 
 			return deferred.promise;
@@ -217,7 +213,7 @@ angular.module("Common.Services").service("k2aService", [
 		{
 			var deferred = $q.defer();
 
-			$http.post(service.apiPath + '/resources/notifications/readmore',
+			junoHttp.post(service.apiPath + '/resources/notifications/readmore',
 				id, Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(response)
 				{
@@ -235,8 +231,8 @@ angular.module("Common.Services").service("k2aService", [
 		service.ackNotification = function ackNotification(id)
 		{
 			var deferred = $q.defer();
-			$http.post(service.apiPath + '/resources/notifications/ack',
-				id, Juno.Common.ServiceHelper.configHeaders()).then(
+			junoHttp.post(service.apiPath + '/resources/notifications/' + id + '/ack',
+				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);

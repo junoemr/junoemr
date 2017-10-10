@@ -59,8 +59,10 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
         };
         console.log('TABLE PARAMS', NgTableParams);
         controller.me = null;
+        controller.k2aActive = false;
+	    controller.k2aFeedActive = false;
 
-        controller.busyLoadingData = false;
+	    controller.busyLoadingData = false;
 
         personaService.getDashboardPreferences().then(
             function success(results)
@@ -131,110 +133,119 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
             }
         };
 
-        // Remove?
-        controller.loadMoreK2aFeed = function()
-        {
-            controller.updateFeed(controller.k2afeed.length, 10);
-        };
 
-        controller.authenticateK2A = function(id)
-        {
-            window.open('../apps/oauth1.jsp?id=' + id, 'appAuth', 'width=700,height=450');
-        };
+	    controller.updateK2aActive = function ()
+	    {
+		    k2aService.isK2AInit().then(
+			    function success(data)
+			    {
+				    controller.k2aActive = data;
+			    }
+		    );
+	    };
+	    controller.loadMoreK2aFeed = function ()
+	    {
+		    controller.updateFeed(controller.k2afeed.length, 10);
+	    };
 
-        controller.agreeWithK2aPost = function(item)
-        {
-            if (item.agree)
-            {
-                k2aService.removeK2AComment(item.agreeId).then(
-                    function(response)
-                    {
-                        item.agree = false;
-                        item.agreeCount--;
-                        item.agreeId = '';
-                    },
-                    function(reason)
-                    {
-                        alert(reason);
-                    });
-            }
-            else if (!(item.agree || item.disagree))
-            {
-                if (typeof item.newComment === 'undefined')
-                {
-                    item.newComment = {};
-                }
-                item.newComment.agree = true;
-                item.newComment.body = '';
+	    controller.authenticateK2A = function (id)
+	    {
+		    window.open('../apps/oauth1.jsp?id=' + id, 'appAuth', 'width=700,height=450');
+	    };
 
-                controller.commentOnK2aPost(item);
-            }
-        };
+	    controller.agreeWithK2aPost = function (item)
+	    {
+		    if (item.agree)
+		    {
+			    k2aService.removeK2AComment(item.agreeId).then(
+				    function (response)
+				    {
+					    item.agree = false;
+					    item.agreeCount--;
+					    item.agreeId = '';
+				    },
+				    function (reason)
+				    {
+					    alert(reason);
+				    });
+		    }
+		    else if (!(item.agree || item.disagree))
+		    {
+			    if (typeof item.newComment === 'undefined')
+			    {
+				    item.newComment = {};
+			    }
+			    item.newComment.agree = true;
+			    item.newComment.body = '';
 
-        controller.disagreeWithK2aPost = function(item)
-        {
-            if (item.disagree)
-            {
-                k2aService.removeK2AComment(item.agreeId).then(
-                    function(response)
-                    {
-                        item.disagree = false;
-                        item.disagreeCount--;
-                        item.agreeId = '';
-                    },
-                    function(reason)
-                    {
-                        alert(reason);
-                    });
-            }
-            if (!(item.agree || item.disagree))
-            {
-                if (typeof item.newComment === 'undefined')
-                {
-                    item.newComment = {};
-                }
-                item.newComment.agree = false;
-                item.newComment.body = '';
+			    controller.commentOnK2aPost(item);
+		    }
+	    };
 
-                controller.commentOnK2aPost(item);
-            }
-        };
+	    controller.disagreeWithK2aPost = function (item)
+	    {
+		    if (item.disagree)
+		    {
+			    k2aService.removeK2AComment(item.agreeId).then(
+				    function (response)
+				    {
+					    item.disagree = false;
+					    item.disagreeCount--;
+					    item.agreeId = '';
+				    },
+				    function (reason)
+				    {
+					    alert(reason);
+				    });
+		    }
+		    if (!(item.agree || item.disagree))
+		    {
+			    if (typeof item.newComment === 'undefined')
+			    {
+				    item.newComment = {};
+			    }
+			    item.newComment.agree = false;
+			    item.newComment.body = '';
 
-        controller.commentOnK2aPost = function(item)
-        {
-            item.newComment.postId = item.id;
-            k2aService.postK2AComment(item.newComment).then(
-                function(response)
-                {
-                    item.newComment.body = '';
-                    item.newComment.agree = '';
-                    item.agreeId = response.agreeId;
-                    if (!(typeof response.post[0].agree === 'undefined'))
-                    {
-                        if (response.post[0].agree)
-                        {
-                            item.agree = true;
-                            item.agreeId = response.post[0].agreeId;
-                            item.agreeCount++;
-                        }
-                        else
-                        {
-                            item.disagree = true;
-                            item.agreeId = response.post[0].agreeId;
-                            item.disagreeCount++;
-                        }
-                    }
-                    else
-                    {
-                        item.commentCount++;
-                        item.comments.unshift(response.post[0]);
-                    }
-                },
-                function(reason)
-                {
-                    alert(reason);
-                });
-        };
+			    controller.commentOnK2aPost(item);
+		    }
+	    };
+
+	    controller.commentOnK2aPost = function (item)
+	    {
+		    item.newComment.postId = item.id;
+		    k2aService.postK2AComment(item.newComment).then(
+			    function (response)
+			    {
+				    item.newComment.body = '';
+				    item.newComment.agree = '';
+				    item.agreeId = response.agreeId;
+				    if (!(typeof response.post[0].agree === 'undefined'))
+				    {
+					    if (response.post[0].agree)
+					    {
+						    item.agree = true;
+						    item.agreeId = response.post[0].agreeId;
+						    item.agreeCount++;
+					    }
+					    else
+					    {
+						    item.disagree = true;
+						    item.agreeId = response.post[0].agreeId;
+						    item.disagreeCount++;
+					    }
+				    }
+				    else
+				    {
+					    item.commentCount++;
+					    item.comments.unshift(response.post[0]);
+				    }
+			    },
+			    function (reason)
+			    {
+				    alert(reason);
+			    });
+	    };
 
         controller.updateTicklers = function updateTicklers()
         {
@@ -329,7 +340,6 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
                 });
         };
 
-        // Remove?
         controller.updateFeed = function updateFeed(startPoint, numberOfRows)
         {
             if (controller.busyLoadingData) return;
@@ -337,45 +347,46 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
             k2aService.getK2aFeed(startPoint, numberOfRows).then(
                 function(response)
                 {
-                    if (response.post == null)
-                    {
-                        return;
-                    }
+                	console.log("k2a feed response", response);
 
-                    if (response.post instanceof Array)
-                    {
-                        for (var i = 0; i < response.post.length; i++)
-                        {
-                            if (!Array.isArray(response.post[i].comments))
-                            {
-                                var arr = new Array();
-                                arr[0] = response.post[i].comments;
-                                response.post[i].comments = arr;
-                            }
-                        }
-                        if (typeof controller.k2afeed === 'undefined')
-                        {
-                            controller.k2afeed = response.post;
-                        }
-                        else
-                        {
-                            controller.k2afeed = controller.k2afeed.concat(response.post);
-                        }
-                        controller.busyLoadingData = false;
-                    }
-                    else
-                    {
-                        if (response.post.authenticatek2a)
-                        {
-                            controller.authenticatek2a = response.post.description;
-                        }
-                        else
-                        {
-                            var arr = new Array();
-                            arr[0] = response.post;
-                            controller.k2afeed = arr;
-                        }
-                    }
+	                if (response.content instanceof Array)
+	                {
+	                	var content = response.content;
+		                for (var i = 0; i < content.length; i++)
+		                {
+			                if (!Array.isArray(content[i].comments))
+			                {
+				                var arr = new Array();
+				                arr[0] = content[i].comments;
+				                content[i].comments = arr;
+			                }
+		                }
+		                if (typeof controller.k2afeed === 'undefined')
+		                {
+			                controller.k2afeed = content;
+		                }
+		                else
+		                {
+			                controller.k2afeed = controller.k2afeed.concat(content);
+		                }
+		                controller.k2aFeedActive = true;
+		                controller.busyLoadingData = false;
+	                }
+	                else
+	                {
+		                if (response.content.authenticatek2a)
+		                {
+			                controller.authenticatek2a = response.content.description;
+		                }
+		                else
+		                {
+			                var arr = new Array();
+			                arr[0] = response.content;
+			                controller.k2afeed = arr;
+			                controller.k2aFeedActive = true;
+		                }
+	                }
+
                 },
                 function(reason)
                 {
@@ -390,6 +401,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
             controller.updateMessages();
             controller.updateReports();
             controller.updateFeed(0, 10);
+            controller.updateK2aActive();
 
         };
 
