@@ -433,7 +433,15 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		}, true);
 
-		//remind user of unsaved data
+		$window.onbeforeunload = function ()
+		{
+			if (controller.page.dataChanged === true)
+			{
+				return 'You have made changes to a note, but you did not save them yet.\nLeaving the page will revert all changes.';
+			}
+		};
+
+		// Warn user about unsaved data before a state change
 		$scope.$on("$stateChangeStart", function(event)
 		{
 			if (controller.page.dataChanged === true)
