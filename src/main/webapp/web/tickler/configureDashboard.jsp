@@ -42,7 +42,7 @@
 							type="radio">
 						Enable
 					</label>
-					<label class="radio-inline" for="radios-1">
+					<label class="radio-inline" for="radios-per-1">
 						<input ng-model="ticklerConfigureCtrl.prefs.expiredTicklersOnly" 
 							name="radios-per-0" 
 							id="radios-per-1" 
