@@ -141,6 +141,8 @@ public class SummaryItemTo1 {
 	public void setIndicatorClass(String indicatorClass) {
 		this.indicatorClass = indicatorClass;
 	}
+
+	public String getIndicatorClass(){ return indicatorClass; }
 	
 	public String getWarning() {
 		return warning;
