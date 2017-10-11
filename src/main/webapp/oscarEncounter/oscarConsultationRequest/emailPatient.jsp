@@ -45,6 +45,9 @@
 <%@page import="java.util.Date" %>
 <%@page import="org.apache.commons.io.IOUtils" %>
 <%@page import="org.apache.velocity.VelocityContext" %>
+<%@ page import="java.io.File" %>
+<%@ page import="java.io.FileInputStream" %>
+<%@ page import="org.apache.log4j.Logger" %>
 
 <%
 	ConsultationRequestDao consultationRequestDao = (ConsultationRequestDao) SpringUtils.getBean("consultationRequestDao");
@@ -65,6 +68,7 @@
 			</tr>
 		</table>
 		<%
+			Logger logger = MiscUtils.getLogger();
 
 			boolean sentEmail = false;
 			String emailAddress = "";
@@ -111,6 +115,14 @@
 					throw new IllegalArgumentException("Application is misconfigured to send email.");
 				}
 
+				String templateFolder = props.getProperty("template_file_location");
+				String detailsTemplateTxt = props.getProperty("email.consult_request_details_template.txt");
+				String detailsTemplateHtml = props.getProperty("email.consult_request_details_template.html");
+				if (templateFolder == null || (detailsTemplateTxt == null && detailsTemplateHtml == null))
+				{
+					throw new IllegalArgumentException("Application email templates misconfigured.");
+				}
+
 				Calendar apptTime = Calendar.getInstance();
 				apptTime.setTime(consultRequest.getAppointmentTime());
 
@@ -127,9 +139,6 @@
 					specialistFullName += " " + specialist.getProfessionalLetters();
 				}
 
-				InputStream templateInputStream = ConsultationRequest.class.getResourceAsStream("/consultation_request_details_email_template.txt");
-				String emailTemplate = IOUtils.toString(templateInputStream);
-
 				VelocityContext velocityContext = VelocityUtils.createVelocityContextWithTools();
 				velocityContext.put("consultRequest", consultRequest);
 				velocityContext.put("demographic", demo);
@@ -138,10 +147,48 @@
 				velocityContext.put("specialistFullName", specialistFullName);
 				velocityContext.put("service", service);
 
-				String emailBody = VelocityUtils.velocityEvaluate(velocityContext, emailTemplate);
+				String emailBodyTxt = null;
+				String emailBodyHtml = null;
+				if (detailsTemplateTxt != null)
+				{
+					File templateFile = new File(templateFolder, detailsTemplateTxt);
+					if (templateFile.exists() && templateFile.isFile())
+					{
+						InputStream templateInputStream = new FileInputStream(templateFile);
+						String emailTemplate = IOUtils.toString(templateInputStream);
+						emailBodyTxt = VelocityUtils.velocityEvaluate(velocityContext, emailTemplate);
+						templateInputStream.close();
+					}
+					else
+					{
+						logger.warn("Missing template file: " + templateFile.getPath());
+					}
+				}
+				if (detailsTemplateHtml != null)
+				{
+					File templateFile = new File(templateFolder, detailsTemplateHtml);
+					if (templateFile.exists() && templateFile.isFile())
+					{
+						InputStream templateInputStream = new FileInputStream(templateFile);
+						String emailTemplate = IOUtils.toString(templateInputStream);
+						emailBodyHtml = VelocityUtils.velocityEvaluate(velocityContext, emailTemplate);
+						templateInputStream.close();
+					}
+					else
+					{
+						logger.warn("Missing template file: " + templateFile.getPath());
+					}
+				}
 
-				EmailUtils.sendEmail(emailAddress, fullName, fromEmail, fromName, subject, emailBody, null);
-				sentEmail = true;
+				// don't send blank emails
+				if (!(emailBodyTxt == null && emailBodyHtml == null))
+				{
+					EmailUtils.sendEmail(emailAddress, fullName, fromEmail, fromName, subject, emailBodyTxt, emailBodyHtml);
+					sentEmail = true;
+				}
+				else {
+					logger.error("Email failed to send: no available templates");
+				}
 
 			}
 			catch (Exception e)
