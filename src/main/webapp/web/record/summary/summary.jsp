@@ -91,7 +91,10 @@
 				<ul>
 					<li ng-repeat="item in mod.summaryItem | limitTo: mod.displaySize">
 						<span class="pull-right">{{item.date | date : 'dd MMM yyyy'}}</span>
-						<a ng-click="summaryCtrl.gotoState(item,mod,item.id)" href="javascript:void(0)" ng-class="item.indicatorClass">
+						<a ng-click="summaryCtrl.gotoState(item,mod,item.id)"
+						   href="javascript:void(0)"
+						   ng-class="item.indicatorClass"
+						   title="{{item.displayName}} {{item.warning}}">
 							{{item.displayName | limitTo: 34 }} {{item.displayName.length > 34 ? '...' : '' }}
 							<small ng-show="item.classification">({{item.classification}})</small>
 						</a>
