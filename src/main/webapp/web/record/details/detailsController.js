@@ -84,7 +84,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			demographicService.getDemographic($stateParams.demographicNo).then(
 				function success(results)
 				{
-					console.log('new demo: ', angular.copy(results));
 					controller.page.demo = results;
 					controller.initDemographicVars();
 					controller.checkAccess();
