@@ -24,9 +24,9 @@
 
 --%>
 
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
+<%@ include file="/common/webAppContextAndSuperMgr.jsp" %>
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@page import="org.oscarehr.common.dao.ConsultationRequestDao" %>
 <%@page import="org.oscarehr.common.dao.ConsultationServiceDao" %>
@@ -47,138 +47,155 @@
 <%@page import="org.apache.velocity.VelocityContext" %>
 
 <%
-  ConsultationRequestDao consultationRequestDao = (ConsultationRequestDao)SpringUtils.getBean("consultationRequestDao");
-  ConsultationServiceDao consultationServiceDao = (ConsultationServiceDao)SpringUtils.getBean("consultationServiceDao");
-  DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
+	ConsultationRequestDao consultationRequestDao = (ConsultationRequestDao) SpringUtils.getBean("consultationRequestDao");
+	ConsultationServiceDao consultationServiceDao = (ConsultationServiceDao) SpringUtils.getBean("consultationServiceDao");
+	DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
 %>
 <html:html locale="true">
-<head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-</head>
+	<head>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	</head>
 
-<body background="../images/gray_bg.jpg" bgproperties="fixed">
-<center>
-<table border="0" cellspacing="0" cellpadding="0" width="90%">
-  <tr bgcolor="#486ebd">
-    <th align="CENTER"><font face="Helvetica" color="#FFFFFF">
-    <bean:message key="oscarEncounter.oscarConsultationRequest.msgMainLabel" /></font></th>
-  </tr>
-</table>
-<%
+	<body background="../images/gray_bg.jpg" bgproperties="fixed">
+	<center>
+		<table border="0" cellspacing="0" cellpadding="0" width="90%">
+			<tr bgcolor="#486ebd">
+				<th align="CENTER"><font face="Helvetica" color="#FFFFFF">
+					<bean:message key="oscarEncounter.oscarConsultationRequest.msgMainLabel"/></font></th>
+			</tr>
+		</table>
+		<%
 
-  boolean sentEmail = false;
-  String emailAddress = "";
-  String errorMsg = "";
-  String statusMsg = "";
-  ConsultationRequest consultRequest = null;
+			boolean sentEmail = false;
+			String emailAddress = "";
+			String errorMsg = "";
+			String statusMsg = "";
+			ConsultationRequest consultRequest = null;
 
-  try {
+			try
+			{
 
-    String consult_request_id = (String)request.getAttribute("consult_request_id");
-    if(consult_request_id == null) {
-      throw new IllegalArgumentException("Unable to find consultation request ID");
-    }
+				String consult_request_id = (String) request.getAttribute("consult_request_id");
+				if (consult_request_id == null)
+				{
+					throw new IllegalArgumentException("Unable to find consultation request ID");
+				}
 
-    consultRequest = consultationRequestDao.find(Integer.parseInt(consult_request_id));
-    Demographic demo = demographicDao.getDemographic(String.valueOf(consultRequest.getDemographicId()));
-    ProfessionalSpecialist specialist = consultRequest.getProfessionalSpecialist();
-    ConsultationServices service = consultationServiceDao.find(consultRequest.getServiceId());
+				consultRequest = consultationRequestDao.find(Integer.parseInt(consult_request_id));
+				Demographic demo = demographicDao.getDemographic(String.valueOf(consultRequest.getDemographicId()));
+				ProfessionalSpecialist specialist = consultRequest.getProfessionalSpecialist();
+				ConsultationServices service = consultationServiceDao.find(consultRequest.getServiceId());
 
-    emailAddress = demo.getEmail();
-    String fullName = demo.getFormattedName();
+				emailAddress = demo.getEmail();
+				String fullName = demo.getFormattedName();
 
-    if(emailAddress == null || emailAddress.trim().equals("")) {
-      throw new IllegalArgumentException("No email address found.");
-    }
+				if (emailAddress == null || emailAddress.trim().equals(""))
+				{
+					throw new IllegalArgumentException("No email address found.");
+				}
 
-    if (!EmailUtils.isValidEmailAddress(emailAddress)) {
-      throw new IllegalArgumentException("Email Address '" + emailAddress + "' is invalid");
-    }
+				if (!EmailUtils.isValidEmailAddress(emailAddress))
+				{
+					throw new IllegalArgumentException("Email Address '" + emailAddress + "' is invalid");
+				}
 
-    OscarProperties props = OscarProperties.getInstance();
+				OscarProperties props = OscarProperties.getInstance();
 
-    String fromEmail = props.getProperty("appointment_reminder_from_email_address");
-    String fromName = props.getProperty("appointment_reminder_from_name");
-    String subject = props.getProperty("appointment_reminder_subject");
-    String dateFormat = props.getProperty("appointment_reminder_appt_date_format_java");
+				String fromEmail = props.getProperty("appointment_reminder_from_email_address");
+				String fromName = props.getProperty("appointment_reminder_from_name");
+				String subject = props.getProperty("appointment_reminder_subject");
+				String dateFormat = props.getProperty("appointment_reminder_appt_date_format_java");
 
-    if(fromEmail == null || fromName == null || subject == null || dateFormat == null) {
-      throw new IllegalArgumentException("Application is misconfigured to send email.");
-    }
+				if (fromEmail == null || fromName == null || subject == null || dateFormat == null)
+				{
+					throw new IllegalArgumentException("Application is misconfigured to send email.");
+				}
 
-    Calendar apptTime = Calendar.getInstance();
-    apptTime.setTime(consultRequest.getAppointmentTime());
+				Calendar apptTime = Calendar.getInstance();
+				apptTime.setTime(consultRequest.getAppointmentTime());
 
-    Calendar apptDate = Calendar.getInstance();
-    apptDate.setTime(consultRequest.getAppointmentDate());
-    apptDate.set(Calendar.HOUR_OF_DAY, apptTime.get(Calendar.HOUR_OF_DAY));
-    apptDate.set(Calendar.MINUTE, apptTime.get(Calendar.MINUTE));
+				Calendar apptDate = Calendar.getInstance();
+				apptDate.setTime(consultRequest.getAppointmentDate());
+				apptDate.set(Calendar.HOUR_OF_DAY, apptTime.get(Calendar.HOUR_OF_DAY));
+				apptDate.set(Calendar.MINUTE, apptTime.get(Calendar.MINUTE));
 
-    String formattedApptDate = DateUtils.format(dateFormat, apptDate.getTime(), null);
+				String formattedApptDate = DateUtils.format(dateFormat, apptDate.getTime(), null);
 
-    String specialistFullName = "Dr. " + specialist.getFirstName() + " " + specialist.getLastName();
-    if(specialist.getProfessionalLetters() != null && specialist.getProfessionalLetters().length() > 0) {
-      specialistFullName += " " + specialist.getProfessionalLetters();
-    }
+				String specialistFullName = "Dr. " + specialist.getFirstName() + " " + specialist.getLastName();
+				if (specialist.getProfessionalLetters() != null && specialist.getProfessionalLetters().length() > 0)
+				{
+					specialistFullName += " " + specialist.getProfessionalLetters();
+				}
 
-    InputStream templateInputStream = ConsultationRequest.class.getResourceAsStream("/consultation_request_details_email_template.txt");
-    String emailTemplate = IOUtils.toString(templateInputStream);
+				InputStream templateInputStream = ConsultationRequest.class.getResourceAsStream("/consultation_request_details_email_template.txt");
+				String emailTemplate = IOUtils.toString(templateInputStream);
 
-    VelocityContext velocityContext = VelocityUtils.createVelocityContextWithTools();
-    velocityContext.put("consultRequest", consultRequest);
-    velocityContext.put("demographic", demo);
-    velocityContext.put("specialist", specialist);
-    velocityContext.put("appointmentDateTime", formattedApptDate);
-    velocityContext.put("specialistFullName", specialistFullName);
-    velocityContext.put("service", service);
+				VelocityContext velocityContext = VelocityUtils.createVelocityContextWithTools();
+				velocityContext.put("consultRequest", consultRequest);
+				velocityContext.put("demographic", demo);
+				velocityContext.put("specialist", specialist);
+				velocityContext.put("appointmentDateTime", formattedApptDate);
+				velocityContext.put("specialistFullName", specialistFullName);
+				velocityContext.put("service", service);
 
-    String emailBody = VelocityUtils.velocityEvaluate(velocityContext, emailTemplate);
+				String emailBody = VelocityUtils.velocityEvaluate(velocityContext, emailTemplate);
 
-    EmailUtils.sendEmail(emailAddress, fullName, fromEmail, fromName, subject, emailBody, null);
-    sentEmail = true;
+				EmailUtils.sendEmail(emailAddress, fullName, fromEmail, fromName, subject, emailBody, null);
+				sentEmail = true;
 
-  } catch (Exception e) {
-    MiscUtils.getLogger().error("Unable to email consultation request reminder", e);
-    errorMsg = e.getMessage();
-  }
+			}
+			catch (Exception e)
+			{
+				MiscUtils.getLogger().error("Unable to email consultation request reminder", e);
+				errorMsg = e.getMessage();
+			}
 
-  if (sentEmail) {
+			if (sentEmail)
+			{
 
-    try {
-      // update the status of the consultation request to 4 (Completed)
-      consultRequest.setStatus("4");
-      consultationRequestDao.merge(consultRequest);
+				try
+				{
+					// update the status of the consultation request to 4 (Completed)
+					consultRequest.setStatus("4");
+					consultationRequestDao.merge(consultRequest);
 
-      statusMsg = "Status updated to 'Completed'";
+					statusMsg = "Status updated to 'Completed'";
 
-    } catch (Exception e) {
-      MiscUtils.getLogger().error("Unable to update consultation request status", e);
-      statusMsg = "Error updating status to 'Completed': " + e.getMessage();
-    }
+				}
+				catch (Exception e)
+				{
+					MiscUtils.getLogger().error("Unable to update consultation request status", e);
+					statusMsg = "Error updating status to 'Completed': " + e.getMessage();
+				}
 
-%>
-<p>
-<h1><bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailSuccess" /></h1>
-<h3><%= emailAddress %></h3>
-<h3><%= statusMsg %></h3>
+		%>
+		<p>
+		<h1><bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailSuccess"/></h1>
+		<h3><%= emailAddress %>
+		</h3>
+		<h3><%= statusMsg %>
+		</h3>
 
-<%
-  } else {
-%>
+		<%
+		}
+		else
+		{
+		%>
 
-<p>
-<h1><bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailFailure" /></h1>
-<h3><%= errorMsg %></h3>
+		<p>
+		<h1><bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailFailure"/></h1>
+		<h3><%= errorMsg %>
+		</h3>
 
-<%
-  }
-%>
+		<%
+			}
+		%>
 
-<p></p>
-<hr width="90%"/>
-<form>
-<input type="button" value="<bean:message key="global.btnClose"/>" onClick="window.close();">
-</form>
-</center>
-</body>
+		<p></p>
+		<hr width="90%"/>
+		<form>
+			<input type="button" value="<bean:message key="global.btnClose"/>" onClick="window.close();">
+		</form>
+	</center>
+	</body>
 </html:html>
