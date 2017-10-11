@@ -57,7 +57,9 @@
 </div>
   
 <div class="modal-footer">
-	<button class="btn btn-default" ng-click="ticklerConfigureCtrl.close()"><bean:message key="global.close" bundle="ui"/></button>
+	<button class="btn btn-default" ng-click="ticklerConfigureCtrl.close()">
+		<bean:message key="global.close" bundle="ui"/>
+	</button>
 	<button class="btn btn-success" ng-click="ticklerConfigureCtrl.save()">Save Changes</button>
 </div>
 
