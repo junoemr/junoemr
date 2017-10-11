@@ -209,15 +209,20 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
+		$scope.$on('$destroy', function() {
+			delete $window.onbeforeunload;
+		});
+
 		// Warn user about unsaved data before a state change
 		$scope.$on("$stateChangeStart", function(event, data)
 		{
 			// If the encounter note is not null/undefined and the new state is not a child of record, continue
-			if (Juno.Common.Util.isDefinedAndNotNull(controller.page.encounterNote) && controller.page.isNoteSaved === false && data.name.indexOf('record.') === -1)
+			if (Juno.Common.Util.isDefinedAndNotNull(controller.page.encounterNote) &&
+				controller.page.isNoteSaved === false && data.name.indexOf('record.') === -1)
 			{
 				if(controller.page.encounterNote.note.trim().length !== 0)
 				{
-					var discard = confirm("You may have unsaved data. Are you sure you want to leave?");
+					var discard = confirm("You have unsaved note data. Are you sure you want to leave?");
 					if (!discard)
 					{
 						event.preventDefault();
