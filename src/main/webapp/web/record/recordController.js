@@ -217,7 +217,7 @@ angular.module('Record').controller('Record.RecordController', [
 			{
 				if(controller.page.encounterNote.note.trim().length !== 0)
 				{
-					var discard = confirm("You may have unsaved data. Are you sure to leave?");
+					var discard = confirm("You may have unsaved data. Are you sure you want to leave?");
 					if (!discard)
 					{
 						event.preventDefault();

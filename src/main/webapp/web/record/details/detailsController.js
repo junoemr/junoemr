@@ -446,7 +446,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		{
 			if (controller.page.dataChanged === true)
 			{
-				var discard = confirm("You may have unsaved data. Are you sure to leave?");
+				var discard = confirm("You may have unsaved data. Are you sure you want to leave?");
 				if (!discard)
 				{
 					event.preventDefault();
