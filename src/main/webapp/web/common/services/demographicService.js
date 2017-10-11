@@ -38,7 +38,7 @@ angular.module("Common.Services").service("demographicService", [
             var deferred = $q.defer();
 
             $http.get(service.apiPath + 'demographics/' + encodeURIComponent(demographicNo),
-                Juno.Common.ServiceHelper.configHeadersWithCache()).then(
+                Juno.Common.ServiceHelper.configHeaders()).then(
                 function success(results)
                 {
                     if(results.data.effDate) results.data.effDate = moment(results.data.effDate).toDate();
