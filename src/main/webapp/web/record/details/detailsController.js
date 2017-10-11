@@ -35,7 +35,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'patientDetailStatusService',
 	'securityService',
 	'staticDataService',
-	'demo',
 	'user',
 
 	function(
@@ -49,7 +48,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		patientDetailStatusService,
 		securityService,
 		staticDataService,
-		demo,
 		user)
 	{
 
