@@ -432,18 +432,25 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		$window.onbeforeunload = function ()
 		{
-			if (controller.page.dataChanged === true)
+			/* Have to use hack to determine if we are on the details page since the controller is
+				not necessarily destroyed upon leaving the page
+			*/
+			if (controller.page.dataChanged === true && $location.$$url.indexOf('/details') >= 0)
 			{
-				return 'You have made changes to a note, but you did not save them yet.\nLeaving the page will revert all changes.';
+				return 'You have unsaved patient data. Are you sure you want to leave?';
 			}
 		};
+
+		$scope.$on('$destroy', function() {
+			delete $window.onbeforeunload;
+		});
 
 		// Warn user about unsaved data before a state change
 		$scope.$on("$stateChangeStart", function(event)
 		{
 			if (controller.page.dataChanged === true)
 			{
-				var discard = confirm("You may have unsaved data. Are you sure you want to leave?");
+				var discard = confirm("You have unsaved patient data. Are you sure you want to leave?");
 				if (!discard)
 				{
 					event.preventDefault();
