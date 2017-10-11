@@ -65,16 +65,16 @@
 </head>
 
 <body ng-controller="Layout.BodyController as bodyCtrl"
-      ng-init="bodyCtrl.init()"
-      id="main-body">
+	  ng-init="bodyCtrl.init()"
+	  id="main-body">
 
 <!-- Navbar -->
 <nav ng-controller="Layout.NavBarController as navBarCtrl"
-     ng-init="navBarCtrl.init()"
-     ng-show="navBarCtrl.me != null"
-     class="navbar navbar-default navbar-fixed-top"
-     id="main-nav"
-     ng-cloak>
+	 ng-init="navBarCtrl.init()"
+	 ng-show="navBarCtrl.me != null"
+	 class="navbar navbar-default navbar-fixed-top"
+	 id="main-nav"
+	 ng-cloak>
 	<div class="container-fluid">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-nav-collapse">
@@ -89,7 +89,7 @@
 			<!-- link back to 'classic' view -->
 			<a href="../provider/providercontrol.jsp">
 				<img id="navbarlogo" src="../images/Oscar.ico"
-				     title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0"/>
+					 title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0"/>
 			</a>
 		</div>
 		<div class="navbar-collapse collapse" id="main-nav-collapse">
@@ -110,13 +110,13 @@
 			<!-- Large view -->
 			<ul class="nav navbar-nav visible-nav-lg">
 				<li ng-repeat="item in navBarCtrl.menuItems"
-				    ng-class="{'active': navBarCtrl.isActive(item) }">
+					ng-class="{'active': navBarCtrl.isActive(item) }">
 
 					<a href="javascript:void(0)"
 					   ng-if="!item.dropdown"
 					   ng-click="navBarCtrl.transition(item)">{{item.label}}
 						<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
-						      class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
+							  class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
 					</a>
 
 					<a href="javascript:void(0)"
@@ -140,7 +140,7 @@
 			<!-- Medium view -->
 			<ul class="nav navbar-nav visible-nav-md">
 				<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.mediumNavItemFilter(false)"
-				    ng-class="{'active': navBarCtrl.isActive(item) }">
+					ng-class="{'active': navBarCtrl.isActive(item) }">
 
 					<%--<a ng-click="navBarCtrl.transition(item)" data-toggle="tab" >{{item.label}}
 						<span ng-if="item.extra.length>0">({{item.extra}})</span>
@@ -150,7 +150,7 @@
 					   ng-if="!item.dropdown"
 					   ng-click="navBarCtrl.transition(item)">{{item.label}}
 						<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
-						      class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
+							  class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
 					</a>
 
 				</li>
@@ -162,7 +162,7 @@
 
 					<ul class="dropdown-menu" role="menu">
 						<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.mediumNavItemFilter(true)"
-						    ng-class="{'active': navBarCtrl.isActive(item) }">
+							ng-class="{'active': navBarCtrl.isActive(item) }">
 							<a href="javascript:void(0)"
 
 							   ng-click="navBarCtrl.transition(item)" data-toggle="tab">{{item.label}}
@@ -176,7 +176,7 @@
 			<%--Small View--%>
 			<ul class="nav navbar-nav visible-nav-sm">
 				<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.smallNavItemFilter(false)"
-				    ng-class="{'active': navBarCtrl.isActive(item) }">
+					ng-class="{'active': navBarCtrl.isActive(item) }">
 					<a ng-click="navBarCtrl.transition(item)" data-toggle="tab">{{item.label}}
 						<span ng-if="item.extra.length>0">({{item.extra}})</span>
 					</a>
@@ -189,12 +189,12 @@
 
 					<ul class="dropdown-menu" role="menu">
 						<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.smallNavItemFilter(true)"
-						    ng-class="{'active': navBarCtrl.isActive(item) }">
+							ng-class="{'active': navBarCtrl.isActive(item) }">
 							<a href="javascript:void(0)"
 							   ng-if="!item.dropdown"
 							   ng-click="navBarCtrl.transition(item)">{{item.label}}
 								<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
-								      class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
+									  class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
 							</a>
 						</li>
 						<%--<li ng-repeat="item in navBarCtrl.moreMenuItems">
@@ -219,7 +219,7 @@
 						   class="hand-hover">
 							<span class="fa fa-envelope"></span>
 							<span ng-show="navBarCtrl.unreadMessageTotal > 0"
-							      class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}
+								  class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}
 							</span>
 						</a>
 						&nbsp;&nbsp;
@@ -243,8 +243,8 @@
 				 </span>--%>
 
 				<span class="dropdown-toggle hand-hover"
-				      data-toggle="dropdown"
-				      title="<bean:message key="navbar.user" bundle="ui"/>">
+					  data-toggle="dropdown"
+					  title="<bean:message key="navbar.user" bundle="ui"/>">
 						<span class="fa fa-user"></span>&nbsp;{{navBarCtrl.me.firstName}}
 					</span>
 				<ul class="dropdown-menu" role="menu">
@@ -266,23 +266,29 @@
 <!-- nav bar is done here -->
 
 <!-- Start patient List template -->
-<div class="container-fluid" id="patient-list-template" ng-controller="PatientList.PatientListController as patientListCtrl">
+<div class="container-fluid" id="patient-list-template"
+	 ng-controller="PatientList.PatientListController as patientListCtrl">
 	<div class="row">
 		<div id="left-pane-hidden" class="col-xs-1" ng-if="!bodyCtrl.showPatientList">
-			<button class="toggle-patient-list-button" type="button" ng-click="patientListCtrl.showPatientList()" title="Show Patient List">
+			<button class="toggle-patient-list-button"
+					type="button"
+					ng-click="patientListCtrl.showPatientList()"
+					title="Show Patient List">
 				<span class="glyphicon glyphicon-chevron-right"></span>
 			</button>
 		</div>
 
 		<div id="left-pane"
-		     class="col-lg-2 col-md-3 col-sm-4 col-xs-7"
-		     ng-controller="PatientList.PatientListAppointmentListController as patientListAppointmentListCtrl"
-		     ng-if="bodyCtrl.showPatientList">
+			 class="col-lg-2 col-md-3 col-sm-4 col-xs-7"
+			 ng-controller="PatientList.PatientListAppointmentListController as patientListAppointmentListCtrl"
+			 ng-if="bodyCtrl.showPatientList">
 
 			<div id="left-pane-header" class="row vertical-align">
 				<div class="col-sm-2 col-xs-3">
-					<button class="toggle-patient-list-button" type="button" class="pull-left" ng-click="patientListCtrl.hidePatientList()"
-					        title="<bean:message key="patientList.hide" bundle="ui"/>">
+					<button class="toggle-patient-list-button pull-left"
+							type="button"
+							ng-click="patientListCtrl.hidePatientList()"
+							title="<bean:message key="patientList.hide" bundle="ui"/>">
 						<span class="glyphicon glyphicon-chevron-left"></span>
 					</button>
 				</div>
@@ -290,13 +296,17 @@
 					<%--<h3 class="no-margin-top" id="left-pane-header-title">Appointments</h3>--%>
 					<%--<form id="patient-search" class="form-search" role="search">--%>
 					<%--<span ng-show="showFilter === true" class="form-group ">--%>
-					<input type="text" class="form-control" placeholder="<bean:message key="patientList.search" bundle="ui"/>" ng-model="query"/>
+					<input type="text" class="form-control"
+						   placeholder="<bean:message key="patientList.search" bundle="ui"/>"
+						   ng-model="query"/>
 					<%--</span>--%>
 					<%--</form>--%>
 				</div>
 				<%--NOTE: Need to give this controller access to the addNewAppointment() function before this button can be used here --%>
 				<div class="col-md-2">
-					<a class="hand-hover" ng-click="patientListAppointmentListCtrl.addNewAppointment()"><span class="glyphicon glyphicon-plus" title="Add appointment"></span></a>
+					<a class="hand-hover" ng-click="patientListAppointmentListCtrl.addNewAppointment()">
+						<span class="glyphicon glyphicon-plus" title="Add appointment"></span>
+					</a>
 				</div>
 			</div>
 
@@ -315,7 +325,9 @@
 						<span class="glyphicon glyphicon-circle-arrow-down"></span>
 					</button>--%>
 					<ul class="nav nav-tabs">
-						<li ng-repeat="item in patientListCtrl.getTabItems()" ng-class="{'active': patientListCtrl.isActive(item.id)}" class="hand-hover">
+						<li ng-repeat="item in patientListCtrl.getTabItems()"
+							ng-class="{'active': patientListCtrl.isActive(item.id)}"
+							class="hand-hover">
 							<a ng-click="patientListCtrl.changeTab(item.id)" data-toggle="tab">{{item.label}}</a>
 						</li>
 
@@ -336,7 +348,9 @@
 					</ul>
 					<div ng-include="patientListCtrl.sidebar.location"></div>
 					<div class="col-md-2 pull-right">
-						<span title="<bean:message key="patientList.pagination" bundle="ui"/>">{{patientListCtrl.currentPage+1}}/{{patientListCtrl.numberOfPages()}}</span>
+						<span title="<bean:message key="patientList.pagination" bundle="ui"/>">
+							{{patientListCtrl.currentPage+1}}/{{patientListCtrl.numberOfPages()}}
+						</span>
 					</div>
 				</div>
 			</div>
@@ -346,11 +360,11 @@
 		<!-- End patient List template -->
 
 		<div id="right-pane"
-		     ng-class="{
+			 ng-class="{
 						'col-lg-10 col-lg-offset-2 col-md-9 col-md-offset-3 col-sm-8 col-sm-offset-4 col-xs-12': bodyCtrl.showPatientList,
 						'col-xs-12 right-pane-padded': !bodyCtrl.showPatientList }"
-		     ui-view
-		     ng-cloak>
+			 ui-view
+			 ng-cloak>
 		</div>
 	</div>
 </div>
