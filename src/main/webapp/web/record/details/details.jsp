@@ -679,16 +679,8 @@
 				</div>
 				<div class="form-group" ng-show="detailsCtrl.isRosterTerminated()">
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.RosterTerminationDate"/></label>
-					<div class="col-md-4" >
-						<input id="rosterTerminationDate" ng-model="detailsCtrl.page.demo.rosterTerminationDate"
-							type="text" class="form-control form-control-details"
-							datepicker-popup="yyyy-MM-dd"
-							datepicker-append-to-body="true"
-							is-open="detailsCtrl.page.rosterTerminationDatePicker"
-							ng-click="detailsCtrl.page.rosterTerminationDatePicker=true"
-							title="YYYY-MM-DD"
-							placeholder="<bean:message key="web.record.details.rosterTerminationDate"/>"
-							ng-change="detailsCtrl.preventManualRosterTerminationDate()"/>
+					<div class="col-md-4">
+						<juno-datepicker-popup juno-model="detailsCtrl.page.demo.rosterTerminationDate" show-icon="true" type="Input"></juno-datepicker-popup>
 					</div>
 
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.RosterTerminationReason"/></label>
