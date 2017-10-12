@@ -400,12 +400,9 @@ angular.module('Record').controller('Record.RecordController', [
 					$rootScope.$emit('noteSaved', results);
 					skipTmpSave = true;
 					controller.page.encounterNote = results;
-					if (controller.page.encounterNote.isSigned)
-					{
-						controller.$storage.hideNote = true;
-						controller.getCurrentNote(false);
-						controller.page.assignedCMIssues = [];
-					}
+					controller.$storage.hideNote = true;
+					controller.getCurrentNote(false);
+					controller.page.assignedCMIssues = [];
 				},
 				function error(errors)
 				{
