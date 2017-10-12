@@ -432,10 +432,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		$window.onbeforeunload = function ()
 		{
-			/* Have to use hack to determine if we are on the details page since the controller is
+			/* Have to check if we are on the details page since the controller is
 				not necessarily destroyed upon leaving the page
 			*/
-			if (controller.page.dataChanged === true && $location.$$url.indexOf('/details') >= 0)
+			if (controller.page.dataChanged === true && $state.current.name === 'record.details')
 			{
 				return 'You have unsaved patient data. Are you sure you want to leave?';
 			}
