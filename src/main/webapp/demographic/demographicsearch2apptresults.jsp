@@ -323,41 +323,40 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 <%}%>
 </script>
 
-
-
-
 	<form method="post" name="addform" action="../appointment/addappointment.jsp">
-        
-<table>
-        <tr class="tableHeadings deep">
-        
 
-		<td class="demoIdSearch">
-		<bean:message key="demographic.demographicsearch2apptresults.demographicId" />
-       </td>
+	<table>
+			<tr class="tableHeadings deep">
 
-		<td class="lastname">
-		<bean:message key="demographic.demographicsearch2apptresults.lastName" />
-                </td>
-		<td class="firstname">
-		<bean:message key="demographic.demographicsearch2apptresults.firstName" />
-                </td>
-		<td class="age">
-		<bean:message key="demographic.demographicsearch2apptresults.age" />
-                </td>
-		<td class="rosterStatus">
-		<bean:message key="demographic.demographicsearch2apptresults.rosterStatus" />
-                </td>
-		<td class="sex">
-		<bean:message key="demographic.demographicsearch2apptresults.sex" />
-                </td>
-        <td class="dob">
-        <bean:message key="demographic.demographicsearch2apptresults.DOB" />
-                </td>
-		<td class="doctor">
-		<bean:message key="demographic.demographicsearch2apptresults.doctor" />
-                </td>
-	</tr>
+				<td class="demoIdSearch">
+					<bean:message key="demographic.demographicsearch2apptresults.demographicId"/>
+				</td>
+
+				<td class="lastname">
+					<bean:message key="demographic.demographicsearch2apptresults.lastName"/>
+				</td>
+				<td class="firstname">
+					<bean:message key="demographic.demographicsearch2apptresults.firstName"/>
+				</td>
+				<td class="age">
+					<bean:message key="demographic.demographicsearch2apptresults.age"/>
+				</td>
+				<td class="rosterStatus">
+					<bean:message key="demographic.demographicsearch2apptresults.rosterStatus"/>
+				</td>
+				<td class="sex">
+					<bean:message key="demographic.demographicsearch2apptresults.sex"/>
+				</td>
+				<td class="dob">
+					<bean:message key="demographic.demographicsearch2apptresults.DOB"/>
+				</td>
+				<td class="hin">
+					<bean:message key="demographic.demographicsearch2apptresults.HIN"/>
+				</td>
+				<td class="doctor">
+					<bean:message key="demographic.demographicsearch2apptresults.doctor"/>
+				</td>
+			</tr>
 
 
 <%
@@ -466,6 +465,7 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 		<td class="rosterStatus"><%=demo.getRosterStatus()==null||demo.getRosterStatus().equals("")?"&nbsp;":demo.getRosterStatus()%></td>
 		<td class="sex"><%=demo.getSex()%></td>
 		<td class="dob"><%=demo.getYearOfBirth() + "-" + demo.getMonthOfBirth() + "-" + demo.getDateOfBirth()%></td>
+		<td class="hin"><%=demo.getHin()%></td>
         <td class="doctor"><%=providerBean.getProperty(demo.getProviderNo()==null?"":demo.getProviderNo())==null?"":providerBean.getProperty(demo.getProviderNo())%></td>
         </tr>
 
