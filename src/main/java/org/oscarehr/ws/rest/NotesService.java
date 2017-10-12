@@ -987,25 +987,11 @@ public class NotesService extends AbstractServiceImpl {
 			}
 
 		}
-		// no note specified, get last unsigned
+		// No note specified, make a new note
 		else {
 			logger.debug("in empty else");
-			// A hack to load last unsigned note when not specifying a particular note to edit
-			// if there is no unsigned note load a new one
-			
-			Map unlockedNotesMap = null; //NEED THIS ??
-			if ((note = caseManagementMgr.getLastSaved(""+programId, ""+demographicNo, providerNo,unlockedNotesMap)) == null) {
-//				session.setAttribute("newNote", "true");
-//				//session.setAttribute("issueStatusChanged", "false");
-			
-				//String encType 
-				String apptDate = getString(jsonobject,"apptDate");
-				String reason = getString(jsonobject,"reason");
-				String appointmentNo = getString(jsonobject,"appointmentNo");
-				note = caseManagementMgr.makeNewNote(providerNo, ""+demographicNo, encType, appointmentNo,loggedInInfo.getLocale());
-				//note = caseManagementMgr.makeNewNote(providerNo, ""+demographicNo, bean, encType, apptDate, reason,loggedInInfo.locale);
-//				note = this.makeNewNote(providerNo, demono, request);				
-			}
+			String appointmentNo = getString(jsonobject,"appointmentNo");
+			note = caseManagementMgr.makeNewNote(providerNo, ""+demographicNo, encType, appointmentNo,loggedInInfo.getLocale());
 		}
 		
 
