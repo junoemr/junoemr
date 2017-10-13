@@ -74,47 +74,52 @@
 	GregorianCalendar gEndDate = (GregorianCalendar) gCalDate.clone();
 	gEndDate.setTime(UtilDateUtilities.StringToDate(endDate, "dd/MM/yyyy"));
 
-    // repeat adding
-    if (request.getParameter("groupappt").equals("Add Group Appointment") ) {
-        String[] param = new String[19];
-        int rowsAffected=0, datano=0;
+	  // repeat adding
+	  if (request.getParameter("groupappt").equals("Add Group Appointment"))
+	  {
+		  String[] param = new String[20];
+		  int rowsAffected = 0, datano = 0;
 
-            param[0]=request.getParameter("provider_no");
-            param[1]=request.getParameter("appointment_date");
-            param[2]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"));
-            param[3]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("end_time"));
-            param[4]=request.getParameter("keyword");
-            param[5]=request.getParameter("notes");
-            param[6]=request.getParameter("reason");
-            param[7]=request.getParameter("location");
-            param[8]=request.getParameter("resources");
-            param[9]=request.getParameter("type");
-            param[10]=request.getParameter("style");
-            param[11]=request.getParameter("billing");
-            param[12]=request.getParameter("status");
-            param[13]=createdDateTime;   //request.getParameter("createdatetime");
-            param[14]=userName;  //request.getParameter("creator");
-            param[15]=request.getParameter("remarks");
-            param[17]=(String)request.getSession().getAttribute("programId_oscarView");
+		  param[0] = request.getParameter("provider_no");
+		  param[1] = request.getParameter("appointment_date");
+		  param[2] = MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"));
+		  param[3] = MyDateFormat.getTimeXX_XX_XX(request.getParameter("end_time"));
+		  param[4] = request.getParameter("keyword");
+		  param[5] = request.getParameter("notes");
+		  param[6] = request.getParameter("reason");
+		  param[7] = request.getParameter("location");
+		  param[8] = request.getParameter("resources");
+		  param[9] = request.getParameter("type");
+		  param[10] = request.getParameter("style");
+		  param[11] = request.getParameter("billing");
+		  param[12] = request.getParameter("status");
+		  param[13] = createdDateTime;   //request.getParameter("createdatetime");
+		  param[14] = userName;  //request.getParameter("creator");
+		  param[15] = request.getParameter("remarks");
+		  param[17] = (String) request.getSession().getAttribute("programId_oscarView");
 
-  	    if (request.getParameter("demographic_no")!=null && !(request.getParameter("demographic_no").equals(""))) {
-			param[16]=request.getParameter("demographic_no");
-	    } else param[16]="0";
+		  if (request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals("")))
+		  {
+			  param[16] = request.getParameter("demographic_no");
+		  }
+		  else param[16] = "0";
 
-  	    	param[18] = request.getParameter("urgency");
+		  param[18] = (request.getParameter("urgency")!=null)?request.getParameter("urgency"):"";
+		  param[19] = (request.getParameter("partial_booking")!=null)?request.getParameter("partial_booking"):"0";
 
-		while (true) {
-			rowsAffected = oscarSuperManager.update("appointmentDao", "add_apptrecord", param);
-            if (rowsAffected != 1) break;
+		  while (true)
+		  {
+			  rowsAffected = oscarSuperManager.update("appointmentDao", "add_apptrecord", param);
+			  if (rowsAffected != 1) break;
 
-			gCalDate.setTime(UtilDateUtilities.StringToDate(param[1], "yyyy-MM-dd"));
-			gCalDate = addDateByYMD(gCalDate, everyUnit, delta);
+			  gCalDate.setTime(UtilDateUtilities.StringToDate(param[1], "yyyy-MM-dd"));
+			  gCalDate = addDateByYMD(gCalDate, everyUnit, delta);
 
-			if (gCalDate.after(gEndDate)) break;
-			else param[1] = UtilDateUtilities.DateToString(gCalDate.getTime(), "yyyy-MM-dd");
-		}
-        if (rowsAffected == 1) bSucc = true;
-	}
+			  if (gCalDate.after(gEndDate)) break;
+			  else param[1] = UtilDateUtilities.DateToString(gCalDate.getTime(), "yyyy-MM-dd");
+		  }
+		  if (rowsAffected == 1) bSucc = true;
+	  }
 
 
     // repeat updating
@@ -186,37 +191,41 @@
         	bSucc = true;
 		}
 
-		if (request.getParameter("groupappt").equals("Group Update")) {
-			Object[] param = new Object[21];
-                        param[0]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"));
-                        param[1]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("end_time"));
-                        param[2]=request.getParameter("keyword");
-                        param[3]=request.getParameter("demographic_no");
-                        param[4]=request.getParameter("notes");
-                        param[5]=request.getParameter("reason");
-                        param[6]=request.getParameter("location");
-                        param[7]=request.getParameter("resources");
-                        param[8]=createdDateTime;
-                        param[9]=userName;
-                        param[10]=request.getParameter("urgency");
- 	        for(int k=0; k<paramE.length; k++) param[k+11] = paramE[k];
+	    if (request.getParameter("groupappt").equals("Group Update"))
+	    {
+		    Object[] param = new Object[22];
+		    param[0] = MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"));
+		    param[1] = MyDateFormat.getTimeXX_XX_XX(request.getParameter("end_time"));
+		    param[2] = request.getParameter("keyword");
+		    param[3] = request.getParameter("demographic_no");
+		    param[4] = request.getParameter("notes");
+		    param[5] = request.getParameter("reason");
+		    param[6] = request.getParameter("location");
+		    param[7] = request.getParameter("resources");
+		    param[8] = createdDateTime;
+		    param[9] = userName;
+		    param[10] = request.getParameter("urgency");
+		    param[11] = request.getParameter("partial_booking");
 
-			// repeat doing
-			while (true) {
-				List<Appointment> appts = appointmentDao.find(dayFormatter.parse((String)param[11]), (String)paramE[1], (java.sql.Time)paramE[2],(java.sql.Time) paramE[3],
-						(String)paramE[4], (String)paramE[5], (String)paramE[6], (java.sql.Timestamp)paramE[7], (String)paramE[8], (Integer)paramE[9]);
-				for(Appointment appt:appts) {
-					appointmentArchiveDao.archiveAppointment(appt);
-				}
-				rowsAffected = oscarSuperManager.update("appointmentDao", "update_appt", param);
+		    for (int k = 0; k < paramE.length; k++) param[k + 11] = paramE[k];
+		    // repeat doing
+		    while (true)
+		    {
+			    List<Appointment> appts = appointmentDao.find(dayFormatter.parse((String) param[11]), (String) paramE[1], (java.sql.Time) paramE[2], (java.sql.Time) paramE[3],
+					    (String) paramE[4], (String) paramE[5], (String) paramE[6], (java.sql.Timestamp) paramE[7], (String) paramE[8], (Integer) paramE[9]);
+			    for (Appointment appt : appts)
+			    {
+				    appointmentArchiveDao.archiveAppointment(appt);
+			    }
+			    rowsAffected = oscarSuperManager.update("appointmentDao", "update_appt", param);
 
-				gCalDate.setTime(UtilDateUtilities.StringToDate((String)param[11], "yyyy-MM-dd"));
-				gCalDate = addDateByYMD(gCalDate, everyUnit, delta);
+			    gCalDate.setTime(UtilDateUtilities.StringToDate((String) param[11], "yyyy-MM-dd"));
+			    gCalDate = addDateByYMD(gCalDate, everyUnit, delta);
 
-				if (gCalDate.after(gEndDate)) break;
-				else param[11] = UtilDateUtilities.DateToString(gCalDate.getTime(), "yyyy-MM-dd");
-			}
-        	bSucc = true;
+			    if (gCalDate.after(gEndDate)) break;
+			    else param[11] = UtilDateUtilities.DateToString(gCalDate.getTime(), "yyyy-MM-dd");
+		    }
+		    bSucc = true;
 		}
 	}
 

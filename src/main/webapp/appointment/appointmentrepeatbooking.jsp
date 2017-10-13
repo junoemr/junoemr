@@ -66,31 +66,33 @@
             //if (strbuf.toString().indexOf("one")==-1 && strbuf.toString().indexOf("two")==-1) continue;
 		    //datano=Integer.parseInt(request.getParameter(strbuf.toString()) );
 
-		    String[] param=new String[20];
-     	    param[0]=request.getParameter("provider_no");
-	        param[1]=request.getParameter("appointment_date");
-    	    param[2]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"));
-	        param[3]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("end_time"));
-            param[4]=request.getParameter("keyword");
-	        param[5]=request.getParameter("notes");
-	        param[6]=request.getParameter("reason");
-    	    param[7]=request.getParameter("location");
-	        param[8]=request.getParameter("resources");
-	        param[9]=request.getParameter("type");
-    	    param[10]=request.getParameter("style");
-	        param[11]=request.getParameter("billing");
-	        param[12]=request.getParameter("status");
-     	    param[13]=createdDateTime;   //request.getParameter("createdatetime");
-	        param[14]=userName;  //request.getParameter("creator");
-    	    param[15]=request.getParameter("remarks");
+	    String[] param = new String[20];
+	    param[0] = request.getParameter("provider_no");
+	    param[1] = request.getParameter("appointment_date");
+	    param[2] = MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"));
+	    param[3] = MyDateFormat.getTimeXX_XX_XX(request.getParameter("end_time"));
+	    param[4] = request.getParameter("keyword");
+	    param[5] = request.getParameter("notes");
+	    param[6] = request.getParameter("reason");
+	    param[7] = request.getParameter("location");
+	    param[8] = request.getParameter("resources");
+	    param[9] = request.getParameter("type");
+	    param[10] = request.getParameter("style");
+	    param[11] = request.getParameter("billing");
+	    param[12] = request.getParameter("status");
+	    param[13] = createdDateTime;   //request.getParameter("createdatetime");
+	    param[14] = userName;  //request.getParameter("creator");
+	    param[15] = request.getParameter("remarks");
 
-	  	    if (request.getParameter("demographic_no")!=null && !(request.getParameter("demographic_no").equals(""))) {
-				param[16]=request.getParameter("demographic_no");
-		    } else param[16]="0";
+	    if (request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals("")))
+	    {
+		    param[16] = request.getParameter("demographic_no");
+	    }
+	    else param[16] = "0";
 
-	  	  	param[17]=(String)request.getSession().getAttribute("programId_oscarView");
-	  	  	param[18]=(request.getParameter("urgency")!=null)?request.getParameter("urgency"):"";
-	  	 	param[19]=(request.getParameter("partial_booking")!=null)?request.getParameter("partial_booking"):"0";
+	    param[17] = (String) request.getSession().getAttribute("programId_oscarView");
+	    param[18] = (request.getParameter("urgency") != null) ? request.getParameter("urgency") : "";
+	    param[19] = (request.getParameter("partial_booking") != null) ? request.getParameter("partial_booking") : "0";
         //}
 
         // repeat adding
