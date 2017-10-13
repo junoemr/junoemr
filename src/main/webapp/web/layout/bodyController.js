@@ -36,12 +36,5 @@ angular.module('Layout').controller('Layout.BodyController', [
 				console.log("Layout.BodyController updating showPatientList", value);
 				controller.showPatientList = value;
 			});
-
-		$rootScope.$on('$stateChangeStart',
-			function()
-			{
-				console.log("Layout.BodyController $stateChangeStart setting showPatientList to true");
-				controller.showPatientList = true;
-			});
 	}
 ]);
