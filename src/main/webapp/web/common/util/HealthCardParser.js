@@ -68,9 +68,9 @@ Oscar.HealthCardParser.parseBCCombined = function parseBCCombined(cardData,cardH
 	var track2 = cardData.substring(track2Index, track3Index);
 	var track3 = cardData.substring(track3Index);
 
-	console.info("Track 1: '" + track1 + "'");
-	console.info("Track 2: '" + track2 + "'");
-	console.info("Track 3: '" + track3 + "'");
+	console.info("Track 1:", track1);
+	console.info("Track 2:", track2);
+	console.info("Track 3:", track3);
 
 	//TRACK 1
 	// length constants taken from specification
@@ -84,7 +84,6 @@ Oscar.HealthCardParser.parseBCCombined = function parseBCCombined(cardData,cardH
 	dataHash.lastName = names.substring(0, names.indexOf("$")-1).toUpperCase();
 	dataHash.firstName = names.substring(names.indexOf("$")+1).toUpperCase();
 	dataHash.address = (fullAddress.includes("$"))? fullAddress.substring(0, fullAddress.indexOf("$")) : fullAddress;
-
 
 	//TRACK 2
 	index = 1; // skip track 2 constant ;
@@ -170,6 +169,7 @@ Oscar.HealthCardParser.parseBCStandalone = function parseBCStandalone(cardData,c
 	dataHash.dobDay = dobCCYYMMDD.substring(6, 8);
 
 	dataHash.sex = 'M'; // this is not included in spec, default to Male
+	dataHash.province = 'BC';
 
 	return cardHash;
 };
@@ -209,6 +209,7 @@ Oscar.HealthCardParser.parseOntario = function parseOntario(cardData,cardHash)
 	{
 		dataHash.sex = "M";
 	}
+	dataHash.province = 'ON';
 
 	return cardHash;
 };
@@ -222,17 +223,20 @@ Oscar.HealthCardParser.parse = function parse(cardData)
 	};
 	try
 	{
+		cardData = cardData.toUpperCase();
+		console.info(cardData);
+
 		if (cardData.startsWith("%B610043"))
 		{
-			return Oscar.HealthCardParser.parseBCStandalone(cardData, cardHash);
+			Oscar.HealthCardParser.parseBCStandalone(cardData, cardHash);
 		}
 		else if (cardData.startsWith("%BC") && cardData.substring(cardData.indexOf("?")).startsWith("?;636028"))
 		{
-			return Oscar.HealthCardParser.parseBCCombined(cardData, cardHash);
+			Oscar.HealthCardParser.parseBCCombined(cardData, cardHash);
 		}
 		else
 		{
-			return Oscar.HealthCardParser.parseOntario(cardData, cardHash);
+			Oscar.HealthCardParser.parseOntario(cardData, cardHash);
 		}
 	}
 	catch (e)

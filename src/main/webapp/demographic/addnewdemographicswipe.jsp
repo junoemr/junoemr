@@ -24,7 +24,9 @@
 
 --%>
 
-<% String cardData = request.getParameter("card_no"); %>
+<% String cardData = request.getParameter("card_no");
+	cardData = cardData.replaceAll("\"","'");
+%>
 <html>
 <head>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -51,8 +53,8 @@
 			}
 		}
 
-		var healthCardData = Oscar.HealthCardParser.parse('<%=cardData%>');
-		console.log(healthCardData);
+		var healthCardData = Oscar.HealthCardParser.parse("<%=cardData%>");
+		console.log("Parsed Card Data",healthCardData);
 
 		var form = self.opener.document.adddemographic;
 
@@ -74,6 +76,7 @@
 		setValueIfExists(form.postal,               healthCardData.data.postal);
 		setValueIfExists(form.city,                 healthCardData.data.city);
 		setValueIfExists(form.province,             healthCardData.data.province);
+		setValueIfExists(form.hc_type,              healthCardData.data.province);
 
 		self.close();
 
