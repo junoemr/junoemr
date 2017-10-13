@@ -49,7 +49,7 @@
 	</logic:equal>
 </logic:present>
 <%
-oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
+oscar.oscarRx.pageUtil.RxSessionBean rxSessionBean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
 %>
 <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
@@ -58,9 +58,8 @@ oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBea
 
 <%
 oscar.oscarRx.data.RxPrescriptionData rxData = new oscar.oscarRx.data.RxPrescriptionData();
-oscar.oscarRx.data.RxDrugData drugData = new oscar.oscarRx.data.RxDrugData();
 
-oscar.oscarRx.data.RxPrescriptionData.Favorite[] favorites = rxData.getFavorites(bean.getProviderNo());
+oscar.oscarRx.data.RxPrescriptionData.Favorite[] favorites = rxData.getFavorites(rxSessionBean.getProviderNo());
 oscar.oscarRx.data.RxPrescriptionData.Favorite f;
 
 oscar.oscarRx.data.RxCodesData.FrequencyCode[] freq = new oscar.oscarRx.data.RxCodesData().getFrequencyCodes();
@@ -133,13 +132,34 @@ int i, j;
             err = true;
         }
 
-        if(err == false) {
-            var data="favoriteId="+favoriteId+"&favoriteName="+favoriteName+"&customName="+customName+"&takeMin="+takeMin+"&takeMax="+takeMax+"&frequencyCode="+frequencyCode+
-                "&duration="+duration+"&durationUnit="+durationUnit+"&quantity="+quantity+"&repeat="+repeat+"&nosubs="+nosubs+"&prn="+prn+"&customInstr="+customInstr+"&special="+special;
-            var url="<c:out value="${ctx}"/>" + "/oscarRx/updateFavorite2.do?method=ajaxEditFavorite";
-            new Ajax.Request(url,{method:'post',postBody:data,onSuccess:function(transport){
-                    $("saveSuccess_"+rowId).show();
-        }});
+	    if (err == false)
+	    {
+		    var params = {
+			    favoriteId: favoriteId,
+			    favoriteName: favoriteName,
+			    customName: customName,
+			    takeMin: takeMin,
+			    takeMax: takeMax,
+			    frequencyCode: frequencyCode,
+			    duration: duration,
+			    durationUnit: durationUnit,
+			    quantity: quantity,
+			    repeat: repeat,
+			    nosubs: nosubs,
+			    prn: prn,
+			    customInstr: customInstr,
+			    special: special
+		    };
+
+		    var url = "<c:out value="${ctx}"/>" + "/oscarRx/updateFavorite2.do?method=ajaxEditFavorite";
+		    new Ajax.Request(url, {
+			    method: 'post',
+			    parameters: params,
+			    onSuccess: function (transport)
+			    {
+				    $("saveSuccess_" + rowId).show();
+			    }
+		    });
         }
     }
 
@@ -349,8 +369,8 @@ int i, j;
 
 				</table>
 				</form>
-				</td>
 				</div>
+				</td>
 			</tr>
 
 			<tr>
@@ -379,7 +399,7 @@ int i, j;
 		<td width="100%" height="0%" colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td width="100%" height="0%" style="padding: 5" bgcolor="#DCDCDC"
+		<td width="100%" height="0%" style="padding: 5px" bgcolor="#DCDCDC"
 			colspan="2"></td>
 	</tr>
 </table>

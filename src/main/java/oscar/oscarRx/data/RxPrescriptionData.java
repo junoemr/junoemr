@@ -2291,7 +2291,7 @@ public class RxPrescriptionData {
         /**
          * Setter for property unitName.
          *
-         * @param unit New value of property unitName.
+         * @param unitName New value of property unitName.
          */
         public void setUnitName(java.lang.String unitName) {
             this.unitName = unitName;
@@ -2326,7 +2326,7 @@ public class RxPrescriptionData {
         /**
          *Setter for property custom (does it have customized directions)
          *
-         * @param boolean value for custom
+         * @param custom boolean flag for custom
          */
         public void setCustomInstr(boolean custom) {
             this.custom = custom;
@@ -2646,67 +2646,152 @@ public class RxPrescriptionData {
             this.customInstr = customInstr;
         }
 
-        public boolean Save() {
-            boolean b = false;
+        public boolean Save()
+        {
+            boolean success = false;
 
             // clean up fields
-            if (this.takeMin > this.takeMax) {
+            if (this.takeMin > this.takeMax)
+            {
                 this.takeMax = this.takeMin;
             }
 
             String parsedSpecial = RxUtil.replace(this.getSpecial(), "'", "");
 
-            try {
+            try
+            {
 
                 ResultSet rs;
                 String sql;
 
-                if (this.getFavoriteId() == 0) {
-                    sql = "SELECT favoriteid FROM favorites WHERE " + "provider_no = '" + this.getProviderNo() + "' AND " + "favoritename = '" + StringEscapeUtils.escapeSql(this.getFavoriteName()) + "' AND " + "BN = '" + StringEscapeUtils.escapeSql(this.getBN()) + "' AND " + "GCN_SEQNO = " + this.getGCN_SEQNO() + " AND " + "customName = '" + StringEscapeUtils.escapeSql(this.getCustomName()) + "' AND " + "takemin = " + this.getTakeMin() + " AND " + "takemax = " + this.getTakeMax() + " AND " + "freqcode = '" + this.getFrequencyCode() + "' AND " + "duration = '" + this.getDuration() + "' AND " + "durunit = '" + this.getDurationUnit() + "' AND " + "quantity = '" + this.getQuantity() + "' AND " + "`repeat` = " + this.getRepeat() + " AND " + "nosubs = " + this.getNosubsInt() + " AND " + "prn = " + this.getPrnInt() + " AND " + "special = '" + StringEscapeUtils.escapeSql(parsedSpecial) + "' AND " + "GN = '" + this.getGN() + "' AND " + "unitName = '" + this.getUnitName() + "' AND " + "custom_instructions = " + this.getCustomInstr();
+                if (this.getFavoriteId() == 0)
+                {
+                    sql = "SELECT favoriteid FROM favorites WHERE " +
+		                    "provider_no = '" + StringEscapeUtils.escapeSql(this.getProviderNo()) + "' AND " +
+		                    "favoritename = '" + StringEscapeUtils.escapeSql(this.getFavoriteName()) + "' AND " +
+		                    "BN = '" + StringEscapeUtils.escapeSql(this.getBN()) + "' AND " +
+		                    "GCN_SEQNO = " + this.getGCN_SEQNO() + " AND " +
+		                    "customName = '" + StringEscapeUtils.escapeSql(this.getCustomName()) + "' AND " +
+		                    "takemin = " + this.getTakeMin() + " AND " +
+		                    "takemax = " + this.getTakeMax() + " AND " +
+		                    "freqcode = '" + StringEscapeUtils.escapeSql(this.getFrequencyCode()) + "' AND " +
+		                    "duration = '" + StringEscapeUtils.escapeSql(this.getDuration()) + "' AND " +
+		                    "durunit = '" + StringEscapeUtils.escapeSql(this.getDurationUnit()) + "' AND " +
+		                    "quantity = '" + StringEscapeUtils.escapeSql(this.getQuantity()) + "' AND " +
+		                    "`repeat` = " + this.getRepeat() + " AND " +
+		                    "nosubs = " + this.getNosubsInt() + " AND " +
+		                    "prn = " + this.getPrnInt() + " AND " +
+		                    "special = '" + StringEscapeUtils.escapeSql(parsedSpecial) + "' AND " +
+		                    "GN = '" + StringEscapeUtils.escapeSql(this.getGN()) + "' AND " +
+		                    "unitName = '" + StringEscapeUtils.escapeSql(this.getUnitName()) + "' AND " +
+		                    "custom_instructions = " + this.getCustomInstr();
 
                     rs = DBHandler.GetSQL(sql);
 
-                    if (rs.next()) {
+                    if (rs.next())
+                    {
                         this.favoriteId = rs.getInt("favoriteid");
                     }
 
                     rs.close();
 
-                    b = true;
+                    success = true;
 
-                    if (this.getFavoriteId() == 0) {
-                        sql = "INSERT INTO favorites (provider_no, favoritename, " + "BN, GCN_SEQNO, customName, takemin, takemax, " + "freqcode, duration, durunit, quantity, " + "`repeat`, nosubs, prn, special,GN,ATC,regional_identifier,unit,unitName,method,route,drug_form,custom_instructions,dosage) " + "VALUES ('" + this.getProviderNo() + "', '" + StringEscapeUtils.escapeSql(this.getFavoriteName()) + "', '" + StringEscapeUtils.escapeSql(this.getBN()) + "', " + this.getGCN_SEQNO() + ", '" + StringEscapeUtils.escapeSql(this.getCustomName()) + "', " + this.getTakeMin() + ", " + this.getTakeMax() + ", '" + this.getFrequencyCode() + "', '" + this.getDuration() + "', '" + this.getDurationUnit() + "', '" + this.getQuantity() + "', " + this.getRepeat() + ", " + this.getNosubsInt() + ", " + this.getPrnInt() + ", '" + parsedSpecial + "', '" + this.getGN() + "', ' " + this.getAtcCode() + "', '" + this.getRegionalIdentifier() + "', '" + this.getUnit() + "', '" + this.getUnitName() + "', '" + this.getMethod() + "', '" + this.getRoute() + "', '" + this.getDrugForm() + "', " + this.getCustomInstr() + ", '" + this.getDosage() + "')";
+	                if (this.getFavoriteId() == 0)
+	                {
+		                sql = "INSERT INTO favorites (provider_no, favoritename, " +
+				                "BN, GCN_SEQNO, customName, takemin, takemax, " +
+				                "freqcode, duration, durunit, quantity, " +
+				                "`repeat`, nosubs, prn, special,GN,ATC,regional_identifier,unit,unitName,method,route,drug_form,custom_instructions,dosage) " +
+				                "VALUES ('" +
+				                StringEscapeUtils.escapeSql(this.getProviderNo()) + "', '" +
+				                StringEscapeUtils.escapeSql(this.getFavoriteName()) + "', '" +
+				                StringEscapeUtils.escapeSql(this.getBN()) + "', " +
+				                this.getGCN_SEQNO() + ", '" +
+				                StringEscapeUtils.escapeSql(this.getCustomName()) + "', " +
+				                this.getTakeMin() + ", " +
+				                this.getTakeMax() + ", '" +
+				                StringEscapeUtils.escapeSql(this.getFrequencyCode()) + "', '" +
+				                StringEscapeUtils.escapeSql(this.getDuration()) + "', '" +
+				                StringEscapeUtils.escapeSql(this.getDurationUnit()) + "', '" +
+				                StringEscapeUtils.escapeSql(this.getQuantity()) + "', " +
+				                this.getRepeat() + ", " +
+				                this.getNosubsInt() + ", " +
+				                this.getPrnInt() + ", '" +
+				                StringEscapeUtils.escapeSql(parsedSpecial) + "', '" +
+				                StringEscapeUtils.escapeSql(this.getGN()) + "', ' " +
+				                StringEscapeUtils.escapeSql(this.getAtcCode()) + "', '" +
+				                StringEscapeUtils.escapeSql(this.getRegionalIdentifier()) + "', '" +
+				                StringEscapeUtils.escapeSql(this.getUnit()) + "', '" +
+				                StringEscapeUtils.escapeSql(this.getUnitName()) + "', '" +
+				                StringEscapeUtils.escapeSql(this.getMethod()) + "', '" +
+				                StringEscapeUtils.escapeSql(this.getRoute()) + "', '" +
+				                StringEscapeUtils.escapeSql(this.getDrugForm()) + "', " +
+				                this.getCustomInstr() + ", '" +
+				                StringEscapeUtils.escapeSql(this.getDosage()) + "')";
 
-                        DBHandler.RunSQL(sql);
+		                DBHandler.RunSQL(sql);
 
-                        sql = "SELECT Max(favoriteid) FROM favorites";
+		                sql = "SELECT Max(favoriteid) FROM favorites";
 
-                        rs = DBHandler.GetSQL(sql);
+		                rs = DBHandler.GetSQL(sql);
 
-                        if (rs.next()) {
-                            this.favoriteId = rs.getInt(1);
-                        }
+		                if (rs.next())
+		                {
+			                this.favoriteId = rs.getInt(1);
+		                }
 
-                        rs.close();
+		                rs.close();
 
-                        b = true;
-                    }
+		                success = true;
+	                }
 
-                } else {
-                    sql = "UPDATE favorites SET " + "provider_no = '" + this.getProviderNo() + "', " + "favoritename = '" + this.getFavoriteName() + "', " + "BN = '" + StringEscapeUtils.escapeSql(this.getBN()) + "', " + "GCN_SEQNO = " + this.getGCN_SEQNO() + ", " + "customName = '" + StringEscapeUtils.escapeSql(this.getCustomName()) + "', " + "takemin = " + this.getTakeMin() + ", " + "takemax = " + this.getTakeMax() + ", " + "freqcode = '" + this.getFrequencyCode() + "', " + "duration = '" + this.getDuration() + "', " + "durunit = '" + this.getDurationUnit() + "', " + "quantity = '" + this.getQuantity() + "', " + "`repeat` = " + this.getRepeat() + ", " + "nosubs = " + this.getNosubsInt() + ", " + "prn = " + this.getPrnInt() + ", " + "special = '" + parsedSpecial + "', " + "GN = '" + this.getGN() + "', " + "ATC = '" + this.getAtcCode() + "', " + "regional_identifier = '" + this.getRegionalIdentifier() + "', " + "unit = '" + this.getUnit() + "', " + "unitName = '" + this.getUnitName() + "', " + "method = '" + this.getMethod() + "', " + "route = '" + this.getRoute() + "', " + "drug_form = '" + this.getDrugForm() + "', " + "custom_instructions = " + this.getCustomInstr() + ", " + "dosage = '" + this.getDosage() + "' " + "WHERE favoriteid = " + this.getFavoriteId();
+                }
+                else
+                {
+	                sql = "UPDATE favorites SET " + "provider_no = '" + StringEscapeUtils.escapeSql(this.getProviderNo()) + "', " +
+			                "favoritename = '" + StringEscapeUtils.escapeSql(this.getFavoriteName()) + "', " +
+			                "BN = '" + StringEscapeUtils.escapeSql(this.getBN()) + "', " +
+			                "GCN_SEQNO = " + this.getGCN_SEQNO() + ", " +
+			                "customName = '" + StringEscapeUtils.escapeSql(this.getCustomName()) + "', " +
+			                "takemin = " + this.getTakeMin() + ", " +
+			                "takemax = " + this.getTakeMax() + ", " +
+			                "freqcode = '" + StringEscapeUtils.escapeSql(this.getFrequencyCode()) + "', " +
+			                "duration = '" + StringEscapeUtils.escapeSql(this.getDuration()) + "', " +
+			                "durunit = '" + StringEscapeUtils.escapeSql(this.getDurationUnit()) + "', " +
+			                "quantity = '" + StringEscapeUtils.escapeSql(this.getQuantity()) + "', " +
+			                "`repeat` = " + this.getRepeat() + ", " +
+			                "nosubs = " + this.getNosubsInt() + ", " +
+			                "prn = " + this.getPrnInt() + ", " +
+			                "special = '" + StringEscapeUtils.escapeSql(parsedSpecial) + "', " +
+			                "GN = '" + StringEscapeUtils.escapeSql(this.getGN()) + "', " +
+			                "ATC = '" + StringEscapeUtils.escapeSql(this.getAtcCode()) + "', " +
+			                "regional_identifier = '" + StringEscapeUtils.escapeSql(this.getRegionalIdentifier()) + "', " +
+			                "unit = '" + StringEscapeUtils.escapeSql(this.getUnit()) + "', " +
+			                "unitName = '" + StringEscapeUtils.escapeSql(this.getUnitName()) + "', " +
+			                "method = '" + StringEscapeUtils.escapeSql(this.getMethod()) + "', " +
+			                "route = '" + StringEscapeUtils.escapeSql(this.getRoute()) + "', " +
+			                "drug_form = '" + StringEscapeUtils.escapeSql(this.getDrugForm()) + "', " +
+			                "custom_instructions = " + this.getCustomInstr() + ", " +
+			                "dosage = '" + StringEscapeUtils.escapeSql(this.getDosage()) + "' " +
+			                "WHERE favoriteid = " + this.getFavoriteId();
 
-                    DBHandler.RunSQL(sql);
+	                DBHandler.RunSQL(sql);
 
-                    b = true;
+	                success = true;
                 }
 
-            } catch (SQLException e) {
+            }
+            catch (SQLException e)
+            {
                 logger.error("unexpected error", e);
-            } finally {
+            }
+            finally
+            {
                 DbConnectionFilter.releaseThreadLocalDbConnection();
             }
 
-            return b;
+            return success;
         }
 
         /**
