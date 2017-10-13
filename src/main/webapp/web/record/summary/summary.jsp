@@ -162,12 +162,15 @@
 								 ng-style="summaryCtrl.setColor(note)"
 								 ng-show="summaryCtrl.showNote(note)">
 								<div class="row note-header vertical-align" ng-show="summaryCtrl.showNoteHeader(note)" >
-									<div class="col-md-9 col-xs-8 pull-left note-header-info vertical-align">
+									<div class="col-lg-9 col-md-7 col-xs-8 pull-left note-header-info vertical-align">
 										<h6>{{note.observationDate | date : 'dd-MMM-yyyy'}}
 											<span class="note-header-title" style="word-break: break-all">{{summaryCtrl.getNoteHeader(note)}}</span>
 										</h6>
 									</div>
-									<div class="col-md-3 col-xs-4 pull-right text-right note-header-buttons">
+									<div class="col-lg-3 col-md-5 col-xs-4 pull-right text-right note-header-buttons">
+										<button class="btn btn-xs btn-warning-static" ng-show="note.isSigned === false">
+											<span class="fa fa-exclamation-triangle" title="This note is unsigned!"></span>
+										</button>
 										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editNote(note)" ng-show="note.editable && summaryCtrl.isRegularNote(note)">
 											Edit
 										</button>
