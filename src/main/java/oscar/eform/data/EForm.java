@@ -25,18 +25,23 @@
 
 package oscar.eform.data;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMessages;
 import org.oscarehr.common.OtherIdManager;
 import org.oscarehr.common.dao.EFormDataDao;
+import org.oscarehr.common.dao.PreventionDao;
 import org.oscarehr.common.model.EFormData;
+import org.oscarehr.common.model.Prevention;
 import org.oscarehr.ui.servlet.ImageRenderingServlet;
 import org.oscarehr.util.DigitalSignatureUtils;
 import org.oscarehr.util.MiscUtils;
@@ -51,6 +56,7 @@ import oscar.util.UtilDateUtilities;
 
 public class EForm extends EFormBase {
 	private static EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean("EFormDataDao");
+	private static PreventionDao preventionDao = (PreventionDao) SpringUtils.getBean("preventionDao");
 	private static Logger log = MiscUtils.getLogger();
 
 	private String appointment_no = "-1";
@@ -544,7 +550,32 @@ public class EForm extends EFormBase {
 				setSqlParams(REF_VAR_VALUE, ref_value);
 				setSqlParams(REF_FID, ref_fid);
 			}
-		} else if (module.equals("o")) {
+		}
+		else if (module.equals("p")) { //preventions & vaccines
+			log.debug("SWITCHING TO PREVENTIONS");
+
+			// get the latest prevention
+			Prevention prevention = preventionDao.findMostRecentByTypeAndDemoNo(type, Integer.parseInt(this.demographicNo));
+			if(prevention != null) {
+
+				curAP = new DatabaseAP();
+				curAP.setApName(apName);
+				String value = "";
+				// quick dirty way to get specified value. redesign for oscar 15?
+				if("ID".equalsIgnoreCase(field))                        value = String.valueOf(prevention.getId());
+				if("DEMOGRAPHIC_NO".equalsIgnoreCase(field))            value = String.valueOf(prevention.getDemographicId());
+				if("CREATION_DATE".equalsIgnoreCase(field))             value = dateStringOrEmpty(prevention.getCreationDate());
+				if("CREATOR".equalsIgnoreCase(field))                   value = String.valueOf(prevention.getCreatorProviderNo());
+				if("PREVENTION_DATE".equalsIgnoreCase(field))           value = dateStringOrEmpty(prevention.getPreventionDate());
+				if("PROVIDER_NO".equalsIgnoreCase(field))               value = String.valueOf(prevention.getProviderNo());
+				if("PROVIDER_NAME".equalsIgnoreCase(field))             value = StringUtils.trimToEmpty(prevention.getProviderName());
+				if("REFUSED".equalsIgnoreCase(field))                   value = String.valueOf(prevention.isRefused());
+				if("UPDATE_DATE".equalsIgnoreCase(field))               value = dateStringOrEmpty(prevention.getLastUpdateDate());
+
+				curAP.setApOutput(value);
+			}
+		}
+		else if (module.equals("o")) {
 			log.debug("SWITCHING TO OTHER_ID");
 			String table_name = "", table_id = "";
 			EFormLoader.getInstance();
@@ -562,6 +593,14 @@ public class EForm extends EFormBase {
 			setSqlParams(TABLE_ID, table_id);
 		}
 		return curAP;
+	}
+	private String dateStringOrEmpty(Date date) {
+		if(date != null) {
+			//TODO - use preferred date format
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			return dateFormat.format(date);
+		}
+		return "";
 	}
 
 	private String escapeHtml(String value) {
