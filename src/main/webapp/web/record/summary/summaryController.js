@@ -437,6 +437,12 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return false;
 		};
 
+		// Returns true if the given note is an unsigned encounter note
+		controller.isUnsignedEncounterNote = function isUnsignedEncounterNote(note)
+		{
+			return (!note.isSigned && !note.cpp && !note.document && !note.ticklerNote && !note.eformData);
+		};
+
 		// controller.showMoreItemsSymbol = function(mod)
 		// {
 		// 	if (!angular.isDefined(mod.summaryItem))
