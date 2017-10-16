@@ -367,12 +367,12 @@
 											</div>
 
 											<div ng-repeat="comment in item.comments"
-												 class="well">
+												 class="well k2a-comment-container">
 												<h5>
 													<b>{{comment.author}}</b> posted {{comment.publishedDate
 													| date:'yyyy-MM-dd'}}
 												</h5>
-												<p style="text-align:left">{{comment.body}}</p>
+												<p >{{comment.body}}</p>
 											</div>
 
 											<div class="well"
