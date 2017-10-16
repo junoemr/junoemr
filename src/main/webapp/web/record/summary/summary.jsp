@@ -169,11 +169,7 @@
 									</div>
 									<div class="col-lg-3 col-md-5 col-xs-4 pull-right text-right note-header-buttons">
 										<button class="btn btn-xs btn-warning-static"
-												ng-show="note.isSigned === false &&
-												note.cpp === false &&
-												note.document === false &&
-												note.ticklerNote === false &&
-												note.eformData === false">
+												ng-show="summaryCtrl.isUnsignedEncounterNote(note)">
 											<span class="fa fa-exclamation-triangle" title="This note is unsigned!"></span>
 										</button>
 										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editNote(note)" ng-show="note.editable && summaryCtrl.isRegularNote(note)">

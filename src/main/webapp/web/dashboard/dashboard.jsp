@@ -38,15 +38,13 @@
 				</h3>
 			</div>
 			<div class="col-md-3 col-xs-4 pull-right">
-				<p class="text-right">Today is {{dashboardCtrl.displayDate() | date:'MMMM d,
-					y'}}</p>
+				<p class="text-right">Today is {{dashboardCtrl.displayDate() | date:'MMMM dd, yyyy'}}</p>
 			</div>
 		</div>
 		<div class="row" id="dashboard-body" ng-if="dashboardCtrl.me != null">
-			<div class="col-xs-12">
-
+			<div class="col-lg-8">
 				<div class="row dashboard-row">
-					<div class="col-lg-8 col-xs-12">
+					<div class="col-lg-12 col-xs-12">
 						<p>
 							<a ng-click="dashboardCtrl.openInbox()">
 								You have
@@ -111,10 +109,10 @@
 								<tbody>
 								<tr ng-repeat="item in dashboardCtrl.inbox" ng-hide="$index >= 5"
 									ng-click="dashboardCtrl.openInbox()" class="hand-hover">
-									<td><span
-											ng-if="item.properity != null && item.priority != 'Routine'"
-											class="glyphicon glyphicon-flag"
-											style="color:red"></span></td>
+									<td>
+										<span ng-if="item.priority != null && item.priority != 'Routine'"
+											  class="glyphicon glyphicon-flag priority-flag"></span>
+									</td>
 									<td>{{item.demographicName}}</td>
 									<td>{{item.discipline}}</td>
 									<!--  <td>{{item.source}}</td> -->
@@ -137,7 +135,7 @@
 				</div>
 
 				<div class="row dashboard-row">
-					<div class="col-lg-8 col-xs-12">
+					<div class="col-lg-12 col-xs-12">
 						<!-- il18n problem here -->
 						<p>
 							<a ng-click="dashboardCtrl.openClassicMessenger()">
@@ -205,7 +203,7 @@
 				</div>
 
 				<div class="row dashboard-row">
-					<div class="col-lg-8 col-xs-12">
+					<div class="col-lg-12">
 						<!-- this is a bit of a problem for il18n -->
 						<p>
 							<a href="../web/#!/ticklers"> <%-- Not a permanent solution, figure out better way to link to ticklers --%>
@@ -256,8 +254,7 @@
 									ng-click="dashboardCtrl.viewTickler(item)" class="hand-hover">
 									<td>
 											<span ng-if="dashboardCtrl.isTicklerHighPriority(item)"
-												  class="glyphicon glyphicon-flag"
-												  style="color:red"
+												  class="glyphicon glyphicon-flag priority-flag"
 												  title="High priority tickler">
 											</span>
 									</td>
@@ -281,98 +278,128 @@
 					</div>
 				</div>
 			</div>
-		</div>
-	</div>
+			<div ng-show="dashboardCtrl.k2aActive" class="col-lg-3 col-md-12 pull-right">
+				<p class="lead"><bean:message key="dashboard.k2a.header" bundle="ui"/></p>
+				<div id="dashboard-body-right" class="well" ng-show="dashboardCtrl.k2aFeedActive">
+					<div infinite-scroll="dashboardCtrl.updateFeed(dashboardCtrl.k2afeed.length,10)"
+						 infinite-scroll-parent="true">
+						<blockquote ng-repeat="item in dashboardCtrl.k2afeed"
+									ng-class="{
+									'significance-high': item.significance === 'High',
+									'significance-medium': item.significance === 'Medium',
+									'significance-low': item.significance === 'Low'
+									}">
+							<h4>{{item.type}}:
+								<a target="_blank" href="{{item.link}}">{{item.title}}</a>
+							</h4>
+							<a href="" style="font-size:14px" data-toggle="modal"
+							   data-target="#expandFeed{{item.id}}" ng-if="item.link">{{item.body |
+								cut:true:140 }}</a>
+							<a href="" ng-click="dashboardCtrl.authenticateK2A(item.id)"
+							   style="font-size:14px" ng-if="!item.link">{{item.body}}</a>
+							<small ng-show="item.agree">You agree with this post</small>
+							<small ng-show="item.disagree">You disagree with this post</small>
+							<small>
+								{{item.author}} posted {{item.publishedDate | date:'yyyy-MM-dd'}}
+							</small>
+							<small>
+								<a class="glyphicon glyphicon-thumbs-up"
+								   ng-click="dashboardCtrl.agreeWithK2aPost(item)">
 
-	<div ng-show="dashboardCtrl.k2aActive">
-		<p class="lead"><bean:message key="dashboard.k2a.header" bundle="ui"/></p>
-		<div id="rightColumn" class="col-md-3 hidden-xs" ng-show="dashboardCtrl.k2aFeedActive"
-			 style="height:80vh;overflow-y:scroll">
-			<div infinite-scroll="dashboardCtrl.updateFeed(dashboardCtrl.k2afeed.length,10)"
-				 infinite-scroll-parent="true">
-				<blockquote class="pull-right" ng-repeat="item in dashboardCtrl.k2afeed"
-							ng-class="{'significance-high': item.significance === 'High', 'significance-medium': item.significance === 'Medium', 'significance-low': item.significance === 'Low'}">
-					<h4>{{item.type}}: <a target="_blank" href="{{item.link}}">{{item.title}}</a>
-					</h4>
-					<a href="" style="font-size:14px" data-toggle="modal"
-					   data-target="#expandFeed{{item.id}}" ng-if="item.link">{{item.body |
-						cut:true:140 }}</a>
-					<a href="" ng-click="dashboardCtrl.authenticateK2A(item.id)"
-					   style="font-size:14px" ng-if="!item.link">{{item.body}}</a>
-					<small ng-show="item.agree">You agree with this post</small>
-					<small ng-show="item.disagree">You disagree with this post</small>
-					<small>{{item.author}} posted {{item.publishedDate | date:'yyyy-MM-dd'}}</small>
-					<small>
-						<a class="glyphicon glyphicon-thumbs-up"
-						   ng-click="dashboardCtrl.agreeWithK2aPost(item)"></a>&nbsp;{{item.agreeCount}}&nbsp;&nbsp;
-						<a class="glyphicon glyphicon-thumbs-down"
-						   ng-click="dashboardCtrl.disagreeWithK2aPost(item)"></a>&nbsp;{{item.disagreeCount}}&nbsp;&nbsp;
-						<a class="glyphicon glyphicon-comment" data-toggle="modal"
-						   data-target="#expandFeed{{item.id}}"></a>&nbsp;{{item.commentCount}}
-					</small>
+								</a>
+								&nbsp;{{item.agreeCount}}&nbsp;&nbsp;
+								<a class="glyphicon glyphicon-thumbs-down"
+								   ng-click="dashboardCtrl.disagreeWithK2aPost(item)">
+								</a>
+								&nbsp;{{item.disagreeCount}}&nbsp;&nbsp;
+								<a class="glyphicon glyphicon-comment"
+								   data-toggle="modal"
+								   data-target="#expandFeed{{item.id}}">
+								</a>
+								&nbsp;{{item.commentCount}}
+							</small>
 
-					<div class="modal fade" id="expandFeed{{item.id}}" tabindex="-1" role="dialog"
-						 aria-labelledby="expandFeed{{item.id}}" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<button type="button" class="close" data-dismiss="modal"
-											aria-hidden="true">&times;
-									</button>
-									<h4 class="modal-title" id="imageTitle">{{item.type}}:
-										{{item.title}}</h4>
-								</div>
-								<div class="modal-body">
-									<div>
-										<h4>Summary</h4>
-										<p style="white-space:pre-line;text-align:left">
-											{{item.body}}</p>
-										<hr/>
-									</div>
-									<div class="row">
-										<div class="col-md-7">
-											<a class="glyphicon glyphicon-thumbs-up"
-											   ng-click="dashboardCtrl.agreeWithK2aPost(item)"></a>&nbsp;<b>{{item.agreeCount}}</b>&nbsp;Agree&nbsp;&nbsp;
-											<a class="glyphicon glyphicon-thumbs-down"
-											   ng-click="dashboardCtrl.disagreeWithK2aPost(item)"></a>&nbsp;<b>{{item.disagreeCount}}</b>&nbsp;Disagree&nbsp;&nbsp;
-											<a class="glyphicon glyphicon-comment"></a>&nbsp;<b>{{item.commentCount}}</b>&nbsp;Comments<br/>
+							<div class="modal fade"
+								 id="expandFeed{{item.id}}"
+								 tabindex="-1"
+								 role="dialog"
+								 aria-labelledby="expandFeed{{item.id}}" aria-hidden="true">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<button type="button"
+													class="close"
+													data-dismiss="modal"
+													aria-hidden="true">&times;
+											</button>
+											<h4 class="modal-title" id="imageTitle">{{item.type}}:
+												{{item.title}}</h4>
 										</div>
-										<div class="col-md-5">
-											<p ng-show="item.agree"><i>You agree with this post</i>
-											</p>
-											<p ng-show="item.disagree"><i>You disagree with this
-												post</i></p>
+										<div class="modal-body">
+											<div>
+												<h4>Summary</h4>
+												<p style="white-space:pre-line;text-align:left">
+													{{item.body}}</p>
+												<hr/>
+											</div>
+											<div class="row">
+												<div class="col-md-7">
+													<a class="glyphicon glyphicon-thumbs-up"
+													   ng-click="dashboardCtrl.agreeWithK2aPost(item)">
+													</a>
+													&nbsp;<b>{{item.agreeCount}}</b>&nbsp;Agree&nbsp;&nbsp;
+													<a class="glyphicon glyphicon-thumbs-down"
+													   ng-click="dashboardCtrl.disagreeWithK2aPost(item)">
+													</a>
+													&nbsp;<b>{{item.disagreeCount}}</b>&nbsp;Disagree&nbsp;&nbsp;
+													<a class="glyphicon glyphicon-comment"></a>
+													&nbsp;<b>{{item.commentCount}}</b>
+													&nbsp;Comments<br/>
+												</div>
+												<div class="col-md-5">
+													<p ng-show="item.agree">
+														<i>You agree with this post</i>
+													</p>
+													<p ng-show="item.disagree">
+														<i>You disagree with this post</i>
+													</p>
+												</div>
+											</div>
+
+											<div ng-repeat="comment in item.comments"
+												 class="well k2a-comment-container">
+												<h5>
+													<b>{{comment.author}}</b> posted {{comment.publishedDate
+													| date:'yyyy-MM-dd'}}
+												</h5>
+												<p >{{comment.body}}</p>
+											</div>
+
+											<div class="well"
+												 ng-if="item.comments.length < item.commentCount">
+												<a target="_blank" href="{{item.link}}">See
+													{{item.commentCount - item.comments.length}} more
+													comments...</a>
+											</div>
+
+											<div>
+												<textarea ng-model="item.newComment.body" rows="4"
+														  cols="50">
+												</textarea>
+												<br/>
+												<button ng-click="dashboardCtrl.commentOnK2aPost(item)"
+														class="btn btn-default">Save Comment
+												</button>
+											</div>
 										</div>
-									</div>
-
-									<div ng-repeat="comment in item.comments" | class="well">
-										<h5><b>{{comment.author}}</b> posted {{comment.publishedDate
-											| date:'yyyy-MM-dd'}}</h5>
-										<p style="text-align:left">{{comment.body}}</p>
-									</div>
-
-									<div class="well"
-										 ng-if="item.comments.length < item.commentCount">
-										<a target="_blank" href="{{item.link}}">See
-											{{item.commentCount - item.comments.length}} more
-											comments...</a>
-									</div>
-
-									<div>
-										<textarea ng-model="item.newComment.body" rows="4"
-												  cols="50"></textarea><br/>
-										<button ng-click="dashboardCtrl.commentOnK2aPost(item)"
-												class="btn btn-default">Save Comment
-										</button>
 									</div>
 								</div>
 							</div>
-						</div>
+						</blockquote>
+						<div style="clear: both;"></div>
 					</div>
-				</blockquote>
-				<div style="clear: both;"></div>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
 </div>
