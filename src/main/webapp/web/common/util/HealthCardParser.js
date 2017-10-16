@@ -64,7 +64,7 @@ Oscar.HealthCardParser.parseBCCombined = function parseBCCombined(cardData,cardH
 	var track2Index=cardData.indexOf("?") + 1;
 	var track3Index=cardData.indexOf("?", track2Index) + 1;
 
-	var track1 = cardData.substring(track1Index,track2Index);
+	var track1 = cardData.substring(track1Index, track2Index);
 	var track2 = cardData.substring(track2Index, track3Index);
 	var track3 = cardData.substring(track3Index);
 
@@ -75,11 +75,15 @@ Oscar.HealthCardParser.parseBCCombined = function parseBCCombined(cardData,cardH
 	//TRACK 1
 	// length constants taken from specification
 	var index = 1; // skip % Constant
-	dataHash.province = Oscar.HealthCardParser.getFieldValue(track1,index,2); index += dataHash.province.length;
+	dataHash.province = Oscar.HealthCardParser.getFieldValue(track1,index,2);
+	index += dataHash.province.length;
 
-	dataHash.city = Oscar.HealthCardParser.getFieldValue(track1,index,13); index += dataHash.city.length+1;
-	var names = Oscar.HealthCardParser.getFieldValue(track1,index,35); index += names.length+1;
-	var fullAddress = Oscar.HealthCardParser.getFieldValue(track1,index,29); index += fullAddress.length+1;
+	dataHash.city = Oscar.HealthCardParser.getFieldValue(track1,index,13);
+	index += dataHash.city.length+1;
+	var names = Oscar.HealthCardParser.getFieldValue(track1,index,35);
+	index += names.length+1;
+	var fullAddress = Oscar.HealthCardParser.getFieldValue(track1,index,29);
+	index += fullAddress.length+1;
 
 	dataHash.lastName = names.substring(0, names.indexOf("$")-1).toUpperCase();
 	dataHash.firstName = names.substring(names.indexOf("$")+1).toUpperCase();
@@ -87,8 +91,10 @@ Oscar.HealthCardParser.parseBCCombined = function parseBCCombined(cardData,cardH
 
 	//TRACK 2
 	index = 1; // skip track 2 constant ;
-	metaHash.isoiin = Oscar.HealthCardParser.getFieldValue(track2,index,6); index += metaHash.isoiin.length;
-	var DL = track2.substring(index, track2.indexOf("=")); index += DL.length;
+	metaHash.isoiin = Oscar.HealthCardParser.getFieldValue(track2,index,6);
+	index += metaHash.isoiin.length;
+	var DL = track2.substring(index, track2.indexOf("="));
+	index += DL.length;
 	if(DL.length === 7) {
 		dataHash.driverLicenseNo = DL;
 	}
@@ -98,14 +104,16 @@ Oscar.HealthCardParser.parseBCCombined = function parseBCCombined(cardData,cardH
 	}
 
 	index++; // skip constant '=' in field 4
-	var expire = Oscar.HealthCardParser.getFieldValue(track2,index,4); index += expire.length;//YYMM
+	var expire = Oscar.HealthCardParser.getFieldValue(track2,index,4); //YYMM
+	index += expire.length;
 	if("0000" !== expire) {
 		dataHash.endYear = "20" + expire.substring(0, 2);
 		dataHash.endMonth = expire.substring(2, 4);
 		dataHash.endDay = "01";
 	}
 
-	var dobCCYYMMDD = Oscar.HealthCardParser.getFieldValue(track2,index,8); index += dobCCYYMMDD.length;//CCYYMMDD
+	var dobCCYYMMDD = Oscar.HealthCardParser.getFieldValue(track2,index,8);
+	index += dobCCYYMMDD.length;
 
 	dataHash.dobYear = dobCCYYMMDD.substring(0, 4);
 	dataHash.dobMonth = dobCCYYMMDD.substring(4, 6);
@@ -113,24 +121,42 @@ Oscar.HealthCardParser.parseBCCombined = function parseBCCombined(cardData,cardH
 
 	//TRACK 3
 
-	index=1;
-	metaHash.versionNo = Oscar.HealthCardParser.getFieldValue(track3,index,1); index += 1;
-	metaHash.secVersionNo = Oscar.HealthCardParser.getFieldValue(track3,index,1); index += 1;
+	index=1; // skip 1 character constant
+	metaHash.versionNo = Oscar.HealthCardParser.getFieldValue(track3,index,1);
+	index += 1;
+	metaHash.secVersionNo = Oscar.HealthCardParser.getFieldValue(track3,index,1);
+	index += 1;
 
-	dataHash.postal = Oscar.HealthCardParser.getFieldValue(track3,index,11); index += 11;
-	dataHash.class = Oscar.HealthCardParser.getFieldValue(track3,index,2); index += 2;
-	dataHash.restrictions = Oscar.HealthCardParser.getFieldValue(track3,index,10); index += 10;
-	dataHash.endorsements = Oscar.HealthCardParser.getFieldValue(track3,index,4); index += 4;
-	dataHash.sex = Oscar.HealthCardParser.getFieldValue(track3,index,1); index += 1;
-	dataHash.height = Oscar.HealthCardParser.getFieldValue(track3,index,3); index += 3;
-	dataHash.weight = Oscar.HealthCardParser.getFieldValue(track3,index,3); index += 3;
-	dataHash.hairColour = Oscar.HealthCardParser.getFieldValue(track3,index,3); index += 3;
-	dataHash.eyeColour = Oscar.HealthCardParser.getFieldValue(track3,index,3); index += 3;
-	dataHash.hin = Oscar.HealthCardParser.getFieldValue(track3,index,10); index += 10;
+	dataHash.postal = Oscar.HealthCardParser.getFieldValue(track3,index,11);
+	index += 11;
+	dataHash.class = Oscar.HealthCardParser.getFieldValue(track3,index,2);
+	index += 2;
+	dataHash.restrictions = Oscar.HealthCardParser.getFieldValue(track3,index,10);
+	index += 10;
+	dataHash.endorsements = Oscar.HealthCardParser.getFieldValue(track3,index,4);
+	index += 4;
+	dataHash.sex = Oscar.HealthCardParser.getFieldValue(track3,index,1);
+	index += 1;
+	dataHash.height = Oscar.HealthCardParser.getFieldValue(track3,index,3);
+	index += 3;
+	dataHash.weight = Oscar.HealthCardParser.getFieldValue(track3,index,3);
+	index += 3;
+	dataHash.hairColour = Oscar.HealthCardParser.getFieldValue(track3,index,3);
+	index += 3;
+	dataHash.eyeColour = Oscar.HealthCardParser.getFieldValue(track3,index,3);
+	index += 3;
+	dataHash.hin = Oscar.HealthCardParser.getFieldValue(track3,index,10);
+	index += 10;
 
-	metaHash.fourteenA = Oscar.HealthCardParser.getFieldValue(track3,index,16); index += 16;
-	metaHash.ecc = Oscar.HealthCardParser.getFieldValue(track3,index,6); index += 6;
-	metaHash.securityFunction = Oscar.HealthCardParser.getFieldValue(track3,index,5); index += 5;
+	metaHash.fourteenA = Oscar.HealthCardParser.getFieldValue(track3,index,16);
+	index += 16;
+	metaHash.ecc = Oscar.HealthCardParser.getFieldValue(track3,index,6);
+	index += 6;
+	metaHash.securityFunction = Oscar.HealthCardParser.getFieldValue(track3,index,5);
+	index += 5;
+
+	cardHash.meta = metaHash;
+	cardHash.data = dataHash;
 
 	return cardHash;
 };
@@ -170,6 +196,9 @@ Oscar.HealthCardParser.parseBCStandalone = function parseBCStandalone(cardData,c
 
 	dataHash.sex = 'M'; // this is not included in spec, default to Male
 	dataHash.province = 'BC';
+
+	cardHash.meta = metaHash;
+	cardHash.data = dataHash;
 
 	return cardHash;
 };
@@ -211,13 +240,16 @@ Oscar.HealthCardParser.parseOntario = function parseOntario(cardData,cardHash)
 	}
 	dataHash.province = 'ON';
 
+	cardHash.meta = metaHash;
+	cardHash.data = dataHash;
+
 	return cardHash;
 };
 
 
 Oscar.HealthCardParser.parse = function parse(cardData)
 {
-	var cardHash = {
+	var cardHashOut = {
 		meta: {},
 		data: {}
 	};
@@ -228,22 +260,22 @@ Oscar.HealthCardParser.parse = function parse(cardData)
 
 		if (cardData.startsWith("%B610043"))
 		{
-			Oscar.HealthCardParser.parseBCStandalone(cardData, cardHash);
+			cardHashOut = Oscar.HealthCardParser.parseBCStandalone(cardData, cardHashOut);
 		}
 		else if (cardData.startsWith("%BC") && cardData.substring(cardData.indexOf("?")).startsWith("?;636028"))
 		{
-			Oscar.HealthCardParser.parseBCCombined(cardData, cardHash);
+			cardHashOut = Oscar.HealthCardParser.parseBCCombined(cardData, cardHashOut);
 		}
 		else
 		{
-			Oscar.HealthCardParser.parseOntario(cardData, cardHash);
+			cardHashOut = Oscar.HealthCardParser.parseOntario(cardData, cardHashOut);
 		}
 	}
 	catch (e)
 	{
 		console.error("Error parsing card data", e);
 	}
-	return cardHash;
+	return cardHashOut;
 };
 
 
