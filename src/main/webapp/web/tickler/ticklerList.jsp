@@ -30,6 +30,7 @@
 	<form name="searchForm" id="search-form" class="noprint">
 		<div class="row search-filters">
 			<div class="col-lg-2 col-sm-4 col-xs-6">
+				<label>Service Start Date</label>
 				<input ng-model="ticklerListCtrl.search.serviceStartDate" type="text" 
 					id="serviceStartDate" 
 					name="serviceStartDate" 
@@ -42,6 +43,7 @@
 				>
 			</div>
 			<div class="col-lg-2 col-sm-4 col-xs-6">
+				<label>Service End Date</label>
 				<input ng-model="ticklerListCtrl.search.serviceEndDate" type="text" 
 					id="serviceEndDate" 
 					name="serviceEndDate" 
@@ -54,6 +56,7 @@
 				>
 			</div>
 			<div class="col-lg-2 col-sm-3 col-xs-6">
+				<label>Status</label>
 				<select ng-model="ticklerListCtrl.search.status" name="status" id="status" class="form-control" >
 					<option value=""><bean:message key="tickler.list.status" bundle="ui"/></option>
 					<option value="A"><bean:message key="tickler.list.status.active" bundle="ui"/></option>
@@ -62,6 +65,7 @@
 				</select>     
 			</div>
 			<div class="col-lg-2 col-sm-3 col-xs-6">
+				<label>Priority</label>
 				<select ng-model="ticklerListCtrl.search.priority" 
 						name="priority" 
 						id="priority" 
@@ -75,6 +79,7 @@
 			</div>
 
 			<div class="col-lg-2 col-sm-3 col-xs-6">
+				<label>Assignee</label>
 				<select ng-model="ticklerListCtrl.search.taskAssignedTo" name="taskAssignedTo" 
 						id="taskAssignedTo" 
 						class="form-control"
@@ -85,6 +90,7 @@
 				</select>
 			</div>
 			<div class="col-lg-2 col-sm-3 col-xs-6">
+				<label>Creator</label>
 				<select ng-model="ticklerListCtrl.search.creator" 
 						name="creator" 
 						id="creator" 
@@ -95,6 +101,7 @@
 				</select>
 			</div>
 			<div class="col-lg-2 col-sm-3 col-xs-6">
+				<label>MRP</label>
 				<select ng-model="ticklerListCtrl.search.mrp" name="mrp" 
 						id="mrp" 
 						class="form-control"
