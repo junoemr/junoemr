@@ -97,7 +97,7 @@ public class PreventionDao extends AbstractDao<Prevention> {
 				"WHERE x.preventionType = :type " +
 				"AND x.demographicId = :demographicNo " +
 				"AND x.deleted='0' " +
-				"ORDER BY x.preventionDate");
+				"ORDER BY x.preventionDate DESC, x.id DESC");
 
 		query.setParameter("type", preventionType);
 		query.setParameter("demographicNo", demoNo);
