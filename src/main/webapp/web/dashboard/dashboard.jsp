@@ -111,7 +111,7 @@
 									ng-click="dashboardCtrl.openInbox()" class="hand-hover">
 									<td>
 										<span ng-if="item.priority != null && item.priority != 'Routine'"
-											  class="glyphicon glyphicon-flag"></span>
+											  class="glyphicon glyphicon-flag priority-flag"></span>
 									</td>
 									<td>{{item.demographicName}}</td>
 									<td>{{item.discipline}}</td>
@@ -254,8 +254,7 @@
 									ng-click="dashboardCtrl.viewTickler(item)" class="hand-hover">
 									<td>
 											<span ng-if="dashboardCtrl.isTicklerHighPriority(item)"
-												  class="glyphicon glyphicon-flag"
-												  style="color:red"
+												  class="glyphicon glyphicon-flag priority-flag"
 												  title="High priority tickler">
 											</span>
 									</td>
