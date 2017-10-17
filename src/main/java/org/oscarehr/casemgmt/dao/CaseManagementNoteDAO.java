@@ -295,26 +295,26 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 					list += issues[x];
 				}
 				hql = "select cmn from CaseManagementNote cmn join cmn.issues i where i.issue_id in (" + list
-				        + ") and cmn.demographic_no = ? and cmn.archived = 0 and cmn.id = (select max(cmn2.id) from CaseManagementNote cmn2 where cmn.uuid = cmn2.uuid) ORDER BY cmn.position, cmn.observation_date desc";
-				return this.getHibernateTemplate().find(hql, demographic_no);
+				        + ") and cmn.demographic_no = ? and i.demographic_no = ? and cmn.archived = 0 and " +
+						"cmn.id = (select max(cmn2.id) from " +
+						"CaseManagementNote cmn2 where cmn.uuid = cmn2.uuid) " +
+						"ORDER BY cmn.position, cmn.observation_date desc";
+
+				issueListReturn = this.getHibernateTemplate().find(
+						hql, new Object[] { demographic_no, demographic_no });
 
 			} else if (issues.length == 1) {
 				long id = Long.parseLong(issues[0]);
 				
-				hql = "select cmn from CaseManagementNote cmn join cmn.issues i where i.issue_id = ? and cmn.demographic_no= ? and cmn.archived=0 order by cmn.position, cmn.observation_date desc";
+				hql = "select cmn from CaseManagementNote cmn join cmn.issues i " +
+						"where i.issue_id = ? and i.demographic_no = ? and cmn.demographic_no= ? " +
+						"and cmn.archived = 0 " +
+						"and cmn.id = (select max(cmn2.id) from " +
+						"CaseManagementNote cmn2 where cmn.uuid = cmn2.uuid) " +
+						"order by cmn.position, cmn.observation_date desc";
 					
-				List<CaseManagementNote> issueList = this.getHibernateTemplate().find(hql, new Object[] { id, demographic_no });
-				
-				hql = "select  max(cmn.id) from CaseManagementNote cmn where cmn.demographic_no = ? group by cmn.uuid order by max(cmn.id)";
-				List<Integer> currNoteList = this.getHibernateTemplate().find(hql, new Object[] { demographic_no });
-				
-				for(CaseManagementNote issueNote : issueList)
-				{
-					if(currNoteList.contains(issueNote.getId())) {
-						issueListReturn.add(issueNote);
-					}
-				}
-				return issueListReturn;
+				issueListReturn = this.getHibernateTemplate().find(
+						hql, new Object[] { id, demographic_no, demographic_no });
 			}
 		}
 

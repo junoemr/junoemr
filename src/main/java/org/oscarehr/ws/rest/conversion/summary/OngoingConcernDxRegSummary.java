@@ -69,7 +69,8 @@ public class OngoingConcernDxRegSummary extends IssueNoteSummary implements Summ
 		}
 		String[] issueIds = getIssueIds(issueList);
 		
-		Collection<CaseManagementNote> notes = caseManagementMgr.getActiveNotes(""+demographicNo, issueIds);
+		Collection<CaseManagementNote> notes = caseManagementMgr.getActiveNotes(
+				"" + demographicNo, issueIds);
 		
 		String cppExts = "";
 		int count = 0;
