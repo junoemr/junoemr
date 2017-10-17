@@ -30,18 +30,11 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 import javax.persistence.PersistenceException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
@@ -285,37 +278,27 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 		
 		List<CaseManagementNote> issueListReturn = new ArrayList<CaseManagementNote>();
 		
-		if (issues != null) {
-			if (issues.length > 1) {
-				list = "";
-				for (int x = 0; x < issues.length; x++) {
-					if (x != 0) {
-						list += ",";
-					}
-					list += issues[x];
-				}
-				hql = "select cmn from CaseManagementNote cmn join cmn.issues i where i.issue_id in (" + list
-				        + ") and cmn.demographic_no = ? and i.demographic_no = ? and cmn.archived = 0 and " +
-						"cmn.id = (select max(cmn2.id) from " +
-						"CaseManagementNote cmn2 where cmn.uuid = cmn2.uuid) " +
-						"ORDER BY cmn.position, cmn.observation_date desc";
-
-				issueListReturn = this.getHibernateTemplate().find(
-						hql, new Object[] { demographic_no, demographic_no });
-
-			} else if (issues.length == 1) {
-				long id = Long.parseLong(issues[0]);
-				
-				hql = "select cmn from CaseManagementNote cmn join cmn.issues i " +
-						"where i.issue_id = ? and i.demographic_no = ? and cmn.demographic_no= ? " +
-						"and cmn.archived = 0 " +
-						"and cmn.id = (select max(cmn2.id) from " +
-						"CaseManagementNote cmn2 where cmn.uuid = cmn2.uuid) " +
-						"order by cmn.position, cmn.observation_date desc";
-					
-				issueListReturn = this.getHibernateTemplate().find(
-						hql, new Object[] { id, demographic_no, demographic_no });
+		if (issues != null)
+		{
+			String[] placeHolderArray = new String[issues.length];
+			ArrayList<String> params = new ArrayList<String>();
+			for(int i = 0; i < issues.length; i++)
+			{
+				params.add(issues[i]);
+				placeHolderArray[i] = "?";
 			}
+			String issues_placeholder = StringUtils.join(placeHolderArray, ",");
+			params.add((demographic_no));
+			params.add((demographic_no));
+
+			hql = "select cmn from CaseManagementNote cmn " +
+					"join cmn.issues i " +
+					"where i.issue_id in (" + issues_placeholder + ") " +
+					"and cmn.demographic_no = ? and i.demographic_no = ? and cmn.archived = 0 " +
+					"and cmn.id = (select max(cmn2.id) from CaseManagementNote cmn2 where cmn.uuid = cmn2.uuid) " +
+					"ORDER BY cmn.position, cmn.observation_date desc";
+
+			issueListReturn = this.getHibernateTemplate().find(hql, params.toArray());
 		}
 
 		return issueListReturn;
