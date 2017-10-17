@@ -25,10 +25,10 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<div class="col-lg-12" ng-hide="detailsCtrl.page.canRead">
+<div class="col-lg-12" ng-show="detailsCtrl.page.canRead === false">
 	<bean:message key="demographic.demographiceditdemographic.accessDenied"/>
 </div>
-<div class="col-xs-12" ng-show="detailsCtrl.page.canRead" id="patient-details-page">
+<div class="col-xs-12" ng-show="detailsCtrl.page.canRead === true" id="patient-details-page">
 	<div class="row">
 			<div class="col-md-10 col-lg-8">
 				<div class="row">
