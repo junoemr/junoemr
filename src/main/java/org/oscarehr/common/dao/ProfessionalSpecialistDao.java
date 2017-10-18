@@ -138,6 +138,43 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 
 	}
 
+	public List<ProfessionalSpecialist> findByReferralNo(Integer referralNo, int offset, int maxResults)
+	{
+		String queryString = "SELECT x FROM " + modelClass.getName() + " x " +
+				"WHERE x.hideFromView = false " +
+				"AND x.referralNo LIKE :refNo " +
+				"ORDER BY x.lastName, x.firstName";
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("refNo", referralNo + "%");
+
+		query.setFirstResult(offset);
+		query.setMaxResults(maxResults);
+
+		@SuppressWarnings("unchecked")
+		List<ProfessionalSpecialist> specialistList = query.getResultList();
+		return specialistList;
+	}
+
+	public List<ProfessionalSpecialist> findBySearchNameAndReferralNo(String searchText,Integer referralNo, int offset, int maxResults)
+	{
+		String queryString = "SELECT x FROM " + modelClass.getSimpleName() + " x " +
+						"WHERE x.hideFromView = false" +
+						"AND (x.firstName LIKE :firstName OR x.lastName LIKE :lastName)" +
+						"AND x.referralNo LIKE :refNo " +
+						"ORDER BY x.lastName, x.firstName";
+
+		Query query = entityManager.createQuery(queryString);
+
+		query.setParameter("firstName", searchText+"%");
+		query.setParameter("lastName", searchText+"%");
+		query.setParameter("refNo", referralNo+"%");
+		query.setFirstResult(offset);
+		query.setMaxResults(maxResults);
+
+		List<ProfessionalSpecialist> results = query.getResultList();
+		return results;
+	}
+
 	public ProfessionalSpecialist getByReferralNo(String referralNo) {
 		List<ProfessionalSpecialist> cList = findByReferralNo(referralNo);
 
