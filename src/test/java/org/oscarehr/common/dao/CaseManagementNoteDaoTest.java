@@ -39,9 +39,4 @@ public class CaseManagementNoteDaoTest extends DaoTestFixtures {
 	public void before() throws Exception {
 		SchemaUtils.restoreTable("casemgmt_note", "secRole", "program");
 	}
-
-	@Test
-	public void testFindAll() {
-		assertNotNull(dao.findAll());
-	}
 }
