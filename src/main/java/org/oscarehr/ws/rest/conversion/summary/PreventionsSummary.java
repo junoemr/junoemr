@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.oscarehr.common.model.Demographic;
+import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.PreventionManager;
 import org.oscarehr.common.model.Prevention;
 import org.oscarehr.util.LoggedInInfo;
@@ -42,7 +44,6 @@ import oscar.oscarPrevention.PreventionDS;
 import oscar.oscarPrevention.PreventionData;
 import oscar.oscarPrevention.PreventionDisplayConfig;
 
-
 @Component
 public class PreventionsSummary implements Summary {
 
@@ -50,7 +51,7 @@ public class PreventionsSummary implements Summary {
 	private PreventionManager preventionManager;
 	
 	public SummaryTo1 getSummary(LoggedInInfo loggedInInfo,Integer demographicNo,String summaryCode){
-		
+
 		SummaryTo1 summary = new SummaryTo1("Preventions",0,SummaryTo1.PREVENTIONS);
 		
 		List<SummaryItemTo1> list = summary.getSummaryItem();
@@ -62,22 +63,28 @@ public class PreventionsSummary implements Summary {
 	
 
 	@SuppressWarnings("unchecked")
-	private void preventionsList(LoggedInInfo loggedInInfo,List<SummaryItemTo1> list, Integer demographicNo){
-		
-		String url = "../oscarPrevention/index.jsp?demographic_no="+demographicNo;
-		
+	private void preventionsList(LoggedInInfo loggedInInfo,List<SummaryItemTo1> list, Integer demographicNo)
+	{
+		String url = "../oscarPrevention/index.jsp?demographic_no=" + demographicNo;
+
+		DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+		Demographic demographic = demographicManager.getDemographic(loggedInInfo, demographicNo);
+
 		//saved preventions for demographicNo
 		List<Prevention> preventions = preventionManager.getPreventionsByDemographicNo(loggedInInfo, demographicNo);
 		
 		SummaryItemTo1 summaryItem;
 				
-		oscar.oscarPrevention.Prevention p = PreventionData.getPrevention(loggedInInfo, demographicNo);
+		oscar.oscarPrevention.Prevention p = PreventionData.getPrevention(loggedInInfo, demographic);
 
-        PreventionDS pf = SpringUtils.getBean(PreventionDS.class);
+        PreventionDS preventionDS = SpringUtils.getBean(PreventionDS.class);
 
-        try{
-            pf.getMessages(p);
-        }catch(Exception dsException){
+        try
+		{
+            preventionDS.getMessages(p);
+        }
+        catch(Exception dsException)
+		{
             //do nothing for now
         }
         
@@ -91,58 +98,73 @@ public class PreventionsSummary implements Summary {
 				
 		List<String> items = new ArrayList<String>();
 
-		for (int i = 0 ; i < prevList.size(); i++){
-			
-			HashMap<String,String> h = prevList.get(i);
-            String prevName = h.get("name");
-            ArrayList<Map<String,Object>> alist = PreventionData.getPreventionData(loggedInInfo, prevName, demographicNo);
-            Date demographicDateOfBirth=PreventionData.getDemographicDateOfBirth(loggedInInfo, demographicNo);
-            PreventionData.addRemotePreventions(loggedInInfo, alist, demographicNo,prevName,demographicDateOfBirth);
-            boolean show = pdc.display(loggedInInfo, h, demographicNo.toString(),alist.size());
-            if( show ) {
-              //add warnings right away so they display first
-        	  if( warningTable.containsKey(prevName) ){
+		for (HashMap<String, String> prevension : prevList)
+		{
+
+			String prevName = prevension.get("name");
+			ArrayList<Map<String, Object>> alist = PreventionData.getPreventionData(
+					loggedInInfo, prevName, demographic);
+
+			Date demographicDateOfBirth = demographic.getBirthDate();
+			PreventionData.addRemotePreventions(
+					loggedInInfo, alist, demographic, prevName, demographicDateOfBirth);
+
+			boolean show = pdc.display(loggedInInfo, prevension, demographic, alist.size());
+			if (show)
+			{
+				//add warnings right away so they display first
+				if (warningTable.containsKey(prevName))
+				{
 					summaryItem = new SummaryItemTo1(0, prevName, url, "prevention");
 					summaryItem.setIndicatorClass("highlight");
 					summaryItem.setWarning(warningTable.get(prevName).toString());
 					list.add(summaryItem);
-              } else {
-            	  
-            	  if(!isPreventionExist(preventions, prevName)){//don't add to items if data entered already
-                  	items.add(prevName);
-            	  }
-              }
+				} else
+				{
 
-            }
+					if (!isPreventionExist(preventions, prevName))
+					{//don't add to items if data entered already
+						items.add(prevName);
+					}
+				}
+
+			}
 		}
-		
-		
-		//add the rest of the items
-        for(int idx = 0; idx < items.size(); ++idx ){
-	        	summaryItem = new SummaryItemTo1(0, items.get(idx),url,"prevention");
-	        	list.add(summaryItem);
-        }
 
-		for(Prevention prevention:preventions) {
-			summaryItem = new SummaryItemTo1(prevention.getId(), prevention.getPreventionType(),url,"prevention");
+		//add the rest of the items
+		for (String item : items)
+		{
+			summaryItem = new SummaryItemTo1(0, item, url, "prevention");
+			list.add(summaryItem);
+		}
+
+		for(Prevention prevention:preventions)
+		{
+			summaryItem = new SummaryItemTo1(
+					prevention.getId(), prevention.getPreventionType(),url,"prevention");
 			summaryItem.setDate(prevention.getPreventionDate());
-		    if( prevention.isRefused() ) {
+		    if( prevention.isRefused() )
+		    {
                 summaryItem.setIndicatorClass("refused");
-            }else if( prevention.isIneligible()) {
+            }
+            else if( prevention.isIneligible())
+            {
             	summaryItem.setIndicatorClass("ineligible");
-            }else if(PreventionData.getExtValue(String.valueOf(prevention.getId()), "result").equals("abnormal")){
+            }
+            else if(PreventionData.getExtValue(
+            		String.valueOf(prevention.getId()), "result").equals("abnormal"))
+            {
             	summaryItem.setIndicatorClass("abnormal-prev");
-            }else if(PreventionData.getExtValue(String.valueOf(prevention.getId()), "result").equals("pending")){
-                	summaryItem.setIndicatorClass("pending");
+            }
+            else if(PreventionData.getExtValue(
+            		String.valueOf(prevention.getId()), "result").equals("pending"))
+            {
+				summaryItem.setIndicatorClass("pending");
             }
 			
 			list.add(summaryItem);
 		}
-		
-		//sort items
-		//Collections.sort(list, new ChronologicAsc());
-	        
-	}	
+	}
 	
 	private boolean isPreventionExist(List<Prevention> preventions, String prevName){
 		

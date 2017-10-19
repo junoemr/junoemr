@@ -228,23 +228,41 @@ public class PreventionData {
 
 	public static Date getDemographicDateOfBirth(LoggedInInfo loggedInInfo, Integer demoNo) {
 		DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-		Demographic dd = demographicManager.getDemographic(loggedInInfo,demoNo);
-		if (dd == null) return (null);
-		Calendar bday = dd.getBirthDay();
-		if (bday == null) return (null);
-		return (bday.getTime());
+		Demographic demographic = demographicManager.getDemographic(loggedInInfo,demoNo);
+		if(demographic == null)
+		{
+			return null;
+		}
+		return getDemographicDateOfBirth(demographic);
+	}
+
+	public static Date getDemographicDateOfBirth(Demographic demographic) {
+		return demographic.getBirthDate();
 	}
 
 	public static ArrayList<Map<String, Object>> getPreventionData(LoggedInInfo loggedInInfo, Integer demoNo) {
 		return getPreventionData(loggedInInfo, null, demoNo);
 	}
+	public static ArrayList<Map<String, Object>> getPreventionData(
+			LoggedInInfo loggedInInfo, String preventionType, Integer demographicNo)
+	{
+		DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+		Demographic demographic = demographicManager.getDemographic(loggedInInfo, demographicNo);
+		return getPreventionData(loggedInInfo, preventionType, demographic);
+	}
 
-	public static ArrayList<Map<String, Object>> getPreventionData(LoggedInInfo loggedInInfo, String preventionType, Integer demographicId) {
+	public static ArrayList<Map<String, Object>> getPreventionData(
+			LoggedInInfo loggedInInfo, String preventionType, Demographic demographic)
+	{
+
 		ArrayList<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
 		try {
-			Date dob = getDemographicDateOfBirth(loggedInInfo, demographicId);
-			List<Prevention> preventions = preventionType == null ? preventionDao.findNotDeletedByDemographicId(demographicId) : preventionDao.findByTypeAndDemoNo(preventionType, demographicId);
+			Date dob = demographic.getBirthDate();
+			List<Prevention> preventions = preventionType == null ? preventionDao.findNotDeletedByDemographicId(
+					demographic.getDemographicNo()) : preventionDao.findByTypeAndDemoNo(
+							preventionType, demographic.getDemographicNo());
+
 			for (Prevention prevention : preventions) {
 
 				/*
@@ -325,29 +343,39 @@ public class PreventionData {
 		return prevention;
 	}
 
-	public static oscar.oscarPrevention.Prevention getPrevention(LoggedInInfo loggedInInfo, Integer demoNo) {
+	public static oscar.oscarPrevention.Prevention getPrevention(LoggedInInfo loggedInInfo, Integer demoNo)
+	{
 		DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-		Demographic dd = demographicManager.getDemographic(loggedInInfo, demoNo);
+		Demographic demographic = demographicManager.getDemographic(loggedInInfo, demoNo);
+		if(demographic == null)
+		{
+			return null;
+		}
+		return getPrevention(loggedInInfo, demographic);
+	}
+
+	public static oscar.oscarPrevention.Prevention getPrevention(
+			LoggedInInfo loggedInInfo, Demographic demographic)
+	{
 
 		java.util.Date dob = null;
 		String sex = null;
-		if (dd != null) {
-			Calendar temp = dd.getBirthDay();
-			if (temp != null) dob = temp.getTime();
-			sex = dd.getSex();
-		}
+		dob = demographic.getBirthDate();
+		sex = demographic.getSex();
 
-		oscar.oscarPrevention.Prevention p = new oscar.oscarPrevention.Prevention(sex, dob);
+		oscar.oscarPrevention.Prevention oscarPrevention = new oscar.oscarPrevention.Prevention(sex, dob);
 
-		PreventionDao dao = SpringUtils.getBean(PreventionDao.class);
-		for (Prevention pp : dao.findActiveByDemoId(demoNo)) {
-			PreventionItem pi = new PreventionItem(pp);
-			p.addPreventionItem(pi);
+		PreventionDao preventionDao = SpringUtils.getBean(PreventionDao.class);
+		for (Prevention prevention : preventionDao.findActiveByDemoId(demographic.getDemographicNo())) {
+			PreventionItem preventionItem = new PreventionItem(prevention);
+			oscarPrevention.addPreventionItem(preventionItem);
 		}
-		return p;
+		return oscarPrevention;
 	}
 
-	private static List<CachedDemographicPrevention> getRemotePreventions(LoggedInInfo loggedInInfo, Integer demographicId) {
+	private static List<CachedDemographicPrevention> getRemotePreventions(
+			LoggedInInfo loggedInInfo, Integer demographicId)
+	{
 
 		List<CachedDemographicPrevention> remotePreventions = null;
 		if (loggedInInfo.getCurrentFacility().isIntegratorEnabled()) {
@@ -368,7 +396,10 @@ public class PreventionData {
 		return (remotePreventions);
 	}
 
-	public static oscar.oscarPrevention.Prevention addRemotePreventions(LoggedInInfo loggedInInfo, oscar.oscarPrevention.Prevention prevention, Integer demographicId) {
+	public static oscar.oscarPrevention.Prevention addRemotePreventions(
+			LoggedInInfo loggedInInfo, oscar.oscarPrevention.Prevention prevention, Integer demographicId)
+
+	{
 		List<CachedDemographicPrevention> remotePreventions = getRemotePreventions(loggedInInfo, demographicId);
 
 		if (remotePreventions != null) {
@@ -384,8 +415,23 @@ public class PreventionData {
 		return (prevention);
 	}
 
-	public static ArrayList<Map<String, Object>> addRemotePreventions(LoggedInInfo loggedInInfo, ArrayList<Map<String, Object>> preventions, Integer demographicId, String preventionType, Date demographicDateOfBirth) {
-		List<CachedDemographicPrevention> remotePreventions = getRemotePreventions(loggedInInfo, demographicId);
+	public static ArrayList<Map<String, Object>> addRemotePreventions(
+			LoggedInInfo loggedInInfo, ArrayList<Map<String, Object>> preventions,
+			Integer demographicNo, String preventionType, Date demographicDateOfBirth)
+	{
+
+		DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+		Demographic demographic = demographicManager.getDemographic(loggedInInfo, demographicNo);
+
+		return addRemotePreventions(loggedInInfo, preventions, demographic, preventionType, demographicDateOfBirth);
+	}
+
+	public static ArrayList<Map<String, Object>> addRemotePreventions(
+			LoggedInInfo loggedInInfo, ArrayList<Map<String, Object>> preventions,
+			Demographic demographic, String preventionType, Date demographicDateOfBirth)
+	{
+		List<CachedDemographicPrevention> remotePreventions = getRemotePreventions(
+				loggedInInfo, demographic.getDemographicNo());
 
 		if (remotePreventions != null) {
 			for (CachedDemographicPrevention cachedDemographicPrevention : remotePreventions) {

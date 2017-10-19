@@ -38,6 +38,7 @@ import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.managers.PreventionManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -246,77 +247,88 @@ public class PreventionDisplayConfig {
         return display;
     }
 
-    public boolean display(LoggedInInfo loggedInInfo, Map<String,String> setHash, String Demographic_no,int numberOfPrevs) {
-        boolean display = false;
-        PreventionManager preventionManager = SpringUtils.getBean(PreventionManager.class);
-        DemographicData dData = new DemographicData();
-        log.debug("demoage " + Demographic_no);
-        org.oscarehr.common.model.Demographic demograph = dData.getDemographic(loggedInInfo, Demographic_no);
-        try {
-        	if(preventionManager.hideItem(setHash.get("name")) && numberOfPrevs==0 ){
-        		//move to hidden list
-        		display=false;
-        	}else{
-            String minAgeStr = setHash.get("minAge");
-            String maxAgeStr = setHash.get("maxAge");
-            String sex = setHash.get("sex");
-            String minNumPrevs = setHash.get("showIfMinRecordNum");
-            int demoAge = demograph.getAgeInYears();
-            String demoSex = demograph.getSex();
-            boolean inAgeGroup = true;
-            //log.debug("min age " + minAgeStr + " max age " + maxAgeStr + " sex " + sex + " demoAge " + demoAge
-            //        + " demoSex " + demoSex);
-            
-            if (minNumPrevs != null){
-               int minNum = Integer.parseInt(minNumPrevs);
-               if (numberOfPrevs >= minNum){
-                  display = true;
-               }
-            }
-            
-            if(!display){
-            
-               if (minAgeStr != null && maxAgeStr != null) { // between ages
-                   //log.debug("HERE1");
-                   int minAge = Integer.parseInt(minAgeStr);
-                   int maxAge = Integer.parseInt(maxAgeStr);
-                   if (minAge <= demoAge && maxAge >= demoAge) {
-                       display = true;
-                   } else {
-                       inAgeGroup = false;
-                   }
-               } else if (minAgeStr != null) { // older than
-                   //log.debug("HERE2");
-                   int minAge = Integer.parseInt(minAgeStr);
-                   if (minAge <= demoAge) {
-                       display = true;
-                   } else {
-                       inAgeGroup = false;
-                   }
-               } else if (maxAgeStr != null) { // younger than
-                   //log.debug("HERE3");
-                   int maxAge = Integer.parseInt(maxAgeStr);
-                   if (maxAge >= demoAge) {
-                       display = true;
-                   } else {
-                       inAgeGroup = false;
-                   }
-               }// else? neither defined should the default be to display it or
-                   // not?
-            
-               if (sex != null && inAgeGroup) {
-                   //log.debug("HERE4");
-                   if (sex.equals(demoSex)) {
-                       display = true;
-                   } else {
-                       display = false;
-                   }
-               }
-            }
-        	}//end check if prevention has been hidden 
-        } catch (Exception e) {
-            MiscUtils.getLogger().error("Error", e);
-        }
-        return display;
-    }
+	public boolean display(LoggedInInfo loggedInInfo, Map<String,String> setHash,
+						   String Demographic_no, int numberOfPrevs)
+	{
+		DemographicData dData = new DemographicData();
+		Demographic demographic = dData.getDemographic(loggedInInfo, Demographic_no);
+		return display(loggedInInfo, setHash, demographic, numberOfPrevs);
+	}
+	
+    public boolean display(LoggedInInfo loggedInInfo, Map<String,String> setHash,
+						   Demographic demographic, int numberOfPrevs)
+	{
+		boolean display = false;
+		PreventionManager preventionManager = SpringUtils.getBean(PreventionManager.class);
+		log.debug("Display: " + demographic.getDemographicNo());
+		try
+		{
+			if(preventionManager.hideItem(setHash.get("name")) && numberOfPrevs==0 )
+			{
+				display = false;
+			}
+			else
+			{
+				String minAgeStr = setHash.get("minAge");
+				String maxAgeStr = setHash.get("maxAge");
+				String sex = setHash.get("sex");
+				String minNumPrevs = setHash.get("showIfMinRecordNum");
+				int demoAge = demographic.getAgeInYears();
+				String demoSex = demographic.getSex();
+				boolean inAgeGroup = true;
+				//log.debug("min age " + minAgeStr + " max age " + maxAgeStr + " sex " + sex + " demoAge " + demoAge
+				//        + " demoSex " + demoSex);
+
+				if (minNumPrevs != null){
+					int minNum = Integer.parseInt(minNumPrevs);
+					if (numberOfPrevs >= minNum){
+						display = true;
+					}
+				}
+
+				if(!display){
+
+					if (minAgeStr != null && maxAgeStr != null) { // between ages
+						//log.debug("HERE1");
+						int minAge = Integer.parseInt(minAgeStr);
+						int maxAge = Integer.parseInt(maxAgeStr);
+						if (minAge <= demoAge && maxAge >= demoAge) {
+							display = true;
+						} else {
+							inAgeGroup = false;
+						}
+					} else if (minAgeStr != null) { // older than
+						//log.debug("HERE2");
+						int minAge = Integer.parseInt(minAgeStr);
+						if (minAge <= demoAge) {
+							display = true;
+						} else {
+							inAgeGroup = false;
+						}
+					} else if (maxAgeStr != null) { // younger than
+						//log.debug("HERE3");
+						int maxAge = Integer.parseInt(maxAgeStr);
+						if (maxAge >= demoAge) {
+							display = true;
+						} else {
+							inAgeGroup = false;
+						}
+					}// else? neither defined should the default be to display it or
+					// not?
+
+					if (sex != null && inAgeGroup) {
+						//log.debug("HERE4");
+						if (sex.equals(demoSex)) {
+							display = true;
+						} else {
+							display = false;
+						}
+					}
+				}
+			}//end check if prevention has been hidden
+		} catch (Exception e) {
+			MiscUtils.getLogger().error("Error", e);
+		}
+		return display;
+	}
  }

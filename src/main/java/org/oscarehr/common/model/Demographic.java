@@ -1121,6 +1121,15 @@ public class Demographic implements Serializable {
 		return (cal);
 	}
 
+	public Date getBirthDate() {
+		Calendar calendar = getBirthDay();
+		if (calendar == null)
+		{
+			return null;
+		}
+		return calendar.getTime();
+	}
+
 	// Returns birthday in the format yyyy-mm-dd
 	public String getBirthDayAsString() {
 		return getYearOfBirth() + "-" + getMonthOfBirth() + "-" + getDateOfBirth();

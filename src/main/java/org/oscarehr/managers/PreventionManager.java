@@ -176,7 +176,10 @@ public class PreventionManager {
 	public List<Prevention> getPreventionsByProgramProviderDemographicDate(LoggedInInfo loggedInInfo, Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateExclusive, int itemsToReturn) {
 		List<Prevention> results = preventionDao.findByProviderDemographicLastUpdateDate(providerNo, demographicId, updatedAfterThisDateExclusive.getTime(), itemsToReturn);
 
-		LogAction.addLogSynchronous(loggedInInfo, "PreventionManager.getUpdatedAfterDate", "programId=" + programId + ", providerNo=" + providerNo + ", demographicId=" + demographicId + ", updatedAfterThisDateExclusive=" + updatedAfterThisDateExclusive.getTime());
+		LogAction.addLogSynchronous(loggedInInfo, "PreventionManager.getUpdatedAfterDate",
+				"programId=" + programId + ", providerNo=" + providerNo + ", demographicId=" +
+						demographicId + ", updatedAfterThisDateExclusive=" +
+						updatedAfterThisDateExclusive.getTime());
 
 		return (results);
 	}
@@ -184,7 +187,8 @@ public class PreventionManager {
 	public List<Prevention> getPreventionsByDemographicNo(LoggedInInfo loggedInInfo, Integer demographicNo) {
 		List<Prevention> results = preventionDao.findUniqueByDemographicId(demographicNo);
 		
-		LogAction.addLogSynchronous(loggedInInfo, "PreventionManager.getPreventionsByDemographicNo", "demographicNo=" + demographicNo);
+		LogAction.addLogSynchronous(loggedInInfo, "PreventionManager.getPreventionsByDemographicNo",
+				"demographicNo=" + demographicNo);
 
 		return (results);
 	}
