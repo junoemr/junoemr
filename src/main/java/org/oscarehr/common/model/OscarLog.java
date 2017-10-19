@@ -150,6 +150,8 @@ public class OscarLog extends AbstractModel<Long> implements Serializable {
 		return created;
 	}
 
+	public void setCreated(Date created) { this.created = created; };
+
 	public Integer getSecurityId() {
     	return (securityId);
     }
