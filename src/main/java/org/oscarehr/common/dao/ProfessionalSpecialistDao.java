@@ -85,6 +85,10 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		return(results);
 	}
 
+	/**
+	 * use version with limit and offset. This method returns null when no results are found?
+	 */
+	@Deprecated
 	public List<ProfessionalSpecialist> findByFullName(String lastName, String firstName) {
 		Query query = entityManager.createQuery("select x from " + modelClass.getName() + " x WHERE x.hideFromView = false and x.lastName like ? and x.firstName like ? order by x.lastName");
 		query.setParameter(1, "%"+lastName+"%");
@@ -120,6 +124,10 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 
 	}
 
+	/**
+	 * use version with limit and offset. This method returns null when no results are found?
+	 */
+	@Deprecated
 	public List<ProfessionalSpecialist> findByReferralNo(String referralNo) {
 		if (StringUtils.isBlank(referralNo)) {
 			return null;
@@ -138,7 +146,7 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 
 	}
 
-	public List<ProfessionalSpecialist> findByReferralNo(Integer referralNo, int offset, int maxResults)
+	public List<ProfessionalSpecialist> findByReferralNo(String referralNo, Integer offset, Integer maxResults)
 	{
 		String queryString = "SELECT x FROM " + modelClass.getName() + " x " +
 				"WHERE x.hideFromView = false " +
@@ -155,19 +163,39 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		return specialistList;
 	}
 
-	public List<ProfessionalSpecialist> findBySearchNameAndReferralNo(String searchText,Integer referralNo, int offset, int maxResults)
+	public List<ProfessionalSpecialist> findByFullName(String lastName, String firstName, int offset, int maxResults)
+	{
+		String queryString = "SELECT x FROM " + modelClass.getName() + " x " +
+				"WHERE x.hideFromView = false " +
+				"AND x.lastName like :lastName " +
+				"AND x.firstName like :firstName " +
+				"ORDER BY x.lastName, x.firstName";
+
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("firstName", firstName + "%");
+		query.setParameter("lastName", lastName + "%");
+		query.setFirstResult(offset);
+		query.setMaxResults(maxResults);
+
+		@SuppressWarnings("unchecked")
+		List<ProfessionalSpecialist> results = query.getResultList();
+		return results;
+	}
+
+	public List<ProfessionalSpecialist> findByFullNameAndReferralNo(String lastName, String firstName, String referralNo, Integer offset, Integer maxResults)
 	{
 		String queryString = "SELECT x FROM " + modelClass.getSimpleName() + " x " +
-						"WHERE x.hideFromView = false" +
-						"AND (x.firstName LIKE :firstName OR x.lastName LIKE :lastName)" +
-						"AND x.referralNo LIKE :refNo " +
-						"ORDER BY x.lastName, x.firstName";
+				"WHERE x.hideFromView = false " +
+				"AND ((x.firstName LIKE :firstName " +
+				"AND x.lastName LIKE :lastName) " +
+				"OR x.referralNo LIKE :refNo ) " +
+				"ORDER BY x.lastName, x.firstName";
 
 		Query query = entityManager.createQuery(queryString);
 
-		query.setParameter("firstName", searchText+"%");
-		query.setParameter("lastName", searchText+"%");
-		query.setParameter("refNo", referralNo+"%");
+		query.setParameter("firstName", firstName + "%");
+		query.setParameter("lastName", lastName + "%");
+		query.setParameter("refNo", referralNo + "%");
 		query.setFirstResult(offset);
 		query.setMaxResults(maxResults);
 

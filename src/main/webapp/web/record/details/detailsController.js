@@ -35,6 +35,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'patientDetailStatusService',
 	'securityService',
 	'staticDataService',
+	'referralDoctorsService',
 	'user',
 
 	function(
@@ -48,6 +49,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		patientDetailStatusService,
 		securityService,
 		staticDataService,
+		referralDoctorsService,
 		user)
 	{
 
@@ -206,27 +208,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					if (controller.page.demo.midwives != null)
 					{
 						controller.page.demo.midwives = toArray(controller.page.demo.midwives);
-					}
-
-					//show referralDoc specialties & names
-					if (controller.page.demo.referralDoctors != null)
-					{
-						if (controller.page.demo.referralDoctors.id != null)
-						{ //only 1 entry, convert to array
-							var tmp = {};
-							tmp.name = controller.page.demo.referralDoctors.name;
-							tmp.referralNo = controller.page.demo.referralDoctors.referralNo;
-							tmp.specialtyType = controller.page.demo.referralDoctors.specialtyType;
-							controller.page.demo.referralDoctors = [tmp];
-						}
-						for (var i = 0; i < controller.page.demo.referralDoctors.length; i++)
-						{
-							controller.page.demo.referralDoctors[i].label = controller.page.demo.referralDoctors[i].name;
-							if (controller.page.demo.referralDoctors[i].specialtyType != null && controller.page.demo.referralDoctors[i].specialtyType != "")
-							{
-								controller.page.demo.referralDoctors[i].label += " [" + controller.page.demo.referralDoctors[i].specialtyType + "]";
-							}
-						}
 					}
 
 					controller.page.dataChanged = false;
@@ -974,17 +955,45 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.showReferralDocList = function showReferralDocList()
 		{
 			controller.page.showReferralDocList = !controller.page.showReferralDocList;
-		}
+		};
+		controller.searchReferralDocs = function searchReferralDocs()
+		{
+			referralDoctorsService.searchReferralDoctors(controller.page.demo.scrReferralDoc,controller.page.demo.scrReferralDocNo, 0, 10).then(
+				function success(results) {
+					console.log("refDoc search results", results);
+
+					controller.page.referralDoctors = new Array(results.length);
+					for (var i = 0; i < results.length; i++)
+					{
+						var displayName = results[i].lastName + ', ' + results[i].firstName;
+						controller.page.referralDoctors[i] = {
+							label: displayName,
+							name: displayName,
+							referralNo: results[i].referralNo
+						};
+						if (results[i].specialtyType != null && results[i].specialtyType != "")
+						{
+							controller.page.referralDoctors[i].label += " [" + results[i].specialtyType + "]";
+						}
+					}
+					console.log("referralDoctors", controller.page.referralDoctors);
+				},
+				function failure(errors) {
+					// clear the results list in case of error
+					controller.page.referralDoctors = [];
+				}
+			);
+		};
 		controller.showAddNewRosterStatus = function showAddNewRosterStatus()
 		{
 			controller.page.showAddNewRosterStatus = !controller.page.showAddNewRosterStatus;
 			controller.page.newRosterStatus = null;
-		}
+		};
 		controller.showAddNewPatientStatus = function showAddNewPatientStatus()
 		{
 			controller.page.showAddNewPatientStatus = !controller.page.showAddNewPatientStatus;
 			controller.page.newPatientStatus = null;
-		}
+		};
 
 		//fill referral doc from list
 		controller.fillReferralDoc = function fillReferralDoc()
@@ -995,7 +1004,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				controller.page.demo.scrReferralDoc = controller.page.referralDocObj.name;
 			}
 			controller.page.showReferralDocList = false;
-		}
+		};
 
 		//add new Roster Status
 		controller.addNewRosterStatus = function addNewRosterStatus()

@@ -594,22 +594,25 @@
 				<div class="form-group">
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formRefDoc"/></label>
 					<div class="col-md-4">
-						<input type="text" class="form-control form-control-details" 
-							placeholder="<bean:message key="demographic.demographiceditdemographic.formRefDoc"/>" 
-							title="<bean:message key="demographic.demographiceditdemographic.formRefDoc"/>" 
-							ng-model="detailsCtrl.page.demo.scrReferralDoc"/>
+						<input type="text" class="form-control form-control-details"
+						       placeholder="<bean:message key="demographic.demographiceditdemographic.formRefDoc"/>"
+						       title="<bean:message key="demographic.demographiceditdemographic.formRefDoc"/>"
+						       ng-model="detailsCtrl.page.demo.scrReferralDoc"
+						/>
 					</div>
 
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formRefDocNo"/></label>
 					<div class="col-md-4">
 						<div class="input-group">
 							<input type="text" class="form-control form-control-details"
-								   placeholder="<bean:message key="demographic.demographiceditdemographic.formRefDocNo"/>"
-								   title="<bean:message key="demographic.demographiceditdemographic.formRefDocNo"/>"
-								   ng-model="detailsCtrl.page.demo.scrReferralDocNo" ng-change="detailsCtrl.checkReferralDocNo()"/>
+							       placeholder="<bean:message key="demographic.demographiceditdemographic.formRefDocNo"/>"
+							       title="<bean:message key="demographic.demographiceditdemographic.formRefDocNo"/>"
+							       ng-model="detailsCtrl.page.demo.scrReferralDocNo"
+							       ng-change="detailsCtrl.checkReferralDocNo()"
+							/>
 							<span class="input-group-btn">	
 								<button type="button" class="btn btn-primary"
-										ng-click="detailsCtrl.showReferralDocList()">
+										ng-click="detailsCtrl.searchReferralDocs(); detailsCtrl.showReferralDocList()">
 									<bean:message key="demographic.demographiceditdemographic.btnSearch"/>
 								</button>
 							</span>
@@ -617,8 +620,8 @@
 						<div style="position: absolute; right: 25px; z-index: 999; background-color: white" ng-show="detailsCtrl.page.showReferralDocList">
 							<select class="form-control form-control-details" title="<bean:message key="web.record.details.pickReferralDoctor"/>" 
 									size="7" 
-									ng-model="detailsCtrl.page.referralDocObj" 
-									ng-options="doctor as doctor.name for doctor in detailsCtrl.page.demo.referralDoctors"
+									ng-model="detailsCtrl.page.referralDocObj"
+									ng-options="doctor as doctor.label for doctor in detailsCtrl.page.referralDoctors"
 									ng-click="detailsCtrl.fillReferralDoc()">
 								<option value="">--<bean:message key="web.record.details.pickReferralDoctor"/>--</option>
 							</select>

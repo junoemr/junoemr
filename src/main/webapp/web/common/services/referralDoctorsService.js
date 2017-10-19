@@ -25,16 +25,16 @@
  Ontario, Canada
 
  */
-angular.module("Common.Services").service("specialistsService", [
+angular.module("Common.Services").service("referralDoctorsService", [
 	'$q',
 	'junoHttp',
 	function($q,junoHttp)
 	{
 		var service = {};
 
-		service.apiPath = '../ws/rs/specialists/';
+		service.apiPath = '../ws/rs/referralDoctors/';
 
-		service.searchSpecialists = function searchSpecialists(searchName, searchRefNo, page, perPage)
+		service.searchReferralDoctors = function searchReferralDoctors(searchName, searchRefNo, page, perPage)
 		{
 			var deferred = $q.defer();
 			var config = Juno.Common.ServiceHelper.configHeaders();
@@ -51,8 +51,8 @@ angular.module("Common.Services").service("specialistsService", [
 					deferred.resolve(response.data);
 				},
 				function error(error) {
-					console.log("SpecialistsService::searchSpecialists error", error);
-					deferred.reject("An error occurred while searching Specialists");
+					console.log("ReferralDoctorsService::searchReferralDoctors error", error);
+					deferred.reject("An error occurred while searching ReferralDoctors");
 				});
 			return deferred.promise;
 		};

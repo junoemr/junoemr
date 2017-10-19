@@ -24,6 +24,7 @@
 
 package org.oscarehr.ws.rest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.model.ProfessionalSpecialist;
@@ -39,13 +40,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Path("/specialists")
 @Component("SpecialistsService")
 public class SpecialistsService extends AbstractServiceImpl
 {
-	Logger logger = Logger.getLogger(SpecialistsService.class);
+	private static Logger logger = Logger.getLogger(SpecialistsService.class);
 
 	@Autowired
 	private ProfessionalSpecialistDao specialistDao;
@@ -56,32 +58,66 @@ public class SpecialistsService extends AbstractServiceImpl
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<ProfessionalSpecialistTo1>, String> searchSpecialists(@QueryParam("searchName") String searchName,
-	                                                                               @QueryParam("searchRefNo") Integer searchRefNo,
+	                                                                               @QueryParam("searchRefNo") String searchRefNo,
 	                                                                               @QueryParam("page") @DefaultValue("1") Integer page,
-	                                                                               @QueryParam("perPage") @DefaultValue("10")Integer perPage)
+	                                                                               @QueryParam("perPage") @DefaultValue("10") Integer perPage)
 	{
 		if(page < 1) page = 1;
 		int offset = perPage * (page-1);
 
+		searchName = StringUtils.trimToNull(searchName);
+		searchRefNo = StringUtils.trimToNull(searchRefNo);
+		logger.debug("SEARCH SPECIALISTS: '" + searchName + "', '" + searchRefNo + "', " + page + ", " + perPage);
+
 		try
 		{
-			List<ProfessionalSpecialist> specialists = new ArrayList<ProfessionalSpecialist>();
-			if (searchName != null && searchRefNo != null) {
-				specialists = specialistDao.findBySearchNameAndReferralNo(searchName, searchRefNo, offset, perPage);
-			}
-			else if (searchName != null) {
-				specialists = specialistDao.findBySearchName(searchName, offset, perPage);
-			}
-			else if (searchRefNo != null) {
-				specialists = specialistDao.findByReferralNo(searchRefNo, offset, perPage);
-			}
+			List<ProfessionalSpecialist> specialists = getSpecialistSearchResults(specialistDao, searchName, searchRefNo, offset, perPage);
 			List<ProfessionalSpecialistTo1> specialistTo1s = specialistConverter.getAllAsTransferObjects(getLoggedInInfo(), specialists);
 			return RestResponse.successResponse(specialistTo1s);
+		}
+		catch (NumberFormatException e)
+		{
+			logger.error("Error", e);
+			return RestResponse.errorResponse("Invalid Integer Parameter");
 		}
 		catch (Exception e)
 		{
 			logger.error("Error", e);
 			return RestResponse.errorResponse("Unexpected Error");
 		}
+	}
+
+	public static List<ProfessionalSpecialist> getSpecialistSearchResults(ProfessionalSpecialistDao specialistDao, String searchName, String referralNo, int offset, int limit) {
+		List<ProfessionalSpecialist> specialists = new ArrayList<ProfessionalSpecialist>();
+		if (searchName != null) {
+			String[] names = splitSearchString(searchName);
+			if (referralNo != null)
+			{
+				specialists = specialistDao.findByFullNameAndReferralNo(names[0], names[1], referralNo, offset, limit);
+			}
+			else {
+				specialists = specialistDao.findByFullName(names[0], names[1], offset, limit);
+			}
+		}
+		else if (referralNo != null) {
+			specialists = specialistDao.findByReferralNo(referralNo, offset, limit);
+		}
+		return specialists;
+	}
+	public static String[] splitSearchString(String searchText) {
+		String[] searchTerms = searchText.split(",");
+
+		// ensure 2 element array
+		if(searchTerms.length == 1)
+		{
+			searchTerms = new String[] {searchTerms[0], ""};
+		}
+		// trim all elements
+		for (int i = 0; i < searchTerms.length; i++)
+		{
+			searchTerms[i] = searchTerms[i].trim();
+		}
+		logger.info("SearchString Final Array: " + Arrays.toString(searchTerms));
+		return searchTerms;
 	}
 }
