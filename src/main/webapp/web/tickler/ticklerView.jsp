@@ -40,11 +40,12 @@
 			<form>
 				<div class="form-group col-sm-12">
 					<label>Message</label>
-					<textarea rows="5" ng-model="ticklerViewCtrl.ticklerUpdate.message"
+					<textarea rows="5"
+							  ng-model="ticklerViewCtrl.ticklerUpdate.message"
 							  class="form-control"
 							  ng-readonly="!ticklerViewCtrl.ticklerWriteAccess">
-					{{ticklerViewCtrl.ticklerUpdate.message}}
-				</textarea>
+						{{ticklerViewCtrl.ticklerUpdate.message}}
+					</textarea>
 				</div>
 				<div class="form-group col-sm-6">
 					<label><bean:message key="tickler.view.assignTo" bundle="ui"/></label>
