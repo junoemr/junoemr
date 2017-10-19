@@ -31,9 +31,7 @@ import java.util.List;
 
 import oscar.log.LogConst;
 
-import javax.persistence.ColumnResult;
 import javax.persistence.Query;
-import javax.persistence.SqlResultSetMapping;
 import javax.persistence.TemporalType;
 
 import org.oscarehr.common.model.AbstractModel;
