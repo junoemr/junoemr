@@ -91,13 +91,7 @@ public class SpecialistsService extends AbstractServiceImpl
 		List<ProfessionalSpecialist> specialists = new ArrayList<ProfessionalSpecialist>();
 		if (searchName != null) {
 			String[] names = splitSearchString(searchName);
-			if (referralNo != null)
-			{
-				specialists = specialistDao.findByFullNameAndReferralNo(names[0], names[1], referralNo, offset, limit);
-			}
-			else {
-				specialists = specialistDao.findByFullName(names[0], names[1], offset, limit);
-			}
+			specialists = specialistDao.findByFullNameAndReferralNo(names[0], names[1], referralNo, offset, limit);
 		}
 		else if (referralNo != null) {
 			specialists = specialistDao.findByReferralNo(referralNo, offset, limit);
@@ -106,6 +100,7 @@ public class SpecialistsService extends AbstractServiceImpl
 	}
 	public static String[] splitSearchString(String searchText) {
 		String[] searchTerms = searchText.split(",");
+		logger.info("Split To: " + Arrays.toString(searchTerms));
 
 		// ensure 2 element array
 		if(searchTerms.length == 1)
@@ -115,7 +110,7 @@ public class SpecialistsService extends AbstractServiceImpl
 		// trim all elements
 		for (int i = 0; i < searchTerms.length; i++)
 		{
-			searchTerms[i] = searchTerms[i].trim();
+			searchTerms[i] = StringUtils.trimToNull(searchTerms[i]);
 		}
 		logger.info("SearchString Final Array: " + Arrays.toString(searchTerms));
 		return searchTerms;

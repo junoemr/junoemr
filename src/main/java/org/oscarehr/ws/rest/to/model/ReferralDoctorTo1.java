@@ -36,12 +36,9 @@ public class ReferralDoctorTo1 implements Serializable
 	private String firstName;
 	private String lastName;
 	private String referralNo;
-	private String professionalLetters;
 	private String streetAddress;
 	private String phoneNumber;
 	private String faxNumber;
-	private String webSite;
-	private String emailAddress;
 	private String specialtyType;
 
 	public Integer getId()
@@ -84,16 +81,6 @@ public class ReferralDoctorTo1 implements Serializable
 		this.referralNo = referralNo;
 	}
 
-	public String getProfessionalLetters()
-	{
-		return professionalLetters;
-	}
-
-	public void setProfessionalLetters(String professionalLetters)
-	{
-		this.professionalLetters = professionalLetters;
-	}
-
 	public String getStreetAddress()
 	{
 		return streetAddress;
@@ -124,26 +111,6 @@ public class ReferralDoctorTo1 implements Serializable
 		this.faxNumber = faxNumber;
 	}
 
-	public String getWebSite()
-	{
-		return webSite;
-	}
-
-	public void setWebSite(String webSite)
-	{
-		this.webSite = webSite;
-	}
-
-	public String getEmailAddress()
-	{
-		return emailAddress;
-	}
-
-	public void setEmailAddress(String emailAddress)
-	{
-		this.emailAddress = emailAddress;
-	}
-
 	public String getSpecialtyType()
 	{
 		return specialtyType;
@@ -153,16 +120,4 @@ public class ReferralDoctorTo1 implements Serializable
 	{
 		this.specialtyType = specialtyType;
 	}
-
-	public String getAnnotation()
-	{
-		return annotation;
-	}
-
-	public void setAnnotation(String annotation)
-	{
-		this.annotation = annotation;
-	}
-
-	private String annotation;
 }

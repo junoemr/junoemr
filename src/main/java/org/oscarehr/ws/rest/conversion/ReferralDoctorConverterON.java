@@ -38,14 +38,10 @@ public class ReferralDoctorConverterON extends AbstractConverter<ProfessionalSpe
 
 		proSpec.setFirstName(t.getFirstName());
 		proSpec.setLastName(t.getLastName());
-		proSpec.setProfessionalLetters(t.getProfessionalLetters());
 		proSpec.setStreetAddress(t.getStreetAddress());
 		proSpec.setPhoneNumber(t.getPhoneNumber());
 		proSpec.setFaxNumber(t.getFaxNumber());
-		proSpec.setWebSite(t.getWebSite());
-		proSpec.setEmailAddress(t.getEmailAddress());
 		proSpec.setSpecialtyType(t.getSpecialtyType());
-		proSpec.setAnnotation(t.getAnnotation());
 		proSpec.setReferralNo(t.getReferralNo());
 
 		return proSpec;
@@ -57,14 +53,10 @@ public class ReferralDoctorConverterON extends AbstractConverter<ProfessionalSpe
 		refDoc.setId(d.getId());
 		refDoc.setFirstName(d.getFirstName());
 		refDoc.setLastName(d.getLastName());
-		refDoc.setProfessionalLetters(d.getProfessionalLetters());
 		refDoc.setStreetAddress(d.getStreetAddress());
 		refDoc.setPhoneNumber(d.getPhoneNumber());
 		refDoc.setFaxNumber(d.getFaxNumber());
-		refDoc.setWebSite(d.getWebSite());
-		refDoc.setEmailAddress(d.getEmailAddress());
 		refDoc.setSpecialtyType(d.getSpecialtyType());
-		refDoc.setAnnotation(d.getAnnotation());
 		refDoc.setReferralNo(d.getReferralNo());
 
 		return refDoc;

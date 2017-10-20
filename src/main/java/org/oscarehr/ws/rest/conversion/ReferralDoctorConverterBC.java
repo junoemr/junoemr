@@ -34,12 +34,31 @@ public class ReferralDoctorConverterBC extends AbstractConverter<Billingreferral
 {
 	@Override
 	public Billingreferral getAsDomainObject(LoggedInInfo loggedInInfo, ReferralDoctorTo1 t) throws ConversionException {
-		//TODO
-		return null;
+		Billingreferral referral = new Billingreferral();
+
+		referral.setFirstName(t.getFirstName());
+		referral.setLastName(t.getLastName());
+		referral.setAddress1(t.getStreetAddress());
+		referral.setPhone(t.getPhoneNumber());
+		referral.setFax(t.getFaxNumber());
+		referral.setSpecialty(t.getSpecialtyType());
+		referral.setReferralNo(t.getReferralNo());
+
+		return referral;
 	}
 	@Override
 	public ReferralDoctorTo1 getAsTransferObject(LoggedInInfo loggedInInfo, Billingreferral d) throws ConversionException {
-		//TODO
-		return null;
+		ReferralDoctorTo1 refDoc = new ReferralDoctorTo1();
+
+		refDoc.setId(d.getId());
+		refDoc.setFirstName(d.getFirstName());
+		refDoc.setLastName(d.getLastName());
+		refDoc.setStreetAddress(d.getAddress1());
+		refDoc.setPhoneNumber(d.getPhone());
+		refDoc.setFaxNumber(d.getFax());
+		refDoc.setSpecialtyType(d.getSpecialty());
+		refDoc.setReferralNo(d.getReferralNo());
+
+		return refDoc;
 	}
 }
