@@ -39,7 +39,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.Arrays;
 import java.util.List;
 
 @Path("/specialists")
@@ -103,7 +102,6 @@ public class SpecialistsService extends AbstractServiceImpl
 			return new String[] {null,null};
 		}
 		String[] searchTerms = searchText.split(",");
-		logger.info("Split To: " + Arrays.toString(searchTerms));
 
 		// ensure 2 element array
 		if(searchTerms.length == 1)
@@ -115,7 +113,6 @@ public class SpecialistsService extends AbstractServiceImpl
 		{
 			searchTerms[i] = StringUtils.trimToNull(searchTerms[i]);
 		}
-		logger.info("SearchString Final Array: " + Arrays.toString(searchTerms));
 		return searchTerms;
 	}
 }

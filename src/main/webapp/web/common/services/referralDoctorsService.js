@@ -44,8 +44,6 @@ angular.module("Common.Services").service("referralDoctorsService", [
 				page:page,
 				perPage:perPage
 			};
-			console.log("params", config.params);
-
 			junoHttp.get(service.apiPath, config).then(
 				function success(response) {
 					deferred.resolve(response.data);
