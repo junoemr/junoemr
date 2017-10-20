@@ -43,7 +43,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
 import java.util.List;
 
 @Path("/referralDoctors")
@@ -108,9 +107,8 @@ public class ReferralDoctorsService extends AbstractServiceImpl
 
 	private List<ReferralDoctorTo1> searchReferralDocsBC(String searchName, String referralNo, int offset, int limit)
 	{
-		List<Billingreferral> referralDocs = new ArrayList<Billingreferral>();
-		//TODO
-
+		String[] names = SpecialistsService.splitSearchString(searchName);
+		List<Billingreferral> referralDocs = billingreferralDao.findByFullNameAndReferralNo(names[0], names[1], referralNo, offset, limit);
 		return converterBC.getAllAsTransferObjects(getLoggedInInfo(), referralDocs);
 	}
 	private List<ReferralDoctorTo1> searchReferralDocsON(String searchName, String referralNo, int offset, int limit)

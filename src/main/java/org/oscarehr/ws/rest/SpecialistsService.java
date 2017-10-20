@@ -39,7 +39,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -88,17 +87,21 @@ public class SpecialistsService extends AbstractServiceImpl
 	}
 
 	public static List<ProfessionalSpecialist> getSpecialistSearchResults(ProfessionalSpecialistDao specialistDao, String searchName, String referralNo, int offset, int limit) {
-		List<ProfessionalSpecialist> specialists = new ArrayList<ProfessionalSpecialist>();
-		if (searchName != null) {
-			String[] names = splitSearchString(searchName);
-			specialists = specialistDao.findByFullNameAndReferralNo(names[0], names[1], referralNo, offset, limit);
-		}
-		else if (referralNo != null) {
-			specialists = specialistDao.findByReferralNo(referralNo, offset, limit);
-		}
-		return specialists;
+
+		String[] names = splitSearchString(searchName);
+		return specialistDao.findByFullNameAndReferralNo(names[0], names[1], referralNo, offset, limit);
 	}
+
+	/**
+	 * splits the search text (on ',') into a string[] which will always have length >= 2
+	 * values will be null if the search text was null, or the trimmed value after the split is an empty string
+	 * @param searchText - string to split
+	 * @return String[] of size 2 or more
+	 */
 	public static String[] splitSearchString(String searchText) {
+		if(searchText == null) {
+			return new String[] {null,null};
+		}
 		String[] searchTerms = searchText.split(",");
 		logger.info("Split To: " + Arrays.toString(searchTerms));
 

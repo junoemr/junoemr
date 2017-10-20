@@ -169,19 +169,14 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		// set parameters
 		if (lastName != null)
 			query.setParameter("lastName", lastName + "%");
-
 		if (firstName != null)
 			query.setParameter("firstName", firstName + "%");
-
 		if (referralNo != null)
 			query.setParameter("refNo", referralNo + "%");
-
 		if (offset != null)
 			query.setFirstResult(offset);
-
 		if (maxResults != null)
 			query.setMaxResults(maxResults);
-
 
 		@SuppressWarnings("unchecked")
 		List<ProfessionalSpecialist> results = query.getResultList();
