@@ -83,13 +83,8 @@ public class BillingreferralDao extends AbstractDao<Billingreferral> {
     }
 
     public List<Billingreferral> getBillingreferral(String last_name, String first_name) {
-    	String sql = "SELECT br From Billingreferral br WHERE br.lastName like ? and br.firstName like ? order by br.lastName";
-		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, "%"+last_name+"%");
-		query.setParameter(2, "%"+first_name+"%");
 
-		@SuppressWarnings("unchecked")
-		List<Billingreferral> cList = query.getResultList();
+		List<Billingreferral> cList = findByFullNameAndReferralNo("%"+last_name, "%"+first_name, null, null, null);
 
         if (cList != null && cList.size() > 0) {
             return cList;
@@ -97,6 +92,42 @@ public class BillingreferralDao extends AbstractDao<Billingreferral> {
             return null;
         }
     }
+
+	public List<Billingreferral> findByFullNameAndReferralNo(String lastName, String firstName, String referralNo, Integer offset, Integer maxResults)
+	{
+		// set up the query
+		String queryString =
+				"SELECT x FROM " + modelClass.getSimpleName() + " x " +
+						"WHERE 1=1 ";
+
+		if (lastName != null)
+			queryString += "AND ( x.lastName LIKE :lastName ) ";
+		if (firstName != null)
+			queryString += "AND ( x.firstName LIKE :firstName ) ";
+		if (referralNo != null)
+			queryString += "AND ( x.referralNo LIKE :refNo ) ";
+
+		queryString += "ORDER BY x.lastName, x.firstName";
+
+		Query query = entityManager.createQuery(queryString);
+
+		// set parameters
+		if (lastName != null)
+			query.setParameter("lastName", lastName + "%");
+		if (firstName != null)
+			query.setParameter("firstName", firstName + "%");
+		if (referralNo != null)
+			query.setParameter("refNo", referralNo + "%");
+		if (offset != null)
+			query.setFirstResult(offset);
+		if (maxResults != null)
+			query.setMaxResults(maxResults);
+
+		@SuppressWarnings("unchecked")
+		List<Billingreferral> results = query.getResultList();
+		return results;
+
+	}
 
     public List<Billingreferral> getBillingreferralByLastName(String last_name) {
     	String sql = "SELECT br From Billingreferral br WHERE br.lastName like ? order by br.lastName";

@@ -594,35 +594,30 @@
 				<div class="form-group">
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formRefDoc"/></label>
 					<div class="col-md-4">
-						<input type="text" class="form-control form-control-details" 
-							placeholder="<bean:message key="demographic.demographiceditdemographic.formRefDoc"/>" 
-							title="<bean:message key="demographic.demographiceditdemographic.formRefDoc"/>" 
-							ng-model="detailsCtrl.page.demo.scrReferralDoc"/>
+						<input type="text" class="form-control form-control-details"
+						       placeholder="<bean:message key="demographic.demographiceditdemographic.formRefDoc"/>"
+						       title="<bean:message key="demographic.demographiceditdemographic.formRefDoc"/>"
+
+						       uib-typeahead="i.label for i in detailsCtrl.searchReferralDocsName($viewValue)"
+						       typeahead-on-select="detailsCtrl.chooseReferralDoc($item, $model, $label);"
+						       ng-model="detailsCtrl.page.demo.scrReferralDoc"
+						       typeahead-loading="loadingRefDocs"
+						       typeahead-min-length="3"
+						/>
 					</div>
 
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formRefDocNo"/></label>
 					<div class="col-md-4">
-						<div class="input-group">
-							<input type="text" class="form-control form-control-details"
-								   placeholder="<bean:message key="demographic.demographiceditdemographic.formRefDocNo"/>"
-								   title="<bean:message key="demographic.demographiceditdemographic.formRefDocNo"/>"
-								   ng-model="detailsCtrl.page.demo.scrReferralDocNo" ng-change="detailsCtrl.checkReferralDocNo()"/>
-							<span class="input-group-btn">	
-								<button type="button" class="btn btn-primary"
-										ng-click="detailsCtrl.showReferralDocList()">
-									<bean:message key="demographic.demographiceditdemographic.btnSearch"/>
-								</button>
-							</span>
-						</div>
-						<div style="position: absolute; right: 25px; z-index: 999; background-color: white" ng-show="detailsCtrl.page.showReferralDocList">
-							<select class="form-control form-control-details" title="<bean:message key="web.record.details.pickReferralDoctor"/>" 
-									size="7" 
-									ng-model="detailsCtrl.page.referralDocObj" 
-									ng-options="doctor as doctor.name for doctor in detailsCtrl.page.demo.referralDoctors"
-									ng-click="detailsCtrl.fillReferralDoc()">
-								<option value="">--<bean:message key="web.record.details.pickReferralDoctor"/>--</option>
-							</select>
-						</div>
+						<input type="text" class="form-control form-control-details"
+						       placeholder="<bean:message key="demographic.demographiceditdemographic.formRefDocNo"/>"
+						       title="<bean:message key="demographic.demographiceditdemographic.formRefDocNo"/>"
+
+						       uib-typeahead="i.label as i.label for i in detailsCtrl.searchReferralDocsRefNo($viewValue);"
+						       typeahead-on-select="detailsCtrl.chooseReferralDoc($item, $model, $label);"
+						       ng-model="detailsCtrl.page.demo.scrReferralDocNo"
+						       typeahead-loading="loadingRefDocs"
+						       typeahead-min-length="3"
+						/>
 					</div>
 				</div>
 				<div class="form-group">
@@ -715,51 +710,17 @@
 
 					<label class="col-md-2 control-label" ><bean:message key="demographic.demographiceditdemographic.PatientStatusDate"/></label>
 					<div class="col-md-4">
-						<%--<input id="patientStatusDate" ng-model="detailsCtrl.page.demo.patientStatusDate" --%>
-							<%--type="date"--%>
-							<%--class="form-control form-control-details" --%>
-							<%--datepicker-popup="yyyy-MM-dd" --%>
-							<%--datepicker-append-to-body="true" --%>
-							<%--is-open="detailsCtrl.page.patientStatusDatePicker" --%>
-							<%--ng-click="detailsCtrl.page.patientStatusDatePicker=true" --%>
-							<%--title="YYYY-MM-DD" --%>
-							<%--placeholder="<bean:message key="demographic.demographiceditdemographic.PatientStatusDate"/>" --%>
-							<%--ng-change="detailsCtrl.preventManualPatientStatusDate()"--%>
-						<%--/>--%>
 						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.patientStatusDate" show-icon="true" type="Input"> </juno-datepicker-popup>
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formDateJoined1"/></label>
 					<div class="col-md-4">
-						<%--<input id="dateJoined" ng-model="detailsCtrl.page.demo.dateJoined" --%>
-							<%--type="date"--%>
-							<%--class="form-control form-control-details" --%>
-							<%--title="Date Joined" --%>
-							<%--datepicker-popup="yyyy-MM-dd" --%>
-							<%--datepicker-append-to-body="true" --%>
-							<%--is-open="detailsCtrl.page.dateJoinedPicker" --%>
-							<%--ng-click="detailsCtrl.page.dateJoinedPicker = true" --%>
-							<%--placeholder="YYYY-MM-DD" --%>
-							<%--ng-change="detailsCtrl.preventManualDateJoined()"--%>
-						<%--/>--%>
 						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.dateJoined" show-icon="true" type="Input"> </juno-datepicker-popup>
 					</div>
 
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formEndDate"/></label>
 					<div class="col-md-4">
-						<%--<input id="endDate"--%>
-							   <%--ng-model="detailsCtrl.page.demo.endDate"--%>
-							<%--type="date"--%>
-							<%--class="form-control form-control-details"--%>
-							<%--title="End Date"--%>
-							<%--datepicker-popup="yyyy-MM-dd"--%>
-							<%--datepicker-append-to-body="true"--%>
-							<%--is-open="detailsCtrl.page.endDatePicker"--%>
-							<%--ng-click="detailsCtrl.page.endDatePicker = true"--%>
-							<%--placeholder="YYYY-MM-DD"--%>
-							<%--ng-change="detailsCtrl.preventManualEndDate()"--%>
-						<%--/>--%>
 						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.endDate" show-icon="true" type="Input"> </juno-datepicker-popup>
 					</div>
 				</div>

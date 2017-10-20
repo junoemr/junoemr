@@ -85,23 +85,22 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		return(results);
 	}
 
-	public List<ProfessionalSpecialist> findByFullName(String lastName, String firstName) {
-		Query query = entityManager.createQuery("select x from " + modelClass.getName() + " x WHERE x.hideFromView = false and x.lastName like ? and x.firstName like ? order by x.lastName");
-		query.setParameter(1, "%"+lastName+"%");
-		query.setParameter(2, "%"+firstName+"%");
-
-		@SuppressWarnings("unchecked")
-		List<ProfessionalSpecialist> cList = query.getResultList();
-
-		if (cList != null && cList.size() > 0) {
+	/**
+	 * use version with limit and offset. This method returns null when no results are found?
+	 */
+	@Deprecated
+	public List<ProfessionalSpecialist> findByFullName(String lastName, String firstName)
+	{
+		List<ProfessionalSpecialist> cList = findByFullName(lastName, firstName, null, null);
+		if (cList != null && cList.size() > 0)
+		{
 			return cList;
 		}
-
 		return null;
 	}
 
 	public List<ProfessionalSpecialist> findByLastName(String lastName) {
-		return findByFullName(lastName, "");
+		return findByFullName(lastName, "", null, null);
 	}
 
 
@@ -120,22 +119,68 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 
 	}
 
-	public List<ProfessionalSpecialist> findByReferralNo(String referralNo) {
-		if (StringUtils.isBlank(referralNo)) {
+	/**
+	 * use version with limit and offset. This method returns null when no results are found?
+	 */
+	@Deprecated
+	public List<ProfessionalSpecialist> findByReferralNo(String referralNo)
+	{
+		if (StringUtils.isBlank(referralNo))
+		{
 			return null;
 		}
-		Query query = entityManager.createQuery("select x from " + modelClass.getName() + " x WHERE x.hideFromView = false and x.referralNo=? order by x.lastName");
-		query.setParameter(1, referralNo);
+		List<ProfessionalSpecialist> cList = findByReferralNo(referralNo, null, null);
 
-		@SuppressWarnings("unchecked")
-		List<ProfessionalSpecialist> cList = query.getResultList();
-
-		if (cList != null && cList.size() > 0) {
+		if (cList != null && cList.size() > 0)
+		{
 			return cList;
 		}
-
 		return null;
+	}
 
+	public List<ProfessionalSpecialist> findByReferralNo(String referralNo, Integer offset, Integer maxResults)
+	{
+		return findByFullNameAndReferralNo(null, null, referralNo, offset, maxResults);
+	}
+
+	public List<ProfessionalSpecialist> findByFullName(String lastName, String firstName, Integer offset, Integer maxResults)
+	{
+		return findByFullNameAndReferralNo(lastName, firstName, null, offset, maxResults);
+	}
+
+	public List<ProfessionalSpecialist> findByFullNameAndReferralNo(String lastName, String firstName, String referralNo, Integer offset, Integer maxResults)
+	{
+		// set up the query
+		String queryString =
+				"SELECT x FROM " + modelClass.getSimpleName() + " x " +
+				"WHERE x.hideFromView = false ";
+
+		if (lastName != null)
+			queryString += "AND ( x.lastName LIKE :lastName ) ";
+		if (firstName != null)
+			queryString += "AND ( x.firstName LIKE :firstName ) ";
+		if (referralNo != null)
+			queryString += "AND ( x.referralNo LIKE :refNo ) ";
+
+		queryString += "ORDER BY x.lastName, x.firstName";
+
+		Query query = entityManager.createQuery(queryString);
+
+		// set parameters
+		if (lastName != null)
+			query.setParameter("lastName", lastName + "%");
+		if (firstName != null)
+			query.setParameter("firstName", firstName + "%");
+		if (referralNo != null)
+			query.setParameter("refNo", referralNo + "%");
+		if (offset != null)
+			query.setFirstResult(offset);
+		if (maxResults != null)
+			query.setMaxResults(maxResults);
+
+		@SuppressWarnings("unchecked")
+		List<ProfessionalSpecialist> results = query.getResultList();
+		return results;
 	}
 
 	public ProfessionalSpecialist getByReferralNo(String referralNo) {
@@ -144,24 +189,22 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		if (cList != null && cList.size() > 0) {
 			return cList.get(0);
 		}
-
 		return null;
-
 	}
 
 	public boolean hasRemoteCapableProfessionalSpecialists()
 	{
 		return(findByEDataUrlNotNull().size()>0);
 	}
-	
+
 
 	public List<ProfessionalSpecialist> search(String keyword) {
 		StringBuilder where = new StringBuilder();
 		List<String> paramList = new ArrayList<String>();
-		
+
 		String searchMode = "search_name";
 		String orderBy = "c.lastName,c.firstName";
-	    
+
 		if(searchMode.equals("search_name")) {
 			String[] temp = keyword.split("\\,\\p{Space}*");
 			if(temp.length>1) {
@@ -172,35 +215,35 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		      where.append("c.lastName like ?1");
 		      paramList.add(temp[0]+"%");
 		    }
-		}		
+		}
 		String sql = "SELECT c from ProfessionalSpecialist c where " + where.toString() + " and c.hideFromView = false order by " + orderBy;
 		MiscUtils.getLogger().info(sql);
 		Query query = entityManager.createQuery(sql);
 		for(int x=0;x<paramList.size();x++) {
 			query.setParameter(x+1,paramList.get(x));
-		}		
-		
+		}
+
 		@SuppressWarnings("unchecked")
 		List<ProfessionalSpecialist> contacts = query.getResultList();
 		return contacts;
 	}
-	
+
 	public List<ProfessionalSpecialist> findByFullNameAndSpecialtyAndAddress(String lastName, String firstName, String specialty, String address, Boolean showHidden) {
 		String sql = "select x from " + modelClass.getName() + " x WHERE (x.lastName like ? and x.firstName like ?) ";
-		
+
 		if(!StringUtils.isEmpty(specialty)) {
 			sql += " AND x.specialtyType LIKE ? ";
 		}
-		
+
 		if(!StringUtils.isEmpty(address)) {
 			sql += " AND x.streetAddress LIKE ? ";
 		}
-		
+
 		if(showHidden == null || !showHidden) {
 			sql += " AND x.hideFromView=false ";
 		}
 		sql += " order by x.lastName";
-		
+
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, "%"+lastName+"%");
 		query.setParameter(2, "%"+firstName+"%");
@@ -212,13 +255,13 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		if(!StringUtils.isEmpty(address)) {
 			query.setParameter(index++, "%" + address +"%");
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		List<ProfessionalSpecialist> cList = query.getResultList();
 
 		return cList;
 	}
-	
+
 	public List<ProfessionalSpecialist> findByService(String serviceName) {
 		Query query = entityManager.createQuery("select x from " + modelClass.getName() + " x, ConsultationServices cs, ServiceSpecialists ss WHERE x.hideFromView = false and x.id = ss.id.specId and ss.id.serviceId = cs.serviceId and cs.serviceDesc = ?");
 		query.setParameter(1, serviceName);
@@ -226,10 +269,10 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		@SuppressWarnings("unchecked")
 		List<ProfessionalSpecialist> cList = query.getResultList();
 
-		
+
 		return cList;
 	}
-	
+
 	public List<ProfessionalSpecialist> findByServiceId(Integer serviceId) {
 		Query query = entityManager.createQuery("select x from " + modelClass.getName() + " x, ServiceSpecialists ss WHERE x.hideFromView = false and x.id = ss.id.specId and ss.id.serviceId = ?");
 		query.setParameter(1, serviceId);
@@ -237,9 +280,9 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		@SuppressWarnings("unchecked")
 		List<ProfessionalSpecialist> cList = query.getResultList();
 
-		
+
 		return cList;
 	}
-	
-	
+
+
 }

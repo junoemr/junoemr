@@ -215,15 +215,6 @@ public class DemographicService extends AbstractServiceImpl {
 			}
 		}
 		
-		List<ProfessionalSpecialist> referralDocs = specialistDao.findAll();
-		if (referralDocs!=null) {
-			for (ProfessionalSpecialist referralDoc : referralDocs) {
-				if(referralDoc != null) {
-					result.getReferralDoctors().add(specialistConverter.getAsTransferObject(getLoggedInInfo(),referralDoc));
-				}
-			}
-		}
-		
 		List<SecUserRole> doctorRoles = secUserRoleDao.getSecUserRolesByRoleName("doctor");
 		if (doctorRoles!=null) {
 			for (SecUserRole doctor : doctorRoles) {

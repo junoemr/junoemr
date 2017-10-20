@@ -30,7 +30,6 @@ import org.oscarehr.managers.FormsManager;
 import org.oscarehr.ws.rest.conversion.EFormConverter;
 import org.oscarehr.ws.rest.to.model.EFormTo1;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
 import oscar.eform.actions.DisplayImageAction;
@@ -50,9 +49,6 @@ public class EFormsService extends AbstractServiceImpl {
 	@Autowired
 	private FormsManager formsManager;
 
-	@Autowired
-	private EFormDao eFormDao;
-
 	/**
 	 * retrieves a list of all eforms better than the getAllEFormNames method
 	 * eform responses will not contain the eform html
@@ -63,9 +59,8 @@ public class EFormsService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<EFormTo1>, String> getEFormList() {
 
-		HttpHeaders responseHeaders = new HttpHeaders();
 		List<EFormTo1> allEforms = new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(), formsManager.findByStatus(getLoggedInInfo(), true, EFormDao.EFormSortOrder.NAME));
-		return RestResponse.successResponse(responseHeaders, allEforms);
+		return RestResponse.successResponse(allEforms);
 	}
 
 	/**
@@ -77,12 +72,10 @@ public class EFormsService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<List<String>, String> getEFormImageList() {
 
-		HttpHeaders responseHeaders = new HttpHeaders();
-
 		String imageHomeDir = OscarProperties.getInstance().getProperty("eform_image");
 		File directory = new File(imageHomeDir);
 
 		List<String> imagesNames = DisplayImageAction.getFiles(directory, ".*\\.(jpg|jpeg|png|gif)$", null);
-		return RestResponse.successResponse(responseHeaders, imagesNames);
+		return RestResponse.successResponse(imagesNames);
 	}
 }

@@ -441,6 +441,8 @@
 <script type="text/javascript" src="common/services/ticklerService.js"></script>
 <script type="text/javascript" src="common/services/reportByTemplateService.js"></script>
 <script type="text/javascript" src="common/services/uxService.js"></script>
+<script type="text/javascript" src="common/services/specialistsService.js"></script>
+<script type="text/javascript" src="common/services/referralDoctorsService.js"></script>
 
 <script type="text/javascript" src="common/filters/module.js"></script>
 <script type="text/javascript" src="common/filters/age.js"></script>
