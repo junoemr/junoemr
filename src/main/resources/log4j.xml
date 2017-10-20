@@ -79,6 +79,14 @@
 		<priority value="WARN" />
 	</category>
 
+    <category name="org.apache.cxf.interceptor.LoggingOutInterceptor">
+        <priority value="WARN" />
+    </category>
+
+    <category name="org.apache.cxf.interceptor.LoggingInInterceptor">
+        <priority value="WARN" />
+    </category>
+
 	<category name="org.apache.cxf.bus.spring.BusApplicationContext">
 		<priority value="WARN" />
 	</category>
