@@ -249,6 +249,9 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 
 	@SuppressWarnings("unchecked")
     public List<CaseManagementNote> getActiveNotesByDemographic(String demographic_no, String[] issues) {
+
+		List<CaseManagementNote> issueListReturn = new ArrayList<CaseManagementNote>();
+
 		String list = null;
 		String hql;
 		if (issues != null) {
@@ -261,17 +264,31 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 					list += issues[x];
 				}
 				hql = "select cmn from CaseManagementNote cmn join cmn.issues i where i.issue_id in (" + list
-				        + ") and cmn.demographic_no = ? and cmn.archived = 0 and cmn.id = (select max(cmn2.id) from CaseManagementNote cmn2 where cmn.uuid = cmn2.uuid) ORDER BY cmn.position, cmn.observation_date desc";
-				return this.getHibernateTemplate().find(hql, demographic_no);
+				        + ") and cmn.demographic_no = ? and i.demographic_no = ? and cmn.archived = 0 and " +
+						"cmn.id = (select max(cmn2.id) from " +
+						"CaseManagementNote cmn2 where cmn.uuid = cmn2.uuid) " +
+						"ORDER BY cmn.position, cmn.observation_date desc";
+
+				issueListReturn = this.getHibernateTemplate().find(
+						hql, new Object[] { demographic_no, demographic_no });
 
 			} else if (issues.length == 1) {
 				hql = "select cmn from CaseManagementNote cmn join cmn.issues i where i.issue_id = ? and cmn.demographic_no = ? and cmn.archived = 0 and cmn.id = (select max(cmn2.id) from CaseManagementNote cmn2 where cmn.uuid = cmn2.uuid) ORDER BY cmn.position, cmn.observation_date desc";
 				long id = Long.parseLong(issues[0]);
-				return this.getHibernateTemplate().find(hql, new Object[] { id, demographic_no });
+				
+				hql = "select cmn from CaseManagementNote cmn join cmn.issues i " +
+						"where i.issue_id = ? and i.demographic_no = ? and cmn.demographic_no= ? " +
+						"and cmn.archived = 0 " +
+						"and cmn.id = (select max(cmn2.id) from " +
+						"CaseManagementNote cmn2 where cmn.uuid = cmn2.uuid) " +
+						"order by cmn.position, cmn.observation_date desc";
+					
+				issueListReturn = this.getHibernateTemplate().find(
+						hql, new Object[] { id, demographic_no, demographic_no });
 			}
 		}
 
-		return new ArrayList<CaseManagementNote>();
+		return issueListReturn;
 	}
 
 	@SuppressWarnings("unchecked")
