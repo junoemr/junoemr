@@ -106,6 +106,8 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	private Date signedConfidentiality = null;
     @Column(name = "supervisor")
     private String supervisor;
+    @Column(name = "super_admin")
+	private boolean superAdmin = false;
     
     /* -- Province specific -- */
 	@Column(name = "alberta_tak_no")
@@ -333,6 +335,14 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	}
 	public void setAlbertaEDeliveryIds(List<String> idList) {
 		setAlbertaEDeliveryIds(StringUtils.join(idList, ","));
+	}
+
+	public void setSuperAdmin(boolean superAdminStatus) {
+		superAdmin = superAdminStatus;
+	}
+
+	public Boolean getSuperAdmin() {
+		return superAdmin;
 	}
         
 	/* -- Comparators -- */

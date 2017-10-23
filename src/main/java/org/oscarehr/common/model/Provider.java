@@ -74,6 +74,7 @@ public class Provider implements Serializable, Comparable<Provider>{
     /* -- Province specific -- */
 	private String albertaTakNo;
 	private String albertaEDeliveryIds;
+	private Boolean superAdmin;
 
 	public String getPractitionerNo() {
 		return practitionerNo;
@@ -134,6 +135,7 @@ public class Provider implements Serializable, Comparable<Provider>{
 		lastUpdateDate = provider.lastUpdateDate;
 		supervisor = provider.supervisor;
 		albertaTakNo = provider.albertaTakNo;
+		superAdmin = provider.superAdmin;
 	}
 
 	/** same as getDisplayName */
@@ -364,9 +366,14 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public void setAlbertaEDeliveryIds(String albertaEDeliveryIds) {
 		this.albertaEDeliveryIds = StringUtils.trimToNull(albertaEDeliveryIds);
 	}
-//	public void setAlbertaEDeliveryIds(List<String> idList) {
-//		setAlbertaEDeliveryIds(StringUtils.join(idList, ","));
-//	}
+
+	public void setSuperAdmin(boolean superAdminStatus) {
+		superAdmin = superAdminStatus;
+	}
+
+	public Boolean getSuperAdmin() {
+		return superAdmin;
+	}
 
 	/* -- other methods --*/
 
