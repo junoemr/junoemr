@@ -40,7 +40,7 @@ public class AppointmentStatusDao extends AbstractDao<AppointmentStatus> {
 	
 	@SuppressWarnings("unchecked")
 	public List<AppointmentStatus> findAll() {
-		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName());
+		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName() + " x ORDER BY x.id");
 		return query.getResultList();
 	}
     

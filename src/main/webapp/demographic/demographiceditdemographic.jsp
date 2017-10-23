@@ -181,7 +181,6 @@ if(!authed) {
 	int nStrShowLen = 20;
 	String billRegion = oscarVariables.getBillingTypeUpperCase();
 	String instanceType = oscarVariables.getInstanceTypeUpperCase();
-	String prov = oscarVariables.getBillingTypeUpperCase();
 
 	CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 	List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.DEMOGRAPHIC, Long.valueOf(demographic_no));
@@ -857,6 +856,8 @@ jQuery(document).ready(function() {
                                                 if (oscar.util.StringUtils.filled(demographic.getMonthOfBirth())) birthMonth = StringUtils.trimToEmpty(demographic.getMonthOfBirth());
                                                 if (oscar.util.StringUtils.filled(demographic.getDateOfBirth())) birthDate = StringUtils.trimToEmpty(demographic.getDateOfBirth());
 
+                                                String birthDisplay = demographic.getBirthDayMasterFileString();
+
                                                	dob_year = Integer.parseInt(birthYear);
                                                	dob_month = Integer.parseInt(birthMonth);
                                                	dob_date = Integer.parseInt(birthDate);
@@ -965,8 +966,8 @@ if(wLReadonly.equals("")){
 			</tr>
 			<tr>
 				<td><a
-					href="javascript: function myFunction() {return false; }"
-					onClick="popupPage(700, 1000, '../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
+					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t')"
+					target="_blank"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>
 			<%
@@ -1448,7 +1449,7 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
                                                     </li>
                                                     <li><span class="label"><bean:message key="demographic.demographiceditdemographic.msgDemoAge"/>:</span>
                                                         <span class="info"><%=age%>&nbsp;(<bean:message
-                                                            key="demographic.demographiceditdemographic.formDOB" />: <%=birthYear%>-<%=birthMonth%>-<%=birthDate%>)
+                                                            key="demographic.demographiceditdemographic.formDOB" />: <%=birthDisplay%>)
                                                         </span>
                                                     </li>
                                                     <li><span class="label"><bean:message key="demographic.demographiceditdemographic.msgDemoLanguage"/>:</span>
@@ -1468,7 +1469,15 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
                                                <li><span class="label"><bean:message key="demographic.demographiceditdemographic.msgSpokenLang"/>:</span>
                                                    <span class="info"><%=sp_lang%></span>
 							</li>
-						<% } %>
+						<% }
+							if(oscarProps.isPropertyActive("demographic_veteran_no")) {
+								String veteranNo = (demographic.getVeteranNo() != null ? demographic.getVeteranNo() : "");
+						%>
+							<li>
+								<span class="label"><bean:message key="demographic.demographiceditdemographic.veteranNo" />:</span>
+								<span class="info"><%= veteranNo %></span>
+							</li>
+							<% } %>
 						
 						<% String aboriginal = StringUtils.trimToEmpty(demoExt.get("aboriginal"));
 						   if (aboriginal!=null && aboriginal.length()>0) { %>
@@ -2845,7 +2854,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 								<td align="right" nowrap><b><bean:message
 									key="demographic.demographiceditdemographic.formRefDocNo" />: </b></td>
 								<td align="left"><input type="text" name="r_doctor_ohip" <%=getDisabled("r_doctor_ohip")%>
-									size="20" maxlength="6" value="<%=rdohip%>"> <% if(!"BC".equals(prov)) { %>
+									size="20" maxlength="6" value="<%=rdohip%>"> <% if(!"BC".equals(instanceType)) { %>
 								<a
 									href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
 								#</a> <% } %>
@@ -2943,24 +2952,26 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 									<input  type="text" name="roster_date_year" size="4" maxlength="4" value="<%=rosterDateYear%>">
 									<input  type="text" name="roster_date_month" size="2" maxlength="2" value="<%=rosterDateMonth%>">
 									<input  type="text" name="roster_date_day" size="2" maxlength="2" value="<%=rosterDateDay%>">
+									<b><bean:message
+											key="demographic.demographiceditdemographic.RosterTerminationDate" />: </b>
+									<input  type="text" name="roster_termination_date_year" size="4" maxlength="4" value="<%=rosterTerminationDateYear%>">
+									<input  type="text" name="roster_termination_date_month" size="2" maxlength="2" value="<%=rosterTerminationDateMonth%>">
+									<input  type="text" name="roster_termination_date_day" size="2" maxlength="2" value="<%=rosterTerminationDateDay%>">
 								</td>
 							</tr>
-							
-							
-							<%--
 							<tr valign="top">
 								<td align="right" nowrap><b><bean:message
-									key="demographic.demographiceditdemographic.RosterTerminationReason" />: </b></td>
+										key="demographic.demographiceditdemographic.RosterTerminationReason" />: </b></td>
 								<td align="left" colspan="3">
 									<select  name="roster_termination_reason">
 										<option value="">N/A</option>
-<%for (String code : Util.rosterTermReasonProperties.getTermReasonCodes()) { %>
+										<%for (String code : Util.rosterTermReasonProperties.getTermReasonCodes()) { %>
 										<option value="<%=code %>" <%=code.equals(rosterTerminationReason)?"selected":"" %> ><%=Util.rosterTermReasonProperties.getReasonByCode(code) %></option>
-<%} %>
+										<%} %>
 									</select>
 								</td>
 							</tr>
-							--%>
+
 
 </oscar:oscarPropertiesCheck>														
 <%-- END TOGGLE OFF PATIENT ROSTERING --%>
@@ -3020,6 +3031,19 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 									size="30" value="<%=StringUtils.trimToEmpty(demographic.getChartNo())%>" <%=getDisabled("chart_no")%>>
 								</td>
 							</tr>
+							<%
+							if(oscarProps.isPropertyActive("demographic_veteran_no")) {
+								String veteranNo = (demographic.getVeteranNo() != null ? demographic.getVeteranNo() : "");
+								%>
+								<tr>
+									<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.veteranNo" />:</b></td>
+									<td align="left">
+										<input name="veteranNo" type="text" value="<%= veteranNo %>">
+									</td>
+								</tr>
+								<%
+							}
+							%>
 							
 							<tr>
 	                            <td align="right"><b><bean:message key="web.record.details.archivedPaperChart" />: </b></td>
@@ -3142,11 +3166,11 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 			<tr>
 			<td >
 				<div id="usSigned">
-					<input type="radio" name="usSigned" id="usSigned" value="signed" <%=usSigned.equals("signed") ? "checked" : ""%>>
-						<label style="font-weight:bold;" for="usSigned">U.S. Resident Consent Form Signed </label>
+					<input type="radio" name="usSigned" id="usSigneds" value="signed" <%=usSigned.equals("signed") ? "checked" : ""%>>
+						<label style="font-weight:bold;" for="usSigneds">U.S. Resident Consent Form Signed </label>
 			
-				    <input type="radio" name="usSigned" id="usSigned" value="unsigned" <%=usSigned.equals("unsigned") ? "checked" : ""%>>
-				    	<label style="font-weight:bold;" for="usSigned">U.S. Resident Consent Form NOT Signed</label>
+				    <input type="radio" name="usSigned" id="usSignedu" value="unsigned" <%=usSigned.equals("unsigned") ? "checked" : ""%>>
+				    	<label style="font-weight:bold;" for="usSignedu">U.S. Resident Consent Form NOT Signed</label>
 			    </div>
 			</td>
 			</tr>
@@ -3628,7 +3652,7 @@ jQuery(document).ready(function(){
 %>
 </script>
 
-<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true") && "BC".equals(prov)) { %>
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true") && "BC".equals(instanceType)) { %>
 
 <script src="https://www.google.com/jsapi"></script>
 <script>

@@ -229,27 +229,39 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 		infoTable.addCell(cell);
 
-		if (reqFrm.pwb.equals("1")){
-			//cell.setPhrase(new Phrase(getResource("msgPleaseReplyPatient"), boldFont));
-			// msgPleaseReplyPatient does not exist. Using Part1 and Part2 method instead
-			cell.setPhrase(new Phrase(
-					String.format("%s %s %s", getResource("msgPleaseReplyPart1"),
-											  clinic.getClinicName(),
-											  getResource("msgPleaseReplyPart2")), boldFont));
+		// allow header message to be disabled in properties file
+		if(!props.isPropertyActive("consultation_fax_disable_header_message")) {
+			cell = createHeaderMessage();
+			infoTable.addCell(cell);
 		}
 
-		else if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
+		return infoTable;
+	}
+
+	/**
+	 * Creates a special header cell with a message
+	 * @return
+	 */
+	private PdfPCell createHeaderMessage() {
+		PdfPCell cell = new PdfPCell(new Phrase("", headerFont));
+		cell.setBorder(0);
+		cell.setPadding(0);
+
+		boolean patientWillBook = reqFrm.pwb.equals("1");
+
+		// multisite reply message
+		if (!patientWillBook && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 			cell.setPhrase(new Phrase("Please reply", boldFont));
 		}
+		// default reply message
 		else {
 			cell.setPhrase(new Phrase(
 					String.format("%s %s %s", getResource("msgPleaseReplyPart1"),
-											  clinic.getClinicName(),
-											  getResource("msgPleaseReplyPart2")), boldFont));
+							clinic.getClinicName(),
+							getResource("msgPleaseReplyPart2")), boldFont));
 		}
-		infoTable.addCell(cell);
 
-		return infoTable;
+		return cell;
 	}
 
 	/**
@@ -333,8 +345,11 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 
 		infoTable.addCell(setInfoCell(cell, getResource("msgWPhone")));
 		infoTable.addCell(setDataCell(cell, reqFrm.patientWPhone));
-                
-                infoTable.addCell(setInfoCell(cell, getResource("msgEmail")));
+
+		infoTable.addCell(setInfoCell(cell, getResource("msgCPhone")));
+		infoTable.addCell(setDataCell(cell, reqFrm.patientCPhone));
+
+		infoTable.addCell(setInfoCell(cell, getResource("msgEmail")));
 		infoTable.addCell(setDataCell(cell, reqFrm.patientEmail));
 
 		infoTable.addCell(setInfoCell(cell, getResource("msgBirth")));

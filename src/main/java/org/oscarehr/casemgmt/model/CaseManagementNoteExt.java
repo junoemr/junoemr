@@ -29,12 +29,12 @@ import java.util.Date;
 import oscar.util.UtilDateUtilities;
 
 public class CaseManagementNoteExt {
-	
+
 	// Key Value constants ***All date value key must be in format "XXX Date"
 	public static String STARTDATE	    = "Start Date"	;
 	public static String RESOLUTIONDATE = "Resolution Date"	;
 	public static String PROCEDUREDATE  = "Procedure Date"	;
-	
+
 	public static String AGEATONSET	    = "Age at Onset"	;
 	public static String TREATMENT	    = "Treatment"	;
 	public static String PROBLEMSTATUS  = "Problem Status"	;
@@ -43,9 +43,9 @@ public class CaseManagementNoteExt {
 	public static String LIFESTAGE	    = "Life Stage"	;
 	public static String HIDECPP	    = "Hide Cpp"	;
 	public static String PROBLEMDESC    = "Problem Description";
-        
-	
-	
+
+
+
 	//Class fields
 	private Long id;
 	private Long noteId;
@@ -54,51 +54,51 @@ public class CaseManagementNoteExt {
 	private Date dateValue;
 
 	public Long getId() {
-	    return this.id;
+		return this.id;
 	}
 	public void setId(Long id) {
-	    this.id = id;
+		this.id = id;
 	}
-	
+
 	public Long getNoteId() {
-	    return this.noteId;
+		return this.noteId;
 	}
 	public void setNoteId(Long noteId) {
-	    this.noteId = noteId;
+		this.noteId = noteId;
 	}
-	
+
 	public String getKeyVal() {
-	    return this.keyVal;
+		return this.keyVal;
 	}
 	public void setKeyVal(String keyVal) {
-	    this.keyVal = keyVal;
+		this.keyVal = keyVal;
 	}
-	
+
 	public String getValue() {
-	    return this.value;
+		return this.value;
 	}
 	public void setValue(String value) {
-	    this.value = value;
+		this.value = value;
 	}
-	
+
 	public Date getDateValue() {
-	    return this.dateValue;
+		return this.dateValue;
 	}
 	public String getDateValueStr() {
-	    return UtilDateUtilities.DateToString(this.dateValue,"yyyy-MM-dd");
+		return UtilDateUtilities.DateToString(this.dateValue,"yyyy-MM-dd");
 	}
 	public void setDateValue(Date dateValue) {
-	    this.dateValue = dateValue;
+		this.dateValue = dateValue;
 	}
 	public void setDateValue(String dateValue) {
-	    if (dateValue.trim().length()>=8) {
-		setDateValue(UtilDateUtilities.StringToDate(dateValue,"yyyy-MM-dd"));
-	    } else if (dateValue.trim().length()>=6) {
-		setDateValue(UtilDateUtilities.StringToDate(dateValue,"yyyy-MM"));
-	    } else if (dateValue.trim().length()==4) {
-		setDateValue(UtilDateUtilities.StringToDate(dateValue,"yyyy"));
-	    } else {
-		this.dateValue = null;
-	    }
+		if (dateValue.trim().length()>=8) {
+			setDateValue(UtilDateUtilities.StringToDate(dateValue,"yyyy-MM-dd"));
+		} else if (dateValue.trim().length()>=6) {
+			setDateValue(UtilDateUtilities.StringToDate(dateValue,"yyyy-MM"));
+		} else if (dateValue.trim().length()==4) {
+			setDateValue(UtilDateUtilities.StringToDate(dateValue,"yyyy"));
+		} else {
+			this.dateValue = null;
+		}
 	}
 }

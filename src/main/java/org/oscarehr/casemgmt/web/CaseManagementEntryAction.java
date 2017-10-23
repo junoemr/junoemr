@@ -239,7 +239,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			String default_view = OscarProperties.getInstance().getProperty("default_view", "");
 
 			url = bsurl + "/billing.do?billRegion=" + java.net.URLEncoder.encode(province, "UTF-8") + "&billForm=" + java.net.URLEncoder.encode(default_view, "UTF-8") + "&hotclick=" + java.net.URLEncoder.encode("", "UTF-8") + "&appointment_no=" + bean.appointmentNo + "&appointment_date=" + bean.appointmentDate + "&start_time=" + Hour + ":" + Min + "&demographic_name=" + java.net.URLEncoder.encode(bean.patientLastName + "," + bean.patientFirstName, "UTF-8") + "&demographic_no=" + bean.demographicNo
-			        + "&providerview=" + bean.curProviderNo + "&user_no=" + bean.providerNo + "&apptProvider_no=" + bean.curProviderNo + "&bNewForm=1&status=t";
+					+ "&providerview=" + bean.curProviderNo + "&user_no=" + bean.providerNo + "&apptProvider_no=" + bean.curProviderNo + "&bNewForm=1&status=t";
 
 			session.setAttribute("billing_url", url);
 		}
@@ -475,7 +475,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 			path.append("demographicNo=" + demono);
 			String noteBody = request.getParameter("noteBody");
-                        
+
 			if (noteBody != null) path.append("&noteBody=" + noteBody);
 
 			finalFwd = new ActionForward(path.toString());
@@ -1214,29 +1214,29 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		// noteString = removeSignature(noteString);
 		noteString = removeCurrentIssue(noteString);
 		note.setNote(noteString);
-                
-                String resident = request.getParameter("resident");
-                if( resident != null && !"null".equalsIgnoreCase(resident) && !"".equalsIgnoreCase(resident)) {
-                    String reviewer = request.getParameter("reviewer");
-                    String residentMsg = "";
-                    ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
-                    
-                    if( !"null".equalsIgnoreCase(reviewer) && !"".equalsIgnoreCase(reviewer) ) {
-                        ProviderData providerData = providerDataDao.find(reviewer);
-                        residentMsg = "\n\n***Reviewed with " + providerData.getLastName() + ", " + providerData.getFirstName() + "***\n";
-                    }
-                                       
-                    String supervisor = request.getParameter("supervisor");
-                    if( !"null".equalsIgnoreCase(supervisor) && !"".equalsIgnoreCase(supervisor) ) {
-                        ProviderData providerData = providerDataDao.find(supervisor);
-                        residentMsg = "\n\n***Not yet verified by " + providerData.getLastName() + ", " + providerData.getFirstName() + "***\n";
-                    }
-                    
-                    noteString = note.getNote();
-                    noteString += residentMsg;
-                    note.setNote(noteString);
-                    
-                }
+
+		String resident = request.getParameter("resident");
+		if( resident != null && !"null".equalsIgnoreCase(resident) && !"".equalsIgnoreCase(resident)) {
+			String reviewer = request.getParameter("reviewer");
+			String residentMsg = "";
+			ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
+
+			if( !"null".equalsIgnoreCase(reviewer) && !"".equalsIgnoreCase(reviewer) ) {
+				ProviderData providerData = providerDataDao.find(reviewer);
+				residentMsg = "\n\n***Reviewed with " + providerData.getLastName() + ", " + providerData.getFirstName() + "***\n";
+			}
+
+			String supervisor = request.getParameter("supervisor");
+			if( !"null".equalsIgnoreCase(supervisor) && !"".equalsIgnoreCase(supervisor) ) {
+				ProviderData providerData = providerDataDao.find(supervisor);
+				residentMsg = "\n\n***Not yet verified by " + providerData.getLastName() + ", " + providerData.getFirstName() + "***\n";
+			}
+
+			noteString = note.getNote();
+			noteString += residentMsg;
+			note.setNote(noteString);
+
+		}
 
 		/* add issues into notes */
 		String includeIssue = request.getParameter("includeIssue");
@@ -1279,7 +1279,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			note.setLocked(true);
 		}
 
-                
+
 		Date now = new Date();
 
 		String observationDate = cform.getObservation_date();
@@ -1762,7 +1762,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		saveMessages(request, messages);
 
 		CaseManagementEntryFormBean cform = (CaseManagementEntryFormBean) form;
-                String  priorNote = cform.getNoteId();
+		String  priorNote = cform.getNoteId();
 		Long noteId = noteSave(cform, request);
 
 		if (noteId == -1) {
@@ -1775,67 +1775,67 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		if (error != null) {
 			return mapping.findForward("windowCloseError");
 		}
-                
-                String supervisor = null;
-                String reviewer = null;
-                String resident = request.getParameter("resident");
-                String reviewerNo = null;
-                ResidentOscarMsgDao residenOscarMsgDao = SpringUtils.getBean(ResidentOscarMsgDao.class);
-                if( resident != null && !"null".equalsIgnoreCase(resident) ) {
-                    reviewer = request.getParameter("reviewer");
-                    if( "null".equalsIgnoreCase(reviewer) || "".equalsIgnoreCase(reviewer) ) {
-                        reviewer = null;
-                    }
-                                       
-                    supervisor = request.getParameter("supervisor");
-                    if( "null".equalsIgnoreCase(supervisor) || "".equalsIgnoreCase(supervisor) ) {
-                        supervisor = null;
-                    }
-                    
-                    if( supervisor != null ) {
-                        Calendar epoch = GregorianCalendar.getInstance();
-                        epoch.set(1970, 0, 1, 0, 0, 0);
-                        ResidentOscarMsg residentOscarMsg = new ResidentOscarMsg();
-                        residentOscarMsg.setComplete(Boolean.FALSE);
-                        residentOscarMsg.setCreate_time(new Date(System.currentTimeMillis()));                        
-                        residentOscarMsg.setComplete_time(epoch.getTime());
-                        residentOscarMsg.setResident_no(loggedInInfo.getLoggedInProvider().getProviderNo());
-                        residentOscarMsg.setSupervisor_no(supervisor);
-                        residentOscarMsg.setDemographic_no(Integer.valueOf(demoNo));
-                        residentOscarMsg.setNote_id(noteId);
-                        if( cform.getAppointmentNo() != null ) {
-                            residentOscarMsg.setAppointment_no(Integer.valueOf(cform.getAppointmentNo()));
-                        }
-                        residenOscarMsgDao.persist(residentOscarMsg);
-                        
-                        reviewerNo = supervisor;
-                    }
-                    else if( reviewer != null ) {
-                        reviewerNo = reviewer;
-                    }
-                }
-                 
-               if( OscarProperties.getInstance().getProperty("resident_review", "false").equalsIgnoreCase("true") ) {
-                    String verifyStr = request.getParameter("verify");
-                    if( verifyStr != null && verifyStr.equalsIgnoreCase("on") ) {
-                    
-                        if( priorNote != null && !"null".equalsIgnoreCase(priorNote) && !"".equalsIgnoreCase(priorNote) ) {
-                            
-                            for( CaseManagementNote n : caseManagementNoteDao.getNotesByUUID(cform.getCaseNote().getUuid())) {
-                                
-                                ResidentOscarMsg residentOscarMsg = residenOscarMsgDao.findByNoteId(n.getId());
 
-                                if( residentOscarMsg != null ) {
+		String supervisor = null;
+		String reviewer = null;
+		String resident = request.getParameter("resident");
+		String reviewerNo = null;
+		ResidentOscarMsgDao residenOscarMsgDao = SpringUtils.getBean(ResidentOscarMsgDao.class);
+		if( resident != null && !"null".equalsIgnoreCase(resident) ) {
+			reviewer = request.getParameter("reviewer");
+			if( "null".equalsIgnoreCase(reviewer) || "".equalsIgnoreCase(reviewer) ) {
+				reviewer = null;
+			}
 
-                                    residentOscarMsg.setComplete(Boolean.TRUE);
-                                    residentOscarMsg.setComplete_time(new Date(System.currentTimeMillis()));
+			supervisor = request.getParameter("supervisor");
+			if( "null".equalsIgnoreCase(supervisor) || "".equalsIgnoreCase(supervisor) ) {
+				supervisor = null;
+			}
 
-                                    residenOscarMsgDao.merge(residentOscarMsg);                                    
-                                }
-                            }
-                        }
-                    }
-               }
+			if( supervisor != null ) {
+				Calendar epoch = GregorianCalendar.getInstance();
+				epoch.set(1970, 0, 1, 0, 0, 0);
+				ResidentOscarMsg residentOscarMsg = new ResidentOscarMsg();
+				residentOscarMsg.setComplete(Boolean.FALSE);
+				residentOscarMsg.setCreate_time(new Date(System.currentTimeMillis()));
+				residentOscarMsg.setComplete_time(epoch.getTime());
+				residentOscarMsg.setResident_no(loggedInInfo.getLoggedInProvider().getProviderNo());
+				residentOscarMsg.setSupervisor_no(supervisor);
+				residentOscarMsg.setDemographic_no(Integer.valueOf(demoNo));
+				residentOscarMsg.setNote_id(noteId);
+				if( cform.getAppointmentNo() != null ) {
+					residentOscarMsg.setAppointment_no(Integer.valueOf(cform.getAppointmentNo()));
+				}
+				residenOscarMsgDao.persist(residentOscarMsg);
+
+				reviewerNo = supervisor;
+			}
+			else if( reviewer != null ) {
+				reviewerNo = reviewer;
+			}
+		}
+
+		if( OscarProperties.getInstance().getProperty("resident_review", "false").equalsIgnoreCase("true") ) {
+			String verifyStr = request.getParameter("verify");
+			if( verifyStr != null && verifyStr.equalsIgnoreCase("on") ) {
+
+				if( priorNote != null && !"null".equalsIgnoreCase(priorNote) && !"".equalsIgnoreCase(priorNote) ) {
+
+					for( CaseManagementNote n : caseManagementNoteDao.getNotesByUUID(cform.getCaseNote().getUuid())) {
+
+						ResidentOscarMsg residentOscarMsg = residenOscarMsgDao.findByNoteId(n.getId());
+
+						if( residentOscarMsg != null ) {
+
+							residentOscarMsg.setComplete(Boolean.TRUE);
+							residentOscarMsg.setComplete_time(new Date(System.currentTimeMillis()));
+
+							residenOscarMsgDao.merge(residentOscarMsg);
+						}
+					}
+				}
+			}
+		}
 
 		String toBill = request.getParameter("toBill");
 		if (toBill != null && toBill.equalsIgnoreCase("true")) {
@@ -1845,19 +1845,19 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			String date = cform.getAppointmentDate();
 			String start_time = cform.getStart_time();
 			String apptProvider = cform.getApptProvider();
-                        String providerview = null;
-                        if( reviewerNo != null ) {
-                            Provider p = providerMgr.getProvider(reviewerNo);
-                            if( p.getProviderType().equalsIgnoreCase("nurse") ) {
-                                providerview = "000000";
-                            }
-                            else {
-                                providerview = reviewerNo;
-                            }
-                        }
-                        else {
-                            providerview = loggedInInfo.getLoggedInProviderNo();
-                        }
+			String providerview = null;
+			if( reviewerNo != null ) {
+				Provider p = providerMgr.getProvider(reviewerNo);
+				if( p.getProviderType().equalsIgnoreCase("nurse") ) {
+					providerview = "000000";
+				}
+				else {
+					providerview = reviewerNo;
+				}
+			}
+			else {
+				providerview = loggedInInfo.getLoggedInProviderNo();
+			}
 			String defaultView = oscar.OscarProperties.getInstance().getProperty("default_view", "");
 
 			Set setIssues = cform.getCaseNote().getIssues();
@@ -2689,37 +2689,37 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 	public ActionForward print(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		SimpleDateFormat headerFormat = new SimpleDateFormat("yyyy-MM-dd.hh.mm.ss");
-	    Date now = new Date();
-	    String headerDate = headerFormat.format(now);
-	    
+		Date now = new Date();
+		String headerDate = headerFormat.format(now);
+
 		response.setContentType("application/pdf"); // octet-stream
 		response.setHeader("Content-Disposition", "attachment; filename=\"Encounter-" + headerDate + ".pdf\"");
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		Integer demographicNo = Integer.parseInt(getDemographicNo(request));
 		String ids = request.getParameter("notes2print");
-		
+
 		String pStartDate = null;
 		String pEndDate = null;
-		
+
 		Calendar cStartDate = null;
 		Calendar cEndDate = null;
-		
+
 		pStartDate = request.getParameter("pStartDate");
 		pEndDate = request.getParameter("pEndDate");
-		
+
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-		
+
 		if(pStartDate!=null && !pStartDate.isEmpty()){
-		Date startDate = formatter.parse(pStartDate);
-		cStartDate = Calendar.getInstance();
-		cStartDate.setTime(startDate);
+			Date startDate = formatter.parse(pStartDate);
+			cStartDate = Calendar.getInstance();
+			cStartDate.setTime(startDate);
 		}
-		
+
 		if(pEndDate!=null && !pEndDate.isEmpty()){
-		Date endDate = formatter.parse(pEndDate);
-		cEndDate = Calendar.getInstance();
-		cEndDate.setTime(endDate);
+			Date endDate = formatter.parse(pEndDate);
+			cEndDate = Calendar.getInstance();
+			cEndDate.setTime(endDate);
 		}
 
 		boolean printAllNotes = "ALL_NOTES".equals(ids);
@@ -2731,14 +2731,14 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		}
 		boolean printCPP  = request.getParameter("printCPP").equalsIgnoreCase("true");
 		boolean printRx   = request.getParameter("printRx").equalsIgnoreCase("true");
-		boolean printLabs = request.getParameter("printLabs") != null && request.getParameter("printLabs").equalsIgnoreCase("true");		
-		
+		boolean printLabs = request.getParameter("printLabs") != null && request.getParameter("printLabs").equalsIgnoreCase("true");
+
 		CaseManagementPrint cmp = new CaseManagementPrint();
 		cmp.doPrint(loggedInInfo,demographicNo, printAllNotes,noteIds,printCPP,printRx,printLabs,cStartDate,cEndDate,request, response.getOutputStream());
-		
+
 		return null;
 	}
-	
+
 	public ActionForward runMacro(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		CaseManagementEntryFormBean cform = (CaseManagementEntryFormBean) form;
@@ -2998,7 +2998,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		return map;
 	}
 
-	
+
 	/*
 	 * Insert encounter reason for new note
 	 */

@@ -25,8 +25,7 @@
 
 package org.oscarehr.document.web;
 
-import java.awt.Image;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.BufferedInputStream;
@@ -41,11 +40,14 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -91,6 +93,7 @@ import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.dms.IncomingDocUtil;
@@ -116,7 +119,7 @@ public class ManageDocumentAction extends DispatchAction {
 	private CtlDocumentDao ctlDocumentDao = SpringUtils.getBean(CtlDocumentDao.class);
 	private ProviderInboxRoutingDao providerInboxRoutingDAO = SpringUtils.getBean(ProviderInboxRoutingDao.class);
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
+
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 
 		return null;
@@ -145,7 +148,7 @@ public class ManageDocumentAction extends DispatchAction {
 		// TODO: if demoLink is "on", check if msp is in flagproviders, if not save to providerInboxRouting, if yes, don't save.
 
 		// DONT COPY THIS !!!
-		if (flagproviders != null && flagproviders.length > 0) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
+		if ((flagproviders != null && flagproviders.length > 0)) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
 			try {
 				for (String proNo : flagproviders) {
 					providerInboxRoutingDAO.addToProviderInbox(proNo, Integer.parseInt(documentId), LabResultData.DOCUMENT);
@@ -497,7 +500,9 @@ public class ManageDocumentAction extends DispatchAction {
 
 			ofile = new File(documentCacheDir, d.getDocfilename() + "_" + pageNum + ".png");
 
-
+			if(OscarProperties.getInstance().isPropertyActive("INVERT_DARK_DOCUMENT_PREVIEWS")) {
+				correctImageFileColors(ofile);
+			}
 
 		}catch(Exception e) {
 			log.error("Error decoding pdf file " + d.getDocfilename());
@@ -1340,4 +1345,110 @@ public class ManageDocumentAction extends DispatchAction {
         return ofile;
 
     }
+
+	/**
+	 * Oscarhost implemented fix to cases where image previews do not generate correctly, resulting in dark images with light writing.
+	 * This method attempts to correct for the error (with external library) by inverting the document colouring.
+	 * @param file - to be inverted
+	 */
+	private void correctImageFileColors(File file)
+	{
+		ImageInputStream inputStream = null;
+		try
+		{
+			inputStream = ImageIO.createImageInputStream(file);
+			Iterator iter = ImageIO.getImageReaders(inputStream);
+			int inversionRatio = Integer.parseInt(OscarProperties.getInstance().getProperty("INVERT_DOCUMENT_BW_RATIO", "10"));
+			int lightnessThreshold = 240; //rgb range 0-255
+			int darknessThreshold = 10; //rgb range 0-255
+
+			if (!iter.hasNext())
+			{
+				log.warn("unable to load image file for color correction");
+				return;
+			}
+
+			ImageReader imageReader = (ImageReader) iter.next();
+			imageReader.setInput(inputStream);
+
+			BufferedImage image = imageReader.read(0);
+
+			int height = image.getHeight();
+			int width = image.getWidth();
+
+			int countWhitish = 0;
+			int countBlackish = 0;
+			for (int i = 0; i < width; i++)
+			{
+				for (int j = 0; j < height; j++)
+				{
+					int rgb = image.getRGB(i, j);
+					int brightness = getBrightness(rgb);
+
+					if (brightness > lightnessThreshold)
+					{
+						countWhitish++;
+					}
+					else if (brightness < darknessThreshold)
+					{
+						countBlackish++;
+					}
+				}
+			}
+
+			log.info(String.format("White vs Black image ratio: %s/%s",
+					countWhitish, countBlackish));
+
+			if (countBlackish > (countWhitish * inversionRatio))
+			{
+				log.info("inverting image");
+
+				for (int x = 0; x < width; x++)
+				{
+					for (int y = 0; y < height; y++)
+					{
+						int rgb = image.getRGB(x, y);
+						Color col = new Color(rgb, true);
+						col = new Color(
+								255 - col.getRed(),
+								255 - col.getGreen(),
+								255 - col.getBlue());
+						image.setRGB(x, y, col.getRGB());
+					}
+				}
+				ImageIO.write(image, "png", file);
+			}
+		}
+		catch (IOException e)
+		{
+			log.error("error inverting image: " + e.getMessage(), e);
+		}
+		finally
+		{
+			if (inputStream != null)
+			{
+				try
+				{
+					inputStream.close();
+				}
+				catch (IOException e)
+				{
+					// do nothing.
+				}
+			}
+		}
+	}
+
+	private int getBrightness(int pixel)
+	{
+		int alpha = (pixel >> 24) & 0xff;
+		int red = (pixel >> 16) & 0xff;
+		int green = (pixel >> 8) & 0xff;
+		int blue = (pixel) & 0xff;
+
+		return (int) Math.sqrt(
+				red * red * .241 +
+				green * green * .691 +
+				blue * blue * .068);
+	}
 }

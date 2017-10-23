@@ -68,7 +68,8 @@
 
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 
-<% 
+<%
+	OscarProperties oscarProps = OscarProperties.getInstance();
 	Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
 	
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -322,41 +323,40 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 <%}%>
 </script>
 
-
-
-
 	<form method="post" name="addform" action="../appointment/addappointment.jsp">
-        
-<table>
-        <tr class="tableHeadings deep">
-        
 
-		<td class="demoIdSearch">
-		<bean:message key="demographic.demographicsearch2apptresults.demographicId" />
-       </td>
+	<table>
+			<tr class="tableHeadings deep">
 
-		<td class="lastname">
-		<bean:message key="demographic.demographicsearch2apptresults.lastName" />
-                </td>
-		<td class="firstname">
-		<bean:message key="demographic.demographicsearch2apptresults.firstName" />
-                </td>
-		<td class="age">
-		<bean:message key="demographic.demographicsearch2apptresults.age" />
-                </td>
-		<td class="rosterStatus">
-		<bean:message key="demographic.demographicsearch2apptresults.rosterStatus" />
-                </td>
-		<td class="sex">
-		<bean:message key="demographic.demographicsearch2apptresults.sex" />
-                </td>
-        <td class="dob">
-        <bean:message key="demographic.demographicsearch2apptresults.DOB" />
-                </td>
-		<td class="doctor">
-		<bean:message key="demographic.demographicsearch2apptresults.doctor" />
-                </td>
-	</tr>
+				<td class="demoIdSearch">
+					<bean:message key="demographic.demographicsearch2apptresults.demographicId"/>
+				</td>
+
+				<td class="lastname">
+					<bean:message key="demographic.demographicsearch2apptresults.lastName"/>
+				</td>
+				<td class="firstname">
+					<bean:message key="demographic.demographicsearch2apptresults.firstName"/>
+				</td>
+				<td class="age">
+					<bean:message key="demographic.demographicsearch2apptresults.age"/>
+				</td>
+				<td class="rosterStatus">
+					<bean:message key="demographic.demographicsearch2apptresults.rosterStatus"/>
+				</td>
+				<td class="sex">
+					<bean:message key="demographic.demographicsearch2apptresults.sex"/>
+				</td>
+				<td class="dob">
+					<bean:message key="demographic.demographicsearch2apptresults.DOB"/>
+				</td>
+				<td class="hin">
+					<bean:message key="demographic.demographicsearch2apptresults.HIN"/>
+				</td>
+				<td class="doctor">
+					<bean:message key="demographic.demographicsearch2apptresults.doctor"/>
+				</td>
+			</tr>
 
 
 <%
@@ -465,6 +465,7 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 		<td class="rosterStatus"><%=demo.getRosterStatus()==null||demo.getRosterStatus().equals("")?"&nbsp;":demo.getRosterStatus()%></td>
 		<td class="sex"><%=demo.getSex()%></td>
 		<td class="dob"><%=demo.getYearOfBirth() + "-" + demo.getMonthOfBirth() + "-" + demo.getDateOfBirth()%></td>
+		<td class="hin"><%=demo.getHin()%></td>
         <td class="doctor"><%=providerBean.getProperty(demo.getProviderNo()==null?"":demo.getProviderNo())==null?"":providerBean.getProperty(demo.getProviderNo())%></td>
         </tr>
 
@@ -582,6 +583,11 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
   <div class="createNew">
 		<a href="../demographic/demographicaddarecordhtm.jsp?fromAppt=1&originalPage=<%=request.getParameter("originalPage")%>&search_mode=<%=request.getParameter("search_mode")%>&keyword=<%=request.getParameter("keyword")%>&notes=<%=request.getParameter("notes")%>&appointment_date=<%=request.getParameter("appointment_date")%>&year=<%=request.getParameter("year")%>&month=<%=request.getParameter("month")%>&day=<%=request.getParameter("day")%>&start_time=<%=request.getParameter("start_time")%>&end_time=<%=request.getParameter("end_time")%>&duration=<%=request.getParameter("duration")%>&bFirstDisp=false&provider_no=<%=request.getParameter("provider_no")%>&notes=<%=request.getParameter("notes")%>&reason=<%=request.getParameter("reason")%>&location=<%=request.getParameter("location")%>&resources=<%=request.getParameter("resources")%>&type=<%=request.getParameter("type")%>&style=<%=request.getParameter("style")%>&billing=<%=request.getParameter("billing")%>&status=<%=request.getParameter("status")%>&createdatetime=<%=request.getParameter("createdatetime")%>&creator=<%=request.getParameter("creator")%>&remarks=<%=request.getParameter("remarks")%>">
 		<bean:message key="demographic.search.btnCreateNew" /></a>
+	  <% if (!oscarProps.isPropertyActive("hide_quickform")) { %>
+	    <br/>
+	    <a href="../demographic/demographicaddrecordcustom.jsp"><bean:message
+			  key="demographic.search.btnQuickCreateNew" /></a>
+	  <% } %>
     </div>    
 <%
         }
