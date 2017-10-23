@@ -116,6 +116,7 @@ p.setPractitionerNo(request.getParameter("practitionerNo"));
 p.setLastUpdateUser((String)session.getAttribute("user"));
 p.setLastUpdateDate(new java.util.Date());
 p.setSupervisor(StringUtils.trimToNull(request.getParameter("supervisor")));
+p.setSuperAdmin(false);
 
 String albertaEDeliveryIds = StringUtils.trimToNull(request.getParameter("alberta_e_delivery_ids"));
 if(albertaEDeliveryIds != null) {
