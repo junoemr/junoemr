@@ -601,7 +601,6 @@
 						       uib-typeahead="i.label for i in detailsCtrl.searchReferralDocsName($viewValue)"
 						       typeahead-on-select="detailsCtrl.chooseReferralDoc($item, $model, $label);"
 						       ng-model="detailsCtrl.page.demo.scrReferralDoc"
-						       typeahead-loading="loadingRefDocs"
 						       typeahead-min-length="3"
 						/>
 					</div>
@@ -615,7 +614,6 @@
 						       uib-typeahead="i.label as i.label for i in detailsCtrl.searchReferralDocsRefNo($viewValue);"
 						       typeahead-on-select="detailsCtrl.chooseReferralDoc($item, $model, $label);"
 						       ng-model="detailsCtrl.page.demo.scrReferralDocNo"
-						       typeahead-loading="loadingRefDocs"
 						       typeahead-min-length="3"
 						/>
 					</div>
