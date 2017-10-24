@@ -101,14 +101,6 @@ public class DemographicTo1 implements Serializable {
 	private List<DemographicContactFewTo1> demoContacts = new ArrayList<DemographicContactFewTo1>();
 	private List<DemographicContactFewTo1> demoContactPros = new ArrayList<DemographicContactFewTo1>();
 	private List<DemographicExtTo1> extras = new ArrayList<DemographicExtTo1>();
-	@Deprecated
-	private List<ProviderTo1> doctors = new ArrayList<ProviderTo1>();
-	@Deprecated
-	private List<ProviderTo1> nurses = new ArrayList<ProviderTo1>();
-	@Deprecated
-	private List<ProviderTo1> midwives = new ArrayList<ProviderTo1>();
-	@Deprecated
-	private List<ProfessionalSpecialistTo1> referralDoctors = new ArrayList<ProfessionalSpecialistTo1>();
 	private List<WaitingListNameTo1> waitingListNames = new ArrayList<WaitingListNameTo1>();
 	private List<StatusValueTo1> patientStatusList = new ArrayList<StatusValueTo1>();
 	private List<StatusValueTo1> rosterStatusList = new ArrayList<StatusValueTo1>();
@@ -599,46 +591,6 @@ public class DemographicTo1 implements Serializable {
 
 	public void setDemoContactPros(List<DemographicContactFewTo1> demoContactPros) {
 		this.demoContactPros = demoContactPros;
-	}
-
-	@Deprecated
-	public List<ProviderTo1> getDoctors() {
-		return doctors;
-	}
-
-	@Deprecated
-	public void setDoctors(List<ProviderTo1> doctors) {
-		this.doctors = doctors;
-	}
-
-	@Deprecated
-	public List<ProviderTo1> getNurses() {
-		return nurses;
-	}
-
-	@Deprecated
-	public void setNurses(List<ProviderTo1> nurses) {
-		this.nurses = nurses;
-	}
-
-	@Deprecated
-	public List<ProviderTo1> getMidwives() {
-		return midwives;
-	}
-
-	@Deprecated
-	public void setMidwives(List<ProviderTo1> midwives) {
-		this.midwives = midwives;
-	}
-
-	@Deprecated
-	public List<ProfessionalSpecialistTo1> getReferralDoctors() {
-		return referralDoctors;
-	}
-
-	@Deprecated
-	public void setReferralDoctors(List<ProfessionalSpecialistTo1> referralDoctors) {
-		this.referralDoctors = referralDoctors;
 	}
 
 	public List<WaitingListNameTo1> getWaitingListNames() {

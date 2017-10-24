@@ -32,6 +32,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'$state',
 	'$window',
 	'demographicService',
+	'providersService',
 	'patientDetailStatusService',
 	'securityService',
 	'staticDataService',
@@ -46,6 +47,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		$state,
 		$window,
 		demographicService,
+		providersService,
 		patientDetailStatusService,
 		securityService,
 		staticDataService,
@@ -87,6 +89,23 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					controller.page.demo = results;
 					controller.initDemographicVars();
 					controller.checkAccess();
+
+					//TODO - are roles determined by security role or provider type?
+					providersService.getBySecurityRole("doctor").then(
+						function success(data) {
+							controller.page.doctors = data;
+						}
+					);
+					providersService.getBySecurityRole("nurse").then(
+						function success(data) {
+							controller.page.nurses = data;
+						}
+					);
+					providersService.getBySecurityRole("midwife").then(
+						function success(data) {
+							controller.page.midwives = data;
+						}
+					);
 
 					//show notes
 					if (controller.page.demo.notes != null)
@@ -194,20 +213,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					if (controller.page.demo.demoContactPros != null)
 					{
 						controller.page.demo.demoContactPros = demoContactShow(controller.page.demo.demoContactPros);
-					}
-
-					//show doctors/nurses/midwives
-					if (controller.page.demo.doctors != null)
-					{
-						controller.page.demo.doctors = toArray(controller.page.demo.doctors);
-					}
-					if (controller.page.demo.nurses != null)
-					{
-						controller.page.demo.nurses = toArray(controller.page.demo.nurses);
-					}
-					if (controller.page.demo.midwives != null)
-					{
-						controller.page.demo.midwives = toArray(controller.page.demo.midwives);
 					}
 
 					controller.page.dataChanged = false;

@@ -560,15 +560,15 @@
 					<div class="col-md-4">
 						<select class="form-control form-control-details" title="MRP" 
 								ng-model="detailsCtrl.page.demo.providerNo" 
-								ng-options="mrp.providerNo as mrp.name for mrp in detailsCtrl.page.demo.doctors">
+								ng-options="mrp.providerNo as mrp.name for mrp in detailsCtrl.page.doctors">
 							<option value="">--</option>
 						</select>
 					</div>
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formNurse"/></label>
 					<div class="col-md-4">
 						<select class="form-control form-control-details" title="Nurse" 
-								ng-model="detailsCtrl.page.demo.nurse" 
-								ng-options="ns.providerNo as ns.name for ns in detailsCtrl.page.demo.nurses">
+								ng-model="detailsCtrl.page.demo.nurse"
+								ng-options="ns.providerNo as ns.name for ns in detailsCtrl.page.nurses">
 							<option value="">--</option>
 						</select>
 					</div>
@@ -578,7 +578,7 @@
 					<div class="col-md-4">
 						<select class="form-control form-control-details" title="Midwife" 
 								ng-model="detailsCtrl.page.demo.midwife" 
-								ng-options="mw.providerNo as mw.name for mw in detailsCtrl.page.demo.midwives">
+								ng-options="mw.providerNo as mw.name for mw in detailsCtrl.page.midwives">
 							<option value="">--</option>
 						</select>
 					</div>
@@ -586,7 +586,7 @@
 					<div class="col-md-4">
 						<select class="form-control form-control-details" title="Resident" 
 								ng-model="detailsCtrl.page.demo.resident" 
-								ng-options="res.providerNo as res.name for res in detailsCtrl.page.demo.doctors">
+								ng-options="res.providerNo as res.name for res in detailsCtrl.page.doctors">
 							<option value="">--</option>
 						</select>
 					</div>

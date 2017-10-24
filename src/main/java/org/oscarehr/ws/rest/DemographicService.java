@@ -38,8 +38,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.PMmodule.dao.SecUserRoleDao;
-import org.oscarehr.PMmodule.model.SecUserRole;
 import org.oscarehr.common.dao.ContactDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.dao.WaitingListDao;
@@ -58,7 +56,6 @@ import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
-import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.conversion.WaitingListNameConverter;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
@@ -98,16 +95,11 @@ public class DemographicService extends AbstractServiceImpl {
 	private ProviderDao providerDao;
 	
 	@Autowired
-	private SecUserRoleDao secUserRoleDao;
-	
-	@Autowired
 	private ProfessionalSpecialistDao specialistDao;
 
 	private DemographicConverter demoConverter = new DemographicConverter();
 	private DemographicContactFewConverter demoContactFewConverter = new DemographicContactFewConverter();
 	private WaitingListNameConverter waitingListNameConverter = new WaitingListNameConverter();
-	private ProviderConverter providerConverter = new ProviderConverter();
-
 	
 	/**
 	 * Finds all demographics.
@@ -200,45 +192,6 @@ public class DemographicService extends AbstractServiceImpl {
 
 					WaitingListNameTo1 waitingListNameTo1 = waitingListNameConverter.getAsTransferObject(getLoggedInInfo(), waitingListName);
 					result.getWaitingListNames().add(waitingListNameTo1);
-				}
-			}
-
-			List<SecUserRole> doctorRoles = secUserRoleDao.getSecUserRolesByRoleName("doctor");
-			if (doctorRoles != null)
-			{
-				for (SecUserRole doctor : doctorRoles)
-				{
-					Provider provider = providerDao.getProvider(doctor.getProviderNo());
-					if (provider != null)
-					{
-						result.getDoctors().add(providerConverter.getAsTransferObject(getLoggedInInfo(), provider));
-					}
-				}
-			}
-
-			List<SecUserRole> nurseRoles = secUserRoleDao.getSecUserRolesByRoleName("nurse");
-			if (nurseRoles != null)
-			{
-				for (SecUserRole nurse : nurseRoles)
-				{
-					Provider provider = providerDao.getProvider(nurse.getProviderNo());
-					if (provider != null)
-					{
-						result.getNurses().add(providerConverter.getAsTransferObject(getLoggedInInfo(), provider));
-					}
-				}
-			}
-
-			List<SecUserRole> midwifeRoles = secUserRoleDao.getSecUserRolesByRoleName("midwife");
-			if (midwifeRoles != null)
-			{
-				for (SecUserRole midwife : midwifeRoles)
-				{
-					Provider provider = providerDao.getProvider(midwife.getProviderNo());
-					if (provider != null)
-					{
-						result.getMidwives().add(providerConverter.getAsTransferObject(getLoggedInInfo(), provider));
-					}
 				}
 			}
 
@@ -351,6 +304,7 @@ public class DemographicService extends AbstractServiceImpl {
 	 */
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<DemographicTo1,String> updateDemographicData(DemographicTo1 data) {
 
 		try
@@ -401,6 +355,7 @@ public class DemographicService extends AbstractServiceImpl {
 	 */
 	@DELETE
 	@Path("/{dataId}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<DemographicTo1,String> deleteDemographicData(@PathParam("dataId") Integer id) {
 		try
 		{
