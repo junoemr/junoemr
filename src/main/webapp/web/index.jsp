@@ -424,6 +424,7 @@
 <script type="text/javascript" src="common/services/billingService.js"></script>
 <script type="text/javascript" src="common/services/consultService.js"></script>
 <script type="text/javascript" src="common/services/demographicService.js"></script>
+<script type="text/javascript" src="common/services/demographicsService.js"></script>
 <script type="text/javascript" src="common/services/diseaseRegistryService.js"></script>
 <script type="text/javascript" src="common/services/formService.js"></script>
 <script type="text/javascript" src="common/services/inboxService.js"></script>

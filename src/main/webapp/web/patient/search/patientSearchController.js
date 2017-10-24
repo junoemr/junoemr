@@ -33,7 +33,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 	'$uibModal',
 	'NgTableParams',
 	'securityService',
-	'demographicService',
+	'demographicsService',
 
 	function(
 		$q,
@@ -42,7 +42,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 		$uibModal,
 		NgTableParams,
 		securityService,
-		demographicService)
+		demographicsService)
 	{
 		var controller = {};
 
@@ -118,13 +118,13 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 					controller.search.params = params.url();
 
 					var promiseArray = [];
-					promiseArray.push(demographicService.search(
+					promiseArray.push(demographicsService.search(
 						controller.search, ((page - 1) * count), count));
 
 					controller.integratorResults = null;
 					if (controller.search.integrator)
 					{
-						promiseArray.push(demographicService.searchIntegrator(
+						promiseArray.push(demographicsService.searchIntegrator(
 							controller.search, 100));
 					}
 
