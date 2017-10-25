@@ -90,6 +90,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					controller.initDemographicVars();
 					controller.checkAccess();
 
+					// retrieve provider types for dropdown selection
 					//TODO - are roles determined by security role or provider type?
 					providersService.getBySecurityRole("doctor").then(
 						function success(data) {
@@ -104,6 +105,18 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					providersService.getBySecurityRole("midwife").then(
 						function success(data) {
 							controller.page.midwives = data;
+						}
+					);
+
+					// retrieve contact lists for demographic
+					demographicService.getDemographicContacts(controller.page.demo.demographicNo, "personal").then(
+						function success(data) {
+							controller.page.demoContacts = demoContactShow(data);
+						}
+					);
+					demographicService.getDemographicContacts(controller.page.demo.demographicNo, "professional").then(
+						function success(data) {
+							controller.page.demoContactPros = demoContactShow(data);
 						}
 					);
 
@@ -203,16 +216,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					else
 					{
 						controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
-					}
-
-					//show demoContacts/demoContactPros
-					if (controller.page.demo.demoContacts != null)
-					{
-						controller.page.demo.demoContacts = demoContactShow(controller.page.demo.demoContacts);
-					}
-					if (controller.page.demo.demoContactPros != null)
-					{
-						controller.page.demo.demoContactPros = demoContactShow(controller.page.demo.demoContactPros);
 					}
 
 					controller.page.dataChanged = false;

@@ -919,7 +919,7 @@
 							<bean:message key="web.record.details.manage"/>
 						</button>
 					</h3>
-					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demo.demoContacts">
+					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContacts">
 						<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
 						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
 						<div class="col-md-5">{{dc.phone}}</div>
@@ -933,7 +933,7 @@
 							<bean:message key="web.record.details.manage"/>
 						</button>
 					</h3>
-					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demo.demoContactPros">
+					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContactPros">
 						<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
 						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
 						<div class="col-md-5">{{dc.phone}}</div>

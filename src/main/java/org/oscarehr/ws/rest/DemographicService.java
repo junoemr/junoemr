@@ -23,6 +23,7 @@
  */
 package org.oscarehr.ws.rest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -39,6 +40,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.ContactDao;
+import org.oscarehr.common.dao.DemographicContactDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.dao.WaitingListDao;
 import org.oscarehr.common.dao.WaitingListNameDao;
@@ -81,6 +83,9 @@ public class DemographicService extends AbstractServiceImpl {
 	
 	@Autowired
 	private DemographicManager demographicManager;
+
+	@Autowired
+	private DemographicContactDao demographicContactDao;
 	
 	@Autowired
 	private ContactDao contactDao;
@@ -195,50 +200,6 @@ public class DemographicService extends AbstractServiceImpl {
 				}
 			}
 
-			List<DemographicContact> demoContacts = demographicManager.getDemographicContacts(getLoggedInInfo(), id);
-			if (demoContacts != null)
-			{
-				for (DemographicContact demoContact : demoContacts)
-				{
-					Integer contactId = Integer.valueOf(demoContact.getContactId());
-					DemographicContactFewTo1 demoContactTo1 = new DemographicContactFewTo1();
-
-					if (demoContact.getCategory().equals(DemographicContact.CATEGORY_PERSONAL))
-					{
-						if (demoContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC)
-						{
-							Demographic contactD = demographicManager.getDemographic(getLoggedInInfo(), contactId);
-							demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactD);
-							if (demoContactTo1.getPhone() == null || demoContactTo1.getPhone().equals(""))
-							{
-								DemographicExt ext = demographicManager.getDemographicExt(getLoggedInInfo(), id, "demo_cell");
-								if (ext != null) demoContactTo1.setPhone(ext.getValue());
-							}
-						}
-						else if (demoContact.getType() == DemographicContact.TYPE_CONTACT)
-						{
-							Contact contactC = contactDao.find(contactId);
-							demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactC);
-						}
-						result.getDemoContacts().add(demoContactTo1);
-					}
-					else if (demoContact.getCategory().equals(DemographicContact.CATEGORY_PROFESSIONAL))
-					{
-						if (demoContact.getType() == DemographicContact.TYPE_PROVIDER)
-						{
-							Provider contactP = providerDao.getProvider(contactId.toString());
-							demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactP);
-						}
-						else if (demoContact.getType() == DemographicContact.TYPE_PROFESSIONALSPECIALIST)
-						{
-							ProfessionalSpecialist contactS = specialistDao.find(contactId);
-							demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactS);
-						}
-						result.getDemoContactPros().add(demoContactTo1);
-					}
-				}
-			}
-
 			List<String> patientStatusList = demographicManager.getPatientStatusList();
 			List<String> rosterStatusList = demographicManager.getRosterStatusList();
 			if (patientStatusList != null)
@@ -259,6 +220,67 @@ public class DemographicService extends AbstractServiceImpl {
 			}
 			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), demo.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
 			return RestResponse.successResponse(result);
+		}
+		catch (Exception e)
+		{
+			logger.error("Error",e);
+		}
+		return RestResponse.errorResponse("Error");
+	}
+
+	@GET
+	@Path("/{dataId}/contacts")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<DemographicContactFewTo1>,String> getDemographicContacts(@PathParam("dataId") Integer id,
+	                                                                                  @QueryParam("type") String type)
+	{
+		try
+		{
+			List<DemographicContactFewTo1> results = new ArrayList<>();
+			String category = ("PROFESSIONAL".equalsIgnoreCase(type))? DemographicContact.CATEGORY_PROFESSIONAL : DemographicContact.CATEGORY_PERSONAL;
+
+			List<DemographicContact> demoContacts = demographicContactDao.findByDemographicNoAndCategory(id, category);
+			for (DemographicContact demoContact : demoContacts)
+			{
+				Integer contactId = Integer.valueOf(demoContact.getContactId());
+				DemographicContactFewTo1 demoContactTo1 = new DemographicContactFewTo1();
+
+				if (demoContact.getCategory().equals(DemographicContact.CATEGORY_PERSONAL))
+				{
+					if (demoContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC)
+					{
+						Demographic contactD = demographicManager.getDemographic(getLoggedInInfo(), contactId);
+						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactD);
+						if (demoContactTo1.getPhone() == null || demoContactTo1.getPhone().equals(""))
+						{
+							DemographicExt ext = demographicManager.getDemographicExt(getLoggedInInfo(), id, "demo_cell");
+							if (ext != null) demoContactTo1.setPhone(ext.getValue());
+						}
+					}
+					else if (demoContact.getType() == DemographicContact.TYPE_CONTACT)
+					{
+						Contact contactC = contactDao.find(contactId);
+						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactC);
+					}
+					results.add(demoContactTo1);
+				}
+				else if (demoContact.getCategory().equals(DemographicContact.CATEGORY_PROFESSIONAL))
+				{
+					if (demoContact.getType() == DemographicContact.TYPE_PROVIDER)
+					{
+						Provider contactP = providerDao.getProvider(contactId.toString());
+						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactP);
+					}
+					else if (demoContact.getType() == DemographicContact.TYPE_PROFESSIONALSPECIALIST)
+					{
+						ProfessionalSpecialist contactS = specialistDao.find(contactId);
+						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactS);
+					}
+					results.add(demoContactTo1);
+				}
+			}
+			return RestResponse.successResponse(results);
+
 		}
 		catch (Exception e)
 		{

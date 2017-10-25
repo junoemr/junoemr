@@ -98,8 +98,6 @@ public class DemographicTo1 implements Serializable {
 	private Date onWaitingListSinceDate;
 	private Integer admissionProgramId;
 
-	private List<DemographicContactFewTo1> demoContacts = new ArrayList<DemographicContactFewTo1>();
-	private List<DemographicContactFewTo1> demoContactPros = new ArrayList<DemographicContactFewTo1>();
 	private List<DemographicExtTo1> extras = new ArrayList<DemographicExtTo1>();
 	private List<WaitingListNameTo1> waitingListNames = new ArrayList<WaitingListNameTo1>();
 	private List<StatusValueTo1> patientStatusList = new ArrayList<StatusValueTo1>();
@@ -575,22 +573,6 @@ public class DemographicTo1 implements Serializable {
 
 	public void setExtras(List<DemographicExtTo1> extras) {
 		this.extras = extras;
-	}
-
-	public List<DemographicContactFewTo1> getDemoContacts() {
-		return demoContacts;
-	}
-
-	public void setDemoContacts(List<DemographicContactFewTo1> demoContacts) {
-		this.demoContacts = demoContacts;
-	}
-
-	public List<DemographicContactFewTo1> getDemoContactPros() {
-		return demoContactPros;
-	}
-
-	public void setDemoContactPros(List<DemographicContactFewTo1> demoContactPros) {
-		this.demoContactPros = demoContactPros;
 	}
 
 	public List<WaitingListNameTo1> getWaitingListNames() {
