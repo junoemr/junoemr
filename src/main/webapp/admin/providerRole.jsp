@@ -45,6 +45,8 @@
 <%@ page import="org.oscarehr.common.model.RecycleBin" %>
 <%@ page import="org.oscarehr.common.dao.RecycleBinDao" %>
 <%@ page import="org.oscarehr.common.dao.ProviderDataDao" %>
+<%@ page import="org.oscarehr.common.model.ProviderData" %>
+<%@ page import="org.oscarehr.common.model.Provider" %>
 
 <%
 	ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
@@ -55,12 +57,34 @@
 	RecycleBinDao recycleBinDao = SpringUtils.getBean(RecycleBinDao.class);
 	ProgramProviderDAO programProviderDao = (ProgramProviderDAO) SpringUtils.getBean("programProviderDAO");
 
-	
+	oscar.OscarProperties props = oscar.OscarProperties.getInstance();
+
 	String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	String curUser_no = (String)session.getAttribute("user");
+	String updateProviderNo = "";
+
+	ProviderData currentProvider = providerDao.findByProviderNo(curUser_no);
 
 	boolean isSiteAccessPrivacy=false;
 	boolean authed=true;
+	boolean isSuperAdmin = currentProvider.getSuperAdmin();
+	boolean isAuthed = true;
+
+	if(request.getParameter("providerId") != null) {
+		updateProviderNo = request.getParameter("providerId");
+	} else if(request.getParameter("primaryRoleProvider") != null) {
+		updateProviderNo = request.getParameter("primaryRoleProvider");
+	}
+
+	if(!updateProviderNo.equals("")) {
+		ProviderData updateProvider = providerDao.findByProviderNo(updateProviderNo);
+		boolean proSuperAdmin = updateProvider.getSuperAdmin();
+
+		if(proSuperAdmin && !isSuperAdmin) {
+			isAuthed = false;
+		}
+	}
+
 %>
 
 <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.userAdmin" rights="r" reverse="<%=true%>">
@@ -86,7 +110,7 @@ if(!org.oscarehr.common.IsPropertiesOn.isCaisiEnable()) {
 	//You cannot assign provider to one program "OSCAR" here if you have caisi enabled.
 	//If there is no program called "OSCAR", it will only assign empty program to the provider which is not acceptable.
 	if(( users != null && users.size() > 0 ) || OscarProperties.getInstance().getProperty("CASEMANAGEMENT", "").equalsIgnoreCase("all"))
-    	newCaseManagement = true;
+		newCaseManagement = true;
 }
 
 String ip = request.getRemoteAddr();
@@ -118,141 +142,144 @@ for(SecRole secRole:secRoles) {
 	}
 }
 
-//set the primary role
-if (request.getParameter("buttonSetPrimaryRole") != null && request.getParameter("buttonSetPrimaryRole").length() > 0) {
-      String providerNo = request.getParameter("primaryRoleProvider");
-      String roleName = request.getParameter("primaryRoleRole");
-      SecRole secRole = secRoleDao.findByName(roleName);
-      Long roleId = secRole.getId().longValue();
-      ProgramProvider pp = programProviderDao.getProgramProvider(providerNo, Long.valueOf(caisiProgram));
-      if(pp != null) {
-              pp.setRoleId(roleId);
-              programProviderDao.saveProgramProvider(pp);
-      } else {
-              pp = new ProgramProvider();
-              pp.setProgramId(Long.valueOf(caisiProgram));
-              pp.setProviderNo(providerNo);
-              pp.setRoleId(roleId);
-              programProviderDao.saveProgramProvider(pp);
-      }
-}
+if(isAuthed) {
+
+	//set the primary role
+	if (request.getParameter("buttonSetPrimaryRole") != null && request.getParameter("buttonSetPrimaryRole").length() > 0) {
+		String providerNo = request.getParameter("primaryRoleProvider");
+		String roleName = request.getParameter("primaryRoleRole");
+		SecRole secRole = secRoleDao.findByName(roleName);
+		Long roleId = secRole.getId().longValue();
+		ProgramProvider pp = programProviderDao.getProgramProvider(providerNo, Long.valueOf(caisiProgram));
+		if (pp != null) {
+			pp.setRoleId(roleId);
+			programProviderDao.saveProgramProvider(pp);
+		} else {
+			pp = new ProgramProvider();
+			pp.setProgramId(Long.valueOf(caisiProgram));
+			pp.setProviderNo(providerNo);
+			pp.setRoleId(roleId);
+			programProviderDao.saveProgramProvider(pp);
+		}
+	}
 
 
-// update the role
-if (request.getParameter("buttonUpdate") != null && request.getParameter("buttonUpdate").length() > 0) {
-    String number = request.getParameter("providerId");
-    String roleId = request.getParameter("roleId");
-    String roleOld = request.getParameter("roleOld");
-    String roleNew = request.getParameter("roleNew");
+	// update the role
+	if (request.getParameter("buttonUpdate") != null && request.getParameter("buttonUpdate").length() > 0) {
+		String number = request.getParameter("providerId");
+		String roleId = request.getParameter("roleId");
+		String roleOld = request.getParameter("roleOld");
+		String roleNew = request.getParameter("roleNew");
 
-    if(!"-".equals(roleNew)) {
+		if (!"-".equals(roleNew)) {
+			Secuserrole secUserRole = secUserRoleDao.findById(Integer.parseInt(roleId));
+			List<Secuserrole> existingRoles = secUserRoleDao.findByProviderAndRoleName(number, roleNew);
+			// prevent saving a role already assigned
+			if (secUserRole != null && existingRoles.isEmpty()) {
+				secUserRole.setRoleName(roleNew);
+				secUserRoleDao.updateRoleName(Integer.parseInt(roleId), roleNew);
+				msg = "Role " + roleNew + " is updated. (" + number + ")";
+
+				RecycleBin recycleBin = new RecycleBin();
+				recycleBin.setProviderNo(curUser_no);
+				recycleBin.setUpdateDateTime(new java.util.Date());
+				recycleBin.setTableName("secUserRole");
+				recycleBin.setKeyword(number + "|" + roleOld);
+				recycleBin.setTableContent("<provider_no>" + number + "</provider_no>" + "<role_name>" + roleOld + "</role_name>" + "<role_id>" + roleId + "</role_id>");
+				recycleBinDao.persist(recycleBin);
+
+				LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_UPDATE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, roleId, ip, number + "|" + roleOld + ">" + roleNew);
+
+				if (newCaseManagement) {
+					ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
+					if (programProvider == null) {
+						programProvider = new ProgramProvider();
+					}
+
+					programProvider.setProgramId(Long.valueOf(caisiProgram));
+					programProvider.setProviderNo(number);
+					programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleNew).getId()));
+					programProviderDao.saveProgramProvider(programProvider);
+				}
+
+			} else {
+				msg = "Role " + roleNew + " is <font color='red'>NOT</font> updated!!! (" + number + ")";
+			}
+		}
+
+	}
+
+	// add the role
+	if (request.getParameter("submit") != null && request.getParameter("submit").equals("Add")) {
+		String number = request.getParameter("providerId");
+		String roleNew = request.getParameter("roleNew");
+
+		if (!"-".equals(roleNew)) {
+			List<Secuserrole> existingRoles = secUserRoleDao.findByProviderAndRoleName(number, roleNew);
+			// prevent saving a role already assigned
+			if (existingRoles.isEmpty()) {
+				Secuserrole secUserRole = new Secuserrole();
+				secUserRole.setProviderNo(number);
+				secUserRole.setRoleName(roleNew);
+				secUserRole.setActiveyn(1);
+				secUserRoleDao.save(secUserRole);
+				msg = "Role " + roleNew + " is added. (" + number + ")";
+				LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_ADD, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, String.valueOf(secUserRole.getId()), ip, number + "|" + roleNew);
+
+				if (newCaseManagement) {
+					ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
+					if (programProvider == null) {
+						programProvider = new ProgramProvider();
+					}
+					programProvider.setProgramId(Long.valueOf(caisiProgram));
+					programProvider.setProviderNo(number);
+					programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleNew).getId()));
+					programProviderDao.saveProgramProvider(programProvider);
+				}
+			}
+		} else {
+			msg = "Role " + roleNew + " is <font color='red'>NOT</font> added!!! (" + number + ")";
+		}
+
+	}
+
+	// delete the role
+	if (request.getParameter("submit") != null && request.getParameter("submit").equals("Delete")) {
+		String number = request.getParameter("providerId");
+		String roleId = request.getParameter("roleId");
+		String roleOld = request.getParameter("roleOld");
+		String roleNew = request.getParameter("roleNew");
+
 		Secuserrole secUserRole = secUserRoleDao.findById(Integer.parseInt(roleId));
-    	List<Secuserrole> existingRoles = secUserRoleDao.findByProviderAndRoleName(number, roleNew);
-    	// prevent saving a role already assigned
-		if(secUserRole != null && existingRoles.isEmpty()) {
-			secUserRole.setRoleName(roleNew);
-			secUserRoleDao.updateRoleName(Integer.parseInt(roleId),roleNew);
-			msg = "Role " + roleNew + " is updated. (" + number + ")";
+		if (secUserRole != null) {
+			secUserRoleDao.deleteById(secUserRole.getId());
+			msg = "Role " + roleOld + " is deleted. (" + number + ")";
 
 			RecycleBin recycleBin = new RecycleBin();
 			recycleBin.setProviderNo(curUser_no);
 			recycleBin.setUpdateDateTime(new java.util.Date());
 			recycleBin.setTableName("secUserRole");
-			recycleBin.setKeyword(number +"|"+ roleOld);
-			recycleBin.setTableContent("<provider_no>" + number + "</provider_no>" + "<role_name>" + roleOld + "</role_name>"  + "<role_id>" + roleId + "</role_id>");
+			recycleBin.setKeyword(number + "|" + roleOld);
+			recycleBin.setTableContent("<provider_no>" + number + "</provider_no>" + "<role_name>" + roleOld + "</role_name>");
 			recycleBinDao.persist(recycleBin);
 
-			LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_UPDATE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, roleId, ip, number +"|" + roleOld +">"+ roleNew);
+			LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, roleId, ip, number + "|" + roleOld);
 
-			if( newCaseManagement ) {
-                ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
-                if(programProvider == null) {
-                	programProvider = new ProgramProvider();
-                }
-                
-                programProvider.setProgramId( Long.valueOf(caisiProgram));
-                programProvider.setProviderNo(number);
-                programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleNew).getId()));
-                programProviderDao.saveProgramProvider(programProvider);
+
+			if (newCaseManagement) {
+				ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
+				if (programProvider != null) {
+					programProviderDao.deleteProgramProvider(programProvider.getId());
+				}
 			}
-
 		} else {
-			msg = "Role " + roleNew + " is <font color='red'>NOT</font> updated!!! (" + number + ")";
+			msg = "Role " + roleOld + " is <font color='red'>NOT</font> deleted!!! (" + number + ")";
 		}
-    }
 
+	}
+} else {
+	out.println("<script>alert('You are trying to modify a system user. This user cannot be modified.');</script>");
 }
-
-// add the role
-if (request.getParameter("submit") != null && request.getParameter("submit").equals("Add")) {
-    String number = request.getParameter("providerId");
-    String roleNew = request.getParameter("roleNew");
-
-    if(!"-".equals(roleNew)) {
-    	List<Secuserrole> existingRoles = secUserRoleDao.findByProviderAndRoleName(number, roleNew);
-    	// prevent saving a role already assigned
-    	if(existingRoles.isEmpty()) {
-		    Secuserrole secUserRole = new Secuserrole();
-		    secUserRole.setProviderNo(number);
-		    secUserRole.setRoleName(roleNew);
-		    secUserRole.setActiveyn(1);
-		    secUserRoleDao.save(secUserRole);
-		    msg = "Role " + roleNew + " is added. (" + number + ")";
-			LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_ADD, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, String.valueOf(secUserRole.getId()), ip, number +"|"+ roleNew);
-	
-		    if( newCaseManagement ) {
-	            ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
-	            if(programProvider == null) {
-	            	programProvider = new ProgramProvider();
-	            }
-	            programProvider.setProgramId( Long.valueOf(caisiProgram));
-	            programProvider.setProviderNo(number);
-	            programProvider.setRoleId(Long.valueOf(secRoleDao.findByName(roleNew).getId()));
-	            programProviderDao.saveProgramProvider(programProvider);
-		    }
-    	}
-    }
-    else {
-    	msg = "Role " + roleNew + " is <font color='red'>NOT</font> added!!! (" + number + ")";
-    }
-
-}
-
-// delete the role
-if (request.getParameter("submit") != null && request.getParameter("submit").equals("Delete")) {
-    String number = request.getParameter("providerId");
-    String roleId = request.getParameter("roleId");
-    String roleOld = request.getParameter("roleOld");
-    String roleNew = request.getParameter("roleNew");
-
-    Secuserrole secUserRole = secUserRoleDao.findById(Integer.parseInt(roleId));
-    if(secUserRole != null) {
-    	secUserRoleDao.deleteById(secUserRole.getId());
-    	msg = "Role " + roleOld + " is deleted. (" + number + ")";
-
-    	RecycleBin recycleBin = new RecycleBin();
-		recycleBin.setProviderNo(curUser_no);
-		recycleBin.setUpdateDateTime(new java.util.Date());
-		recycleBin.setTableName("secUserRole");
-		recycleBin.setKeyword(number +"|"+ roleOld);
-		recycleBin.setTableContent("<provider_no>" + number + "</provider_no>" + "<role_name>" + roleOld + "</role_name>");
-		recycleBinDao.persist(recycleBin);
-
-		LogAction.addLogEntry(curUser_no, null, LogConst.ACTION_DELETE, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS, roleId, ip, number +"|"+ roleOld);
-
-
-        if( newCaseManagement ) {
-            ProgramProvider programProvider = programProviderDao.getProgramProvider(number, Long.valueOf(caisiProgram));
-            if(programProvider != null) {
-            	programProviderDao.deleteProgramProvider(programProvider.getId());
-            }
-        }
-    } else {
-    	msg = "Role " + roleOld + " is <font color='red'>NOT</font> deleted!!! (" + number + ")";
-    }
-
-}
-
 String keyword = request.getParameter("keyword")!=null?request.getParameter("keyword"):"";
 %>
 <%
@@ -272,12 +299,13 @@ providerList = providerDao.findProviderSecUserRoles(lastName, firstName);
 
 Vector<Properties> vec = new Vector<Properties>();
 for (Object[] providerSecUser : providerList) {
-	
+
 	String id = String.valueOf(providerSecUser[0]);
 	String role_name = String.valueOf(providerSecUser[1]);
 	String provider_no = String.valueOf(providerSecUser[2]);
 	String first_name = String.valueOf(providerSecUser[3]);
 	String last_name = String.valueOf(providerSecUser[4]);
+	String super_admin = String.valueOf(providerSecUser[5]);
 
 	Properties prop = new Properties();
 	prop.setProperty("provider_no", provider_no=="null"?"":provider_no);
@@ -285,6 +313,7 @@ for (Object[] providerSecUser : providerList) {
 	prop.setProperty("last_name", last_name);
 	prop.setProperty("role_id", id!="null"?id:"");
 	prop.setProperty("role_name", role_name!="null"?role_name:"");
+	prop.setProperty("super_admin", super_admin);
 	vec.add(prop);
 }
 
@@ -293,35 +322,35 @@ List<Boolean> primaries = new ArrayList<Boolean>();
 //when caisi is off, we need to show which role is the one in the program_provider table for each provider.
 if(newCaseManagement) {
 	for(Properties prop:vec) {
-	      boolean res = false;
-	      String providerNo = prop.getProperty("provider_no");
-	      String secUserRoleId = prop.getProperty("role_id");
-	      String roleName = prop.getProperty("role_name");
-	      if(!roleName.equals("")) {
-	              SecRole secRole = secRoleDao.findByName(roleName);
-	              if(secRole != null) {
-	                      ProgramProvider pp = programProviderDao.getProgramProvider(providerNo, Long.valueOf(caisiProgram), secRole.getId().longValue());
-	                      res = (pp != null);
-	              }
-	      } else {
-	              res = false;
-	      }
-	      primaries.add(res);
+		  boolean res = false;
+		  String providerNo = prop.getProperty("provider_no");
+		  String secUserRoleId = prop.getProperty("role_id");
+		  String roleName = prop.getProperty("role_name");
+		  if(!roleName.equals("")) {
+				  SecRole secRole = secRoleDao.findByName(roleName);
+				  if(secRole != null) {
+						  ProgramProvider pp = programProviderDao.getProgramProvider(providerNo, Long.valueOf(caisiProgram), secRole.getId().longValue());
+						  res = (pp != null);
+				  }
+		  } else {
+				  res = false;
+		  }
+		  primaries.add(res);
 	}
 }
 
 
 %>
   <html>
-    <head>
-      <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-      <title>
-        PROVIDER
-      </title>
-      <link rel="stylesheet" href="../css/receptionistapptstyle.css">
-       <script src="../js/jquery-1.7.1.min.js"></script>
-      
-      <script>
+	<head>
+	  <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	  <title>
+		PROVIDER
+	  </title>
+	  <link rel="stylesheet" href="../css/receptionistapptstyle.css">
+	   <script src="../js/jquery-1.7.1.min.js"></script>
+
+	  <script>
 <!--
 function setfocus() {
 	this.focus();
@@ -331,190 +360,203 @@ function submit(form) {
 	form.submit();
 }
 //-->
-      </script>
-      
-        <script>
-        var items = new Array();
-        <%
-                for(Properties prop:vec) {
-                        %>
-                                item={providerNo:"<%=prop.get("provider_no")%>",role_id:"<%=prop.get("role_id")%>",roleName:"<%=prop.get("role_name")%>"};
-                                items.push(item);
-                        <%
-                }
-        %>
-        </script>
-        <script>
-        $(document).ready(function(){
-                $("#primaryRoleProvider").val("");
-        });
+	  </script>
 
-        function primaryRoleChooseProvider() {
-            $("#primaryRoleRole").find('option').remove();
-            var provider = $("#primaryRoleProvider").val();
-            for(var i=0;i<items.length;i++) {
-                    if(items[i].providerNo == provider && items[i].role_id != "") {
-                            $("#primaryRoleRole").append('<option value="'+items[i].roleName+'">'+items[i].roleName+'</option>');
-                    }
-            }
-    }
+		<script>
+		var items = new Array();
+		<%
+				for(Properties prop:vec) {
+						%>
+								item={providerNo:"<%=prop.get("provider_no")%>",role_id:"<%=prop.get("role_id")%>",roleName:"<%=prop.get("role_name")%>"};
+								items.push(item);
+						<%
+				}
+		%>
+		</script>
+		<script>
+		$(document).ready(function(){
+				$("#primaryRoleProvider").val("");
+		});
 
-    function setPrimaryRole() {
-            var providerNo = $("#primaryRoleProvider").val();
-            var roleName = $("#primaryRoleRole").val();
-            if(providerNo != '' && roleName != '') {
-                    return true;
-            } else {
-                    alert('Please enter in a provider and a corresponding role');
-                    return false;
-            }
-    }
-    </script>
+		function primaryRoleChooseProvider() {
+			$("#primaryRoleRole").find('option').remove();
+			var provider = $("#primaryRoleProvider").val();
+			for(var i=0;i<items.length;i++) {
+					if(items[i].providerNo == provider && items[i].role_id != "") {
+							$("#primaryRoleRole").append('<option value="'+items[i].roleName+'">'+items[i].roleName+'</option>');
+					}
+			}
+	}
 
-    </head>
-    <body bgproperties="fixed" bgcolor="ivory" onLoad="setfocus()" topmargin="0" leftmargin="0" rightmargin="0">
-      <form name="myform" action="providerRole.jsp" method="POST">
-      <table border="0" cellspacing="0" cellpadding="0" width="100%">
-        <tr bgcolor="#486ebd">
-          <th align="CENTER" width="90%">
-            <font face="Helvetica" color="#FFFFFF">
-            <% if(msg.length()>1) {%>
+	function setPrimaryRole() {
+		var providerNo = $("#primaryRoleProvider").val();
+		var roleName = $("#primaryRoleRole").val();
+		if(providerNo != '' && roleName != '') {
+			return true;
+		} else {
+			alert('Please enter in a provider and a corresponding role');
+			return false;
+		}
+
+	}
+
+	function updateProviderRoles(isProSuperAdmin) {
+		var isSuperAdmin = <%=isSuperAdmin%>;
+
+		if(isProSuperAdmin && !isSuperAdmin) {
+			alert("You are trying to modify a system user. This user cannot be modified.");
+			return false;
+		}
+
+		return true;
+	}
+	</script>
+
+	</head>
+	<body bgproperties="fixed" bgcolor="ivory" onLoad="setfocus()" topmargin="0" leftmargin="0" rightmargin="0">
+	  <form name="myform" action="providerRole.jsp" method="POST">
+	  <table border="0" cellspacing="0" cellpadding="0" width="100%">
+		<tr bgcolor="#486ebd">
+		  <th align="CENTER" width="90%">
+			<font face="Helvetica" color="#FFFFFF">
+			<% if(msg.length()>1) {%>
 			<%=msg%>
 			<% } %>
-            </font>
-          </th>
-          <td nowrap>
-            <font size="-1" color="#FFFFFF">
-              Name:
-              <input type="text" name="keyword" size="15" value="<%=keyword%>" />
-              <input type="submit" name="search" value="Search">
-            </font>
-          </td>
-        </tr>
-      </table>
-      </form>
+			</font>
+		  </th>
+		  <td nowrap>
+			<font size="-1" color="#FFFFFF">
+			  Name:
+			  <input type="text" name="keyword" size="15" value="<%=keyword%>" />
+			  <input type="submit" name="search" value="Search">
+			</font>
+		  </td>
+		</tr>
+	  </table>
+	  </form>
 
-        <table width="100%" border="0" bgcolor="ivory" cellspacing="1" cellpadding="1">
-          <tr bgcolor="mediumaquamarine">
-          <% if( newCaseManagement ) { %>
-            <th colspan="6" align="left">
-          <%} else { %>
-           <th colspan="5" align="left">
-          <%} %>
-          </tr>
-          <tr bgcolor="silver">
-            <th width="10%" nowrap>ID</th>
-            <th width="20%" nowrap><b>First Name</b></th>
-            <th width="20%" nowrap><b>Last Name</b></th>
+		<table width="100%" border="0" bgcolor="ivory" cellspacing="1" cellpadding="1">
+		  <tr bgcolor="mediumaquamarine">
+		  <% if( newCaseManagement ) { %>
+			<th colspan="6" align="left">
+		  <%} else { %>
+		   <th colspan="5" align="left">
+		  <%} %>
+		  </tr>
+		  <tr bgcolor="silver">
+			<th width="10%" nowrap>ID</th>
+			<th width="20%" nowrap><b>First Name</b></th>
+			<th width="20%" nowrap><b>Last Name</b></th>
 			<% if( newCaseManagement ) { %>
-            <th width="10%" nowrap>
-              Role
-            </th>
-           <th width="10%" nowrap>
-              Primary Role
-            </th>
+			<th width="10%" nowrap>
+			  Role
+			</th>
+		   <th width="10%" nowrap>
+			  Primary Role
+			</th>
 			<% } else {%>
-           <th width="20%" nowrap>
-              Role
-            </th>
+		   <th width="20%" nowrap>
+			  Role
+			</th>
 			<%} %>
-            
-            <th nowrap>Action</th>
-          </tr>
+
+			<th nowrap>Action</th>
+		  </tr>
 <%
-        String[] colors = { "#ccCCFF", "#EEEEFF" };
-        for (int i = 0; i < vec.size(); i++) {
-          	Properties item = vec.get(i);
-          	String providerNo = item.getProperty("provider_no", "");
+		String[] colors = { "#ccCCFF", "#EEEEFF" };
+		for (int i = 0; i < vec.size(); i++) {
+			Properties item = vec.get(i);
+			String providerNo = item.getProperty("provider_no", "");
+			boolean isProSuperAdmin = Boolean.parseBoolean(item.getProperty("super_admin"));
 %>
-      <form name="myform<%= providerNo %>" action="providerRole.jsp" method="POST">
-            <tr bgcolor="<%=colors[i%2]%>">
-              <td><%= providerNo %></td>
-              <td><%= item.getProperty("first_name", "") %></td>
-              <td><%= item.getProperty("last_name", "") %></td>
-              <td align="center">
-              <select name="roleNew">
-                      <option value="-" >-</option>
+	  <form name="myform<%= providerNo %>" action="providerRole.jsp" method="POST">
+			<tr bgcolor="<%=colors[i%2]%>">
+			  <td><%= providerNo %></td>
+			  <td><%= item.getProperty("first_name", "") %></td>
+			  <td><%= item.getProperty("last_name", "") %></td>
+			  <td align="center">
+			  <select name="roleNew">
+					  <option value="-" >-</option>
 <%
-                    for (int j = 0; j < vecRoleName.size(); j++) {
+					for (int j = 0; j < vecRoleName.size(); j++) {
 %>
-                      <option value="<%=vecRoleName.get(j)%>" <%= vecRoleName.get(j).equals(item.getProperty("role_name", ""))?"selected":"" %>>
-                      <%= vecRoleName.get(j) %>
-                      </option>
+					  <option value="<%=vecRoleName.get(j)%>" <%= vecRoleName.get(j).equals(item.getProperty("role_name", ""))?"selected":"" %>>
+					  <%= vecRoleName.get(j) %>
+					  </option>
 <%
-                    }
+					}
 %>
-            </select>
-            </td>
+			</select>
+			</td>
 			<% if( newCaseManagement ) { %>
-            <td align="center">
-             <%=(primaries.get(i)!=null && (primaries.get(i)).booleanValue()==true)?"Yes":"" %>
-            </td>
+			<td align="center">
+			 <%=(primaries.get(i)!=null && (primaries.get(i)).booleanValue()==true)?"Yes":"" %>
+			</td>
 			<% } %>
-            
-            <td align="center">
-              <input type="hidden" name="keyword" value="<%=keyword%>" />
-              <input type="hidden" name="providerId" value="<%=providerNo%>">
-              <input type="hidden" name="roleId" value="<%= item.getProperty("role_id", "")%>">
-              <input type="hidden" name="roleOld" value="<%= item.getProperty("role_name", "")%>">
-              <input type="submit" name="submit" value="Add">
-              -
-              <input type="submit" name="buttonUpdate" value="Update" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
-              -
-              <input type="submit" name="submit" value="Delete" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
-            </td>
-            </tr>
-      </form>
+
+			<td align="center">
+			  <input type="hidden" name="keyword" value="<%=keyword%>" />
+			  <input type="hidden" name="providerId" value="<%=providerNo%>">
+			  <input type="hidden" name="roleId" value="<%= item.getProperty("role_id", "")%>">
+			  <input type="hidden" name="roleOld" value="<%= item.getProperty("role_name", "")%>">
+			  <input type="submit" name="submit" value="Add" onclick="return updateProviderRoles(<%=isProSuperAdmin%>);">
+			  -
+			  <input type="submit" name="buttonUpdate" value="Update" onclick="return updateProviderRoles(<%=isProSuperAdmin%>);" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
+			  -
+			  <input type="submit" name="submit" value="Delete" onclick="return updateProviderRoles(<%=isProSuperAdmin%>);" <%= StringUtils.hasText(item.getProperty("role_id"))?"":"disabled"%>>
+			</td>
+			</tr>
+	  </form>
 <%
-          }
+		  }
 %>
-        </table>
-      <hr>
+		</table>
+	  <hr>
 
-      <% if( newCaseManagement ) { %>
+	  <% if( newCaseManagement ) { %>
 
-       <form name="myform" action="providerRole.jsp" method="POST">
-      <table>
-      <tr>
-        <td colspan="2">Set primary role</td>
-      </tr>
-      <tr>
-        <td>Provider:</td>
-        <td>
-                <select id="primaryRoleProvider" name="primaryRoleProvider" onChange="primaryRoleChooseProvider()">
-                        <option value="">Select Below</option>
-                        <%
-                                List<String> temp1 = new ArrayList<String>();
-                                for(Properties prop:vec) {
-                                        String providerNo = prop.getProperty("provider_no");
-                                        if(!temp1.contains(providerNo)) {
-                                                %>
-                                                        <option value="<%=providerNo%>"><%=prop.getProperty("last_name") + "," + prop.getProperty("first_name") %></option>
-                                                <%
-                                                temp1.add(providerNo);
-                                        }
-                                }
-                        %>
-                </select>
-        </td>
-        </tr>
-      </tr>
-      <tr>
-        <td>Role:</td>
-        <td>
-                <select id="primaryRoleRole" name="primaryRoleRole">
-                </select>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2">
-                <input type="submit" name="buttonSetPrimaryRole" value="Set Primary Role" onClick="return setPrimaryRole();"/>
-        </td>
-      </tr>
-      </table>
-       </form>
-       <% } %>
-      
-      
-      </body>
-    </html>
+	   <form name="myform" action="providerRole.jsp" method="POST">
+	  <table>
+	  <tr>
+		<td colspan="2">Set primary role</td>
+	  </tr>
+	  <tr>
+		<td>Provider:</td>
+		<td>
+				<select id="primaryRoleProvider" name="primaryRoleProvider" onChange="primaryRoleChooseProvider()">
+						<option value="">Select Below</option>
+						<%
+								List<String> temp1 = new ArrayList<String>();
+								for(Properties prop:vec) {
+										String providerNo = prop.getProperty("provider_no");
+										if(!temp1.contains(providerNo)) {
+												%>
+														<option value="<%=providerNo%>"><%=prop.getProperty("last_name") + "," + prop.getProperty("first_name") %></option>
+												<%
+												temp1.add(providerNo);
+										}
+								}
+						%>
+				</select>
+		</td>
+		</tr>
+	  </tr>
+	  <tr>
+		<td>Role:</td>
+		<td>
+				<select id="primaryRoleRole" name="primaryRoleRole">
+				</select>
+		</td>
+	  </tr>
+	  <tr>
+		<td colspan="2">
+				<input type="submit" name="buttonSetPrimaryRole" value="Set Primary Role" onClick="return setPrimaryRole();"/>
+		</td>
+	  </tr>
+	  </table>
+	   </form>
+	   <% } %>
+
+
+	  </body>
+	</html>

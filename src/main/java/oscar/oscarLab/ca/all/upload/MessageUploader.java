@@ -46,7 +46,10 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.OtherIdManager;
-import org.oscarehr.common.dao.*;
+import org.oscarehr.common.dao.DemographicDao;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.dao.Hl7TextMessageDao;
+import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
@@ -74,13 +77,8 @@ public final class MessageUploader {
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private static PatientLabRoutingDao patientLabRoutingDao = SpringUtils.getBean(PatientLabRoutingDao.class);
-	private static ProviderLabRoutingDao providerLabRoutingDao = SpringUtils.getBean(ProviderLabRoutingDao.class);
-	private static RecycleBinDao recycleBinDao = SpringUtils.getBean(RecycleBinDao.class);
 	private static Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 	private static Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
-	private static MeasurementsExtDao measurementsExtDao = SpringUtils.getBean(MeasurementsExtDao.class);
-	private static MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
-	private static FileUploadCheckDao fileUploadCheckDao = SpringUtils.getBean(FileUploadCheckDao.class);
 	private static DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
 	private static ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	private static DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
@@ -145,10 +143,6 @@ public final class MessageUploader {
 					docNums = findProvidersForSpireLab(docNames);
 				}
             }
-            //logger.debug("docNums:");
-            for (int i=0; i < docNums.size(); i++) {
-				//logger.debug(i + " " + docNums.get(i));
-			}
 
 			try {
 				// reformat date
@@ -260,7 +254,7 @@ public final class MessageUploader {
 					orderByLength = true;
 					search = "provider_no";
 				}
-				else if (type.equals("CLS")) {
+				else if (type.equals("CLS") || type.equals("CLSDI")) {
 					search = "hso_no";
 				}
 				providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);

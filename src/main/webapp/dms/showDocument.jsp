@@ -53,7 +53,7 @@
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils,oscar.oscarLab.ca.all.*,oscar.oscarMDS.data.*,oscar.oscarLab.ca.all.util.*"%>
+<%@page import="org.springframework.web.context.support.WebApplicationContextUtils,oscar.oscarLab.ca.all.*,oscar.oscarMDS.data.*"%>
 <%@page import="org.springframework.web.context.WebApplicationContext,org.oscarehr.common.dao.*,org.oscarehr.common.model.*,org.oscarehr.util.SpringUtils"%><%
 
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
@@ -174,7 +174,10 @@
 		<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/share/yui/css/autocomplete.css"/>
 		<link rel="stylesheet" type="text/css" media="all" href="<%= request.getContextPath() %>/share/css/demographicProviderAutocomplete.css"  />
 
-		<style type="text/css">
+		<script type="text/javascript" src="<%=request.getContextPath()%>/dms/showDocument.js"></script>
+
+
+	<style type="text/css">
 			.multiPage {
 				background-color: RED;
 				color: WHITE;
@@ -211,7 +214,7 @@
 					alert("Error " + jqXHR.status + " " + err);
 				}
 			});
-		}
+		};
 		function handleDocSave(docid,action){
 			var url=contextpath + "/dms/inboxManage.do";
 			var data='method=isDocumentLinkedToDemographic&docId='+docid;
@@ -256,7 +259,6 @@
 		var contextpath = "<%=request.getContextPath()%>";
 
 		</script>
-		<script type="text/javascript" src="showDocument.js"></script>
 </head>
 <body>
 <% } %>
@@ -317,12 +319,12 @@
 														}
 
 														%>
-														<input type="button" id="msgBtn_<%=docId%>" value="Msg" onclick="popupPatient(700,960,'<%= request.getContextPath() %>/oscarMessenger/SendDemoMessage.do?demographic_no=','msg', '<%=docId%>')" <%=btnDisabled %>/>
+														<input type="button" id="msgBtn_<%=docId%>" value="Msg" onclick="Oscar.ShowDocument.popupPatient(700,960,'<%= request.getContextPath() %>/oscarMessenger/SendDemoMessage.do?demographic_no=','msg', '<%=docId%>')" <%=btnDisabled %>/>
 																																										<!--input type="button" id="ticklerBtn_<%=docId%>" value="Tickler" onclick="handleDocSave('<%=docId%>','addTickler')"/-->
-														<input type="button" id="mainTickler_<%=docId%>" value="Tickler" onClick="popupPatientTickler(710, 1024,'<%= request.getContextPath() %>/Tickler.do?', 'Tickler','<%=docId%>')" <%=btnDisabled %>>
-														<input type="button" id="mainEchart_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupPatient(710, 1024,'<%= request.getContextPath() %>/oscarEncounter/IncomingEncounter.do?reason=<bean:message key="oscarMDS.segmentDisplay.labResults"/>&curDate=<%=currentDate%>>&appointmentNo=&appointmentDate=&startTime=&status=&demographicNo=', 'encounter', '<%=docId%>')" <%=btnDisabled %>>
-														<input type="button" id="mainMaster_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnMaster"/>" onClick="popupPatient(710,1024,'<%= request.getContextPath() %>/demographic/demographiccontrol.jsp?displaymode=edit&dboperation=search_detail&demographic_no=','master','<%=docId%>')" <%=btnDisabled %>>
-														<input type="button" id="mainApptHistory_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnApptHist"/>" onClick="popupPatient(710,1024,'<%= request.getContextPath() %>/demographic/demographiccontrol.jsp?orderby=appttime&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&demographic_no=','ApptHist','<%=docId%>')" <%=btnDisabled %>>
+														<input type="button" id="mainTickler_<%=docId%>" value="Tickler" onClick="Oscar.ShowDocument.popupPatientTickler(710, 1024,'<%= request.getContextPath() %>/Tickler.do?', 'Tickler','<%=docId%>')" <%=btnDisabled %>>
+														<input type="button" id="mainEchart_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="Oscar.ShowDocument.popupPatient(710, 1024,'<%= request.getContextPath() %>/oscarEncounter/IncomingEncounter.do?reason=<bean:message key="oscarMDS.segmentDisplay.labResults"/>&curDate=<%=currentDate%>>&appointmentNo=&appointmentDate=&startTime=&status=&demographicNo=', 'encounter', '<%=docId%>')" <%=btnDisabled %>>
+														<input type="button" id="mainMaster_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnMaster"/>" onClick="Oscar.ShowDocument.popupPatient(710,1024,'<%= request.getContextPath() %>/demographic/demographiccontrol.jsp?displaymode=edit&dboperation=search_detail&demographic_no=','master','<%=docId%>')" <%=btnDisabled %>>
+														<input type="button" id="mainApptHistory_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnApptHist"/>" onClick="Oscar.ShowDocument.popupPatient(710,1024,'<%= request.getContextPath() %>/demographic/demographiccontrol.jsp?orderby=appttime&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&demographic_no=','ApptHist','<%=docId%>')" <%=btnDisabled %>>
 
 														<input type="button" id="refileDoc_<%=docId%>" value="<bean:message key="oscarEncounter.noteBrowser.msgRefile"/>" onclick="refileDoc('<%=docId%>');" >
 														<select  id="queueList_<%=docId%>" name="queueList">
@@ -421,7 +423,7 @@
 									<tr>
 										<td><bean:message key="inboxmanager.document.ObservationDateMsg" /></td>
 										<td>
-											<input   id="observationDate<%=docId%>" name="observationDate" type="text" value="<%=curdoc.getObservationDate()%>">
+											<input   id="observationDate<%=docId%>" name="observationDate" type="text" value="<%=curdoc.getObservationDate().replaceAll("/","-")%>">
 											<a id="obsdate<%=docId%>" onmouseover="renderCalendar(this.id,'observationDate<%=docId%>' );" href="javascript:void(0);" ><img title="Calendar" src="<%=request.getContextPath()%>/images/cal.gif" alt="Calendar"border="0" /></a>
 										</td>
 									</tr>
@@ -437,7 +439,8 @@
 											<input type="hidden" name="demog" value="<%=demographicID%>" id="demofind<%=docId%>"/>
 											<input type="hidden" name="demofindName" value="<%=demoName%>" id="demofindName<%=docId%>"/>
 
-											<input type="checkbox" id="activeOnly<%=docId%>" name="activeOnly" checked="checked" value="true" onclick="setupDemoAutoCompletion()">Active Only<br>
+											<input type="checkbox" id="activeOnly<%=docId%>" name="activeOnly" checked="checked" value="true"
+											       onclick="Oscar.ShowDocument.setupDemoAutoCompletion('<%=request.getContextPath()%>', '<%=docId%>',<%=autoLinkDocsToProvider%>)">Active Only<br>
 											<input type="text" style="width:400px;" id="autocompletedemo<%=docId%>" onchange="checkSave('<%=docId%>');" name="demographicKeyword" />
 											<div id="autocomplete_choices<%=docId%>" class="autocomplete"></div>
 
@@ -621,81 +624,8 @@
 			showPDF('<%=docId%>',contextpath);
 		}
 
-		var tmp;
-
-		function setupDemoAutoCompletion() {
-
-			var linkDocsToProvider = <%=autoLinkDocsToProvider%>;
-
-			if(jQuery("#autocompletedemo<%=docId%>") ){
-
-				var url;
-				if( jQuery("#activeOnly<%=docId%>").is(":checked") ) {
-					url = "<%= request.getContextPath() %>/demographic/SearchDemographic.do?jqueryJSON=true&activeOnly=" + jQuery("#activeOnly<%=docId%>").val();
-				}
-				else {
-					url = "<%= request.getContextPath() %>/demographic/SearchDemographic.do?jqueryJSON=true";
-				}
-
-				jQuery( "#autocompletedemo<%=docId%>" ).autocomplete({
-				  source: url,
-				  minLength: 2,
-
-				  focus: function( event, ui ) {
-					  jQuery( "#autocompletedemo<%=docId%>" ).val( ui.item.label );
-					  return false;
-				  },
-				  select: function(event, ui) {
-					  jQuery( "#autocompletedemo<%=docId%>" ).val(ui.item.label);
-					  jQuery( "#demofind<%=docId%>").val(ui.item.value);
-					  jQuery( "#demofindName<%=docId%>" ).val(ui.item.formattedName);
-					  selectedDemos.push(ui.item.label);
-					  console.log(ui.item.providerNo);
-					  if( ui.item.providerNo != undefined && ui.item.providerNo != null &&ui.item.providerNo != "" && ui.item.providerNo != "null" && linkDocsToProvider) {
-						  addDocToList(ui.item.providerNo, ui.item.provider + " (MRP)", "<%=docId%>");
-					  }
-
-					  //enable Save button whenever a selection is made
-					  jQuery('#save<%=docId%>').removeAttr('disabled');
-					  jQuery('#saveNext<%=docId%>').removeAttr('disabled');
-
-					  jQuery('#msgBtn_<%=docId%>').removeAttr('disabled');
-					  jQuery('#mainTickler_<%=docId%>').removeAttr('disabled');
-					  jQuery('#mainEchart_<%=docId%>').removeAttr('disabled');
-					  jQuery('#mainMaster_<%=docId%>').removeAttr('disabled');
-					  jQuery('#mainApptHistory_<%=docId%>').removeAttr('disabled');
-					  return false;
-				  }
-				});
-			}
-		  }
-
-
-		jQuery(setupDemoAutoCompletion());
-
-		function setupProviderAutoCompletion() {
-			var url = "<%= request.getContextPath() %>/provider/SearchProvider.do?method=labSearch";
-
-			jQuery( "#autocompleteprov<%=docId%>" ).autocomplete({
-				  source: url,
-				  minLength: 2,
-
-				  focus: function( event, ui ) {
-					  jQuery( "#autocompleteprov<%=docId%>" ).val( ui.item.label );
-					  return false;
-				  },
-				  select: function(event, ui) {
-					  jQuery( "#autocompleteprov<%=docId%>" ).val("");
-					  jQuery( "#provfind<%=docId%>").val(ui.item.value);
-					  addDocToList(ui.item.value, ui.item.label, "<%=docId%>");
-
-					  return false;
-				  }
-				});
-		}
-
-		jQuery(setupProviderAutoCompletion());
-
+		jQuery(Oscar.ShowDocument.setupDemoAutoCompletion('<%=request.getContextPath()%>', '<%=docId%>', <%=autoLinkDocsToProvider%>));
+		jQuery(Oscar.ShowDocument.setupProviderAutoCompletion('<%=request.getContextPath()%>', '<%=docId%>'));
 
 </script>
 <% if (request.getParameter("inWindow") != null && request.getParameter("inWindow").equalsIgnoreCase("true")) {  %>

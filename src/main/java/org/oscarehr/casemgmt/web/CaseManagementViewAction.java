@@ -993,8 +993,8 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 
 			} else {
 				if (Arrays.binarySearch(providerNo, note.getProviderNo()) >= 0)
-				// correct provider
-				    filteredNotes.add(note);
+					// correct provider
+					filteredNotes.add(note);
 			}
 		}
 

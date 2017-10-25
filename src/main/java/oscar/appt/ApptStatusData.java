@@ -90,22 +90,40 @@ public final class ApptStatusData {
 
 
 	public String getImageName() {
-		return statusData.getIcon();
+
+		String baseIcon = statusData.getIcon();
+		String status = apptStatus;
+		boolean hasImageVersion = (statusData.getEditable() == 0); //TODO better way to know when image versions exist
+		String returnIcon = baseIcon;
+
+		// all the uneditable statuses have multiple versions of the image, for verified/signed versions
+		// example: starbill, Vstarbill, Sstarbill
+		if(status.length() >= 2 && hasImageVersion) {
+			String otherIcon = status.substring(1,2);
+			returnIcon = otherIcon + baseIcon;
+		}
+		return returnIcon;
 	}
 
 	public String getNextStatus() {
 
 		int currentStatusIndex = allStatus.indexOf(statusData);
 		int nextStatusIndex = getNextStatusIndex(currentStatusIndex);
+		String currentStatus = apptStatus;
 		String nextStatus = allStatus.get(nextStatusIndex).getStatus();
 
-		if(statusData.getStatus().charAt(0) == 'B') {
-			return statusData.getStatus();
+		if(currentStatus.charAt(0) == 'B') {
+			return currentStatus;
 		}
 
 		if(nextStatus.charAt(0) == 'B') {
 			nextStatusIndex = getNextStatusIndex(nextStatusIndex);
 			nextStatus = allStatus.get(nextStatusIndex).getStatus();
+		}
+
+		// have to preserver billed/verified status
+		if(currentStatus.length() >= 2) {
+			nextStatus = nextStatus.charAt(0) + currentStatus.substring(1);
 		}
 
 		return nextStatus;
@@ -117,7 +135,13 @@ public final class ApptStatusData {
 	}
 
 	public String getTitle() {
-		return statusData.getDescription();
+
+		String title = statusData.getDescription();
+		if(apptStatus.length() >= 2) {
+			String other = apptStatus.substring(1,2);
+			title += "/" + (other.equals("S")? "Signed":"Verified");
+		}
+		return title;
 	}
 
 	/**
@@ -185,7 +209,7 @@ public final class ApptStatusData {
 		String[] rStatus = new String[allStatus.size()];
 		int idx = 0;
 		for(AppointmentStatus status : allStatus) {
-			rStatus[idx] = status.getDescription();
+			rStatus[idx] = status.getStatus();
 			idx++;
 		}
 		return rStatus;

@@ -151,7 +151,7 @@ public class ProviderDataDao extends AbstractDao<ProviderData> {
 
     public List<Object[]> findProviderSecUserRoles(String lastName, String firstName) {
     	
-		String queryStr = "select u.id, u.role_name, p.provider_no, p.first_name, p.last_name from provider p LEFT JOIN secUserRole u ON  p.provider_no=u.provider_no " 
+		String queryStr = "select u.id, u.role_name, p.provider_no, p.first_name, p.last_name, p.super_admin from provider p LEFT JOIN secUserRole u ON  p.provider_no=u.provider_no "
 				+ " where p.last_name like '" + lastName + "' and p.first_name like '" + firstName + "' and p.status='1' order by p.first_name, p.last_name, u.role_name";
 
 		Query query = entityManager.createNativeQuery(queryStr);

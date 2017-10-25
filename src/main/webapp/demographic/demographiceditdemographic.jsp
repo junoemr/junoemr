@@ -181,7 +181,6 @@ if(!authed) {
 	int nStrShowLen = 20;
 	String billRegion = oscarVariables.getBillingTypeUpperCase();
 	String instanceType = oscarVariables.getInstanceTypeUpperCase();
-	String prov = oscarVariables.getBillingTypeUpperCase();
 
 	CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 	List<CaseManagementNoteLink> cml = cmm.getLinkByTableId(CaseManagementNoteLink.DEMOGRAPHIC, Long.valueOf(demographic_no));
@@ -967,8 +966,8 @@ if(wLReadonly.equals("")){
 			</tr>
 			<tr>
 				<td><a
-					href="javascript: function myFunction() {return false; }"
-					onClick="popupPage(700, 1000, '../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
+					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t')"
+					target="_blank"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>
 			<%
@@ -2855,7 +2854,7 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 								<td align="right" nowrap><b><bean:message
 									key="demographic.demographiceditdemographic.formRefDocNo" />: </b></td>
 								<td align="left"><input type="text" name="r_doctor_ohip" <%=getDisabled("r_doctor_ohip")%>
-									size="20" maxlength="6" value="<%=rdohip%>"> <% if(!"BC".equals(prov)) { %>
+									size="20" maxlength="6" value="<%=rdohip%>"> <% if(!"BC".equals(instanceType)) { %>
 								<a
 									href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
 								#</a> <% } %>
@@ -2953,24 +2952,26 @@ document.updatedelete.r_doctor_ohip.value = refNo;
 									<input  type="text" name="roster_date_year" size="4" maxlength="4" value="<%=rosterDateYear%>">
 									<input  type="text" name="roster_date_month" size="2" maxlength="2" value="<%=rosterDateMonth%>">
 									<input  type="text" name="roster_date_day" size="2" maxlength="2" value="<%=rosterDateDay%>">
+									<b><bean:message
+											key="demographic.demographiceditdemographic.RosterTerminationDate" />: </b>
+									<input  type="text" name="roster_termination_date_year" size="4" maxlength="4" value="<%=rosterTerminationDateYear%>">
+									<input  type="text" name="roster_termination_date_month" size="2" maxlength="2" value="<%=rosterTerminationDateMonth%>">
+									<input  type="text" name="roster_termination_date_day" size="2" maxlength="2" value="<%=rosterTerminationDateDay%>">
 								</td>
 							</tr>
-							
-							
-							<%--
 							<tr valign="top">
 								<td align="right" nowrap><b><bean:message
-									key="demographic.demographiceditdemographic.RosterTerminationReason" />: </b></td>
+										key="demographic.demographiceditdemographic.RosterTerminationReason" />: </b></td>
 								<td align="left" colspan="3">
 									<select  name="roster_termination_reason">
 										<option value="">N/A</option>
-<%for (String code : Util.rosterTermReasonProperties.getTermReasonCodes()) { %>
+										<%for (String code : Util.rosterTermReasonProperties.getTermReasonCodes()) { %>
 										<option value="<%=code %>" <%=code.equals(rosterTerminationReason)?"selected":"" %> ><%=Util.rosterTermReasonProperties.getReasonByCode(code) %></option>
-<%} %>
+										<%} %>
 									</select>
 								</td>
 							</tr>
-							--%>
+
 
 </oscar:oscarPropertiesCheck>														
 <%-- END TOGGLE OFF PATIENT ROSTERING --%>
@@ -3651,7 +3652,7 @@ jQuery(document).ready(function(){
 %>
 </script>
 
-<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true") && "BC".equals(prov)) { %>
+<% if (oscarProps.getBooleanProperty("billingreferral_demographic_refdoc_autocomplete", "true") && "BC".equals(instanceType)) { %>
 
 <script src="https://www.google.com/jsapi"></script>
 <script>

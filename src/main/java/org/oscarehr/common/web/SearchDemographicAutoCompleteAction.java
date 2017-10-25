@@ -86,14 +86,14 @@ public class SearchDemographicAutoCompleteAction extends Action {
         	searchStr = request.getParameter("term");
         }
         
-        boolean activeOnly = false;
-        activeOnly = request.getParameter("activeOnly") != null && request.getParameter("activeOnly").equalsIgnoreCase("true");
-        boolean jqueryJSON = request.getParameter("jqueryJSON") != null && request.getParameter("jqueryJSON").equalsIgnoreCase("true");
+        boolean activeOnly = "true".equalsIgnoreCase(request.getParameter("activeOnly"));
+        boolean jqueryJSON = "true".equalsIgnoreCase(request.getParameter("jqueryJSON"));
         RxProviderData rx = new RxProviderData();
         
 
         List<Demographic> list = null;
 
+        // search by birth date
         if (searchStr.length() == 8 && searchStr.matches("([0-9]*)")) {
             list = demographicDao.searchDemographicByDOB(searchStr.substring(0,4)+"-"+searchStr.substring(4,6)+"-"+searchStr.substring(6,8), 100, 0,providerNo,outOfDomain);
         } 

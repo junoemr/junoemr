@@ -30,3 +30,6 @@ src/main/main.iml
 src/test/test.iml
 utils/tasks/tasks.iml
 classpath.txt
+src/main/webapp/web/bower_components/
+src/main/webapp/web/dist/
+src/main/webapp/web/node_modules/

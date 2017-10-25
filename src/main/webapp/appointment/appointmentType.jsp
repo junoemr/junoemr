@@ -17,7 +17,11 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 --%>
-<%@ page import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*,java.net.*, oscar.appt.*, org.oscarehr.common.dao.AppointmentTypeDao, org.oscarehr.common.model.AppointmentType, org.oscarehr.util.SpringUtils" %>
+<%@ page import="java.util.*" %>
+<%@ page import="org.oscarehr.common.dao.AppointmentTypeDao" %>
+<%@ page import="org.oscarehr.common.model.AppointmentType" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%
 	AppointmentTypeDao appDao = (AppointmentTypeDao) SpringUtils.getBean("appointmentTypeDao");
@@ -25,46 +29,44 @@
 %>
 <html>
 <head>
-<title>Appointment Type</title>
-<script type="text/javascript">
-var dur = '';
-var reason = '';
-var loc = '';
-var notes = '';
-var resources = '';
-var names = '';
-<%   for(int j = 0;j < types.size(); j++) { %>
-		dur = dur + '<%= types.get(j).getDuration() %>'+',';
-		reason = reason + '<%= types.get(j).getReason() %>'+',';
-		loc = loc + '<%= types.get(j).getLocation() %>'+',';
-		notes = notes + '<%= types.get(j).getNotes() %>'+',';
-		resources = resources + '<%= types.get(j).getResources() %>'+',';
-		names = names + '<%= types.get(j).getName() %>'+',';
-<%   } %>
-	var durArray = dur.split(",");
-	var reasonArray = reason.split(",");
-	var locArray = loc.split(",");
-	var notesArray = notes.split(",");
-	var resArray = resources.split(",");
-	var nameArray = names.split(",");
-	
-	var typeSel = '';
-	var reasonSel = '';
-	var locSel = '';
-	var durSel = 15;
-	var notesSel = '';
-	var resSel = '';
+	<title>Appointment Type</title>
+	<script type="text/javascript">
 
-function getFields(idx) {
-	if(idx>0) {
-		typeSel = document.getElementById('durId').innerHTML = nameArray[idx-1];
-		durSel = document.getElementById('durId').innerHTML = durArray[idx-1];
-		reasonSel = document.getElementById('reasonId').innerHTML = reasonArray[idx-1];
-		locSel = document.getElementById('locId').innerHTML = locArray[idx-1];
-		notesSel = document.getElementById('notesId').innerHTML = notesArray[idx-1];
-		resSel = document.getElementById('resId').innerHTML = resArray[idx-1];
-	}	
-}
+		var durArray = [];
+		var reasonArray = [];
+		var locArray = [];
+		var notesArray = [];
+		var resArray = [];
+		var nameArray = [];
+		<%
+		for(int j = 0;j < types.size(); j++) { %>
+			durArray.push('<%=types.get(j).getDuration()%>');
+			reasonArray.push('<%=StringEscapeUtils.escapeJavaScript(types.get(j).getReason())%>');
+			locArray.push('<%=StringEscapeUtils.escapeJavaScript(types.get(j).getLocation())%>');
+			notesArray.push('<%=StringEscapeUtils.escapeJavaScript(types.get(j).getNotes())%>');
+			resArray.push('<%=StringEscapeUtils.escapeJavaScript(types.get(j).getResources())%>');
+			nameArray.push('<%=StringEscapeUtils.escapeJavaScript(types.get(j).getName())%>');
+			<%
+		}
+		%>
+
+		var typeSel = '';
+		var reasonSel = '';
+		var locSel = '';
+		var durSel = 15;
+		var notesSel = '';
+		var resSel = '';
+
+		function getFields(idx) {
+			if (idx > 0) {
+				typeSel = document.getElementById('durId').innerHTML = nameArray[idx - 1];
+				durSel = document.getElementById('durId').innerHTML = durArray[idx - 1];
+				reasonSel = document.getElementById('reasonId').innerHTML = reasonArray[idx - 1];
+				locSel = document.getElementById('locId').innerHTML = locArray[idx - 1];
+				notesSel = document.getElementById('notesId').innerHTML = notesArray[idx - 1];
+				resSel = document.getElementById('resId').innerHTML = resArray[idx - 1];
+			}
+		}
 </script>
 </head>
 <body bgcolor="#EEEEFF" bgproperties="fixed" topmargin="0" leftmargin="0" rightmargin="0">
@@ -74,17 +76,21 @@ function getFields(idx) {
 		<td width="200">
 			<select id="typesId" width="25" maxsize="50" onchange="getFields(this.selectedIndex)">
 				<option value="-1">Select type</option>
-<%   for(int i = 0;i < types.size(); i++) { 
-%>
-				<option value="<%= i %>" <%= (request.getParameter("type").equals(types.get(i).getName())?" selected":"") %>><%= types.get(i).getName() %></option>
-<%   } %>
+				<% for (int i = 0; i < types.size(); i++) {
+					String type = request.getParameter("type");
+					String name = types.get(i).getName();
+				%>
+					<option value="<%= i %>" <%= (type.equals(name) ? " selected" : "") %>><%= StringEscapeUtils.escapeHtml(name) %></option>
+				<% } %>
 			</select>
 		</td>
 		<td><input type="button" name="Select" value="Select" onclick="window.opener.setType(typeSel,reasonSel,locSel,durSel,notesSel,resSel); window.close()">
 	</tr>
 	<tr>
 		<td>Duration</td>
-		<td colspan="2"><div id="durId"></div></td>
+		<td colspan="2">
+			<div id="durId"></div>
+		</td>
 	</tr>
 	<tr>
 		<td>Reason</td>

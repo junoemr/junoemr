@@ -622,6 +622,14 @@ for(ConsultationRequestExt ext:exts) {
                                 <%=reqFrm.patientWPhone %>
                                         </td>
                                     </tr>
+	                                <tr>
+		                                <td class="subTitles">
+			                                <bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgCPhone"/>
+		                                </td>
+		                                <td class="fillLine">
+			                                <%=reqFrm.patientCPhone %>
+		                                </td>
+	                                </tr>
                                     <tr>
                                         <td class="subTitles">
                                             <bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgBirth"/>:
