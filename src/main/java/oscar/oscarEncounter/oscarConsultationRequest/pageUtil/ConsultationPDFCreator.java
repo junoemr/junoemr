@@ -258,9 +258,14 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 		PdfPCell cell = new PdfPCell(new Phrase("", headerFont));
 		
 		boolean patientWillBook = reqFrm.pwb.equals("1");
-		
+
+		// allow properties custom header message override
+		String customHeaderMessage = props.getProperty("consultation_fax_custom_header_message");
+		if(customHeaderMessage != null) {
+			cell.setPhrase(new Phrase(customHeaderMessage, boldFont));
+		}
 		// multisite reply message
-		if (!patientWillBook && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
+		else if (!patientWillBook && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 			cell.setPhrase(new Phrase("Please reply", boldFont));
 		}
 		// default reply message
