@@ -1,3 +1,2 @@
-SET SQL_SAFE_UPDATES=0;
+-- remove broken ovulation form from use
 DELETE FROM encounterForm WHERE form_table='formovulation';
-SET SQL_SAFE_UPDATES=1;
