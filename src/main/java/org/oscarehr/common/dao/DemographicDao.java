@@ -2016,23 +2016,23 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		
 		String demographicQuery = generateDemographicSearchQuery(loggedInInfo,searchRequest, params,
 				"d.demographic_no, d.last_name, d.first_name, d.chart_no, d.sex, d.provider_no, d.roster_status," +
-				" d.patient_status, d.phone, d.year_of_birth,d.month_of_birth,d.date_of_birth,p.last_name as providerLastName," + 
+				" d.patient_status, d.phone, d.year_of_birth,d.month_of_birth,d.date_of_birth,p.last_name as providerLastName," +
 						"p.first_name as providerFirstName,d.hin,dm.merged_to");
-		 
+
 		Session session = getSession();
 		try {
 			SQLQuery sqlQuery = session.createSQLQuery(demographicQuery);
-			
+
 			for(String key:params.keySet()) {
 				sqlQuery.setParameter(key, params.get(key));
 			}
-			
+
 			sqlQuery.setFirstResult(startIndex);
 			DemographicSearchResultTransformer transformer = new DemographicSearchResultTransformer();
 			transformer.setDemographicDao(this);
 			sqlQuery.setResultTransformer(transformer);
 			setLimit(sqlQuery, itemsToReturn);
-			
+
 			return sqlQuery.list();
 		} finally {
 			this.releaseSession(session);
@@ -2186,7 +2186,11 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		  }
 
 		  orderBy = " ORDER BY " + orderBy;
-		  return "select " + select + " from demographic d left join provider p on d.provider_no = p.provider_no left join demographic_merged dm on d.demographic_no = dm.demographic_no where "+fieldname+" "+regularexp+" :keyword "+ptstatusexp+domainRestriction+orderBy ;
+		  return "select " + select + " " +
+				  "from demographic d " +
+				  "left join provider p on d.provider_no = p.provider_no " +
+				  "left join demographic_merged dm on (d.demographic_no = dm.demographic_no AND dm.deleted = '0') " +
+				  "where dm.id IS NULL AND "+fieldname+" "+regularexp+" :keyword "+ptstatusexp+domainRestriction+orderBy;
 	}
 
 	public List<Demographic> getDemographics(List<Integer> demographicIds) {
