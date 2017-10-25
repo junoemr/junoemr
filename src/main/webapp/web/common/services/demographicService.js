@@ -63,13 +63,13 @@ angular.module("Common.Services").service("demographicService", [
             return deferred.promise;
         };
 
-	    service.getDemographicContacts = function getDemographicContacts(demographicNo,contactType)
+	    service.getDemographicContacts = function getDemographicContacts(demographicNo,contactCategory)
 	    {
 		    var deferred = $q.defer();
 
 		    var config = Juno.Common.ServiceHelper.configHeaders();
 		    config.params = {
-			    type: contactType
+			    category: contactCategory
 		    };
 
 		    junoHttp.get(service.apiPath + '/' + encodeURIComponent(demographicNo) + "/contacts", config).then(

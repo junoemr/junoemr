@@ -212,15 +212,20 @@ public class DemographicService extends AbstractServiceImpl {
 	@GET
 	@Path("/{dataId}/contacts")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<DemographicContactFewTo1>,String> getDemographicContacts(@PathParam("dataId") Integer id,
-	                                                                                  @QueryParam("type") String type)
+	public RestResponse<List<DemographicContactFewTo1>,String> getDemographicContacts(@PathParam("dataId") Integer demographicNo,
+	                                                                                  @QueryParam("category") String category)
 	{
 		try
 		{
-			List<DemographicContactFewTo1> results = new ArrayList<>();
-			String category = ("PROFESSIONAL".equalsIgnoreCase(type))? DemographicContact.CATEGORY_PROFESSIONAL : DemographicContact.CATEGORY_PERSONAL;
+			// return error if invalid category
+			if(!(DemographicContact.CATEGORY_PROFESSIONAL.equalsIgnoreCase(category) || DemographicContact.CATEGORY_PERSONAL.equalsIgnoreCase(category)))
+			{
+				return RestResponse.errorResponse("Invalid Category");
+			}
 
-			List<DemographicContact> demoContacts = demographicContactDao.findByDemographicNoAndCategory(id, category);
+			List<DemographicContactFewTo1> results = new ArrayList<>();
+
+			List<DemographicContact> demoContacts = demographicContactDao.findByDemographicNoAndCategory(demographicNo, category);
 			for (DemographicContact demoContact : demoContacts)
 			{
 				Integer contactId = Integer.valueOf(demoContact.getContactId());
@@ -234,7 +239,7 @@ public class DemographicService extends AbstractServiceImpl {
 						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactD);
 						if (demoContactTo1.getPhone() == null || demoContactTo1.getPhone().equals(""))
 						{
-							DemographicExt ext = demographicManager.getDemographicExt(getLoggedInInfo(), id, "demo_cell");
+							DemographicExt ext = demographicManager.getDemographicExt(getLoggedInInfo(), demographicNo, "demo_cell");
 							if (ext != null) demoContactTo1.setPhone(ext.getValue());
 						}
 					}
