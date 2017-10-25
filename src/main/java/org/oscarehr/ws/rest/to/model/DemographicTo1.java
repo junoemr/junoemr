@@ -100,8 +100,6 @@ public class DemographicTo1 implements Serializable {
 
 	private List<DemographicExtTo1> extras = new ArrayList<DemographicExtTo1>();
 	private List<WaitingListNameTo1> waitingListNames = new ArrayList<WaitingListNameTo1>();
-	private List<StatusValueTo1> patientStatusList = new ArrayList<StatusValueTo1>();
-	private List<StatusValueTo1> rosterStatusList = new ArrayList<StatusValueTo1>();
 
 	public Integer getDemographicNo() {
 		return demographicNo;
@@ -581,22 +579,6 @@ public class DemographicTo1 implements Serializable {
 
 	public void setWaitingListNames(List<WaitingListNameTo1> waitingListNames) {
 		this.waitingListNames = waitingListNames;
-	}
-
-	public List<StatusValueTo1> getPatientStatusList() {
-		return patientStatusList;
-	}
-
-	public void setPatientStatusList(List<StatusValueTo1> patientStatusList) {
-		this.patientStatusList = patientStatusList;
-	}
-
-	public List<StatusValueTo1> getRosterStatusList() {
-		return rosterStatusList;
-	}
-
-	public void setRosterStatusList(List<StatusValueTo1> rosterStatusList) {
-		this.rosterStatusList = rosterStatusList;
 	}
 
 	public Integer getAdmissionProgramId() {

@@ -106,6 +106,29 @@ angular.module("Common.Services").service("demographicsService", [
 			return deferred.promise;
 		};
 
+		service.getStatusList = function getStatusList(listType)
+		{
+			var deferred = $q.defer();
+
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.params = {
+				type: listType
+			};
+
+			junoHttp.get(service.apiPath + '/statusList', config).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("demographicsService::getStatusList error", errors);
+					deferred.reject("An error occurred while getting status list");
+				});
+
+			return deferred.promise;
+		};
+
 		return service;
 	}
 ]);

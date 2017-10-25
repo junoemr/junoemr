@@ -50,6 +50,7 @@ import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTDIR;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTMODE;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
+import org.oscarehr.ws.rest.to.model.StatusValueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -262,6 +263,36 @@ public class DemographicsService extends AbstractServiceImpl {
 			response.setTotal((response.getContent() != null) ? response.getContent().size() : 0);
 
 			return RestResponse.successResponse(response);
+		}
+		catch (Exception e)
+		{
+			logger.error("Error", e);
+		}
+		return RestResponse.errorResponse("Error");
+	}
+
+	@GET
+	@Path("/statusList")
+	@Produces("application/json")
+	public RestResponse<List<StatusValueTo1>, String> getStatusList(@QueryParam("type") String listType)
+	{
+		try
+		{
+			// get the list
+			List<String> statusList;
+			if("ROSTER".equalsIgnoreCase(listType))
+				statusList = demographicManager.getRosterStatusList();
+			else
+				statusList = demographicManager.getPatientStatusList();
+
+			// create transfer objects list
+			List<StatusValueTo1> resultList = new ArrayList<>(statusList.size());
+			for(String status : statusList)
+			{
+				resultList.add(new StatusValueTo1(status));
+			}
+
+			return RestResponse.successResponse(resultList);
 		}
 		catch (Exception e)
 		{

@@ -62,7 +62,6 @@ import org.oscarehr.ws.rest.conversion.WaitingListNameConverter;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
-import org.oscarehr.ws.rest.to.model.StatusValueTo1;
 import org.oscarehr.ws.rest.to.model.WaitingListNameTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -200,24 +199,6 @@ public class DemographicService extends AbstractServiceImpl {
 				}
 			}
 
-			List<String> patientStatusList = demographicManager.getPatientStatusList();
-			List<String> rosterStatusList = demographicManager.getRosterStatusList();
-			if (patientStatusList != null)
-			{
-				for (String ps : patientStatusList)
-				{
-					StatusValueTo1 value = new StatusValueTo1(ps);
-					result.getPatientStatusList().add(value);
-				}
-			}
-			if (rosterStatusList != null)
-			{
-				for (String rs : rosterStatusList)
-				{
-					StatusValueTo1 value = new StatusValueTo1(rs);
-					result.getRosterStatusList().add(value);
-				}
-			}
 			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), demo.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
 			return RestResponse.successResponse(result);
 		}

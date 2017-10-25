@@ -626,7 +626,7 @@
 						<div class="input-group">
 							<select class="form-control form-control-details" title="<bean:message key="demographic.demographiceditdemographic.formRosterStatus"/>" 
 									ng-model="detailsCtrl.page.demo.rosterStatus" 
-									ng-options="rs.value as rs.label for rs in detailsCtrl.page.demo.rosterStatusList" >
+									ng-options="rs.value as rs.label for rs in detailsCtrl.page.rosterStatusList" >
 								<option value="">--</option>
 							</select>
 							<span class="input-group-btn">
@@ -693,7 +693,7 @@
 						<div class="input-group">
 							<select class="form-control form-control-details" title="Patient Status" 
 									ng-model="detailsCtrl.page.demo.patientStatus" 
-									ng-options="ps.value as ps.label for ps in detailsCtrl.page.demo.patientStatusList" 
+									ng-options="ps.value as ps.label for ps in detailsCtrl.page.patientStatusList"
 									ng-blur="detailsCtrl.checkPatientStatus()">
 								<option value="">--</option>
 							</select>
