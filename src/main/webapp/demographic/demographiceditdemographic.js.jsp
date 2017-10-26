@@ -160,7 +160,6 @@ function checkRosterStatus() {
 		}
 		else {
 			if (!rosterStatusTerminationDateValid(false)) return false;
-			if (!rosterStatusTerminationReasonNotBlank()) return false;
 		}
 	}
 
