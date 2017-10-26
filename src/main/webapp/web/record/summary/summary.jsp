@@ -27,13 +27,13 @@
 
 <div class="col-xs-12 summary-section">
 	<div class="row">
-		<div class="col-lg-12" ng-hide="summaryCtrl.page.canRead">
+		<div class="col-lg-12" ng-show="summaryCtrl.page.canRead === false">
 			<bean:message key="oscarEncounter.accessDenied"/>
 		</div>
 	</div>
 
-	<div class="row">
-		<div class="col-md-3 col-sm-4 col-xs-12" id="summary-section-left" ng-show="summaryCtrl.page.canRead">
+	<div class="row" ng-show="summaryCtrl.page.canRead === true">
+		<div class="col-md-3 col-sm-4 col-xs-12" id="summary-section-left">
 			<fieldset class="module-list" ng-repeat="mod in summaryCtrl.page.columnOne.modules">
 				<div class="row vertical-align">
 					<div class="col-xs-8">
@@ -118,19 +118,26 @@
 		</div>
 
 		<div class="col-md-6 col-sm-7 col-xs-10 col-sm-offset-0 col-xs-offset-1"
-			 ng-show="summaryCtrl.page.canRead"
 			 ng-click="summaryCtrl.checkAction($event)"
 			 ng-keypress="summaryCtrl.checkAction($event)">
-			<div class="col-sm-12 summary-tabs" ng-show="summaryCtrl.page.canRead" ng-click="summaryCtrl.checkAction($event)" ng-keypress="summaryCtrl.checkAction($event)">
+			<div class="col-sm-12 summary-tabs"
+				 ng-click="summaryCtrl.checkAction($event)"
+				 ng-keypress="summaryCtrl.checkAction($event)">
 				<ul class="nav nav-tabs">
 					<li class="active">
 						<a data-target="#all" data-toggle="tab" class="hand-hover">Notes</a>
 					</li>
 					<li>
-						<a ng-click="summaryCtrl.getTrackerUrl(summaryCtrl.demographicNo)" data-target="#tracker" role="tab" data-toggle="tab" >Tracker</a>
+						<a ng-click="summaryCtrl.getTrackerUrl(summaryCtrl.demographicNo)"
+						   data-target="#tracker"
+						   role="tab"
+						   data-toggle="tab" >
+							Tracker
+						</a>
 					</li>
 					<li class="pull-right">
-						<button class="btn btn-sm btn-primary" ng-click="summaryCtrl.showPrintModal(summaryCtrl.page.notes.notelist)">
+						<button class="btn btn-sm btn-primary"
+								ng-click="summaryCtrl.showPrintModal(summaryCtrl.page.notes.notelist)">
 							<span class="fa fa-print"></span>
 							Print
 						</button>
@@ -172,13 +179,19 @@
 												ng-show="summaryCtrl.isUnsignedEncounterNote(note)">
 											<span class="fa fa-exclamation-triangle" title="This note is unsigned!"></span>
 										</button>
-										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editNote(note)" ng-show="note.editable && summaryCtrl.isRegularNote(note)">
+										<button class="btn btn-primary btn-xs"
+												ng-click="summaryCtrl.editNote(note)"
+												ng-show="note.editable && summaryCtrl.isRegularNote(note)">
 											Edit
 										</button>
-										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.editGroupNote(note)" ng-show="note.editable && note.cpp && !note.archived && !note.ticklerNote">
+										<button class="btn btn-primary btn-xs"
+												ng-click="summaryCtrl.editGroupNote(note)"
+												ng-show="note.editable && note.cpp && !note.archived && !note.ticklerNote">
 											Edit
 										</button>
-										<button class="btn btn-primary btn-xs" ng-click="summaryCtrl.viewEform(note)" ng-show="note.eformData">
+										<button class="btn btn-primary btn-xs"
+												ng-click="summaryCtrl.viewEform(note)"
+												ng-show="note.eformData">
 											View
 										</button>
 										<button class="btn disabled btn-xs" ng-show="note.archived == true">Archived</button>
@@ -243,7 +256,8 @@
 			</div>
 		</div>
 
-		<div class="col-md-3 col-md-offset-0 col-xs-10 col-xs-offset-1" id="summary-section-right" ng-show="summaryCtrl.page.canRead"
+		<div class="col-md-3 col-md-offset-0 col-xs-10 col-xs-offset-1"
+			 id="summary-section-right"
 			 ng-click="summaryCtrl.checkAction($event)"
 			 ng-keypress="summaryCtrl.checkAction($event)">
 			<fieldset ng-repeat="mod in summaryCtrl.page.columnThree.modules">
@@ -256,7 +270,9 @@
 					<%-- href="{{item.action}}" --%>
 					<li ng-repeat="item in mod.summaryItem | filter: incomingQ" ng-show="$index < mod.displaySize"  >
 						<span class="pull-right">{{item.date | date : 'dd-MM-yyyy'}}</span>
-						<a ng-click="summaryCtrl.gotoState(item)" class="hand-hover" ng-class="{true: 'abnormal', false: ''}[item.abnormalFlag]">{{item.displayName}}
+						<a ng-click="summaryCtrl.gotoState(item)"
+						   class="hand-hover"
+						   ng-class="{true: 'abnormal', false: ''}[item.abnormalFlag]">{{item.displayName}}
 							<small ng-show="item.classification">({{item.classification}})</small>
 						</a>
 					</li>

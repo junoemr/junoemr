@@ -466,15 +466,6 @@ function rosterStatusTerminationDateValid(trueIfBlank) {
     return checkDate(yyyy,mm,dd,errMsg);
 }
 
-function rosterStatusTerminationReasonNotBlank() {
-	if (document.updatedelete.roster_termination_reason.value=="") {
-		alert ("<bean:message key="demographic.demographiceditdemographic.msgNoTerminationReason"/>");
-		return false;
-	}
-	return true;
-}
-
-
 function patientStatusDateValid(trueIfBlank) {
     var yyyy = document.updatedelete.patientstatus_date_year.value.trim();
     var mm = document.updatedelete.patientstatus_date_month.value.trim();
