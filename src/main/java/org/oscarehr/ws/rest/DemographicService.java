@@ -218,7 +218,7 @@ public class DemographicService extends AbstractServiceImpl {
 		try
 		{
 			// return error if invalid category
-			if(!(DemographicContact.CATEGORY_PROFESSIONAL.equalsIgnoreCase(category) || DemographicContact.CATEGORY_PERSONAL.equalsIgnoreCase(category)))
+			if(!DemographicContact.ALL_CATEGORIES.contains(category))
 			{
 				return RestResponse.errorResponse("Invalid Category");
 			}
