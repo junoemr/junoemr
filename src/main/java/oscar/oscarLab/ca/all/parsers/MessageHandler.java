@@ -28,6 +28,11 @@ package oscar.oscarLab.ca.all.parsers;
 import java.util.ArrayList;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v23.message.ORU_R01;
+import ca.uhn.hl7v2.model.v23.segment.MSH;
+import ca.uhn.hl7v2.parser.Parser;
+import ca.uhn.hl7v2.parser.PipeParser;
+import ca.uhn.hl7v2.validation.impl.NoValidation;
 
 /**
  *  When implementing this class a global variable 'msg' should be created as
@@ -43,7 +48,26 @@ import ca.uhn.hl7v2.HL7Exception;
  *  The results for the majority of the methods should be retrieved from the
  *  'msg' object
  */
-public interface MessageHandler {
+public abstract class MessageHandler {
+
+
+	public static MessageHandler getSpecificHandlerType(String hl7Body) throws HL7Exception
+	{
+		Parser p = new PipeParser();
+		p.setValidationContext(new NoValidation());
+		ORU_R01 msg = (ORU_R01) p.parse(hl7Body);
+
+		MSH messageHeaderSegment = msg.getMSH();
+		if(CLSHandler.headerTypeMatch(messageHeaderSegment))
+			return new CLSHandler();
+		if(CLSDIHandler.headerTypeMatch(messageHeaderSegment))
+			return new CLSDIHandler();
+		return null;
+	}
+	protected static boolean headerTypeMatch(MSH messageHeaderSegment)
+	{
+		return false;
+	}
 
 
     /**
@@ -60,7 +84,7 @@ public interface MessageHandler {
      *  - The replaceAll statement is necessary to ensure that the parser
      *  correctly reads the end of each line.
      */
-    public void init(String hl7Body) throws HL7Exception;
+    public abstract void init(String hl7Body) throws HL7Exception;
 
     /**
      *  Return the message type
@@ -69,13 +93,13 @@ public interface MessageHandler {
      *      ie/ message type = XXXX
      *          handler name = XXXXHandler
      */
-    public String getMsgType();
+    public abstract String getMsgType();
 
     /**
      *  Return the date and time of the message, usually located in the 7th
      *  field of the MSH segment
      */
-    public String getMsgDate();
+    public abstract String getMsgDate();
 
     /**
      *  A String containing a single letter represinting the priority
@@ -85,43 +109,43 @@ public interface MessageHandler {
      *  If there is no priority specified in the documentation for your message
      *  type then just return the empty string ""
      */
-    public String getMsgPriority();
+    public abstract String getMsgPriority();
 
     /**
      *  Return the number of OBR Segments in the message
      */
-    public int getOBRCount();
+    public abstract int getOBRCount();
 
     /**
      *  Return the number of OBX Segments within the OBR group specified by i.
      */
-    public int getOBXCount( int i);
+    public abstract int getOBXCount( int i);
 
     /**
      *  Return the name of the ith OBR Segment, usually stored in the
      *  UniversalServiceIdentifier
      */
-    public String getOBRName( int i);
+    public abstract String getOBRName( int i);
 
     /**
      *  Return the date and time of the observation refered to by the jth obx
      *  segment of the ith obr group. If the date and time is not specified
      *  within the obx segment it should be specified within the obr segment.
      */
-    public String getTimeStamp( int i, int j);
+    public abstract String getTimeStamp( int i, int j);
 
     /**
      *  Return true if an abnormal flag other than 'N' is returned by
      *  getOBXAbnormalFlag( i, j ) for the OBX segment specified by j, in the
      *  ith OBR group. Return false otherwise.
      */
-    public boolean isOBXAbnormal( int i, int j);
+    public abstract boolean isOBXAbnormal( int i, int j);
 
     /**
      *  Retrieve the abnormal flag if any from the OBX segment specified by j in
      *  the ith OBR group.
      */
-    public String getOBXAbnormalFlag( int i, int j);
+    public abstract String getOBXAbnormalFlag( int i, int j);
 
     /**
      *  Return the observation header which represents the observation stored in
@@ -129,14 +153,14 @@ public interface MessageHandler {
      *  OBR or OBX segment. It is used to separate the observations into groups.
      *  ie/ 'CHEMISTRY' 'HEMATOLOGY' '
      */
-    public String getObservationHeader( int i, int j);
+    public abstract String getObservationHeader( int i, int j);
 
     /**
      *  Return the identifier from jth OBX segment of the ith OBR group. It is
      *  usually stored in the first component of the third field of the OBX
      *  segment.
      */
-    public String getOBXIdentifier( int i, int j);
+    public abstract String getOBXIdentifier( int i, int j);
 
     /**
      * Return the obx value type
@@ -144,7 +168,7 @@ public interface MessageHandler {
      * @param j
      * @return String the obx value
      */
-    public String getOBXValueType(int i, int j);
+    public abstract String getOBXValueType(int i, int j);
 
 
     /**
@@ -152,55 +176,55 @@ public interface MessageHandler {
      *  usually stored in the second component of the third field of the OBX
      *  segment.
      */
-    public String getOBXName( int i, int j);
+    public abstract String getOBXName( int i, int j);
 
     /**
      *  Return the result from the jth OBX segment of the ith OBR group
      */
-    public String getOBXResult( int i, int j);
+    public abstract String getOBXResult( int i, int j);
 
     /**
      *  Return the reference range from the jth OBX segment of the ith OBR group
      */
-    public String getOBXReferenceRange( int i, int j);
+    public abstract String getOBXReferenceRange( int i, int j);
 
     /**
      *  Return the units from the jth OBX segment of the ith OBR group
      */
-    public String getOBXUnits( int i, int j);
+    public abstract String getOBXUnits( int i, int j);
 
     /**
      *  Return the result status from the jth OBX segment of the ith OBR group
      */
-    public String getOBXResultStatus( int i, int j);
+    public abstract String getOBXResultStatus( int i, int j);
 
     /**
      *  Return a list of all possible headers retrieved from getObservationHeader
      *  each header will only occur once in the list
      */
-    public ArrayList<String> getHeaders();
+    public abstract ArrayList<String> getHeaders();
 
     /**
      *  Return the number of comments (usually NTE segments) that follow ith
      *  OBR segment, this should usually be either 0 or 1.
      */
-    public int getOBRCommentCount( int i);
+    public abstract int getOBRCommentCount( int i);
 
     /**
      *  Return the jth comment of the ith OBR segment.
      */
-    public String getOBRComment( int i, int j);
+    public abstract String getOBRComment( int i, int j);
 
     /**
      *  Return the number of comments (usually NTE segments) following the jth
      *  OBX segment of the ith OBR group.
      */
-    public int getOBXCommentCount( int i, int j);
+    public abstract int getOBXCommentCount( int i, int j);
 
     /**
      *  Return the kth comment of the jth OBX segment of the ith OBR group
      */
-    public String getOBXComment( int i, int j, int k);
+    public abstract String getOBXComment( int i, int j, int k);
 
 
     /**
@@ -209,22 +233,22 @@ public interface MessageHandler {
      *  String firstName = getFirstName();
      *  String lastName = getLastName();
      */
-    public String getPatientName();
+    public abstract String getPatientName();
 
     /**
      *  Return the given name of the patient
      */
-    public String getFirstName();
+    public abstract String getFirstName();
 
     /**
      *  Return the family name of the patient
      */
-    public String getLastName();
+    public abstract String getLastName();
 
     /**
      *  Return the patients date of birth
      */
-    public String getDOB();
+    public abstract String getDOB();
 
 
     /**
@@ -234,51 +258,51 @@ public interface MessageHandler {
      *  Please see the other implementations of MessageHandler for an example of
      *  how this is done.
      */
-    public String getAge();
+    public abstract String getAge();
 
     /**
      *  Return the gender of the patient: 'M' or 'F'
      */
-    public String getSex();
+    public abstract String getSex();
 
     /**
      *  Return the patients health number
      */
-    public String getHealthNum();
+    public abstract String getHealthNum();
 
     /**
      *  Return the home phone number of the patient
      */
-    public String getHomePhone();
+    public abstract String getHomePhone();
 
     /**
      *  Return the work phone number of the patient
      */
-    public String getWorkPhone();
+    public abstract String getWorkPhone();
 
 
     /**
      *  Return the patients location, usually the facility from which the
      *  report has been sent ( the 4th field of the MSH segment )
      */
-    public String getPatientLocation();
+    public abstract String getPatientLocation();
 
 
     /**
      *  Return the service date of the message
      */
-    public String getServiceDate();
+    public abstract String getServiceDate();
 
     /**
      *  Return the request date of the message
      */
-    public String getRequestDate(int i);
+    public abstract String getRequestDate(int i);
 
     /**
      *  Return the status of the report, 'F' is returned for a final report,
      *  otherwise the report is partial
      */
-    public String getOrderStatus();
+    public abstract String getOrderStatus();
 
     /**
      *  Returns the number used to order labs with matching accession numbers.
@@ -294,51 +318,51 @@ public interface MessageHandler {
      *  number, the total number of obx segments with final results should be
      *  returned
      */
-    public int getOBXFinalResultCount();
+    public abstract int getOBXFinalResultCount();
 
     /**
      *  Return the clients reference number, usually corresponds to the doctor
      *  who requested the report or the requesting facility.
      */
-    public String getClientRef();
+    public abstract String getClientRef();
 
     /**
      *  Return the accession number
      */
-    public String getAccessionNum();
+    public abstract String getAccessionNum();
 
     /**
      *  Return the name of the doctor who requested the report, the name should
      *  be formatted as follows:
      *      'PREFIX' 'GIVEN NAME' 'MIDDLE INITIALS' 'FAMILY NAME' 'SUFFIX' 'DEGREE'
      */
-    public String getDocName();
+    public abstract String getDocName();
 
     /**
      *  Return the names of the doctors which the report should be copied to. The
      *  formatting of the names should be the same as in the method above. The
      *  names should be separated by a comma and a space.
      */
-    public String getCCDocs();
+    public abstract String getCCDocs();
 
     /**
      *  Return an ArrayList of the requesting doctors billing number and the
      *  billing numbers of the cc'd docs
      */
-    public ArrayList getDocNums();
+    public abstract ArrayList getDocNums();
 
     /**
      * Returns a string audit of the messages.  If not required handler should just return an empty string;
      */
-    public String audit();
+    public abstract String audit();
 
-    public String getFillerOrderNumber();
+    public abstract String getFillerOrderNumber();
 
-    public String getEncounterId();
+    public abstract String getEncounterId();
 
-    public String getRadiologistInfo();
+    public abstract String getRadiologistInfo();
 
-    public String getNteForOBX(int i,int j);
+    public abstract String getNteForOBX(int i,int j);
     
-    public String getNteForPID();
+    public abstract String getNteForPID();
 }

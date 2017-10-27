@@ -54,7 +54,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 
-public class CDLHandler implements MessageHandler {
+public class CDLHandler extends MessageHandler {
 
     ORU_R01 msg = null;
     Logger logger = Logger.getLogger(CDLHandler.class);

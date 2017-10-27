@@ -66,7 +66,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  *
  * @author wrighd
  */
-public class GDMLHandler implements MessageHandler {
+public class GDMLHandler extends MessageHandler {
 
     Logger logger = Logger.getLogger(GDMLHandler.class);
     ORU_R01 msg = null;

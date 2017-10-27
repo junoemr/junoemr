@@ -41,7 +41,7 @@ import ca.uhn.hl7v2.model.v26.message.REF_I12;
 import ca.uhn.hl7v2.model.v26.segment.MSH;
 import ca.uhn.hl7v2.model.v26.segment.PID;
 
-public final class OscarToOscarHl7V2Handler implements MessageHandler {
+public final class OscarToOscarHl7V2Handler extends MessageHandler {
 	private static Logger logger = MiscUtils.getLogger();
 	
 	private ChainnedMessageAdapter<? extends AbstractMessage> chainnedMessageAdapter;

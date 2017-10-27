@@ -37,7 +37,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
 /*
  * @author David Daley, Ithream
  */
-public class ICLHandler extends DefaultGenericHandler implements MessageHandler {
+public class ICLHandler extends DefaultGenericHandler {
 
     Logger logger = Logger.getLogger(ICLHandler.class);
     ORU_R01 msg = null;

@@ -38,7 +38,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
 
 
 
-public class PFHTHandler implements MessageHandler {
+public class PFHTHandler extends MessageHandler {
 
 	Logger logger = Logger.getLogger(PFHTHandler.class);
 

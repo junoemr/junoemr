@@ -89,10 +89,29 @@ public final class Factory {
 		return ret;
 	}
 
+	public static MessageHandler getHandler(String type, String hl7Body)
+	{
+		try{
+			// attempt to read the msh header and determine lab type handler
+			MessageHandler handler = MessageHandler.getSpecificHandlerType(hl7Body);
+			if(handler != null)
+			{
+				handler.init(hl7Body);
+				return handler;
+			}
+		}
+		catch(Exception e)
+		{
+			logger.error("Error Determining lab type by MSH header. ", e);
+		}
+		// default to the old method of handler selection
+		return getHandlerOld(type, hl7Body);
+	}
+
 	/*
 	 * Create and return the message handler corresponding to the message type
 	 */
-	public static MessageHandler getHandler(String type, String hl7Body) {
+	private static MessageHandler getHandlerOld(String type, String hl7Body) {
 		Document doc = null;
 		String msgType;
 		String msgHandler = "";

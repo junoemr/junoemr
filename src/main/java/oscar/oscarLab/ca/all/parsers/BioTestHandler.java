@@ -56,7 +56,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  *
  * @author wrighd
  */
-public class BioTestHandler implements MessageHandler {
+public class BioTestHandler extends MessageHandler {
 
     Logger logger = Logger.getLogger(BioTestHandler.class);
     ORU_R01 msg = null;

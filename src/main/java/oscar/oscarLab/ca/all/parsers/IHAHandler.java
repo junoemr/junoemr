@@ -44,7 +44,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 
-public class IHAHandler implements MessageHandler {
+public class IHAHandler extends MessageHandler {
     
     Logger logger = Logger.getLogger(IHAHandler.class);
     protected Message msg = null;

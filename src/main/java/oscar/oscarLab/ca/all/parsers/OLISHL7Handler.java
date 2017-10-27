@@ -57,7 +57,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
 /**
  * @author Adam Balanga
  */
-public class OLISHL7Handler implements MessageHandler {
+public class OLISHL7Handler extends MessageHandler {
 
 	Logger logger = Logger.getLogger(DefaultGenericHandler.class);
 	protected boolean isFinal = true;

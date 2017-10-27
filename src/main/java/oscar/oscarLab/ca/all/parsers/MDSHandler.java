@@ -53,7 +53,7 @@ import ca.uhn.hl7v2.HL7Exception;
  *
  * @author wrighd
  */
-public class MDSHandler implements MessageHandler {
+public class MDSHandler extends MessageHandler {
 
     Object msg = null;
     Object terser;

@@ -47,7 +47,7 @@ import ca.uhn.hl7v2.model.v26.segment.PID;
  * This class is loosely based on the MessageHandler interface. The purpose of this class is to provide an adapter for that interface with some minor changes like a default parsing and an init method that's a message instead of a string. The general
  * expectation is that all HL7 messages will include an MSH and a PID, if your message does not, then this class will be of little use to you.
  */
-public abstract class ChainnedMessageAdapter<T extends AbstractMessage> implements MessageHandler {
+public abstract class ChainnedMessageAdapter<T extends AbstractMessage> extends MessageHandler {
 	private static final Logger logger = MiscUtils.getLogger();
 
 	protected T hl7Message;

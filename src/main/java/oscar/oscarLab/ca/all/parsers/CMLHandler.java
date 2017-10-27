@@ -60,7 +60,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  *
  * @author wrighd
  */
-public class CMLHandler implements MessageHandler {
+public class CMLHandler extends MessageHandler {
 
     ORU_R01 msg = null;
     Logger logger = Logger.getLogger(CMLHandler.class);

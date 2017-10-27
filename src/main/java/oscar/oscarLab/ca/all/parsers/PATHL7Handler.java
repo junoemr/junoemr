@@ -59,7 +59,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  *
  * @author wrighd
  */
-public class PATHL7Handler implements MessageHandler {
+public class PATHL7Handler extends MessageHandler {
 
     Logger logger = Logger.getLogger(PATHL7Handler.class);
     ORU_R01 msg = null;

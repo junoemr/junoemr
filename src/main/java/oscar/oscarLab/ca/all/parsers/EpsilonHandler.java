@@ -39,7 +39,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 
-public class EpsilonHandler  extends CMLHandler implements MessageHandler {
+public class EpsilonHandler  extends CMLHandler {
 	private static Logger logger = MiscUtils.getLogger();
 	
 	@Override

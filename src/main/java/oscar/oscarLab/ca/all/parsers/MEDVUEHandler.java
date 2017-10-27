@@ -38,7 +38,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  *
  */
 
-public class MEDVUEHandler implements MessageHandler {
+public class MEDVUEHandler extends MessageHandler {
 
 	Logger logger = Logger.getLogger(MEDVUEHandler.class);
 	

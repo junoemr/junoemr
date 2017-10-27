@@ -57,7 +57,7 @@ import ca.uhn.hl7v2.HL7Exception;
  *
  * @author dritan
  */
-public class HRMXMLHandler implements MessageHandler {
+public class HRMXMLHandler extends MessageHandler {
 
 	private static Logger logger = MiscUtils.getLogger();
 

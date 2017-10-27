@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.apache.log4j.Logger;
 
 import oscar.util.ConversionUtils;
@@ -51,7 +52,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  * Dual message handler for both the manual and automated lab uploads in the Calgary Lab Service HL7 format.
  *
  */
-public class CLSHandler implements MessageHandler {
+public class CLSHandler extends MessageHandler {
 
 	private enum NameType {
 		FIRST, MIDDLE, LAST
@@ -63,6 +64,14 @@ public class CLSHandler implements MessageHandler {
 
 	protected Terser terser;
 
+	public static boolean headerTypeMatch(MSH messageHeaderSegment)
+	{
+		String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
+		String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
+
+		return "OPEN ENGINE".equalsIgnoreCase(sendingApplication) &&
+				"CLS".equalsIgnoreCase(sendingFacility);
+	}
 
 	public void init(String hl7Body) throws HL7Exception {
 		Parser p = new PipeParser();

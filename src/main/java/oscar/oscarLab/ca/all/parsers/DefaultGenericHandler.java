@@ -56,7 +56,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  *
  * @author wrighd
  */
-public class DefaultGenericHandler implements MessageHandler {
+public class DefaultGenericHandler extends MessageHandler {
 
     Logger logger = Logger.getLogger(DefaultGenericHandler.class);
 

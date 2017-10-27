@@ -45,7 +45,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 
-public class TRUENORTHHandler implements MessageHandler {
+public class TRUENORTHHandler extends MessageHandler {
     Logger logger = Logger.getLogger(TRUENORTHHandler.class);	
 	ORU_R01 msg = null;
     ArrayList<String> headers = null;

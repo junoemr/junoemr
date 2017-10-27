@@ -37,7 +37,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 
-public class AlphaHandler extends DefaultGenericHandler implements MessageHandler {
+public class AlphaHandler extends DefaultGenericHandler {
 
     Logger logger = Logger.getLogger(AlphaHandler.class);
     ca.uhn.hl7v2.model.v22.message.ORU_R01 msg22 = null;

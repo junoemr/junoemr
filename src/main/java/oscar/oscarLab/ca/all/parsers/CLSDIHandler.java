@@ -23,6 +23,7 @@
  */
 package oscar.oscarLab.ca.all.parsers;
 
+import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.apache.log4j.Logger;
 
 /**
@@ -31,9 +32,18 @@ import org.apache.log4j.Logger;
  *
  * @author Robert
  */
-public class CLSDIHandler extends CLSHandler implements MessageHandler {
+public class CLSDIHandler extends CLSHandler {
 
 	private static Logger logger = Logger.getLogger(CLSDIHandler.class);
+
+	public static boolean headerTypeMatch(MSH messageHeaderSegment)
+	{
+		String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
+		String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
+
+		return "OPEN ENGINE".equalsIgnoreCase(sendingApplication) &&
+				"DI".equalsIgnoreCase(sendingFacility);
+	}
 
 	public CLSDIHandler() {
 		super();

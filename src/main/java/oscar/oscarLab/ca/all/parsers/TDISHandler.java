@@ -55,7 +55,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  * 
  * @author dritan
  */
-public class TDISHandler implements MessageHandler {
+public class TDISHandler extends MessageHandler {
 
 	Logger logger = Logger.getLogger(TDISHandler.class);
 
