@@ -38,7 +38,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.apache.log4j.Logger;
 
@@ -635,26 +634,9 @@ public class DefaultGenericHandler extends MessageHandler {
         return (docName);
     }
 
-
-    protected String formatDateTime(String plain){
-    	if (plain==null || plain.trim().equals("")) return "";
-
-        String dateFormat = "yyyyMMddHHmmss";
-        dateFormat = dateFormat.substring(0, plain.length());
-        String stringFormat = "yyyy-MM-dd HH:mm:ss";
-        stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length()-1))+1);
-
-        Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-        return UtilDateUtilities.DateToString(date, stringFormat);
-    }
-
-    protected String getString(String retrieve){
-        if (retrieve != null){
-            retrieve.replaceAll("^", " ");
-            return(retrieve.trim().replaceAll("\\\\\\.br\\\\", "<br />"));
-        }else{
-            return("");
-        }
+    @Override
+    protected String getString(String retrieve) {
+        return super.getString(retrieve).replaceAll("\\\\\\.br\\\\", "<br />");
     }
 
  public String getFillerOrderNumber(){

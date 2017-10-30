@@ -235,7 +235,8 @@ public class EpsilonHandler  extends CMLHandler {
 		return getLastName() + "^" + getFirstName() + "^" + getMiddleName();
 	}
 
-	private String getMiddleName() {
+	@Override
+	public String getMiddleName() {
 		return (getString(msg.getRESPONSE().getPATIENT().getPID()
 				.getMotherSMaidenName().getMiddleInitialOrName().getValue()));
 	}

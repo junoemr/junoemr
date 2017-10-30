@@ -845,19 +845,7 @@ public class MDSHandler extends MessageHandler {
         return date;
     }
 
-    private String formatDateTime(String plain){
-    	if (plain==null || plain.trim().equals("")) return "";
-
-        String dateFormat = "yyyyMMddHHmmss";
-        dateFormat = dateFormat.substring(0, plain.length());
-        String stringFormat = "yyyy-MM-dd HH:mm:ss";
-        stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length()-1))+1);
-
-        Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-        return UtilDateUtilities.DateToString(date, stringFormat);
-    }
-
-    private String getString(String retrieve){
+    protected String getString(String retrieve){
         if (retrieve != null){
             retrieve.replaceAll("^", " ");
             return(retrieve.trim());

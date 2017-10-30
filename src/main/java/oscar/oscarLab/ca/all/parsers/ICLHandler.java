@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 
 import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
@@ -557,41 +556,9 @@ public class ICLHandler extends DefaultGenericHandler {
      *  END OF PUBLIC METHODS
      */
 
-
-    private String getFullDocName(XCN docSeg){
-        String docName = "";
-
-        if(docSeg.getPrefixEgDR().getValue() != null)
-            docName = docSeg.getPrefixEgDR().getValue();
-
-        if(docSeg.getGivenName().getValue() != null){
-            if (docName.equals("")){
-                docName = docSeg.getGivenName().getValue();
-            }else{
-                docName = docName +" "+ docSeg.getGivenName().getValue();
-            }
-        }
-        if(docSeg.getMiddleInitialOrName().getValue() != null)
-            docName = docName +" "+ docSeg.getMiddleInitialOrName().getValue();
-        if(docSeg.getFamilyName().getValue() != null)
-            docName = docName +" "+ docSeg.getFamilyName().getValue();
-        if(docSeg.getSuffixEgJRorIII().getValue() != null)
-            docName = docName +" "+ docSeg.getSuffixEgJRorIII().getValue();
-        if(docSeg.getDegreeEgMD().getValue() != null)
-            docName = docName +" "+ docSeg.getDegreeEgMD().getValue();
-
-        return (docName);
-    }
-
-
-
-
-    protected String getString(String retrieve){
-        if (retrieve != null){
-            return(retrieve.trim().replaceAll("\\\\\\.br\\\\", "<br />"));
-        }else{
-            return("");
-        }
+    @Override
+    protected String getString(String retrieve) {
+        return super.getString(retrieve).replaceAll("\\\\\\.br\\\\", "<br />");
     }
 
     public String getFillerOrderNumber(){

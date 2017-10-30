@@ -40,7 +40,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.apache.log4j.Logger;
 
@@ -48,7 +47,6 @@ import oscar.util.StringUtils;
 import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
-import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
@@ -543,69 +541,6 @@ public class CMLHandler extends MessageHandler {
 
     public String audit(){
         return "";
-    }
-
-
-    private String getFullDocName(XCN docSeg){
-        String docName = "";
-
-        if(docSeg.getPrefixEgDR().getValue() != null)
-            docName = docSeg.getPrefixEgDR().getValue();
-
-        if(docSeg.getGivenName().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getGivenName().getValue();
-            else
-                docName = docName +" "+ docSeg.getGivenName().getValue();
-        }
-        if(docSeg.getMiddleInitialOrName().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getMiddleInitialOrName().getValue();
-            else
-                docName = docName +" "+ docSeg.getMiddleInitialOrName().getValue();
-        }
-        if(docSeg.getFamilyName().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getFamilyName().getValue();
-            else
-                docName = docName +" "+ docSeg.getFamilyName().getValue();
-        }
-        if(docSeg.getSuffixEgJRorIII().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getSuffixEgJRorIII().getValue();
-            else
-                docName = docName +" "+ docSeg.getSuffixEgJRorIII().getValue();
-        }
-        if(docSeg.getDegreeEgMD().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getDegreeEgMD().getValue();
-            else
-                docName = docName +" "+ docSeg.getDegreeEgMD().getValue();
-        }
-
-        return (docName);
-    }
-
-
-    protected String formatDateTime(String plain){
-    	if (plain==null || plain.trim().equals("")) return "";
-
-        String dateFormat = "yyyyMMddHHmmss";
-        dateFormat = dateFormat.substring(0, plain.length());
-        String stringFormat = "yyyy-MM-dd HH:mm:ss";
-        stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length()-1))+1);
-
-        Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-        return UtilDateUtilities.DateToString(date, stringFormat);
-    }
-
-    protected String getString(String retrieve){
-        if (retrieve != null){
-            retrieve.replaceAll("^", " ");
-            return(retrieve.trim());
-        }else{
-            return("");
-        }
     }
 
     public String getFillerOrderNumber(){

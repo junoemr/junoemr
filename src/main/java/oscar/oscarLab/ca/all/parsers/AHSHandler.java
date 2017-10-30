@@ -25,296 +25,654 @@
 package oscar.oscarLab.ca.all.parsers;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Segment;
+import ca.uhn.hl7v2.model.v23.datatype.FT;
+import ca.uhn.hl7v2.model.v23.group.ORU_R01_ORDER_OBSERVATION;
+import ca.uhn.hl7v2.model.v23.message.ORU_R01;
+import ca.uhn.hl7v2.model.v23.segment.MSH;
+import ca.uhn.hl7v2.model.v23.segment.NTE;
+import ca.uhn.hl7v2.model.v23.segment.OBX;
+import ca.uhn.hl7v2.model.v23.segment.ORC;
+import ca.uhn.hl7v2.parser.Parser;
+import ca.uhn.hl7v2.parser.PipeParser;
+import ca.uhn.hl7v2.util.Terser;
+import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.log4j.Logger;
+import oscar.util.ConversionUtils;
+import oscar.util.UtilDateUtilities;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
-public class AHSHandler extends MessageHandler
+public abstract class AHSHandler extends MessageHandler
 {
-	@Override
-	public void init(String hl7Body) throws HL7Exception
-	{
+	private static Logger logger = Logger.getLogger(AHSHandler.class);
 
-	}
-
-	@Override
-	public String getMsgType()
+	public static AHSHandler getSpecificHandlerType(String hl7Body) throws HL7Exception
 	{
+		Parser p = new PipeParser();
+		p.setValidationContext(new NoValidation());
+		ORU_R01 msg = (ORU_R01) p.parse(hl7Body);
+
+		MSH messageHeaderSegment = msg.getMSH();
+		if(CLSHandler.headerTypeMatch(messageHeaderSegment))
+			return new CLSHandler();
+		if(CLSDIHandler.headerTypeMatch(messageHeaderSegment))
+			return new CLSDIHandler();
 		return null;
 	}
 
+	public void init(String hl7Body) throws HL7Exception {
+		Parser p = new PipeParser();
+		p.setValidationContext(new NoValidation());
+		msg = (ORU_R01) p.parse(hl7Body);
+		terser = new Terser(msg);
+	}
+
+	/**
+	 * This is the OBR date. The MessageHandler architecture uses this to store in hl7TextInfo.obr_date
+	 */
 	@Override
-	public String getMsgDate()
-	{
-		return null;
+	public String getMsgDate() {
+		try
+		{
+			return (formatDateTime(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue()));
+		}
+		catch (Exception e)
+		{
+			logger.error("Could not retrieve message date", e);
+			return ("");
+		}
 	}
 
 	@Override
-	public String getMsgPriority()
-	{
-		return null;
+	public String getMsgPriority() {
+		return ("");
 	}
 
 	@Override
-	public int getOBRCount()
-	{
-		return 0;
+	public int getOBRCount() {
+		return (msg.getRESPONSE().getORDER_OBSERVATIONReps());
+	}
+
+	public ORU_R01_ORDER_OBSERVATION getOBR(int i) throws HL7Exception {
+		return msg.getRESPONSE().getORDER_OBSERVATION(i);
+	}
+
+	public ORC getORC(int i) throws HL7Exception {
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getORC();
+	}
+
+	public OBX getOBX(int i, int ii) throws HL7Exception {
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(ii).getOBX();
+	}
+
+	public NTE getNTE(int i, int j, int k) throws HL7Exception {
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k);
+	}
+
+	public NTE getOBRNTE(int i, int j) throws HL7Exception {
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getNTE(j);
+	}
+
+	public void insertOBR(ORU_R01_ORDER_OBSERVATION newOBR) {
+		try {
+			msg.getRESPONSE().insertORDER_OBSERVATION(newOBR, getOBRCount());
+		} catch (HL7Exception e) {
+			logger.error("Error Adding OBR segment.", e);
+		}
 	}
 
 	@Override
-	public int getOBXCount(int i)
-	{
-		return 0;
+	public int getOBXCount(int i) {
+		try {
+			return (msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATIONReps());
+		} catch (Exception e) {
+			return (0);
+		}
 	}
 
 	@Override
-	public String getOBRName(int i)
-	{
-		return null;
+	public String getOBRName(int i) {
+		try {
+			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getUniversalServiceIdentifier().getText().getValue()));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public String getTimeStamp(int i, int j)
-	{
-		return null;
+	public String getTimeStamp(int i, int j) {
+		try {
+			return (formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue())));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public boolean isOBXAbnormal(int i, int j)
-	{
-		return false;
+	public boolean isOBXAbnormal(int i, int j) {
+		try {
+			return getOBXAbnormalFlag(i, j).equals("C") || getOBXAbnormalFlag(i, j).equals("H") || getOBXAbnormalFlag(i, j).equals("L") || getOBXAbnormalFlag(i, j).equals("A");
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	@Override
-	public String getOBXAbnormalFlag(int i, int j)
-	{
-		return null;
+	public String getOBXAbnormalFlag(int i, int j) {
+		try {
+			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getAbnormalFlags(0).getValue()));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public String getObservationHeader(int i, int j)
-	{
-		return null;
+	public String getObservationHeader(int i, int j) {
+		return getOBRName(i);
 	}
 
 	@Override
-	public String getOBXIdentifier(int i, int j)
-	{
-		return null;
+	public String getOBXIdentifier(int i, int j) {
+		try {
+			Segment obxSeg = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX();
+			String subIdent = Terser.get(obxSeg, 3, 0, 1, 2);
+			if (subIdent != null) { //HACK: for gdml labs generated with SubmitLabByFormAction
+				return getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue()) + "&" + subIdent;
+			}
+			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue()));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public String getOBXValueType(int i, int j)
-	{
-		return null;
+	public String getOBXValueType(int i, int j) {
+		try {
+			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getValueType().getValue()));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public String getOBXName(int i, int j)
-	{
-		return null;
+	public String getOBXName(int i, int j) {
+		try {
+			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getText().getValue()));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public String getOBXResult(int i, int j)
-	{
-		return null;
+	public String getOBXResult(int i, int j) {
+		try {
+			return (getString(Terser.get(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(), 5, 0, 1, 1)));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public String getOBXReferenceRange(int i, int j)
-	{
-		return null;
+	public String getOBXReferenceRange(int i, int j) {
+		try {
+			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getReferencesRange().getValue()));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public String getOBXUnits(int i, int j)
-	{
-		return null;
+	public String getOBXUnits(int i, int j) {
+		try {
+			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getUnits().getIdentifier().getValue()));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public String getOBXResultStatus(int i, int j)
-	{
-		return null;
+	public String getOBXResultStatus(int i, int j) {
+		String status = "";
+		try {
+			status = getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservResultStatus().getValue());
+			if (status.equalsIgnoreCase("C")) {
+				status = "Corrected";
+			} else if (status.equalsIgnoreCase("F")) {
+				status = "Final";
+			} else if (status.equalsIgnoreCase("P")) {
+				status = "Preliminary";
+			}
+			// TODO find out about "Cancelled" status
+		} catch (Exception e) {
+			logger.error("Error retrieving obx result status", e);
+			return status;
+		}
+		return status;
 	}
 
 	@Override
-	public ArrayList<String> getHeaders()
-	{
-		return null;
+	public int getOBXFinalResultCount() {
+		int obrCount = getOBRCount();
+		int obxCount;
+		int count = 0;
+		for (int i = 0; i < obrCount; i++) {
+			obxCount = getOBXCount(i);
+			for (int j = 0; j < obxCount; j++) {
+				if (getOBXResultStatus(i, j).equals("Final") ||
+						getOBXResultStatus(i, j).equals("Corrected"))
+				{
+					count++;
+				}
+			}
+		}
+		return count;
+	}
+
+	/**
+	 *  Retrieve the possible segment headers from the OBX fields
+	 */
+	@Override
+	public ArrayList<String> getHeaders() {
+		ArrayList<String> headers = new ArrayList<String>();
+		for (int i = 0; i < getOBRCount(); i++) {
+			String obrName = getOBRName(i);
+			if (!headers.contains(obrName)) {
+				headers.add(obrName);
+			}
+		}
+		return headers;
+	}
+
+	/**
+	 *  Methods to get information from observation notes
+	 */
+	@Override
+	public int getOBRCommentCount(int i) {
+		// OBR comments are not provided - comments are provided in NTE segment following OBX segment
+		int count = 0;
+		try {
+			count = msg.getRESPONSE().getORDER_OBSERVATION(i).getNTEReps();
+		} catch(Exception e) {
+			return 0;
+		}
+
+		return count;
 	}
 
 	@Override
-	public int getOBRCommentCount(int i)
-	{
-		return 0;
+	public String getOBRComment(int i, int j) {
+		try {
+			FT[] tmp = msg.getRESPONSE().getORDER_OBSERVATION(i).getNTE(j).getComment();
+			StringBuilder comment = new StringBuilder();
+			for(FT t:tmp) {
+				comment.append(t.getValue());
+			}
+			return comment.toString();
+		} catch (Exception e) {
+			return ("");
+		}
+	}
+
+	/**
+	 *  Methods to get information from observation notes
+	 */
+	@Override
+	public int getOBXCommentCount(int i, int j) {
+		int count = 0;
+		try {
+			count = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTEReps();
+
+			// a bug in getNTEReps() causes it to return 1 instead of 0 so we check to make
+			// sure there actually is a comment there
+			if (count == 1) {
+				String comment = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE().getComment(0).getValue();
+				if (comment == null) count = 0;
+			}
+
+		} catch (Exception e) {
+			logger.error("Error retrieving obx comment count", e);
+		}
+		return count;
 	}
 
 	@Override
-	public String getOBRComment(int i, int j)
-	{
-		return null;
+	public String getOBXComment(int i, int j, int k) {
+		try {
+			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k).getComment(0).getValue()));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public int getOBXCommentCount(int i, int j)
-	{
-		return 0;
+	public String getPatientName() {
+		return (getFirstName() + " " + getLastName());
 	}
 
 	@Override
-	public String getOBXComment(int i, int j, int k)
-	{
-		return null;
+	public String getDOB() {
+		try {
+			return (formatDateTime(getString(msg.getRESPONSE().getPATIENT().getPID().getDateOfBirth().getTimeOfAnEvent().getValue())));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public String getPatientName()
-	{
-		return null;
+	public String getAge() {
+		String age = "N/A";
+		String dob = getDOB();
+		try {
+			// Some examples
+			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date date = formatter.parse(dob);
+			age = UtilDateUtilities.calcAge(date);
+		} catch (ParseException e) {
+			logger.error("Could not get age", e);
+
+		}
+		return age;
 	}
 
 	@Override
-	public String getFirstName()
-	{
-		return null;
+	public String getSex() {
+		return (getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue()));
 	}
 
 	@Override
-	public String getLastName()
-	{
-		return null;
+	public String getHealthNum() {
+		return get("/.PID-2-1");
 	}
 
 	@Override
-	public String getDOB()
-	{
-		return null;
+	public String getHomePhone() {
+		String phone = "";
+		int i = 0;
+		try {
+			while (!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue()).equals("")) {
+				if (i == 0) {
+					phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
+				}
+				else {
+					phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
+				}
+				i++;
+			}
+			return (phone);
+		}
+		catch (Exception e) {
+			logger.error("Could not return home phone number", e);
+
+			return ("");
+		}
 	}
 
 	@Override
-	public String getAge()
-	{
-		return null;
+	public String getWorkPhone() {
+		String phone = "";
+		int i = 0;
+		try {
+			while (!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue()).equals("")) {
+				if (i == 0) {
+					phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
+				}
+				else {
+					phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
+				}
+				i++;
+			}
+			return (phone);
+		}
+		catch (Exception e) {
+			logger.error("Could not return work phone number", e);
+
+			return ("");
+		}
 	}
 
 	@Override
-	public String getSex()
-	{
-		return null;
+	public String getPatientLocation() {
+		return (getString(msg.getMSH().getSendingFacility().getNamespaceID().getValue()));
 	}
 
 	@Override
-	public String getHealthNum()
-	{
-		return null;
+	public String getServiceDate() {
+		try {
+			String serviceDate = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getOrderEffectiveDateTime().getTimeOfAnEvent().getValue());
+			if (serviceDate == null || serviceDate.isEmpty()) {
+				serviceDate = get("/.OBR-14");
+			}
+			return (formatDateTime(serviceDate));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public String getHomePhone()
-	{
-		return null;
+	public String getRequestDate(int i) {
+		try {
+			return (formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getRequestedDateTime().getTimeOfAnEvent().getValue())));
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	@Override
-	public String getWorkPhone()
-	{
-		return null;
+	public String getOrderStatus(){
+		try{
+			// of ORC is present - return it
+			String orderStatus = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getOrderStatus().getValue());
+			if (orderStatus != null && !orderStatus.isEmpty()) {
+				return orderStatus;
+			}
+			// otherwise get first OBR status
+			return get("/.OBR-25-1");
+		}catch(Exception e){
+			return("");
+		}
 	}
 
 	@Override
-	public String getPatientLocation()
-	{
-		return null;
+	public String getClientRef() {
+		String docNum = "";
+		int i = 0;
+		try {
+			while (!getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue()).equals("")) {
+				if (i == 0) {
+					docNum = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue());
+				} else {
+					docNum = docNum + ", " + getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue());
+				}
+				i++;
+			}
+			return (docNum);
+		} catch (Exception e) {
+			logger.error("Could not return doctor id numbers", e);
+			return ("");
+		}
 	}
 
 	@Override
-	public String getServiceDate()
-	{
-		return null;
+	public String getDocName() {
+		String docName = "";
+		int i = 0;
+		try {
+			while (!getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i)).equals("")) {
+				if (i == 0) {
+					docName = getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i));
+				} else {
+					docName = docName + ", " + getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i));
+				}
+				i++;
+			}
+			return (docName);
+		} catch (Exception e) {
+			logger.error("Could not return doctor names", e);
+			return ("");
+		}
 	}
 
 	@Override
-	public String getRequestDate(int i)
-	{
-		return null;
+	public String getCCDocs() {
+		String docName = "";
+		int i = 0;
+		try {
+			while (!getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i)).equals("")) {
+				if (i == 0) {
+					docName = getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i));
+				} else {
+					docName = docName + ", " + getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i));
+				}
+				i++;
+			}
+			return (docName);
+		} catch (Exception e) {
+			logger.error("Could not return cc'ed doctors", e);
+			return ("");
+		}
 	}
 
 	@Override
-	public String getOrderStatus()
-	{
-		return null;
+	public ArrayList<String> getDocNums() {
+		ArrayList<String> docNums = new ArrayList<String>();
+		String id;
+		int i;
+
+		try {
+			String providerId = msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(0).getIDNumber().getValue();
+			docNums.add(providerId);
+
+			i = 0;
+			while ((id = msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i).getIDNumber().getValue()) != null) {
+				if (!id.equals(providerId)) docNums.add(id);
+				i++;
+			}
+		} catch (Exception e) {
+			logger.error("Could not return doctor nums", e);
+
+		}
+
+		return (docNums);
 	}
 
 	@Override
-	public int getOBXFinalResultCount()
-	{
-		return 0;
+	public String audit() {
+		return "";
 	}
 
 	@Override
-	public String getClientRef()
-	{
-		return null;
+	protected String getString(String retrieve) {
+		return super.getString(retrieve).replaceAll("\\\\\\.br\\\\", "<br />");
 	}
 
 	@Override
-	public String getAccessionNum()
-	{
-		return null;
+	public String getFillerOrderNumber() {
+		// this is different from the filler order number in ORC
+		return get("/.OBR-3-1");
 	}
 
 	@Override
-	public String getDocName()
-	{
-		return null;
+	public String getEncounterId() {
+		return "";
 	}
 
 	@Override
-	public String getCCDocs()
-	{
-		return null;
+	public String getRadiologistInfo() {
+		return "";
 	}
 
 	@Override
-	public ArrayList getDocNums()
-	{
-		return null;
+	public String getNteForOBX(int i, int j) {
+		return "";
+	}
+
+	public String getAssigningAuthority() {
+		return get("/.PID-2-4");
+	}
+
+	protected String get(String path) {
+		try {
+			return terser.get(path);
+		} catch (HL7Exception e) {
+			logger.warn("Unable to get field at " + path, e);
+			return null;
+		}
+	}
+
+	/**
+	 * Gets the ordering provider name.
+	 *
+	 * @return
+	 * 		Returns the provider name or an empty string if it's not specified
+	 */
+	public String getOrderingProvider() {
+		return get("/.OBR-16-2");
+	}
+
+	/**
+	 * Gets the ordering provider ID for matching provider with the correct inbox routing.
+	 *
+	 * @return
+	 * 		Returns the provider id or an empty string if it's not specified
+	 */
+	public String getOrderingProviderId() {
+		return get("/.OBR-16-1");
+	}
+
+	/**
+	 * Gets the date and time the specimen was collected
+	 *
+	 * @param i
+	 * 		Segment count
+	 * @return
+	 * 		Returns the date / time of the specimen collection or null if it's not available.
+	 */
+	public String getOBRDateTime(int i) {
+		return get("/.OBR-7-1");
+	}
+
+	/**
+	 * Gets the date and time the specimen was collected
+	 *
+	 * @param i
+	 * 		Segment count
+	 * @return
+	 * 		Returns the date / time of the specimen collection or null if it's not available.
+	 */
+	public Date getOBRDateTimeAsDate(int i) {
+		// 20101203122200
+		String date = getOBRDateTime(i);
+		if (date == null || date.equals("")) {
+			return null;
+		}
+		return ConversionUtils.fromDateString(date, "yyyyMMddHHmmss");
 	}
 
 	@Override
-	public String audit()
-	{
-		return null;
+	public String getAccessionNum() {
+		return get("/.OBR-20");
+	}
+
+	////this.isUnstructuredDoc = "TX".equals(handler.getOBXValueType(0,0));
+	public boolean isUnstructured() {
+		boolean result=true;
+		for(int j = 0; j<this.getOBRCount();j++) {
+			for(int k=0;k<this.getOBXCount(j);k++) {
+				if(!"TX".equals(getOBXValueType(j, k))) {
+					result=false;
+				}
+			}
+		}
+		return result;
 	}
 
 	@Override
-	public String getFillerOrderNumber()
-	{
-		return null;
-	}
-
-	@Override
-	public String getEncounterId()
-	{
-		return null;
-	}
-
-	@Override
-	public String getRadiologistInfo()
-	{
-		return null;
-	}
-
-	@Override
-	public String getNteForOBX(int i, int j)
-	{
-		return null;
-	}
-
-	@Override
-	public String getNteForPID()
-	{
-		return null;
+	public String getNteForPID() {
+		return "";
 	}
 }

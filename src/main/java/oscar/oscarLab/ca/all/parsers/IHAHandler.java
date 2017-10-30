@@ -29,7 +29,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
@@ -1152,24 +1151,10 @@ public class IHAHandler extends MessageHandler {
         
         return (docName);
     }
-    
-    
-    private String formatDateTime(String plain){
-        String dateFormat = "yyyyMMddHHmmss";
-        dateFormat = dateFormat.substring(0, plain.length());
-        String stringFormat = "yyyy-MM-dd HH:mm:ss";
-        stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length()-1))+1);
-        
-        Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-        return UtilDateUtilities.DateToString(date, stringFormat);
-    }
-    
-    private String getString(String retrieve){
-        if (retrieve != null){
-            return(retrieve.trim().replaceAll("\\\\\\.br\\\\", "<br />"));
-        }else{
-            return("");
-        }
+
+    @Override
+    protected String getString(String retrieve) {
+        return super.getString(retrieve).replaceAll("\\\\\\.br\\\\", "<br />");
     }
     
     public String getFillerOrderNumber(){

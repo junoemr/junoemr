@@ -25,14 +25,20 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
-import ca.uhn.hl7v2.parser.Parser;
-import ca.uhn.hl7v2.parser.PipeParser;
-import ca.uhn.hl7v2.validation.impl.NoValidation;
+import ca.uhn.hl7v2.util.Terser;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import oscar.util.UtilDateUtilities;
 
 /**
  *  When implementing this class a global variable 'msg' should be created as
@@ -50,10 +56,15 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  */
 public abstract class MessageHandler {
 
+	private static Logger logger = Logger.getLogger(AHSHandler.class);
+
+	protected ORU_R01 msg;
+	protected Terser terser;
+
 
 	public static MessageHandler getSpecificHandlerType(String hl7Body) throws HL7Exception
 	{
-		Parser p = new PipeParser();
+		/*Parser p = new PipeParser();
 		p.setValidationContext(new NoValidation());
 		ORU_R01 msg = (ORU_R01) p.parse(hl7Body);
 
@@ -62,13 +73,38 @@ public abstract class MessageHandler {
 			return new CLSHandler();
 		if(CLSDIHandler.headerTypeMatch(messageHeaderSegment))
 			return new CLSDIHandler();
-		return null;
+		return null;*/
+
+		// TODO for now this only works with AHS type labs, eventually this method could handle them all
+		return AHSHandler.getSpecificHandlerType(hl7Body);
 	}
+
+	/**
+	 * @param messageHeaderSegment hl7 MSH header
+	 * @return true if the header segment belongs to this lab parser. false otherwise
+	 */
+	@SuppressWarnings("unused")
 	protected static boolean headerTypeMatch(MSH messageHeaderSegment)
 	{
 		return false;
 	}
 
+	/**
+	 * default constructor. init must be called after instantiation.
+	 */
+	public MessageHandler()
+	{
+	}
+
+	/**
+	 * constructor which also calls init
+	 * @param hl7Body - hl7 formatted string
+	 * @throws HL7Exception if init fails
+	 */
+	public MessageHandler(String hl7Body) throws HL7Exception
+	{
+		init(hl7Body);
+	}
 
     /**
      *  Initialize the 'msg' object and any other global variables that may be
@@ -86,6 +122,8 @@ public abstract class MessageHandler {
      */
     public abstract void init(String hl7Body) throws HL7Exception;
 
+
+    /* ===================================== MSH ====================================== */
     /**
      *  Return the message type
      *  - The message type returned should be the same as the prefix of your
@@ -99,7 +137,10 @@ public abstract class MessageHandler {
      *  Return the date and time of the message, usually located in the 7th
      *  field of the MSH segment
      */
-    public abstract String getMsgDate();
+    public String getMsgDate()
+    {
+	    return formatDateTime(getString(msg.getMSH().getDateTimeOfMessage().getTimeOfAnEvent().getValue()));
+    }
 
     /**
      *  A String containing a single letter represinting the priority
@@ -109,7 +150,171 @@ public abstract class MessageHandler {
      *  If there is no priority specified in the documentation for your message
      *  type then just return the empty string ""
      */
-    public abstract String getMsgPriority();
+    public String getMsgPriority()
+    {
+    	return "";
+    }
+
+	/**
+	 *  Return the patients location, usually the facility from which the
+	 *  report has been sent ( the 4th field of the MSH segment )
+	 */
+	public String getPatientLocation()
+	{
+		return getString(msg.getMSH().getSendingFacility().getNamespaceID().getValue());
+	}
+
+    /* ===================================== PID ====================================== */
+
+	/**
+	 *  Return the name of the patient. The format should be the first name
+	 *  followed by the last name while being separated by a space.
+	 *  String firstName = getFirstName();
+	 *  String lastName = getLastName();
+	 */
+	public String getPatientName()
+	{
+		return(getFirstName()+" "+getMiddleName()+" "+getLastName());
+	}
+
+	/**
+	 *  Return the given name of the patient
+	 */
+	public String getFirstName()
+	{
+		return getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue());
+	}
+
+	/**
+	 * Return the middle name of the patient
+	 */
+	public String getMiddleName()
+	{
+		return getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getXpn3_MiddleInitialOrName().getValue());
+	}
+
+	/**
+	 * Return the family name of the patient
+	 */
+	public String getLastName()
+	{
+		return getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getFamilyName().getValue());
+	}
+
+	/**
+	 *  Return the patients date of birth
+	 */
+	public String getDOB()
+	{
+		try{
+			return(formatDateTime(getString(msg.getRESPONSE().getPATIENT().getPID().getDateOfBirth().getTimeOfAnEvent().getValue())).substring(0, 10));
+		}catch(Exception e){
+			return("");
+		}
+	}
+
+
+	/**
+	 *  Return the age of the patient (this is not specified in the message but
+	 *  can be calculated using the patients date of birth)
+	 */
+	public String getAge()
+	{
+		String age = "N/A";
+		String dob = getDOB();
+		try
+		{
+			// Some examples
+			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date date = formatter.parse(dob);
+			age = UtilDateUtilities.calcAge(date);
+		}
+		catch(ParseException e)
+		{
+			logger.error("Could not get age", e);
+		}
+		return age;
+	}
+
+	/**
+	 *  Return the gender of the patient: 'M' or 'F'
+	 */
+	public String getSex()
+	{
+		return (getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue()));
+	}
+
+	/**
+	 *  Return the patients health number
+	 */
+	public String getHealthNum()
+	{
+		return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDExternalID().getID().getValue()));
+	}
+
+	/**
+	 *  Return the home phone number of the patient
+	 */
+	public String getHomePhone()
+	{
+		String phone = "";
+		int i = 0;
+		try
+		{
+			while (!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue()).equals(""))
+			{
+				if (i == 0)
+				{
+					phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
+				}
+				else
+				{
+					phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
+				}
+				i++;
+			}
+			return (phone);
+		}
+		catch (Exception e)
+		{
+			logger.error("Could not return phone number", e);
+
+			return ("");
+		}
+	}
+	/**
+	 *  Return the work phone number of the patient
+	 */
+	public String getWorkPhone()
+	{
+		String phone = "";
+		int i = 0;
+		try
+		{
+			while (!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue()).equals(""))
+			{
+				if (i == 0)
+				{
+					phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
+				}
+				else
+				{
+					phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
+				}
+				i++;
+			}
+			return (phone);
+		}
+		catch (Exception e)
+		{
+			logger.error("Could not return phone number", e);
+
+			return ("");
+		}
+	}
+
+
+	/* ===================================== OBR ====================================== */
 
     /**
      *  Return the number of OBR Segments in the message
@@ -133,6 +338,8 @@ public abstract class MessageHandler {
      *  within the obx segment it should be specified within the obr segment.
      */
     public abstract String getTimeStamp( int i, int j);
+
+    /* ===================================== OBX ====================================== */
 
     /**
      *  Return true if an abnormal flag other than 'N' is returned by
@@ -160,7 +367,17 @@ public abstract class MessageHandler {
      *  usually stored in the first component of the third field of the OBX
      *  segment.
      */
-    public abstract String getOBXIdentifier( int i, int j);
+    public String getOBXIdentifier(int i, int j)
+    {
+	    try
+	    {
+		    return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue()));
+	    }
+	    catch(Exception e)
+	    {
+		    return ("");
+	    }
+    }
 
     /**
      * Return the obx value type
@@ -168,7 +385,17 @@ public abstract class MessageHandler {
      * @param j
      * @return String the obx value
      */
-    public abstract String getOBXValueType(int i, int j);
+	public String getOBXValueType(int i, int j)
+	{
+		try
+		{
+		    return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getValueType().getValue()));
+		}
+		catch(Exception e)
+		{
+		    return ("");
+		}
+	}
 
 
     /**
@@ -176,12 +403,32 @@ public abstract class MessageHandler {
      *  usually stored in the second component of the third field of the OBX
      *  segment.
      */
-    public abstract String getOBXName( int i, int j);
+    public String getOBXName( int i, int j)
+    {
+	    try
+	    {
+		    return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getText().getValue()));
+	    }
+	    catch(Exception e)
+	    {
+		    return ("");
+	    }
+    }
 
     /**
      *  Return the result from the jth OBX segment of the ith OBR group
      */
-    public abstract String getOBXResult( int i, int j);
+    public String getOBXResult(int i, int j)
+    {
+	    try
+	    {
+		    return (getString(Terser.get(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(), 5, 0, 1, 1)));
+	    }
+	    catch(Exception e)
+	    {
+		    return ("");
+	    }
+    }
 
     /**
      *  Return the reference range from the jth OBX segment of the ith OBR group
@@ -227,65 +474,7 @@ public abstract class MessageHandler {
     public abstract String getOBXComment( int i, int j, int k);
 
 
-    /**
-     *  Return the name of the patient. The format should be the first name
-     *  followed by the last name while being separated by a space.
-     *  String firstName = getFirstName();
-     *  String lastName = getLastName();
-     */
-    public abstract String getPatientName();
-
-    /**
-     *  Return the given name of the patient
-     */
-    public abstract String getFirstName();
-
-    /**
-     *  Return the family name of the patient
-     */
-    public abstract String getLastName();
-
-    /**
-     *  Return the patients date of birth
-     */
-    public abstract String getDOB();
-
-
-    /**
-     *  Return the age of the patient (this is not specified in the message but
-     *  can be calculated using the patients date of birth)
-     *
-     *  Please see the other implementations of MessageHandler for an example of
-     *  how this is done.
-     */
-    public abstract String getAge();
-
-    /**
-     *  Return the gender of the patient: 'M' or 'F'
-     */
-    public abstract String getSex();
-
-    /**
-     *  Return the patients health number
-     */
-    public abstract String getHealthNum();
-
-    /**
-     *  Return the home phone number of the patient
-     */
-    public abstract String getHomePhone();
-
-    /**
-     *  Return the work phone number of the patient
-     */
-    public abstract String getWorkPhone();
-
-
-    /**
-     *  Return the patients location, usually the facility from which the
-     *  report has been sent ( the 4th field of the MSH segment )
-     */
-    public abstract String getPatientLocation();
+	/* ===================================== MISC ====================================== */
 
 
     /**
@@ -354,7 +543,10 @@ public abstract class MessageHandler {
     /**
      * Returns a string audit of the messages.  If not required handler should just return an empty string;
      */
-    public abstract String audit();
+    public String audit()
+    {
+    	return "";
+    }
 
     public abstract String getFillerOrderNumber();
 
@@ -365,4 +557,84 @@ public abstract class MessageHandler {
     public abstract String getNteForOBX(int i,int j);
     
     public abstract String getNteForPID();
+
+	/* ================================== Extra Methods and helpers ==================================== */
+
+	protected String formatDateTime(String plain)
+	{
+		if (plain == null || plain.trim().equals("")) return "";
+
+		String dateFormat = "yyyyMMddHHmmss";
+		dateFormat = dateFormat.substring(0, plain.length());
+		String stringFormat = "yyyy-MM-dd HH:mm:ss";
+		stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length() - 1)) + 1);
+
+		Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
+		return UtilDateUtilities.DateToString(date, stringFormat);
+	}
+
+	protected String getString(String retrieve)
+	{
+		return StringUtils.trimToEmpty(retrieve);
+	}
+
+	protected String getFullDocName(XCN docSeg) {
+		String docName = "";
+
+		if (docSeg.getPrefixEgDR().getValue() != null) docName = docSeg.getPrefixEgDR().getValue();
+
+		if (docSeg.getGivenName().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getGivenName().getValue();
+			else docName = docName + " " + docSeg.getGivenName().getValue();
+		}
+		if (docSeg.getMiddleInitialOrName().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getMiddleInitialOrName().getValue();
+			else docName = docName + " " + docSeg.getMiddleInitialOrName().getValue();
+		}
+		if (docSeg.getFamilyName().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getFamilyName().getValue();
+			else docName = docName + " " + docSeg.getFamilyName().getValue();
+		}
+		if (docSeg.getSuffixEgJRorIII().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getSuffixEgJRorIII().getValue();
+			else docName = docName + " " + docSeg.getSuffixEgJRorIII().getValue();
+		}
+		if (docSeg.getDegreeEgMD().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getDegreeEgMD().getValue();
+			else docName = docName + " " + docSeg.getDegreeEgMD().getValue();
+		}
+
+		return (docName);
+	}
+
+	protected String getFullDocNameV25(ca.uhn.hl7v2.model.v25.datatype.XCN xcn) {
+		String docName = "";
+
+		if (xcn.getPrefixEgDR().getValue() != null) docName = xcn.getPrefixEgDR().getValue();
+
+		if (xcn.getGivenName().getValue() != null) {
+			if (docName.equals("")) docName = xcn.getGivenName().getValue();
+			else docName = docName + " " + xcn.getGivenName().getValue();
+
+		}
+		if (xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue() != null) {
+			if (docName.equals("")) docName = xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue();
+			else docName = docName + " " + xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue();
+		}
+		if (xcn.getFamilyName().getSurname().getValue() != null) {
+			if (docName.equals("")) docName = xcn.getFamilyName().getSurname().getValue();
+			else docName = docName + " " + xcn.getFamilyName().getSurname().getValue();
+
+		}
+		if (xcn.getSuffixEgJRorIII().getValue() != null) {
+			if (docName.equals("")) docName = xcn.getSuffixEgJRorIII().getValue();
+			else docName = docName + " " + xcn.getSuffixEgJRorIII().getValue();
+		}
+		if (xcn.getDegreeEgMD().getValue() != null) {
+			if (docName.equals("")) docName = xcn.getDegreeEgMD().getValue();
+			else docName = docName + " " + xcn.getDegreeEgMD().getValue();
+		}
+
+		return docName;
+	}
 }

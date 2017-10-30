@@ -37,7 +37,6 @@ import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.v23.datatype.FT;
-import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.group.ORU_R01_ORDER_OBSERVATION;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.NTE;
@@ -52,17 +51,12 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  * Dual message handler for both the manual and automated lab uploads in the Calgary Lab Service HL7 format.
  *
  */
-public class CLSHandler extends MessageHandler {
+public class CLSHandler extends AHSHandler {
 
 	private enum NameType {
 		FIRST, MIDDLE, LAST
 	}
-
 	private static Logger logger = Logger.getLogger(CLSHandler.class);
-
-	protected ORU_R01 msg;
-
-	protected Terser terser;
 
 	public static boolean headerTypeMatch(MSH messageHeaderSegment)
 	{
@@ -593,56 +587,6 @@ public class CLSHandler extends MessageHandler {
 
 	public String audit() {
 		return "";
-	}
-
-	private String getFullDocName(XCN docSeg) {
-		String docName = "";
-
-		if (docSeg.getPrefixEgDR().getValue() != null) docName = docSeg.getPrefixEgDR().getValue();
-
-		if (docSeg.getGivenName().getValue() != null) {
-			if (docName.equals("")) docName = docSeg.getGivenName().getValue();
-			else docName = docName + " " + docSeg.getGivenName().getValue();
-		}
-		if (docSeg.getMiddleInitialOrName().getValue() != null) {
-			if (docName.equals("")) docName = docSeg.getMiddleInitialOrName().getValue();
-			else docName = docName + " " + docSeg.getMiddleInitialOrName().getValue();
-		}
-		if (docSeg.getFamilyName().getValue() != null) {
-			if (docName.equals("")) docName = docSeg.getFamilyName().getValue();
-			else docName = docName + " " + docSeg.getFamilyName().getValue();
-		}
-		if (docSeg.getSuffixEgJRorIII().getValue() != null) {
-			if (docName.equals("")) docName = docSeg.getSuffixEgJRorIII().getValue();
-			else docName = docName + " " + docSeg.getSuffixEgJRorIII().getValue();
-		}
-		if (docSeg.getDegreeEgMD().getValue() != null) {
-			if (docName.equals("")) docName = docSeg.getDegreeEgMD().getValue();
-			else docName = docName + " " + docSeg.getDegreeEgMD().getValue();
-		}
-
-		return (docName);
-	}
-
-	protected String formatDateTime(String plain) {
-		if (plain == null || plain.trim().equals("")) return "";
-
-		String dateFormat = "yyyyMMddHHmmss";
-		dateFormat = dateFormat.substring(0, plain.length());
-		String stringFormat = "yyyy-MM-dd HH:mm:ss";
-		stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length() - 1)) + 1);
-
-		Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-		return UtilDateUtilities.DateToString(date, stringFormat);
-	}
-
-	protected String getString(String retrieve) {
-		if (retrieve != null) {
-			retrieve.replaceAll("^", " ");
-			return (retrieve.trim().replaceAll("\\\\\\.br\\\\", "<br />"));
-		} else {
-			return ("");
-		}
 	}
 
 	public String getFillerOrderNumber() {

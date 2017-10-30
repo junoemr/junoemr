@@ -41,14 +41,14 @@ public class AHSHandler implements MessageHandler {
 	public String parse(LoggedInInfo loggedInInfo, String serviceName,
 	                    String fileName, int fileId, String ipAddr) throws Exception {
 
-		oscar.oscarLab.ca.all.parsers.AHSHandler AHSParser = new oscar.oscarLab.ca.all.parsers.AHSHandler();
-
 		Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 
 		ArrayList<String> messages = Utilities.separateMessages(fileName);
-		for (int i = 0; i < messages.size(); i++)
+		for (String msg : messages)
 		{
-			String msg = messages.get(i);
+			oscar.oscarLab.ca.all.parsers.AHSHandler AHSParser = oscar.oscarLab.ca.all.parsers.AHSHandler.getSpecificHandlerType(msg);
+			if(AHSParser == null)
+				throw new Exception("No Parser available for lab");
 
 			AHSParser.init(msg);
 			String accessionNumber = AHSParser.getAccessionNum();
