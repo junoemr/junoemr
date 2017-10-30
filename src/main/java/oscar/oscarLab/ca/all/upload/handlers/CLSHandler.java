@@ -42,6 +42,10 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v23.segment.OBR;
 import ca.uhn.hl7v2.model.v23.segment.ORC;
 
+/**
+ * @deprecated - use the AHS Handler
+ */
+@Deprecated
 public class CLSHandler implements MessageHandler {
 
 	private Logger logger = Logger.getLogger(CLSHandler.class);
@@ -49,7 +53,9 @@ public class CLSHandler implements MessageHandler {
 	public String parse(LoggedInInfo loggedInInfo, String serviceName,
 						String fileName, int fileId, String ipAddr) throws Exception {
 
-        oscar.oscarLab.ca.all.parsers.CLSHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler();
+		logger.warn("DEPRECATED LAB PARSER IN USE (CLS). USE AHS INSTEAD");
+
+		oscar.oscarLab.ca.all.parsers.CLSHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler();
         
         Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
 		ArrayList<String> messages = Utilities.separateMessages(fileName);

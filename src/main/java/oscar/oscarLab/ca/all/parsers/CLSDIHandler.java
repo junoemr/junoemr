@@ -23,8 +23,13 @@
  */
 package oscar.oscarLab.ca.all.parsers;
 
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.util.SpringUtils;
 
 /**
  * Handler for:
@@ -35,6 +40,8 @@ import org.apache.log4j.Logger;
 public class CLSDIHandler extends CLSHandler {
 
 	private static Logger logger = Logger.getLogger(CLSDIHandler.class);
+
+	private static Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 
 	public static boolean headerTypeMatch(MSH messageHeaderSegment)
 	{
@@ -48,6 +55,41 @@ public class CLSDIHandler extends CLSHandler {
 	public CLSDIHandler() {
 		super();
 	}
+	public CLSDIHandler(ORU_R01 msg) throws HL7Exception
+	{
+		super(msg);
+	}
+
+
+	/**
+	 * This is where duplicates can be checked, merged, or rejected based on each lab's specifications before the lab is routed
+	 */
+	@Override
+	public String preUpload(String hl7Message) {
+		return hl7Message;
+	}
+	/**
+	 * This method should determine if the lab can be routed
+	 * @return true if the lab can be routed, false otherwise
+	 */
+	@Override
+	public boolean canUpload()
+	{
+		String accessionNumber = this.getAccessionNum();
+		Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(accessionNumber);
+
+		// if the report exists the new version must be a correction
+		return (hl7TextInfo == null || this.getOrderStatus().equals("C"));
+	}
+
+	/**
+	 * This gets run after the lab is routed
+	 */
+	@Override
+	public void postUpload() {}
+
+
+    /* ===================================== Hl7 Parsing ====================================== */
 
 	public String getMsgType() {
 		return "CLSDI";
@@ -98,7 +140,6 @@ public class CLSDIHandler extends CLSHandler {
 	public String getFillerOrderNumber() {
 		/* CLS-DI switches accession number and order number positions */
 		return get("/.OBR-20");
-
 	}
 
 	@Override

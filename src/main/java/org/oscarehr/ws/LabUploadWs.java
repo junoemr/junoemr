@@ -51,19 +51,18 @@ import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 @GZIP(threshold=AbstractWs.GZIP_THRESHOLD)
 public class LabUploadWs extends AbstractWs {
 
+	private static final String LAB_TYPE_AHS = "AHS"; //all Alberta labs
 	private static final String LAB_TYPE_CML = "CML";
 	private static final String LAB_TYPE_LIFELABS = "MDS";
 	private static final String LAB_TYPE_EXCELLERIS = "PATHL7";
 	private static final String LAB_TYPE_IHA = "IHA";
 	private static final String LAB_TYPE_GAMMADYNACARE = "GDML";
 	private static final String LAB_TYPE_CDL = "CDL";
-	private static final String LAB_TYPE_CLS = "CLS";
-    private static final String LAB_TYPE_CLSDI = "CLSDI";
     private static final String LAB_TYPE_EPSILON_MHL = "EPSILON";
 
     private static final Logger logger=MiscUtils.getLogger();
 
-    public String uploadCLS(
+    public String uploadAHS(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
             @WebParam(name="oscar_provider_no") String oscarProviderNo
@@ -72,7 +71,7 @@ public class LabUploadWs extends AbstractWs {
         String returnMessage, audit;
 
         try {
-            audit = importLab(fileName, contents, LAB_TYPE_CLS, oscarProviderNo);
+            audit = importLab(fileName, contents, LAB_TYPE_AHS, oscarProviderNo);
 
         } catch(Exception e)
         {
@@ -85,27 +84,30 @@ public class LabUploadWs extends AbstractWs {
         returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
         return returnMessage;
     }
+
+	/**
+	 * use uploadAHS instead. This method redirects to uploadAHS
+	 */
+    @Deprecated
+	public String uploadCLS(
+			@WebParam(name="file_name") String fileName,
+			@WebParam(name="contents") String contents,
+			@WebParam(name="oscar_provider_no") String oscarProviderNo
+	)
+	{
+    	return uploadAHS(fileName, contents, oscarProviderNo);
+	}
+	/**
+	 * use uploadAHS instead. This method redirects to uploadAHS
+	 */
+	@Deprecated
 	public String uploadCLSDI(
 			@WebParam(name="file_name") String fileName,
 			@WebParam(name="contents") String contents,
 			@WebParam(name="oscar_provider_no") String oscarProviderNo
 	)
 	{
-		String returnMessage, audit;
-
-		try {
-			audit = importLab(fileName, contents, LAB_TYPE_CLSDI, oscarProviderNo);
-
-		} catch(Exception e)
-		{
-			logger.error(e.getMessage());
-			returnMessage = "{\"success\":0,\"message\":\"" +
-					e.getMessage() + "\", \"audit\":\"\"}";
-			return returnMessage;
-		}
-
-		returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
-		return returnMessage;
+		return uploadAHS(fileName, contents, oscarProviderNo);
 	}
 
     public String uploadCML(

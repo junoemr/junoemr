@@ -29,7 +29,6 @@ import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.v23.datatype.FT;
 import ca.uhn.hl7v2.model.v23.group.ORU_R01_ORDER_OBSERVATION;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
-import ca.uhn.hl7v2.model.v23.segment.MSH;
 import ca.uhn.hl7v2.model.v23.segment.NTE;
 import ca.uhn.hl7v2.model.v23.segment.OBX;
 import ca.uhn.hl7v2.model.v23.segment.ORC;
@@ -51,25 +50,22 @@ public abstract class AHSHandler extends MessageHandler
 {
 	private static Logger logger = Logger.getLogger(AHSHandler.class);
 
-	public static AHSHandler getSpecificHandlerType(String hl7Body) throws HL7Exception
+	public AHSHandler() {}
+	public AHSHandler(String hl7Body) throws HL7Exception
 	{
-		Parser p = new PipeParser();
-		p.setValidationContext(new NoValidation());
-		ORU_R01 msg = (ORU_R01) p.parse(hl7Body);
-
-		MSH messageHeaderSegment = msg.getMSH();
-		if(CLSHandler.headerTypeMatch(messageHeaderSegment))
-			return new CLSHandler();
-		if(CLSDIHandler.headerTypeMatch(messageHeaderSegment))
-			return new CLSDIHandler();
-		return null;
+		init(hl7Body);
+	}
+	public AHSHandler(ORU_R01 msg) throws HL7Exception
+	{
+		this.msg = msg;
+		this.terser = new Terser(msg);
 	}
 
 	public void init(String hl7Body) throws HL7Exception {
 		Parser p = new PipeParser();
 		p.setValidationContext(new NoValidation());
-		msg = (ORU_R01) p.parse(hl7Body);
-		terser = new Terser(msg);
+		this.msg = (ORU_R01) p.parse(hl7Body);
+		this.terser = new Terser(msg);
 	}
 
 	/**
@@ -86,6 +82,11 @@ public abstract class AHSHandler extends MessageHandler
 			logger.error("Could not retrieve message date", e);
 			return ("");
 		}
+	}
+	@Override
+	public String getMsgType()
+	{
+		return "AHS";
 	}
 
 	@Override

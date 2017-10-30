@@ -38,6 +38,12 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v23.message.ORU_R01;
+import ca.uhn.hl7v2.model.v23.segment.MSH;
+import ca.uhn.hl7v2.parser.Parser;
+import ca.uhn.hl7v2.parser.PipeParser;
+import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -93,10 +99,9 @@ public final class Factory {
 	{
 		try{
 			// attempt to read the msh header and determine lab type handler
-			MessageHandler handler = MessageHandler.getSpecificHandlerType(hl7Body);
+			MessageHandler handler = getSpecificHandlerType(hl7Body);
 			if(handler != null)
 			{
-				handler.init(hl7Body);
 				return handler;
 			}
 		}
@@ -106,6 +111,22 @@ public final class Factory {
 		}
 		// default to the old method of handler selection
 		return getHandlerOld(type, hl7Body);
+	}
+
+	private static MessageHandler getSpecificHandlerType(String hl7Body) throws HL7Exception
+	{
+		Parser p = new PipeParser();
+		p.setValidationContext(new NoValidation());
+		ORU_R01 msg = (ORU_R01) p.parse(hl7Body);
+
+		MSH messageHeaderSegment = msg.getMSH();
+		if(CLSHandler.headerTypeMatch(messageHeaderSegment))
+			return new CLSHandler(msg);
+		if(CLSDIHandler.headerTypeMatch(messageHeaderSegment))
+			return new CLSDIHandler(msg);
+		if(AHSSunquestHandler.headerTypeMatch(messageHeaderSegment))
+			return new AHSSunquestHandler(msg);
+		return null;
 	}
 
 	/*

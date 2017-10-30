@@ -38,6 +38,10 @@ import java.util.ArrayList;
  * Calgary Lab Services Diagnostic Imaging
  * @author Robert
  */
+/**
+ * @deprecated - use the AHS Handler
+ */
+@Deprecated
 public class CLSDIHandler extends CLSHandler implements MessageHandler {
 
 	private static Logger logger = Logger.getLogger(CLSDIHandler.class);
@@ -48,6 +52,8 @@ public class CLSDIHandler extends CLSHandler implements MessageHandler {
 
 	@Override
 	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr) throws Exception {
+
+		logger.warn("DEPRECATED LAB PARSER IN USE (CLSDI). USE AHS INSTEAD");
 
 		oscar.oscarLab.ca.all.parsers.CLSDIHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSDIHandler();
 

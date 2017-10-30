@@ -42,7 +42,11 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
+import oscar.util.UtilDateUtilities;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -110,6 +114,21 @@ public class PATHL7Handler extends MessageHandler {
             return("");
         }
     }
+	public String getAge(){
+		String age = "N/A";
+		String dob = getDOB();
+		String service = getServiceDate();
+		try {
+			// Some examples
+			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date birthDate = formatter.parse(dob);
+			java.util.Date serviceDate = formatter.parse(service);
+			age = UtilDateUtilities.calcAgeAtDate(birthDate, serviceDate);
+		} catch (ParseException e) {
+			logger.error("Could not get age", e);
+		}
+		return age;
+	}
 
     public String getSex(){
         return(getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue()));

@@ -26,10 +26,8 @@
 package oscar.oscarLab.ca.all.upload.handlers;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.Hl7TextInfoDao;
-import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.upload.MessageUploader;
 import oscar.oscarLab.ca.all.util.Utilities;
 
@@ -41,27 +39,26 @@ public class AHSHandler implements MessageHandler {
 	public String parse(LoggedInInfo loggedInInfo, String serviceName,
 	                    String fileName, int fileId, String ipAddr) throws Exception {
 
-		Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
-
 		ArrayList<String> messages = Utilities.separateMessages(fileName);
 		for (String msg : messages)
 		{
-			oscar.oscarLab.ca.all.parsers.AHSHandler AHSParser = oscar.oscarLab.ca.all.parsers.AHSHandler.getSpecificHandlerType(msg);
-			if(AHSParser == null)
+			oscar.oscarLab.ca.all.parsers.MessageHandler parser = Factory.getHandler("AHS", msg);
+			if(parser == null)
 				throw new Exception("No Parser available for lab");
 
-			AHSParser.init(msg);
-			String accessionNumber = AHSParser.getAccessionNum();
-			Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(accessionNumber);
+			// allow each lab type to make modifications to the hl7 if needed.
+			// This is for special cases only most labs return an identical string to the input parameter
+			msg = parser.preUpload(msg);
 
-			// if the report exists the new version must be a correction
-			if (hl7TextInfo == null || AHSParser.getOrderStatus().equals("C"))
+			// check if the lab has passed validation and can be saved
+			if(parser.canUpload())
 			{
-				MessageUploader.routeReport(loggedInInfo, serviceName, "CLSDI", msg, fileId);
+				MessageUploader.routeReport(loggedInInfo, serviceName, parser.getMsgType(), msg, fileId);
+				parser.postUpload();
 			}
 			else
 			{
-				logger.warn("Report Already Uploaded. Status: " + AHSParser.getOrderStatus());
+				logger.warn("Hl7 Report Could Not be Uploaded");
 			}
 		}
 		return ("success");

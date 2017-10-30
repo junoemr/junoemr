@@ -23,29 +23,35 @@
  */
 package oscar.oscarLab.ca.all.parsers;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
-import ca.uhn.hl7v2.model.v23.segment.MSH;
-import org.apache.log4j.Logger;
-
-import oscar.util.ConversionUtils;
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.v23.datatype.FT;
 import ca.uhn.hl7v2.model.v23.group.ORU_R01_ORDER_OBSERVATION;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
+import ca.uhn.hl7v2.model.v23.segment.MSH;
 import ca.uhn.hl7v2.model.v23.segment.NTE;
+import ca.uhn.hl7v2.model.v23.segment.OBR;
 import ca.uhn.hl7v2.model.v23.segment.OBX;
 import ca.uhn.hl7v2.model.v23.segment.ORC;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.OscarAuditLogger;
+import org.oscarehr.util.SpringUtils;
+import oscar.util.ConversionUtils;
+import oscar.util.UtilDateUtilities;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Dual message handler for both the manual and automated lab uploads in the Calgary Lab Service HL7 format.
@@ -67,6 +73,16 @@ public class CLSHandler extends AHSHandler {
 				"CLS".equalsIgnoreCase(sendingFacility);
 	}
 
+
+
+	public CLSHandler()
+	{
+		super();
+	}
+	public CLSHandler(ORU_R01 msg) throws HL7Exception
+	{
+		super(msg);
+	}
 	public void init(String hl7Body) throws HL7Exception {
 		Parser p = new PipeParser();
 		p.setValidationContext(new NoValidation());
@@ -692,4 +708,162 @@ public class CLSHandler extends AHSHandler {
     public String getNteForPID() {
 	    return "";
     }
+
+
+
+    @Override
+    public String preUpload(String hl7Message) throws Exception
+    {
+	    Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
+
+	    String accessionNumber = this.getAccessionNum();
+	    String fillerOrderNumber = this.getFillerOrderNumber();
+	    Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNumberOrFillerNumber(
+			    accessionNumber, fillerOrderNumber);
+
+	    // Glucose labs come back with different accession numbers, but the same filler number.
+	    // We are going to replace any successive accession numbers with the originals as
+	    // suggested in the CLS conformance documentation
+	    if(hl7TextInfo != null && hl7TextInfo.getFillerOrderNum().equals(fillerOrderNumber) &&
+			    !hl7TextInfo.getAccessionNumber().equals(accessionNumber)) {
+
+		    hl7Message = this.ReplaceAccessionNumber(hl7Message, accessionNumber, hl7TextInfo.getAccessionNumber());
+	    }
+
+	    if(hl7TextInfo != null) {
+		    String lastVersionLab = oscar.oscarLab.ca.all.parsers.Factory.getHL7Body(Integer.toString(hl7TextInfo.getLabNumber()));
+		    hl7Message = mergeLabs(lastVersionLab, hl7Message);
+	    }
+	    return hl7Message;
+    }
+    @Override
+    public boolean canUpload()
+    {
+    	return true;
+    }
+	private String mergeLabs(String oldVersion, String newVersion) throws HL7Exception
+	{
+		String lineDelimiter = "\r";
+		String outLabString = newVersion;
+		StringBuilder test = new StringBuilder(newVersion);
+
+		oscar.oscarLab.ca.all.parsers.CLSHandler oldVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler();
+		oldVersionCLSParser.init(oldVersion);
+		oscar.oscarLab.ca.all.parsers.CLSHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler();
+		newVersionCLSParser.init(newVersion);
+
+		int currentObrCount = newVersionCLSParser.getOBRCount();
+
+		// Get all OBRs from the old version that don't exist in the new version
+		// and append them to the current version
+		ArrayList<OBR> oldObrs = this.getObrs(oldVersionCLSParser);
+		int obrIndex = 0;
+		for(OBR oldObr : oldObrs)
+		{
+			String fillerNumber = this.getObrFillerNumber(oldObr);
+			if(!this.obrExists(fillerNumber, newVersionCLSParser))
+			{
+				currentObrCount++;
+				// Remove the old OBR index so we can add the new one
+				String tempObr = oldObr.encode();
+				tempObr = tempObr.substring(tempObr.indexOf('|') + 1);
+				tempObr = tempObr.substring(tempObr.indexOf('|') + 1);
+
+				// Set the OBR index
+				outLabString += lineDelimiter + "OBR|" + Integer.toString(currentObrCount) + "|" + tempObr;
+
+				// Get OBR NTE records
+				int obrNteCount = oldVersionCLSParser.getOBRCommentCount(obrIndex);
+				for(int obrNteIndex = 0; obrNteIndex < obrNteCount; obrNteIndex++) {
+					outLabString += lineDelimiter + oldVersionCLSParser.getOBRNTE(obrIndex, obrNteIndex).encode();
+				}
+
+				// Get Previous version OBX records
+				int obxCount = oldVersionCLSParser.getOBXCount(obrIndex);
+				for(int obxIndex = 0; obxIndex < obxCount; obxIndex++) {
+					outLabString += lineDelimiter + oldVersionCLSParser.getOBX(obrIndex, obxIndex).encode();
+
+					// Get Previous version OBX NTE records
+					int nteCount = oldVersionCLSParser.getOBXCommentCount(obrIndex, obxIndex);
+					for(int nteIndex = 0; nteIndex < nteCount; nteIndex++) {
+						outLabString += lineDelimiter + oldVersionCLSParser.getNTE(obrIndex, obxIndex, nteIndex).encode();
+					}
+				}
+
+				// Get Previous version ORC record if one exists
+				ORC orc = oldVersionCLSParser.getORC(obrIndex);
+				if(orc != null && orc.encode().length() > 5) {
+					test.append(outLabString += lineDelimiter + orc.encode());
+				}
+			}
+			obrIndex++;
+		}
+		return outLabString;
+	}
+
+	private boolean obrExists(String fillerNumber, oscar.oscarLab.ca.all.parsers.CLSHandler parser)
+			throws HL7Exception
+	{
+		ArrayList<OBR> searchObrs = this.getObrs(parser);
+		for(OBR searchObr : searchObrs) {
+			if(this.getObrFillerNumber(searchObr).equals(fillerNumber)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private ArrayList<OBR> getObrs( oscar.oscarLab.ca.all.parsers.CLSHandler parser)
+			throws HL7Exception
+	{
+		ArrayList<OBR> outOBR = new ArrayList<OBR>();
+		for(int obrIndex = 0; obrIndex < parser.getOBRCount(); obrIndex++) {
+			OBR newObr = parser.getOBR(obrIndex).getOBR();
+			outOBR.add(newObr);
+		}
+		return outOBR;
+	}
+
+	private String getObrFillerNumber(OBR obr)
+	{
+		return obr.getFillerOrderNumber().getEi1_EntityIdentifier().getValue() + "^" +
+				obr.getFillerOrderNumber().getEi2_NamespaceID().getValue();
+	}
+
+	private String ReplaceAccessionNumber(String message, String oldAccessionNumber, String newAccessionNumber)
+	{
+		message = message.replace(oldAccessionNumber, newAccessionNumber);
+		return message;
+	}
+
+	private boolean isDuplicate(LoggedInInfo loggedInInfo, String msg) {
+		Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
+		//OLIS requirements - need to see if this is a duplicate
+		oscar.oscarLab.ca.all.parsers.MessageHandler h = Factory.getHandler("CLS", msg);
+		//if final
+		if(h.getOrderStatus().equals("CM")) {
+			String acc = h.getAccessionNum().substring(3);
+			//do we have this?
+			List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(acc);
+			for(Hl7TextInfo dupResult:dupResults) {
+				if(("CLS"+dupResult.getAccessionNumber()).equals(acc)) {
+					//if(h.getHealthNum().equals(dupResult.getHealthNumber())) {
+					OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate lab skipped - accession " + acc + "\n" + msg);
+					return true;
+					//}
+
+				}
+				if(dupResult.getAccessionNumber().indexOf("-")!= -1) {
+					if(dupResult.getAccessionNumber().substring(0,dupResult.getAccessionNumber().indexOf("-")).equals(acc) ) {
+						//olis match
+						//if(h.getHealthNum().equals(dupResult.getHealthNumber())) {
+						OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate lab skipped - accession " + acc + "\n" + msg);
+						return true;
+						//}
+					}
+				}
+			}
+		}
+		return false;
+	}
 }

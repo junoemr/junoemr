@@ -61,23 +61,32 @@ public abstract class MessageHandler {
 	protected ORU_R01 msg;
 	protected Terser terser;
 
-
-	public static MessageHandler getSpecificHandlerType(String hl7Body) throws HL7Exception
-	{
-		/*Parser p = new PipeParser();
-		p.setValidationContext(new NoValidation());
-		ORU_R01 msg = (ORU_R01) p.parse(hl7Body);
-
-		MSH messageHeaderSegment = msg.getMSH();
-		if(CLSHandler.headerTypeMatch(messageHeaderSegment))
-			return new CLSHandler();
-		if(CLSDIHandler.headerTypeMatch(messageHeaderSegment))
-			return new CLSDIHandler();
-		return null;*/
-
-		// TODO for now this only works with AHS type labs, eventually this method could handle them all
-		return AHSHandler.getSpecificHandlerType(hl7Body);
+	/**
+	 * This method is run before labs are uploaded/saved to the database
+	 * This is where duplicates can be checked, merged, or rejected based on each lab's specifications before the lab is routed
+	 * @param hl7Message - the hl7 string for the message
+	 * @return - the same hl7 message as the parameter with any required modifications
+	 */
+	public String preUpload(String hl7Message) throws Exception {
+		return hl7Message;
 	}
+	/**
+	 * This method should determine if the lab can be routed
+	 * @return true if the lab can be routed, false otherwise
+	 */
+	public boolean canUpload()
+	{
+		return false;
+	}
+
+	/**
+	 * This gets run after the lab is routed
+	 */
+	public void postUpload() {}
+
+
+    /* ===================================== Hl7 Parsing ====================================== */
+
 
 	/**
 	 * @param messageHeaderSegment hl7 MSH header
