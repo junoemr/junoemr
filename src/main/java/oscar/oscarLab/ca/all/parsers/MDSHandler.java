@@ -34,20 +34,17 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
+import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
 import org.oscarehr.util.MiscUtils;
-
 import oscar.util.UtilDateUtilities;
-import ca.uhn.hl7v2.HL7Exception;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  *
@@ -523,21 +520,6 @@ public class MDSHandler extends MessageHandler {
         }
     }
 
-    public String getAge(){
-        String age = "N/A";
-        String dob = getDOB();
-        try {
-            // Some examples
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date date = formatter.parse(dob);
-            age = UtilDateUtilities.calcAge(date);
-        } catch (ParseException e) {
-            logger.error("Could not get age", e);
-
-        }
-        return age;
-    }
-
     public String getSex(){
         try{
             return(getString(DynamicHapiLoaderUtils.terserGet(terser,"/.PID-8-1")));
@@ -568,6 +550,7 @@ public class MDSHandler extends MessageHandler {
         }
     }
 
+    @Override
     public String getHomePhone(){
         try{
             return(getString(DynamicHapiLoaderUtils.terserGet(terser,"/.PID-13-1")));
@@ -576,6 +559,7 @@ public class MDSHandler extends MessageHandler {
         }
     }
 
+    @Override
     public String getWorkPhone(){
         return("N/A");
     }

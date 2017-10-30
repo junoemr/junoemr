@@ -9,22 +9,6 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.Hl7TextInfoDao;
-import org.oscarehr.common.model.Hl7TextMessageInfo;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
@@ -34,15 +18,24 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.model.Hl7TextMessageInfo;
+import org.oscarehr.util.SpringUtils;
+import oscar.util.UtilDateUtilities;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 
 
 public class PFHTHandler extends MessageHandler {
 
 	Logger logger = Logger.getLogger(PFHTHandler.class);
-
-	private ORU_R01 msg = null;
-	//private MDM_R01 mdmMsg = null;
 
 	private ArrayList<String> headers = null;
 	private HashMap<OBR, ArrayList<OBX>> obrSegMap = null;
@@ -513,67 +506,12 @@ public class PFHTHandler extends MessageHandler {
 	        }
 	    }
 
-	    public String getAge(){
-	        String age = "N/A";
-	        String dob = getDOB();
-	        try {
-	            // Some examples
-	            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-	            java.util.Date date = formatter.parse(dob);
-	            age = UtilDateUtilities.calcAge(date);
-	        } catch (ParseException e) {
-	            logger.error("Could not get age", e);
-
-	        }
-	        return age;
-	    }
-
 	    public String getSex(){
 	        return(getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue()));
 	    }
 
 	    public String getHealthNum(){
 	        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDExternalID().getID().getValue()));
-	    }
-
-	    public String getHomePhone(){
-	        String phone = "";
-	        int i=0;
-	        try{
-	            while(!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue()).equals("")){
-	                if (i==0){
-	                    phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
-	                }else{
-	                    phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
-	                }
-	                i++;
-	            }
-	            return(phone);
-	        }catch(Exception e){
-	            logger.error("Could not return phone number", e);
-
-	            return("");
-	        }
-	    }
-
-	    public String getWorkPhone(){
-	        String phone = "";
-	        int i=0;
-	        try{
-	            while(!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue()).equals("")){
-	                if (i==0){
-	                    phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
-	                }else{
-	                    phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
-	                }
-	                i++;
-	            }
-	            return(phone);
-	        }catch(Exception e){
-	            logger.error("Could not return phone number", e);
-
-	            return("");
-	        }
 	    }
 
 	    public String getPatientLocation(){
@@ -590,20 +528,6 @@ public class PFHTHandler extends MessageHandler {
 	    }
 
 	    public String getOrderStatus(){
-	    	/*try{
-	            String status = "F";
-	            int obrCount = msg.getRESPONSE().getORDER_OBSERVATIONReps();
-
-	            for (int i=0; i < obrCount; i++){
-	                if (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getResultStatus().getValue()).equals("P"))
-	                    status = "P";
-	            }
-
-	            return(status);
-	        }catch(Exception e){
-	            logger.error("Exception retrieving order status", e);
-	            return("");
-	        }*/
 	    	return ("F"); //PFHT result status is Transcribed, Auth(Verified) so just return F
 	    }
 

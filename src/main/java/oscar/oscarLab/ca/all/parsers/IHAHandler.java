@@ -25,15 +25,6 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
-
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
@@ -42,6 +33,10 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
+
+import java.util.ArrayList;
 
 public class IHAHandler extends MessageHandler {
     
@@ -117,16 +112,6 @@ public class IHAHandler extends MessageHandler {
      *  MSH METHODS
      */
     
-    /*@Override
-      public String getMsgDate(){
-        //try {
-        return(formatDateTime(getString(msg.getMSH().getDateTimeOfMessage().getTimeOfAnEvent().getValue())));
-        //return(formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue())));
-        //} catch (HL7Exception ex) {
-        //    return ("");
-        //}
-    }*/
-    
     @Override
     public String getMsgDate(){
         
@@ -145,25 +130,6 @@ public class IHAHandler extends MessageHandler {
     public String getPatientName(){
         return(getFirstName()+" "+getLastName());
     }
-    
-/*    @Override
-    public String getFirstName(){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()));
-    }
-    
-    @Override
-    public String getLastName(){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getFamilyName().getValue()));
-    }
-    
-    @Override
-    public String getDOB(){
-        try{
-            return(formatDateTime(getString(msg.getRESPONSE().getPATIENT().getPID().getDateOfBirth().getTimeOfAnEvent().getValue())).substring(0, 10));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
     
     @Override
     public String getFirstName(){
@@ -190,74 +156,6 @@ public class IHAHandler extends MessageHandler {
         }
     }
 
-    @Override
-    public String getAge(){
-        String age = "N/A";
-        String dob = getDOB();
-        try {
-            // Some examples
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date date = formatter.parse(dob);
-            age = UtilDateUtilities.calcAge(date);
-        } catch (ParseException e) {
-            logger.error("Could not get age", e);
-            
-        }
-        return age;
-    }
-    
-/*    @Override
-    public String getSex(){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue()));
-    }
-    
-    @Override
-    public String getHealthNum(){
-    	//IHA POI uses the alternatePatientID to store PHN
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getAlternatePatientID().getID().getValue()));
-    }
-    
-    @Override
-    public String getHomePhone(){
-        String phone = null;
-        int i=0;
-        try{
-            while(!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue()).equals("")){
-                if (i==0){
-                    phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
-                }else{
-                    phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
-                }
-                i++;
-            }
-            return(phone);
-        }catch(Exception e){
-            logger.error("Could not return phone number", e);
-            
-            return("");
-        }
-    }
-    
-    @Override
-    public String getWorkPhone(){
-        String phone = null;
-        int i=0;
-        try{
-            while(!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue()).equals("")){
-                if (i==0){
-                    phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
-                }else{
-                    phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
-                }
-                i++;
-            }
-            return(phone);
-        }catch(Exception e){
-            logger.error("Could not return phone number", e);
-            
-            return("");
-        }
-    }*/
     
     @Override
     public String getSex(){
@@ -273,26 +171,9 @@ public class IHAHandler extends MessageHandler {
         String healthNum;
         
         try{
-            
-            //Try finding the health number in the external ID
-            /*healthNum = getString(terser.get("/.PID-2-1"));
-            if (healthNum.length() == 10)
-                return(healthNum);*/
-            
-            //Try finding the health number in the alternate patient ID
             healthNum = getString(terser.get("/.PID-4-1"));
             if (healthNum.length() == 10)
                 return(healthNum);
-            
-            //Try finding the health number in the internal ID
-            /*healthNum = getString(terser.get("/.PID-3-1"));
-            if (healthNum.length() == 10)
-                return(healthNum);
-            
-            //Try finding the health number in the SSN field
-            healthNum = getString(terser.get("/.PID-19-1"));
-            if (healthNum.length() == 10)
-                return(healthNum);*/
         }catch(Exception e){
             //ignore exceptions
         }

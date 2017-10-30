@@ -32,17 +32,6 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import org.apache.log4j.Logger;
-
-import oscar.oscarLab.ca.all.spireHapiExt.v23.message.ORU_R01;
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.v23.datatype.CN;
@@ -52,6 +41,12 @@ import ca.uhn.hl7v2.parser.ModelClassFactory;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.log4j.Logger;
+import oscar.oscarLab.ca.all.spireHapiExt.v23.message.ORU_R01;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 class Lines {
 	private String message = "";
@@ -709,21 +704,6 @@ public class SpireHandler extends MessageHandler {
         }
     }
     
-    public String getAge(){
-        String age = "N/A";
-        String dob = getDOB();
-        try {
-            // Some examples
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date date = formatter.parse(dob);
-            age = UtilDateUtilities.calcAge(date);
-        } catch (ParseException e) {
-            logger.error("Could not get age", e);
-            
-        }
-        return age;
-    }
-    
     public String getSex(){
 		String sex = getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue());
 		
@@ -741,7 +721,8 @@ public class SpireHandler extends MessageHandler {
         
         return hin;
     }
-    
+
+    @Override
     public String getHomePhone(){
         String phone = "";
         int i=0;
@@ -760,7 +741,8 @@ public class SpireHandler extends MessageHandler {
             return("");
         }
     }
-    
+
+    @Override
     public String getWorkPhone(){
         String phone = "";
         int i=0;

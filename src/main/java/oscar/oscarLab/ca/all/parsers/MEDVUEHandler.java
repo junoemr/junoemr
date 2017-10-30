@@ -10,20 +10,6 @@
 package oscar.oscarLab.ca.all.parsers;
 
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.Hl7TextInfoDao;
-import org.oscarehr.common.model.Hl7TextMessageInfo;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v23.segment.OBR;
 import ca.uhn.hl7v2.model.v23.segment.OBX;
@@ -31,6 +17,16 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.model.Hl7TextMessageInfo;
+import org.oscarehr.util.SpringUtils;
+import oscar.util.UtilDateUtilities;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * MEDVUE  Radiology report parser 
@@ -41,8 +37,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
 public class MEDVUEHandler extends MessageHandler {
 
 	Logger logger = Logger.getLogger(MEDVUEHandler.class);
-	
-	private ca.uhn.hl7v2.model.v23.message.ORU_R01 msg = null;
+
 	private ArrayList<String> headers = null;
 	private OBR obrseg = null;
 	private OBX obxseg = null;
@@ -405,21 +400,6 @@ public class MEDVUEHandler extends MessageHandler {
 			logger.error("Exception retrieving DOB", e);
 		}
 		return "";
-	}
-
-	public String getAge() {
-		String age = "N/A";
-		String dob = getDOB();
-		try {
-			// Some examples
-			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			java.util.Date date = formatter.parse(dob);
-			age = UtilDateUtilities.calcAge(date);
-		} catch (ParseException e) {
-			logger.error("Could not get age", e);
-
-		}
-		return age;
 	}
 
 	public String getSex() {

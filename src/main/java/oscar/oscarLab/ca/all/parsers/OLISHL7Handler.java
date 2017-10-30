@@ -13,35 +13,6 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.bouncycastle.util.encoders.Base64;
-import org.oscarehr.olis.dao.OLISRequestNomenclatureDao;
-import org.oscarehr.olis.dao.OLISResultNomenclatureDao;
-import org.oscarehr.olis.model.OLISRequestNomenclature;
-import org.oscarehr.olis.model.OLISResultNomenclature;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.GenericComposite;
 import ca.uhn.hl7v2.model.Message;
@@ -53,6 +24,30 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.bouncycastle.util.encoders.Base64;
+import org.oscarehr.olis.dao.OLISRequestNomenclatureDao;
+import org.oscarehr.olis.dao.OLISResultNomenclatureDao;
+import org.oscarehr.olis.model.OLISRequestNomenclature;
+import org.oscarehr.olis.model.OLISResultNomenclature;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.util.UtilDateUtilities;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Adam Balanga
@@ -2145,22 +2140,6 @@ public class OLISHL7Handler extends MessageHandler {
 		} catch (Exception e) {
 			return ("");
 		}
-	}
-
-	@Override
-	public String getAge() {
-		String age = "N/A";
-		String dob = getDOB();
-		try {
-			// Some examples
-			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			java.util.Date date = formatter.parse(dob);
-			age = UtilDateUtilities.calcAge(date);
-		} catch (ParseException e) {
-			logger.error("Could not get age", e);
-
-		}
-		return age;
 	}
 
 	@Override

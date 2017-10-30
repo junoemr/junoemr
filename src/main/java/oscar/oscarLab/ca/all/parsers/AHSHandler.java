@@ -38,11 +38,7 @@ import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
 import oscar.util.ConversionUtils;
-import oscar.util.UtilDateUtilities;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -365,22 +361,6 @@ public abstract class AHSHandler extends MessageHandler
 	}
 
 	@Override
-	public String getAge() {
-		String age = "N/A";
-		String dob = getDOB();
-		try {
-			// Some examples
-			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			java.util.Date date = formatter.parse(dob);
-			age = UtilDateUtilities.calcAge(date);
-		} catch (ParseException e) {
-			logger.error("Could not get age", e);
-
-		}
-		return age;
-	}
-
-	@Override
 	public String getSex() {
 		return (getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue()));
 	}
@@ -388,52 +368,6 @@ public abstract class AHSHandler extends MessageHandler
 	@Override
 	public String getHealthNum() {
 		return get("/.PID-2-1");
-	}
-
-	@Override
-	public String getHomePhone() {
-		String phone = "";
-		int i = 0;
-		try {
-			while (!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue()).equals("")) {
-				if (i == 0) {
-					phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
-				}
-				else {
-					phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
-				}
-				i++;
-			}
-			return (phone);
-		}
-		catch (Exception e) {
-			logger.error("Could not return home phone number", e);
-
-			return ("");
-		}
-	}
-
-	@Override
-	public String getWorkPhone() {
-		String phone = "";
-		int i = 0;
-		try {
-			while (!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue()).equals("")) {
-				if (i == 0) {
-					phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
-				}
-				else {
-					phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
-				}
-				i++;
-			}
-			return (phone);
-		}
-		catch (Exception e) {
-			logger.error("Could not return work phone number", e);
-
-			return ("");
-		}
 	}
 
 	@Override

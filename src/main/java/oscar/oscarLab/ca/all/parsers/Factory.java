@@ -102,6 +102,7 @@ public final class Factory {
 			MessageHandler handler = getSpecificHandlerType(hl7Body);
 			if(handler != null)
 			{
+				logger.info("Loaded " + handler.getMsgType() + " HL7 Handler");
 				return handler;
 			}
 		}

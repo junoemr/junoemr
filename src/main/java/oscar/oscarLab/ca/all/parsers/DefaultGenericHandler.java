@@ -34,14 +34,6 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
-
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
@@ -50,6 +42,9 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -408,21 +403,6 @@ public class DefaultGenericHandler extends MessageHandler {
         }catch(Exception e){
             return("");
         }
-    }
-
-    public String getAge(){
-        String age = "N/A";
-        String dob = getDOB();
-        try {
-            // Some examples
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date date = formatter.parse(dob);
-            age = UtilDateUtilities.calcAge(date);
-        } catch (ParseException e) {
-            logger.error("Could not get age", e);
-
-        }
-        return age;
     }
 
     public String getSex(){

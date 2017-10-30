@@ -59,7 +59,6 @@ import java.util.List;
 public class PATHL7Handler extends MessageHandler {
 
     Logger logger = Logger.getLogger(PATHL7Handler.class);
-    ORU_R01 msg = null;
 
 	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF");
 	public static final String VIHARTF = "CELLPATHR";
@@ -114,6 +113,8 @@ public class PATHL7Handler extends MessageHandler {
             return("");
         }
     }
+
+    @Override
 	public String getAge(){
 		String age = "N/A";
 		String dob = getDOB();
