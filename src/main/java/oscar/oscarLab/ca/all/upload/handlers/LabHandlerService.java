@@ -39,7 +39,7 @@ public class LabHandlerService {
 
 	Logger logger = Logger.getLogger(MDSHandler.class);
 
-	@Transactional(propagation = Propagation.REQUIRED)
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public String importLab(String type,
 						LoggedInInfo loggedInInfo,
 						String serviceName,

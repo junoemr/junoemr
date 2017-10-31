@@ -29,9 +29,9 @@
 angular.module('Common.Directives').directive('junoPatientSearchTypeahead', [
 	'$q',
 	'typeaheadHelper',
-	'demographicService',
+	'demographicsService',
 
-	function($q, typeaheadHelper, demographicService)
+	function($q, typeaheadHelper, demographicsService)
 	{
 		var scope = typeaheadHelper.defaultTypeaheadScope();
 
@@ -44,7 +44,7 @@ angular.module('Common.Directives').directive('junoPatientSearchTypeahead', [
 			$scope.findMatches = function findMatches(search)
 			{
 				var deferred = $q.defer();
-				demographicService.quickSearch(search).then(
+				demographicsService.quickSearch(search).then(
 					function success(data)
 					{
 						var matches = data.content;

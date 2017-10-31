@@ -447,6 +447,7 @@
 <script type="text/javascript" src="common/services/billingService.js"></script>
 <script type="text/javascript" src="common/services/consultService.js"></script>
 <script type="text/javascript" src="common/services/demographicService.js"></script>
+<script type="text/javascript" src="common/services/demographicsService.js"></script>
 <script type="text/javascript" src="common/services/diseaseRegistryService.js"></script>
 <script type="text/javascript" src="common/services/formService.js"></script>
 <script type="text/javascript" src="common/services/inboxService.js"></script>
@@ -457,6 +458,7 @@
 <script type="text/javascript" src="common/services/personaService.js"></script>
 <script type="text/javascript" src="common/services/programService.js"></script>
 <script type="text/javascript" src="common/services/providerService.js"></script>
+<script type="text/javascript" src="common/services/providersService.js"></script>
 <script type="text/javascript" src="common/services/scheduleService.js"></script>
 <script type="text/javascript" src="common/services/securityService.js"></script>
 <script type="text/javascript" src="common/services/staticDataService.js"></script>

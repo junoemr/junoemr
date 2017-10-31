@@ -560,15 +560,15 @@
 					<div class="col-md-4">
 						<select class="form-control form-control-details" title="MRP" 
 								ng-model="detailsCtrl.page.demo.providerNo" 
-								ng-options="mrp.providerNo as mrp.name for mrp in detailsCtrl.page.demo.doctors">
+								ng-options="mrp.providerNo as mrp.name for mrp in detailsCtrl.page.doctors">
 							<option value="">--</option>
 						</select>
 					</div>
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formNurse"/></label>
 					<div class="col-md-4">
 						<select class="form-control form-control-details" title="Nurse" 
-								ng-model="detailsCtrl.page.demo.nurse" 
-								ng-options="ns.providerNo as ns.name for ns in detailsCtrl.page.demo.nurses">
+								ng-model="detailsCtrl.page.demo.nurse"
+								ng-options="ns.providerNo as ns.name for ns in detailsCtrl.page.nurses">
 							<option value="">--</option>
 						</select>
 					</div>
@@ -578,7 +578,7 @@
 					<div class="col-md-4">
 						<select class="form-control form-control-details" title="Midwife" 
 								ng-model="detailsCtrl.page.demo.midwife" 
-								ng-options="mw.providerNo as mw.name for mw in detailsCtrl.page.demo.midwives">
+								ng-options="mw.providerNo as mw.name for mw in detailsCtrl.page.midwives">
 							<option value="">--</option>
 						</select>
 					</div>
@@ -586,7 +586,7 @@
 					<div class="col-md-4">
 						<select class="form-control form-control-details" title="Resident" 
 								ng-model="detailsCtrl.page.demo.resident" 
-								ng-options="res.providerNo as res.name for res in detailsCtrl.page.demo.doctors">
+								ng-options="res.providerNo as res.name for res in detailsCtrl.page.doctors">
 							<option value="">--</option>
 						</select>
 					</div>
@@ -624,7 +624,7 @@
 						<div class="input-group">
 							<select class="form-control form-control-details" title="<bean:message key="demographic.demographiceditdemographic.formRosterStatus"/>" 
 									ng-model="detailsCtrl.page.demo.rosterStatus" 
-									ng-options="rs.value as rs.label for rs in detailsCtrl.page.demo.rosterStatusList" >
+									ng-options="rs.value as rs.label for rs in detailsCtrl.page.rosterStatusList" >
 								<option value="">--</option>
 							</select>
 							<span class="input-group-btn">
@@ -691,7 +691,7 @@
 						<div class="input-group">
 							<select class="form-control form-control-details" title="Patient Status" 
 									ng-model="detailsCtrl.page.demo.patientStatus" 
-									ng-options="ps.value as ps.label for ps in detailsCtrl.page.demo.patientStatusList" 
+									ng-options="ps.value as ps.label for ps in detailsCtrl.page.patientStatusList"
 									ng-blur="detailsCtrl.checkPatientStatus()">
 								<option value="">--</option>
 							</select>
@@ -917,7 +917,7 @@
 							<bean:message key="web.record.details.manage"/>
 						</button>
 					</h3>
-					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demo.demoContacts">
+					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContacts">
 						<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
 						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
 						<div class="col-md-5">{{dc.phone}}</div>
@@ -931,7 +931,7 @@
 							<bean:message key="web.record.details.manage"/>
 						</button>
 					</h3>
-					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demo.demoContactPros">
+					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContactPros">
 						<div class="col-md-12" style="font-weight:bold">{{dc.role}}</div>
 						<div class="col-md-7" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
 						<div class="col-md-5">{{dc.phone}}</div>
