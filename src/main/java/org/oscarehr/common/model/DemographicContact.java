@@ -25,7 +25,10 @@
 
 package org.oscarehr.common.model;
 
+import com.google.common.collect.Sets;
+
 import java.util.Date;
+import java.util.HashSet;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -52,6 +55,8 @@ public class DemographicContact extends AbstractModel<Integer> {
 
 	public static final String CATEGORY_PERSONAL = "personal";
 	public static final String CATEGORY_PROFESSIONAL = "professional";
+
+	public static final HashSet<String> ALL_CATEGORIES = Sets.newHashSet(CATEGORY_PERSONAL, CATEGORY_PROFESSIONAL);
 
 
 	private static final long serialVersionUID = 1L;

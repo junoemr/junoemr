@@ -26,18 +26,19 @@
 
  */
 angular.module("Common.Services").service("demographicService", [
-    '$http', '$q',
-    function($http, $q)
+    '$q',
+    'junoHttp',
+    function($q, junoHttp)
     {
         var service = {};
 
-        service.apiPath = '../ws/rs/';
+        service.apiPath = '../ws/rs/demographic';
 
         service.getDemographic = function getDemographic(demographicNo)
         {
             var deferred = $q.defer();
 
-            $http.get(service.apiPath + 'demographics/' + encodeURIComponent(demographicNo),
+	        junoHttp.get(service.apiPath + '/' + encodeURIComponent(demographicNo),
                 Juno.Common.ServiceHelper.configHeaders()).then(
                 function success(results)
                 {
@@ -62,11 +63,34 @@ angular.module("Common.Services").service("demographicService", [
             return deferred.promise;
         };
 
+	    service.getDemographicContacts = function getDemographicContacts(demographicNo,contactCategory)
+	    {
+		    var deferred = $q.defer();
+
+		    var config = Juno.Common.ServiceHelper.configHeaders();
+		    config.params = {
+			    category: contactCategory
+		    };
+
+		    junoHttp.get(service.apiPath + '/' + encodeURIComponent(demographicNo) + "/contacts", config).then(
+			    function success(results)
+			    {
+				    deferred.resolve(results.data);
+			    },
+			    function error(errors)
+			    {
+				    console.log("demographicServices::getDemographicContacts error", errors);
+				    deferred.reject("An error occurred while fetching demographic contacts");
+			    });
+
+		    return deferred.promise;
+	    };
+
         service.saveDemographic = function saveDemographic(demographic)
         {
             var deferred = $q.defer();
 
-            $http.post(service.apiPath + 'demographics', demographic).then(
+	        junoHttp.post(service.apiPath, demographic).then(
                 function success(results)
                 {
                     deferred.resolve(results.data);
@@ -84,7 +108,7 @@ angular.module("Common.Services").service("demographicService", [
         {
             var deferred = $q.defer();
 
-            $http.put(service.apiPath + 'demographics', demographic).then(
+	        junoHttp.put(service.apiPath, demographic).then(
                 function success(results)
                 {
                     deferred.resolve(results.data);
@@ -93,64 +117,6 @@ angular.module("Common.Services").service("demographicService", [
                 {
                     console.log("demographicServices::updateDemographic error", errors);
                     deferred.reject("An error occurred while updating demographic");
-                });
-
-            return deferred.promise;
-        };
-
-        service.quickSearch = function quickSearch(search)
-        {
-            var deferred = $q.defer();
-
-            $http.get(service.apiPath + 'demographics/quickSearch?query=' +
-                encodeURIComponent(search)).then(
-                function success(results)
-                {
-                    deferred.resolve(results.data);
-                },
-                function error(errors)
-                {
-                    console.log("demographicServices::quickSearch error", errors);
-                    deferred.reject("An error occurred while searching");
-                });
-
-            return deferred.promise;
-        };
-
-        service.search = function search(search, startIndex, itemsToReturn)
-        {
-            var deferred = $q.defer();
-
-            $http.post(service.apiPath + 'demographics/search?startIndex=' +
-                encodeURIComponent(startIndex) + "&itemsToReturn=" +
-                encodeURIComponent(itemsToReturn), search).then(
-                function success(results)
-                {
-                    deferred.resolve(results.data);
-                },
-                function error(errors)
-                {
-                    console.log("demographicServices::search error", errors);
-                    deferred.reject("An error occurred while searching");
-                });
-
-            return deferred.promise;
-        };
-
-        service.searchIntegrator = function searchIntegrator(search, itemsToReturn)
-        {
-            var deferred = $q.defer();
-
-            $http.post(service.apiPath + 'demographics/searchIntegrator?itemsToReturn=' +
-                encodeURIComponent(itemsToReturn), search).then(
-                function success(results)
-                {
-                    deferred.resolve(results.data);
-                },
-                function error(errors)
-                {
-                    console.log("demographicServices::searchIntegrator error", errors);
-                    deferred.reject("An error occurred while searching");
                 });
 
             return deferred.promise;

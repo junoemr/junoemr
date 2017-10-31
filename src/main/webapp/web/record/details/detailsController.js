@@ -32,6 +32,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'$state',
 	'$window',
 	'demographicService',
+	'demographicsService',
+	'providersService',
 	'patientDetailStatusService',
 	'securityService',
 	'staticDataService',
@@ -46,6 +48,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		$state,
 		$window,
 		demographicService,
+		demographicsService,
+		providersService,
 		patientDetailStatusService,
 		securityService,
 		staticDataService,
@@ -87,6 +91,36 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					controller.page.demo = results;
 					controller.initDemographicVars();
 					controller.checkAccess();
+
+					// retrieve provider types for dropdown selection
+					//TODO - are roles determined by security role or provider type?
+					providersService.getBySecurityRole("doctor").then(
+						function success(data) {
+							controller.page.doctors = data;
+						}
+					);
+					providersService.getBySecurityRole("nurse").then(
+						function success(data) {
+							controller.page.nurses = data;
+						}
+					);
+					providersService.getBySecurityRole("midwife").then(
+						function success(data) {
+							controller.page.midwives = data;
+						}
+					);
+
+					// retrieve contact lists for demographic
+					demographicService.getDemographicContacts(controller.page.demo.demographicNo, "personal").then(
+						function success(data) {
+							controller.page.demoContacts = demoContactShow(data);
+						}
+					);
+					demographicService.getDemographicContacts(controller.page.demo.demographicNo, "professional").then(
+						function success(data) {
+							controller.page.demoContactPros = demoContactShow(data);
+						}
+					);
 
 					//show notes
 					if (controller.page.demo.notes != null)
@@ -186,30 +220,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
 					}
 
-					//show demoContacts/demoContactPros
-					if (controller.page.demo.demoContacts != null)
-					{
-						controller.page.demo.demoContacts = demoContactShow(controller.page.demo.demoContacts);
-					}
-					if (controller.page.demo.demoContactPros != null)
-					{
-						controller.page.demo.demoContactPros = demoContactShow(controller.page.demo.demoContactPros);
-					}
-
-					//show doctors/nurses/midwives
-					if (controller.page.demo.doctors != null)
-					{
-						controller.page.demo.doctors = toArray(controller.page.demo.doctors);
-					}
-					if (controller.page.demo.nurses != null)
-					{
-						controller.page.demo.nurses = toArray(controller.page.demo.nurses);
-					}
-					if (controller.page.demo.midwives != null)
-					{
-						controller.page.demo.midwives = toArray(controller.page.demo.midwives);
-					}
-
 					controller.page.dataChanged = false;
 
 					//get static lists to be selected
@@ -264,54 +274,63 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						});
 
 					//show patientStatusList & rosterStatusList values
-					controller.page.demo.patientStatusList = toArray(controller.page.demo.patientStatusList);
-					controller.page.demo.patientStatusList.unshift(
+					demographicsService.getStatusList("roster").then(
+						function success(data)
 						{
-							"value": "FI",
-							"label": "FI - Fired"
-						});
-					controller.page.demo.patientStatusList.unshift(
+							controller.page.rosterStatusList = toArray(data);
+							controller.page.rosterStatusList.unshift(
+								{
+									"value": "FS",
+									"label": "FS - fee for service"
+								});
+							controller.page.rosterStatusList.unshift(
+								{
+									"value": "TE",
+									"label": "TE - terminated"
+								});
+							controller.page.rosterStatusList.unshift(
+								{
+									"value": "NR",
+									"label": "NR - not rostered"
+								});
+							controller.page.rosterStatusList.unshift(
+								{
+									"value": "RO",
+									"label": "RO - rostered"
+								});
+						}
+					);
+					demographicsService.getStatusList("patient").then(
+						function success(data)
 						{
-							"value": "MO",
-							"label": "MO - Moved"
-						});
-					controller.page.demo.patientStatusList.unshift(
-						{
-							"value": "DE",
-							"label": "DE - Deceased"
-						});
-					controller.page.demo.patientStatusList.unshift(
-						{
-							"value": "IN",
-							"label": "IN - Inactive"
-						});
-					controller.page.demo.patientStatusList.unshift(
-						{
-							"value": "AC",
-							"label": "AC - Active"
-						});
-
-					controller.page.demo.rosterStatusList = toArray(controller.page.demo.rosterStatusList);
-					controller.page.demo.rosterStatusList.unshift(
-						{
-							"value": "FS",
-							"label": "FS - fee for service"
-						});
-					controller.page.demo.rosterStatusList.unshift(
-						{
-							"value": "TE",
-							"label": "TE - terminated"
-						});
-					controller.page.demo.rosterStatusList.unshift(
-						{
-							"value": "NR",
-							"label": "NR - not rostered"
-						});
-					controller.page.demo.rosterStatusList.unshift(
-						{
-							"value": "RO",
-							"label": "RO - rostered"
-						});
+							controller.page.patientStatusList = toArray(data);
+							controller.page.patientStatusList.unshift(
+								{
+									"value": "FI",
+									"label": "FI - Fired"
+								});
+							controller.page.patientStatusList.unshift(
+								{
+									"value": "MO",
+									"label": "MO - Moved"
+								});
+							controller.page.patientStatusList.unshift(
+								{
+									"value": "DE",
+									"label": "DE - Deceased"
+								});
+							controller.page.patientStatusList.unshift(
+								{
+									"value": "IN",
+									"label": "IN - Inactive"
+								});
+							controller.page.patientStatusList.unshift(
+								{
+									"value": "AC",
+									"label": "AC - Active"
+								});
+						}
+					);
 
 					controller.formatDate("DobM"); //done on page load
 					controller.formatDate("DobD"); //done on page load
@@ -1013,7 +1032,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		{
 			if (controller.page.newRosterStatus != null && controller.page.newRosterStatus != "")
 			{
-				controller.page.demo.rosterStatusList.push(
+				controller.page.rosterStatusList.push(
 				{
 					"value": controller.page.newRosterStatus,
 					"label": controller.page.newRosterStatus
@@ -1028,7 +1047,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		{
 			if (controller.page.newPatientStatus != null && controller.page.newPatientStatus != "")
 			{
-				controller.page.demo.patientStatusList.push(
+				controller.page.patientStatusList.push(
 				{
 					"value": controller.page.newPatientStatus,
 					"label": controller.page.newPatientStatus

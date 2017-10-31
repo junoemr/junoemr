@@ -9,6 +9,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 	'consultService',
 	'providerService',
 	'demographicService',
+	'demographicsService',
 	'securityService',
 	'staticDataService',
 
@@ -22,6 +23,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 		consultService,
 		providerService,
 		demographicService,
+		demographicsService,
 		securityService,
 		staticDataService)
 	{
@@ -96,7 +98,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				integrator: false,
 				outofdomain: true
 			};
-			return demographicService.search(search, 0, 25).then(
+			return demographicsService.search(search, 0, 25).then(
 				function success(response)
 				{
 					var resp = [];
