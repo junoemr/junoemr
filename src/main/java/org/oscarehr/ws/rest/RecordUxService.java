@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -116,6 +117,7 @@ public class RecordUxService extends AbstractServiceImpl {
 	public List<MenuItemTo1> getRecordMenu(@PathParam("demographicNo") Integer demographicNo){
 		logger.error("getRecordMenu getting called for demo "+demographicNo);
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		ResourceBundle bundle = getResourceBundle();
 		
 		int idCounter = 0;
 		
@@ -158,21 +160,21 @@ public class RecordUxService extends AbstractServiceImpl {
 			String outstanding = consultationManager.hasOutstandingConsultations(loggedInInfo, demographicNo)? "outstanding" : null;
 			
 			if (!consultationManager.isConsultRequestEnabled() && consultationManager.isConsultResponseEnabled()) {
-				menulist.add(new MenuItemTo1(idCounter++, "Consultation Responses", "record.consultResponses."+demographicNo, null));
+				menulist.add(new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consults"), "record.consultResponses."+demographicNo, null));
 			}
 			else if (consultationManager.isConsultRequestEnabled() && consultationManager.isConsultResponseEnabled()) {
-				MenuItemTo1 consultMenu = new MenuItemTo1(idCounter++, "Consultations", null, outstanding);
+				MenuItemTo1 consultMenu = new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consults"), null, outstanding);
 				consultMenu.setDropdown(true);
 				
 				List<MenuItemTo1> consultList = new ArrayList<MenuItemTo1>();
-				consultList.add(new MenuItemTo1(idCounter++, "Consultation Requests", "record.consultRequests."+demographicNo, outstanding));
-				consultList.add(new MenuItemTo1(idCounter++, "Consultation Responses", "record.consultResponses."+demographicNo, null));
+				consultList.add(new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consultRequests"), "record.consultRequests."+demographicNo, outstanding));
+				consultList.add(new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consultResponses"), "record.consultResponses."+demographicNo, null));
 				consultMenu.setDropdownItems(consultList);
 				
 				menulist.add(consultMenu);
 			}
 			else {
-				menulist.add(new MenuItemTo1(idCounter++, "Consultations", "record.consultRequests."+demographicNo, outstanding));
+				menulist.add(new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consults"), "record.consultRequests."+demographicNo, outstanding));
 			}
 		}
 
