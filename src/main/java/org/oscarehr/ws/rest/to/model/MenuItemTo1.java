@@ -34,6 +34,7 @@ public class MenuItemTo1 implements Serializable {
     private static final long serialVersionUID = 1L;
   
     private Integer id;
+    private Integer demoId;
     private String label;
     private String extra;
     private String url;
@@ -57,6 +58,14 @@ public class MenuItemTo1 implements Serializable {
     	this.state = state;
     	this.extra = extra;
     }
+
+	public MenuItemTo1(Integer id, Integer demoId, String label, String state, String extra){
+		this.id = id;
+		this.demoId = demoId;
+		this.label = label;
+		this.state = state;
+		this.extra = extra;
+	}
     
 	public Integer getId() {
 		return id;
@@ -64,18 +73,28 @@ public class MenuItemTo1 implements Serializable {
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
+	public Integer getDemoId() { 
+		return demoId; 
+	}
+	public void setDemoId(Integer demoId) { 
+		this.demoId = demoId; 
+	}
+
 	public String getLabel() {
 		return label;
 	}
 	public void setLabel(String label) {
 		this.label = label;
 	}
+
 	public String getExtra() {
 		return extra;
 	}
 	public void setExtra(String extra) {
 		this.extra = extra;
 	}
+
 	public String getUrl() {
 		return url;
 	}
@@ -86,7 +105,6 @@ public class MenuItemTo1 implements Serializable {
     public String getState() {
 		return state;
 	}
-
 	public void setState(String state) {
 		this.state = state;
 	}
