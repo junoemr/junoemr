@@ -160,21 +160,21 @@ public class RecordUxService extends AbstractServiceImpl {
 			String outstanding = consultationManager.hasOutstandingConsultations(loggedInInfo, demographicNo)? "outstanding" : null;
 			
 			if (!consultationManager.isConsultRequestEnabled() && consultationManager.isConsultResponseEnabled()) {
-				menulist.add(new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consults"), "record.consultResponses."+demographicNo, null));
+				menulist.add(new MenuItemTo1(idCounter++,  demographicNo, bundle.getString("navbar.menu.consults"), "record.consultResponses", null));
 			}
 			else if (consultationManager.isConsultRequestEnabled() && consultationManager.isConsultResponseEnabled()) {
 				MenuItemTo1 consultMenu = new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consults"), null, outstanding);
 				consultMenu.setDropdown(true);
 				
 				List<MenuItemTo1> consultList = new ArrayList<MenuItemTo1>();
-				consultList.add(new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consultRequests"), "record.consultRequests."+demographicNo, outstanding));
-				consultList.add(new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consultResponses"), "record.consultResponses."+demographicNo, null));
+				consultList.add(new MenuItemTo1(idCounter++, demographicNo, bundle.getString("navbar.menu.consultRequests"), "record.consultRequests", outstanding));
+				consultList.add(new MenuItemTo1(idCounter++, demographicNo, bundle.getString("navbar.menu.consultResponses"), "record.consultResponses", null));
 				consultMenu.setDropdownItems(consultList);
 				
 				menulist.add(consultMenu);
 			}
 			else {
-				menulist.add(new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consults"), "record.consultRequests."+demographicNo, outstanding));
+				menulist.add(new MenuItemTo1(idCounter++,  demographicNo, bundle.getString("navbar.menu.consults"), "record.consultRequests", outstanding));
 			}
 		}
 
