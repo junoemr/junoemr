@@ -55,9 +55,6 @@ import java.util.List;
  */
 public class CLSHandler extends AHSHandler {
 
-	private enum NameType {
-		FIRST, MIDDLE, LAST
-	}
 	private static Logger logger = Logger.getLogger(CLSHandler.class);
 
 	public static boolean headerTypeMatch(MSH messageHeaderSegment)
@@ -340,69 +337,7 @@ public class CLSHandler extends AHSHandler {
 		}
 	}
 
-	public String getPatientName() {
-		return (getFirstName() + " " + getLastName());
-	}
 
-	public String getFirstName() {
-		return getName(NameType.FIRST);
-	}
-
-	private String getName(NameType type) {
-		// format is last,first middle
-		String content = get("/.PID-5-1");
-
-		String firstName = getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()).trim();
-		String middleName = getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getXpn3_MiddleInitialOrName().getValue()).trim();
-
-		if (content == null || content.trim().isEmpty() || content.trim().equals(",")) {
-			return "";
-		}
-
-		String[] allNames = content.trim().split(",");
-
-		String lastName = allNames[0].trim();
-		// First and middle names occur after the comma, if it exists
-		if (allNames.length > 1) {
-			String firstMiddle = allNames[1].trim();
-
-			int firstMiddleDelimiterIndex = firstMiddle.lastIndexOf(' ');
-			if (firstMiddleDelimiterIndex == -1) {
-				firstName = firstMiddle;
-			}
-			else {
-				firstName = firstMiddle.substring(0, firstMiddleDelimiterIndex).trim();
-				middleName = firstMiddle.substring(firstMiddleDelimiterIndex).trim();
-			}
-		}
-
-		switch (type) {
-			case FIRST:
-				return firstName;
-			case MIDDLE:
-				return middleName;
-			case LAST:
-				return lastName;
-			default:
-				throw new IllegalArgumentException("Invalid name type " + type);
-		}
-	}
-
-	public String getLastName() {
-		return getName(NameType.LAST);
-	}
-
-	public String getDOB() {
-		try {
-			return (formatDateTime(getString(msg.getRESPONSE().getPATIENT().getPID().getDateOfBirth().getTimeOfAnEvent().getValue())));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	public String getSex() {
-		return (getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue()));
-	}
 
 	public String getHealthNum() {
 		return get("/.PID-2-1");
@@ -559,10 +494,6 @@ public class CLSHandler extends AHSHandler {
 		}
 	}
 
-	public String getMiddleName() {
-		return getName(NameType.MIDDLE);
-	}
-
 	/**
 	 * Gets the ordering provider name.
 	 *
@@ -634,6 +565,8 @@ public class CLSHandler extends AHSHandler {
     }
 
 
+
+	/* =================================== Lab Uploads ==================================== */
 
     @Override
     public String preUpload(String hl7Message) throws Exception

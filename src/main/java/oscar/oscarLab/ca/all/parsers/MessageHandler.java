@@ -328,27 +328,51 @@ public abstract class MessageHandler {
     /**
      *  Return the number of OBR Segments in the message
      */
-    public abstract int getOBRCount();
-
-    /**
-     *  Return the number of OBX Segments within the OBR group specified by i.
-     */
-    public abstract int getOBXCount( int i);
+	public int getOBRCount() {
+		return (msg.getRESPONSE().getORDER_OBSERVATIONReps());
+	}
 
     /**
      *  Return the name of the ith OBR Segment, usually stored in the
      *  UniversalServiceIdentifier
      */
-    public abstract String getOBRName( int i);
-
-    /**
-     *  Return the date and time of the observation refered to by the jth obx
-     *  segment of the ith obr group. If the date and time is not specified
-     *  within the obx segment it should be specified within the obr segment.
-     */
-    public abstract String getTimeStamp( int i, int j);
+    public String getOBRName(int i) {
+	    try {
+		    return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getUniversalServiceIdentifier().getText().getValue()));
+	    } catch (Exception e) {
+		    return ("");
+	    }
+    }
 
     /* ===================================== OBX ====================================== */
+
+	/**
+	 *  Return the date and time of the observation refered to by the jth obx
+	 *  segment of the ith obr group. If the date and time is not specified
+	 *  within the obx segment it should be specified within the obr segment.
+	 */
+	public String getTimeStamp(int i, int j) {
+		try {
+			return (formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue())));
+		} catch (Exception e) {
+			return ("");
+		}
+	}
+
+	/**
+	 *  Return the number of OBX Segments within the OBR group specified by i.
+	 */
+	public int getOBXCount(int i)
+	{
+		try
+		{
+			return (msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATIONReps());
+		}
+		catch(Exception e)
+		{
+			return (0);
+		}
+	}
 
     /**
      *  Return true if an abnormal flag other than 'N' is returned by

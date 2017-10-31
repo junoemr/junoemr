@@ -249,7 +249,7 @@ class Lines {
  * @author j.chisholm
  */
 public class SpireHandler extends MessageHandler {
-    
+
     ORU_R01 msg = null;
     Logger logger = Logger.getLogger(SpireHandler.class);
     

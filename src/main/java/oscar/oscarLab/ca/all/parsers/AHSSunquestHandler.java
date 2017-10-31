@@ -38,7 +38,7 @@ public class AHSSunquestHandler extends AHSHandler
 
 		//TODO - correct once we find a sample lab
 		return "OADD".equalsIgnoreCase(sendingApplication) &&
-				"DI".equalsIgnoreCase(sendingFacility);
+				"SUNQUEST".equalsIgnoreCase(sendingFacility);
 	}
 
 	public AHSSunquestHandler()

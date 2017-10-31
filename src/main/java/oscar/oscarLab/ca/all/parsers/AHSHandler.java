@@ -46,6 +46,10 @@ public abstract class AHSHandler extends MessageHandler
 {
 	private static Logger logger = Logger.getLogger(AHSHandler.class);
 
+	protected enum NameType {
+		FIRST, MIDDLE, LAST
+	}
+
 	public AHSHandler() {}
 	public AHSHandler(String hl7Body) throws HL7Exception
 	{
@@ -63,6 +67,8 @@ public abstract class AHSHandler extends MessageHandler
 		this.msg = (ORU_R01) p.parse(hl7Body);
 		this.terser = new Terser(msg);
 	}
+
+	/* ===================================== MSH ====================================== */
 
 	/**
 	 * This is the OBR date. The MessageHandler architecture uses this to store in hl7TextInfo.obr_date
@@ -90,10 +96,81 @@ public abstract class AHSHandler extends MessageHandler
 		return ("");
 	}
 
+	/* ===================================== PID ====================================== */
+
 	@Override
-	public int getOBRCount() {
-		return (msg.getRESPONSE().getORDER_OBSERVATIONReps());
+	public String getPatientName() {
+		return (getFirstName() + " " + getLastName());
 	}
+
+	@Override
+	public String getFirstName() {
+		return getName(NameType.FIRST);
+	}
+
+	@Override
+	public String getLastName() {
+		return getName(NameType.LAST);
+	}
+
+	@Override
+	public String getMiddleName() {
+		return getName(NameType.MIDDLE);
+	}
+
+	private String getName(NameType type) {
+		// format is last,first middle
+		String content = get("/.PID-5-1");
+
+		String firstName = getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()).trim();
+		String middleName = getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getXpn3_MiddleInitialOrName().getValue()).trim();
+
+		if (content == null || content.trim().isEmpty() || content.trim().equals(",")) {
+			return "";
+		}
+
+		String[] allNames = content.trim().split(",");
+
+		String lastName = allNames[0].trim();
+		// First and middle names occur after the comma, if it exists
+		if (allNames.length > 1) {
+			String firstMiddle = allNames[1].trim();
+
+			int firstMiddleDelimiterIndex = firstMiddle.lastIndexOf(' ');
+			if (firstMiddleDelimiterIndex == -1) {
+				firstName = firstMiddle;
+			}
+			else {
+				firstName = firstMiddle.substring(0, firstMiddleDelimiterIndex).trim();
+				middleName = firstMiddle.substring(firstMiddleDelimiterIndex).trim();
+			}
+		}
+
+		switch (type) {
+			case FIRST:
+				return firstName;
+			case MIDDLE:
+				return middleName;
+			case LAST:
+				return lastName;
+			default:
+				throw new IllegalArgumentException("Invalid name type " + type);
+		}
+	}
+
+	public String getDOB() {
+		try {
+			return (formatDateTime(getString(msg.getRESPONSE().getPATIENT().getPID().getDateOfBirth().getTimeOfAnEvent().getValue())));
+		} catch (Exception e) {
+			return ("");
+		}
+	}
+
+	public String getSex() {
+		return (getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue()));
+	}
+
+	/* ===================================== OBR ====================================== */
 
 	public ORU_R01_ORDER_OBSERVATION getOBR(int i) throws HL7Exception {
 		return msg.getRESPONSE().getORDER_OBSERVATION(i);
@@ -101,14 +178,6 @@ public abstract class AHSHandler extends MessageHandler
 
 	public ORC getORC(int i) throws HL7Exception {
 		return msg.getRESPONSE().getORDER_OBSERVATION(i).getORC();
-	}
-
-	public OBX getOBX(int i, int ii) throws HL7Exception {
-		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(ii).getOBX();
-	}
-
-	public NTE getNTE(int i, int j, int k) throws HL7Exception {
-		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k);
 	}
 
 	public NTE getOBRNTE(int i, int j) throws HL7Exception {
@@ -123,31 +192,14 @@ public abstract class AHSHandler extends MessageHandler
 		}
 	}
 
-	@Override
-	public int getOBXCount(int i) {
-		try {
-			return (msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATIONReps());
-		} catch (Exception e) {
-			return (0);
-		}
+	/* ===================================== OBX ====================================== */
+
+	public OBX getOBX(int i, int ii) throws HL7Exception {
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(ii).getOBX();
 	}
 
-	@Override
-	public String getOBRName(int i) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getUniversalServiceIdentifier().getText().getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	@Override
-	public String getTimeStamp(int i, int j) {
-		try {
-			return (formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue())));
-		} catch (Exception e) {
-			return ("");
-		}
+	public NTE getNTE(int i, int j, int k) throws HL7Exception {
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k);
 	}
 
 	@Override
@@ -344,25 +396,6 @@ public abstract class AHSHandler extends MessageHandler
 		} catch (Exception e) {
 			return ("");
 		}
-	}
-
-	@Override
-	public String getPatientName() {
-		return (getFirstName() + " " + getLastName());
-	}
-
-	@Override
-	public String getDOB() {
-		try {
-			return (formatDateTime(getString(msg.getRESPONSE().getPATIENT().getPID().getDateOfBirth().getTimeOfAnEvent().getValue())));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	@Override
-	public String getSex() {
-		return (getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue()));
 	}
 
 	@Override
