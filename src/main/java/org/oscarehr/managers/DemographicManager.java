@@ -205,10 +205,7 @@ public class DemographicManager {
 
 	public List<DemographicContact> getDemographicContacts(LoggedInInfo loggedInInfo, Integer id) {
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-		List<DemographicContact> result = null;
-		result = demographicContactDao.findActiveByDemographicNo(id);
-
-		return result;
+		return demographicContactDao.findActiveByDemographicNo(id);
 	}
 
 	public List<Demographic> getDemographicsByProvider(LoggedInInfo loggedInInfo, Provider provider) {

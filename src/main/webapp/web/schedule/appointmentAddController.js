@@ -5,6 +5,7 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 	'$uibModalInstance',
 	'$timeout',
 	'demographicService',
+	'demographicsService',
 	'me',
 	'providerService',
 	'scheduleService',
@@ -16,6 +17,7 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 		$uibModalInstance,
 		$timeout,
 		demographicService,
+		demographicsService,
 		me,
 		providerService,
 		scheduleService,
@@ -207,7 +209,7 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 				integrator: false,
 				outofdomain: true
 			};
-			return demographicService.search(search, 0, 25).then(
+			return demographicsService.search(search, 0, 25).then(
 				function(results)
 				{
 					var resp = [];
