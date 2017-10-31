@@ -47,7 +47,9 @@
 
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="org.oscarehr.common.model.Site"%><html:html locale="true">
+<%@page import="org.oscarehr.common.model.Site"%>
+<%@ page import="com.lowagie.text.Phrase" %>
+<html:html locale="true">
 
 <%
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
@@ -460,13 +462,23 @@
                     <br>
                     <font size="-1">
                         <b>
-                    <% if (bMultisites) {
-							out.print("Please reply");
-                    } else { %>
-                        <bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgPleaseReplyPart1"/>
-               			<%=reqFrm.getClinicName()%>
-               		<% } %>
-                        <bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgPleaseReplyPart2"/>
+                    <% // allow properties custom header message override
+	                    String customHeaderMessage = props.getProperty("consultation_fax_custom_header_message");
+	                    if(customHeaderMessage != null) {
+		                    out.print(customHeaderMessage);
+	                    }
+	                    else if (bMultisites) {
+							out.print("Please reply");%>
+							<bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgPleaseReplyPart2"/>
+						<%
+	                    }
+	                    else
+	                    { %>
+	                        <bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgPleaseReplyPart1"/>
+	                        <%=reqFrm.getClinicName()%>
+	                        <bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgPleaseReplyPart2"/>
+	                        <%
+	                    } %>
                         </b>
                     </font>
                 </td>
