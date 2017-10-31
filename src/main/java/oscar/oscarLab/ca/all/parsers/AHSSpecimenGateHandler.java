@@ -28,7 +28,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 
-public class AHSSunquestHandler extends AHSHandler
+public class AHSSpecimenGateHandler extends AHSHandler
 {
 
 	public static boolean headerTypeMatch(MSH messageHeaderSegment)
@@ -36,19 +36,20 @@ public class AHSSunquestHandler extends AHSHandler
 		String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
 		String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
 
+		//TODO - the sending facility is not populated. HOW TO determine lab type?
 		return "OADD".equalsIgnoreCase(sendingApplication) &&
-				("SUNQUEST".equalsIgnoreCase(sendingFacility) || "COPATH".equalsIgnoreCase(sendingFacility));
+				"".equalsIgnoreCase(sendingFacility);
 	}
 
-	public AHSSunquestHandler()
+	public AHSSpecimenGateHandler()
 	{
 		super();
 	}
-	public AHSSunquestHandler(String hl7Body) throws HL7Exception
+	public AHSSpecimenGateHandler(String hl7Body) throws HL7Exception
 	{
 		super(hl7Body);
 	}
-	public AHSSunquestHandler(ORU_R01 msg) throws HL7Exception
+	public AHSSpecimenGateHandler(ORU_R01 msg) throws HL7Exception
 	{
 		super(msg);
 	}
