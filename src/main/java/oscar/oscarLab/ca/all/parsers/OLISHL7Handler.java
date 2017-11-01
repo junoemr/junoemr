@@ -80,6 +80,19 @@ public class OLISHL7Handler extends MessageHandler {
 		defaultSourceOrganizations.put("4010", "BSD Lab10");
 	}
 
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
+
 	public String getSourceOrganization(String org) {
 		return sourceOrganizations.containsKey(org) ? sourceOrganizations.get(org) : defaultSourceOrganizations.get(org);
 	}

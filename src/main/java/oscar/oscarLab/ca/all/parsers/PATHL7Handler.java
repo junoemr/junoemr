@@ -73,6 +73,19 @@ public class PATHL7Handler extends MessageHandler {
         msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ).replace("\\.Zt\\", "\t"));
     }
 
+    @Override
+    public String preUpload(String hl7Message) throws HL7Exception
+    {
+        return hl7Message;
+    }
+    @Override
+    public boolean canUpload()
+    {
+        return true;
+    }
+    @Override
+    public void postUpload() {}
+
     public String getMsgType(){
         return("PATHL7");
     }

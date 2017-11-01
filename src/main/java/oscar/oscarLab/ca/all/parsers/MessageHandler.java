@@ -67,35 +67,32 @@ public abstract class MessageHandler {
 	 * @param hl7Message - the hl7 string for the message
 	 * @return - the same hl7 message as the parameter with any required modifications
 	 */
-	public String preUpload(String hl7Message) throws Exception {
-		return hl7Message;
-	}
+	public abstract String preUpload(String hl7Message) throws HL7Exception;
 	/**
 	 * This method should determine if the lab can be routed
 	 * @return true if the lab can be routed, false otherwise
 	 */
-	public boolean canUpload()
-	{
-		return false;
-	}
+	public abstract boolean canUpload();
 
 	/**
 	 * This gets run after the lab is routed
 	 */
-	public void postUpload() {}
+	public abstract void postUpload();
 
 
     /* ===================================== Hl7 Parsing ====================================== */
 
 
 	/**
+	 * Each handler should implement this method.
+	 * This method should return true if it should use this instance of MessageHandler to parse the lab
 	 * @param messageHeaderSegment hl7 MSH header
 	 * @return true if the header segment belongs to this lab parser. false otherwise
 	 */
 	@SuppressWarnings("unused")
 	protected static boolean headerTypeMatch(MSH messageHeaderSegment)
 	{
-		return false;
+		return true;
 	}
 
 	/**

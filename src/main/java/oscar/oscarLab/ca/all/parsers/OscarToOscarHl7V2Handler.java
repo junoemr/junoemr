@@ -56,6 +56,19 @@ public final class OscarToOscarHl7V2Handler extends MessageHandler {
 		else logger.error("Recevied unsupported message type : "+message.getClass().getSimpleName());
 	}
 
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
+
 	public String audit() {
 	    return chainnedMessageAdapter.audit();
     }

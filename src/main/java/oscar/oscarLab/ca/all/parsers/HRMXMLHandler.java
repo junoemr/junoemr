@@ -93,6 +93,18 @@ public class HRMXMLHandler extends MessageHandler {
 		headers = new ArrayList<String>();
 
 	}
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
 
 	private ArrayList<String> getMatchingHL7Labs(String hl7Body) {
 		Base64 base64 = new Base64(0);

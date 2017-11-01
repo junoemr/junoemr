@@ -68,6 +68,19 @@ public abstract class AHSHandler extends MessageHandler
 		this.terser = new Terser(msg);
 	}
 
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return false;
+	}
+	@Override
+	public void postUpload() {}
+
 	/* ===================================== MSH ====================================== */
 
 	/**

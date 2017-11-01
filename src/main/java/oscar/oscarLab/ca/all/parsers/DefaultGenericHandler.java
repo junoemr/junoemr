@@ -640,4 +640,17 @@ public class DefaultGenericHandler extends MessageHandler {
     public String getNteForPID() {
     	return "";
     }
+
+    @Override
+    public String preUpload(String hl7Message) throws HL7Exception
+    {
+        return hl7Message;
+    }
+    @Override
+    public boolean canUpload()
+    {
+        return true;
+    }
+    @Override
+    public void postUpload() {}
 }

@@ -266,6 +266,19 @@ public class SpireHandler extends MessageHandler {
         
         msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ));
     }
+
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
     
     /**
      * Method fixMessage

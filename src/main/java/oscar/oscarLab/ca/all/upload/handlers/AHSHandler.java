@@ -43,7 +43,8 @@ public class AHSHandler implements MessageHandler {
 		for (String msg : messages)
 		{
 			oscar.oscarLab.ca.all.parsers.MessageHandler parser = Factory.getHandler("AHS", msg);
-			if(parser == null)
+			// just in case
+			if(parser == null || !(parser instanceof oscar.oscarLab.ca.all.parsers.AHSHandler))
 				throw new RuntimeException("No Parser available for lab");
 
 			// allow each lab type to make modifications to the hl7 if needed.

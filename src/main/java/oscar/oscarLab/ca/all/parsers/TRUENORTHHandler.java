@@ -96,6 +96,19 @@ public class TRUENORTHHandler extends MessageHandler {
 		}     
 
     }
+
+    @Override
+    public String preUpload(String hl7Message) throws HL7Exception
+    {
+        return hl7Message;
+    }
+    @Override
+    public boolean canUpload()
+    {
+        return true;
+    }
+    @Override
+    public void postUpload() {}
     
     public String getMsgType(){
     	return "TRUENORTH";

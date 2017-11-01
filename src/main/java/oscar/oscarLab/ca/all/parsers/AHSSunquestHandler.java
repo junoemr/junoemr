@@ -52,4 +52,16 @@ public class AHSSunquestHandler extends AHSHandler
 	{
 		super(msg);
 	}
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
 }

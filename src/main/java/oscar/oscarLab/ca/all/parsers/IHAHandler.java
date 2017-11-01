@@ -98,6 +98,19 @@ public class IHAHandler extends MessageHandler {
             obrGroups.add(obxSegs);
         }
     }
+
+    @Override
+    public String preUpload(String hl7Message) throws HL7Exception
+    {
+        return hl7Message;
+    }
+    @Override
+    public boolean canUpload()
+    {
+        return true;
+    }
+    @Override
+    public void postUpload() {}
     
     @Override
     public String getMsgType(){

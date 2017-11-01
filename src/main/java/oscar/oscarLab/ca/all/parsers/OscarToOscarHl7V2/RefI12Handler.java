@@ -90,6 +90,19 @@ public final class RefI12Handler extends ChainnedMessageAdapter<REF_I12> {
 	}
 
 	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
+
+	@Override
 	public String getMessageStructureType() {
 		return ("REF_I12");
 	}

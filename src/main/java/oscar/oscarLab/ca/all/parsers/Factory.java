@@ -36,6 +36,7 @@ package oscar.oscarLab.ca.all.parsers;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 
 import ca.uhn.hl7v2.HL7Exception;
@@ -44,6 +45,7 @@ import ca.uhn.hl7v2.model.v23.segment.MSH;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import com.google.common.collect.Sets;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -59,6 +61,8 @@ import oscar.OscarProperties;
 public final class Factory {
 
 	private static Logger logger = MiscUtils.getLogger();
+
+	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS","CLS","CLSDI");
 
 	private Factory() {
 		// static methods no need for instance
@@ -78,8 +82,7 @@ public final class Factory {
 		} catch (Exception e) {
 			logger.error("Could not retrieve lab for segmentID(" + segmentID + ")", e);
 		}
-
-		return getHandler("", "");
+		return new DefaultGenericHandler();
 	}
 
 	public static String getHL7Body(String segmentID) {
@@ -97,37 +100,47 @@ public final class Factory {
 
 	public static MessageHandler getHandler(String type, String hl7Body)
 	{
-		try{
-			// attempt to read the msh header and determine lab type handler
-			MessageHandler handler = getSpecificHandlerType(hl7Body);
-			if(handler != null)
+		MessageHandler handler;
+		try
+		{
+			if(REFACTORED_LAB_TYPES.contains(type))
 			{
-				logger.debug("Loaded " + handler.getMsgType() + " HL7 Handler");
-				return handler;
+				handler = getHandlerNew(hl7Body);
+			}
+			else
+			{
+				handler = getHandlerOld(type, hl7Body);
 			}
 		}
-		catch(Exception e)
+		catch(HL7Exception e)
 		{
-			logger.error("Error Determining lab type by MSH header. ", e);
+			//TODO - the error should not get caught here but most of oscar does not expect a checked exception when calling this method
+			logger.error("Parse Error", e);
+			throw new RuntimeException("Hl7 Parse Error");
 		}
-		// default to the old method of handler selection
-		return getHandlerOld(type, hl7Body);
+		return handler;
 	}
 
-	private static MessageHandler getSpecificHandlerType(String hl7Body) throws HL7Exception
-	{
+	private static MessageHandler getHandlerNew(String hl7Body) throws HL7Exception {
+		MessageHandler handler;
+
 		Parser p = new PipeParser();
 		p.setValidationContext(new NoValidation());
 		ORU_R01 msg = (ORU_R01) p.parse(hl7Body);
 
+		// attempt to read the msh header and determine lab type handler
 		MSH messageHeaderSegment = msg.getMSH();
 		if(CLSHandler.headerTypeMatch(messageHeaderSegment))
-			return new CLSHandler(msg);
-		if(CLSDIHandler.headerTypeMatch(messageHeaderSegment))
-			return new CLSDIHandler(msg);
-		if(AHSSunquestHandler.headerTypeMatch(messageHeaderSegment))
-			return new AHSSunquestHandler(msg);
-		return null;
+			handler = new CLSHandler(msg);
+		else if(CLSDIHandler.headerTypeMatch(messageHeaderSegment))
+			handler = new CLSDIHandler(msg);
+		else if(AHSSunquestHandler.headerTypeMatch(messageHeaderSegment))
+			handler = new AHSSunquestHandler(msg);
+		else
+			throw new RuntimeException("Hl7 message/type does not match a known lab handler.");
+
+		logger.debug("Loaded " + handler.getMsgType() + " HL7 Handler");
+		return handler;
 	}
 
 	/*

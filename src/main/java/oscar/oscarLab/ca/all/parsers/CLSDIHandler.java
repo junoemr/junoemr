@@ -60,14 +60,6 @@ public class CLSDIHandler extends CLSHandler {
 		super(msg);
 	}
 
-
-	/**
-	 * This is where duplicates can be checked, merged, or rejected based on each lab's specifications before the lab is routed
-	 */
-	@Override
-	public String preUpload(String hl7Message) {
-		return hl7Message;
-	}
 	/**
 	 * This method should determine if the lab can be routed
 	 * @return true if the lab can be routed, false otherwise
@@ -81,13 +73,6 @@ public class CLSDIHandler extends CLSHandler {
 		// if the report exists the new version must be a correction
 		return (hl7TextInfo == null || this.getOrderStatus().equals("C"));
 	}
-
-	/**
-	 * This gets run after the lab is routed
-	 */
-	@Override
-	public void postUpload() {}
-
 
     /* ===================================== Hl7 Parsing ====================================== */
 

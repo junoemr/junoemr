@@ -108,6 +108,19 @@ public class BioTestHandler extends MessageHandler {
         }
     }
 
+    @Override
+    public String preUpload(String hl7Message) throws HL7Exception
+    {
+        return hl7Message;
+    }
+    @Override
+    public boolean canUpload()
+    {
+        return true;
+    }
+    @Override
+    public void postUpload() {}
+
     private ArrayList<String> getMatchingBioTestLabs(String hl7Body) {
 		Base64 base64 = new Base64(0);
 		ArrayList<String> ret = new ArrayList<String>();

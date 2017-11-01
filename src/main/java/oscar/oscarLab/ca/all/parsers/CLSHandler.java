@@ -39,15 +39,12 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.util.SpringUtils;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Dual message handler for both the manual and automated lab uploads in the Calgary Lab Service HL7 format.
@@ -569,7 +566,7 @@ public class CLSHandler extends AHSHandler {
 	/* =================================== Lab Uploads ==================================== */
 
     @Override
-    public String preUpload(String hl7Message) throws Exception
+    public String preUpload(String hl7Message) throws HL7Exception
     {
 	    Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
 
@@ -598,6 +595,9 @@ public class CLSHandler extends AHSHandler {
     {
     	return true;
     }
+	@Override
+	public void postUpload() {}
+
 	private String mergeLabs(String oldVersion, String newVersion) throws HL7Exception
 	{
 		String lineDelimiter = "\r";
@@ -691,36 +691,5 @@ public class CLSHandler extends AHSHandler {
 	{
 		message = message.replace(oldAccessionNumber, newAccessionNumber);
 		return message;
-	}
-
-	private boolean isDuplicate(LoggedInInfo loggedInInfo, String msg) {
-		Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
-		//OLIS requirements - need to see if this is a duplicate
-		oscar.oscarLab.ca.all.parsers.MessageHandler h = Factory.getHandler("CLS", msg);
-		//if final
-		if(h.getOrderStatus().equals("CM")) {
-			String acc = h.getAccessionNum().substring(3);
-			//do we have this?
-			List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(acc);
-			for(Hl7TextInfo dupResult:dupResults) {
-				if(("CLS"+dupResult.getAccessionNumber()).equals(acc)) {
-					//if(h.getHealthNum().equals(dupResult.getHealthNumber())) {
-					OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate lab skipped - accession " + acc + "\n" + msg);
-					return true;
-					//}
-
-				}
-				if(dupResult.getAccessionNumber().indexOf("-")!= -1) {
-					if(dupResult.getAccessionNumber().substring(0,dupResult.getAccessionNumber().indexOf("-")).equals(acc) ) {
-						//olis match
-						//if(h.getHealthNum().equals(dupResult.getHealthNumber())) {
-						OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate lab skipped - accession " + acc + "\n" + msg);
-						return true;
-						//}
-					}
-				}
-			}
-		}
-		return false;
 	}
 }
