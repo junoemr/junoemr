@@ -43,7 +43,7 @@ angular.module("Common.Services").service("consultService", [
 
 			var config = Juno.Common.ServiceHelper.configHeaders();
 			config.params = search;
-
+			
 			junoHttp.get(service.apiPath + 'searchRequests', config).then(
 				function success(results)
 				{
@@ -173,18 +173,21 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
-		service.searchResponses = function searchResponses(search)
+		service.searchResponses = function searchRequests(search)
 		{
 			var deferred = $q.defer();
-			$http.post(service.apiPath + 'searchResponses', search).then(
+
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.params = search;
+			junoHttp.get(service.apiPath + 'searchResponses', config).then(
 				function success(results)
 				{
-					deferred.resolve(results.data);
+					deferred.resolve(results);
 				},
 				function error(errors)
 				{
-					console.log("consultService::searchResponses error", errors);
-					deferred.reject("An error occurred while searching consult responses");
+					console.log("consultService::searchRequests error", errors);
+					deferred.reject("An error occured while searching consult requests");
 				});
 
 			return deferred.promise;
@@ -209,6 +212,11 @@ angular.module("Common.Services").service("consultService", [
 			}).then(
 				function success(results)
 				{
+
+					if(results.data.responseDate) results.data.responseDate = moment(results.data.responseDate).toDate();
+					if(results.data.referralDate) results.data.referralDate = moment(results.data.referralDate).toDate();
+					if(results.data.appointmentDate) results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
+					if(results.data.followUpDate) results.data.followUpDate = moment(results.data.followUpDate).toDate();
 					deferred.resolve(results.data);
 				},
 				function error(errors)
@@ -248,10 +256,7 @@ angular.module("Common.Services").service("consultService", [
 		{
 			var deferred = $q.defer();
 
-			var responseTo1 = {
-				consultationResponseTo1: response
-			};
-			$http.post(service.apiPath + 'saveResponse', responseTo1).then(
+			$http.post(service.apiPath + 'saveResponse', response).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
