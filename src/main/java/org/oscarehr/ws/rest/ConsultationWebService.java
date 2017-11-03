@@ -42,6 +42,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.taskdefs.condition.Http;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.BORNPathwayMappingDao;
@@ -88,6 +89,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import net.sf.json.JSONObject;
+import oscar.Misc;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.eform.EFormUtil;
@@ -330,22 +332,64 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	/********************************
 	 * Consultation Response methods *
 	 ********************************/
-	@POST
+	@GET
 	@Path("/searchResponses")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public AbstractSearchResponse<ConsultationResponseSearchResult> searchResponses(JSONObject json) {
+	public RestResponse<List<ConsultationResponseSearchResult>, String> searchResponses(
+			@QueryParam("demographicNo") Integer demographicNo,
+			@QueryParam("mrpNo") Integer mrpNo,
+			@QueryParam("status") Integer status,
+			@QueryParam("page") @DefaultValue("1") Integer page,
+			@QueryParam("perPage") @DefaultValue("10") Integer perPage,
+			@QueryParam("referralStartDate") String referralStartDateString,
+			@QueryParam("referralEndDate") String referralEndDate,
+			@QueryParam("appointmentStartDate") String appointmentStartDate,
+			@QueryParam("appointmentEndDate") String appointmentEndDate,
+			@QueryParam("team") String team,
+			@QueryParam("sortColumn") @DefaultValue("ReferralDate") String sortColumn,
+			@QueryParam("sortDirection") @DefaultValue("desc") String sortDirection
+	) {
+		HttpHeaders headers = new HttpHeaders();
 		AbstractSearchResponse<ConsultationResponseSearchResult> rp = new AbstractSearchResponse<ConsultationResponseSearchResult>();
-				
-		int count = consultationManager.getConsultationCount(convertResponseJSON(json));
+		ConsultationResponseSearchFilter filter = new ConsultationResponseSearchFilter();
+		List<ConsultationResponseSearchResult> resultList;
 
-		if(count>0) {
-			List<ConsultationResponseSearchResult> items =  consultationManager.search(getLoggedInInfo(), convertResponseJSON(json));
-			//convert items to a ConsultationResponseSearchResult object
-			rp.setContent(items);
-			rp.setTotal(count);
+		if(page < 1) page = 1;
+		int offset = perPage * (page-1);
+
+		try {
+			filter.setDemographicNo(demographicNo);
+			filter.setMrpNo(mrpNo);
+			filter.setStatus(status);
+			filter.setStartIndex(offset);
+			filter.setNumToReturn(perPage);
+			filter.setReferralStartDate(toNullableLegacyDate(toNullableLocalDate(referralStartDateString)));
+			filter.setReferralEndDate(toNullableLegacyDate(toNullableLocalDate(referralEndDate)));
+			filter.setAppointmentStartDate(toNullableLegacyDate(toNullableLocalDate(appointmentStartDate)));
+			filter.setAppointmentEndDate(toNullableLegacyDate(toNullableLocalDate(appointmentEndDate)));
+			filter.setTeam(team);
+
+			filter.setSortMode(ConsultationResponseSearchFilter.SORTMODE.valueOf(sortColumn));
+			filter.setSortDir(ConsultationResponseSearchFilter.SORTDIR.valueOf(sortDirection));
+
+			int resultTotal = consultationManager.getConsultationCount(filter);
+			headers.set("total", String.valueOf(resultTotal));
+			headers.set("page", String.valueOf(page));
+			headers.set("perPage", String.valueOf(perPage));
+
+			resultList = consultationManager.search(getLoggedInInfo(), filter);
 		}
-		return rp;
+		catch(DateTimeParseException e) {
+			logger.error("Unparseable Date", e);
+			return RestResponse.errorResponse(headers, "Unparseable Date");
+		}
+		catch(Exception e) {
+			logger.error("Search Error", e);
+			return RestResponse.errorResponse(headers, "Search Error");
+		}
+
+		return RestResponse.successResponse(headers, resultList);
 	}
 	
 	@GET
@@ -375,7 +419,6 @@ public class ConsultationWebService extends AbstractServiceImpl {
 
 		Demographic demographicD = demographicManager.getDemographicWithExt(getLoggedInInfo(), demographicNo);
 		response.setDemographic(demographicConverter.getAsTransferObject(getLoggedInInfo(), demographicD));
-		
 		response.setLetterheadList(getLetterheadList());
 		response.setReferringDoctorList(getReferringDoctorList());
 		response.setFaxList(getFaxList());
@@ -407,23 +450,29 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Path("/saveResponse")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ConsultationResponseTo1 saveResponse(ConsultationResponseTo1 data) {
-		ConsultationResponse response = null;
-		
-		if (data.getId()==null) { //new consultation response
-			response = responseConverter.getAsDomainObject(getLoggedInInfo(), data);
-		} else {
-			response = responseConverter.getAsDomainObject(getLoggedInInfo(), data, consultationManager.getResponse(getLoggedInInfo(), data.getId()));
+	public RestResponse<ConsultationResponseTo1,String> saveRequest(ConsultationResponseTo1 data) {
+		try {
+			ConsultationResponse response;
+
+			if (data.getId()==null) { //new consultation response
+				response = responseConverter.getAsDomainObject(getLoggedInInfo(), data);
+			} else {
+				response = responseConverter.getAsDomainObject(getLoggedInInfo(), data, consultationManager.getResponse(getLoggedInInfo(), data.getId()));
+			}
+			consultationManager.saveConsultationResponse(getLoggedInInfo(), response);
+			if (data.getId()==null) data.setId(response.getId());
+
+			//save attachments
+			saveResponseAttachments(data);
+
+			return RestResponse.successResponse(new HttpHeaders(), data);
 		}
-		consultationManager.saveConsultationResponse(getLoggedInInfo(), response);
-	    if (data.getId()==null) data.setId(response.getId());
-	    
-		//save attachments
-		saveResponseAttachments(data);
-		
-		return data;
+		catch(Exception e) {
+			logger.error("Error saving Consult Request", e);
+			return RestResponse.errorResponse(new HttpHeaders(), "Failed to save Consult");
+		}
 	}
-	
+
 	@GET
 	@Path("/getReferralPathwaysByService")
 	@Produces(MediaType.APPLICATION_JSON)
