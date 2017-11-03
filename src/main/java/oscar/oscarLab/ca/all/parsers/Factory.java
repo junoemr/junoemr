@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import ca.uhn.hl7v2.parser.Parser;
@@ -57,6 +58,8 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
+import oscar.oscarLab.ca.all.parsers.v22.AHSSpecimenGateHandler;
+import oscar.oscarLab.ca.all.parsers.v23.AHSSunquestHandler;
 
 public final class Factory {
 
@@ -122,24 +125,40 @@ public final class Factory {
 	}
 
 	private static MessageHandler getHandlerNew(String hl7Body) throws HL7Exception {
-		MessageHandler handler;
+		MessageHandler handler = null;
 
 		Parser p = new PipeParser();
 		p.setValidationContext(new NoValidation());
-		ORU_R01 msg = (ORU_R01) p.parse(hl7Body);
+		Message msg = p.parse(hl7Body);
+
+		String version = msg.getVersion();
 
 		// attempt to read the msh header and determine lab type handler
-		MSH messageHeaderSegment = msg.getMSH();
-		if(CLSHandler.headerTypeMatch(messageHeaderSegment))
-			handler = new CLSHandler(msg);
-		else if(CLSDIHandler.headerTypeMatch(messageHeaderSegment))
-			handler = new CLSDIHandler(msg);
-		else if(AHSSunquestHandler.headerTypeMatch(messageHeaderSegment))
-			handler = new AHSSunquestHandler(msg);
-		else
+		if(version.equals("2.3"))
+		{
+			ORU_R01 msh = (ORU_R01) msg;
+			MSH messageHeaderSegment = msh.getMSH();
+			if(CLSHandler.headerTypeMatch(messageHeaderSegment))
+				handler = new CLSHandler(msh);
+			else if(CLSDIHandler.headerTypeMatch(messageHeaderSegment))
+				handler = new CLSDIHandler(msh);
+			else if(AHSSunquestHandler.headerTypeMatch(messageHeaderSegment))
+				handler = new AHSSunquestHandler(msh);
+		}
+		else if(version.equals("2.2"))
+		{
+			ca.uhn.hl7v2.model.v22.message.ORU_R01 msh = (ca.uhn.hl7v2.model.v22.message.ORU_R01) msg;
+			ca.uhn.hl7v2.model.v22.segment.MSH messageHeaderSegment = msh.getMSH();
+			if(AHSSpecimenGateHandler.headerTypeMatch(messageHeaderSegment))
+				handler = new AHSSpecimenGateHandler(msh);
+		}
+		if(handler == null)
 			throw new RuntimeException("Hl7 message/type does not match a known lab handler.");
 
-		logger.debug("Loaded " + handler.getMsgType() + " HL7 Handler");
+
+
+
+		logger.info("Loaded " + handler.getMsgType() + " HL7 Handler");
 		return handler;
 	}
 

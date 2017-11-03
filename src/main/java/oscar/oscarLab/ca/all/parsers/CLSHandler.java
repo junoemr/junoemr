@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.all.parsers.v23.AHSHandler;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
@@ -50,7 +51,8 @@ import java.util.Date;
  * Dual message handler for both the manual and automated lab uploads in the Calgary Lab Service HL7 format.
  *
  */
-public class CLSHandler extends AHSHandler {
+public class CLSHandler extends AHSHandler
+{
 
 	private static Logger logger = Logger.getLogger(CLSHandler.class);
 

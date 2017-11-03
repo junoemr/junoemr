@@ -44,10 +44,12 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
+import oscar.oscarLab.ca.all.parsers.v23.MessageHandler23;
 
 import java.util.ArrayList;
 
-public class CDLHandler extends MessageHandler {
+public class CDLHandler extends MessageHandler23
+{
 
     Logger logger = Logger.getLogger(CDLHandler.class);
 

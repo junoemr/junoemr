@@ -49,6 +49,7 @@ import org.oscarehr.hospitalReportManager.xsd.ReportsReceived;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
+import oscar.oscarLab.ca.all.parsers.v23.MessageHandler23;
 import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 
@@ -57,7 +58,8 @@ import ca.uhn.hl7v2.HL7Exception;
  *
  * @author dritan
  */
-public class HRMXMLHandler extends MessageHandler {
+public class HRMXMLHandler extends MessageHandler23
+{
 
 	private static Logger logger = MiscUtils.getLogger();
 

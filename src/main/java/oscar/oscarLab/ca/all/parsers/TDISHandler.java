@@ -35,6 +35,7 @@ import org.oscarehr.common.model.HL7HandlerMSHMapping;
 import org.oscarehr.common.model.Hl7TextMessageInfo;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.pageUtil.ORUR01Manager;
+import oscar.oscarLab.ca.all.parsers.v23.MessageHandler23;
 import oscar.util.UtilDateUtilities;
 
 import java.util.ArrayList;
@@ -51,7 +52,8 @@ import java.util.List;
  * 
  * @author dritan
  */
-public class TDISHandler extends MessageHandler {
+public class TDISHandler extends MessageHandler23
+{
 
 	Logger logger = Logger.getLogger(TDISHandler.class);
 

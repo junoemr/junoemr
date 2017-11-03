@@ -43,6 +43,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
+import oscar.oscarLab.ca.all.parsers.v23.MessageHandler23;
 
 import java.util.ArrayList;
 
@@ -50,7 +51,8 @@ import java.util.ArrayList;
  *
  * @author wrighd
  */
-public class DefaultGenericHandler extends MessageHandler {
+public class DefaultGenericHandler extends MessageHandler23
+{
 
     Logger logger = Logger.getLogger(DefaultGenericHandler.class);
 

@@ -33,11 +33,11 @@ import java.util.Date;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v23.datatype.XCN;
-import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import ca.uhn.hl7v2.util.Terser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import oscar.oscarLab.ca.all.parsers.v23.AHSHandler;
 import oscar.util.UtilDateUtilities;
 
 /**
@@ -58,7 +58,6 @@ public abstract class MessageHandler {
 
 	private static Logger logger = Logger.getLogger(AHSHandler.class);
 
-	protected ORU_R01 msg;
 	protected Terser terser;
 
 	/**
@@ -143,10 +142,7 @@ public abstract class MessageHandler {
      *  Return the date and time of the message, usually located in the 7th
      *  field of the MSH segment
      */
-    public String getMsgDate()
-    {
-	    return formatDateTime(getString(msg.getMSH().getDateTimeOfMessage().getTimeOfAnEvent().getValue()));
-    }
+    public abstract String getMsgDate();
 
     /**
      *  A String containing a single letter represinting the priority
@@ -165,10 +161,7 @@ public abstract class MessageHandler {
 	 *  Return the patients location, usually the facility from which the
 	 *  report has been sent ( the 4th field of the MSH segment )
 	 */
-	public String getPatientLocation()
-	{
-		return getString(msg.getMSH().getSendingFacility().getNamespaceID().getValue());
-	}
+	public abstract String getPatientLocation();
 
     /* ===================================== PID ====================================== */
 
@@ -178,46 +171,27 @@ public abstract class MessageHandler {
 	 *  String firstName = getFirstName();
 	 *  String lastName = getLastName();
 	 */
-	public String getPatientName()
-	{
-		return(getFirstName()+" "+getMiddleName()+" "+getLastName());
-	}
+	public abstract String getPatientName();
 
 	/**
 	 *  Return the given name of the patient
 	 */
-	public String getFirstName()
-	{
-		return getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue());
-	}
+	public abstract String getFirstName();
 
 	/**
 	 * Return the middle name of the patient
 	 */
-	public String getMiddleName()
-	{
-		return getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getXpn3_MiddleInitialOrName().getValue());
-	}
+	public abstract String getMiddleName();
 
 	/**
 	 * Return the family name of the patient
 	 */
-	public String getLastName()
-	{
-		return getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getFamilyName().getValue());
-	}
+	public abstract String getLastName();
 
 	/**
 	 *  Return the patients date of birth
 	 */
-	public String getDOB()
-	{
-		try{
-			return(formatDateTime(getString(msg.getRESPONSE().getPATIENT().getPID().getDateOfBirth().getTimeOfAnEvent().getValue())).substring(0, 10));
-		}catch(Exception e){
-			return("");
-		}
-	}
+	public abstract String getDOB();
 
 
 	/**
@@ -245,19 +219,16 @@ public abstract class MessageHandler {
 	/**
 	 *  Return the gender of the patient: 'M' or 'F'
 	 */
-	public String getSex()
-	{
-		return (getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue()));
-	}
+	public abstract String getSex();
 
 	/**
 	 *  Return the patients health number
 	 */
-	public String getHealthNum()
-	{
-		return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDExternalID().getID().getValue()));
-	}
+	public abstract String getHealthNum();
 
+
+	protected abstract String getBuisnessPhone(int i) throws HL7Exception;
+	protected abstract String getHomePhone(int i) throws HL7Exception;
 	/**
 	 *  Return the home phone number of the patient
 	 */
@@ -267,15 +238,15 @@ public abstract class MessageHandler {
 		int i = 0;
 		try
 		{
-			while (!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue()).equals(""))
+			while (!getHomePhone(i).equals(""))
 			{
 				if (i == 0)
 				{
-					phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
+					phone = getHomePhone(i);
 				}
 				else
 				{
-					phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
+					phone = phone + ", " + getHomePhone(i);
 				}
 				i++;
 			}
@@ -297,15 +268,15 @@ public abstract class MessageHandler {
 		int i = 0;
 		try
 		{
-			while (!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue()).equals(""))
+			while (!getBuisnessPhone(i).equals(""))
 			{
 				if (i == 0)
 				{
-					phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
+					phone = getBuisnessPhone(i);
 				}
 				else
 				{
-					phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
+					phone = phone + ", " + getBuisnessPhone(i);
 				}
 				i++;
 			}
@@ -325,21 +296,13 @@ public abstract class MessageHandler {
     /**
      *  Return the number of OBR Segments in the message
      */
-	public int getOBRCount() {
-		return (msg.getRESPONSE().getORDER_OBSERVATIONReps());
-	}
+	public abstract int getOBRCount();
 
     /**
      *  Return the name of the ith OBR Segment, usually stored in the
      *  UniversalServiceIdentifier
      */
-    public String getOBRName(int i) {
-	    try {
-		    return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getUniversalServiceIdentifier().getText().getValue()));
-	    } catch (Exception e) {
-		    return ("");
-	    }
-    }
+    public abstract String getOBRName(int i);
 
     /* ===================================== OBX ====================================== */
 
@@ -348,28 +311,12 @@ public abstract class MessageHandler {
 	 *  segment of the ith obr group. If the date and time is not specified
 	 *  within the obx segment it should be specified within the obr segment.
 	 */
-	public String getTimeStamp(int i, int j) {
-		try {
-			return (formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue())));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
+	public abstract String getTimeStamp(int i, int j);
 
 	/**
 	 *  Return the number of OBX Segments within the OBR group specified by i.
 	 */
-	public int getOBXCount(int i)
-	{
-		try
-		{
-			return (msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATIONReps());
-		}
-		catch(Exception e)
-		{
-			return (0);
-		}
-	}
+	public abstract int getOBXCount(int i);
 
     /**
      *  Return true if an abnormal flag other than 'N' is returned by
@@ -397,17 +344,7 @@ public abstract class MessageHandler {
      *  usually stored in the first component of the third field of the OBX
      *  segment.
      */
-    public String getOBXIdentifier(int i, int j)
-    {
-	    try
-	    {
-		    return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue()));
-	    }
-	    catch(Exception e)
-	    {
-		    return ("");
-	    }
-    }
+    public abstract String getOBXIdentifier(int i, int j);
 
     /**
      * Return the obx value type
@@ -415,17 +352,7 @@ public abstract class MessageHandler {
      * @param j
      * @return String the obx value
      */
-	public String getOBXValueType(int i, int j)
-	{
-		try
-		{
-		    return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getValueType().getValue()));
-		}
-		catch(Exception e)
-		{
-		    return ("");
-		}
-	}
+	public abstract String getOBXValueType(int i, int j);
 
 
     /**
@@ -433,32 +360,12 @@ public abstract class MessageHandler {
      *  usually stored in the second component of the third field of the OBX
      *  segment.
      */
-    public String getOBXName( int i, int j)
-    {
-	    try
-	    {
-		    return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getText().getValue()));
-	    }
-	    catch(Exception e)
-	    {
-		    return ("");
-	    }
-    }
+    public abstract String getOBXName( int i, int j);
 
     /**
      *  Return the result from the jth OBX segment of the ith OBR group
      */
-    public String getOBXResult(int i, int j)
-    {
-	    try
-	    {
-		    return (getString(Terser.get(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(), 5, 0, 1, 1)));
-	    }
-	    catch(Exception e)
-	    {
-		    return ("");
-	    }
-    }
+    public abstract String getOBXResult(int i, int j);
 
     /**
      *  Return the reference range from the jth OBX segment of the ith OBR group

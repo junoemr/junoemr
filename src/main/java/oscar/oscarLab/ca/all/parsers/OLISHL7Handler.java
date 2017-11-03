@@ -33,6 +33,7 @@ import org.oscarehr.olis.model.OLISRequestNomenclature;
 import org.oscarehr.olis.model.OLISResultNomenclature;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.all.parsers.v23.MessageHandler23;
 import oscar.util.UtilDateUtilities;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +53,8 @@ import java.util.regex.Pattern;
 /**
  * @author Adam Balanga
  */
-public class OLISHL7Handler extends MessageHandler {
+public class OLISHL7Handler extends MessageHandler23
+{
 
 	Logger logger = Logger.getLogger(DefaultGenericHandler.class);
 	protected boolean isFinal = true;

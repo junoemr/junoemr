@@ -22,23 +22,19 @@
  * Ontario, Canada
  */
 
-package oscar.oscarLab.ca.all.parsers;
+package oscar.oscarLab.ca.all.parsers.v22;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.v23.message.ORU_R01;
-import ca.uhn.hl7v2.model.v23.segment.MSH;
+import ca.uhn.hl7v2.model.v22.message.ORU_R01;
+import ca.uhn.hl7v2.model.v22.segment.MSH;
 
-public class AHSSpecimenGateHandler extends AHSHandler
+public class AHSSpecimenGateHandler extends MessageHandler22
 {
 
 	public static boolean headerTypeMatch(MSH messageHeaderSegment)
 	{
-		String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
-		String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
-
-		//TODO - the sending facility is not populated. HOW TO determine lab type?
-		return "OADD".equalsIgnoreCase(sendingApplication) &&
-				"".equalsIgnoreCase(sendingFacility);
+		String sendingApplication = messageHeaderSegment.getSendingApplication().getValue();
+		return "SpecimenGate".equalsIgnoreCase(sendingApplication);
 	}
 
 	public AHSSpecimenGateHandler()
@@ -66,4 +62,14 @@ public class AHSSpecimenGateHandler extends AHSHandler
 	}
 	@Override
 	public void postUpload() {}
+
+    /* ===================================== MSH ====================================== */
+
+	@Override
+	public String getMsgType()
+	{
+		return "AHS";
+	}
+
+
 }

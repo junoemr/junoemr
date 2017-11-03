@@ -22,7 +22,7 @@
  * Ontario, Canada
  */
 
-package oscar.oscarLab.ca.all.parsers;
+package oscar.oscarLab.ca.all.parsers.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
@@ -42,9 +42,10 @@ import oscar.util.ConversionUtils;
 import java.util.ArrayList;
 import java.util.Date;
 
-public abstract class AHSHandler extends MessageHandler
+public abstract class AHSHandler extends MessageHandler23
 {
 	private static Logger logger = Logger.getLogger(AHSHandler.class);
+	protected ORU_R01 msg;
 
 	protected enum NameType {
 		FIRST, MIDDLE, LAST
@@ -53,12 +54,11 @@ public abstract class AHSHandler extends MessageHandler
 	public AHSHandler() {}
 	public AHSHandler(String hl7Body) throws HL7Exception
 	{
-		init(hl7Body);
+		super(hl7Body);
 	}
 	public AHSHandler(ORU_R01 msg) throws HL7Exception
 	{
-		this.msg = msg;
-		this.terser = new Terser(msg);
+		super(msg);
 	}
 
 	public void init(String hl7Body) throws HL7Exception {

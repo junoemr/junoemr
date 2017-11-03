@@ -35,10 +35,12 @@ import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
+import oscar.oscarLab.ca.all.parsers.v23.MessageHandler23;
 
 import java.util.ArrayList;
 
-public class IHAHandler extends MessageHandler {
+public class IHAHandler extends MessageHandler23
+{
     
     Logger logger = Logger.getLogger(IHAHandler.class);
     protected Message msg = null;

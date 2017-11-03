@@ -33,6 +33,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
+import oscar.oscarLab.ca.all.parsers.v23.MessageHandler23;
 import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
@@ -42,7 +43,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-public class TRUENORTHHandler extends MessageHandler {
+public class TRUENORTHHandler extends MessageHandler23
+{
     Logger logger = Logger.getLogger(TRUENORTHHandler.class);
     ArrayList<String> headers = null;
     HashMap<OBR, ArrayList<OBX>> obrSegMap = null;

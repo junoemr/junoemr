@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
 import org.oscarehr.util.MiscUtils;
+import oscar.oscarLab.ca.all.parsers.v23.MessageHandler23;
 import oscar.util.UtilDateUtilities;
 
 import java.text.SimpleDateFormat;
@@ -50,7 +51,8 @@ import java.util.HashMap;
  *
  * @author wrighd
  */
-public class MDSHandler extends MessageHandler {
+public class MDSHandler extends MessageHandler23
+{
 
     Object msg = null;
     Object terser;

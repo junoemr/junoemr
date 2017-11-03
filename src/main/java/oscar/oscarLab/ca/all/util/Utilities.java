@@ -79,7 +79,7 @@ public class Utilities {
 				if (line.substring(0, 3).equals("BHS")) {
 					continue;
 				}
-				if (line.substring(0, 3).equals("MSH")){
+				if (line.substring(0, 3).equals("MSH") && line.contains("ORU^R01")){
 					if (firstMSHflag){
 						messages.add(sb.toString());
 						sb.delete(0, sb.length());
