@@ -71,5 +71,26 @@ public class AHSSpecimenGateHandler extends MessageHandler22
 		return "AHS";
 	}
 
+    /* ===================================== OBX ====================================== */
 
+	@Override
+	public boolean isOBXAbnormal(int i, int j) {
+		try {
+			return getOBXAbnormalFlag(i, j).equals("C") || getOBXAbnormalFlag(i, j).equals("H")
+					|| getOBXAbnormalFlag(i, j).equals("L") || getOBXAbnormalFlag(i, j).equals("A");
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	/* ===================================== MISC ===================================== */
+
+	@Override
+	public boolean isUnstructured() {
+		return true;
+	}
+	@Override
+	public String getAccessionNum() {
+		return get("/.OBR-20");
+	}
 }

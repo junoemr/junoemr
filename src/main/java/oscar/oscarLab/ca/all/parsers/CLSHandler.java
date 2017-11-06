@@ -32,10 +32,7 @@ import ca.uhn.hl7v2.model.v23.segment.NTE;
 import ca.uhn.hl7v2.model.v23.segment.OBR;
 import ca.uhn.hl7v2.model.v23.segment.OBX;
 import ca.uhn.hl7v2.model.v23.segment.ORC;
-import ca.uhn.hl7v2.parser.Parser;
-import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
-import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
@@ -53,7 +50,6 @@ import java.util.Date;
  */
 public class CLSHandler extends AHSHandler
 {
-
 	private static Logger logger = Logger.getLogger(CLSHandler.class);
 
 	public static boolean headerTypeMatch(MSH messageHeaderSegment)
@@ -65,21 +61,17 @@ public class CLSHandler extends AHSHandler
 				"CLS".equalsIgnoreCase(sendingFacility);
 	}
 
-
-
 	public CLSHandler()
 	{
 		super();
 	}
+	public CLSHandler(String hl7Body) throws HL7Exception
+	{
+		super(hl7Body);
+	}
 	public CLSHandler(ORU_R01 msg) throws HL7Exception
 	{
 		super(msg);
-	}
-	public void init(String hl7Body) throws HL7Exception {
-		Parser p = new PipeParser();
-		p.setValidationContext(new NoValidation());
-		msg = (ORU_R01) p.parse(hl7Body);
-		terser = new Terser(msg);
 	}
 
 	public String getMsgType() {
@@ -484,15 +476,6 @@ public class CLSHandler extends AHSHandler
 		return get("/.PID-2-4");
 	}
 
-	protected String get(String path) {
-		try {
-			return terser.get(path);
-		} catch (HL7Exception e) {
-			logger.warn("Unable to get field at " + path, e);
-			return null;
-		}
-	}
-
 	/**
 	 * Gets the ordering provider name.
 	 *
@@ -606,10 +589,8 @@ public class CLSHandler extends AHSHandler
 		String outLabString = newVersion;
 		StringBuilder test = new StringBuilder(newVersion);
 
-		oscar.oscarLab.ca.all.parsers.CLSHandler oldVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler();
-		oldVersionCLSParser.init(oldVersion);
-		oscar.oscarLab.ca.all.parsers.CLSHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler();
-		newVersionCLSParser.init(newVersion);
+		oscar.oscarLab.ca.all.parsers.CLSHandler oldVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler(oldVersion);
+		oscar.oscarLab.ca.all.parsers.CLSHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler(newVersion);
 
 		int currentObrCount = newVersionCLSParser.getOBRCount();
 

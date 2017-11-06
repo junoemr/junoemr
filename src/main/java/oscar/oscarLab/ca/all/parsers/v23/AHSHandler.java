@@ -32,10 +32,7 @@ import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.NTE;
 import ca.uhn.hl7v2.model.v23.segment.OBX;
 import ca.uhn.hl7v2.model.v23.segment.ORC;
-import ca.uhn.hl7v2.parser.Parser;
-import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
-import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
 import oscar.util.ConversionUtils;
 
@@ -45,7 +42,6 @@ import java.util.Date;
 public abstract class AHSHandler extends MessageHandler23
 {
 	private static Logger logger = Logger.getLogger(AHSHandler.class);
-	protected ORU_R01 msg;
 
 	protected enum NameType {
 		FIRST, MIDDLE, LAST
@@ -59,13 +55,6 @@ public abstract class AHSHandler extends MessageHandler23
 	public AHSHandler(ORU_R01 msg) throws HL7Exception
 	{
 		super(msg);
-	}
-
-	public void init(String hl7Body) throws HL7Exception {
-		Parser p = new PipeParser();
-		p.setValidationContext(new NoValidation());
-		this.msg = (ORU_R01) p.parse(hl7Body);
-		this.terser = new Terser(msg);
 	}
 
 	@Override
@@ -104,10 +93,6 @@ public abstract class AHSHandler extends MessageHandler23
 		return "AHS";
 	}
 
-	@Override
-	public String getMsgPriority() {
-		return ("");
-	}
 
 	/* ===================================== PID ====================================== */
 
@@ -171,18 +156,6 @@ public abstract class AHSHandler extends MessageHandler23
 		}
 	}
 
-	public String getDOB() {
-		try {
-			return (formatDateTime(getString(msg.getRESPONSE().getPATIENT().getPID().getDateOfBirth().getTimeOfAnEvent().getValue())));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	public String getSex() {
-		return (getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue()));
-	}
-
 	/* ===================================== OBR ====================================== */
 
 	public ORU_R01_ORDER_OBSERVATION getOBR(int i) throws HL7Exception {
@@ -225,15 +198,6 @@ public abstract class AHSHandler extends MessageHandler23
 	}
 
 	@Override
-	public String getOBXAbnormalFlag(int i, int j) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getAbnormalFlags(0).getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	@Override
 	public String getObservationHeader(int i, int j) {
 		return getOBRName(i);
 	}
@@ -247,51 +211,6 @@ public abstract class AHSHandler extends MessageHandler23
 				return getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue()) + "&" + subIdent;
 			}
 			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	@Override
-	public String getOBXValueType(int i, int j) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getValueType().getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	@Override
-	public String getOBXName(int i, int j) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getText().getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	@Override
-	public String getOBXResult(int i, int j) {
-		try {
-			return (getString(Terser.get(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(), 5, 0, 1, 1)));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	@Override
-	public String getOBXReferenceRange(int i, int j) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getReferencesRange().getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	@Override
-	public String getOBXUnits(int i, int j) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getUnits().getIdentifier().getValue()));
 		} catch (Exception e) {
 			return ("");
 		}
@@ -333,21 +252,6 @@ public abstract class AHSHandler extends MessageHandler23
 			}
 		}
 		return count;
-	}
-
-	/**
-	 *  Retrieve the possible segment headers from the OBX fields
-	 */
-	@Override
-	public ArrayList<String> getHeaders() {
-		ArrayList<String> headers = new ArrayList<String>();
-		for (int i = 0; i < getOBRCount(); i++) {
-			String obrName = getOBRName(i);
-			if (!headers.contains(obrName)) {
-				headers.add(obrName);
-			}
-		}
-		return headers;
 	}
 
 	/**
@@ -542,11 +446,6 @@ public abstract class AHSHandler extends MessageHandler23
 	}
 
 	@Override
-	public String audit() {
-		return "";
-	}
-
-	@Override
 	protected String getString(String retrieve) {
 		return super.getString(retrieve).replaceAll("\\\\\\.br\\\\", "<br />");
 	}
@@ -574,15 +473,6 @@ public abstract class AHSHandler extends MessageHandler23
 
 	public String getAssigningAuthority() {
 		return get("/.PID-2-4");
-	}
-
-	protected String get(String path) {
-		try {
-			return terser.get(path);
-		} catch (HL7Exception e) {
-			logger.warn("Unable to get field at " + path, e);
-			return null;
-		}
 	}
 
 	/**

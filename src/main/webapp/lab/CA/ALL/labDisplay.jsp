@@ -1173,11 +1173,9 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 							if(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")){
 								isSGorCDC = true;
 							}
-						} else if(handler.getMsgType().equals("CLS")){
-                            isUnstructuredDoc = ((CLSHandler) handler).isUnstructured();
-                        }
-                        else if(handler.getMsgType().equals("CLSDI")){
-                            isUnstructuredDoc = ((CLSDIHandler) handler).isUnstructured();
+						}
+                        else {
+                        	isUnstructuredDoc = handler.isUnstructured();
                         }
 						%>
 		                       <table style="page-break-inside:avoid;" bgcolor="#003399" border="0" cellpadding="0" cellspacing="0" width="100%">

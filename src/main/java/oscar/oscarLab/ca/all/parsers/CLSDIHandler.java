@@ -55,6 +55,10 @@ public class CLSDIHandler extends CLSHandler {
 	public CLSDIHandler() {
 		super();
 	}
+	public CLSDIHandler(String hl7Body) throws HL7Exception
+	{
+		super(hl7Body);
+	}
 	public CLSDIHandler(ORU_R01 msg) throws HL7Exception
 	{
 		super(msg);

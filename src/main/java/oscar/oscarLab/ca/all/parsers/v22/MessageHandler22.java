@@ -71,110 +71,6 @@ public abstract class MessageHandler22 extends MessageHandler
 		response = msg.getPATIENT_RESULT();
 		patient = msg.getPATIENT_RESULT().getPATIENT();
 	}
-
-		/* ===================================== MSH ====================================== */
-	/**
-	 *  Return the date and time of the message, usually located in the 7th
-	 *  field of the MSH segment
-	 */
-	@Override
-	public String getMsgDate()
-	{
-		return formatDateTime(getString(msg.getMSH().getDateTimeOfMessage().getTimeOfAnEvent().getValue()));
-	}
-
-	/**
-	 *  Return the patients location, usually the facility from which the
-	 *  report has been sent ( the 4th field of the MSH segment )
-	 */
-	@Override
-	public String getPatientLocation()
-	{
-		return getString(msg.getMSH().getSendingFacility().getValue());
-	}
-
-	/* ===================================== PID ====================================== */
-
-	/**
-	 *  Return the name of the patient. The format should be the first name
-	 *  followed by the last name while being separated by a space.
-	 *  String firstName = getFirstName();
-	 *  String lastName = getLastName();
-	 */
-	@Override
-	public String getPatientName()
-	{
-		return(getFirstName()+" "+getMiddleName()+" "+getLastName());
-	}
-
-	/**
-	 *  Return the given name of the patient
-	 */
-	@Override
-	public String getFirstName()
-	{
-		return getString(patient.getPID().getPatientName().getGivenName().getValue());
-	}
-
-	/**
-	 * Return the middle name of the patient
-	 */
-	@Override
-	public String getMiddleName()
-	{
-		return getString(patient.getPID().getPatientName().getMiddleInitialOrName().getValue());
-	}
-
-	/**
-	 * Return the family name of the patient
-	 */
-	@Override
-	public String getLastName()
-	{
-		return getString(patient.getPID().getPatientName().getFamilyName().getValue());
-	}
-
-	/**
-	 *  Return the patients date of birth
-	 */
-	@Override
-	public String getDOB()
-	{
-		try{
-			return(formatDateTime(getString(patient.getPID().getDateOfBirth().getTimeOfAnEvent().getValue())).substring(0, 10));
-		}catch(Exception e){
-			return("");
-		}
-	}
-	/**
-	 *  Return the gender of the patient: 'M' or 'F'
-	 */
-	@Override
-	public String getSex()
-	{
-		return (getString(patient.getPID().getSex().getValue()));
-	}
-
-	/**
-	 *  Return the patients health number
-	 */
-	@Override
-	public String getHealthNum()
-	{
-		return(getString(patient.getPID().getPatientIDExternalID().getIDNumber().getValue()));
-	}
-
-	@Override
-	protected String getBuisnessPhone(int i) throws HL7Exception
-	{
-		return getString(patient.getPID().getPhoneNumberHome(i).getValue());
-	}
-	@Override
-	protected String getHomePhone(int i) throws HL7Exception
-	{
-		return getString(patient.getPID().getPhoneNumberHome(i).getValue());
-	}
-
 	/* ===================================== OBR ====================================== */
 
 	/**
@@ -183,19 +79,6 @@ public abstract class MessageHandler22 extends MessageHandler
 	@Override
 	public int getOBRCount() {
 		return (response.getORDER_OBSERVATIONReps());
-	}
-
-	/**
-	 *  Return the name of the ith OBR Segment, usually stored in the
-	 *  UniversalServiceIdentifier
-	 */
-	@Override
-	public String getOBRName(int i) {
-		try {
-			return (getString(response.getORDER_OBSERVATION(i).getOBR().getUniversalServiceID().getText().getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
 	}
 
 	/**
@@ -461,43 +344,43 @@ public abstract class MessageHandler22 extends MessageHandler
 	@Override
 	public String getServiceDate()
 	{
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getRequestDate(int i)
 	{
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getOrderStatus()
 	{
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getClientRef()
 	{
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getAccessionNum()
 	{
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getDocName()
 	{
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getCCDocs()
 	{
-		return null;
+		return "";
 	}
 
 	@Override
@@ -509,29 +392,33 @@ public abstract class MessageHandler22 extends MessageHandler
 	@Override
 	public String getFillerOrderNumber()
 	{
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getEncounterId()
 	{
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getRadiologistInfo()
 	{
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getNteForOBX(int i, int j)
 	{
-		return null;
+		return "";
 	}
 
 	@Override
 	public String getNteForPID() {
 		return "";
+	}
+	@Override
+	public boolean isUnstructured() {
+		return true;
 	}
 }

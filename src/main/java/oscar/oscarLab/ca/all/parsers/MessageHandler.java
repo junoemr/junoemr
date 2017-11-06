@@ -25,20 +25,20 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import ca.uhn.hl7v2.util.Terser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import oscar.oscarLab.ca.all.parsers.v23.AHSHandler;
 import oscar.util.UtilDateUtilities;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 
 /**
  *  When implementing this class a global variable 'msg' should be created as
@@ -56,7 +56,7 @@ import oscar.util.UtilDateUtilities;
  */
 public abstract class MessageHandler {
 
-	private static Logger logger = Logger.getLogger(AHSHandler.class);
+	private static Logger logger = Logger.getLogger(MessageHandler.class);
 
 	protected Terser terser;
 
@@ -142,7 +142,10 @@ public abstract class MessageHandler {
      *  Return the date and time of the message, usually located in the 7th
      *  field of the MSH segment
      */
-    public abstract String getMsgDate();
+    public String getMsgDate()
+    {
+	    return formatDateTime(get("/.MSH-7"));
+    }
 
     /**
      *  A String containing a single letter represinting the priority
@@ -161,7 +164,10 @@ public abstract class MessageHandler {
 	 *  Return the patients location, usually the facility from which the
 	 *  report has been sent ( the 4th field of the MSH segment )
 	 */
-	public abstract String getPatientLocation();
+	public String getPatientLocation()
+	{
+		return getString(get("/.MSH-4"));
+	}
 
     /* ===================================== PID ====================================== */
 
@@ -171,76 +177,79 @@ public abstract class MessageHandler {
 	 *  String firstName = getFirstName();
 	 *  String lastName = getLastName();
 	 */
-	public abstract String getPatientName();
-
-	/**
-	 *  Return the given name of the patient
-	 */
-	public abstract String getFirstName();
-
-	/**
-	 * Return the middle name of the patient
-	 */
-	public abstract String getMiddleName();
-
-	/**
-	 * Return the family name of the patient
-	 */
-	public abstract String getLastName();
-
-	/**
-	 *  Return the patients date of birth
-	 */
-	public abstract String getDOB();
-
-
-	/**
-	 *  Return the age of the patient (this is not specified in the message but
-	 *  can be calculated using the patients date of birth)
-	 */
-	public String getAge()
+	public String getPatientName()
 	{
-		String age = "N/A";
-		String dob = getDOB();
-		try
-		{
-			// Some examples
-			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			java.util.Date date = formatter.parse(dob);
-			age = UtilDateUtilities.calcAge(date);
-		}
-		catch(ParseException e)
-		{
-			logger.error("Could not get age", e);
-		}
-		return age;
+		return(getFirstName()+" "+getMiddleName()+" "+getLastName());
 	}
-
-	/**
-	 *  Return the gender of the patient: 'M' or 'F'
-	 */
-	public abstract String getSex();
 
 	/**
 	 *  Return the patients health number
 	 */
-	public abstract String getHealthNum();
+	public String getHealthNum()
+	{
+		return getString(get("/.PID-2"));
+	}
+
+	/**
+	 * Return the family name of the patient
+	 */
+	public String getLastName()
+	{
+		return getString(get("/.PID-5-1"));
+	}
+	/**
+	 *  Return the given name of the patient
+	 */
+	public String getFirstName()
+	{
+		return getString(get("/.PID-5-2"));
+	}
+
+	/**
+	 * Return the middle name of the patient
+	 */
+	public String getMiddleName()
+	{
+		return getString(get("/.PID-5-3"));
+	}
+
+	/**
+	 *  Return the patients date of birth
+	 */
+	public String getDOB()
+	{
+		return formatDateTime(getString(get("/.PID-7"))).substring(0, 10);
+	}
+	/**
+	 *  Return the gender of the patient: 'M' or 'F'
+	 */
+	public String getSex()
+	{
+		return getString(get("/.PID-8"));
+	}
 
 
-	protected abstract String getBuisnessPhone(int i) throws HL7Exception;
-	protected abstract String getHomePhone(int i) throws HL7Exception;
+
+	protected String getBuisnessPhone(int i) throws HL7Exception
+	{
+		return getString(get("/.PID-13-"+i));
+	}
+	protected String getHomePhone(int i) throws HL7Exception
+	{
+		return getString(get("/.PID-14-"+i));
+	}
 	/**
 	 *  Return the home phone number of the patient
 	 */
 	public String getHomePhone()
 	{
 		String phone = "";
-		int i = 0;
+		int i = 1;
 		try
 		{
 			while (!getHomePhone(i).equals(""))
 			{
-				if (i == 0)
+				if (i == 1)
 				{
 					phone = getHomePhone(i);
 				}
@@ -265,12 +274,12 @@ public abstract class MessageHandler {
 	public String getWorkPhone()
 	{
 		String phone = "";
-		int i = 0;
+		int i = 1;
 		try
 		{
 			while (!getBuisnessPhone(i).equals(""))
 			{
-				if (i == 0)
+				if (i == 1)
 				{
 					phone = getBuisnessPhone(i);
 				}
@@ -302,12 +311,48 @@ public abstract class MessageHandler {
      *  Return the name of the ith OBR Segment, usually stored in the
      *  UniversalServiceIdentifier
      */
-    public abstract String getOBRName(int i);
+    public String getOBRName(int i)
+    {
+    	return getString(get("/.OBR("+i+")-4"));
+    }
+
+	/**
+	 *  Return the number of comments (usually NTE segments) that follow ith
+	 *  OBR segment, this should usually be either 0 or 1.
+	 */
+	public abstract int getOBRCommentCount(int i);
+
+	/**
+	 *  Return the jth comment of the ith OBR segment.
+	 */
+	public abstract String getOBRComment(int i, int j);
+
+	/**
+	 *  Return the observation header which represents the observation stored in
+	 *  the jth OBX segment of the ith OBR group. May be stored in either the
+	 *  OBR or OBX segment. It is used to separate the observations into groups.
+	 *  ie/ 'CHEMISTRY' 'HEMATOLOGY' '
+	 */
+	public abstract String getObservationHeader( int i, int j);
+
+	/**
+	 *  Return a list of all possible headers retrieved from getObservationHeader
+	 *  each header will only occur once in the list
+	 */
+	public ArrayList<String> getHeaders()
+	{
+		HashSet<String> headers = new HashSet<>();
+		for (int i = 0; i < getOBRCount(); i++) {
+			// duplicates are ignored in hash set add
+			headers.add(getOBRName(i));
+		}
+		return new ArrayList<>(headers);
+	}
 
     /* ===================================== OBX ====================================== */
 
 	/**
-	 *  Return the date and time of the observation refered to by the jth obx
+	 *  Return the date and time of the observation referred to by the jth obx
 	 *  segment of the ith obr group. If the date and time is not specified
 	 *  within the obx segment it should be specified within the obr segment.
 	 */
@@ -323,28 +368,20 @@ public abstract class MessageHandler {
      *  getOBXAbnormalFlag( i, j ) for the OBX segment specified by j, in the
      *  ith OBR group. Return false otherwise.
      */
-    public abstract boolean isOBXAbnormal( int i, int j);
+    public boolean isOBXAbnormal(int i, int j)
+    {
+    	String abnormalFlags = getOBXAbnormalFlag(i,j);
+	    return !("N".equals(abnormalFlags));
+    }
 
     /**
      *  Retrieve the abnormal flag if any from the OBX segment specified by j in
      *  the ith OBR group.
      */
-    public abstract String getOBXAbnormalFlag( int i, int j);
-
-    /**
-     *  Return the observation header which represents the observation stored in
-     *  the jth OBX segment of the ith OBR group. May be stored in either the
-     *  OBR or OBX segment. It is used to separate the observations into groups.
-     *  ie/ 'CHEMISTRY' 'HEMATOLOGY' '
-     */
-    public abstract String getObservationHeader( int i, int j);
-
-    /**
-     *  Return the identifier from jth OBX segment of the ith OBR group. It is
-     *  usually stored in the first component of the third field of the OBX
-     *  segment.
-     */
-    public abstract String getOBXIdentifier(int i, int j);
+    public String getOBXAbnormalFlag( int i, int j)
+    {
+	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-8"));
+    }
 
     /**
      * Return the obx value type
@@ -352,52 +389,62 @@ public abstract class MessageHandler {
      * @param j
      * @return String the obx value
      */
-	public abstract String getOBXValueType(int i, int j);
+	public String getOBXValueType(int i, int j)
+	{
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-2"));
+	}
 
+	/**
+	 *  Return the identifier from jth OBX segment of the ith OBR group. It is
+	 *  usually stored in the first component of the third field of the OBX
+	 *  segment.
+	 */
+	public String getOBXIdentifier(int i, int j)
+	{
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-3-1"));
+	}
 
     /**
      *  Return the name of the jth OBX segment of the ith OBR group. It is
      *  usually stored in the second component of the third field of the OBX
      *  segment.
      */
-    public abstract String getOBXName( int i, int j);
+    public String getOBXName( int i, int j)
+    {
+	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-3-2"));
+    }
 
     /**
      *  Return the result from the jth OBX segment of the ith OBR group
      */
-    public abstract String getOBXResult(int i, int j);
+    public String getOBXResult(int i, int j)
+    {
+	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-5"));
+    }
+
+	/**
+	 *  Return the units from the jth OBX segment of the ith OBR group
+	 */
+	public String getOBXUnits( int i, int j)
+	{
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-6"));
+	}
 
     /**
      *  Return the reference range from the jth OBX segment of the ith OBR group
      */
-    public abstract String getOBXReferenceRange( int i, int j);
-
-    /**
-     *  Return the units from the jth OBX segment of the ith OBR group
-     */
-    public abstract String getOBXUnits( int i, int j);
+    public String getOBXReferenceRange( int i, int j)
+    {
+	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-7"));
+    }
 
     /**
      *  Return the result status from the jth OBX segment of the ith OBR group
      */
-    public abstract String getOBXResultStatus( int i, int j);
-
-    /**
-     *  Return a list of all possible headers retrieved from getObservationHeader
-     *  each header will only occur once in the list
-     */
-    public abstract ArrayList<String> getHeaders();
-
-    /**
-     *  Return the number of comments (usually NTE segments) that follow ith
-     *  OBR segment, this should usually be either 0 or 1.
-     */
-    public abstract int getOBRCommentCount( int i);
-
-    /**
-     *  Return the jth comment of the ith OBR segment.
-     */
-    public abstract String getOBRComment( int i, int j);
+    public String getOBXResultStatus( int i, int j)
+    {
+	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-11"));
+    }
 
     /**
      *  Return the number of comments (usually NTE segments) following the jth
@@ -409,6 +456,22 @@ public abstract class MessageHandler {
      *  Return the kth comment of the jth OBX segment of the ith OBR group
      */
     public abstract String getOBXComment( int i, int j, int k);
+
+	/**
+	 *  Returns the number used to order labs with matching accession numbers.
+	 *
+	 *  - Multiple labs with the same accession number must display in a certain
+	 *  order. They are ordered by their date but if two labs with the same
+	 *  accession number have the same date they are ordered by the number
+	 *  retrievied by this method
+	 *
+	 *  - The newest lab will have the greatest number returned from this method.
+	 *
+	 *  - If the hl7 messages do not contain a version number or other such
+	 *  number, the total number of obx segments with final results should be
+	 *  returned
+	 */
+	public abstract int getOBXFinalResultCount();
 
 
 	/* ===================================== MISC ====================================== */
@@ -429,22 +492,6 @@ public abstract class MessageHandler {
      *  otherwise the report is partial
      */
     public abstract String getOrderStatus();
-
-    /**
-     *  Returns the number used to order labs with matching accession numbers.
-     *
-     *  - Multiple labs with the same accession number must display in a certain
-     *  order. They are ordered by their date but if two labs with the same
-     *  accession number have the same date they are ordered by the number
-     *  retrievied by this method
-     *
-     *  - The newest lab will have the greatest number returned from this method.
-     *
-     *  - If the hl7 messages do not contain a version number or other such
-     *  number, the total number of obx segments with final results should be
-     *  returned
-     */
-    public abstract int getOBXFinalResultCount();
 
     /**
      *  Return the clients reference number, usually corresponds to the doctor
@@ -495,11 +542,31 @@ public abstract class MessageHandler {
     
     public abstract String getNteForPID();
 
+	public abstract boolean isUnstructured();
+
 	/* ================================== Extra Methods and helpers ==================================== */
+
+	/**
+	 * use the terser to retrieve segment info, with exception handling
+	 * @param path - terser formatted segment path
+	 * @return String value of the segment, or null if parsing the path failed
+	 */
+	protected String get(String path)
+	{
+		try
+		{
+			return terser.get(path);
+		}
+		catch(HL7Exception e)
+		{
+			logger.warn("Unable to get field at " + path, e);
+			return null;
+		}
+	}
 
 	protected String formatDateTime(String plain)
 	{
-		if (plain == null || plain.trim().equals("")) return "";
+		if(plain == null || plain.trim().equals("")) return "";
 
 		String dateFormat = "yyyyMMddHHmmss";
 		dateFormat = dateFormat.substring(0, plain.length());
@@ -508,6 +575,23 @@ public abstract class MessageHandler {
 
 		Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
 		return UtilDateUtilities.DateToString(date, stringFormat);
+	}
+	public String getAge()
+	{
+		String age = "N/A";
+		String dob = getDOB();
+		try
+		{
+			// Some examples
+			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date date = formatter.parse(dob);
+			age = UtilDateUtilities.calcAge(date);
+		}
+		catch(ParseException e)
+		{
+			logger.error("Could not get age", e);
+		}
+		return age;
 	}
 
 	protected String getString(String retrieve)

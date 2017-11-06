@@ -277,18 +277,6 @@ public class IHAHandler extends MessageHandler23
             return(i-1);
         }
     }
-
-    /*@Override
-    /*public String getOBRName(int i){
-    	String sName=null;
-        try{
-        	sName = getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getDiagnosticServiceSectionID().getValue());
-        	if(sName.equals("")) sName = getString(msg.getMSH().getMsh4_SendingFacility().getUniversalID().getValue());
-            return(sName);
-        }catch(Exception e){
-            return("");
-        }
-    }*/
     
     private String getSendingApplication() {
     	try {
@@ -305,13 +293,6 @@ public class IHAHandler extends MessageHandler23
             return("");
         }
     }
-    /*private String getUniversalServiceID() {
-    	try {
-    	return(getString(terser.get("/.OBR-4-2")));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
 
     @Override
     public String getOBRName(int i){
@@ -641,21 +622,7 @@ public class IHAHandler extends MessageHandler23
     public String getOBXIdentifier(int i, int j){
         return(getOBXField(i, j, 3, 0, 1));
     }
-    
-    /*@Override
-    public String getOBXValueType(int i, int j){
-        try{
-        	String obrName = getOBRName(i);
-        	if(obrName.equals("OE")) return "NA";
-        	String header = getObservationHeader(0,0);
-        	if(header.equals("")) return "NA";
-        	if(header.equalsIgnoreCase("BBK")||header.equalsIgnoreCase("MB")||header.equalsIgnoreCase("PTH")||header.equalsIgnoreCase("RAD")||header.equalsIgnoreCase("OE"))
-        		return "NA";
-        	else return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getValueType().getValue()));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
+
     
     @Override
     public String getOBXValueType(int i, int j){
