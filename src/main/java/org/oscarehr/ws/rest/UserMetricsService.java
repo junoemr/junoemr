@@ -24,7 +24,6 @@
 
 package org.oscarehr.ws.rest;
 
-import io.prometheus.client.Gauge;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
