@@ -52,6 +52,28 @@ public class AHSSunquestHandler extends AHSHandler
 	{
 		super(msg);
 	}
+
+    /* ===================================== MSH ====================================== */
+
+    @Override
+	public String getAccessionNum()
+    {
+    	return getString(get("/.MSH-10"));
+    }
+
+    /* ===================================== PID ====================================== */
+
+	@Override
+	public String getClientRef()
+	{
+		return ""; // not sent
+	}
+
+
+
+
+
+
 	@Override
 	public String preUpload(String hl7Message) throws HL7Exception
 	{
@@ -64,4 +86,6 @@ public class AHSSunquestHandler extends AHSHandler
 	}
 	@Override
 	public void postUpload() {}
+
+
 }

@@ -66,7 +66,8 @@ public class CMLHandler extends MessageHandler23
     public void init(String hl7Body) throws HL7Exception {
         Parser p = new PipeParser();
         p.setValidationContext(new NoValidation());
-        msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ));
+        this.msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ));
+        this.terser = new Terser(msg);
     }
     @Override
     public String preUpload(String hl7Message) throws HL7Exception

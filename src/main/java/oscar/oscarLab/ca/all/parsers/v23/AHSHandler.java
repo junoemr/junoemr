@@ -36,7 +36,6 @@ import ca.uhn.hl7v2.util.Terser;
 import org.apache.log4j.Logger;
 import oscar.util.ConversionUtils;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 public abstract class AHSHandler extends MessageHandler23
@@ -168,14 +167,6 @@ public abstract class AHSHandler extends MessageHandler23
 
 	public NTE getOBRNTE(int i, int j) throws HL7Exception {
 		return msg.getRESPONSE().getORDER_OBSERVATION(i).getNTE(j);
-	}
-
-	public void insertOBR(ORU_R01_ORDER_OBSERVATION newOBR) {
-		try {
-			msg.getRESPONSE().insertORDER_OBSERVATION(newOBR, getOBRCount());
-		} catch (HL7Exception e) {
-			logger.error("Error Adding OBR segment.", e);
-		}
 	}
 
 	/* ===================================== OBX ====================================== */
@@ -339,15 +330,6 @@ public abstract class AHSHandler extends MessageHandler23
 	}
 
 	@Override
-	public String getRequestDate(int i) {
-		try {
-			return (formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getRequestedDateTime().getTimeOfAnEvent().getValue())));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	@Override
 	public String getOrderStatus(){
 		try{
 			// of ORC is present - return it
@@ -360,89 +342,6 @@ public abstract class AHSHandler extends MessageHandler23
 		}catch(Exception e){
 			return("");
 		}
-	}
-
-	@Override
-	public String getClientRef() {
-		String docNum = "";
-		int i = 0;
-		try {
-			while (!getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue()).equals("")) {
-				if (i == 0) {
-					docNum = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue());
-				} else {
-					docNum = docNum + ", " + getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue());
-				}
-				i++;
-			}
-			return (docNum);
-		} catch (Exception e) {
-			logger.error("Could not return doctor id numbers", e);
-			return ("");
-		}
-	}
-
-	@Override
-	public String getDocName() {
-		String docName = "";
-		int i = 0;
-		try {
-			while (!getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i)).equals("")) {
-				if (i == 0) {
-					docName = getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i));
-				} else {
-					docName = docName + ", " + getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i));
-				}
-				i++;
-			}
-			return (docName);
-		} catch (Exception e) {
-			logger.error("Could not return doctor names", e);
-			return ("");
-		}
-	}
-
-	@Override
-	public String getCCDocs() {
-		String docName = "";
-		int i = 0;
-		try {
-			while (!getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i)).equals("")) {
-				if (i == 0) {
-					docName = getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i));
-				} else {
-					docName = docName + ", " + getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i));
-				}
-				i++;
-			}
-			return (docName);
-		} catch (Exception e) {
-			logger.error("Could not return cc'ed doctors", e);
-			return ("");
-		}
-	}
-
-	@Override
-	public ArrayList<String> getDocNums() {
-		ArrayList<String> docNums = new ArrayList<String>();
-		String id;
-		int i;
-
-		try {
-			String providerId = msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(0).getIDNumber().getValue();
-			docNums.add(providerId);
-
-			i = 0;
-			while ((id = msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i).getIDNumber().getValue()) != null) {
-				if (!id.equals(providerId)) docNums.add(id);
-				i++;
-			}
-		} catch (Exception e) {
-			logger.error("Could not return doctor nums", e);
-
-		}
-
-		return (docNums);
 	}
 
 	@Override

@@ -61,7 +61,8 @@ public class EpsilonHandler  extends CMLHandler {
 		}
 		Parser p = new PipeParser();
 		p.setValidationContext(new NoValidation());
-		msg = (ORU_R01) p.parse(hl7Body.replaceAll("\n", "\r\n"));
+		this.msg = (ORU_R01) p.parse(hl7Body.replaceAll("\n", "\r\n"));
+		this.terser = new Terser(msg);
 	}
 
 	@Override

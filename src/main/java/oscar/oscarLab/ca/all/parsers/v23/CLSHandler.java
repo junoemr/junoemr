@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package oscar.oscarLab.ca.all.parsers;
+package oscar.oscarLab.ca.all.parsers.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
@@ -37,7 +37,6 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.util.SpringUtils;
-import oscar.oscarLab.ca.all.parsers.v23.AHSHandler;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
@@ -271,20 +270,6 @@ public class CLSHandler extends AHSHandler
 	}
 
 	/**
-	 *  Retrieve the possible segment headers from the OBX fields
-	 */
-	public ArrayList<String> getHeaders() {
-		ArrayList<String> headers = new ArrayList<String>();
-		for (int i = 0; i < getOBRCount(); i++) {
-			String obrName = getOBRName(i);
-			if (!headers.contains(obrName)) {
-				headers.add(obrName);
-			}
-		}
-		return headers;
-	}
-
-	/**
 	 *  Methods to get information from observation notes
 	 */
 	public int getOBRCommentCount(int i) {
@@ -338,121 +323,12 @@ public class CLSHandler extends AHSHandler
 		return (getString(msg.getMSH().getSendingFacility().getNamespaceID().getValue()));
 	}
 
-	public String getServiceDate() {
-		try {
-			String serviceDate = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getOrderEffectiveDateTime().getTimeOfAnEvent().getValue());
-			if (serviceDate == null || serviceDate.isEmpty()) {
-				serviceDate = get("/.OBR-14");
-			}
-			return (formatDateTime(serviceDate));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
 	public String getRequestDate(int i) {
 		try {
 			return (formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getRequestedDateTime().getTimeOfAnEvent().getValue())));
 		} catch (Exception e) {
 			return ("");
 		}
-	}
-
-	   public String getOrderStatus(){
-	        try{
-	        	// of ORC is present - return it
-	        	String orderStatus = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getOrderStatus().getValue());
-	        	if (orderStatus != null && !orderStatus.isEmpty()) {
-	        		return orderStatus;
-	        	}
-	        	// otherwise get first OBR status
-	            return get("/.OBR-25-1");
-	        }catch(Exception e){
-	            return("");
-	        }
-	    }
-
-	public String getClientRef() {
-		String docNum = "";
-		int i = 0;
-		try {
-			while (!getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue()).equals("")) {
-				if (i == 0) {
-					docNum = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue());
-				} else {
-					docNum = docNum + ", " + getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue());
-				}
-				i++;
-			}
-			return (docNum);
-		} catch (Exception e) {
-			logger.error("Could not return doctor id numbers", e);
-			return ("");
-		}
-	}
-
-	public String getDocName() {
-		String docName = "";
-		int i = 0;
-		try {
-			while (!getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i)).equals("")) {
-				if (i == 0) {
-					docName = getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i));
-				} else {
-					docName = docName + ", " + getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i));
-				}
-				i++;
-			}
-			return (docName);
-		} catch (Exception e) {
-			logger.error("Could not return doctor names", e);
-			return ("");
-		}
-	}
-
-	public String getCCDocs() {
-		String docName = "";
-		int i = 0;
-		try {
-			while (!getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i)).equals("")) {
-				if (i == 0) {
-					docName = getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i));
-				} else {
-					docName = docName + ", " + getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i));
-				}
-				i++;
-			}
-			return (docName);
-		} catch (Exception e) {
-			logger.error("Could not return cc'ed doctors", e);
-			return ("");
-		}
-	}
-
-	public ArrayList<String> getDocNums() {
-		ArrayList<String> docNums = new ArrayList<String>();
-		String id;
-		int i;
-
-		try {
-			String providerId = msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(0).getIDNumber().getValue();
-			docNums.add(providerId);
-
-			i = 0;
-			while ((id = msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i).getIDNumber().getValue()) != null) {
-				if (!id.equals(providerId)) docNums.add(id);
-				i++;
-			}
-		} catch (Exception e) {
-			logger.error("Could not return doctor nums", e);
-
-		}
-
-		return (docNums);
-	}
-
-	public String audit() {
-		return "";
 	}
 
 	public String getFillerOrderNumber() {
@@ -589,8 +465,8 @@ public class CLSHandler extends AHSHandler
 		String outLabString = newVersion;
 		StringBuilder test = new StringBuilder(newVersion);
 
-		oscar.oscarLab.ca.all.parsers.CLSHandler oldVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler(oldVersion);
-		oscar.oscarLab.ca.all.parsers.CLSHandler newVersionCLSParser = new oscar.oscarLab.ca.all.parsers.CLSHandler(newVersion);
+		CLSHandler oldVersionCLSParser = new CLSHandler(oldVersion);
+		CLSHandler newVersionCLSParser = new CLSHandler(newVersion);
 
 		int currentObrCount = newVersionCLSParser.getOBRCount();
 
@@ -641,7 +517,7 @@ public class CLSHandler extends AHSHandler
 		return outLabString;
 	}
 
-	private boolean obrExists(String fillerNumber, oscar.oscarLab.ca.all.parsers.CLSHandler parser)
+	private boolean obrExists(String fillerNumber, CLSHandler parser)
 			throws HL7Exception
 	{
 		ArrayList<OBR> searchObrs = this.getObrs(parser);
@@ -653,7 +529,7 @@ public class CLSHandler extends AHSHandler
 		return false;
 	}
 
-	private ArrayList<OBR> getObrs( oscar.oscarLab.ca.all.parsers.CLSHandler parser)
+	private ArrayList<OBR> getObrs( CLSHandler parser)
 			throws HL7Exception
 	{
 		ArrayList<OBR> outOBR = new ArrayList<OBR>();

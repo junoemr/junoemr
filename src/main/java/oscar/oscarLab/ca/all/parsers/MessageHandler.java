@@ -26,8 +26,8 @@
 package oscar.oscarLab.ca.all.parsers;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
+import ca.uhn.hl7v2.model.v25.datatype.XCN;
 import ca.uhn.hl7v2.util.Terser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -36,8 +36,12 @@ import oscar.util.UtilDateUtilities;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 
 /**
@@ -169,6 +173,11 @@ public abstract class MessageHandler {
 		return getString(get("/.MSH-4"));
 	}
 
+	/**
+	 *  Return the accession number
+	 */
+	public abstract String getAccessionNum();
+
     /* ===================================== PID ====================================== */
 
 	/**
@@ -218,7 +227,7 @@ public abstract class MessageHandler {
 	 */
 	public String getDOB()
 	{
-		return formatDateTime(getString(get("/.PID-7"))).substring(0, 10);
+		return formatDate(getString(get("/.PID-7")));
 	}
 	/**
 	 *  Return the gender of the patient: 'M' or 'F'
@@ -227,8 +236,6 @@ public abstract class MessageHandler {
 	{
 		return getString(get("/.PID-8"));
 	}
-
-
 
 	protected String getBuisnessPhone(int i) throws HL7Exception
 	{
@@ -317,6 +324,31 @@ public abstract class MessageHandler {
     }
 
 	/**
+	 *  Return the request date of the message
+	 */
+	public String getRequestDate(int i)
+	{
+		return formatDateTime(get("/.OBR("+i+")-6"));
+	}
+
+	/**
+	 *  Return the service date of the message
+	 */
+	public String getServiceDate()
+	{
+		return formatDateTime(get("/.OBR(0)-14"));
+	}
+
+	/**
+	 *  Return the status of the report, 'F' is returned for a final report,
+	 *  otherwise the report is partial
+	 */
+	public String getOrderStatus()
+	{
+		return getString(get("/.OBR(0)-25"));
+	}
+
+	/**
 	 *  Return the number of comments (usually NTE segments) that follow ith
 	 *  OBR segment, this should usually be either 0 or 1.
 	 */
@@ -349,14 +381,112 @@ public abstract class MessageHandler {
 		return new ArrayList<>(headers);
 	}
 
-    /* ===================================== OBX ====================================== */
+	protected abstract String getClientRef(int i, int k) throws HL7Exception;
 
 	/**
-	 *  Return the date and time of the observation referred to by the jth obx
-	 *  segment of the ith obr group. If the date and time is not specified
-	 *  within the obx segment it should be specified within the obr segment.
+	 *  Return the clients reference number, usually corresponds to the doctor
+	 *  who requested the report or the requesting facility.
 	 */
-	public abstract String getTimeStamp(int i, int j);
+	public String getClientRef() {
+		String docNum = "";
+		int i = 0;
+		try {
+			while (!getClientRef(0,i).isEmpty()) {
+				if (i == 0) {
+					docNum = getClientRef(0,i);
+				} else {
+					docNum = docNum + ", " + getClientRef(0,i);
+				}
+				i++;
+			}
+			return (docNum);
+		} catch (Exception e) {
+			logger.error("Could not return doctor id numbers", e);
+			return ("");
+		}
+	}
+
+	protected abstract String getOrderingProvider(int i, int k) throws HL7Exception;
+	protected abstract String getResultCopiesTo(int i, int k) throws HL7Exception;
+	protected abstract String getOrderingProviderNo(int i, int k) throws HL7Exception;
+	protected abstract String getResultCopiesToProviderNo(int i, int k) throws HL7Exception;
+
+	/**
+	 *  Return the name of the doctor who requested the report, the name should
+	 *  be formatted as follows:
+	 *      'PREFIX' 'GIVEN NAME' 'MIDDLE INITIALS' 'FAMILY NAME' 'SUFFIX' 'DEGREE'
+	 */
+	public String getDocName()
+	{
+		String docName = "";
+		int i = 0;
+		try {
+			while (!getOrderingProvider(0,i).isEmpty()) {
+				if (i == 0) {
+					docName = getOrderingProvider(0,i);
+				} else {
+					docName = docName + ", " + getOrderingProvider(0,i);
+				}
+				i++;
+			}
+			return (docName);
+		} catch (Exception e) {
+			logger.error("Could not return doctor names", e);
+			return ("");
+		}
+	}
+
+	/**
+	 *  Return the names of the doctors which the report should be copied to. The
+	 *  formatting of the names should be the same as in the method above. The
+	 *  names should be separated by a comma and a space.
+	 */
+	public String getCCDocs() {
+		String docName = "";
+		int i = 0;
+		try {
+			while (!getResultCopiesTo(0,i).isEmpty()) {
+				if (i == 0) {
+					docName = getResultCopiesTo(0,i);
+				} else {
+					docName = docName + ", " + getResultCopiesTo(0,i);
+				}
+				i++;
+			}
+			return (docName);
+		} catch (Exception e) {
+			logger.error("Could not return cc'ed doctors", e);
+			return ("");
+		}
+	}
+
+	/**
+	 *  Return an ArrayList of the requesting doctors billing number and the
+	 *  billing numbers of the cc'd docs
+	 */
+	public ArrayList<String> getDocNums() {
+		ArrayList<String> docNums = new ArrayList<>();
+		String id;
+		int i;
+
+		try {
+			String providerId = getOrderingProviderNo(0, 0);
+			docNums.add(providerId);
+
+			i = 0;
+			while ((id = getResultCopiesToProviderNo(0, i)) != null) {
+				if (!id.equals(providerId)) docNums.add(id);
+				i++;
+			}
+		} catch (Exception e) {
+			logger.error("Could not return doctor nums", e);
+
+		}
+
+		return (docNums);
+	}
+
+    /* ===================================== OBX ====================================== */
 
 	/**
 	 *  Return the number of OBX Segments within the OBR group specified by i.
@@ -372,15 +502,6 @@ public abstract class MessageHandler {
     {
     	String abnormalFlags = getOBXAbnormalFlag(i,j);
 	    return !("N".equals(abnormalFlags));
-    }
-
-    /**
-     *  Retrieve the abnormal flag if any from the OBX segment specified by j in
-     *  the ith OBR group.
-     */
-    public String getOBXAbnormalFlag( int i, int j)
-    {
-	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-8"));
     }
 
     /**
@@ -438,6 +559,15 @@ public abstract class MessageHandler {
 	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-7"));
     }
 
+	/**
+	 *  Retrieve the abnormal flag if any from the OBX segment specified by j in
+	 *  the ith OBR group.
+	 */
+	public String getOBXAbnormalFlag( int i, int j)
+	{
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-8"));
+	}
+
     /**
      *  Return the result status from the jth OBX segment of the ith OBR group
      */
@@ -445,6 +575,16 @@ public abstract class MessageHandler {
     {
 	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-11"));
     }
+
+	/**
+	 *  Return the date and time of the observation referred to by the jth obx
+	 *  segment of the ith obr group. If the date and time is not specified
+	 *  within the obx segment it should be specified within the obr segment.
+	 */
+	public String getTimeStamp(int i, int j)
+	{
+		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-14"));
+	}
 
     /**
      *  Return the number of comments (usually NTE segments) following the jth
@@ -475,54 +615,6 @@ public abstract class MessageHandler {
 
 
 	/* ===================================== MISC ====================================== */
-
-
-    /**
-     *  Return the service date of the message
-     */
-    public abstract String getServiceDate();
-
-    /**
-     *  Return the request date of the message
-     */
-    public abstract String getRequestDate(int i);
-
-    /**
-     *  Return the status of the report, 'F' is returned for a final report,
-     *  otherwise the report is partial
-     */
-    public abstract String getOrderStatus();
-
-    /**
-     *  Return the clients reference number, usually corresponds to the doctor
-     *  who requested the report or the requesting facility.
-     */
-    public abstract String getClientRef();
-
-    /**
-     *  Return the accession number
-     */
-    public abstract String getAccessionNum();
-
-    /**
-     *  Return the name of the doctor who requested the report, the name should
-     *  be formatted as follows:
-     *      'PREFIX' 'GIVEN NAME' 'MIDDLE INITIALS' 'FAMILY NAME' 'SUFFIX' 'DEGREE'
-     */
-    public abstract String getDocName();
-
-    /**
-     *  Return the names of the doctors which the report should be copied to. The
-     *  formatting of the names should be the same as in the method above. The
-     *  names should be separated by a comma and a space.
-     */
-    public abstract String getCCDocs();
-
-    /**
-     *  Return an ArrayList of the requesting doctors billing number and the
-     *  billing numbers of the cc'd docs
-     */
-    public abstract ArrayList getDocNums();
 
     /**
      * Returns a string audit of the messages.  If not required handler should just return an empty string;
@@ -566,16 +658,52 @@ public abstract class MessageHandler {
 
 	protected String formatDateTime(String plain)
 	{
-		if(plain == null || plain.trim().equals("")) return "";
-
-		String dateFormat = "yyyyMMddHHmmss";
-		dateFormat = dateFormat.substring(0, plain.length());
-		String stringFormat = "yyyy-MM-dd HH:mm:ss";
-		stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length() - 1)) + 1);
-
-		Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-		return UtilDateUtilities.DateToString(date, stringFormat);
+		return formatDateTime(plain, "yyyyMMddHHmmss", "yyyy-MM-dd HH:mm:ss");
 	}
+	protected String formatDate(String plain)
+	{
+		return formatDateTime(plain, "yyyyMMddHHmmss", "yyyy-MM-dd");
+	}
+	protected String formatTime(String plain)
+	{
+		return formatDateTime(plain, "yyyyMMddHHmmss", "HH:mm:ss");
+	}
+
+	protected String formatDateTime(String plain, String inFormat, String outFormat)
+	{
+		String formatted = "";
+
+		if(plain == null || plain.trim().isEmpty())
+			return formatted;
+
+		if(inFormat.length() > plain.length())
+			inFormat = inFormat.substring(0, plain.length());
+
+		logger.info("Parse Date: (" + plain + ") " + inFormat + " -> " + outFormat);
+		try
+		{
+			DateTimeFormatter inFormatter = DateTimeFormatter.ofPattern(inFormat);
+			DateTimeFormatter outFormatter = DateTimeFormatter.ofPattern(outFormat);
+
+			// use format builder to set default missing time values
+			DateTimeFormatter customFormatter = new DateTimeFormatterBuilder().append(inFormatter)
+					.parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+					.parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+					.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+					.toFormatter();
+
+			LocalDateTime parsedDate = LocalDateTime.parse(plain, customFormatter);
+
+			formatted = parsedDate.format(outFormatter);
+		}
+		catch(DateTimeException e)
+		{
+			logger.error("Date parse Exception", e);
+		}
+		logger.info("Parse Date: (" + plain + ") finished -> " + formatted);
+		return formatted;
+	}
+
 	public String getAge()
 	{
 		String age = "N/A";
@@ -599,36 +727,8 @@ public abstract class MessageHandler {
 		return StringUtils.trimToEmpty(retrieve);
 	}
 
-	protected String getFullDocName(XCN docSeg) {
-		String docName = "";
-
-		if (docSeg.getPrefixEgDR().getValue() != null) docName = docSeg.getPrefixEgDR().getValue();
-
-		if (docSeg.getGivenName().getValue() != null) {
-			if (docName.equals("")) docName = docSeg.getGivenName().getValue();
-			else docName = docName + " " + docSeg.getGivenName().getValue();
-		}
-		if (docSeg.getMiddleInitialOrName().getValue() != null) {
-			if (docName.equals("")) docName = docSeg.getMiddleInitialOrName().getValue();
-			else docName = docName + " " + docSeg.getMiddleInitialOrName().getValue();
-		}
-		if (docSeg.getFamilyName().getValue() != null) {
-			if (docName.equals("")) docName = docSeg.getFamilyName().getValue();
-			else docName = docName + " " + docSeg.getFamilyName().getValue();
-		}
-		if (docSeg.getSuffixEgJRorIII().getValue() != null) {
-			if (docName.equals("")) docName = docSeg.getSuffixEgJRorIII().getValue();
-			else docName = docName + " " + docSeg.getSuffixEgJRorIII().getValue();
-		}
-		if (docSeg.getDegreeEgMD().getValue() != null) {
-			if (docName.equals("")) docName = docSeg.getDegreeEgMD().getValue();
-			else docName = docName + " " + docSeg.getDegreeEgMD().getValue();
-		}
-
-		return (docName);
-	}
-
-	protected String getFullDocNameV25(ca.uhn.hl7v2.model.v25.datatype.XCN xcn) {
+	//TODO move to v25 message handler
+	protected String getFullDocNameV25(XCN xcn) {
 		String docName = "";
 
 		if (xcn.getPrefixEgDR().getValue() != null) docName = xcn.getPrefixEgDR().getValue();

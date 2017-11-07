@@ -25,6 +25,7 @@
 package oscar.oscarLab.ca.all.parsers.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.group.ORU_R01_PATIENT;
 import ca.uhn.hl7v2.model.v23.group.ORU_R01_RESPONSE;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
@@ -75,24 +76,36 @@ public abstract class MessageHandler23 extends MessageHandler
 	 */
 	@Override
 	public int getOBRCount() {
-		return (response.getORDER_OBSERVATIONReps());
+		return response.getORDER_OBSERVATIONReps();
+	}
+
+	@Override
+	protected String getClientRef(int i, int k) throws HL7Exception
+	{
+		return getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getOrderingProvider(k).getIDNumber().getValue());
+	}
+	@Override
+	protected String getOrderingProvider(int i, int k) throws HL7Exception
+	{
+		return getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getOrderingProvider(k));
+	}
+	@Override
+	protected String getResultCopiesTo(int i, int k) throws HL7Exception
+	{
+		return getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getResultCopiesTo(k));
+	}
+	@Override
+	protected String getOrderingProviderNo(int i, int k) throws HL7Exception
+	{
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getOrderingProvider(k).getIDNumber().getValue();
+	}
+	@Override
+	protected String getResultCopiesToProviderNo(int i, int k) throws HL7Exception
+	{
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getResultCopiesTo(k).getIDNumber().getValue();
 	}
 
     /* ===================================== OBX ====================================== */
-
-	/**
-	 *  Return the date and time of the observation refered to by the jth obx
-	 *  segment of the ith obr group. If the date and time is not specified
-	 *  within the obx segment it should be specified within the obr segment.
-	 */
-	@Override
-	public String getTimeStamp(int i, int j) {
-		try {
-			return (formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue())));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
 
 	/**
 	 *  Return the number of OBX Segments within the OBR group specified by i.
@@ -102,7 +115,7 @@ public abstract class MessageHandler23 extends MessageHandler
 	{
 		try
 		{
-			return (msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATIONReps());
+			return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATIONReps();
 		}
 		catch(Exception e)
 		{
@@ -110,73 +123,22 @@ public abstract class MessageHandler23 extends MessageHandler
 		}
 	}
 
-	/**
-	 *  Return the identifier from jth OBX segment of the ith OBR group. It is
-	 *  usually stored in the first component of the third field of the OBX
-	 *  segment.
-	 */
 	@Override
-	public String getOBXIdentifier(int i, int j)
-	{
-		try
-		{
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue()));
-		}
-		catch(Exception e)
-		{
-			return ("");
-		}
-	}
-
-	/**
-     * Return the obx value type
-     * @param i
-     * @param j
-     * @return String the obx value
-     */
-	@Override
-	public String getOBXValueType(int i, int j)
-	{
-		try
-		{
-		    return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getValueType().getValue()));
-		}
-		catch(Exception e)
-		{
-		    return ("");
-		}
-	}
-
-	/**
-	 *  Return the name of the jth OBX segment of the ith OBR group. It is
-	 *  usually stored in the second component of the third field of the OBX
-	 *  segment.
-	 */
-	@Override
-	public String getOBXName( int i, int j)
-	{
-		try
-		{
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getText().getValue()));
-		}
-		catch(Exception e)
-		{
-			return ("");
-		}
-	}
-
-	/**
-	 *  Return the result from the jth OBX segment of the ith OBR group
-	 */
-	@Override
-	public String getOBXResult(int i, int j)
-	{
-		try
-		{
-			return (getString(Terser.get(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(), 5, 0, 1, 1)));
-		}
-		catch(Exception e)
-		{
+	public String getClientRef() {
+		String docNum = "";
+		int i = 0;
+		try {
+			while (!getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue()).equals("")) {
+				if (i == 0) {
+					docNum = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue());
+				} else {
+					docNum = docNum + ", " + getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue());
+				}
+				i++;
+			}
+			return (docNum);
+		} catch (Exception e) {
+			logger.error("Could not return doctor id numbers", e);
 			return ("");
 		}
 	}
@@ -184,5 +146,35 @@ public abstract class MessageHandler23 extends MessageHandler
 	@Override
 	public boolean isUnstructured() {
 		return false;
+	}
+
+
+	protected String getFullDocName(XCN docSeg) {
+		String docName = "";
+
+		if (docSeg.getPrefixEgDR().getValue() != null) docName = docSeg.getPrefixEgDR().getValue();
+
+		if (docSeg.getGivenName().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getGivenName().getValue();
+			else docName = docName + " " + docSeg.getGivenName().getValue();
+		}
+		if (docSeg.getMiddleInitialOrName().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getMiddleInitialOrName().getValue();
+			else docName = docName + " " + docSeg.getMiddleInitialOrName().getValue();
+		}
+		if (docSeg.getFamilyName().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getFamilyName().getValue();
+			else docName = docName + " " + docSeg.getFamilyName().getValue();
+		}
+		if (docSeg.getSuffixEgJRorIII().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getSuffixEgJRorIII().getValue();
+			else docName = docName + " " + docSeg.getSuffixEgJRorIII().getValue();
+		}
+		if (docSeg.getDegreeEgMD().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getDegreeEgMD().getValue();
+			else docName = docName + " " + docSeg.getDegreeEgMD().getValue();
+		}
+
+		return (docName);
 	}
 }

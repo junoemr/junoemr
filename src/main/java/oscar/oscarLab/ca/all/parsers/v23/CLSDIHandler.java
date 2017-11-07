@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package oscar.oscarLab.ca.all.parsers;
+package oscar.oscarLab.ca.all.parsers.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
