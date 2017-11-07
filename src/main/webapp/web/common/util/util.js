@@ -121,7 +121,7 @@ Juno.Common.Util.isDefinedAndNotNull = function isDefinedAndNotNull(val)
 	return (angular.isDefined(val) && val !== null);
 };
 
-Juno.Common.Util.objectArrayIndexOf = function findIndex(array, searchTerm, property)
+Juno.Common.Util.objectArrayIndexOf = function objectArrayIndexOf(array, searchTerm, property)
 {
 	for(var i = 0, len = array.length; i < len; i++) {
 		if (array[i][property] === searchTerm) return i;
