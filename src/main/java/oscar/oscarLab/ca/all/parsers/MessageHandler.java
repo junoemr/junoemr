@@ -26,9 +26,13 @@
 package oscar.oscarLab.ca.all.parsers;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.v23.segment.MSH;
+import ca.uhn.hl7v2.model.AbstractSegment;
+import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v25.datatype.XCN;
+import ca.uhn.hl7v2.parser.Parser;
+import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
+import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import oscar.util.UtilDateUtilities;
@@ -63,6 +67,32 @@ public abstract class MessageHandler {
 	private static Logger logger = Logger.getLogger(MessageHandler.class);
 
 	protected Terser terser;
+	protected Message message;
+
+	/**
+	 * default constructor. init must be called after instantiation.
+	 */
+	public MessageHandler()
+	{
+	}
+	/**
+	 * constructor which also calls init
+	 * @param hl7Body - hl7 formatted string
+	 * @throws HL7Exception if init fails
+	 */
+	public MessageHandler(String hl7Body) throws HL7Exception
+	{
+		Parser p = new PipeParser();
+		p.setValidationContext(new NoValidation());
+		Message msg = p.parse(hl7Body);
+		this.message = msg;
+		this.terser = new Terser(msg);
+	}
+	public MessageHandler(Message msg) throws HL7Exception
+	{
+		this.message = msg;
+		this.terser = new Terser(msg);
+	}
 
 	/**
 	 * This method is run before labs are uploaded/saved to the database
@@ -93,26 +123,9 @@ public abstract class MessageHandler {
 	 * @return true if the header segment belongs to this lab parser. false otherwise
 	 */
 	@SuppressWarnings("unused")
-	protected static boolean headerTypeMatch(MSH messageHeaderSegment)
+	protected static boolean headerTypeMatch(AbstractSegment messageHeaderSegment)
 	{
 		return true;
-	}
-
-	/**
-	 * default constructor. init must be called after instantiation.
-	 */
-	public MessageHandler()
-	{
-	}
-
-	/**
-	 * constructor which also calls init
-	 * @param hl7Body - hl7 formatted string
-	 * @throws HL7Exception if init fails
-	 */
-	public MessageHandler(String hl7Body) throws HL7Exception
-	{
-		init(hl7Body);
 	}
 
     /**
@@ -312,23 +325,44 @@ public abstract class MessageHandler {
     /**
      *  Return the number of OBR Segments in the message
      */
-	public abstract int getOBRCount();
+	public int getOBRCount()
+	{
+		//TODO better way to find this
+		int count = 0;
+		int i=0;
+		String value;
+		do
+		{
+			// always check for a required value in OBR segment
+			value = get("/.ORDER_OBSERVATION("+i+")/OBR-4");
+			if(value != null) count++;
+			i++;
+		}
+		while(value != null);
 
-    /**
-     *  Return the name of the ith OBR Segment, usually stored in the
-     *  UniversalServiceIdentifier
-     */
-    public String getOBRName(int i)
-    {
-    	return getString(get("/.OBR("+i+")-4"));
-    }
+		return count;
+	}
+
+	public String getFillerOrderNumber()
+	{
+		return getString(get("/.OBR-3"));
+	}
+
+	/**
+	 *  Return the name of the ith OBR Segment, usually stored in the
+	 *  UniversalServiceIdentifier
+	 */
+	public String getOBRName(int i)
+	{
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-4"));
+	}
 
 	/**
 	 *  Return the request date of the message
 	 */
 	public String getRequestDate(int i)
 	{
-		return formatDateTime(get("/.OBR("+i+")-6"));
+		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-6"));
 	}
 
 	/**
@@ -365,7 +399,10 @@ public abstract class MessageHandler {
 	 *  OBR or OBX segment. It is used to separate the observations into groups.
 	 *  ie/ 'CHEMISTRY' 'HEMATOLOGY' '
 	 */
-	public abstract String getObservationHeader( int i, int j);
+	public String getObservationHeader(int i, int j)
+	{
+		return getOBRName(i);
+	}
 
 	/**
 	 *  Return a list of all possible headers retrieved from getObservationHeader
@@ -381,8 +418,10 @@ public abstract class MessageHandler {
 		return new ArrayList<>(headers);
 	}
 
-	protected abstract String getClientRef(int i, int k) throws HL7Exception;
-
+	protected String getClientRef(int i, int k) throws HL7Exception
+	{
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-1"));
+	}
 	/**
 	 *  Return the clients reference number, usually corresponds to the doctor
 	 *  who requested the report or the requesting facility.
@@ -406,10 +445,38 @@ public abstract class MessageHandler {
 		}
 	}
 
-	protected abstract String getOrderingProvider(int i, int k) throws HL7Exception;
-	protected abstract String getResultCopiesTo(int i, int k) throws HL7Exception;
-	protected abstract String getOrderingProviderNo(int i, int k) throws HL7Exception;
-	protected abstract String getResultCopiesToProviderNo(int i, int k) throws HL7Exception;
+	protected String getOrderingProvider(int i, int k) throws HL7Exception
+	{
+		String familyName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-2"));
+		String givenName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-3"));
+		String middleName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-4"));
+		String suffix = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-5"));
+		String prefix = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-6"));
+		String degree = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-7"));
+
+		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
+		return fullName.trim().replaceAll("\\s+", " ");
+	}
+	protected String getResultCopiesTo(int i, int k) throws HL7Exception
+	{
+		String familyName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-2"));
+		String givenName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-3"));
+		String middleName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-4"));
+		String suffix = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-5"));
+		String prefix = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-6"));
+		String degree = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-7"));
+
+		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
+		return fullName.trim().replaceAll("\\s+", " ");
+	}
+	protected String getOrderingProviderNo(int i, int k) throws HL7Exception
+	{
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-1"));
+	}
+	protected String getResultCopiesToProviderNo(int i, int k) throws HL7Exception
+	{
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-1"));
+	}
 
 	/**
 	 *  Return the name of the doctor who requested the report, the name should
@@ -491,7 +558,23 @@ public abstract class MessageHandler {
 	/**
 	 *  Return the number of OBX Segments within the OBR group specified by i.
 	 */
-	public abstract int getOBXCount(int i);
+	public int getOBXCount(int i)
+	{
+		//TODO better way to find this
+		int count = 0;
+		int j=0;
+		String value;
+		do
+		{
+			// always check a required value in OBX segment
+			value = get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-2");
+			if(value != null) count++;
+			j++;
+		}
+		while(value != null);
+
+		return count;
+	}
 
     /**
      *  Return true if an abnormal flag other than 'N' is returned by
@@ -624,8 +707,6 @@ public abstract class MessageHandler {
     	return "";
     }
 
-    public abstract String getFillerOrderNumber();
-
     public abstract String getEncounterId();
 
     public abstract String getRadiologistInfo();
@@ -634,7 +715,10 @@ public abstract class MessageHandler {
     
     public abstract String getNteForPID();
 
-	public abstract boolean isUnstructured();
+	public boolean isUnstructured()
+	{
+		return false;
+	}
 
 	/* ================================== Extra Methods and helpers ==================================== */
 
@@ -679,7 +763,6 @@ public abstract class MessageHandler {
 		if(inFormat.length() > plain.length())
 			inFormat = inFormat.substring(0, plain.length());
 
-		logger.info("Parse Date: (" + plain + ") " + inFormat + " -> " + outFormat);
 		try
 		{
 			DateTimeFormatter inFormatter = DateTimeFormatter.ofPattern(inFormat);
@@ -700,7 +783,6 @@ public abstract class MessageHandler {
 		{
 			logger.error("Date parse Exception", e);
 		}
-		logger.info("Parse Date: (" + plain + ") finished -> " + formatted);
 		return formatted;
 	}
 

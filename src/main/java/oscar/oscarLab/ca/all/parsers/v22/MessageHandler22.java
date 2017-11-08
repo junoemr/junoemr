@@ -155,11 +155,6 @@ public abstract class MessageHandler22 extends MessageHandler
 		}
 	}
 
-	@Override
-	public String getObservationHeader(int i, int j) {
-		return getOBRName(i);
-	}
-
 	/**
 	 *  Methods to get information from observation notes
 	 */
