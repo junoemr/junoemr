@@ -53,13 +53,11 @@
 <%@page import="org.oscarehr.caisi_integrator.ws.FacilityIdStringCompositePk"%>
 <%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager"%>
 <%@page import="org.apache.commons.lang.time.DateFormatUtils"%>
-<%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="oscar.util.DateUtils"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.DemographicTransfer"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore"%>
-<%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
 
-<%@ page import="java.util.*, java.sql.*,java.net.*, oscar.*" errorPage="errorpage.jsp"%>
+<%@ page import="java.util.*, java.net.*, oscar.*" errorPage="errorpage.jsp"%>
 
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="org.oscarehr.common.model.Demographic"%>
@@ -161,12 +159,12 @@ function checkTypeIn() {
 }
 
 function searchInactive() {
-    document.titlesearch.ptstatus.value="inactive"
+    document.titlesearch.ptstatus.value="inactive";
     if (checkTypeIn()) document.forms[0].submit()
 }
 
 function searchAll() {
-    document.titlesearch.ptstatus.value=""
+    document.titlesearch.ptstatus.value="";
     if (checkTypeIn()) document.forms[0].submit()
 }
 
@@ -212,8 +210,8 @@ function searchAll() {
         <li>
 	<INPUT TYPE="hidden" NAME="orderby" VALUE="last_name, first_name">
         <INPUT TYPE="hidden" NAME="dboperation" VALUE="search_titlename">
-        <INPUT TYPE="hidden" NAME="limit1" VALUE="0">
-        <INPUT TYPE="hidden" NAME="limit2" VALUE="5">
+        <INPUT TYPE="hidden" NAME="limit1" id="limit1" VALUE="0">
+        <INPUT TYPE="hidden" NAME="limit2" id="limit2" VALUE="<%=limit%>">
         <input type="hidden" name="displaymode" value="Search ">
         <INPUT TYPE="hidden" NAME="ptstatus" VALUE="active">
         
@@ -270,6 +268,19 @@ function searchAll() {
         	<jsp:include page="../admin/IntegratorStatus.jspf"></jsp:include>
         </li>
 <%	} %>
+
+	    <li>
+		    <div class="pageLimiter">
+			    <label>Result Limit:</label>
+			    <select name="limit" onchange="document.getElementById('limit2').value = this.options[this.selectedIndex].value;">
+				    <option value="5" <%= limit == 5 ? "selected='selected'" : "" %>>5</option>
+				    <option value="10" <%= limit == 10 ? "selected='selected'" : "" %>>10</option>
+				    <option value="25" <%= limit == 25 ? "selected='selected'" : "" %>>25</option>
+				    <option value="50" <%= limit == 50 ? "selected='selected'" : "" %>>50</option>
+				    <option value="100"<%= limit == 100 ? "selected='selected'" : "" %>>100</option>
+			    </select>
+		    </div>
+	    </li>
     </ul>
 	</form>
 </div>
