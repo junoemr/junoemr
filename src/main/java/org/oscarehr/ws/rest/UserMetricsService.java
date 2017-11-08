@@ -24,8 +24,6 @@
 
 package org.oscarehr.ws.rest;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.oscarehr.ws.rest.to.model.UserMetricsTo1;
 import org.springframework.stereotype.Component;
@@ -38,17 +36,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import io.prometheus.client.Histogram;
-import oscar.OscarProperties;
-
 import java.util.ArrayList;
 
 @Path("/user_metrics")
 @Component("UserMetricsService")
 public class UserMetricsService extends AbstractServiceImpl
 {
-	private static Logger logger = MiscUtils.getLogger();
-	private static OscarProperties properties = OscarProperties.getInstance();
-
 	static final Histogram requestLatency = Histogram.build().
 			name("request_latency_seconds").
 			help("Reguest latency in seconds").
@@ -64,7 +57,6 @@ public class UserMetricsService extends AbstractServiceImpl
 		String page = "appointment";
 		for(UserMetricsTo1 metric : data)
 		{
-			logger.error("Stuff: " + metric.getMetricName());
 			if(metric.getMetricName().equals("performance_timing_domLoading"))
 			{
 				for(Double observedTime : metric.getObservations())
