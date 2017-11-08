@@ -215,8 +215,8 @@ $(function () {
 				<html:option value="<%=s%>"><%=s%></html:option>
 				<%}%>
 			</html:select> <input type="submit" value="<bean:message key="oscarReport.oscarReportDemoSetEdit.btnDisplaySet"/>" /></div>
-
-		</html:form> <%if( request.getAttribute("SET") != null ) {
+		</html:form>
+			<%if( request.getAttribute("SET") != null ) {
                    List<DemographicSets> list = (List<DemographicSets>) request.getAttribute("SET");
                    String setName = (String) request.getAttribute("setname");%>
 		<div><html:form action="/report/SetEligibility">
@@ -245,7 +245,7 @@ $(function () {
 					<td><%=demo.getFormattedDob()%></td>
 					<td><%=demo.getAge()%></td>
 					<td><%=demo.getRosterStatus()%></td>
-					<td><%=providerBean.getProperty(demo.getProviderNo(),"")%></td>
+					<td><%=providerBean.getProperty(String.valueOf(demo.getProviderNo()),"")%></td>
 					<td><%=elle(h.getEligibility())%></td>
 				</tr>
 				<%}%>
