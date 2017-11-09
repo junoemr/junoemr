@@ -121,7 +121,7 @@ public class FrmBCAR2012Record extends FrmRecord{
         if(surname != null)
             props.setProperty("c_surname", surname);
         if(firstname != null)
-            props.setProperty("c_surname", firstname);
+            props.setProperty("c_givenName", firstname);
         if(address != null)
             props.setProperty("c_address", address);
         if(city != null)
