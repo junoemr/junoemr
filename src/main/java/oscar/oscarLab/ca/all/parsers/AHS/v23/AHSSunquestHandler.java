@@ -71,19 +71,22 @@ public class AHSSunquestHandler extends AHSHandler
 
     /* ===================================== MSH ====================================== */
 
-    @Override
-	public String getAccessionNum()
-    {
-    	return getString(get("/.MSH-10"));
-    }
-
     /* ===================================== PID ====================================== */
 
+    /* ===================================== OBR ====================================== */
+
 	@Override
-	public String getClientRef()
+	protected String getOrderingProvider(int i, int k) throws HL7Exception
 	{
-		return ""; // not sent
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-2"));
 	}
+	@Override
+	protected String getResultCopiesTo(int i, int k) throws HL7Exception
+	{
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-2"));
+	}
+
+    /* =============================== Upload Handling ================================ */
 
 	@Override
 	public String preUpload(String hl7Message) throws HL7Exception
@@ -93,10 +96,9 @@ public class AHSSunquestHandler extends AHSHandler
 	@Override
 	public boolean canUpload()
 	{
+		//TODO - check duplicates and merge labs
 		return true;
 	}
 	@Override
 	public void postUpload() {}
-
-
 }

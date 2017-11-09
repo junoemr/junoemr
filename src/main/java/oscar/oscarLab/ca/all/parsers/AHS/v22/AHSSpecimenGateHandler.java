@@ -31,8 +31,6 @@ import ca.uhn.hl7v2.model.v22.segment.MSH;
 import org.apache.log4j.Logger;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
-import java.util.ArrayList;
-
 public class AHSSpecimenGateHandler extends AHSHandler
 {
 	private static Logger logger = Logger.getLogger(AHSSpecimenGateHandler.class);
@@ -68,20 +66,6 @@ public class AHSSpecimenGateHandler extends AHSHandler
 		this.msg = (ORU_R01) this.message;
 	}
 
-	@Override
-	public String preUpload(String hl7Message) throws HL7Exception
-	{
-		return hl7Message;
-	}
-	@Override
-	public boolean canUpload()
-	{
-		//Specimen Gate reports are not linked
-		return true;
-	}
-	@Override
-	public void postUpload() {}
-
     /* ===================================== MSH ====================================== */
 
 	@Override
@@ -92,12 +76,8 @@ public class AHSSpecimenGateHandler extends AHSHandler
 	@Override
 	public String getPatientLocation()
 	{
-		return getString(get("/.PV1-3"));
-	}
-	@Override
-	public String getAccessionNum()
-	{
-		return getString(get("/.MSH-10"));
+		//return getString(get("/.PV1-3"));
+		return "SpecimenGate";
 	}
 
     /* ===================================== PID ====================================== */
@@ -129,32 +109,23 @@ public class AHSSpecimenGateHandler extends AHSHandler
 		return true;
 	}
 
-	@Override
-	public String getClientRef()
-	{
-		return ""; //not sent
-	}
-
-
-	@Override
-	public String getDocName()
-	{
-		return ""; //not sent
-	}
-
-	@Override
-	public String getCCDocs()
-	{
-		return "";
-	}
-
-	@Override
-	public ArrayList getDocNums()
-	{
-		return null;
-	}
-
     /* ===================================== OBX ====================================== */
 
 	/* ===================================== MISC ===================================== */
+
+    /* =============================== Upload Handling ================================ */
+
+    @Override
+    public String preUpload(String hl7Message) throws HL7Exception
+    {
+	    return hl7Message;
+    }
+	@Override
+	public boolean canUpload()
+	{
+		//Specimen Gate reports are not linked
+		return true;
+	}
+	@Override
+	public void postUpload() {}
 }
