@@ -26,7 +26,6 @@
 package oscar.oscarLab.ca.all.parsers;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v25.datatype.XCN;
 import ca.uhn.hl7v2.parser.Parser;
@@ -118,12 +117,12 @@ public abstract class MessageHandler {
 
 	/**
 	 * Each handler should implement this method.
-	 * This method should return true if it should use this instance of MessageHandler to parse the lab
-	 * @param messageHeaderSegment hl7 MSH header
-	 * @return true if the header segment belongs to this lab parser. false otherwise
+	 * This method should return true if this instance of MessageHandler can parse the lab
+	 * @param message hl7 Message used for determining lab parser type
+	 * @return true if this parser matches the lab type. false otherwise
 	 */
 	@SuppressWarnings("unused")
-	protected static boolean headerTypeMatch(AbstractSegment messageHeaderSegment)
+	protected static boolean handlerTypeMatch(Message message)
 	{
 		return true;
 	}
@@ -250,13 +249,13 @@ public abstract class MessageHandler {
 		return getString(get("/.PID-8"));
 	}
 
-	protected String getBuisnessPhone(int i) throws HL7Exception
+	protected String getBusinessPhone(int i) throws HL7Exception
 	{
-		return getString(get("/.PID-13-"+i));
+		return getString(get("/.PID-14-"+i));
 	}
 	protected String getHomePhone(int i) throws HL7Exception
 	{
-		return getString(get("/.PID-14-"+i));
+		return getString(get("/.PID-13-"+i));
 	}
 	/**
 	 *  Return the home phone number of the patient
@@ -297,15 +296,15 @@ public abstract class MessageHandler {
 		int i = 1;
 		try
 		{
-			while (!getBuisnessPhone(i).isEmpty())
+			while (!getBusinessPhone(i).isEmpty())
 			{
 				if (i == 1)
 				{
-					phone = getBuisnessPhone(i);
+					phone = getBusinessPhone(i);
 				}
 				else
 				{
-					phone = phone + ", " + getBuisnessPhone(i);
+					phone = phone + ", " + getBusinessPhone(i);
 				}
 				i++;
 			}
@@ -848,7 +847,7 @@ public abstract class MessageHandler {
 		return formatted;
 	}
 
-	protected String getAge()
+	public String getAge()
 	{
 		String age = "N/A";
 		String dob = getDOB();

@@ -24,6 +24,7 @@
 package oscar.oscarLab.ca.all.parsers.AHS.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.group.ORU_R01_ORDER_OBSERVATION;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
@@ -48,13 +49,21 @@ public class CLSHandler extends AHSHandler
 	private static Logger logger = Logger.getLogger(CLSHandler.class);
 	protected ORU_R01 msg;
 
-	public static boolean headerTypeMatch(MSH messageHeaderSegment)
+	public static boolean handlerTypeMatch(Message message)
 	{
-		String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
-		String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
+		String version = message.getVersion();
+		if(version.equals("2.3"))
+		{
+			ORU_R01 msh = (ORU_R01) message;
+			MSH messageHeaderSegment = msh.getMSH();
 
-		return "OPEN ENGINE".equalsIgnoreCase(sendingApplication) &&
-				"CLS".equalsIgnoreCase(sendingFacility);
+			String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
+			String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
+
+			return "OPEN ENGINE".equalsIgnoreCase(sendingApplication) &&
+					"CLS".equalsIgnoreCase(sendingFacility);
+		}
+		return false;
 	}
 
 	public CLSHandler()
@@ -66,7 +75,7 @@ public class CLSHandler extends AHSHandler
 		super(hl7Body);
 		this.msg = (ORU_R01) this.message;
 	}
-	public CLSHandler(ORU_R01 msg) throws HL7Exception
+	public CLSHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
 		this.msg = (ORU_R01) this.message;

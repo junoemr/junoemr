@@ -38,10 +38,19 @@ public class AHSSpecimenGateHandler extends AHSHandler
 	private static Logger logger = Logger.getLogger(AHSSpecimenGateHandler.class);
 	protected ORU_R01 msg;
 
-	public static boolean headerTypeMatch(MSH messageHeaderSegment)
+	public static boolean handlerTypeMatch(Message message)
 	{
-		String sendingApplication = messageHeaderSegment.getSendingApplication().getValue();
-		return "SpecimenGate".equalsIgnoreCase(sendingApplication);
+		String version = message.getVersion();
+		if(version.equals("2.2"))
+		{
+			ORU_R01 msh = (ORU_R01) message;
+			MSH messageHeaderSegment = msh.getMSH();
+
+			String sendingApplication = messageHeaderSegment.getSendingApplication().getValue();
+
+			return "SpecimenGate".equalsIgnoreCase(sendingApplication);
+		}
+		return false;
 	}
 
 	public AHSSpecimenGateHandler()

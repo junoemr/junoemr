@@ -37,13 +37,21 @@ public class AHSSunquestHandler extends AHSHandler
 
 	protected ORU_R01 msg;
 
-	public static boolean headerTypeMatch(MSH messageHeaderSegment)
+	public static boolean handlerTypeMatch(Message message)
 	{
-		String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
-		String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
+		String version = message.getVersion();
+		if(version.equals("2.3"))
+		{
+			ORU_R01 msh = (ORU_R01) message;
+			MSH messageHeaderSegment = msh.getMSH();
 
-		return "OADD".equalsIgnoreCase(sendingApplication) &&
-				("SUNQUEST".equalsIgnoreCase(sendingFacility) || "COPATH".equalsIgnoreCase(sendingFacility));
+			String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
+			String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
+
+			return "OADD".equalsIgnoreCase(sendingApplication) &&
+					("SUNQUEST".equalsIgnoreCase(sendingFacility) || "COPATH".equalsIgnoreCase(sendingFacility));
+		}
+		return false;
 	}
 
 	public AHSSunquestHandler()

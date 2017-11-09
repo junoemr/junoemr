@@ -24,6 +24,7 @@
 package oscar.oscarLab.ca.all.parsers.AHS.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.apache.log4j.Logger;
@@ -43,13 +44,21 @@ public class CLSDIHandler extends CLSHandler {
 
 	private static Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 
-	public static boolean headerTypeMatch(MSH messageHeaderSegment)
+	public static boolean handlerTypeMatch(Message message)
 	{
-		String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
-		String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
+		String version = message.getVersion();
+		if(version.equals("2.3"))
+		{
+			ORU_R01 msh = (ORU_R01) message;
+			MSH messageHeaderSegment = msh.getMSH();
 
-		return "OPEN ENGINE".equalsIgnoreCase(sendingApplication) &&
-				"DI".equalsIgnoreCase(sendingFacility);
+			String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
+			String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
+
+			return "OPEN ENGINE".equalsIgnoreCase(sendingApplication) &&
+					"DI".equalsIgnoreCase(sendingFacility);
+		}
+		return false;
 	}
 
 	public CLSDIHandler() {
@@ -59,7 +68,7 @@ public class CLSDIHandler extends CLSHandler {
 	{
 		super(hl7Body);
 	}
-	public CLSDIHandler(ORU_R01 msg) throws HL7Exception
+	public CLSDIHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
 	}
