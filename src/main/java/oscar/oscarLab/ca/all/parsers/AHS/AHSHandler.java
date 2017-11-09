@@ -129,7 +129,8 @@ public abstract class AHSHandler extends MessageHandler
 	}
 
 	@Override
-	public String getServiceDate() {
+	public String getServiceDate()
+	{
 		String serviceDate = getString(get("/.ORC-15"));
 		if (serviceDate == null || serviceDate.isEmpty()) {
 			serviceDate = get("/.OBR-14");
@@ -138,8 +139,8 @@ public abstract class AHSHandler extends MessageHandler
 	}
 
 	@Override
-	public String getOrderStatus(){
-
+	public String getOrderStatus()
+	{
 		// of ORC is present - return it
 		String orderStatus = getString(get("/.ORC-5"));
 		if (orderStatus != null && !orderStatus.isEmpty()) {

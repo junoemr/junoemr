@@ -24,8 +24,6 @@
 package oscar.oscarLab.ca.all.parsers.AHS.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.Segment;
-import ca.uhn.hl7v2.model.v23.datatype.FT;
 import ca.uhn.hl7v2.model.v23.group.ORU_R01_ORDER_OBSERVATION;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
@@ -33,17 +31,13 @@ import ca.uhn.hl7v2.model.v23.segment.NTE;
 import ca.uhn.hl7v2.model.v23.segment.OBR;
 import ca.uhn.hl7v2.model.v23.segment.OBX;
 import ca.uhn.hl7v2.model.v23.segment.ORC;
-import ca.uhn.hl7v2.util.Terser;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
-import oscar.util.ConversionUtils;
-import oscar.util.UtilDateUtilities;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Dual message handler for both the manual and automated lab uploads in the Calgary Lab Service HL7 format.
@@ -78,84 +72,19 @@ public class CLSHandler extends AHSHandler
 		this.msg = (ORU_R01) this.message;
 	}
 
+	/* ===================================== MSH ====================================== */
+
 	public String getMsgType() {
 		return "CLS";
 	}
 
-	/**
-	 * This is the OBR date. The MessageHandler architecture uses this to store in hl7TextInfo.obr_date
-	 */
-	public String getMsgDate() {
-		try {
-			return (formatDateTime(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue()));
-		} catch (Exception e) {
-			logger.error("Could not retrieve message date", e);
-			return ("");
-		}
+	/* ===================================== PID ====================================== */
+
+	public String getHealthNum() {
+		return get("/.PID-2-1");
 	}
 
-	public Date getMsgDateTime() {
-		try {
-			String dateFormat = "yyyyMMddHHmmss";
-			Date dateTime = UtilDateUtilities.StringToDate(get("/.MSH-7"), dateFormat);
-			return dateTime;
-		} catch (Exception e) {
-			logger.error("Could not retrieve message date", e);
-			return null;
-		}
-	}
-
-	public String getMsgPriority() {
-		return ("");
-	}
-
-	public int getOBRCount() {
-		return (msg.getRESPONSE().getORDER_OBSERVATIONReps());
-	}
-
-	public ORU_R01_ORDER_OBSERVATION getOBR(int i) throws HL7Exception {
-		return msg.getRESPONSE().getORDER_OBSERVATION(i);
-	}
-
-	public ORC getORC(int i) throws HL7Exception {
-        return msg.getRESPONSE().getORDER_OBSERVATION(i).getORC();
-	}
-
-	public OBX getOBX(int i, int ii) throws HL7Exception {
-		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(ii).getOBX();
-	}
-
-	public NTE getNTE(int i, int j, int k) throws HL7Exception {
-        return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k);
-	}
-
-	public NTE getOBRNTE(int i, int j) throws HL7Exception {
-        return msg.getRESPONSE().getORDER_OBSERVATION(i).getNTE(j);
-	}
-
-	public void insertOBR(ORU_R01_ORDER_OBSERVATION newOBR) {
-		try {
-        	msg.getRESPONSE().insertORDER_OBSERVATION(newOBR, getOBRCount());
-        } catch (HL7Exception e) {
-			logger.error("Error Adding OBR segment.", e);
-        }
-	}
-
-	public int getOBXCount(int i) {
-		try {
-			return (msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATIONReps());
-		} catch (Exception e) {
-			return (0);
-		}
-	}
-
-	public String getOBRName(int i) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getUniversalServiceIdentifier().getText().getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
+	/* ===================================== OBR ====================================== */
 
 	public String getTimeStamp(int i, int j) {
 		try {
@@ -165,169 +94,9 @@ public class CLSHandler extends AHSHandler
 		}
 	}
 
-	public boolean isOBXAbnormal(int i, int j) {
-		try {
-			return getOBXAbnormalFlag(i, j).equals("C") || getOBXAbnormalFlag(i, j).equals("H") || getOBXAbnormalFlag(i, j).equals("L") || getOBXAbnormalFlag(i, j).equals("A");
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	public String getOBXAbnormalFlag(int i, int j) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getAbnormalFlags(0).getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	public String getObservationHeader(int i, int j) {
-		return getOBRName(i);
-	}
-
-	public String getOBXIdentifier(int i, int j) {
-		try {
-			Segment obxSeg = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX();
-			String subIdent = Terser.get(obxSeg, 3, 0, 1, 2);
-			if (subIdent != null) { //HACK: for gdml labs generated with SubmitLabByFormAction
-				return getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue()) + "&" + subIdent;
-			}
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	public String getOBXValueType(int i, int j) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getValueType().getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	public String getOBXName(int i, int j) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getText().getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	public String getOBXResult(int i, int j) {
-		try {
-			return (getString(Terser.get(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(), 5, 0, 1, 1)));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	public String getOBXReferenceRange(int i, int j) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getReferencesRange().getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	public String getOBXUnits(int i, int j) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getUnits().getIdentifier().getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	/**
-	 *  Methods to get information from observation notes
-	 */
-	public int getOBRCommentCount(int i) {
-		// OBR comments are not provided - comments are provided in NTE segment following OBX segment
-		int count = 0;
-		try {
-			count = msg.getRESPONSE().getORDER_OBSERVATION(i).getNTEReps();
-		} catch(Exception e) {
-			return 0;
-		}
-
-		return count;
-	}
-	@Override
-	public String getOBRComment(int i, int j) {
-		try {
-			FT[] tmp = msg.getRESPONSE().getORDER_OBSERVATION(i).getNTE(j).getComment();
-			StringBuilder comment = new StringBuilder();
-			for(FT t:tmp) {
-				comment.append(t.getValue());
-			}
-			return comment.toString();
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-	/**
-	 *  Methods to get information from observation notes
-	 */
-	public int getOBXCommentCount(int i, int j) {
-		int count = 0;
-		try {
-			count = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTEReps();
-
-			// a bug in getNTEReps() causes it to return 1 instead of 0 so we check to make
-			// sure there actually is a comment there
-			if (count == 1) {
-				String comment = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE().getComment(0).getValue();
-				if (comment == null) count = 0;
-			}
-
-		} catch (Exception e) {
-			logger.error("Error retrieving obx comment count", e);
-		}
-		return count;
-	}
-
-	public String getOBXComment(int i, int j, int k) {
-		try {
-			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k).getComment(0).getValue()));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
-
-
-	public String getHealthNum() {
-		return get("/.PID-2-1");
-	}
-
-	public String getPatientLocation() {
-		return (getString(msg.getMSH().getSendingFacility().getNamespaceID().getValue()));
-	}
-
-	public String getRequestDate(int i) {
-		try {
-			return (formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getRequestedDateTime().getTimeOfAnEvent().getValue())));
-		} catch (Exception e) {
-			return ("");
-		}
-	}
-
 	public String getFillerOrderNumber() {
 		// this is different from the filler order number in ORC
 		return get("/.OBR-3-1");
-	}
-
-	public String getEncounterId() {
-		return "";
-	}
-
-	public String getRadiologistInfo() {
-		return "";
-	}
-
-	public String getNteForOBX(int i, int j) {
-		return "";
 	}
 
 	public String getAssigningAuthority() {
@@ -366,23 +135,6 @@ public class CLSHandler extends AHSHandler
 		return get("/.OBR-7-1");
 	}
 
-	/**
-	 * Gets the date and time the specimen was collected
-	 * 
-	 * @param i
-	 * 		Segment count
-	 * @return
-	 * 		Returns the date / time of the specimen collection or null if it's not available.
-	 */
-	public Date getOBRDateTimeAsDate(int i) {
-		// 20101203122200
-		String date = getOBRDateTime(i);
-		if (date == null || date.equals("")) {
-			return null;
-		}
-		return ConversionUtils.fromDateString(date, "yyyyMMddHHmmss");
-	}
-
 	public String getAccessionNum() {
 		return get("/.OBR-20");
 	}
@@ -399,11 +151,6 @@ public class CLSHandler extends AHSHandler
 		}
 		return result;
 	}
-
-    public String getNteForPID() {
-	    return "";
-    }
-
 
 
 	/* =================================== Lab Uploads ==================================== */
@@ -532,5 +279,25 @@ public class CLSHandler extends AHSHandler
 	{
 		message = message.replace(oldAccessionNumber, newAccessionNumber);
 		return message;
+	}
+
+	public ORU_R01_ORDER_OBSERVATION getOBR(int i) throws HL7Exception {
+		return msg.getRESPONSE().getORDER_OBSERVATION(i);
+	}
+
+	public ORC getORC(int i) throws HL7Exception {
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getORC();
+	}
+
+	public OBX getOBX(int i, int ii) throws HL7Exception {
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(ii).getOBX();
+	}
+
+	public NTE getNTE(int i, int j, int k) throws HL7Exception {
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k);
+	}
+
+	public NTE getOBRNTE(int i, int j) throws HL7Exception {
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getNTE(j);
 	}
 }

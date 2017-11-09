@@ -356,7 +356,7 @@ public abstract class MessageHandler {
 	 */
 	public String getOBRName(int i)
 	{
-		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-4"));
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-4-2"));
 	}
 
 	/**
@@ -848,7 +848,7 @@ public abstract class MessageHandler {
 		return formatted;
 	}
 
-	public String getAge()
+	protected String getAge()
 	{
 		String age = "N/A";
 		String dob = getDOB();
