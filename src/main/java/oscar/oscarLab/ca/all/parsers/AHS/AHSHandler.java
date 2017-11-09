@@ -151,26 +151,6 @@ public abstract class AHSHandler extends MessageHandler
 	}
 
 	/**
-	 * Gets the ordering provider name.
-	 *
-	 * @return
-	 * 		Returns the provider name or an empty string if it's not specified
-	 */
-	public String getOrderingProvider() {
-		return get("/.OBR-16-2");
-	}
-
-	/**
-	 * Gets the ordering provider ID for matching provider with the correct inbox routing.
-	 *
-	 * @return
-	 * 		Returns the provider id or an empty string if it's not specified
-	 */
-	public String getOrderingProviderId() {
-		return get("/.OBR-16-1");
-	}
-
-	/**
 	 * Gets the date and time the specimen was collected
 	 *
 	 * @param i
@@ -227,8 +207,9 @@ public abstract class AHSHandler extends MessageHandler
 				status = "Final";
 			} else if (status.equalsIgnoreCase("P")) {
 				status = "Preliminary";
+			} else if (status.equalsIgnoreCase("X")) {
+				status = "Cancelled";
 			}
-			// TODO find out about "Cancelled" status
 		} catch (Exception e) {
 			logger.error("Error retrieving obx result status", e);
 			return status;

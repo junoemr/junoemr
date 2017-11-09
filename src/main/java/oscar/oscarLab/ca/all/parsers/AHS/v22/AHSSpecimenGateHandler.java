@@ -76,7 +76,7 @@ public class AHSSpecimenGateHandler extends AHSHandler
 	@Override
 	public boolean canUpload()
 	{
-		//get("/.PID-2")
+		//Specimen Gate reports are not linked
 		return true;
 	}
 	@Override
@@ -88,6 +88,11 @@ public class AHSSpecimenGateHandler extends AHSHandler
 	public String getMsgType()
 	{
 		return "AHS";
+	}
+	@Override
+	public String getPatientLocation()
+	{
+		return getString(get("/.PV1-3"));
 	}
 	@Override
 	public String getAccessionNum()
