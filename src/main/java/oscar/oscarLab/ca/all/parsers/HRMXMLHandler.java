@@ -15,26 +15,7 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-
+import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
@@ -48,17 +29,33 @@ import org.oscarehr.hospitalReportManager.xsd.PhoneNumber;
 import org.oscarehr.hospitalReportManager.xsd.ReportsReceived;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
-import oscar.oscarLab.ca.all.parsers.AHS.v23.MessageHandler23;
 import oscar.util.UtilDateUtilities;
-import ca.uhn.hl7v2.HL7Exception;
+
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 /**
  * TDIS HL7 Report Parser/Handler. Handles incoming HL7 files containing ITS or DEPARTMENTAL reports as part of the OBR/OBX segments.
  *
  * @author dritan
  */
-public class HRMXMLHandler extends MessageHandler23
+public class HRMXMLHandler extends MessageHandler
 {
 
 	private static Logger logger = MiscUtils.getLogger();

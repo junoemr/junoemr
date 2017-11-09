@@ -44,7 +44,6 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.MessageHandler23;
 import oscar.util.StringUtils;
 
 import java.util.ArrayList;
@@ -54,10 +53,11 @@ import java.util.ArrayList;
  *
  * @author wrighd
  */
-public class CMLHandler extends MessageHandler23
+public class CMLHandler extends MessageHandler
 {
 
     Logger logger = Logger.getLogger(CMLHandler.class);
+    protected ORU_R01 msg;
 
     /** Creates a new instance of CMLHandler */
     public CMLHandler(){

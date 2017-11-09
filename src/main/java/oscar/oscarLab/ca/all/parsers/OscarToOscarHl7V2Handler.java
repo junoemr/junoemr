@@ -25,24 +25,22 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.v2.oscar_to_oscar.OscarToOscarUtils;
-import org.oscarehr.util.MiscUtils;
-
-import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.ChainnedMessageAdapter;
-import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.OruR01Handler;
-import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.RefI12Handler;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractMessage;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import ca.uhn.hl7v2.model.v26.message.REF_I12;
 import ca.uhn.hl7v2.model.v26.segment.MSH;
 import ca.uhn.hl7v2.model.v26.segment.PID;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.MessageHandler23;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.hl7.v2.oscar_to_oscar.OscarToOscarUtils;
+import org.oscarehr.util.MiscUtils;
+import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.ChainnedMessageAdapter;
+import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.OruR01Handler;
+import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.RefI12Handler;
 
-public final class OscarToOscarHl7V2Handler extends MessageHandler23
+import java.util.ArrayList;
+
+public final class OscarToOscarHl7V2Handler extends MessageHandler
 {
 	private static Logger logger = MiscUtils.getLogger();
 	

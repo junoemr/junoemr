@@ -39,7 +39,6 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextMessageInfo;
 import org.oscarehr.util.SpringUtils;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.MessageHandler23;
 import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
@@ -55,13 +54,14 @@ import java.util.List;
  *
  * @author wrighd
  */
-public class BioTestHandler extends MessageHandler23
+public class BioTestHandler extends MessageHandler
 {
 
     Logger logger = Logger.getLogger(BioTestHandler.class);
     ArrayList<String> headers = null;
     HashMap<OBR,ArrayList<OBX>> obrSegMap = null;
     ArrayList<OBR> obrSegKeySet = null;
+    protected ORU_R01 msg;
 
     /** Creates a new instance of CMLHandler */
     public BioTestHandler(){

@@ -27,7 +27,6 @@ package oscar.oscarLab.ca.all.parsers;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v25.datatype.XCN;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
@@ -870,8 +869,8 @@ public abstract class MessageHandler {
 		return StringUtils.trimToEmpty(retrieve);
 	}
 
-	//TODO move to v25 message handler
-	protected String getFullDocNameV25(XCN xcn) {
+	// kept for older parsers
+	protected String getFullDocNameV25(ca.uhn.hl7v2.model.v25.datatype.XCN xcn) {
 		String docName = "";
 
 		if (xcn.getPrefixEgDR().getValue() != null) docName = xcn.getPrefixEgDR().getValue();
@@ -900,5 +899,35 @@ public abstract class MessageHandler {
 		}
 
 		return docName;
+	}
+
+	// kept for older parsers
+	protected String getFullDocName(ca.uhn.hl7v2.model.v23.datatype.XCN docSeg) {
+		String docName = "";
+
+		if (docSeg.getPrefixEgDR().getValue() != null) docName = docSeg.getPrefixEgDR().getValue();
+
+		if (docSeg.getGivenName().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getGivenName().getValue();
+			else docName = docName + " " + docSeg.getGivenName().getValue();
+		}
+		if (docSeg.getMiddleInitialOrName().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getMiddleInitialOrName().getValue();
+			else docName = docName + " " + docSeg.getMiddleInitialOrName().getValue();
+		}
+		if (docSeg.getFamilyName().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getFamilyName().getValue();
+			else docName = docName + " " + docSeg.getFamilyName().getValue();
+		}
+		if (docSeg.getSuffixEgJRorIII().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getSuffixEgJRorIII().getValue();
+			else docName = docName + " " + docSeg.getSuffixEgJRorIII().getValue();
+		}
+		if (docSeg.getDegreeEgMD().getValue() != null) {
+			if (docName.equals("")) docName = docSeg.getDegreeEgMD().getValue();
+			else docName = docName + " " + docSeg.getDegreeEgMD().getValue();
+		}
+
+		return (docName);
 	}
 }

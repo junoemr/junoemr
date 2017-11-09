@@ -11,6 +11,7 @@ package oscar.oscarLab.ca.all.parsers;
 
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.OBR;
 import ca.uhn.hl7v2.model.v23.segment.OBX;
 import ca.uhn.hl7v2.parser.Parser;
@@ -22,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextMessageInfo;
 import org.oscarehr.util.SpringUtils;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.MessageHandler23;
 import oscar.util.UtilDateUtilities;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import java.util.List;
  *
  */
 
-public class MEDVUEHandler extends MessageHandler23
+public class MEDVUEHandler extends MessageHandler
 {
 
 	Logger logger = Logger.getLogger(MEDVUEHandler.class);
@@ -43,6 +43,7 @@ public class MEDVUEHandler extends MessageHandler23
 	private ArrayList<String> headers = null;
 	private OBR obrseg = null;
 	private OBX obxseg = null;
+	protected ORU_R01 msg;
 	
 	
 	

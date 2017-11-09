@@ -44,11 +44,10 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.MessageHandler23;
 
 import java.util.ArrayList;
 
-public class CDLHandler extends MessageHandler23
+public class CDLHandler extends MessageHandler
 {
 
     Logger logger = Logger.getLogger(CDLHandler.class);
@@ -56,6 +55,7 @@ public class CDLHandler extends MessageHandler23
 	private OBR obrseg = null;
 	private OBX obxseg = null;
 	private ca.uhn.hl7v2.model.v23.group.ORU_R01_PATIENT pat_23;
+    protected ORU_R01 msg;
 
     /** Creates a new instance of CDLHandler */
     public CDLHandler(){

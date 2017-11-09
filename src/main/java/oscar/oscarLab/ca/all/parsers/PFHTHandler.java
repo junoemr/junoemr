@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextMessageInfo;
 import org.oscarehr.util.SpringUtils;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.MessageHandler23;
 import oscar.util.UtilDateUtilities;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ import java.util.List;
 
 
 
-public class PFHTHandler extends MessageHandler23
+public class PFHTHandler extends MessageHandler
 {
 
 	Logger logger = Logger.getLogger(PFHTHandler.class);
@@ -42,7 +41,7 @@ public class PFHTHandler extends MessageHandler23
 	private ArrayList<String> headers = null;
 	private HashMap<OBR, ArrayList<OBX>> obrSegMap = null;
 	private ArrayList<OBR> obrSegKeySet = null;
-
+	protected ORU_R01 msg;
 
 
 	public PFHTHandler() {

@@ -35,11 +35,10 @@ import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.MessageHandler23;
 
 import java.util.ArrayList;
 
-public class IHAHandler extends MessageHandler23
+public class IHAHandler extends MessageHandler
 {
     
     Logger logger = Logger.getLogger(IHAHandler.class);
