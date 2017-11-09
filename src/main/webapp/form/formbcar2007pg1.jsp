@@ -964,7 +964,7 @@ function calcAgeAtEDD(){
 					<td colspan='2' valign="bottom">Mother's Name <input
 						type="text" name="pg1_moName" style="width: 100%" size="60"
 						maxlength="60"
-						value="<%= props.getProperty("pg1_moName", (props.getProperty("c_surname", "")+", "+props.getProperty("c_givenName", "")) ) %>"
+						value="<%= props.getProperty("pg1_moName", (props.getProperty("c_surname", "")+", ")) %>"
 						@oscar.formDB /></td>
 					<td width="20%">Date of Birth<br>
 					dd/mm/yyyy <input type="text" name="pg1_dateOfBirth"
