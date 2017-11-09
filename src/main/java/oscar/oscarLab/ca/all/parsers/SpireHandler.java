@@ -42,7 +42,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
-import oscar.oscarLab.ca.all.parsers.v23.MessageHandler23;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.MessageHandler23;
 import oscar.oscarLab.ca.all.spireHapiExt.v23.message.ORU_R01;
 
 import java.util.ArrayList;

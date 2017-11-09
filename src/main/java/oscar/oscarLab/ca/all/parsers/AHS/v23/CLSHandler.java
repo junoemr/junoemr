@@ -21,10 +21,11 @@
  * Hamilton
  * Ontario, Canada
  */
-package oscar.oscarLab.ca.all.parsers.v23;
+package oscar.oscarLab.ca.all.parsers.AHS.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
+import ca.uhn.hl7v2.model.v23.datatype.FT;
 import ca.uhn.hl7v2.model.v23.group.ORU_R01_ORDER_OBSERVATION;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
@@ -37,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
@@ -50,6 +52,7 @@ import java.util.Date;
 public class CLSHandler extends AHSHandler
 {
 	private static Logger logger = Logger.getLogger(CLSHandler.class);
+	protected ORU_R01 msg;
 
 	public static boolean headerTypeMatch(MSH messageHeaderSegment)
 	{
@@ -67,10 +70,12 @@ public class CLSHandler extends AHSHandler
 	public CLSHandler(String hl7Body) throws HL7Exception
 	{
 		super(hl7Body);
+		this.msg = (ORU_R01) this.message;
 	}
 	public CLSHandler(ORU_R01 msg) throws HL7Exception
 	{
 		super(msg);
+		this.msg = (ORU_R01) this.message;
 	}
 
 	public String getMsgType() {
@@ -233,42 +238,6 @@ public class CLSHandler extends AHSHandler
 		}
 	}
 
-	public String getOBXResultStatus(int i, int j) {
-		String status = "";
-		try {
-			status = getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservResultStatus().getValue());
-			if (status.equalsIgnoreCase("C")) {
-				status = "Corrected";
-			} else if (status.equalsIgnoreCase("F")) {
-				status = "Final";
-			} else if (status.equalsIgnoreCase("P")) {
-				status = "Preliminary";
-			}
-			// TODO find out about "Cancelled" status
-		} catch (Exception e) {
-			logger.error("Error retrieving obx result status", e);
-			return status;
-		}
-		return status;
-	}
-
-	public int getOBXFinalResultCount() {
-		int obrCount = getOBRCount();
-		int obxCount;
-		int count = 0;
-		for (int i = 0; i < obrCount; i++) {
-			obxCount = getOBXCount(i);
-			for (int j = 0; j < obxCount; j++) {
-				if (getOBXResultStatus(i, j).equals("Final") ||
-						getOBXResultStatus(i, j).equals("Corrected"))
-				{
-					count++;
-				}
-			}
-		}
-		return count;
-	}
-
 	/**
 	 *  Methods to get information from observation notes
 	 */
@@ -282,6 +251,19 @@ public class CLSHandler extends AHSHandler
 		}
 
 		return count;
+	}
+	@Override
+	public String getOBRComment(int i, int j) {
+		try {
+			FT[] tmp = msg.getRESPONSE().getORDER_OBSERVATION(i).getNTE(j).getComment();
+			StringBuilder comment = new StringBuilder();
+			for(FT t:tmp) {
+				comment.append(t.getValue());
+			}
+			return comment.toString();
+		} catch (Exception e) {
+			return ("");
+		}
 	}
 
 	/**

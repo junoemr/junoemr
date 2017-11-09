@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.oscarehr.util.MiscUtils;
 
-import oscar.oscarLab.ca.all.parsers.v23.CLSHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
 
 public class CLSHandlerTest {
 

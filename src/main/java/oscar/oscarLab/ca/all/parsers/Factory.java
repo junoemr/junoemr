@@ -58,10 +58,10 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
-import oscar.oscarLab.ca.all.parsers.v22.AHSSpecimenGateHandler;
-import oscar.oscarLab.ca.all.parsers.v23.AHSSunquestHandler;
-import oscar.oscarLab.ca.all.parsers.v23.CLSDIHandler;
-import oscar.oscarLab.ca.all.parsers.v23.CLSHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v22.AHSSpecimenGateHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.AHSSunquestHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
 
 public final class Factory {
 

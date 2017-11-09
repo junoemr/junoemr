@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import oscar.oscarLab.ca.all.parsers.v23.CLSHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
 import oscar.util.ConversionUtils;
 
 public class CLSResultsComplianceTest {

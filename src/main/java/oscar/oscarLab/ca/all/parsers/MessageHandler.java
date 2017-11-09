@@ -267,7 +267,7 @@ public abstract class MessageHandler {
 		int i = 1;
 		try
 		{
-			while (!getHomePhone(i).equals(""))
+			while (!getHomePhone(i).isEmpty())
 			{
 				if (i == 1)
 				{
@@ -297,7 +297,7 @@ public abstract class MessageHandler {
 		int i = 1;
 		try
 		{
-			while (!getBuisnessPhone(i).equals(""))
+			while (!getBuisnessPhone(i).isEmpty())
 			{
 				if (i == 1)
 				{
@@ -318,6 +318,8 @@ public abstract class MessageHandler {
 			return ("");
 		}
 	}
+
+	public abstract String getNteForPID();
 
 
 	/* ===================================== OBR ====================================== */
@@ -386,12 +388,31 @@ public abstract class MessageHandler {
 	 *  Return the number of comments (usually NTE segments) that follow ith
 	 *  OBR segment, this should usually be either 0 or 1.
 	 */
-	public abstract int getOBRCommentCount(int i);
+	public int getOBRCommentCount(int i)
+	{
+		//TODO better way to find this
+		int count = 0;
+		int k=0;
+		String value;
+		do
+		{
+			// check for non-empty set id in NTE section
+			value = get("/.ORDER_OBSERVATION("+i+")/NTE("+k+")-1");
+			if(value != null) count++;
+			k++;
+		}
+		while(value != null);
+
+		return count;
+	}
 
 	/**
-	 *  Return the jth comment of the ith OBR segment.
+	 *  Return the kth comment of the ith OBR segment.
 	 */
-	public abstract String getOBRComment(int i, int j);
+	public String getOBRComment(int i, int k)
+	{
+		return getString(get("/.ORDER_OBSERVATION("+i+")/NTE("+k+")-3"));
+	}
 
 	/**
 	 *  Return the observation header which represents the observation stored in
@@ -541,9 +562,12 @@ public abstract class MessageHandler {
 			docNums.add(providerId);
 
 			i = 0;
-			while ((id = getResultCopiesToProviderNo(0, i)) != null) {
-				if (!id.equals(providerId)) docNums.add(id);
+			id = getResultCopiesToProviderNo(0, i);
+			while (id != null && !id.isEmpty()) {
+				if (!id.equals(providerId))
+					docNums.add(id);
 				i++;
+				id = getResultCopiesToProviderNo(0, i);
 			}
 		} catch (Exception e) {
 			logger.error("Could not return doctor nums", e);
@@ -673,12 +697,31 @@ public abstract class MessageHandler {
      *  Return the number of comments (usually NTE segments) following the jth
      *  OBX segment of the ith OBR group.
      */
-    public abstract int getOBXCommentCount( int i, int j);
+    public int getOBXCommentCount( int i, int j)
+    {
+	    //TODO better way to find this
+	    int count = 0;
+	    int k=0;
+	    String value;
+	    do
+	    {
+		    // check for non-empty set id in NTE section
+		    value = get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/NTE("+k+")-1");
+		    if(value != null) count++;
+		    k++;
+	    }
+	    while(value != null);
+
+	    return count;
+    }
 
     /**
      *  Return the kth comment of the jth OBX segment of the ith OBR group
      */
-    public abstract String getOBXComment( int i, int j, int k);
+    public String getOBXComment( int i, int j, int k)
+    {
+	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/NTE("+k+")-3"));
+    }
 
 	/**
 	 *  Returns the number used to order labs with matching accession numbers.
@@ -686,7 +729,7 @@ public abstract class MessageHandler {
 	 *  - Multiple labs with the same accession number must display in a certain
 	 *  order. They are ordered by their date but if two labs with the same
 	 *  accession number have the same date they are ordered by the number
-	 *  retrievied by this method
+	 *  retrieved by this method
 	 *
 	 *  - The newest lab will have the greatest number returned from this method.
 	 *
@@ -694,7 +737,24 @@ public abstract class MessageHandler {
 	 *  number, the total number of obx segments with final results should be
 	 *  returned
 	 */
-	public abstract int getOBXFinalResultCount();
+	public int getOBXFinalResultCount()
+	{
+		int obrCount = getOBRCount();
+		int obxCount;
+		int count = 0;
+		for (int i = 0; i < obrCount; i++) {
+			obxCount = getOBXCount(i);
+			for (int j = 0; j < obxCount; j++) {
+				if (getOBXResultStatus(i, j).equals("F"))
+				{
+					count++;
+				}
+			}
+		}
+		return count;
+	}
+
+	public abstract String getNteForOBX(int i,int j);
 
 
 	/* ===================================== MISC ====================================== */
@@ -707,13 +767,15 @@ public abstract class MessageHandler {
     	return "";
     }
 
-    public abstract String getEncounterId();
+    public String getEncounterId()
+    {
+	    return "";
+    }
 
-    public abstract String getRadiologistInfo();
-
-    public abstract String getNteForOBX(int i,int j);
-    
-    public abstract String getNteForPID();
+    public String getRadiologistInfo()
+    {
+    	return "";
+    }
 
 	public boolean isUnstructured()
 	{

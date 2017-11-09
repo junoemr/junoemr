@@ -33,7 +33,7 @@ import org.oscarehr.olis.model.OLISRequestNomenclature;
 import org.oscarehr.olis.model.OLISResultNomenclature;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import oscar.oscarLab.ca.all.parsers.v23.MessageHandler23;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.MessageHandler23;
 import oscar.util.UtilDateUtilities;
 
 import javax.servlet.http.HttpServletRequest;

@@ -22,7 +22,7 @@
  * Ontario, Canada
  */
 
-package oscar.oscarLab.ca.all.parsers.v23;
+package oscar.oscarLab.ca.all.parsers.AHS.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v23.datatype.XCN;

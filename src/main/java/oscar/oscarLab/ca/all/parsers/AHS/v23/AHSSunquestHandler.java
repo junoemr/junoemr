@@ -22,14 +22,20 @@
  * Ontario, Canada
  */
 
-package oscar.oscarLab.ca.all.parsers.v23;
+package oscar.oscarLab.ca.all.parsers.AHS.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
+import org.apache.log4j.Logger;
+import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
 public class AHSSunquestHandler extends AHSHandler
 {
+	private static Logger logger = Logger.getLogger(AHSSunquestHandler.class);
+
+	protected ORU_R01 msg;
 
 	public static boolean headerTypeMatch(MSH messageHeaderSegment)
 	{
@@ -47,10 +53,12 @@ public class AHSSunquestHandler extends AHSHandler
 	public AHSSunquestHandler(String hl7Body) throws HL7Exception
 	{
 		super(hl7Body);
+		this.msg = (ORU_R01) this.message;
 	}
-	public AHSSunquestHandler(ORU_R01 msg) throws HL7Exception
+	public AHSSunquestHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
+		this.msg = (ORU_R01) this.message;
 	}
 
     /* ===================================== MSH ====================================== */
@@ -68,11 +76,6 @@ public class AHSSunquestHandler extends AHSHandler
 	{
 		return ""; // not sent
 	}
-
-
-
-
-
 
 	@Override
 	public String preUpload(String hl7Message) throws HL7Exception

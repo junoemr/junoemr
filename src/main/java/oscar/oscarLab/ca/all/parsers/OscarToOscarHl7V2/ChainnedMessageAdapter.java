@@ -34,7 +34,7 @@ import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.OscarToOscarUtils;
 import org.oscarehr.util.MiscUtils;
 
-import oscar.oscarLab.ca.all.parsers.v23.MessageHandler23;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.MessageHandler23;
 import oscar.util.DateUtils;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractMessage;
