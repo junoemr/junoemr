@@ -44,7 +44,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		controller.user = user;
 		controller.billingServiceTypes = billingServiceTypes;
 		controller.pref = loadedSettings;
-		controller.encounterForms = encounterForms;
+		controller.encounterForms = encounterForms.content;
 		controller.eforms = eforms;
 		controller.loadedApps = loadedApps;
 
