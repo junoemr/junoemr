@@ -25,10 +25,11 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
+import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
-import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.commons.lang.StringUtils;
@@ -80,8 +81,10 @@ public abstract class MessageHandler {
 	 */
 	public MessageHandler(String hl7Body) throws HL7Exception
 	{
-		Parser p = new PipeParser();
-		p.setValidationContext(new NoValidation());
+		HapiContext context = new DefaultHapiContext();
+		context.setValidationContext(new NoValidation());
+		Parser p = context.getPipeParser();
+
 		Message msg = p.parse(hl7Body);
 		this.message = msg;
 		this.terser = new Terser(msg);
@@ -139,7 +142,10 @@ public abstract class MessageHandler {
      *		'http://hl7api.sourceforge.net/'
      *  - The replaceAll statement is necessary to ensure that the parser
      *  correctly reads the end of each line.
+     *
+     *  @deprecated - initialization should be done in constructors.
      */
+    @Deprecated
     public abstract void init(String hl7Body) throws HL7Exception;
 
 

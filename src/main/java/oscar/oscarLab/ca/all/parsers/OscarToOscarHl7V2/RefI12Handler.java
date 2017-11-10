@@ -50,39 +50,35 @@ public final class RefI12Handler extends ChainnedMessageAdapter<REF_I12> {
 		
 		logger.debug("hl7Message.getPROVIDER_CONTACTReps()="+hl7Message.getPROVIDER_CONTACTReps());
 		for (int i = 0; i < hl7Message.getPROVIDER_CONTACTReps(); i++) {
-			try {
-	            REF_I12_PROVIDER_CONTACT providerContact = hl7Message.getPROVIDER_CONTACT(i);
+            REF_I12_PROVIDER_CONTACT providerContact = hl7Message.getPROVIDER_CONTACT(i);
 
-	            PRD prd = providerContact.getPRD();
+            PRD prd = providerContact.getPRD();
 
-	            logger.debug("prd.getProviderRole(0).getIdentifier()='"+prd.getProviderRole(0).getIdentifier()+'\'');
-	            if ("RP".equals(prd.getProviderRole(0).getIdentifier().getValue())) {
-	            	XPN xpn = prd.getProviderName(0);
-	            	StringBuilder sb=new StringBuilder();
-	            	
-	            	String temp= xpn.getPrefixEgDR().getValue();
-	            	if (temp!=null)
-	            	{
-	            		sb.append(temp);
-	            		sb.append(' ');
-	            	}
-	            	
-	            	temp=xpn.getGivenName().getValue();
-	            	if (temp!=null)
-	            	{
-	            		sb.append(temp);
-	            		sb.append(' ');
-	            	}
-	            	
-	            	temp=xpn.getFamilyName().getSurname().getValue();
-	            	if (temp!=null) sb.append(temp);
-	            	
-	            	String name=sb.toString();
-	            	logger.debug("xpn/name="+name);
-	            	return (name);
-	            }
-            } catch (HL7Exception e) {
-            	logger.error("Unexpected error.", e);
+            logger.debug("prd.getProviderRole(0).getIdentifier()='"+prd.getProviderRole(0).getIdentifier()+'\'');
+            if ("RP".equals(prd.getProviderRole(0).getIdentifier().getValue())) {
+                XPN xpn = prd.getProviderName(0);
+                StringBuilder sb=new StringBuilder();
+
+                String temp= xpn.getPrefixEgDR().getValue();
+                if (temp!=null)
+                {
+                    sb.append(temp);
+                    sb.append(' ');
+                }
+
+                temp=xpn.getGivenName().getValue();
+                if (temp!=null)
+                {
+                    sb.append(temp);
+                    sb.append(' ');
+                }
+
+                temp=xpn.getFamilyName().getSurname().getValue();
+                if (temp!=null) sb.append(temp);
+
+                String name=sb.toString();
+                logger.debug("xpn/name="+name);
+                return (name);
             }
 		}
 

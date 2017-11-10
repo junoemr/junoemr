@@ -94,13 +94,10 @@ public class EpsilonHandler  extends CMLHandler {
 	}
 
 	@Override
-	public String getMsgPriority() {
-		try {
-			return msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR()
-					.getPriority().getValue();
-		} catch (HL7Exception e) {
-			return ("");
-		}
+	public String getMsgPriority()
+	{
+		return msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR()
+				.getPriority().getValue();
 	}
 
 	@Override

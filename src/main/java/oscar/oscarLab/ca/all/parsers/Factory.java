@@ -34,10 +34,11 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
+import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
-import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import com.google.common.collect.Sets;
 import org.apache.commons.codec.binary.Base64;
@@ -126,8 +127,9 @@ public final class Factory {
 	private static MessageHandler getHandlerNew(String hl7Body) throws HL7Exception {
 		MessageHandler handler = null;
 
-		Parser p = new PipeParser();
-		p.setValidationContext(new NoValidation());
+		HapiContext context = new DefaultHapiContext();
+		context.setValidationContext(new NoValidation());
+		Parser p = context.getPipeParser();
 		Message msg = p.parse(hl7Body);
 
 		// attempt to read the msh header and determine lab type handler

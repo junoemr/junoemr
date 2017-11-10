@@ -388,7 +388,7 @@ public class MEDVUEHandler extends MessageHandler
 	public String getFirstName() {
 		
 		try {	
-			return (getString(this.pat_23.getPID().getPatientName().getGivenName().getValue()));
+			return (getString(this.pat_23.getPID().getPatientName(0).getGivenName().getValue()));
 		} catch (Exception e) {
 			logger.error("Exception getting firstName of the patient" , e);
 		}
@@ -399,7 +399,7 @@ public class MEDVUEHandler extends MessageHandler
 	public String getLastName() {
 		
 		try {	
-			return getString(this.pat_23.getPID().getPatientName().getFamilyName().getValue());
+			return getString(this.pat_23.getPID().getPatientName(0).getFamilyName().getValue());
 		} catch (Exception e) {
 			logger.error("Exception getting lastName of the patient" , e);
 		}
@@ -430,17 +430,9 @@ public class MEDVUEHandler extends MessageHandler
 	}
 
 	public String getHealthNum() {
-		//int pat_ids = pat_25.getPID().getPatientIdentifierListReps();
-		try {
-			ca.uhn.hl7v2.model.v23.datatype.CX patIdList = pat_23.getPID().getPatientIDInternalID(0);
-			String hnumber = patIdList.getID().getValue();
-			return hnumber;
-			
-		} catch (HL7Exception e) {
-			logger.error("ERROR getting the health number for HL7 lab report patient: " + e.toString());
-		}
-
-		return "";
+		ca.uhn.hl7v2.model.v23.datatype.CX patIdList = pat_23.getPID().getPatientIDInternalID(0);
+		String hnumber = patIdList.getID().getValue();
+		return hnumber;
 	}
 
 	public String getHomePhone() {

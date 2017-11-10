@@ -221,21 +221,11 @@ public abstract class ChainnedMessageAdapter<T extends AbstractMessage> extends 
 	}
 
 	public String getHealthNum() {
-		try {
-			return (getPid().getPatientIdentifierList(0).getIDNumber().getValue());
-		} catch (HL7Exception e) {
-			logger.error("Unexpected Error.", e);
-			return (null);
-		}
+		return (getPid().getPatientIdentifierList(0).getIDNumber().getValue());
 	}
 
 	public String getHomePhone() {
-		try {
-			return (getPid().getPhoneNumberHome(0).getUnformattedTelephoneNumber().getValue());
-		} catch (HL7Exception e) {
-			logger.error("Unexpected Error.", e);
-			return (null);
-		}
+		return (getPid().getPhoneNumberHome(0).getUnformattedTelephoneNumber().getValue());
 	}
 
 	public String getWorkPhone() {

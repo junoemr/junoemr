@@ -683,25 +683,11 @@ public class TDISHandler extends MessageHandler
 	}
 
 	public String getFirstName() {
-
-		try {
-			
-			return getString(this.pat_25.getPID().getPatientName(0).getGivenName().getValue());
-
-		} catch (HL7Exception e) {
-			logger.error("Exception while parsing first name of patient: " + e);
-		}
-		return null;
-		//return (getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()));
+		return getString(this.pat_25.getPID().getPatientName(0).getGivenName().getValue());
 	}
 
 	public String getLastName() {
-		try {
-			return getString(this.pat_25.getPID().getPatientName(0).getFamilyName().getSurname().getValue());
-		} catch (HL7Exception e) {
-			logger.error("Exception while parsing last name of patient: " + e);
-		}
-		return "";
+		return getString(this.pat_25.getPID().getPatientName(0).getFamilyName().getSurname().getValue());
 	}
 
 	public String getDOB() {
@@ -720,21 +706,17 @@ public class TDISHandler extends MessageHandler
 
 	public String getHealthNum() {
 		//int pat_ids = pat_25.getPID().getPatientIdentifierListReps();
-		 String hin;
-		try {
-			String[] hinArray = null ;
-			ca.uhn.hl7v2.model.v25.datatype.CX patIdList = pat_25.getPID().getPatientIdentifierList(0);
-			String hnumber = patIdList.getIDNumber().getValue();
-			if (hnumber != null)
-				hinArray = hnumber.split("-");
-				if ((hinArray!=null)&& hinArray.length>0) {
-				hin = hinArray[0];
-				return hin; } //return first instance that is not null
-		} catch (HL7Exception e) {
-			logger.error("ERROR getting the health number for HL7 lab report patient: " + e.toString());
-		}
-
-		return "";
+		String hin = "";
+		String[] hinArray = null;
+		ca.uhn.hl7v2.model.v25.datatype.CX patIdList = pat_25.getPID().getPatientIdentifierList(0);
+		String hnumber = patIdList.getIDNumber().getValue();
+		if(hnumber != null)
+			hinArray = hnumber.split("-");
+		if((hinArray != null) && hinArray.length > 0)
+		{
+			hin = hinArray[0];
+		} //return first instance that is not null
+		return hin;
 	}
 
 	public String getHomePhone() {
