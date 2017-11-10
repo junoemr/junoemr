@@ -42,7 +42,7 @@ public class AHSHandler implements MessageHandler {
 		ArrayList<String> messages = Utilities.separateMessages(fileName);
 		for (String msg : messages)
 		{
-			logger.info("Handle message:\n" + msg);
+			logger.debug("Handle message:\n" + msg);
 			oscar.oscarLab.ca.all.parsers.MessageHandler parser = Factory.getHandler("AHS", msg);
 			// just in case
 			if(parser == null)

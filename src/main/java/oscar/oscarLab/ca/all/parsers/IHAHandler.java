@@ -1036,4 +1036,19 @@ public class IHAHandler extends MessageHandler
     public String getNteForPID() {
     	return "";
     }
+
+
+    @Override
+    public boolean isUnstructured() {
+
+        boolean result=true;
+        for(int j = 0; j<this.getOBRCount();j++) {
+            for(int k=0;k<this.getOBXCount(j);k++) {
+                if(!"NAR".equals(getOBXValueType(j, k))) {
+                    result=false;
+                }
+            }
+        }
+        return result;
+    }
 }
