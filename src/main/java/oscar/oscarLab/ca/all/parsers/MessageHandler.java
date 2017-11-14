@@ -28,8 +28,10 @@ package oscar.oscarLab.ca.all.parsers;
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.HapiContext;
+import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
+import ca.uhn.hl7v2.util.SegmentFinder;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.commons.lang.StringUtils;
@@ -333,20 +335,7 @@ public abstract class MessageHandler {
      */
 	public int getOBRCount()
 	{
-		//TODO better way to find this
-		int count = 0;
-		int i=0;
-		String value;
-		do
-		{
-			// always check for a required value in OBR segment
-			value = get("/.ORDER_OBSERVATION("+i+")/OBR-4");
-			if(value != null) count++;
-			i++;
-		}
-		while(value != null);
-
-		return count;
+		return getReps("RESPONSE", 0, "ORDER_OBSERVATION");
 	}
 
 	public String getFillerOrderNumber()
@@ -394,20 +383,7 @@ public abstract class MessageHandler {
 	 */
 	public int getOBRCommentCount(int i)
 	{
-		//TODO better way to find this
-		int count = 0;
-		int k=0;
-		String value;
-		do
-		{
-			// check for non-empty set id in NTE section
-			value = get("/.ORDER_OBSERVATION("+i+")/NTE("+k+")-1");
-			if(value != null) count++;
-			k++;
-		}
-		while(value != null);
-
-		return count;
+		return getReps("ORDER_OBSERVATION", i, "NTE");
 	}
 
 	/**
@@ -588,20 +564,7 @@ public abstract class MessageHandler {
 	 */
 	public int getOBXCount(int i)
 	{
-		//TODO better way to find this
-		int count = 0;
-		int j=0;
-		String value;
-		do
-		{
-			// always check a required value in OBX segment
-			value = get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-2");
-			if(value != null) count++;
-			j++;
-		}
-		while(value != null);
-
-		return count;
+		return getReps("ORDER_OBSERVATION", i, "OBSERVATION");
 	}
 
     /**
@@ -703,20 +666,7 @@ public abstract class MessageHandler {
      */
     public int getOBXCommentCount( int i, int j)
     {
-	    //TODO better way to find this
-	    int count = 0;
-	    int k=0;
-	    String value;
-	    do
-	    {
-		    // check for non-empty set id in NTE section
-		    value = get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/NTE("+k+")-1");
-		    if(value != null) count++;
-		    k++;
-	    }
-	    while(value != null);
-
-	    return count;
+    	return getReps("ORDER_OBSERVATION", i, "OBSERVATION", j, "NTE");
     }
 
     /**
@@ -804,6 +754,71 @@ public abstract class MessageHandler {
 			logger.warn("Unable to get field at " + path, e);
 			return null;
 		}
+	}
+
+	/**
+	 * finds a count of the segments under the group name. This uses terser groups
+	 * The basic group structure of HL7 is similar to this:
+	 * ORU_R01/(RESPONSE|PATIENT_RESULT)/ORDER_OBSERVATION/OBSERVATION
+	 * for searching an OBR count, the parent group would be RESPONSE, and the rep 0 (only 1 response per message)
+	 * but OBX would have parent ORDER_OBSERVATION, with n reps
+	 * @param parentGroupName - name of the group to search within. this is paired with the repetition number.
+	 * @param parentRep - the parent repetition to search for the segments in
+	 * @param groupName - the group name type to count
+	 * @return - the group count matching the group name
+	 */
+	protected int getReps(String parentGroupName, int parentRep, String groupName)
+	{
+		int count = 0;
+		try
+		{
+			Group g = findGroupFromTop(parentGroupName, parentRep);
+			count = g.getAll(groupName).length;
+			logger.debug("get reps -> " + parentGroupName + "("+parentRep+")" + groupName + ": " + count);
+		}
+		catch(HL7Exception e) {
+			logger.error("Terser Repetition Error", e);
+		}
+		return count;
+	}
+
+	/**
+	 * finds a count of the segments under the group name. This uses terser groups
+	 * This overloads the basic getReps method allowing a sub group with index.
+	 * This is used for nested groups such as OBX NTE comments.
+	 * Example: for searching an OBX NTE count, the parent group would be ORDER_OBSERVATION(i),the sub-parent OBSERVATION(j), groupName NTE
+	 * @param parentGroupName - name of the group to search within. this is paired with the repetition number.
+	 * @param parentRep - the parent repetition to search for the segments in
+	 * @param subParentGroupName - name of the sup group to search within. this is paired with the sub repetition number.
+	 * @param subParentRep - the sub parent repetition to search for the segments in
+	 * @param groupName - the group name type to count
+	 * @return - the group count matching the group name
+	 */
+	protected int getReps(String parentGroupName, int parentRep, String subParentGroupName, int subParentRep, String groupName)
+	{
+		int count = 0;
+		try
+		{
+			Group g = findGroupFromTop(parentGroupName, parentRep);
+			Group g2 = (Group) g.get(subParentGroupName, subParentRep);
+			count = g2.getAll(groupName).length;
+			logger.debug("get reps -> " + g.getName() + "("+parentRep+")/" + g2.getName() + "("+ subParentRep +")" + groupName + ": " + count);
+		}
+		catch(HL7Exception e) {
+			logger.error("Terser Repetition Error", e);
+		}
+		return count;
+	}
+
+	/**
+	 * convenient way to always search the entire hl7 message for the given group
+	 */
+	private Group findGroupFromTop(String groupName, int groupRep) throws HL7Exception
+	{
+		SegmentFinder finder = terser.getFinder();
+		finder.reset(); // reset or it only searches from current parse position
+		logger.debug("Find Group: " + groupName + "(" + groupRep + ")");
+		return finder.findGroup(groupName, groupRep);
 	}
 
 	protected String formatDateTime(String plain)

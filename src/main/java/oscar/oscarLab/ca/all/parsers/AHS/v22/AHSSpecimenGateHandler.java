@@ -84,6 +84,13 @@ public class AHSSpecimenGateHandler extends AHSHandler
 
     /* ===================================== OBR ====================================== */
 
+	/**
+	 *  Return the number of OBR Segments in the message
+	 */
+	public int getOBRCount()
+	{
+		return getReps("PATIENT_RESULT", 0, "ORDER_OBSERVATION");
+	}
 	@Override
 	public String getServiceDate()
 	{
