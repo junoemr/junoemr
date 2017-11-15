@@ -2506,8 +2506,8 @@
                         <forward name="error" path="/errorpage.jsp" />
 		</action>
 
-        <action path="/CodeSearch" type="org.oscarehr.common.web.CodeSearchService">
-        </action>
+        <action path="/CodeSearch" type="org.oscarehr.common.web.CodeSearchService"/>
+        <action path="/user_metrics" type="org.oscarehr.common.web.UserMetricsService"/>
 
         <action path="/oscarEncounter/displayEpisodes" scope="request" type="oscar.oscarEncounter.pageUtil.EctDisplayEpisodeAction" />
 

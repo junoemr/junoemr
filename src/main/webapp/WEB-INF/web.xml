@@ -148,6 +148,15 @@
 		<url-pattern>/ws/*</url-pattern>
 	</servlet-mapping>
 
+    <servlet>
+        <servlet-name>prometheusexporter</servlet-name>
+        <servlet-class>io.prometheus.client.exporter.MetricsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>prometheusexporter</servlet-name>
+        <url-pattern>/prometheus/*</url-pattern>
+    </servlet-mapping>
+
 	<servlet>
 		<servlet-name>action</servlet-name>
 		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>

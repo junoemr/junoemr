@@ -387,6 +387,21 @@ if (apptDate.before(minDate)) {
 <%@page import="org.oscarehr.web.AppointmentProviderAdminDayUIBean"%>
 <%@page import="org.oscarehr.common.model.EForm"%><html:html locale="true">
 <head>
+
+	<script>
+		// copied from Google Analytics Snippet, adapted for Prometheus Aggregator
+		(function(i,s,o,g,r,a,m){i['PrometheusAggregatorObjectName']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=(
+			"<%=request.getContextPath()%>/js/userMetrics.js");m.parentNode.insertBefore(a,m);
+			i[r].aggregatorServerRoot = g;
+		})(window,document,'script',
+			"<%=request.getContextPath()%>/user_metrics.do",'prometheusAggregator');
+
+		prometheusAggregator('increment', 'app_load_succeeded', { app: 'student'}, 1);
+
+	</script>
+
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title><%=WordUtils.capitalize(userlastname + ", " +  org.apache.commons.lang.StringUtils.substring(userfirstname, 0, 1)) + "-"%><bean:message key="provider.appointmentProviderAdminDay.title"/></title>
 
@@ -2341,12 +2356,3 @@ document.onkeydown=function(e){
                 return false;
         }
 %>
-<script src="../js/boomerang.js"></script>
-<script src="../js/rt.js"></script>
-<script type ="text/javascript">
-   BOOMR.init({
-        beacon_url: "<%=request.getScheme() + "://" + request.getServerName() + request.getContextPath()%>/oscarhost_pageLoadTimer.html"
-   });
-</script>
-
-
