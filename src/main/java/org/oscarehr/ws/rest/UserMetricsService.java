@@ -57,7 +57,7 @@ public class UserMetricsService extends AbstractServiceImpl
 		String page = "appointment";
 		for(UserMetricsTo1 metric : data)
 		{
-			if(metric.getMetricName().equals("performance_timing_domLoading"))
+			if(metric.getMetricName().equals("performance_timing_loadEventEnd"))
 			{
 				for(Double observedTime : metric.getObservations())
 				{
