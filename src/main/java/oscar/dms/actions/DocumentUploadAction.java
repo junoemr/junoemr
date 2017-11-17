@@ -9,22 +9,12 @@
 
 package oscar.dms.actions;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.itextpdf.text.pdf.PdfReader;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -43,7 +33,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.dms.IncomingDocUtil;
@@ -51,122 +40,176 @@ import oscar.dms.data.DocumentUploadForm;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.ResourceBundle;
+
 public class DocumentUploadAction extends DispatchAction {
-	
+
 	private static Logger logger = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
+
 	public ActionForward executeUpload(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-								 HttpServletResponse response) throws Exception {
+	                                   HttpServletResponse response) throws Exception
+	{
 		DocumentUploadForm fm = (DocumentUploadForm) form;
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
+		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null))
+		{
 			throw new SecurityException("missing required security object (_edoc)");
 		}
-		
-		HashMap<String,Object>map = new HashMap<String,Object>();
+		logger.info("BEGIN DOCUMENT UPLOAD");
+
+		HashMap<String, Object> map = new HashMap<String, Object>();
 		FormFile docFile = fm.getFiledata();
-                String destination=request.getParameter("destination");
-                java.util.Locale locale = (java.util.Locale) request.getSession().getAttribute(org.apache.struts.Globals.LOCALE_KEY);
-                ResourceBundle props = ResourceBundle.getBundle("oscarResources", locale);
-		if (docFile == null) { 
+		String destination = request.getParameter("destination");
+		java.util.Locale locale = (java.util.Locale) request.getSession().getAttribute(org.apache.struts.Globals.LOCALE_KEY);
+		ResourceBundle props = ResourceBundle.getBundle("oscarResources", locale);
+		if(docFile == null)
+		{
 			map.put("error", 4);
 		}
-                else if(destination!=null && destination.equals("incomingDocs"))
-                {
-                    String fileName = docFile.getFileName();
-                    if (!fileName.toLowerCase().endsWith(".pdf")) {
-                        map.put("error", props.getString("dms.documentUpload.onlyPdf"));
-                    } else if (docFile.getFileSize() == 0) {
-                        map.put("error", 4);
-                        throw new FileNotFoundException();
-                    } else {
+		else if(destination != null && destination.equals("incomingDocs"))
+		{
+			String fileName = docFile.getFileName();
+			if(!fileName.toLowerCase().endsWith(".pdf"))
+			{
+				map.put("error", props.getString("dms.documentUpload.onlyPdf"));
+			}
+			else if(docFile.getFileSize() == 0)
+			{
+				map.put("error", 4);
+				throw new FileNotFoundException();
+			}
+			else
+			{
 
-                        String queueId = request.getParameter("queue");
-                        String destFolder = request.getParameter("destFolder");
+				String queueId = request.getParameter("queue");
+				String destFolder = request.getParameter("destFolder");
 
-                        File f = new File(IncomingDocUtil.getAndCreateIncomingDocumentFilePathName(queueId, destFolder, fileName));
-                        if(f.exists()) {
-                            map.put("error",fileName+ " "+props.getString("dms.documentUpload.alreadyExists"));
+				File f = new File(IncomingDocUtil.getAndCreateIncomingDocumentFilePathName(queueId, destFolder, fileName));
+				if(f.exists())
+				{
+					map.put("error", fileName + " " + props.getString("dms.documentUpload.alreadyExists"));
 
-                        } else
-                        {
-                            writeToIncomingDocs(docFile, queueId, destFolder, fileName);
-                            map.put("name", docFile.getFileName());
-                            map.put("size", docFile.getFileSize());
-                        }
-                        request.getSession().setAttribute("preferredQueue", queueId);
-                        if (docFile != null) {
-                            docFile.destroy();
-                            docFile = null;
-                        }
+				}
+				else
+				{
+					writeToIncomingDocs(docFile, queueId, destFolder, fileName);
+					map.put("name", docFile.getFileName());
+					map.put("size", docFile.getFileSize());
+				}
+				request.getSession().setAttribute("preferredQueue", queueId);
+				if(docFile != null)
+				{
+					docFile.destroy();
+					docFile = null;
+				}
 
-                    }
-                }
-		else {
+			}
+		}
+		else
+		{
+			logger.info("default document case");
+
 			int numberOfPages = 0;
 			String fileName = docFile.getFileName();
 			String user = (String) request.getSession().getAttribute("user");
 			EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A',
-								   oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1", 0);
+					oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1", 0);
 			newDoc.setDocPublic("0");
-			
-	        // if the document was added in the context of a program
+
+			// if the document was added in the context of a program
 			ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
-			LoggedInInfo loggedInInfo  = LoggedInInfo.getLoggedInInfoFromSession(request);
+			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 			ProgramProvider pp = programManager.getCurrentProgramInDomain(loggedInInfo, loggedInInfo.getLoggedInProviderNo());
-			if(pp != null && pp.getProgramId() != null) {
+			if(pp != null && pp.getProgramId() != null)
+			{
 				newDoc.setProgramId(pp.getProgramId().intValue());
 			}
-			
+
+			logger.info("get file name");
 			fileName = newDoc.getFileName();
 			// save local file;
-			if (docFile.getFileSize() == 0) {
+			if(docFile.getFileSize() == 0)
+			{
 				map.put("error", 4);
 				throw new FileNotFoundException();
 			}
-	
+
+			logger.info("Write pdf file to server");
 			// write file to local dir
 			writeLocalFile(docFile, fileName);
+			logger.info("validate pdf encoding");
+			if(!isValidPdf(fileName))
+			{
+				throw new RuntimeException("Invalid Pdf encoding");
+			}
+
+			logger.info("get content type");
 			newDoc.setContentType(docFile.getContentType());
-			if (fileName.endsWith(".PDF") || fileName.endsWith(".pdf")) {
+			if(fileName.toLowerCase().endsWith(".pdf"))
+			{
+				logger.info("set content type");
 				newDoc.setContentType("application/pdf");
 				// get number of pages when document is a PDF
+				logger.info("count pages");
 				numberOfPages = countNumOfPages(fileName);
 			}
+			logger.info("set pages to " + numberOfPages);
 			newDoc.setNumberOfPages(numberOfPages);
+			logger.info("add document sql");
 			String doc_no = EDocUtil.addDocumentSQL(newDoc);
+
+			logger.info("add security log entry");
 			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr(), fileName);
-	
+
 			String providerId = request.getParameter("provider");
-			if (providerId != null) { 
+			if(providerId != null)
+			{
+				logger.info("provider inbox routing");
 				WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
 				ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) ctx.getBean("providerInboxRoutingDAO");
 				providerInboxRoutingDao.addToProviderInbox(providerId, Integer.parseInt(doc_no), "DOC");
 			}
-	
-			String queueId=request.getParameter("queue");
-	        if (queueId !=null &&!queueId.equals("-1")) {
-	            WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
-	            QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) ctx.getBean("queueDocumentLinkDAO");
-	            Integer qid=Integer.parseInt(queueId.trim());
-	            Integer did=Integer.parseInt(doc_no.trim());
-	            queueDocumentLinkDAO.addActiveQueueDocumentLink(qid,did);
-	            request.getSession().setAttribute("preferredQueue", queueId);
-	        }
-			
-	        map.put("name", docFile.getFileName());
-	        map.put("size", docFile.getFileSize());
-	        
-			if (docFile != null) {
+
+			String queueId = request.getParameter("queue");
+			if(queueId != null && !queueId.equals("-1"))
+			{
+				logger.info("queue document");
+				WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
+				QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) ctx.getBean("queueDocumentLinkDAO");
+				Integer qid = Integer.parseInt(queueId.trim());
+				Integer did = Integer.parseInt(doc_no.trim());
+				queueDocumentLinkDAO.addActiveQueueDocumentLink(qid, did);
+				request.getSession().setAttribute("preferredQueue", queueId);
+			}
+
+			logger.info("set name/size of return data");
+			map.put("name", docFile.getFileName());
+			map.put("size", docFile.getFileSize());
+
+			if(docFile != null)
+			{
+				logger.info("destroy the docfile");
 				docFile.destroy();
 				docFile = null;
 			}
 		}
+		logger.info("create JSON return data");
 		JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = JSONObject.fromObject(map);        
-        jsonArray.add(jsonObject);
-        response.getOutputStream().write(jsonArray.toString().getBytes());
+		JSONObject jsonObject = JSONObject.fromObject(map);
+		jsonArray.add(jsonObject);
+		logger.info("write response stream");
+		response.getOutputStream().write(jsonArray.toString().getBytes());
+		logger.info("COMPLETE");
 		return null;
 	}
 
@@ -179,15 +222,46 @@ public class DocumentUploadAction extends DispatchAction {
 		int numOfPage = 0;
 		String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 
+		int maxMB = 20;
+		int maxBytes = 1000000 * maxMB;// 1MB = 1e+6 bytes
+
 		try {
-			PDDocument doc = PDDocument.load(new File(documentDir, fileName));
+			logger.info("count pages | load pdf");
+			PDDocument doc = PDDocument.load(new File(documentDir, fileName), MemoryUsageSetting.setupTempFileOnly(maxBytes));
+			logger.info("count pages | read page count");
 			numOfPage = doc.getNumberOfPages();
 		}
 		catch (IOException e) {
-			MiscUtils.getLogger().error("Error", e);
+			logger.error("Error", e);
 		}
+		catch(OutOfMemoryError e)
+		{
+			logger.error("Super corrupt pdf error", e);
+			throw e;
+		}
+
 		return numOfPage;
 	}
+
+	public boolean isValidPdf(String fileName)
+	{
+		String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+
+		try
+		{
+			File f = new File(documentDir, fileName);
+			PdfReader reader = new PdfReader(f.getPath());
+			byte metaBytes[] = reader.getMetadata();
+			logger.info(Arrays.toString(metaBytes));
+			return true;
+		}
+		catch(IOException e)
+		{
+			logger.error("Validation Error", e);
+		}
+		return false;
+	}
+
 
 	/**
 	 * Writes an uploaded file to disk
@@ -216,67 +290,80 @@ public class DocumentUploadAction extends DispatchAction {
 				fos.close();
 		}
 	}
-        private void writeToIncomingDocs(FormFile docFile, String queueId, String PdfDir, String fileName) throws Exception {
+
+	private void writeToIncomingDocs(FormFile docFile, String queueId, String PdfDir, String fileName) throws Exception
+	{
 		InputStream fis = null;
 		FileOutputStream fos = null;
-		try {
+		try
+		{
 			fis = docFile.getInputStream();
 			String savePath = IncomingDocUtil.getAndCreateIncomingDocumentFilePathName(queueId, PdfDir, fileName);
 			fos = new FileOutputStream(savePath);
-                        IOUtils.copy(fis, fos);
-		} catch (Exception e) {
+			IOUtils.copy(fis, fos);
+		}
+		catch(Exception e)
+		{
 			logger.debug(e.toString());
-		} finally {
-			if (fis != null)
-                        {
+		}
+		finally
+		{
+			if(fis != null)
+			{
 				fis.close();
-                        }
-			if (fos != null)
-                        {
+			}
+			if(fos != null)
+			{
 				fos.close();
-                        }
+			}
 		}
 	}
 
-        public ActionForward setUploadDestination(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-								 HttpServletResponse response) {
-        	
-        String user_no = (String) request.getSession().getAttribute("user");
-        String destination=request.getParameter("destination");
-        UserPropertyDAO pref = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
-        UserProperty up = pref.getProp(user_no, UserProperty.UPLOAD_DOCUMENT_DESTINATION);
+	public ActionForward setUploadDestination(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	                                          HttpServletResponse response)
+	{
 
-        if (up == null) {
-            up = new UserProperty();
-            up.setName(UserProperty.UPLOAD_DOCUMENT_DESTINATION);
-            up.setProviderNo(user_no);
-        }
+		String user_no = (String) request.getSession().getAttribute("user");
+		String destination = request.getParameter("destination");
+		UserPropertyDAO pref = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
+		UserProperty up = pref.getProp(user_no, UserProperty.UPLOAD_DOCUMENT_DESTINATION);
 
-        if (up.getValue() == null || !(up.getValue().equals(destination))) {
-            up.setValue(destination);
-            pref.saveProp(up);
-        }
-        return null;
-    }
-        public ActionForward setUploadIncomingDocumentFolder(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-								 HttpServletResponse response)  {
+		if(up == null)
+		{
+			up = new UserProperty();
+			up.setName(UserProperty.UPLOAD_DOCUMENT_DESTINATION);
+			up.setProviderNo(user_no);
+		}
 
-        	
-        String user_no = (String) request.getSession().getAttribute("user");
-        String destFolder=request.getParameter("destFolder");
-        UserPropertyDAO pref = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
-        UserProperty up = pref.getProp(user_no, UserProperty.UPLOAD_INCOMING_DOCUMENT_FOLDER);
+		if(up.getValue() == null || !(up.getValue().equals(destination)))
+		{
+			up.setValue(destination);
+			pref.saveProp(up);
+		}
+		return null;
+	}
 
-        if (up == null) {
-            up = new UserProperty();
-            up.setName(UserProperty.UPLOAD_INCOMING_DOCUMENT_FOLDER);
-            up.setProviderNo(user_no);
-        }
+	public ActionForward setUploadIncomingDocumentFolder(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	                                                     HttpServletResponse response)
+	{
 
-        if (up.getValue() == null || !(up.getValue().equals(destFolder))) {
-            up.setValue(destFolder);
-            pref.saveProp(up);
-        }
-        return null;
-    }
+		String user_no = (String) request.getSession().getAttribute("user");
+		String destFolder = request.getParameter("destFolder");
+		UserPropertyDAO pref = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
+		UserProperty up = pref.getProp(user_no, UserProperty.UPLOAD_INCOMING_DOCUMENT_FOLDER);
+
+		if(up == null)
+		{
+			up = new UserProperty();
+			up.setName(UserProperty.UPLOAD_INCOMING_DOCUMENT_FOLDER);
+			up.setProviderNo(user_no);
+		}
+
+		if(up.getValue() == null || !(up.getValue().equals(destFolder)))
+		{
+			up.setValue(destFolder);
+			pref.saveProp(up);
+		}
+		return null;
+	}
 }
