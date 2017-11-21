@@ -181,6 +181,7 @@ ArrayList tickerList = new ArrayList();
 <script type="text/javascript" src="../../share/calendar/calendar.js"></script>
 <script type="text/javascript" src="../../share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>                                                            
 <script type="text/javascript" src="../../share/calendar/calendar-setup.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/checkDate.js"></script>
 <!--META HTTP-EQUIV="Refresh" CONTENT="20;"-->
 
 <style type="text/css">
@@ -267,6 +268,23 @@ function gotoPage(next) {
 	
 	frm.submit();
 }
+
+var readOnly=false; // required by check_date()
+function validateAndFilterDate(obj) {
+    if (!check_date(obj.name)) {
+        return false;
+    }
+
+    // yyyy/MM/dd is valid input but the backend expects yyyy-MM-dd only
+    obj.value = obj.value.replace(/\//g,"-");
+    return true;
+}
+function validateForm() {
+    startDate = document.getElementById("startDate");
+    endDate = document.getElementById("endDate");
+
+    return validateAndFilterDate(startDate) && validateAndFilterDate(endDate);
+}
 </script>
 
 
@@ -316,7 +334,7 @@ function gotoPage(next) {
                 <table width="100%" >
                 <tr>
                     <td style="margin: 0; padding: 0;">
-                        <html:form action="/oscarEncounter/ViewConsultation"  method="get">
+                        <html:form action="/oscarEncounter/ViewConsultation"  method="get" onsubmit="return validateForm();">
                             <bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.formSelectTeam"/>:
                             <select name="sendTo">                                
 				<option value=""><bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.formViewAll"/></option>                                
@@ -339,8 +357,8 @@ function gotoPage(next) {
                             </select>                            
                             <input type="submit" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.btnConsReq"/>"/>
                             <div style="margin: 0; padding: 0; ">
-                            <bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgStart"/>:<html:text property="startDate" size="8" styleId="startDate"/><a id="SCal"><img title="Calendar" src="../../images/cal.gif" alt="Calendar" border="0" /></a>
-                            <bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgEnd"/>:<html:text property="endDate" size="8"   styleId="endDate"/><a id="ECal"><img title="Calendar" src="../../images/cal.gif" alt="Calendar" border="0" /></a>
+                            <bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgStart"/>:<html:text property="startDate" size="8" styleId="startDate" onchange="validateAndFilterDate(this);"/><a id="SCal"><img title="Calendar" src="../../images/cal.gif" alt="Calendar" border="0" /></a>
+                            <bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgEnd"/>:<html:text property="endDate" size="8"   styleId="endDate" onchange="validateAndFilterDate(this);"/><a id="ECal"><img title="Calendar" src="../../images/cal.gif" alt="Calendar" border="0" /></a>
                             <bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgIncludeCompleted"/>:<html:checkbox property="includeCompleted" value="include" />
                             <bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgSearchon"/><html:radio property="searchDate" value="0" titleKey="Search on Referal Date"/>
                             <bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgApptDate"/><html:radio property="searchDate" value="1" titleKey="Search on Appt. Date"/>
@@ -597,8 +615,8 @@ function gotoPage(next) {
         </tr>
     </table>
     <script language='javascript'>
-       Calendar.setup({inputField:"startDate",ifFormat:"%Y-%m-%d",showsTime:false,button:"SCal",singleClick:true,step:1});          
-       Calendar.setup({inputField:"endDate",ifFormat:"%Y-%m-%d",showsTime:false,button:"ECal",singleClick:true,step:1});                      
+       Calendar.setup({inputField:"startDate",ifFormat:"%Y-%m-%d",showsTime:false,button:"SCal",singleClick:true,step:1});
+       Calendar.setup({inputField:"endDate",ifFormat:"%Y-%m-%d",showsTime:false,button:"ECal",singleClick:true,step:1});
    </script>
 </body>
 
