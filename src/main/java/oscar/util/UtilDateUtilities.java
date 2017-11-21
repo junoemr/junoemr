@@ -208,7 +208,7 @@ public class UtilDateUtilities {
       Date date = null;
 
       // early exit if no date
-      if (dateStr == null || dateStr.isEmpty()) {
+      if (dateStr == null || dateStr.trim().isEmpty()) {
           return date;
       }
 
