@@ -61,11 +61,11 @@
 			<url>http://oscarmcmaster.sourceforge.net/m2</url>
 		</repository>
 		<!-- MARC-HI (Everest & SHIC) -->
-		<repository>
-			<id>marc-te-main</id>
-			<name>MARC-HI Technology Exchange Private Maven Repository</name>
-			<url>http://te.marc-hi.ca/mvn</url>
-		</repository>
+		<!--<repository>-->
+			<!--<id>marc-te-main</id>-->
+			<!--<name>MARC-HI Technology Exchange Private Maven Repository</name>-->
+			<!--<url>http://te.marc-hi.ca/mvn</url>-->
+		<!--</repository>-->
 
 		<!--
 		<repository>
@@ -326,12 +326,12 @@
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
-			<version>5.4.1</version>
+			<version>5.5.12</version>
 		</dependency>
 		<dependency>
 			<groupId>com.itextpdf.tool</groupId>
 			<artifactId>xmlworker</artifactId>
-			<version>5.4.1</version>
+			<version>5.5.12</version>
 		</dependency>
 		<!-- rtf / lowagie -->
 		<dependency>
