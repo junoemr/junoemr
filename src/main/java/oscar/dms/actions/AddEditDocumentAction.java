@@ -25,21 +25,8 @@
 
 package oscar.dms.actions;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -67,19 +54,33 @@ import org.oscarehr.util.SessionConstants;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
 import oscar.MyDateFormat;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.dms.data.AddEditDocumentForm;
+import oscar.dms.util.OscarPdfValidator;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.util.UtilDateUtilities;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.ResourceBundle;
+
 public class AddEditDocumentAction extends DispatchAction {
 	
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private static Logger logger = MiscUtils.getLogger();
 	
 	public ActionForward html5MultiUpload(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ResourceBundle props = ResourceBundle.getBundle("oscarResources");
@@ -125,6 +126,16 @@ public class AddEditDocumentAction extends DispatchAction {
 
 		newDoc.setContentType(docFile.getContentType());
 		if (fileName.endsWith(".PDF") || fileName.endsWith(".pdf")) {
+			logger.info("validate pdf encoding");
+			String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+			File f = new File(documentDir, fileName);
+			OscarPdfValidator validator = new OscarPdfValidator(f);
+			if(!validator.validate())
+			{
+				logger.error("Pdf Encoding Error: " + validator.getReasonInvalid());
+				throw new RuntimeException("Pdf Encoding Error: " + validator.getReasonInvalid());
+			}
+
 			newDoc.setContentType("application/pdf");
 			// get number of pages when document is pdf;
 			numberOfPages = countNumOfPages(fileName);
@@ -202,6 +213,16 @@ public class AddEditDocumentAction extends DispatchAction {
 		writeLocalFile(docFile, fileName);
 		newDoc.setContentType(docFile.getContentType());
                 if (fileName.toLowerCase().endsWith(".pdf")) {
+	                logger.info("validate pdf encoding");
+	                String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+	                File f = new File(documentDir, fileName);
+	                OscarPdfValidator validator = new OscarPdfValidator(f);
+	                if(!validator.validate())
+	                {
+		                logger.error("Pdf Encoding Error: " + validator.getReasonInvalid());
+		                throw new RuntimeException("Pdf Encoding Error: " + validator.getReasonInvalid());
+	                }
+
                     newDoc.setContentType("application/pdf");
                     int numberOfPages = countNumOfPages(fileName);
                     newDoc.setNumberOfPages(numberOfPages);                        
@@ -304,6 +325,16 @@ public class AddEditDocumentAction extends DispatchAction {
 				newDoc.setContentType(docFile.getContentType());
 				int numberOfPages = 0;
 				if (fileName2.toLowerCase().endsWith(".pdf")) {
+					logger.info("validate pdf encoding");
+					String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+					File f = new File(documentDir, fileName2);
+					OscarPdfValidator validator = new OscarPdfValidator(f);
+					if(!validator.validate())
+					{
+						logger.error("Pdf Encoding Error: " + validator.getReasonInvalid());
+						throw new RuntimeException("Pdf Encoding Error: " + validator.getReasonInvalid());
+					}
+
 					newDoc.setContentType("application/pdf");
 					// get number of pages when document is pdf;
 					numberOfPages = countNumOfPages(fileName2);

@@ -13,7 +13,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -49,15 +48,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.ResourceBundle;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-public class DocumentUploadAction extends DispatchAction {
+public class DocumentUploadAction extends DispatchAction
+{
 
 	private static Logger logger = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
@@ -115,18 +108,22 @@ public class DocumentUploadAction extends DispatchAction {
 
 	/**
 	 * Counts the number of pages in a local pdf file.
+	 *
 	 * @param fileName the name of the file
 	 * @return the number of pages in the file
 	 */
-	public int countNumOfPages(String fileName) {
+	public int countNumOfPages(String fileName)
+	{
 		int numOfPage = 0;
 		String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 
-		try {
+		try
+		{
 			PDDocument doc = PDDocument.load(new File(documentDir, fileName));
 			numOfPage = doc.getNumberOfPages();
 		}
-		catch (IOException e) {
+		catch(IOException e)
+		{
 			logger.error("Error", e);
 		}
 		return numOfPage;
@@ -244,11 +241,13 @@ public class DocumentUploadAction extends DispatchAction {
 
 	/**
 	 * Writes an uploaded file to disk
-	 * @param docFile the uploaded file
+	 *
+	 * @param docFile  the uploaded file
 	 * @param fileName the name for the file on disk
 	 * @throws Exception when an error occurs
 	 */
-	private void writeLocalFile(FormFile docFile, String fileName) throws IOException {
+	private void writeLocalFile(FormFile docFile, String fileName) throws IOException
+	{
 		InputStream fis = null;
 		FileOutputStream fos = null;
 		try
@@ -352,65 +351,6 @@ public class DocumentUploadAction extends DispatchAction {
 			pref.saveProp(up);
 		}
 		return null;
-	}
-
-	//TODO remove this method
-	public boolean checkPdfReadable(String fileName)
-	{
-		boolean canRead = false;
-		String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-
-		ExecutorService executor = Executors.newSingleThreadExecutor();
-
-		File f = new File(documentDir, fileName);
-		Future<String> future = executor.submit(new PDFTask(f));
-
-		try
-		{
-			logger.info("PDF Validation Started..");
-			future.get(10, TimeUnit.SECONDS);
-
-			logger.info("PDF Validation Passed!");
-			canRead = true;
-		}
-		catch(InterruptedException | ExecutionException | TimeoutException e)
-		{
-			future.cancel(true);
-			logger.error("PDF Validation Error", e);
-			canRead = false;
-
-			if(!future.isDone())
-			{
-				try
-				{
-					future.wait();
-					future.cancel(true);
-				}
-				catch(InterruptedException ex)
-				{
-					logger.error("Thread Hack Kill Thing", e);
-				}
-			}
-		}
-		executor.shutdownNow();
-		return canRead;
-	}
-
-	//TODO remove this too
-	private class PDFTask implements Callable<String>
-	{
-		private File file;
-		public PDFTask(File f)
-		{
-			super();
-			this.file=f;
-		}
-		@Override
-		public String call() throws Exception {
-			PDDocument doc = PDDocument.load(this.file, MemoryUsageSetting.setupTempFileOnly(100 * 1000000));
-			doc.getNumberOfPages();
-			return "SUCCESS";
-		}
 	}
 }
 
