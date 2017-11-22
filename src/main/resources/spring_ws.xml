@@ -81,6 +81,12 @@
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
 
+    <jaxws:endpoint implementor="#userMetricsWs" address="/UserMetricsService" >
+        <jaxws:inInterceptors>
+            <ref bean="authenticationInWSS4JInterceptor"/>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
+
 	<jaxws:endpoint implementor="#facilityWs" address="/FacilityService" >
 		<jaxws:inInterceptors>
 			<ref bean="authenticationInWSS4JInterceptor"/>
@@ -159,7 +165,8 @@
 		<jaxrs:serviceBeans>
 			<bean class="org.oscarehr.ws.rest.PharmacyService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.DemographicService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.DemographicsService"  autowire="byName"/>
+            <bean class="org.oscarehr.ws.rest.DemographicsService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.UserMetricsService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.ScheduleService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.DemographicMergeService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.MessagingService"  autowire="byName"/>

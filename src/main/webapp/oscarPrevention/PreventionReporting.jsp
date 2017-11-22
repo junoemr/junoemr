@@ -392,9 +392,9 @@ table.ele thead {
             <td valign="top" class="MainTableRightColumn">
                <html:form action="/oscarPrevention/PreventionReport" method="get">
                <div>
-                  Patient Set:
+                   Saved Query:
                   <html:select property="patientSet">
-                      <html:option value="-1" >--Select Set--</html:option>
+                      <html:option value="-1" >--Select Query--</html:option>
                       <%for (int i =0 ; i < queryArray.size(); i++){
                         RptSearchData.SearchCriteria sc = (RptSearchData.SearchCriteria) queryArray.get(i);
                         String qId = sc.id;
@@ -625,7 +625,7 @@ table.ele thead {
                           	<%} %>
                           </td>
                           <%
-                          	String providerName=providerBean.getProperty(demo.getProviderNo());
+                          	String providerName=providerBean.getProperty(String.valueOf(demo.getProviderNo()),"");
                           	providerName=StringUtils.trimToEmpty(providerName);
                           %>
                           <td bgcolor="<%=dis.color%>"><%=providerName%></td>
