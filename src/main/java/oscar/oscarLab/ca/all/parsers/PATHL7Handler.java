@@ -62,7 +62,7 @@ public class PATHL7Handler extends MessageHandler
     Logger logger = Logger.getLogger(PATHL7Handler.class);
     protected ORU_R01 msg;
 
-	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF");
+	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF", "BCCASMP", "BCCACSP");
 	public static final String VIHARTF = "CELLPATHR";
 
     /** Creates a new instance of CMLHandler */
