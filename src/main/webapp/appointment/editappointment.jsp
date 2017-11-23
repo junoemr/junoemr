@@ -183,7 +183,11 @@
 		<script type="text/javascript"
 				src="<%= request.getContextPath() %>/js/moment.min.js"></script>
 		<script type="text/javascript"
-				src="<%= request.getContextPath() %>/js/util/util.js"></script>
+				src="<%= request.getContextPath() %>/js/util/common.js"></script>
+		<script type="text/javascript"
+				src="<%= request.getContextPath() %>/js/util/date.js"></script>
+		<script type="text/javascript"
+				src="<%= request.getContextPath() %>/js/util/appointment.js"></script>
 		<title><bean:message key="appointment.editappointment.title"/></title>
 		<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
 		<script>
@@ -272,7 +276,7 @@
 				ctrl.value = ctrl.value.toUpperCase();
 			}
 
-			function onSub()
+			function validateForm()
 			{
 				if (saveTemp == 1)
 				{
@@ -293,7 +297,7 @@
 						window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
 						return false;
 					}
-					return Oscar.Util.validateDateInput('appointment_date') && calculateEndTime();
+					return Oscar.Util.Date.validateDateInput('appointment_date') && calculateEndTime();
 				}
 				else
 					return true;
@@ -302,58 +306,21 @@
 
 			function calculateEndTime()
 			{
-				var stime = document.EDITAPPT.start_time.value;
-				var vlen = stime.indexOf(':') == -1 ? 1 : 2;
-
-				if (vlen == 1 && stime.length == 4)
+				if (!Oscar.Util.Appointment.validateStartTime('start_time'))
 				{
-					document.EDITAPPT.start_time.value = stime.substring(0, 2) + ":" + stime.substring(2);
-					stime = document.EDITAPPT.start_time.value;
-				}
-
-				if (stime.length != 5)
-				{
-					alert("<bean:message key="Appointment.msgInvalidDateFormat"/>");
+					window.alert("<bean:message key="Appointment.msgInvalidDateFormat"/>");
 					return false;
 				}
-
-				var shour = stime.substring(0, 2);
-				var smin = stime.substring(stime.length - vlen);
-				var duration = document.EDITAPPT.duration.value;
-
-				if (isNaN(duration))
+				if (!Oscar.Util.Common.validateNumberInput('duration'))
 				{
-					alert("<bean:message key="Appointment.msgFillTimeField"/>");
+					window.alert("<bean:message key="Appointment.msgFillTimeField"/>");
 					return false;
 				}
-
-				if (eval(duration) == 0)
+				if (!Oscar.Util.Appointment.setEndTime('end_time',
+						document.EDITAPPT.start_time.value,
+						document.EDITAPPT.duration.value))
 				{
-					duration = 1;
-				}
-				if (eval(duration) < 0)
-				{
-					duration = Math.abs(duration);
-				}
-
-				var lmin = eval(smin) + eval(duration) - 1;
-				var lhour = parseInt(lmin / 60);
-
-				if ((lmin) > 59)
-				{
-					shour = eval(shour) + eval(lhour);
-					shour = shour < 10 ? ("0" + shour) : shour;
-					smin = lmin - 60 * lhour;
-				}
-				else
-				{
-					smin = lmin;
-				}
-				smin = smin < 10 ? ("0" + smin) : smin;
-				document.EDITAPPT.end_time.value = shour + ":" + smin;
-				if (shour > 23)
-				{
-					alert("<bean:message key="Appointment.msgCheckDuration"/>");
+					window.alert("<bean:message key="Appointment.msgCheckDuration"/>");
 					return false;
 				}
 				return true;
@@ -545,7 +512,7 @@
 	<div id="editAppointment"
 		 style="display:<%= (isMobileOptimized && bFirstDisp) ? "none":"block"%>;">
 		<FORM NAME="EDITAPPT" METHOD="post" ACTION="appointmentcontrol.jsp"
-			  onSubmit="return(onSub())"><INPUT TYPE="hidden"
+			  ONSUBMIT="return validateForm();"><INPUT TYPE="hidden"
 												NAME="displaymode" value="">
 			<div class="header deep">
 				<div class="title">
@@ -676,7 +643,7 @@
 								   NAME="appointment_date"
 								   VALUE="<%=bFirstDisp?ConversionUtils.toDateString(appt.getAppointmentDate()):strApptDate%>"
 								   WIDTH="25" HEIGHT="20" border="0"
-								   ONCHANGE="Oscar.Util.validateDateInput('appointment_date');">
+								   ONCHANGE="Oscar.Util.Date.validateDateInput('appointment_date');">
 						</div>
 						<div class="space">&nbsp;</div>
 						<div class="label"><bean:message key="Appointment.formStatus"/>:</div>

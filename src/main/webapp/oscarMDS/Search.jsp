@@ -31,7 +31,7 @@
 <head>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/moment.min.js"></script>
-	<script type="text/javascript" src="<%= request.getContextPath() %>/js/util/util.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/util/date.js"></script>
 	<script type="text/javascript"
 			src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
 	<script type="text/javascript"
@@ -40,8 +40,8 @@
 	<script type="text/javascript">
 		function onSubmitCheck()
 		{
-			if (!Oscar.Util.validateDateInputTolerant('startDate') ||
-				!Oscar.Util.validateDateInputTolerant('endDate'))
+			if (!Oscar.Util.Date.validateDateInputTolerant('startDate') ||
+				!Oscar.Util.Date.validateDateInputTolerant('endDate'))
 			{
 				return false;
 			}
@@ -203,7 +203,7 @@
 							</td>
 							<td><input type="text" id="startDate" name="startDate" size="15"
 									   id="startDate"
-									   onchange="Oscar.Util.validateDateInputTolerant('startDate')">
+									   onchange="Oscar.Util.Date.validateDateInputTolerant('startDate')">
 							</td>
 						</tr>
 						<tr>
@@ -211,7 +211,7 @@
 							</td>
 							<td><input type="text" id="endDate" name="endDate" size="15"
 									   id="endDate"
-									   onchange="Oscar.Util.validateDateInputTolerant('endDate')">
+									   onchange="Oscar.Util.Date.validateDateInputTolerant('endDate')">
 							</td>
 						</tr>
 

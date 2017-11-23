@@ -1,12 +1,13 @@
 'use strict';
 
 if (!window.Oscar) window.Oscar = {};
+if (!Oscar.Util) Oscar.Util = {};
 
-Oscar.Util = {};
+Oscar.Util.Date = {};
 
 // single digit formatters will work with either one or two digits
-Oscar.Util.DateFormat = "YYYY-M-D";
-Oscar.Util.DateFormatAlt = "YYYY/M/D";
+Oscar.Util.Date.DateFormat = "YYYY-M-D";
+Oscar.Util.Date.DateFormatAlt = "YYYY/M/D";
 
 /**
  * Returns true if the given string represents a valid date.
@@ -17,7 +18,7 @@ Oscar.Util.DateFormatAlt = "YYYY/M/D";
  *
  * @returns {boolean}
  */
-Oscar.Util.validateDateString = function validateDateString(dateStr, strict)
+Oscar.Util.Date.validateDateString = function validateDateString(dateStr, strict)
 {
 	var validFormats = strict ? [this.DateFormat] : [this.DateFormat, this.DateFormatAlt];
 
@@ -32,7 +33,7 @@ Oscar.Util.validateDateString = function validateDateString(dateStr, strict)
  * @param {string} name   Name of the input to normalize (there should only be one input with
  * this name)
  */
-Oscar.Util.normalizeDateInput = function normalizeDateInput(name)
+Oscar.Util.Date.normalizeDateInput = function normalizeDateInput(name)
 {
 	var dateElem = document.getElementsByName(name)[0];
 
@@ -53,7 +54,7 @@ Oscar.Util.normalizeDateInput = function normalizeDateInput(name)
  *
  * @returns {boolean}
  */
-Oscar.Util.validateDateInput = function validateDateInput(name, strict)
+Oscar.Util.Date.validateDateInput = function validateDateInput(name, strict)
 {
 	strict = strict !== false;
 	var dateElem = document.getElementsByName(name)[0];
@@ -82,7 +83,7 @@ Oscar.Util.validateDateInput = function validateDateInput(name, strict)
  *
  * @returns {boolean}
  */
-Oscar.Util.validateDateInputTolerant = function validateDateInputTolerant(name)
+Oscar.Util.Date.validateDateInputTolerant = function validateDateInputTolerant(name)
 {
 	var dateStr = document.getElementsByName(name)[0].value;
 

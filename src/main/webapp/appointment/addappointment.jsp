@@ -180,7 +180,11 @@ Ontario, Canada
 		<script type="text/javascript"
 				src="<%= request.getContextPath() %>/js/moment.min.js"></script>
 		<script type="text/javascript"
-				src="<%= request.getContextPath() %>/js/util/util.js"></script>
+				src="<%= request.getContextPath() %>/js/util/common.js"></script>
+		<script type="text/javascript"
+				src="<%= request.getContextPath() %>/js/util/date.js"></script>
+		<script type="text/javascript"
+				src="<%= request.getContextPath() %>/js/util/appointment.js"></script>
 		<script type="text/javascript"
 				src="<%= request.getContextPath() %>/share/javascript/Oscar.js"></script>
 		<% if (isMobileOptimized)
@@ -199,17 +203,44 @@ Ontario, Canada
 		</script>
 		<oscar:customInterface section="addappt"/>
 		<script type="text/javascript">
-
-			function onAdd()
+			function validateForm()
 			{
 				if (document.ADDAPPT.notes.value.length > 255)
 				{
 					window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
 					return false;
 				}
-				return Oscar.Util.validateDateInput('appointment_date') && calculateEndTime();
+				// set no-show status if no demographic selected and "Last Name" starts with '.'
+				if (document.ADDAPPT.keyword.value.startsWith(".")
+					&& document.ADDAPPT.demographic_no.value.length === 0)
+				{
+					document.ADDAPPT.status.value = 'N';
+				}
+
+				return Oscar.Util.Date.validateDateInput('appointment_date') && calculateEndTime();
 			}
 
+			function calculateEndTime()
+			{
+				if (!Oscar.Util.Appointment.validateStartTime('start_time'))
+				{
+					window.alert("<bean:message key="Appointment.msgInvalidDateFormat"/>");
+					return false;
+				}
+				if (!Oscar.Util.Common.validateNumberInput('duration'))
+				{
+					window.alert("<bean:message key="Appointment.msgFillTimeField"/>");
+					return false;
+				}
+				if (!Oscar.Util.Appointment.setEndTime('end_time',
+						document.ADDAPPT.start_time.value,
+						document.ADDAPPT.duration.value))
+				{
+					window.alert("<bean:message key="Appointment.msgCheckDuration"/>");
+					return false;
+				}
+				return true;
+			}
 
 			function setfocus()
 			{
@@ -300,61 +331,6 @@ Ontario, Canada
 				obj.value = hours + ":" + minutes;
 			}
 
-			function calculateEndTime()
-			{
-				var stime = document.ADDAPPT.start_time.value;
-				var vlen = stime.indexOf(':') == -1 ? 1 : 2;
-				var shour = stime.substring(0, 2);
-				var smin = stime.substring(stime.length - vlen);
-				var duration = document.ADDAPPT.duration.value;
-
-				if (isNaN(duration))
-				{
-					alert("<bean:message key="Appointment.msgFillTimeField"/>");
-					return false;
-				}
-
-				if (eval(duration) == 0)
-				{
-					duration = 1;
-				}
-				if (eval(duration) < 0)
-				{
-					duration = Math.abs(duration);
-				}
-
-				var lmin = eval(smin) + eval(duration) - 1;
-				var lhour = parseInt(lmin / 60);
-
-				if ((lmin) > 59)
-				{
-					shour = eval(shour) + eval(lhour);
-					shour = shour < 10 ? ("0" + shour) : shour;
-					smin = lmin - 60 * lhour;
-				}
-				else
-				{
-					smin = lmin;
-				}
-
-				smin = smin < 10 ? ("0" + smin) : smin;
-				document.ADDAPPT.end_time.value = shour + ":" + smin;
-
-				if (shour > 23)
-				{
-					alert("<bean:message key="Appointment.msgCheckDuration"/>");
-					return false;
-				}
-
-				//no show
-				if (document.ADDAPPT.keyword.value.substring(0, 1) == "." && document.ADDAPPT.demographic_no.value == "")
-				{
-					document.ADDAPPT.status.value = 'N';
-				}
-
-				return true;
-			}
-
 			function onNotBook()
 			{
 				document.forms[0].keyword.value = "<%=DONOTBOOK%>";
@@ -362,9 +338,9 @@ Ontario, Canada
 
 			function onButRepeat()
 			{
-				document.forms[0].action = "appointmentrepeatbooking.jsp";
 				if (calculateEndTime())
 				{
+					document.forms[0].action = "appointmentrepeatbooking.jsp";
 					document.forms[0].submit();
 				}
 			}
@@ -464,8 +440,6 @@ Ontario, Canada
 					document.forms['ADDAPPT'].location.value = locSel;
 				}
 			}
-
-
 			// stop javascript -->
 
 		</script>
@@ -926,7 +900,7 @@ Ontario, Canada
 
 	<FORM NAME="ADDAPPT" id="addappt" METHOD="post"
 		  ACTION="<%=request.getContextPath()%>/appointment/appointmentcontrol.jsp"
-		  onsubmit="return(onAdd())"><INPUT TYPE="hidden"
+		  onsubmit="return validateForm();"><INPUT TYPE="hidden"
 											NAME="displaymode" value="">
 		<input type="hidden" name="year" value="<%=request.getParameter("year") %>">
 		<input type="hidden" name="month" value="<%=request.getParameter("month") %>">
@@ -955,7 +929,7 @@ Ontario, Canada
 						<INPUT TYPE="TEXT" NAME="appointment_date"
 							   VALUE="<%=dateString2%>" WIDTH="25" HEIGHT="20" border="0"
 							   hspace="2"
-							   onChange="Oscar.Util.validateDateInput('appointment_date');checkPageLock()">
+							   onChange="Oscar.Util.Date.validateDateInput('appointment_date');checkPageLock()">
 					</div>
 					<div class="space">&nbsp;</div>
 					<div class="label"><bean:message key="Appointment.formStatus"/>:</div>

@@ -133,7 +133,7 @@
 		<script type="text/javascript"
 				src="<%= request.getContextPath() %>/js/moment.min.js"></script>
 		<script type="text/javascript"
-				src="<%= request.getContextPath() %>/js/util/util.js"></script>
+				src="<%= request.getContextPath() %>/js/util/date.js"></script>
 		<script language="JavaScript">
 			<!--
 			function popupPage(vheight, vwidth, varpage)
@@ -171,7 +171,7 @@
 
 			function validateForm()
 			{
-				return validateDemoNo() && Oscar.Util.validateDateInput('xml_appointment_date');
+				return validateDemoNo() && Oscar.Util.Date.validateDateInput('xml_appointment_date');
 			}
 
 			function validateDemoNo()

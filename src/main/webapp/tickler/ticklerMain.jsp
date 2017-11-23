@@ -205,7 +205,7 @@
 				type="text/javascript"></script>
 		<script src="<%=request.getContextPath()%>/js/jquery-ui-1.8.18.custom.min.js"></script>
 		<script src="<%=request.getContextPath()%>/js/moment.min.js"></script>
-		<script src="<%=request.getContextPath()%>/js/util/util.js"></script>
+		<script src="<%=request.getContextPath()%>/js/util/date.js"></script>
 		<link rel="stylesheet"
 			  href="<%=request.getContextPath()%>/css/cupertino/jquery-ui-1.8.18.custom.css">
 
@@ -253,8 +253,8 @@
 
 			function validateForm()
 			{
-				return Oscar.Util.validateDateInputTolerant('xml_appointment_date')
-					&& Oscar.Util.validateDateInputTolerant('xml_vdate');
+				return Oscar.Util.Date.validateDateInputTolerant('xml_appointment_date')
+					&& Oscar.Util.Date.validateDateInputTolerant('xml_vdate');
 			}
 
 			function openNoteDialog(demographicNo, ticklerNo)
@@ -784,7 +784,7 @@
 				<td width="41%">
 					<div align="center">
 						<input type="text" id="xml_vdate" name="xml_vdate" value="<%=xml_vdate%>"
-							   onchange="Oscar.Util.validateDateInputTolerant('xml_vdate')">
+							   onchange="Oscar.Util.Date.validateDateInputTolerant('xml_vdate')">
 						<font size="1" face="Arial, Helvetica, sans-serif"><a href="#"
 																			  onClick="openBrWindow('../billing/billingCalendarPopup.jsp?type=admission&amp;year=<%=curYear%>&amp;month=<%=curMonth%>','','width=300,height=300')"><bean:message
 								key="tickler.ticklerMain.btnBegin"/>:</a></font>
@@ -793,7 +793,7 @@
 				<td width="40%">
 					<input type="text" id="xml_appointment_date" name="xml_appointment_date"
 						   value="<%=xml_appointment_date%>"
-						   onchange="Oscar.Util.validateDateInputTolerant('xml_appointment_date')">
+						   onchange="Oscar.Util.Date.validateDateInputTolerant('xml_appointment_date')">
 					<font size="1" face="Arial, Helvetica, sans-serif"><a href="#"
 																		  onClick="openBrWindow('../billing/billingCalendarPopup.jsp?type=end&amp;year=<%=curYear%>&amp;month=<%=curMonth%>','','width=300,height=300')"><bean:message
 							key="tickler.ticklerMain.btnEnd"/>:</a> &nbsp; &nbsp; <a href="#"

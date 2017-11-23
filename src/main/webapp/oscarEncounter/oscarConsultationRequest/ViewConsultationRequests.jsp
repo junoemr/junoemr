@@ -200,7 +200,7 @@
 		<script type="text/javascript"
 				src="<%= request.getContextPath() %>/js/moment.min.js"></script>
 		<script type="text/javascript"
-				src="<%= request.getContextPath() %>/js/util/util.js"></script>
+				src="<%= request.getContextPath() %>/js/util/date.js"></script>
 		<!--META HTTP-EQUIV="Refresh" CONTENT="20;"-->
 
 		<style type="text/css">
@@ -304,8 +304,8 @@
 
 		function validateForm()
 		{
-			return Oscar.Util.validateDateInputTolerant('startDate')
-				&& Oscar.Util.validateDateInputTolerant('endDate');
+			return Oscar.Util.Date.validateDateInputTolerant('startDate')
+				&& Oscar.Util.Date.validateDateInputTolerant('endDate');
 		}
 	</script>
 
@@ -407,13 +407,13 @@
 									<bean:message
 											key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgStart"/>:<html:text
 										property="startDate" size="8" styleId="startDate"
-										onchange="Oscar.Util.validateDateInputTolerant('startDate')"/><a
+										onchange="Oscar.Util.Date.validateDateInputTolerant('startDate')"/><a
 										id="SCal"><img title="Calendar" src="../../images/cal.gif"
 													   alt="Calendar" border="0"/></a>
 									<bean:message
 											key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgEnd"/>:<html:text
 										property="endDate" size="8" styleId="endDate"
-										onchange="Oscar.Util.validateDateInputTolerant('endDate')"/><a
+										onchange="Oscar.Util.Date.validateDateInputTolerant('endDate')"/><a
 										id="ECal"><img title="Calendar" src="../../images/cal.gif"
 													   alt="Calendar" border="0"/></a>
 									<bean:message
