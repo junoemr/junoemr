@@ -5,21 +5,33 @@ if (!Oscar.Util) Oscar.Util = {};
 
 Oscar.Util.Appointment = {};
 
-// single digit formatters will work with either one or two digits
-Oscar.Util.Appointment.TimeFormat = "H:m";
-Oscar.Util.Appointment.TimeFormatAlt = "Hm";
+Oscar.Util.Appointment.TimeFormats = ["H:m", "Hmm", "H"];
+Oscar.Util.Appointment.TimeFormatDisplay = "HH:mm";
 
 /**
- * Returns true if the input value represents a valid time, and false otherwise.
+ * If the input value represents a valid time, normalizes it to the display format,
+ * and returns true. Otherwise returns false.
  *
- * @param {string} name   Name of input to validate (there should only be one input with this name)
+ * @param {string} name  Name of input to validate (there should only be one input with this name)
  *
  * @returns {boolean}
  */
-Oscar.Util.Appointment.validateStartTime = function validateStartTime(name)
+
+Oscar.Util.Appointment.validateTimeInput = function validateTimeInput(name)
 {
-	var startElem = document.getElementsByName(name)[0];
-	return moment(startElem.value, [this.TimeFormat, this.TimeFormatAlt], true).isValid();
+	var timeElem = document.getElementsByName(name)[0];
+
+	var timeStr = timeElem.value.trim();
+	var time = moment(timeStr, this.TimeFormats, true);
+
+	if (!time.isValid())
+	{
+		timeElem.focus();
+		return false;
+	}
+
+	timeElem.value = time.format(this.TimeFormatDisplay);
+	return true;
 }
 
 /**
@@ -28,28 +40,26 @@ Oscar.Util.Appointment.validateStartTime = function validateStartTime(name)
  * If the calculated time wraps around to the next day, fails and returns false.
  *
  * @param {string} name   Name of input to validate (there should only be one input with this name)
- * @param {string} startTime   The start time to use, in the H:m format.
+ * @param {string} start   The start time to use, in the H:m format.
  * @param {string} duration   The duration to use, in minutes.
  *
  * @returns {boolean}
  */
-Oscar.Util.Appointment.setEndTime = function setEndTime(name, startTime, duration)
+Oscar.Util.Appointment.setEndTime = function setEndTime(name, start, duration)
 {
 	var endElem = document.getElementsByName(name)[0];
 
 	// if duration is unparseable or 0, use 1
-	var duration = parseInt(duration) || 1;
-
-	// moments are mutable; clone so we don't alter the original
-	var startTime = moment(startTime, this.TimeFormat);
+	var durationTime = parseInt(duration) || 1;
+	var startTime = moment(start, this.TimeFormat);
 	var endTime = startTime.clone();
 
-	endTime.add(Math.abs(duration) - 1, 'minutes');
+	endTime.add(Math.abs(durationTime) - 1, 'minutes');
 	if (startTime.diff(endTime, 'days') > 0)
 	{
 		return false;
 	}
 
-	endElem.value = endTime.format(this.TimeFormat);
+	endElem.value = endTime.format(this.TimeFormatDisplay);
 	return true;
 }

@@ -306,9 +306,8 @@
 
 			function calculateEndTime()
 			{
-				if (!Oscar.Util.Appointment.validateStartTime('start_time'))
+				if (!handleTimeChange('start_time'))
 				{
-					window.alert("<bean:message key="Appointment.msgInvalidDateFormat"/>");
 					return false;
 				}
 				if (!Oscar.Util.Common.validateNumberInput('duration'))
@@ -326,73 +325,14 @@
 				return true;
 			}
 
-			function checkTypeNum(typeIn)
+			function handleTimeChange(name)
 			{
-				var typeInOK = true;
-				var i = 0;
-				var length = typeIn.length;
-				var ch;
-
-				// walk through a string and find a number
-				if (length >= 1)
+				if (!Oscar.Util.Appointment.validateTimeInput(name))
 				{
-					while (i < length)
-					{
-						ch = typeIn.substring(i, i + 1);
-						if (ch == ":")
-						{
-							i++;
-							continue;
-						}
-						if ((ch < "0") || (ch > "9"))
-						{
-							typeInOK = false;
-							break;
-						}
-						i++;
-					}
+					window.alert("<bean:message key="Appointment.msgFillValidTimeField"/>");
+					return false;
 				}
-				else typeInOK = false;
-				return typeInOK;
-			}
-
-			function checkTimeTypeIn(obj)
-			{
-				var colonIdx;
-				if (!checkTypeNum(obj.value))
-				{
-					alert("<bean:message key="Appointment.msgFillTimeField"/>");
-				}
-				else
-				{
-					colonIdx = obj.value.indexOf(':');
-					if (colonIdx == -1)
-					{
-						if (obj.value.length < 3) alert("<bean:message key="Appointment.msgFillValidTimeField"/>");
-						obj.value = obj.value.substring(0, obj.value.length - 2) + ":" + obj.value.substring(obj.value.length - 2);
-					}
-				}
-
-				var hours = "";
-				var minutes = "";
-
-				colonIdx = obj.value.indexOf(':');
-				if (colonIdx < 1)
-					hours = "00";
-				else if (colonIdx == 1)
-					hours = "0" + obj.value.substring(0, 1);
-				else
-					hours = obj.value.substring(0, 2);
-
-				minutes = obj.value.substring(colonIdx + 1, colonIdx + 3);
-				if (minutes.length == 0)
-					minutes = "00";
-				else if (minutes.length == 1)
-					minutes = "0" + minutes;
-				else if (minutes > 59)
-					minutes = "00";
-
-				obj.value = hours + ":" + minutes;
+				return true;
 			}
 
 			<% if (apptObj!=null) { %>
@@ -697,7 +637,7 @@
 								   NAME="start_time"
 								   VALUE="<%=bFirstDisp?ConversionUtils.toTimeStringNoSeconds(appt.getStartTime()):request.getParameter("start_time")%>"
 								   WIDTH="25"
-								   HEIGHT="20" border="0" onChange="checkTimeTypeIn(this)">
+								   HEIGHT="20" border="0" onChange="handleTimeChange('start_date')">
 						</div>
 						<div class="space">&nbsp;</div>
 
@@ -758,11 +698,10 @@
 										nameSb.append(appt.getName());
 									}
 								}
-							%> <INPUT TYPE="hidden" NAME="end_time"
-									  VALUE="<%=bFirstDisp?ConversionUtils.toTimeStringNoSeconds(appt.getEndTime()):request.getParameter("end_time")%>"
-									  WIDTH="25" HEIGHT="20" border="0"
-									  onChange="checkTimeTypeIn(this)">
-								<%--              <INPUT TYPE="hidden" NAME="end_time" VALUE="<%=request.getParameter("end_time")%>" WIDTH="25" HEIGHT="20" border="0" onChange="checkTimeTypeIn(this)">--%>
+							%>
+							<INPUT TYPE="hidden" NAME="end_time"
+								   VALUE="<%=bFirstDisp?ConversionUtils.toTimeStringNoSeconds(appt.getEndTime()):request.getParameter("end_time")%>"
+								   WIDTH="25" HEIGHT="20" border="0">
 							<INPUT TYPE="TEXT" NAME="duration"
 								   VALUE="<%=request.getParameter("duration")!=null?(request.getParameter("duration").equals(" ")||request.getParameter("duration").equals("")||request.getParameter("duration").equals("null")?(""+everyMin) :request.getParameter("duration")):(""+everyMin)%>"
 								   WIDTH="25">
