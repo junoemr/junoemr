@@ -23,6 +23,8 @@ import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -35,7 +37,6 @@ import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.dms.IncomingDocUtil;
 import oscar.dms.data.DocumentUploadForm;
-import oscar.dms.util.OscarPdfValidator;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 
@@ -163,7 +164,67 @@ public class DocumentUploadAction extends DispatchAction
 		}
 	}
 
-	private void uploadRegularDocument(HttpServletRequest request, String fmSource, FormFile docFile, HashMap<String, Object> map) throws IOException
+	private void uploadRegularDocument(HttpServletRequest request, String fmSource, FormFile docFile, HashMap<String, Object> map) throws IOException, InterruptedException
+	{
+		String fileName = docFile.getFileName();
+		String user = (String) request.getSession().getAttribute("user");
+		if(docFile.getFileSize() == 0)
+		{
+			throw new FileNotFoundException();
+		}
+		map.put("name", docFile.getFileName());
+		map.put("size", docFile.getFileSize());
+
+		GenericFile file = FileFactory.getNewDocumentFile(docFile.getInputStream(), fileName);
+		if(!file.validate())
+		{
+			file.onFailedValidation();
+		}
+		file.setContentType(docFile.getContentType());
+		file.moveToDocuments();
+		docFile.destroy();
+
+		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fmSource, 'A',
+				oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "",
+				"demographic", "-1", file.getPageCount());
+
+		newDoc.setDocPublic("0");
+		newDoc.setContentType(file.getContentType());
+
+		// if the document was added in the context of a program
+		ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		ProgramProvider pp = programManager.getCurrentProgramInDomain(loggedInInfo, loggedInInfo.getLoggedInProviderNo());
+		if(pp != null && pp.getProgramId() != null)
+		{
+			newDoc.setProgramId(pp.getProgramId().intValue());
+		}
+
+
+		String doc_no = EDocUtil.addDocumentSQL(newDoc);
+		LogAction.addLogEntry(user, null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr(), fileName);
+
+		String providerId = request.getParameter("provider");
+		if(providerId != null)
+		{
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
+			ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) ctx.getBean("providerInboxRoutingDAO");
+			providerInboxRoutingDao.addToProviderInbox(providerId, Integer.parseInt(doc_no), "DOC");
+		}
+
+		String queueId = request.getParameter("queue");
+		if(queueId != null && !queueId.equals("-1"))
+		{
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
+			QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) ctx.getBean("queueDocumentLinkDAO");
+			Integer qid = Integer.parseInt(queueId.trim());
+			Integer did = Integer.parseInt(doc_no.trim());
+			queueDocumentLinkDAO.addActiveQueueDocumentLink(qid, did);
+			request.getSession().setAttribute("preferredQueue", queueId);
+		}
+	}
+
+	private void uploadRegularDocumentOLD(HttpServletRequest request, String fmSource, FormFile docFile, HashMap<String, Object> map) throws IOException
 	{
 		int numberOfPages = 0;
 		String fileName = docFile.getFileName();
@@ -195,15 +256,6 @@ public class DocumentUploadAction extends DispatchAction
 		newDoc.setContentType(docFile.getContentType());
 		if(fileName.toLowerCase().endsWith(".pdf"))
 		{
-			logger.info("validate pdf encoding");
-			String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-			File f = new File(documentDir, fileName);
-			OscarPdfValidator validator = new OscarPdfValidator(f);
-			if(!validator.validate())
-			{
-				logger.error("Pdf Encoding Error: " + validator.getReasonInvalid());
-				throw new RuntimeException("Pdf Encoding Error: " + validator.getReasonInvalid());
-			}
 			newDoc.setContentType("application/pdf");
 			// get number of pages when document is a PDF
 			numberOfPages = countNumOfPages(fileName);

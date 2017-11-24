@@ -1,6 +1,5 @@
 /**
- *
- * Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
+ * Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,16 +15,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * This software was written for
- * Centre for Research on Inner City Health, St. Michael's Hospital,
- * Toronto, Ontario, Canada
+ * This software was written for the
+ * Department of Family Medicine
+ * McMaster University
+ * Hamilton
+ * Ontario, Canada
  */
 
-package oscar.dms.util;
+package org.oscarehr.common.io;
 
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.oscarehr.util.MiscUtils;
-import oscar.OscarProperties;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,67 +35,70 @@ import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
 
-public class OscarPdfValidator
+public class PDFFile extends GenericFile
 {
+	private static Logger logger = MiscUtils.getLogger();
 	private static final Set<String> allowedErrors = new HashSet<>();
 
-	private static Logger logger = MiscUtils.getLogger();
-	private static OscarProperties props = oscar.OscarProperties.getInstance();
-
-	private File file;
-	private boolean hasBeenValidated;
-	private boolean isValid;
-
-	private String reasonInvalid;
-	private int exitValue;
-
-	public OscarPdfValidator(File file)
+	public PDFFile(File file) throws IOException
 	{
-		this.file = file;
-		this.hasBeenValidated = false;
-		this.isValid = false;
-
-		this.reasonInvalid = null;
-		this.exitValue = -1;
+		super(file);
+	}
+	public PDFFile(File file, String fileType) throws IOException
+	{
+		super(file, fileType);
+		this.contentType = "application/pdf";
 	}
 
-	public boolean validate()
+	@Override
+	public boolean validate() throws IOException, InterruptedException
 	{
-		this.isValid = false;
-		try
+		this.isValid = pdfinfoValidation(javaFile);
+		if(!this.isValid)
 		{
-			this.isValid = runExec();
+			logger.error("Pdf Encoding Error: " + getReasonInvalid());
 		}
-		catch(IOException | InterruptedException e)
-		{
-			logger.error("Error with pdf validate",e);
-		}
-
 		this.hasBeenValidated = true;
 		return this.isValid;
 	}
+	@Override
+	public void onFailedValidation()
+	{
+		ghostscriptReencode();
+	}
+	/**
+	 * Counts the number of pages in a local pdf file.
+	 *
+	 * @return the number of pages in the file
+	 */
+	@Override
+	public int getPageCount()
+	{
+		int numOfPage = 0;
+		try
+		{
+			PDDocument doc = PDDocument.load(javaFile);
+			numOfPage = doc.getNumberOfPages();
+		}
+		catch(IOException e)
+		{
+			logger.error("Error", e);
+		}
+		return numOfPage;
+	}
 
-	public boolean isValid()
+	@Override
+	public void setContentType(String type)
 	{
-		return this.isValid;
-	}
-	public boolean hasBeenValidated()
-	{
-		return this.hasBeenValidated;
-	}
-	public String getReasonInvalid()
-	{
-		return this.reasonInvalid;
-	}
-	public int getExitValue()
-	{
-		return this.exitValue;
+		// pdfs always have this type of content
+		this.contentType = "application/pdf";
 	}
 
-
-	private boolean runExec() throws IOException,InterruptedException
+	private boolean pdfinfoValidation(File file) throws IOException,InterruptedException
 	{
 		boolean isValid = true;
+		int exitValue;
+
 		String pdfInfo = props.getProperty("document.pdfinfo_path", "/usr/bin/pdfinfo");
 
 		String[] command = {pdfInfo, file.getPath()};
@@ -115,13 +119,27 @@ public class OscarPdfValidator
 		process.waitFor();
 		in.close();
 
-		this.exitValue = process.exitValue();
-		if(this.exitValue != 0) {
+		exitValue = process.exitValue();
+		if(exitValue != 0) {
 			isValid = false;
 		}
 
 		logger.info("Passed Validation: " + isValid);
-		logger.info("Exit Value: " + this.exitValue);
+		logger.info("Exit Value: " + exitValue);
 		return isValid;
 	}
+
+	private void ghostscriptReencode()
+	{
+
+		File currentDir = javaFile.getParentFile();
+		this.moveToCorrupt();
+
+		//TODO replace the pdf here
+
+		this.moveFile(currentDir);
+	}
+
+
+
 }

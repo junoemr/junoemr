@@ -58,7 +58,6 @@ import oscar.MyDateFormat;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.dms.data.AddEditDocumentForm;
-import oscar.dms.util.OscarPdfValidator;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarEncounter.data.EctProgram;
@@ -126,15 +125,6 @@ public class AddEditDocumentAction extends DispatchAction {
 
 		newDoc.setContentType(docFile.getContentType());
 		if (fileName.endsWith(".PDF") || fileName.endsWith(".pdf")) {
-			logger.info("validate pdf encoding");
-			String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-			File f = new File(documentDir, fileName);
-			OscarPdfValidator validator = new OscarPdfValidator(f);
-			if(!validator.validate())
-			{
-				logger.error("Pdf Encoding Error: " + validator.getReasonInvalid());
-				throw new RuntimeException("Pdf Encoding Error: " + validator.getReasonInvalid());
-			}
 
 			newDoc.setContentType("application/pdf");
 			// get number of pages when document is pdf;
@@ -169,7 +159,7 @@ public class AddEditDocumentAction extends DispatchAction {
 	/** count number of pages in a local pdf file */
 	public static int countNumOfPages(String fileName) {
 		int numOfPage = 0;
-		String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+		String documentDir = oscar.OscarProperties.getInstance().getProperty("");
 
 		try {
 			PDDocument doc = PDDocument.load(new File(documentDir, fileName));
@@ -213,15 +203,6 @@ public class AddEditDocumentAction extends DispatchAction {
 		writeLocalFile(docFile, fileName);
 		newDoc.setContentType(docFile.getContentType());
                 if (fileName.toLowerCase().endsWith(".pdf")) {
-	                logger.info("validate pdf encoding");
-	                String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-	                File f = new File(documentDir, fileName);
-	                OscarPdfValidator validator = new OscarPdfValidator(f);
-	                if(!validator.validate())
-	                {
-		                logger.error("Pdf Encoding Error: " + validator.getReasonInvalid());
-		                throw new RuntimeException("Pdf Encoding Error: " + validator.getReasonInvalid());
-	                }
 
                     newDoc.setContentType("application/pdf");
                     int numberOfPages = countNumOfPages(fileName);
@@ -325,15 +306,6 @@ public class AddEditDocumentAction extends DispatchAction {
 				newDoc.setContentType(docFile.getContentType());
 				int numberOfPages = 0;
 				if (fileName2.toLowerCase().endsWith(".pdf")) {
-					logger.info("validate pdf encoding");
-					String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-					File f = new File(documentDir, fileName2);
-					OscarPdfValidator validator = new OscarPdfValidator(f);
-					if(!validator.validate())
-					{
-						logger.error("Pdf Encoding Error: " + validator.getReasonInvalid());
-						throw new RuntimeException("Pdf Encoding Error: " + validator.getReasonInvalid());
-					}
 
 					newDoc.setContentType("application/pdf");
 					// get number of pages when document is pdf;
@@ -547,7 +519,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		FileOutputStream fos = null;
 		File file = null;
 		try {
-			String savePath = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "/" + fileName;
+			String savePath = oscar.OscarProperties.getInstance().getProperty("") + "/" + fileName;
 			file = new File (savePath);
 			fos = new FileOutputStream(savePath);
 			byte[] buf = new byte[128 * 1024];
