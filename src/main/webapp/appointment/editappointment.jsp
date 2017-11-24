@@ -637,7 +637,7 @@
 								   NAME="start_time"
 								   VALUE="<%=bFirstDisp?ConversionUtils.toTimeStringNoSeconds(appt.getStartTime()):request.getParameter("start_time")%>"
 								   WIDTH="25"
-								   HEIGHT="20" border="0" onChange="handleTimeChange('start_date')">
+								   HEIGHT="20" border="0" onChange="handleTimeChange('start_time')">
 						</div>
 						<div class="space">&nbsp;</div>
 

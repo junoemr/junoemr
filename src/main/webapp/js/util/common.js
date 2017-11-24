@@ -16,4 +16,4 @@ Oscar.Util.Common.validateNumberInput = function validateNumberInput(name)
 {
 	var elem = document.getElementsByName(name)[0];
 	return !isNaN(elem.value.trim());
-}
+};

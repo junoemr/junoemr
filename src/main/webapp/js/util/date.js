@@ -24,7 +24,7 @@ Oscar.Util.Date.validateDateString = function validateDateString(dateStr, strict
 
 	// enforce strict parsing to match against the given formats exactly
 	return moment(dateStr, validFormats, true).isValid();
-}
+};
 
 /**
  * Normalizes a date input value to use the default format delimiters.
@@ -42,7 +42,7 @@ Oscar.Util.Date.normalizeDateInput = function normalizeDateInput(name)
 	// Since we are not enforcing strict parsing, delimiters don't need to match.
 	var date = moment(dateElem.value.trim(), this.DateFormat);
 	dateElem.value = date.format(this.DateFormat);
-}
+};
 
 /**
  * Returns true if the input value represents a valid date, and false otherwise.
@@ -70,7 +70,7 @@ Oscar.Util.Date.validateDateInput = function validateDateInput(name, strict)
 	}
 
 	return isValid;
-}
+};
 
 /**
  * Returns true if the input value represents a valid date.
@@ -100,4 +100,4 @@ Oscar.Util.Date.validateDateInputTolerant = function validateDateInputTolerant(n
 	}
 
 	return isValid;
-}
+};

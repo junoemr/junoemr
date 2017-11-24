@@ -32,7 +32,7 @@ Oscar.Util.Appointment.validateTimeInput = function validateTimeInput(name)
 
 	timeElem.value = time.format(this.TimeFormatDisplay);
 	return true;
-}
+};
 
 /**
  * Given a start time and duration, calculates the end time and sets it as the value of the given
@@ -51,15 +51,15 @@ Oscar.Util.Appointment.setEndTime = function setEndTime(name, start, duration)
 
 	// if duration is unparseable or 0, use 1
 	var durationTime = parseInt(duration) || 1;
-	var startTime = moment(start, this.TimeFormat);
+	var startTime = moment(start, this.TimeFormats);
 	var endTime = startTime.clone();
 
 	endTime.add(Math.abs(durationTime) - 1, 'minutes');
-	if (startTime.diff(endTime, 'days') > 0)
+	if (endTime.diff(startTime, 'days') !== 0)
 	{
 		return false;
 	}
 
 	endElem.value = endTime.format(this.TimeFormatDisplay);
 	return true;
-}
+};
