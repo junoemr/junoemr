@@ -1030,9 +1030,11 @@
 				<th style="color:#000000; font-size:xsmall; font-family:verdana,arial,helvetica;"
 					width="15%">
 					<a href="#"
-					   onClick="document.forms['ticklerform'].sort_order.value='<%=sortOrderStr%>';document.forms['ticklerform'].sort_column.value='
-						   <c:out value="${sortByDemoName}"/>'; document.forms['ticklerform'].submit();"><bean:message
-							key="tickler.ticklerMain.msgDemographicName"/></a>
+					   onClick="document.forms['ticklerform'].sort_order.value='<%=sortOrderStr%>';
+					   document.forms['ticklerform'].sort_column.value='<c:out value="${sortByDemoName}"/>';
+					   document.forms['ticklerform'].submit();"
+					><bean:message key="tickler.ticklerMain.msgDemographicName"/>
+					</a>
 					<c:if test="${sortColumn == sortByDemoName}">
 						<c:out value="${imgTag}" escapeXml="false"/>
 					</c:if>
@@ -1040,9 +1042,11 @@
 				<th style="color:#000000; font-size:xsmall; font-family:verdana,arial,helvetica;"
 					width="8%">
 					<a href="#"
-					   onClick="document.forms['ticklerform'].sort_order.value='<%=sortOrderStr%>';document.forms['ticklerform'].sort_column.value='
-						   <c:out value="${sortByCreator}"/>'; document.forms['ticklerform'].submit();"><bean:message
-							key="tickler.ticklerMain.msgCreator"/></a>
+					   onClick="document.forms['ticklerform'].sort_order.value='<%=sortOrderStr%>';
+					   document.forms['ticklerform'].sort_column.value='<c:out value="${sortByCreator}"/>';
+					   document.forms['ticklerform'].submit();"
+					><bean:message key="tickler.ticklerMain.msgCreator"/>
+					</a>
 					<c:if test="${sortColumn == sortByCreator}">
 						<c:out value="${imgTag}" escapeXml="false"/>
 					</c:if>
@@ -1050,9 +1054,11 @@
 				<th style="color:#000000; font-size:xsmall; font-family:verdana,arial,helvetica;"
 					width="12%">
 					<a href="#"
-					   onClick="document.forms['ticklerform'].sort_order.value='<%=sortOrderStr%>';document.forms['ticklerform'].sort_column.value='
-						   <c:out value="${sortByServiceDate}"/>'; document.forms['ticklerform'].submit();"><bean:message
-							key="tickler.ticklerMain.msgDate"/></a>
+					   onClick="document.forms['ticklerform'].sort_order.value='<%=sortOrderStr%>';
+					   document.forms['ticklerform'].sort_column.value='<c:out value="${sortByServiceDate}"/>';
+					   document.forms['ticklerform'].submit();"
+					><bean:message key="tickler.ticklerMain.msgDate"/>
+					</a>
 					<c:if test="${sortColumn == sortByServiceDate}">
 						<c:out value="${imgTag}" escapeXml="false"/>
 					</c:if>
@@ -1060,9 +1066,11 @@
 				<th style="color:#000000; font-size:xsmall; font-family:verdana,arial,helvetica;"
 					width="15%">
 					<a href="#"
-					   onClick="document.forms['ticklerform'].sort_order.value='<%=sortOrderStr%>';document.forms['ticklerform'].sort_column.value='
-						   <c:out value="${sortByCreationDate}"/>'; document.forms['ticklerform'].submit();"><bean:message
-							key="tickler.ticklerMain.msgCreationDate"/></a>
+					   onClick="document.forms['ticklerform'].sort_order.value='<%=sortOrderStr%>';
+					   document.forms['ticklerform'].sort_column.value='<c:out value="${sortByCreationDate}"/>';
+					   document.forms['ticklerform'].submit();"
+					><bean:message key="tickler.ticklerMain.msgCreationDate"/>
+					</a>
 					<c:if test="${sortColumn == sortByCreationDate}">
 						<c:out value="${imgTag}" escapeXml="false"/>
 					</c:if>
@@ -1071,9 +1079,11 @@
 				<th style="color:#000000; font-size:xsmall; font-family:verdana,arial,helvetica;"
 					width="8%">
 					<a href="#"
-					   onClick="document.forms['ticklerform'].sort_order.value='<%=sortOrderStr%>';document.forms['ticklerform'].sort_column.value='
-						   <c:out value="${sortByPriority}"/>'; document.forms['ticklerform'].submit();"><bean:message
-							key="tickler.ticklerMain.Priority"/></a>
+					   onClick="document.forms['ticklerform'].sort_order.value='<%=sortOrderStr%>';
+					   document.forms['ticklerform'].sort_column.value='<c:out value="${sortByPriority}"/>';
+					   document.forms['ticklerform'].submit();"
+					><bean:message key="tickler.ticklerMain.Priority"/>
+					</a>
 					<c:if test="${sortColumn == sortByPriority}">
 						<c:out value="${imgTag}" escapeXml="false"/>
 					</c:if>
@@ -1082,9 +1092,11 @@
 				<th style="color:#000000; font-size:xsmall; font-family:verdana,arial,helvetica;"
 					width="15%">
 					<a href="#"
-					   onClick="document.forms['ticklerform'].sort_order.value='<%=sortOrderStr%>';document.forms['ticklerform'].sort_column.value='
-						   <c:out value="${sortByTAT}"/>'; document.forms['ticklerform'].submit();"><bean:message
-							key="tickler.ticklerMain.taskAssignedTo"/></a>
+					   onClick="document.forms['ticklerform'].sort_order.value='<%=sortOrderStr%>';
+					   document.forms['ticklerform'].sort_column.value='<c:out value="${sortByTAT}"/>';
+					   document.forms['ticklerform'].submit();"
+					><bean:message key="tickler.ticklerMain.taskAssignedTo"/>
+					</a>
 					<c:if test="${sortColumn == sortByTAT}">
 						<c:out value="${imgTag}" escapeXml="false"/>
 					</c:if>
