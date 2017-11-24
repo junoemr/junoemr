@@ -948,11 +948,9 @@
 						<!--/td>
 						<td -->
 						<font color="#333333" size="2" face="Verdana, Arial, Helvetica, sans-serif">
-							<input type="hidden" name="Submit" value="">
-							<input type="button"
+							<input type="submit"
 								   value="<bean:message key="tickler.ticklerMain.btnCreateReport"/>"
-								   class="mbttn noprint"
-								   onclick="document.forms['serviceform'].Submit.value='Create Report'; document.forms['serviceform'].submit();">
+								   class="mbttn noprint">
 							<oscar:oscarPropertiesCheck property="TICKLERSAVEVIEW" value="yes">
 								&nbsp;
 								<input type="button"

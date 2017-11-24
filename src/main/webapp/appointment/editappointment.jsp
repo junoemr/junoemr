@@ -216,7 +216,7 @@
 				if (calculateEndTime())
 				{
 					document.forms[0].action = "appointmenteditrepeatbooking.jsp";
-					document.forms[0].submit();
+					document.forms[0].querySelector('input[type="submit"]').click();
 				}
 			}
 
@@ -457,7 +457,7 @@
 
 			function onCut()
 			{
-				document.EDITAPPT.submit();
+				document.EDITAPPT.querySelector('input[type="submit"]').click();
 			}
 
 

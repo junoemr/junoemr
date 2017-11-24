@@ -288,7 +288,9 @@
 				document.forms[0].orderby.value = val;
 				document.forms[0].desc.value = '0';
 			}
-			document.forms[0].submit();
+
+			document.forms[0].querySelector('input[type="submit"]').click();
+
 		}
 
 		function gotoPage(next)
@@ -299,7 +301,7 @@
 			if (next) frm.offset.value = <%=offset+limit%>;
 			else frm.offset.value = <%=offset-limit%>;
 
-			frm.submit();
+			frm.querySelector('input[type="submit"]').click();
 		}
 
 		function validateForm()

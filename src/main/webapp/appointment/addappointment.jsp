@@ -341,7 +341,7 @@ Ontario, Canada
 				if (calculateEndTime())
 				{
 					document.forms[0].action = "appointmentrepeatbooking.jsp";
-					document.forms[0].submit();
+					document.forms[0].querySelector('input[type="submit"]').click();
 				}
 			}
 
