@@ -216,18 +216,23 @@ Ontario, Canada
 				{
 					document.ADDAPPT.status.value = 'N';
 				}
-
-				return Oscar.Util.Date.validateDateInput('appointment_date') && calculateEndTime();
+				if (!handleDateChange(document.ADDAPPT.appointment_date))
+				{
+					return false;
+				}
+				return calculateEndTime();
 			}
 
 			function calculateEndTime()
 			{
-				if (!handleTimeChange('start_time'))
+				if (!handleTimeChange(document.ADDAPPT.start_time))
 				{
 					return false;
 				}
-				if (!Oscar.Util.Common.validateNumberInput('duration'))
+				var duration = document.ADDAPPT.duration;
+				if (!Oscar.Util.Common.validateNumberInput(duration))
 				{
+					duration.focus();
 					window.alert("<bean:message key="Appointment.msgFillTimeField"/>");
 					return false;
 				}
@@ -241,11 +246,23 @@ Ontario, Canada
 				return true;
 			}
 
-			function handleTimeChange(name)
+			function handleTimeChange(elem)
 			{
-				if (!Oscar.Util.Appointment.validateTimeInput(name))
+				if (!Oscar.Util.Appointment.validateTimeInput(elem))
 				{
+					elem.focus();
 					window.alert("<bean:message key="Appointment.msgFillValidTimeField"/>");
+					return false;
+				}
+				return true;
+			}
+
+			function handleDateChange(elem)
+			{
+				if (!Oscar.Util.Date.validateDateInput(elem))
+				{
+					elem.focus();
+					window.alert("<bean:message key="Appointment.msgInvalidDateFormat"/>");
 					return false;
 				}
 				return true;
@@ -869,7 +886,7 @@ Ontario, Canada
 						<INPUT TYPE="TEXT" NAME="appointment_date"
 							   VALUE="<%=dateString2%>" WIDTH="25" HEIGHT="20" border="0"
 							   hspace="2"
-							   onChange="Oscar.Util.Date.validateDateInput('appointment_date');checkPageLock()">
+							   onChange="handleDateChange(this);checkPageLock()">
 					</div>
 					<div class="space">&nbsp;</div>
 					<div class="label"><bean:message key="Appointment.formStatus"/>:</div>
@@ -901,7 +918,7 @@ Ontario, Canada
 						<INPUT TYPE="TEXT" NAME="start_time"
 							   VALUE='<%=request.getParameter("start_time")%>' WIDTH="25"
 							   HEIGHT="20" border="0"
-							   onChange="handleTimeChange('start_time');checkPageLock()">
+							   onChange="handleTimeChange(this);checkPageLock()">
 					</div>
 					<div class="space">&nbsp;</div>
 

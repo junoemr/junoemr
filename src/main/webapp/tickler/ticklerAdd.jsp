@@ -133,6 +133,8 @@
 		<script type="text/javascript"
 				src="<%= request.getContextPath() %>/js/moment.min.js"></script>
 		<script type="text/javascript"
+				src="<%= request.getContextPath() %>/js/util/common.js"></script>
+		<script type="text/javascript"
 				src="<%= request.getContextPath() %>/js/util/date.js"></script>
 		<script language="JavaScript">
 			<!--
@@ -171,33 +173,33 @@
 
 			function validateForm()
 			{
-				return validateDemoNo() && Oscar.Util.Date.validateDateInput('xml_appointment_date');
-			}
-
-			function validateDemoNo()
-			{
 				if (document.serviceform.demographic_no.value == "")
 				{
 					alert("<bean:message key="tickler.ticklerAdd.msgInvalidDemographic"/>");
 					return false;
 				}
-				else
+				var date = document.serviceform.xml_appointment_date;
+				if (!Oscar.Util.Common.validateInputNotEmpty(date))
 				{
-					if (document.serviceform.xml_appointment_date.value == "")
-					{
-						alert("<bean:message key="tickler.ticklerAdd.msgMissingDate"/>");
-						return false;
-					}
-					<%
-					if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) { %>
-					if (document.serviceform.site.value == "none")
-					{
-						alert("Must assign task to a provider.");
-						return false;
-					}
-					<% } %>
-					return true;
+					date.focus();
+					alert("<bean:message key="tickler.ticklerAdd.msgMissingDate"/>");
+					return false;
 				}
+				if (!Oscar.Util.Date.validateDateInput(date))
+				{
+					date.focus();
+					alert("<bean:message key="Tickler.msgInvalidDate"/>");
+					return false;
+				}
+				<%
+				if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) { %>
+				if (document.serviceform.site.value == "none")
+				{
+					alert("Must assign task to a provider.");
+					return false;
+				}
+				<% } %>
+				return true;
 			}
 
 			function refresh()

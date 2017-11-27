@@ -194,13 +194,20 @@
 
 			function validateForm()
 			{
-				return Oscar.Util.Date.validateDateInput('xml_appointment_date');
+				date = document.serviceform.xml_appointment_date;
+				if (!Oscar.Util.Date.validateDateInput(date))
+				{
+					date.focus();
+					alert("<bean:message key="Tickler.msgInvalidDate"/>");
+					return false;
+				}
+				return true;
 			}
 		</script>
 	</head>
 
 	<body>
-	<html:form action="/tickler/EditTickler" onsubmit="return validateForm()">
+	<html:form action="/tickler/EditTickler" onsubmit="return validateForm();">
 		<input type="hidden" name="method" value="editTickler"/>
 		<input type="hidden" name="ticklerNo" value="<%=ticklerNo%>"/>
 		<table width="100%">

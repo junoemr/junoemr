@@ -253,8 +253,19 @@
 
 			function validateForm()
 			{
-				return Oscar.Util.Date.validateDateInputTolerant('xml_appointment_date')
-					&& Oscar.Util.Date.validateDateInputTolerant('xml_vdate');
+				return handleDateChange(document.serviceform.xml_vdate)
+					&& handleDateChange(document.serviceform.xml_appointment_date);
+			}
+
+			function handleDateChange(elem)
+			{
+				if (!Oscar.Util.Date.validateDateInputTolerant(elem))
+				{
+					elem.focus();
+					alert("<bean:message key="Tickler.msgInvalidDate"/>");
+					return false;
+				}
+				return true;
 			}
 
 			function openNoteDialog(demographicNo, ticklerNo)
@@ -784,7 +795,7 @@
 				<td width="41%">
 					<div align="center">
 						<input type="text" id="xml_vdate" name="xml_vdate" value="<%=xml_vdate%>"
-							   onchange="Oscar.Util.Date.validateDateInputTolerant('xml_vdate')">
+							   onchange="handleDateChange(this)">
 						<font size="1" face="Arial, Helvetica, sans-serif"><a href="#"
 																			  onClick="openBrWindow('../billing/billingCalendarPopup.jsp?type=admission&amp;year=<%=curYear%>&amp;month=<%=curMonth%>','','width=300,height=300')"><bean:message
 								key="tickler.ticklerMain.btnBegin"/>:</a></font>
@@ -793,7 +804,7 @@
 				<td width="40%">
 					<input type="text" id="xml_appointment_date" name="xml_appointment_date"
 						   value="<%=xml_appointment_date%>"
-						   onchange="Oscar.Util.Date.validateDateInputTolerant('xml_appointment_date')">
+						   onchange="handleDateChange(this)">
 					<font size="1" face="Arial, Helvetica, sans-serif"><a href="#"
 																		  onClick="openBrWindow('../billing/billingCalendarPopup.jsp?type=end&amp;year=<%=curYear%>&amp;month=<%=curMonth%>','','width=300,height=300')"><bean:message
 							key="tickler.ticklerMain.btnEnd"/>:</a> &nbsp; &nbsp; <a href="#"

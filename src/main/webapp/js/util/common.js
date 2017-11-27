@@ -6,14 +6,23 @@ if (!Oscar.Util) Oscar.Util = {};
 Oscar.Util.Common = {};
 
 /**
- * Returns true if the value of the input is a valid number.
+ * Returns true if the input value is a valid number.
  *
- * @param {string} name   Name of the input to validate (there should only be one
- * input with this name)
+ * @param {object} elem   The DOM element to validate.
  * @returns {boolean}
  */
-Oscar.Util.Common.validateNumberInput = function validateNumberInput(name)
+Oscar.Util.Common.validateNumberInput = function validateNumberInput(elem)
 {
-	var elem = document.getElementsByName(name)[0];
-	return !isNaN(elem.value.trim());
+	return !isNaN(elem.value);
 };
+
+/**
+ * Returns true if the input value is not empty.
+ *
+ * @param {object} elem   The DOM element to validate.
+ * @returns {boolean}
+ */
+Oscar.Util.Common.validateInputNotEmpty = function validateInputNotEmpty(elem)
+{
+	return elem.value.length !== 0;
+}

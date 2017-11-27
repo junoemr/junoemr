@@ -297,7 +297,11 @@
 						window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
 						return false;
 					}
-					return Oscar.Util.Date.validateDateInput('appointment_date') && calculateEndTime();
+					if (!handleDateChange(document.EDITAPPT.appointment_date))
+					{
+						return false;
+					}
+					return calculateEndTime();
 				}
 				else
 					return true;
@@ -306,12 +310,14 @@
 
 			function calculateEndTime()
 			{
-				if (!handleTimeChange('start_time'))
+				if (!handleTimeChange(document.EDITAPPT.start_time))
 				{
 					return false;
 				}
-				if (!Oscar.Util.Common.validateNumberInput('duration'))
+				var duration = document.EDITAPPT.duration;
+				if (!Oscar.Util.Common.validateNumberInput(duration))
 				{
+					duration.focus();
 					window.alert("<bean:message key="Appointment.msgFillTimeField"/>");
 					return false;
 				}
@@ -325,11 +331,23 @@
 				return true;
 			}
 
-			function handleTimeChange(name)
+			function handleTimeChange(elem)
 			{
-				if (!Oscar.Util.Appointment.validateTimeInput(name))
+				if (!Oscar.Util.Appointment.validateTimeInput(elem))
 				{
+					elem.focus();
 					window.alert("<bean:message key="Appointment.msgFillValidTimeField"/>");
+					return false;
+				}
+				return true;
+			}
+
+			function handleDateChange(elem)
+			{
+				if (!Oscar.Util.Date.validateDateInput(elem))
+				{
+					elem.focus();
+					window.alert("<bean:message key="Appointment.msgInvalidDateFormat"/>");
 					return false;
 				}
 				return true;
@@ -583,7 +601,7 @@
 								   NAME="appointment_date"
 								   VALUE="<%=bFirstDisp?ConversionUtils.toDateString(appt.getAppointmentDate()):strApptDate%>"
 								   WIDTH="25" HEIGHT="20" border="0"
-								   ONCHANGE="Oscar.Util.Date.validateDateInput('appointment_date');">
+								   ONCHANGE="handleDateChange(this);">
 						</div>
 						<div class="space">&nbsp;</div>
 						<div class="label"><bean:message key="Appointment.formStatus"/>:</div>
@@ -637,7 +655,7 @@
 								   NAME="start_time"
 								   VALUE="<%=bFirstDisp?ConversionUtils.toTimeStringNoSeconds(appt.getStartTime()):request.getParameter("start_time")%>"
 								   WIDTH="25"
-								   HEIGHT="20" border="0" onChange="handleTimeChange('start_time')">
+								   HEIGHT="20" border="0" onChange="handleTimeChange(this)">
 						</div>
 						<div class="space">&nbsp;</div>
 

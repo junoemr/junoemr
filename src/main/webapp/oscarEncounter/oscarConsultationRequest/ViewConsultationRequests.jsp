@@ -306,8 +306,19 @@
 
 		function validateForm()
 		{
-			return Oscar.Util.Date.validateDateInputTolerant('startDate')
-				&& Oscar.Util.Date.validateDateInputTolerant('endDate');
+			return handleDateChange(document.forms[0].startDate)
+				&& handleDateChange(document.forms[0].endDate);
+		}
+
+		function handleDateChange(elem)
+		{
+			if (!Oscar.Util.Date.validateDateInputTolerant(elem))
+			{
+				elem.focus();
+				alert("<bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgInvalidDate"/>");
+				return false;
+			}
+			return true;
 		}
 	</script>
 
@@ -409,13 +420,13 @@
 									<bean:message
 											key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgStart"/>:<html:text
 										property="startDate" size="8" styleId="startDate"
-										onchange="Oscar.Util.Date.validateDateInputTolerant('startDate')"/><a
+										onchange="handleDateChange(this)"/><a
 										id="SCal"><img title="Calendar" src="../../images/cal.gif"
 													   alt="Calendar" border="0"/></a>
 									<bean:message
 											key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgEnd"/>:<html:text
 										property="endDate" size="8" styleId="endDate"
-										onchange="Oscar.Util.Date.validateDateInputTolerant('endDate')"/><a
+										onchange="handleDateChange(this)"/><a
 										id="ECal"><img title="Calendar" src="../../images/cal.gif"
 													   alt="Calendar" border="0"/></a>
 									<bean:message

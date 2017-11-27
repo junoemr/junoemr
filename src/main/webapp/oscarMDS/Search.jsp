@@ -38,10 +38,20 @@
 			src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
 
 	<script type="text/javascript">
+		function handleDateChange(elem)
+		{
+			if (!Oscar.Util.Date.validateDateInputTolerant(elem))
+			{
+				elem.focus();
+				alert("<bean:message key="oscarMDS.search.msgInvalidDate"/>");
+				return false;
+			}
+			return true;
+		}
 		function onSubmitCheck()
 		{
-			if (!Oscar.Util.Date.validateDateInputTolerant('startDate') ||
-				!Oscar.Util.Date.validateDateInputTolerant('endDate'))
+			if (!handleDateChange(document.searchFrm.startDate)
+				|| !handleDateChange(document.searchFrm.endDate))
 			{
 				return false;
 			}
@@ -159,7 +169,7 @@
 </head>
 
 <body>
-<form id="searchFrm" method="POST" action="" onSubmit="return onSubmitCheck();">
+<form id="searchFrm" name="searchFrm" method="POST" action="" onSubmit="return onSubmitCheck();">
 	<input type="hidden" name="method" value="prepareForIndexPage"/>
 	<table width="100%" height="100%" border="0">
 		<tr class="MainTableTopRow">
@@ -203,7 +213,7 @@
 							</td>
 							<td><input type="text" id="startDate" name="startDate" size="15"
 									   id="startDate"
-									   onchange="Oscar.Util.Date.validateDateInputTolerant('startDate')">
+									   onchange="handleDateChange(this)">
 							</td>
 						</tr>
 						<tr>
@@ -211,7 +221,7 @@
 							</td>
 							<td><input type="text" id="endDate" name="endDate" size="15"
 									   id="endDate"
-									   onchange="Oscar.Util.Date.validateDateInputTolerant('endDate')">
+									   onchange="handleDateChange(this)">
 							</td>
 						</tr>
 
