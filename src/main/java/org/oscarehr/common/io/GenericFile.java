@@ -48,9 +48,6 @@ public class GenericFile
 
 	// file info
 	protected File javaFile;
-	protected String fileType;
-	protected String contentType;
-	protected int pageCount;
 
 	// validation info
 	protected boolean hasBeenValidated;
@@ -59,50 +56,57 @@ public class GenericFile
 
 	public GenericFile(File file)
 	{
-		this(file, null);
-	}
-	public GenericFile(File file, String fileType)
-	{
 		this.javaFile = file;
-		this.fileType = fileType;
-		this.pageCount = 0;
-		this.contentType = null;
 
 		this.hasBeenValidated = false;
 		this.isValid = false;
 		this.reasonInvalid = null;
 	}
 
-	public boolean moveToDocuments()
+	public boolean moveToDocuments() throws IOException
 	{
 		return moveFile(DOCUMENT_BASE);
 	}
-	public boolean moveToCorrupt()
+	public boolean moveToCorrupt() throws IOException
 	{
 		return moveFile(DOCUMENT_CORRUPT);
 	}
-	public boolean moveToDemographicDocuments(Integer demographicNo)
+	public boolean moveToDemographicDocuments(Integer demographicNo) throws IOException
 	{
 		return moveFile(new File(DOCUMENT_BASE, String.valueOf(demographicNo)));
 	}
 
-	public boolean moveFile(String directory)
+	public boolean moveFile(String directory) throws IOException
 	{
 		File directoryFile = new File(directory);
 		return moveFile(directoryFile);
 	}
 
-	public boolean moveFile(File directoryFile)
+	public boolean moveFile(File directoryFile) throws IOException
 	{
-		File destinationFile = new File(directoryFile.getPath(), javaFile.getName());
-
-		boolean validDir = directoryFile.exists() && directoryFile.isDirectory();
-
 		if(!directoryFile.exists())
 		{
-			validDir = directoryFile.mkdirs();
+			boolean mkdir = directoryFile.mkdirs();
+			if(!mkdir)
+			{
+				throw new IOException("Failed to create Directory: " + directoryFile.getPath());
+			}
 		}
-		return validDir && javaFile.renameTo(destinationFile);
+
+		File destinationFile = new File(directoryFile.getPath(), javaFile.getName());
+		logger.info("moving file to: " + destinationFile.getPath());
+
+		if(directoryFile.exists() && directoryFile.isDirectory())
+		{
+			boolean success = javaFile.renameTo(destinationFile);
+			if(!success)
+			{
+				throw new IOException("Failed to move file");
+			}
+			javaFile = destinationFile;
+			return true;
+		}
+		throw new IOException("Invalid Directory: " + directoryFile.getPath());
 	}
 
 
@@ -112,7 +116,7 @@ public class GenericFile
 		this.isValid = true;
 		return true;
 	}
-	public void onFailedValidation()
+	public void onFailedValidation() throws IOException, InterruptedException
 	{
 		throw new RuntimeException("Validation Failure");
 	}
@@ -137,25 +141,13 @@ public class GenericFile
 	{
 		return this.javaFile;
 	}
-	public String getFileType()
+	public String getContentType() throws IOException
 	{
-		return fileType;
-	}
-	public void setFileType(String fileType)
-	{
-		this.fileType = fileType;
-	}
-	public String getContentType()
-	{
-		return this.contentType;
-	}
-	public void setContentType(String type)
-	{
-		this.contentType = type;
+		return GenericFile.getContentType(javaFile);
 	}
 	public int getPageCount()
 	{
-		return pageCount;
+		return 0;
 	}
 
 
@@ -171,5 +163,16 @@ public class GenericFile
 		Files.copy(fileInputStream, this.javaFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		// close the stream
 		IOUtils.closeQuietly(fileInputStream);
+	}
+
+	/**
+	 * returns the file content type, or null if it cannot be determined
+	 * @param f - the file to read
+	 * @return - content type string or null
+	 * @throws IOException - if an IO error occurs
+	 */
+	public static String getContentType(File f) throws IOException
+	{
+		return Files.probeContentType(f.toPath());
 	}
 }

@@ -32,6 +32,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,11 +44,6 @@ public class PDFFile extends GenericFile
 	public PDFFile(File file) throws IOException
 	{
 		super(file);
-	}
-	public PDFFile(File file, String fileType) throws IOException
-	{
-		super(file, fileType);
-		this.contentType = "application/pdf";
 	}
 
 	@Override
@@ -62,9 +58,9 @@ public class PDFFile extends GenericFile
 		return this.isValid;
 	}
 	@Override
-	public void onFailedValidation()
+	public void onFailedValidation() throws IOException, InterruptedException
 	{
-		ghostscriptReencode();
+		javaFile = ghostscriptReencode();
 	}
 	/**
 	 * Counts the number of pages in a local pdf file.
@@ -87,17 +83,9 @@ public class PDFFile extends GenericFile
 		return numOfPage;
 	}
 
-	@Override
-	public void setContentType(String type)
-	{
-		// pdfs always have this type of content
-		this.contentType = "application/pdf";
-	}
-
 	private boolean pdfinfoValidation(File file) throws IOException,InterruptedException
 	{
 		boolean isValid = true;
-		int exitValue;
 
 		String pdfInfo = props.getProperty("document.pdfinfo_path", "/usr/bin/pdfinfo");
 
@@ -119,7 +107,7 @@ public class PDFFile extends GenericFile
 		process.waitFor();
 		in.close();
 
-		exitValue = process.exitValue();
+		int exitValue = process.exitValue();
 		if(exitValue != 0) {
 			isValid = false;
 		}
@@ -129,17 +117,55 @@ public class PDFFile extends GenericFile
 		return isValid;
 	}
 
-	private void ghostscriptReencode()
+	private File ghostscriptReencode() throws IOException,InterruptedException
 	{
+		logger.info("BEGIN PDF RE-ENCODING");
+
+		String gs = props.getProperty("document.ghostscript_path", "/usr/bin/gs");
 
 		File currentDir = javaFile.getParentFile();
 		this.moveToCorrupt();
 
-		//TODO replace the pdf here
+		File newPdf = new File(currentDir, javaFile.getName());
 
-		this.moveFile(currentDir);
+		logger.info("run conversion");
+		/*
+		This has to de done through the command line and not the java library,
+		due to a bug in how the java libraries read pdf files. (libraries lowagie, pdfbox, and itext all have this error)
+		The error has caused an infinite loop during the initial parse and crashed tomcat.
+		 */
+		String[] command = {gs,
+				"-sDEVICE=pdfwrite",
+				"-dCompatibilityLevel=1.4",
+				"-dPDFSETTINGS=/printer",
+				"-dNOPAUSE",
+				"-dQUIET",
+				"-dBATCH",
+				"-sOutputFile="+ newPdf.getPath(),
+				javaFile.getPath()};
+		
+		logger.info(Arrays.toString(command));
+		Process process = Runtime.getRuntime().exec(command);
+
+		BufferedReader in = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+		String line;
+
+		String reasonInvalid = null;
+		while((line = in.readLine()) != null)
+		{
+			logger.error(line);
+			reasonInvalid = (reasonInvalid == null)? line : reasonInvalid + ", " + line;
+		}
+		process.waitFor();
+		in.close();
+
+		int exitValue = process.exitValue();
+		if(exitValue != 0 || reasonInvalid != null)
+		{
+			throw new RuntimeException("Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue);
+		}
+
+		logger.info("END PDF RE-ENCODING");
+		return newPdf;
 	}
-
-
-
 }

@@ -30,7 +30,6 @@ import org.oscarehr.util.MiscUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 
 public class FileFactory
 {
@@ -57,19 +56,19 @@ public class FileFactory
 		}
 
 		File file = new File(directory.getPath(), sanitizedFileName);
-		String fileType = Files.probeContentType(file.toPath());
+		String fileContent = GenericFile.getContentType(file);
+		logger.info("FileContent: " + fileContent);
 
 		GenericFile genFile;
-		if("PDF".equals(fileType))
+		if("application/pdf".equals(fileContent))
 		{
-			genFile = new PDFFile(file, fileType);
+			genFile = new PDFFile(file);
 		}
 		else
 		{
-			genFile = new GenericFile(file,fileType);
+			genFile = new GenericFile(file);
 		}
 		genFile.writeFileStream(fileInputStream);
-
 
 		return genFile;
 	}
@@ -82,11 +81,13 @@ public class FileFactory
 	public static GenericFile getExistingDocumentFile(String fileName)
 	{
 		File file = new File(GenericFile.DOCUMENT_BASE, fileName);
+		GenericFile genFile = null;
+
 		if(file.exists() && file.isFile())
 		{
-			return new GenericFile(file);
+			genFile = new GenericFile(file);
 		}
-		return null;
+		return genFile;
 	}
 
 
@@ -97,9 +98,10 @@ public class FileFactory
 	 */
 	public static String sanitizeFileName(String originalName)
 	{
-		String sanitized = originalName;
+		String sanitized = originalName.trim();
+		sanitized = sanitized.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
 
-		//TODO
+		sanitized = System.currentTimeMillis() + "-" + sanitized;
 		return sanitized;
 	}
 }
