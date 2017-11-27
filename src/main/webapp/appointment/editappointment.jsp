@@ -321,7 +321,8 @@
 					window.alert("<bean:message key="Appointment.msgFillTimeField"/>");
 					return false;
 				}
-				if (!Oscar.Util.Appointment.setEndTime('end_time',
+				if (!Oscar.Util.Appointment.setEndTime(
+						document.EDITAPPT.end_time,
 						document.EDITAPPT.start_time.value,
 						document.EDITAPPT.duration.value))
 				{

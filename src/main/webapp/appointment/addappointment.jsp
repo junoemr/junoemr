@@ -236,7 +236,8 @@ Ontario, Canada
 					window.alert("<bean:message key="Appointment.msgFillTimeField"/>");
 					return false;
 				}
-				if (!Oscar.Util.Appointment.setEndTime('end_time',
+				if (!Oscar.Util.Appointment.setEndTime(
+						document.ADDAPPT.end_time,
 						document.ADDAPPT.start_time.value,
 						document.ADDAPPT.duration.value))
 				{
