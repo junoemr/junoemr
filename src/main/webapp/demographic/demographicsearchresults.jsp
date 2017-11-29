@@ -47,6 +47,10 @@
 <%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager"%>
 <%@page import="org.apache.commons.lang.time.DateFormatUtils"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.DemographicTransfer"%>
+<%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest"%>
+<%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE"%>
+<%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTMODE"%>
+<%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchResult"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore"%>
 <%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
 
@@ -259,7 +263,7 @@
 		        key="demographic.demographicsearchresults.btnHIN" /></a>
         </td>
 		<td class="doctor"><a
-			href="demographiccontrol.jsp?fromMessenger=<%=fromMessenger%>&keyword=<%=StringEscapeUtils.escapeHtml(request.getParameter("keyword"))%>&displaymode=<%=request.getParameter("displaymode")%>&search_mode=<%=request.getParameter("search_mode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=provider_no&limit1=0&limit2=<%=strLimit%>"><bean:message
+			href="demographiccontrol.jsp?fromMessenger=<%=fromMessenger%>&keyword=<%=StringEscapeUtils.escapeHtml(request.getParameter("keyword"))%>&displaymode=<%=request.getParameter("displaymode")%>&search_mode=<%=request.getParameter("search_mode")%>&dboperation=<%=request.getParameter("dboperation")%>&orderby=provider_name&limit1=0&limit2=<%=strLimit%>"><bean:message
 			key="demographic.demographicsearchresults.btnDoctor" /></a>
                 </td>
                 <td class="rosterStatus"><a
@@ -297,9 +301,9 @@
 		orderBy = "last_name";
 	
 	
-	List<Demographic> demoList = null;
+	List<DemographicSearchResult> demoList = null;
 	
-	demoList = doSearch(demographicDao,searchMode,ptstatus,keyword,limit,offset,orderBy,providerNo,outOfDomain);	
+	demoList = doSearch(demographicDao,loggedInInfo,searchMode,ptstatus,keyword,limit,offset,orderBy,providerNo,outOfDomain);
 	
 	
 	boolean toggleLine = false;
@@ -310,36 +314,6 @@
 		out.println("Your Search Returned No Results!!!");
 	} 
 	else {
-		
-		if(orderBy.equals("last_name")) {
-			Collections.sort(demoList, Demographic.LastNameComparator);
-		}
-		else if(orderBy.equals("demographic_no")) {
-			Collections.sort(demoList, Demographic.DemographicNoComparator);
-		}
-		else if(orderBy.equals("chart_no")) {
-			Collections.sort(demoList, Demographic.ChartNoComparator);
-		}
-		else if(orderBy.equals("sex")) {
-			Collections.sort(demoList, Demographic.SexComparator);
-		}
-		else if(orderBy.equals("dob")) {
-			Collections.sort(demoList, Demographic.DateOfBirthComparator);
-		}
-		else if(orderBy.equals("provider_no")) {
-			Collections.sort(demoList, Demographic.ProviderNoComparator);
-		}
-		else if(orderBy.equals("roster_status")) {
-			Collections.sort(demoList, Demographic.RosterStatusComparator);
-		}
-		else if(orderBy.equals("patient_status")) {
-			Collections.sort(demoList, Demographic.PatientStatusComparator);
-		}
-		else if(orderBy.equals("phone")) {
-			Collections.sort(demoList, Demographic.PhoneComparator);
-		}
-		
-		
 		@SuppressWarnings("unchecked")
 		  List<MatchingDemographicTransferScore> integratorSearchResults=(List<MatchingDemographicTransferScore>)request.getAttribute("integratorSearchResults");
 		  
@@ -394,17 +368,10 @@
 
 		DemographicMerged dmDAO = new DemographicMerged();
 
-		for(Demographic demo : demoList) {
+		for(DemographicSearchResult demo : demoList) {
 
-
-			
 			String dem_no = demo.getDemographicNo().toString();
 			String head = dmDAO.getHead(dem_no);
-
-			if (head != null && !head.equals(dem_no)) {
-				//skip non head records
-				continue;
-			}
 
 %>
 	<tr class="<%=toggleLine?"even":"odd"%>">
@@ -448,7 +415,7 @@
 		</caisi:isModuleLoad>
 		<td class="chartNo"><%=demo.getChartNo()==null||demo.getChartNo().equals("")?"&nbsp;":demo.getChartNo()%></td>
 		<td class="sex"><%=demo.getSex()%></td>
-		<td class="dob"><%=demo.getFormattedDob()%></td>
+		<td class="dob"><%=demo.getFormattedDOB()%></td>
 		<td class="hin"><%=demo.getHin()%></td>
 		<td class="doctor"><%=Misc.getShortStr(providerBean.getProperty(demo.getProviderNo() == null ? "" : demo.getProviderNo()),"_",12 )%></td>
 		<td class="rosterStatus"><%=demo.getRosterStatus()==null||demo.getRosterStatus().equals("")?"&nbsp;":demo.getRosterStatus()%></td>
@@ -507,9 +474,9 @@
 </html:html>
 <%!
 
-Boolean isLocal(MatchingDemographicTransferScore matchingDemographicTransferScore, List<Demographic> demoList) {
+Boolean isLocal(MatchingDemographicTransferScore matchingDemographicTransferScore, List<DemographicSearchResult> demoList) {
     String hin = matchingDemographicTransferScore.getDemographicTransfer().getHin(); 
-    for( Demographic demo : demoList ) {
+    for( DemographicSearchResult demo : demoList ) {
 		
 		if( hin != null && hin.equals(demo.getHin()) ) {
 		    return true;
@@ -520,87 +487,70 @@ Boolean isLocal(MatchingDemographicTransferScore matchingDemographicTransferScor
     
 }
 
-List<Demographic> doSearch(DemographicDao demographicDao,String searchMode, String ptstatus, String keyword, int limit, int offset, String orderBy, String providerNo, boolean outOfDomain) {
-	List<Demographic> demoList = null;  
-	OscarProperties props = OscarProperties.getInstance();
-	
-	String pstatus = props.getProperty("inactive_statuses", "IN, DE, IC, ID, MO, FI");
-	pstatus = pstatus.replaceAll("'","").replaceAll("\\s", "");
-	List<String>stati = Arrays.asList(pstatus.split(","));
-	
-	
+List<DemographicSearchResult> doSearch(DemographicDao demographicDao,LoggedInInfo loggedInInfo, String searchMode, String ptstatus, String keyword, int limit, int offset, String orderBy, String providerNo, boolean outOfDomain) {
+	List<DemographicSearchResult> demoList = null;
 
-	if( "".equals(ptstatus) ) {
-		if(searchMode.equals("search_name")) {
-			demoList = demographicDao.searchDemographicByName(keyword, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_phone")) {
-			demoList = demographicDao.searchDemographicByPhone(keyword, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_dob")) {
-			demoList = demographicDao.searchDemographicByDOB(keyword, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_address")) {
-			demoList = demographicDao.searchDemographicByAddress(keyword, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_hin")) {
-			demoList = demographicDao.searchDemographicByHIN(keyword, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_chart_no")) {
-			demoList = demographicDao.findDemographicByChartNo(keyword, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_demographic_no")) {
-			demoList = demographicDao.findDemographicByDemographicNo(keyword, limit, offset,providerNo,outOfDomain);
-		}
-	}
-	else if( "active".equals(ptstatus) ) {
-	    if(searchMode.equals("search_name")) {
-			demoList = demographicDao.searchDemographicByNameAndNotStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-	    else if(searchMode.equals("search_phone")) {
-			demoList = demographicDao.searchDemographicByPhoneAndNotStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_dob")) {
-			demoList = demographicDao.searchDemographicByDOBAndNotStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_address")) {
-			demoList = demographicDao.searchDemographicByAddressAndNotStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_hin")) {
-			demoList = demographicDao.searchDemographicByHINAndNotStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_chart_no")) {
-			demoList = demographicDao.findDemographicByChartNoAndNotStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_demographic_no")) {
-			demoList = demographicDao.findDemographicByDemographicNoAndNotStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-	}
-	else if( "inactive".equals(ptstatus) ) {
-	    if(searchMode.equals("search_name")) {
-			demoList = demographicDao.searchDemographicByNameAndStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-	    else if(searchMode.equals("search_phone")) {
-			demoList = demographicDao.searchDemographicByPhoneAndStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_dob")) {
-			demoList = demographicDao.searchDemographicByDOBAndStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_address")) {
-			demoList = demographicDao.searchDemographicByAddressAndStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_hin")) {
-			demoList = demographicDao.searchDemographicByHINAndStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_chart_no")) {
-			demoList = demographicDao.findDemographicByChartNoAndStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
-		else if(searchMode.equals("search_demographic_no")) {
-			demoList = demographicDao.findDemographicByDemographicNoAndStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
-		}
+	DemographicSearchRequest req = new DemographicSearchRequest();
+
+	req.setActive("active".equals(ptstatus));
+	req.setOutOfDomain(outOfDomain);
+	req.setKeyword(keyword);
+
+	// Set Search Mode
+	if ("search_name".equals(searchMode))
+	{
+		req.setMode(SEARCHMODE.Name);
+	} else if ("search_phone".equals(searchMode))
+	{
+		req.setMode(SEARCHMODE.Phone);
+	} else if ("search_dob".equals(searchMode))
+	{
+		req.setMode(SEARCHMODE.DOB);
+	} else if ("search_address".equals(searchMode))
+	{
+		req.setMode(SEARCHMODE.Address);
+	} else if ("search_hin".equals(searchMode))
+	{
+		req.setMode(SEARCHMODE.HIN);
+	} else if ("search_chart_no".equals(searchMode))
+	{
+		req.setMode(SEARCHMODE.ChartNo);
+	} else if ("search_demographic_no".equals(searchMode))
+	{
+		req.setMode(SEARCHMODE.DemographicNo);
 	}
 
-	
+	// Set Order By
+	if ("demographic_no".equals(orderBy))
+	{
+		req.setSortMode(SORTMODE.DemographicNo);
+	} else if ("last_name".equals(orderBy))
+	{
+		req.setSortMode(SORTMODE.Name);
+	} else if ("chart_no".equals(orderBy))
+	{
+		req.setSortMode(SORTMODE.ChartNo);
+	} else if ("dob".equals(orderBy))
+	{
+		req.setSortMode(SORTMODE.DOB);
+	} else if ("sex".equals(orderBy))
+	{
+		req.setSortMode(SORTMODE.Sex);
+	} else if ("patient_status".equals(orderBy))
+	{
+		req.setSortMode(SORTMODE.PS);
+	} else if ("roster_status".equals(orderBy))
+	{
+		req.setSortMode(SORTMODE.RS);
+	} else if ("phone".equals(orderBy))
+	{
+		req.setSortMode(SORTMODE.Phone);
+	} else if ("provider_name".equals(orderBy))
+	{
+		req.setSortMode(SORTMODE.ProviderName);
+	}
+
+	demoList = demographicDao.searchPatients(loggedInInfo, req, offset, limit);
 	return demoList;
 }
 %>
