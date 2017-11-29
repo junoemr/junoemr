@@ -58,9 +58,9 @@ public class PDFFile extends GenericFile
 		return this.isValid;
 	}
 	@Override
-	public void onFailedValidation() throws IOException, InterruptedException
+	public void reEncode() throws IOException, InterruptedException
 	{
-		javaFile = ghostscriptReencode();
+		javaFile = ghostscriptReEncode();
 	}
 	/**
 	 * Counts the number of pages in a local pdf file.
@@ -117,7 +117,7 @@ public class PDFFile extends GenericFile
 		return isValid;
 	}
 
-	private File ghostscriptReencode() throws IOException,InterruptedException
+	private File ghostscriptReEncode() throws IOException,InterruptedException
 	{
 		logger.info("BEGIN PDF RE-ENCODING");
 

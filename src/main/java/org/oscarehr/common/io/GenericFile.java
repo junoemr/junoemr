@@ -24,6 +24,7 @@
 
 package org.oscarehr.common.io;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
@@ -34,11 +35,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Set;
 
 public class GenericFile
 {
 	protected static final Logger logger = MiscUtils.getLogger();
 	protected static final OscarProperties props = oscar.OscarProperties.getInstance();
+
+	private static final Set<String> ALLOWED_CONTENT_TYPE = Sets.newHashSet(
+			"application/pdf",
+			"application/image",
+			"application/doc");
+
 
 	public static final String BASE_DIRECTORY = props.getProperty("BASE_DOCUMENT_DIR");
 
@@ -116,9 +124,9 @@ public class GenericFile
 		this.isValid = true;
 		return true;
 	}
-	public void onFailedValidation() throws IOException, InterruptedException
+	public void reEncode() throws IOException, InterruptedException
 	{
-		throw new RuntimeException("Validation Failure");
+		throw new RuntimeException("Not Implemented");
 	}
 	public boolean isValid()
 	{
@@ -174,5 +182,9 @@ public class GenericFile
 	public static String getContentType(File f) throws IOException
 	{
 		return Files.probeContentType(f.toPath());
+	}
+	public static Set<String> getAllowedContent()
+	{
+		return ALLOWED_CONTENT_TYPE;
 	}
 }

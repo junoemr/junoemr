@@ -156,7 +156,7 @@ public class DocumentUploadAction extends DispatchAction
 
 		if(!file.validate())
 		{
-			file.onFailedValidation();
+			file.reEncode();
 		}
 		file.moveToDocuments();
 
