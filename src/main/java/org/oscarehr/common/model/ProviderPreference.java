@@ -47,7 +47,7 @@ import oscar.OscarProperties;
 public class ProviderPreference extends AbstractModel<String> implements Serializable {
 
 	@Embeddable
-	public static class QuickLink
+	public static class QuickLink implements Serializable
 	{
 		private String name;
 		private String url;
