@@ -64,6 +64,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTMODE;
+import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.STATUSMODE;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -2144,12 +2145,14 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		}
 		
 		String ptstatusexp="";
-		   
-		if(searchRequest.isActive()) {	
-			ptstatusexp=" and d.patient_status not in ("+props.getProperty("inactive_statuses", "'IN','DE','IC', 'ID', 'MO', 'FI'")+") ";
-		  }else {
-			  ptstatusexp=" and d.patient_status in ("+props.getProperty("inactive_statuses", "'IN','DE','IC', 'ID', 'MO', 'FI'")+") ";
-		  }
+
+		if (STATUSMODE.active.equals(searchRequest.getStatusMode()))
+		{
+			ptstatusexp = " and d.patient_status not in (" + props.getProperty("inactive_statuses", "'IN','DE','IC', 'ID', 'MO', 'FI'") + ") ";
+		} else if (STATUSMODE.inactive.equals(searchRequest.getStatusMode()))
+		{
+			ptstatusexp = " and d.patient_status in (" + props.getProperty("inactive_statuses", "'IN','DE','IC', 'ID', 'MO', 'FI'") + ") ";
+		}
 		 
 		  String domainRestriction="";
 		  if(!searchRequest.isOutOfDomain()) {

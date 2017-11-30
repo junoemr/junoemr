@@ -182,7 +182,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			controller.search = {
 				type: searchType,
 				term: '',
-				active: true,
+				status: "all",
 				integrator: false,
 				outofdomain: true
 			};
@@ -200,7 +200,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 
 		controller.toggleParam = function toggleParam(param)
 		{
-			if (['active', 'integrator', 'outofdomain'].indexOf(param) > -1)
+			if (['integrator', 'outofdomain'].indexOf(param) > -1)
 			{
 				controller.search[param] = !controller.search[param];
 			}

@@ -50,6 +50,7 @@
 <%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest"%>
 <%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE"%>
 <%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTMODE"%>
+<%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest.STATUSMODE"%>
 <%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchResult"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore"%>
 <%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
@@ -492,9 +493,20 @@ List<DemographicSearchResult> doSearch(DemographicDao demographicDao,LoggedInInf
 
 	DemographicSearchRequest req = new DemographicSearchRequest();
 
-	req.setActive("active".equals(ptstatus));
 	req.setOutOfDomain(outOfDomain);
 	req.setKeyword(keyword);
+
+	// Set Status Mode
+	if (("").equals(ptstatus))
+	{
+		req.setStatusMode(STATUSMODE.all);
+	} else if (("active").equals(ptstatus))
+	{
+		req.setStatusMode(STATUSMODE.active);
+	} else if (("inactive").equals(ptstatus))
+	{
+		req.setStatusMode(STATUSMODE.inactive);
+	}
 
 	// Set Search Mode
 	if ("search_name".equals(searchMode))
