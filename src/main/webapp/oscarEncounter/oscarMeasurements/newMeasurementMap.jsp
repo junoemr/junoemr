@@ -81,6 +81,13 @@
 
                     var codeArray = new Array();
                     codeArray = code.split('-');
+
+                    //Validate the format of the Lonic code before validating that it's a correct code
+					if(codeArray.length != 2 || codeArray[0].length < 2 || codeArray[1].length > 1) {
+						alert("Invalid lonic code format, please start the code with an 'X' if you would like to make your own.");
+						return false;
+					}
+
                     var length = codeArray[0].length;
                     var sum = 0;
 					var codeIntArray = new Array();
