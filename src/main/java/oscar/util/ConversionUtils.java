@@ -23,8 +23,17 @@
  */
 package oscar.util;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +42,8 @@ import java.util.List;
  * Yet another conversion utility class for bridging JPA entity to legacy schema mismatch. 
  */
 public class ConversionUtils {
+
+	private static final Logger logger = MiscUtils.getLogger();
 
 	public static final String DATE_PATTERN_YEAR = "yyyy";
 	public static final String DATE_PATTERN_MONTH = "MM";
@@ -306,6 +317,48 @@ public class ConversionUtils {
 	 */
 	public static int toDays(long timestamp) {
 		return (int) (timestamp / MS_IN_DAY);
+	}
+
+
+	public static Date coalesceTimeStampString(String dateString)
+	{
+		return coalesceTimeStampString(dateString, DEFAULT_TS_PATTERN);
+	}
+	public static Date coalesceTimeStampString(String plain, String inFormat)
+	{
+		Date returnDate = null;
+
+		if(plain == null || plain.trim().isEmpty())
+		{
+			logger.warn("Cannot Coalesce a null/empty date string");
+			return returnDate;
+		}
+
+		if(inFormat.length() > plain.length())
+			inFormat = inFormat.substring(0, plain.length());
+
+		try
+		{
+			DateTimeFormatter inFormatter = DateTimeFormatter.ofPattern(inFormat);
+
+			// use format builder to set default missing time values
+			DateTimeFormatter customFormatter = new DateTimeFormatterBuilder().append(inFormatter)
+					.parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+					.parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+					.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+					.toFormatter();
+
+			LocalDateTime parsedDate = LocalDateTime.parse(plain, customFormatter);
+
+			returnDate = Date.from(parsedDate.toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+			logger.debug("Coalesce " + plain + " to " + parsedDate.format(inFormatter));
+		}
+		catch(DateTimeException e)
+		{
+			logger.error("Date parse Exception", e);
+		}
+		return returnDate;
 	}
 
 }
