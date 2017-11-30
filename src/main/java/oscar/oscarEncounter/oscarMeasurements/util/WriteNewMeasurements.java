@@ -25,11 +25,6 @@
 
 package oscar.oscarEncounter.oscarMeasurements.util;
 //used by eforms for writing measurements
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
 
 import org.apache.commons.validator.GenericValidator;
 import org.apache.struts.action.ActionMessage;
@@ -41,10 +36,15 @@ import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.MeasurementType;
 import org.oscarehr.common.model.Validations;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarEncounter.oscarMeasurements.pageUtil.EctValidation;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
 
 public class WriteNewMeasurements {
 	
@@ -253,7 +253,7 @@ public class WriteNewMeasurements {
             m.setDataField(inputValue);
             m.setMeasuringInstruction(mInstrc);
             m.setComments(comments);
-            m.setDateObserved(ConversionUtils.fromTimestampString(dateObserved));
+            m.setDateObserved(ConversionUtils.coalesceTimeStampString(dateObserved));
             dao.persist(m);
            
         }
