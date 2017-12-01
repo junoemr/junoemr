@@ -155,20 +155,32 @@ public final class LoginCheckLogin {
 		while (loginList == null) {
 			loginList = LoginList.getLoginListInstance();
 		}
-		// unlock the entry in the login list
 		boolean unlocked = loginList.containsKey(key);
 		loginList.remove(key);
 		return unlocked;
 	}
 
 	/**
-	 * @return a list of all login instances
+	 * @return a list of all locked login instances
 	 */
 	public ArrayList<String> findLockList() {
+		LoginInfoBean loginInfoBean;
 
 		while (loginList == null) {
 			loginList = LoginList.getLoginListInstance();
 		}
-		return new ArrayList<String>(loginList.keySet());
+
+		ArrayList<String> lockedList = new ArrayList<String>();
+
+		//Look through the list of failed and locked users to just find the locked ones
+		for(String key: loginList.keySet()) {
+			loginInfoBean = loginList.get(key);
+
+			if(loginInfoBean.isLockedStatus()) {
+				lockedList.add(key);
+			}
+		}
+
+		return lockedList;
 	}
 }
