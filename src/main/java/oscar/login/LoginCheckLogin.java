@@ -155,6 +155,7 @@ public final class LoginCheckLogin {
 		while (loginList == null) {
 			loginList = LoginList.getLoginListInstance();
 		}
+		// unlock the entry in the login list
 		boolean unlocked = loginList.containsKey(key);
 		loginList.remove(key);
 		return unlocked;
