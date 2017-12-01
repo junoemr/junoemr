@@ -122,7 +122,7 @@ if(!authed) {
 		<td>&nbsp;</td>
 	</tr>
 	<tr bgcolor="#EEEEFF">
-		<td align="right"><b>Role name</b></td>
+		<td align="right"><b>User Name</b></td>
 		<td><select name="userName">
 			<% for(String lock : lockList) { %>
 			<option value="<%=lock%>"><%=lock%></option>
