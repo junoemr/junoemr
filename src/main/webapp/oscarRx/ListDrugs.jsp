@@ -433,7 +433,7 @@ String getName(Drug prescriptDrug){
             sb.append("expireInReference ");
         }
 
-        if ((drug.isCurrent() && !drug.isArchived()) || drug.isLongTerm()) {
+        if ((drug.isCurrent() && !drug.isArchived())) {
             sb.append("currentDrug ");
         }
 
@@ -441,7 +441,7 @@ String getName(Drug prescriptDrug){
             sb.append("archivedDrug ");
         }
 
-        if(!drug.isLongTerm() && !drug.isCurrent()) {
+        if(!drug.isCurrent()) {
             sb.append("expiredDrug ");
         }
 
