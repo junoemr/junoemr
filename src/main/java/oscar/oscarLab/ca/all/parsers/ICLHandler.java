@@ -44,6 +44,7 @@ public class ICLHandler extends DefaultGenericHandler {
         Parser p = new PipeParser();
         p.setValidationContext(new NoValidation());
         msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ));
+        this.terser = new Terser(msg);
     }
 
     public String getMsgType(){

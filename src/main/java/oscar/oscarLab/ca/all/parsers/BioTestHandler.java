@@ -108,6 +108,8 @@ public class BioTestHandler extends MessageHandler
 
             }
         }
+        this.message = msg;
+        this.terser = new Terser(msg);
     }
 
     @Override

@@ -72,6 +72,9 @@ public class CDLHandler extends MessageHandler
 		pat_23 = pat_res.getPATIENT();
 		obrseg = obsr.getOBR();
 		obxseg = obsr.getOBSERVATION().getOBX();
+
+		this.message = msg;
+		this.terser = new Terser(msg);
     }
 
     @Override

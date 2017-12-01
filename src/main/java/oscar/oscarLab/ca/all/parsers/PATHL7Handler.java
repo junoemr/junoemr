@@ -73,6 +73,8 @@ public class PATHL7Handler extends MessageHandler
         Parser p = new PipeParser();
         p.setValidationContext(new NoValidation());
         msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ).replace("\\.Zt\\", "\t"));
+        this.message = msg;
+        this.terser = new Terser(msg);
     }
 
     @Override

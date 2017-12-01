@@ -95,8 +95,9 @@ public class TRUENORTHHandler extends MessageHandler
 			if (!headers.contains(header)) {
 				headers.add(header);
 			}
-		}     
-
+		}
+        this.message = msg;
+        this.terser = new Terser(msg);
     }
 
     @Override

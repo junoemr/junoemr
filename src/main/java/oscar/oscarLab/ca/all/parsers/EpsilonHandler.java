@@ -157,6 +157,14 @@ public class EpsilonHandler  extends CMLHandler {
 			return ("");
 		}
 	}
+	/**
+	 *  Return the patients date of birth
+	 *  same as the message handler super class but not the parent super class
+	 */
+	public String getDOB()
+	{
+		return formatDate(getString(get("/.PID-7")));
+	}
 
 	String delimiter = "  ";
 	char bl = ' ';

@@ -41,6 +41,8 @@ import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.UtilDateUtilities;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -533,6 +535,21 @@ public class MDSHandler extends MessageHandler
             return("");
         }
     }
+    @SuppressWarnings("Duplicates")
+	public String getAge(){
+		String age = "N/A";
+		String dob = getDOB();
+		try {
+			// Some examples
+			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date date = formatter.parse(dob);
+			age = UtilDateUtilities.calcAge(date);
+		} catch (ParseException e) {
+			logger.error("Could not get age", e);
+
+		}
+		return age;
+	}
 
     public String getSex(){
         try{

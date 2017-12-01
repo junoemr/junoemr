@@ -87,7 +87,8 @@ public class MEDVUEHandler extends MessageHandler
 			}*/
 				
 		} //end lab iteration
-
+		this.message = msg;
+		this.terser = new Terser(msg);
 	}
 
 	@Override
