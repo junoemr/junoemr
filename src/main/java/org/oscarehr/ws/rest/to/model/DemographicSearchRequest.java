@@ -69,7 +69,7 @@ public class DemographicSearchRequest {
 	}
 
 	public void setKeyword(String keyword) {
-		this.keyword = keyword;
+		this.keyword = keyword.trim();
 	}
 
 	public boolean isIntegrator() {
