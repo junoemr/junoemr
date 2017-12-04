@@ -95,11 +95,9 @@ public class PDFFile extends GenericFile
 		BufferedReader in = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 		String line;
 
-		logger.info("validator error output:");
-
 		while((line = in.readLine()) != null)
 		{
-			logger.info(line);
+			logger.warn("validator error line: " + line);
 			// if error is allowed and flag not already set to fail
 			isValid = (isValid && allowedErrors.contains(line.toLowerCase()));
 			this.reasonInvalid = (this.reasonInvalid == null)? line : this.reasonInvalid + ", " + line;
@@ -153,7 +151,7 @@ public class PDFFile extends GenericFile
 		String reasonInvalid = null;
 		while((line = in.readLine()) != null)
 		{
-			logger.error(line);
+			logger.warn(line);
 			reasonInvalid = (reasonInvalid == null)? line : reasonInvalid + ", " + line;
 		}
 		process.waitFor();

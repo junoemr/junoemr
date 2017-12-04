@@ -27,7 +27,6 @@ package oscar.dms.actions;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -43,6 +42,8 @@ import org.oscarehr.common.dao.DocumentStorageDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.DocumentStorage;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.SecRole;
@@ -69,9 +70,6 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -91,12 +89,23 @@ public class AddEditDocumentAction extends DispatchAction {
 		}
 		
 		FormFile docFile = fm.getFiledata();
-		int numberOfPages = 0;
 		String fileName = docFile.getFileName();
 		String user = (String) request.getSession().getAttribute("user");
-		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A', oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1", 0);
+
+		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
+		if(!file.validate())
+		{
+			file.reEncode();
+		}
+		file.moveToDocuments();
+
+		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A',
+				oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1",
+				file.getPageCount());
 		newDoc.setDocPublic("0");
 		newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
+		newDoc.setContentType(file.getContentType());
+		newDoc.setFileName(file.getName());
 		
         // if the document was added in the context of a program
 		ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
@@ -113,24 +122,8 @@ public class AddEditDocumentAction extends DispatchAction {
 			response.setHeader("oscar_error",props.getString("dms.addDocument.errorZeroSize") );
 			response.sendError(500,props.getString("dms.addDocument.errorZeroSize") );
 			return null;
-			//throw new FileNotFoundException();
-		}
-		File file = writeLocalFile(docFile, fileName);// write file to local dir
-
-		if(!file.exists() || file.length() < docFile.getFileSize()) {
-			response.setHeader("oscar_error",props.getString("dms.addDocument.errorNoWrite") );
-			response.sendError(500,props.getString("dms.addDocument.errorNoWrite") );
-			return null;
 		}
 
-		newDoc.setContentType(docFile.getContentType());
-		if (fileName.endsWith(".PDF") || fileName.endsWith(".pdf")) {
-
-			newDoc.setContentType("application/pdf");
-			// get number of pages when document is pdf;
-			numberOfPages = countNumOfPages(fileName);
-		}
-		newDoc.setNumberOfPages(numberOfPages);
 		String doc_no = EDocUtil.addDocumentSQL(newDoc);
 		LogAction.addLogEntry(user, null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr(), fileName);
 		String providerId = request.getParameter("provider");
@@ -153,22 +146,6 @@ public class AddEditDocumentAction extends DispatchAction {
 		}
 		
 		return null;
-
-	}
-
-	/** count number of pages in a local pdf file */
-	public static int countNumOfPages(String fileName) {
-		int numOfPage = 0;
-		String documentDir = oscar.OscarProperties.getInstance().getProperty("");
-
-		try {
-			PDDocument doc = PDDocument.load(new File(documentDir, fileName));
-			numOfPage = doc.getNumberOfPages();
-		}
-		catch (IOException e) {
-			MiscUtils.getLogger().error("Error", e);
-		}
-		return numOfPage;
 	}
 
 	public ActionForward fastUpload(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -177,14 +154,25 @@ public class AddEditDocumentAction extends DispatchAction {
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
 			throw new SecurityException("missing required security object (_edoc)");
 		}
-		
-		HashMap<String, String> errors = new HashMap<String, String>();
 		FormFile docFile = fm.getDocFile();
 		String fileName = docFile.getFileName();
+		HashMap<String, String> errors = new HashMap<String, String>();
 		String user = (String) request.getSession().getAttribute("user");
-		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A', oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1");
+
+		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
+
+		if(!file.validate())
+		{
+			file.reEncode();
+		}
+		file.moveToDocuments();
+
+		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A',
+				oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1");
 		newDoc.setDocPublic("0");
 		newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
+		newDoc.setContentType(file.getContentType());
+		newDoc.setNumberOfPages(file.getPageCount());
 		
         // if the document was added in the context of a program
 		ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
@@ -194,20 +182,11 @@ public class AddEditDocumentAction extends DispatchAction {
 			newDoc.setProgramId(pp.getProgramId().intValue());
 		}
 		
-		fileName = newDoc.getFileName();
 		// save local file;
 		if (docFile.getFileSize() == 0) {
 			errors.put("uploaderror", "dms.error.uploadError");
 			throw new FileNotFoundException();
 		}
-		writeLocalFile(docFile, fileName);
-		newDoc.setContentType(docFile.getContentType());
-                if (fileName.toLowerCase().endsWith(".pdf")) {
-
-                    newDoc.setContentType("application/pdf");
-                    int numberOfPages = countNumOfPages(fileName);
-                    newDoc.setNumberOfPages(numberOfPages);                        
-                }
 
 		EDocUtil.addDocumentSQL(newDoc);
 
@@ -293,25 +272,23 @@ public class AddEditDocumentAction extends DispatchAction {
 			if(documentValid) {
 				// original file name
 				String fileName1 = docFile.getFileName();
-	
+
+				GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName1);
+
+				if(!file.validate())
+				{
+					file.reEncode();
+				}
+				file.moveToDocuments();
+
 				EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName1, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), "", "", fm.getFunction(), fm.getFunctionId());
 				newDoc.setDocPublic(fm.getDocPublic());
-				newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
-	                        newDoc.setDocClass(fm.getDocClass());
-	                        newDoc.setDocSubClass(fm.getDocSubClass());
-				// new file name with date attached
-				String fileName2 = newDoc.getFileName();
-				// save local file
-				File file = writeLocalFile(docFile, fileName2);
-				newDoc.setContentType(docFile.getContentType());
-				int numberOfPages = 0;
-				if (fileName2.toLowerCase().endsWith(".pdf")) {
+				newDoc.setDocClass(fm.getDocClass());
+				newDoc.setDocSubClass(fm.getDocSubClass());
+				newDoc.setContentType(file.getContentType());
+				newDoc.setNumberOfPages(file.getPageCount());
+				newDoc.setFileName(file.getName());
 
-					newDoc.setContentType("application/pdf");
-					// get number of pages when document is pdf;
-					numberOfPages = countNumOfPages(fileName2);
-				}
-				newDoc.setNumberOfPages(numberOfPages);
 				MiscUtils.getLogger().info("Content Type:" + newDoc.getContentType());
 
 				// if the document was added in the context of a program
@@ -336,7 +313,7 @@ public class AddEditDocumentAction extends DispatchAction {
 	
 				String doc_no = EDocUtil.addDocumentSQL(newDoc);
 				if(ConformanceTestHelper.enableConformanceOnlyTestFeatures){
-					storeDocumentInDatabase(file, Integer.parseInt(doc_no));
+					storeDocumentInDatabase(file.getFileObject(), Integer.parseInt(doc_no));
 				}
 				// add note if document is added under a patient
 				String module = fm.getFunction().trim();
@@ -439,53 +416,67 @@ public class AddEditDocumentAction extends DispatchAction {
 			}
 			if(documentValid) {
 				FormFile docFile = fm.getDocFile();
+				Integer demographicNo = "demographic".equals(fm.getFunction()) ? Integer.parseInt(fm.getFunctionId()) : null;
+				String providerNo = (String) request.getSession().getAttribute("user");
 				String fileName = "";
-				if(oscar.OscarProperties.getInstance().isPropertyActive("ALLOW_UPDATE_DOCUMENT_CONTENT")) {
-					fileName = docFile.getFileName();
+
+				GenericFile file = null;
+
+				// only create a new file when a stream is sent
+				if(docFile.getFileSize() != 0 && docFile.getFileName().length() != 0)
+				{
+					file = FileFactory.getDocumentFile(docFile.getFileName(), demographicNo);
+					if(oscar.OscarProperties.getInstance().isPropertyActive("ALLOW_UPDATE_DOCUMENT_CONTENT"))
+					{
+						file = FileFactory.overwriteFileContents(file, docFile.getInputStream());
+					}
+					else
+					{
+						file = FileFactory.createDocumentFile(docFile.getInputStream(), docFile.getFileName());
+					}
+					if(!file.validate())
+					{
+						file.reEncode();
+					}
+					file.moveToDocuments(demographicNo);
+					fileName = file.getName();
 				}
+
+				// set up reviewer info
 				String reviewerId = filled(fm.getReviewerId()) ? fm.getReviewerId() : "";
 				String reviewDateTime = filled(fm.getReviewDateTime()) ? fm.getReviewDateTime() : "";
-				Integer demographicNo = "demographic".equals(fm.getFunction()) ? Integer.parseInt(fm.getFunctionId()) : null;
-	
+
 				if (!filled(reviewerId) && fm.getReviewDoc()) {
-					reviewerId = (String) request.getSession().getAttribute("user");
+					reviewerId = providerNo;
 					reviewDateTime = UtilDateUtilities.DateToString(new Date(), EDocUtil.REVIEW_DATETIME_FORMAT);
 
 					LogAction.addLogEntry(reviewerId, demographicNo, LogConst.ACTION_REVIEWED, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
 							fm.getMode(), request.getRemoteAddr(), fileName);
 				}
-				EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), reviewerId, reviewDateTime, fm.getFunction(), fm.getFunctionId());
+				EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A',
+						fm.getObservationDate(), reviewerId, reviewDateTime, fm.getFunction(), fm.getFunctionId());
+
 				newDoc.setSourceFacility(fm.getSourceFacility());
 				newDoc.setDocId(fm.getMode());
 				newDoc.setDocPublic(fm.getDocPublic());
 				newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
 				newDoc.setDocClass(fm.getDocClass());
 				newDoc.setDocSubClass(fm.getDocSubClass());
+				newDoc.setFileName(fileName);
+
+				if(file != null)
+				{
+					newDoc.setContentType(file.getContentType());
+					newDoc.setNumberOfPages(file.getPageCount());
+				}
+
 				String programIdStr = (String) request.getSession().getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
 				if (programIdStr != null) {
 					newDoc.setProgramId(Integer.valueOf(programIdStr));
 				}
-				fileName = newDoc.getFileName();
-				if (docFile.getFileSize() != 0 && fileName.length() != 0) {
-					// save local file
-					writeLocalFile(docFile, fileName);
-					newDoc.setContentType(docFile.getContentType());
-					if (fileName.toLowerCase().endsWith(".pdf")) {
-						newDoc.setContentType("application/pdf");
-						int numberOfPages = countNumOfPages(fileName);
-						newDoc.setNumberOfPages(numberOfPages);
-					}
-					// ---
-				} else if (docFile.getFileName().length() != 0) {
-					errors.put("uploaderror", "dms.error.uploadError");
-					throw new FileNotFoundException();
-				}
-				if(fm.getReviewDoc()) {
-					newDoc.setReviewDateTime(UtilDateUtilities.DateToString(new Date(), EDocUtil.REVIEW_DATETIME_FORMAT));
-				}
 				EDocUtil.editDocumentSQL(newDoc, fm.getReviewDoc());
 	
-				LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+				LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
 						fm.getMode(), request.getRemoteAddr(), fileName);
 			}
 		} 
@@ -501,38 +492,6 @@ public class AddEditDocumentAction extends DispatchAction {
 			return mapping.findForward("failEdit");
 		}
 		return mapping.findForward("successEdit");
-	}
-
-	private File writeLocalFile(FormFile docFile, String fileName) throws Exception {
-		InputStream fis = null;
-		File file= null;
-		try {
-			fis = docFile.getInputStream();
-			file =writeLocalFile(fis, fileName);
-		} finally {
-			if (fis != null) fis.close();
-		}
-		return file;
-	}
-
-	public static File writeLocalFile(InputStream is, String fileName) throws Exception {
-		FileOutputStream fos = null;
-		File file = null;
-		try {
-			String savePath = oscar.OscarProperties.getInstance().getProperty("") + "/" + fileName;
-			file = new File (savePath);
-			fos = new FileOutputStream(savePath);
-			byte[] buf = new byte[128 * 1024];
-			int i = 0;
-			while ((i = is.read(buf)) != -1) {
-				fos.write(buf, 0, i);
-			}
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("Error", e);
-		} finally {
-			if (fos != null) fos.close();
-		}
-		return file;
 	}
 
 	public static int storeDocumentInDatabase(File file, Integer documentNo){

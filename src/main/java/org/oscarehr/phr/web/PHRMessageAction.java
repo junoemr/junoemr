@@ -24,20 +24,6 @@
 
 package org.oscarehr.phr.web;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Hashtable;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -49,6 +35,8 @@ import org.apache.struts.upload.FormFile;
 import org.apache.struts.upload.MultipartRequestHandler;
 import org.oscarehr.PMmodule.caisi_integrator.ConformanceTestHelper;
 import org.oscarehr.common.dao.DemographicDao;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.myoscar.client.ws_manager.AccountManager;
@@ -72,7 +60,6 @@ import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WebUtils;
 import org.oscarehr.util.XmlUtils;
 import org.w3c.dom.Document;
-
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.dms.actions.AddEditDocumentAction;
@@ -81,6 +68,18 @@ import oscar.log.LogConst;
 import oscar.oscarDemographic.data.DemographicData;
 import oscar.oscarProvider.data.ProviderData;
 import oscar.util.UtilDateUtilities;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Hashtable;
+import java.util.List;
 
 public class PHRMessageAction extends DispatchAction {
 
@@ -390,26 +389,27 @@ public class PHRMessageAction extends DispatchAction {
 
 		String date = DateUtils.getIsoDate(messageSentDate);
 		date = date.replaceAll("-", "/");
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
 
-		EDoc newDoc = new EDoc(description, "others", filename, "", loggedInInfo.getLoggedInProviderNo(), "", "", 'A', date, "", "", "demographic", demographicNo.toString());
-
-		// new file name with date attached
-		String fileName2 = newDoc.getFileName();
-
-		// save local file
-		ByteArrayInputStream bais = new ByteArrayInputStream(fileBytes);
-		File file = AddEditDocumentAction.writeLocalFile(bais, fileName2);
-
-		newDoc.setContentType(mimeType);
-		if ("application/pdf".equals(mimeType)) {
-			int numberOfPages = AddEditDocumentAction.countNumOfPages(fileName2);
-			newDoc.setNumberOfPages(numberOfPages);
+		GenericFile file = FileFactory.createDocumentFile(new ByteArrayInputStream(fileBytes), filename);
+		if(!file.validate())
+		{
+			file.reEncode();
 		}
+		file.moveToDocuments(demographicNo);
+
+		EDoc newDoc = new EDoc(description, "others", file.getName(), "", providerNo,
+				"", "", 'A', date, "", "", "demographic", demographicNo.toString());
+
+		newDoc.setContentType(file.getContentType());
+		newDoc.setNumberOfPages(file.getPageCount());
+		newDoc.setFileName(file.getName());
 
 		String doc_no = EDocUtil.addDocumentSQL(newDoc);
 		if (ConformanceTestHelper.enableConformanceOnlyTestFeatures) {
-			AddEditDocumentAction.storeDocumentInDatabase(file, Integer.parseInt(doc_no));
+			AddEditDocumentAction.storeDocumentInDatabase(file.getFileObject(), Integer.parseInt(doc_no));
 		}
-		LogAction.addLog(loggedInInfo.getLoggedInProviderNo(), LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, doc_no);
+		LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+				doc_no, loggedInInfo.getIp(), file.getName());
 	}
 }

@@ -24,12 +24,19 @@
 
 package org.oscarehr.common.io;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class FileFactory
 {
@@ -41,9 +48,9 @@ public class FileFactory
 	 * @param fileName - name of the file to be saved and opened
 	 * @return - the file, or null if no file exists with the given filename
 	 */
-	public static GenericFile getNewDocumentFile(InputStream fileInputStream, String fileName) throws IOException
+	public static GenericFile createDocumentFile(InputStream fileInputStream, String fileName) throws IOException
 	{
-		return getNewFile(fileInputStream, fileName, GenericFile.DOCUMENT_BASE);
+		return createNewFile(fileInputStream, fileName, GenericFile.DOCUMENT_BASE);
 	}
 
 	/**
@@ -51,9 +58,9 @@ public class FileFactory
 	 * @param fileName - name of the file to load
 	 * @return - the file, or null if no file exists with the given filename
 	 */
-	public static GenericFile getExistingDocumentFile(String fileName)
+	public static GenericFile getDocumentFile(String fileName) throws IOException
 	{
-		return getExistingFile(fileName, GenericFile.DOCUMENT_BASE);
+		return getExistingFile(GenericFile.DOCUMENT_BASE, fileName);
 	}
 
 	/**
@@ -63,35 +70,65 @@ public class FileFactory
 	 * @param demographicNo - the demographic that the document is linked to.
 	 * @return - the file, or null if no file exists with the given filename
 	 */
-	public static GenericFile getExistingDocumentFile(String fileName, String demographicNo)
+	public static GenericFile getDocumentFile(String fileName, String demographicNo) throws IOException
 	{
-		File demoDir = new File(GenericFile.DOCUMENT_BASE, demographicNo);
 		GenericFile returnFile = null;
-
-		if(demoDir.exists() && demoDir.isDirectory())
+		if(demographicNo != null)
 		{
-			returnFile = getExistingFile(fileName, demoDir.getPath());
+			File demoDir = new File(GenericFile.DOCUMENT_BASE, demographicNo);
+
+			if(demoDir.exists() && demoDir.isDirectory())
+			{
+				returnFile = getExistingFile(demoDir.getPath(), fileName);
+			}
 		}
+
 		if(returnFile == null)
 		{
-			returnFile = getExistingFile(fileName, GenericFile.DOCUMENT_BASE);
+			returnFile = getDocumentFile(fileName);
 		}
 		return returnFile;
 	}
+	public static GenericFile getDocumentFile(String fileName, Integer demographicNo) throws IOException
+	{
+		String demoNo = (demographicNo != null)? String.valueOf(demographicNo) : null;
+		return getDocumentFile(fileName, demoNo);
+	}
 
+	/**
+	 * Overwrite an existing file with new stream content
+	 * @param oldFile - generic file to overwrite
+	 * @param fileInputStream - stream to save over existing file
+	 * @return the new Generic File
+	 * @throws IOException - if an error occurs
+	 */
+	public static GenericFile overwriteFileContents(GenericFile oldFile, InputStream fileInputStream) throws IOException
+	{
+		File file = oldFile.getFileObject();
+
+		// copy the stream to the file
+		Files.copy(fileInputStream, file.toPath(), StandardCopyOption.ATOMIC_MOVE);
+		// close the stream
+		IOUtils.closeQuietly(fileInputStream);
+
+		return getExistingFile(file);
+	}
 
 	/**
 	 * sanitizes the incoming file name string to a friendly format
 	 * @param originalName - name to be sanitized
 	 * @return - the reformatted name string
 	 */
-	public static String sanitizeFileName(String originalName)
+	public static String getSanitizedFileName(String originalName)
 	{
-		String sanitized = originalName.trim();
-		sanitized = sanitized.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+		return StringUtils.trimToEmpty(originalName).replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+	}
+	public static String getFormattedFileName(String originalName)
+	{
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+		LocalDateTime now = LocalDateTime.now();
 
-		sanitized = System.currentTimeMillis() + "-" + sanitized;
-		return sanitized;
+		return formatter.format(now) + getSanitizedFileName(originalName);
 	}
 
 	/**
@@ -100,9 +137,9 @@ public class FileFactory
 	 * @param fileName - name of the file to be saved and opened
 	 * @return - the file, or null if no file exists with the given filename
 	 */
-	private static GenericFile getNewFile(InputStream fileInputStream, String fileName, String folder) throws IOException
+	private static GenericFile createNewFile(InputStream fileInputStream, String fileName, String folder) throws IOException
 	{
-		String sanitizedFileName = sanitizeFileName(fileName);
+		String sanitizedFileName = getFormattedFileName(fileName);
 
 		File directory = new File(folder);
 		if(!directory.exists())
@@ -115,35 +152,60 @@ public class FileFactory
 		}
 
 		File file = new File(directory.getPath(), sanitizedFileName);
-		String fileContent = GenericFile.getContentType(file);
-		logger.info("FileContent: " + fileContent);
+		// copy the stream to the file
+		Files.copy(fileInputStream, file.toPath());
+		// close the stream
+		IOUtils.closeQuietly(fileInputStream);
 
-		GenericFile genFile;
-		if("application/pdf".equals(fileContent))
-		{
-			genFile = new PDFFile(file);
-		}
-		else
-		{
-			genFile = new GenericFile(file);
-		}
-		genFile.writeFileStream(fileInputStream);
+		GenericFile returnFile = getExistingFile(file);
 
-		return genFile;
+		// for now, only warn with unknown file content types.
+		String contentType = returnFile.getContentType();
+		if(!GenericFile.getAllowedContent().contains(contentType))
+		{
+			//TODO - how to handle unknown content type. must have complete list of allowed types first
+			logger.warn("Unknown file content type: " + contentType);
+		}
+		return returnFile;
 	}
 	/**
 	 * load an existing file with the given name and folder location
 	 * @param fileName - name of the file to load
+	 * @param folder - directory of the file to load
 	 * @return - the file, or null if no file exists with the given filename
 	 */
-	private static GenericFile getExistingFile(String fileName, String folder)
+	private static GenericFile getExistingFile(String folder, String fileName) throws IOException
 	{
-		File file = new File(folder, fileName);
-		GenericFile genFile = null;
+		return getExistingFile(new File(folder, fileName));
+	}
 
+	/**
+	 * load an existing file with the given name and folder location
+	 * @param file - the file to load
+	 * @return - the file as a GenericFile
+	 * @throws FileNotFoundException - if the given file is invalid for use as a GenericFile
+	 */
+	private static GenericFile getExistingFile(File file) throws IOException
+	{
+		logger.debug("Load File: " + file.getPath());
+
+		GenericFile genFile;
 		if(file.exists() && file.isFile())
 		{
-			genFile = new GenericFile(file);
+			String fileContent = GenericFile.getContentType(file);
+			logger.info("FileContent: " + fileContent);
+			if("application/pdf".equals(fileContent))
+			{
+				genFile = new PDFFile(file);
+			}
+			else
+			{
+				genFile = new GenericFile(file);
+			}
+		}
+		else
+		{
+			throw new FileNotFoundException("No Valid File Exists: " + file.getPath());
 		}
 		return genFile;
 	}

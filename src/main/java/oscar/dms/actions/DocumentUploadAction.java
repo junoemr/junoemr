@@ -151,7 +151,7 @@ public class DocumentUploadAction extends DispatchAction
 		map.put("name", docFile.getFileName());
 		map.put("size", docFile.getFileSize());
 
-		GenericFile file = FileFactory.getNewDocumentFile(docFile.getInputStream(), fileName);
+		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
 		docFile.destroy();
 
 		if(!file.validate())
@@ -166,6 +166,7 @@ public class DocumentUploadAction extends DispatchAction
 
 		newDoc.setDocPublic("0");
 		newDoc.setContentType(file.getContentType());
+		newDoc.setFileName(file.getName());
 
 		// if the document was added in the context of a program
 		ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);

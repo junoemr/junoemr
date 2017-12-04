@@ -25,14 +25,12 @@
 package org.oscarehr.common.io;
 
 import com.google.common.collect.Sets;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Set;
@@ -45,8 +43,8 @@ public class GenericFile
 	private static final Set<String> ALLOWED_CONTENT_TYPE = Sets.newHashSet(
 			"application/pdf",
 			"application/image",
-			"application/doc");
-
+			"application/doc",
+			"text/plain");
 
 	public static final String BASE_DIRECTORY = props.getProperty("BASE_DOCUMENT_DIR");
 
@@ -75,13 +73,19 @@ public class GenericFile
 	{
 		return moveFile(DOCUMENT_BASE);
 	}
+	public boolean moveToDocuments(String demographicNo) throws IOException
+	{
+		//TODO move to demographic specific folder
+		return moveFile(DOCUMENT_BASE);
+	}
+	public boolean moveToDocuments(Integer demographicNo) throws IOException
+	{
+		return moveToDocuments(String.valueOf(demographicNo));
+	}
+
 	public boolean moveToCorrupt() throws IOException
 	{
 		return moveFile(DOCUMENT_CORRUPT);
-	}
-	public boolean moveToDemographicDocuments(Integer demographicNo) throws IOException
-	{
-		return moveFile(new File(DOCUMENT_BASE, String.valueOf(demographicNo)));
 	}
 
 	public boolean moveFile(String directory) throws IOException
@@ -106,17 +110,12 @@ public class GenericFile
 
 		if(directoryFile.exists() && directoryFile.isDirectory())
 		{
-			boolean success = javaFile.renameTo(destinationFile);
-			if(!success)
-			{
-				throw new IOException("Failed to move file");
-			}
+			Files.move(javaFile.toPath(), destinationFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
 			javaFile = destinationFile;
 			return true;
 		}
 		throw new IOException("Invalid Directory: " + directoryFile.getPath());
 	}
-
 
 	public boolean validate() throws IOException, InterruptedException
 	{
@@ -142,7 +141,7 @@ public class GenericFile
 	}
 
 	/**
-	 * get the base file object for backwards compatability
+	 * get the base file object for backwards compatibility
 	 * @return java.io File
 	 */
 	public File getFileObject()
@@ -157,22 +156,10 @@ public class GenericFile
 	{
 		return 0;
 	}
-
-
-
-	/**
-	 * write a file input stream to the targetFile
-	 * @param fileInputStream - input stream of the file
-	 * @throws IOException - if file cannot be written
-	 */
-	public void writeFileStream(InputStream fileInputStream) throws IOException
+	public String getName()
 	{
-		// copy the stream to the file
-		Files.copy(fileInputStream, this.javaFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-		// close the stream
-		IOUtils.closeQuietly(fileInputStream);
+		return javaFile.getName();
 	}
-
 	/**
 	 * returns the file content type, or null if it cannot be determined
 	 * @param f - the file to read
