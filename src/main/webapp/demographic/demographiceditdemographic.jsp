@@ -41,6 +41,8 @@
 	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 	CountryCodeDao ccDAO = (CountryCodeDao) ctx.getBean("countryCodeDao");
 	UserPropertyDAO pref = (UserPropertyDAO) ctx.getBean("UserPropertyDAO");
+	DemographicCustomStatusDao demographicCustomStatusDao = (DemographicCustomStatusDao)SpringUtils.getBean("demographicCustomStatusDao");
+
 	List<CountryCode> countryList = ccDAO.getAllCountryCodes();
 
 	DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
@@ -180,6 +182,8 @@
 
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="javax.persistence.NoResultException" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 <html:html locale="true">
 	<head>
 		<title><bean:message
@@ -1068,6 +1072,20 @@ while(field_itr.hasNext()){
 
 								DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
 								Demographic demographic = demographicDao.getDemographic(demographic_no);
+
+								Integer demographicCustomStatusId = demographic.getCustomStatusId();
+								// Get the custom status so we have access to the status value
+								DemographicCustomStatus demographicCustomStatus = null;
+								if(demographicCustomStatusId != null)
+								{
+									try
+									{
+										demographicCustomStatus = demographicCustomStatusDao.getStatusById(demographicCustomStatusId);
+									} catch (NoResultException e) {
+										MiscUtils.getLogger().error("No status found with ID: " + demographicCustomStatusId);
+									}
+
+								}
 
 								String dateString = curYear + "-" + curMonth + "-" + curDay;
 								int age = 0, dob_year = 0, dob_month = 0, dob_date = 0;
@@ -2153,29 +2171,42 @@ while(field_itr.hasNext()){
 																		class="label"><bean:message
 																		key="demographic.demographiceditdemographic.formPatientStatus"/>:</span>
 																	<span class="info">
-							<%
-								String PatStat = demographic.getPatientStatus();
-								String Dead = "DE";
-								String Inactive = "IN";
+																		<%
+																			String PatStat = demographic.getPatientStatus();
+																			String Dead = "DE";
+																			String Inactive = "IN";
 
-								if (PatStat.equals(Dead))
-								{%>
-							<b style="color: #FF0000;"><%=demographic.getPatientStatus()%></b>
-							<%
-							}
-							else if (PatStat.equals(Inactive))
-							{
-							%>
-							<b style="color: #0000FF;"><%=demographic.getPatientStatus()%></b>
-							<%
-							}
-							else
-							{
-							%>
-                                                            <%=demographic.getPatientStatus()%>
-							<%}%>
+																			if (PatStat.equals(Dead))
+																			{%>
+																		<b style="color: #FF0000;"><%=demographic.getPatientStatus()%></b>
+																		<%
+																		}
+																		else if (PatStat.equals(Inactive))
+																		{
+																		%>
+																		<b style="color: #0000FF;"><%=demographic.getPatientStatus()%></b>
+																		<%
+																		}
+																		else
+																		{
+																		%>
+																										<%=demographic.getPatientStatus()%>
+																		<%}%>
                                                         </span>
 																</li>
+																<%
+																	if (oscarProps.isPropertyActive("demographic.showCustomStatus"))
+																	{
+																%>
+																	<li>
+																		<span class="label">
+																			<%= oscarProps.getProperty("demographic.customStatusLabel")%>:
+																		</span>
+																		<span class="info">
+																			<%=demographicCustomStatus != null ? demographicCustomStatus.getStatus() : "" %>
+																		</span>
+																	</li>
+																<% } %>
 																<li><span
 																		class="label"><bean:message
 																		key="demographic.demographiceditdemographic.formChartNo"/>:</span>
@@ -4322,6 +4353,37 @@ while(field_itr.hasNext()){
 															   value="<%=patientStatusDateDay%>">
 													</td>
 												</tr>
+												<%
+													if(oscarProps.isPropertyActive("demographic.showCustomStatus"))
+													{
+												%>
+													<tr>
+														<td align="right">
+															<b>
+																<%= oscarProps.getProperty("demographic.customStatusLabel")%>
+															</b>
+														</td>
+														<td>
+															<select name="custom_demographic_status"
+																	style="width: 281px">
+																<option></option>
+																<%
+																	ResultSet rsCustStatus = apptMainBean.queryResults("search_demo_cust_status");
+
+																	while (rsCustStatus.next())
+																	{
+																%>
+																	<option value="<%=Integer.valueOf(rsCustStatus.getInt("id"))%>"
+																			<%= Integer.valueOf(rsCustStatus.getInt("id")).equals(demographicCustomStatusId) ? "selected" : ""%>
+																	>
+																		<%=rsCustStatus.getString("status")%>
+																	</option>
+																<% } %>
+															</select>
+														</td>
+
+													</tr>
+												<% } %>
 												<%
 													// Patient parental name OHSUPPORT-3228
 													if (oscarProps.isPropertyActive("demographic_parent_names"))
