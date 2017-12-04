@@ -63,6 +63,7 @@ public class Demographic implements Serializable {
 	private String patientStatus;
 	private Date patientStatusDate;
 	private String rosterStatus;
+	private Integer customStatusId;
 	private String providerNo;
 	private String myOscarUserName;
 	private String hin;
@@ -1187,5 +1188,19 @@ public class Demographic implements Serializable {
 	}
 	public String getVeteranNo() {
 		return veteranNo;
+	}
+
+	/**
+	 * Set the value related to the column: custom_status_id
+	 *
+	 * @param customStatusId the custom_status_id value
+	 */
+	public void setCustomStatusId(Integer customStatusId)
+	{
+		this.customStatusId = customStatusId;
+	}
+	public Integer getCustomStatusId()
+	{
+		return customStatusId;
 	}
 }
