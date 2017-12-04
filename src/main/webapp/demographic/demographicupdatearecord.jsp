@@ -50,7 +50,8 @@
 <%@page import="org.oscarehr.common.model.DemographicArchive" %>
 <%@page import="org.oscarehr.common.model.DemographicCust" %>
 <%@page import="org.oscarehr.common.dao.DemographicCustDao" %>
-<%
+<%@page import="org.apache.commons.lang.math.NumberUtils" %>
+	<%
 	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
 	DemographicArchiveDao demographicArchiveDao = (DemographicArchiveDao)SpringUtils.getBean("demographicArchiveDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
@@ -109,7 +110,18 @@
   demographic.setLastUpdateUser((String)session.getAttribute("user"));
   demographic.setLastUpdateDate(new java.util.Date());
   demographic.setScannedChart((request.getParameter("scanned_chart")!= null && request.getParameter("scanned_chart").equals("scanned"))?"1":"0");
-  
+
+  // Allow null value
+  String custDemoStatusVal = StringUtils.trimToNull(request.getParameter("custom_demographic_status"));
+  if( custDemoStatusVal == null || StringUtils.isNumeric(custDemoStatusVal))
+  {
+	  demographic.setCustomStatusId(NumberUtils.createInteger(custDemoStatusVal));
+  }
+  else 
+  {
+      MiscUtils.getLogger().error("Invalid value for custom status ID");
+  }
+
   // Patient parental name OHSUPPORT-3228
   if(oscarVariables.isPropertyActive("demographic_parent_names")) {
 		demographic.setNameOfMother(request.getParameter("nameOfMother"));
@@ -281,7 +293,7 @@
     //demographicArchiveDao.persist(da);
 
     demographicDao.save(demographic);
-    
+
     // save custom licensed producer if enabled
     if(oscarVariables.isPropertyActive("show_demographic_licensed_producers")) {
 	    try {
@@ -294,7 +306,7 @@
 	    	// unable to save licensed producer info
 	    }
     }
-    
+
     int rowsAffected=1;
   if (rowsAffected ==1) {
     //find the democust record for update
