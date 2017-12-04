@@ -304,7 +304,7 @@
 	
 	List<DemographicSearchResult> demoList = null;
 	
-	demoList = doSearch(demographicDao,loggedInInfo,searchMode,ptstatus,keyword,limit,offset,orderBy,providerNo,outOfDomain);
+	demoList = doSearch(demographicDao,loggedInInfo,searchMode,ptstatus,keyword,limit,offset,orderBy,outOfDomain);
 	
 	
 	boolean toggleLine = false;
@@ -488,7 +488,7 @@ Boolean isLocal(MatchingDemographicTransferScore matchingDemographicTransferScor
     
 }
 
-List<DemographicSearchResult> doSearch(DemographicDao demographicDao,LoggedInInfo loggedInInfo, String searchMode, String searchStatus, String searchKeyword, int limit, int offset, String orderBy, String providerNo, boolean outOfDomain) {
+List<DemographicSearchResult> doSearch(DemographicDao demographicDao,LoggedInInfo loggedInInfo, String searchMode, String searchStatus, String searchKeyword, int limit, int offset, String orderBy, boolean outOfDomain) {
 	List<DemographicSearchResult> demoList = null;
 
 	DemographicSearchRequest searchRequest = new DemographicSearchRequest();
