@@ -1081,8 +1081,9 @@ while(field_itr.hasNext()){
 									try
 									{
 										demographicCustomStatus = demographicCustomStatusDao.getStatusById(demographicCustomStatusId);
-									} catch (NoResultException e) {
-										MiscUtils.getLogger().error("No status found with ID: " + demographicCustomStatusId);
+									} catch (NoResultException e)
+									{
+										MiscUtils.getLogger().error("Demographic " + demographic.getDemographicNo() + " contains a custom status ID that does not exist. Status ID: " + demographicCustomStatusId);
 									}
 
 								}
@@ -4368,15 +4369,15 @@ while(field_itr.hasNext()){
 																	style="width: 281px">
 																<option></option>
 																<%
-																	ResultSet rsCustStatus = apptMainBean.queryResults("search_demo_cust_status");
+																	ResultSet custStatusRs = apptMainBean.queryResults("search_demo_cust_status");
 
-																	while (rsCustStatus.next())
+																	while (custStatusRs.next())
 																	{
 																%>
-																	<option value="<%=Integer.valueOf(rsCustStatus.getInt("id"))%>"
-																			<%= Integer.valueOf(rsCustStatus.getInt("id")).equals(demographicCustomStatusId) ? "selected" : ""%>
+																	<option value="<%=Integer.valueOf(custStatusRs.getInt("id"))%>"
+																			<%= Integer.valueOf(custStatusRs.getInt("id")).equals(demographicCustomStatusId) ? "selected" : ""%>
 																	>
-																		<%=rsCustStatus.getString("status")%>
+																		<%=custStatusRs.getString("status")%>
 																	</option>
 																<% } %>
 															</select>
