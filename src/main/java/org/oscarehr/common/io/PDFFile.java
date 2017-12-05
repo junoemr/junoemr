@@ -85,6 +85,7 @@ public class PDFFile extends GenericFile
 
 	private boolean pdfinfoValidation(File file) throws IOException,InterruptedException
 	{
+		logger.info("BEGIN PDF VALIDATION");
 		boolean isValid = true;
 
 		String pdfInfo = props.getProperty("document.pdfinfo_path", "/usr/bin/pdfinfo");
@@ -110,8 +111,7 @@ public class PDFFile extends GenericFile
 			isValid = false;
 		}
 
-		logger.info("Passed Validation: " + isValid);
-		logger.info("Exit Value: " + exitValue);
+		logger.info("Passed PDF Validation: " + isValid);
 		return isValid;
 	}
 
@@ -126,7 +126,6 @@ public class PDFFile extends GenericFile
 
 		File newPdf = new File(currentDir, javaFile.getName());
 
-		logger.info("run conversion");
 		/*
 		This has to de done through the command line and not the java library,
 		due to a bug in how the java libraries read pdf files. (libraries lowagie, pdfbox, and itext all have this error)
@@ -151,7 +150,7 @@ public class PDFFile extends GenericFile
 		String reasonInvalid = null;
 		while((line = in.readLine()) != null)
 		{
-			logger.warn(line);
+			logger.warn("gs error line: " + line);
 			reasonInvalid = (reasonInvalid == null)? line : reasonInvalid + ", " + line;
 		}
 		process.waitFor();

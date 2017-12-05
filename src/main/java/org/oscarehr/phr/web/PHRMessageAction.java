@@ -396,7 +396,7 @@ public class PHRMessageAction extends DispatchAction {
 		{
 			file.reEncode();
 		}
-		file.moveToDocuments(demographicNo);
+		file.moveToDocuments();
 
 		EDoc newDoc = new EDoc(description, "others", file.getName(), "", providerNo,
 				"", "", 'A', date, "", "", "demographic", demographicNo.toString());

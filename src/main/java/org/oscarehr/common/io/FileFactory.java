@@ -61,38 +61,6 @@ public class FileFactory
 	}
 
 	/**
-	 * load an existing document with the given name and demographic. when the demographic number is present,
-	 * this method checks for a demographic subdirectory. otherwise returns results from the base directory.
-	 * @param fileName - name of the file to load
-	 * @param demographicNo - the demographic that the document is linked to.
-	 * @return - the file, or null if no file exists with the given filename
-	 */
-	public static GenericFile getDocumentFile(String fileName, String demographicNo) throws IOException
-	{
-		GenericFile returnFile = null;
-		if(demographicNo != null)
-		{
-			File demoDir = new File(GenericFile.DOCUMENT_BASE_DIR, demographicNo);
-
-			if(demoDir.exists() && demoDir.isDirectory())
-			{
-				returnFile = getExistingFile(demoDir.getPath(), fileName);
-			}
-		}
-
-		if(returnFile == null)
-		{
-			returnFile = getDocumentFile(fileName);
-		}
-		return returnFile;
-	}
-	public static GenericFile getDocumentFile(String fileName, Integer demographicNo) throws IOException
-	{
-		String demoNo = (demographicNo != null)? String.valueOf(demographicNo) : null;
-		return getDocumentFile(fileName, demoNo);
-	}
-
-	/**
 	 * Overwrite an existing file with new stream content
 	 * @param oldFile - generic file to overwrite
 	 * @param fileInputStream - stream to save over existing file
@@ -105,6 +73,7 @@ public class FileFactory
 
 		if(file.exists() && file.isFile())
 		{
+			logger.info("Overwriting file contents: " + file.getPath());
 			// copy the stream to the existing file
 			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			// close the stream
@@ -173,7 +142,7 @@ public class FileFactory
 	 */
 	private static GenericFile getExistingFile(File file) throws IOException
 	{
-		logger.debug("Load File: " + file.getPath());
+		logger.info("Load File: " + file.getPath());
 
 		GenericFile genFile;
 		if(file.exists() && file.isFile())

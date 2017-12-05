@@ -57,7 +57,6 @@ public class GenericFile
 
 	// file info
 	protected File javaFile;
-	protected File backupFile;
 
 	// validation info
 	protected boolean hasBeenValidated;
@@ -71,22 +70,11 @@ public class GenericFile
 		this.hasBeenValidated = false;
 		this.isValid = false;
 		this.reasonInvalid = null;
-
-		this.backupFile = null;
 	}
 
 	public boolean moveToDocuments() throws IOException
 	{
 		return moveFile(DOCUMENT_BASE_DIR);
-	}
-	public boolean moveToDocuments(String demographicNo) throws IOException
-	{
-		//TODO move to demographic specific folder
-		return moveFile(DOCUMENT_BASE_DIR);
-	}
-	public boolean moveToDocuments(Integer demographicNo) throws IOException
-	{
-		return moveToDocuments(String.valueOf(demographicNo));
 	}
 
 	public boolean moveToCorrupt() throws IOException
@@ -112,7 +100,7 @@ public class GenericFile
 		}
 
 		File destinationFile = new File(directoryFile.getPath(), javaFile.getName());
-		logger.info("moving file to: " + destinationFile.getPath());
+		logger.info("Moving file to: " + destinationFile.getPath());
 
 		if(directoryFile.exists() && directoryFile.isDirectory())
 		{
@@ -147,40 +135,6 @@ public class GenericFile
 	public void reEncode() throws IOException, InterruptedException
 	{
 		throw new RuntimeException("Not Implemented");
-	}
-
-	public void createBackup() throws IOException
-	{
-		this.backupFile = File.createTempFile("", "");
-		Files.copy(javaFile.toPath(), backupFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
-		backupFile.deleteOnExit();
-	}
-	public boolean clearBackup()
-	{
-		if(this.backupFile != null)
-		{
-			this.backupFile.delete();
-			this.backupFile = null;
-			return true;
-		}
-		return false;
-	}
-	public boolean restoreBackup() throws IOException
-	{
-		if(this.backupFile != null)
-		{
-			Files.copy(backupFile.toPath(), javaFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
-			return clearBackup();
-		}
-		return false;
-	}
-	public File getBackupFile()
-	{
-		return this.backupFile;
-	}
-	public void setBackupFile(File backupFile)
-	{
-		this.backupFile = backupFile;
 	}
 
 	public boolean isValid()

@@ -433,21 +433,19 @@ public class AddEditDocumentAction extends DispatchAction {
 					{
 						// find the old file
 						Document document = documentDao.find(Integer.parseInt(fm.getMode()));
-						GenericFile oldFile = FileFactory.getDocumentFile(document.getDocfilename(), demographicNo);
-						// overwrite it and rename it
+						GenericFile oldFile = FileFactory.getDocumentFile(document.getDocfilename());
+						// overwrite it
 						file = FileFactory.overwriteFileContents(oldFile, docFile.getInputStream());
-						file.rename(GenericFile.getFormattedFileName(docFile.getFileName()));
 					}
 					else
 					{
-						// TODO archive the old file (it is now de-referenced within the database)?
 						file = FileFactory.createDocumentFile(docFile.getInputStream(), docFile.getFileName());
 					}
 					if(!file.validate())
 					{
 						file.reEncode();
 					}
-					file.moveToDocuments(demographicNo);
+					file.moveToDocuments();
 					fileName = file.getName();
 				}
 
