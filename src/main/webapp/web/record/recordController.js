@@ -111,6 +111,11 @@ angular.module('Record').controller('Record.RecordController', [
 		                 	 {id : 4,displayName : 'Rx'       ,path : 'partials/eform.jsp'}];
 		*/
 
+		controller.init = function init()
+		{
+			controller.fillMenu();
+		};
+
 		//get access rights
 		securityService.hasRight("_eChart", "w", controller.demographicNo).then(
 			function success(results)
@@ -135,7 +140,7 @@ angular.module('Record').controller('Record.RecordController', [
 		// Is there a shared location where this could be accessed from any controller? i.e. a utils file
 		controller.isNaN = function(num)
 		{
-			return isNaN(num)
+			return isNaN(num);
 		};
 
 		controller.fillMenu = function fillMenu()
@@ -151,8 +156,6 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 		};
 
-		controller.fillMenu();
-
 		//var transitionP = $state.transitionTo(controller.recordtabs2[0].path,$stateParams,{location:'replace',notify:true});
 		//console.log("transition ",transitionP);
 
@@ -160,15 +163,13 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			controller.currenttab2 = controller.recordtabs2[temp.id];
 
-			if (angular.isDefined(temp.state) && temp.state != null)
+			if (Juno.Common.Util.isDefinedAndNotNull(temp.state))
 			{
-				if (/^record.consultRequests.[0-9]+$/.test(temp.state) || /^record.consultResponses.[0-9]+$/.test(temp.state))
-				{
-					var recIdPos = temp.state.lastIndexOf(".");
-					$state.go(temp.state.substring(0, recIdPos),
-					{
-						demographicNo: temp.state.substring(recIdPos + 1)
-					});
+				if(Juno.Common.Util.isDefinedAndNotNull(temp.demoId)){
+					$state.go(temp.state,
+						{
+							demographicNo: temp.demoId
+						});
 				}
 				else
 				{
@@ -189,13 +190,17 @@ angular.module('Record').controller('Record.RecordController', [
 				window.open(temp.url, win, "scrollbars=yes, location=no, width=1000, height=600", "");
 			}
 			//console.log(controller.recordtabs2[temp].path);
-
-
 		};
 
 		controller.isActive = function isActive(tab)
 		{
-			return ($state.current.name == tab.state);
+			if(Juno.Common.Util.isDefinedAndNotNull($state.current.name) &&
+				Juno.Common.Util.isDefinedAndNotNull(tab.state))
+			{
+				return ($state.current.name === tab.state);
+			}
+
+			return false;
 		};
 
 		// Check if there have been potential changes to a note, display a warning if needed
@@ -474,8 +479,7 @@ angular.module('Record').controller('Record.RecordController', [
 			{
 				apptNo = controller.page.appointment.id;
 				apptProvider = controller.page.appointment.providerNo;
-
-				var dt = new Date(controller.page.appointment.appointmentDate);
+				var dt = moment(controller.page.appointment.appointmentDate).toDate();
 				apptDate = dt.getFullYear() + "-" + zero(dt.getMonth() + 1) + "-" + zero(dt.getDate());
 				dt = new Date(controller.page.appointment.startTime);
 				apptStartTime = zero(dt.getHours()) + ":" + zero(dt.getMinutes()) + ":" + zero(dt.getSeconds());
@@ -828,6 +832,7 @@ angular.module('Record').controller('Record.RecordController', [
 		};
 
 		controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
+		controller.init();
 	}
 ]);
 

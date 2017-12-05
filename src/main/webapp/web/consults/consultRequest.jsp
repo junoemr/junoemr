@@ -154,12 +154,10 @@
 			
 			<div class="col-md-12"><!-- Referral -->
 				<form class="consult-request-form">
-					
 					<div class="form-group col-md-6">
 						<label class="control-label">Referral Date</label>
 						<%--<input id="dp-referralDate" type="text" class="form-control" ng-model="consult.referralDate" placeholder="Referral Date" datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true" is-open="page.refDatePicker" ng-click="page.refDatePicker=true"/>--%>
 						<juno-datepicker-popup juno-model="consultRequestCtrl.consult.referralDate" show-icon="true" type="Input"> </juno-datepicker-popup>
-
 					</div>
 					<div class="form-group col-md-6">
 						<label class="control-label">Urgency</label>
@@ -244,7 +242,7 @@
 
 					<div class="form-group col-md-12" id="clinical-note"><!-- Clinic Notes -->
 							<label class="control-label">Pertinent clinical information</label>
-							<div class="col-md-12 info-add-buttons">
+							<div class="info-add-buttons">
 								<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getFamilyHistory('clinicalInfo');">
 									<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 									Family History
@@ -272,10 +270,10 @@
 							</textarea>
 					</div>
 
-					<div class="form-group col-md-12 info-add-buttons" id="concurrent-problem"><!-- Concurrent Problem -->
+					<div class="form-group col-md-12" id="concurrent-problem"><!-- Concurrent Problem -->
 						<div>
 							<label class="control-label">Significant Concurrent Problems</label>
-							<div class="col-md-12 info-add-buttons">
+							<div class="info-add-buttons">
 
 								<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getFamilyHistory('concurrentProblems');">
 									<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
@@ -297,22 +295,31 @@
 									<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 									Reminders
 								</button>
-							</div>						
-							<textarea id="concurrentProblems" cols="80" rows="5" class="form-control" placeholder="Use the buttons above to insert data from the patients chart"
-								ng-model="consultRequestCtrl.consult.concurrentProblems">
+							</div>
+							<textarea id="concurrentProblems"
+									  rows="5"
+									  class="form-control"
+									  placeholder="Use the buttons above to insert data from the patients chart"
+									  ng-model="consultRequestCtrl.consult.concurrentProblems">
 							</textarea>
 						</div>
 					</div>
 
 					<div class="form-group col-md-12">
 						<label class="control-label">Current Medications</label>
-						<div class="col-md-12 info-add-buttons">
+						<div class="info-add-buttons">
 							<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getOtherMeds('currentMeds');">
 								<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 								Other Meds
 							</button>
 						</div>
-						<textarea id="currentMeds" cols="80" rows="5" class="form-control" ng-model="consultRequestCtrl.consult.currentMeds" placeholder="Use the button above to insert Other Meds data from the patients chart"></textarea>
+						<textarea id="currentMeds"
+								  cols="80"
+								  rows="5"
+								  class="form-control"
+								  ng-model="consultRequestCtrl.consult.currentMeds"
+								  placeholder="Use the button above to insert Other Meds data from the patients chart">
+						</textarea>
 					</div>
 
 					<div class="form-group col-md-12"><!-- Alergies / Current Medications -->

@@ -126,14 +126,14 @@
 						<span class="caret"></span>
 					</a>
 
-					<%--<ul ng-if="item.dropdown"
-							class="dropdown-menu"
-							role="menu">
+					<ul ng-if="item.dropdown"
+						class="dropdown-menu"
+						role="menu">
 						<li ng-repeat="dropdownItem in item.dropdownItems">
-							<a href="#"
-								 ng-click="navBarCtrl.transition(dropdownItem)" >{{dropdownItem.label}}</a>
+							<a href="javascript:void(0)"
+							   ng-click="navBarCtrl.transition(dropdownItem)">{{dropdownItem.label}}</a>
 						</li>
-					</ul>--%>
+					</ul>
 				</li>
 			</ul>
 
@@ -153,6 +153,21 @@
 							  class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
 					</a>
 
+					<a href="javascript:void(0)"
+					   ng-if="item.dropdown"
+					   class="dropdown-toggle"
+					   data-toggle="dropdown">{{item.label}}
+						<span class="caret"></span>
+					</a>
+
+					<ul ng-if="item.dropdown"
+						class="dropdown-menu"
+						role="menu">
+						<li ng-repeat="dropdownItem in item.dropdownItems">
+							<a href="javascript:void(0)"
+							   ng-click="navBarCtrl.transition(dropdownItem)" >{{dropdownItem.label}}</a>
+						</li>
+					</ul>
 				</li>
 				<li class="dropdown hand-hover">
 					<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
@@ -195,6 +210,14 @@
 							   ng-click="navBarCtrl.transition(item)">{{item.label}}
 								<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
 									  class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
+							</a>
+
+							<a href="javascript:void(0)"
+							   ng-if="item.dropdown"
+							   ng-repeat="dropdownItem in item.dropdownItems"
+							   ng-class="{'active': navBarCtrl.isActive(dropdownItem) }"
+							   ng-click="navBarCtrl.transition(dropdownItem)">
+								{{dropdownItem.label}}
 							</a>
 						</li>
 						<%--<li ng-repeat="item in navBarCtrl.moreMenuItems">

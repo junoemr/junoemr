@@ -25,9 +25,7 @@
 
 package org.oscarehr.common.model;
 
-import java.io.Serializable;
-import java.util.Comparator;
-import java.util.Date;
+import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,8 +36,9 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.commons.lang.StringUtils;
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.Date;
 
 @Entity
 @Table(name = "measurements")
@@ -69,7 +68,7 @@ public class Measurement extends AbstractModel<Integer> implements Serializable 
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "dateObserved")
-	private Date dateObserved;
+	private Date dateObserved = new Date();
 
 	@Column(name = "appointmentNo")
 	private Integer appointmentNo;
@@ -155,18 +154,22 @@ public class Measurement extends AbstractModel<Integer> implements Serializable 
 	public Date getCreateDate() {
 		return (createDate);
 	}
-	
-	
-	public void setCreateDate(Date createDate) {
+
+
+	public void setCreateDate(Date createDate)
+	{
 		this.createDate = createDate;
 	}
-	
-	   public static final Comparator<Measurement> DateObservedComparator = new Comparator<Measurement>() {
-	        public int compare(Measurement o1, Measurement o2) {
-	        	if(o1.getId()!=null && o2.getId() != null) {
-	        		return o1.getDateObserved().compareTo(o2.getDateObserved());
-	        	}
-	        	return 0;
-	        }
-	    };
+
+	public static final Comparator<Measurement> DateObservedComparator = new Comparator<Measurement>()
+	{
+		public int compare(Measurement o1, Measurement o2)
+		{
+			if(o1.getId() != null && o2.getId() != null)
+			{
+				return o1.getDateObserved().compareTo(o2.getDateObserved());
+			}
+			return 0;
+		}
+	};
 }

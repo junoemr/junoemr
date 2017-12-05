@@ -296,40 +296,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 			{
 				if (controller.justOpen)
 				{
-					//process demographicNo in url, run only once
-					if ($state.params.demographicNo != null)
-					{
-						//called from patient record
-						controller.hideSearchPatient = true;
-						controller.search.demographicNo = Number($state.params.demographicNo);
-					}
-					else if ($location.search().srhDemoNo != null)
-					{
-						//come back from another consults
-						controller.search.demographicNo = Number($location.search().srhDemoNo);
-						controller.updateDemographicNo(null, $location.search().srhDemoNo);
-					}
-
-					//process other search parameters in url
-					if ($location.search().srhMrpNo != null)
-					{
-						controller.search.mrpNo = Number($location.search().srhMrpNo);
-						controller.updateMrpNo($location.search().srhMrpNo);
-					}
-					if ($location.search().srhRefStartDate != null) controller.search.referralStartDate = new Date(Number($location.search().srhRefStartDate));
-					if ($location.search().srhRefEndDate != null) controller.search.referralEndDate = new Date(Number($location.search().srhRefEndDate));
-					if ($location.search().srhApptStartDate != null) controller.search.appointmentStartDate = new Date(Number($location.search().srhApptStartDate));
-					if ($location.search().srhApptEndDate != null) controller.search.appointmentEndDate = new Date(Number($location.search().srhApptEndDate));
-					if ($location.search().srhStatus != null) controller.search.status = Number($location.search().srhStatus);
-					if ($location.search().srhTeam != null) controller.search.team = $location.search().srhTeam;
-					if ($location.search().srhCountPerPage != null) controller.search.perPage = $location.search().srhCountPerPage;
-
-					if ($location.search().srhToPage != null) controller.search.page = $location.search().srhToPage;
-					if ($location.search().srhSortMode != null && $location.search().srhSortDir != null)
-					{
-						controller.search.sortColumn = $location.search().sortMode;
-						controller.search.sortDirection = $location.search().srhSortDir;
-					}
+					controller.getSavedSearchVals();
 					controller.justOpen = false;
 				}
 
@@ -420,6 +387,44 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 			}
 
 		});
+
+		controller.getSavedSearchVals = function getSavedSearchVals()
+		{
+			//process demographicNo in url, run only once
+			if ($state.params.demographicNo != null)
+			{
+				//called from patient record
+				controller.hideSearchPatient = true;
+				controller.search.demographicNo = Number($state.params.demographicNo);
+			}
+			else if ($location.search().srhDemoNo != null)
+			{
+				//come back from another consults
+				controller.search.demographicNo = Number($location.search().srhDemoNo);
+				controller.updateDemographicNo(null, $location.search().srhDemoNo);
+			}
+
+			//process other search parameters in url
+			if ($location.search().srhMrpNo != null)
+			{
+				controller.search.mrpNo = Number($location.search().srhMrpNo);
+				controller.updateMrpNo($location.search().srhMrpNo);
+			}
+			if ($location.search().srhRefStartDate != null) controller.search.referralStartDate = new Date(Number($location.search().srhRefStartDate));
+			if ($location.search().srhRefEndDate != null) controller.search.referralEndDate = new Date(Number($location.search().srhRefEndDate));
+			if ($location.search().srhApptStartDate != null) controller.search.appointmentStartDate = new Date(Number($location.search().srhApptStartDate));
+			if ($location.search().srhApptEndDate != null) controller.search.appointmentEndDate = new Date(Number($location.search().srhApptEndDate));
+			if ($location.search().srhStatus != null) controller.search.status = Number($location.search().srhStatus);
+			if ($location.search().srhTeam != null) controller.search.team = $location.search().srhTeam;
+			if ($location.search().srhCountPerPage != null) controller.search.perPage = $location.search().srhCountPerPage;
+
+			if ($location.search().srhToPage != null) controller.search.page = $location.search().srhToPage;
+			if ($location.search().srhSortMode != null && $location.search().srhSortDir != null)
+			{
+				controller.search.sortColumn = $location.search().sortMode;
+				controller.search.sortDirection = $location.search().srhSortDir;
+			}
+		};
 
 		controller.popup = function popup(vheight, vwidth, varpage, winname)
 		{
