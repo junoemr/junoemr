@@ -2988,6 +2988,8 @@
 
 		if(origCaseNote != $(caseNote).value || origObservationDate != $("observationDate").value) {
 			autoSave(true);
+			origCaseNote = $(caseNote).value;
+			origObservationDate = $("observationDate").value;
 		}
 		setTimer();
 	}
