@@ -43,6 +43,9 @@ public class DemographicCustomStatus extends AbstractModel<Integer>
 	@Column(name="status")
 	private String status;
 
+	@Column(name = "deleted", nullable = false)
+	private Boolean deleted = false;
+
 	public Integer getId()
 	{
 		return id;
@@ -61,5 +64,15 @@ public class DemographicCustomStatus extends AbstractModel<Integer>
 	public void setStatus(String status)
 	{
 		this.status = status;
+	}
+
+	public Boolean isDeleted()
+	{
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted)
+	{
+		this.deleted = deleted;
 	}
 }
