@@ -75,7 +75,7 @@ pageContext.setAttribute("pageType",""+pageType);
 
 if (request.getParameter("orderby") != null){
     String orderby = request.getParameter("orderby");
-    String sessionOrderby = (String) session.getAttribute("orderby");     
+    String sessionOrderby = (String) session.getAttribute("orderby");
     if (sessionOrderby != null && sessionOrderby.equals(orderby)){
         orderby = "!"+orderby;
     }
@@ -392,7 +392,7 @@ function checkAll(formId){
                                             </html:link>
                                     </th>
                                     <th align="left" bgcolor="#DDDDFF">
-                                            <html:link page="/oscarMessenger/DisplayMessages.jsp?orderby=linked" paramId="boxType" paramName="pageType">
+                                            <html:link page="/oscarMessenger/DisplayMessages.jsp?orderby=patient" paramId="boxType" paramName="pageType">
                                             <bean:message key="oscarMessenger.DisplayMessages.msgLinked"/>
                                             </html:link>
                                     </th>
