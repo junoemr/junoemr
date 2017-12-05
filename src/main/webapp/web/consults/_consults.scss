@@ -1,4 +1,5 @@
-#consult-request-section {
+#consult-request-section,
+#consult-response-section {
 	.consult-request-form {
 		input[type="checkbox"] {
 			margin: 0;
@@ -17,5 +18,6 @@
 	}
 	.search-buttons {
 		margin-bottom: $margin-md;
+		margin-top: $margin-md;
 	}
 }

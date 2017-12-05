@@ -60,12 +60,10 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			});
 
 		controller.consult = consult;
-
 		consult.letterheadList = Juno.Common.Util.toArray(consult.letterheadList);
 		consult.referringDoctorList = Juno.Common.Util.toArray(consult.referringDoctorList);
 		consult.faxList = Juno.Common.Util.toArray(consult.faxList);
 		consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
-		if (consult.referringDoctor == null) consult.referringDoctor = {};
 
 		//set attachments
 		consult.attachments = Juno.Common.Util.toArray(consult.attachments);
@@ -95,9 +93,12 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		//show referringDoctor in list
 		angular.forEach(consult.referringDoctorList, function(referringDoc)
 		{
-			if (referringDoc.id == consult.referringDoctor.id)
+			if(consult.referringDoctor !== null)
 			{
-				consult.referringDoctor = referringDoc;
+				if (referringDoc.id === consult.referringDoctor.id)
+				{
+					consult.referringDoctor = referringDoc;
+				}
 			}
 		});
 
@@ -112,25 +113,34 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			}
 		}
 
-		//set appointment time
-		if (consult.appointmentTime != null)
-		{
-			var apptTime = new Date(consult.appointmentTime);
-			consult.appointmentHour = Juno.Common.Util.pad0(apptTime.getHours());
-			consult.appointmentMinute = Juno.Common.Util.pad0(apptTime.getMinutes());
-		}
-
 		controller.urgencies = staticDataService.getConsultUrgencies();
 		controller.statuses = staticDataService.getConsultResponseStatuses();
 		controller.hours = staticDataService.getHours();
 		controller.minutes = staticDataService.getMinutes();
 
+		controller.parseTime = function parseTime(time)
+		{
+			var tArray = time.split(":");
+			consult.appointmentHour = tArray[0];
+			consult.appointmentMinute = tArray[1];
+		};
+		/* If appointment time is present, we must parse the hours and minutes in order to
+		   populate the hour and minute selectors */
+		if (consult.appointmentTime !== null)
+		{
+			controller.parseTime(consult.appointmentTime);
+
+		}
+
 		//monitor data changed
 		controller.consultChanged = -1;
-		$scope.$watchCollection("consult", function()
-		{
-			controller.consultChanged++;
-		});
+		$scope.$watchCollection(function()
+			{
+				return controller.consult;
+			}, function()
+			{
+				controller.consultChanged++;
+			});
 
 		//remind user of unsaved data
 		$scope.$on("$stateChangeStart", function(event)
@@ -144,7 +154,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 		controller.changeLetterhead = function changeLetterhead()
 		{
-			var index = $("#letterhead").val();
+			var index = $("#letterhead").selectedIndex;
 			if (index == null) return;
 
 			consult.letterheadAddress = consult.letterheadList[index].address;
@@ -227,22 +237,22 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 		controller.invalidData = function invalidData()
 		{
-			if (controller.urgencies[$("#urgency").val()] == null)
+			if (!controller.consult.urgency)
 			{
 				alert("Please select an Urgency");
 				return true;
 			}
-			if (consult.letterheadList[$("#letterhead").val()] == null)
+			if (!controller.consult.letterheadName)
 			{
 				alert("Please select a Letterhead");
 				return true;
 			}
-			if (consult.referringDoctor == null)
+			if (Juno.Common.Util.isUndefinedOrNull(controller.consult.referringDoctor))
 			{
 				alert("Please select a Referring Doctor");
 				return true;
 			}
-			if (consult.demographic == null || consult.demographic == "")
+			if (!controller.consult.demographic || controller.consult.demographic === "")
 			{
 				alert("Error! Invalid patient!");
 				return true;
@@ -252,14 +262,16 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 		controller.setAppointmentTime = function setAppointmentTime()
 		{
-			if (consult.appointmentHour != null && consult.appointmentMinute != null)
+			if (consult.appointmentHour !== null && consult.appointmentMinute !== null)
 			{
-				var apptTime = new Date();
-				if (consult.appointmentTime != null) apptTime = new Date(consult.appointmentTime);
-				apptTime.setHours(consult.appointmentHour);
-				apptTime.setMinutes(consult.appointmentMinute);
-				apptTime.setSeconds(0);
+				apptTime = moment(Date.now());
+				apptTime.set('hours', consult.appointmentHour);
+				apptTime.set('minute', consult.appointmentMinute);
 				consult.appointmentTime = apptTime;
+			}
+			else
+			{
+				consult.appointmentTime = null;
 			}
 		};
 
@@ -322,7 +334,9 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				function success(results)
 				{
 					//update url for new consultation
-					if (consult.id == null) $location.path("/record/" + consult.demographic.demographicNo + "/consultResponse/" + results.id);
+					if (consult.id === null) {
+						$location.path("/record/" + consult.demographic.demographicNo + "/consultResponse/" + results.body.id);
+					}
 				},
 				function error(errors)
 				{
@@ -335,7 +349,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 		controller.close = function close()
 		{
-			if ($location.search().list == "patient") $location.path("/record/" + consult.demographic.demographicNo + "/consultResponses");
+			if ($location.search().list === "patient") $location.path("/record/" + consult.demographic.demographicNo + "/consultResponses");
 			else $location.path("/consultResponses");
 		};
 

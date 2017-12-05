@@ -246,7 +246,7 @@ public class PersonaService extends AbstractServiceImpl {
 			menu.addWithState(idCounter++,bundle.getString("navbar.menu.consults"),null,"consultRequests");
 		}
 		else if (!consultationManager.isConsultRequestEnabled()) {
-			menu.addWithState(idCounter++,bundle.getString("navbar.menu.consultResponses"),null,"consultResponses");
+			menu.addWithState(idCounter++,bundle.getString("navbar.menu.consults"),null,"consultResponses");
 		}
 
 		//consult menu

@@ -93,12 +93,13 @@
 			
 			<div class="col-lg-3 col-xs-6" ng-hide="consultRequestListCtrl.hideSearchPatient">
 				<div class="input-group">
-					
-					<input type="text" ng-model="consultRequestListCtrl.consult.demographicName" 
-						placeholder="<bean:message key="consult.list.patient" bundle="ui"/>"
-						uib-typeahead="pt.demographicNo as pt.name for pt in consultRequestListCtrl.searchPatients($viewValue)"
-						typeahead-on-select="consultRequestListCtrl.updateDemographicNo($item, $model, $label)"
-						class="form-control"
+
+					<input type="text"
+						   ng-model="consultRequestListCtrl.demographicName"
+						   placeholder="<bean:message key="consult.list.patient" bundle="ui"/>"
+						   uib-typeahead="pt.demographicNo as pt.name for pt in consultRequestListCtrl.searchPatients($viewValue)"
+						   typeahead-on-select="consultRequestListCtrl.updateDemographicNo($item, $model, $label)"
+						   class="form-control"
 					/>
 					<span class="input-group-btn">
 						<button class="btn btn-default" ng-click="consultRequestListCtrl.removeDemographicAssignment()">
