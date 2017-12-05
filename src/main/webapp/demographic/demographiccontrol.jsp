@@ -181,7 +181,7 @@
 			{"search_licensed_producer_address_name", "SELECT address_id, display_name FROM licensed_producer_address ORDER BY display_name"},
 			{"search_demo_licensed_producer_address_name", "SELECT pa.address_id, pa.display_name FROM demographic_licensed_producer d JOIN licensed_producer_address pa ON (d.address_id=pa.address_id) where d.demographic_no=?"},
 			// Custom demographic status
-			{"search_demo_cust_status", "SELECT * FROM demographic_custom_status"}
+			{"search_demo_cust_status", "SELECT * FROM demographic_custom_status WHERE deleted = 0"},
 	};
 
 	//associate each operation with an output JSP file -- displaymode
