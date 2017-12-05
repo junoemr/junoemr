@@ -112,14 +112,14 @@
   demographic.setScannedChart((request.getParameter("scanned_chart")!= null && request.getParameter("scanned_chart").equals("scanned"))?"1":"0");
 
   // Allow null value
-  String custDemoStatusVal = StringUtils.trimToNull(request.getParameter("custom_demographic_status"));
-  if( custDemoStatusVal == null || StringUtils.isNumeric(custDemoStatusVal))
+  String customDemographicStatusVal = StringUtils.trimToNull(request.getParameter("custom_demographic_status"));
+  if( customDemographicStatusVal == null || StringUtils.isNumeric(customDemographicStatusVal))
   {
-	  demographic.setCustomStatusId(NumberUtils.createInteger(custDemoStatusVal));
+	  demographic.setCustomStatusId(NumberUtils.createInteger(customDemographicStatusVal));
   }
   else 
   {
-      MiscUtils.getLogger().error("Invalid value for custom status ID");
+      MiscUtils.getLogger().error("Invalid value for custom status ID: " + customDemographicStatusVal);
   }
 
   // Patient parental name OHSUPPORT-3228
