@@ -479,8 +479,7 @@ angular.module('Record').controller('Record.RecordController', [
 			{
 				apptNo = controller.page.appointment.id;
 				apptProvider = controller.page.appointment.providerNo;
-
-				var dt = new Date(controller.page.appointment.appointmentDate);
+				var dt = moment(controller.page.appointment.appointmentDate).toDate();
 				apptDate = dt.getFullYear() + "-" + zero(dt.getMonth() + 1) + "-" + zero(dt.getDate());
 				dt = new Date(controller.page.appointment.startTime);
 				apptStartTime = zero(dt.getHours()) + ":" + zero(dt.getMinutes()) + ":" + zero(dt.getSeconds());

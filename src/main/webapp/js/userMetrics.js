@@ -48,7 +48,7 @@
 		let counterIncrements = {};
 		let histogramObservations = {};
 
-		setInterval(sendUpdates, 10000);
+		setTimeout(sendUpdates, 100);
 
 		function sendUpdates() {
 			const body = JSON.parse(JSON.stringify(packageUpdates()));
@@ -129,11 +129,20 @@
 		}
 	}
 
-	const { q, aggregatorServerRoot } = window[window['PrometheusAggregatorObjectName']];
+	function start()
+	{
+		const {q, aggregatorServerRoot} = window[window['PrometheusAggregatorObjectName']];
 
-	const actualFunction = window[window['PrometheusAggregatorObjectName']] = setUpAndStartInterval({ aggregatorReportingUrl: aggregatorServerRoot + '/' });
+		const actualFunction = window[window['PrometheusAggregatorObjectName']] = setUpAndStartInterval({aggregatorReportingUrl: aggregatorServerRoot});
 
-	(q || []).forEach((args) => actualFunction(...args));
+		(q || []).forEach((args) => actualFunction(...args ));
 
-	reportNavigationTiming();
+		reportNavigationTiming();
+	}
+
+	window.addEventListener('load', function()
+	{
+		setTimeout( start, 500);
+	});
+
 }());

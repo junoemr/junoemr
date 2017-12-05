@@ -68,6 +68,7 @@ public class UserPropertyDAO extends AbstractDao<UserProperty> {
         if(prop.getId() != null && prop.getId().intValue()>0) {
         	merge(prop);
         } else {
+        	prop.setId(null); // Make sure the ID is null, db entry is not supposed to exist on persist
         	persist(prop);
         }
     }
