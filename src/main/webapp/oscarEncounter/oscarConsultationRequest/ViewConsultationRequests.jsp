@@ -315,7 +315,7 @@
 			if (!Oscar.Util.Date.validateDateInputTolerant(elem))
 			{
 				elem.focus();
-				alert("<bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgInvalidDate"/>");
+				alert("<bean:message key="oscarEncounter.oscarConsultationRequest.msgInvalidDate"/>");
 				return false;
 			}
 			return true;
