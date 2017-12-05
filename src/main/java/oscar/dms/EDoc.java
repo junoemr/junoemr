@@ -28,7 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
-import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
@@ -167,7 +167,7 @@ public class EDoc extends TagObject implements Comparable<EDoc> {
 		this.setDateTimeStampAsDate(EDocUtil.getDmsDateTimeAsDate());
                 this.setContentDateTime(EDocUtil.getDmsDateTimeAsDate());
 		if (fileName.length() != 0) {
-			this.fileName = FileFactory.getFormattedFileName(fileName);
+			this.fileName = GenericFile.getFormattedFileName(fileName);
 		}
 	}
 

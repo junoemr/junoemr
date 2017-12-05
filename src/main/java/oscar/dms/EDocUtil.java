@@ -298,19 +298,24 @@ public final class EDocUtil {
 			doc.setDocxml(newDocument.getHtml());
 			doc.setResponsible(newDocument.getResponsibleId());
 			doc.setPublic1(ConversionUtils.fromIntString(newDocument.getDocPublic()));
-			if (doReview) {
+			if(doReview)
+			{
 				doc.setReviewer(newDocument.getReviewerId());
 				doc.setReviewdatetime(ConversionUtils.fromDateString(newDocument.getReviewDateTime(), "yyyy/MM/dd HH:mm:ss"));
-			} else {
+			}
+			else
+			{
 				doc.setReviewer(null);
 				doc.setReviewdatetime(null);
 				doc.setUpdatedatetime(newDocument.getDateTimeStampAsDate());
 				doc.setObservationdate(MyDateFormat.getSysDate(newDocument.getObservationDate()));
 			}
-			if (newDocument.getFileName().length() > 0) {
+			if(newDocument.getFileName().length() > 0)
+			{
 				doc.setDocfilename(newDocument.getFileName());
 				doc.setContenttype(newDocument.getContentType());
-                                doc.setContentdatetime(newDocument.getContentDateTime());
+				doc.setContentdatetime(newDocument.getContentDateTime());
+				doc.setNumberofpages(newDocument.getNumberOfPages());
 			}
 			documentDao.merge(doc);
 		}

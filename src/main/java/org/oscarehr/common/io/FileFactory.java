@@ -25,7 +25,6 @@
 package org.oscarehr.common.io;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
@@ -35,8 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class FileFactory
 {
@@ -50,7 +47,7 @@ public class FileFactory
 	 */
 	public static GenericFile createDocumentFile(InputStream fileInputStream, String fileName) throws IOException
 	{
-		return createNewFile(fileInputStream, fileName, GenericFile.DOCUMENT_BASE);
+		return createNewFile(fileInputStream, fileName, GenericFile.DOCUMENT_BASE_DIR);
 	}
 
 	/**
@@ -60,7 +57,7 @@ public class FileFactory
 	 */
 	public static GenericFile getDocumentFile(String fileName) throws IOException
 	{
-		return getExistingFile(GenericFile.DOCUMENT_BASE, fileName);
+		return getExistingFile(GenericFile.DOCUMENT_BASE_DIR, fileName);
 	}
 
 	/**
@@ -75,7 +72,7 @@ public class FileFactory
 		GenericFile returnFile = null;
 		if(demographicNo != null)
 		{
-			File demoDir = new File(GenericFile.DOCUMENT_BASE, demographicNo);
+			File demoDir = new File(GenericFile.DOCUMENT_BASE_DIR, demographicNo);
 
 			if(demoDir.exists() && demoDir.isDirectory())
 			{
@@ -99,36 +96,25 @@ public class FileFactory
 	 * Overwrite an existing file with new stream content
 	 * @param oldFile - generic file to overwrite
 	 * @param fileInputStream - stream to save over existing file
-	 * @return the new Generic File
+	 * @return the new GenericFile
 	 * @throws IOException - if an error occurs
 	 */
 	public static GenericFile overwriteFileContents(GenericFile oldFile, InputStream fileInputStream) throws IOException
 	{
 		File file = oldFile.getFileObject();
 
-		// copy the stream to the file
-		Files.copy(fileInputStream, file.toPath(), StandardCopyOption.ATOMIC_MOVE);
-		// close the stream
-		IOUtils.closeQuietly(fileInputStream);
-
+		if(file.exists() && file.isFile())
+		{
+			// copy the stream to the existing file
+			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			// close the stream
+			IOUtils.closeQuietly(fileInputStream);
+		}
+		else
+		{
+			throw new IOException("Attempt to overwrite an invalid File: " + file.getPath());
+		}
 		return getExistingFile(file);
-	}
-
-	/**
-	 * sanitizes the incoming file name string to a friendly format
-	 * @param originalName - name to be sanitized
-	 * @return - the reformatted name string
-	 */
-	public static String getSanitizedFileName(String originalName)
-	{
-		return StringUtils.trimToEmpty(originalName).replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
-	}
-	public static String getFormattedFileName(String originalName)
-	{
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-		LocalDateTime now = LocalDateTime.now();
-
-		return formatter.format(now) + getSanitizedFileName(originalName);
 	}
 
 	/**
@@ -139,7 +125,7 @@ public class FileFactory
 	 */
 	private static GenericFile createNewFile(InputStream fileInputStream, String fileName, String folder) throws IOException
 	{
-		String sanitizedFileName = getFormattedFileName(fileName);
+		String sanitizedFileName = GenericFile.getFormattedFileName(fileName);
 
 		File directory = new File(folder);
 		if(!directory.exists())

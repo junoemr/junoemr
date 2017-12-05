@@ -38,12 +38,14 @@ import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
+import org.oscarehr.common.dao.DocumentDao;
 import org.oscarehr.common.dao.DocumentStorageDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.Document;
 import org.oscarehr.common.model.DocumentStorage;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.SecRole;
@@ -78,6 +80,8 @@ public class AddEditDocumentAction extends DispatchAction {
 	
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	private static Logger logger = MiscUtils.getLogger();
+
+	private static final DocumentDao documentDao = (DocumentDao) SpringUtils.getBean("documentDao");
 	
 	public ActionForward html5MultiUpload(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ResourceBundle props = ResourceBundle.getBundle("oscarResources");
@@ -405,6 +409,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		
 		HashMap<String, String> errors = new HashMap<String, String>();
 		boolean documentValid = true;
+
 		try {
 			if (fm.getDocDesc().length() == 0) {
 				errors.put("descmissing", "dms.error.descriptionInvalid");
@@ -419,19 +424,23 @@ public class AddEditDocumentAction extends DispatchAction {
 				Integer demographicNo = "demographic".equals(fm.getFunction()) ? Integer.parseInt(fm.getFunctionId()) : null;
 				String providerNo = (String) request.getSession().getAttribute("user");
 				String fileName = "";
-
 				GenericFile file = null;
 
-				// only create a new file when a stream is sent
+				// only create a new file when a replacement is present
 				if(docFile.getFileSize() != 0 && docFile.getFileName().length() != 0)
 				{
-					file = FileFactory.getDocumentFile(docFile.getFileName(), demographicNo);
 					if(oscar.OscarProperties.getInstance().isPropertyActive("ALLOW_UPDATE_DOCUMENT_CONTENT"))
 					{
-						file = FileFactory.overwriteFileContents(file, docFile.getInputStream());
+						// find the old file
+						Document document = documentDao.find(Integer.parseInt(fm.getMode()));
+						GenericFile oldFile = FileFactory.getDocumentFile(document.getDocfilename(), demographicNo);
+						// overwrite it and rename it
+						file = FileFactory.overwriteFileContents(oldFile, docFile.getInputStream());
+						file.rename(GenericFile.getFormattedFileName(docFile.getFileName()));
 					}
 					else
 					{
+						// TODO archive the old file (it is now de-referenced within the database)?
 						file = FileFactory.createDocumentFile(docFile.getInputStream(), docFile.getFileName());
 					}
 					if(!file.validate())
@@ -479,7 +488,7 @@ public class AddEditDocumentAction extends DispatchAction {
 				LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
 						fm.getMode(), request.getRemoteAddr(), fileName);
 			}
-		} 
+		}
 		catch (Exception e) {
 			MiscUtils.getLogger().error("Error Editing Document", e);
 			errors.put("uploaderror", "dms.error.uploadError");

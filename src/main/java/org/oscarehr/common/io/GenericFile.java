@@ -25,6 +25,7 @@
 package org.oscarehr.common.io;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
@@ -33,6 +34,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 public class GenericFile
@@ -48,12 +51,13 @@ public class GenericFile
 
 	public static final String BASE_DIRECTORY = props.getProperty("BASE_DOCUMENT_DIR");
 
-	public static final String DOCUMENT_BASE = props.getProperty("DOCUMENT_DIR");
-	public static final String DOCUMENT_NEW = new File(props.getProperty("DOCUMENT_DIR"), props.getProperty("DOCUMENT_NEW")).getPath();
-	public static final String DOCUMENT_CORRUPT = new File(props.getProperty("DOCUMENT_DIR"), props.getProperty("DOCUMENT_CORRUPT")).getPath();
+	public static final String DOCUMENT_BASE_DIR = props.getProperty("DOCUMENT_DIR");
+	public static final String DOCUMENT_NEW_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_NEW_DIR")).getPath();
+	public static final String DOCUMENT_CORRUPT_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_CORRUPT_DIR")).getPath();
 
 	// file info
 	protected File javaFile;
+	protected File backupFile;
 
 	// validation info
 	protected boolean hasBeenValidated;
@@ -67,16 +71,18 @@ public class GenericFile
 		this.hasBeenValidated = false;
 		this.isValid = false;
 		this.reasonInvalid = null;
+
+		this.backupFile = null;
 	}
 
 	public boolean moveToDocuments() throws IOException
 	{
-		return moveFile(DOCUMENT_BASE);
+		return moveFile(DOCUMENT_BASE_DIR);
 	}
 	public boolean moveToDocuments(String demographicNo) throws IOException
 	{
 		//TODO move to demographic specific folder
-		return moveFile(DOCUMENT_BASE);
+		return moveFile(DOCUMENT_BASE_DIR);
 	}
 	public boolean moveToDocuments(Integer demographicNo) throws IOException
 	{
@@ -85,7 +91,7 @@ public class GenericFile
 
 	public boolean moveToCorrupt() throws IOException
 	{
-		return moveFile(DOCUMENT_CORRUPT);
+		return moveFile(DOCUMENT_CORRUPT_DIR);
 	}
 
 	public boolean moveFile(String directory) throws IOException
@@ -117,6 +123,21 @@ public class GenericFile
 		throw new IOException("Invalid Directory: " + directoryFile.getPath());
 	}
 
+	public void rename(String newName) throws IOException
+	{
+		File directoryFile = javaFile.getParentFile();
+		if(directoryFile.exists() && directoryFile.isDirectory())
+		{
+			File destinationFile = new File(directoryFile, newName);
+			Files.move(javaFile.toPath(), destinationFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
+			javaFile = destinationFile;
+		}
+		else
+		{
+			throw new IOException("Invalid Directory: " + directoryFile.getPath());
+		}
+	}
+
 	public boolean validate() throws IOException, InterruptedException
 	{
 		this.hasBeenValidated = true;
@@ -127,6 +148,41 @@ public class GenericFile
 	{
 		throw new RuntimeException("Not Implemented");
 	}
+
+	public void createBackup() throws IOException
+	{
+		this.backupFile = File.createTempFile("", "");
+		Files.copy(javaFile.toPath(), backupFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
+		backupFile.deleteOnExit();
+	}
+	public boolean clearBackup()
+	{
+		if(this.backupFile != null)
+		{
+			this.backupFile.delete();
+			this.backupFile = null;
+			return true;
+		}
+		return false;
+	}
+	public boolean restoreBackup() throws IOException
+	{
+		if(this.backupFile != null)
+		{
+			Files.copy(backupFile.toPath(), javaFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
+			return clearBackup();
+		}
+		return false;
+	}
+	public File getBackupFile()
+	{
+		return this.backupFile;
+	}
+	public void setBackupFile(File backupFile)
+	{
+		this.backupFile = backupFile;
+	}
+
 	public boolean isValid()
 	{
 		return this.isValid;
@@ -173,5 +229,22 @@ public class GenericFile
 	public static Set<String> getAllowedContent()
 	{
 		return ALLOWED_CONTENT_TYPE;
+	}
+
+	/**
+	 * sanitizes the incoming file name string to a friendly format
+	 * @param originalName - name to be sanitized
+	 * @return - the reformatted name string
+	 */
+	public static String getSanitizedFileName(String originalName)
+	{
+		return StringUtils.trimToEmpty(originalName).replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+	}
+	public static String getFormattedFileName(String originalName)
+	{
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+		LocalDateTime now = LocalDateTime.now();
+
+		return formatter.format(now) + getSanitizedFileName(originalName);
 	}
 }
