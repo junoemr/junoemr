@@ -151,6 +151,9 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 //			infoTable.addCell(cell);
 //		}
 
+		// Split row if there isn't enough space on the current page
+		border.setSplitLate(false);
+
 		// Adding details and promotional information.
 		addTable(border, infoTable);
 
@@ -397,6 +400,9 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 		PdfPCell cell;
 		infoTable = new PdfPTable(1);
 		cell = new PdfPCell();
+
+		// Split rows if there isn't enough space on the current page
+		infoTable.setSplitLate(false);
 
 		infoTable.addCell(setInfoCell(cell, getResource("msgReason")));
 		infoTable.addCell(setDataCell(cell, reqFrm.reasonForConsultation));
