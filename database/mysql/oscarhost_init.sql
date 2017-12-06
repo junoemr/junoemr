@@ -202,3 +202,7 @@ ALTER TABLE `providerArchive` ADD COLUMN `tak_no` VARCHAR(20);
 ALTER TABLE appointment ADD COLUMN partial_booking tinyint(1) NOT NULL DEFAULT 0;
 ALTER TABLE appointmentArchive ADD COLUMN partial_booking tinyint(1) NOT NULL DEFAULT 0;
 
+-- OHSUPPORT-4570 - Add new field for custom status to the main demographic page
+CREATE TABLE demographic_custom_status (id int(10) AUTO_INCREMENT PRIMARY KEY, status varchar(128), deleted tinyint(1) NOT NULL DEFAULT 0);
+ALTER TABLE demographic ADD COLUMN custom_status_id int(10) AFTER patient_status;
+
