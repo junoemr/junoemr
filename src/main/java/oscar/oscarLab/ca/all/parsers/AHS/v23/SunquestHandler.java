@@ -22,45 +22,48 @@
  * Ontario, Canada
  */
 
-package oscar.oscarLab.ca.all.parsers.AHS.v22;
+package oscar.oscarLab.ca.all.parsers.AHS.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v22.message.ORU_R01;
-import ca.uhn.hl7v2.model.v22.segment.MSH;
+import ca.uhn.hl7v2.model.v23.message.ORU_R01;
+import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.apache.log4j.Logger;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
-public class AHSSpecimenGateHandler extends AHSHandler
+public class SunquestHandler extends AHSHandler
 {
-	private static Logger logger = Logger.getLogger(AHSSpecimenGateHandler.class);
+	private static Logger logger = Logger.getLogger(SunquestHandler.class);
+
 	protected ORU_R01 msg;
 
 	public static boolean handlerTypeMatch(Message message)
 	{
 		String version = message.getVersion();
-		if(version.equals("2.2"))
+		if(version.equals("2.3"))
 		{
 			ORU_R01 msh = (ORU_R01) message;
 			MSH messageHeaderSegment = msh.getMSH();
 
-			String sendingApplication = messageHeaderSegment.getSendingApplication().getValue();
+			String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
+			String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
 
-			return "SpecimenGate".equalsIgnoreCase(sendingApplication);
+			return "OADD".equalsIgnoreCase(sendingApplication) &&
+					("SUNQUEST".equalsIgnoreCase(sendingFacility) || "COPATH".equalsIgnoreCase(sendingFacility));
 		}
 		return false;
 	}
 
-	public AHSSpecimenGateHandler()
+	public SunquestHandler()
 	{
 		super();
 	}
-	public AHSSpecimenGateHandler(String hl7Body) throws HL7Exception
+	public SunquestHandler(String hl7Body) throws HL7Exception
 	{
 		super(hl7Body);
 		this.msg = (ORU_R01) this.message;
 	}
-	public AHSSpecimenGateHandler(Message msg) throws HL7Exception
+	public SunquestHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
 		this.msg = (ORU_R01) this.message;
@@ -68,69 +71,32 @@ public class AHSSpecimenGateHandler extends AHSHandler
 
     /* ===================================== MSH ====================================== */
 
-	@Override
-	public String getMsgType()
-	{
-		return "AHS";
-	}
-	@Override
-	public String getPatientLocation()
-	{
-		//return getString(get("/.PV1-3"));
-		return "SpecimenGate";
-	}
-
     /* ===================================== PID ====================================== */
 
     /* ===================================== OBR ====================================== */
 
-	/**
-	 *  Return the number of OBR Segments in the message
-	 */
-	public int getOBRCount()
+	@Override
+	protected String getOrderingProvider(int i, int k) throws HL7Exception
 	{
-		return getReps("PATIENT_RESULT", 0, "ORDER_OBSERVATION");
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-2"));
 	}
 	@Override
-	public String getServiceDate()
+	protected String getResultCopiesTo(int i, int k) throws HL7Exception
 	{
-		String collectionDate = formatDate(getString(get("/.OBR-7")));
-		String collectionTime = formatTime(getString(get("/.OBR-7")));
-
-		// use collectionDate, birth-date, or all 1's for date
-		if(collectionDate.isEmpty())
-		{
-			collectionDate = getDOB();
-			if(collectionDate.isEmpty())
-				collectionDate = "1111-11-11";
-		}
-		// use collectionTime or all 0's for time
-		if(collectionTime.isEmpty())
-			collectionTime = "00:00";
-
-		return collectionDate + " " + collectionTime;
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-2"));
 	}
-
-	@Override
-	public boolean isUnstructured() {
-		return true;
-	}
-
-    /* ===================================== OBX ====================================== */
-
-	/* ===================================== MISC ===================================== */
 
     /* =============================== Upload Handling ================================ */
 
-    @Override
-    public String preUpload(String hl7Message) throws HL7Exception
-    {
-	    return hl7Message;
-    }
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
 	@Override
 	public boolean canUpload()
 	{
-		//Specimen Gate reports are not linked
+		//TODO - check duplicates and merge labs
 		return true;
 	}
 	@Override

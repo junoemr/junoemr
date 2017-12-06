@@ -51,10 +51,13 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
-import oscar.oscarLab.ca.all.parsers.AHS.v22.AHSSpecimenGateHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.AHSSunquestHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v22.SpecimenGateHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.AITLHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.GLSHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ProvlabHandler;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -137,10 +140,16 @@ public final class Factory {
 			handler = new CLSHandler(msg);
 		else if(CLSDIHandler.handlerTypeMatch(msg))
 			handler = new CLSDIHandler(msg);
-		else if(AHSSunquestHandler.handlerTypeMatch(msg))
-			handler = new AHSSunquestHandler(msg);
-		else if(AHSSpecimenGateHandler.handlerTypeMatch(msg))
-			handler = new AHSSpecimenGateHandler(msg);
+		else if(SunquestHandler.handlerTypeMatch(msg))
+			handler = new SunquestHandler(msg);
+		else if(SpecimenGateHandler.handlerTypeMatch(msg))
+			handler = new SpecimenGateHandler(msg);
+		else if(AITLHandler.handlerTypeMatch(msg))
+			handler = new AITLHandler(msg);
+		else if(GLSHandler.handlerTypeMatch(msg))
+			handler = new GLSHandler(msg);
+		else if(ProvlabHandler.handlerTypeMatch(msg))
+			handler = new ProvlabHandler(msg);
 
 		if(handler == null)
 			throw new RuntimeException("Hl7 message/type does not match a known lab handler.");

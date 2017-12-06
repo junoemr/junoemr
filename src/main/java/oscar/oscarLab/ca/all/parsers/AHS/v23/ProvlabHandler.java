@@ -28,15 +28,9 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
-import org.apache.log4j.Logger;
-import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
-public class AHSSunquestHandler extends AHSHandler
+public class ProvlabHandler extends CLSHandler
 {
-	private static Logger logger = Logger.getLogger(AHSSunquestHandler.class);
-
-	protected ORU_R01 msg;
-
 	public static boolean handlerTypeMatch(Message message)
 	{
 		String version = message.getVersion();
@@ -48,57 +42,16 @@ public class AHSSunquestHandler extends AHSHandler
 			String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
 
-			return "OADD".equalsIgnoreCase(sendingApplication) &&
-					("SUNQUEST".equalsIgnoreCase(sendingFacility) || "COPATH".equalsIgnoreCase(sendingFacility));
+			return "OPEN ENGINE".equalsIgnoreCase(sendingApplication) &&
+					"PROV".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
 	}
-
-	public AHSSunquestHandler()
-	{
-		super();
-	}
-	public AHSSunquestHandler(String hl7Body) throws HL7Exception
-	{
-		super(hl7Body);
-		this.msg = (ORU_R01) this.message;
-	}
-	public AHSSunquestHandler(Message msg) throws HL7Exception
+	public ProvlabHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
-		this.msg = (ORU_R01) this.message;
 	}
-
-    /* ===================================== MSH ====================================== */
-
-    /* ===================================== PID ====================================== */
-
-    /* ===================================== OBR ====================================== */
-
-	@Override
-	protected String getOrderingProvider(int i, int k) throws HL7Exception
-	{
-		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-2"));
+	public String getMsgType() {
+		return "CLS";
 	}
-	@Override
-	protected String getResultCopiesTo(int i, int k) throws HL7Exception
-	{
-		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-2"));
-	}
-
-    /* =============================== Upload Handling ================================ */
-
-	@Override
-	public String preUpload(String hl7Message) throws HL7Exception
-	{
-		return hl7Message;
-	}
-	@Override
-	public boolean canUpload()
-	{
-		//TODO - check duplicates and merge labs
-		return true;
-	}
-	@Override
-	public void postUpload() {}
 }
