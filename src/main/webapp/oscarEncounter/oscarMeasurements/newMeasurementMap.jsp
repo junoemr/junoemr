@@ -65,50 +65,55 @@
                 
                 return false;
             }
-            
+
+			/**
+			 * Checks to see if a lonic code is valid. Lonic code validations are done by a mod 10
+			 * check digit algorithm (https://en.wikipedia.org/wiki/Luhn_algorithm). Where, in the
+			 * lonic code, the number before the dash is the code and the number after is the check
+			 * digit.
+			 * @param {String} code - A lonic code
+			 * @return {Boolean} True or False depending if the lonic code is valid or not
+			 */
             function modCheck(code){
                 if (code.charAt(0) == 'x' || code.charAt(0) == 'X'){
                     return true;
                 }else{
 
                     var codeArray = new Array();
-                    codeArray = code.split('-');                    
+                    codeArray = code.split('-');
+
+                    //Validate the format of the Lonic code before validating that it's a correct code
+					if(codeArray.length != 2 || codeArray[0].length < 2 || codeArray[1].length > 1) {
+						alert("Invalid lonic code format, please start the code with an 'X' if you would like to make your own.");
+						return false;
+					}
+
                     var length = codeArray[0].length;
-                    
-                    var even = false;
-                    if ( (length % 2) == 0 ) even = true;
-                    
-                    
-                    var oddNums = '';
-                    var evenNums = '';
-                    
-                    length--;
-                    for (length; length >= 0; length--){
-                        if (even){
-                            even = false;
-                            evenNums = evenNums+codeArray[0].charAt(length);
-                        }else{
-                            even = true;
-                            oddNums = oddNums+codeArray[0].charAt(length);
-                        }
-                    }
-                    
-                    oddNums = oddNums*2;
-                    var newNum = evenNums+oddNums;
                     var sum = 0;
-                    
-                    
-                    for (var i=0; i < newNum.length; i++){
-                        sum = sum + parseInt(newNum.charAt(i));
-                    }
-                    
-                    var newSum = sum;
+					var codeIntArray = new Array();
 
-                    while((newSum % 10) != 0){
-                        newSum++;
-                    }
+                    for(var i = 0; i < length; i++) {
+                    	codeIntArray[i] = parseInt(codeArray[0].charAt(i));
+					}
 
-                    var checkDigit = newSum - sum;
+					//Double every other digit starting from rightmost digit
+					for (var i = codeIntArray.length-1; i >= 0; i-=2){
+						codeIntArray[i] = codeIntArray[i]*2;
+
+						//If doubling is greater than 10, sum the digits(same as subtracting 9)
+						if(codeIntArray[i] >= 10) {
+							codeIntArray[i] = codeIntArray[i] - 9;
+						}
+					}
+
+					for (var i = 0; i < codeIntArray.length; i++){
+						sum = sum + codeIntArray[i];
+					}
+
+					sum = sum * 9;
+
+					var checkDigit = sum % 10;
+
                     if (checkDigit == codeArray[1]){
                         return true;
                     }else{
