@@ -180,16 +180,13 @@ public class DemographicsService extends AbstractServiceImpl {
 
 			List<DemographicSearchResult> results = new ArrayList<DemographicSearchResult>();
 
-			if (json.getString("term").length() >= 1)
-			{
-				int count = demographicManager.searchPatientsCount(getLoggedInInfo(), req);
+			int count = demographicManager.searchPatientsCount(getLoggedInInfo(), req);
 
-				if (count > 0)
-				{
-					results = demographicManager.searchPatients(getLoggedInInfo(), req, startIndex, itemsToReturn);
-					response.setContent(results);
-					response.setTotal(count);
-				}
+			if (count > 0)
+			{
+				results = demographicManager.searchPatients(getLoggedInInfo(), req, startIndex, itemsToReturn);
+				response.setContent(results);
+				response.setTotal(count);
 			}
 
 			return RestResponse.successResponse(response);
