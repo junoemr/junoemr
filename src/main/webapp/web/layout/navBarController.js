@@ -480,7 +480,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		};
 
 		// For some reason Angular does not allow for the evaluation of the inverse of custom filters, thus, we have the the following masterpiece
-		// If inverse === false, return true if the given item is supposed to be shown outisde the 'more' dropdown on the medium view
+		// If inverse === false, return true if the given item is supposed to be shown outside the 'more' dropdown on the medium view
 		// If inverse === true, return the inverse of the above statement,
 		controller.mediumNavItemFilter = function mediumNavItemFilter(inverse)
 		{

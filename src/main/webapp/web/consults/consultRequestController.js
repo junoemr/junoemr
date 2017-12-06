@@ -31,10 +31,8 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		var controller = this;
 
 		controller.consult = consult;
-		console.log('CONSULT: ', angular.copy(controller.consult));
 
 		consult.letterheadList = Juno.Common.Util.toArray(consult.letterheadList);
-		console.log('LETTERHEAD LIST: ', consult.letterheadList);
 		consult.faxList = Juno.Common.Util.toArray(consult.faxList);
 		consult.serviceList = Juno.Common.Util.toArray(consult.serviceList);
 		consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
@@ -446,7 +444,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		controller.close = function close()
 		{
-			if ($location.search().list == "patient") $location.path("/record/" + consult.demographicId + "/consults");
+			if ($location.search().list === "patient") $location.path("/record/" + consult.demographicId + "/consults");
 			else $location.path("/consults");
 		};
 

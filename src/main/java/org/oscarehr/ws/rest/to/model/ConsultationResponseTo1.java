@@ -25,6 +25,8 @@
 
 package org.oscarehr.ws.rest.to.model;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +34,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public class ConsultationResponseTo1 implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static final String DEFAULT_NOTHING = "1";
