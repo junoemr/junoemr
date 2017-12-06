@@ -2187,7 +2187,7 @@ public class DemographicExportAction4 extends Action {
 							String expFile = first_name + "_" + last_name;
 							expFile += "_" + demoNo;
 							expFile += "_" + demographic.getDateOfBirth() + demographic.getMonthOfBirth() + demographic.getYearOfBirth();
-							patientTempFile = new File(directory, expFile + ".xml");
+							patientTempFile = new File(directory, StringUtils.sanitizeFilename(expFile) + ".xml");
 						}
 						catch (Exception e) {
 							logger.error("Error", e);
