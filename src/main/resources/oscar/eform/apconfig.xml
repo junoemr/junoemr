@@ -1132,28 +1132,16 @@
 	<!-- Referral information -->
 	<databaseap>
 		<ap-name>referral_name</ap-name>
-		<ap-sql>SELECT IF (
-					(SELECT
-					<!-- if referralno in specialists table-->
-					COUNT(*)
-						FROM professionalSpecialists ps JOIN demographic d ON (SUBSTRING(d.family_doctor,9,(LENGTH(ps.referralNo))) = ps.referralNo)
-						WHERE (d.demographic_no=${demographic}
-						AND LENGTH(ps.referralNo) > 0
-						AND SUBSTRING(d.family_doctor,9,(LENGTH(ps.referralNo)))=ps.referralNo))
-					> 0,
-					<!-- then use specialist table info-->
-					(SELECT CONCAT(ps.lName, ", ", ps.fName)
-					FROM professionalSpecialists ps JOIN demographic d ON (SUBSTRING(d.family_doctor,9,(LENGTH(ps.referralNo))) = ps.referralNo)
-					WHERE (d.demographic_no=${demographic}
-					AND LENGTH(ps.referralNo) > 0
-					AND SUBSTRING(d.family_doctor,9,(LENGTH(ps.referralNo)))=ps.referralNo)),
-					<!-- else use text field-->
-					(SELECT ExtractValue(demographic.family_doctor, '/rd')
-					FROM demographic
-					WHERE demographic.demographic_no=${demographic})
-				) AS fullName
+		<ap-sql>SELECT
+			CASE WHEN ps.lName IS NULL AND ps.fName IS NULL
+			THEN EXTRACTVALUE(d.family_doctor, '/rd')
+			ELSE CONCAT(ps.lName, ", ", ps.fName)
+			END as referral_doc_name
+			FROM demographic d
+			LEFT JOIN professionalSpecialists ps ON (EXTRACTVALUE(d.family_doctor, '/rdohip') = ps.referralNo)
+			WHERE d.demographic_no=${demographic}
 		</ap-sql>
-		<ap-output>${fullName}</ap-output>
+		<ap-output>${referral_doc_name}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>referral_address</ap-name>
