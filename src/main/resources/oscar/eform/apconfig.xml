@@ -1132,9 +1132,22 @@
 	<!-- Referral information -->
 	<databaseap>
 		<ap-name>referral_name</ap-name>
-		<ap-sql>SELECT ExtractValue(demographic.family_doctor, '/rd') AS fullName
+		<ap-sql> SELECT IF ( (SELECT COUNT(*)
+			FROM professionalSpecialists, demographic
+			WHERE (demographic.demographic_no=${demographic} AND
+			LENGTH(professionalSpecialists.referralNo) > 0
+			AND
+			SUBSTRING(demographic.family_doctor,9,(LENGTH(professionalSpecialists.referralNo)))=professionalSpecialists.referralNo)) > 0,
+			(SELECT CONCAT(professionalSpecialists.lName, ", ", professionalSpecialists.fName)
+			FROM professionalSpecialists, demographic
+			WHERE demographic.demographic_no=${demographic} AND
+			LENGTH(professionalSpecialists.referralNo) > 0
+			AND
+			SUBSTRING(demographic.family_doctor,9,(LENGTH(professionalSpecialists.referralNo)))=professionalSpecialists.referralNo),
+			(SELECT ExtractValue(demographic.family_doctor, '/rd')
 			FROM demographic
-			WHERE demographic.demographic_no=${demographic}
+			WHERE demographic.demographic_no=${demographic}) )
+			AS fullName
 		</ap-sql>
 		<ap-output>${fullName}</ap-output>
 	</databaseap>
