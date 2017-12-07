@@ -167,6 +167,9 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 					return;
 				}
 			}
+
+			// reset to page 1 for new searches
+			controller.tableParams.page(1);
 			controller.tableParams.reload();
 		};
 
@@ -194,6 +197,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			// do the search (if initialized)
 			if (Juno.Common.Util.exists(controller.tableParams))
 			{
+				controller.tableParams.page(1);
 				controller.tableParams.reload();
 			}
 		};
