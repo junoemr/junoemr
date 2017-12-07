@@ -49,7 +49,6 @@ import org.hibernate.criterion.Restrictions;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.web.formbean.ClientListsReportFormBean;
 import org.oscarehr.PMmodule.web.formbean.ClientSearchFormBean;
-import org.oscarehr.caisi_integrator.ws.MatchingDemographicParameters;
 import org.oscarehr.common.DemographicSearchResultTransformer;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.NativeSql;
@@ -2064,136 +2063,132 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	  	}
 		return lastfirst;
 	}
-	
+
 	private String generateDemographicSearchQuery(LoggedInInfo loggedInInfo, DemographicSearchRequest searchRequest, Map<String,Object> params, String select) {
 		OscarProperties props = OscarProperties.getInstance();  
-		MatchingDemographicParameters matchingDemographicParameters=null;
-		
+
 		String keyword = searchRequest.getKeyword();
 		SEARCHMODE mode = searchRequest.getMode();
-		
-		params.put("keyword", keyword);
-	
-		String fieldname="";  
-		String regularexp = "regexp";
-	  
-		if(keyword.contains("*") || keyword.contains("%")) {
-			regularexp="like";
-		}
-    
+
+		String fieldName="";
+		String comparisonOperator = "like";
+		Boolean useUserWildcards = keyword.contains("%") || keyword.contains("_");
+
 		if(mode == SEARCHMODE.Address) {
-			fieldname="d.address";
+			fieldName="d.address";
 		}
 		else if(mode == SEARCHMODE.Phone) {
-			fieldname="d.phone";
+			fieldName="d.phone";
 		}
 		else if(mode == SEARCHMODE.DemographicNo) {
-			fieldname="d.demographic_no";
+			fieldName="d.demographic_no";
+			// unless keyword uses wildcards look for an exact match
+			if (!useUserWildcards)
+			{
+				comparisonOperator = "=";
+			}
 		}
 		else if(mode == SEARCHMODE.HIN) {
-			fieldname="d.hin";
-			matchingDemographicParameters=new MatchingDemographicParameters();
-		    matchingDemographicParameters.setHin(keyword);
+			fieldName="d.hin";
 		}
 		else if(mode == SEARCHMODE.DOB) {
-			fieldname="d.year_of_birth = :year and d.month_of_birth = :month and d.date_of_birth ";
+			// unless keyword uses wildcards look for an exact match
+			if (!useUserWildcards)
+			{
+				comparisonOperator = "=";
+			}
+			fieldName="d.year_of_birth " + comparisonOperator + " :year and d.month_of_birth " +
+					comparisonOperator + " :month and d.date_of_birth ";
 
-	    	try
-	    	{
-	    		String year=keyword.substring(0, 4);
-	    		String month=keyword.substring(5, 7);
-	    		String day=keyword.substring(8);
-	    		
-	    		params.put("year", year);
-	    		params.put("month", month);
-	    		params.put("keyword", day);
+			String[] dateOfBirth = keyword.split("-");
+			String year = dateOfBirth.length > 0 ? dateOfBirth[0] : null;
+			String month = dateOfBirth.length > 1 ? dateOfBirth[1] : null;
+			String day = dateOfBirth.length > 2 ? dateOfBirth[2] : null;
 
-		    	GregorianCalendar cal=new GregorianCalendar(Integer.parseInt(year), Integer.parseInt(month)-1, Integer.parseInt(day));
-		    	matchingDemographicParameters=new MatchingDemographicParameters();
-		    	matchingDemographicParameters.setBirthDate(cal);
-	    	}
-	    	catch (Exception e){
-	    		// this is okay, person inputed a bad date, we'll ignore for now
-	    		matchingDemographicParameters=null;
-	    		params.put("year", null);
-	    		params.put("month", null);
-	    		params.put("keyword", null);
-	    	}
+			params.put("year", year);
+			params.put("month", month);
+			keyword = day;
+
 		}
 		else if(mode == SEARCHMODE.ChartNo) {
-			fieldname="d.chart_no";
-		}
-		else if(mode == SEARCHMODE.HIN) {
-			fieldname="d.hin";
+			fieldName="d.chart_no";
 		}
 		else if(mode == SEARCHMODE.Name) {
-		  	matchingDemographicParameters=new MatchingDemographicParameters();
 		  	String[] lastfirst = splitPatientNames(keyword);
 		  	
-		  	if(lastfirst[0].trim().equals("")) lastfirst[0] = (regularexp.equals("regexp")) ? ".*" : "%";
-		  	
-		  	matchingDemographicParameters.setLastName(lastfirst[0].trim());
-		  	params.put("keyword", lastfirst[0].trim());
-		  	fieldname="lower(d.last_name)";
-		  	
-	        if (lastfirst.length > 1) {	        	
-	        	params.put("extraKeyword", lastfirst[0].trim());
-	            matchingDemographicParameters.setFirstName(lastfirst[1].trim());
-	            params.put("keyword", lastfirst[1].trim());
-	            fieldname += " "+regularexp+" :extraKeyword and lower(d.first_name) ";
+		  	keyword = lastfirst[0].trim();
+		  	fieldName="lower(d.last_name)";
+
+	        if (lastfirst.length > 1) {
+	        	params.put("extraKeyword", lastfirst[0].trim() + (useUserWildcards ? "" : "%"));
+				keyword = lastfirst[1].trim();
+	            fieldName += "like :extraKeyword and lower(d.first_name) ";
 	        }
 		}
-		
-		String ptstatusexp="";
+
+		if (useUserWildcards ||
+				mode == SEARCHMODE.DemographicNo || mode == SEARCHMODE.DOB)
+		{
+			params.put("keyword", keyword);
+		} else if (mode == SEARCHMODE.Address || mode == SEARCHMODE.Phone)
+		{
+			params.put("keyword", "%" + keyword + "%");
+		} else
+		{
+			params.put("keyword", keyword + "%");
+		}
+
+		String patientStatusExpression="";
 
 		if (STATUSMODE.active.equals(searchRequest.getStatusMode()))
 		{
-			ptstatusexp = " and d.patient_status not in (" + props.getProperty("inactive_statuses", "'IN','DE','IC', 'ID', 'MO', 'FI'") + ") ";
+			patientStatusExpression = " and d.patient_status not in (" + props.getProperty("inactive_statuses", "'IN','DE','IC', 'ID', 'MO', 'FI'") + ") ";
 		} else if (STATUSMODE.inactive.equals(searchRequest.getStatusMode()))
 		{
-			ptstatusexp = " and d.patient_status in (" + props.getProperty("inactive_statuses", "'IN','DE','IC', 'ID', 'MO', 'FI'") + ") ";
+			patientStatusExpression = " and d.patient_status in (" + props.getProperty("inactive_statuses", "'IN','DE','IC', 'ID', 'MO', 'FI'") + ") ";
 		}
-		 
-		  String domainRestriction="";
-		  if(!searchRequest.isOutOfDomain()) {
-			  domainRestriction = " and d.demographic_no in ( select distinct a.client_id from program_provider pp,admission a WHERE pp.program_id=a.program_id AND pp.provider_no=:providerNo ) ";
-			  params.put("providerNo", loggedInInfo.getLoggedInProviderNo());
-		  }
-		  
-		  String orderBy = "d.last_name,d.first_name";
-		  
-		  String orderDir = "asc";
-		  if(searchRequest.getSortDir() != null) {
-			  orderDir = searchRequest.getSortDir().toString();
-		  }
-		  if(SORTMODE.Address.equals(searchRequest.getSortMode())) {
-			  orderBy = "d.address " + orderDir;
-		  } else if(SORTMODE.ChartNo.equals(searchRequest.getSortMode())) {
-			  orderBy = "d.chart_no " + orderDir;
-		  } else if(SORTMODE.DemographicNo.equals(searchRequest.getSortMode())) {
-			  orderBy = "d.demographic_no " + orderDir;
-		  } else if(SORTMODE.DOB.equals(searchRequest.getSortMode())) {
-			  orderBy = "year_of_birth "+ orderDir+",month_of_birth "+ orderDir+",date_of_birth "+ orderDir;
-		  } else if(SORTMODE.Name.equals(searchRequest.getSortMode())) {
-			  orderBy =  "d.last_name "+ orderDir+",d.first_name " + orderDir;
-		  } else if(SORTMODE.Phone.equals(searchRequest.getSortMode())) {
-			  orderBy =  "d.phone " + orderDir;
-		  } else if(SORTMODE.ProviderName.equals(searchRequest.getSortMode())) {
-			  orderBy =  "p.last_name "+ orderDir+",p.first_name " + orderDir;
-		  }  else if(SORTMODE.PS.equals(searchRequest.getSortMode())) {
-			  orderBy =  "d.patient_status "+ orderDir;
-		  } else if(SORTMODE.RS.equals(searchRequest.getSortMode())) {
-			  orderBy =  "d.roster_status "+ orderDir;
-		  } else if(SORTMODE.Sex.equals(searchRequest.getSortMode())) {
-			  orderBy =  "d.sex "+ orderDir;
-		  }
 
-		  orderBy = " ORDER BY " + orderBy;
-		  return "select " + select + " " +
-				  "from demographic d " +
-				  "left join provider p on d.provider_no = p.provider_no " +
-				  "left join demographic_merged dm on (d.demographic_no = dm.demographic_no AND dm.deleted = '0') " +
-				  "where dm.id IS NULL AND "+fieldname+" "+regularexp+" :keyword "+ptstatusexp+domainRestriction+orderBy;
+		String domainRestriction="";
+		if(!searchRequest.isOutOfDomain()) {
+		  domainRestriction = " and d.demographic_no in ( select distinct a.client_id from program_provider pp,admission a WHERE pp.program_id=a.program_id AND pp.provider_no=:providerNo ) ";
+		  params.put("providerNo", loggedInInfo.getLoggedInProviderNo());
+		}
+
+		String orderBy = "d.last_name,d.first_name";
+
+		String orderDir = "asc";
+		if(searchRequest.getSortDir() != null) {
+		  orderDir = searchRequest.getSortDir().toString();
+		}
+		if(SORTMODE.Address.equals(searchRequest.getSortMode())) {
+		  orderBy = "d.address " + orderDir;
+		} else if(SORTMODE.ChartNo.equals(searchRequest.getSortMode())) {
+		  orderBy = "d.chart_no " + orderDir;
+		} else if(SORTMODE.DemographicNo.equals(searchRequest.getSortMode())) {
+		  orderBy = "d.demographic_no " + orderDir;
+		} else if(SORTMODE.DOB.equals(searchRequest.getSortMode())) {
+		  orderBy = "year_of_birth "+ orderDir+",month_of_birth "+ orderDir+",date_of_birth "+ orderDir;
+		} else if(SORTMODE.Name.equals(searchRequest.getSortMode())) {
+		  orderBy =  "d.last_name "+ orderDir+",d.first_name " + orderDir;
+		} else if(SORTMODE.Phone.equals(searchRequest.getSortMode())) {
+		  orderBy =  "d.phone " + orderDir;
+		} else if(SORTMODE.ProviderName.equals(searchRequest.getSortMode())) {
+		  orderBy =  "p.last_name "+ orderDir+",p.first_name " + orderDir;
+		}  else if(SORTMODE.PS.equals(searchRequest.getSortMode())) {
+		  orderBy =  "d.patient_status "+ orderDir;
+		} else if(SORTMODE.RS.equals(searchRequest.getSortMode())) {
+		  orderBy =  "d.roster_status "+ orderDir;
+		} else if(SORTMODE.Sex.equals(searchRequest.getSortMode())) {
+		  orderBy =  "d.sex "+ orderDir;
+		}
+
+		orderBy = " ORDER BY " + orderBy;
+		return "select " + select + " " +
+				"from demographic d " +
+				"left join provider p on d.provider_no = p.provider_no " +
+				"left join demographic_merged dm on (d.demographic_no = dm.demographic_no AND dm.deleted = '0') " +
+				"where dm.id IS NULL AND " + fieldName + " " + comparisonOperator + " :keyword " +
+				patientStatusExpression + domainRestriction + orderBy;
 	}
 
 	public List<Demographic> getDemographics(List<Integer> demographicIds) {
