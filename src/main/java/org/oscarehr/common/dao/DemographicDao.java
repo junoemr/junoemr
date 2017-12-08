@@ -2070,9 +2070,13 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		String keyword = searchRequest.getKeyword();
 		SEARCHMODE mode = searchRequest.getMode();
 
+		// Allow '*' in searches and treat it the same as the % wildcard
+		keyword = keyword.replace('*', '%');
+
 		String fieldName="";
 		String comparisonOperator = "like";
 		Boolean useUserWildcards = keyword.contains("%") || keyword.contains("_");
+
 
 		if(mode == SEARCHMODE.Address) {
 			fieldName="d.address";
