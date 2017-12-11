@@ -1132,15 +1132,16 @@
 	<!-- Referral information -->
 	<databaseap>
 		<ap-name>referral_name</ap-name>
-		<ap-sql>SELECT professionalSpecialists.lName,
-			professionalSpecialists.fName
-			FROM professionalSpecialists, demographic
-			WHERE demographic.demographic_no=${demographic} AND
-			LENGTH(professionalSpecialists.referralNo) > 0
-			AND
-			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = professionalSpecialists.referralNo
+		<ap-sql>SELECT
+			CASE WHEN ps.lName IS NULL AND ps.fName IS NULL
+			THEN EXTRACTVALUE(d.family_doctor, '/rd')
+			ELSE CONCAT(ps.lName, ", ", ps.fName)
+			END as referral_doc_name
+			FROM demographic d
+			LEFT JOIN professionalSpecialists ps ON (EXTRACTVALUE(d.family_doctor, '/rdohip') = ps.referralNo)
+			WHERE d.demographic_no=${demographic}
 		</ap-sql>
-		<ap-output>${lName}, ${fName}</ap-output>
+		<ap-output>${referral_doc_name}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>referral_address</ap-name>
