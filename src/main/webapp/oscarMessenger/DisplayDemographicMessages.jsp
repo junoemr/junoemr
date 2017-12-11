@@ -30,6 +30,7 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 <%@ page import="oscar.oscarDemographic.data.DemographicData"%>
+<%@ page import="static org.apache.commons.lang.StringUtils.stripToNull" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -52,7 +53,7 @@ if(!authed) {
 
 if (request.getParameter("orderby") != null){
     String orderby = request.getParameter("orderby");
-    String sessionOrderby = (String) session.getAttribute("orderby");     
+    String sessionOrderby = (String) session.getAttribute("orderby");
     if (sessionOrderby != null && sessionOrderby.equals(orderby)){
         orderby = "!"+orderby;
     }
@@ -81,14 +82,14 @@ final int INITIAL_DISPLAY=20;
 <%
 oscar.oscarMessenger.pageUtil.MsgSessionBean bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)pageContext.findAttribute("bean");
 String demographic_no = "";
-if(request.getParameter("demographic_no")!=null){
+if(stripToNull(request.getParameter("demographic_no"))!=null){
 	demographic_no = request.getParameter("demographic_no");
 }else{
 	demographic_no = bean.getDemographic_no();
 }
 
 String demographic_name = "";
-if ( demographic_no != null ) {   
+if ( stripToNull(demographic_no) != null ) {
     DemographicData demographic_data = new DemographicData();
     org.oscarehr.common.model.Demographic demographic = demographic_data.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demographic_no);
     demographic_name = demographic.getLastName() + ", " + demographic.getFirstName();
@@ -134,8 +135,8 @@ function BackToOscar()
     }
 }
 
-function unlink(){    
-    document.forms[0].submit();    
+function unlink(){
+    document.forms[0].submit();
 }
 </script>
 </head>
@@ -155,7 +156,7 @@ function unlink(){
 				</td>
 				<td></td>
 				<td style="text-align: right">
-				  <oscar:help keywords="message" key="app.top1"/> | 
+				  <oscar:help keywords="message" key="app.top1"/> |
 				  <a href="javascript:void(0)" onclick="javascript:popupPage(600,700,'../oscarEncounter/About.jsp')"><bean:message key="global.about" /></a>
 			    </td>
 			</tr>
@@ -222,17 +223,17 @@ function unlink(){
 								<bean:message key="oscarMessenger.DisplayMessages.msgDate" />
 							</html:link> <%}%>
 							</th>
-                                                        <th align="left" bgcolor="#DDDDFF">
-                                                        <% if (moreMessages.equals("true")){%>
-                                                            <html:link page="/oscarMessenger/DisplayDemographicMessages.jsp?orderby=linked&moreMessages=true">
-                                                            <bean:message key="oscarMessenger.DisplayMessages.msgLinked"/>
-                                                            </html:link>
-                                                        <%}else{%>
-                                                            <html:link page="/oscarMessenger/DisplayDemographicMessages.jsp?orderby=linked&moreMessages=false">
-                                                            <bean:message key="oscarMessenger.DisplayMessages.msgLinked"/>
-                                                            </html:link>
-                                                        <%}%>
-                                                        </th>
+							<th align="left" bgcolor="#DDDDFF">
+							<% if (moreMessages.equals("true")){%>
+								<html:link page="/oscarMessenger/DisplayDemographicMessages.jsp?orderby=patient&moreMessages=true">
+								<bean:message key="oscarMessenger.DisplayMessages.msgLinked"/>
+								</html:link>
+							<%}else{%>
+								<html:link page="/oscarMessenger/DisplayDemographicMessages.jsp?orderby=patient&moreMessages=false">
+								<bean:message key="oscarMessenger.DisplayMessages.msgLinked"/>
+								</html:link>
+							<%}%>
+							</th>
 						</tr>
 						<% //java.util.Vector theMessages = new java.util.Vector() ;
                                    java.util.Vector theMessages2 = new java.util.Vector() ;
