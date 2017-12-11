@@ -207,7 +207,8 @@ import oscar.util.UtilDateUtilities;
     final boolean ADD_IMPORT_NOTES_MEDICATIONS 		= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_MEDICATIONS", "false");
     final boolean ADD_IMPORT_NOTES_IMMUNIZATIONS 	= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_IMMUNIZATIONS", "false");
     final boolean ADD_IMPORT_NOTES_REPORTS 			= !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_REPORTS", "false");
-    
+	final boolean ADD_IMPORT_NOTES_LABS             = !oscarProperties.getBooleanProperty("ADD_IMPORT_NOTES_LABS", "false");
+
     /*
      * Allow the default provider to be customized via properties file
      */
@@ -1980,7 +1981,7 @@ import oscar.util.UtilDateUtilities;
 
                         //to dumpsite
                         String testResultsInfo = labResults.getTestResultsInformationReportedByTheLab();
-                        if (StringUtils.filled(testResultsInfo)) {
+                        if (StringUtils.filled(testResultsInfo) && ADD_IMPORT_NOTES_LABS) {
                             String dump = Util.addLine("imported.cms4.2011.06", "Test Results Info: ", testResultsInfo);
                             CaseManagementNote cmNote = prepareCMNote("2",null);
                             cmNote.setNote(dump);
