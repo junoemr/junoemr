@@ -149,6 +149,12 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return false;
 		};
 
+		controller.openAssessments = function openAssessments()
+		{
+			// open forms tab with "Library" list selected
+			$state.go('record.forms', {formListId: 1});
+		};
+
 		//Note display functions
 		controller.addMoreItems = function addMoreItems()
 		{

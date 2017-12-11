@@ -59,7 +59,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		controller.page = {};
 		controller.page.currentFormList = [];
 		controller.page.currentForm = {};
-		controller.page.currentlistId = 0;
+		controller.page.currentlistId = $stateParams.formListId;
 
 		console.log("What is the state " + $state.params.type + " : " + angular.isUndefined($state.params.type) + " id " + $state.params.id, $state); // Use this to load the current form if the page is refreshed
 

@@ -75,7 +75,7 @@
 						</button>
 
 						<button class="btn btn-xs btn-success pull-right"
-								ng-click="summaryCtrl.gotoState('add', mod)"
+								ng-click="summaryCtrl.openAssessments()"
 								ng-if="mod.summaryCode=='assessments'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</button>
