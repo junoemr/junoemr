@@ -1138,7 +1138,7 @@
 			WHERE demographic.demographic_no=${demographic} AND
 			LENGTH(professionalSpecialists.referralNo) > 0
 			AND
-			SUBSTRING(demographic.family_doctor,9,(LENGTH(professionalSpecialists.referralNo)))=professionalSpecialists.referralNo
+			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = professionalSpecialists.referralNo
 		</ap-sql>
 		<ap-output>${lName}, ${fName}</ap-output>
 	</databaseap>
@@ -1149,7 +1149,7 @@
 			WHERE demographic.demographic_no=${demographic} AND
 			LENGTH(professionalSpecialists.referralNo) > 0
 			AND
-			SUBSTRING(demographic.family_doctor,9,(LENGTH(professionalSpecialists.referralNo)))=professionalSpecialists.referralNo
+			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = professionalSpecialists.referralNo
 		</ap-sql>
 		<ap-output>${raddress}</ap-output>
 	</databaseap>
@@ -1160,7 +1160,7 @@
 			WHERE demographic.demographic_no=${demographic} AND
 			LENGTH(professionalSpecialists.referralNo) > 0
 			AND
-			SUBSTRING(demographic.family_doctor,9,(LENGTH(professionalSpecialists.referralNo)))=professionalSpecialists.referralNo
+			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = professionalSpecialists.referralNo
 		</ap-sql>
 		<ap-output>${phone}</ap-output>
 	</databaseap>
@@ -1171,7 +1171,7 @@
 			WHERE demographic.demographic_no=${demographic} AND
 			LENGTH(professionalSpecialists.referralNo) > 0
 			AND
-			SUBSTRING(demographic.family_doctor,9,(LENGTH(professionalSpecialists.referralNo)))=professionalSpecialists.referralNo
+			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = professionalSpecialists.referralNo
 		</ap-sql>
 		<ap-output>${fax}</ap-output>
 	</databaseap>
@@ -1183,7 +1183,7 @@
 			WHERE demographic.demographic_no=${demographic} AND
 			LENGTH(professionalSpecialists.referralNo) > 0
 			AND
-			SUBSTRING(demographic.family_doctor,9,(LENGTH(professionalSpecialists.referralNo)))=professionalSpecialists.referralNo
+			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = professionalSpecialists.referralNo
 		</ap-sql>
 		<ap-output>${referral_no}</ap-output>
 	</databaseap>
@@ -1194,7 +1194,7 @@
 			WHERE demographic.demographic_no=${demographic}
 			AND LENGTH(billingreferral.referral_no) > 0
 			AND
-			SUBSTRING(demographic.family_doctor,9,(LENGTH(billingreferral.referral_no)))=billingreferral.referral_no
+			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = billingreferral.referral_no
 		</ap-sql>
 		<ap-output>${last_name}, ${first_name}</ap-output>
 	</databaseap>
@@ -1206,7 +1206,7 @@
 			FROM billingreferral b, demographic d
 			WHERE d.demographic_no=${demographic}
 			AND LENGTH(b.referral_no) > 0
-			AND SUBSTRING(d.family_doctor,9,(LENGTH(b.referral_no)))=b.referral_no
+			EXTRACTVALUE(d.family_doctor, '/rdohip') = b.referral_no
 		</ap-sql>
 		<ap-output>${raddress}</ap-output>
 	</databaseap>
@@ -1216,7 +1216,8 @@
 			FROM billingreferral b, demographic d
 			WHERE d.demographic_no=${demographic}
 			AND LENGTH(b.referral_no) > 0
-			AND SUBSTRING(d.family_doctor,9,(LENGTH(b.referral_no)))=b.referral_no
+			AND
+			EXTRACTVALUE(d.family_doctor, '/rdohip') = b.referral_no
 		</ap-sql>
 		<ap-output>${phone}</ap-output>
 	</databaseap>
@@ -1226,7 +1227,8 @@
 			FROM billingreferral b, demographic d
 			WHERE d.demographic_no=${demographic}
 			AND LENGTH(b.referral_no) > 0
-			AND SUBSTRING(d.family_doctor,9,(LENGTH(b.referral_no)))=b.referral_no
+			AND
+			EXTRACTVALUE(d.family_doctor, '/rdohip') = b.referral_no
 		</ap-sql>
 		<ap-output>${fax}</ap-output>
 	</databaseap>
@@ -1236,7 +1238,8 @@
 			FROM billingreferral b, demographic d
 			WHERE d.demographic_no=${demographic}
 			AND LENGTH(b.referral_no) > 0
-			AND SUBSTRING(d.family_doctor,9,(LENGTH(b.referral_no)))=b.referral_no
+			AND
+			EXTRACTVALUE(d.family_doctor, '/rdohip') = b.referral_no
 		</ap-sql>
 		<ap-output>${referral_no}</ap-output>
 	</databaseap>
