@@ -41,32 +41,32 @@
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%-- @ taglib uri="../WEB-INF/taglibs-log.tld" prefix="log" --%>
-<%@page import="org.oscarehr.sharingcenter.SharingCenterUtil"%>
-<%@page import="oscar.util.ConversionUtils"%>
-<%@page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo"%>
-<%@page import="org.oscarehr.phr.util.MyOscarUtils"%>
-<%@page import="org.oscarehr.util.LoggedInInfo" %>
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="org.oscarehr.PMmodule.caisi_integrator.ConformanceTestHelper"%>
-<%@page import="org.oscarehr.common.dao.DemographicExtDao" %>
-<%@page import="org.oscarehr.common.dao.DemographicArchiveDao" %>
-<%@page import="org.oscarehr.common.dao.DemographicExtArchiveDao" %>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="oscar.OscarProperties" %>
-<%@page import="org.oscarehr.common.dao.ScheduleTemplateCodeDao" %>
-<%@page import="org.oscarehr.common.model.ScheduleTemplateCode" %>
-<%@page import="org.oscarehr.common.dao.WaitingListDao" %>
-<%@page import="org.oscarehr.common.dao.WaitingListNameDao" %>
-<%@page import="org.oscarehr.common.model.WaitingListName" %>
-<%@page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@page import="org.oscarehr.common.Gender" %>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.managers.ProgramManager2" %>
-<%@page import="org.oscarehr.PMmodule.model.Program" %>
-<%@page import="org.oscarehr.PMmodule.web.GenericIntakeEditAction" %>
+<%@page import="org.oscarehr.PMmodule.dao.ProgramDao"%>
+<%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
+<%@page import="org.oscarehr.PMmodule.model.Program"%>
 <%@page import="org.oscarehr.PMmodule.model.ProgramProvider" %>
-<%@page import="org.oscarehr.managers.PatientConsentManager" %>
-<%@page import="org.oscarehr.common.model.Consent" %>
-<%@page import="org.oscarehr.common.model.ConsentType" %>
+<%@page import="org.oscarehr.PMmodule.service.AdmissionManager" %>
+<%@page import="org.oscarehr.PMmodule.service.ProgramManager" %>
+<%@page import="org.oscarehr.PMmodule.web.GenericIntakeEditAction" %>
+<%@page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink" %>
+<%@page import="org.oscarehr.casemgmt.service.CaseManagementManager" %>
+<%@page import="org.oscarehr.common.Gender" %>
+<%@page import="org.oscarehr.common.OtherIdManager" %>
+<%@page import="org.oscarehr.common.dao.ContactDao" %>
+<%@page import="org.oscarehr.common.dao.CountryCodeDao" %>
+<%@page import="org.oscarehr.common.dao.DemographicArchiveDao" %>
+<%@page import="org.oscarehr.common.dao.DemographicContactDao" %>
+<%@page import="org.oscarehr.common.dao.DemographicCustDao" %>
+<%@page import="org.oscarehr.common.dao.DemographicDao" %>
+<%@page import="org.oscarehr.common.dao.DemographicExtArchiveDao" %>
+<%@page import="org.oscarehr.common.dao.DemographicExtDao" %>
+<%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
+<%@page import="org.oscarehr.common.dao.ProfessionalSpecialistDao" %>
+<%@page import="org.oscarehr.common.dao.ScheduleTemplateCodeDao" %>
+<%@page import="org.oscarehr.common.dao.ScheduleTemplateDao" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean" scope="session" />
 <%
@@ -106,31 +106,31 @@ if(!authed) {
 }
 
 %>
-<%@ page import="java.util.*, java.sql.*, java.net.*,java.text.DecimalFormat, oscar.*, oscar.oscarDemographic.data.ProvinceNames, oscar.oscarWaitingList.WaitingList, oscar.oscarReport.data.DemographicSetManager,oscar.log.*"%>
-<%@ page import="oscar.oscarDemographic.data.*"%>
-<%@ page import="oscar.oscarDemographic.pageUtil.Util" %>
-<%@ page import="org.springframework.web.context.*,org.springframework.web.context.support.*" %>
-<%@ page import="oscar.OscarProperties"%>
-<%@ page import="org.oscarehr.common.dao.*,org.oscarehr.common.model.*" %>
-<%@ page import="org.oscarehr.common.OtherIdManager" %>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO, org.oscarehr.common.dao.WaitingListDao, org.oscarehr.common.dao.WaitingListNameDao,org.oscarehr.common.model.Admission, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.CountryCode, org.oscarehr.common.model.Demographic, org.oscarehr.common.model.DemographicArchive,org.oscarehr.common.model.DemographicContact"%>
+<%@ page import="org.oscarehr.common.model.DemographicCust"%>
+<%@ page import="org.oscarehr.common.model.DemographicExtArchive" %>
+<%@ page import="org.oscarehr.common.model.ProfessionalSpecialist,org.oscarehr.common.model.Provider" %>
+<%@ page import="org.oscarehr.common.model.ScheduleTemplateCode"%>
+<%@ page import="org.oscarehr.common.model.UserProperty,org.oscarehr.common.model.WaitingListName" %>
 <%@ page import="org.oscarehr.common.web.ContactAction" %>
-<%@ page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink" %>
-<%@ page import="org.oscarehr.casemgmt.service.CaseManagementManager" %>
-<%@ page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.common.model.ProfessionalSpecialist" %>
-<%@page import="org.oscarehr.common.dao.ProfessionalSpecialistDao" %>
-<%@page import="org.oscarehr.common.model.DemographicCust" %>
-<%@page import="org.oscarehr.common.dao.DemographicCustDao" %>
-<%@page import="org.oscarehr.common.model.Demographic" %>
-<%@page import="org.oscarehr.common.dao.DemographicDao" %>
-<%@page import="org.oscarehr.common.model.Provider" %>
-<%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@page import="org.oscarehr.managers.DemographicManager" %>
-<%@page import="org.oscarehr.PMmodule.service.ProgramManager" %>
-<%@page import="org.oscarehr.PMmodule.dao.ProgramDao" %>
-<%@page import="org.oscarehr.PMmodule.service.AdmissionManager" %>
-<%@ page import="org.oscarehr.common.dao.SpecialtyDao" %>
-<%@ page import="org.oscarehr.common.model.Specialty" %>
+<%@ page import="org.oscarehr.managers.DemographicManager" %>
+<%@ page import="org.oscarehr.managers.PatientConsentManager" %>
+<%@ page import="org.oscarehr.managers.ProgramManager2" %>
+<%@ page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo"%>
+<%@page import="org.oscarehr.sharingcenter.SharingCenterUtil" %>
+<%@page import="org.oscarehr.util.LoggedInInfo" %>
+<%@page import="org.oscarehr.util.SpringUtils" %>
+<%@page import="org.springframework.web.context.WebApplicationContext" %>
+<%@page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
+<%@page import="oscar.Misc" %>
+<%@page import="oscar.MyDateFormat" %>
+<%@page import="oscar.OscarProperties" %>
+<%@page import="oscar.SxmlMisc" %>
+<%@page import="oscar.log.LogAction" %>
+<%@page import="oscar.log.LogConst" %>
+<%@page import="oscar.oscarDemographic.data.DemographicRelationship" %>
+<%@ page import="oscar.oscarDemographic.data.ProvinceNames" %>
+<%@ page import="oscar.oscarDemographic.pageUtil.Util" %>
 <%
 	ProfessionalSpecialistDao professionalSpecialistDao = (ProfessionalSpecialistDao) SpringUtils.getBean("professionalSpecialistDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
@@ -177,7 +177,6 @@ if(!authed) {
 	String userfirstname = (String) session.getAttribute("userfirstname");
 	String userlastname = (String) session.getAttribute("userlastname");
 	String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF" ;
-	String str = null;
 	int nStrShowLen = 20;
 	String billRegion = oscarVariables.getBillingTypeUpperCase();
 	String instanceType = oscarVariables.getInstanceTypeUpperCase();
@@ -248,8 +247,23 @@ if(!authed) {
 
 
 
-<%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.apache.commons.lang.StringUtils"%><html:html locale="true">
+<%@page import="oscar.oscarWaitingList.WaitingList"%>
+<%@page import="oscar.util.ConversionUtils"%>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.text.DecimalFormat" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ListIterator" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.Properties" %>
+<%@ page import="java.util.ResourceBundle" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="java.util.Vector" %>
+<html:html locale="true">
 
 <head>
 <title><bean:message

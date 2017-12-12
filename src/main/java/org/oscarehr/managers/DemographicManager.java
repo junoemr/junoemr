@@ -47,6 +47,7 @@ import org.oscarehr.common.model.Demographic.PatientStatus;
 import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.DemographicCust;
 import org.oscarehr.common.model.DemographicExt;
+import org.oscarehr.common.model.DemographicExtArchive;
 import org.oscarehr.common.model.DemographicMerged;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.common.model.Provider;
@@ -57,6 +58,7 @@ import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
 import oscar.util.StringUtils;
 
 /**
@@ -309,6 +311,29 @@ public class DemographicManager {
 			if (!(ext.getKey().equals(prevExt.getKey()) && ext.getValue().equals(prevExt.getValue()))) {
 				demographicExtArchiveDao.archiveDemographicExt(prevExt);
 			}
+		}
+	}
+
+	/**
+	 * Saves the list of demographicExt objects to the ext database and ext archive
+	 * @param demographicArchiveId - id of the archived demographic record
+	 * @param extensions - list of objects to update/insert
+	 */
+	@Transactional
+	public void saveAndArchiveDemographicExt(Long demographicArchiveId, List<DemographicExt> extensions)
+	{
+		// update/insert extension entries
+		for(DemographicExt extension : extensions)
+		{
+			demographicExtDao.saveEntity(extension);
+		}
+
+		// save the demographic extras in the archive
+		for(DemographicExt extension : extensions)
+		{
+			DemographicExtArchive archive = new DemographicExtArchive(extension);
+			archive.setArchiveId(demographicArchiveId);
+			demographicExtArchiveDao.persist(archive);
 		}
 	}
 
