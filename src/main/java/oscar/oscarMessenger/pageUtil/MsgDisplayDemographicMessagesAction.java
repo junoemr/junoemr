@@ -89,11 +89,14 @@ public class MsgDisplayDemographicMessagesAction extends Action {
                 bean.setDemographic_no(request.getParameter("demographic_no"));
 
                 request.getSession().setAttribute("msgSessionBean", bean);
-                                
             }//if
             else
             {
                 bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)request.getSession().getAttribute("msgSessionBean");
+                // Ensure that the bean has the values we need
+				bean.setProviderNo((String) request.getSession().getAttribute("user"));
+				bean.setUserName(request.getParameter("userName"));
+				bean.setDemographic_no(request.getParameter("demographic_no"));
             }//else
             
             
