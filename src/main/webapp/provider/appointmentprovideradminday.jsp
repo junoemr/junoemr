@@ -1900,8 +1900,10 @@ public boolean isBirthday(String schedDate,String demBday){
 																	.<%=(view==0&&numAvailProvider!=1)?(name.length()>len?name.substring(0,len).toUpperCase():name.toUpperCase()):name.toUpperCase()%>
 																	</font></a><!--Inline display of reason -->
 																<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-																	<span class="reason reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }"><bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=UtilMisc.htmlEscape(reason)%></span>
-																</oscar:oscarPropertiesCheck></td>
+																	<span class="reason reason_<%=curProvider_no[nProvider]%>">
+																		<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%if(reason!=null){%>&nbsp;<%=UtilMisc.htmlEscape(reason)%><%}%>
+																	</span>
+																</oscar:oscarPropertiesCheck>
 																	<%
         			} else {
 				%>	<% if (tickler_no.compareTo("") != 0) {%>
@@ -2116,7 +2118,7 @@ start_time += iSm + ":00";
 															&#124;<b style="color:#FF0000">$</b>
 																	<%}}%>
 															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-															<span class="reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
+															<span class="toggleable reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
      			<strong>&#124;<%=reasonCodeName==null?"":"&nbsp;" + reasonCodeName + " -"%><%=reason==null?"":"&nbsp;" + reason%></strong>
      		</span>
 															</oscar:oscarPropertiesCheck>
