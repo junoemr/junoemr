@@ -1904,6 +1904,7 @@ public boolean isBirthday(String schedDate,String demBday){
 																		<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%if(reason!=null){%>&nbsp;<%=UtilMisc.htmlEscape(reason)%><%}%>
 																	</span>
 																</oscar:oscarPropertiesCheck>
+															</td>
 																	<%
         			} else {
 				%>	<% if (tickler_no.compareTo("") != 0) {%>
