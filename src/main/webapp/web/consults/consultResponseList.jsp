@@ -27,104 +27,113 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
 <!-- this CSS makes it so the modals don't have the vertical sliding animation. Not sure if I will keep this or how I will use this yet -->
-<style>
-.modal.fade {
-	opacity: 1;
-}
-
-.modal.fade .modal-dialog, .modal.in .modal-dialog {
-	-webkit-transform: translate(0, 0);
-	-ms-transform: translate(0, 0);
-	transform: translate(0, 0);
-}
-
-.state1 {}
-.state2 {background-color: #e6e6e6 !important;} /*#f5f5f5*/
-.state3 {background-color: #d9d9d9 !important;} /*#e6e6e6*/
-.state6 {background-color: #cccccc !important;} /*cccccc*/
-
-.table tbody tr:hover td, .table tbody tr:hover th {
-    background-color: #FFFFAA;
-}
-</style>
 
 <div ng-show="consultResponseListCtrl.consultReadAccess" class="col-lg-12">
 
+	<form name="searchForm" id="search-form">
 
-	<form name="searchForm" id="searchForm">
-
-		<div class="row">
-			<div class="col-xs-2">
-				<input ng-model="consultResponseListCtrl.search.referralStartDate" type="text"
-					id="referralStartDate" name="referralStartDate"
-					class="form-control" datepicker-popup="yyyy-MM-dd"
-					datepicker-append-to-body="true" is-open="data.isOpen"
-					ng-click="data.isOpen = true" placeholder="<bean:message key="consult.list.referralStartDate" bundle="ui"/>">
+		<div class="row search-filters">
+			<div class="col-lg-3 col-xs-6">
+				<label>Referral Start Date</label>
+				<juno-datepicker-popup
+						juno-model="consultResponseListCtrl.search.referralStartDate"
+						placeholder="<bean:message key="consult.list.referralStartDate" bundle="ui"/>"
+						show-icon="true"
+						type="Input">
+				</juno-datepicker-popup>
 			</div>
-			<div class="col-xs-2">
-				<input ng-model="consultResponseListCtrl.search.referralEndDate" type="text"
-					id="referralEndDate" name="referralEndDate" class="form-control"
-					datepicker-popup="yyyy-MM-dd" datepicker-append-to-body="true"
-					is-open="data2.isOpen" ng-click="data2.isOpen = true"
-					placeholder="<bean:message key="consult.list.referralEndDate" bundle="ui"/>">
+			<div class="col-lg-3 col-xs-6">
+				<label>Referral End Date</label>
+				<juno-datepicker-popup
+						juno-model="consultResponseListCtrl.search.referralEndDate"
+						placeholder="<bean:message key="consult.list.referralEndDate" bundle="ui"/>"
+						show-icon="true"
+						type="Input">
+				</juno-datepicker-popup>
 			</div>
-			<div class="col-xs-2">
-				<select class="form-control" ng-model="search.status" 
-						name="status" id="status" 
+			<div class="col-lg-3 col-xs-6">
+				<label>Status</label>
+				<select class="form-control"
+						ng-model="consultResponseListCtrl.search.status"
+						name="status"
+						id="status"
 						ng-options="status.value as status.name for status in consultResponseListCtrl.statuses">
-					<option value=""><bean:message key="consult.list.status.all" bundle="ui"/></option>
+					<option value="">
+						<bean:message key="consult.list.status.all" bundle="ui"/>
+					</option>
 				</select>
 			</div>
-			<div class="col-xs-2">
-				<select ng-model="search.team" name="team" id="team"
-					class="form-control" ng-init="search.team='<bean:message key="consult.list.team.all" bundle="ui"/>'" ng-options="t for t in consultResponseListCtrl.teams">
+			<div class="col-lg-3 col-xs-6">
+				<label>Team</label>
+				<select ng-model="consultResponseListCtrl.search.team"
+						name="team"
+						id="team"
+						class="form-control"
+						<%--<!--ng-init="search.team='<bean:message key="consult.list.team.all" bundle="ui"/>'"-->--%>
+						ng-options="t for t in consultResponseListCtrl.teams">
+					<%--<option value="">--%>
+						<%--<bean:message key="consult.list.team.all" bundle="ui"/>--%>
+					<%--</option>--%>
 				</select>
+			</div>
+
+			<div class="col-lg-3 col-xs-6">
+				<label>Appointment Start Date</label>
+				<juno-datepicker-popup
+						juno-model="consultResponseListCtrl.search.appointmentStartDate"
+						placeholder="<bean:message key="consult.list.appointmentStartDate" bundle="ui"/>"
+						show-icon="true"
+						type="Input">
+				</juno-datepicker-popup>
+			</div>
+			<div class="col-lg-3 col-xs-6">
+				<label>Appointment End Date</label>
+				<juno-datepicker-popup
+						juno-model="consultResponseListCtrl.search.appointmentEndDate"
+						placeholder="<bean:message key="consult.list.appointmentEndDate" bundle="ui"/>"
+						show-icon="true"
+						type="Input">
+				</juno-datepicker-popup>
+			</div>
+
+			<div class="col-lg-3 col-xs-6" ng-hide="consultResponseListCtrl.onRecordPage">
+				<label>Patient</label>
+				<div class="input-group">
+					<input type="text"
+						   ng-model="consultResponseListCtrl.demographicName"
+						   placeholder="<bean:message key="consult.list.patient" bundle="ui"/>"
+						   uib-typeahead="pt.demographicNo as pt.name for pt in consultResponseListCtrl.searchPatients($viewValue)"
+						   typeahead-on-select="consultResponseListCtrl.updateDemographicNo($item, $model, $label)"
+						   class="form-control"/>
+					<span class="input-group-btn">
+						<button class="btn btn-default"
+								ng-click="consultResponseListCtrl.removeDemographicAssignment()">
+							<span class="glyphicon glyphicon-remove"></span>
+						</button>
+					</span>
+				</div>
+			</div>
+
+			<div class="col-lg-3 col-xs-6">
+				<label>MRP</label>
+				<div class="input-group">
+					<input type="text"
+						   ng-model="consultResponseListCtrl.consult.mrpName"
+						   placeholder="<bean:message key="consult.list.mrp" bundle="ui"/>"
+						   uib-typeahead="pvd as pvd.name for pvd in consultResponseListCtrl.searchMrps($viewValue)"
+						   typeahead-on-select="consultResponseListCtrl.updateMrpNo($model)"
+						   class="form-control"/>
+					<span class="input-group-btn">
+						<button class="btn btn-default"
+								ng-click="consultResponseListCtrl.removeMrpAssignment()">
+							<span class="glyphicon glyphicon-remove"></span>
+						</button>
+					</span>
+				</div>
 			</div>
 		</div>
 
-
-		<div style="height: 5px"></div>
-
-		<div class="row">
-			<div class="col-xs-2">
-				<input ng-model="search.appointmentStartDate" type="text"
-					id="appointmentStartDate" name="appointmentStartDate"
-					class="form-control" datepicker-popup="yyyy-MM-dd"
-					datepicker-append-to-body="true" is-open="data3.isOpen"
-					ng-click="data3.isOpen = true" placeholder="<bean:message key="consult.list.appointmentStartDate" bundle="ui"/>">
-			</div>
-			<div class="col-xs-2">
-				<input ng-model="consultResponseListCtrl.search.appointmentEndDate" type="text"
-					id="appointmentEndDate" name="appointmentEndDate"
-					class="form-control" datepicker-popup="yyyy-MM-dd"
-					datepicker-append-to-body="true" is-open="data4.isOpen"
-					ng-click="data4.isOpen = true" placeholder="<bean:message key="consult.list.appointmentEndDate" bundle="ui"/>">
-			</div>
-		
-			<div class="col-xs-2" ng-hide="hideSearchPatient">
-				<div class="input-group">
-					<div class="input-group-addon"><span class="glyphicon glyphicon-remove" ng-click="consultResponseListCtrl.removeDemographicAssignment()"></span></div>
-					<input type="text" ng-model="consult.demographicName" placeholder="<bean:message key="consult.list.patient" bundle="ui"/>"
-						uib-typeahead="pt.demographicNo as pt.name for pt in consultResponseListCtrl.searchPatients($viewValue)"
-						typeahead-on-select="consultResponseListCtrl.updateDemographicNo($item, $model, $label)"
-						class="form-control"/>
-				</div>
-			</div>
-			
-			<div class="col-xs-2">
-				<div class="input-group">
-					<div class="input-group-addon"><span class="glyphicon glyphicon-remove" ng-click="consultResponseListCtrl.removeMrpAssignment()"></span></div>
-					<input type="text" ng-model="consultResponseListCtrl.consult.mrpName" placeholder="<bean:message key="consult.list.mrp" bundle="ui"/>"
-						uib-typeahead="pvd as pvd.name for pvd in consultResponseListCtrl.searchMrps($viewValue)"
-						typeahead-on-select="consultResponseListCtrl.updateMrpNo($model)"
-						class="form-control"/>
-				</div>
-			</div>
-		</div>
-
-		<div style="height: 5px"></div>
-
-		<div class="row">
+		<div class="row search-buttons">
 			<div class="col-xs-12">
 				<button class="btn btn-primary" type="button" ng-click="consultResponseListCtrl.doSearch()">
 					<bean:message key="global.search" bundle="ui"/>
@@ -132,8 +141,9 @@
 				<button class="btn btn-default" type="button" ng-click="consultResponseListCtrl.clear()">
 					<bean:message key="global.clear" bundle="ui"/>
 				</button>
-				<button class="btn btn-success" type="button" ng-click="consultResponseListCtrl.addConsult()" 
-						ng-disabled="consultResponseListCtrl.search.demographicNo==null" 
+				<button class="btn btn-success" type="button"
+						ng-click="consultResponseListCtrl.addConsult()"
+						ng-disabled="consultResponseListCtrl.demographicNo==null"
 						title="<bean:message key="consult.list.newRemindFill" bundle="ui"/>">
 					<bean:message key="consult.list.newResponse" bundle="ui"/>
 				</button>
@@ -141,23 +151,13 @@
 		</div>
 	</form>
 
-	<div style="height: 15px"></div>
-
-	<table ng-table="consultResponseListCtrl.tableParams" show-filter="false" class="table">
+	<table ng-table="consultResponseListCtrl.tableParams"
+		   show-filter="false"
+		   class="table table-striped table-bordered">
 		<tbody>
-
-			<tr ng-repeat="consult in $data" ng-mouseover="consultResponseListCtrl.consult.$selected=true" 
-				ng-mouseout="consultResponseListCtrl.consult.$selected=false"
-    	 		ng-class="{'active': consult.$selected}" 
-			 	class="state{{consult.status}}">
-    	 
-				<td>
-<!-- Ronnie: Temporarily hidden until batch operations is created
-					<input type="checkbox" ng-model="consult.checked">
- -->
- 				</td>
+			<tr ng-repeat="consult in $data">
 				<td><a
-					ng-click="consultResponseListCtrl.editConsult(consult)" class="hand-hover"><bean:message key="global.edit" bundle="ui"/></a></td>
+					ng-click="consultResponseListCtrl.editConsult(consult)" class="btn btn-xs btn-primary hand-hover"><bean:message key="global.edit" bundle="ui"/></a></td>
 				<td data-title="'<bean:message key="consult.list.header.patient" bundle="ui"/>'" sortable="'Demographic'">
 					{{consult.demographic.formattedName}}</td>
 				<td data-title="'<bean:message key="consult.list.header.referringDoctor" bundle="ui"/>'" sortable="'ReferringDoctor'">{{consult.referringDoctor.formattedName}}</td>

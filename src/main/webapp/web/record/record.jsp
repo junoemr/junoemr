@@ -24,16 +24,16 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<div id="patient-record-page"> 
+<div id="patient-record-page">
 	<div class="row vertical-align patient-record-header">
-		<div class="col-xs-4">	
+		<div class="col-xs-4">
 			<h2 class="patient-header-name" ng-cloak>
-				{{recordCtrl.demographic.lastName}}, {{recordCtrl.demographic.firstName}}  
-				<span ng-show="recordCtrl.demographic.alias">({{recordCtrl.demographic.alias}})</span> 
+				{{recordCtrl.demographic.lastName}}, {{recordCtrl.demographic.firstName}}
+				<span ng-show="recordCtrl.demographic.alias">({{recordCtrl.demographic.alias}})</span>
 			</h2>
 		</div>
-		<div class="col-xs-8">	
-			<div class="pull-right"> 
+		<div class="col-xs-8">
+			<div class="pull-right">
 				<h4 class="patient-header-info">
 					<span class="patient-header-label">
 						<bean:message key="demographic.patient.context.born"/>:
@@ -53,12 +53,12 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<nav class="navbar navbar-default record-navbar" role="navigation" id="record-nav">
 		<!-- Brand and toggle get grouped for better mobile display -->
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse"
-				data-target="#record-nav-collapse">
+					data-target="#record-nav-collapse">
 				<span class="sr-only">Toggle navigation</span> <span
 					class="icon-bar"></span> <span class="icon-bar"></span> <span
 					class="icon-bar"></span>
@@ -69,64 +69,137 @@
 
 		<div class="collapse navbar-collapse" id="record-nav-collapse">
 
-				<%-- Large view --%>
+			<%-- Large view --%>
 			<ul class="nav navbar-nav visible-nav-lg" id="myTabs">
-				<li ng-repeat="tab in recordCtrl.recordtabs2" 
+				<li ng-repeat="tab in recordCtrl.recordtabs2"
 					ng-class="{'active': recordCtrl.isActive(tab) }">
-					<a href="javascript:void(0)" ng-click="recordCtrl.changeTab(tab)">
-						{{tab.label}} 
+					<a href="javascript:void(0)"
+					   ng-if="!tab.dropdown"
+					   ng-click="recordCtrl.changeTab(tab)">
+						{{tab.label}}
 						<%-- <strong class="text-danger" ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong> --%>
-						<span ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>" class="badge badge-danger ng-binding ng-scope">
+						<span ng-show="tab.extra == 'outstanding'"
+							  title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>"
+							  class="badge badge-danger ng-binding ng-scope">
 							!
 						</span>
 					</a>
+
+					<a href="javascript:void(0)"
+					   ng-if="tab.dropdown"
+					   class="dropdown-toggle"
+					   data-toggle="dropdown">{{tab.label}}
+						<span class="caret"></span>
+					</a>
+
+					<ul ng-if="tab.dropdown"
+						class="dropdown-menu"
+						role="menu">
+						<li ng-repeat="dropdownItem in tab.dropdownItems"
+							ng-class="{'active': recordCtrl.isActive(dropdownItem) }">
+							<a href="javascript:void(0)"
+							   ng-click="recordCtrl.changeTab(dropdownItem)">{{dropdownItem.label}}</a>
+						</li>
+					</ul>
 				</li>
 			</ul>
-	
+
 			<%-- Medium view --%>
 			<ul class="nav navbar-nav visible-nav-md">
-					<li ng-repeat="tab in recordCtrl.recordtabs2 | filter: recordCtrl.mediumNavItemFilter(false)"
+				<li ng-repeat="tab in recordCtrl.recordtabs2 | filter: recordCtrl.mediumNavItemFilter(false)"
+					ng-class="{'active': recordCtrl.isActive(tab) }">
+					<a href="javascript:void(0)"
+					   ng-if="!tab.dropdown"
+					   ng-click="recordCtrl.changeTab(tab)">
+						{{tab.label}}
+					</a>
+
+
+					<a href="javascript:void(0)"
+					   ng-if="tab.dropdown"
+					   class="dropdown-toggle"
+					   data-toggle="dropdown">{{tab.label}}
+						<span class="caret"></span>
+					</a>
+					<ul ng-if="tab.dropdown"
+						class="dropdown-menu"
+						role="menu">
+						<li ng-repeat="dropDownItem in tab.dropdownItems"
+							ng-class="{'active': recordCtrl.isActive(dropDownItem) }">
+							<a href="javascript:void(0)"
+							   ng-click="recordCtrl.changeTab(dropDownItem)">
+								{{dropDownItem.label}}
+							</a>
+						</li>
+					</ul>
+
+				</li>
+
+				<li class="dropdown hand-hover">
+					<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
+						More <b class="caret"></b>
+					</a>
+
+					<ul class="dropdown-menu" role="menu">
+						<li ng-repeat="tab in recordCtrl.recordtabs2 | filter: recordCtrl.mediumNavItemFilter(true)"
 							ng-class="{'active': recordCtrl.isActive(tab) }">
-						<a href="javascript:void(0)" ng-click="recordCtrl.changeTab(tab)">
-							 {{tab.label}}
-						</a>
+							<a href="javascript:void(0)" ng-if="!tab.dropdown"
+							   ng-click="recordCtrl.changeTab(tab)">{{tab.label}}
+								<strong class="text-danger" ng-show="tab.extra == 'outstanding'"
+										title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
+							</a>
 
-					</li>
+							<a href="javascript:void(0)"
+							   ng-if="tab.dropdown">
+								{{tab.label}}
+								<span class="caret"></span>
+							</a>
+							<ul ng-if="tab.dropdown"
+								class="dropdown-menu"
+								role="menu">
+								<li ng-repeat="dropDownItem in tab.dropdownItems"
+									ng-class="{'active': recordCtrl.isActive(dropDownItem) }">
+									<a href="javascript:void(0)"
+									   ng-click="recordCtrl.changeTab(dropDownItem)">
+										{{dropDownItem.label}}
+									</a>
+								</li>
+							</ul>
 
-					<li class="dropdown hand-hover">
-						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
-							More <b class="caret"></b>
-						</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
 
-						<ul class="dropdown-menu" role="menu">
-							<li ng-repeat="tab in recordCtrl.recordtabs2 | filter: recordCtrl.mediumNavItemFilter(true)" 
-								ng-class="{'active': recordCtrl.isActive(tab) }">
-								<a href="javascript:void(0)" ng-if="!tab.dropdown" ng-click="recordCtrl.changeTab(tab)" >{{tab.label}} 
-									<strong class="text-danger" ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
-								</a>
-								
-							</li>
-						</ul>
-					</li>
-				</ul>
+			<%-- Small view --%>
+			<ul class="nav navbar-nav visible-nav-sm">
+				<li class="dropdown hand-hover">
+					<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
+						Menu <b class="caret"></b>
+					</a>
 
-				<%-- Small view --%>
-				<ul class="nav navbar-nav visible-nav-sm">
-					<li class="dropdown hand-hover">
-						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
-							Menu <b class="caret"></b>
-						</a>
+					<ul class="dropdown-menu" role="menu">
+						<li ng-repeat="tab in recordCtrl.recordtabs2"
+							ng-class="{'active': recordCtrl.isActive(tab) }">
+							<a href="javascript:void(0)" ng-if="!tab.dropdown"
+							   ng-click="recordCtrl.changeTab(tab)">{{tab.label}}
+								<strong class="text-danger"
+										ng-show="tab.extra == 'outstanding'"
+										title="<bean:message
+										key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
+							</a>
 
-						<ul class="dropdown-menu" role="menu">
-							<li ng-repeat="tab in recordCtrl.recordtabs2" 
-								ng-class="{'active': recordCtrl.isActive(tab) }">
-								<a href="javascript:void(0)" ng-if="!tab.dropdown" ng-click="recordCtrl.changeTab(tab)" >{{tab.label}} 
-									<strong class="text-danger" ng-show="tab.extra == 'outstanding'" title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>">!</strong>
-								</a>
-							</li>
-						</ul>
-					</li>
-				</ul>
+							<a href="javascript:void(0)"
+							   ng-if="tab.dropdown"
+							   ng-repeat="dropdownItem in tab.dropdownItems"
+							   ng-class="{'active': recordCtrl.isActive(dropdownItem) }"
+							   ng-click="recordCtrl.changeTab(dropdownItem)">
+								{{dropdownItem.label}}
+							</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
 		</div>
 		<!-- /.navbar-collapse -->
 	</nav>
@@ -137,18 +210,18 @@
 
 	<div class="row" id="note-editor-container">
 		<div id="note-editor-minimized"
-			class="col-sm-3 col-xs-12 text-center hand-hover" 
-			ng-click="recordCtrl.toggleNote();" 
+			class="col-sm-3 col-xs-12 text-center hand-hover"
+			ng-click="recordCtrl.toggleNote();"
 			ng-show="recordCtrl.$storage.hideNote">
 			Open note editor <span class="fa fa-chevron-up"></span>
 		</div>
-	
+
 		<div id="note-editor"
 			class="col-sm-5 col-xs-12"
 			resizable
 			draggable
 			ng-show="!recordCtrl.$storage.hideNote"
-			ng-click="recordCtrl.checkAction($event)" 
+			ng-click="recordCtrl.checkAction($event)"
 			ng-keypress="recordCtrl.checkAction($event)">
 			<div class="row hand-hover" id="note-editor-header">
 				<%--<div class="col-sm-12 text-center hand-hover" ng-click="recordCtrl.toggleNote();"  >
@@ -171,16 +244,16 @@
 					</p>
 				</div>
 				<div class="col-xs-4 dropup">
-					<input type="text" ng-model="recordCtrl.options.magicVal" placeholder="Template" 
-					uib-typeahead="t.encounterTemplateName as t.encounterTemplateName for t in recordCtrl.searchTemplates($viewValue)" 
+					<input type="text" ng-model="recordCtrl.options.magicVal" placeholder="Template"
+					uib-typeahead="t.encounterTemplateName as t.encounterTemplateName for t in recordCtrl.searchTemplates($viewValue)"
 					typeahead-on-select="recordCtrl.insertTemplate($item, $model, $label)"
-					class="form-control">	
+					class="form-control">
 				</div>
 				<div class="col-xs-4 dropup">
-					<input type="text" class="form-control" placeholder="Assign Issue"  
-						uib-typeahead="i.issueId as i.code for i in recordCtrl.searchIssues($viewValue)" 
-						typeahead-on-select="recordCtrl.assignIssue($item, $model, $label);recordCtrl.selectedIssue='';" 
-						ng-model="recordCtrl.selectedIssue" 
+					<input type="text" class="form-control" placeholder="Assign Issue"
+						uib-typeahead="i.issueId as i.code for i in recordCtrl.searchIssues($viewValue)"
+						typeahead-on-select="recordCtrl.assignIssue($item, $model, $label);recordCtrl.selectedIssue='';"
+						ng-model="recordCtrl.selectedIssue"
 						typeahead-loading="loadingIssues"
 						typeahead-min-length="3" />
 				</div>
@@ -190,13 +263,13 @@
 					<textarea class="form-control input-md col-lg-4 note-editor-textarea"
 						rows="6"
 						ng-model="recordCtrl.page.encounterNote.note"
-						ng-disabled="recordCtrl.page.cannotChange" 
+						ng-disabled="recordCtrl.page.cannotChange"
 						id="noteEditor{{recordCtrl.demographicNo}}"
 						ng-change="recordCtrl.setEditingNoteFlag()">
 					</textarea>
 				</div>
 
-			</div>    		
+			</div>
 			<div class="row note-editor-issues">
 				<div class="col-sm-12">
 					<label >Assigned Issues:</label>
@@ -207,17 +280,17 @@
 								<button class="btn btn-xs btn-danger" type="button" ng-click="recordCtrl.removeIssue(i)" ng-if="i.unchecked == null || i.unchecked == false">Remove</button>
 							</td>
 						</tr>
-						
+
 					</table>
 				</div>
 			</div>
 			<div class="row" id="note-editor-footer">
 				<div class="col-sm-12">
-					
+
 					<input type="hidden" id="startTag" value="<bean:message key="oscarEncounter.Index.startTime"/>">
 					<input type="hidden" id="endTag" value="<bean:message key="oscarEncounter.Index.endTime"/>">
 					<div class="pull-left">
-						<button class="btn btn-danger" ng-click="recordCtrl.cancelNoteEdit()"> 
+						<button class="btn btn-danger" ng-click="recordCtrl.cancelNoteEdit()">
 							Cancel
 						</button>
 					</div>
@@ -228,10 +301,10 @@
 						<button type="button" class="btn btn-default" ng-click="recordCtrl.toggleTimer()" title="<bean:message key="oscarEncounter.Index.toggleTimer"/>">
 							<span class="fa fa-pause"  id="aToggle"></span>
 						</button>
-						<button type="button" class="btn btn-success" 
-							ng-click="recordCtrl.saveNote()" 
-							id="saveButton" 
-							data-ng-disabled="recordCtrl.page.encounterNote.isSigned || recordCtrl.page.encounterNote.isSaved" 
+						<button type="button" class="btn btn-success"
+							ng-click="recordCtrl.saveNote()"
+							id="saveButton"
+							data-ng-disabled="recordCtrl.page.encounterNote.isSigned || recordCtrl.page.encounterNote.isSaved"
 							title="<bean:message key="oscarEncounter.Index.btnSave"/>">
 							<span class="fa fa-save"  id="theSave"></span>
 						</button>

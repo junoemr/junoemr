@@ -233,7 +233,8 @@ public class EctConsultationFormRequestAction extends Action {
 		if (submission.endsWith("And Print Preview")) {
 
 			request.setAttribute("reqId", requestId);
-			if (OscarProperties.getInstance().isConsultationFaxEnabled()) {
+			if (OscarProperties.getInstance().isConsultationFaxEnabled()
+					|| IsPropertiesOn.propertiesOn("consultation_pdf_enabled")) {
 				return mapping.findForward("printIndivica");
 			}
 			else if (IsPropertiesOn.propertiesOn("CONSULT_PRINT_PDF")) {

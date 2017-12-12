@@ -89,12 +89,12 @@ public class ConsultationServiceDao extends AbstractDao<ConsultationServices> {
     }
 
     public ConsultationServices findReferringDoctorService(boolean activeOnly) {
-    	String sql = "select x from ConsultationServices x where x.serviceDesc=?";
-    	if (activeOnly) sql += " and x.active=?";
+    	String sql = "select x from ConsultationServices x where x.serviceDesc=:desc";
+    	if (activeOnly) sql += " and x.active=:active";
     	
     	Query query = entityManager.createQuery(sql);
-    	query.setParameter(1, REFERRING_DOCTOR);
-    	if (activeOnly) query.setParameter(2, ACTIVE);
+    	query.setParameter("desc", REFERRING_DOCTOR);
+    	if (activeOnly) query.setParameter("active", ACTIVE);
 
         @SuppressWarnings("unchecked")
         List<ConsultationServices> results = query.getResultList();

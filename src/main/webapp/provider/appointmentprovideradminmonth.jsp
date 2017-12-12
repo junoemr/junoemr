@@ -87,6 +87,8 @@ private String getSiteHTML(String reason, List<Site> sites) {
   curProvider_no = (String) session.getAttribute("user");
   String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 
+  String viewall = request.getParameter("viewall") != null ? request.getParameter("viewall") : "0";
+
   ProviderPreference providerPreference=(ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
 
   curUser_no = (String) session.getAttribute("user");
@@ -621,18 +623,18 @@ function refreshTabAlerts(id) {
 		<table BORDER="0" CELLPADDING="0" CELLSPACING="0" WIDTH="100%">
 			<tr BGCOLOR="ivory">
 				<td width="33%"><a
-					href="providercontrol.jsp?year=<%=year%>&month=<%=(month-1)%>&day=<%=(day)%>&displaymode=month&dboperation=searchappointmentmonth&providerview=<%=providerview%>">
+					href="providercontrol.jsp?year=<%=year%>&month=<%=(month-1)%>&day=<%=(day)%>&displaymode=month&dboperation=searchappointmentmonth&providerview=<%=providerview%>&viewall=<%=viewall%>">
 				&nbsp;&nbsp;<img src="../images/previous.gif" WIDTH="10" HEIGHT="9"
 					BORDER="0" ALT="<%=arrayMonthOfYear[((month+10)%12)]%>" vspace="2"></a>
 				<b><span CLASS=title><%=strYear%>-<%=strMonth%></span></b> <a
-					href="providercontrol.jsp?year=<%=year%>&month=<%=(month+1)%>&day=<%=day%>&displaymode=month&dboperation=searchappointmentmonth&providerview=<%=providerview%>">
+					href="providercontrol.jsp?year=<%=year%>&month=<%=(month+1)%>&day=<%=day%>&displaymode=month&dboperation=searchappointmentmonth&providerview=<%=providerview%>&viewall=<%=viewall%>">
 				<img src="../images/next.gif" WIDTH="10" HEIGHT="9" BORDER="0"
 					ALT="<%=arrayMonthOfYear[month%12]%>" vspace="2">&nbsp;&nbsp;</a>
 				
          		| <u><a href="providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1"  title="<bean:message key="provider.appointmentProviderAdminDay.viewAllProv"/>"><bean:message key="provider.appointmentProviderAdminDay.viewAll"/></a></u>				
 					
 				| <a
-				href="providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=day&dboperation=searchappointmentday"
+				href="providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>"
 				TITLE='<bean:message key="provider.appointmentProviderAdminDay.viewDaySched"/>'
 				OnMouseOver="window.status='<bean:message key="provider.appointmentProviderAdminDay.viewDaySched"/>' ; return true"><bean:message key="global.today" /></a>	
 				
@@ -653,9 +655,10 @@ function refreshTabAlerts(id) {
 			VALUE="<%=view%>"> <INPUT TYPE="hidden" NAME="curProvider"
 			VALUE="<%=request.getParameter("curProvider")%>"> <INPUT
 			TYPE="hidden" NAME="curProviderName"
-			VALUE="<%=request.getParameter("curProviderName")%>"> <INPUT
-			TYPE="hidden" NAME="displaymode" VALUE="day"> <INPUT
-			TYPE="hidden" NAME="dboperation" VALUE="searchappointmentday">
+			VALUE="<%=request.getParameter("curProviderName")%>">
+			<INPUT TYPE="hidden" NAME="viewall" VALUE="<%=viewall%>">
+			<INPUT TYPE="hidden" NAME="displaymode" VALUE="day">
+			<INPUT TYPE="hidden" NAME="dboperation" VALUE="searchappointmentday">
 		<input type="hidden" name="Go" value=""> <INPUT TYPE="SUBMIT"
 			VALUE="<bean:message key="provider.appointmentprovideradminmonth.btnGo"/>"
 			onclick="document.forms['jumptodate'].Go.value='GO'; document.forms['jumptodate'].submit();"
@@ -832,7 +835,7 @@ function refreshTabAlerts(id) {
                  
             %>
 					<td nowrap bgcolor="<%=bgcolor.toString()%>" valign="top"><a
-						href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=MyDateFormat.getDigitalXX(dateGrid[i][j])%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName"))%>&displaymode=day&dboperation=searchappointmentday'>
+						href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=MyDateFormat.getDigitalXX(dateGrid[i][j])%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName"))%>&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>'>
 					<span class='date'>&nbsp;<%=dateGrid[i][j] %> </span> <font
 						size="-2" color="blue"><%=strHolidayName.toString()%></font> <%
   while (bFistEntry?it.hasNext():true) { 
@@ -880,7 +883,7 @@ function refreshTabAlerts(id) {
                   dateGrid = aDate.getMonthDateGrid();
             %>
 						<td><b> <a
-							href="providercontrol.jsp?year=<%=year%>&month=<%=(month)%>&day=<%=(day)%>&displaymode=month&dboperation=searchappointmentmonth"
+							href="providercontrol.jsp?year=<%=year%>&month=<%=(month)%>&day=<%=(day)%>&displaymode=month&dboperation=searchappointmentmonth&viewall=<%=viewall%>"
 							title="Last Month: <%=arrayMonthOfYear[((month+10)%12)]%>">
 						&nbsp;&nbsp;<img src="../images/previous.gif" WIDTH="10"
 							HEIGHT="9" BORDER="0"
@@ -943,7 +946,7 @@ function refreshTabAlerts(id) {
             %>
 							<td align='center' bgcolor='#FOFOFO'><font
 								FACE='VERDANA,ARIAL,HELVETICA' SIZE='2'> <a
-								href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=dateGrid[i][j+1]==0?1:dateGrid[i][j+1]%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=week&dboperation=searchapptweek'>
+								href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=dateGrid[i][j+1]==0?1:dateGrid[i][j+1]%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=week&dboperation=searchapptweek&viewall=<%=viewall%>'>
 							<%=(i+1)%></font></td>
 							<%
                     continue;
@@ -953,7 +956,7 @@ function refreshTabAlerts(id) {
                     if(dateGrid[i][j]==day) {
             %>
 							<td align='center'><a
-								href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=MyDateFormat.getDigitalXX(day)%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=day&dboperation=searchappointmentday'>
+								href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=MyDateFormat.getDigitalXX(day)%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>'>
 							<font FACE="VERDANA,ARIAL,HELVETICA" SIZE="2" color="red">
 							<div class='specialtxt'><%= dateGrid[i][j] %></div>
 							</font></a></td>
@@ -961,7 +964,7 @@ function refreshTabAlerts(id) {
             %>
 							<td align='center'><font FACE='VERDANA,ARIAL,HELVETICA'
 								SIZE='2' color='white'><a
-								href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=MyDateFormat.getDigitalXX(dateGrid[i][j])%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName"))%>&displaymode=day&dboperation=searchappointmentday'>
+								href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=MyDateFormat.getDigitalXX(dateGrid[i][j])%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName"))%>&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>'>
 							<%=dateGrid[i][j] %></a></font></td>
 							<%
                     }
@@ -982,7 +985,7 @@ function refreshTabAlerts(id) {
             %>
 						<td align='right'><b><%= arrayMonthOfYear[(month+11)%12]%>&nbsp;
 						&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <%=year%>-<%=month%> </b><a
-							href="providercontrol.jsp?year=<%=year%>&month=<%=(month)%>&day=<%=day%>&displaymode=month&dboperation=searchappointmentmonth"
+							href="providercontrol.jsp?year=<%=year%>&month=<%=(month)%>&day=<%=day%>&displaymode=month&dboperation=searchappointmentmonth&viewall=<%=viewall%>"
 							title="Next Month: <%=arrayMonthOfYear[month%12]%>"> &nbsp;
 						&nbsp; &nbsp; <bean:message
 							key="provider.appointmentprovideradminmonth.btnNextMonth" /> <img
@@ -1043,7 +1046,7 @@ function refreshTabAlerts(id) {
             %>
 							<td align='center' bgcolor='#FOFOFO'><font
 								FACE='VERDANA,ARIAL,HELVETICA' SIZE='2'> <a
-								href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=dateGrid[i][j+1]==0?1:dateGrid[i][j+1]%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=week&dboperation=searchapptweek'>
+								href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=dateGrid[i][j+1]==0?1:dateGrid[i][j+1]%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=week&dboperation=searchapptweek&viewall=<%=viewall%>'>
 							<%=(i+1)%></font></td>
 							<%
                     continue;
@@ -1053,7 +1056,7 @@ function refreshTabAlerts(id) {
                     if(dateGrid[i][j]==day) {
             %>
 							<td align='center'><a
-								href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=MyDateFormat.getDigitalXX(day)%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=day&dboperation=searchappointmentday'>
+								href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=MyDateFormat.getDigitalXX(day)%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName") )%>&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>'>
 							<font FACE="VERDANA,ARIAL,HELVETICA" SIZE="2" color="red">
 							<div class='specialtxt'><%= dateGrid[i][j] %></div>
 							</font></a></td>
@@ -1061,7 +1064,7 @@ function refreshTabAlerts(id) {
             %>
 							<td align='center'><font FACE='VERDANA,ARIAL,HELVETICA'
 								SIZE='2' color='white'><a
-								href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=MyDateFormat.getDigitalXX(dateGrid[i][j])%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName"))%>&displaymode=day&dboperation=searchappointmentday'>
+								href='providercontrol.jsp?<%=caisi%>year=<%=year%>&month=<%=MyDateFormat.getDigitalXX(month)%>&day=<%=MyDateFormat.getDigitalXX(dateGrid[i][j])%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+request.getParameter("curProviderName"))%>&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>'>
 							<%=dateGrid[i][j] %></a></font></td>
 							<%
                     }
@@ -1081,11 +1084,11 @@ function refreshTabAlerts(id) {
 			</tr>
 			<tr>
 				<td BGCOLOR="ivory" width="33%"><a
-					href="providercontrol.jsp?year=<%=year%>&month=<%=(month-1)%>&day=<%=(day)%>&displaymode=month&dboperation=searchappointmentmonth">
+					href="providercontrol.jsp?year=<%=year%>&month=<%=(month-1)%>&day=<%=(day)%>&displaymode=month&dboperation=searchappointmentmonth&viewall=<%=viewall%>">
 				&nbsp;&nbsp;<img src="../images/previous.gif" WIDTH="10" HEIGHT="9"
 					BORDER="0" ALT="View Previous MONTH" vspace="2"></a> <b><span
 					CLASS=title><%=strYear%>-<%=strMonth%></span></b> <a
-					href="providercontrol.jsp?year=<%=year%>&month=<%=(month+1)%>&day=<%=day%>&displaymode=month&dboperation=searchappointmentmonth">
+					href="providercontrol.jsp?year=<%=year%>&month=<%=(month+1)%>&day=<%=day%>&displaymode=month&dboperation=searchappointmentmonth&viewall=<%=viewall%>">
 				<img src="../images/next.gif" WIDTH="10" HEIGHT="9" BORDER="0"
 					ALT="View Next MONTH" vspace="2">&nbsp;&nbsp;</a></td>
 				<TD ALIGN="center" BGCOLOR="ivory" width="33%"></TD>
