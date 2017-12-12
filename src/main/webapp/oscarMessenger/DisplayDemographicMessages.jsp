@@ -80,13 +80,8 @@ final int INITIAL_DISPLAY=20;
 	</logic:equal>
 </logic:present>
 <%
-oscar.oscarMessenger.pageUtil.MsgSessionBean bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)pageContext.findAttribute("bean");
-String demographic_no = "";
-if(stripToNull(request.getParameter("demographic_no"))!=null){
-	demographic_no = request.getParameter("demographic_no");
-}else{
-	demographic_no = bean.getDemographic_no();
-}
+oscar.oscarMessenger.pageUtil.MsgSessionBean bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)pageContext.findAttribute("msgSessionBean");
+String demographic_no = bean.getDemographic_no();
 
 String demographic_name = "";
 if ( stripToNull(demographic_no) != null ) {
@@ -201,17 +196,17 @@ function unlink(){
 									if (moreMessages.equals("true"))
 									{
 								%>
-									<a href="<%=request.getContextPath()%>/oscarMessenger/DisplayDemographicMessages.jsp?orderby=from&moreMessages=true&demographic_no=<%= request.getParameter("demographic_no") %>">
+									<html:link page="/oscarMessenger/DisplayDemographicMessages.jsp?orderby=from&moreMessages=true">
 										<bean:message key="oscarMessenger.DisplayMessages.msgFrom"/>
-									</a>
+									</html:link>
 								<%
 									}
 									else
 									{
 								%>
-									<a href="<%=request.getContextPath()%>/oscarMessenger/DisplayDemographicMessages.jsp?orderby=from&moreMessages=false&demographic_no=<%= request.getParameter("demographic_no") %>">
+									<html:link page="/oscarMessenger/DisplayDemographicMessages.jsp?orderby=from&moreMessages=false">
 										<bean:message key="oscarMessenger.DisplayMessages.msgFrom"/>
-									</a>
+									</html:link>
 								<%}%>
 							</th>
 							<th align="left" bgcolor="#DDDDFF">
@@ -219,17 +214,17 @@ function unlink(){
 									if (moreMessages.equals("true"))
 									{
 								%>
-									<a href="<%=request.getContextPath()%>/oscarMessenger/DisplayDemographicMessages.jsp?orderby=subject&moreMessages=true&demographic_no=<%= request.getParameter("demographic_no") %>">
+								<html:link page="/oscarMessenger/DisplayDemographicMessages.jsp?orderby=subject&moreMessages=true">
 										<bean:message key="oscarMessenger.DisplayMessages.msgSubject"/>
-									</a>
+								</html:link>
 								<%
 									}
 									else
 									{
 								%>
-									<a href="<%=request.getContextPath()%>/oscarMessenger/DisplayDemographicMessages.jsp?orderby=subject&moreMessages=false&demographic_no=<%= request.getParameter("demographic_no") %>">
+									<html:link page="/oscarMessenger/DisplayDemographicMessages.jsp?orderby=subject&moreMessages=false">
 										<bean:message key="oscarMessenger.DisplayMessages.msgSubject"/>
-									</a>
+									</html:link>
 								<%}%>
 							</th>
 							<th align="left" bgcolor="#DDDDFF">
@@ -237,17 +232,17 @@ function unlink(){
 									if (moreMessages.equals("true"))
 									{
 								%>
-									<a href="<%=request.getContextPath()%>/oscarMessenger/DisplayDemographicMessages.jsp?orderby=date&moreMessages=true&demographic_no=<%= request.getParameter("demographic_no") %>">
+									<html:link page="/oscarMessenger/DisplayDemographicMessages.jsp?orderby=date&moreMessages=true">
 										<bean:message key="oscarMessenger.DisplayMessages.msgDate"/>
-									</a>
+									</html:link>
 								<%
 									}
 									else
 									{
 								%>
-									<a href="<%=request.getContextPath()%>/oscarMessenger/DisplayDemographicMessages.jsp?orderby=date&moreMessages=false&demographic_no=<%= request.getParameter("demographic_no") %>">
+									<html:link page="/oscarMessenger/DisplayDemographicMessages.jsp?orderby=date&moreMessages=false">
 									<bean:message key="oscarMessenger.DisplayMessages.msgDate"/>
-									</a>
+									</html:link>
 								<%}%>
 							</th>
 							<th align="left" bgcolor="#DDDDFF">
@@ -255,17 +250,17 @@ function unlink(){
 									if (moreMessages.equals("true"))
 									{
 								%>
-									<a href="<%=request.getContextPath()%>/oscarMessenger/DisplayDemographicMessages.jsp?orderby=patient&moreMessages=true&demographic_no=<%= request.getParameter("demographic_no") %>">
+									<html:link page="/oscarMessenger/DisplayDemographicMessages.jsp?orderby=patient&moreMessages=true">
 										<bean:message key="oscarMessenger.DisplayMessages.msgLinked"/>
-									</a>
+									</html:link>
 								<%
 									}
 									else
 									{
 								%>
-									<a href="<%=request.getContextPath()%>/oscarMessenger/DisplayDemographicMessages.jsp?orderby=patient&moreMessages=false&demographic_no=<%= request.getParameter("demographic_no") %>">
+									<html:link page="/oscarMessenger/DisplayDemographicMessages.jsp?orderby=patient&moreMessages=false">
 										<bean:message key="oscarMessenger.DisplayMessages.msgLinked"/>
-									</a>
+									</html:link>
 								<%}%>
 							</th>
 						</tr>
