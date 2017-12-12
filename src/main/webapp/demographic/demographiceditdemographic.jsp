@@ -57,16 +57,16 @@
 <%@page import="org.oscarehr.common.OtherIdManager" %>
 <%@page import="org.oscarehr.common.dao.ContactDao" %>
 <%@page import="org.oscarehr.common.dao.CountryCodeDao" %>
-<%@page import="org.oscarehr.common.dao.DemographicArchiveDao" %>
 <%@page import="org.oscarehr.common.dao.DemographicContactDao" %>
 <%@page import="org.oscarehr.common.dao.DemographicCustDao" %>
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
-<%@page import="org.oscarehr.common.dao.DemographicExtArchiveDao" %>
 <%@page import="org.oscarehr.common.dao.DemographicExtDao" %>
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.dao.ProfessionalSpecialistDao" %>
 <%@page import="org.oscarehr.common.dao.ScheduleTemplateCodeDao" %>
 <%@page import="org.oscarehr.common.dao.ScheduleTemplateDao" %>
+<%@page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@page import="org.oscarehr.common.dao.WaitingListNameDao" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean" scope="session" />
 <%
@@ -75,19 +75,14 @@
     
     LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
     
-    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-    CountryCodeDao ccDAO =  (CountryCodeDao) ctx.getBean("countryCodeDao");
-    UserPropertyDAO pref = (UserPropertyDAO) ctx.getBean("UserPropertyDAO");                       
+    CountryCodeDao ccDAO =  SpringUtils.getBean(CountryCodeDao.class);
+    UserPropertyDAO pref = SpringUtils.getBean(UserPropertyDAO.class);
     List<CountryCode> countryList = ccDAO.getAllCountryCodes();
 
     DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
-    DemographicArchiveDao demographicArchiveDao = SpringUtils.getBean(DemographicArchiveDao.class);
-    DemographicExtArchiveDao demographicExtArchiveDao = SpringUtils.getBean(DemographicExtArchiveDao.class);
     ScheduleTemplateCodeDao scheduleTemplateCodeDao = SpringUtils.getBean(ScheduleTemplateCodeDao.class);
-    WaitingListDao waitingListDao = SpringUtils.getBean(WaitingListDao.class);
     WaitingListNameDao waitingListNameDao = SpringUtils.getBean(WaitingListNameDao.class);
-    String privateConsentEnabledProperty = OscarProperties.getInstance().getProperty("privateConsentEnabled");
-    boolean privateConsentEnabled = (privateConsentEnabledProperty != null && privateConsentEnabledProperty.equals("true"));
+    boolean privateConsentEnabled = OscarProperties.getInstance().isPropertyActive("privateConsentEnabled");
 
 %>
 
@@ -106,22 +101,15 @@ if(!authed) {
 }
 
 %>
-<%@ page import="org.oscarehr.common.dao.UserPropertyDAO, org.oscarehr.common.dao.WaitingListDao, org.oscarehr.common.dao.WaitingListNameDao,org.oscarehr.common.model.Admission, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.CountryCode, org.oscarehr.common.model.Demographic, org.oscarehr.common.model.DemographicArchive,org.oscarehr.common.model.DemographicContact"%>
-<%@ page import="org.oscarehr.common.model.DemographicCust"%>
-<%@ page import="org.oscarehr.common.model.DemographicExtArchive" %>
-<%@ page import="org.oscarehr.common.model.ProfessionalSpecialist,org.oscarehr.common.model.Provider" %>
-<%@ page import="org.oscarehr.common.model.ScheduleTemplateCode"%>
-<%@ page import="org.oscarehr.common.model.UserProperty,org.oscarehr.common.model.WaitingListName" %>
-<%@ page import="org.oscarehr.common.web.ContactAction" %>
-<%@ page import="org.oscarehr.managers.DemographicManager" %>
-<%@ page import="org.oscarehr.managers.PatientConsentManager" %>
-<%@ page import="org.oscarehr.managers.ProgramManager2" %>
-<%@ page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo"%>
-<%@page import="org.oscarehr.sharingcenter.SharingCenterUtil" %>
-<%@page import="org.oscarehr.util.LoggedInInfo" %>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.springframework.web.context.WebApplicationContext" %>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
+<%@ page import="org.oscarehr.common.model.Admission, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.CountryCode,org.oscarehr.common.model.Demographic, org.oscarehr.common.model.DemographicContact, org.oscarehr.common.model.DemographicCust, org.oscarehr.common.model.ProfessionalSpecialist, org.oscarehr.common.model.Provider,org.oscarehr.common.model.ScheduleTemplateCode"%>
+<%@ page import="org.oscarehr.common.model.UserProperty"%>
+<%@ page import="org.oscarehr.common.model.WaitingListName" %>
+<%@ page import="org.oscarehr.common.web.ContactAction,org.oscarehr.managers.DemographicManager" %>
+<%@ page import="org.oscarehr.managers.PatientConsentManager"%>
+<%@ page import="org.oscarehr.managers.ProgramManager2,org.oscarehr.myoscar.utils.MyOscarLoggedInInfo" %>
+<%@ page import="org.oscarehr.sharingcenter.SharingCenterUtil" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="oscar.Misc" %>
 <%@page import="oscar.MyDateFormat" %>
 <%@page import="oscar.OscarProperties" %>
@@ -129,14 +117,18 @@ if(!authed) {
 <%@page import="oscar.log.LogAction" %>
 <%@page import="oscar.log.LogConst" %>
 <%@page import="oscar.oscarDemographic.data.DemographicRelationship" %>
-<%@ page import="oscar.oscarDemographic.data.ProvinceNames" %>
-<%@ page import="oscar.oscarDemographic.pageUtil.Util" %>
+<%@page import="oscar.oscarDemographic.data.ProvinceNames" %>
+<%@page import="oscar.oscarDemographic.pageUtil.Util" %>
+<%@page import="oscar.oscarWaitingList.WaitingList" %>
+<%@page import="oscar.util.ConversionUtils" %>
+<%@page import="java.net.URLEncoder" %>
+<%@ page import="java.text.DecimalFormat" %>
+<%@ page import="java.util.ArrayList" %>
 <%
 	ProfessionalSpecialistDao professionalSpecialistDao = (ProfessionalSpecialistDao) SpringUtils.getBean("professionalSpecialistDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
-	List<Provider> providers = providerDao.getActiveProviders();
 	List<Provider> doctors = providerDao.getActiveProvidersByType("doctor");
 	List<Provider> nurses = providerDao.getActiveProvidersByRole("nurse");
 	List<Provider> midwifes = providerDao.getActiveProvidersByRole("midwife");
@@ -247,13 +239,8 @@ if(!authed) {
 
 
 
-<%@page import="oscar.oscarWaitingList.WaitingList"%>
-<%@page import="oscar.util.ConversionUtils"%>
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.text.DecimalFormat" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Calendar" %>
-<%@ page import="java.util.Collections" %>
+<%@page import="java.util.Calendar"%>
+<%@page import="java.util.Collections"%>
 <%@ page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
@@ -787,12 +774,9 @@ jQuery(document).ready(function() {
 	topmargin="0" leftmargin="0" rightmargin="0" id="demographiceditdemographic">
 <%
        Demographic demographic = demographicDao.getDemographic(demographic_no);
-       List<DemographicArchive> archives = demographicArchiveDao.findByDemographicNo(Integer.parseInt(demographic_no));
-       List<DemographicExtArchive> extArchives = demographicExtArchiveDao.getDemographicExtArchiveByDemoAndKey(Integer.parseInt(demographic_no), "demo_cell");
        
        AdmissionManager admissionManager = SpringUtils.getBean(AdmissionManager.class);  
      	Admission bedAdmission = admissionManager.getCurrentBedProgramAdmission(demographic.getDemographicNo());
-     	Admission communityAdmission = admissionManager.getCurrentCommunityProgramAdmission(demographic.getDemographicNo());
      	List<Admission> serviceAdmissions = admissionManager.getCurrentServiceProgramAdmission(demographic.getDemographicNo());
      	if(serviceAdmissions == null) {
      		serviceAdmissions = new ArrayList<Admission>();
@@ -1542,7 +1526,6 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
 						<bean:message key="demographic.demographiceditdemographic.msgManageContacts"/><!--i18n--></a></b></h3>
 						<ul>
 						<%
-							ContactDao contactDao = (ContactDao)SpringUtils.getBean("contactDao");
 							DemographicContactDao dContactDao = (DemographicContactDao)SpringUtils.getBean("demographicContactDao");
 							List<DemographicContact> dContacts = dContactDao.findByDemographicNo(demographic.getDemographicNo());
 							dContacts = ContactAction.fillContactNames(dContacts);
@@ -1832,9 +1815,8 @@ if ( Dead.equals(PatStat) ) {%>
 
 <%-- TOGGLE WORKFLOW_ENHANCE - SHOWS PATIENTS INTERNAL PROVIDERS AND RELATED SCHEDULE AVAIL --%>
 
-<oscar:oscarPropertiesCheck value="true" property="workflow_enhance">
-<%--if (OscarProperties.getInstance().getProperty("workflow_enhance")!=null && OscarProperties.getInstance().getProperty("workflow_enhance").equals("true")) {--%>
-						
+	<oscar:oscarPropertiesCheck value="true" property="workflow_enhance.quick_appt_booking">
+
 						<div class="demographicSection">
                         <h3>&nbsp;<bean:message key="demographic.demographiceditdemographic.msgInternalProviders"/></h3>
                         <div style="background-color: #EEEEFF;">
@@ -2127,7 +2109,7 @@ if ( Dead.equals(PatStat) ) {%>
                          </div>
 						
 						<%--} --%>
-</oscar:oscarPropertiesCheck>
+	</oscar:oscarPropertiesCheck>
 <%-- END TOGGLE WORKFLOW_ENHANCE --%>
 
 <%-- AUTHOR DENNIS WARREN O/A COLCAMEX RESOURCES --%>
@@ -2169,7 +2151,7 @@ if ( Dead.equals(PatStat) ) {%>
 							</li>
 						</ul>
 						</div>
-						
+
 </oscar:oscarPropertiesCheck>
 
 	<%-- END TOGGLE OFF PATIENT CLINIC STATUS --%>
