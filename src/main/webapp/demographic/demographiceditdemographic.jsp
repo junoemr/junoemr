@@ -55,7 +55,6 @@
 <%@page import="org.oscarehr.casemgmt.service.CaseManagementManager" %>
 <%@page import="org.oscarehr.common.Gender" %>
 <%@page import="org.oscarehr.common.OtherIdManager" %>
-<%@page import="org.oscarehr.common.dao.ContactDao" %>
 <%@page import="org.oscarehr.common.dao.CountryCodeDao" %>
 <%@page import="org.oscarehr.common.dao.DemographicContactDao" %>
 <%@page import="org.oscarehr.common.dao.DemographicCustDao" %>

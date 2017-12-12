@@ -322,15 +322,12 @@ public class DemographicManager {
 	@Transactional
 	public void saveAndArchiveDemographicExt(Long demographicArchiveId, List<DemographicExt> extensions)
 	{
-		// update/insert extension entries
 		for(DemographicExt extension : extensions)
 		{
+			// update/insert extension entries
 			demographicExtDao.saveEntity(extension);
-		}
 
-		// save the demographic extras in the archive
-		for(DemographicExt extension : extensions)
-		{
+			// save the demographic extension in the archive
 			DemographicExtArchive archive = new DemographicExtArchive(extension);
 			archive.setArchiveId(demographicArchiveId);
 			demographicExtArchiveDao.persist(archive);
