@@ -80,37 +80,30 @@ public class MsgDisplayDemographicMessagesAction extends Action {
             String findForward = "success";
 
             //if(request.getParameter("providerNo")!=null & request.getParameter("userName")!=null)
-            if(request.getSession().getAttribute("msgSessionBean") == null)
-            {
+			bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)request.getSession().getAttribute("msgSessionBean");
 
+            if(bean == null)
+            {
                 bean = new oscar.oscarMessenger.pageUtil.MsgSessionBean();
-                bean.setProviderNo((String) request.getSession().getAttribute("user"));
-                bean.setUserName(request.getParameter("userName"));
-                bean.setDemographic_no(request.getParameter("demographic_no"));
-
                 request.getSession().setAttribute("msgSessionBean", bean);
-            }//if
-            else
-            {
-                bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)request.getSession().getAttribute("msgSessionBean");
-                // Ensure that the bean has the values we need
-				bean.setProviderNo((String) request.getSession().getAttribute("user"));
-				bean.setUserName(request.getParameter("userName"));
-				bean.setDemographic_no(request.getParameter("demographic_no"));
-            }//else
-            
-            
-            //Unlinked selected messages
-            if(messageNo!=null){              
-                MsgDemoMap msgDemoMap = new MsgDemoMap();                                              
-                for (int i =0 ; i < messageNo.length ; i++){
-                    msgDemoMap.unlinkMsg(request.getParameter("demographic_no"), messageNo[i]);                            
-                }
-                                 
-                //Forward to DisplayDemographiMessage.jsp
-                findForward = "demoMsg";                
             }
-            
-    return (mapping.findForward(findForward));
+			bean.setProviderNo((String) request.getSession().getAttribute("user"));
+			bean.setUserName(request.getParameter("userName"));
+			bean.setDemographic_no(request.getParameter("demographic_no"));
+
+            //Unlinked selected messages
+		if (messageNo != null)
+		{
+			MsgDemoMap msgDemoMap = new MsgDemoMap();
+			for (int i = 0; i < messageNo.length; i++)
+			{
+				msgDemoMap.unlinkMsg(request.getParameter("demographic_no"), messageNo[i]);
+			}
+
+			//Forward to DisplayDemographiMessage.jsp
+			findForward = "demoMsg";
+		}
+
+		return (mapping.findForward(findForward));
     }
 }
