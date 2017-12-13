@@ -1136,13 +1136,18 @@ public class Demographic implements Serializable {
 	}
 
 	public String getBirthDayMasterFileString() {
+	    GregorianCalendar birthDay = getBirthDay();
+
+	    if(birthDay == null) {
+	    	return null;
+		}
 
 		String dateFormat = OscarProperties.getInstance().getDisplayDateFormat();
 
 		SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-		formatter.setCalendar(getBirthDay());
+		formatter.setCalendar(birthDay);
 
-		return formatter.format(getBirthDay().getTime());
+		return formatter.format(birthDay.getTime());
 	}
 
 	public String getSpokenLanguage() {

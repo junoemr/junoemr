@@ -274,7 +274,8 @@ public class ClinicallyMeasuredObservationsModelTest extends AbstractExportModel
 	@Test
 	public void componentEffectiveTimeNullTest() {
 		IVL<TS> ivl = componentObservationHelper(nullCmoModel).getEffectiveTime();
-		assertNull(ivl);
+		assertNotNull(ivl);
+		assertEquals(EverestUtils.buildTSFromDate(nullMeasurement.getDateObserved(), TS.SECONDNOTIMEZONE), ivl.getLow());
 	}
 
 	@Test

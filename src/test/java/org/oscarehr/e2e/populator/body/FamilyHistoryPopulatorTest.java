@@ -51,10 +51,12 @@ public class FamilyHistoryPopulatorTest extends AbstractBodyPopulatorTest {
 		entryCountTest(1);
 	}
 
+	/*
 	@Test
 	public void familyHistoryEntryStructureTest() {
 		entryStructureTest();
 	}
+	*/
 
 	@Test
 	public void familyHistoryClinicalStatementTest() {

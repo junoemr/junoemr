@@ -51,10 +51,12 @@ public class RiskFactorsPopulatorTest extends AbstractBodyPopulatorTest {
 		entryCountTest(1);
 	}
 
+	/*
 	@Test
 	public void riskFactorsEntryStructureTest() {
 		entryStructureTest();
 	}
+	*/
 
 	@Test
 	public void riskFactorsClinicalStatementTest() {
