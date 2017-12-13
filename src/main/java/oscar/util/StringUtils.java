@@ -420,4 +420,15 @@ public class StringUtils {
     static public boolean filled(String s) {
 		return !isNullOrEmpty(s);
     }
+
+    /**
+     * Replaces invalid filename characters with a dash.
+     *
+     * @param str the string to sanitize
+     * @return    the sanitized string
+     */
+    public static String sanitizeFilename(String str)
+    {
+        return str.replaceAll("[\\\\/:*?\"<>|]", "-");
+    }
 }
