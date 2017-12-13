@@ -1133,7 +1133,7 @@
 	<databaseap>
 		<ap-name>referral_name</ap-name>
 		<ap-sql>SELECT
-			CASE WHEN ps.lName IS NULL AND ps.fName IS NULL
+			CASE WHEN (ps.lName IS NULL AND ps.fName IS NULL) OR LENGTH(ps.referralNo) = 0
 			THEN EXTRACTVALUE(d.family_doctor, '/rd')
 			ELSE CONCAT(ps.lName, ", ", ps.fName)
 			END as referral_doc_name
