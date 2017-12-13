@@ -79,9 +79,13 @@ public class MsgViewMessageByPositionAction extends Action {
 		MsgDisplayMessagesBean displayMsgBean = new MsgDisplayMessagesBean();
 		ParameterActionForward actionforward = new ParameterActionForward(mapping.findForward("success"));
 
-		String sql = "select m.messageid  " 
-				+ "from  messagetbl m, msgDemoMap mapp where mapp.demographic_no = '" + demographic_no + "'  " 
-				+ "and m.messageid = mapp.messageID  order by " + displayMsgBean.getOrderBy(orderBy) ;
+		String sql =
+				"SELECT msgTbl.messageid " +
+				"FROM  messagetbl msgTbl, msgDemoMap map " +
+				"WHERE map.demographic_no = '" + demographic_no + "' " +
+				"AND msgTbl.messageid = map.messageID " +
+				"ORDER BY " + displayMsgBean.getOrderBy(orderBy) ;
+
 		FormsDao dao = SpringUtils.getBean(FormsDao.class);
 		try {
 			Integer messageId = (Integer)dao.runNativeQueryWithOffset(sql,Integer.parseInt(messagePosition));
