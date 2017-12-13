@@ -25,7 +25,7 @@
 --%>
 
 <%@ page import="org.oscarehr.common.service.FieldNoteManager"%>
-<%@ page import="org.oscarehr.common.model.EForm, org.oscarehr.common.dao.EFormDao" %>
+<%@ page import="org.oscarehr.eform.model.EForm, org.oscarehr.eform.dao.EFormDao" %>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
 <%@ page import="java.util.*"%>
 

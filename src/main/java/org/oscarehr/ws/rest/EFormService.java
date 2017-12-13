@@ -26,8 +26,8 @@ package org.oscarehr.ws.rest;
 
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.EFormDao;
-import org.oscarehr.common.model.EForm;
+import org.oscarehr.eform.dao.EFormDao;
+import org.oscarehr.eform.model.EForm;
 import org.oscarehr.ws.rest.conversion.EFormConverter;
 import org.oscarehr.ws.rest.to.model.EFormTo1;
 import org.springframework.beans.factory.annotation.Autowired;

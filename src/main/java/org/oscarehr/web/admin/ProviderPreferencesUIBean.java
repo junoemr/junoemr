@@ -32,10 +32,10 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.jfree.util.Log;
-import org.oscarehr.common.dao.EFormDao;
+import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.common.dao.EncounterFormDao;
 import org.oscarehr.common.dao.ProviderPreferenceDao;
-import org.oscarehr.common.model.EForm;
+import org.oscarehr.eform.model.EForm;
 import org.oscarehr.common.model.EncounterForm;
 import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.util.LoggedInInfo;

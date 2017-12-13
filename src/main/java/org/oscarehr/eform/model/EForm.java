@@ -21,7 +21,9 @@
  * Toronto, Ontario, Canada
  */
 
-package org.oscarehr.common.model;
+package org.oscarehr.eform.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.io.Serializable;
 import java.util.Comparator;

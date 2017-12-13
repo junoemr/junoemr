@@ -59,18 +59,18 @@ import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.ConsultationRequestDao;
-import org.oscarehr.common.dao.EFormDao;
-import org.oscarehr.common.dao.EFormDao.EFormSortOrder;
-import org.oscarehr.common.dao.EFormDataDao;
+import org.oscarehr.eform.dao.EFormDao;
+import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
+import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.common.dao.EFormGroupDao;
-import org.oscarehr.common.dao.EFormValueDao;
+import org.oscarehr.eform.dao.EFormValueDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.model.ConsultationRequest;
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.common.model.EFormGroup;
-import org.oscarehr.common.model.EFormValue;
+import org.oscarehr.eform.model.EFormValue;
 import org.oscarehr.common.model.Prevention;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.SecRole;
@@ -144,7 +144,7 @@ public class EFormUtil {
 	public static String saveEForm(String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, String roleType) {
 		// called by the upload action, puts the uploaded form into DB		
 
-		org.oscarehr.common.model.EForm eform = new org.oscarehr.common.model.EForm();
+		org.oscarehr.eform.model.EForm eform = new org.oscarehr.eform.model.EForm();
 		eform.setFormName(formName);
 		eform.setFileName(fileName);
 		eform.setSubject(formSubject);
@@ -165,7 +165,7 @@ public class EFormUtil {
 
 		// sends back a list of forms that were uploaded (those that can be added to the patient)
 		EFormDao dao = SpringUtils.getBean(EFormDao.class);
-		List<org.oscarehr.common.model.EForm> eforms = null;
+		List<org.oscarehr.eform.model.EForm> eforms = null;
 		Boolean status = null;
 		if (deleted.equals("deleted")) {
 			status = false;
@@ -184,7 +184,7 @@ public class EFormUtil {
 		eforms = dao.findByStatus(status, sortOrder);
 
 		ArrayList<HashMap<String, ? extends Object>> results = new ArrayList<HashMap<String, ? extends Object>>();
-		for (org.oscarehr.common.model.EForm eform : eforms) {
+		for (org.oscarehr.eform.model.EForm eform : eforms) {
 			HashMap<String, Object> curht = new HashMap<String, Object>();
 			curht.put("fid", eform.getId().toString());
 			curht.put("formName", eform.getFormName());
@@ -436,7 +436,7 @@ public class EFormUtil {
 	public static HashMap<String, Object> loadEForm(String fid) {
 		EFormDao dao = SpringUtils.getBean(EFormDao.class);
 		Integer id = Integer.valueOf(fid);
-		org.oscarehr.common.model.EForm eform = dao.find(id);
+		org.oscarehr.eform.model.EForm eform = dao.find(id);
 		HashMap<String, Object> curht = new HashMap<String, Object>();
 		if (eform == null) {
 			logger.error("Unable to find EForm with ID = " + fid);
@@ -465,7 +465,7 @@ public class EFormUtil {
 		// Updates the form - used by editForm
 	
 		EFormDao dao = SpringUtils.getBean(EFormDao.class);
-		org.oscarehr.common.model.EForm eform = dao.find(Integer.parseInt(updatedForm.getFid()));
+		org.oscarehr.eform.model.EForm eform = dao.find(Integer.parseInt(updatedForm.getFid()));
 		if (eform == null) {
 			logger.error("Unable to find eform for update: " + updatedForm);
 			return;
@@ -502,7 +502,7 @@ public class EFormUtil {
 
 	public static String getEFormParameter(String fid, String fieldName) {
 		EFormDao dao = SpringUtils.getBean(EFormDao.class); 
-		org.oscarehr.common.model.EForm eform = dao.find(ConversionUtils.fromIntString(fid));
+		org.oscarehr.eform.model.EForm eform = dao.find(ConversionUtils.fromIntString(fid));
 		if (eform == null) {
 			logger.error("Unable to find EForm for ID = " + fid);
 			return "";
@@ -641,7 +641,7 @@ public class EFormUtil {
 
 	public static boolean formExistsInDB(String eFormName) {
 		EFormDao dao = SpringUtils.getBean(EFormDao.class);
-		org.oscarehr.common.model.EForm eform = dao.findByName(eFormName);
+		org.oscarehr.eform.model.EForm eform = dao.findByName(eFormName);
 		return eform != null;
 	}
 
@@ -1278,7 +1278,7 @@ public class EFormUtil {
 
 	private static void setFormStatus(String fid, boolean status) {
 		EFormDao dao = SpringUtils.getBean(EFormDao.class);
-		org.oscarehr.common.model.EForm eform = dao.find(ConversionUtils.fromIntString(fid));
+		org.oscarehr.eform.model.EForm eform = dao.find(ConversionUtils.fromIntString(fid));
 		if (eform == null) {
 			logger.error("Unable to find EForm for " + fid);
 			return;
