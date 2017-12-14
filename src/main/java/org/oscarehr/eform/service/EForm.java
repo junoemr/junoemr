@@ -62,7 +62,7 @@ public class EForm
 
 	public EFormData saveExistingEForm(Integer oldFormDataId, Integer demographicNo, Integer providerNo, Integer formId, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
-		logger.info("Save Existing EForm: " + formId);
+		logger.info("Save Existing EForm (template id " + formId + ")");
 		EFormData oldVersion = eFormDataDao.find(oldFormDataId);
 		if(oldVersion == null)
 		{
@@ -82,7 +82,7 @@ public class EForm
 	}
 	public EFormData saveNewEForm(Integer demographicNo, Integer providerNo, Integer formId, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
-		logger.info("Save New EForm: " + formId);
+		logger.info("Save New EForm (template id " + formId + ")");
 		EFormData newVersion = copyFromTemplate(formId);
 		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
 	}
@@ -118,6 +118,7 @@ public class EForm
 		}
 		curForm.setImagePath();
 		curForm.setAction();
+		curForm.setNowDateTime();
 
 		Date currentDate = new Date();
 		eForm.setFormDate(currentDate);
@@ -128,6 +129,7 @@ public class EForm
 
 		eFormDataDao.persist(eForm);
 		saveEformValues(eForm.getFormId(), eForm.getId(), eForm.getDemographicId(), eFormValueMap);
+		logger.info("EForm data saved with id " + eForm.getId());
 		return eForm;
 	}
 
