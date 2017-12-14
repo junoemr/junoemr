@@ -53,19 +53,16 @@ function finishPage(secs){
 				<td>
 				<%
 					
-				String id  = (String)request.getAttribute("fdid");
-				String[] s = request.getParameterValues("faxRecipients");
+				String formId  = (String)request.getAttribute("fdid");
+				String[] faxRecipients = request.getParameterValues("faxRecipients");
 				String providerId = request.getParameter("efmprovider_no");
 				FaxAction bean=new FaxAction(request);
-				try { 
-					bean.faxForms(s,id,providerId);
+				Boolean success = bean.faxForms(faxRecipients, formId, providerId);
+				if (success) {
 					%>
-					Fax has been sent successfully.	
+					Fax has been sent successfully.
 					<%
-				}
-				catch (Exception e) {
-					MiscUtils.getLogger().error("",e);
-					
+				} else {
 					%>
 					An error occurred sending the fax, please contact an administrator.
 					<%
