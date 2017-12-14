@@ -50,7 +50,16 @@
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 
 	String[] param = new String[2];
-String[] temp = request.getParameterValues("checkbox");
+	String[] temp = request.getParameterValues("checkbox");
+
+	String filterparams = "";
+	filterparams += "?ticklerview=" + request.getParameter("ticklerview");
+	filterparams += "&xml_vdate=" + request.getParameter("xml_vdate");
+	filterparams += "&xml_appointment_date=" + request.getParameter("xml_appointment_date");
+	filterparams += "&mrpview=" + request.getParameter("mrpview");
+	filterparams += "&providerview=" + request.getParameter("providerview");
+	filterparams += "&assignedTo=" + request.getParameter("assignedTo");
+
 if (temp == null){
     String sortColumn = request.getParameter("sort_column");
     String sortOrder = request.getParameter("sort_order");
@@ -62,7 +71,7 @@ if (temp == null){
     if (sortOrder == null) {
         sortOrder = TicklerManager.SORT_ASC;
     }
-	response.sendRedirect("ticklerMain.jsp?sort_column="+sortColumn+"&sort_order="+sortOrder);
+	response.sendRedirect("ticklerMain.jsp"+filterparams+"&sort_column="+sortColumn+"&sort_order="+sortOrder);
 	}else{
 	
     for (int i=0; i<temp.length; i++){
@@ -83,6 +92,6 @@ if (temp == null){
         }
 
     }
-    response.sendRedirect("ticklerMain.jsp");
+    response.sendRedirect("ticklerMain.jsp"+filterparams);
 }
 %>
