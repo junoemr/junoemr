@@ -24,6 +24,57 @@
 
 package oscar.eform;
 
+import com.quatro.model.security.Secobjprivilege;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.PMmodule.model.ProgramProvider;
+import org.oscarehr.casemgmt.dao.CaseManagementNoteLinkDAO;
+import org.oscarehr.casemgmt.model.CaseManagementIssue;
+import org.oscarehr.casemgmt.model.CaseManagementNote;
+import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
+import org.oscarehr.casemgmt.model.Issue;
+import org.oscarehr.casemgmt.service.CaseManagementManager;
+import org.oscarehr.common.dao.ConsultationRequestDao;
+import org.oscarehr.common.dao.EFormGroupDao;
+import org.oscarehr.common.dao.ProfessionalSpecialistDao;
+import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.common.dao.TicklerDao;
+import org.oscarehr.common.model.ConsultationRequest;
+import org.oscarehr.common.model.EFormGroup;
+import org.oscarehr.common.model.OscarMsgType;
+import org.oscarehr.common.model.Prevention;
+import org.oscarehr.common.model.ProfessionalSpecialist;
+import org.oscarehr.common.model.SecRole;
+import org.oscarehr.common.model.Tickler;
+import org.oscarehr.eform.dao.EFormDao;
+import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
+import org.oscarehr.eform.dao.EFormDataDao;
+import org.oscarehr.eform.dao.EFormValueDao;
+import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.managers.PreventionManager;
+import org.oscarehr.managers.ProgramManager2;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.OscarProperties;
+import oscar.dms.EDoc;
+import oscar.dms.EDocUtil;
+import oscar.eform.actions.DisplayImageAction;
+import oscar.eform.data.EForm;
+import oscar.eform.data.EFormBase;
+import oscar.oscarClinic.ClinicData;
+import oscar.oscarDB.DBHandler;
+import oscar.oscarMessenger.data.MsgMessageData;
+import oscar.util.ConversionUtils;
+import oscar.util.OscarRoleObjectPrivilege;
+import oscar.util.UtilDateUtilities;
+
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -44,62 +95,11 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.persistence.PersistenceException;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.PMmodule.model.ProgramProvider;
-import org.oscarehr.casemgmt.dao.CaseManagementNoteLinkDAO;
-import org.oscarehr.casemgmt.model.CaseManagementIssue;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
-import org.oscarehr.casemgmt.model.Issue;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.oscarehr.common.dao.ConsultationRequestDao;
-import org.oscarehr.eform.dao.EFormDao;
-import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
-import org.oscarehr.eform.dao.EFormDataDao;
-import org.oscarehr.common.dao.EFormGroupDao;
-import org.oscarehr.eform.dao.EFormValueDao;
-import org.oscarehr.common.dao.ProfessionalSpecialistDao;
-import org.oscarehr.common.dao.SecRoleDao;
-import org.oscarehr.common.dao.TicklerDao;
-import org.oscarehr.common.model.ConsultationRequest;
-import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.common.model.EFormGroup;
-import org.oscarehr.eform.model.EFormValue;
-import org.oscarehr.common.model.Prevention;
-import org.oscarehr.common.model.ProfessionalSpecialist;
-import org.oscarehr.common.model.SecRole;
-import org.oscarehr.common.model.Tickler;
-import org.oscarehr.managers.PreventionManager;
-import org.oscarehr.managers.ProgramManager2;
-import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
-import com.quatro.model.security.Secobjprivilege;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import org.oscarehr.common.model.OscarMsgType;
-import oscar.OscarProperties;
-import oscar.dms.EDoc;
-import oscar.dms.EDocUtil;
-import oscar.eform.actions.DisplayImageAction;
-import oscar.eform.data.EForm;
-import oscar.eform.data.EFormBase;
-import oscar.oscarClinic.ClinicData;
-import oscar.oscarDB.DBHandler;
-import oscar.oscarMessenger.data.MsgMessageData;
-import oscar.util.ConversionUtils;
-import oscar.util.OscarRoleObjectPrivilege;
-import oscar.util.UtilDateUtilities;
-
+/**
+ * use the oscarehr/eform/service objects for anything new
+ * @deprecated
+ */
+@Deprecated
 public class EFormUtil {
 	private static final Logger logger = MiscUtils.getLogger();
 
@@ -618,25 +618,6 @@ public class EFormUtil {
 			}
 		}
 		return sb.toString();
-	}
-
-	public static void addEFormValues(ArrayList<String> names, ArrayList<String> values, Integer fdid, Integer fid, Integer demographic_no) {
-		// adds parsed values and names to DB
-		// names.size and values.size must equal!
-		try {
-			for (int i = 0; i < names.size(); i++) {
-				EFormValue eFormValue = new EFormValue();
-				eFormValue.setFormId(fid);
-				eFormValue.setFormDataId(fdid);
-				eFormValue.setDemographicId(demographic_no);
-				eFormValue.setVarName(names.get(i));
-				eFormValue.setVarValue(values.get(i));
-
-				eFormValueDao.persist(eFormValue);
-			}
-		} catch (PersistenceException ee) {
-			logger.error("Unexpected Error", ee);
-		}
 	}
 
 	public static boolean formExistsInDB(String eFormName) {

@@ -53,6 +53,11 @@ import oscar.oscarEncounter.oscarMeasurements.util.WriteNewMeasurements;
 import oscar.util.StringBuilderUtils;
 import oscar.util.UtilDateUtilities;
 
+/**
+ * Use oscarhr.eform.service for new stuff
+ * @deprecated
+ */
+@Deprecated
 public class EForm extends EFormBase {
 	private static EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean("EFormDataDao");
 	private static Logger log = MiscUtils.getLogger();

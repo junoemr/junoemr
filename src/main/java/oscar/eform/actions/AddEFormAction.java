@@ -29,7 +29,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -66,6 +68,7 @@ public class AddEFormAction extends Action {
 
 	private static final Logger logger=MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	org.oscarehr.eform.service.EForm eFormService = SpringUtils.getBean(org.oscarehr.eform.service.EForm.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
@@ -90,6 +93,8 @@ public class AddEFormAction extends Action {
 		ArrayList<String> paramValues = new ArrayList<String>(); //holds "myval, ...."
 		ArrayList<String> eformFields = new ArrayList<String>();
 		ArrayList<String> eformValues = new ArrayList<String>();
+		Map<String,String> eFormValueMap = new HashMap<String,String>();
+
 		String fid = request.getParameter("efmfid");
 		String demographic_no = request.getParameter("efmdemographic_no");
 		String eform_link = request.getParameter("eform_link");
@@ -166,6 +171,7 @@ public class AddEFormAction extends Action {
 			{
 				paramNames.add(curField);
 				paramValues.add(request.getParameter(curField));
+				eFormValueMap.put(curField, request.getParameter(curField));
 			}
 			
 		}
@@ -214,7 +220,8 @@ public class AddEFormAction extends Action {
 			eFormDataDao.persist(eFormData);
 			String fdid = eFormData.getId().toString();
 
-			EFormUtil.addEFormValues(paramNames, paramValues, new Integer(fdid), new Integer(fid), new Integer(demographic_no)); //adds parsed values
+			//EFormUtil.addEFormValues(paramNames, paramValues, new Integer(fdid), new Integer(fid), new Integer(demographic_no)); //adds parsed values
+			eFormService.saveEformValues(new Integer(fid), new Integer(fdid), new Integer(demographic_no), eFormValueMap);
 
 			//post fdid to {eform_link} attribute
 			if (eform_link!=null) {
