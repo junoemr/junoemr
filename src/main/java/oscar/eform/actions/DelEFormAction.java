@@ -25,22 +25,22 @@
 
 package oscar.eform.actions;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.eform.EFormUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class DelEFormAction extends Action {
 	
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private org.oscarehr.eform.service.EFormTemplate eFormTemplateService = SpringUtils.getBean(org.oscarehr.eform.service.EFormTemplate.class);
 	
     public ActionForward execute(ActionMapping mapping, ActionForm form, 
                                 HttpServletRequest request, HttpServletResponse response) {
@@ -50,7 +50,15 @@ public class DelEFormAction extends Action {
 		}
     	
         String fid = request.getParameter("fid");
-        EFormUtil.delEForm(fid);
+    	try
+	    {
+		    eFormTemplateService.deleteTemplate(Integer.parseInt(fid));
+	    }
+	    catch(IllegalArgumentException e)
+	    {
+	    	MiscUtils.getLogger().error("Invalid Form Id: " + fid, e);
+	    	throw e;
+	    }
         return(mapping.findForward("success"));
     }
 }

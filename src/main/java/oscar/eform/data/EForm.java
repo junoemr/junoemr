@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -205,8 +206,7 @@ public class EForm extends EFormBase {
 	}
 
 	// ------------------Saving the Form (inserting value= statements)---------------------
-	public void setValues(ArrayList<String> names, ArrayList<String> values, ArrayList<String> allNames, ArrayList<String> allValues) {
-		if (names.size() != values.size()) return;
+	public void setValues(List<String> allNames, List<String> allValues) {
 		StringBuilder html = new StringBuilder(this.formHtml);
 		int pointer = -1;
 		// Iterates through every relevant html tag in 'this.formHtml'
@@ -459,7 +459,7 @@ public class EForm extends EFormBase {
 		this.formDate = UtilDateUtilities.DateToString(new Date(), "yyyy-MM-dd");
 	}
 
-	public ActionMessages setMeasurements(ArrayList<String> names, ArrayList<String> values) {
+	public ActionMessages setMeasurements(List<String> names, List<String> values) {
 		return (WriteNewMeasurements.addMeasurements(names, values, this.demographicNo, this.providerNo));
 	}
 

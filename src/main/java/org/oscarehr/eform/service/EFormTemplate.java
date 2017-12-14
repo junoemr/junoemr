@@ -43,5 +43,63 @@ public class EFormTemplate
 	private static Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	private EFormDao eformDao;
+	private EFormDao eFormDao;
+
+	/**
+	 * Save a new EForm template
+	 * @param formName
+	 * @param formSubject
+	 * @param fileName
+	 * @param htmlStr
+	 * @param creator
+	 * @param showLatestFormOnly
+	 * @param patientIndependent
+	 * @param roleType
+	 * @return
+	 */
+	public org.oscarehr.eform.model.EForm saveEFormTemplate(String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, String roleType) {
+
+		org.oscarehr.eform.model.EForm eformTemplate = new org.oscarehr.eform.model.EForm();
+		eformTemplate.setFormName(formName);
+		eformTemplate.setFileName(fileName);
+		eformTemplate.setSubject(formSubject);
+		eformTemplate.setCreator(creator);
+		eformTemplate.setCurrent(true);
+		eformTemplate.setFormHtml(htmlStr);
+		eformTemplate.setShowLatestFormOnly(showLatestFormOnly);
+		eformTemplate.setPatientIndependent(patientIndependent);
+		eformTemplate.setRoleType(roleType);
+
+		eFormDao.persist(eformTemplate);
+
+		return eformTemplate;
+	}
+
+	/**
+	 * delete an eform template with the given ID
+	 * @param formId - id of the eform template to delete
+	 * @throws IllegalArgumentException - if the id is invalid
+	 */
+	public void deleteTemplate(Integer formId)
+	{
+		setTemplateDeleted(formId, true);
+	}
+	/**
+	 * restore an eform template with the given ID
+	 * @param formId - id of the eform template to restore
+	 * @throws IllegalArgumentException - if the id is invalid
+	 */
+	public void restoreTemplate(Integer formId)
+	{
+		setTemplateDeleted(formId, false);
+	}
+	private void setTemplateDeleted(Integer formId, boolean isDeleted)
+	{
+		org.oscarehr.eform.model.EForm eform = eFormDao.find(formId);
+		if (eform == null) {
+			throw new IllegalArgumentException("No EForm exists with id " + formId);
+		}
+		eform.setCurrent(isDeleted);
+		eFormDao.merge(eform);
+	}
 }

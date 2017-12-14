@@ -25,14 +25,19 @@
 package org.oscarehr.eform.service;
 
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionMessages;
+import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.dao.EFormValueDao;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.model.EFormValue;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -47,14 +52,88 @@ public class EForm
 	private static Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	private EFormDataDao eformDataDao;
+	private EFormDataDao eFormDataDao;
 
 	@Autowired
 	private EFormValueDao eFormValueDao;
 
-	public void saveEformValues(Integer formId, Integer formDataId, Integer demographicNo, Map<String,String> valueMap)
+	@Autowired
+	private EFormDao eFormTemplateDao;
+
+	public EFormData saveExistingEForm(Integer oldFormDataId, Integer demographicNo, Integer providerNo, Integer formId, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
-		for(Map.Entry<String, String> entry : valueMap.entrySet())
+		logger.info("Save Existing EForm: " + formId);
+		EFormData oldVersion = eFormDataDao.find(oldFormDataId);
+		if(oldVersion == null)
+		{
+			throw new IllegalArgumentException("No FormData found for fdid " + oldFormDataId);
+		}
+		EFormData newVersion = copyFromTemplate(formId);
+
+		// this could be expensive for larger eforms
+		boolean sameForm = oldVersion.getFormData().equals(newVersion.getFormData());
+
+		if(!sameForm)
+		{
+			logger.info("EForm html does not match, save a new copy");
+			return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
+		}
+		return null;
+	}
+	public EFormData saveNewEForm(Integer demographicNo, Integer providerNo, Integer formId, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	{
+		logger.info("Save New EForm: " + formId);
+		EFormData newVersion = copyFromTemplate(formId);
+		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
+	}
+
+	private EFormData saveEForm(EFormData eForm, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	{
+		String demographicNoStr = String.valueOf(demographicNo);
+		String providerNoStr = String.valueOf(providerNo);
+		String fid = String.valueOf(eForm.getFormId());
+
+		oscar.eform.data.EForm curForm = new oscar.eform.data.EForm(fid, demographicNoStr, providerNoStr);
+
+		ArrayList<String> openerNames = new ArrayList<>(formOpenerMap.keySet());
+		ArrayList<String> openerValues = new ArrayList<>(formOpenerMap.values());
+		ArrayList<String> eFormFields = new ArrayList<>(eFormValueMap.keySet());
+		ArrayList<String> eFormValues = new ArrayList<>(eFormValueMap.values());
+
+		ActionMessages errors = curForm.setMeasurements(eFormFields, eFormValues);
+		if(!errors.isEmpty())
+		{
+			throw new RuntimeException("Errors Saving measurements");
+		}
+
+		curForm.setFormSubject(subject);
+		curForm.setValues(eFormFields, eFormValues);
+		if(!openerNames.isEmpty())
+		{
+			curForm.setOpenerValues(openerNames, openerValues);
+		}
+		if(eformLink != null)
+		{
+			curForm.setEformLink(eformLink);
+		}
+		curForm.setImagePath();
+		curForm.setAction();
+
+		Date currentDate = new Date();
+		eForm.setFormDate(currentDate);
+		eForm.setFormTime(currentDate);
+		eForm.setFormData(curForm.getFormHtml());
+		eForm.setProviderNo(providerNoStr);
+		eForm.setDemographicId(demographicNo);
+
+		eFormDataDao.persist(eForm);
+		saveEformValues(eForm.getFormId(), eForm.getId(), eForm.getDemographicId(), eFormValueMap);
+		return eForm;
+	}
+
+	private void saveEformValues(Integer formId, Integer formDataId, Integer demographicNo, Map<String,String> formValueMap)
+	{
+		for(Map.Entry<String, String> entry : formValueMap.entrySet())
 		{
 			EFormValue eFormValue = new EFormValue();
 			eFormValue.setFormId(formId);
@@ -66,5 +145,25 @@ public class EForm
 			eFormValueDao.persist(eFormValue);
 		}
 	}
+	private EFormData copyFromTemplate(Integer templateId)
+	{
+		org.oscarehr.eform.model.EForm template = eFormTemplateDao.find(templateId);
+		if(template == null)
+		{
+			throw new IllegalArgumentException("No Eform Template found for fid " + templateId);
+		}
+		EFormData eFormCopy = new EFormData();
+		eFormCopy.setFormId(template.getId());
+		eFormCopy.setFormName(template.getFormName());
+		eFormCopy.setFormDate(template.getFormDate());
+		eFormCopy.setFormTime(template.getFormTime());
+		eFormCopy.setRoleType(template.getRoleType());
+		eFormCopy.setFormData(template.getFormHtml());
+		eFormCopy.setCurrent(template.isCurrent());
+		eFormCopy.setSubject(template.getSubject());
+		eFormCopy.setShowLatestFormOnly(template.isShowLatestFormOnly());
+		eFormCopy.setPatientIndependent(template.isPatientIndependent());
 
+		return eFormCopy;
+	}
 }

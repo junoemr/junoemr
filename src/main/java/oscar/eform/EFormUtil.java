@@ -54,7 +54,6 @@ import org.oscarehr.common.model.Tickler;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
 import org.oscarehr.eform.dao.EFormDataDao;
-import org.oscarehr.eform.dao.EFormValueDao;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.PreventionManager;
 import org.oscarehr.managers.ProgramManager2;
@@ -117,12 +116,10 @@ public class EFormUtil {
 	private static CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean(CaseManagementManager.class);
 	private static CaseManagementNoteLinkDAO cmDao = (CaseManagementNoteLinkDAO) SpringUtils.getBean(CaseManagementNoteLinkDAO.class);
 	private static EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean(EFormDataDao.class);
-	private static EFormValueDao eFormValueDao = (EFormValueDao) SpringUtils.getBean(EFormValueDao.class);
 	private static EFormGroupDao eFormGroupDao = (EFormGroupDao) SpringUtils.getBean(EFormGroupDao.class);
 	private static ProviderDao providerDao = (ProviderDao) SpringUtils.getBean(ProviderDao.class);
 	private static TicklerDao ticklerDao = SpringUtils.getBean(TicklerDao.class);
 	private static PreventionManager preventionManager = SpringUtils.getBean(PreventionManager.class);
-	private static ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
 	private static ConsultationRequestDao consultationRequestDao = SpringUtils.getBean(ConsultationRequestDao.class);
 	private static ProfessionalSpecialistDao professionalSpecialistDao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
 	
@@ -540,14 +537,6 @@ public class EFormUtil {
 		Integer maxId = dao.findMaxIdForActiveForm(name);
 		
 		return (maxId == null ? null : maxId.toString());
-	}
-	
-	public static void delEForm(String fid) {
-		setFormStatus(fid, false);
-	}
-
-	public static void restoreEForm(String fid) {
-		setFormStatus(fid, true);
 	}
 
 	@Deprecated
@@ -1255,17 +1244,6 @@ public class EFormUtil {
 			logger.error("Error", sqe);
 		}
 		return (rs);
-	}
-
-	private static void setFormStatus(String fid, boolean status) {
-		EFormDao dao = SpringUtils.getBean(EFormDao.class);
-		org.oscarehr.eform.model.EForm eform = dao.find(ConversionUtils.fromIntString(fid));
-		if (eform == null) {
-			logger.error("Unable to find EForm for " + fid);
-			return;
-		}
-		eform.setCurrent(status);
-		dao.merge(eform);
 	}
 
 	private static String rsGetString(ResultSet rs, String column) throws SQLException {
