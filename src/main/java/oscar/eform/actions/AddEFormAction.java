@@ -46,6 +46,8 @@ import oscar.eform.EFormLoader;
 import oscar.eform.EFormUtil;
 import oscar.eform.data.DatabaseAP;
 import oscar.eform.data.EForm;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.util.StringUtils;
 
@@ -193,8 +195,15 @@ public class AddEFormAction extends Action {
 			eForm = eFormService.saveNewEForm(demographicNo, providerNo, formId, subject, formOpenerMap, paramValueMap, eFormLink);
 		}
 
+
 		boolean sameForm = (eForm == null);
 		String fdid = (sameForm)? previousFormDataId : eForm.getId().toString();
+
+		if(!sameForm)
+		{
+			LogAction.addLogEntry(providerNoStr, demographicNo, LogConst.ACTION_ADD, LogConst.CON_EFORM_DATA, LogConst.STATUS_SUCCESS,
+					String.valueOf(eForm.getId()), loggedInInfo.getIp(), eForm.getFormName());
+		}
 
 		//post fdid to {eform_link} attribute
 		if(!sameForm && eFormLink != null)

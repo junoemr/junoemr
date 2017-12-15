@@ -26,10 +26,13 @@ package org.oscarehr.eform.service;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.eform.dao.EFormDao;
+import org.oscarehr.eform.model.EForm;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 /**
  * EForm service for handling interactions with EForms.
@@ -43,7 +46,7 @@ public class EFormTemplate
 	private static Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	private EFormDao eFormDao;
+	private EFormDao eFormTemplateDao;
 
 	/**
 	 * Save a new EForm template
@@ -57,49 +60,73 @@ public class EFormTemplate
 	 * @param roleType
 	 * @return
 	 */
-	public org.oscarehr.eform.model.EForm saveEFormTemplate(String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, String roleType) {
+	public EForm addEFormTemplate(String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, String roleType)
+	{
+		EForm eFormTemplate = new EForm();
+		eFormTemplate = copyToModel(eFormTemplate, formName, formSubject, fileName, htmlStr, creator, showLatestFormOnly, patientIndependent, roleType);
 
-		org.oscarehr.eform.model.EForm eformTemplate = new org.oscarehr.eform.model.EForm();
-		eformTemplate.setFormName(formName);
-		eformTemplate.setFileName(fileName);
-		eformTemplate.setSubject(formSubject);
-		eformTemplate.setCreator(creator);
-		eformTemplate.setCurrent(true);
-		eformTemplate.setFormHtml(htmlStr);
-		eformTemplate.setShowLatestFormOnly(showLatestFormOnly);
-		eformTemplate.setPatientIndependent(patientIndependent);
-		eformTemplate.setRoleType(roleType);
-
-		eFormDao.persist(eformTemplate);
-
-		return eformTemplate;
+		eFormTemplateDao.persist(eFormTemplate);
+		return eFormTemplate;
 	}
+
+	public EForm updateEFormTemplate(Integer id, String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, String roleType)
+	{
+		EForm eFormTemplate = eFormTemplateDao.find(id);
+		if(eFormTemplate == null)
+		{
+			throw new IllegalArgumentException("No EFormTemplate found for id " + id);
+		}
+		eFormTemplate = copyToModel(eFormTemplate, formName, formSubject, fileName, htmlStr, creator, showLatestFormOnly, patientIndependent, roleType);
+
+		eFormTemplateDao.merge(eFormTemplate);
+		return eFormTemplate;
+	}
+	private EForm copyToModel(EForm eFormTemplate, String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, String roleType)
+	{
+		eFormTemplate.setFormName(formName);
+		eFormTemplate.setFileName(fileName);
+		eFormTemplate.setSubject(formSubject);
+		eFormTemplate.setCreator(creator);
+		eFormTemplate.setCurrent(true);
+		eFormTemplate.setFormHtml(htmlStr);
+		eFormTemplate.setShowLatestFormOnly(showLatestFormOnly);
+		eFormTemplate.setPatientIndependent(patientIndependent);
+		eFormTemplate.setRoleType(roleType);
+
+		Date now = new Date();
+		eFormTemplate.setFormDate(now);
+		eFormTemplate.setFormTime(now);
+		return eFormTemplate;
+	}
+
 
 	/**
 	 * delete an eform template with the given ID
+	 *
 	 * @param formId - id of the eform template to delete
 	 * @throws IllegalArgumentException - if the id is invalid
 	 */
-	public void deleteTemplate(Integer formId)
+	public EForm deleteTemplate(Integer formId)
 	{
-		setTemplateDeleted(formId, true);
+		return setTemplateDeleted(formId, true);
 	}
 	/**
 	 * restore an eform template with the given ID
 	 * @param formId - id of the eform template to restore
 	 * @throws IllegalArgumentException - if the id is invalid
 	 */
-	public void restoreTemplate(Integer formId)
+	public EForm restoreTemplate(Integer formId)
 	{
-		setTemplateDeleted(formId, false);
+		return setTemplateDeleted(formId, false);
 	}
-	private void setTemplateDeleted(Integer formId, boolean isDeleted)
+	private EForm setTemplateDeleted(Integer formId, boolean isDeleted)
 	{
-		org.oscarehr.eform.model.EForm eform = eFormDao.find(formId);
-		if (eform == null) {
+		EForm eFormTemplate = eFormTemplateDao.find(formId);
+		if (eFormTemplate == null) {
 			throw new IllegalArgumentException("No EForm exists with id " + formId);
 		}
-		eform.setCurrent(isDeleted);
-		eFormDao.merge(eform);
+		eFormTemplate.setCurrent(!isDeleted);
+		eFormTemplateDao.merge(eFormTemplate);
+		return eFormTemplate;
 	}
 }

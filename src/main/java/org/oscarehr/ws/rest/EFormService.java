@@ -88,7 +88,7 @@ public class EFormService extends AbstractServiceImpl {
 		if(isValidEformData(eForm)) {
 			eFormDao.persist(eForm);
 			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), null,
-					LogConst.ACTION_ADD, LogConst.CON_EFORM, LogConst.STATUS_SUCCESS,
+					LogConst.ACTION_ADD, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
 					String.valueOf(eForm.getId()), getLoggedInInfo().getIp(), eForm.getFormName());
 
 			EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eForm);
@@ -141,7 +141,7 @@ public class EFormService extends AbstractServiceImpl {
 		if(isValidEformData(eForm)) {
 			eFormDao.persist(eForm);
 			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), null,
-					LogConst.ACTION_ADD, LogConst.CON_EFORM, LogConst.STATUS_SUCCESS,
+					LogConst.ACTION_ADD, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
 					String.valueOf(eForm.getId()), getLoggedInInfo().getIp(), eForm.getFormName());
 
 			EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eForm);
@@ -166,7 +166,7 @@ public class EFormService extends AbstractServiceImpl {
 		if(isValidEformData(eForm)) {
 			eFormDao.merge(eForm);
 			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), null,
-					LogConst.ACTION_UPDATE, LogConst.CON_EFORM, LogConst.STATUS_SUCCESS,
+					LogConst.ACTION_UPDATE, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
 					String.valueOf(eForm.getId()), getLoggedInInfo().getIp(), eForm.getFormName());
 			EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eForm);
 			return RestResponse.successResponse(responseHeaders, transferObj);
@@ -215,7 +215,7 @@ public class EFormService extends AbstractServiceImpl {
 			if(isValidEformData(eForm)) {
 				eFormDao.merge(eForm);
 				LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), null,
-						LogConst.ACTION_UPDATE, LogConst.CON_EFORM, LogConst.STATUS_SUCCESS,
+						LogConst.ACTION_UPDATE, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
 						String.valueOf(eForm.getId()), getLoggedInInfo().getIp(), eForm.getFormName());
 				EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eForm);
 				return RestResponse.successResponse(responseHeaders, transferObj);
