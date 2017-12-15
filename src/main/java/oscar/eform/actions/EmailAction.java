@@ -118,10 +118,12 @@ public final class EmailAction {
 
 	/**
 	 * This method will take eforms and send them to a PHR.
-	 * @throws DocumentException 
-	 * @throws EmailException 
+	 * @throws HtmlToPdfConversionException
+	 * @throws DocumentException
+	 * @throws EmailException
 	 */
-	public void sendEformToEmail( String toEmailAddress, String toName, String formId, String emailSubject, String emailBodyText) throws DocumentException, EmailException {
+	public void sendEformToEmail( String toEmailAddress, String toName, String formId, String emailSubject, String emailBodyText)
+			throws HtmlToPdfConversionException, DocumentException, EmailException {
 		
 		File tempFile = null;
 
@@ -183,14 +185,9 @@ public final class EmailAction {
 
 			// write note to echart
 			saveEmailNoteOnEChart(formId, Integer.toString(eFormData.getDemographicId()), eFormData.getFormName(), toEmailAddress);
-		} catch (HtmlToPdfConversionException e)
-		{
-			MiscUtils.getLogger().error("Error converting eform to pdf. id=" + formId, e);
 		} catch (IOException e) {
 			MiscUtils.getLogger().error("Error sending eform. id="+formId, e);
-		} catch (EmailException e){
-			throw e;
-		} 
+		}
 	}
 	
 	private void saveEmailNoteOnEChart(String formId, String demographicNo, String formName, String toEmailAddress){

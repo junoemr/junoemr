@@ -53,9 +53,15 @@ public class PrintOLISLabAction extends Action {
 		String showLatest = request.getParameter("showLatest");
 		String labName = request.getParameter("labName");
 		localUri = getLabRequestUrl(request, segmentID, searchProviderNo, providerNo, status, showLatest);
-		
-		printLab(labName, segmentID, searchProviderNo, providerNo, status, showLatest);
-		
+
+		try
+		{
+			printLab(labName, segmentID, searchProviderNo, providerNo, status, showLatest);
+		} catch (Exception e)
+		{
+			MiscUtils.getLogger().error("",e);
+			return mapping.findForward("error");
+		}
 		return mapping.findForward("success");
 	}
 	
@@ -96,7 +102,8 @@ public class PrintOLISLabAction extends Action {
 	/**
 	 * This method will take eforms and send them to a PHR.
 	 */
-	public void printLab(String labName, String segmentID, String searchProviderNo, String providerNo, String status, String showLatest) {
+	public void printLab(String labName, String segmentID, String searchProviderNo, String providerNo, String status, String showLatest)
+			throws HtmlToPdfConversionException {
 		
 		File tempFile = null;
 
@@ -132,13 +139,9 @@ public class PrintOLISLabAction extends Action {
 
 			// Removing the consulation pdf.
 			tempFile.delete();
-
-		} catch (HtmlToPdfConversionException e)
-		{
-			logger.error("Error converting lab to pdf", e);
 		} catch (IOException e) {
 			logger.error("I/O error generating lab pdf", e);
-		} finally {			
+		} finally {
 			// we'll be nice and if debugging is enabled we'll leave the file lying around so you can see it.
 			//if (tempFile != null && !logger.isDebugEnabled()) tempFile.delete();
 		}
