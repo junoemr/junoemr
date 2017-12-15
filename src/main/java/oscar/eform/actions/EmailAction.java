@@ -27,6 +27,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -124,7 +125,8 @@ public final class EmailAction {
 		
 		File tempFile = null;
 
-		try {
+		try
+		{
 			logger.info("Generating PDF for eform with fdid = " + formId);
 
 			tempFile = File.createTempFile("EForm." + formId, ".pdf");
@@ -133,54 +135,60 @@ public final class EmailAction {
 			// convert to PDF
 			String viewUri = localUri + formId;
 			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
-			logger.info("Writing pdf to : "+tempFile.getCanonicalPath());
+			logger.info("Writing pdf to : " + tempFile.getCanonicalPath());
 
 			String tempPath = OscarProperties.getInstance().getProperty("email_file_location");
 
-		    String tempName = "EForm-" + formId + "." + System.currentTimeMillis();
-			
+			String tempName = "EForm-" + formId + "." + System.currentTimeMillis();
+
 			String tempPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
-			
+
 			// Copying the pdf.
 			FileUtils.copyFile(tempFile, new File(tempPdf));
-			logger.debug("Copying pdf to : "+tempPdf);
-			
+			logger.debug("Copying pdf to : " + tempPdf);
+
 
 			// A little sanity check to ensure both files exist.
-			if (!new File(tempPdf).exists()) {
+			if (!new File(tempPdf).exists())
+			{
 				throw new DocumentException("Unable to create files for email of eform " + formId + ".");
 			}
-			
-			EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
-			EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));
-			
-			if (skipSave) {
-	        	 eFormData.setCurrent(false);
-	        	 eFormDataDao.merge(eFormData);
+
+			EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean("EFormDataDao");
+			EFormData eFormData = eFormDataDao.find(Integer.parseInt(formId));
+
+			if (skipSave)
+			{
+				eFormData.setCurrent(false);
+				eFormDataDao.merge(eFormData);
 			}
-			
-			logger.debug("Emailing PDF from "+tempPdf);
-			logger.debug("skipsave: "+skipSave);
-			
-			if(emailSubject == null){
+
+			logger.debug("Emailing PDF from " + tempPdf);
+			logger.debug("skipsave: " + skipSave);
+
+			if (emailSubject == null)
+			{
 				emailSubject = OscarProperties.getInstance().getProperty("eform_email_subject");
 			}
-			
-			if(emailBodyText == null){
+
+			if (emailBodyText == null)
+			{
 				emailBodyText = "";
 			}
-			
+
 			fromEmailAddress = OscarProperties.getInstance().getProperty("eform_email_from_address");
 
 			emailPdf(tempPdf, emailSubject, toEmailAddress, toName, emailBodyText);
 			tempFile.delete();
-			
+
 			// write note to echart
-			saveEmailNoteOnEChart(formId,Integer.toString(eFormData.getDemographicId()), eFormData.getFormName(), toEmailAddress);
-						
+			saveEmailNoteOnEChart(formId, Integer.toString(eFormData.getDemographicId()), eFormData.getFormName(), toEmailAddress);
+		} catch (HtmlToPdfConversionException e)
+		{
+			MiscUtils.getLogger().error("Error converting eform to pdf. id=" + formId, e);
 		} catch (IOException e) {
-			MiscUtils.getLogger().error("Error converting and sending eform. id="+formId, e);
-		}catch (EmailException e){
+			MiscUtils.getLogger().error("Error sending eform. id="+formId, e);
+		} catch (EmailException e){
 			throw e;
 		} 
 	}

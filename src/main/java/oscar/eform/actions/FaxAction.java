@@ -8,11 +8,7 @@
  */
 package oscar.eform.actions;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -21,12 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.EFormDataDao;
+import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.model.EFormData;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
-
-import com.lowagie.text.DocumentException;
 
 import oscar.OscarProperties;
 import oscar.oscarEncounter.data.EctProgram;
@@ -35,7 +30,6 @@ import oscar.util.FaxUtils;
 public final class FaxAction {
 
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final int MAX_PDF_CONVERSION_ATTEMPTS = 2;
 
 	private String localUri = null;
 	private HttpServletRequest request;
@@ -91,13 +85,16 @@ public final class FaxAction {
 	/**
 	 * Prepares eForm fax files and places them in the outgoing faxes location.
 	 *
-	 * @param numbers     the fax numbers to send to
-	 * @param formId      the fdid of the form to send
-	 * @param providerId  the provider number
-	 * @return true if successful, false otherwise
+	 * @param numbers      the fax numbers to send to
+	 * @param formId       the fdid of the form to send
+	 * @param providerId   the provider number needed if encounter_notes_add_fax_notes_eform is on
+	 *
+	 * @throws IOException if an I/O exception occurs
+	 * @throws HtmlToPdfConversionException if an error occurs converting the form to pdf
 	 */
-	public Boolean faxForms(String[] numbers, String formId, String providerId) {
-		
+	public void faxForms(String[] numbers, String formId, String providerId) throws IOException, HtmlToPdfConversionException
+	{
+		String faxFileLocation = OscarProperties.getInstance().getProperty("fax_file_location");
 		File tempFile = null;
 
 		try {
@@ -107,86 +104,52 @@ public final class FaxAction {
 
 			// convert to PDF
 			String viewUri = localUri + formId;
-			int pdfConversionAttempts = 0;
-			do
-			{
-				logger.info("Attempting to convert eForm content to pdf. Target file: " + tempFile.getCanonicalPath());
-				WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
-				pdfConversionAttempts++;
-			} while (tempFile.length() == 0 && pdfConversionAttempts < MAX_PDF_CONVERSION_ATTEMPTS);
+			logger.info("Attempting to convert eForm content to pdf. Target file: " + tempFile.getCanonicalPath());
+			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
 
-			// failed to generate pdf
-			if (tempFile.length() == 0)
-			{
-				tempFile.delete();
-				logger.error("Unable to convert eForm with fdid " + formId +
-						" to pdf after " + MAX_PDF_CONVERSION_ATTEMPTS + " attempts.");
-				return false;
-			}
-
-			// Removing all non digit characters from fax numbers.
-			for (int i = 0; i < numbers.length; i++) { 
-				numbers[i] = numbers[i].trim().replaceAll("\\D", "");
-			}
-			ArrayList<String> recipients = new ArrayList<String>(Arrays.asList(numbers));
-			
 			// Removing duplicate phone numbers.
-			recipients = new ArrayList<String>(new HashSet<String>(recipients));
-			String tempPath = OscarProperties.getInstance().getProperty("fax_file_location");
-			FileOutputStream fos;
-			for (int i = 0; i < recipients.size(); i++) {					
-			    String faxNo = recipients.get(i).trim().replaceAll("\\D", "");
-			    if (faxNo.length() < 7)
-				{
-					logger.error("Document target fax number '" + faxNo + "' is invalid.");
-					return false;
-				}
-				String tempName = "EForm-" + formId + "." + System.currentTimeMillis();
-				
-				String tempPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
-				String tempTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
-				
-				// Copying the fax pdf.
-				FileUtils.copyFile(tempFile, new File(tempPdf));
+			HashSet<String> recipients = new HashSet<String>(Arrays.asList(numbers));
 
-				// Removing the tmp pdf.
-				tempFile.delete();
+			FileOutputStream fos;
+			for (String recipient : recipients) {
+				String fileNameFormat = "EForm-" + formId + "." + System.currentTimeMillis();
+				String pdfFileName = String.format("%s%s%s.pdf", faxFileLocation, File.separator, fileNameFormat);
+				String txtFileName = String.format("%s%s%s.txt", faxFileLocation, File.separator, fileNameFormat);
+
+				// Copying the fax pdf.
+				FileUtils.copyFile(tempFile, new File(pdfFileName));
 
 				// Creating text file with the specialists fax number.
-				fos = new FileOutputStream(tempTxt);				
+				fos = new FileOutputStream(txtFileName);
 				PrintWriter pw = new PrintWriter(fos);
-				pw.println(faxNo);
+				pw.println(recipient);
 				pw.close();
 				fos.close();
 				
-				// A little sanity check to ensure both files exist.
-				if (!new File(tempPdf).exists() || !new File(tempTxt).exists()) {
-					logger.error("Unable to create files for fax of eForm " + formId + ".");
-					return false;
-				}		
-				if (skipSave) {
-		        	 EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
-		        	 EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));
-		        	 eFormData.setCurrent(false);
-		        	 eFormDataDao.merge(eFormData);
+				// A little sanity check to ensure file exists.
+				if (!new File(txtFileName).exists()) {
+					throw new IOException("Unable to create fax file for eForm " + formId + ".");
 				}
-				
+
 				/* -- OHSUPPORT-2932 -- */
 				if(props.isPropertyActive("encounter_notes_add_fax_notes_eform")) {
 					String demographic_no = request.getParameter("efmdemographic_no");
 					String programNo = new EctProgram(request.getSession()).getProgram(providerId);
-					FaxUtils.addFaxEformEncounterNote(demographic_no, providerId, programNo, faxNo, Long.valueOf(formId));
+					FaxUtils.addFaxEformEncounterNote(demographic_no, providerId, programNo, recipient, Long.valueOf(formId));
 				}
 			}
-		} catch (IOException e) {
-			MiscUtils.getLogger().error("I/O Error occurred while preparing eForm fax files. form id="+formId, e);
+
+			if (skipSave) {
+				EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
+				EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));
+				eFormData.setCurrent(false);
+				eFormDataDao.merge(eFormData);
+			}
+		} finally {
 			if (tempFile != null)
 			{
 				tempFile.delete();
 			}
-			return false;
 		}
-
-		return true;
 	}
 }

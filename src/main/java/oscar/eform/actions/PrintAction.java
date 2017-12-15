@@ -23,6 +23,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.EFormDataDao;
+import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.model.EFormData;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -105,7 +106,8 @@ public class PrintAction extends Action {
 		
 		File tempFile = null;
 
-		try {
+		try
+		{
 			logger.info("Generating PDF for eform with fdid = " + formId);
 
 			tempFile = File.createTempFile("EFormPrint." + formId, ".pdf");
@@ -113,45 +115,50 @@ public class PrintAction extends Action {
 
 			// convert to PDF
 			String viewUri = localUri + formId;
-			if(printLabel) {
+			if (printLabel)
+			{
 				WKHtmlToPdfUtils.convertToPdfLabel(viewUri, tempFile);
-			}
-			else {
+			} else
+			{
 				WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
 			}
-			logger.info("Writing pdf to : "+tempFile.getCanonicalPath());
-			
-			
+			logger.info("Writing pdf to : " + tempFile.getCanonicalPath());
+
+
 			InputStream is = new BufferedInputStream(new FileInputStream(tempFile));
 			ByteOutputStream bos = new ByteOutputStream();
 			byte buffer[] = new byte[1024];
 			int read;
-			while (is.available() != 0) {
-				read = is.read(buffer,0,1024);
-				bos.write(buffer,0, read);
+			while (is.available() != 0)
+			{
+				read = is.read(buffer, 0, 1024);
+				bos.write(buffer, 0, read);
 			}
-			
+
 			//while (fos.read() != -1)
 			response.setContentType("application/pdf");  //octet-stream
-            response.setHeader("Content-Disposition", "attachment; filename=\"EForm-"
-            				+ formId + "-"
-							+ UtilDateUtilities.getToday("yyyy-mm-dd.hh.mm.ss")
-							+ ".pdf\"");
+			response.setHeader("Content-Disposition", "attachment; filename=\"EForm-"
+					+ formId + "-"
+					+ UtilDateUtilities.getToday("yyyy-mm-dd.hh.mm.ss")
+					+ ".pdf\"");
 			response.getOutputStream().write(bos.getBytes(), 0, bos.getCount());
-			
+
 			// Removing the consulation pdf.
-			tempFile.delete();	
-			
+			tempFile.delete();
+
 			// Removing the eform
-			if (skipSave) {
-	        	 EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
-	        	 EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));
-	        	 eFormData.setCurrent(false);
-	        	 eFormDataDao.merge(eFormData);
+			if (skipSave)
+			{
+				EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean("EFormDataDao");
+				EFormData eFormData = eFormDataDao.find(Integer.parseInt(formId));
+				eFormData.setCurrent(false);
+				eFormDataDao.merge(eFormData);
 			}
+		} catch (HtmlToPdfConversionException e)
+		{
+			logger.error("Error converting eform to pdf. ", e);
 		} catch (IOException e) {
-			//logger.error("Error converting and sending eform. id=" + eFormId, e);
-			MiscUtils.getLogger().error("",e);
+			logger.error("",e);
 		}
 	}
 

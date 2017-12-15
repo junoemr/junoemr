@@ -57,16 +57,20 @@ function finishPage(secs){
 				String[] faxRecipients = request.getParameterValues("faxRecipients");
 				String providerId = request.getParameter("efmprovider_no");
 				FaxAction bean=new FaxAction(request);
-				Boolean success = bean.faxForms(faxRecipients, formId, providerId);
-				if (success) {
+
+				try {
+					bean.faxForms(faxRecipients, formId, providerId);
 					%>
 					Fax has been sent successfully.
 					<%
-				} else {
+				} catch (Exception e) {
+					MiscUtils.getLogger().error("An error occurred while faxing eForm.", e);
+
 					%>
 					An error occurred sending the fax, please contact an administrator.
 					<%
 				}
+
 				%>
 				
 				<%=WebUtils.popInfoMessagesAsHtml(session)%>
