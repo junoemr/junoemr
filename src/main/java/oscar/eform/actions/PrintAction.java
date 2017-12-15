@@ -23,6 +23,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.EFormDataDao;
+import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.model.EFormData;
 import org.oscarehr.common.printing.HtmlToPdfServlet;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -174,7 +175,10 @@ public class PrintAction extends Action {
 				eFormDataDao.merge(eFormData);
 			}
 		}
-		catch (IOException e) {
+		catch (HtmlToPdfConversionException e)
+		{
+			MiscUtils.getLogger().error("Error converting eForm to pdf", e);
+		} catch (IOException e) {
 			MiscUtils.getLogger().error("Error printing eForm", e);
 		}
 	}

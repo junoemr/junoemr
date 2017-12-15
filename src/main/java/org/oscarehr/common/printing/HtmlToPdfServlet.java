@@ -26,7 +26,6 @@ package org.oscarehr.common.printing;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
 
@@ -59,11 +59,18 @@ public class HtmlToPdfServlet extends HttpServlet {
 		String content = req.getParameter("content");
 
 		// convert the content provide into PDF
-		byte[] pdf = convertToPdf(req, content);
-		// make sure we show footer information
-		pdf = appendFooter(pdf);
-		// and finally stream it to the user
-		stream(resp, pdf, true);
+		try
+		{
+			byte[] pdf = convertToPdf(req, content);
+
+			// make sure we show footer information
+			pdf = appendFooter(pdf);
+			// and finally stream it to the user
+			stream(resp, pdf, true);
+		} catch (HtmlToPdfConversionException e)
+		{
+			throw new ServletException("Could not convert html to pdf.", e);
+		}
 	}
 
 	public static byte[] stamp(byte[] content) throws Exception {
@@ -214,7 +221,8 @@ public class HtmlToPdfServlet extends HttpServlet {
 		}
 	}
 
-	private byte[] convertToPdf(HttpServletRequest req, String content) throws IOException, FileNotFoundException {
+	private byte[] convertToPdf(HttpServletRequest req, String content) throws IOException, HtmlToPdfConversionException
+	{
 		File contentFile = File.createTempFile("pdfservlet.", ".html");
 		contentFile.deleteOnExit();
 

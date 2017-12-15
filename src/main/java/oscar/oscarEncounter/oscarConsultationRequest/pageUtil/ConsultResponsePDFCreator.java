@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
 
@@ -55,8 +56,12 @@ public class ConsultResponsePDFCreator {
 		
 		//convert consultResponse.html to pdf
         File filePDF = new File(filename+".pdf");
-        try {
-	        WKHtmlToPdfUtils.convertToPdf(fileHtml.getPath(), filePDF);
+        try
+		{
+			WKHtmlToPdfUtils.convertToPdf(fileHtml.getPath(), filePDF);
+		} catch (HtmlToPdfConversionException ex)
+		{
+			logger.error("Error converting to pdf", ex);
         } catch (IOException ex) {
         	logger.error("Error saving pdf", ex);
         }

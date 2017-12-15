@@ -24,6 +24,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -107,7 +108,8 @@ public class PrintOLISLabAction extends Action {
 		
 		File tempFile = null;
 
-		try {
+		try
+		{
 			logger.info("Generating PDF for lab with segment id = " + segmentID);
 
 			tempFile = File.createTempFile(labName, ".pdf");
@@ -116,31 +118,33 @@ public class PrintOLISLabAction extends Action {
 			// convert to PDF
 			String viewUri = localUri;
 			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
-			logger.info("Writing pdf to : "+tempFile.getCanonicalPath());
-			
-			
+			logger.info("Writing pdf to : " + tempFile.getCanonicalPath());
+
+
 			InputStream is = new BufferedInputStream(new FileInputStream(tempFile));
 			ByteOutputStream bos = new ByteOutputStream();
 			byte buffer[] = new byte[1024];
 			int read;
-			while (is.available() != 0) {
-				read = is.read(buffer,0,1024);
-				bos.write(buffer,0, read);
+			while (is.available() != 0)
+			{
+				read = is.read(buffer, 0, 1024);
+				bos.write(buffer, 0, read);
 			}
-			
+
 			//while (fos.read() != -1)
 			response.setContentType("application/pdf");  //octet-stream
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + labName + "_"
-							+ UtilDateUtilities.getToday("yyyy-mm-dd.hh.mm.ss")
-							+ ".pdf\"");
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + labName + "_"
+					+ UtilDateUtilities.getToday("yyyy-mm-dd.hh.mm.ss")
+					+ ".pdf\"");
 			response.getOutputStream().write(bos.getBytes(), 0, bos.getCount());
-			
+
 			// Removing the consulation pdf.
-			tempFile.delete();			
-						
+			tempFile.delete();
+		} catch (HtmlToPdfConversionException e)
+		{
+			logger.error("Error converting lab to pdf", e);
 		} catch (IOException e) {
-			//logger.error("Error converting and sending eform. id=" + eFormId, e);
-			MiscUtils.getLogger().error("error",e);
+			logger.error("I/O error generating lab pdf", e);
 		} finally {			
 			// we'll be nice and if debugging is enabled we'll leave the file lying around so you can see it.
 			//if (tempFile != null && !logger.isDebugEnabled()) tempFile.delete();
