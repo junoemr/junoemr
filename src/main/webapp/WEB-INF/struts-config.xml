@@ -1868,6 +1868,7 @@
 		</action>
 		<action input="/eform/efmformmanager.jsp" name="deleteEform" path="/eform/delEForm" scope="request" type="oscar.eform.actions.DelEFormAction">
 			<forward name="success" path="/eform/efmformmanager.jsp" />
+			<forward name="failure" path="/eform/efmformmanager.jsp" />
 		</action>
 		<action input="/eform/partials/import.jsp" name="FrmForm" path="/eform/manageEForm" scope="request" type="oscar.eform.actions.ManageEFormAction" parameter="method">
 			<forward name="upload" path="/eform/partials/import.jsp" />
@@ -1907,6 +1908,7 @@
 		</action>
 		<action input="/eform/efmformmanagerdeleted.jsp" name="restoreEForm" path="/eform/restoreEForm" scope="request" type="oscar.eform.actions.RestoreEFormAction">
 			<forward name="success" path="/eform/efmformmanagerdeleted.jsp" />
+			<forward name="failure" path="/eform/efmformmanagerdeleted.jsp" />
 		</action>
 		<action input="/eform/efmmanageformgroups.jsp" name="addGroup" path="/eform/addGroup" scope="request" type="oscar.eform.actions.AddGroupAction">
 			<forward name="success" path="/eform/efmmanageformgroups.jsp" />

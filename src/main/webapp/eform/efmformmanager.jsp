@@ -24,7 +24,7 @@
 
 --%>
 <!DOCTYPE html>
-<%@ page import="oscar.eform.data.*, oscar.eform.*, java.util.*"%>
+<%@ page import="oscar.eform.EFormUtil, java.util.ArrayList, java.util.HashMap"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%

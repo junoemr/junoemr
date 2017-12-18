@@ -50,29 +50,32 @@ public class RestoreEFormAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 	                             HttpServletRequest request, HttpServletResponse response)
 	{
-
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null))
-		{
-			throw new SecurityException("missing required security object (_eform)");
-		}
-
 		String fid = request.getParameter("fid");
-		logger.info("Restore EForm Template (id: " + fid + ")");
-
 		try
 		{
+			logger.info("Restore EForm Template (id: " + fid + ")");
+
+			if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null))
+			{
+				throw new SecurityException("missing required security object (_eform)");
+			}
+
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 			String providerNo = loggedInInfo.getLoggedInProviderNo();
 
 			EForm eFormTemplate = eFormTemplateService.restoreTemplate(Integer.parseInt(fid));
 			LogAction.addLogEntry(providerNo, null, LogConst.ACTION_RESTORE, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
 					String.valueOf(eFormTemplate.getId()), loggedInInfo.getIp(), eFormTemplate.getFormName());
+			return mapping.findForward("success");
 		}
 		catch(IllegalArgumentException e)
 		{
 			logger.error("Invalid Form Id: " + fid, e);
-			throw e;
 		}
-		return mapping.findForward("success");
+		catch(SecurityException e)
+		{
+			logger.error("Security Error", e);
+		}
+		return mapping.findForward("failure");
 	}
 }

@@ -88,6 +88,26 @@ public class EForm extends EFormBase {
 	public EForm() {
 	}
 
+	/**
+	 * Construct from the model object for backwards compatability
+	 * This avoids the built in database query on loading
+	 * @param model - eForm Data model
+	 */
+	public EForm(EFormData model)
+	{
+		this.fdid = (model.getId() != null)? model.getId().toString() : null;
+		this.fid = model.getFormId().toString();
+		this.providerNo = model.getProviderNo();
+		this.demographicNo = model.getDemographicId().toString();
+		this.formName = model.getFormName();
+		this.formSubject = model.getSubject();
+		this.formDate = model.getFormDate().toString();
+		this.formHtml = model.getFormData();
+		this.showLatestFormOnly = model.isShowLatestFormOnly();
+		this.patientIndependent = model.isPatientIndependent();
+		this.roleType = model.getRoleType();
+	}
+
 	public EForm(String fid, String demographicNo) {
 		loadEForm(fid, demographicNo);
 	}

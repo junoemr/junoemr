@@ -24,8 +24,7 @@
 
 --%>
 
-<%@ page import="oscar.util.*, oscar.eform.data.*"%>
-<%@ page import="java.util.*"%>
+<%@ page import="oscar.eform.data.EForm"%>
 <%@taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%
   if (request.getAttribute("page_errors") != null) {

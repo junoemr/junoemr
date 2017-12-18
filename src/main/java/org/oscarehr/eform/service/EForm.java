@@ -89,11 +89,13 @@ public class EForm
 
 	private EFormData saveEForm(EFormData eForm, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
-		String demographicNoStr = String.valueOf(demographicNo);
-		String providerNoStr = String.valueOf(providerNo);
-		String fid = String.valueOf(eForm.getFormId());
+		Date currentDate = new Date();
+		eForm.setFormDate(currentDate);
+		eForm.setFormTime(currentDate);
+		eForm.setProviderNo(String.valueOf(providerNo));
+		eForm.setDemographicId(demographicNo);
 
-		oscar.eform.data.EForm curForm = new oscar.eform.data.EForm(fid, demographicNoStr, providerNoStr);
+		oscar.eform.data.EForm curForm = new oscar.eform.data.EForm(eForm);
 
 		ArrayList<String> openerNames = new ArrayList<>(formOpenerMap.keySet());
 		ArrayList<String> openerValues = new ArrayList<>(formOpenerMap.values());
@@ -120,12 +122,8 @@ public class EForm
 		curForm.setAction();
 		curForm.setNowDateTime();
 
-		Date currentDate = new Date();
-		eForm.setFormDate(currentDate);
-		eForm.setFormTime(currentDate);
+		// must update the html after running the image/action etc. changes on curForm
 		eForm.setFormData(curForm.getFormHtml());
-		eForm.setProviderNo(providerNoStr);
-		eForm.setDemographicId(demographicNo);
 
 		eFormDataDao.persist(eForm);
 		saveEformValues(eForm.getFormId(), eForm.getId(), eForm.getDemographicId(), eFormValueMap);
@@ -152,7 +150,7 @@ public class EForm
 		org.oscarehr.eform.model.EForm template = eFormTemplateDao.find(templateId);
 		if(template == null)
 		{
-			throw new IllegalArgumentException("No Eform Template found for fid " + templateId);
+			throw new IllegalArgumentException("No EForm Template found for fid " + templateId);
 		}
 		EFormData eFormCopy = new EFormData();
 		eFormCopy.setFormId(template.getId());

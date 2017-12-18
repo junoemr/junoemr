@@ -97,7 +97,9 @@ public class AddEFormAction extends Action {
 		Integer demographicNo = Integer.parseInt(demographic_no);
 		Integer providerNo = Integer.parseInt(providerNoStr);
 
-		Map<String,String> paramValueMap = new HashMap<>();
+		@SuppressWarnings("unchecked")
+		Map<String, String[]> unfilteredParamValueMap = request.getParameterMap();
+		Map<String, String> paramValueMap = new HashMap<>();
 		Map<String,String> formOpenerMap = new HashMap<>();
 		ActionMessages updateErrors = new ActionMessages();
 
@@ -151,23 +153,26 @@ public class AddEFormAction extends Action {
 			}
 		}
 
-		// get parameters as a map
-		String paramName;
-		@SuppressWarnings("unchecked")
-		Enumeration<String> paramNamesE = request.getParameterNames();
-
-		while (paramNamesE.hasMoreElements()) {
-			paramName = paramNamesE.nextElement();
-			String paramValue = request.getParameter(paramName);
-			if(paramValue != null && !paramValue.trim().isEmpty() && !paramName.equalsIgnoreCase("parentAjaxId"))
+		// filter incoming parameter values and remove unwanted (null/empty, etc.) pairs.
+		for(Map.Entry<String, String[]> entry : unfilteredParamValueMap.entrySet())
+		{
+			String key = entry.getKey();
+			String value = String.join(",", entry.getValue());// most parameters will be single value.
+			if(value != null && !value.trim().isEmpty() && !value.equalsIgnoreCase("parentAjaxId"))
 			{
-				paramValueMap.put(paramName, paramValue);
+				paramValueMap.put(key,value);
 			}
 		}
+		// java 8 filtering
+//		paramValueMap.entrySet().removeIf(entry -> (entry.getValue() == null
+//				|| entry.getValue().trim().isEmpty()
+//				|| entry.getValue().equalsIgnoreCase("parentAjaxId")));
+
+
 
 		// for some reason, stuff is stored on the session, so it needs to be pulled off.
 		Enumeration sessionAttr = session.getAttributeNames();
-		String attrPattern = providerNoStr+"_"+demographic_no+"_"+fid+"_";
+		String attrPattern = providerNoStr + "_" + demographic_no + "_" + fid + "_";
 		while (sessionAttr.hasMoreElements())
 		{
 			Object key = sessionAttr.nextElement();
@@ -177,9 +182,9 @@ public class AddEFormAction extends Action {
 				if(attribute.startsWith(attrPattern))
 				{
 					String name = attribute.substring(attrPattern.length());
-					String value = (String)session.getAttribute(attribute);
+					String value = (String) session.getAttribute(attribute);
 					formOpenerMap.put(name, value);
-					if (value!=null) session.removeAttribute(attribute);
+					if(value != null) session.removeAttribute(attribute);
 				}
 			}
 		}
@@ -231,7 +236,7 @@ public class AddEFormAction extends Action {
 
 			ArrayList<String> paramNames = new ArrayList<>(paramValueMap.keySet());
 			ArrayList<String> paramValues = new ArrayList<>(paramValueMap.values());
-			EForm curForm = new EForm(fdid);
+			EForm curForm = new EForm(eForm);
 
 			EFormUtil.writeEformTemplate(LoggedInInfo.getLoggedInInfoFromSession(request),paramNames, paramValues, curForm, fdid, program_no, path);
 		}

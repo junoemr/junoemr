@@ -50,15 +50,15 @@ public class EFormTemplate
 
 	/**
 	 * Save a new EForm template
-	 * @param formName
-	 * @param formSubject
-	 * @param fileName
-	 * @param htmlStr
-	 * @param creator
-	 * @param showLatestFormOnly
-	 * @param patientIndependent
-	 * @param roleType
-	 * @return
+	 * @param formName name of the eForm
+	 * @param formSubject subject of the eForm
+	 * @param fileName associated file on disc
+	 * @param htmlStr html body of the eForm
+	 * @param creator provider ID
+	 * @param showLatestFormOnly true if only the latest version of the form gets displayed
+	 * @param patientIndependent true if form is patient independent
+	 * @param roleType role
+	 * @return The newly saved model
 	 */
 	public EForm addEFormTemplate(String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, String roleType)
 	{
@@ -69,6 +69,20 @@ public class EFormTemplate
 		return eFormTemplate;
 	}
 
+	/**
+	 * Update an EForm template
+	 * @param id id of existing eForm template to update
+	 * @param formName name of the eForm
+	 * @param formSubject subject of the eForm
+	 * @param fileName associated file on disc
+	 * @param htmlStr html body of the eForm
+	 * @param creator provider ID
+	 * @param showLatestFormOnly true if only the latest version of the form gets displayed
+	 * @param patientIndependent true if form is patient independent
+	 * @param roleType role
+	 * @return The newly updated model
+	 * @throws IllegalArgumentException if id is invalid
+	 */
 	public EForm updateEFormTemplate(Integer id, String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, String roleType)
 	{
 		EForm eFormTemplate = eFormTemplateDao.find(id);
