@@ -109,6 +109,11 @@ public final class FaxAction {
 			logger.info("Converting eForm content to pdf. Target file: " + tempFile.getCanonicalPath());
 			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
 
+			// Removing all non digit characters from fax numbers.
+			for (int i = 0; i < numbers.length; i++) {
+				numbers[i] = numbers[i].trim().replaceAll("\\D", "");
+			}
+
 			// Removing duplicate phone numbers.
 			HashSet<String> recipients = new HashSet<>(Arrays.asList(numbers));
 
