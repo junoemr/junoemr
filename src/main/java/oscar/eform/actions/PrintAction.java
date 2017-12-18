@@ -111,71 +111,69 @@ public class PrintAction extends Action {
 	/**
 	 * This method will take eforms and send them to a PHR.
 	 */
-	public void printForm(String formId, String providerId) throws HtmlToPdfConversionException {
+	public void printForm(String formId, String providerId)
+			throws HtmlToPdfConversionException, IOException
+	{
 
 		File tempFile = null;
 
-		try {
-			logger.info("Generating PDF for eform with fdid = " + formId);
+		logger.info("Generating PDF for eform with fdid = " + formId);
 
-			tempFile = File.createTempFile("EFormPrint." + formId, ".pdf");
+		tempFile = File.createTempFile("EFormPrint." + formId, ".pdf");
 
-			// convert to PDF
-			String viewUri = localUri + formId;
-			if (printLabel) {
-				WKHtmlToPdfUtils.convertToPdfLabel(viewUri, tempFile);
+		// convert to PDF
+		String viewUri = localUri + formId;
+		if (printLabel) {
+			WKHtmlToPdfUtils.convertToPdfLabel(viewUri, tempFile);
+		}
+		else {
+			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
+		}
+		logger.info("Writing pdf to : " + tempFile.getCanonicalPath());
+
+		InputStream is = new BufferedInputStream(new FileInputStream(tempFile));
+		ByteOutputStream bos = new ByteOutputStream();
+		byte buffer[] = new byte[1024];
+		int read;
+		while (is.available() != 0) {
+			read = is.read(buffer, 0, 1024);
+			bos.write(buffer, 0, read);
+		}
+		is.close();
+
+		bos.flush();
+		byte[] pdf;
+		if (printLabel) {
+			pdf = bos.getBytes();
+			bos.close();
+		}
+		else {
+			try {
+				// append page number & confidentiality warning
+				pdf = HtmlToPdfServlet.stamp(bos.getBytes());
 			}
-			else {
-				WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
+			catch (Exception e) {
+				throw new RuntimeException(e);
 			}
-			logger.info("Writing pdf to : " + tempFile.getCanonicalPath());
-
-			InputStream is = new BufferedInputStream(new FileInputStream(tempFile));
-			ByteOutputStream bos = new ByteOutputStream();
-			byte buffer[] = new byte[1024];
-			int read;
-			while (is.available() != 0) {
-				read = is.read(buffer, 0, 1024);
-				bos.write(buffer, 0, read);
-			}
-			is.close();
-
-			bos.flush();
-			byte[] pdf;
-			if (printLabel) {
-				pdf = bos.getBytes();
+			finally {
 				bos.close();
 			}
-			else {
-				try {
-					// append page number & confidentiality warning
-					pdf = HtmlToPdfServlet.stamp(bos.getBytes());
-				}
-				catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-				finally {
-					bos.close();
-				}
-			}
+		}
 
-			response.setContentType("application/pdf"); // octet-stream
-			response.setHeader("Content-Disposition", "attachment; filename=\"EForm-" + formId + "-"
-					+ UtilDateUtilities.getToday("yyyy-mm-dd.hh.mm.ss") + ".pdf\"");
-			HtmlToPdfServlet.stream(response, pdf, false);
+		response.setContentType("application/pdf"); // octet-stream
+		response.setHeader("Content-Disposition", "attachment; filename=\"EForm-" + formId + "-"
+				+ UtilDateUtilities.getToday("yyyy-mm-dd.hh.mm.ss") + ".pdf\"");
+		HtmlToPdfServlet.stream(response, pdf, false);
 
-			// Removing the consulation pdf.
-			tempFile.delete();
+		// Removing the consulation pdf.
+		tempFile.delete();
 
-			// Removing the eform
-			if (skipSave) {
-				EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean("EFormDataDao");
-				EFormData eFormData = eFormDataDao.find(Integer.parseInt(formId));
-				eFormData.setCurrent(false);
-				eFormDataDao.merge(eFormData);
-			}
-		} catch (IOException e) {
-			MiscUtils.getLogger().error("Error printing eForm", e);
+		// Removing the eform
+		if (skipSave) {
+			EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean("EFormDataDao");
+			EFormData eFormData = eFormDataDao.find(Integer.parseInt(formId));
+			eFormData.setCurrent(false);
+			eFormDataDao.merge(eFormData);
 		}
 	}
 }

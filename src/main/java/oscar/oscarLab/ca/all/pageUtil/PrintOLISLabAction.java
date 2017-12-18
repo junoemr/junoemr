@@ -112,7 +112,7 @@ public class PrintOLISLabAction extends Action {
 	 * This method will take eforms and send them to a PHR.
 	 */
 	public void printLab(String labName, String segmentID, String searchProviderNo, String providerNo, String status, String showLatest)
-			throws HtmlToPdfConversionException
+			throws HtmlToPdfConversionException, IOException
 	{
 		
 		File tempFile = null;
@@ -149,8 +149,6 @@ public class PrintOLISLabAction extends Action {
 
 			// Removing the consulation pdf.
 			tempFile.delete();
-		} catch (IOException e) {
-			logger.error("I/O error generating lab pdf", e);
 		} finally {			
 			// we'll be nice and if debugging is enabled we'll leave the file lying around so you can see it.
 			//if (tempFile != null && !logger.isDebugEnabled()) tempFile.delete();

@@ -38,7 +38,8 @@ import oscar.OscarProperties;
 public class ConsultResponsePDFCreator {
 	private static Logger logger = MiscUtils.getLogger();
 	
-	public static String create(String consultResponseHtmlPage) throws HtmlToPdfConversionException
+	public static String create(String consultResponseHtmlPage) throws
+			HtmlToPdfConversionException, IOException
 	{
 		String tmpDir = OscarProperties.getInstance().getProperty("TMP_DIR");
 		String filename = tmpDir + "/ConsultResponse" + System.currentTimeMillis();
@@ -57,12 +58,8 @@ public class ConsultResponsePDFCreator {
 		
 		//convert consultResponse.html to pdf
         File filePDF = new File(filename+".pdf");
-        try
-		{
-			WKHtmlToPdfUtils.convertToPdf(fileHtml.getPath(), filePDF);
-        } catch (IOException ex) {
-        	logger.error("Error saving pdf", ex);
-        }
+		WKHtmlToPdfUtils.convertToPdf(fileHtml.getPath(), filePDF);
+
 		
 		//mark temporary files for clean-up afterwards
         fileHtml.deleteOnExit();
