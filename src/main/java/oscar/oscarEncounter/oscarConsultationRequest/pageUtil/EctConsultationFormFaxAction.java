@@ -55,36 +55,43 @@ import com.lowagie.text.DocumentException;
 import com.sun.xml.messaging.saaj.util.ByteInputStream;
 import com.sun.xml.messaging.saaj.util.ByteOutputStream;
 
-public class EctConsultationFormFaxAction extends Action {
+public class EctConsultationFormFaxAction extends Action
+{
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
-	public EctConsultationFormFaxAction() {
+
+	public EctConsultationFormFaxAction()
+	{
 	}
-	    
-    @Override
-    public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response){
-        
-    	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-    	
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_con", "r", null)) {
+
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+
+		if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_con", "r", null))
+		{
 			throw new SecurityException("missing required security object (_con)");
 		}
-    	
-    	String reqId = request.getParameter("reqId");
+
+		String reqId = request.getParameter("reqId");
 		String demoNo = request.getParameter("demographicNo");
 		String faxNumber = request.getParameter("letterheadFax");
 		String consultResponsePage = request.getParameter("consultResponsePage");
 		boolean doCoverPage = request.getParameter("coverpage").equalsIgnoreCase("true");
-		
+
 		ArrayList<EDoc> docs;
-		if (consultResponsePage==null) {
+		if (consultResponsePage == null)
+		{
 			docs = EDocUtil.listDocs(loggedInInfo, demoNo, reqId, EDocUtil.ATTACHED);
-		} else {
+		}
+		else
+		{
 			docs = EDocUtil.listResponseDocs(loggedInInfo, demoNo, reqId, EDocUtil.ATTACHED);
 		}
-		
+
 		String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 		ArrayList<Object> alist = new ArrayList<Object>();
 		byte[] buffer;
@@ -92,15 +99,18 @@ public class EctConsultationFormFaxAction extends Action {
 		ByteOutputStream bos;
 		CommonLabResultData consultLabs = new CommonLabResultData();
 		ArrayList<InputStream> streams = new ArrayList<InputStream>();
-		String provider_no = loggedInInfo.getLoggedInProviderNo();		
+		String provider_no = loggedInInfo.getLoggedInProviderNo();
 
 		ArrayList<LabResultData> labs;
-		if (consultResponsePage==null) {
+		if (consultResponsePage == null)
+		{
 			labs = consultLabs.populateLabResultsData(loggedInInfo, demoNo, reqId, CommonLabResultData.ATTACHED);
-		} else {
+		}
+		else
+		{
 			labs = consultLabs.populateLabResultsDataConsultResponse(loggedInInfo, demoNo, reqId, CommonLabResultData.ATTACHED);
 		}
-		
+
 		String error = "";
 		Exception exception = null;
 		try
@@ -130,7 +140,8 @@ public class EctConsultationFormFaxAction extends Action {
 				bos.close();
 				streams.add(bis);
 				alist.add(bis);
-			} else
+			}
+			else
 			{ //fax for consultation response
 				String consultRespoonsePDF = ConsultResponsePDFCreator.create(consultResponsePage);
 				alist.add(consultRespoonsePDF);
@@ -155,10 +166,12 @@ public class EctConsultationFormFaxAction extends Action {
 						streams.add(bis);
 						alist.add(bis);
 
-					} else if (doc.isPDF())
+					}
+					else if (doc.isPDF())
 					{
 						alist.add(path + doc.getFileName());
-					} else
+					}
+					else
 					{
 						logger.error("EctConsultationFormRequestPrintAction: " + doc.getType() + " is marked as printable but no means have been established to print it.");
 					}
@@ -219,7 +232,8 @@ public class EctConsultationFormFaxAction extends Action {
 				{
 					fos = new FileOutputStream(faxPdf);
 					ConcatPDF.concat(alist, fos);
-				} finally
+				}
+				finally
 				{
 					IOUtils.closeQuietly(fos);
 				}
@@ -264,7 +278,8 @@ public class EctConsultationFormFaxAction extends Action {
 						fos = new FileOutputStream(tempTxt);
 						pw = new PrintWriter(fos);
 						pw.println(faxNo);
-					} finally
+					}
+					finally
 					{
 						IOUtils.closeQuietly(pw);
 						IOUtils.closeQuietly(fos);
@@ -277,7 +292,7 @@ public class EctConsultationFormFaxAction extends Action {
 					}
 					
 					/*
-				    validFaxNumber = false;
+					validFaxNumber = false;
 				    
 				    faxJob = new FaxJob();
 		    		faxJob.setDestination(faxNo);
@@ -319,31 +334,43 @@ public class EctConsultationFormFaxAction extends Action {
 				return mapping.findForward("success");
 
 			}
-		} catch (HtmlToPdfConversionException e)
+		}
+		catch (HtmlToPdfConversionException e)
 		{
 			error = "HtmlToPdfConversionException";
 			exception = e;
-		} catch (DocumentException de) {
+		}
+		catch (DocumentException de)
+		{
 			error = "DocumentException";
 			exception = de;
-		} catch (IOException ioe) {
+		}
+		catch (IOException ioe)
+		{
 			error = "IOException";
 			exception = ioe;
-		} finally { 
+		}
+		finally
+		{
 			// Cleaning up InputStreams created for concatenation.
-			for (InputStream is : streams) {
-				try {
+			for (InputStream is : streams)
+			{
+				try
+				{
 					is.close();
-				} catch (IOException e) {
+				}
+				catch (IOException e)
+				{
 					error = "IOException";
 				}
 			}
 		}
-		if (!error.equals("")) {
+		if (!error.equals(""))
+		{
 			logger.error(error + " occured insided ConsultationPrintAction", exception);
 			request.setAttribute("printError", new Boolean(true));
 			return mapping.findForward("error");
 		}
-		return null;		
-    }   
+		return null;
+	}
 }

@@ -33,15 +33,17 @@ import oscar.OscarProperties;
 
 import com.itextpdf.text.pdf.PdfReader;
 
-public final class FaxAction {
+public final class FaxAction
+{
 
 	private static final Logger logger = MiscUtils.getLogger();
 
 	private String localUri = null;
-	
+
 	private boolean skipSave = false;
 
-	public FaxAction(HttpServletRequest request) {
+	public FaxAction(HttpServletRequest request)
+	{
 		localUri = getEformRequestUrl(request);
 		skipSave = "true".equals(request.getParameter("skipSave"));
 	}
@@ -50,26 +52,34 @@ public final class FaxAction {
 	 * This method is a copy of Apache Tomcat's ApplicationHttpRequest getRequestURL method with the exception that the uri is removed and replaced with our eform viewing uri. Note that this requires that the remote url is valid for local access. i.e. the
 	 * host name from outside needs to resolve inside as well. The result needs to look something like this : https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&parentAjaxId=eforms
 	 */
-	private String getEformRequestUrl(HttpServletRequest request) {
+	private String getEformRequestUrl(HttpServletRequest request)
+	{
 		StringBuilder url = new StringBuilder();
 		String scheme = request.getScheme();
 		String prop_scheme = OscarProperties.getInstance().getProperty("oscar_protocol");
-		if(prop_scheme != null && prop_scheme != "")
+		if (prop_scheme != null && prop_scheme != "")
 		{
 			scheme = prop_scheme;
 		}
 
 		Integer port;
-		try { port = new Integer(OscarProperties.getInstance().getProperty("oscar_port")); }
-	    catch (Exception e) { port = 8443; }
+		try
+		{
+			port = new Integer(OscarProperties.getInstance().getProperty("oscar_port"));
+		}
+		catch (Exception e)
+		{
+			port = 8443;
+		}
 		if (port < 0) port = 80; // Work around java.net.URL bug
 
 		url.append(scheme);
 		url.append("://");
 		//url.append(request.getServerName());
 		url.append("127.0.0.1");
-		
-		if ((scheme.equals("http") && (port != 80)) || (scheme.equals("https") && (port != 443))) {
+
+		if ((scheme.equals("http") && (port != 80)) || (scheme.equals("https") && (port != 443)))
+		{
 			url.append(':');
 			url.append(port);
 		}
@@ -84,10 +94,9 @@ public final class FaxAction {
 	/**
 	 * Prepares eForm fax files and places them in the outgoing faxes location.
 	 *
-	 * @param numbers     the fax numbers to send to
-	 * @param formId      the fdid of the form to send
-	 * @param providerId  the provider number to record in the faxJob
-	 *
+	 * @param numbers    the fax numbers to send to
+	 * @param formId     the fdid of the form to send
+	 * @param providerId the provider number to record in the faxJob
 	 * @throws IOException
 	 * @throws HtmlToPdfConversionException
 	 */
@@ -98,7 +107,8 @@ public final class FaxAction {
 		String temporaryFileLocation = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "/";
 		File tempFile = null;
 
-		try {
+		try
+		{
 			logger.info("Generating PDF for eForm with fdid = " + formId);
 
 			String pdfFile = "EForm." + formId + System.currentTimeMillis();
@@ -110,7 +120,8 @@ public final class FaxAction {
 			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
 
 			// Removing all non digit characters from fax numbers.
-			for (int i = 0; i < numbers.length; i++) {
+			for (int i = 0; i < numbers.length; i++)
+			{
 				numbers[i] = numbers[i].trim().replaceAll("\\D", "");
 			}
 
@@ -121,7 +132,8 @@ public final class FaxAction {
 			FaxJobDao faxJobDao = SpringUtils.getBean(FaxJobDao.class);
 			FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 			List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
-			for (String recipient : recipients) {
+			for (String recipient : recipients)
+			{
 				String fileNameFormat = "EForm-" + formId + "." + System.currentTimeMillis();
 				String pdfFileName = String.format("%s%s%s.pdf", faxFileLocation, File.separator, fileNameFormat);
 				String txtFileName = String.format("%s%s%s.txt", faxFileLocation, File.separator, fileNameFormat);
@@ -131,7 +143,8 @@ public final class FaxAction {
 
 				FaxJob faxJob;
 
-				for( FaxConfig faxConfig : faxConfigs ) {
+				for (FaxConfig faxConfig : faxConfigs)
+				{
 
 					PdfReader pdfReader = new PdfReader(temporaryFileLocation + tempFile.getName());
 
@@ -149,27 +162,30 @@ public final class FaxAction {
 					faxJobDao.persist(faxJob);
 					break;
 				}
-				
+
 				// Creating text file with the specialists fax number.
 				fos = new FileOutputStream(txtFileName);
 				PrintWriter pw = new PrintWriter(fos);
 				pw.println(recipient);
 				pw.close();
 				fos.close();
-				
+
 				// A little sanity check to ensure the file exists.
-				if (!new File(txtFileName).exists()) {
+				if (!new File(txtFileName).exists())
+				{
 					throw new IOException("Unable to create fax file for eForm " + formId + ".");
 				}
 			}
 
-			if (skipSave) {
-				EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
-				EFormData eFormData=eFormDataDao.find(Integer.parseInt(formId));
+			if (skipSave)
+			{
+				EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean("EFormDataDao");
+				EFormData eFormData = eFormDataDao.find(Integer.parseInt(formId));
 				eFormData.setCurrent(false);
 				eFormDataDao.merge(eFormData);
 			}
-		} finally
+		}
+		finally
 		{
 			// Removing the temp pdf.
 			if (tempFile != null)

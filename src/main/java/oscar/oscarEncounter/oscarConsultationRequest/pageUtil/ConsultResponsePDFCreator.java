@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,36 +35,40 @@ import org.oscarehr.util.WKHtmlToPdfUtils;
 
 import oscar.OscarProperties;
 
-public class ConsultResponsePDFCreator {
+public class ConsultResponsePDFCreator
+{
 	private static Logger logger = MiscUtils.getLogger();
-	
+
 	public static String create(String consultResponseHtmlPage) throws
 			HtmlToPdfConversionException, IOException
 	{
 		String tmpDir = OscarProperties.getInstance().getProperty("TMP_DIR");
 		String filename = tmpDir + "/ConsultResponse" + System.currentTimeMillis();
-		
+
 		//save consultResponse as .html
-		File fileHtml = new File(filename+".html");
-        try {
-        	FileOutputStream fos = new FileOutputStream(fileHtml);
+		File fileHtml = new File(filename + ".html");
+		try
+		{
+			FileOutputStream fos = new FileOutputStream(fileHtml);
 			byte[] pageInBytes = consultResponseHtmlPage.getBytes();
 			fos.write(pageInBytes);
 			fos.flush();
 			fos.close();
-        } catch (Exception ex) {
-        	logger.error("Error saving html", ex);
-        }
-		
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error saving html", ex);
+		}
+
 		//convert consultResponse.html to pdf
-        File filePDF = new File(filename+".pdf");
+		File filePDF = new File(filename + ".pdf");
 		WKHtmlToPdfUtils.convertToPdf(fileHtml.getPath(), filePDF);
 
-		
+
 		//mark temporary files for clean-up afterwards
-        fileHtml.deleteOnExit();
-        filePDF.deleteOnExit();
-		
+		fileHtml.deleteOnExit();
+		filePDF.deleteOnExit();
+
 		return filePDF.getPath();
 	}
 }

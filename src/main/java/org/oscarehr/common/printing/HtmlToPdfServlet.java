@@ -50,12 +50,14 @@ import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfWriter;
 
-public class HtmlToPdfServlet extends HttpServlet {
+public class HtmlToPdfServlet extends HttpServlet
+{
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+	{
 		String content = req.getParameter("content");
 
 		// convert the content provide into PDF
@@ -67,46 +69,53 @@ public class HtmlToPdfServlet extends HttpServlet {
 			pdf = appendFooter(pdf);
 			// and finally stream it to the user
 			stream(resp, pdf, true);
-		} catch (HtmlToPdfConversionException e)
+		}
+		catch (HtmlToPdfConversionException e)
 		{
 			throw new ServletException("Could not convert html to pdf.", e);
 		}
 	}
 
-	public static byte[] stamp(byte[] content) throws Exception {
+	public static byte[] stamp(byte[] content) throws Exception
+	{
 		PdfReader reader = null;
 		ByteArrayOutputStream os = null;
 		PdfStamper stamper = null;
 
-		try {
+		try
+		{
 			reader = new PdfReader(content);
 			os = new ByteArrayOutputStream(content.length);
 			stamper = new PdfStamper(reader, os);
 
-			for (int i = 1; i <= reader.getNumberOfPages(); i++) {
+			for (int i = 1; i <= reader.getNumberOfPages(); i++)
+			{
 				PdfContentByte over = stamper.getOverContent(i);
 				BaseFont font = FontSettings.HELVETICA_6PT.createFont();
 
 				over.setFontAndSize(font, 10);
 				float center = reader.getPageSize(i).getWidth() / 2.0f;
-				
+
 				// TODO Consider refactoring this into is own class 
 				printText(over, "Page " + i + " of " + reader.getNumberOfPages(), center, 35);
 				printText(over, OscarProperties.getConfidentialityStatement(), center, 25);
 			}
-			
+
 			// this is ugly, but there is no flush method for readers in itext....
 			stamper.close();
 			reader.close();
 			os.flush();
-			
+
 			return os.toByteArray();
-		} finally {
+		}
+		finally
+		{
 			if (os != null) IOUtils.closeQuietly(os);
 		}
 	}
 
-	private static void printText(PdfContentByte over, String text, float x, float y) {
+	private static void printText(PdfContentByte over, String text, float x, float y)
+	{
 		over.beginText();
 		over.showTextAligned(PdfContentByte.ALIGN_CENTER, text, x, y, 0);
 		over.endText();
@@ -114,29 +123,32 @@ public class HtmlToPdfServlet extends HttpServlet {
 
 	/**
 	 * Streams the specified content as the response
-	 * 
-	 * @param resp
-	 * 		Response to stream PDF bytes to
-	 * @param pdf
-	 * 		PDF bytes to be streamed
-	 * @param setHeaders
-	 * 		Flag indicating if the Content-Disposition header and content type should be set 
+	 *
+	 * @param resp       Response to stream PDF bytes to
+	 * @param pdf        PDF bytes to be streamed
+	 * @param setHeaders Flag indicating if the Content-Disposition header and content type should be set
 	 * @throws IOException
 	 */
-	public static void stream(HttpServletResponse resp, byte[] pdf, boolean setHeaders) throws IOException {
+	public static void stream(HttpServletResponse resp, byte[] pdf, boolean setHeaders) throws IOException
+	{
 		resp.setContentLength(pdf.length);
-		if (setHeaders) {
+		if (setHeaders)
+		{
 			resp.setContentType("application/pdf");
 			resp.setHeader("Content-Disposition", "attachment; filename=printout.pdf");
 		}
 
 		OutputStream ros = null;
-		try {
+		try
+		{
 			ros = resp.getOutputStream();
 			ros.write(pdf);
 			ros.flush();
-		} finally {
-			if (ros != null) {
+		}
+		finally
+		{
+			if (ros != null)
+			{
 				IOUtils.closeQuietly(ros);
 			}
 		}
@@ -144,33 +156,36 @@ public class HtmlToPdfServlet extends HttpServlet {
 
 	/**
 	 * Appends footer to the provided PDF
-	 * 
-	 * @param pdf
-	 * 		PDF to append footer to
-	 * @return
-	 * 		Returns the newly generated PDF with the footer appended
-	 * @throws IOException
-	 * 	IOException is thrown in case PDF can not be changed 
+	 *
+	 * @param pdf PDF to append footer to
+	 * @return Returns the newly generated PDF with the footer appended
+	 * @throws IOException IOException is thrown in case PDF can not be changed
 	 */
-	public static byte[] appendFooter(byte[] pdf) throws IOException {
+	public static byte[] appendFooter(byte[] pdf) throws IOException
+	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(pdf.length); // assume new content is shorter
-		try {
+		try
+		{
 			appendFooter(pdf, baos);
 
 			baos.flush();
 			pdf = baos.toByteArray();
-		} finally {
+		}
+		finally
+		{
 			if (baos != null) baos.close();
 		}
 		return pdf;
 	}
 
-	private static void appendFooter(byte[] pdf, ByteArrayOutputStream baos) {
+	private static void appendFooter(byte[] pdf, ByteArrayOutputStream baos)
+	{
 		PdfReader reader = null;
 		PdfWriter writer = null;
 		Document document = null;
 
-		try {
+		try
+		{
 			// do initialization
 			reader = new PdfReader(pdf);
 			document = new Document(PageSize.LETTER);
@@ -179,43 +194,63 @@ public class HtmlToPdfServlet extends HttpServlet {
 			PdfContentByte cb = writer.getDirectContent();
 
 			// copy pages
-			for (int i = 1; i <= reader.getNumberOfPages(); i++) {
+			for (int i = 1; i <= reader.getNumberOfPages(); i++)
+			{
 				cb.addTemplate(writer.getImportedPage(reader, i), 0, 0);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			throw new RuntimeException("Unable to append document footer", e);
-		} finally {
+		}
+		finally
+		{
 			close(document);
 			close(writer);
 			close(reader);
 		}
 	}
 
-	private static void close(PdfReader reader) {
-		if (reader != null) {
-			try {
+	private static void close(PdfReader reader)
+	{
+		if (reader != null)
+		{
+			try
+			{
 				reader.close();
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				MiscUtils.getLogger().error("Unable to close reader", e);
 			}
 		}
 	}
 
-	private static void close(PdfWriter writer) {
-		if (writer != null) {
-			try {
+	private static void close(PdfWriter writer)
+	{
+		if (writer != null)
+		{
+			try
+			{
 				writer.close();
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				MiscUtils.getLogger().error("Unable to close writer", e);
 			}
 		}
 	}
 
-	private static void close(Document document) {
-		if (document != null && document.isOpen()) {
-			try {
+	private static void close(Document document)
+	{
+		if (document != null && document.isOpen())
+		{
+			try
+			{
 				document.close();
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				MiscUtils.getLogger().error("Unable to close document", e);
 			}
 		}
@@ -227,10 +262,13 @@ public class HtmlToPdfServlet extends HttpServlet {
 		contentFile.deleteOnExit();
 
 		OutputStream os = null;
-		try {
+		try
+		{
 			os = new BufferedOutputStream(new FileOutputStream(contentFile));
 			IOUtils.write(content, os, req.getCharacterEncoding());
-		} finally {
+		}
+		finally
+		{
 			if (os != null) IOUtils.closeQuietly(os);
 		}
 

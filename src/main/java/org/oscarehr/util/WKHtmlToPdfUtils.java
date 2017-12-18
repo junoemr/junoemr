@@ -38,33 +38,38 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import oscar.OscarProperties;
 
-public class WKHtmlToPdfUtils {
+public class WKHtmlToPdfUtils
+{
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final int TIMEOUT_SECONDS = 40;
 	private static final String CONVERT_COMMAND;
 	private static final String CONVERT_ARGS;
 	private static final String CONVERT_ARGS_LABEL;
-	static {
+
+	static
+	{
 		String convertCommand = OscarProperties.getInstance().getProperty("WKHTMLTOPDF_COMMAND");
 		if (convertCommand != null) CONVERT_COMMAND = convertCommand;
-		else throw (new RuntimeException("Properties file is missing property : WKHTMLTOPDF_COMMAND"));
-		
+		else
+			throw (new RuntimeException("Properties file is missing property : WKHTMLTOPDF_COMMAND"));
+
 		String convertParameters = OscarProperties.getInstance().getProperty("WKHTMLTOPDF_ARGS");
 		if (convertParameters != null) CONVERT_ARGS = convertParameters;
 		else CONVERT_ARGS = null;
-		
+
 		String convertParametersLabel = OscarProperties.getInstance().getProperty("WKHTMLTOPDF_ARGS_LABEL");
 		if (convertParametersLabel != null) CONVERT_ARGS_LABEL = convertParametersLabel;
-		else CONVERT_ARGS_LABEL= null;
+		else CONVERT_ARGS_LABEL = null;
 	}
 
-	private WKHtmlToPdfUtils() {
+	private WKHtmlToPdfUtils()
+	{
 		// not meant for instantiation
 	}
 
 	/**
 	 * This method should convert the html page at the sourceUrl into a pdf as returned by the byte[]. This method requires wkhtmltopdf to be installed on the machine.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws HtmlToPdfConversionException
 	 */
@@ -72,20 +77,26 @@ public class WKHtmlToPdfUtils {
 	{
 		File outputFile = null;
 
-		try {
+		try
+		{
 			outputFile = File.createTempFile("wkhtmltopdf.", ".pdf");
 			outputFile.deleteOnExit();
 
 			convertToPdf(sourceUrl, outputFile);
 
 			FileInputStream fis = new FileInputStream(outputFile);
-			try {
+			try
+			{
 				byte[] results = IOUtils.toByteArray(fis);
 				return (results);
-			} finally {
+			}
+			finally
+			{
 				if (fis != null) fis.close();
 			}
-		} finally {
+		}
+		finally
+		{
 			if (outputFile != null) outputFile.delete();
 		}
 	}
@@ -103,8 +114,9 @@ public class WKHtmlToPdfUtils {
 		// example command : wkhtmltopdf-i386 "https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&parentAjaxId=eforms" /tmp/out.pdf
 		ArrayList<String> command = new ArrayList<String>();
 		command.add(CONVERT_COMMAND);
-		if (CONVERT_ARGS != null) {
-			for(String arg : CONVERT_ARGS.split("\\s"))
+		if (CONVERT_ARGS != null)
+		{
+			for (String arg : CONVERT_ARGS.split("\\s"))
 				command.add(arg);
 		}
 		command.add(sourceUrl);
@@ -119,11 +131,13 @@ public class WKHtmlToPdfUtils {
 			{
 				throw new HtmlToPdfConversionException("Attempting to convert eForm to pdf returned a nonzero exit value: " + exitValue);
 			}
-		} catch (TimeoutException e)
+		}
+		catch (TimeoutException e)
 		{
 			throw new HtmlToPdfConversionException("Attempting to convert eForm to pdf timed out before operation could be completed.", e);
 		}
 	}
+
 	/**
 	 * This method should convert the html page at the sourceUrl into a pdf (of label size) written to the outputFile. This method requires wkhtmltopdf to be installed on the machine. In general the outputFile should be a unique temp file. If you're not sure what you're
 	 * doing don't call this method as you will leave lingering data everywhere or you may overwrite important files...
@@ -137,8 +151,9 @@ public class WKHtmlToPdfUtils {
 		// example command : wkhtmltopdf-i386 "https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&parentAjaxId=eforms" /tmp/out.pdf
 		ArrayList<String> command = new ArrayList<String>();
 		command.add(CONVERT_COMMAND);
-		if (CONVERT_ARGS_LABEL != null) {
-			for(String arg : CONVERT_ARGS_LABEL.split("\\s"))
+		if (CONVERT_ARGS_LABEL != null)
+		{
+			for (String arg : CONVERT_ARGS_LABEL.split("\\s"))
 				command.add(arg);
 		}
 		command.add(sourceUrl);
@@ -153,7 +168,8 @@ public class WKHtmlToPdfUtils {
 			{
 				throw new HtmlToPdfConversionException("Attempting to convert eForm to pdf returned a nonzero exit value: " + exitValue);
 			}
-		} catch (TimeoutException e)
+		}
+		catch (TimeoutException e)
 		{
 			throw new HtmlToPdfConversionException("Attempting to convert eForm to pdf timed out before operation could be completed.", e);
 		}
@@ -164,7 +180,7 @@ public class WKHtmlToPdfUtils {
 	 *
 	 * @param  command          array containing the command to call and its arguments
 	 *
-	 * @return 					The command's return code.
+	 * @return The command's return code.
 	 *
 	 * @throws TimeoutException if command does not finish execution within TIMEOUT_SECONDS
 	 * @throws IOException      if an I/O error occurs
@@ -195,11 +211,13 @@ public class WKHtmlToPdfUtils {
 			}
 
 			return exitValue;
-		} catch (InterruptedException e)
+		}
+		catch (InterruptedException e)
 		{
 			Thread.currentThread().interrupt();
 			throw new InterruptedIOException("Thread was interrupted while waiting for command to finish.");
-		} finally
+		}
+		finally
 		{
 			process.destroy();
 		}
