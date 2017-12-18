@@ -111,7 +111,7 @@ public class PrintAction extends Action {
 	/**
 	 * This method will take eforms and send them to a PHR.
 	 */
-	public void printForm(String formId, String providerId) {
+	public void printForm(String formId, String providerId) throws HtmlToPdfConversionException {
 
 		File tempFile = null;
 
@@ -174,10 +174,6 @@ public class PrintAction extends Action {
 				eFormData.setCurrent(false);
 				eFormDataDao.merge(eFormData);
 			}
-		}
-		catch (HtmlToPdfConversionException e)
-		{
-			MiscUtils.getLogger().error("Error converting eForm to pdf", e);
 		} catch (IOException e) {
 			MiscUtils.getLogger().error("Error printing eForm", e);
 		}
