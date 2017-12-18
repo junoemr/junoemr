@@ -71,14 +71,6 @@
 							</a>
 							<ul class="dropdown-menu">
 								<li>
-									<a ng-click="patientSearchCtrl.toggleParam('active'); $event.stopPropagation();">
-										<input ng-model="patientSearchCtrl.search.active"
-											   type="checkbox"
-											   ng-click="$event.stopPropagation();"/>
-										<bean:message key="patientsearch.showActiveOnly" bundle="ui"/>
-									</a>
-								</li>
-								<li>
 									<a ng-click="patientSearchCtrl.toggleParam('integrator'); $event.stopPropagation();">
 										<input ng-model="patientSearchCtrl.search.integrator"
 											   type="checkbox"
@@ -101,6 +93,20 @@
 							   type="text"
 							   class="form-control"
 							   placeholder="{{patientSearchCtrl.searchTermPlaceHolder}}"/>
+
+						<select ng-model="patientSearchCtrl.search.status"
+								class="form-control">
+							<option value="all">
+								<bean:message key="patientsearch.showAll" bundle="ui"/>
+							</option>
+							<option value="active">
+								<bean:message key="patientsearch.showActiveOnly" bundle="ui"/>
+							</option>
+							<option value="inactive">
+								<bean:message key="patientsearch.showInactiveOnly" bundle="ui"/>
+							</option>
+						</select>
+
 						<button class="btn btn-primary"
 								type="submit">
 							<bean:message key="global.search" bundle="ui"/>
