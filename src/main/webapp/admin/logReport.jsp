@@ -162,11 +162,11 @@ label{margin-top:6px;margin-bottom:0px;}
 			<label>Content Type:</label>
 			<select name="content" >
 				<option value="all">All</option>
+				<option value="demographic">Demographic</option>
+				<option value="document">Document</option>
 				<option value="eform_data">EForm</option>
 				<option value="eform_template">EForm Template</option>
 				<option value="cme_notes">Encounter Note</option>
-				<option value="demographic">Demographic</option>
-				<option value="document">Document</option>
 				<option value="login">Log in</option>
 			</select>
 			</div>
