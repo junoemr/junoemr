@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.MeasurementGroupDao;
 import org.oscarehr.common.dao.MeasurementTypeDao;
 import org.oscarehr.common.dao.MeasurementTypeDeletedDao;
+import org.oscarehr.common.model.MeasurementGroup;
 import org.oscarehr.common.model.MeasurementType;
 import org.oscarehr.common.model.MeasurementTypeDeleted;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -75,6 +76,12 @@ public class EctDeleteMeasurementTypesAction extends Action {
                 
                 MeasurementType mt = measurementTypeDao.find(Integer.parseInt(deleteCheckbox[i]));
                 if(mt != null) {
+
+					for (MeasurementGroup group : measurementGroupDao.findByTypeDisplayName(mt.getTypeDisplayName()))
+					{
+						measurementGroupDao.remove(group.getId());
+					}
+
                 	MeasurementTypeDeleted mtd = new MeasurementTypeDeleted();
                 	mtd.setType(mt.getType());
                 	mtd.setTypeDisplayName(mt.getTypeDisplayName());
@@ -85,8 +92,6 @@ public class EctDeleteMeasurementTypesAction extends Action {
                 	measurementTypeDeletedDao.persist(mtd);
                 	
                 	measurementTypeDao.remove(mt.getId());
-                	
-                	measurementGroupDao.remove(measurementGroupDao.findByTypeDisplayName(mt.getTypeDisplayName()));
                 }
                 
                 
