@@ -49,6 +49,7 @@ import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTDIR;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTMODE;
+import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.STATUSMODE;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.oscarehr.ws.rest.to.model.StatusValueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +104,7 @@ public class DemographicsService extends AbstractServiceImpl {
 			}
 
 			DemographicSearchRequest req = new DemographicSearchRequest();
-			req.setActive(true);
+			req.setStatusMode(STATUSMODE.active);
 			req.setIntegrator(false); //this should be configurable by persona
 
 			//caisi
@@ -179,16 +180,13 @@ public class DemographicsService extends AbstractServiceImpl {
 
 			List<DemographicSearchResult> results = new ArrayList<DemographicSearchResult>();
 
-			if (json.getString("term").length() >= 1)
-			{
-				int count = demographicManager.searchPatientsCount(getLoggedInInfo(), req);
+			int count = demographicManager.searchPatientsCount(getLoggedInInfo(), req);
 
-				if (count > 0)
-				{
-					results = demographicManager.searchPatients(getLoggedInInfo(), req, startIndex, itemsToReturn);
-					response.setContent(results);
-					response.setTotal(count);
-				}
+			if (count > 0)
+			{
+				results = demographicManager.searchPatients(getLoggedInInfo(), req, startIndex, itemsToReturn);
+				response.setContent(results);
+				response.setTotal(count);
 			}
 
 			return RestResponse.successResponse(response);
@@ -314,9 +312,9 @@ public class DemographicsService extends AbstractServiceImpl {
 		}
 
 		req.setKeyword(json.getString("term"));
-		req.setActive(Boolean.valueOf(json.getString("active")));
 		req.setIntegrator(Boolean.valueOf(json.getString("integrator")));
 		req.setOutOfDomain(Boolean.valueOf(json.getString("outofdomain")));
+		req.setStatusMode(STATUSMODE.valueOf(json.getString("status")));
 
 		Pattern namePtrn = Pattern.compile("sorting\\[(\\w+)\\]");
 
@@ -339,7 +337,7 @@ public class DemographicsService extends AbstractServiceImpl {
 
 		if(hin != null && !hin.isEmpty()) {
 			DemographicSearchRequest dsr = new DemographicSearchRequest();
-			dsr.setActive(true);
+			dsr.setStatusMode(STATUSMODE.active);
 			dsr.setKeyword(hin);
 			dsr.setMode(SEARCHMODE.HIN);
 			dsr.setOutOfDomain(true);
