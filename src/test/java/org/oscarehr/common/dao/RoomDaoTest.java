@@ -39,13 +39,14 @@ public class RoomDaoTest extends DaoTestFixtures {
 
 	@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreTable("room");
+		SchemaUtils.restoreTable("room", "Facility");
 	}
 
 	@Test
 	public void testCreate() throws Exception {
 		Room entity = new Room();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setFacilityId(1);
 		dao.persist(entity);
 		assertNotNull(entity.getId());
 	}

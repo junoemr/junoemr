@@ -202,18 +202,23 @@ public class UtilDateUtilities {
      * For Parsing Dates.
      * @param dateStr The date string to be parsed
      * @param datePattern The date pattern to use to parse the date string
-     * @return Date object. If date was unable to be parsed the object will be null
+     * @return Date object. If date was null, empty, or unparseable the object will be null
      */    
     public static Date getDateFromString(String dateStr, String datePattern){
       Date date = null;
+
+      // early exit if no date
+      if (dateStr == null || dateStr.trim().isEmpty()) {
+          return date;
+      }
+
       try {
-         // Some examples
          DateFormat formatter = new SimpleDateFormat(datePattern);
          date = formatter.parse(dateStr);                        
       } catch (ParseException e) {
-    	  MiscUtils.getLogger().error("Looks bad, too bad original author didn't document how bad", e);
+         MiscUtils.getLogger().error("Unparseable date", e);
       }
-      return date   ;     
+      return date;
     }
     
     

@@ -50,10 +50,12 @@ public class AlertsPopulatorTest extends AbstractBodyPopulatorTest {
 		entryCountTest(1);
 	}
 
+	/*
 	@Test
 	public void alertsEntryStructureTest() {
 		entryStructureTest();
 	}
+	*/
 
 	@Test
 	public void alertsClinicalStatementTest() {

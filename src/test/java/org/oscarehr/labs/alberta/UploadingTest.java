@@ -53,7 +53,6 @@ public class UploadingTest extends DaoTestFixtures {
 
 	@BeforeClass
 	public static void init() throws Exception {
-		SchemaUtils.restoreAllTables();
 		logger.info("Initialized successfully");
 	}
 	

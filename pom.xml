@@ -55,22 +55,11 @@
 			<id>oscar_repo</id>
 			<url>http://oscarmcmaster.sourceforge.net/m2</url>
 		</repository>
-		<!--
-		<repository>
-			<id>Codehaus Mojo</id>
-			<name>Codehaus Mojo</name>
-			<url>https://nexus.codehaus.org/content/repositories/releases/</url>
-		</repository>
-		-->
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>local_repo</id>
 			<url>file://${basedir}/local_repo</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>oscar_repo</id>
-			<url>http://oscarmcmaster.sourceforge.net/m2</url>
 		</pluginRepository>
 	</pluginRepositories>
 	<dependencies>

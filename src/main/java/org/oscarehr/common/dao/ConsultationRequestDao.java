@@ -32,7 +32,6 @@ import javax.persistence.Query;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.ConsultationRequest;
-import org.oscarehr.util.MiscUtils;
 
 @SuppressWarnings("unchecked")
 public class ConsultationRequestDao extends AbstractDao<ConsultationRequest> {
@@ -71,8 +70,6 @@ public class ConsultationRequestDao extends AbstractDao<ConsultationRequest> {
 
         
         public List<ConsultationRequest> getConsults(String team, boolean showCompleted, Date startDate, Date endDate, String orderby, String desc, String searchDate, Integer offset, Integer limit) {
-        	MiscUtils.getLogger().error("getConsults(bunch)-----------------------------------------------"); 
-        	
         	StringBuilder sql = new StringBuilder("select cr from ConsultationRequest cr left outer join cr.professionalSpecialist specialist, ConsultationServices service, Demographic d left outer join d.provider p where d.DemographicNo = cr.demographicId and service.id = cr.serviceId ");
 
             if( !showCompleted ) {
