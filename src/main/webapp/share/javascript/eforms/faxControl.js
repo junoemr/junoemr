@@ -109,7 +109,10 @@ function _AddOtherFax(name, number) {
 
 function checkPhone(str) 
 {
-	var phone =  /^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/;
+	// matches numbers in the NANP format: NXX-NXX-XXXX where X is a digit 0-9 and N is a digit 2-9
+	// with optional country code at the front
+	// valid examples: 250-333-1234, +1 250 333 1234, 12503331234
+	var phone = /^(\+?\d)?[- ]?([2-9]\d{2}[- ]?){2}\d{4}$/;
 	if (str.match(phone)) {
    		return true;
  	} else {
