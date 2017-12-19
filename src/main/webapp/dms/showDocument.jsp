@@ -156,25 +156,41 @@
 <script type="text/javascript" src="<%= request.getContextPath() %>/share/calendar/calendar-setup.js"></script>
 <!-- calendar stylesheet -->
 <link rel="stylesheet" type="text/css" media="all" href="<%= request.getContextPath() %>/share/calendar/calendar.css" title="win2k-cold-1" />
-		<script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/prototype.js"></script>
-		<script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/effects.js"></script>
-		<script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/controls.js"></script>
-		<!-- jquery -->
-		<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
-		<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
-		<script language="javascript" type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/Oscar.js" ></script>
+	<script type="text/javascript"
+			src="<%= request.getContextPath() %>/share/javascript/prototype.js"></script>
+	<script type="text/javascript"
+			src="<%= request.getContextPath() %>/share/javascript/effects.js"></script>
+	<script type="text/javascript"
+			src="<%= request.getContextPath() %>/share/javascript/controls.js"></script>
+	<!-- jquery -->
+	<script type="text/javascript"
+			src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
+	<script type="text/javascript"
+			src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
+	<script language="javascript" type="text/javascript"
+			src="<%= request.getContextPath() %>/share/javascript/Oscar.js"></script>
 
 
+	<script type="text/javascript"
+			src="<%= request.getContextPath() %>/js/demographicProviderAutocomplete.js"></script>
 
-		<script type="text/javascript" src="<%= request.getContextPath() %>/js/demographicProviderAutocomplete.js"></script>
+	<script type="text/javascript"
+			src="<%= request.getContextPath() %>/share/javascript/oscarMDSIndex.js"></script>
 
-		<script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/oscarMDSIndex.js"></script>
+	<link rel="stylesheet" type="text/css"
+		  href="<%= request.getContextPath() %>/share/yui/css/fonts-min.css"/>
+	<link rel="stylesheet" type="text/css"
+		  href="<%= request.getContextPath() %>/share/yui/css/autocomplete.css"/>
+	<link rel="stylesheet" type="text/css" media="all"
+		  href="<%= request.getContextPath() %>/share/css/demographicProviderAutocomplete.css"/>
 
-		<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/share/yui/css/fonts-min.css"/>
-		<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/share/yui/css/autocomplete.css"/>
-		<link rel="stylesheet" type="text/css" media="all" href="<%= request.getContextPath() %>/share/css/demographicProviderAutocomplete.css"  />
-
-		<script type="text/javascript" src="<%=request.getContextPath()%>/dms/showDocument.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/dms/showDocument.js"></script>
+	<script type="text/javascript"
+			src="<%= request.getContextPath() %>/js/moment.min.js"></script>
+	<script type="text/javascript"
+			src="<%= request.getContextPath() %>/js/util/common.js"></script>
+	<script type="text/javascript"
+			src="<%= request.getContextPath() %>/js/util/date.js"></script>
 
 
 	<style type="text/css">
@@ -253,6 +269,27 @@
 		function split(id,demoName) {
 			var loc = "<%= request.getContextPath()%>/oscarMDS/Split.jsp?document=" + id + "&queueID=<%=inQueue%>" + "&demoName=" + demoName;
 			popupStart(1400, 1400, loc, "Splitter");
+		}
+
+		function checkObservationDate(formId)
+		{
+			var formElem = document.getElementById(formId);
+			var dateElem = formElem.elements["observationDate"];
+
+			if (!Oscar.Util.Common.validateInputNotEmpty(dateElem))
+			{
+				alert("Blank Date.");
+				dateElem.focus();
+				return false;
+			}
+
+			if (!Oscar.Util.Date.validateDateInput(dateElem))
+			{
+				alert("Invalid date format: " + dateElem.value);
+				dateElem.focus();
+				return false;
+			}
+			return true;
 		}
 
 		var _in_window = <%=( "true".equals(request.getParameter("inWindow")) ? "true" : "false" )%>;
@@ -397,7 +434,7 @@
 
 							</table>
 
-							<form id="forms_<%=docId%>" onsubmit="return updateDocument('forms_<%=docId%>');">
+							<form id="forms_<%=docId%>" onsubmit="return checkObservationDate(this.id) && updateDocument(this.id);">
 								<input type="hidden" name="method" value="documentUpdateAjax" />
 								<input type="hidden" name="documentId" value="<%=docId%>" />
 								<input type="hidden" name="curPage_<%=docId%>" id="curPage_<%=docId%>" value="1"/>
