@@ -66,16 +66,19 @@ public class RestoreEFormAction extends Action {
 			EForm eFormTemplate = eFormTemplateService.restoreTemplate(Integer.parseInt(fid));
 			LogAction.addLogEntry(providerNo, null, LogConst.ACTION_RESTORE, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
 					String.valueOf(eFormTemplate.getId()), loggedInInfo.getIp(), eFormTemplate.getFormName());
-			return mapping.findForward("success");
 		}
 		catch(IllegalArgumentException e)
 		{
 			logger.error("Invalid Form Id: " + fid, e);
+			request.setAttribute("error","Invalid Form Id: " + fid);
+			return mapping.findForward("failure");
 		}
 		catch(SecurityException e)
 		{
 			logger.error("Security Error", e);
+			request.setAttribute("error","Security Error");
+			return mapping.findForward("failure");
 		}
-		return mapping.findForward("failure");
+		return mapping.findForward("success");
 	}
 }
