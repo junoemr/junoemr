@@ -41,7 +41,8 @@ public class MeasurementGroupDao extends AbstractDao<MeasurementGroup>{
 	public MeasurementGroupDao() {
 		super(MeasurementGroup.class);
 	}
-	
+
+
 	public List<MeasurementGroup> findAll() {
 		Query query = createQuery("x", null);
 		return query.getResultList();
@@ -94,4 +95,11 @@ public class MeasurementGroupDao extends AbstractDao<MeasurementGroup>{
 		query.setParameter("groupName", groupName);
 		return query.getResultList();
     }
+
+	public void removeAll(String typeDisplayName)
+	{
+		Query query = entityManager.createQuery("DELETE FROM MeasurementGroup mg WHERE mg.typeDisplayName = :typeDisplayName");
+		query.setParameter("typeDisplayName", typeDisplayName);
+		query.executeUpdate();
+	}
 }

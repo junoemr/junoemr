@@ -40,7 +40,6 @@ import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.MeasurementGroupDao;
 import org.oscarehr.common.dao.MeasurementTypeDao;
 import org.oscarehr.common.dao.MeasurementTypeDeletedDao;
-import org.oscarehr.common.model.MeasurementGroup;
 import org.oscarehr.common.model.MeasurementType;
 import org.oscarehr.common.model.MeasurementTypeDeleted;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -66,42 +65,39 @@ public class EctDeleteMeasurementTypesAction extends Action {
         EctDeleteMeasurementTypesForm frm = (EctDeleteMeasurementTypesForm) form;                
         request.getSession().setAttribute("EctDeleteMeasurementTypesForm", frm);
         String[] deleteCheckbox = frm.getDeleteCheckbox();
-        GregorianCalendar now=new GregorianCalendar(); 
-       
-                                                                                        
-            
-        if(deleteCheckbox != null){
-            for(int i=0; i<deleteCheckbox.length; i++){
-                MiscUtils.getLogger().debug(deleteCheckbox[i]);
-                
-                MeasurementType mt = measurementTypeDao.find(Integer.parseInt(deleteCheckbox[i]));
-                if(mt != null) {
+        GregorianCalendar now=new GregorianCalendar();
 
-					for (MeasurementGroup group : measurementGroupDao.findByTypeDisplayName(mt.getTypeDisplayName()))
+
+			if (deleteCheckbox != null)
+			{
+				for (int i = 0; i < deleteCheckbox.length; i++)
+				{
+					MiscUtils.getLogger().debug(deleteCheckbox[i]);
+
+					MeasurementType mt = measurementTypeDao.find(Integer.parseInt(deleteCheckbox[i]));
+					if (mt != null)
 					{
-						measurementGroupDao.remove(group.getId());
+						String typeDisplayName = mt.getTypeDisplayName();
+
+						MeasurementTypeDeleted mtd = new MeasurementTypeDeleted();
+						mtd.setType(mt.getType());
+						mtd.setTypeDisplayName(typeDisplayName);
+						mtd.setTypeDescription(mt.getTypeDescription());
+						mtd.setMeasuringInstruction(mt.getMeasuringInstruction());
+						mtd.setValidation(mt.getValidation());
+						mtd.setDateDeleted(new Date());
+						measurementTypeDeletedDao.persist(mtd);
+
+						measurementTypeDao.remove(mt.getId());
+						measurementGroupDao.removeAll(typeDisplayName);
 					}
 
-                	MeasurementTypeDeleted mtd = new MeasurementTypeDeleted();
-                	mtd.setType(mt.getType());
-                	mtd.setTypeDisplayName(mt.getTypeDisplayName());
-                	mtd.setTypeDescription(mt.getTypeDescription());
-                	mtd.setMeasuringInstruction(mt.getMeasuringInstruction());
-                	mtd.setValidation(mt.getValidation());
-                	mtd.setDateDeleted(new Date());
-                	measurementTypeDeletedDao.persist(mtd);
-                	
-                	measurementTypeDao.remove(mt.getId());
-                }
-                
-                
-            }
-        }
-        
 
-         
-      
-        MeasurementTypes mt =  MeasurementTypes.getInstance();
+				}
+			}
+
+
+			MeasurementTypes mt =  MeasurementTypes.getInstance();
         mt.reInit();
         return mapping.findForward("success");
 
