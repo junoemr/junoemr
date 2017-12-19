@@ -1715,6 +1715,7 @@ public boolean isBirthday(String schedDate,String demBday){
                         nameSb.append(String.valueOf(appointment.getName()));
                   }
                   String name = UtilMisc.toUpperLowerCase(nameSb.toString());
+                  Boolean doNotBook = ("DO_NOT_BOOK").equalsIgnoreCase(name);
 
                   paramTickler[0]=String.valueOf(demographic_no);
                   paramTickler[1]=MyDateFormat.getSysDate(strDate); //year+"-"+month+"-"+day;//e.g."2001-02-02";
@@ -1898,11 +1899,31 @@ public boolean isBirthday(String schedDate,String demBday){
 	reason: <%=reasonCodeName!=null?reasonCodeName:""%> <%if(reason!=null && !reason.isEmpty()){%>- <%=UtilMisc.htmlEscape(reason)%>
 <%}%>	<bean:message key="provider.appointmentProviderAdminDay.notes"/>: <%=UtilMisc.htmlEscape(notes)%>" >
 																	.<%=(view==0&&numAvailProvider!=1)?(name.length()>len?name.substring(0,len).toUpperCase():name.toUpperCase()):name.toUpperCase()%>
-																	</font></a><!--Inline display of reason -->
+																	</font>
+																</a>
+
+																<!--Inline display of reason -->
 																<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
+																	<%
+																		String escapedReason = reason != null ? "&nbsp;" + UtilMisc.htmlEscape(reason) : "";
+																		if (doNotBook)
+																		{
+																	%>
+																	<%--Do not book appointments always display reason and can not be toggled. --%>
 																	<span class="reason reason_<%=curProvider_no[nProvider]%>">
-																		<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%if(reason!=null){%>&nbsp;<%=UtilMisc.htmlEscape(reason)%><%}%>
+																		<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=escapedReason%>
 																	</span>
+																	<%
+																		}
+																		else
+																		{
+																	%>
+																	<span class="toggleable reason reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
+																		<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=escapedReason%>
+																	</span>
+																	<%
+																		}
+																	%>
 																</oscar:oscarPropertiesCheck>
 															</td>
 																	<%
