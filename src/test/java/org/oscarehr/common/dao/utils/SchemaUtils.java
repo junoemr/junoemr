@@ -62,7 +62,10 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
@@ -196,7 +199,8 @@ public class SchemaUtils
 				if (isWindows()) {
 					tableName = tableName.toLowerCase(); // make it case insensitive by default
 				}
-				s.executeUpdate("drop table if exists " + tableName);
+				String sql = "drop table if exists " + tableName;
+				s.executeUpdate(sql);
 				
 				String createTableStatement = createTableStatements.get(tableName);
 				if (createTableStatement == null) {
@@ -295,6 +299,20 @@ public class SchemaUtils
 		return exitValue;
 	}
 
+	/**
+	 * Replace constraint names with name + "_original".
+	 * @param sql The input sql to modify
+	 * @return The updated-constraint sql
+	 */
+	private static String renameConstraint(String sql)
+	{
+		if(sql == null) {
+			return null;
+		}
+
+	    return sql.replaceAll("CONSTRAINT `(.*?)`", String.format("CONSTRAINT `$1%s`", "_original"));
+	}
+
 	private static void runCreateTablesScript(Connection c) throws IOException
 	{
 		boolean skipDbInit = false;
@@ -311,19 +329,31 @@ public class SchemaUtils
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/oscardata.sql"),0);
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/oscardata_on.sql"),0);
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/icd9.sql"),0);
-	
+
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/caisi/initcaisi.sql"),0);
-	
+
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/caisi/initcaisidata.sql"),0);
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/caisi/populate_issue_icd9.sql"),0);
-			//		assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/icd9_issue_groups.sql"),0);
+			//assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/icd9_issue_groups.sql"),0);
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/measurementMapData.sql"),0);
-	//		assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/expire_oscardoc.sql"),0);
-	
+			//assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/expire_oscardoc.sql"),0);
+
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/oscarinit_bc.sql"),0);
 			assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/oscardata_bc.sql"),0);
 
+			//assertEquals(loadFileIntoMySQL(baseDir + "/database/mysql/oscar_15.creation_db.2017.02.23.sql"), 0);
 
+			// Run OscarHost updates
+			File folder = new File(baseDir, "/database/mysql/oscarhost_updates/");
+			File[] updateFiles = folder.listFiles();
+			Arrays.sort(updateFiles);
+
+			for(File update_file: updateFiles) {
+
+				if(FilenameUtils.getExtension(update_file.getAbsolutePath()).equals("sql")) {
+					assertEquals(loadFileIntoMySQL(update_file.getAbsolutePath()),0);
+				}
+			}
 		 
 			createTableStatements.clear();
 			try {
@@ -334,11 +364,14 @@ public class SchemaUtils
 					Statement stmt2 = c.createStatement();
 					ResultSet rs2 = stmt2.executeQuery("show create table " + tableName + ";");
 					if(rs2.next()) {
-						String sql = rs2.getString(2);	
+						String sql = rs2.getString(2);
+						sql = renameConstraint(sql);
 						createTableStatements.put(tableName, sql);
-	
+
+						// Rename the table so it's out of the way
 						Statement stmt = c.createStatement();
 						stmt.executeUpdate("alter table "+ tableName + " rename to " + tableName + "_maventest");
+
 						stmt.close();
 					}
 					rs2.close();
@@ -362,8 +395,9 @@ public class SchemaUtils
 					Statement stmt2 = c.createStatement();
 					ResultSet rs2 = stmt2.executeQuery("show create table " + tableName + ";");
 					if(rs2.next()) {
-						String sql = rs2.getString(2).replaceAll(tableName, tableName.substring(0,tableName.length()-10));	
-						createTableStatements.put(tableName.substring(0,tableName.length()-10), sql);							
+						String sql = rs2.getString(2).replaceAll(tableName, tableName.substring(0,tableName.length()-10));
+						sql = renameConstraint(sql);
+						createTableStatements.put(tableName.substring(0,tableName.length()-10), sql);
 					}
 					rs2.close();
 					stmt2.close();

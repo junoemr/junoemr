@@ -138,12 +138,7 @@ public class EaapsIntegrationTest extends DaoTestFixtures {
 			"NTE|1|eaaps_" + HASH + "_" + System.currentTimeMillis() + ".pdf|" + PDF + "\r" +
 			"NTE|2||Note comment for message with the AAP attachment " + HASH + "\r" +
 			"NTE|3||MRP message for message with the AAP attachment " + HASH + "\r";
-	
-	@BeforeClass
-	public static void init() throws Exception {
-		SchemaUtils.restoreAllTables();
-	}
-	
+
 	@Test
 	public void testHash() {
 		Demographic demo = new Demographic();

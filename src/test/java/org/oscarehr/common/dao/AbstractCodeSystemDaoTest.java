@@ -41,7 +41,7 @@ public class AbstractCodeSystemDaoTest extends DaoTestFixtures {
 		String codeSystem = "icd9";
 		assertEquals("icd9Dao", getDaoName(AbstractCodeSystemDao.codingSystem.valueOf(codeSystem)));
 		
-		codeSystem = "ichppccode";
+		codeSystem = "ichppc";
 		assertEquals("ichppccodeDao", getDaoName(AbstractCodeSystemDao.codingSystem.valueOf(codeSystem)));
 		
 		codeSystem = "SnomedCore";

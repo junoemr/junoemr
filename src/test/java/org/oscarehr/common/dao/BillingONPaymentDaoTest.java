@@ -52,7 +52,7 @@ public class BillingONPaymentDaoTest extends DaoTestFixtures {
 	
 	@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing_on_payment", "billing_on_cheader1","billing_on_ext");
+		SchemaUtils.restoreTable("billing_on_payment", "billing_on_cheader1","billing_on_ext", "billing_payment_type");
 
 	}
 

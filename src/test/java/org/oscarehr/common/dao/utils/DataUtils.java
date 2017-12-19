@@ -189,7 +189,7 @@ public class DataUtils {
 				try
 				{
 					LabHandlerService labMsgHandler = SpringUtils.getBean(LabHandlerService.class);
-					status = labMsgHandler.parse(
+					status = labMsgHandler.importLab(
 							type,
 							DaoTestFixtures.getLoggedInInfo(),
 							"",

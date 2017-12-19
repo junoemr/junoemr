@@ -423,8 +423,11 @@ public final class EDocUtil {
 				currentdoc.setReviewerId(d.getReviewer());
 				currentdoc.setReviewDateTime(ConversionUtils.toTimestampString(d.getReviewdatetime()));
 				currentdoc.setReviewDateTimeDate(d.getReviewdatetime());
-                                currentdoc.setContentDateTime(d.getContentdatetime());
-                currentdoc.setRestrictToProgram(d.isRestrictToProgram());
+				currentdoc.setContentDateTime(d.getContentdatetime());
+				if(d.isRestrictToProgram() != null)
+				{
+					currentdoc.setRestrictToProgram(d.isRestrictToProgram());
+				}
                                 
 				if (!attachedDocs.contains(currentdoc)) resultDocs.add(currentdoc);
 			}

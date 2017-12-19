@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import net.sf.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.oscarehr.common.model.Demographic;
@@ -78,8 +79,8 @@ public class JsonUtilTest {
 	}
 
 	@Test
-	public void testPojoToJson() {				
-		assertNotNull( JsonUtil.pojoToJson(demographic, ignoreMethods) );
+	public void testPojoToJson() {
+		assertNotNull(JsonUtil.pojoToJson(demographic, ignoreMethods));
 	}
 	
 	@Test

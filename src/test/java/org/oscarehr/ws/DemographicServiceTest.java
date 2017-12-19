@@ -25,6 +25,7 @@ package org.oscarehr.ws;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.oscarehr.ws.rest.DemographicMergeService;
 import org.oscarehr.ws.rest.DemographicService;
+import org.oscarehr.ws.rest.RestResponse;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicMergedTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
@@ -70,11 +72,17 @@ public class DemographicServiceTest extends BaseRestServiceTest {
 		DemographicService demographicService = getResource(DemographicService.class);
 		
 		DemographicTo1 parent = newRandomDemograpic();
-		parent = demographicService.createDemographicData(parent);
+		RestResponse<DemographicTo1, String> response = demographicService.createDemographicData(parent);
+		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
+
+		parent = response.getBody();
 		assertNotNull(parent.getDemographicNo());
 
 		DemographicTo1 child = newRandomDemograpic();
-		child = demographicService.createDemographicData(child);
+		response = demographicService.createDemographicData(child);
+		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
+
+		child = response.getBody();
 		assertNotNull(child.getDemographicNo());
 
 		Integer parentId = parent.getDemographicNo();
@@ -106,7 +114,10 @@ public class DemographicServiceTest extends BaseRestServiceTest {
 		logger.info("REST Tests are enabled. Continuing...");
 
 		DemographicTo1 demo = newRandomDemograpic();
-		demo = demographicService.createDemographicData(demo);
+		RestResponse<DemographicTo1,String> response = demographicService.createDemographicData(demo);
+		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
+
+		demo = response.getBody();
 		assertNotNull(demo);
 		assertNotNull(demo.getDemographicNo());
 
@@ -123,11 +134,17 @@ public class DemographicServiceTest extends BaseRestServiceTest {
 		String newFirstName = "NEW FIRST NAME";
 		demo.setFirstName(newFirstName);
 		demographicService.updateDemographicData(demo);
-		demo = demographicService.getDemographicData(demoId);
+		response = demographicService.getDemographicData(demoId);
+		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
+
+		demo = response.getBody();
 		assertTrue(newFirstName.equals(demo.getFirstName()));
 
 		/* test delete demo */
-		demo = demographicService.deleteDemographicData(demo.getDemographicNo());
+		response = demographicService.deleteDemographicData(demo.getDemographicNo());
+		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
+
+		demo = response.getBody();
 		assertNotNull(demo);
 
 		demographics = demographicService.getAllDemographics(0, 0);

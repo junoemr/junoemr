@@ -90,15 +90,12 @@ public final class ApptStatusData {
 
 
 	public String getImageName() {
-
+		// icon images exists for all statuses including up to 11 custom statuses
 		String baseIcon = statusData.getIcon();
 		String status = apptStatus;
-		boolean hasImageVersion = (statusData.getEditable() == 0); //TODO better way to know when image versions exist
 		String returnIcon = baseIcon;
 
-		// all the uneditable statuses have multiple versions of the image, for verified/signed versions
-		// example: starbill, Vstarbill, Sstarbill
-		if(status.length() >= 2 && hasImageVersion) {
+		if(status.length() >= 2) {
 			String otherIcon = status.substring(1,2);
 			returnIcon = otherIcon + baseIcon;
 		}

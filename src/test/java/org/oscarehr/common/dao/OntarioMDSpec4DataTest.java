@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -99,6 +100,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.managers.TicklerManager;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -111,7 +113,29 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures {
 	
 	@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreAllTables();
+		//SchemaUtils.restoreAllTables();
+		SchemaUtils.restoreTable(
+		    "program",
+			"provider",
+			"program_provider",
+			"security",
+			"secUserRole",
+			"demographicQueryFavourites",
+			"demographic",
+			"admission",
+			"dxresearch",
+			"casemgmt_issue",
+			"casemgmt_note",
+			"casemgmt_issue_notes",
+			"allergies",
+			"casemgmt_note_ext",
+			"formLabReq07",
+			"document",
+		    "ctl_document",
+			"program_queue",
+		    "Facility",
+			"issue"
+        );
 	}
 
 	Document getDocument(String doctype,String docdesc,String docxml,String docfilename,String doccreator,String responsible,String source,Integer program_id,
@@ -135,9 +159,9 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures {
 
  CtlDocument getCtlDocument(String module,Integer moduleId,Integer documentNo,String status){
   	CtlDocument ctlDocument = new CtlDocument();
-  	ctlDocument.getId().setModuleId(moduleId);
   	ctlDocument.setStatus(status);
-  	ctlDocument.setId(new CtlDocumentPK(documentNo,module));
+  	ctlDocument.setId(new CtlDocumentPK(module, moduleId, documentNo));
+	//ctlDocument.getId().setModuleId(moduleId);
   	return ctlDocument;
   }
 
@@ -1220,7 +1244,9 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures {
         tickler.setProgramId(oscarProgramID);
         tickler.setServiceDate(lastWeek);
         tickler.setUpdateDate(lastWeek);
-        ticklerManager.addTickler(getLoggedInInfo(),tickler);
+        LoggedInInfo lii = getLoggedInInfo();
+        lii.setLoggedInProvider(new Provider("999998"));
+        ticklerManager.addTickler(lii,tickler);
 
         //TODO:  Overdue Referral: Geriatrician
 

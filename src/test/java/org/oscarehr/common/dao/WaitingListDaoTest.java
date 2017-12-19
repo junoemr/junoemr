@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.util.SpringUtils;
@@ -43,26 +44,17 @@ import oscar.util.ConversionUtils;
 public class WaitingListDaoTest extends DaoTestFixtures {
 
 	protected WaitingListDao dao = SpringUtils.getBean(WaitingListDao.class);
+	protected DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+
+	private WaitingListName wn;
+	private Demographic demographic;
 
 	@Before
 	public void before() throws Exception {
 		beforeForInnoDB();
 		SchemaUtils.restoreTable("Facility","lst_gender","demographic_merged","admission","health_safety","program","waitingList", "waitingListName", "demographic","appointment");
-	}
 
-	@Test
-	public void testCreate() throws Exception {
-		WaitingList entity = new WaitingList();
-		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
-
-		assertNotNull(entity.getId());
-	}
-
-	@Test
-	public void testFindByDemographic() {
-		// WaitingListNameDao wlnDao = SpringUtils.getBean(WaitingListNameDao.class);
-		WaitingListName wn = new WaitingListName();
+		wn = new WaitingListName();
 		wn.setCreateDate(new Date());
 		wn.setName("NAHBLIAYH");
 		wn.setGroupNo("1");
@@ -70,30 +62,44 @@ public class WaitingListDaoTest extends DaoTestFixtures {
 		wn.setProviderNo("1");
 		dao.persist(wn);
 
+		demographic = new Demographic();
+		EntityDataGenerator.generateTestDataForModelClass(demographic);
+		demographic.setDemographicNo(null);
+		demographicDao.save(demographic);
+	}
+
+	@Test
+	public void testCreate() throws Exception {
+		WaitingList entity = new WaitingList();
+		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setDemographic(demographic);
+		entity.setWaitingListName(wn);
+		dao.persist(entity);
+
+		assertNotNull(entity.getId());
+	}
+
+	@Test
+	public void testFindByDemographic() {
 		WaitingList w = new WaitingList();
-		w.setDemographicNo(10);
-		w.setListId(wn.getId());
+		w.setDemographic(new Demographic(1));
+		w.setWaitingListName(wn);
 		w.setOnListSince(new Date());
 		w.setPosition(1);
 		w.setIsHistory("N");
 		dao.persist(w);
 
-		List<Object[]> lists = dao.findByDemographic(ConversionUtils.fromIntString("10"));
+		List<WaitingList> lists = dao.findByDemographic(ConversionUtils.fromIntString(demographic.getDemographicNo().toString()));
 		assertNotNull(lists);
 		assertTrue(lists.size() == 1);
 	}
 
 	@Test
-	public void testFindWaitingListsAndDemographics() {
-		List<Object[]> results = dao.findWaitingListsAndDemographics(1);
-		assertNotNull(results);
-	}
-	
-	@Test
 	public void testFindAppts() {
 		WaitingList w = new WaitingList();
-		w.setDemographicNo(1);
+		w.setDemographic(demographic);
 		w.setOnListSince(new Date());
+		w.setWaitingListName(wn);
 		List<Appointment> appts = dao.findAppointmentFor(w);
 		assertNotNull(appts);
 	}
@@ -106,7 +112,7 @@ public class WaitingListDaoTest extends DaoTestFixtures {
 	
 	@Test
 	public void testMaxPosition() {
-		Integer i = dao.getMaxPosition(1);
+		Long i = dao.getMaxPosition(1);
 		assertNotNull(i);
 	}
 	

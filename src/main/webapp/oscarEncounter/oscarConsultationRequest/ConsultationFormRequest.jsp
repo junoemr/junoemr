@@ -178,7 +178,7 @@ if(!authed) {
 		String day = Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
 		String mon = Integer.toString(calender.get(java.util.Calendar.MONTH) + 1);
 		String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
-		String formattedDate = year + "/" + mon + "/" + day;
+		String formattedDate = year + "-" + mon + "-" + day;
 
 		OscarProperties props = OscarProperties.getInstance();
 		ConsultationServiceDao consultationServiceDao = SpringUtils.getBean(ConsultationServiceDao.class);
@@ -192,8 +192,10 @@ if(!authed) {
 	var appointmentNo = '<%=appNo%>';
 </script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/util/date.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery_oscar_defaults.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/moment.min.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/prototype.js"></script>
 <link rel="stylesheet" type="text/css" media="all"
 	href="<%=request.getContextPath()%>/share/calendar/calendar.css" title="win2k-cold-1" />
@@ -753,26 +755,37 @@ function popupOscarCal(vheight,vwidth,varpage) { //open a new popup window
 }
 
 
+function checkForm(submissionVal, formName)
+{
+	//if document attach to consultation is still active user needs to close before submitting
+	if (DocPopup != null && !DocPopup.closed)
+	{
+		alert("Please close Consultation Documents window before proceeding");
+		return false;
+	}
 
-function checkForm(submissionVal,formName){
-    //if document attach to consultation is still active user needs to close before submitting
-    if( DocPopup != null && !DocPopup.closed ) {
-        alert("Please close Consultation Documents window before proceeding");
-        return false;
-    }
+	var msg = "<bean:message key="Errors.service.noServiceSelected"/>";
+	msg = msg.replace('<li>', '');
+	msg = msg.replace('</li>', '');
+	if (document.EctConsultationFormRequestForm.service.options.selectedIndex == 0)
+	{
+		alert(msg);
+		document.EctConsultationFormRequestForm.service.focus();
+		return false;
+	}
 
-   var msg = "<bean:message key="Errors.service.noServiceSelected"/>";
-   msg  = msg.replace('<li>','');
-   msg  = msg.replace('</li>','');
-  if (document.EctConsultationFormRequestForm.service.options.selectedIndex == 0){
-     alert(msg);
-     document.EctConsultationFormRequestForm.service.focus();
-     return false;
-  }
-  $("saved").value = "true";
-  document.forms[formName].submission.value=submissionVal;
-  document.forms[formName].submit();
-  return true;
+	var dateElem = document.EctConsultationFormRequestForm.referalDate;
+	if (!Oscar.Util.Date.validateDateInput(dateElem, false))
+	{
+		dateElem.focus();
+		alert("<bean:message key="oscarEncounter.oscarConsultationRequest.msgInvalidDate"/>");
+		return false;
+	}
+
+	$("saved").value = "true";
+	document.forms[formName].submission.value = submissionVal;
+	document.forms[formName].submit();
+	return true;
 }
 
 //enable import from encounter
