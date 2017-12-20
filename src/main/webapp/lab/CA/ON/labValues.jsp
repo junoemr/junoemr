@@ -46,6 +46,9 @@ if(!authed) {
 <%@page import="oscar.oscarLab.ca.all.web.LabDisplayHelper"%>
 <%@ page
 	import="java.util.*,oscar.oscarLab.ca.on.*,oscar.oscarDemographic.data.*"%>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="org.oscarehr.util.DateMapComparator" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -69,6 +72,8 @@ org.oscarehr.common.model.Demographic demographic =  dData.getDemographic(logged
 
 ArrayList list = null;
 
+	SimpleDateFormat dateOutputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+	DateMapComparator comparator = new DateMapComparator("collDate");
 if (!(demographicNo == null || demographicNo.equals("null"))){
 	if(remoteFacilityIdString==null)
 	{
@@ -80,6 +85,15 @@ if (!(demographicNo == null || demographicNo.equals("null"))){
 		Document labContentsAsXml=LabDisplayHelper.getXmlDocument(remoteLab);
 		HashMap<String, ArrayList<Map<String, Serializable>>> mapOfTestValues=LabDisplayHelper.getMapOfTestValues(labContentsAsXml);
 		list=mapOfTestValues.get(identifier);
+	}
+
+	// Attempt to sort the lab result dates
+	try
+	{
+		Collections.sort(list, Collections.reverseOrder(comparator));
+	} catch (RuntimeException e) {
+		MiscUtils.getLogger().error("Cannot sort lab dates: " + e);
+		MiscUtils.getLogger().error("Returning unsorted list.");
 	}
 }
 %>
@@ -250,7 +264,7 @@ window.close();
 				<td align="center"><%=h.get("abn") %></td>
 				<td align="left"><%=h.get("range")%></td>
 				<td align="left"><%=h.get("units") %></td>
-				<td align="center"><%=h.get("collDate")%></td>
+				<td align="center"><%=dateOutputFormat.format(h.get("collDate"))%></td>
 			</tr>
 
 			<%     }
