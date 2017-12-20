@@ -32,7 +32,11 @@ public class DemographicSearchRequest {
 	public static enum SORTMODE {
         DemographicNo, Name, Phone, Address, DOB, ChartNo, Sex, ProviderName, RS, PS
 	}
-	
+
+	public static enum STATUSMODE {
+		all, active, inactive
+	}
+
 	public static enum SORTDIR {
         asc,desc
 	}
@@ -41,8 +45,6 @@ public class DemographicSearchRequest {
 	
 	private String keyword;
 	
-	private boolean active;
-	
 	private boolean integrator;
 	
 	private boolean outOfDomain;
@@ -50,6 +52,8 @@ public class DemographicSearchRequest {
 	private SORTMODE sortMode;
 	
 	private SORTDIR sortDir;
+
+	private STATUSMODE statusMode;
 	
 
 	public SEARCHMODE getMode() {
@@ -65,15 +69,7 @@ public class DemographicSearchRequest {
 	}
 
 	public void setKeyword(String keyword) {
-		this.keyword = keyword;
-	}
-
-	public boolean isActive() {
-		return active;
-	}
-
-	public void setActive(boolean active) {
-		this.active = active;
+		this.keyword = keyword.trim();
 	}
 
 	public boolean isIntegrator() {
@@ -106,6 +102,14 @@ public class DemographicSearchRequest {
 
 	public void setSortDir(SORTDIR sortDir) {
 		this.sortDir = sortDir;
+	}
+
+	public STATUSMODE getStatusMode() {
+		return statusMode;
+	}
+
+	public void setStatusMode(STATUSMODE statusMode) {
+		this.statusMode = statusMode;
 	}
 	
 }

@@ -102,7 +102,7 @@ function setInvalid(checkedDateObj)
 function check_date(checkedDateName) 
 {	
 	// Regular expression used to check if date is in correct format
-   	// pattern = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;	 //'2007-09-21'
+   	// pattern = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;	 //'2007-09-21' or '2007/09/21'
    	
    	if(readOnly==true) return true;
    	var checkedDateObj = document.getElementsByName(checkedDateName)[0];
@@ -140,6 +140,8 @@ function check_date(checkedDateName)
 		setInvalid(checkedDateObj);
       	return false;
    	}
+
+    checkedDateObj.style.backgroundColor='initial';
     return true;
 }
 

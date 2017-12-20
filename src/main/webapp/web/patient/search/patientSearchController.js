@@ -167,6 +167,9 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 					return;
 				}
 			}
+
+			// reset to page 1 for new searches
+			controller.tableParams.page(1);
 			controller.tableParams.reload();
 		};
 
@@ -182,7 +185,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			controller.search = {
 				type: searchType,
 				term: '',
-				active: true,
+				status: "all",
 				integrator: false,
 				outofdomain: true
 			};
@@ -194,13 +197,14 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			// do the search (if initialized)
 			if (Juno.Common.Util.exists(controller.tableParams))
 			{
+				controller.tableParams.page(1);
 				controller.tableParams.reload();
 			}
 		};
 
 		controller.toggleParam = function toggleParam(param)
 		{
-			if (['active', 'integrator', 'outofdomain'].indexOf(param) > -1)
+			if (['integrator', 'outofdomain'].indexOf(param) > -1)
 			{
 				controller.search[param] = !controller.search[param];
 			}
