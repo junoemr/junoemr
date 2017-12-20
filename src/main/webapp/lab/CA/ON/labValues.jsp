@@ -264,7 +264,7 @@ window.close();
 				<td align="center"><%=h.get("abn") %></td>
 				<td align="left"><%=h.get("range")%></td>
 				<td align="left"><%=h.get("units") %></td>
-				<td align="center"><%=dateOutputFormat.format(h.get("collDate"))%></td>
+				<td align="center"><%=h.get("collDate")%></td>
 			</tr>
 
 			<%     }
