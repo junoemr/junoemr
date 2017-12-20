@@ -122,6 +122,8 @@ public class HtmlEditAction extends Action
 		catch(Exception e)
 		{
 			MiscUtils.getLogger().error("Error", e);
+			request.setAttribute("error", "An error occurred saving the eForm");
+			return (mapping.findForward("failure"));
 		}
 		return (mapping.findForward("success"));
 	}

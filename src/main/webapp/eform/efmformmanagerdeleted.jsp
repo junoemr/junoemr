@@ -66,7 +66,7 @@
 
 
 <%@ include file="efmTopNav.jspf"%>
-<%@ include file="efm_form_errorbar.jspf"%>
+<%@ include file="efmShowError.jspf"%>
 
 <h3><bean:message key="eform.calldeletedformdata.title" /></h3>
 

@@ -102,6 +102,7 @@ window.opener.location.href = '<%=request.getContextPath()%>/administration/?sho
 <body id="eformBody">
 
 <%@ include file="efmTopNav.jspf"%>
+<%@ include file="efmShowError.jspf"%>
 
 <%if (request.getParameter("fid") != null){%>
 <h3><bean:message key="eform.edithtml.msgEditEform" /></h3>

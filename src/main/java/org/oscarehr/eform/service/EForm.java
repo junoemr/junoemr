@@ -94,6 +94,7 @@ public class EForm
 		eForm.setFormTime(currentDate);
 		eForm.setProviderNo(String.valueOf(providerNo));
 		eForm.setDemographicId(demographicNo);
+		eForm.setSubject(subject);
 
 		oscar.eform.data.EForm curForm = new oscar.eform.data.EForm(eForm);
 

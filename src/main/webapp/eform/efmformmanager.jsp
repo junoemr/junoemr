@@ -108,7 +108,7 @@ $(function ()  {
 
 
 <%@ include file="efmTopNav.jspf"%>
-<%@ include file="efm_form_errorbar.jspf"%>
+<%@ include file="efmShowError.jspf"%>
 
 <h3 style='display:inline;padding-right:10px'><bean:message key="eform.uploadhtml.msgLibrary" /></h3> <a href="<%= request.getContextPath() %>/eform/efmformmanagerdeleted.jsp" class="contentLink">View Deleted<!--<bean:message key="eform.uploadhtml.btnDeleted" />--> </a> 
 
