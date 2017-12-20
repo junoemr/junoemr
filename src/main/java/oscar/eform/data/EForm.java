@@ -629,6 +629,8 @@ public class EForm extends EFormBase {
 	}
 
 	private StringBuilder putValue(String value, String type, int pointer, StringBuilder html) {
+
+		value = StringEscapeUtils.escapeHtml(value);
 		// inserts value= into tag or textarea
 		if (type.equals("onclick") || type.equals("onclick_append")) {
 			if (type.equals("onclick_append")) {
@@ -787,6 +789,7 @@ public class EForm extends EFormBase {
 				}
 			}
 		}
+		output = StringEscapeUtils.escapeHtml(output);
 		//put values into according controls
 		if (type.equals("textarea")) {
 			pointer = html.indexOf(">", pointer) + 1;
