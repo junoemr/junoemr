@@ -1722,7 +1722,7 @@ $(document).ready(function () {
 
 		if ( self !== top ) {
 		var h = $(document).height();
-		parent.parent.document.getElementById('trackerSlim').style.height = h+"px";
+		parent.parent.document.getElementById('trackerSlim').style.height = (h + 100)+"px";
 		//$(".save-all").hide();		
         $("#demoHeader").hide();
         $("#tracker-bar").css({
