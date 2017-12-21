@@ -28,7 +28,7 @@
  * and open the template in the editor.
  */
 
-package org.oscarehr.common.model;
+package org.oscarehr.document.model;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +51,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.apache.commons.io.FileUtils;
+import org.oscarehr.common.model.AbstractModel;
 
 /**
  *

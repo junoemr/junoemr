@@ -21,52 +21,38 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.model;
+package org.oscarehr.document.dao;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import java.util.List;
 
-@Entity
-@Table(name="ctl_document")
-public class CtlDocument extends AbstractModel<CtlDocumentPK> {
-	
-	public static final String MODULE_DEMOGRAPHIC = "demographic";
-	public static final String MODULE_PROVIDER = "provider";
+import javax.persistence.Query;
 
-	@EmbeddedId
-	private CtlDocumentPK id;
-	
-	@Column(nullable=true)
-	private String status;
-	
-	public CtlDocument() {
-		id = new CtlDocumentPK();
-	}
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.document.model.CtlDocument;
+import org.springframework.stereotype.Repository;
 
-	public CtlDocumentPK getId() {
-		return id;
-	}
+@Repository
+public class CtlDocumentDao extends AbstractDao<CtlDocument>
+{
 
-	public void setId(CtlDocumentPK id) {
-		this.id = id;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
+	public CtlDocumentDao() {
+		super(CtlDocument.class);
 	}
 	
-    public boolean isDemographicDocument(){
-        if(id.getModule() != null && id.getModule().equals("demographic")){
-            return true;
-        }
-        return false;
+	public CtlDocument getCtrlDocument(Integer docId) {
+		Query query = entityManager.createQuery("SELECT x FROM CtlDocument x WHERE x.id.documentNo=:documentNo");
+		query.setParameter("documentNo", docId);
+		
+		return(getSingleResultOrNull(query));
+	}
+
+    public List<CtlDocument> findByDocumentNoAndModule(Integer documentNo, String module) {
+		Query query = entityManager.createQuery("SELECT x FROM CtlDocument x WHERE x.id.documentNo=:documentNo and x.id.module = :module");
+		query.setParameter("documentNo", documentNo);
+		query.setParameter("module", module);
+		
+		@SuppressWarnings("unchecked")
+        List<CtlDocument> cList = query.getResultList();
+		return cList;
     }
-
-	
 }

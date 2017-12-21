@@ -26,9 +26,8 @@ package org.oscarehr.document.dao;
 import java.util.Date;
 import java.util.List;
 
-import org.oscarehr.common.dao.DocumentDao;
 import org.oscarehr.common.merge.MergedDemographicTemplate;
-import org.oscarehr.common.model.Document;
+import org.oscarehr.document.model.Document;
 
 import oscar.dms.EDocUtil.EDocSort;
 import oscar.util.ConversionUtils;

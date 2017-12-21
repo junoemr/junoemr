@@ -21,36 +21,14 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
 
-import java.util.List;
+package org.oscarehr.document.service;
 
-import javax.persistence.Query;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import org.oscarehr.common.model.CtlDocument;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public class CtlDocumentDao extends AbstractDao<CtlDocument>{
-
-	public CtlDocumentDao() {
-		super(CtlDocument.class);
-	}
-	
-	public CtlDocument getCtrlDocument(Integer docId) {
-		Query query = entityManager.createQuery("SELECT x FROM CtlDocument x WHERE x.id.documentNo=:documentNo");
-		query.setParameter("documentNo", docId);
-		
-		return(getSingleResultOrNull(query));
-	}
-
-    public List<CtlDocument> findByDocumentNoAndModule(Integer documentNo, String module) {
-		Query query = entityManager.createQuery("SELECT x FROM CtlDocument x WHERE x.id.documentNo=:documentNo and x.id.module = :module");
-		query.setParameter("documentNo", documentNo);
-		query.setParameter("module", module);
-		
-		@SuppressWarnings("unchecked")
-        List<CtlDocument> cList = query.getResultList();
-		return cList;
-    }
+@Service
+@Transactional
+public class Document
+{
 }
