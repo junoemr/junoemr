@@ -286,8 +286,7 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 			if(observationDate != null)
 			{
 				paramIndex++;
-				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-				params[paramIndex] = formatter.format(observationDate);
+				params[paramIndex] = observationDate;
 			}
 
 			issueListReturn = this.getHibernateTemplate().find(hql, params);
