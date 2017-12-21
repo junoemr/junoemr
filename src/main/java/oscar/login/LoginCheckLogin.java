@@ -62,8 +62,16 @@ public final class LoginCheckLogin {
 	 */
 	public boolean isBlocked(String ip, String userName) {
 
-		while (loginList == null) {
+		if (loginList == null) {
 			loginList = LoginList.getLoginListInstance();
+		}
+
+		if (loginList == null) {
+			logger.error("loginList is NULL");
+			while (loginList == null)
+			{
+				loginList = LoginList.getLoginListInstance();
+			}
 		}
 		GregorianCalendar now = new GregorianCalendar();
 		// delete the old entry in the login list if time out
@@ -152,8 +160,16 @@ public final class LoginCheckLogin {
 	 */
 	public boolean unlock(String key) {
 
-		while (loginList == null) {
+		if (loginList == null) {
 			loginList = LoginList.getLoginListInstance();
+		}
+
+		if (loginList == null) {
+			logger.error("loginList is NULL");
+			while (loginList == null)
+			{
+				loginList = LoginList.getLoginListInstance();
+			}
 		}
 		// unlock the entry in the login list
 		boolean unlocked = loginList.containsKey(key);
@@ -167,8 +183,16 @@ public final class LoginCheckLogin {
 	public ArrayList<String> findLockList() {
 		LoginInfoBean loginInfoBean;
 
-		while (loginList == null) {
+		if (loginList == null) {
 			loginList = LoginList.getLoginListInstance();
+		}
+
+		if (loginList == null) {
+			logger.error("loginList is NULL");
+			while (loginList == null)
+			{
+				loginList = LoginList.getLoginListInstance();
+			}
 		}
 
 		ArrayList<String> lockedList = new ArrayList<String>();
