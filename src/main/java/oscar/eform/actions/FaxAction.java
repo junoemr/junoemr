@@ -104,7 +104,6 @@ public final class FaxAction
 	{
 		String faxFileLocation = OscarProperties.getInstance().getProperty(
 				"fax_file_location", System.getProperty("java.io.tmpdir"));
-		String temporaryFileLocation = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "/";
 		File tempFile = null;
 
 		try
@@ -112,7 +111,7 @@ public final class FaxAction
 			logger.info("Generating PDF for eForm with fdid = " + formId);
 
 			String pdfFile = "EForm." + formId + System.currentTimeMillis();
-			tempFile = File.createTempFile(pdfFile, ".pdf", new File(temporaryFileLocation));
+			tempFile = File.createTempFile(pdfFile, ".pdf");
 
 			// convert to PDF
 			String viewUri = localUri + formId;
@@ -145,8 +144,7 @@ public final class FaxAction
 
 				for (FaxConfig faxConfig : faxConfigs)
 				{
-
-					PdfReader pdfReader = new PdfReader(temporaryFileLocation + tempFile.getName());
+					PdfReader pdfReader = new PdfReader(tempFile.getAbsolutePath());
 
 					faxJob = new FaxJob();
 					faxJob.setDestination(recipient);
