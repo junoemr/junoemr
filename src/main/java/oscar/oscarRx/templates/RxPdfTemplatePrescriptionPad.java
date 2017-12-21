@@ -412,7 +412,17 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 					Image img = Image.getInstance(this.imgPath);
 					// image, image_width, 0, 0, image_height, x, y
 					//         131, 55, 375, 75, 0
-					cb.addImage(img, 207, 0, 0, 20, 75f, endPara-30f);
+					/*
+						Preset signatures need to be sized differently than drawn signatures. These signatures are stored in different locations.
+						Check the path for the locations and size based on what's found in the path.
+						If it's in /var/cache/tomcat/temp/, then it's a drawn signature. Otherwise, it's a preset signature
+					*/
+					if (this.imgPath.contains("/var/cache/tomcat/temp/")) {
+						cb.addImage(img, 207, 0, 0, 20, 75f, endPara - 30f);
+					} else {
+						cb.addImage(img, 170, 0, 0, 70, 75f, endPara - 30f);
+					}
+
 				}
 
 				// Render doctor name
