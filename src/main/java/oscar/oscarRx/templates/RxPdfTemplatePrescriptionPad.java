@@ -316,7 +316,6 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				head.setTotalWidth(272f);
 				head.writeSelectedRows(0, -1, 13f, height - 100f, cb);
 
-				// OHSUPPORT-4611 - custom prescription logo
 				String custom_logo_name = OscarProperties.getInstance().getProperty("rx_custom_logo");
 				if(custom_logo_name != null ){
 					Image img = Image.getInstance(OscarProperties.getInstance().getProperty("eform_image") + custom_logo_name);
@@ -371,7 +370,7 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				cb.setRGBColorStrokeF(0f, 0f, 0f);
 				cb.setLineWidth(0.5f);
 				// cb.moveTo(13f, 20f);
-				cb.moveTo(13f, endPara - 60);
+				cb.moveTo(13f, endPara - 80);
 				cb.lineTo(13f, height - 15f);
 				cb.stroke();
 
@@ -379,7 +378,7 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				cb.setRGBColorStrokeF(0f, 0f, 0f);
 				cb.setLineWidth(0.5f);
 				// cb.moveTo(285f, 20f);
-				cb.moveTo(285f, endPara - 60);
+				cb.moveTo(285f, endPara - 80);
 				cb.lineTo(285f, height - 15f);
 				cb.stroke();
 				// draw top line 10, 405, 285, 405, 0.5
@@ -394,50 +393,40 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				cb.setLineWidth(0.5f);
 				// cb.moveTo(13f, 20f);
 				// cb.lineTo(285f, 20f);
-				cb.moveTo(13f, endPara - 60);
-				cb.lineTo(285f, endPara - 60);
+				cb.moveTo(13f, endPara - 80);
+				cb.lineTo(285f, endPara - 80);
 				cb.stroke();
 				// Render "Signature:"
-				writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_LEFT, geti18nTagValue(locale, "RxPreview.msgSignature"), 20f, endPara - 30f, 0);
+				writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_LEFT, geti18nTagValue(locale, "RxPreview.msgSignature"), 20f, endPara - 50f, 0);
 				// Render line for Signature 75, 55, 280, 55, 0.5
 				cb.setRGBColorStrokeF(0f, 0f, 0f);
 				cb.setLineWidth(0.5f);
 				// cb.moveTo(75f, 50f);
 				// cb.lineTo(280f, 50f);
-				cb.moveTo(75f, endPara - 30f);
-				cb.lineTo(280f, endPara - 30f);
+				cb.moveTo(75f, endPara - 50f);
+				cb.lineTo(275f, endPara - 50f);
 				cb.stroke();
 
 				if (this.imgPath != null) {
 					Image img = Image.getInstance(this.imgPath);
-					// image, image_width, 0, 0, image_height, x, y
-					//         131, 55, 375, 75, 0
-					/*
-						Preset signatures need to be sized differently than drawn signatures. These signatures are stored in different locations.
-						Check the path for the locations and size based on what's found in the path.
-						If it's in /var/cache/tomcat/temp/, then it's a drawn signature. Otherwise, it's a preset signature
-					*/
-					if (this.imgPath.contains("/var/cache/tomcat/temp/")) {
-						cb.addImage(img, 207, 0, 0, 20, 75f, endPara - 30f);
-					} else {
-						cb.addImage(img, 170, 0, 0, 70, 75f, endPara - 30f);
-					}
-
+					img.scaleToFit(200, 100);
+					img.setAbsolutePosition(75f, endPara - 50f);
+					cb.addImage(img);
 				}
 
 				// Render doctor name
-				writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_LEFT, this.sigDoctorName, 90, endPara - 40f, 0);
+				writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_LEFT, this.sigDoctorName, 90, endPara - 60f, 0);
 				// public void writeDirectContent(PdfContentByte cb, BaseFont bf, float fontSize, int alignment, String text, float x, float y, float rotation)
 				// render reprint origPrintDate and numPrint
 				if (origPrintDate != null && numPrint != null) {
 					String rePrintStr = geti18nTagValue(locale, "RxPreview.msgReprintBy")+" " + this.sigDoctorName + "; "+geti18nTagValue(locale, "RxPreview.msgOrigPrinted")+": " + origPrintDate + "; "+geti18nTagValue(locale, "RxPreview.msgTimesPrinted") +": " + numPrint;
-					writeDirectContent(cb, bf, 6, PdfContentByte.ALIGN_LEFT, rePrintStr, 50, endPara - 48, 0);
+					writeDirectContent(cb, bf, 6, PdfContentByte.ALIGN_LEFT, rePrintStr, 50, endPara - 68, 0);
 				}
 				// print promoText
-				writeDirectContent(cb, bf, 6, PdfContentByte.ALIGN_LEFT, this.promoText, 70, endPara - 57, 0);
+				writeDirectContent(cb, bf, 6, PdfContentByte.ALIGN_LEFT, this.promoText, 70, endPara - 77, 0);
 				// print page number
 				String footer = "" + writer.getPageNumber();
-				writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_RIGHT, footer, 280, endPara - 57, 0);
+				writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_RIGHT, footer, 280, endPara - 77, 0);
 			} catch (Exception e) {
 				logger.error("Error", e);
 			}
