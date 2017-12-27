@@ -202,13 +202,17 @@ if(prop!=null && prop.getValue().equalsIgnoreCase("yes")){
     showPatientDOB=true;
 }
 
-// OHSUPPORT-4611 - custom prescription logo
-	String logoSrc = "img/rx.gif";
+String logoSrc = "img/rx.gif";
+String logoPath;
 
-	String custom_logo_name = props.getProperty("rx_custom_logo");
-	if(custom_logo_name != null ){
-		logoSrc = request.getContextPath()+"/eform/displayImage.do?imagefile=" + custom_logo_name;
+String custom_logo_name = props.getProperty("rx_custom_logo");
+if(custom_logo_name != null ){
+	logoPath = oscar.OscarProperties.getInstance().getProperty("eform_image","")+custom_logo_name;
+	File f = new File(logoPath);
+	if(f.exists()) {
+		logoSrc = request.getContextPath() + "/eform/displayImage.do?imagefile=" + custom_logo_name;
 	}
+}
 %>
 <html:form action="/form/formname" styleId="preview2Form">
 

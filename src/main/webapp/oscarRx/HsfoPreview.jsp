@@ -28,6 +28,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page import="java.io.File"%>
 <%@ page import="oscar.oscarProvider.data.*"%>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@ page import="oscar.*,java.lang.*"%>
@@ -87,13 +88,17 @@ doctorName = doctorName.replaceAll("\\d{6}","");
 doctorName = doctorName.replaceAll("\\-","");
 OscarProperties props = OscarProperties.getInstance();
 
-//OHSUPPORT-4611 - custom prescription logo
-	String logoSrc = "img/rx.gif";
+String logoSrc = "img/rx.gif";
+String logoPath;
 
-	String custom_logo_name = props.getProperty("rx_custom_logo");
-	if(custom_logo_name != null ){
-		logoSrc = request.getContextPath()+"/eform/displayImage.do?imagefile=" + custom_logo_name;
+String custom_logo_name = props.getProperty("rx_custom_logo");
+if(custom_logo_name != null ){
+	logoPath = oscar.OscarProperties.getInstance().getProperty("eform_image","")+custom_logo_name;
+	File f = new File(logoPath);
+	if(f.exists()) {
+		logoSrc = request.getContextPath() + "/eform/displayImage.do?imagefile=" + custom_logo_name;
 	}
+}
 %>
 <html:form action="/form/formname">
 
