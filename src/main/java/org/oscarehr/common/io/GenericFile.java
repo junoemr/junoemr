@@ -126,6 +126,30 @@ public class GenericFile
 		}
 	}
 
+	/**
+	 * replace the contents of the file with those of the new file.
+	 * This performs a move operation
+	 * @param replacementFile - the replacement file.
+	 * @throws IOException
+	 */
+	public void replaceWith(GenericFile replacementFile) throws IOException
+	{
+		File incomingFile = replacementFile.getFileObject();
+		if(incomingFile.exists() && incomingFile.isFile())
+		{
+			Files.move(incomingFile.toPath(), javaFile.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Invalid File: " + incomingFile.toPath());
+		}
+
+		// copy the incoming file properties
+		this.hasBeenValidated = replacementFile.hasBeenValidated();
+		this.isValid = replacementFile.isValid();
+		this.reasonInvalid = replacementFile.getReasonInvalid();
+	}
+
 	public boolean validate() throws IOException, InterruptedException
 	{
 		this.hasBeenValidated = true;

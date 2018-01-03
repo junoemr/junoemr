@@ -133,7 +133,7 @@ public class Document extends AbstractModel<Integer> implements Serializable {
     private Date contentdatetime;    
     @Basic(optional = false)
     @Column(name = "public1")
-    private int public1;
+    private Boolean public1 = false;
     @Column(name = "observationdate")
     @Temporal(TemporalType.DATE)
     private Date observationdate;
@@ -150,24 +150,6 @@ public class Document extends AbstractModel<Integer> implements Serializable {
     private Boolean restrictToProgram=false;
     
     public Document() {
-    }
-
-    public Document(Integer documentNo) {
-        this.documentNo = documentNo;
-       // this.id=this.documentNo;
-    }
-
-    public Document(Integer documentNo, String docdesc, String docfilename, String doccreator, String responsible, char status, String contenttype, int public1, int numberOfPages) {
-        this.documentNo = documentNo;
-        this.docdesc = docdesc;
-        this.docfilename = docfilename;
-        this.doccreator = doccreator;
-        this.responsible = responsible;
-        this.status = status;
-        this.contenttype = contenttype;
-        this.public1 = public1;
-        this.numberofpages = numberOfPages;
-//        this.id=this.documentNo;
     }
 
     public Integer getId(){
@@ -277,12 +259,31 @@ public class Document extends AbstractModel<Integer> implements Serializable {
         this.contenttype = contenttype;
     }
 
+    /**
+     * legacy public flag getter
+     * @deprecated use the boolean version
+     */
+    @Deprecated
     public int getPublic1() {
+        return public1 ? 1 : 0;
+    }
+    public boolean isPublic()
+    {
         return public1;
     }
 
+    /**
+     * legacy public flag setter
+     * @deprecated use the boolean version
+     * @param public1 1 or 0
+     */
+    @Deprecated
     public void setPublic1(int public1) {
-        this.public1 = public1;
+	    setPublic1(public1 == 1);
+    }
+    public void setPublic1(Boolean isPublic)
+    {
+        this.public1 = isPublic;
     }
 
     public Date getObservationdate() {

@@ -38,17 +38,16 @@ import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.common.dao.DocumentStorageDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.document.model.Document;
 import org.oscarehr.common.model.DocumentStorage;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.SecRole;
+import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -64,7 +63,6 @@ import oscar.dms.data.AddEditDocumentForm;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarEncounter.data.EctProgram;
-import oscar.util.UtilDateUtilities;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -77,12 +75,13 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 
 public class AddEditDocumentAction extends DispatchAction {
-	
-	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private static Logger logger = MiscUtils.getLogger();
 
+	private static Logger logger = MiscUtils.getLogger();
 	private static final DocumentDao documentDao = (DocumentDao) SpringUtils.getBean("documentDao");
-	
+
+	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private org.oscarehr.document.service.Document documentService = SpringUtils.getBean(org.oscarehr.document.service.Document.class);
+
 	public ActionForward html5MultiUpload(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ResourceBundle props = ResourceBundle.getBundle("oscarResources");
 		
@@ -406,7 +405,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
 			throw new SecurityException("missing required security object (_edoc)");
 		}
-		
+
 		HashMap<String, String> errors = new HashMap<String, String>();
 		boolean documentValid = true;
 
@@ -420,71 +419,16 @@ public class AddEditDocumentAction extends DispatchAction {
 				documentValid = false;
 			}
 			if(documentValid) {
+
 				FormFile docFile = fm.getDocFile();
 				Integer demographicNo = "demographic".equals(fm.getFunction()) ? Integer.parseInt(fm.getFunctionId()) : null;
-				String providerNo = (String) request.getSession().getAttribute("user");
-				String fileName = "";
-				GenericFile file = null;
-
-				// only create a new file when a replacement is present
-				if(docFile.getFileSize() != 0 && docFile.getFileName().length() != 0)
-				{
-					if(oscar.OscarProperties.getInstance().isPropertyActive("ALLOW_UPDATE_DOCUMENT_CONTENT"))
-					{
-						// find the old file
-						Document document = documentDao.find(Integer.parseInt(fm.getMode()));
-						GenericFile oldFile = FileFactory.getDocumentFile(document.getDocfilename());
-						// overwrite it
-						file = FileFactory.overwriteFileContents(oldFile, docFile.getInputStream());
-					}
-					else
-					{
-						file = FileFactory.createDocumentFile(docFile.getInputStream(), docFile.getFileName());
-					}
-					if(!file.validate())
-					{
-						file.reEncode();
-					}
-					file.moveToDocuments();
-					fileName = file.getName();
-				}
-
-				// set up reviewer info
-				String reviewerId = filled(fm.getReviewerId()) ? fm.getReviewerId() : "";
-				String reviewDateTime = filled(fm.getReviewDateTime()) ? fm.getReviewDateTime() : "";
-
-				if (!filled(reviewerId) && fm.getReviewDoc()) {
-					reviewerId = providerNo;
-					reviewDateTime = UtilDateUtilities.DateToString(new Date(), EDocUtil.REVIEW_DATETIME_FORMAT);
-
-					LogAction.addLogEntry(reviewerId, demographicNo, LogConst.ACTION_REVIEWED, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
-							fm.getMode(), request.getRemoteAddr(), fileName);
-				}
-				EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A',
-						fm.getObservationDate(), reviewerId, reviewDateTime, fm.getFunction(), fm.getFunctionId());
-
-				newDoc.setSourceFacility(fm.getSourceFacility());
-				newDoc.setDocId(fm.getMode());
-				newDoc.setDocPublic(fm.getDocPublic());
-				newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
-				newDoc.setDocClass(fm.getDocClass());
-				newDoc.setDocSubClass(fm.getDocSubClass());
-				newDoc.setFileName(fileName);
-
-				if(file != null)
-				{
-					newDoc.setContentType(file.getContentType());
-					newDoc.setNumberOfPages(file.getPageCount());
-				}
-
+				String providerNoStr = (String) request.getSession().getAttribute("user");
+				Integer documentNo = Integer.parseInt(fm.getMode());
 				String programIdStr = (String) request.getSession().getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
-				if (programIdStr != null) {
-					newDoc.setProgramId(Integer.valueOf(programIdStr));
-				}
-				EDocUtil.editDocumentSQL(newDoc, fm.getReviewDoc());
-	
-				LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
-						fm.getMode(), request.getRemoteAddr(), fileName);
+				Integer programId = programIdStr != null ? Integer.valueOf(programIdStr) : null;
+
+				documentService.updateDocument(fm, docFile.getInputStream(), docFile.getFileName(), documentNo, demographicNo,
+						providerNoStr, request.getRemoteAddr(), programId);
 			}
 		}
 		catch (Exception e) {

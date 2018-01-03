@@ -43,6 +43,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
+/**
+ * @deprecated use oscarehr.document.service.Document for new changes
+ */
+@Deprecated
 public class EDoc extends TagObject implements Comparable<EDoc> {
 	private static final Logger logger = MiscUtils.getLogger();
 

@@ -43,11 +43,25 @@ public class FileFactory
 	 * save and load a new document with the given name and input stream
 	 * @param fileInputStream - input stream of the new file
 	 * @param fileName - name of the file to be saved and opened
-	 * @return - the file, or null if no file exists with the given filename
+	 * @return - the file
+	 * @throws FileNotFoundException - if the given file is invalid for use as a GenericFile
 	 */
 	public static GenericFile createDocumentFile(InputStream fileInputStream, String fileName) throws IOException
 	{
 		return createNewFile(fileInputStream, fileName, GenericFile.DOCUMENT_BASE_DIR);
+	}
+
+	/**
+	 * Write the input stream to a tempfile
+	 * @param fileInputStream - input stream of the new file
+	 * @return the file
+	 * @throws IOException
+	 */
+	public static GenericFile createTempFile(InputStream fileInputStream) throws IOException
+	{
+		File file = File.createTempFile("oscar", "tempfile");
+		logger.info("Created tempfile: " + file.getPath());
+		return writeInputStream(fileInputStream, file, true);
 	}
 
 	/**
@@ -71,19 +85,12 @@ public class FileFactory
 	{
 		File file = oldFile.getFileObject();
 
-		if(file.exists() && file.isFile())
-		{
-			logger.info("Overwriting file contents: " + file.getPath());
-			// copy the stream to the existing file
-			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			// close the stream
-			IOUtils.closeQuietly(fileInputStream);
-		}
-		else
+		if(!file.exists() || !file.isFile())
 		{
 			throw new IOException("Attempt to overwrite an invalid File: " + file.getPath());
 		}
-		return getExistingFile(file);
+		logger.info("Overwriting file contents: " + file.getPath());
+		return writeInputStream(fileInputStream, file, true);
 	}
 
 	/**
@@ -94,7 +101,7 @@ public class FileFactory
 	 */
 	private static GenericFile createNewFile(InputStream fileInputStream, String fileName, String folder) throws IOException
 	{
-		String sanitizedFileName = GenericFile.getFormattedFileName(fileName);
+		String formattedFileName = GenericFile.getFormattedFileName(fileName);
 
 		File directory = new File(folder);
 		if(!directory.exists())
@@ -106,9 +113,20 @@ public class FileFactory
 			}
 		}
 
-		File file = new File(directory.getPath(), sanitizedFileName);
+		File file = new File(directory.getPath(), formattedFileName);
+		return writeInputStream(fileInputStream, file, false);
+	}
+	private static GenericFile writeInputStream(InputStream fileInputStream, File file, boolean allowOverwrite) throws IOException
+	{
 		// copy the stream to the file
-		Files.copy(fileInputStream, file.toPath());
+		if(allowOverwrite)
+		{
+			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		}
+		else
+		{
+			Files.copy(fileInputStream, file.toPath());
+		}
 		// close the stream
 		IOUtils.closeQuietly(fileInputStream);
 
@@ -123,6 +141,7 @@ public class FileFactory
 		}
 		return returnFile;
 	}
+
 	/**
 	 * load an existing file with the given name and folder location
 	 * @param fileName - name of the file to load
