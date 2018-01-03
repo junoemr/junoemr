@@ -147,7 +147,7 @@
 
 		<table ng-table="patientSearchCtrl.tableParams"
 			   show-filter="false"
-			   class="table table-hover table-striped"
+			   class="table table-hover table-striped table-bordered"
 			   id="patient-search-table">
 			<tbody>
 			<tr ng-repeat="patient in $data"
