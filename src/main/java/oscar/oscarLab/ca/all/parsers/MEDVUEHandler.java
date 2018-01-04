@@ -10,27 +10,24 @@
 package oscar.oscarLab.ca.all.parsers;
 
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.Hl7TextInfoDao;
-import org.oscarehr.common.model.Hl7TextMessageInfo;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.OBR;
 import ca.uhn.hl7v2.model.v23.segment.OBX;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.model.Hl7TextMessageInfo;
+import org.oscarehr.util.SpringUtils;
+import oscar.util.UtilDateUtilities;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * MEDVUE  Radiology report parser 
@@ -38,14 +35,15 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  *
  */
 
-public class MEDVUEHandler implements MessageHandler {
+public class MEDVUEHandler extends MessageHandler
+{
 
 	Logger logger = Logger.getLogger(MEDVUEHandler.class);
-	
-	private ca.uhn.hl7v2.model.v23.message.ORU_R01 msg = null;
+
 	private ArrayList<String> headers = null;
 	private OBR obrseg = null;
 	private OBX obxseg = null;
+	protected ORU_R01 msg;
 	
 	
 	
@@ -89,8 +87,22 @@ public class MEDVUEHandler implements MessageHandler {
 			}*/
 				
 		} //end lab iteration
-
+		this.message = msg;
+		this.terser = new Terser(msg);
 	}
+
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
 
 	private ArrayList<String> getMatchingHL7Labs(String hl7Body) {
 		Base64 base64 = new Base64(0);
@@ -377,7 +389,7 @@ public class MEDVUEHandler implements MessageHandler {
 	public String getFirstName() {
 		
 		try {	
-			return (getString(this.pat_23.getPID().getPatientName().getGivenName().getValue()));
+			return (getString(this.pat_23.getPID().getPatientName(0).getGivenName().getValue()));
 		} catch (Exception e) {
 			logger.error("Exception getting firstName of the patient" , e);
 		}
@@ -388,7 +400,7 @@ public class MEDVUEHandler implements MessageHandler {
 	public String getLastName() {
 		
 		try {	
-			return getString(this.pat_23.getPID().getPatientName().getFamilyName().getValue());
+			return getString(this.pat_23.getPID().getPatientName(0).getFamilyName().getValue());
 		} catch (Exception e) {
 			logger.error("Exception getting lastName of the patient" , e);
 		}
@@ -407,21 +419,6 @@ public class MEDVUEHandler implements MessageHandler {
 		return "";
 	}
 
-	public String getAge() {
-		String age = "N/A";
-		String dob = getDOB();
-		try {
-			// Some examples
-			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			java.util.Date date = formatter.parse(dob);
-			age = UtilDateUtilities.calcAge(date);
-		} catch (ParseException e) {
-			logger.error("Could not get age", e);
-
-		}
-		return age;
-	}
-
 	public String getSex() {
 		
 		try {
@@ -434,17 +431,9 @@ public class MEDVUEHandler implements MessageHandler {
 	}
 
 	public String getHealthNum() {
-		//int pat_ids = pat_25.getPID().getPatientIdentifierListReps();
-		try {
-			ca.uhn.hl7v2.model.v23.datatype.CX patIdList = pat_23.getPID().getPatientIDInternalID(0);
-			String hnumber = patIdList.getID().getValue();
-			return hnumber;
-			
-		} catch (HL7Exception e) {
-			logger.error("ERROR getting the health number for HL7 lab report patient: " + e.toString());
-		}
-
-		return "";
+		ca.uhn.hl7v2.model.v23.datatype.CX patIdList = pat_23.getPID().getPatientIDInternalID(0);
+		String hnumber = patIdList.getID().getValue();
+		return hnumber;
 	}
 
 	public String getHomePhone() {
@@ -616,67 +605,6 @@ public class MEDVUEHandler implements MessageHandler {
 
 	public String audit() {
 		return "";
-	}
-
-	/*private String getFullDocName(ca.uhn.hl7v2.model.v25.datatype.XCN xcn) {
-		String docName = "";
-
-		if (xcn.getPrefixEgDR().getValue() != null)
-			docName = xcn.getPrefixEgDR().getValue();
-
-		if (xcn.getGivenName().getValue() != null) {
-			if (docName.equals(""))
-				docName = xcn.getGivenName().getValue();
-			else
-				docName = docName + " " + xcn.getGivenName().getValue();
-
-		}
-		if (xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue() != null) {
-			if (docName.equals(""))
-				docName = xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue();
-			else
-				docName = docName + " " + xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue();
-		}
-		if (xcn.getFamilyName().getSurname().getValue() != null) {
-			if (docName.equals(""))
-				docName = xcn.getFamilyName().getSurname().getValue();
-			else
-				docName = docName + " " + xcn.getFamilyName().getSurname().getValue();
-
-		}
-		if (xcn.getSuffixEgJRorIII().getValue() != null) {
-			if (docName.equals(""))
-				docName = xcn.getSuffixEgJRorIII().getValue();
-			else
-				docName = docName + " " + xcn.getSuffixEgJRorIII().getValue();
-		}
-		if (xcn.getDegreeEgMD().getValue() != null) {
-			if (docName.equals(""))
-				docName = xcn.getDegreeEgMD().getValue();
-			else
-				docName = docName + " " + xcn.getDegreeEgMD().getValue();
-		}
-
-		return docName;
-	}*/
-
-	private String formatDateTime(String plain) {
-		String dateFormat = "yyyyMMddHHmmss";
-		dateFormat = dateFormat.substring(0, plain.length());
-		String stringFormat = "yyyy-MM-dd HH:mm:ss";
-		stringFormat = stringFormat.substring(0,
-				stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length() - 1)) + 1);
-
-		Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-		return UtilDateUtilities.DateToString(date, stringFormat);
-	}
-
-	private String getString(String retrieve) {
-		if (retrieve != null) {
-			return (retrieve.trim());
-		} else {
-			return "";
-		}
 	}
 
 	public String getFillerOrderNumber(){

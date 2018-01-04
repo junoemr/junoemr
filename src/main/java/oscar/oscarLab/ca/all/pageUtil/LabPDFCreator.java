@@ -32,32 +32,6 @@
 
 package oscar.oscarLab.ca.all.pageUtil;
 
-import java.awt.Color;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.oscarehr.common.dao.Hl7TextMessageDao;
-import org.oscarehr.common.model.Hl7TextMessage;
-import org.oscarehr.common.printing.FontSettings;
-import org.oscarehr.common.printing.PdfWriterFactory;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.OscarProperties;
-import oscar.oscarLab.ca.all.Hl7textResultsData;
-import oscar.oscarLab.ca.all.parsers.CLSDIHandler;
-import oscar.oscarLab.ca.all.parsers.CLSHandler;
-import oscar.oscarLab.ca.all.parsers.Factory;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
-import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
-import oscar.util.UtilDateUtilities;
-
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -76,6 +50,27 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.rtf.RtfWriter2;
+import org.oscarehr.common.dao.Hl7TextMessageDao;
+import org.oscarehr.common.model.Hl7TextMessage;
+import org.oscarehr.common.printing.FontSettings;
+import org.oscarehr.common.printing.PdfWriterFactory;
+import org.oscarehr.util.SpringUtils;
+import oscar.OscarProperties;
+import oscar.oscarLab.ca.all.Hl7textResultsData;
+import oscar.oscarLab.ca.all.parsers.Factory;
+import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
+import oscar.util.UtilDateUtilities;
+
+import javax.servlet.http.HttpServletRequest;
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 /**
  *
  * @author wrighd
@@ -261,11 +256,8 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		if (handler.getMsgType().equals("PATHL7")) {
 			this.isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(header);
 		}
-		else if (handler.getMsgType().equals("CLS")) {
-			this.isUnstructuredDoc = ((CLSHandler) handler).isUnstructured();
-		}
-		else if (handler.getMsgType().equals("CLSDI")) {
-			this.isUnstructuredDoc = ((CLSDIHandler) handler).isUnstructured();
+		else {
+			this.isUnstructuredDoc = handler.isUnstructured();
 		}
 		
 		float[] mainTableWidths;

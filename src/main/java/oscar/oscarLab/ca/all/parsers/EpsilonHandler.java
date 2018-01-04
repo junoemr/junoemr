@@ -39,7 +39,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 
-public class EpsilonHandler  extends CMLHandler implements MessageHandler {
+public class EpsilonHandler  extends CMLHandler {
 	private static Logger logger = MiscUtils.getLogger();
 	
 	@Override
@@ -61,7 +61,8 @@ public class EpsilonHandler  extends CMLHandler implements MessageHandler {
 		}
 		Parser p = new PipeParser();
 		p.setValidationContext(new NoValidation());
-		msg = (ORU_R01) p.parse(hl7Body.replaceAll("\n", "\r\n"));
+		this.msg = (ORU_R01) p.parse(hl7Body.replaceAll("\n", "\r\n"));
+		this.terser = new Terser(msg);
 	}
 
 	@Override
@@ -93,13 +94,10 @@ public class EpsilonHandler  extends CMLHandler implements MessageHandler {
 	}
 
 	@Override
-	public String getMsgPriority() {
-		try {
-			return msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR()
-					.getPriority().getValue();
-		} catch (HL7Exception e) {
-			return ("");
-		}
+	public String getMsgPriority()
+	{
+		return msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR()
+				.getPriority().getValue();
 	}
 
 	@Override
@@ -158,6 +156,14 @@ public class EpsilonHandler  extends CMLHandler implements MessageHandler {
 		} catch (Exception e) {
 			return ("");
 		}
+	}
+	/**
+	 *  Return the patients date of birth
+	 *  same as the message handler super class but not the parent super class
+	 */
+	public String getDOB()
+	{
+		return formatDate(getString(get("/.PID-7")));
 	}
 
 	String delimiter = "  ";
@@ -235,7 +241,8 @@ public class EpsilonHandler  extends CMLHandler implements MessageHandler {
 		return getLastName() + "^" + getFirstName() + "^" + getMiddleName();
 	}
 
-	private String getMiddleName() {
+	@Override
+	public String getMiddleName() {
 		return (getString(msg.getRESPONSE().getPATIENT().getPID()
 				.getMotherSMaidenName().getMiddleInitialOrName().getValue()));
 	}

@@ -34,6 +34,13 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
+import ca.uhn.hl7v2.HL7Exception;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
+import org.oscarehr.util.MiscUtils;
+import oscar.util.UtilDateUtilities;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -41,19 +48,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
-import org.oscarehr.util.MiscUtils;
-
-import oscar.util.UtilDateUtilities;
-import ca.uhn.hl7v2.HL7Exception;
-
 /**
  *
  * @author wrighd
  */
-public class MDSHandler implements MessageHandler {
+public class MDSHandler extends MessageHandler
+{
 
     Object msg = null;
     Object terser;
@@ -133,6 +133,19 @@ public class MDSHandler implements MessageHandler {
         	throw new HL7Exception(e);
         }
     }
+
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
 
     public String getMsgType(){
         return("MDS");
@@ -522,21 +535,21 @@ public class MDSHandler implements MessageHandler {
             return("");
         }
     }
+    @SuppressWarnings("Duplicates")
+	public String getAge(){
+		String age = "N/A";
+		String dob = getDOB();
+		try {
+			// Some examples
+			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date date = formatter.parse(dob);
+			age = UtilDateUtilities.calcAge(date);
+		} catch (ParseException e) {
+			logger.error("Could not get age", e);
 
-    public String getAge(){
-        String age = "N/A";
-        String dob = getDOB();
-        try {
-            // Some examples
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date date = formatter.parse(dob);
-            age = UtilDateUtilities.calcAge(date);
-        } catch (ParseException e) {
-            logger.error("Could not get age", e);
-
-        }
-        return age;
-    }
+		}
+		return age;
+	}
 
     public String getSex(){
         try{
@@ -568,6 +581,7 @@ public class MDSHandler implements MessageHandler {
         }
     }
 
+    @Override
     public String getHomePhone(){
         try{
             return(getString(DynamicHapiLoaderUtils.terserGet(terser,"/.PID-13-1")));
@@ -576,6 +590,7 @@ public class MDSHandler implements MessageHandler {
         }
     }
 
+    @Override
     public String getWorkPhone(){
         return("N/A");
     }
@@ -845,19 +860,7 @@ public class MDSHandler implements MessageHandler {
         return date;
     }
 
-    private String formatDateTime(String plain){
-    	if (plain==null || plain.trim().equals("")) return "";
-
-        String dateFormat = "yyyyMMddHHmmss";
-        dateFormat = dateFormat.substring(0, plain.length());
-        String stringFormat = "yyyy-MM-dd HH:mm:ss";
-        stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length()-1))+1);
-
-        Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-        return UtilDateUtilities.DateToString(date, stringFormat);
-    }
-
-    private String getString(String retrieve){
+    protected String getString(String retrieve){
         if (retrieve != null){
             retrieve.replaceAll("^", " ");
             return(retrieve.trim());

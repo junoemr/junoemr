@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <message-configuration id="HL7_upload" version="1.0">
+	<handler name="AHS" className="AHSHandler"/>
 	<handler name="ALPHA" className="AlphaHandler"/>
 	<handler name="BIOTEST" className="BioTestHandler"/>
 	<handler name="CML" className="CMLHandler"/>
 	<handler name="CDL" className="CDLHandler"/>
-	<handler name="CLS" className="CLSHandler"/>
-	<handler name="CLSDI" className="CLSDIHandler"/>
+	<handler name="CLS" className="AHSHandler"/>
+	<handler name="CLSDI" className="AHSHandler"/>
 	<handler name="eaaps" className="org.oscarehr.research.eaaps.EaapsHandler"/>
 	<handler name="EPSILON" className="EpsilonHandler"/>
 	<handler name="GDML" className="GDMLHandler"/>

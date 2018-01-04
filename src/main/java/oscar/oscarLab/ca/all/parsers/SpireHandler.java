@@ -32,18 +32,6 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import org.apache.log4j.Logger;
-
-import oscar.oscarLab.ca.all.spireHapiExt.v23.message.ORU_R01;
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.v23.datatype.CN;
@@ -53,9 +41,12 @@ import ca.uhn.hl7v2.parser.ModelClassFactory;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
-//import ca.uhn.hl7v2.model.v23.message.ORU_R01;
-//import ca.uhn.hl7v2.parser.Parser;
-//import oscar.oscarLab.ca.all.spireHapiExt.v23.segment.ZDS;
+import org.apache.log4j.Logger;
+import oscar.oscarLab.ca.all.spireHapiExt.v23.message.ORU_R01;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 class Lines {
 	private String message = "";
@@ -257,8 +248,9 @@ class Lines {
  *
  * @author j.chisholm
  */
-public class SpireHandler implements MessageHandler {
-    
+public class SpireHandler extends MessageHandler
+{
+
     ORU_R01 msg = null;
     Logger logger = Logger.getLogger(SpireHandler.class);
     
@@ -275,6 +267,19 @@ public class SpireHandler implements MessageHandler {
         
         msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ));
     }
+
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
     
     /**
      * Method fixMessage
@@ -698,11 +703,11 @@ public class SpireHandler implements MessageHandler {
     }
     
     public String getFirstName(){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()));
+        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName(0).getGivenName().getValue()));
     }
     
     public String getLastName(){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getFamilyName().getValue()));
+        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName(0).getFamilyName().getValue()));
     }
     
     public String getDOB(){
@@ -711,21 +716,6 @@ public class SpireHandler implements MessageHandler {
         }catch(Exception e){
             return("");
         }
-    }
-    
-    public String getAge(){
-        String age = "N/A";
-        String dob = getDOB();
-        try {
-            // Some examples
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date date = formatter.parse(dob);
-            age = UtilDateUtilities.calcAge(date);
-        } catch (ParseException e) {
-            logger.error("Could not get age", e);
-            
-        }
-        return age;
     }
     
     public String getSex(){
@@ -745,7 +735,8 @@ public class SpireHandler implements MessageHandler {
         
         return hin;
     }
-    
+
+    @Override
     public String getHomePhone(){
         String phone = "";
         int i=0;
@@ -764,7 +755,8 @@ public class SpireHandler implements MessageHandler {
             return("");
         }
     }
-    
+
+    @Override
     public String getWorkPhone(){
         String phone = "";
         int i=0;
@@ -942,61 +934,7 @@ public class SpireHandler implements MessageHandler {
     public String audit(){
         return "";
     }
-    
-    
-    private String getFullDocName(XCN docSeg){
-        String docName = "";
-        
-        if(docSeg.getPrefixEgDR().getValue() != null)
-            docName = docSeg.getPrefixEgDR().getValue();
-        
-        if(docSeg.getGivenName().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getGivenName().getValue();
-            else
-                docName = docName +" "+ docSeg.getGivenName().getValue();
-        }
-        if(docSeg.getMiddleInitialOrName().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getMiddleInitialOrName().getValue();
-            else
-                docName = docName +" "+ docSeg.getMiddleInitialOrName().getValue();
-        }
-        if(docSeg.getFamilyName().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getFamilyName().getValue();
-            else
-                docName = docName +" "+ docSeg.getFamilyName().getValue();
-        }
-        if(docSeg.getSuffixEgJRorIII().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getSuffixEgJRorIII().getValue();
-            else
-                docName = docName +" "+ docSeg.getSuffixEgJRorIII().getValue();
-        }
-        if(docSeg.getDegreeEgMD().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getDegreeEgMD().getValue();
-            else
-                docName = docName +" "+ docSeg.getDegreeEgMD().getValue();
-        }
-        
-        return (docName);
-    }
-    
-    
-    protected String formatDateTime(String plain){
-    	if (plain==null || plain.trim().equals("")) return "";
-    	
-        String dateFormat = "yyyyMMddHHmmss";
-        dateFormat = dateFormat.substring(0, plain.length());
-        String stringFormat = "yyyy-MM-dd HH:mm:ss";
-        stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length()-1))+1);
-        
-        Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-        return UtilDateUtilities.DateToString(date, stringFormat);
-    }
-    
+
     protected String getString(String retrieve){
         if (retrieve != null){
             retrieve.replaceAll("^", " ");

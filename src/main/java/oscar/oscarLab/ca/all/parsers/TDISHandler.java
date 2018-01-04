@@ -15,26 +15,6 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.dao.HL7HandlerMSHMappingDao;
-import org.oscarehr.common.dao.Hl7TextInfoDao;
-import org.oscarehr.common.model.HL7HandlerMSHMapping;
-import org.oscarehr.common.model.Hl7TextMessageInfo;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.oscarLab.ca.all.pageUtil.ORUR01Manager;
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.v25.datatype.CX;
@@ -46,6 +26,22 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.dao.HL7HandlerMSHMappingDao;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.model.HL7HandlerMSHMapping;
+import org.oscarehr.common.model.Hl7TextMessageInfo;
+import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.all.pageUtil.ORUR01Manager;
+import oscar.util.UtilDateUtilities;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * TDIS HL7 Report Parser/Handler.
@@ -55,7 +51,8 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  * 
  * @author dritan
  */
-public class TDISHandler implements MessageHandler {
+public class TDISHandler extends MessageHandler
+{
 
 	Logger logger = Logger.getLogger(TDISHandler.class);
 
@@ -162,6 +159,19 @@ public class TDISHandler implements MessageHandler {
 		} //end lab iteration
 
 	}
+
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
 
 	private ArrayList<String> getMatchingHL7Labs(String hl7Body) {
 		Base64 base64 = new Base64(0);
@@ -673,25 +683,11 @@ public class TDISHandler implements MessageHandler {
 	}
 
 	public String getFirstName() {
-
-		try {
-			
-			return getString(this.pat_25.getPID().getPatientName(0).getGivenName().getValue());
-
-		} catch (HL7Exception e) {
-			logger.error("Exception while parsing first name of patient: " + e);
-		}
-		return null;
-		//return (getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()));
+		return getString(this.pat_25.getPID().getPatientName(0).getGivenName().getValue());
 	}
 
 	public String getLastName() {
-		try {
-			return getString(this.pat_25.getPID().getPatientName(0).getFamilyName().getSurname().getValue());
-		} catch (HL7Exception e) {
-			logger.error("Exception while parsing last name of patient: " + e);
-		}
-		return "";
+		return getString(this.pat_25.getPID().getPatientName(0).getFamilyName().getSurname().getValue());
 	}
 
 	public String getDOB() {
@@ -704,42 +700,23 @@ public class TDISHandler implements MessageHandler {
 		return "";
 	}
 
-	public String getAge() {
-		String age = "N/A";
-		String dob = getDOB();
-		try {
-			// Some examples
-			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			java.util.Date date = formatter.parse(dob);
-			age = UtilDateUtilities.calcAge(date);
-		} catch (ParseException e) {
-			logger.error("Could not get age", e);
-
-		}
-		return age;
-	}
-
 	public String getSex() {
 		return getString(pat_25.getPID().getAdministrativeSex().getValue());
 	}
 
 	public String getHealthNum() {
 		//int pat_ids = pat_25.getPID().getPatientIdentifierListReps();
-		 String hin;
-		try {
-			String[] hinArray = null ;
-			ca.uhn.hl7v2.model.v25.datatype.CX patIdList = pat_25.getPID().getPatientIdentifierList(0);
-			String hnumber = patIdList.getIDNumber().getValue();
-			if (hnumber != null)
-				hinArray = hnumber.split("-");
-				if ((hinArray!=null)&& hinArray.length>0) {
-				hin = hinArray[0];
-				return hin; } //return first instance that is not null
-		} catch (HL7Exception e) {
-			logger.error("ERROR getting the health number for HL7 lab report patient: " + e.toString());
-		}
-
-		return "";
+		String hin = "";
+		String[] hinArray = null;
+		ca.uhn.hl7v2.model.v25.datatype.CX patIdList = pat_25.getPID().getPatientIdentifierList(0);
+		String hnumber = patIdList.getIDNumber().getValue();
+		if(hnumber != null)
+			hinArray = hnumber.split("-");
+		if((hinArray != null) && hinArray.length > 0)
+		{
+			hin = hinArray[0];
+		} //return first instance that is not null
+		return hin;
 	}
 
 	public String getHomePhone() {
@@ -859,11 +836,11 @@ public class TDISHandler implements MessageHandler {
 		String docName = "";
 		int i = 0;
 		try {
-			while (!getFullDocName(obrSegKeySet.get(0).getOrderingProvider(i)).equals("")) {
+			while (!getFullDocNameV25(obrSegKeySet.get(0).getOrderingProvider(i)).equals("")) {
 				if (i == 0) {
-					docName = getFullDocName(obrSegKeySet.get(0).getOrderingProvider(i));
+					docName = getFullDocNameV25(obrSegKeySet.get(0).getOrderingProvider(i));
 				} else {
-					docName = docName + ", " + getFullDocName(obrSegKeySet.get(0).getOrderingProvider(i));
+					docName = docName + ", " + getFullDocNameV25(obrSegKeySet.get(0).getOrderingProvider(i));
 				}
 				i++;
 			}
@@ -882,7 +859,7 @@ public class TDISHandler implements MessageHandler {
 		try {
 			int ccs = obrSegKeySet.get(0).getResultCopiesToReps();
 			for (int j=0; j<ccs;j++){
-				String name = getFullDocName(obrSegKeySet.get(0).getResultCopiesTo(j));
+				String name = getFullDocNameV25(obrSegKeySet.get(0).getResultCopiesTo(j));
 				if (name != null && !name.equals("")) {
 					if (j>0) docNames +=", "+name;
 					else docNames +=name;
@@ -930,67 +907,6 @@ public class TDISHandler implements MessageHandler {
 
 	public String audit() {
 		return "";
-	}
-
-	private String getFullDocName(ca.uhn.hl7v2.model.v25.datatype.XCN xcn) {
-		String docName = "";
-
-		if (xcn.getPrefixEgDR().getValue() != null)
-			docName = xcn.getPrefixEgDR().getValue();
-
-		if (xcn.getGivenName().getValue() != null) {
-			if (docName.equals(""))
-				docName = xcn.getGivenName().getValue();
-			else
-				docName = docName + " " + xcn.getGivenName().getValue();
-
-		}
-		if (xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue() != null) {
-			if (docName.equals(""))
-				docName = xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue();
-			else
-				docName = docName + " " + xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue();
-		}
-		if (xcn.getFamilyName().getSurname().getValue() != null) {
-			if (docName.equals(""))
-				docName = xcn.getFamilyName().getSurname().getValue();
-			else
-				docName = docName + " " + xcn.getFamilyName().getSurname().getValue();
-
-		}
-		if (xcn.getSuffixEgJRorIII().getValue() != null) {
-			if (docName.equals(""))
-				docName = xcn.getSuffixEgJRorIII().getValue();
-			else
-				docName = docName + " " + xcn.getSuffixEgJRorIII().getValue();
-		}
-		if (xcn.getDegreeEgMD().getValue() != null) {
-			if (docName.equals(""))
-				docName = xcn.getDegreeEgMD().getValue();
-			else
-				docName = docName + " " + xcn.getDegreeEgMD().getValue();
-		}
-
-		return docName;
-	}
-
-	private String formatDateTime(String plain) {
-		String dateFormat = "yyyyMMddHHmmss";
-		dateFormat = dateFormat.substring(0, plain.length());
-		String stringFormat = "yyyy-MM-dd HH:mm:ss";
-		stringFormat = stringFormat.substring(0,
-				stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length() - 1)) + 1);
-
-		Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-		return UtilDateUtilities.DateToString(date, stringFormat);
-	}
-
-	private String getString(String retrieve) {
-		if (retrieve != null) {
-			return (retrieve.trim());
-		} else {
-			return "";
-		}
 	}
 
 	public String getFillerOrderNumber(){

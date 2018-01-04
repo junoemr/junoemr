@@ -34,10 +34,13 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.List;
-
+import ca.uhn.hl7v2.DefaultHapiContext;
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.HapiContext;
+import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.parser.Parser;
+import ca.uhn.hl7v2.validation.impl.NoValidation;
+import com.google.common.collect.Sets;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -47,12 +50,25 @@ import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.OscarProperties;
+import oscar.oscarLab.ca.all.parsers.AHS.v22.SpecimenGateHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.AITLHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.GLSHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ProvlabHandler;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.List;
 
 public final class Factory {
 
 	private static Logger logger = MiscUtils.getLogger();
+
+	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS","CLS","CLSDI");
 
 	private Factory() {
 		// static methods no need for instance
@@ -72,8 +88,7 @@ public final class Factory {
 		} catch (Exception e) {
 			logger.error("Could not retrieve lab for segmentID(" + segmentID + ")", e);
 		}
-
-		return getHandler("", "");
+		return new DefaultGenericHandler();
 	}
 
 	public static String getHL7Body(String segmentID) {
@@ -89,10 +104,64 @@ public final class Factory {
 		return ret;
 	}
 
+	public static MessageHandler getHandler(String type, String hl7Body)
+	{
+		MessageHandler handler;
+		try
+		{
+			if(REFACTORED_LAB_TYPES.contains(type))
+			{
+				handler = getHandlerNew(hl7Body);
+			}
+			else
+			{
+				handler = getHandlerOld(type, hl7Body);
+			}
+		}
+		catch(HL7Exception e)
+		{
+			//TODO - the error should not get caught here but most of oscar does not expect a checked exception when calling this method
+			logger.error("Parse Error", e);
+			throw new RuntimeException("Hl7 Parse Error");
+		}
+		return handler;
+	}
+
+	private static MessageHandler getHandlerNew(String hl7Body) throws HL7Exception {
+		MessageHandler handler = null;
+
+		HapiContext context = new DefaultHapiContext();
+		context.setValidationContext(new NoValidation());
+		Parser p = context.getPipeParser();
+		Message msg = p.parse(hl7Body);
+
+		// attempt to read the msh header and determine lab type handler
+		if(CLSHandler.handlerTypeMatch(msg))
+			handler = new CLSHandler(msg);
+		else if(CLSDIHandler.handlerTypeMatch(msg))
+			handler = new CLSDIHandler(msg);
+		else if(SunquestHandler.handlerTypeMatch(msg))
+			handler = new SunquestHandler(msg);
+		else if(SpecimenGateHandler.handlerTypeMatch(msg))
+			handler = new SpecimenGateHandler(msg);
+		else if(AITLHandler.handlerTypeMatch(msg))
+			handler = new AITLHandler(msg);
+		else if(GLSHandler.handlerTypeMatch(msg))
+			handler = new GLSHandler(msg);
+		else if(ProvlabHandler.handlerTypeMatch(msg))
+			handler = new ProvlabHandler(msg);
+
+		if(handler == null)
+			throw new RuntimeException("Hl7 message/type does not match a known lab handler.");
+
+		logger.debug("Loaded " + handler.getMsgType() + " HL7 Handler");
+		return handler;
+	}
+
 	/*
 	 * Create and return the message handler corresponding to the message type
 	 */
-	public static MessageHandler getHandler(String type, String hl7Body) {
+	private static MessageHandler getHandlerOld(String type, String hl7Body) {
 		Document doc = null;
 		String msgType;
 		String msgHandler = "";

@@ -119,6 +119,7 @@ $(function() {
 				<bean:message key="lab.ca.all.testUploader.labType" /><br />
 				<select name="type" id="type" onchange="selectOther()">
 					<option value="0">Select Lab Type:</option>
+					<option value="AHS">Alberta Health Services (AHS)</option>
 					<option value="AlphaHL7">ALPHA</option>
 					<option value="CML">CML</option>
 					<option value="EPSILON">EPSILON/MHL</option>
@@ -141,8 +142,6 @@ $(function() {
 					<option value="OUL_R21">OUL_R21</option>
 					<option value="ORU_R01">ORU_R01</option>
 					<option value="BIOTEST">BioTest</option>
-					<option value="CLS">Calgary Lab Services (CLS)</option>
-					<option value="CLSDI">Calgary Lab Services - Diagnostic Imaging</option>
 					<option value="TRUENORTH">TRUENORTH</option>
 					<option value="OTHER">Other</option>
 				</select>
