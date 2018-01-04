@@ -165,6 +165,60 @@ public class IHAHandler implements MessageHandler {
             return("");
         }
     }*/
+
+    public String getAdmittingProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-1-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getAttendingProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-2-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getOtherProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-3-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getFamilyProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-4-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getEmergencyProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-5-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getPrimaryCareProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-6-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
     
     @Override
     public String getFirstName(){
@@ -1030,7 +1084,7 @@ public class IHAHandler implements MessageHandler {
         
         ArrayList<String> headers = new ArrayList<String>();
         String currentHeader;
-        
+
         try{
             for (i=0; i < getOBRCount(); i++){
                 
