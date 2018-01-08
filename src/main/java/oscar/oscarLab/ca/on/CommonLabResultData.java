@@ -27,6 +27,7 @@ package oscar.oscarLab.ca.on;
 
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -359,7 +360,8 @@ public class CommonLabResultData {
 		return labs;
 	}
 
-	public static boolean updateReportStatus(int labNo, String providerNo, char status, String comment, String labType) {
+	public static void updateReportStatus(int labNo, String providerNo, char status, String comment, String labType) throws SQLException
+	{
 
 		try {
 			DBPreparedHandler db = new DBPreparedHandler();
@@ -406,11 +408,6 @@ public class CommonLabResultData {
 				}
 				
 			}
-			return true;
-		} catch (Exception e) {
-			Logger l = Logger.getLogger(CommonLabResultData.class);
-			l.error("exception in MDSResultsData.updateReportStatus()", e);
-			return false;
 		} finally {
 			DbConnectionFilter.releaseThreadLocalDbConnection();
 		}
@@ -540,23 +537,36 @@ public class CommonLabResultData {
 
 		CommonLabResultData data = new CommonLabResultData();
 
-		for (int i = 0; i < flaggedLabs.size(); i++) {
-			String[] strarr = flaggedLabs.get(i);
-			String lab = strarr[0];
-			String labType = strarr[1];
-			String labs = data.getMatchingLabs(lab, labType);
+		try
+		{
+			for (int i = 0; i < flaggedLabs.size(); i++)
+			{
+				String[] strarr = flaggedLabs.get(i);
+				String lab = strarr[0];
+				String labType = strarr[1];
+				String labs = data.getMatchingLabs(lab, labType);
 
-			if (labs != null && !labs.equals("")) {
-				String[] labArray = labs.split(",");
-				for (int j = 0; j < labArray.length; j++) {
-					updateReportStatus(Integer.parseInt(labArray[j]), provider, 'F', "", labType);
-					removeFromQueue(Integer.parseInt(labArray[j]));
+				if (labs != null && !labs.equals(""))
+				{
+					String[] labArray = labs.split(",");
+					for (int j = 0; j < labArray.length; j++)
+					{
+						updateReportStatus(Integer.parseInt(labArray[j]), provider, 'F', "", labType);
+						removeFromQueue(Integer.parseInt(labArray[j]));
+					}
+
 				}
-
-			} else {
-				updateReportStatus(Integer.parseInt(lab), provider, 'F', "", labType);
-				removeFromQueue(Integer.parseInt(lab));
+				else
+				{
+					updateReportStatus(Integer.parseInt(lab), provider, 'F', "", labType);
+					removeFromQueue(Integer.parseInt(lab));
+				}
 			}
+		}
+		catch (SQLException e)
+		{
+			logger.error("Error filing labs.", e);
+			return false;
 		}
 		return true;
 	}

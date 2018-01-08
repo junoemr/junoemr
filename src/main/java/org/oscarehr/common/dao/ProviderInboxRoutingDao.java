@@ -24,6 +24,7 @@
 
 package org.oscarehr.common.dao;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,8 +51,9 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 
 
 
-    public boolean removeLinkFromDocument(String docType, Integer docId, String providerNo) {
-    	return CommonLabResultData.updateReportStatus(docId, providerNo, 'X', "Archived", "DOC");    	
+    public void removeLinkFromDocument(String docType, Integer docId, String providerNo) throws SQLException
+	{
+		CommonLabResultData.updateReportStatus(docId, providerNo, 'X', "Archived", "DOC");
     }
 
 	public List<ProviderInboxItem> getProvidersWithRoutingForDocument(String docType, Integer docId) {
