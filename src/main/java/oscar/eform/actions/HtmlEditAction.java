@@ -77,7 +77,6 @@ public class HtmlEditAction extends Action
 			String roleType = fm.getRoleType();
 
 			boolean isNewEFormTemplate = (fidStr.length() == 0);
-			Integer fid = Integer.parseInt(fidStr);
 
 			HashMap<String, String> errors = new HashMap<String, String>();
 			HashMap<String, Object> submittedValues;
@@ -97,14 +96,16 @@ public class HtmlEditAction extends Action
 				if(isNewEFormTemplate)
 				{
 					logger.info("Created new EForm Template");
-					eFormTemplate = eFormTemplateService.addEFormTemplate(formName, formSubject, formFileName, formHtml, creatorNo, showLatestFormOnly, patientIndependent, roleType);
+					eFormTemplate = eFormTemplateService.addEFormTemplate(formName, formSubject, formFileName, formHtml,
+							creatorNo, showLatestFormOnly, patientIndependent, roleType);
 					LogAction.addLogEntry(creatorNo, null, LogConst.ACTION_ADD, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
 							String.valueOf(eFormTemplate.getId()), loggedInInfo.getIp(), eFormTemplate.getFormName());
 				}
 				else
 				{
 					logger.info("Update EForm Template (id: " + fidStr + ")");
-					eFormTemplate = eFormTemplateService.updateEFormTemplate(fid, formName, formSubject, formFileName, formHtml, creatorNo, showLatestFormOnly, patientIndependent, roleType);
+					eFormTemplate = eFormTemplateService.updateEFormTemplate(Integer.parseInt(fidStr), formName, formSubject,
+							formFileName, formHtml, creatorNo, showLatestFormOnly, patientIndependent, roleType);
 					LogAction.addLogEntry(creatorNo, null, LogConst.ACTION_UPDATE, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
 							String.valueOf(eFormTemplate.getId()), loggedInInfo.getIp(), eFormTemplate.getFormName());
 				}

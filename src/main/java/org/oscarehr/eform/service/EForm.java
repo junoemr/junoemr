@@ -29,6 +29,7 @@ import org.apache.struts.action.ActionMessages;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.dao.EFormValueDao;
+import org.oscarehr.eform.exception.EFormMeasurementException;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.model.EFormValue;
 import org.oscarehr.util.MiscUtils;
@@ -103,11 +104,8 @@ public class EForm
 		ArrayList<String> eFormFields = new ArrayList<>(eFormValueMap.keySet());
 		ArrayList<String> eFormValues = new ArrayList<>(eFormValueMap.values());
 
-		ActionMessages errors = curForm.setMeasurements(eFormFields, eFormValues);
-		if(!errors.isEmpty())
-		{
-			throw new RuntimeException("Errors Saving measurements");
-		}
+		// attempt to save measurements first. This is contained in the transaction
+		ActionMessages measurementErrors = curForm.setMeasurements(eFormFields, eFormValues);
 
 		curForm.setFormSubject(subject);
 		curForm.setValues(eFormFields, eFormValues);
@@ -122,6 +120,13 @@ public class EForm
 		curForm.setImagePath();
 		curForm.setAction();
 		curForm.setNowDateTime();
+
+		// because of how the curForm gets populated, and because the values are used on error,
+		// this has to be done after some of the curForm operations are performed.
+		if(!measurementErrors.isEmpty())
+		{
+			throw new EFormMeasurementException("Errors Saving measurements", measurementErrors, curForm);
+		}
 
 		// must update the html after running the image/action etc. changes on curForm
 		eForm.setFormData(curForm.getFormHtml());
