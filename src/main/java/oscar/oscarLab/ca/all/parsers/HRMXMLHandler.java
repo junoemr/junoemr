@@ -15,26 +15,7 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-
+import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
@@ -48,16 +29,34 @@ import org.oscarehr.hospitalReportManager.xsd.PhoneNumber;
 import org.oscarehr.hospitalReportManager.xsd.ReportsReceived;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.util.UtilDateUtilities;
-import ca.uhn.hl7v2.HL7Exception;
+
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 /**
  * TDIS HL7 Report Parser/Handler. Handles incoming HL7 files containing ITS or DEPARTMENTAL reports as part of the OBR/OBX segments.
  *
  * @author dritan
  */
-public class HRMXMLHandler implements MessageHandler {
+public class HRMXMLHandler extends MessageHandler
+{
 
 	private static Logger logger = MiscUtils.getLogger();
 
@@ -93,6 +92,18 @@ public class HRMXMLHandler implements MessageHandler {
 		headers = new ArrayList<String>();
 
 	}
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
 
 	private ArrayList<String> getMatchingHL7Labs(String hl7Body) {
 		Base64 base64 = new Base64(0);
@@ -410,57 +421,6 @@ public class HRMXMLHandler implements MessageHandler {
 
 	public String audit() {
 		return "";
-	}
-
-	private String getFullDocName(ca.uhn.hl7v2.model.v25.datatype.XCN xcn) {
-		String docName = "";
-
-		if (xcn.getPrefixEgDR().getValue() != null) docName = xcn.getPrefixEgDR().getValue();
-
-		if (xcn.getGivenName().getValue() != null) {
-			if (docName.equals("")) docName = xcn.getGivenName().getValue();
-			else docName = docName + " " + xcn.getGivenName().getValue();
-
-		}
-		if (xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue() != null) {
-			if (docName.equals("")) docName = xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue();
-			else docName = docName + " " + xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue();
-		}
-		if (xcn.getFamilyName().getSurname().getValue() != null) {
-			if (docName.equals("")) docName = xcn.getFamilyName().getSurname().getValue();
-			else docName = docName + " " + xcn.getFamilyName().getSurname().getValue();
-
-		}
-		if (xcn.getSuffixEgJRorIII().getValue() != null) {
-			if (docName.equals("")) docName = xcn.getSuffixEgJRorIII().getValue();
-			else docName = docName + " " + xcn.getSuffixEgJRorIII().getValue();
-		}
-		if (xcn.getDegreeEgMD().getValue() != null) {
-			if (docName.equals("")) docName = xcn.getDegreeEgMD().getValue();
-			else docName = docName + " " + xcn.getDegreeEgMD().getValue();
-		}
-
-		return docName;
-	}
-
-	private String formatDateTime(String plain) {
-		if (plain==null || plain.trim().equals("")) return "";
-
-		String dateFormat = "yyyyMMddHHmmss";
-		dateFormat = dateFormat.substring(0, plain.length());
-		String stringFormat = "yyyy-MM-dd HH:mm:ss";
-		stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length() - 1)) + 1);
-
-		Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-		return UtilDateUtilities.DateToString(date, stringFormat);
-	}
-
-	private String getString(String retrieve) {
-		if (retrieve != null) {
-			return (retrieve.trim());
-		} else {
-			return "";
-		}
 	}
 
 	private String getFormattedDate(XMLGregorianCalendar date, boolean omitTime) {

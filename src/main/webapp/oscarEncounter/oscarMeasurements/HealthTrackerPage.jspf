@@ -1722,7 +1722,7 @@ $(document).ready(function () {
 
 		if ( self !== top ) {
 		var h = $(document).height();
-		parent.parent.document.getElementById('trackerSlim').style.height = h+"px";
+		parent.parent.document.getElementById('trackerSlim').style.height = (h + 100)+"px";
 		//$(".save-all").hide();		
         $("#demoHeader").hide();
         $("#tracker-bar").css({
@@ -2221,52 +2221,64 @@ $('[id^=group-btn-]')
 
        }
     }
-    
-    public String getPattern(String inputType, String mInstructions){
-    	String htmlValidation = "";
-    	String pattern = "";
-    	
-    	EctValidation ectValidation = new EctValidation();
-    	
+
+	public String getPattern(String inputType, String mInstructions)
+	{
+		String htmlValidation = "";
+		String pattern = "";
+
+		EctValidation ectValidation = new EctValidation();
+
 		String regExp = null;
 		Double dMax = 0.0;
 		Double dMin = 0.0;
 		Integer iMax = 0;
 		Integer iMin = 0;
 		String vName = null;
-		
-		 try{
-		    	List<Validations> vs = ectValidation.getValidationType(inputType, mInstructions);
-		    	
-		    	if (!vs.isEmpty()) {
-					Validations v = vs.iterator().next();		
-							dMax = v.getMaxValue();
-							dMin = v.getMinValue();
-							iMax = v.getMaxLength();
-							iMin = v.getMinLength();
-							regExp = v.getRegularExp();
-							vName = v.getName().toString();
-							
-					    	if(regExp==null && dMax>0){
-					    		pattern="min='"+dMin+"' max='"+dMax+"'"; 	
-					    	}else if(vName.equals("No Validations")){
-					    		pattern="rel='noValidation'";
-					    	}else if(vName.equals("Numeric Value greater than or equal to 0")){
-					    		pattern="min='0' rel='greaterThanZero'";
-					    	}else{
-					    		pattern="pattern='"+regExp+"' rel='"+vName+"'";
-					    	}
 
+		try
+		{
+			List<Validations> vs = ectValidation.getValidationType(inputType, mInstructions);
+			if (!vs.isEmpty())
+			{
+				Validations v = vs.iterator().next();
+				dMax = v.getMaxValue();
+				if (dMax == null) // Ensure that we don't do a numeric-related check on null
+					dMax = 0.0;
+				dMin = v.getMinValue();
+				iMax = v.getMaxLength();
+				iMin = v.getMinLength();
+				regExp = v.getRegularExp();
+				vName = v.getName();
+
+				if (regExp == null && dMax > 0.0)
+				{
+					pattern = "min='" + dMin + "' max='" + dMax + "'";
 				}
-		    	
-		    }catch(Exception e){
-		    	MiscUtils.getLogger().error("Error getting validation for Health Tracker "+inputType,e);
-		    }
-    	
-    	htmlValidation=pattern;
-    	
-    	return(htmlValidation);
-    }
+				else if (vName.equals("No Validations"))
+				{
+
+					pattern = "rel='noValidation'";
+				}
+				else if (vName.equals("Numeric Value greater than or equal to 0"))
+				{
+					pattern = "min='0' rel='greaterThanZero'";
+				}
+				else
+				{
+					pattern = "pattern='" + regExp + "' rel='" + vName + "'";
+				}
+			}
+
+		} catch (Exception e)
+		{
+			MiscUtils.getLogger().error("Error getting validation for Health Tracker " + inputType, e);
+		}
+
+		htmlValidation = pattern;
+
+		return (htmlValidation);
+	}
     
     
     public String getFromFacilityMsg(EctMeasurementsDataBean emdb){

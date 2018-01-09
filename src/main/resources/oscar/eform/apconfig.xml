@@ -1207,7 +1207,7 @@
 			FROM billingreferral b, demographic d
 			WHERE d.demographic_no=${demographic}
 			AND LENGTH(b.referral_no) > 0
-			EXTRACTVALUE(d.family_doctor, '/rdohip') = b.referral_no
+			AND EXTRACTVALUE(d.family_doctor, '/rdohip') = b.referral_no
 		</ap-sql>
 		<ap-output>${raddress}</ap-output>
 	</databaseap>

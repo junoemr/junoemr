@@ -116,6 +116,19 @@ public final class OruR01Handler extends ChainnedMessageAdapter<ORU_R01> {
 	}
 
 	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
+
+	@Override
 	public MSH getMsh() {
 		return (hl7Message.getMSH());
 	}

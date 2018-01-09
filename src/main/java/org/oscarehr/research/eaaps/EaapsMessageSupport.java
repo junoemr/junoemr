@@ -62,11 +62,8 @@ public class EaapsMessageSupport {
 	public byte[] getPdf() {
 		NTE nte = message.getPATIENT_RESULT().getORDER_OBSERVATION().getNTE();
 		String base64EncodedPdfContent;
-        try {
-	        base64EncodedPdfContent = nte.getComment(0).getValue();
-        } catch (HL7Exception e) {
-	        return null;
-        }
+        base64EncodedPdfContent = nte.getComment(0).getValue();
+
         
 		// break on empty PDFs
 		if (base64EncodedPdfContent == null || base64EncodedPdfContent.isEmpty()) {
@@ -142,24 +139,18 @@ public class EaapsMessageSupport {
 		}
 		return null;
 	}
-	
-	public String getProviderNote() {
-		try {
-			NTE nte = message.getPATIENT_RESULT().getORDER_OBSERVATION().getNTE(2);
-			return decode(nte.getComment(0).getValue());
-		} catch (HL7Exception e) {
-			throw new IllegalStateException("Unable to get comment field from the message", e);
-		}
+
+	public String getProviderNote()
+	{
+		NTE nte = message.getPATIENT_RESULT().getORDER_OBSERVATION().getNTE(2);
+		return decode(nte.getComment(0).getValue());
 	}
 
-	public String getRecommendations() {
-		try {
-			NTE nte = message.getPATIENT_RESULT().getORDER_OBSERVATION().getNTE(1);
-			String commentValue = nte.getComment(0).getValue();
-			return decode(commentValue);
-		} catch (HL7Exception e) {
-			throw new IllegalStateException("Unable to get comment field from the message", e);
-		}
+	public String getRecommendations()
+	{
+		NTE nte = message.getPATIENT_RESULT().getORDER_OBSERVATION().getNTE(1);
+		String commentValue = nte.getComment(0).getValue();
+		return decode(commentValue);
 	}
 
 }

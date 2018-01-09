@@ -25,23 +25,23 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.v2.oscar_to_oscar.OscarToOscarUtils;
-import org.oscarehr.util.MiscUtils;
-
-import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.ChainnedMessageAdapter;
-import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.OruR01Handler;
-import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.RefI12Handler;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractMessage;
 import ca.uhn.hl7v2.model.v26.message.ORU_R01;
 import ca.uhn.hl7v2.model.v26.message.REF_I12;
 import ca.uhn.hl7v2.model.v26.segment.MSH;
 import ca.uhn.hl7v2.model.v26.segment.PID;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.hl7.v2.oscar_to_oscar.OscarToOscarUtils;
+import org.oscarehr.util.MiscUtils;
+import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.ChainnedMessageAdapter;
+import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.OruR01Handler;
+import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.RefI12Handler;
 
-public final class OscarToOscarHl7V2Handler implements MessageHandler {
+import java.util.ArrayList;
+
+public final class OscarToOscarHl7V2Handler extends MessageHandler
+{
 	private static Logger logger = MiscUtils.getLogger();
 	
 	private ChainnedMessageAdapter<? extends AbstractMessage> chainnedMessageAdapter;
@@ -55,6 +55,19 @@ public final class OscarToOscarHl7V2Handler implements MessageHandler {
 		else if (message instanceof ORU_R01) chainnedMessageAdapter=new OruR01Handler((ORU_R01) message);
 		else logger.error("Recevied unsupported message type : "+message.getClass().getSimpleName());
 	}
+
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+	@Override
+	public void postUpload() {}
 
 	public String audit() {
 	    return chainnedMessageAdapter.audit();
