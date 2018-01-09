@@ -31,9 +31,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
 
+import org.oscarehr.util.MiscUtils;
 import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
@@ -751,11 +753,46 @@ public class IHAHandler implements MessageHandler {
                 nums.add(docNum);
                 i++;
             }
-            
+           nums.addAll(getProviderMnemonics());
         }catch(Exception e){
             logger.error("Error retrieving DocNums", e);
         }
         return(nums);
+    }
+
+    // Returns a list of all provider mnemonics associated with the lab
+    private ArrayList<String> getProviderMnemonics()
+    {
+        MiscUtils.getLogger().error("getProviderNumFromMnemonic");
+        ArrayList<String> mnemonicList = new ArrayList<>();
+        String providerMnemonic;
+
+        if ((providerMnemonic = StringUtils.trimToNull(getAdmittingProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getAttendingProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getFamilyProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getEmergencyProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getPrimaryCareProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getOtherProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+
+        return mnemonicList;
     }
     
     /*
