@@ -198,6 +198,18 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 					console.log(errors);
 				});
 		};
+		controller.getSocialHistory = function getSocialHistory(boxId)
+		{
+			summaryService.getSocialHistory(consult.demographic.demographicNo).then(
+				function success(results)
+				{
+					controller.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
+		};
 		controller.getOngoingConcerns = function getOngoingConcerns(boxId)
 		{
 			summaryService.getOngoingConcerns(consult.demographic.demographicNo).then(
