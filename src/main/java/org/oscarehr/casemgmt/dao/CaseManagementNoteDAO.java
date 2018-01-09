@@ -53,6 +53,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
 import oscar.util.SqlUtils;
 
 public class CaseManagementNoteDAO extends HibernateDaoSupport {
@@ -286,7 +287,7 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 			if(observationDate != null)
 			{
 				paramIndex++;
-				params[paramIndex] = observationDate;
+				params[paramIndex] = ConversionUtils.toDateString(observationDate, ConversionUtils.DEFAULT_TS_PATTERN);
 			}
 
 			issueListReturn = this.getHibernateTemplate().find(hql, params);

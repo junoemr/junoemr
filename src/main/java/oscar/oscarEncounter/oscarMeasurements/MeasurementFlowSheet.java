@@ -483,10 +483,10 @@ public class MeasurementFlowSheet {
         }
     }
     /////
-    public MeasurementInfo getMessages(MeasurementInfo mi) throws Exception {
-        if (!rulesLoaded) {
-            throw new Exception("No Drools file loaded"+ruleBase);
-        //loadRuleBase();
+    public MeasurementInfo getMessages(MeasurementInfo mi) {
+        if(!rulesLoaded)
+        {
+            throw new IllegalStateException("No Drools file loaded: " + ruleBase);
         }
 
         try {
