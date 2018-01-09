@@ -763,7 +763,6 @@ public class IHAHandler implements MessageHandler {
     // Returns a list of all provider mnemonics associated with the lab
     private ArrayList<String> getProviderMnemonics()
     {
-        MiscUtils.getLogger().error("getProviderNumFromMnemonic");
         ArrayList<String> mnemonicList = new ArrayList<>();
         String providerMnemonic;
 
