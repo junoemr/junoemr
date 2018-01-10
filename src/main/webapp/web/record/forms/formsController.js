@@ -202,19 +202,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		formService.getCompletedEncounterForms($stateParams.demographicNo).then(
 			function success(results)
 			{
-				if (results.list instanceof Array)
-				{
-					controller.page.encounterFormlist[0] = results.list;
-				}
-				else
-				{
-					var arr = new Array();
-					arr[0] = results.list;
-					controller.page.encounterFormlist[0] = arr;
-				}
-
-				//controller.page.encounterFormlist[0] = results.list;
-				//console.log("completed list as is:" + JSON.stringify(controller.page.encounterFormlist[0]) );
+				controller.page.encounterFormlist[0] = results;
 			},
 			function error(errors)
 			{
