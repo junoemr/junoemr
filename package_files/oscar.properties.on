@@ -99,9 +99,6 @@ RENAL_DOSING_DS=yes
 #Turns on mydrugref decision support
 MYDRUGREF_DS=yes
 
-#Turns on interaction checking from drugref using regional identifier
-RX_INTERACTION_LOCAL_DRUGREF_REGIONAL_IDENTIFIER=yes
-
 # Prevention/Immunization
 PREVENTION=yes
 IMMUNIZATION_IN_PREVENTION=yes
