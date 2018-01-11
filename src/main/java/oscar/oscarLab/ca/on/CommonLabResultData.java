@@ -39,14 +39,7 @@ import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
 import org.oscarehr.billing.CA.BC.dao.Hl7MshDao;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicLabResult;
 import org.oscarehr.caisi_integrator.ws.DemographicWs;
-import org.oscarehr.common.dao.CtlDocumentDao;
-import org.oscarehr.common.dao.DocumentResultsDao;
-import org.oscarehr.common.dao.Hl7TextMessageDao;
-import org.oscarehr.common.dao.LabPatientPhysicianInfoDao;
-import org.oscarehr.common.dao.MdsMSHDao;
-import org.oscarehr.common.dao.PatientLabRoutingDao;
-import org.oscarehr.common.dao.ProviderLabRoutingDao;
-import org.oscarehr.common.dao.QueueDocumentLinkDao;
+import org.oscarehr.common.dao.*;
 import org.oscarehr.common.model.CtlDocument;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.Provider;
@@ -404,8 +397,22 @@ public class CommonLabResultData {
 				for(ProviderLabRoutingModel plr : providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labNo, labType, "0")) {
 					providerLabRoutingDao.remove(plr.getId());
 				}
-				
 			}
+
+			// If we updated the status to X, then we want to see if all other statuses for the labNo are also X.
+			// If they are then there are no more providers associated with the document, so move the document to the unclaimed inbox
+			if (status == 'X')
+			{
+				ProviderInboxRoutingDao providerInboxRoutingDao = SpringUtils.getBean(ProviderInboxRoutingDao.class);
+				List<ProviderLabRoutingModel> allDocsWithLabNo = providerLabRoutingDao.getProviderLabRoutingDocuments(labNo);
+				List<ProviderLabRoutingModel> docsWithStatusX = providerLabRoutingDao.findByStatusANDLabNoType(labNo, labType, "X");
+
+				if (allDocsWithLabNo.size() == docsWithStatusX.size())
+				{
+					providerInboxRoutingDao.addToProviderInbox("0", labNo, labType);
+				}
+			}
+
 			return true;
 		} catch (Exception e) {
 			Logger l = Logger.getLogger(CommonLabResultData.class);

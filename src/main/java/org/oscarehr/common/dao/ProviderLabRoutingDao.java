@@ -30,7 +30,7 @@ public class ProviderLabRoutingDao extends AbstractDao<ProviderLabRoutingModel> 
 
 	
 	private List<ProviderLabRoutingModel> getProviderLabRoutings(Integer labNo, String labType, String providerNo, String status) {
-		Query q = entityManager.createQuery("select x from " + modelClass.getName() + " x where x.labNo=? and x.labType=? and x.providerNo=? and x.status=?");
+		Query q = entityManager.createQuery("select x from " + modelClass.getName() + " x where x.labNo like ? and x.labType like ? and x.providerNo like ? and x.status like ?");
 		q.setParameter(1, labNo != null ? labNo : "%");
 		q.setParameter(2, labType != null ? labType : "%");
 		q.setParameter(3, providerNo != null ? providerNo : "%");

@@ -513,7 +513,6 @@
 																<!--center-->
 																	<% for (int i=0; i < ackList.size(); i++) {
 																		ReportStatus report = (ReportStatus) ackList.get(i); %>
-																		<%= report.getProviderName() %> :
 
 																		<% String ackStatus = report.getStatus();
 																			if(ackStatus.equals("A")){
@@ -523,13 +522,16 @@
 																			}else{
 																				ackStatus = "Not Acknowledged";
 																			}
-																		%>
-																		<font color="red"><%= ackStatus %></font>
-																			<span id="timestamp_<%=docId + "_" + report.getOscarProviderNo()%>"><%= report.getTimestamp() == null ? "&nbsp;" : report.getTimestamp() + "&nbsp;"%></span>,
-																			comment: <span id="comment_<%=docId + "_" + report.getOscarProviderNo()%>"><%=report.getComment() == null || report.getComment().equals("") ? "no comment" : report.getComment()%></span>
+																		// Only show providers that weren't removed from the document
+																		if(!report.getStatus().equals("X")) { %>
+																			<%= report.getProviderName() %> :
+																			<font color="red"><%= ackStatus %></font>
+																				<span id="timestamp_<%=docId + "_" + report.getOscarProviderNo()%>"><%= report.getTimestamp() == null ? "&nbsp;" : report.getTimestamp() + "&nbsp;"%></span>,
+																				comment: <span id="comment_<%=docId + "_" + report.getOscarProviderNo()%>"><%=report.getComment() == null || report.getComment().equals("") ? "no comment" : report.getComment()%></span>
 
-																		<br>
-																	<% }
+																			<br>
+																		<%}
+																	 }
 																	if (ackList.size() == 0){
 																		%><font color="red">N/A</font><%
 																	}
