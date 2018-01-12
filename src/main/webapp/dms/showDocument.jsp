@@ -85,7 +85,7 @@
 			String status = request.getParameter("status");
 			String inQueue=request.getParameter("inQueue");
 
-			if(documentNo == null || documentNo == "null")
+			if(documentNo == null || documentNo.equals("null"))
 				throw new InvalidArgumentException("Invalid document_no: " + documentNo);
 
 			boolean inQueueB=false;
