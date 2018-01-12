@@ -508,7 +508,7 @@ if(custom_logo_name != null ){
 																	%>
 																	<input type="hidden" name="<%=DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY%>" value="<%=signatureRequestId%>" />	
 
-																	<img id="signature" style="width:300px; height:60px" src="<%=startimageUrl%>" alt="digital_signature" />
+																	<img id="signature" style="width:200px; height:100px; object-fit:scale-down; object-position: 100% 100%" src="<%=startimageUrl%>" alt="digital_signature" />
 				 													<input type="hidden" name="imgFile" id="imgFile" value="<%=imgFile%>" />
 																	<script type="text/javascript">
 																		
