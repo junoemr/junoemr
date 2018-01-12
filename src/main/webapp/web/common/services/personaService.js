@@ -78,29 +78,6 @@ angular.module("Common.Services").service("personaService", [
 			return deferred.promise;
 		};
 
-		service.getPatientLists = function getPatientLists()
-		{
-			var deferred = $q.defer();
-
-			$http(
-			{
-				url: service.apiPath + '/patientLists',
-				method: "GET",
-				headers: Juno.Common.ServiceHelper.configHeaders()
-			}).then(
-				function success(results)
-				{
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("personaService::getPatientLists error", errors);
-					deferred.reject("An error occured while getting patient lists from persona");
-				});
-
-			return deferred.promise;
-		};
-
 		service.getPatientListConfig = function getPatientListConfig()
 		{
 			var deferred = $q.defer();

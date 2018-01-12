@@ -33,6 +33,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 	'angularUtil',
 	'Navigation',
 	'personaService',
+	'providerService',
 	'patientListState',
 
 	function(
@@ -43,6 +44,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		angularUtil,
 		Navigation,
 		personaService,
+		providerService,
 		patientListState)
 	{
 
@@ -265,7 +267,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			controller.refresh();
 		});
 
-		personaService.getPatientLists().then(
+		providerService.getRecentPatientList().then(
 			function success(results)
 			{
 				patientListState.tabItems = results.patientListTabItems;
@@ -276,7 +278,6 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			{
 				console.log(errors);
 			});
-
 		personaService.getPatientListConfig().then(
 			function success(results)
 			{

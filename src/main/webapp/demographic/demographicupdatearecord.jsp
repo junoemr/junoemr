@@ -51,7 +51,7 @@
 <%@page import="org.oscarehr.common.model.DemographicExt" %>
 <%@page import="org.oscarehr.managers.DemographicManager" %>
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
-<%@page import="org.oscarehr.provider.model.PreventionManager" %>
+<%@page import="org.oscarehr.provider.model.ProviderPreventionManager" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
 <%@page import="org.oscarehr.util.MiscUtils" %>
 
@@ -440,7 +440,7 @@
 </h2>
 
 <%
-	PreventionManager prevMgr = (PreventionManager) SpringUtils.getBean("preventionMgr");
+	ProviderPreventionManager prevMgr = (ProviderPreventionManager) SpringUtils.getBean("preventionMgr");
 	prevMgr.removePrevention(demographicNoStr);
 
 	LogAction.addLogEntry(currentUserNoStr, demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, demographicNoStr, request.getRemoteAddr());
