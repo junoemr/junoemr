@@ -730,11 +730,6 @@ public final class EDocUtil {
 			currentdoc.setContentType(d.getContenttype());
 			currentdoc.setNumberOfPages(d.getNumberofpages());
             currentdoc.setContentDateTime(d.getContentdatetime());
-
-            if(currentdoc.getDocId() == null)
-			{	
-				logger.info("Document ID is null, something went wrong. Original document_no: " + documentNo);
-			}
             
             if(d.isRestrictToProgram() != null){
             	currentdoc.setRestrictToProgram(d.isRestrictToProgram());
