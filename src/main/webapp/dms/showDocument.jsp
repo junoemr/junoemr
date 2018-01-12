@@ -54,7 +54,8 @@
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils,oscar.oscarLab.ca.all.*,oscar.oscarMDS.data.*"%>
-<%@page import="org.springframework.web.context.WebApplicationContext,org.oscarehr.common.dao.*,org.oscarehr.common.model.*,org.oscarehr.util.SpringUtils"%><%
+<%@page import="org.springframework.web.context.WebApplicationContext,org.oscarehr.common.dao.*,org.oscarehr.common.model.*,org.oscarehr.util.SpringUtils"%>
+<%@ page import="org.apache.jcs.access.exception.InvalidArgumentException" %><%
 
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 			ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) ctx.getBean("providerInboxRoutingDAO");
@@ -80,11 +81,12 @@
 
 			String demoName=request.getParameter("demoName");
 			String documentNo = request.getParameter("segmentID");
-
-
 			String searchProviderNo = request.getParameter("searchProviderNo");
 			String status = request.getParameter("status");
 			String inQueue=request.getParameter("inQueue");
+
+			if(documentNo == null || documentNo == "null")
+				throw new InvalidArgumentException("Invalid document_no: " + documentNo);
 
 			boolean inQueueB=false;
 			if(inQueue!=null) {
