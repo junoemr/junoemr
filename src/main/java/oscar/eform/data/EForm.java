@@ -542,7 +542,7 @@ public class EForm extends EFormBase {
 	// ----------------------------------private -----------------------------------------
 	private DatabaseAP getAPExtra(String apName, String fieldHeader) {
 		// --------------------------Process extra attributes for APs --------------------------------
-		Pattern p = Pattern.compile("\\b[a-z]\\$[^ \\$#]+#[^\n]+");
+		Pattern p = Pattern.compile("\\b[a-z]\\$[^\\$#]+#[^\n]+");
 		Matcher m = p.matcher(apName);
 		if (!m.matches()) return null;
 
