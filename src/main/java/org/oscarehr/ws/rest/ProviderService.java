@@ -41,7 +41,6 @@ import org.oscarehr.managers.model.ProviderSettings;
 import org.oscarehr.provider.model.ProviderRecentDemographicAccess;
 import org.oscarehr.provider.service.ProviderRecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.web.PatientListApptBean;
 import org.oscarehr.web.PatientListApptItemBean;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
@@ -196,9 +195,10 @@ public class ProviderService extends AbstractServiceImpl {
 	@GET
 	@Path("/getRecentDemographicsViewed")
 	@Produces("application/json")
-	public RestResponse<PatientListApptBean,String> getRecentDemographicsViewed()
+	public RestResponse<List<PatientListApptItemBean>,String> getRecentDemographicsViewed()
 	{
-		PatientListApptBean response = new PatientListApptBean();
+		List<PatientListApptItemBean> resultList = new ArrayList<>();
+
 		try
 		{
 			int providerNo = Integer.parseInt(getLoggedInInfo().getLoggedInProviderNo());
@@ -224,7 +224,7 @@ public class ProviderService extends AbstractServiceImpl {
 				item.setDemographicNo(demographicNo);
 				item.setDate(accessDateTime);
 				item.setName(demographic.getDisplayName());
-				response.getPatients().add(item);
+				resultList.add(item);
 			}
 		}
 		catch(Exception e)
@@ -232,7 +232,7 @@ public class ProviderService extends AbstractServiceImpl {
 			logger.error("Error retrieving recent demographics viewed", e);
 			return RestResponse.errorResponse("Error retrieving recent demographics viewed");
 		}
-		return RestResponse.successResponse(response);
+		return RestResponse.successResponse(resultList);
 	}
 	
 	@GET

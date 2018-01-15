@@ -45,7 +45,7 @@ public class ProviderRecentDemographicAccessDao extends AbstractDao<ProviderRece
 				"FROM ProviderRecentDemographicAccess x " +
 				"WHERE x.providerRecentDemographicAccessId.providerNo = :providerNo " +
 				"AND x.providerRecentDemographicAccessId.demographicNo = :demographicNo " +
-				"ORDER BY x.accessDateTime ASC";
+				"ORDER BY x.accessDateTime DESC";
 
 		Query query = entityManager.createQuery(querySql);
 		query.setParameter("providerNo", providerNo);
@@ -59,7 +59,7 @@ public class ProviderRecentDemographicAccessDao extends AbstractDao<ProviderRece
 		String querySql = "SELECT x " +
 				"FROM ProviderRecentDemographicAccess x " +
 				"WHERE x.providerRecentDemographicAccessId.providerNo = :providerNo " +
-				"ORDER BY x.accessDateTime ASC";
+				"ORDER BY x.accessDateTime DESC";
 
 		Query query = entityManager.createQuery(querySql);
 		query.setParameter("providerNo", providerNo);
