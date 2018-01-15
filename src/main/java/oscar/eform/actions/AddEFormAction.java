@@ -80,7 +80,7 @@ public class AddEFormAction extends Action {
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		String providerNo=loggedInInfo.getLoggedInProviderNo();
 
-		boolean fax = "true".equals(request.getParameter("faxEForm"));
+		boolean fax = "true".equals(request.getParameter("fax"));
 		boolean print = "true".equals(request.getParameter("print"));
 
 		@SuppressWarnings("unchecked")

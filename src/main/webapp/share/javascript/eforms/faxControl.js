@@ -3,7 +3,7 @@ if (typeof jQuery == "undefined") { alert("The faxControl library requires jQuer
 var faxControlPlaceholder = "<br/>Fax Recipients:<br/><div id='faxForm'>Loading fax options..</div>";
 var faxControlFaxButton     = "<span>&nbsp;</span><input value='Fax' name='FaxButton' id='fax_button' disabled type='button' onclick='submitFaxButtonAjax(false)'>";
 var faxControlFaxSaveButton = "<span>&nbsp;</span><input value='Submit & Fax' name='FaxSaveButton' id='faxSave_button' disabled type='button' onclick='submitFaxButtonAjax(true)'>";
-var faxControlMemoryInput = "<input value='false' name='faxEForm' id='faxEForm' type='hidden' />";	
+var faxControlMemoryInput = "<input value='false' name='fax' id='fax' type='hidden' />";
 var faxControl = {
 	initialize: function () {
 		var placeholder = jQuery("#faxControl");
@@ -33,7 +33,7 @@ var faxControl = {
 					placeholder.html("");
 					console.log("Error loading fax control, please contact an administrator.");
 				}
-				else { 
+				else {
 					placeholder.html(data);					
 					var buttonLocation = jQuery("input[name='SubmitButton']");
 					faxEnabled = (jQuery("#faxControl_faxEnabled").val() == "true");
@@ -134,7 +134,7 @@ function hasFaxNumber() {
 }
 
 function submitFaxButtonAjax(save) {
-	document.getElementById('faxEForm').value=true;
+	document.getElementById('fax').value=true;
 	
 	var saveHolder = jQuery("#saveHolder");
 	if (saveHolder == null || saveHolder.size() == 0) {
@@ -150,11 +150,11 @@ function submitFaxButtonAjax(save) {
 		var form = $("form[name='RichTextLetter']");
 		form.attr("target", "_blank");
 		document.getElementById('Letter').value=editControlContents('edit');
-		
+
 		$.ajax({
 			 type: "POST",  
 			 url: form.attr("action"),  
-			 data: form.serialize(),  
+			 data: form.serialize(),
 			 success: function() {  
 			    alert("Fax sent successfully");
 			    if (save) { window.close(); }
@@ -164,5 +164,5 @@ function submitFaxButtonAjax(save) {
 			 } 
 		});
 	}
-	document.getElementById('faxEForm').value=false;
+	document.getElementById('fax').value=false;
 }
