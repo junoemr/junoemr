@@ -18,7 +18,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<% java.util.Properties oscarVariables = oscar.OscarProperties.getInstance(); %>
+<% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
 
 <%
 	String formClass = "BCAR";
@@ -654,7 +654,17 @@ function calByLMP() {
 				onclick="javascript:return onExit();" /> <input type="submit"
 				value="Print" onclick="javascript:return onPrint();" /> <input
 				type="submit" value="Print Risk"
-				onclick="javascript:return onPrintRisk();" /></td>
+				onclick="javascript:return onPrintRisk();" />
+				<%
+					if (oscarVariables.isPropertyActive("faxEnable") && oscarVariables.isPropertyActive("form_fax_enabled"))
+					{
+				%>
+				<input type="button" value="Fax"
+					   onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>', 'fax_recipients');"/>
+				<%
+					}
+				%>
+			</td>
 			<%
   if (!bView) {
 %>
@@ -2039,7 +2049,17 @@ function calByLMP() {
   }
 %> <input type="submit" value="Exit"
 				onclick="javascript:return onExit();" /> <input type="submit"
-				value="Print" onclick="javascript:return onPrint();" /></td>
+				value="Print" onclick="javascript:return onPrint();" />
+				<%
+					if (oscarVariables.isPropertyActive("faxEnable") && oscarVariables.isPropertyActive("form_fax_enabled"))
+					{
+				%>
+				<input type="button" value="Fax"
+					   onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>', 'fax_recipients');"/>
+				<%
+					}
+				%>
+			</td>
 			<%
   if (!bView) {
 %>
