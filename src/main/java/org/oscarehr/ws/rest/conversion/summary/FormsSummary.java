@@ -27,7 +27,7 @@ package org.oscarehr.ws.rest.conversion.summary;
 import java.util.Collections;
 import java.util.List;
 
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.FormsManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;

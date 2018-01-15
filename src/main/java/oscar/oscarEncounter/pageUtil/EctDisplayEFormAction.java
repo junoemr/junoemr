@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.util.MessageResources;
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 

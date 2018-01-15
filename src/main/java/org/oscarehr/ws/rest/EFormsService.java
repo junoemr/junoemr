@@ -25,7 +25,7 @@
 package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.EFormDao;
+import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.managers.FormsManager;
 import org.oscarehr.ws.rest.conversion.EFormConverter;
 import org.oscarehr.ws.rest.to.model.EFormTo1;

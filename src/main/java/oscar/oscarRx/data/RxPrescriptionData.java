@@ -24,6 +24,7 @@
 
 package oscar.oscarRx.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -572,7 +573,8 @@ public class RxPrescriptionData {
 	}
 
 	// erased an orfin }
-	public static class Prescription {
+	public static class Prescription implements Serializable
+	{
 
 		int drugId;
 		String providerNo;

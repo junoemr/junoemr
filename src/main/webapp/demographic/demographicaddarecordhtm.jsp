@@ -64,17 +64,16 @@
 <%@page import="org.oscarehr.PMmodule.model.Program" %>
 <%@page import="org.oscarehr.PMmodule.service.ProgramManager" %>
 <%@page import="org.oscarehr.common.dao.WaitingListNameDao" %>
-<%@page import="org.oscarehr.common.dao.EFormDao" %>
+<%@page import="org.oscarehr.eform.dao.EFormDao" %>
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao" %>
 <%@page import="org.oscarehr.common.model.Facility" %>
-<%@page import="org.oscarehr.util.LoggedInInfo" %>
 <%@page import="oscar.OscarProperties" %>
-<%@page import="org.oscarehr.util.LoggedInInfo" %>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="org.oscarehr.managers.ProgramManager2" %>
 <%@page import="org.oscarehr.PMmodule.model.ProgramProvider" %>
 
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
+<%@ page import="org.oscarehr.eform.model.EForm" %>
 
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean" scope="session" />
 <%

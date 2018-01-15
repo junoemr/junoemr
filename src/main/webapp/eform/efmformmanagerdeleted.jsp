@@ -23,16 +23,16 @@
     Ontario, Canada
 
 --%>
-<%@ page import="oscar.eform.data.*, oscar.eform.*, java.util.*"%>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
+<%@ page import="oscar.eform.EFormUtil, java.util.ArrayList, java.util.HashMap" %>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%
-String orderByRequest = request.getParameter("orderby");
-String orderBy = "";
-if (orderByRequest == null) orderBy = EFormUtil.DATE;
-else if (orderByRequest.equals("form_subject")) orderBy = EFormUtil.SUBJECT;
-else if (orderByRequest.equals("form_name")) orderBy = EFormUtil.NAME;
-else if (orderByRequest.equals("file_name")) orderBy = EFormUtil.FILE_NAME;
+	String orderByRequest = request.getParameter("orderby");
+	String orderBy = "";
+	if(orderByRequest == null) orderBy = EFormUtil.DATE;
+	else if(orderByRequest.equals("form_subject")) orderBy = EFormUtil.SUBJECT;
+	else if(orderByRequest.equals("form_name")) orderBy = EFormUtil.NAME;
+	else if(orderByRequest.equals("file_name")) orderBy = EFormUtil.FILE_NAME;
 %>
 <html:html locale="true">
 <head>
@@ -61,10 +61,12 @@ else if (orderByRequest.equals("file_name")) orderBy = EFormUtil.FILE_NAME;
     }
   }
 </script>
+
 <body>
 
 
 <%@ include file="efmTopNav.jspf"%>
+<%@ include file="efmShowError.jspf"%>
 
 <h3><bean:message key="eform.calldeletedformdata.title" /></h3>
 

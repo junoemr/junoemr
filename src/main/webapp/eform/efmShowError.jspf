@@ -23,29 +23,23 @@
     Ontario, Canada
 
 --%>
+<%@ page contentType="text/html;charset=UTF-8" %>
 
-<html>
-<head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-</head>
-<body>
-<center>Closing Window, Please Wait....</center>
-<%@taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<script type="text/javascript" language="javascript">
-   
-   if (!window.opener.closed) {
-        var parentAjaxId = "<%=request.getParameter("parentAjaxId")%>";
-        if( window.opener. writeToEncounterNote ) {
-            window.opener.reloadNav(parentAjaxId);
-            //window.opener.document.forms['encForm'].elements['reloadDiv'].value = parentAjaxId;
-            //window.opener.updateNeeded = true;
-        } else {
-            if (window.opener.location.href.indexOf("efmpatientformlist.jsp")>=0)
-                window.opener.location.reload();
-        }
-        window.opener.focus();
-        window.close();
-    }
-</script>
-</body>
-</html>
+<%
+	String efm_form_error = (String) request.getAttribute("error");
+
+	if(efm_form_error != null)
+	{
+	%>
+	<style>
+		#efm_form_error-bar {
+			background: rgba(199,0,0,0.25);
+			color: #770000;
+			font-size: 16px;
+			text-align: center;
+		}
+	</style>
+	<div id="efm_form_error-bar" class="error_message"><%=efm_form_error%></div>
+	<%
+	}
+%>

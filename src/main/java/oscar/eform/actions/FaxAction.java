@@ -22,10 +22,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.EFormDataDao;
+import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.common.dao.FaxConfigDao;
 import org.oscarehr.common.dao.FaxJobDao;
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.common.model.FaxConfig;
 import org.oscarehr.common.model.FaxJob;
 import org.oscarehr.util.MiscUtils;

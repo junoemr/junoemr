@@ -468,7 +468,7 @@ public boolean isBirthday(String schedDate,String demBday){
 <%@page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
 <%@page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@page import="org.oscarehr.web.AppointmentProviderAdminDayUIBean"%>
-<%@page import="org.oscarehr.common.model.EForm"%><html:html locale="true">
+<%@page import="org.oscarehr.eform.model.EForm"%><html:html locale="true">
 	<head>
 		<script>
 
