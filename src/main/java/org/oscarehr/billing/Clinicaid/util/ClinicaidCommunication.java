@@ -275,7 +275,14 @@ public class ClinicaidCommunication {
 		}
 		else if(action.equals("invoice_reports"))
 		{
-			clinicaid_link = clinicaid_domain + "/?nonce=" + nonce + "#/reports";
+			if(request.getParameter("patient_remote_id") != null && !request.getParameter("patient_remote_id").isEmpty())
+			{
+				clinicaid_link = clinicaid_domain + "/?nonce=" + nonce + "#/reports?patient_remote_id=" + request.getParameter("patient_remote_id");
+			}
+			else
+			{
+				clinicaid_link = clinicaid_domain + "/?nonce=" + nonce + "#/reports";
+			}
 		}
 		return clinicaid_link;
 	}
