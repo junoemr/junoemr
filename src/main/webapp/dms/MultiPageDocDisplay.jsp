@@ -69,14 +69,14 @@
                          searchProviderNo = request.getParameter("searchProviderNo");
                          status = request.getParameter("status");
             }
-            
+
             Provider provider = providerDao.getProvider(providerNo);
             String creator = (String) session.getAttribute("user");
             ArrayList doctypes = EDocUtil.getActiveDocTypes("demographic");
             EDoc curdoc = EDocUtil.getDoc(documentNo);
 
             String demographicID = curdoc.getModuleId();
-            
+
             if(demoName == null || "".equals(demoName)) {
             	Demographic d = demographicDao.getDemographic(demographicID);
             	if(d != null) {
@@ -128,13 +128,20 @@
         <script type="text/javascript" src="../share/yui/js/animation-min.js"></script>
         <script type="text/javascript" src="../share/yui/js/datasource-min.js"></script>
         <script type="text/javascript" src="../share/yui/js/autocomplete-min.js"></script>
-        <script type="text/javascript" src="../js/demographicProviderAutocomplete.js"></script> 
-        <script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-1.4.2.js"></script>       
+        <script type="text/javascript" src="../js/demographicProviderAutocomplete.js"></script>
+        <script type="text/javascript"
+                src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-1.4.2.js"></script>
+        <script type="text/javascript"
+                src="<%= request.getContextPath() %>/js/moment.min.js"></script>
+        <script type="text/javascript"
+                src="<%= request.getContextPath() %>/js/util/common.js"></script>
+        <script type="text/javascript"
+                src="<%= request.getContextPath() %>/js/util/date.js"></script>
 
         <link rel="stylesheet" type="text/css" href="../share/yui/css/fonts-min.css"/>
         <link rel="stylesheet" type="text/css" href="../share/yui/css/autocomplete.css"/>
         <link rel="stylesheet" type="text/css" media="all" href="../share/css/demographicProviderAutocomplete.css"  />
-        
+
         <style type="text/css">
         	.multiPage {
         		background-color: RED;
@@ -146,7 +153,7 @@
         	.singlePage {
 
         	}
-        </style>               
+        </style>
     </head>
     <body >
         <div id="labdoc_<%=docId%>">
@@ -155,17 +162,17 @@
 
 
                     <td colspan="8">
-                        <div style="text-align: right; font-weight: bold"> 
-                        <% if( numOfPage > 1 ) {%> 
+                        <div style="text-align: right; font-weight: bold">
+                        <% if( numOfPage > 1 ) {%>
                         <a id="firstP" style="display: none;" href="javascript:void(0);" onclick="firstPage('<%=docId%>');">First</a>
                         <a id="prevP" style="display: none;" href="javascript:void(0);" onclick="prevPage('<%=docId%>');">Prev</a>
                         <a id="nextP" href="javascript:void(0);" onclick="nextPage('<%=docId%>');">Next</a>
-                        <a id="lastP" href="javascript:void(0);" onclick="lastPage('<%=docId%>');">Last</a>                        
+                        <a id="lastP" href="javascript:void(0);" onclick="lastPage('<%=docId%>');">Last</a>
                         <%}%>
                         </div>
                         <a href="<%=url2%>" ><img alt="document" src="<%=url%>" id="docImg_<%=docId%>" /></a>
-              
-                        
+
+
                    </td>
                     <td align="left" valign="top">
                         <fieldset><legend>Patient:<%=demoName%> </legend>
@@ -184,7 +191,7 @@
                                 </tr>
                             </table>
 
-                            <form id="forms_<%=docId%>" onsubmit="return updateDocument(this.id);" >
+                            <form id="forms_<%=docId%>" onsubmit="return checkObservationDate(this.id) && updateDocument(this.id);" >
                                 <input type="hidden" name="method" value="documentUpdate" />
                                 <input type="hidden" name="documentId" value="<%=docId%>" />
                                 <input type="hidden" name="providerNo" value="<%=providerNo%>" />
@@ -241,16 +248,16 @@
 
                                             <script type="text/javascript">
                                             jQuery.noConflict();
-                                            
-                                            
+
+
                                             function addDocComment(docId, status) {
-                                            	var url="<%=request.getContextPath()%>/oscarMDS/UpdateStatus.do";                                            	
+                                            	var url="<%=request.getContextPath()%>/oscarMDS/UpdateStatus.do";
                                             	var formid = "#acknowledgeForm_" + docId;
-                                            	
+
                                             	jQuery("#ackStatus").val(status);
                                             	var data= jQuery(formid).serialize();
                                             	data += "&method=addComment";
-                                            	
+
                                             	jQuery.ajax({
                                             		type: "POST",
                                             		url: url,
@@ -259,14 +266,14 @@
                                             			window.location.reload();
                                             		}
                                             	});
-                                            	
+
                                             }
 
-                                            
+
                                             function forwardDocument(docId) {
                                             	var frm = "#reassignForm_" + docId;
                                             	var query = jQuery(frm).serialize();
-                                            	
+
                                             	jQuery.ajax({
                                             		type: "POST",
                                             		url:  "<%=request.getContextPath()%>/oscarMDS/ReportReassign.do",
@@ -292,7 +299,7 @@
                                                 }
                                                 nextPage=function(docid){
                                                     curPage++;
-                                                    
+
                                                     	$('viewedPage_'+docid).innerHTML = curPage;
                                                         showPageImg(docid,curPage);
                                                         if(curPage==totalPage){
@@ -318,7 +325,7 @@
                                                             showPrev();
                                                             showNext();
                                                         }
-                                                    
+
                                                 }
                                                 firstPage=function(docid){
                                                     curPage=1;
@@ -584,72 +591,53 @@ function sendMRP(ele){
                                             }
                                             }();
 
-                        updateDocument=function(eleId){
-                        	if (!checkObservationDate(eleId)) {
-                        		return false;
-                        	}
-                        	//save doc info
-                                                    var url="../dms/ManageDocument.do",data=$(eleId).serialize(true);
-                                                    new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){
-                                                                var ar=eleId.split("_");
-                                                                var num=ar[1];
-                                                                num=num.replace(/\s/g,'');
-                                                           if($("saveSucessMsg_"+num))     $("saveSucessMsg_"+num).show();
-                                                           if($('saved'+num))      $('saved'+num).value='true';
-                                                           if($('autocompletedemo'+num))
-                                                               $('autocompletedemo'+num).disabled=true;
-                                                           if($('removeProv'+num))
-                                                                    $('removeProv'+num).remove();
+											updateDocument = function(eleId)
+											{
+												//save doc info
+												var url = "../dms/ManageDocument.do",
+													data = $(eleId).serialize(true);
+												new Ajax.Request(url, {
+													method: 'post',
+													parameters: data,
+													onSuccess: function(transport)
+													{
+														var ar = eleId.split("_");
+														var num = ar[1];
+														num = num.replace(/\s/g, '');
+														if ($("saveSucessMsg_" + num)) $("saveSucessMsg_" + num).show();
+														if ($('saved' + num)) $('saved' + num).value = 'true';
+														if ($('autocompletedemo' + num))
+															$('autocompletedemo' + num).disabled = true;
+														if ($('removeProv' + num))
+															$('removeProv' + num).remove();
 
-                                                refreshParent();
+														refreshParent();
 
-                                                    }});
-                                                    return false;
-                                        }
+													}
+												});
+												return false;
+											}
 
-                        function checkObservationDate(formid) {
-                            // regular expression to match required date format
-                            re = /^\d{4}\-\d{1,2}\-\d{1,2}$/;
-                            re2 = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
+											function checkObservationDate(formId)
+											{
+												var formElem = document.getElementById(formId);
+												var dateElem = formElem.elements["observationDate"];
 
-                            var form = document.getElementById(formid);
-                            if(form.elements["observationDate"].value == "") {
-                            	alert("Blank Date: " + form.elements["observationDate"].value);
-                        		form.elements["observationDate"].focus();
-                        		return false;
-                            }
-                            
-                            if(!form.elements["observationDate"].value.match(re)) {
-                            	if(!form.elements["observationDate"].value.match(re2)) {
-                            		alert("Invalid date format: " + form.elements["observationDate"].value);
-                            		form.elements["observationDate"].focus();
-                            		return false;
-                            	} else if(form.elements["observationDate"].value.match(re2)) {
-                            		form.elements["observationDate"].value=form.elements["observationDate"].value.replace("/","-");
-                            		form.elements["observationDate"].value=form.elements["observationDate"].value.replace("/","-");
-                            	}
-                            }
-                            regs= form.elements["observationDate"].value.split("-");
-                            // day value between 1 and 31
-                            if(regs[2] < 1 || regs[2] > 31) {
-                              alert("Invalid value for day: " + regs[2]);
-                              form.elements["observationDate"].focus();
-                              return false;
-                            }
-                            // month value between 1 and 12
-                            if(regs[1] < 1 || regs[1] > 12) {
-                              alert("Invalid value for month: " + regs[1]);
-                              form.elements["observationDate"].focus();
-                              return false;
-                            }
-                            // year value between 1902 and 2015
-                            if(regs[0] < 1902 || regs[0] > (new Date()).getFullYear()) {
-                              alert("Invalid value for year: " + regs[0] + " - must be between 1902 and " + (new Date()).getFullYear());
-                              form.elements["observationDate"].focus();
-                              return false;
-                            }
-                            return true;
-                          }
+												if (!Oscar.Util.Common.validateInputNotEmpty(dateElem))
+												{
+													alert("Blank Date.");
+													dateElem.focus();
+													return false;
+												}
+
+												if (!Oscar.Util.Date.validateDateInput(dateElem))
+												{
+													alert("Invalid date format: " + dateElem.value);
+													dateElem.focus();
+													return false;
+												}
+												return true;
+											}
 
                                             </script>
                                             <div id="providerList<%=docId%>"></div>
@@ -720,7 +708,7 @@ function sendMRP(ele){
                                                                        		&nbsp;
                                                                             <%= report.getTimestamp()== null ? "" : report.getTimestamp() %>,&nbsp;
                                                                             comment: <%= ( report.getComment() == null || report.getComment().equals("") ? "no comment" : report.getComment() ) %>
-                                                                       
+
                                                                         <br>
                                                                     <% }
                                                                     if (ackList.size() == 0){
@@ -787,9 +775,9 @@ function sendMRP(ele){
 															boolean enabledMyOscarButton=MyOscarUtils.isMyOscarSendButtonEnabled(myOscarLoggedInInfo, Integer.valueOf(demographicID));
 														%>
 														<input type="button" <%=WebUtils.getDisabledString(enabledMyOscarButton)%> tabindex="<%=tabindex++%>" value="<bean:message key="global.btnSendToPHR"/>" onclick="popup(450, 600, '../phr/SendToPhrPreview.jsp?module=document&documentNo=<%=docId%>&demographic_no=<%=demographicID%>', 'sendtophr')"/>
-				
+
 														<%}
-		
+
                                                          }%>
                                                     </td>
                                                 </tr>
@@ -803,15 +791,15 @@ function sendMRP(ele){
                 </tr>
                 <tr>
                 	 <td colspan="8">
-                        <div style="text-align: right; font-weight: bold"> 
-                        <% if( numOfPage > 1 ) {%> 
+                        <div style="text-align: right; font-weight: bold">
+                        <% if( numOfPage > 1 ) {%>
                         <a id="firstP2" style="display: none;" href="javascript:void(0);" onclick="firstPage('<%=docId%>');">First</a>
                         <a id="prevP2" style="display: none;" href="javascript:void(0);" onclick="prevPage('<%=docId%>');">Prev</a>
                         <a id="nextP2" href="javascript:void(0);" onclick="nextPage('<%=docId%>');">Next</a>
-                        <a id="lastP2" href="javascript:void(0);" onclick="lastPage('<%=docId%>');">Last</a>                        
+                        <a id="lastP2" href="javascript:void(0);" onclick="lastPage('<%=docId%>');">Last</a>
                         <%}%>
                         </div>
-                                  
+
                    </td>
                    <td>&nbsp;</td>
                 </tr>

@@ -43,7 +43,7 @@ import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.PMmodule.web.FacilityDischargedClients;
 import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.EFormDao;
+import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.common.dao.FacilityDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.Demographic;

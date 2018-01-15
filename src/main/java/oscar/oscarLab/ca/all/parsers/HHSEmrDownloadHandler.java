@@ -51,7 +51,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
  *
  * @author wrighd
  */
-public class HHSEmrDownloadHandler extends DefaultGenericHandler implements MessageHandler {
+public class HHSEmrDownloadHandler extends DefaultGenericHandler {
 
     Logger logger = Logger.getLogger(HHSEmrDownloadHandler.class);
     ArrayList<String> headerList = null;

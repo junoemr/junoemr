@@ -48,7 +48,7 @@
 <%@page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page import="org.oscarehr.web.PrescriptionQrCodeUIBean"%>
-<%@page import="org.oscarehr.common.model.EForm"%>
+<%@page import="org.oscarehr.eform.model.EForm"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="org.oscarehr.common.model.EncounterForm"%>
 <%@page import="org.oscarehr.common.dao.CtlBillingServiceDao" %>
@@ -56,7 +56,6 @@
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@page import="java.util.List" %>
 <%@page import="java.util.ArrayList" %>
-<%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@page import="org.oscarehr.common.model.Provider" %>
 
 <%

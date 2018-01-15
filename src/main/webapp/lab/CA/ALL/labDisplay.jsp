@@ -1173,11 +1173,9 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 							if(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")){
 								isSGorCDC = true;
 							}
-						} else if(handler.getMsgType().equals("CLS")){
-                            isUnstructuredDoc = ((CLSHandler) handler).isUnstructured();
-                        }
-                        else if(handler.getMsgType().equals("CLSDI")){
-                            isUnstructuredDoc = ((CLSDIHandler) handler).isUnstructured();
+						}
+                        else {
+                        	isUnstructuredDoc = handler.isUnstructured();
                         }
 						%>
 		                       <table style="page-break-inside:avoid;" bgcolor="#003399" border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -1477,12 +1475,12 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                     } else if ((!handler.getOBXResultStatus(j, k).equals("TDIS") && !handler.getMsgType().equals("EPSILON")) )  {
 
                                     	if(isUnstructuredDoc){%>
-                                   			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>"><% 
-                                   			if(handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1)){%>
-                                   				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8")%>')"></a><%
+                                   			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>"><%
+                                   			if((obxCount>1) && k>1 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1))) {%>
+                                   				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"></a><%
                                    				}
                                    			else{%> <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a><%}%>
-											<%if(isVIHARtf){
+											<%if(isVIHARtf) {
 											    //create bytes from the rtf string
 										    	byte[] rtfBytes = handler.getOBXResult(j, k).getBytes();
 										    	ByteArrayInputStream rtfStream = new ByteArrayInputStream(rtfBytes);
@@ -1493,12 +1491,16 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										    	rtfParser.read(rtfStream, doc, 0);
 										    	String rtfText = doc.getText(0, doc.getLength()).replaceAll("\n", "<br>");
 										    	String disclaimer = "<br>IMPORTANT DISCLAIMER: You are viewing a PREVIEW of the original report. The rich text formatting contained in the original report may convey critical information that must be considered for clinical decision making. Please refer to the ORIGINAL report, by clicking 'Print', prior to making any decision on diagnosis or treatment.";%>
-										    	<td align="left"><%= rtfText + disclaimer %></td><%} %><%
-											else{%>
-                                           		<td align="left"><%= handler.getOBXResult( j, k) %></td><%} %>
-                                           	<%if(handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1)) && (obxCount>1)){
-                                        			%><td align="center"></td><%}
-                                        		else{%> <td align="center"><%= handler.getTimeStamp(j, k) %></td><%}
+										    	<td align="left"><%= rtfText + disclaimer %></td><%}
+											else {%>
+                                           		<td align="left"><%= handler.getOBXResult( j, k) %></td><%
+											} %>
+	                                            <%if((obxCount>1) && k>1 && handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1))) {
+	                                                    %><td align="center"></td><%
+	                                            }
+	                                                else{%>
+				                                    <td align="center"><%= handler.getTimeStamp(j, k) %></td><%
+	                                            }
                                    			}//end of isUnstructuredDoc
                                    			
                                    			else{//if it isn't a PATHL7 doc%>

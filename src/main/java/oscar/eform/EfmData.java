@@ -26,8 +26,8 @@ package oscar.eform;
 
 import java.util.HashMap;
 
-import org.oscarehr.common.dao.EFormDataDao;
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.dao.EFormDataDao;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.util.SpringUtils;
 
 /**

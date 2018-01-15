@@ -25,16 +25,6 @@
 
 package oscar.eform.actions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -42,9 +32,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.oscarehr.common.dao.EFormDataDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.exception.EFormMeasurementException;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.match.IMatchManager;
@@ -53,19 +43,31 @@ import org.oscarehr.match.MatchManagerException;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.eform.EFormLoader;
 import oscar.eform.EFormUtil;
 import oscar.eform.data.DatabaseAP;
 import oscar.eform.data.EForm;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.util.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class AddEFormAction extends Action {
 
 	private static final Logger logger=MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private org.oscarehr.eform.service.EForm eFormService = SpringUtils.getBean(org.oscarehr.eform.service.EForm.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
@@ -74,40 +76,38 @@ public class AddEFormAction extends Action {
 			throw new SecurityException("missing required security object (_eform)");
 		}
 		
-		logger.debug("==================SAVING ==============");
-		HttpSession se = request.getSession();
+		logger.info("================== SAVING EFORM ==============");
+		HttpSession session = request.getSession();
 
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		String providerNo=loggedInInfo.getLoggedInProviderNo();
+		String providerNoStr=loggedInInfo.getLoggedInProviderNo();
 
 		boolean fax = "true".equals(request.getParameter("faxEForm"));
 		boolean print = "true".equals(request.getParameter("print"));
 
-		@SuppressWarnings("unchecked")
-		Enumeration<String> paramNamesE = request.getParameterNames();
-		//for each name="fieldname" value="myval"
-		ArrayList<String> paramNames = new ArrayList<String>();  //holds "fieldname, ...."
-		ArrayList<String> paramValues = new ArrayList<String>(); //holds "myval, ...."
-		ArrayList<String> eformFields = new ArrayList<String>();
-		ArrayList<String> eformValues = new ArrayList<String>();
+		String previousFormDataId = (String)session.getAttribute("eform_data_id");
+		session.removeAttribute("eform_data_id");
+
 		String fid = request.getParameter("efmfid");
-		String demographic_no = request.getParameter("efmdemographic_no");
-		String eform_link = request.getParameter("eform_link");
-		String subject = request.getParameter("subject");
+		String demographicNoStr = request.getParameter("efmdemographic_no");
+		String eFormLink = request.getParameter("eform_link");
+		String subject = org.apache.commons.lang.StringUtils.trimToEmpty(request.getParameter("subject"));
+		boolean doDatabaseUpdate = "on".equalsIgnoreCase(request.getParameter("_oscardodatabaseupdate"));
 
-		boolean doDatabaseUpdate = false;
+		Integer formId = Integer.parseInt(fid);
+		Integer demographicNo = Integer.parseInt(demographicNoStr);
+		Integer providerNo = Integer.parseInt(providerNoStr);
 
-		List<String> oscarUpdateFields = new ArrayList<String>();
-
-		if (request.getParameter("_oscardodatabaseupdate") != null && request.getParameter("_oscardodatabaseupdate").equalsIgnoreCase("on"))
-			doDatabaseUpdate = true;
-
+		@SuppressWarnings("unchecked")
+		Map<String, String[]> unfilteredParamValueMap = request.getParameterMap();
+		Map<String, String> paramValueMap = new HashMap<>();
+		Map<String,String> formOpenerMap = new HashMap<>();
 		ActionMessages updateErrors = new ActionMessages();
 
 		// The fields in the _oscarupdatefields parameter are separated by %s.
 		if (!print && !fax && doDatabaseUpdate && request.getParameter("_oscarupdatefields") != null) {
 
-			oscarUpdateFields = Arrays.asList(request.getParameter("_oscarupdatefields").split("%"));
+			List<String> oscarUpdateFields = Arrays.asList(request.getParameter("_oscarupdatefields").split("%"));
 
 			boolean validationError = false;
 
@@ -136,8 +136,8 @@ public class AddEFormAction extends Action {
 					if (currentAP != null) {
 						String inSQL = currentAP.getApInSQL();
 
-						inSQL = DatabaseAP.parserReplace("demographic", demographic_no, inSQL);
-						inSQL = DatabaseAP.parserReplace("provider", providerNo, inSQL);
+						inSQL = DatabaseAP.parserReplace("demographic", demographicNoStr, inSQL);
+						inSQL = DatabaseAP.parserReplace("provider", providerNoStr, inSQL);
 						inSQL = DatabaseAP.parserReplace("fid", fid, inSQL);
 
 						inSQL = DatabaseAP.parserReplace("value", request.getParameter(field), inSQL);
@@ -154,138 +154,117 @@ public class AddEFormAction extends Action {
 			}
 		}
 
-		if (subject == null) subject="";
-		String curField = "";
-		while (paramNamesE.hasMoreElements()) {
-			curField = paramNamesE.nextElement();
-			eformFields.add(curField);
-			eformValues.add(request.getParameter(curField));
-			if( curField.equalsIgnoreCase("parentAjaxId"))
-				continue;
-			if(request.getParameter(curField) != null && (!request.getParameter(curField).trim().equals("")) )
+		// filter incoming parameter values and remove unwanted (null/empty, etc.) pairs.
+		for(Map.Entry<String, String[]> entry : unfilteredParamValueMap.entrySet())
+		{
+			String key = entry.getKey();
+			String value = String.join(",", entry.getValue());// most parameters will be single value.
+			if(value != null && !value.trim().isEmpty() && !value.equalsIgnoreCase("parentAjaxId"))
 			{
-				paramNames.add(curField);
-				paramValues.add(request.getParameter(curField));
+				paramValueMap.put(key,value);
 			}
-			
+		}
+		// java 8 filtering
+//		paramValueMap.entrySet().removeIf(entry -> (entry.getValue() == null
+//				|| entry.getValue().trim().isEmpty()
+//				|| entry.getValue().equalsIgnoreCase("parentAjaxId")));
+
+
+
+		// for some reason, stuff is stored on the session, so it needs to be pulled off.
+		Enumeration sessionAttr = session.getAttributeNames();
+		String attrPattern = providerNoStr + "_" + demographicNoStr + "_" + fid + "_";
+		while (sessionAttr.hasMoreElements())
+		{
+			Object key = sessionAttr.nextElement();
+			if(key instanceof String)
+			{
+				String attribute = (String) key;
+				if(attribute.startsWith(attrPattern))
+				{
+					String name = attribute.substring(attrPattern.length());
+					String value = (String) session.getAttribute(attribute);
+					formOpenerMap.put(name, value);
+					if(value != null) session.removeAttribute(attribute);
+				}
+			}
 		}
 
-		EForm curForm = new EForm(fid, demographic_no, providerNo);
+		try
+		{
+			EFormData eForm;
+			if(StringUtils.filled(previousFormDataId))
+			{
+				Integer oldFdid = Integer.parseInt(previousFormDataId);
+				eForm = eFormService.saveExistingEForm(oldFdid, demographicNo, providerNo, formId, subject, formOpenerMap, paramValueMap, eFormLink);
+			}
+			else
+			{
+				eForm = eFormService.saveNewEForm(demographicNo, providerNo, formId, subject, formOpenerMap, paramValueMap, eFormLink);
+			}
 
-		//add eform_link value from session attribute
-		ArrayList<String> openerNames = curForm.getOpenerNames();
-		ArrayList<String> openerValues = new ArrayList<String>();
-		for (String name : openerNames) {
-			String lnk = providerNo+"_"+demographic_no+"_"+fid+"_"+name;
-			String val = (String)se.getAttribute(lnk);
-			openerValues.add(val);
-			if (val!=null) se.removeAttribute(lnk);
-		}
 
-		//----names parsed
-		ActionMessages errors = curForm.setMeasurements(paramNames, paramValues);
-		curForm.setFormSubject(subject);
-		curForm.setValues(paramNames, paramValues, eformFields, eformValues);
-		if (!openerNames.isEmpty()) curForm.setOpenerValues(openerNames, openerValues);
-		if (eform_link!=null) curForm.setEformLink(eform_link);
-		curForm.setImagePath();
-		curForm.setAction();
-		curForm.setNowDateTime();
-		if (!errors.isEmpty()) {
-			saveErrors(request, errors);
-			request.setAttribute("curform", curForm);
-			request.setAttribute("page_errors", "true");
-			return mapping.getInputForward();
-		}
+			boolean sameForm = (eForm == null);
+			String fdid = (sameForm) ? previousFormDataId : eForm.getId().toString();
 
-		//Check if eform same as previous, if same -> not saved
-		String prev_fdid = (String)se.getAttribute("eform_data_id");
-		se.removeAttribute("eform_data_id");
-		boolean sameform = false;
-		if (StringUtils.filled(prev_fdid)) {
-			EForm prevForm = new EForm(prev_fdid);
-			if (prevForm!=null) {
-				sameform = curForm.getFormHtml().equals(prevForm.getFormHtml());
-			}			
-		}
-		if (!sameform) { //save eform data
-			EFormDataDao eFormDataDao=(EFormDataDao)SpringUtils.getBean("EFormDataDao");
-			EFormData eFormData=toEFormData(curForm);
-			eFormDataDao.persist(eFormData);
-			String fdid = eFormData.getId().toString();
-
-			EFormUtil.addEFormValues(paramNames, paramValues, new Integer(fdid), new Integer(fid), new Integer(demographic_no)); //adds parsed values
+			if(!sameForm)
+			{
+				LogAction.addLogEntry(providerNoStr, demographicNo, LogConst.ACTION_ADD, LogConst.CON_EFORM_DATA, LogConst.STATUS_SUCCESS,
+						String.valueOf(eForm.getId()), loggedInInfo.getIp(), eForm.getFormName());
+			}
 
 			//post fdid to {eform_link} attribute
-			if (eform_link!=null) {
-				se.setAttribute(eform_link, fdid);
+			if(!sameForm && eFormLink != null)
+			{
+				session.setAttribute(eFormLink, fdid);
 			}
-			
-			if (fax) {
+			if(fax)
+			{
 				request.setAttribute("fdid", fdid);
-				return(mapping.findForward("fax"));
+				return (mapping.findForward("fax"));
 			}
-			
-			else if (print) {
+			else if(print)
+			{
 				request.setAttribute("fdid", fdid);
-				return(mapping.findForward("print"));
+				return (mapping.findForward("print"));
 			}
-
-			else {
+			else if(!sameForm)
+			{
 				//write template message to echart
-				String program_no = new EctProgram(se).getProgram(providerNo);
+				String program_no = new EctProgram(session).getProgram(providerNoStr);
 				String path = request.getRequestURL().toString();
 				String uri = request.getRequestURI();
 				path = path.substring(0, path.indexOf(uri));
 				path += request.getContextPath();
-	
-				EFormUtil.writeEformTemplate(LoggedInInfo.getLoggedInInfoFromSession(request),paramNames, paramValues, curForm, fdid, program_no, path);
+
+				ArrayList<String> paramNames = new ArrayList<>(paramValueMap.keySet());
+				ArrayList<String> paramValues = new ArrayList<>(paramValueMap.values());
+				EForm curForm = new EForm(eForm);
+
+				EFormUtil.writeEformTemplate(LoggedInInfo.getLoggedInInfoFromSession(request), paramNames, paramValues, curForm, fdid, program_no, path);
 			}
-			
-		}
-		else {
-			logger.debug("Warning! Form HTML exactly the same, new form data not saved.");
-			if (fax) {
-				request.setAttribute("fdid", prev_fdid);
-				return(mapping.findForward("fax"));
-			}
-			
-			else if (print) {
-				request.setAttribute("fdid", prev_fdid);
-				return(mapping.findForward("print"));
-			}
-		}
-		
-		if (demographic_no != null) {
+
 			IMatchManager matchManager = new MatchManager();
 			DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-			Demographic client = demographicManager.getDemographic(loggedInInfo,demographic_no);
-			try {
-	            matchManager.<Demographic>processEvent(client, IMatchManager.Event.CLIENT_CREATED);
-            } catch (MatchManagerException e) {
-            	MiscUtils.getLogger().error("Error while processing MatchManager.processEvent(Client)",e);
-            }
+			Demographic client = demographicManager.getDemographic(loggedInInfo, demographicNoStr);
+			try
+			{
+				matchManager.<Demographic>processEvent(client, IMatchManager.Event.CLIENT_CREATED);
+			}
+			catch(MatchManagerException e)
+			{
+				MiscUtils.getLogger().error("Error while processing MatchManager.processEvent(Client)", e);
+			}
 		}
-		
-
+		catch(EFormMeasurementException e)
+		{
+			// this is an expected error that happens when the measurement save fails. log as a warning
+			logger.warn("Save aborted: Invalid measurement data");
+			saveErrors(request, e.getErrors());
+			request.setAttribute("curform", e.getEformData());
+			request.setAttribute("page_errors", true);
+			return mapping.getInputForward();
+		}
 		return(mapping.findForward("close"));
-	}
-
-	private EFormData toEFormData(EForm eForm) {
-		EFormData eFormData=new EFormData();
-		eFormData.setFormId(Integer.parseInt(eForm.getFid()));
-		eFormData.setFormName(eForm.getFormName());
-		eFormData.setSubject(eForm.getFormSubject());
-		eFormData.setDemographicId(Integer.parseInt(eForm.getDemographicNo()));
-		eFormData.setCurrent(true);
-		eFormData.setFormDate(new Date());
-		eFormData.setFormTime(eFormData.getFormDate());
-		eFormData.setProviderNo(eForm.getProviderNo());
-		eFormData.setFormData(eForm.getFormHtml());
-		eFormData.setShowLatestFormOnly(eForm.isShowLatestFormOnly());
-		eFormData.setPatientIndependent(eForm.isPatientIndependent());
-		eFormData.setRoleType(eForm.getRoleType());
-
-		return(eFormData);
 	}
 }

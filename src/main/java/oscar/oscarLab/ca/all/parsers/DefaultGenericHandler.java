@@ -34,15 +34,6 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
-import org.apache.log4j.Logger;
-
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
@@ -51,12 +42,16 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
 
 /**
  *
  * @author wrighd
  */
-public class DefaultGenericHandler implements MessageHandler {
+public class DefaultGenericHandler extends MessageHandler
+{
 
     Logger logger = Logger.getLogger(DefaultGenericHandler.class);
 
@@ -411,21 +406,6 @@ public class DefaultGenericHandler implements MessageHandler {
         }
     }
 
-    public String getAge(){
-        String age = "N/A";
-        String dob = getDOB();
-        try {
-            // Some examples
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date date = formatter.parse(dob);
-            age = UtilDateUtilities.calcAge(date);
-        } catch (ParseException e) {
-            logger.error("Could not get age", e);
-
-        }
-        return age;
-    }
-
     public String getSex(){
         try{
             return(getString(terser.get("/.PID-8-1")));
@@ -635,26 +615,9 @@ public class DefaultGenericHandler implements MessageHandler {
         return (docName);
     }
 
-
-    protected String formatDateTime(String plain){
-    	if (plain==null || plain.trim().equals("")) return "";
-
-        String dateFormat = "yyyyMMddHHmmss";
-        dateFormat = dateFormat.substring(0, plain.length());
-        String stringFormat = "yyyy-MM-dd HH:mm:ss";
-        stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length()-1))+1);
-
-        Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-        return UtilDateUtilities.DateToString(date, stringFormat);
-    }
-
-    protected String getString(String retrieve){
-        if (retrieve != null){
-            retrieve.replaceAll("^", " ");
-            return(retrieve.trim().replaceAll("\\\\\\.br\\\\", "<br />"));
-        }else{
-            return("");
-        }
+    @Override
+    protected String getString(String retrieve) {
+        return super.getString(retrieve).replaceAll("\\\\\\.br\\\\", "<br />");
     }
 
  public String getFillerOrderNumber(){
@@ -678,4 +641,17 @@ public class DefaultGenericHandler implements MessageHandler {
     public String getNteForPID() {
     	return "";
     }
+
+    @Override
+    public String preUpload(String hl7Message) throws HL7Exception
+    {
+        return hl7Message;
+    }
+    @Override
+    public boolean canUpload()
+    {
+        return true;
+    }
+    @Override
+    public void postUpload() {}
 }

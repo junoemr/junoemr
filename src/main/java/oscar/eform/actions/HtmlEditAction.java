@@ -25,95 +25,144 @@
 
 package oscar.eform.actions;
 
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.eform.model.EForm;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WebUtils;
-
 import oscar.eform.EFormUtil;
-import oscar.eform.data.EFormBase;
 import oscar.eform.data.HtmlEditForm;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
+import oscar.util.ConversionUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.HashMap;
 
 
-public class HtmlEditAction extends Action {
-	
+public class HtmlEditAction extends Action
+{
+	private static Logger logger = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-    	
-        HtmlEditForm fm = (HtmlEditForm) form;
-       
-        if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null)) {
+	private org.oscarehr.eform.service.EFormTemplate eFormTemplateService = SpringUtils.getBean(org.oscarehr.eform.service.EFormTemplate.class);
+
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null))
+		{
 			throw new SecurityException("missing required security object (_eform)");
 		}
-        
-        try {
-            String fid = fm.getFid();
-            String formName = fm.getFormName();
-            String formSubject = fm.getFormSubject();
-            String formFileName = fm.getFormFileName();
-            String formHtml = fm.getFormHtml();
-            boolean showLatestFormOnly = WebUtils.isChecked(request, "showLatestFormOnly");
-            boolean patientIndependent = WebUtils.isChecked(request, "patientIndependent");
-            String roleType = fm.getRoleType();
-            
-            HashMap<String, String> errors = new HashMap<String, String>();
-            EFormBase updatedform = new EFormBase(fid, formName, formSubject, formFileName, formHtml, showLatestFormOnly, patientIndependent, roleType); //property container (bean)
-            //validation...
-            if ((formName == null) || (formName.length() == 0)) {
-                errors.put("formNameMissing", "eform.errors.form_name.missing.regular");
-            }
-            if ((fid.length() > 0) && (EFormUtil.formExistsInDBn(formName, fid) > 0)) {
-                errors.put("formNameExists", "eform.errors.form_name.exists.regular");
-            }
-            if ((fid.length() == 0) && (errors.size() == 0)) {
-                fid = EFormUtil.saveEForm(formName, formSubject, formFileName, formHtml, showLatestFormOnly, patientIndependent, roleType);
-                request.setAttribute("success", "true");
-            } else if (errors.size() == 0) {
-                EFormUtil.updateEForm(updatedform);
-                request.setAttribute("success", "true");
-            }
-            
-            HashMap<String, Object> curht = createHashMap(fid, formName, formSubject, formFileName, formHtml, showLatestFormOnly, patientIndependent, roleType);
-            request.setAttribute("submitted", curht);
-            
-            request.setAttribute("errors", errors);
-        } catch (Exception e) {
-            MiscUtils.getLogger().error("Error", e);
-        }
 
-        return(mapping.findForward("success"));
-    }
-    
-    private HashMap<String, Object> createHashMap(String fid, String formName, String formSubject, String formFileName, String formHtml, boolean showLatestFormOnly, boolean patientIndependent, String roleType) {
-    	HashMap<String, Object> curht = new HashMap<String, Object>();
-        curht.put("fid", fid);  
-        curht.put("formName", formName);
-        curht.put("formSubject", formSubject);
-        curht.put("formFileName", formFileName);
-        curht.put("formHtml", formHtml);
-        curht.put("showLatestFormOnly", showLatestFormOnly);
-        curht.put("patientIndependent", patientIndependent);
-        curht.put("roleType", roleType);
-        
-        if (fid.length() == 0) {
-            curht.put("formDate", "--");
-            curht.put("formTime", "--");
-        } else {
-            curht.put("formDate", EFormUtil.getEFormParameter(fid, "formDate"));
-            curht.put("formTime", EFormUtil.getEFormParameter(fid, "formTime"));
-        }
-        return curht;
-    }
-    
+		HtmlEditForm fm = (HtmlEditForm) form;
+		try
+		{
+			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+			String creatorNo = loggedInInfo.getLoggedInProviderNo();
+
+			String fidStr = fm.getFid();
+			String formName = fm.getFormName();
+			String formSubject = fm.getFormSubject();
+			String formFileName = fm.getFormFileName();
+			String formHtml = fm.getFormHtml();
+			boolean showLatestFormOnly = WebUtils.isChecked(request, "showLatestFormOnly");
+			boolean patientIndependent = WebUtils.isChecked(request, "patientIndependent");
+			String roleType = fm.getRoleType();
+
+			boolean isNewEFormTemplate = (fidStr.length() == 0);
+
+			HashMap<String, String> errors = new HashMap<String, String>();
+			HashMap<String, Object> submittedValues;
+			//validation...
+			if((formName == null) || (formName.length() == 0))
+			{
+				errors.put("formNameMissing", "eform.errors.form_name.missing.regular");
+			}
+			if(isNewEFormTemplate && (EFormUtil.formExistsInDBn(formName, fidStr) > 0))
+			{
+				errors.put("formNameExists", "eform.errors.form_name.exists.regular");
+			}
+
+			if(errors.isEmpty())
+			{
+				EForm eFormTemplate;
+				if(isNewEFormTemplate)
+				{
+					logger.info("Created new EForm Template");
+					eFormTemplate = eFormTemplateService.addEFormTemplate(formName, formSubject, formFileName, formHtml,
+							creatorNo, showLatestFormOnly, patientIndependent, roleType);
+					LogAction.addLogEntry(creatorNo, null, LogConst.ACTION_ADD, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
+							String.valueOf(eFormTemplate.getId()), loggedInInfo.getIp(), eFormTemplate.getFormName());
+				}
+				else
+				{
+					logger.info("Update EForm Template (id: " + fidStr + ")");
+					eFormTemplate = eFormTemplateService.updateEFormTemplate(Integer.parseInt(fidStr), formName, formSubject,
+							formFileName, formHtml, creatorNo, showLatestFormOnly, patientIndependent, roleType);
+					LogAction.addLogEntry(creatorNo, null, LogConst.ACTION_UPDATE, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
+							String.valueOf(eFormTemplate.getId()), loggedInInfo.getIp(), eFormTemplate.getFormName());
+				}
+				request.setAttribute("success", "true");
+				submittedValues = createHashMap(eFormTemplate);
+			}
+			else
+			{
+				submittedValues = createHashMap(fidStr, formName, formSubject, formFileName, formHtml, showLatestFormOnly, patientIndependent, roleType, null);
+			}
+
+			request.setAttribute("submitted", submittedValues);
+			request.setAttribute("errors", errors);
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+			request.setAttribute("error", "An error occurred saving the eForm");
+			return (mapping.findForward("failure"));
+		}
+		return (mapping.findForward("success"));
+	}
+
+	private HashMap<String, Object> createHashMap(EForm eFormTemplate)
+	{
+		return createHashMap(eFormTemplate.getId().toString(),
+				eFormTemplate.getFormName(),
+				eFormTemplate.getSubject(),
+				eFormTemplate.getFileName(),
+				eFormTemplate.getFormHtml(),
+				eFormTemplate.isShowLatestFormOnly(),
+				eFormTemplate.isPatientIndependent(),
+				eFormTemplate.getRoleType(),
+				eFormTemplate.getFormDateTime());
+	}
+	private HashMap<String, Object> createHashMap(String fid, String formName, String formSubject, String formFileName, String formHtml, boolean showLatestFormOnly, boolean patientIndependent, String roleType, Date formDateTime)
+	{
+		HashMap<String, Object> curht = new HashMap<>();
+		curht.put("fid", fid);
+		curht.put("formName", formName);
+		curht.put("formSubject", formSubject);
+		curht.put("formFileName", formFileName);
+		curht.put("formHtml", formHtml);
+		curht.put("showLatestFormOnly", showLatestFormOnly);
+		curht.put("patientIndependent", patientIndependent);
+		curht.put("roleType", roleType);
+
+		if(formDateTime == null)
+		{
+			curht.put("formDate", "--");
+			curht.put("formTime", "--");
+		}
+		else
+		{
+			curht.put("formDate", ConversionUtils.toDateString(formDateTime));
+			curht.put("formTime", ConversionUtils.toTimeString(formDateTime));
+		}
+		return curht;
+	}
 }

@@ -28,18 +28,20 @@
 
 <div id="patient-search-page" ng-init="patientSearchCtrl.init()">
 
-	<div ng-show="patientSearchCtrl.demographicReadAccess">
+	<div ng-show="patientSearchCtrl.demographicReadAccess" class="col-lg-12">
 
 		<h2>
 			<bean:message key="patientsearch.title" bundle="ui"/>
 		</h2>
+		<hr>
 
-		<div class="row">
-			<div class="col-xs-6">
-				<form role="form"
-					  class="form-inline"
-					  ng-submit="patientSearchCtrl.searchPatients()">
-					<div class="form-group">
+		<form role="form"
+			  id="search-form"
+			  ng-submit="patientSearchCtrl.searchPatients()">
+			<div class="form-group">
+				<div class="row search-filters">
+					<div class="col-sm-3 col-xs-12">
+						<label>Search By</label>
 						<select ng-model="patientSearchCtrl.search.type"
 								ng-change="patientSearchCtrl.clearParams(patientSearchCtrl.search.type)"
 								class="form-control">
@@ -65,8 +67,37 @@
 								<bean:message key="patientsearch.type.demographicNo" bundle="ui"/>
 							</option>
 						</select>
-						<div class="btn-group">
+					</div>
+
+					<div class="col-sm-3 col-xs-12">
+						<label>Search Term</label>
+						<input ng-model="patientSearchCtrl.search.term"
+							   type="text"
+							   class="form-control"
+							   placeholder="{{patientSearchCtrl.searchTermPlaceHolder}}"/>
+					</div>
+
+					<div class="col-sm-3 col-xs-12">
+						<label>What to Show</label>
+						<select ng-model="patientSearchCtrl.search.status"
+								class="form-control">
+							<option value="all">
+								<bean:message key="patientsearch.showAll" bundle="ui"/>
+							</option>
+							<option value="active">
+								<bean:message key="patientsearch.showActiveOnly" bundle="ui"/>
+							</option>
+							<option value="inactive">
+								<bean:message key="patientsearch.showInactiveOnly" bundle="ui"/>
+							</option>
+						</select>
+					</div>
+
+					<div class="col-sm-2 col-xs-3">
+						<label>Options</label>
+						<div class="col-xs-12 demo-search-options">
 							<a class="btn dropdown-toggle" data-toggle="dropdown">
+								<span class="glyphicon glyphicon-cog"></span>
 								<span class="caret"></span>
 							</a>
 							<ul class="dropdown-menu">
@@ -88,51 +119,35 @@
 								</li>
 							</ul>
 						</div>
-
-						<input ng-model="patientSearchCtrl.search.term"
-							   type="text"
-							   class="form-control"
-							   placeholder="{{patientSearchCtrl.searchTermPlaceHolder}}"/>
-
-						<select ng-model="patientSearchCtrl.search.status"
-								class="form-control">
-							<option value="all">
-								<bean:message key="patientsearch.showAll" bundle="ui"/>
-							</option>
-							<option value="active">
-								<bean:message key="patientsearch.showActiveOnly" bundle="ui"/>
-							</option>
-							<option value="inactive">
-								<bean:message key="patientsearch.showInactiveOnly" bundle="ui"/>
-							</option>
-						</select>
-
+					</div>
+				</div>
+				<div class="row search-buttons">
+					<div class="col-xs-12">
 						<button class="btn btn-primary"
 								type="submit">
 							<bean:message key="global.search" bundle="ui"/>
 						</button>
-						<button class="btn"
+						<button class="btn btn-default"
 								type="button"
 								ng-click="patientSearchCtrl.clearParams()">
 							<bean:message key="global.clear" bundle="ui"/>
 						</button>
-
 					</div>
-				</form>
+				</div>
 			</div>
-			<div class="col-xs-6">
-				<button class="btn btn-warning"
-						ng-show="patientSearchCtrl.integratorResults != null && patientSearchCtrl.integratorResults.total > 0"
-						ng-click="patientSearchCtrl.showIntegratorResults()"><span
-						class="glyphicon glyphicon-exclamation-sign"></span>
-					<bean:message key="patientsearch.remoteMatches" bundle="ui"/>
-				</button>
-			</div>
+		</form>
+		<div class="col-xs-6">
+			<button class="btn btn-warning"
+					ng-show="patientSearchCtrl.integratorResults != null && patientSearchCtrl.integratorResults.total > 0"
+					ng-click="patientSearchCtrl.showIntegratorResults()"><span
+					class="glyphicon glyphicon-exclamation-sign"></span>
+				<bean:message key="patientsearch.remoteMatches" bundle="ui"/>
+			</button>
 		</div>
 
 		<table ng-table="patientSearchCtrl.tableParams"
 			   show-filter="false"
-			   class="table table-hover table-striped"
+			   class="table table-hover table-striped table-bordered"
 			   id="patient-search-table">
 			<tbody>
 			<tr ng-repeat="patient in $data"

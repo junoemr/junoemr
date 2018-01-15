@@ -35,36 +35,34 @@
 package oscar.oscarLab.ca.all.parsers;
 
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.log4j.Logger;
+import oscar.util.UtilDateUtilities;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
  *
  * @author wrighd
  */
-public class PATHL7Handler implements MessageHandler {
+public class PATHL7Handler extends MessageHandler
+{
 
     Logger logger = Logger.getLogger(PATHL7Handler.class);
-    ORU_R01 msg = null;
+    protected ORU_R01 msg;
 
-	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF");
+	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF", "BCCASMP", "BCCACSP");
 	public static final String VIHARTF = "CELLPATHR";
 
     /** Creates a new instance of CMLHandler */
@@ -75,7 +73,22 @@ public class PATHL7Handler implements MessageHandler {
         Parser p = new PipeParser();
         p.setValidationContext(new NoValidation());
         msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ).replace("\\.Zt\\", "\t"));
+        this.message = msg;
+        this.terser = new Terser(msg);
     }
+
+    @Override
+    public String preUpload(String hl7Message) throws HL7Exception
+    {
+        return hl7Message;
+    }
+    @Override
+    public boolean canUpload()
+    {
+        return true;
+    }
+    @Override
+    public void postUpload() {}
 
     public String getMsgType(){
         return("PATHL7");
@@ -89,12 +102,7 @@ public class PATHL7Handler implements MessageHandler {
      */
 
     public String getMsgDate(){
-        //try {
         return(formatDateTime(getString(msg.getMSH().getDateTimeOfMessage().getTimeOfAnEvent().getValue())));
-        //return(formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue())));
-        //} catch (HL7Exception ex) {
-        //    return ("");
-        //}
     }
 
     /*
@@ -105,14 +113,14 @@ public class PATHL7Handler implements MessageHandler {
     }
 
     public String getFirstName(){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()));
+        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName(0).getGivenName().getValue()));
     }
 
     public String getMiddleName(){
-    	return (getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getXpn3_MiddleInitialOrName().getValue()));
+    	return (getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName(0).getXpn3_MiddleInitialOrName().getValue()));
     }
     public String getLastName(){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getFamilyName().getValue()));
+        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName(0).getFamilyName().getValue()));
     }
 
     public String getDOB(){
@@ -123,22 +131,22 @@ public class PATHL7Handler implements MessageHandler {
         }
     }
 
-    public String getAge(){
-        String age = "N/A";
-        String dob = getDOB();
-        String service = getServiceDate(); 
-        try {
-            // Some examples
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date birthDate = formatter.parse(dob);
-            java.util.Date serviceDate = formatter.parse(service);
-            age = UtilDateUtilities.calcAgeAtDate(birthDate, serviceDate);
-        } catch (ParseException e) {
-            logger.error("Could not get age", e);
-
-        }
-        return age;
-    }
+    @Override
+	public String getAge(){
+		String age = "N/A";
+		String dob = getDOB();
+		String service = getServiceDate();
+		try {
+			// Some examples
+			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date birthDate = formatter.parse(dob);
+			java.util.Date serviceDate = formatter.parse(service);
+			age = UtilDateUtilities.calcAgeAtDate(birthDate, serviceDate);
+		} catch (ParseException e) {
+			logger.error("Could not get age", e);
+		}
+		return age;
+	}
 
     public String getSex(){
         return(getString(msg.getRESPONSE().getPATIENT().getPID().getSex().getValue()));
@@ -146,46 +154,6 @@ public class PATHL7Handler implements MessageHandler {
 
     public String getHealthNum(){
         return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDExternalID().getID().getValue()));
-    }
-
-    public String getHomePhone(){
-        String phone = "";
-        int i=0;
-        try{
-            while(!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue()).equals("")){
-                if (i==0){
-                    phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
-                }else{
-                    phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
-                }
-                i++;
-            }
-            return(phone);
-        }catch(Exception e){
-            logger.error("Could not return phone number", e);
-
-            return("");
-        }
-    }
-
-    public String getWorkPhone(){
-        String phone = "";
-        int i=0;
-        try{
-            while(!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue()).equals("")){
-                if (i==0){
-                    phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
-                }else{
-                    phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
-                }
-                i++;
-            }
-            return(phone);
-        }catch(Exception e){
-            logger.error("Could not return phone number", e);
-
-            return("");
-        }
     }
 
     public String getPatientLocation(){
@@ -413,37 +381,57 @@ public class PATHL7Handler implements MessageHandler {
         return count;
     }
 
-    public String getOBXIdentifier(int i, int j){
-        try{
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue()));
-        }catch(Exception e){
-            return("");
-        }
-    }
+	@Override
+	public String getOBXIdentifier(int i, int j)
+	{
+		try
+		{
+			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue()));
+		}
+		catch(Exception e)
+		{
+			return ("");
+		}
+	}
 
-    public String getOBXValueType(int i, int j){
-        try{
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getValueType().getValue()));
-        }catch(Exception e){
-            return("");
-        }
-    }
+	@Override
+	public String getOBXValueType(int i, int j)
+	{
+		try
+		{
+			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getValueType().getValue()));
+		}
+		catch(Exception e)
+		{
+			return ("");
+		}
+	}
 
-    public String getOBXName(int i, int j){
-        try{
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getText().getValue()));
-        }catch(Exception e){
-            return("");
-        }
-    }
+	@Override
+	public String getOBXName(int i, int j)
+	{
+		try
+		{
+			return (getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getText().getValue()));
+		}
+		catch(Exception e)
+		{
+			return ("");
+		}
+	}
 
-    public String getOBXResult(int i, int j){
-        try{
-            return(getString(Terser.get(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(),5,0,1,1)));
-        }catch(Exception e){
-            return("");
-        }
-    }
+	@Override
+	public String getOBXResult(int i, int j)
+	{
+		try
+		{
+			return (getString(Terser.get(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(), 5, 0, 1, 1)));
+		}
+		catch(Exception e)
+		{
+			return ("");
+		}
+	}
 
     public String getOBXReferenceRange(int i, int j){
         try{
@@ -588,51 +576,12 @@ public class PATHL7Handler implements MessageHandler {
      *  END OF PUBLIC METHODS
      */
 
-
-    private String getFullDocName(XCN docSeg){
-        String docName = "";
-
-        if(docSeg.getPrefixEgDR().getValue() != null)
-            docName = docSeg.getPrefixEgDR().getValue();
-
-        if(docSeg.getGivenName().getValue() != null){
-            if (docName.equals("")){
-                docName = docSeg.getGivenName().getValue();
-            }else{
-                docName = docName +" "+ docSeg.getGivenName().getValue();
-            }
-        }
-        if(docSeg.getMiddleInitialOrName().getValue() != null)
-            docName = docName +" "+ docSeg.getMiddleInitialOrName().getValue();
-        if(docSeg.getFamilyName().getValue() != null)
-            docName = docName +" "+ docSeg.getFamilyName().getValue();
-        if(docSeg.getSuffixEgJRorIII().getValue() != null)
-            docName = docName +" "+ docSeg.getSuffixEgJRorIII().getValue();
-        if(docSeg.getDegreeEgMD().getValue() != null)
-            docName = docName +" "+ docSeg.getDegreeEgMD().getValue();
-
-        return (docName);
-    }
-
-
-    private String formatDateTime(String plain){
-    	if (plain==null || plain.trim().equals("")) return "";
-
-        String dateFormat = "yyyyMMddHHmmss";
-        dateFormat = dateFormat.substring(0, plain.length());
-        String stringFormat = "yyyy-MM-dd HH:mm:ss";
-        stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length()-1))+1);
-
-        Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-        return UtilDateUtilities.DateToString(date, stringFormat);
-    }
-
-    private String getString(String retrieve){
-        if (retrieve != null){
-            return(retrieve.trim().replaceAll("\\\\\\.br\\\\", "<br />"));
-        }else{
-            return("");
-        }
+    @Override
+    protected String getString(String retrieve) {
+        if (retrieve != null)
+            return (retrieve.trim().replaceAll("\\\\\\.br\\\\", "<br />"));
+        else
+            return ("");
     }
 
     public String getFillerOrderNumber(){

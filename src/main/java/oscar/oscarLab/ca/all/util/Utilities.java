@@ -69,6 +69,7 @@ public class Utilities {
 		boolean firstPIDflag = false; //true if the first PID segment has been processed false otherwise
 		boolean firstMSHflag = false; //true if the first MSH segment has been processed false otherwise
 		//String mshSeg = br.readLine();
+	    boolean skipMessage = false;
 
 		StringBuilder sb = new StringBuilder();
 		String mshSeg = "";
@@ -79,7 +80,19 @@ public class Utilities {
 				if (line.substring(0, 3).equals("BHS")) {
 					continue;
 				}
+				if(!line.substring(0, 3).equals("MSH") && skipMessage)
+					continue;
 				if (line.substring(0, 3).equals("MSH")){
+					if(line.contains("ORU"))
+					{
+						skipMessage = false;
+					}
+					else
+					{
+						// skip any messages that are not ORU^R01
+						skipMessage = true;
+						continue;
+					}
 					if (firstMSHflag){
 						messages.add(sb.toString());
 						sb.delete(0, sb.length());

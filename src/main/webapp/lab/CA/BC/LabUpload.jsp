@@ -45,7 +45,6 @@ if(!authed) {
   String demographic_no = request.getParameter("demographic_no"); 
 %>
 
-<%@page import="oscar.oscarDemographic.data.*,java.util.*"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 

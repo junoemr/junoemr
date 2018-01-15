@@ -23,20 +23,8 @@
  */
 package oscar.oscarLab.ca.all.parsers;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-
-import org.apache.log4j.Logger;
-
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
-import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.OBR;
 import ca.uhn.hl7v2.model.v23.segment.OBX;
@@ -44,13 +32,23 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.log4j.Logger;
+import oscar.util.UtilDateUtilities;
 
-public class TRUENORTHHandler implements MessageHandler {
-    Logger logger = Logger.getLogger(TRUENORTHHandler.class);	
-	ORU_R01 msg = null;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
+public class TRUENORTHHandler extends MessageHandler
+{
+    Logger logger = Logger.getLogger(TRUENORTHHandler.class);
     ArrayList<String> headers = null;
     HashMap<OBR, ArrayList<OBX>> obrSegMap = null;
     ArrayList<OBR> obrSegKeySet = null;
+    protected ORU_R01 msg;
     
     public TRUENORTHHandler() {
     }
@@ -97,9 +95,23 @@ public class TRUENORTHHandler implements MessageHandler {
 			if (!headers.contains(header)) {
 				headers.add(header);
 			}
-		}     
-
+		}
+        this.message = msg;
+        this.terser = new Terser(msg);
     }
+
+    @Override
+    public String preUpload(String hl7Message) throws HL7Exception
+    {
+        return hl7Message;
+    }
+    @Override
+    public boolean canUpload()
+    {
+        return true;
+    }
+    @Override
+    public void postUpload() {}
     
     public String getMsgType(){
     	return "TRUENORTH";
@@ -445,7 +457,7 @@ public class TRUENORTHHandler implements MessageHandler {
     }
     
     private String getFirstName(ORU_R01 msg){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()));
+        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName(0).getGivenName().getValue()));
     }
 
     public String getLastName(){
@@ -453,7 +465,7 @@ public class TRUENORTHHandler implements MessageHandler {
     }
     
     private String getLastName(ORU_R01 msg){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getFamilyName().getValue()));
+        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName(0).getFamilyName().getValue()));
     }
 
     public String getDOB(){
@@ -465,6 +477,7 @@ public class TRUENORTHHandler implements MessageHandler {
         }
     }
 
+    @Override
     public String getAge(){
         String age = "N/A";
         String dob = getDOB();
@@ -490,12 +503,7 @@ public class TRUENORTHHandler implements MessageHandler {
     }
     	
     private String getHealthNum(ORU_R01 msg){
-        try {
-	        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalID(0).getID().getValue()));
-        } catch (HL7Exception e) {
-        	logger.error("Could not get hin", e);
-        	return "";
-        }
+        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalID(0).getID().getValue()));
     }
 
     public String getServiceDate(){
@@ -629,50 +637,6 @@ public class TRUENORTHHandler implements MessageHandler {
     public String audit(){
         return "";
     }
-
-    private String getFullDocName(XCN docSeg){
-        String docName = "";
-
-        if(docSeg.getPrefixEgDR().getValue() != null)
-            docName = docSeg.getPrefixEgDR().getValue();
-
-        if(docSeg.getGivenName().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getGivenName().getValue();
-            else
-                docName = docName +" "+ docSeg.getGivenName().getValue();
-
-        }
-        if(docSeg.getMiddleInitialOrName().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getMiddleInitialOrName().getValue();
-            else
-                docName = docName +" "+ docSeg.getMiddleInitialOrName().getValue();
-
-        }
-        if(docSeg.getFamilyName().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getFamilyName().getValue();
-            else
-                docName = docName +" "+ docSeg.getFamilyName().getValue();
-
-        }
-        if(docSeg.getSuffixEgJRorIII().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getSuffixEgJRorIII().getValue();
-            else
-                docName = docName +" "+ docSeg.getSuffixEgJRorIII().getValue();
-        }
-        if(docSeg.getDegreeEgMD().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getDegreeEgMD().getValue();
-            else
-                docName = docName +" "+ docSeg.getDegreeEgMD().getValue();
-        }
-
-        return (docName);
-    }
-    
     
     public String getFillerOrderNumber(){
 		return "";
@@ -689,26 +653,7 @@ public class TRUENORTHHandler implements MessageHandler {
 
     	return "";
     }
-    
-    private String formatDateTime(String plain){
-    	if (plain==null || plain.trim().equals("")) return "";
 
-        String dateFormat = "yyyyMMddHHmmss";
-        dateFormat = dateFormat.substring(0, plain.length());
-        String stringFormat = "yyyy-MM-dd HH:mm:ss";
-        stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length()-1))+1);
-
-        Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-        return UtilDateUtilities.DateToString(date, stringFormat);
-    }
-
-    private String getString(String retrieve){
-        if (retrieve != null){
-            return(retrieve.trim());
-        }else{
-            return("");
-        }
-    }
 
 	@Override
     public String getHomePhone() {
