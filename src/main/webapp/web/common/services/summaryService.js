@@ -109,6 +109,25 @@ angular.module("Common.Services").service("summaryService", [
 			return deferred.promise;
 		};
 
+		service.getSocialHistory = function getSocialHistory(demographicNo)
+		{
+			var deferred = $q.defer();
+
+			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
+				'/getSocialHistory').then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("summaryService::getSocialHistory error", errors);
+					deferred.reject("An error occurred while fetching social history");
+				});
+
+			return deferred.promise;
+		};
+
 		service.getOngoingConcerns = function(demographicNo)
 		{
 			var deferred = $q.defer();

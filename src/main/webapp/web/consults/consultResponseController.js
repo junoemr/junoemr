@@ -179,10 +179,13 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			summaryService.getFamilyHistory(consult.demographic.demographicNo).then(
 				function success(results)
 				{
+					if(results.summaryItem.length === 0)
+						alert("No family history");
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
+					alert("Error grabbing family history!");
 					console.log(errors);
 				});
 		};
@@ -191,10 +194,28 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			summaryService.getMedicalHistory(consult.demographic.demographicNo).then(
 				function success(results)
 				{
+					if(results.summaryItem.length === 0)
+						alert("No medical history");
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
+					alert("Error grabbing medical history!");
+					console.log(errors);
+				});
+		};
+		controller.getSocialHistory = function getSocialHistory(boxId)
+		{
+			summaryService.getSocialHistory(consult.demographic.demographicNo).then(
+				function success(results)
+				{
+					if(results.summaryItem.length === 0)
+						alert("No social history");
+					controller.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					alert("Error grabbing social history!");
 					console.log(errors);
 				});
 		};
@@ -203,10 +224,13 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			summaryService.getOngoingConcerns(consult.demographic.demographicNo).then(
 				function success(results)
 				{
+					if(results.summaryItem.length === 0)
+						alert("No ongoing concerns");
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
+					alert("Error grabbing ongoing concerns!");
 					console.log(errors);
 				});
 		};
@@ -215,10 +239,13 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			summaryService.getOtherMeds(consult.demographic.demographicNo).then(
 				function success(results)
 				{
+					if(results.summaryItem.length === 0)
+						alert("No other meds");
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
+					alert("Error grabbing other meds!");
 					console.log(errors);
 				});
 		};
@@ -227,10 +254,13 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			summaryService.getReminders(consult.demographic.demographicNo).then(
 				function success(results)
 				{
+					if(results.summaryItem.length === 0)
+						alert("No reminders");
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
+					alert("Error grabbing reminders!");
 					console.log(errors);
 				});
 		};
