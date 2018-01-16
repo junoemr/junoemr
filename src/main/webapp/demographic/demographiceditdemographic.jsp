@@ -2503,7 +2503,7 @@ if ( Dead.equals(PatStat) ) {%>
 								<td align="left" nowrap><input type="text"
 									name="year_of_birth" <%=getDisabled("year_of_birth")%>
 									value="<%=birthYear%>"
-									size="3" maxlength="4"> 
+									size="4" maxlength="4">
 
 									<% 
 									String sbMonth;

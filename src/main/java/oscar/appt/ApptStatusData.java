@@ -55,13 +55,13 @@ public final class ApptStatusData {
 	private AppointmentStatus statusData;
 	private List<AppointmentStatus> allStatus;
 
-	public ApptStatusData() {}
-
-
+	public ApptStatusData() {
+		setTitleMap();
+		setAllStatus();
+	}
 	public ApptStatusData(String status) {
 		setTitleMap();
 		setApptStatus(status);
-		setThisStatus();
 		setAllStatus();
 	}
 
@@ -81,11 +81,16 @@ public final class ApptStatusData {
 	}
 
 	private void setThisStatus() {
-		statusData = apptManager.findByStatus(apptStatus);
+		// assume apptStatus not null
+		// use only the first character in the status since second character denotes Signed/Verified etc.
+		// and is not included in the appointment_status table
+		String baseStatus = apptStatus.substring(0, 1);
+		statusData = apptManager.findByStatus(baseStatus);
 	}
 
 	public void setApptStatus(String status) {
 		apptStatus = status;
+		setThisStatus();
 	}
 
 

@@ -28,13 +28,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.EFormDao;
-import org.oscarehr.common.dao.EFormDataDao;
+import org.oscarehr.eform.dao.EFormDao;
+import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.common.dao.EFormReportToolDao;
-import org.oscarehr.common.dao.EFormValueDao;
-import org.oscarehr.common.model.EForm;
+import org.oscarehr.eform.dao.EFormValueDao;
+import org.oscarehr.eform.model.EForm;
 import org.oscarehr.common.model.EFormReportTool;
-import org.oscarehr.common.model.EFormValue;
+import org.oscarehr.eform.model.EFormValue;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;

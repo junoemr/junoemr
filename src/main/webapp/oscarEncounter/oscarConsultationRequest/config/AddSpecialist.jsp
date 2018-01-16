@@ -24,7 +24,7 @@
 
 --%>
 
-<%@page import="org.oscarehr.common.dao.EFormDao"%>
+<%@page import="org.oscarehr.eform.dao.EFormDao"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -57,7 +57,7 @@ if(!authed) {
 <%@page import="org.oscarehr.common.model.InstitutionDepartment" %>
 <%@page import="org.oscarehr.common.dao.DepartmentDao" %>
 <%@page import="org.oscarehr.common.model.Department" %>
-<%@page import="org.oscarehr.common.model.EForm" %>
+<%@page import="org.oscarehr.eform.model.EForm" %>
 
 <%
 	InstitutionDao institutionDao = SpringUtils.getBean(InstitutionDao.class);
