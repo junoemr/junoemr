@@ -139,7 +139,7 @@ public class FormsService extends AbstractServiceImpl {
 		response.setContent(new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(),formsManager.findByStatus(getLoggedInInfo(), true, EFormSortOrder.NAME)));
 		response.setTotal(response.getContent().size());
 		return response;
-		
+
 	}
 	
 	@GET
@@ -161,15 +161,14 @@ public class FormsService extends AbstractServiceImpl {
 		response.setContent(new EncounterFormConverter().getAllAsTransferObjects(getLoggedInInfo(),formsManager.getSelectedEncounterForms()));
 		response.setTotal(response.getContent().size());
 		return response;
-		
+
 	}
 	
 		
 	@GET
 	@Path("/{demographicNo}/completedEncounterForms")
 	@Produces("application/json")
-	public AbstractSearchResponse<FormTo1> getCompletedFormNames(@PathParam("demographicNo") String demographicNo){
-		AbstractSearchResponse<FormTo1> response = new AbstractSearchResponse<FormTo1>();
+	public RestResponse<List<FormTo1>,String> getCompletedFormNames(@PathParam("demographicNo") String demographicNo){
 		List<FormTo1> formList = new ArrayList<FormTo1>();
 
 		List<EncounterForm> encounterForms = formsManager.getAllEncounterForms();
@@ -205,9 +204,7 @@ public class FormsService extends AbstractServiceImpl {
 			}
 		}
 
-		response.setContent(formList);
-		response.setTotal(response.getContent().size());
-		return response;
+		return RestResponse.successResponse(formList);
 	}
 	
 	@GET
@@ -219,7 +216,7 @@ public class FormsService extends AbstractServiceImpl {
 		response.setContent(formsManager.getGroupNames());
 		response.setTotal(response.getContent().size());
 		return response;
-		
+
 	}
 	
 	@GET

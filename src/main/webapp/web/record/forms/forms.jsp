@@ -75,7 +75,7 @@
 			</li>
 
 			<li class="list-group-item"	
-				ng-repeat="formItem2 in formCtrl.page.encounterFormlist[formCtrl.page.currentlistId].content | filter:formCtrl.filterFormsQ" 
+				ng-repeat="formItem2 in formCtrl.page.encounterFormlist[formCtrl.page.currentlistId] | filter:formCtrl.filterFormsQ"
 				ng-hide="formCtrl.page.currentlistId==1">
 				<a class="list-group-item-text hand-hover" ng-click="formCtrl.viewFormState(formItem2,1)">{{formItem2.name}}</a>
 			</li>
