@@ -40,7 +40,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 
 @Path("/eforms")
@@ -97,7 +96,6 @@ public class EFormsService extends AbstractServiceImpl
 		{
 			EFormLoader loader = EFormLoader.getInstance();
 			dbTagList = loader.getNames();
-			Collections.sort(dbTagList);
 		}
 		catch(Exception e)
 		{
