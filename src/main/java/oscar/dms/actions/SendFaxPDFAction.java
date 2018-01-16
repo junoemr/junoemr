@@ -62,9 +62,7 @@ public class SendFaxPDFAction extends DispatchAction {
     public ActionForward faxDocument(ActionMapping mapping, ActionForm form,
 		HttpServletRequest request, HttpServletResponse response) 
 	{
-		OscarProperties props = OscarProperties.getInstance();
-
-		if (!(props.isPropertyActive("faxEnable") && props.isPropertyActive("document_fax_enabled")))
+		if (!OscarProperties.getInstance().isDocumentFaxEnabled())
 		{
 			return mapping.findForward("failed");
 		}
@@ -93,7 +91,7 @@ public class SendFaxPDFAction extends DispatchAction {
             for (int i =0 ; i < docNoArray.length ; i++)
 			{
 				String docNo = docNoArray[i];
-				String path = props.getProperty("DOCUMENT_DIR");
+				String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 				String filename =  docData.getDocumentName(docNo);
 				String faxPdf = path + filename;
 
@@ -117,7 +115,8 @@ public class SendFaxPDFAction extends DispatchAction {
 					}
 
 					/* -- OHSUPPORT-2932 -- */
-					if(props.isPropertyActive("encounter_notes_add_fax_notes_consult") && demoNo != "-1")
+					if(OscarProperties.getInstance().isPropertyActive(
+						"encounter_notes_add_fax_notes_consult") && demoNo != "-1")
 					{
 						MiscUtils.getLogger().info("SAVING NOTE FOR " + demoNo);
 						String programNo = 
@@ -140,9 +139,7 @@ public class SendFaxPDFAction extends DispatchAction {
 	public ActionForward faxForm(ActionMapping mapping, ActionForm form,
 								 HttpServletRequest request, HttpServletResponse response)
 	{
-		OscarProperties props = OscarProperties.getInstance();
-
-		if (!(props.isPropertyActive("faxEnable") && props.isPropertyActive("form_fax_enabled")))
+		if (!OscarProperties.getInstance().isFormFaxEnabled())
 		{
 			return mapping.findForward("failed");
 		}

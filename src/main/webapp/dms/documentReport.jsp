@@ -621,7 +621,7 @@ function popup1(height, width, url, windowName){
         onClick="window.print()"> <input type="button"
         value="<bean:message key="dms.documentReport.btnCombinePDF"/>"
         onclick="return submitForm('<rewrite:reWrite jspPage="combinePDFs.do"/>');" />
-				<% if (props.isPropertyActive("faxEnable") && props.isPropertyActive("document_fax_enabled")) { %>
+				<% if (props.isDocumentFaxEnabled()) { %>
 				<input type="button"
 					value="<bean:message key="dms.documentReport.btnFaxPDF"/>"
 					onclick="return newWindowForm('<rewrite:reWrite jspPage="faxPDFs.do"/>');" />

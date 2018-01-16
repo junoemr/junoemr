@@ -18,7 +18,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
+<% oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance(); %>
 
 <%
 	String formClass = "BCAR";
@@ -833,7 +833,7 @@ function calToday(field) {
             <input type="submit" value="Exit" onclick="javascript:return onExit();"/>
             <input type="submit" value="Print" onclick="javascript:return onPrint();"/>
 			<%
-				if (oscarVariables.isPropertyActive("faxEnable") && oscarVariables.isPropertyActive("form_fax_enabled"))
+				if (oscarProperties.isFormFaxEnabled())
 				{
 			%>
 			<input type="button" value="Fax"
@@ -880,7 +880,7 @@ function calToday(field) {
   <table width="100%" border="1"  cellspacing="0" cellpadding="0">
     <tr>
       <td width="50%"><b>14.</b> HOSPITAL<br>
-      <input type="text" name="c_hospital" <%=oscarVariables.getProperty("BCAR_hospital")==null? " ": ("class=\"spe\" onDblClick='showDef(\""+oscarVariables.getProperty("BCAR_hospital")+"\", this);'") %> style="width:100%" size="30" maxlength="60" value="<%= props.getProperty("c_hospital", "") %>" />
+      <input type="text" name="c_hospital" <%=oscarProperties.getProperty("BCAR_hospital")==null? " ": ("class=\"spe\" onDblClick='showDef(\""+ oscarProperties.getProperty("BCAR_hospital")+"\", this);'") %> style="width:100%" size="30" maxlength="60" value="<%= props.getProperty("c_hospital", "") %>" />
       </td>
 	  <td width="50%">INTENDED PLACE OF BIRTH<br>
       <input type="text" name="ar2_inBirthPlace" class="spe" onDblClick="showPGBox('BirthPlacediv',1, this, event, 'ar2_inBirthPlace', 300, 80, 26);" style="width:100%" size="40" maxlength="60" value="<%= props.getProperty("ar2_inBirthPlace", "") %>" @oscar.formDB />
@@ -1819,7 +1819,7 @@ function calToday(field) {
             <input type="submit" value="Exit" onclick="javascript:return onExit();"/>
             <input type="submit" value="Print" onclick="javascript:return onPrint();"/>
 			<%
-				if (oscarVariables.isPropertyActive("faxEnable") && oscarVariables.isPropertyActive("form_fax_enabled"))
+				if (oscarProperties.isFormFaxEnabled())
 				{
 			%>
 			<input type="button" value="Fax"

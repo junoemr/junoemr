@@ -43,7 +43,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
+<% oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance(); %>
 
 <%
 String formClass = "BCAR2007";
@@ -905,7 +905,7 @@ function calcAgeAtEDD(){
 				<input type="submit" style="width: 75px;" value="Print All"
 				onclick="javascript:return onPrintAll();" />
 				<%
-					if (oscarVariables.isPropertyActive("faxEnable") && oscarVariables.isPropertyActive("form_fax_enabled"))
+					if (oscarProperties.isFormFaxEnabled())
 					{
 				%>
 				<input type="button" value="Fax All"
@@ -954,7 +954,7 @@ function calcAgeAtEDD(){
 					<td width="30%"><b>1.</b> Hospital<br>
 					<input type="text" name="c_hospital" id="c_hospital" class="spe"
 						onDblClick="showHideBox('Hospdiv',1);"
-						<%=oscarVariables.getProperty("BCAR_hospital")==null? " ": ("class=\"spe\" onDblClick='showDef(\""+oscarVariables.getProperty("BCAR_hospital")+"\", this);'") %>
+						<%=oscarProperties.getProperty("BCAR_hospital")==null? " ": ("class=\"spe\" onDblClick='showDef(\""+ oscarProperties.getProperty("BCAR_hospital")+"\", this);'") %>
 						style="width: 100%" size="30" maxlength="60"
 						value="<%= props.getProperty("c_hospital", "") %>" @oscar.formDB />
 					</td>
@@ -2264,7 +2264,7 @@ function calcAgeAtEDD(){
             <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
             <input type="submit" style="width:75px;" value="Print All" onclick="javascript:return onPrintAll();"/>
 			<%
-				if (oscarVariables.isPropertyActive("faxEnable") && oscarVariables.isPropertyActive("form_fax_enabled"))
+				if (oscarProperties.isFormFaxEnabled())
 				{
 			%>
 			<input type="button" value="Fax All"
