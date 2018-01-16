@@ -121,3 +121,76 @@ Oscar.ShowDocument.setupProviderAutoCompletion = function setupProviderAutoCompl
 		}
 	});
 };
+Oscar.ShowDocument.checkObservationDate = function checkObservationDate(formId)
+{
+	var formElem = document.getElementById(formId);
+	var dateElem = formElem.elements["observationDate"];
+
+	if (!Oscar.Util.Common.validateInputNotEmpty(dateElem))
+	{
+		alert("Blank Date.");
+		dateElem.focus();
+		return false;
+	}
+
+	if (!Oscar.Util.Date.validateDateInput(dateElem))
+	{
+		alert("Invalid date format: " + dateElem.value);
+		dateElem.focus();
+		return false;
+	}
+	return true;
+};
+Oscar.ShowDocument.updateDocument = function updateDocument(eleId)
+{
+	var url="../dms/ManageDocument.do",
+		data=$(eleId).serialize(true);
+	new Ajax.Request(url, {
+		method:'post',
+		parameters:data,
+		onSuccess: function (transport)
+		{
+			var json = transport.responseText.evalJSON();
+			var patientId;
+			if (json != null)
+			{
+				patientId = json.patientId;
+
+				var ar = eleId.split("_");
+				var num = ar[1];
+				num = num.replace(/\s/g, '');
+				$("saveSucessMsg_" + num).show();
+				$('saved' + num).value = 'true';
+				$("msgBtn_" + num).onclick = function ()
+				{
+					popup(700, 960, contextpath + '/oscarMessenger/SendDemoMessage.do?demographic_no=' + patientId, 'msg');
+				};
+
+				Oscar.ShowDocument.updateDocStatusInQueue(num);
+				var success = updateGlobalDataAndSideNav(num, patientId);
+
+				if (success)
+				{
+					success = updatePatientDocLabNav(num, patientId);
+					if (success)
+					{
+						//disable demo input
+						$('autocompletedemo' + num).disabled = true;
+					}
+				}
+			}
+		}
+	});
+	return false;
+};
+//change status of queue document link row to I=inactive
+Oscar.ShowDocument.updateDocStatusInQueue = function updateDocStatusInQueue(docid)
+{
+	var url="../dms/inboxManage.do",
+		data="docid="+docid+"&method=updateDocStatusInQueue";
+	new Ajax.Request(url,{
+		method:'post',
+		parameters:data,
+		onSuccess:function(transport){}
+	});
+};

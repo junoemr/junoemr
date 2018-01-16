@@ -191,7 +191,7 @@
                                 </tr>
                             </table>
 
-                            <form id="forms_<%=docId%>" onsubmit="return checkObservationDate(this.id) && updateDocument(this.id);" >
+                            <form id="forms_<%=docId%>" onsubmit="return checkObservationDate(this.id) && Oscar.ShowDocument.updateDocument(this.id);" >
                                 <input type="hidden" name="method" value="documentUpdate" />
                                 <input type="hidden" name="documentId" value="<%=docId%>" />
                                 <input type="hidden" name="providerNo" value="<%=providerNo%>" />

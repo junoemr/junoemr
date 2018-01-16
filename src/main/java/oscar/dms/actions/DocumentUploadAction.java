@@ -66,7 +66,7 @@ public class DocumentUploadAction extends DispatchAction
 		}
 		logger.info("BEGIN DOCUMENT UPLOAD");
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		FormFile docFile = fm.getFiledata();
 		String destination = request.getParameter("destination");
 		java.util.Locale locale = (java.util.Locale) request.getSession().getAttribute(org.apache.struts.Globals.LOCALE_KEY);
@@ -90,7 +90,7 @@ public class DocumentUploadAction extends DispatchAction
 		catch(IOException e)
 		{
 			logger.error("Document Upload Error", e);
-			map.put("error", 4);
+			map.put("error", 6);
 		}
 		catch(RuntimeException e)
 		{

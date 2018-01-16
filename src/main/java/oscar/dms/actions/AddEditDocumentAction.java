@@ -47,7 +47,6 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.DocumentStorage;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.SecRole;
-import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -77,7 +76,6 @@ import java.util.ResourceBundle;
 public class AddEditDocumentAction extends DispatchAction {
 
 	private static Logger logger = MiscUtils.getLogger();
-	private static final DocumentDao documentDao = (DocumentDao) SpringUtils.getBean("documentDao");
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	private org.oscarehr.document.service.Document documentService = SpringUtils.getBean(org.oscarehr.document.service.Document.class);
@@ -406,7 +404,7 @@ public class AddEditDocumentAction extends DispatchAction {
 			throw new SecurityException("missing required security object (_edoc)");
 		}
 
-		HashMap<String, String> errors = new HashMap<String, String>();
+		HashMap<String, String> errors = new HashMap<>();
 		boolean documentValid = true;
 
 		try {
