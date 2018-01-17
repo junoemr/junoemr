@@ -39,7 +39,15 @@ import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
 import org.oscarehr.billing.CA.BC.dao.Hl7MshDao;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicLabResult;
 import org.oscarehr.caisi_integrator.ws.DemographicWs;
-import org.oscarehr.common.dao.*;
+import org.oscarehr.common.dao.CtlDocumentDao;
+import org.oscarehr.common.dao.DocumentResultsDao;
+import org.oscarehr.common.dao.Hl7TextMessageDao;
+import org.oscarehr.common.dao.LabPatientPhysicianInfoDao;
+import org.oscarehr.common.dao.MdsMSHDao;
+import org.oscarehr.common.dao.PatientLabRoutingDao;
+import org.oscarehr.common.dao.ProviderLabRoutingDao;
+import org.oscarehr.common.dao.QueueDocumentLinkDao;
+import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.model.CtlDocument;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.Provider;
@@ -352,8 +360,8 @@ public class CommonLabResultData {
 		return labs;
 	}
 
-	public static boolean updateReportStatus(int labNo, String providerNo, char status, String comment, String labType) {
-
+	public static boolean updateReportStatus(int labNo, String providerNo, char charStatus, String comment, String labType) {
+		String status = String.valueOf(charStatus);
 		try {
 			DBPreparedHandler db = new DBPreparedHandler();
 			// handles the case where this provider/lab combination is not already in providerLabRouting table
@@ -364,12 +372,12 @@ public class CommonLabResultData {
 			while (rs.next()) {
 				empty = false;
 				String id = oscar.Misc.getString(rs, "id");
-				if (!oscar.Misc.getString(rs, "status").equals("A")) {
+				if (!oscar.Misc.getString(rs, "status").equals(CtlDocument.ACK_STATUS)) {
 					ProviderLabRoutingModel plr  = providerLabRoutingDao.find(Integer.parseInt(id));
 					if(plr != null) {
 						plr.setStatus(""+status);
 						//we don't want to clobber existing comments when filing labs
-						if( status != 'F' ) {
+						if( !status.equals(CtlDocument.FILED_STATUS) ) {
 							plr.setComment(comment);
 						}
 						plr.setTimestamp(new Date());
@@ -388,28 +396,28 @@ public class CommonLabResultData {
 				providerLabRoutingDao.persist(p);
 			}
 
-			if (!"0".equals(providerNo)) {
+			if (!NOT_ASSIGNED_PROVIDER_NO.equals(providerNo)) {
 				ProviderLabRoutingDao dao = SpringUtils.getBean(ProviderLabRoutingDao.class);
 				List<ProviderLabRoutingModel> modelRecords = dao.findByLabNoAndLabTypeAndProviderNo(labNo, labType, providerNo);
 				ArchiveDeletedRecords adr = new ArchiveDeletedRecords();
 				adr.recordRowsToBeDeleted(modelRecords, "" + providerNo, "providerLabRouting");
 				
-				for(ProviderLabRoutingModel plr : providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labNo, labType, "0")) {
+				for(ProviderLabRoutingModel plr : providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labNo, labType, NOT_ASSIGNED_PROVIDER_NO)) {
 					providerLabRoutingDao.remove(plr.getId());
 				}
 			}
 
 			// If we updated the status to X, then we want to see if all other statuses for the labNo are also X.
 			// If they are then there are no more providers associated with the document, so move the document to the unclaimed inbox
-			if (status == 'X')
+			if (status.equals(CtlDocument.ARCHIVED_STATUS))
 			{
 				ProviderInboxRoutingDao providerInboxRoutingDao = SpringUtils.getBean(ProviderInboxRoutingDao.class);
 				List<ProviderLabRoutingModel> allDocsWithLabNo = providerLabRoutingDao.getProviderLabRoutingDocuments(labNo);
-				List<ProviderLabRoutingModel> docsWithStatusX = providerLabRoutingDao.findByStatusANDLabNoType(labNo, labType, "X");
+				List<ProviderLabRoutingModel> docsWithStatusX = providerLabRoutingDao.findByStatusANDLabNoType(labNo, labType, CtlDocument.ARCHIVED_STATUS);
 
 				if (allDocsWithLabNo.size() == docsWithStatusX.size())
 				{
-					providerInboxRoutingDao.addToProviderInbox("0", labNo, labType);
+					providerInboxRoutingDao.addToProviderInbox(NOT_ASSIGNED_PROVIDER_NO, labNo, labType);
 				}
 			}
 

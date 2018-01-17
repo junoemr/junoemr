@@ -34,6 +34,10 @@ public class CtlDocument extends AbstractModel<CtlDocumentPK> {
 	
 	public static final String MODULE_DEMOGRAPHIC = "demographic";
 	public static final String MODULE_PROVIDER = "provider";
+	public static final String ARCHIVED_STATUS = "X";
+	public static final String NEW_STATUS = "N";
+	public static final String ACK_STATUS = "A";
+	public static final String FILED_STATUS = "F";
 
 	@EmbeddedId
 	private CtlDocumentPK id;
