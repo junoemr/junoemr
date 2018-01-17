@@ -910,7 +910,8 @@ if(wLReadonly.equals("")){
 					if ("CLINICAID".equals(billRegion)) 
 					{
 						%>
-							<a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">
+							<a href="../billing.do?billRegion=CLINICAID&action=invoice_reports&patient_remote_id=<%=demographic.getDemographicNo()%>"
+							   target="_blank">
 							<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/>
 							</a>
 						<%
