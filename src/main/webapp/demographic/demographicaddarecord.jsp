@@ -38,33 +38,37 @@
 	}
 %>
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="java.util.*, java.net.URLEncoder, oscar.MyDateFormat, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
-<%@ page import="oscar.log.*"%>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.oscarehr.PMmodule.service.AdmissionManager, org.oscarehr.PMmodule.service.ProgramManager, org.oscarehr.PMmodule.web.GenericIntakeEditAction, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
+<%@ page import="org.oscarehr.common.dao.DemographicArchiveDao"%>
+<%@ page import="org.oscarehr.common.dao.DemographicCustDao" %>
+<%@ page import="org.oscarehr.common.dao.DemographicDao"%>
 
-<%@ page import="oscar.oscarWaitingList.util.WLWaitingListUtil" %>
+<%@ page import="org.oscarehr.common.dao.DemographicExtArchiveDao" %>
 
-<%@ page import="org.oscarehr.common.model.DemographicExt" %>
 <%@ page import="org.oscarehr.common.dao.DemographicExtDao" %>
+<%@ page import="org.oscarehr.common.model.ConsentType" %>
 
 <%@ page import="org.oscarehr.common.model.Demographic" %>
-<%@ page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@ page import="org.oscarehr.common.model.DemographicCust" %>
-<%@ page import="org.oscarehr.common.dao.DemographicCustDao" %>
-
-<%@page import="org.oscarehr.PMmodule.web.GenericIntakeEditAction" %>
-<%@page import="org.oscarehr.PMmodule.service.ProgramManager" %>
-<%@page import="org.oscarehr.PMmodule.service.AdmissionManager" %>
-
-<%@page import="org.oscarehr.common.dao.DemographicArchiveDao" %>
-<%@page import="org.oscarehr.common.dao.DemographicExtArchiveDao" %>
-<%@page import="org.oscarehr.common.model.DemographicExtArchive" %>
+<%@ page import="org.oscarehr.common.model.DemographicExt" %>
+<%@ page import="org.oscarehr.common.model.DemographicExtArchive" %>
 
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
-<%@page import="org.oscarehr.common.model.ConsentType" %>
+<%@page import="org.oscarehr.provider.service.ProviderRecentDemographicAccessService" %>
+<%@page import="org.oscarehr.util.LoggedInInfo" %>
+
+<%@page import="org.oscarehr.util.SpringUtils" %>
+<%@page import="oscar.MyDateFormat" %>
 <%@page import="oscar.OscarProperties" %>
+
+<%@page import="oscar.log.LogAction" %>
+<%@page import="oscar.log.LogConst" %>
+<%@page import="oscar.oscarWaitingList.util.WLWaitingListUtil" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.util.HashSet" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Set" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -81,6 +85,8 @@
 
 	DemographicExtArchiveDao demographicExtArchiveDao = SpringUtils.getBean(DemographicExtArchiveDao.class);
 	DemographicArchiveDao demographicArchiveDao = (DemographicArchiveDao)SpringUtils.getBean("demographicArchiveDao");
+
+	ProviderRecentDemographicAccessService providerRecentDemographicAccessService = SpringUtils.getBean(ProviderRecentDemographicAccessService.class);
 		
 %>
 
@@ -203,12 +209,11 @@
         hinDupCheckException = true;
      }
 
-    if(request.getParameter("hin")!=null && request.getParameter("hin").length()>5 && !hinDupCheckException) {
+	String paramNameHin = request.getParameter("hin");
+    if(paramNameHin!=null && paramNameHin.length()>5 && !hinDupCheckException) {
   		//oscar.oscarBilling.ca.on.data.BillingONDataHelp dbObj = new oscar.oscarBilling.ca.on.data.BillingONDataHelp();
 		//String sql = "select demographic_no from demographic where hin=? and year_of_birth=? and month_of_birth=? and date_of_birth=?";
-		String paramNameHin =new String();
-		paramNameHin=request.getParameter("hin").trim();
-		List<Demographic> demographics = demographicDao.searchByHealthCard(paramNameHin);
+		List<Demographic> demographics = demographicDao.searchByHealthCard(paramNameHin.trim());
 		if(demographics.size()>0){ 
 %>
 		***<font color='red'><bean:message key="demographic.demographicaddarecord.msgDuplicatedHIN" /></font>***<br><br>
@@ -315,6 +320,7 @@
 		// add log
 		String ip = request.getRemoteAddr();
 		LogAction.addLogEntry(curUser_no, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, param2[0], ip);
+		providerRecentDemographicAccessService.updateAccessRecord(Integer.parseInt(curUser_no), demographic.getDemographicNo());
 
 		//archive the original too
 		Long archiveId = demographicArchiveDao.archiveRecord(demographicDao.getDemographic(dem));

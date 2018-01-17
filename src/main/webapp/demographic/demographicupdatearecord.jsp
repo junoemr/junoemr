@@ -52,21 +52,22 @@
 <%@page import="org.oscarehr.managers.DemographicManager" %>
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
 <%@page import="org.oscarehr.provider.model.ProviderPreventionManager" %>
+<%@page import="org.oscarehr.provider.service.ProviderRecentDemographicAccessService" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
-<%@page import="org.oscarehr.util.MiscUtils" %>
 
-<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 
+<%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="oscar.MyDateFormat" %>
-<%@page import="oscar.OscarProperties" %>
 
-<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.OscarProperties" %>
+<%@page import="oscar.log.LogAction" %>
 <%@page import="oscar.log.LogConst" %>
 <%@page import="oscar.oscarWaitingList.util.WLWaitingListUtil" %>
 <%@page import="java.util.ArrayList" %>
 <%@page import="java.util.HashSet" %>
 <%@page import="java.util.List" %>
-<%@page import="java.util.Set" %>
+<%@ page import="java.util.Set" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -80,6 +81,7 @@
 	DemographicArchiveDao demographicArchiveDao = (DemographicArchiveDao)SpringUtils.getBean("demographicArchiveDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 	DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+	ProviderRecentDemographicAccessService providerRecentDemographicAccessService = SpringUtils.getBean(ProviderRecentDemographicAccessService.class);
 	
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 	
@@ -444,6 +446,7 @@
 	prevMgr.removePrevention(demographicNoStr);
 
 	LogAction.addLogEntry(currentUserNoStr, demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, demographicNoStr, request.getRemoteAddr());
+	providerRecentDemographicAccessService.updateAccessRecord(Integer.parseInt(currentUserNoStr), demographicNo);
 %>
 <p></p>
 
