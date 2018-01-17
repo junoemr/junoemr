@@ -910,7 +910,8 @@ if(wLReadonly.equals("")){
 					if ("CLINICAID".equals(billRegion)) 
 					{
 						%>
-							<a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">
+							<a href="../billing.do?billRegion=CLINICAID&action=invoice_reports&patient_remote_id=<%=demographic.getDemographicNo()%>"
+							   target="_blank">
 							<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/>
 							</a>
 						<%
@@ -2503,7 +2504,7 @@ if ( Dead.equals(PatStat) ) {%>
 								<td align="left" nowrap><input type="text"
 									name="year_of_birth" <%=getDisabled("year_of_birth")%>
 									value="<%=birthYear%>"
-									size="3" maxlength="4"> 
+									size="4" maxlength="4">
 
 									<% 
 									String sbMonth;

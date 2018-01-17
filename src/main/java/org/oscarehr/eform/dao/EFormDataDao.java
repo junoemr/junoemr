@@ -21,7 +21,7 @@
  * Toronto, Ontario, Canada
  */
 
-package org.oscarehr.common.dao;
+package org.oscarehr.eform.dao;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,12 +34,14 @@ import java.util.TreeSet;
 import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class EFormDataDao extends AbstractDao<EFormData> {
+public class EFormDataDao extends AbstractDao<EFormData>
+{
 
 	private static final Logger logger = MiscUtils.getLogger();
 

@@ -27,13 +27,13 @@ package org.oscarehr.managers;
 
 import java.util.Collections;
 import java.util.List;
-import org.oscarehr.common.dao.EFormDao;
-import org.oscarehr.common.dao.EFormDao.EFormSortOrder;
-import org.oscarehr.common.dao.EFormDataDao;
+import org.oscarehr.eform.dao.EFormDao;
+import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
+import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.common.dao.EFormGroupDao;
 import org.oscarehr.common.dao.EncounterFormDao;
-import org.oscarehr.common.model.EForm;
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.model.EForm;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.common.model.EncounterForm;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;

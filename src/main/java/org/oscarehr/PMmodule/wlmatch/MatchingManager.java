@@ -47,7 +47,7 @@ import org.oscarehr.PMmodule.model.CriteriaSelectionOption;
 import org.oscarehr.PMmodule.model.CriteriaType;
 import org.oscarehr.PMmodule.model.Vacancy;
 import org.oscarehr.PMmodule.model.VacancyClientMatch;
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 

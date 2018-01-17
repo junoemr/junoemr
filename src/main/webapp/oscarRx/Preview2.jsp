@@ -201,6 +201,18 @@ UserProperty prop = userPropertyDAO.getProp(signingProvider, UserProperty.RX_SHO
 if(prop!=null && prop.getValue().equalsIgnoreCase("yes")){
     showPatientDOB=true;
 }
+
+String logoSrc = "img/rx.gif";
+String logoPath;
+
+String custom_logo_name = props.getProperty("rx_custom_logo");
+if(custom_logo_name != null ){
+	logoPath = oscar.OscarProperties.getInstance().getProperty("eform_image","")+custom_logo_name;
+	File f = new File(logoPath);
+	if(f.exists()) {
+		logoSrc = request.getContextPath() + "/eform/displayImage.do?imagefile=" + custom_logo_name;
+	}
+}
 %>
 <html:form action="/form/formname" styleId="preview2Form">
 
@@ -213,7 +225,7 @@ if(prop!=null && prop.getValue().equalsIgnoreCase("yes")){
                             <table id="pwTable" width="400px" height="500px" cellspacing=0 cellpadding=10 border=2>
                                     <tr>
                                             <td valign=top height="100px"><input type="image"
-                                                    src="img/rx.gif" border="0" alt="[Submit]"
+                                                    src="<%=logoSrc%>" border="0" alt="[Submit]" style="max-height:100px; max-width:100px;"
                                                     name="submit" title="Print in a half letter size paper"
                                                     onclick="<%=rePrint.equalsIgnoreCase("true") ? "javascript:return onPrint2('rePrint');" : "javascript:return onPrint2('print');"  %>"/>
                                             <!--input type="hidden" name="printPageSize" value="PageSize.A6" /--> <% 	
@@ -496,7 +508,7 @@ if(prop!=null && prop.getValue().equalsIgnoreCase("yes")){
 																	%>
 																	<input type="hidden" name="<%=DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY%>" value="<%=signatureRequestId%>" />	
 
-																	<img id="signature" style="width:300px; height:60px" src="<%=startimageUrl%>" alt="digital_signature" />
+																	<img id="signature" style="width:200px; height:100px; object-fit:scale-down; object-position: 100% 100%" src="<%=startimageUrl%>" alt="digital_signature" />
 				 													<input type="hidden" name="imgFile" id="imgFile" value="<%=imgFile%>" />
 																	<script type="text/javascript">
 																		

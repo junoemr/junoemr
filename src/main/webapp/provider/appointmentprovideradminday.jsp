@@ -460,7 +460,7 @@ public boolean isBirthday(String schedDate,String demBday){
 <%@page import="oscar.appt.JdbcApptImpl"%>
 <%@page import="oscar.appt.ApptUtil"%>
 <%@page import="org.oscarehr.web.AppointmentProviderAdminDayUIBean"%>
-<%@page import="org.oscarehr.common.model.EForm"%><html:html locale="true">
+<%@page import="org.oscarehr.eform.model.EForm"%><html:html locale="true">
 	<head>
 		<script>
 
@@ -1707,6 +1707,7 @@ public boolean isBirthday(String schedDate,String demBday){
                         nameSb.append(String.valueOf(appointment.getName()));
                   }
                   String name = UtilMisc.toUpperLowerCase(nameSb.toString());
+                  Boolean doNotBook = ("DO_NOT_BOOK").equalsIgnoreCase(name);
 
                   paramTickler[0]=String.valueOf(demographic_no);
                   paramTickler[1]=MyDateFormat.getSysDate(strDate); //year+"-"+month+"-"+day;//e.g."2001-02-02";
@@ -1890,10 +1891,33 @@ public boolean isBirthday(String schedDate,String demBday){
 	reason: <%=reasonCodeName!=null?reasonCodeName:""%> <%if(reason!=null && !reason.isEmpty()){%>- <%=UtilMisc.htmlEscape(reason)%>
 <%}%>	<bean:message key="provider.appointmentProviderAdminDay.notes"/>: <%=UtilMisc.htmlEscape(notes)%>" >
 																	.<%=(view==0&&numAvailProvider!=1)?(name.length()>len?name.substring(0,len).toUpperCase():name.toUpperCase()):name.toUpperCase()%>
-																	</font></a><!--Inline display of reason -->
+																	</font>
+																</a>
+
+																<!--Inline display of reason -->
 																<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-																	<span class="reason reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }"><bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=UtilMisc.htmlEscape(reason)%></span>
-																</oscar:oscarPropertiesCheck></td>
+																	<%
+																		String escapedReason = reason != null ? "&nbsp;" + UtilMisc.htmlEscape(reason) : "";
+																		if (doNotBook)
+																		{
+																	%>
+																	<%--Do not book appointments always display reason and can not be toggled. --%>
+																	<span class="reason reason_<%=curProvider_no[nProvider]%>">
+																		<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=escapedReason%>
+																	</span>
+																	<%
+																		}
+																		else
+																		{
+																	%>
+																	<span class="toggleable reason reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
+																		<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=escapedReason%>
+																	</span>
+																	<%
+																		}
+																	%>
+																</oscar:oscarPropertiesCheck>
+															</td>
 																	<%
         			} else {
 				%>	<% if (tickler_no.compareTo("") != 0) {%>
@@ -2108,7 +2132,7 @@ start_time += iSm + ":00";
 															&#124;<b style="color:#FF0000">$</b>
 																	<%}}%>
 															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-															<span class="reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
+															<span class="toggleable reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
      			<strong>&#124;<%=reasonCodeName==null?"":"&nbsp;" + reasonCodeName + " -"%><%=reason==null?"":"&nbsp;" + reason%></strong>
      		</span>
 															</oscar:oscarPropertiesCheck>

@@ -26,8 +26,8 @@ package org.oscarehr.ws.rest.conversion;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import org.oscarehr.common.dao.EFormDao;
-import org.oscarehr.common.model.EForm;
+import org.oscarehr.eform.dao.EFormDao;
+import org.oscarehr.eform.model.EForm;
 import org.oscarehr.common.model.EFormReportTool;
 import org.oscarehr.managers.EFormReportToolManager;
 import org.oscarehr.util.LoggedInInfo;

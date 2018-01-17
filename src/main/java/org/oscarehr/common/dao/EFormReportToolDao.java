@@ -32,9 +32,9 @@ import javax.persistence.Query;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.oscarehr.common.model.EForm;
+import org.oscarehr.eform.model.EForm;
 import org.oscarehr.common.model.EFormReportTool;
-import org.oscarehr.common.model.EFormValue;
+import org.oscarehr.eform.model.EFormValue;
 import org.springframework.stereotype.Repository;
 
 @Repository
