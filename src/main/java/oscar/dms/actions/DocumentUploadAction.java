@@ -66,7 +66,7 @@ public class DocumentUploadAction extends DispatchAction
 		}
 		logger.info("BEGIN DOCUMENT UPLOAD");
 
-		HashMap<String, Object> map = new HashMap<>();
+		HashMap<String, Object> responseMap = new HashMap<>();
 		FormFile docFile = fm.getFiledata();
 		String destination = request.getParameter("destination");
 		java.util.Locale locale = (java.util.Locale) request.getSession().getAttribute(org.apache.struts.Globals.LOCALE_KEY);
@@ -76,46 +76,46 @@ public class DocumentUploadAction extends DispatchAction
 		{
 			if(docFile == null)
 			{
-				map.put("error", 4);
+				responseMap.put("error", 4);
 			}
 			else if(destination != null && destination.equals("incomingDocs"))
 			{
-				uploadIncomingDocs(request, props, docFile, map);
+				uploadIncomingDocs(request, props, docFile, responseMap);
 			}
 			else
 			{
-				uploadRegularDocument(request, fm.getSource(), docFile, map);
+				uploadRegularDocument(request, fm.getSource(), docFile, responseMap);
 			}
 		}
 		catch(IOException e)
 		{
 			logger.error("Document Upload Error", e);
-			map.put("error", 6);
+			responseMap.put("error", 6);
 		}
 		catch(RuntimeException e)
 		{
 			logger.error("Document Upload Error", e);
-			map.put("error", "Document Error. Please contact support.");
+			responseMap.put("error", "Document Error. Please contact support.");
 		}
 
 		JSONArray jsonArray = new JSONArray();
-		JSONObject jsonObject = JSONObject.fromObject(map);
+		JSONObject jsonObject = JSONObject.fromObject(responseMap);
 		jsonArray.add(jsonObject);
 		response.getOutputStream().write(jsonArray.toString().getBytes());
 		logger.info("DOCUMENT UPLOAD COMPLETE");
 		return null;
 	}
 
-	private void uploadIncomingDocs(HttpServletRequest request, ResourceBundle props, FormFile docFile, HashMap<String, Object> map) throws IOException
+	private void uploadIncomingDocs(HttpServletRequest request, ResourceBundle props, FormFile docFile, HashMap<String, Object> responseMap) throws IOException
 	{
 		String fileName = docFile.getFileName();
 		if(!fileName.toLowerCase().endsWith(".pdf"))
 		{
-			map.put("error", props.getString("dms.documentUpload.onlyPdf"));
+			responseMap.put("error", props.getString("dms.documentUpload.onlyPdf"));
 		}
 		else if(docFile.getFileSize() == 0)
 		{
-			map.put("error", 4);
+			responseMap.put("error", 4);
 			throw new FileNotFoundException();
 		}
 		else
@@ -127,20 +127,20 @@ public class DocumentUploadAction extends DispatchAction
 			File f = new File(IncomingDocUtil.getAndCreateIncomingDocumentFilePathName(queueId, destFolder, fileName));
 			if(f.exists())
 			{
-				map.put("error", fileName + " " + props.getString("dms.documentUpload.alreadyExists"));
+				responseMap.put("error", fileName + " " + props.getString("dms.documentUpload.alreadyExists"));
 			}
 			else
 			{
 				writeToIncomingDocs(docFile, queueId, destFolder, fileName);
-				map.put("name", docFile.getFileName());
-				map.put("size", docFile.getFileSize());
+				responseMap.put("name", docFile.getFileName());
+				responseMap.put("size", docFile.getFileSize());
 			}
 			request.getSession().setAttribute("preferredQueue", queueId);
 			docFile.destroy();
 		}
 	}
 
-	private void uploadRegularDocument(HttpServletRequest request, String fmSource, FormFile docFile, HashMap<String, Object> map) throws IOException, InterruptedException
+	private void uploadRegularDocument(HttpServletRequest request, String fmSource, FormFile docFile, HashMap<String, Object> responseMap) throws IOException, InterruptedException
 	{
 		String fileName = docFile.getFileName();
 		String user = (String) request.getSession().getAttribute("user");
@@ -148,8 +148,8 @@ public class DocumentUploadAction extends DispatchAction
 		{
 			throw new FileNotFoundException();
 		}
-		map.put("name", docFile.getFileName());
-		map.put("size", docFile.getFileSize());
+		responseMap.put("name", docFile.getFileName());
+		responseMap.put("size", docFile.getFileSize());
 
 		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
 		docFile.destroy();

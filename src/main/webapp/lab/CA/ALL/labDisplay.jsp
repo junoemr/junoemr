@@ -1672,7 +1672,6 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                 </td>
                             </tr>
                         </table>
-                       </table>
                     </td>
                 </tr>
             </table>
