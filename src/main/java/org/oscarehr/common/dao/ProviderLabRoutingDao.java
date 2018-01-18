@@ -14,7 +14,7 @@ import java.util.List;
 import javax.persistence.Query;
 
 import org.oscarehr.common.NativeSql;
-import org.oscarehr.common.model.CtlDocument;
+import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.springframework.stereotype.Repository;
@@ -69,7 +69,7 @@ public class ProviderLabRoutingDao extends AbstractDao<ProviderLabRoutingModel> 
 	}
 
 	public List<ProviderLabRoutingModel> getProviderLabRoutingForLabAndType(Integer labNo, String labType) {
-		return getProviderLabRoutings(labNo, labType, null, CtlDocument.NEW_STATUS);
+		return getProviderLabRoutings(labNo, labType, null, ProviderInboxItem.NEW);
 	}
 
 	public void updateStatus(Integer labNo, String labType) {

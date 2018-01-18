@@ -49,6 +49,7 @@ import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.model.CtlDocument;
+import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
@@ -372,12 +373,12 @@ public class CommonLabResultData {
 			while (rs.next()) {
 				empty = false;
 				String id = oscar.Misc.getString(rs, "id");
-				if (!oscar.Misc.getString(rs, "status").equals(CtlDocument.ACK_STATUS)) {
+				if (!oscar.Misc.getString(rs, "status").equals(ProviderInboxItem.ACK)) {
 					ProviderLabRoutingModel plr  = providerLabRoutingDao.find(Integer.parseInt(id));
 					if(plr != null) {
 						plr.setStatus(""+status);
 						//we don't want to clobber existing comments when filing labs
-						if( !status.equals(CtlDocument.FILED_STATUS) ) {
+						if( !status.equals(ProviderInboxItem.FILE) ) {
 							plr.setComment(comment);
 						}
 						plr.setTimestamp(new Date());
@@ -409,11 +410,11 @@ public class CommonLabResultData {
 
 			// If we updated the status to X, then we want to see if all other statuses for the labNo are also X.
 			// If they are then there are no more providers associated with the document, so move the document to the unclaimed inbox
-			if (status.equals(CtlDocument.ARCHIVED_STATUS))
+			if (status.equals(ProviderInboxItem.ARCHIVED))
 			{
 				ProviderInboxRoutingDao providerInboxRoutingDao = SpringUtils.getBean(ProviderInboxRoutingDao.class);
 				List<ProviderLabRoutingModel> allDocsWithLabNo = providerLabRoutingDao.getProviderLabRoutingDocuments(labNo);
-				List<ProviderLabRoutingModel> docsWithStatusX = providerLabRoutingDao.findByStatusANDLabNoType(labNo, labType, CtlDocument.ARCHIVED_STATUS);
+				List<ProviderLabRoutingModel> docsWithStatusX = providerLabRoutingDao.findByStatusANDLabNoType(labNo, labType, ProviderInboxItem.ARCHIVED);
 
 				if (allDocsWithLabNo.size() == docsWithStatusX.size())
 				{

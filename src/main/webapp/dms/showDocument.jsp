@@ -489,7 +489,7 @@
 													Provider p = providerDao.getProvider(pItem.getProviderNo());
 													String s = (p != null)? p.getDisplayName() : pItem.getProviderNo();
 
-													if(!s.equals("0")&&!s.equals("null")&& !pItem.getStatus().equals(CtlDocument.ARCHIVED_STATUS)){  %>
+													if(!s.equals("0")&&!s.equals("null")&& !pItem.getStatus().equals(ProviderInboxItem.ARCHIVED)){  %>
 														<li><%=s%><a href="#" onclick="removeLink('DOC', '<%=docId %>', '<%=pItem.getProviderNo() %>', this);return false;"><bean:message key="inboxmanager.document.RemoveLinkedProviderMsg" /></a></li>
 												<%}
 												}%>
@@ -515,15 +515,15 @@
 																		ReportStatus report = (ReportStatus) ackList.get(i); %>
 
 																		<% String ackStatus = report.getStatus();
-																			if(ackStatus.equals(CtlDocument.ACK_STATUS)){
+																			if(ackStatus.equals(ProviderInboxItem.ACK)){
 																				ackStatus = "Acknowledged";
-																			}else if(ackStatus.equals(CtlDocument.FILED_STATUS)){
+																			}else if(ackStatus.equals(ProviderInboxItem.FILE)){
 																				ackStatus = "Filed but not Acknowledged";
 																			}else{
 																				ackStatus = "Not Acknowledged";
 																			}
 																		// Only show providers that weren't removed from the document
-																		if(!report.getStatus().equals(CtlDocument.ARCHIVED_STATUS)) { %>
+																		if(!report.getStatus().equals(ProviderInboxItem.ARCHIVED)) { %>
 																			<%= report.getProviderName() %> :
 																			<font color="red"><%= ackStatus %></font>
 																				<span id="timestamp_<%=docId + "_" + report.getOscarProviderNo()%>"><%= report.getTimestamp() == null ? "&nbsp;" : report.getTimestamp() + "&nbsp;"%></span>,
