@@ -55,7 +55,7 @@
 <%@ page import="org.oscarehr.common.model.DemographicExtArchive" %>
 
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
-<%@page import="org.oscarehr.provider.service.ProviderRecentDemographicAccessService" %>
+<%@page import="org.oscarehr.provider.service.RecentDemographicAccessService" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
 
 <%@page import="org.oscarehr.util.SpringUtils" %>
@@ -86,7 +86,7 @@
 	DemographicExtArchiveDao demographicExtArchiveDao = SpringUtils.getBean(DemographicExtArchiveDao.class);
 	DemographicArchiveDao demographicArchiveDao = (DemographicArchiveDao)SpringUtils.getBean("demographicArchiveDao");
 
-	ProviderRecentDemographicAccessService providerRecentDemographicAccessService = SpringUtils.getBean(ProviderRecentDemographicAccessService.class);
+	RecentDemographicAccessService recentDemographicAccessService = SpringUtils.getBean(RecentDemographicAccessService.class);
 		
 %>
 
@@ -320,7 +320,7 @@
 		// add log
 		String ip = request.getRemoteAddr();
 		LogAction.addLogEntry(curUser_no, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, param2[0], ip);
-		providerRecentDemographicAccessService.updateAccessRecord(Integer.parseInt(curUser_no), demographic.getDemographicNo());
+		recentDemographicAccessService.updateAccessRecord(Integer.parseInt(curUser_no), demographic.getDemographicNo());
 
 		//archive the original too
 		Long archiveId = demographicArchiveDao.archiveRecord(demographicDao.getDemographic(dem));

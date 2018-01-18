@@ -38,8 +38,8 @@ import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.managers.model.ProviderSettings;
-import org.oscarehr.provider.model.ProviderRecentDemographicAccess;
-import org.oscarehr.provider.service.ProviderRecentDemographicAccessService;
+import org.oscarehr.provider.model.RecentDemographicAccess;
+import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.PatientListApptItemBean;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
@@ -81,7 +81,7 @@ public class ProviderService extends AbstractServiceImpl {
 	DemographicManager demographicManager;
 
 	@Autowired
-	ProviderRecentDemographicAccessService providerRecentDemographicAccessService;
+	RecentDemographicAccessService recentDemographicAccessService;
 
 	@Autowired
 	private PreferenceManager preferenceManager;
@@ -211,10 +211,10 @@ public class ProviderService extends AbstractServiceImpl {
 				limit = Integer.parseInt(recentPatients);
 			}
 
-			List<ProviderRecentDemographicAccess> results = providerRecentDemographicAccessService.getRecentAccessList(providerNo, offset, limit);
+			List<RecentDemographicAccess> results = recentDemographicAccessService.getRecentAccessList(providerNo, offset, limit);
 
 			//TODO avoid the loop over demographics to get the display name
-			for(ProviderRecentDemographicAccess result : results)
+			for(RecentDemographicAccess result : results)
 			{
 				Integer demographicNo = result.getDemographicNo();
 				Date accessDateTime = result.getAccessDateTime();

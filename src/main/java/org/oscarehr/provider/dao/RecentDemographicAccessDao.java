@@ -24,7 +24,7 @@
 package org.oscarehr.provider.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.provider.model.ProviderRecentDemographicAccess;
+import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
@@ -32,19 +32,19 @@ import java.util.List;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class ProviderRecentDemographicAccessDao extends AbstractDao<ProviderRecentDemographicAccess>
+public class RecentDemographicAccessDao extends AbstractDao<RecentDemographicAccess>
 {
-	protected ProviderRecentDemographicAccessDao()
+	protected RecentDemographicAccessDao()
 	{
-		super(ProviderRecentDemographicAccess.class);
+		super(RecentDemographicAccess.class);
 	}
 
-	public ProviderRecentDemographicAccess findByPrimaryKey(Integer providerNo, Integer demographicNo)
+	public RecentDemographicAccess findByPrimaryKey(Integer providerNo, Integer demographicNo)
 	{
 		String querySql = "SELECT x " +
-				"FROM ProviderRecentDemographicAccess x " +
-				"WHERE x.providerRecentDemographicAccessId.providerNo = :providerNo " +
-				"AND x.providerRecentDemographicAccessId.demographicNo = :demographicNo " +
+				"FROM RecentDemographicAccess x " +
+				"WHERE x.recentDemographicAccessId.providerNo = :providerNo " +
+				"AND x.recentDemographicAccessId.demographicNo = :demographicNo " +
 				"ORDER BY x.accessDateTime DESC";
 
 		Query query = entityManager.createQuery(querySql);
@@ -54,11 +54,11 @@ public class ProviderRecentDemographicAccessDao extends AbstractDao<ProviderRece
 		return this.getSingleResultOrNull(query);
 	}
 
-	public List<ProviderRecentDemographicAccess> findByProviderNo(Integer providerNo, int offset, int limit)
+	public List<RecentDemographicAccess> findByProviderNo(Integer providerNo, int offset, int limit)
 	{
 		String querySql = "SELECT x " +
-				"FROM ProviderRecentDemographicAccess x " +
-				"WHERE x.providerRecentDemographicAccessId.providerNo = :providerNo " +
+				"FROM RecentDemographicAccess x " +
+				"WHERE x.recentDemographicAccessId.providerNo = :providerNo " +
 				"ORDER BY x.accessDateTime DESC";
 
 		Query query = entityManager.createQuery(querySql);

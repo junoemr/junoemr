@@ -55,7 +55,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.provider.service.ProviderRecentDemographicAccessService;
+import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
@@ -103,7 +103,7 @@ public class DemographicService extends AbstractServiceImpl {
 	private ProfessionalSpecialistDao specialistDao;
 
 	@Autowired
-	ProviderRecentDemographicAccessService providerRecentDemographicAccessService;
+	RecentDemographicAccessService recentDemographicAccessService;
 
 	private DemographicConverter demoConverter = new DemographicConverter();
 	private DemographicContactFewConverter demoContactFewConverter = new DemographicContactFewConverter();
@@ -207,7 +207,7 @@ public class DemographicService extends AbstractServiceImpl {
 			}
 
 			LogAction.addLogEntry(providerNoStr, demo.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
-			providerRecentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
+			recentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
 
 			return RestResponse.successResponse(result);
 		}
@@ -305,7 +305,7 @@ public class DemographicService extends AbstractServiceImpl {
 			int providerNo = Integer.parseInt(providerNoStr);
 
 			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,getLoggedInInfo().getIp());
-			providerRecentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
+			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
 
 			return RestResponse.successResponse(demoConverter.getAsTransferObject(getLoggedInInfo(), demographic));
 		}
@@ -361,7 +361,7 @@ public class DemographicService extends AbstractServiceImpl {
 			int providerNo = Integer.parseInt(providerNoStr);
 
 			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
-			providerRecentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
+			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
 
 			return RestResponse.successResponse(demoConverter.getAsTransferObject(getLoggedInInfo(), demographic));
 		}
@@ -398,7 +398,7 @@ public class DemographicService extends AbstractServiceImpl {
 
 			demographicManager.deleteDemographic(getLoggedInInfo(), demo);
 			LogAction.addLogEntry(providerNoStr, demo.getDemographicNo(), LogConst.ACTION_DELETE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
-			providerRecentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
+			recentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
 
 			return RestResponse.successResponse(result);
 		}

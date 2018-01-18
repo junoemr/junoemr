@@ -52,7 +52,7 @@
 <%@page import="org.oscarehr.managers.DemographicManager" %>
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
 <%@page import="org.oscarehr.provider.model.ProviderPreventionManager" %>
-<%@page import="org.oscarehr.provider.service.ProviderRecentDemographicAccessService" %>
+<%@page import="org.oscarehr.provider.service.RecentDemographicAccessService" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
 
 <%@ page import="org.oscarehr.util.MiscUtils" %>
@@ -81,7 +81,7 @@
 	DemographicArchiveDao demographicArchiveDao = (DemographicArchiveDao)SpringUtils.getBean("demographicArchiveDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 	DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-	ProviderRecentDemographicAccessService providerRecentDemographicAccessService = SpringUtils.getBean(ProviderRecentDemographicAccessService.class);
+	RecentDemographicAccessService recentDemographicAccessService = SpringUtils.getBean(RecentDemographicAccessService.class);
 	
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 	
@@ -446,7 +446,7 @@
 	prevMgr.removePrevention(demographicNoStr);
 
 	LogAction.addLogEntry(currentUserNoStr, demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, demographicNoStr, request.getRemoteAddr());
-	providerRecentDemographicAccessService.updateAccessRecord(Integer.parseInt(currentUserNoStr), demographicNo);
+	recentDemographicAccessService.updateAccessRecord(Integer.parseInt(currentUserNoStr), demographicNo);
 %>
 <p></p>
 

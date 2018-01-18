@@ -35,32 +35,32 @@ import java.util.Date;
 
 @Entity
 @Table(name = "provider_recent_demographic_access")
-public class ProviderRecentDemographicAccess extends AbstractModel<ProviderRecentDemographicAccessId> implements Serializable
+public class RecentDemographicAccess extends AbstractModel<RecentDemographicAccessId> implements Serializable
 {
 	@EmbeddedId
-	private ProviderRecentDemographicAccessId providerRecentDemographicAccessId;
+	private RecentDemographicAccessId recentDemographicAccessId;
 
 	@Column(name = "access_datetime", nullable = false)
 	private Date accessDateTime = new Date();
 
-	public ProviderRecentDemographicAccess()
+	public RecentDemographicAccess()
 	{
-		providerRecentDemographicAccessId = new ProviderRecentDemographicAccessId();
+		recentDemographicAccessId = new RecentDemographicAccessId();
 	}
-	public ProviderRecentDemographicAccess(Integer providerNo, Integer demographicNo)
+	public RecentDemographicAccess(Integer providerNo, Integer demographicNo)
 	{
-		this.setId(new ProviderRecentDemographicAccessId(providerNo, demographicNo));
+		this.setId(new RecentDemographicAccessId(providerNo, demographicNo));
 	}
 
 	@Override
-	public ProviderRecentDemographicAccessId getId()
+	public RecentDemographicAccessId getId()
 	{
-		return providerRecentDemographicAccessId;
+		return recentDemographicAccessId;
 	}
 
-	public void setId(ProviderRecentDemographicAccessId providerRecentDemographicAccessId)
+	public void setId(RecentDemographicAccessId recentDemographicAccessId)
 	{
-		this.providerRecentDemographicAccessId = providerRecentDemographicAccessId;
+		this.recentDemographicAccessId = recentDemographicAccessId;
 	}
 
 	public Date getAccessDateTime()
@@ -79,28 +79,28 @@ public class ProviderRecentDemographicAccess extends AbstractModel<ProviderRecen
 
 	public Integer getDemographicNo()
 	{
-		return providerRecentDemographicAccessId.getDemographicNo();
+		return recentDemographicAccessId.getDemographicNo();
 	}
 	public Integer getProviderNo()
 	{
-		return providerRecentDemographicAccessId.getProviderNo();
+		return recentDemographicAccessId.getProviderNo();
 	}
 }
 
 @Embeddable
-class ProviderRecentDemographicAccessId implements Serializable
+class RecentDemographicAccessId implements Serializable
 {
 	@Column(name = "demographic_no", nullable = false)
 	private Integer demographicNo;
 	@Column(name = "provider_no", nullable = false)
 	private Integer providerNo;
 
-	public ProviderRecentDemographicAccessId()
+	public RecentDemographicAccessId()
 	{
 		//default constructor
 	}
 
-	public ProviderRecentDemographicAccessId(Integer providerNo, Integer demographicNo)
+	public RecentDemographicAccessId(Integer providerNo, Integer demographicNo)
 	{
 		this.demographicNo = demographicNo;
 		this.providerNo = providerNo;

@@ -106,7 +106,7 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.web.ContactAction,org.oscarehr.managers.DemographicManager" %>
 <%@ page import="org.oscarehr.managers.PatientConsentManager"%>
 <%@ page import="org.oscarehr.managers.ProgramManager2,org.oscarehr.myoscar.utils.MyOscarLoggedInInfo" %>
-<%@ page import="org.oscarehr.provider.service.ProviderRecentDemographicAccessService" %>
+<%@ page import="org.oscarehr.provider.service.RecentDemographicAccessService" %>
 <%@ page import="org.oscarehr.sharingcenter.SharingCenterUtil" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
@@ -134,7 +134,7 @@ if(!authed) {
 	
 	DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
 	ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
-	ProviderRecentDemographicAccessService providerRecentDemographicAccessService = SpringUtils.getBean(ProviderRecentDemographicAccessService.class);
+	RecentDemographicAccessService recentDemographicAccessService = SpringUtils.getBean(RecentDemographicAccessService.class);
     
 %>
 
@@ -181,7 +181,7 @@ if(!authed) {
 	String annotation_display = CaseManagementNoteLink.DISP_DEMO;
 
 	LogAction.addLogEntry(curProvider_no, demographicNo, LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, demographic_no, request.getRemoteAddr());
-	providerRecentDemographicAccessService.updateAccessRecord(providerNo, demographicNo);
+	recentDemographicAccessService.updateAccessRecord(providerNo, demographicNo);
 
 	OscarProperties oscarProps = OscarProperties.getInstance();
 

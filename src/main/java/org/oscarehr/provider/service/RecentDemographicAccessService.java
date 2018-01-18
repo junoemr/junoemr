@@ -23,8 +23,8 @@
 
 package org.oscarehr.provider.service;
 
-import org.oscarehr.provider.dao.ProviderRecentDemographicAccessDao;
-import org.oscarehr.provider.model.ProviderRecentDemographicAccess;
+import org.oscarehr.provider.dao.RecentDemographicAccessDao;
+import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,29 +33,29 @@ import java.util.List;
 
 @Service
 @Transactional
-public class ProviderRecentDemographicAccessService
+public class RecentDemographicAccessService
 {
 	@Autowired
-	ProviderRecentDemographicAccessDao providerRecentDemographicAccessDao;
+	RecentDemographicAccessDao recentDemographicAccessDao;
 
-	public List<ProviderRecentDemographicAccess> getRecentAccessList(Integer providerNo, int offset, int limit)
+	public List<RecentDemographicAccess> getRecentAccessList(Integer providerNo, int offset, int limit)
 	{
-		return providerRecentDemographicAccessDao.findByProviderNo(providerNo, offset, limit);
+		return recentDemographicAccessDao.findByProviderNo(providerNo, offset, limit);
 	}
 
 	public void updateAccessRecord(Integer providerNo, Integer demographicNo)
 	{
-		ProviderRecentDemographicAccess record = providerRecentDemographicAccessDao.findByPrimaryKey(providerNo, demographicNo);
+		RecentDemographicAccess record = recentDemographicAccessDao.findByPrimaryKey(providerNo, demographicNo);
 		if(record == null)
 		{
-			record = new ProviderRecentDemographicAccess(providerNo, demographicNo);
+			record = new RecentDemographicAccess(providerNo, demographicNo);
 			record.setAccessDateTimeToNow();
-			providerRecentDemographicAccessDao.persist(record);
+			recentDemographicAccessDao.persist(record);
 		}
 		else
 		{
 			record.setAccessDateTimeToNow();
-			providerRecentDemographicAccessDao.merge(record);
+			recentDemographicAccessDao.merge(record);
 		}
 	}
 }
