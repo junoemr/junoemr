@@ -141,10 +141,10 @@ Oscar.ShowDocument.checkObservationDate = function checkObservationDate(formId)
 	}
 	return true;
 };
-Oscar.ShowDocument.updateDocument = function updateDocument(eleId)
+Oscar.ShowDocument.updateDocument = function updateDocument(elementId)
 {
 	var url="../dms/ManageDocument.do",
-		data=$(eleId).serialize(true);
+		data=$(elementId).serialize(true);
 	new Ajax.Request(url, {
 		method:'post',
 		parameters:data,
@@ -156,26 +156,26 @@ Oscar.ShowDocument.updateDocument = function updateDocument(eleId)
 			{
 				patientId = json.patientId;
 
-				var ar = eleId.split("_");
-				var num = ar[1];
-				num = num.replace(/\s/g, '');
-				$("saveSucessMsg_" + num).show();
-				$('saved' + num).value = 'true';
-				$("msgBtn_" + num).onclick = function ()
+				var elementIdArray = elementId.split("_");
+				var documentId = elementIdArray[1];
+				documentId = documentId.replace(/\s/g, '');
+				$("saveSucessMsg_" + documentId).show();
+				$('saved' + documentId).value = 'true';
+				$("msgBtn_" + documentId).onclick = function ()
 				{
 					popup(700, 960, contextpath + '/oscarMessenger/SendDemoMessage.do?demographic_no=' + patientId, 'msg');
 				};
 
-				Oscar.ShowDocument.updateDocStatusInQueue(num);
-				var success = updateGlobalDataAndSideNav(num, patientId);
+				Oscar.ShowDocument.updateDocStatusInQueue(documentId);
+				var success = updateGlobalDataAndSideNav(documentId, patientId);
 
 				if (success)
 				{
-					success = updatePatientDocLabNav(num, patientId);
+					success = updatePatientDocLabNav(documentId, patientId);
 					if (success)
 					{
 						//disable demo input
-						$('autocompletedemo' + num).disabled = true;
+						$('autocompletedemo' + documentId).disabled = true;
 					}
 				}
 			}
@@ -184,10 +184,10 @@ Oscar.ShowDocument.updateDocument = function updateDocument(eleId)
 	return false;
 };
 //change status of queue document link row to I=inactive
-Oscar.ShowDocument.updateDocStatusInQueue = function updateDocStatusInQueue(docid)
+Oscar.ShowDocument.updateDocStatusInQueue = function updateDocStatusInQueue(documentId)
 {
 	var url="../dms/inboxManage.do",
-		data="docid="+docid+"&method=updateDocStatusInQueue";
+		data="docid="+documentId+"&method=updateDocStatusInQueue";
 	new Ajax.Request(url,{
 		method:'post',
 		parameters:data,
