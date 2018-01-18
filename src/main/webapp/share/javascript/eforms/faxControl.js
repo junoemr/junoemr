@@ -57,7 +57,7 @@ var faxControl = {
 					if (buttonLocation == null) { alert("Unable to find form or save button please check this is a proper eform."); return; }					
 					
 					updateFaxButton();
-					
+
 					if(!faxEnabled) {
 						placeholder.find(":input").prop('disabled', true);
 						placeholder.find(":button").prop('disabled', true);
@@ -86,8 +86,13 @@ function getSearchValue(name, url)
 }
 
 function AddOtherFaxProvider() {
-	var selected = jQuery("#otherFaxSelect option:selected"); 
-	_AddOtherFax(selected.text(),selected.val());
+	var selected = jQuery("#otherFaxSelect option:selected");
+	if (checkPhone(selected.val())) {
+		_AddOtherFax(selected.text(),selected.val());
+	}
+	else {
+		alert("The fax number for this provider is invalid.");
+	}
 }
 function AddOtherFax() {
 	var number = jQuery("#otherFaxInput").val();
@@ -133,7 +138,7 @@ function updateFaxButton() {
 }
 
 function hasFaxNumber() {
-	return jQuery("#faxRecipients").children().size() > 0; 
+	return jQuery("#faxRecipients").children().size() > 0;
 }
 
 function submitFaxButtonAjax(save) {
