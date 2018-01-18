@@ -336,6 +336,13 @@ public class RecordUxService extends AbstractServiceImpl {
 	public SummaryTo1 getMedicalHistory(@PathParam("demographicNo") Integer demographicNo) {
 		return getFullSummmary(demographicNo, SummaryTo1.MEDICALHISTORY_CODE);
 	}
+
+	@GET
+	@Path("/{demographicNo}/getSocialHistory")
+	@Produces(MediaType.APPLICATION_JSON)
+	public SummaryTo1 getSocialHistory(@PathParam("demographicNo") Integer demographicNo) {
+		return getFullSummmary(demographicNo, SummaryTo1.SOCIALHISTORY_CODE);
+	}
 	
 	@GET
 	@Path("/{demographicNo}/getOngoingConcerns")

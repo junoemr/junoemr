@@ -25,6 +25,10 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
+import java.util.ArrayList;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
@@ -33,10 +37,6 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
-
-import java.util.ArrayList;
 
 public class IHAHandler extends MessageHandler
 {
@@ -143,6 +143,79 @@ public class IHAHandler extends MessageHandler
     @Override
     public String getPatientName(){
         return(getFirstName()+" "+getLastName());
+    }
+    
+/*    @Override
+    public String getFirstName(){
+        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()));
+    }
+    
+    @Override
+    public String getLastName(){
+        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getFamilyName().getValue()));
+    }
+    
+    @Override
+    public String getDOB(){
+        try{
+            return(formatDateTime(getString(msg.getRESPONSE().getPATIENT().getPID().getDateOfBirth().getTimeOfAnEvent().getValue())).substring(0, 10));
+        }catch(Exception e){
+            return("");
+        }
+    }*/
+
+    public String getAdmittingProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-1-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getAttendingProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-2-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getOtherProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-3-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getFamilyProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-4-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getEmergencyProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-5-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getPrimaryCareProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-6-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
     }
     
     @Override
@@ -572,11 +645,45 @@ public class IHAHandler extends MessageHandler
                 nums.add(docNum);
                 i++;
             }
-            
+           nums.addAll(getProviderMnemonics());
         }catch(Exception e){
             logger.error("Error retrieving DocNums", e);
         }
         return(nums);
+    }
+
+    // Returns a list of all provider mnemonics associated with the lab
+    private ArrayList<String> getProviderMnemonics()
+    {
+        ArrayList<String> mnemonicList = new ArrayList<>();
+        String providerMnemonic;
+
+        if ((providerMnemonic = StringUtils.trimToNull(getAdmittingProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getAttendingProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getFamilyProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getEmergencyProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getPrimaryCareProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getOtherProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+
+        return mnemonicList;
     }
     
     /*
@@ -891,7 +998,7 @@ public class IHAHandler extends MessageHandler
         
         ArrayList<String> headers = new ArrayList<String>();
         String currentHeader;
-        
+
         try{
             for (i=0; i < getOBRCount(); i++){
                 

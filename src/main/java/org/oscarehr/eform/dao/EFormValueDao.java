@@ -21,18 +21,20 @@
  * Toronto, Ontario, Canada
  */
 
-package org.oscarehr.common.dao;
+package org.oscarehr.eform.dao;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.EFormValue;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.eform.model.EFormValue;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class EFormValueDao extends AbstractDao<EFormValue> {
+public class EFormValueDao extends AbstractDao<EFormValue>
+{
 
 	public EFormValueDao() {
 		super(EFormValue.class);

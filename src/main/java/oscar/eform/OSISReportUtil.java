@@ -30,10 +30,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.EFormDataDao;
-import org.oscarehr.common.dao.EFormValueDao;
-import org.oscarehr.common.model.EFormData;
-import org.oscarehr.common.model.EFormValue;
+import org.oscarehr.eform.dao.EFormDataDao;
+import org.oscarehr.eform.dao.EFormValueDao;
+import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.eform.model.EFormValue;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 

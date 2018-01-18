@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,8 +40,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMessages;
 import org.oscarehr.common.OtherIdManager;
-import org.oscarehr.common.dao.EFormDataDao;
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.dao.EFormDataDao;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.ui.servlet.ImageRenderingServlet;
 import org.oscarehr.util.DigitalSignatureUtils;
 import org.oscarehr.util.MiscUtils;
@@ -53,6 +54,11 @@ import oscar.oscarEncounter.oscarMeasurements.util.WriteNewMeasurements;
 import oscar.util.StringBuilderUtils;
 import oscar.util.UtilDateUtilities;
 
+/**
+ * Use oscarhr.eform.service for new stuff
+ * @deprecated
+ */
+@Deprecated
 public class EForm extends EFormBase {
 	private static EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean("EFormDataDao");
 	private static Logger log = MiscUtils.getLogger();
@@ -80,6 +86,26 @@ public class EForm extends EFormBase {
 	private static final String PRECHECKED = "checked=\"checked\"";
 
 	public EForm() {
+	}
+
+	/**
+	 * Construct from the model object for backwards compatability
+	 * This avoids the built in database query on loading
+	 * @param model - eForm Data model
+	 */
+	public EForm(EFormData model)
+	{
+		this.fdid = (model.getId() != null)? model.getId().toString() : null;
+		this.fid = model.getFormId().toString();
+		this.providerNo = model.getProviderNo();
+		this.demographicNo = model.getDemographicId().toString();
+		this.formName = model.getFormName();
+		this.formSubject = model.getSubject();
+		this.formDate = model.getFormDate().toString();
+		this.formHtml = model.getFormData();
+		this.showLatestFormOnly = model.isShowLatestFormOnly();
+		this.patientIndependent = model.isPatientIndependent();
+		this.roleType = model.getRoleType();
 	}
 
 	public EForm(String fid, String demographicNo) {
@@ -200,8 +226,7 @@ public class EForm extends EFormBase {
 	}
 
 	// ------------------Saving the Form (inserting value= statements)---------------------
-	public void setValues(ArrayList<String> names, ArrayList<String> values, ArrayList<String> allNames, ArrayList<String> allValues) {
-		if (names.size() != values.size()) return;
+	public void setValues(List<String> allNames, List<String> allValues) {
 		StringBuilder html = new StringBuilder(this.formHtml);
 		int pointer = -1;
 		// Iterates through every relevant html tag in 'this.formHtml'
@@ -454,7 +479,7 @@ public class EForm extends EFormBase {
 		this.formDate = UtilDateUtilities.DateToString(new Date(), "yyyy-MM-dd");
 	}
 
-	public ActionMessages setMeasurements(ArrayList<String> names, ArrayList<String> values) {
+	public ActionMessages setMeasurements(List<String> names, List<String> values) {
 		return (WriteNewMeasurements.addMeasurements(names, values, this.demographicNo, this.providerNo));
 	}
 
@@ -517,7 +542,7 @@ public class EForm extends EFormBase {
 	// ----------------------------------private -----------------------------------------
 	private DatabaseAP getAPExtra(String apName, String fieldHeader) {
 		// --------------------------Process extra attributes for APs --------------------------------
-		Pattern p = Pattern.compile("\\b[a-z]\\$[^ \\$#]+#[^\n]+");
+		Pattern p = Pattern.compile("\\b[a-z]\\$[^\\$#]+#[^\n]+");
 		Matcher m = p.matcher(apName);
 		if (!m.matches()) return null;
 
@@ -604,6 +629,8 @@ public class EForm extends EFormBase {
 	}
 
 	private StringBuilder putValue(String value, String type, int pointer, StringBuilder html) {
+
+		value = StringEscapeUtils.escapeHtml(value);
 		// inserts value= into tag or textarea
 		if (type.equals("onclick") || type.equals("onclick_append")) {
 			if (type.equals("onclick_append")) {
@@ -762,6 +789,7 @@ public class EForm extends EFormBase {
 				}
 			}
 		}
+		output = StringEscapeUtils.escapeHtml(output);
 		//put values into according controls
 		if (type.equals("textarea")) {
 			pointer = html.indexOf(">", pointer) + 1;

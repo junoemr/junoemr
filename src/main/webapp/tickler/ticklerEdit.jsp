@@ -39,6 +39,7 @@
 <%@page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="org.oscarehr.managers.TicklerManager" %>
+<%@ page import="java.text.SimpleDateFormat" %>
 
 <%
 	TicklerManager ticklerManager = SpringUtils.getBean(TicklerManager.class);
@@ -102,6 +103,7 @@
 	GregorianCalendar now = new GregorianCalendar();
 	int curYear = now.get(Calendar.YEAR);
 	int curMonth = (now.get(Calendar.MONTH) + 1);
+	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 %>
 
 <html:html locale="true">
@@ -436,7 +438,7 @@
 			<tr>
 				<td colspan="2"></td>
 				<td><input name="xml_appointment_date" type="text" maxlength="10"
-						   value="<%=t.getServiceDate()%>"/></td>
+						   value="<%=dateFormat.format(t.getServiceDate())%>"/></td>
 				<td style="text-align:right"><a href="#"
 												onClick="openBrWindow('../billing/billingCalendarPopup.jsp?type=end&amp;year=<%=curYear%>&amp;month=<%=curMonth%>','','width=300,height=300')"><bean:message
 						key="tickler.ticklerEdit.calendarLookup"/></a></td>
