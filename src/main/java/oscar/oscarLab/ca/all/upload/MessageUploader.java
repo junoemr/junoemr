@@ -248,6 +248,9 @@ public final class MessageUploader {
 					search = "provider_no";
 				} else  if (type.equals("CLS") || type.equals("CLSDI")) {
 					search = "hso_no";
+				} else if (type.equals("IHA"))
+				{
+					search = "e_delivery_ids";
 				}
 				else if (type.equals("PATHL7")){
 					//custom lab routing for excelleris labs

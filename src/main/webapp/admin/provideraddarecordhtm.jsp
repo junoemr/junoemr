@@ -325,6 +325,14 @@ for (int i=0; i<sites.size(); i++) {
 			<td><input type="text" name="tak_no"></td>
 		</tr>
 		<%} %>
+		<%
+			if (OscarProperties.getInstance().getProperty("billregion").equals("BC")) {
+		%>
+		<tr>
+			<td align="right"><bean:message key="admin.provider.formIHAMnemonic" />:</td>
+			<td><input type="text" name="e_delivery_ids"></td>
+		</tr>
+		<%} %>
 		<tr>
 			<td align="right"><bean:message
 				key="admin.provider.formSpecialtyCode" />:</td>

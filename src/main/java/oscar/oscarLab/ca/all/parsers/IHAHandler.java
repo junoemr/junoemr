@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
 
@@ -135,6 +136,60 @@ public class IHAHandler implements MessageHandler {
             String dateString = formatDateTime(getString(terser.get("/.MSH-7-1")));
             return(dateString);
         }catch(Exception e){
+            return("");
+        }
+    }
+
+    public String getAdmittingProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-1-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getAttendingProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-2-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getOtherProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-3-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getFamilyProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-4-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getEmergencyProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-5-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
+            return("");
+        }
+    }
+
+    public String getPrimaryCareProviderMnemonic(){
+        try {
+            return(getString(terser.get("/.ZDR-6-1")));
+        }catch (HL7Exception ex) {
+            logger.error("Error parsing HL7 file: " + ex);
             return("");
         }
     }
@@ -697,11 +752,45 @@ public class IHAHandler implements MessageHandler {
                 nums.add(docNum);
                 i++;
             }
-            
+            nums.addAll(getProviderMnemonics());
         }catch(Exception e){
             logger.error("Error retrieving DocNums", e);
         }
         return(nums);
+    }
+
+    // Returns a list of all provider mnemonics associated with the lab
+    private ArrayList<String> getProviderMnemonics()
+    {
+        ArrayList<String> mnemonicList = new ArrayList<String>();
+        String providerMnemonic;
+
+        if ((providerMnemonic = StringUtils.trimToNull(getAdmittingProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getAttendingProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getFamilyProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getEmergencyProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getPrimaryCareProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+        if ((providerMnemonic = StringUtils.trimToNull(getOtherProviderMnemonic())) != null)
+        {
+            mnemonicList.add(providerMnemonic);
+        }
+
+        return mnemonicList;
     }
     
     /*

@@ -322,6 +322,18 @@ for (int i=0; i<sites.size(); i++) {
 			value="<%= apptMainBean.getString(rs,"tak_no") %>"></td>
 		</tr>
 		<%} %>
+		<%
+			if (OscarProperties.getInstance().getProperty("billregion").equals("BC")) {
+		%>
+		<tr>
+			<td align="right"><bean:message key="admin.provider.formIHAMnemonic" />:</td>
+			<td>
+				<input type="text"
+					   name="e_delivery_ids"
+					   value="<%= apptMainBean.getString(rs,"e_delivery_ids") %>">
+			</td>
+		</tr>
+		<%} %>
 		<tr>
 			<td align="right"><bean:message key="admin.provider.formStatus" />:
 			</td>

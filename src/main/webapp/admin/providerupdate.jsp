@@ -41,6 +41,7 @@
 <%@page import="org.oscarehr.common.model.ProviderSite"%>
 <%@page import="org.oscarehr.common.model.ProviderSitePK"%>
 <%@page import="org.oscarehr.common.dao.ProviderSiteDao"%>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean" scope="session" />
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
@@ -65,7 +66,7 @@
 <%
   ProviderBillCenter billCenter = new ProviderBillCenter();
   billCenter.updateBillCenter(request.getParameter("provider_no"),request.getParameter("billcenter"));
-
+  OscarProperties props = OscarProperties.getInstance();
 
 
 //multi-office provide id formalize check, can be turn off on properties multioffice.formalize.provider.id
@@ -77,7 +78,6 @@
   if (org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable()) {
 
   	String StrProviderId = request.getParameter("provider_no");
-  	OscarProperties props = OscarProperties.getInstance();
 
   	String[] provider_sites = {};
 
@@ -163,8 +163,15 @@
 		  p.setPractitionerNo(request.getParameter("practitionerNo"));
 		  p.setLastUpdateUser((String)session.getAttribute("user"));
 		  p.setLastUpdateDate(new java.util.Date());
-		  p.setEDeliveryIds(request.getParameter("e_delivery_ids"));
 		  p.setTakNo(request.getParameter("tak_no"));
+
+		  String eDeliveryIds = StringUtils.trimToNull(request.getParameter("e_delivery_ids"));
+		  // Only strip non-numeric characters if we are on an Alberta instance
+		  if(eDeliveryIds != null && props.getProperty("billregion").equals("AB")) {
+			  eDeliveryIds = eDeliveryIds.replaceAll("[^0-9.,]", ""); // strip non-numbers
+		  }
+		  p.setEDeliveryIds(eDeliveryIds);
+
 		  providerDao.updateProvider(p);
 
         if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
