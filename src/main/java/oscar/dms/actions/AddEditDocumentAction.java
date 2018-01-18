@@ -285,8 +285,8 @@ public class AddEditDocumentAction extends DispatchAction {
 			 	if (!EDocUtil.getDoctypes(fm.getFunction()).contains(fm.getDocType())){
 			 		EDocUtil.addDocTypeSQL(fm.getDocType(),fm.getFunction());
 			 	}
-	
-	
+
+
 				// ---
 				String doc_no = EDocUtil.addDocumentSQL(newDoc);
 				if(ConformanceTestHelper.enableConformanceOnlyTestFeatures){
@@ -347,7 +347,7 @@ public class AddEditDocumentAction extends DispatchAction {
 					// Add a noteLink to casemgmt_note_link
 					CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
 					cmnl.setTableName(CaseManagementNoteLink.DOCUMENT);
-					cmnl.setTableId(Long.parseLong(EDocUtil.getLastDocumentNo()));
+					cmnl.setTableId(Long.parseLong(doc_no));
 					cmnl.setNoteId(note_id);
 	
 					request.setAttribute("document_no", doc_no);
