@@ -121,3 +121,76 @@ Oscar.ShowDocument.setupProviderAutoCompletion = function setupProviderAutoCompl
 		}
 	});
 };
+Oscar.ShowDocument.checkObservationDate = function checkObservationDate(formId)
+{
+	var formElem = document.getElementById(formId);
+	var dateElem = formElem.elements["observationDate"];
+
+	if (!Oscar.Util.Common.validateInputNotEmpty(dateElem))
+	{
+		alert("Blank Date.");
+		dateElem.focus();
+		return false;
+	}
+
+	if (!Oscar.Util.Date.validateDateInput(dateElem))
+	{
+		alert("Invalid date format: " + dateElem.value);
+		dateElem.focus();
+		return false;
+	}
+	return true;
+};
+Oscar.ShowDocument.updateDocument = function updateDocument(elementId)
+{
+	var url="../dms/ManageDocument.do",
+		data=$(elementId).serialize(true);
+	new Ajax.Request(url, {
+		method:'post',
+		parameters:data,
+		onSuccess: function (transport)
+		{
+			var json = transport.responseText.evalJSON();
+			var patientId;
+			if (json != null)
+			{
+				patientId = json.patientId;
+
+				var elementIdArray = elementId.split("_");
+				var documentId = elementIdArray[1];
+				documentId = documentId.replace(/\s/g, '');
+				$("saveSucessMsg_" + documentId).show();
+				$('saved' + documentId).value = 'true';
+				$("msgBtn_" + documentId).onclick = function ()
+				{
+					popup(700, 960, contextpath + '/oscarMessenger/SendDemoMessage.do?demographic_no=' + patientId, 'msg');
+				};
+
+				Oscar.ShowDocument.updateDocStatusInQueue(documentId);
+				var success = updateGlobalDataAndSideNav(documentId, patientId);
+
+				if (success)
+				{
+					success = updatePatientDocLabNav(documentId, patientId);
+					if (success)
+					{
+						//disable demo input
+						$('autocompletedemo' + documentId).disabled = true;
+					}
+				}
+			}
+		}
+	});
+	return false;
+};
+//change status of queue document link row to I=inactive
+Oscar.ShowDocument.updateDocStatusInQueue = function updateDocStatusInQueue(documentId)
+{
+	var url="../dms/inboxManage.do",
+		data="docid="+documentId+"&method=updateDocStatusInQueue";
+	new Ajax.Request(url,{
+		method:'post',
+		parameters:data,
+		onSuccess:function(transport){}
+	});
+};

@@ -8,18 +8,19 @@
     and "gnu.org/licenses/gpl-2.0.html".
 
 --%>
-<%@page import="java.net.URLEncoder"%>
-<%@ page language="java" %>
-<%@ page import="java.util.*" %>
-<%@ page import="oscar.oscarMDS.data.*,oscar.oscarLab.ca.on.*,oscar.util.StringUtils,oscar.util.UtilDateUtilities" %>
-<%@ page import="org.apache.commons.collections.MultiHashMap" %>
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@ page import="org.apache.log4j.Logger" %>
+<%@ page import="org.oscarehr.common.dao.OscarLogDao"%>
+<%@ page import="org.oscarehr.util.MiscUtils"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="oscar.oscarLab.ca.on.LabResultData" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
-<%@page import="org.oscarehr.common.hl7.v2.oscar_to_oscar.OscarToOscarUtils"%>
-<%@page import="org.oscarehr.util.MiscUtils,org.apache.commons.lang.StringEscapeUtils"%>
-<%@page import="org.apache.log4j.Logger,org.oscarehr.common.dao.OscarLogDao,org.oscarehr.util.SpringUtils"%>
+<%@page import="java.util.List"%>
+<%@page import="java.util.Map"%>
 
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -187,7 +188,7 @@ String curUser_no = (String) session.getAttribute("user");
                                 	%> <input type="hidden" name="NoMoreItems" value="true" /> <%
                             		if (isListView) { %>
 		                                <tr>
-		                                    <tdcolspan="9" align="center">
+		                                    <td colspan="9" align="center">
 		                                        <i>	<% if (pageNum == 1) { %>
 		                                        	<bean:message key="oscarMDS.index.msgNoReports"/>
 		                                        	<% } else { %>
@@ -216,7 +217,6 @@ String curUser_no = (String) session.getAttribute("user");
                             for (int i = 0; i < labdocs.size(); i++) {
 
                                 LabResultData   result =  (LabResultData) labdocs.get(i);
-                                //LabResultData result = (LabResultData) labMap.get(labNoArray.get(i));
 
                                 String segmentID        =  result.getSegmentID();
                                 String status           =  result.getAcknowledgedStatus();
@@ -240,10 +240,6 @@ String curUser_no = (String) session.getAttribute("user");
                                 	labRead = "*";
                                 }
 
-
-                                String discipline=result.getDiscipline();
-                                if(discipline==null || discipline.equalsIgnoreCase("null"))
-                                    discipline="";
                                 MiscUtils.getLogger().debug("result.isAbnormal()="+result.isAbnormal());
                                 doclabid_seq.add(segmentID);
                                 request.setAttribute("segmentID", segmentID);

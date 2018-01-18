@@ -21,36 +21,56 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.document.model;
 
-import java.util.List;
+import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.common.model.CtlDocumentPK;
 
-import javax.persistence.Query;
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-import org.oscarehr.common.model.CtlDocument;
-import org.springframework.stereotype.Repository;
+@Entity
+@Table(name="ctl_document")
+public class CtlDocument extends AbstractModel<CtlDocumentPK>
+{
+	
+	public static final String MODULE_DEMOGRAPHIC = "demographic";
+	public static final String MODULE_PROVIDER = "provider";
 
-@Repository
-public class CtlDocumentDao extends AbstractDao<CtlDocument>{
+	@EmbeddedId
+	private CtlDocumentPK id;
+	
+	@Column(nullable=true)
+	private String status;
+	
+	public CtlDocument() {
+		id = new CtlDocumentPK();
+	}
 
-	public CtlDocumentDao() {
-		super(CtlDocument.class);
+	public CtlDocumentPK getId() {
+		return id;
+	}
+
+	public void setId(CtlDocumentPK id) {
+		this.id = id;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
-	public CtlDocument getCtrlDocument(Integer docId) {
-		Query query = entityManager.createQuery("SELECT x FROM CtlDocument x WHERE x.id.documentNo=:documentNo");
-		query.setParameter("documentNo", docId);
-		
-		return(getSingleResultOrNull(query));
-	}
-
-    public List<CtlDocument> findByDocumentNoAndModule(Integer documentNo, String module) {
-		Query query = entityManager.createQuery("SELECT x FROM CtlDocument x WHERE x.id.documentNo=:documentNo and x.id.module = :module");
-		query.setParameter("documentNo", documentNo);
-		query.setParameter("module", module);
-		
-		@SuppressWarnings("unchecked")
-        List<CtlDocument> cList = query.getResultList();
-		return cList;
+    public boolean isDemographicDocument(){
+        if(id.getModule() != null && id.getModule().equals("demographic")){
+            return true;
+        }
+        return false;
     }
+
+	
 }
