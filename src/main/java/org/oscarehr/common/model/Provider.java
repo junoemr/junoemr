@@ -302,9 +302,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 		setEDeliveryIds(StringUtils.join(idList, ","));
 	}
 	public void setEDeliveryIds(String idCSVString) {
-		if(idCSVString != null) {
-			idCSVString = idCSVString.replaceAll("[^0-9.,]", ""); // strip non-numbers
-		}
 		this.eDeliveryIds = StringUtils.trimToNull(idCSVString);
 	}
 	public String getEDeliveryIds() {
