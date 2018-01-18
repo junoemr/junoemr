@@ -25,6 +25,7 @@ package org.oscarehr.provider.service;
 
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
+import org.oscarehr.provider.model.RecentDemographicAccessPK;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,16 +37,29 @@ import java.util.List;
 public class RecentDemographicAccessService
 {
 	@Autowired
-	RecentDemographicAccessDao recentDemographicAccessDao;
+	private RecentDemographicAccessDao recentDemographicAccessDao;
 
+	/**
+	 * retrieve a list of recent demographics for a given provider
+	 * @param providerNo provider id
+	 * @param offset offset results. ignored if offset < 1
+	 * @param limit limit results. ignored if limit < 1
+	 * @return list of recent access results
+	 */
 	public List<RecentDemographicAccess> getRecentAccessList(Integer providerNo, int offset, int limit)
 	{
 		return recentDemographicAccessDao.findByProviderNo(providerNo, offset, limit);
 	}
 
+	/**
+	 * update a recorded access datetime
+	 * @param providerNo set the provider who accessed the record
+	 * @param demographicNo demographic id of the record
+	 */
 	public void updateAccessRecord(Integer providerNo, Integer demographicNo)
 	{
-		RecentDemographicAccess record = recentDemographicAccessDao.findByPrimaryKey(providerNo, demographicNo);
+		RecentDemographicAccessPK primaryKey = new RecentDemographicAccessPK(providerNo, demographicNo);
+		RecentDemographicAccess record = recentDemographicAccessDao.find(primaryKey);
 		if(record == null)
 		{
 			record = new RecentDemographicAccess(providerNo, demographicNo);

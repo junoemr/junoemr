@@ -39,26 +39,11 @@ public class RecentDemographicAccessDao extends AbstractDao<RecentDemographicAcc
 		super(RecentDemographicAccess.class);
 	}
 
-	public RecentDemographicAccess findByPrimaryKey(Integer providerNo, Integer demographicNo)
-	{
-		String querySql = "SELECT x " +
-				"FROM RecentDemographicAccess x " +
-				"WHERE x.recentDemographicAccessId.providerNo = :providerNo " +
-				"AND x.recentDemographicAccessId.demographicNo = :demographicNo " +
-				"ORDER BY x.accessDateTime DESC";
-
-		Query query = entityManager.createQuery(querySql);
-		query.setParameter("providerNo", providerNo);
-		query.setParameter("demographicNo", demographicNo);
-
-		return this.getSingleResultOrNull(query);
-	}
-
 	public List<RecentDemographicAccess> findByProviderNo(Integer providerNo, int offset, int limit)
 	{
 		String querySql = "SELECT x " +
 				"FROM RecentDemographicAccess x " +
-				"WHERE x.recentDemographicAccessId.providerNo = :providerNo " +
+				"WHERE x.recentDemographicAccessPK.providerNo = :providerNo " +
 				"ORDER BY x.accessDateTime DESC";
 
 		Query query = entityManager.createQuery(querySql);

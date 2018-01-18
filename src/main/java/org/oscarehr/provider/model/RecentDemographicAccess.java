@@ -26,7 +26,6 @@ package org.oscarehr.provider.model;
 import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -35,32 +34,32 @@ import java.util.Date;
 
 @Entity
 @Table(name = "provider_recent_demographic_access")
-public class RecentDemographicAccess extends AbstractModel<RecentDemographicAccessId> implements Serializable
+public class RecentDemographicAccess extends AbstractModel<RecentDemographicAccessPK> implements Serializable
 {
 	@EmbeddedId
-	private RecentDemographicAccessId recentDemographicAccessId;
+	private RecentDemographicAccessPK recentDemographicAccessPK;
 
 	@Column(name = "access_datetime", nullable = false)
 	private Date accessDateTime = new Date();
 
 	public RecentDemographicAccess()
 	{
-		recentDemographicAccessId = new RecentDemographicAccessId();
+		recentDemographicAccessPK = new RecentDemographicAccessPK();
 	}
 	public RecentDemographicAccess(Integer providerNo, Integer demographicNo)
 	{
-		this.setId(new RecentDemographicAccessId(providerNo, demographicNo));
+		this.setId(new RecentDemographicAccessPK(providerNo, demographicNo));
 	}
 
 	@Override
-	public RecentDemographicAccessId getId()
+	public RecentDemographicAccessPK getId()
 	{
-		return recentDemographicAccessId;
+		return recentDemographicAccessPK;
 	}
 
-	public void setId(RecentDemographicAccessId recentDemographicAccessId)
+	public void setId(RecentDemographicAccessPK recentDemographicAccessPK)
 	{
-		this.recentDemographicAccessId = recentDemographicAccessId;
+		this.recentDemographicAccessPK = recentDemographicAccessPK;
 	}
 
 	public Date getAccessDateTime()
@@ -79,50 +78,11 @@ public class RecentDemographicAccess extends AbstractModel<RecentDemographicAcce
 
 	public Integer getDemographicNo()
 	{
-		return recentDemographicAccessId.getDemographicNo();
+		return recentDemographicAccessPK.getDemographicNo();
 	}
 	public Integer getProviderNo()
 	{
-		return recentDemographicAccessId.getProviderNo();
+		return recentDemographicAccessPK.getProviderNo();
 	}
 }
 
-@Embeddable
-class RecentDemographicAccessId implements Serializable
-{
-	@Column(name = "demographic_no", nullable = false)
-	private Integer demographicNo;
-	@Column(name = "provider_no", nullable = false)
-	private Integer providerNo;
-
-	public RecentDemographicAccessId()
-	{
-		//default constructor
-	}
-
-	public RecentDemographicAccessId(Integer providerNo, Integer demographicNo)
-	{
-		this.demographicNo = demographicNo;
-		this.providerNo = providerNo;
-	}
-
-	public Integer getDemographicNo()
-	{
-		return demographicNo;
-	}
-
-	public void setDemographicNo(Integer demographicNo)
-	{
-		this.demographicNo = demographicNo;
-	}
-
-	public Integer getProviderNo()
-	{
-		return providerNo;
-	}
-
-	public void setProviderNo(Integer providerNo)
-	{
-		this.providerNo = providerNo;
-	}
-}
