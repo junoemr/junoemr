@@ -12,8 +12,19 @@
 
 	<appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="File" value="${catalina.base}/logs/oscar.log" />
+		<param name="Threshold" value="INFO" />
 		<param name="Append" value="true" />
-		<param name="DatePattern" value="'.'yyyy-MM" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p [%c{1}:%L] %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="ALERT_FILE" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${catalina.base}/logs/oscar.log.alert" />
+		<param name="Threshold" value="ERROR" />
+		<param name="Append" value="true" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d %-5p [%c{1}:%L] %m%n" />
 		</layout>
@@ -128,8 +139,8 @@
 	<!-- ############################# -->
 
 	<root>
-		<priority value="INFO" />
-		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="FILE"/>
+		<appender-ref ref="ALERT_FILE"/>
 	</root>
 
 </log4j:configuration>
