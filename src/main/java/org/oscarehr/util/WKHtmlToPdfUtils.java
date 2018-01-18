@@ -164,9 +164,11 @@ public class WKHtmlToPdfUtils
 			Timer timer = new Timer();
 			timer.schedule(new InterruptTask(Thread.currentThread()), TIMEOUT_MILLISECONDS);
 
-			process.waitFor();
+			int exitValue = process.waitFor();
 
-			int exitValue = process.exitValue();
+			timer.cancel();
+			timer.purge();
+
 			if (exitValue != 0)
 			{
 				logger.debug("Nonzero exit value running command : " + command[0]);
