@@ -47,7 +47,7 @@ if ( bean == null ){
     return;
 }
 
-     RxDrugData.Interaction[] interactions = (RxDrugData.Interaction[]) bean.getInteractions();
+     RxDrugData.Interaction[] interactions = bean.getInteractions();
      if (interactions != null && interactions.length > 0){
         for (int i = 0 ; i < interactions.length; i++){  %>
 <div
