@@ -27,11 +27,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.runner.RunWith;
-import org.oscarehr.common.dao.EFormDataDao;
+import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.util.SpringUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -47,6 +49,7 @@ import java.util.Hashtable;
 public class DatabaseAPTest
 {
 	private EForm eform;
+	private String demographic_no = "999";
 
 	@Before
 	public void before()
@@ -57,6 +60,16 @@ public class DatabaseAPTest
 		when(SpringUtils.getBean("EFormDataDao")).thenReturn(eFormDataDao);
 
 		eform = new EForm();
+		eform.setDemographicNo(demographic_no);
+		PowerMockito.mockStatic(EctMeasurementsDataBeanHandler.class);
+
+		// to start, set up so any measurement lookup returns empty result
+		when(EctMeasurementsDataBeanHandler.getLast(anyString(), anyString()))
+				.thenReturn(new Hashtable<String, Object>() {}
+				);
+		when(EctMeasurementsDataBeanHandler.getNthLast(anyString(), anyString(), anyInt()))
+				.thenReturn(new Hashtable<String, Object>() {}
+				);
 
 		PowerMockito.mockStatic(EFormLoader.class);
 		when(EFormLoader.getMarker()).thenReturn("oscarDB");
@@ -71,10 +84,16 @@ public class DatabaseAPTest
 
 	public void setExpectedLastMeasurement(String type, String value)
 	{
-		eform.setDemographicNo("999");
-		PowerMockito.mockStatic(EctMeasurementsDataBeanHandler.class);
+		when(EctMeasurementsDataBeanHandler.getLast(demographic_no, type)).
+				thenReturn(new Hashtable<String, Object>()
+				{{
+					put("value", value);
+				}});
+	}
 
-		when(EctMeasurementsDataBeanHandler.getLast("999", type)).
+	public void setExpectedLastMeasurement(String type, String value, int position)
+	{
+		when(EctMeasurementsDataBeanHandler.getNthLast(demographic_no, type, position)).
 				thenReturn(new Hashtable<String, Object>()
 				{{
 					put("value", value);
@@ -106,6 +125,35 @@ public class DatabaseAPTest
 		eform.setDatabaseAPs();
 
 		String expected = "<input name=\"test\" id=\"test\" oscarDB=m$testType#value value=\"testValue\">";
+		String actual = eform.getFormHtml();
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testSetMeasurementAPOffset()
+	{
+		String formHtml = "<input name=\"test\" id=\"test\" oscarDB=m$testType@3#value>";
+		eform.setFormHtml(formHtml);
+
+		setExpectedAP("testType", null);
+		setExpectedLastMeasurement("testType", "testValue", 3);
+		eform.setDatabaseAPs();
+
+		String expected = "<input name=\"test\" id=\"test\" oscarDB=m$testType@3#value value=\"testValue\">";
+		String actual = eform.getFormHtml();
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testSetMeasurementAPOffsetInvalid()
+	{
+		String formHtml = "<input name=\"test\" id=\"test\" oscarDB=m$testType@bad#value>";
+		eform.setFormHtml(formHtml);
+
+		setExpectedAP("testType", null);
+		eform.setDatabaseAPs();
+
+		String expected = "<input name=\"test\" id=\"test\" oscarDB=m$testType@bad#value>";
 		String actual = eform.getFormHtml();
 		assertEquals(expected, actual);
 	}

@@ -176,7 +176,7 @@ public class EctMeasurementsDataBeanHandler {
 
     public static Hashtable<String,Object> getLast(String demo, String type) {
     	MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
-        Object[] i = dao.findMeasurementsAndProvidersByDemoAndType(ConversionUtils.fromIntString(demo), type);
+        Object[] i = dao.findMeasurementAndProviderByDemoTypeAndOffset(ConversionUtils.fromIntString(demo), type, 1);
 		if (i == null) {
 			return new Hashtable<String, Object>();
 		}
@@ -186,6 +186,19 @@ public class EctMeasurementsDataBeanHandler {
     	MeasurementType mt = (MeasurementType) i[2];
     	return toHashTable(m, mt, p);
     }
+
+	public static Hashtable<String,Object> getNthLast(String demo, String type, int position) {
+		MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
+		Object[] i = dao.findMeasurementAndProviderByDemoTypeAndOffset(ConversionUtils.fromIntString(demo), type, position);
+		if (i == null) {
+			return new Hashtable<String, Object>();
+		}
+
+		Measurement m = (Measurement) i[0];
+		Provider p = (Provider) i[1];
+		MeasurementType mt = (MeasurementType) i[2];
+		return toHashTable(m, mt, p);
+	}
 
     private static Hashtable<String,Object> toHashTable(Measurement m, MeasurementType mt, Provider p){
         Hashtable<String,Object> data = new Hashtable<String,Object>();
