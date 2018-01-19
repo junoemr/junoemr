@@ -44,38 +44,46 @@ This Page creates the fax form for eforms.
 %>
 <table width="100%">
 	<input type="hidden" value=<%=faxEnabled%> id="faxControl_faxEnabled"></input>
-	<tr>
-		<td class="tite4" width="10%">Providers:</td>
-		<td class="tite3" width="20%"><select id="otherFaxSelect"
-			style="width: 100%;">
-			<%
+<%
 	String rdName = "";
 	String rdFaxNo = "";
-	for (int i=0;i < displayServiceUtil.specIdVec.size(); i++) {
-		String  specId     = (String) displayServiceUtil.specIdVec.elementAt(i);
-		String  fName      = (String) displayServiceUtil.fNameVec.elementAt(i);
-		String  lName      = (String) displayServiceUtil.lNameVec.elementAt(i);
-		String  proLetters = (String) displayServiceUtil.proLettersVec.elementAt(i);
-		String  address    = (String) displayServiceUtil.addressVec.elementAt(i);
-		String  phone      = (String) displayServiceUtil.phoneVec.elementAt(i);
-		String  fax        = (String) displayServiceUtil.faxVec.elementAt(i);
-		String  referralNo = (displayServiceUtil.referralNoVec.size() > 0 ? displayServiceUtil.referralNoVec.get(i).trim() : "");
-		if (rdohip != null && !"".equals(rdohip) && rdohip.equals(referralNo)) {
-			rdName = String.format("%s, %s", lName, fName);
-			rdFaxNo = fax;
-		}
-		if (!"".equals(fax)) {
-		%>
-			<option value="<%= fax %>"><%= String.format("%s, %s", lName, fName) %></option>
-			<%						
-		}
-	} %>
-		</select></td>
+	if (displayServiceUtil.specIdVec.size() != 0)
+	{
+%>
+	<tr>
+		<td class="tite4" width="10%">Providers:</td>
+		<td class="tite3" width="20%">
+		<select id="otherFaxSelect" style="width: 100%;">
+		<%
+		for (int i=0;i < displayServiceUtil.specIdVec.size(); i++) {
+			String  specId     = (String) displayServiceUtil.specIdVec.elementAt(i);
+			String  fName      = (String) displayServiceUtil.fNameVec.elementAt(i);
+			String  lName      = (String) displayServiceUtil.lNameVec.elementAt(i);
+			String  proLetters = (String) displayServiceUtil.proLettersVec.elementAt(i);
+			String  address    = (String) displayServiceUtil.addressVec.elementAt(i);
+			String  phone      = (String) displayServiceUtil.phoneVec.elementAt(i);
+			String  fax        = (String) displayServiceUtil.faxVec.elementAt(i);
+			String  referralNo = (displayServiceUtil.referralNoVec.size() > 0 ? displayServiceUtil.referralNoVec.get(i).trim() : "");
+			if (rdohip != null && !"".equals(rdohip) && rdohip.equals(referralNo)) {
+				rdName = String.format("%s, %s", lName, fName);
+				rdFaxNo = fax;
+			}
+			if (!"".equals(fax)) {
+			%>
+				<option value="<%= fax %>"><%= String.format("%s, %s", lName, fName) %></option>
+				<%
+			}
+		} %>
+		</select>
+		</td>
 		<td class="tite3">
 			<button onclick="AddOtherFaxProvider(); return false;">Add
 				Provider</button>
 		</td>
 	</tr>
+<%
+	}
+%>
 	<tr>
 		<td class="tite4" width="10%">Other Fax Number:</td>
 		<td class="tite3" width="20%"><input type="text"

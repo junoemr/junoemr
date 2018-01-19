@@ -86,8 +86,13 @@ function getSearchValue(name, url)
 }
 
 function AddOtherFaxProvider() {
-	var selected = jQuery("#otherFaxSelect option:selected"); 
-	_AddOtherFax(selected.text(),selected.val());
+	var selected = jQuery("#otherFaxSelect option:selected");
+	if (checkPhone(selected.val())) {
+		_AddOtherFax(selected.text(),selected.val());
+	}
+	else {
+		alert("The fax number for this provider is invalid.");
+	}
 }
 function AddOtherFax() {
 	var number = jQuery("#otherFaxInput").val();
