@@ -37,13 +37,16 @@ import oscar.oscarRx.data.RxInteractionData;
 import oscar.oscarRx.data.RxPatientData;
 import oscar.oscarRx.data.RxPrescriptionData;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-public class RxSessionBean  implements java.io.Serializable {
+public class RxSessionBean implements Serializable
+{
 	private static final Logger logger=MiscUtils.getLogger();
 
     private String providerNo = null;
@@ -53,8 +56,8 @@ public class RxSessionBean  implements java.io.Serializable {
     private ArrayList<RxPrescriptionData.Prescription> stash = new ArrayList<>();
    // private ArrayList stash=new ArrayList();
     private int stashIndex = -1;
-    private HashMap<String, Allergy[]> allergyWarnings = new HashMap<>();
-    private HashMap<String, RxAllergyWarningWorker> workingAllergyWarnings = new HashMap<>();
+    private Hashtable<String, Allergy[]> allergyWarnings = new Hashtable<>();
+    private Hashtable<String, RxAllergyWarningWorker> workingAllergyWarnings = new Hashtable<>();
     private ArrayList attributeNames = new ArrayList();
     private String interactingDrugList="";//contains hash tables, each hashtable has the a
     private List<String> reRxDrugIdList=new ArrayList<>();
@@ -288,7 +291,7 @@ public class RxSessionBean  implements java.io.Serializable {
 
     public void clearAllergyWarnings(){
        allergyWarnings =null;
-       allergyWarnings = new HashMap<>();
+       allergyWarnings = new Hashtable<>();
     }
 
 

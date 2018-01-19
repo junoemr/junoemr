@@ -25,10 +25,10 @@
 
 package oscar.oscarRx.data;
 
-import java.util.HashMap;
-import java.util.Vector;
-
 import org.oscarehr.util.MiscUtils;
+
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  *
@@ -37,8 +37,8 @@ import org.oscarehr.util.MiscUtils;
 public class RxInteractionData
 {
    private static RxInteractionData rxInteractionData = new RxInteractionData();
-   private static HashMap<Integer, RxDrugData.Interaction[]> interactionHash = new HashMap<>();
-   private static HashMap<Integer, RxInteractionWorker> workingThreadHash = new HashMap<>();
+   private static Hashtable<Integer, RxDrugData.Interaction[]> interactionHash = new Hashtable<>();
+   private static Hashtable<Integer, RxInteractionWorker> workingThreadHash = new Hashtable<>();
 
    public static RxInteractionData getInstance()
    {
