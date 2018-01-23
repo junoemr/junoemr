@@ -53,6 +53,8 @@ import oscar.util.ConversionUtils;
 
 public class EctMeasurementsDataBeanHandler {
 
+	private static MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
+
     Vector<EctMeasurementsDataBean> measurementsDataVector = new Vector<EctMeasurementsDataBean>();
 
     public EctMeasurementsDataBeanHandler(Integer demo) {
@@ -64,8 +66,7 @@ public class EctMeasurementsDataBeanHandler {
     }
 
     public boolean init(Integer demo) {
-        MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
-        for(Object[] i : dao.findMeasurementsAndTypes(demo)) {
+        for(Object[] i : measurementDao.findMeasurementsAndTypes(demo)) {
         	MeasurementType mt = (MeasurementType) i[1];
         	
             EctMeasurementsDataBean data = new EctMeasurementsDataBean();
@@ -140,8 +141,7 @@ public class EctMeasurementsDataBeanHandler {
     }
 
     public static Hashtable<String,String> getMeasurementDataById(String id){
-        MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
-        for(Object[] i : dao.findMeasurementsAndProviders(ConversionUtils.fromIntString(id))) {
+        for(Object[] i : measurementDao.findMeasurementsAndProviders(ConversionUtils.fromIntString(id))) {
         	Measurement m = (Measurement) i[0];
         	MeasurementType mt = (MeasurementType) i[1];
         	Provider p = (Provider) i[2];
@@ -153,8 +153,7 @@ public class EctMeasurementsDataBeanHandler {
     public static List<EctMeasurementsDataBean> getMeasurementObjectByType(String type, Integer demographicNo) {
 		List<EctMeasurementsDataBean> measurements = new ArrayList<EctMeasurementsDataBean>();
 
-    	MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
-        for(Object[] i : dao.findMeasurementsAndProvidersByType(type, demographicNo)) {
+        for(Object[] i : measurementDao.findMeasurementsAndProvidersByType(type, demographicNo)) {
 			Measurement m = (Measurement) i[0];
 			Provider p = (Provider) i[2];
 
@@ -179,8 +178,7 @@ public class EctMeasurementsDataBeanHandler {
     }
 
 	public static Hashtable<String,String> getLast(String demo, String type, int maxResults) {
-		MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
-		List<Object[]> result = dao.findMeasurementsAndProvidersByDemoAndType(ConversionUtils.fromIntString(demo), type, maxResults);
+		List<Object[]> result = measurementDao.findMeasurementsAndProvidersByDemoAndType(ConversionUtils.fromIntString(demo), type, maxResults);
 		return toHashTable(result);
 	}
 
