@@ -251,7 +251,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			var params = {
 				demographicNo: $stateParams.demographicNo,
 				type: item.type === 'eform' ? 'eform' : 'form',
-				id: item.id || item.formId || ''
+				id: item.id || item.formId
 			};
 
 			// The items sent from the server are such that
@@ -263,8 +263,14 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			{
 				params.name = item.type === 'form' ? item.name || queryName : '';
 				$state.go('record.forms.view', params);
-			} else {
+			}
+			else if (item.type === 'eform')
+			{
 				$state.go('record.forms.add', params);
+			}
+			else
+			{
+				$state.go('record.forms');
 			}
 
 			/*
