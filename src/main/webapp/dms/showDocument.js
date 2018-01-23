@@ -183,6 +183,13 @@ Oscar.ShowDocument.updateDocument = function updateDocument(elementId)
 	});
 	return false;
 };
+
+Oscar.ShowDocument.validateAndUpdateDocument = function validateAndUpdateDocument(formId)
+{
+	if (this.checkObservationDate(formId))
+		this.updateDocument(formId);
+
+};
 //change status of queue document link row to I=inactive
 Oscar.ShowDocument.updateDocStatusInQueue = function updateDocStatusInQueue(documentId)
 {

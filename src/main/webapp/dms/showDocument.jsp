@@ -428,7 +428,7 @@
 
 							</table>
 
-							<form id="forms_<%=docId%>" onsubmit="Oscar.ShowDocument.checkObservationDate(this.id); Oscar.ShowDocument.updateDocument(this.id); return false">
+							<form id="forms_<%=docId%>" onsubmit="Oscar.ShowDocument.validateAndUpdateDocument(this.id); return false">
 								<input type="hidden" name="method" value="documentUpdateAjax" />
 								<input type="hidden" name="documentId" value="<%=docId%>" />
 								<!-- segmentID is needed in the event of a page refresh on submit, 
