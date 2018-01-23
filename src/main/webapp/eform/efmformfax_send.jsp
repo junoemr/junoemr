@@ -14,31 +14,67 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 
-<%@page import="org.oscarehr.util.WebUtils,org.oscarehr.util.MiscUtils"%>
+<%@page import="org.oscarehr.util.MiscUtils"%>
 <html:html locale="true">
+	<%
 
+		String formId = (String) request.getAttribute("fdid");
+		String[] faxRecipients = request.getParameterValues("faxRecipients");
+		String providerId = request.getParameter("efmprovider_no");
+		FaxAction bean = new FaxAction(request);
+		boolean failed = false;
+		String responseMsg;
+
+		try
+		{
+			bean.faxForms(faxRecipients, formId, providerId);
+			responseMsg = "Fax has been sent successfully.";
+
+		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().error("An error occurred while faxing eForm.", e);
+			responseMsg = "An error occurred sending the fax, please contact an administrator.";
+			failed = true;
+		}
+
+	%>
 <head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title>Rich Text Letter Fax
-</title>
-<html:base />
-
+	<title>Fax</title>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<link rel="stylesheet" type="text/css" href="../oscarEncounter/encounterStyles.css">
+	<style>
+		table {
+			font-size: initial;
+		}
+		#faxError {
+			font-size: 1.25em;
+			color: red;
+		}
+	</style>
+	<html:base />
 </head>
 <script language="javascript">
 function BackToOscar() {
        window.close();
 }
 
-function finishPage(secs){
-    setTimeout("window.close()",secs*500);
-}
-
+<%
+	if (!failed)
+	{
+%>
+window.onload = function()
+{
+	var seconds = 5;
+	setTimeout(window.close, seconds * 500);
+};
+<%
+	}
+%>
 </script>
 
 
-<link rel="stylesheet" type="text/css" href="../oscarEncounter/encounterStyles.css">
-<body topmargin="0" leftmargin="0" vlink="#0000FF"
-	onload="finishPage(5);">
+<body topmargin="0" leftmargin="0" vlink="#0000FF">
 <!--  -->
 <table class="MainTable" id="scrollNumber1" name="encounterTable">
 	<tr class="MainTableTopRow">
@@ -50,40 +86,28 @@ function finishPage(secs){
 		<td class="MainTableRightColumn">
 		<table width="100%" height="100%">
 			<tr>
-				<td>
-				<%
-					
-				String id  = (String)request.getAttribute("fdid");
-				String[] s = request.getParameterValues("faxRecipients");
-				String providerId = request.getParameter("efmprovider_no");
-				FaxAction bean=new FaxAction(request);
-				try { 
-					bean.faxForms(s,id,providerId);
-					%>
-					Fax has been sent successfully.	
-					<%
-				}
-				catch (Exception e) {
-					MiscUtils.getLogger().error("",e);
-					
-					%>
-					An error occurred sending the fax, please contact an administrator.
-					<%
-				}
-				%>
-				
-				<%=WebUtils.popInfoMessagesAsHtml(session)%>
+				<td id=<%=failed ? "faxError" : "faxSuccess"%>>
+					<%=responseMsg%>
 				</td>
 			</tr>
+
+			<%
+				if (!failed)
+				{
+			%>
 			<tr>
 				<td><bean:message
-					key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgClose5Sec" />
+						key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgClose5Sec"/>
 				</td>
 			</tr>
 			<tr>
 				<td><a href="javascript: BackToOscar();"> <bean:message
-					key="global.btnClose" /> </a></td>
+						key="global.btnClose"/> </a></td>
 			</tr>
+			<%
+				}
+			%>
+
 		</table>
 		</td>
 	</tr>

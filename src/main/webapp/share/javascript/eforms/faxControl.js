@@ -1,8 +1,8 @@
 if (typeof jQuery == "undefined") { alert("The faxControl library requires jQuery. Please ensure that it is loaded first"); }
 
 var faxControlPlaceholder = "<br/>Fax Recipients:<br/><div id='faxForm'>Loading fax options..</div>";
-var faxControlFaxButton     = "<span>&nbsp;</span><input value='Fax' name='FaxButton' id='fax_button' disabled type='button' onclick='submitFaxButtonAjax(false)'>";
-var faxControlFaxSaveButton = "<span>&nbsp;</span><input value='Submit & Fax' name='FaxSaveButton' id='faxSave_button' disabled type='button' onclick='submitFaxButtonAjax(true)'>";
+var faxControlFaxButton     = "<span>&nbsp;</span><input value='Fax' name='FaxButton' id='fax_button' disabled type='button' onclick='submitFax(false)'>";
+var faxControlFaxSaveButton = "<span>&nbsp;</span><input value='Submit & Fax' name='FaxSaveButton' id='faxSave_button' disabled type='button' onclick='submitFax(true)'>";
 var faxControlMemoryInput = "<input value='false' name='faxEForm' id='faxEForm' type='hidden' />";	
 var faxControl = {
 	initialize: function () {
@@ -133,7 +133,7 @@ function hasFaxNumber() {
 	return jQuery("#faxRecipients").children().size() > 0; 
 }
 
-function submitFaxButtonAjax(save) {
+function submitFax(save) {
 	document.getElementById('faxEForm').value=true;
 	
 	var saveHolder = jQuery("#saveHolder");
@@ -145,27 +145,24 @@ function submitFaxButtonAjax(save) {
 	needToConfirm=false;
 	
 	var form = jQuery("form");
+
 	// preserve old RTL functionality
 	var formName=form.attr("name");
 	if ((typeof formName !== typeof undefined && formName !== false) && formName === "RichTextLetter") {
-		form.attr("target", "_blank");
 		document.getElementById('Letter').value=editControlContents('edit');
 	}
-	/* POST the AddEFormAction without navigating away from the page */
-	$.ajax({
-		 type: "POST",
-		 url: form.attr("action"),
-		 data: form.serialize(),
-		 success: function() {
-		    alert("Fax sent successfully");
-		    /* if the save option is selected, close the window after the call */
-		    if (save) { 
-		    	window.close(); 
-	    	}
-		 },
-		 error: function() {
-			 alert("An error occured while attempting to send your fax, please contact an administrator.");
-		 } 
-	});
+
+	if (save)
+	{
+		form.attr('target', '_self');
+	}
+	else
+	{
+		window.open('', 'faxResponse', 'height=300,width=800');
+		form.attr('target', 'faxResponse');
+	}
+
+	form.submit();
+
 	document.getElementById('faxEForm').value=false;
 }
