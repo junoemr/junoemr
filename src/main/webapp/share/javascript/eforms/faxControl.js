@@ -152,8 +152,12 @@ function submitFax(save) {
 		document.getElementById('Letter').value=editControlContents('edit');
 	}
 
-	window.open('', 'faxResponse', 'height=300,width=800');
-	form.attr('target', 'faxResponse');
+	if (!save)
+	{
+		window.open('', 'faxResponse', 'height=300,width=800');
+		form.attr('target', 'faxResponse');
+	}
+
 	form.submit();
 
 	document.getElementById('faxEForm').value=false;
