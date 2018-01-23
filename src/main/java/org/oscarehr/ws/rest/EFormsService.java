@@ -32,6 +32,7 @@ import org.oscarehr.ws.rest.to.model.EFormTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
+import oscar.eform.EFormLoader;
 import oscar.eform.actions.DisplayImageAction;
 
 import javax.ws.rs.GET;
@@ -43,39 +44,64 @@ import java.util.List;
 
 @Path("/eforms")
 @Component("EFormsService")
-public class EFormsService extends AbstractServiceImpl {
+public class EFormsService extends AbstractServiceImpl
+{
 	Logger logger = Logger.getLogger(EFormsService.class);
 
 	@Autowired
 	private FormsManager formsManager;
 
 	/**
-	 * retrieves a list of all eforms better than the getAllEFormNames method
-	 * eform responses will not contain the eform html
+	 * retrieves a list of all EForms better than the getAllEFormNames method
+	 * EForm responses will not contain the eform html
 	 * @return RestResponse
 	 */
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<EFormTo1>, String> getEFormList() {
-
-		List<EFormTo1> allEforms = new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(), formsManager.findByStatus(getLoggedInInfo(), true, EFormDao.EFormSortOrder.NAME));
+	public RestResponse<List<EFormTo1>, String> getEFormList()
+	{
+		List<EFormTo1> allEforms = new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(),
+				formsManager.findByStatus(getLoggedInInfo(), true, EFormDao.EFormSortOrder.NAME));
 		return RestResponse.successResponse(allEforms);
 	}
 
 	/**
-	 * retrieves a list of all eform image names as strings
+	 * retrieves a list of all EForm image names as strings
 	 * @return RestResponse
 	 */
 	@GET
 	@Path("/images")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<String>, String> getEFormImageList() {
-
+	public RestResponse<List<String>, String> getEFormImageList()
+	{
 		String imageHomeDir = OscarProperties.getInstance().getProperty("eform_image");
 		File directory = new File(imageHomeDir);
 
 		List<String> imagesNames = DisplayImageAction.getFiles(directory, ".*\\.(jpg|jpeg|png|gif)$", null);
 		return RestResponse.successResponse(imagesNames);
+	}
+
+	/**
+	 * retrieves a list of all EForm database tags
+	 * @return RestResponse
+	 */
+	@GET
+	@Path("/databaseTags")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<List<String>, String> getEFormDatabaseTagList()
+	{
+		List<String> dbTagList;
+		try
+		{
+			EFormLoader loader = EFormLoader.getInstance();
+			dbTagList = loader.getNames();
+		}
+		catch(Exception e)
+		{
+			logger.error("DB tag Error: ", e);
+			return RestResponse.errorResponse("Error retrieving oscar database tag list");
+		}
+		return RestResponse.successResponse(dbTagList);
 	}
 }

@@ -525,7 +525,7 @@
 
 		// store the list of images on the oscar server so only one load is needed.
 		var eFormImageList = [];
-		/** oscar db tags hardcoded for now. list update date: 2016-10-13 */
+		/** oscar db tags hardcoded for standalone. list update date: 2016-10-13 */
 		var oscarDatabaseTags = ["today", "appt_date", "appt_start_time", "appt_end_time", "next_appt_date",
 			"next_appt_time", "nextf_appt_date", "current_form_id", "current_form_data_id", "current_user",
 			"current_user_fname_lname", "current_user_ohip_no", "current_user_specialty", "current_user_specialty_code",
@@ -590,6 +590,31 @@
 				makeDroppable($(this), "divHighlight", ".gen-layer2, .gen-layer3", true);
 				$(this).removeClass("gen-droppable-destroyed");
 			});
+		}
+		function getOscarDBTags() {
+			var dbTagList = null;
+			if(runStandaloneVersion) {
+				dbTagList = oscarDatabaseTags;
+			}
+			else {
+				$.ajax
+				({
+					type: "GET",
+					url: OSCAR_EFORM_SEARCH_URL + 'databaseTags',
+					dataType: 'json',
+					async: false,
+					success: function (data) {
+						var status = data.status;
+						if(status === "SUCCESS") {
+							dbTagList = data.body;
+						}
+					},
+					failure: function(data) {
+						console.error(data);
+					}
+				});
+			}
+			return dbTagList;
 		}
 		function addOscarImagePath(string) {
 			if(!runStandaloneVersion) {
@@ -1797,7 +1822,7 @@
 			})).append($oscarDbCheckbox).appendTo($options_menu1);
 
 			var $div1 = $("<div>").appendTo($options_menu1);
-			var $db_tag_select = addSelectMenu($div1, "oscarDbTagSelect", "Select Tag:", oscarDatabaseTags);
+			var $db_tag_select = addSelectMenu($div1, "oscarDbTagSelect", "Select Tag:", getOscarDBTags());
 			$db_tag_select.selectmenu("disable");
 			$db_tag_select.on("selectmenuchange", ( function (event, data) {
 				$textBoxTemplate.find(":input").attr('oscarDB', $db_tag_select.val());
