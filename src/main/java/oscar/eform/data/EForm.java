@@ -553,20 +553,17 @@ public class EForm extends EFormBase {
 		if (module.equals("m")) {
 			log.debug("SWITCHING TO MEASUREMENTS");
 
-			Hashtable data;
-			int indexAt = type.indexOf('@');
-			if (indexAt != -1)
+			int maxResults = 1;
+			int startAt = type.indexOf('@');
+			if (startAt != -1)
 			{
-				String index = type.substring(indexAt + 1);
-				type = type.substring(0, indexAt);
-				data = StringUtils.isNumeric(index)
-						? EctMeasurementsDataBeanHandler.getNthLast(this.demographicNo, type, Integer.parseInt(index))
-						: new Hashtable<String, Object>();
+				String count = type.substring(startAt + 1);
+				type = type.substring(0, startAt);
+				maxResults = StringUtils.isNumeric(count) ? Integer.parseInt(count) : 1;
 			}
-			else
-			{
-				data = EctMeasurementsDataBeanHandler.getLast(this.demographicNo, type);
-			}
+
+			Hashtable data = EctMeasurementsDataBeanHandler.getLast(this.demographicNo, type, maxResults);
+
 			if (!data.isEmpty()) {
 				curAP = new DatabaseAP();
 				curAP.setApName(apName);

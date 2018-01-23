@@ -52,7 +52,7 @@ import oscar.oscarEncounter.oscarMeasurements.data.MeasurementTypes;
 import oscar.util.ConversionUtils;
 
 public class EctMeasurementsDataBeanHandler {
-    
+
     Vector<EctMeasurementsDataBean> measurementsDataVector = new Vector<EctMeasurementsDataBean>();
 
     public EctMeasurementsDataBeanHandler(Integer demo) {
@@ -139,7 +139,7 @@ public class EctMeasurementsDataBeanHandler {
         return measurementsDataVector;
     }
 
-    public static Hashtable<String,Object> getMeasurementDataById(String id){
+    public static Hashtable<String,String> getMeasurementDataById(String id){
         MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
         for(Object[] i : dao.findMeasurementsAndProviders(ConversionUtils.fromIntString(id))) {
         	Measurement m = (Measurement) i[0];
@@ -147,75 +147,80 @@ public class EctMeasurementsDataBeanHandler {
         	Provider p = (Provider) i[2];
         	return toHashTable(m, mt, p);
         }
-        return new Hashtable<String, Object>();
-    }
+			return new Hashtable<String, String>();
+		}
 
     public static List<EctMeasurementsDataBean> getMeasurementObjectByType(String type, Integer demographicNo) {
-    	List<EctMeasurementsDataBean> measurements = new ArrayList<EctMeasurementsDataBean>();
-    	
+		List<EctMeasurementsDataBean> measurements = new ArrayList<EctMeasurementsDataBean>();
+
     	MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
         for(Object[] i : dao.findMeasurementsAndProvidersByType(type, demographicNo)) {
-        	Measurement m = (Measurement) i[0];
-        	Provider p = (Provider) i[2];
-        	
-        	EctMeasurementsDataBean measurement = new EctMeasurementsDataBean();
-            measurement.setId(m.getId());
-            measurement.setMeasuringInstrc(m.getMeasuringInstruction());
-            measurement.setType(m.getType());
-            measurement.setProviderFirstName(p.getFirstName());
-            measurement.setProviderLastName(p.getLastName());
-            measurement.setDataField(m.getDataField());
-            measurement.setComments(m.getComments());
-            measurement.setDateObservedAsDate(m.getDateObserved());
-            measurement.setDateEnteredAsDate(m.getCreateDate());
-            measurements.add(measurement);
-        }
-       
+			Measurement m = (Measurement) i[0];
+			Provider p = (Provider) i[2];
+
+			EctMeasurementsDataBean measurement = new EctMeasurementsDataBean();
+			measurement.setId(m.getId());
+			measurement.setMeasuringInstrc(m.getMeasuringInstruction());
+			measurement.setType(m.getType());
+			measurement.setProviderFirstName(p.getFirstName());
+			measurement.setProviderLastName(p.getLastName());
+			measurement.setDataField(m.getDataField());
+			measurement.setComments(m.getComments());
+			measurement.setDateObservedAsDate(m.getDateObserved());
+			measurement.setDateEnteredAsDate(m.getCreateDate());
+			measurements.add(measurement);
+		}
+
         return measurements;
-    }
-
-    public static Hashtable<String,Object> getLast(String demo, String type) {
-    	MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
-        Object[] i = dao.findMeasurementAndProviderByDemoTypeAndOffset(ConversionUtils.fromIntString(demo), type, 1);
-		if (i == null) {
-			return new Hashtable<String, Object>();
-		}
-    
-    	Measurement m = (Measurement) i[0];
-    	Provider p = (Provider) i[1];
-    	MeasurementType mt = (MeasurementType) i[2];
-    	return toHashTable(m, mt, p);
-    }
-
-	public static Hashtable<String,Object> getNthLast(String demo, String type, int position) {
-		MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
-		Object[] i = dao.findMeasurementAndProviderByDemoTypeAndOffset(ConversionUtils.fromIntString(demo), type, position);
-		if (i == null) {
-			return new Hashtable<String, Object>();
-		}
-
-		Measurement m = (Measurement) i[0];
-		Provider p = (Provider) i[1];
-		MeasurementType mt = (MeasurementType) i[2];
-		return toHashTable(m, mt, p);
 	}
 
-    private static Hashtable<String,Object> toHashTable(Measurement m, MeasurementType mt, Provider p){
-        Hashtable<String,Object> data = new Hashtable<String,Object>();
-        data.put("type", mt.getTypeDisplayName());
-        data.put("typeDisplayName", mt.getTypeDisplayName());
-        data.put("typeDescription", mt.getTypeDescription());
-        data.put("value", m.getDataField());
-        data.put("measuringInstruction", m.getMeasuringInstruction());
-        data.put("comments", m.getComments());
-        data.put("dateObserved", ConversionUtils.toTimestampString(m.getDateObserved()));
-        data.put("dateObserved_date", m.getDateObserved());
-        data.put("dateEntered", ConversionUtils.toTimestampString(m.getCreateDate()));
-        data.put("dateEntered_date", m.getCreateDate());
-        data.put("provider_first", p.getFirstName());
-        data.put("provider_last", p.getLastName());
-        return data;
-    }   
+    public static Hashtable<String,String> getLast(String demo, String type) {
+    	return getLast(demo, type, 1);
+    }
+
+	public static Hashtable<String,String> getLast(String demo, String type, int maxResults) {
+		MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
+		List<Object[]> result = dao.findMeasurementsAndProvidersByDemoAndType(ConversionUtils.fromIntString(demo), type, maxResults);
+		if (result == null) {
+			return new Hashtable<>();
+		}
+		return toHashTable(result);
+	}
+
+	private static Hashtable<String,String> toHashTable(List<Object[]> resultList)
+	{
+		Hashtable<String,String> data = new Hashtable<>();
+		for (Object[] result : resultList)
+		{
+			Measurement measurement = (Measurement) result[0];
+			Provider provider = (Provider) result[1];
+			MeasurementType measurementType = (MeasurementType) result[2];
+
+			Hashtable<String, String> resultTable = toHashTable(measurement, measurementType, provider);
+			for (String key : resultTable.keySet())
+			{
+				String value = resultTable.get(key);
+				data.put(key, data.containsKey(key) ? data.get(key) + "," + value : value);
+			}
+		}
+
+		return data;
+	}
+
+	private static Hashtable<String,String> toHashTable(Measurement m, MeasurementType mt, Provider p){
+		Hashtable<String,String> data = new Hashtable<>();
+		data.put("type", mt.getTypeDisplayName());
+		data.put("typeDisplayName", mt.getTypeDisplayName());
+		data.put("typeDescription", mt.getTypeDescription());
+		data.put("value", m.getDataField());
+		data.put("measuringInstruction", m.getMeasuringInstruction());
+		data.put("comments", m.getComments());
+		data.put("dateObserved", ConversionUtils.toTimestampString(m.getDateObserved()));
+		data.put("dateEntered", ConversionUtils.toTimestampString(m.getCreateDate()));
+		data.put("provider_first", p.getFirstName());
+		data.put("provider_last", p.getLastName());
+		return data;
+    }
     
     private static List<CachedMeasurement> getRemoteMeasurements(LoggedInInfo loggedInInfo,Integer demographicId){
     	List<CachedMeasurement> remoteMeasurements = null;

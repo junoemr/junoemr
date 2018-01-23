@@ -683,19 +683,20 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 		return query.getResultList();
 	}
 
-	public Object[] findMeasurementAndProviderByDemoTypeAndOffset(Integer demographicNo, String type, int position) {
+	public List<Object[]> findMeasurementsAndProvidersByDemoAndType(Integer demographicNo, String type, int maxResults) {
 		String sql = "FROM Measurement m, Provider p, MeasurementType mt " + "WHERE m.demographicId = :demoNo " + "AND m.type = :type " + "AND (" + "	m.providerNo = p.ProviderNo " + "	OR m.providerNo = '0'" + ") " + "AND m.type = mt.type " + "GROUP BY m.id " + "ORDER BY m.dateObserved DESC, m.createDate DESC";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("type", type);
 		query.setParameter("demoNo", demographicNo);
-		query.setMaxResults(position);
+		query.setMaxResults(maxResults);
+
 
 		List<Object[]> result = query.getResultList();
-		if (result.isEmpty() || result.size() < position) {
+		if (result.isEmpty()) {
 			return null;
 		}
 
-		return result.get(--position);
+		return result;
 	}
 
 	public List<Measurement> findByValue(String key, String value) {
