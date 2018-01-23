@@ -690,13 +690,7 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 		query.setParameter("demoNo", demographicNo);
 		query.setMaxResults(maxResults);
 
-
-		List<Object[]> result = query.getResultList();
-		if (result.isEmpty()) {
-			return null;
-		}
-
-		return result;
+		return query.getResultList();
 	}
 
 	public List<Measurement> findByValue(String key, String value) {

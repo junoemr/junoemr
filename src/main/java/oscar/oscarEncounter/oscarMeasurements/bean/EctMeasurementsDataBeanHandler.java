@@ -181,9 +181,6 @@ public class EctMeasurementsDataBeanHandler {
 	public static Hashtable<String,String> getLast(String demo, String type, int maxResults) {
 		MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
 		List<Object[]> result = dao.findMeasurementsAndProvidersByDemoAndType(ConversionUtils.fromIntString(demo), type, maxResults);
-		if (result == null) {
-			return new Hashtable<>();
-		}
 		return toHashTable(result);
 	}
 
