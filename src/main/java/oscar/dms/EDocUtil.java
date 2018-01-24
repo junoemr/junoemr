@@ -797,28 +797,10 @@ public final class EDocUtil extends SqlUtilBaseS {
 		return key;
 	}
 
-	// private static String getLastDocumentNo() {
-	public static String getLastDocumentNo() {
-		String documentNo = null;
-		try {
-			String sql = "select max(document_no) from document";
-			ResultSet rs = DBHandler.GetSQL(sql);
-			if (rs.next()) {
-				documentNo = oscar.Misc.getString(rs, 1);
-			}
-			rs.close();
-		} catch (SQLException e) {
-			logger.error("Error", e);
-		}
-		return documentNo;
-	}
-
-	public static String getLastDocumentDesc() {
+	public static String getDocumentDescription(Integer doc_no) {
 		String docDesc = null;
 		try {
-			String docNumber = EDocUtil.getLastDocumentNo();
-
-			String sql = "select docdesc from document where document_no=" + docNumber;
+			String sql = "select docdesc from document where document_no=" + doc_no;
 			ResultSet rs = DBHandler.GetSQL(sql);
 			if (rs.next()) {
 				docDesc = oscar.Misc.getString(rs, 1);
