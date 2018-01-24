@@ -57,7 +57,7 @@ var faxControl = {
 					if (buttonLocation == null) { alert("Unable to find form or save button please check this is a proper eform."); return; }					
 					
 					updateFaxButton();
-					
+
 					if(!faxEnabled) {
 						placeholder.find(":input").prop('disabled', true);
 						placeholder.find(":button").prop('disabled', true);
@@ -86,8 +86,13 @@ function getSearchValue(name, url)
 }
 
 function AddOtherFaxProvider() {
-	var selected = jQuery("#otherFaxSelect option:selected"); 
-	_AddOtherFax(selected.text(),selected.val());
+	var selected = jQuery("#otherFaxSelect option:selected");
+	if (checkPhone(selected.val())) {
+		_AddOtherFax(selected.text(),selected.val());
+	}
+	else {
+		alert("The fax number for this provider is invalid.");
+	}
 }
 function AddOtherFax() {
 	var number = jQuery("#otherFaxInput").val();
@@ -109,7 +114,10 @@ function _AddOtherFax(name, number) {
 
 function checkPhone(str) 
 {
-	var phone =  /^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/;
+	// matches numbers in the NANP format: NXX-NXX-XXXX where X is a digit 0-9 and N is a digit 2-9
+	// with optional country code at the front
+	// valid examples: 250-333-1234, +1 250 333 1234, 12503331234
+	var phone = /^(\+?\d)?[- ]?([2-9]\d{2}[- ]?){2}\d{4}$/;
 	if (str.match(phone)) {
    		return true;
  	} else {
@@ -130,7 +138,7 @@ function updateFaxButton() {
 }
 
 function hasFaxNumber() {
-	return jQuery("#faxRecipients").children().size() > 0; 
+	return jQuery("#faxRecipients").children().size() > 0;
 }
 
 function submitFaxButtonAjax(save) {
