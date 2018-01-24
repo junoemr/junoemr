@@ -21,52 +21,41 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.model;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+package org.oscarehr.eform.exception;
 
-@Entity
-@Table(name="ctl_document")
-public class CtlDocument extends AbstractModel<CtlDocumentPK> {
-	
-	public static final String MODULE_DEMOGRAPHIC = "demographic";
-	public static final String MODULE_PROVIDER = "provider";
+import org.apache.struts.action.ActionMessages;
+import oscar.eform.data.EForm;
 
-	@EmbeddedId
-	private CtlDocumentPK id;
-	
-	@Column(nullable=true)
-	private String status;
-	
-	public CtlDocument() {
-		id = new CtlDocumentPK();
+/**
+ * Custom exception class for saving EForms.
+ * This is intended as a way to allow specific errors and error messages to be
+ * passed out of the transactional service for backwards compatibility.
+ */
+public class EFormMeasurementException extends RuntimeException
+{
+	private ActionMessages errors;
+	private EForm eformData;
+
+	public EFormMeasurementException(String message)
+	{
+		super(message);
+		eformData = null;
+		errors = null;
 	}
 
-	public CtlDocumentPK getId() {
-		return id;
+	public EFormMeasurementException(String message, ActionMessages errors, EForm eformData)
+	{
+		super(message);
+		this.eformData = eformData;
+		this.errors = errors;
 	}
-
-	public void setId(CtlDocumentPK id) {
-		this.id = id;
+	public ActionMessages getErrors()
+	{
+		return errors;
 	}
-
-	public String getStatus() {
-		return status;
+	public EForm getEformData()
+	{
+		return eformData;
 	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-	
-    public boolean isDemographicDocument(){
-        if(id.getModule() != null && id.getModule().equals("demographic")){
-            return true;
-        }
-        return false;
-    }
-
-	
 }

@@ -25,7 +25,7 @@
 --%>
 
 <%@ page import="org.oscarehr.common.service.FieldNoteManager" %>
-<%@ page import="org.oscarehr.common.model.EFormValue" %>
+<%@ page import="org.oscarehr.eform.model.EFormValue" %>
 <%@ page import="java.util.*" %>
 <%@ page import="oscar.util.StringUtils" %>
 

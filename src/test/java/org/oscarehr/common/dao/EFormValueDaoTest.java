@@ -32,7 +32,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.EFormValue;
+import org.oscarehr.eform.dao.EFormValueDao;
+import org.oscarehr.eform.model.EFormValue;
 import org.oscarehr.util.SpringUtils;
 
 public class EFormValueDaoTest extends DaoTestFixtures {

@@ -105,7 +105,10 @@ boolean ajax = "true".equals(request.getParameter("ajax"));
 
 	<link rel="stylesheet" type="text/css" media="all" href="<%=request.getContextPath()%>/share/css/oscarMDSIndex.css"/>
 
-	<script type="text/javascript" src="<%=request.getContextPath()%>/dms/showDocument.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/util/common.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/moment.min.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/util/date.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath()%>/dms/showDocument.js"></script>
 
 	<title>
 <bean:message key="oscarMDS.index.title"/>

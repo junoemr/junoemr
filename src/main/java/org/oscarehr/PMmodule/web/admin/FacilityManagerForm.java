@@ -24,7 +24,7 @@
 package org.oscarehr.PMmodule.web.admin;
 
 import org.apache.struts.action.ActionForm;
-import org.oscarehr.common.model.EForm;
+import org.oscarehr.eform.model.EForm;
 import org.oscarehr.common.model.Facility;
 
 import java.util.List;

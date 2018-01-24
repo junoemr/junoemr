@@ -36,11 +36,11 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.common.dao.EFormValueDao;
+import org.oscarehr.eform.dao.EFormValueDao;
 import org.oscarehr.common.model.Allergy;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.EFormValue;
+import org.oscarehr.eform.model.EFormValue;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
@@ -1196,7 +1196,7 @@ public class PdfRecordPrinter {
 
     }
 
-    public void printPhotos(String contextPath, List<org.oscarehr.common.model.Document> photos) throws DocumentException {
+    public void printPhotos(String contextPath, List<org.oscarehr.document.model.Document> photos) throws DocumentException {
     	writer.setStrictImageSequence(true);
 
     	if(photos.size()>0) {
@@ -1210,7 +1210,7 @@ public class PdfRecordPrinter {
 	        getDocument().add(p);
     	}
 
-    	for(org.oscarehr.common.model.Document doc:photos) {
+    	for(org.oscarehr.document.model.Document doc:photos) {
     		Image img = null;
     		try {
     			String location = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR").trim() + doc.getDocfilename();

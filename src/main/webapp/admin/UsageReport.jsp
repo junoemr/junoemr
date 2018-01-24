@@ -57,7 +57,7 @@ if(!authed) {
 <%@page import="org.oscarehr.common.model.ProviderInboxItem" %>
 <%@page import="org.oscarehr.managers.TicklerManager" %>
 <%@page import="org.oscarehr.common.model.CustomFilter" %>
-<%@page import="org.oscarehr.common.dao.DocumentDao"%>
+<%@page import="org.oscarehr.document.dao.DocumentDao"%>
 <%@page import="org.oscarehr.common.dao.BillingONCHeader1Dao" %>
 
 <%@ include file="/taglibs.jsp"%>

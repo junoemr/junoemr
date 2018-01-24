@@ -257,6 +257,10 @@ public final class MessageUploader {
 				else if (type.equals("CLS") || type.equals("CLSDI")) {
 					search = "hso_no";
 				}
+				else if (type.equals("IHA"))
+				{
+					search = "alberta_e_delivery_ids";
+				}
 				providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
 			}
 			retVal = messageHandler.audit();

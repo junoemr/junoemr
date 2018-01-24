@@ -45,8 +45,8 @@
 <%@page import="org.oscarehr.sharingcenter.dao.MiscMappingDao"%>
 <%@page import="org.oscarehr.sharingcenter.model.EFormMapping"%>
 <%@page import="org.oscarehr.sharingcenter.dao.EFormMappingDao"%>
-<%@page import="org.oscarehr.common.dao.EFormDao"%>
-<%@page import="org.oscarehr.common.model.EForm"%>
+<%@page import="org.oscarehr.eform.dao.EFormDao"%>
+<%@page import="org.oscarehr.eform.model.EForm"%>
 <%@page import="org.marc.shic.core.MappingCodeType"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="org.oscarehr.sharingcenter.model.EDocMapping"%>
