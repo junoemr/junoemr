@@ -27,6 +27,7 @@ package oscar.oscarMDS.pageUtil;
 
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -89,14 +90,16 @@ public class ReportStatusUpdateAction extends DispatchAction {
 			}
 		}
 
-        if(status == 'A'){
-            String demographicID = getDemographicIdFromLab(lab_type, labNo);
-            String logConst = (lab_type != null && lab_type.equalsIgnoreCase("DOC")) ? LogConst.CON_DOCUMENT : LogConst.CON_HL7_LAB;
-            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACK, logConst, ""+labNo, request.getRemoteAddr(),demographicID);
-        }
-
-        try {
+        try
+		{
             CommonLabResultData.updateReportStatus(labNo, providerNo, status, comment,lab_type);
+
+			if(status == 'A'){
+				String demographicID = getDemographicIdFromLab(lab_type, labNo);
+				String logConst = (lab_type != null && lab_type.equalsIgnoreCase("DOC")) ? LogConst.CON_DOCUMENT : LogConst.CON_HL7_LAB;
+				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACK, logConst, ""+labNo, request.getRemoteAddr(),demographicID);
+			}
+
             if (multiID != null){
                 String[] id = multiID.split(",");
                 int i=0;
@@ -112,8 +115,10 @@ public class ReportStatusUpdateAction extends DispatchAction {
                 return null;
             else
                 return mapping.findForward("success");
-        } catch (Exception e) {
-            logger.error("exception in ReportStatusUpdateAction",e);
+        }
+        catch (SQLException e)
+		{
+            logger.error("Error updating report status.", e);
             return mapping.findForward("failure");
         }
     }
@@ -129,8 +134,8 @@ public class ReportStatusUpdateAction extends DispatchAction {
 
         	CommonLabResultData.updateReportStatus(labNo, providerNo, status, comment,lab_type);
 
-        } catch(Exception e) {
-        	logger.error("exception in setting comment",e);
+        } catch(SQLException e) {
+        	logger.error("exception in setting comment", e);
             return mapping.findForward("failure");
         }
     	return null;

@@ -38,6 +38,7 @@ import java.io.RandomAccessFile;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -222,20 +224,28 @@ public class ManageDocumentAction extends DispatchAction {
 	}
 
 	public ActionForward removeLinkFromDocument(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response) throws ServletException
+	{
 		String docType = request.getParameter("docType");
 		String docId = request.getParameter("docId");
 		String providerNo = request.getParameter("providerNo");
 
-		providerInboxRoutingDAO.removeLinkFromDocument(docType, docId, providerNo);
-		HashMap hm = new HashMap();
-		hm.put("linkedProviders", providerInboxRoutingDAO.getProvidersWithRoutingForDocument(docType, docId));
+		try
+		{
+			providerInboxRoutingDAO.removeLinkFromDocument(docType, docId, providerNo);
+			HashMap hm = new HashMap();
+			hm.put("linkedProviders", providerInboxRoutingDAO.getProvidersWithRoutingForDocument(docType, docId));
 
-		JSONObject jsonObject = JSONObject.fromObject(hm);
-		try {
+			JSONObject jsonObject = JSONObject.fromObject(hm);
 			response.getOutputStream().write(jsonObject.toString().getBytes());
-		} catch (IOException e) {
-			MiscUtils.getLogger().error("Error",e);
+		}
+		catch (SQLException e)
+		{
+			throw new ServletException("Error removing link from document.", e);
+		}
+		catch (IOException e)
+		{
+			MiscUtils.getLogger().error("Error writing response.", e);
 		}
 
 		return null;
