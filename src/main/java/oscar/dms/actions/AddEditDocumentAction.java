@@ -188,14 +188,15 @@ public class AddEditDocumentAction extends DispatchAction {
 			request.setAttribute("editDocumentNo", "");
 			return mapping.findForward("failEdit");
 		} else if (fm.getMode().equals("add")) {
+			Integer doc_no = addDocument(fm, mapping, request);
 			// if add/edit success then send redirect, if failed send a forward (need the formdata and errors hashtables while trying to avoid POSTDATA messages)
-			if (addDocument(fm, mapping, request) == true) { // if success
+			if (doc_no != null) { // if success
 				ActionRedirect redirect = new ActionRedirect(mapping.findForward("successAdd"));
 				// If this is for an eform...
 				if(request.getParameter("eformUpload") != null && request.getParameter("eformUpload").equals("true")){
 					redirect = new ActionRedirect(mapping.findForward("successAddEForm"));
 					// TODO: I can't figure out a way to easily get the document_no from addDocument() without significantly changing the function, so let's use this hack for now.
-					redirect.addParameter("document_no", EDocUtil.getLastDocumentNo());
+					redirect.addParameter("document_no", doc_no);
 					redirect.addParameter("document_index", request.getParameter("document_index"));
 					redirect.addParameter("document_description", fm.getDocDesc());
 				}
@@ -227,11 +228,11 @@ public class AddEditDocumentAction extends DispatchAction {
 		}
 	}
 
-	/** returns true if successful */
-	private boolean addDocument(AddEditDocumentForm fm, ActionMapping mapping, HttpServletRequest request) {
-
+	/** returns new document ID if successful else returns null */
+	private Integer addDocument(AddEditDocumentForm fm, ActionMapping mapping, HttpServletRequest request) {
 		HashMap<String, String> errors = new HashMap<String, String>();
 		boolean documentValid = true;
+		Integer doc_no = null;
 		try {
 			if ((fm.getDocDesc().length() == 0) || (fm.getDocDesc().equals("Enter Title"))) {
 				errors.put("descmissing", "dms.error.descriptionInvalid");
@@ -286,21 +287,25 @@ public class AddEditDocumentAction extends DispatchAction {
 			 		EDocUtil.addDocTypeSQL(fm.getDocType(),fm.getFunction());
 			 	}
 
-
 				// ---
-				String doc_no = EDocUtil.addDocumentSQL(newDoc);
-				if(ConformanceTestHelper.enableConformanceOnlyTestFeatures){
-					storeDocumentInDatabase(file, Integer.parseInt(doc_no));
+				try
+				{
+					doc_no = Integer.parseInt(EDocUtil.addDocumentSQL(newDoc));
+				} catch(NumberFormatException e){
+					MiscUtils.getLogger().error("Invalid document number: " + doc_no);
+					return null;
 				}
-				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, doc_no, request.getRemoteAddr());
+				if(ConformanceTestHelper.enableConformanceOnlyTestFeatures){
+					storeDocumentInDatabase(file,doc_no);
+				}
+				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ADD, LogConst.CON_DOCUMENT, String.valueOf(doc_no), request.getRemoteAddr());
 				// add note if document is added under a patient
 				String module = fm.getFunction().trim();
 				String moduleId = fm.getFunctionId().trim();
 				if (module.equals("demographic")) {// doc is uploaded under a patient,moduleId become demo no.
 	
 					Date now = EDocUtil.getDmsDateTimeAsDate();
-	
-					String docDesc = EDocUtil.getLastDocumentDesc();
+					String docDesc = EDocUtil.getDocumentDescription(doc_no);
 	
 					CaseManagementNote cmn = new CaseManagementNote();
 					cmn.setUpdate_date(now);
@@ -347,7 +352,7 @@ public class AddEditDocumentAction extends DispatchAction {
 					// Add a noteLink to casemgmt_note_link
 					CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
 					cmnl.setTableName(CaseManagementNoteLink.DOCUMENT);
-					cmnl.setTableId(Long.parseLong(doc_no));
+					cmnl.setTableId(Long.valueOf(doc_no));
 					cmnl.setNoteId(note_id);
 	
 					request.setAttribute("document_no", doc_no);
@@ -366,8 +371,9 @@ public class AddEditDocumentAction extends DispatchAction {
 			// ActionRedirect redirect = new ActionRedirect(mapping.findForward("failAdd"));
 			request.setAttribute("docerrors", errors);
 			request.setAttribute("completedForm", fm);
+			return null;
 		}
-		return documentValid;
+		return doc_no;
 	}
 
 	private ActionForward editDocument(AddEditDocumentForm fm, ActionMapping mapping, HttpServletRequest request) {
