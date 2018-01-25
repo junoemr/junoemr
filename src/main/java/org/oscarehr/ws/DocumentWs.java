@@ -52,8 +52,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.lowagie.text.pdf.PdfReader;
 
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
-import org.oscarehr.common.model.CtlDocument;
-import org.oscarehr.common.model.Document;
+import org.oscarehr.document.model.CtlDocument;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.managers.DocumentManager;
 import org.oscarehr.util.LoggedInInfo;

@@ -25,32 +25,59 @@
 
 package oscar.eform.actions;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.eform.model.EForm;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
-import oscar.eform.EFormUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class DelEFormAction extends Action {
-	
+
+	private static Logger logger = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private org.oscarehr.eform.service.EFormTemplate eFormTemplateService = SpringUtils.getBean(org.oscarehr.eform.service.EFormTemplate.class);
 	
     public ActionForward execute(ActionMapping mapping, ActionForm form, 
                                 HttpServletRequest request, HttpServletResponse response) {
-    	
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null)) {
-			throw new SecurityException("missing required security object (_eform)");
-		}
-    	
-        String fid = request.getParameter("fid");
-        EFormUtil.delEForm(fid);
-        return(mapping.findForward("success"));
+
+	    String fid = request.getParameter("fid");
+    	try
+	    {
+		    logger.info("Delete EForm Template (id: " + fid + ")");
+
+		    if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null)) {
+			    throw new SecurityException("missing required security object (_eform)");
+		    }
+
+		    LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		    String providerNo = loggedInInfo.getLoggedInProviderNo();
+
+		    EForm eFormTemplate = eFormTemplateService.deleteTemplate(Integer.parseInt(fid));
+		    LogAction.addLogEntry(providerNo, null, LogConst.ACTION_DELETE, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
+				    String.valueOf(eFormTemplate.getId()), loggedInInfo.getIp(), eFormTemplate.getFormName());
+	    }
+	    catch(IllegalArgumentException e)
+	    {
+	    	logger.error("Invalid Form Id: " + fid, e);
+	    	request.setAttribute("error","Invalid Form Id: " + fid);
+		    return(mapping.findForward("failure"));
+	    }
+	    catch(SecurityException e)
+	    {
+		    logger.error("Security Error", e);
+		    request.setAttribute("error","Security Error");
+		    return(mapping.findForward("failure"));
+	    }
+	    return(mapping.findForward("success"));
     }
 }

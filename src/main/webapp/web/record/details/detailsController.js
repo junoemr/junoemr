@@ -1227,7 +1227,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			{
 				if (controller.page.billregion == "CLINICAID")
 				{
-					url = "../billing.do?billRegion=CLINICAID&action=invoice_reports";
+					url = "../billing.do?billRegion=CLINICAID&action=invoice_reports&patient_remote_id=" + controller.page.demo.demographicNo;
 				}
 				else if (controller.page.billregion == "ON")
 				{

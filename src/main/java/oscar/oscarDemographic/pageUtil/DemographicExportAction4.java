@@ -1610,17 +1610,18 @@ public class DemographicExportAction4 extends Action {
 								}
 
 								long dLong = (ap.getEndTime().getTime() - ap.getStartTime().getTime()) / 60000 + 1;
-								BigInteger duration = BigInteger.valueOf(dLong); // duration
-																					// in
-																					// minutes
+								BigInteger duration = BigInteger.valueOf(dLong); // duration in minutes
 								aptm.setDuration(duration);
 
 								if (StringUtils.filled(ap.getStatus())) {
-									ApptStatusData asd = new ApptStatusData();
-									asd.setApptStatus(ap.getStatus());
+									ApptStatusData asd = new ApptStatusData(ap.getStatus());
 									String msg = null;
-									if (strEditable != null && strEditable.equalsIgnoreCase("yes")) msg = asd.getTitle();
-									else msg = getResources(request).getMessage(asd.getTitle());
+									if (strEditable != null && strEditable.equalsIgnoreCase("yes")) {
+										msg = asd.getTitle();
+									}
+									else {
+										msg = getResources(request).getMessage(asd.getTitle());
+									}
 
 									if (StringUtils.filled(msg)) {
 										aptm.setAppointmentStatus(msg);

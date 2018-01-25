@@ -23,7 +23,7 @@
     Ontario, Canada
 
 --%>
-<%@ page import="oscar.eform.data.*, oscar.eform.*, java.util.*, oscar.util.*, org.apache.commons.lang.StringEscapeUtils"%>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils, oscar.eform.EFormUtil, java.util.ArrayList, java.util.HashMap"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%
@@ -102,6 +102,7 @@ window.opener.location.href = '<%=request.getContextPath()%>/administration/?sho
 <body id="eformBody">
 
 <%@ include file="efmTopNav.jspf"%>
+<%@ include file="efmShowError.jspf"%>
 
 <%if (request.getParameter("fid") != null){%>
 <h3><bean:message key="eform.edithtml.msgEditEform" /></h3>

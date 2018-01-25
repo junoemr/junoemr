@@ -9,7 +9,7 @@
 
 --%>
 <%@ page import="java.util.*,oscar.oscarDemographic.data.*,oscar.oscarPrevention.*,oscar.oscarProvider.data.*,oscar.util.*,oscar.oscarReport.data.*,oscar.oscarPrevention.pageUtil.*,oscar.oscarDemographic.pageUtil.*"%>
-<%@ page import="org.oscarehr.util.SpringUtils,org.oscarehr.common.dao.EFormDao" %>
+<%@ page import="org.oscarehr.util.SpringUtils,org.oscarehr.eform.dao.EFormDao" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>

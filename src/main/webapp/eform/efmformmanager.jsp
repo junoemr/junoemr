@@ -24,16 +24,16 @@
 
 --%>
 <!DOCTYPE html>
-<%@ page import="oscar.eform.data.*, oscar.eform.*, java.util.*"%>
+<%@ page import="oscar.eform.EFormUtil, java.util.ArrayList, java.util.HashMap"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%
-String orderByRequest = request.getParameter("orderby");
-String orderBy = "";
-if (orderByRequest == null) orderBy = EFormUtil.DATE;
-else if (orderByRequest.equals("form_subject")) orderBy = EFormUtil.SUBJECT;
-else if (orderByRequest.equals("form_name")) orderBy = EFormUtil.NAME;
-else if (orderByRequest.equals("file_name")) orderBy = EFormUtil.FILE_NAME;
+	String orderByRequest = request.getParameter("orderby");
+	String orderBy = "";
+	if(orderByRequest == null) orderBy = EFormUtil.DATE;
+	else if(orderByRequest.equals("form_subject")) orderBy = EFormUtil.SUBJECT;
+	else if(orderByRequest.equals("form_name")) orderBy = EFormUtil.NAME;
+	else if(orderByRequest.equals("file_name")) orderBy = EFormUtil.FILE_NAME;
 %>
 <html:html locale="true">
 <head>
@@ -108,7 +108,8 @@ $(function ()  {
 
 
 <%@ include file="efmTopNav.jspf"%>
-    
+<%@ include file="efmShowError.jspf"%>
+
 <h3 style='display:inline;padding-right:10px'><bean:message key="eform.uploadhtml.msgLibrary" /></h3> <a href="<%= request.getContextPath() %>/eform/efmformmanagerdeleted.jsp" class="contentLink">View Deleted<!--<bean:message key="eform.uploadhtml.btnDeleted" />--> </a> 
 
     
@@ -150,7 +151,7 @@ $(function ()  {
 <table class="table table-condensed table-striped" id="eformTbl">
 <thead>
     <tr>
-        <th><!--<a href="<%= request.getContextPath() %>/eform/efmformmanager.jsp?orderby=file_name" class="contentLink"class="contentLink"><bean:message key="eform.uploadhtml.btnFile" />--></a></th>
+        <th><!--<a href="<%= request.getContextPath() %>/eform/efmformmanager.jsp?orderby=file_name" class="contentLink"class="contentLink"><bean:message key="eform.uploadhtml.btnFile" /></a>--></th>
 
         <th style="width:15%"><a href="<%= request.getContextPath() %>/eform/efmformmanager.jsp?orderby=form_name" class="contentLink"><bean:message key="eform.uploadhtml.btnFormName" /></a></th>
         <th style="width:20%"><a href="<%= request.getContextPath() %>/eform/efmformmanager.jsp?orderby=form_subject" class="contentLink"><bean:message key="eform.uploadhtml.btnSubject" /></a></th>

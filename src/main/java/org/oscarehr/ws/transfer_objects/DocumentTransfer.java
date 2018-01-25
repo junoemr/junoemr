@@ -31,8 +31,8 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.model.CtlDocument;
-import org.oscarehr.common.model.Document;
+import org.oscarehr.document.model.CtlDocument;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.managers.DocumentManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
