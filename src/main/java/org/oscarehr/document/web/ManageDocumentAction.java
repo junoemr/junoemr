@@ -237,6 +237,7 @@ public class ManageDocumentAction extends DispatchAction {
 			}
 			catch (SQLException e)
 			{
+				MiscUtils.getLogger().error("Failed to remove link from document.", e);
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to remove link from document.");
 			}
 
