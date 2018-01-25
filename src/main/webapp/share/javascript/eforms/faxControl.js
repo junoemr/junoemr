@@ -114,15 +114,10 @@ function _AddOtherFax(name, number) {
 
 function checkPhone(str) 
 {
-	// matches numbers in the NANP format: NXX-NXX-XXXX where X is a digit 0-9 and N is a digit 2-9
-	// with optional country code at the front
-	// valid examples: 250-333-1234, +1 250 333 1234, 12503331234
-	var phone = /^(\+?\d)?[- ]?([2-9]\d{2}[- ]?){2}\d{4}$/;
-	if (str.match(phone)) {
-   		return true;
- 	} else {
- 		return false;
- 	}
+	var phone = str.replace(/\D/g,'');
+
+	// phone number must be 10 digits, optionally with country code 1 at the front
+	return phone.length === 10 || (phone.length === 11 && phone.charAt(0) === '1');
 }
 
 function removeRecipient(element) { 
