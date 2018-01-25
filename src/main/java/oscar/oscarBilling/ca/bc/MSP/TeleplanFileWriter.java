@@ -180,7 +180,7 @@ public class TeleplanFileWriter {
                     log.error("Billing # "+billing_no+ " has no associated WCB record" );
                     continue;  // Not sure if this is great but at least it contines
                 }
-                
+
                 providerClaimsCount += c.getNumClaims();
                 providerTotals = providerTotals.add(c.getClaimTotal());
                 
@@ -435,14 +435,22 @@ public class TeleplanFileWriter {
     private List getBilling(String providerInsNo,Date startDate, Date endDate) throws Exception{
         ArrayList list = new ArrayList();      
         
-        String query = "select * from billing where provider_ohip_no='"+ providerInsNo+"' and (status='O' or status='W') and billingtype != 'Pri' ";
+        String query =
+                "SELECT * " +
+                "FROM billing x JOIN billingmaster y " +
+                "ON x.billing_no = y.billing_no " +
+                "WHERE x.provider_ohip_no='"+ providerInsNo + "' " +
+                "AND (x.status='O' or x.status='W') " +
+                "AND x.billingtype != 'Pri' " +
+                "AND y.billingstatus NOT IN ('S', 'D')";
+
         log.debug("billing query "+query);
         ResultSet rs = DBHandler.GetSQL(query);
         while (rs.next()){
             HashMap map = new HashMap();
             map.put("billing_no",rs.getString("billing_no"));
             map.put("demographic_name",rs.getString("demographic_name"));
-            map.put("billingtype",rs.getString("billingtype"));   
+            map.put("billingtype",rs.getString("billingtype"));
             list.add(map);
         }     
         return list;
