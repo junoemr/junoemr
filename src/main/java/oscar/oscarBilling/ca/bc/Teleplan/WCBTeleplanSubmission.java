@@ -248,7 +248,7 @@ public class WCBTeleplanSubmission {
    }
    private String Note4(String logNo,Billingmaster bm,WCB wcb) {
       int length = wcb.getW_clinicinfo().length();
-      return this.Note(logNo,Misc.backwardSpace(((length >= 400)? wcb.getW_clinicinfo().substring(400, length): "Clinical Information Complete"),400),bm,wcb);
+      return this.Note(logNo,Misc.backwardSpace(((length > 400)? wcb.getW_clinicinfo().substring(400, length): "Clinical Information Complete"),400),bm,wcb);
    }
    private String Claim5(String logNo,Billingmaster bm,WCB wcb) {      
       return this.Claim(logNo, bm.getBillAmount(), bm.getBillingCode(), "0",bm,wcb);
