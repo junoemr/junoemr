@@ -47,7 +47,6 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -224,7 +223,7 @@ public class ManageDocumentAction extends DispatchAction {
 	}
 
 	public ActionForward removeLinkFromDocument(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws ServletException
+			HttpServletRequest request, HttpServletResponse response)
 	{
 		String docType = request.getParameter("docType");
 		String docId = request.getParameter("docId");
@@ -232,16 +231,20 @@ public class ManageDocumentAction extends DispatchAction {
 
 		try
 		{
-			providerInboxRoutingDAO.removeLinkFromDocument(docType, docId, providerNo);
+			try
+			{
+				providerInboxRoutingDAO.removeLinkFromDocument(docType, docId, providerNo);
+			}
+			catch (SQLException e)
+			{
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to remove link from document.");
+			}
+
 			HashMap hm = new HashMap();
 			hm.put("linkedProviders", providerInboxRoutingDAO.getProvidersWithRoutingForDocument(docType, docId));
 
 			JSONObject jsonObject = JSONObject.fromObject(hm);
 			response.getOutputStream().write(jsonObject.toString().getBytes());
-		}
-		catch (SQLException e)
-		{
-			throw new ServletException("Error removing link from document.", e);
 		}
 		catch (IOException e)
 		{
