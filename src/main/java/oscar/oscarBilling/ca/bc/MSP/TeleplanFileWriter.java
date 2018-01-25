@@ -437,12 +437,12 @@ public class TeleplanFileWriter {
         
         String query =
                 "SELECT * " +
-                "FROM billing x JOIN billingmaster y " +
-                "ON x.billing_no = y.billing_no " +
-                "WHERE x.provider_ohip_no='"+ providerInsNo + "' " +
-                "AND (x.status='O' or x.status='W') " +
-                "AND x.billingtype != 'Pri' " +
-                "AND y.billingstatus NOT IN ('S', 'D')";
+                "FROM billing b JOIN billingmaster bm " +
+                "ON b.billing_no = bm.billing_no " +
+                "WHERE b.provider_ohip_no='"+ providerInsNo + "' " +
+                "AND (b.status='O' or b.status='W') " +
+                "AND b.billingtype != 'Pri' " +
+                "AND bm.billingstatus NOT IN ('S', 'D')";
 
         log.debug("billing query "+query);
         ResultSet rs = DBHandler.GetSQL(query);
