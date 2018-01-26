@@ -25,7 +25,7 @@
 <%@page import="org.oscarehr.common.dao.CtlBillingServiceDao"%>
 <%@page import="org.oscarehr.common.model.BillingONItem"%>
 <%@page import="org.oscarehr.common.dao.BillingONItemDao"%>
-<%@page import="java.util.*, java.text.*,java.sql.*, java.net.*, oscar.*, oscar.util.*, org.oscarehr.provider.model.PreventionManager" %>
+<%@page import="java.util.*, java.text.*,java.sql.*, java.net.*, oscar.*, oscar.util.*, org.oscarehr.provider.model.ProviderPreventionManager" %>
 <%@page import="oscar.oscarBilling.ca.on.data.*"%>
 <%@page import="oscar.oscarBilling.ca.on.pageUtil.*"%>
 <%@page import="org.oscarehr.common.model.ProviderPreference"%>
