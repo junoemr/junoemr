@@ -369,10 +369,6 @@ public class OscarProperties extends Properties {
 		return isRxFaxEnabled() || isPropertyActive("rx_signature_enabled");
 	}
 	
-	public boolean isConsultationSignatureEnabled() {
-		return isPropertyActive("consultation_signature_enabled");
-	}
-	
 	public boolean isSpireClientEnabled() {
 		return isPropertyActive("SPIRE_CLIENT_ENABLED");
 	}
