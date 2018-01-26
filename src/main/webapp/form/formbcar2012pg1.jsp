@@ -45,7 +45,7 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 
-<jsp:useBean id="oscarProperties" class="oscar.OscarProperties" scope="session" />
+<% oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance(); %>
 
 <%
 String formClass = "BCAR2012";
