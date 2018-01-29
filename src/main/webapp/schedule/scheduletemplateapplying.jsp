@@ -24,7 +24,14 @@
 
 --%>
 <%@ page
-	import="java.util.*, java.net.*, java.sql.*, oscar.*, oscar.util.*, java.text.*, java.lang.*, org.apache.struts.util.*"
+	import="org.apache.struts.util.MessageResources,
+	org.apache.struts.util.MessageResourcesFactory,
+	org.oscarehr.common.dao.RScheduleDao,
+	org.oscarehr.common.dao.ScheduleDateDao,
+	org.oscarehr.common.dao.ScheduleTemplateDao,
+	org.oscarehr.common.dao.SiteDao,
+	org.oscarehr.common.model.RSchedule,
+	org.oscarehr.common.model.ScheduleDate"
 	errorPage="../appointment/errorpage.jsp"%>
 
 <jsp:useBean id="scheduleRscheduleBean" class="oscar.RscheduleBean"	scope="session" />
@@ -32,21 +39,26 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.common.model.ScheduleDate" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleDateDao" %>
-<%@ page import="org.oscarehr.common.model.RSchedule" %>
-<%@ page import="org.oscarehr.common.dao.RScheduleDao" %>
 <%@ page import="org.oscarehr.common.model.ScheduleTemplate" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleTemplateDao" %>
+<%@ page import="org.oscarehr.common.model.Site" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
+<%@ page import="oscar.MyDateFormat" %>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="oscar.SxmlMisc" %>
+<%@page import="oscar.util.ConversionUtils"%>
+<%@page import="oscar.util.UtilDateUtilities"%>
+<%@page import="java.net.URLEncoder"%>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.StringTokenizer" %>
 <%
 	ScheduleDateDao scheduleDateDao = SpringUtils.getBean(ScheduleDateDao.class);
 	RScheduleDao rScheduleDao = (RScheduleDao)SpringUtils.getBean("rScheduleDao");
 	ScheduleTemplateDao scheduleTemplateDao = SpringUtils.getBean(ScheduleTemplateDao.class);
 %>
-<%@page import="org.oscarehr.common.dao.SiteDao"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="org.oscarehr.common.model.Site"%><html:html locale="true">
+
+<html:html locale="true">
 
 <%
     if(session.getAttribute("user") == null ) response.sendRedirect("../logout.jsp");
@@ -64,107 +76,121 @@
 </security:oscarSec>
 
 
-<%!  boolean bMultisites=org.oscarehr.common.IsPropertiesOn.isMultisitesEnable(); %>
-<%!  String [] bgColors; %>
-<%!  List<String> excludedSites = new ArrayList<String>(); %>
-<%
+	<%! boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable(); %>
+	<%! String[] bgColors; %>
+	<%! List<String> excludedSites = new ArrayList<String>(); %>
+	<%
 
-  String weekdaytag[] = {"SUN","MON","TUE","WED","THU","FRI","SAT"};
-  boolean bAlternate =(request.getParameter("alternate")!=null&&request.getParameter("alternate").equals("checked") )?true:false;
-  boolean bOrigAlt = false;
+		String weekdaytag[] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
+		boolean bAlternate = "checked".equals(request.getParameter("alternate"));
+		boolean bOrigAlt = false;
 
-  OscarProperties props = OscarProperties.getInstance();
+		OscarProperties props = OscarProperties.getInstance();
 
-  boolean bMoreAddr = bMultisites
-  						? true
-  						: (props.getProperty("scheduleSiteID", "").equals("") ? false : true);
-  String [] addr;
+		boolean bMoreAddr = (bMultisites || !props.getProperty("scheduleSiteID", "").equals(""));
+		String[] addr;
 
-  if (bMultisites) {
-	//multisite starts =====================
-	  SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
-      List<Site> sites = siteDao.getActiveSitesByProviderNo(request.getParameter("provider_no"));
-      List<Site> managerSites;
+		if(bMultisites)
+		{
+			//multisite starts =====================
+			SiteDao siteDao = (SiteDao) WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
+			List<Site> sites = siteDao.getActiveSitesByProviderNo(request.getParameter("provider_no"));
+			List<Site> managerSites;
 
-	  if (isSiteAccessPrivacy) {
-		  // login user have site manager role
-		  managerSites = siteDao.getActiveSitesByProviderNo(CurProviderNo);
-		  //build excluded sites list for sites that not in current site manager
-		  for (Site site : sites) {
-			  if (!managerSites.contains(site)) {
-				  excludedSites.add(site.getName());
-			  }
-		  }
+			if(isSiteAccessPrivacy)
+			{
+				// login user have site manager role
+				managerSites = siteDao.getActiveSitesByProviderNo(CurProviderNo);
+				//build excluded sites list for sites that not in current site manager
+				for(Site site : sites)
+				{
+					if(!managerSites.contains(site))
+					{
+						excludedSites.add(site.getName());
+					}
+				}
 
-	  }
+			}
 
-	  //login user have admin role
-	  addr = new String[sites.size()+1];
-	  bgColors = new String[sites.size()+1];
+			//login user have admin role
+			addr = new String[sites.size() + 1];
+			bgColors = new String[sites.size() + 1];
 
-      for (int i=0; i<sites.size(); i++) {
-		  addr[i]=sites.get(i).getName();
-		  bgColors[i]=sites.get(i).getBgColor();
-      }
-	  addr[sites.size()]="NONE";
-	  bgColors[sites.size()]="white";
+			for(int i = 0; i < sites.size(); i++)
+			{
+				addr[i] = sites.get(i).getName();
+				bgColors[i] = sites.get(i).getBgColor();
+			}
+			addr[sites.size()] = "NONE";
+			bgColors[sites.size()] = "white";
+
+			//multisite ends =====================
+		}
+		else
+		{
+			addr = props.getProperty("scheduleSiteID", "").split("\\|");
+		}
+
+		String today = UtilDateUtilities.DateToString(new java.util.Date(), "yyyy-MM-dd");
+		String lastYear = (Integer.parseInt(today.substring(0, today.indexOf('-'))) - 2) + today.substring(today.indexOf('-'));
+
+		if(request.getParameter("delete") != null && request.getParameter("delete").equals("1"))
+		{ //delete rschedule
+
+			String[] param = new String[2];
+			String edate = null;
+			param[0] = request.getParameter("provider_no");
+			param[1] = request.getParameter("sdate") != null ? request.getParameter("sdate") : today;
+			RSchedule rs1 = rScheduleDao.search_rschedule_current1(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("sdate") != null ? request.getParameter("sdate") : today));
 
 
-	//multisite ends =====================
-  } else {
-  	  addr = props.getProperty("scheduleSiteID", "").split("\\|");
-  }
+			if(rs1 != null)
+			{
+				param[1] = ConversionUtils.toDateString(rs1.getsDate());
+				edate = ConversionUtils.toDateString(rs1.geteDate());
+			}
 
-%>
-<%
-  String today = UtilDateUtilities.DateToString(new java.util.Date(), "yyyy-MM-dd" );
-  String lastYear = (Integer.parseInt(today.substring(0,today.indexOf('-'))) - 2) + today.substring(today.indexOf('-'));
+			List<RSchedule> rsl = rScheduleDao.findByProviderNoAndDates(request.getParameter("provider_no"), MyDateFormat.getSysDate(request.getParameter("sdate") != null ? request.getParameter("sdate") : today));
 
-  if(request.getParameter("delete")!= null && request.getParameter("delete").equals("1") ) { //delete rschedule
-	
-	String[] param =new String[2];
-	String edate = null;
-    param[0]=request.getParameter("provider_no");
-    param[1]=request.getParameter("sdate")!=null?request.getParameter("sdate"):today;
-    RSchedule rs1 = rScheduleDao.search_rschedule_current1(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("sdate")!=null?request.getParameter("sdate"):today));
-    
-    
-    if (rs1 != null) {
-      param[1]= ConversionUtils.toDateString(rs1.getsDate());
-      edate= ConversionUtils.toDateString(rs1.geteDate());
-    }
-    
-     List<RSchedule> rsl = rScheduleDao.findByProviderNoAndDates(request.getParameter("provider_no"),MyDateFormat.getSysDate(request.getParameter("sdate")!=null?request.getParameter("sdate"):today));
- 
-   	for(RSchedule rs:rsl) {
-   		rs.setStatus("D");
-   		rScheduleDao.merge(rs);
-   	}
-   	
-    rsl = rScheduleDao.findByProviderAvailableAndDate(request.getParameter("provider_no"),"A",MyDateFormat.getSysDate(request.getParameter("sdate")!=null?request.getParameter("sdate"):today));
-    for(RSchedule rs:rsl) {
-        rs.setStatus("D");
-        rScheduleDao.merge(rs);
-    }
+			for(RSchedule rs : rsl)
+			{
+				rs.setStatus("D");
+				rScheduleDao.merge(rs);
+			}
 
-	if(request.getParameter("deldate")!= null && (request.getParameter("deldate").equals("b") || request.getParameter("deldate").equals("all")) ) { //delete scheduledate
-	  if(request.getParameter("deldate").equals("b")) {
-		  List<ScheduleDate> sds = scheduleDateDao.findByProviderPriorityAndDateRange(request.getParameter("provider_no"),'b',MyDateFormat.getSysDate(request.getParameter("sdate")!=null?request.getParameter("sdate"):today), MyDateFormat.getSysDate(edate));
-		  for(ScheduleDate sd:sds) {
-			  sd.setStatus('D');
-			  scheduleDateDao.merge(sd);
-		  }
-	  } else {
-		  List<ScheduleDate> sds = scheduleDateDao.findByProviderAndDateRange(request.getParameter("provider_no"),MyDateFormat.getSysDate(request.getParameter("sdate")!=null?request.getParameter("sdate"):today), MyDateFormat.getSysDate(edate));
-		  for(ScheduleDate sd:sds) {
-			  sd.setStatus('D');
-			  scheduleDateDao.merge(sd);
-		  }
-	  }
-	}
-    response.sendRedirect("scheduletemplateapplying.jsp?provider_no="+param[0]+"&provider_name="+URLEncoder.encode(request.getParameter("provider_name")) );
-  } else {
-%>
+			rsl = rScheduleDao.findByProviderAvailableAndDate(request.getParameter("provider_no"), "A", MyDateFormat.getSysDate(request.getParameter("sdate") != null ? request.getParameter("sdate") : today));
+			for(RSchedule rs : rsl)
+			{
+				rs.setStatus("D");
+				rScheduleDao.merge(rs);
+			}
+
+			if(request.getParameter("deldate") != null && (request.getParameter("deldate").equals("b") || request.getParameter("deldate").equals("all")))
+			{ //delete scheduledate
+				if(request.getParameter("deldate").equals("b"))
+				{
+					List<ScheduleDate> sds = scheduleDateDao.findByProviderPriorityAndDateRange(request.getParameter("provider_no"), 'b', MyDateFormat.getSysDate(request.getParameter("sdate") != null ? request.getParameter("sdate") : today), MyDateFormat.getSysDate(edate));
+					for(ScheduleDate sd : sds)
+					{
+						sd.setStatus('D');
+						scheduleDateDao.merge(sd);
+					}
+				}
+				else
+				{
+					List<ScheduleDate> sds = scheduleDateDao.findByProviderAndDateRange(request.getParameter("provider_no"), MyDateFormat.getSysDate(request.getParameter("sdate") != null ? request.getParameter("sdate") : today), MyDateFormat.getSysDate(edate));
+					for(ScheduleDate sd : sds)
+					{
+						sd.setStatus('D');
+						scheduleDateDao.merge(sd);
+					}
+				}
+			}
+			response.sendRedirect("scheduletemplateapplying.jsp?provider_no=" + param[0] + "&provider_name=" + URLEncoder.encode(request.getParameter("provider_name")));
+		}
+		else
+		{
+	%>
 
 <% scheduleRscheduleBean.clear(); %>
 
@@ -178,29 +204,31 @@
 <!--
 
 
-function displayTemplate(s) {
-    var url = "scheduleDisplayTemplate.jsp?name=" + s[s.selectedIndex].value + "&providerid=<%=request.getParameter("provider_no")%>";
-    var div = "template";
+function displayTemplate(s)
+{
+	var url = "scheduleDisplayTemplate.jsp?name=" + s[s.selectedIndex].value + "&providerid=<%=request.getParameter("provider_no")%>";
+	var div = "template";
 
-    var objAjax = new Ajax.Request (
-                        url,
-                        {
-                            method: 'get',
-                            onSuccess: function(request) {
-                                            while( $(div).firstChild )
-                                                $(div).removeChild($(div).firstChild);
+	var objAjax = new Ajax.Request(
+		url,
+		{
+			method: 'get',
+			onSuccess: function (request)
+			{
+				while ($(div).firstChild)
+					$(div).removeChild($(div).firstChild);
 
-                                            if( navigator.userAgent.indexOf("AppleWebKit") > -1 )
-                                                $(div).updateSafari(request.responseText);
-                                            else
-                                                $(div).update(request.responseText);
-                                       },
-                            onFailure: function(request) {
-                                            $(div).innerHTML = "<h3>Error:</h3>" + request.status;
-                                        }
-                        }
-
-                  );
+				if (navigator.userAgent.indexOf("AppleWebKit") > -1)
+					$(div).updateSafari(request.responseText);
+				else
+					$(div).update(request.responseText);
+			},
+			onFailure: function (request)
+			{
+				$(div).innerHTML = "<h3>Error:</h3>" + request.status;
+			}
+		}
+	);
 }
 
 function selectrschedule(s) {
@@ -401,29 +429,33 @@ function addDataString1() {
 //-->
 </script>
 </head>
-<%
-  int rowsAffected = 0;
-  String[] param1 =new String[2];
-  param1[0]=request.getParameter("provider_no");
-  //param1[1]="1";
-  param1[1]=request.getParameter("sdate")!=null?request.getParameter("sdate"):today;
-  
-  RSchedule rs1 = rScheduleDao.search_rschedule_current1(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("sdate")!=null?request.getParameter("sdate"):today));
-  
-  if (rs1 != null) {
-    scheduleRscheduleBean.setRscheduleBean(rs1.getProviderNo(),ConversionUtils.toDateString(rs1.getsDate()),ConversionUtils.toDateString(rs1.geteDate()), rs1.getAvailable(),rs1.getDayOfWeek(),rs1.getAvailHourB(), rs1.getAvailHour(), rs1.getCreator());
-    if(rs1.getAvailable().equals("A")&&request.getParameter("bFirstDisp")==null) bOrigAlt = true;
-    //break;
-  } else {
-      rs1 = rScheduleDao.search_rschedule_current2(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("sdate")!=null?request.getParameter("sdate"):today));
-      
-      if (rs1 != null) {
-        scheduleRscheduleBean.setRscheduleBean(rs1.getProviderNo(),ConversionUtils.toDateString(rs1.getsDate()),ConversionUtils.toDateString(rs1.geteDate()), rs1.getAvailable(),rs1.getDayOfWeek(),rs1.getAvailHourB(), rs1.getAvailHour(), rs1.getCreator());
-        if(rs1.getAvailable().equals("A")&&request.getParameter("bFirstDisp")==null) bOrigAlt = true;
-        //break;
-	  }
-  }
-%>
+	<%
+		int rowsAffected = 0;
+		String[] param1 = new String[2];
+		param1[0] = request.getParameter("provider_no");
+		//param1[1]="1";
+		param1[1] = request.getParameter("sdate") != null ? request.getParameter("sdate") : today;
+
+		RSchedule rs1 = rScheduleDao.search_rschedule_current1(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("sdate") != null ? request.getParameter("sdate") : today));
+
+		if(rs1 != null)
+		{
+			scheduleRscheduleBean.setRscheduleBean(rs1.getProviderNo(), ConversionUtils.toDateString(rs1.getsDate()), ConversionUtils.toDateString(rs1.geteDate()), rs1.getAvailable(), rs1.getDayOfWeek(), rs1.getAvailHourB(), rs1.getAvailHour(), rs1.getCreator());
+			if(rs1.getAvailable().equals("A") && request.getParameter("bFirstDisp") == null) bOrigAlt = true;
+			//break;
+		}
+		else
+		{
+			rs1 = rScheduleDao.search_rschedule_current2(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("sdate") != null ? request.getParameter("sdate") : today));
+
+			if(rs1 != null)
+			{
+				scheduleRscheduleBean.setRscheduleBean(rs1.getProviderNo(), ConversionUtils.toDateString(rs1.getsDate()), ConversionUtils.toDateString(rs1.geteDate()), rs1.getAvailable(), rs1.getDayOfWeek(), rs1.getAvailHourB(), rs1.getAvailHour(), rs1.getCreator());
+				if(rs1.getAvailable().equals("A") && request.getParameter("bFirstDisp") == null) bOrigAlt = true;
+				//break;
+			}
+		}
+	%>
 <body bgcolor="ivory" bgproperties="fixed" onLoad="setfocus()"
 	topmargin="0" leftmargin="0" rightmargin="0">
 <form method="post" name="schedule" action="schedulecreatedate.jsp"
@@ -468,54 +500,68 @@ function addDataString1() {
 		<center>
 		<%
 
-  String syear = "",smonth="",sday="",eyear="",emonth="",eday="";
-  String[] param2 =new String[7];
-  for(int i=0; i<7; i++) {param2[i]="";}
-  String[][] param3 =new String[7][2];
-  String[][] param4 =new String[7][2];
-  for(int i=0; i<7; i++) {
-    for(int j=0; j<2; j++) {
-	    param3[i][j]="";
-	    param4[i][j]="";
-	  }
-  }
-  if(scheduleRscheduleBean.provider_no!="") {
-    syear = ""+MyDateFormat.getYearFromStandardDate(scheduleRscheduleBean.sdate);
-    smonth = ""+MyDateFormat.getMonthFromStandardDate(scheduleRscheduleBean.sdate);
-    sday = ""+MyDateFormat.getDayFromStandardDate(scheduleRscheduleBean.sdate);
-    eyear = ""+MyDateFormat.getYearFromStandardDate(scheduleRscheduleBean.edate);
-    emonth = ""+MyDateFormat.getMonthFromStandardDate(scheduleRscheduleBean.edate);
-    eday = ""+MyDateFormat.getDayFromStandardDate(scheduleRscheduleBean.edate);
-
-    String availhour = scheduleRscheduleBean.avail_hour;
-    //String availhourB = scheduleRscheduleBean.avail_hourB;
-
-    StringTokenizer st = new StringTokenizer(scheduleRscheduleBean.day_of_week.substring(0,scheduleRscheduleBean.day_of_week.indexOf("|")==-1?scheduleRscheduleBean.day_of_week.length():scheduleRscheduleBean.day_of_week.indexOf("|")) );
-    while (st.hasMoreTokens() ) {
-      int j = Integer.parseInt(st.nextToken())-1;
-	  int i = j==7?0:j;
-      param2[i]="checked";
-      if(SxmlMisc.getXmlContent(availhour, ("<"+weekdaytag[i]+">"),"</"+weekdaytag[i]+">") != null) {
-	      StringTokenizer sthour = new StringTokenizer(SxmlMisc.getXmlContent(availhour, ("<"+weekdaytag[i]+">"),"</"+weekdaytag[i]+">"), "^"); //not "-"
-          j = 0;
-		  while (sthour.hasMoreTokens() ) {
-            param3[i][j]=sthour.nextToken(); j++;
-          }
-
-		  if(bMoreAddr) {
-			if(SxmlMisc.getXmlContent(availhour, ("<A"+(i==0?7:i)+">"),"</A"+(i==0?7:i)+">") != null) {
-		    	  sthour = new StringTokenizer(SxmlMisc.getXmlContent(availhour, ("<A"+(i==0?7:i)+">"),"</A"+(i==0?7:i)+">"), "^");
-		          j = 0;
-				  while (sthour.hasMoreTokens() ) {
-	    	        param4[i][j]=sthour.nextToken(); j++;
-	        	  }
+			String syear = "", smonth = "", sday = "", eyear = "", emonth = "", eday = "";
+			String[] param2 = new String[7];
+			for(int i = 0; i < 7; i++)
+			{
+				param2[i] = "";
 			}
-		  }
-	  }
-    }
-  }
+			String[][] param3 = new String[7][2];
+			String[][] param4 = new String[7][2];
+			for(int i = 0; i < 7; i++)
+			{
+				for(int j = 0; j < 2; j++)
+				{
+					param3[i][j] = "";
+					param4[i][j] = "";
+				}
+			}
+			if(scheduleRscheduleBean.provider_no != "")
+			{
+				syear = "" + MyDateFormat.getYearFromStandardDate(scheduleRscheduleBean.sdate);
+				smonth = "" + MyDateFormat.getMonthFromStandardDate(scheduleRscheduleBean.sdate);
+				sday = "" + MyDateFormat.getDayFromStandardDate(scheduleRscheduleBean.sdate);
+				eyear = "" + MyDateFormat.getYearFromStandardDate(scheduleRscheduleBean.edate);
+				emonth = "" + MyDateFormat.getMonthFromStandardDate(scheduleRscheduleBean.edate);
+				eday = "" + MyDateFormat.getDayFromStandardDate(scheduleRscheduleBean.edate);
 
-%>
+				String availhour = scheduleRscheduleBean.avail_hour;
+				//String availhourB = scheduleRscheduleBean.avail_hourB;
+
+				StringTokenizer st = new StringTokenizer(scheduleRscheduleBean.day_of_week.substring(0, scheduleRscheduleBean.day_of_week.indexOf("|") == -1 ? scheduleRscheduleBean.day_of_week.length() : scheduleRscheduleBean.day_of_week.indexOf("|")));
+				while(st.hasMoreTokens())
+				{
+					int j = Integer.parseInt(st.nextToken()) - 1;
+					int i = j == 7 ? 0 : j;
+					param2[i] = "checked";
+					if(SxmlMisc.getXmlContent(availhour, ("<" + weekdaytag[i] + ">"), "</" + weekdaytag[i] + ">") != null)
+					{
+						StringTokenizer sthour = new StringTokenizer(SxmlMisc.getXmlContent(availhour, ("<" + weekdaytag[i] + ">"), "</" + weekdaytag[i] + ">"), "^"); //not "-"
+						j = 0;
+						while(sthour.hasMoreTokens())
+						{
+							param3[i][j] = sthour.nextToken();
+							j++;
+						}
+
+						if(bMoreAddr)
+						{
+							if(SxmlMisc.getXmlContent(availhour, ("<A" + (i == 0 ? 7 : i) + ">"), "</A" + (i == 0 ? 7 : i) + ">") != null)
+							{
+								sthour = new StringTokenizer(SxmlMisc.getXmlContent(availhour, ("<A" + (i == 0 ? 7 : i) + ">"), "</A" + (i == 0 ? 7 : i) + ">"), "^");
+								j = 0;
+								while(sthour.hasMoreTokens())
+								{
+									param4[i][j] = sthour.nextToken();
+									j++;
+								}
+							}
+						}
+					}
+				}
+			}
+
+		%>
 		<table width="99%" border="0" cellspacing="0" cellpadding="0">
 			<tr>
 				<td bgcolor="#CCFFCC"><b><%=request.getParameter("provider_name")%></b>
@@ -524,18 +570,20 @@ function addDataString1() {
 				<td bgcolor="#CCFFCC" nowrap align="right"><select
 					name="select" onChange="selectrschedule(this)">
 					<%
- 
-  List<RSchedule> rss = rScheduleDao.search_rschedule_future1(request.getParameter("provider_no"),ConversionUtils.fromDateString(lastYear));
- 
- 	for (RSchedule rs:rss) {
-%>
+
+						List<RSchedule> rss = rScheduleDao.search_rschedule_future1(request.getParameter("provider_no"), ConversionUtils.fromDateString(lastYear));
+
+						for(RSchedule rs : rss)
+						{
+					%>
 					<option value="<%=ConversionUtils.toDateString(rs.getsDate())%>"
-						<%=request.getParameter("sdate")!=null?(ConversionUtils.toDateString(rs.getsDate()).equals(request.getParameter("sdate"))?"selected":""):(ConversionUtils.toDateString(rs.getsDate()).equals(scheduleRscheduleBean.sdate)?"selected":"")%>>
-					<%=ConversionUtils.toDateString(rs.getsDate())+" ~ "+ConversionUtils.toDateString(rs.geteDate())%></option>
+							<%=request.getParameter("sdate") != null ? (ConversionUtils.toDateString(rs.getsDate()).equals(request.getParameter("sdate")) ? "selected" : "") : (ConversionUtils.toDateString(rs.getsDate()).equals(scheduleRscheduleBean.sdate) ? "selected" : "")%>>
+						<%=ConversionUtils.toDateString(rs.getsDate()) + " ~ " + ConversionUtils.toDateString(rs.geteDate())%>
+					</option>
 					<%
- 	}
-        MessageResources msg = MessageResourcesFactory.createFactory().createResources("oscarResources");
-%>
+						}
+						MessageResources msg = MessageResourcesFactory.createFactory().createResources("oscarResources");
+					%>
 				</select> <input type="button" name="command"
 					value="<bean:message key="schedule.scheduletemplateapplying.btnDelete"/>"
 					onClick="onBtnDelete(document.forms['schedule'].elements['select'])">
@@ -693,46 +741,58 @@ function tranbutton7_click() {
 								</td>
 							</tr>
 							<%
-  if(bOrigAlt && request.getParameter("bFirstDisp")==null || bAlternate && request.getParameter("bFirstDisp")!=null) {
-    String availhour = scheduleRscheduleBean.avail_hourB;
-    //String availhourB = scheduleRscheduleBean.avail_hourB;
+								if(bOrigAlt && request.getParameter("bFirstDisp") == null || bAlternate && request.getParameter("bFirstDisp") != null)
+								{
+									String availhour = scheduleRscheduleBean.avail_hourB;
+									//String availhourB = scheduleRscheduleBean.avail_hourB;
 
-    String stToken = "";
-    if(scheduleRscheduleBean.day_of_week.indexOf("|")!=-1) stToken = scheduleRscheduleBean.day_of_week.substring(scheduleRscheduleBean.day_of_week.indexOf("|")+1);
+									String stToken = "";
+									if(scheduleRscheduleBean.day_of_week.indexOf("|") != -1)
+										stToken = scheduleRscheduleBean.day_of_week.substring(scheduleRscheduleBean.day_of_week.indexOf("|") + 1);
 //scheduleRscheduleBean.day_of_week.indexOf("|")==-1?scheduleRscheduleBean.day_of_week.length():()
-  for(int i=0; i<7; i++) {param2[i]="";}
-  for(int i=0; i<7; i++) {
-    for(int j=0; j<2; j++) {
-	    param3[i][j]="";
-	    param4[i][j]="";
-	  }
-  }
+									for(int i = 0; i < 7; i++)
+									{
+										param2[i] = "";
+									}
+									for(int i = 0; i < 7; i++)
+									{
+										for(int j = 0; j < 2; j++)
+										{
+											param3[i][j] = "";
+											param4[i][j] = "";
+										}
+									}
 
-    StringTokenizer st = new StringTokenizer(stToken );
-    while (st.hasMoreTokens() ) {
-      int j = Integer.parseInt(st.nextToken())-1;
-	  int i = j==7?0:j;
-      param2[i]="checked";
-      if(SxmlMisc.getXmlContent(availhour, ("<"+weekdaytag[i]+">"),"</"+weekdaytag[i]+">") != null) {
-	      StringTokenizer sthour = new StringTokenizer(SxmlMisc.getXmlContent(availhour, ("<"+weekdaytag[i]+">"),"</"+weekdaytag[i]+">"), "^");
-          j = 0;
-		  while (sthour.hasMoreTokens() ) {
-          	param3[i][j]=sthour.nextToken();
-          	j++;
-          }
+									StringTokenizer st = new StringTokenizer(stToken);
+									while(st.hasMoreTokens())
+									{
+										int j = Integer.parseInt(st.nextToken()) - 1;
+										int i = j == 7 ? 0 : j;
+										param2[i] = "checked";
+										if(SxmlMisc.getXmlContent(availhour, ("<" + weekdaytag[i] + ">"), "</" + weekdaytag[i] + ">") != null)
+										{
+											StringTokenizer sthour = new StringTokenizer(SxmlMisc.getXmlContent(availhour, ("<" + weekdaytag[i] + ">"), "</" + weekdaytag[i] + ">"), "^");
+											j = 0;
+											while(sthour.hasMoreTokens())
+											{
+												param3[i][j] = sthour.nextToken();
+												j++;
+											}
 
-		  if(bMoreAddr) {
-		      sthour = new StringTokenizer(SxmlMisc.getXmlContent(availhour, ("<A"+(i==0?7:i)+">"),"</A"+(i==0?7:i)+">"), "^");
-	          j = 0;
-			  while (sthour.hasMoreTokens() ) {
-	            param4[i][j]=sthour.nextToken();
-	            j++;
-	          }
-		  }
-	  }
-    }
-  //}
-%>
+											if(bMoreAddr)
+											{
+												sthour = new StringTokenizer(SxmlMisc.getXmlContent(availhour, ("<A" + (i == 0 ? 7 : i) + ">"), "</A" + (i == 0 ? 7 : i) + ">"), "^");
+												j = 0;
+												while(sthour.hasMoreTokens())
+												{
+													param4[i][j] = sthour.nextToken();
+													j++;
+												}
+											}
+										}
+									}
+									//}
+							%>
 							<script language=javascript>
 <!--
 function tranbuttonb1_click() {
@@ -846,19 +906,23 @@ function tranbuttonb7_click() {
 						<td><select size=<%=bOrigAlt||bAlternate?22:11%>
 							onclick="displayTemplate(this)" name="mytemplate">
 							<%
-							
-							for(ScheduleTemplate st: scheduleTemplateDao.findByProviderNo("Public")) {
-   
-	%>
-							<option value="<%=st.getId().getName()%>"><%=st.getId().getName()+" |"+st.getSummary()%></option>
+
+								for(ScheduleTemplate st : scheduleTemplateDao.findByProviderNo("Public"))
+								{
+
+							%>
+							<option value="<%=st.getId().getName()%>"><%=st.getId().getName() + " |" + st.getSummary()%>
+							</option>
 							<%
-   }
-							
-							for(ScheduleTemplate st: scheduleTemplateDao.findByProviderNo(request.getParameter("provider_no"))) {
-							
-	%>
-							<option value="<%=st.getId().getName()%>"><%=st.getId().getName()+" |"+st.getSummary()%></option>
-							<% }	%>
+								}
+
+								for(ScheduleTemplate st : scheduleTemplateDao.findByProviderNo(request.getParameter("provider_no")))
+								{
+
+							%>
+							<option value="<%=st.getId().getName()%>"><%=st.getId().getName() + " |" + st.getSummary()%>
+							</option>
+							<% } %>
 						</select></td>
 					</tr>
 				</table>
@@ -904,46 +968,52 @@ function tranbuttonb7_click() {
 } //end if
 %>
 </body>
-<%! String getSelectAddr(String s, String [] site, String sel) {
+	<%! String getSelectAddr(String s, String[] site, String sel)
+	{
 
 		boolean isExcludedSiteSelected = false;
-		if (bMultisites && excludedSites.contains(sel))
+		if(bMultisites && excludedSites.contains(sel))
 			isExcludedSiteSelected = true; //"; text-decoration:line-through;";
 
-		String ret = "<select name='" + s + "' "  + (isExcludedSiteSelected ? " disabled style='text-decoration:line-through;'  " : "")
-			+ " onchange='this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor'>";
-		int ind=0;
-		boolean isSiteSel=false;
+		String ret = "<select name='" + s + "' " + (isExcludedSiteSelected ? " disabled style='text-decoration:line-through;'  " : "")
+				+ " onchange='this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor'>";
+		int ind = 0;
+		boolean isSiteSel = false;
 
-		for(int i=0; i<site.length; i++) {
+		for(int i = 0; i < site.length; i++)
+		{
 			String t = site[i].equals(sel) ? " selected" : "";
-			if (site[i].equals(sel)) {
-				ind=i;
+			if(site[i].equals(sel))
+			{
+				ind = i;
 				isSiteSel = true;
 			}
-			if (i==site.length - 1 && isSiteSel ==false) {
+			if(i == site.length - 1 && isSiteSel == false)
+			{
 				//if None of the site has been selected, default select to the last one "None"
-				ind=i;
+				ind = i;
 				t = " selected";
 			}
 
-			if ((isExcludedSiteSelected) || (!excludedSites.contains(site[i]))) {
-				ret += "<option value='" + site[i] + "'" + t + (bMultisites? " style='background-color:"+bgColors[i] + "'": "") +">" + site[i] + "</option>";
+			if((isExcludedSiteSelected) || (!excludedSites.contains(site[i])))
+			{
+				ret += "<option value='" + site[i] + "'" + t + (bMultisites ? " style='background-color:" + bgColors[i] + "'" : "") + ">" + site[i] + "</option>";
 			}
 		}
 		ret += "</select>";
-		if (bMultisites)
-			ret += "<script>document.schedule."+s+".style.backgroundColor='"+bgColors[ind]+"';</script>";
-		if (isExcludedSiteSelected)
-			ret += "<script>document.schedule.check"+s.substring(0,3)+".disabled='true';</script>";
+		if(bMultisites)
+			ret += "<script>document.schedule." + s + ".style.backgroundColor='" + bgColors[ind] + "';</script>";
+		if(isExcludedSiteSelected)
+			ret += "<script>document.schedule.check" + s.substring(0, 3) + ".disabled='true';</script>";
 		return ret;
-}
-%>
-<%! String getJSstr(String s, String obj) {
+	}
+	%>
+	<%! String getJSstr(String s, String obj)
+	{
 		String ret = "";
-		ret +="str1 +=" + "\"<"+s+">\""+ "+" + "document.schedule." + obj
-		+ "[" + "document.schedule." + obj + ".selectedIndex" + "].text"+ "+" +"\"</"+s+">\";";
+		ret += "str1 +=" + "\"<" + s + ">\"" + "+" + "document.schedule." + obj
+				+ "[" + "document.schedule." + obj + ".selectedIndex" + "].text" + "+" + "\"</" + s + ">\";";
 		return ret;
-}
-%>
+	}
+	%>
 </html:html>
