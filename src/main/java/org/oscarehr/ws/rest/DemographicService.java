@@ -55,6 +55,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
@@ -100,6 +101,9 @@ public class DemographicService extends AbstractServiceImpl {
 	
 	@Autowired
 	private ProfessionalSpecialistDao specialistDao;
+
+	@Autowired
+	RecentDemographicAccessService recentDemographicAccessService;
 
 	private DemographicConverter demoConverter = new DemographicConverter();
 	private DemographicContactFewConverter demoContactFewConverter = new DemographicContactFewConverter();
@@ -153,6 +157,9 @@ public class DemographicService extends AbstractServiceImpl {
 	public RestResponse<DemographicTo1,String> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException {
 		try
 		{
+			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
+			int providerNo = Integer.parseInt(providerNoStr);
+
 			Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);
 			if (demo == null)
 			{
@@ -199,7 +206,9 @@ public class DemographicService extends AbstractServiceImpl {
 				}
 			}
 
-			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), demo.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+			LogAction.addLogEntry(providerNoStr, demo.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+			recentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
+
 			return RestResponse.successResponse(result);
 		}
 		catch (Exception e)
@@ -292,7 +301,12 @@ public class DemographicService extends AbstractServiceImpl {
 			Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
 			demographicManager.createDemographic(getLoggedInInfo(), demographic, data.getAdmissionProgramId());
 
-			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,getLoggedInInfo().getIp());
+			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
+			int providerNo = Integer.parseInt(providerNoStr);
+
+			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,getLoggedInInfo().getIp());
+			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
+
 			return RestResponse.successResponse(demoConverter.getAsTransferObject(getLoggedInInfo(), demographic));
 		}
 		catch (Exception e)
@@ -343,7 +357,12 @@ public class DemographicService extends AbstractServiceImpl {
 			Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
 			demographicManager.updateDemographic(getLoggedInInfo(), demographic);
 
-			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), demographic.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
+			int providerNo = Integer.parseInt(providerNoStr);
+
+			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
+
 			return RestResponse.successResponse(demoConverter.getAsTransferObject(getLoggedInInfo(), demographic));
 		}
 		catch (Exception e)
@@ -374,8 +393,13 @@ public class DemographicService extends AbstractServiceImpl {
 				return RestResponse.errorResponse("Demographic with id " + id + " not found");
 			}
 
+			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
+			int providerNo = Integer.parseInt(providerNoStr);
+
 			demographicManager.deleteDemographic(getLoggedInInfo(), demo);
-			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), demo.getDemographicNo(), LogConst.ACTION_DELETE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+			LogAction.addLogEntry(providerNoStr, demo.getDemographicNo(), LogConst.ACTION_DELETE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+			recentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
+
 			return RestResponse.successResponse(result);
 		}
 		catch (Exception e)

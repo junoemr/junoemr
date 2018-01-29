@@ -121,5 +121,8 @@ public abstract class AbstractServiceImpl {
 	protected Date toLegacyDate(LocalDate localDate) {
 		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 	}
+	protected Date toLegacyDateTime(LocalDateTime localDateTime) {
+		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+	}
 
 }

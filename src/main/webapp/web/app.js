@@ -228,14 +228,17 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			params: {
 				formListId: 0
 			}
-		}).state('record.forms.new',
+		})
+		.state('record.forms.view',
 		{
-			url: '/:type/:id',
+			url: '/view/:type/:id?name',
 			templateUrl: 'record/forms/forms.jsp',
+			params: { name: { dynamic: true } },
 			controller: 'Record.Forms.FormController as formCtrl'
-		}).state('record.forms.existing',
+		})
+		.state('record.forms.add',
 		{
-			url: '/:type/:id',
+			url: '/add/:type/:id',
 			templateUrl: 'record/forms/forms.jsp',
 			controller: 'Record.Forms.FormController as formCtrl'
 		})
