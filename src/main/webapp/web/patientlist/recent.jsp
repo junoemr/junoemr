@@ -24,15 +24,15 @@
 
 --%>
 <div id="patient-list">
-    <a ng-repeat="patient in patientListCtrl.patients | offset: patientListCtrl.currentPage * patientListCtrl.pageSize" 
-        class="list-group-item hand-hover" 
-        ng-click="patientListCtrl.goToRecord(patient)" 
-        class="default">
-        <h5 class="list-group-item-heading pull-right patient-time" >{{patient.date | date : 'yyyy-MM-dd HH:mm'}}</h5>
-        <h4 class="list-group-item-heading patient-name" >{{patient.name}}</h5>
+	<a ng-repeat="patient in patientListCtrl.recentPatientList | offset: patientListCtrl.currentPage * patientListCtrl.pageSize"
+	   class="list-group-item hand-hover"
+	   ng-click="patientListCtrl.goToRecord(patient)"
+	   class="default">
+		<h5 class="list-group-item-heading pull-right patient-time">{{patient.date | date : 'yyyy-MM-dd HH:mm'}}</h5>
+		<h4 class="list-group-item-heading patient-name">{{patient.name}}</h4>
 
-        <p class="list-group-item-text" ng-if="patient.demographicNo != 0" ng-show="patientListCtrl.patientListConfig.showReason">
-        </p>
-    </a>
+		<p class="list-group-item-text" ng-if="patient.demographicNo != 0" ng-show="patientListCtrl.patientListConfig.showReason">
+		</p>
+	</a>
 </div>
 		

@@ -23,21 +23,8 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import oscar.OscarProperties;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.common.dao.UserPropertyDAO;
@@ -51,7 +38,9 @@ import org.oscarehr.managers.MessagingManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.myoscar.client.ws_manager.MessageManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
+import org.oscarehr.phr.util.MyOscarUtils;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.ProgramProviderConverter;
@@ -61,7 +50,6 @@ import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.DashboardPreferences;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.NavbarResponse;
-import org.oscarehr.ws.rest.to.PatientList;
 import org.oscarehr.ws.rest.to.PersonaResponse;
 import org.oscarehr.ws.rest.to.PersonaRightsResponse;
 import org.oscarehr.ws.rest.to.model.MenuItemTo1;
@@ -70,8 +58,16 @@ import org.oscarehr.ws.rest.to.model.NavBarMenuTo1;
 import org.oscarehr.ws.rest.to.model.PatientListConfigTo1;
 import org.oscarehr.ws.rest.to.model.ProgramProviderTo1;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.oscarehr.myoscar.client.ws_manager.MessageManager;
-import org.oscarehr.phr.util.MyOscarUtils;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 
 @Path("/persona")
@@ -297,32 +293,6 @@ public class PersonaService extends AbstractServiceImpl {
 	public GenericRESTResponse setDefaultProgram(@QueryParam("programId") Integer programId) {
 		programManager2.setCurrentProgramInDomain(getLoggedInInfo().getLoggedInProviderNo(), programId);
 		return new GenericRESTResponse();
-	}
-	
-	@GET
-	@Path("/patientLists")
-	@Produces("application/json")
-	public PersonaResponse getMyPatientLists() {
-		Provider provider = getCurrentProvider();
-		ResourceBundle bundle = getResourceBundle();
-		
-		String itemsToReturn = "8";
-		String recentPatients = preferenceManager.getProviderPreference(getLoggedInInfo(), "recentPatients");
-		if(recentPatients!=null){
-			itemsToReturn = recentPatients;
-		}
-
-		PersonaResponse response = new PersonaResponse();
-
-		response.getPatientListTabItems().add(new PatientList(0,bundle.getString("patientList.tab.appts"),"../ws/rs/schedule/day/today","patientlist/patientList1.jsp","GET"));
-		
-		if (!OscarProperties.getInstance().getBooleanProperty("disable.patientList.tab.recent", "true")) {
-		response.getPatientListTabItems().add(new PatientList(1,bundle.getString("patientList.tab.recent"),"../ws/rs/providerService/getRecentDemographicsViewed?startIndex=0&itemsToReturn="+itemsToReturn,"patientlist/recent.jsp","GET"));
-		}
-		response.getPatientListMoreTabItems().add(new PatientList(0,bundle.getString("patientList.tab.patientSets"),"../ws/rs/reporting/demographicSets/patientList","patientlist/demographicSets.jsp","POST"));
-		response.getPatientListMoreTabItems().add(new PatientList(1,bundle.getString("patientList.tab.caseload"),null,"patientlist/program.jsp",null));
-		
-		return response;
 	}
 
 	@GET

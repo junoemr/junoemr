@@ -54,7 +54,8 @@ import oscar.oscarPrevention.PreventionData;
  * @author rjonasz
  */
 @Component
-public class PreventionManager {
+public class ProviderPreventionManager
+{
 	private static Logger logger = MiscUtils.getLogger();
 	private static final QueueCache<String, String> dataCache=new QueueCache<String, String>(4, 500, DateUtils.MILLIS_PER_HOUR, null);
 	
@@ -91,7 +92,7 @@ public class PreventionManager {
 	                 Map.Entry me = (Map.Entry)i.next();
 
 	                 k="["+me.getKey()+"="+me.getValue()+"]";
-	                 boolean prevCheck = PreventionManager.isPrevDisabled(me.getKey().toString());
+	                 boolean prevCheck = ProviderPreventionManager.isPrevDisabled(me.getKey().toString());
 	                 	if(prevCheck==false){
 		                 ret=ret+k;
 	                 	}
@@ -124,7 +125,7 @@ public static String checkNames(String k){
   	
   	while(matcher.find()){
   		String[] key = matcher.group(2).split("=");
-	  	boolean prevCheck = PreventionManager.isPrevDisabled(key[0]);
+	  	boolean prevCheck = ProviderPreventionManager.isPrevDisabled(key[0]);
 	  	
 	  	if(prevCheck==false){
 	  		rebuilt=rebuilt+"["+key[1]+"]";
@@ -149,12 +150,7 @@ public static boolean isDisabled(){
   	}
   	
   	//disable all preventions warnings if result is master
-  	if(getStatus.equals("master")){
-  		return true;
-  	}else{
-  		return false;
-  	}
-	
+  	return getStatus.equals("master");
 }
 
 

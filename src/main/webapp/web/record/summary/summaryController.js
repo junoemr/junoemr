@@ -665,7 +665,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		controller.viewEform = function viewEform(eForm)
 		{
-			$state.transitionTo('record.forms.existing',
+			$state.transitionTo('record.forms.view',
 				{
 					demographicNo: $stateParams.demographicNo,
 					type: 'eform',

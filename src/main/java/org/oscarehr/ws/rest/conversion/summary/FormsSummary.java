@@ -69,7 +69,7 @@ public class FormsSummary implements Summary{
 			int id = eformData.getId();
 			
 			//list.add(new SummaryItemTo1(id, eformData.getFormName(),"#/record/"+demographicNo+"/forms/eform/id/"+id));
-			list.add(new SummaryItemTo1(id, eformData.getFormName(),"record.forms.existing","eform"));
+			list.add(new SummaryItemTo1(id, eformData.getFormName(),"record.forms.view","eform"));
 			count++;
 			/*int formId = eformData.getFormId();
 			String name = eformData.getFormName();

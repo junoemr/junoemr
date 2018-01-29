@@ -33,6 +33,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 	'angularUtil',
 	'Navigation',
 	'personaService',
+	'providerService',
 	'patientListState',
 
 	function(
@@ -43,6 +44,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		angularUtil,
 		Navigation,
 		personaService,
+		providerService,
 		patientListState)
 	{
 
@@ -119,10 +121,13 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 		controller.changeTab = function changeTab(temp, filter)
 		{
-			controller.currenttab = patientListState.tabItems[temp];
-			controller.showFilter = true;
-			controller.currentmoretab = null;
-			controller.refresh(filter);
+			if(controller.currenttab !== patientListState.tabItems[temp])
+			{
+				controller.currenttab = patientListState.tabItems[temp];
+				controller.showFilter = true;
+				controller.currentmoretab = null;
+				controller.refresh(filter);
+			}
 		};
 
 		controller.getMoreTabClass = function getMoreTabClass(id)
@@ -265,18 +270,15 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			controller.refresh();
 		});
 
-		personaService.getPatientLists().then(
+		providerService.getRecentPatientList().then(
 			function success(results)
 			{
-				patientListState.tabItems = results.patientListTabItems;
-				controller.moreTabItems = results.patientListMoreTabItems; // Doesn't need to be stored in patientListState, should we put it there anyways?
-				controller.changeTab(0);
+				controller.recentPatientList = results;
 			},
 			function error(errors)
 			{
 				console.log(errors);
 			});
-
 		personaService.getPatientListConfig().then(
 			function success(results)
 			{
@@ -331,5 +333,39 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 					console.log(errors);
 				});
 		};
+
+		patientListState.tabItems = [
+			{
+				id: 0,
+				label: "Appts.",
+				template: "patientlist/patientList1.jsp",
+				url: "../ws/rs/schedule/day/today",
+				httpType: "GET"
+			},
+			{
+				id: 1,
+				label: "Recent",
+				template: "patientlist/recent.jsp",
+				url: "../ws/rs/providerService/getRecentDemographicsViewed",
+				httpType: "GET"
+			}
+		];
+		controller.moreTabItems = [
+			{
+				id: 0,
+				label: "Patient Sets",
+				template: "patientlist/demographicSets.jsp",
+				url: "../ws/rs/reporting/demographicSets/patientList",
+				httpType: "POST"
+			},
+			{
+				id: 1,
+				label: "Caseload",
+				template: "patientlist/program.jsp",
+				url: null,
+				httpType: null
+			}
+		];
+		controller.changeTab(0);
 	}
 ]);
