@@ -250,6 +250,7 @@ if(!authed) {
 						<%
 							ArrayList privatedocs = new ArrayList();
 							privatedocs = EDocUtil.listDocs(loggedInInfo, demoNo, requestId, EDocUtil.UNATTACHED);
+							Collections.reverse(privatedocs);
 							EDoc curDoc;
 							for (int idx = 0; idx < privatedocs.size(); ++idx) {
 								curDoc = (EDoc) privatedocs.get(idx);
@@ -261,6 +262,7 @@ if(!authed) {
 							CommonLabResultData labData = new CommonLabResultData();
 
 							ArrayList labs = labData.populateLabResultsData(loggedInInfo, demoNo, requestId, CommonLabResultData.UNATTACHED);
+							Collections.reverse(labs);
 							LabResultData resData;
 							
 							for (int idx = 0; idx < labs.size(); ++idx) {
