@@ -25,4 +25,4 @@ Oscar.Util.Common.validateNumberInput = function validateNumberInput(elem)
 Oscar.Util.Common.validateInputNotEmpty = function validateInputNotEmpty(elem)
 {
 	return elem.value.length !== 0;
-}
+};

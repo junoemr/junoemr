@@ -48,6 +48,7 @@ public class ProviderInboxItem extends AbstractModel<Integer>{
    @Transient static final public String ACK =  "A";
    @Transient static final public String FILE = "F";
    @Transient static final public String NEW =  "N";
+   @Transient static final public String ARCHIVED =  "X";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

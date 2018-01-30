@@ -26,8 +26,8 @@
 
  */
 angular.module("Common.Services").service("formService", [
-	'$http', '$q',
-	function($http, $q)
+	'$http', '$q', 'junoHttp',
+	function($http, $q, junoHttp)
 	{
 		var service = {};
 
@@ -91,7 +91,7 @@ angular.module("Common.Services").service("formService", [
 		service.getCompletedEncounterForms = function getCompletedEncounterForms(demographicNo)
 		{
 			var deferred = $q.defer();
-			$http.get(service.apiPath + '/' + demographicNo + '/completedEncounterForms',
+			junoHttp.get(service.apiPath + '/' + demographicNo + '/completedEncounterForms',
 				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(results)
 				{

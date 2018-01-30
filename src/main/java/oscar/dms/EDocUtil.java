@@ -54,17 +54,17 @@ import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.common.dao.ConsultDocsDao;
 import org.oscarehr.common.dao.CtlDocTypeDao;
-import org.oscarehr.common.dao.CtlDocumentDao;
-import org.oscarehr.common.dao.DocumentDao;
-import org.oscarehr.common.dao.DocumentDao.Module;
+import org.oscarehr.document.dao.CtlDocumentDao;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.dao.DocumentDao.Module;
 import org.oscarehr.common.dao.IndivoDocsDao;
 import org.oscarehr.common.dao.TicklerLinkDao;
 import org.oscarehr.common.model.ConsultDocs;
 import org.oscarehr.common.model.CtlDocType;
-import org.oscarehr.common.model.CtlDocument;
+import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.Document;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.common.model.IndivoDocs;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Tickler;
@@ -298,19 +298,24 @@ public final class EDocUtil {
 			doc.setDocxml(newDocument.getHtml());
 			doc.setResponsible(newDocument.getResponsibleId());
 			doc.setPublic1(ConversionUtils.fromIntString(newDocument.getDocPublic()));
-			if (doReview) {
+			if(doReview)
+			{
 				doc.setReviewer(newDocument.getReviewerId());
 				doc.setReviewdatetime(ConversionUtils.fromDateString(newDocument.getReviewDateTime(), "yyyy/MM/dd HH:mm:ss"));
-			} else {
+			}
+			else
+			{
 				doc.setReviewer(null);
 				doc.setReviewdatetime(null);
 				doc.setUpdatedatetime(newDocument.getDateTimeStampAsDate());
 				doc.setObservationdate(MyDateFormat.getSysDate(newDocument.getObservationDate()));
 			}
-			if (newDocument.getFileName().length() > 0) {
+			if(newDocument.getFileName().length() > 0)
+			{
 				doc.setDocfilename(newDocument.getFileName());
 				doc.setContenttype(newDocument.getContentType());
-                                doc.setContentdatetime(newDocument.getContentDateTime());
+				doc.setContentdatetime(newDocument.getContentDateTime());
+				doc.setNumberofpages(newDocument.getNumberOfPages());
 			}
 			documentDao.merge(doc);
 		}

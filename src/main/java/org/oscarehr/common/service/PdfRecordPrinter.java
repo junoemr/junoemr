@@ -1196,7 +1196,7 @@ public class PdfRecordPrinter {
 
     }
 
-    public void printPhotos(String contextPath, List<org.oscarehr.common.model.Document> photos) throws DocumentException {
+    public void printPhotos(String contextPath, List<org.oscarehr.document.model.Document> photos) throws DocumentException {
     	writer.setStrictImageSequence(true);
 
     	if(photos.size()>0) {
@@ -1210,7 +1210,7 @@ public class PdfRecordPrinter {
 	        getDocument().add(p);
     	}
 
-    	for(org.oscarehr.common.model.Document doc:photos) {
+    	for(org.oscarehr.document.model.Document doc:photos) {
     		Image img = null;
     		try {
     			String location = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR").trim() + doc.getDocfilename();

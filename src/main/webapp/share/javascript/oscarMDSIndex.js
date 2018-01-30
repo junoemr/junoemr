@@ -27,10 +27,13 @@ var oldestLab = null;
 
 function  updateDocStatusInQueue(docid){//change status of queue document link row to I=inactive
     //console.log('in updateDocStatusInQueue, docid '+docid);
-          var url="../dms/inboxManage.do",data="docid="+docid+"&method=updateDocStatusInQueue";
-          new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){}});
-
-
+          var url="../dms/inboxManage.do",
+	          data="docid="+docid+"&method=updateDocStatusInQueue";
+          new Ajax.Request(url,{
+          	method:'post',
+	          parameters:data,
+	          onSuccess:function(transport){}
+          });
 }
 
 function saveNext(docid) {
@@ -1602,41 +1605,6 @@ function updateDocumentAndNext(eleId){//save doc info
 	return false;
 }
 
-function updateDocument(eleId){
-	//save doc info
-	var url="../dms/ManageDocument.do",data=$(eleId).serialize(true);
-	new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){
-		var json=transport.responseText.evalJSON();
-		var patientId;
-		//oscarLog(json);
-		if(json!=null ){
-			patientId=json.patientId;
-
-			var ar=eleId.split("_");
-			var num=ar[1];
-			num=num.replace(/\s/g,'');
-			$("saveSucessMsg_"+num).show();
-			$('saved'+num).value='true';
-			$("msgBtn_"+num).onclick = function() { popup(700,960,contextpath +'/oscarMessenger/SendDemoMessage.do?demographic_no='+patientId,'msg'); };
-			
-			updateDocStatusInQueue(num);
-			var success= updateGlobalDataAndSideNav(num,patientId);
-			
-			if(success){
-				success=updatePatientDocLabNav(num,patientId);
-				if(success){
-					//disable demo input
-					$('autocompletedemo'+num).disabled=true;
-					
-					//console.log('updated by save');
-					//console.log(patientDocs);
-				}
-			}
-		}
-	}});
-	return false;
-}
-
 function updateStatus(formid){//acknowledge
 	var num=formid.split("_");
 	var doclabid=num[1];
@@ -1669,8 +1637,6 @@ function updateStatus(formid){//acknowledge
 		}
 	}
 }
-
-
 
 function fileDoc(docId){
 	if(docId){

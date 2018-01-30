@@ -21,7 +21,10 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.model;
+package org.oscarehr.document.model;
+
+import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.common.model.CtlDocumentPK;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -30,7 +33,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="ctl_document")
-public class CtlDocument extends AbstractModel<CtlDocumentPK> {
+public class CtlDocument extends AbstractModel<CtlDocumentPK>
+{
 	
 	public static final String MODULE_DEMOGRAPHIC = "demographic";
 	public static final String MODULE_PROVIDER = "provider";

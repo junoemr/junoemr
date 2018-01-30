@@ -323,6 +323,10 @@
 							<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 							Medical History
 						</button>
+						<button type="button" class="btn btn-sm btn-success" ng-click="consultResponseCtrl.getSocialHistory('clinicalInfo');">
+							<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+							Social History
+						</button>
 						<button type="button" class="btn btn-sm btn-success" ng-click="consultResponseCtrl.getOngoingConcerns('clinicalInfo');">
 							<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 							Ongoing Concerns
@@ -353,6 +357,10 @@
 							<button type="button" class="btn btn-sm btn-success" ng-click="consultResponseCtrl.getMedicalHistory('concurrentProblems');">
 								<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 								Medical History
+							</button>
+							<button type="button" class="btn btn-sm btn-success" ng-click="consultResponseCtrl.getSocialHistory('concurrentProblems');">
+								<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+								Social History
 							</button>
 							<button type="button" class="btn btn-sm btn-success" ng-click="consultResponseCtrl.getOngoingConcerns('concurrentProblems');">
 								<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>

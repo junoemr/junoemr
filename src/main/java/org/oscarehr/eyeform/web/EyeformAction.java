@@ -76,7 +76,7 @@ import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.common.model.DemographicExt;
-import org.oscarehr.common.model.Document;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.common.model.EFormGroup;
 import org.oscarehr.eform.model.EFormValue;
 import org.oscarehr.common.model.Measurement;

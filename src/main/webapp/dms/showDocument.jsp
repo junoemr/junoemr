@@ -39,23 +39,36 @@
 	}
 %>
 
-<%@page import="java.text.SimpleDateFormat"%>
-<%@ page import="org.oscarehr.phr.util.MyOscarUtils,org.oscarehr.myoscar.utils.MyOscarLoggedInInfo,org.oscarehr.util.WebUtils"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@ page import="oscar.dms.*,java.util.*" %>
+<%@ page import="org.apache.jcs.access.exception.InvalidArgumentException,org.oscarehr.PMmodule.dao.ProviderDao,org.oscarehr.common.dao.DemographicDao"%>
+<%@page import="org.oscarehr.common.dao.OscarAppointmentDao"%>
+<%@ page import="org.oscarehr.common.dao.ProviderInboxRoutingDao,org.oscarehr.common.dao.QueueDao" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
-<%@ page import="oscar.OscarProperties,oscar.log.*"%>
-<%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO,org.oscarehr.common.model.Appointment"%>
+<%@ page import="org.oscarehr.common.model.Demographic" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
+<%@ page import="org.oscarehr.common.model.ProviderInboxItem" %>
+<%@page import="org.oscarehr.common.model.UserProperty"%>
+<%@page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo,org.oscarehr.phr.util.MyOscarUtils,org.oscarehr.util.SpringUtils"%>
+<%@page import="org.oscarehr.util.WebUtils,org.springframework.web.context.WebApplicationContext,org.springframework.web.context.support.WebApplicationContextUtils,oscar.OscarProperties"%>
+<%@ page import="oscar.dms.EDoc" %>
+<%@ page import="oscar.dms.EDocUtil" %>
+<%@ page import="oscar.dms.IncomingDocUtil" %>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
+<%@ page import="oscar.oscarLab.ca.all.AcknowledgementData" %>
+<%@ page import="oscar.oscarMDS.data.ReportStatus" %>
 <%@ page import="oscar.util.ConversionUtils" %>
-<%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils,oscar.oscarLab.ca.all.*,oscar.oscarMDS.data.*"%>
-<%@page import="org.springframework.web.context.WebApplicationContext,org.oscarehr.common.dao.*,org.oscarehr.common.model.*,org.oscarehr.util.SpringUtils"%>
-<%@ page import="org.apache.jcs.access.exception.InvalidArgumentException" %><%
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.Hashtable" %>
+<%@ page import="java.util.List" %>
+<%
 
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 			ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) ctx.getBean("providerInboxRoutingDAO");
@@ -159,6 +172,12 @@
 <!-- calendar stylesheet -->
 <link rel="stylesheet" type="text/css" media="all" href="<%= request.getContextPath() %>/share/calendar/calendar.css" title="win2k-cold-1" />
 	<script type="text/javascript"
+	        src="<%= request.getContextPath() %>/js/util/common.js"></script>
+	<script type="text/javascript"
+	        src="<%= request.getContextPath() %>/js/moment.min.js"></script>
+	<script type="text/javascript"
+	        src="<%= request.getContextPath() %>/js/util/date.js"></script>
+	<script type="text/javascript"
 			src="<%= request.getContextPath() %>/share/javascript/prototype.js"></script>
 	<script type="text/javascript"
 			src="<%= request.getContextPath() %>/share/javascript/effects.js"></script>
@@ -187,12 +206,6 @@
 		  href="<%= request.getContextPath() %>/share/css/demographicProviderAutocomplete.css"/>
 
 	<script type="text/javascript" src="<%=request.getContextPath()%>/dms/showDocument.js"></script>
-	<script type="text/javascript"
-			src="<%= request.getContextPath() %>/js/moment.min.js"></script>
-	<script type="text/javascript"
-			src="<%= request.getContextPath() %>/js/util/common.js"></script>
-	<script type="text/javascript"
-			src="<%= request.getContextPath() %>/js/util/date.js"></script>
 
 
 	<style type="text/css">
@@ -273,27 +286,6 @@
 			popupStart(1400, 1400, loc, "Splitter");
 		}
 
-		function checkObservationDate(formId)
-		{
-			var formElem = document.getElementById(formId);
-			var dateElem = formElem.elements["observationDate"];
-
-			if (!Oscar.Util.Common.validateInputNotEmpty(dateElem))
-			{
-				alert("Blank Date.");
-				dateElem.focus();
-				return false;
-			}
-
-			if (!Oscar.Util.Date.validateDateInput(dateElem))
-			{
-				alert("Invalid date format: " + dateElem.value);
-				dateElem.focus();
-				return false;
-			}
-			return true;
-		}
-
 		var _in_window = <%=( "true".equals(request.getParameter("inWindow")) ? "true" : "false" )%>;
 		var contextpath = "<%=request.getContextPath()%>";
 
@@ -328,54 +320,54 @@
 			%>
 			<form name="acknowledgeForm_<%=docId%>" id="acknowledgeForm_<%=docId%>" onsubmit="<%=ackFunc%>" method="post" action="javascript:void(0);">
 
-														<input type="hidden" name="segmentID" value="<%= docId%>"/>
-														<input type="hidden" name="multiID" value="<%= docId%>" />
-														<input type="hidden" name="providerNo" value="<%= providerNo%>"/>
-														<input type="hidden" name="status" value="A"/ id="status_<%=docId%>">
-														<input type="hidden" name="labType" value="DOC"/>
-														<input type="hidden" name="ajaxcall" value="yes"/>
-														<input type="hidden" name="comment" id="comment_<%=docId%>" value="<%=docCommentTxt%>">
-													<% if (demographicID != null && !demographicID.equals("") && !demographicID.equalsIgnoreCase("null") && !ackedOrFiled ) {%>
-														<input type="submit" id="ackBtn_<%=docId%>" value="<bean:message key="oscarMDS.segmentDisplay.btnAcknowledge"/>">
-														<input type="button" value="Comment" onclick="addDocComment('<%=docId%>','<%=providerNo%>',true)"/>
-														<%if (MyOscarUtils.isMyOscarEnabled((String) session.getAttribute("user"))){
-															MyOscarLoggedInInfo myOscarLoggedInInfo=MyOscarLoggedInInfo.getLoggedInInfo(session);
-															boolean enabledMyOscarButton=MyOscarUtils.isMyOscarSendButtonEnabled(myOscarLoggedInInfo, Integer.valueOf(demographicID));
-														%>
-														<input type="button" <%=WebUtils.getDisabledString(enabledMyOscarButton)%> value="<bean:message key="global.btnSendToPHR"/>" onclick="popup(450, 600, '../phr/SendToPhrPreview.jsp?module=document&documentNo=<%=docId%>&demographic_no=<%=demographicID%>', 'sendtophr')"/>
-														<%}%>
-													<%}%>
-														<input type="button" id="fwdBtn_<%=docId%>"  value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(355, 685, '../oscarMDS/SelectProvider.jsp?docId=<%=docId%>', 'providerselect');">
-													<%if( !ackedOrFiled ) { %>
-														<input type="button" id="fileBtn_<%=docId%>"  value="<bean:message key="oscarMDS.index.btnFile"/>" onclick="fileDoc('<%=docId%>');">
-													<%} %>
-														<input type="button" id="closeBtn_<%=docId%>" value=" <bean:message key="global.btnClose"/> " onClick="window.close()">
-														<input type="button" id="printBtn_<%=docId%>" value=" <bean:message key="global.btnPrint"/> " onClick="popup(700,960,'<%=url2%>','file download')">
-														<%
-														String btnDisabled = "disabled";
-														if (demographicID != null && !demographicID.equals("") && !demographicID.equalsIgnoreCase("null") && !demographicID.equals("-1") ) {
-															btnDisabled = "";
-														}
+								<input type="hidden" name="segmentID" value="<%= docId%>"/>
+								<input type="hidden" name="multiID" value="<%= docId%>" />
+								<input type="hidden" name="providerNo" value="<%= providerNo%>"/>
+								<input type="hidden" name="status" value="A" id="status_<%=docId%>">
+								<input type="hidden" name="labType" value="DOC"/>
+								<input type="hidden" name="ajaxcall" value="yes"/>
+								<input type="hidden" name="comment" id="comment_<%=docId%>" value="<%=docCommentTxt%>">
+							<% if (demographicID != null && !demographicID.equals("") && !demographicID.equalsIgnoreCase("null") && !ackedOrFiled ) {%>
+								<input type="submit" id="ackBtn_<%=docId%>" value="<bean:message key="oscarMDS.segmentDisplay.btnAcknowledge"/>">
+								<input type="button" value="Comment" onclick="addDocComment('<%=docId%>','<%=providerNo%>',true)"/>
+								<%if (MyOscarUtils.isMyOscarEnabled((String) session.getAttribute("user"))){
+									MyOscarLoggedInInfo myOscarLoggedInInfo=MyOscarLoggedInInfo.getLoggedInInfo(session);
+									boolean enabledMyOscarButton=MyOscarUtils.isMyOscarSendButtonEnabled(myOscarLoggedInInfo, Integer.valueOf(demographicID));
+								%>
+								<input type="button" <%=WebUtils.getDisabledString(enabledMyOscarButton)%> value="<bean:message key="global.btnSendToPHR"/>" onclick="popup(450, 600, '../phr/SendToPhrPreview.jsp?module=document&documentNo=<%=docId%>&demographic_no=<%=demographicID%>', 'sendtophr')"/>
+								<%}%>
+							<%}%>
+								<input type="button" id="fwdBtn_<%=docId%>"  value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(355, 685, '../oscarMDS/SelectProvider.jsp?docId=<%=docId%>', 'providerselect');">
+							<%if( !ackedOrFiled ) { %>
+								<input type="button" id="fileBtn_<%=docId%>"  value="<bean:message key="oscarMDS.index.btnFile"/>" onclick="fileDoc('<%=docId%>');">
+							<%} %>
+								<input type="button" id="closeBtn_<%=docId%>" value=" <bean:message key="global.btnClose"/> " onClick="window.close()">
+								<input type="button" id="printBtn_<%=docId%>" value=" <bean:message key="global.btnPrint"/> " onClick="popup(700,960,'<%=url2%>','file download')">
+								<%
+								String btnDisabled = "disabled";
+								if (demographicID != null && !demographicID.equals("") && !demographicID.equalsIgnoreCase("null") && !demographicID.equals("-1") ) {
+									btnDisabled = "";
+								}
 
-														%>
-														<input type="button" id="msgBtn_<%=docId%>" value="Msg" onclick="Oscar.ShowDocument.popupPatient(700,960,'<%= request.getContextPath() %>/oscarMessenger/SendDemoMessage.do?demographic_no=','msg', '<%=docId%>')" <%=btnDisabled %>/>
-																																										<!--input type="button" id="ticklerBtn_<%=docId%>" value="Tickler" onclick="handleDocSave('<%=docId%>','addTickler')"/-->
-														<input type="button" id="mainTickler_<%=docId%>" value="Tickler" onClick="Oscar.ShowDocument.popupPatientTickler(710, 1024,'<%= request.getContextPath() %>/Tickler.do?', 'Tickler','<%=docId%>')" <%=btnDisabled %>>
-														<input type="button" id="mainEchart_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="Oscar.ShowDocument.popupPatient(710, 1024,'<%= request.getContextPath() %>/oscarEncounter/IncomingEncounter.do?reason=<bean:message key="oscarMDS.segmentDisplay.labResults"/>&curDate=<%=currentDate%>>&appointmentNo=&appointmentDate=&startTime=&status=&demographicNo=', 'encounter', '<%=docId%>')" <%=btnDisabled %>>
-														<input type="button" id="mainMaster_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnMaster"/>" onClick="Oscar.ShowDocument.popupPatient(710,1024,'<%= request.getContextPath() %>/demographic/demographiccontrol.jsp?displaymode=edit&dboperation=search_detail&demographic_no=','master','<%=docId%>')" <%=btnDisabled %>>
-														<input type="button" id="mainApptHistory_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnApptHist"/>" onClick="Oscar.ShowDocument.popupPatient(710,1024,'<%= request.getContextPath() %>/demographic/demographiccontrol.jsp?orderby=appttime&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&demographic_no=','ApptHist','<%=docId%>')" <%=btnDisabled %>>
+								%>
+								<input type="button" id="msgBtn_<%=docId%>" value="Msg" onclick="Oscar.ShowDocument.popupPatient(700,960,'<%= request.getContextPath() %>/oscarMessenger/SendDemoMessage.do?demographic_no=','msg', '<%=docId%>')" <%=btnDisabled %>/>
+																																				<!--input type="button" id="ticklerBtn_<%=docId%>" value="Tickler" onclick="handleDocSave('<%=docId%>','addTickler')"/-->
+								<input type="button" id="mainTickler_<%=docId%>" value="Tickler" onClick="Oscar.ShowDocument.popupPatientTickler(710, 1024,'<%= request.getContextPath() %>/Tickler.do?', 'Tickler','<%=docId%>')" <%=btnDisabled %>>
+								<input type="button" id="mainEchart_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="Oscar.ShowDocument.popupPatient(710, 1024,'<%= request.getContextPath() %>/oscarEncounter/IncomingEncounter.do?reason=<bean:message key="oscarMDS.segmentDisplay.labResults"/>&curDate=<%=currentDate%>>&appointmentNo=&appointmentDate=&startTime=&status=&demographicNo=', 'encounter', '<%=docId%>')" <%=btnDisabled %>>
+								<input type="button" id="mainMaster_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnMaster"/>" onClick="Oscar.ShowDocument.popupPatient(710,1024,'<%= request.getContextPath() %>/demographic/demographiccontrol.jsp?displaymode=edit&dboperation=search_detail&demographic_no=','master','<%=docId%>')" <%=btnDisabled %>>
+								<input type="button" id="mainApptHistory_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnApptHist"/>" onClick="Oscar.ShowDocument.popupPatient(710,1024,'<%= request.getContextPath() %>/demographic/demographiccontrol.jsp?orderby=appttime&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&demographic_no=','ApptHist','<%=docId%>')" <%=btnDisabled %>>
 
-														<input type="button" id="refileDoc_<%=docId%>" value="<bean:message key="oscarEncounter.noteBrowser.msgRefile"/>" onclick="refileDoc('<%=docId%>');" >
-														<select  id="queueList_<%=docId%>" name="queueList">
-															<%
-															for (Hashtable ht : queues) {
-																int id = (Integer) ht.get("id");
-																String qName = (String) ht.get("queue");
-															%>
-															<option value="<%=id%>" <%=((id == queueId) ? " selected" : "")%>><%= qName%> </option>
-															<%}%>
-														</select>
-							</form>
+								<input type="button" id="refileDoc_<%=docId%>" value="<bean:message key="oscarEncounter.noteBrowser.msgRefile"/>" onclick="refileDoc('<%=docId%>');" >
+								<select  id="queueList_<%=docId%>" name="queueList">
+									<%
+									for (Hashtable ht : queues) {
+										int id = (Integer) ht.get("id");
+										String qName = (String) ht.get("queue");
+									%>
+									<option value="<%=id%>" <%=((id == queueId) ? " selected" : "")%>><%= qName%> </option>
+									<%}%>
+								</select>
+			</form>
 			<table class="docTable">
 				<tr>
 
@@ -436,9 +428,12 @@
 
 							</table>
 
-							<form id="forms_<%=docId%>" onsubmit="return checkObservationDate(this.id) && updateDocument(this.id);">
+							<form id="forms_<%=docId%>" onsubmit="Oscar.ShowDocument.validateAndUpdateDocument(this.id); return false">
 								<input type="hidden" name="method" value="documentUpdateAjax" />
 								<input type="hidden" name="documentId" value="<%=docId%>" />
+								<!-- segmentID is needed in the event of a page refresh on submit, 
+								which shouldn't happen anymore  since we are forcing a false return -->
+								<input type="hidden" name="segmentID" value="<%=docId%>" /> 
 								<input type="hidden" name="curPage_<%=docId%>" id="curPage_<%=docId%>" value="1"/>
 								<input type="hidden" name="totalPage_<%=docId%>" id="totalPage_<%=docId%>" value="<%=numOfPage%>"/>
 								<input type="hidden" name="displayDocumentAs_<%=docId%>" id="displayDocumentAs_<%=docId%>" value="<%=displayDocumentAs%>">
@@ -504,18 +499,25 @@
 										</td>
 									</tr>
 
-
-
 									<tr>
 										<td><bean:message key="dms.documentReport.msgCreator"/>:</td>
 										<td><%=curdoc.getCreatorName()%></td>
 									</tr>
 
 									<tr>
-										<td width="30%" colspan="1" align="left"><a id="saveSucessMsg_<%=docId%>" style="display:none;color:blue;"><bean:message key="inboxmanager.document.SuccessfullySavedMsg"/></a></td>
-										<td width="30%" colspan="1" align="left"><%if(demographicID.equals("-1")){%><input type="submit" name="save" disabled id="save<%=docId%>" value="Save" /><input type="button" name="save" id="saveNext<%=docId%>" onclick="saveNext(<%=docId%>)" disabled value='<bean:message key="inboxmanager.document.SaveAndNext"/>' /><%}
-			else{%><input type="submit" name="save" id="save<%=docId%>" value="Save" /><input type="button" name="save" onclick="saveNext(<%=docId%>)" id="saveNext<%=docId%>" value='<bean:message key="inboxmanager.document.SaveAndNext"/>' /> <%}%>
-
+										<td width="30%" colspan="1" align="left">
+											<a id="saveSucessMsg_<%=docId%>" style="display:none;color:blue;"><bean:message key="inboxmanager.document.SuccessfullySavedMsg"/></a>
+										</td>
+										<td width="30%" colspan="1" align="left"><%
+												if(demographicID.equals("-1")){%>
+											<input type="submit" name="save" disabled id="save<%=docId%>" value="Save" />
+											<input type="button" name="save" id="saveNext<%=docId%>" onclick="saveNext(<%=docId%>)" disabled value='<bean:message key="inboxmanager.document.SaveAndNext"/>' />
+												<%}
+												else{%>
+											<input type="submit" name="save" id="save<%=docId%>" value="Save" />
+											<input type="button" name="save" onclick="saveNext(<%=docId%>)" id="saveNext<%=docId%>" value='<bean:message key="inboxmanager.document.SaveAndNext"/>'/>
+												<%}%>
+										</td>
 									</tr>
 
 									<tr>
@@ -528,7 +530,7 @@
 													Provider p = providerDao.getProvider(pItem.getProviderNo());
 													String s = (p != null)? p.getDisplayName() : pItem.getProviderNo();
 
-													if(!s.equals("0")&&!s.equals("null")&& !pItem.getStatus().equals("X")){  %>
+													if(!s.equals("0")&&!s.equals("null")&& !pItem.getStatus().equals(ProviderInboxItem.ARCHIVED)){  %>
 														<li><%=s%><a href="#" onclick="removeLink('DOC', '<%=docId %>', '<%=pItem.getProviderNo() %>', this);return false;"><bean:message key="inboxmanager.document.RemoveLinkedProviderMsg" /></a></li>
 												<%}
 												}%>
@@ -552,23 +554,25 @@
 																<!--center-->
 																	<% for (int i=0; i < ackList.size(); i++) {
 																		ReportStatus report = (ReportStatus) ackList.get(i); %>
-																		<%= report.getProviderName() %> :
 
 																		<% String ackStatus = report.getStatus();
-																			if(ackStatus.equals("A")){
+																			if(ackStatus.equals(ProviderInboxItem.ACK)){
 																				ackStatus = "Acknowledged";
-																			}else if(ackStatus.equals("F")){
+																			}else if(ackStatus.equals(ProviderInboxItem.FILE)){
 																				ackStatus = "Filed but not Acknowledged";
 																			}else{
 																				ackStatus = "Not Acknowledged";
 																			}
-																		%>
-																		<font color="red"><%= ackStatus %></font>
-																			<span id="timestamp_<%=docId + "_" + report.getOscarProviderNo()%>"><%= report.getTimestamp() == null ? "&nbsp;" : report.getTimestamp() + "&nbsp;"%></span>,
-																			comment: <span id="comment_<%=docId + "_" + report.getOscarProviderNo()%>"><%=report.getComment() == null || report.getComment().equals("") ? "no comment" : report.getComment()%></span>
+																		// Only show providers that weren't removed from the document
+																		if(!report.getStatus().equals(ProviderInboxItem.ARCHIVED)) { %>
+																			<%= report.getProviderName() %> :
+																			<font color="red"><%= ackStatus %></font>
+																				<span id="timestamp_<%=docId + "_" + report.getOscarProviderNo()%>"><%= report.getTimestamp() == null ? "&nbsp;" : report.getTimestamp() + "&nbsp;"%></span>,
+																				comment: <span id="comment_<%=docId + "_" + report.getOscarProviderNo()%>"><%=report.getComment() == null || report.getComment().equals("") ? "no comment" : report.getComment()%></span>
 
-																		<br>
-																	<% }
+																			<br>
+																		<%}
+																	 }
 																	if (ackList.size() == 0){
 																		%><font color="red">N/A</font><%
 																	}

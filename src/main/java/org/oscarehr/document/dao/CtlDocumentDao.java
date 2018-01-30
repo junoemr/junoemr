@@ -21,31 +21,38 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.managers;
+package org.oscarehr.document.dao;
 
 import java.util.List;
 
-import org.oscarehr.common.dao.OscarLogDao;
-import org.oscarehr.common.model.OscarLog;
-import org.oscarehr.util.LoggedInInfo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import javax.persistence.Query;
 
-import oscar.log.LogAction;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.document.model.CtlDocument;
+import org.springframework.stereotype.Repository;
 
-@Service
-public class OscarLogManager {
+@Repository
+public class CtlDocumentDao extends AbstractDao<CtlDocument>
+{
 
-	@Autowired 
-	private OscarLogDao oscarLogDao;
-	
-	public List<OscarLog> getRecentDemographicsViewedByProvider(LoggedInInfo loggedInInfo, String providerNo, int startPosition, int itemsToReturn) {
-		List<OscarLog> results = oscarLogDao.getRecentDemographicsViewedByProvider(providerNo, startPosition, itemsToReturn);
-
-		LogAction.addLogSynchronous(loggedInInfo,"OscarLogManager.getRecentDemographicsViewedByProvider", "providerNo"+providerNo);
-		
-		return results;
-			
+	public CtlDocumentDao() {
+		super(CtlDocument.class);
 	}
 	
+	public CtlDocument getCtrlDocument(Integer docId) {
+		Query query = entityManager.createQuery("SELECT x FROM CtlDocument x WHERE x.id.documentNo=:documentNo");
+		query.setParameter("documentNo", docId);
+		
+		return(getSingleResultOrNull(query));
+	}
+
+    public List<CtlDocument> findByDocumentNoAndModule(Integer documentNo, String module) {
+		Query query = entityManager.createQuery("SELECT x FROM CtlDocument x WHERE x.id.documentNo=:documentNo and x.id.module = :module");
+		query.setParameter("documentNo", documentNo);
+		query.setParameter("module", module);
+		
+		@SuppressWarnings("unchecked")
+        List<CtlDocument> cList = query.getResultList();
+		return cList;
+    }
 }

@@ -23,20 +23,14 @@
 
 package org.oscarehr.common.dao;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import oscar.log.LogConst;
-
-import javax.persistence.Query;
-import javax.persistence.TemporalType;
-
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.common.model.OscarLog;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 @Repository
 public class OscarLogDao extends AbstractDao<OscarLog> {
@@ -87,7 +81,6 @@ public class OscarLogDao extends AbstractDao<OscarLog> {
 	    return results;
     }
     
-    
     public List<OscarLog> findByActionContentAndDemographicId(String action, String content, Integer demographicId) {
 
     	String sqlCommand="select x from "+modelClass.getSimpleName()+" x where x.action=?1 and x.content = ?2 and x.demographicId=?3 order by x.created desc";
@@ -114,48 +107,6 @@ public class OscarLogDao extends AbstractDao<OscarLog> {
 		results.removeAll(Collections.singleton(null));
 
 		return(results);
-	}
-
-	/**
-	 * 
-	 * @param providerNo
-	 * @param startPosition
-	 * @param itemsToReturn
-	 * @return List of Object array [demographicId (Integer), lastDateViewed Date]
-	 */
-	public List<OscarLog> getRecentDemographicsViewedByProvider(String providerNo, int startPosition, int itemsToReturn) {
-
-		String sqlCommand =
-				"SELECT MAX(dateTime) created, demographic_no FROM log " +
-						"WHERE dateTime > :created_at_filter " +
-						"AND content = :content AND provider_no = :providerNo " +
-						"GROUP BY demographic_no " +
-						"ORDER BY dateTime DESC ";
-
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MONTH, -1);
-		Date oneMonthAgo = cal.getTime();
-
-		Query query = entityManager.createNativeQuery(sqlCommand);
-		query.setFirstResult(startPosition);
-		query.setParameter("providerNo", providerNo);
-		query.setParameter("content", LogConst.CON_DEMOGRAPHIC);
-		query.setParameter("created_at_filter", oneMonthAgo, TemporalType.TIMESTAMP);
-		setLimit(query, itemsToReturn);
-
-		@SuppressWarnings("unchecked")
-		List<Object[]> results = query.getResultList();
-
-		List<OscarLog> logEntries = new ArrayList<OscarLog>();
-		for(Object[] result: results)
-		{
-			OscarLog logEntry = new OscarLog();
-			logEntry.setDemographicId((int)result[1]);
-			logEntry.setCreated((Date)result[0]);
-			logEntries.add(logEntry);
-		};
-		
-		return logEntries;
 	}
 
 	@Override
