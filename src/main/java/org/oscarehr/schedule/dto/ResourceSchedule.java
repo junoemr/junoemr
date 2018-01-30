@@ -21,25 +21,21 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.util.persistence;
+package org.oscarehr.schedule.dto;
 
-import java.sql.Types;
+import java.util.List;
 
-import org.hibernate.Hibernate;
-import org.hibernate.dialect.MySQL5InnoDBDialect;
+public class ResourceSchedule
+{
+	private List<UserDateSchedule> schedules;
 
-/**
- * Customized dialect that adds a mapping for {@link Types#LONGVARBINARY} in order to prevent {@link org.hibernate.MappingException}. 
- *
- */
-public class OscarMySQL5Dialect extends MySQL5InnoDBDialect {
-
-	public OscarMySQL5Dialect() {
-		super();
-		registerHibernateType(Types.LONGVARBINARY, Hibernate.BINARY.getName());
-		registerHibernateType(Types.LONGVARCHAR, Hibernate.TEXT.getName());
-		registerHibernateType(Types.CHAR, 1, Hibernate.CHARACTER.getName());
-		registerHibernateType(Types.CHAR, 255, Hibernate.STRING.getName());
+	public List<UserDateSchedule> getSchedules()
+	{
+		return schedules;
 	}
 
+	public ResourceSchedule(List<UserDateSchedule> schedules)
+	{
+		this.schedules = schedules;
+	}
 }

@@ -23,6 +23,8 @@
 
 package org.oscarehr.common.dao;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -31,14 +33,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.common.model.Facility;
+import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Repository;
@@ -747,5 +753,109 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 
 		return results;
 	}
-	
+
+	public SortedMap<LocalTime, List<AppointmentDetails>> findAppointmentDetailsByDateAndProvider(LocalDate date, Integer providerNo)
+	{
+		String sql = "SELECT\n" +
+				"  a.appointment_no,\n" +
+				"  a.demographic_no,\n" +
+				"  a.appointment_date,\n" +
+				"  a.start_time,\n" +
+				"  a.end_time,\n" +
+				"  a.name,\n" +
+				"  a.notes,\n" +
+				"  a.reason,\n" +
+				"  a.reasonCode,\n" +
+				"  a.location,\n" +
+				"  a.resources,\n" +
+				"  a.type,\n" +
+				"  a.style,\n" +
+				"  a.bookingSource,\n" +
+				"  a.status,\n" +
+				"  aps.description,\n" +
+				"  aps.color,\n" +
+				"  aps.icon,\n" +
+				"  aps.short_letter_colour,\n" +
+				"  aps.short_letters\n" +
+				"FROM appointment a\n" +
+				"JOIN appointment_status aps ON a.status = aps.status\n" +
+				"WHERE a.appointment_date = :date\n" +
+				"AND provider_no = :providerNo\n" +
+				"ORDER BY a.start_time, appointment_no\n";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
+		query.setParameter("providerNo", providerNo);
+
+		List<Object[]> results = query.getResultList();
+
+		SortedMap<LocalTime, List<AppointmentDetails>> appointmentDetails = new TreeMap<>();
+
+		for(Object[] result: results)
+		{
+			int index = 0;
+			Integer appointmentNo = (Integer) result[index++];
+			Integer demographicNo = (Integer) result[index++];
+			LocalDate appointmentDate = ((java.sql.Date) result[index++]).toLocalDate();
+			LocalTime startTime = ((java.sql.Time) result[index++]).toLocalTime();
+			LocalTime endTime = ((java.sql.Time) result[index++]).toLocalTime();
+			String name = (String) result[index++];
+			String notes = (String) result[index++];
+			String reason = (String) result[index++];
+			Integer reasonCode = (Integer) result[index++];
+			String location = (String) result[index++];
+			String resources = (String) result[index++];
+			String type = (String) result[index++];
+			String style = (String) result[index++];
+			String bookingSource = (String) result[index++];
+			String status = (String) result[index++];
+			String statusTitle = (String) result[index++];
+			String color = (String) result[index++];
+			String iconImage = (String) result[index++];
+			String shortLetterColour = (String) result[index++];
+			String shortLetters = (String) result[index++];
+
+			if(status != null)
+			{
+				status = status.trim();
+			}
+
+			if(bookingSource != null)
+			{
+				bookingSource = bookingSource.trim();
+			}
+
+			List<AppointmentDetails> currentValue = appointmentDetails.get(startTime);
+
+			if(currentValue == null)
+			{
+				appointmentDetails.put(startTime, new ArrayList<>());
+			}
+
+			appointmentDetails.get(startTime).add(new AppointmentDetails(
+				appointmentNo,
+				demographicNo,
+				appointmentDate,
+				startTime,
+				endTime,
+				name,
+				notes,
+				reason,
+				reasonCode,
+				location,
+				resources,
+				type,
+				style,
+				bookingSource,
+				status,
+				statusTitle,
+				color,
+				iconImage,
+				shortLetterColour,
+				shortLetters
+			));
+		}
+
+		return appointmentDetails;
+	}
 }
