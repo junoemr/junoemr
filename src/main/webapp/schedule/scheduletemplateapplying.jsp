@@ -26,12 +26,12 @@
 <%@ page
 	import="org.apache.struts.util.MessageResources,
 	org.apache.struts.util.MessageResourcesFactory,
-	org.oscarehr.common.dao.RScheduleDao,
-	org.oscarehr.common.dao.ScheduleDateDao,
+	org.oscarehr.schedule.dao.RScheduleDao,
+	org.oscarehr.schedule.dao.ScheduleDateDao,
 	org.oscarehr.schedule.dao.ScheduleTemplateDao,
 	org.oscarehr.common.dao.SiteDao,
-	org.oscarehr.common.model.RSchedule,
-	org.oscarehr.common.model.ScheduleDate"
+	org.oscarehr.schedule.model.RSchedule,
+	org.oscarehr.schedule.model.ScheduleDate"
 	errorPage="../appointment/errorpage.jsp"%>
 
 <jsp:useBean id="scheduleRscheduleBean" class="oscar.RscheduleBean"	scope="session" />

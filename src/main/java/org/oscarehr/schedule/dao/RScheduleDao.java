@@ -23,19 +23,21 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.schedule.dao;
 
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.RSchedule;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.schedule.model.RSchedule;
 import org.springframework.stereotype.Repository;
 
 @Repository(value="rScheduleDao")
 @SuppressWarnings("unchecked")
-public class RScheduleDao extends AbstractDao<RSchedule>{
+public class RScheduleDao extends AbstractDao<RSchedule>
+{
 
 	public RScheduleDao() {
 		super(RSchedule.class);
@@ -60,7 +62,7 @@ public class RScheduleDao extends AbstractDao<RSchedule>{
 		query.setParameter(5, d4);
 		query.setParameter(6, d5);
 		query.setParameter(7, d6);
-		query.setParameter(8, d7);
+		query.setParameter( 8, d7);
 		query.setParameter(9, d8);
 		query.setParameter(10, d9);
 		query.setParameter(11, d10);

@@ -34,7 +34,7 @@
 <%@page import="org.oscarehr.common.model.Appointment" %>
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.schedule.model.ScheduleTemplate" %>
-<%@page import="org.oscarehr.common.model.ScheduleDate" %>
+<%@page import="org.oscarehr.schedule.model.ScheduleDate" %>
 <%@page import="org.oscarehr.schedule.dao.ScheduleTemplateDao" %>
 <%@page import="org.oscarehr.schedule.model.ScheduleTemplateCode" %>
 <%@page import="org.oscarehr.schedule.dao.ScheduleTemplateCodeDao" %>

@@ -38,8 +38,8 @@
 <jsp:useBean id="scheduleDateBean" class="java.util.Hashtable" scope="session" />
 <jsp:useBean id="scheduleRscheduleBean" class="oscar.RscheduleBean"	scope="session" />
 <%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.common.model.ScheduleDate" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleDateDao" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleDate" %>
+<%@ page import="org.oscarehr.schedule.dao.ScheduleDateDao" %>
 <%
 	ScheduleDateDao scheduleDateDao = SpringUtils.getBean(ScheduleDateDao.class);
 %>

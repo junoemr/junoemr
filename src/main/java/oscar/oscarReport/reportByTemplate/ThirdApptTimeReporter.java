@@ -36,7 +36,7 @@ import org.apache.commons.collections.comparators.ReverseComparator;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.ScheduleDate;
+import org.oscarehr.schedule.model.ScheduleDate;
 import org.oscarehr.schedule.model.ScheduleTemplate;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;

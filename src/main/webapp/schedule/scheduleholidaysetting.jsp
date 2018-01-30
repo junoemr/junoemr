@@ -58,8 +58,8 @@
 
 <jsp:useBean id="scheduleHolidayBean" class="java.util.Hashtable" scope="session" />
 <%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.common.model.ScheduleHoliday" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleHolidayDao" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleHoliday" %>
+<%@ page import="org.oscarehr.schedule.dao.ScheduleHolidayDao" %>
 <%
 	ScheduleHolidayDao scheduleHolidayDao = SpringUtils.getBean(ScheduleHolidayDao.class);
 %>

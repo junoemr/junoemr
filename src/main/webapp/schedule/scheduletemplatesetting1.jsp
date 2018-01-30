@@ -30,8 +30,8 @@
 %>
 <%@ page import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*" errorPage="../appointment/errorpage.jsp"%>
 <%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.model.RSchedule" %>
-<%@page import="org.oscarehr.common.dao.RScheduleDao" %>
+<%@page import="org.oscarehr.schedule.model.RSchedule" %>
+<%@page import="org.oscarehr.schedule.dao.RScheduleDao" %>
 <%@page import="oscar.util.ConversionUtils" %>
 
 <%

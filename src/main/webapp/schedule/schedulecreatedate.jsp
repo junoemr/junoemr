@@ -53,32 +53,29 @@
 	boolean scheduleOverlaps = false;
 %>
 <%@ page
-		import="org.oscarehr.common.dao.RScheduleDao,
-		        org.oscarehr.common.dao.ScheduleDateDao,
-		        org.oscarehr.common.dao.ScheduleHolidayDao,
-		        org.oscarehr.common.dao.SiteDao,
-		        org.oscarehr.common.model.RSchedule,
-		        org.oscarehr.common.model.ScheduleDate"
+		import="org.oscarehr.common.dao.SiteDao,
+		        org.oscarehr.common.model.Site,
+		        org.oscarehr.schedule.service.Schedule,
+		        org.oscarehr.util.SpringUtils,
+		        org.springframework.web.context.support.WebApplicationContextUtils,
+		        oscar.DateInMonthTable"
 		errorPage="../appointment/errorpage.jsp" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <jsp:useBean id="scheduleRscheduleBean" class="oscar.RscheduleBean" scope="session"/>
 <jsp:useBean id="scheduleDateBean" class="java.util.Hashtable" scope="session"/>
 <jsp:useBean id="scheduleHolidayBean" class="java.util.Hashtable" scope="session"/>
-<%@ page import="org.oscarehr.common.model.ScheduleHoliday" %>
-<%@ page import="org.oscarehr.common.model.Site" %>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@ page import="oscar.DateInMonthTable" %>
 <%@ page import="oscar.HScheduleDate" %>
 <%@ page import="oscar.HScheduleHoliday" %>
-<%@page import="oscar.MyDateFormat" %>
+<%@ page import="oscar.MyDateFormat" %>
+<%@ page import="oscar.SxmlMisc" %>
+<%@ page import="oscar.appt.ApptUtil" %>
+<%@ page import="java.net.URLDecoder" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@page import="java.util.Calendar" %>
 <%
-	ScheduleDateDao scheduleDateDao = SpringUtils.getBean(ScheduleDateDao.class);
-	RScheduleDao rScheduleDao = (RScheduleDao) SpringUtils.getBean("rScheduleDao");
-	ScheduleHolidayDao scheduleHolidayDao = SpringUtils.getBean(ScheduleHolidayDao.class);
-%>
-<%
+	Schedule schedule = SpringUtils.getBean(Schedule.class);
+
 	String provider_name = URLDecoder.decode(request.getParameter("provider_name"));
 	String provider_no = request.getParameter("provider_no");
 	if(provider_no == null || provider_no == "") response.sendRedirect("../logout.jsp");
@@ -111,6 +108,7 @@
 		int y = Integer.parseInt(request.getParameter("syear")); //cal.get(Calendar.YEAR);
 		int m = Integer.parseInt(request.getParameter("smonth")); //cal.get(Calendar.MONTH)+1;
 		int d = Integer.parseInt(request.getParameter("sday")); //cal.get(Calendar.DATE);
+		GregorianCalendar cal = new GregorianCalendar(y, m - 1, d);
 
 		String sdate = MyDateFormat.getMysqlStandardDate(y, m, d);
 		String edate = MyDateFormat.getMysqlStandardDate(Integer.parseInt(request.getParameter("eyear")), Integer.parseInt(request.getParameter("emonth")), Integer.parseInt(request.getParameter("eday")));
@@ -120,140 +118,30 @@
 		else
 			origEdate = MyDateFormat.getMysqlStandardDate(Integer.parseInt(request.getParameter("origeyear")), Integer.parseInt(request.getParameter("origemonth")), Integer.parseInt(request.getParameter("origeday")));
 
-		if(sdate.equals(scheduleRscheduleBean.sdate))
-		{
-			List<RSchedule> rsl = rScheduleDao.findByProviderAvailableAndDate(request.getParameter("provider_no"), "1", MyDateFormat.getSysDate(sdate));
-			for(RSchedule rs : rsl)
-			{
-				rs.setStatus("D");
-				rScheduleDao.merge(rs);
-			}
-			rsl = rScheduleDao.findByProviderAvailableAndDate(request.getParameter("provider_no"), "A", MyDateFormat.getSysDate(sdate));
-			for(RSchedule rs : rsl)
-			{
-				rs.setStatus("D");
-				rScheduleDao.merge(rs);
-			}
-		}
+		String dayOfWeek2 = (bAlternate)? request.getParameter("day_of_weekB") : null;
 
-
-		Long overLapResult = rScheduleDao.search_rschedule_overlaps(request.getParameter("provider_no"), ConversionUtils.fromDateString(sdate), ConversionUtils.fromDateString(edate),
-				ConversionUtils.fromDateString(sdate), ConversionUtils.fromDateString(edate), ConversionUtils.fromDateString(sdate), ConversionUtils.fromDateString(edate),
-				ConversionUtils.fromDateString(sdate), ConversionUtils.fromDateString(edate), ConversionUtils.fromDateString(sdate), ConversionUtils.fromDateString(edate),
-				ConversionUtils.fromDateString(sdate), ConversionUtils.fromDateString(edate), ConversionUtils.fromDateString(sdate), ConversionUtils.fromDateString(edate));
-
-
-		scheduleOverlaps = overLapResult > 0;
-
-
-		//if the schedule is the same we are editing instead
-
-		Long existsResult = rScheduleDao.search_rschedule_exists(request.getParameter("provider_no"), ConversionUtils.fromDateString(sdate), ConversionUtils.fromDateString(edate));
-		boolean editingSchedule = existsResult > 0;
-
-
-		//save rschedule data
-		if(bAlternate)
-			scheduleRscheduleBean.setRscheduleBean(provider_no, sdate, edate, request.getParameter("available"), request.getParameter("day_of_week"), request.getParameter("day_of_weekB"), request.getParameter("avail_hourB"), request.getParameter("avail_hour"), user_name);
-		else
-			scheduleRscheduleBean.setRscheduleBean(provider_no, sdate, edate, request.getParameter("available"), request.getParameter("day_of_week"), request.getParameter("avail_hourB"), request.getParameter("avail_hour"), user_name);
-
-		if(editingSchedule)
-		{
-			List<RSchedule> rsl = rScheduleDao.findByProviderAvailableAndDate(scheduleRscheduleBean.provider_no, scheduleRscheduleBean.available, MyDateFormat.getSysDate(scheduleRscheduleBean.sdate));
-			for(RSchedule rs : rsl)
-			{
-				rs.setDayOfWeek(scheduleRscheduleBean.day_of_week);
-				rs.setAvailHourB(scheduleRscheduleBean.avail_hourB);
-				rs.setAvailHour(scheduleRscheduleBean.avail_hour);
-				rs.setCreator(scheduleRscheduleBean.creator);
-				rs.setStatus(scheduleRscheduleBean.active);
-				rScheduleDao.merge(rs);
-			}
-		}
-		else
-		{
-			RSchedule rs = new RSchedule();
-			rs.setProviderNo(scheduleRscheduleBean.provider_no);
-			rs.setsDate(MyDateFormat.getSysDate(scheduleRscheduleBean.sdate));
-			rs.seteDate(MyDateFormat.getSysDate(scheduleRscheduleBean.edate));
-			rs.setAvailable(scheduleRscheduleBean.available);
-			rs.setDayOfWeek(scheduleRscheduleBean.day_of_week);
-			rs.setAvailHourB(scheduleRscheduleBean.avail_hourB);
-			rs.setAvailHour(scheduleRscheduleBean.avail_hour);
-			rs.setCreator(scheduleRscheduleBean.creator);
-			rs.setStatus(scheduleRscheduleBean.active);
-			rScheduleDao.persist(rs);
-		}
-
-		//create scheduledate record and initial scheduleDateBean
-		scheduleDateBean.clear();
-		for(ScheduleDate sd : scheduleDateDao.search_scheduledate_c(request.getParameter("provider_no")))
-		{
-			scheduleDateBean.put(ConversionUtils.toDateString(sd.getDate()), new HScheduleDate(String.valueOf(sd.getAvailable()), String.valueOf(sd.getPriority()), sd.getReason(), sd.getHour(), sd.getCreator()));
-		}
-
-		//initial scheduleHolidayBean record
-		if(scheduleHolidayBean.isEmpty())
-		{
-			for(ScheduleHoliday sh : scheduleHolidayDao.findAll())
-			{
-				scheduleHolidayBean.put(ConversionUtils.toDateString(sh.getId()), new HScheduleHoliday(sh.getHolidayName()));
-			}
-		}
-
-		//create scheduledate record by 'b' rate
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		java.util.Date dnewEdate = df.parse(edate);
-		java.util.Date dorigEdate = df.parse(origEdate);
-
-		List<ScheduleDate> sds = scheduleDateDao.findByProviderPriorityAndDateRange(provider_no, 'b', MyDateFormat.getSysDate(sdate), MyDateFormat.getSysDate(dnewEdate.before(dorigEdate) ? origEdate : edate));
-		for(ScheduleDate sd : sds)
-		{
-			sd.setStatus('D');
-			scheduleDateDao.merge(sd);
-		}
-
-		GregorianCalendar cal = new GregorianCalendar(y, m - 1, d);
-		//  GregorianCalendar cal = new GregorianCalendar(year,month-1,1);
-		for(int i = 0; i < 365 * yearLimit; i++)
-		{
-			y = cal.get(Calendar.YEAR);
-			m = cal.get(Calendar.MONTH) + 1;
-			d = cal.get(Calendar.DATE);
-			if(scheduleDateBean.get(y + "-" + MyDateFormat.getDigitalXX(m) + "-" + MyDateFormat.getDigitalXX(d)) == null && scheduleRscheduleBean.getDateAvail(cal))
-			{
-				ScheduleDate sd = new ScheduleDate();
-				sd.setDate(MyDateFormat.getSysDate(y + "-" + m + "-" + d));
-				sd.setProviderNo(provider_no);
-				sd.setAvailable('1');
-				sd.setPriority('b');
-				sd.setReason(scheduleRscheduleBean.getSiteAvail(cal));
-				sd.setHour(scheduleRscheduleBean.getDateAvailHour(cal));
-				sd.setCreator(user_name);
-				sd.setStatus(scheduleRscheduleBean.active.toCharArray()[0]);
-				scheduleDateDao.persist(sd);
-
-
-			}
-			if((y + "-" + MyDateFormat.getDigitalXX(m) + "-" + MyDateFormat.getDigitalXX(d)).equals(edate)) break;
-			cal.add(Calendar.DATE, 1);
-		}
-
+		schedule.updateSchedule(scheduleRscheduleBean,
+				scheduleDateBean,
+				scheduleHolidayBean,
+				request.getParameter("available"),
+				request.getParameter("day_of_week"),
+				dayOfWeek2,
+				request.getParameter("avail_hourB"),
+				request.getParameter("avail_hour"),
+				provider_no,
+				user_name,
+				sdate,
+				edate,
+				origEdate,
+				cal,
+				yearLimit);
 	}
 
 /////////////////////////////////////
 
 %>
-<%@page import="oscar.SxmlMisc" %>
-<%@page import="oscar.appt.ApptUtil" %>
-<%@page import="oscar.util.ConversionUtils" %>
-<%@page import="java.net.URLDecoder" %>
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.util.Calendar" %>
-<%@ page import="java.util.GregorianCalendar" %>
-<%@ page import="java.util.List" %>
+<%@page import="java.util.GregorianCalendar" %>
+<%@page import="java.util.List" %>
 <html:html locale="true">
 	<head>
 		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>

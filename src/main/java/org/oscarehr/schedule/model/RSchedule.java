@@ -23,7 +23,9 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.schedule.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.util.Date;
 
@@ -38,7 +40,8 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name="rschedule")
-public class RSchedule extends AbstractModel<Integer> {
+public class RSchedule extends AbstractModel<Integer>
+{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

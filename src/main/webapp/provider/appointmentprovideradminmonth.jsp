@@ -30,16 +30,15 @@
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleHolidayDao" %>
-<%@ page import="org.oscarehr.common.model.ScheduleHoliday" %>
+<%@ page import="org.oscarehr.schedule.dao.ScheduleHolidayDao" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleHoliday" %>
 <%@ page import="org.oscarehr.common.dao.MyGroupDao" %>
 <%@ page import="org.oscarehr.common.model.MyGroup" %>
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="oscar.util.ConversionUtils" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleDateDao" %>
-<%@ page import="org.oscarehr.common.model.ScheduleDate" %>
-<%@ page import="org.oscarehr.common.dao.ProviderSiteDao" %>
+<%@ page import="org.oscarehr.schedule.dao.ScheduleDateDao" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleDate" %>
 
 <%
 	UserPropertyDAO userPropertyDao = SpringUtils.getBean(UserPropertyDAO.class);
