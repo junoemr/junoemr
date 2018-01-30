@@ -33,11 +33,11 @@
 <%@page import="org.oscarehr.common.dao.MyGroupDao" %>
 <%@page import="org.oscarehr.common.model.Appointment" %>
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
-<%@page import="org.oscarehr.common.model.ScheduleTemplate" %>
+<%@page import="org.oscarehr.schedule.model.ScheduleTemplate" %>
 <%@page import="org.oscarehr.common.model.ScheduleDate" %>
-<%@page import="org.oscarehr.common.dao.ScheduleTemplateDao" %>
-<%@page import="org.oscarehr.common.model.ScheduleTemplateCode" %>
-<%@page import="org.oscarehr.common.dao.ScheduleTemplateCodeDao" %>
+<%@page import="org.oscarehr.schedule.dao.ScheduleTemplateDao" %>
+<%@page import="org.oscarehr.schedule.model.ScheduleTemplateCode" %>
+<%@page import="org.oscarehr.schedule.dao.ScheduleTemplateCodeDao" %>
 <%@page import="oscar.util.ConversionUtils" %>
 <%
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);

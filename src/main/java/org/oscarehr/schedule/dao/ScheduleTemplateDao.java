@@ -23,7 +23,7 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.schedule.dao;
 
 import java.util.Date;
 import java.util.List;
@@ -31,12 +31,14 @@ import java.util.List;
 import javax.persistence.Query;
 
 import org.oscarehr.common.NativeSql;
-import org.oscarehr.common.model.ScheduleTemplate;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.schedule.model.ScheduleTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate> {
+public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
+{
 	
 	public ScheduleTemplateDao() {
 		super(ScheduleTemplate.class);

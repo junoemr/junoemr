@@ -28,7 +28,7 @@
 	org.apache.struts.util.MessageResourcesFactory,
 	org.oscarehr.common.dao.RScheduleDao,
 	org.oscarehr.common.dao.ScheduleDateDao,
-	org.oscarehr.common.dao.ScheduleTemplateDao,
+	org.oscarehr.schedule.dao.ScheduleTemplateDao,
 	org.oscarehr.common.dao.SiteDao,
 	org.oscarehr.common.model.RSchedule,
 	org.oscarehr.common.model.ScheduleDate"
@@ -39,7 +39,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
-<%@ page import="org.oscarehr.common.model.ScheduleTemplate" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleTemplate" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>

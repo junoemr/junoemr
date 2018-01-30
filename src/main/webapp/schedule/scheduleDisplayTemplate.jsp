@@ -29,10 +29,10 @@
 <%@ page import="java.sql.*, java.util.*"%>
 <%@ page errorPage="/common/error.jsp"%>
 <%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.dao.ScheduleTemplateDao" %>
-<%@page import="org.oscarehr.common.model.ScheduleTemplate" %>
-<%@page import="org.oscarehr.common.dao.ScheduleTemplateCodeDao" %>
-<%@page import="org.oscarehr.common.model.ScheduleTemplateCode" %>
+<%@page import="org.oscarehr.schedule.dao.ScheduleTemplateDao" %>
+<%@page import="org.oscarehr.schedule.model.ScheduleTemplate" %>
+<%@page import="org.oscarehr.schedule.dao.ScheduleTemplateCodeDao" %>
+<%@page import="org.oscarehr.schedule.model.ScheduleTemplateCode" %>
 <%
 	ScheduleTemplateDao scheduleTemplateDao = SpringUtils.getBean(ScheduleTemplateDao.class);
     ScheduleTemplateCodeDao scheduleTemplateCodeDao = SpringUtils.getBean(ScheduleTemplateCodeDao.class);

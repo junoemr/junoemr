@@ -28,8 +28,8 @@
   if (session.getAttribute("user") == null) response.sendRedirect("../logout.jsp");
 %>
 <%@ page
-		import="org.oscarehr.common.dao.ScheduleTemplateCodeDao,
-		org.oscarehr.common.model.ScheduleTemplateCode,
+		import="org.oscarehr.schedule.dao.ScheduleTemplateCodeDao,
+		org.oscarehr.schedule.model.ScheduleTemplateCode,
 		org.oscarehr.util.SpringUtils,
 		java.util.Collections,
 		java.util.List"
