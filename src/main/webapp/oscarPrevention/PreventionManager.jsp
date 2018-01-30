@@ -26,7 +26,7 @@
 
 <%@page import="oscar.oscarPrevention.*"%>
 <%@page import="org.oscarehr.common.model.Property" %>
-<%@page import="org.oscarehr.provider.model.PreventionManager" %>
+<%@page import="org.oscarehr.provider.model.ProviderPreventionManager" %>
 <%@page import="org.oscarehr.common.dao.PropertyDao"%>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="oscar.OscarProperties" %>
