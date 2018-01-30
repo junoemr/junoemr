@@ -42,6 +42,9 @@ import javax.persistence.TemporalType;
 @Table(name="rschedule")
 public class RSchedule extends AbstractModel<Integer>
 {
+	public static final String STATUS_ACTIVE = "A";
+	public static final String STATUS_DELETED = "D";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

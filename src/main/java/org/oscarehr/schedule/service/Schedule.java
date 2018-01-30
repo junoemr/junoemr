@@ -39,8 +39,8 @@ import oscar.RscheduleBean;
 import oscar.util.ConversionUtils;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
@@ -59,7 +59,7 @@ public class Schedule
 	ScheduleHolidayDao scheduleHolidayDao;
 
 
-	public void updateSchedule(RscheduleBean scheduleRscheduleBean,
+	public long updateSchedule(RscheduleBean scheduleRscheduleBean,
 	                           Hashtable<String, HScheduleDate> scheduleDateBean,
 	                           Hashtable<String, HScheduleHoliday> scheduleHolidayBean,
 	                           String available,
@@ -69,48 +69,51 @@ public class Schedule
 	                           String availableHour2,
 	                           String providerNo,
 	                           String providerName,
-	                           String startDate,
-	                           String endDate,
-	                           String originalDate,
+	                           String startDateString,
+	                           String endDateString,
+	                           String originalDateString,
 	                           GregorianCalendar cal,
 	                           int yearLimit) throws ParseException
 	{
-		if(startDate.equals(scheduleRscheduleBean.sdate))
+		Date startDate = ConversionUtils.fromDateString(startDateString);
+		Date endDate = ConversionUtils.fromDateString(endDateString);
+		Date originalDate = ConversionUtils.fromDateString(originalDateString);
+
+		if(startDateString.equals(scheduleRscheduleBean.sdate))
 		{
-			List<RSchedule> rsl = rScheduleDao.findByProviderAvailableAndDate(providerNo, "1", MyDateFormat.getSysDate(startDate));
+			List<RSchedule> rsl = rScheduleDao.findByProviderAvailableAndDate(providerNo, "1", startDate);
 			for(RSchedule rs : rsl)
 			{
-				rs.setStatus("D");
+				rs.setStatus(RSchedule.STATUS_DELETED);
 				rScheduleDao.merge(rs);
 			}
-			rsl = rScheduleDao.findByProviderAvailableAndDate(providerNo, "A", MyDateFormat.getSysDate(startDate));
+			// I don't believe that available is any value other than 0 or 1. left this here for compatibility
+			rsl = rScheduleDao.findByProviderAvailableAndDate(providerNo, "A", startDate);
 			for(RSchedule rs : rsl)
 			{
-				rs.setStatus("D");
+				rs.setStatus(RSchedule.STATUS_DELETED);
 				rScheduleDao.merge(rs);
 			}
 		}
 
-
-		Long overLapResult = rScheduleDao.search_rschedule_overlaps(providerNo, ConversionUtils.fromDateString(startDate), ConversionUtils.fromDateString(endDate),
-				ConversionUtils.fromDateString(startDate), ConversionUtils.fromDateString(endDate), ConversionUtils.fromDateString(startDate), ConversionUtils.fromDateString(endDate),
-				ConversionUtils.fromDateString(startDate), ConversionUtils.fromDateString(endDate), ConversionUtils.fromDateString(startDate), ConversionUtils.fromDateString(endDate),
-				ConversionUtils.fromDateString(startDate), ConversionUtils.fromDateString(endDate), ConversionUtils.fromDateString(startDate), ConversionUtils.fromDateString(endDate));
-
-
-		boolean scheduleOverlaps = overLapResult > 0;
+		Long overLapResult = rScheduleDao.search_rschedule_overlaps(providerNo, startDate, endDate,
+				startDate, endDate, startDate, endDate,
+				startDate, endDate, startDate, endDate,
+				startDate, endDate, startDate, endDate);
 
 		//if the schedule is the same we are editing instead
-
-		Long existsResult = rScheduleDao.search_rschedule_exists(providerNo, ConversionUtils.fromDateString(startDate), ConversionUtils.fromDateString(endDate));
+		Long existsResult = rScheduleDao.search_rschedule_exists(providerNo, startDate, endDate);
 		boolean editingSchedule = existsResult > 0;
 
 		//save rschedule data
-		scheduleRscheduleBean.setRscheduleBean(providerNo, startDate, endDate, available, dayOfWeek1, dayOfWeek2, availableHour1, availableHour2, providerName);
+		scheduleRscheduleBean.setRscheduleBean(providerNo, startDateString, endDateString, available, dayOfWeek1, dayOfWeek2, availableHour1, availableHour2, providerName);
+		Date beanStartDate = MyDateFormat.getSysDate(scheduleRscheduleBean.sdate);
+		Date beanEndDate = MyDateFormat.getSysDate(scheduleRscheduleBean.edate);
+
 
 		if(editingSchedule)
 		{
-			List<RSchedule> rsl = rScheduleDao.findByProviderAvailableAndDate(scheduleRscheduleBean.provider_no, scheduleRscheduleBean.available, MyDateFormat.getSysDate(scheduleRscheduleBean.sdate));
+			List<RSchedule> rsl = rScheduleDao.findByProviderAvailableAndDate(scheduleRscheduleBean.provider_no, scheduleRscheduleBean.available, beanStartDate);
 			for(RSchedule rs : rsl)
 			{
 				rs.setDayOfWeek(scheduleRscheduleBean.day_of_week);
@@ -125,8 +128,8 @@ public class Schedule
 		{
 			RSchedule rs = new RSchedule();
 			rs.setProviderNo(scheduleRscheduleBean.provider_no);
-			rs.setsDate(MyDateFormat.getSysDate(scheduleRscheduleBean.sdate));
-			rs.seteDate(MyDateFormat.getSysDate(scheduleRscheduleBean.edate));
+			rs.setsDate(beanStartDate);
+			rs.seteDate(beanEndDate);
 			rs.setAvailable(scheduleRscheduleBean.available);
 			rs.setDayOfWeek(scheduleRscheduleBean.day_of_week);
 			rs.setAvailHourB(scheduleRscheduleBean.avail_hourB);
@@ -153,26 +156,22 @@ public class Schedule
 		}
 
 		//create scheduledate record by 'b' rate
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		java.util.Date dnewEdate = df.parse(endDate);
-		java.util.Date dorigEdate = df.parse(originalDate);
-
-		List<ScheduleDate> sds = scheduleDateDao.findByProviderPriorityAndDateRange(providerNo, 'b', MyDateFormat.getSysDate(startDate), MyDateFormat.getSysDate(dnewEdate.before(dorigEdate) ? originalDate : endDate));
-		for(ScheduleDate sd : sds)
+		List<ScheduleDate> scheduleDates = scheduleDateDao.findByProviderPriorityAndDateRange(providerNo, 'b', startDate, (endDate.before(originalDate) ? originalDate : endDate));
+		for(ScheduleDate scheduleDate : scheduleDates)
 		{
-			sd.setStatus('D');
-			scheduleDateDao.merge(sd);
+			scheduleDate.setStatus(ScheduleDate.STATUS_DELETED);
+			scheduleDateDao.merge(scheduleDate);
 		}
 
 		for(int i = 0; i < 365 * yearLimit; i++)
 		{
-			int y = cal.get(Calendar.YEAR);
-			int m = cal.get(Calendar.MONTH) + 1;
-			int d = cal.get(Calendar.DATE);
-			if(scheduleDateBean.get(y + "-" + MyDateFormat.getDigitalXX(m) + "-" + MyDateFormat.getDigitalXX(d)) == null && scheduleRscheduleBean.getDateAvail(cal))
+			int year = cal.get(Calendar.YEAR);
+			int month = cal.get(Calendar.MONTH) + 1;
+			int day = cal.get(Calendar.DATE);
+			if(scheduleDateBean.get(year + "-" + MyDateFormat.getDigitalXX(month) + "-" + MyDateFormat.getDigitalXX(day)) == null && scheduleRscheduleBean.getDateAvail(cal))
 			{
 				ScheduleDate sd = new ScheduleDate();
-				sd.setDate(MyDateFormat.getSysDate(y + "-" + m + "-" + d));
+				sd.setDate(MyDateFormat.getSysDate(year + "-" + month + "-" + day));
 				sd.setProviderNo(providerNo);
 				sd.setAvailable('1');
 				sd.setPriority('b');
@@ -182,8 +181,9 @@ public class Schedule
 				sd.setStatus(scheduleRscheduleBean.active.toCharArray()[0]);
 				scheduleDateDao.persist(sd);
 			}
-			if((y + "-" + MyDateFormat.getDigitalXX(m) + "-" + MyDateFormat.getDigitalXX(d)).equals(endDate)) break;
+			if((year + "-" + MyDateFormat.getDigitalXX(month) + "-" + MyDateFormat.getDigitalXX(day)).equals(endDateString)) break;
 			cal.add(Calendar.DATE, 1);
 		}
+		return overLapResult;
 	}
 }

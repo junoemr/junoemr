@@ -48,7 +48,7 @@
 
 	String user_no = (String) session.getAttribute("user");
 	String user_name = (String) session.getAttribute("userlastname") + "," + (String) session.getAttribute("userfirstname");
-	boolean bAlternate = (request.getParameter("alternate") != null && request.getParameter("alternate").equals("checked")) ? true : false;
+	boolean bAlternate = "checked".equals(request.getParameter("alternate"));
 	int yearLimit = Integer.parseInt(session.getAttribute("schedule_yearlimit") != null ? ((String) session.getAttribute("schedule_yearlimit")) : "10");
 	boolean scheduleOverlaps = false;
 %>
@@ -73,8 +73,11 @@
 <%@ page import="java.net.URLDecoder" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@page import="java.util.Calendar" %>
+<%@page import="java.util.GregorianCalendar" %>
+<%@page import="java.util.List" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%
-	Schedule schedule = SpringUtils.getBean(Schedule.class);
+	Schedule scheduleService = SpringUtils.getBean(Schedule.class);
 
 	String provider_name = URLDecoder.decode(request.getParameter("provider_name"));
 	String provider_no = request.getParameter("provider_no");
@@ -120,28 +123,35 @@
 
 		String dayOfWeek2 = (bAlternate)? request.getParameter("day_of_weekB") : null;
 
-		schedule.updateSchedule(scheduleRscheduleBean,
-				scheduleDateBean,
-				scheduleHolidayBean,
-				request.getParameter("available"),
-				request.getParameter("day_of_week"),
-				dayOfWeek2,
-				request.getParameter("avail_hourB"),
-				request.getParameter("avail_hour"),
-				provider_no,
-				user_name,
-				sdate,
-				edate,
-				origEdate,
-				cal,
-				yearLimit);
+		try {
+			long overlapCount = scheduleService.updateSchedule(scheduleRscheduleBean,
+					scheduleDateBean,
+					scheduleHolidayBean,
+					request.getParameter("available"),
+					request.getParameter("day_of_week"),
+					dayOfWeek2,
+					request.getParameter("avail_hourB"),
+					request.getParameter("avail_hour"),
+					provider_no,
+					user_name,
+					sdate,
+					edate,
+					origEdate,
+					cal,
+					yearLimit);
+
+			scheduleOverlaps = overlapCount > 0;
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("Schedule Error", e);
+			throw e;
+		}
 	}
 
 /////////////////////////////////////
 
 %>
-<%@page import="java.util.GregorianCalendar" %>
-<%@page import="java.util.List" %>
 <html:html locale="true">
 	<head>
 		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -153,14 +163,11 @@
 			function setfocus()
 			{
 				this.focus();
-				//document.schedule.keyword.focus();
-				//document.schedule.keyword.select();
 			}
 
 			function refresh()
 			{
 				history.go(0);//
-				//window.location.reload(); //
 			}
 
 //-->
@@ -208,7 +215,6 @@
 			key="schedule.schedulecreatedate.msgEffective" />&nbsp;<b>(<%=scheduleRscheduleBean.sdate +" - "+scheduleRscheduleBean.edate%>)</b></font>
 		<center>
 			<%
-				//now = new GregorianCalendar(year, month+1, 1);
 				now.add(Calendar.DATE, -1);
 				DateInMonthTable aDate = new DateInMonthTable(year, month - 1, 1);
 				int[][] dateGrid = aDate.getMonthDateGrid();

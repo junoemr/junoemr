@@ -42,6 +42,7 @@ import javax.persistence.TemporalType;
 @Table(name="scheduledate")
 public class ScheduleDate extends AbstractModel<Integer>
 {
+	public static final char STATUS_DELETED = 'D';
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
