@@ -26,8 +26,9 @@
 
  */
 angular.module("Common.Services").service("EFormsService", [
-	'$http', '$q',
-	function($http, $q)
+	'$q',
+	'junoHttp',
+	function($q, junoHttp)
 	{
 		var service = {};
 
@@ -36,11 +37,11 @@ angular.module("Common.Services").service("EFormsService", [
         service.getEFormList = function getEFormList()
         {
             var deferred = $q.defer();
-            $http.get(service.apiPath + '/',
+	        junoHttp.get(service.apiPath + '/',
                 Juno.Common.ServiceHelper.configHeaders()).then(
                 function success(results)
                 {
-                    deferred.resolve(results.data);
+                    deferred.resolve(results);
                 },
                 function error(errors)
                 {
@@ -53,11 +54,11 @@ angular.module("Common.Services").service("EFormsService", [
         service.getEFormImageList = function getEFormImageList()
         {
             var deferred = $q.defer();
-            $http.get(service.apiPath + '/images',
+	        junoHttp.get(service.apiPath + '/images',
                 Juno.Common.ServiceHelper.configHeaders()).then(
                 function success(results)
                 {
-                    deferred.resolve(results.data);
+                    deferred.resolve(results);
                 },
                 function error(errors)
                 {
@@ -67,6 +68,23 @@ angular.module("Common.Services").service("EFormsService", [
 
             return deferred.promise;
         };
+		service.getEFormDatabaseTagList = function getEFormDatabaseTagList()
+		{
+			var deferred = $q.defer();
+			junoHttp.get(service.apiPath + '/databaseTags',
+				Juno.Common.ServiceHelper.configHeaders()).then(
+				function success(results)
+				{
+					deferred.resolve(results);
+				},
+				function error(errors)
+				{
+					console.log("formService::getEFormImageList error", errors);
+					deferred.reject("An error occurred while retrieving the eForm Tag List");
+				});
+
+			return deferred.promise;
+		};
 
 		return service;
 	}

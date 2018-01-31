@@ -31,6 +31,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tika.io.IOUtils;
 import org.oscarehr.common.dao.FaxConfigDao;
 import org.oscarehr.common.dao.FaxJobDao;
+import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.model.FaxConfig;
 import org.oscarehr.common.model.FaxJob;
 import org.oscarehr.fax.util.PdfCoverPageCreator;
@@ -54,36 +55,43 @@ import com.lowagie.text.DocumentException;
 import com.sun.xml.messaging.saaj.util.ByteInputStream;
 import com.sun.xml.messaging.saaj.util.ByteOutputStream;
 
-public class EctConsultationFormFaxAction extends Action {
+public class EctConsultationFormFaxAction extends Action
+{
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
-	public EctConsultationFormFaxAction() {
+
+	public EctConsultationFormFaxAction()
+	{
 	}
-	    
-    @Override
-    public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response){
-        
-    	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-    	
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_con", "r", null)) {
+
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+
+		if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_con", "r", null))
+		{
 			throw new SecurityException("missing required security object (_con)");
 		}
-    	
-    	String reqId = request.getParameter("reqId");
+
+		String reqId = request.getParameter("reqId");
 		String demoNo = request.getParameter("demographicNo");
 		String faxNumber = request.getParameter("letterheadFax");
 		String consultResponsePage = request.getParameter("consultResponsePage");
 		boolean doCoverPage = request.getParameter("coverpage").equalsIgnoreCase("true");
-		
+
 		ArrayList<EDoc> docs;
-		if (consultResponsePage==null) {
+		if (consultResponsePage == null)
+		{
 			docs = EDocUtil.listDocs(loggedInInfo, demoNo, reqId, EDocUtil.ATTACHED);
-		} else {
+		}
+		else
+		{
 			docs = EDocUtil.listResponseDocs(loggedInInfo, demoNo, reqId, EDocUtil.ATTACHED);
 		}
-		
+
 		String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 		ArrayList<Object> alist = new ArrayList<Object>();
 		byte[] buffer;
@@ -91,75 +99,88 @@ public class EctConsultationFormFaxAction extends Action {
 		ByteOutputStream bos;
 		CommonLabResultData consultLabs = new CommonLabResultData();
 		ArrayList<InputStream> streams = new ArrayList<InputStream>();
-		String provider_no = loggedInInfo.getLoggedInProviderNo();		
+		String provider_no = loggedInInfo.getLoggedInProviderNo();
 
 		ArrayList<LabResultData> labs;
-		if (consultResponsePage==null) {
+		if (consultResponsePage == null)
+		{
 			labs = consultLabs.populateLabResultsData(loggedInInfo, demoNo, reqId, CommonLabResultData.ATTACHED);
-		} else {
+		}
+		else
+		{
 			labs = consultLabs.populateLabResultsDataConsultResponse(loggedInInfo, demoNo, reqId, CommonLabResultData.ATTACHED);
 		}
-		
+
 		String error = "";
 		Exception exception = null;
-		try {
-			
-			if( doCoverPage ) {
+		try
+		{
+
+			if (doCoverPage)
+			{
 				String note = request.getParameter("note") == null ? "" : request.getParameter("note");
-				
+
 				PdfCoverPageCreator pdfCoverPageCreator = new PdfCoverPageCreator(note);
-				
+
 				buffer = pdfCoverPageCreator.createCoverPage();
 				bis = new ByteInputStream(buffer, buffer.length);
 				streams.add(bis);
 				alist.add(bis);
-				
+
 			}
 
-			if (consultResponsePage==null) { //fax for consultation request
+			if (consultResponsePage == null)
+			{ //fax for consultation request
 				bos = new ByteOutputStream();
 				ConsultationPDFCreator cpdfc = new ConsultationPDFCreator(request, bos);
 				cpdfc.printPdf(loggedInInfo);
-				
+
 				buffer = bos.getBytes();
 				bis = new ByteInputStream(buffer, bos.getCount());
 				bos.close();
 				streams.add(bis);
 				alist.add(bis);
 			}
-			else { //fax for consultation response
+			else
+			{ //fax for consultation response
 				String consultRespoonsePDF = ConsultResponsePDFCreator.create(consultResponsePage);
 				alist.add(consultRespoonsePDF);
 			}
 
-			for (int i = 0; i < docs.size(); i++) {
-				EDoc doc = docs.get(i);  
-				if (doc.isPrintable()) {
-					if (doc.isImage()) {
+			for (int i = 0; i < docs.size(); i++)
+			{
+				EDoc doc = docs.get(i);
+				if (doc.isPrintable())
+				{
+					if (doc.isImage())
+					{
 						bos = new ByteOutputStream();
 						request.setAttribute("imagePath", path + doc.getFileName());
 						request.setAttribute("imageTitle", doc.getDescription());
 						ImagePDFCreator ipdfc = new ImagePDFCreator(request, bos);
 						ipdfc.printPdf();
-						
+
 						buffer = bos.getBytes();
 						bis = new ByteInputStream(buffer, bos.getCount());
 						bos.close();
 						streams.add(bis);
 						alist.add(bis);
-						
+
 					}
-					else if (doc.isPDF()) {
+					else if (doc.isPDF())
+					{
 						alist.add(path + doc.getFileName());
 					}
-					else {
-						logger.error("EctConsultationFormRequestPrintAction: " + doc.getType() + " is marked as printable but no means have been established to print it.");	
+					else
+					{
+						logger.error("EctConsultationFormRequestPrintAction: " + doc.getType() + " is marked as printable but no means have been established to print it.");
 					}
 				}
 			}
 
 			// Iterating over requested labs.
-			for (int i = 0; labs != null && i < labs.size(); i++) {
+			for (int i = 0; labs != null && i < labs.size(); i++)
+			{
 				// Storing the lab in PDF format inside a byte stream.
 				bos = new ByteOutputStream();
 				request.setAttribute("segmentID", labs.get(i).segmentID);
@@ -175,89 +196,103 @@ public class EctConsultationFormFaxAction extends Action {
 				alist.add(bis);
 
 			}
-			
-			if (alist.size() > 0) {
-				
+
+			if (alist.size() > 0)
+			{
+
 				String referralFax = request.getParameter("fax");
-				
+
 				// Retrieving additional fax recipients.
 				String[] tmpRecipients = request.getParameterValues("faxRecipients");
-				
+
 				// Removing all non digit characters from fax numbers.
-				for (int i = 0; tmpRecipients != null && i < tmpRecipients.length; i++) { 
+				for (int i = 0; tmpRecipients != null && i < tmpRecipients.length; i++)
+				{
 					tmpRecipients[i] = tmpRecipients[i].trim().replaceAll("\\D", "");
 				}
 				ArrayList<String> recipients = tmpRecipients == null ? new ArrayList<String>() : new ArrayList<String>(Arrays.asList(tmpRecipients));
-				
+
 				// Including consultant fax number if appropriate.
-				if (referralFax != null && !referralFax.equals("")) {
-					recipients.add(referralFax.trim().replaceAll("\\D", ""));					
+				if (referralFax != null && !referralFax.equals(""))
+				{
+					recipients.add(referralFax.trim().replaceAll("\\D", ""));
 				}
-				
+
 				// Removing duplicate phone numbers.
 				recipients = new ArrayList<String>(new HashSet<String>(recipients));
-				
+
 				// Writing consultation request to disk as a pdf.
 				String faxPath = path;
 				String filename = "Consult_" + reqId + System.currentTimeMillis() + ".pdf";
 				String faxPdf = String.format("%s%s%s", faxPath, File.separator, filename);
-				
+
 				FileOutputStream fos = null;
-				
-				try {
-					fos = new FileOutputStream(faxPdf);		
+
+				try
+				{
+					fos = new FileOutputStream(faxPdf);
 					ConcatPDF.concat(alist, fos);
-				} finally {
+				}
+				finally
+				{
 					IOUtils.closeQuietly(fos);
 				}
-				
-				String tempPath = OscarProperties.getInstance().getProperty(
-					"fax_file_location", System.getProperty("java.io.tmpdir"));
-                String faxClinicId = OscarProperties.getInstance().getProperty("fax_clinic_id","");
 
-				
+				String tempPath = OscarProperties.getInstance().getProperty(
+						"fax_file_location", System.getProperty("java.io.tmpdir"));
+				String faxClinicId = OscarProperties.getInstance().getProperty("fax_clinic_id", "");
+
+
 				PdfReader pdfReader = new PdfReader(faxPdf);
 				int numPages = pdfReader.getNumberOfPages();
 				pdfReader.close();
-				
+
 				FaxJob faxJob = null;
-				FaxJobDao faxJobDao = SpringUtils.getBean(FaxJobDao.class);				
+				FaxJobDao faxJobDao = SpringUtils.getBean(FaxJobDao.class);
 				FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
-				
+
 				List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
 				boolean validFaxNumber;
-				
-				for (int i = 0; i < recipients.size(); i++) {					
-				    String faxNo = recipients.get(i).replaceAll("\\D", "");
-				    if (faxNo.length() < 7) { throw new DocumentException("Document target fax number '"+faxNo+"' is invalid."); }
-				
-				    String tempName = "CRF-" + faxClinicId + reqId + "." + System.currentTimeMillis();
-					
+
+				for (int i = 0; i < recipients.size(); i++)
+				{
+					String faxNo = recipients.get(i).replaceAll("\\D", "");
+					if (faxNo.length() < 7)
+					{
+						throw new DocumentException("Document target fax number '" + faxNo + "' is invalid.");
+					}
+
+					String tempName = "CRF-" + faxClinicId + reqId + "." + System.currentTimeMillis();
+
 					String tempPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
 					String tempTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
-					
+
 					// Copying the fax pdf.
 					FileUtils.copyFile(new File(faxPdf), new File(tempPdf));
-					
+
 					// Creating text file with the specialists fax number.
 					PrintWriter pw = null;
-					
-					try {
+
+					try
+					{
 						fos = new FileOutputStream(tempTxt);
 						pw = new PrintWriter(fos);
 						pw.println(faxNo);
-					} finally {
+					}
+					finally
+					{
 						IOUtils.closeQuietly(pw);
 						IOUtils.closeQuietly(fos);
 					}
 
 					// A little sanity check to ensure both files exist.
-					if (!new File(tempPdf).exists() || !new File(tempTxt).exists()) {
+					if (!new File(tempPdf).exists() || !new File(tempTxt).exists())
+					{
 						throw new DocumentException("Unable to create files for fax of consultation request " + reqId + ".");
 					}
 					
 					/*
-				    validFaxNumber = false;
+					validFaxNumber = false;
 				    
 				    faxJob = new FaxJob();
 		    		faxJob.setDestination(faxNo);
@@ -294,33 +329,48 @@ public class EctConsultationFormFaxAction extends Action {
 					*/
 				}
 
-				LogAction.addLog(provider_no, LogConst.SENT, LogConst.CON_FAX, "CONSULT "+ reqId);
+				LogAction.addLog(provider_no, LogConst.SENT, LogConst.CON_FAX, "CONSULT " + reqId);
 				request.setAttribute("faxSuccessful", true);
 				return mapping.findForward("success");
 
 			}
-
-		} catch (DocumentException de) {
+		}
+		catch (HtmlToPdfConversionException e)
+		{
+			error = "HtmlToPdfConversionException";
+			exception = e;
+		}
+		catch (DocumentException de)
+		{
 			error = "DocumentException";
 			exception = de;
-		} catch (IOException ioe) {
+		}
+		catch (IOException ioe)
+		{
 			error = "IOException";
 			exception = ioe;
-		} finally { 
+		}
+		finally
+		{
 			// Cleaning up InputStreams created for concatenation.
-			for (InputStream is : streams) {
-				try {
+			for (InputStream is : streams)
+			{
+				try
+				{
 					is.close();
-				} catch (IOException e) {
+				}
+				catch (IOException e)
+				{
 					error = "IOException";
 				}
 			}
 		}
-		if (!error.equals("")) {
+		if (!error.equals(""))
+		{
 			logger.error(error + " occured insided ConsultationPrintAction", exception);
 			request.setAttribute("printError", new Boolean(true));
 			return mapping.findForward("error");
 		}
-		return null;		
-    }   
+		return null;
+	}
 }

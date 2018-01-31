@@ -31,7 +31,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.runner.RunWith;
-import org.oscarehr.common.dao.EFormDataDao;
+import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.util.SpringUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;

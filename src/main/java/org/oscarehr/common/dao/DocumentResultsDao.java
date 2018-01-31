@@ -33,8 +33,9 @@ import javax.persistence.Query;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.Document;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.common.model.ProviderInboxItem;
+import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 

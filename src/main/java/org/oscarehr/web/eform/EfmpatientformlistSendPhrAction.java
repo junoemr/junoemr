@@ -25,21 +25,20 @@
 
 package org.oscarehr.web.eform;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
-
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
-import oscar.dms.actions.AddEditDocumentAction;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
 
 public final class EfmpatientformlistSendPhrAction {
 
@@ -145,19 +144,21 @@ public final class EfmpatientformlistSendPhrAction {
 	/**
 	 * @return the new documentId
 	 */
-	private String uploadToOscarDocuments(File file, String description, String type) throws Exception {
+	private String uploadToOscarDocuments(File tempFile, String description, String type) throws Exception {
 
-		String originalFileName = file.getName();
-		EDoc newDoc = new EDoc(description, type, originalFileName, "", providerNo, "", "", 'A', oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", clientId);
-		newDoc.setContentType("application/pdf");
-		String newFileName = newDoc.getFileName();
-
-		FileInputStream fis = new FileInputStream(file);
-		try {
-			AddEditDocumentAction.writeLocalFile(fis, newFileName);
-		} finally {
-			fis.close();
+		GenericFile file = FileFactory.createDocumentFile(new FileInputStream(tempFile), tempFile.getName());
+		if(!file.validate())
+		{
+			file.reEncode();
 		}
+		file.moveToDocuments();
+
+		String originalFileName = tempFile.getName();
+		EDoc newDoc = new EDoc(description, type, originalFileName, "", providerNo, "", "", 'A',
+				oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", clientId);
+		newDoc.setContentType(file.getContentType());
+		newDoc.setFileName(file.getName());
+		newDoc.setNumberOfPages(file.getPageCount());
 
 		return(EDocUtil.addDocumentSQL(newDoc));
 	}

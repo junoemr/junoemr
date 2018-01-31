@@ -24,6 +24,44 @@
 
 package oscar.oscarRx.pageUtil;
 
+import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
+import org.apache.struts.util.MessageResources;
+import org.apache.xmlrpc.XmlRpcClient;
+import org.apache.xmlrpc.XmlRpcClientLite;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
+import org.oscarehr.PMmodule.caisi_integrator.RemoteDrugAllergyHelper;
+import org.oscarehr.app.OAuth1Utils;
+import org.oscarehr.common.dao.AppDefinitionDao;
+import org.oscarehr.common.dao.AppUserDao;
+import org.oscarehr.common.dao.DemographicExtDao;
+import org.oscarehr.common.dao.UserDSMessagePrefsDao;
+import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.common.model.Allergy;
+import org.oscarehr.common.model.AppDefinition;
+import org.oscarehr.common.model.AppUser;
+import org.oscarehr.common.model.DemographicExt;
+import org.oscarehr.common.model.UserDSMessagePrefs;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import oscar.OscarProperties;
+import oscar.oscarRx.data.RxPatientData;
+import oscar.oscarRx.util.MyDrugrefComparator;
+import oscar.oscarRx.util.RxDrugRef;
+import oscar.oscarRx.util.RxUtil;
+import oscar.oscarRx.util.TimingOutCallback;
+import oscar.oscarRx.util.TimingOutCallback.TimeoutException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,48 +75,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Vector;
-
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
-import org.apache.struts.util.MessageResources;
-import org.apache.xmlrpc.XmlRpcClient;
-import org.apache.xmlrpc.XmlRpcClientLite;
-import org.oscarehr.PMmodule.caisi_integrator.RemoteDrugAllergyHelper;
-import org.oscarehr.common.dao.AppDefinitionDao;
-import org.oscarehr.common.dao.AppUserDao;
-import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.DemographicExtDao;
-import org.oscarehr.common.dao.UserDSMessagePrefsDao;
-import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.common.model.Allergy;
-import org.oscarehr.common.model.AppDefinition;
-import org.oscarehr.common.model.AppUser;
-import org.oscarehr.common.model.DemographicExt;
-import org.oscarehr.common.model.UserDSMessagePrefs;
-import org.oscarehr.common.model.UserProperty;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-import org.oscarehr.app.OAuth1Utils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import oscar.OscarProperties;
-import oscar.oscarRx.data.RxPatientData;
-import oscar.oscarRx.util.MyDrugrefComparator;
-import oscar.oscarRx.util.RxDrugRef;
-import oscar.oscarRx.util.RxUtil;
-import oscar.oscarRx.util.TimingOutCallback;
-import oscar.oscarRx.util.TimingOutCallback.TimeoutException;
 
 public final class RxMyDrugrefInfoAction extends DispatchAction {
 
@@ -137,9 +133,8 @@ public final class RxMyDrugrefInfoAction extends DispatchAction {
 
 			}
 			UserProperty prop = propDAO.getProp(provider, UserProperty.MYDRUGREF_ID);
-			String myDrugrefId = null;
 			//get from system first
-			myDrugrefId = OscarProperties.getInstance().getProperty("mydrugref_id");
+			String myDrugrefId = OscarProperties.getInstance().getProperty("mydrugref_id");
 
 			//override with user pref
 			if (prop != null && prop.getValue().length() > 0) {
@@ -235,8 +230,6 @@ public final class RxMyDrugrefInfoAction extends DispatchAction {
 				}
 			}
 
-
-			DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
 			DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
 
 			DemographicExt demoWarn = demographicExtDao.getLatestDemographicExt(bean.getDemographicNo(), "rxInteractionWarningLevel");

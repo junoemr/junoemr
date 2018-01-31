@@ -353,6 +353,10 @@
 							class="hand-hover">
 							<a ng-click="patientListCtrl.changeTab(item.id)" data-toggle="tab">{{item.label}}</a>
 						</li>
+						<%--<li class="hand-hover">--%>
+							<%--<a ng-click="patientListCtrl.changeTab(0)" data-toggle="tab">Appts.</a>--%>
+							<%--<a ng-click="patientListCtrl.changeTab(1)" data-toggle="tab">Recent</a>--%>
+						<%--</li>--%>
 
 						<li class="dropdown" ng-class="{'active': patientListCtrl.currentmoretab != null}">
 							<a class="dropdown-toggle hand-hover" data-toggle="dropdown"><b class="caret"></b></a>
