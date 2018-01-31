@@ -46,6 +46,7 @@ import com.lowagie.text.pdf.PdfPageEventHelper;
 public class ConsultationPDFCreator extends PdfPageEventHelper {
 
 	private static Logger logger = MiscUtils.getLogger();
+	private static boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 	private OutputStream os;
 
 	private Document document;
@@ -198,10 +199,13 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 			ProgramDao programDao = (ProgramDao) SpringUtils.getBean("programDao");
 			Integer programNo = Integer.parseInt(reqFrm.letterheadName.substring(5));
 			letterheadName = programDao.getProgramName(programNo);
-		}  else if (reqFrm.letterheadName != null && !reqFrm.letterheadName.equals("-1")) {
+		}  else if (reqFrm.letterheadName != null && !reqFrm.letterheadName.equals("-1") && !reqFrm.letterheadName.equals("multisite")) {
 			ProviderDao proDAO = (ProviderDao) SpringUtils.getBean("providerDao");
 			letterheadName = proDAO.getProviderName(reqFrm.letterheadName);
-		} else {
+		} else if (reqFrm.letterheadName.equals("multisite")) {
+			letterheadName = reqFrm.getSiteName();
+		}
+		else {
 			letterheadName = clinic.getClinicName();
 		}
 
