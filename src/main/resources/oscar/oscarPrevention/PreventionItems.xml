@@ -529,4 +529,18 @@ Varicella Immunoglobulin	VarIg
 		layout="history"	
 		showIfMinRecordNum="1" />
 
+	<item
+		resultDesc=""
+		desc= "Prolia (denosumab)"
+		name="PROLIA"
+		layout="injection"
+		showIfMinRecordNum="1" />
+
+	<item
+		resultDesc=""
+		desc= "Vitamin B12"
+		name="B12"
+		layout="injection"
+		showIfMinRecordNum="1" />
+
 </preventions>
