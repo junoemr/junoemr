@@ -36,6 +36,8 @@ import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.util.SpringUtils;
 import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
@@ -50,22 +52,18 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
- *  When implementing this class a global variable 'msg' should be created as
- *  follows:
- *      ORU_R01 msg = null;
+ * This is the main class for parsing hl7 text values.
+ * This class is meant to provide default getters for all hl7 labs based on the hl7 spec
+ * Individual labs will have unique usages of some hl7 fields, and lab handlers should extend this class.
  *
- *  ORU_R01 is located at 'ca.uhn.hl7v2.model.vXX.message.ORU_R01' where 'vXX'
- *  is the version specified by the hl7 messages that you inted to parse, it is
- *  stored in the 12th field of the MSH segment.
- *
- *  'msg' should be initialized in the init(String hl7Body) method
- *
- *  The results for the majority of the methods should be retrieved from the
- *  'msg' object
+ * This class uses the terser to traverse hl7 messages without specific version requirements,
+ * and it is recommended whenever possible to avoid versioned handlers unless necessary.
  */
 public abstract class MessageHandler {
 
 	private static Logger logger = Logger.getLogger(MessageHandler.class);
+
+	protected Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
 
 	protected Terser terser;
 	protected Message message;
