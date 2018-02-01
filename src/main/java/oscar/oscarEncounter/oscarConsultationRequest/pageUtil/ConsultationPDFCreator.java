@@ -195,17 +195,20 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 	private PdfPTable createClinicInfoHeader() {
 
 		String letterheadName = null;
-		if (reqFrm.letterheadName != null && reqFrm.letterheadName.startsWith("prog_")) {
+		if (reqFrm.letterheadName != null && reqFrm.letterheadName.startsWith("prog_"))
+		{
 			ProgramDao programDao = (ProgramDao) SpringUtils.getBean("programDao");
 			Integer programNo = Integer.parseInt(reqFrm.letterheadName.substring(5));
 			letterheadName = programDao.getProgramName(programNo);
-		}  else if (reqFrm.letterheadName != null && !reqFrm.letterheadName.equals("-1") && !reqFrm.letterheadName.equals("multisite")) {
+		} else if (reqFrm.letterheadName != null && !reqFrm.letterheadName.equals("-1") && !reqFrm.letterheadName.equals("multisite"))
+		{
 			ProviderDao proDAO = (ProviderDao) SpringUtils.getBean("providerDao");
 			letterheadName = proDAO.getProviderName(reqFrm.letterheadName);
-		} else if (reqFrm.letterheadName.equals("multisite")) {
+		} else if (reqFrm.letterheadName.equals("multisite"))
+		{
 			letterheadName = reqFrm.getSiteName();
-		}
-		else {
+		} else
+		{
 			letterheadName = clinic.getClinicName();
 		}
 

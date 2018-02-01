@@ -183,7 +183,8 @@ if(!authed) {
 	var appointmentNo = '<%=appNo%>';
 
 	//JS multisite object
-	function Multisite(id, name, address, city, province, postal, phone, fax, bgColour) {
+	function Multisite(id, name, address, city, province, postal, phone, fax, bgColour)
+	{
 		this.id = id;
 		this.name = name;
 		this.address = address;
@@ -194,18 +195,20 @@ if(!authed) {
 		this.city = city;
 		this.province = province;
 	}
+
 	// multisite info
 	var selectedMultisiteIndex = 0;
 	var multisite = [];
 	var siteIndex = 0;
-	var multisiteSpecialVal="multisite";
+	var multisiteSpecialVal = "multisite";
 	<%
 	// Sites is empty list if multisites disabled
-	for(Site site:sites){%>
-		multisite[siteIndex] = new Multisite("<%=site.getSiteId()%>","<%=site.getName()%>","<%=site.getAddress()%>",
-				"<%=site.getCity()%>","<%=site.getProvince()%>","<%=site.getPostal()%>","<%=site.getPhone()%>","<%=site.getFax()%>","<%=site.getBgColor()%>");
+	for(Site site:sites)
+	{%>
+		multisite[siteIndex] = new Multisite("<%=site.getSiteId()%>", "<%=site.getName()%>", "<%=site.getAddress()%>",
+			"<%=site.getCity()%>", "<%=site.getProvince()%>", "<%=site.getPostal()%>", "<%=site.getPhone()%>", "<%=site.getFax()%>", "<%=site.getBgColor()%>");
 		siteIndex++;
-		<%
+	<%
 	} %>
 </script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
@@ -326,14 +329,17 @@ var specialistFaxNumber = "";
 				out.println(configScript.getJavascript());%>
 
 // initialize anything that needs it when the document has loaded
-function onDocumentLoad() {
+function onDocumentLoad()
+{
 	<%
 	// intitalize to the correct site and set the letterhead
-	if(bMultisites) { %>
+	if(bMultisites)
+	{ %>
 		updateSelectedMultisite(document.getElementById("siteName"));
 	<%
 	}%>
 }
+
 jQuery(document).ready(onDocumentLoad);
 
 /////////////////////////////////////////////////////////////////////
@@ -1044,32 +1050,40 @@ if (OscarProperties.getInstance().getBooleanProperty("consultation_program_lette
 		}
 	}
 } %>
-function isLetterheadMultisiteSelected() {
+
+function isLetterheadMultisiteSelected()
+{
 	return document.getElementById("letterheadName").value === multisiteSpecialVal;
 }
 
-function updateSelectedMultisite(element) {
+function updateSelectedMultisite(element)
+{
 	// set the background colour
-	element.style.backgroundColor=element.options[element.selectedIndex].style.backgroundColor;
+	element.style.backgroundColor = element.options[element.selectedIndex].style.backgroundColor;
 
 	// update the global index
 	var siteName = element.value;
 	selectedMultisiteIndex = 0;
-	for(i=0; i< multisite.length; i++) {
-		if(multisite[i].name === siteName) {
+	for (i = 0; i < multisite.length; i++)
+	{
+		if (multisite[i].name === siteName)
+		{
 			selectedMultisiteIndex = i;
 			break;
 		}
 	}
 	console.info("set site index " + selectedMultisiteIndex);
-	if(isLetterheadMultisiteSelected()) {
+	if (isLetterheadMultisiteSelected())
+	{
 		setLetterheadToMultisiteInfo(selectedMultisiteIndex);
 	}
 }
 
-function setLetterheadToMultisiteInfo(multisiteIndex) {
+function setLetterheadToMultisiteInfo(multisiteIndex)
+{
 
-	if (multisite.length <= 0) {
+	if (multisite.length <= 0)
+	{
 		return;
 	}
 	site = multisite[multisiteIndex];
@@ -1088,11 +1102,14 @@ function setLetterheadToMultisiteInfo(multisiteIndex) {
 	document.getElementById("letterheadFaxSpan").innerHTML = site.fax;
 }
 
-function switchProvider(value) {
-	if (value === multisiteSpecialVal) {
+function switchProvider(value)
+{
+	if (value === multisiteSpecialVal)
+	{
 		setLetterheadToMultisiteInfo(selectedMultisiteIndex);
 	}
-	else if (value==-1) {
+	else if (value == -1)
+	{
 		document.getElementById("letterheadName").value = value;
 		document.getElementById("letterheadAddress").value = "<%=(clinic.getClinicAddress() + "  " + clinic.getClinicCity() + "   " + clinic.getClinicProvince() + "  " + clinic.getClinicPostal()).trim() %>";
 		document.getElementById("letterheadAddressSpan").innerHTML = "<%=(clinic.getClinicAddress() + "  " + clinic.getClinicCity() + "   " + clinic.getClinicProvince() + "  " + clinic.getClinicPostal()).trim() %>";
@@ -1101,9 +1118,11 @@ function switchProvider(value) {
 		document.getElementById("letterheadFax").value = "<%=clinic.getClinicFax().trim() %>";
 		document.getElementById("letterheadFaxSpan").innerHTML = "<%=clinic.getClinicFax().trim() %>";
 	}
-	else {
+	else
+	{
 		document.getElementById("letterheadName").value = value;
-		if (typeof providerData["prov_" + value] != "undefined") {
+		if (typeof providerData["prov_" + value] != "undefined")
+		{
 			value = "prov_" + value;
 		}
 		document.getElementById("letterheadAddress").value = providerData[value]['address'];
@@ -1676,18 +1695,23 @@ function updateFaxButton() {
 								<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.siteName" />:
 							</td>
 							<td style="text-align: right;background-color: #B8B8FF;">
-								<html:select property="siteName" styleId="siteName" onchange='updateSelectedMultisite(this);'>
-						            <%
-						            for (Site site:sites) {
-					            		String addrName = site.getName();
-					            		String bgColour = site.getBgColor();
-					            		if (addrName.equals(defaultSiteName)) {
-					            			defaultSiteId = site.getId();
-					            		}
-						            %>
-						                    <html:option value="<%=addrName%>" style='<%="background-color: "+bgColour%>'> <%=addrName%> </html:option>
-						            <%  }%>
-							</html:select>
+								<html:select property="siteName" styleId="siteName"
+											 onchange='updateSelectedMultisite(this);'>
+									<%
+										for (Site site : sites)
+										{
+											String addrName = site.getName();
+											String bgColour = site.getBgColor();
+											if (addrName.equals(defaultSiteName))
+											{
+												defaultSiteId = site.getId();
+											}
+									%>
+											<html:option value="<%=addrName%>"
+												 style='<%="background-color: "+bgColour%>'><%=addrName%>
+											</html:option>
+									<% }%>
+								</html:select>
 							</td>
 						</tr>
 						<%} %>
@@ -1847,9 +1871,12 @@ function updateFaxButton() {
 							<td align="right" class="tite3">
 								<select name="letterheadName" id="letterheadName" onchange="switchProvider(this.value)">
 									<%
-									if(bMultisites && sites.size() > 0 ) { %>
-										<option value="multisite"><%=multisiteLetterheadSelectionName %></option> <%
-									}%>
+										if (bMultisites && sites.size() > 0)
+										{ %>
+											<option value="multisite"><%=multisiteLetterheadSelectionName %>
+											</option>
+									<%
+										}%>
 									<option value="-1" <%= (consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase(clinic.getClinicName()) || requestId == null ? "selected='selected'" : lhndType.equals("clinic") ? "selected='selected'" : "" )%>><%= clinic.getClinicName() %></option>
 								<%
 									for (Provider p : prList) {
