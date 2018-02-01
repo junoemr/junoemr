@@ -1286,6 +1286,15 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		String verify = request.getParameter("verify");
 		OscarAppointmentDao appointmentDao = (OscarAppointmentDao) SpringUtils.getBean("oscarAppointmentDao");
 
+		Appointment appointment = null;
+
+		try{
+			appointment = appointmentDao.find(note.getAppointmentNo());
+		}catch(Exception e){
+			logger.debug("Appointment number error",e);
+		}
+		logger.debug("note.getAppointmentNo() "+note.getAppointmentNo()+" --- "+appointment);
+
 		Date now = new Date();
 		String roleName = caseManagementMgr.getRoleName(providerNo, note.getProgram_no());
 
@@ -1296,9 +1305,8 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			note.setNote(n);
 
 			// only update appt if there is one
-			if (sessionBean.appointmentNo != null && !(sessionBean.appointmentNo.equals("") || sessionBean.appointmentNo.equals("0"))) {
+			if (appointment != null) {
 				String apptStatus = updateApptStatus(sessionBean.status, "verify");
-				Appointment appointment = appointmentDao.find(Integer.parseInt(sessionBean.appointmentNo));
 				appointmentArchiveDao.archiveAppointment(appointment);
 				appointment.setStatus(apptStatus);
 				appointment.setLastUpdateUser(providerNo);
@@ -1312,9 +1320,8 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			note.setNote(n);
 
 			// only update appt if there is one
-			if (sessionBean.appointmentNo != null && !(sessionBean.appointmentNo.equals("") || sessionBean.appointmentNo.equals("0"))) {
+			if (appointment != null) {
 				String apptStatus = updateApptStatus(sessionBean.status, "sign");
-				Appointment appointment = appointmentDao.find(Integer.parseInt(sessionBean.appointmentNo));
 				appointmentArchiveDao.archiveAppointment(appointment);
 				appointment.setStatus(apptStatus);
 				appointment.setLastUpdateUser(providerNo);
