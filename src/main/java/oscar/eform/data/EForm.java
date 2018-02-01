@@ -25,6 +25,28 @@
 
 package oscar.eform.data;
 
+import net.sf.json.JSONArray;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionMessages;
+import org.oscarehr.common.OtherIdManager;
+import org.oscarehr.common.dao.PreventionDao;
+import org.oscarehr.common.model.Prevention;
+import org.oscarehr.eform.dao.EFormDataDao;
+import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.ui.servlet.ImageRenderingServlet;
+import org.oscarehr.util.DigitalSignatureUtils;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.eform.EFormLoader;
+import oscar.eform.EFormUtil;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
+import oscar.oscarEncounter.oscarMeasurements.util.WriteNewMeasurements;
+import oscar.util.ConversionUtils;
+import oscar.util.StringBuilderUtils;
+import oscar.util.UtilDateUtilities;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,34 +55,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.json.JSONArray;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionMessages;
-import org.oscarehr.common.OtherIdManager;
-import org.oscarehr.eform.dao.EFormDataDao;
-import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.ui.servlet.ImageRenderingServlet;
-import org.oscarehr.util.DigitalSignatureUtils;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.eform.EFormLoader;
-import oscar.eform.EFormUtil;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
-import oscar.oscarEncounter.oscarMeasurements.util.WriteNewMeasurements;
-import oscar.util.StringBuilderUtils;
-import oscar.util.UtilDateUtilities;
-
 /**
  * Use oscarhr.eform.service for new stuff
  * @deprecated
  */
 @Deprecated
 public class EForm extends EFormBase {
-	private static EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean("EFormDataDao");
+	private static EFormDataDao eFormDataDao = SpringUtils.getBean(EFormDataDao.class);
+	private static PreventionDao preventionDao = SpringUtils.getBean(PreventionDao.class);
 	private static Logger log = MiscUtils.getLogger();
 
 	private String appointment_no = "-1";
@@ -608,7 +610,33 @@ public class EForm extends EFormBase {
 				setSqlParams(REF_VAR_VALUE, ref_value);
 				setSqlParams(REF_FID, ref_fid);
 			}
-		} else if (module.equals("o")) {
+
+		}
+		else if (module.equals("p"))
+		{ //preventions & vaccines
+			log.debug("SWITCHING TO PREVENTIONS");
+
+			// get the latest prevention
+			Prevention prevention = preventionDao.findMostRecentByTypeAndDemoNo(type, Integer.parseInt(this.demographicNo));
+			if(prevention != null) {
+
+				curAP = new DatabaseAP();
+				curAP.setApName(apName);
+				String value = "";
+				// quick dirty way to get specified value
+				if("ID".equalsIgnoreCase(field))                        value = String.valueOf(prevention.getId());
+				if("DEMOGRAPHIC_NO".equalsIgnoreCase(field))            value = String.valueOf(prevention.getDemographicId());
+				if("CREATION_DATE".equalsIgnoreCase(field))             value = dateStringOrEmpty(prevention.getCreationDate());
+				if("CREATOR".equalsIgnoreCase(field))                   value = String.valueOf(prevention.getCreatorProviderNo());
+				if("PREVENTION_DATE".equalsIgnoreCase(field))           value = dateStringOrEmpty(prevention.getPreventionDate());
+				if("PROVIDER_NO".equalsIgnoreCase(field))               value = String.valueOf(prevention.getProviderNo());
+				if("REFUSED".equalsIgnoreCase(field))                   value = String.valueOf(prevention.isRefused());
+				if("UPDATE_DATE".equalsIgnoreCase(field))               value = dateStringOrEmpty(prevention.getLastUpdateDate());
+
+				curAP.setApOutput(value);
+			}
+		}
+		else if (module.equals("o")) {
 			log.debug("SWITCHING TO OTHER_ID");
 			String table_name = "", table_id = "";
 			EFormLoader.getInstance();
@@ -730,6 +758,10 @@ public class EForm extends EFormBase {
 		}
 
 		return type;
+	}
+
+	private String dateStringOrEmpty(Date date) {
+		return ConversionUtils.toDateString(date, ConversionUtils.DEFAULT_DATE_PATTERN);
 	}
 /*
 	private String getFieldType(StringBuilder html, int pointer) {
