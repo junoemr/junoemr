@@ -908,7 +908,7 @@ function calcAgeAtEDD(){
 					if (oscarProperties.isFormFaxEnabled())
 					{
 				%>
-				<input type="button" value="Fax All"
+				<input type="button" style="width: 65px;" value="Fax All"
 					   onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>&faxAll', 'fax_recipients');"/>
 				<%
 					}
@@ -2267,7 +2267,7 @@ function calcAgeAtEDD(){
 				if (oscarProperties.isFormFaxEnabled())
 				{
 			%>
-			<input type="button" value="Fax All"
+			<input type="button" style="width: 65px;" value="Fax All"
 				   onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>&faxAll', 'fax_recipients');"/>
 			<%
 				}
