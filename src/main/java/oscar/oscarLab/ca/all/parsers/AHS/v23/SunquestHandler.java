@@ -71,6 +71,17 @@ public class SunquestHandler extends AHSHandler
 
     /* ===================================== MSH ====================================== */
 
+	public String getAccessionNum() {
+
+		// unique labs are a combination of accessionNumber, fillerOrderNumber, universalServiceId, and observation year
+		// fillerOrderNumber is separate (for lab versions), but the other fields are combined here to ensure uniqueness
+		String accessionNum = get("/.OBR-20");
+		String serviceId = get("/.OBR-4");
+		String obrYear = getServiceDate().substring(0,4);
+
+		return accessionNum + "-" + serviceId + "-" + obrYear;
+	}
+
     /* ===================================== PID ====================================== */
 
     /* ===================================== OBR ====================================== */
@@ -96,7 +107,6 @@ public class SunquestHandler extends AHSHandler
 	@Override
 	public boolean canUpload()
 	{
-		//TODO - check duplicates and merge labs
 		return true;
 	}
 	@Override
