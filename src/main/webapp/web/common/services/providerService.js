@@ -27,8 +27,10 @@
  */
 
 angular.module("Common.Services").service("providerService", [
-	'$http', '$q',
-	function($http, $q)
+	'$http',
+	'$q',
+	'junoHttp',
+	function($http, $q, junoHttp)
 	{
 
 		var service = {};
@@ -161,6 +163,22 @@ angular.module("Common.Services").service("providerService", [
 					deferred.reject("An error occured while fetching provider teams");
 				});
 
+			return deferred.promise;
+		};
+
+		service.getRecentPatientList = function getRecentPatientList()
+		{
+			var deferred = $q.defer();
+			var config = Juno.Common.ServiceHelper.configHeaders();
+
+			junoHttp.get(service.apiPath + '/getRecentDemographicsViewed', config).then(
+				function success(response) {
+					deferred.resolve(response.data);
+				},
+				function error(error) {
+					console.log("providerService::getRecentDemographicsViewed error", error);
+					deferred.reject("An error occurred while getting RecentDemographicsViewed");
+				});
 			return deferred.promise;
 		};
 
