@@ -1291,9 +1291,8 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		try{
 			appointment = appointmentDao.find(note.getAppointmentNo());
 		}catch(Exception e){
-			logger.debug("Appointment number error",e);
+			logger.error("Appointment number error",e);
 		}
-		logger.debug("note.getAppointmentNo() "+note.getAppointmentNo()+" --- "+appointment);
 
 		Date now = new Date();
 		String roleName = caseManagementMgr.getRoleName(providerNo, note.getProgram_no());
