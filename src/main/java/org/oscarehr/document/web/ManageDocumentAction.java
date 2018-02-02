@@ -116,37 +116,31 @@ public class ManageDocumentAction extends DispatchAction {
 	private ProviderInboxRoutingDao providerInboxRoutingDAO = SpringUtils.getBean(ProviderInboxRoutingDao.class);
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
-	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-
+	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
 		return null;
 	}
 
-	public ActionForward documentUpdateAjax(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-
-		String ret = "";
-
+	public ActionForward documentUpdate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
 		String observationDate = request.getParameter("observationDate");// :2008-08-22<
 		String documentDescription = request.getParameter("documentDescription");// :test2<
 		String documentId = request.getParameter("documentId");// :29<
 		String docType = request.getParameter("docType");// :consult<
 		String providerId = (String) request.getSession().getAttribute("user");
-		Integer demographicNo = Integer.parseInt(request.getParameter("demog"));
+		String demographic = request.getParameter("demog");
+		Integer demographicNo = Integer.parseInt(demographic);
+		String[] flagProviders = request.getParameterValues("flagproviders");
 
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
         	throw new SecurityException("missing required security object (_edoc)");
         }
 
-		String demog = request.getParameter("demog");
-
-		String[] flagproviders = request.getParameterValues("flagproviders");
-		// String demoLink=request.getParameter("demoLink");
-
 		// TODO: if demoLink is "on", check if msp is in flagproviders, if not save to providerInboxRouting, if yes, don't save.
 
-		// DONT COPY THIS !!!
-		if ((flagproviders != null && flagproviders.length > 0)) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
+		if ((flagProviders != null && flagProviders.length > 0)) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
 			try {
-				for (String proNo : flagproviders) {
+				for (String proNo : flagProviders) {
 					providerInboxRoutingDAO.addToProviderInbox(proNo, Integer.parseInt(documentId), LabResultData.DOCUMENT);
 				}
 
@@ -157,7 +151,7 @@ public class ManageDocumentAction extends DispatchAction {
 			}
 		}
 		
-		//Check to see if we have to route document to patient
+		// Check to see if we have to route document to patient
 		PatientLabRoutingDao patientLabRoutingDao = SpringUtils.getBean(PatientLabRoutingDao.class);
 		List<PatientLabRouting>patientLabRoutingList = patientLabRoutingDao.findByLabNoAndLabType(Integer.parseInt(documentId), docType);
 		if( patientLabRoutingList == null || patientLabRoutingList.size() == 0 ) {
@@ -194,24 +188,23 @@ public class ManageDocumentAction extends DispatchAction {
 				// save a document created note
 				if (ctlDocument.isDemographicDocument()) {
 					// save note
-					saveDocNote(request, d.getDocdesc(), demog, documentId);
+					saveDocNote(request, d.getDocdesc(), demographic, documentId);
 				}
 				
 			}
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("Error", e);
 		}
-		
-		
-		if (ret != null && !ret.equals("")) {
-			// response.getOutputStream().print(ret);
-		}
+
 		HashMap<String, String> hm = new HashMap<String, String>();
-		hm.put("patientId", demog);
+		hm.put("patientId", demographic);
 		JSONObject jsonObject = JSONObject.fromObject(hm);
-		try {
+		try
+		{
 			response.getOutputStream().write(jsonObject.toString().getBytes());
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			MiscUtils.getLogger().error("Error", e);
 		}
 
@@ -278,87 +271,6 @@ public class ManageDocumentAction extends DispatchAction {
                 }
                 return null;
         }
-        
-	public ActionForward documentUpdate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-
-		String ret = "";
-
-		String observationDate = request.getParameter("observationDate");// :2008-08-22<
-		String documentDescription = request.getParameter("documentDescription");// :test2<
-		String documentId = request.getParameter("documentId");// :29<
-		String docType = request.getParameter("docType");// :consult<
-		String providerId = (String) request.getSession().getAttribute("user");
-		Integer demographicNo = Integer.parseInt(request.getParameter("demog"));
-
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-        }
-		String demog = request.getParameter("demog");
-
-		String[] flagproviders = request.getParameterValues("flagproviders");
-		// String demoLink=request.getParameter("demoLink");
-
-		// TODO: if demoLink is "on", check if msp is in flagproviders, if not save to providerInboxRouting, if yes, don't save.
-
-		// DONT COPY THIS !!!
-		if (flagproviders != null && flagproviders.length > 0) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
-			try {
-				for (String proNo : flagproviders) {
-					providerInboxRoutingDAO.addToProviderInbox(proNo, Integer.parseInt(documentId), LabResultData.DOCUMENT);
-				}
-			} catch (Exception e) {
-				MiscUtils.getLogger().error("Error", e);
-			}
-		}
-		Document d = documentDao.getDocument(documentId);
-
-		if(d != null) {
-			d.setDocdesc(documentDescription);
-			d.setDoctype(docType);
-			Date obDate = UtilDateUtilities.StringToDate(observationDate);
-	
-			if (obDate != null) {
-				d.setObservationdate(obDate);
-			}
-	
-			documentDao.merge(d);
-			LogAction.addLogEntry(providerId, demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, documentId, request.getRemoteAddr());
-		}
-
-		try {
-
-			CtlDocument ctlDocument = ctlDocumentDao.getCtrlDocument(Integer.parseInt(documentId));
-			if(ctlDocument != null) {
-				ctlDocument.getId().setModuleId(demographicNo);
-				ctlDocumentDao.merge(ctlDocument);
-				// save a document created note
-				if (ctlDocument.isDemographicDocument()) {
-					// save note
-					saveDocNote(request, d.getDocdesc(), demog, documentId);
-				}
-			}
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("Error", e);
-		}
-
-		if (ret != null && !ret.equals("")) {
-			// response.getOutputStream().print(ret);
-		}
-				
-		
-		String providerNo = request.getParameter("providerNo");
-		String searchProviderNo = request.getParameter("searchProviderNo");
-		String ackStatus = request.getParameter("status");
-		String demoName = getDemoName(LoggedInInfo.getLoggedInInfoFromSession(request) , demog);
-		request.setAttribute("demoName", demoName);
-		request.setAttribute("segmentID", documentId);
-		request.setAttribute("providerNo", providerNo);
-		request.setAttribute("searchProviderNo", searchProviderNo);
-		request.setAttribute("status", ackStatus);
-
-		return mapping.findForward("displaySingleDoc");
-
-	}
 
 	private String getDemoName(LoggedInInfo loggedInInfo, String demog) {
 		DemographicData demoD = new DemographicData();
