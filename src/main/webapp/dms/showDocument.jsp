@@ -222,6 +222,7 @@
 	<script type="text/javascript">
 		jQuery.noConflict();
 		var contextPath = '<%=contextPath%>';
+
 		var _in_window = <%=( "true".equals(request.getParameter("inWindow")) ? "true" : "false" )%>;
 	</script>
 </head>
@@ -621,24 +622,25 @@
 				if (<%=inChart%>)
 					window.opener.location.reload();
 			};
+
+			// queues view implements its own version of this
+			window.forwardDocument = function(docId) {
+				var frm = "#reassignForm_" + docId;
+				var query = jQuery(frm).serialize();
+
+				jQuery.ajax({
+					type: "POST",
+					url:  "<%= request.getContextPath()%>/oscarMDS/ReportReassign.do",
+					data: query,
+					success: function (data) {
+						window.location.reload();
+					},
+					error: function(jqXHR, err, exception) {
+						alert("Error " + jqXHR.status + " " + err);
+					}
+				});
+			};
 		}
-
-		window.forwardDocument = function(docId) {
-			var frm = "#reassignForm_" + docId;
-			var query = jQuery(frm).serialize();
-
-			jQuery.ajax({
-				type: "POST",
-				url:  "<%= request.getContextPath()%>/oscarMDS/ReportReassign.do",
-				data: query,
-				success: function (data) {
-					window.location.reload();
-				},
-				error: function(jqXHR, err, exception) {
-					alert("Error " + jqXHR.status + " " + err);
-				}
-			});
-		};
 </script>
 <% if (request.getParameter("inWindow") != null && request.getParameter("inWindow").equalsIgnoreCase("true")) {  %>
 </body>
