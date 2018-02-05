@@ -102,18 +102,18 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
     public Hl7TextInfo findLatestVersionByAccessionNumberOrFillerNumber(
 		String acc, String fillerNumber) {
 
-		String sqlCommand="select x from Hl7TextInfo x where x.accessionNumber = ?1 " +
-			"OR x.fillerOrderNum = ?2 order by lab_no DESC";
+		String sqlCommand="SELECT x FROM Hl7TextInfo x WHERE x.accessionNumber = :accession " +
+			"OR x.fillerOrderNum = :fillerNo order by x.labNumber DESC";
 
 		Query query = entityManager.createQuery(sqlCommand);
-		query.setParameter(1, acc);
-		query.setParameter(2, fillerNumber);
+		query.setParameter("accession", acc);
+		query.setParameter("fillerNo", fillerNumber);
 
 		return (getSingleResultOrNull(query));
     }
 
     public List<Hl7TextInfo> searchByFillerOrderNumber(String fon, String sending_facility){
-    	String sql = "select x from Hl7TextInfo x where x.fillerOrderNum=?1 and sendingFacility=?2";
+    	String sql = "select x from Hl7TextInfo x where x.fillerOrderNum=?1 and x.sendingFacility=?2";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1, fon);
     	query.setParameter(2, sending_facility);
@@ -148,7 +148,6 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
     	@SuppressWarnings("unchecked")
 		List<Hl7TextMessageInfo> labs =  query.getResultList();
     	return labs;
-
     }
 
     public List<Hl7TextMessageInfo2> getMatchingLabsByAccessionNo(String accession) {

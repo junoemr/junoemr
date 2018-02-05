@@ -80,6 +80,20 @@ public class SpecimenGateHandler extends AHSHandler
 		return "SpecimenGate";
 	}
 
+	@Override
+	public String getAccessionNum() {
+
+		// unique labs are a combination of accessionNumber, fillerOrderNumber, universalServiceId, and observation year
+		// fillerOrderNumber is separate (for lab versions), but the other fields are combined here to ensure uniqueness
+		String accessionNum = get("/.OBR-20");
+		String serviceId = get("/.OBR-4");
+		String obrYear = getServiceDate().substring(0,4);
+		// there could be a potential error here if the date is missing the year and defaults to 1111 (required by conformance spec)
+		// in two labs with a repeated accession number
+
+		return accessionNum + "-" + serviceId + "-" + obrYear;
+	}
+
     /* ===================================== PID ====================================== */
 
     /* ===================================== OBR ====================================== */
@@ -130,7 +144,6 @@ public class SpecimenGateHandler extends AHSHandler
 	@Override
 	public boolean canUpload()
 	{
-		//Specimen Gate reports are not linked
 		return true;
 	}
 	@Override
