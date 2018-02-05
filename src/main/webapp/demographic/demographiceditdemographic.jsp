@@ -1120,9 +1120,11 @@ while(field_itr.hasNext()){
 										else
 										{
 											referralDoctorName = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(referralDoctorXML), "rd");
-											referralDoctorName = referralDoctorName != null ? referralDoctorName : "";
+											if(referralDoctorName == null || referralDoctorName.equalsIgnoreCase("null") )
+												referralDoctorName = "";
 											referralDoctorOHIP = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(referralDoctorXML), "rdohip");
-											referralDoctorOHIP = referralDoctorOHIP != null ? referralDoctorOHIP : "";
+											if(referralDoctorOHIP == null || referralDoctorOHIP.equalsIgnoreCase("null") )
+												referralDoctorOHIP = "";
 										}
 										//----------------------------REFERRAL DOCTOR --------------end-----------
 
@@ -1135,10 +1137,11 @@ while(field_itr.hasNext()){
 										else
 										{
 											familyDoctorOHIP = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(familyDoctorXML), "fd");
-											familyDoctorOHIP = familyDoctorOHIP != null ? familyDoctorOHIP : "";
+											if(familyDoctorOHIP == null || familyDoctorOHIP.equalsIgnoreCase("null") )
+												familyDoctorOHIP = "";
 											familyDoctorName = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(familyDoctorXML), "fdname");
-											familyDoctorName = familyDoctorName != null ? familyDoctorName : "";
-
+											if(familyDoctorName == null || familyDoctorName.equalsIgnoreCase("null") )
+												familyDoctorName = "";
 										}
 
 
