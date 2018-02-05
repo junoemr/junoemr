@@ -1286,7 +1286,12 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		String verify = request.getParameter("verify");
 		OscarAppointmentDao appointmentDao = (OscarAppointmentDao) SpringUtils.getBean("oscarAppointmentDao");
 
-		Appointment appointment = appointmentDao.find(note.getAppointmentNo());
+		Appointment appointment = null;
+
+		if (note.getAppointmentNo() > 0)
+		{
+			appointment = appointmentDao.find(note.getAppointmentNo());
+		}
 
 		Date now = new Date();
 		String roleName = caseManagementMgr.getRoleName(providerNo, note.getProgram_no());
