@@ -24,21 +24,21 @@
 
 --%>
 
-<%@page import="org.oscarehr.util.SessionConstants"%>
-<%@page import="org.oscarehr.common.model.ProviderPreference"%>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.model.Provider" %>
-<%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@page import="org.oscarehr.common.model.MyGroup" %>
-<%@page import="org.oscarehr.common.dao.MyGroupDao" %>
-<%@page import="org.oscarehr.common.model.Appointment" %>
+<%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
+<%@page import="org.oscarehr.common.dao.MyGroupDao"%>
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
-<%@page import="org.oscarehr.schedule.model.ScheduleTemplate" %>
-<%@page import="org.oscarehr.schedule.model.ScheduleDate" %>
-<%@page import="org.oscarehr.schedule.dao.ScheduleTemplateDao" %>
-<%@page import="org.oscarehr.schedule.model.ScheduleTemplateCode" %>
+<%@page import="org.oscarehr.common.dao.SiteDao" %>
+<%@page import="org.oscarehr.common.model.Appointment" %>
+<%@page import="org.oscarehr.common.model.MyGroup" %>
+<%@page import="org.oscarehr.common.model.Provider" %>
+<%@page import="org.oscarehr.common.model.ProviderPreference" %>
+<%@page import="org.oscarehr.common.model.Site" %>
 <%@page import="org.oscarehr.schedule.dao.ScheduleTemplateCodeDao" %>
-<%@page import="oscar.util.ConversionUtils" %>
+<%@page import="org.oscarehr.schedule.dao.ScheduleTemplateDao" %>
+<%@page import="org.oscarehr.schedule.model.ScheduleDate" %>
+<%@page import="org.oscarehr.schedule.model.ScheduleTemplate" %>
+<%@page import="org.oscarehr.schedule.model.ScheduleTemplateCode" %>
+<%@page import="org.oscarehr.util.SessionConstants" %>
 <%
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
     MyGroupDao myGroupDao = SpringUtils.getBean(MyGroupDao.class);
@@ -80,20 +80,26 @@ sites = siteDao.getAllSites();
   String [] param = new String[3];
 %>
 <%@ page
-	import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*,java.net.*"
+		import="org.oscarehr.util.SpringUtils,
+		        org.springframework.web.context.support.WebApplicationContextUtils,
+		        oscar.Misc,
+		        oscar.MyDateFormat,
+		        oscar.appt.ApptUtil,
+		        oscar.appt.JdbcApptImpl"
 	errorPage="../appointment/errorpage.jsp"%>
 
-<jsp:useBean id="DateTimeCodeBean" class="java.util.Hashtable"
-	scope="page" />
+<jsp:useBean id="DateTimeCodeBean" class="java.util.Hashtable" scope="page" />
 	
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
-<%@page import="oscar.appt.JdbcApptImpl"%>
-<%@page import="org.oscarehr.common.model.Site"%>
-<%@page import="org.oscarehr.common.dao.SiteDao"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="oscar.appt.ApptUtil"%><html:html locale="true">
+<%@page import="oscar.util.ConversionUtils"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.util.Calendar"%>
+<%@page import="java.util.Collections"%>
+<%@page import="java.util.GregorianCalendar"%>
+<%@ page import="java.util.List" %>
+<html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title><bean:message key="schedule.scheduleflipview.title" /></title>

@@ -28,11 +28,16 @@
   
   String weekdaytag[] = {"SUN","MON","TUE","WED","THU","FRI","SAT"};
 %>
-<%@ page import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*" errorPage="../appointment/errorpage.jsp"%>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.schedule.model.RSchedule" %>
-<%@page import="org.oscarehr.schedule.dao.RScheduleDao" %>
+<%@ page import="org.oscarehr.schedule.dao.RScheduleDao,
+                 org.oscarehr.schedule.model.RSchedule,
+                 org.oscarehr.util.SpringUtils,
+                 oscar.MyDateFormat,
+                 oscar.SxmlMisc"
+         errorPage="../appointment/errorpage.jsp" %>
 <%@page import="oscar.util.ConversionUtils" %>
+<%@page import="java.util.Calendar" %>
+<%@page import="java.util.GregorianCalendar" %>
+<%@page import="java.util.StringTokenizer" %>
 
 <%
 	RScheduleDao rScheduleDao = SpringUtils.getBean(RScheduleDao.class);

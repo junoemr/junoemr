@@ -29,17 +29,17 @@
   String user_name = (String) session.getAttribute("userlastname")+","+ (String) session.getAttribute("userfirstname");
   String provider_no = request.getParameter("provider_no");
 %>
-<%@ page
-	import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*"
+<%@ page import="org.oscarehr.schedule.dao.ScheduleDateDao,
+                 org.oscarehr.schedule.model.ScheduleDate,
+                 org.oscarehr.util.SpringUtils,
+                 oscar.HScheduleDate,
+                 oscar.MyDateFormat"
 	errorPage="../appointment/errorpage.jsp"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
 <jsp:useBean id="scheduleDateBean" class="java.util.Hashtable" scope="session" />
 <jsp:useBean id="scheduleRscheduleBean" class="oscar.RscheduleBean"	scope="session" />
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.schedule.model.ScheduleDate" %>
-<%@ page import="org.oscarehr.schedule.dao.ScheduleDateDao" %>
 <%
 	ScheduleDateDao scheduleDateDao = SpringUtils.getBean(ScheduleDateDao.class);
 %>
