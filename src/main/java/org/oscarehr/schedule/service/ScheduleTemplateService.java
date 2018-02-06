@@ -24,11 +24,32 @@
 
 package org.oscarehr.schedule.service;
 
+import org.oscarehr.schedule.dao.ScheduleTemplateDao;
+import org.oscarehr.schedule.model.ScheduleTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional
 public class ScheduleTemplateService
 {
+	@Autowired
+	ScheduleTemplateDao scheduleTemplateDao;
+
+	/**
+	 * Find the public and private templates available to the provider.
+	 * @param providerNo provider id
+	 * @return List of public and private templates.
+	 */
+	public List<ScheduleTemplate> getPublicAndPrivateTemplates(String providerNo)
+	{
+		List<ScheduleTemplate> templateList = scheduleTemplateDao.findByProviderNo("Public");
+		List<ScheduleTemplate> providerTemplates = scheduleTemplateDao.findByProviderNo(providerNo);
+
+		templateList.addAll(providerTemplates);
+		return templateList;
+	}
 }

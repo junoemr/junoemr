@@ -24,23 +24,22 @@
 
 --%>
 <%@ page
-	import="org.apache.struts.util.MessageResources,
-	org.apache.struts.util.MessageResourcesFactory,
-	org.oscarehr.schedule.dao.RScheduleDao,
-	org.oscarehr.schedule.dao.ScheduleDateDao,
-	org.oscarehr.schedule.dao.ScheduleTemplateDao,
-	org.oscarehr.common.dao.SiteDao,
-	org.oscarehr.schedule.model.RSchedule,
-	org.oscarehr.schedule.model.ScheduleDate"
-	errorPage="../appointment/errorpage.jsp"%>
+		import="org.apache.struts.util.MessageResources,
+		        org.apache.struts.util.MessageResourcesFactory,
+		        org.oscarehr.common.dao.SiteDao,
+		        org.oscarehr.common.model.Site,
+		        org.oscarehr.schedule.dao.RScheduleDao,
+		        org.oscarehr.schedule.model.RSchedule,
+		        org.oscarehr.schedule.model.ScheduleTemplate,
+		        org.oscarehr.schedule.service.Schedule"
+		errorPage="../appointment/errorpage.jsp" %>
 
 <jsp:useBean id="scheduleRscheduleBean" class="oscar.RscheduleBean"	scope="session" />
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
-<%@ page import="org.oscarehr.schedule.model.ScheduleTemplate" %>
-<%@ page import="org.oscarehr.common.model.Site" %>
+<%@ page import="org.oscarehr.schedule.service.ScheduleTemplateService" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@ page import="oscar.MyDateFormat" %>
@@ -53,9 +52,10 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.StringTokenizer" %>
 <%
-	ScheduleDateDao scheduleDateDao = SpringUtils.getBean(ScheduleDateDao.class);
-	RScheduleDao rScheduleDao = (RScheduleDao)SpringUtils.getBean("rScheduleDao");
-	ScheduleTemplateDao scheduleTemplateDao = SpringUtils.getBean(ScheduleTemplateDao.class);
+	Schedule scheduleService = SpringUtils.getBean(Schedule.class);
+	ScheduleTemplateService scheduleTemplateService = SpringUtils.getBean(ScheduleTemplateService.class);
+
+	RScheduleDao rScheduleDao = SpringUtils.getBean(RScheduleDao.class);
 %>
 
 <html:html locale="true">
@@ -134,59 +134,15 @@
 		String today = UtilDateUtilities.DateToString(new java.util.Date(), "yyyy-MM-dd");
 		String lastYear = (Integer.parseInt(today.substring(0, today.indexOf('-'))) - 2) + today.substring(today.indexOf('-'));
 
-		if(request.getParameter("delete") != null && request.getParameter("delete").equals("1"))
-		{ //delete rschedule
+		if("1".equals(request.getParameter("delete")))
+		{
+			String providerNo = request.getParameter("provider_no");
+			String startDate = request.getParameter("sdate") != null ? request.getParameter("sdate") : today;
+			String deletePriority = (request.getParameter("deldate") != null)? request.getParameter("deldate"): "all" ;
 
-			String[] param = new String[2];
-			String edate = null;
-			param[0] = request.getParameter("provider_no");
-			param[1] = request.getParameter("sdate") != null ? request.getParameter("sdate") : today;
-			RSchedule rs1 = rScheduleDao.search_rschedule_current1(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("sdate") != null ? request.getParameter("sdate") : today));
+			scheduleService.deleteSchedule(providerNo, startDate, deletePriority);
 
-
-			if(rs1 != null)
-			{
-				param[1] = ConversionUtils.toDateString(rs1.getsDate());
-				edate = ConversionUtils.toDateString(rs1.geteDate());
-			}
-
-			List<RSchedule> rsl = rScheduleDao.findByProviderNoAndDates(request.getParameter("provider_no"), MyDateFormat.getSysDate(request.getParameter("sdate") != null ? request.getParameter("sdate") : today));
-
-			for(RSchedule rs : rsl)
-			{
-				rs.setStatus("D");
-				rScheduleDao.merge(rs);
-			}
-
-			rsl = rScheduleDao.findByProviderAvailableAndDate(request.getParameter("provider_no"), "A", MyDateFormat.getSysDate(request.getParameter("sdate") != null ? request.getParameter("sdate") : today));
-			for(RSchedule rs : rsl)
-			{
-				rs.setStatus("D");
-				rScheduleDao.merge(rs);
-			}
-
-			if(request.getParameter("deldate") != null && (request.getParameter("deldate").equals("b") || request.getParameter("deldate").equals("all")))
-			{ //delete scheduledate
-				if(request.getParameter("deldate").equals("b"))
-				{
-					List<ScheduleDate> sds = scheduleDateDao.findByProviderPriorityAndDateRange(request.getParameter("provider_no"), 'b', MyDateFormat.getSysDate(request.getParameter("sdate") != null ? request.getParameter("sdate") : today), MyDateFormat.getSysDate(edate));
-					for(ScheduleDate sd : sds)
-					{
-						sd.setStatus('D');
-						scheduleDateDao.merge(sd);
-					}
-				}
-				else
-				{
-					List<ScheduleDate> sds = scheduleDateDao.findByProviderAndDateRange(request.getParameter("provider_no"), MyDateFormat.getSysDate(request.getParameter("sdate") != null ? request.getParameter("sdate") : today), MyDateFormat.getSysDate(edate));
-					for(ScheduleDate sd : sds)
-					{
-						sd.setStatus('D');
-						scheduleDateDao.merge(sd);
-					}
-				}
-			}
-			response.sendRedirect("scheduletemplateapplying.jsp?provider_no=" + param[0] + "&provider_name=" + URLEncoder.encode(request.getParameter("provider_name")));
+			response.sendRedirect("scheduletemplateapplying.jsp?provider_no=" + providerNo + "&provider_name=" + URLEncoder.encode(request.getParameter("provider_name")));
 		}
 		else
 		{
@@ -906,17 +862,8 @@ function tranbuttonb7_click() {
 						<td><select size=<%=bOrigAlt||bAlternate?22:11%>
 							onclick="displayTemplate(this)" name="mytemplate">
 							<%
-
-								for(ScheduleTemplate st : scheduleTemplateDao.findByProviderNo("Public"))
-								{
-
-							%>
-							<option value="<%=st.getId().getName()%>"><%=st.getId().getName() + " |" + st.getSummary()%>
-							</option>
-							<%
-								}
-
-								for(ScheduleTemplate st : scheduleTemplateDao.findByProviderNo(request.getParameter("provider_no")))
+								List<ScheduleTemplate> publicAndPrivateTemplates = scheduleTemplateService.getPublicAndPrivateTemplates(request.getParameter("provider_no"));
+								for(ScheduleTemplate st : publicAndPrivateTemplates)
 								{
 
 							%>

@@ -27,20 +27,23 @@
 <%!  boolean bMultisites=org.oscarehr.common.IsPropertiesOn.isMultisitesEnable(); %>
 <%!  String [] bgColors; %>
 
-<%@ page import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*" errorPage="../appointment/errorpage.jsp"%>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.schedule.dao.ScheduleTemplateDao" %>
-<%@page import="org.oscarehr.schedule.model.ScheduleTemplate" %>
-<%
-	ScheduleTemplateDao scheduleTemplateDao = SpringUtils.getBean(ScheduleTemplateDao.class);
-%>
-
+<%@ page import="org.oscarehr.common.dao.SiteDao,
+                 org.oscarehr.common.model.Site,
+                 org.oscarehr.schedule.model.ScheduleTemplate,
+                 org.oscarehr.schedule.service.ScheduleTemplateService,
+                 org.oscarehr.util.SpringUtils"
+         errorPage="../appointment/errorpage.jsp" %>
+<%@page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
+<%@page import="oscar.HScheduleDate" %>
+<%@page import="oscar.MyDateFormat" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
 
 <jsp:useBean id="scheduleDateBean" class="java.util.Hashtable" scope="session" />
 <%
+	ScheduleTemplateService scheduleTemplateService = SpringUtils.getBean(ScheduleTemplateService.class);
+
   String year = request.getParameter("year");
   String month = MyDateFormat.getDigitalXX(Integer.parseInt(request.getParameter("month")));
   String day = MyDateFormat.getDigitalXX(Integer.parseInt(request.getParameter("day")));
@@ -54,11 +57,13 @@
     strCreator= aHScheduleDate.creator;
   }
 
+  String providerNoStr = request.getParameter("provider_no");
+
 %>
 
-<%@page import="org.oscarehr.common.dao.SiteDao"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="org.oscarehr.common.model.Site"%><html:html locale="true">
+<%@page import="oscar.OscarProperties"%>
+<%@page import="java.util.List"%>
+<html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title><bean:message key="schedule.scheduledatepopup.title" /></title>
@@ -115,31 +120,23 @@ function upCaseCtrl(ctrl) {
 				<td><!--input type="text" name="hour1" <%=strHour%> --> <select
 					name="hour">
 					<%
-					
-					for(ScheduleTemplate st: scheduleTemplateDao.findByProviderNo("Public")) {
-						
-	%>
+						List<ScheduleTemplate> publicAndPrivateTemplates = scheduleTemplateService.getPublicAndPrivateTemplates(providerNoStr);
+						for(ScheduleTemplate st : publicAndPrivateTemplates)
+						{ %>
 					<option value="<%=st.getId().getName()%>"
-						<%=strHour.equals(st.getId().getName())?"selected":""%>><%=st.getId().getName()+" |"+st.getSummary()%></option>
-					<% }
-					for(ScheduleTemplate st: scheduleTemplateDao.findByProviderNo( request.getParameter("provider_no"))) {
-  
-	%>
-					<option value="<%=st.getId().getName()%>"
-						<%=st.getId().getName().equals(strHour)?"selected":""%>><%=st.getId().getName()+" |"+st.getSummary()%></option>
-					<% }	%>
+							<%=strHour.equals(st.getId().getName()) ? "selected" : ""%>><%=st.getId().getName() + " |" + st.getSummary()%>
+					</option>
+					<%  } %>
 				</select></td>
 			</tr>
 			<% 
           OscarProperties props = OscarProperties.getInstance();
-          boolean bMoreAddr = bMultisites
-						? true
-						: props.getProperty("scheduleSiteID", "").equals("") ? false : true;
+          boolean bMoreAddr = bMultisites || !props.getProperty("scheduleSiteID", "").equals("");
           String [] siteList;
           if (bMultisites) {
         		//multisite starts =====================	  
         		  SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
-        	      List<Site> sites = siteDao.getActiveSitesByProviderNo(request.getParameter("provider_no")); 
+        	      List<Site> sites = siteDao.getActiveSitesByProviderNo(providerNoStr);
         	      siteList = new String[sites.size()+1];
         		  bgColors = new String[sites.size()+1];
         	      for (int i=0; i<sites.size(); i++) {
@@ -185,18 +182,19 @@ function upCaseCtrl(ctrl) {
 			</tr>
 			<tr>
 				<td bgcolor="#CCFFCC">
-				<div align="right"><input type="hidden" name="Submit" value="">
-				<input type="hidden" name="provider_no"
-					value="<%=request.getParameter("provider_no")%>"> <input
-					type="button"
-					value='<bean:message key="schedule.scheduledatepopup.btnSave"/>'
-					onclick="document.forms['schedule'].Submit.value=' Save '; document.forms['schedule'].submit();">
-				<input type="button" name="Button"
-					value='<bean:message key="schedule.scheduledatepopup.btnCancel"/>'
-					onClick="window.close()"> <input type="button"
-					value='<bean:message key="schedule.scheduledatepopup.btnDelete"/>'
-					onclick="document.forms['schedule'].Submit.value=' Delete '; document.forms['schedule'].submit();">
-				</div>
+					<div align="right"><input type="hidden" name="Submit" value="">
+						<input type="hidden" name="provider_no"
+						       value="<%=providerNoStr%>">
+						<input type="button"
+						       value='<bean:message key="schedule.scheduledatepopup.btnSave"/>'
+						       onclick="document.forms['schedule'].Submit.value=' Save '; document.forms['schedule'].submit();">
+						<input type="button" name="Button"
+						       value='<bean:message key="schedule.scheduledatepopup.btnCancel"/>'
+						       onClick="window.close()">
+						<input type="button"
+						       value='<bean:message key="schedule.scheduledatepopup.btnDelete"/>'
+						       onclick="document.forms['schedule'].Submit.value=' Delete '; document.forms['schedule'].submit();">
+					</div>
 				</td>
 			</tr>
 		</table>

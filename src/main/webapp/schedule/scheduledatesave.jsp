@@ -25,75 +25,53 @@
 --%>
 
 <%
-
-  String user_name = (String) session.getAttribute("userlastname")+","+ (String) session.getAttribute("userfirstname");
-  String provider_no = request.getParameter("provider_no");
+	String user_name = (String) session.getAttribute("userlastname") + "," + (String) session.getAttribute("userfirstname");
 %>
-<%@ page import="org.oscarehr.schedule.dao.ScheduleDateDao,
-                 org.oscarehr.schedule.model.ScheduleDate,
+<%@ page import="org.oscarehr.schedule.service.Schedule,
                  org.oscarehr.util.SpringUtils,
                  oscar.HScheduleDate,
-                 oscar.MyDateFormat"
+                 oscar.MyDateFormat,
+                 java.util.Date"
 	errorPage="../appointment/errorpage.jsp"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
 <jsp:useBean id="scheduleDateBean" class="java.util.Hashtable" scope="session" />
 <jsp:useBean id="scheduleRscheduleBean" class="oscar.RscheduleBean"	scope="session" />
-<%
-	ScheduleDateDao scheduleDateDao = SpringUtils.getBean(ScheduleDateDao.class);
-%>
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title><bean:message key="schedule.scheduledatesave.title" /></title>
 </head>
-<%
-  String available = request.getParameter("available");
-  String priority = "c";
-  String reason = request.getParameter("reason");
-  String hour = request.getParameter("hour");
-  //save the record first, change holidaybean next
-  int rowsAffected = 0;
+	<%
+		Schedule scheduleService = SpringUtils.getBean(Schedule.class);
 
-  ScheduleDate sd = scheduleDateDao.findByProviderNoAndDate(provider_no, MyDateFormat.getSysDate(request.getParameter("date")));
-  if(sd != null) {
-	  sd.setStatus('D');
-	  scheduleDateDao.merge(sd);
-  }
-  //add R schedule date if it is available
-  if(request.getParameter("Submit")!=null && request.getParameter("Submit").equals(" Delete ")) {
-    if(scheduleRscheduleBean.getDateAvail(request.getParameter("date"))) {
-      sd = new ScheduleDate();
-      sd.setDate(MyDateFormat.getSysDate(request.getParameter("date")));
-      sd.setProviderNo(provider_no);
-      sd.setAvailable('1');
-      sd.setPriority('b');
-      sd.setReason("");
-      sd.setHour(scheduleRscheduleBean.getDateAvailHour(request.getParameter("date")));
-      sd.setCreator(user_name);
-      sd.setStatus(scheduleRscheduleBean.active.toCharArray()[0]);
-      scheduleDateDao.persist(sd);
-    }
-  }
-  scheduleDateBean.remove(request.getParameter("date") );
+		String provider_no = request.getParameter("provider_no");
+		String available = request.getParameter("available");
+		String priority = "c";
+		String reason = request.getParameter("reason");
+		String hour = request.getParameter("hour");
+		String dateStr = request.getParameter("date");
+		Date date = MyDateFormat.getSysDate(dateStr);
 
-if(request.getParameter("Submit")!=null && request.getParameter("Submit").equals(" Save ")) {
+		//save the record first, change holidaybean next
 
-  sd = new ScheduleDate();
-  sd.setDate(MyDateFormat.getSysDate(request.getParameter("date")));
-  sd.setProviderNo(provider_no);
-  sd.setAvailable(available.toCharArray()[0]);
-  sd.setPriority(priority.toCharArray()[0]);
-  sd.setReason(reason);
-  sd.setHour(hour);
-  sd.setCreator(user_name);
-  sd.setStatus(scheduleRscheduleBean.active.toCharArray()[0]);
-  scheduleDateDao.persist(sd);
-
-  scheduleDateBean.put(request.getParameter("date"), new HScheduleDate(available, priority, reason, hour, user_name) );
-}
-%>
+		//add R schedule date if it is available
+		if(" Delete ".equals(request.getParameter("Submit")))
+		{
+			if(scheduleRscheduleBean.getDateAvail(dateStr))
+			{
+				String availHour = scheduleRscheduleBean.getDateAvailHour(dateStr);
+				scheduleService.saveScheduleByDate(provider_no, date, "1", "b", "", availHour, user_name, scheduleRscheduleBean.active);
+			}
+		}
+		if(" Save ".equals(request.getParameter("Submit")))
+		{
+			scheduleService.saveScheduleByDate(provider_no, date, available, priority, reason, hour, user_name, scheduleRscheduleBean.active);
+			scheduleDateBean.put(dateStr, new HScheduleDate(available, priority, reason, hour, user_name));
+		}
+		scheduleDateBean.remove(dateStr);
+	%>
 
 <script language="JavaScript">
 <!--

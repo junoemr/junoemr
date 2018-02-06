@@ -186,4 +186,78 @@ public class Schedule
 		}
 		return overLapResult;
 	}
+
+	public void deleteSchedule(String providerNo, String startDateString, String deletePriority)
+	{
+		Date startDate = MyDateFormat.getSysDate(startDateString);
+		Date endDate = null;
+
+		RSchedule rs1 = rScheduleDao.search_rschedule_current1(providerNo, startDate);
+		if(rs1 != null)
+		{
+			String endDateStr = ConversionUtils.toDateString(rs1.geteDate());
+			endDate = MyDateFormat.getSysDate(endDateStr);
+		}
+
+		List<RSchedule> rsl = rScheduleDao.findByProviderNoAndDates(providerNo, startDate);
+		for(RSchedule rs : rsl)
+		{
+			rs.setStatus(RSchedule.STATUS_DELETED);
+			rScheduleDao.merge(rs);
+		}
+
+		rsl = rScheduleDao.findByProviderAvailableAndDate(providerNo, "A", startDate);
+		for(RSchedule rs : rsl)
+		{
+			rs.setStatus(RSchedule.STATUS_DELETED);
+			rScheduleDao.merge(rs);
+		}
+
+		//delete scheduledate
+		List<ScheduleDate> sds;
+		if("b".equals(deletePriority))
+		{
+			sds = scheduleDateDao.findByProviderPriorityAndDateRange(providerNo, 'b', startDate, endDate);
+		}
+		else
+		{
+			sds = scheduleDateDao.findByProviderAndDateRange(providerNo, startDate, endDate);
+		}
+		for(ScheduleDate sd : sds)
+		{
+			sd.setStatus(ScheduleDate.STATUS_DELETED);
+			scheduleDateDao.merge(sd);
+		}
+	}
+
+	/**
+	 * delete any existing schedules by date & provider, and create a new one with the given values.
+	 * @param providerNoStr provider id
+	 * @param date date of schedule
+	 * @param available 1 or 0
+	 * @param priority priority
+	 * @param reason reason
+	 * @param hour hour
+	 * @param userName username
+	 */
+	public void saveScheduleByDate(String providerNoStr, Date date, String available, String priority, String reason, String hour, String userName, String status)
+	{
+		// flag existing schedule(s) as deleted.
+		ScheduleDate sd = scheduleDateDao.findByProviderNoAndDate(providerNoStr, date);
+		if(sd != null) {
+			sd.setStatus(ScheduleDate.STATUS_DELETED);
+			scheduleDateDao.merge(sd);
+		}
+
+		sd = new ScheduleDate();
+		sd.setDate(date);
+		sd.setProviderNo(providerNoStr);
+		sd.setAvailable(available.toCharArray()[0]);
+		sd.setPriority(priority.toCharArray()[0]);
+		sd.setReason(reason);
+		sd.setHour(hour);
+		sd.setCreator(userName);
+		sd.setStatus(status.toCharArray()[0]);
+		scheduleDateDao.persist(sd);
+	}
 }

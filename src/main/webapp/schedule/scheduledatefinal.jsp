@@ -25,12 +25,10 @@
 --%>
 
 <%
-  
   String user_no = (String) session.getAttribute("user");
   String creator = (String) session.getAttribute("userlastname")+","+ (String) session.getAttribute("userfirstname");
 %>
 <%@ page errorPage="../appointment/errorpage.jsp"%>
-<html:html locale="true">
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -127,6 +125,4 @@ function upCaseCtrl(ctrl) {
 
 </form>
 
-
 </body>
-</html:html>
