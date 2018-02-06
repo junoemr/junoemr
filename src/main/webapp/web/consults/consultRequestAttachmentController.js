@@ -25,7 +25,6 @@ angular.module('Consults').controller('Consults.ConsultRequestAttachmentControll
 			{
 				if (consult.availableDocs == null) consult.availableDocs = Juno.Common.Util.toArray(results);
 				controller.atth.availableDocs = consult.availableDocs;
-				Juno.Consults.Common.sortAttachmentDocs(controller.atth.availableDocs);
 				if (controller.atth.availableDocs[0] != null) controller.atth.selectedAvailableDoc = controller.atth.availableDocs[0];
 			},
 			function error(errors)
@@ -45,7 +44,6 @@ angular.module('Consults').controller('Consults.ConsultRequestAttachmentControll
 			controller.atth.attachedDocs.push(controller.atth.selectedAvailableDoc);
 			controller.atth.selectedAttachedDoc = controller.atth.selectedAvailableDoc;
 			controller.atth.selectedAttachedDoc.attached = true;
-			Juno.Consults.Common.sortAttachmentDocs(controller.atth.attachedDocs);
 
 			var selectionIndex = $("#selAvailDoc").val();
 			controller.atth.availableDocs.splice(selectionIndex, 1);
@@ -62,7 +60,6 @@ angular.module('Consults').controller('Consults.ConsultRequestAttachmentControll
 			controller.atth.availableDocs.push(controller.atth.selectedAttachedDoc);
 			controller.atth.selectedAvailableDoc = controller.atth.selectedAttachedDoc;
 			controller.atth.selectedAvailableDoc.attached = false;
-			Juno.Consults.Common.sortAttachmentDocs(controller.atth.availableDocs);
 
 			var selectionIndex = $("#selAttachDoc").val();
 			controller.atth.attachedDocs.splice(selectionIndex, 1);
