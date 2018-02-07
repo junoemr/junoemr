@@ -95,56 +95,65 @@ public class WCBTeleplanSubmission {
     
     public String validate(WCB wcb,Billingmaster bm){
         StringBuilder m = new StringBuilder();
-        
-        try {
-            Integer.parseInt(bm.getDxCode1() );
-        }catch(Exception e){
-            m.append(": ICD9 may only contain Numbers ");
-        }
-        if(wcb==null) {
-        	
-        	m.append(": Please select a WCB form or change billing type for invoice no:"+bm.getBillingNo());
-        }
-        
-        else {
 
-	        if (wcb.getW_wcbno() != null && !wcb.getW_wcbno().trim().equals("")){
-	            try {
-	                Integer.parseInt(wcb.getW_wcbno());
-	            }catch(Exception e){
-	                m.append(": WCB claim # may only contain Numbers ");
-	            }
-	        }
-	        
-	        if (wcb.getW_reporttype() != null && wcb.getW_reporttype().equals("F") && wcb.getFormNeeded() == 1 ){
-	            if (wcb.getW_empname() != null && wcb.getW_empname().trim().length() == 0 ){
-	                m.append(": Employer's name can not be empty ");
-	            }
-	            
-	            if (wcb.getW_opaddress() != null && wcb.getW_opaddress().trim().length() == 0 ){
-	                m.append(": Employer's Operation Address can not be empty ");
-	            }
-	            
-	            if (wcb.getW_opcity() != null && wcb.getW_opcity().trim().length() == 0 ){
-	                m.append(": Employer's Operation City can not be empty ");
-	            }
-	             
-	            if (wcb.getW_empphone() != null && wcb.getW_empphone().trim().length() == 0 ){
-	                m.append(": Employer's Phone # can not be empty ");
-	            }
-	        }    
+        int icdMaxLength = 5;
+        if(bm.getDxCode1() != null && bm.getDxCode1().length() > icdMaxLength)
+        {
+	        m.append(": ICD9 exceeds maximum length of " + icdMaxLength);
         }
+	    if(wcb == null)
+	    {
+		    m.append(": Please select a WCB form or change billing type for invoice no:" + bm.getBillingNo());
+	    }
+	    else
+	    {
+		    if(wcb.getW_wcbno() != null && !wcb.getW_wcbno().trim().equals(""))
+		    {
+			    try
+			    {
+				    Integer.parseInt(wcb.getW_wcbno());
+			    }
+			    catch(Exception e)
+			    {
+				    m.append(": WCB claim # may only contain Numbers ");
+			    }
+		    }
 
-       
-        String ret = "<tr bgcolor='red'><td colspan='11'>"
-                + "<a href='#' onClick=\"openBrWindow('adjustBill.jsp?billing_no="
-                + Misc.forwardZero(""+bm.getBillingmasterNo(), 7)
-                + "','','resizable=yes,scrollbars=yes,top=0,left=0,width=900,height=600'); return false;\">"
-                + m.toString() + "</a>" + "</td></tr>";
-        if ("".equals(m.toString())){
-            return "" ;
-        }      
-        return ret;
+		    if(wcb.getW_reporttype() != null && wcb.getW_reporttype().equals("F") && wcb.getFormNeeded() == 1)
+		    {
+			    if(wcb.getW_empname() != null && wcb.getW_empname().trim().length() == 0)
+			    {
+				    m.append(": Employer's name can not be empty ");
+			    }
+
+			    if(wcb.getW_opaddress() != null && wcb.getW_opaddress().trim().length() == 0)
+			    {
+				    m.append(": Employer's Operation Address can not be empty ");
+			    }
+
+			    if(wcb.getW_opcity() != null && wcb.getW_opcity().trim().length() == 0)
+			    {
+				    m.append(": Employer's Operation City can not be empty ");
+			    }
+
+			    if(wcb.getW_empphone() != null && wcb.getW_empphone().trim().length() == 0)
+			    {
+				    m.append(": Employer's Phone # can not be empty ");
+			    }
+		    }
+	    }
+
+
+	    String ret = "<tr bgcolor='red'><td colspan='11'>"
+			    + "<a href='#' onClick=\"openBrWindow('adjustBill.jsp?billing_no="
+			    + Misc.forwardZero("" + bm.getBillingmasterNo(), 7)
+			    + "','','resizable=yes,scrollbars=yes,top=0,left=0,width=900,height=600'); return false;\">"
+			    + m.toString() + "</a>" + "</td></tr>";
+	    if("".equals(m.toString()))
+	    {
+		    return "";
+	    }
+	    return ret;
    }
     
  
