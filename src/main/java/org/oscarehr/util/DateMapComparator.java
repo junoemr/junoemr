@@ -48,7 +48,6 @@ public class DateMapComparator implements Comparator<Map<String, Serializable>>
 		// TODO: Null checking, both for maps and values
 		String firstValue = first.get(key).toString();
 		String secondValue = second.get(key).toString();
-		//DateFormat dateInputFormat = new SimpleDateFormat("EEE MMM dd hh:mm:ss z yyyy");
 		DateFormat dateInputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
 		
 		try
