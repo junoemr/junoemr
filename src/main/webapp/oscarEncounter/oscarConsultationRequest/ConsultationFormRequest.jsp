@@ -1877,8 +1877,11 @@ function updateFaxButton() {
 											</option>
 									<%
 										}%>
-									<option value="-1" <%= (consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase(clinic.getClinicName()) || requestId == null ? "selected='selected'" : lhndType.equals("clinic") ? "selected='selected'" : "" )%>><%= clinic.getClinicName() %></option>
-								<%
+
+									<option value="-1" <%=(consultUtil.letterheadName != null && consultUtil.letterheadName.equalsIgnoreCase("-1") ? "selected='selected'"  : "") %>>
+										<%=clinic.getClinicName() %>
+									</option>
+									<%
 									for (Provider p : prList) {
 										if (p.getProviderNo().compareTo("-1") != 0 && (p.getFirstName() != null || p.getSurname() != null)) {
 								%>
