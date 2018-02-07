@@ -1134,86 +1134,115 @@ function autoFillHin(){
 					key="demographic.demographicaddrecordhtm.formReferalDoctor" />:</b></td>
 				<td align="left" height="10">
 				<% if(oscarProps.getProperty("isMRefDocSelectList", "").equals("true") ) {
-                                  		// drop down list
-									  Properties prop = null;
-									  Vector vecRef = new Vector();
+						// drop down list
+					  Properties prop = null;
+					  Vector vecRef = new Vector();
 
-                                      List<ProfessionalSpecialist> specialists = professionalSpecialistDao.findAll();
-                                      for(ProfessionalSpecialist specialist : specialists) {
-                                    	  prop = new Properties();
-                                          prop.setProperty("referral_no", specialist.getReferralNo());
-                                          prop.setProperty("last_name", specialist.getLastName());
-                                          prop.setProperty("first_name", specialist.getFirstName());
-                                          vecRef.add(prop);
-                                      }
-                                  %> <select name="r_doctor"
-					onChange="changeRefDoc()" style="width: 200px">
-					<option value=""></option>
-					<% for(int k=0; k<vecRef.size(); k++) {
-                                  		prop= (Properties) vecRef.get(k);
-                                  	%>
-					<option
-						value="<%=prop.getProperty("last_name")+","+prop.getProperty("first_name")%>">
-					<%=Misc.getShortStr( (prop.getProperty("last_name")+","+prop.getProperty("first_name")),"",nStrShowLen)%></option>
-					<% } %>
-				</select> <script language="Javascript">
-<!--
-function changeRefDoc() {
-//alert(document.forms[1].r_doctor.value);
-var refName = document.forms[1].r_doctor.options[document.forms[1].r_doctor.selectedIndex].value;
-var refNo = "";
-  	<% for(int k=0; k<vecRef.size(); k++) {
-  		prop= (Properties) vecRef.get(k);
-  	%>
-if(refName.indexOf("<%=prop.getProperty("last_name")+","+prop.getProperty("first_name")%>")>=0) {
-  refNo = <%=prop.getProperty("referral_no", "")%>;
-}
-<% } %>
-document.forms[1].r_doctor_ohip.value = refNo;
-}
-//-->
-</script> <% } else {%> <input type="text" name="r_doctor" size="30" maxlength="40"
-					value=""> <% } %>
+					  List<ProfessionalSpecialist> specialists = professionalSpecialistDao.findAll();
+					  for(ProfessionalSpecialist specialist : specialists) {
+						  prop = new Properties();
+						  prop.setProperty("referral_no", specialist.getReferralNo());
+						  prop.setProperty("last_name", specialist.getLastName());
+						  prop.setProperty("first_name", specialist.getFirstName());
+						  vecRef.add(prop);
+					  }
+				  %>
+					<select name="referral_doctor_name"
+							onChange="changeRefDoc()" style="width: 200px">
+						<option value=""></option>
+						<% for(int k=0; k<vecRef.size(); k++) {
+											prop= (Properties) vecRef.get(k);
+										%>
+						<option
+							value="<%=prop.getProperty("last_name")+","+prop.getProperty("first_name")%>">
+						<%=Misc.getShortStr( (prop.getProperty("last_name")+","+prop.getProperty("first_name")),"",nStrShowLen)%></option>
+						<% } %>
+					</select>
+					<script type="text/javascript" language="Javascript">
+
+						function changeRefDoc() {
+						var refName = document.forms[1].referral_doctor_name.options[document.forms[1].referral_doctor_name.selectedIndex].value;
+						var refNo = "";
+							<% for(int k=0; k<vecRef.size(); k++) {
+								prop= (Properties) vecRef.get(k);
+							%>
+						if(refName.indexOf("<%=prop.getProperty("last_name")+","+prop.getProperty("first_name")%>")>=0) {
+						  refNo = <%=prop.getProperty("referral_no", "")%>;
+						}
+						<% } %>
+						document.forms[1].referral_doctor_ohip.value = refNo;
+						}
+						//-->
+						</script>
+				<% } else {%>
+					<input type="text" name="referral_doctor_name" size="30" maxlength="40"
+					value="">
+				<% } %>
 				</td>
 				<td align="right" nowrap height="10"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formReferalDoctorN" />:</b></td>
 				<td align="left" height="10"><input type="text"
-					name="r_doctor_ohip" maxlength="6">
+					name="referral_doctor_ohip" maxlength="6">
 				<a
-					href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
+					href="javascript:referralScriptAttach2('referral_doctor_ohip','referral_doctor_name')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
 				#</a>
 				</td>
 			</tr>
 			<!-- Family Doctor -->
             <% if (oscarProps.isPropertyActive("demographic_family_doctor")) { %>
 			<tr>
+				<%if (oscarProps.isPropertyActive("demographic_family_doctor_dropdown"))
+				{ %>
+					<td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.familyDoctor" />: </b></td>
+					<td align="left">
+					<%
+						  Properties prop = null;
+						  Vector vecRef = new Vector();
+						  List<ProfessionalSpecialist> specialists = professionalSpecialistDao.findAll();
+						  for(ProfessionalSpecialist specialist : specialists) {
+							  prop = new Properties();
+							  prop.setProperty("fd_referral_no", specialist.getReferralNo());
+							  prop.setProperty("fd_last_name", specialist.getLastName());
+							  prop.setProperty("fd_first_name", specialist.getFirstName());
+							  vecRef.add(prop);
+						  }
 
-				<td align="right" nowrap><b><bean:message key="demographic.demographiceditdemographic.familyDoctor" />: </b></td>
-				<td align="left">
-				<%
-					  Properties prop = null;
-					  Vector vecRef = new Vector();
-					  List<ProfessionalSpecialist> specialists = professionalSpecialistDao.findAll();
-					  for(ProfessionalSpecialist specialist : specialists) {
-						  prop = new Properties();
-						  prop.setProperty("fd_referral_no", specialist.getReferralNo());
-						  prop.setProperty("fd_last_name", specialist.getLastName());
-						  prop.setProperty("fd_first_name", specialist.getFirstName());
-						  vecRef.add(prop);
-					  }
-
-					  %> <select name="family_doctor" onChange="document.adddemographic.family_doctor_name.value = this.options[this.selectedIndex].innerHTML.trim()" style="width: 200px">
-						<option value=""></option>
-						<% for(int k=0; k<vecRef.size(); k++) {
-							prop= (Properties) vecRef.get(k);
-						%>
-						<option value="<%=prop.getProperty("fd_referral_no","")%>" >
-							<%=Misc.getShortStr( (prop.getProperty("fd_last_name")+", "+prop.getProperty("fd_first_name")),"",nStrShowLen)%>
-						</option>
-						<% } %>
-					</select> 
-					<input type="hidden" name="family_doctor_name" value=""/>
-				</td>
+						  %> <select name="family_doctor" onChange="document.adddemographic.family_doctor_name.value = this.options[this.selectedIndex].innerHTML.trim()" style="width: 200px">
+							<option value=""></option>
+							<% for(int k=0; k<vecRef.size(); k++) {
+								prop= (Properties) vecRef.get(k);
+							%>
+							<option value="<%=prop.getProperty("fd_referral_no","")%>" >
+								<%=Misc.getShortStr( (prop.getProperty("fd_last_name")+", "+prop.getProperty("fd_first_name")),"",nStrShowLen)%>
+							</option>
+							<% } %>
+						</select>
+						<input type="hidden" name="family_doctor_name" value=""/>
+					</td>
+				<% } else { %>
+					<td align="right" nowrap>
+						<b>
+							<bean:message key="demographic.demographiceditdemographic.familyDoctor"/>:
+						</b>
+					</td>
+					<td align="left">
+						<input type="text" name="family_doctor_name"
+							   size="30"
+							   maxlength="40"
+							   value="">
+					</td>
+					<td align="right" nowrap>
+						<b>
+							<bean:message key="demographic.demographiceditdemographic.familyDoctorNo"/>:
+						</b>
+					</td>
+					<td align="left">
+						<input type="text" name="family_doctor_ohip"
+							   size="30"
+							   maxlength="40"
+							   value="">
+					</td>
+				<%}%>
 			</tr>
 			<% } %>
 			<tr valign="top">
@@ -1549,22 +1578,42 @@ Calendar.setup({ inputField : "waiting_list_referral_date", ifFormat : "%Y-%m-%d
 <script type="text/javascript">
 $(document).ready(function(){
 	// AJAX autocomplete referrer doctors 
-	$("input[name=r_doctor]").keypress(function(){
-		$("input[name=r_doctor]").autocomplete({
+	$("input[name=referral_doctor_name]").keypress(function(){
+		$("input[name=referral_doctor_name]").autocomplete({
 	    	source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
 	    	select: function( event, ui){
-	    		$("input[name=r_doctor_ohip]").val(ui.item.referral_no);
+	    		$("input[name=referral_doctor_ohip]").val(ui.item.referral_no);
 	    	}
 		});
 	});
-	$("input[name=r_doctor_ohip]").keypress(function(){
-		$("input[name=r_doctor_ohip]").autocomplete({
+	$("input[name=referral_doctor_ohip]").keypress(function(){
+		$("input[name=referral_doctor_ohip]").autocomplete({
 	    	source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
 	    	select: function( event, ui){
-	    		$("input[name=r_doctor]").val(ui.item.namedesc);
+	    		$("input[name=referral_doctor_name]").val(ui.item.namedesc);
 	    	}
 		});
-	});	
+	});
+
+	// AJAX autocomplete family doctors
+	jQuery("input[name=family_doctor_name]").keypress(function(){
+		jQuery("input[name=family_doctor_name]").autocomplete({
+			source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
+			select: function( event, ui){
+				console.log('name UI: ', ui);
+				jQuery("input[name=family_doctor_ohip]").val(ui.item.referral_no);
+			}
+		});
+	});
+	jQuery("input[name=family_doctor_ohip]").keypress(function(){
+		jQuery("input[name=family_doctor_ohip]").autocomplete({
+			source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+			select: function( event, ui){
+				console.log('num UI: ', ui);
+				jQuery("input[name=family_doctor_name]").val(ui.item.namedesc);
+			}
+		});
+	});
 });
 </script>
 </body>
