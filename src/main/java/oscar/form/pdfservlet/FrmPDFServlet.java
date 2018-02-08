@@ -59,6 +59,7 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfImportedPage;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfWriter;
+import oscar.util.StringUtils;
 
 /**
  *
@@ -671,9 +672,9 @@ public class FrmPDFServlet extends HttpServlet {
 	                            tempName = new StringBuilder(e.nextElement().toString());
 	                            tempValue = tempPropertiesArray[k].getProperty(tempName.toString()).trim();
 	                            if (tempName.toString().equals("__finalEDB"))
-	                                args.setProperty(tempName.toString(), props.getProperty(tempValue));
+	                                args.setProperty(tempName.toString(), StringUtils.noNull(props.getProperty(tempValue)));
 	                            else if (tempName.toString().equals("__xDateScale"))
-	                                args.setProperty(tempName.toString(), props.getProperty(tempValue));
+	                                args.setProperty(tempName.toString(), StringUtils.noNull(props.getProperty(tempValue)));
 	                            else if (tempName.toString().equals("__dateFormat"))
 	                                args.setProperty(tempName.toString(),tempValue);
 	                            else if (tempName.toString().equals("__nMaxPixX"))
