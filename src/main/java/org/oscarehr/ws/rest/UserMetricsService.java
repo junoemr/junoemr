@@ -24,7 +24,7 @@
 
 package org.oscarehr.ws.rest;
 
-import org.oscarehr.ws.rest.to.model.DemographicTo1;
+import io.prometheus.client.Histogram;
 import org.oscarehr.ws.rest.to.model.UserMetricsTo1;
 import org.springframework.stereotype.Component;
 
@@ -34,26 +34,23 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
-import io.prometheus.client.Histogram;
 import java.util.ArrayList;
 
 @Path("/user_metrics")
 @Component("UserMetricsService")
 public class UserMetricsService extends AbstractServiceImpl
 {
-	static final Histogram requestLatency = Histogram.build().
+	private static final Histogram requestLatency = Histogram.build().
 			name("request_latency_seconds").
-			help("Reguest latency in seconds").
+			help("Request latency in seconds").
 			labelNames("page").
 			register();
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces({MediaType.APPLICATION_JSON , MediaType.APPLICATION_XML})
-	public RestResponse<DemographicTo1,String> postMetrics(ArrayList<UserMetricsTo1> data)
+	public RestResponse<String,String> postMetrics(ArrayList<UserMetricsTo1> data)
 	{
-		double time = 6;
 		String page = "appointment";
 		for(UserMetricsTo1 metric : data)
 		{
@@ -65,13 +62,13 @@ public class UserMetricsService extends AbstractServiceImpl
 				}
 			}
 		}
-		return RestResponse.errorResponse("Error");
+		return RestResponse.successResponse("Success");
 	}
 
 	@GET
 	@Produces({MediaType.APPLICATION_JSON , MediaType.APPLICATION_XML})
-	public RestResponse<DemographicTo1,String> test()
+	public RestResponse<String,String> test()
 	{
-		return RestResponse.errorResponse("Error");
+		return RestResponse.successResponse("Success");
 	}
 }
