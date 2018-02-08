@@ -73,6 +73,7 @@
   DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
 %>
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
+<%@ page import="org.oscarehr.common.model.Site" %>
 <html:html locale="true">
 <head>
 <% if (isMobileOptimized) { %>
