@@ -241,4 +241,47 @@ public class DrugDao extends AbstractDao<Drug> {
 		return (results);
 	}
 
+	public Drug findByEverything(String providerNo, int demographicNo, Date rxDate, Date endDate, Date writtenDate, String brandName, int gcn_SEQNO, String customName, float takeMin, float takeMax, String frequencyCode, String duration, String durationUnit, String quantity, String unitName, int repeat, Date lastRefillDate, boolean nosubs, boolean prn, String escapedSpecial, String outsideProviderName, String outsideProviderOhip, boolean customInstr, boolean longTerm, boolean customNote, boolean pastMed,
+								 Boolean patientCompliance, String specialInstruction, String comment, boolean startDateUnknown) {
+
+		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName() + " d WHERE (d.archived = 0 OR d.archived IS NULL) AND d.providerNo = :providerNo AND d.demographicId = :demographicNo AND d.rxDate = :rxDate AND d.endDate = :endDate AND d.writtenDate = :writtenDate AND d.brandName = :brandName AND "
+				+ "d.gcnSeqNo = :gcnSeqNo AND d.customName = :customName AND d.takeMin = :takemin AND d.takeMax = :takemax AND d.freqCode = :freqCode AND d.duration = :duration AND d.durUnit = :durunit AND d.quantity = :quantity AND d.unitName = :unitName AND d.repeat = :repeat AND "
+				+ "d.lastRefillDate = :lastRefillDate AND d.noSubs = :nosubs AND d.prn = :prn AND d.special = :special AND d.outsideProviderName = :outsideProviderName AND d.outsideProviderOhip = :outsideProviderOhip AND d.customInstructions = :customInstructions AND d.longTerm = :longTerm AND "
+				+ "d.customNote = :customNote AND d.pastMed = :pastMed AND d.patientCompliance = :patientCompliance AND d.special_instruction = :specialInstruction AND d.comment = :comment AND d.startDateUnknown = :startDateUnknown");
+
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("demographicNo", demographicNo);
+		query.setParameter("rxDate", rxDate);
+		query.setParameter("endDate", endDate);
+		query.setParameter("writtenDate", writtenDate);
+		query.setParameter("brandName", brandName);
+		query.setParameter("gcnSeqNo", gcn_SEQNO);
+		query.setParameter("customName", customName);
+		query.setParameter("takemin", takeMin);
+		query.setParameter("takemax", takeMax);
+		query.setParameter("freqCode", frequencyCode);
+		query.setParameter("duration", duration);
+		query.setParameter("durunit", durationUnit);
+		query.setParameter("quantity", quantity);
+		query.setParameter("unitName", unitName);
+		query.setParameter("repeat", repeat);
+		query.setParameter("lastRefillDate", lastRefillDate);
+		query.setParameter("nosubs", nosubs);
+		query.setParameter("prn", prn);
+		query.setParameter("special", escapedSpecial);
+		query.setParameter("outsideProviderName", outsideProviderName);
+		query.setParameter("outsideProviderOhip", outsideProviderOhip);
+		query.setParameter("customInstructions", customInstr);
+		query.setParameter("longTerm", longTerm);
+		query.setParameter("customNote", customNote);
+		query.setParameter("pastMed", pastMed);
+		query.setParameter("patientCompliance", patientCompliance);
+		query.setParameter("specialInstruction", specialInstruction);
+		query.setParameter("comment", comment);
+		query.setParameter("startDateUnknown", startDateUnknown);
+
+		query.setMaxResults(1);
+		return getSingleResultOrNull(query);
+	}
+
 }
