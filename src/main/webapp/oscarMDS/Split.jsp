@@ -15,8 +15,9 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite"%>
 <%@page import="oscar.oscarLab.ca.all.*,oscar.oscarMDS.data.*,oscar.oscarLab.ca.all.util.*"%>
-<%@page import="org.oscarehr.common.dao.DocumentDao" %>
+<%@page import="org.oscarehr.document.dao.DocumentDao" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="org.oscarehr.document.model.Document" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -66,7 +67,7 @@ String documentId = request.getParameter("document");
 String queueID = request.getParameter("queueID");
 String demoName = request.getParameter("demoName");
 DocumentDao docdao = SpringUtils.getBean(DocumentDao.class);
-org.oscarehr.common.model.Document thisDocument = docdao.getDocument(documentId);
+Document thisDocument = docdao.getDocument(documentId);
 
 for (int i = 1; i <= thisDocument.getNumberofpages(); i++) {
 %>

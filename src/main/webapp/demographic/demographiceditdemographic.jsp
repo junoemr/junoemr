@@ -106,9 +106,10 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.web.ContactAction,org.oscarehr.managers.DemographicManager" %>
 <%@ page import="org.oscarehr.managers.PatientConsentManager"%>
 <%@ page import="org.oscarehr.managers.ProgramManager2,org.oscarehr.myoscar.utils.MyOscarLoggedInInfo" %>
+<%@ page import="org.oscarehr.provider.service.RecentDemographicAccessService" %>
 <%@ page import="org.oscarehr.sharingcenter.SharingCenterUtil" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="oscar.Misc" %>
 <%@page import="oscar.MyDateFormat" %>
 <%@page import="oscar.OscarProperties" %>
@@ -120,9 +121,8 @@ if(!authed) {
 <%@page import="oscar.oscarDemographic.pageUtil.Util" %>
 <%@page import="oscar.oscarWaitingList.WaitingList" %>
 <%@page import="oscar.util.ConversionUtils" %>
-<%@page import="java.net.URLEncoder" %>
+<%@ page import="java.net.URLEncoder" %>
 <%@ page import="java.text.DecimalFormat" %>
-<%@ page import="java.util.ArrayList" %>
 <%
 	ProfessionalSpecialistDao professionalSpecialistDao = (ProfessionalSpecialistDao) SpringUtils.getBean("professionalSpecialistDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
@@ -134,6 +134,7 @@ if(!authed) {
 	
 	DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
 	ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
+	RecentDemographicAccessService recentDemographicAccessService = SpringUtils.getBean(RecentDemographicAccessService.class);
     
 %>
 
@@ -162,7 +163,9 @@ if(!authed) {
     
 
 	String curProvider_no = (String) session.getAttribute("user");
+	Integer providerNo = Integer.parseInt(curProvider_no);
 	String demographic_no = request.getParameter("demographic_no") ;
+	Integer demographicNo = Integer.parseInt(demographic_no);
 	String apptProvider = request.getParameter("apptProvider");
 	String appointment = request.getParameter("appointment");
 	String userfirstname = (String) session.getAttribute("userfirstname");
@@ -177,14 +180,14 @@ if(!authed) {
 	boolean hasImportExtra = (cml.size()>0);
 	String annotation_display = CaseManagementNoteLink.DISP_DEMO;
 
-	LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC,  demographic_no , request.getRemoteAddr(),demographic_no);
-
+	LogAction.addLogEntry(curProvider_no, demographicNo, LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, demographic_no, request.getRemoteAddr());
+	recentDemographicAccessService.updateAccessRecord(providerNo, demographicNo);
 
 	OscarProperties oscarProps = OscarProperties.getInstance();
 
         Boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
 	ProvinceNames pNames = ProvinceNames.getInstance();
-	Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(Integer.parseInt(demographic_no));
+	Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographicNo);
 
 	
 	String usSigned = StringUtils.defaultString(apptMainBean.getString(demoExt.get("usSigned")));
@@ -231,15 +234,16 @@ if(!authed) {
 	if( OscarProperties.getInstance().getBooleanProperty("USE_NEW_PATIENT_CONSENT_MODULE", "true") ) {
 	    PatientConsentManager patientConsentManager = SpringUtils.getBean( PatientConsentManager.class );
 		pageContext.setAttribute( "consentTypes", patientConsentManager.getConsentTypes() );
-		pageContext.setAttribute( "patientConsents", patientConsentManager.getAllConsentsByDemographic( loggedInInfo, Integer.parseInt(demographic_no) ) );
+		pageContext.setAttribute( "patientConsents", patientConsentManager.getAllConsentsByDemographic( loggedInInfo, demographicNo ) );
 	}
 
 %>
 
 
 
+<%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Calendar"%>
-<%@page import="java.util.Collections"%>
+<%@ page import="java.util.Collections" %>
 <%@ page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
@@ -798,7 +802,7 @@ jQuery(document).ready(function() {
 
                                 String resident="", nurse="", alert="", notes="", midwife="";
                                 
-                                DemographicCust demographicCust = demographicCustDao.find(Integer.parseInt(demographic_no));
+                                DemographicCust demographicCust = demographicCustDao.find(demographicNo);
                                 if(demographicCust != null) {
                                     resident = demographicCust.getResident() == null ? "" : demographicCust.getResident();
                             		nurse = demographicCust.getNurse() == null ? "" : demographicCust.getNurse();
@@ -910,7 +914,8 @@ if(wLReadonly.equals("")){
 					if ("CLINICAID".equals(billRegion)) 
 					{
 						%>
-							<a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">
+							<a href="../billing.do?billRegion=CLINICAID&action=invoice_reports&patient_remote_id=<%=demographic.getDemographicNo()%>"
+							   target="_blank">
 							<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/>
 							</a>
 						<%
@@ -2503,7 +2508,7 @@ if ( Dead.equals(PatStat) ) {%>
 								<td align="left" nowrap><input type="text"
 									name="year_of_birth" <%=getDisabled("year_of_birth")%>
 									value="<%=birthYear%>"
-									size="3" maxlength="4"> 
+									size="4" maxlength="4">
 
 									<% 
 									String sbMonth;

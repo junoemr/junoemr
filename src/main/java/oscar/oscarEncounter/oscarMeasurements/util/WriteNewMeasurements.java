@@ -40,7 +40,6 @@ import oscar.oscarEncounter.oscarMeasurements.pageUtil.EctValidation;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -51,7 +50,7 @@ public class WriteNewMeasurements {
 	private static MeasurementTypeDao measurementTypeDao = SpringUtils.getBean(MeasurementTypeDao.class);
 	private static MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
 
-    public static ActionMessages addMeasurements(ArrayList names, ArrayList values, String demographicNo, String providerNo) {
+    public static ActionMessages addMeasurements(List<String> names, List<String> values, String demographicNo, String providerNo) {
             //must be called on the same eform object because it retrieves some of its properties
         Vector measures = new Vector();
         for (int i=0; i<names.size(); i++) {

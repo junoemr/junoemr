@@ -24,6 +24,17 @@
 
 package oscar.dms;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.log4j.Logger;
+import org.apache.struts.upload.FormFile;
+import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.util.MiscUtils;
+import oscar.OscarProperties;
+import oscar.oscarTags.TagObject;
+import oscar.util.UtilDateUtilities;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,17 +43,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.log4j.Logger;
-import org.apache.struts.upload.FormFile;
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.util.MiscUtils;
-
-import oscar.OscarProperties;
-import oscar.oscarTags.TagObject;
-import oscar.util.UtilDateUtilities;
-
+/**
+ * @deprecated use oscarehr.document.service.Document for new changes
+ */
+@Deprecated
 public class EDoc extends TagObject implements Comparable<EDoc> {
 	private static final Logger logger = MiscUtils.getLogger();
 
@@ -167,8 +171,7 @@ public class EDoc extends TagObject implements Comparable<EDoc> {
 		this.setDateTimeStampAsDate(EDocUtil.getDmsDateTimeAsDate());
                 this.setContentDateTime(EDocUtil.getDmsDateTimeAsDate());
 		if (fileName.length() != 0) {
-			String filenamePrefix = UtilDateUtilities.DateToString(new Date(), "yyyyMMdd") + UtilDateUtilities.DateToString(new Date(), "HHmmss");
-			this.fileName = filenamePrefix + fileName;
+			this.fileName = GenericFile.getFormattedFileName(fileName);
 		}
 	}
 

@@ -107,7 +107,7 @@ public class DemographicManager {
 	
 
 	public Demographic getDemographic(LoggedInInfo loggedInInfo, Integer demographicId) throws PatientDirectiveException {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ, (demographicId!=null)?demographicId:null );
+		checkPrivilege(loggedInInfo, SecurityInfoManager.READ, demographicId);
 		
 		return demographicDao.getDemographicById(demographicId);
 	}

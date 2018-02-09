@@ -23,8 +23,32 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.ArrayList;
-import java.util.List;
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+import net.sf.json.processors.JsDateJsonBeanProcessor;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.oauth.data.OAuthContext;
+import org.apache.cxf.security.SecurityContext;
+import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.managers.PreferenceManager;
+import org.oscarehr.managers.ProviderManager2;
+import org.oscarehr.managers.model.ProviderSettings;
+import org.oscarehr.provider.model.RecentDemographicAccess;
+import org.oscarehr.provider.service.RecentDemographicAccessService;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.web.PatientListApptItemBean;
+import org.oscarehr.ws.rest.conversion.ProviderConverter;
+import org.oscarehr.ws.rest.to.AbstractSearchResponse;
+import org.oscarehr.ws.rest.to.GenericRESTResponse;
+import org.oscarehr.ws.rest.to.model.ProviderTo1;
+import org.oscarehr.ws.transfer_objects.ProviderTransfer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -35,32 +59,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
-import net.sf.json.processors.JsDateJsonBeanProcessor;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.rs.security.oauth.data.OAuthContext;
-import org.apache.cxf.security.SecurityContext;
-import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.OscarLog;
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.managers.OscarLogManager;
-import org.oscarehr.managers.ProviderManager2;
-import org.oscarehr.managers.model.ProviderSettings;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.web.PatientListApptBean;
-import org.oscarehr.web.PatientListApptItemBean;
-import org.oscarehr.ws.rest.conversion.ProviderConverter;
-import org.oscarehr.ws.rest.to.AbstractSearchResponse;
-import org.oscarehr.ws.rest.to.GenericRESTResponse;
-import org.oscarehr.ws.rest.to.model.ProviderTo1;
-import org.oscarehr.ws.transfer_objects.ProviderTransfer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 @Component("ProviderService")
@@ -68,17 +69,22 @@ import org.springframework.stereotype.Component;
 @Produces("application/xml")
 public class ProviderService extends AbstractServiceImpl {
 
+	private static Logger logger = MiscUtils.getLogger();
+
 	@Autowired
 	ProviderDao providerDao;
 	
 	@Autowired
-	ProviderManager2 providerManager; 
-	
-	@Autowired
-	OscarLogManager oscarLogManager;
+	ProviderManager2 providerManager;
 	
 	@Autowired
 	DemographicManager demographicManager;
+
+	@Autowired
+	RecentDemographicAccessService recentDemographicAccessService;
+
+	@Autowired
+	private PreferenceManager preferenceManager;
 	
 	
 	protected SecurityContext getSecurityContext() {
@@ -189,23 +195,44 @@ public class ProviderService extends AbstractServiceImpl {
 	@GET
 	@Path("/getRecentDemographicsViewed")
 	@Produces("application/json")
-	public PatientListApptBean getRecentDemographicsViewed(@QueryParam("startIndex") Integer startIndex,@QueryParam("itemsToReturn") Integer itemsToReturn ) {	
-		List<OscarLog> results = oscarLogManager.getRecentDemographicsViewedByProvider(getLoggedInInfo(), getLoggedInInfo().getLoggedInProviderNo(), startIndex, itemsToReturn);
-		PatientListApptBean response = new PatientListApptBean();
-		
-		for(OscarLog logItem : results) {
-			Demographic d = demographicManager.getDemographic(getLoggedInInfo(), logItem.getDemographicId());
-			
-			if(d != null) {
-				PatientListApptItemBean item = new PatientListApptItemBean();
-				item.setDemographicNo(logItem.getDemographicId());
-				item.setDate(logItem.getCreated());
-				item.setName(d.getFormattedName());
-				response.getPatients().add(item);
+	public RestResponse<List<PatientListApptItemBean>,String> getRecentDemographicsViewed()
+	{
+		List<PatientListApptItemBean> resultList = new ArrayList<>();
+
+		try
+		{
+			int providerNo = Integer.parseInt(getLoggedInInfo().getLoggedInProviderNo());
+			int offset = 0;
+			int limit = 8;
+
+			String recentPatients = preferenceManager.getProviderPreference(getLoggedInInfo(), "recentPatients");
+			if(recentPatients != null)
+			{
+				limit = Integer.parseInt(recentPatients);
 			}
 
+			List<RecentDemographicAccess> results = recentDemographicAccessService.getRecentAccessList(providerNo, offset, limit);
+
+			//TODO avoid the loop over demographics to get the display name
+			for(RecentDemographicAccess result : results)
+			{
+				Integer demographicNo = result.getDemographicNo();
+				Date accessDateTime = result.getAccessDateTime();
+				Demographic demographic = demographicManager.getDemographic(getLoggedInInfo(), demographicNo);
+
+				PatientListApptItemBean item = new PatientListApptItemBean();
+				item.setDemographicNo(demographicNo);
+				item.setDate(accessDateTime);
+				item.setName(demographic.getDisplayName());
+				resultList.add(item);
+			}
 		}
-		return response;
+		catch(Exception e)
+		{
+			logger.error("Error retrieving recent demographics viewed", e);
+			return RestResponse.errorResponse("Error retrieving recent demographics viewed");
+		}
+		return RestResponse.successResponse(resultList);
 	}
 	
 	@GET

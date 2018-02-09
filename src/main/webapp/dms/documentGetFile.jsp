@@ -29,8 +29,8 @@
 <%@taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@page import="java.math.*, java.util.*, java.io.*, java.sql.*, oscar.*, java.net.*,oscar.MyDateFormat"%>
 <%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.dao.DocumentDao" %>
-<%@page import="org.oscarehr.common.model.Document" %>
+<%@page import="org.oscarehr.document.dao.DocumentDao" %>
+<%@page import="org.oscarehr.document.model.Document" %>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%

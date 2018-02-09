@@ -21,31 +21,41 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.managers;
 
-import java.util.List;
+package org.oscarehr.eform.exception;
 
-import org.oscarehr.common.dao.OscarLogDao;
-import org.oscarehr.common.model.OscarLog;
-import org.oscarehr.util.LoggedInInfo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.apache.struts.action.ActionMessages;
+import oscar.eform.data.EForm;
 
-import oscar.log.LogAction;
+/**
+ * Custom exception class for saving EForms.
+ * This is intended as a way to allow specific errors and error messages to be
+ * passed out of the transactional service for backwards compatibility.
+ */
+public class EFormMeasurementException extends RuntimeException
+{
+	private ActionMessages errors;
+	private EForm eformData;
 
-@Service
-public class OscarLogManager {
-
-	@Autowired 
-	private OscarLogDao oscarLogDao;
-	
-	public List<OscarLog> getRecentDemographicsViewedByProvider(LoggedInInfo loggedInInfo, String providerNo, int startPosition, int itemsToReturn) {
-		List<OscarLog> results = oscarLogDao.getRecentDemographicsViewedByProvider(providerNo, startPosition, itemsToReturn);
-
-		LogAction.addLogSynchronous(loggedInInfo,"OscarLogManager.getRecentDemographicsViewedByProvider", "providerNo"+providerNo);
-		
-		return results;
-			
+	public EFormMeasurementException(String message)
+	{
+		super(message);
+		eformData = null;
+		errors = null;
 	}
-	
+
+	public EFormMeasurementException(String message, ActionMessages errors, EForm eformData)
+	{
+		super(message);
+		this.eformData = eformData;
+		this.errors = errors;
+	}
+	public ActionMessages getErrors()
+	{
+		return errors;
+	}
+	public EForm getEformData()
+	{
+		return eformData;
+	}
 }

@@ -633,7 +633,12 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
       	      url: '<%=request.getContextPath()%>'+"/lab/CA/ALL/createLabelTDIS.do",
       	      dataType: "json",
       	      data: { lab_no: jQuery("#labNum_<%=segmentID%>").val(),accessionNum: jQuery("#accNum").val(), label: jQuery("#label_<%=segmentID%>").val(), ajaxcall: true },
-      	      success: function(result) {alert("label applied");
+      	      success: function(result)
+			  {
+			  	<%
+			  	if(!OscarProperties.getInstance().isPropertyActive("disable_lab_label_alert")) {%>
+				  alert("label applied");
+			  	<%}%>
       	    	jQuery("#labelspan_<%=segmentID%>").children().get(0).innerHTML = "Label: " +  jQuery("#label_<%=segmentID%>").val();
         	  	document.forms['acknowledgeForm_<%=segmentID%>'].label.value = "";    
       	      }
@@ -658,7 +663,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 					<input type="hidden" id="label_<%=segmentID %>" name="label" value="<%=label%>">
 		</form>
 
-        <form name="acknowledgeForm_<%=segmentID%>" id="acknowledgeForm_<%=segmentID%>" method="post" onsubmit="javascript:void(0);" method="post" action="javascript:void(0);" >
+        <form name="acknowledgeForm_<%=segmentID%>" id="acknowledgeForm_<%=segmentID%>" method="post" onsubmit="javascript:void(0);" action="javascript:void(0);" >
 
             <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
@@ -1477,7 +1482,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                     	if(isUnstructuredDoc){%>
                                    			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>"><%
                                    			if((obxCount>1) && k>1 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1))) {%>
-                                   				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"></a><%
+                                   				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"></a><%
                                    				}
                                    			else{%> <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a><%}%>
 											<%if(isVIHARtf) {
@@ -1675,8 +1680,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                     </td>
                 </tr>
             </table>
-
-        </form>      
+        </form>
         
         <%String s = ""+System.currentTimeMillis();%>
         <a style="color:white;" href="javascript: void(0);" onclick="showHideItem('rawhl7<%=s%>');" >show</a>

@@ -370,6 +370,14 @@ for (int i=0; i<sites.size(); i++) {
 			<td><input type="text" name="alberta_tak_no" maxlength="20"></td>
 		</tr>
 		<%} %>
+		<%
+			if (OscarProperties.getInstance().getProperty("instance_type").equals("BC")) {
+		%>
+		<tr>
+			<td align="right"><bean:message key="admin.provider.formIHAMnemonic" />:</td>
+			<td><input type="text" name="alberta_e_delivery_ids"></td>
+		</tr>
+		<%} %>
 		<tr>
 			<td align="right"><bean:message
 				key="admin.provider.formSpecialtyCode" />:</td>

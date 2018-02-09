@@ -38,7 +38,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.dao.EFormDataDao;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.util.SpringUtils;
 
 public class EFormDataDaoTest extends DaoTestFixtures {

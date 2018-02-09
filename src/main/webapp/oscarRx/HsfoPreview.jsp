@@ -28,6 +28,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page import="java.io.File"%>
 <%@ page import="oscar.oscarProvider.data.*"%>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@ page import="oscar.*,java.lang.*"%>
@@ -86,6 +87,18 @@ if (hasSig){
 doctorName = doctorName.replaceAll("\\d{6}","");
 doctorName = doctorName.replaceAll("\\-","");
 OscarProperties props = OscarProperties.getInstance();
+
+String logoSrc = "img/rx.gif";
+String logoPath;
+
+String custom_logo_name = props.getProperty("rx_custom_logo");
+if(custom_logo_name != null ){
+	logoPath = oscar.OscarProperties.getInstance().getProperty("eform_image","")+custom_logo_name;
+	File f = new File(logoPath);
+	if(f.exists()) {
+		logoSrc = request.getContextPath() + "/eform/displayImage.do?imagefile=" + custom_logo_name;
+	}
+}
 %>
 <html:form action="/form/formname">
 
@@ -93,7 +106,7 @@ OscarProperties props = OscarProperties.getInstance();
 		border=0 style="border: 2px ridge;">
 		<tr>
 			<td valign=top height="100px"><input type="image"
-				src="img/rx.gif" border="0" value="submit" alt="[Submit]"
+				src="<%=logoSrc%>" border="0" value="submit" alt="[Submit]" style="max-height:100px; max-width:100px;"
 				name="submit" title="Print in a half letter size paper"
 				onclick="javascript:return onPrint();"> <input type="hidden"
 				name="printPageSize" value="PageSize.A6" /> <% 	String clinicTitle = provider.getClinicName().replaceAll("\\(\\d{6}\\)","") + "<br>" ;

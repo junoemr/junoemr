@@ -9,12 +9,11 @@
 
 --%>
 <%@page contentType="text/html"%>
-<%@page import="oscar.dms.data.*,java.util.*,oscar.oscarLab.ca.on.CommonLabResultData,org.oscarehr.util.SpringUtils,org.oscarehr.common.dao.QueueDao, oscar.oscarMDS.data.ProviderData" %>
-<%@page import="org.oscarehr.PMmodule.dao.ProviderDao, org.oscarehr.common.model.Provider" %>
-<%@page import="oscar.OscarProperties"%>
-<%@page import="org.oscarehr.common.model.UserProperty"%>
-<%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.common.dao.UserPropertyDAO"%>
+<%@page import="org.oscarehr.PMmodule.dao.ProviderDao,org.oscarehr.common.dao.QueueDao,org.oscarehr.common.dao.UserPropertyDAO,org.oscarehr.common.model.Provider,org.oscarehr.common.model.UserProperty" %>
+<%@page import="org.oscarehr.util.SpringUtils, oscar.oscarLab.ca.on.CommonLabResultData" %>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="java.util.Map"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%

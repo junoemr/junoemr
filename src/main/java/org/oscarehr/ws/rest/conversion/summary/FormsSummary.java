@@ -27,7 +27,7 @@ package org.oscarehr.ws.rest.conversion.summary;
 import java.util.Collections;
 import java.util.List;
 
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.FormsManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;
@@ -69,7 +69,7 @@ public class FormsSummary implements Summary{
 			int id = eformData.getId();
 			
 			//list.add(new SummaryItemTo1(id, eformData.getFormName(),"#/record/"+demographicNo+"/forms/eform/id/"+id));
-			list.add(new SummaryItemTo1(id, eformData.getFormName(),"record.forms.existing","eform"));
+			list.add(new SummaryItemTo1(id, eformData.getFormName(),"record.forms.view","eform"));
 			count++;
 			/*int formId = eformData.getFormId();
 			String name = eformData.getFormName();

@@ -46,11 +46,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.common.dao.CtlDocumentDao;
+import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.DocumentDao;
+import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.common.dao.PropertyDao;
-import org.oscarehr.common.model.CtlDocument;
+import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Property;
@@ -462,7 +462,7 @@ public class PHRUserManagementAction extends DispatchAction {
 			boas.writeTo(fos);
 
 
-			org.oscarehr.common.model.Document document = new org.oscarehr.common.model.Document();
+			org.oscarehr.document.model.Document document = new org.oscarehr.document.model.Document();
 			document.setContenttype("application/pdf");
 			document.setDocdesc("PHR Registration");
 			document.setDocfilename(filename);

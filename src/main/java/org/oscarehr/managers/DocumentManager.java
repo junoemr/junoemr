@@ -28,10 +28,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.oscarehr.common.dao.CtlDocumentDao;
-import org.oscarehr.common.dao.DocumentDao;
-import org.oscarehr.common.model.CtlDocument;
-import org.oscarehr.common.model.Document;
+import org.oscarehr.document.dao.CtlDocumentDao;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.model.CtlDocument;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -24,6 +24,56 @@
 
 package oscar.eform;
 
+import com.quatro.model.security.Secobjprivilege;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.PMmodule.model.ProgramProvider;
+import org.oscarehr.casemgmt.dao.CaseManagementNoteLinkDAO;
+import org.oscarehr.casemgmt.model.CaseManagementIssue;
+import org.oscarehr.casemgmt.model.CaseManagementNote;
+import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
+import org.oscarehr.casemgmt.model.Issue;
+import org.oscarehr.casemgmt.service.CaseManagementManager;
+import org.oscarehr.common.dao.ConsultationRequestDao;
+import org.oscarehr.common.dao.EFormGroupDao;
+import org.oscarehr.common.dao.ProfessionalSpecialistDao;
+import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.common.dao.TicklerDao;
+import org.oscarehr.common.model.ConsultationRequest;
+import org.oscarehr.common.model.EFormGroup;
+import org.oscarehr.common.model.OscarMsgType;
+import org.oscarehr.common.model.Prevention;
+import org.oscarehr.common.model.ProfessionalSpecialist;
+import org.oscarehr.common.model.SecRole;
+import org.oscarehr.common.model.Tickler;
+import org.oscarehr.eform.dao.EFormDao;
+import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
+import org.oscarehr.eform.dao.EFormDataDao;
+import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.managers.PreventionManager;
+import org.oscarehr.managers.ProgramManager2;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.OscarProperties;
+import oscar.dms.EDoc;
+import oscar.dms.EDocUtil;
+import oscar.eform.actions.DisplayImageAction;
+import oscar.eform.data.EForm;
+import oscar.eform.data.EFormBase;
+import oscar.oscarClinic.ClinicData;
+import oscar.oscarDB.DBHandler;
+import oscar.oscarMessenger.data.MsgMessageData;
+import oscar.util.ConversionUtils;
+import oscar.util.OscarRoleObjectPrivilege;
+import oscar.util.UtilDateUtilities;
+
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -44,62 +94,11 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.persistence.PersistenceException;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.PMmodule.model.ProgramProvider;
-import org.oscarehr.casemgmt.dao.CaseManagementNoteLinkDAO;
-import org.oscarehr.casemgmt.model.CaseManagementIssue;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
-import org.oscarehr.casemgmt.model.Issue;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.oscarehr.common.dao.ConsultationRequestDao;
-import org.oscarehr.common.dao.EFormDao;
-import org.oscarehr.common.dao.EFormDao.EFormSortOrder;
-import org.oscarehr.common.dao.EFormDataDao;
-import org.oscarehr.common.dao.EFormGroupDao;
-import org.oscarehr.common.dao.EFormValueDao;
-import org.oscarehr.common.dao.ProfessionalSpecialistDao;
-import org.oscarehr.common.dao.SecRoleDao;
-import org.oscarehr.common.dao.TicklerDao;
-import org.oscarehr.common.model.ConsultationRequest;
-import org.oscarehr.common.model.EFormData;
-import org.oscarehr.common.model.EFormGroup;
-import org.oscarehr.common.model.EFormValue;
-import org.oscarehr.common.model.Prevention;
-import org.oscarehr.common.model.ProfessionalSpecialist;
-import org.oscarehr.common.model.SecRole;
-import org.oscarehr.common.model.Tickler;
-import org.oscarehr.managers.PreventionManager;
-import org.oscarehr.managers.ProgramManager2;
-import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
-import com.quatro.model.security.Secobjprivilege;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import org.oscarehr.common.model.OscarMsgType;
-import oscar.OscarProperties;
-import oscar.dms.EDoc;
-import oscar.dms.EDocUtil;
-import oscar.eform.actions.DisplayImageAction;
-import oscar.eform.data.EForm;
-import oscar.eform.data.EFormBase;
-import oscar.oscarClinic.ClinicData;
-import oscar.oscarDB.DBHandler;
-import oscar.oscarMessenger.data.MsgMessageData;
-import oscar.util.ConversionUtils;
-import oscar.util.OscarRoleObjectPrivilege;
-import oscar.util.UtilDateUtilities;
-
+/**
+ * use the oscarehr/eform/service objects for anything new
+ * @deprecated
+ */
+@Deprecated
 public class EFormUtil {
 	private static final Logger logger = MiscUtils.getLogger();
 
@@ -117,12 +116,10 @@ public class EFormUtil {
 	private static CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean(CaseManagementManager.class);
 	private static CaseManagementNoteLinkDAO cmDao = (CaseManagementNoteLinkDAO) SpringUtils.getBean(CaseManagementNoteLinkDAO.class);
 	private static EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean(EFormDataDao.class);
-	private static EFormValueDao eFormValueDao = (EFormValueDao) SpringUtils.getBean(EFormValueDao.class);
 	private static EFormGroupDao eFormGroupDao = (EFormGroupDao) SpringUtils.getBean(EFormGroupDao.class);
 	private static ProviderDao providerDao = (ProviderDao) SpringUtils.getBean(ProviderDao.class);
 	private static TicklerDao ticklerDao = SpringUtils.getBean(TicklerDao.class);
 	private static PreventionManager preventionManager = SpringUtils.getBean(PreventionManager.class);
-	private static ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
 	private static ConsultationRequestDao consultationRequestDao = SpringUtils.getBean(ConsultationRequestDao.class);
 	private static ProfessionalSpecialistDao professionalSpecialistDao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
 	
@@ -144,7 +141,7 @@ public class EFormUtil {
 	public static String saveEForm(String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, String roleType) {
 		// called by the upload action, puts the uploaded form into DB		
 
-		org.oscarehr.common.model.EForm eform = new org.oscarehr.common.model.EForm();
+		org.oscarehr.eform.model.EForm eform = new org.oscarehr.eform.model.EForm();
 		eform.setFormName(formName);
 		eform.setFileName(fileName);
 		eform.setSubject(formSubject);
@@ -165,7 +162,7 @@ public class EFormUtil {
 
 		// sends back a list of forms that were uploaded (those that can be added to the patient)
 		EFormDao dao = SpringUtils.getBean(EFormDao.class);
-		List<org.oscarehr.common.model.EForm> eforms = null;
+		List<org.oscarehr.eform.model.EForm> eforms = null;
 		Boolean status = null;
 		if (deleted.equals("deleted")) {
 			status = false;
@@ -184,7 +181,7 @@ public class EFormUtil {
 		eforms = dao.findByStatus(status, sortOrder);
 
 		ArrayList<HashMap<String, ? extends Object>> results = new ArrayList<HashMap<String, ? extends Object>>();
-		for (org.oscarehr.common.model.EForm eform : eforms) {
+		for (org.oscarehr.eform.model.EForm eform : eforms) {
 			HashMap<String, Object> curht = new HashMap<String, Object>();
 			curht.put("fid", eform.getId().toString());
 			curht.put("formName", eform.getFormName());
@@ -436,7 +433,7 @@ public class EFormUtil {
 	public static HashMap<String, Object> loadEForm(String fid) {
 		EFormDao dao = SpringUtils.getBean(EFormDao.class);
 		Integer id = Integer.valueOf(fid);
-		org.oscarehr.common.model.EForm eform = dao.find(id);
+		org.oscarehr.eform.model.EForm eform = dao.find(id);
 		HashMap<String, Object> curht = new HashMap<String, Object>();
 		if (eform == null) {
 			logger.error("Unable to find EForm with ID = " + fid);
@@ -465,7 +462,7 @@ public class EFormUtil {
 		// Updates the form - used by editForm
 	
 		EFormDao dao = SpringUtils.getBean(EFormDao.class);
-		org.oscarehr.common.model.EForm eform = dao.find(Integer.parseInt(updatedForm.getFid()));
+		org.oscarehr.eform.model.EForm eform = dao.find(Integer.parseInt(updatedForm.getFid()));
 		if (eform == null) {
 			logger.error("Unable to find eform for update: " + updatedForm);
 			return;
@@ -502,7 +499,7 @@ public class EFormUtil {
 
 	public static String getEFormParameter(String fid, String fieldName) {
 		EFormDao dao = SpringUtils.getBean(EFormDao.class); 
-		org.oscarehr.common.model.EForm eform = dao.find(ConversionUtils.fromIntString(fid));
+		org.oscarehr.eform.model.EForm eform = dao.find(ConversionUtils.fromIntString(fid));
 		if (eform == null) {
 			logger.error("Unable to find EForm for ID = " + fid);
 			return "";
@@ -540,14 +537,6 @@ public class EFormUtil {
 		Integer maxId = dao.findMaxIdForActiveForm(name);
 		
 		return (maxId == null ? null : maxId.toString());
-	}
-	
-	public static void delEForm(String fid) {
-		setFormStatus(fid, false);
-	}
-
-	public static void restoreEForm(String fid) {
-		setFormStatus(fid, true);
 	}
 
 	@Deprecated
@@ -620,28 +609,9 @@ public class EFormUtil {
 		return sb.toString();
 	}
 
-	public static void addEFormValues(ArrayList<String> names, ArrayList<String> values, Integer fdid, Integer fid, Integer demographic_no) {
-		// adds parsed values and names to DB
-		// names.size and values.size must equal!
-		try {
-			for (int i = 0; i < names.size(); i++) {
-				EFormValue eFormValue = new EFormValue();
-				eFormValue.setFormId(fid);
-				eFormValue.setFormDataId(fdid);
-				eFormValue.setDemographicId(demographic_no);
-				eFormValue.setVarName(names.get(i));
-				eFormValue.setVarValue(values.get(i));
-
-				eFormValueDao.persist(eFormValue);
-			}
-		} catch (PersistenceException ee) {
-			logger.error("Unexpected Error", ee);
-		}
-	}
-
 	public static boolean formExistsInDB(String eFormName) {
 		EFormDao dao = SpringUtils.getBean(EFormDao.class);
-		org.oscarehr.common.model.EForm eform = dao.findByName(eFormName);
+		org.oscarehr.eform.model.EForm eform = dao.findByName(eFormName);
 		return eform != null;
 	}
 
@@ -1274,17 +1244,6 @@ public class EFormUtil {
 			logger.error("Error", sqe);
 		}
 		return (rs);
-	}
-
-	private static void setFormStatus(String fid, boolean status) {
-		EFormDao dao = SpringUtils.getBean(EFormDao.class);
-		org.oscarehr.common.model.EForm eform = dao.find(ConversionUtils.fromIntString(fid));
-		if (eform == null) {
-			logger.error("Unable to find EForm for " + fid);
-			return;
-		}
-		eform.setCurrent(status);
-		dao.merge(eform);
 	}
 
 	private static String rsGetString(ResultSet rs, String column) throws SQLException {
