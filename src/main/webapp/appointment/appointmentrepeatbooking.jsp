@@ -62,7 +62,7 @@
     boolean bSucc = false;
     if (request.getParameter("groupappt").equals("Add Group Appointment")) {
         int rowsAffected=0, datano=0;
-		String createdDateTime = UtilDateUtilities.DateToString(new Date(),"yyyy-MM-dd HH:mm:ss");
+		Date createdDateTime = new Date();
 		String userName = (String) session.getAttribute("userlastname") + ", " + (String) session.getAttribute("userfirstname");
 		String everyNum = request.getParameter("everyNum")!=null? request.getParameter("everyNum") : "0";
 		String everyUnit = request.getParameter("everyUnit")!=null? request.getParameter("everyUnit") : "day";
@@ -93,7 +93,7 @@
 			a.setStyle(request.getParameter("style"));
 			a.setBilling(request.getParameter("billing"));
 			a.setStatus(request.getParameter("status"));
-			a.setCreateDateTime(new java.util.Date());
+			a.setCreateDateTime(createdDateTime);
 			a.setCreator(userName);
 			a.setRemarks(request.getParameter("remarks"));
 			if (request.getParameter("demographic_no")!=null && !(request.getParameter("demographic_no").equals(""))) {
@@ -132,7 +132,7 @@
     if (request.getParameter("groupappt").equals("Group Update") || request.getParameter("groupappt").equals("Group Cancel") ||
     		request.getParameter("groupappt").equals("Group Delete")) {
         int rowsAffected=0, datano=0;
-		String createdDateTime = UtilDateUtilities.DateToString(new Date(),"yyyy-MM-dd HH:mm:ss");
+		Date createdDateTime = new Date();
 		String userName =  (String) session.getAttribute("userlastname") + ", " + (String) session.getAttribute("userfirstname");
 
 		for (Enumeration e = request.getParameterNames() ; e.hasMoreElements() ;) {
@@ -186,7 +186,7 @@
 				a.setStyle(request.getParameter("style"));
 				a.setBilling(request.getParameter("billing"));
 				a.setStatus(request.getParameter("status"));
-				a.setCreateDateTime(new java.util.Date());
+				a.setCreateDateTime(createdDateTime);
 				a.setCreator(userName);
 				a.setRemarks(request.getParameter("remarks"));
 				if (!(request.getParameter("demographic_no").equals("")) && strbuf.toString().indexOf("one") != -1) {
