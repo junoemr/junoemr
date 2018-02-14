@@ -30,10 +30,10 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.util.MiscUtils;
 
 import oscar.OscarProperties;
@@ -57,12 +57,12 @@ import java.io.IOException;
  *
  * @author jay
  */
-public class SendFaxPDFAction extends Action {
+public class SendFaxPDFAction extends DispatchAction {
 
-    public ActionForward execute(ActionMapping mapping, ActionForm form, 
+    public ActionForward faxDocument(ActionMapping mapping, ActionForm form,
 		HttpServletRequest request, HttpServletResponse response) 
 	{
-		if(!OscarProperties.getInstance().isPropertyActive("document_fax_enabled")) 
+		if (!OscarProperties.getInstance().isDocumentFaxEnabled())
 		{
 			return mapping.findForward("failed");
 		}
@@ -103,45 +103,20 @@ public class SendFaxPDFAction extends Action {
 					Exception exception = null;
 					try
 					{
-						sendFax(docNo, path, faxPdf, faxNo);
+						sendFax("DOC-" + docNo, faxPdf, faxNo);
 					}
-					catch (DocumentException de) 
-					{
-						error = "DocumentException";
-						message = de.getMessage();
-						exception = de;
-					} 
-					catch (FileNotFoundException fnfe) 
-					{
-						error = "FileNotFoundException";
-						message = "Cannot find file to fax (" + filename + ")";
-						exception = fnfe;
-					} 
-					catch (IOException ioe) 
-					{
-						error = "IOException";
-						message = "File error (" + filename + ")";
-						exception = ioe;
-					} 
 					catch(Exception e)
 					{
-						error = "Exception";
-						message = "A system error occurred";
-						exception = e;
-					}
-
-					if (!error.equals("")) 
-					{
-						MiscUtils.getLogger().error(
-							error + " occured insided SendFaxPDFAction", exception);
-						errorList.add(message);
-						request.setAttribute("printError", new Boolean(true));
+						MiscUtils.getLogger().error(e.getClass().getCanonicalName() +
+								" occurred while preparing document fax files.");
+						String errorAt = " (Document: " + filename + " Recipient: " + recipients[j] + ")";
+						errorList.add(getUserFriendlyError(e) + errorAt);
 						continue;
 					}
 
 					/* -- OHSUPPORT-2932 -- */
 					if(OscarProperties.getInstance().isPropertyActive(
-						"encounter_notes_add_fax_notes_consult") && demoNo != "-1") 
+						"encounter_notes_add_fax_notes_consult") && demoNo != "-1")
 					{
 						MiscUtils.getLogger().info("SAVING NOTE FOR " + demoNo);
 						String programNo = 
@@ -151,50 +126,100 @@ public class SendFaxPDFAction extends Action {
 					}
 				}
 			}
+			if (errorList.size() != 0)
+			{
+				request.setAttribute("printError", true);
+			}
         }
 		
 		request.setAttribute("errors", errorList);
-
         return mapping.findForward("success");
     }
 
-	private void sendFax(String docNo, String path, String faxPdf, String faxNo)
-		throws DocumentException, IOException, FileNotFoundException
+	public ActionForward faxForm(ActionMapping mapping, ActionForm form,
+								 HttpServletRequest request, HttpServletResponse response)
 	{
-		if (faxNo.length() < 7) 
-		{ 
-			throw new DocumentException(
-					"Document target fax number '"+faxNo+"' is invalid."); 
+		if (!OscarProperties.getInstance().isFormFaxEnabled())
+		{
+			return mapping.findForward("failed");
 		}
 
-		String tempPath = OscarProperties.getInstance().getProperty("fax_file_location");
-		String tempName = "DOC-" + docNo + "-" + faxNo + "." + System.currentTimeMillis();
+		String[] recipients = request.getParameterValues("faxRecipients");
+		String pdfPath = (String) request.getAttribute("pdfPath");
+		String formName = (String) request.getAttribute("formName");
 
-		String tempPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
-		String tempTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
+		ArrayList<Object> errorList = new ArrayList<Object>();
+		for (int i = 0; i < recipients.length; i++)
+		{
+			try
+			{
+				sendFax("Form-" + formName, pdfPath, recipients[i]);
+			}
+			catch (Exception e)
+			{
+				MiscUtils.getLogger().error(e.getClass().getCanonicalName() +
+						" occurred while preparing form fax files. ", e);
+				String errorAt = " (Form: " + formName + " Recipient: " + recipients[i] + ")";
+				errorList.add(getUserFriendlyError(e) + errorAt);
+			}
+		}
+
+		request.setAttribute("errors", errorList);
+		return mapping.findForward("success");
+	}
+
+	private void sendFax(String fileName, String tmpPdf, String faxNo)
+		throws DocumentException, IOException
+	{
+		String tempPath = OscarProperties.getInstance().getProperty("fax_file_location");
+		String tempName = fileName + "-" + faxNo + "." + System.currentTimeMillis();
+
+		String faxPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
+		String faxTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
 
 		MiscUtils.getLogger().info("======================================================");
+		MiscUtils.getLogger().info(tmpPdf);
 		MiscUtils.getLogger().info(faxPdf);
-		MiscUtils.getLogger().info(tempPdf);
-		MiscUtils.getLogger().info(tempTxt);
+		MiscUtils.getLogger().info(faxTxt);
 		MiscUtils.getLogger().info("======================================================");
 
 		// Copying the fax pdf.
-		FileUtils.copyFile(new File(faxPdf), new File(tempPdf));
+		FileUtils.copyFile(new File(tmpPdf), new File(faxPdf));
 
 		// Creating text file with the specialists fax number.
-		FileOutputStream fos = new FileOutputStream(tempTxt);				
+		FileOutputStream fos = new FileOutputStream(faxTxt);
 		PrintWriter pw = new PrintWriter(fos);
 		pw.println(faxNo);
 		pw.close();
 		fos.close();
 
 		// A little sanity check to ensure both files exist.
-		if (!new File(tempPdf).exists() || !new File(tempTxt).exists()) 
+		if (!new File(faxPdf).exists() || !new File(faxTxt).exists())
 		{
 			throw new DocumentException(
-				"Unable to create files for fax of consultation request " + docNo + ".");
+				"Unable to create files for fax of " + fileName + ".");
 		}
+
+		// clear temp files on JVM exit
+		new File(tmpPdf).deleteOnExit();
+	}
+
+	private String getUserFriendlyError(Exception e)
+	{
+		if (e instanceof DocumentException)
+		{
+			return e.getMessage();
+		}
+		if (e instanceof  FileNotFoundException)
+		{
+			return "Cannot find file to fax.";
+		}
+		if (e instanceof IOException)
+		{
+			return "File error.";
+		}
+
+		return "A system error occurred.";
 	}
 
     /** Creates a new instance of CombinePDFAction */
