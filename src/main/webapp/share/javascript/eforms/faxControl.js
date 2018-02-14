@@ -3,7 +3,7 @@ if (typeof jQuery == "undefined") { alert("The faxControl library requires jQuer
 var faxControlPlaceholder = "<br/>Fax Recipients:<br/><div id='faxForm'>Loading fax options..</div>";
 var faxControlFaxButton     = "<span>&nbsp;</span><input value='Fax' name='FaxButton' id='fax_button' disabled type='button' onclick='submitFax(false)'>";
 var faxControlFaxSaveButton = "<span>&nbsp;</span><input value='Submit & Fax' name='FaxSaveButton' id='faxSave_button' disabled type='button' onclick='submitFax(true)'>";
-var faxControlMemoryInput = "<input value='false' name='faxEForm' id='faxEForm' type='hidden' />";	
+var faxControlMemoryInput = "<input value='false' name='fax' id='fax' type='hidden' />";
 var faxControl = {
 	initialize: function () {
 		var placeholder = jQuery("#faxControl");
@@ -33,7 +33,7 @@ var faxControl = {
 					placeholder.html("");
 					console.log("Error loading fax control, please contact an administrator.");
 				}
-				else { 
+				else {
 					placeholder.html(data);					
 					var buttonLocation = jQuery("input[name='SubmitButton']");
 					faxEnabled = (jQuery("#faxControl_faxEnabled").val() == "true");
@@ -137,7 +137,7 @@ function hasFaxNumber() {
 }
 
 function submitFax(save) {
-	document.getElementById('faxEForm').value=true;
+	document.getElementById('fax').value=true;
 	var form = jQuery("form");
 
 	var saveHolder = jQuery("#saveHolder");
@@ -160,6 +160,5 @@ function submitFax(save) {
 		form.submit();
 	}
 
-
-	document.getElementById('faxEForm').value=false;
+	document.getElementById('fax').value=false;
 }

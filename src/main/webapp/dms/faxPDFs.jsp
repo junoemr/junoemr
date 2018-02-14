@@ -231,7 +231,7 @@ function updateFaxButton()
 //	} 
 %>
 
-<html:form action="/dms/sendFaxPDFs">
+<html:form action="/dms/sendFaxPDFs.do?method=faxDocument">
 
 	<ul id="faxRecipients">
 	</ul>

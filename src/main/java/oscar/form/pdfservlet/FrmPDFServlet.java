@@ -91,10 +91,10 @@ public class FrmPDFServlet extends HttpServlet {
 
         ByteArrayOutputStream baosPDF = null;
         LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(req);
-        
-        try {        	
+
+        try {
             File tmpFile = null;
-            
+
             if(req.getParameter("multiple")!=null) {
             	ArrayList<Object> files = new ArrayList<Object>();
             	for(int x=0;x<Integer.parseInt(req.getParameter("multiple"));x++) {
@@ -117,50 +117,60 @@ public class FrmPDFServlet extends HttpServlet {
             //sbFilename.append(System.currentTimeMillis());
             sbFilename.append(".pdf");
 
-            // set the Cache-Control header
-            res.setHeader("Cache-Control", "max-age=0");
-            //res.setHeader("Cache-Control","no-cache"); //HTTP 1.1
-            res.setDateHeader("Expires", 0);
-            res.setContentType("application/pdf");
+            if ("true".equals(req.getParameter("fax")))
+			{
+				req.setAttribute("pdfPath", tmpFile.getAbsolutePath());
+				req.setAttribute("formName", req.getParameter("__template"));
+				req.getRequestDispatcher("/dms/sendFaxPDFs.do?method=faxForm").forward(req, res);
+			}
+			else
+			{
+				// set the Cache-Control header
+				res.setHeader("Cache-Control", "max-age=0");
+				//res.setHeader("Cache-Control","no-cache"); //HTTP 1.1
+				res.setDateHeader("Expires", 0);
+				res.setContentType("application/pdf");
 
-            // The Content-disposition value will be inline
+				// The Content-disposition value will be inline
 
-            StringBuilder sbContentDispValue = new StringBuilder();
-            sbContentDispValue.append("inline; filename="); //inline - display
-            // the pdf file
-            // directly rather
-            // than open/save
-            // selection
-            //sbContentDispValue.append("; filename=");
-            sbContentDispValue.append(sbFilename);
+				StringBuilder sbContentDispValue = new StringBuilder();
+				sbContentDispValue.append("inline; filename="); //inline - display
+				// the pdf file
+				// directly rather
+				// than open/save
+				// selection
+				//sbContentDispValue.append("; filename=");
+				sbContentDispValue.append(sbFilename);
 
-            res.setHeader("Content-disposition", sbContentDispValue.toString());
+				res.setHeader("Content-disposition", sbContentDispValue.toString());
 
-            
-            res.setContentLength((int)tmpFile.length());
-            
-            
-            ServletOutputStream sout = res.getOutputStream();  
-            FileInputStream fis = new FileInputStream(tmpFile);
-            try {
-	            byte[] buffer = new byte[64000];  
-	            int bytesRead = 0;  
-	                                
-	            while(true)  
-                {  
-                       bytesRead = fis.read(buffer);  
-                       if (bytesRead == -1)  
-                              break;  
-                                    
-                       sout.write(buffer,0,bytesRead);  
-                }
-            }
-            finally {
-            	fis.close();
-            }
-            
-            LogAction.addLogSynchronous(loggedInInfo,"FrmPDFServlet", "formID=" + req.getParameter("formId") + ",form_class=" + req.getParameter("form_class"));
-            
+
+				res.setContentLength((int) tmpFile.length());
+
+
+				ServletOutputStream sout = res.getOutputStream();
+				FileInputStream fis = new FileInputStream(tmpFile);
+				try
+				{
+					byte[] buffer = new byte[64000];
+					int bytesRead = 0;
+
+					while (true)
+					{
+						bytesRead = fis.read(buffer);
+						if (bytesRead == -1)
+							break;
+
+						sout.write(buffer, 0, bytesRead);
+					}
+				}
+				finally
+				{
+					fis.close();
+				}
+
+				LogAction.addLogSynchronous(loggedInInfo, "FrmPDFServlet", "formID=" + req.getParameter("formId") + ",form_class=" + req.getParameter("form_class"));
+			}
         } catch (DocumentException dex) {
             res.setContentType("text/html");
             PrintWriter writer = res.getWriter();
