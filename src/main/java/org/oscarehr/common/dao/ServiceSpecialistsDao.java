@@ -41,7 +41,7 @@ public class ServiceSpecialistsDao extends AbstractDao<ServiceSpecialists> {
 	public List<ServiceSpecialists> findByServiceId(int serviceId) {
 		Query q = entityManager.createQuery("select x from ServiceSpecialists x where x.id.serviceId = ?");
 		q.setParameter(1, serviceId);
-		
+
 		@SuppressWarnings("unchecked")
 		List<ServiceSpecialists> results = q.getResultList();
 		
@@ -65,4 +65,13 @@ public class ServiceSpecialistsDao extends AbstractDao<ServiceSpecialists> {
 		query.setParameter("serviceId", servId);
 	    return query.getResultList();
     }
+
+	public void removeSpecialistsNotInList(int serviceId, List<Integer> specialists)
+	{
+		Query q = entityManager.createQuery("delete from ServiceSpecialists x where x.id.serviceId = :serviceId and x.id.specId not in (:specialists)");
+		q.setParameter("serviceId", serviceId);
+		q.setParameter("specialists", specialists);
+		q.executeUpdate();
+	}
+
 }
