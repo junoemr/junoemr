@@ -60,16 +60,16 @@
 private boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 private JdbcApptImpl jdbc = new JdbcApptImpl();
 private List<Site> sites = new ArrayList<Site>();
-private List<Site> curUserSites = new ArrayList<Site>();
-private List<String> siteProviderNos = new ArrayList<String>();
-private List<String> siteGroups = new ArrayList<String>();
-private String selectedSite = null;
 private HashMap<String,String> siteBgColor = new HashMap<String,String>();
-private HashMap<String,String> CurrentSiteMap = new HashMap<String,String>();
-
 %>
 
 <%
+List<Site> curUserSites = new ArrayList<Site>();
+List<String> siteProviderNos = new ArrayList<String>();
+List<String> siteGroups = new ArrayList<String>();
+String selectedSite = null;
+HashMap<String,String> CurrentSiteMap = new HashMap<String,String>();
+
 if (bMultisites) {
 	SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
 	sites = siteDao.getAllActiveSites();
