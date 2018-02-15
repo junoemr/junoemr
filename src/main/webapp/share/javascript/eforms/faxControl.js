@@ -1,8 +1,8 @@
 if (typeof jQuery == "undefined") { alert("The faxControl library requires jQuery. Please ensure that it is loaded first"); }
 
 var faxControlPlaceholder = "<br/>Fax Recipients:<br/><div id='faxForm'>Loading fax options..</div>";
-var faxControlFaxButton     = "<span>&nbsp;</span><input value='Fax' name='FaxButton' id='fax_button' disabled type='button' onclick='submitFax(false)'>";
-var faxControlFaxSaveButton = "<span>&nbsp;</span><input value='Submit & Fax' name='FaxSaveButton' id='faxSave_button' disabled type='button' onclick='submitFax(true)'>";
+var faxControlFaxButton     = "<span>&nbsp;</span><input value='Fax' name='FaxButton' id='fax_button' class='faxButton' disabled type='button' onclick='submitFax(false)'>";
+var faxControlFaxSaveButton = "<span>&nbsp;</span><input value='Submit & Fax' name='FaxSaveButton' class='faxButton' id='faxSave_button' disabled type='button' onclick='submitFax(true)'>";
 var faxControlMemoryInput = "<input value='false' name='faxEForm' id='faxEForm' type='hidden' />";	
 var faxControl = {
 	initialize: function () {
@@ -23,7 +23,7 @@ var faxControl = {
 		if (demoNo == "") { demoNo = getSearchValue("efmdemographic_no", jQuery("form").attr('action')); }
 		placeholder.html(faxControlPlaceholder);
 		var faxEnabled = true;
-		
+
 		$.ajax({
 			url:"../eform/efmformfax_form.jsp",
 			data:"demographicNo=" + demoNo,
@@ -54,9 +54,7 @@ var faxControl = {
 							buttonLocation.append(jQuery(faxControlMemoryInput));
 						}
 					}
-					if (buttonLocation == null) { alert("Unable to find form or save button please check this is a proper eform."); return; }					
-					
-					updateFaxButton();
+					if (buttonLocation == null) { alert("Unable to find form or save button please check this is a proper eform."); return; }
 
 					if(!faxEnabled) {
 						placeholder.find(":input").prop('disabled', true);
@@ -83,57 +81,6 @@ function getSearchValue(name, url)
 	var results = regex.exec(url);
 	if (results == null) { return ""; }
 	else { return results[1]; }
-}
-
-function AddOtherFaxProvider() {
-	var selected = jQuery("#otherFaxSelect option:selected");
-	if (checkPhone(selected.val())) {
-		_AddOtherFax(selected.text(),selected.val());
-	}
-	else {
-		alert("The fax number for this provider is invalid.");
-	}
-}
-function AddOtherFax() {
-	var number = jQuery("#otherFaxInput").val();
-	if (checkPhone(number)) {
-		_AddOtherFax(number,number);
-	}
-	else {
-		alert("The fax number you entered is invalid.");
-	}
-}
- 
-function _AddOtherFax(name, number) {
-	//if (name == "" || number == "") { alert("Invalid recipient"); return; }
-	var remove = "<a href='javascript:void(0);' onclick='removeRecipient(this)'>remove</a>";
-	var html = "<li>"+name+"<b>, Fax No: </b>"+number+ " " +remove+"<input type='hidden' name='faxRecipients' value='"+number+"'></input></li>";
-	jQuery("#faxRecipients").append(jQuery(html));
-	updateFaxButton();
-}
-
-function checkPhone(str) 
-{
-	var phone = str.replace(/\D/g,'');
-
-	// phone number must be 10 digits, optionally with country code 1 at the front
-	return phone.length === 10 || (phone.length === 11 && phone.charAt(0) === '1');
-}
-
-function removeRecipient(element) { 
-	var el = jQuery(element);
-	if (el) { el.parent().remove(); updateFaxButton(); }
-	else { alert("Unable to remove recipient."); }	
-}
-
-function updateFaxButton() {
-	var disabled = !hasFaxNumber();
-	document.getElementById("fax_button").disabled = disabled;
-	document.getElementById("faxSave_button").disabled = disabled;
-}
-
-function hasFaxNumber() {
-	return jQuery("#faxRecipients").children().size() > 0;
 }
 
 function submitFax(save) {

@@ -193,6 +193,7 @@ if(!authed) {
 </script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/util/date.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/util/fax.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery_oscar_defaults.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/moment.min.js"></script>
@@ -212,6 +213,11 @@ if(!authed) {
    <script src="<c:out value="${ctx}/js/jquery.js"/>"></script>
    <script>
      jQuery.noConflict();
+
+	 Oscar.Util.Fax.hasFaxNumber = function()
+	 {
+		 return specialistFaxNumber.length > 0 || jQuery("#faxRecipients").children().size() > 0;
+	 };
    </script>
 
 
@@ -610,7 +616,7 @@ function onSelectSpecialist(SelectedSpec)	{
 		if (props.isConsultationFaxEnabled()) {//
 		%>
 		specialistFaxNumber = "";
-		updateFaxButton();
+		Oscar.Util.Fax.updateFaxButton();
 		<% } %>
 		
 		return;
@@ -644,7 +650,7 @@ function onSelectSpecialist(SelectedSpec)	{
         		if (props.isConsultationFaxEnabled()) {//
 				%>
 				specialistFaxNumber = aSpeci.specFax.trim();
-				updateFaxButton();
+				Oscar.Util.Fax.updateFaxButton();
         		<% } %>
             	
             	jQuery.getJSON("getProfessionalSpecialist.json", {id: aSpeci.specNbr},
@@ -682,7 +688,7 @@ function FillThreeBoxes(serNbr)	{
         		if (props.isConsultationFaxEnabled()) {//
 				%>
 				specialistFaxNumber = aSpeci.specFax.trim();
-				updateFaxButton();
+				Oscar.Util.Fax.updateFaxButton();
 				<% } %>
                 break;
            }
@@ -1119,7 +1125,7 @@ function signatureHandler(e) {
 	<%
 	if (props.isConsultationFaxEnabled()) { //
 	%>
-	updateFaxButton();
+	Oscar.Util.Fax.updateFaxButton();
 	<% } %>
 	if (e.isSave) {
 		refreshImage();
@@ -1131,52 +1137,6 @@ function signatureHandler(e) {
 }
 
 var requestIdKey = "<%=signatureRequestId %>";
-
-function AddOtherFaxProvider() {
-	var selected = jQuery("#otherFaxSelect option:selected");
-	_AddOtherFax(selected.text(),selected.val());
-}
-function AddOtherFax() {
-	var number = jQuery("#otherFaxInput").val();
-	if (checkPhone(number)) {
-		_AddOtherFax(number,number);
-	}
-	else {
-		alert("The fax number you entered is invalid.");
-	}
-}
-
-function _AddOtherFax(name, number) {
-	var remove = "<a href='javascript:void(0);' onclick='removeRecipient(this)'>remove</a>";
-	var html = "<li>"+name+"<b>, Fax No: </b>"+number+ " " +remove+"<input type='hidden' name='faxRecipients' value='"+number+"'></input></li>";
-	jQuery("#faxRecipients").append(jQuery(html));
-	updateFaxButton();
-}
-
-function checkPhone(str)
-{
-	var phone =  /^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/
-	if (str.match(phone)) {
-   		return true;
- 	} else {
- 		return false;
- 	}
-}
-
-function removeRecipient(el) {
-	var el = jQuery(el);
-	if (el) { el.parent().remove(); updateFaxButton(); }
-	else { alert("Unable to remove recipient."); }
-}
-
-function hasFaxNumber() {
-	return specialistFaxNumber.length > 0 || jQuery("#faxRecipients").children().size() > 0;
-}
-function updateFaxButton() {
-	var disabled = !hasFaxNumber();
-	document.getElementById("fax_button").disabled = disabled;
-	document.getElementById("fax_button2").disabled = disabled;
-}
 </script>
 
 <%=WebUtilsOld.popErrorMessagesAsAlert(session)%>
@@ -1407,14 +1367,14 @@ function updateFaxButton() {
 						<input name="printPreview" type="button" value="Print Preview" onclick="return checkForm('And Print Preview','EctConsultationFormRequestForm');" />
 						<input name="updateAndSendElectronicallyTop" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndSendElectronicReferral"/>" onclick="return checkForm('Update_esend','EctConsultationFormRequestForm');" />
 						<% if (faxEnabled) { %>
-						<input id="fax_button" name="updateAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndFax"/>" onclick="return checkForm('Update And Fax','EctConsultationFormRequestForm');" />
+						<input id="fax_button" class="faxButton" name="updateAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndFax"/>" onclick="return checkForm('Update And Fax','EctConsultationFormRequestForm');" />
 						<% } %>
 					<% } else { %>
 						<input name="submitSaveOnly" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmit"/>" onclick="return checkForm('Submit Consultation Request','EctConsultationFormRequestForm'); " />
 						<input name="submitAndPrint" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndPrint"/>" onclick="return checkForm('Submit Consultation Request And Print Preview','EctConsultationFormRequestForm'); " />
 						<input name="submitAndSendElectronicallyTop" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndSendElectronicReferral"/>" onclick="return checkForm('Submit_esend','EctConsultationFormRequestForm');" />
 						<% if (faxEnabled) { %>
-						<input id="fax_button" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
+						<input id="fax_button" class="faxButton" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
 					<% 	   }
 					   }
 					   if (thisForm.iseReferral()) { %>
@@ -2093,7 +2053,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 								</select>
 							</td>
 							<td class="tite3">
-								<button onclick="AddOtherFaxProvider(); return false;">Add Provider</button>
+								<button onclick="Oscar.Util.Fax.AddOtherFaxProvider(); return false;">Add Provider</button>
 							</td>
 						</tr>
 						<tr>
@@ -2103,7 +2063,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 
 							<font size="1">(xxx-xxx-xxxx)  </font></td>
 							<td class="tite3">
-								<button onclick="AddOtherFax(); return false;">Add Other Fax Recipient</button>
+								<button onclick="Oscar.Util.Fax.AddOtherFax(); return false;">Add Other Fax Recipient</button>
 							</td>
 						</tr>
 						<tr>
@@ -2142,7 +2102,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 							if (props.getBooleanProperty("faxEnable", "yes"))
 										{
 						%>
-						<input id="fax_button2" name="updateAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndFax"/>" onclick="return checkForm('Update And Fax','EctConsultationFormRequestForm');" />
+						<input id="fax_button2" class="faxButton" name="updateAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndFax"/>" onclick="return checkForm('Update And Fax','EctConsultationFormRequestForm');" />
 						<%
 							}
 						%>
@@ -2158,7 +2118,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 							if (props.getBooleanProperty("faxEnable", "yes"))
 										{
 						%>
-						<input id="fax_button2" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
+						<input id="fax_button2" class="faxButton" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
 						<%
 							}
 						%>
