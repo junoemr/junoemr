@@ -2128,34 +2128,6 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 					<td colspan=2><html:textarea cols="90" rows="3"
 						property="allergies"></html:textarea></td>
 				</tr>
-
-<%
-				if (props.isConsultationSignatureEnabled()) {
-				%>
-				<tr>
-					<td colspan=2 class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formSignature" />:
-					</td>
-				</tr>
-				<tr>
-					<td colspan=2>
-
-						<input type="hidden" name="newSignature" id="newSignature" value="true" />
-						<input type="hidden" name="signatureImg" id="signatureImg" value="<%=(consultUtil.signatureImg != null ? consultUtil.signatureImg : "") %>" />
-						<input type="hidden" name="newSignatureImg" id="newSignatureImg" value="<%=signatureRequestId %>" />
-
-						<div id="signatureShow" style="display: none;">
-							<img id="signatureImgTag" src="" />
-						</div>
-
-						<% if (OscarProperties.getInstance().getBooleanProperty("topaz_enabled", "true")) { %>
-						<input type="button" id="clickToSign" onclick="requestSignature()" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formClickToSign" />" />
-						<% } else { %>
-						<iframe style="width:500px; height:132px;"id="signatureFrame" src="<%= request.getContextPath() %>/signature_pad/tabletSignature.jsp?inWindow=true&<%=DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY%>=<%=signatureRequestId%>" ></iframe>
-						<% } %>
-
-					</td>
-				</tr>
-				<% }%>
 				<%
 				if (props.isConsultationFaxEnabled()) {
 				%>
