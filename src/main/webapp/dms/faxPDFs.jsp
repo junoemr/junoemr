@@ -249,7 +249,7 @@ function updateFaxButton()
 
     <input type="button" id="fax_button" disabled="disabled"
         value="<bean:message key="dms.documentReport.btnFaxPDF"/>"
-        onclick="return submitForm('<rewrite:reWrite jspPage="sendFaxPDFs.do"/>');" />
+        onclick="return submitForm('<rewrite:reWrite jspPage="sendFaxPDFs.do?method=faxDocument"/>');" />
 
 </html:form>
 </body>
