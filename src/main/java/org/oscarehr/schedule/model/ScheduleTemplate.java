@@ -23,7 +23,9 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.schedule.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -31,7 +33,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="scheduletemplate")
-public class ScheduleTemplate extends AbstractModel<ScheduleTemplatePrimaryKey> {
+public class ScheduleTemplate extends AbstractModel<ScheduleTemplatePrimaryKey>
+{
 
 	@EmbeddedId
 	private ScheduleTemplatePrimaryKey id;

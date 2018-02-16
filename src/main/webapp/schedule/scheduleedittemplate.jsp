@@ -28,20 +28,22 @@
 
 %>
 <%@ page
-	import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*"
+		import="org.apache.commons.lang.StringEscapeUtils,
+		        org.oscarehr.schedule.dao.ScheduleTemplateCodeDao,
+		        org.oscarehr.schedule.dao.ScheduleTemplateDao,
+		        org.oscarehr.schedule.model.ScheduleTemplate,
+		        org.oscarehr.schedule.model.ScheduleTemplateCode"
 	errorPage="../appointment/errorpage.jsp"%>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@ page import="oscar.OscarProperties"%>
+<%@ page import="org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
 <jsp:useBean id="myTempBean" class="oscar.ScheduleTemplateBean"	scope="page" />
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.common.model.ScheduleTemplate" %>
-<%@ page import="org.oscarehr.common.model.ScheduleTemplatePrimaryKey" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleTemplateDao" %>
-<%@ page import="org.oscarehr.common.model.ScheduleTemplateCode" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleTemplateCodeDao" %>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="oscar.SxmlMisc" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.List" %>
 <%
 	ScheduleTemplateDao scheduleTemplateDao = SpringUtils.getBean(ScheduleTemplateDao.class);
 	ScheduleTemplateCodeDao scheduleTemplateCodeDao = SpringUtils.getBean(ScheduleTemplateCodeDao.class);

@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.common.model.AppointmentType;
-import org.oscarehr.common.model.ScheduleTemplateCode;
+import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.managers.DayWorkSchedule;
 import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.util.MiscUtils;

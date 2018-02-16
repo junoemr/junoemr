@@ -23,32 +23,33 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.schedule.dao;
 
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.RSchedule;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.schedule.model.RSchedule;
 import org.springframework.stereotype.Repository;
 
 @Repository(value="rScheduleDao")
 @SuppressWarnings("unchecked")
-public class RScheduleDao extends AbstractDao<RSchedule>{
+public class RScheduleDao extends AbstractDao<RSchedule>
+{
 
 	public RScheduleDao() {
 		super(RSchedule.class);
 	}
 
-	public List<RSchedule> findByProviderAvailableAndDate(String providerNo, String available, Date sdate) {
-		Query query = entityManager.createQuery("select s from RSchedule s where s.providerNo=? and s.available=? and s.sDate=?");
-		query.setParameter(1, providerNo);
-		query.setParameter(2, available);
-		query.setParameter(3, sdate);
+	public List<RSchedule> findByProviderAvailableAndDate(String providerNo, String available, Date startDate) {
+		Query query = entityManager.createQuery("SELECT s FROM RSchedule s WHERE s.providerNo=:providerNo AND s.available=:available AND s.sDate=:startDate");
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("available", available);
+		query.setParameter("startDate", startDate);
 
-        List<RSchedule> results = query.getResultList();
-		return results;
+        return query.getResultList();
 	}
 	
 	public Long search_rschedule_overlaps(String providerNo, Date d1, Date d2, Date d3, Date d4, Date d5, Date d6, Date d7, Date d8, Date d9, Date d10, Date d11, Date d12,Date d13,Date d14) {
@@ -60,7 +61,7 @@ public class RScheduleDao extends AbstractDao<RSchedule>{
 		query.setParameter(5, d4);
 		query.setParameter(6, d5);
 		query.setParameter(7, d6);
-		query.setParameter(8, d7);
+		query.setParameter( 8, d7);
 		query.setParameter(9, d8);
 		query.setParameter(10, d9);
 		query.setParameter(11, d10);
@@ -72,16 +73,16 @@ public class RScheduleDao extends AbstractDao<RSchedule>{
 		Long results = (Long) query.getSingleResult();
 		return results;
 	}
-	
-	
-	public Long search_rschedule_exists(String providerNo, Date d1, Date d2) {
-		Query query = entityManager.createQuery("select count(r.id) from RSchedule r where r.providerNo=? and r.sDate =? and r.eDate =? and r.status = 'A'");
-		query.setParameter(1, providerNo);
-		query.setParameter(2, d1);
-		query.setParameter(3, d2);
-		
-		Long results = (Long) query.getSingleResult();
-		return results;
+
+
+	public Long search_rschedule_exists(String providerNo, Date startDate, Date endDate)
+	{
+		Query query = entityManager.createQuery("SELECT count(r.id) FROM RSchedule r WHERE r.providerNo=:providerNo and r.sDate =:startDate AND r.eDate =:endDate and r.status = 'A'");
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("startDate", startDate);
+		query.setParameter("endDate", endDate);
+
+		return (Long) query.getSingleResult();
 	}
 	
 	public RSchedule search_rschedule_current(String providerNo, String available, Date sdate) {

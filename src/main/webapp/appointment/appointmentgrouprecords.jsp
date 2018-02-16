@@ -47,8 +47,8 @@
 <%@page import="org.oscarehr.common.dao.MyGroupDao" %>
 <%@page import="org.oscarehr.common.model.MyGroup" %>
 <%@page import="org.oscarehr.common.model.Provider" %>
-<%@page import="org.oscarehr.common.dao.ScheduleDateDao" %>
-<%@page import="org.oscarehr.common.model.ScheduleDate" %>
+<%@page import="org.oscarehr.schedule.dao.ScheduleDateDao" %>
+<%@page import="org.oscarehr.schedule.model.ScheduleDate" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");

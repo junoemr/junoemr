@@ -51,15 +51,20 @@
 
 %>
 <%@ page
-	import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*"
+		import="org.oscarehr.schedule.dao.ScheduleHolidayDao,
+		        org.oscarehr.schedule.model.ScheduleHoliday,
+		        org.oscarehr.util.SpringUtils,
+		        oscar.DateInMonthTable,
+		        oscar.HScheduleHoliday"
 	errorPage="../appointment/errorpage.jsp"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
 <jsp:useBean id="scheduleHolidayBean" class="java.util.Hashtable" scope="session" />
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.common.model.ScheduleHoliday" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleHolidayDao" %>
+<%@ page import="oscar.MyDateFormat" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Enumeration" %>
+<%@ page import="java.util.GregorianCalendar" %>
 <%
 	ScheduleHolidayDao scheduleHolidayDao = SpringUtils.getBean(ScheduleHolidayDao.class);
 %>
