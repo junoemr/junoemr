@@ -159,7 +159,10 @@ function checkRosterStatus() {
 			if (!rosterStatusDateValid(false)) return false;
 		}
 		else {
-			if (!rosterStatusTerminationDateValid(false)) return false;
+			if (document.updatedelete.roster_status.value!="FS")
+			{
+				if (!rosterStatusTerminationDateValid(false)) return false;
+			}
 		}
 	}
 
