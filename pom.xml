@@ -51,10 +51,6 @@
 			<id>local_repo</id>
 			<url>file://${basedir}/local_repo</url>
 		</repository>
-		<repository>
-			<id>oscar_repo</id>
-			<url>http://oscarmcmaster.sourceforge.net/m2</url>
-		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
