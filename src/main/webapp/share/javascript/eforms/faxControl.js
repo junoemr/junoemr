@@ -20,7 +20,7 @@ var faxControl = {
 		
 		var demoNo ="";			
 		demoNo = getSearchValue("demographic_no");
-		if (demoNo == "") { demoNo = getSearchValue("efmdemographic_no", jQuery("form").attr('action')); }
+		if (demoNo == "") { demoNo = getSearchValue("efmdemographic_no", jQuery("form").first().attr('action')); }
 		placeholder.html(faxControlPlaceholder);
 		var faxEnabled = true;
 		
@@ -46,7 +46,7 @@ var faxControl = {
 					else {
 						buttonLocation = jQuery(".DoNotPrint");
 						if (buttonLocation == null || buttonLocation.size() == 0) {			
-							buttonLocation = jQuery(jQuery("form")[0]);
+							buttonLocation = jQuery("form").first();
 						}
 						if (buttonLocation != null) {
 							buttonLocation.append(jQuery(faxControlFaxButton));
@@ -138,16 +138,15 @@ function hasFaxNumber() {
 
 function submitFax(save) {
 	document.getElementById('faxEForm').value=true;
+	var form = jQuery("form").first();
 	
 	var saveHolder = jQuery("#saveHolder");
 	if (saveHolder == null || saveHolder.size() == 0) {
-		jQuery("form").append("<input id='saveHolder' type='hidden' name='skipSave' value='"+!save+"' >");
+		form.append("<input id='saveHolder' type='hidden' name='skipSave' value='"+!save+"' >");
 	}
 	saveHolder = jQuery("#saveHolder");
 	saveHolder.val(!save);
 	needToConfirm=false;
-	
-	var form = jQuery("form");
 
 	// preserve old RTL functionality
 	var formName=form.attr("name");
