@@ -483,7 +483,7 @@ public class MeasurementFlowSheet {
         }
     }
     /////
-    public MeasurementInfo getMessages(MeasurementInfo mi) throws Exception {
+    public MeasurementInfo getMessages(MeasurementInfo mi) {
         if (rulesLoaded)
         {
             try
