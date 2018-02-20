@@ -62,7 +62,8 @@ public final class LoginCheckLogin {
 	 */
 	public boolean isBlocked(String ip, String userName) {
 
-		if (loginList == null) {
+		if (loginList == null)
+		{
 			loginList = LoginList.getLoginListInstance();
 		}
 
@@ -153,7 +154,8 @@ public final class LoginCheckLogin {
 	 */
 	public boolean unlock(String key) {
 
-		if (loginList == null) {
+		if (loginList == null)
+		{
 			loginList = LoginList.getLoginListInstance();
 		}
 
@@ -169,7 +171,8 @@ public final class LoginCheckLogin {
 	public ArrayList<String> findLockList() {
 		LoginInfoBean loginInfoBean;
 
-		if (loginList == null) {
+		if (loginList == null)
+		{
 			loginList = LoginList.getLoginListInstance();
 		}
 
