@@ -141,9 +141,9 @@ displayServiceUtil.estSpecialist();
 		if (demo != null) consultUtil.estPatient(demo);
 		consultUtil.estActiveTeams();
 
-    boolean enableEmailDetails = false;
+    boolean enableEmail = false;
     if(demographic != null) {
-      enableEmailDetails = EmailUtils.isValidEmailAddress(demographic.getEmail());
+      enableEmail = EmailUtils.isValidEmailAddress(demographic.getEmail());
     }
 
 		if (request.getParameter("error") != null)
@@ -1482,9 +1482,9 @@ function chooseEmail(){
 
             <% if (OscarProperties.getInstance().isPropertyActive("appointment_reminder_enabled")) { %>
               <input type="button"
-                <% if(!enableEmailDetails) { %> disabled="disabled" <% } %>
+                <% if(!enableEmail) { %> disabled="disabled" <% } %>
                 name="updateAndEmailDetails"
-                value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailPatient"/>'
+                value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailAppointmentTime"/>'
                 onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
             <% } %>
 
@@ -1563,8 +1563,13 @@ function chooseEmail(){
 							</div>
 							<%
 						}
-
-
+						<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
+							<input type="button"
+									<% if(!enableEmail) { %> disabled="disabled" <% } %>
+								   id="submitAndEmailNotification" name="submitAndEmailNotification"
+								   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailNotification"/>"
+								   onclick="return checkForm('Submit And Email Notification','EctConsultationFormRequestForm');" />
+						<% } %>
 					   if (thisForm.iseReferral()) { %>
 						<input type="button" value="Send eResponse" onclick="$('saved').value='true';document.location='<%=thisForm.getOruR01UrlString(request)%>'" />
 					<% } %>
@@ -2271,9 +2276,9 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 
             <% if (OscarProperties.getInstance().isPropertyActive("appointment_reminder_enabled")) { %>
               <input type="button"
-                <% if(!enableEmailDetails) { %> disabled="disabled" <% } %>
+                <% if(!enableEmail) { %> disabled="disabled" <% } %>
                 name="updateAndEmailDetails"
-                value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailPatient"/>'
+                value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailAppointmentTime"/>'
                 onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
             <% } %>
 
@@ -2303,6 +2308,14 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 							<%
 						}
 						%>
+
+						<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
+						<input type="button"
+								<% if(!enableEmail) { %> disabled="disabled" <% } %>
+							   id="updateAndEmailNotification" name="updateAndEmailNotification"
+							   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailNotification"/>"
+							   onclick="return checkForm('Update And Email Notification','EctConsultationFormRequestForm');" />
+						<% } %>
 					</td>
 				</tr>
 

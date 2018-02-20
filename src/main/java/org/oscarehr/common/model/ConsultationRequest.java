@@ -96,6 +96,8 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
     private String letterheadAddress;
     private String letterheadPhone;
     private String letterheadFax;
+    @Column(name = "notification_sent", columnDefinition = "TINYINT(1)", nullable = false)
+	private boolean notificationSent = false;
     
 	@Override
     public Integer getId() {
@@ -309,4 +311,14 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 	public void setLetterheadFax(String letterheadFax) {
 	    this.letterheadFax = letterheadFax;
     }
+
+	public boolean isNotificationSent()
+	{
+		return notificationSent;
+	}
+
+	public void setNotificationSent(boolean notificationSent)
+	{
+		this.notificationSent = notificationSent;
+	}
 }

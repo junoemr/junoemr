@@ -206,3 +206,18 @@ ALTER TABLE appointmentArchive ADD COLUMN partial_booking tinyint(1) NOT NULL DE
 CREATE TABLE demographic_custom_status (id int(10) AUTO_INCREMENT PRIMARY KEY, status varchar(128), deleted tinyint(1) NOT NULL DEFAULT 0);
 ALTER TABLE demographic ADD COLUMN custom_status_id int(10) AFTER patient_status;
 
+-- OHSUPPORT-4715 - Kensington custom consultation emails: add 'email sent' flag to consultations, add logging table.
+CREATE TABLE log_emails(
+  id bigint(20) unsigned AUTO_INCREMENT PRIMARY KEY,
+  timestamp datetime NOT NULL,
+  referring_provider_no varchar(6),
+  loggedIn_provider_no varchar(6),
+  referral_doctor_id int(10),
+  demographic_no int(10),
+  email_address varchar(60),
+  email_success tinyint(1) NOT NULL DEFAULT 0,
+  email_content text
+);
+
+ALTER TABLE consultationRequests ADD COLUMN notification_sent tinyint(1) NOT NULL DEFAULT 0;
+
