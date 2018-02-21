@@ -38,6 +38,7 @@ import java.io.RandomAccessFile;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -222,20 +223,33 @@ public class ManageDocumentAction extends DispatchAction {
 	}
 
 	public ActionForward removeLinkFromDocument(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response)
+	{
 		String docType = request.getParameter("docType");
 		String docId = request.getParameter("docId");
 		String providerNo = request.getParameter("providerNo");
 
-		providerInboxRoutingDAO.removeLinkFromDocument(docType, docId, providerNo);
-		HashMap hm = new HashMap();
-		hm.put("linkedProviders", providerInboxRoutingDAO.getProvidersWithRoutingForDocument(docType, docId));
+		try
+		{
+			try
+			{
+				providerInboxRoutingDAO.removeLinkFromDocument(docType, docId, providerNo);
+			}
+			catch (SQLException e)
+			{
+				MiscUtils.getLogger().error("Failed to remove link from document.", e);
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to remove link from document.");
+			}
 
-		JSONObject jsonObject = JSONObject.fromObject(hm);
-		try {
+			HashMap hm = new HashMap();
+			hm.put("linkedProviders", providerInboxRoutingDAO.getProvidersWithRoutingForDocument(docType, docId));
+
+			JSONObject jsonObject = JSONObject.fromObject(hm);
 			response.getOutputStream().write(jsonObject.toString().getBytes());
-		} catch (IOException e) {
-			MiscUtils.getLogger().error("Error",e);
+		}
+		catch (IOException e)
+		{
+			MiscUtils.getLogger().error("Error writing response.", e);
 		}
 
 		return null;
