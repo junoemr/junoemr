@@ -70,10 +70,19 @@ public class ServiceSpecialistsDao extends AbstractDao<ServiceSpecialists>
 
 	public void removeSpecialistsNotInList(int serviceId, List<Integer> specialists)
 	{
-		Query q = entityManager.createQuery("delete from ServiceSpecialists x where x.id.serviceId = :serviceId and x.id.specId not in (:specialists)");
-		q.setParameter("serviceId", serviceId);
-		q.setParameter("specialists", specialists);
-		q.executeUpdate();
+		Query query;
+		if (specialists.size() == 0)
+		{
+			query = entityManager.createQuery("delete from ServiceSpecialists x where x.id.serviceId = :serviceId");
+		}
+		else
+		{
+			query = entityManager.createQuery("delete from ServiceSpecialists x where x.id.serviceId = :serviceId and x.id.specId not in (:specialists)");
+			query.setParameter("specialists", specialists);
+		}
+
+		query.setParameter("serviceId", serviceId);
+		query.executeUpdate();
 	}
 
 }
