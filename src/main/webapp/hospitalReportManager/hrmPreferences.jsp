@@ -136,9 +136,15 @@ function updateLink(filePath,keytype){
 		<div class="control-group">
 			<label class="control-label">Private Key:</label>
 			<div class="controls">
-				<%if (privateKey != null && !privateKey.isEmpty()) {%>
+				<%
+				if (privateKey != null && !privateKey.isEmpty())
+				{
+				%>
 					<a href="../<%=privateKey%>" id="pkeyLink">View Private Key</a>
-				<%} else {%>
+				<%
+				} else
+				{
+				%>
 					<span id="pkeyLink">No Private Key Uploaded</span>
 				<%}%>
 				<input type="button" class="btn" name="privateKey" value="Upload Private Key" onClick='popupPage(600,900,&quot;<html:rewrite page="/hospitalReportManager/hrmKeyUploader.jsp"/>&quot;);return false;' />
@@ -147,9 +153,15 @@ function updateLink(filePath,keytype){
 		<div class="control-group">
 			<label class="control-label">Decryption Key:</label>
 			<div class="controls">
-				<%if (decryptionKey != null && !decryptionKey.isEmpty()) {%>
+				<%
+				if (decryptionKey != null && !decryptionKey.isEmpty())
+				{
+				%>
 					<a href="../<%=decryptionKey%>" id="dkeyLink">View Decryption Key</a>
-				<%} else {%>
+				<%
+				} else
+				{
+				%>
 					<span id="dkeyLink">No Decryption Key Uploaded</span>
 				<%}%>
 				<input type="button" class="btn" name="decryptionKey" value="Upload Decryption Key" onClick='popupPage(600,900,&quot;<html:rewrite page="/hospitalReportManager/hrmKeyUploader.jsp"/>&quot;);return false;' />	
