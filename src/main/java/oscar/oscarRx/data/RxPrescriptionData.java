@@ -2028,6 +2028,8 @@ public class RxPrescriptionData {
                     // check to see if there is an identitical prescription in
                     // the database. If there is we'll return that drugid instead
                     // of adding a new prescription.
+                    DrugDao drugDao = (DrugDao) SpringUtils.getBean("drugDao");
+                    Drug drug = new Drug();
 
                 	String endDate;
                 	if (this.getEndDate() == null) {
@@ -2036,26 +2038,16 @@ public class RxPrescriptionData {
                 		endDate = RxUtil.DateToString(this.getEndDate());
                 	}
 
-                    sql = "SELECT drugid FROM drugs WHERE archived = 0 AND " + "provider_no = '" + this.getProviderNo() + "' AND " + "demographic_no = " +
-                            this.getDemographicNo() + " AND " + "rx_date = '" + RxUtil.DateToString(this.getRxDate()) + "' AND " + "end_date = '" +
-                            RxUtil.DateToString(this.getEndDate()) + "' AND " + "written_date = '" + RxUtil.DateToString(this.getWrittenDate()) + "' AND " + "BN = '" +
-                            StringEscapeUtils.escapeSql(this.getBrandName()) + "' AND " + "GCN_SEQNO = " + this.getGCN_SEQNO() + " AND " + "customName = '" + this.getCustomName() +
-                            "' AND " + "takemin = " + this.getTakeMin() + " AND " + "takemax = " + this.getTakeMax() + " AND " + "freqcode = '" + this.getFrequencyCode() +
-                            "' AND " + "duration = '" + this.getDuration() + "' AND " + "durunit = '" + this.getDurationUnit() + "' AND " + "quantity = '" + this.getQuantity() +
-                            "' AND " + "unitName = '" + this.getUnitName() + "' AND " + "`repeat` = " + this.getRepeat() + " AND " + "last_refill_date = '" +
-                            RxUtil.DateToString(this.getLastRefillDate()) + "' AND " + "nosubs = " + this.getNosubsInt() + " AND " + "prn = " + this.getPrnInt() + " AND " +
-                            "special = '" +escapedSpecial+ "' AND " + "outside_provider_name = '" + this.getOutsideProviderName() + "' AND " +
-                            "outside_provider_ohip = '" + this.getOutsideProviderOhip() + "' AND " + "custom_instructions = " + this.getCustomInstr() + " AND " + "long_term = " +
-                            this.getLongTerm() +" AND " + "custom_note = " + this.isCustomNote() + " AND " + "past_med = " + this.getPastMed() + " AND " + "patient_compliance = " + this.getPatientCompliance()
-                            +" AND "+" special_instruction = '"+this.getSpecialInstruction()+"' AND comment = '" + this.getComment() + "' AND start_date_unknown = " + this.getStartDateUnknown();
-                    MiscUtils.getLogger().debug("QUERY: " + sql);
-                    rs = DBHandler.GetSQL(sql);
+                    drug = drugDao.findByEverything(this.getProviderNo(), this.getDemographicNo(), this.getRxDate(), this.getEndDate(), this.getWrittenDate(), this.getBrandName(), this.getGCN_SEQNO(), this.getCustomName(), this.getTakeMin(), this.getTakeMax(), this.getFrequencyCode(), this.getDuration(), this.getDurationUnit(), this.getQuantity(), this.getUnitName(), this.getRepeat(), this.getLastRefillDate(), this.getNosubs(), this.getPrn(), escapedSpecial, this.getOutsideProviderName(),
+                            this.getOutsideProviderOhip(), this.getCustomInstr(), this.getLongTerm(), this.isCustomNote(), this.getPastMed(), this.getPatientCompliance(), this.getSpecialInstruction(), this.getComment(), this.getStartDateUnknown());
 
-                    if (rs.next()) {
-                        this.drugId = rs.getInt("drugid");
+                    if (drug != null)
+                    {
+                        this.drugId = drug.getId();
+                    } else
+                    {
+                        this.drugId = 0;
                     }
-
-                    rs.close();
 
                     b = true;
 
@@ -2063,8 +2055,7 @@ public class RxPrescriptionData {
                     if (this.getDrugId() == 0) {
                     	int position = this.getNextPosition();
 
-                    	DrugDao drugDao=(DrugDao) SpringUtils.getBean("drugDao");
-                    	Drug drug=new Drug();
+                    	drug=new Drug();
 
                     	// the fields set are based on previous code, I don't know the details of why which are and are not set and can not audit it at this point in time.
                     	drug.setProviderNo(getProviderNo());
