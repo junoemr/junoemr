@@ -21,18 +21,20 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.consultations.dao;
 
 import java.util.List;
 
 import javax.persistence.Query;
 
+import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.ServiceSpecialists;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ServiceSpecialistsDao extends AbstractDao<ServiceSpecialists> {
+public class ServiceSpecialistsDao extends AbstractDao<ServiceSpecialists>
+{
 
 	public ServiceSpecialistsDao() {
 		super(ServiceSpecialists.class);	

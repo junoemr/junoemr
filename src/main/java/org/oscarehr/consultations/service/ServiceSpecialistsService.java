@@ -22,9 +22,9 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.common.service;
+package org.oscarehr.consultations.service;
 
-import org.oscarehr.common.dao.ServiceSpecialistsDao;
+import org.oscarehr.consultations.dao.ServiceSpecialistsDao;
 import org.oscarehr.common.model.ServiceSpecialists;
 import org.oscarehr.common.model.ServiceSpecialistsPK;
 import org.springframework.beans.factory.annotation.Autowired;
