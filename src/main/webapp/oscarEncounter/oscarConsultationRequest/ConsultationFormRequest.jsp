@@ -1487,15 +1487,31 @@ function chooseEmail(){
                 value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailAppointmentTime"/>'
                 onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
             <% } %>
+			<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
+			<input type="button"
+					<% if(!enableEmail) { %> disabled="disabled" <% } %>
+				   id="updateAndEmailNotification" name="updateAndEmailNotification"
+				   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailNotification"/>"
+				   onclick="return checkForm('Update And Email Notification','EctConsultationFormRequestForm');" />
+			<% }
 
-					<% } else { %>
+					 } else { %>
 						<input name="submitSaveOnly" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmit"/>" onclick="return checkForm('Submit Consultation Request','EctConsultationFormRequestForm'); " />
 						<input name="submitAndPrint" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndPrint"/>" onclick="return checkForm('Submit Consultation Request And Print Preview','EctConsultationFormRequestForm'); " />
 						<input name="submitAndSendElectronicallyTop" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndSendElectronicReferral"/>" onclick="return checkForm('Submit_esend','EctConsultationFormRequestForm');" />
 						<% if (faxEnabled) { %>
 						<input id="fax_button" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
-					<% 	   }
-					   }
+					<%  }
+						if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) {
+					%>
+						<input type="button"
+								<% if(!enableEmail) { %> disabled="disabled" <% } %>
+							   id="submitAndEmailNotification" name="submitAndEmailNotification"
+							   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailNotification"/>"
+							   onclick="return checkForm('Submit And Email Notification','EctConsultationFormRequestForm');" />
+					<% }
+
+				    }
 						if(props.isConsultationEmailEnabled()){
 							%>
 							<div>
@@ -1563,13 +1579,6 @@ function chooseEmail(){
 							</div>
 							<%
 						}
-						<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
-							<input type="button"
-									<% if(!enableEmail) { %> disabled="disabled" <% } %>
-								   id="submitAndEmailNotification" name="submitAndEmailNotification"
-								   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailNotification"/>"
-								   onclick="return checkForm('Submit And Email Notification','EctConsultationFormRequestForm');" />
-						<% } %>
 					   if (thisForm.iseReferral()) { %>
 						<input type="button" value="Send eResponse" onclick="$('saved').value='true';document.location='<%=thisForm.getOruR01UrlString(request)%>'" />
 					<% } %>
@@ -2282,7 +2291,13 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
                 onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
             <% } %>
 
-					<%
+			<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
+			<input type="button"
+					<% if(!enableEmail) { %> disabled="disabled" <% } %>
+				   id="updateAndEmailNotification" name="updateAndEmailNotification"
+				   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailNotification"/>"
+				   onclick="return checkForm('Update And Email Notification','EctConsultationFormRequestForm');" />
+			<% }
 						}
 								else
 								{
@@ -2298,7 +2313,13 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 						<%
 							}
 						%>
-					<%
+						<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
+						<input type="button"
+								<% if(!enableEmail) { %> disabled="disabled" <% } %>
+							   id="submitAndEmailNotification" name="submitAndEmailNotification"
+							   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailNotification"/>"
+							   onclick="return checkForm('Submit And Email Notification','EctConsultationFormRequestForm');" />
+						<% }
 						}
 
 						if (thisForm.iseReferral())
@@ -2308,14 +2329,6 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 							<%
 						}
 						%>
-
-						<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
-						<input type="button"
-								<% if(!enableEmail) { %> disabled="disabled" <% } %>
-							   id="updateAndEmailNotification" name="updateAndEmailNotification"
-							   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailNotification"/>"
-							   onclick="return checkForm('Update And Email Notification','EctConsultationFormRequestForm');" />
-						<% } %>
 					</td>
 				</tr>
 

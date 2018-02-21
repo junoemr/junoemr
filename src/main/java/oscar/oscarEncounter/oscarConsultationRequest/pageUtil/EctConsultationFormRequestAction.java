@@ -95,7 +95,6 @@ public class EctConsultationFormRequestAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		EctConsultationFormRequestForm frm = (EctConsultationFormRequestForm) form;
-		ConsultationRequestDao consultDao = (ConsultationRequestDao)SpringUtils.getBean("consultationRequestDao");
 
 		String appointmentHour = frm.getAppointmentHour();
 		String appointmentPm = frm.getAppointmentPm();
@@ -313,7 +312,7 @@ public class EctConsultationFormRequestAction extends Action {
 
 		request.setAttribute("teamVar", sendTo);
 
-		ConsultationRequest consult = consultDao.find(requestId);
+		ConsultationRequest consult = consultationRequestDao.find(Integer.parseInt(requestId));
 		if (submission.endsWith("And Print Preview")) {
 
 			request.setAttribute("reqId", requestId);

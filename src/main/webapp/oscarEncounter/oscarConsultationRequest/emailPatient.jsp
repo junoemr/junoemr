@@ -65,12 +65,6 @@
 
 	<body background="../images/gray_bg.jpg" bgproperties="fixed">
 	<center>
-		<table border="0" cellspacing="0" cellpadding="0" width="90%">
-			<tr bgcolor="#486ebd">
-				<th align="CENTER"><font face="Helvetica" color="#FFFFFF">
-					<bean:message key="oscarEncounter.oscarConsultationRequest.msgMainLabel"/></font></th>
-			</tr>
-		</table>
 		<%
 			Logger logger = MiscUtils.getLogger();
 
@@ -207,11 +201,11 @@
 				}
 
 				logEntry.setLoggedInProviderNo(LoggedInInfo.loggedInInfo.get().loggedInProvider.getProviderNo());
-				logEntry.setReferralDoctorId(specialist.getId());
+				logEntry.setReferralDoctorId(specialist != null ? specialist.getId() : null);
 				logEntry.setReferringProviderNo(consultRequest.getProviderNo());
 				logEntry.setDemographicNo(demo.getDemographicNo());
 				logEntry.setEmailAddress(emailAddress);
-				logEntry.setEmailContent(emailBodyHtml);
+				logEntry.setEmailContent(emailBodyHtml != null ? emailBodyHtml : emailBodyTxt);
 
 				// don't send blank emails
 				if (!(emailBodyTxt == null && emailBodyHtml == null))
@@ -233,8 +227,26 @@
 			logEntry.setEmailSuccess(sentEmail);
 			emailLogDao.persist(logEntry);
 
+			%>
+			<table border="0" cellspacing="0" cellpadding="0" width="90%">
+				<tr bgcolor="#486ebd">
+					<th align="CENTER">
+						<font face="Helvetica" color="#FFFFFF">
+							<%if (details) {%>
+							<bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailDetailsLabel"/>
+							<%} else {%>
+							<bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailNotificationLabel"/>
+							<%}%>
+						</font>
+					</th>
+				</tr>
+			</table>
+
+			<%
 			if (sentEmail)
 			{
+				consultRequest.setNotificationSent(true);
+				consultationRequestDao.merge(consultRequest);
 			%>
 				<p>
 				<h1><bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailSuccess"/></h1>
