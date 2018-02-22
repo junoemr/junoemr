@@ -72,7 +72,7 @@
 			String template = (String) request.getAttribute("template");
 
 			boolean sentEmail = false;
-			boolean details = ("details").equals(template);
+			boolean useDetailsTemplate = ("details").equals(template);
 			String emailAddress = "";
 			String errorMsg = "";
 			String statusMsg = "";
@@ -125,7 +125,8 @@
 					throw new IllegalArgumentException("Unable to find requested email template.");
 				}
 
-				String templateFileName = details ? "email.consult_request_details_template" : "email.consult_request_notification_template";
+				String templateFileName = useDetailsTemplate ?
+						"email.consult_request_details_template" : "email.consult_request_notification_template";
 
 				String templateTxt = props.getProperty(String.format("%s.txt", templateFileName));
 				String templateHtml = props.getProperty(String.format("%s.html", templateFileName));
@@ -139,7 +140,7 @@
 				velocityContext.put("specialist", specialist);
 				velocityContext.put("service", service);
 
-				if (details)
+				if (useDetailsTemplate)
 				{
 					Calendar apptTime = Calendar.getInstance();
 					apptTime.setTime(consultRequest.getAppointmentTime());
@@ -213,7 +214,8 @@
 					EmailUtils.sendEmail(emailAddress, fullName, fromEmail, fromName, subject, emailBodyTxt, emailBodyHtml);
 					sentEmail = true;
 				}
-				else {
+				else
+				{
 					logger.error("Email failed to send: no available templates");
 				}
 
@@ -227,56 +229,65 @@
 			logEntry.setEmailSuccess(sentEmail);
 			emailLogDao.persist(logEntry);
 
-			%>
-			<table border="0" cellspacing="0" cellpadding="0" width="90%">
-				<tr bgcolor="#486ebd">
-					<th align="CENTER">
-						<font face="Helvetica" color="#FFFFFF">
-							<%if (details) {%>
-							<bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailDetailsLabel"/>
-							<%} else {%>
-							<bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailNotificationLabel"/>
-							<%}%>
-						</font>
-					</th>
-				</tr>
-			</table>
+		%>
+		<table border="0" cellspacing="0" cellpadding="0" width="90%">
+			<tr bgcolor="#486ebd">
+				<th align="CENTER">
+					<font face="Helvetica" color="#FFFFFF">
+						<%
+							if (useDetailsTemplate)
+							{
+						%>
+						<bean:message
+								key="oscarEncounter.oscarConsultationRequest.msgEmailDetailsLabel"/>
+						<%
+						}
+						else
+						{
+						%>
+						<bean:message
+								key="oscarEncounter.oscarConsultationRequest.msgEmailNotificationLabel"/>
+						<%}%>
+					</font>
+				</th>
+			</tr>
+		</table>
 
-			<%
+		<%
 			if (sentEmail)
 			{
 				consultRequest.setNotificationSent(true);
 				consultationRequestDao.merge(consultRequest);
-			%>
-				<p>
-				<h1><bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailSuccess"/></h1>
-				<h3><%= emailAddress %>
-				</h3>
-			<%
-				if (details)
-				{
-					try
-					{
-						// update the status of the consultation request to 4 (Completed)
-						consultRequest.setStatus("4");
-						consultationRequestDao.merge(consultRequest);
-
-						statusMsg = "Status updated to 'Completed'";
-
-					}
-					catch (Exception e)
-					{
-						MiscUtils.getLogger().error("Unable to update consultation request status", e);
-						statusMsg = "Error updating status to 'Completed': " + e.getMessage();
-					}
-			%>
-					<h3><%= statusMsg %>
-					</h3>
+		%>
+		<p>
+		<h1><bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailSuccess"/></h1>
+		<h3><%= emailAddress %>
+		</h3>
 		<%
-				}
-			}
-			else
+			if (useDetailsTemplate)
 			{
+				try
+				{
+					// update the status of the consultation request to 4 (Completed)
+					consultRequest.setStatus("4");
+					consultationRequestDao.merge(consultRequest);
+
+					statusMsg = "Status updated to 'Completed'";
+
+				}
+				catch (Exception e)
+				{
+					MiscUtils.getLogger().error("Unable to update consultation request status", e);
+					statusMsg = "Error updating status to 'Completed': " + e.getMessage();
+				}
+		%>
+		<h3><%= statusMsg %>
+		</h3>
+		<%
+			}
+		}
+		else
+		{
 		%>
 
 		<p>
@@ -291,7 +302,8 @@
 		<p></p>
 		<hr width="90%"/>
 		<form>
-			<input type="button" value="<bean:message key="global.btnClose"/>" onClick="window.close();">
+			<input type="button" value="<bean:message key="global.btnClose"/>"
+				   onClick="window.close();">
 		</form>
 	</center>
 	</body>

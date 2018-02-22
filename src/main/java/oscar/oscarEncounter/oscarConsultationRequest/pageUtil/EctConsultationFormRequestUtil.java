@@ -45,444 +45,533 @@ import org.oscarehr.util.SpringUtils;
 import oscar.oscarDB.DBHandler;
 import oscar.util.UtilDateUtilities;
 
-public class EctConsultationFormRequestUtil {
+public class EctConsultationFormRequestUtil
+{
 
-	private ConsultationServiceDao consultationServiceDao = (ConsultationServiceDao)SpringUtils.getBean("consultationServiceDao");
-	private DemographicExtDao demographicExtDao = (DemographicExtDao)SpringUtils.getBean("demographicExtDao");
+	private ConsultationServiceDao consultationServiceDao = (ConsultationServiceDao) SpringUtils.getBean("consultationServiceDao");
+	private DemographicExtDao demographicExtDao = (DemographicExtDao) SpringUtils.getBean("demographicExtDao");
 
-	private boolean bMultisites=org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
+	private boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 
-    public boolean estPatient(String demo) {
+	public boolean estPatient(String demo)
+	{
 
-        demoNo = demo;
-        boolean verdict = true;
+		demoNo = demo;
+		boolean verdict = true;
 
-        try {
+		try
+		{
 
-            String sql = "select * from demographic where demographic_no = " + demoNo;
-            ResultSet rs = DBHandler.GetSQL(sql);
+			String sql = "select * from demographic where demographic_no = " + demoNo;
+			ResultSet rs = DBHandler.GetSQL(sql);
 
-            if (rs.next()) {
-                patientFirstName = oscar.Misc.getString(rs, "first_name");
-                patientLastName = oscar.Misc.getString(rs, "last_name");
-                patientName = patientLastName + "," +patientFirstName;
+			if (rs.next())
+			{
+				patientFirstName = oscar.Misc.getString(rs, "first_name");
+				patientLastName = oscar.Misc.getString(rs, "last_name");
+				patientName = patientLastName + "," + patientFirstName;
 
-                patientEmail = oscar.Misc.getString(rs, "email");
+				patientEmail = oscar.Misc.getString(rs, "email");
 
-                patientAddress = oscar.Misc.getString(rs, "address") + "<br>" + oscar.Misc.getString(rs, "city") +
-                        "," + oscar.Misc.getString(rs, "province") + "," + oscar.Misc.getString(rs, "postal");
-                patientPhone = oscar.Misc.getString(rs, "phone");
-                patientWPhone = oscar.Misc.getString(rs, "phone2");
-                patientDOB = oscar.Misc.getString(rs, "year_of_birth") + "-" +
-                        oscar.Misc.getString(rs, "month_of_birth") + "-" + oscar.Misc.getString(rs, "date_of_birth");
-                patientHealthNum = oscar.Misc.getString(rs, "hin");
-                patientSex = oscar.Misc.getString(rs, "sex");
-                patientHealthCardType = oscar.Misc.getString(rs, "hc_type");
-                patientHealthCardVersionCode = oscar.Misc.getString(rs, "ver");
-                patientChartNo = oscar.Misc.getString(rs, "chart_no");
-                patientAge = UtilDateUtilities.calcAge(UtilDateUtilities.calcDate(rs.getString("year_of_birth"), oscar.Misc.getString(rs, "month_of_birth"),
-                        oscar.Misc.getString(rs, "date_of_birth")));
-                mrp = oscar.Misc.getString(rs, "provider_no");
-            }
-            rs.close();
-            
-            int demographic_no = Integer.parseInt(demoNo);
-            DemographicExt demoExt = demographicExtDao.getLatestDemographicExt(demographic_no, "demo_cell");
-            patientCPhone = (demoExt == null) ? "" : StringUtils.trimToEmpty(demoExt.getValue());
-        } 
-        catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
-            verdict = false;
-        }
-        return verdict;
-    }
+				patientAddress = oscar.Misc.getString(rs, "address") + "<br>" + oscar.Misc.getString(rs, "city") +
+						"," + oscar.Misc.getString(rs, "province") + "," + oscar.Misc.getString(rs, "postal");
+				patientPhone = oscar.Misc.getString(rs, "phone");
+				patientWPhone = oscar.Misc.getString(rs, "phone2");
+				patientDOB = oscar.Misc.getString(rs, "year_of_birth") + "-" +
+						oscar.Misc.getString(rs, "month_of_birth") + "-" + oscar.Misc.getString(rs, "date_of_birth");
+				patientHealthNum = oscar.Misc.getString(rs, "hin");
+				patientSex = oscar.Misc.getString(rs, "sex");
+				patientHealthCardType = oscar.Misc.getString(rs, "hc_type");
+				patientHealthCardVersionCode = oscar.Misc.getString(rs, "ver");
+				patientChartNo = oscar.Misc.getString(rs, "chart_no");
+				patientAge = UtilDateUtilities.calcAge(UtilDateUtilities.calcDate(rs.getString("year_of_birth"), oscar.Misc.getString(rs, "month_of_birth"),
+						oscar.Misc.getString(rs, "date_of_birth")));
+				mrp = oscar.Misc.getString(rs, "provider_no");
+			}
+			rs.close();
 
-    public boolean estActiveTeams() {
-        boolean verdict = true;
-        teamVec = new Vector();
-        try {
+			int demographic_no = Integer.parseInt(demoNo);
+			DemographicExt demoExt = demographicExtDao.getLatestDemographicExt(demographic_no, "demo_cell");
+			patientCPhone = (demoExt == null) ? "" : StringUtils.trimToEmpty(demoExt.getValue());
+		}
+		catch (SQLException e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+			verdict = false;
+		}
+		return verdict;
+	}
 
-            String sql = "select distinct team from provider where status = '1' and team != '' order by team";
-            ResultSet rs = DBHandler.GetSQL(sql);
+	public boolean estActiveTeams()
+	{
+		boolean verdict = true;
+		teamVec = new Vector();
+		try
+		{
 
-            while (rs.next()) {
-                String teamName = oscar.Misc.getString(rs, "team");
-                if (!teamName.equals("")) {
-                    teamVec.add(teamName);
-                }
-            }
-            rs.close();
-        } catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
-            verdict = false;
-        }
-        return verdict;
-    }
+			String sql = "select distinct team from provider where status = '1' and team != '' order by team";
+			ResultSet rs = DBHandler.GetSQL(sql);
 
-    public boolean estTeams() {
+			while (rs.next())
+			{
+				String teamName = oscar.Misc.getString(rs, "team");
+				if (!teamName.equals(""))
+				{
+					teamVec.add(teamName);
+				}
+			}
+			rs.close();
+		}
+		catch (SQLException e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+			verdict = false;
+		}
+		return verdict;
+	}
 
-        boolean verdict = true;
-        teamVec = new Vector();
-        try {
+	public boolean estTeams()
+	{
 
-            String sql = "select distinct team from provider order by team ";
-            ResultSet rs = DBHandler.GetSQL(sql);
+		boolean verdict = true;
+		teamVec = new Vector();
+		try
+		{
 
-            while (rs.next()) {
-                String teamName = oscar.Misc.getString(rs, "team");
-                if (!teamName.equals("")) {
-                    teamVec.add(teamName);
-                }
-            }
-            rs.close();
-        } catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
-            verdict = false;
-        }
-        return verdict;
-    }
+			String sql = "select distinct team from provider order by team ";
+			ResultSet rs = DBHandler.GetSQL(sql);
 
-    public boolean estTeamsBySite(String providerNo) {
+			while (rs.next())
+			{
+				String teamName = oscar.Misc.getString(rs, "team");
+				if (!teamName.equals(""))
+				{
+					teamVec.add(teamName);
+				}
+			}
+			rs.close();
+		}
+		catch (SQLException e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+			verdict = false;
+		}
+		return verdict;
+	}
 
-        boolean verdict = true;
-        teamVec = new Vector();
-        try {
-            String sql = "select distinct team from provider p inner join providersite s on s.provider_no = p.provider_no " +
-            		" where s.site_id in (select site_id from providersite where provider_no = '" + providerNo + "') order by team ";
-            ResultSet rs = DBHandler.GetSQL(sql);
+	public boolean estTeamsBySite(String providerNo)
+	{
 
-            while (rs.next()) {
-                String teamName = oscar.Misc.getString(rs, "team");
-                if (!teamName.equals("")) {
-                    teamVec.add(teamName);
-                }
-            }
-            rs.close();
+		boolean verdict = true;
+		teamVec = new Vector();
+		try
+		{
+			String sql = "select distinct team from provider p inner join providersite s on s.provider_no = p.provider_no " +
+					" where s.site_id in (select site_id from providersite where provider_no = '" + providerNo + "') order by team ";
+			ResultSet rs = DBHandler.GetSQL(sql);
 
-        } catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
-            verdict = false;
-        }
-        return verdict;
-    }
+			while (rs.next())
+			{
+				String teamName = oscar.Misc.getString(rs, "team");
+				if (!teamName.equals(""))
+				{
+					teamVec.add(teamName);
+				}
+			}
+			rs.close();
 
-    public boolean estTeamsByTeam(String providerNo) {
+		}
+		catch (SQLException e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+			verdict = false;
+		}
+		return verdict;
+	}
 
-        boolean verdict = true;
-        teamVec = new Vector();
-        try {
-            String sql = "select distinct team from provider where provider_no = '" + providerNo + "' order by team ";
-            ResultSet rs = DBHandler.GetSQL(sql);
+	public boolean estTeamsByTeam(String providerNo)
+	{
 
-            while (rs.next()) {
-                String teamName = oscar.Misc.getString(rs, "team");
-                if (!teamName.equals("")) {
-                    teamVec.add(teamName);
-                }
-            }
-            rs.close();
+		boolean verdict = true;
+		teamVec = new Vector();
+		try
+		{
+			String sql = "select distinct team from provider where provider_no = '" + providerNo + "' order by team ";
+			ResultSet rs = DBHandler.GetSQL(sql);
 
-        } catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
-            verdict = false;
-        }
-        return verdict;
-    }
+			while (rs.next())
+			{
+				String teamName = oscar.Misc.getString(rs, "team");
+				if (!teamName.equals(""))
+				{
+					teamVec.add(teamName);
+				}
+			}
+			rs.close();
 
-    public boolean estRequestFromId(String id) {
+		}
+		catch (SQLException e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+			verdict = false;
+		}
+		return verdict;
+	}
 
-        boolean verdict = true;
-        getSpecailistsName(id);
-        try {
+	public boolean estRequestFromId(String id)
+	{
 
-            String sql = "select * from consultationRequests where requestId  = " +id;
+		boolean verdict = true;
+		getSpecailistsName(id);
+		try
+		{
 
-            ResultSet rs = DBHandler.GetSQL(sql);
-            if (rs.next()) {
-                pwb = oscar.Misc.getString(rs, "patientWillBook");
-                urgency = oscar.Misc.getString(rs, "urgency");
-                providerNo = oscar.Misc.getString(rs, "providerNo");
-                referalDate = oscar.Misc.getString(rs, "referalDate");
-                service = oscar.Misc.getString(rs, "serviceId");
-                specialist = oscar.Misc.getString(rs, "specId");
-                String appointmentTime = oscar.Misc.getString(rs, "appointmentTime");
-                reasonForConsultation = oscar.Misc.getString(rs, "reason");
-                clinicalInformation = oscar.Misc.getString(rs, "clinicalInfo");
-                concurrentProblems = oscar.Misc.getString(rs, "concurrentProblems");
-                currentMedications = oscar.Misc.getString(rs, "currentMeds");
-                allergies = oscar.Misc.getString(rs, "allergies");
-                sendTo = oscar.Misc.getString(rs, "sendTo");
-                status = oscar.Misc.getString(rs, "status");
+			String sql = "select * from consultationRequests where requestId  = " + id;
 
-                letterheadName = oscar.Misc.getString(rs, "letterheadName");
-                letterheadAddress = oscar.Misc.getString(rs, "letterheadAddress");
-                letterheadPhone = oscar.Misc.getString(rs, "letterheadPhone");
-                letterheadFax = oscar.Misc.getString(rs, "letterheadFax");
+			ResultSet rs = DBHandler.GetSQL(sql);
+			if (rs.next())
+			{
+				pwb = oscar.Misc.getString(rs, "patientWillBook");
+				urgency = oscar.Misc.getString(rs, "urgency");
+				providerNo = oscar.Misc.getString(rs, "providerNo");
+				referalDate = oscar.Misc.getString(rs, "referalDate");
+				service = oscar.Misc.getString(rs, "serviceId");
+				specialist = oscar.Misc.getString(rs, "specId");
+				String appointmentTime = oscar.Misc.getString(rs, "appointmentTime");
+				reasonForConsultation = oscar.Misc.getString(rs, "reason");
+				clinicalInformation = oscar.Misc.getString(rs, "clinicalInfo");
+				concurrentProblems = oscar.Misc.getString(rs, "concurrentProblems");
+				currentMedications = oscar.Misc.getString(rs, "currentMeds");
+				allergies = oscar.Misc.getString(rs, "allergies");
+				sendTo = oscar.Misc.getString(rs, "sendTo");
+				status = oscar.Misc.getString(rs, "status");
 
-		letterheadName = letterheadName == null?"":letterheadName;
-		letterheadAddress = letterheadAddress == null?"":letterheadAddress;
-		letterheadPhone = letterheadPhone == null?"":letterheadPhone;
-		letterheadFax = letterheadFax == null?"":letterheadFax;
+				letterheadName = oscar.Misc.getString(rs, "letterheadName");
+				letterheadAddress = oscar.Misc.getString(rs, "letterheadAddress");
+				letterheadPhone = oscar.Misc.getString(rs, "letterheadPhone");
+				letterheadFax = oscar.Misc.getString(rs, "letterheadFax");
 
-                signatureImg = oscar.Misc.getString(rs, "signature_img");
+				letterheadName = letterheadName == null ? "" : letterheadName;
+				letterheadAddress = letterheadAddress == null ? "" : letterheadAddress;
+				letterheadPhone = letterheadPhone == null ? "" : letterheadPhone;
+				letterheadFax = letterheadFax == null ? "" : letterheadFax;
 
-                appointmentNotes = oscar.Misc.getString(rs, "statusText");
-                if (appointmentNotes == null || appointmentNotes.equals("null")) {
-                    appointmentNotes = new String();
-                }
-                estPatient(oscar.Misc.getString(rs, "demographicNo"));
+				signatureImg = oscar.Misc.getString(rs, "signature_img");
 
-                if (bMultisites) {
-                	siteName = oscar.Misc.getString(rs, "site_name");
-                }
+				appointmentNotes = oscar.Misc.getString(rs, "statusText");
+				if (appointmentNotes == null || appointmentNotes.equals("null"))
+				{
+					appointmentNotes = new String();
+				}
+				estPatient(oscar.Misc.getString(rs, "demographicNo"));
 
-                String date = oscar.Misc.getString(rs, "appointmentDate");
-                if( date == null || date.equals("") ) {
-                	appointmentYear = "1970";
-                	appointmentMonth = "1";
-                	appointmentDay = "1";
-                	appointmentHour = "1";
-                	appointmentMinute = "1";
-                	appointmentPm = "AM";
+				if (bMultisites)
+				{
+					siteName = oscar.Misc.getString(rs, "site_name");
+				}
 
-                }
-                else {
-	                int fir = date.indexOf('-');
-	                int las = date.lastIndexOf('-');
-	                appointmentYear = date.substring(0, fir);
-	                appointmentMonth = date.substring(fir + 1, las);
-	                appointmentDay = date.substring(las + 1);
-	                fir = appointmentTime.indexOf(':');
-	                las = appointmentTime.lastIndexOf(':');
-	                if (fir > -1 && las > -1) {
+				String date = oscar.Misc.getString(rs, "appointmentDate");
+				if (date == null || date.equals(""))
+				{
+					appointmentYear = "1970";
+					appointmentMonth = "1";
+					appointmentDay = "1";
+					appointmentHour = "1";
+					appointmentMinute = "1";
+					appointmentPm = "AM";
 
-	                    appointmentHour = appointmentTime.substring(0, fir);
-	                    if (fir < las) {
-	                        appointmentMinute = appointmentTime.substring(fir + 1, las);
-	                    }
-	                    int h = Integer.parseInt(appointmentHour);
-	                    if (h > 12) {
-	                        appointmentPm = "PM";
-	                        appointmentHour = Integer.toString(h - 12);
-	                    } else if (h==12){
-	                    	appointmentPm = "PM";
-	                        appointmentHour = Integer.toString(h);
-	                    } else {
-	                        appointmentPm = "AM";
-	                        appointmentHour = Integer.toString(h);
-	                    }
-	                }
-                }
-            }
-            rs.close();
-        } catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
-            verdict = false;
-        }
-        return verdict;
-    }
+				}
+				else
+				{
+					int fir = date.indexOf('-');
+					int las = date.lastIndexOf('-');
+					appointmentYear = date.substring(0, fir);
+					appointmentMonth = date.substring(fir + 1, las);
+					appointmentDay = date.substring(las + 1);
+					fir = appointmentTime.indexOf(':');
+					las = appointmentTime.lastIndexOf(':');
+					if (fir > -1 && las > -1)
+					{
 
-    public String getSpecailistsName(String id) {
-    	if (id == null || id.trim().length() == 0) { return ""; }
-        String retval = new String();
-        try {
+						appointmentHour = appointmentTime.substring(0, fir);
+						if (fir < las)
+						{
+							appointmentMinute = appointmentTime.substring(fir + 1, las);
+						}
+						int h = Integer.parseInt(appointmentHour);
+						if (h > 12)
+						{
+							appointmentPm = "PM";
+							appointmentHour = Integer.toString(h - 12);
+						}
+						else if (h == 12)
+						{
+							appointmentPm = "PM";
+							appointmentHour = Integer.toString(h);
+						}
+						else
+						{
+							appointmentPm = "AM";
+							appointmentHour = Integer.toString(h);
+						}
+					}
+				}
+			}
+			rs.close();
+		}
+		catch (SQLException e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+			verdict = false;
+		}
+		return verdict;
+	}
 
-            String sql = "select * from professionalSpecialists where specId  = " +id;
-            ResultSet rs = DBHandler.GetSQL(sql);
-            if (rs.next()) {
-                retval = oscar.Misc.getString(rs, "lName") + ", " + oscar.Misc.getString(rs, "fName") + " " +oscar.Misc.getString(rs, "proLetters");
-                specPhone = oscar.Misc.getString(rs, "phone");
-                specFax = oscar.Misc.getString(rs, "fax");
-                specAddr = oscar.Misc.getString(rs, "address");
-                specEmail = oscar.Misc.getString(rs, "email");
-                MiscUtils.getLogger().debug("getting Null" + specEmail + "<");
-
-                if (specPhone == null || specPhone.equals("null")) {
-                    specPhone = new String();
-                }
-                if (specFax == null || specFax.equals("null")) {
-                    specFax = new String();
-                }
-                if (specAddr == null || specAddr.equals("null")) {
-                    specAddr = new String();
-                }
-                if (specEmail == null || specEmail.equalsIgnoreCase("null")) {
-                    specEmail = new String();
-                }
-            }
-            rs.close();
-        } catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
-        }
-        return retval;
-
-    }
-
-    public String getSpecailistsEmail(String id) {
-        MiscUtils.getLogger().debug("in Get SPECAILISTS EMAIL \n\n" + id);
-        String retval = new String();
-        try {
-
-            String sql = "select email from professionalSpecialists where specId  = '" + id + "'";
-            ResultSet rs = DBHandler.GetSQL(sql);
-            if (rs.next()) {
-                specEmail = oscar.Misc.getString(rs, "email");
-                MiscUtils.getLogger().debug("meial" + specEmail + "<");
-                if (specEmail == null || specEmail.equalsIgnoreCase("null")) {
-                    specEmail = new String();
-                }
-                retval = specEmail;
-            }
-            rs.close();
-        } catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
-        }
-        return retval;
-    }
-
-    public String getProviderTeam(String id) {
-        String retval = new String();
-        try {
-
-            String sql = "select team from provider where provider_no  = " + id;
-            ResultSet rs = DBHandler.GetSQL(sql);
-            if (rs.next()) {
-                retval = oscar.Misc.getString(rs, "team");
-            }
-            rs.close();
-        } catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
-        }
-        return retval;
-    }
-
-    public String getProviderName(String id) {
-        String retval = new String();
-        try {
-
-            String sql = "select * from provider where provider_no  = " + id;
-            ResultSet rs = DBHandler.GetSQL(sql);
-            if (rs.next()) {
-                retval = oscar.Misc.getString(rs, "last_name") + ", " + oscar.Misc.getString(rs, "first_name");
-            }
-            rs.close();
-        } catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
-        }
-        return retval;
-    }
-    public String getProviderOhipNo(String id) {
-		if(id == null || id.length()==0)
+	public String getSpecailistsName(String id)
+	{
+		if (id == null || id.trim().length() == 0)
+		{
 			return "";
-		
+		}
+		String retval = new String();
+		try
+		{
+
+			String sql = "select * from professionalSpecialists where specId  = " + id;
+			ResultSet rs = DBHandler.GetSQL(sql);
+			if (rs.next())
+			{
+				retval = oscar.Misc.getString(rs, "lName") + ", " + oscar.Misc.getString(rs, "fName") + " " + oscar.Misc.getString(rs, "proLetters");
+				specPhone = oscar.Misc.getString(rs, "phone");
+				specFax = oscar.Misc.getString(rs, "fax");
+				specAddr = oscar.Misc.getString(rs, "address");
+				specEmail = oscar.Misc.getString(rs, "email");
+				MiscUtils.getLogger().debug("getting Null" + specEmail + "<");
+
+				if (specPhone == null || specPhone.equals("null"))
+				{
+					specPhone = new String();
+				}
+				if (specFax == null || specFax.equals("null"))
+				{
+					specFax = new String();
+				}
+				if (specAddr == null || specAddr.equals("null"))
+				{
+					specAddr = new String();
+				}
+				if (specEmail == null || specEmail.equalsIgnoreCase("null"))
+				{
+					specEmail = new String();
+				}
+			}
+			rs.close();
+		}
+		catch (SQLException e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+		}
+		return retval;
+
+	}
+
+	public String getSpecailistsEmail(String id)
+	{
+		MiscUtils.getLogger().debug("in Get SPECAILISTS EMAIL \n\n" + id);
+		String retval = new String();
+		try
+		{
+
+			String sql = "select email from professionalSpecialists where specId  = '" + id + "'";
+			ResultSet rs = DBHandler.GetSQL(sql);
+			if (rs.next())
+			{
+				specEmail = oscar.Misc.getString(rs, "email");
+				MiscUtils.getLogger().debug("meial" + specEmail + "<");
+				if (specEmail == null || specEmail.equalsIgnoreCase("null"))
+				{
+					specEmail = new String();
+				}
+				retval = specEmail;
+			}
+			rs.close();
+		}
+		catch (SQLException e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+		}
+		return retval;
+	}
+
+	public String getProviderTeam(String id)
+	{
+		String retval = new String();
+		try
+		{
+
+			String sql = "select team from provider where provider_no  = " + id;
+			ResultSet rs = DBHandler.GetSQL(sql);
+			if (rs.next())
+			{
+				retval = oscar.Misc.getString(rs, "team");
+			}
+			rs.close();
+		}
+		catch (SQLException e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+		}
+		return retval;
+	}
+
+	public String getProviderName(String id)
+	{
+		String retval = new String();
+		try
+		{
+
+			String sql = "select * from provider where provider_no  = " + id;
+			ResultSet rs = DBHandler.GetSQL(sql);
+			if (rs.next())
+			{
+				retval = oscar.Misc.getString(rs, "last_name") + ", " + oscar.Misc.getString(rs, "first_name");
+			}
+			rs.close();
+		}
+		catch (SQLException e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+		}
+		return retval;
+	}
+
+	public String getProviderOhipNo(String id)
+	{
+		if (id == null || id.length() == 0)
+			return "";
+
 		ProviderDao dao = SpringUtils.getBean(ProviderDao.class);
 		Provider p = dao.getProvider(id);
-		if (p != null) {
-			return (p.getOhipNo() == null)? "" : p.getOhipNo();
+		if (p != null)
+		{
+			return (p.getOhipNo() == null) ? "" : p.getOhipNo();
 		}
 		return "";
 	}
 
-    public String getFamilyDoctor() {
-        String retval = new String();
-        try {
+	public String getFamilyDoctor()
+	{
+		String retval = new String();
+		try
+		{
 
-            String sql = "select p.last_name, p.first_name from provider p, demographic d where d.provider_no  = p.provider_no and  d.demographic_no = " +demoNo;
-            ResultSet rs = DBHandler.GetSQL(sql);
-            if (rs.next()) {
-                retval = oscar.Misc.getString(rs, "last_name") + ", " + oscar.Misc.getString(rs, "first_name");
-            }
-            rs.close();
-        } catch (SQLException e) {
-            MiscUtils.getLogger().error("Error", e);
-        }
-        return retval;
-    }
-    public String getFamilyDoctorOhipNo() {
+			String sql = "select p.last_name, p.first_name from provider p, demographic d where d.provider_no  = p.provider_no and  d.demographic_no = " + demoNo;
+			ResultSet rs = DBHandler.GetSQL(sql);
+			if (rs.next())
+			{
+				retval = oscar.Misc.getString(rs, "last_name") + ", " + oscar.Misc.getString(rs, "first_name");
+			}
+			rs.close();
+		}
+		catch (SQLException e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+		}
+		return retval;
+	}
+
+	public String getFamilyDoctorOhipNo()
+	{
 		ProviderDao dao = SpringUtils.getBean(ProviderDao.class);
 		List<Provider> ps = dao.getProviderByPatientId(Integer.parseInt(demoNo));
-		if (ps.isEmpty() || ps.get(0).getOhipNo() == null) {
+		if (ps.isEmpty() || ps.get(0).getOhipNo() == null)
+		{
 			return "";
 		}
 		return ps.get(0).getOhipNo();
 	}
 
-    public String getServiceName(String id) {
-        String retval = new String();
-        ConsultationServices cs = consultationServiceDao.find(Integer.parseInt(id));
-        if(cs != null) {
-        	retval = cs.getServiceDesc();
-        }
+	public String getServiceName(String id)
+	{
+		String retval = new String();
+		ConsultationServices cs = consultationServiceDao.find(Integer.parseInt(id));
+		if (cs != null)
+		{
+			retval = cs.getServiceDesc();
+		}
 
-        return retval;
-    }
+		return retval;
+	}
 
-    public String getClinicName() {
-    	ClinicDAO clinicDao = (ClinicDAO)SpringUtils.getBean("clinicDAO");
+	public String getClinicName()
+	{
+		ClinicDAO clinicDao = (ClinicDAO) SpringUtils.getBean("clinicDAO");
 
-        String retval = new String();
-        Clinic clinic = clinicDao.getClinic();
-        if(clinic != null) {
-        	retval = clinic.getClinicName();
-        }
+		String retval = new String();
+		Clinic clinic = clinicDao.getClinic();
+		if (clinic != null)
+		{
+			retval = clinic.getClinicName();
+		}
 
-        return retval;
-    }
-    public String getSiteName() {
-    	return (siteName == null) ? "" : siteName;
-    }
+		return retval;
+	}
 
-    public String patientName;
-    public String patientFirstName;
-    public String patientLastName;
-    public String patientEmail;
-    public String patientAddress;
-    public String patientPhone;
-    public String patientWPhone;
-    public String patientCPhone;
-    public String patientDOB;
-    public String patientHealthNum;
-    public String patientSex;
-    public String patientAge;
-    public String patientHealthCardType;
-    public String patientHealthCardVersionCode;
-    public String patientChartNo;
-    public String familyPhysician;
-    public String referalDate;
-    public String service;
-    public String specialist;
-    public String appointmentYear;
-    public String appointmentMonth;
-    public String appointmentDay;
-    public String appointmentHour;
-    public String appointmentMinute;
-    public String appointmentPm;
-    public String reasonForConsultation;
-    public String clinicalInformation;
-    public String concurrentProblems;
-    public String currentMedications;
-    public String allergies;
-    public String sendTo;
-    public String status;
-    public String appointmentNotes;
-    public String providerNo;
-    public String urgency;
-    public String specPhone;
-    public String specFax;
-    public String specAddr;
-    public String specEmail;
-    public Vector teamVec;
-    public String demoNo;
-    public String pwb;
-    public String mrp = "";
-    public String siteName;
-    public String signatureImg;
+	public String getSiteName()
+	{
+		return (siteName == null) ? "" : siteName;
+	}
 
-    public String letterheadName;
-    public String letterheadAddress;
-    public String letterheadPhone;
-    public String letterheadFax;
+	public String patientName;
+	public String patientFirstName;
+	public String patientLastName;
+	public String patientEmail;
+	public String patientAddress;
+	public String patientPhone;
+	public String patientWPhone;
+	public String patientCPhone;
+	public String patientDOB;
+	public String patientHealthNum;
+	public String patientSex;
+	public String patientAge;
+	public String patientHealthCardType;
+	public String patientHealthCardVersionCode;
+	public String patientChartNo;
+	public String familyPhysician;
+	public String referalDate;
+	public String service;
+	public String specialist;
+	public String appointmentYear;
+	public String appointmentMonth;
+	public String appointmentDay;
+	public String appointmentHour;
+	public String appointmentMinute;
+	public String appointmentPm;
+	public String reasonForConsultation;
+	public String clinicalInformation;
+	public String concurrentProblems;
+	public String currentMedications;
+	public String allergies;
+	public String sendTo;
+	public String status;
+	public String appointmentNotes;
+	public String providerNo;
+	public String urgency;
+	public String specPhone;
+	public String specFax;
+	public String specAddr;
+	public String specEmail;
+	public Vector teamVec;
+	public String demoNo;
+	public String pwb;
+	public String mrp = "";
+	public String siteName;
+	public String signatureImg;
 
+	public String letterheadName;
+	public String letterheadAddress;
+	public String letterheadPhone;
+	public String letterheadFax;
 
 
 }

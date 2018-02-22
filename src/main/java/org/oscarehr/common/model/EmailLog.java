@@ -72,12 +72,14 @@ public class EmailLog extends AbstractModel<Long> implements Serializable
 	private String emailContent;
 
 	@PreRemove
-	protected void jpaPreventDelete() {
+	protected void jpaPreventDelete()
+	{
 		throw (new UnsupportedOperationException("Remove is not allowed for this type of item."));
 	}
 
 	@PreUpdate
-	protected void jpaPreventUpdate() {
+	protected void jpaPreventUpdate()
+	{
 		throw (new UnsupportedOperationException("Update is not allowed for this type of item."));
 	}
 
