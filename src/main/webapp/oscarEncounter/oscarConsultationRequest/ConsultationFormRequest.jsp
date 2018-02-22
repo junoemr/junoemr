@@ -63,8 +63,11 @@
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao, org.oscarehr.PMmodule.model.Program" %>
 <%@page import="oscar.oscarDemographic.data.DemographicData, oscar.oscarRx.data.RxProviderData, oscar.oscarRx.data.RxProviderData.Provider, oscar.oscarClinic.ClinicData"%>
 <%@page import="org.oscarehr.util.EmailUtils" %>
+<%@ page import="org.oscarehr.common.dao.ConsultationRequestDao" %>
+<%@ page import="org.oscarehr.common.model.ConsultationRequest" %>
 <!-- add for custom invoice link OHSUPPORT 2883 -->
 <%@ page import="java.net.*, oscar.SxmlMisc"%>
+
 <!-- end -->
 <html:html locale="true">
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
@@ -1486,16 +1489,28 @@ function chooseEmail(){
                 name="updateAndEmailDetails"
                 value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailAppointmentTime"/>'
                 onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
-            <% } %>
-			<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
-			<input type="button"
-					<% if(!enableEmail) { %> disabled="disabled" <% } %>
-				   id="updateAndEmailNotification" name="updateAndEmailNotification"
-				   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailNotification"/>"
-				   onclick="return checkForm('Update And Email Notification','EctConsultationFormRequestForm');" />
-			<% }
-
-					 } else { %>
+						<% } %>
+						<%
+							if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled"))
+							{
+								boolean disableNotification = !enableEmail;
+								if (requestId != null)
+								{
+									ConsultationRequestDao consultationRequestDao = (ConsultationRequestDao) SpringUtils.getBean("consultationRequestDao");
+									ConsultationRequest consult = consultationRequestDao.find(Integer.parseInt(requestId));
+									disableNotification = disableNotification || consult.isNotificationSent();
+						%>
+								<input type="button"
+								<% if(disableNotification) { %> disabled="disabled" <% } %>
+							   id="updateAndEmailNotification" name="updateAndEmailNotification"
+							   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailNotification"/>"
+							   onclick="return checkForm('Update And Email Notification','EctConsultationFormRequestForm');"/>
+						<%
+								}
+							}
+						}
+						else
+						{ %>
 						<input name="submitSaveOnly" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmit"/>" onclick="return checkForm('Submit Consultation Request','EctConsultationFormRequestForm'); " />
 						<input name="submitAndPrint" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndPrint"/>" onclick="return checkForm('Submit Consultation Request And Print Preview','EctConsultationFormRequestForm'); " />
 						<input name="submitAndSendElectronicallyTop" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndSendElectronicReferral"/>" onclick="return checkForm('Submit_esend','EctConsultationFormRequestForm');" />
