@@ -38,6 +38,7 @@ import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -96,7 +97,6 @@ public final class MessageUploader {
 	 */
 	public static String routeReport(LoggedInInfo loggedInInfo, String serviceName, String type, String hl7Body, int fileId, RouteReportResults results) throws Exception {
 
-		
 		String retVal = "";
 		try {
 			MessageHandler messageHandler = Factory.getHandler(type, hl7Body);
@@ -236,38 +236,68 @@ public final class MessageUploader {
 
 			}
 
-			if(type.equals("OLIS_HL7") && demProviderNo.equals("0")) {
-				OLISSystemPreferencesDao olisPrefDao = (OLISSystemPreferencesDao)SpringUtils.getBean("OLISSystemPreferencesDao");
-			    OLISSystemPreferences olisPreferences =  olisPrefDao.getPreferences();
-			    if(olisPreferences.isFilterPatients()) {
-			    	//set as unclaimed
-			    	providerRouteReport(String.valueOf(insertID), null, DbConnectionFilter.getThreadLocalDbConnection(), String.valueOf(0), type);
-			    } else {
-			    	providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type);
-			    }
-			} else {
+			if(type.equals("OLIS_HL7") && demProviderNo.equals("0"))
+			{
+				OLISSystemPreferencesDao olisPrefDao = SpringUtils.getBean(OLISSystemPreferencesDao.class);
+				OLISSystemPreferences olisPreferences = olisPrefDao.getPreferences();
+				if(olisPreferences.isFilterPatients())
+				{
+					//set as unclaimed
+					providerRouteReport(String.valueOf(insertID), null, DbConnectionFilter.getThreadLocalDbConnection(), String.valueOf(0), type);
+				}
+				else
+				{
+					providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type);
+				}
+			}
+			else
+			{
 				Integer limit = null;
 				boolean orderByLength = false;
 				String search = null;
-				if (type.equals("Spire")) {
+				if(type.equals("Spire"))
+				{
 					limit = new Integer(1);
 					orderByLength = true;
 					search = "provider_no";
 				}
-				else if (type.equals("CLS") || type.equals("CLSDI")) {
+				else if(type.equals("CLS") || type.equals("CLSDI"))
+				{
 					search = "hso_no";
 				}
-				else if (type.equals("IHA"))
+				else if(type.equals("IHA"))
 				{
 					search = "alberta_e_delivery_ids";
 				}
-				providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+
+				/* allow property override setting to route all labs to a specific inbox or list of inboxes. */
+				String route_labs_to_provider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
+				if(route_labs_to_provider.equals("0"))
+				{
+					// Send to the unclaimed inbox
+					providerRouteReport(String.valueOf(insertID), null, DbConnectionFilter.getThreadLocalDbConnection(), String.valueOf(0), type);
+
+				}
+				else if(!route_labs_to_provider.equals(""))
+				{
+					// Send to matching provider ohip_no
+					ArrayList<String> providers = new ArrayList<>(Arrays.asList(route_labs_to_provider.split(",")));
+					providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+				}
+				else
+				{
+					// Normal -- send to docs who requested for the labs OR to the family doctor
+					providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+				}
 			}
 			retVal = messageHandler.audit();
-			if(results != null) {
+			if(results != null)
+			{
 				results.segmentId = insertID;
 			}
-		} catch (Exception e) {
+		}
+		catch(Exception e)
+		{
 			logger.error("Error uploading lab to database");
 			throw e;
 		}
