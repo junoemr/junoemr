@@ -63,8 +63,9 @@ public class TeleplanAPI {
     public static String ExternalActionPutRemit   = "AputRemit";
     public static String ExternalActionCheckE45   = "AcheckE45";
 
-    
-    //public String CONTACT_URL = "https://tlpt2.moh.hnet.bc.ca/TeleplanBroker";
+
+	// If you need to set this to a different URL, put it in the properties file instead.
+	// Set TELEPLAN_URL=https://tlpt2.moh.hnet.bc.ca/TeleplanBroker
     public String CONTACT_URL = "https://teleplan.hnet.bc.ca/TeleplanBroker";
     
     HttpClient httpclient = null;
@@ -78,9 +79,6 @@ public class TeleplanAPI {
         getClient();
         
     }
-    
-    
-	
 
     private void getClient(){
        CONTACT_URL = OscarProperties.getInstance().getProperty("TELEPLAN_URL",CONTACT_URL);
