@@ -2138,6 +2138,13 @@ if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","fals
 
 	</oscar:oscarPropertiesCheck>
 
+	<oscar:oscarPropertiesCheck property="medisproutplugin" value="true" defaultVal="false">
+  	   <c:set var="appointmentNo" value="<%=appointment_no %>" />
+	   <jsp:include page="medisprout.jsp" >
+  	     <jsp:param value="${appointmentNo}" name="appointmentNo"/>
+	   </jsp:include>
+	</oscar:oscarPropertiesCheck>
+
       <!--Inline display of reason -->
       <oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true">
         <span class="reason">

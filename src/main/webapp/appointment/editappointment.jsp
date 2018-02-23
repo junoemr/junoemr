@@ -25,6 +25,8 @@
 --%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
+<%@page import="org.oscarehr.integration.medisprout.MediSprout"%>
+<%@page import="org.oscarehr.common.model.MediSproutAppointment"%>
 <%
   if (session.getAttribute("user") == null)    response.sendRedirect("../logout.jsp");
 
@@ -723,6 +725,24 @@ if (bMultisites) { %>
                 <INPUT TYPE="hidden" NAME="appointment_no" VALUE="<%=appointment_no%>">
             </div>
         </li>
+        <% if (props.getProperty("medisproutplugin", "false").equalsIgnoreCase("true")) {
+        
+        	MediSprout mediSprout = new MediSprout();
+        	MediSproutAppointment mediSproutAppointment = mediSprout.getAppointment(appointment_no);
+        	
+        	if (mediSproutAppointment != null) {
+        %>
+	        <li class="row weak">
+				<div class="label">Provider:</div>
+	            <div class="input"><a href="<%= mediSproutAppointment.getProviderUrl() %>" target="_blank">LiveCare</a></div>
+	            <div class="space">&nbsp;</div>
+				<div class="label">Attendee:</div>
+	            <div class="input"><a href="<%= mediSproutAppointment.getAttendeesUrl() %>" target="_blank">LiveCare</a></div>
+	        </li>
+        <%
+        	} 
+        }
+        %>
         <li class="row weak">
             <div class="label">Create Date:</div>
             <div class="input">
@@ -764,6 +784,7 @@ if (bMultisites) { %>
 			<div class="label"></div>
             <div class="input"></div>
         </li>
+
     </ul>
 
 <% if (isSiteSelected) { %>

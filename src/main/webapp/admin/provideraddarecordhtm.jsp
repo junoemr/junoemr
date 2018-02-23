@@ -419,6 +419,13 @@ for (int i=0; i<sites.size(); i++) {
 			</td>
 		</tr>
 	</caisi:isModuleLoad>
+	<% if (OscarProperties.getInstance().getProperty("medisproutplugin", "false").equalsIgnoreCase("true")) {
+	%>
+			<tr>
+				<td align="right">MediSprout API Key:</td>
+				<td><input type="text" name="mediSproutApiKey" value="" maxlength="64"></td>
+			</tr>
+	<%} %>
 	<tr>
 		<td colspan="2">
 		<div align="center"><%-- not quite sure why we need both dboperation and displaymode set to the same thing, but

@@ -33,6 +33,7 @@
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.model.Appointment" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.integration.medisprout.MediSprout" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
@@ -51,10 +52,23 @@
 	</tr>
 </table>
 <%
-	Appointment appt = appointmentDao.find(Integer.parseInt(request.getParameter("appointment_no")));
-	appointmentArchiveDao.archiveAppointment(appt);
-	int rowsAffected = oscarSuperManager.update("appointmentDao", "delete", new Object [] {request.getParameter("appointment_no")});
-	if (rowsAffected == 1) {
+    int appointment_no = Integer.parseInt(request.getParameter("appointment_no"));
+	String provider_no = request.getParameter("provider_no");
+	oscar.OscarProperties pros = oscar.OscarProperties.getInstance();
+
+	boolean deleteMediSproutAppt = true;
+ 	if (pros.getProperty("medisproutplugin", "false").equalsIgnoreCase("true")) {
+		MediSprout medisprout = new MediSprout();
+		if (medisprout.getAppointment(request.getParameter("appointment_no")) != null) {
+			deleteMediSproutAppt = medisprout.deleteAppointment(appointment_no, provider_no);
+		} 
+	}
+
+ 	if (deleteMediSproutAppt) {
+		Appointment appt = appointmentDao.find(appointment_no);
+		appointmentArchiveDao.archiveAppointment(appt);
+		int rowsAffected = oscarSuperManager.update("appointmentDao", "delete", new Object [] {request.getParameter("appointment_no")});
+		if (rowsAffected == 1) {
 %>
 <p>
 <h1><bean:message
@@ -64,14 +78,21 @@
 	self.opener.refresh();
 	self.close();
 </script> <%
-	} else {
+		} else {
 %>
 <p>
 <h1><bean:message
 	key="appointment.appointmentdeletearecord.msgDeleteFailure" /></h1>
 
 <%
-	}
+		}
+ 	} else {
+ 		%>
+<p>
+<h1>Unable to delete MediSprout Appointment</h1>
+
+ <%			
+ 	}
 %>
 <p></p>
 <hr width="90%"/>

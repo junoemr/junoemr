@@ -32,6 +32,7 @@ import java.io.Serializable;
 public class Providerext implements Serializable {
     private String _providerNo;
     private String _signature;
+    private String _mediasproutapikey;
 
     // constructors
     public Providerext () {
@@ -74,5 +75,14 @@ public class Providerext implements Serializable {
 
     public String toString () {
         return super.toString();
+    }
+
+
+	public String getMediasproutapikey() {
+    	return _mediasproutapikey;
+    }
+
+	public void setMediasproutapikey(String mediasproutapikey) {
+    	this._mediasproutapikey = mediasproutapikey;
     }
 }
