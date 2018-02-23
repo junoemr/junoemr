@@ -25,10 +25,6 @@
 
 package oscar.oscarBilling.ca.bc.Teleplan;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpState;
@@ -41,15 +37,18 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
-
 import oscar.OscarProperties;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  *
  * @author jay
  */
 public class TeleplanAPI {
-    static Logger log=MiscUtils.getLogger();
+    private static Logger log=MiscUtils.getLogger();
     	
     public static String ExternalActionLogon      = "AsignOn";
     public static String ExternalActionLogoff     = "AsignOff";
@@ -82,7 +81,11 @@ public class TeleplanAPI {
 
     private void getClient(){
        CONTACT_URL = OscarProperties.getInstance().getProperty("TELEPLAN_URL",CONTACT_URL);
-       HttpState initialState = new HttpState();
+
+	    String proxy_host = OscarProperties.getInstance().getProperty("teleplan_proxy_host");
+	    String proxy_port = OscarProperties.getInstance().getProperty("teleplan_proxy_port");
+
+	    HttpState initialState = new HttpState();
         // Initial set of cookies can be retrieved from persistent storage and 
         // re-created, using a persistence mechanism of choice,
         Cookie mycookie = new Cookie("moh.hnet.bc.ca","mycookie", "stuff", "/", null, false);        // and then added to your HTTP state instance
@@ -95,6 +98,12 @@ public class TeleplanAPI {
         httpclient = new HttpClient(); //hcParams);
         httpclient.getHttpConnectionManager().getParams().setConnectionTimeout(30000);
         httpclient.setState(initialState);
+
+	    if(proxy_host != null && proxy_port != null)
+	    {
+		    httpclient.getHostConfiguration().setProxy(
+				    proxy_host, Integer.parseInt(proxy_port));
+	    }
         
         httpclient.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
         httpclient.getParams().setParameter("User-Agent","TeleplanPerl 1.0");  
