@@ -154,16 +154,21 @@
    </script>
 
    <script type="text/javascript">
-        function aSubmit(){
-            if(document.getElementById("eform_iframe")!=null)document.getElementById("eform_iframe").contentWindow.document.forms[0].submit();
+	   function aSubmit()
+	   {
+		   var submitButtons = jQuery("#adddemographic").find("input[type='submit']");
+		   submitButtons.attr('disabled', 'disabled');
 
-            if(!checkFormTypeIn()) return false;
+		   if (document.getElementById("eform_iframe") != null) document.getElementById("eform_iframe").contentWindow.document.forms[0].submit();
 
-            if( !ignoreDuplicates() ) return false;
+		   if (!checkFormTypeIn() || !ignoreDuplicates())
+		   {
+			   submitButtons.removeAttr('disabled');
+			   return false;
+		   }
 
-            return true;
-        }
-
+		   return true;
+	   }
    </script>
 
 

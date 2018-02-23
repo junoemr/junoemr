@@ -205,6 +205,18 @@
 		</style>
 		<script language="JavaScript">
 
+			function onSubmit()
+			{
+				document.adddemographic.submit.disabled = true;
+				if (!checkFormTypeIn())
+				{
+					document.adddemographic.submit.disabled = false;
+					return false;
+				}
+
+				return true;
+			}
+
 			function setfocus() {
 				this.focus();
 				document.adddemographic.last_name.focus();
@@ -486,8 +498,7 @@
 	</table>
 
 	<%@ include file="zdemographicfulltitlesearch.jsp"%>
-	<!--<form method="post" name="adddemographic" action="demographiccontrol.jsp" onsubmit="return checkFormTypeIn()">-->
-	<form method="post" name="adddemographic" action="demographicaddarecord.jsp" onsubmit="return checkFormTypeIn()">
+	<form method="post" name="adddemographic" action="demographicaddarecord.jsp" onsubmit="return onSubmit()">
 		<%
 			for(int i=0; i<custom_demographic_fields.size(); i++){
 				if(hidden_demographic_fields.indexOf(custom_demographic_fields.get(i)) >= 0){
