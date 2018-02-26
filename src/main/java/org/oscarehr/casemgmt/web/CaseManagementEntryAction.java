@@ -82,12 +82,14 @@ import org.oscarehr.common.dao.BillingServiceDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.ProviderDefaultProgramDao;
+import org.oscarehr.common.dao.ProviderPreferenceDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderDefaultProgram;
+import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.eyeform.dao.EyeFormDao;
 import org.oscarehr.eyeform.dao.EyeformFollowUpDao;
@@ -1859,6 +1861,16 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 				providerview = loggedInInfo.getLoggedInProviderNo();
 			}
 			String defaultView = oscar.OscarProperties.getInstance().getProperty("default_view", "");
+
+			ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
+			DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+			Demographic demographic = demographicDao.getDemographic(demoNo);
+			//Should we get the billform based on the appointment provider or the demographic's provider?
+			ProviderPreference providerPreference = providerPreferenceDao.find(demographic.getProviderNo());
+
+			if (providerPreference != null && !providerPreference.getDefaultServiceType().equals("no")) {
+				defaultView = providerPreference.getDefaultServiceType();
+			}
 
 			Set setIssues = cform.getCaseNote().getIssues();
 			Iterator iter = setIssues.iterator();
