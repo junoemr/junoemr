@@ -103,7 +103,7 @@ public class SendFaxPDFAction extends DispatchAction {
 					Exception exception = null;
 					try
 					{
-						sendFax("DOC-" + docNo, faxPdf, faxNo);
+						sendFax("DOC-" + docNo, faxPdf, faxNo, false);
 					}
 					catch(Exception e)
 					{
@@ -153,7 +153,7 @@ public class SendFaxPDFAction extends DispatchAction {
 		{
 			try
 			{
-				sendFax("Form-" + formName, pdfPath, recipients[i]);
+				sendFax("Form-" + formName, pdfPath, recipients[i], true);
 			}
 			catch (Exception e)
 			{
@@ -168,7 +168,7 @@ public class SendFaxPDFAction extends DispatchAction {
 		return mapping.findForward("success");
 	}
 
-	private void sendFax(String fileName, String tmpPdf, String faxNo)
+	private void sendFax(String fileName, String pdf, String faxNo, boolean deleteFile)
 		throws DocumentException, IOException
 	{
 		String tempPath = OscarProperties.getInstance().getProperty("fax_file_location");
@@ -178,13 +178,13 @@ public class SendFaxPDFAction extends DispatchAction {
 		String faxTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
 
 		MiscUtils.getLogger().info("======================================================");
-		MiscUtils.getLogger().info(tmpPdf);
+		MiscUtils.getLogger().info(pdf);
 		MiscUtils.getLogger().info(faxPdf);
 		MiscUtils.getLogger().info(faxTxt);
 		MiscUtils.getLogger().info("======================================================");
 
 		// Copying the fax pdf.
-		FileUtils.copyFile(new File(tmpPdf), new File(faxPdf));
+		FileUtils.copyFile(new File(pdf), new File(faxPdf));
 
 		// Creating text file with the specialists fax number.
 		FileOutputStream fos = new FileOutputStream(faxTxt);
@@ -200,8 +200,11 @@ public class SendFaxPDFAction extends DispatchAction {
 				"Unable to create files for fax of " + fileName + ".");
 		}
 
-		// clear temp files on JVM exit
-		new File(tmpPdf).deleteOnExit();
+		if (deleteFile)
+		{
+			// clear temp files on JVM exit
+			new File(pdf).deleteOnExit();
+		}
 	}
 
 	private String getUserFriendlyError(Exception e)
