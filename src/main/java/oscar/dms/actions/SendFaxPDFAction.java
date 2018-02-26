@@ -103,7 +103,7 @@ public class SendFaxPDFAction extends DispatchAction {
 					Exception exception = null;
 					try
 					{
-						sendFax("DOC-" + docNo, faxPdf, faxNo, false);
+						sendFax("DOC-" + docNo, faxPdf, faxNo);
 					}
 					catch(Exception e)
 					{
@@ -153,7 +153,7 @@ public class SendFaxPDFAction extends DispatchAction {
 		{
 			try
 			{
-				sendFax("Form-" + formName, pdfPath, recipients[i], true);
+				faxTempFile("Form-" + formName, pdfPath, recipients[i]);
 			}
 			catch (Exception e)
 			{
@@ -168,7 +168,17 @@ public class SendFaxPDFAction extends DispatchAction {
 		return mapping.findForward("success");
 	}
 
-	private void sendFax(String fileName, String pdf, String faxNo, boolean deleteFile)
+	private void faxTempFile(String fileName, String tmpPdf, String faxNo)
+		throws DocumentException, IOException
+	{
+		sendFax(fileName, tmpPdf, faxNo);
+
+		// clear temp files on JVM exit
+		new File(tmpPdf).deleteOnExit();
+	}
+
+
+	private void sendFax(String fileName, String pdf, String faxNo)
 		throws DocumentException, IOException
 	{
 		String tempPath = OscarProperties.getInstance().getProperty("fax_file_location");
@@ -198,12 +208,6 @@ public class SendFaxPDFAction extends DispatchAction {
 		{
 			throw new DocumentException(
 				"Unable to create files for fax of " + fileName + ".");
-		}
-
-		if (deleteFile)
-		{
-			// clear temp files on JVM exit
-			new File(pdf).deleteOnExit();
 		}
 	}
 
