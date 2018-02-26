@@ -56,7 +56,7 @@ public class AddReferralDocAction extends Action {
     	 
     	 List<Billingreferral> billingReferrals = billingReferralDao.getBillingreferral(f.getReferral_no());
     	 
-    	 if(billingReferrals == null) {
+    	 if(billingReferrals.isEmpty()) {
     		 Billingreferral billingReferral = new Billingreferral();
     		 billingReferral.setReferralNo(f.getReferral_no());
     		 billingReferral.setLastName(f.getLast_name());
