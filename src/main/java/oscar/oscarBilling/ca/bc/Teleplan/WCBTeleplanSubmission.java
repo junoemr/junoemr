@@ -25,21 +25,21 @@
 
 package oscar.oscarBilling.ca.bc.Teleplan;
 
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-
+import org.oscarehr.util.SpringUtils;
 import oscar.Misc;
 import oscar.OscarProperties;
 import oscar.entities.Billingmaster;
 import oscar.entities.WCB;
 import oscar.oscarBilling.ca.bc.MSP.TeleplanFileWriter;
+
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 /**
  *
  * @author jaygallagher
@@ -47,7 +47,7 @@ import oscar.oscarBilling.ca.bc.MSP.TeleplanFileWriter;
 public class WCBTeleplanSubmission {
     private static Logger log = MiscUtils.getLogger();
     
-    private DemographicManager demographicManager = null;
+    private static DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
     
     //Misc misc = new Misc();
     public String getHtmlLine(WCB wcb,Billingmaster bm) {
@@ -121,7 +121,7 @@ public class WCBTeleplanSubmission {
 				}
 			}
 
-			if(wcb.getW_reporttype() != null && wcb.getW_reporttype().equals("F"))
+			if(wcb.getW_reporttype() != null && wcb.getW_reporttype().equals("F") && wcb.getFormNeeded() == 1)
 			{
 				if(wcb.getW_empname() != null && wcb.getW_empname().trim().length() == 0)
 				{
@@ -289,7 +289,7 @@ public class WCBTeleplanSubmission {
    private String Claim(LoggedInInfo loggedInInfo, String logNo, String billedAmount, String feeitem,String billingUnit,String correspondenceCode,Billingmaster bm,WCB wcb) {
       StringBuilder dLine = new StringBuilder();
      
-      Demographic d = demographicManager.getDemographic(loggedInInfo, ""+bm.getDemographicNo()); 
+      Demographic d = demographicDao.getDemographic(String.valueOf(bm.getDemographicNo()));
       
       dLine.append("C02");
       dLine.append( this.ClaimNote1Head(logNo,bm.getPayeeNo(),bm.getPractitionerNo()) );
@@ -299,7 +299,7 @@ public class WCBTeleplanSubmission {
       dLine.append( "0" );//Misc.space(1)
       dLine.append( "00");//Misc.backwardSpace("", 2).toUpperCase()
       dLine.append( Misc.zero(2));
-      dLine.append( Misc.forwardZero(billingUnit, 3)); // SR#: 7153 v1.9 Section 6.1.1 SEQ P20
+      dLine.append( Misc.forwardZero(TeleplanFileWriter.roundUp(billingUnit), 3)); // SR#: 7153 v1.9 Section 6.1.1 SEQ P20
       dLine.append( Misc.zero(2 + 2 + 1 + 2) ); //clarification
       dLine.append( Misc.forwardZero(feeitem, 5));
       dLine.append( Misc.moneyFormatPaddedZeroNoDecimal(billedAmount, 7));
@@ -357,14 +357,5 @@ public class WCBTeleplanSubmission {
       + Misc.forwardZero(String.valueOf(logNo), 7)
       + Misc.forwardZero(w_payeeno, 5)
       + Misc.forwardZero(w_pracno, 5);
-   } 
-   
-   
-   public void setDemographicManager(
-		   DemographicManager demographicManager) {
-	   	this.demographicManager = demographicManager;
-    }
-  
-   
-    
+   }
 }

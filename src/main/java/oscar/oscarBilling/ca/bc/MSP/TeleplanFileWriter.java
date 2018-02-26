@@ -25,13 +25,6 @@
 
 package oscar.oscarBilling.ca.bc.MSP;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.BillingDao;
 import org.oscarehr.common.model.Billing;
@@ -39,7 +32,6 @@ import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.Misc;
 import oscar.entities.Billingmaster;
 import oscar.entities.WCB;
@@ -47,6 +39,13 @@ import oscar.oscarBilling.ca.bc.Teleplan.TeleplanSequenceDAO;
 import oscar.oscarBilling.ca.bc.Teleplan.WCBTeleplanSubmission;
 import oscar.oscarBilling.ca.bc.data.BillingmasterDAO;
 import oscar.oscarProvider.data.ProviderData;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -232,7 +231,6 @@ public class TeleplanFileWriter {
            MiscUtils.getLogger().debug("BM "+bm+" WCB "+wcbForm + " for "+billing_no);
            
            WCBTeleplanSubmission wcbSub = new WCBTeleplanSubmission();
-           wcbSub.setDemographicManager(demographicManager);
            //WcbSb sb = new WcbSb(billing_no);
            appendToHTML(wcbSub.getHtmlLine(wcbForm,bm)); //sb.getHtmlLine());
            appendToHTML(wcbSub.validate(wcbForm,bm)); //sb.validate());
