@@ -239,7 +239,7 @@ function addSvcCode(svcCode) {
     }
   }
 function getAssocCode(svcCode,assocCodes){
-  var retcode = ""
+  var retcode = "";
   for (var i = 0; i < assocCodes.length; i++) {
     var row = assocCodes[i];
 
@@ -250,7 +250,7 @@ function getAssocCode(svcCode,assocCodes){
   return retcode;
 }
 function checkSelectedCodes(){
-    myform = document.forms[0];
+    var myform = document.forms[0];
     for (var i = 0; i < myform.service.length; i++) {
         if (myform.service[i].checked) {
             if(!codeEntered(myform.service[i].value)){
@@ -259,10 +259,6 @@ function checkSelectedCodes(){
         }
     }
 }
-
-
-
-
 
 
 function HideElementById(ele){
@@ -510,15 +506,13 @@ function grabEnter(event,callb){
 
 </SCRIPT>
 <script language="JavaScript">
-<!--
-<!--
+
 function reloadPage(init) {  //reloads the window if Nav4 resized
   if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
     document.pgW=innerWidth; document.pgH=innerHeight; onresize=reloadPage; }}
   else if (innerWidth!=document.pgW || innerHeight!=document.pgH) location.reload();
 }
 reloadPage(true);
-// -->
 
 function findObj(n, d) { //v4.0
   var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
