@@ -309,7 +309,7 @@ public class ManageTeleplanAction extends DispatchAction {
 		}
 		catch(Exception e)
 		{
-			log.warn(e.getMessage(), e);
+			log.warn(e.getMessage());
 			request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
 			return mapping.findForward("error");
 		}
@@ -424,7 +424,7 @@ public class ManageTeleplanAction extends DispatchAction {
 		}
 		catch(Exception e)
 		{
-			log.warn(e.getMessage(), e);
+			log.warn(e.getMessage());
 			request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
 			return mapping.findForward("error");
 		}
@@ -474,7 +474,7 @@ public class ManageTeleplanAction extends DispatchAction {
 		}
 		catch(Exception e)
 		{
-			log.warn(e.getMessage(), e);
+			log.warn(e.getMessage());
 			request.setAttribute("error", e.getMessage());
 			return mapping.findForward("error");
 		}
@@ -515,7 +515,7 @@ public class ManageTeleplanAction extends DispatchAction {
 		}
 		catch(Exception e)
 		{
-			log.warn(e.getMessage(), e);
+			log.warn(e.getMessage());
 			request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
 			return mapping.findForward("checkElig");
 		}
