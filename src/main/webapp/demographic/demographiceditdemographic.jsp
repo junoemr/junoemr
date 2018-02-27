@@ -2604,7 +2604,11 @@ if ( Dead.equals(PatStat) ) {%>
 									<option value="BC" <%=hctype.equals("BC")?" selected":""%>>BC-British Columbia</option>
 									<option value="MB" <%=hctype.equals("MB")?" selected":""%>>MB-Manitoba</option>
 									<option value="NB" <%=hctype.equals("NB")?" selected":""%>>NB-New Brunswick</option>
+									<% if (oscarProps.isBritishColumbiaInstanceType() && !oscarProps.isClinicaidBillingType()) {%>
+									<option value="NF" <%=hctype.equals("NF")?" selected":""%>>NF-Newfoundland & Labrador</option>
+									<% } else { %>
 									<option value="NL" <%=hctype.equals("NL")?" selected":""%>>NL-Newfoundland & Labrador</option>
+									<% } %>
 									<option value="NT" <%=hctype.equals("NT")?" selected":""%>>NT-Northwest Territory</option>
 									<option value="NS" <%=hctype.equals("NS")?" selected":""%>>NS-Nova Scotia</option>
 									<option value="NU" <%=hctype.equals("NU")?" selected":""%>>NU-Nunavut</option>
