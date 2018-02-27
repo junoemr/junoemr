@@ -184,60 +184,77 @@ if(!authed) {
 <%=createAssociationJS(supDao.getAssociationKeyValues(),"trayAssocCodes")%>
 
 
-
-function codeEntered(svcCode){
-	myform = document.forms[0];
-	return((myform.xml_other1.value == svcCode)||(myform.xml_other2.value == svcCode)||(myform.xml_other3.value == svcCode))
+function codeEntered(svcCode)
+{
+	var myform = document.forms[0];
+	return ((myform.xml_other1.value == svcCode) || (myform.xml_other2.value == svcCode) || (myform.xml_other3.value == svcCode))
 }
-function addSvcCode(svcCode) {
-    myform = document.forms[0];
-    for (var i = 0; i < myform.service.length; i++) {
-      if (myform.service[i].value == svcCode) {
-        if (myform.service[i].checked) {
-          if (myform.xml_other1.value == "") {
-            myform.xml_other1.value = svcCode;
-            var trayCode =  getAssocCode(svcCode,trayAssocCodes);
-            if(trayCode!=''){
-              myform.xml_other2.value = trayCode;
-            }
-            myform.xml_diagnostic_detail1.value = getAssocCode(svcCode,jsAssocCodes);
-          }
-          else if (myform.xml_other2.value == "") {
-            myform.xml_other2.value = svcCode;
-            var trayCode =  getAssocCode(svcCode,trayAssocCodes);
-            if(trayCode!=''){
-              myform.xml_other3.value = trayCode;
-            }
-            myform.xml_diagnostic_detail2.value = getAssocCode(svcCode,jsAssocCodes);
-          }
-          else if (myform.xml_other3.value == "") {
-            myform.xml_other3.value = svcCode;
-            myform.xml_diagnostic_detail3.value = getAssocCode(svcCode,jsAssocCodes);
-          }
-          else {
-            alert("There are already three service codes entered");
-            myform.service[i].checked = false;
-            return;
-          }
-        }
-        else {
-          if (myform.xml_other1.value == svcCode) {
-            myform.xml_other1.value = "";
-            myform.xml_other2.value = "";
-            myform.xml_diagnostic_detail1.value = "";
-          }
-          else if (myform.xml_other2.value == svcCode) {
-            myform.xml_other2.value = "";
-            myform.xml_diagnostic_detail2.value = "";
-          }
-          else if (myform.xml_other3.value == svcCode) {
-            myform.xml_other3.value = "";
-            myform.xml_diagnostic_detail3.value = "";
-          }
-        }return;
-      }
-    }
-  }
+
+function addSvcCode(svcCode)
+{
+	var myform = document.forms[0];
+	for (var i = 0; i < myform.service.length; i++)
+	{
+		if (myform.service[i].value == svcCode)
+		{
+			if (myform.service[i].checked)
+			{
+				if (myform.xml_other1.value == "")
+				{
+					myform.xml_other1.value = svcCode;
+					var trayCode = getAssocCode(svcCode, trayAssocCodes);
+					if (trayCode != '')
+					{
+						myform.xml_other2.value = trayCode;
+					}
+					myform.xml_diagnostic_detail1.value = getAssocCode(svcCode, jsAssocCodes);
+				}
+				else if (myform.xml_other2.value == "")
+				{
+					myform.xml_other2.value = svcCode;
+					var trayCode = getAssocCode(svcCode, trayAssocCodes);
+					if (trayCode != '')
+					{
+						myform.xml_other3.value = trayCode;
+					}
+					myform.xml_diagnostic_detail2.value = getAssocCode(svcCode, jsAssocCodes);
+				}
+				else if (myform.xml_other3.value == "")
+				{
+					myform.xml_other3.value = svcCode;
+					myform.xml_diagnostic_detail3.value = getAssocCode(svcCode, jsAssocCodes);
+				}
+				else
+				{
+					alert("There are already three service codes entered");
+					myform.service[i].checked = false;
+					return false;
+				}
+			}
+			else
+			{
+				if (myform.xml_other1.value == svcCode)
+				{
+					myform.xml_other1.value = "";
+					myform.xml_other2.value = "";
+					myform.xml_diagnostic_detail1.value = "";
+				}
+				else if (myform.xml_other2.value == svcCode)
+				{
+					myform.xml_other2.value = "";
+					myform.xml_diagnostic_detail2.value = "";
+				}
+				else if (myform.xml_other3.value == svcCode)
+				{
+					myform.xml_other3.value = "";
+					myform.xml_diagnostic_detail3.value = "";
+				}
+			}
+			return true;
+		}
+	}
+	return false;
+}
 function getAssocCode(svcCode,assocCodes){
   var retcode = "";
   for (var i = 0; i < assocCodes.length; i++) {
@@ -249,15 +266,34 @@ function getAssocCode(svcCode,assocCodes){
   }
   return retcode;
 }
-function checkSelectedCodes(){
-    var myform = document.forms[0];
-    for (var i = 0; i < myform.service.length; i++) {
-        if (myform.service[i].checked) {
-            if(!codeEntered(myform.service[i].value)){
-                myform.service[i].checked = false;
-            }
-        }
-    }
+
+function checkSelectedCode(service)
+{
+	if (service.checked)
+	{
+		if (!codeEntered(service.value))
+		{
+			service.checked = false;
+		}
+	}
+}
+
+function checkSelectedCodes()
+{
+	var myform = document.forms[0];
+	var service = myform.service;
+
+	if (service.length)
+	{
+		for (var i = 0; i < service.length; i++)
+		{
+			checkSelectedCode(service[i]);
+		}
+	}
+	else
+	{
+		checkSelectedCode(service);
+	}
 }
 
 
