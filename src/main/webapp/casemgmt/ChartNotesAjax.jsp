@@ -815,7 +815,7 @@ int maxId = 0;
 		<input type="hidden" id="bgColour<%=savedId%>" value="color:#000000;background-color:#CCCCFF;" />
 		<input type="hidden" id="editWarn<%=savedId%>" value="false" />
 		<div id="n<%=savedId%>" style="line-height: 1.1em;">
-			 <textarea tabindex="7" cols="84" rows="10" class="txtArea" wrap="hard" style="line-height: 1.1em;" name="caseNote_note" id="caseNote_note<%=savedId%>"><%=cform.getCaseNote_note() %></textarea>
+			 <textarea tabindex="7" cols="84" rows="10" class="txtArea" style="line-height: 1.1em;" name="caseNote_note" id="caseNote_note<%=savedId%>"><%=cform.getCaseNote_note() %></textarea>
 			<div class="sig" id="sig<%=savedId%>">
 				<%@ include file="noteIssueList.jsp"%>
 			</div> <!-- end of div sig<%=savedId%> -->
