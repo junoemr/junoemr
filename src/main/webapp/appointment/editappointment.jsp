@@ -73,7 +73,8 @@
   DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
 %>
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
-<%@page import="org.oscarehr.common.model.Site"%><html:html locale="true">
+<%@ page import="org.oscarehr.common.model.Site" %>
+<html:html locale="true">
 <head>
 <% if (isMobileOptimized) { %>
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width" />
@@ -826,28 +827,33 @@ if (bMultisites) { %>
 <% if (isSiteSelected) { %>
 <table width="95%" align="center">
 	<tr>
-		<td><input type="submit"
-			onclick="document.forms['EDITAPPT'].displaymode.value='Cut';"
-			value="Cut" /> | <input type="submit"
-			onclick="document.forms['EDITAPPT'].displaymode.value='Copy';"
-			value="Copy" />
-                     <%
-                     if(bFirstDisp && apptObj!=null) {
+		<td>
+			<input type="submit"
+				   onclick="document.forms['EDITAPPT'].displaymode.value='Cut';"
+				   value="Cut"/> |
+			<input type="submit"
+				   onclick="document.forms['EDITAPPT'].displaymode.value='Copy';"
+				   value="Copy"/> |
+			<input type="submit"
+				   onclick="document.forms['EDITAPPT'].displaymode.value='Copy & Cancel';"
+				   value="Copy & Cancel"/>
+			 <%
+			 if(bFirstDisp && apptObj!=null) {
 
-                            long numSameDayGroupApptsPaste = 0;
+					long numSameDayGroupApptsPaste = 0;
 
-                            if (props.getProperty("allowMultipleSameDayGroupAppt", "").equalsIgnoreCase("no")) {
-                                String [] sqlParam = new String[3] ;
-                                sqlParam[0] = myGroupNo; //schedule group
-                                sqlParam[1] = apptObj.getDemographic_no();
-                                sqlParam[2] = (String) appt.get("appointment_date").toString();
+					if (props.getProperty("allowMultipleSameDayGroupAppt", "").equalsIgnoreCase("no")) {
+						String [] sqlParam = new String[3] ;
+						sqlParam[0] = myGroupNo; //schedule group
+						sqlParam[1] = apptObj.getDemographic_no();
+						sqlParam[2] = (String) appt.get("appointment_date").toString();
 
-                                List<Map<String,Object>> resultList = oscarSuperManager.find("appointmentDao", "search_group_day_appt", sqlParam);
-                                numSameDayGroupApptsPaste = resultList.size() > 0 ? (Long)resultList.get(0).get("numAppts") : 0;
-                            }
-                  %><a href=#
-			onclick="pasteAppt(<%=(numSameDayGroupApptsPaste > 0)%>);">Paste</a>
-		<% } %>
+						List<Map<String,Object>> resultList = oscarSuperManager.find("appointmentDao", "search_group_day_appt", sqlParam);
+						numSameDayGroupApptsPaste = resultList.size() > 0 ? (Long)resultList.get(0).get("numAppts") : 0;
+					}
+		  	%><a href=#
+				onclick="pasteAppt(<%=(numSameDayGroupApptsPaste > 0)%>);">Paste</a>
+			<% } %>
 		</td>
 	</tr>
 </table>
