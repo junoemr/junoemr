@@ -31,7 +31,7 @@ import java.util.Vector;
 
 import org.oscarehr.common.dao.ConsultationServiceDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
-import org.oscarehr.common.dao.ServiceSpecialistsDao;
+import org.oscarehr.consultations.dao.ServiceSpecialistsDao;
 import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.ServiceSpecialists;
