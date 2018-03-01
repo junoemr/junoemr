@@ -56,7 +56,7 @@
 	<title>Fax Form</title>
 </head>
 <body>
-<form action="javascript:submitForm();">
+<form action="#" onsubmit="submitForm();">
 	<div id="faxControl"></div>
 </form>
 </body>
