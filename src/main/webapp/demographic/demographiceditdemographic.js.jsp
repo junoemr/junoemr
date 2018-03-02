@@ -37,7 +37,7 @@
 <%@page import="java.net.URLEncoder"%>
 <%@page import="java.util.ResourceBundle"%>
 <%@page import="oscar.OscarProperties"%>
-
+<%@page contentType="text/javascript"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <%
 	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -201,9 +201,27 @@ function checkRosterStatus()
 		{
 			if (document.updatedelete.roster_status.value == "FS")
 			{
+				//Check if termination date is valid and don't validate if left blank
 				if (!rosterStatusTerminationDateValid(true))
 				{
 					return false;
+				}
+
+				//Check if termination date was left blank
+				if (checkTerminationDateBlank())
+				{
+					//If were are updating from a Rostered patient to a Fee Service patient. Confirm that they don't want to enter a termination date
+					if (document.updatedelete.initial_rosterstatus.value == "RO")
+					{
+						if (window.confirm("You have not set a roster termination date. Do you want to continue?"))
+						{
+							return true;
+						}
+						else
+						{
+							return false;
+						}
+					}
 				}
 			}
 			else
