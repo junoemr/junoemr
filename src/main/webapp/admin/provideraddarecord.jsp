@@ -60,6 +60,8 @@
 <%@page import="org.oscarehr.common.model.ProviderSite"%>
 <%@page import="org.oscarehr.common.model.ProviderSitePK"%>
 <%@page import="org.oscarehr.common.dao.ProviderSiteDao"%>
+<%@ page import="org.oscarehr.common.dao.ProviderMediSproutDao"%>
+<%@page import="org.oscarehr.common.model.ProviderExt"%>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
@@ -196,6 +198,18 @@ if (isOk && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
         	ps.setId(new ProviderSitePK(p.getProviderNo(),Integer.parseInt(sites[i])));
         	providerSiteDao.persist(ps);
 		}
+}
+
+if (isOk && OscarProperties.getInstance().getProperty("medisproutplugin", "false").equalsIgnoreCase("true")) {
+	ProviderMediSproutDao providerMediSproutDao = (ProviderMediSproutDao) SpringUtils.getBean("providerMediSproutDao");
+	
+	ProviderExt providerExt = providerMediSproutDao.getProviderExt(request.getParameter("provider_no"));
+	if (providerExt == null) {
+		providerExt = new ProviderExt();
+		providerExt.set(p.getProviderNo());
+	}
+	providerExt.setMediasproutapikey(request.getParameter("mediSproutApiKey"));
+	providerMediSproutDao.persist(providerExt);
 }
 
 if (isOk) {
