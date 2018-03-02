@@ -34,6 +34,8 @@
 <%@ page import="java.util.*,java.net.*, oscar.util.*"
 	errorPage="errorpage.jsp"%>
 <%@ page import="oscar.OscarProperties" %>
+<%@ page import="org.oscarehr.common.dao.DemographicStudyDao" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 
 <caisi:isModuleLoad moduleName="caisi">
 <%
@@ -51,6 +53,8 @@
 </caisi:isModuleLoad>
 
 <%
+	DemographicStudyDao demographicStudyDao = SpringUtils.getBean(DemographicStudyDao.class);
+
     if(session.getAttribute("userrole") == null ) {
    	 	MiscUtils.getLogger().error("userrole is null? logging user out");
         response.sendRedirect("../logout.jsp");
@@ -146,15 +150,18 @@
 
 	String day_file = "appointment_optimized.jsp";
 	boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
+
     // XXX: This assumes that the user is not using indivo
     if(
+		!props.isPropertyActive("enable_limited_schedule") ||
     	isMobileOptimized ||
-    	props.isPropertyActive("caisi") ||
+		props.isPropertyActive("caisi") ||
 		props.isPropertyActive("TORONTO_RFQ") ||
 		props.isPropertyActive("ticklerplus") ||
 		props.isPropertyActive("OSCAR_LEARNING") ||
 		"1".equals(request.getParameter("oldschedule")) ||
-		"1".equals(request.getParameter("caseload"))
+		"1".equals(request.getParameter("caseload")) ||
+		demographicStudyDao.hasStudy()
 	)
 	{
 		day_file = "appointmentprovideradminday.jsp";

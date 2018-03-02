@@ -25,6 +25,7 @@ package org.oscarehr.schedule.dto;
 
 import com.google.common.collect.RangeMap;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.SortedMap;
@@ -32,6 +33,7 @@ import java.util.SortedMap;
 public class UserDateSchedule
 {
 	Integer providerNo;
+	LocalDate scheduleDate;
 
 	String firstName;
 	String lastName;
@@ -40,11 +42,12 @@ public class UserDateSchedule
 	private SortedMap<LocalTime, List<AppointmentDetails>> appointments;
 
 	public UserDateSchedule(
-			Integer providerNo, String firstName, String lastName,
-			RangeMap<LocalTime, ScheduleSlot> scheduleSlots,
-			SortedMap<LocalTime, List<AppointmentDetails>> appointments)
+		Integer providerNo, LocalDate scheduleDate, String firstName, String lastName,
+		RangeMap<LocalTime, ScheduleSlot> scheduleSlots,
+		SortedMap<LocalTime, List<AppointmentDetails>> appointments)
 	{
 		this.providerNo = providerNo;
+		this.scheduleDate = scheduleDate;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.scheduleSlots = scheduleSlots;
@@ -54,6 +57,11 @@ public class UserDateSchedule
 	public Integer getProviderNo()
 	{
 		return providerNo;
+	}
+
+	public LocalDate getScheduleDate()
+	{
+		return scheduleDate;
 	}
 
 	public String getFirstName()

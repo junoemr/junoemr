@@ -33,7 +33,7 @@ import java.util.TreeMap;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.AppointmentArchiveDao;
-import org.oscarehr.common.dao.AppointmentStatusDao;
+import org.oscarehr.appointment.dao.AppointmentStatusDao;
 import org.oscarehr.common.dao.AppointmentTypeDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.ScheduleDateDao;

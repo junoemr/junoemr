@@ -29,26 +29,38 @@ import java.time.LocalTime;
 public class AppointmentDetails
 {
 
-	Integer appointmentNo;
-	Integer demographicNo;
-	LocalDate date;
-	LocalTime startTime;
-	LocalTime endTime;
-	String name;
-	String notes;
-	String reason;
-	Integer reasonCode;
-	String location;
-	String resources;
-	String type;
-	String style;
-	String bookingSource;
-	String status;
-	String statusTitle;
-	String color;
-	String iconImage;
-	String shortLetterColour;
-	String shortLetters;
+	private Integer appointmentNo;
+	private Integer demographicNo;
+	private LocalDate date;
+	private LocalTime startTime;
+	private LocalTime endTime;
+	private String name;
+	private String notes;
+	private String reason;
+	private Integer reasonCode;
+	private String location;
+	private String resources;
+	private String type;
+	private String style;
+	private String bookingSource;
+	private String status;
+	private String urgency;
+	private String statusTitle;
+	private String color;
+	private String iconImage;
+	private String shortLetterColour;
+	private String shortLetters;
+	private String firstName;
+	private String lastName;
+	private String ver;
+	private String rosterStatus;
+	private LocalDate hcRenewDate;
+	private String custNotes;
+	private String custAlert;
+	private String colorProperty;
+	private LocalDate birthday;
+	private boolean hasTicklers;
+	private String ticklerMessages;
 
 	public AppointmentDetails(
 		Integer appointmentNo,
@@ -66,11 +78,23 @@ public class AppointmentDetails
 		String style,
 		String bookingSource,
 		String status,
+		String urgency,
 		String statusTitle,
 		String color,
 		String iconImage,
 		String shortLetterColour,
-		String shortLetters
+		String shortLetters,
+		String firstName,
+		String lastName,
+		String ver,
+		String rosterStatus,
+		LocalDate hcRenewDate,
+		String custNotes,
+		String custAlert,
+		String colorProperty,
+		LocalDate birthday,
+		boolean hasTicklers,
+		String ticklerMessages
 	)
 	{
 		this.appointmentNo = appointmentNo;
@@ -88,11 +112,23 @@ public class AppointmentDetails
 		this.style = style;
 		this.bookingSource = bookingSource;
 		this.status = status;
+		this.urgency = urgency;
 		this.statusTitle = statusTitle;
 		this.color = color;
 		this.iconImage = iconImage;
 		this.shortLetters = shortLetters;
 		this.shortLetterColour = shortLetterColour;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.ver = ver;
+		this.rosterStatus = rosterStatus;
+		this.hcRenewDate = hcRenewDate;
+		this.custNotes = custNotes;
+		this.custAlert = custAlert;
+		this.colorProperty = colorProperty;
+		this.birthday = birthday;
+		this.hasTicklers = hasTicklers;
+		this.ticklerMessages = ticklerMessages;
 	}
 
 	public Integer getAppointmentNo()
@@ -170,6 +206,11 @@ public class AppointmentDetails
 		return status;
 	}
 
+	public String getUrgency()
+	{
+		return urgency;
+	}
+
 	public String getStatusTitle()
 	{
 		return statusTitle;
@@ -193,5 +234,60 @@ public class AppointmentDetails
 	public String getShortLetters()
 	{
 		return shortLetters;
+	}
+
+	public String getFirstName()
+	{
+		return firstName;
+	}
+
+	public String getLastName()
+	{
+		return lastName;
+	}
+
+	public String getVer()
+	{
+		return ver;
+	}
+
+	public String getRosterStatus()
+	{
+		return rosterStatus;
+	}
+
+	public LocalDate getHcRenewDate()
+	{
+		return hcRenewDate;
+	}
+
+	public String getCustNotes()
+	{
+		return custNotes;
+	}
+
+	public String getCustAlert()
+	{
+		return custAlert;
+	}
+
+	public String getColorProperty()
+	{
+		return colorProperty;
+	}
+
+	public LocalDate getBirthday()
+	{
+		return birthday;
+	}
+
+	public boolean hasTicklers()
+	{
+		return hasTicklers;
+	}
+
+	public String getTicklerMessages()
+	{
+		return ticklerMessages;
 	}
 }
