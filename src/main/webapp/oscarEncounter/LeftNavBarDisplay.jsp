@@ -205,6 +205,10 @@ else
 		}
 
 		StringBuilder jscode = new StringBuilder();
+		if (xpanded)
+		{
+			jscode.append("$(" + request.getAttribute("navbarName") + ").setAttribute('data-expanded', '');");
+		}
 
 		numDisplayed = display(noDates, numToDisplay, numDisplayed, manageItems, xpanded, numItems, jscode, displayThreshold, reloadURL.toString(), dao.getDivId(), request, out);
 
@@ -289,7 +293,7 @@ else
 			{
 				imgName = "img" + request.getAttribute("navbarName") + curNum;
 				out.println("<a href='#' onclick=\"return false;\" title='" + String.valueOf(numItems - j - 1) + " more items' style=' text-decoration:none; width:7px; z-index: 100; " + dateColour + " position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;'><img id='" + imgName + "' src='" + request.getContextPath() + "/oscarEncounter/graphics/expand.gif'/>&nbsp;&nbsp;</a>");
-				js.append("imgfunc['" + imgName + "'] = clickLoadDiv.bindAsEventListener(obj,'" + request.getAttribute("navbarName") + "','" + reloadUrl + "');");
+				js.append("imgfunc['" + imgName + "'] = clickLoadMore.bindAsEventListener(obj,'" + request.getAttribute("navbarName") + "','" + reloadUrl + "');");
 				js.append("Element.observe($('" + imgName + "'), 'click', imgfunc['" + imgName + "']);");
 			}
 			else
@@ -352,7 +356,7 @@ else
 			if (matcher.find())
 			{
 				windowName = matcher.group(1);
-				reloadUrl += "&numToDisplay=6&cmd=" + cmd;
+				reloadUrl += "&cmd=" + cmd;
 				divReloadInfo = "reloadWindows['" + windowName + "'] = '" + reloadUrl + "';reloadWindows['" + windowName + "div'] = '" + cmd + "';";
 			}
 

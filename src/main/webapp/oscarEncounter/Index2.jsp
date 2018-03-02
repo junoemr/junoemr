@@ -915,21 +915,29 @@ else
 				setTimeout("updateDiv();", 1000);
 			}
 
-			function clickLoadDiv(e)
+			function clickLoadMore(e)
 			{
 				var data = $A(arguments);
 				Event.stop(e);
 				data.shift();
+
+				$(data[0]).setAttribute('data-expanded', '');
 				loadDiv(data[0], data[1], 0);
 			}
 
 			function loadDiv(div, url, limit)
 			{
+				var requestParams = {};
+				if (!$(div).hasAttribute('data-expanded'))
+				{
+					requestParams['numToDisplay'] = "6";
+				}
 
 				var objAjax = new Ajax.Request(
 					url,
 					{
 						method: 'post',
+						parameters: requestParams,
 						evalScripts: true,
 						/*onLoading: function() {
 										$(div).update("<p>Loading ...<\/p>");
@@ -1022,7 +1030,7 @@ else
 				var topImage = $(topName);
 				var midImage = $(midName);
 				var lastImage = $(lastName);
-				var expand;
+				var wireExpand;
 				var expandPath = "<c:out value="${ctx}"/>/oscarEncounter/graphics/expand.gif";
 				var collapsePath = "<c:out value="${ctx}"/>/oscarMessenger/img/collapse.gif";
 				var transparentPath = "<c:out value="${ctx}"/>/images/clear.gif";
@@ -1032,17 +1040,19 @@ else
 					if (items[idx].style.display == 'block')
 					{
 						items[idx].style.display = 'none';
-						expand = true;
+						wireExpand = true;
 					}
 					else
 					{
 						items[idx].style.display = 'block';
-						expand = false;
+						wireExpand = false;
 					}
 				}
 
-				if (expand)
+				if (wireExpand)
 				{
+					$(Id).removeAttribute('data-expanded');
+
 					topImage.src = transparentPath;
 					lastImage.src = transparentPath;
 					midImage.src = expandPath;
@@ -1057,6 +1067,8 @@ else
 				}
 				else
 				{
+					$(Id).setAttribute('data-expanded', '');
+
 					topImage.src = collapsePath;
 					lastImage.src = collapsePath;
 					midImage.src = transparentPath;
