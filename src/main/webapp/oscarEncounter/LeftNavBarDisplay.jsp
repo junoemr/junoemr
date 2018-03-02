@@ -160,7 +160,7 @@ else
 		StringBuilder reloadURL = new StringBuilder(request.getParameter("reloadURL") + "&reloadURL=" + request.getParameter("reloadURL"));
 		String strToDisplay = request.getParameter("numToDisplay");
 		int numToDisplay;
-		boolean xpanded = false;
+		boolean expanded = false;
 		int displayThreshold = 6;
 
 		if (strToDisplay != null)
@@ -178,7 +178,7 @@ else
 			numToDisplay = numItems;
 			if (numToDisplay > displayThreshold)
 			{
-				xpanded = true;
+				expanded = true;
 			}
 		}
 		reloadURL.append("&cmd=" + div);
@@ -205,21 +205,21 @@ else
 		}
 
 		StringBuilder jscode = new StringBuilder();
-		if (xpanded)
+		if (expanded)
 		{
 			jscode.append("$(" + request.getAttribute("navbarName") + ").setAttribute('data-expanded', '');");
 		}
 
-		numDisplayed = display(noDates, numToDisplay, numDisplayed, manageItems, xpanded, numItems, jscode, displayThreshold, reloadURL.toString(), dao.getDivId(), request, out);
+		numDisplayed = display(noDates, numToDisplay, numDisplayed, manageItems, expanded, numItems, jscode, displayThreshold, reloadURL.toString(), dao.getDivId(), request, out);
 
 		if (numDisplayed < numToDisplay)
 		{
-			numDisplayed += display(current, numToDisplay, numDisplayed, manageItems, xpanded, numItems, jscode, displayThreshold, reloadURL.toString(), dao.getDivId(), request, out);
+			numDisplayed += display(current, numToDisplay, numDisplayed, manageItems, expanded, numItems, jscode, displayThreshold, reloadURL.toString(), dao.getDivId(), request, out);
 		}
 
 		if (numDisplayed < numToDisplay)
 		{
-			numDisplayed += display(pastDates, numToDisplay, numDisplayed, manageItems, xpanded, numItems, jscode, displayThreshold, reloadURL.toString(), dao.getDivId(), request, out);
+			numDisplayed += display(pastDates, numToDisplay, numDisplayed, manageItems, expanded, numItems, jscode, displayThreshold, reloadURL.toString(), dao.getDivId(), request, out);
 		}
 
 		if (numDisplayed == 0)
