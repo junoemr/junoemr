@@ -233,10 +233,10 @@ public class OscarProperties extends Properties {
 	 * Get the providers to route the labs to.
 	 * By default we will just return the list of providers that were requested in the lab
 	 *
-	 * @param docNums The requested providers to route the labs to. Returned by default
+	 * @param defaultProviderNumbers The requested providers to route the labs to. Returned by default
 	 * @return ArrayList of the providers to route the labs to
 	 */
-	public ArrayList<String> getRouteLabsToProviders(ArrayList<String> docNums)
+	public ArrayList<String> getRouteLabsToProviders(ArrayList<String> defaultProviderNumbers)
 	{
 		String property = getProperty("route_labs_to_provider");
 
@@ -251,7 +251,7 @@ public class OscarProperties extends Properties {
 		} else
 		{
 			//Default. Send labs to requested providers
-			return docNums;
+			return defaultProviderNumbers;
 		}
 	}
 
