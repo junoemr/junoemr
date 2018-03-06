@@ -38,7 +38,6 @@ import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -271,24 +270,8 @@ public final class MessageUploader {
 				}
 
 				/* allow property override setting to route all labs to a specific inbox or list of inboxes. */
-				String route_labs_to_provider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
-				if(route_labs_to_provider.equals("0"))
-				{
-					// Send to the unclaimed inbox
-					providerRouteReport(String.valueOf(insertID), null, DbConnectionFilter.getThreadLocalDbConnection(), String.valueOf(0), type);
-
-				}
-				else if(!route_labs_to_provider.equals(""))
-				{
-					// Send to matching provider ohip_no
-					ArrayList<String> providers = new ArrayList<>(Arrays.asList(route_labs_to_provider.split(",")));
-					providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
-				}
-				else
-				{
-					// Normal -- send to docs who requested for the labs OR to the family doctor
-					providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
-				}
+				ArrayList<String> providers = OscarProperties.getInstance().getRouteLabsToProviders(docNums);
+				providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
 			}
 			retVal = messageHandler.audit();
 			if(results != null)
