@@ -796,93 +796,108 @@ jQuery(document).ready(function() {
 			<tr>
 				<td>
 				<%
-                           java.util.Locale vLocale =(java.util.Locale)session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
-								//----------------------------REFERRAL DOCTOR------------------------------
-								// Referral doctor
-								String referralDoctorXML = "";
-								String referralDoctorNo = "";
-								String referralDoctorName = "";
+					java.util.Locale vLocale = (java.util.Locale) session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
+					//----------------------------REFERRAL DOCTOR------------------------------
+					// Referral doctor
+					String referralDoctorXML = "";
+					String referralDoctorNo = "";
+					String referralDoctorName = "";
 
-								// Family doctor
-								String familyDoctorXML = "";
-								String familyDoctorNo = "";
-								String familyDoctorName = "";
+					// Family doctor
+					String familyDoctorXML = "";
+					String familyDoctorNo = "";
+					String familyDoctorName = "";
 
 
-                                String resident="", nurse="", alert="", notes="", midwife="";
-                                
-                                DemographicCust demographicCust = demographicCustDao.find(demographicNo);
-                                if(demographicCust != null) {
-                                    resident = demographicCust.getResident() == null ? "" : demographicCust.getResident();
-                            		nurse = demographicCust.getNurse() == null ? "" : demographicCust.getNurse();
-                            		alert = demographicCust.getAlert() == null ? "" : demographicCust.getAlert();;
-                            		midwife = demographicCust.getMidwife() == null ? "" : demographicCust.getMidwife();;
-                                	notes = SxmlMisc.getXmlContent(demographicCust.getNotes(),"unotes") ;
-                                	
-                                	resident = resident==null?"":resident;
-                                	nurse = nurse==null?"":nurse;
-                                	alert = alert==null?"":alert;	
-                                	midwife = midwife==null?"":midwife;
-                                	notes = notes==null?"":notes;                               	
-                                }
+					String resident = "", nurse = "", alert = "", notes = "", midwife = "";
 
-                                // Demographic demographic=demographicDao.getDemographic(demographic_no);
+					DemographicCust demographicCust = demographicCustDao.find(demographicNo);
+					if (demographicCust != null)
+					{
+						resident = demographicCust.getResident() == null ? "" : demographicCust.getResident();
+						nurse = demographicCust.getNurse() == null ? "" : demographicCust.getNurse();
+						alert = demographicCust.getAlert() == null ? "" : demographicCust.getAlert();
+						;
+						midwife = demographicCust.getMidwife() == null ? "" : demographicCust.getMidwife();
+						;
+						notes = SxmlMisc.getXmlContent(demographicCust.getNotes(), "unotes");
 
-                                String dateString = curYear+"-"+curMonth+"-"+curDay;
-                                int age=0, dob_year=0, dob_month=0, dob_date=0;
-                                String birthYear="0000", birthMonth="00", birthDate="00";
+						resident = resident == null ? "" : resident;
+						nurse = nurse == null ? "" : nurse;
+						alert = alert == null ? "" : alert;
+						midwife = midwife == null ? "" : midwife;
+						notes = notes == null ? "" : notes;
+					}
 
-                                
-                                if(demographic==null) {
-                                        out.println("failed!!!");
-                                } else {
-                                        if (true) {
-                                                //----------------------------REFERRAL DOCTOR------------------------------
-                                                referralDoctorXML=demographic.getFamilyDoctor();
-                                                if (referralDoctorXML==null) {
-                                                    referralDoctorName = "";
-                                                    referralDoctorNo="";
-                                                }else{
-													referralDoctorName = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(referralDoctorXML), "rd");
-													if(referralDoctorName == null || referralDoctorName.equalsIgnoreCase("null") )
-														referralDoctorName = "";
+					// Demographic demographic=demographicDao.getDemographic(demographic_no);
 
-                                                    referralDoctorNo = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
-													if(referralDoctorNo == null || referralDoctorNo.equalsIgnoreCase("null") )
-														referralDoctorNo = "";
+					String dateString = curYear + "-" + curMonth + "-" + curDay;
+					int age = 0, dob_year = 0, dob_month = 0, dob_date = 0;
+					String birthYear = "0000", birthMonth = "00", birthDate = "00";
 
-                                                }
-                                                //----------------------------REFERRAL DOCTOR --------------end-----------
 
-												familyDoctorXML = demographic.getFamilyDoctor2();
-												if (familyDoctorXML == null)
-												{
-													familyDoctorNo = "";
-													familyDoctorName = "";
-												}
-												else
-												{
-													familyDoctorNo = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(familyDoctorXML), "fd");
-													if(familyDoctorNo == null || familyDoctorNo.equalsIgnoreCase("null") )
-														familyDoctorNo = "";
-													familyDoctorName = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(familyDoctorXML), "fdname");
-													if(familyDoctorName == null || familyDoctorName.equalsIgnoreCase("null") )
-														familyDoctorName = "";
-												}
+					if (demographic == null)
+					{
+						out.println("failed!!!");
+					}
+					else
+					{
+						if (true)
+						{
+							//----------------------------REFERRAL DOCTOR------------------------------
+							referralDoctorXML = demographic.getFamilyDoctor();
+							if (referralDoctorXML == null)
+							{
+								referralDoctorName = "";
+								referralDoctorNo = "";
+							}
+							else
+							{
+								referralDoctorName = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(referralDoctorXML), "rd");
+								if (referralDoctorName == null || referralDoctorName.equalsIgnoreCase("null"))
+									referralDoctorName = "";
 
-                                                if (oscar.util.StringUtils.filled(demographic.getYearOfBirth())) birthYear = StringUtils.trimToEmpty(demographic.getYearOfBirth());
-                                                if (oscar.util.StringUtils.filled(demographic.getMonthOfBirth())) birthMonth = StringUtils.trimToEmpty(demographic.getMonthOfBirth());
-                                                if (oscar.util.StringUtils.filled(demographic.getDateOfBirth())) birthDate = StringUtils.trimToEmpty(demographic.getDateOfBirth());
+								referralDoctorNo = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()), "rdohip");
+								if (referralDoctorNo == null || referralDoctorNo.equalsIgnoreCase("null"))
+									referralDoctorNo = "";
 
-                                                String birthDisplay = demographic.getBirthDayMasterFileString();
+							}
+							//----------------------------REFERRAL DOCTOR --------------end-----------
 
-                                               	dob_year = Integer.parseInt(birthYear);
-                                               	dob_month = Integer.parseInt(birthMonth);
-                                               	dob_date = Integer.parseInt(birthDate);
-                                                if(dob_year!=0) age=MyDateFormat.getAge(dob_year,dob_month,dob_date);
-                        %> <%=demographic.getLastName()%>,
-				<%=demographic.getFirstName()%> <%=demographic.getSex()%>
-				<%=age%> years &nbsp;
+							familyDoctorXML = demographic.getFamilyDoctor2();
+							if (familyDoctorXML == null)
+							{
+								familyDoctorNo = "";
+								familyDoctorName = "";
+							}
+							else
+							{
+								familyDoctorNo = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(familyDoctorXML), "fd");
+								if (familyDoctorNo == null || familyDoctorNo.equalsIgnoreCase("null"))
+									familyDoctorNo = "";
+								familyDoctorName = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(familyDoctorXML), "fdname");
+								if (familyDoctorName == null || familyDoctorName.equalsIgnoreCase("null"))
+									familyDoctorName = "";
+							}
+
+							if (oscar.util.StringUtils.filled(demographic.getYearOfBirth()))
+								birthYear = StringUtils.trimToEmpty(demographic.getYearOfBirth());
+							if (oscar.util.StringUtils.filled(demographic.getMonthOfBirth()))
+								birthMonth = StringUtils.trimToEmpty(demographic.getMonthOfBirth());
+							if (oscar.util.StringUtils.filled(demographic.getDateOfBirth()))
+								birthDate = StringUtils.trimToEmpty(demographic.getDateOfBirth());
+
+							String birthDisplay = demographic.getBirthDayMasterFileString();
+
+							dob_year = Integer.parseInt(birthYear);
+							dob_month = Integer.parseInt(birthMonth);
+							dob_date = Integer.parseInt(birthDate);
+							if (dob_year != 0)
+								age = MyDateFormat.getAge(dob_year, dob_month, dob_date);
+				%>
+					<%=demographic.getLastName()%>,
+					<%=demographic.getFirstName()%> <%=demographic.getSex()%>
+					<%=age%> years &nbsp;
 				<oscar:phrverification demographicNo='<%=demographic.getDemographicNo().toString()%>' ><bean:message key="phr.verification.link"/></oscar:phrverification>
 
 				<span style="margin-left: 20px;font-style:italic">
@@ -2896,7 +2911,8 @@ document.updatedelete.referral_doctor_no.value = refNo;
 							</tr>
 
 							<!-- Family Doctor -->
-							<% if (oscarProps.isPropertyActive("demographic_family_doctor")) { %>
+							<% if (oscarProps.isPropertyActive("demographic_family_doctor"))
+							{ %>
 							<tr>
 								<td align="right" nowrap>
 									<b>
@@ -3728,38 +3744,47 @@ jQuery(document).ready(function(){
 </script>
 <script type="text/javascript">
 jQuery.noConflict();
-jQuery(document).ready(function(){
-    // AJAX autocomplete referrer doctors
-    jQuery("input[name=referral_doctor_name]").keypress(function(){
-    	jQuery("input[name=referral_doctor_name]").autocomplete({
-            source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
-            select: function( event, ui){
-            	jQuery("input[name=referral_doctor_no]").val(ui.item.referral_no);
-            }
-        });
-    });
-    jQuery("input[name=referral_doctor_no]").keypress(function(){
-    	jQuery("input[name=referral_doctor_no]").autocomplete({
-            source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
-            select: function( event, ui){
-            	jQuery("input[name=referral_doctor_name]").val(ui.item.namedesc);
-            }
-        });
-    });
+jQuery(document).ready(function()
+{
+	// AJAX autocomplete referrer doctors
+	jQuery("input[name=referral_doctor_name]").keypress(function()
+	{
+		jQuery("input[name=referral_doctor_name]").autocomplete({
+			source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
+			select: function(event, ui)
+			{
+				jQuery("input[name=referral_doctor_no]").val(ui.item.referral_no);
+			}
+		});
+	});
+	jQuery("input[name=referral_doctor_no]").keypress(function()
+	{
+		jQuery("input[name=referral_doctor_no]").autocomplete({
+			source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+			select: function(event, ui)
+			{
+				jQuery("input[name=referral_doctor_name]").val(ui.item.namedesc);
+			}
+		});
+	});
 
 	// AJAX autocomplete family doctors
-	jQuery("input[name=family_doctor_name]").keypress(function(){
+	jQuery("input[name=family_doctor_name]").keypress(function()
+	{
 		jQuery("input[name=family_doctor_name]").autocomplete({
 			source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
-			select: function( event, ui){
+			select: function(event, ui)
+			{
 				jQuery("input[name=family_doctor_no]").val(ui.item.referral_no);
 			}
 		});
 	});
-	jQuery("input[name=family_doctor_no]").keypress(function(){
+	jQuery("input[name=family_doctor_no]").keypress(function()
+	{
 		jQuery("input[name=family_doctor_no]").autocomplete({
 			source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
-			select: function( event, ui){
+			select: function(event, ui)
+			{
 				jQuery("input[name=family_doctor_name]").val(ui.item.namedesc);
 			}
 		});

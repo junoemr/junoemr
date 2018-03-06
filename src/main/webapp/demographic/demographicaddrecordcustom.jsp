@@ -1092,7 +1092,9 @@
 			}%>
 		</div>
 		<%
-		}else if(custom_demographic_fields.get(i).equals("family_doc")){
+		}
+		else if (custom_demographic_fields.get(i).equals("family_doc"))
+		{
 		%>
 		<div>
 			<label>
@@ -1616,38 +1618,47 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 		google.load("jqueryui", "1");
 	</script>
 	<script type="text/javascript">
-		$(document).ready(function(){
+		$(document).ready(function()
+		{
 			// AJAX autocomplete referrer doctors
-			$("input[name=referral_doctor_name]").keypress(function(){
+			$("input[name=referral_doctor_name]").keypress(function()
+			{
 				$("input[name=referral_doctor_name]").autocomplete({
 					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
-					select: function( event, ui){
+					select: function(event, ui)
+					{
 						$("input[name=referral_doctor_no]").val(ui.item.referral_no);
 					}
 				});
 			});
-			$("input[name=referral_doctor_no]").keypress(function(){
+			$("input[name=referral_doctor_no]").keypress(function()
+			{
 				$("input[name=referral_doctor_no]").autocomplete({
 					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
-					select: function( event, ui){
+					select: function(event, ui)
+					{
 						$("input[name=referral_doctor_name]").val(ui.item.namedesc);
 					}
 				});
 			});
 
 			// AJAX autocomplete family doctors
-			jQuery("input[name=family_doctor_name]").keypress(function(){
+			jQuery("input[name=family_doctor_name]").keypress(function()
+			{
 				jQuery("input[name=family_doctor_name]").autocomplete({
 					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
-					select: function( event, ui){
+					select: function(event, ui)
+					{
 						jQuery("input[name=family_doctor_no]").val(ui.item.referral_no);
 					}
 				});
 			});
-			jQuery("input[name=family_doctor_no]").keypress(function(){
+			jQuery("input[name=family_doctor_no]").keypress(function()
+			{
 				jQuery("input[name=family_doctor_no]").autocomplete({
 					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
-					select: function( event, ui){
+					select: function(event, ui)
+					{
 						jQuery("input[name=family_doctor_name]").val(ui.item.namedesc);
 					}
 				});

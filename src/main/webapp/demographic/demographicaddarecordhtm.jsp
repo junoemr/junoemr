@@ -1226,7 +1226,8 @@ document.forms[1].referral_doctor_no.value = refNo;
 				</td>
 			</tr>
 			<!-- Family Doctor -->
-			<% if (oscarProps.isPropertyActive("demographic_family_doctor")) { %>
+			<% if (oscarProps.isPropertyActive("demographic_family_doctor"))
+			{ %>
 			<tr>
 				<td align="right" nowrap>
 					<b>
@@ -1637,45 +1638,54 @@ jQuery(document).ready(function(){
 	google.load("jqueryui", "1");
 </script>
 <script type="text/javascript">
-$(document).ready(function(){
-	// AJAX autocomplete referrer doctors
-	$("input[name=referral_doctor_name]").keypress(function(){
-		$("input[name=referral_doctor_name]").autocomplete({
-	    	source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
-	    	select: function( event, ui){
-	    		$("input[name=referral_doctor_no]").val(ui.item.referral_no);
-	    	}
+	$(document).ready(function()
+	{
+		// AJAX autocomplete referrer doctors
+		$("input[name=referral_doctor_name]").keypress(function()
+		{
+			$("input[name=referral_doctor_name]").autocomplete({
+				source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
+				select: function(event, ui)
+				{
+					$("input[name=referral_doctor_no]").val(ui.item.referral_no);
+				}
+			});
 		});
-	});
-	$("input[name=referral_doctor_no]").keypress(function(){
-		$("input[name=referral_doctor_no]").autocomplete({
-	    	source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
-	    	select: function( event, ui){
-	    		$("input[name=referral_doctor_name]").val(ui.item.namedesc);
-	    	}
+		$("input[name=referral_doctor_no]").keypress(function()
+		{
+			$("input[name=referral_doctor_no]").autocomplete({
+				source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+				select: function(event, ui)
+				{
+					$("input[name=referral_doctor_name]").val(ui.item.namedesc);
+				}
+			});
 		});
-	});
 
-	// AJAX autocomplete family doctors
-	jQuery("input[name=family_doctor_name]").keypress(function(){
-		jQuery("input[name=family_doctor_name]").autocomplete({
-			source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
-			select: function( event, ui){
-				console.log('name UI: ', ui);
-				jQuery("input[name=family_doctor_no]").val(ui.item.referral_no);
-			}
+		// AJAX autocomplete family doctors
+		jQuery("input[name=family_doctor_name]").keypress(function()
+		{
+			jQuery("input[name=family_doctor_name]").autocomplete({
+				source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
+				select: function(event, ui)
+				{
+					console.log('name UI: ', ui);
+					jQuery("input[name=family_doctor_no]").val(ui.item.referral_no);
+				}
+			});
+		});
+		jQuery("input[name=family_doctor_no]").keypress(function()
+		{
+			jQuery("input[name=family_doctor_no]").autocomplete({
+				source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+				select: function(event, ui)
+				{
+					console.log('num UI: ', ui);
+					jQuery("input[name=family_doctor_name]").val(ui.item.namedesc);
+				}
+			});
 		});
 	});
-	jQuery("input[name=family_doctor_no]").keypress(function(){
-		jQuery("input[name=family_doctor_no]").autocomplete({
-			source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
-			select: function( event, ui){
-				console.log('num UI: ', ui);
-				jQuery("input[name=family_doctor_name]").val(ui.item.namedesc);
-			}
-		});
-	});
-});
 </script>
 <!--<iframe src="../eform/efmshowform_data.jsp?fid=<%=fid%>" width="100%" height="100%"></iframe>-->
 <%}%>
