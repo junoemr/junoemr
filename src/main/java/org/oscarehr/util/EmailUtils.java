@@ -141,6 +141,18 @@ public final class EmailUtils
 
 		email.setHostName(smtpServer);
 
+		if (smtpPort != null)
+		{
+			if (connectionSecurity != null && connectionSecurity.equals(CONNECTION_SECURITY_SSL))
+			{
+				email.setSslSmtpPort(smtpPort);
+			}
+			else
+			{
+				email.setSmtpPort(Integer.parseInt(smtpPort));
+			}
+		}
+
 		if (smtpUser != null && smtpPassword != null) email.setAuthentication(smtpUser, smtpPassword);
 
                 Session session = email.getMailSession();
@@ -153,12 +165,6 @@ public final class EmailUtils
                         email.setSSL(true);
                     }
                 }
-
-		if (smtpPort != null)
-		{
-			email.setSslSmtpPort(smtpPort);
-		}
-
 
 		Properties properties = session.getProperties();
 		properties.setProperty("mail.smtp.connectiontimeout", "20000");
@@ -184,6 +190,18 @@ public final class EmailUtils
 
 		email.setHostName(smtpServer);
 
+		if (smtpPort != null)
+		{
+			if (connectionSecurity != null && connectionSecurity.equals(CONNECTION_SECURITY_SSL))
+			{
+				email.setSslSmtpPort(smtpPort);
+			}
+			else
+			{
+				email.setSmtpPort(Integer.parseInt(smtpPort));
+			}
+		}
+
 		if (smtpUser != null && smtpPassword != null) email.setAuthentication(smtpUser, smtpPassword);
 
                 Session session = email.getMailSession();
@@ -196,12 +214,6 @@ public final class EmailUtils
                         email.setSSL(true);
                     }
                 }
-
-		if (smtpPort != null)
-		{
-			email.setSslSmtpPort(smtpPort);
-		}
-
 
 		Properties properties = session.getProperties();
 		properties.setProperty("mail.smtp.connectiontimeout", "20000");
