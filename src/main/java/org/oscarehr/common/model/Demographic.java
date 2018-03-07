@@ -590,10 +590,6 @@ public class Demographic implements Serializable
 	 */
 	public String getFamilyDoctor2()
 	{
-		if (StringUtils.isBlank(familyDoctor2))
-		{
-			this.familyDoctor2 = "";
-		}
 		return familyDoctor2;
 	}
 
@@ -604,7 +600,7 @@ public class Demographic implements Serializable
 	 */
 	public void setFamilyDoctor2(String familyDoctor2)
 	{
-		this.familyDoctor2 = familyDoctor2;
+		this.familyDoctor2 = StringUtils.trimToNull(familyDoctor2);
 	}
 
 	/**
