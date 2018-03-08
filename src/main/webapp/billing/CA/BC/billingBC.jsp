@@ -717,8 +717,8 @@ function checkifSet(icd9,feeitem,extrafeeitem){
   <%}  %>
   </table>
 </div>
-<h3>
-<html:errors/>
+<html:errors property="error"/>
+<html:errors property="warning" header="warnings.header" footer="warnings.footer"/>
 <!-- above here -->
 <%
 List<String> wcbneeds = (List) request.getAttribute("WCBFormNeeds");

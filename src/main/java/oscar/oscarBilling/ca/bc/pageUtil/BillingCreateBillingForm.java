@@ -725,14 +725,14 @@ public final class BillingCreateBillingForm extends ActionForm {
    
    
    if("WCB".equals(this.getXml_billtype()) && request.getParameter("WCBid") == null ){
-        errors.add("",new ActionMessage("oscar.billing.CA.BC.billingBC.wcb.error.formRequired"));
+        errors.add("error",new ActionMessage("oscar.billing.CA.BC.billingBC.wcb.error.formRequired"));
         request.setAttribute("FormMissing","YES");
     }
 
     if (this.xml_refer1.equals("") && this.xml_refer2.equals("")) {
       if (this.xml_other1 == null || xml_other1.equals("")) {
           if (this.service == null || service.length == 0) {
-            errors.add("",
+            errors.add("error",
                        new ActionMessage(
                            "oscar.billing.CA.BC.billingBC.error.nullservicecode"));
           }
@@ -744,7 +744,7 @@ public final class BillingCreateBillingForm extends ActionForm {
              xml_diagnostic_detail2.equals("")) &&
             (this.xml_diagnostic_detail3 == null ||
              xml_diagnostic_detail3.equals(""))) {
-          errors.add("",
+          errors.add("error",
                      new ActionMessage(
                          "oscar.billing.CA.BC.billingBC.error.nulldxcodes"));
         }
