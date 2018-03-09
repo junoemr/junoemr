@@ -21,6 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
+
 package org.oscarehr.integration.clinicaid.service;
 
 import com.fasterxml.jackson.databind.MapperFeature;
