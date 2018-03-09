@@ -1903,7 +1903,7 @@
 		Element.remove(txtId);
 		caseNote = "caseNote_note" + nId;
 
-		var input = "<textarea tabindex='7' cols='84' rows='10' wrap='hard' class='txtArea' style='line-height:1.1em;' name='caseNote_note' id='" + caseNote + "'>" + payload + "<\/textarea>";
+		var input = "<textarea tabindex='7' cols='84' rows='10' class='txtArea' style='line-height:1.1em;' name='caseNote_note' id='" + caseNote + "'>" + payload + "<\/textarea>";
 		new Insertion.Top(txt, input);
 		var printimg = "<img title='Print' id='print" + nId + "' alt='Toggle Print Note' onclick='togglePrint(" + nId + ", event)' style='float:right; margin-right:5px;' src='" + ctx + "/oscarEncounter/graphics/printer.png'>";
 
@@ -2870,7 +2870,7 @@
 		var newNoteIdx = "0" + newNoteCounter;
 		var id = "nc" + newNoteIdx;
 		var sigId = "sig"+ newNoteIdx;
-		var input = "<textarea tabindex='7' cols='84' rows='1' wrap='hard' class='txtArea' style='line-height:1.0em;' name='caseNote_note' id='caseNote_note" + newNoteIdx + "'>" + reason + "<\/textarea>";
+		var input = "<textarea tabindex='7' cols='84' rows='1' class='txtArea' style='line-height:1.0em;' name='caseNote_note' id='caseNote_note" + newNoteIdx + "'>" + reason + "<\/textarea>";
 		var passwd = "";
 		if( passwordEnabled ) {
 			passwd = "<p style='background-color:#CCCCFF; display:none; margin:0px;' id='notePasswd'>Password:&nbsp;<input type='password' name='caseNote.password'/><\/p>";

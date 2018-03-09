@@ -457,7 +457,7 @@ if (pId==null) pId="";
 	<table width="90%" border="1">
 		<tr>
 			<td class="fieldValue" colspan="1">
-				<textarea name="caseNote_note" id="caseNote_note" cols="60" rows="20" wrap="hard" onchange="setChangeFlag(true);"><nested:write property="caseNote.note"/></textarea>
+				<textarea name="caseNote_note" id="caseNote_note" cols="60" rows="20" onchange="setChangeFlag(true);"><nested:write property="caseNote.note"/></textarea>
 			</td>
 			<td class="fieldTitle"></td>
  

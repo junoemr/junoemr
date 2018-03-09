@@ -1344,17 +1344,16 @@ function grabEnterGetTemplate(event){
 					<tr width="100%">
 						<!-- This is the Social History cell ...sh...-->
 						<td valign="top"><!-- Creating the table tag within the script allows you to adjust all table sizes at once, by changing the value of leftCol -->
-						<textarea name="shTextarea" tabindex="1" wrap="hard" cols="28"
+						<textarea name="shTextarea" tabindex="1" cols="28"
 							style="height:<%=windowSizes.getProperty("rowOneSize")%>;overflow:auto"><%=bean.socialHistory%></textarea>
 						</td>
 						<!-- This is the Family History cell ...fh...-->
-						<td valign="top"><textarea name="fhTextarea" tabindex="2"
-							wrap="hard" cols="28"
+						<td valign="top"><textarea name="fhTextarea" tabindex="2" cols="28"
 							style="height:<%=windowSizes.getProperty("rowOneSize")%>;overflow:auto"><%=bean.familyHistory%></textarea>
 						</td>
 						<!-- This is the Medical History cell ...mh...-->
 						<td valign="top" colspan="2"><textarea name="mhTextarea"
-							tabindex="3" wrap="hard" cols="28"
+							tabindex="3" cols="28"
 							style="height:<%=windowSizes.getProperty("rowOneSize")%>;overflow:auto"><%=bean.medicalHistory%></textarea>
 						</td>
 					</tr>
@@ -1408,11 +1407,11 @@ function grabEnterGetTemplate(event){
 					</tr>
 					<tr width="100%">
 						<td valign="top" style="border-right: 2px solid #ccccff"><textarea
-							name='ocTextarea' tabindex="4" wrap="hard" cols="44"
+							name='ocTextarea' tabindex="4" cols="44"
 							style="height:<%=windowSizes.getProperty("rowTwoSize")%>;overflow:auto"><%=bean.ongoingConcerns%></textarea>
 						</td>
 						<td colspan="2" valign="top"><textarea name='reTextarea'
-							tabindex="5" wrap="hard" cols="44"
+							tabindex="5" cols="44"
 							style="height:<%=windowSizes.getProperty("rowTwoSize")%>;overflow:auto"><%=bean.reminders%></textarea>
 						</td>
 					</tr>
@@ -1640,7 +1639,7 @@ function grabEnterGetTemplate(event){
                             %>
 					<tr>
 						<td colspan="2" valign="top" style="text-align: left"><textarea
-							name='enTextarea' tabindex="7" wrap="hard" cols="90"
+							name='enTextarea' tabindex="7" cols="90"
 							style="height:<%=windowSizes.getProperty("rowThreeSize")%>;overflow:auto"><%=encounterText%></textarea>
 						</td>
 					</tr>
