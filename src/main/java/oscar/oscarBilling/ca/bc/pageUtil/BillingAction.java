@@ -110,7 +110,7 @@ public final class BillingAction extends Action {
         
             for (DSConsequence dscon : list){
                 _log.debug("DSTEXT "+dscon.getText());
-                errors.add("error",new ActionMessage("message.custom",dscon.getText()));
+                errors.add("warning" ,new ActionMessage("message.custom",dscon.getText()));
            }
         }catch(Exception e){
             MiscUtils.getLogger().error("Error", e);
