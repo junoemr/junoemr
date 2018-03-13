@@ -311,8 +311,9 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 
 <style>
 
-.TDISRes	{font-weight: bold; font-size: 10pt; color: black; font-family:
-               Verdana, Arial, Helvetica}
+.TDISRes	{ font-weight: bold; font-size: 10pt; color: black; font-family:
+               Verdana, Arial, Helvetica }
+pre         { white-space: pre-wrap; }
 
 </style>
     <div id="labdoc_<%=segmentID%>">
