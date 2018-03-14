@@ -58,6 +58,8 @@ public class ClinicaidAPIService
 		this.sessionManager = sessionManager;
 	}
 
+	// This method assumes the eligibility check is synchronous. This is only the case for BC eligibility checks.
+	// TODO: This needs to be changed when implementing Ontario.
 	public Map<String, String> checkEligibility(String hin, String birthDate) throws IOException
 	{
 		HashMap<String, String> response = new HashMap<>();
