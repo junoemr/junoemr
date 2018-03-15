@@ -40,7 +40,6 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public class Schedule
 	 * @param date Date to get schedule for.
 	 * @return The schedule for this provider.
 	 */
-	public ResourceSchedule getResourceScheduleByProvider(String providerNo, LocalDate date)
+	public ResourceSchedule getResourceScheduleByProvider(String providerNo, LocalDate date, String site)
 	{
 		Provider provider = providerDao.getProvider(providerNo);
 
@@ -85,7 +84,8 @@ public class Schedule
 			date,
 			new Integer(provider.getProviderNo()),
 			provider.getFirstName(),
-			provider.getLastName()
+			provider.getLastName(),
+			site
 		));
 
 		// Create transfer object
@@ -98,7 +98,7 @@ public class Schedule
 	 * @param date The date to get the schedule for.
 	 * @return The schedule for the group.
 	 */
-	public ResourceSchedule getResourceScheduleByGroup(String group, LocalDate date)
+	public ResourceSchedule getResourceScheduleByGroup(String group, LocalDate date, String site)
 	{
 		List<MyGroup> results = myGroupDao.getGroupByGroupNo(group);
 
@@ -111,7 +111,8 @@ public class Schedule
 				date,
 				new Integer(result.getId().getProviderNo()),
 				result.getFirstName(),
-				result.getLastName()
+				result.getLastName(),
+				site
 			));
 		}
 
@@ -125,7 +126,7 @@ public class Schedule
 	 * @param date Get the schedule for the week (sun-sat) including this date.
 	 * @return The schedule for the week.
 	 */
-	public ResourceSchedule getWeekScheduleByProvider(String providerNo, LocalDate date)
+	public ResourceSchedule getWeekScheduleByProvider(String providerNo, LocalDate date, String site)
 	{
 		Provider provider = providerDao.getProvider(providerNo);
 
@@ -145,7 +146,8 @@ public class Schedule
 				currentDay,
 				new Integer(provider.getProviderNo()),
 				provider.getFirstName(),
-				provider.getLastName()
+				provider.getLastName(),
+				site
 			));
 		}
 
@@ -154,14 +156,14 @@ public class Schedule
 	}
 
 	private UserDateSchedule getUserDateSchedule(
-		LocalDate date, Integer providerNo, String firstName, String lastName)
+		LocalDate date, Integer providerNo, String firstName, String lastName, String site)
 	{
 		// Get schedule slots
 		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(date, providerNo);
 
 		// Get appointments
 		SortedMap<LocalTime, List<AppointmentDetails>> appointments =
-			appointmentDao.findAppointmentDetailsByDateAndProvider(date, providerNo);
+			appointmentDao.findAppointmentDetailsByDateAndProvider(date, providerNo, site);
 
 		return new UserDateSchedule(providerNo, date, firstName, lastName, scheduleSlots, appointments);
 	}

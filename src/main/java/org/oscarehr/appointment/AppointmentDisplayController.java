@@ -416,6 +416,41 @@ public class AppointmentDisplayController
 		return UtilMisc.htmlEscape(this.appointment.getReason());
 	}
 
+	public boolean isReasonToggleable()
+	{
+		return !("DO_NOT_BOOK").equalsIgnoreCase(this.getName());
+	}
+
+	public String getReasonToggleableClass()
+	{
+
+		if(isReasonToggleable())
+		{
+			return "toggleable";
+		}
+		else
+		{
+			return "";
+		}
+	}
+
+	public boolean isToggleReasonByProvider()
+	{
+		return OscarProperties.getInstance().isPropertyActive("TOGGLE_REASON_BY_PROVIDER", true);
+	}
+
+	public String getHideReasonClass()
+	{
+		if(isToggleReasonByProvider() && isReasonToggleable())
+		{
+			return "hideReason";
+		}
+		else
+		{
+			return "";
+		}
+	}
+
 	public String getFormattedReason()
 	{
 		String out_string = "";
@@ -683,6 +718,17 @@ public class AppointmentDisplayController
 
 	public boolean isBirthday()
 	{
-		return appointment.getDate().equals(appointment.getBirthday());
+		LocalDate appointmentDate = appointment.getDate();
+		LocalDate birthday = appointment.getBirthday();
+
+		if(appointmentDate == null || birthday == null)
+		{
+			return false;
+		}
+
+		return (
+			appointmentDate.getMonthValue() == birthday.getMonthValue() &&
+			appointmentDate.getDayOfMonth() == birthday.getDayOfMonth()
+		);
 	}
 }

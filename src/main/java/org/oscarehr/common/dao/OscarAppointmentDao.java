@@ -48,16 +48,6 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.Query;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 @Repository
 @SuppressWarnings("unchecked")
 public class OscarAppointmentDao extends AbstractDao<Appointment> {
@@ -781,7 +771,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 		return results;
 	}
 
-	public SortedMap<LocalTime, List<AppointmentDetails>> findAppointmentDetailsByDateAndProvider(LocalDate date, Integer providerNo)
+	public SortedMap<LocalTime, List<AppointmentDetails>> findAppointmentDetailsByDateAndProvider(
+		LocalDate date, Integer providerNo, String site)
 	{
 		String sql = "SELECT\n" +
 				"  a.appointment_no,\n" +
@@ -829,8 +820,14 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  AND t.service_date <= a.appointment_date \n" +
 				"  AND t.status = 'A'\n" +
 				"WHERE a.appointment_date = :date\n" +
-				"AND a.provider_no = :providerNo\n" +
-				"GROUP BY   \n" +
+				"AND a.provider_no = :providerNo\n";
+
+				if(site != null)
+				{
+					sql += "AND a.location = :location\n";
+				}
+
+				sql += "GROUP BY   \n" +
 				"  a.appointment_no,\n" +
 				"  a.demographic_no,\n" +
 				"  a.appointment_date,\n" +
@@ -869,6 +866,11 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 		query.setParameter("property_name", UserPropertyDAO.COLOR_PROPERTY);
 		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
+
+		if(site != null)
+		{
+			query.setParameter("location", site);
+		}
 
 		List<Object[]> results = query.getResultList();
 

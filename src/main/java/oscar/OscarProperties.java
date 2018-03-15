@@ -199,8 +199,25 @@ public class OscarProperties extends Properties {
 	 * @return boolean whether the property is active
 	 */
 	public boolean isPropertyActive(String key) {
+		return isPropertyActive(key, false);
+	}
+
+	/**
+	 * Will check the properties to see if that property is set and if it's set to "true", "yes" or "on".
+	 * If it is method returns true if not method returns false.
+	 *
+	 * @param key key of property
+	 * @param defaultValue Value to use if they key isn't there
+	 * @return boolean whether the property is active
+	 */
+	public boolean isPropertyActive(String key, boolean defaultValue) {
+		String defaultString = "";
+		if(defaultValue)
+		{
+			defaultString = "true";
+		}
 		key = key==null ? null : key.trim();
-		return activeMarkers.contains(getProperty(key, "").trim().toLowerCase());
+		return activeMarkers.contains(getProperty(key, defaultString).trim().toLowerCase());
 	}
 
 	
