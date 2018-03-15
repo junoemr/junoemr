@@ -491,7 +491,7 @@ public class ManageTeleplanAction extends DispatchAction {
 						   ConversionUtils.toDateString(demo.getBirthDate())
 				   );
 				   request.setAttribute("error", clinicaidResponse.get("error"));
-				   request.setAttribute("result", clinicaidResponse.get("result"));
+				   request.setAttribute("Result", clinicaidResponse.get("result"));
 				   request.setAttribute("Msgs", clinicaidResponse.get("msg"));
 			   }
 			   catch(IOException e)

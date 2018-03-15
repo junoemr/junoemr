@@ -24,66 +24,68 @@
 
 package org.oscarehr.integration.clinicaid.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ClinicaidResultTo1 implements Serializable
+public class PatientEligibilityDataTo1 implements Serializable
 {
-	final String ERROR_STRING = "error";
 
+	@JsonProperty("eligible_for_provincial_billing")
+	private boolean eligible;
 
-	private String result;
+	@JsonProperty("eligibility_check_message")
+	private String message;
 
-	@JsonProperty("data")
-	private ClinicaidResultDataTo1 data;
+	@JsonProperty("eligibility_queued_at")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date queuedAt;
 
-	private ClinicaidErrorResultTo1 errors;
+	@JsonProperty("eligibility_expiry_date")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date expiryAt;
 
-	private String nonce;
-
-	private boolean hasError = false;
-
-
-	public String getResult()
+	public boolean isEligible()
 	{
-		return this.result;
+		return eligible;
 	}
 
-	public void setResult(String result)
+	public void setEligible(boolean eligible)
 	{
-		this.result = result;
-		if (this.result.equals(ERROR_STRING))
-		{
-			this.hasError = true;
-		}
+		this.eligible = eligible;
 	}
 
-	public String getNonce()
+	public String getMessage()
 	{
-		return this.nonce;
+		return message;
 	}
 
-	public ClinicaidResultDataTo1 getData()
+	public void setMessage(String message)
 	{
-		return this.data;
+		this.message = message;
 	}
 
-	public ClinicaidErrorResultTo1 getErrors()
+	public Date getQueuedAt()
 	{
-		return this.errors;
+		return queuedAt;
 	}
 
-	public void setErrors(ClinicaidErrorResultTo1 errors)
+	public void setQueuedAt(Date queuedAt)
 	{
-		this.errors = errors;
+		this.queuedAt = queuedAt;
 	}
 
-	public boolean hasError()
+	public Date getExpiryAt()
 	{
-		return this.hasError;
+		return expiryAt;
+	}
+
+	public void setExpiryAt(Date expiryAt)
+	{
+		this.expiryAt = expiryAt;
 	}
 }

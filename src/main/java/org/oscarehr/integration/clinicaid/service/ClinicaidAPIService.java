@@ -28,7 +28,6 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +35,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidResultTo1;
+import org.oscarehr.integration.clinicaid.dto.PatientEligibilityDataTo1;
 import org.oscarehr.util.LoggedInInfo;
 
 import org.oscarehr.util.MiscUtils;
@@ -73,8 +73,10 @@ public class ClinicaidAPIService
 		String urlString = sessionManager.getClinicaidDomain() + apiPath + "patient/eligibility/" + queryString;
 		ClinicaidResultTo1 result = sessionManager.get(new URL(urlString));
 
-		response.put("result", result.getData().get("eligible_for_provincial_billing"));
-		response.put("msg", result.getData().get("eligibility_check_message"));
+		PatientEligibilityDataTo1 eligibilityData = result.getData().getEligibilityData();
+		response.put("result", eligibilityData.isEligible() ? "Eligible" : "Not Eligible");
+		response.put("msg", eligibilityData.getMessage());
+
 		if (result.hasError())
 		{
 			response.put("error", result.getErrors().getErrorString());
