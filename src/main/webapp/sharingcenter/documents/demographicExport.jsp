@@ -53,7 +53,7 @@
 <%@page import="org.oscarehr.common.model.Demographic"%>
 <%@page import="org.oscarehr.sharingcenter.dao.AffinityDomainDao"%>
 <%@page import="org.oscarehr.sharingcenter.model.AffinityDomainDataObject"%>
-<%@page import="org.oscarehr.common.model.Document"%>
+<%@page import="org.oscarehr.document.model.Document"%>
 <%@page import="oscar.oscarDemographic.pageUtil.DemographicExportAction4"%>
 <%@page import="org.marc.shic.core.configuration.IheConfiguration"%>
 <%@page import="org.marc.shic.core.configuration.IheAffinityDomainConfiguration"%>

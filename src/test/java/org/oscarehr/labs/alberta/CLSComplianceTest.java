@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
-import oscar.oscarLab.ca.all.parsers.CLSHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
 
 public class CLSComplianceTest {
 
@@ -73,36 +73,42 @@ public class CLSComplianceTest {
 	
 	@Test
 	public void testNameParsing() throws Exception {
-		CLSHandler handler = new CLSHandler();
-		handler.init(LAB02);
-		assertEquals("", handler.getFirstName());
-		assertEquals("MillMCK CB FSI", handler.getLastName());
-		assertEquals("", handler.getMiddleName());
+		//CLSHandler handler = new CLSHandler();
+		//handler.init(LAB02);
+		CLSHandler handler1 = new CLSHandler(LAB02);
+		assertEquals("", handler1.getFirstName());
+		assertEquals("MillMCK CB FSI", handler1.getLastName());
+		assertEquals("", handler1.getMiddleName());
 		
-		handler.init(LAB03);
-		assertEquals("Karla", handler.getFirstName());
-		assertEquals("MillMCK CB FSI", handler.getLastName());
-		assertEquals("Bruni", handler.getMiddleName());
+		//handler.init(LAB03);
+		CLSHandler handler2 = new CLSHandler(LAB03);
+		assertEquals("Karla", handler2.getFirstName());
+		assertEquals("MillMCK CB FSI", handler2.getLastName());
+		assertEquals("Bruni", handler2.getMiddleName());
 		
-		handler.init(LAB04);
-		assertEquals("Karla Marla", handler.getFirstName());
-		assertEquals("MillMCK CB FSI", handler.getLastName());
-		assertEquals("Darla", handler.getMiddleName());
+		//handler.init(LAB04);
+		CLSHandler handler3 = new CLSHandler(LAB04);
+		assertEquals("Karla Marla", handler3.getFirstName());
+		assertEquals("MillMCK CB FSI", handler3.getLastName());
+		assertEquals("Darla", handler3.getMiddleName());
 		
-		handler.init(LAB05);
-		assertEquals("Karla", handler.getFirstName());
-		assertEquals("", handler.getLastName());
-		assertEquals("", handler.getMiddleName());
+		//handler.init(LAB05);
+		CLSHandler handler4 = new CLSHandler(LAB05);
+		assertEquals("Karla", handler4.getFirstName());
+		assertEquals("", handler4.getLastName());
+		assertEquals("", handler4.getMiddleName());
 		
-		handler.init(LAB06);
-		assertEquals("", handler.getFirstName());
-		assertEquals("", handler.getLastName());
-		assertEquals("", handler.getMiddleName());
+		//handler.init(LAB06);
+		CLSHandler handler5 = new CLSHandler(LAB06);
+		assertEquals("", handler5.getFirstName());
+		assertEquals("", handler5.getLastName());
+		assertEquals("", handler5.getMiddleName());
 		
-		handler.init(LAB07);
-		assertEquals("", handler.getFirstName());
-		assertEquals("", handler.getLastName());
-		assertEquals("", handler.getMiddleName());
+		//handler.init(LAB07);
+		CLSHandler handler6 = new CLSHandler(LAB07);
+		assertEquals("", handler6.getFirstName());
+		assertEquals("", handler6.getLastName());
+		assertEquals("", handler6.getMiddleName());
 	}
 	
 	/**
@@ -110,11 +116,12 @@ public class CLSComplianceTest {
 	 */
 	@Test
 	public void testNameDemographicCompliance() throws Exception {
-		CLSHandler handler = new CLSHandler();
+		//CLSHandler handler = new CLSHandler();
 		
 		int i = 0;
 		for(String lab : TestLabs.ALL_LABS) {			
-			handler.init(lab);
+			//handler.init(lab);
+			CLSHandler handler = new CLSHandler(lab);
 			assertEquals("Karla", handler.getFirstName());
 			assertEquals("MillMCK CB FSI", handler.getLastName());
 			assertEquals("", handler.getMiddleName());
@@ -134,12 +141,13 @@ public class CLSComplianceTest {
 	 */
 	@Test
 	public void testPhysicianInformationCompliance() throws Exception {
-		CLSHandler handler = new CLSHandler();
+		//CLSHandler handler = new CLSHandler();
 
 		int i = 0;
 		for(String lab : TestLabs.ALL_LABS) {			
-			handler.init(lab);
-			
+			//handler.init(lab);
+			CLSHandler handler = new CLSHandler(lab);
+
 			String orderingProvider = handler.getOrderingProvider();
 			assertTrue("Test, Physician - p-Test Physician".equals(orderingProvider) ||
 					"Unknown1, Physician, MD".equals(orderingProvider));

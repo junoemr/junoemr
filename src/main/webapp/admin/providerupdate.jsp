@@ -187,7 +187,8 @@ if(!authed) {
         	  supervisor = null;
           }
           String albertaEDeliveryIds = StringUtils.trimToNull(request.getParameter("alberta_e_delivery_ids"));
-          if(albertaEDeliveryIds != null) {
+          // Only strip non-numeric characters if we are on an Alberta instance
+          if(albertaEDeliveryIds != null && OscarProperties.getInstance().getProperty("instance_type").equals("AB")) {
           	albertaEDeliveryIds = albertaEDeliveryIds.replaceAll("[^0-9.,]", ""); // strip non-numbers
           }
           p.setAlbertaEDeliveryIds(albertaEDeliveryIds);

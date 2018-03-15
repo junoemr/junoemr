@@ -26,21 +26,23 @@
 
  */
 angular.module("Common.Services").service("EFormService", [
-	'$http', '$q',
-	function($http, $q)
+	'$q',
+	'junoHttp',
+	function($q, junoHttp)
 	{
 		var service = {};
 
 		service.apiPath = '../ws/rs/eform';
 
+		//TODO this file is not used anywhere and requires testing
 		service.saveEForm = function saveEForm()
 		{
 			var deferred = $q.defer();
-			$http.get(service.apiPath + '/',
+			junoHttp.put(service.apiPath + '/',
 				Juno.Common.ServiceHelper.configHeaders()).then(
 				function success(results)
 				{
-					deferred.resolve(results.data);
+					deferred.resolve(results);
 				},
 				function error(errors)
 				{
@@ -53,11 +55,11 @@ angular.module("Common.Services").service("EFormService", [
 		service.updateEForm = function updateEForm(formId)
         {
             var deferred = $q.defer();
-            $http.get(service.apiPath + '/' + formId,
+	        junoHttp.post(service.apiPath + '/' + formId,
                 Juno.Common.ServiceHelper.configHeaders()).then(
                 function success(results)
                 {
-                    deferred.resolve(results.data);
+                    deferred.resolve(results);
                 },
                 function error(errors)
                 {
@@ -70,11 +72,11 @@ angular.module("Common.Services").service("EFormService", [
 		service.loadEForm = function loadEForm(formId)
         {
             var deferred = $q.defer();
-            $http.get(service.apiPath + '/' + formId,
+	        junoHttp.get(service.apiPath + '/' + formId,
                 Juno.Common.ServiceHelper.configHeaders()).then(
                 function success(results)
                 {
-                    deferred.resolve(results.data);
+                    deferred.resolve(results);
                 },
                 function error(errors)
                 {

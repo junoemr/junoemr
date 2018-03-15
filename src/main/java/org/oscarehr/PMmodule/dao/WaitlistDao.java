@@ -43,7 +43,7 @@ import org.oscarehr.PMmodule.wlmatch.CriteriaBO;
 import org.oscarehr.PMmodule.wlmatch.CriteriasBO;
 import org.oscarehr.PMmodule.wlmatch.MatchBO;
 import org.oscarehr.PMmodule.wlmatch.VacancyDisplayBO;
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.match.client.ClientData;
 import org.oscarehr.match.vacancy.VacancyData;
 import org.oscarehr.match.vacancy.VacancyTemplateData;

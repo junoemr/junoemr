@@ -36,7 +36,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.provider.model.PreventionManager;
+import org.oscarehr.provider.model.ProviderPreventionManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -150,7 +150,7 @@ public class AddPreventionAction  extends Action {
             PreventionData.updatetPreventionData(id,sessionUser,demographic_no,prevDate,providerNo,providerName,preventionType,refused,nextDate,neverWarn,extraData);
          }
 
-         PreventionManager prvMgr = (PreventionManager) SpringUtils.getBean("preventionMgr");
+         ProviderPreventionManager prvMgr = (ProviderPreventionManager) SpringUtils.getBean("preventionMgr");
          prvMgr.removePrevention(demographic_no); 
          MiscUtils.getLogger().debug("Given "+given+" prevDate "+prevDate+" providerName "+providerName+" provider "+providerNo);
 

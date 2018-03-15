@@ -202,19 +202,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		formService.getCompletedEncounterForms($stateParams.demographicNo).then(
 			function success(results)
 			{
-				if (results.list instanceof Array)
-				{
-					controller.page.encounterFormlist[0] = results.list;
-				}
-				else
-				{
-					var arr = new Array();
-					arr[0] = results.list;
-					controller.page.encounterFormlist[0] = arr;
-				}
-
-				//controller.page.encounterFormlist[0] = results.list;
-				//console.log("completed list as is:" + JSON.stringify(controller.page.encounterFormlist[0]) );
+				controller.page.encounterFormlist[0] = results;
 			},
 			function error(errors)
 			{
@@ -259,93 +247,80 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 				document.getElementById('formInViewFrame').removeChild(document.getElementById('formInViewFrame').firstChild);
 			}
 
-			var url = '';
-			var addOrShow = '';
-			var formId = 0;
+			var queryName = $location.search().name;
+			var params = {
+				demographicNo: $stateParams.demographicNo,
+				type: item.type === 'eform' ? 'eform' : 'form',
+				id: item.id || item.formId
+			};
 
+			// The items sent from the server are such that
+			// 1. Existing eforms have a formId and an id
+			// 2. Existing forms have a formId only
+			// 3. Library/available eforms have a formId only
+			// 4. Library/available forms have neither
+			if ((item.type === 'eform' && item.id) || (item.type === 'form' && item.formId))
+			{
+				params.name = item.type === 'form' ? item.name || queryName : '';
+				$state.go('record.forms.view', params);
+			}
+			else if (item.type === 'eform')
+			{
+				$state.go('record.forms.add', params);
+			}
+			else
+			{
+				$state.go('record.forms');
+			}
+
+			/*
+			* 1=frame
+			* 2=newwindow
+			*/
 			if (view === undefined)
 			{
 				view = 1;
 			}
 
-
-			if (item.type == 'eform')
+			var url = '';
+			if (item.type === 'eform')
 			{
 				if (!Juno.Common.Util.isUndefinedOrNull(item.id))
 				{
-					addOrShow = '../eform/efmshowform_data.jsp?fdid=' + item.id;
+					url = '../eform/efmshowform_data.jsp?fdid=' + item.id;
 				}
 				else
 				{
-					addOrShow = '../eform/efmformadd_data.jsp?fid=' + item.formId + '&demographic_no=' + $stateParams.demographicNo;
+					url = '../eform/efmformadd_data.jsp?fid=' + item.formId + '&demographic_no=' + $stateParams.demographicNo;
 				}
-				/*
-				 * 1=frame
-				 * 2=newwindow
-				 */
-				if (view == 1)
-				{
-					url = addOrShow;
-					$state.go('controller.record.forms.existing',
-					{
-						demographicNo: $stateParams.demographicNo,
-						type: 'eform',
-						id: item.id
-					});
-					$("html, body").animate(
-					{
-						scrollTop: 0
-					}, "slow");
-				}
-				else if (view == 2)
-				{
-					url = addOrShow;
-
-					var rnd = Math.round(Math.random() * 1000);
-					win = "win" + rnd;
-
-					window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
-					return;
-				}
-
 			}
 			else
 			{ //form
 				if (angular.isDefined(item.formId))
 				{
-					addOrShow = '../form/forwardshortcutname.jsp?formname=' + item.name + '&demographic_no=' + $stateParams.demographicNo + '&formId=' + item.formId;
+					var name = item.name || queryName;
+					url = '../form/forwardshortcutname.jsp?formname=' + name + '&demographic_no=' + $stateParams.demographicNo + '&formId=' + item.formId;
 				}
 				else
 				{
-					addOrShow = item.formValue + $stateParams.demographicNo + "&formId=0&provNo=" + user.providerNo + "&parentAjaxId=forms";
+					url = item.formValue + $stateParams.demographicNo + "&formId=0&provNo=" + user.providerNo + "&parentAjaxId=forms";
 				}
+			}
 
-				if (view == 1)
-				{
-					url = addOrShow;
-					$state.go('record.forms.existing',
-					{
-						demographicNo: $stateParams.demographicNo,
-						type: 'form',
-					});
-					$("html, body").animate(
+			if (view === 1)
+			{
+				$("html, body").animate(
 					{
 						scrollTop: 0
 					}, "slow");
+			}
+			else if (view === 2)
+			{
+				var rnd = Math.round(Math.random() * 1000);
+				win = "win" + rnd;
 
-				}
-				else if (view == 2)
-				{
-					url = addOrShow;
-
-					var rnd = Math.round(Math.random() * 1000);
-					win = "win" + rnd;
-
-					window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
-					return;
-				}
-
-
+				window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
+				return;
 			}
 
 			controller.page.currentForm = item;
@@ -453,32 +428,27 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			{
 				return "active";
 			}
-		};
-
-		// Remove?
-		function handleError(errorMessage)
-		{
-			console.log(errorMessage);
 		}
 
-		if ($state.current.name == 'record.forms.new')
+		var currentState = $state.current.name;
+		if (currentState === 'record.forms.view' || currentState === 'record.forms.add')
 		{
 			var item = {};
 			item.type = $state.params.type;
-			item.formId = $state.params.id;
-			controller.viewFormState(item);
-			controller.changeTo(1);
 
-		}
-		else if ($state.current.name == 'record.forms.existing')
-		{
-			var item = {};
-			item.type = $state.params.type;
-			item.id = $state.params.id;
-			controller.viewFormState(item);
-			controller.changeTo(0);
-		}
+			// set item properties in a way that matches the content that the server returns
+			if (currentState === 'record.forms.view' && item.type === 'eform')
+			{
+				item.id = $state.params.id;
+			}
+			else
+			{
+				item.formId = $state.params.id;
+			}
 
+			controller.viewFormState(item);
+			controller.changeTo(currentState === 'record.forms.view' ? 0 : 1);
+		}
 
 		/*
 		 * This still needs to be tested

@@ -23,7 +23,7 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
-import org.oscarehr.common.model.EForm;
+import org.oscarehr.eform.model.EForm;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.EFormTo1;
 import org.springframework.beans.BeanUtils;

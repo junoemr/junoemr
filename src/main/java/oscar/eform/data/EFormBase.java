@@ -25,12 +25,11 @@
 
 package oscar.eform.data;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Properties;
-
 import oscar.util.StringBuilderUtils;
 import oscar.util.UtilDateUtilities;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 public class EFormBase {
     protected final String imageMarker = "${oscar_image_path}";
@@ -83,8 +82,6 @@ public class EFormBase {
     }
 
     public void setImagePath() {
-        Properties prop = oscar.OscarProperties.getInstance();
-        String projHome = prop.getProperty("project_home");
         String output = "../eform/displayImage.do?imagefile=";
         StringBuilder html = new StringBuilder(formHtml);
         int pointer = StringBuilderUtils.indexOfIgnoreCase(html, imageMarker, 0);
@@ -108,7 +105,7 @@ public class EFormBase {
     public void setFormDate(String formDate) {
         this.formDate = formDate;
     }
-    public java.lang.String getFid() {
+    public String getFid() {
         return fid;
     }
     public void setFid(String fid) {

@@ -27,10 +27,13 @@ var oldestLab = null;
 
 function  updateDocStatusInQueue(docid){//change status of queue document link row to I=inactive
     //console.log('in updateDocStatusInQueue, docid '+docid);
-          var url="../dms/inboxManage.do",data="docid="+docid+"&method=updateDocStatusInQueue";
-          new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){}});
-
-
+          var url="../dms/inboxManage.do",
+	          data="docid="+docid+"&method=updateDocStatusInQueue";
+          new Ajax.Request(url,{
+          	method:'post',
+	          parameters:data,
+	          onSuccess:function(transport){}
+          });
 }
 
 function saveNext(docid) {
@@ -1602,88 +1605,6 @@ function updateDocumentAndNext(eleId){//save doc info
 	return false;
 }
 
-function updateDocument(eleId){
-	if (!checkObservationDate(eleId)) {
-		return false;
-	}
-	//save doc info
-	var url="../dms/ManageDocument.do",data=$(eleId).serialize(true);
-	new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){
-		var json=transport.responseText.evalJSON();
-		var patientId;
-		//oscarLog(json);
-		if(json!=null ){
-			patientId=json.patientId;
-
-			var ar=eleId.split("_");
-			var num=ar[1];
-			num=num.replace(/\s/g,'');
-			$("saveSucessMsg_"+num).show();
-			$('saved'+num).value='true';
-			$("msgBtn_"+num).onclick = function() { popup(700,960,contextpath +'/oscarMessenger/SendDemoMessage.do?demographic_no='+patientId,'msg'); };
-			
-			updateDocStatusInQueue(num);
-			var success= updateGlobalDataAndSideNav(num,patientId);
-			
-			if(success){
-				success=updatePatientDocLabNav(num,patientId);
-				if(success){
-					//disable demo input
-					$('autocompletedemo'+num).disabled=true;
-					
-					//console.log('updated by save');
-					//console.log(patientDocs);
-				}
-			}
-		}
-	}});
-	return false;
-}
-
-function checkObservationDate(formid) {
-    // regular expression to match required date format
-    re = /^\d{4}\-\d{1,2}\-\d{1,2}$/;
-    re2 = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
-
-    var form = document.getElementById(formid);
-    if(form.elements["observationDate"].value == "") {
-    	alert("Blank Date: " + form.elements["observationDate"].value);
-		form.elements["observationDate"].focus();
-		return false;
-    }
-    
-    if(!form.elements["observationDate"].value.match(re)) {
-    	if(!form.elements["observationDate"].value.match(re2)) {
-    		alert("Invalid date format: " + form.elements["observationDate"].value);
-    		form.elements["observationDate"].focus();
-    		return false;
-    	} else if(form.elements["observationDate"].value.match(re2)) {
-    		form.elements["observationDate"].value=form.elements["observationDate"].value.replace("/","-");
-    		form.elements["observationDate"].value=form.elements["observationDate"].value.replace("/","-");
-    	}
-    }
-    regs= form.elements["observationDate"].value.split("-");
-    // day value between 1 and 31
-    if(regs[2] < 1 || regs[2] > 31) {
-      alert("Invalid value for day: " + regs[2]);
-      form.elements["observationDate"].focus();
-      return false;
-    }
-    // month value between 1 and 12
-    if(regs[1] < 1 || regs[1] > 12) {
-      alert("Invalid value for month: " + regs[1]);
-      form.elements["observationDate"].focus();
-      return false;
-    }
-    // year value between 1902 and 2015
-    if(regs[0] < 1902 || regs[0] > (new Date()).getFullYear()) {
-      alert("Invalid value for year: " + regs[0] + " - must be between 1902 and " + (new Date()).getFullYear());
-      form.elements["observationDate"].focus();
-      return false;
-    }
-    return true;
-  }
-
 function updateStatus(formid){//acknowledge
 	var num=formid.split("_");
 	var doclabid=num[1];
@@ -1716,8 +1637,6 @@ function updateStatus(formid){//acknowledge
 		}
 	}
 }
-
-
 
 function fileDoc(docId){
 	if(docId){

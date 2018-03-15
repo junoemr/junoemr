@@ -116,7 +116,7 @@
 	</bean>
 
 	<!--Container for holding preventions -->
-	<bean id="preventionMgr" class="org.oscarehr.provider.model.PreventionManager"></bean>
+	<bean id="preventionMgr" class="org.oscarehr.provider.model.ProviderPreventionManager"></bean>
 
 	<!-- OcanDataProcessor is used to create the OCAN xml submission file based on intake data -->
 	<bean id="ocanDataProcessor" class="oscar.ocan.service.OcanDataProcessor">

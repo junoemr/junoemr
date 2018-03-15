@@ -74,7 +74,7 @@ jQuery("document").ready(function(){
 	}
 })
 function toggleReason( providerNo ) { 
-	var id = ".reason_" + providerNo;
+	var id = ".toggleable.reason_" + providerNo;
     jQuery( id ).toggle();
     localStorage.setItem( id, jQuery( id ).is( ":visible" ) );
 }

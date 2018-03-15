@@ -36,34 +36,28 @@
 package oscar.oscarLab.ca.all.parsers;
 
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-
-import org.apache.log4j.Logger;
-
-import oscar.util.StringUtils;
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
-import ca.uhn.hl7v2.model.v23.datatype.XCN;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.log4j.Logger;
+import oscar.util.StringUtils;
+
+import java.util.ArrayList;
 
 
 /**
  *
  * @author wrighd
  */
-public class CMLHandler implements MessageHandler {
+public class CMLHandler extends MessageHandler
+{
 
-    ORU_R01 msg = null;
     Logger logger = Logger.getLogger(CMLHandler.class);
+    protected ORU_R01 msg;
 
     /** Creates a new instance of CMLHandler */
     public CMLHandler(){
@@ -72,8 +66,21 @@ public class CMLHandler implements MessageHandler {
     public void init(String hl7Body) throws HL7Exception {
         Parser p = new PipeParser();
         p.setValidationContext(new NoValidation());
-        msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ));
+        this.msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ));
+        this.terser = new Terser(msg);
     }
+    @Override
+    public String preUpload(String hl7Message) throws HL7Exception
+    {
+        return hl7Message;
+    }
+    @Override
+    public boolean canUpload()
+    {
+        return true;
+    }
+    @Override
+    public void postUpload() {}
 
     public String getMsgType(){
         return("CML");
@@ -332,11 +339,11 @@ public class CMLHandler implements MessageHandler {
     }
 
     public String getFirstName(){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()));
+        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName(0).getGivenName().getValue()));
     }
 
     public String getLastName(){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getFamilyName().getValue()));
+        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName(0).getFamilyName().getValue()));
     }
 
     public String getDOB(){
@@ -345,21 +352,6 @@ public class CMLHandler implements MessageHandler {
         }catch(Exception e){
             return("");
         }
-    }
-
-    public String getAge(){
-        String age = "N/A";
-        String dob = getDOB();
-        try {
-            // Some examples
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date date = formatter.parse(dob);
-            age = UtilDateUtilities.calcAge(date);
-        } catch (ParseException e) {
-            logger.error("Could not get age", e);
-
-        }
-        return age;
     }
 
     public String getSex(){
@@ -379,44 +371,6 @@ public class CMLHandler implements MessageHandler {
     	}
     	
         return(value);
-    }
-
-    public String getHomePhone(){
-        String phone = "";
-        int i=0;
-        try{
-            while(!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue()).equals("")){
-                if (i==0){
-                    phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
-                }else{
-                    phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberHome(i).get9999999X99999CAnyText().getValue());
-                }
-                i++;
-            }
-            return(phone);
-        }catch(Exception e){
-            logger.error("Could not return phone number", e);
-            return("");
-        }
-    }
-
-    public String getWorkPhone(){
-        String phone = "";
-        int i=0;
-        try{
-            while(!getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue()).equals("")){
-                if (i==0){
-                    phone = getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
-                }else{
-                    phone = phone + ", " + getString(msg.getRESPONSE().getPATIENT().getPID().getPhoneNumberBusiness(i).get9999999X99999CAnyText().getValue());
-                }
-                i++;
-            }
-            return(phone);
-        }catch(Exception e){
-            logger.error("Could not return phone number", e);
-            return("");
-        }
     }
 
     public String getPatientLocation(){
@@ -543,69 +497,6 @@ public class CMLHandler implements MessageHandler {
 
     public String audit(){
         return "";
-    }
-
-
-    private String getFullDocName(XCN docSeg){
-        String docName = "";
-
-        if(docSeg.getPrefixEgDR().getValue() != null)
-            docName = docSeg.getPrefixEgDR().getValue();
-
-        if(docSeg.getGivenName().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getGivenName().getValue();
-            else
-                docName = docName +" "+ docSeg.getGivenName().getValue();
-        }
-        if(docSeg.getMiddleInitialOrName().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getMiddleInitialOrName().getValue();
-            else
-                docName = docName +" "+ docSeg.getMiddleInitialOrName().getValue();
-        }
-        if(docSeg.getFamilyName().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getFamilyName().getValue();
-            else
-                docName = docName +" "+ docSeg.getFamilyName().getValue();
-        }
-        if(docSeg.getSuffixEgJRorIII().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getSuffixEgJRorIII().getValue();
-            else
-                docName = docName +" "+ docSeg.getSuffixEgJRorIII().getValue();
-        }
-        if(docSeg.getDegreeEgMD().getValue() != null){
-            if (docName.equals(""))
-                docName = docSeg.getDegreeEgMD().getValue();
-            else
-                docName = docName +" "+ docSeg.getDegreeEgMD().getValue();
-        }
-
-        return (docName);
-    }
-
-
-    protected String formatDateTime(String plain){
-    	if (plain==null || plain.trim().equals("")) return "";
-
-        String dateFormat = "yyyyMMddHHmmss";
-        dateFormat = dateFormat.substring(0, plain.length());
-        String stringFormat = "yyyy-MM-dd HH:mm:ss";
-        stringFormat = stringFormat.substring(0, stringFormat.lastIndexOf(dateFormat.charAt(dateFormat.length()-1))+1);
-
-        Date date = UtilDateUtilities.StringToDate(plain, dateFormat);
-        return UtilDateUtilities.DateToString(date, stringFormat);
-    }
-
-    protected String getString(String retrieve){
-        if (retrieve != null){
-            retrieve.replaceAll("^", " ");
-            return(retrieve.trim());
-        }else{
-            return("");
-        }
     }
 
     public String getFillerOrderNumber(){

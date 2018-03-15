@@ -53,7 +53,7 @@ import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.PMmodule.dao.SecUserRoleDao;
 import org.oscarehr.PMmodule.model.SecUserRole;
 import org.oscarehr.PMmodule.utility.UtilDateUtilities;
-import org.oscarehr.common.dao.DocumentDao;
+import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.common.dao.InboxResultsDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.QueueDao;

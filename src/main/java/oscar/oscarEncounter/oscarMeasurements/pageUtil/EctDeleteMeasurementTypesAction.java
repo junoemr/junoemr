@@ -65,38 +65,39 @@ public class EctDeleteMeasurementTypesAction extends Action {
         EctDeleteMeasurementTypesForm frm = (EctDeleteMeasurementTypesForm) form;                
         request.getSession().setAttribute("EctDeleteMeasurementTypesForm", frm);
         String[] deleteCheckbox = frm.getDeleteCheckbox();
-        GregorianCalendar now=new GregorianCalendar(); 
-       
-                                                                                        
-            
-        if(deleteCheckbox != null){
-            for(int i=0; i<deleteCheckbox.length; i++){
-                MiscUtils.getLogger().debug(deleteCheckbox[i]);
-                
-                MeasurementType mt = measurementTypeDao.find(Integer.parseInt(deleteCheckbox[i]));
-                if(mt != null) {
-                	MeasurementTypeDeleted mtd = new MeasurementTypeDeleted();
-                	mtd.setType(mt.getType());
-                	mtd.setTypeDisplayName(mt.getTypeDisplayName());
-                	mtd.setTypeDescription(mt.getTypeDescription());
-                	mtd.setMeasuringInstruction(mt.getMeasuringInstruction());
-                	mtd.setValidation(mt.getValidation());
-                	mtd.setDateDeleted(new Date());
-                	measurementTypeDeletedDao.persist(mtd);
-                	
-                	measurementTypeDao.remove(mt.getId());
-                	
-                	measurementGroupDao.remove(measurementGroupDao.findByTypeDisplayName(mt.getTypeDisplayName()));
-                }
-                
-                
-            }
-        }
-        
+        GregorianCalendar now=new GregorianCalendar();
 
-         
-      
-        MeasurementTypes mt =  MeasurementTypes.getInstance();
+
+			if (deleteCheckbox != null)
+			{
+				for (int i = 0; i < deleteCheckbox.length; i++)
+				{
+					MiscUtils.getLogger().debug(deleteCheckbox[i]);
+
+					MeasurementType mt = measurementTypeDao.find(Integer.parseInt(deleteCheckbox[i]));
+					if (mt != null)
+					{
+						String typeDisplayName = mt.getTypeDisplayName();
+
+						MeasurementTypeDeleted mtd = new MeasurementTypeDeleted();
+						mtd.setType(mt.getType());
+						mtd.setTypeDisplayName(typeDisplayName);
+						mtd.setTypeDescription(mt.getTypeDescription());
+						mtd.setMeasuringInstruction(mt.getMeasuringInstruction());
+						mtd.setValidation(mt.getValidation());
+						mtd.setDateDeleted(new Date());
+						measurementTypeDeletedDao.persist(mtd);
+
+						measurementTypeDao.remove(mt.getId());
+						measurementGroupDao.removeAll(typeDisplayName);
+					}
+
+
+				}
+			}
+
+
+			MeasurementTypes mt =  MeasurementTypes.getInstance();
         mt.reInit();
         return mapping.findForward("success");
 

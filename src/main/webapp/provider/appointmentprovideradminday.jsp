@@ -41,7 +41,6 @@
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="org.oscarehr.common.dao.SiteDao" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.common.dao.MyGroupDao" %>
@@ -54,8 +53,6 @@
 <%@ page import="org.oscarehr.common.model.ScheduleTemplate" %>
 <%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@ page import="org.oscarehr.common.model.Appointment" %>
-<%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
-<%@ page import="org.oscarehr.common.model.UserProperty" %>
 <%@ page import="org.oscarehr.common.model.Tickler" %>
 <%@ page import="org.oscarehr.managers.TicklerManager" %>
 <%@page import="org.oscarehr.managers.ProgramManager2"%>
@@ -226,7 +223,7 @@
 </caisi:isModuleLoad>
 <!-- caisi infirmary view extension add end -->
 
-<%@ page import="java.util.*,java.text.*,java.sql.*,java.net.*,oscar.*,oscar.util.*,org.oscarehr.provider.model.PreventionManager" %>
+<%@ page import="java.util.*,java.text.*,java.sql.*,java.net.*,oscar.*,oscar.util.*,org.oscarehr.provider.model.ProviderPreventionManager" %>
 
 <%@ page import="org.apache.commons.lang.*" %>
 <%@ page import="oscar.appt.ApptStatusData" %>
@@ -242,7 +239,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%
-	PreventionManager prevMgr = (PreventionManager)SpringUtils.getBean("preventionMgr");
+	ProviderPreventionManager prevMgr = (ProviderPreventionManager)SpringUtils.getBean("preventionMgr");
 %>
 <%!/**
  Checks if the schedule day is patients birthday
@@ -458,17 +455,12 @@ public boolean isBirthday(String schedDate,String demBday){
 		allowWeek = "No";
 	}
 %>
-<%@page import="oscar.util.*"%>
 <%@page import="oscar.oscarDB.*"%>
 
 <%@page import="oscar.appt.JdbcApptImpl"%>
 <%@page import="oscar.appt.ApptUtil"%>
-<%@page import="org.oscarehr.common.dao.SiteDao"%>
-<%@page import="org.oscarehr.common.model.Site"%>
-<%@page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
-<%@page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@page import="org.oscarehr.web.AppointmentProviderAdminDayUIBean"%>
-<%@page import="org.oscarehr.common.model.EForm"%><html:html locale="true">
+<%@page import="org.oscarehr.eform.model.EForm"%><html:html locale="true">
 	<head>
 		<script>
 
@@ -1715,6 +1707,7 @@ public boolean isBirthday(String schedDate,String demBday){
                         nameSb.append(String.valueOf(appointment.getName()));
                   }
                   String name = UtilMisc.toUpperLowerCase(nameSb.toString());
+                  Boolean doNotBook = ("DO_NOT_BOOK").equalsIgnoreCase(name);
 
                   paramTickler[0]=String.valueOf(demographic_no);
                   paramTickler[1]=MyDateFormat.getSysDate(strDate); //year+"-"+month+"-"+day;//e.g."2001-02-02";
@@ -1898,10 +1891,33 @@ public boolean isBirthday(String schedDate,String demBday){
 	reason: <%=reasonCodeName!=null?reasonCodeName:""%> <%if(reason!=null && !reason.isEmpty()){%>- <%=UtilMisc.htmlEscape(reason)%>
 <%}%>	<bean:message key="provider.appointmentProviderAdminDay.notes"/>: <%=UtilMisc.htmlEscape(notes)%>" >
 																	.<%=(view==0&&numAvailProvider!=1)?(name.length()>len?name.substring(0,len).toUpperCase():name.toUpperCase()):name.toUpperCase()%>
-																	</font></a><!--Inline display of reason -->
+																	</font>
+																</a>
+
+																<!--Inline display of reason -->
 																<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-																	<span class="reason reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }"><bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=UtilMisc.htmlEscape(reason)%></span>
-																</oscar:oscarPropertiesCheck></td>
+																	<%
+																		String escapedReason = reason != null ? "&nbsp;" + UtilMisc.htmlEscape(reason) : "";
+																		if (doNotBook)
+																		{
+																	%>
+																	<%--Do not book appointments always display reason and can not be toggled. --%>
+																	<span class="reason reason_<%=curProvider_no[nProvider]%>">
+																		<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=escapedReason%>
+																	</span>
+																	<%
+																		}
+																		else
+																		{
+																	%>
+																	<span class="toggleable reason reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
+																		<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=escapedReason%>
+																	</span>
+																	<%
+																		}
+																	%>
+																</oscar:oscarPropertiesCheck>
+															</td>
 																	<%
         			} else {
 				%>	<% if (tickler_no.compareTo("") != 0) {%>
@@ -1941,13 +1957,13 @@ public boolean isBirthday(String schedDate,String demBday){
 															<!-- doctor code block 2 -->
 																	<%
 
-boolean disableStopSigns = PreventionManager.isDisabled();
-boolean propertyExists = PreventionManager.isCreated();
+boolean disableStopSigns = ProviderPreventionManager.isDisabled();
+boolean propertyExists = ProviderPreventionManager.isCreated();
 if(disableStopSigns!=true){
 if( OscarProperties.getInstance().getProperty("SHOW_PREVENTION_STOP_SIGNS","false").equals("true") || propertyExists==true) {
 
 		String warning = prevMgr.getWarnings(loggedInInfo1, String.valueOf(demographic_no));
-		warning = PreventionManager.checkNames(warning);
+		warning = ProviderPreventionManager.checkNames(warning);
 
 		String htmlWarning = "";
 
@@ -2116,7 +2132,7 @@ start_time += iSm + ":00";
 															&#124;<b style="color:#FF0000">$</b>
 																	<%}}%>
 															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-															<span class="reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
+															<span class="toggleable reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
      			<strong>&#124;<%=reasonCodeName==null?"":"&nbsp;" + reasonCodeName + " -"%><%=reason==null?"":"&nbsp;" + reason%></strong>
      		</span>
 															</oscar:oscarPropertiesCheck>

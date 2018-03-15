@@ -34,7 +34,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DownloadAction;
-import org.oscarehr.common.dao.DocumentDao;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -138,13 +139,13 @@ public class DisplayInvoiceLogo extends DownloadAction{
 			MiscUtils.getLogger().info("Can't get DocumentDAO bean");
 			return fileName;
 		}
-		List<org.oscarehr.common.model.Document> docList = docDao.findByDoctype(logoDocType);
+		List<Document> docList = docDao.findByDoctype(logoDocType);
 		if (docList == null || docList.size() < 1) {
 			MiscUtils.getLogger().info("Can't get document according to doctype: " + logoDocType);
 			return fileName;
 		}
 		
-		org.oscarehr.common.model.Document doc = docList.get(docList.size() - 1);
+		Document doc = docList.get(docList.size() - 1);
 		if (doc != null) {
 			fileName = doc.getDocfilename();
 		}

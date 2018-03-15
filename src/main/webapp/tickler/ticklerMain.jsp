@@ -1003,6 +1003,14 @@
 
 		<input type="hidden" name="sort_order" id="sort_order" value="<%=sortOrderStr%>"/>
 		<input type="hidden" name="sort_column" id="sort_column" value=""/>
+		<input type="hidden" name="ticklerview" value="<%=ticklerview%>" />
+		<input type="hidden" name="xml_vdate" value="<%=xml_vdate%>" />
+		<input type="hidden" name="xml_appointment_date" value="<%=xml_appointment_date%>" />
+		<input type="hidden" name="mrpview" value="<%=mrpview%>" />
+		<input type="hidden" name="providerview" value="<%=providerview%>" />
+		<input type="hidden" name="assignedTo" value="<%=assignedTo%>" />
+		<input type="hidden" name="demoview" value="<%=demographic_no%>" />
+		<input type="hidden" name="parentAjaxId" value="<%=parentAjaxId%>">
 
 		<c:set var="imgTag" scope="request"><img src="<c:out value="${ctx}"/>/images/<%=sortImage%>"
 												 alt="Sort Arrow <%=sortDirection%>"/></c:set>
@@ -1404,7 +1412,6 @@
 
 	<div id="note-form" title="Tickler Note">
 		<form>
-
 			<table>
 				<tbody>
 				<textarea id="tickler_note" name="tickler_note"

@@ -52,12 +52,12 @@ import org.oscarehr.app.OAuth1Utils;
 import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.common.dao.EFormDao.EFormSortOrder;
+import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.EForm;
-import org.oscarehr.common.model.EFormData;
+import org.oscarehr.eform.model.EForm;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.common.model.EncounterForm;
 import org.oscarehr.managers.FormsManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -139,7 +139,7 @@ public class FormsService extends AbstractServiceImpl {
 		response.setContent(new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(),formsManager.findByStatus(getLoggedInInfo(), true, EFormSortOrder.NAME)));
 		response.setTotal(response.getContent().size());
 		return response;
-		
+
 	}
 	
 	@GET
@@ -161,15 +161,15 @@ public class FormsService extends AbstractServiceImpl {
 		response.setContent(new EncounterFormConverter().getAllAsTransferObjects(getLoggedInInfo(),formsManager.getSelectedEncounterForms()));
 		response.setTotal(response.getContent().size());
 		return response;
-		
+
 	}
 	
 		
 	@GET
 	@Path("/{demographicNo}/completedEncounterForms")
 	@Produces("application/json")
-	public FormListTo1 getCompletedFormNames(@PathParam("demographicNo") String demographicNo){
-		FormListTo1 formListTo1 = new FormListTo1();
+	public RestResponse<List<FormTo1>,String> getCompletedFormNames(@PathParam("demographicNo") String demographicNo){
+		List<FormTo1> formList = new ArrayList<FormTo1>();
 
 		List<EncounterForm> encounterForms = formsManager.getAllEncounterForms();
 		Collections.sort(encounterForms, EncounterForm.BC_FIRST_COMPARATOR);
@@ -196,15 +196,15 @@ public class FormsService extends AbstractServiceImpl {
 					} catch (ParseException ex) {
 						date = null;
 					}
-                                   
-					formListTo1.add(FormTo1.create(null, Integer.parseInt(demographicNo), formId, FormsManager.FORM, name, null, null, date, false ));
+
+					formList.add(FormTo1.create(null, Integer.parseInt(demographicNo), formId, FormsManager.FORM, name, null, null, date, false ));
 
 				}
 
 			}
 		}
-		
-		return formListTo1;
+
+		return RestResponse.successResponse(formList);
 	}
 	
 	@GET
@@ -216,7 +216,7 @@ public class FormsService extends AbstractServiceImpl {
 		response.setContent(formsManager.getGroupNames());
 		response.setTotal(response.getContent().size());
 		return response;
-		
+
 	}
 	
 	@GET

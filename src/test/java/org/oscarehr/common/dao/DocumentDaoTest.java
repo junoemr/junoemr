@@ -33,10 +33,11 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.oscarehr.common.dao.DocumentDao.Module;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.dao.DocumentDao.Module;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.Document;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.util.SpringUtils;
 
 public class DocumentDaoTest extends DaoTestFixtures {

@@ -38,7 +38,6 @@ import java.util.TreeMap;
 
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
-
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Appointment;
@@ -48,6 +47,16 @@ import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 @Repository
 @SuppressWarnings("unchecked")
@@ -554,9 +563,12 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
     }
     
     public List<Object[]> export_appt(Integer demographicNo) {
-    	String sql="from Appointment app, Provider prov where app.id = prov.id and app.demographicNo = ?";
+    	String sql="SELECT app, prov " +
+			    "FROM Appointment app, Provider prov " +
+			    "WHERE app.providerNo = prov.ProviderNo " +
+			    "AND app.demographicNo = :demographicNo";
     	Query query = entityManager.createQuery(sql);
-    	query.setParameter(1, demographicNo);
+    	query.setParameter("demographicNo", demographicNo);
          
         return query.getResultList();
     }

@@ -24,7 +24,7 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<div class="col-lg-3 col-md-4">		
+<div id="forms-page" class="col-lg-3 col-md-4">
 	<ul class="nav nav-tabs nav-justified">
 		<li ng-repeat="list in formCtrl.page.formlists" 
 				ng-class="formCtrl.getListClass(list.id)" 
@@ -59,7 +59,7 @@
 	        	</ul>
 	</fieldset>   
 	 --%>
-	<div class="panel panel-success"> 
+	<div id="forms-panel" class="panel panel-success">
 	  	<!-- Default panel contents -->
 		<input type="search" class="form-control" placeholder="Filter" ng-model="formCtrl.filterFormsQ">
 		<ul class="list-group" tabindex="0" ng-keypress="formCtrl.keypress($event)">
@@ -75,12 +75,12 @@
 			</li>
 
 			<li class="list-group-item"	
-				ng-repeat="formItem2 in formCtrl.page.encounterFormlist[formCtrl.page.currentlistId].content | filter:formCtrl.filterFormsQ" 
+				ng-repeat="formItem2 in formCtrl.page.encounterFormlist[0] | filter:formCtrl.filterFormsQ"
 				ng-hide="formCtrl.page.currentlistId==1">
 				<a class="list-group-item-text hand-hover" ng-click="formCtrl.viewFormState(formItem2,1)">{{formItem2.name}}</a>
 			</li>
 			
-			<li class="list-group-item" ng-repeat="formItem in formCtrl.page.encounterFormlist[formCtrl.page.currentlistId].content | filter:formCtrl.filterFormsQ" 
+			<li class="list-group-item" ng-repeat="formItem in formCtrl.page.encounterFormlist[1].content | filter:formCtrl.filterFormsQ"
 					ng-hide="formCtrl.page.currentlistId==0">
 				<a class="list-group-item-text hand-hover" ng-click="formCtrl.viewFormState(formItem,1)">
 					{{formItem.formName}} 
@@ -101,14 +101,14 @@
 		<div>
 			
 			<div  class="col-sm-4">
-				<legend> 
+				<legend>
 					<bean:message key="forms.title.form.groups" bundle="ui"/>
 				</legend>
 				<ul class="list-group" >
 	        		<li ng-repeat="mod in formCtrl.page.formGroups" class="list-group-item" ng-class="formCtrl.getGroupListClass(mod)">
 	        			 <span class="badge">{{mod.summaryItem.length}}</span>
-	        			<a class="list-group-item-text" ng-click="formCtrl.setCurrentEFormGroup(mod)" href="javascript:void(0)"> {{mod.displayName}} </a> 
-	        		</li> 			
+	        			<a class="list-group-item-text" ng-click="formCtrl.setCurrentEFormGroup(mod)" href="javascript:void(0)"> {{mod.displayName}} </a>
+	        		</li>
 				</ul>
 			</div>
 

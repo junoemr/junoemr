@@ -66,6 +66,12 @@ if(!authed) {
 <script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/prototype.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/effects.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/Oscar.js"></script>
+        <script type="text/javascript"
+                src="<%= request.getContextPath() %>/js/moment.min.js"></script>
+        <script type="text/javascript"
+                src="<%= request.getContextPath() %>/js/util/common.js"></script>
+        <script type="text/javascript"
+                src="<%= request.getContextPath() %>/js/util/date.js"></script>
 
         <script type="text/javascript" src="../share/javascript/controls.js"></script>
 
@@ -1964,6 +1970,27 @@ function addDocToPatient(doclabid,patientId){//if doc is previously not assigned
 
 
   }
+
+function checkObservationDate(formId)
+{
+	var formElem = document.getElementById(formId);
+	var dateElem = formElem.elements["observationDate"];
+
+	if (!Oscar.Util.Common.validateInputNotEmpty(dateElem))
+	{
+		alert("Blank Date.");
+		dateElem.focus();
+		return false;
+	}
+
+	if (!Oscar.Util.Date.validateDateInput(dateElem))
+	{
+		alert("Invalid date format: " + dateElem.value);
+		dateElem.focus();
+		return false;
+	}
+	return true;
+}
 
                                                function updateDocument(eleId,isNext){//save doc info
                                                     var url="../dms/ManageDocument.do",data=$(eleId).serialize(true);

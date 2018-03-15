@@ -49,7 +49,7 @@ String userlastname = (String) session.getAttribute("userlastname");
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ page
-	import="java.util.*, java.io.*, java.sql.*, oscar.*, oscar.util.*, java.net.*,oscar.MyDateFormat, oscar.dms.*, oscar.dms.data.*, oscar.oscarProvider.data.ProviderData, org.oscarehr.util.SpringUtils, org.oscarehr.common.dao.CtlDocClassDao"%><%
+	import="org.oscarehr.common.dao.CtlDocClassDao, org.oscarehr.util.SpringUtils, oscar.dms.EDoc, oscar.dms.EDocUtil, oscar.dms.data.AddEditDocumentForm, oscar.oscarProvider.data.ProviderData,oscar.util.UtilDateUtilities, java.util.ArrayList, java.util.HashMap, java.util.List, java.util.Map"%><%
 String editDocumentNo = "";
 if (request.getAttribute("editDocumentNo") != null) {
     editDocumentNo = (String) request.getAttribute("editDocumentNo");

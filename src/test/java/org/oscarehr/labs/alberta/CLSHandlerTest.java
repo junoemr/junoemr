@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.oscarehr.util.MiscUtils;
 
-import oscar.oscarLab.ca.all.parsers.CLSHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
 
 public class CLSHandlerTest {
 
@@ -38,13 +38,14 @@ public class CLSHandlerTest {
 	
 	@Test
 	public void testAll() throws Exception {
-		CLSHandler h = new CLSHandler();
+		//CLSHandler h = new CLSHandler();
 		
 		InputStream is = this.getClass().getResourceAsStream("/labs/HL7-CLS/MillenniumUpgrade2010_Clinic_Validation_Current.hl7");
 		byte[] bytes = IOUtils.toByteArray(is);
 		
-		h.init(new String(bytes));
-		
+		//h.init(new String(bytes));
+		CLSHandler h = new CLSHandler(new String(bytes));
+
 		logger.info(h.getPatientLocation());
 		logger.info(h.getHealthNum());
 		logger.info(h.getHomePhone());
