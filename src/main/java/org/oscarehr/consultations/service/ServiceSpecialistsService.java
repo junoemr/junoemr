@@ -21,43 +21,49 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
 
-import static org.junit.Assert.assertNotNull;
+package org.oscarehr.consultations.service;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.oscarehr.consultations.dao.ServiceSpecialistsDao;
 import org.oscarehr.common.model.ServiceSpecialists;
 import org.oscarehr.common.model.ServiceSpecialistsPK;
-import org.oscarehr.consultations.dao.ServiceSpecialistsDao;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-public class ServiceSpecialistsDaoTest extends DaoTestFixtures {
+import java.util.ArrayList;
+import java.util.List;
 
-	protected ServiceSpecialistsDao dao = SpringUtils.getBean(ServiceSpecialistsDao.class);
+@Service
+@Transactional
+public class ServiceSpecialistsService
+{
+	@Autowired
+	private ServiceSpecialistsDao dao;
 
-	public ServiceSpecialistsDaoTest() {
-	}
+	/**
+	 * Update specialists associated with the given service to match the given list.
+	 *
+	 * @param serviceId    the service id
+	 * @param specialists  a list of specialist ids
+	 */
+	public void updateServiceSpecialists(Integer serviceId, List<String> specialists)
+	{
+		List<Integer> specialistIds = new ArrayList<Integer>();
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("serviceSpecialists", "professionalSpecialists");
-	}
+		for (String specialist : specialists)
+		{
+			specialistIds.add(Integer.parseInt(specialist));
+		}
 
-	@Test
-	public void testCreate() {
-		ServiceSpecialists entity = new ServiceSpecialists();
-		ServiceSpecialistsPK key = new ServiceSpecialistsPK(1, 1);
-		entity.setId(key);
-		dao.persist(entity);
+		dao.removeSpecialistsNotInList(serviceId, specialistIds);
 
-		assertNotNull(entity.getId());
-	}
-
-	@Test
-	public void testFindSpecialists() {
-		assertNotNull(dao.findSpecialists(1000));
+		for (Integer specId : specialistIds)
+		{
+			ServiceSpecialists ss = new ServiceSpecialists();
+			ss.setId(new ServiceSpecialistsPK(serviceId, specId));
+			dao.merge(ss);
+		}
 	}
 
 }

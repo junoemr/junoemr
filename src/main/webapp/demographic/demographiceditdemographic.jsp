@@ -470,6 +470,20 @@ function rosterStatusTerminationDateValid(trueIfBlank) {
     return checkDate(yyyy,mm,dd,errMsg);
 }
 
+function checkTerminationDateBlank()
+{
+	yyyy = document.updatedelete.roster_termination_date_year.value.trim();
+	mm = document.updatedelete.roster_termination_date_month.value.trim();
+	dd = document.updatedelete.roster_termination_date_day.value.trim();
+
+	if (yyyy=="" && mm=="" && dd=="")
+	{
+		return true;
+	} else {
+		return false;
+	}
+}
+
 function patientStatusDateValid(trueIfBlank) {
     var yyyy = document.updatedelete.patientstatus_date_year.value.trim();
     var mm = document.updatedelete.patientstatus_date_month.value.trim();

@@ -153,7 +153,7 @@ public class SendFaxPDFAction extends DispatchAction {
 		{
 			try
 			{
-				sendFax("Form-" + formName, pdfPath, recipients[i]);
+				faxTempFile("Form-" + formName, pdfPath, recipients[i]);
 			}
 			catch (Exception e)
 			{
@@ -168,7 +168,17 @@ public class SendFaxPDFAction extends DispatchAction {
 		return mapping.findForward("success");
 	}
 
-	private void sendFax(String fileName, String tmpPdf, String faxNo)
+	private void faxTempFile(String fileName, String tmpPdf, String faxNo)
+		throws DocumentException, IOException
+	{
+		sendFax(fileName, tmpPdf, faxNo);
+
+		// clear temp files on JVM exit
+		new File(tmpPdf).deleteOnExit();
+	}
+
+
+	private void sendFax(String fileName, String pdf, String faxNo)
 		throws DocumentException, IOException
 	{
 		String tempPath = OscarProperties.getInstance().getProperty("fax_file_location");
@@ -178,13 +188,13 @@ public class SendFaxPDFAction extends DispatchAction {
 		String faxTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
 
 		MiscUtils.getLogger().info("======================================================");
-		MiscUtils.getLogger().info(tmpPdf);
+		MiscUtils.getLogger().info(pdf);
 		MiscUtils.getLogger().info(faxPdf);
 		MiscUtils.getLogger().info(faxTxt);
 		MiscUtils.getLogger().info("======================================================");
 
 		// Copying the fax pdf.
-		FileUtils.copyFile(new File(tmpPdf), new File(faxPdf));
+		FileUtils.copyFile(new File(pdf), new File(faxPdf));
 
 		// Creating text file with the specialists fax number.
 		FileOutputStream fos = new FileOutputStream(faxTxt);
@@ -199,9 +209,6 @@ public class SendFaxPDFAction extends DispatchAction {
 			throw new DocumentException(
 				"Unable to create files for fax of " + fileName + ".");
 		}
-
-		// clear temp files on JVM exit
-		new File(tmpPdf).deleteOnExit();
 	}
 
 	private String getUserFriendlyError(Exception e)
