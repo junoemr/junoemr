@@ -120,7 +120,7 @@ function updateLink(filePath,keytype){
 <body>
 <h4>HRM Preferences</h4>
 <form action="<%=request.getContextPath()%>/hospitalReportManager/HRMPreferences.do" method="post">
-	<fieldset>
+	<table>
 		<div class="control-group">
 			<label class="control-label">User Name:</label>
 			<div class="controls">
@@ -136,14 +136,34 @@ function updateLink(filePath,keytype){
 		<div class="control-group">
 			<label class="control-label">Private Key:</label>
 			<div class="controls">
-				<a href="../<%=privateKey%>" id="pkeyLink">View Private Key</a>
+				<%
+				if (privateKey != null && !privateKey.isEmpty())
+				{
+				%>
+					<a href="../<%=privateKey%>" id="pkeyLink">View Private Key</a>
+				<%
+				} else
+				{
+				%>
+					<span id="pkeyLink">No Private Key Uploaded</span>
+				<%}%>
 				<input type="button" class="btn" name="privateKey" value="Upload Private Key" onClick='popupPage(600,900,&quot;<html:rewrite page="/hospitalReportManager/hrmKeyUploader.jsp"/>&quot;);return false;' />
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">Decryption Key:</label>
 			<div class="controls">
-				<a href="../<%=decryptionKey%>" id="dkeyLink">View Decryption Key</a>
+				<%
+				if (decryptionKey != null && !decryptionKey.isEmpty())
+				{
+				%>
+					<a href="../<%=decryptionKey%>" id="dkeyLink">View Decryption Key</a>
+				<%
+				} else
+				{
+				%>
+					<span id="dkeyLink">No Decryption Key Uploaded</span>
+				<%}%>
 				<input type="button" class="btn" name="decryptionKey" value="Upload Decryption Key" onClick='popupPage(600,900,&quot;<html:rewrite page="/hospitalReportManager/hrmKeyUploader.jsp"/>&quot;);return false;' />	
 			</div>
 		</div>
