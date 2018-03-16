@@ -629,7 +629,7 @@ text-align:left;
                         if (hdata.get("id")==null) onClickCode="popup(300,500,'display_remote_prevention.jsp?remoteFacilityId="+hdata.get("integratorFacilityId")+"&remotePreventionId="+hdata.get("integratorPreventionId")+"&amp;demographic_no="+demographic_no+"')";
                         %>
              
-		<div class="preventionProcedure" onclick="<%=onClickCode%>" title="fade=[on] header=[<%=hdata.get("age")%> -- Date:<%=hdata.get("prevention_date_no_time")%>] body=[<%=hExt.get("comments")%>&lt;br/&gt;Entered By: <%=hdata.get("provider_name")%>]">
+		<div class="preventionProcedure" onclick="<%=onClickCode%>" title="fade=[on] header=[<%=hdata.get("age")%> -- Date:<%=hdata.get("prevention_date_no_time")%>] body=[<%=hExt.get("comments")%>&lt;br/&gt;Entered By: <%=hdata.get("creator_name")%>]">
 		
 		<!--this is setting the style <%=r(hdata.get("refused"),result)%>  -->
 		<p <%=r(hdata.get("refused"),result)%> >Age: <%=hdata.get("age")%> <%if(result!=null && result.equals("abnormal")){out.print("result:"+result);}%> <br />
@@ -682,7 +682,7 @@ text-align:left;
                             Map<String,String> hExt = PreventionData.getPreventionKeyValues(hdata.get("id"));
                             result = hExt.get("result");
                             %>
-		<div class="preventionProcedure" onclick="javascript:popup(465,635,'AddPreventionData.jsp?id=<%=hdata.get("id")%>&amp;demographic_no=<%=demographic_no%>','addPreventionData')" title="fade=[on] header=[<%=hdata.get("age")%> -- Date:<%=hdata.get("prevention_date_no_time")%>] body=[<%=hExt.get("comments")%>&lt;br/&gt;Entered By: <%=hdata.get("provider_name")%>]">
+		<div class="preventionProcedure" onclick="javascript:popup(465,635,'AddPreventionData.jsp?id=<%=hdata.get("id")%>&amp;demographic_no=<%=demographic_no%>','addPreventionData')" title="fade=[on] header=[<%=hdata.get("age")%> -- Date:<%=hdata.get("prevention_date_no_time")%>] body=[<%=hExt.get("comments")%>&lt;br/&gt;Entered By: <%=hdata.get("creator_name")%>]">
 		<p <%=r(hdata.get("refused"), result)%>>Age: <%=hdata.get("age")%> <br />
 		<!--<%=refused(hdata.get("refused"))%>-->Date: <%=hdata.get("prevention_date_no_time")%>
 		<%if (hExt.get("comments") != null && (hExt.get("comments")).length()>0) {
