@@ -238,7 +238,7 @@ public class OscarProperties extends Properties {
 	 */
 	public ArrayList<String> getRouteLabsToProviders(ArrayList<String> defaultProviderNumbers)
 	{
-		String property = getProperty("route_labs_to_provider");
+		String property = getProperty("route_labs_to_provider", "");
 
 		//Send all labs to the unclaimed inbox
 		if (property.equals("0"))
