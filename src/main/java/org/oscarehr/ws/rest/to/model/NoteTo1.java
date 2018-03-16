@@ -55,6 +55,7 @@ public class NoteTo1 implements Serializable{
 	private boolean archived;
 	private String note;
 	private boolean isDocument;
+	private boolean isDeleted;
 	private boolean isRxAnnotation;
 	private boolean isEformData;
 	private boolean isEncounterForm;
@@ -221,6 +222,14 @@ public class NoteTo1 implements Serializable{
 
 	public void setDocument(boolean isDocument) {
 		this.isDocument = isDocument;
+	}
+
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
 	}
 
 	public boolean isRxAnnotation() {

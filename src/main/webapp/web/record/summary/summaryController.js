@@ -375,8 +375,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				if (user.providerNo !== note.providerNo)
 					return false;
 			}
-
-			return true;
+			return !note.deleted;
 		};
 
 		controller.getNoteHeader = function firstLine(noteObj)

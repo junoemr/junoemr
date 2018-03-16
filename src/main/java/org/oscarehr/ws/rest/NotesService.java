@@ -65,6 +65,8 @@ import org.oscarehr.casemgmt.web.NoteDisplay;
 import org.oscarehr.casemgmt.web.NoteDisplayLocal;
 import org.oscarehr.common.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.EncounterUtil;
@@ -124,91 +126,81 @@ public class NotesService extends AbstractServiceImpl {
 	
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
+
+	@Autowired
+	private DocumentDao documentDao;
 	
 	
 	@POST
 	@Path("/{demographicNo}/all")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public NoteSelectionTo1 getNotesWithFilter(@PathParam("demographicNo") Integer demographicNo,
-	                                           @QueryParam("numToReturn") @DefaultValue("20") Integer numToReturn,
-	                                           @QueryParam("offset") @DefaultValue("0") Integer offset,
-	                                           JSONObject jsonobject) {
+	public RestResponse<NoteSelectionTo1, String> getNotesWithFilter(@PathParam("demographicNo") Integer demographicNo,
+	                                                                 @QueryParam("numToReturn") @DefaultValue("20") Integer numToReturn,
+	                                                                 @QueryParam("offset") @DefaultValue("0") Integer offset,
+	                                                                 JSONObject jsonobject)
+	{
 		NoteSelectionTo1 returnResult = new NoteSelectionTo1();
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		logger.debug("The config "+jsonobject.toString());
-	
-		HttpSession se = loggedInInfo.getSession();
-		if (se.getAttribute("userrole") == null) {
-			logger.error("An Error needs to be added to the returned result, remove this when fixed");
-			return returnResult;
-		}
-		
-		String demoNo = ""+demographicNo;
 
-		logger.debug("is client in program");
+		HttpSession se = loggedInInfo.getSession();
+		if(se.getAttribute("userrole") == null)
+		{
+			return RestResponse.errorResponse("Missing session userrole");
+		}
+
+		String demoNo = "" + demographicNo;
+
 		// need to check to see if the client is in our program domain
 		// if not...don't show this screen!
 		String roles = (String) se.getAttribute("userrole");
-		if (OscarProperties.getInstance().isOscarLearning() && roles != null && roles.indexOf("moderator") != -1) {
+		if(OscarProperties.getInstance().isOscarLearning() && roles != null && roles.contains("moderator"))
+		{
 			logger.info("skipping domain check..provider is a moderator");
-		} else if (!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo)) {
-			logger.error("A domain error needs to be added to the returned result, remove this when fixed");
-			return returnResult;
 		}
-		
-		ProgramProvider pp = programManager2.getCurrentProgramInDomain(getLoggedInInfo(),loggedInInfo.getLoggedInProviderNo());
-		String programId = null;
-		
-		if(pp !=null && pp.getProgramId() != null){
-			programId = ""+pp.getProgramId();
-		}else{
-			programId = String.valueOf(programMgr.getProgramIdByProgramName("OSCAR")); //Default to the oscar program if provider hasn't been assigned to a program
+		else if(!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo))
+		{
+			return RestResponse.errorResponse("Domain Error");
 		}
-		
+		String programId = getProgram(loggedInInfo, loggedInInfo.getLoggedInProviderNo());
+
 		NoteSelectionCriteria criteria = new NoteSelectionCriteria();
-		
+
 		criteria.setMaxResults(numToReturn);
 		criteria.setFirstResult(offset);
-		
+
 		criteria.setDemographicId(demographicNo);
 		criteria.setUserRole((String) se.getAttribute("userrole"));
 		criteria.setUserName((String) se.getAttribute("user"));
-		
+
 		// Note order is not user selectable in this version yet
 		criteria.setNoteSort("observation_date_desc");
 		criteria.setSliceFromEndOfList(false);
-				
 
-		if (programId != null && !programId.trim().isEmpty()) {
+		if(programId != null && !programId.trim().isEmpty())
+		{
 			criteria.setProgramId(programId);
 		}
-		
+
 		processJsonArray(jsonobject, "filterRoles", criteria.getRoles());
-		
 		processJsonArray(jsonobject, "filterProviders", criteria.getProviders());
-		
 		processJsonArray(jsonobject, "filterIssues", criteria.getIssues());
-		
-		if (logger.isDebugEnabled()) {
-			logger.debug("SEARCHING FOR NOTES WITH CRITERIA: " + criteria);
-		}
-		
-		NoteSelectionResult result = noteService.findNotes(loggedInInfo,criteria);
-		
-		if (logger.isDebugEnabled()) {
-			logger.debug("FOUND: " + result);
-			for(NoteDisplay nd : result.getNotes()) {
-				logger.debug("   " + nd.getClass().getSimpleName() + " " + nd.getNoteId() + " " + nd.getNote());
-			}
-		}
-		
-		
-		
+
+		NoteSelectionResult result = noteService.findNotes(loggedInInfo, criteria);
+
 		returnResult.setMoreNotes(result.isMoreNotes());
 		List<NoteTo1> noteList = returnResult.getNotelist();
-		for(NoteDisplay nd : result.getNotes()) {
+		for(NoteDisplay nd : result.getNotes())
+		{
 			NoteTo1 note = new NoteTo1();
+			boolean isDeleted = false;
+			if(nd.isDocument()) {
+				Document doc = documentDao.find(nd.getNoteId());
+				if(doc != null) {
+					isDeleted = (Document.STATUS_DELETED == doc.getStatus());
+				}
+			}
+
 			note.setNoteId(nd.getNoteId());
 			note.setArchived(nd.isArchived());
 			note.setIsSigned(nd.isSigned());
@@ -228,6 +220,7 @@ public class NotesService extends AbstractServiceImpl {
 			note.setLocked(nd.isLocked());
 			note.setNote(nd.getNote());
 			note.setDocument(nd.isDocument());
+			note.setDeleted(isDeleted);
 			note.setRxAnnotation(nd.isRxAnnotation());
 			note.setEformData(nd.isEformData());
 			note.setEncounterForm(nd.isEncounterForm());
@@ -239,14 +232,14 @@ public class NotesService extends AbstractServiceImpl {
 			note.setReadOnly(nd.isReadOnly());
 			note.setGroupNote(nd.isGroupNote());
 			note.setCpp(nd.isCpp());
-			note.setEncounterTime(nd.getEncounterTime());	
+			note.setEncounterTime(nd.getEncounterTime());
 			note.setEncounterTransportationTime(nd.getEncounterTransportationTime());
-			
+
 			noteList.add(note);
 		}
-		logger.debug("returning note list size "+noteList.size() +"  numToReturn was "+numToReturn+" offset "+offset );
-		
-		return returnResult;
+		logger.debug("returning note list size " + noteList.size() + "  numToReturn was " + numToReturn + " offset " + offset);
+
+		return RestResponse.successResponse(returnResult);
 	}
 	
 	
