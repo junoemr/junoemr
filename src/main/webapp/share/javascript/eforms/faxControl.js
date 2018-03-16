@@ -20,7 +20,7 @@ var faxControl = {
 		
 		var demoNo ="";			
 		demoNo = getSearchValue("demographic_no");
-		if (demoNo == "") { demoNo = getSearchValue("efmdemographic_no", jQuery("form").attr('action')); }
+		if (demoNo == "") { demoNo = getSearchValue("efmdemographic_no", jQuery("form").first().attr('action')); }
 		placeholder.html(faxControlPlaceholder);
 		var faxEnabled = true;
 		
@@ -45,8 +45,8 @@ var faxControl = {
 					}
 					else {
 						buttonLocation = jQuery(".DoNotPrint");
-						if (buttonLocation == null || buttonLocation.size() == 0) {			
-							buttonLocation = jQuery(jQuery("form")[0]);
+						if (buttonLocation == null || buttonLocation.size() == 0) {
+							buttonLocation = jQuery("form").first();
 						}
 						if (buttonLocation != null) {
 							buttonLocation.append(jQuery(faxControlFaxButton));
@@ -138,7 +138,7 @@ function hasFaxNumber() {
 
 function submitFax(save) {
 	document.getElementById('fax').value=true;
-	var form = jQuery("form");
+	var form = jQuery("form").first();
 
 	var saveHolder = jQuery("#saveHolder");
 	if (saveHolder == null || saveHolder.size() == 0) {
