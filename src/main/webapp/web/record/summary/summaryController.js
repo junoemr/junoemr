@@ -662,13 +662,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		};
 
-		controller.viewEform = function viewEform(eForm)
+		controller.viewEform = function viewEform(eFormId)
 		{
 			$state.transitionTo('record.forms.view',
 				{
 					demographicNo: $stateParams.demographicNo,
 					type: 'eform',
-					id: eForm.noteId
+					id: eFormId
 				},
 				{
 					location: 'replace',
@@ -693,6 +693,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			// if we found a matching document, open it
 			if(item != null) {
 				controller.gotoState(item);
+			}
+			else
+			{
+				console.error("item not linked to valid document id:" + documentId);
 			}
 		};
 

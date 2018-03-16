@@ -128,6 +128,9 @@ public class NotesService extends AbstractServiceImpl {
 	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
+	private CaseManagementNoteLinkDAO caseManagementNoteLinkDAO;
+
+	@Autowired
 	private DocumentDao documentDao;
 	
 	
@@ -195,9 +198,10 @@ public class NotesService extends AbstractServiceImpl {
 			NoteTo1 note = new NoteTo1();
 			boolean isDeleted = false;
 			if(nd.isDocument()) {
-				Document doc = documentDao.find(nd.getNoteId());
+				Document doc = getDocumentByNoteId(nd.getNoteId().longValue());
 				if(doc != null) {
 					isDeleted = (Document.STATUS_DELETED == doc.getStatus());
+					note.setDocumentId(doc.getId());
 				}
 			}
 
@@ -1567,5 +1571,21 @@ public class NotesService extends AbstractServiceImpl {
 	}
 	private Integer getProgramId(LoggedInInfo loggedInInfo,String providerNo) {
 		return Integer.parseInt(getProgram(loggedInInfo, providerNo));
+	}
+
+	private Document getDocumentByNoteId(Long noteId)
+	{
+		Document linkedDoc = null;
+		CaseManagementNoteLink link = caseManagementMgr.getLatestLinkByNote(noteId);
+		if(link != null && CaseManagementNoteLink.DOCUMENT.equals(link.getTableName()))
+		{
+			long documentId = link.getTableId();
+			linkedDoc = documentDao.find((int)documentId);
+		}
+		if(linkedDoc == null)
+		{
+			logger.error("Invalid or missing document link for note: " + noteId);
+		}
+		return linkedDoc;
 	}
 }
