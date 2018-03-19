@@ -1286,8 +1286,12 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		String verify = request.getParameter("verify");
 		OscarAppointmentDao appointmentDao = (OscarAppointmentDao) SpringUtils.getBean("oscarAppointmentDao");
 
-		Appointment appointment = null;
+		if (sessionBean.appointmentNo != null && sessionBean.appointmentNo.length() > 0)
+		{
+			note.setAppointmentNo(Integer.parseInt(sessionBean.appointmentNo));
+		}
 
+		Appointment appointment = null;
 		if (note.getAppointmentNo() > 0)
 		{
 			appointment = appointmentDao.find(note.getAppointmentNo());
@@ -1406,10 +1410,6 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			} else {
 				throw new Exception("Missing role id or program number. [roleId=" + noteRoleId + ", programNo=" + noteProgramNo + "]");
 			}
-		}
-
-		if (sessionBean.appointmentNo != null && sessionBean.appointmentNo.length() > 0) {
-			note.setAppointmentNo(Integer.parseInt(sessionBean.appointmentNo));
 		}
 
 		/* save note including add signature */
