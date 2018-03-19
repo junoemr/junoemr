@@ -288,7 +288,7 @@ public class BillingCreateBillingAction extends Action {
           //if the specified code requires a start time
           if ("0".equals(elem[1])) {
             if (noStartTime) {
-              errors.add("",
+              errors.add("error",
                          new ActionMessage(
                              "oscar.billing.CA.BC.billingBC.error.startTimeNeeded",
                              item.getServiceCode()));
@@ -297,7 +297,7 @@ public class BillingCreateBillingAction extends Action {
           }
           else if ("1".equals(elem[1])) {
             if (noStartTime || noEndTime) {
-              errors.add("",
+              errors.add("error",
                          new ActionMessage(
                              "oscar.billing.CA.BC.billingBC.error.startTimeandEndNeeded",
                              item.getServiceCode()));
@@ -325,7 +325,7 @@ public class BillingCreateBillingAction extends Action {
     for (int i = 0; i < dxcodes.length; i++) {
       String code = dxcodes[i];
       if (code != null && !code.equals("") && !per.dxcodeExists(code)) {
-        errors.add("",
+        errors.add("error",
                    new ActionMessage(
                        "oscar.billing.CA.BC.billingBC.error.invaliddxcode",
                        code));
@@ -354,7 +354,7 @@ public class BillingCreateBillingAction extends Action {
         SexValidator sex = (SexValidator) vldt.getSexValidator(item.
             getServiceCode(), demo);
         if (!age.isValid()) {
-          errors.add("",
+          errors.add("error",
                      new org.apache.struts.action.ActionMessage(
                          "oscar.billing.CA.BC.billingBC.error.invalidAge",
                          item.getServiceCode(),
@@ -362,7 +362,7 @@ public class BillingCreateBillingAction extends Action {
                          age.getDescription()));
         }
         if (!sex.isValid()) {
-          errors.add("",
+          errors.add("error",
                      new org.apache.struts.action.ActionMessage(
                          "oscar.billing.CA.BC.billingBC.error.invalidSex",
                          item.getServiceCode(), demo.getSex(), sex.getGender()));
@@ -370,7 +370,7 @@ public class BillingCreateBillingAction extends Action {
 
       }
       else {
-        errors.add("",
+        errors.add("error",
                    new ActionMessage(
                        "oscar.billing.CA.BC.billingBC.error.invalidsvccode",
                        item.getServiceCode()));
@@ -391,7 +391,7 @@ public class BillingCreateBillingAction extends Action {
       if (vCodes.contains(item.getServiceCode())) {
         if (!vldt.hasMore00120Codes(demo.getDemographicNo().toString(),
                                     item.getServiceCode(), serviceDate)) {
-          errors.add("",
+          errors.add("error",
                      new ActionMessage(
                          "oscar.billing.CA.BC.billingBC.error.noMore00120"));
         }
@@ -443,7 +443,7 @@ public class BillingCreateBillingAction extends Action {
         if ( (count > dailyAvail)) {
           String dayMsg =
               "oscar.billing.CA.BC.billingBC.error.patientManagementCodesDayUsed";
-          errors.add("",
+          errors.add("error",
                      new ActionMessage(
                          dayMsg, new String[] {key, String.valueOf(count),
                          String.valueOf(dailyAvail)}));
@@ -451,7 +451,7 @@ public class BillingCreateBillingAction extends Action {
         else if (count > yearAvail) {
           String yearMsg =
               "oscar.billing.CA.BC.billingBC.error.patientManagementCodesYearUsed";
-          errors.add("",
+          errors.add("error",
                      new ActionMessage(yearMsg, new String[] {key,
                                        String.valueOf(count),
                                        String.valueOf(yearAvail)}));
@@ -482,7 +482,7 @@ public class BillingCreateBillingAction extends Action {
       if (code.equals(item[0])) {
         int days = vldt.daysSinceCodeLastBilled(demoNo, item[1]);
         if (days >= 0 && days < 365) {
-          errors.add("",
+          errors.add("error",
                      new ActionMessage(
                          "oscar.billing.CA.BC.billingBC.error.codeCond",
                          new String[] {item[0], item[1]}));
@@ -525,13 +525,13 @@ public class BillingCreateBillingAction extends Action {
       }
     }
     if (codeLastBilled > 365) {
-      errors.add("",
+      errors.add("warning",
                  new ActionMessage(
                      "oscar.billing.CA.BC.billingBC.error.codeLastBilled",
                      new String[] {String.valueOf(codeLastBilled), code}));
     }
     else if (codeLastBilled == -1) {
-      errors.add("",
+      errors.add("warning",
                  new ActionMessage(
                      "oscar.billing.CA.BC.billingBC.error.codeNeverBilled",
                      new String[] {code}));

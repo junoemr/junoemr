@@ -110,7 +110,7 @@ public final class BillingAction extends Action {
         
             for (DSConsequence dscon : list){
                 _log.debug("DSTEXT "+dscon.getText());
-                errors.add("",new ActionMessage("message.custom",dscon.getText()));
+                errors.add("warning" ,new ActionMessage("message.custom",dscon.getText()));
            }
         }catch(Exception e){
             MiscUtils.getLogger().error("Error", e);
@@ -203,11 +203,11 @@ public final class BillingAction extends Action {
     }
     if (codeLastBilled > 365) {
         MiscUtils.getLogger().debug("adding code last billed "+code);
-      errors.add("",new ActionMessage("oscar.billing.CA.BC.billingBC.error.codeLastBilled",new String[] {String.valueOf(codeLastBilled), code}));
+      errors.add("warning",new ActionMessage("oscar.billing.CA.BC.billingBC.error.codeLastBilled",new String[] {String.valueOf(codeLastBilled), code}));
     }
     else if (codeLastBilled == -1) {
         MiscUtils.getLogger().debug("adding code never billed "+code);
-      errors.add("",new ActionMessage("oscar.billing.CA.BC.billingBC.error.codeNeverBilled",new String[] {code}));
+      errors.add("warning",new ActionMessage("oscar.billing.CA.BC.billingBC.error.codeNeverBilled",new String[] {code}));
     }
   }
 
