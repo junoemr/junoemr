@@ -1038,7 +1038,7 @@ while(field_itr.hasNext()){
 			}
 		</style>
 	</head>
-	<body onLoad="setfocus(); checkONReferralNo(); formatPhoneNum();checkRosterStatus();"
+	<body onLoad="setfocus();formatPhoneNum();checkRosterStatus();"
 		  topmargin="0" leftmargin="0" rightmargin="0">
 	<table class="MainTable" id="scrollNumber1" name="encounterTable">
 		<tr class="MainTableTopRow">
