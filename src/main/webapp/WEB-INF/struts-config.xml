@@ -2015,7 +2015,7 @@
 		<action input="/dms/documentReport.jsp" name="FrmForm" path="/dms/faxPDFs" type="oscar.dms.actions.FaxPDFAction" scope="request" validate="false">
 			<forward name="success" path="/dms/faxPDFs.jsp"></forward>
 		</action>
-		<action input="/dms/faxPDFs.jsp" name="FrmForm" path="/dms/sendFaxPDFs" type="oscar.dms.actions.SendFaxPDFAction" scope="request" validate="false">
+		<action input="/dms/faxPDFs.jsp" name="FrmForm" path="/dms/sendFaxPDFs" parameter="method" type="oscar.dms.actions.SendFaxPDFAction" scope="request" validate="false">
 			<forward name="success" path="/dms/sendFaxPDFs.jsp"></forward>
 			<forward name="failed" path="/dms/closeWindow.html"></forward>
 		</action>
@@ -2504,8 +2504,7 @@
 
 		<action path="/dms/ManageDocument" name="FrmForm" type="org.oscarehr.document.web.ManageDocumentAction" parameter="method" scope="request">
 			<forward name="success" path="/dms/undocument.jsp" />
-			<forward name="displaySingleDoc" path="/dms/MultiPageDocDisplay.jsp" />
-                        <forward name="nextIncomingDoc" path="/dms/incomingDocs.jsp" />
+			<forward name="nextIncomingDoc" path="/dms/incomingDocs.jsp" />
 		</action>
 		
                 <action path="/DocumentDescriptionTemplate" name="FrmForm" type="org.oscarehr.provider.web.DocumentDescriptionTemplateAction" parameter="method" scope="request">

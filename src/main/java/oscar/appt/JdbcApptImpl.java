@@ -21,11 +21,11 @@ package oscar.appt;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.AppointmentArchiveDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
-import org.oscarehr.common.dao.RScheduleDao;
-import org.oscarehr.common.dao.ScheduleDateDao;
+import org.oscarehr.schedule.dao.RScheduleDao;
+import org.oscarehr.schedule.dao.ScheduleDateDao;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.RSchedule;
-import org.oscarehr.common.model.ScheduleDate;
+import org.oscarehr.schedule.model.RSchedule;
+import org.oscarehr.schedule.model.ScheduleDate;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.SxmlMisc;

@@ -48,9 +48,10 @@ public class CLSResultsComplianceTest {
 	
 	@Test
 	public void testResultElementsForLab01() throws Exception {
-		CLSHandler handler = new CLSHandler();
-		handler.init(TestLabs.LAB01);
-		
+		//CLSHandler handler = new CLSHandler();
+		//handler.init(TestLabs.LAB01);
+		CLSHandler handler = new CLSHandler(TestLabs.LAB01);
+
 		assertEquals(1, handler.getOBRCount());
 		assertEquals(5, handler.getOBXCount(0));
 
@@ -115,9 +116,10 @@ public class CLSResultsComplianceTest {
 	
 	@Test
 	public void testResultElementsForLab02() throws Exception {
-		CLSHandler handler = new CLSHandler();
-		handler.init(TestLabs.LAB02);
-				
+		//CLSHandler handler = new CLSHandler();
+		//handler.init(TestLabs.LAB02);
+		CLSHandler handler = new CLSHandler(TestLabs.LAB02);
+
 		assertEquals(1, handler.getOBRCount());
 		assertEquals(1, handler.getOBXCount(0));
 
@@ -156,8 +158,9 @@ public class CLSResultsComplianceTest {
 
 	@Test
 	public void testFillerOrderIdCompliance() throws Exception {
-		CLSHandler handler = new CLSHandler();
-		handler.init(SAMPLE_LAB_WITH_ORC_SEGMENTS); 
+		//CLSHandler handler = new CLSHandler();
+		//handler.init(SAMPLE_LAB_WITH_ORC_SEGMENTS);
+		CLSHandler handler = new CLSHandler(SAMPLE_LAB_WITH_ORC_SEGMENTS);
 		assertEquals("20809880170", handler.getFillerOrderNumber());
 		
 		/*
@@ -173,24 +176,29 @@ public class CLSResultsComplianceTest {
 
 	@Test
 	public void testCareSetsCompliance() throws Exception {
-		CLSHandler handler = new CLSHandler();
+		//CLSHandler handler = new CLSHandler();
 		
 		// Occult Blood
-		handler.init(TestLabs.LAB29); 
-		assertEquals("10-344-300006", handler.getAccessionNum());
+		//handler.init(TestLabs.LAB29);
+		CLSHandler handler1 = new CLSHandler(TestLabs.LAB29);
+		assertEquals("10-344-300006", handler1.getAccessionNum());
 		
-		handler.init(TestLabs.LAB30); 
-		assertEquals("10-344-300006", handler.getAccessionNum());
+		//handler.init(TestLabs.LAB30);
+		CLSHandler handler2 = new CLSHandler(TestLabs.LAB30);
+		assertEquals("10-344-300006", handler2.getAccessionNum());
 		
-		handler.init(TestLabs.LAB31); 
-		assertEquals("10-344-300006", handler.getAccessionNum());
+		//handler.init(TestLabs.LAB31);
+		CLSHandler handler3 = new CLSHandler(TestLabs.LAB31);
+		assertEquals("10-344-300006", handler3.getAccessionNum());
 
 		// Glucose Tolerance
-		handler.init(TestLabs.LAB55); 
-		assertEquals("11-012-300002", handler.getAccessionNum());
+		//handler.init(TestLabs.LAB55);
+		CLSHandler handler4 = new CLSHandler(TestLabs.LAB55);
+		assertEquals("11-012-300002", handler4.getAccessionNum());
 				
-		handler.init(TestLabs.LAB57); 
-		assertEquals("11-012-300004", handler.getAccessionNum());
+		//handler.init(TestLabs.LAB57);
+		CLSHandler handler5 = new CLSHandler(TestLabs.LAB57);
+		assertEquals("11-012-300004", handler5.getAccessionNum());
 		
 		/*
 		 * Care sets. The sequence of the results on the clinic charts do not need to be the same 
@@ -214,8 +222,9 @@ public class CLSResultsComplianceTest {
 	
 	@Test
 	public void testHeadersParsing() throws Exception {
-		CLSHandler handler = new CLSHandler();
-		handler.init(TestLabs.LAB01);
-		assertTrue(handler.getHeaders().contains("URINE MICROSCOPIC"));		
+		//CLSHandler handler = new CLSHandler();
+		//handler.init(TestLabs.LAB01);
+		CLSHandler handler = new CLSHandler(TestLabs.LAB01);
+		assertTrue(handler.getHeaders().contains("URINE MICROSCOPIC"));
 	}
 }

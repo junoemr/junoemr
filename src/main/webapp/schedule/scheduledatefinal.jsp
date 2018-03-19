@@ -25,30 +25,20 @@
 --%>
 
 <%
-  
   String user_no = (String) session.getAttribute("user");
   String creator = (String) session.getAttribute("userlastname")+","+ (String) session.getAttribute("userfirstname");
 %>
-<%@ page
-	import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*,java.net.*"
-	errorPage="../appointment/errorpage.jsp"%>
+<%@ page errorPage="../appointment/errorpage.jsp"%>
+
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
 <jsp:useBean id="scheduleDateBean" class="java.util.Hashtable"
 	scope="session" />
 <%
-  //String provider_name = URLDecoder.decode(request.getParameter("provider_name"));
-  String sdate ="";
   String provider_no = request.getParameter("provider_no");
-  String available = "";
-  String priority = "c";
-  String reason = "";
-  String hour = "";
-
 %>
 
-<%@page import="org.oscarehr.util.MiscUtils"%><html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title><bean:message key="schedule.scheduledatefinal.title" /></title>
@@ -58,13 +48,10 @@
 <!--
 function setfocus() {
   this.focus();
-  //document.schedule.keyword.focus();
-  //document.schedule.keyword.select();
 }
 function upCaseCtrl(ctrl) {
 	ctrl.value = ctrl.value.toUpperCase();
 }
-
 
 //-->
 </script>
@@ -138,6 +125,4 @@ function upCaseCtrl(ctrl) {
 
 </form>
 
-
 </body>
-</html:html>

@@ -38,6 +38,8 @@
 <%@page import="org.oscarehr.common.dao.ProviderDataDao" %>
 <%@page import="org.oscarehr.common.model.ProviderData"%>
 <%@page import="java.util.List"%>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="oscar.util.StringUtils" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -206,7 +208,7 @@
 					 paramValue = request.getParameter(paramName);
 
 				 %>
-				params += "&<%=paramName%>=<%=StringEscapeUtils.escapeJavaScript(paramValue)%>";
+				params += "&<%=paramName%>=<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(paramValue), "UTF-8")%>";
 				<%
 
 				 }

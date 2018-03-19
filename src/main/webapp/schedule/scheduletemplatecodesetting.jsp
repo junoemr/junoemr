@@ -28,25 +28,29 @@
   if (session.getAttribute("user") == null) response.sendRedirect("../logout.jsp");
 %>
 <%@ page
-	import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*"
-	errorPage="../appointment/errorpage.jsp"%>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
+		import="org.oscarehr.schedule.dao.ScheduleTemplateCodeDao,
+		org.oscarehr.schedule.model.ScheduleTemplateCode,
+		org.oscarehr.util.SpringUtils,
+		java.util.Collections,
+		java.util.List"
+		errorPage="../appointment/errorpage.jsp" %>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 
-<jsp:useBean id="dataBean" class="java.util.Properties" scope="page" />
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.common.model.ScheduleTemplateCode" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleTemplateCodeDao" %>
+<jsp:useBean id="dataBean" class="java.util.Properties" scope="page"/>
 <%
 	ScheduleTemplateCodeDao scheduleTemplateCodeDao = SpringUtils.getBean(ScheduleTemplateCodeDao.class);
 
 	String dbOperation = request.getParameter("dboperation");
 	String codeStr = request.getParameter("code");
 
-	if(dbOperation != null && codeStr != null && !codeStr.isEmpty()) {
+	if(dbOperation != null && codeStr != null && !codeStr.isEmpty())
+	{
 		ScheduleTemplateCode code = scheduleTemplateCodeDao.getByCode(codeStr.toCharArray()[0]);
-		if(dbOperation.equals(" Save ")) {
-			if (code != null) {
+		if(dbOperation.equals(" Save "))
+		{
+			if(code != null)
+			{
 				scheduleTemplateCodeDao.remove(code.getId());
 			}
 
@@ -59,8 +63,10 @@
 			code.setBookinglimit(Integer.parseInt(request.getParameter("bookinglimit")));
 			scheduleTemplateCodeDao.persist(code);
 		}
-		else if (dbOperation.equals("Delete")) {
-			if (code != null) {
+		else if(dbOperation.equals("Delete"))
+		{
+			if(code != null)
+			{
 				scheduleTemplateCodeDao.remove(code.getId());
 			}
 		}
@@ -72,37 +78,47 @@
 <title><bean:message
 	key="schedule.scheduletemplatecodesetting.title" /></title>
 <link rel="stylesheet" href="../web.css" />
-<script language="JavaScript">
+	<script language="JavaScript">
 
-	function validateNum() {
-		var node = document.getElementById("bookinglimit");
+		function validateNum()
+		{
+			var node = document.getElementById("bookinglimit");
 
-		if (isNaN(node.value)) {
-			alert("<bean:message key="schedule.scheduletemplatecodesetting.msgCheckInput"/>");
-			node.focus();
-			return false;
-		}
+			if (isNaN(node.value))
+			{
+				alert("<bean:message key="schedule.scheduletemplatecodesetting.msgCheckInput"/>");
+				node.focus();
+				return false;
+			}
 
-		return true;
-	}
-
-	function setfocus() {
-		this.focus();
-		document.addtemplatecode.code.focus();
-		document.addtemplatecode.code.select();
-	}
-	function upCaseCtrl(ctrl) {
-		ctrl.value = ctrl.value.toUpperCase();
-	}
-	function checkInput() {
-		if (document.schedule.holiday_name.value == "") {
-			alert("<bean:message key="schedule.scheduletemplatecodesetting.msgCheckInput"/>");
-			return false;
-		} else {
 			return true;
 		}
-	}
-</script>
+
+		function setfocus()
+		{
+			this.focus();
+			document.addtemplatecode.code.focus();
+			document.addtemplatecode.code.select();
+		}
+
+		function upCaseCtrl(ctrl)
+		{
+			ctrl.value = ctrl.value.toUpperCase();
+		}
+
+		function checkInput()
+		{
+			if (document.schedule.holiday_name.value == "")
+			{
+				alert("<bean:message key="schedule.scheduletemplatecodesetting.msgCheckInput"/>");
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+	</script>
 <script type="text/javascript" src="../share/javascript/picker.js"></script>
 </head>
 <body bgcolor="ivory" bgproperties="fixed" onLoad="setfocus()"

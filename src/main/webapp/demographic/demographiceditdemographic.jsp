@@ -62,8 +62,8 @@
 <%@page import="org.oscarehr.common.dao.DemographicExtDao" %>
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.dao.ProfessionalSpecialistDao" %>
-<%@page import="org.oscarehr.common.dao.ScheduleTemplateCodeDao" %>
-<%@page import="org.oscarehr.common.dao.ScheduleTemplateDao" %>
+<%@page import="org.oscarehr.schedule.dao.ScheduleTemplateCodeDao" %>
+<%@page import="org.oscarehr.schedule.dao.ScheduleTemplateDao" %>
 <%@page import="org.oscarehr.common.dao.UserPropertyDAO" %>
 <%@page import="org.oscarehr.common.dao.WaitingListNameDao" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -100,7 +100,7 @@ if(!authed) {
 }
 
 %>
-<%@ page import="org.oscarehr.common.model.Admission, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.CountryCode,org.oscarehr.common.model.Demographic, org.oscarehr.common.model.DemographicContact, org.oscarehr.common.model.DemographicCust, org.oscarehr.common.model.ProfessionalSpecialist, org.oscarehr.common.model.Provider,org.oscarehr.common.model.ScheduleTemplateCode"%>
+<%@ page import="org.oscarehr.common.model.Admission, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.CountryCode,org.oscarehr.common.model.Demographic, org.oscarehr.common.model.DemographicContact, org.oscarehr.common.model.DemographicCust, org.oscarehr.common.model.ProfessionalSpecialist, org.oscarehr.common.model.Provider,org.oscarehr.schedule.model.ScheduleTemplateCode"%>
 <%@ page import="org.oscarehr.common.model.UserProperty"%>
 <%@ page import="org.oscarehr.common.model.WaitingListName" %>
 <%@ page import="org.oscarehr.common.web.ContactAction,org.oscarehr.managers.DemographicManager" %>
@@ -468,6 +468,20 @@ function rosterStatusTerminationDateValid(trueIfBlank) {
     	if (yyyy=="" && mm=="" && dd=="") return true;
     }
     return checkDate(yyyy,mm,dd,errMsg);
+}
+
+function checkTerminationDateBlank()
+{
+	yyyy = document.updatedelete.roster_termination_date_year.value.trim();
+	mm = document.updatedelete.roster_termination_date_month.value.trim();
+	dd = document.updatedelete.roster_termination_date_day.value.trim();
+
+	if (yyyy=="" && mm=="" && dd=="")
+	{
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function patientStatusDateValid(trueIfBlank) {
