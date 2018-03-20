@@ -149,22 +149,22 @@ public class AppointmentDisplayController
 	public boolean isSelfBooked()
 	{
 		return Appointment.BookingSource.MYOSCAR_SELF_BOOKING.toString().equals(
-			this.appointment.getBookingSource());
+			appointment.getBookingSource());
 	}
 
 	public boolean isMultisitesEnabled()
 	{
-		return this.multisitesEnabled;
+		return multisitesEnabled;
 	}
 
 	public String getSiteName()
 	{
-		return String.valueOf(this.appointment.getLocation()).trim();
+		return String.valueOf(appointment.getLocation()).trim();
 	}
 
 	public String getSiteColour()
 	{
-		return this.siteBgColour.get(getSiteName());
+		return siteBgColour.get(getSiteName());
 	}
 
 	public boolean isWeekView()
@@ -230,7 +230,7 @@ public class AppointmentDisplayController
 
 	public String getAppointmentTitle()
 	{
-		return appointmentStatusList.getTitle(appointment.getStatus(), this.locale);
+		return appointmentStatusList.getTitle(appointment.getStatus(), locale);
 	}
 
 	public boolean isShowShortLetters()
@@ -244,12 +244,12 @@ public class AppointmentDisplayController
 
 	public String getShortLetters()
 	{
-		return UtilMisc.htmlEscape(this.appointment.getShortLetters());
+		return UtilMisc.htmlEscape(appointment.getShortLetters());
 	}
 
 	public String getColour()
 	{
-		String colour = this.appointment.getShortLetterColour();
+		String colour = appointment.getShortLetterColour();
 		if (colour == null)
 		{
 			colour = "#FFFFFF";
@@ -272,20 +272,20 @@ public class AppointmentDisplayController
 	{
 		String viewValue = "0";
 
-		if (this.view != 0)
+		if (view != 0)
 		{
 			String curProviderName = "";
 			try
 			{
-				curProviderName = URLEncoder.encode(this.currentProviderName, "UTF-8");
+				curProviderName = URLEncoder.encode(currentProviderName, "UTF-8");
 			}
 			catch(UnsupportedEncodingException e)
 			{
 				MiscUtils.getLogger().error("Refresh URL encoding error with string: " +
-					this.currentProviderName, e);
+					currentProviderName, e);
 			}
 
-			viewValue = "1&curProvider=" + this.currentProvider +
+			viewValue = "1&curProvider=" + currentProvider +
 				"&curProviderName=" + curProviderName;
 		}
 
@@ -296,19 +296,19 @@ public class AppointmentDisplayController
 		}
 
 		String viewWeekValue = "";
-		if (this.isWeekView)
+		if (isWeekView)
 		{
 			viewWeekValue = "&viewWeek=1";
 		}
 
 		return "providercontrol.jsp" +
-			"?appointment_no=" + this.appointment.getAppointmentNo() +
-			"&provider_no=" + this.providerNo.toString() +
+			"?appointment_no=" + appointment.getAppointmentNo() +
+			"&provider_no=" + providerNo.toString() +
 			"&status=" +
-			"&statusch=" + this.appointmentStatusList.getStatusAfter(appointment.getStatus()) +
-			"&year=" + this.appointment.getDate().getYear() +
-			"&month=" + this.appointment.getDate().getMonthValue() +
-			"&day=" + this.appointment.getDate().getDayOfMonth() +
+			"&statusch=" + appointmentStatusList.getStatusAfter(appointment.getStatus()) +
+			"&year=" + appointment.getDate().getYear() +
+			"&month=" + appointment.getDate().getMonthValue() +
+			"&day=" + appointment.getDate().getDayOfMonth() +
 			"&view=" + viewValue +
 			"&displaymode=addstatus" +
 			"&dboperation=updateapptstatus" +
@@ -320,13 +320,13 @@ public class AppointmentDisplayController
 	public String getAppointmentURL()
 	{
 		return "../appointment/appointmentcontrol.jsp" +
-			"?appointment_no=" + this.appointment.getAppointmentNo() +
-			"&provider_no=" + this.providerNo.toString() +
-			"&year=" + this.appointment.getDate().getYear() +
-			"&month=" + this.appointment.getDate().getMonthValue() +
-			"&day=" + this.appointment.getDate().getDayOfMonth() +
-			"&start_time=" + this.appointment.getStartTime().format(this.timeFormatter) +
-			"&demographic_no=" + this.appointment.getDemographicNo().toString() +
+			"?appointment_no=" + appointment.getAppointmentNo() +
+			"&provider_no=" + providerNo.toString() +
+			"&year=" + appointment.getDate().getYear() +
+			"&month=" + appointment.getDate().getMonthValue() +
+			"&day=" + appointment.getDate().getDayOfMonth() +
+			"&start_time=" + appointment.getStartTime().format(timeFormatter) +
+			"&demographic_no=" + appointment.getDemographicNo().toString() +
 			"&displaymode=edit" +
 			"&dboperation=search";
 	}
@@ -362,7 +362,7 @@ public class AppointmentDisplayController
 		catch(UnsupportedEncodingException e)
 		{
 			MiscUtils.getLogger().error("Incoming URL encoding error with string: " +
-				this.currentProviderName, e);
+				currentProviderName, e);
 		}
 
 		return "";
@@ -402,8 +402,8 @@ public class AppointmentDisplayController
 	public String getReasonCodeName()
 	{
 		String reasonCodeName = "";
-		if(this.appointment.getReasonCode() != null)    {
-			LookupListItem lli  = this.reasonCodesMap.get(appointment.getReasonCode());
+		if(appointment.getReasonCode() != null)    {
+			LookupListItem lli  = reasonCodesMap.get(appointment.getReasonCode());
 			if(lli != null) {
 				reasonCodeName = lli.getLabel();
 			}
@@ -413,12 +413,12 @@ public class AppointmentDisplayController
 
 	public String getReason()
 	{
-		return UtilMisc.htmlEscape(this.appointment.getReason());
+		return UtilMisc.htmlEscape(appointment.getReason());
 	}
 
 	public boolean isReasonToggleable()
 	{
-		return !("DO_NOT_BOOK").equalsIgnoreCase(this.getName());
+		return !("DO_NOT_BOOK").equalsIgnoreCase(getName());
 	}
 
 	public String getReasonToggleableClass()
@@ -441,7 +441,7 @@ public class AppointmentDisplayController
 
 	public String getHideReasonClass()
 	{
-		if(isToggleReasonByProvider() && isReasonToggleable())
+		if(!isWeekView && isToggleReasonByProvider() && isReasonToggleable())
 		{
 			return "hideReason";
 		}
@@ -461,9 +461,9 @@ public class AppointmentDisplayController
 			out_string = "&nbsp;" + reasonCodeName + " -";
 		}
 
-		if(this.appointment.getReason() != null)
+		if(appointment.getReason() != null)
 		{
-			out_string += "&nbsp;" + UtilMisc.htmlEscape(this.appointment.getReason());
+			out_string += "&nbsp;" + UtilMisc.htmlEscape(appointment.getReason());
 		}
 
 		return out_string;
@@ -471,30 +471,30 @@ public class AppointmentDisplayController
 
 	public String getAppointmentLinkTitle()
 	{
-		String title = this.appointment.getStartTime().format(this.timeFormatter) + "-";
-		title += this.appointment.getEndTime().format(timeFormatter) + "\n";
-		title += this.getName() + "\n";
+		String title = appointment.getStartTime().format(timeFormatter) + "-";
+		title += appointment.getEndTime().format(timeFormatter) + "\n";
+		title += getName() + "\n";
 
-		if(this.appointment.getType() != null)
+		if(appointment.getType() != null)
 		{
-			title += "type: " + this.appointment.getType() + "\n";
+			title += "type: " + appointment.getType() + "\n";
 		}
 
-		title += "reason: " + this.getReasonCodeName();
+		title += "reason: " + getReasonCodeName();
 
-		if (this.appointment.getReason() != null && !this.appointment.getReason().isEmpty())
+		if (appointment.getReason() != null && !appointment.getReason().isEmpty())
 		{
-			title += "- " + UtilMisc.htmlEscape(this.appointment.getReason() + "\n");
+			title += "- " + UtilMisc.htmlEscape(appointment.getReason() + "\n");
 		}
 
-		title += "notes: " + UtilMisc.htmlEscape(this.appointment.getNotes());
+		title += "notes: " + UtilMisc.htmlEscape(appointment.getNotes());
 
 		return " title=\"" + title + "\"";
 	}
 
 	public boolean isCriticalUrgency()
 	{
-		return (this.appointment.getUrgency() != null && this.appointment.getUrgency().equals("critical"));
+		return (appointment.getUrgency() != null && appointment.getUrgency().equals("critical"));
 	}
 
 	public boolean isEmptyDemographic()
@@ -504,54 +504,54 @@ public class AppointmentDisplayController
 
 	public boolean isShowTickler()
 	{
-		return this.showTicklers && this.appointment.hasTicklers();
+		return showTicklers && appointment.hasTicklers();
 	}
 
 	public boolean isShowDoctorLink()
 	{
-		return this.showDoctorLink;
+		return showDoctorLink;
 	}
 
 	public boolean isShowMasterLink()
 	{
-		return this.showMasterLink;
+		return showMasterLink;
 	}
 
 	public boolean isShowBilling()
 	{
-		return this.showBilling;
+		return showBilling;
 	}
 
 	public boolean isShowEChart()
 	{
-		return this.showEChart;
+		return showEChart;
 	}
 
 	public String getTicklerNote()
 	{
-		return UtilMisc.htmlEscape(this.appointment.getTicklerMessages());
+		return UtilMisc.htmlEscape(appointment.getTicklerMessages());
 	}
 
 	public boolean isDisplayAlerts()
 	{
 		return (
 			OscarProperties.getInstance().isPropertyActive("displayAlertsOnScheduleScreen") &&
-				this.appointment.getCustAlert() != null &&
-				!this.appointment.getCustAlert().isEmpty()
+				appointment.getCustAlert() != null &&
+				!appointment.getCustAlert().isEmpty()
 		);
 	}
 
 	public String getAlert()
 	{
-		return StringEscapeUtils.escapeHtml(this.appointment.getCustAlert());
+		return StringEscapeUtils.escapeHtml(appointment.getCustAlert());
 	}
 
 	public boolean isDisplayNotes()
 	{
 		return (
 			OscarProperties.getInstance().isPropertyActive("displayNotesOnScheduleScreen") &&
-				this.appointment.getCustNotes() != null &&
-				!SxmlMisc.getXmlContent(this.appointment.getCustNotes(), "<unotes>", "</unotes>")
+				appointment.getCustNotes() != null &&
+				!SxmlMisc.getXmlContent(appointment.getCustNotes(), "<unotes>", "</unotes>")
 					.isEmpty()
 		);
 	}
@@ -559,17 +559,17 @@ public class AppointmentDisplayController
 	public String getNotes()
 	{
 		return StringEscapeUtils
-			.escapeHtml(SxmlMisc.getXmlContent(this.appointment.getCustNotes(), "<unotes>", "</unotes>"));
+			.escapeHtml(SxmlMisc.getXmlContent(appointment.getCustNotes(), "<unotes>", "</unotes>"));
 	}
 
 	public String getName()
 	{
 		StringBuilder nameSb = new StringBuilder();
-		if(this.appointment.getDemographicNo() != 0)
+		if(appointment.getDemographicNo() != 0)
 		{
-			nameSb.append(this.appointment.getLastName())
+			nameSb.append(appointment.getLastName())
 				.append(",")
-				.append(this.appointment.getFirstName());
+				.append(appointment.getFirstName());
 		}
 		else
 		{
@@ -581,11 +581,11 @@ public class AppointmentDisplayController
 
 	public String getTruncatedName()
 	{
-		String name = this.getName();
+		String name = getName();
 
-		if (this.view == 0 && this.numAvailProvider != 1 && name.length() > this.nameLength)
+		if (view == 0 && numAvailProvider != 1 && name.length() > nameLength)
 		{
-			return name.substring(0, this.nameLength);
+			return name.substring(0, nameLength);
 		}
 
 		return name;
@@ -593,7 +593,7 @@ public class AppointmentDisplayController
 
 	public String getTruncatedUpperName()
 	{
-		return this.getTruncatedName().toUpperCase();
+		return getTruncatedName().toUpperCase();
 	}
 
 	public String getProviderNo()
@@ -613,7 +613,7 @@ public class AppointmentDisplayController
 
 	public String getDemographicNo()
 	{
-		return this.appointment.getDemographicNo().toString();
+		return appointment.getDemographicNo().toString();
 	}
 
 	public boolean isShowVerLink()
@@ -666,9 +666,9 @@ public class AppointmentDisplayController
 	public boolean isShowAppointmentLinks()
 	{
 		return(
-			this.nameLength == this.longLengthLimit ||
-			this.view != 0 ||
-			this.numAvailProvider == 1 ||
+			nameLength == longLengthLimit ||
+			view != 0 ||
+			numAvailProvider == 1 ||
 			OscarProperties.getInstance().isPropertyActive("APPT_ALWAYS_SHOW_LINKS")
 		);
 	}

@@ -88,4 +88,9 @@ public class UserDateSchedule
 	{
 		return appointments;
 	}
+
+	public boolean hasSchedule()
+	{
+		return scheduleSlots.asMapOfRanges().size() > 0;
+	}
 }

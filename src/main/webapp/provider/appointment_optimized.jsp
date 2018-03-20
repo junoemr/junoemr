@@ -27,8 +27,13 @@
 
 <%@ page import="org.oscarehr.provider.controller.MenuBar" %>
 
+<%@ page import="java.io.UnsupportedEncodingException" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.time.LocalTime" %>
+<%@ page import="java.time.Duration" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.Collections" %>
@@ -37,48 +42,43 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.ResourceBundle" %>
+<%@ page import="java.util.SortedMap" %>
 
 <%@ page import="oscar.OscarProperties" %>
 <%@ page import="oscar.util.UtilDateUtilities" %>
 <%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="org.oscarehr.appointment.model.AppointmentStatusList" %>
 <%@ page import="org.oscarehr.common.dao.MyGroupDao" %>
 <%@ page import="org.oscarehr.common.dao.MyGroupAccessRestrictionDao" %>
 <%@ page import="org.oscarehr.common.dao.ProviderSiteDao" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleDateDao" %>
 <%@ page import="org.oscarehr.common.dao.SiteDao" %>
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@ page import="org.oscarehr.common.model.LookupList" %>
+<%@ page import="org.oscarehr.common.model.LookupListItem" %>
 <%@ page import="org.oscarehr.common.model.MyGroup" %>
 <%@ page import="org.oscarehr.common.model.MyGroupAccessRestriction" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="org.oscarehr.common.model.ProviderPreference"%>
-<%@ page import="org.oscarehr.common.model.ScheduleDate" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="org.oscarehr.managers.AppointmentManager" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
+<%@ page import="org.oscarehr.managers.LookupListManager" %>
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
+<%@ page import="org.oscarehr.provider.model.ProviderPreventionManager" %>
+<%@ page import="org.oscarehr.schedule.dao.ScheduleDateDao" %>
+<%@ page import="org.oscarehr.schedule.dto.AppointmentDetails" %>
 <%@ page import="org.oscarehr.schedule.dto.ResourceSchedule" %>
+<%@ page import="org.oscarehr.schedule.dto.ScheduleSlot" %>
+<%@ page import="org.oscarehr.schedule.dto.UserDateSchedule" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleDate" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.util.SessionConstants" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
-<%@ page import="org.oscarehr.common.model.LookupListItem" %>
-<%@ page import="org.oscarehr.common.model.LookupList" %>
-<%@ page import="org.oscarehr.managers.LookupListManager" %>
-<%@ page import="org.oscarehr.provider.model.ProviderPreventionManager" %>
 <%@ page import="org.oscarehr.web.admin.ProviderPreferencesUIBean" %>
 <%@ page import="org.springframework.transaction.support.DefaultTransactionDefinition" %>
 <%@ page import="org.springframework.transaction.TransactionDefinition" %>
-<%@ page import="java.time.format.DateTimeFormatter" %>
-<%@ page import="java.time.LocalDate" %>
-<%@ page import="java.time.LocalTime" %>
-<%@ page import="org.oscarehr.schedule.dto.UserDateSchedule" %>
-<%@ page import="org.oscarehr.schedule.dto.ScheduleSlot" %>
-<%@ page import="org.oscarehr.schedule.dto.AppointmentDetails" %>
-<%@ page import="java.time.Duration" %>
-<%@ page import="java.util.SortedMap" %>
-<%@ page import="org.oscarehr.appointment.model.AppointmentStatusList" %>
-<%@ page import="org.oscarehr.managers.AppointmentManager" %>
-<%@ page import="java.io.UnsupportedEncodingException" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 <jsp:useBean id="appointmentInfo" class="org.oscarehr.appointment.AppointmentDisplayController" scope="page" />
@@ -342,20 +342,7 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 
 		curProviderName[0]=providerDao.getProvider(mygroupno).getFullName();
 
-		// Get schedules (mygroupno is provider number)
-		//resourceScheduleDTO = scheduleService.getResourceScheduleByProvider(mygroupno, selectedDate);
-
 	} else {
-
-		// Get schedules
-		//if(".default".equals(mygroupno))
-		//{
-		//	resourceScheduleDTO = scheduleService.getResourceScheduleByProvider(curUser_no, selectedDate);
-		//}
-		//else
-		//{
-		//	resourceScheduleDTO = scheduleService.getResourceScheduleByGroup(mygroupno, selectedDate);
-		//}
 
 		if(view==0) { //multiple views
 			if (selectedSite!=null) {
@@ -538,6 +525,21 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 %>
 <html>
 <head>
+	<script>
+
+		// copied from Google Analytics Snippet, adapted for Prometheus Aggregator
+		(function(i,s,o,g,r,a,m){i['PrometheusAggregatorObjectName']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=(
+			"<%=request.getContextPath()%>/js/userMetrics.js");m.parentNode.insertBefore(a,m);
+			i[r].aggregatorServerRoot = g;
+		})(window,document,'script',
+			"<%=request.getContextPath()%>/ws/rs/user_metrics",'prometheusAggregator');
+
+		prometheusAggregator('increment', 'app_load_succeeded', { app: 'student'}, 1);
+
+	</script>
+
 	<title>Title</title>
 
 	<link rel="stylesheet" href="../css/receptionistapptstyle.css" type="text/css">
@@ -1144,7 +1146,6 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 
 	<%
 
-		boolean userAvail = true;
 		boolean showApptCountForProvider = OscarProperties.getInstance().isPropertyActive("schedule.show_appointment_count");
 	%>
 
@@ -1175,26 +1176,52 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 
 						ResourceSchedule resourceScheduleDTO;
 
+
+
+
+						// This section decides which schedules to show on the page.  Here is the
+						// logic behind what gets shown for a provider/date combination (it applies
+						// to single providers, the .default provider and to providers in a selected
+						// group):
+
+						// - If the viewall parameter is set, show the schedule for all providers.
+						// - Otherwise, use these rules:
+						//   - Show a regular schedule for anyone with a scheduledate entry
+						//   - Show a greyed out schedule for the current user if there is no
+						//     scheduledate entry for that provider.
+						//   - Don't show a schedule for anyone else
+
+						boolean viewAllBoolean = ("1".equals(viewall));
+
 						if(isWeekView(request))
 						{
 							resourceScheduleDTO = scheduleService
-									.getWeekScheduleByProvider(provNum, selectedDate, selectedSite);
+								.getWeekScheduleByProvider(provNum, selectedDate, selectedSite);
 						}
 						else if(mygroupno != null && providerBean.get(mygroupno) != null)
 						{
 							// Get schedules (mygroupno is provider number)
+							String actuallyProviderNo = mygroupno;
+
+							boolean showForSure =
+								(viewAllBoolean || actuallyProviderNo.equals(curUser_no));
+
 							resourceScheduleDTO = scheduleService
-									.getResourceScheduleByProvider(mygroupno, selectedDate, selectedSite);
+								.getResourceScheduleByProvider(mygroupno, selectedDate,
+									selectedSite, showForSure);
 						}
 						else if(".default".equals(mygroupno))
 						{
+							// Always show the schedule because it will
 							resourceScheduleDTO = scheduleService
-									.getResourceScheduleByProvider(curUser_no, selectedDate, selectedSite);
+								.getResourceScheduleByProvider(curUser_no, selectedDate,
+									selectedSite, true);
 						}
 						else
 						{
 							resourceScheduleDTO = scheduleService
-									.getResourceScheduleByGroup(mygroupno, selectedDate, selectedSite);
+								.getResourceScheduleByGroup(mygroupno, selectedDate, selectedSite,
+									viewAllBoolean, Integer.parseInt(curUser_no));
 						}
 
 						AppointmentManager appointmentManager = SpringUtils.getBean(AppointmentManager.class);
@@ -1209,6 +1236,11 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 
 							headerColor = !headerColor;
 
+							boolean notOnSchedule = false;
+							if(!viewall.equals("1") && providerNo == Integer.parseInt(curUser_no) && !schedule.hasSchedule())
+							{
+								notOnSchedule = true;
+							}
 
 
 					%>
@@ -1266,7 +1298,7 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 								%>
 
 								<%
-          						if (!userAvail) {
+          						if (notOnSchedule) {
           						%>
 									[<bean:message key="provider.appointmentProviderAdminDay.msgNotOnSched"/>]
 								<%
@@ -1295,7 +1327,7 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 								<!-- caisi infirmary view extension modify end ffffffffffffffff-->
 							</td></tr>
 							<tr><td valign="top">
-								<table id="providerSchedule" border="0" cellpadding="0" bgcolor="<%=userAvail?"#486ebd":"silver"%>" cellspacing="0" width="100%">
+								<table id="providerSchedule" border="0" cellpadding="0" bgcolor="<%=notOnSchedule?"silver":"#486ebd"%>" cellspacing="0" width="100%">
 								<%
 
 								int slotLengthInMinutes = everyMin;
@@ -1809,7 +1841,7 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 									%>
 
 									<%
-									if (!userAvail) {
+									if (notOnSchedule) {
 									%>
 										[<bean:message key="provider.appointmentProviderAdminDay.msgNotOnSched"/>]
 										<%

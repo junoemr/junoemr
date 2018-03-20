@@ -1912,7 +1912,7 @@ public boolean isBirthday(String schedDate,String demBday){
 																		else
 																		{
 																	%>
-																	<span class="toggleable reason reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
+																	<span class="buildable reason reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
 																		<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=escapedReason%>
 																	</span>
 																	<%

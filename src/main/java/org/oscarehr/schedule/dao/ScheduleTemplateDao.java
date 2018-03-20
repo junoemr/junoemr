@@ -42,8 +42,6 @@ import com.google.common.collect.TreeRangeMap;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.schedule.model.ScheduleTemplate;
 import org.oscarehr.schedule.dto.ScheduleSlot;
-import org.oscarehr.util.MiscUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.oscarehr.common.dao.AbstractDao;
 import org.springframework.stereotype.Repository;
 
@@ -138,10 +136,6 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
 	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, Integer providerNo)
 	{
-		MiscUtils.getLogger().info("===============================================================");
-		MiscUtils.getLogger().info(date);
-		MiscUtils.getLogger().info(providerNo);
-		MiscUtils.getLogger().info("===============================================================");
 		String sql = "SELECT \n" +
 				"  (n3.i + (10 * n2.i) + (100 * n1.i))+1 AS position, \n" +
 				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
@@ -173,12 +167,6 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
 
-
-		// Get appointments
-		//List<AppointmentDetails> appointments = appointmentDao.findAppointmentDetailsByDateAndProvider(date, providerNo);
-
-		//ListIterator<AppointmentDetails> appointmentIter = appointments.listIterator();
-
 		List<Object[]> results = query.getResultList();
 
 		RangeMap<LocalTime, ScheduleSlot> slots = TreeRangeMap.create();
@@ -201,9 +189,6 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			// Get the end time by adding the duration
 			LocalTime endTime = slotTime.plus(Duration.ofMinutes(durationMinutes));
 
-			//List<AppointmentDetails> appointmentDetails = getAppointmentsForSlot(endTime,
-			//	appointmentIter);
-
 			Range range = Range.closedOpen(slotTime, endTime);
 			slots.put(range, new ScheduleSlot(appointmentDateTime, code, durationMinutes, description,
 					color, confirm, bookingLimit));
@@ -211,30 +196,4 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 		return slots;
 	}
-
-	/*
-	private List<AppointmentDetails> getAppointmentsForSlot(LocalTime slotEndTime,
-		ListIterator<AppointmentDetails> appointmentIterator)
-	{
-		List<AppointmentDetails> out = new ArrayList<>();
-
-		while(appointmentIterator.hasNext())
-		{
-			AppointmentDetails appointmentDetails = appointmentIterator.next();
-
-			if(appointmentDetails.getStartTime().isBefore(slotEndTime))
-			{
-				out.add(appointmentDetails);
-			}
-			else
-			{
-				// Move back one slot if it's not in the slot, then exit the loop.
-				appointmentIterator.previous();
-				break;
-			}
-		}
-
-		return out;
-	}
-	*/
 }
