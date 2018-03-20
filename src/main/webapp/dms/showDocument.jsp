@@ -451,10 +451,8 @@
                                                                             }
                                                                         %>
                                                                         <font color="red"><%= ackStatus %></font>
-                                                                        <% if ( ackStatus.equals("Acknowledged") ) { %>
                                                                             <%= report.getTimestamp() %>,
                                                                             <%= ( report.getComment().equals("") ? "no comment" : "comment : "+report.getComment() ) %>
-                                                                        <% } %>
                                                                         <br>
                                                                     <% }
                                                                     if (ackList.size() == 0){
