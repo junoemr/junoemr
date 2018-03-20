@@ -82,7 +82,7 @@ public class AddEFormAction extends Action {
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		String providerNoStr=loggedInInfo.getLoggedInProviderNo();
 
-		boolean fax = "true".equals(request.getParameter("faxEForm"));
+		boolean fax = "true".equals(request.getParameter("fax"));
 		boolean print = "true".equals(request.getParameter("print"));
 
 		String previousFormDataId = (String)session.getAttribute("eform_data_id");

@@ -121,16 +121,6 @@ boolean ajax = "true".equals(request.getParameter("ajax"));
 	jQuery.noConflict();
 	
 	jQuery(window).on("scroll",handleScroll());
-	
-	function renderCalendar(id,inputFieldId){
-    	Calendar.setup({ inputField : inputFieldId, ifFormat : "%Y-%m-%d", showsTime :false, button : id });
-        
-	}
-	
-	function split(id) {
-		var loc = "<%= request.getContextPath()%>/oscarMDS/Split.jsp?document=" + id;
-		popupStart(1100, 1100, loc, "Splitter");
-	}
 
 	var page = 1;
 	var pageSize = 40;
@@ -144,7 +134,7 @@ boolean ajax = "true".equals(request.getParameter("ajax"));
 	var providerNo = "<%=(providerNo == null ? "" : providerNo)%>";
 	var searchStatus = "<%=(ackStatus == null ? "": ackStatus)%>";
 	var url = "<%=request.getContextPath()%>/dms/inboxManage.do?";
-	var contextpath = "<%=request.getContextPath()%>";
+	var contextPath = "<%=request.getContextPath()%>";
 	var startDate = "<%= startDate %>";
 	var endDate = "<%= endDate %>";
 	var request = null;

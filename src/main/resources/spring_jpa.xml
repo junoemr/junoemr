@@ -65,6 +65,7 @@
 	<!-- Managed Beans -->
 	<context:component-scan base-package="org.oscarehr.appointment.dao" />
 	<context:component-scan base-package="org.oscarehr.common.dao" />
+	<context:component-scan base-package="org.oscarehr.consultations" />
 	<context:component-scan base-package="org.oscarehr.eyeform.dao" />
 	<context:component-scan base-package="org.oscarehr.hospitalReportManager.dao" />
 	<context:component-scan base-package="org.oscarehr.olis.dao" />
@@ -73,6 +74,7 @@
 	<context:component-scan base-package="org.oscarehr.billing.CA.dao" />
 	<context:component-scan base-package="org.oscarehr.PMmodule.dao" />
 	<context:component-scan base-package="org.oscarehr.provider" />
+	<context:component-scan base-package="org.oscarehr.schedule" />
 	<!-- Sharing Center -->
 	<context:component-scan base-package="org.oscarehr.sharingcenter.dao" />
 	<context:component-scan base-package="oscar.oscarLab.ca.all.upload.handlers"/>

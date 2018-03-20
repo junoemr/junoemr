@@ -179,6 +179,123 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 				}
 			}
 		})
+		.state('settings.persona',
+			{
+				url: '/persona',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'persona'
+				}
+			})
+		.state('settings.general',
+			{
+				url: '/general',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'general'
+				}
+			})
+		.state('settings.schedule',
+			{
+				url: '/schedule',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'schedule'
+				}
+			})
+		.state('settings.billing',
+			{
+				url: '/billing',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'billing'
+				}
+			})
+		.state('settings.rx',
+			{
+				url: '/rx',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'rx'
+				}
+			})
+		.state('settings.masterdemo',
+			{
+				url: '/masterdemo',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'masterdemo'
+				}
+			})
+		.state('settings.consults',
+			{
+				url: '/consults',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'consults'
+				}
+			})
+		.state('settings.documents',
+			{
+				url: '/documents',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'documents'
+				}
+			})
+		.state('settings.summary',
+			{
+				url: '/summary',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'summary'
+				}
+			})
+		.state('settings.eforms',
+			{
+				url: '/eforms',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'eforms'
+				}
+			})
+		.state('settings.inbox',
+			{
+				url: '/inbox',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'inbox'
+				}
+			})
+		.state('settings.programs',
+			{
+				url: '/programs',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'programs'
+				}
+			})
+		.state('settings.integration',
+			{
+				url: '/integration',
+				templateUrl: 'settings/settings.jsp',
+				controller: 'Settings.SettingsController as settingsCtrl',
+				data: {
+					tab: 'integration'
+				}
+			})
 		.state('support',
 		{
 			url: '/support',

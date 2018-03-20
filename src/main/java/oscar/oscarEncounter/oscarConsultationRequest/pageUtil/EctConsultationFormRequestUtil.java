@@ -406,4 +406,9 @@ public class EctConsultationFormRequestUtil {
 
 		return retval;
 	}
+
+	public String getSiteName()
+	{
+		return (siteName == null) ? "" : siteName;
+	}
 }

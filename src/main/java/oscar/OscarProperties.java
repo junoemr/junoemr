@@ -358,28 +358,24 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("OSCAR_LEARNING");
 	}
 	
-	public boolean faxEnabled() {
-		return isPropertyActive("enableFax");
-	}
-	
 	public boolean isRxFaxEnabled() {
-		return isPropertyActive("rx_fax_enabled");
+		return isPropertyActive("faxEnable") && isPropertyActive("rx_fax_enabled");
 	}
 		
 	public boolean isConsultationFaxEnabled() {
-		return isPropertyActive("consultation_fax_enabled");
+		return isPropertyActive("faxEnable") && isPropertyActive("consultation_fax_enabled");
 	}
-	
-	public boolean isEFormSignatureEnabled() {
-		return isPropertyActive("eform_signature_enabled");
-	}
-	
+
 	public boolean isEFormFaxEnabled() {
-		return isPropertyActive("eform_fax_enabled");
+		return isPropertyActive("faxEnable") && isPropertyActive("eform_fax_enabled");
 	}
-	
-	public boolean isFaxEnabled() {
-		return faxEnabled() || isRxFaxEnabled() || isConsultationFaxEnabled() || isEFormFaxEnabled();
+
+	public boolean isFormFaxEnabled() {
+		return isPropertyActive("faxEnable") && isPropertyActive("form_fax_enabled");
+	}
+
+	public boolean isDocumentFaxEnabled() {
+		return isPropertyActive("faxEnable") && isPropertyActive("document_fax_enabled");
 	}
 
 	public boolean isRxSignatureEnabled() {
@@ -388,6 +384,10 @@ public class OscarProperties extends Properties {
 	
 	public boolean isConsultationSignatureEnabled() {
 		return isPropertyActive("consultation_signature_enabled");
+	}
+
+	public boolean isEFormSignatureEnabled() {
+		return isPropertyActive("eform_signature_enabled");
 	}
 	
 	public boolean isSpireClientEnabled() {

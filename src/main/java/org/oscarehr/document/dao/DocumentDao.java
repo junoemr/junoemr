@@ -109,7 +109,8 @@ public class DocumentDao extends AbstractDao<Document>
 				"AND d.status != 'D' " +
 				"AND c.id.documentNo = d.documentNo " +
 				"AND c.id.module = :module " +
-				"AND c.id.moduleId = :moduleId";
+				"AND c.id.moduleId = :moduleId " +
+				"ORDER BY d.observationdate DESC, d.updatedatetime DESC";
 		
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("module", module.getName());
@@ -122,7 +123,8 @@ public class DocumentDao extends AbstractDao<Document>
     			"WHERE d.documentNo = cd.documentNo " +
     			"AND cd.requestId = :consultationId " +
     			"AND cd.docType = :doctype " +
-    			"AND cd.deleted IS NULL";
+    			"AND cd.deleted IS NULL " +
+				"ORDER BY d.observationdate DESC, d.updatedatetime DESC";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("consultationId", consultationId);
 		query.setParameter("doctype", ConsultDocs.DOCTYPE_DOC);
@@ -134,7 +136,8 @@ public class DocumentDao extends AbstractDao<Document>
     			"WHERE d.documentNo = crd.documentNo " +
     			"AND crd.responseId = :consultationId " +
     			"AND crd.docType = 'D' " +
-    			"AND crd.deleted IS NULL";
+    			"AND crd.deleted IS NULL " +
+				"ORDER BY d.observationdate DESC, d.updatedatetime DESC";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("consultationId", consultationId);
 		return query.getResultList();

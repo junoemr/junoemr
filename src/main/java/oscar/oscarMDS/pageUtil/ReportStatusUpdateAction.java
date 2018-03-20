@@ -26,6 +26,7 @@
 package oscar.oscarMDS.pageUtil;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Calendar;
 
 import javax.servlet.ServletException;
@@ -64,11 +65,11 @@ public class ReportStatusUpdateAction extends DispatchAction {
     	return executemain(mapping, form, request, response);
     }
 
-    public ActionForward executemain(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)
-             {
+	public ActionForward executemain(ActionMapping mapping,
+									 ActionForm form,
+									 HttpServletRequest request,
+									 HttpServletResponse response)
+	{
 
     	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_lab", "w", null)) {
 			throw new SecurityException("missing required security object (_lab)");
@@ -82,13 +83,15 @@ public class ReportStatusUpdateAction extends DispatchAction {
         String lab_type = request.getParameter("labType");
         String ajaxcall=request.getParameter("ajaxcall");
 
-        if(status == 'A'){
-            String demographicID = getDemographicIdFromLab(lab_type, labNo);
-            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACK, LogConst.CON_HL7_LAB, ""+labNo, request.getRemoteAddr(),demographicID);
-        }
+		try
+		{
+			CommonLabResultData.updateReportStatus(labNo, providerNo, status, comment,lab_type);
 
-        try {
-            CommonLabResultData.updateReportStatus(labNo, providerNo, status, comment,lab_type);
+			if(status == 'A'){
+				String demographicID = getDemographicIdFromLab(lab_type, labNo);
+				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACK, LogConst.CON_HL7_LAB, ""+labNo, request.getRemoteAddr(),demographicID);
+			}
+
             if (multiID != null){
                 String[] id = multiID.split(",");
                 int i=0;
@@ -104,11 +107,13 @@ public class ReportStatusUpdateAction extends DispatchAction {
                 return null;
             else
                 return mapping.findForward("success");
-        } catch (Exception e) {
-            logger.error("exception in ReportStatusUpdateAction",e);
-            return mapping.findForward("failure");
-        }
-    }
+		}
+		catch (SQLException e)
+		{
+			logger.error("Error updating report status.", e);
+			return mapping.findForward("failure");
+		}
+	}
 
     public ActionForward addComment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
     	int labNo = Integer.parseInt(request.getParameter("segmentID"));
@@ -119,9 +124,9 @@ public class ReportStatusUpdateAction extends DispatchAction {
 
         try {
 
-        	CommonLabResultData.updateReportStatus(labNo, providerNo, status, comment,lab_type);
+			CommonLabResultData.updateReportStatus(labNo, providerNo, status, comment, lab_type);
 
-        } catch(Exception e) {
+        } catch(SQLException e) {
         	logger.error("exception in setting comment",e);
             return mapping.findForward("failure");
         }

@@ -23,7 +23,7 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.schedule.dao;
 
 import java.sql.Time;
 import java.time.Duration;
@@ -40,19 +40,18 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 import org.oscarehr.common.NativeSql;
-import org.oscarehr.common.model.ScheduleTemplate;
+import org.oscarehr.schedule.model.ScheduleTemplate;
 import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.oscarehr.common.dao.AbstractDao;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate> {
-
-	@Autowired
-	OscarAppointmentDao appointmentDao;
-
+public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
+{
+	
 	public ScheduleTemplateDao() {
 		super(ScheduleTemplate.class);
 	}

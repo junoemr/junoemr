@@ -43,6 +43,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
+<% oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance(); %>
 
 <%
 String formClass = "BCAR2007";
@@ -992,6 +993,15 @@ function setEPDSscores(){
             <input type="submit" style="width:125px;" value="Print EPDS/TWEAK" onclick="javascript:return onPrintScores();"/>
             <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
             <input type="submit" style="width:75px;" value="Print All" onclick="javascript:return onPrintAll();"/>
+            <%
+                if (oscarProperties.isFormFaxEnabled())
+                {
+            %>
+            <input type="button" style="width: 65px;" value="Fax All"
+                   onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>&faxAll', 'fax_recipients');"/>
+            <%
+                }
+            %>
         </td>
         
         <%
@@ -2450,6 +2460,15 @@ function setEPDSscores(){
             <input type="submit" style="width:125px;" value="Print EPDS/TWEAK" onclick="javascript:return onPrintScores();"/>
             <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
             <input type="submit" style="width:75px;" value="Print All" onclick="javascript:return onPrintAll();"/>
+            <%
+                if (oscarProperties.isFormFaxEnabled())
+                {
+            %>
+            <input type="button" style="width: 65px;" value="Fax All"
+                   onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>&faxAll', 'fax_recipients');"/>
+            <%
+                }
+            %>
         </td>
         
         <%

@@ -45,7 +45,7 @@
 <html:html locale="true">
 <head>
 
-<title>Fax Documents</title>
+<title>Fax PDFs</title>
 
 <link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css" />
 
@@ -80,7 +80,7 @@ if(errors.size() == 0) {
 		<td class="MainTableTopRowRightColumn">                                 
 			<table class="TopStatusBar">                                            
 				<tr>                                                                
-					<td>Send Documents By Fax</td>                                  
+					<td>Send PDFs By Fax</td>
 				</tr>                                                               
 			</table>                                                                
 		</td>                                                                   
@@ -98,7 +98,7 @@ if(errors.size() == 0) {
 } else {
 %>
 
-    <div style="padding: 5px;">Not all documents were faxed, the following errors occurred:</div>
+    <div style="padding: 5px;">Not everything was faxed, the following errors occurred:</div>
     <ul>
     <logic:iterate name="errors" id="error">
         <li><bean:write name="error" /></li>

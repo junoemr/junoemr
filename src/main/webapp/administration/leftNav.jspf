@@ -104,7 +104,7 @@ String curProvider_no = (String)session.getAttribute("user");
 
 					<li><a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">Manage Invoices</a></li>
 					
-					<oscar:oscarPropertiesCheck property="hctype" value="BC">
+					<oscar:oscarPropertiesCheck property="instance_type" value="BC">
 					<!-- BC clinicaid users still need to be able to edit billingreferral for consultations etc. -->
 					<li><a href="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="contentLink defaultManageReferralDoc"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
 					</oscar:oscarPropertiesCheck>

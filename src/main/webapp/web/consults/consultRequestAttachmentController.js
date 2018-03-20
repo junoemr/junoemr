@@ -25,7 +25,6 @@ angular.module('Consults').controller('Consults.ConsultRequestAttachmentControll
 			{
 				if (consult.availableDocs == null) consult.availableDocs = Juno.Common.Util.toArray(results);
 				controller.atth.availableDocs = consult.availableDocs;
-				Juno.Consults.Common.sortAttachmentDocs(controller.atth.availableDocs);
 				if (controller.atth.availableDocs[0] != null) controller.atth.selectedAvailableDoc = controller.atth.availableDocs[0];
 			},
 			function error(errors)
@@ -45,10 +44,16 @@ angular.module('Consults').controller('Consults.ConsultRequestAttachmentControll
 			controller.atth.attachedDocs.push(controller.atth.selectedAvailableDoc);
 			controller.atth.selectedAttachedDoc = controller.atth.selectedAvailableDoc;
 			controller.atth.selectedAttachedDoc.attached = true;
-			Juno.Consults.Common.sortAttachmentDocs(controller.atth.attachedDocs);
 
-			var selectionIndex = $("#selAvailDoc").val();
-			controller.atth.availableDocs.splice(selectionIndex, 1);
+			//Get index to remove by document id
+			var removeIndex = controller.atth.availableDocs.map(function(item)
+			{
+				return item.documentNo;
+			}).indexOf(controller.atth.selectedAvailableDoc.documentNo);
+
+			controller.atth.availableDocs.splice(removeIndex, 1);
+
+			var selectionIndex = $("#selAvailDoc")[0].selectedIndex;
 			if (selectionIndex >= controller.atth.availableDocs.length) selectionIndex = controller.atth.availableDocs.length - 1;
 			controller.atth.selectedAvailableDoc = controller.atth.availableDocs[selectionIndex];
 
@@ -62,10 +67,16 @@ angular.module('Consults').controller('Consults.ConsultRequestAttachmentControll
 			controller.atth.availableDocs.push(controller.atth.selectedAttachedDoc);
 			controller.atth.selectedAvailableDoc = controller.atth.selectedAttachedDoc;
 			controller.atth.selectedAvailableDoc.attached = false;
-			Juno.Consults.Common.sortAttachmentDocs(controller.atth.availableDocs);
 
-			var selectionIndex = $("#selAttachDoc").val();
-			controller.atth.attachedDocs.splice(selectionIndex, 1);
+			//Get index to remove by document id
+			var removeIndex = controller.atth.attachedDocs.map(function(item)
+			{
+				return item.documentNo;
+			}).indexOf(controller.atth.selectedAttachedDoc.documentNo);
+
+			controller.atth.attachedDocs.splice(removeIndex, 1);
+
+			var selectionIndex = $("#selAttachDoc")[0].selectedIndex
 			if (selectionIndex >= controller.atth.attachedDocs.length) selectionIndex = controller.atth.attachedDocs.length - 1;
 			controller.atth.selectedAttachedDoc = controller.atth.attachedDocs[selectionIndex];
 

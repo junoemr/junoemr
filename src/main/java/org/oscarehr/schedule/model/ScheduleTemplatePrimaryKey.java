@@ -23,12 +23,14 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.schedule.model;
 
 import java.io.Serializable;
 
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
+@Embeddable
 public class ScheduleTemplatePrimaryKey implements Serializable {
 
 	/**

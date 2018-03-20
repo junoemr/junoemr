@@ -35,7 +35,7 @@ This Page creates the fax form for eforms.
 		rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()), "rdohip");
 		rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(), "rdohip").trim();
 	}
-	boolean faxEnabled = (props.isPropertyActive("faxEnable") && props.isEFormFaxEnabled());
+	boolean faxEnabled = props.isEFormFaxEnabled();
 %> 
 <table width="100%">
 	<input type="hidden" value=<%=faxEnabled%> id="faxControl_faxEnabled"></input>

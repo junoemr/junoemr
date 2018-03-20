@@ -1294,7 +1294,7 @@ public class RxPrescriptionData {
         	 */
 			if ((RHS == null && special != null) || (RHS != null && RHS.trim().length() == 0)) {
 			    logger.error("The drug special has been set to a bad value:'" + RHS + "'; "+
-			    		"The old value was:'"+special+"';", new IllegalStateException());
+			    		"The old value was:'"+special+"';");
 			}
         	
 			if (RHS != null && !RHS.equals("null")) {
