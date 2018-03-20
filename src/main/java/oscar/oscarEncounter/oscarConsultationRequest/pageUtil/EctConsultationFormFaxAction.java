@@ -199,9 +199,6 @@ public class EctConsultationFormFaxAction extends Action
 
 			if (alist.size() > 0)
 			{
-
-				String referralFax = request.getParameter("fax");
-
 				// Retrieving additional fax recipients.
 				String[] tmpRecipients = request.getParameterValues("faxRecipients");
 
@@ -211,12 +208,6 @@ public class EctConsultationFormFaxAction extends Action
 					tmpRecipients[i] = tmpRecipients[i].trim().replaceAll("\\D", "");
 				}
 				ArrayList<String> recipients = tmpRecipients == null ? new ArrayList<String>() : new ArrayList<String>(Arrays.asList(tmpRecipients));
-
-				// Including consultant fax number if appropriate.
-				if (referralFax != null && !referralFax.equals(""))
-				{
-					recipients.add(referralFax.trim().replaceAll("\\D", ""));
-				}
 
 				// Removing duplicate phone numbers.
 				recipients = new ArrayList<String>(new HashSet<String>(recipients));

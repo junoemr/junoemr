@@ -213,11 +213,6 @@ if(!authed) {
    <script src="<c:out value="${ctx}/js/jquery.js"/>"></script>
    <script>
      jQuery.noConflict();
-
-	 Oscar.Util.Fax.hasFaxNumber = function()
-	 {
-		 return specialistFaxNumber.length > 0 || jQuery("#faxRecipients").children().size() > 0;
-	 };
    </script>
 
 
@@ -297,6 +292,10 @@ font-size: 10pt;
 input.righty{
 text-align: right;
 }
+
+#faxRecipients .autoAdded {
+	display: none;
+}
 </style>
 </head>
 
@@ -309,7 +308,6 @@ text-align: right;
 var servicesName = new Object();   		// used as a cross reference table for name and number
 var services = new Array();				// the following are used as a 2D table for makes and models
 var specialists = new Array();
-var specialistFaxNumber = "";
 <%oscar.oscarEncounter.oscarConsultationRequest.config.data.EctConConfigurationJavascriptData configScript;
 				configScript = new oscar.oscarEncounter.oscarConsultationRequest.config.data.EctConConfigurationJavascriptData();
 				out.println(configScript.getJavascript());%>
@@ -605,20 +603,18 @@ function onSelectSpecialist(SelectedSpec)	{
 	var selectedIdx = SelectedSpec.selectedIndex;
 	var form=document.EctConsultationFormRequestForm;
 
+	<% if (props.isConsultationFaxEnabled())
+	{ %>
+		jQuery("#faxRecipients").find(".autoAdded").remove();
+	<% } %>
+
+
 	if (selectedIdx==null || selectedIdx==-1 || (SelectedSpec.options[ selectedIdx ]).value == "-1") {   		//if its the first item set everything to blank
 		form.phone.value = ("");
 		form.fax.value = ("");
 		form.address.value = ("");
 
 		enableDisableRemoteReferralButton(form, true);
-
-		<%
-		if (props.isConsultationFaxEnabled()) {//
-		%>
-		specialistFaxNumber = "";
-		Oscar.Util.Fax.updateFaxButton();
-		<% } %>
-		
 		return;
 	}
 	var selectedService = document.EctConsultationFormRequestForm.service.value;  				// get the service that is selected now
@@ -642,15 +638,14 @@ function onSelectSpecialist(SelectedSpec)	{
             	form.phone.value = (aSpeci.phoneNum.replace(null,""));
             	form.fax.value = (aSpeci.specFax.replace(null,""));					// load the text fields with phone fax and address
             	form.address.value = (aSpeci.specAddress.replace(null,""));
-            	
+
        			//since there is a match make sure the dislaimer is hidden
        			document.getElementById("consult-disclaimer").style.display='none';
         	
             	<%
-        		if (props.isConsultationFaxEnabled()) {//
-				%>
-				specialistFaxNumber = aSpeci.specFax.trim();
-				Oscar.Util.Fax.updateFaxButton();
+				if (props.isConsultationFaxEnabled())
+				{ %>
+					Oscar.Util.Fax.AddFax(aSpeci.specName, aSpeci.specFax.trim())
         		<% } %>
             	
             	jQuery.getJSON("getProfessionalSpecialist.json", {id: aSpeci.specNbr},
@@ -667,7 +662,12 @@ function onSelectSpecialist(SelectedSpec)	{
             	break;
             }
         }//spec loop
-	 
+
+	<% if (props.isConsultationFaxEnabled())
+	{ %>
+		Oscar.Util.Fax.updateFaxButton();
+	<% } %>
+
 	}
 
 //-----------------------------------------------------------------
@@ -687,8 +687,8 @@ function FillThreeBoxes(serNbr)	{
                 <%
         		if (props.isConsultationFaxEnabled()) {//
 				%>
-				specialistFaxNumber = aSpeci.specFax.trim();
-				Oscar.Util.Fax.updateFaxButton();
+					Oscar.Util.Fax.AddFax(aSpeci.specName, aSpeci.specFax.trim());
+					Oscar.Util.Fax.updateFaxButton();
 				<% } %>
                 break;
            }
@@ -1486,12 +1486,12 @@ var requestIdKey = "<%=signatureRequestId %>";
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formPhone" />:
 							</td>
-							<td align="right" class="tite2"><input type="text" name="phone" class="righty" value="<%=thisForm.getProfessionalSpecialistPhone()%>" /></td>
+							<td align="right" class="tite2"><input disabled type="text" name="phone" class="righty" value="<%=thisForm.getProfessionalSpecialistPhone()%>" /></td>
 						</tr>
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formFax" />:
 							</td>
-							<td align="right" class="tite3"><input type="text" name="fax" class="righty" /></td>
+							<td align="right" class="tite3"><input disabled type="text" onchange="onChangeSpecialistFax();" name="fax" class="righty" /></td>
 						</tr>
 
 						<tr>
@@ -1499,7 +1499,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 								<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formAddr" />:
 							</td>
 							<td align="right" class="tite3">
-								<textarea name="address" cols=20 ><%=thisForm.getProfessionalSpecialistAddress()%></textarea>
+								<textarea disabled name="address" cols=20 ><%=thisForm.getProfessionalSpecialistAddress()%></textarea>
 							</td>
 						</tr>
 						<tr>
