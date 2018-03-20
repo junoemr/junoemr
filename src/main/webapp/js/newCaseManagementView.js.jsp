@@ -2952,6 +2952,14 @@
 		return false;
 	}
 
+	function maximizeWindow()
+	{
+		window.onunload=function()
+		{
+			window.resizeTo(screen.width,screen.height);
+		};
+	}
+
 	var changeIssueMsg;
 	function changeDiagnosis(issueId)
 	{
