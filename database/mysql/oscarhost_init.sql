@@ -206,3 +206,12 @@ ALTER TABLE appointmentArchive ADD COLUMN partial_booking tinyint(1) NOT NULL DE
 CREATE TABLE demographic_custom_status (id int(10) AUTO_INCREMENT PRIMARY KEY, status varchar(128), deleted tinyint(1) NOT NULL DEFAULT 0);
 ALTER TABLE demographic ADD COLUMN custom_status_id int(10) AFTER patient_status;
 
+CREATE TABLE log_report_by_template (
+  id int(10) AUTO_INCREMENT PRIMARY KEY,
+  template_id int(10),
+  provider_no VARCHAR(6),
+  datetime_start DATETIME,
+  datetime_end DATETIME,
+  query_string text
+);
+
