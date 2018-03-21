@@ -524,7 +524,7 @@
 				ctx + "/oscarEncounter/displayMessages.do?hC=" + Colour.messages,
 				ctx + "/oscarEncounter/displayMeasurements.do?hC=" + Colour.measurements,
 				ctx + "/oscarEncounter/displayConsultation.do?hC=" + Colour.consultation,
-				ctx + "/oscarEncounter/displayHRM.do?hC="
+				//ctx + "/oscarEncounter/displayHRM.do?hC="
 				//ctx + "/oscarEncounter/displayMyOscar.do?hC=",
 				//ctx + "/eaaps/displayEctEaaps.do?hC="
 			];

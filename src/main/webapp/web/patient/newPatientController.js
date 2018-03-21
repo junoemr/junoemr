@@ -49,6 +49,8 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 
 		controller.demographic = {};
 
+		controller.submitDisabled = false;
+
 		//get access right for creating new patient
 		securityService.hasRight("_demographic", "w").then(
 			function success(results)
@@ -90,6 +92,8 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 			console.log(ngModelContoller.$valid);
 			console.log($scope);
 
+			controller.submitDisabled = true;
+
 			if (ngModelContoller.$valid)
 			{
 				console.log("Saving...");
@@ -98,6 +102,7 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 						controller.demographic.dobMonth, controller.demographic.dobDay))
 				{
 					alert("Incorrect Date of Birth!");
+					controller.submitDisabled = false;
 					return;
 				}
 
@@ -120,12 +125,14 @@ angular.module('Patient').controller('Patient.NewPatientController', [
 					function error(errors)
 					{
 						console.log(errors);
+						controller.submitDisabled = false;
 					});
 
 			}
 			else
 			{
 				console.log("ERR!!");
+				controller.submitDisabled = false;
 			}
 		};
 

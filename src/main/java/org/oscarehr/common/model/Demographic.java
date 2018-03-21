@@ -45,7 +45,8 @@ import oscar.OscarProperties;
 /**
  * This is the object class that relates to the demographic table. Any customizations belong here.
  */
-public class Demographic implements Serializable {
+public class Demographic implements Serializable
+{
 
 	private static final String DEFAULT_MONTH = "01";
 	private static final String DEFAULT_DATE = "01";
@@ -56,12 +57,12 @@ public class Demographic implements Serializable {
 	private static final String DEFAULT_FUTURE_DATE = "2100-01-01";
 	public static final String ANONYMOUS = "ANONYMOUS";
 	public static final String UNIQUE_ANONYMOUS = "UNIQUE_ANONYMOUS";
-	
+
 	private final static Pattern FD_LAST_NAME = Pattern.compile(".*<rd>([^,]*),.*</rd>.*");
 	private final static Pattern FD_FIRST_NAME = Pattern.compile(".*<rd>[^,]*,(.*)</rd>.*");
 	private final static Pattern FD_OHIP = Pattern.compile("<rdohip>(.*)</rdohip>.*");
-	
-	
+
+
 	private int hashCode = Integer.MIN_VALUE;// primary key
 	private Integer demographicNo;// fields
 	private String phone;
@@ -80,6 +81,7 @@ public class Demographic implements Serializable {
 	private String sexDesc;
 	private Date dateJoined;
 	private String familyDoctor;
+	private String familyDoctor2;
 	private String city;
 	private String firstName;
 	private String postal;
@@ -111,7 +113,7 @@ public class Demographic implements Serializable {
 
 	private int activeCount = 0;
 	private int hsAlertCount = 0;
-	private String displayName=null;
+	private String displayName = null;
 
 	private Provider provider;
 	private String lastUpdateUser = null;
@@ -120,86 +122,102 @@ public class Demographic implements Serializable {
 	private String title;
 	private String officialLanguage;
 
-    private String countryOfOrigin;
-    private String newsletter;
+	private String countryOfOrigin;
+	private String newsletter;
 	private String veteranNo;
-    
 
-        public String getTitle() {
-        	return title;
-        }
 
-		public void setTitle(String title) {
-        	this.title = title;
-        }
+	public String getTitle()
+	{
+		return title;
+	}
 
-		public String getOfficialLanguage() {
-        	return officialLanguage;
-        }
+	public void setTitle(String title)
+	{
+		this.title = title;
+	}
 
-		public void setOfficialLanguage(String officialLanguage) {
-        	this.officialLanguage = officialLanguage;
-        }
+	public String getOfficialLanguage()
+	{
+		return officialLanguage;
+	}
 
-		public String getLastUpdateUser() {
-        	return lastUpdateUser;
-        }
+	public void setOfficialLanguage(String officialLanguage)
+	{
+		this.officialLanguage = officialLanguage;
+	}
 
-		public void setLastUpdateUser(String lastUpdateUser) {
-        	this.lastUpdateUser = lastUpdateUser;
-        }
+	public String getLastUpdateUser()
+	{
+		return lastUpdateUser;
+	}
 
-		public Date getLastUpdateDate() {
-        	return lastUpdateDate;
-        }
+	public void setLastUpdateUser(String lastUpdateUser)
+	{
+		this.lastUpdateUser = lastUpdateUser;
+	}
 
-		public void setLastUpdateDate(Date lastUpdateDate) {
-        	this.lastUpdateDate = lastUpdateDate;
-        }
+	public Date getLastUpdateDate()
+	{
+		return lastUpdateDate;
+	}
+
+	public void setLastUpdateDate(Date lastUpdateDate)
+	{
+		this.lastUpdateDate = lastUpdateDate;
+	}
 
 	/**
-     * @return the rosterDate
-     */
-    public Date getRosterDate() {
-        return rosterDate;
-    }
+	 * @return the rosterDate
+	 */
+	public Date getRosterDate()
+	{
+		return rosterDate;
+	}
 
-    /**
-     * @param rosterDate the rosterDate to set
-     */
-    public void setRosterDate(Date rosterDate) {
-        this.rosterDate = rosterDate;
-    }
+	/**
+	 * @param rosterDate the rosterDate to set
+	 */
+	public void setRosterDate(Date rosterDate)
+	{
+		this.rosterDate = rosterDate;
+	}
 
-    public Date getRosterTerminationDate() {
-        return rosterTerminationDate;
-    }
+	public Date getRosterTerminationDate()
+	{
+		return rosterTerminationDate;
+	}
 
-    public void setRosterTerminationDate(Date rosterTermDate) {
-        this.rosterTerminationDate = rosterTermDate;
-    }
+	public void setRosterTerminationDate(Date rosterTermDate)
+	{
+		this.rosterTerminationDate = rosterTermDate;
+	}
 
-    public String getRosterTerminationReason() {
-    	return rosterTerminationReason;
-    }
+	public String getRosterTerminationReason()
+	{
+		return rosterTerminationReason;
+	}
 
-    public void setRosterTerminationReason(String rosterTermReason) {
-    	this.rosterTerminationReason = rosterTermReason;
-    }
+	public void setRosterTerminationReason(String rosterTermReason)
+	{
+		this.rosterTerminationReason = rosterTermReason;
+	}
 
-	public enum PatientStatus {
+	public enum PatientStatus
+	{
 		AC, IN, DE, IC, ID, MO, FI
 	}
 
 	/**
 	 * @deprecated default for birth day should be null
 	 */
-	public static Demographic create(String firstName, String lastName, String gender, String monthOfBirth, String dateOfBirth, String yearOfBirth, String hin, String ver, boolean applyDefaultBirthDate) {
-		return(create(firstName, lastName, gender, monthOfBirth, dateOfBirth, yearOfBirth, hin, ver));
+	public static Demographic create(String firstName, String lastName, String gender, String monthOfBirth, String dateOfBirth, String yearOfBirth, String hin, String ver, boolean applyDefaultBirthDate)
+	{
+		return (create(firstName, lastName, gender, monthOfBirth, dateOfBirth, yearOfBirth, hin, ver));
 	}
 
 	/**
-	 * 
+	 *
 	 * @param firstName
 	 * @param lastName
 	 * @param gender
@@ -210,7 +228,8 @@ public class Demographic implements Serializable {
 	 * @param ver
 	 * @return Demographic
 	 */
-	public static Demographic create(String firstName, String lastName, String gender, String monthOfBirth, String dateOfBirth, String yearOfBirth, String hin, String ver) {
+	public static Demographic create(String firstName, String lastName, String gender, String monthOfBirth, String dateOfBirth, String yearOfBirth, String hin, String ver)
+	{
 		Demographic demographic = new Demographic();
 
 		demographic.setFirstName(firstName);
@@ -223,7 +242,7 @@ public class Demographic implements Serializable {
 
 		demographic.setHcType(DEFAULT_HEATH_CARD_TYPE);
 		demographic.setPatientStatus(DEFAULT_PATIENT_STATUS);
-                demographic.setPatientStatusDate(new Date());
+		demographic.setPatientStatusDate(new Date());
 		demographic.setSex(gender == null || gender.length() == 0 ? DEFAULT_SEX : gender.substring(0, 1).toUpperCase());
 
 		demographic.setDateJoined(new Date());
@@ -235,14 +254,16 @@ public class Demographic implements Serializable {
 	}
 
 	// constructors
-	public Demographic() {
+	public Demographic()
+	{
 		initialize();
 	}
 
 	/**
 	 * Constructor for primary key
 	 */
-	public Demographic(Integer demographicNo) {
+	public Demographic(Integer demographicNo)
+	{
 		this.setDemographicNo(demographicNo);
 		initialize();
 	}
@@ -250,7 +271,8 @@ public class Demographic implements Serializable {
 	/**
 	 * Constructor for required fields
 	 */
-	public Demographic(Integer demographicNo, String firstName, String lastName) {
+	public Demographic(Integer demographicNo, String firstName, String lastName)
+	{
 
 		this.setDemographicNo(demographicNo);
 		this.setFirstName(firstName);
@@ -258,22 +280,27 @@ public class Demographic implements Serializable {
 		initialize();
 	}
 
-	public String getDisplayName() {
-		if (displayName == null) {
-			String lastName  = (getLastName()  == null) ? "" : getLastName().trim();
+	public String getDisplayName()
+	{
+		if (displayName == null)
+		{
+			String lastName = (getLastName() == null) ? "" : getLastName().trim();
 			String firstName = (getFirstName() == null) ? "" : getFirstName().trim();
-			if(!lastName.isEmpty() && !firstName.isEmpty()) {
+			if (!lastName.isEmpty() && !firstName.isEmpty())
+			{
 				lastName += ", ";
 			}
 			displayName = lastName + firstName;
 		}
 		return displayName;
 	}
+
 	/**
 	 * Return the unique identifier of this class
 	 *
 	 */
-	public Integer getDemographicNo() {
+	public Integer getDemographicNo()
+	{
 		return demographicNo;
 	}
 
@@ -282,7 +309,8 @@ public class Demographic implements Serializable {
 	 *
 	 * @param demographicNo the new ID
 	 */
-	public void setDemographicNo(Integer demographicNo) {
+	public void setDemographicNo(Integer demographicNo)
+	{
 		this.demographicNo = demographicNo;
 		this.hashCode = Integer.MIN_VALUE;
 	}
@@ -290,7 +318,8 @@ public class Demographic implements Serializable {
 	/**
 	 * Return the value associated with the column: phone
 	 */
-	public String getPhone() {
+	public String getPhone()
+	{
 		return phone;
 	}
 
@@ -299,18 +328,21 @@ public class Demographic implements Serializable {
 	 *
 	 * @param phone the phone value
 	 */
-	public void setPhone(String phone) {
+	public void setPhone(String phone)
+	{
 		this.phone = phone;
 	}
 
 	/**
 	 * Return the value associated with the column: patient_status
 	 */
-	public String getPatientStatus() {
+	public String getPatientStatus()
+	{
 		return patientStatus;
 	}
 
-	public Date getPatientStatusDate() {
+	public Date getPatientStatusDate()
+	{
 		return patientStatusDate;
 	}
 
@@ -319,18 +351,21 @@ public class Demographic implements Serializable {
 	 *
 	 * @param patientStatus the patient_status value
 	 */
-	public void setPatientStatus(String patientStatus) {
+	public void setPatientStatus(String patientStatus)
+	{
 		this.patientStatus = patientStatus;
 	}
 
-	public void setPatientStatusDate(Date patientStatusDate) {
+	public void setPatientStatusDate(Date patientStatusDate)
+	{
 		this.patientStatusDate = patientStatusDate;
 	}
 
 	/**
 	 * Return the value associated with the column: roster_status
 	 */
-	public String getRosterStatus() {
+	public String getRosterStatus()
+	{
 		return rosterStatus;
 	}
 
@@ -339,14 +374,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param rosterStatus the roster_status value
 	 */
-	public void setRosterStatus(String rosterStatus) {
+	public void setRosterStatus(String rosterStatus)
+	{
 		this.rosterStatus = rosterStatus;
 	}
 
 	/**
 	 * Return the value associated with the column: provider_no
 	 */
-	public String getProviderNo() {
+	public String getProviderNo()
+	{
 		return providerNo;
 	}
 
@@ -355,24 +392,27 @@ public class Demographic implements Serializable {
 	 *
 	 * @param providerNo the provider_no value
 	 */
-	public void setProviderNo(String providerNo) {
+	public void setProviderNo(String providerNo)
+	{
 		this.providerNo = providerNo;
 	}
 
 
+	public String getMyOscarUserName()
+	{
+		return (myOscarUserName);
+	}
 
-	public String getMyOscarUserName() {
-    	return (myOscarUserName);
-    }
-
-	public void setMyOscarUserName(String myOscarUserName) {
-    	this.myOscarUserName = StringUtils.trimToNull(myOscarUserName);
-    }
+	public void setMyOscarUserName(String myOscarUserName)
+	{
+		this.myOscarUserName = StringUtils.trimToNull(myOscarUserName);
+	}
 
 	/**
 	 * Return the value associated with the column: hin
 	 */
-	public String getHin() {
+	public String getHin()
+	{
 		return hin;
 	}
 
@@ -381,14 +421,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param hin the hin value
 	 */
-	public void setHin(String hin) {
+	public void setHin(String hin)
+	{
 		this.hin = hin;
 	}
 
 	/**
 	 * Return the value associated with the column: address
 	 */
-	public String getAddress() {
+	public String getAddress()
+	{
 		return address;
 	}
 
@@ -397,14 +439,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param address the address value
 	 */
-	public void setAddress(String address) {
+	public void setAddress(String address)
+	{
 		this.address = address;
 	}
 
 	/**
 	 * Return the value associated with the column: province
 	 */
-	public String getProvince() {
+	public String getProvince()
+	{
 		return province;
 	}
 
@@ -413,10 +457,11 @@ public class Demographic implements Serializable {
 	 *
 	 * @param province the province value
 	 */
-	public void setProvince(String province) {
-		province=StringUtils.trimToNull(province);
+	public void setProvince(String province)
+	{
+		province = StringUtils.trimToNull(province);
 
-		if (province!=null) province=province.toUpperCase();
+		if (province != null) province = province.toUpperCase();
 
 		this.province = province;
 	}
@@ -424,7 +469,8 @@ public class Demographic implements Serializable {
 	/**
 	 * Return the value associated with the column: month_of_birth
 	 */
-	public String getMonthOfBirth() {
+	public String getMonthOfBirth()
+	{
 		return monthOfBirth;
 	}
 
@@ -433,14 +479,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param monthOfBirth the month_of_birth value
 	 */
-	public void setMonthOfBirth(String monthOfBirth) {
+	public void setMonthOfBirth(String monthOfBirth)
+	{
 		this.monthOfBirth = StringUtils.trimToNull(monthOfBirth);
 	}
 
 	/**
 	 * Return the value associated with the column: ver
 	 */
-	public String getVer() {
+	public String getVer()
+	{
 		return ver;
 	}
 
@@ -449,14 +497,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param ver the ver value
 	 */
-	public void setVer(String ver) {
+	public void setVer(String ver)
+	{
 		this.ver = ver;
 	}
 
 	/**
 	 * Return the value associated with the column: date_of_birth
 	 */
-	public String getDateOfBirth() {
+	public String getDateOfBirth()
+	{
 		return dateOfBirth;
 	}
 
@@ -465,14 +515,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param dateOfBirth the date_of_birth value
 	 */
-	public void setDateOfBirth(String dateOfBirth) {
+	public void setDateOfBirth(String dateOfBirth)
+	{
 		this.dateOfBirth = StringUtils.trimToNull(dateOfBirth);
 	}
 
 	/**
 	 * Return the value associated with the column: sex
 	 */
-	public String getSex() {
+	public String getSex()
+	{
 		return sex;
 	}
 
@@ -481,18 +533,21 @@ public class Demographic implements Serializable {
 	 *
 	 * @param sex the sex value
 	 */
-	public void setSex(String sex) {
+	public void setSex(String sex)
+	{
 		this.sex = sex;
 	}
 
 	/**
 	 * Return the value associated with the column: date_joined
 	 */
-	public Date getDateJoined() {
+	public Date getDateJoined()
+	{
 		return dateJoined;
 	}
-	
-	public String getFormattedDateJoined() {
+
+	public String getFormattedDateJoined()
+	{
 		Date d = getDateJoined();
 		if (d != null) return (DateFormatUtils.ISO_DATE_FORMAT.format(d));
 		else return ("");
@@ -503,15 +558,18 @@ public class Demographic implements Serializable {
 	 *
 	 * @param dateJoined the date_joined value
 	 */
-	public void setDateJoined(Date dateJoined) {
+	public void setDateJoined(Date dateJoined)
+	{
 		this.dateJoined = dateJoined;
 	}
 
 	/**
 	 * Return the value associated with the column: family_doctor
 	 */
-	public String getFamilyDoctor() {
-		if(StringUtils.isBlank(familyDoctor)) {
+	public String getFamilyDoctor()
+	{
+		if (StringUtils.isBlank(familyDoctor))
+		{
 			this.familyDoctor = "";
 		}
 		return familyDoctor;
@@ -522,30 +580,53 @@ public class Demographic implements Serializable {
 	 *
 	 * @param familyDoctor the family_doctor value
 	 */
-	public void setFamilyDoctor(String familyDoctor) {
+	public void setFamilyDoctor(String familyDoctor)
+	{
 		this.familyDoctor = familyDoctor;
+	}
+
+	/**
+	 * Return the value associated with the column: family_doctor_2
+	 */
+	public String getFamilyDoctor2()
+	{
+		return familyDoctor2;
+	}
+
+	/**
+	 * Set the value related to the column: family_doctor_2
+	 *
+	 * @param familyDoctor2 the family_doctor_2 value
+	 */
+	public void setFamilyDoctor2(String familyDoctor2)
+	{
+		this.familyDoctor2 = StringUtils.trimToNull(familyDoctor2);
 	}
 
 	/**
 	 * Return the last name as parsed from column: family_doctor
 	 */
-	public String getFamilyDoctorLastName() {
+	public String getFamilyDoctorLastName()
+	{
 
 		Matcher m = FD_LAST_NAME.matcher(getFamilyDoctor());
 
-		if( m.find() ) {
+		if (m.find())
+		{
 			return m.group(1);
 		}
-		return ""; 
+		return "";
 	}
 
 	/**
 	 * Return the first name as parsed from column: family_doctor
 	 */
-	public String getFamilyDoctorFirstName() {
+	public String getFamilyDoctorFirstName()
+	{
 		Matcher m = FD_FIRST_NAME.matcher(getFamilyDoctor());
 
-		if( m.find()) {
+		if (m.find())
+		{
 			return m.group(1);
 		}
 		return "";
@@ -554,21 +635,24 @@ public class Demographic implements Serializable {
 	/**
 	 * Return the doctor number as parsed from column: family_doctor
 	 */
-	public String getFamilyDoctorNumber() {
+	public String getFamilyDoctorNumber()
+	{
 
 		Matcher m = FD_OHIP.matcher(getFamilyDoctor());
 
-		if( m.find() ) {
+		if (m.find())
+		{
 			return m.group(1);
 		}
-		
+
 		return "";
 	}
 
 	/**
 	 * Return the value associated with the column: city
 	 */
-	public String getCity() {
+	public String getCity()
+	{
 		return city;
 	}
 
@@ -577,40 +661,45 @@ public class Demographic implements Serializable {
 	 *
 	 * @param city the city value
 	 */
-	public void setCity(String city) {
+	public void setCity(String city)
+	{
 		this.city = city;
 	}
 
 	/**
 	 * Return the value associated with the column: first_name
 	 */
-	public String getFirstName() {
+	public String getFirstName()
+	{
 		return firstName;
 	}
 
 	/**
 	 * Gets demographic's full name.
-	 * 
+	 *
 	 * @return
 	 * 		Returns the last name, first name pair.
 	 */
-	public String getFullName() {
+	public String getFullName()
+	{
 		return getLastName() + ", " + getFirstName();
 	}
-	
+
 	/**
 	 * Set the value related to the column: first_name
 	 *
 	 * @param firstName the first_name value
 	 */
-	public void setFirstName(String firstName) {
+	public void setFirstName(String firstName)
+	{
 		this.firstName = firstName;
 	}
 
 	/**
 	 * Return the value associated with the column: postal
 	 */
-	public String getPostal() {
+	public String getPostal()
+	{
 		return postal;
 	}
 
@@ -619,14 +708,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param postal the postal value
 	 */
-	public void setPostal(String postal) {
+	public void setPostal(String postal)
+	{
 		this.postal = postal;
 	}
 
 	/**
 	 * Return the value associated with the column: hc_renew_date
 	 */
-	public Date getHcRenewDate() {
+	public Date getHcRenewDate()
+	{
 		return hcRenewDate;
 	}
 
@@ -635,14 +726,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param hcRenewDate the hc_renew_date value
 	 */
-	public void setHcRenewDate(Date hcRenewDate) {
+	public void setHcRenewDate(Date hcRenewDate)
+	{
 		this.hcRenewDate = hcRenewDate;
 	}
 
 	/**
 	 * Return the value associated with the column: phone2
 	 */
-	public String getPhone2() {
+	public String getPhone2()
+	{
 		return phone2;
 	}
 
@@ -651,14 +744,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param phone2 the phone2 value
 	 */
-	public void setPhone2(String phone2) {
+	public void setPhone2(String phone2)
+	{
 		this.phone2 = phone2;
 	}
 
 	/**
 	 * Return the value associated with the column: pcn_indicator
 	 */
-	public String getPcnIndicator() {
+	public String getPcnIndicator()
+	{
 		return pcnIndicator;
 	}
 
@@ -667,18 +762,21 @@ public class Demographic implements Serializable {
 	 *
 	 * @param pcnIndicator the pcn_indicator value
 	 */
-	public void setPcnIndicator(String pcnIndicator) {
+	public void setPcnIndicator(String pcnIndicator)
+	{
 		this.pcnIndicator = pcnIndicator;
 	}
 
 	/**
 	 * Return the value associated with the column: end_date
 	 */
-	public Date getEndDate() {
+	public Date getEndDate()
+	{
 		return endDate;
 	}
-	
-	public String getFormattedEndDate() {
+
+	public String getFormattedEndDate()
+	{
 		Date d = getEndDate();
 		if (d != null) return (DateFormatUtils.ISO_DATE_FORMAT.format(d));
 		else return ("");
@@ -689,14 +787,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param endDate the end_date value
 	 */
-	public void setEndDate(Date endDate) {
+	public void setEndDate(Date endDate)
+	{
 		this.endDate = endDate;
 	}
 
 	/**
 	 * Return the value associated with the column: last_name
 	 */
-	public String getLastName() {
+	public String getLastName()
+	{
 		return lastName;
 	}
 
@@ -705,14 +805,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param lastName the last_name value
 	 */
-	public void setLastName(String lastName) {
+	public void setLastName(String lastName)
+	{
 		this.lastName = lastName;
 	}
 
 	/**
 	 * Return the value associated with the column: hc_type
 	 */
-	public String getHcType() {
+	public String getHcType()
+	{
 		return hcType;
 	}
 
@@ -721,14 +823,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param hcType the hc_type value
 	 */
-	public void setHcType(String hcType) {
+	public void setHcType(String hcType)
+	{
 		this.hcType = hcType;
 	}
 
 	/**
 	 * Return the value associated with the column: chart_no
 	 */
-	public String getChartNo() {
+	public String getChartNo()
+	{
 		return chartNo;
 	}
 
@@ -737,14 +841,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param chartNo the chart_no value
 	 */
-	public void setChartNo(String chartNo) {
+	public void setChartNo(String chartNo)
+	{
 		this.chartNo = chartNo;
 	}
 
 	/**
 	 * Return the value associated with the column: email
 	 */
-	public String getEmail() {
+	public String getEmail()
+	{
 		return email;
 	}
 
@@ -753,14 +859,16 @@ public class Demographic implements Serializable {
 	 *
 	 * @param email the email value
 	 */
-	public void setEmail(String email) {
+	public void setEmail(String email)
+	{
 		this.email = email;
 	}
 
 	/**
 	 * Return the value associated with the column: year_of_birth
 	 */
-	public String getYearOfBirth() {
+	public String getYearOfBirth()
+	{
 		return yearOfBirth;
 	}
 
@@ -769,63 +877,77 @@ public class Demographic implements Serializable {
 	 *
 	 * @param yearOfBirth the year_of_birth value
 	 */
-	public void setYearOfBirth(String yearOfBirth) {
+	public void setYearOfBirth(String yearOfBirth)
+	{
 		this.yearOfBirth = StringUtils.trimToNull(yearOfBirth);
 	}
 
 	/**
 	 * Return the value associated with the column: eff_date
 	 */
-	public Date getEffDate() {
+	public Date getEffDate()
+	{
 		return effDate;
 	}
 
-	public String getFormattedEffDate() {
+	public String getFormattedEffDate()
+	{
 		Date d = getEffDate();
 		if (d != null) return (DateFormatUtils.ISO_DATE_FORMAT.format(d));
 		else return ("");
 	}
 
-	public String getAnonymous() {
+	public String getAnonymous()
+	{
 		return anonymous;
 	}
 
 	/**
 	 * @param anonymous can be any string indicating it's anonymisity (if that's a word), null means it's not anonymous.
 	 */
-	public void setAnonymous(String anonymous) {
+	public void setAnonymous(String anonymous)
+	{
 		this.anonymous = anonymous;
 	}
 
-	public void setFormattedEffDate(String formattedDate) {
-		 if(StringUtils.isBlank(formattedDate))
-                        return;
+	public void setFormattedEffDate(String formattedDate)
+	{
+		if (StringUtils.isBlank(formattedDate))
+			return;
 
-		try {
+		try
+		{
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			Date d = sdf.parse(formattedDate);
 			this.setEffDate(d);
-		} catch (ParseException e) {
+		}
+		catch (ParseException e)
+		{
 			MiscUtils.getLogger().error("Error", e);
 		}
 
 	}
 
-	public String getFormattedRenewDate() {
+	public String getFormattedRenewDate()
+	{
 		Date d = getHcRenewDate();
 		if (d != null) return (DateFormatUtils.ISO_DATE_FORMAT.format(d));
 		else return ("");
 	}
 
-	public void setFormattedRenewDate(String formattedDate) {
-	 	if(StringUtils.isBlank(formattedDate))
-                       return;
+	public void setFormattedRenewDate(String formattedDate)
+	{
+		if (StringUtils.isBlank(formattedDate))
+			return;
 
-		try {
+		try
+		{
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			Date d = sdf.parse(formattedDate);
 			this.setHcRenewDate(d);
-		} catch (ParseException e) {
+		}
+		catch (ParseException e)
+		{
 			MiscUtils.getLogger().error("Error", e);
 		}
 
@@ -836,81 +958,103 @@ public class Demographic implements Serializable {
 	 *
 	 * @param effDate the eff_date value
 	 */
-	public void setEffDate(Date effDate) {
+	public void setEffDate(Date effDate)
+	{
 		this.effDate = effDate;
 	}
 
-	public String getAlias() {
+	public String getAlias()
+	{
 		return alias;
 	}
 
-	public void setAlias(String alias) {
+	public void setAlias(String alias)
+	{
 		this.alias = alias;
 	}
 
-	public String getChildren() {
+	public String getChildren()
+	{
 		return children;
 	}
 
-	public void setChildren(String children) {
+	public void setChildren(String children)
+	{
 		this.children = children;
 	}
 
-	public String getCitizenship() {
+	public String getCitizenship()
+	{
 		return citizenship;
 	}
 
-	public void setCitizenship(String citizenship) {
+	public void setCitizenship(String citizenship)
+	{
 		this.citizenship = citizenship;
 	}
 
-	public String getPreviousAddress() {
+	public String getPreviousAddress()
+	{
 		return previousAddress;
 	}
 
-	public void setPreviousAddress(String previousAddress) {
+	public void setPreviousAddress(String previousAddress)
+	{
 		this.previousAddress = previousAddress;
 	}
 
-	public String getSin() {
+	public String getSin()
+	{
 		return sin;
 	}
 
-	public void setSin(String sin) {
+	public void setSin(String sin)
+	{
 		this.sin = sin;
 	}
 
-	public String getSourceOfIncome() {
+	public String getSourceOfIncome()
+	{
 		return sourceOfIncome;
 	}
 
-	public void setSourceOfIncome(String sourceOfIncome) {
+	public void setSourceOfIncome(String sourceOfIncome)
+	{
 		this.sourceOfIncome = sourceOfIncome;
 	}
 
-	public void setVeteranNo(String vetNo) {
+	public void setVeteranNo(String vetNo)
+	{
 		veteranNo = vetNo;
 	}
-	public String getVeteranNo() {
+
+	public String getVeteranNo()
+	{
 		return veteranNo;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj)
+	{
 		if (null == obj) return false;
 		if (!(obj instanceof Demographic)) return false;
-		else {
+		else
+		{
 			Demographic demographic = (Demographic) obj;
-			if (null == this.getDemographicNo() || null == demographic.getDemographicNo()) return false;
+			if (null == this.getDemographicNo() || null == demographic.getDemographicNo())
+				return false;
 			else return (this.getDemographicNo().equals(demographic.getDemographicNo()));
 		}
 	}
 
 	@Override
-	public int hashCode() {
-		if (Integer.MIN_VALUE == this.hashCode) {
+	public int hashCode()
+	{
+		if (Integer.MIN_VALUE == this.hashCode)
+		{
 			if (null == this.getDemographicNo()) return super.hashCode();
-			else {
+			else
+			{
 				String hashStr = this.getClass().getName() + ":" + this.getDemographicNo().hashCode();
 				this.hashCode = hashStr.hashCode();
 			}
@@ -919,34 +1063,40 @@ public class Demographic implements Serializable {
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return super.toString();
 	}
 
-	protected void initialize() {
+	protected void initialize()
+	{
 		links = StringUtils.EMPTY;
 	}
 
-	public String addZero(String text, int num) {
+	public String addZero(String text, int num)
+	{
 		text = text.trim();
 
-		for (int i = text.length(); i < num; i++) {
+		for (int i = text.length(); i < num; i++)
+		{
 			text = "0" + text;
 		}
 
 		return text;
 	}
 
-	public String getAge() {
+	public String getAge()
+	{
 		return (String.valueOf(Utility.calcAge(Utility.convertToReplaceStrIfEmptyStr(getYearOfBirth(), DEFAULT_YEAR), Utility.convertToReplaceStrIfEmptyStr(getMonthOfBirth(), DEFAULT_MONTH), Utility.convertToReplaceStrIfEmptyStr(getDateOfBirth(), DEFAULT_DATE))));
 	}
 
-	public String getAgeAsOf(Date asofDate) {
+	public String getAgeAsOf(Date asofDate)
+	{
 		return Utility.calcAgeAtDate(Utility.calcDate(Utility.convertToReplaceStrIfEmptyStr(getYearOfBirth(), DEFAULT_YEAR), Utility.convertToReplaceStrIfEmptyStr(getMonthOfBirth(), DEFAULT_MONTH), Utility.convertToReplaceStrIfEmptyStr(getDateOfBirth(), DEFAULT_DATE)), asofDate);
 	}
 
 
-        //NEED TO IMPLEMENT
+	//NEED TO IMPLEMENT
 
 //            public long getAgeInDays(){
 //           return UtilDateUtilities.getNumDays(UtilDateUtilities.calcDate(year_of_birth,month_of_birth,date_of_birth),Calendar.getInstance().getTime());
@@ -961,32 +1111,40 @@ public class Demographic implements Serializable {
 //           return UtilDateUtilities.getNumMonths(UtilDateUtilities.calcDate(year_of_birth,month_of_birth,date_of_birth),asofDate);
 //        }
 
-	public int getAgeInYears() {
+	public int getAgeInYears()
+	{
 		return Utility.getNumYears(Utility.calcDate(Utility.convertToReplaceStrIfEmptyStr(getYearOfBirth(), DEFAULT_YEAR), Utility.convertToReplaceStrIfEmptyStr(getMonthOfBirth(), DEFAULT_MONTH), Utility.convertToReplaceStrIfEmptyStr(getDateOfBirth(), DEFAULT_DATE)), Calendar.getInstance().getTime());
 	}
 
-	public int getAgeInYearsAsOf(Date asofDate) {
+	public int getAgeInYearsAsOf(Date asofDate)
+	{
 		return Utility.getNumYears(Utility.calcDate(Utility.convertToReplaceStrIfEmptyStr(getYearOfBirth(), DEFAULT_YEAR), Utility.convertToReplaceStrIfEmptyStr(getMonthOfBirth(), DEFAULT_MONTH), Utility.convertToReplaceStrIfEmptyStr(getDateOfBirth(), DEFAULT_DATE)), asofDate);
 	}
 
-	public DemographicExt[] getExtras() {
+	public DemographicExt[] getExtras()
+	{
 		return extras;
 	}
 
-	public String getFormattedDob() {
+	public String getFormattedDob()
+	{
 		Calendar cal = getBirthDay();
 		if (cal != null) return (DateFormatUtils.ISO_DATE_FORMAT.format(cal));
 		else return ("");
 	}
 
-	public void setFormattedDob(String formattedDate) {
-		try {
+	public void setFormattedDob(String formattedDate)
+	{
+		try
+		{
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			Date d = sdf.parse(formattedDate);
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(d);
 			this.setBirthDay(cal);
-		} catch (ParseException e) {
+		}
+		catch (ParseException e)
+		{
 			MiscUtils.getLogger().error("Error", e);
 		}
 
@@ -1000,13 +1158,17 @@ public class Demographic implements Serializable {
 //	   return this.getYearOfBirth() + seperator + this.getMonthOfBirth() + seperator + this.getDateOfBirth();
 //	}
 
-	public String getFormattedLinks() {
+	public String getFormattedLinks()
+	{
 		StringBuilder response = new StringBuilder();
 
-		if (getNumLinks() > 0) {
+		if (getNumLinks() > 0)
+		{
 			String[] links = getLinks().split(",");
-			for (int x = 0; x < links.length; x++) {
-				if (response.length() > 0) {
+			for (int x = 0; x < links.length; x++)
+			{
+				if (response.length() > 0)
+				{
 					response.append(",");
 				}
 			}
@@ -1015,101 +1177,127 @@ public class Demographic implements Serializable {
 		return response.toString();
 	}
 
-	public String getFormattedName() {
+	public String getFormattedName()
+	{
 		return getDisplayName();
 	}
 
-	public String getLinks() {
+	public String getLinks()
+	{
 		return links;
 	}
 
-	public int getNumLinks() {
-		if (getLinks() == null) {
+	public int getNumLinks()
+	{
+		if (getLinks() == null)
+		{
 			return 0;
 		}
 
-		if (getLinks().equals("")) {
+		if (getLinks().equals(""))
+		{
 			return 0;
 		}
 
 		return getLinks().split(",").length;
 	}
 
-	public void setExtras(DemographicExt[] extras) {
+	public void setExtras(DemographicExt[] extras)
+	{
 		this.extras = extras;
 	}
 
-	public void setLinks(String links) {
+	public void setLinks(String links)
+	{
 		this.links = links;
 	}
 
-	public Integer getHeadRecord() {
+	public Integer getHeadRecord()
+	{
 		return headRecord;
 	}
 
-	public void setHeadRecord(Integer headRecord) {
+	public void setHeadRecord(Integer headRecord)
+	{
 		this.headRecord = headRecord;
 	}
 
-	public Integer getCurrentRecord() {
+	public Integer getCurrentRecord()
+	{
 		if (headRecord != null) return headRecord;
 		return demographicNo;
 	}
 
-	public Set<Integer> getSubRecord() {
+	public Set<Integer> getSubRecord()
+	{
 		return subRecord;
 	}
 
-	public void setSubRecord(Set<Integer> subRecord) {
+	public void setSubRecord(Set<Integer> subRecord)
+	{
 		this.subRecord = subRecord;
 	}
 
-	public String getSexDesc() {
+	public String getSexDesc()
+	{
 		return sexDesc;
 	}
 
-	public void setSexDesc(String sexDesc) {
+	public void setSexDesc(String sexDesc)
+	{
 		this.sexDesc = sexDesc;
 	}
 
-	public boolean isActive() {
+	public boolean isActive()
+	{
 		return activeCount > 0;
 	}
 
-	public boolean hasHsAlert() {
+	public boolean hasHsAlert()
+	{
 		return hsAlertCount > 0;
 	}
 
-	public int getActiveCount() {
+	public int getActiveCount()
+	{
 		return activeCount;
 	}
 
-	public void setActiveCount(int activeCount) {
+	public void setActiveCount(int activeCount)
+	{
 		this.activeCount = activeCount;
 	}
 
-	public int getHsAlertCount() {
+	public int getHsAlertCount()
+	{
 		return hsAlertCount;
 	}
 
-	public void setHsAlertCount(int hsAlertCount) {
+	public void setHsAlertCount(int hsAlertCount)
+	{
 		this.hsAlertCount = hsAlertCount;
 	}
 
-	public void setBirthDay(Calendar cal) {
-		if (cal == null) {
+	public void setBirthDay(Calendar cal)
+	{
+		if (cal == null)
+		{
 			dateOfBirth = monthOfBirth = yearOfBirth = null;
-		} else {
+		}
+		else
+		{
 			dateOfBirth = addZero(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)), 2);
 			monthOfBirth = addZero(String.valueOf(cal.get(Calendar.MONTH) + 1), 2);
 			yearOfBirth = addZero(String.valueOf(cal.get(Calendar.YEAR)), 4);
 		}
 	}
 
-	public GregorianCalendar getBirthDay() {
+	public GregorianCalendar getBirthDay()
+	{
 		GregorianCalendar cal = null;
 
-		if (dateOfBirth != null && monthOfBirth != null && yearOfBirth != null) {
+		if (dateOfBirth != null && monthOfBirth != null && yearOfBirth != null)
+		{
 			cal = new GregorianCalendar();
 			cal.setTimeInMillis(0);
 			cal.set(Integer.parseInt(yearOfBirth), Integer.parseInt(monthOfBirth) - 1, Integer.parseInt(dateOfBirth));
@@ -1121,7 +1309,8 @@ public class Demographic implements Serializable {
 		return (cal);
 	}
 
-	public Date getBirthDate() {
+	public Date getBirthDate()
+	{
 		Calendar calendar = getBirthDay();
 		if (calendar == null)
 		{
@@ -1131,15 +1320,18 @@ public class Demographic implements Serializable {
 	}
 
 	// Returns birthday in the format yyyy-mm-dd
-	public String getBirthDayAsString() {
+	public String getBirthDayAsString()
+	{
 		return getYearOfBirth() + "-" + getMonthOfBirth() + "-" + getDateOfBirth();
 	}
 
-	public String getBirthDayMasterFileString() {
-	    GregorianCalendar birthDay = getBirthDay();
+	public String getBirthDayMasterFileString()
+	{
+		GregorianCalendar birthDay = getBirthDay();
 
-	    if(birthDay == null) {
-	    	return null;
+		if (birthDay == null)
+		{
+			return null;
 		}
 
 		String dateFormat = OscarProperties.getInstance().getDisplayDateFormat();
@@ -1150,120 +1342,154 @@ public class Demographic implements Serializable {
 		return formatter.format(birthDay.getTime());
 	}
 
-	public String getSpokenLanguage() {
+	public String getSpokenLanguage()
+	{
 		return spokenLanguage;
 	}
 
-	public void setSpokenLanguage(String spokenLanguage) {
+	public void setSpokenLanguage(String spokenLanguage)
+	{
 		this.spokenLanguage = spokenLanguage;
 	}
 
-     /**
-     * @return the provider
-     */
-    public Provider getProvider() {
-        return provider;
-}
+	/**
+	 * @return the provider
+	 */
+	public Provider getProvider()
+	{
+		return provider;
+	}
 
-    /**
-     * @param provider the provider to set
-     */
-    public void setProvider(Provider provider) {
-        this.provider = provider;
-    }
+	/**
+	 * @param provider the provider to set
+	 */
+	public void setProvider(Provider provider)
+	{
+		this.provider = provider;
+	}
 
-	public String getCountryOfOrigin() {
-    	return countryOfOrigin;
-    }
+	public String getCountryOfOrigin()
+	{
+		return countryOfOrigin;
+	}
 
-	public void setCountryOfOrigin(String countryOfOrigin) {
-    	this.countryOfOrigin = countryOfOrigin;
-    }
+	public void setCountryOfOrigin(String countryOfOrigin)
+	{
+		this.countryOfOrigin = countryOfOrigin;
+	}
 
-	public String getNewsletter() {
-    	return newsletter;
-    }
+	public String getNewsletter()
+	{
+		return newsletter;
+	}
 
-	public void setNewsletter(String newsletter) {
-    	this.newsletter = newsletter;
-    }
+	public void setNewsletter(String newsletter)
+	{
+		this.newsletter = newsletter;
+	}
 
-    public static final Comparator<Demographic> FormattedNameComparator = new Comparator<Demographic>() {	
-        @Override	
-        public int compare(Demographic dm1, Demographic dm2) {	
-            return dm1.getFormattedName().compareToIgnoreCase(dm2.getFormattedName());	
-        }	
-    }; 
-	public static final Comparator<Demographic> LastNameComparator = new Comparator<Demographic>() {
-        public int compare(Demographic dm1, Demographic dm2) {
-        	return dm1.getLastName().compareTo(dm2.getLastName());
-        }
-    }; 
-	public static final Comparator<Demographic> FirstNameComparator = new Comparator<Demographic>() {
-        public int compare(Demographic dm1, Demographic dm2) {
-        	return dm1.getFirstName().compareTo(dm2.getFirstName());
-        }
-    }; 
-	public static final Comparator<Demographic> DemographicNoComparator = new Comparator<Demographic>() {
-        public int compare(Demographic dm1, Demographic dm2) {
-        	return dm1.getDemographicNo().compareTo(dm2.getDemographicNo());
-        }
-    }; 
-	public static final Comparator<Demographic> SexComparator = new Comparator<Demographic>() {
-        public int compare(Demographic dm1, Demographic dm2) {
-        	return dm1.getSex().compareTo(dm2.getSex());
-        }
-    }; 
-	public static final Comparator<Demographic> AgeComparator = new Comparator<Demographic>() {
-        public int compare(Demographic dm1, Demographic dm2) {
-        	return dm1.getAge().compareTo(dm2.getAge());
-        }
-    }; 
-	public static final Comparator<Demographic> DateOfBirthComparator = new Comparator<Demographic>() {
-        public int compare(Demographic dm1, Demographic dm2) {
-        	return dm1.getBirthDayAsString().compareTo(dm2.getBirthDayAsString());
-        }
-    }; 
-	public static final Comparator<Demographic> RosterStatusComparator = new Comparator<Demographic>() {
-        public int compare(Demographic dm1, Demographic dm2) {
-        	return dm1.getRosterStatus().compareTo(dm2.getRosterStatus());
-        }
-    }; 
-	public static final Comparator<Demographic> ChartNoComparator = new Comparator<Demographic>() {
-        public int compare(Demographic dm1, Demographic dm2) {
-        	return dm1.getChartNo().compareTo(dm2.getChartNo());
-        }
-    }; 
-	public static final Comparator<Demographic> ProviderNoComparator = new Comparator<Demographic>() {
-        public int compare(Demographic dm1, Demographic dm2) {
-        	return dm1.getProviderNo().compareTo(dm2.getProviderNo());
-        }
-    }; 
-	public static final Comparator<Demographic> PatientStatusComparator = new Comparator<Demographic>() {
-        public int compare(Demographic dm1, Demographic dm2) {
-        	return dm1.getPatientStatus().compareTo(dm2.getPatientStatus());
-        }
-    }; 
-	public static final Comparator<Demographic> PhoneComparator = new Comparator<Demographic>() {
-        public int compare(Demographic dm1, Demographic dm2) {
-        	return dm1.getPhone().compareTo(dm2.getPhone());
-        }
-    }; 
+	public static final Comparator<Demographic> FormattedNameComparator = new Comparator<Demographic>()
+	{
+		@Override
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getFormattedName().compareToIgnoreCase(dm2.getFormattedName());
+		}
+	};
+	public static final Comparator<Demographic> LastNameComparator = new Comparator<Demographic>()
+	{
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getLastName().compareTo(dm2.getLastName());
+		}
+	};
+	public static final Comparator<Demographic> FirstNameComparator = new Comparator<Demographic>()
+	{
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getFirstName().compareTo(dm2.getFirstName());
+		}
+	};
+	public static final Comparator<Demographic> DemographicNoComparator = new Comparator<Demographic>()
+	{
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getDemographicNo().compareTo(dm2.getDemographicNo());
+		}
+	};
+	public static final Comparator<Demographic> SexComparator = new Comparator<Demographic>()
+	{
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getSex().compareTo(dm2.getSex());
+		}
+	};
+	public static final Comparator<Demographic> AgeComparator = new Comparator<Demographic>()
+	{
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getAge().compareTo(dm2.getAge());
+		}
+	};
+	public static final Comparator<Demographic> DateOfBirthComparator = new Comparator<Demographic>()
+	{
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getBirthDayAsString().compareTo(dm2.getBirthDayAsString());
+		}
+	};
+	public static final Comparator<Demographic> RosterStatusComparator = new Comparator<Demographic>()
+	{
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getRosterStatus().compareTo(dm2.getRosterStatus());
+		}
+	};
+	public static final Comparator<Demographic> ChartNoComparator = new Comparator<Demographic>()
+	{
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getChartNo().compareTo(dm2.getChartNo());
+		}
+	};
+	public static final Comparator<Demographic> ProviderNoComparator = new Comparator<Demographic>()
+	{
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getProviderNo().compareTo(dm2.getProviderNo());
+		}
+	};
+	public static final Comparator<Demographic> PatientStatusComparator = new Comparator<Demographic>()
+	{
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getPatientStatus().compareTo(dm2.getPatientStatus());
+		}
+	};
+	public static final Comparator<Demographic> PhoneComparator = new Comparator<Demographic>()
+	{
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getPhone().compareTo(dm2.getPhone());
+		}
+	};
 
 
-	
-	public String getStandardIdentificationHTML() {
+	public String getStandardIdentificationHTML()
+	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("<b>" + getLastName().toUpperCase() + "</b>");
 		sb.append(",");
 		sb.append(getFirstName());
-		if(getTitle() != null && getTitle().length()>0) {
+		if (getTitle() != null && getTitle().length() > 0)
+		{
 			sb.append("(" + getTitle() + ")");
 		}
 		sb.append("<br/>");
 		sb.append("Born ");
 		sb.append("<b>" + getFormattedDob() + "</b>");
-		if(getHin() != null && getHin().length()>0) {
+		if (getHin() != null && getHin().length() > 0)
+		{
 			sb.append("<br/>");
 			sb.append("HC ");
 			sb.append("<b>");
@@ -1271,7 +1497,8 @@ public class Demographic implements Serializable {
 			sb.append("(" + getHcType() + ")");
 			sb.append("</b>");
 		}
-		if(getChartNo() != null && getChartNo().length()>0) {
+		if (getChartNo() != null && getChartNo().length() > 0)
+		{
 			sb.append("<br/>");
 			sb.append("Chart No ");
 			sb.append("<b>");
@@ -1280,5 +1507,5 @@ public class Demographic implements Serializable {
 		}
 		return sb.toString();
 	}
-	
+
 }
