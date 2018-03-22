@@ -375,8 +375,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				if (user.providerNo !== note.providerNo)
 					return false;
 			}
-
-			return true;
+			return !note.deleted;
 		};
 
 		controller.getNoteHeader = function firstLine(noteObj)
@@ -675,6 +674,26 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					location: 'replace',
 					notify: true
 				});
+		};
+		controller.viewDocument = function viewDocument(documentId)
+		{
+			// get only document summary items
+			let itemArray = summaryLists['incoming'].summaryItem;
+			let item = null;
+
+			// find the summary item that matches the document id
+			for (let i=0; i < itemArray.length; i++)
+			{
+				if(itemArray[i].id === documentId) {
+					item = itemArray[i];
+					break;
+				}
+			}
+
+			// if we found a matching document, open it
+			if(item != null) {
+				controller.gotoState(item);
+			}
 		};
 
 

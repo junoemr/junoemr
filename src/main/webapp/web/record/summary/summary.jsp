@@ -195,6 +195,11 @@
 												ng-show="note.eformData">
 											View
 										</button>
+										<button class="btn btn-primary btn-xs"
+										        ng-click="summaryCtrl.viewDocument(note.noteId)"
+										        ng-show="note.document">
+											View
+										</button>
 										<button class="btn disabled btn-xs" ng-show="note.archived == true">Archived</button>
 										<%--<input type="checkbox" ng-model="note.isSelected"/> --%>
 										<button class="btn btn-default btn-xs"
