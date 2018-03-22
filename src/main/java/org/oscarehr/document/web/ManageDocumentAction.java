@@ -764,7 +764,10 @@ public class ManageDocumentAction extends DispatchAction {
 		
 		String temp = request.getParameter("remoteFacilityId");
 		Integer remoteFacilityId = null;
-		if (temp != null && !temp.trim().isEmpty()) remoteFacilityId = Integer.parseInt(temp);
+		if(temp != null && !temp.trim().isEmpty())
+		{
+			remoteFacilityId = Integer.parseInt(temp);
+		}
 
 		String doc_no = request.getParameter("doc_no");
 		log.debug("Document No :" + doc_no);

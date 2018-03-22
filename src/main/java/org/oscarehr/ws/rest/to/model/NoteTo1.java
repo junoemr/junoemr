@@ -49,6 +49,7 @@ public class NoteTo1 implements Serializable{
 	private String location;
 	private String roleName;
 	private Integer remoteFacilityId;
+	private Integer documentId;
 	private String uuid;
 	private Boolean hasHistory;
 	private Boolean locked;
@@ -174,6 +175,16 @@ public class NoteTo1 implements Serializable{
 
 	public void setRemoteFacilityId(Integer remoteFacilityId) {
 		this.remoteFacilityId = remoteFacilityId;
+	}
+
+	public Integer getDocumentId()
+	{
+		return documentId;
+	}
+
+	public void setDocumentId(Integer documentId)
+	{
+		this.documentId = documentId;
 	}
 
 	public String getUuid() {
