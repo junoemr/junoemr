@@ -7,18 +7,18 @@ Oscar.Util.Fax = {};
 
 Oscar.Util.Fax.AddFax = function AddFax(name, number)
 {
-	if (this.checkPhone(number))
+	if (Oscar.Util.Fax.checkPhone(number))
 	{
-		this._AddOtherFax(name, number, true);
+		Oscar.Util.Fax._AddOtherFax(name, number, true);
 	}
 };
 
 Oscar.Util.Fax.AddOtherFaxProvider = function AddOtherFaxProvider()
 {
 	var selected = jQuery("#otherFaxSelect option:selected");
-	if (this.checkPhone(selected.val()))
+	if (Oscar.Util.Fax.checkPhone(selected.val()))
 	{
-		this._AddOtherFax(selected.text(), selected.val());
+		Oscar.Util.Fax._AddOtherFax(selected.text(), selected.val());
 	}
 	else
 	{
@@ -29,9 +29,9 @@ Oscar.Util.Fax.AddOtherFaxProvider = function AddOtherFaxProvider()
 Oscar.Util.Fax.AddOtherFax = function AddOtherFax()
 {
 	var number = jQuery("#otherFaxInput").val();
-	if (this.checkPhone(number))
+	if (Oscar.Util.Fax.checkPhone(number))
 	{
-		this._AddOtherFax(number, number);
+		Oscar.Util.Fax._AddOtherFax(number, number);
 	}
 	else
 	{
@@ -48,7 +48,7 @@ Oscar.Util.Fax._AddOtherFax = function _AddOtherFax(name, number, direct)
 		"</li>";
 	jQuery("#faxRecipients").append(jQuery(html));
 
-	this.updateFaxButton();
+	Oscar.Util.Fax.updateFaxButton();
 };
 
 Oscar.Util.Fax.checkPhone = function checkPhone(str)
@@ -65,7 +65,7 @@ Oscar.Util.Fax.removeRecipient = function removeRecipient(element)
 	if (el)
 	{
 		el.parent().remove();
-		this.updateFaxButton();
+		Oscar.Util.Fax.updateFaxButton();
 	}
 	else
 	{
@@ -75,7 +75,7 @@ Oscar.Util.Fax.removeRecipient = function removeRecipient(element)
 
 Oscar.Util.Fax.updateFaxButton = function updateFaxButton()
 {
-	jQuery(".faxButton").attr('disabled', !this.hasFaxNumber());
+	jQuery(".faxButton").attr('disabled', !Oscar.Util.Fax.hasFaxNumber());
 };
 
 Oscar.Util.Fax.hasFaxNumber = function hasFaxNumber()
