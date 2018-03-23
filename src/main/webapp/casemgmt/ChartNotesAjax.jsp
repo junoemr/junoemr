@@ -602,7 +602,10 @@ int maxId = 0;
 
 							<div id="wrapper<%=globalNoteId%>" style="<%=(note.isDocument()||note.isCpp()||note.isEformData()||note.isEncounterForm()||note.isInvoice())?(bgColour+";color:white;font-size:10px"):"clear:right;"%>">
 							<%-- render the note contents here --%>
-							<div id="txt<%=globalNoteId%>" style="display:inline-block;overflow-wrap:break-word;word-wrap:break-word;<%=(note.isDocument()||note.isCpp()||note.isEformData()||note.isEncounterForm()||note.isInvoice())?("max-width:60%;"):"max-width:100%;"%>">
+								<%
+									String maxWidth = note.isDocument() ? "90%" : isMagicNote ? "60%" : "100%";
+								%>
+							<div id="txt<%=globalNoteId%>" style="display:inline-block;overflow-wrap:break-word;word-wrap:break-word;max-width:<%=maxWidth%>;">
 
 		  						<%=noteStr%>
 							</div> <!-- end of txt<%=globalNoteId%> -->
