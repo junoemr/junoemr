@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013-2015. Department of Computer Science, University of Victoria. All Rights Reserved.
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * This software was written for the
- * Department of Computer Science
- * LeadLab
- * University of Victoria
- * Victoria, Canada
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
  */
+
 package org.oscarehr.provider.controller;
 
 import org.oscarehr.common.model.Dashboard;
@@ -91,7 +91,7 @@ public class MenuBar
 		return this.appManager.isK2AEnabled();
 	}
 
-	public boolean hasDashboards()
+	public boolean isHasDashboards()
 	{
 		return (this.dashboards != null && this.dashboards.size() > 0);
 	}
@@ -115,9 +115,6 @@ public class MenuBar
 	{
 		return currentDay;
 	}
-
-
-
 
 	private List<Dashboard> loadDashboards()
 	{

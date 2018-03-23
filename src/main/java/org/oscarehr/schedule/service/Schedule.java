@@ -16,11 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * This software was written for
- * Cloud Practice Inc.
+ * CloudPractice Inc.
  * Victoria, British Columbia
  * Canada
  */
-
 package org.oscarehr.schedule.service;
 
 import com.google.common.collect.RangeMap;
@@ -367,7 +366,7 @@ public class Schedule
 	}
 
 	/**
-	 * Get the provider's schedule for the week (sun-sat) that includes the date.
+	 * Get the provider's schedule for the week (sun-sat) that includes the provided date.
 	 * @param providerNo Provider to get the schedule for.
 	 * @param date Get the schedule for the week (sun-sat) including this date.
 	 * @param site String the name of the site to get the schedule for.
@@ -400,11 +399,6 @@ public class Schedule
 
 		// Create transfer object
 		return new ResourceSchedule(userDateSchedules);
-	}
-
-	public ResourceSchedule getEmptyResourceSchedule()
-	{
-		return new ResourceSchedule(new ArrayList<UserDateSchedule>());
 	}
 
 	private UserDateSchedule getUserDateSchedule(

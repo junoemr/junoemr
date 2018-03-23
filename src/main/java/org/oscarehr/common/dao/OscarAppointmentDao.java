@@ -898,7 +898,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String statusTitle = (String) result[index++];
 			String color = (String) result[index++];
 			String iconImage = (String) result[index++];
-			String shortLetterColour = (String) result[index++];
+			Integer shortLetterColour = (Integer) result[index++];
 			String shortLetters = (String) result[index++];
 			String firstName = (String) result[index++];
 			String lastName = (String) result[index++];

@@ -1,6 +1,5 @@
 /**
- *
- * Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,10 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * This software was written for
- * Centre for Research on Inner City Health, St. Michael's Hospital,
- * Toronto, Ontario, Canada
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
  */
-
 package org.oscarehr.appointment;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -42,7 +41,16 @@ import java.util.Map;
 
 public class AppointmentDisplayController
 {
-	public static final String BILLED_STATUS = "B";
+	private static final String BILLED_STATUS = "B";
+	private static final String DEFAULT_SHORT_LETTER_COLOR = "#FFFFFF";
+	private static final String DO_NOT_BOOK_LABEL = "DO_NOT_BOOK";
+	private static final String TOGGLEABLE_CLASS = "toggleable";
+	private static final String HIDE_REASON_CLASS = "hideReason";
+	private static final String URGENCY_CRITICAL = "critical";
+	private static final String ROSTER_STATUS_FS = "FS";
+	private static final String ROSTER_STATUS_RO = "RO";
+	private static final String ROSTER_STATUS_NR = "NR";
+	private static final String ROSTER_STATUS_PL = "PL";
 
 	private DateTimeFormatter timeFormatter;
 	private DateTimeFormatter dateFormatter;
@@ -194,12 +202,12 @@ public class AppointmentDisplayController
 
 	public boolean isShowIntakeFormLink()
 	{
-		return OscarProperties.getInstance().isPropertyActive("appt_intake_form");
+		return OscarProperties.getInstance().isAppointmentIntakeFormEnabled();
 	}
 
 	public boolean isShowEyeformLink()
 	{
-		return (OscarProperties.getInstance().isPropertyActive("new_eyeform_enabled") && !isWeekView);
+		return (OscarProperties.getInstance().isNewEyeformEnabled() && !isWeekView);
 	}
 
 	public boolean isShowDollarSign()
@@ -212,7 +220,7 @@ public class AppointmentDisplayController
 		);
 	}
 
-	public boolean patientHasOutstandingPrivateBills(String demographicNo)
+	private boolean patientHasOutstandingPrivateBills(String demographicNo)
 	{
 		oscar.oscarBilling.ca.bc.MSP.MSPReconcile msp = new oscar.oscarBilling.ca.bc.MSP.MSPReconcile();
 		return msp.patientHasOutstandingPrivateBill(demographicNo);
@@ -220,7 +228,7 @@ public class AppointmentDisplayController
 
 	public boolean isSinglePageChart()
 	{
-		return OscarProperties.getInstance().isPropertyActive("SINGLE_PAGE_CHART");
+		return OscarProperties.getInstance().isSinglePageChartEnabled();
 	}
 
 	public String getAppointmentNo()
@@ -235,24 +243,20 @@ public class AppointmentDisplayController
 
 	public boolean isShowShortLetters()
 	{
-		return (
-			OscarProperties.getInstance().getProperty("APPT_SHOW_SHORT_LETTERS", "false") != null &&
-				OscarProperties.getInstance().getProperty("APPT_SHOW_SHORT_LETTERS", "false")
-					.equals("true")
-		);
+		return OscarProperties.getInstance().isAppointmentShowShortLettersEnabled();
 	}
 
 	public String getShortLetters()
 	{
-		return UtilMisc.htmlEscape(appointment.getShortLetters());
+		return StringEscapeUtils.escapeHtml(appointment.getShortLetters());
 	}
 
-	public String getColour()
+	public String getShortLetterColour()
 	{
 		String colour = appointment.getShortLetterColour();
 		if (colour == null)
 		{
-			colour = "#FFFFFF";
+			colour = DEFAULT_SHORT_LETTER_COLOR;
 		}
 
 		return colour;
@@ -285,8 +289,7 @@ public class AppointmentDisplayController
 					currentProviderName, e);
 			}
 
-			viewValue = "1&curProvider=" + currentProvider +
-				"&curProviderName=" + curProviderName;
+			viewValue = "1&curProvider=" + currentProvider + "&curProviderName=" + curProviderName;
 		}
 
 		String viewAllValue = "0";
@@ -373,21 +376,30 @@ public class AppointmentDisplayController
 		String province = OscarProperties.getInstance().getBillingTypeUpperCase();
 		String default_view = OscarProperties.getInstance().getProperty("default_view");
 
-		return "../billing.do" +
-			"?billRegion=" + URLEncoder.encode(province) +
-			"&billForm=" + URLEncoder.encode(default_view) +
-			"&hotclick=" +
-			"&appointment_no=" + appointment.getAppointmentNo().toString() +
-			"&demographic_name=" + getName() +
-			"&status=" + appointment.getStatus() +
-			"&demographic_no=" + appointment.getDemographicNo().toString() +
-			"&providerview=" + currentProvider +
-			"&user_no=" + currentUserNo +
-			"&apptProvider_no=" + currentProvider +
-			"&appointmentDate=" + appointment.getDate().format(dateFormatter) +
-			"&start_time=" + appointment.getStartTime().format(timeFormatter) +
-			"&bNewForm=1";
+		try
+		{
+			return "../billing.do" +
+				"?billRegion=" + URLEncoder.encode(province, "UTF-8") +
+				"&billForm=" + URLEncoder.encode(default_view, "UTF-8") +
+				"&hotclick=" +
+				"&appointment_no=" + appointment.getAppointmentNo().toString() +
+				"&demographic_name=" + getName() +
+				"&status=" + appointment.getStatus() +
+				"&demographic_no=" + appointment.getDemographicNo().toString() +
+				"&providerview=" + currentProvider +
+				"&user_no=" + currentUserNo +
+				"&apptProvider_no=" + currentProvider +
+				"&appointmentDate=" + appointment.getDate().format(dateFormatter) +
+				"&start_time=" + appointment.getStartTime().format(timeFormatter) +
+				"&bNewForm=1";
+		}
+		catch(UnsupportedEncodingException e)
+		{
+			MiscUtils.getLogger().error("Billing link URL encoding error with string: " +
+				currentProviderName, e);
+		}
 
+		return "";
 	}
 
 	public String getUnbillURL()
@@ -399,7 +411,7 @@ public class AppointmentDisplayController
 			"&appointment_no=" + appointment.getAppointmentNo();
 	}
 
-	public String getReasonCodeName()
+	private String getReasonCodeName()
 	{
 		String reasonCodeName = "";
 		if(appointment.getReasonCode() != null)    {
@@ -413,12 +425,12 @@ public class AppointmentDisplayController
 
 	public String getReason()
 	{
-		return UtilMisc.htmlEscape(appointment.getReason());
+		return StringEscapeUtils.escapeHtml(appointment.getReason());
 	}
 
-	public boolean isReasonToggleable()
+	private boolean isReasonToggleable()
 	{
-		return !("DO_NOT_BOOK").equalsIgnoreCase(getName());
+		return !DO_NOT_BOOK_LABEL.equalsIgnoreCase(getName());
 	}
 
 	public String getReasonToggleableClass()
@@ -426,7 +438,7 @@ public class AppointmentDisplayController
 
 		if(isReasonToggleable())
 		{
-			return "toggleable";
+			return TOGGLEABLE_CLASS;
 		}
 		else
 		{
@@ -434,16 +446,16 @@ public class AppointmentDisplayController
 		}
 	}
 
-	public boolean isToggleReasonByProvider()
+	private boolean isToggleReasonByProvider()
 	{
-		return OscarProperties.getInstance().isPropertyActive("TOGGLE_REASON_BY_PROVIDER", true);
+		return OscarProperties.getInstance().isToggleReasonByProviderEnabled();
 	}
 
 	public String getHideReasonClass()
 	{
 		if(!isWeekView && isToggleReasonByProvider() && isReasonToggleable())
 		{
-			return "hideReason";
+			return HIDE_REASON_CLASS;
 		}
 		else
 		{
@@ -463,7 +475,7 @@ public class AppointmentDisplayController
 
 		if(appointment.getReason() != null)
 		{
-			out_string += "&nbsp;" + UtilMisc.htmlEscape(appointment.getReason());
+			out_string += "&nbsp;" + StringEscapeUtils.escapeHtml(appointment.getReason());
 		}
 
 		return out_string;
@@ -484,17 +496,17 @@ public class AppointmentDisplayController
 
 		if (appointment.getReason() != null && !appointment.getReason().isEmpty())
 		{
-			title += "- " + UtilMisc.htmlEscape(appointment.getReason() + "\n");
+			title += "- " + StringEscapeUtils.escapeHtml(appointment.getReason() + "\n");
 		}
 
-		title += "notes: " + UtilMisc.htmlEscape(appointment.getNotes());
+		title += "notes: " + StringEscapeUtils.escapeHtml(appointment.getNotes());
 
 		return " title=\"" + title + "\"";
 	}
 
 	public boolean isCriticalUrgency()
 	{
-		return (appointment.getUrgency() != null && appointment.getUrgency().equals("critical"));
+		return (appointment.getUrgency() != null && appointment.getUrgency().equals(URGENCY_CRITICAL));
 	}
 
 	public boolean isEmptyDemographic()
@@ -529,15 +541,15 @@ public class AppointmentDisplayController
 
 	public String getTicklerNote()
 	{
-		return UtilMisc.htmlEscape(appointment.getTicklerMessages());
+		return StringEscapeUtils.escapeHtml(appointment.getTicklerMessages());
 	}
 
 	public boolean isDisplayAlerts()
 	{
 		return (
-			OscarProperties.getInstance().isPropertyActive("displayAlertsOnScheduleScreen") &&
-				appointment.getCustAlert() != null &&
-				!appointment.getCustAlert().isEmpty()
+			OscarProperties.getInstance().isDisplayAlertsOnScheduleScreenEnabled() &&
+			appointment.getCustAlert() != null &&
+			!appointment.getCustAlert().isEmpty()
 		);
 	}
 
@@ -549,17 +561,17 @@ public class AppointmentDisplayController
 	public boolean isDisplayNotes()
 	{
 		return (
-			OscarProperties.getInstance().isPropertyActive("displayNotesOnScheduleScreen") &&
-				appointment.getCustNotes() != null &&
-				!SxmlMisc.getXmlContent(appointment.getCustNotes(), "<unotes>", "</unotes>")
-					.isEmpty()
+			OscarProperties.getInstance().isDisplayAlertsOnScheduleScreenEnabled() &&
+			appointment.getCustNotes() != null &&
+			!SxmlMisc.getXmlContent(appointment.getCustNotes(), "<unotes>", "</unotes>")
+				.isEmpty()
 		);
 	}
 
 	public String getNotes()
 	{
-		return StringEscapeUtils
-			.escapeHtml(SxmlMisc.getXmlContent(appointment.getCustNotes(), "<unotes>", "</unotes>"));
+		return StringEscapeUtils.escapeHtml(
+			SxmlMisc.getXmlContent(appointment.getCustNotes(), "<unotes>", "</unotes>"));
 	}
 
 	public String getName()
@@ -606,11 +618,6 @@ public class AppointmentDisplayController
 		return currentProvider;
 	}
 
-	public String getCurrentUserNo()
-	{
-		return currentUserNo;
-	}
-
 	public String getDemographicNo()
 	{
 		return appointment.getDemographicNo().toString();
@@ -623,25 +630,29 @@ public class AppointmentDisplayController
 
 	public String getVer()
 	{
-		return UtilMisc.htmlEscape(appointment.getVer());
+		return StringEscapeUtils.escapeHtml(appointment.getVer());
 	}
 
 	public boolean isShowFSRosterLink()
 	{
-		return "FS".equalsIgnoreCase(appointment.getRosterStatus());
+		return ROSTER_STATUS_FS.equalsIgnoreCase(appointment.getRosterStatus());
 	}
 
+	public boolean isShowRORosterLink()
+	{
+		return ROSTER_STATUS_RO.equalsIgnoreCase(appointment.getRosterStatus());
+	}
 	public boolean isShowNRorPLRosterLink()
 	{
 		return (
-			"NR".equalsIgnoreCase(appointment.getRosterStatus()) ||
-			"PL".equalsIgnoreCase(appointment.getRosterStatus())
+			ROSTER_STATUS_NR.equalsIgnoreCase(appointment.getRosterStatus()) ||
+			ROSTER_STATUS_PL.equalsIgnoreCase(appointment.getRosterStatus())
 		);
 	}
 
 	public String getRosterStatus()
 	{
-		return UtilMisc.htmlEscape(appointment.getRosterStatus());
+		return StringEscapeUtils.escapeHtml(appointment.getRosterStatus());
 	}
 
 	public boolean isShowPreventionWarnings()
@@ -669,7 +680,7 @@ public class AppointmentDisplayController
 			nameLength == longLengthLimit ||
 			view != 0 ||
 			numAvailProvider == 1 ||
-			OscarProperties.getInstance().isPropertyActive("APPT_ALWAYS_SHOW_LINKS")
+			OscarProperties.getInstance().isAppoinmtnetAlwaysShowLinksEnabled()
 		);
 	}
 

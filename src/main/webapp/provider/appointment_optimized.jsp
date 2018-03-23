@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
+    Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -16,11 +16,10 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-    This software was written for the
-    Department of Family Medicine
-    McMaster University
-    Hamilton
-    Ontario, Canada
+    This software was written for
+    CloudPractice Inc.
+    Victoria, British Columbia
+    Canada
 
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -144,6 +143,34 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 			providerString +
 			"&viewall=" + viewAll;
 }
+
+private LocalTime cleanLocalTime(int hour)
+{
+	if(hour < 0)
+	{
+		return LocalTime.of(0, 0);
+	}
+
+	if(hour >= 24)
+	{
+		return LocalTime.MAX;
+	}
+
+	return LocalTime.of(hour, 0);
+}
+
+private LocalTime plusNoWrap(LocalTime time, int slotLengthInMinutes)
+{
+	LocalTime outTime = time.plusMinutes(slotLengthInMinutes);
+
+	if(outTime.compareTo(time) == -1 || slotLengthInMinutes >= (24*60))
+	{
+		return LocalTime.MAX;
+	}
+
+	return outTime;
+}
+
 
 
 %>
@@ -665,7 +692,7 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 		</td>
 		<td id="firstMenu">
 			<ul id="navlist">
-				<c:if test="${menuBarController.isInfirmaryOscarView()}">
+				<c:if test="${menuBarController.infirmaryOscarView}">
 					<c:choose>
 						<c:when test="${menuBarController.isViewAll()}">
 							<li>
@@ -757,7 +784,7 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 					<li><a href="javascript: function myFunction() {return false; }" onClick="popup(700,1024,'../oscarWorkflow/WorkFlowList.jsp','<bean:message key="global.workflow"/>')"><bean:message key="global.btnworkflow"/></a></li>
 				</oscar:oscarPropertiesCheck>
 
-				<c:if test="${menuBarController.isK2AEnabled()}">
+				<c:if test="${menuBarController.k2AEnabled}">
 					<li>
 						<a href="javascript:void(0);" id="K2ALink">K2A<span><sup id="k2a_new_notifications"></sup></span></a>
 						<script type="text/javascript">
@@ -792,12 +819,12 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 					</li>
 
 					<security:oscarSec roleName="<%=roleName$%>" objectName="_dashboardDisplay" rights="r">
-						<c:if test="menuBarController.hasDashboards()">
+						<c:if test="${menuBarController.hasDashboards}">
 							<li id="dashboardList">
 								<div class="dropdown">
 									<a href="#" class="dashboardBtn">Dashboard</a>
 									<div class="dashboardDropdown">
-										<c:forEach items="${ menuBarController.getDashboards() }" var="dashboard" >
+										<c:forEach items="${ menuBarController.dashboards }" var="dashboard" >
 											<a href="javascript:void(0)" onclick="newWindow('<%=request.getContextPath()%>/web/dashboard/display/DashboardDisplay.do?method=getDashboard&dashboardId=${ dashboard.id }','admin')">
 												<c:out value="${ dashboard.name }" />
 											</a>
@@ -846,6 +873,7 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 
 
 		<td align="right" valign="bottom" >
+			<span>New!</span>
 			<a href="javascript: function myFunction() {return false; }" onClick="popup(700,1024,'../scratch/index.jsp','scratch')"><span id="oscar_scratch"></span></a>&nbsp;
 
 			<a href=# onClick="popupPage(700,1024,'<%=resourceBaseUrl%>')">
@@ -1337,14 +1365,15 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 									slotLengthInMinutes = (MINUTES_IN_DAY/schedule.getScheduleSlots().asMapOfRanges().size());
 								}
 
-								LocalTime startTime = LocalTime.of(startHour, 0);
-								LocalTime endTime = LocalTime.of(endHour + 1, 0);
+								LocalTime startTime = cleanLocalTime(startHour);
+								LocalTime endTime = cleanLocalTime(endHour + 1);
+
 								DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 								DateTimeFormatter titleFormatter = DateTimeFormatter.ofPattern("h:mm a");
 
-								for(LocalTime slotTime = startTime; slotTime.isBefore(endTime); slotTime = slotTime.plusMinutes(slotLengthInMinutes))
+								for(LocalTime slotTime = startTime; slotTime.isBefore(endTime); slotTime = plusNoWrap(slotTime, slotLengthInMinutes))
 								{
-									LocalTime slotEndTime = slotTime.plusMinutes(slotLengthInMinutes);
+									LocalTime slotEndTime = plusNoWrap(slotTime, slotLengthInMinutes);
 
 									boolean isExactHour = false;
 									if(slotTime.getMinute() == 0)
@@ -1545,7 +1574,7 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 															<!-- Appointment status image -->
 															<span
 																class='short_letters'
-																style='color:${appointmentInfo.colour};border:0;height:10'>
+																style='color:${appointmentInfo.shortLetterColour};border:0;height:10'>
 																[${appointmentInfo.shortLetters}]
 															</span>
 														</c:when>
@@ -1619,6 +1648,12 @@ private String getScheduleUrl(boolean isWeekView, LocalDate date, int view, Stri
 															<c:if test="${appointmentInfo.showFSRosterLink}">
 																<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
 																	<font color="red">$</font>
+																</a>
+															</c:if>
+
+															<c:if test="${appointmentInfo.showRORosterLink}">
+																<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
+																	<font color="red">^</font>
 																</a>
 															</c:if>
 

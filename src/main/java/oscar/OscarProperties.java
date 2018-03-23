@@ -192,17 +192,6 @@ public class OscarProperties extends Properties {
 	}
 
 	/**
-	 * Will check the properties to see if that property is set and if it's set to "true", "yes" or "on". 
-	 * If it is method returns true if not method returns false.
-	 * 
-	 * @param key key of property
-	 * @return boolean whether the property is active
-	 */
-	public boolean isPropertyActive(String key) {
-		return isPropertyActive(key, false);
-	}
-
-	/**
 	 * Will check the properties to see if that property is set and if it's set to "true", "yes" or "on".
 	 * If it is method returns true if not method returns false.
 	 *
@@ -210,14 +199,9 @@ public class OscarProperties extends Properties {
 	 * @param defaultValue Value to use if they key isn't there
 	 * @return boolean whether the property is active
 	 */
-	public boolean isPropertyActive(String key, boolean defaultValue) {
-		String defaultString = "";
-		if(defaultValue)
-		{
-			defaultString = "true";
-		}
+	public boolean isPropertyActive(String key) {
 		key = key==null ? null : key.trim();
-		return activeMarkers.contains(getProperty(key, defaultString).trim().toLowerCase());
+		return activeMarkers.contains(getProperty(key, "").trim().toLowerCase());
 	}
 
 	
@@ -460,6 +444,45 @@ public class OscarProperties extends Properties {
 		return Integer.parseInt(prop);
 	}
 
+	public boolean isAppointmentIntakeFormEnabled()
+	{
+		return isPropertyActive("appt_intake_form");
+	}
+
+	public boolean isNewEyeformEnabled()
+	{
+		return isPropertyActive("new_eyeform_enabled");
+	}
+
+	public boolean isSinglePageChartEnabled()
+	{
+		return isPropertyActive("SINGLE_PAGE_CHART");
+	}
+
+	public boolean isAppointmentShowShortLettersEnabled()
+	{
+		return isPropertyActive("APPT_SHOW_SHORT_LETTERS");
+	}
+
+	public boolean isToggleReasonByProviderEnabled()
+	{
+		return isPropertyActive("TOGGLE_REASON_BY_PROVIDER");
+	}
+
+	public boolean isDisplayAlertsOnScheduleScreenEnabled()
+	{
+		return isPropertyActive("displayAlertsOnScheduleScreen");
+	}
+
+	public boolean isAppoinmtnetAlwaysShowLinksEnabled()
+	{
+		return isPropertyActive("APPT_ALWAYS_SHOW_LINKS");
+	}
+
+	public boolean isEditAppointmentStatusEnabled()
+	{
+		return isPropertyActive("ENABLE_EDIT_APPT_STATUS");
+	}
 
 	// =========================================================================
 	// Static methods for getting specific property values

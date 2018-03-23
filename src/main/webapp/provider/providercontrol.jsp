@@ -151,7 +151,9 @@
 	String day_file = "appointment_optimized.jsp";
 	boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
 
-    // XXX: This assumes that the user is not using indivo
+	// Use the old schedule if any of the following conditions are true because
+	// appointment_optimized.jsp doesn't account for them.
+    // This assumes that the user is not using indivo
     if(
 		!props.isPropertyActive("enable_limited_schedule") ||
     	isMobileOptimized ||
