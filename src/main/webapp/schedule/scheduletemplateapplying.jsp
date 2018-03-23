@@ -892,8 +892,8 @@ function tranbuttonb7_click() {
 					value="<%=request.getParameter("provider_no")%>"> <input
 					type="hidden" name="available"
 					value="<%=bAlternate||bOrigAlt?"A":"1"%>"> <input
-					type="hidden" name="Submit" value=" Next "> <input
-					type="submit"
+					type="hidden" name="Submit" value=" Next ">
+					<input type="submit" <%=publicAndPrivateTemplates.isEmpty() ? "disabled" : ""%>
 					value='<bean:message key="schedule.scheduletemplateapplying.btnNext"/>'>
 				</div>
 				</td>
