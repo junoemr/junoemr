@@ -2960,6 +2960,18 @@
 		};
 	}
 
+	function signSaveBill(event)
+	{
+		document.forms['caseManagementEntryForm'].sign.value='on';
+		document.forms['caseManagementEntryForm'].toBill.value='true';
+
+		Event.stop(event);
+
+		maximizeWindow();
+
+		return savePage('saveAndExit', '');
+	}
+
 	var changeIssueMsg;
 	function changeDiagnosis(issueId)
 	{
