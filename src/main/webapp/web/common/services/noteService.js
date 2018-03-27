@@ -42,10 +42,14 @@ angular.module("Common.Services").service("noteService", [
 		{
 			var deferred = $q.defer();
 
-			$http.post(service.apiPath + '/' + encodeURIComponent(demographicNo) +
-				'/all?offset=' + encodeURIComponent(offset) +
-				'&numToReturn=' + encodeURIComponent(numberToReturn),
-				noteConfig, Juno.Common.ServiceHelper.configHeaders()).then(
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.params = {
+				offset: encodeURIComponent(offset),
+				numToReturn: encodeURIComponent(numberToReturn),
+				noteConfig: noteConfig
+			};
+
+			junoHttp.post(service.apiPath + '/' + encodeURIComponent(demographicNo) + '/all', config).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);

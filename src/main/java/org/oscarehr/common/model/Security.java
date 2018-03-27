@@ -167,6 +167,10 @@ public class Security extends AbstractModel<Integer> {
 	public void setBExpireset(Integer bExpireset) {
 		BExpireset = bExpireset;
 	}
+	public boolean isExpireSet()
+	{
+		return (BExpireset == 1);
+	}
 
 	public Date getDateExpiredate() {
 		return dateExpiredate;
