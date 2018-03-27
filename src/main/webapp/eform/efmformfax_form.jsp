@@ -50,6 +50,7 @@ This Page creates the fax form for eforms.
 		<td class="tite3" width="20%">
 
 		<select id="otherFaxSelect">
+			<option value="">--Select Provider--</option>
 		<%
 			for (int i=0;i < displayServiceUtil.specIdVec.size(); i++) {
 				String  specId     = (String) displayServiceUtil.specIdVec.elementAt(i);
