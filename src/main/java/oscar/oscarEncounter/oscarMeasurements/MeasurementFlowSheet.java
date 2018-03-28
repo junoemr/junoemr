@@ -417,19 +417,24 @@ public class MeasurementFlowSheet {
         }
     }
     /////
-    public MeasurementInfo getMessages(MeasurementInfo mi) throws Exception {
-        if (!rulesLoaded) {
-            throw new Exception("No Drools file loaded"+ruleBase);
-        //loadRuleBase();
-        }
-
-        try {
-            WorkingMemory workingMemory = ruleBase.newWorkingMemory();
-            workingMemory.assertObject(mi);
-            workingMemory.fireAllRules();
-        } catch (Exception e) {
-            MiscUtils.getLogger().error("Error", e);
-        //throw new Exception("ERROR: Drools ",e);
+    public MeasurementInfo getMessages(MeasurementInfo mi) throws Exception
+    {
+        if (rulesLoaded)
+        {
+            try
+            {
+                WorkingMemory workingMemory = ruleBase.newWorkingMemory();
+                workingMemory.assertObject(mi);
+                workingMemory.fireAllRules();
+                log.info("Rules loaded from Drools");
+            } catch (Exception e)
+            {
+                MiscUtils.getLogger().error("Error", e);
+                //throw new Exception("ERROR: Drools ",e);
+            }
+        } else
+        {
+            log.info("No rules loaded from Drools");
         }
         return mi;
     }
