@@ -132,7 +132,8 @@
     MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(template,custList);
     if(mFlowsheet == null)
     {
-        throw new IllegalArgumentException("Invalid flowsheet template: " + template);
+        MiscUtils.getLogger().error("Invalid Flowsheet Template: " + template);
+        return;
     }
 
     MeasurementInfo mi = new MeasurementInfo(demographic_no);
