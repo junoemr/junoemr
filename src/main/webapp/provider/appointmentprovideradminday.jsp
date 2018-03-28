@@ -45,12 +45,12 @@
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.common.dao.MyGroupDao" %>
 <%@ page import="org.oscarehr.common.model.MyGroup" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleTemplateCodeDao" %>
-<%@ page import="org.oscarehr.common.model.ScheduleTemplateCode" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleDateDao" %>
-<%@ page import="org.oscarehr.common.model.ScheduleDate" %>
+<%@ page import="org.oscarehr.schedule.dao.ScheduleTemplateCodeDao" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleTemplateCode" %>
+<%@ page import="org.oscarehr.schedule.dao.ScheduleDateDao" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleDate" %>
 <%@ page import="org.oscarehr.common.dao.ProviderSiteDao" %>
-<%@ page import="org.oscarehr.common.model.ScheduleTemplate" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleTemplate" %>
 <%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@ page import="org.oscarehr.common.model.Appointment" %>
 <%@ page import="org.oscarehr.common.model.Tickler" %>
@@ -134,14 +134,16 @@
 	private boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 	private JdbcApptImpl jdbc = new JdbcApptImpl();
 	private List<Site> sites = new ArrayList<Site>();
-	private List<Site> curUserSites = new ArrayList<Site>();
-	private List<String> siteProviderNos = new ArrayList<String>();
-	private List<String> siteGroups = new ArrayList<String>();
-	private String selectedSite = null;
 	private HashMap<String,String> siteBgColor = new HashMap<String,String>();
-	private HashMap<String,String> CurrentSiteMap = new HashMap<String,String>();%>
+%>
 
 <%
+	List<Site> curUserSites = new ArrayList<Site>();
+	List<String> siteProviderNos = new ArrayList<String>();
+	List<String> siteGroups = new ArrayList<String>();
+	String selectedSite = null;
+	HashMap<String,String> CurrentSiteMap = new HashMap<String,String>();
+
 	if (bMultisites) {
 		sites = siteDao.getAllActiveSites();
 		selectedSite = (String)session.getAttribute("site_selected");
@@ -1950,6 +1952,8 @@ public boolean isBirthday(String schedDate,String demBday){
 																	<% if (ver!=null && ver!="" && "##".compareTo(ver.toString()) == 0){%><a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.versionMsg"/> <%=UtilMisc.htmlEscape(ver)%>"> <font color="red">*</font></a><%}%>
 
 																	<% if (roster!="" && "FS".equalsIgnoreCase(roster)){%> <a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> <%=UtilMisc.htmlEscape(roster)%>"><font color="red">$</font></a><%}%>
+
+																	<% if (roster!="" && "RO".equalsIgnoreCase(roster)){%> <a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> <%=UtilMisc.htmlEscape(roster)%>"><font color="red">^</font></a><%}%>
 
 																	<% if ("NR".equalsIgnoreCase(roster) || "PL".equalsIgnoreCase(roster)){%> <a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> <%=UtilMisc.htmlEscape(roster)%>"><font color="red">#</font></a><%}%>
 															<!-- /security:oscarSec -->

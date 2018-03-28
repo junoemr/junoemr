@@ -72,6 +72,7 @@ public class PreventionData {
 			prevention.setDemographicId(Integer.valueOf(demoNo));
 			prevention.setPreventionDate(UtilDateUtilities.StringToDate(date, "yyyy-MM-dd HH:mm"));
 			prevention.setProviderNo(providerNo);
+			prevention.setProviderName(providerName);
 			prevention.setPreventionType(preventionType);
 			prevention.setNextDate(UtilDateUtilities.StringToDate(nextDate, "yyyy-MM-dd"));
 			prevention.setNever(neverWarn.trim().equals("1"));
@@ -279,6 +280,7 @@ public class PreventionData {
 				h.put("type", prevention.getPreventionType());
 				h.put("provider_no", prevention.getProviderNo());
 				h.put("provider_name", ProviderData.getProviderName(prevention.getProviderNo()));
+				h.put("creator_name", ProviderData.getProviderName(prevention.getCreatorProviderNo()));
 
 				Date pDate = prevention.getPreventionDate();
 				h.put("prevention_date", blankIfNull(UtilDateUtilities.DateToString(pDate, "yyyy-MM-dd HH:mm")));
@@ -501,7 +503,15 @@ public class PreventionData {
 			Prevention prevention = preventionDao.find(Integer.valueOf(id));
 			if (prevention != null) {
 				h = new HashMap<String, Object>();
-				String providerName = ProviderData.getProviderName(prevention.getProviderNo());
+				String providerName;
+				if (prevention.getProviderNo().equals("-1"))
+				{
+					providerName = prevention.getProviderName();
+				} else
+				{
+					providerName = ProviderData.getProviderName(prevention.getProviderNo());
+				}
+
 				String preventionDate = UtilDateUtilities.DateToString(prevention.getPreventionDate(), "yyyy-MM-dd HH:mm");
 				String lastUpdateDate = UtilDateUtilities.DateToString(prevention.getLastUpdateDate(), "yyyy-MM-dd");
 				@SuppressWarnings("deprecation")

@@ -23,7 +23,9 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.schedule.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.util.Comparator;
 
@@ -35,7 +37,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="scheduletemplatecode")
-public class ScheduleTemplateCode extends AbstractModel<Integer> {
+public class ScheduleTemplateCode extends AbstractModel<Integer>
+{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

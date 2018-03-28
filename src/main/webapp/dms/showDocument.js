@@ -161,23 +161,17 @@ Oscar.ShowDocument.updateDocument = function updateDocument(elementId)
 				documentId = documentId.replace(/\s/g, '');
 				$("saveSucessMsg_" + documentId).show();
 				$('saved' + documentId).value = 'true';
+				if ($('autocompletedemo' + documentId))
+					$('autocompletedemo' + documentId).disabled = true;
 				$("msgBtn_" + documentId).onclick = function ()
 				{
-					popup(700, 960, contextpath + '/oscarMessenger/SendDemoMessage.do?demographic_no=' + patientId, 'msg');
+					popup(700, 960, `${contextPath}/oscarMessenger/SendDemoMessage.do?demographic_no=${patientId}`, 'msg');
 				};
 
+				// after a document is saved for a patient, it is not shown in the pending docs queue
 				Oscar.ShowDocument.updateDocStatusInQueue(documentId);
-				var success = updateGlobalDataAndSideNav(documentId, patientId);
 
-				if (success)
-				{
-					success = updatePatientDocLabNav(documentId, patientId);
-					if (success)
-					{
-						//disable demo input
-						$('autocompletedemo' + documentId).disabled = true;
-					}
-				}
+				// TODO: update side navigation to reflect the new document counts for the patient
 			}
 		}
 	});
@@ -188,8 +182,8 @@ Oscar.ShowDocument.validateAndUpdateDocument = function validateAndUpdateDocumen
 {
 	if (this.checkObservationDate(formId))
 		this.updateDocument(formId);
-
 };
+
 //change status of queue document link row to I=inactive
 Oscar.ShowDocument.updateDocStatusInQueue = function updateDocStatusInQueue(documentId)
 {

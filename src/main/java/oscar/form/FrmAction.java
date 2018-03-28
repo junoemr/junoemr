@@ -63,7 +63,8 @@ public final class FrmAction extends Action {
     	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
         int newID = 0;
         FrmRecord rec = null;
-        String where = "";                
+        String where = "";
+        boolean save = false;
 
         try {
             FrmRecordFactory recorder = new FrmRecordFactory();
@@ -99,8 +100,19 @@ public final class FrmAction extends Action {
                     if( request.getParameter(name) == null )
                         request.setAttribute(name,props.getProperty(name));
                 }
+
+                if (("true").equals(request.getParameter("fax"))
+                        && ("false").equals(request.getParameter("skipSave"))) {
+                    save = true;
+                }
             }
-            else {
+            else
+            {
+                save = true;
+            }
+
+            if (save)
+            {
                 boolean bMulPage = request.getParameter("c_lastVisited") != null ? true : false;
                 String name;
 

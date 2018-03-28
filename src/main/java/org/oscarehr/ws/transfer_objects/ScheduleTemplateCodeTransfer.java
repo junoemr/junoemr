@@ -27,7 +27,7 @@ package org.oscarehr.ws.transfer_objects;
 
 import java.util.List;
 
-import org.oscarehr.common.model.ScheduleTemplateCode;
+import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.springframework.beans.BeanUtils;
 
 public final class ScheduleTemplateCodeTransfer {

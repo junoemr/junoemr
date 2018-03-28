@@ -23,7 +23,9 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.schedule.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.util.Date;
 
@@ -38,7 +40,9 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name="scheduledate")
-public class ScheduleDate extends AbstractModel<Integer>{
+public class ScheduleDate extends AbstractModel<Integer>
+{
+	public static final char STATUS_DELETED = 'D';
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

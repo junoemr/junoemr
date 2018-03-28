@@ -121,16 +121,6 @@ boolean ajax = "true".equals(request.getParameter("ajax"));
 	jQuery.noConflict();
 	
 	jQuery(window).on("scroll",handleScroll());
-	
-	function renderCalendar(id,inputFieldId){
-    	Calendar.setup({ inputField : inputFieldId, ifFormat : "%Y-%m-%d", showsTime :false, button : id });
-        
-	}
-	
-	function split(id) {
-		var loc = "<%= request.getContextPath()%>/oscarMDS/Split.jsp?document=" + id;
-		popupStart(1100, 1100, loc, "Splitter");
-	}
 
 	var page = 1;
 	var pageSize = 40;
@@ -144,7 +134,7 @@ boolean ajax = "true".equals(request.getParameter("ajax"));
 	var providerNo = "<%=(providerNo == null ? "" : providerNo)%>";
 	var searchStatus = "<%=(ackStatus == null ? "": ackStatus)%>";
 	var url = "<%=request.getContextPath()%>/dms/inboxManage.do?";
-	var contextpath = "<%=request.getContextPath()%>";
+	var contextPath = "<%=request.getContextPath()%>";
 	var startDate = "<%= startDate %>";
 	var endDate = "<%= endDate %>";
 	var request = null;
@@ -471,7 +461,9 @@ boolean ajax = "true".equals(request.getParameter("ajax"));
                                                                 | <a href="javascript:popupStart(800,1200,'<%=request.getContextPath() %>/dms/incomingDocs.jsp')" style="color: #FFFFFF;" ><bean:message key="inboxmanager.document.incomingDocs"/></a>
 								| <a href="javascript:popupStart(800,1000, '<%=request.getContextPath() %>/oscarMDS/CreateLab.jsp')" style="color: #FFFFFF;"><bean:message key="global.createLab" /></a>
                                 | <a href="javascript:popupStart(800,1000, '<%=request.getContextPath() %>/olis/Search.jsp')" style="color: #FFFFFF;"><bean:message key="olis.olisSearch" /></a>
+                                <!--- Hiding this for now until we decide to get the HRM integration working properly
                                 | <a href="javascript:popupPage(400, 400,'<html:rewrite page="/hospitalReportManager/hospitalReportManager.jsp"/>')" style="color: #FFFFFF;">HRM Status/Upload</a>
+								-->
 
                             </td>
                         </tr>

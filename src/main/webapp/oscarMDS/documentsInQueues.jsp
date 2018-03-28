@@ -1971,27 +1971,6 @@ function addDocToPatient(doclabid,patientId){//if doc is previously not assigned
 
   }
 
-function checkObservationDate(formId)
-{
-	var formElem = document.getElementById(formId);
-	var dateElem = formElem.elements["observationDate"];
-
-	if (!Oscar.Util.Common.validateInputNotEmpty(dateElem))
-	{
-		alert("Blank Date.");
-		dateElem.focus();
-		return false;
-	}
-
-	if (!Oscar.Util.Date.validateDateInput(dateElem))
-	{
-		alert("Invalid date format: " + dateElem.value);
-		dateElem.focus();
-		return false;
-	}
-	return true;
-}
-
                                                function updateDocument(eleId,isNext){//save doc info
                                                     var url="../dms/ManageDocument.do",data=$(eleId).serialize(true);
                                                     new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){

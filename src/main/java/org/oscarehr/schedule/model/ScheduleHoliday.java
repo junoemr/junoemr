@@ -23,7 +23,9 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.schedule.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.util.Date;
 
@@ -34,7 +36,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="scheduleholiday")
-public class ScheduleHoliday extends AbstractModel<Date>{
+public class ScheduleHoliday extends AbstractModel<Date>
+{
 
 	@Id
 	@Column(name="sdate")

@@ -23,17 +23,19 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.schedule.dao;
 
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.ScheduleTemplateCode;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ScheduleTemplateCodeDao extends AbstractDao<ScheduleTemplateCode> {
+public class ScheduleTemplateCodeDao extends AbstractDao<ScheduleTemplateCode>
+{
 	
 	public ScheduleTemplateCodeDao() {
 		super(ScheduleTemplateCode.class);

@@ -31,7 +31,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.ScheduleHoliday;
+import org.oscarehr.schedule.model.ScheduleHoliday;
+import org.oscarehr.schedule.dao.ScheduleHolidayDao;
 import org.oscarehr.util.SpringUtils;
 
 public class ScheduleHolidayDaoTest extends DaoTestFixtures {

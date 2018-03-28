@@ -25,6 +25,15 @@
 
 package oscar.oscarLab.ca.on;
 
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
@@ -67,13 +76,6 @@ import oscar.oscarLab.ca.bc.PathNet.PathnetResultsData;
 import oscar.oscarMDS.data.MDSResultsData;
 import oscar.oscarMDS.data.ReportStatus;
 import oscar.util.ConversionUtils;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 public class CommonLabResultData {
 
@@ -359,8 +361,10 @@ public class CommonLabResultData {
 		return labs;
 	}
 
-	public static boolean updateReportStatus(int labNo, String providerNo, char charStatus, String comment, String labType) {
+	public static void updateReportStatus(int labNo, String providerNo, char charStatus, String comment, String labType) throws SQLException
+	{
 		String status = String.valueOf(charStatus);
+
 		try {
 			DBPreparedHandler db = new DBPreparedHandler();
 			// handles the case where this provider/lab combination is not already in providerLabRouting table
@@ -419,12 +423,6 @@ public class CommonLabResultData {
 					providerInboxRoutingDao.addToProviderInbox(NOT_ASSIGNED_PROVIDER_NO, labNo, labType);
 				}
 			}
-
-			return true;
-		} catch (Exception e) {
-			Logger l = Logger.getLogger(CommonLabResultData.class);
-			l.error("exception in MDSResultsData.updateReportStatus()", e);
-			return false;
 		} finally {
 			DbConnectionFilter.releaseThreadLocalDbConnection();
 		}
@@ -554,23 +552,36 @@ public class CommonLabResultData {
 
 		CommonLabResultData data = new CommonLabResultData();
 
-		for (int i = 0; i < flaggedLabs.size(); i++) {
-			String[] strarr = flaggedLabs.get(i);
-			String lab = strarr[0];
-			String labType = strarr[1];
-			String labs = data.getMatchingLabs(lab, labType);
+		try
+		{
+			for (int i = 0; i < flaggedLabs.size(); i++)
+			{
+				String[] strarr = flaggedLabs.get(i);
+				String lab = strarr[0];
+				String labType = strarr[1];
+				String labs = data.getMatchingLabs(lab, labType);
 
-			if (labs != null && !labs.equals("")) {
-				String[] labArray = labs.split(",");
-				for (int j = 0; j < labArray.length; j++) {
-					updateReportStatus(Integer.parseInt(labArray[j]), provider, 'F', "", labType);
-					removeFromQueue(Integer.parseInt(labArray[j]));
+				if (labs != null && !labs.equals(""))
+				{
+					String[] labArray = labs.split(",");
+					for (int j = 0; j < labArray.length; j++)
+					{
+						updateReportStatus(Integer.parseInt(labArray[j]), provider, 'F', "", labType);
+						removeFromQueue(Integer.parseInt(labArray[j]));
+					}
+
 				}
-
-			} else {
-				updateReportStatus(Integer.parseInt(lab), provider, 'F', "", labType);
-				removeFromQueue(Integer.parseInt(lab));
+				else
+				{
+					updateReportStatus(Integer.parseInt(lab), provider, 'F', "", labType);
+					removeFromQueue(Integer.parseInt(lab));
+				}
 			}
+		}
+		catch (SQLException e)
+		{
+			logger.error("Error filing labs.", e);
+			return false;
 		}
 		return true;
 	}
