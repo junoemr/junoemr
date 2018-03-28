@@ -60,13 +60,13 @@ Demographic demographic = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFr
 int age = demographic.getAgeInYears();
 boolean female = DemographicData.isFemale(demographic);
 double weight = -1;
-Hashtable measurementHash = EctMeasurementsDataBeanHandler.getLast(demographicNo, "WT");
+Hashtable<String,String> measurementHash = EctMeasurementsDataBeanHandler.getLast(demographicNo, "WT");
 
 String wt= null;
 Date  wtDate = null;
 if (measurementHash != null && measurementHash.get("value") != null){
     weight = Double.parseDouble((String) measurementHash.get("value"));
-    wtDate = (Date) measurementHash.get("dateObserved_date");
+    wtDate = ConversionUtils.fromTimestampString(measurementHash.get("dateObserved"));
 }
 
 double measurementsCr = -1;
@@ -75,7 +75,7 @@ Date measurementsCrDate = null;
 measurementHash = EctMeasurementsDataBeanHandler.getLast(demographicNo, "sCr");
 if (measurementHash != null && measurementHash.get("value") != null){
     measurementsCr = Double.parseDouble((String) measurementHash.get("value"));
-    measurementsCrDate = (Date) measurementHash.get("dateObserved_date");
+    measurementsCrDate = ConversionUtils.fromTimestampString(measurementHash.get("dateObserved"));
 }
 
 

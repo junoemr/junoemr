@@ -205,6 +205,18 @@
 		</style>
 		<script language="JavaScript">
 
+			function onSubmit()
+			{
+				document.adddemographic.submit.disabled = true;
+				if (!checkFormTypeIn())
+				{
+					document.adddemographic.submit.disabled = false;
+					return false;
+				}
+
+				return true;
+			}
+
 			function setfocus() {
 				this.focus();
 				document.adddemographic.last_name.focus();
@@ -486,8 +498,7 @@
 	</table>
 
 	<%@ include file="zdemographicfulltitlesearch.jsp"%>
-	<!--<form method="post" name="adddemographic" action="demographiccontrol.jsp" onsubmit="return checkFormTypeIn()">-->
-	<form method="post" name="adddemographic" action="demographicaddarecord.jsp" onsubmit="return checkFormTypeIn()">
+	<form method="post" name="adddemographic" action="demographicaddarecord.jsp" onsubmit="return onSubmit()">
 		<%
 			for(int i=0; i<custom_demographic_fields.size(); i++){
 				if(hidden_demographic_fields.indexOf(custom_demographic_fields.get(i)) >= 0){
@@ -1042,7 +1053,7 @@
 					}
 				}
 			%>
-			<select name="r_doctor" onChange="changeRefDoc()" style="width: 200px">
+			<select name="referral_doctor_name" onChange="changeRefDoc()" style="width: 200px">
 				<option value=""></option>
 				<% for(int k=0; k<vecRef.size(); k++) {
 					prop= vecRef.get(k);%>
@@ -1054,8 +1065,8 @@
 			<script language="Javascript">
 				<!--
 				function changeRefDoc() {
-					//alert(document.forms[1].r_doctor.value);
-					var refName = document.forms[1].r_doctor.options[document.forms[1].r_doctor.selectedIndex].value;
+					//alert(document.forms[1].referral_doctor_name.value);
+					var refName = document.forms[1].referral_doctor_name.options[document.forms[1].referral_doctor_name.selectedIndex].value;
 					var refNo = "";
 					<% for(int k=0; k<vecRef.size(); k++) {
 						prop= vecRef.get(k);
@@ -1064,17 +1075,17 @@
 							refNo = <%=prop.getProperty("referral_no", "")%>;
 						}
 					<% } %>
-					document.forms[1].r_doctor_ohip.value = refNo;
+					document.forms[1].referral_doctor_no.value = refNo;
 				}
 				//-->
 			</script> <%
 		} else {%>
-			<input type="text" name="r_doctor" size="30" maxlength="40" value=""> <%
+			<input type="text" name="referral_doctor_name" size="30" maxlength="40" value=""> <%
 			} %>
 		</div>
 		<div>
 			<label><b><bean:message key="demographic.demographicaddrecordhtm.formReferalDoctorN" />:</b></label>
-			<input type="text" name="r_doctor_ohip" maxlength="6">
+			<input type="text" name="referral_doctor_no" maxlength="6">
 			<% if(!"BC".equals(prov)) { %>
 			<!--add more if-else statements to include other languages for now if en and fr-->
 			<%
@@ -1087,9 +1098,39 @@
 			<a href=# onClick ="popupPage(600,750,'<%=protocol + custom_link_fr%>');return false;"> <bean:message key="demographic.demographicaddrecordhtm.Search"/></a>
 			<%}
 			else {%>
-			<a href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographicaddrecordhtm.Search"/></a>
+			<a href="javascript:referralScriptAttach2('referral_doctor_no','referral_doctor_name')"><bean:message key="demographic.demographicaddrecordhtm.Search"/></a>
 			<%}
 			}%>
+		</div>
+		<%
+		}
+		else if (custom_demographic_fields.get(i).equals("family_doc"))
+		{
+		%>
+		<div>
+			<label>
+				<b>
+					<bean:message key="demographic.demographiceditdemographic.familyDoctor"/>:
+				</b>
+			</label>
+			<input type="text" name="family_doctor_name"
+				   size="30"
+				   maxlength="40"
+				   value="">
+			<label>
+				<b>
+					<bean:message key="demographic.demographiceditdemographic.familyDoctorNo"/>:
+				</b>
+			</label>
+			<input type="text" name="family_doctor_no"
+				   maxlength="6"
+				   value="">
+			<% if(!"BC".equals(prov))
+			{ %>
+			<a
+			href="javascript:referralScriptAttach2('family_doctor_no','family_doctor_name')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
+			#</a>
+			<% } %>
 		</div>
 		<%
 		}else if(custom_demographic_fields.get(i).equals("roster_status")){
@@ -1461,8 +1502,8 @@
 		<%
 		}else if(hidden_demographic_fields.get(i).equals("referral_doc")){
 		%>
-		<input type="hidden" name="r_doctor" value=""/>
-		<input type="hidden" name="r_doctor_ohip" value=""/>
+		<input type="hidden" name="referral_doctor_name" value=""/>
+		<input type="hidden" name="referral_doctor_no" value=""/>
 		<%
 		}else if(hidden_demographic_fields.get(i).equals("roster_status")){
 		%>
@@ -1588,21 +1629,48 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 		google.load("jqueryui", "1");
 	</script>
 	<script type="text/javascript">
-		$(document).ready(function(){
+		$(document).ready(function()
+		{
 			// AJAX autocomplete referrer doctors
-			$("input[name=r_doctor]").keypress(function(){
-				$("input[name=r_doctor]").autocomplete({
+			$("input[name=referral_doctor_name]").keypress(function()
+			{
+				$("input[name=referral_doctor_name]").autocomplete({
 					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
-					select: function( event, ui){
-						$("input[name=r_doctor_ohip]").val(ui.item.referral_no);
+					select: function(event, ui)
+					{
+						$("input[name=referral_doctor_no]").val(ui.item.referral_no);
 					}
 				});
 			});
-			$("input[name=r_doctor_ohip]").keypress(function(){
-				$("input[name=r_doctor_ohip]").autocomplete({
+			$("input[name=referral_doctor_no]").keypress(function()
+			{
+				$("input[name=referral_doctor_no]").autocomplete({
 					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
-					select: function( event, ui){
-						$("input[name=r_doctor]").val(ui.item.namedesc);
+					select: function(event, ui)
+					{
+						$("input[name=referral_doctor_name]").val(ui.item.namedesc);
+					}
+				});
+			});
+
+			// AJAX autocomplete family doctors
+			jQuery("input[name=family_doctor_name]").keypress(function()
+			{
+				jQuery("input[name=family_doctor_name]").autocomplete({
+					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
+					select: function(event, ui)
+					{
+						jQuery("input[name=family_doctor_no]").val(ui.item.referral_no);
+					}
+				});
+			});
+			jQuery("input[name=family_doctor_no]").keypress(function()
+			{
+				jQuery("input[name=family_doctor_no]").autocomplete({
+					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+					select: function(event, ui)
+					{
+						jQuery("input[name=family_doctor_name]").val(ui.item.namedesc);
 					}
 				});
 			});

@@ -191,8 +191,13 @@
 											Edit
 										</button>
 										<button class="btn btn-primary btn-xs"
-												ng-click="summaryCtrl.viewEform(note)"
+												ng-click="summaryCtrl.viewEform(note.noteId)"
 												ng-show="note.eformData">
+											View
+										</button>
+										<button class="btn btn-primary btn-xs"
+										        ng-click="summaryCtrl.viewDocument(note.documentId)"
+										        ng-show="note.document">
 											View
 										</button>
 										<button class="btn disabled btn-xs" ng-show="note.archived == true">Archived</button>
