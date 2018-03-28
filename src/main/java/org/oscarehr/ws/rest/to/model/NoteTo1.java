@@ -49,12 +49,14 @@ public class NoteTo1 implements Serializable{
 	private String location;
 	private String roleName;
 	private Integer remoteFacilityId;
+	private Integer documentId;
 	private String uuid;
 	private Boolean hasHistory;
 	private Boolean locked;
 	private boolean archived;
 	private String note;
 	private boolean isDocument;
+	private boolean isDeleted;
 	private boolean isRxAnnotation;
 	private boolean isEformData;
 	private boolean isEncounterForm;
@@ -175,6 +177,16 @@ public class NoteTo1 implements Serializable{
 		this.remoteFacilityId = remoteFacilityId;
 	}
 
+	public Integer getDocumentId()
+	{
+		return documentId;
+	}
+
+	public void setDocumentId(Integer documentId)
+	{
+		this.documentId = documentId;
+	}
+
 	public String getUuid() {
 		return uuid;
 	}
@@ -221,6 +233,14 @@ public class NoteTo1 implements Serializable{
 
 	public void setDocument(boolean isDocument) {
 		this.isDocument = isDocument;
+	}
+
+	public boolean isDeleted() {
+		return isDeleted;
+	}
+
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
 	}
 
 	public boolean isRxAnnotation() {
