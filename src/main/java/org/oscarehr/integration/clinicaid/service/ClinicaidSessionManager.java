@@ -56,9 +56,10 @@ public class ClinicaidSessionManager
 {
 	private static OscarProperties oscarProps = OscarProperties.getInstance();
 	private final String clinicaidDomain = oscarProps.getProperty("clinicaid_domain");
+	private final String apiDomain = oscarProps.getProperty("clinicaid_api_domain", clinicaidDomain);
 	private final String instanceName = oscarProps.getProperty("clinicaid_instance_name");
 	private final String apiKey = oscarProps.getProperty("clinicaid_api_key");
-	private final String loginEndPoint = clinicaidDomain + "/auth/pushed_login/";
+	private final String loginEndPoint = apiDomain + "/auth/pushed_login/";
 
 	private ClinicaidUserTo1 clinicaidUser;
 	private String nonce;
@@ -67,9 +68,9 @@ public class ClinicaidSessionManager
 	{
 	}
 
-	protected String getClinicaidDomain()
+	protected String getApiDomain()
 	{
-		return clinicaidDomain;
+		return apiDomain;
 	}
 
 	public ClinicaidResultTo1 post(URL url, String postData) throws IOException
@@ -154,7 +155,6 @@ public class ClinicaidSessionManager
 			MiscUtils.getLogger().error("###########################");
 			MiscUtils.getLogger().error("Errors: " + result.getErrors().getErrorString());
 			MiscUtils.getLogger().error("###########################");
-			throw new IllegalArgumentException("Error: " + result.getErrors().getErrorString());
 		}
 		return result;
 	}

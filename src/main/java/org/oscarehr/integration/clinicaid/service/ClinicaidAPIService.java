@@ -70,16 +70,18 @@ public class ClinicaidAPIService
 				sessionManager.urlEncode(birthDate)
 		);
 
-		String urlString = sessionManager.getClinicaidDomain() + apiPath + "patient/eligibility/" + queryString;
+		String urlString = sessionManager.getApiDomain() + apiPath + "patient/eligibility/" + queryString;
 		ClinicaidResultTo1 result = sessionManager.get(new URL(urlString));
-
-		PatientEligibilityDataTo1 eligibilityData = result.getData().getEligibilityData();
-		response.put("result", eligibilityData.isEligible() ? "Eligible" : "Not Eligible");
-		response.put("msg", eligibilityData.getMessage());
 
 		if (result.hasError())
 		{
 			response.put("error", result.getErrors().getErrorString());
+		}
+		else
+		{
+			PatientEligibilityDataTo1 eligibilityData = result.getData().getEligibilityData();
+			response.put("result", eligibilityData.isEligible() ? "Eligible" : "Not Eligible");
+			response.put("msg", eligibilityData.getMessage());
 		}
 
 		return response;
@@ -212,7 +214,7 @@ public class ClinicaidAPIService
 				provider_uli = "";
 			}
 
-			String urlFormat = sessionManager.getClinicaidDomain() + "/?nonce=" + nonce +
+			String urlFormat = sessionManager.getApiDomain() + "/?nonce=" + nonce +
 					"#/invoice/add?service_recipient_first_name=%s" +
 					"&service_recipient_uli=%s" +
 					"&service_recipient_ver=%s" +
@@ -273,11 +275,11 @@ public class ClinicaidAPIService
 		{
 			if (request.getParameter("patient_remote_id") != null && !request.getParameter("patient_remote_id").isEmpty())
 			{
-				clinicaidLink = sessionManager.getClinicaidDomain() + "/?nonce=" + nonce + "#/reports?patient_remote_id=" + request.getParameter("patient_remote_id");
+				clinicaidLink = sessionManager.getApiDomain() + "/?nonce=" + nonce + "#/reports?patient_remote_id=" + request.getParameter("patient_remote_id");
 			}
 			else
 			{
-				clinicaidLink = sessionManager.getClinicaidDomain() + "/?nonce=" + nonce + "#/reports";
+				clinicaidLink = sessionManager.getApiDomain() + "/?nonce=" + nonce + "#/reports";
 			}
 		}
 		return clinicaidLink;
