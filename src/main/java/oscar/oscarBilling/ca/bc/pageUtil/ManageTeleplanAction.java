@@ -65,7 +65,6 @@ import oscar.oscarBilling.ca.bc.Teleplan.TeleplanService;
 import oscar.oscarBilling.ca.bc.Teleplan.TeleplanUserPassDAO;
 import oscar.oscarBilling.ca.bc.data.BillActivityDAO;
 import oscar.oscarBilling.ca.bc.data.BillingCodeData;
-import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 /**
@@ -484,10 +483,7 @@ public class ManageTeleplanAction extends DispatchAction {
 
                try
 			   {
-				   Map<String, String> clinicaidResponse = clinicaidAPIService.checkEligibility(
-						   demo.getHin(),
-						   ConversionUtils.toDateString(demo.getBirthDate())
-				   );
+				   Map<String, String> clinicaidResponse = clinicaidAPIService.checkEligibility(demo);
 				   request.setAttribute("error", clinicaidResponse.get("error"));
 				   request.setAttribute("Result", clinicaidResponse.get("result"));
 				   request.setAttribute("Msgs", clinicaidResponse.get("msg"));

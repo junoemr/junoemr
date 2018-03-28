@@ -49,6 +49,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 
 @Service
 @Scope(value = WebApplicationContext.SCOPE_SESSION)
@@ -66,6 +67,11 @@ public class ClinicaidSessionManager
 
 	private ClinicaidSessionManager()
 	{
+	}
+
+	protected String getClinicaidDomain()
+	{
+		return clinicaidDomain;
 	}
 
 	protected String getApiDomain()
@@ -166,6 +172,17 @@ public class ClinicaidSessionManager
 		userPassBase64String = userPassBase64String.replaceAll("\n", "").replaceAll("\r", "");
 		String basicAuthString = "Basic " + userPassBase64String;
 		return basicAuthString;
+	}
+
+	protected String buildQueryString(Map<String, String> data)
+	{
+		StringBuilder stringBuilder = new StringBuilder("?");
+
+		for (Map.Entry<String, String> pair : data.entrySet())
+		{
+			stringBuilder.append(String.format("%s=%s&", pair.getKey(), pair.getValue()));
+		}
+		return stringBuilder.toString();
 	}
 
 	protected String urlEncode(String inValue)
