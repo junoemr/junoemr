@@ -214,7 +214,7 @@ public class MeasurementDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindMeasurementsAndProvidersByDemoAndType() {
-		dao.findMeasurementsAndProvidersByDemoAndType(100, "TYPE");
+		dao.findMeasurementsAndProvidersByDemoAndType(100, "TYPE", 1);
 	}
 	
 	@Test

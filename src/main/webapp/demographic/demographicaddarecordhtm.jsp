@@ -154,16 +154,21 @@
    </script>
 
    <script type="text/javascript">
-        function aSubmit(){
-            if(document.getElementById("eform_iframe")!=null)document.getElementById("eform_iframe").contentWindow.document.forms[0].submit();
+	   function aSubmit()
+	   {
+		   var submitButtons = jQuery("#adddemographic").find("input[type='submit']");
+		   submitButtons.attr('disabled', 'disabled');
 
-            if(!checkFormTypeIn()) return false;
+		   if (document.getElementById("eform_iframe") != null) document.getElementById("eform_iframe").contentWindow.document.forms[0].submit();
 
-            if( !ignoreDuplicates() ) return false;
+		   if (!checkFormTypeIn() || !ignoreDuplicates())
+		   {
+			   submitButtons.removeAttr('disabled');
+			   return false;
+		   }
 
-            return true;
-        }
-
+		   return true;
+	   }
    </script>
 
 
@@ -1185,7 +1190,7 @@ function ignoreDuplicates() {
                                           	  vecRef.add(prop);
                                     	  }
                                       }
-                                  %> <select name="r_doctor"
+                                  %> <select name="referral_doctor_name"
 					onChange="changeRefDoc()" style="width: 200px">
 					<option value=""></option>
 					<% for(int k=0; k<vecRef.size(); k++) {
@@ -1198,8 +1203,8 @@ function ignoreDuplicates() {
 				</select> <script language="Javascript">
 <!--
 function changeRefDoc() {
-//alert(document.forms[1].r_doctor.value);
-var refName = document.forms[1].r_doctor.options[document.forms[1].r_doctor.selectedIndex].value;
+//alert(document.forms[1].referral_doctor_name.value);
+var refName = document.forms[1].referral_doctor_name.options[document.forms[1].referral_doctor_name.selectedIndex].value;
 var refNo = "";
   	<% for(int k=0; k<vecRef.size(); k++) {
   		prop= (Properties) vecRef.get(k);
@@ -1208,21 +1213,56 @@ if(refName.indexOf("<%=prop.getProperty("last_name")+","+prop.getProperty("first
   refNo = <%=prop.getProperty("referral_no", "")%>;
 }
 <% } %>
-document.forms[1].r_doctor_ohip.value = refNo;
+document.forms[1].referral_doctor_no.value = refNo;
 }
 //-->
-</script> <% } else {%> <input type="text" name="r_doctor" size="30" maxlength="40"
+</script> <% } else {%> <input type="text" name="referral_doctor_name" size="30" maxlength="40"
 					value=""> <% } %>
 				</td>
 				<td id="referralDocNoLbl" align="right" nowrap height="10"><b><bean:message
 					key="demographic.demographicaddrecordhtm.formReferalDoctorN" />:</b></td>
 				<td id="referralDocNoCell" align="left" height="10"><input type="text"
-					name="r_doctor_ohip" maxlength="6"> <% if(!"BC".equals(instanceType)) { %>
-								<a
-									href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
-								#</a> <% } %>
+					name="referral_doctor_no" maxlength="6">
+					<% if(!"BC".equals(instanceType)) { %>
+						<a
+						href="javascript:referralScriptAttach2('referral_doctor_no','referral_doctor_name')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
+						#</a>
+					<% } %>
 				</td>
 			</tr>
+			<!-- Family Doctor -->
+			<% if (oscarProps.isPropertyActive("demographic_family_doctor"))
+			{ %>
+			<tr>
+				<td align="right" nowrap>
+					<b>
+						<bean:message key="demographic.demographiceditdemographic.familyDoctor"/>:
+					</b>
+				</td>
+				<td align="left">
+					<input type="text" name="family_doctor_name"
+						   size="30"
+						   maxlength="40"
+						   value="">
+				</td>
+				<td align="right" nowrap>
+					<b>
+						<bean:message key="demographic.demographiceditdemographic.familyDoctorNo"/>:
+					</b>
+				</td>
+				<td align="left">
+					<input type="text" name="family_doctor_no"
+						   maxlength="6"
+						   value="">
+					<% if(!"BC".equals(instanceType))
+					{ %>
+					<a
+					href="javascript:referralScriptAttach2('family_doctor_no','family_doctor_name')"><bean:message key="demographic.demographiceditdemographic.btnSearch"/>
+					#</a>
+					<% } %>
+				</td>
+			</tr>
+			<% } %>
 			<tr valign="top">
 				<td align="right" id="rosterStatusLbl" nowrap><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPCNRosterStatus" />: </b></td>
@@ -1603,25 +1643,54 @@ jQuery(document).ready(function(){
 	google.load("jqueryui", "1");
 </script>
 <script type="text/javascript">
-$(document).ready(function(){
-	// AJAX autocomplete referrer doctors
-	$("input[name=r_doctor]").keypress(function(){
-		$("input[name=r_doctor]").autocomplete({
-	    	source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
-	    	select: function( event, ui){
-	    		$("input[name=r_doctor_ohip]").val(ui.item.referral_no);
-	    	}
+	$(document).ready(function()
+	{
+		// AJAX autocomplete referrer doctors
+		$("input[name=referral_doctor_name]").keypress(function()
+		{
+			$("input[name=referral_doctor_name]").autocomplete({
+				source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
+				select: function(event, ui)
+				{
+					$("input[name=referral_doctor_no]").val(ui.item.referral_no);
+				}
+			});
+		});
+		$("input[name=referral_doctor_no]").keypress(function()
+		{
+			$("input[name=referral_doctor_no]").autocomplete({
+				source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+				select: function(event, ui)
+				{
+					$("input[name=referral_doctor_name]").val(ui.item.namedesc);
+				}
+			});
+		});
+
+		// AJAX autocomplete family doctors
+		jQuery("input[name=family_doctor_name]").keypress(function()
+		{
+			jQuery("input[name=family_doctor_name]").autocomplete({
+				source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
+				select: function(event, ui)
+				{
+					console.log('name UI: ', ui);
+					jQuery("input[name=family_doctor_no]").val(ui.item.referral_no);
+				}
+			});
+		});
+		jQuery("input[name=family_doctor_no]").keypress(function()
+		{
+			jQuery("input[name=family_doctor_no]").autocomplete({
+				source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+				select: function(event, ui)
+				{
+					console.log('num UI: ', ui);
+					jQuery("input[name=family_doctor_name]").val(ui.item.namedesc);
+				}
+			});
 		});
 	});
-	$("input[name=r_doctor_ohip]").keypress(function(){
-		$("input[name=r_doctor_ohip]").autocomplete({
-	    	source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
-	    	select: function( event, ui){
-	    		$("input[name=r_doctor]").val(ui.item.namedesc);
-	    	}
-		});
-	});
-});
 </script>
 <!--<iframe src="../eform/efmshowform_data.jsp?fid=<%=fid%>" width="100%" height="100%"></iframe>-->
 <%}%>

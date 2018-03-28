@@ -813,7 +813,7 @@
 								%>
 							</select>
 							</br>
-							<textarea id="reason" name="reason" tabindex="2" rows="2" wrap="virtual"
+							<textarea id="reason" name="reason" tabindex="2" maxlength="80" rows="2" wrap="virtual"
 									  cols="18"><%=bFirstDisp ? appt.getReason() : request.getParameter("reason")%></textarea>
 						</div>
 						<div class="space">&nbsp;</div>

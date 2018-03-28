@@ -186,7 +186,8 @@
 		demographic.setHcRenewDate(null);
 	}
 	         
-	demographic.setFamilyDoctor("<rdohip>" + request.getParameter("r_doctor_ohip") + "</rdohip>" + "<rd>" + request.getParameter("r_doctor") + "</rd>"+ (request.getParameter("family_doc")!=null? ("<family_doc>" + request.getParameter("family_doc") + "</family_doc>") : ""));
+	demographic.setFamilyDoctor("<rdohip>" + request.getParameter("referral_doctor_no") + "</rdohip>" + "<rd>" + request.getParameter("referral_doctor_name") + "</rd>"+ (request.getParameter("family_doc")!=null? ("<family_doc>" + request.getParameter("family_doc") + "</family_doc>") : ""));
+	demographic.setFamilyDoctor2("<fd>" + request.getParameter("family_doctor_no") + "</fd>" + (request.getParameter("family_doctor_name")!=null? ("<fdname>" + request.getParameter("family_doctor_name") + "</fdname>") : ""));
 	demographic.setCountryOfOrigin(request.getParameter("countryOfOrigin"));
 	demographic.setNewsletter(request.getParameter("newsletter"));
 	demographic.setSin(request.getParameter("sin"));

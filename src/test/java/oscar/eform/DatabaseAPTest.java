@@ -27,6 +27,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +49,7 @@ import java.util.Hashtable;
 public class DatabaseAPTest
 {
 	private EForm eform;
+	private String demographic_no = "999";
 
 	@Before
 	public void before()
@@ -57,6 +60,13 @@ public class DatabaseAPTest
 		when(SpringUtils.getBean("EFormDataDao")).thenReturn(eFormDataDao);
 
 		eform = new EForm();
+		eform.setDemographicNo(demographic_no);
+		PowerMockito.mockStatic(EctMeasurementsDataBeanHandler.class);
+
+		// to start, set up so any measurement lookup returns empty result
+		when(EctMeasurementsDataBeanHandler.getLast(anyString(), anyString(), anyInt()))
+				.thenReturn(new Hashtable<String, String>() {}
+				);
 
 		PowerMockito.mockStatic(EFormLoader.class);
 		when(EFormLoader.getMarker()).thenReturn("oscarDB");
@@ -71,11 +81,13 @@ public class DatabaseAPTest
 
 	public void setExpectedLastMeasurement(String type, String value)
 	{
-		eform.setDemographicNo("999");
-		PowerMockito.mockStatic(EctMeasurementsDataBeanHandler.class);
+		setExpectedLastMeasurement(type, value, 1);
+	}
 
-		when(EctMeasurementsDataBeanHandler.getLast("999", type)).
-				thenReturn(new Hashtable<String, Object>()
+	public void setExpectedLastMeasurement(String type, String value, int maxResults)
+	{
+		when(EctMeasurementsDataBeanHandler.getLast(demographic_no, type, maxResults)).
+				thenReturn(new Hashtable<String, String>()
 				{{
 					put("value", value);
 				}});
@@ -106,6 +118,21 @@ public class DatabaseAPTest
 		eform.setDatabaseAPs();
 
 		String expected = "<input name=\"test\" id=\"test\" oscarDB=m$testType#value value=\"testValue\">";
+		String actual = eform.getFormHtml();
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testSetMeasurementAPOffset()
+	{
+		String formHtml = "<input name=\"test\" id=\"test\" oscarDB=m$testType@3#value>";
+		eform.setFormHtml(formHtml);
+
+		setExpectedAP("testType", null);
+		setExpectedLastMeasurement("testType", "test1,test2,test3", 3);
+		eform.setDatabaseAPs();
+
+		String expected = "<input name=\"test\" id=\"test\" oscarDB=m$testType@3#value value=\"test1,test2,test3\">";
 		String actual = eform.getFormHtml();
 		assertEquals(expected, actual);
 	}

@@ -172,7 +172,9 @@ public class LabsDocsSummary implements Summary {
 				url = "../dms/showDocument.jsp?segmentID=" + dispDocNo + "&searchProviderNo=" + loggedInInfo.getLoggedInProviderNo() + "&status=A&inWindow=true&chartView&demoName=";//'); return false;";
 			}
 			else {
-				url = "";// "../dms/ManageDocument.do?method=display&doc_no=" + dispDocNo + "&providerNo=" + loggedInInfo.getLoggedInProviderNo() + (curDoc.getRemoteFacilityId()!=null?"&remoteFacilityId="+curDoc.getRemoteFacilityId();
+				url = "../dms/ManageDocument.do?method=display&doc_no=" + dispDocNo +
+						"&providerNo=" + loggedInInfo.getLoggedInProviderNo() +
+						"&remoteFacilityId=" + ((curDoc.getRemoteFacilityId() != null) ? curDoc.getRemoteFacilityId() : "");
 			}
 			summaryItem.setAction(url);
 			if(summaryItem.getDisplayName().trim().equals("")){

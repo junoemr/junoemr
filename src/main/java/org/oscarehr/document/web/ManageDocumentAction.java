@@ -97,6 +97,7 @@ import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -232,7 +233,8 @@ public class ManageDocumentAction extends DispatchAction {
 	}
 
 	public ActionForward removeLinkFromDocument(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response)
+	{
 		String docType = request.getParameter("docType");
 		String docId = request.getParameter("docId");
 		String providerNo = request.getParameter("providerNo");
@@ -240,17 +242,27 @@ public class ManageDocumentAction extends DispatchAction {
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
         	throw new SecurityException("missing required security object (_edoc)");
         }
-		
 
-		providerInboxRoutingDAO.removeLinkFromDocument(docType, Integer.parseInt(docId), providerNo);
-		HashMap<String, List> hm = new HashMap<String, List>();
-		hm.put("linkedProviders", providerInboxRoutingDAO.getProvidersWithRoutingForDocument(docType, Integer.parseInt(docId)));
+		try
+		{
+			try
+			{
+				providerInboxRoutingDAO.removeLinkFromDocument(docType, Integer.parseInt(docId), providerNo);
+			}
+			catch (SQLException e)
+			{
+				MiscUtils.getLogger().error("Failed to remove link from document.", e);
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to remove link from document.");
+			}
+			HashMap<String, List> hm = new HashMap<String, List>();
+			hm.put("linkedProviders", providerInboxRoutingDAO.getProvidersWithRoutingForDocument(docType, Integer.parseInt(docId)));
 
-		JSONObject jsonObject = JSONObject.fromObject(hm);
-		try {
+			JSONObject jsonObject = JSONObject.fromObject(hm);
 			response.getOutputStream().write(jsonObject.toString().getBytes());
-		} catch (IOException e) {
-			MiscUtils.getLogger().error("Error",e);
+		}
+		catch (IOException e)
+		{
+			MiscUtils.getLogger().error("Error writing response.", e);
 		}
 
 		return null;
@@ -752,7 +764,10 @@ public class ManageDocumentAction extends DispatchAction {
 		
 		String temp = request.getParameter("remoteFacilityId");
 		Integer remoteFacilityId = null;
-		if (temp != null) remoteFacilityId = Integer.parseInt(temp);
+		if(temp != null && !temp.trim().isEmpty())
+		{
+			remoteFacilityId = Integer.parseInt(temp);
+		}
 
 		String doc_no = request.getParameter("doc_no");
 		log.debug("Document No :" + doc_no);

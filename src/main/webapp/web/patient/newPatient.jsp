@@ -99,7 +99,8 @@
 		<button ng-click="newPatientCtrl.cancel()" type="button" class="btn btn-default">
 			<bean:message key="modal.newPatient.cancel" bundle="ui"/>
 		</button>
-		<button ng-show="newPatientCtrl.hasRight" ng-click="newPatientCtrl.save(newDemographic)" type="button" class="btn btn-success">
+		<button ng-show="newPatientCtrl.hasRight" ng-click="newPatientCtrl.save(newDemographic)" ng-disabled="newPatientCtrl.submitDisabled"
+				type="button" class="btn btn-success">
 			<bean:message key="modal.newPatient.submit" bundle="ui"/>
 		</button>
 	</div>
