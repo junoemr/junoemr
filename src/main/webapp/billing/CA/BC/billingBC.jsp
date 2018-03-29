@@ -59,6 +59,7 @@ if(!authed) {
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="oscar.oscarBilling.ca.bc.data.BillingPreference" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -190,81 +191,79 @@ function codeEntered(svcCode)
 	return ((myform.xml_other1.value == svcCode) || (myform.xml_other2.value == svcCode) || (myform.xml_other3.value == svcCode))
 }
 
-function addSvcCode(svcCode)
+function addSvcCode(service, svcCode)
 {
 	var myform = document.forms[0];
-	for (var i = 0; i < myform.service.length; i++)
+
+	if (service.checked)
 	{
-		if (myform.service[i].value == svcCode)
+		if (myform.xml_other1.value == "")
 		{
-			if (myform.service[i].checked)
+			myform.xml_other1.value = svcCode;
+			var trayCode = getAssocCode(svcCode, trayAssocCodes);
+			if (trayCode != '')
 			{
-				if (myform.xml_other1.value == "")
-				{
-					myform.xml_other1.value = svcCode;
-					var trayCode = getAssocCode(svcCode, trayAssocCodes);
-					if (trayCode != '')
-					{
-						myform.xml_other2.value = trayCode;
-					}
-					myform.xml_diagnostic_detail1.value = getAssocCode(svcCode, jsAssocCodes);
-				}
-				else if (myform.xml_other2.value == "")
-				{
-					myform.xml_other2.value = svcCode;
-					var trayCode = getAssocCode(svcCode, trayAssocCodes);
-					if (trayCode != '')
-					{
-						myform.xml_other3.value = trayCode;
-					}
-					myform.xml_diagnostic_detail2.value = getAssocCode(svcCode, jsAssocCodes);
-				}
-				else if (myform.xml_other3.value == "")
-				{
-					myform.xml_other3.value = svcCode;
-					myform.xml_diagnostic_detail3.value = getAssocCode(svcCode, jsAssocCodes);
-				}
-				else
-				{
-					alert("There are already three service codes entered");
-					myform.service[i].checked = false;
-					return false;
-				}
+				myform.xml_other2.value = trayCode;
 			}
-			else
+			myform.xml_diagnostic_detail1.value = getAssocCode(svcCode, jsAssocCodes);
+		}
+		else if (myform.xml_other2.value == "")
+		{
+			myform.xml_other2.value = svcCode;
+			var trayCode = getAssocCode(svcCode, trayAssocCodes);
+			if (trayCode != '')
 			{
-				if (myform.xml_other1.value == svcCode)
-				{
-					myform.xml_other1.value = "";
-					myform.xml_other2.value = "";
-					myform.xml_diagnostic_detail1.value = "";
-				}
-				else if (myform.xml_other2.value == svcCode)
-				{
-					myform.xml_other2.value = "";
-					myform.xml_diagnostic_detail2.value = "";
-				}
-				else if (myform.xml_other3.value == svcCode)
-				{
-					myform.xml_other3.value = "";
-					myform.xml_diagnostic_detail3.value = "";
-				}
+				myform.xml_other3.value = trayCode;
 			}
-			return true;
+			myform.xml_diagnostic_detail2.value = getAssocCode(svcCode, jsAssocCodes);
+		}
+		else if (myform.xml_other3.value == "")
+		{
+			myform.xml_other3.value = svcCode;
+			myform.xml_diagnostic_detail3.value = getAssocCode(svcCode, jsAssocCodes);
+		}
+		else
+		{
+			alert("There are already three service codes entered");
+			service.checked = false;
+			return false;
 		}
 	}
-	return false;
+	else
+	{
+		if (myform.xml_other1.value == svcCode)
+		{
+			myform.xml_other1.value = "";
+			myform.xml_other2.value = "";
+			myform.xml_diagnostic_detail1.value = "";
+		}
+		else if (myform.xml_other2.value == svcCode)
+		{
+			myform.xml_other2.value = "";
+			myform.xml_diagnostic_detail2.value = "";
+		}
+		else if (myform.xml_other3.value == svcCode)
+		{
+			myform.xml_other3.value = "";
+			myform.xml_diagnostic_detail3.value = "";
+		}
+	}
+	return true;
 }
-function getAssocCode(svcCode,assocCodes){
-  var retcode = "";
-  for (var i = 0; i < assocCodes.length; i++) {
-    var row = assocCodes[i];
 
-    if(row[0] == svcCode){
-      return row[1];
-    }
-  }
-  return retcode;
+function getAssocCode(svcCode, assocCodes)
+{
+	var retcode = "";
+	for (var i = 0; i < assocCodes.length; i++)
+	{
+		var row = assocCodes[i];
+
+		if (row[0] == svcCode)
+		{
+			return row[1];
+		}
+	}
+	return retcode;
 }
 
 function checkSelectedCode(service)
@@ -764,7 +763,6 @@ function checkifSet(icd9,feeitem,extrafeeitem){
   <%}  %>
   </table>
 </div>
-<h3>
 <html:errors/>
 <!-- above here -->
 <%
@@ -827,8 +825,9 @@ if(wcbneeds != null){%>
     oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO dao = SpringUtils.getBean(oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO.class);
     oscar.oscarBilling.ca.bc.data.BillingPreference pref = null;
     //checking for a bug where the passed in provider number is actually "none" rather than numeral 0
-    if (oscar.util.StringUtils.isNumeric(thisForm.getXml_provider())) {
-      pref = dao.getUserBillingPreference((String) thisForm.getXml_provider());
+    if(oscar.util.StringUtils.isNumeric(thisForm.getXml_provider()))
+    {
+      pref = dao.getUserBillingPreference(thisForm.getXml_provider());
     }
 
     // -- autofill referral type code --
@@ -843,17 +842,20 @@ if(wcbneeds != null){%>
 	if(refType1.isEmpty()) { refType1 = propReferralPref; }
 	if(refType2.isEmpty()) { refType2 = propReferralPref; }
 
-	// prefrences overrides the properties file settings
-    if (pref != null) {
-      if (pref.getReferral() == 1) {
-    	  refType1 = "T";
-    	  refType2 = "T";
-      }
-      else if (pref.getReferral() == 2) {
-    	  refType1 = "B";
-    	  refType2 = "B";
-      }
-    }
+	  // prefrences overrides the properties file settings
+	  if(pref != null)
+	  {
+		  if(pref.getReferral() == BillingPreference.INT_REFER_TO)
+		  {
+			  refType1 = "T";
+			  refType2 = "T";
+		  }
+		  else if(pref.getReferral() == BillingPreference.INT_REFER_FROM)
+		  {
+			  refType1 = "B";
+			  refType2 = "B";
+		  }
+	  }
     thisForm.setRefertype1(refType1);
     thisForm.setRefertype2(refType2);
 
@@ -884,7 +886,7 @@ if(wcbneeds != null){%>
             </td>
             <td>
                 <u><%=demo.getLastName()%>,<%=demo.getFirstName()%></u>
-                <a href="javascript: void();" onclick="popup(800, 1000, 'billStatus.jsp?lastName=<%=demo.getLastName()%>&firstName=<%=demo.getFirstName()%>&filterPatient=true&demographicNo=<%=demo.getDemographicNo()%>','InvoiceList');return false;">
+                <a href="javascript: return false;" onclick="popup(800, 1000, 'billStatus.jsp?lastName=<%=demo.getLastName()%>&firstName=<%=demo.getFirstName()%>&filterPatient=true&demographicNo=<%=demo.getDemographicNo()%>','InvoiceList');return false;">
 				<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/></a>
             </td>
             <td>
@@ -1146,7 +1148,7 @@ if(wcbneeds != null){%>
                 </tr>
               <%for (int i = 0; i < billlist1.length; i++) {              %>
                 <tr bgcolor>
-                <%String svcCall = "addSvcCode('" + billlist1[i].getServiceCode() + "')";                %>
+                <%String svcCall = "addSvcCode(this, '" + billlist1[i].getServiceCode() + "')";                %>
                   <td width="25%" height="14">
                     <b>                    </b>
                     <font face="Verdana, Arial, Helvetica, sans-serif">
@@ -1252,7 +1254,7 @@ if(wcbneeds != null){%>
                 </tr>
               <%for (int i = 0; i < billlist2.length; i++) {              %>
                 <tr bgcolor>
-                <%String svcCall = "addSvcCode('" + billlist2[i].getServiceCode() + "')";                %>
+                <%String svcCall = "addSvcCode(this, '" + billlist2[i].getServiceCode() + "')";                %>
                   <td width="21%" height="14">  d
                       <html:multibox property="service" value="<%=billlist2[i].getServiceCode()%>" onclick="<%=svcCall%>"/>
                       <%=billlist2[i].getServiceCode()%>
@@ -1341,7 +1343,7 @@ if(wcbneeds != null){%>
                 </tr>
               <%for (int i = 0; i < billlist3.length; i++) {              %>
                 <tr bgcolor>
-                <%String svcCall = "addSvcCode('" + billlist3[i].getServiceCode() + "')";                %>
+                <%String svcCall = "addSvcCode(this, '" + billlist3[i].getServiceCode() + "')";                %>
                   <td width="25%" height="14">
                       <html:multibox property="service" value="<%=billlist3[i].getServiceCode()%>" onclick="<%=svcCall%>"/>
                       <%=billlist3[i].getServiceCode()%>

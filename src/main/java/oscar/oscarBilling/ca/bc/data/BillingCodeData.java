@@ -30,8 +30,10 @@ import java.util.List;
 
 import org.oscarehr.common.dao.BillingServiceDao;
 import org.oscarehr.common.model.BillingService;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
+import org.springframework.stereotype.Service;
 import oscar.Misc;
 import oscar.util.SqlUtils;
 
@@ -39,8 +41,9 @@ import oscar.util.SqlUtils;
  *
  * @author  root
  */
-public final class BillingCodeData implements Comparable      {
-    private static BillingServiceDao billingServiceDao = (BillingServiceDao) SpringUtils.getBean("billingServiceDao");
+public final class BillingCodeData implements Comparable
+{
+  private static BillingServiceDao billingServiceDao = SpringUtils.getBean(BillingServiceDao.class);
   
 
   /*
@@ -94,18 +97,23 @@ public final class BillingCodeData implements Comparable      {
     return retval;
   }
 
-  /**
-   * Removes a private billing code from database
-   * @param codeId String - The service code to be removed
-   * @return boolean
-   */
-  public boolean deleteBillingCode(String codeId) {
-
-     boolean retval = true;
-     BillingService  billingService = billingServiceDao.find(Integer.parseInt(codeId));
-     billingServiceDao.remove(billingService);
-     return retval;
-   }
+	/**
+	 * Removes a private billing code from database
+	 *
+	 * @param codeId String - The service code to be removed
+	 * @return boolean
+	 */
+	public static boolean deleteBillingCode(Integer codeId)
+	{
+		MiscUtils.getLogger().info("Delete billing Code id: " + codeId);
+		BillingService billingService = billingServiceDao.find(codeId);
+		if(billingService != null)
+		{
+			billingServiceDao.remove(billingService);
+			return true;
+		}
+		return false;
+	}
 
   public boolean addBillingCode(String code, String desc, String val) {
     boolean retval = true;

@@ -41,6 +41,10 @@ import org.oscarehr.common.model.AbstractModel;
 @Table(name = "billing_preferences")
 public class BillingPreference extends AbstractModel<Integer> {
 
+	public static final int INT_REFER_TO = 1;
+	public static final int INT_REFER_FROM = 2;
+	public static final int INT_NEITHER = 3;
+
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "id", unique = true, nullable = false)
@@ -51,7 +55,7 @@ public class BillingPreference extends AbstractModel<Integer> {
 	 * May be one of thre values refer to = 1, refer from = 2 or neither = 3
 	 */
 	@Column(name = "referral", nullable = false)
-	private int referral = 1;
+	private int referral = INT_REFER_TO;
 
 	@Column(name = "providerNo", nullable = false)
 	private int providerNo;
