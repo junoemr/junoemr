@@ -22,45 +22,32 @@
     Toronto, Ontario, Canada
 
 --%>
-<%@page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@page import="org.oscarehr.common.dao.ProviderPreferenceDao"%>
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="java.util.List"%>
-
-
+<%@page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.apache.commons.lang.time.DateFormatUtils" %>
 
 
 <script type="text/javascript">
-var remote=null;
-var awnd=null;
-function rs(n,u,w,h,x) {
-    args="width="+w+",height="+h+",resizable=yes,scrollbars=yes,status=0,top=60,left=30";
-    remote=window.open(u,n,args);    
-}
-function dxScriptAttach(name2) {
-	ff = eval("document.forms[0].elements['" +name2+"']");
-	f0 = ff.value;
-	f1 = escape("document.forms[0].elements[\'"+name2+"\'].value");
-	awnd=rs('att','../billing/CA/ON/billingDigSearch.jsp?name='+f0 + '&search=&name2='+f1,600,600,1);
-	awnd.focus();
-}
+	var remote = null;
+	var awnd = null;
+
+	function rs(n, u, w, h, x)
+	{
+		args = "width=" + w + ",height=" + h + ",resizable=yes,scrollbars=yes,status=0,top=60,left=30";
+		remote = window.open(u, n, args);
+	}
+
+	function dxScriptAttach(name2)
+	{
+		ff = eval("document.forms[0].elements['" + name2 + "']");
+		f0 = ff.value;
+		f1 = escape("document.forms[0].elements[\'" + name2 + "\'].value");
+		awnd = rs('att', '../billing/CA/ON/billingDigSearch.jsp?name=' + f0 + '&search=&name2=' + f1, 600, 600, 1);
+		awnd.focus();
+	}
 </script>
 
-<% 
-	/*
-	String start_hour=null;	
-	String end_hour = null;
-	String every_min = null;
-	String mygroup_no=null;
-	String color_template=null;
-	String new_tickler_warning_window=null;
-	String default_servicetype=null;
-	String default_caisi_pmm=null;
-	String default_new_oscar_cme=null;
-	boolean defaultDoNotDeleteBilling=false;
-	*/
+<%
 	String provider_no=null;
 	String defaultDxCode="";
 	

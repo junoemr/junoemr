@@ -78,34 +78,38 @@
 		</table>
 		</td>
 		<td width="26%" bgcolor="#336699" valign="top">
-		<table width="100%" border="0">
-			<tr>
-				<td colspan="2" valign="top" class="black"><bean:message
-					key="billing.manageBillingform_add.msgDeleteType" /></td>
-			</tr>
+			<table width="100%" border="0">
+				<tr>
+					<td colspan="2" valign="top" class="black"><bean:message
+							key="billing.manageBillingform_add.msgDeleteType"/></td>
+				</tr>
+				<%
+					List<Object[]> cbss1 = ctlBillingServiceDao.getUniqueServiceTypes();
 
-			<% 
+					if(cbss1 == null)
+					{
+						out.println("failed!!!");
+					}
+					else
+					{
+						for(Object[] cbs : cbss1)
+						{
+							String serviceType = (String) cbs[0];
+							String serviceTypeName = (String) cbs[1];
+				%>
+				<tr>
+					<td width="23%" valign="top" class="black"><a href=#
+					                                              onClick='onUnbilled("dbManageBillingform_delete.jsp?servicetype=<%=serviceType%>");return false;'
+					                                              title="Delete Billing Form"><%=serviceType%>
+					</a></td>
+					<td width="77%" class="black"><%=serviceTypeName%>
+					</td>
+				</tr>
+				<%
+						}
+					}%>
 
-			List<CtlBillingService> cbss1 = ctlBillingServiceDao.findByServiceTypeId("%");
-int rCount = 0;
-  boolean bodd=false;
-
-  if(cbss1==null) {
-    out.println("failed!!!"); 
-  } else {
-  %>
-			<% 
-    for (CtlBillingService cbs:cbss1) {
-%><tr>
-				<td width="23%" valign="top" class="black"><a href=#
-					onClick='onUnbilled("dbManageBillingform_delete.jsp?servicetype=<%=cbs.getServiceType()%>");return false;'
-					title="Delete Billing Form"><%=cbs.getServiceType()%></a></td>
-				<td width="77%" class="black"><%=cbs.getServiceTypeName()%></td>
-			</tr>
-			<%
-}}%>
-
-		</table>
+			</table>
 		</td>
 	</tr>
 </table>

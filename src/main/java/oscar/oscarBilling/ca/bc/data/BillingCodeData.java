@@ -25,17 +25,15 @@
 
 package oscar.oscarBilling.ca.bc.data;
 
-import java.util.Date;
-import java.util.List;
-
 import org.oscarehr.common.dao.BillingServiceDao;
 import org.oscarehr.common.model.BillingService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
-import org.springframework.stereotype.Service;
 import oscar.Misc;
 import oscar.util.SqlUtils;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  *
