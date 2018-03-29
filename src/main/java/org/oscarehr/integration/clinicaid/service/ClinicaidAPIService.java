@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidResultTo1;
 import org.oscarehr.integration.clinicaid.dto.PatientEligibilityDataTo1;
@@ -41,6 +42,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilMisc;
 import oscar.oscarBilling.data.BillingFormData;
 
@@ -60,26 +62,26 @@ public class ClinicaidAPIService
 
 	// This method assumes the eligibility check is synchronous. This is only the case for BC eligibility checks.
 	// TODO: This needs to be changed when implementing Ontario.
-	public Map<String, String> checkEligibility(String hin, String birthDate) throws IOException
+	public Map<String, String> checkEligibility(Demographic demo) throws IOException
 	{
-		HashMap<String, String> response = new HashMap<>();
+		Map<String, String> data = new HashMap<>();
+		data.put("health_number", demo.getHin());
+		data.put("birth_date", ConversionUtils.toDateString(demo.getBirthDate()));
+		String queryString = sessionManager.buildQueryString(data);
 
-		String queryString = String.format(
-				"/?health_number=%s&birth_date=%s",
-				sessionManager.urlEncode(hin),
-				sessionManager.urlEncode(birthDate)
-		);
-
-		String urlString = sessionManager.getClinicaidDomain() + apiPath + "patient/eligibility/" + queryString;
+		String urlString = sessionManager.getApiDomain() + apiPath + "patient/eligibility/" + queryString;
 		ClinicaidResultTo1 result = sessionManager.get(new URL(urlString));
 
-		PatientEligibilityDataTo1 eligibilityData = result.getData().getEligibilityData();
-		response.put("result", eligibilityData.isEligible() ? "Eligible" : "Not Eligible");
-		response.put("msg", eligibilityData.getMessage());
-
+		HashMap<String, String> response = new HashMap<>();
 		if (result.hasError())
 		{
 			response.put("error", result.getErrors().getErrorString());
+		}
+		else
+		{
+			PatientEligibilityDataTo1 eligibilityData = result.getData().getEligibilityData();
+			response.put("result", eligibilityData.isEligible() ? "Eligible" : "Not Eligible");
+			response.put("msg", eligibilityData.getMessage());
 		}
 
 		return response;
@@ -212,62 +214,36 @@ public class ClinicaidAPIService
 				provider_uli = "";
 			}
 
-			String urlFormat = sessionManager.getClinicaidDomain() + "/?nonce=" + nonce +
-					"#/invoice/add?service_recipient_first_name=%s" +
-					"&service_recipient_uli=%s" +
-					"&service_recipient_ver=%s" +
-					"&service_recipient_last_name=%s" +
-					"&service_recipient_oscar_number=%s" +
-					"&service_recipient_status=%s" +
-					"&service_recipient_age=%s" +
-					"&service_recipient_gender=%s" +
-					"&service_provider_oscar_number=%s" +
-					"&service_provider_first_name=%s" +
-					"&service_provider_last_name=%s" +
-					"&service_provider_uli=%s" +
-					"&service_start_date=%s" +
-					"&province=%s" +
-					"&hc_province=%s" +
-					"&city=%s" +
-					"&postal_code=%s" +
-					"&chart_number=%s" +
-					"&service_recipient_birth_date=%s" +
-					"&appointment_number=%s" +
-					"&appointment_start_time=%s" +
-					"&referral_number=%s" +
-					"&referral_first_name=%s" +
-					"&referral_last_name=%s" +
-					"&diagnostic_code=%s" +
-					"&address=%s";
+			HashMap<String, String> data = new HashMap<>();
+			data.put("service_recipient_uli", demo.getHin());
+			data.put("service_recipient_ver", demo.getVer());
+			data.put("service_recipient_last_name", UtilMisc.toUpperLowerCase(demo.getLastName()));
+			data.put("service_recipient_oscar_number", service_recipient_oscar_number);
+			data.put("service_recipient_status", demo.getPatientStatus());
+			data.put("service_recipient_age", demo.getAge());
+			data.put("service_recipient_gender", demo.getSex());
+			data.put("service_provider_oscar_number", provider_no);
+			data.put("service_provider_first_name", provider_first_name);
+			data.put("service_provider_last_name", provider_last_name);
+			data.put("service_provider_uli", provider_uli);
+			data.put("service_start_date", request.getParameter("appointment_date"));
+			data.put("province", StringUtils.upperCase(demo.getProvince()));
+			data.put("hc_province", StringUtils.upperCase(demo.getHcType()));
+			data.put("city", demo.getCity());
+			data.put("postal_code", demo.getPostal());
+			data.put("chart_number", request.getParameter("chart_no"));
+			data.put("service_recipient_birth_date", demo.getYearOfBirth() + "-" + demo.getMonthOfBirth() + "-" + demo.getDateOfBirth());
+			data.put("appointment_number", request.getParameter("appointment_no"));
+			data.put("appointment_start_time", request.getParameter("start_time"));
+			data.put("referral_number", referral_no);
+			data.put("referral_first_name", referral_first_name);
+			data.put("referral_last_name", referral_last_name);
+			data.put("diagnostic_code", dx_codes);
+			data.put("address", demo.getAddress());
 
-			clinicaidLink = String.format(urlFormat,
-					sessionManager.urlEncode(provider_no),
-					sessionManager.urlEncode(provider_first_name),
-					sessionManager.urlEncode(provider_last_name),
-					sessionManager.urlEncode(provider_uli),
-					sessionManager.urlEncode(dx_codes),
-					sessionManager.urlEncode(request.getParameter("appointment_no")),
-					sessionManager.urlEncode(demo.getYearOfBirth() + "-" + demo.getMonthOfBirth() + "-" + demo.getDateOfBirth()),
-					sessionManager.urlEncode(demo.getSex()),
-					sessionManager.urlEncode(UtilMisc.toUpperLowerCase(demo.getFirstName())),
-					sessionManager.urlEncode(UtilMisc.toUpperLowerCase(demo.getLastName())),
-					sessionManager.urlEncode(StringUtils.upperCase(demo.getProvince())),
-					sessionManager.urlEncode(StringUtils.upperCase(demo.getHcType())),
-					sessionManager.urlEncode(demo.getCity()),
-					sessionManager.urlEncode(demo.getAddress()),
-					sessionManager.urlEncode(demo.getPostal()),
-					sessionManager.urlEncode(service_recipient_oscar_number),
-					sessionManager.urlEncode(demo.getPatientStatus()),
-					sessionManager.urlEncode(demo.getHin()),
-					sessionManager.urlEncode(demo.getVer()),
-					sessionManager.urlEncode(demo.getAge()),
-					sessionManager.urlEncode(referral_no),
-					sessionManager.urlEncode(referral_first_name),
-					sessionManager.urlEncode(referral_last_name),
-					sessionManager.urlEncode(request.getParameter("start_time")),
-					sessionManager.urlEncode(request.getParameter("chart_no")),
-					sessionManager.urlEncode(request.getParameter("appointment_date"))
-			);
+			clinicaidLink = sessionManager.getClinicaidDomain() + "/?nonce=" + nonce +
+					"#/invoice/add" + sessionManager.buildQueryString(data);
+
 		}
 		else if (action.equals("invoice_reports"))
 		{

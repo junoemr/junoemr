@@ -49,6 +49,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 
 @Service
 @Scope(value = WebApplicationContext.SCOPE_SESSION)
@@ -56,9 +57,10 @@ public class ClinicaidSessionManager
 {
 	private static OscarProperties oscarProps = OscarProperties.getInstance();
 	private final String clinicaidDomain = oscarProps.getProperty("clinicaid_domain");
+	private final String apiDomain = oscarProps.getProperty("clinicaid_api_domain", clinicaidDomain);
 	private final String instanceName = oscarProps.getProperty("clinicaid_instance_name");
 	private final String apiKey = oscarProps.getProperty("clinicaid_api_key");
-	private final String loginEndPoint = clinicaidDomain + "/auth/pushed_login/";
+	private final String loginEndPoint = apiDomain + "/auth/pushed_login/";
 
 	private ClinicaidUserTo1 clinicaidUser;
 	private String nonce;
@@ -70,6 +72,11 @@ public class ClinicaidSessionManager
 	protected String getClinicaidDomain()
 	{
 		return clinicaidDomain;
+	}
+
+	protected String getApiDomain()
+	{
+		return apiDomain;
 	}
 
 	public ClinicaidResultTo1 post(URL url, String postData) throws IOException
@@ -154,7 +161,6 @@ public class ClinicaidSessionManager
 			MiscUtils.getLogger().error("###########################");
 			MiscUtils.getLogger().error("Errors: " + result.getErrors().getErrorString());
 			MiscUtils.getLogger().error("###########################");
-			throw new IllegalArgumentException("Error: " + result.getErrors().getErrorString());
 		}
 		return result;
 	}
@@ -166,6 +172,17 @@ public class ClinicaidSessionManager
 		userPassBase64String = userPassBase64String.replaceAll("\n", "").replaceAll("\r", "");
 		String basicAuthString = "Basic " + userPassBase64String;
 		return basicAuthString;
+	}
+
+	protected String buildQueryString(Map<String, String> data)
+	{
+		StringBuilder stringBuilder = new StringBuilder("?");
+
+		for (Map.Entry<String, String> pair : data.entrySet())
+		{
+			stringBuilder.append(String.format("%s=%s&", pair.getKey(), pair.getValue()));
+		}
+		return stringBuilder.toString();
 	}
 
 	protected String urlEncode(String inValue)
