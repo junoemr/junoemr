@@ -973,11 +973,6 @@ if(wLReadonly.equals("")){
 							   target="_blank">
 							<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/>
 							</a>
-						<%
-						if ("BC".equals(instanceType))
-						{
-						    %>
-
 							<br/>
                             <a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
                             <div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
@@ -985,7 +980,6 @@ if(wLReadonly.equals("")){
                                 <span id="eligibilityMsg"></span>
                             </div>
 					<%
-						}
 					}
 					else if("ON".equals(billRegion)) 
 					{

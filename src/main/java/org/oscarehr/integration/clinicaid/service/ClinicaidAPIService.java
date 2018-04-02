@@ -42,6 +42,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilMisc;
 import oscar.oscarBilling.data.BillingFormData;
@@ -54,19 +55,29 @@ public class ClinicaidAPIService
 
 	private ClinicaidSessionManager sessionManager;
 
+	private OscarProperties oscarProperties = OscarProperties.getInstance();
+	private String instanceType = oscarProperties.getInstanceType();
+
 	@Autowired
 	public ClinicaidAPIService(ClinicaidSessionManager sessionManager)
 	{
 		this.sessionManager = sessionManager;
 	}
 
-	// This method assumes the eligibility check is synchronous. This is only the case for BC eligibility checks.
-	// TODO: This needs to be changed when implementing Ontario.
 	public Map<String, String> checkEligibility(Demographic demo) throws IOException
 	{
 		Map<String, String> data = new HashMap<>();
 		data.put("health_number", demo.getHin());
-		data.put("birth_date", ConversionUtils.toDateString(demo.getBirthDate()));
+
+		if ("ON".equals(instanceType))
+		{
+			data.put("ontario_version_code", demo.getVer());
+		}
+		else
+		{
+			data.put("birth_date", ConversionUtils.toDateString(demo.getBirthDate()));
+		}
+
 		String queryString = sessionManager.buildQueryString(data);
 
 		String urlString = sessionManager.getApiDomain() + apiPath + "patient/eligibility/" + queryString;
