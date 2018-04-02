@@ -841,7 +841,7 @@ function importFromEnct(reqInfo,txtArea)
 						oscar.oscarDemographic.data.EctInformation EctInfo = new oscar.oscarDemographic.data.EctInformation(LoggedInInfo.getLoggedInInfoFromSession(request), demo);
 						value = EctInfo.getMedicalHistory();
 					}
-					if (pasteFmt == null || pasteFmt.equalsIgnoreCase("single"))
+					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
 						value = StringUtils.lineBreaks(value);
 					}
@@ -861,7 +861,7 @@ function importFromEnct(reqInfo,txtArea)
 					oscar.oscarDemographic.data.EctInformation EctInfo = new oscar.oscarDemographic.data.EctInformation(LoggedInInfo.getLoggedInInfoFromSession(request), demo);
 					value = EctInfo.getSocialHistory();
 				}
-				if (pasteFmt == null || pasteFmt.equalsIgnoreCase("single"))
+				if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 				{
 					value = StringUtils.lineBreaks(value);
 				}
@@ -881,7 +881,7 @@ function importFromEnct(reqInfo,txtArea)
 						oscar.oscarDemographic.data.EctInformation EctInfo = new oscar.oscarDemographic.data.EctInformation(LoggedInInfo.getLoggedInInfoFromSession(request),demo);
 						value = EctInfo.getOngoingConcerns();
 					}
-					if (pasteFmt == null || pasteFmt.equalsIgnoreCase("single"))
+					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
 						value = StringUtils.lineBreaks(value);
 					}
@@ -909,7 +909,7 @@ function importFromEnct(reqInfo,txtArea)
 							value = EctInfo.getFamilyHistory();
 						}
 					}
-					if (pasteFmt == null || pasteFmt.equalsIgnoreCase("single"))
+					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
 						value = StringUtils.lineBreaks(value);
 					}
@@ -937,7 +937,7 @@ function importFromEnct(reqInfo,txtArea)
 							value = EctInfo.getFamilyHistory();
 						}
 					}
-					if (pasteFmt == null || pasteFmt.equalsIgnoreCase("single"))
+					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
 						value = StringUtils.lineBreaks(value);
 					}
@@ -959,7 +959,7 @@ function importFromEnct(reqInfo,txtArea)
 						value = EctInfo.getReminders();
 					}
 					//if( !value.equals("") ) {
-					if (pasteFmt == null || pasteFmt.equalsIgnoreCase("single"))
+					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
 						value = StringUtils.lineBreaks(value);
 					}
@@ -2346,6 +2346,9 @@ Calendar.setup( { inputField : "appointmentDate", ifFormat : "%Y/%m/%d", showsTi
 
 		// need to apply issue filter
 		List<CaseManagementNote> notes = cmgmtMgr.getNotes(demoNo, issueIds);
+
+		// Order by position set in echart
+		Collections.sort(notes, CaseManagementNote.getPositionComparator());
 		StringBuffer noteStr = new StringBuffer();
 		for (CaseManagementNote n : notes)
 		{
