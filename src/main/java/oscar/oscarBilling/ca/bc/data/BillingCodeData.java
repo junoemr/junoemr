@@ -104,13 +104,7 @@ public final class BillingCodeData implements Comparable
 	public static boolean deleteBillingCode(Integer codeId)
 	{
 		MiscUtils.getLogger().info("Delete billing Code id: " + codeId);
-		BillingService billingService = billingServiceDao.find(codeId);
-		if(billingService != null)
-		{
-			billingServiceDao.remove(billingService);
-			return true;
-		}
-		return false;
+		return billingServiceDao.remove(codeId);
 	}
 
   public boolean addBillingCode(String code, String desc, String val) {
