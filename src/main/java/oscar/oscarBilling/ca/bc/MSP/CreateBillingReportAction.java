@@ -52,15 +52,17 @@ public class CreateBillingReportAction extends OscarAction {
      * Performs Report Generation Logic based on the supplied parameters form the submitted form
      */
     public ActionForward execute(ActionMapping actionMapping, ActionForm actionForm, HttpServletRequest request, HttpServletResponse response) {
-        request.getSession().getServletContext().getServletContextName();
-        if (!System.getProperties().containsKey("jasper.reports.compile.class.path")) {
-            String classpath = (String)getServlet().getServletContext().getAttribute("org.apache.catalina.jsp_classpath");
-            if (classpath==null) classpath = (String)request.getSession().getServletContext().getAttribute("com.ibm.websphere.servlet.application.classpath");
-            System.setProperty("jasper.reports.compile.class.path", classpath);
-        }
-        if (!System.getProperties().containsKey("java.awt.headless")) {
-            System.setProperty("java.awt.headless", "true");
-        }
+	    request.getSession().getServletContext().getServletContextName();
+	    if(!System.getProperties().containsKey("jasper.reports.compile.class.path"))
+	    {
+		    String classpath = (String) getServlet().getServletContext().getAttribute("org.apache.catalina.jsp_classpath");
+		    if(classpath == null) classpath = (String) request.getSession().getServletContext().getAttribute("com.ibm.websphere.servlet.application.classpath");
+		    System.setProperty("jasper.reports.compile.class.path", classpath);
+	    }
+	    if(!System.getProperties().containsKey("java.awt.headless"))
+	    {
+		    System.setProperty("java.awt.headless", "true");
+	    }
 
         CreateBillingReportActionForm frm = (CreateBillingReportActionForm)actionForm;
 
