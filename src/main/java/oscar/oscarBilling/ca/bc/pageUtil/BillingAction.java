@@ -44,6 +44,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.billing.Clinicaid.util.ClinicaidCommunication;
 
+import oscar.OscarProperties;
 import oscar.oscarBilling.ca.bc.MSP.ServiceCodeValidationLogic;
 import oscar.oscarBilling.ca.bc.decisionSupport.BillingGuidelines;
 import oscar.util.SqlUtils;
@@ -159,19 +160,33 @@ public final class BillingAction extends Action {
     return (mapping.findForward(region));
   }
 
-  private void fillBean(HttpServletRequest request, BillingSessionBean bean) {
-    bean.setApptProviderNo(request.getParameter("apptProvider_no"));
-    bean.setPatientName(request.getParameter("demographic_name"));
-    bean.setProviderView(request.getParameter("providerview"));
-    bean.setBillRegion(request.getParameter("billRegion"));
-    bean.setBillForm(request.getParameter("billForm"));
-    bean.setCreator(request.getParameter("user_no"));
-    bean.setPatientNo(request.getParameter("demographic_no"));
-    bean.setApptNo(request.getParameter("appointment_no"));
-    bean.setApptDate(request.getParameter("appointment_date"));
-    bean.setApptStart(request.getParameter("start_time"));
-    bean.setApptStatus(request.getParameter("status"));
-  }
+	private void fillBean(HttpServletRequest request, BillingSessionBean bean)
+	{
+		bean.setApptProviderNo(request.getParameter("apptProvider_no"));
+		bean.setPatientName(request.getParameter("demographic_name"));
+		bean.setProviderView(request.getParameter("providerview"));
+		bean.setBillRegion(request.getParameter("billRegion"));
+		bean.setBillForm(request.getParameter("billForm"));
+		bean.setCreator(request.getParameter("user_no"));
+		bean.setPatientNo(request.getParameter("demographic_no"));
+		bean.setApptNo(request.getParameter("appointment_no"));
+		bean.setApptDate(request.getParameter("appointment_date"));
+		bean.setApptStart(request.getParameter("start_time"));
+		bean.setApptStatus(request.getParameter("status"));
+
+		if(OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc"))
+		{
+			bean.setReferral1(request.getParameter("referral_no_1"));
+		}
+
+		bean.setDx1(request.getParameter("diag_code_1"));
+		bean.setDx2(request.getParameter("diag_code_2"));
+		bean.setDx3(request.getParameter("diag_code_3"));
+
+		bean.setOtherCode1(request.getParameter("other_code_1"));
+		bean.setOtherCode2(request.getParameter("other_code_2"));
+		bean.setOtherCode3(request.getParameter("other_code_3"));
+	}
 
   /**
    * Determines if the specified demographic number fits the following criteria and generates

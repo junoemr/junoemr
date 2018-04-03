@@ -781,100 +781,109 @@ if(wcbneeds != null){%>
   <input type="hidden" name="fromBilling" value=""/>
 
 <%
-  BillingCreateBillingForm thisForm;
-  thisForm = (BillingCreateBillingForm) request.getSession().getAttribute("BillingCreateBillingForm");
-  if (thisForm != null) {
-    sxml_provider = ((String) thisForm.getXml_provider());
-    sxml_location = ((String) thisForm.getXml_location());
-    sxml_visittype = ((String) thisForm.getXml_visittype());
-    if (sxml_location.compareTo("") == 0) {
-      sxml_location = OscarProperties.getInstance().getProperty("visitlocation");
-      sxml_visittype = OscarProperties.getInstance().getProperty("visittype");
-      sxml_provider = bean.getApptProviderNo();
-      thisForm.setXml_location(sxml_location);
-      thisForm.setXml_provider(sxml_provider);
-      thisForm.setXml_visittype(sxml_visittype);
-      if ( OscarProperties.getInstance().getProperty("BC_DEFAULT_ALT_BILLING") != null && OscarProperties.getInstance().getProperty("BC_DEFAULT_ALT_BILLING").equalsIgnoreCase("YES")){
-         thisForm.setXml_encounter("8");
-      }
-    }
-    if (sxml_provider.trim().equals("")) {
-    	// OHSUPORT-2718 - set the default billing physician. Overrides appointment physician
-    	sxml_provider = oscarProperties.getProperty("auto_populate_billing_bc_billingPhysicianID", bean.getApptProviderNo());
+	BillingCreateBillingForm thisForm;
+	thisForm = (BillingCreateBillingForm) request.getSession().getAttribute("BillingCreateBillingForm");
+	if(thisForm != null)
+	{
+		sxml_provider = ((String) thisForm.getXml_provider());
+		sxml_location = ((String) thisForm.getXml_location());
+		sxml_visittype = ((String) thisForm.getXml_visittype());
+		if(sxml_location.compareTo("") == 0)
+		{
+			sxml_location = OscarProperties.getInstance().getProperty("visitlocation");
+			sxml_visittype = OscarProperties.getInstance().getProperty("visittype");
+			sxml_provider = bean.getBillingProvider();
+			thisForm.setXml_location(sxml_location);
+			thisForm.setXml_provider(sxml_provider);
+			thisForm.setXml_visittype(sxml_visittype);
+			if("YES".equalsIgnoreCase(OscarProperties.getInstance().getProperty("BC_DEFAULT_ALT_BILLING")))
+			{
+				thisForm.setXml_encounter("8");
+			}
+		}
+		if(sxml_provider == null || sxml_provider.trim().equals("") || sxml_provider.trim().equals("none"))
+		{
+			// OHSUPORT-2718 - set the default billing physician. Overrides appointment physician
+			sxml_provider = oscarProperties.getProperty("auto_populate_billing_bc_billingPhysicianID", bean.getApptProviderNo());
 
-    	// OHSUPORT-2883 - autofill based on assigned provider. only if not already autofilled
-        if (oscarProperties.isPropertyActive("auto_populate_billing_bc_billingPhysician") && sxml_provider.trim().equals("none")) {
-        	sxml_provider = demo.getProviderNo();
-        }
-    	thisForm.setXml_provider(sxml_provider);
-    }
-    String apDate = thisForm.getXml_appointment_date();
-    if (apDate != null && apDate.trim().length() == 0) {
-      thisForm.setXml_appointment_date(bean.getApptDate());
-    }
-    if (bean != null && bean.getBillType() != null) {
-      thisForm.setXml_billtype(bean.getBillType());
-    }
-    else if (request.getParameter("billType") != null) {
-      thisForm.setXml_billtype(request.getParameter("billType"));
-    }
-    if (demo != null && demo.getVer() != null && demo.getVer().equals("66")) {
-      thisForm.setDependent("66");
-    }
-    thisForm.setCorrespondenceCode(bean.getCorrespondenceCode());
-    oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO dao = SpringUtils.getBean(oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO.class);
-    oscar.oscarBilling.ca.bc.data.BillingPreference pref = null;
-    //checking for a bug where the passed in provider number is actually "none" rather than numeral 0
-    if(oscar.util.StringUtils.isNumeric(thisForm.getXml_provider()))
-    {
-      pref = dao.getUserBillingPreference(thisForm.getXml_provider());
-    }
+			// OHSUPORT-2883 - autofill based on assigned provider. only if not already autofilled
+			if(oscarProperties.isPropertyActive("auto_populate_billing_bc_billingPhysician") && sxml_provider.trim().equals("none"))
+			{
+				sxml_provider = demo.getProviderNo();
+			}
+			thisForm.setXml_provider(sxml_provider);
+		}
+		String apDate = thisForm.getXml_appointment_date();
+		if(apDate != null && apDate.trim().length() == 0)
+		{
+			thisForm.setXml_appointment_date(bean.getApptDate());
+		}
+		if(bean != null && bean.getBillType() != null)
+		{
+			thisForm.setXml_billtype(bean.getBillType());
+		}
+		else if(request.getParameter("billType") != null)
+		{
+			thisForm.setXml_billtype(request.getParameter("billType"));
+		}
+		if(demo != null && demo.getVer() != null && demo.getVer().equals("66"))
+		{
+			thisForm.setDependent("66");
+		}
+		thisForm.setCorrespondenceCode(bean.getCorrespondenceCode());
+		oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO dao = SpringUtils.getBean(oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO.class);
+		oscar.oscarBilling.ca.bc.data.BillingPreference pref = null;
+		//checking for a bug where the passed in provider number is actually "none" rather than numeral 0
+		if(oscar.util.StringUtils.isNumeric(thisForm.getXml_provider()))
+		{
+			pref = dao.getUserBillingPreference(thisForm.getXml_provider());
+		}
 
-    // -- autofill referral type code --
-    String refType1 = "";
-    String refType2 = "";
-    // url parameters override properties file, but not user pref
-    if ( request.getParameter("referral_type_1") != null) { refType1 = request.getParameter("referral_type_1").toUpperCase(); }
-    if ( request.getParameter("referral_type_2") != null) { refType2 = request.getParameter("referral_type_2").toUpperCase(); }
+		// -- autofill referral type code --
+		String refType1 = "";
+		String refType2 = "";
+	    // url parameters override properties file, but not user pref
+	    if ( request.getParameter("referral_type_1") != null) { refType1 = request.getParameter("referral_type_1").toUpperCase(); }
+	    if ( request.getParameter("referral_type_2") != null) { refType2 = request.getParameter("referral_type_2").toUpperCase(); }
 
-	// OHSUPORT-2718 - default the referral type fields to B=refer By or T=refer To. ''="Select Type"
-    String propReferralPref = oscarProperties.getProperty("auto_populate_billingreferral_type_bc", "").toUpperCase();
-	if(refType1.isEmpty()) { refType1 = propReferralPref; }
-	if(refType2.isEmpty()) { refType2 = propReferralPref; }
+		// OHSUPORT-2718 - default the referral type fields to B=refer By or T=refer To. ''="Select Type"
+	    String propReferralPref = oscarProperties.getProperty("auto_populate_billingreferral_type_bc", "").toUpperCase();
+		if(refType1.isEmpty()) { refType1 = propReferralPref; }
+		if(refType2.isEmpty()) { refType2 = propReferralPref; }
 
-	  // prefrences overrides the properties file settings
-	  if(pref != null)
-	  {
-		  if(pref.getReferral() == BillingPreference.INT_REFER_TO)
-		  {
-			  refType1 = "T";
-			  refType2 = "T";
-		  }
-		  else if(pref.getReferral() == BillingPreference.INT_REFER_FROM)
-		  {
-			  refType1 = "B";
-			  refType2 = "B";
-		  }
-	  }
-    thisForm.setRefertype1(refType1);
-    thisForm.setRefertype2(refType2);
+		// preferences overrides the properties file settings
+		if(pref != null)
+		{
+			if(pref.getReferral() == BillingPreference.INT_REFER_TO)
+			{
+				refType1 = "T";
+				refType2 = "T";
+			}
+			else if(pref.getReferral() == BillingPreference.INT_REFER_FROM)
+			{
+				refType1 = "B";
+				refType2 = "B";
+			}
+		}
+		thisForm.setRefertype1(refType1);
+		thisForm.setRefertype2(refType2);
 
-	// -- autofill referral physician --
-    if(oscarProperties.isPropertyActive("auto_populate_billingreferral_bc")){
-      thisForm.setXml_refer1(bean.getReferral1());
-    }
+		// -- autofill referral physician --
+		if(oscarProperties.isPropertyActive("auto_populate_billingreferral_bc"))
+		{
+			thisForm.setXml_refer1(bean.getReferral1());
+		}
 
-    // OHSUPORT-2883 - autofill diagnostic codes with specific values (from url)
-    if ( request.getParameter("diag_code_1") != null ) { thisForm.setXml_diagnostic_detail1(request.getParameter("diag_code_1")); }
-    if ( request.getParameter("diag_code_2") != null ) { thisForm.setXml_diagnostic_detail2(request.getParameter("diag_code_2")); }
-    if ( request.getParameter("diag_code_3") != null ) { thisForm.setXml_diagnostic_detail3(request.getParameter("diag_code_3")); }
+	    // OHSUPORT-2883 - autofill diagnostic codes with specific values (from url)
+	    if ( request.getParameter("diag_code_1") != null ) { thisForm.setXml_diagnostic_detail1(request.getParameter("diag_code_1")); }
+	    if ( request.getParameter("diag_code_2") != null ) { thisForm.setXml_diagnostic_detail2(request.getParameter("diag_code_2")); }
+	    if ( request.getParameter("diag_code_3") != null ) { thisForm.setXml_diagnostic_detail3(request.getParameter("diag_code_3")); }
 
-	// OHSUPORT-2883 - autofill other codes with specific values (from url)
-	if ( request.getParameter("other_code_1") != null ) { thisForm.setXml_other1(request.getParameter("other_code_1")); }
-	if ( request.getParameter("other_code_2") != null ) { thisForm.setXml_other2(request.getParameter("other_code_2")); }
-	if ( request.getParameter("other_code_3") != null ) { thisForm.setXml_other3(request.getParameter("other_code_3")); }
-
-  }
+		// OHSUPORT-2883 - autofill other codes with specific values (from url)
+		if ( request.getParameter("other_code_1") != null ) { thisForm.setXml_other1(request.getParameter("other_code_1")); }
+		if ( request.getParameter("other_code_2") != null ) { thisForm.setXml_other2(request.getParameter("other_code_2")); }
+		if ( request.getParameter("other_code_3") != null ) { thisForm.setXml_other3(request.getParameter("other_code_3")); }
+	}
 %>
   <table width="100%" border="0" cellspacing="0" cellpadding="0">
     <tr>

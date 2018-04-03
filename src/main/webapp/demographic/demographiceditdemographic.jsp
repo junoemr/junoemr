@@ -128,6 +128,7 @@ if(!authed) {
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
 	List<Provider> doctors = providerDao.getActiveProvidersByType("doctor");
 	List<Provider> nurses = providerDao.getActiveProvidersByRole("nurse");
 	List<Provider> midwifes = providerDao.getActiveProvidersByRole("midwife");
@@ -253,6 +254,8 @@ if(!authed) {
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.Vector" %>
+<%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
+<%@ page import="org.oscarehr.common.model.ProviderPreference" %>
 <html:html locale="true">
 
 <head>
@@ -1013,8 +1016,25 @@ if(wLReadonly.equals("")){
 				</td>
 			</tr>
 			<tr>
+				<%
+					String referral_no_parameter = "";
+					String defaultBillingView = oscarVariables.getProperty("default_view");
+					if (oscarProps.isPropertyActive("auto_populate_billingreferral_bc"))
+					{
+						referral_no_parameter = "&referral_no_1=" + referralDoctorNo;
+					}
+					ProviderPreference preference = providerPreferenceDao.find(demographic.getProviderNo());
+					if(preference != null)
+					{
+						String preferredView = preference.getDefaultServiceType();
+						if(preferredView != null && !preferredView.equals("no"))
+						{
+							defaultBillingView = preferredView;
+						}
+					}
+				%>
 				<td><a
-					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t')"
+					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t<%=referral_no_parameter%>"
 					target="_blank"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>
