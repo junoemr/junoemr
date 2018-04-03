@@ -602,6 +602,7 @@
 						       typeahead-on-select="detailsCtrl.chooseReferralDoc($item, $model, $label);"
 						       ng-model="detailsCtrl.page.demo.scrReferralDoc"
 						       typeahead-min-length="3"
+							   ng-change="detailsCtrl.checkReferralDocNo()"
 						/>
 					</div>
 
@@ -615,6 +616,37 @@
 						       typeahead-on-select="detailsCtrl.chooseReferralDoc($item, $model, $label);"
 						       ng-model="detailsCtrl.page.demo.scrReferralDocNo"
 						       typeahead-min-length="3"
+							   ng-change="detailsCtrl.checkReferralDocNo()"
+						/>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.familyDoctor"/></label>
+					<div class="col-md-4">
+						<input type="text" class="form-control form-control-details"
+							   placeholder="<bean:message key="demographic.demographiceditdemographic.familyDoctor"/>"
+							   title="<bean:message key="demographic.demographiceditdemographic.familyDoctor"/>"
+
+							   uib-typeahead="i.label for i in detailsCtrl.searchReferralDocsName($viewValue)"
+							   typeahead-on-select="detailsCtrl.chooseFamilyDoc($item, $model, $label);"
+							   ng-model="detailsCtrl.page.demo.scrFamilyDoc"
+							   typeahead-min-length="3"
+							   ng-change="detailsCtrl.checkFamilyDocNo()"
+						/>
+					</div>
+
+					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.familyDoctorNo"/></label>
+					<div class="col-md-4">
+						<input type="text" class="form-control form-control-details"
+							   placeholder="<bean:message key="demographic.demographiceditdemographic.familyDoctorNo"/>"
+							   title="<bean:message key="demographic.demographiceditdemographic.familyDoctorNo"/>"
+
+							   uib-typeahead="i.label as i.label for i in detailsCtrl.searchReferralDocsRefNo($viewValue);"
+							   typeahead-on-select="detailsCtrl.chooseFamilyDoc($item, $model, $label);"
+							   ng-model="detailsCtrl.page.demo.scrFamilyDocNo"
+							   typeahead-min-length="3"
+							   ng-change="detailsCtrl.checkFamilyDocNo()"
 						/>
 					</div>
 				</div>

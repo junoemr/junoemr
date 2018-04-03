@@ -61,6 +61,7 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		d.setSexDesc(t.getSexDesc());
 		d.setDateJoined(t.getDateJoined());
 		d.setFamilyDoctor(t.getFamilyDoctor());
+		d.setFamilyDoctor2(t.getFamilyDoctor2());
 		d.setCity(t.getAddress().getCity());
 		d.setFirstName(t.getFirstName());
 		d.setPostal(t.getAddress().getPostal());
@@ -136,6 +137,7 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		t.setSexDesc(d.getSexDesc());
 		t.setDateJoined(d.getDateJoined());
 		t.setFamilyDoctor(d.getFamilyDoctor());
+		t.setFamilyDoctor2(d.getFamilyDoctor2());
 		t.getAddress().setCity(d.getCity());
 		t.setFirstName(d.getFirstName());
 		t.getAddress().setPostal(d.getPostal());

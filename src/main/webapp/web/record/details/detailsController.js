@@ -72,6 +72,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		var chartNo0;
 		var cytolNum0;
 		var referralDocNo0;
+		var familyDocNo0;
 		var sin0;
 		var effDate0;
 		var hcRenewDate0;
@@ -133,14 +134,17 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					//show referral doctor
 					if (controller.page.demo.familyDoctor != null)
 					{
-						var referralDoc = controller.page.demo.familyDoctor;
-						var begin = referralDoc.indexOf("<rdohip>") + "<rdohip>".length;
-						var end = referralDoc.indexOf("</rdohip>");
-						if (end > begin && end >= 0 && begin >= 0) controller.page.demo.scrReferralDocNo = referralDoc.substring(begin, end);
+						var referralDoc = controller.formatDocOutput(controller.page.demo.familyDoctor);
+						controller.page.demo.scrReferralDocNo = referralDoc.number;
+						controller.page.demo.scrReferralDoc = referralDoc.name;
+					}
 
-						begin = referralDoc.indexOf("<rd>") + "<rd>".length;
-						end = referralDoc.indexOf("</rd>");
-						if (end > begin && end >= 0 && begin >= 0) controller.page.demo.scrReferralDoc = referralDoc.substring(begin, end);
+					//show family doctor
+					if (controller.page.demo.familyDoctor2 != null)
+					{
+						var familyDoc = controller.formatDocOutput(controller.page.demo.familyDoctor2);
+						controller.page.demo.scrFamilyDocNo = familyDoc.number;
+						controller.page.demo.scrFamilyDoc = familyDoc.name;
 					}
 
 					if (controller.page.demo.extras != null)
@@ -842,30 +846,37 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			if (!isNumber(controller.page.demo.scrCytolNum)) controller.page.demo.scrCytolNum = cytolNum0;
 			else cytolNum0 = controller.page.demo.scrCytolNum;
-		}
+		};
 
 		//check Referral Doctor No
 		controller.checkReferralDocNo = function checkReferralDocNo()
 		{
-			if (controller.page.demo.scrReferralDocNo == null || controller.page.demo.scrReferralDocNo == "")
-			{
+			var isValid = controller.validateDocNo(controller.page.demo.scrReferralDocNo, true);
+			if (isValid)
 				referralDocNo0 = controller.page.demo.scrReferralDocNo;
-				return;
-			}
-			if (!isNumber(controller.page.demo.scrReferralDocNo) || controller.page.demo.scrReferralDocNo.length > 6) controller.page.demo.scrReferralDocNo = referralDocNo0;
-			else referralDocNo0 = controller.page.demo.scrReferralDocNo;
+			else
+				controller.page.demo.scrReferralDocNo = referralDocNo0;
 		};
 
-		controller.validateReferralDocNo = function validateReferralDocNo()
+		//check Family Doctor No
+		controller.checkFamilyDocNo = function checkFamilyDocNo()
 		{
-			if (controller.page.demo.scrReferralDocNo == null || controller.page.demo.scrReferralDocNo == "") return true;
+			var isValid = controller.validateDocNo(controller.page.demo.scrFamilyDocNo, true);
+			if (isValid)
+				familyDocNo0 = controller.page.demo.scrFamilyDocNo;
+			else
+				controller.page.demo.scrFamilyDocNo = familyDocNo0;
+		};
 
-			if (!isNumber(controller.page.demo.scrReferralDocNo || controller.page.demo.scrReferralDocNo != 6))
-			{
-				alert("Invalid Referral Doctor Number");
-				return false;
-			}
-			return true;
+		controller.validateDocNo = function validateDocNo(docNo, quiet)
+		{
+			if (docNo == null || docNo === "" || (isNumber(docNo) && docNo.length < 10))
+				return true;
+
+			if (!quiet)
+				alert("Invalid Doctor Number");
+
+			return false;
 		};
 
 		//check SIN
@@ -978,11 +989,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		controller.searchReferralDocsName = function searchReferralDocsName(searchName)
 		{
-			return controller.searchReferralDocs(searchName, controller.page.demo.scrReferralDocNo);
+			return controller.searchReferralDocs(searchName, null);
 		};
 		controller.searchReferralDocsRefNo = function searchReferralDocsRefNo(searchRefNo)
 		{
-			return controller.searchReferralDocs(controller.page.demo.scrReferralDoc, searchRefNo);
+			return controller.searchReferralDocs(null, searchRefNo);
 		};
 		controller.searchReferralDocs = function searchReferralDocs(searchName, searchRefNo)
 		{
@@ -1015,6 +1026,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.demo.scrReferralDocNo = item.referralNo;
 			controller.page.demo.scrReferralDoc = item.name;
 			controller.checkReferralDocNo();
+		};
+		controller.chooseFamilyDoc = function chooseFamilyDoc(item, model, label)
+		{
+			controller.page.demo.scrFamilyDocNo = item.referralNo;
+			controller.page.demo.scrFamilyDoc = item.name;
+			controller.checkFamilyDocNo();
 		};
 		controller.showAddNewRosterStatus = function showAddNewRosterStatus()
 		{
@@ -1272,6 +1289,35 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			window.open(url, "DemographicExport", "width=960, height=700");
 		}
 
+		controller.formatDocOutput = function formatDocOutput(value)
+		{
+			var number, name;
+			var begin = value.indexOf("<rdohip>") + "<rdohip>".length;
+			var end = value.indexOf("</rdohip>");
+			if (end > begin && end >= 0 && begin >= 0) number = value.substring(begin, end);
+
+			begin = value.indexOf("<rd>") + "<rd>".length;
+			end = value.indexOf("</rd>");
+			if (end > begin && end >= 0 && begin >= 0) name = value.substring(begin, end);
+
+			return {"number": number, "name": name};
+		};
+
+		controller.formatDocInput = function formatDocInput(name, number)
+		{
+			var docNo = "<rdohip></rdohip>";
+			var doc = "<rd></rd>";
+			if (number != null && number !== "")
+			{
+				docNo = "<rdohip>" + number + "</rdohip>";
+			}
+			if (name != null && name !== "")
+			{
+				doc = "<rd>" + name + "</rd>";
+			}
+			return docNo + doc;
+		};
+
 		//HCValidation on open & save
 		controller.validateHCSave = function validateHCSave(doSave)
 		{
@@ -1361,7 +1407,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			if (!controller.checkPatientStatus()) return;
 			if (!controller.isPostalComplete()) return;
 			if (!controller.validateSin()) return;
-			if (!controller.validateReferralDocNo()) return;
+			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
+			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
 
 			//save notes
 			if (controller.page.demo.scrNotes != null)
@@ -1370,17 +1417,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 
 			//save referral doctor (familyDoctor)
-			var referralDocNo = "<rdohip></rdohip>";
-			var referralDoc = "<rd></rd>";
-			if (controller.page.demo.scrReferralDocNo != null && controller.page.demo.scrReferralDocNo != "")
-			{
-				referralDocNo = "<rdohip>" + controller.page.demo.scrReferralDocNo + "</rdohip>";
-			}
-			if (controller.page.demo.scrReferralDoc != null && controller.page.demo.scrReferralDoc != "")
-			{
-				referralDoc = "<rd>" + controller.page.demo.scrReferralDoc + "</rd>";
-			}
-			controller.page.demo.familyDoctor = referralDocNo + referralDoc;
+			controller.page.demo.familyDoctor = controller.formatDocInput(controller.page.demo.scrReferralDoc, controller.page.demo.scrReferralDocNo);
+
+			//save family doctor (familyDoctor2)
+			controller.page.demo.familyDoctor2 = controller.formatDocInput(controller.page.demo.scrFamilyDoc, controller.page.demo.scrFamilyDocNo);
 
 			//save phone numbers
 			controller.page.demo.scrDemoCell = controller.page.demo.scrCellPhone;

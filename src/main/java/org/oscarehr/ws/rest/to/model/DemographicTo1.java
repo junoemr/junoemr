@@ -57,6 +57,7 @@ public class DemographicTo1 implements Serializable {
 	private String sexDesc;
 	private Date dateJoined;
 	private String familyDoctor;
+	private String familyDoctor2;
 	private String firstName;
 	private String lastName;
 	private Date hcRenewDate;
@@ -235,6 +236,14 @@ public class DemographicTo1 implements Serializable {
 
 	public void setFamilyDoctor(String familyDoctor) {
 		this.familyDoctor = familyDoctor;
+	}
+
+	public String getFamilyDoctor2() {
+		return familyDoctor2;
+	}
+
+	public void setFamilyDoctor2(String familyDoctor2) {
+		this.familyDoctor2 = familyDoctor2;
 	}
 
 	public String getFirstName() {
