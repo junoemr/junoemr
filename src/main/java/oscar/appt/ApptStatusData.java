@@ -160,11 +160,16 @@ public final class ApptStatusData {
     }
 
     private String preStatus(String status, String s) {
-        String temp = null;
-        if (status.length() == 1) {
-            temp = s;
-        } else {
-            temp = s + status.substring(1, 2);
+        String temp = "";
+        if (status != null && status.length() > 0)
+        {
+            if (status.length() == 1)
+            {
+                temp = s;
+            } else
+            {
+                temp = s + status.substring(1, 2);
+            }
         }
         return temp;
     }
