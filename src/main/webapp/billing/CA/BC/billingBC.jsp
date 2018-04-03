@@ -191,11 +191,11 @@ function codeEntered(svcCode)
 	return ((myform.xml_other1.value == svcCode) || (myform.xml_other2.value == svcCode) || (myform.xml_other3.value == svcCode))
 }
 
-function addSvcCode(service, svcCode)
+function addSvcCode(serviceCheckbox, svcCode)
 {
 	var myform = document.forms[0];
 
-	if (service.checked)
+	if (serviceCheckbox.checked)
 	{
 		if (myform.xml_other1.value == "")
 		{
@@ -225,7 +225,7 @@ function addSvcCode(service, svcCode)
 		else
 		{
 			alert("There are already three service codes entered");
-			service.checked = false;
+			serviceCheckbox.checked = false;
 			return false;
 		}
 	}
@@ -854,12 +854,12 @@ if(wcbneeds != null){%>
 		// preferences overrides the properties file settings
 		if(pref != null)
 		{
-			if(pref.getReferral() == BillingPreference.INT_REFER_TO)
+			if(pref.getReferral() == BillingPreference.REFER_TO_CODE)
 			{
 				refType1 = "T";
 				refType2 = "T";
 			}
-			else if(pref.getReferral() == BillingPreference.INT_REFER_FROM)
+			else if(pref.getReferral() == BillingPreference.REFER_FROM_CODE)
 			{
 				refType1 = "B";
 				refType2 = "B";

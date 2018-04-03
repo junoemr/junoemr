@@ -84,18 +84,18 @@
 							key="billing.manageBillingform_add.msgDeleteType"/></td>
 				</tr>
 				<%
-					List<Object[]> cbss1 = ctlBillingServiceDao.getUniqueServiceTypes();
+					List<Object[]> billingServiceTypeList = ctlBillingServiceDao.getUniqueServiceTypes();
 
-					if(cbss1 == null)
+					if(billingServiceTypeList == null)
 					{
 						out.println("failed!!!");
 					}
 					else
 					{
-						for(Object[] cbs : cbss1)
+						for(Object[] billingServiceTypeObj : billingServiceTypeList)
 						{
-							String serviceType = (String) cbs[0];
-							String serviceTypeName = (String) cbs[1];
+							String serviceType = (String) billingServiceTypeObj[0];
+							String serviceTypeName = (String) billingServiceTypeObj[1];
 				%>
 				<tr>
 					<td width="23%" valign="top" class="black"><a href=#
