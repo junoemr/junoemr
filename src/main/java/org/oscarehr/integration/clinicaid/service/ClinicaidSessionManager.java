@@ -138,6 +138,8 @@ public class ClinicaidSessionManager
 			writer.close();
 		}
 
+		connection.setReadTimeout(5000);
+
 		// Read the result
 		String inputLine;
 		String response = "";
