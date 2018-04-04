@@ -46,13 +46,13 @@
     String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
     String demographic_no = request.getParameter("demographic_no");
     String providerNo = (String) session.getAttribute("user");
-    String temp = request.getParameter("template");
+    String template = request.getParameter("template");
 %>
 <oscar:oscarPropertiesCheck property="SPEC3" value="yes">
     <security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="r" reverse="<%=true%>">
         "You have no right to access this page!"
         <%
-    	LogAction.addLog((String) session.getAttribute("user"), LogConst.NORIGHT+LogConst.READ, LogConst.CON_FLOWSHEET,  temp , request.getRemoteAddr(),demographic_no);
+    	LogAction.addLog((String) session.getAttribute("user"), LogConst.NORIGHT+LogConst.READ, LogConst.CON_FLOWSHEET,  template , request.getRemoteAddr(),demographic_no);
             response.sendRedirect("../../noRights.html");
     %>
     </security:oscarSec>
@@ -62,7 +62,7 @@
 	if (OscarProperties.getInstance().getBooleanProperty("new_flowsheet_enabled", "true")) {
 %>
 	<%
-		if (temp.equals("diab3")) {
+		if (template.equals("diab3")) {
 	%>
 		<jsp:forward page="DiabFlowSheet.jsp" />
 	<%
@@ -77,7 +77,7 @@
 %>
 
 <%
-	LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_FLOWSHEET,  temp , request.getRemoteAddr(),demographic_no);
+	LogAction.addLog((String) session.getAttribute("user"), LogConst.READ, LogConst.CON_FLOWSHEET,  template , request.getRemoteAddr(),demographic_no);
 
 
     int numElementsToShow = 4;
@@ -112,13 +112,19 @@
     FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
     FlowSheetDrugDao flowSheetDrugDao = (FlowSheetDrugDao) ctx.getBean("flowSheetDrugDao");
 	FlowSheetDxDao flowSheetDxDao = (FlowSheetDxDao) ctx.getBean("flowSheetDxDao");
-    List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),demographic_no);
+    List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( template,(String) session.getAttribute("user"),demographic_no);
 
     ////Start
     MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
 
 
-    MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
+    MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(template,custList);
+
+    if(mFlowsheet == null)
+    {
+        MiscUtils.getLogger().error("Invalid Flowsheet Template: " + template);
+        return;
+    }
 
     MeasurementInfo mi = new MeasurementInfo(demographic_no);
     List<String> measurementLs = mFlowsheet.getMeasurementList();
@@ -255,13 +261,13 @@ div.headPrevention p {
         var sdate = $('flowsheetStartDate').value;
         var edate = $('flowsheetEndDate').value;
         if( !numEle.blank()){
-            window.location = 'TemplateFlowSheet.jsp?demographic_no=<%=demographic_no%>&template=<%=temp%>&numEle='+numEle;
+            window.location = 'TemplateFlowSheet.jsp?demographic_no=<%=demographic_no%>&template=<%=template%>&numEle='+numEle;
             //console.log("one");
         }else if (!sdate.blank() && !edate.blank()){
-            window.location = 'TemplateFlowSheet.jsp?demographic_no=<%=demographic_no%>&template=<%=temp%>&sdate='+sdate+'&edate='+edate;
+            window.location = 'TemplateFlowSheet.jsp?demographic_no=<%=demographic_no%>&template=<%=template%>&sdate='+sdate+'&edate='+edate;
             //console.log("two");
         }else{
-            window.location = 'TemplateFlowSheet.jsp?demographic_no=<%=demographic_no%>&template=<%=temp%>';
+            window.location = 'TemplateFlowSheet.jsp?demographic_no=<%=demographic_no%>&template=<%=template%>';
         }
 
     }
@@ -428,16 +434,16 @@ div.recommendations li{
                     <oscar:oscarPropertiesCheck property="SPEC3" value="yes">
                     <span class="DoNotPrint">
                     <security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="x">
-                    <a href="adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=temp%>&demographic=<%=demographic_no%>" target="_new">Edit</a>
+                    <a href="adminFlowsheet/EditFlowsheet.jsp?flowsheet=<%=template%>&demographic=<%=demographic_no%>" target="_new">Edit</a>
                     &nbsp;
                     </security:oscarSec>
-                    <a href="TemplateFlowSheet.jsp?demographic_no=<%=demographic_no%>&template=<%=temp%>&show=lastOnly">Last Only</a>
+                    <a href="TemplateFlowSheet.jsp?demographic_no=<%=demographic_no%>&template=<%=template%>&show=lastOnly">Last Only</a>
                     &nbsp;
-                    <a href="TemplateFlowSheet.jsp?demographic_no=<%=demographic_no%>&template=<%=temp%>&show=outOfRange">Only out of Range</a>
+                    <a href="TemplateFlowSheet.jsp?demographic_no=<%=demographic_no%>&template=<%=template%>&show=outOfRange">Only out of Range</a>
                     &nbsp;
-                    <a href="TemplateFlowSheet.jsp?demographic_no=<%=demographic_no%>&template=<%=temp%>">All</a>
+                    <a href="TemplateFlowSheet.jsp?demographic_no=<%=demographic_no%>&template=<%=template%>">All</a>
                     &nbsp;
-                    <a href="TemplateFlowSheetPrint.jsp?demographic_no=<%=demographic_no%>&template=<%=temp%>">Custom Print</a>
+                    <a href="TemplateFlowSheetPrint.jsp?demographic_no=<%=demographic_no%>&template=<%=template%>">Custom Print</a>
                   </span>
                 </td>
              </tr>
@@ -466,10 +472,10 @@ div.recommendations li{
 <td class="MainTableLeftColumn" valign="top">
 	<security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="w">
     <% if (recList.size() > 0){ %>
-    <p><a class="DoNotPrint" href="javascript: function myFunction() {return false; }"  onclick="javascript:createAddAll(<%=demographic_no%>, '<%= URLEncoder.encode(temp,"UTF-8") %>', <%=Math.abs( "ADDTHEMALL".hashCode() ) %>)" TITLE="Add all measurements.">
+    <p><a class="DoNotPrint" href="javascript: function myFunction() {return false; }"  onclick="javascript:createAddAll(<%=demographic_no%>, '<%= URLEncoder.encode(template,"UTF-8") %>', <%=Math.abs( "ADDTHEMALL".hashCode() ) %>)" TITLE="Add all measurements.">
 	    Add All
 	</a> </p>
-    <p><a class="DoNotPrint" href="javascript: function myFunction() {return false; }"  onclick="javascript:fsPopup(760,670,'AddMeasurementData.jsp?demographic_no=<%=demographic_no%><%=recListBuffer.toString()%>&amp;template=<%=temp%>','addMeasurementData<%=Math.abs( "ADDTHEMALL".hashCode() ) %>')" TITLE="Add all overdue measurements.">
+    <p><a class="DoNotPrint" href="javascript: function myFunction() {return false; }"  onclick="javascript:fsPopup(760,670,'AddMeasurementData.jsp?demographic_no=<%=demographic_no%><%=recListBuffer.toString()%>&amp;template=<%=template%>','addMeasurementData<%=Math.abs( "ADDTHEMALL".hashCode() ) %>')" TITLE="Add all overdue measurements.">
         Add Overdue
     </a></p>
     <%}%>
@@ -490,7 +496,7 @@ div.recommendations li{
                     dxResearchBean code = (dxResearchBean)patientDx.get(i);  // code.getEnd_date() code.getStart_date()
                     String desc = code.getDescription();
                     desc = org.apache.commons.lang.StringUtils.abbreviate(desc,lim) ;
-                    HashMap<String,String> dxMap = flowSheetDxDao.getFlowSheetDxMap( temp, demographic_no);
+                    HashMap<String,String> dxMap = flowSheetDxDao.getFlowSheetDxMap( template, demographic_no);
 
                     String pDx = dxMap.get(code.getType()+""+code.getDxSearchCode());
 
@@ -498,7 +504,7 @@ div.recommendations li{
             <li>
                 <oscar:oscarPropertiesCheck property="SPEC3" value="yes">
                     <% if (pDx == null){ %>
-                     <a href="FlowSheetDrugAction.do?method=dxSave&flowsheet=<%=temp%>&demographic=<%=demographic_no%>&dxCode=<%=code.getDxSearchCode()%>&dxCodeType=<%=code.getType()%>">
+                     <a href="FlowSheetDrugAction.do?method=dxSave&flowsheet=<%=template%>&demographic=<%=demographic_no%>&dxCode=<%=code.getDxSearchCode()%>&dxCodeType=<%=code.getType()%>">
                     <%}else{%>
                      <span title="<%=code.getDescription()%>"  style="background-color: yellow;">
                     <%}%>
@@ -538,7 +544,7 @@ div.recommendations li{
                     %>
                     <li title="<%=rxD%> - <%=rxP%>">
                         <oscar:oscarPropertiesCheck property="SPEC3" value="yes">
-                            <a href="FlowSheetDrugAction.do?method=save&flowsheet=<%=temp%>&demographic=<%=demographic_no%>&atcCode=<%=arr[i].getAtcCode()%>">
+                            <a href="FlowSheetDrugAction.do?method=save&flowsheet=<%=template%>&demographic=<%=demographic_no%>&atcCode=<%=arr[i].getAtcCode()%>">
                             </oscar:oscarPropertiesCheck>
                             - <%= org.apache.commons.lang.StringUtils.abbreviate(rxP, 12)%>
                             <oscar:oscarPropertiesCheck property="SPEC3" value="yes">
@@ -674,7 +680,7 @@ div.recommendations li{
            <%}%>
 
 		   <security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="w">
-            <a class="noborder" href="javascript: function myFunction() {return false; }"  onclick="javascript:fsPopup(760,670,'AddMeasurementData.jsp?measurement=<%= response.encodeURL( measure) %>&amp;demographic_no=<%=demographic_no%>&amp;template=<%= URLEncoder.encode(temp,"UTF-8") %>','addMeasurementData<%=Math.abs( ((String) h.get("name")).hashCode() ) %>')">
+            <a class="noborder" href="javascript: function myFunction() {return false; }"  onclick="javascript:fsPopup(760,670,'AddMeasurementData.jsp?measurement=<%= response.encodeURL( measure) %>&amp;demographic_no=<%=demographic_no%>&amp;template=<%= URLEncoder.encode(template,"UTF-8") %>','addMeasurementData<%=Math.abs( ((String) h.get("name")).hashCode() ) %>')">
            </security:oscarSec>
                 <span  class="noborder" style="font-weight:bold;"><%=h2.get("display_name")%></span>
 
@@ -727,7 +733,7 @@ div.recommendations li{
     %>
     <div class="preventionProcedure" <%=hider%>  
     <%if(mdb.getRemoteFacility() == null){ %>
-    onclick="javascript:fsPopup(760,670,'AddMeasurementData.jsp?measurement=<%= response.encodeURL( measure) %>&amp;id=<%=hdata.get("id")%>&amp;demographic_no=<%=demographic_no%>&amp;template=<%= URLEncoder.encode(temp,"UTF-8") %>','addMeasurementData')" 
+    onclick="javascript:fsPopup(760,670,'AddMeasurementData.jsp?measurement=<%= response.encodeURL( measure) %>&amp;id=<%=hdata.get("id")%>&amp;demographic_no=<%=demographic_no%>&amp;template=<%= URLEncoder.encode(template,"UTF-8") %>','addMeasurementData')"
     <%}%>
     >
         <p <%=indColour%> title="fade=[on] header=[<%=hdata.get("age")%> -- Date:<%=hdata.get("prevention_date")%>] body=[<%=com%>&lt;br/&gt;Entered By:<%=mdb.getProviderFirstName()%> <%=mdb.getProviderLastName()%>]"><%=h2.get("value_name")%>: <%=hdata.get("age")%> <br/>
@@ -810,7 +816,7 @@ function createAddAll(d,t,h){
     oscar.oscarRx.data.RxPrescriptionData prescriptData = new oscar.oscarRx.data.RxPrescriptionData();
     oscar.oscarRx.data.RxPrescriptionData.Prescription [] arr = {};
 
-    List<FlowSheetDrug> atcCodes = flowSheetDrugDao.getFlowSheetDrugs(temp,demographic_no);
+    List<FlowSheetDrug> atcCodes = flowSheetDrugDao.getFlowSheetDrugs(template,demographic_no);
     for(FlowSheetDrug fsd : atcCodes){
             arr = prescriptData.getPrescriptionScriptsByPatientATC(Integer.parseInt(demographic_no),fsd.getAtcCode());
 
