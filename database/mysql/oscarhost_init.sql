@@ -215,3 +215,5 @@ CREATE TABLE log_report_by_template (
   query_string text
 );
 
+CREATE INDEX fdidIndex ON eform_values (fdid);
+
