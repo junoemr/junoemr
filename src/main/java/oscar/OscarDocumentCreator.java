@@ -15,6 +15,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.ByteArrayInputStream;
@@ -27,6 +28,8 @@ import java.util.List;
 
 public class OscarDocumentCreator
 {
+	private static Logger logger = MiscUtils.getLogger();
+
 	public static final String PDF = "pdf";
 	public static final String CSV = "csv";
 	public static final String EXCEL = "excel";
@@ -88,17 +91,29 @@ public class OscarDocumentCreator
 				JRDataSource ds = (JRDataSource) dataSrc;
 				print = JasperFillManager.fillReport(jasperReport, parameters, ds);
 			}
-			if(docType.equals(OscarDocumentCreator.PDF))
+
+			switch(docType)
 			{
-				JasperExportManager.exportReportToPdfStream(print, sos);
-			}
-			else if(docType.equals(OscarDocumentCreator.CSV))
-			{
-				this.exportReportToCSVStream(print, sos);
-			}
-			else if(docType.equals(OscarDocumentCreator.EXCEL))
-			{
-				this.exportReportToExcelStream(print, sos);
+				case OscarDocumentCreator.PDF:
+				{
+					JasperExportManager.exportReportToPdfStream(print, sos);
+					break;
+				}
+				case OscarDocumentCreator.CSV:
+				{
+					this.exportReportToCSVStream(print, sos);
+					break;
+				}
+				case OscarDocumentCreator.EXCEL:
+				{
+					this.exportReportToExcelStream(print, sos);
+					break;
+				}
+				default:
+				{
+					logger.error("Invalid document Type: " + docType);
+					break;
+				}
 			}
 		}
 		catch(JRException ex)

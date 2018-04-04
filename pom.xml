@@ -388,38 +388,22 @@
 			<version>2.0</version>
 		</dependency>
 		<!-- jasper reports -->
+		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports -->
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
-			<version>4.1.2</version>
-			<exclusions>
-				<exclusion>
-					<groupId>bouncycastle</groupId>
-					<artifactId>bcprov-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>bouncycastle</groupId>
-					<artifactId>bcmail-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bcprov-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bctsp-jdk14</artifactId>
-				</exclusion>
-			</exclusions>
+			<version>6.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports-fonts</artifactId>
-			<version>4.0.0</version>
+			<version>6.0.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sourceforge.barbecue/barbecue -->
 		<dependency>
 			<groupId>net.sourceforge.barbecue</groupId>
 			<artifactId>barbecue</artifactId>
-			<version>1.0.6b</version>
+			<version>1.5-beta1</version>
 		</dependency>
 		<!-- joda time -->
 		<dependency>
@@ -690,18 +674,18 @@
 			<artifactId>displaytag</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-		<!-- zxing / 2d bar codes -->
+		<!-- https://mvnrepository.com/artifact/com.google.zxing/core -->
 		<dependency>
-			<groupId>zxing</groupId>
-			<artifactId>zxing-core</artifactId>
-			<version>1.5</version>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.3.2</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.google.zxing/javase -->
 		<dependency>
-			<groupId>zxing</groupId>
-			<artifactId>zxing-j2se</artifactId>
-			<version>1.5</version>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>3.3.2</version>
 		</dependency>
-		<!-- chip / ping libararies -->
 		<dependency>
 			<groupId>org.chip.ping</groupId>
 			<artifactId>oscar-ping</artifactId>

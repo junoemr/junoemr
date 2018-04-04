@@ -25,28 +25,25 @@
 
 package org.oscarehr.util;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import org.apache.log4j.Logger;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
-
-import org.apache.log4j.Logger;
-
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.google.zxing.qrcode.encoder.Encoder;
-import com.google.zxing.qrcode.encoder.QRCode;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class QrCodeUtils {
 	
@@ -100,14 +97,30 @@ public class QrCodeUtils {
 		
 		return(mergedResults);
 	}
-	
-	public static BufferedImage toSingleQrCodeBufferedImage(String s, ErrorCorrectionLevel ec, int scaleFactor) throws WriterException
+
+	/**
+	 * TODO - re-write and refactor this method. This was cobbled together from example code after a library version upgrade broke it.
+	 * TODO - This needs to be tested
+	 */
+	public static BufferedImage toSingleQrCodeBufferedImage(String content, ErrorCorrectionLevel errorCorrection, int scaleFactor) throws WriterException
 	{
-		QRCode qrCode = new QRCode();
-		Encoder.encode(s, ec, qrCode);
-		
-		BufferedImage bufferedImage=MatrixToImageWriter.toBufferedImage(qrCode.getMatrix());
-		
+		// example taken from http://www.codepool.biz/zxing-write-read-qrcode.html
+		QRCodeWriter writer = new QRCodeWriter();
+		int width = 256, height = 256;
+		BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB); // create an empty image
+		int white = 255 << 16 | 255 << 8 | 255;
+		int black = 0;
+
+		BitMatrix bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, width, height);
+		for(int i = 0; i < width; i++)
+		{
+			for(int j = 0; j < height; j++)
+			{
+				bufferedImage.setRGB(i, j, bitMatrix.get(i, j) ? black : white); // set pixel one by one
+			}
+		}
+
+		// scale the image. leftover from previous implementation
 		if (scaleFactor!=1)
 		{
 			int newWidth=bufferedImage.getWidth()*scaleFactor;
@@ -115,8 +128,7 @@ public class QrCodeUtils {
 			Image image=bufferedImage.getScaledInstance(newWidth, newHeight, Image.SCALE_FAST);
 			bufferedImage=ImageIoUtils.toBufferedImage(image);
 		}
-		
-		return(bufferedImage);
+		return bufferedImage;
 	}
 
 	public static byte[] toSingleQrCodePng(String s, ErrorCorrectionLevel ec, int scaleFactor) throws IOException, WriterException
