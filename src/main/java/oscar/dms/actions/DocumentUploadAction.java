@@ -24,6 +24,7 @@ import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.PDFFile;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -154,7 +155,7 @@ public class DocumentUploadAction extends DispatchAction
 		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
 		docFile.destroy();
 
-		if(!file.validate())
+		if(file instanceof PDFFile)
 		{
 			file.reEncode();
 		}

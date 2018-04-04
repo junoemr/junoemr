@@ -26,6 +26,7 @@ package org.oscarehr.document.service;
 
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.PDFFile;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,8 +118,8 @@ public class Document
 				formattedFileName = GenericFile.getFormattedFileName(documentFileName);
 				// get a tempfile. it will replace the existing doc at last step of the transaction
 				tempFile = FileFactory.createTempFile(documentInputStream);
-				// validate the file & content
-				if(!tempFile.validate())
+				// re-encode pdfs
+				if(tempFile instanceof PDFFile)
 				{
 					tempFile.reEncode();
 				}
@@ -128,8 +129,8 @@ public class Document
 			{
 				tempFile = FileFactory.createDocumentFile(documentInputStream, documentFileName);
 				formattedFileName = tempFile.getName();
-				// validate the file & content
-				if(!tempFile.validate())
+				// re-encode pdfs
+				if(tempFile instanceof PDFFile)
 				{
 					tempFile.reEncode();
 				}

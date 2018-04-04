@@ -44,6 +44,7 @@ import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.PDFFile;
 import org.oscarehr.common.model.DocumentStorage;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.SecRole;
@@ -94,7 +95,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		String user = (String) request.getSession().getAttribute("user");
 
 		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
-		if(!file.validate())
+		if(file instanceof PDFFile)
 		{
 			file.reEncode();
 		}
@@ -162,7 +163,7 @@ public class AddEditDocumentAction extends DispatchAction {
 
 		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
 
-		if(!file.validate())
+		if(file instanceof PDFFile)
 		{
 			file.reEncode();
 		}
@@ -276,7 +277,7 @@ public class AddEditDocumentAction extends DispatchAction {
 
 				GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName1);
 
-				if(!file.validate())
+				if(file instanceof PDFFile)
 				{
 					file.reEncode();
 				}
