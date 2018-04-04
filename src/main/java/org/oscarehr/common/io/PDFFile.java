@@ -35,15 +35,32 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class PDFFile extends GenericFile
 {
 	private static Logger logger = MiscUtils.getLogger();
 	private static final Set<String> allowedErrors = new HashSet<>();
+	private static final Set<Pattern> allowedWarningsGS = new HashSet<>();
 
 	public PDFFile(File file) throws IOException
 	{
 		super(file);
+
+		// define allowed GhostScript warnings
+		allowedWarningsGS.add(
+				Pattern.compile(".*Missing glyph .* in the font HiddenHorzOCR.*", Pattern.CASE_INSENSITIVE)
+		);
+	}
+
+	private boolean isAllowedWarning(String line)
+	{
+		for (Pattern pattern : allowedWarningsGS)
+		{
+			if (pattern.matcher(line).matches())
+				return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -151,6 +168,9 @@ public class PDFFile extends GenericFile
 		while((line = in.readLine()) != null)
 		{
 			logger.warn("gs error line: " + line);
+			if (isAllowedWarning(line))
+				continue;
+
 			reasonInvalid = (reasonInvalid == null)? line : reasonInvalid + ", " + line;
 		}
 		process.waitFor();
