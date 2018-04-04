@@ -156,9 +156,8 @@ public class GenericFile
 		this.isValid = true;
 		return true;
 	}
-	public void reEncode() throws IOException, InterruptedException
+	public void process() throws IOException, InterruptedException
 	{
-		throw new RuntimeException("Not Implemented");
 	}
 
 	public boolean isValid()

@@ -80,7 +80,7 @@ public class PDFFile extends GenericFile
 		return this.isValid;
 	}
 	@Override
-	public void reEncode() throws IOException, InterruptedException
+	public void process() throws IOException, InterruptedException
 	{
 		javaFile = ghostscriptReEncode();
 	}

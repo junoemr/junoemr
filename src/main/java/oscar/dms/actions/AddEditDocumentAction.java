@@ -95,10 +95,6 @@ public class AddEditDocumentAction extends DispatchAction {
 		String user = (String) request.getSession().getAttribute("user");
 
 		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
-		if(file instanceof PDFFile)
-		{
-			file.reEncode();
-		}
 		file.moveToDocuments();
 
 		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A',
@@ -163,10 +159,6 @@ public class AddEditDocumentAction extends DispatchAction {
 
 		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
 
-		if(file instanceof PDFFile)
-		{
-			file.reEncode();
-		}
 		file.moveToDocuments();
 
 		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A',
@@ -277,10 +269,6 @@ public class AddEditDocumentAction extends DispatchAction {
 
 				GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName1);
 
-				if(file instanceof PDFFile)
-				{
-					file.reEncode();
-				}
 				file.moveToDocuments();
 
 				EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName1, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), "", "", fm.getFunction(), fm.getFunctionId());

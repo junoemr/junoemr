@@ -118,22 +118,12 @@ public class Document
 				formattedFileName = GenericFile.getFormattedFileName(documentFileName);
 				// get a tempfile. it will replace the existing doc at last step of the transaction
 				tempFile = FileFactory.createTempFile(documentInputStream);
-				// re-encode pdfs
-				if(tempFile instanceof PDFFile)
-				{
-					tempFile.reEncode();
-				}
 			}
 			// save the content as new and update the references, but keep the previous document in the folder.
 			else
 			{
 				tempFile = FileFactory.createDocumentFile(documentInputStream, documentFileName);
 				formattedFileName = tempFile.getName();
-				// re-encode pdfs
-				if(tempFile instanceof PDFFile)
-				{
-					tempFile.reEncode();
-				}
 				tempFile.moveToDocuments();
 			}
 			documentModel.setDocfilename(formattedFileName);

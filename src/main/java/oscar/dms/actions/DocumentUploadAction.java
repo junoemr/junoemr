@@ -155,10 +155,6 @@ public class DocumentUploadAction extends DispatchAction
 		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
 		docFile.destroy();
 
-		if(file instanceof PDFFile)
-		{
-			file.reEncode();
-		}
 		file.moveToDocuments();
 
 		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fmSource, 'A',

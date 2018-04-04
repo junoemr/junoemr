@@ -393,10 +393,7 @@ public class PHRMessageAction extends DispatchAction {
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
 
 		GenericFile file = FileFactory.createDocumentFile(new ByteArrayInputStream(fileBytes), filename);
-		if(file instanceof PDFFile)
-		{
-			file.reEncode();
-		}
+
 		file.moveToDocuments();
 
 		EDoc newDoc = new EDoc(description, "others", file.getName(), "", providerNo,

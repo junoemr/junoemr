@@ -46,7 +46,7 @@ public class FileFactory
 	 * @return - the file
 	 * @throws FileNotFoundException - if the given file is invalid for use as a GenericFile
 	 */
-	public static GenericFile createDocumentFile(InputStream fileInputStream, String fileName) throws IOException
+	public static GenericFile createDocumentFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
 	{
 		return createNewFile(fileInputStream, fileName, GenericFile.DOCUMENT_BASE_DIR);
 	}
@@ -57,7 +57,7 @@ public class FileFactory
 	 * @return the file
 	 * @throws IOException
 	 */
-	public static GenericFile createTempFile(InputStream fileInputStream) throws IOException
+	public static GenericFile createTempFile(InputStream fileInputStream) throws IOException, InterruptedException
 	{
 		File file = File.createTempFile("oscar", "tempfile");
 		logger.info("Created tempfile: " + file.getPath());
@@ -81,7 +81,7 @@ public class FileFactory
 	 * @return the new GenericFile
 	 * @throws IOException - if an error occurs
 	 */
-	public static GenericFile overwriteFileContents(GenericFile oldFile, InputStream fileInputStream) throws IOException
+	public static GenericFile overwriteFileContents(GenericFile oldFile, InputStream fileInputStream) throws IOException, InterruptedException
 	{
 		File file = oldFile.getFileObject();
 
@@ -99,7 +99,7 @@ public class FileFactory
 	 * @param fileName - name of the file to be saved and opened
 	 * @return - the file, or null if no file exists with the given filename
 	 */
-	private static GenericFile createNewFile(InputStream fileInputStream, String fileName, String folder) throws IOException
+	private static GenericFile createNewFile(InputStream fileInputStream, String fileName, String folder) throws IOException, InterruptedException
 	{
 		String formattedFileName = GenericFile.getFormattedFileName(fileName);
 
@@ -116,7 +116,7 @@ public class FileFactory
 		File file = new File(directory.getPath(), formattedFileName);
 		return writeInputStream(fileInputStream, file, false);
 	}
-	private static GenericFile writeInputStream(InputStream fileInputStream, File file, boolean allowOverwrite) throws IOException
+	private static GenericFile writeInputStream(InputStream fileInputStream, File file, boolean allowOverwrite) throws IOException, InterruptedException
 	{
 		// copy the stream to the file
 		if(allowOverwrite)
@@ -132,8 +132,11 @@ public class FileFactory
 
 		GenericFile returnFile = getExistingFile(file);
 
+		returnFile.process();
+
 		// for now, only warn with unknown file content types.
 		String contentType = returnFile.getContentType();
+
 		if(!GenericFile.getAllowedContent().contains(contentType))
 		{
 			//TODO - how to handle unknown content type. must have complete list of allowed types first

@@ -148,10 +148,7 @@ public final class EfmpatientformlistSendPhrAction {
 	private String uploadToOscarDocuments(File tempFile, String description, String type) throws Exception {
 
 		GenericFile file = FileFactory.createDocumentFile(new FileInputStream(tempFile), tempFile.getName());
-		if(file instanceof PDFFile)
-		{
-			file.reEncode();
-		}
+
 		file.moveToDocuments();
 
 		String originalFileName = tempFile.getName();
