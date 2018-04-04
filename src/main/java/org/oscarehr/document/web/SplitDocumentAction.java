@@ -21,6 +21,7 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.struts.action.ActionForm;
@@ -39,6 +40,7 @@ import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
+import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
@@ -53,6 +55,9 @@ public class SplitDocumentAction extends DispatchAction {
 	private PatientLabRoutingDao patientLabRoutingDao = (PatientLabRoutingDao) SpringUtils.getBean("patientLabRoutingDao");
 	private QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) SpringUtils.getBean("queueDocumentLinkDAO");
 
+	private String documentDir = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+	private long maxMemoryUsage = OscarProperties.getInstance().getPDFMaxMemUsage();
+
 	public ActionForward split(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String docNum = request.getParameter("document");
 		String[] commands = request.getParameterValues("page[]");
@@ -63,8 +68,6 @@ public class SplitDocumentAction extends DispatchAction {
 
 		Document doc = documentDao.getDocument(docNum);
 
-		String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-
 		String newFilename = doc.getDocfilename();
 
 		PDDocument pdf = null;
@@ -73,7 +76,7 @@ public class SplitDocumentAction extends DispatchAction {
 		try {
 		
 			File inputFile = new File(documentDir, doc.getDocfilename());
-			pdf = PDDocument.load(inputFile);
+			pdf = PDDocument.load(inputFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
 			newPdf = new PDDocument();
 			
 			if (commands != null) {
@@ -165,10 +168,9 @@ public class SplitDocumentAction extends DispatchAction {
 
 	private ActionForward rotate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response, int degrees) throws Exception {
 		Document doc = documentDao.getDocument(request.getParameter("document"));
-		String docDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 
-		File pdfFile = new File(docDir, doc.getDocfilename());
-		PDDocument pdf = PDDocument.load(pdfFile);
+		File pdfFile = new File(documentDir, doc.getDocfilename());
+		PDDocument pdf = PDDocument.load(pdfFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
 		
 		for(int i=0; i<pdf.getNumberOfPages(); i++) {
 			PDPage pg = pdf.getPage(i);
@@ -194,10 +196,9 @@ public class SplitDocumentAction extends DispatchAction {
 	public ActionForward removeFirstPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Document doc = documentDao.getDocument(request.getParameter("document"));
 
-		String docDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		
-		File pdfFile = new File(docDir, doc.getDocfilename());
-		PDDocument pdf = PDDocument.load(pdfFile);
+
+		File pdfFile = new File(documentDir, doc.getDocfilename());
+		PDDocument pdf = PDDocument.load(pdfFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
 
 		// Documents must have at least 2 pages, for the first page to be removed.
 		if (pdf.getNumberOfPages() > 1) {

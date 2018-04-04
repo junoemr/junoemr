@@ -186,7 +186,7 @@ public class GenericFile
 	{
 		return GenericFile.getContentType(javaFile);
 	}
-	public int getPageCount()
+	public int getPageCount() throws IOException
 	{
 		return 0;
 	}

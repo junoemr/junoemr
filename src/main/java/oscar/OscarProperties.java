@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.oscarehr.util.MiscUtils;
 
 /**
@@ -197,6 +198,11 @@ public class OscarProperties extends Properties {
 	public boolean isPropertyActive(String key) {
 		key = key==null ? null : key.trim();
 		return activeMarkers.contains(getProperty(key, "").trim().toLowerCase());
+	}
+
+	public long getPDFMaxMemUsage()
+	{
+		return NumberUtils.toLong(getProperty("PDF_MAX_MEM_USAGE"), -1);
 	}
 
 	

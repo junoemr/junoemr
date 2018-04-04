@@ -25,8 +25,10 @@
 package org.oscarehr.common.io;
 
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.oscarehr.util.MiscUtils;
+import oscar.OscarProperties;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,6 +44,9 @@ public class PDFFile extends GenericFile
 	private static Logger logger = MiscUtils.getLogger();
 	private static final Set<String> allowedErrors = new HashSet<>();
 	private static final Set<Pattern> allowedWarningsGS = new HashSet<>();
+
+	private OscarProperties oscarProperties = OscarProperties.getInstance();
+	private long maxMemoryUsage = oscarProperties.getPDFMaxMemUsage();
 
 	public PDFFile(File file) throws IOException
 	{
@@ -85,18 +90,13 @@ public class PDFFile extends GenericFile
 	 * @return the number of pages in the file
 	 */
 	@Override
-	public int getPageCount()
+	public int getPageCount() throws IOException
 	{
 		int numOfPage = 0;
-		try
-		{
-			PDDocument doc = PDDocument.load(javaFile);
-			numOfPage = doc.getNumberOfPages();
-		}
-		catch(IOException e)
-		{
-			logger.error("Error", e);
-		}
+
+		PDDocument doc = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+		numOfPage = doc.getNumberOfPages();
+
 		return numOfPage;
 	}
 

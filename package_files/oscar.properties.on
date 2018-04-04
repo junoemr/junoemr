@@ -1003,6 +1003,9 @@ auto_populate_billingreferral_bc=true
 #document_email_name=Oscar                                    
 #document_email_from_address=test@test.com
 
+# Maximum memory usage for loading PDFs, in bytes
+#PDF_MAX_MEM_USAGE=512000000
+
 display_date_format=yyyy-MM-dd
 
 # Automatically link assigned document to demographic's provider
