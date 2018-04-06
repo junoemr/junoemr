@@ -56,7 +56,6 @@ public class ClinicaidAPIService
 	private ClinicaidSessionManager sessionManager;
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
-	private String instanceType = oscarProperties.getInstanceType();
 
 	@Autowired
 	public ClinicaidAPIService(ClinicaidSessionManager sessionManager)
@@ -69,7 +68,7 @@ public class ClinicaidAPIService
 		Map<String, String> data = new HashMap<>();
 		data.put("health_number", demo.getHin());
 
-		if ("ON".equals(instanceType))
+		if (oscarProperties.isOntarioInstanceType())
 		{
 			data.put("ontario_version_code", demo.getVer());
 		}
