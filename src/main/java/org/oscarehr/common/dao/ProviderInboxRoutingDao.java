@@ -69,6 +69,15 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 		return results;
 	}
 
+	public ProviderInboxItem getRoutingForProviderLabNo(String labType, Integer labNo, String providerNo) {
+		Query query = entityManager.createQuery("SELECT p FROM ProviderInboxItem p WHERE p.providerNo=:providerNo AND p.labType=:labType AND p.labNo=:labNo");
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("labType", labType);
+		query.setParameter("labNo", labNo);
+
+		return(getSingleResultOrNull(query));
+	}
+
 	public boolean hasProviderBeenLinkedWithDocument(String docType, String docId, String providerNo) {
 		int dId = Integer.parseInt(docId);
 		Query query = entityManager.createQuery("select p from ProviderInboxItem p where p.labType = ? and p.labNo = ? and p.providerNo=?");
@@ -118,7 +127,7 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 				String frwdProvider = rules.getFrwdProviderNo();
 
 				listofAdditionalProviders.add(frwdProvider);
-				if (status != null && status.equals("F")) fileForMainProvider = true;
+				if (status != null && status.equals(ProviderInboxItem.FILE)) fileForMainProvider = true;
 			}
 
 			ProviderInboxItem p = new ProviderInboxItem();
@@ -128,6 +137,14 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 			p.setStatus(fileForMainProvider ? ProviderInboxItem.FILE : ProviderInboxItem.NEW);
 
 			if (!hasProviderBeenLinkedWithDocument(labType, labNo, providerNo)) persist(p);
+
+			//See if the provider we're adding is already linked with the document
+			ProviderInboxItem labForProvider = getRoutingForProviderLabNo(labType, Integer.parseInt(labNo), providerNo);
+
+			//If the document is archived for the provider, move the document from the archive back to their inbox as they've been re-linked to the document
+			if (labForProvider.getStatus().equals(ProviderInboxItem.ARCHIVED)) {
+				CommonLabResultData.updateReportStatus(Integer.parseInt(labNo), providerNo, 'N', null, labType);
+			}
 
 			for (String s : listofAdditionalProviders) {
 				if (!hasProviderBeenLinkedWithDocument(labType, labNo, s)) {

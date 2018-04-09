@@ -14,8 +14,11 @@ import java.util.List;
 import javax.persistence.Query;
 
 import org.oscarehr.common.model.ProviderLabRoutingModel;
+import org.oscarehr.common.model.ProviderInboxItem;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.apache.commons.lang.StringUtils;
 
 @Repository
 @Transactional
@@ -27,11 +30,20 @@ public class ProviderLabRoutingDao extends AbstractDao<ProviderLabRoutingModel> 
 
 	@SuppressWarnings("unchecked")
     private List<ProviderLabRoutingModel> getProviderLabRoutings(String labNo, String labType, String providerNo, String status) {
-		Query q = entityManager.createQuery("select x from " + modelClass.getName() + " x where x.labNo=? and x.labType=? and x.providerNo=? and x.status=?");
-		q.setParameter(1, labNo != null ? Integer.parseInt(labNo) : "%");
-		q.setParameter(2, labType != null ? labType : "%");
-		q.setParameter(3, providerNo != null ? providerNo : "%");
-		q.setParameter(4, status != null ? status : "%");
+		labType = StringUtils.trimToNull(labType);
+		providerNo = StringUtils.trimToNull(providerNo);
+		status = StringUtils.trimToNull(status);
+
+		Query q = entityManager.createQuery("SELECT x FROM " +
+											modelClass.getName() +
+											" x WHERE (:labNo IS NULL OR x.labNo=:labNo) " +
+											"AND (:labType IS NULL OR x.labType=:labType) " +
+											"AND (:providerNo IS NULL OR x.providerNo=:providerNo) " +
+											"AND (:status IS NULL OR x.status=:status)");
+		q.setParameter("labNo", labNo);
+		q.setParameter("labType", labType);
+		q.setParameter("providerNo", providerNo);
+		q.setParameter("status", status);
 
 		return q.getResultList();
 	}
@@ -45,7 +57,15 @@ public class ProviderLabRoutingDao extends AbstractDao<ProviderLabRoutingModel> 
 	}
 
 	public List<ProviderLabRoutingModel> getProviderLabRoutingForLabAndType(String labNo, String labType) {
-		return getProviderLabRoutings(labNo, labType, null, "N");
+		return getProviderLabRoutings(labNo, labType, null, ProviderInboxItem.NEW);
+	}
+
+	public List<ProviderLabRoutingModel> findByStatusANDLabNoType(int labNo, String labType, String status) {
+		Query query = entityManager.createQuery("SELECT x FROM " + modelClass.getName() +" x WHERE x.labNo = :labNo AND x.labType = :labType AND x.status = :status");
+		query.setParameter("labNo", labNo);
+		query.setParameter("labType", labType);
+		query.setParameter("status", status);
+		return query.getResultList();
 	}
 
 	public void updateStatus(String labNo, String labType) {
