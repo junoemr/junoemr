@@ -476,8 +476,7 @@ public class ManageTeleplanAction extends DispatchAction {
 
            Date billingDate = new Date();
 
-           String billingRegion = oscarProperties.getBillingTypeUpperCase();
-           if ("CLINICAID".equals(billingRegion))
+           if (oscarProperties.isClinicaidBillingType())
            {
                ClinicaidAPIService clinicaidAPIService = SpringUtils.getBean(ClinicaidAPIService.class);
 

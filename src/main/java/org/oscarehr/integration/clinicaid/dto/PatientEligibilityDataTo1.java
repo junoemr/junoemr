@@ -34,6 +34,9 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PatientEligibilityDataTo1 implements Serializable
 {
+	private static final String CHECKED_STATUS_CHECKED = "checked";
+	private static final String CHECKED_STATUS_UNKNOWN = "unknown";
+	private static final String CHECKED_STATUS_PENDING = "pending";
 
 	@JsonProperty("eligible_for_provincial_billing")
 	private boolean eligible;
@@ -45,9 +48,16 @@ public class PatientEligibilityDataTo1 implements Serializable
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date queuedAt;
 
+	@JsonProperty("eligibility_checked_at")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date checkedAt;
+
 	@JsonProperty("eligibility_expiry_date")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date expiryAt;
+
+	@JsonProperty("check_status")
+	private String checkStatus;
 
 	public boolean isEligible()
 	{
@@ -87,5 +97,20 @@ public class PatientEligibilityDataTo1 implements Serializable
 	public void setExpiryAt(Date expiryAt)
 	{
 		this.expiryAt = expiryAt;
+	}
+
+	public Date getCheckedAt()
+	{
+		return checkedAt;
+	}
+
+	public String getCheckStatus()
+	{
+		return checkStatus;
+	}
+
+	public boolean isChecked()
+	{
+		return CHECKED_STATUS_CHECKED.equals(checkStatus);
 	}
 }

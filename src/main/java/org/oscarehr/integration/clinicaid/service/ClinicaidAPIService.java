@@ -35,6 +35,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.integration.clinicaid.dto.ClinicaidApiLimitInfoTo1;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidResultTo1;
 import org.oscarehr.integration.clinicaid.dto.PatientEligibilityDataTo1;
 import org.oscarehr.util.LoggedInInfo;
@@ -47,10 +48,14 @@ import oscar.util.ConversionUtils;
 import oscar.util.UtilMisc;
 import oscar.oscarBilling.data.BillingFormData;
 
+import static java.lang.Thread.sleep;
+
 
 @Service
 public class ClinicaidAPIService
 {
+	static private final int ELIG_CHECK_TIMEOUT_MS = 5000;
+	static private final int ELIG_CHECK_POLL_FREQUENCY_MS = 700;
 	static private String apiPath = "/api/v2/";
 
 	private ClinicaidSessionManager sessionManager;
@@ -63,24 +68,61 @@ public class ClinicaidAPIService
 		this.sessionManager = sessionManager;
 	}
 
-	public Map<String, String> checkEligibility(Demographic demo) throws IOException
+	private ClinicaidResultTo1 doAsyncEligibilityCheck(String queryString)
+			throws IOException, InterruptedException
 	{
+		String urlString = sessionManager.getApiDomain() + apiPath + "patient/eligibility/";
+		URL url = new URL(urlString + queryString);
+
+		ClinicaidResultTo1 result;
+		ClinicaidResultTo1 lastUsableResult = null;
+		long start = System.currentTimeMillis();
+		int sleepDuration = 0;
+
+		do
+		{
+			sleep(sleepDuration);
+
+			result = sessionManager.get(url);
+
+			ClinicaidApiLimitInfoTo1 limitInfo = result.getApiLimitInfo();
+			if (result.hasError() && limitInfo != null && limitInfo.isLimitReached())
+			{
+				sleepDuration = limitInfo.getIntervalExpireSeconds() * 1000;
+				continue;
+			}
+
+			lastUsableResult = result;
+			sleepDuration = ELIG_CHECK_POLL_FREQUENCY_MS;
+
+			if (result.hasError() || result.getData().getEligibilityData().isChecked())
+				break;
+
+		} while (System.currentTimeMillis() - start < ELIG_CHECK_TIMEOUT_MS);
+
+		return lastUsableResult;
+	}
+
+	public Map<String, String> checkEligibility(Demographic demo) throws IOException, InterruptedException
+	{
+		String urlString = sessionManager.getApiDomain() + apiPath + "patient/eligibility/";
+
 		Map<String, String> data = new HashMap<>();
 		data.put("health_number", demo.getHin());
 
+		ClinicaidResultTo1 result;
 		if (oscarProperties.isOntarioInstanceType())
 		{
 			data.put("ontario_version_code", demo.getVer());
+			String queryString = sessionManager.buildQueryString(data);
+			result = doAsyncEligibilityCheck(queryString);
 		}
 		else
 		{
 			data.put("birth_date", ConversionUtils.toDateString(demo.getBirthDate()));
+			String queryString = sessionManager.buildQueryString(data);
+			result = sessionManager.get(new URL(urlString + queryString));
 		}
-
-		String queryString = sessionManager.buildQueryString(data);
-
-		String urlString = sessionManager.getApiDomain() + apiPath + "patient/eligibility/" + queryString;
-		ClinicaidResultTo1 result = sessionManager.get(new URL(urlString));
 
 		HashMap<String, String> response = new HashMap<>();
 		if (result.hasError())
@@ -92,6 +134,11 @@ public class ClinicaidAPIService
 			PatientEligibilityDataTo1 eligibilityData = result.getData().getEligibilityData();
 			response.put("result", eligibilityData.isEligible() ? "Patient Eligible" : "Patient Not Eligible");
 			response.put("msg", eligibilityData.getMessage());
+
+			if (!eligibilityData.isChecked())
+			{
+				response.put("error", String.format("Check timed out. Last check from %tF:", eligibilityData.getCheckedAt()));
+			}
 		}
 
 		return response;
