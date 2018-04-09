@@ -199,7 +199,7 @@ public class Schedule
 			endDate = MyDateFormat.getSysDate(endDateStr);
 		}
 
-		List<RSchedule> rsl = rScheduleDao.findByProviderNoAndDates(providerNo, startDate);
+		List<RSchedule> rsl = rScheduleDao.findByProviderNoAndStartEndDates(providerNo, startDate, endDate);
 		for(RSchedule rs : rsl)
 		{
 			rs.setStatus(RSchedule.STATUS_DELETED);

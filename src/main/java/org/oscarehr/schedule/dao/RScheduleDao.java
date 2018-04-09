@@ -142,4 +142,12 @@ public class RScheduleDao extends AbstractDao<RSchedule>
 		query.setParameter("apptDate", apptDate);
 		return query.getResultList();
     }
+
+	public List<RSchedule> findByProviderNoAndStartEndDates(String providerNo, Date startDate, Date endDate) {
+		Query query = createQuery("r", "r.providerNo = :providerNo AND r.sDate = :startDate AND r.eDate = :endDate");
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("startDate", startDate);
+		query.setParameter("endDate", endDate);
+		return query.getResultList();
+	}
 }
