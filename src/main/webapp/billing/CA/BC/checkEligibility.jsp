@@ -23,7 +23,6 @@
     Ontario, Canada
 
 --%>
-
 <%
 String result = oscar.Misc.safeString((String) request.getAttribute("Result"));
 String msgs   = oscar.Misc.safeString((String) request.getAttribute("Msgs"));
@@ -32,4 +31,5 @@ if ( error.length() != 0)
 {
    error = "Error in connection : " + error;
 }
-%><%=result%>-<%=msgs%><%=error%>
+%><%=result%>
+<%=msgs%><%=error%>

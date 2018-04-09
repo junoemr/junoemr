@@ -90,7 +90,7 @@ public class ClinicaidAPIService
 		else
 		{
 			PatientEligibilityDataTo1 eligibilityData = result.getData().getEligibilityData();
-			response.put("result", eligibilityData.isEligible() ? "Eligible" : "Not Eligible");
+			response.put("result", eligibilityData.isEligible() ? "Patient Eligible" : "Patient Not Eligible");
 			response.put("msg", eligibilityData.getMessage());
 		}
 
