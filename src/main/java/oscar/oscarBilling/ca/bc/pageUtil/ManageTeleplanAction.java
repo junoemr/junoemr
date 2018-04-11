@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * of the License, or (at your option) any later version. 
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,11 +28,9 @@ package oscar.oscarBilling.ca.bc.pageUtil;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -44,7 +42,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.integration.clinicaid.service.ClinicaidAPIService;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DiagnosticCodeDao;
 import org.oscarehr.common.model.Demographic;
@@ -469,33 +466,12 @@ public class ManageTeleplanAction extends DispatchAction {
            throws Exception {
            log.debug("checkElig");
            String demographicNo = request.getParameter("demographic");
-           OscarProperties oscarProperties = OscarProperties.getInstance();
+           OscarProperties prop = OscarProperties.getInstance();
            DemographicDao dDao = (DemographicDao) SpringUtils.getBean("demographicDao");
            DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
            Demographic demo = demographicManager.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demographicNo);
 
            Date billingDate = new Date();
-
-           String billingRegion = oscarProperties.getBillingTypeUpperCase();
-           if ("CLINICAID".equals(billingRegion))
-           {
-               ClinicaidAPIService clinicaidAPIService = SpringUtils.getBean(ClinicaidAPIService.class);
-
-               try
-			   {
-				   Map<String, String> clinicaidResponse = clinicaidAPIService.checkEligibility(demo);
-				   request.setAttribute("error", clinicaidResponse.get("error"));
-				   request.setAttribute("Result", clinicaidResponse.get("result"));
-				   request.setAttribute("Msgs", clinicaidResponse.get("msg"));
-			   }
-			   catch(IOException e)
-			   {
-				   log.error("Failed to get eligibility status through ClinicAid API.", e);
-				   request.setAttribute("error", e.getMessage());
-			   }
-
-               return mapping.findForward("checkElig");
-           }
 
            TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
            String[] userpass = dao.getUsernamePassword();

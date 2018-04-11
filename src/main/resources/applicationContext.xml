@@ -243,9 +243,6 @@
 	<!-- Encounter Form DAO -->
 	<bean id="Rourke2009DAO" class="oscar.form.dao.Rourke2009DAO" autowire="byName"/>
 
-	<!-- CLINICAID -->
-	<bean id="clinicaidAPIService" class="org.oscarehr.integration.clinicaid.service.ClinicaidAPIService" autowire="byName"/>
-	<bean id="clinicaidSessionManager" class="org.oscarehr.integration.clinicaid.service.ClinicaidSessionManager" autowire="byName"/>
 
         <!--Email Support -->
         <context:component-scan base-package="oscar.service"/>
