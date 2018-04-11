@@ -45,12 +45,11 @@ angular.module('Consults').controller('Consults.ConsultRequestAttachmentControll
 			controller.atth.selectedAttachedDoc = controller.atth.selectedAvailableDoc;
 			controller.atth.selectedAttachedDoc.attached = true;
 
-			//Get index to remove by document id
+			//Get index to remove by document id and document type
 			var removeIndex = controller.atth.availableDocs.map(function(item)
 			{
-				return item.documentNo;
-			}).indexOf(controller.atth.selectedAvailableDoc.documentNo);
-
+				return item.documentNo+item.documentType;
+			}).indexOf(controller.atth.selectedAvailableDoc.documentNo+controller.atth.selectedAvailableDoc.documentType);
 			controller.atth.availableDocs.splice(removeIndex, 1);
 
 			var selectionIndex = $("#selAvailDoc")[0].selectedIndex;
@@ -68,15 +67,14 @@ angular.module('Consults').controller('Consults.ConsultRequestAttachmentControll
 			controller.atth.selectedAvailableDoc = controller.atth.selectedAttachedDoc;
 			controller.atth.selectedAvailableDoc.attached = false;
 
-			//Get index to remove by document id
+			//Get index to remove by document id and document type
 			var removeIndex = controller.atth.attachedDocs.map(function(item)
 			{
-				return item.documentNo;
-			}).indexOf(controller.atth.selectedAttachedDoc.documentNo);
-
+				return item.documentNo+item.documentType;
+			}).indexOf(controller.atth.selectedAttachedDoc.documentNo+controller.atth.selectedAttachedDoc.documentType);
 			controller.atth.attachedDocs.splice(removeIndex, 1);
 
-			var selectionIndex = $("#selAttachDoc")[0].selectedIndex
+			var selectionIndex = $("#selAttachDoc")[0].selectedIndex;
 			if (selectionIndex >= controller.atth.attachedDocs.length) selectionIndex = controller.atth.attachedDocs.length - 1;
 			controller.atth.selectedAttachedDoc = controller.atth.attachedDocs[selectionIndex];
 

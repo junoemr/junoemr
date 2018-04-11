@@ -25,6 +25,7 @@
 
 package oscar.oscarBilling.ca.bc.Teleplan;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Demographic;
@@ -45,6 +46,9 @@ import java.util.Date;
  * @author jaygallagher
  */
 public class WCBTeleplanSubmission {
+
+	private static final int WCB_CLAIM_NO_MAX_LENGTH = 8;
+
     private static Logger log = MiscUtils.getLogger();
     
     private static DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
@@ -109,13 +113,16 @@ public class WCBTeleplanSubmission {
 		}
 		else
 		{
-			if(wcb.getW_wcbno() != null && !wcb.getW_wcbno().trim().equals(""))
+			String wcbNo = wcb.getW_wcbno();
+			if(wcbNo != null && !wcbNo.trim().isEmpty())
 			{
-				try
+				// check maximum length
+				if(wcbNo.length() > WCB_CLAIM_NO_MAX_LENGTH)
 				{
-					Integer.parseInt(wcb.getW_wcbno());
+					m.append(": WCB claim # exceeds maximum length of " + WCB_CLAIM_NO_MAX_LENGTH + " digits ");
 				}
-				catch(Exception e)
+				// if not a number
+				if(!StringUtils.isNumeric(wcbNo))
 				{
 					m.append(": WCB claim # may only contain Numbers ");
 				}

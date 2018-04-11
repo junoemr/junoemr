@@ -41,26 +41,31 @@ public class PDFFile extends GenericFile
 {
 	private static Logger logger = MiscUtils.getLogger();
 	private static final Set<String> allowedErrors = new HashSet<>();
-	private static final Set<Pattern> allowedWarningsGS = new HashSet<>();
+	private static Pattern[] allowedWarningsGS = null;
 
-	public PDFFile(File file) throws IOException
+	public PDFFile(File file)
 	{
 		super(file);
-
-		// define allowed GhostScript warnings
-		allowedWarningsGS.add(
-				Pattern.compile(".*Missing glyph .* in the font HiddenHorzOCR.*", Pattern.CASE_INSENSITIVE)
-		);
 	}
 
 	private boolean isAllowedWarning(String line)
 	{
-		for (Pattern pattern : allowedWarningsGS)
+		for (Pattern pattern : getAllowedWarningsGS())
 		{
 			if (pattern.matcher(line).matches())
 				return true;
 		}
 		return false;
+	}
+
+	private static Pattern[] getAllowedWarningsGS()
+	{
+		if(allowedWarningsGS == null)
+		{
+			allowedWarningsGS = new Pattern[1];
+			allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font HiddenHorzOCR.*", Pattern.CASE_INSENSITIVE);
+		}
+		return allowedWarningsGS;
 	}
 
 	@Override
