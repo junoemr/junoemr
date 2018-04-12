@@ -1042,6 +1042,14 @@
 		<ap-output>${practitionerNo}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>appt_provider_cpsid</ap-name>
+		<ap-sql>SELECT provider.practitionerNo FROM provider, appointment
+			WHERE appointment.appointment_no=${appt_no} AND
+			appointment.provider_no=provider.provider_no
+		</ap-sql>
+		<ap-output>${practitionerNo}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>doctor_title</ap-name>
 		<ap-sql>SELECT provider.title FROM provider, demographic WHERE
 			demographic.demographic_no=${demographic} AND
