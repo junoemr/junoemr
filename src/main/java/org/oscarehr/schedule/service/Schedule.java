@@ -199,6 +199,11 @@ public class Schedule
 			endDate = MyDateFormat.getSysDate(endDateStr);
 		}
 
+		if (endDate == null)
+		{
+			throw new IllegalArgumentException("End date cannot be null");
+		}
+
 		List<RSchedule> rsl = rScheduleDao.findByProviderNoAndStartEndDates(providerNo, startDate, endDate);
 		for(RSchedule rs : rsl)
 		{
