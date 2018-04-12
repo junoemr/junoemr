@@ -174,7 +174,7 @@ if(groupName.equals(groupView)){
 		</td>
 
 		<td style="padding-left: 4px;"><a href="#"
-			onclick="newWindow('efmshowform_data.jsp?fid=<%=curForm.get("fid")%>', '<%="FormG" + i%>'); return false;"><%=curForm.get("formName")%></a></td>
+			onclick="newWindow('../eform/efmshowform_data.jsp?fid=<%=curForm.get("fid")%>', '<%="FormG" + i%>'); return false;"><%=curForm.get("formName")%></a></td>
 
 		<td nowrap align='center'><%=curForm.get("formDate")%></td>
 		
