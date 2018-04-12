@@ -23,25 +23,18 @@
 
 package org.oscarehr.common.model;
 
+import org.oscarehr.common.annotation.SiteLocation;
+import org.oscarehr.common.listeners.BeanValidationEventListener;
+
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 @Entity
+@EntityListeners(BeanValidationEventListener.class)
 @Table(name = "appointment")
 public class Appointment extends AbstractModel<Integer> implements Serializable {
 
@@ -81,7 +74,10 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	private String notes;
 	private String reason;
+
+	@SiteLocation
 	private String location;
+
 	private String resources;
 	private String type;
 	private String style;

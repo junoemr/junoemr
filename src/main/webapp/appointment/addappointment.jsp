@@ -209,7 +209,8 @@
 
 				<% if (isMultisitesOn)
 					{
-				%>		if ($('[name="location"] option').length == 0)
+				%>
+						if ($('[name="location"] option').length == 0)
 						{
 							window.alert("<bean:message key="appointment.addappointment.msgNoSiteAssigned"/>");
 							return false;
