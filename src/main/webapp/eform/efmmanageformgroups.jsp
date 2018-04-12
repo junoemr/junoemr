@@ -145,13 +145,13 @@ if(groupName.equals(groupView)){
 </th>
 
 <th>
-<a href="<%= request.getContextPath() %>/eform/efmmanageformgroups.jsp?orderby=form_name&group_view=<%=groupView%>" class="contentLink">
+<a href="<%= request.getContextPath() %>/eform/efmmanageformgroups.jsp?orderby=form_name&group_view=<%=URLEncoder.encode(groupView, "UTF-8")%>" class="contentLink">
 <bean:message key="eform.uploadhtml.btnFormName" />
 </a>
 </th>
 	
 <th>
-<a href="<%= request.getContextPath() %>/eform/efmmanageformgroups.jsp?group_view=<%=groupView%>" class="contentLink">
+<a href="<%= request.getContextPath() %>/eform/efmmanageformgroups.jsp?group_view=<%=URLEncoder.encode(groupView, "UTF-8")%>" class="contentLink">
 <bean:message key="eform.uploadhtml.btnDate" />
 </a>
 </th>
@@ -170,7 +170,7 @@ if(groupName.equals(groupView)){
 	<tr rel="popover" data-html="true" data-title="<%=curForm.get("formName")%>" data-content="<strong><bean:message key="eform.uploadhtml.btnSubject" />:</strong><br> <%=curForm.get("formSubject")%> <br> <small><bean:message key="eform.uploadhtml.btnFile" />: <%=curForm.get("formFileName")%></small>" data-trigger="hover" data-placement="bottom">
 
 		<td nowrap align="center">
-		<a href="<%= request.getContextPath() %>/eforms/removeFromGroup.do?fid=<%=curForm.get("fid")%>&groupName=<%=groupView%>" title="remove from group" class="btn btn-small" title="delete eform from group" data-confirm="<i class='icon-warning-sign icon-large'></i> Are you sure you would like to remove this eform from this group?"><i class="icon-trash"></i></a>
+		<a href="<%= request.getContextPath() %>/eforms/removeFromGroup.do?fid=<%=curForm.get("fid")%>&groupName=<%=URLEncoder.encode(groupView, "UTF-8")%>" title="remove from group" class="btn btn-small" title="delete eform from group" data-confirm="<i class='icon-warning-sign icon-large'></i> Are you sure you would like to remove this eform from this group?"><i class="icon-trash"></i></a>
 		</td>
 
 		<td style="padding-left: 4px;"><a href="#"
