@@ -63,75 +63,6 @@ public class ProviderLabRouting {
     public ProviderLabRouting() {
     }
 
-    public void route(String labId, String provider_no, Connection conn, String labType) throws SQLException{
-        route(Integer.parseInt(labId), provider_no, conn, labType);
-    }
-
-    public void route(int labId, String provider_no, Connection conn, String labType) throws SQLException {
-
-        PreparedStatement pstmt;
-        ForwardingRules fr = new ForwardingRules();
-        OscarProperties props = OscarProperties.getInstance();
-
-        String autoFileLabs = props.getProperty("AUTO_FILE_LABS");
-        String autoUnfileLabs = props.getProperty("AUTO_UNFILE_LABS");
-
-        String sql = "SELECT status FROM providerLabRouting WHERE provider_no='"+provider_no+"' AND lab_no='"+labId+"' AND lab_type='"+labType+"'";
-        pstmt = conn.prepareStatement(sql);
-        ResultSet rs = pstmt.executeQuery();
-
-        if (!rs.next()){
-
-            String status = fr.getStatus(provider_no);
-            ArrayList<ArrayList<String>> forwardProviders = fr.getProviders(provider_no);
-            sql = "insert into providerLabRouting (provider_no, lab_no, status, lab_type) values('"+provider_no+"', '"+labId+"', '"+status+"', '"+labType+"')";
-
-            pstmt = conn.prepareStatement(sql);
-            pstmt.executeUpdate();
-
-            //forward lab to specified providers
-            for (int j=0; j < forwardProviders.size(); j++){
-                logger.info("FORWARDING PROVIDER: "+((forwardProviders.get(j)).get(0)));
-                route(labId, ( ( forwardProviders.get(j)).get(0)), conn, labType);
-            }
-        }
-        else
-        {
-            // If the lab has already been sent to this provider check to make sure that
-            // it is set as a new lab for at least one provider if AUTO_FILE_LABS=yes is not
-            // set in the oscar.properties file
-            if (autoFileLabs == null || !autoFileLabs.equalsIgnoreCase("yes"))
-            {
-                sql = "SELECT provider_no FROM providerLabRouting WHERE lab_no='"+labId+"' AND status='N' AND lab_type='"+labType+"'";
-                pstmt = conn.prepareStatement(sql);
-                rs = pstmt.executeQuery();
-                if (!rs.next()){
-
-                    sql = "UPDATE providerLabRouting set status='N' WHERE lab_no='"+labId+"' AND lab_type='"+labType+"'";
-                    pstmt = conn.prepareStatement(sql);
-                    pstmt.executeUpdate();
-                }
-            }
-
-            // if auto-unfile-labs is turned on, when a lab is forwarded and
-            // the status is filed for that provider, change it to new
-            if("yes".equalsIgnoreCase(autoUnfileLabs))
-            {
-                logger.info(String.format("unfiling lab %s (%s) for %s", labId, labType, provider_no));
-                sql = "UPDATE providerLabRouting set status = ? WHERE provider_no = ? AND lab_no = ? AND lab_type= ? AND status = ?";
-                pstmt = conn.prepareStatement(sql);
-                int paramIndex = 1;
-                pstmt.setString(paramIndex++, "N");
-                pstmt.setString(paramIndex++, provider_no);
-                pstmt.setInt(paramIndex++, labId);
-                pstmt.setString(paramIndex++, labType);
-                pstmt.setString(paramIndex++, "F");
-                pstmt.executeUpdate();
-            }
-        }
-        pstmt.close();
-    }
-
     public static Hashtable<String,Object> getInfo(String lab_no) throws SQLException {
 	Hashtable<String,Object> info = new Hashtable<String,Object>();
 	String sql = "SELECT * FROM providerLabRouting WHERE lab_no='"+lab_no+"'";
@@ -161,7 +92,7 @@ public class ProviderLabRouting {
         ProviderLabRoutingDao providerLabRoutingDao = new ProviderLabRoutingDao();
         List<ProviderLabRoutingModel> rs = providerLabRoutingDao.getProviderLabRoutingForLabProviderType(labId, provider_no, labType);
 
-        if(!rs.isEmpty()) {
+        if(rs.isEmpty()) {
         	String status = fr.getStatus(provider_no);
             ArrayList<ArrayList<String>> forwardProviders = fr.getProviders(provider_no);
 

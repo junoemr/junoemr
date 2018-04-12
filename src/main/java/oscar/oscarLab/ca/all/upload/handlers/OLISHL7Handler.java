@@ -67,7 +67,7 @@ public class OLISHL7Handler implements MessageHandler {
 				if (routeToCurrentProvider) {
 					String provNo =  LoggedInInfo.loggedInInfo.get().loggedInProvider.getProviderNo();
 					ProviderLabRouting routing = new ProviderLabRouting();
-					routing.route(results.segmentId, provNo, DbConnectionFilter.getThreadLocalDbConnection(), "HL7");
+					routing.route(String.valueOf(results.segmentId), provNo,"HL7");
 					this.lastSegmentId = results.segmentId;
 				}
 			}
