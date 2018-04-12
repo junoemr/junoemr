@@ -84,7 +84,13 @@ public class SunquestHandler extends AHSHandler
 
     /* ===================================== PID ====================================== */
 
-    /* ===================================== OBR ====================================== */
+    @Override
+	public String getPatientName()
+	{
+		return(getFirstName()+" "+getMiddleName()+" "+getLastName());
+	}
+
+	/* ===================================== OBR ====================================== */
 
 	@Override
 	protected String getOrderingProvider(int i, int k) throws HL7Exception
