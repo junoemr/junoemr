@@ -29,19 +29,15 @@ import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
-import org.oscarehr.ws.rest.RestResponse;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
-import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import java.util.List;
 
 @Component("ProviderWs")
@@ -54,21 +50,9 @@ public class ProvidersWs extends AbstractServiceImpl
 	@Autowired
 	ProviderDao providerDao;
 
-	@GET
-	@Path("/search")
-	public RestResponse<DemographicTo1, String> search(
-			@QueryParam("page") @DefaultValue("1") Integer page,
-			@QueryParam("perPage") @DefaultValue("10") Integer perPage,
-			@QueryParam("hin") String hin)
-	{
-		perPage = limitedResultCount(perPage);
-		page = validPageNo(page);
-		int offset = calculatedOffset(page, perPage);
-
-
-		return null;
-	}
-
+	/**
+	 * leftover method from old oscar REST api. left here so that the test app providers example will work.
+	 */
 	@GET
 	@Path("/providers_json")
 	public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON() {
