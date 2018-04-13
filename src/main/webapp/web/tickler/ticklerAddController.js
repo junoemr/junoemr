@@ -137,9 +137,12 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			t.status = 'A';
 			t.message = controller.tickler.message;
 
-			var date = moment(controller.tickler.serviceDateDate.getTime()).format("MM-DD-YYYY");
-			t.serviceDate = moment(date + "-" + controller.tickler.serviceDateTime, 'MM-DD-YYYY-hh:mm A').toDate();
+			var givenDate = controller.tickler.serviceDateDate;
+			var givenTime = moment(controller.tickler.serviceDateTime, 'hh:mm A');
+			givenDate.setHours(givenTime.get('hour'));
+			givenDate.setMinutes(givenTime.get('minute'));
 
+			t.serviceDate = givenDate;
 			ticklerService.add(t).then(function(data)
 			{
 				$uibModalInstance.close(true);
