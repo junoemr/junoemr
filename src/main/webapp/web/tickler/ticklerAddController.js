@@ -77,7 +77,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				});
 			}
 
-			$('#timepicker').timepicker();
+			$('#timepicker').timepicker({defaultTime: controller.tickler.serviceDateTime});
 		};
 
 		ticklerService.getTextSuggestions().then(function(data)
