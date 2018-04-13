@@ -79,9 +79,12 @@
 		  <ref bean="restLoggingOutInterceptor" />
 	  </jaxrs:outFaultInterceptors>
 
+	  <!-- define which services are externally available -->
 	  <jaxrs:serviceBeans>
-            <bean class="org.oscarehr.ws.rest.ProviderService"  autowire="byName"/>
-        </jaxrs:serviceBeans>
+		  <bean class="org.oscarehr.ws.external.rest.v1.DemographicsWs" autowire="byName"/>
+		  <bean class="org.oscarehr.ws.external.rest.v1.ProviderWs" autowire="byName"/>
+		  <bean class="org.oscarehr.ws.external.rest.v1.ProvidersWs" autowire="byName"/>
+	  </jaxrs:serviceBeans>
              
       <jaxrs:providers>
            <ref bean="oAuthFilter"/>

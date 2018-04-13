@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,48 +22,17 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.ws;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+package org.oscarehr.ws.external.soap.v1;
+
+import org.apache.cxf.annotations.GZIP;
+import org.springframework.stereotype.Component;
 
 import javax.jws.WebService;
 
-import org.apache.cxf.annotations.GZIP;
-import org.oscarehr.common.dao.AbstractDao;
-import org.springframework.stereotype.Component;
-
 @WebService
 @Component
-@GZIP(threshold = AbstractWs.GZIP_THRESHOLD)
-public class SystemInfoWs extends AbstractWs {
-	/**
-	 * http://127.0.0.1:8080/myoscar_server/ws/SystemInfoService/helloWorld
-	 */
-	public String helloWorld() {
-		return ("Hello World! the configuration works! and your client works! :) " + (new java.util.Date()));
-	}
-
-	public String isAlive() {
-		return ("alive");
-	}
-
-	public int getMaxListReturnSize() {
-		return (AbstractDao.MAX_LIST_RETURN_SIZE);
-	}
-
-	/**
-	 * This returns the time on the oscar server
-	 */
-	public Calendar getServerTime() {
-		Calendar cal = new GregorianCalendar();
-		return (cal);
-	}
-
-	public int getServerTimeGmtOffset() {
-		TimeZone timeZone=TimeZone.getDefault();
-		int offset=timeZone.getOffset(System.currentTimeMillis());
-		return(offset);
-	}
+@GZIP(threshold= AbstractWs.GZIP_THRESHOLD)
+public class UserMetricsWs extends AbstractWs
+{
 }

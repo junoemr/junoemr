@@ -22,11 +22,7 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.ws;
-
-import java.util.List;
-
-import javax.jws.WebService;
+package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
 import org.oscarehr.common.model.Property;
@@ -37,6 +33,9 @@ import org.oscarehr.ws.transfer_objects.ProviderPropertyTransfer;
 import org.oscarehr.ws.transfer_objects.ProviderTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.jws.WebService;
+import java.util.List;
 
 @WebService
 @Component
