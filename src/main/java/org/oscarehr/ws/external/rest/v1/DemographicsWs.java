@@ -27,11 +27,10 @@ import org.apache.log4j.Logger;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
-import org.oscarehr.ws.rest.RestResponse;
+import org.oscarehr.ws.rest.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.DefaultValue;
@@ -54,7 +53,7 @@ public class DemographicsWs extends AbstractServiceImpl
 
 	@GET
 	@Path("/search")
-	public RestResponse<List<DemographicSearchResult>, String> search(
+	public RestSearchResponse<DemographicSearchResult, String> search(
 			@QueryParam("page") @DefaultValue("1") Integer page,
 			@QueryParam("perPage") @DefaultValue("10") Integer perPage,
 			@QueryParam("exactMatch") @DefaultValue("false") Boolean exactMatch,
@@ -62,8 +61,8 @@ public class DemographicsWs extends AbstractServiceImpl
 	)
 	{
 		List<DemographicSearchResult> response = new ArrayList<>(0);
-		HttpHeaders responseHeaders = new HttpHeaders();
 
+		int totalResultCount;
 		try
 		{
 			perPage = limitedResultCount(perPage);
@@ -71,7 +70,7 @@ public class DemographicsWs extends AbstractServiceImpl
 			int offset = calculatedOffset(page, perPage);
 
 			DemographicSearchRequest searchRequest = new DemographicSearchRequest();
-			searchRequest.setStatusMode(DemographicSearchRequest.STATUSMODE.active);
+			searchRequest.setStatusMode(DemographicSearchRequest.STATUSMODE.all);
 			searchRequest.setIntegrator(false); //this should be configurable by persona
 			searchRequest.setOutOfDomain(true);
 			searchRequest.setExactMatch(exactMatch);
@@ -84,23 +83,20 @@ public class DemographicsWs extends AbstractServiceImpl
 			else
 			{
 				logger.warn("Missing Search Parameter");
-				return RestResponse.errorResponse("Missing Search Parameter");
+				return RestSearchResponse.errorSearchResponse("Missing Search Parameter");
 			}
 
-			int count = demographicManager.searchPatientsCount(getLoggedInInfo(), searchRequest);
-			if(count > 0)
+			totalResultCount = demographicManager.searchPatientsCount(getLoggedInInfo(), searchRequest);
+			if(totalResultCount > 0)
 			{
 				response = demographicManager.searchPatients(getLoggedInInfo(), searchRequest, offset, perPage);
 			}
-			responseHeaders.add("total", String.valueOf(count));
-			responseHeaders.add("page", String.valueOf(page));
-			responseHeaders.add("perPage", String.valueOf(perPage));
 		}
 		catch(Exception e)
 		{
 			logger.error("Error", e);
-			return RestResponse.errorResponse("System Error");
+			return RestSearchResponse.errorSearchResponse("System Error");
 		}
-		return RestResponse.successResponse(responseHeaders, response);
+		return RestSearchResponse.successSearchResponse(response, page, perPage, totalResultCount);
 	}
 }
