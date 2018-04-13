@@ -464,11 +464,7 @@ public class CommonLabResultData {
 				for (int k = 0; k < labIds.length; k++) {
 
 					for (int j = 0; j < providersArray.length; j++) {
-						/*
-						 * if (!insertString.equals("")) { insertString = insertString + ", "; } insertString = insertString + "('" + providersArray[j] + "','" + labIds[k]+ "','N','"+labType+"')";
-						 */
-						plr.route(labIds[k], providersArray[j], labType);
-						//updateReportStatus(Integer.parseInt(labIds[k]),((providersArray[j]==null)?"":providersArray[j]),'N',"",labType);
+						plr.addToLabRouting(labIds[k], providersArray[j], labType);
 					}
 
 					// delete old entries

@@ -81,56 +81,60 @@ public class ProviderLabRouting {
 	return info;
     }
 
-    public void route(String labId, String provider_no, String labType) throws SQLException {
 
-    	ForwardingRules fr = new ForwardingRules();
+    public void addToLabRouting(String labId, String provider_no, String labType) throws SQLException
+	{
+		ForwardingRules fr = new ForwardingRules();
+		ProviderLabRoutingDao providerLabRoutingDao = new ProviderLabRoutingDao();
+		List<ProviderLabRoutingModel> rs = providerLabRoutingDao.getProviderLabRoutingForLabProviderType(labId, provider_no, labType);
+
+		OscarProperties props = OscarProperties.getInstance();
+		String autoUnfileLabs = props.getProperty("AUTO_UNFILE_LABS");
+
+		if(rs.isEmpty()) {
+			String status = fr.getStatus(provider_no);
+			ArrayList<ArrayList<String>> forwardProviders = fr.getProviders(provider_no);
+
+			ProviderLabRoutingModel newRouted = new ProviderLabRoutingModel();
+			newRouted.setProviderNo(provider_no);
+			newRouted.setLabNo(Integer.parseInt(labId));
+			newRouted.setLabType(labType);
+			newRouted.setStatus(status);
+
+			providerLabRoutingDao.persist(newRouted);
+
+			//forward lab to specified providers
+			for (int j=0; j < forwardProviders.size(); j++){
+				logger.info("FORWARDING PROVIDER: "+((forwardProviders.get(j)).get(0)));
+				route(labId, ( ( forwardProviders.get(j)).get(0)),labType);
+			}
+
+		// if auto-unfile-labs is turned on, when a lab is forwarded and
+		// the status is filed for that provider, change it to new
+		} else if ("yes".equalsIgnoreCase(autoUnfileLabs))
+		{
+			logger.info(String.format("unfiling lab %s (%s) for %s", labId, labType, provider_no));
+			providerLabRoutingDao.updateStatus("N", labId, labType, provider_no, "F");
+		}
+	}
+
+	public void route(String labId, String provider_no, String labType) throws SQLException
+	{
+		ProviderLabRoutingDao providerLabRoutingDao = new ProviderLabRoutingDao();
 
         OscarProperties props = OscarProperties.getInstance();
         String autoFileLabs = props.getProperty("AUTO_FILE_LABS");
-        String autoUnfileLabs = props.getProperty("AUTO_UNFILE_LABS");
 
-        ProviderLabRoutingDao providerLabRoutingDao = new ProviderLabRoutingDao();
-        List<ProviderLabRoutingModel> rs = providerLabRoutingDao.getProviderLabRoutingForLabProviderType(labId, provider_no, labType);
+        addToLabRouting(labId, provider_no, labType);
 
-        if(rs.isEmpty()) {
-        	String status = fr.getStatus(provider_no);
-            ArrayList<ArrayList<String>> forwardProviders = fr.getProviders(provider_no);
-
-            ProviderLabRoutingModel newRouted = new ProviderLabRoutingModel();
-            newRouted.setProviderNo(provider_no);
-            newRouted.setLabNo(Integer.parseInt(labId));
-            newRouted.setLabType(labType);
-            newRouted.setStatus(status);
-
-            providerLabRoutingDao.persist(newRouted);
-
-            //forward lab to specified providers
-            for (int j=0; j < forwardProviders.size(); j++){
-                logger.info("FORWARDING PROVIDER: "+((forwardProviders.get(j)).get(0)));
-                route(labId, ( ( forwardProviders.get(j)).get(0)),labType);
-            }
-
-           } else {
-
-                // If the lab has already been sent to this provider check to make sure that
-                // it is set as a new lab for at least one provider if AUTO_FILE_LABS=yes is not
-                // set in the oscar.properties file
-                if (autoFileLabs == null || !autoFileLabs.equalsIgnoreCase("yes")) {
-            	   rs = providerLabRoutingDao.getProviderLabRoutingForLabAndType(labId, labType);
-            	   if (rs.isEmpty()) {
-            		   providerLabRoutingDao.updateStatus(labId,labType);
-            	   }
-                }
-
-                // if auto-unfile-labs is turned on, when a lab is forwarded and
-                // the status is filed for that provider, change it to new
-                if("yes".equalsIgnoreCase(autoUnfileLabs))
-                {
-                    logger.info(String.format("unfiling lab %s (%s) for %s", labId, labType, provider_no));
-                    providerLabRoutingDao.updateStatus("N", labId, labType, provider_no, "F");
-                }
-           }
-
+		// check to make sure that the lab is set as a new lab for at least one provider
+		// if not, update lab to new for all providers (unless AUTO_FILE_LABS is enabled)
+		if (autoFileLabs == null || !autoFileLabs.equalsIgnoreCase("yes")) {
+			List<ProviderLabRoutingModel> rs = providerLabRoutingDao.getProviderLabRoutingForLabAndType(labId, labType);
+		   if (rs.isEmpty()) {
+			   providerLabRoutingDao.updateStatus(labId,labType);
+		   }
+		}
 
     }
 
