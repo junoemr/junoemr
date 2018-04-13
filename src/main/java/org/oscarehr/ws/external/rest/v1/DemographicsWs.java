@@ -53,7 +53,7 @@ public class DemographicsWs extends AbstractServiceImpl
 	private DemographicManager demographicManager;
 
 	@GET
-	@Path("/find")
+	@Path("/search")
 	public RestResponse<List<DemographicSearchResult>, String> search(
 			@QueryParam("page") @DefaultValue("1") Integer page,
 			@QueryParam("perPage") @DefaultValue("10") Integer perPage,
@@ -74,6 +74,7 @@ public class DemographicsWs extends AbstractServiceImpl
 			searchRequest.setStatusMode(DemographicSearchRequest.STATUSMODE.active);
 			searchRequest.setIntegrator(false); //this should be configurable by persona
 			searchRequest.setOutOfDomain(true);
+			searchRequest.setExactMatch(exactMatch);
 
 			if(hin != null)
 			{
