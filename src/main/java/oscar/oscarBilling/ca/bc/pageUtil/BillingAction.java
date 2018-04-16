@@ -25,13 +25,6 @@
 
 package oscar.oscarBilling.ca.bc.pageUtil;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -40,14 +33,20 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.oscarehr.decisionSupport.model.DSConsequence;
+import org.oscarehr.integration.clinicaid.service.ClinicaidAPIService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.billing.Clinicaid.util.ClinicaidCommunication;
-
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarBilling.ca.bc.MSP.ServiceCodeValidationLogic;
 import oscar.oscarBilling.ca.bc.decisionSupport.BillingGuidelines;
 import oscar.util.SqlUtils;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
 
 public final class BillingAction extends Action {
   private static Logger _log = MiscUtils.getLogger();
@@ -75,8 +74,7 @@ public final class BillingAction extends Action {
     }
 	else if ("CLINICAID".equals(region)) {
 
-	  ClinicaidCommunication clinicaid_communicator 
-		  = new ClinicaidCommunication();
+	  ClinicaidAPIService clinicaidAPIService = SpringUtils.getBean(ClinicaidAPIService.class);
 
 	  String action = "";
 	  if( request.getParameter("action") != null) {
@@ -86,7 +84,7 @@ public final class BillingAction extends Action {
 		  action = "create_invoice";
 	  }
 
-	  String clinicaidURL = clinicaid_communicator.buildClinicaidURL(request, action);
+	  String clinicaidURL = clinicaidAPIService.buildClinicaidURL(request, action);
       String newURL = mapping.findForward("CLINICAID").getPath();
       newURL = newURL + "?" + request.getQueryString();
       ActionForward Clinicaid = new ActionForward();

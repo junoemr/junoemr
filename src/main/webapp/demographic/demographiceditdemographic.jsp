@@ -982,10 +982,10 @@ if(wLReadonly.equals("")){
 						    %>
 
 							<br/>
-                            <a  href="javascript: void();" onclick="return !showMenu('2', event);" onmouseover="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','returnTeleplanMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+                            <a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
                             <div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
                                 <span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
-                                <span id="returnTeleplanMsg"></span>
+                                <span id="eligibilityMsg"></span>
                             </div>
 					<%
 						}
@@ -1007,10 +1007,10 @@ if(wLReadonly.equals("")){
 
 
 						<br/>
-						<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmouseover="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','returnTeleplanMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+						<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
 						<div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
 							<span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
-							<span id="returnTeleplanMsg"></span>
+							<span id="eligibilityMsg"></span>
 						</div>
 					<%}%>
 				</td>

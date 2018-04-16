@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,6 +33,7 @@ import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DiagnosticCodeDao;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.integration.clinicaid.service.ClinicaidAPIService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
@@ -56,6 +57,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -499,10 +501,32 @@ public class ManageTeleplanAction extends DispatchAction {
 	{
 		log.debug("checkElig");
 		String demographicNo = request.getParameter("demographic");
+		OscarProperties oscarProperties = OscarProperties.getInstance();
 		DemographicDao dDao = SpringUtils.getBean(DemographicDao.class);
 		Demographic demo = dDao.getDemographic(demographicNo);
 
 		Date billingDate = new Date();
+
+		String billingRegion = oscarProperties.getBillingTypeUpperCase();
+		if ("CLINICAID".equals(billingRegion))
+		{
+			ClinicaidAPIService clinicaidAPIService = SpringUtils.getBean(ClinicaidAPIService.class);
+
+			try
+			{
+				Map<String, String> clinicaidResponse = clinicaidAPIService.checkEligibility(demo);
+				request.setAttribute("error", clinicaidResponse.get("error"));
+				request.setAttribute("Result", clinicaidResponse.get("result"));
+				request.setAttribute("Msgs", clinicaidResponse.get("msg"));
+			}
+			catch(IOException e)
+			{
+				log.error("Failed to get eligibility status through ClinicAid API.", e);
+				request.setAttribute("error", e.getMessage());
+			}
+
+			return mapping.findForward("checkElig");
+		}
 
 		TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
 		String[] userpass = dao.getUsernamePassword();
