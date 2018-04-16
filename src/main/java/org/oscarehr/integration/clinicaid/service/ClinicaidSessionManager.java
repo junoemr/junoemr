@@ -63,7 +63,6 @@ public class ClinicaidSessionManager
 	private final String loginEndPoint = apiDomain + "/auth/pushed_login/";
 
 	private ClinicaidUserTo1 clinicaidUser;
-	private String nonce;
 
 	private ClinicaidSessionManager()
 	{
@@ -101,18 +100,14 @@ public class ClinicaidSessionManager
 
 	protected String getLoginToken(Provider loggedInProvider) throws IOException
 	{
-		if (nonce == null)
-		{
-			clinicaidUser = new ClinicaidUserTo1();
-			clinicaidUser.setIdentifier(loggedInProvider.getProviderNo());
-			clinicaidUser.setFirstName(loggedInProvider.getFirstName());
-			clinicaidUser.setLastName(loggedInProvider.getLastName());
-			pushLogin();
-		}
-		return nonce;
+		clinicaidUser = new ClinicaidUserTo1();
+		clinicaidUser.setIdentifier(loggedInProvider.getProviderNo());
+		clinicaidUser.setFirstName(loggedInProvider.getFirstName());
+		clinicaidUser.setLastName(loggedInProvider.getLastName());
+		return pushLogin();
 	}
 
-	private void pushLogin() throws IOException
+	private String pushLogin() throws IOException
 	{
 		if (OscarProperties.getInstance().isPropertyActive("clinicaid_dev_mode"))
 		{
@@ -123,7 +118,7 @@ public class ClinicaidSessionManager
 
 		URL nonceUrl = new URL(loginEndPoint);
 		ClinicaidResultTo1 result = post(nonceUrl, mapper.writeValueAsString(clinicaidUser));
-		nonce = result.getNonce();
+		return result.getNonce();
 	}
 
 	private ClinicaidResultTo1 executeRequest
