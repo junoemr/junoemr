@@ -22,43 +22,39 @@
  * Ontario, Canada
  */
 
-package oscar.oscarBilling.ca.bc.data;
+package org.oscarehr.integration.clinicaid.dto;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.Query;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.springframework.stereotype.Repository;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ClinicaidErrorResultTo1 implements Serializable
+{
+	@JsonProperty("standard_errors")
+	private ArrayList<String> standardErrors;
 
-import oscar.util.ConversionUtils;
-
-/**
- * 
- * Responsible for CRUD operation a user Billing Module Preferences
- * 
- * @author not attributable
- * @version 1.0
- */
-@Repository
-public class BillingPreferencesDAO extends AbstractDao<BillingPreference> {
-
-	public BillingPreferencesDAO() {
-		super(BillingPreference.class);
+	public void setStandardErrors(ArrayList<String> standardErrors)
+	{
+		this.standardErrors = standardErrors;
 	}
 
-	@SuppressWarnings("unchecked")
-	public BillingPreference getUserBillingPreference(String providerNo)
+	public ArrayList<String> getStandardErrors()
 	{
-		return getUserBillingPreference(ConversionUtils.fromIntString(providerNo));
+		return this.standardErrors;
 	}
-	public BillingPreference getUserBillingPreference(Integer providerNo)
-	{
-		Query query = createQuery("bp", "bp.providerNo = :providerNo");
-		query.setParameter("providerNo", providerNo);
 
-		List<BillingPreference> prefs = query.getResultList();
-		if(prefs.isEmpty()) return null;
-		return prefs.get(0);
+	public String getErrorString()
+	{
+		String errorString = "";
+		Iterator<String> standardErrorsI = this.standardErrors.iterator();
+		while (standardErrorsI.hasNext())
+		{
+			errorString += standardErrorsI.next() + "\n";
+		}
+		return errorString;
 	}
 }

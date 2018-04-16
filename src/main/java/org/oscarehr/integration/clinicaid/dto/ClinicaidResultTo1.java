@@ -22,43 +22,67 @@
  * Ontario, Canada
  */
 
-package oscar.oscarBilling.ca.bc.data;
+package org.oscarehr.integration.clinicaid.dto;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.Query;
+import java.io.Serializable;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.springframework.stereotype.Repository;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ClinicaidResultTo1 implements Serializable
+{
+	final String ERROR_STRING = "error";
 
-import oscar.util.ConversionUtils;
 
-/**
- * 
- * Responsible for CRUD operation a user Billing Module Preferences
- * 
- * @author not attributable
- * @version 1.0
- */
-@Repository
-public class BillingPreferencesDAO extends AbstractDao<BillingPreference> {
+	private String result;
 
-	public BillingPreferencesDAO() {
-		super(BillingPreference.class);
+	@JsonProperty("data")
+	private ClinicaidResultDataTo1 data;
+
+	private ClinicaidErrorResultTo1 errors;
+
+	private String nonce;
+
+	private boolean hasError = false;
+
+
+	public String getResult()
+	{
+		return this.result;
 	}
 
-	@SuppressWarnings("unchecked")
-	public BillingPreference getUserBillingPreference(String providerNo)
+	public void setResult(String result)
 	{
-		return getUserBillingPreference(ConversionUtils.fromIntString(providerNo));
+		this.result = result;
+		if (this.result.equals(ERROR_STRING))
+		{
+			this.hasError = true;
+		}
 	}
-	public BillingPreference getUserBillingPreference(Integer providerNo)
-	{
-		Query query = createQuery("bp", "bp.providerNo = :providerNo");
-		query.setParameter("providerNo", providerNo);
 
-		List<BillingPreference> prefs = query.getResultList();
-		if(prefs.isEmpty()) return null;
-		return prefs.get(0);
+	public String getNonce()
+	{
+		return this.nonce;
+	}
+
+	public ClinicaidResultDataTo1 getData()
+	{
+		return this.data;
+	}
+
+	public ClinicaidErrorResultTo1 getErrors()
+	{
+		return this.errors;
+	}
+
+	public void setErrors(ClinicaidErrorResultTo1 errors)
+	{
+		this.errors = errors;
+	}
+
+	public boolean hasError()
+	{
+		return this.hasError;
 	}
 }

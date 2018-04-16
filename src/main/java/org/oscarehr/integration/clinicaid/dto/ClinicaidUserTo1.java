@@ -22,43 +22,54 @@
  * Ontario, Canada
  */
 
-package oscar.oscarBilling.ca.bc.data;
+package org.oscarehr.integration.clinicaid.dto;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.Query;
+import java.io.Serializable;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.springframework.stereotype.Repository;
+public class ClinicaidUserTo1 implements Serializable
+{
+	private String identifier;
 
-import oscar.util.ConversionUtils;
+	@JsonProperty("first_name")
 
-/**
- * 
- * Responsible for CRUD operation a user Billing Module Preferences
- * 
- * @author not attributable
- * @version 1.0
- */
-@Repository
-public class BillingPreferencesDAO extends AbstractDao<BillingPreference> {
+	private String firstName;
 
-	public BillingPreferencesDAO() {
-		super(BillingPreference.class);
+	@JsonProperty("last_name")
+	private String lastName;
+
+	public ClinicaidUserTo1()
+	{
 	}
 
-	@SuppressWarnings("unchecked")
-	public BillingPreference getUserBillingPreference(String providerNo)
+	public void setIdentifier(String identifier)
 	{
-		return getUserBillingPreference(ConversionUtils.fromIntString(providerNo));
+		this.identifier = identifier;
 	}
-	public BillingPreference getUserBillingPreference(Integer providerNo)
-	{
-		Query query = createQuery("bp", "bp.providerNo = :providerNo");
-		query.setParameter("providerNo", providerNo);
 
-		List<BillingPreference> prefs = query.getResultList();
-		if(prefs.isEmpty()) return null;
-		return prefs.get(0);
+	public String getIdentifier()
+	{
+		return this.identifier;
+	}
+
+	public void setFirstName(String firstName)
+	{
+		this.firstName = firstName;
+	}
+
+	public String getFirstName()
+	{
+		return this.firstName;
+	}
+
+	public void setLastName(String lastName)
+	{
+		this.lastName = lastName;
+	}
+
+	public String getLastName()
+	{
+		return this.lastName;
 	}
 }

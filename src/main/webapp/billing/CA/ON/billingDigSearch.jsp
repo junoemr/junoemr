@@ -20,23 +20,20 @@
 <%
   String user_no = (String) session.getAttribute("user");
 %>
-<%@ page import="java.util.*, java.sql.*, oscar.*, java.net.*" errorPage="errorpage.jsp"%>
+<%@ page import="org.oscarehr.common.dao.DiagnosticCodeDao, org.oscarehr.common.model.DiagnosticCode, org.oscarehr.util.SpringUtils, java.sql.ResultSet" errorPage="errorpage.jsp"%>
 
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.common.model.DiagnosticCode" %>
-<%@ page import="org.oscarehr.common.dao.DiagnosticCodeDao" %>
+<%@ page import="java.util.List" %>
 <%
 	DiagnosticCodeDao diagnosticCodeDao = SpringUtils.getBean(DiagnosticCodeDao.class);
 %>
-<% String search = "",search2 = "";
- search = request.getParameter("search");
- if (search.compareTo("") == 0){
- search = "search_diagnostic_code";
- }
+<% String search = "", search2 = "";
+	search = request.getParameter("search");
+	if(search.compareTo("") == 0)
+	{
+		search = "search_diagnostic_code";
+	}
 
-
-   String codeName = request.getParameter("name");
-
+	String codeName = request.getParameter("name");
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -208,7 +205,8 @@ textCode = sBuffer.toString();
 	for(DiagnosticCode result:results) {
 		intCount++;
 		Dcode = result.getDiagnosticCode();
-		DcodeDesc = result.getDescription().trim();
+		DcodeDesc = result.getDescription();
+		DcodeDesc = (DcodeDesc == null) ? "" : DcodeDesc.trim();
 		if (Count == 0){
 			Count = 1;
 			color = "#FFFFFF";
@@ -236,7 +234,8 @@ textCode = sBuffer.toString();
   	  for(DiagnosticCode result:results) {
   		  intCount++;
   		  Dcode = result.getDiagnosticCode();
-  		  DcodeDesc = result.getDescription().trim();
+	      DcodeDesc = result.getDescription();
+	      DcodeDesc = (DcodeDesc == null) ? "" : DcodeDesc.trim();
   		  if (Count == 0){
   			 Count = 1;
   			 color = "#FFFFFF";
@@ -265,7 +264,8 @@ textCode = sBuffer.toString();
   	  for(DiagnosticCode result:results) {
   		  intCount++;
   		  Dcode2 = result.getDiagnosticCode();
-  		  DcodeDesc2 = result.getDescription().trim();
+	      DcodeDesc2 = result.getDescription();
+	      DcodeDesc2 = (DcodeDesc2 == null) ? "" : DcodeDesc2.trim();
   		  if (Count == 0){
   			 Count = 1;
   			 color = "#FFFFFF";

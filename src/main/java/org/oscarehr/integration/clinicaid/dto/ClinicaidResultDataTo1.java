@@ -22,43 +22,23 @@
  * Ontario, Canada
  */
 
-package oscar.oscarBilling.ca.bc.data;
+package org.oscarehr.integration.clinicaid.dto;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
-import javax.persistence.Query;
+import java.io.Serializable;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.springframework.stereotype.Repository;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ClinicaidResultDataTo1 implements Serializable
+{
+	// TODO: invoice and other data to be added here as those are integrated
 
-import oscar.util.ConversionUtils;
+	@JsonUnwrapped
+	private PatientEligibilityDataTo1 eligibilityData;
 
-/**
- * 
- * Responsible for CRUD operation a user Billing Module Preferences
- * 
- * @author not attributable
- * @version 1.0
- */
-@Repository
-public class BillingPreferencesDAO extends AbstractDao<BillingPreference> {
-
-	public BillingPreferencesDAO() {
-		super(BillingPreference.class);
-	}
-
-	@SuppressWarnings("unchecked")
-	public BillingPreference getUserBillingPreference(String providerNo)
+	public PatientEligibilityDataTo1 getEligibilityData()
 	{
-		return getUserBillingPreference(ConversionUtils.fromIntString(providerNo));
-	}
-	public BillingPreference getUserBillingPreference(Integer providerNo)
-	{
-		Query query = createQuery("bp", "bp.providerNo = :providerNo");
-		query.setParameter("providerNo", providerNo);
-
-		List<BillingPreference> prefs = query.getResultList();
-		if(prefs.isEmpty()) return null;
-		return prefs.get(0);
+		return eligibilityData;
 	}
 }
