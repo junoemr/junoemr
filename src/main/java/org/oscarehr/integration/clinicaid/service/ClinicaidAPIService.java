@@ -54,8 +54,8 @@ import static java.lang.Thread.sleep;
 @Service
 public class ClinicaidAPIService
 {
-	static private final int ELIG_CHECK_TIMEOUT_MS = 5000;
-	static private final int ELIG_CHECK_POLL_FREQUENCY_MS = 700;
+	static private final int ELIG_CHECK_TIMEOUT_MS = 6000;
+	static private final int ELIG_CHECK_POLL_FREQUENCY_MS = 1200;
 	static private String apiPath = "/api/v2/";
 
 	private ClinicaidSessionManager sessionManager;
