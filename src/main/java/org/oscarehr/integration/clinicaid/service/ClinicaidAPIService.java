@@ -89,7 +89,7 @@ public class ClinicaidAPIService
 
 	public String buildClinicaidURL(HttpServletRequest request, String action)
 	{
-		String clinicaidLink = "";
+		String clinicaidLink = sessionManager.getClinicaidDomain();
 		String nonce = "";
 
 		HttpSession session = request.getSession();
@@ -108,7 +108,7 @@ public class ClinicaidAPIService
 		{
 			String message = "Failed to get login token for Clinicaid integration.";
 			MiscUtils.getLogger().error(message, error);
-			return null;
+			return clinicaidLink;
 		}
 
 		// If creating a new invoice in Clinicaid
@@ -241,7 +241,7 @@ public class ClinicaidAPIService
 			data.put("diagnostic_code", dx_codes);
 			data.put("address", demo.getAddress());
 
-			clinicaidLink = sessionManager.getClinicaidDomain() + "/?nonce=" + nonce +
+			clinicaidLink = clinicaidLink + "/?nonce=" + nonce +
 					"#/invoice/add" + sessionManager.buildQueryString(data);
 
 		}
@@ -249,11 +249,11 @@ public class ClinicaidAPIService
 		{
 			if (request.getParameter("patient_remote_id") != null && !request.getParameter("patient_remote_id").isEmpty())
 			{
-				clinicaidLink = sessionManager.getClinicaidDomain() + "/?nonce=" + nonce + "#/reports?patient_remote_id=" + request.getParameter("patient_remote_id");
+				clinicaidLink = clinicaidLink + "/?nonce=" + nonce + "#/reports?patient_remote_id=" + request.getParameter("patient_remote_id");
 			}
 			else
 			{
-				clinicaidLink = sessionManager.getClinicaidDomain() + "/?nonce=" + nonce + "#/reports";
+				clinicaidLink = clinicaidLink + "/?nonce=" + nonce + "#/reports";
 			}
 		}
 		return clinicaidLink;
