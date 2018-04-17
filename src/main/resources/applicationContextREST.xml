@@ -44,60 +44,79 @@
 	<bean id="accessTokenService" class="org.apache.cxf.rs.security.oauth.services.AccessTokenService">
 	  <property name="dataProvider" ref="oauthProvider"/>
 	</bean>
-  
-	
-    <jaxrs:server id="oauthService" address="/oauth" >
 
-        <jaxrs:serviceBeans>
-            <ref bean="requestTokenService"/>
-            <ref bean="authorizationService"/>
-            <ref bean="accessTokenService"/>
-        </jaxrs:serviceBeans>
-         
-        <jaxrs:providers>
-      		<ref bean="dispatchProvider"/>
-   		</jaxrs:providers> 
-      
-        <jaxrs:extensionMappings>
-            <entry key="xml" value="application/xml" />         
-        </jaxrs:extensionMappings>
-        
-    </jaxrs:server>
+	<bean id="exceptionMapper" class="org.apache.cxf.jaxrs.validation.ValidationExceptionMapper"/>
+	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.util.ValidationExceptionMapper"/>
 
-  <jaxrs:server id="restServices" address="/services">
-	  <jaxrs:inInterceptors>
-		  <ref bean="restLoggingInInterceptor" />
-	  </jaxrs:inInterceptors>
-	  <jaxrs:outInterceptors>
-		  <ref bean="restLoggingOutInterceptor" />
-	  </jaxrs:outInterceptors>
+	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider" />
 
-	  <jaxrs:inFaultInterceptors>
-		  <ref bean="restLoggingInInterceptor" />
-	  </jaxrs:inFaultInterceptors>
-	  <jaxrs:outFaultInterceptors>
-		  <ref bean="restLoggingOutInterceptor" />
-	  </jaxrs:outFaultInterceptors>
+	<bean id="validationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
+		<property name="provider" ref="validationProvider" />
+	</bean>
 
-	  <!-- define which services are externally available -->
-	  <jaxrs:serviceBeans>
-		  <bean class="org.oscarehr.ws.external.rest.v1.DemographicsWs" autowire="byName"/>
-		  <bean class="org.oscarehr.ws.external.rest.v1.ProviderWs" autowire="byName"/>
-		  <bean class="org.oscarehr.ws.external.rest.v1.ProvidersWs" autowire="byName"/>
-	  </jaxrs:serviceBeans>
-             
-      <jaxrs:providers>
-           <ref bean="oAuthFilter"/>
-           <ref bean="jaxb"/>
-            <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
-      </jaxrs:providers>
-      
-      
-      <jaxrs:extensionMappings>
-		  <entry key="xml" value="application/xml" />
-		  <entry key="json" value="application/json" />
-	  </jaxrs:extensionMappings>
-    </jaxrs:server>
-    
-   
+	<bean id="validationOutInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor">
+		<property name="provider" ref="validationProvider" />
+	</bean>
+
+	<jaxrs:server id="oauthService" address="/oauth" >
+
+		<jaxrs:serviceBeans>
+			<ref bean="requestTokenService"/>
+			<ref bean="authorizationService"/>
+			<ref bean="accessTokenService"/>
+		</jaxrs:serviceBeans>
+
+		<jaxrs:providers>
+			<ref bean="dispatchProvider"/>
+		</jaxrs:providers>
+
+		<jaxrs:extensionMappings>
+			<entry key="xml" value="application/xml" />
+		</jaxrs:extensionMappings>
+
+	</jaxrs:server>
+
+	<jaxrs:server id="restServices" address="/services">
+		<jaxrs:inInterceptors>
+			<ref bean="validationInInterceptor" />
+			<ref bean="restLoggingInInterceptor" />
+		</jaxrs:inInterceptors>
+		<jaxrs:outInterceptors>
+			<ref bean="validationOutInterceptor" />
+			<ref bean="restLoggingOutInterceptor" />
+		</jaxrs:outInterceptors>
+
+		<jaxrs:inFaultInterceptors>
+			<!-- XXX: make sure failed calls get logged
+			<ref bean="restLoggingInInterceptor" />
+			-->
+		</jaxrs:inFaultInterceptors>
+		<jaxrs:outFaultInterceptors>
+			<!-- XXX: make sure failed calls get logged
+			<ref bean="restLoggingOutInterceptor" />
+			<ref bean="exceptionParsingOutInterceptor" />
+			-->
+		</jaxrs:outFaultInterceptors>
+
+		<!-- define which services are externally available -->
+		<jaxrs:serviceBeans>
+			<bean class="org.oscarehr.ws.external.rest.v1.DemographicsWs" autowire="byName"/>
+			<bean class="org.oscarehr.ws.external.rest.v1.ProviderWs" autowire="byName"/>
+			<bean class="org.oscarehr.ws.external.rest.v1.ProvidersWs" autowire="byName"/>
+		</jaxrs:serviceBeans>
+
+		<jaxrs:providers>
+			<ref bean="oAuthFilter"/>
+			<ref bean="jaxb"/>
+			<ref bean="exceptionMapper"/>
+			<ref bean="validationExceptionMapper"/>
+			<bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
+		</jaxrs:providers>
+
+
+		<jaxrs:extensionMappings>
+			<entry key="xml" value="application/xml" />
+			<entry key="json" value="application/json" />
+		</jaxrs:extensionMappings>
+	</jaxrs:server>
 </beans>

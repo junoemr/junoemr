@@ -902,6 +902,10 @@
 					<groupId>org.apache.cxf.services.ws-discovery</groupId>
 					<artifactId>cxf-services-ws-discovery-service</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -1076,6 +1080,11 @@
             <artifactId>simpleclient_servlet</artifactId>
             <version>0.1.0</version>
         </dependency>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>2.0.1</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<resources>
