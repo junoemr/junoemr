@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component("DemographicsWs")
-@Path("/v1/demographics/")
+@Path("/demographics")
 @Produces("application/json")
 public class DemographicsWs extends AbstractServiceImpl
 {

@@ -76,7 +76,7 @@
 
 	</jaxrs:server>
 
-	<jaxrs:server id="restServices" address="/services">
+	<jaxrs:server id="restServicesV1" address="/services/v1">
 		<jaxrs:inInterceptors>
 			<ref bean="validationInInterceptor" />
 			<ref bean="restLoggingInInterceptor" />

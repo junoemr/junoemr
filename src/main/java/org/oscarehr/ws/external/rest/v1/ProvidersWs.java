@@ -41,7 +41,7 @@ import javax.ws.rs.Produces;
 import java.util.List;
 
 @Component("ProviderWs")
-@Path("/v1/providers/")
+@Path("/providers")
 @Produces("application/json")
 public class ProvidersWs extends AbstractServiceImpl
 {
