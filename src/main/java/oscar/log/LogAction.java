@@ -173,6 +173,9 @@ public class LogAction {
 	public static void addLogEntrySyncronous(String providerNo, String action, String module, String status, String data) {
 		addLogEntrySyncronous(providerNo, null, action, module, status, null, null, data, null);
 	}
+	public static void addLogEntrySyncronous(String action, String data) {
+		addLogEntrySyncronous(null, null, action, null, null, null, null, data, null);
+	}
 	
 	/**
 	 * @deprecated - use addLogEntrySyncronous instead
