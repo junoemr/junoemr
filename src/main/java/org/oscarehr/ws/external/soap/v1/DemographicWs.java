@@ -31,6 +31,7 @@ import org.oscarehr.common.Gender;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.transfer_objects.DemographicTransfer;
 import org.oscarehr.ws.transfer_objects.PhrVerificationTransfer;
@@ -141,48 +142,46 @@ public class DemographicWs extends AbstractWs {
 	/**
 	 * @return the ID of the demographic just added
 	 */
-	public Integer addDemographic(DemographicTransfer demographicTransfer)
-			throws Exception
+	public Integer addDemographic(DemographicTransfer demographicTransfer) throws Exception
 	{
 		MessageContext mc = wsContext.getMessageContext();
-		HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+		HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
 
 		LogAction.addLogEntrySyncronous("DemographicWs.addDemographic", "Client IP = " + req.getRemoteAddr());
 
 		Demographic demographic = new Demographic();
 		demographicTransfer.copyTo(demographic);
 
-		if(demographic.getDemographicNo() != null)
+		if (demographic.getDemographicNo() != null)
 		{
-			Integer demo_no = demographic.getDemographicNo();
-
-			throw new Exception("Demographic " + demo_no + " already exists.");
+			throw new Exception("Demographic number can not be specified on creation. This is automatically generated.");
 		}
 
-		demographicManager.addDemographic(demographic);
-		demographicManager.addDemographicExtras(demographic);
-		demographicManager.addDemographicExts(demographic, demographicTransfer);
+		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
+		demographicManager.addDemographicExtras(loggedInInfo, demographic);
+		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
 
-		return(demographic.getDemographicNo());
+		return demographic.getDemographicNo();
 	}
 
-	public void updateDemographic(DemographicTransfer demographicTransfer)
-			throws Exception
+	public void updateDemographic(DemographicTransfer demographicTransfer) throws Exception
 	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		Demographic demographic = new Demographic();
 		demographicTransfer.copyTo(demographic);
 
 		Integer demo_no = demographic.getDemographicNo();
 
-		Demographic existingDemographic = demographicManager.getDemographic(getLoggedInInfo(), demo_no);
+		Demographic existingDemographic = demographicManager.getDemographic(loggedInInfo, demo_no);
 
-		if(existingDemographic == null)
+		if (existingDemographic == null)
 		{
 			throw new Exception("Demographic " + demo_no + " doesn't exist.");
 		}
 
-		demographicManager.addDemographic(demographic);
-		demographicManager.updateDemographicExtras(demographic);
-		demographicManager.addDemographicExts(demographic, demographicTransfer);
+		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
+		demographicManager.updateDemographicExtras(loggedInInfo, demographic);
+		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
 	}
 }

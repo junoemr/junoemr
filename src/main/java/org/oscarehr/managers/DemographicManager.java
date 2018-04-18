@@ -616,54 +616,45 @@ public class DemographicManager {
 		}
 	}
 
-	public Integer addDemographic(Demographic demographic)
-			throws Exception
+	public void addDemographicWithValidation(LoggedInInfo loggedInInfo, Demographic demographic) throws Exception
 	{
-		validateDemographic(demographic);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
 
+		validateDemographic(demographic);
 		filterDemographic(demographic);
 
 		demographicDao.save(demographic);
 
-		//--- log action ---
-		LogAction.addLogEntrySyncronous("DemographicManager.addDemographic", "demographicId=" + demographic.getDemographicNo());
-
-		return (demographic.getDemographicNo());
+		LogAction.addLogEntrySyncronous("DemographicManager.addDemographicWithValidation", "demographicId=" + demographic.getDemographicNo());
 	}
 
-	public Integer addDemographicExts(Demographic demographic,
+	public void addDemographicExts(LoggedInInfo loggedInInfo, Demographic demographic,
 									  DemographicTransfer demographicTransfer)
 	{
-		boolean saved = false;
+		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+
 		if (demographicTransfer.getCellPhone() != null)
 		{
 			demographicExtDao.addKey(demographic.getProviderNo(),
 					demographic.getDemographicNo(), "demo_cell",
 					demographicTransfer.getCellPhone());
-
-			saved = true;
-		}
-
-		if (saved)
-		{
-			return (demographic.getDemographicNo());
-		}
-		else
-		{
-			return (null);
 		}
 	}
 
-	public void updateDemographicExtras(Demographic demographic)
+	public void updateDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic)
 	{
-		DemographicCust demoCust = demographicCustDao.find(demographic.getDemographicNo());
-		demographicCustDao.merge(demoCust);
+		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+
+		DemographicCust demoCust = getDemographicCust(loggedInInfo, demographic.getDemographicNo());
+		createUpdateDemographicCust(loggedInInfo, demoCust);
 	}
 
 	// When adding a demographic, entries are required in other tables.  This
 	// method adds those entries.
-	public Integer addDemographicExtras(Demographic demographic)
+	public void addDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic)
 	{
+		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+
 		// demographiccust
 		DemographicCust demoCust = new DemographicCust();
 		demoCust.setId(demographic.getDemographicNo());
@@ -671,6 +662,7 @@ public class DemographicManager {
 		demoCust.setResident("");
 		demoCust.setMidwife("");
 		demoCust.setNurse("");
+		demoCust.setNotes("<unotes></unotes>");
 
 		demographicCustDao.persist(demoCust);
 
@@ -698,11 +690,9 @@ public class DemographicManager {
 		);
 		recentDemographicAccess.setAccessDateTimeToNow();
 		recentDemographicAccessDao.persist(recentDemographicAccess);
-
-		return (demographic.getDemographicNo());
 	}
 
-	public void filterDemographic(Demographic demographic)
+	private void filterDemographic(Demographic demographic)
 	{
 		// Set some default values
 		if (demographic.getPatientStatus() == null)
@@ -793,7 +783,7 @@ public class DemographicManager {
 		}
 	}
 
-	public void validateDemographic(Demographic demographic)
+	private void validateDemographic(Demographic demographic)
 			throws Exception
 	{
 		boolean has_error = false;
@@ -906,7 +896,7 @@ public class DemographicManager {
 		}
 	}
 
-	public boolean validateFamilyDoctor(String familyDoctor)
+	private boolean validateFamilyDoctor(String familyDoctor)
 	{
 		if (familyDoctor == null)
 		{
@@ -936,7 +926,7 @@ public class DemographicManager {
 		return true;
 	}
 
-	public boolean validateString(String testValue)
+	private boolean validateString(String testValue)
 	{
 		if (testValue == null)
 		{
