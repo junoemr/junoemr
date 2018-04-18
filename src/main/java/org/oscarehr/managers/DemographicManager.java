@@ -616,12 +616,6 @@ public class DemographicManager {
 		}
 	}
 
-
-	public Demographic getDemographic(Integer demographicId)
-	{
-		return demographicDao.getDemographicById(demographicId);
-	}
-
 	public Integer addDemographic(Demographic demographic)
 			throws Exception
 	{
@@ -632,8 +626,7 @@ public class DemographicManager {
 		demographicDao.save(demographic);
 
 		//--- log action ---
-		LogAction.addLogEntrySyncronous("DemographicManager.addDemographic",
-				"demographicId=" + demographic.getDemographicNo());
+		LogAction.addLogEntrySyncronous("DemographicManager.addDemographic", "demographicId=" + demographic.getDemographicNo());
 
 		return (demographic.getDemographicNo());
 	}

@@ -174,7 +174,7 @@ public class DemographicWs extends AbstractWs {
 
 		Integer demo_no = demographic.getDemographicNo();
 
-		Demographic existingDemographic = demographicManager.getDemographic(demo_no);
+		Demographic existingDemographic = demographicManager.getDemographic(getLoggedInInfo(), demo_no);
 
 		if(existingDemographic == null)
 		{
