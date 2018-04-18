@@ -24,10 +24,6 @@
 
 package org.oscarehr.managers;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.dao.AdmissionDao;
@@ -57,9 +53,12 @@ import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
 import oscar.util.StringUtils;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Will provide access to demographic data, as well as closely related data such as 
@@ -217,8 +216,12 @@ public class DemographicManager {
 		return result;
 	}
 
-	public void createDemographic(LoggedInInfo loggedInInfo, Demographic demographic, Integer admissionProgramId) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+	public void createDemographic(LoggedInInfo loggedInInfo, Demographic demographic, Integer admissionProgramId)
+	{
+		createDemographic(loggedInInfo.getLoggedInProviderNo(), demographic, admissionProgramId);
+	}
+	public void createDemographic(String providerNo, Demographic demographic, Integer admissionProgramId) {
+		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
 		try {
 			demographic.getBirthDay();
 		} catch (Exception e) {
@@ -227,13 +230,13 @@ public class DemographicManager {
 
 		demographic.setPatientStatus(PatientStatus.AC.name());
 		demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
-		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		demographic.setLastUpdateUser(providerNo);
 		demographicDao.save(demographic);
 
 		Admission admission = new Admission();
 		admission.setClientId(demographic.getDemographicNo());
 		admission.setProgramId(admissionProgramId);
-		admission.setProviderNo(loggedInInfo.getLoggedInProviderNo());
+		admission.setProviderNo(providerNo);
 		admission.setAdmissionDate(new Date());
 		admission.setAdmissionStatus(Admission.STATUS_CURRENT);
 		admission.setAdmissionNotes("");
@@ -242,7 +245,7 @@ public class DemographicManager {
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
-				createExtension(loggedInInfo, ext);
+				createExtension(providerNo, ext);
 			}
 		}
 	}
@@ -293,8 +296,8 @@ public class DemographicManager {
 	}
 	
 
-	public void createExtension(LoggedInInfo loggedInInfo, DemographicExt ext) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+	public void createExtension(String providerNo, DemographicExt ext) {
+		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
 		demographicExtDao.saveEntity(ext);
 	}
 
@@ -591,15 +594,19 @@ public class DemographicManager {
 		return (results);
 	}
 
-	private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege) {
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_demographic", privilege, null)) {
-			throw new RuntimeException("missing required security object (_demographic)");
+	private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege)
+	{
+		checkPrivilege(loggedInInfo.getLoggedInProviderNo(), privilege);
+	}
+	private void checkPrivilege(String providerNo, String privilege) {
+		if (!securityInfoManager.hasPrivilege(providerNo, "_demographic", privilege, null)) {
+			throw new SecurityException("missing required security object (_demographic)");
 		}
 	}
 
 	private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege, int demographicNo) {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_demographic", privilege, demographicNo)) {
-			throw new RuntimeException("missing required security object (_demographic)");
+			throw new SecurityException("missing required security object (_demographic)");
 		}
 	}
 }

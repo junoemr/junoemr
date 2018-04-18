@@ -26,7 +26,7 @@ package org.oscarehr.ws.external.rest.v1;
 import org.apache.log4j.Logger;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
+import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.rest.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
@@ -38,13 +38,14 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component("DemographicsWs")
 @Path("/demographics")
-@Produces("application/json")
-public class DemographicsWs extends AbstractServiceImpl
+@Produces(MediaType.APPLICATION_JSON)
+public class DemographicsWs extends AbstractExternalRestWs
 {
 	private static Logger logger = MiscUtils.getLogger();
 

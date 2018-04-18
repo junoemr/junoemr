@@ -17,48 +17,48 @@
 	">
 
 
-
 	<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>
 	<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>
 
-	    <bean id="oauthProvider" class="oscar.login.OscarOAuthDataProvider" autowire="byName"/>
+	<bean id="oauthProvider" class="oscar.login.OscarOAuthDataProvider" autowire="byName"/>
 
 	<bean id="requestTokenService" class="oscar.login.OscarRequestTokenService">
-	   <property name="dataProvider" ref="oauthProvider"/>
+		<property name="dataProvider" ref="oauthProvider"/>
 	</bean>
-	
+
 	<bean id="oAuthFilter" class="org.apache.cxf.rs.security.oauth.filters.OAuthRequestFilter">
-         <property name="dataProvider" ref="oauthProvider"/>
-         <property name="useUserSubject" value="true"/>
-     </bean>
-	
+		<property name="dataProvider" ref="oauthProvider"/>
+		<property name="useUserSubject" value="true"/>
+		<property name="supportUnknownParameters" value="true"/>
+	</bean>
+
 	<bean id="authorizationService" class="org.apache.cxf.rs.security.oauth.services.AuthorizationRequestService">
 		<property name="dataProvider" ref="oauthProvider"/>
 	</bean>
-     
-     <bean id="dispatchProvider" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
-      <property name="resourcePath" value="/login/3rdpartyLogin.jsp"/>
-	 </bean>
-	 
-	      
+
+	<bean id="dispatchProvider" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
+		<property name="resourcePath" value="/login/3rdpartyLogin.jsp"/>
+	</bean>
+
+
 	<bean id="accessTokenService" class="org.apache.cxf.rs.security.oauth.services.AccessTokenService">
-	  <property name="dataProvider" ref="oauthProvider"/>
+		<property name="dataProvider" ref="oauthProvider"/>
 	</bean>
 
 	<bean id="exceptionMapper" class="org.apache.cxf.jaxrs.validation.ValidationExceptionMapper"/>
 	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.util.ValidationExceptionMapper"/>
 
-	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider" />
+	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
 
 	<bean id="validationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
-		<property name="provider" ref="validationProvider" />
+		<property name="provider" ref="validationProvider"/>
 	</bean>
 
 	<bean id="validationOutInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor">
-		<property name="provider" ref="validationProvider" />
+		<property name="provider" ref="validationProvider"/>
 	</bean>
 
-	<jaxrs:server id="oauthService" address="/oauth" >
+	<jaxrs:server id="oauthService" address="/oauth">
 
 		<jaxrs:serviceBeans>
 			<ref bean="requestTokenService"/>
@@ -71,19 +71,19 @@
 		</jaxrs:providers>
 
 		<jaxrs:extensionMappings>
-			<entry key="xml" value="application/xml" />
+			<entry key="xml" value="application/xml"/>
 		</jaxrs:extensionMappings>
 
 	</jaxrs:server>
 
 	<jaxrs:server id="restServicesV1" address="/services/v1">
 		<jaxrs:inInterceptors>
-			<ref bean="validationInInterceptor" />
-			<ref bean="restLoggingInInterceptor" />
+			<ref bean="validationInInterceptor"/>
+			<ref bean="restLoggingInInterceptor"/>
 		</jaxrs:inInterceptors>
 		<jaxrs:outInterceptors>
-			<ref bean="validationOutInterceptor" />
-			<ref bean="restLoggingOutInterceptor" />
+			<ref bean="validationOutInterceptor"/>
+			<ref bean="restLoggingOutInterceptor"/>
 		</jaxrs:outInterceptors>
 
 		<jaxrs:inFaultInterceptors>
@@ -100,6 +100,7 @@
 
 		<!-- define which services are externally available -->
 		<jaxrs:serviceBeans>
+			<bean class="org.oscarehr.ws.external.rest.v1.DemographicWs" autowire="byName"/>
 			<bean class="org.oscarehr.ws.external.rest.v1.DemographicsWs" autowire="byName"/>
 			<bean class="org.oscarehr.ws.external.rest.v1.ProviderWs" autowire="byName"/>
 			<bean class="org.oscarehr.ws.external.rest.v1.ProvidersWs" autowire="byName"/>
@@ -115,8 +116,8 @@
 
 
 		<jaxrs:extensionMappings>
-			<entry key="xml" value="application/xml" />
-			<entry key="json" value="application/json" />
+			<entry key="xml" value="application/xml"/>
+			<entry key="json" value="application/json"/>
 		</jaxrs:extensionMappings>
 	</jaxrs:server>
 </beans>

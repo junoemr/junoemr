@@ -20,48 +20,34 @@
  * Centre for Research on Inner City Health, St. Michael's Hospital,
  * Toronto, Ontario, Canada
  */
+package org.oscarehr.ws.external.rest;
 
-package org.oscarehr.ws.external.rest.v1;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.oauth.data.OAuthContext;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
-import org.oscarehr.ws.rest.RestResponse;
-import org.oscarehr.ws.transfer_objects.ProviderTransfer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Component("ProviderWs")
-@Path("/provider")
 @Produces(MediaType.APPLICATION_JSON)
-public class ProviderWs extends AbstractExternalRestWs
+public class AbstractExternalRestWs extends AbstractServiceImpl
 {
-	private static Logger logger = MiscUtils.getLogger();
-
-	@Autowired
-	ProviderDao providerDao;
-
-	@GET
-	@Path("/{id}")
-	public RestResponse<ProviderTransfer,String> getProvider(@PathParam("id") String id)
+	protected OAuthContext getOAuthContext()
 	{
-		ProviderTransfer providerTransfer;
-		try
-		{
-			providerTransfer = ProviderTransfer.toTransfer(providerDao.getProvider(id));
-		}
-		catch(Exception e)
-		{
-			logger.error("Error", e);
-			return RestResponse.errorResponse("Error");
-		}
-		return RestResponse.successResponse(providerTransfer);
+		Message m = PhaseInterceptorChain.getCurrentMessage();
+		return m.getContent(OAuthContext.class);
+	}
+	protected String getOAuthProviderNo()
+	{
+		return getOAuthContext().getSubject().getLogin();
+	}
+
+	protected HttpServletRequest getHttpServletRequest()
+	{
+		Message message = PhaseInterceptorChain.getCurrentMessage();
+		return (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
 	}
 }

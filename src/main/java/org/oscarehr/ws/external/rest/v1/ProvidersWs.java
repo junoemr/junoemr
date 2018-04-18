@@ -28,7 +28,7 @@ import net.sf.json.processors.JsDateJsonBeanProcessor;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
+import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
@@ -38,12 +38,13 @@ import org.springframework.stereotype.Component;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 @Component("ProviderWs")
 @Path("/providers")
-@Produces("application/json")
-public class ProvidersWs extends AbstractServiceImpl
+@Produces(MediaType.APPLICATION_JSON)
+public class ProvidersWs extends AbstractExternalRestWs
 {
 	private static Logger logger = MiscUtils.getLogger();
 
