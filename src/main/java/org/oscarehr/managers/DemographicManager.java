@@ -800,7 +800,13 @@ public class DemographicManager {
 			has_error = true;
 		}
 
-		if (!demographic.getSex().equals("M")
+		if (demographic.getSex() == null)
+		{
+			error_string += "sex is a required field.  ";
+			has_error = true;
+		}
+
+		else if (!demographic.getSex().equals("M")
 				&& !demographic.getSex().equals("F"))
 		{
 			error_string += "sex must be either \"M\" or \"F\" (received " +
