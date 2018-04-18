@@ -148,14 +148,14 @@ public class DemographicWs extends AbstractWs {
 		HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 
-		LogAction.addLogEntrySyncronous("DemographicWs.addDemographic", "Client IP = " + req.getRemoteAddr());
+		LogAction.addLogEntrySynchronous("DemographicWs.addDemographic", "Client IP = " + req.getRemoteAddr());
 
 		Demographic demographic = new Demographic();
 		demographicTransfer.copyTo(demographic);
 
 		if (demographic.getDemographicNo() != null)
 		{
-			throw new Exception("Demographic number can not be specified on creation. This is automatically generated.");
+			throw new Exception("Demographic number can not be specified on creation. It is automatically generated.");
 		}
 
 		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
@@ -168,6 +168,7 @@ public class DemographicWs extends AbstractWs {
 	public void updateDemographic(DemographicTransfer demographicTransfer) throws Exception
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
+
 		Demographic demographic = new Demographic();
 		demographicTransfer.copyTo(demographic);
 
@@ -183,5 +184,6 @@ public class DemographicWs extends AbstractWs {
 		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
 		demographicManager.updateDemographicExtras(loggedInInfo, demographic);
 		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
+
 	}
 }

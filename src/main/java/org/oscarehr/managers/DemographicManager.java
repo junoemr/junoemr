@@ -625,7 +625,7 @@ public class DemographicManager {
 
 		demographicDao.save(demographic);
 
-		LogAction.addLogEntrySyncronous("DemographicManager.addDemographicWithValidation", "demographicId=" + demographic.getDemographicNo());
+		LogAction.addLogEntrySynchronous("DemographicManager.addDemographicWithValidation", "demographicId=" + demographic.getDemographicNo());
 	}
 
 	public void addDemographicExts(LoggedInInfo loggedInInfo, Demographic demographic,
