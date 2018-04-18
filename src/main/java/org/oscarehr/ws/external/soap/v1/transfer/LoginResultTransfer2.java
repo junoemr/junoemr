@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * of the License, or (at your option) any later version. 
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,24 +21,36 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.transfer_objects;
 
-import static org.junit.Assert.assertEquals;
+package org.oscarehr.ws.external.soap.v1.transfer;
 
-import org.junit.Test;
-import org.oscarehr.common.model.Allergy;
+public final class LoginResultTransfer2 {
+	private Integer securityId;
+	private String securityTokenKey;
+	private ProviderTransfer provider;
 
-public class AllergyTransferTest {
-
-	@Test
-	public void transferTest()
-	{
-		Allergy p=new Allergy();
-		p.setId(12345);
-		p.setDescription("testAllergy");
-		
-		AllergyTransfer pt=AllergyTransfer.toTransfer(p);
-		assertEquals(12345, pt.getId().intValue());
-		assertEquals("testAllergy", pt.getDescription());
+	public Integer getSecurityId() {
+		return (securityId);
 	}
+
+	public void setSecurityId(Integer securityId) {
+		this.securityId = securityId;
+	}
+
+	public String getSecurityTokenKey() {
+		return (securityTokenKey);
+	}
+
+	public void setSecurityTokenKey(String securityTokenKey) {
+		this.securityTokenKey = securityTokenKey;
+	}
+
+	public ProviderTransfer getProvider() {
+		return (provider);
+	}
+
+	public void setProvider(ProviderTransfer provider) {
+		this.provider = provider;
+	}
+
 }

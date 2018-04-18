@@ -211,7 +211,7 @@
 
       <property name="extraClass">
          <list>
-           <value>org.oscarehr.ws.transfer_objects.ProviderTransfer</value>
+           <value>org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer</value>
          </list>
       </property>
 

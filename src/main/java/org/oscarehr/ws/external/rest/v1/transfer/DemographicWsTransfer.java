@@ -28,7 +28,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.oscarehr.common.dao.DemographicExtDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.transfer_objects.DemographicTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.springframework.beans.BeanUtils;
 
 import javax.xml.bind.annotation.XmlRootElement;

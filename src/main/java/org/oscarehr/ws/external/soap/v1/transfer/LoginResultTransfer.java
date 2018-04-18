@@ -23,7 +23,7 @@
  */
 
 
-package org.oscarehr.ws.transfer_objects;
+package org.oscarehr.ws.external.soap.v1.transfer;
 
 /**
  * @deprecated 2015-01-28 

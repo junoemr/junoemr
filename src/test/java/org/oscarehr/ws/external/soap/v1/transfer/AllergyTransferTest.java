@@ -21,28 +21,24 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.transfer_objects;
+package org.oscarehr.ws.external.soap.v1.transfer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.oscarehr.PMmodule.model.Program;
+import org.oscarehr.common.model.Allergy;
 
-public class ProgramTransferTest {
+public class AllergyTransferTest {
 
 	@Test
 	public void transferTest()
 	{
-		Program p=new Program();
+		Allergy p=new Allergy();
 		p.setId(12345);
-		p.setName("testProgram");
-		p.setFacilityId(3345);
-		p.setHic(false);
+		p.setDescription("testAllergy");
 		
-		ProgramTransfer pt=ProgramTransfer.toTransfer(p);
+		AllergyTransfer pt=AllergyTransfer.toTransfer(p);
 		assertEquals(12345, pt.getId().intValue());
-		assertEquals("testProgram", pt.getName());
-		assertEquals(3345, pt.getFacilityId());
-		assertFalse(pt.isHic());
+		assertEquals("testAllergy", pt.getDescription());
 	}
 }

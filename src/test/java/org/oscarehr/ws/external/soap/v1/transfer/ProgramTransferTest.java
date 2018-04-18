@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,36 +21,28 @@
  * Hamilton
  * Ontario, Canada
  */
+package org.oscarehr.ws.external.soap.v1.transfer;
 
-package org.oscarehr.ws.transfer_objects;
+import static org.junit.Assert.*;
 
-public final class LoginResultTransfer2 {
-	private Integer securityId;
-	private String securityTokenKey;
-	private ProviderTransfer provider;
+import org.junit.Test;
+import org.oscarehr.PMmodule.model.Program;
 
-	public Integer getSecurityId() {
-		return (securityId);
+public class ProgramTransferTest {
+
+	@Test
+	public void transferTest()
+	{
+		Program p=new Program();
+		p.setId(12345);
+		p.setName("testProgram");
+		p.setFacilityId(3345);
+		p.setHic(false);
+		
+		ProgramTransfer pt=ProgramTransfer.toTransfer(p);
+		assertEquals(12345, pt.getId().intValue());
+		assertEquals("testProgram", pt.getName());
+		assertEquals(3345, pt.getFacilityId());
+		assertFalse(pt.isHic());
 	}
-
-	public void setSecurityId(Integer securityId) {
-		this.securityId = securityId;
-	}
-
-	public String getSecurityTokenKey() {
-		return (securityTokenKey);
-	}
-
-	public void setSecurityTokenKey(String securityTokenKey) {
-		this.securityTokenKey = securityTokenKey;
-	}
-
-	public ProviderTransfer getProvider() {
-		return (provider);
-	}
-
-	public void setProvider(ProviderTransfer provider) {
-		this.provider = provider;
-	}
-
 }

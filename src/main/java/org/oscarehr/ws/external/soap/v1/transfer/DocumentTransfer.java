@@ -22,7 +22,7 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.ws.transfer_objects;
+package org.oscarehr.ws.external.soap.v1.transfer;
 
 import java.io.IOException;
 import java.util.ArrayList;

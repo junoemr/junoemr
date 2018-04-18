@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * of the License, or (at your option) any later version. 
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,20 +21,23 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.transfer_objects;
+
+package org.oscarehr.ws.external.soap.v1.transfer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.oscarehr.common.model.Property;
+import org.oscarehr.common.model.MeasurementMap;
 import org.springframework.beans.BeanUtils;
 
-public final class ProviderPropertyTransfer {
+public final class MeasurementMapTransfer {
 
 	private Integer id;
+	private String loincCode;
+	private String identCode;
 	private String name;
-	private String value;
+	private String labType;
 
 	public Integer getId() {
 		return (id);
@@ -42,6 +45,22 @@ public final class ProviderPropertyTransfer {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getLoincCode() {
+		return (loincCode);
+	}
+
+	public void setLoincCode(String loincCode) {
+		this.loincCode = loincCode;
+	}
+
+	public String getIdentCode() {
+		return (identCode);
+	}
+
+	public void setIdentCode(String identCode) {
+		this.identCode = identCode;
 	}
 
 	public String getName() {
@@ -52,34 +71,35 @@ public final class ProviderPropertyTransfer {
 		this.name = name;
 	}
 
-	public String getValue() {
-		return (value);
+	public String getLabType() {
+		return (labType);
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	public void setLabType(String labType) {
+		this.labType = labType;
 	}
 
-	public static ProviderPropertyTransfer toTransfer(Property property) {
-		if (property == null) return (null);
+	public static MeasurementMapTransfer toTransfer(MeasurementMap measurementMap) {
+		if (measurementMap == null) return (null);
 
-		ProviderPropertyTransfer providerPropertyTransfer = new ProviderPropertyTransfer();
+		MeasurementMapTransfer measurementMapTransfer = new MeasurementMapTransfer();
+		BeanUtils.copyProperties(measurementMap, measurementMapTransfer);
 
-		BeanUtils.copyProperties(property, providerPropertyTransfer);
-
-		return (providerPropertyTransfer);
+		return (measurementMapTransfer);
 	}
 
-	public static ProviderPropertyTransfer[] toTransfers(List<Property> properties) {
-		ArrayList<ProviderPropertyTransfer> results = new ArrayList<ProviderPropertyTransfer>();
-
-		for (Property property : properties) {
-			results.add(toTransfer(property));
+	public static MeasurementMapTransfer[] toTransfers(List<MeasurementMap> measurementMaps)
+	{
+		ArrayList<MeasurementMapTransfer> tempResults=new ArrayList<MeasurementMapTransfer>();
+		
+		for (MeasurementMap measurementMap : measurementMaps)
+		{
+			tempResults.add(toTransfer(measurementMap));
 		}
-
-		return (results.toArray(new ProviderPropertyTransfer[0]));
+		
+		return(tempResults.toArray(new MeasurementMapTransfer[0]));
 	}
-
+	
 	@Override
 	public String toString() {
 		return (ReflectionToStringBuilder.toString(this));
