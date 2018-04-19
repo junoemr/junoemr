@@ -826,12 +826,6 @@ public class DemographicManager {
 			has_error = true;
 		}
 
-		if (demographic.getPhone() == null)
-		{
-			error_string += "phone is a required field.  ";
-			has_error = true;
-		}
-
 		if (demographic.getYearOfBirth() == null)
 		{
 			error_string += "yearOfBirth is a required field.  ";
