@@ -174,9 +174,12 @@ public class DemographicWs extends AbstractWs {
 
 		Integer demo_no = demographic.getDemographicNo();
 
-		Demographic existingDemographic = demographicManager.getDemographic(loggedInInfo, demo_no);
+		if (demo_no == null)
+		{
+			throw new Exception("You must specify a demographic number.");
+		}
 
-		if (existingDemographic == null)
+		if (demographicManager.getDemographic(loggedInInfo, demo_no) == null)
 		{
 			throw new Exception("Demographic " + demo_no + " doesn't exist.");
 		}
