@@ -663,10 +663,6 @@ public class DemographicManager {
 		// demographiccust
 		DemographicCust demoCust = new DemographicCust();
 		demoCust.setId(demographic.getDemographicNo());
-		demoCust.setAlert("");
-		demoCust.setResident("");
-		demoCust.setMidwife("");
-		demoCust.setNurse("");
 		demoCust.setNotes("<unotes></unotes>");
 
 		demographicCustDao.persist(demoCust);
@@ -721,65 +717,9 @@ public class DemographicManager {
 			demographic.setFamilyDoctor2("<fd></fd><fdname></fdname>");
 		}
 
-		// Set nulls to blank
-		if (demographic.getTitle() == null)
+		if (demographic.getLastUpdateDate() == null)
 		{
-			demographic.setTitle("");
-		}
-
-		if (demographic.getAddress() == null)
-		{
-			demographic.setAddress("");
-		}
-
-		if (demographic.getCity() == null)
-		{
-			demographic.setCity("");
-		}
-
-		if (demographic.getProvince() == null)
-		{
-			demographic.setProvince("");
-		}
-
-		if (demographic.getPostal() == null)
-		{
-			demographic.setPostal("");
-		}
-
-		if (demographic.getPhone2() == null)
-		{
-			demographic.setPhone2("");
-		}
-
-		if (demographic.getHin() == null)
-		{
-			demographic.setHin("");
-		}
-
-		if (demographic.getVer() == null)
-		{
-			demographic.setVer("");
-		}
-
-		if (demographic.getRosterStatus() == null)
-		{
-			demographic.setRosterStatus("");
-		}
-
-		if (demographic.getChartNo() == null)
-		{
-			demographic.setChartNo("");
-		}
-
-		if (demographic.getSpokenLanguage() == null)
-		{
-			demographic.setSpokenLanguage("");
-		}
-
-		if (demographic.getOfficialLanguage() == null)
-		{
-			demographic.setOfficialLanguage("");
+			demographic.setLastUpdateDate(new Date());
 		}
 
 		if (demographic.getProviderNo() == null)
@@ -787,10 +727,6 @@ public class DemographicManager {
 			demographic.setProviderNo("");
 		}
 
-		if (demographic.getSin() == null)
-		{
-			demographic.setSin("");
-		}
 	}
 
 	private void validateDemographic(Demographic demographic)
