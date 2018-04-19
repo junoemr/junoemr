@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.Gender;
@@ -66,7 +67,6 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 import oscar.log.LogAction;
-import oscar.util.StringUtils;
 
 /**
  * Will provide access to demographic data, as well as closely related data such as 
@@ -209,7 +209,12 @@ public class DemographicManager {
 			//Archive previous demoCust
 			DemographicCust prevCust = demographicCustDao.find(demoCust.getId());
 			if (prevCust != null) {
-				if (!(StringUtils.nullSafeEquals(prevCust.getAlert(), demoCust.getAlert()) && StringUtils.nullSafeEquals(prevCust.getMidwife(), demoCust.getMidwife()) && StringUtils.nullSafeEquals(prevCust.getNurse(), demoCust.getNurse()) && StringUtils.nullSafeEquals(prevCust.getResident(), demoCust.getResident()) && StringUtils.nullSafeEquals(prevCust.getNotes(), demoCust.getNotes()))) {
+				if (!(StringUtils.equals(prevCust.getAlert(), demoCust.getAlert()) &&
+						StringUtils.equals(prevCust.getMidwife(), demoCust.getMidwife()) &&
+						StringUtils.equals(prevCust.getNurse(), demoCust.getNurse()) &&
+						StringUtils.equals(prevCust.getResident(), demoCust.getResident()) &&
+						StringUtils.equals(prevCust.getNotes(), demoCust.getNotes())))
+				{
 					demographicCustArchiveDao.archiveDemographicCust(prevCust);
 				}
 			}
@@ -706,9 +711,14 @@ public class DemographicManager {
 			}
 		}
 
-		if (demographic.getFamilyDoctor() == null)
+		if (StringUtils.isBlank(demographic.getFamilyDoctor()))
 		{
 			demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
+		}
+
+		if (StringUtils.isBlank(demographic.getFamilyDoctor2()))
+		{
+			demographic.setFamilyDoctor2("<fd></fd><fdname></fdname>");
 		}
 
 		// Set nulls to blank
@@ -839,11 +849,22 @@ public class DemographicManager {
 			has_error = true;
 		}
 
-		if (!validateFamilyDoctor(demographic.getFamilyDoctor()))
+		String familyDoctor = demographic.getFamilyDoctor();
+		if (!StringUtils.isBlank(familyDoctor) && !validatePattern(familyDoctor, "<rdohip>(.*)<\\/rdohip><rd>(.*)<\\/rd>"))
 		{
 			error_string += "familyDoctor is formatted incorrectly.  It must ";
-			error_string += "be a string like <rdohip>{family doctor number}";
+			error_string += "be a string like <rdohip>{referral doctor number}";
 			error_string += "</rdohip><rd>{last name},{first name}</rd>.  ";
+			error_string += "Also no other tags and no quotes, line breaks ";
+			error_string += "or semicolons are allowed.";
+			has_error = true;
+		}
+
+		if (!validatePattern(demographic.getFamilyDoctor2(), "<fd>(.*)<\\/fd><fdname>(.*)<\\/fdname>"))
+		{
+			error_string += "familyDoctor2 is formatted incorrectly.  It must ";
+			error_string += "be a string like <fd>{family doctor number}";
+			error_string += "</fd><fdname>{last name},{first name}</fdname>.  ";
 			error_string += "Also no other tags and no quotes, line breaks ";
 			error_string += "or semicolons are allowed.";
 			has_error = true;
@@ -888,7 +909,8 @@ public class DemographicManager {
 						!validateString(demographic.getTitle()) ||
 						!validateString(demographic.getOfficialLanguage()) ||
 						!validateString(demographic.getCountryOfOrigin()) ||
-						!validateString(demographic.getNewsletter())
+						!validateString(demographic.getNewsletter()) ||
+						!validateString(demographic.getVeteranNo())
 				)
 		{
 			error_string += "No html tags and no quotes, line breaks ";
@@ -902,31 +924,30 @@ public class DemographicManager {
 		}
 	}
 
-	private boolean validateFamilyDoctor(String familyDoctor)
+	private boolean validatePattern(String value, String pattern)
 	{
-		if (familyDoctor == null)
+		if (value == null)
 		{
 			return true;
 		}
 
 		// Make sure it is formatted correctly
-		Pattern p = Pattern.compile("<rdohip>(.*)</rdohip><rd>(.*)</rd>");
-		Matcher m = p.matcher(familyDoctor);
+		Pattern p = Pattern.compile(pattern);
+		Matcher m = p.matcher(value);
 
-		if (m.matches())
+		if (!m.matches())
 		{
-			// Fail if there are invalid characters in the contents
-			if (!validateString(m.group(1)))
+			return false;
+		}
+
+		// Fail if there are invalid characters in the contents
+		int numGroups = m.groupCount();
+		for (int group = 1; group <= numGroups; group++)
+		{
+			if (!validateString(m.group(group)))
 			{
 				return false;
 			}
-
-			if (!validateString(m.group(2)))
-			{
-				return false;
-			}
-
-			return true;
 		}
 
 		return true;
