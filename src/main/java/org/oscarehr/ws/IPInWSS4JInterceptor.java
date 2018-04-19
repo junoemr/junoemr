@@ -73,11 +73,10 @@ public class IPInWSS4JInterceptor extends WSS4JInInterceptor implements Callback
 		if (request==null) return; // it's an outgoing request
 		String ip = request.getRemoteAddr();
 
-		MiscUtils.getLogger().error("--------------------In IP interceptor.");
 		if(!isIPAllowed(ip))
 		{
 			String errorMessage = "Invalid IP Address (" + ip + ")";
-			MiscUtils.getLogger().error(errorMessage);
+			logger.error(errorMessage);
 			OscarLog oscarLog=new OscarLog();
 			oscarLog.setAction("ACCESS_WS");
 			oscarLog.setIp(ip);
