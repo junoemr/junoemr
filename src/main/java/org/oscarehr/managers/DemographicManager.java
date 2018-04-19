@@ -628,7 +628,6 @@ public class DemographicManager {
 		validateDemographic(demographic);
 		filterDemographic(demographic);
 
-		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		demographicDao.save(demographic);
 
 		LogAction.addLogEntrySynchronous("DemographicManager.addDemographicWithValidation", "demographicId=" + demographic.getDemographicNo());
@@ -900,6 +899,7 @@ public class DemographicManager {
 						!validateString(demographic.getAnonymous()) ||
 						!validateString(demographic.getSpokenLanguage()) ||
 						!validateString(demographic.getDisplayName()) ||
+						!validateString(demographic.getLastUpdateUser()) ||
 						!validateString(demographic.getTitle()) ||
 						!validateString(demographic.getOfficialLanguage()) ||
 						!validateString(demographic.getCountryOfOrigin()) ||

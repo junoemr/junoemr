@@ -87,6 +87,8 @@ public final class DemographicTransfer {
 	private int activeCount;
 	private int hsAlertCount;
 	private String displayName;
+	private String lastUpdateUser;
+	private Date lastUpdateDate;
 	private String title;
 	private String officialLanguage;
 	private String countryOfOrigin;
@@ -468,6 +470,22 @@ public final class DemographicTransfer {
 
 	public void setDisplayName(String displayName) {
     	this.displayName = displayName;
+    }
+
+	public String getLastUpdateUser() {
+    	return (lastUpdateUser);
+    }
+
+	public void setLastUpdateUser(String lastUpdateUser) {
+    	this.lastUpdateUser = lastUpdateUser;
+    }
+
+	public Date getLastUpdateDate() {
+    	return (lastUpdateDate);
+    }
+
+	public void setLastUpdateDate(Date lastUpdateDate) {
+    	this.lastUpdateDate = lastUpdateDate;
     }
 
 	public String getTitle() {
