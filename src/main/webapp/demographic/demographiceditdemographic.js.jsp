@@ -199,7 +199,14 @@ function checkRosterStatus()
 		}
 		else
 		{
-			if (document.updatedelete.roster_status.value == "FS")
+			if (document.updatedelete.roster_status.value == "NR" || document.updatedelete.roster_status.value == "TE")
+			{
+				if (!rosterStatusTerminationDateValid(false))
+				{
+					return false;
+				}
+			}
+			else
 			{
 				//Check if termination date is valid and don't validate if left blank
 				if (!rosterStatusTerminationDateValid(true))
@@ -222,13 +229,6 @@ function checkRosterStatus()
 							return false;
 						}
 					}
-				}
-			}
-			else
-			{
-				if (!rosterStatusTerminationDateValid(false))
-				{
-					return false;
 				}
 			}
 		}
