@@ -78,10 +78,17 @@ function submitForm(actionPath)
 	return true;
 }
 
-function AddOtherFaxProvider() 
+function AddOtherFaxProvider()
 {
 	var selected = jQuery("#otherFaxSelect option:selected");
-	_AddOtherFax(selected.text(),selected.val());
+	if (checkPhone(selected.val()))
+	{
+		_AddOtherFax(selected.text(), selected.val());
+	}
+	else {
+		alert("The fax number for this provider is invalid.");
+	}
+
 }
 
 function AddOtherFax() 

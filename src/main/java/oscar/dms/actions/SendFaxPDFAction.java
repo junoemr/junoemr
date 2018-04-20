@@ -98,6 +98,20 @@ public class SendFaxPDFAction extends DispatchAction {
 				for (int j = 0; j < recipients.length; j++)
 				{
 					String faxNo = recipients[j].replaceAll("\\D", "");
+					try
+					{
+						if (faxNo.length() < 7)
+						{
+							throw new DocumentException("Document target fax number '" + faxNo + "' is invalid.");
+						}
+					}
+					catch(DocumentException de)
+					{
+						MiscUtils.getLogger().error("Document target fax number '" + faxNo + "' is invalid.");
+						String errorAt = " (Document: " + filename + " Recipient: " + recipients[j] + ")";
+						errorList.add(getUserFriendlyError(de) + errorAt);
+						continue;
+					}
 					String error = "";
 					String message = "";
 					Exception exception = null;
