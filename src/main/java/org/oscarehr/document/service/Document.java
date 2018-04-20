@@ -26,7 +26,6 @@ package org.oscarehr.document.service;
 
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.io.PDFFile;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
 import org.springframework.beans.factory.annotation.Autowired;
