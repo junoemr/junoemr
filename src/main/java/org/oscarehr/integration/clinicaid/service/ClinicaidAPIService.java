@@ -68,6 +68,21 @@ public class ClinicaidAPIService
 		this.sessionManager = sessionManager;
 	}
 
+	private String formatEligibilityData(PatientEligibilityDataTo1 data)
+	{
+		// Strip out numeric message code at the front
+		String message = StringUtils.trimToEmpty(data.getMessage()).replaceFirst("\\d*", "");
+		return String.format(
+				"Name: %s %s %s\nBirth Date: %s\nGender: %s\nMessage: %s",
+				StringUtils.trimToEmpty(data.getFirstName()),
+				StringUtils.trimToEmpty(data.getMiddleName()),
+				StringUtils.trimToEmpty(data.getLastName()),
+				ConversionUtils.toDateString(data.getBirthDate()),
+				StringUtils.trimToEmpty(data.getGender()),
+				message
+		);
+	}
+
 	private ClinicaidResultTo1 doAsyncEligibilityCheck(String queryString)
 			throws IOException, InterruptedException
 	{
@@ -133,7 +148,10 @@ public class ClinicaidAPIService
 		{
 			PatientEligibilityDataTo1 eligibilityData = result.getData().getEligibilityData();
 			response.put("result", eligibilityData.isEligible() ? "Patient Eligible" : "Patient Not Eligible");
-			response.put("msg", eligibilityData.getMessage());
+			response.put("msg", oscarProperties.isOntarioInstanceType()
+							? formatEligibilityData(eligibilityData)
+							: eligibilityData.getMessage()
+			);
 
 			if (!eligibilityData.isChecked())
 			{

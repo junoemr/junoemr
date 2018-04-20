@@ -59,6 +59,22 @@ public class PatientEligibilityDataTo1 implements Serializable
 	@JsonProperty("check_status")
 	private String checkStatus;
 
+	@JsonProperty("first_name")
+	private String firstName;
+
+	@JsonProperty("middle_name")
+	private String middleName;
+
+	@JsonProperty("last_name")
+	private String lastName;
+
+	@JsonProperty("gender")
+	private String gender;
+
+	@JsonProperty("birth_date")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date birthDate;
+
 	public boolean isEligible()
 	{
 		return eligible;
@@ -112,5 +128,55 @@ public class PatientEligibilityDataTo1 implements Serializable
 	public boolean isChecked()
 	{
 		return CHECKED_STATUS_CHECKED.equals(checkStatus);
+	}
+
+	public String getFirstName()
+	{
+		return firstName;
+	}
+
+	public void setFirstName(String firstName)
+	{
+		this.firstName = firstName;
+	}
+
+	public String getMiddleName()
+	{
+		return middleName;
+	}
+
+	public void setMiddleName(String middleName)
+	{
+		this.middleName = middleName;
+	}
+
+	public String getLastName()
+	{
+		return lastName;
+	}
+
+	public void setLastName(String lastName)
+	{
+		this.lastName = lastName;
+	}
+
+	public String getGender()
+	{
+		return gender;
+	}
+
+	public void setGender(String gender)
+	{
+		this.gender = gender;
+	}
+
+	public Date getBirthDate()
+	{
+		return birthDate;
+	}
+
+	public void setBirthDate(Date birthDate)
+	{
+		this.birthDate = birthDate;
 	}
 }
