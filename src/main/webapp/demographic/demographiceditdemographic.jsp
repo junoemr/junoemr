@@ -1860,10 +1860,21 @@ if ( Dead.equals(PatStat) ) {%>
                                                                                } %>:</span>
                                                        <span class="info"><%=StringUtils.trimToEmpty(demographic.getPostal())%></span></li>
 
-                                                    <li><span class="label"><bean:message
-                                                            key="demographic.demographiceditdemographic.formEmail" />:</span>
-                                                        <span class="info"><%=demographic.getEmail()!=null? demographic.getEmail() : ""%></span>
-							</li>
+                                                    <li><span class="label"><bean:message key="demographic.demographiceditdemographic.formEmail" />:</span>
+														<%
+															String patientEmail = StringUtils.trimToEmpty(demographic.getEmail());
+
+															if (oscarProps.isPropertyActive("enable_demographic_email_link"))
+															{
+														%>
+														<span class="info"><a href="mailto:<%=patientEmail%>"><%=patientEmail%></a></span>
+														<%	}
+															else
+															{
+														%>
+														<span class="info"><%=patientEmail%></span><%
+															}%>
+													</li>
                                                     <li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.formNewsLetter" />:</span>
                                                         <span class="info"><%=demographic.getNewsletter()!=null? demographic.getNewsletter() : "Unknown"%></span>
