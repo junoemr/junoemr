@@ -805,6 +805,7 @@ String curProvider_no = (String)session.getAttribute("user");
 					<li>API/Connections
 						<ul>
 						<li>&nbsp;<a href='javascript:void(0);' class="xlink" rel="${ctx}/admin/api/clients.jsp">REST Clients</a></li>
+						<li>&nbsp;<a href='javascript:void(0);' class="xlink" rel="${ctx}/admin/api/api.jsp">REST API</a></li>
 						</ul>
 					</li>
 					<li><a href='javascript:void(0);' class="xlink" rel='${ctx}/setProviderStaleDate.do?method=viewIntegratorProperties'><bean:message key="provider.btnSetIntegratorPreferences" /></a></li>
