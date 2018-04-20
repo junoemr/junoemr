@@ -1638,10 +1638,12 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
                                                             key="demographic.demographiceditdemographic.RosterTerminationDate" />:</span>
                                                         <span class="info"><%=MyDateFormat.getMyStandardDate(demographic.getRosterTerminationDate())%></span>
                                                     </li>
-<%if (null != demographic.getRosterTerminationDate()) { %>
+<%
+	String terminationReason = demographic.getRosterTerminationReason();
+	if (null != demographic.getRosterTerminationDate() && StringUtils.isNotBlank(terminationReason)) { %>
 													<li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.RosterTerminationReason" />:</span>
-                                                        <span class="info"><%=Util.rosterTermReasonProperties.getReasonByCode(demographic.getRosterTerminationReason()) %></span>
+                                                        <span class="info"><%=Util.rosterTermReasonProperties.getReasonByCode(terminationReason) %></span>
                                                     </li>
 <%} %>
                                                     <li><span class="label"><bean:message
