@@ -11,13 +11,14 @@
 		Collection<String> formNames=providerPreference.getAppointmentScreenForms();
 		List<String>formNamesList = new ArrayList<String>(formNames);
 		Collections.sort(formNamesList);
-		
+
 		for (String formNameTemp : formNamesList)
 		{
 			String trimmedEscapedLinkName=StringEscapeUtils.escapeHtml(AppointmentProviderAdminDayUIBean.getLengthLimitedLinkName(loggedInInfo3, formNameTemp));
 			String escapedLinkName=StringEscapeUtils.escapeHtml(formNameTemp);
 			%>
-				|<a href=# onClick='popupPage2("../form/forwardshortcutname.jsp?formname=<%=escapedLinkName%>&amp;demographic_no=<%=demographic_no%>&amp;appointmentNo=<%=appointment_no%>")' title='<%=escapedLinkName%>'><%=trimmedEscapedLinkName%></a>
+				|<a href=# onClick='popupPage2("../form/forwardshortcutname.jsp?formname=<%=escapedLinkName%>&amp;demographic_no=<%=demographic_no%>&amp;appointmentNo=<%=appointment_no%>", "Form_<%=demographic_no + "_" + trimmedEscapedLinkName%>")'
+				title='<%=escapedLinkName%>'><%=trimmedEscapedLinkName%></a>
 			<%
 		}
 		
@@ -28,7 +29,8 @@
 			String trimmedEscapedLinkName=StringEscapeUtils.escapeHtml(AppointmentProviderAdminDayUIBean.getLengthLimitedLinkName(loggedInInfo3, eForm.getFormName()));
 			String escapedLinkName=StringEscapeUtils.escapeHtml(eForm.getFormName());
 			%>
-				|<a href=# onClick='popupPage2("<%=request.getContextPath()%>/eform/efmformadd_data.jsp?fid=<%=eFormIdTemp%>&amp;demographic_no=<%=demographic_no%>&amp;appointment=<%=appointment_no%>")' title='<%=escapedLinkName%>'><%=trimmedEscapedLinkName%></a>
+				|<a href=# onClick='popupPage2("<%=request.getContextPath()%>/eform/efmformadd_data.jsp?fid=<%=eFormIdTemp%>&amp;demographic_no=<%=demographic_no%>&amp;appointment=<%=appointment_no%>", "Eform_<%=demographic_no + "_" + eFormIdTemp%>")'
+				title='<%=escapedLinkName%>'><%=trimmedEscapedLinkName%></a>
 			<%
 		}
 
