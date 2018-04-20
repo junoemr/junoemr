@@ -24,12 +24,10 @@
 
 package org.oscarehr.integration.clinicaid.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
-import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PatientEligibilityDataTo1 implements Serializable
@@ -45,16 +43,13 @@ public class PatientEligibilityDataTo1 implements Serializable
 	private String message;
 
 	@JsonProperty("eligibility_queued_at")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date queuedAt;
+	private String queuedAt;
 
 	@JsonProperty("eligibility_checked_at")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date checkedAt;
+	private String checkedAt;
 
 	@JsonProperty("eligibility_expiry_date")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date expiryAt;
+	private String expiryAt;
 
 	@JsonProperty("check_status")
 	private String checkStatus;
@@ -72,8 +67,7 @@ public class PatientEligibilityDataTo1 implements Serializable
 	private String gender;
 
 	@JsonProperty("birth_date")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date birthDate;
+	private String birthDate;
 
 	public boolean isEligible()
 	{
@@ -95,27 +89,27 @@ public class PatientEligibilityDataTo1 implements Serializable
 		this.message = message;
 	}
 
-	public Date getQueuedAt()
+	public String getQueuedAt()
 	{
 		return queuedAt;
 	}
 
-	public void setQueuedAt(Date queuedAt)
+	public void setQueuedAt(String queuedAt)
 	{
 		this.queuedAt = queuedAt;
 	}
 
-	public Date getExpiryAt()
+	public String getExpiryAt()
 	{
 		return expiryAt;
 	}
 
-	public void setExpiryAt(Date expiryAt)
+	public void setExpiryAt(String expiryAt)
 	{
 		this.expiryAt = expiryAt;
 	}
 
-	public Date getCheckedAt()
+	public String getCheckedAt()
 	{
 		return checkedAt;
 	}
@@ -170,12 +164,12 @@ public class PatientEligibilityDataTo1 implements Serializable
 		this.gender = gender;
 	}
 
-	public Date getBirthDate()
+	public String getBirthDate()
 	{
 		return birthDate;
 	}
 
-	public void setBirthDate(Date birthDate)
+	public void setBirthDate(String birthDate)
 	{
 		this.birthDate = birthDate;
 	}

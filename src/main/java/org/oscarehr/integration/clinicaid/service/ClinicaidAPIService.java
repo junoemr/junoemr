@@ -79,7 +79,7 @@ public class ClinicaidAPIService
 				StringUtils.trimToEmpty(data.getFirstName()),
 				StringUtils.trimToEmpty(data.getMiddleName()),
 				StringUtils.trimToEmpty(data.getLastName()),
-				ConversionUtils.toDateString(data.getBirthDate()),
+				StringUtils.trimToEmpty(data.getBirthDate()),
 				StringUtils.trimToEmpty(data.getGender()),
 				message
 		);
@@ -157,7 +157,7 @@ public class ClinicaidAPIService
 
 			if (!eligibilityData.isChecked())
 			{
-				response.put("error", String.format("Check timed out. Last check from %tF:", eligibilityData.getCheckedAt()));
+				response.put("error", String.format("Check timed out. Last check from %s:", eligibilityData.getCheckedAt()));
 			}
 		}
 
