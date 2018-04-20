@@ -48,6 +48,7 @@ public class ProviderWs extends AbstractExternalRestWs
 	@Autowired
 	ProviderDao providerDao;
 
+	//TODO use a custom transfer object
 	@GET
 	@Path("/{id}")
 	public RestResponse<ProviderTransfer,String> getProvider(@PathParam("id") String id)

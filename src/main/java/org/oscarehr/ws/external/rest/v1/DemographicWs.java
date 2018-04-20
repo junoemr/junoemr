@@ -30,13 +30,15 @@ import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
-import org.oscarehr.ws.external.rest.v1.transfer.DemographicWsTransfer;
+import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
+import org.oscarehr.ws.external.rest.v1.transfer.DemographicTransfer;
 import org.oscarehr.ws.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -63,43 +65,42 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Autowired
 	ProgramManager programManager;
 
+	private static final DemographicConverter demographicConverter = new DemographicConverter();
+
 	@GET
 	@Path("/{id}")
-	public RestResponse<DemographicWsTransfer, String> getDemographic(@PathParam("id") Integer demographicNo)
+	public RestResponse<DemographicTransfer, String> getDemographic(@PathParam("id") Integer demographicNo)
 	{
 		return RestResponse.errorResponse("Not Implemented");
 	}
 
 	@PUT
 	@Path("/{id}")
-	public RestResponse<DemographicWsTransfer, String> putDemographic(@PathParam("id") Integer demographicNo)
+	public RestResponse<DemographicTransfer, String> putDemographic(@PathParam("id") Integer demographicNo)
 	{
 		return RestResponse.errorResponse("Not Implemented");
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public RestResponse<Integer, String> postDemographic(DemographicWsTransfer demographicTo)
+	public RestResponse<Integer, String> postDemographic(@Valid DemographicTransfer demographicTo)
 	{
 		Demographic demographic;
 		try
 		{
-			demographic = new Demographic();
-			demographic = demographicTo.copyTo(demographic);
+			demographic = demographicConverter.getAsDomainObject(null, demographicTo);
 
 			if(demographic.getDemographicNo() != null)
 			{
 				return RestResponse.errorResponse("Demographic " + demographic.getDemographicNo() + " already exists.");
 			}
-
-			if(demographic.getLastUpdateDate() == null)
-			{
-				demographic.setLastUpdateDate(new Date());
-			}
-
 			String providerNoStr = getOAuthProviderNo();
 			int providerNo = Integer.parseInt(providerNoStr);
 			String ip = getHttpServletRequest().getRemoteAddr();
+
+			/* set some default values */
+			demographic.setLastUpdateDate(new Date());
+			demographic.setLastUpdateUser(providerNoStr);
 
 			demographicManager.createDemographic(providerNoStr, demographic, getDefaultProgramId());
 

@@ -1,0 +1,521 @@
+/**
+ *
+ * Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This software was written for
+ * Centre for Research on Inner City Health, St. Michael's Hospital,
+ * Toronto, Ontario, Canada
+ */
+package org.oscarehr.ws.external.rest.v1.transfer;
+
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.oscarehr.ws.validator.ProviderNoConstraint;
+import org.oscarehr.ws.validator.StringValueConstraint;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Size;
+import javax.ws.rs.DefaultValue;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+import java.util.Date;
+
+@XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
+public class DemographicTransfer implements Serializable
+{
+	// demographic base info
+	private Integer demographicNo;
+	@NotNull
+	@Size(min=1, max=30)
+	private String firstName;
+	@NotNull
+	@Size(min=1, max=30)
+	private String lastName;
+	@Size(max=10)
+	private String title;
+	@NotNull
+	@StringValueConstraint(allows = {"M","F","T","O","U"})
+	private String sex;
+	@Size(max=10)
+	private String hin;
+	@Size(max=15)
+	private String sin;
+	@Size(max=20)
+	private String hcType;
+	@Size(max=3)
+	private String hcVersion;
+	private Date hcRenewDate;
+	private Date hcEffectiveDate;
+	@Past
+	@NotNull
+	private Date dateJoined;
+	private Date endDate;
+	@NotNull
+	private Date dateOfBirth;
+//	@NotNull
+	@DefaultValue("AC")
+	@StringValueConstraint(allows = {"AC","IN","DE","FI","MO"})
+	private String patientStatus;
+	@Past
+	private Date patientStatusDate;
+
+	// address and contact info
+	@Size(max=100)
+	private String email;
+	@Size(max=6)
+	@ProviderNoConstraint(allowNull = true)
+	private String providerNo;
+	@Size(max=60)
+	private String address;
+	@Size(max=50)
+	private String city;
+	@Size(max=9)
+	private String postal;
+	@Size(max=20)
+	private String province;
+	@Size(max=255)
+	private String previousAddress;
+	private String familyDoctor;
+	@Size(max=20)
+	private String primaryPhone;
+	@Size(max=20)
+	private String secondaryPhone;
+	private String cellPhone;
+	private String pcnIndicator;
+
+	// roster info
+	@Size(max=20)
+	private String rosterStatus;
+	@Size(max=2)
+	private String rosterTerminationReason;
+	private Date rosterDate;
+	private Date rosterTerminationDate;
+
+	// other info
+	@Size(max=10)
+	private String chartNo;
+	@Size(max=70)
+	private String alias;
+	@Size(max=255)
+	private String children;
+	@Size(max=255)
+	private String sourceOfIncome;
+	@Size(max=40)
+	private String citizenship;
+	@Size(max=60)
+	private String spokenLanguage;
+	@Size(max=60)
+	private String officialLanguage;
+
+	public Integer getDemographicNo()
+	{
+		return demographicNo;
+	}
+
+	public void setDemographicNo(Integer demographicNo)
+	{
+		this.demographicNo = demographicNo;
+	}
+
+	public String getFirstName()
+	{
+		return firstName;
+	}
+
+	public void setFirstName(String firstName)
+	{
+		this.firstName = firstName;
+	}
+
+	public String getLastName()
+	{
+		return lastName;
+	}
+
+	public void setLastName(String lastName)
+	{
+		this.lastName = lastName;
+	}
+
+	public String getTitle()
+	{
+		return title;
+	}
+
+	public void setTitle(String title)
+	{
+		this.title = title;
+	}
+
+	public String getSex()
+	{
+		return sex;
+	}
+
+	public void setSex(String sex)
+	{
+		this.sex = sex;
+	}
+
+	public String getHin()
+	{
+		return hin;
+	}
+
+	public void setHin(String hin)
+	{
+		this.hin = hin;
+	}
+
+	public String getHcType()
+	{
+		return hcType;
+	}
+
+	public void setHcType(String hcType)
+	{
+		this.hcType = hcType;
+	}
+
+	public String getHcVersion()
+	{
+		return hcVersion;
+	}
+
+	public void setHcVersion(String hcVersion)
+	{
+		this.hcVersion = hcVersion;
+	}
+
+	public String getSin()
+	{
+		return sin;
+	}
+
+	public void setSin(String sin)
+	{
+		this.sin = sin;
+	}
+
+	public Date getDateJoined()
+	{
+		return dateJoined;
+	}
+
+	public void setDateJoined(Date dateJoined)
+	{
+		this.dateJoined = dateJoined;
+	}
+
+	public Date getDateOfBirth()
+	{
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(Date dateOfBirth)
+	{
+		this.dateOfBirth = dateOfBirth;
+	}
+
+	public String getPatientStatus()
+	{
+		return patientStatus;
+	}
+
+	public void setPatientStatus(String patientStatus)
+	{
+		this.patientStatus = patientStatus;
+	}
+
+	public Date getPatientStatusDate()
+	{
+		return patientStatusDate;
+	}
+
+	public void setPatientStatusDate(Date patientStatusDate)
+	{
+		this.patientStatusDate = patientStatusDate;
+	}
+
+	public String getPrimaryPhone()
+	{
+		return primaryPhone;
+	}
+
+	public void setPrimaryPhone(String primaryPhone)
+	{
+		this.primaryPhone = primaryPhone;
+	}
+
+	public String getCellPhone()
+	{
+		return cellPhone;
+	}
+
+	public void setCellPhone(String cellPhone)
+	{
+		this.cellPhone = cellPhone;
+	}
+
+	public String getEmail()
+	{
+		return email;
+	}
+
+	public void setEmail(String email)
+	{
+		this.email = email;
+	}
+
+	public String getProviderNo()
+	{
+		return providerNo;
+	}
+
+	public void setProviderNo(String providerNo)
+	{
+		this.providerNo = providerNo;
+	}
+
+	public String getAddress()
+	{
+		return address;
+	}
+
+	public void setAddress(String address)
+	{
+		this.address = address;
+	}
+
+	public String getProvince()
+	{
+		return province;
+	}
+
+	public void setProvince(String province)
+	{
+		this.province = province;
+	}
+
+	public String getPreviousAddress()
+	{
+		return previousAddress;
+	}
+
+	public void setPreviousAddress(String previousAddress)
+	{
+		this.previousAddress = previousAddress;
+	}
+
+	public String getFamilyDoctor()
+	{
+		return familyDoctor;
+	}
+
+	public void setFamilyDoctor(String familyDoctor)
+	{
+		this.familyDoctor = familyDoctor;
+	}
+
+	public String getCity()
+	{
+		return city;
+	}
+
+	public void setCity(String city)
+	{
+		this.city = city;
+	}
+
+	public String getPostal()
+	{
+		return postal;
+	}
+
+	public void setPostal(String postal)
+	{
+		this.postal = postal;
+	}
+
+	public Date getHcRenewDate()
+	{
+		return hcRenewDate;
+	}
+
+	public void setHcRenewDate(Date hcRenewDate)
+	{
+		this.hcRenewDate = hcRenewDate;
+	}
+
+	public String getSecondaryPhone()
+	{
+		return secondaryPhone;
+	}
+
+	public void setSecondaryPhone(String secondaryPhone)
+	{
+		this.secondaryPhone = secondaryPhone;
+	}
+
+	public String getPcnIndicator()
+	{
+		return pcnIndicator;
+	}
+
+	public void setPcnIndicator(String pcnIndicator)
+	{
+		this.pcnIndicator = pcnIndicator;
+	}
+
+	public Date getEndDate()
+	{
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate)
+	{
+		this.endDate = endDate;
+	}
+
+	public String getChartNo()
+	{
+		return chartNo;
+	}
+
+	public void setChartNo(String chartNo)
+	{
+		this.chartNo = chartNo;
+	}
+
+	public String getAlias()
+	{
+		return alias;
+	}
+
+	public void setAlias(String alias)
+	{
+		this.alias = alias;
+	}
+
+	public Date getHcEffectiveDate()
+	{
+		return hcEffectiveDate;
+	}
+
+	public void setHcEffectiveDate(Date hcEffectiveDate)
+	{
+		this.hcEffectiveDate = hcEffectiveDate;
+	}
+
+	public String getRosterStatus()
+	{
+		return rosterStatus;
+	}
+
+	public void setRosterStatus(String rosterStatus)
+	{
+		this.rosterStatus = rosterStatus;
+	}
+
+	public Date getRosterDate()
+	{
+		return rosterDate;
+	}
+
+	public void setRosterDate(Date rosterDate)
+	{
+		this.rosterDate = rosterDate;
+	}
+
+	public Date getRosterTerminationDate()
+	{
+		return rosterTerminationDate;
+	}
+
+	public void setRosterTerminationDate(Date rosterTerminationDate)
+	{
+		this.rosterTerminationDate = rosterTerminationDate;
+	}
+
+	public String getRosterTerminationReason()
+	{
+		return rosterTerminationReason;
+	}
+
+	public void setRosterTerminationReason(String rosterTerminationReason)
+	{
+		this.rosterTerminationReason = rosterTerminationReason;
+	}
+
+	public String getChildren()
+	{
+		return children;
+	}
+
+	public void setChildren(String children)
+	{
+		this.children = children;
+	}
+
+	public String getSourceOfIncome()
+	{
+		return sourceOfIncome;
+	}
+
+	public void setSourceOfIncome(String sourceOfIncome)
+	{
+		this.sourceOfIncome = sourceOfIncome;
+	}
+
+	public String getCitizenship()
+	{
+		return citizenship;
+	}
+
+	public void setCitizenship(String citizenship)
+	{
+		this.citizenship = citizenship;
+	}
+
+	public String getSpokenLanguage()
+	{
+		return spokenLanguage;
+	}
+
+	public void setSpokenLanguage(String spokenLanguage)
+	{
+		this.spokenLanguage = spokenLanguage;
+	}
+
+	public String getOfficialLanguage()
+	{
+		return officialLanguage;
+	}
+
+	public void setOfficialLanguage(String officialLanguage)
+	{
+		this.officialLanguage = officialLanguage;
+	}
+
+	@Override
+	public String toString() {
+		return (ReflectionToStringBuilder.toString(this));
+	}
+
+}

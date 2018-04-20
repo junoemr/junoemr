@@ -24,23 +24,25 @@
 
 package org.oscarehr.common.model;
 
-import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
 import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
+
+import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This is the object class that relates to the demographic table. Any customizations belong here.
@@ -518,6 +520,18 @@ public class Demographic implements Serializable
 	public void setDateOfBirth(String dateOfBirth)
 	{
 		this.dateOfBirth = StringUtils.trimToNull(dateOfBirth);
+	}
+
+	/**
+	 * Set the dateOfBirth,monthOfBirth,yearOfBirth using a date object
+	 */
+	public void setDateOfBirth(Date dateOfBirth)
+	{
+		LocalDate localDate = dateOfBirth.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+		setDateOfBirth(StringUtils.leftPad(String.valueOf(localDate.getDayOfMonth()), 2,"0"));
+		setMonthOfBirth(StringUtils.leftPad(String.valueOf(localDate.getMonthValue()), 2,"0"));
+		setYearOfBirth(StringUtils.leftPad(String.valueOf(localDate.getYear()), 4,"0"));
 	}
 
 	/**
