@@ -33,7 +33,7 @@ import javax.validation.constraints.Size;
 import javax.ws.rs.DefaultValue;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
@@ -60,20 +60,20 @@ public class DemographicTransfer implements Serializable
 	private String hcType;
 	@Size(max=3)
 	private String hcVersion;
-	private Date hcRenewDate;
-	private Date hcEffectiveDate;
+	private LocalDate hcRenewDate;
+	private LocalDate hcEffectiveDate;
 	@Past
 	@NotNull
-	private Date dateJoined;
-	private Date endDate;
+	private LocalDate dateJoined;
+	private LocalDate endDate;
 	@NotNull
-	private Date dateOfBirth;
+	private LocalDate dateOfBirth;
 //	@NotNull
 	@DefaultValue("AC")
 	@StringValueConstraint(allows = {"AC","IN","DE","FI","MO"})
 	private String patientStatus;
 	@Past
-	private Date patientStatusDate;
+	private LocalDate patientStatusDate;
 
 	// address and contact info
 	@Size(max=100)
@@ -104,8 +104,8 @@ public class DemographicTransfer implements Serializable
 	private String rosterStatus;
 	@Size(max=2)
 	private String rosterTerminationReason;
-	private Date rosterDate;
-	private Date rosterTerminationDate;
+	private LocalDate rosterDate;
+	private LocalDate rosterTerminationDate;
 
 	// other info
 	@Size(max=10)
@@ -213,22 +213,22 @@ public class DemographicTransfer implements Serializable
 		this.sin = sin;
 	}
 
-	public Date getDateJoined()
+	public LocalDate getDateJoined()
 	{
 		return dateJoined;
 	}
 
-	public void setDateJoined(Date dateJoined)
+	public void setDateJoined(LocalDate dateJoined)
 	{
 		this.dateJoined = dateJoined;
 	}
 
-	public Date getDateOfBirth()
+	public LocalDate getDateOfBirth()
 	{
 		return dateOfBirth;
 	}
 
-	public void setDateOfBirth(Date dateOfBirth)
+	public void setDateOfBirth(LocalDate dateOfBirth)
 	{
 		this.dateOfBirth = dateOfBirth;
 	}
@@ -243,12 +243,12 @@ public class DemographicTransfer implements Serializable
 		this.patientStatus = patientStatus;
 	}
 
-	public Date getPatientStatusDate()
+	public LocalDate getPatientStatusDate()
 	{
 		return patientStatusDate;
 	}
 
-	public void setPatientStatusDate(Date patientStatusDate)
+	public void setPatientStatusDate(LocalDate patientStatusDate)
 	{
 		this.patientStatusDate = patientStatusDate;
 	}
@@ -353,12 +353,12 @@ public class DemographicTransfer implements Serializable
 		this.postal = postal;
 	}
 
-	public Date getHcRenewDate()
+	public LocalDate getHcRenewDate()
 	{
 		return hcRenewDate;
 	}
 
-	public void setHcRenewDate(Date hcRenewDate)
+	public void setHcRenewDate(LocalDate hcRenewDate)
 	{
 		this.hcRenewDate = hcRenewDate;
 	}
@@ -383,12 +383,12 @@ public class DemographicTransfer implements Serializable
 		this.pcnIndicator = pcnIndicator;
 	}
 
-	public Date getEndDate()
+	public LocalDate getEndDate()
 	{
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate)
+	public void setEndDate(LocalDate endDate)
 	{
 		this.endDate = endDate;
 	}
@@ -413,12 +413,12 @@ public class DemographicTransfer implements Serializable
 		this.alias = alias;
 	}
 
-	public Date getHcEffectiveDate()
+	public LocalDate getHcEffectiveDate()
 	{
 		return hcEffectiveDate;
 	}
 
-	public void setHcEffectiveDate(Date hcEffectiveDate)
+	public void setHcEffectiveDate(LocalDate hcEffectiveDate)
 	{
 		this.hcEffectiveDate = hcEffectiveDate;
 	}
@@ -433,22 +433,22 @@ public class DemographicTransfer implements Serializable
 		this.rosterStatus = rosterStatus;
 	}
 
-	public Date getRosterDate()
+	public LocalDate getRosterDate()
 	{
 		return rosterDate;
 	}
 
-	public void setRosterDate(Date rosterDate)
+	public void setRosterDate(LocalDate rosterDate)
 	{
 		this.rosterDate = rosterDate;
 	}
 
-	public Date getRosterTerminationDate()
+	public LocalDate getRosterTerminationDate()
 	{
 		return rosterTerminationDate;
 	}
 
-	public void setRosterTerminationDate(Date rosterTerminationDate)
+	public void setRosterTerminationDate(LocalDate rosterTerminationDate)
 	{
 		this.rosterTerminationDate = rosterTerminationDate;
 	}

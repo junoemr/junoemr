@@ -30,6 +30,10 @@ import org.oscarehr.ws.external.rest.v1.transfer.DemographicTransfer;
 import org.oscarehr.ws.rest.conversion.AbstractConverter;
 import org.oscarehr.ws.rest.conversion.ConversionException;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+
 public class DemographicConverter extends AbstractConverter<Demographic, DemographicTransfer>
 {
 	@Override
@@ -42,20 +46,20 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		demographic.setDemographicNo(transfer.getDemographicNo());
 		demographic.setFirstName(transfer.getFirstName());
 		demographic.setLastName(transfer.getLastName());
-		demographic.setDateOfBirth(transfer.getDateOfBirth());
+		demographic.setDateOfBirth(toNullableLegacyDate(transfer.getDateOfBirth()));
 		demographic.setTitle(transfer.getTitle());
 		demographic.setHin(transfer.getHin());
 		demographic.setVer(transfer.getHcVersion());
 		demographic.setHcType(transfer.getHcType());
-		demographic.setHcRenewDate(transfer.getHcRenewDate());
+		demographic.setHcRenewDate(toNullableLegacyDate(transfer.getHcRenewDate()));
 		demographic.setSex(transfer.getSex());
-		demographic.setEffDate(transfer.getHcEffectiveDate());
+		demographic.setEffDate(toNullableLegacyDate(transfer.getHcEffectiveDate()));
 		demographic.setSin(transfer.getSin());
-		demographic.setDateJoined(transfer.getDateJoined());
-		demographic.setEndDate(transfer.getEndDate());
+		demographic.setDateJoined(toNullableLegacyDate(transfer.getDateJoined()));
+		demographic.setEndDate(toNullableLegacyDate(transfer.getEndDate()));
 		demographic.setProviderNo(transfer.getProviderNo());
 		demographic.setPatientStatus(transfer.getPatientStatus());
-		demographic.setPatientStatusDate(transfer.getPatientStatusDate());
+		demographic.setPatientStatusDate(toNullableLegacyDate(transfer.getPatientStatusDate()));
 
 		// contact info
 		demographic.setAddress(transfer.getAddress());
@@ -68,8 +72,8 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 
 		//roster info
 		demographic.setRosterStatus(transfer.getRosterStatus());
-		demographic.setRosterDate(transfer.getRosterDate());
-		demographic.setRosterTerminationDate(transfer.getRosterTerminationDate());
+		demographic.setRosterDate(toNullableLegacyDate(transfer.getRosterDate()));
+		demographic.setRosterTerminationDate(toNullableLegacyDate(transfer.getRosterTerminationDate()));
 		demographic.setRosterTerminationReason(transfer.getRosterTerminationReason());
 
 		// other info
@@ -109,20 +113,20 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		transfer.setDemographicNo(demographic.getDemographicNo());
 		transfer.setFirstName(demographic.getFirstName());
 		transfer.setLastName(demographic.getLastName());
-		transfer.setDateOfBirth(demographic.getBirthDate());
+		transfer.setDateOfBirth(toNullableLocalDate(demographic.getBirthDate()));
 		transfer.setTitle(demographic.getTitle());
 		transfer.setSex(demographic.getSex());
 		transfer.setHin(demographic.getHin());
 		transfer.setSin(demographic.getSin());
 		transfer.setHcVersion(demographic.getVer());
 		transfer.setHcType(demographic.getHcType());
-		transfer.setHcRenewDate(demographic.getHcRenewDate());
-		transfer.setHcEffectiveDate(demographic.getEffDate());
+		transfer.setHcRenewDate(toNullableLocalDate(demographic.getHcRenewDate()));
+		transfer.setHcEffectiveDate(toNullableLocalDate(demographic.getEffDate()));
 		transfer.setProviderNo(demographic.getProviderNo());
 		transfer.setPatientStatus(demographic.getPatientStatus());
-		transfer.setPatientStatusDate(demographic.getPatientStatusDate());
-		transfer.setDateJoined(demographic.getDateJoined());
-		transfer.setEndDate(demographic.getEndDate());
+		transfer.setPatientStatusDate(toNullableLocalDate(demographic.getPatientStatusDate()));
+		transfer.setDateJoined(toNullableLocalDate(demographic.getDateJoined()));
+		transfer.setEndDate(toNullableLocalDate(demographic.getEndDate()));
 
 
 		// contact info
@@ -136,8 +140,8 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 
 		// roster info
 		transfer.setRosterStatus(demographic.getRosterStatus());
-		transfer.setRosterDate(demographic.getRosterDate());
-		transfer.setRosterTerminationDate(demographic.getRosterTerminationDate());
+		transfer.setRosterDate(toNullableLocalDate(demographic.getRosterDate()));
+		transfer.setRosterTerminationDate(toNullableLocalDate(demographic.getRosterTerminationDate()));
 		transfer.setRosterTerminationReason(demographic.getRosterTerminationReason());
 
 		//other info
@@ -162,5 +166,26 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 //		}
 
 		return transfer;
+	}
+
+	//TODO move to new location and consolidate with AbstractServiceImpl version
+	private Date toNullableLegacyDate(LocalDate localDate)
+	{
+		if(localDate == null) return null;
+		return toLegacyDate(localDate);
+	}
+
+	private Date toLegacyDate(LocalDate localDate)
+	{
+		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	}
+	private LocalDate toNullableLocalDate(Date legacyDate)
+	{
+		if(legacyDate == null) return null;
+		return toLocalDate(legacyDate);
+	}
+	private LocalDate toLocalDate(Date legacyDate)
+	{
+		return legacyDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 	}
 }
