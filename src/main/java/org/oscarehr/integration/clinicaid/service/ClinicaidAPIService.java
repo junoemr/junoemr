@@ -70,8 +70,10 @@ public class ClinicaidAPIService
 
 	private String formatEligibilityData(PatientEligibilityDataTo1 data)
 	{
-		// Strip out numeric message code at the front
-		String message = StringUtils.trimToEmpty(data.getMessage()).replaceFirst("\\d*", "");
+		// strip out numeric message code at the front
+		String message = StringUtils.trimToEmpty(data.getMessage())
+				.replaceFirst("\\d*", "")
+				.replace(";", "\n");
 		return String.format(
 				"Name: %s %s %s\nBirth Date: %s\nGender: %s\nMessage: %s",
 				StringUtils.trimToEmpty(data.getFirstName()),
