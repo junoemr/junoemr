@@ -36,8 +36,8 @@
 <%@page import="java.util.GregorianCalendar"%>
 <%@page import="java.net.URLEncoder"%>
 <%@page import="java.util.ResourceBundle"%>
-<%@page import="oscar.OscarProperties"%>
-<%@page contentType="text/javascript"%>
+<%@page import="oscar.OscarProperties"%><%@ page import="org.oscarehr.common.model.Demographic"%>
+	<%@page contentType="text/javascript"%>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <%
 	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -190,7 +190,7 @@ function checkRosterStatus()
 {
 	if (rosterStatusChangedNotBlank())
 	{
-		if (document.updatedelete.roster_status.value == "RO")
+		if (document.updatedelete.roster_status.value == "<%=Demographic.ROSTER_STATUS_ROSTERED%>")
 		{ //Patient rostered
 			if (!rosterStatusDateValid(false))
 			{
@@ -199,7 +199,7 @@ function checkRosterStatus()
 		}
 		else
 		{
-			if (document.updatedelete.roster_status.value == "NR" || document.updatedelete.roster_status.value == "TE")
+			if (document.updatedelete.roster_status.value == "<%=Demographic.ROSTER_STATUS_NOT_ROSTERED%>" || document.updatedelete.roster_status.value == "<%=Demographic.ROSTER_STATUS_TERMINATED%>")
 			{
 				if (!rosterStatusTerminationDateValid(false))
 				{
@@ -218,7 +218,7 @@ function checkRosterStatus()
 				if (checkTerminationDateBlank())
 				{
 					//If were are updating from a Rostered patient to a Fee Service patient. Confirm that they don't want to enter a termination date
-					if (document.updatedelete.initial_rosterstatus.value == "RO")
+					if (document.updatedelete.initial_rosterstatus.value == "<%=Demographic.ROSTER_STATUS_ROSTERED%>")
 					{
 						if (window.confirm("You have not set a roster termination date. Do you want to continue?"))
 						{
@@ -236,7 +236,7 @@ function checkRosterStatus()
 
 	if (rosterStatusDateAllowed())
 	{
-		if (document.updatedelete.roster_status.value == "RO")
+		if (document.updatedelete.roster_status.value == "<%=Demographic.ROSTER_STATUS_ROSTERED%>")
 		{ //Patient rostered
 			if (!rosterStatusDateValid(false))
 			{
