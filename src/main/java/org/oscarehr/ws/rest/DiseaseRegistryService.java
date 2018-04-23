@@ -23,11 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.*;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.casemgmt.dao.IssueDAO;
 import org.oscarehr.casemgmt.model.Issue;
@@ -35,14 +30,28 @@ import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.QuickListDao;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.QuickListView;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.DiagnosisTo1;
 import org.oscarehr.ws.rest.to.model.DxQuickList;
 import org.oscarehr.ws.rest.to.model.IssueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpHeaders;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Path("/dxRegisty")
 public class DiseaseRegistryService extends AbstractServiceImpl {
@@ -75,9 +84,9 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 		}
 		catch(Exception e) {
 			logger.error("Error", e);
-			return RestResponse.errorResponse(new HttpHeaders(), "Server Query Error");
+			return RestResponse.errorResponse("Server Query Error");
 		}
-		return RestResponse.successResponse(new HttpHeaders(), resultList);
+		return RestResponse.successResponse(resultList);
 	}
 
 	/**
@@ -96,9 +105,9 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 		}
 		catch(Exception e) {
 			logger.error("Error", e);
-			return RestResponse.errorResponse(new HttpHeaders(), "Server Query Error");
+			return RestResponse.errorResponse("Server Query Error");
 		}
-		return RestResponse.successResponse(new HttpHeaders(), resultList);
+		return RestResponse.successResponse(resultList);
 	}
 
 	@GET
@@ -116,9 +125,9 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 			returnIssue.setRole(issue.getRole());
 			returnIssue.setUpdate_date(issue.getUpdate_date());
 			returnIssue.setSortOrderId(issue.getSortOrderId());
-			return RestResponse.successResponse(new HttpHeaders(), returnIssue);
+			return RestResponse.successResponse(returnIssue);
 		}
-		return RestResponse.errorResponse(new HttpHeaders(), "No Issue Found");
+		return RestResponse.errorResponse("No Issue Found");
 	}
 	
 	@POST

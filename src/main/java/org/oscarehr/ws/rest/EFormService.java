@@ -29,14 +29,20 @@ import org.apache.log4j.Logger;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.model.EForm;
 import org.oscarehr.ws.rest.conversion.EFormConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.EFormTo1;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("/eform")
@@ -56,14 +62,13 @@ public class EFormService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<EFormTo1, String> loadEForm(@PathParam("dataId") Integer id) {
 
-		HttpHeaders responseHeaders = new HttpHeaders();
 		EForm eform = eFormDao.findById(id);
 
 		if(eform == null) {
-			return RestResponse.errorResponse(responseHeaders, "Failed to find EForm");
+			return RestResponse.errorResponse("Failed to find EForm");
 		}
 		EFormTo1 transferObj = new EFormConverter(false).getAsTransferObject(getLoggedInInfo(), eform);
-		return RestResponse.successResponse(responseHeaders, transferObj);
+		return RestResponse.successResponse(transferObj);
 	}
 
 	/**
@@ -75,14 +80,13 @@ public class EFormService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<EFormTo1, String> saveEForm(EFormTo1 eformTo1) {
-		HttpHeaders responseHeaders = new HttpHeaders();
 
 		EForm eForm = new EFormConverter(false).getAsDomainObject(getLoggedInInfo(), eformTo1);
 
 		EForm nameMatch = eFormDao.findByName(eForm.getFormName());
 		if(nameMatch != null) {
 			logger.warn("EForm Name Already in Use. Save Aborted");
-			return RestResponse.errorResponse(responseHeaders, "EForm Name Already in Use");
+			return RestResponse.errorResponse("EForm Name Already in Use");
 		}
 
 		if(isValidEformData(eForm)) {
@@ -92,9 +96,9 @@ public class EFormService extends AbstractServiceImpl {
 					String.valueOf(eForm.getId()), getLoggedInInfo().getIp(), eForm.getFormName());
 
 			EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eForm);
-			return RestResponse.successResponse(responseHeaders, transferObj);
+			return RestResponse.successResponse(transferObj);
 		}
-		return RestResponse.errorResponse(responseHeaders, "Invalid Eform Data");
+		return RestResponse.errorResponse("Invalid Eform Data");
 	}
 
 	/**
@@ -107,8 +111,6 @@ public class EFormService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<EFormTo1, String> saveEForm(String jsonString) {
-
-		HttpHeaders responseHeaders = new HttpHeaders();
 
 		JSONObject jsonObject = JSONObject.fromObject(jsonString);
 
@@ -123,7 +125,7 @@ public class EFormService extends AbstractServiceImpl {
 		EForm nameMatch = eFormDao.findByName(formName);
 		if(nameMatch != null) {
 			logger.warn("EForm Name Already in Use. Save Aborted");
-			return RestResponse.errorResponse(responseHeaders, "EForm Name Already in Use");
+			return RestResponse.errorResponse("EForm Name Already in Use");
 		}
 
 		EForm eForm = new EForm();
@@ -145,9 +147,9 @@ public class EFormService extends AbstractServiceImpl {
 					String.valueOf(eForm.getId()), getLoggedInInfo().getIp(), eForm.getFormName());
 
 			EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eForm);
-			return RestResponse.successResponse(responseHeaders, transferObj);
+			return RestResponse.successResponse(transferObj);
 		}
-		return RestResponse.errorResponse(responseHeaders, "Invalid Eform Data");
+		return RestResponse.errorResponse("Invalid Eform Data");
 	}
 
 	/**
@@ -160,7 +162,6 @@ public class EFormService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<EFormTo1, String> updateEForm(EFormTo1 eformTo1) {
 
-		HttpHeaders responseHeaders = new HttpHeaders();
 		EForm eForm = new EFormConverter(false).getAsDomainObject(getLoggedInInfo(), eformTo1);
 
 		if(isValidEformData(eForm)) {
@@ -169,9 +170,9 @@ public class EFormService extends AbstractServiceImpl {
 					LogConst.ACTION_UPDATE, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
 					String.valueOf(eForm.getId()), getLoggedInInfo().getIp(), eForm.getFormName());
 			EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eForm);
-			return RestResponse.successResponse(responseHeaders, transferObj);
+			return RestResponse.successResponse(transferObj);
 		}
-		return RestResponse.errorResponse(responseHeaders, "Invalid Eform Data");
+		return RestResponse.errorResponse("Invalid Eform Data");
 	}
 
 	/**
@@ -184,8 +185,6 @@ public class EFormService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<EFormTo1, String> updateEFormJson(String jsonString) {
-
-		HttpHeaders responseHeaders = new HttpHeaders();
 
 		JSONObject jsonObject = JSONObject.fromObject(jsonString);
 
@@ -218,10 +217,10 @@ public class EFormService extends AbstractServiceImpl {
 						LogConst.ACTION_UPDATE, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
 						String.valueOf(eForm.getId()), getLoggedInInfo().getIp(), eForm.getFormName());
 				EFormTo1 transferObj = new EFormConverter(true).getAsTransferObject(getLoggedInInfo(), eForm);
-				return RestResponse.successResponse(responseHeaders, transferObj);
+				return RestResponse.successResponse(transferObj);
 			}
 		}
-		return RestResponse.errorResponse(responseHeaders, "Invalid Eform Data");
+		return RestResponse.errorResponse("Invalid Eform Data");
 	}
 
 	/**

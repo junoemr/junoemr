@@ -32,7 +32,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.DemographicTransfer;
-import org.oscarehr.ws.rest.RestResponse;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
@@ -76,7 +76,9 @@ public class DemographicWs extends AbstractExternalRestWs
 
 	@PUT
 	@Path("/{id}")
-	public RestResponse<DemographicTransfer, String> putDemographic(@PathParam("id") Integer demographicNo)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public RestResponse<DemographicTransfer, String> putDemographic(@PathParam("id") Integer demographicNo,
+	                                                                @Valid DemographicTransfer demographicTo)
 	{
 		return RestResponse.errorResponse("Not Implemented");
 	}

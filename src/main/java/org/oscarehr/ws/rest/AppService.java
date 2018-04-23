@@ -23,6 +23,34 @@
  */
 package org.oscarehr.ws.rest;
 
+import net.sf.json.JSONObject;
+import org.apache.log4j.Logger;
+import org.oscarehr.app.OAuth1Utils;
+import org.oscarehr.common.dao.AppDefinitionDao;
+import org.oscarehr.common.dao.AppUserDao;
+import org.oscarehr.common.model.AppDefinition;
+import org.oscarehr.common.model.AppUser;
+import org.oscarehr.managers.AppManager;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
+import org.oscarehr.ws.rest.to.RSSResponse;
+import org.oscarehr.ws.rest.to.model.AppDefinitionTo1;
+import org.oscarehr.ws.rest.to.model.RssItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import oscar.OscarProperties;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
@@ -36,36 +64,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-
-import net.sf.json.JSONObject;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.app.OAuth1Utils;
-import org.oscarehr.common.dao.AppDefinitionDao;
-import org.oscarehr.common.dao.AppUserDao;
-import org.oscarehr.common.model.AppDefinition;
-import org.oscarehr.common.model.AppUser;
-import org.oscarehr.managers.AppManager;
-import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.rest.to.RSSResponse;
-import org.oscarehr.ws.rest.to.model.AppDefinitionTo1;
-import org.oscarehr.ws.rest.to.model.RssItem;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.http.HttpHeaders;
-import oscar.OscarProperties;
 
 @Path("/app")
 public class AppService extends AbstractServiceImpl {
@@ -172,13 +170,11 @@ public class AppService extends AbstractServiceImpl {
 	@Path("/comment")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<List<RssItem>, String> postK2AComment(RssItem comment) {
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("timestamp", LocalDate.now().toString());
+	public RestSearchResponse<RssItem, String> postK2AComment(RssItem comment) {
+		int total = 0;
 
 		RSSResponse response = new RSSResponse();
-		List<RssItem> itemList = new ArrayList<RssItem>();
+		List<RssItem> itemList = new ArrayList<>();
 		try {
 			AppDefinitionDao appDefinitionDao = SpringUtils.getBean(AppDefinitionDao.class);
 			AppUserDao appUserDao = SpringUtils.getBean(AppUserDao.class);
@@ -218,15 +214,15 @@ public class AppService extends AbstractServiceImpl {
 						}
 						itemList.add(commentItem);
 					}
-					headers.add("total", String.valueOf(response.getContent().size()));
+					total = response.getContent().size();
 				}
 			}
 		}
 		catch (Exception e) {
 			logger.error("error", e);
-			RestResponse.errorResponse(headers, "Unexpected Error");
+			RestSearchResponse.errorResponse("Unexpected Error");
 		}
-		return RestResponse.successResponse(headers, itemList);
+		return RestSearchResponse.successSearchResponse(itemList, 1, 0, total);
 	}
 	
 	@DELETE

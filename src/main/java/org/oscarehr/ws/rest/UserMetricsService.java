@@ -25,6 +25,7 @@
 package org.oscarehr.ws.rest;
 
 import io.prometheus.client.Histogram;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.UserMetricsTo1;
 import org.springframework.stereotype.Component;
 

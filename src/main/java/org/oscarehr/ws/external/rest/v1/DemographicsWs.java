@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
-import org.oscarehr.ws.rest.RestSearchResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -23,7 +23,7 @@
  */
 package org.oscarehr.ws.rest.util;
 
-import org.oscarehr.ws.rest.RestResponse;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.http.HttpHeaders;
 
 import java.util.ArrayList;
