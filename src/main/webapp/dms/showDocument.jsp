@@ -413,7 +413,7 @@
                                                 <%for (ProviderInboxItem pItem : routeList) {
                                                     String s=p.getProperty(pItem.getProviderNo(), pItem.getProviderNo());
 
-                                                    if(!s.equals("0")&&!s.equals("null")&& !pItem.getStatus().equals("X")){  %>
+                                                    if(!s.equals("0")&&!s.equals("null")&& !pItem.getStatus().equals(ProviderInboxItem.ARCHIVED)){  %>
                                                         <li><%=s%><a href="#" onclick="removeLink('DOC', '<%=docId %>', '<%=pItem.getProviderNo() %>', this);return false;"><bean:message key="inboxmanager.document.RemoveLinkedProviderMsg" /></a></li>
                                                 <%}
                                                 }%>
@@ -439,24 +439,25 @@
                                                                 <!--center-->
                                                                     <% for (int i=0; i < ackList.size(); i++) {
                                                                         ReportStatus report = (ReportStatus) ackList.get(i); %>
-                                                                        <%= report.getProviderName() %> :
 
                                                                         <% String ackStatus = report.getStatus();
-                                                                            if(ackStatus.equals("A")){
+                                                                            if(ackStatus.equals(ProviderInboxItem.ACK)){
                                                                                 ackStatus = "Acknowledged";
-                                                                            }else if(ackStatus.equals("F")){
+                                                                            }else if(ackStatus.equals(ProviderInboxItem.FILE)){
                                                                                 ackStatus = "Filed but not Acknowledged";
                                                                             }else{
                                                                                 ackStatus = "Not Acknowledged";
                                                                             }
-                                                                        %>
-                                                                        <font color="red"><%= ackStatus %></font>
-                                                                        <% if ( ackStatus.equals("Acknowledged") ) { %>
-                                                                            <%= report.getTimestamp() %>,
-                                                                            <%= ( report.getComment().equals("") ? "no comment" : "comment : "+report.getComment() ) %>
-                                                                        <% } %>
-                                                                        <br>
-                                                                    <% }
+
+                                                                        // Only show providers that weren't removed from the document
+                                                                        if(!report.getStatus().equals(ProviderInboxItem.ARCHIVED)) { %>
+                                                                            <%= report.getProviderName() %> :
+                                                                            <font color="red"><%= ackStatus %></font>
+                                                                                <%= report.getTimestamp() %>,
+                                                                                <%= ( report.getComment().equals("") ? "no comment" : "comment : "+report.getComment() ) %>
+                                                                            <br>
+                                                                        <%}
+                                                                    }
                                                                     if (ackList.size() == 0){
                                                                         %><font color="red">N/A</font><%
                                                                     }
