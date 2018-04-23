@@ -83,6 +83,7 @@ public class DemographicWs extends AbstractExternalRestWs
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Integer, String> postDemographic(@Valid DemographicTransfer demographicTo)
 	{
 		Demographic demographic;

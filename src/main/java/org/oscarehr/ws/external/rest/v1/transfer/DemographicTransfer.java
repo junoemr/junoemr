@@ -23,12 +23,11 @@
 package org.oscarehr.ws.external.rest.v1.transfer;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.oscarehr.ws.validator.ProviderNoConstraint;
 import org.oscarehr.ws.validator.StringValueConstraint;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import javax.ws.rs.DefaultValue;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -62,7 +61,6 @@ public class DemographicTransfer implements Serializable
 	private String hcVersion;
 	private LocalDate hcRenewDate;
 	private LocalDate hcEffectiveDate;
-	@Past
 	@NotNull
 	private LocalDate dateJoined;
 	private LocalDate endDate;
@@ -72,7 +70,6 @@ public class DemographicTransfer implements Serializable
 	@DefaultValue("AC")
 	@StringValueConstraint(allows = {"AC","IN","DE","FI","MO"})
 	private String patientStatus;
-	@Past
 	private LocalDate patientStatusDate;
 
 	// address and contact info

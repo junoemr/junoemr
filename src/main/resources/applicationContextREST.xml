@@ -1,11 +1,22 @@
 <beans xmlns="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:cxf="http://cxf.apache.org/core"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
 	">
 
+	<cxf:bus>
+		<cxf:properties>
+			<!--
+			  This property needs to be set 'true' in order to give preference to JacksonJsonProvider
+			  over the default Jettison provider.
+			-->
+			<entry key="skip.default.json.provider.registration" value="true" ></entry>
+		</cxf:properties>
+	</cxf:bus>
 
 	<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>
 	<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>
@@ -37,7 +48,7 @@
 
 	<bean id="exceptionMapper" class="org.apache.cxf.jaxrs.validation.ValidationExceptionMapper"/>
 	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.util.ValidationExceptionMapper"/>
-	<bean id="objectMapperContextResolver" class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
+	<bean id="objectMapperProvider" class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
 
 	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
 
@@ -102,10 +113,9 @@
 			<ref bean="jaxb"/>
 			<ref bean="exceptionMapper"/>
 			<ref bean="validationExceptionMapper"/>
-			<ref bean="objectMapperContextResolver"/>
-			<bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
+			<ref bean="objectMapperProvider"/>
+			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
 		</jaxrs:providers>
-
 
 		<jaxrs:extensionMappings>
 			<entry key="xml" value="application/xml"/>

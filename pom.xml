@@ -222,7 +222,9 @@
 			<version>3.1.0.RELEASE</version>
 		</dependency>
 		<!-- Version 3.0.7 of this was included by cxf but is used by the app.  Version 3.1.0
-		     was tried, but oscar wouldn't start
+		     was tried, but oscar wouldn't start due to signature change in
+		     org.oscarehr.common.web.OscarSpringContextLoader.createWebApplicationContext().
+		     It also appears to start all of the schedule tasks.
 		-->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -1095,16 +1097,15 @@
 			<artifactId>hcv-stubs</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
 			<version>2.9.5</version>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-jaxrs</artifactId>
-			<version>1.9.0</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.9.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
