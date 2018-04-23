@@ -23,6 +23,7 @@
 
 package org.oscarehr.ws.external.rest.v1;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.model.Demographic;
@@ -69,6 +70,7 @@ public class DemographicWs extends AbstractExternalRestWs
 
 	@GET
 	@Path("/{id}")
+	@Operation(summary = "Retrieve an existing patient demographic record by id.")
 	public RestResponse<DemographicTransfer, String> getDemographic(@PathParam("id") Integer demographicNo)
 	{
 		return RestResponse.errorResponse("Not Implemented");
@@ -77,6 +79,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	@PUT
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Update an existing patient demographic record by id.")
 	public RestResponse<DemographicTransfer, String> putDemographic(@PathParam("id") Integer demographicNo,
 	                                                                @Valid DemographicTransfer demographicTo)
 	{
@@ -85,6 +88,7 @@ public class DemographicWs extends AbstractExternalRestWs
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Add a new patient demographic record to the system.")
 	public RestResponse<Integer, String> postDemographic(@Valid DemographicTransfer demographicTo)
 	{
 		Demographic demographic;

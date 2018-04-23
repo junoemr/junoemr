@@ -28,7 +28,6 @@ import org.oscarehr.ws.validator.ProviderNoConstraint;
 import org.oscarehr.ws.validator.StringValueConstraint;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import javax.ws.rs.DefaultValue;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -50,6 +49,7 @@ public class DemographicTransfer implements Serializable
 	@Size(max=10)
 	private String title;
 	@NotNull
+	@Size(min=1,max=1)
 	@StringValueConstraint(allows = {"M","F","T","O","U"})
 	private String sex;
 	@Size(max=10)
@@ -62,17 +62,14 @@ public class DemographicTransfer implements Serializable
 	private String hcVersion;
 	private Date hcRenewDate;
 	private Date hcEffectiveDate;
-	@Past
 	@NotNull
 	private Date dateJoined;
 	private Date endDate;
 	@NotNull
 	private Date dateOfBirth;
-//	@NotNull
 	@DefaultValue("AC")
 	@StringValueConstraint(allows = {"AC","IN","DE","FI","MO"})
 	private String patientStatus;
-	@Past
 	private Date patientStatusDate;
 
 	// address and contact info
@@ -91,12 +88,14 @@ public class DemographicTransfer implements Serializable
 	private String province;
 	@Size(max=255)
 	private String previousAddress;
+	@Size(max=80)
 	private String familyDoctor;
 	@Size(max=20)
 	private String primaryPhone;
 	@Size(max=20)
 	private String secondaryPhone;
 	private String cellPhone;
+	@Size(max=20)
 	private String pcnIndicator;
 
 	// roster info
