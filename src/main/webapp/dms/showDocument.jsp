@@ -311,8 +311,8 @@
 					<td colspan="8">
 						<div style="text-align: right;font-weight: bold">
 						<% if( numOfPage > 1 && displayDocumentAs.equals(UserProperty.IMAGE) ) {%>
-							<a id="firstP_<%=docId%>" style="display: none;" href="javascript:void(0);" onclick="firstPage('<%=docId%>','<%=contextPath%>');">First</a>
-							<a id="prevP_<%=docId%>" style="display: none;"  href="javascript:void(0);" onclick="prevPage('<%=docId%>','<%=contextPath%>');">Prev</a>
+							<a id="firstP_<%=docId%>" style="visibility: hidden;" href="javascript:void(0);" onclick="firstPage('<%=docId%>','<%=contextPath%>');">First</a>
+							<a id="prevP_<%=docId%>" style="visibility: hidden;"  href="javascript:void(0);" onclick="prevPage('<%=docId%>','<%=contextPath%>');">Prev</a>
 							<a id="nextP_<%=docId%>" href="javascript:void(0);" onclick="nextPage('<%=docId%>','<%=contextPath%>');">Next</a>
 							<a id="lastP_<%=docId%>" href="javascript:void(0);" onclick="lastPage('<%=docId%>','<%=contextPath%>');">Last</a>
 							<%} %>
@@ -585,8 +585,8 @@
 					<td colspan="8">
 						<div style="text-align: right;font-weight: bold">
 							<% if( numOfPage > 1 && displayDocumentAs.equals(UserProperty.IMAGE)) {%>
-							<a id="firstP2_<%=docId%>" style="display: none;" href="javascript:void(0);" onclick="firstPage('<%=docId%>','<%=contextPath%>');">First</a>
-							<a id="prevP2_<%=docId%>" style="display: none;"  href="javascript:void(0);" onclick="prevPage('<%=docId%>','<%=contextPath%>');">Prev</a>
+							<a id="firstP2_<%=docId%>" style="visibility: hidden;" href="javascript:void(0);" onclick="firstPage('<%=docId%>','<%=contextPath%>');">First</a>
+							<a id="prevP2_<%=docId%>" style="visibility: hidden;"  href="javascript:void(0);" onclick="prevPage('<%=docId%>','<%=contextPath%>');">Prev</a>
 							<a id="nextP2_<%=docId%>" href="javascript:void(0);" onclick="nextPage('<%=docId%>','<%=contextPath%>');">Next</a>
 							<a id="lastP2_<%=docId%>" href="javascript:void(0);" onclick="lastPage('<%=docId%>','<%=contextPath%>');">Last</a>
 							<%} %>
