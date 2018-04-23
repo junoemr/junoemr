@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
-import org.oscarehr.ws.rest.RestResponse;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

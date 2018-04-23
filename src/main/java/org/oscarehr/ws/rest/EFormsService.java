@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.managers.FormsManager;
 import org.oscarehr.ws.rest.conversion.EFormConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.EFormTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

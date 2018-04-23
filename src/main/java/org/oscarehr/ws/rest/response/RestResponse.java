@@ -22,37 +22,48 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.response;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.util.MultiValueMap;
+import java.io.Serializable;
 
-public class RestResponse<T, E> extends HttpEntity<T>
+public class RestResponse<B, E> implements Serializable
 {
 	public enum ResponseStatus
 	{
 		SUCCESS, ERROR
 	}
 
+	private final RestResponseHeaders headers;
+	private final B body;
 	private final E error;
 	private final ResponseStatus status;
 
-	protected RestResponse(MultiValueMap<String, String> headers, T body)
+	protected RestResponse(RestResponseHeaders headers, B body)
 	{
 		this(headers, body, null, ResponseStatus.SUCCESS);
 	}
 
-	protected RestResponse(MultiValueMap<String, String> headers, T body, E error)
+	protected RestResponse(RestResponseHeaders headers, B body, E error)
 	{
 		this(headers, body, error, ResponseStatus.ERROR);
 	}
 
-	protected RestResponse(MultiValueMap<String, String> headers, T body, E error, ResponseStatus status)
+	protected RestResponse(RestResponseHeaders headers, B body, E error, ResponseStatus status)
 	{
-		super(body, headers);
+		this.headers = headers;
+		this.body= body;
 		this.error = error;
 		this.status = status;
+	}
+
+	public RestResponseHeaders getHeaders()
+	{
+		return headers;
+	}
+
+	public B getBody()
+	{
+		return body;
 	}
 
 	public E getError()
@@ -65,23 +76,23 @@ public class RestResponse<T, E> extends HttpEntity<T>
 		return status;
 	}
 
-	public static <T, E> RestResponse<T, E> successResponse(MultiValueMap<String, String> headers, T body)
+	public static <T, E> RestResponse<T, E> successResponse(RestResponseHeaders headers, T body)
 	{
 		return new RestResponse<>(headers, body, null, ResponseStatus.SUCCESS);
 	}
 
 	public static <T, E> RestResponse<T, E> successResponse(T body)
 	{
-		return successResponse(new HttpHeaders(), body);
+		return successResponse(new RestResponseHeaders(), body);
 	}
 
-	public static <T, E> RestResponse<T, E> errorResponse(MultiValueMap<String, String> headers, E error)
+	public static <T, E> RestResponse<T, E> errorResponse(RestResponseHeaders headers, E error)
 	{
 		return new RestResponse<>(headers, null, error, ResponseStatus.ERROR);
 	}
 
 	public static <T, E> RestResponse<T, E> errorResponse(E error)
 	{
-		return errorResponse(new HttpHeaders(), error);
+		return errorResponse(new RestResponseHeaders(), error);
 	}
 }

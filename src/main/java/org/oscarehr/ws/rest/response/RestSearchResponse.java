@@ -21,38 +21,36 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest;
-
-import org.springframework.http.HttpHeaders;
+package org.oscarehr.ws.rest.response;
 
 import java.util.List;
 
 public class RestSearchResponse<T, E> extends RestResponse<List<T>, E>
 {
-	protected RestSearchResponse(HttpHeaders headers, List<T> body, E error, ResponseStatus status)
+	protected RestSearchResponse(RestResponseHeaders headers, List<T> body, E error, ResponseStatus status)
 	{
 		super(headers, body, error, status);
 	}
 
-	public static <T, E> RestSearchResponse<T, E> successSearchResponse(HttpHeaders headers, List<T> body, int page, int perPage, int total)
+	public static <T, E> RestSearchResponse<T, E> successSearchResponse(RestSearchResponseHeaders headers, List<T> body, int page, int perPage, int total)
 	{
-		headers.add("total", String.valueOf(total));
-		headers.add("page", String.valueOf(page));
-		headers.add("perPage", String.valueOf(perPage));
+		headers.setPage(page);
+		headers.setPerPage(perPage);
+		headers.setTotal(total);
 		return new RestSearchResponse<>(headers, body, null, RestResponse.ResponseStatus.SUCCESS);
 	}
 	public static <T, E> RestSearchResponse<T, E> successSearchResponse(List<T> body, int page, int perPage, int total)
 	{
-		return successSearchResponse(new HttpHeaders(), body, page, perPage, total);
+		return successSearchResponse(new RestSearchResponseHeaders(), body, page, perPage, total);
 	}
 
-	public static <T, E> RestSearchResponse<T, E> errorSearchResponse(HttpHeaders headers, E error)
+	public static <T, E> RestSearchResponse<T, E> errorSearchResponse(RestResponseHeaders headers, E error)
 	{
 		return new RestSearchResponse<>(headers, null, error, ResponseStatus.ERROR);
 	}
 
 	public static <T, E> RestSearchResponse<T, E> errorSearchResponse(E error)
 	{
-		return errorSearchResponse(new HttpHeaders(), error);
+		return errorSearchResponse(new RestResponseHeaders(), error);
 	}
 }

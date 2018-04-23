@@ -60,6 +60,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
 import org.oscarehr.ws.rest.conversion.WaitingListNameConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;

@@ -23,11 +23,12 @@
 
 package org.oscarehr.ws.external.rest.v1;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
-import org.oscarehr.ws.rest.RestSearchResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,7 @@ public class DemographicsWs extends AbstractExternalRestWs
 
 	@GET
 	@Path("/search")
+	@Operation(summary = "Search demographics by parameter")
 	public RestSearchResponse<DemographicSearchResult, String> search(
 			@QueryParam("page") @DefaultValue("1") Integer page,
 			@QueryParam("perPage") @DefaultValue("10") Integer perPage,

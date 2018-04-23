@@ -49,6 +49,7 @@ import org.oscarehr.common.model.AppUser;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.RSSResponse;
 import org.oscarehr.ws.rest.to.model.RssItem;
 import org.springframework.stereotype.Component;
@@ -68,7 +69,7 @@ public class RSSFeedService extends AbstractServiceImpl {
 	@GET
 	@Path("/rss")
 	@Produces("application/json")
-	public RestResponse<RSSResponse, String> getRSS(@QueryParam("key") String key,@QueryParam("startPoint") String startPoint, @QueryParam("numberOfRows") String numberOfRows, @Context HttpServletRequest request) {
+	public RestResponse<RSSResponse, String> getRSS(@QueryParam("key") String key, @QueryParam("startPoint") String startPoint, @QueryParam("numberOfRows") String numberOfRows, @Context HttpServletRequest request) {
 		RSSResponse response = new RSSResponse();
 		response.setTimestamp(new Date());
 		try {
