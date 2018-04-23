@@ -154,13 +154,13 @@
 	bgcolor="ivory">
 	<tr bgcolor="<%=deepcolor%>">
 		<TH align="center" width="10%"><b><a
-			href="providersearchresults.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&orderby=provider_no&limit1=0&limit2=10">
+			href="providersearchresults.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&search_status=<%=searchStatus%>&orderby=provider_no&limit1=0&limit2=10">
 			<bean:message key="admin.providersearchresults.ID" /></a></b></TH>
 		<TH align="center" width="19%"><b><a
-			href="providersearchresults.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&orderby=first_name&limit1=0&limit2=10">
+			href="providersearchresults.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&search_status=<%=searchStatus%>&orderby=first_name&limit1=0&limit2=10">
 			<bean:message key="admin.provider.formFirstName" /></a> </b></TH>
 		<TH align="center" width="19%"><b><a
-			href="providersearchresults.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&orderby=last_name&limit1=0&limit2=10">
+			href="providersearchresults.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&search_status=<%=searchStatus%>&orderby=last_name&limit1=0&limit2=10">
 			<bean:message key="admin.provider.formLastName" /></a></b></TH>
 		<TH align="center" width="16%"><b>
 			<bean:message key="admin.provider.formSpecialty" /></b></TH>
