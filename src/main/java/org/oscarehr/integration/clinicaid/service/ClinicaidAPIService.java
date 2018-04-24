@@ -76,7 +76,7 @@ public class ClinicaidAPIService
 				.replaceFirst("\\d*", "")
 				.replace(";", "\n");
 		return String.format(
-				"Name: %s %s %s\nBirth Date: %s\nGender: %s\nMessage: %s",
+				"First Name: %s\nMiddle Name:%s\nLast Name: %s\nBirth Date: %s\nGender: %s\nMessage: %s",
 				StringUtils.trimToEmpty(data.getFirstName()),
 				StringUtils.trimToEmpty(data.getMiddleName()),
 				StringUtils.trimToEmpty(data.getLastName()),
