@@ -22,17 +22,54 @@
  * Ontario, Canada
  */
 
+package org.oscarehr.integration.clinicaid.dto;
 
-package org.oscarehr.ws;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.jws.WebService;
+import java.io.Serializable;
 
-import org.apache.cxf.annotations.GZIP;
-import org.springframework.stereotype.Component;
-
-@WebService
-@Component
-@GZIP(threshold=AbstractWs.GZIP_THRESHOLD)
-public class UserMetricsWs extends AbstractWs
+public class ClinicaidUserTo1 implements Serializable
 {
+	private String identifier;
+
+	@JsonProperty("first_name")
+
+	private String firstName;
+
+	@JsonProperty("last_name")
+	private String lastName;
+
+	public ClinicaidUserTo1()
+	{
+	}
+
+	public void setIdentifier(String identifier)
+	{
+		this.identifier = identifier;
+	}
+
+	public String getIdentifier()
+	{
+		return this.identifier;
+	}
+
+	public void setFirstName(String firstName)
+	{
+		this.firstName = firstName;
+	}
+
+	public String getFirstName()
+	{
+		return this.firstName;
+	}
+
+	public void setLastName(String lastName)
+	{
+		this.lastName = lastName;
+	}
+
+	public String getLastName()
+	{
+		return this.lastName;
+	}
 }

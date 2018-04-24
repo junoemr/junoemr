@@ -25,29 +25,33 @@
 
 package oscar.oscarBilling.ca.bc.Teleplan;
 
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-
+import org.oscarehr.util.SpringUtils;
 import oscar.Misc;
 import oscar.OscarProperties;
 import oscar.entities.Billingmaster;
 import oscar.entities.WCB;
 import oscar.oscarBilling.ca.bc.MSP.TeleplanFileWriter;
+
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 /**
  *
  * @author jaygallagher
  */
 public class WCBTeleplanSubmission {
+
+	private static final int WCB_CLAIM_NO_MAX_LENGTH = 8;
+
     private static Logger log = MiscUtils.getLogger();
     
-    private DemographicManager demographicManager = null;
+    private static DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
     
     //Misc misc = new Misc();
     public String getHtmlLine(WCB wcb,Billingmaster bm) {
@@ -91,56 +95,74 @@ public class WCBTeleplanSubmission {
     public  String dateFormat(String date){
        return Misc.forwardZero(oscar.Misc.cleanNumber(date), 8);
     }
-    
-    
-    public String validate(WCB wcb,Billingmaster bm){
-        StringBuilder m = new StringBuilder();
-        
-        try {
-            Integer.parseInt(bm.getDxCode1() );
-        }catch(Exception e){
-            m.append(": ICD9 may only contain Numbers ");
-        }
 
 
-        if (wcb.getW_wcbno() != null && !wcb.getW_wcbno().trim().equals("")){
-            try {
-                Integer.parseInt(wcb.getW_wcbno());
-            }catch(Exception e){
-                m.append(": WCB claim # may only contain Numbers ");
-            }
-        }
-        
-        if (wcb.getW_reporttype() != null && wcb.getW_reporttype().equals("F") ){
-            if (wcb.getW_empname() != null && wcb.getW_empname().trim().length() == 0 ){
-                m.append(": Employer's name can not be empty ");
-            }
-            
-            if (wcb.getW_opaddress() != null && wcb.getW_opaddress().trim().length() == 0 ){
-                m.append(": Employer's Operation Address can not be empty ");
-            }
-            
-            if (wcb.getW_opcity() != null && wcb.getW_opcity().trim().length() == 0 ){
-                m.append(": Employer's Operation City can not be empty ");
-            }
-             
-            if (wcb.getW_empphone() != null && wcb.getW_empphone().trim().length() == 0 ){
-                m.append(": Employer's Phone # can not be empty ");
-            }
-        }    
-        
+	public String validate(WCB wcb, Billingmaster bm)
+	{
+		StringBuilder m = new StringBuilder();
 
-       
-        String ret = "<tr bgcolor='red'><td colspan='11'>"
-                + "<a href='#' onClick=\"openBrWindow('adjustBill.jsp?billing_no="
-                + Misc.forwardZero(""+bm.getBillingmasterNo(), 7)
-                + "','','resizable=yes,scrollbars=yes,top=0,left=0,width=900,height=600'); return false;\">"
-                + m.toString() + "</a>" + "</td></tr>";
-        if ("".equals(m.toString())){
-            return "" ;
-        }      
-        return ret;
-   }
+		int icdMaxLength = 5;
+		if(bm.getDxCode1() != null && bm.getDxCode1().length() > icdMaxLength)
+		{
+			m.append(": ICD9 exceeds maximum length of " + icdMaxLength);
+		}
+
+		if(wcb == null)
+		{
+			m.append(": Please select a WCB form or change billing type for invoice no:" + bm.getBillingNo());
+		}
+		else
+		{
+			String wcbNo = wcb.getW_wcbno();
+			if(wcbNo != null && !wcbNo.trim().isEmpty())
+			{
+				// check maximum length
+				if(wcbNo.length() > WCB_CLAIM_NO_MAX_LENGTH)
+				{
+					m.append(": WCB claim # exceeds maximum length of " + WCB_CLAIM_NO_MAX_LENGTH + " digits ");
+				}
+				// if not a number
+				if(!StringUtils.isNumeric(wcbNo))
+				{
+					m.append(": WCB claim # may only contain Numbers ");
+				}
+			}
+
+			if(wcb.getW_reporttype() != null && wcb.getW_reporttype().equals("F") && wcb.getFormNeeded() == 1)
+			{
+				if(wcb.getW_empname() != null && wcb.getW_empname().trim().length() == 0)
+				{
+					m.append(": Employer's name can not be empty ");
+				}
+
+				if(wcb.getW_opaddress() != null && wcb.getW_opaddress().trim().length() == 0)
+				{
+					m.append(": Employer's Operation Address can not be empty ");
+				}
+
+				if(wcb.getW_opcity() != null && wcb.getW_opcity().trim().length() == 0)
+				{
+					m.append(": Employer's Operation City can not be empty ");
+				}
+
+				if(wcb.getW_empphone() != null && wcb.getW_empphone().trim().length() == 0)
+				{
+					m.append(": Employer's Phone # can not be empty ");
+				}
+			}
+		}
+
+		String ret = "<tr bgcolor='red'><td colspan='11'>"
+				+ "<a href='#' onClick=\"openBrWindow('adjustBill.jsp?billing_no="
+				+ Misc.forwardZero("" + bm.getBillingmasterNo(), 7)
+				+ "','','resizable=yes,scrollbars=yes,top=0,left=0,width=900,height=600'); return false;\">"
+				+ m.toString() + "</a>" + "</td></tr>";
+		if("".equals(m.toString()))
+		{
+			return "";
+		}
+		return ret;
+	}
     
  
    
@@ -274,7 +296,7 @@ public class WCBTeleplanSubmission {
    private String Claim(LoggedInInfo loggedInInfo, String logNo, String billedAmount, String feeitem,String billingUnit,String correspondenceCode,Billingmaster bm,WCB wcb) {
       StringBuilder dLine = new StringBuilder();
      
-      Demographic d = demographicManager.getDemographic(loggedInInfo, ""+bm.getDemographicNo()); 
+      Demographic d = demographicDao.getDemographic(String.valueOf(bm.getDemographicNo()));
       
       dLine.append("C02");
       dLine.append( this.ClaimNote1Head(logNo,bm.getPayeeNo(),bm.getPractitionerNo()) );
@@ -284,7 +306,7 @@ public class WCBTeleplanSubmission {
       dLine.append( "0" );//Misc.space(1)
       dLine.append( "00");//Misc.backwardSpace("", 2).toUpperCase()
       dLine.append( Misc.zero(2));
-      dLine.append( Misc.forwardZero(billingUnit, 3)); // SR#: 7153 v1.9 Section 6.1.1 SEQ P20
+      dLine.append( Misc.forwardZero(TeleplanFileWriter.roundUp(bm.getBillingUnit()), 3)); // SR#: 7153 v1.9 Section 6.1.1 SEQ P20
       dLine.append( Misc.zero(2 + 2 + 1 + 2) ); //clarification
       dLine.append( Misc.forwardZero(feeitem, 5));
       dLine.append( Misc.moneyFormatPaddedZeroNoDecimal(billedAmount, 7));
@@ -342,14 +364,5 @@ public class WCBTeleplanSubmission {
       + Misc.forwardZero(String.valueOf(logNo), 7)
       + Misc.forwardZero(w_payeeno, 5)
       + Misc.forwardZero(w_pracno, 5);
-   } 
-   
-   
-   public void setDemographicManager(
-		   DemographicManager demographicManager) {
-	   	this.demographicManager = demographicManager;
-    }
-  
-   
-    
+   }
 }

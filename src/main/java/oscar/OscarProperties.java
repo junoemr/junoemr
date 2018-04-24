@@ -29,11 +29,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import org.oscarehr.util.MiscUtils;
 
@@ -232,6 +228,32 @@ public class OscarProperties extends Properties {
 		} catch (Exception e) {/* No Date Found */
 		}
 		return ret;
+	}
+
+	/**
+	 * Get the providers to route the labs to.
+	 * By default we will just return the list of providers that were requested in the lab
+	 *
+	 * @param defaultProviderNumbers The requested providers to route the labs to. Returned by default
+	 * @return ArrayList of the providers to route the labs to
+	 */
+	public ArrayList<String> getRouteLabsToProviders(ArrayList<String> defaultProviderNumbers)
+	{
+		String property = getProperty("route_labs_to_provider", "");
+
+		//Send all labs to the unclaimed inbox
+		if (property.equals("0"))
+		{
+			return null;
+		} else if (!property.equals("")) //Send all labs to providers listed in property
+		{
+			ArrayList<String> providers = new ArrayList<>(Arrays.asList(property.split(",")));
+			return providers;
+		} else
+		{
+			//Default. Send labs to requested providers
+			return defaultProviderNumbers;
+		}
 	}
 
 	public boolean isTorontoRFQ() {

@@ -22,33 +22,30 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.ws;
+package org.oscarehr.ws.external.soap.v1;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.cxf.annotations.GZIP;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import org.springframework.stereotype.Component;
+import oscar.OscarProperties;
+import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
+
+import javax.jws.WebParam;
+import javax.jws.WebService;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.text.ParseException;
 import java.util.Date;
 
-import javax.jws.WebParam;
-import javax.jws.WebService;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.cxf.annotations.GZIP;
-import org.apache.log4j.Logger;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.LoggedInInfo;
-
-import org.oscarehr.util.SpringUtils;
-import org.springframework.stereotype.Component;
-
-import oscar.OscarProperties;
-import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
-
 @WebService
 @Component
-@GZIP(threshold=AbstractWs.GZIP_THRESHOLD)
+@GZIP(threshold= AbstractWs.GZIP_THRESHOLD)
 public class LabUploadWs extends AbstractWs {
 
 	private static final String LAB_TYPE_AHS = "AHS"; //all Alberta labs

@@ -216,6 +216,14 @@
 			<artifactId>spring-orm</artifactId>
 			<version>3.1.0.RELEASE</version>
 		</dependency>
+		<!-- Version 3.0.7 of this was included by cxf but is used by the app.  Version 3.1.0
+		     was tried, but oscar wouldn't start
+		-->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>3.0.7.RELEASE</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
@@ -257,6 +265,28 @@
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>3.4.0.GA</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.4.2.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.1.0.Final</version>
+		</dependency>
+		<!--
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>javax.el-api</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.el</artifactId>
+			<version>3.0.1-b08</version>
+		</dependency>
+		-->
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib-nodep</artifactId>
@@ -388,38 +418,22 @@
 			<version>2.0</version>
 		</dependency>
 		<!-- jasper reports -->
+		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports -->
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
-			<version>4.1.2</version>
-			<exclusions>
-				<exclusion>
-					<groupId>bouncycastle</groupId>
-					<artifactId>bcprov-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>bouncycastle</groupId>
-					<artifactId>bcmail-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bcprov-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bctsp-jdk14</artifactId>
-				</exclusion>
-			</exclusions>
+			<version>6.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports-fonts</artifactId>
-			<version>4.0.0</version>
+			<version>6.0.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sourceforge.barbecue/barbecue -->
 		<dependency>
 			<groupId>net.sourceforge.barbecue</groupId>
 			<artifactId>barbecue</artifactId>
-			<version>1.0.6b</version>
+			<version>1.5-beta1</version>
 		</dependency>
 		<!-- joda time -->
 		<dependency>
@@ -690,18 +704,18 @@
 			<artifactId>displaytag</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-		<!-- zxing / 2d bar codes -->
+		<!-- https://mvnrepository.com/artifact/com.google.zxing/core -->
 		<dependency>
-			<groupId>zxing</groupId>
-			<artifactId>zxing-core</artifactId>
-			<version>1.5</version>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.3.2</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.google.zxing/javase -->
 		<dependency>
-			<groupId>zxing</groupId>
-			<artifactId>zxing-j2se</artifactId>
-			<version>1.5</version>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>3.3.2</version>
 		</dependency>
-		<!-- chip / ping libararies -->
 		<dependency>
 			<groupId>org.chip.ping</groupId>
 			<artifactId>oscar-ping</artifactId>
@@ -861,9 +875,17 @@
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>apache-cxf</artifactId>
-			<version>2.7.4</version>
+			<version>3.2.4</version>
 			<type>pom</type>
 			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-web</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
 				<exclusion>
 					<groupId>org.apache.geronimo.specs</groupId>
 					<artifactId>geronimo-servlet_2.5_spec</artifactId>
@@ -885,12 +907,12 @@
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-frontend-jaxws</artifactId>
-			<version>2.7.4</version>
+			<version>3.2.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http</artifactId>
-			<version>2.7.4</version>
+			<version>3.2.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.oscarehr</groupId>
@@ -957,6 +979,14 @@
 					<groupId>org.slf4j</groupId>
 					<artifactId>log4j-over-slf4j</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcprov-jdk16</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.santuario</groupId>
+					<artifactId>xmlsec</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -1009,6 +1039,10 @@
 				<exclusion>
 					<groupId>org.bouncycastle</groupId>
 					<artifactId>bcprov-jdk16</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.santuario</groupId>
+					<artifactId>xmlsec</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

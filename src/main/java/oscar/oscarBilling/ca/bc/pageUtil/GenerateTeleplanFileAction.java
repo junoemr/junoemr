@@ -25,28 +25,23 @@
 
 package oscar.oscarBilling.ca.bc.pageUtil;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
 import oscar.Misc;
 import oscar.OscarProperties;
 import oscar.oscarBilling.ca.bc.MSP.TeleplanFileWriter;
 import oscar.oscarBilling.ca.bc.MSP.TeleplanSubmission;
 import oscar.oscarBilling.ca.bc.data.BillActivityDAO;
-import oscar.oscarBilling.ca.bc.data.BillingmasterDAO;
 import oscar.oscarProvider.data.ProviderData;
 import oscar.util.UtilDateUtilities;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 
 /**
@@ -96,11 +91,7 @@ public class GenerateTeleplanFileAction extends Action{
         synchronized (this)  { 
             try{
              
-            BillingmasterDAO billingmasterDAO = (BillingmasterDAO) SpringUtils.getBean("BillingmasterDAO");
-            DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-            TeleplanFileWriter teleplanWr = new TeleplanFileWriter();  
-            teleplanWr.setBillingmasterDAO(billingmasterDAO);
-            teleplanWr.setDemographicManager(demographicManager);
+            TeleplanFileWriter teleplanWr = new TeleplanFileWriter();
             TeleplanSubmission submission = teleplanWr.getSubmission(LoggedInInfo.getLoggedInInfoFromSession(request), testRun,pdArr,dataCenterId);
 
             BillActivityDAO bActDao  = new BillActivityDAO();

@@ -24,6 +24,7 @@
 
 package oscar.oscarBilling.ca.bc.pageUtil;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +46,8 @@ import oscar.oscarBilling.ca.bc.data.BillingmasterDAO;
 import oscar.oscarBilling.ca.bc.pageUtil.BillingBillingManager.BillingItem;
 import oscar.util.ConversionUtils;
 
-public class BillingViewBean {
+public class BillingViewBean implements Serializable
+{
 
 	private String apptProviderNo = null;
 	private String patientName = null;

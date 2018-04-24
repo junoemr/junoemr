@@ -22,11 +22,7 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.ws;
-
-import java.util.List;
-
-import javax.jws.WebService;
+package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
@@ -36,11 +32,15 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.NotAuthorisedException;
+import org.oscarehr.ws.WsUtils;
 import org.oscarehr.ws.transfer_objects.LoginResultTransfer;
 import org.oscarehr.ws.transfer_objects.LoginResultTransfer2;
 import org.oscarehr.ws.transfer_objects.ProviderTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.jws.WebService;
+import java.util.List;
 
 @WebService
 @Component

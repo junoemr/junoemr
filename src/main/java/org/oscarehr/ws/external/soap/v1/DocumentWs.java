@@ -22,46 +22,38 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.ws;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import javax.jws.WebService;
-
-import javax.servlet.ServletContext;
-
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.MessageContext;
-
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.cxf.annotations.GZIP;
-import org.apache.log4j.Logger;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+package org.oscarehr.ws.external.soap.v1;
 
 import com.lowagie.text.pdf.PdfReader;
-
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.cxf.annotations.GZIP;
+import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.managers.DocumentManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.transfer_objects.DocumentTransfer;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
+
+import javax.jws.WebService;
+import javax.servlet.ServletContext;
+import javax.xml.ws.WebServiceException;
+import javax.xml.ws.handler.MessageContext;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 
 @WebService

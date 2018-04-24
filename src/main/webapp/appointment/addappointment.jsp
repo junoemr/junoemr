@@ -1045,7 +1045,7 @@
 							%>
 						</select>
 						</br>
-						<textarea id="reason" name="reason" tabindex="2" rows="2" wrap="virtual"
+						<textarea id="reason" name="reason" tabindex="2" maxlength="80" rows="2" wrap="virtual"
 								  cols="18"><%=bFirstDisp ? "" : request.getParameter("reason").equals("") ? "" : request.getParameter("reason")%></textarea>
 					</div>
 					<div class="space">&nbsp;</div>

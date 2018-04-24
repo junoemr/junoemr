@@ -23,16 +23,16 @@
  */
 
 
-package org.oscarehr.ws;
+package org.oscarehr.ws.external.soap.v1;
+
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.Security;
+import org.oscarehr.util.LoggedInInfo;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
-
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.Security;
-import org.oscarehr.util.LoggedInInfo;
 
 
 public abstract class AbstractWs

@@ -22,14 +22,7 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.ws;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-
-import javax.jws.WebService;
+package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.cxf.annotations.GZIP;
@@ -37,9 +30,9 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.common.model.AppointmentType;
-import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.managers.DayWorkSchedule;
 import org.oscarehr.managers.ScheduleManager;
+import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.transfer_objects.AppointmentArchiveTransfer;
 import org.oscarehr.ws.transfer_objects.AppointmentTransfer;
@@ -48,6 +41,12 @@ import org.oscarehr.ws.transfer_objects.DayWorkScheduleTransfer;
 import org.oscarehr.ws.transfer_objects.ScheduleTemplateCodeTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.jws.WebService;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 @WebService
 @Component

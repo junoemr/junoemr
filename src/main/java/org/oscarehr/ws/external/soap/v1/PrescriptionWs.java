@@ -22,13 +22,7 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.ws;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import javax.jws.WebService;
+package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
 import org.oscarehr.common.model.Drug;
@@ -39,9 +33,14 @@ import org.oscarehr.ws.transfer_objects.PrescriptionTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.jws.WebService;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 @WebService
 @Component
-@GZIP(threshold=AbstractWs.GZIP_THRESHOLD)
+@GZIP(threshold= AbstractWs.GZIP_THRESHOLD)
 public class PrescriptionWs extends AbstractWs {
 	@Autowired
 	private PrescriptionManager prescriptionManager;
