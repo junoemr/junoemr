@@ -155,13 +155,20 @@
 	// appointment_optimized.jsp doesn't account for them.
     // This assumes that the user is not using indivo
     if(
-		!props.isPropertyActive("enable_limited_schedule") ||
+		!props.isPropertyActive("optimized_schedule_enable") ||
     	isMobileOptimized ||
 		props.isPropertyActive("caisi") ||
 		props.isPropertyActive("TORONTO_RFQ") ||
 		props.isPropertyActive("ticklerplus") ||
 		props.isPropertyActive("OSCAR_LEARNING") ||
-		"1".equals(request.getParameter("oldschedule")) ||
+		(
+			props.isPropertyActive("optimized_schedule_default_new") &&
+			"1".equals(request.getParameter("oldschedule"))
+		) ||
+		(
+			!props.isPropertyActive("optimized_schedule_default_new") &&
+			!"1".equals(request.getParameter("newschedule"))
+		) ||
 		"1".equals(request.getParameter("caseload")) ||
 		demographicStudyDao.hasStudy()
 	)

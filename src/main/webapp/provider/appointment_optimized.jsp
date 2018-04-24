@@ -78,6 +78,8 @@
 <%@ page import="org.oscarehr.web.admin.ProviderPreferencesUIBean" %>
 <%@ page import="org.springframework.transaction.support.DefaultTransactionDefinition" %>
 <%@ page import="org.springframework.transaction.TransactionDefinition" %>
+<%@ page import="java.time.temporal.ChronoUnit" %>
+<%@ page import="java.time.Period" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 <jsp:useBean id="appointmentInfo" class="org.oscarehr.appointment.AppointmentDisplayController" scope="page" />
@@ -169,6 +171,35 @@ private LocalTime plusNoWrap(LocalTime time, int slotLengthInMinutes)
 	}
 
 	return outTime;
+}
+
+private long getAppointmentRowSpan(
+	LocalTime appointmentEndTime,
+	LocalTime slotEndTime,
+	int slotLengthInMinutes,
+	LocalTime scheduleEndTime
+)
+{
+	// Always going to be at least one slot
+	long appointmentRowSpan = 1;
+
+	// If the schedule ends before the appointment, chop off the appointment
+	LocalTime endTime = appointmentEndTime;
+	if(scheduleEndTime.isBefore(endTime))
+	{
+		endTime = scheduleEndTime;
+	}
+
+	if(endTime.isAfter(slotEndTime))
+	{
+		// Get the amount of time remaining after the first slot
+		long additionalMinutes = slotEndTime.until(endTime, ChronoUnit.MINUTES);
+
+		// count the number of additional slots that takes up
+		appointmentRowSpan += (long) Math.ceil((double) additionalMinutes / slotLengthInMinutes);
+	}
+
+	return appointmentRowSpan;
 }
 
 
@@ -1472,17 +1503,27 @@ private LocalTime plusNoWrap(LocalTime time, int slotLengthInMinutes)
 										SortedMap<LocalTime, List<AppointmentDetails>> appointmentLists =
 											schedule.getAppointments().subMap(slotTime, slotEndTime);
 
+										boolean isFirstAppointmentInSlot = true;
 										for(List<AppointmentDetails> appointments: appointmentLists.values())
 										{
 											Collections.reverse(appointments);
 											for(AppointmentDetails appointment: appointments)
 											{
+												long appointmentRowSpan = getAppointmentRowSpan(
+													appointment.getEndTime().plus(1, ChronoUnit.MINUTES),
+													slotEndTime,
+													slotLengthInMinutes,
+													endTime
+												);
+												/*
 												long appointmentLengthInMinutes = Duration
 														.between(appointment.getStartTime(),
-																appointment.getEndTime())
+																appointment.getEndTime().minus(1,
+																		ChronoUnit.MINUTES))
 														.toMinutes();
 												long appointmentRowSpan = (long) Math
 														.ceil((double) appointmentLengthInMinutes / slotLengthInMinutes);
+														*/
 
 												// Preventions are very complicated.  To keep from running a query per appointment it
 												// would require a complicated query.
@@ -1508,6 +1549,13 @@ private LocalTime plusNoWrap(LocalTime time, int slotLengthInMinutes)
 													module = request.getParameter("module");
 												}
 
+												// Shorten names for second+ appointments in a slot
+												int nameLength = len;
+												if(!isFirstAppointmentInSlot)
+												{
+													nameLength = lenLimitedS;
+												}
+
 												// Load appointmentInfo bean for this appointment
 												appointmentInfo.init(
 													appointment,
@@ -1518,7 +1566,7 @@ private LocalTime plusNoWrap(LocalTime time, int slotLengthInMinutes)
 													isWeekView(request),
 													view,
 													numAvailProvider,
-													len,
+													nameLength,
 													lenLimitedL,
 													request.getParameter("curProvider"),
 													request.getParameter("curProviderName"),
@@ -1806,6 +1854,7 @@ private LocalTime plusNoWrap(LocalTime time, int slotLengthInMinutes)
 
 
 											<%
+												isFirstAppointmentInSlot = false;
 											}
 										}
 
@@ -1938,4 +1987,72 @@ private LocalTime plusNoWrap(LocalTime time, int slotLengthInMinutes)
 
 
 </body>
+<!-- key shortcut hotkey block added by phc -->
+<script language="JavaScript">
+
+	// popup blocking for the site must be off!
+	// developed on Windows FF 2, 3 IE 6 Linux FF 1.5
+	// FF on Mac and Opera on Windows work but will require shift or control with alt and Alpha
+	// to fire the altKey + Alpha combination - strange
+
+	// Modification Notes:
+	//     event propagation has not been blocked beyond returning false for onkeydown (onkeypress may or may not fire depending)
+	//     keyevents have not been even remotely standardized so test mods across agents/systems or something will break!
+	//     use popupOscarRx so that this codeblock can be cut and pasted to appointmentprovideradminmonth.jsp
+
+	// Internationalization Notes:
+	//     underlines should be added to the labels to prompt/remind the user and should correspond to
+	//     the actual key whose keydown fires, which is also stored in the oscarResources.properties files
+	//     if you are using the keydown/up event the value stored is the actual key code
+	//     which, at least with a US keyboard, also is the uppercase utf-8 code, ie A keyCode=65
+
+	document.onkeydown=function(e){
+		evt = e || window.event;  // window.event is the IE equivalent
+		if (evt.altKey) {
+			//use (evt.altKey || evt.metaKey) for Mac if you want Apple+A, you will probably want a seperate onkeypress handler in that case to return false to prevent propagation
+			switch(evt.keyCode) {
+				case <bean:message key="global.adminShortcut"/> : newWindow("../administration/","admin");  return false;  //run code for 'A'dmin
+				case <bean:message key="global.billingShortcut"/> : popupOscarRx(600,1024,'../billing/CA/<%=prov%>/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;  //code for 'B'illing
+				case <bean:message key="global.calendarShortcut"/> : popupOscarRx(425,430,'../share/CalendarPopup.jsp?urlfrom=../provider/providercontrol.jsp&year=<%=strYear%>&month=<%=strMonth%>&param=<%=URLEncoder.encode("&view=0&displaymode=day&dboperation=searchappointmentday","UTF-8")%>');  return false;  //run code for 'C'alendar
+				case <bean:message key="global.edocShortcut"/> : popupOscarRx('700', '1024', '../dms/documentReport.jsp?function=provider&functionid=<%=curUser_no%>&curUser=<%=curUser_no%>', 'edocView');  return false;  //run code for e'D'oc
+				case <bean:message key="global.resourcesShortcut"/> : popupOscarRx(550,687,'<%=resourceBaseUrl%>'); return false; // code for R'e'sources
+				case <bean:message key="global.helpShortcut"/> : popupOscarRx(600,750,'<%=resourceBaseUrl%>');  return false;  //run code for 'H'elp
+				case <bean:message key="global.ticklerShortcut"/> : {
+					popupOscarRx(700,1024,'../tickler/ticklerMain.jsp','<bean:message key="global.tickler"/>') //run code for t'I'ckler
+					return false;
+				}
+				case <bean:message key="global.labShortcut"/> : popupOscarRx(600,1024,'../dms/inboxManage.do?method=prepareForIndexPage&providerNo=<%=curUser_no%>', '<bean:message key="global.lab"/>');  return false;  //run code for 'L'ab
+				case <bean:message key="global.msgShortcut"/> : popupOscarRx(600,1024,'../oscarMessenger/DisplayMessages.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userFirstName+" "+userLastName)%>'); return false;  //run code for 'M'essage
+				case <bean:message key="global.monthShortcut"/> : window.open("providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=1&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+URLEncoder.encode(request.getParameter("curProviderName"),"UTF-8") )%>&displaymode=month&dboperation=searchappointmentmonth&viewall=<%=viewall%>","_self"); return false ;  //run code for Mo'n'th
+				case <bean:message key="global.conShortcut"/> : popupOscarRx(625,1024,'../oscarEncounter/IncomingConsultation.do?providerNo=<%=curUser_no%>&userName=<%=URLEncoder.encode(userFirstName+" "+userLastName)%>');  return false;  //run code for c'O'nsultation
+				case <bean:message key="global.reportShortcut"/> : popupOscarRx(650,1024,'../report/reportindex.jsp','reportPage');  return false;  //run code for 'R'eports
+				case <bean:message key="global.prefShortcut"/> : {
+					popupOscarRx(715,680,'providerpreference.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&mygroup_no=<%=mygroupno%>'); //run code for 'P'references
+					return false;
+				}
+				case <bean:message key="global.searchShortcut"/> : popupOscarRx(550,687,'../demographic/search.jsp');  return false;  //run code for 'S'earch
+				case <bean:message key="global.dayShortcut"/> : window.open("providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+URLEncoder.encode(request.getParameter("curProviderName"),"UTF-8") )%>&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>","_self") ;  return false;  //run code for 'T'oday
+				case <bean:message key="global.viewShortcut"/> : {
+					<% if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals("1") ) { %>
+					review('0');  return false; //scheduled providers 'V'iew
+					<% } else {  %>
+					review('1');  return false; //all providers 'V'iew
+					<% } %>
+				}
+				case <bean:message key="global.workflowShortcut"/> : popupOscarRx(700,1024,'../oscarWorkflow/WorkFlowList.jsp','<bean:message key="global.workflow"/>'); return false ; //code for 'W'orkflow
+				case <bean:message key="global.phrShortcut"/> : popupOscarRx('600', '1024','../phr/PhrMessage.do?method=viewMessages','INDIVOMESSENGER2<%=curUser_no%>')
+				default : return;
+			}
+		}
+		if (evt.ctrlKey) {
+			switch(evt.keyCode || evt.charCode) {
+				case <bean:message key="global.btnLogoutShortcut"/> : window.open('../logout.jsp','_self');  return false;  // 'Q'uit/log out
+				default : return;
+			}
+
+		}
+	}
+
+</script>
+<!-- end of keycode block -->
 </html>
