@@ -24,33 +24,37 @@
 
 package oscar.oscarBilling.ca.bc.pageUtil;
 
-import java.util.Map;
-
 import org.displaytag.decorator.TableDecorator;
 import org.oscarehr.common.model.BillingService;
 
+import java.util.Map;
+
 /**
-A helper class for the displayTag Tag Library used to List of java beans for augmented tabular display
-**/
+ * A helper class for the displayTag Tag Library used to List of java beans for augmented tabular display
+ **/
 public class BillCodesTableWrapper
-    extends TableDecorator {
-  public BillCodesTableWrapper() {
-  }
+		extends TableDecorator
+{
+	public BillCodesTableWrapper()
+	{
+	}
 
-  public String getBillingserviceNo() {
-    BillingService bcd = (BillingService) this.getCurrentRowObject();
-    String links = "<a href=\"billingEditCode.jsp?codeId=" + bcd.getBillingserviceNo() +
-    "&code=" + bcd.getServiceCode()+"&desc=" + bcd.getDescription() + "&value=" + bcd.getValue() + "&whereTo=private\">Edit</a> <br>" +
-    "<a href=\"deletePrivateCode.jsp?code=" + bcd.getBillingserviceNo() + "\">Delete</a>";
-    return links;
-  }
+	public String getBillingserviceNo()
+	{
+		BillingService bcd = (BillingService) this.getCurrentRowObject();
+		String links = "<a href=\"billingEditCode.jsp?codeId=" + bcd.getBillingserviceNo() +
+				"&code=" + bcd.getServiceCode() + "&desc=" + bcd.getDescription() + "&value=" + bcd.getValue() + "&whereTo=private\">Edit</a> <br>" +
+				"<a href=\"deletePrivateCode.jsp?codeId=" + bcd.getBillingserviceNo() + "\">Delete</a>";
+		return links;
+	}
 
-  public String getAssociationStatus(){
-    String ret = "";
-    Map map = (Map)this.getCurrentRowObject();
-    ret = "<a href=\"#\" onClick=\"editAssociation('" + map.get("billingServiceNo") + "','" + map.get("billingServiceTrayNo") + "'); return false;\">Edit</a>";
-    ret+="<br />";
-    ret +="<a href=\"#\" onClick=\"deleteAssociation('" + map.get("id") + "'); return false;\">Delete</a>";
-    return ret;
-  }
+	public String getAssociationStatus()
+	{
+		String ret = "";
+		Map map = (Map) this.getCurrentRowObject();
+		ret = "<a href=\"#\" onClick=\"editAssociation('" + map.get("billingServiceNo") + "','" + map.get("billingServiceTrayNo") + "'); return false;\">Edit</a>";
+		ret += "<br />";
+		ret += "<a href=\"#\" onClick=\"deleteAssociation('" + map.get("id") + "'); return false;\">Delete</a>";
+		return ret;
+	}
 }

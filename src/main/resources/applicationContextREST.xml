@@ -15,10 +15,12 @@
 		http://cxf.apache.org/jaxws	http://cxf.apache.org/schemas/jaxws.xsd
 		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
 	">
-	
-	
-	
-	
+
+
+
+	<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>
+	<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>
+
 	    <bean id="oauthProvider" class="oscar.login.OscarOAuthDataProvider" autowire="byName"/>
 
 	<bean id="requestTokenService" class="oscar.login.OscarRequestTokenService">
@@ -63,21 +65,38 @@
     </jaxrs:server>
 
   <jaxrs:server id="restServices" address="/services">
-        <jaxrs:serviceBeans>
-            <bean class="org.oscarehr.ws.rest.ProviderService"  autowire="byName"/>
-        </jaxrs:serviceBeans>
+	  <jaxrs:inInterceptors>
+		  <ref bean="restLoggingInInterceptor" />
+	  </jaxrs:inInterceptors>
+	  <jaxrs:outInterceptors>
+		  <ref bean="restLoggingOutInterceptor" />
+	  </jaxrs:outInterceptors>
+
+	  <jaxrs:inFaultInterceptors>
+		  <ref bean="restLoggingInInterceptor" />
+	  </jaxrs:inFaultInterceptors>
+	  <jaxrs:outFaultInterceptors>
+		  <ref bean="restLoggingOutInterceptor" />
+	  </jaxrs:outFaultInterceptors>
+
+	  <!-- define which services are externally available -->
+	  <jaxrs:serviceBeans>
+		  <bean class="org.oscarehr.ws.external.rest.v1.DemographicsWs" autowire="byName"/>
+		  <bean class="org.oscarehr.ws.external.rest.v1.ProviderWs" autowire="byName"/>
+		  <bean class="org.oscarehr.ws.external.rest.v1.ProvidersWs" autowire="byName"/>
+	  </jaxrs:serviceBeans>
              
       <jaxrs:providers>
            <ref bean="oAuthFilter"/>
            <ref bean="jaxb"/>
             <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
-        </jaxrs:providers>
+      </jaxrs:providers>
       
       
-        <jaxrs:extensionMappings>
-            <entry key="xml" value="application/xml" />
-            <entry key="json" value="application/json" />
-        </jaxrs:extensionMappings>
+      <jaxrs:extensionMappings>
+		  <entry key="xml" value="application/xml" />
+		  <entry key="json" value="application/json" />
+	  </jaxrs:extensionMappings>
     </jaxrs:server>
     
    

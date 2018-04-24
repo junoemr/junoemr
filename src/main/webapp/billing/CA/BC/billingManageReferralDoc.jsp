@@ -42,11 +42,11 @@ if(!authed) {
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@ page
-	import="java.util.*,oscar.oscarBilling.ca.bc.data.*,oscar.oscarBilling.ca.bc.pageUtil.*"%>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.model.Billingreferral" %>
 <%@page import="org.oscarehr.common.dao.BillingreferralDao" %>
+<%@page import="org.oscarehr.common.model.Billingreferral" %>
+<%@page import="org.oscarehr.util.SpringUtils" %>
+<%@page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%
 	BillingreferralDao billingReferralDao = (BillingreferralDao)SpringUtils.getBean("BillingreferralDAO");
 %>
@@ -88,18 +88,21 @@ table td{font-size:10px;}
 <body>
 	<h3><bean:message key="admin.admin.ManageReferralDoc"/></h3>
 	<div class="container-fluid">
-		
-	    <%
-              String limit = request.getParameter("limit");
-              String lastname = request.getParameter("lastname");
-            %>
+
+		<%
+			String limit = request.getParameter("limit");
+			String offset = request.getParameter("offset");
+			String lastname = request.getParameter("lastname");
+			String escaped_lastname = StringEscapeUtils.escapeHtml(lastname);
+		%>
 		<form action="<%=request.getContextPath() %>/billing/CA/BC/billingManageReferralDoc.jsp" class="form-inline" name="referralDocform" id="referralDocform">
-			Last Name: <input type="text" name="lastname" value="<%= (lastname == null)?"":lastname%>" /> 
+			Last Name: <input type="text" name="lastname" value="<%= (lastname == null)?"":escaped_lastname%>" /> 
 			<select name="limit" class="span1" title="limit results">
 				<option value="10" <%=selected(limit,"10")%>>10</option>
 				<option value="50" <%=selected(limit,"50")%>>50</option>
 				<option value="100" <%=selected(limit,"100")%>>100</option>
-			</select> 
+			</select>
+			<input type="hidden" name="offset" value="0"/>
 			<input class="btn btn-primary" type="submit" value="Search" /> 
 			<a href="<%=request.getContextPath() %>/billing/CA/BC/billingAddReferralDoc.jsp" class="contentLink btn btn-info">Add Doctor</a>
 		</form>
@@ -125,11 +128,25 @@ table td{font-size:10px;}
 		<tbody>
 			<%
 			//ReferralBillingData rbd = new ReferralBillingData();
-               if (limit == null) limit = "10";
-               if (lastname == null) lastname = "%";
-               List<Billingreferral> alist = billingReferralDao.getBillingreferralByLastName(lastname);
-               for ( int i =0 ; i < alist.size() ; i++ ){
-                  Billingreferral billingReferral = alist.get(i);
+				if(limit == null) limit = "10";
+				if(offset == null) offset = "0";
+				if(lastname == null) lastname = "%";
+
+				int limit_int = 10;
+				int offset_int = 0;
+				try {
+					limit_int = Integer.parseInt(limit);
+					offset_int = Integer.parseInt(offset);
+				}
+				catch(Exception e)
+				{
+					// Don't really want to do anything here
+				}
+
+				List<Billingreferral> alist = billingReferralDao.getBillingreferralByLastName(lastname, limit_int, offset_int);
+				for(int i = 0; i < alist.size(); i++)
+				{
+					Billingreferral billingReferral = alist.get(i);
             %>
 			<tr>
 				<!--td><%=billingReferral.getBillingreferralNo()%></td-->
@@ -148,6 +165,25 @@ table td{font-size:10px;}
 			<%}%>
 		</tbody>
 		</table>
+		<div style="margin-top: 20px;">
+			<%
+				if(alist != null && offset_int > 0) {
+					int previous_page = 0;
+					if( (offset_int - limit_int) > 0) {
+						previous_page = offset_int - limit_int;
+					}
+			%>
+			<a href="#" onclick="document.forms[0].offset.value=<%=previous_page%>;document.forms[0].submit();return false;">Previous</a>
+			<%
+				}
+				if(alist != null && alist.size() == limit_int)
+				{
+			%>
+			<a href="#" onclick="document.forms[0].offset.value=<%=offset_int+limit_int%>;document.forms[0].submit();return false;">Next</a>
+			<%
+				}
+			%>
+		</div>
 	</div>
 <script>
 registerFormSubmit('referralDocform', 'dynamic-content');

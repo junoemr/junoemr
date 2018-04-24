@@ -272,7 +272,7 @@ function sendMRP(ele){
 	}else{
 		if(confirm('Send to Most Responsible Provider?')){
 			var type=checkType(doclabid);
-			var url=contextpath + "/oscarMDS/SendMRP.do";
+			var url=contextPath + "/oscarMDS/SendMRP.do";
 			var data='demoId='+demoId+'&docLabType='+type+'&docLabId='+doclabid;
 			new Ajax.Request(url, {method: 'post',parameters:data,onSuccess:function(transport){
 				ele.disabled=true;
@@ -293,14 +293,14 @@ function forwardDocument(docId) {
 	
 	jQuery.ajax({
 		type: "POST",
-		url:  contextpath + "/oscarMDS/ReportReassign.do",
+		url:  contextPath + "/oscarMDS/ReportReassign.do",
 		data: query,
 		success: function (data) {
 			frm = "#frmDocumentDisplay_" + docId;
 			query = jQuery(frm).serialize();
 			jQuery.ajax({
 				type: "POST",
-				url: contextpath + "/dms/showDocument.jsp",
+				url: contextPath + "/dms/showDocument.jsp",
 				data: query,
 				success: function(data) {
 					jQuery("#document_"+docId).html(data);
@@ -318,12 +318,12 @@ function rotate180(id) {
 	jQuery("#rotate180btn_" + id).attr('disabled', 'disabled');
         var displayDocumentAs=$('displayDocumentAs_'+id).value;
 
-	new Ajax.Request(contextpath + "/dms/SplitDocument.do", {method: 'post', parameters: "method=rotate180&document=" + id, onSuccess: function(data) {
+	new Ajax.Request(contextPath + "/dms/SplitDocument.do", {method: 'post', parameters: "method=rotate180&document=" + id, onSuccess: function(data) {
 		jQuery("#rotate180btn_" + id).removeAttr('disabled');
                 if(displayDocumentAs=="PDF") {
-                    showPDF(id,contextpath);
+                    showPDF(id,contextPath);
                 } else {
-                    jQuery("#docImg_" + id).attr('src', contextpath + "/dms/ManageDocument.do?method=viewDocPage&doc_no=" + id + "&curPage=1&rand=" + (new Date().getTime()));
+                    jQuery("#docImg_" + id).attr('src', contextPath + "/dms/ManageDocument.do?method=viewDocPage&doc_no=" + id + "&curPage=1&rand=" + (new Date().getTime()));
                 }
 	}});
 }
@@ -332,12 +332,12 @@ function rotate90(id) {
 	jQuery("#rotate90btn_" + id).attr('disabled', 'disabled');
         var displayDocumentAs=$('displayDocumentAs_'+id).value;
 
-	new Ajax.Request(contextpath + "/dms/SplitDocument.do", {method: 'post', parameters: "method=rotate90&document=" + id, onSuccess: function(data) {
+	new Ajax.Request(contextPath + "/dms/SplitDocument.do", {method: 'post', parameters: "method=rotate90&document=" + id, onSuccess: function(data) {
 		jQuery("#rotate90btn_" + id).removeAttr('disabled');
                 if(displayDocumentAs=="PDF") {
-                    showPDF(id,contextpath);
+                    showPDF(id,contextPath);
                 } else {
-                    jQuery("#docImg_" + id).attr('src', contextpath + "/dms/ManageDocument.do?method=viewDocPage&doc_no=" + id + "&curPage=1&rand=" + (new Date().getTime()));
+                    jQuery("#docImg_" + id).attr('src', contextPath + "/dms/ManageDocument.do?method=viewDocPage&doc_no=" + id + "&curPage=1&rand=" + (new Date().getTime()));
                 }
 	}});
 }
@@ -346,12 +346,12 @@ function removeFirstPage(id) {
 	jQuery("#removeFirstPagebtn_" + id).attr('disabled', 'disabled');
         var displayDocumentAs=$('displayDocumentAs_'+id).value;
 
-	new Ajax.Request(contextpath + "/dms/SplitDocument.do", {method: 'post', parameters: "method=removeFirstPage&document=" + id, onSuccess: function(data) {
+	new Ajax.Request(contextPath + "/dms/SplitDocument.do", {method: 'post', parameters: "method=removeFirstPage&document=" + id, onSuccess: function(data) {
 		jQuery("#removeFirstPagebtn_" + id).removeAttr('disabled');
                 if(displayDocumentAs=="PDF") {
-                    showPDF(id,contextpath);
+                    showPDF(id,contextPath);
                 } else {
-                    jQuery("#docImg_" + id).attr('src', contextpath + "/dms/ManageDocument.do?method=viewDocPage&doc_no=" + id + "&curPage=1&rand=" + (new Date().getTime()));
+                    jQuery("#docImg_" + id).attr('src', contextPath + "/dms/ManageDocument.do?method=viewDocPage&doc_no=" + id + "&curPage=1&rand=" + (new Date().getTime()));
                 }
 		var numPages = parseInt(jQuery("#numPages_" + id).text())-1;
 		jQuery("#numPages_" + id).text("" + numPages);
@@ -367,9 +367,9 @@ function removeFirstPage(id) {
 }
 
 function split(id) {
-        	var loc = contextpath+"/oscarMDS/Split.jsp?document=" + id;
-        	popupStart(1400, 1400, loc, "Splitter");
-        }
+	var loc = contextPath + "/oscarMDS/Split.jsp?document=" + id;
+	popupStart(1400, 1400, loc, "Splitter");
+}
         
 function hideTopBtn(){
 	$('topFRBtn').hide();
@@ -1100,7 +1100,7 @@ function getPatientNameFromPatientId(patientId){
 	if(pn&&pn!=null){
 		return pn;
 	}else{
-		var url=contextpath+"/dms/ManageDocument.do";
+		var url=contextPath+"/dms/ManageDocument.do";
 		var data='method=getDemoNameAjax&demo_no='+patientId;
 		new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){
 			var json=transport.responseText.evalJSON();
@@ -1215,7 +1215,7 @@ function showThisPatientDocs(patientId,keepPrevious){
 	}
 }
 function popupConsultation(segmentId) {
-	var page =contextpath+ '/oscarEncounter/ViewRequest.do?segmentId='+segmentId;
+	var page =contextPath+ '/oscarEncounter/ViewRequest.do?segmentId='+segmentId;
 	var windowprops = "height=960,width=700,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=0,left=0";
 	var popup=window.open(page, msgConsReq, windowprops);
 	if (popup != null) {
@@ -1247,7 +1247,7 @@ function checkSelected(doc) {
 	}
 	if (aBoxIsChecked) {
 		var isListView = jQuery("input[name=isListView]").val();
-		var url = contextpath + "/oscarMDS/SelectProvider.jsp?isListView="+isListView;
+		var url = contextPath + "/oscarMDS/SelectProvider.jsp?isListView="+isListView;
 		popupStart(355, 685, url, 'providerselect');
 	} else {
 		alert(msgSelectOneLab);
@@ -1485,7 +1485,7 @@ function  updatePatientDocLabNav(num,patientId){
 	}
 }
 function createPatientDocLabEle(patientId,doclabid){
-	var url=contextpath+"/dms/ManageDocument.do";
+	var url=contextPath+"/dms/ManageDocument.do";
 	var data='method=getDemoNameAjax&demo_no='+patientId;
 	new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){
 		var json=transport.responseText.evalJSON();
@@ -1581,7 +1581,7 @@ function updateDocumentAndNext(eleId){//save doc info
 						num=num.replace(/\s/g,'');
 						$("saveSucessMsg_"+num).show();
 						$('saved'+num).value='true';
-						$("msgBtn_"+num).onclick = function() { popup(700,960, contextpath +'/oscarMessenger/SendDemoMessage.do?demographic_no='+patientId,'msg'); };
+						$("msgBtn_"+num).onclick = function() { popup(700,960, contextPath +'/oscarMessenger/SendDemoMessage.do?demographic_no='+patientId,'msg'); };
 						//Hide document						
 						Effect.BlindUp('labdoc_'+num);											
 						updateDocStatusInQueue(num);
@@ -1614,7 +1614,7 @@ function updateStatus(formid){//acknowledge
 		if(demoId=='-1'|| saved=='false'){
 			alert('Document is not assigned and saved to a patient,please file it');
 		}else{
-			var url=contextpath+"/oscarMDS/UpdateStatus.do";
+			var url=contextPath+"/oscarMDS/UpdateStatus.do";
 			var data=$(formid).serialize(true);
 
 			new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){
@@ -1674,7 +1674,7 @@ function fileDoc(docId){
 
 function refileDoc(id) {
     var queueId=document.getElementById('queueList_'+id).options[document.getElementById('queueList_'+id).selectedIndex].value;
-    var url=contextpath +"/dms/ManageDocument.do";
+    var url=contextPath +"/dms/ManageDocument.do";
     var data='method=refileDocumentAjax&documentId='+id+"&queueId="+queueId;
     new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){
         fileDoc(id);
@@ -1973,7 +1973,7 @@ function addDocComment(docId, providerNo,sync) {
 
     if( ret ) {
     	$("status_"+docId).value = 'N';
-    	var url=contextpath+"/oscarMDS/UpdateStatus.do";
+		var url = contextPath + "/oscarMDS/UpdateStatus.do";
     	var formid = "acknowledgeForm_" + docId;
     	var data=$(formid).serialize();
     	data += "&method=addComment";

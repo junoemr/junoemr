@@ -600,9 +600,12 @@ int maxId = 0;
 						<%}
 						%>
 
-							<div id="wrapper<%=globalNoteId%>" style="<%=(note.isDocument()||note.isCpp()||note.isEformData()||note.isEncounterForm()||note.isInvoice())?(bgColour+";color:white;font-size:10px"):""%>">
+							<div id="wrapper<%=globalNoteId%>" style="<%=(note.isDocument()||note.isCpp()||note.isEformData()||note.isEncounterForm()||note.isInvoice())?(bgColour+";color:white;font-size:10px"):"clear:right;"%>">
 							<%-- render the note contents here --%>
-			  				<div id="txt<%=globalNoteId%>" style="display:inline-block;<%=(note.isDocument()||note.isCpp()||note.isEformData()||note.isEncounterForm()||note.isInvoice())?("max-width:60%;"):""%>">
+								<%
+									String maxWidth = note.isDocument() ? "90%" : isMagicNote ? "60%" : "100%";
+								%>
+							<div id="txt<%=globalNoteId%>" style="display:inline-block;overflow-wrap:break-word;word-wrap:break-word;max-width:<%=maxWidth%>;">
 
 		  						<%=noteStr%>
 							</div> <!-- end of txt<%=globalNoteId%> -->
@@ -815,7 +818,7 @@ int maxId = 0;
 		<input type="hidden" id="bgColour<%=savedId%>" value="color:#000000;background-color:#CCCCFF;" />
 		<input type="hidden" id="editWarn<%=savedId%>" value="false" />
 		<div id="n<%=savedId%>" style="line-height: 1.1em;">
-			 <textarea tabindex="7" cols="84" rows="10" class="txtArea" wrap="hard" style="line-height: 1.1em;" name="caseNote_note" id="caseNote_note<%=savedId%>"><%=cform.getCaseNote_note() %></textarea>
+			 <textarea tabindex="7" cols="84" rows="10" class="txtArea" style="line-height: 1.1em;" name="caseNote_note" id="caseNote_note<%=savedId%>"><%=cform.getCaseNote_note() %></textarea>
 			<div class="sig" id="sig<%=savedId%>">
 				<%@ include file="noteIssueList.jsp"%>
 			</div> <!-- end of div sig<%=savedId%> -->

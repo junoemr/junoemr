@@ -48,24 +48,17 @@ public class BillingPreferencesDAO extends AbstractDao<BillingPreference> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public BillingPreference getUserBillingPreference(String providerNo) {
+	public BillingPreference getUserBillingPreference(String providerNo)
+	{
+		return getUserBillingPreference(ConversionUtils.fromIntString(providerNo));
+	}
+	public BillingPreference getUserBillingPreference(Integer providerNo)
+	{
 		Query query = createQuery("bp", "bp.providerNo = :providerNo");
-		query.setParameter("providerNo", ConversionUtils.fromIntString(providerNo));
+		query.setParameter("providerNo", providerNo);
 
 		List<BillingPreference> prefs = query.getResultList();
-		if (prefs.isEmpty()) return null;
+		if(prefs.isEmpty()) return null;
 		return prefs.get(0);
 	}
-
-	/**
-	 * Saves the preferences for a specific user, if a record exists for the specific user,
-	 * the values in that record are updated otherwise a new record is created
-	 * @param pref the preferences
-	 * 
-	 * @deprecated 
-	 */
-	public void saveUserPreferences(BillingPreference pref) {
-		saveEntity(pref);
-	}
-
 }

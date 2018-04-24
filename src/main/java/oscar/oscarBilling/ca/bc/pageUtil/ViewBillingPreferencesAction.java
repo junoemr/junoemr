@@ -43,34 +43,38 @@ import oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO;
  * Forwards flow of control to Billing Preferences Screen
  * @version 1.0
  */
-public class ViewBillingPreferencesAction
-    extends Action {
-  public ActionForward execute(ActionMapping actionMapping,
-                               ActionForm actionForm,
-                               HttpServletRequest servletRequest,
-                               HttpServletResponse servletResponse) {
-    BillingPreferencesActionForm frm = (
-        BillingPreferencesActionForm) actionForm;
-    BillingPreferencesDAO dao = SpringUtils.getBean(BillingPreferencesDAO.class);
-    BillingPreference pref = dao.getUserBillingPreference(frm.getProviderNo());
-    //If the user doesn't have a BillingPreference record create one
-    if (pref == null) {
-      pref = new BillingPreference();
-      pref.setProviderNo(Integer.parseInt(frm.getProviderNo()));
-      dao.saveUserPreferences(pref);
-    }
-    frm.setReferral(String.valueOf(pref.getReferral()));
-    frm.setPayeeProviderNo(String.valueOf(pref.getDefaultPayeeNo()));
-    servletRequest.setAttribute("providerList",this.getPayeeProviderList());
-    return actionMapping.findForward("success");
-  }
+public class ViewBillingPreferencesAction extends Action
+{
+	public ActionForward execute(ActionMapping actionMapping,
+	                             ActionForm actionForm,
+	                             HttpServletRequest servletRequest,
+	                             HttpServletResponse servletResponse)
+	{
+		BillingPreferencesActionForm frm = (
+				BillingPreferencesActionForm) actionForm;
+		BillingPreferencesDAO dao = SpringUtils.getBean(BillingPreferencesDAO.class);
+		BillingPreference pref = dao.getUserBillingPreference(frm.getProviderNo());
+		//If the user doesn't have a BillingPreference record create one
+		if(pref == null)
+		{
+			pref = new BillingPreference();
+			pref.setProviderNo(Integer.parseInt(frm.getProviderNo()));
+			dao.persist(pref);
+		}
+		frm.setReferral(String.valueOf(pref.getReferral()));
+		frm.setPayeeProviderNo(String.valueOf(pref.getDefaultPayeeNo()));
+		servletRequest.setAttribute("providerList", this.getPayeeProviderList());
+		return actionMapping.findForward("success");
+	}
 
-  /**
-   * Returns a List of Provider instances
-   * @return List
-   */
-  public List getPayeeProviderList() {
-    MSPReconcile rec = new MSPReconcile();
-    return rec.getAllProviders();
-  }
+	/**
+	 * Returns a List of Provider instances
+	 *
+	 * @return List
+	 */
+	public List getPayeeProviderList()
+	{
+		MSPReconcile rec = new MSPReconcile();
+		return rec.getAllProviders();
+	}
 }

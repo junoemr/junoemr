@@ -39,7 +39,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.RSchedule;
+import org.oscarehr.schedule.model.RSchedule;
+import org.oscarehr.schedule.dao.RScheduleDao;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 

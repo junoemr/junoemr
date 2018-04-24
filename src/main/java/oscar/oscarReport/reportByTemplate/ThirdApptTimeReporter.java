@@ -34,10 +34,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.collections.comparators.ReverseComparator;
 import org.oscarehr.common.dao.OscarAppointmentDao;
-import org.oscarehr.common.dao.ScheduleTemplateDao;
+import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.ScheduleDate;
-import org.oscarehr.common.model.ScheduleTemplate;
+import org.oscarehr.schedule.model.ScheduleDate;
+import org.oscarehr.schedule.model.ScheduleTemplate;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 

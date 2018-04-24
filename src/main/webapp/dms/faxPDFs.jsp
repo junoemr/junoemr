@@ -180,6 +180,7 @@ function updateFaxButton()
 					<td class="tite4" width="10%">  Providers: </td>
 					<td class="tite3" width="20%">
 						<select id="otherFaxSelect">
+							<option value="">--Select Provider--</option>
 						<%
 						String rdName = "";
 						String rdFaxNo = "";
@@ -231,7 +232,7 @@ function updateFaxButton()
 //	} 
 %>
 
-<html:form action="/dms/sendFaxPDFs">
+<html:form action="/dms/sendFaxPDFs.do?method=faxDocument">
 
 	<ul id="faxRecipients">
 	</ul>
@@ -249,7 +250,7 @@ function updateFaxButton()
 
     <input type="button" id="fax_button" disabled="disabled"
         value="<bean:message key="dms.documentReport.btnFaxPDF"/>"
-        onclick="return submitForm('<rewrite:reWrite jspPage="sendFaxPDFs.do"/>');" />
+        onclick="return submitForm('<rewrite:reWrite jspPage="sendFaxPDFs.do?method=faxDocument"/>');" />
 
 </html:form>
 </body>

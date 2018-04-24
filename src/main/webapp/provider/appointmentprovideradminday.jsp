@@ -27,7 +27,7 @@
 <%@ page import="org.oscarehr.phr.util.MyOscarUtils"%>
 <%@ page import="org.oscarehr.common.model.Appointment.BookingSource"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
-<%@ page import="org.oscarehr.common.model.Provider,org.oscarehr.common.model.BillingONCHeader1"%>
+<%@ page import="org.oscarehr.common.model.Provider"%>
 <%@ page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@ page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
 <%@ page import="org.oscarehr.common.dao.DemographicDao, org.oscarehr.common.model.Demographic" %>
@@ -45,12 +45,12 @@
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.common.dao.MyGroupDao" %>
 <%@ page import="org.oscarehr.common.model.MyGroup" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleTemplateCodeDao" %>
-<%@ page import="org.oscarehr.common.model.ScheduleTemplateCode" %>
-<%@ page import="org.oscarehr.common.dao.ScheduleDateDao" %>
-<%@ page import="org.oscarehr.common.model.ScheduleDate" %>
+<%@ page import="org.oscarehr.schedule.dao.ScheduleTemplateCodeDao" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleTemplateCode" %>
+<%@ page import="org.oscarehr.schedule.dao.ScheduleDateDao" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleDate" %>
 <%@ page import="org.oscarehr.common.dao.ProviderSiteDao" %>
-<%@ page import="org.oscarehr.common.model.ScheduleTemplate" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleTemplate" %>
 <%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@ page import="org.oscarehr.common.model.Appointment" %>
 <%@ page import="org.oscarehr.common.model.Tickler" %>
@@ -93,6 +93,7 @@
 	DemographicCustDao demographicCustDao = SpringUtils.getBean(DemographicCustDao.class);
 	ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
 	AppManager appManager = SpringUtils.getBean(AppManager.class);
+	ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
 
 	LookupListManager lookupListManager = SpringUtils.getBean(LookupListManager.class);
 	LookupList reasonCodes = lookupListManager.findLookupListByName(loggedInInfo1, "reasonCode");
@@ -134,14 +135,16 @@
 	private boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 	private JdbcApptImpl jdbc = new JdbcApptImpl();
 	private List<Site> sites = new ArrayList<Site>();
-	private List<Site> curUserSites = new ArrayList<Site>();
-	private List<String> siteProviderNos = new ArrayList<String>();
-	private List<String> siteGroups = new ArrayList<String>();
-	private String selectedSite = null;
 	private HashMap<String,String> siteBgColor = new HashMap<String,String>();
-	private HashMap<String,String> CurrentSiteMap = new HashMap<String,String>();%>
+%>
 
 <%
+	List<Site> curUserSites = new ArrayList<Site>();
+	List<String> siteProviderNos = new ArrayList<String>();
+	List<String> siteGroups = new ArrayList<String>();
+	String selectedSite = null;
+	HashMap<String,String> CurrentSiteMap = new HashMap<String,String>();
+
 	if (bMultisites) {
 		sites = siteDao.getAllActiveSites();
 		selectedSite = (String)session.getAttribute("site_selected");
@@ -460,7 +463,9 @@ public boolean isBirthday(String schedDate,String demBday){
 <%@page import="oscar.appt.JdbcApptImpl"%>
 <%@page import="oscar.appt.ApptUtil"%>
 <%@page import="org.oscarehr.web.AppointmentProviderAdminDayUIBean"%>
-<%@page import="org.oscarehr.eform.model.EForm"%><html:html locale="true">
+<%@page import="org.oscarehr.eform.model.EForm"%>
+<%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
+<html:html locale="true">
 	<head>
 		<script>
 
@@ -1951,6 +1956,8 @@ public boolean isBirthday(String schedDate,String demBday){
 
 																	<% if (roster!="" && "FS".equalsIgnoreCase(roster)){%> <a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> <%=UtilMisc.htmlEscape(roster)%>"><font color="red">$</font></a><%}%>
 
+																	<% if (roster!="" && "RO".equalsIgnoreCase(roster)){%> <a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> <%=UtilMisc.htmlEscape(roster)%>"><font color="red">^</font></a><%}%>
+
 																	<% if ("NR".equalsIgnoreCase(roster) || "PL".equalsIgnoreCase(roster)){%> <a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> <%=UtilMisc.htmlEscape(roster)%>"><font color="red">#</font></a><%}%>
 															<!-- /security:oscarSec -->
 																	<% } %>
@@ -2065,14 +2072,34 @@ start_time += iSm + ":00";
 																	<% if (!isWeekView) { %>
 															<security:oscarSec roleName="<%=roleName$%>" objectName="_billing" rights="r">
 																	<%
+
+	String referral_no_parameter = "";
+	if(oscar.OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc"))
+	{
+		String rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
+		rdohip = rdohip !=null ? rdohip : "" ;
+		referral_no_parameter = "&referral_no_1=" + rdohip;
+	}
+
+	String defaultBillingView = oscarVariables.getProperty("default_view");
+	ProviderPreference preference = providerPreferenceDao.find(demographic.getProviderNo());
+	if(preference != null)
+	{
+		String preferredView = preference.getDefaultServiceType();
+		if(preferredView != null && !preferredView.equals("no"))
+		{
+			defaultBillingView = preferredView;
+		}
+	}
+
 	if(status.indexOf('B')==-1) 
 	{ 
 	%>
 															&#124; <a
-																href="../billing.do?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=<%=URLEncoder.encode("")%>&appointment_no=<%=appointment.getId()%>&demographic_name=<%=URLEncoder.encode(name)%>&status=<%=status%>&demographic_no=<%=demographic_no%>&providerview=<%=curProvider_no[nProvider]%>&user_no=<%=curUser_no%>&apptProvider_no=<%=curProvider_no[nProvider]%>&appointment_date=<%=year+"-"+month+"-"+day%>&start_time=<%=start_time%>&bNewForm=1"
+																href="../billing.do?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=<%=URLEncoder.encode("")%>&appointment_no=<%=appointment.getId()%>&demographic_name=<%=URLEncoder.encode(name)%>&status=<%=status%>&demographic_no=<%=demographic_no%>&providerview=<%=curProvider_no[nProvider]%>&user_no=<%=curUser_no%>&apptProvider_no=<%=curProvider_no[nProvider]%>&appointment_date=<%=year+"-"+month+"-"+day%>&start_time=<%=start_time%>&bNewForm=1<%=referral_no_parameter%>"
 																target="_blank"
 																title="<bean:message key="global.billingtag"/>"><bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
-														<%
+																	<%
 	}
 	else 
 	{

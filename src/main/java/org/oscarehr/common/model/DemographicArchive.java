@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,7 +40,8 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "demographicArchive")
-public class DemographicArchive extends AbstractModel<Long> implements Serializable {
+public class DemographicArchive extends AbstractModel<Long> implements Serializable
+{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -122,6 +123,8 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	Date hcRenewDate = null;
 	@Column(name = "family_doctor")
 	private String familyDoctor = null;
+	@Column(name = "family_doctor_2")
+	private String familyDoctor2 = null;
 	@Column(name = "alias")
 	private String alias = null;
 	@Column(name = "previousAddress")
@@ -145,12 +148,15 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	@Column(name = "lastUpdateDate")
 	@Temporal(TemporalType.DATE)
 	private Date lastUpdateDate = null;
-	@Column(name="veteran_no")
+	@Column(name = "veteran_no")
 	private String veteranNo = null;
 
-	public DemographicArchive() {}
+	public DemographicArchive()
+	{
+	}
 
-	public DemographicArchive(Demographic demographic) {
+	public DemographicArchive(Demographic demographic)
+	{
 		this.address = demographic.getAddress();
 		this.alias = demographic.getAlias();
 		this.anonymous = demographic.getAnonymous();
@@ -166,6 +172,7 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		this.email = demographic.getEmail();
 		this.endDate = demographic.getEndDate();
 		this.familyDoctor = demographic.getFamilyDoctor();
+		this.familyDoctor2 = demographic.getFamilyDoctor2();
 		this.firstName = demographic.getFirstName();
 		this.hcRenewDate = demographic.getHcRenewDate();
 		this.hcType = demographic.getHcType();
@@ -199,389 +206,495 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		this.yearOfBirth = demographic.getYearOfBirth();
 	}
 
-	public Integer getDemographicNo() {
+	public Integer getDemographicNo()
+	{
 		return this.demographicNo;
 	}
 
-	public void setDemographicNo(Integer i) {
+	public void setDemographicNo(Integer i)
+	{
 		this.demographicNo = i;
 	}
 
-	public String getTitle() {
+	public String getTitle()
+	{
 		return this.title;
 	}
 
-	public void setTitle(String s) {
+	public void setTitle(String s)
+	{
 		this.title = s;
 	}
 
-	public String getLastName() {
+	public String getLastName()
+	{
 		return this.lastName;
 	}
 
-	public void setLastName(String s) {
+	public void setLastName(String s)
+	{
 		this.lastName = s;
 	}
 
-	public String getFirstName() {
+	public String getFirstName()
+	{
 		return this.firstName;
 	}
 
-	public void setFirstName(String s) {
+	public void setFirstName(String s)
+	{
 		this.firstName = s;
 	}
 
-	public String getAddress() {
+	public String getAddress()
+	{
 		return this.address;
 	}
 
-	public void setAddress(String s) {
+	public void setAddress(String s)
+	{
 		this.address = s;
 	}
 
-	public String getCity() {
+	public String getCity()
+	{
 		return this.city;
 	}
 
-	public void setCity(String s) {
+	public void setCity(String s)
+	{
 		this.city = s;
 	}
 
-	public String getProvince() {
+	public String getProvince()
+	{
 		return this.province;
 	}
 
-	public void setProvince(String s) {
+	public void setProvince(String s)
+	{
 		this.province = s;
 	}
 
-	public String getPostal() {
+	public String getPostal()
+	{
 		return this.postal;
 	}
 
-	public void setPostal(String s) {
+	public void setPostal(String s)
+	{
 		this.postal = s;
 	}
 
-	public String getPhone() {
+	public String getPhone()
+	{
 		return this.phone;
 	}
 
-	public void setPhone(String s) {
+	public void setPhone(String s)
+	{
 		this.phone = s;
 	}
 
-	public String getPhone2() {
+	public String getPhone2()
+	{
 		return this.phone2;
 	}
 
-	public void setPhone2(String s) {
+	public void setPhone2(String s)
+	{
 		this.phone2 = s;
 	}
 
-	public String getEmail() {
+	public String getEmail()
+	{
 		return this.email;
 	}
 
-	public void setEmail(String s) {
+	public void setEmail(String s)
+	{
 		this.email = s;
 	}
 
-	public String getMyOscarUserName() {
+	public String getMyOscarUserName()
+	{
 		return (myOscarUserName);
 	}
 
-	public void setMyOscarUserName(String myOscarUserName) {
+	public void setMyOscarUserName(String myOscarUserName)
+	{
 		this.myOscarUserName = myOscarUserName;
 	}
 
-	public String getYearOfBirth() {
+	public String getYearOfBirth()
+	{
 		return this.yearOfBirth;
 	}
 
-	public void setYearOfBirth(String s) {
+	public void setYearOfBirth(String s)
+	{
 		this.yearOfBirth = s;
 	}
 
-	public String getMonthOfBirth() {
+	public String getMonthOfBirth()
+	{
 		return this.monthOfBirth;
 	}
 
-	public void setMonthOfBirth(String s) {
+	public void setMonthOfBirth(String s)
+	{
 		this.monthOfBirth = s;
 	}
 
-	public String getDateOfBirth() {
+	public String getDateOfBirth()
+	{
 		return this.dateOfBirth;
 	}
 
-	public void setDateOfBirth(String s) {
+	public void setDateOfBirth(String s)
+	{
 		this.dateOfBirth = s;
 	}
 
-	public String getHin() {
+	public String getHin()
+	{
 		return this.hin;
 	}
 
-	public void setHin(String s) {
+	public void setHin(String s)
+	{
 		this.hin = s;
 	}
 
-	public String getVer() {
+	public String getVer()
+	{
 		return this.ver;
 	}
 
-	public void setVer(String s) {
+	public void setVer(String s)
+	{
 		this.ver = s;
 	}
 
-	public String getRosterStatus() {
+	public String getRosterStatus()
+	{
 		return this.rosterStatus;
 	}
 
-	public void setRosterStatus(String s) {
+	public void setRosterStatus(String s)
+	{
 		this.rosterStatus = s;
 	}
 
-	public Date getRosterDate() {
+	public Date getRosterDate()
+	{
 		return this.rosterDate;
 	}
 
-	public void setRosterDate(Date d) {
+	public void setRosterDate(Date d)
+	{
 		this.rosterDate = d;
 	}
 
-	public Date getRosterTerminationDate() {
+	public Date getRosterTerminationDate()
+	{
 		return this.rosterTerminationDate;
 	}
 
-	public void setRosterTerminationDate(Date d) {
+	public void setRosterTerminationDate(Date d)
+	{
 		this.rosterTerminationDate = d;
 	}
 
-	public String getRosterTerminationReason() {
+	public String getRosterTerminationReason()
+	{
 		return this.rosterTerminationReason;
 	}
 
-	public void setRosterTerminationReason(String s) {
+	public void setRosterTerminationReason(String s)
+	{
 		this.rosterTerminationReason = s;
 	}
 
-	public String getPatientStatus() {
+	public String getPatientStatus()
+	{
 		return this.patientStatus;
 	}
 
-	public void setPatientStatus(String s) {
+	public void setPatientStatus(String s)
+	{
 		this.patientStatus = s;
 	}
 
-	public Date getPatientStatusDate() {
+	public Date getPatientStatusDate()
+	{
 		return this.patientStatusDate;
 	}
 
-	public void setPatientStatusDate(Date d) {
+	public void setPatientStatusDate(Date d)
+	{
 		this.patientStatusDate = d;
 	}
 
-	public Date getDateJoined() {
+	public Date getDateJoined()
+	{
 		return this.dateJoined;
 	}
 
-	public void setDateJoined(Date d) {
+	public void setDateJoined(Date d)
+	{
 		this.dateJoined = d;
 	}
 
-	public String getChartNo() {
+	public String getChartNo()
+	{
 		return this.chartNo;
 	}
 
-	public void setChartNo(String s) {
+	public void setChartNo(String s)
+	{
 		this.chartNo = s;
 	}
 
 
-	public String getOfficialLanguage() {
+	public String getOfficialLanguage()
+	{
 		return officialLanguage;
 	}
 
-	public void setOfficialLanguage(String officialLanguage) {
+	public void setOfficialLanguage(String officialLanguage)
+	{
 		this.officialLanguage = officialLanguage;
 	}
 
-	public String getSpokenLanguage() {
+	public String getSpokenLanguage()
+	{
 		return spokenLanguage;
 	}
 
-	public void setSpokenLanguage(String spokenLanguage) {
+	public void setSpokenLanguage(String spokenLanguage)
+	{
 		this.spokenLanguage = spokenLanguage;
 	}
 
-	public String getProviderNo() {
+	public String getProviderNo()
+	{
 		return this.providerNo;
 	}
 
-	public void setProviderNo(String s) {
+	public void setProviderNo(String s)
+	{
 		this.providerNo = s;
 	}
 
-	public String getSex() {
+	public String getSex()
+	{
 		return this.sex;
 	}
 
-	public void setSex(String s) {
+	public void setSex(String s)
+	{
 		this.sex = s;
 	}
 
-	public Date getEndDate() {
+	public Date getEndDate()
+	{
 		return this.endDate;
 	}
 
-	public void setEndDate(Date d) {
+	public void setEndDate(Date d)
+	{
 		this.endDate = d;
 	}
 
-	public Date getEffDate() {
+	public Date getEffDate()
+	{
 		return this.effDate;
 	}
 
-	public void setEffDate(Date d) {
+	public void setEffDate(Date d)
+	{
 		this.effDate = d;
 	}
 
-	public String getPcnIndicator() {
+	public String getPcnIndicator()
+	{
 		return this.pcnIndicator;
 	}
 
-	public void setPcnIndicator(String s) {
+	public void setPcnIndicator(String s)
+	{
 		this.pcnIndicator = s;
 	}
 
-	public String getHcType() {
+	public String getHcType()
+	{
 		return this.hcType;
 	}
 
-	public void setHcType(String s) {
+	public void setHcType(String s)
+	{
 		this.hcType = s;
 	}
 
-	public Date getHcRenewDate() {
+	public Date getHcRenewDate()
+	{
 		return this.hcRenewDate;
 	}
 
-	public void setHcRenewDate(Date d) {
+	public void setHcRenewDate(Date d)
+	{
 		this.hcRenewDate = d;
 	}
 
-	public String getFamilyDoctor() {
+	public String getFamilyDoctor()
+	{
 		return this.familyDoctor;
 	}
 
-	public void setFamilyDoctor(String s) {
+	public void setFamilyDoctor(String s)
+	{
 		this.familyDoctor = s;
 	}
 
-	public String getAlias() {
+	public String getFamilyDoctor2()
+	{
+		return this.familyDoctor2;
+	}
+
+	public void setFamilyDoctor2(String s)
+	{
+		this.familyDoctor2 = s;
+	}
+
+	public String getAlias()
+	{
 		return this.alias;
 	}
 
-	public void setAlias(String s) {
+	public void setAlias(String s)
+	{
 		this.alias = s;
 	}
 
-	public String getPreviousAddress() {
+	public String getPreviousAddress()
+	{
 		return this.previousAddress;
 	}
 
-	public void setPreviousAddress(String s) {
+	public void setPreviousAddress(String s)
+	{
 		this.previousAddress = s;
 	}
 
-	public String getChildren() {
+	public String getChildren()
+	{
 		return this.children;
 	}
 
-	public void setChildren(String s) {
+	public void setChildren(String s)
+	{
 		this.children = s;
 	}
 
-	public String getSourceOfIncome() {
+	public String getSourceOfIncome()
+	{
 		return this.sourceOfIncome;
 	}
 
-	public void setSourceOfIncome(String s) {
+	public void setSourceOfIncome(String s)
+	{
 		this.sourceOfIncome = s;
 	}
 
-	public String getCitizenship() {
+	public String getCitizenship()
+	{
 		return this.citizenship;
 	}
 
-	public void setCitizenship(String s) {
+	public void setCitizenship(String s)
+	{
 		this.citizenship = s;
 	}
 
-	public String getSin() {
+	public String getSin()
+	{
 		return this.sin;
 	}
 
-	public void setSin(String s) {
+	public void setSin(String s)
+	{
 		this.sin = s;
 	}
 
-	public String getCountryOfOrigin() {
+	public String getCountryOfOrigin()
+	{
 		return this.countryOfOrigin;
 	}
 
-	public void setCountryOfOrigin(String s) {
+	public void setCountryOfOrigin(String s)
+	{
 		this.countryOfOrigin = s;
 	}
 
-	public String getNewsletter() {
+	public String getNewsletter()
+	{
 		return this.newsletter;
 	}
 
-	public void setNewsletter(String s) {
+	public void setNewsletter(String s)
+	{
 		this.newsletter = s;
 	}
 
-	public String getAnonymous() {
+	public String getAnonymous()
+	{
 		return this.anonymous;
 	}
 
-	public void setAnonymous(String s) {
+	public void setAnonymous(String s)
+	{
 		this.anonymous = s;
 	}
 
-	public String getLastUpdateUser() {
+	public String getLastUpdateUser()
+	{
 		return this.lastUpdateUser;
 	}
 
-	public void setLastUpdateUser(String s) {
+	public void setLastUpdateUser(String s)
+	{
 		this.lastUpdateUser = s;
 	}
 
-	public Date getLastUpdateDate() {
+	public Date getLastUpdateDate()
+	{
 		return this.lastUpdateDate;
 	}
 
-	public void setLastUpdateDate(Date d) {
+	public void setLastUpdateDate(Date d)
+	{
 		this.lastUpdateDate = d;
 	}
 
-	public void setVeteranNo(String vetNo) {
+	public void setVeteranNo(String vetNo)
+	{
 		veteranNo = vetNo;
 	}
 
-	public String getVeteranNo() {
+	public String getVeteranNo()
+	{
 		return veteranNo;
 	}
 
 	@Override
-	public Long getId() {
+	public Long getId()
+	{
 		return this.id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Long id)
+	{
 		this.id = id;
 	}
 }

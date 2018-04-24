@@ -2069,6 +2069,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 
 		String keyword = searchRequest.getKeyword();
 		SEARCHMODE mode = searchRequest.getMode();
+		boolean exactMatchOnly = searchRequest.isExactMatch();
 
 		// Allow '*' in searches and treat it the same as the % wildcard
 		keyword = keyword.replace('*', '%');
@@ -2130,7 +2131,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	        }
 		}
 
-		if (useUserWildcards ||
+		if (useUserWildcards || exactMatchOnly ||
 				mode == SEARCHMODE.DemographicNo || mode == SEARCHMODE.DOB)
 		{
 			params.put("keyword", keyword);

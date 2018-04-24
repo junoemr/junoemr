@@ -18,7 +18,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<% java.util.Properties oscarVariables = oscar.OscarProperties.getInstance(); %>
+<% oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance(); %>
 
 <%
 	String formClass = "BCAR";
@@ -654,7 +654,17 @@ function calByLMP() {
 				onclick="javascript:return onExit();" /> <input type="submit"
 				value="Print" onclick="javascript:return onPrint();" /> <input
 				type="submit" value="Print Risk"
-				onclick="javascript:return onPrintRisk();" /></td>
+				onclick="javascript:return onPrintRisk();" />
+				<%
+					if (oscarProperties.isFormFaxEnabled())
+					{
+				%>
+				<input type="button" value="Fax"
+					   onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>', 'fax_recipients');"/>
+				<%
+					}
+				%>
+			</td>
 			<%
   if (!bView) {
 %>
@@ -694,7 +704,7 @@ function calByLMP() {
 				<tr>
 					<td width="30%"><b>1.</b> HOSPITAL<br>
 					<input type="text" name="c_hospital"
-						<%=oscarVariables.getProperty("BCAR_hospital")==null? " ": ("class=\"spe\" onDblClick='showDef(\""+oscarVariables.getProperty("BCAR_hospital")+"\", this);'") %>
+						<%=oscarProperties.getProperty("BCAR_hospital")==null? " ": ("class=\"spe\" onDblClick='showDef(\""+ oscarProperties.getProperty("BCAR_hospital")+"\", this);'") %>
 						style="width: 100%" size="30" maxlength="60"
 						value="<%= props.getProperty("c_hospital", "") %>" @oscar.formDB />
 					</td>
@@ -2039,7 +2049,17 @@ function calByLMP() {
   }
 %> <input type="submit" value="Exit"
 				onclick="javascript:return onExit();" /> <input type="submit"
-				value="Print" onclick="javascript:return onPrint();" /></td>
+				value="Print" onclick="javascript:return onPrint();" />
+				<%
+					if (oscarProperties.isFormFaxEnabled())
+					{
+				%>
+				<input type="button" value="Fax"
+					   onclick="popPage('../form/formfax.jsp?demo=<%=demoNo%>', 'fax_recipients');"/>
+				<%
+					}
+				%>
+			</td>
 			<%
   if (!bView) {
 %>

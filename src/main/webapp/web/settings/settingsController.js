@@ -437,7 +437,15 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		}
 
 
-		controller.currentTab = controller.tabs[0];
+		if ($state.current.data !== undefined)
+		{
+			controller.currentTab = $filter('filter')(controller.tabs, {path: $state.current.data.tab})[0];
+		}
+		else
+		{
+			controller.currentTab = controller.tabs[0];
+		}
+
 
 		controller.isActive = function(tab)
 		{
@@ -447,6 +455,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		controller.changeTab = function(tab)
 		{
 			controller.currentTab = tab;
+			$state.go('settings.' + tab.path);
 		};
 
 		controller.save = function()

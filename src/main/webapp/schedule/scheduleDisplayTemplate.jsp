@@ -24,15 +24,15 @@
 
 --%>
 
-<%@page import="org.oscarehr.util.SessionConstants"%>
 <%@page import="org.oscarehr.common.model.ProviderPreference"%>
-<%@ page import="java.sql.*, java.util.*"%>
+<%@page import="org.oscarehr.schedule.dao.ScheduleTemplateCodeDao"%>
+<%@ page import="org.oscarehr.schedule.dao.ScheduleTemplateDao, org.oscarehr.schedule.model.ScheduleTemplate"%>
 <%@ page errorPage="/common/error.jsp"%>
+<%@page import="org.oscarehr.schedule.model.ScheduleTemplateCode" %>
+<%@page import="org.oscarehr.util.SessionConstants" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.dao.ScheduleTemplateDao" %>
-<%@page import="org.oscarehr.common.model.ScheduleTemplate" %>
-<%@page import="org.oscarehr.common.dao.ScheduleTemplateCodeDao" %>
-<%@page import="org.oscarehr.common.model.ScheduleTemplateCode" %>
+<%@page import="java.util.Collections" %>
+<%@page import="java.util.List" %>
 <%
 	ScheduleTemplateDao scheduleTemplateDao = SpringUtils.getBean(ScheduleTemplateDao.class);
     ScheduleTemplateCodeDao scheduleTemplateCodeDao = SpringUtils.getBean(ScheduleTemplateCodeDao.class);

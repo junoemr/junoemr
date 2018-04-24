@@ -452,6 +452,7 @@ public class InboxResultsDao {
 
 			sql += "LEFT JOIN providerLabRouting proLR_filter ON "
 				+ "  proLR.lab_no = proLR_filter.lab_no "
+				+ "  AND proLR.lab_type = proLR_filter.lab_type "
 				+ "  AND ( "
 				+ "    proLR.timestamp < proLR_filter.timestamp OR ( "
 				+ "      proLR.timestamp = proLR_filter.timestamp AND proLR.id < proLR_filter.id)) "

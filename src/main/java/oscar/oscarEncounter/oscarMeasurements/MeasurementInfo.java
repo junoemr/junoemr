@@ -200,7 +200,7 @@ public class MeasurementInfo {
 
         //EctMeasurementsDataBeanHandler.getLast(demographicNo, measurement);
         //if (h != null ){
-        //   Date date = (Date) h.get("dateObserved_date");
+        //   Date date = ConversionUtils.fromTimestampString(h.get("dateObserved");
         //   numMonths = getNumMonths(date, Calendar.getInstance().getTime());
         //}
         log.debug("Returning the number of months "+numMonths);

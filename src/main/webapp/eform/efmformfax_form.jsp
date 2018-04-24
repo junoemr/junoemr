@@ -35,12 +35,13 @@ This Page creates the fax form for eforms.
 		rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()), "rdohip");
 		rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(), "rdohip").trim();
 	}
-	boolean faxEnabled = (props.isPropertyActive("faxEnable") && props.isEFormFaxEnabled());
+	boolean faxEnabled = props.isEFormFaxEnabled();
 %>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/util/fax.js"></script>
 <script type="text/javascript">
 	Oscar.Util.Fax.updateFaxButton();
 </script>
+
 <table width="100%">
 	<input type="hidden" value=<%=faxEnabled%> id="faxControl_faxEnabled"></input>
 	<%
@@ -54,6 +55,7 @@ This Page creates the fax form for eforms.
 		<td class="tite3" width="20%">
 
 		<select id="otherFaxSelect">
+			<option value="">--Select Provider--</option>
 		<%
 			for (int i=0;i < displayServiceUtil.specIdVec.size(); i++) {
 				String  specId     = (String) displayServiceUtil.specIdVec.elementAt(i);

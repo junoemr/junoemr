@@ -31,8 +31,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.ScheduleTemplate;
-import org.oscarehr.common.model.ScheduleTemplatePrimaryKey;
+import org.oscarehr.schedule.dao.ScheduleTemplateDao;
+import org.oscarehr.schedule.model.ScheduleTemplate;
+import org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey;
 import org.oscarehr.util.SpringUtils;
 
 public class ScheduleTemplateDaoTest extends DaoTestFixtures {

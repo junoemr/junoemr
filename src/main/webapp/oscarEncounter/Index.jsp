@@ -1248,17 +1248,15 @@ function removeSaveFeedback()  {
 					<tr width="100%">
 						<!-- This is the Social History cell ...sh...-->
 						<td valign="top"><!-- Creating the table tag within the script allows you to adjust all table sizes at once, by changing the value of leftCol -->
-						<textarea name="shTextarea" wrap="hard" cols="31"
+						<textarea name="shTextarea" cols="31"
 							style="height:<%=windowSizes.getProperty("rowOneSize")%>;overflow:auto"><%=bean.socialHistory%></textarea>
 						</td>
 						<!-- This is the Family History cell ...fh...-->
-						<td valign="top"><textarea name="fhTextarea" wrap="hard"
-							cols="31"
+						<td valign="top"><textarea name="fhTextarea" cols="31"
 							style="height:<%=windowSizes.getProperty("rowOneSize")%>;overflow:auto"><%=bean.familyHistory%></textarea>
 						</td>
 						<!-- This is the Medical History cell ...mh...-->
-						<td valign="top" colspan="2"><textarea name="mhTextarea"
-							wrap="hard" cols="31"
+						<td valign="top" colspan="2"><textarea name="mhTextarea" cols="31"
 							style="height:<%=windowSizes.getProperty("rowOneSize")%>;overflow:auto"><%=bean.medicalHistory%></textarea>
 						</td>
 					</tr>
@@ -1313,12 +1311,10 @@ function removeSaveFeedback()  {
 						</td>
 					</tr>
 					<tr width="100%">
-						<td valign="top" style="border-right: 2px solid #ccccff"><textarea
-							name='ocTextarea' wrap="hard" cols="48"
+						<td valign="top" style="border-right: 2px solid #ccccff"><textarea name='ocTextarea' cols="48"
 							style="height:<%=windowSizes.getProperty("rowTwoSize")%>;overflow:auto"><%=bean.ongoingConcerns%></textarea>
 						</td>
-						<td colspan="2" valign="top"><textarea name='reTextarea'
-							wrap="hard" cols="48"
+						<td colspan="2" valign="top"><textarea name='reTextarea' cols="48"
 							style="height:<%=windowSizes.getProperty("rowTwoSize")%>;overflow:auto"><%=bean.reminders%></textarea>
 						</td>
 					</tr>
@@ -1528,7 +1524,7 @@ function removeSaveFeedback()  {
                             %>
 					<tr>
 						<td colspan="2" valign="top" style="text-align: left"><textarea
-							name='enTextarea' wrap="hard" cols="99"
+							name='enTextarea' cols="99"
 							style="height:<%=windowSizes.getProperty("rowThreeSize")%>;overflow:auto"
 							onfocus="javascript: encTextareaFocus=true;"
 							onblur="javascript: encTextareaFocus=false;"><%=encounterText%></textarea>
