@@ -21,33 +21,51 @@
  * Hamilton
  * Ontario, Canada
  */
+
 package org.oscarehr.ws.rest.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import oscar.OscarProperties;
 
 import java.io.Serializable;
 
-/**
- * custom headers class for rest responses.
- */
-@Schema(description = "Generic response header object")
-public class RestResponseHeaders implements Serializable
+@Schema(description = "Generic response wrapper object")
+public class GenericRestResponse<H, B, E> implements Serializable
 {
-	private final String buildDate;
-	private final String buildTag;
+	public enum ResponseStatus
+	{
+		SUCCESS, ERROR
+	}
 
-	public RestResponseHeaders()
+	private final H headers;
+	private final B body;
+	private final E error;
+	private final ResponseStatus status;
+
+	protected GenericRestResponse(H headers, B body, E error, ResponseStatus status)
 	{
-		this.buildDate = OscarProperties.getBuildDate();
-		this.buildTag = OscarProperties.getBuildTag();
+		this.headers = headers;
+		this.body= body;
+		this.error = error;
+		this.status = status;
 	}
-	public String getBuildDate()
+
+	public H getHeaders()
 	{
-		return buildDate;
+		return headers;
 	}
-	public String getBuildTag()
+
+	public B getBody()
 	{
-		return buildTag;
+		return body;
+	}
+
+	public E getError()
+	{
+		return error;
+	}
+
+	public ResponseStatus getStatus()
+	{
+		return status;
 	}
 }

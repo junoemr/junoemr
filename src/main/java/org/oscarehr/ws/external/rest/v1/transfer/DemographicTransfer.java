@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 @XmlRootElement
+@Schema(description = "Demographic record data transfer object")
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public class DemographicTransfer implements Serializable
 {

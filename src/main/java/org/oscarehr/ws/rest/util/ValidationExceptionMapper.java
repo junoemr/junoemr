@@ -24,16 +24,16 @@
 package org.oscarehr.ws.rest.util;
 
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.springframework.http.HttpHeaders;
+import org.oscarehr.ws.rest.response.RestResponseError;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Provider
@@ -52,8 +52,7 @@ public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViol
 			errors.add(toValidationError(constraintViolation));
 		}
 
-
-		RestResponse<HttpHeaders, List<ValidationError>> response = RestResponse.errorResponse(errors);
+		RestResponse<List<ValidationError>> response = RestResponse.errorResponse(errors, new RestResponseError("Validation Error"));
 
 		return Response.status(Response.Status.BAD_REQUEST).entity(response)
 			.type(MediaType.APPLICATION_JSON).build();

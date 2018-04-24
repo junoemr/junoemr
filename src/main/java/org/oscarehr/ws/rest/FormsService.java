@@ -169,7 +169,7 @@ public class FormsService extends AbstractServiceImpl {
 	@GET
 	@Path("/{demographicNo}/completedEncounterForms")
 	@Produces("application/json")
-	public RestResponse<List<FormTo1>,String> getCompletedFormNames(@PathParam("demographicNo") String demographicNo){
+	public RestResponse<List<FormTo1>> getCompletedFormNames(@PathParam("demographicNo") String demographicNo){
 		List<FormTo1> formList = new ArrayList<FormTo1>();
 
 		List<EncounterForm> encounterForms = formsManager.getAllEncounterForms();

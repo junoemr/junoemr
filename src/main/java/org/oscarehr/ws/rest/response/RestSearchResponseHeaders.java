@@ -23,13 +23,19 @@
  */
 package org.oscarehr.ws.rest.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * custom headers class for rest search responses.
  */
+@Schema(description = "Response header object for lists")
 public class RestSearchResponseHeaders extends RestResponseHeaders
 {
+	@Schema(description = "total result count")
 	private int total;
+	@Schema(description = "current results page number")
 	private int page;
+	@Schema(description = "max results for a page")
 	private int perPage;
 
 	public RestSearchResponseHeaders(int page, int perPage, int total)

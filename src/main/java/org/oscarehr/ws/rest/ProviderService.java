@@ -196,7 +196,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@GET
 	@Path("/getRecentDemographicsViewed")
 	@Produces("application/json")
-	public RestResponse<List<PatientListApptItemBean>,String> getRecentDemographicsViewed()
+	public RestResponse<List<PatientListApptItemBean>> getRecentDemographicsViewed()
 	{
 		List<PatientListApptItemBean> resultList = new ArrayList<>();
 

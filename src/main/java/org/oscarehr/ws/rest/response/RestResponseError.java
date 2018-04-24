@@ -24,30 +24,24 @@
 package org.oscarehr.ws.rest.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import oscar.OscarProperties;
 
 import java.io.Serializable;
 
-/**
- * custom headers class for rest responses.
- */
-@Schema(description = "Generic response header object")
-public class RestResponseHeaders implements Serializable
+@Schema(description = "Response wrapper object for error information")
+public class RestResponseError implements Serializable
 {
-	private final String buildDate;
-	private final String buildTag;
+	private final String message;
+	public RestResponseError()
+	{
+		this(null);
+	}
+	public RestResponseError(String message)
+	{
+		this.message = message;
+	}
 
-	public RestResponseHeaders()
+	public String getMessage()
 	{
-		this.buildDate = OscarProperties.getBuildDate();
-		this.buildTag = OscarProperties.getBuildTag();
-	}
-	public String getBuildDate()
-	{
-		return buildDate;
-	}
-	public String getBuildTag()
-	{
-		return buildTag;
+		return message;
 	}
 }

@@ -139,7 +139,7 @@ public class NotesService extends AbstractServiceImpl {
 	@Path("/{demographicNo}/all")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public RestResponse<NoteSelectionTo1, String> getNotesWithFilter(@PathParam("demographicNo") Integer demographicNo,
+	public RestResponse<NoteSelectionTo1> getNotesWithFilter(@PathParam("demographicNo") Integer demographicNo,
 	                                                                 @QueryParam("numToReturn") @DefaultValue("20") Integer numToReturn,
 	                                                                 @QueryParam("offset") @DefaultValue("0") Integer offset,
 	                                                                 JSONObject jsonobject)
@@ -296,7 +296,7 @@ public class NotesService extends AbstractServiceImpl {
 	@Path("/{demographicNo}/save")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<NoteTo1,String> saveNote(@PathParam("demographicNo") Integer demographicNo, NoteTo1 note) {
+	public RestResponse<NoteTo1> saveNote(@PathParam("demographicNo") Integer demographicNo, NoteTo1 note) {
 		logger.debug("saveNote "+note);
 
 		try {
@@ -417,7 +417,7 @@ public class NotesService extends AbstractServiceImpl {
 	@Path("/{demographicNo}/saveIssueNote")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<NoteIssueTo1,String> saveIssueNote(@PathParam("demographicNo") Integer demographicNo ,NoteIssueTo1 noteIssue) {
+	public RestResponse<NoteIssueTo1> saveIssueNote(@PathParam("demographicNo") Integer demographicNo ,NoteIssueTo1 noteIssue) {
 
 		try {
 			NoteTo1 note = noteIssue.getEncounterNote();
@@ -1087,7 +1087,7 @@ public class NotesService extends AbstractServiceImpl {
 	@GET
 	@Path("/getIssueNote/{noteId}")	
 	@Produces("application/json")
-	public RestResponse<NoteIssueTo1,String> getIssueNote(@PathParam("noteId") Integer noteId){
+	public RestResponse<NoteIssueTo1> getIssueNote(@PathParam("noteId") Integer noteId){
 
 		try {
 			//get all note values NoteDisplay nd = new NoteDisplayLocal(loggedInInfo,note);

@@ -86,7 +86,7 @@ public class AppService extends AbstractServiceImpl {
 	@GET
 	@Path("/K2AActive/")
 	@Produces("application/json")
-	public RestResponse<Boolean, String> isK2AActive() {
+	public RestResponse<Boolean> isK2AActive() {
 		return RestResponse.successResponse(appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null);
 	}
 	
@@ -94,7 +94,7 @@ public class AppService extends AbstractServiceImpl {
 	@Path("/K2AInit/")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public RestResponse<String, String> initK2A(JSONObject k2aClinicTo1, @Context HttpServletRequest request) {
+	public RestResponse<String> initK2A(JSONObject k2aClinicTo1, @Context HttpServletRequest request) {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_appDefinition", "w", null)) {
 			return RestResponse.errorResponse("Access Denied");
 		}
@@ -170,7 +170,7 @@ public class AppService extends AbstractServiceImpl {
 	@Path("/comment")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestSearchResponse<RssItem, String> postK2AComment(RssItem comment) {
+	public RestSearchResponse<RssItem> postK2AComment(RssItem comment) {
 		int total = 0;
 
 		RSSResponse response = new RSSResponse();
@@ -222,14 +222,14 @@ public class AppService extends AbstractServiceImpl {
 			logger.error("error", e);
 			RestSearchResponse.errorResponse("Unexpected Error");
 		}
-		return RestSearchResponse.successSearchResponse(itemList, 1, 0, total);
+		return RestSearchResponse.successResponse(itemList, 1, 0, total);
 	}
 	
 	@DELETE
 	@Path("/comment/{commentId}")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<Date, String> removeK2AComment(@PathParam("commentId") String commentId) {
+	public RestResponse<Date> removeK2AComment(@PathParam("commentId") String commentId) {
 		try {
 			AppDefinitionDao appDefinitionDao = SpringUtils.getBean(AppDefinitionDao.class);
 	    	AppUserDao appUserDao = SpringUtils.getBean(AppUserDao.class);

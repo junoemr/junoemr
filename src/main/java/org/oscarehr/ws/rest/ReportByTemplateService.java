@@ -85,7 +85,7 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	@GET
 	@Path("/K2AUrl/")
 	@Produces("application/json")
-	public RestResponse<String, String> getK2AUrl() {
+	public RestResponse<String> getK2AUrl() {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "r", null)) {
 			return RestResponse.errorResponse("Access Denied");
 		}
@@ -107,7 +107,7 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	@GET
 	@Path("/allReports")
 	@Produces("application/json")
-	public RestResponse<String, String> getReportByTemplatesFromK2A() {
+	public RestResponse<String> getReportByTemplatesFromK2A() {
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "r", null)) {
 			return RestResponse.errorResponse("Access Denied");

@@ -71,7 +71,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	@GET
 	@Path("/{id}")
 	@Operation(summary = "Retrieve an existing patient demographic record by demographic id.")
-	public RestResponse<DemographicTransfer, String> getDemographic(@PathParam("id") Integer demographicNo)
+	public RestResponse<DemographicTransfer> getDemographic(@PathParam("id") Integer demographicNo)
 	{
 		DemographicTransfer demographicTransfer;
 		try
@@ -97,7 +97,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Update an existing patient demographic record by demographic id.")
-	public RestResponse<DemographicTransfer, String> putDemographic(@PathParam("id") Integer demographicNo,
+	public RestResponse<DemographicTransfer> putDemographic(@PathParam("id") Integer demographicNo,
 	                                                                @Valid DemographicTransfer demographicTo)
 	{
 		return RestResponse.errorResponse("Not Implemented");
@@ -106,7 +106,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Add a new patient demographic record to the system.")
-	public RestResponse<Integer, String> postDemographic(@Valid DemographicTransfer demographicTo)
+	public RestResponse<Integer> postDemographic(@Valid DemographicTransfer demographicTo)
 	{
 		Demographic demographic;
 		try

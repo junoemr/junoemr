@@ -23,34 +23,41 @@
  */
 package org.oscarehr.ws.rest.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 
-public class RestSearchResponse<T, E> extends RestResponse<List<T>, E>
+@Schema(description = "Response wrapper object for list results")
+public class RestSearchResponse<T> extends GenericRestResponse<RestSearchResponseHeaders, List<T>, RestResponseError>
 {
-	protected RestSearchResponse(RestSearchResponseHeaders headers, List<T> body, E error, ResponseStatus status)
+	protected RestSearchResponse(RestSearchResponseHeaders headers, List<T> body, RestResponseError error, ResponseStatus status)
 	{
 		super(headers, body, error, status);
 	}
 
-	public static <T, E> RestSearchResponse<T, E> successSearchResponse(RestSearchResponseHeaders headers, List<T> body, int page, int perPage, int total)
+	public static <T> RestSearchResponse<T> successResponse(RestSearchResponseHeaders headers, List<T> body, int page, int perPage, int total)
 	{
 		headers.setPage(page);
 		headers.setPerPage(perPage);
 		headers.setTotal(total);
-		return new RestSearchResponse<>(headers, body, null, RestResponse.ResponseStatus.SUCCESS);
+		return new RestSearchResponse<>(headers, body, null, ResponseStatus.SUCCESS);
 	}
-	public static <T, E> RestSearchResponse<T, E> successSearchResponse(List<T> body, int page, int perPage, int total)
+	public static <T> RestSearchResponse<T> successResponse(List<T> body, int page, int perPage, int total)
 	{
-		return successSearchResponse(new RestSearchResponseHeaders(), body, page, perPage, total);
+		return successResponse(new RestSearchResponseHeaders(), body, page, perPage, total);
 	}
 
-	public static <T, E> RestSearchResponse<T, E> errorSearchResponse(RestSearchResponseHeaders headers, E error)
+	public static <T> RestSearchResponse<T> errorResponse(RestSearchResponseHeaders headers, RestResponseError error)
 	{
 		return new RestSearchResponse<>(headers, null, error, ResponseStatus.ERROR);
 	}
 
-	public static <T, E> RestSearchResponse<T, E> errorSearchResponse(E error)
+	public static <T> RestSearchResponse<T> errorResponse(RestResponseError error)
 	{
-		return errorSearchResponse(new RestSearchResponseHeaders(), error);
+		return errorResponse(new RestSearchResponseHeaders(), error);
+	}
+	public static <T> RestSearchResponse<T> errorResponse(String errorMessage)
+	{
+		return errorResponse(new RestResponseError(errorMessage));
 	}
 }

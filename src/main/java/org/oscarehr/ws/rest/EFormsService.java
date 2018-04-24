@@ -60,7 +60,7 @@ public class EFormsService extends AbstractServiceImpl
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<EFormTo1>, String> getEFormList()
+	public RestResponse<List<EFormTo1>> getEFormList()
 	{
 		List<EFormTo1> allEforms = new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(),
 				formsManager.findByStatus(getLoggedInInfo(), true, EFormDao.EFormSortOrder.NAME));
@@ -74,7 +74,7 @@ public class EFormsService extends AbstractServiceImpl
 	@GET
 	@Path("/images")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<String>, String> getEFormImageList()
+	public RestResponse<List<String>> getEFormImageList()
 	{
 		String imageHomeDir = OscarProperties.getInstance().getProperty("eform_image");
 		File directory = new File(imageHomeDir);
@@ -90,7 +90,7 @@ public class EFormsService extends AbstractServiceImpl
 	@GET
 	@Path("/databaseTags")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<String>, String> getEFormDatabaseTagList()
+	public RestResponse<List<String>> getEFormDatabaseTagList()
 	{
 		List<String> dbTagList;
 		try

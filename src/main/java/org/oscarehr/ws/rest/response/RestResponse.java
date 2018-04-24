@@ -24,75 +24,45 @@
 
 package org.oscarehr.ws.rest.response;
 
-import java.io.Serializable;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-public class RestResponse<B, E> implements Serializable
+@Schema(description = "Response wrapper object for single results")
+public class RestResponse<T> extends GenericRestResponse<RestResponseHeaders, T, RestResponseError>
 {
-	public enum ResponseStatus
+	protected RestResponse(RestResponseHeaders headers, T body, RestResponseError error, ResponseStatus status)
 	{
-		SUCCESS, ERROR
+		super(headers, body, error, status);
 	}
 
-	private final RestResponseHeaders headers;
-	private final B body;
-	private final E error;
-	private final ResponseStatus status;
-
-	protected RestResponse(RestResponseHeaders headers, B body)
-	{
-		this(headers, body, null, ResponseStatus.SUCCESS);
-	}
-
-	protected RestResponse(RestResponseHeaders headers, B body, E error)
-	{
-		this(headers, body, error, ResponseStatus.ERROR);
-	}
-
-	protected RestResponse(RestResponseHeaders headers, B body, E error, ResponseStatus status)
-	{
-		this.headers = headers;
-		this.body= body;
-		this.error = error;
-		this.status = status;
-	}
-
-	public RestResponseHeaders getHeaders()
-	{
-		return headers;
-	}
-
-	public B getBody()
-	{
-		return body;
-	}
-
-	public E getError()
-	{
-		return error;
-	}
-
-	public ResponseStatus getStatus()
-	{
-		return status;
-	}
-
-	public static <T, E> RestResponse<T, E> successResponse(RestResponseHeaders headers, T body)
+	public static <T> RestResponse<T> successResponse(RestResponseHeaders headers, T body)
 	{
 		return new RestResponse<>(headers, body, null, ResponseStatus.SUCCESS);
 	}
 
-	public static <T, E> RestResponse<T, E> successResponse(T body)
+	public static <T> RestResponse<T> successResponse(T body)
 	{
 		return successResponse(new RestResponseHeaders(), body);
 	}
 
-	public static <T, E> RestResponse<T, E> errorResponse(RestResponseHeaders headers, E error)
+	public static <T> RestResponse<T> errorResponse(RestResponseHeaders headers, RestResponseError error)
 	{
 		return new RestResponse<>(headers, null, error, ResponseStatus.ERROR);
 	}
 
-	public static <T, E> RestResponse<T, E> errorResponse(E error)
+	public static <T> RestResponse<T> errorResponse(RestResponseError error)
 	{
 		return errorResponse(new RestResponseHeaders(), error);
+	}
+	public static <T> RestResponse<T> errorResponse(String errorMessage)
+	{
+		return errorResponse(new RestResponseError(errorMessage));
+	}
+
+	/**
+	 * for special cases where a body is required with the error status
+	 */
+	public static <T> RestResponse<T> errorResponse(T body, RestResponseError error)
+	{
+		return new RestResponse<>(new RestResponseHeaders(), body, error, ResponseStatus.ERROR);
 	}
 }

@@ -60,7 +60,7 @@ public class EFormService extends AbstractServiceImpl {
 	@GET
 	@Path("/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1, String> loadEForm(@PathParam("dataId") Integer id) {
+	public RestResponse<EFormTo1> loadEForm(@PathParam("dataId") Integer id) {
 
 		EForm eform = eFormDao.findById(id);
 
@@ -79,7 +79,7 @@ public class EFormService extends AbstractServiceImpl {
 	@Path("/")
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1, String> saveEForm(EFormTo1 eformTo1) {
+	public RestResponse<EFormTo1> saveEForm(EFormTo1 eformTo1) {
 
 		EForm eForm = new EFormConverter(false).getAsDomainObject(getLoggedInInfo(), eformTo1);
 
@@ -110,7 +110,7 @@ public class EFormService extends AbstractServiceImpl {
 	@Path("/json")
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1, String> saveEForm(String jsonString) {
+	public RestResponse<EFormTo1> saveEForm(String jsonString) {
 
 		JSONObject jsonObject = JSONObject.fromObject(jsonString);
 
@@ -160,7 +160,7 @@ public class EFormService extends AbstractServiceImpl {
 	@Path("/{dataId}")
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1, String> updateEForm(EFormTo1 eformTo1) {
+	public RestResponse<EFormTo1> updateEForm(EFormTo1 eformTo1) {
 
 		EForm eForm = new EFormConverter(false).getAsDomainObject(getLoggedInInfo(), eformTo1);
 
@@ -184,7 +184,7 @@ public class EFormService extends AbstractServiceImpl {
 	@Path("/{dataId}/json")
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<EFormTo1, String> updateEFormJson(String jsonString) {
+	public RestResponse<EFormTo1> updateEFormJson(String jsonString) {
 
 		JSONObject jsonObject = JSONObject.fromObject(jsonString);
 

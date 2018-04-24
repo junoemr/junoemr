@@ -175,7 +175,7 @@ if(!authed) {
 	</tr>
 	<tr>
 		<td>Service Base URI:</td>
-		<td><%=here%>/ws/services</td>
+		<td><%=here%>/ws/services/v1</td>
 	</tr>
 </table>
 

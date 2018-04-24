@@ -139,7 +139,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@GET
 	@Path("/searchRequests")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestSearchResponse<ConsultationRequestSearchResult, String> searchRequests(
+	public RestSearchResponse<ConsultationRequestSearchResult> searchRequests(
 			@QueryParam("demographicNo") Integer demographicNo,
 			@QueryParam("mrpNo") Integer mrpNo,
 			@QueryParam("status") Integer status,
@@ -181,19 +181,19 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		}
 		catch(DateTimeParseException e) {
 			logger.error("Unparseable Date", e);
-			return RestSearchResponse.errorSearchResponse("Unparseable Date");
+			return RestSearchResponse.errorResponse("Unparseable Date");
 		}
 		catch(Exception e) {
 			logger.error("Search Error", e);
-			return RestSearchResponse.errorSearchResponse("Search Error");
+			return RestSearchResponse.errorResponse("Search Error");
 		}
-		return RestSearchResponse.successSearchResponse(resultList, page, perPage, resultTotal);
+		return RestSearchResponse.successResponse(resultList, page, perPage, resultTotal);
 	}
 	
 	@GET
 	@Path("/getRequest/{requestId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ConsultationRequestTo1, String> getRequest(@PathParam("requestId") Integer requestId)
+	public RestResponse<ConsultationRequestTo1> getRequest(@PathParam("requestId") Integer requestId)
 	{
 		ConsultationRequestTo1 request;
 		try
@@ -224,7 +224,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@GET
 	@Path("/getNewRequest")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ConsultationRequestTo1,String> getNewRequest(@QueryParam("demographicNo") Integer demographicId) {
+	public RestResponse<ConsultationRequestTo1> getNewRequest(@QueryParam("demographicNo") Integer demographicId) {
 
 		ConsultationRequestTo1 request;
 		try {
@@ -257,7 +257,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@GET
 	@Path("/getRequestAttachments/{requestId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<ConsultationAttachmentTo1>,String> getRequestAttachments(@PathParam("requestId")Integer requestId,
+	public RestResponse<List<ConsultationAttachmentTo1>> getRequestAttachments(@PathParam("requestId")Integer requestId,
 	                                                                                  @QueryParam("demographicId")Integer demographicIdInt,
 	                                                                                  @QueryParam("attached")boolean attached) {
 		try {
@@ -284,7 +284,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Path("/saveRequest")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ConsultationRequestTo1,String> saveRequest(ConsultationRequestTo1 data) {
+	public RestResponse<ConsultationRequestTo1> saveRequest(ConsultationRequestTo1 data) {
 		try {
 			ConsultationRequest request;
 			if (data.getId() == null) { //new consultation request
@@ -310,7 +310,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@GET
 	@Path("/eSendRequest/{requestId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<String,String> eSendRequest(@PathParam("requestId")Integer requestId) {
+	public RestResponse<String> eSendRequest(@PathParam("requestId")Integer requestId) {
 		try {
 			consultationManager.doHl7Send(getLoggedInInfo(), requestId);
 			return RestResponse.successResponse("Referral Electronically Sent");
@@ -329,7 +329,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Path("/searchResponses")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public RestSearchResponse<ConsultationResponseSearchResult, String> searchResponses(
+	public RestSearchResponse<ConsultationResponseSearchResult> searchResponses(
 			@QueryParam("demographicNo") Integer demographicNo,
 			@QueryParam("mrpNo") Integer mrpNo,
 			@QueryParam("status") Integer status,
@@ -370,14 +370,14 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		}
 		catch(DateTimeParseException e) {
 			logger.error("Unparseable Date", e);
-			return RestSearchResponse.errorSearchResponse("Unparseable Date");
+			return RestSearchResponse.errorResponse("Unparseable Date");
 		}
 		catch(Exception e) {
 			logger.error("Search Error", e);
-			return RestSearchResponse.errorSearchResponse("Search Error");
+			return RestSearchResponse.errorResponse("Search Error");
 		}
 
-		return RestSearchResponse.successSearchResponse(resultList, page, perPage, resultTotal);
+		return RestSearchResponse.successResponse(resultList, page, perPage, resultTotal);
 	}
 	
 	@GET
@@ -438,7 +438,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Path("/saveResponse")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ConsultationResponseTo1,String> saveRequest(ConsultationResponseTo1 data) {
+	public RestResponse<ConsultationResponseTo1> saveRequest(ConsultationResponseTo1 data) {
 		try {
 			ConsultationResponse response;
 

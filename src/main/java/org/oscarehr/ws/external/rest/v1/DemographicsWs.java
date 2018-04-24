@@ -57,7 +57,7 @@ public class DemographicsWs extends AbstractExternalRestWs
 	@GET
 	@Path("/search")
 	@Operation(summary = "Search demographics by parameter")
-	public RestSearchResponse<DemographicSearchResult, String> search(
+	public RestSearchResponse<DemographicSearchResult> search(
 			@QueryParam("page")
 			@DefaultValue("1")
 			@Parameter(description = "requested result page")
@@ -97,7 +97,7 @@ public class DemographicsWs extends AbstractExternalRestWs
 			else
 			{
 				logger.warn("Missing Search Parameter");
-				return RestSearchResponse.errorSearchResponse("Missing Search Parameter");
+				return RestSearchResponse.errorResponse("Missing Search Parameter");
 			}
 
 			totalResultCount = demographicManager.searchPatientsCount(getLoggedInInfo(), searchRequest);
@@ -109,8 +109,8 @@ public class DemographicsWs extends AbstractExternalRestWs
 		catch(Exception e)
 		{
 			logger.error("Error", e);
-			return RestSearchResponse.errorSearchResponse("System Error");
+			return RestSearchResponse.errorResponse("System Error");
 		}
-		return RestSearchResponse.successSearchResponse(response, page, perPage, totalResultCount);
+		return RestSearchResponse.successResponse(response, page, perPage, totalResultCount);
 	}
 }

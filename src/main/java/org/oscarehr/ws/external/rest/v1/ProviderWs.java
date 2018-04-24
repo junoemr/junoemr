@@ -51,7 +51,7 @@ public class ProviderWs extends AbstractExternalRestWs
 	//TODO use a custom transfer object
 	@GET
 	@Path("/{id}")
-	public RestResponse<ProviderTransfer,String> getProvider(@PathParam("id") String id)
+	public RestResponse<ProviderTransfer> getProvider(@PathParam("id") String id)
 	{
 		ProviderTransfer providerTransfer;
 		try

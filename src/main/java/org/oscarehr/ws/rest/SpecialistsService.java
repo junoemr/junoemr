@@ -56,7 +56,7 @@ public class SpecialistsService extends AbstractServiceImpl
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<ProfessionalSpecialistTo1>, String> searchSpecialists(@QueryParam("searchName") String searchName,
+	public RestResponse<List<ProfessionalSpecialistTo1>> searchSpecialists(@QueryParam("searchName") String searchName,
 	                                                                               @QueryParam("searchRefNo") String searchRefNo,
 	                                                                               @QueryParam("page") @DefaultValue("1") Integer page,
 	                                                                               @QueryParam("perPage") @DefaultValue("10") Integer perPage)

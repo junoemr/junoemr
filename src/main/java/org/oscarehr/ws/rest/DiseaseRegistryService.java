@@ -76,7 +76,7 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@GET
 	@Path("/quickLists")
 	@Produces("application/json")
-	public RestResponse<List<DxQuickList>, String> getQuickLists() {
+	public RestResponse<List<DxQuickList>> getQuickLists() {
 
 		List<DxQuickList> resultList;
 		try {
@@ -97,7 +97,7 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@GET
 	@Path("/issueQuickLists")
 	@Produces("application/json")
-	public RestResponse<List<DxQuickList>, String> getIssueQuickLists() {
+	public RestResponse<List<DxQuickList>> getIssueQuickLists() {
 
 		List<DxQuickList> resultList;
 		try {
@@ -113,7 +113,7 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@GET
 	@Path("/findDxIssue")
 	@Produces("application/json")
-	public RestResponse<IssueTo1, String> findDxIssue(@QueryParam("codingSystem") String codingSystem, @QueryParam("code") String code) {
+	public RestResponse<IssueTo1> findDxIssue(@QueryParam("codingSystem") String codingSystem, @QueryParam("code") String code) {
 		Issue issue = issueDao.findIssueByTypeAndCode(codingSystem, code);
 		if(issue != null) {
 			IssueTo1 returnIssue = new IssueTo1();

@@ -50,7 +50,7 @@ public class UserMetricsService extends AbstractServiceImpl
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces({MediaType.APPLICATION_JSON , MediaType.APPLICATION_XML})
-	public RestResponse<String,String> postMetrics(ArrayList<UserMetricsTo1> data)
+	public RestResponse<String> postMetrics(ArrayList<UserMetricsTo1> data)
 	{
 		String page = "appointment";
 		for(UserMetricsTo1 metric : data)
@@ -68,7 +68,7 @@ public class UserMetricsService extends AbstractServiceImpl
 
 	@GET
 	@Produces({MediaType.APPLICATION_JSON , MediaType.APPLICATION_XML})
-	public RestResponse<String,String> test()
+	public RestResponse<String> test()
 	{
 		return RestResponse.successResponse("Success");
 	}
