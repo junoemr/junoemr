@@ -24,13 +24,15 @@
 
 package org.oscarehr.integration.clinicaid.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.codehaus.jackson.map.ext.JodaDeserializers;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PatientEligibilityDataTo1 implements Serializable
@@ -46,15 +48,15 @@ public class PatientEligibilityDataTo1 implements Serializable
 	private String message;
 
 	@JsonProperty("eligibility_queued_at")
-	@JsonDeserialize(using = JodaDeserializers.LocalDateDeserializer.class)
-	private LocalDate queuedAt;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date queuedAt;
 
 	@JsonProperty("eligibility_checked_at")
-	@JsonDeserialize(using = JodaDeserializers.LocalDateDeserializer.class)
+	@JsonDeserialize(using = LocalDateDeserializer.class)
 	private LocalDate checkedAt;
 
 	@JsonProperty("eligibility_expiry_date")
-	@JsonDeserialize(using = JodaDeserializers.LocalDateDeserializer.class)
+	@JsonDeserialize(using = LocalDateDeserializer.class)
 	private LocalDate expiryAt;
 
 	@JsonProperty("check_status")
@@ -73,7 +75,7 @@ public class PatientEligibilityDataTo1 implements Serializable
 	private String gender;
 
 	@JsonProperty("birth_date")
-	@JsonDeserialize(using = JodaDeserializers.LocalDateDeserializer.class)
+	@JsonDeserialize(using = LocalDateDeserializer.class)
 	private LocalDate birthDate;
 
 	public boolean isEligible()
@@ -96,12 +98,12 @@ public class PatientEligibilityDataTo1 implements Serializable
 		this.message = message;
 	}
 
-	public LocalDate getQueuedAt()
+	public Date getQueuedAt()
 	{
 		return queuedAt;
 	}
 
-	public void setQueuedAt(LocalDate queuedAt)
+	public void setQueuedAt(Date queuedAt)
 	{
 		this.queuedAt = queuedAt;
 	}
