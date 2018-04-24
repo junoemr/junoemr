@@ -248,7 +248,7 @@ if(!authed) {
 	String licensedProducerDefaultAddress = "None";
 	String licensedProducerAddress = licensedProducerDefaultAddress;
 
-	if (Boolean.parseBoolean(oscarProps.getProperty("show_demographic_licensed_producers")))
+	if (oscarProps.isPropertyActive("show_demographic_licensed_producers"))
 	{
 		String[] params = {demographic_no};
 		ResultSet demoProducerRs = apptMainBean.queryResults(params, "search_demo_licensed_producer");
