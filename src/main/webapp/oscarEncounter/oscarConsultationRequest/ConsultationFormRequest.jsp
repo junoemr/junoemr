@@ -341,7 +341,14 @@ function onDocumentLoad()
 	{ %>
 		updateSelectedMultisite(document.getElementById("siteName"));
 	<%
-	}%>
+	}
+
+	// update fax button state (enabled/disabled) on load
+	if (props.isConsultationFaxEnabled())
+	{ %>
+	Oscar.Util.Fax.updateFaxButton();
+	<%
+	} %>
 }
 
 jQuery(document).ready(onDocumentLoad);
