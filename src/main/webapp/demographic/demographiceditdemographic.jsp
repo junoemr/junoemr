@@ -238,6 +238,35 @@ if(!authed) {
 		pageContext.setAttribute( "patientConsents", patientConsentManager.getAllConsentsByDemographic( loggedInInfo, demographicNo ) );
 	}
 
+	// Custom licensed producer fields
+	String licensedProducerDefault = "None";
+	String licensedProducer = licensedProducerDefault;
+
+	String licensedProducerDefault2 = "None";
+	String licensedProducer2 = licensedProducerDefault2;
+
+	String licensedProducerDefaultAddress = "None";
+	String licensedProducerAddress = licensedProducerDefaultAddress;
+
+	if (Boolean.parseBoolean(oscarProps.getProperty("show_demographic_licensed_producers")))
+	{
+		String[] params = {demographic_no};
+		ResultSet demoProducerRs = apptMainBean.queryResults(params, "search_demo_licensed_producer");
+		if (demoProducerRs.next())
+		{
+			licensedProducer = demoProducerRs.getString("producer_name");
+		}
+		ResultSet demoProducerRs2 = apptMainBean.queryResults(params, "search_demo_licensed_producer2");
+		if (demoProducerRs2.next())
+		{
+			licensedProducer2 = demoProducerRs2.getString("producer_name");
+		}
+		ResultSet demoProducerAddrRs = apptMainBean.queryResults(params, "search_demo_licensed_producer_address_name");
+		if (demoProducerAddrRs.next())
+		{
+			licensedProducerAddress = demoProducerAddrRs.getString("display_name");
+		}
+	}
 %>
 
 
@@ -256,6 +285,7 @@ if(!authed) {
 <%@ page import="java.util.Vector" %>
 <%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
 <%@ page import="org.oscarehr.common.model.ProviderPreference" %>
+<%@ page import="java.sql.ResultSet" %>
 <html:html locale="true">
 
 <head>
@@ -2255,7 +2285,24 @@ if ( Dead.equals(PatStat) ) {%>
 								</span>
 								<span class="info"><%=familyDoctorNo%></span>
 							</li>
+							<% }
+								//-- Licensed producer drop-down selection (display only)-->
+								if (oscarProps.isPropertyActive("show_demographic_licensed_producers"))
+								{ %>
+							<li>
+								<span class="label"><bean:message key="demographic.demographiceditdemographic.licensedProducer"/>:</span>
+								<span class="info"><%= licensedProducer %></span>
+							</li>
+							<li>
+								<span class="label"><bean:message key="demographic.demographiceditdemographic.licensedProducer2"/>:</span>
+								<span class="info"><%= licensedProducer2 %></span>
+							</li>
+							<li>
+								<span class="label"><bean:message key="demographic.demographiceditdemographic.licensedProducerAddress"/>:</span>
+								<span class="info"><%= licensedProducerAddress %></span>
+							</li>
 							<% } %>
+
 						</ul>
 						</div>
 
@@ -3175,8 +3222,83 @@ document.updatedelete.referral_doctor_no.value = refNo;
 										<input name="veteranNo" type="text" value="<%= veteranNo %>">
 									</td>
 								</tr>
-								<%
-							}
+							<%
+								}
+								// Licensed producer drop-down selection
+								if (oscarProps.isPropertyActive("show_demographic_licensed_producers"))
+								{
+									ResultSet producerRs = apptMainBean.queryResults("search_licensed_producer");
+									ResultSet producerAddrRs = apptMainBean.queryResults("search_licensed_producer_address_name");
+							%>
+							<tr>
+								<td align="right"><b><bean:message
+										key="demographic.demographiceditdemographic.licensedProducer"/>:</b>
+								</td>
+								<td align="left">
+									<select name="licensed_producer">
+										<option value="0" <%=licensedProducerDefault.equals(licensedProducer) ? " selected" : ""%> ><%=licensedProducerDefault%>
+										</option>
+										<%
+											while (producerRs.next())
+											{
+												String producer_id = producerRs.getString("producer_id");
+												String producer_name = producerRs.getString("producer_name");
+										%>
+										<option value="<%=producer_id%>" <%=producer_name.equals(licensedProducer) ? " selected" : ""%> ><%=producer_name%>
+										</option>
+										<%
+											}
+										%>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td align="right"><b><bean:message
+										key="demographic.demographiceditdemographic.licensedProducer2"/>:</b>
+								</td>
+								<td align="left">
+									<select name="licensed_producer2">
+										<option value="0" <%=licensedProducerDefault2.equals(licensedProducer2) ? " selected" : ""%> ><%=licensedProducerDefault2%>
+										</option>
+										<%
+											producerRs.beforeFirst();
+											while (producerRs.next())
+											{
+												String producer_id = producerRs.getString("producer_id");
+												String producer_name = producerRs.getString("producer_name");
+										%>
+										<option value="<%=producer_id%>" <%=producer_name.equals(licensedProducer2) ? " selected" : ""%> ><%=producer_name%>
+										</option>
+										<%
+											}
+										%>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td align="right"><b><bean:message
+										key="demographic.demographiceditdemographic.licensedProducerAddress"/>:</b>
+								</td>
+								<td align="left">
+									<select name="licensed_producer_address">
+										<option value="0" <%=licensedProducerDefaultAddress.equals(licensedProducerAddress) ? " selected" : ""%> ><%=licensedProducerDefaultAddress%>
+										</option>
+										<%
+											while (producerAddrRs.next())
+											{
+												String address_id = producerAddrRs.getString("address_id");
+												String address_name = producerAddrRs.getString("display_name");
+										%>
+										<option value="<%=address_id%>" <%=address_name.equals(licensedProducerAddress) ? " selected" : ""%> ><%=address_name%>
+										</option>
+										<%
+											}
+										%>
+									</select>
+								</td>
+							</tr>
+							<%
+								}
 							%>
 							
 							<tr>

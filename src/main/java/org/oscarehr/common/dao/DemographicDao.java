@@ -2261,4 +2261,41 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 			this.releaseSession(session);
 		}
 	}
+
+	/**
+	 * Save custom licensed producer info for a demographic.
+	 *
+	 * @param demo_no
+	 * @param producer_id
+	 * @param producer_id2
+	 * @param address_id
+	 */
+	public void saveDemographicLicensedProducer(int demo_no, int producer_id, int producer_id2, int address_id)
+	{
+		Connection c = null;
+		try
+		{
+			c = DbConnectionFilter.getThreadLocalDbConnection();
+			PreparedStatement ps = c.prepareStatement("INSERT INTO demographic_licensed_producer (demographic_no, producer_id, producer_id2, address_id) "
+					+ "VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE producer_id=?, producer_id2=?, address_id=?");
+			ps.setInt(1, demo_no);
+			ps.setInt(2, producer_id);
+			ps.setInt(3, producer_id2);
+			ps.setInt(4, address_id);
+
+			ps.setInt(5, producer_id);
+			ps.setInt(6, producer_id2);
+			ps.setInt(7, address_id);
+
+			ps.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			log.error("SQL Exception", e);
+		}
+		finally
+		{
+			SqlUtils.closeResources(c, null, null);
+		}
+	}
 }
