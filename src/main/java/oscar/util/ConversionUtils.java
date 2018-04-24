@@ -29,6 +29,7 @@ import org.oscarehr.util.MiscUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -153,6 +154,26 @@ public class ConversionUtils {
 	}
 
 	/**
+	 * Formats date instance using the provided date format pattern
+	 *
+	 * @param date
+	 * 		LocalDate to be formatted
+	 * @param formatPattern
+	 * 		Format pattern to apply
+	 * @return
+	 * 		Returns the formatted date as a string, or an empty string for
+	 * 		null date parameter.
+	 */
+	public static String toDateString(LocalDate date, String formatPattern) {
+		if (date == null) {
+			return "";
+		}
+
+		DateTimeFormatter format = DateTimeFormatter.ofPattern(formatPattern);
+		return date.format(format);
+	}
+
+	/**
 	 * Formats the date instance into a string keeping only the time of the day and excluding the remaining info.   
 	 * 
 	 * @param time
@@ -173,6 +194,19 @@ public class ConversionUtils {
 	 * 		Returns the formatted string
 	 */
 	public static String toDateString(Date date) {
+		return toDateString(date, DEFAULT_DATE_PATTERN);
+	}
+
+	/**
+	 * Formats the local date instance into a string.
+	 *
+	 * @param date
+	 * 		LocalDate to be formatted using {@link #DEFAULT_DATE_PATTERN}
+	 * @return
+	 * 		Returns the formatted string
+	 */
+	public static String toDateString(LocalDate date)
+	{
 		return toDateString(date, DEFAULT_DATE_PATTERN);
 	}
 

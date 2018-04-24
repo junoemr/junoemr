@@ -26,8 +26,11 @@ package org.oscarehr.integration.clinicaid.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.codehaus.jackson.map.ext.JodaDeserializers;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PatientEligibilityDataTo1 implements Serializable
@@ -43,13 +46,16 @@ public class PatientEligibilityDataTo1 implements Serializable
 	private String message;
 
 	@JsonProperty("eligibility_queued_at")
-	private String queuedAt;
+	@JsonDeserialize(using = JodaDeserializers.LocalDateDeserializer.class)
+	private LocalDate queuedAt;
 
 	@JsonProperty("eligibility_checked_at")
-	private String checkedAt;
+	@JsonDeserialize(using = JodaDeserializers.LocalDateDeserializer.class)
+	private LocalDate checkedAt;
 
 	@JsonProperty("eligibility_expiry_date")
-	private String expiryAt;
+	@JsonDeserialize(using = JodaDeserializers.LocalDateDeserializer.class)
+	private LocalDate expiryAt;
 
 	@JsonProperty("check_status")
 	private String checkStatus;
@@ -67,7 +73,8 @@ public class PatientEligibilityDataTo1 implements Serializable
 	private String gender;
 
 	@JsonProperty("birth_date")
-	private String birthDate;
+	@JsonDeserialize(using = JodaDeserializers.LocalDateDeserializer.class)
+	private LocalDate birthDate;
 
 	public boolean isEligible()
 	{
@@ -89,27 +96,27 @@ public class PatientEligibilityDataTo1 implements Serializable
 		this.message = message;
 	}
 
-	public String getQueuedAt()
+	public LocalDate getQueuedAt()
 	{
 		return queuedAt;
 	}
 
-	public void setQueuedAt(String queuedAt)
+	public void setQueuedAt(LocalDate queuedAt)
 	{
 		this.queuedAt = queuedAt;
 	}
 
-	public String getExpiryAt()
+	public LocalDate getExpiryAt()
 	{
 		return expiryAt;
 	}
 
-	public void setExpiryAt(String expiryAt)
+	public void setExpiryAt(LocalDate expiryAt)
 	{
 		this.expiryAt = expiryAt;
 	}
 
-	public String getCheckedAt()
+	public LocalDate getCheckedAt()
 	{
 		return checkedAt;
 	}
@@ -164,12 +171,12 @@ public class PatientEligibilityDataTo1 implements Serializable
 		this.gender = gender;
 	}
 
-	public String getBirthDate()
+	public LocalDate getBirthDate()
 	{
 		return birthDate;
 	}
 
-	public void setBirthDate(String birthDate)
+	public void setBirthDate(LocalDate birthDate)
 	{
 		this.birthDate = birthDate;
 	}

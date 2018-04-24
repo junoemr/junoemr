@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,7 +80,7 @@ public class ClinicaidAPIService
 				StringUtils.trimToEmpty(data.getFirstName()),
 				StringUtils.trimToEmpty(data.getMiddleName()),
 				StringUtils.trimToEmpty(data.getLastName()),
-				StringUtils.trimToEmpty(data.getBirthDate()),
+				ConversionUtils.toDateString(data.getBirthDate()),
 				StringUtils.trimToEmpty(data.getGender()),
 				message
 		);
@@ -157,7 +158,8 @@ public class ClinicaidAPIService
 
 			if (!eligibilityData.isChecked())
 			{
-				response.put("error", String.format("Check timed out. Last check from %s:", eligibilityData.getCheckedAt()));
+				LocalDate checkedAt = eligibilityData.getCheckedAt();
+				response.put("error", String.format("Check timed out. Last check from %s:", ConversionUtils.toDateString(checkedAt)));
 			}
 		}
 
