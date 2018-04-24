@@ -70,16 +70,33 @@ public class DemographicWs extends AbstractExternalRestWs
 
 	@GET
 	@Path("/{id}")
-	@Operation(summary = "Retrieve an existing patient demographic record by id.")
+	@Operation(summary = "Retrieve an existing patient demographic record by demographic id.")
 	public RestResponse<DemographicTransfer, String> getDemographic(@PathParam("id") Integer demographicNo)
 	{
-		return RestResponse.errorResponse("Not Implemented");
+		DemographicTransfer demographicTransfer;
+		try
+		{
+			String providerNoStr = getOAuthProviderNo();
+			Demographic demographic = demographicManager.getDemographic(providerNoStr, demographicNo);
+			demographicTransfer = demographicConverter.getAsTransferObject(null, demographic);
+		}
+		catch(SecurityException e)
+		{
+			logger.error("Security Error", e);
+			return RestResponse.errorResponse("User Permissions Error");
+		}
+		catch(Exception e)
+		{
+			logger.error("Error", e);
+			return RestResponse.errorResponse("System Error");
+		}
+		return RestResponse.successResponse(demographicTransfer);
 	}
 
 	@PUT
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Operation(summary = "Update an existing patient demographic record by id.")
+	@Operation(summary = "Update an existing patient demographic record by demographic id.")
 	public RestResponse<DemographicTransfer, String> putDemographic(@PathParam("id") Integer demographicNo,
 	                                                                @Valid DemographicTransfer demographicTo)
 	{
@@ -98,7 +115,7 @@ public class DemographicWs extends AbstractExternalRestWs
 
 			if(demographic.getDemographicNo() != null)
 			{
-				return RestResponse.errorResponse("Demographic " + demographic.getDemographicNo() + " already exists.");
+				return RestResponse.errorResponse("Demographic number for a new record must be null");
 			}
 			String providerNoStr = getOAuthProviderNo();
 			int providerNo = Integer.parseInt(providerNoStr);
@@ -110,18 +127,18 @@ public class DemographicWs extends AbstractExternalRestWs
 
 			demographicManager.createDemographic(providerNoStr, demographic, getDefaultProgramId());
 
-			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,ip);
+			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, ip);
 			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
 		}
-		catch (SecurityException e)
+		catch(SecurityException e)
 		{
-			logger.error("Security Error",e);
+			logger.error("Security Error", e);
 			return RestResponse.errorResponse("User Permissions Error");
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
-			logger.error("Error",e);
-			return RestResponse.errorResponse("Error");
+			logger.error("Error", e);
+			return RestResponse.errorResponse("System Error");
 		}
 		return RestResponse.successResponse(demographic.getDemographicNo());
 	}

@@ -32,17 +32,16 @@ public class RestSearchResponseHeaders extends RestResponseHeaders
 	private int page;
 	private int perPage;
 
-	public RestSearchResponseHeaders()
-	{
-		this.total = 0;
-		this.page = 0;
-		this.perPage = 0;
-	}
 	public RestSearchResponseHeaders(int page, int perPage, int total)
 	{
+		super();
 		this.total = total;
 		this.page = page;
 		this.perPage = perPage;
+	}
+	public RestSearchResponseHeaders()
+	{
+		this(0,0,0);
 	}
 
 	public int getTotal()

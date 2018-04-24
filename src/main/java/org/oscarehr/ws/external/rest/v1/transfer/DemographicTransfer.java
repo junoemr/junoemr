@@ -22,8 +22,9 @@
  */
 package org.oscarehr.ws.external.rest.v1.transfer;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.oscarehr.ws.validator.ProviderNoConstraint;
 import org.oscarehr.ws.validator.StringValueConstraint;
 
@@ -39,77 +40,121 @@ import java.time.LocalDate;
 public class DemographicTransfer implements Serializable
 {
 	// demographic base info
+	@Schema(description = "patient demographic record identifier")
 	private Integer demographicNo;
 	@NotNull
 	@Size(min=1, max=30)
+	@Schema(description = "patient first name")
 	private String firstName;
 	@NotNull
 	@Size(min=1, max=30)
+	@Schema(description = "patient last name")
 	private String lastName;
 	@Size(max=10)
+	@Schema(description = "patient title (Mr, Mrs, Dr, etc.)")
 	private String title;
 	@NotNull
 	@Size(min=1,max=1)
+	@Schema(description = "patient gender", allowableValues = {"M", "F", "T", "O", "U"})
 	@StringValueConstraint(allows = {"M","F","T","O","U"})
 	private String sex;
 	@Size(max=10)
+	@Schema(description = "patient health insurance number")
 	private String hin;
 	@Size(max=15)
+	@Schema(description = "patient social insurance number")
 	private String sin;
 	@Size(max=20)
+	@Schema(description = "patient health card type")
 	private String hcType;
 	@Size(max=3)
+	@Schema(description = "patient health card version code")
 	private String hcVersion;
+	@Schema(description = "patient health card end date")
 	private LocalDate hcRenewDate;
+	@Schema(description = "patient health card start date")
 	private LocalDate hcEffectiveDate;
 	@NotNull
+	@Schema(description = "patient start date")
 	private LocalDate dateJoined;
+	@Schema(description = "patient end date")
 	private LocalDate endDate;
 	@NotNull
+	@Schema(description = "patient date of birth")
 	private LocalDate dateOfBirth;
 	@DefaultValue("AC")
 	@StringValueConstraint(allows = {"AC","IN","DE","FI","MO"})
+	@Schema(description = "patient status", example = "AC")
 	private String patientStatus;
+	@Schema(description = "date of last patient status change")
 	private LocalDate patientStatusDate;
 
 	// address and contact info
 	@Size(max=100)
+	@Schema(description = "patient email address")
 	private String email;
-	@Size(max=6)
-	@ProviderNoConstraint(allowNull = true)
-	private String providerNo;
 	@Size(max=60)
+	@Schema(description = "patient residence street address")
 	private String address;
 	@Size(max=50)
+	@Schema(description = "patient residence city")
 	private String city;
 	@Size(max=9)
+	@Schema(description = "patient residence postal code")
 	private String postal;
 	@Size(max=20)
+	@Schema(description = "patient residence province")
 	private String province;
 	@Size(max=255)
+	@Schema(description = "patient past residence full address line")
 	private String previousAddress;
-	@Size(max=80)
-	private String familyDoctor;
 	@Size(max=20)
+	@Schema(description = "patient primary (home) phone number")
 	private String primaryPhone;
 	@Size(max=20)
+	@Schema(description = "patient alternate (work) phone number")
 	private String secondaryPhone;
+	@Schema(description = "patient cell phone number")
 	private String cellPhone;
 	@Size(max=20)
 	private String pcnIndicator;
 
 	// roster info
 	@Size(max=20)
+	@Schema(description = "patient roster status")
 	private String rosterStatus;
 	@Size(max=2)
+	@Schema(description = "roster termination 2 digit code")
 	private String rosterTerminationReason;
+	@Schema(description = "date rostered")
 	private LocalDate rosterDate;
+	@Schema(description = "date of roster termination")
 	private LocalDate rosterTerminationDate;
+
+	// physician info
+	@Size(max=6)
+	@ProviderNoConstraint(allowNull = true)
+	@Schema(description = "patient assigned physician unique identifier. Id must match an existing provider record.")
+	private String providerNo;
+	@Size(max=45)
+	@Schema(description = "referring doctor full name (Last, First)", example = "LastName,FirstName")
+	private String referralDoctorName;
+	@Size(max=10)
+	@Schema(description = "referring doctor number")
+	private String referralDoctorNo;
+	@Size(max=45)
+	@Schema(description = "family doctor full name (Last, First)", example = "LastName,FirstName")
+	private String familyDoctorName;
+	@Size(max=10)
+	@Schema(description = "family doctor number")
+	private String familyDoctorNo;
 
 	// other info
 	@Size(max=10)
+	@Schema(description = "patient chart number")
 	private String chartNo;
 	@Size(max=70)
+	@Schema(description = "patient alias")
 	private String alias;
 	@Size(max=255)
 	private String children;
@@ -322,14 +367,44 @@ public class DemographicTransfer implements Serializable
 		this.previousAddress = previousAddress;
 	}
 
-	public String getFamilyDoctor()
+	public String getReferralDoctorName()
 	{
-		return familyDoctor;
+		return referralDoctorName;
 	}
 
-	public void setFamilyDoctor(String familyDoctor)
+	public void setReferralDoctorName(String referralDoctorName)
 	{
-		this.familyDoctor = familyDoctor;
+		this.referralDoctorName = referralDoctorName;
+	}
+
+	public String getReferralDoctorNo()
+	{
+		return referralDoctorNo;
+	}
+
+	public void setReferralDoctorNo(String referralDoctorNo)
+	{
+		this.referralDoctorNo = referralDoctorNo;
+	}
+
+	public String getFamilyDoctorName()
+	{
+		return familyDoctorName;
+	}
+
+	public void setFamilyDoctorName(String familyDoctorName)
+	{
+		this.familyDoctorName = familyDoctorName;
+	}
+
+	public String getFamilyDoctorNo()
+	{
+		return familyDoctorNo;
+	}
+
+	public void setFamilyDoctorNo(String familyDoctorNo)
+	{
+		this.familyDoctorNo = familyDoctorNo;
 	}
 
 	public String getCity()

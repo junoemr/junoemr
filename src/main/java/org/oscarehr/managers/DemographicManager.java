@@ -106,8 +106,11 @@ public class DemographicManager {
 	
 
 	public Demographic getDemographic(LoggedInInfo loggedInInfo, Integer demographicId) throws PatientDirectiveException {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ, demographicId);
-		
+		return getDemographic(loggedInInfo.getLoggedInProviderNo() , demographicId);
+	}
+	public Demographic getDemographic(String providerNo, Integer demographicId) throws PatientDirectiveException {
+		checkPrivilege(providerNo, SecurityInfoManager.READ, demographicId);
+
 		return demographicDao.getDemographicById(demographicId);
 	}
 		
@@ -604,8 +607,8 @@ public class DemographicManager {
 		}
 	}
 
-	private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege, int demographicNo) {
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_demographic", privilege, demographicNo)) {
+	private void checkPrivilege(String providerNo, String privilege, int demographicNo) {
+		if (!securityInfoManager.hasPrivilege(providerNo, "_demographic", privilege, String.valueOf(demographicNo))) {
 			throw new SecurityException("missing required security object (_demographic)");
 		}
 	}

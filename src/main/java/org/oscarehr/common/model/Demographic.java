@@ -24,6 +24,7 @@
 
 package org.oscarehr.common.model;
 
+import com.sun.istack.NotNull;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
@@ -35,7 +36,6 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -523,15 +523,14 @@ public class Demographic implements Serializable
 	}
 
 	/**
-	 * Set the dateOfBirth,monthOfBirth,yearOfBirth using a date object
+	 * Set the dateOfBirth,monthOfBirth,yearOfBirth using a localdate object
 	 */
-	public void setDateOfBirth(Date dateOfBirth)
+	@NotNull
+	public void setDateOfBirth(LocalDate dateOfBirth)
 	{
-		LocalDate localDate = dateOfBirth.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-		setDateOfBirth(StringUtils.leftPad(String.valueOf(localDate.getDayOfMonth()), 2,"0"));
-		setMonthOfBirth(StringUtils.leftPad(String.valueOf(localDate.getMonthValue()), 2,"0"));
-		setYearOfBirth(StringUtils.leftPad(String.valueOf(localDate.getYear()), 4,"0"));
+		setDateOfBirth(StringUtils.leftPad(String.valueOf(dateOfBirth.getDayOfMonth()), 2,"0"));
+		setMonthOfBirth(StringUtils.leftPad(String.valueOf(dateOfBirth.getMonthValue()), 2,"0"));
+		setYearOfBirth(StringUtils.leftPad(String.valueOf(dateOfBirth.getYear()), 4,"0"));
 	}
 
 	/**
@@ -631,6 +630,17 @@ public class Demographic implements Serializable
 		}
 		return "";
 	}
+	public String getFamilyDoctor2LastName()
+	{
+
+		Matcher m = FD_LAST_NAME.matcher(getFamilyDoctor2());
+
+		if (m.find())
+		{
+			return m.group(1);
+		}
+		return "";
+	}
 
 	/**
 	 * Return the first name as parsed from column: family_doctor
@@ -638,6 +648,16 @@ public class Demographic implements Serializable
 	public String getFamilyDoctorFirstName()
 	{
 		Matcher m = FD_FIRST_NAME.matcher(getFamilyDoctor());
+
+		if (m.find())
+		{
+			return m.group(1);
+		}
+		return "";
+	}
+	public String getFamilyDoctor2FirstName()
+	{
+		Matcher m = FD_FIRST_NAME.matcher(getFamilyDoctor2());
 
 		if (m.find())
 		{
@@ -653,6 +673,18 @@ public class Demographic implements Serializable
 	{
 
 		Matcher m = FD_OHIP.matcher(getFamilyDoctor());
+
+		if (m.find())
+		{
+			return m.group(1);
+		}
+
+		return "";
+	}
+	public String getFamilyDoctor2Number()
+	{
+
+		Matcher m = FD_OHIP.matcher(getFamilyDoctor2());
 
 		if (m.find())
 		{

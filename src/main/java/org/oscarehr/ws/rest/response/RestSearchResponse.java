@@ -27,7 +27,7 @@ import java.util.List;
 
 public class RestSearchResponse<T, E> extends RestResponse<List<T>, E>
 {
-	protected RestSearchResponse(RestResponseHeaders headers, List<T> body, E error, ResponseStatus status)
+	protected RestSearchResponse(RestSearchResponseHeaders headers, List<T> body, E error, ResponseStatus status)
 	{
 		super(headers, body, error, status);
 	}
@@ -44,13 +44,13 @@ public class RestSearchResponse<T, E> extends RestResponse<List<T>, E>
 		return successSearchResponse(new RestSearchResponseHeaders(), body, page, perPage, total);
 	}
 
-	public static <T, E> RestSearchResponse<T, E> errorSearchResponse(RestResponseHeaders headers, E error)
+	public static <T, E> RestSearchResponse<T, E> errorSearchResponse(RestSearchResponseHeaders headers, E error)
 	{
 		return new RestSearchResponse<>(headers, null, error, ResponseStatus.ERROR);
 	}
 
 	public static <T, E> RestSearchResponse<T, E> errorSearchResponse(E error)
 	{
-		return errorSearchResponse(new RestResponseHeaders(), error);
+		return errorSearchResponse(new RestSearchResponseHeaders(), error);
 	}
 }

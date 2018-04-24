@@ -23,6 +23,7 @@
 
 package org.oscarehr.ws.external.rest.v1;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import net.sf.json.JsonConfig;
 import net.sf.json.processors.JsDateJsonBeanProcessor;
 import org.apache.log4j.Logger;
@@ -56,6 +57,7 @@ public class ProvidersWs extends AbstractExternalRestWs
 	 */
 	@GET
 	@Path("/providers_json")
+	@Hidden
 	public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON() {
 		JsonConfig config = new JsonConfig();
 		config.registerJsonBeanProcessor(java.sql.Date.class, new JsDateJsonBeanProcessor());

@@ -24,6 +24,7 @@
 package org.oscarehr.ws.external.rest.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.log4j.Logger;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.MiscUtils;
@@ -57,9 +58,19 @@ public class DemographicsWs extends AbstractExternalRestWs
 	@Path("/search")
 	@Operation(summary = "Search demographics by parameter")
 	public RestSearchResponse<DemographicSearchResult, String> search(
-			@QueryParam("page") @DefaultValue("1") Integer page,
-			@QueryParam("perPage") @DefaultValue("10") Integer perPage,
-			@QueryParam("exactMatch") @DefaultValue("false") Boolean exactMatch,
+			@QueryParam("page")
+			@DefaultValue("1")
+			@Parameter(description = "requested result page")
+					Integer page,
+			@QueryParam("perPage")
+			@DefaultValue("10")
+			@Parameter(description = "number of results per page")
+					Integer perPage,
+			@QueryParam("exactMatch")
+			@DefaultValue("false")
+			@Parameter(description = "when true, search results wil only be returned if they are a complete match. Otherwise partial matches may be returned.")
+					Boolean exactMatch,
+			@Parameter(description = "Match results by health insurance number")
 			@QueryParam("hin") String hin
 	)
 	{

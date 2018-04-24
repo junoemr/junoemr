@@ -24,12 +24,14 @@
 
 package org.oscarehr.ws.external.rest.v1.conversion;
 
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.external.rest.v1.transfer.DemographicTransfer;
 import org.oscarehr.ws.rest.conversion.AbstractConverter;
 import org.oscarehr.ws.rest.conversion.ConversionException;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -39,14 +41,13 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 	@Override
 	public Demographic getAsDomainObject(LoggedInInfo loggedInInfo, DemographicTransfer transfer) throws ConversionException
 	{
-
 		Demographic demographic = new Demographic();
 
 		// base info
 		demographic.setDemographicNo(transfer.getDemographicNo());
 		demographic.setFirstName(transfer.getFirstName());
 		demographic.setLastName(transfer.getLastName());
-		demographic.setDateOfBirth(toNullableLegacyDate(transfer.getDateOfBirth()));
+		demographic.setDateOfBirth(transfer.getDateOfBirth());
 		demographic.setTitle(transfer.getTitle());
 		demographic.setHin(transfer.getHin());
 		demographic.setVer(transfer.getHcVersion());
@@ -57,7 +58,6 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		demographic.setSin(transfer.getSin());
 		demographic.setDateJoined(toNullableLegacyDate(transfer.getDateJoined()));
 		demographic.setEndDate(toNullableLegacyDate(transfer.getEndDate()));
-		demographic.setProviderNo(transfer.getProviderNo());
 		demographic.setPatientStatus(transfer.getPatientStatus());
 		demographic.setPatientStatusDate(toNullableLegacyDate(transfer.getPatientStatusDate()));
 
@@ -76,8 +76,16 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		demographic.setRosterTerminationDate(toNullableLegacyDate(transfer.getRosterTerminationDate()));
 		demographic.setRosterTerminationReason(transfer.getRosterTerminationReason());
 
+		// physician info
+		demographic.setProviderNo(transfer.getProviderNo());
+		demographic.setFamilyDoctor(
+				"<rdohip>" + StringUtils.trimToEmpty(transfer.getReferralDoctorNo()) + "</rdohip>" +
+				"<rd>" + StringUtils.trimToEmpty(transfer.getReferralDoctorName()) + "</rd>");
+		demographic.setFamilyDoctor2(
+				"<rdohip>" + StringUtils.trimToEmpty(transfer.getFamilyDoctorNo()) + "</rdohip>" +
+				"<rd>" + StringUtils.trimToEmpty(transfer.getFamilyDoctorName()) + "</rd>");
+
 		// other info
-		demographic.setFamilyDoctor(transfer.getFamilyDoctor());
 		demographic.setPcnIndicator(transfer.getPcnIndicator());
 		demographic.setChartNo(transfer.getChartNo());
 		demographic.setLinks(transfer.getRosterTerminationReason());
@@ -122,12 +130,10 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		transfer.setHcType(demographic.getHcType());
 		transfer.setHcRenewDate(toNullableLocalDate(demographic.getHcRenewDate()));
 		transfer.setHcEffectiveDate(toNullableLocalDate(demographic.getEffDate()));
-		transfer.setProviderNo(demographic.getProviderNo());
 		transfer.setPatientStatus(demographic.getPatientStatus());
 		transfer.setPatientStatusDate(toNullableLocalDate(demographic.getPatientStatusDate()));
 		transfer.setDateJoined(toNullableLocalDate(demographic.getDateJoined()));
 		transfer.setEndDate(toNullableLocalDate(demographic.getEndDate()));
-
 
 		// contact info
 		transfer.setAddress(demographic.getAddress());
@@ -144,8 +150,15 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		transfer.setRosterTerminationDate(toNullableLocalDate(demographic.getRosterTerminationDate()));
 		transfer.setRosterTerminationReason(demographic.getRosterTerminationReason());
 
+		// physician info
+		transfer.setProviderNo(demographic.getProviderNo());
+		//TODO - handle commas & strings with null values
+		transfer.setReferralDoctorName(demographic.getFamilyDoctorLastName() + "," + demographic.getFamilyDoctorFirstName());
+		transfer.setReferralDoctorNo(demographic.getFamilyDoctorNumber());
+		transfer.setFamilyDoctorName(demographic.getFamilyDoctor2LastName() + "," + demographic.getFamilyDoctor2FirstName());
+		transfer.setFamilyDoctorNo(demographic.getFamilyDoctor2Number());
+
 		//other info
-		transfer.setFamilyDoctor(demographic.getFamilyDoctor());
 		transfer.setPcnIndicator(demographic.getPcnIndicator());
 		transfer.setChartNo(demographic.getChartNo());
 		transfer.setAlias(demographic.getAlias());
@@ -186,6 +199,13 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 	}
 	private LocalDate toLocalDate(Date legacyDate)
 	{
-		return legacyDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		LocalDate date = Instant
+				// get the millis value to build the Instant
+				.ofEpochMilli(legacyDate.getTime())
+				// convert to JVM default timezone
+				.atZone(ZoneId.systemDefault())
+				// convert to LocalDate
+				.toLocalDate();
+		return date;
 	}
 }
