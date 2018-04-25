@@ -168,13 +168,14 @@ public class DemographicManager {
 		return (results);
 	}
 
-	public List<DemographicExt> getDemographicExts(LoggedInInfo loggedInInfo, Integer id) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-		List<DemographicExt> result = null;
-
-		result = demographicExtDao.getDemographicExtByDemographicNo(id);
-
-		return result;
+	public List<DemographicExt> getDemographicExts(LoggedInInfo loggedInInfo, Integer id)
+	{
+		return getDemographicExts(loggedInInfo.getLoggedInProviderNo(), id);
+	}
+	public List<DemographicExt> getDemographicExts(String providerNo, Integer id)
+	{
+		checkPrivilege(providerNo, SecurityInfoManager.READ);
+		return demographicExtDao.getDemographicExtByDemographicNo(id);
 	}
 
 	public DemographicExt getDemographicExt(LoggedInInfo loggedInInfo, Integer demographicNo, String key) {
@@ -185,20 +186,32 @@ public class DemographicManager {
 		return result;
 	}
 
-	public DemographicCust getDemographicCust(LoggedInInfo loggedInInfo, Integer id) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-		DemographicCust result = demographicCustDao.find(id);
-
-		return result;
+	public DemographicCust getDemographicCust(LoggedInInfo loggedInInfo, Integer id)
+	{
+		return getDemographicCust(loggedInInfo.getLoggedInProviderNo(), id);
+	}
+	public DemographicCust getDemographicCust(String providerNo, Integer id)
+	{
+		checkPrivilege(providerNo, SecurityInfoManager.READ);
+		return demographicCustDao.find(id);
 	}
 
-	public void createUpdateDemographicCust(LoggedInInfo loggedInInfo, DemographicCust demoCust) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
-		if (demoCust != null) {
+	public void createUpdateDemographicCust(LoggedInInfo loggedInInfo, DemographicCust demoCust)
+	{
+		createUpdateDemographicCust(loggedInInfo.getLoggedInProviderNo(), demoCust);
+	}
+
+	public void createUpdateDemographicCust(String providerNo, DemographicCust demoCust)
+	{
+		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
+		if(demoCust != null)
+		{
 			//Archive previous demoCust
 			DemographicCust prevCust = demographicCustDao.find(demoCust.getId());
-			if (prevCust != null) {
-				if (!(StringUtils.nullSafeEquals(prevCust.getAlert(), demoCust.getAlert()) && StringUtils.nullSafeEquals(prevCust.getMidwife(), demoCust.getMidwife()) && StringUtils.nullSafeEquals(prevCust.getNurse(), demoCust.getNurse()) && StringUtils.nullSafeEquals(prevCust.getResident(), demoCust.getResident()) && StringUtils.nullSafeEquals(prevCust.getNotes(), demoCust.getNotes()))) {
+			if(prevCust != null)
+			{
+				if(!(StringUtils.nullSafeEquals(prevCust.getAlert(), demoCust.getAlert()) && StringUtils.nullSafeEquals(prevCust.getMidwife(), demoCust.getMidwife()) && StringUtils.nullSafeEquals(prevCust.getNurse(), demoCust.getNurse()) && StringUtils.nullSafeEquals(prevCust.getResident(), demoCust.getResident()) && StringUtils.nullSafeEquals(prevCust.getNotes(), demoCust.getNotes())))
+				{
 					demographicCustArchiveDao.archiveDemographicCust(prevCust);
 				}
 			}
@@ -231,8 +244,14 @@ public class DemographicManager {
 			throw new IllegalArgumentException("Birth date was specified for " + demographic.getFullName() + ": " + demographic.getBirthDayAsString());
 		}
 
-		demographic.setPatientStatus(PatientStatus.AC.name());
-		demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
+		if(demographic.getPatientStatus() == null)
+		{
+			demographic.setPatientStatus(PatientStatus.AC.name());
+		}
+		if(demographic.getFamilyDoctor() == null)
+		{
+			demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
+		}
 		demographic.setLastUpdateUser(providerNo);
 		demographicDao.save(demographic);
 

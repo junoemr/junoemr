@@ -23,6 +23,7 @@
 
 package org.oscarehr.ws.external.rest.v1;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.util.MiscUtils;
@@ -51,6 +52,7 @@ public class ProviderWs extends AbstractExternalRestWs
 	//TODO use a custom transfer object
 	@GET
 	@Path("/{id}")
+	@Operation(summary = "Retrieve an existing provider record by provider id.")
 	public RestResponse<ProviderTransfer> getProvider(@PathParam("id") String id)
 	{
 		ProviderTransfer providerTransfer;

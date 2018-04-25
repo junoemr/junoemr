@@ -89,6 +89,9 @@ public class DemographicTransfer implements Serializable
 	private String patientStatus;
 	@Schema(description = "date of last patient status change")
 	private LocalDate patientStatusDate;
+	@Size(max=32)
+	@Schema(description = "patient veteran number")
+	private String veteranNo;
 
 	// address and contact info
 	@Size(max=100)
@@ -137,6 +140,18 @@ public class DemographicTransfer implements Serializable
 	@ProviderNoConstraint(allowNull = true)
 	@Schema(description = "patient assigned physician unique identifier. Id must match an existing provider record.")
 	private String providerNo;
+	@Size(max=6)
+	@ProviderNoConstraint(allowNull = true)
+	@Schema(description = "patient assigned resident unique identifier. Id must match an existing provider record.")
+	private String resident;
+	@Size(max=6)
+	@ProviderNoConstraint(allowNull = true)
+	@Schema(description = "patient assigned nurse unique identifier. Id must match an existing provider record.")
+	private String nurse;
+	@Size(max=6)
+	@ProviderNoConstraint(allowNull = true)
+	@Schema(description = "patient assigned midwife unique identifier. Id must match an existing provider record.")
+	private String midwife;
 	@Size(max=45)
 	@Schema(description = "referring doctor full name (Last, First)", example = "LastName,FirstName")
 	private String referralDoctorName;
@@ -163,10 +178,26 @@ public class DemographicTransfer implements Serializable
 	private String sourceOfIncome;
 	@Size(max=40)
 	private String citizenship;
+	@Size(max=4)
+	@Schema(description = "country of origin country code", example = "CA")
+	private String countryOfOrigin;
 	@Size(max=60)
 	private String spokenLanguage;
 	@Size(max=60)
 	private String officialLanguage;
+	@Size(max=32)
+	@StringValueConstraint(allows = {"No","Paper","Electronic"})
+	@Schema(description = "newsletter type", allowableValues = {"No","Paper","Electronic"})
+	private String newsletter;
+	@Size(max=32)
+	private String anonymous;
+
+	// notes
+	@Schema(description = "The note on the patient master file")
+	private String notes;
+	@Schema(description = "The alert on the patient master file")
+	private String alert;
+
 
 	public Integer getDemographicNo()
 	{
@@ -336,6 +367,36 @@ public class DemographicTransfer implements Serializable
 	public void setProviderNo(String providerNo)
 	{
 		this.providerNo = providerNo;
+	}
+
+	public String getResident()
+	{
+		return resident;
+	}
+
+	public void setResident(String resident)
+	{
+		this.resident = resident;
+	}
+
+	public String getNurse()
+	{
+		return nurse;
+	}
+
+	public void setNurse(String nurse)
+	{
+		this.nurse = nurse;
+	}
+
+	public String getMidwife()
+	{
+		return midwife;
+	}
+
+	public void setMidwife(String midwife)
+	{
+		this.midwife = midwife;
 	}
 
 	public String getAddress()
@@ -586,6 +647,66 @@ public class DemographicTransfer implements Serializable
 	public void setOfficialLanguage(String officialLanguage)
 	{
 		this.officialLanguage = officialLanguage;
+	}
+
+	public String getVeteranNo()
+	{
+		return veteranNo;
+	}
+
+	public void setVeteranNo(String veteranNo)
+	{
+		this.veteranNo = veteranNo;
+	}
+
+	public String getCountryOfOrigin()
+	{
+		return countryOfOrigin;
+	}
+
+	public void setCountryOfOrigin(String countryOfOrigin)
+	{
+		this.countryOfOrigin = countryOfOrigin;
+	}
+
+	public String getNewsletter()
+	{
+		return newsletter;
+	}
+
+	public void setNewsletter(String newsletter)
+	{
+		this.newsletter = newsletter;
+	}
+
+	public String getAnonymous()
+	{
+		return anonymous;
+	}
+
+	public void setAnonymous(String anonymous)
+	{
+		this.anonymous = anonymous;
+	}
+
+	public String getNotes()
+	{
+		return notes;
+	}
+
+	public void setNotes(String notes)
+	{
+		this.notes = notes;
+	}
+
+	public String getAlert()
+	{
+		return alert;
+	}
+
+	public void setAlert(String alert)
+	{
+		this.alert = alert;
 	}
 
 	@Override

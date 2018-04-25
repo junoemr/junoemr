@@ -54,21 +54,22 @@ public class DemographicsWs extends AbstractExternalRestWs
 	@Autowired
 	private DemographicManager demographicManager;
 
+	//TODO use a custom transfer object
 	@GET
 	@Path("/search")
 	@Operation(summary = "Search demographics by parameter")
 	public RestSearchResponse<DemographicSearchResult> search(
 			@QueryParam("page")
 			@DefaultValue("1")
-			@Parameter(description = "requested result page")
+			@Parameter(description = "Requested result page")
 					Integer page,
 			@QueryParam("perPage")
 			@DefaultValue("10")
-			@Parameter(description = "number of results per page")
+			@Parameter(description = "Number of results per page")
 					Integer perPage,
 			@QueryParam("exactMatch")
 			@DefaultValue("false")
-			@Parameter(description = "when true, search results wil only be returned if they are a complete match. Otherwise partial matches may be returned.")
+			@Parameter(description = "When true, search results will only be returned if they are a complete match. Otherwise partial matches may be returned.")
 					Boolean exactMatch,
 			@Parameter(description = "Match results by health insurance number")
 			@QueryParam("hin") String hin

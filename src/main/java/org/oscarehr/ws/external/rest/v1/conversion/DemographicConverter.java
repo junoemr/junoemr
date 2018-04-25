@@ -24,22 +24,23 @@
 
 package org.oscarehr.ws.external.rest.v1.conversion;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.common.model.DemographicCust;
+import org.oscarehr.common.model.DemographicExt;
 import org.oscarehr.ws.external.rest.v1.transfer.DemographicTransfer;
-import org.oscarehr.ws.rest.conversion.AbstractConverter;
-import org.oscarehr.ws.rest.conversion.ConversionException;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-public class DemographicConverter extends AbstractConverter<Demographic, DemographicTransfer>
+public class DemographicConverter
 {
-	@Override
-	public Demographic getAsDomainObject(LoggedInInfo loggedInInfo, DemographicTransfer transfer) throws ConversionException
+	public Demographic getAsDomainObject(DemographicTransfer transfer)
 	{
 		Demographic demographic = new Demographic();
 
@@ -60,6 +61,7 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		demographic.setEndDate(toNullableLegacyDate(transfer.getEndDate()));
 		demographic.setPatientStatus(transfer.getPatientStatus());
 		demographic.setPatientStatusDate(toNullableLegacyDate(transfer.getPatientStatusDate()));
+		demographic.setVeteranNo(transfer.getVeteranNo());
 
 		// contact info
 		demographic.setAddress(transfer.getAddress());
@@ -79,11 +81,11 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		// physician info
 		demographic.setProviderNo(transfer.getProviderNo());
 		demographic.setFamilyDoctor(
-				"<rdohip>" + StringUtils.trimToEmpty(transfer.getReferralDoctorNo()) + "</rdohip>" +
-				"<rd>" + StringUtils.trimToEmpty(transfer.getReferralDoctorName()) + "</rd>");
+				"<rdohip>" + StringEscapeUtils.escapeXml(StringUtils.trimToEmpty(transfer.getReferralDoctorNo())) + "</rdohip>" +
+				"<rd>" + StringEscapeUtils.escapeXml(StringUtils.trimToEmpty(transfer.getReferralDoctorName())) + "</rd>");
 		demographic.setFamilyDoctor2(
-				"<rdohip>" + StringUtils.trimToEmpty(transfer.getFamilyDoctorNo()) + "</rdohip>" +
-				"<rd>" + StringUtils.trimToEmpty(transfer.getFamilyDoctorName()) + "</rd>");
+				"<fd>" + StringEscapeUtils.escapeXml(StringUtils.trimToEmpty(transfer.getFamilyDoctorNo())) + "</fd>" +
+				"<fdname>" + StringEscapeUtils.escapeXml(StringUtils.trimToEmpty(transfer.getFamilyDoctorName())) + "</fdname>");
 
 		// other info
 		demographic.setPcnIndicator(transfer.getPcnIndicator());
@@ -95,25 +97,44 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		demographic.setCitizenship(transfer.getCitizenship());
 		demographic.setSpokenLanguage(transfer.getSpokenLanguage());
 		demographic.setOfficialLanguage(transfer.getOfficialLanguage());
-
-//		DemographicExt[] exts = new DemographicExt[transfer.getExtras().size()];
-//		for (int i = 0; i < transfer.getExtras().size(); i++) {
-//			exts[i] = demoExtConverter.getAsDomainObject(loggedInInfo, transfer.getExtras().get(i));
-//
-//			if (exts[i].getDemographicNo()==null) exts[i].setDemographicNo(demographic.getDemographicNo());
-//			if (exts[i].getProviderNo()==null) exts[i].setProviderNo(loggedInInfo.getLoggedInProviderNo());
-//		}
-//		demographic.setExtras(exts);
-//
-//		if (transfer.getProvider() != null) {
-//			demographic.setProvider(providerConverter.getAsDomainObject(loggedInInfo, transfer.getProvider()));
-//		}
+		demographic.setCountryOfOrigin(transfer.getCountryOfOrigin());
+		demographic.setNewsletter(transfer.getNewsletter());
+		demographic.setAnonymous(transfer.getAnonymous());
 
 		return demographic;
 	}
+	public List<DemographicExt> getExtensionList(DemographicTransfer transfer)
+	{
+		List<DemographicExt> extensionList = new ArrayList<>(1);
 
-	@Override
-	public DemographicTransfer getAsTransferObject(LoggedInInfo loggedInInfo, Demographic demographic) throws ConversionException
+		if(transfer.getCellPhone() != null)
+		{
+			DemographicExt extension = new DemographicExt();
+			extension.setDemographicNo(transfer.getDemographicNo());
+			extension.setDateCreated(new Date());
+			extension.setKey("demo_cell");
+			extension.setValue(transfer.getCellPhone());
+			extensionList.add(extension);
+		}
+		return extensionList;
+	}
+	public DemographicCust getCustom(DemographicTransfer transfer)
+	{
+		DemographicCust demographicCustom = null;
+		if (transfer.getNurse() != null || transfer.getResident() != null || transfer.getAlert() != null || transfer.getMidwife() != null || transfer.getNotes() != null)
+		{
+			demographicCustom = new DemographicCust();
+			demographicCustom.setId(transfer.getDemographicNo());
+			demographicCustom.setNurse(transfer.getNurse());
+			demographicCustom.setResident(transfer.getResident());
+			demographicCustom.setAlert(transfer.getAlert());
+			demographicCustom.setMidwife(transfer.getMidwife());
+			demographicCustom.setNotes("<unotes>" + StringEscapeUtils.escapeXml(StringUtils.trimToEmpty(transfer.getNotes())) + "</unotes>");
+		}
+		return demographicCustom;
+	}
+
+	public DemographicTransfer getAsTransferObject(Demographic demographic, List<DemographicExt> demographicExtensions, DemographicCust demographicCustom)
 	{
 		DemographicTransfer transfer = new DemographicTransfer();
 
@@ -134,6 +155,7 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		transfer.setPatientStatusDate(toNullableLocalDate(demographic.getPatientStatusDate()));
 		transfer.setDateJoined(toNullableLocalDate(demographic.getDateJoined()));
 		transfer.setEndDate(toNullableLocalDate(demographic.getEndDate()));
+		transfer.setVeteranNo(demographic.getVeteranNo());
 
 		// contact info
 		transfer.setAddress(demographic.getAddress());
@@ -152,10 +174,9 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 
 		// physician info
 		transfer.setProviderNo(demographic.getProviderNo());
-		//TODO - handle commas & strings with null values
-		transfer.setReferralDoctorName(demographic.getFamilyDoctorLastName() + "," + demographic.getFamilyDoctorFirstName());
+		transfer.setReferralDoctorName(demographic.getFamilyDoctorName());
 		transfer.setReferralDoctorNo(demographic.getFamilyDoctorNumber());
-		transfer.setFamilyDoctorName(demographic.getFamilyDoctor2LastName() + "," + demographic.getFamilyDoctor2FirstName());
+		transfer.setFamilyDoctorName(demographic.getFamilyDoctor2Name());
 		transfer.setFamilyDoctorNo(demographic.getFamilyDoctor2Number());
 
 		//other info
@@ -167,17 +188,31 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		transfer.setCitizenship(demographic.getCitizenship());
 		transfer.setSpokenLanguage(demographic.getSpokenLanguage());
 		transfer.setOfficialLanguage(demographic.getOfficialLanguage());
+		transfer.setCountryOfOrigin(demographic.getCountryOfOrigin());
+		transfer.setNewsletter(demographic.getNewsletter());
+		transfer.setAnonymous(demographic.getAnonymous());
 
-//		if (d.getExtras() != null) {
-//			for (DemographicExt ext : d.getExtras()) {
-//				t.getExtras().add(demoExtConverter.getAsTransferObject(loggedInInfo,ext));
-//			}
-//		}
-//
-//		if (d.getProvider() != null) {
-//			t.setProvider(providerConverter.getAsTransferObject(loggedInInfo,d.getProvider()));
-//		}
+		if(demographicExtensions != null)
+		{
+			for(DemographicExt extension : demographicExtensions)
+			{
+				String key = extension.getKey();
+				String value = StringUtils.trimToNull(extension.getValue());
 
+				switch(key)
+				{
+					case "demo_cell": transfer.setCellPhone(value); break;
+				}
+			}
+		}
+		if(demographicCustom != null)
+		{
+			transfer.setNotes(StringUtils.substringBetween(demographicCustom.getNotes(), "<unotes>", "</unotes>"));
+			transfer.setAlert(demographicCustom.getAlert());
+			transfer.setMidwife(demographicCustom.getMidwife());
+			transfer.setNurse(demographicCustom.getNurse());
+			transfer.setResident(demographicCustom.getResident());
+		}
 		return transfer;
 	}
 

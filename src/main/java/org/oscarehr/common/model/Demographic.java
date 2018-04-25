@@ -630,17 +630,6 @@ public class Demographic implements Serializable
 		}
 		return "";
 	}
-	public String getFamilyDoctor2LastName()
-	{
-
-		Matcher m = FD_LAST_NAME.matcher(getFamilyDoctor2());
-
-		if (m.find())
-		{
-			return m.group(1);
-		}
-		return "";
-	}
 
 	/**
 	 * Return the first name as parsed from column: family_doctor
@@ -655,15 +644,14 @@ public class Demographic implements Serializable
 		}
 		return "";
 	}
-	public String getFamilyDoctor2FirstName()
+	public String getFamilyDoctorName()
 	{
-		Matcher m = FD_FIRST_NAME.matcher(getFamilyDoctor2());
+		return StringUtils.substringBetween(getFamilyDoctor(), "<rd>", "</rd>");
+	}
 
-		if (m.find())
-		{
-			return m.group(1);
-		}
-		return "";
+	public String getFamilyDoctor2Name()
+	{
+		return StringUtils.substringBetween(getFamilyDoctor2(), "<fdname>", "</fdname>");
 	}
 
 	/**
@@ -671,27 +659,12 @@ public class Demographic implements Serializable
 	 */
 	public String getFamilyDoctorNumber()
 	{
-
-		Matcher m = FD_OHIP.matcher(getFamilyDoctor());
-
-		if (m.find())
-		{
-			return m.group(1);
-		}
-
-		return "";
+		return StringUtils.substringBetween(getFamilyDoctor(), "<rdohip>", "</rdohip>");
 	}
 	public String getFamilyDoctor2Number()
 	{
 
-		Matcher m = FD_OHIP.matcher(getFamilyDoctor2());
-
-		if (m.find())
-		{
-			return m.group(1);
-		}
-
-		return "";
+		return StringUtils.substringBetween(getFamilyDoctor2(), "<fd>", "</fd>");
 	}
 
 	/**

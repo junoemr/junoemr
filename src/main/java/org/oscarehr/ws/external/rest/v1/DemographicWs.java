@@ -27,6 +27,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.DemographicCust;
+import org.oscarehr.common.model.DemographicExt;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
@@ -49,6 +51,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Date;
+import java.util.List;
 
 @Component("DemographicWs")
 @Path("/demographic")
@@ -77,8 +80,15 @@ public class DemographicWs extends AbstractExternalRestWs
 		try
 		{
 			String providerNoStr = getOAuthProviderNo();
+			int providerNo = Integer.parseInt(providerNoStr);
 			Demographic demographic = demographicManager.getDemographic(providerNoStr, demographicNo);
-			demographicTransfer = demographicConverter.getAsTransferObject(null, demographic);
+			List<DemographicExt> demoExtras = demographicManager.getDemographicExts(providerNoStr, demographicNo);
+			DemographicCust demoCustom = demographicManager.getDemographicCust(providerNoStr, demographicNo);
+
+			demographicTransfer = demographicConverter.getAsTransferObject(demographic, demoExtras, demoCustom);
+
+			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
 		}
 		catch(SecurityException e)
 		{
@@ -98,7 +108,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Update an existing patient demographic record by demographic id.")
 	public RestResponse<DemographicTransfer> putDemographic(@PathParam("id") Integer demographicNo,
-	                                                                @Valid DemographicTransfer demographicTo)
+	                                                        @Valid DemographicTransfer demographicTo)
 	{
 		return RestResponse.errorResponse("Not Implemented");
 	}
@@ -108,10 +118,10 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Operation(summary = "Add a new patient demographic record to the system.")
 	public RestResponse<Integer> postDemographic(@Valid DemographicTransfer demographicTo)
 	{
-		Demographic demographic;
+		Integer demographicNo;
 		try
 		{
-			demographic = demographicConverter.getAsDomainObject(null, demographicTo);
+			Demographic demographic = demographicConverter.getAsDomainObject(demographicTo);
 
 			if(demographic.getDemographicNo() != null)
 			{
@@ -125,9 +135,28 @@ public class DemographicWs extends AbstractExternalRestWs
 			demographic.setLastUpdateDate(new Date());
 			demographic.setLastUpdateUser(providerNoStr);
 
+			// save the base demographic object
 			demographicManager.createDemographic(providerNoStr, demographic, getDefaultProgramId());
+			demographicNo = demographic.getDemographicNo();
 
-			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, ip);
+			DemographicCust demoCustom = demographicConverter.getCustom(demographicTo);
+			if(demoCustom != null)
+			{
+				// save the custom fields
+				demoCustom.setId(demographicNo);
+				demographicManager.createUpdateDemographicCust(providerNoStr, demoCustom);
+			}
+			List<DemographicExt> demographicExtensions = demographicConverter.getExtensionList(demographicTo);
+			for(DemographicExt extension : demographicExtensions)
+			{
+				//save the extension fields
+				extension.setDemographicNo(demographicNo);
+				extension.setProviderNo(providerNoStr);
+				demographicManager.createExtension(providerNoStr, extension);
+			}
+
+			// log the action and update the access record
+			LogAction.addLogEntry(providerNoStr, demographicNo, LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, ip);
 			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
 		}
 		catch(SecurityException e)
@@ -140,7 +169,7 @@ public class DemographicWs extends AbstractExternalRestWs
 			logger.error("Error", e);
 			return RestResponse.errorResponse("System Error");
 		}
-		return RestResponse.successResponse(demographic.getDemographicNo());
+		return RestResponse.successResponse(demographicNo);
 	}
 
 	private Integer getDefaultProgramId()
