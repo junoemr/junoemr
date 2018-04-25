@@ -21,61 +21,42 @@
  * Hamilton
  * Ontario, Canada
  */
-
-package org.oscarehr.ws.rest.response;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+package org.oscarehr.ws.rest.util;
 
 import java.io.Serializable;
 
-@Schema(description = "Generic response wrapper object")
-public class GenericRestResponse<H, B, E> implements Serializable
+public class ValidationError implements Serializable
 {
-	public enum ResponseStatus
+	private String path;
+	private String message;
+
+	public ValidationError()
 	{
-		SUCCESS, ERROR
+		this(null,null);
+	}
+	public ValidationError(String path, String message)
+	{
+		this.path = path;
+		this.message = message;
 	}
 
-	private final H headers;
-	private final B body;
-	private final E error;
-	private final ResponseStatus status;
-
-	protected GenericRestResponse(H headers, B body, E error, ResponseStatus status)
+	public String getPath()
 	{
-		this.headers = headers;
-		this.body= body;
-		this.error = error;
-		this.status = status;
+		return path;
 	}
 
-	public H getHeaders()
+	public void setPath(String path)
 	{
-		return headers;
+		this.path = path;
 	}
 
-	public B getBody()
+	public String getMessage()
 	{
-		return body;
+		return message;
 	}
 
-	public E getError()
+	public void setMessage(String message)
 	{
-		return error;
-	}
-
-	public ResponseStatus getStatus()
-	{
-		return status;
-	}
-
-	/**
-	 * override the toString on this object to write it as a JSON object string
-	 */
-	@Override
-	public String toString()
-	{
-		return ReflectionToStringBuilder.toString(this);
+		this.message = message;
 	}
 }

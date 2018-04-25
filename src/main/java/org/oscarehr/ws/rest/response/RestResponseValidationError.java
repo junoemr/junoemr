@@ -21,61 +21,33 @@
  * Hamilton
  * Ontario, Canada
  */
-
 package org.oscarehr.ws.rest.response;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.oscarehr.ws.rest.util.ValidationError;
 
-import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 
-@Schema(description = "Generic response wrapper object")
-public class GenericRestResponse<H, B, E> implements Serializable
+public class RestResponseValidationError extends RestResponseError
 {
-	public enum ResponseStatus
+	private List<ValidationError> validationErrors;
+
+	public RestResponseValidationError()
 	{
-		SUCCESS, ERROR
+		super();
+		validationErrors = new LinkedList<>();
 	}
-
-	private final H headers;
-	private final B body;
-	private final E error;
-	private final ResponseStatus status;
-
-	protected GenericRestResponse(H headers, B body, E error, ResponseStatus status)
+	public RestResponseValidationError(String message)
 	{
-		this.headers = headers;
-		this.body= body;
-		this.error = error;
-		this.status = status;
+		super(message);
+		validationErrors = new LinkedList<>();
 	}
-
-	public H getHeaders()
+	public void addError(String path, String message)
 	{
-		return headers;
+		validationErrors.add(new ValidationError(path, message));
 	}
-
-	public B getBody()
+	public List<ValidationError> getValidationErrors()
 	{
-		return body;
-	}
-
-	public E getError()
-	{
-		return error;
-	}
-
-	public ResponseStatus getStatus()
-	{
-		return status;
-	}
-
-	/**
-	 * override the toString on this object to write it as a JSON object string
-	 */
-	@Override
-	public String toString()
-	{
-		return ReflectionToStringBuilder.toString(this);
+		return validationErrors;
 	}
 }

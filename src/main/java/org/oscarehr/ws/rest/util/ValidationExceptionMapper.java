@@ -23,8 +23,10 @@
  */
 package org.oscarehr.ws.rest.util;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.response.RestResponseError;
+import org.oscarehr.ws.rest.response.RestResponseValidationError;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -32,12 +34,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Provider
 public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
+
+	private static final Logger logger = MiscUtils.getLogger();
 
 	public ValidationExceptionMapper()
 	{
@@ -46,49 +48,15 @@ public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViol
 	@Override
 	public Response toResponse(ConstraintViolationException exception)
 	{
-		List<ValidationError> errors = new ArrayList<>();
+		RestResponseValidationError responseError = new RestResponseValidationError("Constraint Violation Error");
 		for(ConstraintViolation constraintViolation: exception.getConstraintViolations())
 		{
-			errors.add(toValidationError(constraintViolation));
+			responseError.addError(constraintViolation.getPropertyPath().toString(), constraintViolation.getMessage());
 		}
 
-		RestResponse<List<ValidationError>> response = RestResponse.errorResponse(errors, new RestResponseError("Validation Error"));
+		RestResponse<String> response = RestResponse.errorResponse(responseError);
 
 		return Response.status(Response.Status.BAD_REQUEST).entity(response)
 			.type(MediaType.APPLICATION_JSON).build();
-	}
-
-	private ValidationError toValidationError(ConstraintViolation constraintViolation)
-	{
-		ValidationError error = new ValidationError();
-		error.setPath(constraintViolation.getPropertyPath().toString());
-		error.setMessage(constraintViolation.getMessage());
-		return error;
-	}
-
-	private class ValidationError
-	{
-		private String path;
-		private String message;
-
-		public String getPath()
-		{
-			return path;
-		}
-
-		public void setPath(String path)
-		{
-			this.path = path;
-		}
-
-		public String getMessage()
-		{
-			return message;
-		}
-
-		public void setMessage(String message)
-		{
-			this.message = message;
-		}
 	}
 }
