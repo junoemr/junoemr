@@ -230,7 +230,12 @@ public class Schedule
 			endDate = MyDateFormat.getSysDate(endDateStr);
 		}
 
-		List<RSchedule> rsl = rScheduleDao.findByProviderNoAndDates(providerNo, startDate);
+		if (endDate == null)
+		{
+			throw new IllegalArgumentException("End date cannot be null");
+		}
+
+		List<RSchedule> rsl = rScheduleDao.findByProviderNoAndStartEndDates(providerNo, startDate, endDate);
 		for(RSchedule rs : rsl)
 		{
 			rs.setStatus(RSchedule.STATUS_DELETED);
