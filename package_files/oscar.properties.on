@@ -1013,6 +1013,3 @@ assign_document.link_docs_to_provider=yes
 
 # Show appointment count for providers on schedule page
 schedule.show_appointment_count=no
-
-# OHSUPPORT-3434 -- add email link to the patient email address in the demographic master file.
-enable_demographic_email_link=false
