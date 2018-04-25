@@ -205,20 +205,6 @@
 		<script type="text/javascript">
 			function validateForm()
 			{
-				<%boolean isMultisitesOn = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();%>
-
-				<% if (isMultisitesOn)
-					{
-				%>
-						if ($('[name="location"] option').length == 0)
-						{
-							window.alert("<bean:message key="appointment.addappointment.msgNoSiteAssigned"/>");
-							return false;
-						}
-				<%
-					}
-				%>
-
 				if (document.ADDAPPT.notes.value.length > 255)
 				{
 					window.alert("<bean:message key="appointment.editappointment.msgNotesTooBig"/>");
