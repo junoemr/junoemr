@@ -26,9 +26,12 @@ package org.oscarehr.common.dao;
 
 
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 import org.oscarehr.common.model.MyGroup;
 import org.oscarehr.common.model.MyGroupPrimaryKey;
@@ -85,6 +88,59 @@ public class MyGroupDao extends AbstractDao<MyGroup> {
 
          return dList;
      }
+
+    /**
+     * Gets only the group members that have a schedule for the provided date.
+     * @param groupNo The group to get the records for
+	 * @param date The date to check for schedules
+     * @param providerNo Include this provider even if there is no schedule
+     * @return
+     */
+    public List<MyGroup> getGroupWithScheduleByGroupNo(String groupNo, LocalDate date, Integer providerNo)
+	{
+        String sql = "SELECT " +
+			"  g.mygroup_no, " +
+			"  g.provider_no, " +
+			"  g.last_name," +
+			"  g.first_name, " +
+			"  g.vieworder, " +
+			"  g.default_billing_form " +
+		"FROM mygroup g " +
+		"LEFT JOIN scheduledate sd ON g.provider_no = sd.provider_no " +
+		"WHERE g.mygroup_no = :groupNo " +
+		"AND ((sd.status = 'A' " +
+		"AND sd.sdate = :date " +
+		"AND sd.id IS NOT NULL) OR g.provider_no = :providerNo) ";
+
+		Query query = entityManager.createNativeQuery(sql);
+
+		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
+		query.setParameter("groupNo", groupNo);
+		query.setParameter("providerNo", providerNo);
+
+        @SuppressWarnings("unchecked")
+		List<Object[]> results = query.getResultList();
+
+		List<MyGroup> groupList = new ArrayList<>();
+		for(Object[] result: results)
+		{
+			MyGroup myGroup = new MyGroup();
+
+			MyGroupPrimaryKey id = new MyGroupPrimaryKey();
+			id.setMyGroupNo((String) result[0]);
+			id.setProviderNo((String) result[1]);
+
+			myGroup.setId(id);
+			myGroup.setLastName((String) result[2]);
+			myGroup.setFirstName((String) result[3]);
+			myGroup.setViewOrder((String) result[4]);
+			myGroup.setDefaultBillingForm((String) result[5]);
+
+			groupList.add(myGroup);
+		}
+
+        return groupList;
+    }
 
      public void deleteGroupMember(String myGroupNo, String providerNo){
     	 MyGroupPrimaryKey key = new MyGroupPrimaryKey();
