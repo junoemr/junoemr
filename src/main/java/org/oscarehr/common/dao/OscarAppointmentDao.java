@@ -23,16 +23,8 @@
 
 package org.oscarehr.common.dao;
 
-import org.oscarehr.PMmodule.model.Program;
-import org.oscarehr.common.NativeSql;
-import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.AppointmentArchive;
-import org.oscarehr.common.model.Facility;
-import org.oscarehr.util.MiscUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Repository;
-
-import javax.persistence.Query;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -41,6 +33,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
+import org.oscarehr.PMmodule.model.Program;
+import org.oscarehr.common.NativeSql;
+import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.AppointmentArchive;
+import org.oscarehr.common.model.Facility;
+import org.oscarehr.schedule.dto.AppointmentDetails;
+import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
@@ -749,5 +755,237 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 
 		return results;
 	}
-	
+
+	public List<Appointment> testMarker()
+	{
+		return testMarker("");
+	}
+
+	public List<Appointment> testMarker(String label) {
+		String sql = "SELECT '" + label + "============================================================='";
+		Query query = entityManager.createNativeQuery(sql);
+
+		@SuppressWarnings("unchecked")
+		List<Appointment> results =  query.getResultList();
+
+		return results;
+	}
+
+	public SortedMap<LocalTime, List<AppointmentDetails>> findAppointmentDetailsByDateAndProvider(
+		LocalDate date, Integer providerNo, String site)
+	{
+		String sql = "SELECT\n" +
+				"  a.appointment_no,\n" +
+				"  a.demographic_no,\n" +
+				"  a.appointment_date,\n" +
+				"  a.start_time,\n" +
+				"  a.end_time,\n" +
+				"  a.name,\n" +
+				"  a.notes,\n" +
+				"  a.reason,\n" +
+				"  a.reasonCode,\n" +
+				"  a.location,\n" +
+				"  a.resources,\n" +
+				"  a.type,\n" +
+				"  a.style,\n" +
+				"  a.bookingSource,\n" +
+				"  a.status,\n" +
+				"  a.urgency,\n" +
+				"  aps.description,\n" +
+				"  aps.color,\n" +
+				"  aps.icon,\n" +
+				"  aps.short_letter_colour,\n" +
+				"  aps.short_letters,\n" +
+				"  d.first_name,\n" +
+				"  d.last_name,\n" +
+				"  d.hc_renew_date,\n" +
+				"  d.ver,\n" +
+				"  d.roster_status,\n" +
+				"  d.year_of_birth,\n" +
+				"  d.month_of_birth,\n" +
+				"  d.date_of_birth,\n" +
+				"  dc.content AS cust_notes,\n" +
+				"  dc.cust3 AS cust_alert,\n" +
+				"  p.value AS color_property,\n" +
+				"  MAX(t.tickler_no) AS max_tickler_no,\n" +
+				"  GROUP_CONCAT(t.message SEPARATOR '\n') AS tickler_messages\n" +
+				"FROM appointment a\n" +
+				"JOIN appointment_status aps ON a.status = aps.status\n" +
+				"LEFT JOIN demographic d ON a.demographic_no = d.demographic_no\n" +
+				"LEFT JOIN demographiccust dc ON a.demographic_no = dc.demographic_no\n" +
+				"LEFT JOIN property p \n" +
+				"  ON d.provider_no = p.provider_no AND p.name = :property_name\n" +
+				"LEFT JOIN tickler t \n" +
+				"  ON d.demographic_no = t.demographic_no \n" +
+				"  AND t.service_date <= a.appointment_date \n" +
+				"  AND t.status = 'A'\n" +
+				"WHERE a.appointment_date = :date\n" +
+				"AND a.provider_no = :providerNo\n";
+
+				if(site != null)
+				{
+					sql += "AND a.location = :location\n";
+				}
+
+				sql += "GROUP BY   \n" +
+				"  a.appointment_no,\n" +
+				"  a.demographic_no,\n" +
+				"  a.appointment_date,\n" +
+				"  a.start_time,\n" +
+				"  a.end_time,\n" +
+				"  a.name,\n" +
+				"  a.notes,\n" +
+				"  a.reason,\n" +
+				"  a.reasonCode,\n" +
+				"  a.location,\n" +
+				"  a.resources,\n" +
+				"  a.type,\n" +
+				"  a.style,\n" +
+				"  a.bookingSource,\n" +
+				"  a.status,\n" +
+				"  a.urgency,\n" +
+				"  aps.description,\n" +
+				"  aps.color,\n" +
+				"  aps.icon,\n" +
+				"  aps.short_letter_colour,\n" +
+				"  aps.short_letters,\n" +
+				"  d.first_name,\n" +
+				"  d.last_name,\n" +
+				"  d.hc_renew_date,\n" +
+				"  d.ver,\n" +
+				"  d.roster_status,\n" +
+				"  d.year_of_birth,\n" +
+				"  d.month_of_birth,\n" +
+				"  d.date_of_birth,\n" +
+				"  dc.content,\n" +
+				"  dc.cust3,\n" +
+				"  p.value\n" +
+				"ORDER BY a.start_time, appointment_no\n";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("property_name", UserPropertyDAO.COLOR_PROPERTY);
+		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
+		query.setParameter("providerNo", providerNo);
+
+		if(site != null)
+		{
+			query.setParameter("location", site);
+		}
+
+		List<Object[]> results = query.getResultList();
+
+		SortedMap<LocalTime, List<AppointmentDetails>> appointmentDetails = new TreeMap<>();
+
+		for(Object[] result: results)
+		{
+			int index = 0;
+			Integer appointmentNo = (Integer) result[index++];
+			Integer demographicNo = (Integer) result[index++];
+			LocalDate appointmentDate = ((java.sql.Date) result[index++]).toLocalDate();
+			LocalTime startTime = ((java.sql.Time) result[index++]).toLocalTime();
+			LocalTime endTime = ((java.sql.Time) result[index++]).toLocalTime();
+			String name = (String) result[index++];
+			String notes = (String) result[index++];
+			String reason = (String) result[index++];
+			Integer reasonCode = (Integer) result[index++];
+			String location = (String) result[index++];
+			String resources = (String) result[index++];
+			String type = (String) result[index++];
+			String style = (String) result[index++];
+			String bookingSource = (String) result[index++];
+			String status = (String) result[index++];
+			String urgency = (String) result[index++];
+			String statusTitle = (String) result[index++];
+			String color = (String) result[index++];
+			String iconImage = (String) result[index++];
+			Integer shortLetterColour = (Integer) result[index++];
+			String shortLetters = (String) result[index++];
+			String firstName = (String) result[index++];
+			String lastName = (String) result[index++];
+			java.sql.Date hcRenewDateRaw = (java.sql.Date) result[index++];
+			String ver = (String) result[index++];
+			String rosterStatus = (String) result[index++];
+			String yearOfBirth = (String) result[index++];
+			String monthOfBirth = (String) result[index++];
+			String dayOfBirth = (String) result[index++];
+			String custNotes = (String) result[index++];
+			String custAlert = (String) result[index++];
+			String colorProperty = (String) result[index++];
+			Integer maxTicklerNo = (Integer) result[index++];
+			String ticklerMessages = (String) result[index++];
+
+			if(status != null)
+			{
+				status = status.trim();
+			}
+
+			if(bookingSource != null)
+			{
+				bookingSource = bookingSource.trim();
+			}
+
+			List<AppointmentDetails> currentValue = appointmentDetails.get(startTime);
+
+			if(currentValue == null)
+			{
+				appointmentDetails.put(startTime, new ArrayList<>());
+			}
+
+			LocalDate hcRenewDate = null;
+			if(hcRenewDateRaw != null)
+			{
+				hcRenewDate = hcRenewDateRaw.toLocalDate();
+			}
+
+			LocalDate birthday = null;
+			if(yearOfBirth != null && monthOfBirth != null && dayOfBirth != null)
+			{
+				int year = Integer.parseInt(yearOfBirth);
+				int month = Integer.parseInt(monthOfBirth);
+				int day = Integer.parseInt(dayOfBirth);
+
+				birthday = LocalDate.of(year, month, day);
+
+			}
+
+			boolean hasTicklers = (maxTicklerNo != null);
+
+			appointmentDetails.get(startTime).add(new AppointmentDetails(
+				appointmentNo,
+				demographicNo,
+				appointmentDate,
+				startTime,
+				endTime,
+				name,
+				notes,
+				reason,
+				reasonCode,
+				location,
+				resources,
+				type,
+				style,
+				bookingSource,
+				status,
+				urgency,
+				statusTitle,
+				color,
+				iconImage,
+				shortLetterColour,
+				shortLetters,
+				firstName,
+				lastName,
+				ver,
+				rosterStatus,
+				hcRenewDate,
+				custNotes,
+				custAlert,
+				colorProperty,
+				birthday,
+				hasTicklers,
+				ticklerMessages
+			));
+		}
+
+		return appointmentDetails;
+	}
 }

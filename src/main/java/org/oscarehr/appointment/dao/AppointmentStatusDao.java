@@ -21,18 +21,20 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.appointment.dao;
 
 import java.math.BigInteger;
 import java.util.List;
 
 import javax.persistence.Query;
 
+import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class AppointmentStatusDao extends AbstractDao<AppointmentStatus> {
+public class AppointmentStatusDao extends AbstractDao<AppointmentStatus>
+{
 
 	public AppointmentStatusDao() {
 		super(AppointmentStatus.class);
@@ -59,7 +61,7 @@ public class AppointmentStatusDao extends AbstractDao<AppointmentStatus> {
     		return null;
     	}
     	
-    	Query q = entityManager.createQuery("select a from AppointmentStatus a where a.status like ?");
+    	Query q = entityManager.createQuery("select a from AppointmentStatus a where a.status like ?1");
     	q.setParameter(1, status.substring(0, 1) + "%");
     	
     	@SuppressWarnings("unchecked")
