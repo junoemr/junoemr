@@ -167,10 +167,10 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			filter.setStatus(status);
 			filter.setStartIndex(offset);
 			filter.setNumToReturn(perPage);
-			filter.setReferralStartDate(toNullableLegacyDate(toNullableLocalDate(referralStartDateString)));
-			filter.setReferralEndDate(toNullableLegacyDate(toNullableLocalDate(referralEndDate)));
-			filter.setAppointmentStartDate(toNullableLegacyDate(toNullableLocalDate(appointmentStartDate)));
-			filter.setAppointmentEndDate(toNullableLegacyDate(toNullableLocalDate(appointmentEndDate)));
+			filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(referralStartDateString)));
+			filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(referralEndDate)));
+			filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(appointmentStartDate)));
+			filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(appointmentEndDate)));
 			filter.setTeam(team);
 
 			filter.setSortMode(ConsultationRequestSearchFilter.SORTMODE.valueOf(sortColumn));
@@ -356,10 +356,10 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			filter.setStatus(status);
 			filter.setStartIndex(offset);
 			filter.setNumToReturn(perPage);
-			filter.setReferralStartDate(toNullableLegacyDate(toNullableLocalDate(referralStartDateString)));
-			filter.setReferralEndDate(toNullableLegacyDate(toNullableLocalDate(referralEndDate)));
-			filter.setAppointmentStartDate(toNullableLegacyDate(toNullableLocalDate(appointmentStartDate)));
-			filter.setAppointmentEndDate(toNullableLegacyDate(toNullableLocalDate(appointmentEndDate)));
+			filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(referralStartDateString)));
+			filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(referralEndDate)));
+			filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(appointmentStartDate)));
+			filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(appointmentEndDate)));
 			filter.setTeam(team);
 
 			filter.setSortMode(ConsultationResponseSearchFilter.SORTMODE.valueOf(sortColumn));

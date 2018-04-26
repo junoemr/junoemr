@@ -57,12 +57,4 @@ public class RestResponse<T> extends GenericRestResponse<RestResponseHeaders, T,
 	{
 		return errorResponse(new RestResponseError(errorMessage));
 	}
-
-	/**
-	 * for special cases where a body is required with the error status
-	 */
-	public static <T> RestResponse<T> errorResponse(T body, RestResponseError error)
-	{
-		return new RestResponse<>(new RestResponseHeaders(), body, error, ResponseStatus.ERROR);
-	}
 }

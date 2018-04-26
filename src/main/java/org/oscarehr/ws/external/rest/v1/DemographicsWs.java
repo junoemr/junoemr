@@ -29,6 +29,8 @@ import org.apache.log4j.Logger;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
+import org.oscarehr.ws.external.rest.v1.conversion.DemographicSearchConverter;
+import org.oscarehr.ws.external.rest.v1.transfer.DemographicSearchTransfer;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
@@ -54,11 +56,10 @@ public class DemographicsWs extends AbstractExternalRestWs
 	@Autowired
 	private DemographicManager demographicManager;
 
-	//TODO use a custom transfer object
 	@GET
 	@Path("/search")
 	@Operation(summary = "Search demographics by parameter")
-	public RestSearchResponse<DemographicSearchResult> search(
+	public RestSearchResponse<DemographicSearchTransfer> search(
 			@QueryParam("page")
 			@DefaultValue("1")
 			@Parameter(description = "Requested result page")
@@ -75,7 +76,7 @@ public class DemographicsWs extends AbstractExternalRestWs
 			@QueryParam("hin") String hin
 	)
 	{
-		List<DemographicSearchResult> response = new ArrayList<>(0);
+		List<DemographicSearchTransfer> response = new ArrayList<>(0);
 
 		int totalResultCount;
 		try
@@ -104,7 +105,8 @@ public class DemographicsWs extends AbstractExternalRestWs
 			totalResultCount = demographicManager.searchPatientsCount(getLoggedInInfo(), searchRequest);
 			if(totalResultCount > 0)
 			{
-				response = demographicManager.searchPatients(getLoggedInInfo(), searchRequest, offset, perPage);
+				List<DemographicSearchResult> list = demographicManager.searchPatients(getLoggedInInfo(), searchRequest, offset, perPage);
+				response = DemographicSearchConverter.getListAsTransferObjects(list);
 			}
 		}
 		catch(Exception e)

@@ -69,8 +69,6 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Autowired
 	ProgramManager programManager;
 
-	private static final DemographicConverter demographicConverter = new DemographicConverter();
-
 	@GET
 	@Path("/{id}")
 	@Operation(summary = "Retrieve an existing patient demographic record by demographic id.")
@@ -85,7 +83,7 @@ public class DemographicWs extends AbstractExternalRestWs
 			List<DemographicExt> demoExtras = demographicManager.getDemographicExts(providerNoStr, demographicNo);
 			DemographicCust demoCustom = demographicManager.getDemographicCust(providerNoStr, demographicNo);
 
-			demographicTransfer = demographicConverter.getAsTransferObject(demographic, demoExtras, demoCustom);
+			demographicTransfer = DemographicConverter.getAsTransferObject(demographic, demoExtras, demoCustom);
 
 			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
 			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
@@ -121,7 +119,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		Integer demographicNo;
 		try
 		{
-			Demographic demographic = demographicConverter.getAsDomainObject(demographicTo);
+			Demographic demographic = DemographicConverter.getAsDomainObject(demographicTo);
 
 			if(demographic.getDemographicNo() != null)
 			{
@@ -139,14 +137,14 @@ public class DemographicWs extends AbstractExternalRestWs
 			demographicManager.createDemographic(providerNoStr, demographic, getDefaultProgramId());
 			demographicNo = demographic.getDemographicNo();
 
-			DemographicCust demoCustom = demographicConverter.getCustom(demographicTo);
+			DemographicCust demoCustom = DemographicConverter.getCustom(demographicTo);
 			if(demoCustom != null)
 			{
 				// save the custom fields
 				demoCustom.setId(demographicNo);
 				demographicManager.createUpdateDemographicCust(providerNoStr, demoCustom);
 			}
-			List<DemographicExt> demographicExtensions = demographicConverter.getExtensionList(demographicTo);
+			List<DemographicExt> demographicExtensions = DemographicConverter.getExtensionList(demographicTo);
 			for(DemographicExt extension : demographicExtensions)
 			{
 				//save the extension fields

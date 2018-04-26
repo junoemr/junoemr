@@ -41,6 +41,7 @@ import org.oscarehr.ws.rest.to.model.AppDefinitionTo1;
 import org.oscarehr.ws.rest.to.model.RssItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -243,7 +244,7 @@ public class AppService extends AbstractServiceImpl {
 		    		OAuth1Utils.getOAuthDeleteResponse(k2aApp, k2aUser, "/ws/api/posts/comment/" + commentId, "/ws/api/posts/comment/" + commentId);
 		    	}
 	    	}
-			return RestResponse.successResponse(toLegacyDate(LocalDate.now()));
+			return RestResponse.successResponse(ConversionUtils.toLegacyDate(LocalDate.now()));
 		}
 		catch (Exception e) {
 			logger.error("error", e);

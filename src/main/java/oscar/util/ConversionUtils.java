@@ -29,8 +29,11 @@ import org.oscarehr.util.MiscUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -361,4 +364,50 @@ public class ConversionUtils {
 		return returnDate;
 	}
 
+
+	public static Date toNullableLegacyDate(LocalDate localDate)
+	{
+		if(localDate == null) return null;
+		return toLegacyDate(localDate);
+	}
+
+	public static Date toLegacyDate(LocalDate localDate)
+	{
+		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	}
+
+	protected Date toLegacyDateTime(LocalDateTime localDateTime)
+	{
+		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+	}
+
+	public static LocalDate toNullableLocalDate(String dateString)
+	{
+		if(dateString == null) return null;
+		return toLocalDate(dateString);
+	}
+
+	public static LocalDate toNullableLocalDate(Date legacyDate)
+	{
+		if(legacyDate == null) return null;
+		return toLocalDate(legacyDate);
+	}
+
+	public static LocalDate toLocalDate(String dateString)
+	{
+		ZonedDateTime result = ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
+		return result.toLocalDate();
+	}
+
+	public static LocalDate toLocalDate(Date legacyDate)
+	{
+		LocalDate date = Instant
+				// get the millis value to build the Instant
+				.ofEpochMilli(legacyDate.getTime())
+				// convert to JVM default timezone
+				.atZone(ZoneId.systemDefault())
+				// convert to LocalDate
+				.toLocalDate();
+		return date;
+	}
 }

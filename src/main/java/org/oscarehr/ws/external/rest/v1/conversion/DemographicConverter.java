@@ -30,17 +30,15 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicCust;
 import org.oscarehr.common.model.DemographicExt;
 import org.oscarehr.ws.external.rest.v1.transfer.DemographicTransfer;
+import oscar.util.ConversionUtils;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class DemographicConverter
 {
-	public Demographic getAsDomainObject(DemographicTransfer transfer)
+	public static Demographic getAsDomainObject(DemographicTransfer transfer)
 	{
 		Demographic demographic = new Demographic();
 
@@ -53,14 +51,14 @@ public class DemographicConverter
 		demographic.setHin(transfer.getHin());
 		demographic.setVer(transfer.getHcVersion());
 		demographic.setHcType(transfer.getHcType());
-		demographic.setHcRenewDate(toNullableLegacyDate(transfer.getHcRenewDate()));
+		demographic.setHcRenewDate(ConversionUtils.toNullableLegacyDate(transfer.getHcRenewDate()));
 		demographic.setSex(transfer.getSex());
-		demographic.setEffDate(toNullableLegacyDate(transfer.getHcEffectiveDate()));
+		demographic.setEffDate(ConversionUtils.toNullableLegacyDate(transfer.getHcEffectiveDate()));
 		demographic.setSin(transfer.getSin());
-		demographic.setDateJoined(toNullableLegacyDate(transfer.getDateJoined()));
-		demographic.setEndDate(toNullableLegacyDate(transfer.getEndDate()));
+		demographic.setDateJoined(ConversionUtils.toNullableLegacyDate(transfer.getDateJoined()));
+		demographic.setEndDate(ConversionUtils.toNullableLegacyDate(transfer.getEndDate()));
 		demographic.setPatientStatus(transfer.getPatientStatus());
-		demographic.setPatientStatusDate(toNullableLegacyDate(transfer.getPatientStatusDate()));
+		demographic.setPatientStatusDate(ConversionUtils.toNullableLegacyDate(transfer.getPatientStatusDate()));
 		demographic.setVeteranNo(transfer.getVeteranNo());
 
 		// contact info
@@ -74,8 +72,8 @@ public class DemographicConverter
 
 		//roster info
 		demographic.setRosterStatus(transfer.getRosterStatus());
-		demographic.setRosterDate(toNullableLegacyDate(transfer.getRosterDate()));
-		demographic.setRosterTerminationDate(toNullableLegacyDate(transfer.getRosterTerminationDate()));
+		demographic.setRosterDate(ConversionUtils.toNullableLegacyDate(transfer.getRosterDate()));
+		demographic.setRosterTerminationDate(ConversionUtils.toNullableLegacyDate(transfer.getRosterTerminationDate()));
 		demographic.setRosterTerminationReason(transfer.getRosterTerminationReason());
 
 		// physician info
@@ -103,7 +101,7 @@ public class DemographicConverter
 
 		return demographic;
 	}
-	public List<DemographicExt> getExtensionList(DemographicTransfer transfer)
+	public static List<DemographicExt> getExtensionList(DemographicTransfer transfer)
 	{
 		List<DemographicExt> extensionList = new ArrayList<>(1);
 
@@ -118,7 +116,7 @@ public class DemographicConverter
 		}
 		return extensionList;
 	}
-	public DemographicCust getCustom(DemographicTransfer transfer)
+	public static DemographicCust getCustom(DemographicTransfer transfer)
 	{
 		DemographicCust demographicCustom = null;
 		if (transfer.getNurse() != null || transfer.getResident() != null || transfer.getAlert() != null || transfer.getMidwife() != null || transfer.getNotes() != null)
@@ -134,7 +132,7 @@ public class DemographicConverter
 		return demographicCustom;
 	}
 
-	public DemographicTransfer getAsTransferObject(Demographic demographic, List<DemographicExt> demographicExtensions, DemographicCust demographicCustom)
+	public static DemographicTransfer getAsTransferObject(Demographic demographic, List<DemographicExt> demographicExtensions, DemographicCust demographicCustom)
 	{
 		DemographicTransfer transfer = new DemographicTransfer();
 
@@ -142,19 +140,19 @@ public class DemographicConverter
 		transfer.setDemographicNo(demographic.getDemographicNo());
 		transfer.setFirstName(demographic.getFirstName());
 		transfer.setLastName(demographic.getLastName());
-		transfer.setDateOfBirth(toNullableLocalDate(demographic.getBirthDate()));
+		transfer.setDateOfBirth(ConversionUtils.toNullableLocalDate(demographic.getBirthDate()));
 		transfer.setTitle(demographic.getTitle());
 		transfer.setSex(demographic.getSex());
 		transfer.setHin(demographic.getHin());
 		transfer.setSin(demographic.getSin());
 		transfer.setHcVersion(demographic.getVer());
 		transfer.setHcType(demographic.getHcType());
-		transfer.setHcRenewDate(toNullableLocalDate(demographic.getHcRenewDate()));
-		transfer.setHcEffectiveDate(toNullableLocalDate(demographic.getEffDate()));
+		transfer.setHcRenewDate(ConversionUtils.toNullableLocalDate(demographic.getHcRenewDate()));
+		transfer.setHcEffectiveDate(ConversionUtils.toNullableLocalDate(demographic.getEffDate()));
 		transfer.setPatientStatus(demographic.getPatientStatus());
-		transfer.setPatientStatusDate(toNullableLocalDate(demographic.getPatientStatusDate()));
-		transfer.setDateJoined(toNullableLocalDate(demographic.getDateJoined()));
-		transfer.setEndDate(toNullableLocalDate(demographic.getEndDate()));
+		transfer.setPatientStatusDate(ConversionUtils.toNullableLocalDate(demographic.getPatientStatusDate()));
+		transfer.setDateJoined(ConversionUtils.toNullableLocalDate(demographic.getDateJoined()));
+		transfer.setEndDate(ConversionUtils.toNullableLocalDate(demographic.getEndDate()));
 		transfer.setVeteranNo(demographic.getVeteranNo());
 
 		// contact info
@@ -168,8 +166,8 @@ public class DemographicConverter
 
 		// roster info
 		transfer.setRosterStatus(demographic.getRosterStatus());
-		transfer.setRosterDate(toNullableLocalDate(demographic.getRosterDate()));
-		transfer.setRosterTerminationDate(toNullableLocalDate(demographic.getRosterTerminationDate()));
+		transfer.setRosterDate(ConversionUtils.toNullableLocalDate(demographic.getRosterDate()));
+		transfer.setRosterTerminationDate(ConversionUtils.toNullableLocalDate(demographic.getRosterTerminationDate()));
 		transfer.setRosterTerminationReason(demographic.getRosterTerminationReason());
 
 		// physician info
@@ -214,33 +212,5 @@ public class DemographicConverter
 			transfer.setResident(demographicCustom.getResident());
 		}
 		return transfer;
-	}
-
-	//TODO move to new location and consolidate with AbstractServiceImpl version
-	private Date toNullableLegacyDate(LocalDate localDate)
-	{
-		if(localDate == null) return null;
-		return toLegacyDate(localDate);
-	}
-
-	private Date toLegacyDate(LocalDate localDate)
-	{
-		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-	}
-	private LocalDate toNullableLocalDate(Date legacyDate)
-	{
-		if(legacyDate == null) return null;
-		return toLocalDate(legacyDate);
-	}
-	private LocalDate toLocalDate(Date legacyDate)
-	{
-		LocalDate date = Instant
-				// get the millis value to build the Instant
-				.ofEpochMilli(legacyDate.getTime())
-				// convert to JVM default timezone
-				.atZone(ZoneId.systemDefault())
-				// convert to LocalDate
-				.toLocalDate();
-		return date;
 	}
 }

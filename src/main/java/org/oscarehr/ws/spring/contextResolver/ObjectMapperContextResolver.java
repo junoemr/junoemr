@@ -43,7 +43,7 @@ public class ObjectMapperContextResolver implements ContextResolver<ObjectMapper
 		MAPPER = new ObjectMapper();
 		MAPPER.registerModule(new JavaTimeModule());
 		MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-		logger.error("Configure JavaTimeModule Context Resolver");
+		logger.info("Configure JavaTimeModule Context Resolver");
 	}
 
 	@Override
