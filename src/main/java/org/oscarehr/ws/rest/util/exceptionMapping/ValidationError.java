@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest.util;
+package org.oscarehr.ws.rest.util.exceptionMapping;
 
 import java.io.Serializable;
 

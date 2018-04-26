@@ -47,7 +47,8 @@
 	</bean>
 
 	<bean id="exceptionMapper" class="org.apache.cxf.jaxrs.validation.ValidationExceptionMapper"/>
-	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.util.ValidationExceptionMapper"/>
+	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.util.exceptionMapping.ValidationExceptionMapper"/>
+	<bean id="invalidFormatExceptionMapper" class="org.oscarehr.ws.rest.util.exceptionMapping.InvalidFormatExceptionMapper"/>
 	<bean id="objectMapperProvider" class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
 
 	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
@@ -113,6 +114,7 @@
 			<ref bean="jaxb"/>
 			<ref bean="exceptionMapper"/>
 			<ref bean="validationExceptionMapper"/>
+			<ref bean="invalidFormatExceptionMapper"/>
 			<ref bean="objectMapperProvider"/>
 			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
 		</jaxrs:providers>

@@ -21,10 +21,8 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest.util;
+package org.oscarehr.ws.rest.util.exceptionMapping;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestResponseValidationError;
 
@@ -37,10 +35,8 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
-
-	private static final Logger logger = MiscUtils.getLogger();
-
+public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViolationException>
+{
 	public ValidationExceptionMapper()
 	{
 	}
@@ -49,7 +45,7 @@ public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViol
 	public Response toResponse(ConstraintViolationException exception)
 	{
 		RestResponseValidationError responseError = new RestResponseValidationError("Constraint Violation Error");
-		for(ConstraintViolation constraintViolation: exception.getConstraintViolations())
+		for(ConstraintViolation constraintViolation : exception.getConstraintViolations())
 		{
 			responseError.addError(constraintViolation.getPropertyPath().toString(), constraintViolation.getMessage());
 		}
@@ -57,6 +53,6 @@ public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViol
 		RestResponse<String> response = RestResponse.errorResponse(responseError);
 
 		return Response.status(Response.Status.BAD_REQUEST).entity(response)
-			.type(MediaType.APPLICATION_JSON).build();
+				.type(MediaType.APPLICATION_JSON).build();
 	}
 }

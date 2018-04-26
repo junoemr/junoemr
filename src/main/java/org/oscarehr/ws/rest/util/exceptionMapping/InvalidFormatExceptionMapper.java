@@ -21,33 +21,30 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest.response;
+package org.oscarehr.ws.rest.util.exceptionMapping;
 
-import org.oscarehr.ws.rest.util.exceptionMapping.ValidationError;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import org.oscarehr.ws.rest.response.RestResponse;
 
-import java.util.LinkedList;
-import java.util.List;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-public class RestResponseValidationError extends RestResponseError
+@Provider
+public class InvalidFormatExceptionMapper implements ExceptionMapper<InvalidFormatException>
 {
-	private List<ValidationError> validationErrors;
+	public InvalidFormatExceptionMapper()
+	{
+	}
 
-	public RestResponseValidationError()
+	@Override
+	public Response toResponse(InvalidFormatException exception)
 	{
-		super();
-		validationErrors = new LinkedList<>();
-	}
-	public RestResponseValidationError(String message)
-	{
-		super(message);
-		validationErrors = new LinkedList<>();
-	}
-	public void addError(String path, String message)
-	{
-		validationErrors.add(new ValidationError(path, message));
-	}
-	public List<ValidationError> getValidationErrors()
-	{
-		return validationErrors;
+		String originalMessage = exception.getOriginalMessage();
+		RestResponse<String> response = RestResponse.errorResponse(originalMessage);
+
+		return Response.status(Response.Status.BAD_REQUEST).entity(response)
+				.type(MediaType.APPLICATION_JSON).build();
 	}
 }
