@@ -105,6 +105,7 @@
 		<jaxrs:serviceBeans>
 			<bean class="org.oscarehr.ws.external.rest.v1.DemographicWs" autowire="byName"/>
 			<bean class="org.oscarehr.ws.external.rest.v1.DemographicsWs" autowire="byName"/>
+			<bean class="org.oscarehr.ws.external.rest.v1.DocumentWs" autowire="byName"/>
 			<bean class="org.oscarehr.ws.external.rest.v1.ProviderWs" autowire="byName"/>
 			<bean class="org.oscarehr.ws.external.rest.v1.ProvidersWs" autowire="byName"/>
 		</jaxrs:serviceBeans>

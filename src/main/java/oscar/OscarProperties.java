@@ -192,7 +192,6 @@ public class OscarProperties extends Properties {
 	 * If it is method returns true if not method returns false.
 	 *
 	 * @param key key of property
-	 * @param defaultValue Value to use if they key isn't there
 	 * @return boolean whether the property is active
 	 */
 	public boolean isPropertyActive(String key) {

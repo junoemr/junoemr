@@ -26,8 +26,11 @@ package org.oscarehr.document.service;
 
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.model.CtlDocument;
+import org.oscarehr.document.model.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -48,7 +51,7 @@ import static oscar.util.StringUtils.filled;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-public class Document
+public class DocumentService
 {
 	private static final OscarProperties props = OscarProperties.getInstance();
 
@@ -57,6 +60,55 @@ public class Document
 
 	@Autowired
 	CtlDocumentDao ctlDocumentDao;
+
+	/**
+	 * Create a new document from the given document model and a file input stream.
+	 * This method will write the file from the stream and persist the document record.
+	 * Document metadata fields that can be read from the file directly will replace the values in the model.
+	 * @param document - the un-persisted document model
+	 * @param fileInputStream - input stream
+	 * @param demographicNo - demographic id of the attached demographic
+	 * @return - the persisted document model
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public Document uploadNewDocument(Document document, InputStream fileInputStream, Integer demographicNo) throws IOException, InterruptedException
+	{
+		GenericFile file = FileFactory.createDocumentFile(fileInputStream, document.getDocfilename());
+
+		if(!file.validate())
+		{
+			file.reEncode();
+		}
+		file.moveToDocuments();
+
+		document.setDocfilename(file.getName());
+		document.setContenttype(file.getContentType());
+		document.setNumberofpages(file.getPageCount());
+
+		documentDao.persist(document);
+
+		// unassigned documents have a module id of -1
+		if(demographicNo == null || demographicNo < 1)
+		{
+			demographicNo = -1;
+		}
+
+		CtlDocumentPK cdpk = new CtlDocumentPK();
+		CtlDocument cd = new CtlDocument();
+		cd.setId(cdpk);
+		cdpk.setModule(CtlDocument.MODULE_DEMOGRAPHIC);
+		cdpk.setDocumentNo(document.getDocumentNo());
+		cd.getId().setModuleId(demographicNo);
+		cd.setStatus(String.valueOf(document.getStatus()));
+		ctlDocumentDao.persist(cd);
+
+		return document;
+	}
+	public Document uploadNewDocument(Document document, InputStream fileInputStream) throws IOException, InterruptedException
+	{
+		return uploadNewDocument(document, fileInputStream, null);
+	}
 
 	public void updateDocument(AddEditDocumentForm fm,
 	                           InputStream documentInputStream,

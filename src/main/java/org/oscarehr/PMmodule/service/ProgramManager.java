@@ -502,4 +502,9 @@ public class ProgramManager {
     	}
     	return results;
     }
+
+	public Integer getDefaultProgramId()
+	{
+		return getProgramIdByProgramName("OSCAR");
+	}
 }

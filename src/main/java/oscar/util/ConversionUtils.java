@@ -376,7 +376,12 @@ public class ConversionUtils {
 		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 	}
 
-	protected Date toLegacyDateTime(LocalDateTime localDateTime)
+	public static Date toNullableLegacyDateTime(LocalDateTime localDateTime)
+	{
+		if(localDateTime == null) return null;
+		return toLegacyDateTime(localDateTime);
+	}
+	public static Date toLegacyDateTime(LocalDateTime localDateTime)
 	{
 		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 	}
@@ -409,5 +414,14 @@ public class ConversionUtils {
 				// convert to LocalDate
 				.toLocalDate();
 		return date;
+	}
+	public static LocalDateTime toNullableLocalDateTime(Date legacyDate)
+	{
+		if(legacyDate == null) return null;
+		return toLocalDateTime(legacyDate);
+	}
+	public static LocalDateTime toLocalDateTime(Date legacyDate)
+	{
+		return new java.sql.Timestamp(legacyDate.getTime()).toLocalDateTime();
 	}
 }

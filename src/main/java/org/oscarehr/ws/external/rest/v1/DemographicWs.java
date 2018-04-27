@@ -134,7 +134,7 @@ public class DemographicWs extends AbstractExternalRestWs
 			demographic.setLastUpdateUser(providerNoStr);
 
 			// save the base demographic object
-			demographicManager.createDemographic(providerNoStr, demographic, getDefaultProgramId());
+			demographicManager.createDemographic(providerNoStr, demographic, programManager.getDefaultProgramId());
 			demographicNo = demographic.getDemographicNo();
 
 			DemographicCust demoCustom = DemographicConverter.getCustom(demographicTo);
@@ -168,10 +168,5 @@ public class DemographicWs extends AbstractExternalRestWs
 			return RestResponse.errorResponse("System Error");
 		}
 		return RestResponse.successResponse(demographicNo);
-	}
-
-	private Integer getDefaultProgramId()
-	{
-		return programManager.getProgramIdByProgramName("OSCAR");
 	}
 }

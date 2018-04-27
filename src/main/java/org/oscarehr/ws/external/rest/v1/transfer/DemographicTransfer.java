@@ -30,7 +30,6 @@ import org.oscarehr.ws.validator.StringValueConstraint;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.ws.rs.DefaultValue;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -83,7 +82,6 @@ public class DemographicTransfer implements Serializable
 	@NotNull
 	@Schema(description = "patient date of birth")
 	private LocalDate dateOfBirth;
-	@DefaultValue("AC")
 	@StringValueConstraint(allows = {"AC","IN","DE","FI","MO"})
 	@Schema(description = "patient status", example = "AC")
 	private String patientStatus;
