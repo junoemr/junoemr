@@ -264,7 +264,15 @@ public class AppointmentDisplayController
 
 	public String getIconImage()
 	{
-		return appointment.getIconImage();
+		String iconImage = appointment.getIconImage();
+		String status = appointment.getStatus();
+
+		if(status.length() >= 2)
+		{
+			iconImage = status.substring(1,2) + iconImage;
+		}
+
+		return iconImage;
 	}
 
 	public String getStatusTitle()

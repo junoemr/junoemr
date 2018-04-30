@@ -80,6 +80,8 @@
 <%@ page import="org.springframework.transaction.TransactionDefinition" %>
 <%@ page import="java.time.temporal.ChronoUnit" %>
 <%@ page import="java.time.Period" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.apache.commons.lang.WordUtils" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 <jsp:useBean id="appointmentInfo" class="org.oscarehr.appointment.AppointmentDisplayController" scope="page" />
@@ -319,7 +321,9 @@ private long getAppointmentRowSpan(
 	String prov = oscarProperties.getBillingTypeUpperCase();
 
 
-	int view = request.getParameter("view")!=null ? Integer.parseInt(request.getParameter("view")) : 0; //0-multiple views, 1-single view
+	//0-multiple views, 1-single view
+	int view = request.getParameter("view")!=null ? Integer.parseInt(request.getParameter("view")) : 0;
+
 	String provNum = request.getParameter("provider_no");
 
 	SimpleDateFormat inform = new SimpleDateFormat ("yyyy-MM-dd", request.getLocale());
@@ -366,8 +370,13 @@ private long getAppointmentRowSpan(
 
 	ProviderPreference providerPreference2=(ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
 	String mygroupno = providerPreference2.getMyGroupNo();
+	if(mygroupno == null)
+	{
+		mygroupno = ".default";
+	}
 
-	int startHour = providerPreference2.getStartHour();
+
+		int startHour = providerPreference2.getStartHour();
 	int endHour = providerPreference2.getEndHour();
 	int everyMin = providerPreference2.getEveryMin();
 
@@ -598,7 +607,7 @@ private long getAppointmentRowSpan(
 
 	</script>
 
-	<title>Title</title>
+	<title><%=WordUtils.capitalize(userLastName + ", " +  org.apache.commons.lang.StringUtils.substring(userFirstName, 0, 1)) + "-"%><bean:message key="provider.appointmentProviderAdminDay.title"/></title>
 
 	<link rel="stylesheet" href="../css/receptionistapptstyle.css" type="text/css">
 	<link rel="stylesheet" href="../css/helpdetails.css" type="text/css">
@@ -1251,11 +1260,22 @@ private long getAppointmentRowSpan(
 						//   - Don't show a schedule for anyone else
 
 						boolean viewAllBoolean = ("1".equals(viewall));
+						String curProviderNo = request.getParameter("curProvider");
 
 						if(isWeekView(request))
 						{
 							resourceScheduleDTO = scheduleService
 								.getWeekScheduleByProvider(provNum, selectedDate, selectedSite);
+						}
+						else if(view == 1 && !StringUtils.isEmpty(curProviderNo))
+						{
+							// Get schedules for selected provider
+							boolean showForSure =
+									(viewAllBoolean || curProviderNo.equals(curUser_no));
+
+							resourceScheduleDTO = scheduleService
+								.getResourceScheduleByProvider(curProviderNo, selectedDate,
+									selectedSite, showForSure);
 						}
 						else if(mygroupno != null && providerBean.get(mygroupno) != null)
 						{
