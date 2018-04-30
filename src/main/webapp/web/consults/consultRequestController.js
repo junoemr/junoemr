@@ -406,6 +406,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 					templateUrl: "consults/consultAttachment.jsp",
 					controller: 'Consults.ConsultRequestAttachmentController as consultAttachmentCtrl',
 					windowClass: "attachment-modal-window",
+					size: 'lg',
 					resolve:
 						{
 							consult: function()

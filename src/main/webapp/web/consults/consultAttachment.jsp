@@ -36,7 +36,7 @@
 		<h3 class="modal-title">Documents for {{consultAttachmentCtrl.atth.patientName}}</h3>
 	</div>
 
-	<div class="modal-body">
+	<div class="modal-body text-center">
 		<div class="col-sm-5 middle">
 			<label>Available Documents</label>
 			<br/>
@@ -48,9 +48,8 @@
 			</select>
 		</div>
 		<div class="middle">
-			<button type="button" class="btn btn-default" ng-click="consultAttachmentCtrl.attach()">&gt;&gt;</button>
-			<br/>
-			<button type="button" class="btn btn-default" ng-click="consultAttachmentCtrl.detach()">&lt;&lt;</button>
+			<button type="button" class="btn btn-block btn-default" ng-click="consultAttachmentCtrl.attach()">&gt;&gt;</button>
+			<button type="button" class="btn btn-block btn-default" ng-click="consultAttachmentCtrl.detach()">&lt;&lt;</button>
 		</div>
 		<div class="col-sm-5 middle">
 			<label>Attached Documents</label>
