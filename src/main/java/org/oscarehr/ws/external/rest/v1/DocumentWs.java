@@ -25,12 +25,13 @@ package org.oscarehr.ws.external.rest.v1;
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.service.ProgramManager;
+import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.conversion.DocumentConverter;
-import org.oscarehr.ws.external.rest.v1.transfer.DocumentTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferInbound;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -41,11 +42,13 @@ import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Base64;
+import java.util.Date;
 
 @Component("DocumentWs")
 @Path("/document")
@@ -58,12 +61,15 @@ public class DocumentWs extends AbstractExternalRestWs
 	DocumentService documentService;
 
 	@Autowired
+	DocumentDao documentDao;
+
+	@Autowired
 	ProgramManager programManager;
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Add a new document to the system")
-	public RestResponse<Integer> postDocument(@Valid DocumentTransfer transfer)
+	public RestResponse<Integer> postDocument(@Valid DocumentTransferInbound transfer)
 	{
 		Document document;
 		try
@@ -84,8 +90,18 @@ public class DocumentWs extends AbstractExternalRestWs
 				return RestResponse.errorResponse("Error decoding file: " + e.getMessage());
 			}
 
-			document = DocumentConverter.getAsDomainObject(transfer);
+			document = DocumentConverter.getInboundAsDomainObject(transfer);
 			document.setProgramId(programManager.getDefaultProgramId());
+			// default some dates if they are missing
+			if(document.getObservationdate() == null)
+			{
+				document.setObservationdate(new Date());
+			}
+			if(document.getContentdatetime() == null)
+			{
+				document.setContentdatetime(new Date());
+			}
+			// upload the document record
 			document = documentService.uploadNewDocument(document, inputStream);
 
 			String providerNoStr = getOAuthProviderNo();
@@ -106,5 +122,51 @@ public class DocumentWs extends AbstractExternalRestWs
 			return RestResponse.errorResponse("System Error");
 		}
 		return RestResponse.successResponse(document.getDocumentNo());
+	}
+
+	@POST
+	@Path("/{documentId}/inbox/general")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Route the document to the unclaimed inbox")
+	public RestResponse<Integer> postDocument(@PathParam("documentId") Integer documentId)
+	{
+		try
+		{
+			String providerNoStr = getOAuthProviderNo();
+			String ip = getHttpServletRequest().getRemoteAddr();
+
+			documentService.routeToGeneralInbox(documentId);
+			LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+					String.valueOf(documentId), ip);
+		}
+		catch(Exception e)
+		{
+			logger.error("Error", e);
+			return RestResponse.errorResponse("System Error");
+		}
+		return RestResponse.successResponse(documentId);
+	}
+	@POST
+	@Path("/{documentId}/inbox/provider/{providerId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Route the document to the given provider inbox")
+	public RestResponse<Integer> postDocument(@PathParam("documentId") Integer documentId,
+	                                          @PathParam("providerId") Integer providerId)
+	{
+		try
+		{
+			String providerNoStr = getOAuthProviderNo();
+			String ip = getHttpServletRequest().getRemoteAddr();
+
+			documentService.routeToProviderInbox(documentId, providerId);
+			LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+					String.valueOf(documentId), ip);
+		}
+		catch(Exception e)
+		{
+			logger.error("Error", e);
+			return RestResponse.errorResponse("System Error");
+		}
+		return RestResponse.successResponse(documentId);
 	}
 }

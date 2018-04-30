@@ -382,7 +382,7 @@
 												<option value=""><bean:message key="dms.addDocument.formSelect" /></option>
 												<%for (int j = 0; j < doctypes.size(); j++) {
 				String doctype = (String) doctypes.get(j);%>
-												<option value="<%= doctype%>" <%=(curdoc.getType().equals(doctype)) ? " selected" : ""%>><%= doctype%></option>
+												<option value="<%= doctype%>" <%=(doctype.equals(curdoc.getType())) ? " selected" : ""%>><%= doctype%></option>
 												<%}%>
 											</select>
 										</td>

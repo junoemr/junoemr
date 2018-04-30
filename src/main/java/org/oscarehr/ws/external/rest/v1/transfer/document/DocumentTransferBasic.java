@@ -20,7 +20,7 @@
  * Centre for Research on Inner City Health, St. Michael's Hospital,
  * Toronto, Ontario, Canada
  */
-package org.oscarehr.ws.external.rest.v1.transfer;
+package org.oscarehr.ws.external.rest.v1.transfer.document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,13 +30,14 @@ import org.oscarehr.ws.validator.StringValueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @XmlRootElement
 @Schema(description = "Document data transfer object")
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class DocumentTransfer
+public class DocumentTransferBasic implements Serializable
 {
 	// important document info
 	@Schema(description = "document record identifier")
@@ -47,11 +48,8 @@ public class DocumentTransfer
 	@Schema(description = "document status", allowableValues = {"A","D"}, example = "A")
 	private String status;
 
-	@Schema(description = "document last updated timestamp")
-	private LocalDateTime updateDateTime;
-
-	@Schema(description = "document date added/modified timestamp")
-	private LocalDateTime contentDateTime;
+	@Schema(description = "document date created timestamp")
+	private LocalDateTime createdDateTime;
 
 	@Schema(description = "document date")
 	private LocalDate observationDate;
@@ -59,23 +57,9 @@ public class DocumentTransfer
 	@Schema(description = "true if this is a public document, false otherwise")
 	private Boolean publicDocument = false;
 
-	// file properties
-	@NotNull
-	@Size(max=255)
-	@Schema(description = "document filename")
-	private String fileName;
-
 	@NotNull
 	@Schema(description = "base64 encoded document")
 	private String base64EncodedFile;
-
-	@Size(max=255)
-	@Schema(description = "document Content-Type")
-	private String contentType;
-
-	@NotNull
-	@Schema(description = "document page count")
-	private Integer numberOfPages;
 
 	// document additional info
 	@Size(max=60)
@@ -147,24 +131,14 @@ public class DocumentTransfer
 		this.status = status;
 	}
 
-	public LocalDateTime getUpdateDateTime()
+	public LocalDateTime getCreatedDateTime()
 	{
-		return updateDateTime;
+		return createdDateTime;
 	}
 
-	public void setUpdateDateTime(LocalDateTime updateDateTime)
+	public void setCreatedDateTime(LocalDateTime createdDateTime)
 	{
-		this.updateDateTime = updateDateTime;
-	}
-
-	public LocalDateTime getContentDateTime()
-	{
-		return contentDateTime;
-	}
-
-	public void setContentDateTime(LocalDateTime contentDateTime)
-	{
-		this.contentDateTime = contentDateTime;
+		this.createdDateTime = createdDateTime;
 	}
 
 	public LocalDate getObservationDate()
@@ -177,16 +151,6 @@ public class DocumentTransfer
 		this.observationDate = observationDate;
 	}
 
-	public String getFileName()
-	{
-		return fileName;
-	}
-
-	public void setFileName(String fileName)
-	{
-		this.fileName = fileName;
-	}
-
 	public String getBase64EncodedFile()
 	{
 		return base64EncodedFile;
@@ -195,26 +159,6 @@ public class DocumentTransfer
 	public void setBase64EncodedFile(String base64EncodedFile)
 	{
 		this.base64EncodedFile = base64EncodedFile;
-	}
-
-	public String getContentType()
-	{
-		return contentType;
-	}
-
-	public void setContentType(String contentType)
-	{
-		this.contentType = contentType;
-	}
-
-	public Integer getNumberOfPages()
-	{
-		return numberOfPages;
-	}
-
-	public void setNumberOfPages(Integer numberOfPages)
-	{
-		this.numberOfPages = numberOfPages;
 	}
 
 	public String getDocumentType()

@@ -24,6 +24,8 @@
 
 package org.oscarehr.document.service;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.CtlDocumentPK;
@@ -31,6 +33,7 @@ import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -41,6 +44,7 @@ import oscar.dms.EDocUtil;
 import oscar.dms.data.AddEditDocumentForm;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
+import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConversionUtils;
 
 import java.io.IOException;
@@ -54,12 +58,16 @@ import static oscar.util.StringUtils.filled;
 public class DocumentService
 {
 	private static final OscarProperties props = OscarProperties.getInstance();
+	private static Logger logger = MiscUtils.getLogger();
 
 	@Autowired
 	DocumentDao documentDao;
 
 	@Autowired
 	CtlDocumentDao ctlDocumentDao;
+
+	@Autowired
+	ProviderInboxRoutingDao providerInboxRoutingDao;
 
 	/**
 	 * Create a new document from the given document model and a file input stream.
@@ -94,14 +102,8 @@ public class DocumentService
 			demographicNo = -1;
 		}
 
-		CtlDocumentPK cdpk = new CtlDocumentPK();
-		CtlDocument cd = new CtlDocument();
-		cd.setId(cdpk);
-		cdpk.setModule(CtlDocument.MODULE_DEMOGRAPHIC);
-		cdpk.setDocumentNo(document.getDocumentNo());
-		cd.getId().setModuleId(demographicNo);
-		cd.setStatus(String.valueOf(document.getStatus()));
-		ctlDocumentDao.persist(cd);
+		// create a ctl document link
+		createDemographicCtlLink(document, demographicNo);
 
 		return document;
 	}
@@ -123,12 +125,12 @@ public class DocumentService
 		//TODO - replace AddEditDocumentForm with transfer object
 
 		// load existing models & retrieve file object
-		org.oscarehr.document.model.Document documentModel = documentDao.find(documentNo);
+		Document documentModel = documentDao.find(documentNo);
 		if(documentModel == null)
 		{
 			throw new IllegalArgumentException("No Document exists with documentId " + documentNo);
 		}
-		org.oscarehr.document.model.CtlDocument ctlDocumentModel = ctlDocumentDao.getCtrlDocument(documentNo);
+		CtlDocument ctlDocumentModel = ctlDocumentDao.getCtrlDocument(documentNo);
 		if(ctlDocumentModel == null)
 		{
 			throw new IllegalStateException("No CtlDocument exists for documentId " + documentNo);
@@ -224,5 +226,63 @@ public class DocumentService
 			file.replaceWith(tempFile);
 			file.rename(formattedFileName);
 		}
+	}
+
+
+	/**
+	 * Add the document to the given provider inbox
+	 * @param documentNo - document id to route
+	 * @param providerNo - provider id to route to
+	 */
+	public void routeToProviderInbox(Integer documentNo, Integer providerNo)
+	{
+		//TODO handle the routing weirdness
+		providerInboxRoutingDao.addToProviderInbox(String.valueOf(providerNo), documentNo, LabResultData.DOCUMENT);
+		logger.info("Added route to provider " + providerNo + " for document " + documentNo);
+	}
+	/**
+	 * Add the document to the unclaimed/general inbox
+	 * @param documentNo - document id to route
+	 */
+	public void routeToGeneralInbox(Integer documentNo)
+	{
+		routeToProviderInbox(documentNo, 0);
+	}
+
+	/**
+	 * Assign the given document to a demographic record
+	 * @param documentNo - the document id to assign
+	 * @param demographicNo - the demographic id to assign to
+	 */
+	public void assignDocumentToDemographic(Integer documentNo, Integer demographicNo)
+	{
+		Document document = documentDao.find(documentNo);
+		CtlDocument ctlDocument = ctlDocumentDao.getCtrlDocument(documentNo);
+		// since the demographic module id is a primary key, the old entry can't be updated by jpa. so we replace it instead.
+		ctlDocumentDao.remove(ctlDocument);
+		ctlDocument = createDemographicCtlLink(document, demographicNo);
+
+		logger.info("updated ctl_document (" + ctlDocument.getId().getModule() + "," + ctlDocument.getId().getModuleId() + "," + ctlDocument.getId().getDocumentNo() + ")");
+	}
+
+	private CtlDocument createDemographicCtlLink(Document document, Integer demographicNo)
+	{
+		CtlDocumentPK cdpk = new CtlDocumentPK();
+		CtlDocument cd = new CtlDocument();
+		cd.setId(cdpk);
+		cdpk.setModule(CtlDocument.MODULE_DEMOGRAPHIC);
+		cdpk.setDocumentNo(document.getDocumentNo());
+		cd.getId().setModuleId(demographicNo);
+		cd.setStatus(String.valueOf(document.getStatus()));
+		ctlDocumentDao.persist(cd);
+		return cd;
+	}
+	/**
+	 * Remove the given document from a demographic
+	 * @param documentNo - the document id to un-assign
+	 */
+	public void unassignDocumentFromDemographic(Integer documentNo)
+	{
+		assignDocumentToDemographic(documentNo, -1);
 	}
 }

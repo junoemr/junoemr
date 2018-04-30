@@ -29,6 +29,7 @@ import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicCust;
 import org.oscarehr.common.model.DemographicExt;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
@@ -69,10 +70,13 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Autowired
 	ProgramManager programManager;
 
+	@Autowired
+	DocumentService documentService;
+
 	@GET
-	@Path("/{id}")
+	@Path("/{demographicId}")
 	@Operation(summary = "Retrieve an existing patient demographic record by demographic id.")
-	public RestResponse<DemographicTransfer> getDemographic(@PathParam("id") Integer demographicNo)
+	public RestResponse<DemographicTransfer> getDemographic(@PathParam("demographicId") Integer demographicNo)
 	{
 		DemographicTransfer demographicTransfer;
 		try
@@ -102,10 +106,10 @@ public class DemographicWs extends AbstractExternalRestWs
 	}
 
 	@PUT
-	@Path("/{id}")
+	@Path("/{demographicId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Update an existing patient demographic record by demographic id.")
-	public RestResponse<DemographicTransfer> putDemographic(@PathParam("id") Integer demographicNo,
+	public RestResponse<DemographicTransfer> putDemographic(@PathParam("demographicId") Integer demographicNo,
 	                                                        @Valid DemographicTransfer demographicTo)
 	{
 		return RestResponse.errorResponse("Not Implemented");
@@ -168,5 +172,29 @@ public class DemographicWs extends AbstractExternalRestWs
 			return RestResponse.errorResponse("System Error");
 		}
 		return RestResponse.successResponse(demographicNo);
+	}
+
+	@POST
+	@Path("/{demographicId}/chart/document/{documentId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Assign a document in the system to the demographic chart")
+	public RestResponse<Integer> assignDocument(@PathParam("demographicId") Integer demographicId,
+	                                            @PathParam("documentId") Integer documentId)
+	{
+		try
+		{
+			String providerNoStr = getOAuthProviderNo();
+			String ip = getHttpServletRequest().getRemoteAddr();
+
+			documentService.assignDocumentToDemographic(documentId, demographicId);
+			LogAction.addLogEntry(providerNoStr, demographicId, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+					String.valueOf(documentId), ip);
+		}
+		catch(Exception e)
+		{
+			logger.error("Error", e);
+			return RestResponse.errorResponse("System Error");
+		}
+		return RestResponse.successResponse(documentId);
 	}
 }

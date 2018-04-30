@@ -20,36 +20,33 @@
  * Centre for Research on Inner City Health, St. Michael's Hospital,
  * Toronto, Ontario, Canada
  */
-package org.oscarehr.ws.external.rest;
+package org.oscarehr.ws.external.rest.v1.transfer.document;
 
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.rs.security.oauth.data.OAuthContext;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlRootElement;
 
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class AbstractExternalRestWs extends AbstractServiceImpl
+@XmlRootElement
+@Schema(description = "Document data transfer object")
+@JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
+public class DocumentTransferInbound extends DocumentTransferBasic
 {
-	protected OAuthContext getOAuthContext()
+	// file properties
+	@NotNull
+	@Size(max=255)
+	@Schema(description = "document filename")
+	private String fileName;
+
+	public String getFileName()
 	{
-		Message m = PhaseInterceptorChain.getCurrentMessage();
-		return m.getContent(OAuthContext.class);
-	}
-	protected String getOAuthProviderNo()
-	{
-		return getOAuthContext().getSubject().getLogin();
+		return fileName;
 	}
 
-	protected HttpServletRequest getHttpServletRequest()
+	public void setFileName(String fileName)
 	{
-		Message message = PhaseInterceptorChain.getCurrentMessage();
-		return (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
+		this.fileName = fileName;
 	}
 }

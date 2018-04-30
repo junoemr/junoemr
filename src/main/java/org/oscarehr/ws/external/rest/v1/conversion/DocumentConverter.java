@@ -27,7 +27,9 @@ package org.oscarehr.ws.external.rest.v1.conversion;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.ws.external.rest.v1.transfer.DocumentTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferBasic;
+import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferInbound;
+import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferOutbound;
 import oscar.util.ConversionUtils;
 
 import java.io.File;
@@ -37,19 +39,17 @@ import java.util.Base64;
 
 public class DocumentConverter
 {
-	public static Document getAsDomainObject(DocumentTransfer transfer)
+	public static Document getBasicAsDomainObject(DocumentTransferBasic transfer)
 	{
 		Document document = new Document();
 
 		document.setDocumentNo(transfer.getDocumentNo());
-		document.setDocfilename(transfer.getFileName());
-		document.setContenttype(transfer.getContentType());
-		document.setNumberofpages(transfer.getNumberOfPages());
+
 		document.setStatus(transfer.getStatus().charAt(0));
 		document.setPublic1(transfer.getPublicDocument());
 		document.setObservationdate(ConversionUtils.toNullableLegacyDate(transfer.getObservationDate()));
-		document.setContentdatetime(ConversionUtils.toNullableLegacyDateTime(transfer.getContentDateTime()));
-		document.setUpdatedatetime(ConversionUtils.toNullableLegacyDateTime(transfer.getUpdateDateTime()));
+		document.setContentdatetime(ConversionUtils.toNullableLegacyDateTime(transfer.getCreatedDateTime()));
+//		document.setUpdatedatetime(ConversionUtils.toNullableLegacyDateTime(transfer.getUpdateDateTime()));
 
 		document.setDocClass(transfer.getDocumentClass());
 		document.setDocSubClass(transfer.getDocumentSubClass());
@@ -67,19 +67,28 @@ public class DocumentConverter
 
 		return document;
 	}
-
-	public static DocumentTransfer getAsTransferObject(Document document) throws IOException
+	public static Document getInboundAsDomainObject(DocumentTransferInbound transfer)
 	{
-		DocumentTransfer transfer = new DocumentTransfer();
+		Document document = getBasicAsDomainObject(transfer);
+		document.setDocfilename(transfer.getFileName());
+//		document.setContenttype(transfer.getContentType());
+//		document.setNumberofpages(transfer.getNumberOfPages());
+
+		return document;
+	}
+
+	public static DocumentTransferOutbound getAsTransferObject(Document document) throws IOException
+	{
+		DocumentTransferOutbound transfer = new DocumentTransferOutbound();
 
 		transfer.setDocumentNo(document.getDocumentNo());
-		transfer.setFileName(document.getDocfilename());
+//		transfer.setFileName(document.getDocfilename());
 		transfer.setContentType(document.getContenttype());
 		transfer.setNumberOfPages(document.getNumberofpages());
 		transfer.setStatus(String.valueOf(document.getStatus()));
 		transfer.setPublicDocument(document.isPublic());
 		transfer.setObservationDate(ConversionUtils.toNullableLocalDate(document.getObservationdate()));
-		transfer.setContentDateTime(ConversionUtils.toNullableLocalDateTime(document.getContentdatetime()));
+		transfer.setCreatedDateTime(ConversionUtils.toNullableLocalDateTime(document.getContentdatetime()));
 		transfer.setUpdateDateTime(ConversionUtils.toNullableLocalDateTime(document.getUpdatedatetime()));
 
 		transfer.setDocumentClass(document.getDocClass());
