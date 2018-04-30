@@ -55,7 +55,7 @@
 
 	<!-- Managed WS Beans -->
 	<!-- The WS classes are turned into spring beans to allow autowiring etc, then the endpoints reference them -->
- 	<context:component-scan base-package="org.oscarehr.ws"/>
+ 	<context:component-scan base-package="org.oscarehr.ws.external.soap"/>
 
 	<bean id="authenticationInWSS4JInterceptor" class="org.oscarehr.ws.AuthenticationInWSS4JInterceptor" />
 

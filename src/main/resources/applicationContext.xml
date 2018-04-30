@@ -243,44 +243,49 @@
 	<!-- Encounter Form DAO -->
 	<bean id="Rourke2009DAO" class="oscar.form.dao.Rourke2009DAO" autowire="byName"/>
 
+	<!-- CLINICAID -->
+	<bean id="clinicaidAPIService" class="org.oscarehr.integration.clinicaid.service.ClinicaidAPIService" autowire="byName"/>
+	<bean id="clinicaidSessionManager" class="org.oscarehr.integration.clinicaid.service.ClinicaidSessionManager" autowire="byName"/>
 
-        <!--Email Support -->
-        <context:component-scan base-package="oscar.service"/>
+   <!--Email Support -->
+   <context:component-scan base-package="oscar.service"/>
 
-        <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" p:corePoolSize="5"
-          p:maxPoolSize="10" p:queueCapacity="100" p:waitForTasksToCompleteOnShutdown="true"/>
+   <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" p:corePoolSize="5"
+     p:maxPoolSize="10" p:queueCapacity="100" p:waitForTasksToCompleteOnShutdown="true"/>
 
-        <bean id="asyncMailSender" class="oscar.service.AsyncMailSender" autowire="byName">
-           <property name="taskExecutor" ref="taskExecutor" />
-        </bean>
+   <bean id="asyncMailSender" class="oscar.service.AsyncMailSender" autowire="byName">
+      <property name="taskExecutor" ref="taskExecutor" />
+   </bean>
 
-        <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-            <property name="host" value="${email.host}"/>
-            <property name="port" value="${email.port}" />
-            <property name="protocol" value="${email.protocol}" />
-            <property name="username" value="${email.username}" />
-            <property name="password" value="${email.password}" />
+   <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+       <property name="host" value="${email.host}"/>
+       <property name="port" value="${email.port}" />
+       <property name="protocol" value="${email.protocol}" />
+       <property name="username" value="${email.username}" />
+       <property name="password" value="${email.password}" />
 
-            <property name="javaMailProperties">
-               <props>
-                  <prop key="mail.smtp.auth">true</prop>
-                  <prop key="mail.smtp.starttls.enable">true</prop>
-               </props>
-            </property>
-        </bean>
-		
-		<bean id="eventService" class="org.oscarehr.event.EventService"/> 
-		<bean id="applicationEventMulticaster" class="org.springframework.context.event.SimpleApplicationEventMulticaster">  
-              <property name="taskExecutor">  
-                  <!--  bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/ -->  
-                  <bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor"/>
-              </property>  
-		</bean>
-		
-<!-- 		
-		<task:executor id="taskExecutor" />
-		-->
-		<task:scheduler id="taskScheduler" />
+       <property name="javaMailProperties">
+          <props>
+             <prop key="mail.smtp.auth">true</prop>
+             <prop key="mail.smtp.starttls.enable">true</prop>
+          </props>
+       </property>
+   </bean>
+
+	<bean id="eventService" class="org.oscarehr.event.EventService"/>
+	<bean id="applicationEventMulticaster" class="org.springframework.context.event.SimpleApplicationEventMulticaster">
+         <property name="taskExecutor">
+             <!--  bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/ -->
+             <bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor"/>
+         </property>
+	</bean>
+
+	<bean id="scheduleService" class="org.oscarehr.schedule.service.Schedule" autowire="byName" />
+
+	<!--
+	<task:executor id="taskExecutor" />
+	-->
+	<task:scheduler id="taskScheduler" />
 		
 		
 </beans>

@@ -40,22 +40,36 @@ import oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO;
  * Saves the values in the ActionForm into the BillingPreferences record
  * @version 1.0
  */
-public class SaveBillingPreferencesAction
-    extends Action {
-  public ActionForward execute(ActionMapping actionMapping,
-                               ActionForm actionForm,
-                               HttpServletRequest servletRequest,
-                               HttpServletResponse servletResponse) {
-    BillingPreferencesActionForm frm = (
-        BillingPreferencesActionForm) actionForm;
-    BillingPreferencesDAO dao = SpringUtils.getBean(BillingPreferencesDAO.class);
-    BillingPreference pref = new BillingPreference();
-    pref.setProviderNo(Integer.parseInt(frm.getProviderNo()));
-    pref.setReferral(Integer.parseInt(frm.getReferral()));
-    pref.setDefaultPayeeNo(Integer.parseInt(frm.getPayeeProviderNo()));
-    dao.saveUserPreferences(pref);
-    servletRequest.setAttribute("providerNo",frm.getProviderNo());
-    return actionMapping.findForward("success");
+public class SaveBillingPreferencesAction extends Action
+{
+	public ActionForward execute(ActionMapping actionMapping,
+	                             ActionForm actionForm,
+	                             HttpServletRequest servletRequest,
+	                             HttpServletResponse servletResponse)
+	{
+		BillingPreferencesActionForm frm = (BillingPreferencesActionForm) actionForm;
+		BillingPreferencesDAO dao = SpringUtils.getBean(BillingPreferencesDAO.class);
 
-  }
+		Integer providerNo = Integer.parseInt(frm.getProviderNo());
+		Integer referralNo = Integer.parseInt(frm.getReferral());
+		Integer payeeProviderNo = Integer.parseInt(frm.getPayeeProviderNo());
+
+		BillingPreference pref = dao.getUserBillingPreference(providerNo);
+		if(pref == null)
+		{
+			pref = new BillingPreference();
+			pref.setProviderNo(providerNo);
+			pref.setReferral(referralNo);
+			pref.setDefaultPayeeNo(payeeProviderNo);
+			dao.persist(pref);
+		}
+		else
+		{
+			pref.setReferral(referralNo);
+			pref.setDefaultPayeeNo(payeeProviderNo);
+			dao.merge(pref);
+		}
+		servletRequest.setAttribute("providerNo", frm.getProviderNo());
+		return actionMapping.findForward("success");
+	}
 }

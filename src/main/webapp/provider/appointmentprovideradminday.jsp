@@ -27,7 +27,7 @@
 <%@ page import="org.oscarehr.phr.util.MyOscarUtils"%>
 <%@ page import="org.oscarehr.common.model.Appointment.BookingSource"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
-<%@ page import="org.oscarehr.common.model.Provider,org.oscarehr.common.model.BillingONCHeader1"%>
+<%@ page import="org.oscarehr.common.model.Provider"%>
 <%@ page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@ page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
 <%@ page import="org.oscarehr.common.dao.DemographicDao, org.oscarehr.common.model.Demographic" %>
@@ -93,6 +93,7 @@
 	DemographicCustDao demographicCustDao = SpringUtils.getBean(DemographicCustDao.class);
 	ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
 	AppManager appManager = SpringUtils.getBean(AppManager.class);
+	ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
 
 	LookupListManager lookupListManager = SpringUtils.getBean(LookupListManager.class);
 	LookupList reasonCodes = lookupListManager.findLookupListByName(loggedInInfo1, "reasonCode");
@@ -462,7 +463,9 @@ public boolean isBirthday(String schedDate,String demBday){
 <%@page import="oscar.appt.JdbcApptImpl"%>
 <%@page import="oscar.appt.ApptUtil"%>
 <%@page import="org.oscarehr.web.AppointmentProviderAdminDayUIBean"%>
-<%@page import="org.oscarehr.eform.model.EForm"%><html:html locale="true">
+<%@page import="org.oscarehr.eform.model.EForm"%>
+<%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
+<html:html locale="true">
 	<head>
 		<script>
 
@@ -1912,7 +1915,7 @@ public boolean isBirthday(String schedDate,String demBday){
 																		else
 																		{
 																	%>
-																	<span class="toggleable reason reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
+																	<span class="buildable reason reason_<%=curProvider_no[nProvider]%> ${ hideReason ? "hideReason" : "" }">
 																		<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:<%=escapedReason%>
 																	</span>
 																	<%
@@ -2069,14 +2072,34 @@ start_time += iSm + ":00";
 																	<% if (!isWeekView) { %>
 															<security:oscarSec roleName="<%=roleName$%>" objectName="_billing" rights="r">
 																	<%
+
+	String referral_no_parameter = "";
+	if(oscar.OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc"))
+	{
+		String rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
+		rdohip = rdohip !=null ? rdohip : "" ;
+		referral_no_parameter = "&referral_no_1=" + rdohip;
+	}
+
+	String defaultBillingView = oscarVariables.getProperty("default_view");
+	ProviderPreference preference = providerPreferenceDao.find(loggedInInfo1.getLoggedInProviderNo());
+	if(preference != null)
+	{
+		String preferredView = preference.getDefaultServiceType();
+		if(preferredView != null && !preferredView.equals("no"))
+		{
+			defaultBillingView = preferredView;
+		}
+	}
+
 	if(status.indexOf('B')==-1) 
 	{ 
 	%>
 															&#124; <a
-																href="../billing.do?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=<%=URLEncoder.encode("")%>&appointment_no=<%=appointment.getId()%>&demographic_name=<%=URLEncoder.encode(name)%>&status=<%=status%>&demographic_no=<%=demographic_no%>&providerview=<%=curProvider_no[nProvider]%>&user_no=<%=curUser_no%>&apptProvider_no=<%=curProvider_no[nProvider]%>&appointment_date=<%=year+"-"+month+"-"+day%>&start_time=<%=start_time%>&bNewForm=1"
+																href="../billing.do?billRegion=<%=URLEncoder.encode(prov)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=<%=URLEncoder.encode("")%>&appointment_no=<%=appointment.getId()%>&demographic_name=<%=URLEncoder.encode(name)%>&status=<%=status%>&demographic_no=<%=demographic_no%>&providerview=<%=curProvider_no[nProvider]%>&user_no=<%=curUser_no%>&apptProvider_no=<%=curProvider_no[nProvider]%>&appointment_date=<%=year+"-"+month+"-"+day%>&start_time=<%=start_time%>&bNewForm=1<%=referral_no_parameter%>"
 																target="_blank"
 																title="<bean:message key="global.billingtag"/>"><bean:message key="provider.appointmentProviderAdminDay.btnB"/></a>
-														<%
+																	<%
 	}
 	else 
 	{
@@ -2312,7 +2335,7 @@ start_time += iSm + ":00";
 						</caisi:isModuleLoad>
 					}
 					case <bean:message key="global.searchShortcut"/> : popupOscarRx(550,687,'../demographic/search.jsp');  return false;  //run code for 'S'earch
-					case <bean:message key="global.dayShortcut"/> : window.open("providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+URLEncoder.encode(request.getParameter("curProviderName"),"UTF-8") )%>&displaymode=day&dboperation=searchappointmentday","_self") ;  return false;  //run code for 'T'oday
+					case <bean:message key="global.dayShortcut"/> : window.open("providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+URLEncoder.encode(request.getParameter("curProviderName"),"UTF-8") )%>&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>","_self") ;  return false;  //run code for 'T'oday
 					case <bean:message key="global.viewShortcut"/> : {
 						<% if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals("1") ) { %>
 						review('0');  return false; //scheduled providers 'V'iew

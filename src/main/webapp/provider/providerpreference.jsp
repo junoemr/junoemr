@@ -38,25 +38,24 @@
 <%@ taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ page import="java.util.*,java.text.*,java.sql.*,java.net.*" errorPage="errorpage.jsp" %>
-<%@ page import="oscar.OscarProperties" %>
+<%@ page errorPage="errorpage.jsp" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@ page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
+<%@ page import="org.oscarehr.common.dao.CtlBillingServiceDao"%>
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO"%>
+<%@ page import="org.oscarehr.common.model.EncounterForm" %>
+<%@ page import="org.oscarehr.common.model.Provider"%>
+<%@ page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@ page import="org.oscarehr.common.model.UserProperty"%>
+<%@ page import="org.oscarehr.eform.model.EForm"%>
+<%@ page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
-
-<%@page import="org.oscarehr.common.model.ProviderPreference"%>
-<%@page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="org.oscarehr.web.PrescriptionQrCodeUIBean"%>
-<%@page import="org.oscarehr.eform.model.EForm"%>
-<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@page import="org.oscarehr.common.model.EncounterForm"%>
-<%@page import="org.oscarehr.common.dao.CtlBillingServiceDao" %>
-<%@page import="org.oscarehr.common.model.CtlBillingService" %>
-<%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@page import="java.util.List" %>
-<%@page import="java.util.ArrayList" %>
-<%@page import="org.oscarehr.common.model.Provider" %>
+<%@ page import="org.oscarehr.web.PrescriptionQrCodeUIBean"%>
+<%@ page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
+<%@ page import="oscar.OscarProperties"%>
+<%@ page import="java.util.ArrayList"%>
+<%@ page import="java.util.Collection" %>
+<%@ page import="java.util.List" %>
 
 <%
 	CtlBillingServiceDao ctlBillingServiceDao = SpringUtils.getBean(CtlBillingServiceDao.class);
@@ -545,39 +544,79 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
 
 });
 
-</script>
+        </script>
 			</tr>
 
- <tr>
-     <%
-         Integer h = 0;
-         Integer mins = 0;
-         prop = propertyDao.getProp(providerNo,UserProperty.OSCAR_MSG_RECVD);
-         if( prop != null ) {
-            String[] tmp = prop.getValue().split(":");
-            h = Integer.valueOf(tmp[0]);
-            mins = Integer.valueOf(tmp[1]);
-         }
-     %>
-        <td class="preferenceLabel">
-            Select when you want to receive Review Messages
-            
-         </td>
-         <td preferenceValue>
-             <select id="reviewMsg" name="reviewMsg">                 
-                 <%
-                     for( int hr = 0; hr < 24; ++hr ) {
-                         for( int min = 0; min < 60; min+=30 ) {
-                 %>
-                 <option value="<%=String.valueOf(hr)+":"+String.valueOf(min) %>" <%= hr == h && min == mins ? "selected" : ""%> ><%=String.valueOf(hr) + " : " + String.valueOf(min) + (min == 0 ? "0" :"") %></option>
-                 <%
-                        }
-                    }
-                 %>
-             </select>                          
-         </td>
-        </tr>
-        <script>
+			<tr>
+				<%
+					Integer h = 0;
+					Integer mins = 0;
+					prop = propertyDao.getProp(providerNo, UserProperty.OSCAR_MSG_RECVD);
+					if(prop != null)
+					{
+						String[] tmp = prop.getValue().split(":");
+						h = Integer.valueOf(tmp[0]);
+						mins = Integer.valueOf(tmp[1]);
+					}
+				%>
+				<td class="preferenceLabel">
+					Select when you want to receive Review Messages
+
+				</td>
+				<td class="preferenceValue">
+					<select id="reviewMsg" name="reviewMsg">
+						<%
+							for(int hr = 0; hr < 24; ++hr)
+							{
+								for(int min = 0; min < 60; min += 30)
+								{
+						%>
+						<option value="<%=String.valueOf(hr)+":"+String.valueOf(min) %>" <%= hr == h && min == mins ? "selected" : ""%> ><%=String.valueOf(hr) + " : " + String.valueOf(min) + (min == 0 ? "0" : "") %>
+						</option>
+						<%
+								}
+							}
+						%>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="preferenceLabel">
+					<bean:message key="provider.labelDefaultBillForm"/>:
+				</td>
+				<td class="preferenceValue">
+					<select name="default_servicetype">
+						<option value="no">-- no --</option>
+						<%
+							if(providerPreference != null)
+							{
+								String def = providerPreference.getDefaultServiceType();
+								for(Object[] result : ctlBillingServiceDao.getUniqueServiceTypes("A"))
+								{
+
+						%>
+						<option value="<%=(String)result[0]%>"
+								<%=((String) result[0]).equals(def) ? "selected" : ""%>>
+							<%=(String) result[1]%>
+						</option>
+						<%
+							}
+						}
+						else
+						{
+							for(Object[] result : ctlBillingServiceDao.getUniqueServiceTypes("A"))
+							{
+						%>
+						<option value="<%=(String)result[0]%>"><%=(String) result[1]%>
+						</option>
+						<%
+								}
+							}
+						%>
+					</select>
+				</td>
+			</tr>
+			<script>
         Event.observe('reviewMsg', 'change', function(event) {
 	var value = $('reviewMsg').getValue();
 
@@ -634,35 +673,6 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
 	<a href=# onClick ="showHideBillPref();return false;"><bean:message key="provider.btnBillPreference"/></a>
 <% } %>
     </td>
-  </tr>
-  <tr>
-      <td align="center">
-	  <div id="billingONpref">
-          <bean:message key="provider.labelDefaultBillForm"/>:
-	  <select name="default_servicetype">
-	      <option value="no">-- no --</option>
-<%
-	if (providerPreference!=null) {
-		String def = providerPreference.getDefaultServiceType();
-		for(Object[] result : ctlBillingServiceDao.getUniqueServiceTypes("A")) {
-
-%>
-				<option value="<%=(String)result[0]%>"
-					<%=((String)result[0]).equals(def)?"selected":""%>>
-					<%=(String)result[1]%></option>
-<%
-		}
-	} else {
-		for(Object[] result : ctlBillingServiceDao.getUniqueServiceTypes("A")) {
-%>
-		<option value="<%=(String)result[0]%>"><%=(String)result[1]%></option>
-<%
-		}
-	}
-%>
-	  </select>
-	  </div>
-      </td>
   </tr>
 </security:oscarSec>
 	  <tr>

@@ -111,8 +111,8 @@ public class ProviderService extends AbstractServiceImpl {
     	   	
     	for(Provider p: providerDao.getActiveProviders()) {
     		lst.getContent().add(ProviderTransfer.toTransfer(p));
-    	} 
-      
+    	}
+
         return lst;
     }
  

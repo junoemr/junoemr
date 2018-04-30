@@ -75,4 +75,10 @@ public class DemographicStudyDao extends AbstractDao<DemographicStudy>{
 		return query.getResultList();
 	}
 
+	public boolean hasStudy()
+	{
+		Query query = entityManager.createQuery("select count(*) from DemographicStudy");
+		long result = (long) query.getSingleResult();
+		return result > 0;
+	}
 }
