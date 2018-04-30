@@ -25,10 +25,12 @@
 package org.oscarehr.document.service;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.CtlDocumentPK;
+import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.CtlDocument;
@@ -50,6 +52,7 @@ import oscar.util.ConversionUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 
 import static oscar.util.StringUtils.filled;
 
@@ -68,6 +71,9 @@ public class DocumentService
 
 	@Autowired
 	ProviderInboxRoutingDao providerInboxRoutingDao;
+
+	@Autowired
+	PatientLabRoutingDao patientLabRoutingDao;
 
 	/**
 	 * Create a new document from the given document model and a file input stream.
@@ -96,15 +102,16 @@ public class DocumentService
 
 		documentDao.persist(document);
 
-		// unassigned documents have a module id of -1
 		if(demographicNo == null || demographicNo < 1)
 		{
-			demographicNo = -1;
+			// unassigned documents still get a link with id -1
+			createDemographicCtlLink(document, -1);
 		}
-
-		// create a ctl document link
-		createDemographicCtlLink(document, demographicNo);
-
+		else
+		{
+			assignDocumentToDemographic(document, demographicNo);
+		}
+		logger.info("Uploaded Document " + document.getDocumentNo());
 		return document;
 	}
 	public Document uploadNewDocument(Document document, InputStream fileInputStream) throws IOException, InterruptedException
@@ -251,21 +258,47 @@ public class DocumentService
 
 	/**
 	 * Assign the given document to a demographic record
+	 * @param document - the document to assign
+	 * @param demographicNo - the demographic id to assign to
+	 */
+	public void assignDocumentToDemographic(Document document, Integer demographicNo)
+	{
+		CtlDocument ctlDocument = ctlDocumentDao.getCtrlDocument(document.getDocumentNo());
+		if(ctlDocument != null)
+		{
+			// since the demographic module id is a primary key, the old entry can't be updated by jpa. so we replace it instead.
+			ctlDocumentDao.remove(ctlDocument);
+		}
+		createDemographicCtlLink(document, demographicNo);
+		createDemographicRouteLink(document, demographicNo);
+	}
+	/**
+	 * Assign the given document to a demographic record
 	 * @param documentNo - the document id to assign
 	 * @param demographicNo - the demographic id to assign to
 	 */
 	public void assignDocumentToDemographic(Integer documentNo, Integer demographicNo)
 	{
 		Document document = documentDao.find(documentNo);
-		CtlDocument ctlDocument = ctlDocumentDao.getCtrlDocument(documentNo);
-		// since the demographic module id is a primary key, the old entry can't be updated by jpa. so we replace it instead.
-		ctlDocumentDao.remove(ctlDocument);
-		ctlDocument = createDemographicCtlLink(document, demographicNo);
-
-		logger.info("updated ctl_document (" + ctlDocument.getId().getModule() + "," + ctlDocument.getId().getModuleId() + "," + ctlDocument.getId().getDocumentNo() + ")");
+		assignDocumentToDemographic(document, demographicNo);
 	}
 
-	private CtlDocument createDemographicCtlLink(Document document, Integer demographicNo)
+	private void createDemographicRouteLink(Document document, Integer demographicNo)
+	{
+		// Check to see if we have to route document to patient
+		List<PatientLabRouting> patientLabRoutingList = patientLabRoutingDao.findByLabNoAndLabType(document.getDocumentNo(), PatientLabRoutingDao.DOC);
+		if(patientLabRoutingList.isEmpty())
+		{
+			PatientLabRouting patientLabRouting = new PatientLabRouting();
+			patientLabRouting.setDemographicNo(demographicNo);
+			patientLabRouting.setLabNo(document.getDocumentNo());
+			patientLabRouting.setLabType(PatientLabRoutingDao.DOC);
+			patientLabRoutingDao.persist(patientLabRouting);
+		}
+		//TODO handle re-assigning a linked document?
+	}
+
+	private void createDemographicCtlLink(Document document, Integer demographicNo)
 	{
 		CtlDocumentPK cdpk = new CtlDocumentPK();
 		CtlDocument cd = new CtlDocument();
@@ -275,14 +308,5 @@ public class DocumentService
 		cd.getId().setModuleId(demographicNo);
 		cd.setStatus(String.valueOf(document.getStatus()));
 		ctlDocumentDao.persist(cd);
-		return cd;
-	}
-	/**
-	 * Remove the given document from a demographic
-	 * @param documentNo - the document id to un-assign
-	 */
-	public void unassignDocumentFromDemographic(Integer documentNo)
-	{
-		assignDocumentToDemographic(documentNo, -1);
 	}
 }
