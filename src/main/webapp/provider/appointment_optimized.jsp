@@ -81,6 +81,7 @@
 <%@ page import="java.time.temporal.ChronoUnit" %>
 <%@ page import="java.time.Period" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.apache.commons.lang.WordUtils" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 <jsp:useBean id="appointmentInfo" class="org.oscarehr.appointment.AppointmentDisplayController" scope="page" />
@@ -606,7 +607,7 @@ private long getAppointmentRowSpan(
 
 	</script>
 
-	<title>Title</title>
+	<title><%=WordUtils.capitalize(userLastName + ", " +  org.apache.commons.lang.StringUtils.substring(userFirstName, 0, 1)) + "-"%><bean:message key="provider.appointmentProviderAdminDay.title"/></title>
 
 	<link rel="stylesheet" href="../css/receptionistapptstyle.css" type="text/css">
 	<link rel="stylesheet" href="../css/helpdetails.css" type="text/css">

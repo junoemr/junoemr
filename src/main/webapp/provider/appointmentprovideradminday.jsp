@@ -2082,7 +2082,7 @@ start_time += iSm + ":00";
 	}
 
 	String defaultBillingView = oscarVariables.getProperty("default_view");
-	ProviderPreference preference = providerPreferenceDao.find(demographic.getProviderNo());
+	ProviderPreference preference = providerPreferenceDao.find(loggedInInfo1.getLoggedInProviderNo());
 	if(preference != null)
 	{
 		String preferredView = preference.getDefaultServiceType();
