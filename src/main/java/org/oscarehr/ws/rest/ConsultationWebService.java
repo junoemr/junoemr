@@ -251,6 +251,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			request.setServiceList(serviceConverter.getAllAsTransferObjects(getLoggedInInfo(), consultationManager.getConsultationServices()));
 			request.setSendToList(providerDao.getActiveTeams());
 			request.setProviderNo(getLoggedInInfo().getLoggedInProviderNo());
+			request.setPatientWillBook(true);
 		}
 		catch(Exception e) {
 			logger.error("Unexpected Error", e);
