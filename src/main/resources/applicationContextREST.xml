@@ -46,8 +46,8 @@
 		<property name="dataProvider" ref="oauthProvider"/>
 	</bean>
 
-	<bean id="exceptionMapper" class="org.apache.cxf.jaxrs.validation.ValidationExceptionMapper"/>
 	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.util.exceptionMapping.ValidationExceptionMapper"/>
+	<bean id="generalExceptionMapper" class="org.oscarehr.ws.rest.util.exceptionMapping.GeneralExceptionMapper"/>
 	<bean id="invalidFormatExceptionMapper" class="org.oscarehr.ws.rest.util.exceptionMapping.InvalidFormatExceptionMapper"/>
 	<bean id="objectMapperProvider" class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
 
@@ -113,9 +113,9 @@
 		<jaxrs:providers>
 			<ref bean="oAuthFilter"/>
 			<ref bean="jaxb"/>
-			<ref bean="exceptionMapper"/>
 			<ref bean="validationExceptionMapper"/>
 			<ref bean="invalidFormatExceptionMapper"/>
+			<ref bean="generalExceptionMapper"/>
 			<ref bean="objectMapperProvider"/>
 			<bean class="org.oscarehr.ws.rest.filter.LoggingFilter"/>
 			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
