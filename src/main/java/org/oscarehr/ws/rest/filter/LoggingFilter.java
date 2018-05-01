@@ -23,29 +23,95 @@
 package org.oscarehr.ws.rest.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-public class LoggingFilter implements ContainerResponseFilter
+public class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter
 {
 	private static Logger logger = MiscUtils.getLogger();
 
 	@Context
 	private ContextResolver<ObjectMapper> mapperResolver;
 
+	@Context
+	private HttpServletRequest httpRequest;
+
+	@Context
+	private MessageContext messageContext;
+
+	// Request filter
+	// This collects data that is only available in the request filter and stores it in the
+	// request properties.
+	public void filter(ContainerRequestContext request)
+	{
+		OAuthContext oAuthContext = messageContext.getContent(OAuthContext.class);
+
+		if(oAuthContext != null && oAuthContext.getSubject() != null)
+		{
+			request.setProperty("providerNo", oAuthContext.getSubject().getLogin());
+		}
+
+		// Get the message body and put it in a property
+		String body = null;
+
+		if(request.hasEntity())
+		{
+			body = readEntityStream(request);
+		}
+
+		request.setProperty("requestBody", body);
+	}
+
+	// Response filter
+	// Collects the data for the log entry and logs it
+	// TODO: put this in the database
 	public void filter(ContainerRequestContext request, ContainerResponseContext response)
 	{
 		logger.info("=======================================");
-		logger.info("LOGGING FILTER");
-		logger.info(request.getMethod());
+		logger.info("GENERAL");
+		logger.info("-------");
+
+		logger.info(request.getProperty("providerNo"));
+		logger.info(httpRequest.getRemoteAddr());
+		logger.info(request.getHeaderString("User-Agent"));
+
+
+		logger.info("REQUEST");
+		logger.info("-------");
+
 		logger.info(request.getMediaType());
+		logger.info(request.getMethod());
+
+		UriInfo uriInfo = request.getUriInfo();
+		if(uriInfo != null)
+		{
+			logger.info(uriInfo.getRequestUri().toString());
+		}
+
+		logger.info(request.getProperty("requestBody"));
+
+		logger.info("RESPONSE");
+		logger.info("--------");
+		logger.info(response.getMediaType());
 		logger.info(response.getStatus());
+
+
 		logger.info(response.getEntityClass());
 
 		if(response.getEntity() != null)
@@ -65,5 +131,34 @@ public class LoggingFilter implements ContainerResponseFilter
 		}
 
 		logger.info("=======================================");
+	}
+
+
+	private String readEntityStream(ContainerRequestContext requestContext)
+	{
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		final InputStream inputStream = requestContext.getEntityStream();
+		final StringBuilder builder = new StringBuilder();
+		try
+		{
+			IOUtils.copy(inputStream, outStream);
+			byte[] requestEntity = outStream.toByteArray();
+
+			if (requestEntity.length == 0)
+			{
+				builder.append("");
+			}
+			else
+			{
+				builder.append(new String(requestEntity));
+			}
+			requestContext.setEntityStream(new ByteArrayInputStream(requestEntity) );
+		}
+		catch (IOException e)
+		{
+			logger.debug("Error reading input stream for logging",e);
+		}
+
+		return builder.toString();
 	}
 }
