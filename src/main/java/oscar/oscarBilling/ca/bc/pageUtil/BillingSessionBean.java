@@ -25,11 +25,12 @@
 
 package oscar.oscarBilling.ca.bc.pageUtil;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import oscar.oscarBilling.ca.bc.pageUtil.BillingBillingManager.BillingItem;
 
-public class BillingSessionBean implements java.io.Serializable
+public class BillingSessionBean implements Serializable
 {
 	private String apptProviderNo = null;
 	private String patientName = null;
