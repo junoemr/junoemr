@@ -166,7 +166,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
 
 		//monitor data changed
-		controller.consultChanged = -1;
+		controller.consultChanged = 0;
 		$scope.$watchCollection(function()
 			{
 				return controller.consult;
@@ -474,7 +474,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				});
 			controller.setESendEnabled();
 			controller.consultSaving = false; //hide saving banner
-			controller.consultChanged = -1; //reset change count
+			controller.consultChanged = 0; //reset change count
 			return true;
 		};
 
