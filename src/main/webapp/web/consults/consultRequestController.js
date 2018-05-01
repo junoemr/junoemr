@@ -45,6 +45,15 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		//set appointment time
 		console.log('initial appointment time: ', angular.copy(consult.appointmentTime));
 
+		controller.changeLetterhead = function changeLetterhead()
+		{
+			if (consult.letterhead === null) return;
+
+			consult.letterheadName = consult.letterhead.id;
+			consult.letterheadAddress = consult.letterhead.address;
+			consult.letterheadPhone = consult.letterhead.phone;
+		};
+
 		controller.parseTime = function parseTime(time)
 		{
 			var tArray = time.split(":");
@@ -112,11 +121,16 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			});
 
 		//set default letterhead
-		if (consult.letterhead == null)
+		if (consult.letterheadName == null)
+		{
+			consult.letterhead = consult.letterheadList[0];
+			controller.changeLetterhead();
+		}
+		else
 		{
 			for (var i = 0; i < consult.letterheadList.length; i++)
 			{
-				if (consult.letterheadList[i].id == user.providerNo)
+				if (consult.letterheadList[i].id === consult.letterheadName)
 				{
 					consult.letterhead = consult.letterheadList[i];
 					break;
@@ -171,16 +185,6 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				if (!discard) event.preventDefault();
 			}
 		});
-
-		controller.changeLetterhead = function changeLetterhead(newLetterheadName)
-		{
-			var index = $("#letterhead")[0].selectedIndex;
-			if (index === null) return;
-
-			consult.letterheadAddress = consult.letterheadList[index].address;
-			consult.letterheadPhone = consult.letterheadList[index].phone;
-
-		};
 
 		controller.changeService = function changeService(id)
 		{

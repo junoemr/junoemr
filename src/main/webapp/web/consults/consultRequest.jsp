@@ -81,9 +81,9 @@
 								<%--<label class="col-sm-2 control-label">Name</label>--%>
 								<div class="col-sm-12">
 									<select id="letterhead" class="form-control"
-											ng-model="consultRequestCtrl.consult.letterheadName"
-											ng-options="letterhead.id as letterhead.name for letterhead in consultRequestCtrl.consult.letterheadList"
-											ng-change="consultRequestCtrl.changeLetterhead(consultRequestCtrl.consult.letterheadName)">
+											ng-model="consultRequestCtrl.consult.letterhead"
+											ng-options="letterhead.name for letterhead in consultRequestCtrl.consult.letterheadList track by letterhead.id"
+											ng-change="consultRequestCtrl.changeLetterhead()">
 									</select>
 								</div>
 							</div>
