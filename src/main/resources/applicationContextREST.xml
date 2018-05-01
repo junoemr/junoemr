@@ -82,11 +82,11 @@
 	<jaxrs:server id="restServicesV1" address="/services/v1">
 		<jaxrs:inInterceptors>
 			<ref bean="validationInInterceptor"/>
-			<ref bean="restLoggingInInterceptor"/>
+			<!--<ref bean="restLoggingInInterceptor"/>-->
 		</jaxrs:inInterceptors>
 		<jaxrs:outInterceptors>
 			<ref bean="validationOutInterceptor"/>
-			<ref bean="restLoggingOutInterceptor"/>
+			<!--<ref bean="restLoggingOutInterceptor"/>-->
 		</jaxrs:outInterceptors>
 
 		<jaxrs:inFaultInterceptors>
@@ -117,6 +117,7 @@
 			<ref bean="validationExceptionMapper"/>
 			<ref bean="invalidFormatExceptionMapper"/>
 			<ref bean="objectMapperProvider"/>
+			<bean class="org.oscarehr.ws.rest.filter.LoggingFilter"/>
 			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
 		</jaxrs:providers>
 
