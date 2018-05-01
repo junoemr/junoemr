@@ -117,6 +117,7 @@
 			<ref bean="validationExceptionMapper"/>
 			<ref bean="invalidFormatExceptionMapper"/>
 			<ref bean="objectMapperProvider"/>
+			<bean class="org.oscarehr.ws.rest.filter.LoggingFilter"/>
 			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
 		</jaxrs:providers>
 
