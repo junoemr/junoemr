@@ -568,7 +568,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		
 		//clinic letterhead
 		Clinic clinic = clinicDAO.getClinic();
-		LetterheadTo1 letterhead = new LetterheadTo1(clinic.getClinicName(), clinic.getClinicName());
+		LetterheadTo1 letterhead = new LetterheadTo1("-1", clinic.getClinicName());
 		
 		String clinicPhone = StringUtils.trimToEmpty(clinic.getClinicPhone());
 		String clinicAddress = buildAddress(clinic.getClinicAddress(), clinic.getClinicCity(), clinic.getClinicProvince(), clinic.getClinicPostal());
