@@ -399,8 +399,6 @@ private long getAppointmentRowSpan(
 
 	int nProvider;
 
-	//ResourceSchedule resourceScheduleDTO = null;
-
 	if(mygroupno != null && providerBean.get(mygroupno) != null) { //single appointed provider view
 		numProvider=1;
 		curProvider_no = new String [numProvider];
@@ -611,6 +609,11 @@ private long getAppointmentRowSpan(
 
 	<link rel="stylesheet" href="../css/receptionistapptstyle.css" type="text/css">
 	<link rel="stylesheet" href="../css/helpdetails.css" type="text/css">
+
+	<c:if test="${empty sessionScope.archiveView or sessionScope.archiveView != true}">
+		<%!String refresh = oscar.OscarProperties.getInstance().getProperty("refresh.appointmentprovideradminday.jsp", "-1");%>
+		<%="-1".equals(refresh)?"":"<meta http-equiv=\"refresh\" content=\""+refresh+";\">"%>
+	</c:if>
 
 	<script type="text/javascript" src="../share/javascript/Oscar.js" ></script>
 	<script type="text/javascript" src="../share/javascript/prototype.js"></script>
