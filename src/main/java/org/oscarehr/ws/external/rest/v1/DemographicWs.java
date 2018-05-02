@@ -30,12 +30,15 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicCust;
 import org.oscarehr.common.model.DemographicExt;
 import org.oscarehr.document.service.DocumentService;
+import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.DemographicTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.eform.EFormTransferInbound;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,6 +55,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @Component("DemographicWs")
@@ -72,6 +76,9 @@ public class DemographicWs extends AbstractExternalRestWs
 
 	@Autowired
 	DocumentService documentService;
+
+	@Autowired
+	EFormDataService eFormService;
 
 	@GET
 	@Path("/{demographicId}")
@@ -196,5 +203,34 @@ public class DemographicWs extends AbstractExternalRestWs
 			return RestResponse.errorResponse("System Error");
 		}
 		return RestResponse.successResponse(documentId);
+	}
+
+	@POST
+	@Path("/{demographicId}/chart/eform")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Create an eForm on the patient chart with the passed in values")
+	public RestResponse<Integer> postEForm(@PathParam("demographicId") Integer demographicId,
+	                                       @Valid EFormTransferInbound transfer)
+	{
+		EFormData eForm;
+		try
+		{
+			String providerNoStr = getOAuthProviderNo();
+			int providerNo = Integer.parseInt(providerNoStr);
+			String ip = getHttpServletRequest().getRemoteAddr();
+
+			eForm = eFormService.saveNewEForm(demographicId, providerNo, transfer.getTemplateId(),
+					transfer.getSubject(), new HashMap<>(), transfer.getFormValues(), null);
+
+			LogAction.addLogEntry(providerNoStr, demographicId, LogConst.ACTION_ADD, LogConst.CON_EFORM_DATA, LogConst.STATUS_SUCCESS,
+					String.valueOf(eForm.getId()), ip, eForm.getFormName());
+		}
+		catch(Exception e)
+		{
+			logger.error("Error", e);
+			return RestResponse.errorResponse("System Error");
+		}
+
+		return RestResponse.successResponse(eForm.getId());
 	}
 }

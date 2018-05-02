@@ -48,7 +48,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-public class EForm
+public class EFormDataService
 {
 	private static Logger logger = MiscUtils.getLogger();
 
@@ -132,12 +132,12 @@ public class EForm
 		eForm.setFormData(curForm.getFormHtml());
 
 		eFormDataDao.persist(eForm);
-		saveEformValues(eForm.getFormId(), eForm.getId(), eForm.getDemographicId(), eFormValueMap);
+		saveEFormValues(eForm.getFormId(), eForm.getId(), eForm.getDemographicId(), eFormValueMap);
 		logger.info("EForm data saved with id " + eForm.getId());
 		return eForm;
 	}
 
-	private void saveEformValues(Integer formId, Integer formDataId, Integer demographicNo, Map<String,String> formValueMap)
+	private void saveEFormValues(Integer formId, Integer formDataId, Integer demographicNo, Map<String,String> formValueMap)
 	{
 		for(Map.Entry<String, String> entry : formValueMap.entrySet())
 		{

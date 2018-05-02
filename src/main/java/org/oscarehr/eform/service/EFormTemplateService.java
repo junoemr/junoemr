@@ -41,7 +41,7 @@ import java.util.Date;
  */
 @Service
 @Transactional
-public class EFormTemplate
+public class EFormTemplateService
 {
 	private static Logger logger = MiscUtils.getLogger();
 

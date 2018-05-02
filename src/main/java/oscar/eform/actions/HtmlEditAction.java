@@ -31,6 +31,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.eform.model.EForm;
+import org.oscarehr.eform.service.EFormTemplateService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -52,7 +53,7 @@ public class HtmlEditAction extends Action
 {
 	private static Logger logger = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private org.oscarehr.eform.service.EFormTemplate eFormTemplateService = SpringUtils.getBean(org.oscarehr.eform.service.EFormTemplate.class);
+	private EFormTemplateService eFormTemplateService = SpringUtils.getBean(EFormTemplateService.class);
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{

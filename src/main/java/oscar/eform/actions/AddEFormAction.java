@@ -35,6 +35,7 @@ import org.apache.struts.action.ActionMessages;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.eform.exception.EFormMeasurementException;
 import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.match.IMatchManager;
@@ -67,7 +68,7 @@ public class AddEFormAction extends Action {
 
 	private static final Logger logger=MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private org.oscarehr.eform.service.EForm eFormService = SpringUtils.getBean(org.oscarehr.eform.service.EForm.class);
+	private EFormDataService eFormService = SpringUtils.getBean(EFormDataService.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
