@@ -63,9 +63,10 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 	@Context
 	private MessageContext messageContext;
 
-	// Request filter
-	// This collects data that is only available in the request filter and stores it in the
-	// request properties.
+	/** Request filter
+	 * This collects data that is only available in the request filter and stores it in the
+	 * request properties.
+	 */
 	public void filter(ContainerRequestContext request)
 	{
 		OAuthContext oAuthContext = messageContext.getContent(OAuthContext.class);
@@ -87,9 +88,10 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 		request.setProperty(PROP_REQUEST_DATETIME, new Date());
 	}
 
-	// Response filter
-	// Collects the data for the log entry and logs it
-	// TODO: put this in the database
+	/**
+	 * Response filter
+	 * Collects the data for the log entry and logs it
+	 */
 	public void filter(ContainerRequestContext request, ContainerResponseContext response)
 	{
 
