@@ -35,7 +35,9 @@ import java.util.Map;
 public class EFormTransferInbound extends EFormTransferBasic
 {
 	@NotNull
-	@Schema(description = "eForm value map. key should match the input name.")
+	@Schema(description = "eForm key:value map. " +
+			"The key should match the input name (html input as found in the eForm). " +
+			"For checkbox inputs, if the key exists it is assumed to be checked. Omitting the key will result in an unchecked box.")
 	private Map<String, String> formValues;
 
 	public Map<String, String> getFormValues()

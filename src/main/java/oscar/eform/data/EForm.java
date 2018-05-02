@@ -689,7 +689,7 @@ public class EForm extends EFormBase {
 			html.delete(pointer, endPointer);
 			html.insert(pointer, value);
 		} else if (type.equals("checkbox")) {
-			if( value.equals("prechecked") ) {
+			if( "prechecked".equals(value) ) {
 				pointer = html.indexOf(PRECHECKED, pointer);
 				html.delete(pointer, pointer + PRECHECKED.length());
 			} else {

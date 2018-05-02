@@ -28,6 +28,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.oscarehr.ws.validator.EFormTemplateIdConstraint;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
@@ -42,6 +43,7 @@ public class EFormTransferBasic implements Serializable
 	private Integer templateId;
 
 	@NotBlank
+	@Size(max=255)
 	@Schema(description = "eForm subject/description")
 	private String subject;
 

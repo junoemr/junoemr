@@ -49,6 +49,7 @@
 	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.filter.exceptionMapping.ValidationExceptionMapper"/>
 	<bean id="generalExceptionMapper" class="org.oscarehr.ws.rest.filter.exceptionMapping.GeneralExceptionMapper"/>
 	<bean id="invalidFormatExceptionMapper" class="org.oscarehr.ws.rest.filter.exceptionMapping.InvalidFormatExceptionMapper"/>
+	<bean id="jsonParseExceptionMapper" class="org.oscarehr.ws.rest.filter.exceptionMapping.JsonParseExceptionMapper"/>
 	<bean id="objectMapperProvider" class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
 
 	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
@@ -115,6 +116,7 @@
 			<ref bean="jaxb"/>
 			<ref bean="validationExceptionMapper"/>
 			<ref bean="invalidFormatExceptionMapper"/>
+			<ref bean="jsonParseExceptionMapper"/>
 			<ref bean="generalExceptionMapper"/>
 			<ref bean="objectMapperProvider"/>
 			<bean class="org.oscarehr.ws.rest.filter.LoggingFilter"/>
