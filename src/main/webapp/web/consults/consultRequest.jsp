@@ -409,27 +409,24 @@
 		</div><!-- Right pane End -->
 	</div>
 	<div class="wrapper-action col-sm-12" ng-show="consultRequestCtrl.consultReadAccess"><!-- Action Buttons -->
-		<button type="button" class="btn btn-large btn-warning action" 
-				ng-click="consultRequestCtrl.printPreview()" 
-				ng-show="consultRequestCtrl.consult.id!=null && consultRequestCtrl.consultChanged<=0">
-			Print Preview
-		</button>&nbsp;
-		<button type="button" class="btn btn-large btn-warning action" 
-				ng-click="consultRequestCtrl.sendFax()" 
-				ng-show="consultRequestCtrl.consult.id!=null && consultRequestCtrl.consultChanged<=0">
-			Send Fax
-		</button>&nbsp;
-		<button type="button" class="btn btn-large btn-warning action" 
-				ng-click="consultRequestCtrl.eSend()" 
-				ng-show="consultRequestCtrl.eSendEnabled && consult.id!=null && consultRequestCtrl.consultChanged<=0">
-			Send Electronically
-		</button>&nbsp;
-		<button type="button" class="btn btn-large btn-success action" 
-				ng-click="consultRequestCtrl.save()" 
-				ng-show="consultRequestCtrl.consultChanged>0">
+		<button type="button" class="btn btn-large btn-success action"
+				ng-click="consultRequestCtrl.save()">
 			Save
 		</button>&nbsp;
-		<button type="button" class="btn btn-large btn-default action" 
+		<button type="button" class="btn btn-large btn-warning action"
+				ng-click="consultRequestCtrl.saveAndPrint()">
+			Save & Print
+		</button>&nbsp;
+		<button type="button" class="btn btn-large btn-warning action"
+				ng-click="consultRequestCtrl.saveAndFax()">
+			Save & Fax
+		</button>&nbsp;
+		<button type="button" class="btn btn-large btn-warning action"
+				ng-click="consultRequestCtrl.eSend()"
+				ng-show="consultRequestCtrl.eSendEnabled">
+			Save & Send Electronically
+		</button>&nbsp;
+		<button type="button" class="btn btn-large btn-default action"
 				ng-click="consultRequestCtrl.close()">
 			Close
 		</button>&nbsp;

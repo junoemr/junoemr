@@ -2,6 +2,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 	'$scope',
 	'$http',
+	'$q',
 	'$resource',
 	'$location',
 	'$uibModal',
@@ -16,6 +17,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 	function(
 		$scope,
 		$http,
+		$q,
 		$resource,
 		$location,
 		$uibModal,
@@ -216,7 +218,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			summaryService.getFamilyHistory(consult.demographicId).then(
 				function success(results)
 				{
-					if(results.summaryItem.length === 0)
+					if (results.summaryItem.length === 0)
 						alert("No family history");
 					controller.writeToBox(results, boxId);
 				},
@@ -232,7 +234,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			summaryService.getMedicalHistory(consult.demographicId).then(
 				function success(results)
 				{
-					if(results.summaryItem.length === 0)
+					if (results.summaryItem.length === 0)
 						alert("No medical history");
 					controller.writeToBox(results, boxId);
 				},
@@ -248,7 +250,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			summaryService.getSocialHistory(consult.demographicId).then(
 				function success(results)
 				{
-					if(results.summaryItem.length === 0)
+					if (results.summaryItem.length === 0)
 						alert("No social history");
 					controller.writeToBox(results, boxId);
 				},
@@ -264,7 +266,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			summaryService.getOngoingConcerns(consult.demographicId).then(
 				function success(results)
 				{
-					if(results.summaryItem.length === 0)
+					if (results.summaryItem.length === 0)
 						alert("No ongoing concerns");
 					controller.writeToBox(results, boxId);
 				},
@@ -280,7 +282,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			summaryService.getOtherMeds(consult.demographicId).then(
 				function success(results)
 				{
-					if(results.summaryItem.length === 0)
+					if (results.summaryItem.length === 0)
 						alert("No other meds");
 					controller.writeToBox(results, boxId);
 				},
@@ -296,7 +298,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			summaryService.getReminders(consult.demographicId).then(
 				function success(results)
 				{
-					if(results.summaryItem.length === 0)
+					if (results.summaryItem.length === 0)
 						alert("No reminders");
 					controller.writeToBox(results, boxId);
 				},
@@ -445,37 +447,46 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		controller.save = function save()
 		{
-			console.log('CONSULT: ', consult);
+			var deferred = $q.defer();
 
 			if (!controller.consultWriteAccess && consult.id == null)
 			{
 				alert("You don't have right to save new consult");
-				return false;
+				deferred.reject();
 			}
 			if (!controller.consultUpdateAccess)
 			{
 				alert("You don't have right to update consult");
-				return false;
+				deferred.reject();
 			}
 
-			if (controller.invalidData()) return false;
+			if (controller.invalidData()) deferred.reject();
 
 			controller.consultSaving = true; //show saving banner
 			controller.setAppointmentTime();
 
-			consultService.saveRequest(consult).then(
-				function success(results)
-				{
-					if (consult.id == null) $location.path("/record/" + consult.demographicId + "/consult/" + results.id);
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-			controller.setESendEnabled();
-			controller.consultSaving = false; //hide saving banner
-			controller.consultChanged = 0; //reset change count
-			return true;
+			deferred = consultService.saveRequest(consult)
+				.then(
+					function success(results)
+					{
+						if (consult.id == null) $location.path("/record/" + consult.demographicId + "/consult/" + results.id);
+						return results.id;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					})
+				.finally(
+					function()
+					{
+						console.log("finally happened")
+						controller.setESendEnabled();
+						controller.consultSaving = false; //hide saving banner
+						controller.consultChanged = 0; //reset change count
+					}
+				);
+
+			return deferred;
 		};
 
 		controller.close = function close()
@@ -484,15 +495,18 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			else $location.path("/consults");
 		};
 
-		controller.sendFax = function sendFax()
+		controller.saveAndFax = function saveAndPrint()
 		{
-			var reqId = consult.id;
-			var demographicNo = consult.demographicId;
-			var letterheadFax = Juno.Common.Util.noNull(consult.letterhead.fax);
-			var fax = Juno.Common.Util.noNull(consult.professionalSpecialist.faxNumber);
-			//		var faxRecipients = *additional fax recipients (can be >1)*
+			controller.save().then(
+				function success(reqId)
+				{
+					var demographicNo = consult.demographicId;
+					var letterheadFax = Juno.Common.Util.noNull(consult.letterhead.fax);
+					var fax = Juno.Common.Util.noNull(consult.professionalSpecialist.faxNumber);
 
-			window.open("../fax/CoverPage.jsp?reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&fax=" + fax);
+					window.open("../fax/CoverPage.jsp?reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&fax=" + fax);
+				}
+			);
 		};
 
 		controller.eSend = function eSend()
@@ -511,213 +525,16 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			}
 		};
 
-		controller.printPreview = function printPreview()
+		controller.saveAndPrint = function saveAndPrint()
 		{
-			if (controller.invalidData()) return;
+			controller.save().then(
+				function success(reqId)
+				{
+					if (controller.invalidData()) return;
 
-			window.open("../oscarEncounter/oscarConsultationRequest/printPdf2.do?reqId=" + consult.id + "&demographicNo=" + consult.demographicId);
-			/*
-					var printWin = window.open("","consultRequestPrintWin","width=830,height=900,scrollbars=yes,location=no");
-					printWin.document.open();
-
-					var replyTo = "Please reply ";
-					if (consult.patientWillBook) {
-						replyTo = "";
-					} else {
-						if (noNull(consult.letterheadList[0].name)!="") replyTo += "to " + consult.letterheadList[0].name;
-						replyTo += " by fax or by phone with appointment";
-					}
-
-					var urgency = noNull(controller.urgencies[$("#urgency").val()].name);
-					var referralDate = formatDate(consult.referralDate);
-					var letterheadName = noNull(consult.letterheadList[$("#letterhead").val()].name);
-					var letterheadAddress = noNull(consult.letterheadAddress);
-					var letterheadPhone = noNull(consult.letterheadPhone);
-					var letterheadFax = noNull(consult.letterheadFax);
-					var serviceName = noNull(consult.serviceList[$("#serviceId").val()].serviceDesc);
-					var consultantName = noNull(consult.professionalSpecialist.name);
-					var consultantPhone = noNull(consult.professionalSpecialist.phoneNumber);
-					var consultantFax = noNull(consult.professionalSpecialist.faxNumber);
-					var consultantAddress = noNull(consult.professionalSpecialist.streetAddress);
-					var patientName = noNull(consult.demographic.lastName)+", "+noNull(consult.demographic.firstName);
-					var patientPhone = noNull(consult.demographic.phone);
-					var patientWorkPhone = noNull(consult.demographic.alternativePhone);
-					var patientBirthdate = formatDate(consult.demographic.dateOfBirth);
-					var patientSex = noNull(consult.demographic.sexDesc);
-					var patientHealthCardNo = noNull(consult.demographic.hin)+"-"+noNull(consult.demographic.ver);
-					var patientChartNo = noNull(consult.demographic.chartNo);
-					var patientAddress = "";
-					if (consult.demographic.address!=null) {
-						patientAddress = noNull(consult.demographic.address.address)+", "+noNull(consult.demographic.address.city)+", "+noNull(consult.demographic.address.province)+" "+noNull(consult.demographic.address.postal);
-					}
-					var appointmentDate = formatDate(consult.appointmentDate);
-					var appointmentTime = formatTime(consult.appointmentTime);
-					var reason = noNull(consult.reasonForReferral);
-					var clinicalInfo = noNull(consult.clinicalInfo);
-					var concurrentProblems = noNull(consult.concurrentProblems);
-					var currentMeds = noNull(consult.currentMeds);
-					var allergies = noNull(consult.allergies);
-					var referringProvider = noNull(user.lastName)+", "+noNull(user.firstName);
-					var mrp = "";
-					if (consult.demographic.provider!=null) {
-						mrp = noNull(consult.demographic.provider.lastName)+", "+noNull(consult.demographic.provider.firstName);
-					}
-
-					var reqId = consult.id;
-					var demoId = consult.demographicId;
-					var userId = user.providerNo;
-
-					printWin.document.write("<html><style>body {width:800px;font-family:arial,verdana,tahoma,helvetica,sans serif;}div {text-align:center;}table {width:100%;}th {text-align:left;font-weight:bold;width:1;white-space:nowrap}td {vertical-align:top;}label {font-weight:bold;}em {font-size:small;}p {font-size:large;}</style><style media='print'>button {display: none;}</style><script>function printAttachments(){window.location.href='../oscarEncounter/oscarConsultationRequest/attachmentReport.jsp?reqId="+reqId+"&demographicNo="+demoId+"&providerNo="+userId+"';}</script><body><button onclick='window.print();'>Print</button><button onclick='printAttachments()'>Print attachments</button><button onclick='window.close()'>Close</button><div><label>Consultation Request</label><br/><label>"+replyTo+"</label></div><br/><table><tr><td><label>Date: </label>"+referralDate+"</td><td rowspan=6 width=10>&nbsp;</td><td><label>Status: </label>"+urgency+"</td></tr><tr><td colspan=2>&nbsp;</td></tr><tr><th>FROM:</th><th>TO:</th></tr><tr><td><p>"+letterheadName+"</p>"+letterheadAddress+"<br/><label>Tel: </label>"+letterheadPhone+"<br/><label>Fax: </label>"+letterheadFax+"</td><td><table><tr><th>Consultant:</th><td>"+consultantName+"</td></tr><tr><th>Service:</th><td>"+serviceName+"</td></tr><tr><th>Phone:</th><td>"+consultantPhone+"</td></tr><tr><th>Fax:</th><td>"+consultantFax+"</td></tr><tr><th>Address:</th><td>"+consultantAddress+"</td></tr></table></td></tr><tr><td colspan=2>&nbsp;</td></tr><tr><td><table><tr><th>Patient:</th><td>"+patientName+"</td></tr><tr><th>Address:</th><td>"+patientAddress+"</td></tr><tr><th>Phone:</th><td>"+patientPhone+"</td></tr><tr><th>Work Phone:</th><td>"+patientWorkPhone+"</td></tr><tr><th>Birthdate:</th><td>"+patientBirthdate+"</td></tr></table></td><td><table><tr><th>Sex:</th><td>"+patientSex+"</td></tr><tr><th>Health Card No:</th><td>"+patientHealthCardNo+"</td></tr><tr><th>Appointment date:</th><td>"+appointmentDate+"</td></tr><tr><th>Appointment time:</th><td>"+appointmentTime+"</td></tr><tr><th>Chart No:</th><td>"+patientChartNo+"</td></tr></table></td></tr></table><br/><table><tr><th>Reason for consultation:</th></tr><tr><td>"+reason+"<hr></td></tr><tr><th>Pertinent Clinical Information:</th></tr><tr><td>"+clinicalInfo+"<hr></td></tr><tr><th>Significant Concurrent Problems:</th></tr><tr><td>"+concurrentProblems+"<hr></td></tr><tr><th>Current Medications:</th></tr><tr><td>"+currentMeds+"<hr></td></tr><tr><th>Allergies:</th></tr><tr><td>"+allergies+"<hr></td></tr><tr><td><label>Referring Practitioner: </label>"+referringProvider+"</td></tr><tr><td><label>MRP: </label>"+mrp+"</td></tr><tr><td>&nbsp;</td></tr><tr><td><div><em>Created by: OSCAR The open-source EMR www.oscarcanada.org</em></div></td></tr></table></body></html>");
-					printWin.document.close();
-			*/
+					window.open("../oscarEncounter/oscarConsultationRequest/printPdf2.do?reqId=" + reqId + "&demographicNo=" + consult.demographicId);
+				}
+			);
 		}
-		/* html for printPreview, kept here for easy reference
-		<html>
-		<style>
-			body {width:800px;font-family:arial,verdana,tahoma,helvetica,sans serif;}
-			div {text-align:center;}
-			table {width:100%;}
-			th {text-align:left;font-weight:bold;width:1;white-space:nowrap}
-			td {vertical-align:top;}
-			label {font-weight:bold;}
-			em {font-size:small;}
-			p {font-size:large;}
-		</style>
-		<style media='print'>
-			button {display: none;}
-		</style>
-		<script>
-			function printAttachments(){
-				window.location.href='../oscarEncounter/oscarConsultationRequest/attachmentReport.jsp?reqId="+reqId+"&demographicNo="+demoId+"&providerNo="+userId+"';
-			}
-		</script>
-		<body>
-			<button onclick='window.print();'>Print</button>
-			<button onclick='printAttachments()'>Print attachments</button>
-			<button onclick='window.close()'>Close</button>
-			<div>
-				<label>Consultation Request</label><br/>
-				<label>"+replyTo+"</label>
-			</div>
-			<br/>
-			<table>
-				<tr>
-					<td>
-						<label>Date: </label>"+referralDate+"
-					</td>
-					<td rowspan=6 width=10>&nbsp;</td>
-					<td>
-						<label>Status: </label>"+urgency+"
-					</td>
-				</tr>
-				<tr><td colspan=2>&nbsp;</td></tr>
-				<tr>
-					<th>FROM:</th>
-					<th>TO:</th>
-				</tr>
-				<tr>
-					<td>
-						<p>"+letterheadName+"</p>
-						"+letterheadAddress+"<br/>
-						<label>Tel: </label>"+letterheadPhone+"<br/>
-						<label>Fax: </label>"+letterheadFax+"
-					</td>
-					<td>
-						<table>
-							<tr>
-								<th>Consultant:</th>
-								<td>"+consultantName+"</td>
-							</tr>
-							<tr>
-								<th>Service:</th>
-								<td>"+serviceName+"</td>
-							</tr>
-							<tr>
-								<th>Phone:</th>
-								<td>"+consultantPhone+"</td>
-							</tr>
-							<tr>
-								<th>Fax:</th>
-								<td>"+consultantFax+"</td>
-							</tr>
-							<tr>
-								<th>Address:</th>
-								<td>"+consultantAddress+"</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr><td colspan=2>&nbsp;</td></tr>
-				<tr>
-					<td>
-						<table>
-							<tr>
-								<th>Patient:</th>
-								<td>"+patientName+"</td>
-							</tr>
-							<tr>
-								<th>Address:</th>
-								<td>"+patientAddress+"</td>
-							</tr>
-							<tr>
-								<th>Phone:</th>
-								<td>"+patientPhone+"</td>
-							</tr>
-							<tr>
-								<th>Work Phone:</th>
-								<td>"+patientWorkPhone+"</td>
-							</tr>
-							<tr>
-								<th>Birthdate:</th>
-								<td>"+patientBirthdate+"</td>
-							</tr>
-						</table>
-					</td>
-					<td>
-						<table>
-							<tr>
-								<th>Sex:</th>
-								<td>"+patientSex+"</td>
-							</tr>
-							<tr>
-								<th>Health Card No:</th>
-								<td>"+patientHealthCardNo+"</td>
-							</tr>
-							<tr>
-								<th>Appointment date:</th>
-								<td>"+appointmentDate+"</td>
-							</tr>
-							<tr>
-								<th>Appointment time:</th>
-								<td>"+appointmentTime+"</td>
-							</tr>
-							<tr>
-								<th>Chart No:</th>
-								<td>"+patientChartNo+"</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-			</table>
-			<br/>
-			<table>
-				<tr><th>Reason for consultation:</th></tr>
-				<tr><td>"+reason+"<hr></td></tr>
-				<tr><th>Pertinent Clinical Information:</th></tr>
-				<tr><td>"+clinicalInfo+"<hr></td></tr>
-				<tr><th>Significant Concurrent Problems:</th></tr>
-				<tr><td>"+concurrentProblems+"<hr></td></tr>
-				<tr><th>Current Medications:</th></tr>
-				<tr><td>"+currentMeds+"<hr></td></tr>
-				<tr><th>Allergies:</th></tr>
-				<tr><td>"+allergies+"<hr></td></tr>
-				<tr><td><label>Referring Practitioner: </label>"+referringProvider+"</td></tr>
-				<tr><td><label>MRP: </label>"+mrp+"</td></tr>
-				<tr><td>&nbsp;</td></tr>
-				<tr><td><div><em>Created by: OSCAR The open-source EMR www.oscarcanada.org</em></div></td></tr>
-			</table>
-		</body>
-		</html>
-		*/
 	}
 ]);
