@@ -18,8 +18,8 @@
 		</cxf:properties>
 	</cxf:bus>
 
-	<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>
-	<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>
+	<!--<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>-->
+	<!--<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>-->
 
 	<bean id="oauthProvider" class="oscar.login.OscarOAuthDataProvider" autowire="byName"/>
 
@@ -46,9 +46,9 @@
 		<property name="dataProvider" ref="oauthProvider"/>
 	</bean>
 
-	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.util.exceptionMapping.ValidationExceptionMapper"/>
-	<bean id="generalExceptionMapper" class="org.oscarehr.ws.rest.util.exceptionMapping.GeneralExceptionMapper"/>
-	<bean id="invalidFormatExceptionMapper" class="org.oscarehr.ws.rest.util.exceptionMapping.InvalidFormatExceptionMapper"/>
+	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.filter.exceptionMapping.ValidationExceptionMapper"/>
+	<bean id="generalExceptionMapper" class="org.oscarehr.ws.rest.filter.exceptionMapping.GeneralExceptionMapper"/>
+	<bean id="invalidFormatExceptionMapper" class="org.oscarehr.ws.rest.filter.exceptionMapping.InvalidFormatExceptionMapper"/>
 	<bean id="objectMapperProvider" class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
 
 	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
@@ -82,11 +82,11 @@
 	<jaxrs:server id="restServicesV1" address="/services/v1">
 		<jaxrs:inInterceptors>
 			<ref bean="validationInInterceptor"/>
-			<ref bean="restLoggingInInterceptor"/>
+			<!--<ref bean="restLoggingInInterceptor"/>-->
 		</jaxrs:inInterceptors>
 		<jaxrs:outInterceptors>
 			<ref bean="validationOutInterceptor"/>
-			<ref bean="restLoggingOutInterceptor"/>
+			<!--<ref bean="restLoggingOutInterceptor"/>-->
 		</jaxrs:outInterceptors>
 
 		<jaxrs:inFaultInterceptors>

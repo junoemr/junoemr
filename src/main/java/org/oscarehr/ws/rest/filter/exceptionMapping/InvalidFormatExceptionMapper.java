@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest.util.exceptionMapping;
+package org.oscarehr.ws.rest.filter.exceptionMapping;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.oscarehr.ws.rest.response.RestResponse;

@@ -27,7 +27,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.RestServiceLog;
 import org.oscarehr.util.MiscUtils;
+import oscar.log.LogAction;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -41,10 +43,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.util.Date;
 
 public class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter
 {
 	private static Logger logger = MiscUtils.getLogger();
+
+	private static final String PROP_REQUEST_BODY = "LoggingFilter.requestBody";
+	private static final String PROP_REQUEST_PROVIDER = "LoggingFilter.requestProviderNo";
+	private static final String PROP_REQUEST_DATETIME = "LoggingFilter.requestDateTime";
 
 	@Context
 	private ContextResolver<ObjectMapper> mapperResolver;
@@ -64,7 +72,7 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 
 		if(oAuthContext != null && oAuthContext.getSubject() != null)
 		{
-			request.setProperty("providerNo", oAuthContext.getSubject().getLogin());
+			request.setProperty(PROP_REQUEST_PROVIDER, oAuthContext.getSubject().getLogin());
 		}
 
 		// Get the message body and put it in a property
@@ -75,7 +83,8 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 			body = readEntityStream(request);
 		}
 
-		request.setProperty("requestBody", body);
+		request.setProperty(PROP_REQUEST_BODY, body);
+		request.setProperty(PROP_REQUEST_DATETIME, new Date());
 	}
 
 	// Response filter
@@ -83,11 +92,85 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 	// TODO: put this in the database
 	public void filter(ContainerRequestContext request, ContainerResponseContext response)
 	{
+
+		String providerNo = (String) request.getProperty(PROP_REQUEST_PROVIDER);
+		String rawPostData = (String) request.getProperty(PROP_REQUEST_BODY);
+		Date requestDateTime = (Date) request.getProperty(PROP_REQUEST_DATETIME);
+		String rawResponseData = null;
+		long duration = 0L;
+
+		UriInfo uriInfo = request.getUriInfo();
+		String url = null;
+		String queryString = null;
+
+		if(requestDateTime != null)
+		{
+			duration = new Date().getTime() - requestDateTime.getTime();
+		}
+		else
+		{
+			logger.warn("request start date is missing");
+		}
+
+		if(uriInfo != null)
+		{
+			try
+			{
+				url = uriInfo.getRequestUri().toURL().toString();
+				queryString = uriInfo.getRequestUri().getQuery();
+			}
+			catch(MalformedURLException e)
+			{
+				logger.error("Malformed URL", e);
+			}
+		}
+
+		if(response.getEntity() != null)
+		{
+			Object entity = response.getEntity();
+			final ObjectMapper objectMapper = mapperResolver.getContext(Object.class);
+
+			try
+			{
+				rawResponseData = objectMapper.writeValueAsString(entity);
+			}
+			catch(Exception e)
+			{
+				logger.error("Error writing API response as JSON", e);
+			}
+		}
+
+		try
+		{
+			RestServiceLog restLog = new RestServiceLog();
+
+			restLog.setProviderNo(providerNo);
+			restLog.setIp(httpRequest.getRemoteAddr());
+			restLog.setUserAgent(request.getHeaderString("User-Agent"));
+			restLog.setUrl(url);
+			restLog.setMethod(request.getMethod());
+			restLog.setRequestMediaType(request.getMediaType().toString());
+			restLog.setRawQueryString(queryString);
+			restLog.setRawPost(rawPostData);
+
+			restLog.setStatusCode(response.getStatus());
+			restLog.setRawOutput(rawResponseData);
+			restLog.setDuration(duration);
+			restLog.setResponseMediaType(response.getMediaType().toString());
+
+			LogAction.saveRestLogEntry(restLog);
+		}
+		catch(Exception e)
+		{
+			logger.error("Failed to save REST Log Entry", e);
+		}
+
+
 		logger.info("=======================================");
 		logger.info("GENERAL");
 		logger.info("-------");
 
-		logger.info(request.getProperty("providerNo"));
+		logger.info(request.getProperty(PROP_REQUEST_PROVIDER));
 		logger.info(httpRequest.getRemoteAddr());
 		logger.info(request.getHeaderString("User-Agent"));
 
@@ -98,13 +181,12 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 		logger.info(request.getMediaType());
 		logger.info(request.getMethod());
 
-		UriInfo uriInfo = request.getUriInfo();
 		if(uriInfo != null)
 		{
 			logger.info(uriInfo.getRequestUri().toString());
 		}
 
-		logger.info(request.getProperty("requestBody"));
+		logger.info(request.getProperty(PROP_REQUEST_BODY));
 
 		logger.info("RESPONSE");
 		logger.info("--------");
@@ -144,11 +226,7 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 			IOUtils.copy(inputStream, outStream);
 			byte[] requestEntity = outStream.toByteArray();
 
-			if (requestEntity.length == 0)
-			{
-				builder.append("");
-			}
-			else
+			if (requestEntity.length != 0)
 			{
 				builder.append(new String(requestEntity));
 			}

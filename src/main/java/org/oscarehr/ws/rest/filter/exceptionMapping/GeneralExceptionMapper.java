@@ -21,19 +21,26 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest.util.exceptionMapping;
+package org.oscarehr.ws.rest.filter.exceptionMapping;
 
-	import org.oscarehr.ws.rest.response.RestResponse;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.response.RestResponse;
 
-	import javax.ws.rs.core.MediaType;
-	import javax.ws.rs.core.Response;
-	import javax.ws.rs.ext.ExceptionMapper;
-	import javax.ws.rs.ext.Provider;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-
+/**
+ * Generalized exception mapper. This class catches all uncaught exceptions and formats them in a response object.
+ * The LoggingFilter is able to handle these responses like a regular response.
+ */
 @Provider
 public class GeneralExceptionMapper implements ExceptionMapper<Exception>
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public GeneralExceptionMapper()
 	{
 	}
@@ -42,8 +49,9 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception>
 	public Response toResponse(Exception exception)
 	{
 		RestResponse<String> response = RestResponse.errorResponse("System error");
+		logger.error("Uncaught System Error", exception);
 
 		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(response)
-			.type(MediaType.APPLICATION_JSON).build();
+				.type(MediaType.APPLICATION_JSON).build();
 	}
 }
