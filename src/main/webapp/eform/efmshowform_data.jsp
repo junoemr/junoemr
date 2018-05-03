@@ -23,7 +23,7 @@
     Ontario, Canada
 
 --%>
-<%@ page import="java.sql.*, oscar.eform.data.*"%>
+<%@ page import="oscar.eform.data.EForm"%>
 <%
   String id = request.getParameter("fid");
   String messageOnFailure = "No eform or appointment is available";

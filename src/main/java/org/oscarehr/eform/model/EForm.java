@@ -25,11 +25,6 @@ package org.oscarehr.eform.model;
 
 import org.oscarehr.common.model.AbstractModel;
 
-import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -39,6 +34,10 @@ import javax.persistence.PreRemove;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
 
 @Entity
 @Table(name = "eform")
@@ -89,12 +88,17 @@ public class EForm extends AbstractModel<Integer> implements Serializable {
 	@Column(name = "form_html")
 	private String formHtml;
 
+	@Column(name = "showLatestFormOnly")
 	private boolean showLatestFormOnly;
 
 	@Column(name = "patient_independent")
 	private boolean patientIndependent;
 
+	@Column(name = "roleType")
 	private String roleType;
+
+	@Column(name="instanced")
+	private boolean instanced = false;
 
 	@Override
 	public Integer getId() {
@@ -204,6 +208,16 @@ public class EForm extends AbstractModel<Integer> implements Serializable {
 
 	public void setRoleType(String roleType) {
 		this.roleType = roleType;
+	}
+
+	public boolean isInstanced()
+	{
+		return instanced;
+	}
+
+	public void setInstanced(boolean instanced)
+	{
+		this.instanced = instanced;
 	}
 
 	@PreRemove

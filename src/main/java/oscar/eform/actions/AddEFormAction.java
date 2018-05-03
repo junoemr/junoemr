@@ -86,10 +86,8 @@ public class AddEFormAction extends Action {
 		boolean fax = "true".equals(request.getParameter("fax"));
 		boolean print = "true".equals(request.getParameter("print"));
 
-		String previousFormDataId = (String)session.getAttribute("eform_data_id");
-		session.removeAttribute("eform_data_id");
-
 		String fid = request.getParameter("efmfid");
+		String oldFormDataId = org.apache.commons.lang.StringUtils.trimToNull(request.getParameter("efmfdid"));
 		String demographicNoStr = request.getParameter("efmdemographic_no");
 		String eFormLink = request.getParameter("eform_link");
 		String subject = org.apache.commons.lang.StringUtils.trimToEmpty(request.getParameter("subject"));
@@ -194,9 +192,9 @@ public class AddEFormAction extends Action {
 		try
 		{
 			EFormData eForm;
-			if(StringUtils.filled(previousFormDataId))
+			if(StringUtils.filled(oldFormDataId))
 			{
-				Integer oldFdid = Integer.parseInt(previousFormDataId);
+				Integer oldFdid = Integer.parseInt(oldFormDataId);
 				eForm = eFormService.saveExistingEForm(oldFdid, demographicNo, providerNo, formId, subject, formOpenerMap, paramValueMap, eFormLink);
 			}
 			else
@@ -206,7 +204,7 @@ public class AddEFormAction extends Action {
 
 
 			boolean sameForm = (eForm == null);
-			String fdid = (sameForm) ? previousFormDataId : eForm.getId().toString();
+			String fdid = (sameForm) ? oldFormDataId : eForm.getId().toString();
 
 			if(!sameForm)
 			{

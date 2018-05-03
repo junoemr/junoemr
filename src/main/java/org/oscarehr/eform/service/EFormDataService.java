@@ -28,9 +28,12 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMessages;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.dao.EFormDataDao;
+import org.oscarehr.eform.dao.EFormInstanceDao;
 import org.oscarehr.eform.dao.EFormValueDao;
 import org.oscarehr.eform.exception.EFormMeasurementException;
+import org.oscarehr.eform.model.EForm;
 import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.eform.model.EFormInstance;
 import org.oscarehr.eform.model.EFormValue;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +59,9 @@ public class EFormDataService
 	private EFormDataDao eFormDataDao;
 
 	@Autowired
+	private EFormInstanceDao eFormInstanceDao;
+
+	@Autowired
 	private EFormValueDao eFormValueDao;
 
 	@Autowired
@@ -69,26 +75,23 @@ public class EFormDataService
 		{
 			throw new IllegalArgumentException("No FormData found for fdid " + oldFormDataId);
 		}
-		EFormData newVersion = copyFromTemplate(formId);
+		EForm template = getEFormTemplate(formId);
+		EFormData newVersion = copyFromEFormData(oldVersion);
 
-		// this could be expensive for larger eforms
-		boolean sameForm = oldVersion.getFormData().equals(newVersion.getFormData());
-
-		if(!sameForm)
-		{
-			logger.info("EForm html does not match, save a new copy");
-			return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
-		}
-		return null;
+		return saveEForm(newVersion, template, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
 	}
 	public EFormData saveNewEForm(Integer demographicNo, Integer providerNo, Integer formId, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
 		logger.info("Save New EForm (template id " + formId + ")");
-		EFormData newVersion = copyFromTemplate(formId);
-		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
+		EForm template = getEFormTemplate(formId);
+		EFormData newVersion = copyFromTemplate(template);
+		return saveEForm(newVersion, template, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
 	}
 
-	private EFormData saveEForm(EFormData eForm, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	/**
+	 * Handle all of the major eForm creation logic. save an eForm data model for a demographic.
+	 */
+	private EFormData saveEForm(EFormData eForm, EForm template, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
 		Date currentDate = new Date();
 		eForm.setFormDate(currentDate);
@@ -131,12 +134,26 @@ public class EFormDataService
 		// must update the html after running the image/action etc. changes on curForm
 		eForm.setFormData(curForm.getFormHtml());
 
+		// must have a persisted instance in order to save the id
+		EFormInstance eFormInstance = getPersistedEFormInstance(template, eForm);
+		eForm.setEFormInstance(eFormInstance);
+
 		eFormDataDao.persist(eForm);
+
+		// now that the eForm data is persisted, update the id in the instance table;
+		eFormInstance.setCurrentEFormData(eForm);
+		eFormInstanceDao.merge(eFormInstance);
+
+		// save the eForm values
 		saveEFormValues(eForm.getFormId(), eForm.getId(), eForm.getDemographicId(), eFormValueMap);
+
 		logger.info("EForm data saved with id " + eForm.getId());
 		return eForm;
 	}
 
+	/**
+	 * save the eForm values from the value map
+	 */
 	private void saveEFormValues(Integer formId, Integer formDataId, Integer demographicNo, Map<String,String> formValueMap)
 	{
 		for(Map.Entry<String, String> entry : formValueMap.entrySet())
@@ -151,13 +168,48 @@ public class EFormDataService
 			eFormValueDao.persist(eFormValue);
 		}
 	}
-	private EFormData copyFromTemplate(Integer templateId)
+
+	/**
+	 * get an existing eForm instance model, or create a new one.
+	 * new models get persisted to ensure the id exists
+	 */
+	private EFormInstance getPersistedEFormInstance(EForm eFormTemplate, EFormData eForm)
 	{
-		org.oscarehr.eform.model.EForm template = eFormTemplateDao.find(templateId);
+		EFormInstance eFormInstance = null;
+		if(eFormTemplate.isInstanced())
+		{
+			eFormInstance = eForm.getEFormInstance();
+			if(eFormInstance == null)
+			{
+				eFormInstance = new EFormInstance();
+				eFormInstance.setCreatedAt(new Date());
+				eFormInstance.setEFormTemplate(eFormTemplate);
+				eFormInstanceDao.persist(eFormInstance);
+			}
+		}
+		return eFormInstance;
+	}
+
+	/**
+	 * load the eForm template from the primary key
+	 * @param templateId - eForm primary key
+	 * @throws IllegalArgumentException if the entity is not found
+	 */
+	private EForm getEFormTemplate(Integer templateId)
+	{
+		EForm template = eFormTemplateDao.find(templateId);
 		if(template == null)
 		{
 			throw new IllegalArgumentException("No EForm Template found for fid " + templateId);
 		}
+		return template;
+	}
+
+	/**
+	 * copy stuff from the template to the data model
+	 */
+	private EFormData copyFromTemplate(EForm template)
+	{
 		EFormData eFormCopy = new EFormData();
 		eFormCopy.setFormId(template.getId());
 		eFormCopy.setFormName(template.getFormName());
@@ -169,6 +221,26 @@ public class EFormDataService
 		eFormCopy.setSubject(template.getSubject());
 		eFormCopy.setShowLatestFormOnly(template.isShowLatestFormOnly());
 		eFormCopy.setPatientIndependent(template.isPatientIndependent());
+
+		return eFormCopy;
+	}
+	/**
+	 * copy stuff from the old eForm to a new model
+	 */
+	private EFormData copyFromEFormData(EFormData eFormData)
+	{
+		EFormData eFormCopy = new EFormData();
+		eFormCopy.setFormId(eFormData.getId());
+		eFormCopy.setFormName(eFormData.getFormName());
+		eFormCopy.setFormDate(eFormData.getFormDate());
+		eFormCopy.setFormTime(eFormData.getFormTime());
+		eFormCopy.setRoleType(eFormData.getRoleType());
+		eFormCopy.setFormData(eFormData.getFormData());
+		eFormCopy.setCurrent(eFormData.isCurrent());
+		eFormCopy.setSubject(eFormData.getSubject());
+		eFormCopy.setShowLatestFormOnly(eFormData.isShowLatestFormOnly());
+		eFormCopy.setPatientIndependent(eFormData.isPatientIndependent());
+		eFormCopy.setEFormInstance(eFormData.getEFormInstance());
 
 		return eFormCopy;
 	}

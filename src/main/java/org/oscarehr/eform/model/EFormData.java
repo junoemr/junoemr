@@ -25,19 +25,21 @@ package org.oscarehr.eform.model;
 
 import org.oscarehr.common.model.AbstractModel;
 
-import java.io.Serializable;
-import java.util.Comparator;
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PreRemove;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.Date;
 
 @Entity
 @Table(name = "eform_data")
@@ -106,12 +108,18 @@ public class EFormData extends AbstractModel<Integer> implements Serializable {
 	@Column(name = "form_data")
 	private String formData;
 
+	@Column(name = "showLatestFormOnly")
 	private boolean showLatestFormOnly;
 
 	@Column(name = "patient_independent")
 	private boolean patientIndependent;
 
+	@Column(name = "roleType")
 	private String roleType;
+
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="eform_instance_id")
+	private EFormInstance eFormInstance;
 
 	@Override
 	public Integer getId() {
@@ -218,8 +226,19 @@ public class EFormData extends AbstractModel<Integer> implements Serializable {
 		this.roleType = roleType;
 	}
 
+	public EFormInstance getEFormInstance()
+	{
+		return eFormInstance;
+	}
+
+	public void setEFormInstance(EFormInstance eFormInstance)
+	{
+		this.eFormInstance = eFormInstance;
+	}
+
 	@PreRemove
-	protected void jpa_preventDelete() {
+	protected void jpa_preventDelete()
+	{
 		throw (new UnsupportedOperationException("Remove is not allowed for this type of item."));
 	}
 }
