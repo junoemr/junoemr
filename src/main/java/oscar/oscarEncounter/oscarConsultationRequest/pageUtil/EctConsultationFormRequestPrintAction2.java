@@ -19,6 +19,7 @@ package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +29,12 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.common.dao.ConsultDocsDao;
+import org.oscarehr.common.exception.HtmlToPdfConversionException;
+import org.oscarehr.common.model.ConsultDocs;
+import org.oscarehr.common.printing.HtmlToPdfServlet;
+import org.oscarehr.eform.dao.EFormDataDao;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -40,6 +47,7 @@ import oscar.oscarLab.ca.all.pageUtil.LabPDFCreator;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConcatPDF;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 import com.lowagie.text.DocumentException;
@@ -54,6 +62,8 @@ public class EctConsultationFormRequestPrintAction2 extends Action {
     
     private static final Logger logger = MiscUtils.getLogger();
     private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private ConsultDocsDao consultDocsDao = SpringUtils.getBean(ConsultDocsDao.class);
+	private EFormDataDao eFormDataDao = SpringUtils.getBean(EFormDataDao.class);
     
     public EctConsultationFormRequestPrintAction2() {
     }
@@ -80,48 +90,58 @@ public class EctConsultationFormRequestPrintAction2 extends Action {
 		ArrayList<InputStream> streams = new ArrayList<InputStream>();
 
 		ArrayList<LabResultData> labs = consultLabs.populateLabResultsData(loggedInInfo, demoNo, reqId, CommonLabResultData.ATTACHED);
+
+		List<Integer> eforms = consultDocsDao.findDocNoByRequestIdAndType(ConversionUtils.fromIntString(reqId), ConsultDocs.DOCTYPE_EFORM);
+
 		String error = "";
 		Exception exception = null;
-		try {
+		try
+		{
 
 			bos = new ByteOutputStream();
-			ConsultationPDFCreator cpdfc = new ConsultationPDFCreator(request,bos);
+			ConsultationPDFCreator cpdfc = new ConsultationPDFCreator(request, bos);
 			cpdfc.printPdf(loggedInInfo);
-			
+
 			buffer = bos.getBytes();
 			bis = new ByteInputStream(buffer, bos.getCount());
 			bos.close();
 			streams.add(bis);
 			alist.add(bis);
 
-			for (int i = 0; i < docs.size(); i++) {
-				EDoc doc = docs.get(i);  
-				if (doc.isPrintable()) {
-					if (doc.isImage()) {
+			for (int i = 0; i < docs.size(); i++)
+			{
+				EDoc doc = docs.get(i);
+				if (doc.isPrintable())
+				{
+					if (doc.isImage())
+					{
 						bos = new ByteOutputStream();
 						request.setAttribute("imagePath", path + doc.getFileName());
 						request.setAttribute("imageTitle", doc.getDescription());
 						ImagePDFCreator ipdfc = new ImagePDFCreator(request, bos);
 						ipdfc.printPdf();
-						
+
 						buffer = bos.getBytes();
 						bis = new ByteInputStream(buffer, bos.getCount());
 						bos.close();
 						streams.add(bis);
 						alist.add(bis);
-						
+
 					}
-					else if (doc.isPDF()) {
+					else if (doc.isPDF())
+					{
 						alist.add(path + doc.getFileName());
 					}
-					else {
-						logger.error("EctConsultationFormRequestPrintAction: " + doc.getType() + " is marked as printable but no means have been established to print it.");	
+					else
+					{
+						logger.error("EctConsultationFormRequestPrintAction: " + doc.getType() + " is marked as printable but no means have been established to print it.");
 					}
 				}
 			}
 
 			// Iterating over requested labs.
-			for (int i = 0; labs != null && i < labs.size(); i++) {
+			for (int i = 0; labs != null && i < labs.size(); i++)
+			{
 				// Storing the lab in PDF format inside a byte stream.
 				bos = new ByteOutputStream();
 				request.setAttribute("segmentID", labs.get(i).segmentID);
@@ -137,9 +157,26 @@ public class EctConsultationFormRequestPrintAction2 extends Action {
 				alist.add(bis);
 
 			}
-			
-			if (alist.size() > 0) {
-				
+
+			// Iterating over requested eforms.
+			HtmlToPdfServlet htmlToPdfServlet = new HtmlToPdfServlet();
+			for (int i = 0; eforms != null && i < eforms.size(); i++)
+			{
+				EFormData eFormData = eFormDataDao.findByFormDataId(eforms.get(i));
+				if (eFormData == null)
+				{
+					MiscUtils.getLogger().warn("Could not find data for eform fdid " + eforms.get(i));
+					continue;
+				}
+				buffer = htmlToPdfServlet.convertToPdf(request, eFormData.getFormData());
+				bis = new ByteInputStream(buffer, buffer.length);
+				streams.add(bis);
+				alist.add(bis);
+			}
+
+			if (alist.size() > 0)
+			{
+
 				bos = new ByteOutputStream();
 				ConcatPDF.concat(alist, bos);
 				response.setContentType("application/pdf"); // octet-stream
@@ -151,10 +188,16 @@ public class EctConsultationFormRequestPrintAction2 extends Action {
 				response.getOutputStream().write(bos.getBytes(), 0, bos.getCount());
 			}
 
+		}
+		catch (HtmlToPdfConversionException ce)
+		{
+			error = "HtmlToPdfConversionException";
+			exception = ce;
 		} catch (DocumentException de) {
 			error = "DocumentException";
 			exception = de;
-		} catch (IOException ioe) {
+		} catch (IOException ioe)
+		{
 			error = "IOException";
 			exception = ioe;
 		} finally { 
