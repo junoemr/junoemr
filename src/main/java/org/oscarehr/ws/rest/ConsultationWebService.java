@@ -92,6 +92,7 @@ import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.eform.EFormUtil;
 import oscar.oscarDemographic.data.RxInformation;
+import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConversionUtils;
@@ -669,7 +670,11 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			String url = null;
 			if (lab.isMDS()) url = "oscarMDS/SegmentDisplay.jsp?demographicId="+demographicNo+"&segmentID="+lab.getSegmentID();
 			else if (lab.isCML()) url = "lab/CA/ON/CMLDisplay.jsp?demographicId="+demographicNo+"&segmentID="+lab.getSegmentID();
-			else if (lab.isHL7TEXT()) url = "lab/CA/ALL/labDisplay.jsp?demographicId="+demographicNo+"&segmentID="+lab.getSegmentID();
+			else if (lab.isHL7TEXT())
+			{
+				if (!Hl7textResultsData.getMatchingLabs(lab.segmentID).endsWith(lab.segmentID)) continue;
+				url = "lab/CA/ALL/labDisplay.jsp?demographicId=" + demographicNo + "&segmentID=" + lab.getSegmentID();
+			}
 			else url = "lab/CA/BC/labDisplay.jsp?demographicId="+demographicNo+"&segmentID="+lab.getSegmentID();
 			
 			attachments.add(new ConsultationAttachmentTo1(ConversionUtils.fromIntString(lab.getLabPatientId()), ConsultationAttachmentTo1.TYPE_LAB, attached, displayName, url));
