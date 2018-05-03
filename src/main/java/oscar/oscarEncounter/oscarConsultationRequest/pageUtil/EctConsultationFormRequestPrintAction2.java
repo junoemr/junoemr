@@ -162,7 +162,7 @@ public class EctConsultationFormRequestPrintAction2 extends Action {
 			HtmlToPdfServlet htmlToPdfServlet = new HtmlToPdfServlet();
 			for (int i = 0; eforms != null && i < eforms.size(); i++)
 			{
-				EFormData eFormData = eFormDataDao.findByFormDataId(eforms.get(i));
+				EFormData eFormData = eFormDataDao.find(eforms.get(i));
 				if (eFormData == null)
 				{
 					MiscUtils.getLogger().warn("Could not find data for eform fdid " + eforms.get(i));
