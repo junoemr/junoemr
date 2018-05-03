@@ -479,7 +479,6 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				.finally(
 					function()
 					{
-						console.log("finally happened")
 						controller.setESendEnabled();
 						controller.consultSaving = false; //hide saving banner
 						controller.consultChanged = 0; //reset change count
