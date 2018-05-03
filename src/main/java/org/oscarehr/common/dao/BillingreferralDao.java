@@ -68,18 +68,13 @@ public class BillingreferralDao extends AbstractDao<Billingreferral> {
 	 }
 
     public List<Billingreferral> getBillingreferral(String referral_no) {
-    	String sql = "SELECT br From Billingreferral br WHERE br.referralNo=?";
+    	String sql = "SELECT br FROM Billingreferral br WHERE br.referralNo= :referralNo";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, referral_no);
+		query.setParameter("referralNo", referral_no);
 
 		@SuppressWarnings("unchecked")
 		List<Billingreferral> cList = query.getResultList();
-
-        if (cList != null && cList.size() > 0) {
-            return cList;
-        } else {
-            return null;
-        }
+		return cList;
     }
 
     public List<Billingreferral> getBillingreferral(String last_name, String first_name) {
@@ -129,20 +124,19 @@ public class BillingreferralDao extends AbstractDao<Billingreferral> {
 
 	}
 
-    public List<Billingreferral> getBillingreferralByLastName(String last_name) {
-    	String sql = "SELECT br From Billingreferral br WHERE br.lastName like ? order by br.lastName";
+	public List<Billingreferral> getBillingreferralByLastName(String last_name, int limit, int offset)
+	{
+		String sql = "SELECT br FROM Billingreferral br WHERE br.lastName LIKE :lastName ORDER BY br.lastName";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, "%"+last_name+"%");
+		query.setParameter("lastName", "%" + last_name + "%");
+
+		query.setMaxResults(limit);
+		query.setFirstResult(offset);
 
 		@SuppressWarnings("unchecked")
 		List<Billingreferral> cList = query.getResultList();
-
-        if (cList != null && cList.size() > 0) {
-            return cList;
-        } else {
-            return null;
-        }
-    }
+		return cList;
+	}
 
 
     public List<Billingreferral> getBillingreferralBySpecialty(String specialty) {

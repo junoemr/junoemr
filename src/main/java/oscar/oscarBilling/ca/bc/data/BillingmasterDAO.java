@@ -139,7 +139,7 @@ public class BillingmasterDAO {
 	}
 
 	public WCB getWCBForm(String formID) {
-		if (formID == null) {
+		if (formID == null || "null".equalsIgnoreCase(formID)) {
 			return null;
 		}
 		MiscUtils.getLogger().debug("\nFORM ID " + formID);

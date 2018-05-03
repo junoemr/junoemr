@@ -39,6 +39,8 @@ import java.awt.geom.Rectangle2D;
 
 import net.sf.jasperreports.engine.JRAbstractSvgRenderer;
 import net.sourceforge.barbecue.Barcode;
+import net.sourceforge.barbecue.output.OutputException;
+import org.oscarehr.util.MiscUtils;
 
 
 /**
@@ -74,7 +76,14 @@ public class BarbecueRenderer extends JRAbstractSvgRenderer
 	{
 		if (barcode != null) 
 		{
-			barcode.draw(grx, (int)rectangle.getX(), (int)rectangle.getY());
+			try
+			{
+				barcode.draw(grx, (int)rectangle.getX(), (int)rectangle.getY());
+			}
+			catch(OutputException e)
+			{
+				MiscUtils.getLogger().error("Error", e);
+			}
 		}
 	}
 

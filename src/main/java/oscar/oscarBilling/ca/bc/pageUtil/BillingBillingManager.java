@@ -23,6 +23,7 @@
  */
 package oscar.oscarBilling.ca.bc.pageUtil;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -234,7 +235,8 @@ public class BillingBillingManager {
 
 	}
 
-	public class BillingItem {
+	public class BillingItem implements Serializable
+	{
 
 		String service_code;
 		String description;

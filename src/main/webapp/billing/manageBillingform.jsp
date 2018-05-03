@@ -24,7 +24,7 @@
 
 --%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<%      
+<%
   String user_no = (String) session.getAttribute("user");
   String asstProvider_no = "";
    String color ="";

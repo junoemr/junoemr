@@ -44,14 +44,24 @@ public final class WsUtils {
 	 * @param security can be null, it will return false for null. 
 	 * @param securityToken can be the SecurityId's password, or a valid securityToken.
 	 */
-	public static boolean checkAuthenticationAndSetLoggedInInfo(HttpServletRequest request, Security security, String securityToken) {
-		if (security != null) {
-			if (security.getDateExpiredate() != null && security.getDateExpiredate().before(new Date())) return (false);
+	public static boolean checkAuthenticationAndSetLoggedInInfo(HttpServletRequest request, Security security, String securityToken)
+	{
+		if(security != null)
+		{
+			// check for login expiry
+			// fail auth if record flagged as expire set and invalid or expired date
+			if(security.isExpireSet() && (security.getDateExpiredate() == null || security.getDateExpiredate().before(new Date())))
+			{
+				return (false);
+			}
 
-			if (checkToken(security, securityToken) || security.checkPassword(securityToken)) {
+			// verify security token
+			if(checkToken(security, securityToken) || security.checkPassword(securityToken))
+			{
 				LoggedInInfo loggedInInfo = new LoggedInInfo();
 				loggedInInfo.setLoggedInSecurity(security);
-				if (security.getProviderNo() != null) {
+				if(security.getProviderNo() != null)
+				{
 					loggedInInfo.setLoggedInProvider(providerDao.getProvider(security.getProviderNo()));
 				}
 

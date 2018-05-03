@@ -29,11 +29,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import org.oscarehr.util.MiscUtils;
 
@@ -192,10 +188,11 @@ public class OscarProperties extends Properties {
 	}
 
 	/**
-	 * Will check the properties to see if that property is set and if it's set to "true", "yes" or "on". 
+	 * Will check the properties to see if that property is set and if it's set to "true", "yes" or "on".
 	 * If it is method returns true if not method returns false.
-	 * 
+	 *
 	 * @param key key of property
+	 * @param defaultValue Value to use if they key isn't there
 	 * @return boolean whether the property is active
 	 */
 	public boolean isPropertyActive(String key) {
@@ -231,6 +228,32 @@ public class OscarProperties extends Properties {
 		} catch (Exception e) {/* No Date Found */
 		}
 		return ret;
+	}
+
+	/**
+	 * Get the providers to route the labs to.
+	 * By default we will just return the list of providers that were requested in the lab
+	 *
+	 * @param defaultProviderNumbers The requested providers to route the labs to. Returned by default
+	 * @return ArrayList of the providers to route the labs to
+	 */
+	public ArrayList<String> getRouteLabsToProviders(ArrayList<String> defaultProviderNumbers)
+	{
+		String property = getProperty("route_labs_to_provider", "");
+
+		//Send all labs to the unclaimed inbox
+		if (property.equals("0"))
+		{
+			return null;
+		} else if (!property.equals("")) //Send all labs to providers listed in property
+		{
+			ArrayList<String> providers = new ArrayList<>(Arrays.asList(property.split(",")));
+			return providers;
+		} else
+		{
+			//Default. Send labs to requested providers
+			return defaultProviderNumbers;
+		}
 	}
 
 	public boolean isTorontoRFQ() {
@@ -443,6 +466,45 @@ public class OscarProperties extends Properties {
 		return Integer.parseInt(prop);
 	}
 
+	public boolean isAppointmentIntakeFormEnabled()
+	{
+		return isPropertyActive("appt_intake_form");
+	}
+
+	public boolean isNewEyeformEnabled()
+	{
+		return isPropertyActive("new_eyeform_enabled");
+	}
+
+	public boolean isSinglePageChartEnabled()
+	{
+		return isPropertyActive("SINGLE_PAGE_CHART");
+	}
+
+	public boolean isAppointmentShowShortLettersEnabled()
+	{
+		return isPropertyActive("APPT_SHOW_SHORT_LETTERS");
+	}
+
+	public boolean isToggleReasonByProviderEnabled()
+	{
+		return isPropertyActive("TOGGLE_REASON_BY_PROVIDER");
+	}
+
+	public boolean isDisplayAlertsOnScheduleScreenEnabled()
+	{
+		return isPropertyActive("displayAlertsOnScheduleScreen");
+	}
+
+	public boolean isAppoinmtnetAlwaysShowLinksEnabled()
+	{
+		return isPropertyActive("APPT_ALWAYS_SHOW_LINKS");
+	}
+
+	public boolean isEditAppointmentStatusEnabled()
+	{
+		return isPropertyActive("ENABLE_EDIT_APPT_STATUS");
+	}
 
 	// =========================================================================
 	// Static methods for getting specific property values

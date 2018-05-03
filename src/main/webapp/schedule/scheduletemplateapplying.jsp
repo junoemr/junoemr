@@ -888,13 +888,18 @@ function tranbuttonb7_click() {
 			</tr>
 			<tr>
 				<td bgcolor="#CCFFCC" colspan="2">
-				<div align="right"><input type="hidden" name="provider_no"
-					value="<%=request.getParameter("provider_no")%>"> <input
-					type="hidden" name="available"
-					value="<%=bAlternate||bOrigAlt?"A":"1"%>"> <input
-					type="hidden" name="Submit" value=" Next "> <input
-					type="submit"
-					value='<bean:message key="schedule.scheduletemplateapplying.btnNext"/>'>
+				<div align="right">
+					<%if (publicAndPrivateTemplates == null || publicAndPrivateTemplates.isEmpty())
+					{%>
+						You must have a day Template Setting available before continuing.
+					<%}
+					else
+					{%>
+						<input type="hidden" name="provider_no" value="<%=request.getParameter("provider_no")%>">
+						<input type="hidden" name="available" value="<%=bAlternate||bOrigAlt?"A":"1"%>">
+						<input type="hidden" name="Submit" value=" Next ">
+						<input type="submit" value='<bean:message key="schedule.scheduletemplateapplying.btnNext"/>'>
+					<%}%>
 				</div>
 				</td>
 			</tr>

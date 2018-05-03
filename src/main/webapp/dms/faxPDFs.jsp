@@ -180,6 +180,7 @@ function updateFaxButton()
 					<td class="tite4" width="10%">  Providers: </td>
 					<td class="tite3" width="20%">
 						<select id="otherFaxSelect">
+							<option value="">--Select Provider--</option>
 						<%
 						String rdName = "";
 						String rdFaxNo = "";

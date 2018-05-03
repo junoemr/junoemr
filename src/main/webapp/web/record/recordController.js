@@ -494,7 +494,7 @@ angular.module('Record').controller('Record.RecordController', [
 			url += "&appointment_date=" + apptDate + "&start_time=" + apptStartTime;
 			url += "&hotclick=&status=t&bNewForm=1" + dxCode;
 
-			window.open(url, "billingWin", "scrollbars=yes, location=no, width=1000, height=600", "");
+			window.open(url, "billingWin", "scrollbars=yes, location=no, width=" + screen.width + ", height=" + screen.height, "");
 		};
 
 

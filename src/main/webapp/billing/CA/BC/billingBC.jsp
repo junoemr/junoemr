@@ -39,17 +39,27 @@ if(!authed) {
 }
 %>
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 
 <%@taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite"%>
-<%@ page import="org.springframework.web.context.WebApplicationContext"%>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="oscar.oscarDemographic.data.*"%>
-<%@page import="java.text.*, java.util.*, oscar.oscarBilling.ca.bc.data.*,oscar.oscarBilling.ca.bc.pageUtil.*,oscar.*,oscar.entities.*"%>
-<%@page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@page import="oscar.OscarProperties"%>
+<%@page import="oscar.entities.PaymentType, oscar.oscarBilling.ca.bc.data.BillingFormData, oscar.oscarBilling.ca.bc.data.SupServiceCodeAssocDAO,oscar.oscarBilling.ca.bc.pageUtil.BillingAssociationPersistence,oscar.oscarBilling.ca.bc.pageUtil.BillingCreateBillingForm,oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean"%>
+<%@page import="oscar.oscarBilling.ca.bc.pageUtil.ServiceCodeAssociation" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="oscar.oscarBilling.ca.bc.data.BillingPreference" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -82,51 +92,56 @@ if(!authed) {
   }
 %>
 <%
-  int year = 0; //Integer.parseInt(request.getParameter("year"));
-  int month = 0; //Integer.parseInt(request.getParameter("month"));
-  //int day = now.get(Calendar.DATE);
-  int delta = 0; //request.getParameter("delta")==null?0:Integer.parseInt(request.getParameter("delta")); //add or minus month
-  GregorianCalendar now = new GregorianCalendar();
-  year = now.get(Calendar.YEAR);
-  month = now.get(Calendar.MONTH) + 1;
-  String sxml_location = "", sxml_provider = "", sxml_visittype = "";
-  String color = "", colorflag = "";
-  BillingSessionBean bean = (BillingSessionBean) pageContext.findAttribute("billingSessionBean");
-  oscar.oscarDemographic.data.DemographicData demoData = new oscar.oscarDemographic.data.DemographicData();
-  org.oscarehr.common.model.Demographic demo = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), bean.getPatientNo());
-  oscar.oscarBilling.ca.bc.MSP.ServiceCodeValidationLogic lgc = new oscar.oscarBilling.ca.bc.MSP.ServiceCodeValidationLogic();
-  BillingFormData billform = new BillingFormData();
-  BillingFormData.BillingService[] billlist1 = lgc.filterServiceCodeList(billform.getServiceList("Group1", bean.getBillForm(), bean.getBillRegion(),new Date()), demo);
-  BillingFormData.BillingService[] billlist2 = lgc.filterServiceCodeList(billform.getServiceList("Group2", bean.getBillForm(), bean.getBillRegion(),new Date()), demo);
-  BillingFormData.BillingService[] billlist3 = lgc.filterServiceCodeList(billform.getServiceList("Group3", bean.getBillForm(), bean.getBillRegion(),new Date()), demo);
-  String group1Header = billform.getServiceGroupName("Group1", bean.getBillForm());
-  String group2Header = billform.getServiceGroupName("Group2", bean.getBillForm());
-  String group3Header = billform.getServiceGroupName("Group3", bean.getBillForm());
-  BillingFormData.BillingPhysician[] billphysician = billform.getProviderList();
-  BillingFormData.BillingVisit[] billvisit = billform.getVisitType(bean.getBillRegion());
-  BillingFormData.Location[] billlocation = billform.getLocationList(bean.getBillRegion());
-  BillingFormData.Diagnostic[] diaglist = billform.getDiagnosticList(bean.getBillForm(), bean.getBillRegion());
-  BillingFormData.BillingForm[] billformlist = billform.getFormList();
-  SupServiceCodeAssocDAO supDao = SpringUtils.getBean(SupServiceCodeAssocDAO.class);
-  HashMap assocCodeMap = new HashMap();
-  fillDxcodeList(billlist1, assocCodeMap);
-  fillDxcodeList(billlist2, assocCodeMap);
-  fillDxcodeList(billlist3, assocCodeMap);
-  String frmType = request.getParameter("billType");
-  if (frmType != null && frmType.equals("Pri")) {
-    billform.setPrivateFees(billlist1);
-    billform.setPrivateFees(billlist2);
-    billform.setPrivateFees(billlist3);
-  }
-  String loadFromSession = request.getParameter("loadFromSession");
-  if (request.getAttribute("loadFromSession") != null) {
-    loadFromSession = "y";
-  }
-  if (loadFromSession == null) {
-    request.getSession().removeAttribute("BillingCreateBillingForm");
-  }
+	OscarProperties oscarProperties = OscarProperties.getInstance();
 
-  String newWCBClaim = (String)request.getAttribute("newWCBClaim");
+	int year = 0; //Integer.parseInt(request.getParameter("year"));
+	int month = 0; //Integer.parseInt(request.getParameter("month"));
+	//int day = now.get(Calendar.DATE);
+	int delta = 0; //request.getParameter("delta")==null?0:Integer.parseInt(request.getParameter("delta")); //add or minus month
+	GregorianCalendar now = new GregorianCalendar();
+	year = now.get(Calendar.YEAR);
+	month = now.get(Calendar.MONTH) + 1;
+	String sxml_location = "", sxml_provider = "", sxml_visittype = "";
+	String color = "", colorflag = "";
+	BillingSessionBean bean = (BillingSessionBean) pageContext.findAttribute("billingSessionBean");
+	oscar.oscarDemographic.data.DemographicData demoData = new oscar.oscarDemographic.data.DemographicData();
+	org.oscarehr.common.model.Demographic demo = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), bean.getPatientNo());
+	oscar.oscarBilling.ca.bc.MSP.ServiceCodeValidationLogic lgc = new oscar.oscarBilling.ca.bc.MSP.ServiceCodeValidationLogic();
+	BillingFormData billform = new BillingFormData();
+	BillingFormData.BillingService[] billlist1 = lgc.filterServiceCodeList(billform.getServiceList("Group1", bean.getBillForm(), bean.getBillRegion(), new Date()), demo);
+	BillingFormData.BillingService[] billlist2 = lgc.filterServiceCodeList(billform.getServiceList("Group2", bean.getBillForm(), bean.getBillRegion(), new Date()), demo);
+	BillingFormData.BillingService[] billlist3 = lgc.filterServiceCodeList(billform.getServiceList("Group3", bean.getBillForm(), bean.getBillRegion(), new Date()), demo);
+	String group1Header = billform.getServiceGroupName("Group1", bean.getBillForm());
+	String group2Header = billform.getServiceGroupName("Group2", bean.getBillForm());
+	String group3Header = billform.getServiceGroupName("Group3", bean.getBillForm());
+	BillingFormData.BillingPhysician[] billphysician = billform.getProviderList();
+	BillingFormData.BillingVisit[] billvisit = billform.getVisitType(bean.getBillRegion());
+	BillingFormData.Location[] billlocation = billform.getLocationList(bean.getBillRegion());
+	BillingFormData.Diagnostic[] diaglist = billform.getDiagnosticList(bean.getBillForm(), bean.getBillRegion());
+	BillingFormData.BillingForm[] billformlist = billform.getFormList();
+	SupServiceCodeAssocDAO supDao = SpringUtils.getBean(SupServiceCodeAssocDAO.class);
+	HashMap assocCodeMap = new HashMap();
+	fillDxcodeList(billlist1, assocCodeMap);
+	fillDxcodeList(billlist2, assocCodeMap);
+	fillDxcodeList(billlist3, assocCodeMap);
+	String frmType = request.getParameter("billType");
+	if(frmType != null && frmType.equals("Pri"))
+	{
+		billform.setPrivateFees(billlist1);
+		billform.setPrivateFees(billlist2);
+		billform.setPrivateFees(billlist3);
+	}
+	String loadFromSession = request.getParameter("loadFromSession");
+	if(request.getAttribute("loadFromSession") != null)
+	{
+		loadFromSession = "y";
+	}
+	if(loadFromSession == null)
+	{
+		request.getSession().removeAttribute("BillingCreateBillingForm");
+	}
+
+	String newWCBClaim = (String) request.getAttribute("newWCBClaim");
 %>
 <html>
 <head>
@@ -170,85 +185,115 @@ if(!authed) {
 <%=createAssociationJS(supDao.getAssociationKeyValues(),"trayAssocCodes")%>
 
 
-
-function codeEntered(svcCode){
-	myform = document.forms[0];
-	return((myform.xml_other1.value == svcCode)||(myform.xml_other2.value == svcCode)||(myform.xml_other3.value == svcCode))
-}
-function addSvcCode(svcCode) {
-    myform = document.forms[0];
-    for (var i = 0; i < myform.service.length; i++) {
-      if (myform.service[i].value == svcCode) {
-        if (myform.service[i].checked) {
-          if (myform.xml_other1.value == "") {
-            myform.xml_other1.value = svcCode;
-            var trayCode =  getAssocCode(svcCode,trayAssocCodes);
-            if(trayCode!=''){
-              myform.xml_other2.value = trayCode;
-            }
-            myform.xml_diagnostic_detail1.value = getAssocCode(svcCode,jsAssocCodes);
-          }
-          else if (myform.xml_other2.value == "") {
-            myform.xml_other2.value = svcCode;
-            var trayCode =  getAssocCode(svcCode,trayAssocCodes);
-            if(trayCode!=''){
-              myform.xml_other3.value = trayCode;
-            }
-            myform.xml_diagnostic_detail2.value = getAssocCode(svcCode,jsAssocCodes);
-          }
-          else if (myform.xml_other3.value == "") {
-            myform.xml_other3.value = svcCode;
-            myform.xml_diagnostic_detail3.value = getAssocCode(svcCode,jsAssocCodes);
-          }
-          else {
-            alert("There are already three service codes entered");
-            myform.service[i].checked = false;
-            return;
-          }
-        }
-        else {
-          if (myform.xml_other1.value == svcCode) {
-            myform.xml_other1.value = "";
-            myform.xml_other2.value = "";
-            myform.xml_diagnostic_detail1.value = "";
-          }
-          else if (myform.xml_other2.value == svcCode) {
-            myform.xml_other2.value = "";
-            myform.xml_diagnostic_detail2.value = "";
-          }
-          else if (myform.xml_other3.value == svcCode) {
-            myform.xml_other3.value = "";
-            myform.xml_diagnostic_detail3.value = "";
-          }
-        }return;
-      }
-    }
-  }
-function getAssocCode(svcCode,assocCodes){
-  var retcode = ""
-  for (var i = 0; i < assocCodes.length; i++) {
-    var row = assocCodes[i];
-
-    if(row[0] == svcCode){
-      return row[1];
-    }
-  }
-  return retcode;
-}
-function checkSelectedCodes(){
-    myform = document.forms[0];
-    for (var i = 0; i < myform.service.length; i++) {
-        if (myform.service[i].checked) {
-            if(!codeEntered(myform.service[i].value)){
-                myform.service[i].checked = false;
-            }
-        }
-    }
+function codeEntered(svcCode)
+{
+	var myform = document.forms[0];
+	return ((myform.xml_other1.value == svcCode) || (myform.xml_other2.value == svcCode) || (myform.xml_other3.value == svcCode))
 }
 
+function addSvcCode(serviceCheckbox, svcCode)
+{
+	var myform = document.forms[0];
 
+	if (serviceCheckbox.checked)
+	{
+		if (myform.xml_other1.value == "")
+		{
+			myform.xml_other1.value = svcCode;
+			var trayCode = getAssocCode(svcCode, trayAssocCodes);
+			if (trayCode != '')
+			{
+				myform.xml_other2.value = trayCode;
+			}
+			myform.xml_diagnostic_detail1.value = getAssocCode(svcCode, jsAssocCodes);
+		}
+		else if (myform.xml_other2.value == "")
+		{
+			myform.xml_other2.value = svcCode;
+			var trayCode = getAssocCode(svcCode, trayAssocCodes);
+			if (trayCode != '')
+			{
+				myform.xml_other3.value = trayCode;
+			}
+			myform.xml_diagnostic_detail2.value = getAssocCode(svcCode, jsAssocCodes);
+		}
+		else if (myform.xml_other3.value == "")
+		{
+			myform.xml_other3.value = svcCode;
+			myform.xml_diagnostic_detail3.value = getAssocCode(svcCode, jsAssocCodes);
+		}
+		else
+		{
+			alert("There are already three service codes entered");
+			serviceCheckbox.checked = false;
+			return false;
+		}
+	}
+	else
+	{
+		if (myform.xml_other1.value == svcCode)
+		{
+			myform.xml_other1.value = "";
+			myform.xml_other2.value = "";
+			myform.xml_diagnostic_detail1.value = "";
+		}
+		else if (myform.xml_other2.value == svcCode)
+		{
+			myform.xml_other2.value = "";
+			myform.xml_diagnostic_detail2.value = "";
+		}
+		else if (myform.xml_other3.value == svcCode)
+		{
+			myform.xml_other3.value = "";
+			myform.xml_diagnostic_detail3.value = "";
+		}
+	}
+	return true;
+}
 
+function getAssocCode(svcCode, assocCodes)
+{
+	var retcode = "";
+	for (var i = 0; i < assocCodes.length; i++)
+	{
+		var row = assocCodes[i];
 
+		if (row[0] == svcCode)
+		{
+			return row[1];
+		}
+	}
+	return retcode;
+}
+
+function checkSelectedCode(service)
+{
+	if (service.checked)
+	{
+		if (!codeEntered(service.value))
+		{
+			service.checked = false;
+		}
+	}
+}
+
+function checkSelectedCodes()
+{
+	var myform = document.forms[0];
+	var service = myform.service;
+
+	if (service.length)
+	{
+		for (var i = 0; i < service.length; i++)
+		{
+			checkSelectedCode(service[i]);
+		}
+	}
+	else
+	{
+		checkSelectedCode(service);
+	}
+}
 
 
 function HideElementById(ele){
@@ -313,26 +358,16 @@ function replaceWCB(id){
   oscarLog("replaceWCB out == "+ur);
 }
 
-
-/*
-function gotoPrivate(){
-   if (document.BillingCreateBillingForm.xml_billtype.value == "Pri"){
-      document.location.href = "<%=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/" %>billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=Pri&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=bean.getPatientName()%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=Pri";
-      //document.location.href = "../../../billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=PRI&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=bean.getPatientName()%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=Pri";
-   }
-   if (document.BillingCreateBillingForm.xml_billtype.value == "MSP"){
-      document.location.href = "<%=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/" %>billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=<%=OscarProperties.getInstance().getProperty("default_view")%>&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=bean.getPatientName()%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=MSP";
-
-   }
-}
-*/
-function gotoPrivate(){
-   if (document.BillingCreateBillingForm.xml_billtype.value == "Pri"){
-      document.location.href = "<%=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/" %>billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=Pri&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=oscar.util.UtilMisc.htmlEscape(bean.getPatientName())%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=Pri";
-  }
-   if (document.BillingCreateBillingForm.xml_billtype.value == "MSP"){
-      document.location.href = "<%=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/" %>billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=<%=OscarProperties.getInstance().getProperty("default_view")%>&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=oscar.util.UtilMisc.htmlEscape(bean.getPatientName())%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=MSP";
-   }
+function gotoPrivate()
+{
+	if (document.BillingCreateBillingForm.xml_billtype.value == "Pri")
+	{
+		document.location.href = "<%=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/" %>billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=Pri&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=StringEscapeUtils.escapeHtml(bean.getPatientName())%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=Pri";
+	}
+	if (document.BillingCreateBillingForm.xml_billtype.value == "MSP")
+	{
+		document.location.href = "<%=request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/" %>billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=<%=OscarProperties.getInstance().getProperty("default_view")%>&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=StringEscapeUtils.escapeHtml(bean.getPatientName())%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=MSP";
+	}
 }
 
 function correspondenceNote(){
@@ -354,9 +389,6 @@ function checkFACILITY(){
 		HideElementById('FACILITY');
 	}
 }
-
-
-
 
 function quickPickDiagnostic(diagnos){
 
@@ -509,15 +541,13 @@ function grabEnter(event,callb){
 
 </SCRIPT>
 <script language="JavaScript">
-<!--
-<!--
+
 function reloadPage(init) {  //reloads the window if Nav4 resized
   if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
     document.pgW=innerWidth; document.pgH=innerHeight; onresize=reloadPage; }}
   else if (innerWidth!=document.pgW || innerHeight!=document.pgH) location.reload();
 }
 reloadPage(true);
-// -->
 
 function findObj(n, d) { //v4.0
   var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
@@ -582,18 +612,34 @@ function addCodeToList(svcCode){
 }
 
 function setCodeToChecked(svcCode){
-    myform = document.forms[0];
+	var myform = document.forms[0];
+	var service = myform.service;
     var codeset = false;
-    for (var i = 0; i < myform.service.length; i++) {
-        if (myform.service[i].value == svcCode) {
-            var wasAbleToAddCode = addCodeToList(svcCode);
-            if(wasAbleToAddCode){
-               myform.service[i].checked = true;
-               codeset = true;
-            }
-            return;
-        }
-    }
+
+	if (service.length)
+	{
+		for (var i = 0; i < service.length; i++)
+		{
+			if (service[i].value == svcCode)
+			{
+				var wasAbleToAddCode = addCodeToList(svcCode);
+				if (wasAbleToAddCode)
+				{
+					service[i].checked = true;
+					codeset = true;
+				}
+				return;
+			}
+		}
+	}
+	else if (service.value == svcCode) {
+		var wasAbleToAddCode = addCodeToList(svcCode);
+		if(wasAbleToAddCode) {
+			service.checked = true;
+			codeset = true;
+		}
+		return;
+	}
     
     if(codeEntered(svcCode) == false){
         if (myform.xml_other1.value == "") {
@@ -711,13 +757,12 @@ function checkifSet(icd9,feeitem,extrafeeitem){
   %>
     <tr class="<%=rowClass%>">
       <td colspan="2">
-        <a href="../../../billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=<%=billformlist[i].getFormCode()%>&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=bean.getPatientName()%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=<%=bean.getBillForm()%>" onClick="showHideLayers('Layer1','','hide')"><%=billformlist[i].getDescription()%>        </a>
+        <a href="../../../billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=<%=billformlist[i].getFormCode()%>&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=StringEscapeUtils.escapeHtml(bean.getPatientName())%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=<%=bean.getBillForm()%>" onClick="showHideLayers('Layer1','','hide')"><%=billformlist[i].getDescription()%>        </a>
       </td>
     </tr>
   <%}  %>
   </table>
 </div>
-<h3>
 <html:errors/>
 <!-- above here -->
 <%
@@ -736,55 +781,109 @@ if(wcbneeds != null){%>
   <input type="hidden" name="fromBilling" value=""/>
 
 <%
-  BillingCreateBillingForm thisForm;
-  thisForm = (BillingCreateBillingForm) request.getSession().getAttribute("BillingCreateBillingForm");
-  if (thisForm != null) {
-    sxml_provider = ((String) thisForm.getXml_provider());
-    sxml_location = ((String) thisForm.getXml_location());
-    sxml_visittype = ((String) thisForm.getXml_visittype());
-    if (sxml_location.compareTo("") == 0) {
-      sxml_location = OscarProperties.getInstance().getProperty("visitlocation");
-      sxml_visittype = OscarProperties.getInstance().getProperty("visittype");
-      sxml_provider = bean.getApptProviderNo();
-      thisForm.setXml_location(sxml_location);
-      thisForm.setXml_provider(sxml_provider);
-      thisForm.setXml_visittype(sxml_visittype);
-      if ( OscarProperties.getInstance().getProperty("BC_DEFAULT_ALT_BILLING") != null && OscarProperties.getInstance().getProperty("BC_DEFAULT_ALT_BILLING").equalsIgnoreCase("YES")){
-         thisForm.setXml_encounter("8");
-      }
-    }
-    String apDate = thisForm.getXml_appointment_date();
-    if (apDate != null && apDate.trim().length() == 0) {
-      thisForm.setXml_appointment_date(bean.getApptDate());
-    }
-    if (bean != null && bean.getBillType() != null) {
-      thisForm.setXml_billtype(bean.getBillType());
-    }
-    else if (request.getParameter("billType") != null) {
-      thisForm.setXml_billtype(request.getParameter("billType"));
-    }
-    if (demo != null && demo.getVer() != null && demo.getVer().equals("66")) {
-      thisForm.setDependent("66");
-    }
-    thisForm.setCorrespondenceCode(bean.getCorrespondenceCode());
-    oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO dao = SpringUtils.getBean(oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO.class);
-    oscar.oscarBilling.ca.bc.data.BillingPreference pref = null;
-    //checking for a bug where the passed in provider number is actually "none" rather than numeral 0
-    if (oscar.util.StringUtils.isNumeric(thisForm.getXml_provider())) {
-      pref = dao.getUserBillingPreference((String) thisForm.getXml_provider());
-    }
-    String userReferralPref = "";
-    if (pref != null) {
-      if (pref.getReferral() == 1) {
-        userReferralPref = "T";
-      }
-      else if (pref.getReferral() == 2) {
-        userReferralPref = "B";
-      }
-      thisForm.setRefertype1(userReferralPref);
-      thisForm.setRefertype2(userReferralPref);
-    }
-  }
+	BillingCreateBillingForm thisForm;
+	thisForm = (BillingCreateBillingForm) request.getSession().getAttribute("BillingCreateBillingForm");
+	if(thisForm != null)
+	{
+		sxml_provider = ((String) thisForm.getXml_provider());
+		sxml_location = ((String) thisForm.getXml_location());
+		sxml_visittype = ((String) thisForm.getXml_visittype());
+		if(sxml_location.compareTo("") == 0)
+		{
+			sxml_location = OscarProperties.getInstance().getProperty("visitlocation");
+			sxml_visittype = OscarProperties.getInstance().getProperty("visittype");
+			sxml_provider = bean.getBillingProvider();
+			thisForm.setXml_location(sxml_location);
+			thisForm.setXml_provider(sxml_provider);
+			thisForm.setXml_visittype(sxml_visittype);
+			if("YES".equalsIgnoreCase(OscarProperties.getInstance().getProperty("BC_DEFAULT_ALT_BILLING")))
+			{
+				thisForm.setXml_encounter("8");
+			}
+		}
+		if(sxml_provider == null || sxml_provider.trim().equals("") || sxml_provider.trim().equals("none"))
+		{
+			// OHSUPORT-2718 - set the default billing physician. Overrides appointment physician
+			sxml_provider = oscarProperties.getProperty("auto_populate_billing_bc_billingPhysicianID", bean.getApptProviderNo());
+
+			// OHSUPORT-2883 - autofill based on assigned provider. only if not already autofilled
+			if(oscarProperties.isPropertyActive("auto_populate_billing_bc_billingPhysician") && sxml_provider.trim().equals("none"))
+			{
+				sxml_provider = demo.getProviderNo();
+			}
+			thisForm.setXml_provider(sxml_provider);
+		}
+		String apDate = thisForm.getXml_appointment_date();
+		if(apDate != null && apDate.trim().length() == 0)
+		{
+			thisForm.setXml_appointment_date(bean.getApptDate());
+		}
+		if(bean != null && bean.getBillType() != null)
+		{
+			thisForm.setXml_billtype(bean.getBillType());
+		}
+		else if(request.getParameter("billType") != null)
+		{
+			thisForm.setXml_billtype(request.getParameter("billType"));
+		}
+		if(demo != null && demo.getVer() != null && demo.getVer().equals("66"))
+		{
+			thisForm.setDependent("66");
+		}
+		thisForm.setCorrespondenceCode(bean.getCorrespondenceCode());
+		oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO dao = SpringUtils.getBean(oscar.oscarBilling.ca.bc.data.BillingPreferencesDAO.class);
+		oscar.oscarBilling.ca.bc.data.BillingPreference pref = null;
+		//checking for a bug where the passed in provider number is actually "none" rather than numeral 0
+		if(oscar.util.StringUtils.isNumeric(thisForm.getXml_provider()))
+		{
+			pref = dao.getUserBillingPreference(thisForm.getXml_provider());
+		}
+
+		// -- autofill referral type code --
+		String refType1 = "";
+		String refType2 = "";
+	    // url parameters override properties file, but not user pref
+	    if ( request.getParameter("referral_type_1") != null) { refType1 = request.getParameter("referral_type_1").toUpperCase(); }
+	    if ( request.getParameter("referral_type_2") != null) { refType2 = request.getParameter("referral_type_2").toUpperCase(); }
+
+		// OHSUPORT-2718 - default the referral type fields to B=refer By or T=refer To. ''="Select Type"
+	    String propReferralPref = oscarProperties.getProperty("auto_populate_billingreferral_type_bc", "").toUpperCase();
+		if(refType1.isEmpty()) { refType1 = propReferralPref; }
+		if(refType2.isEmpty()) { refType2 = propReferralPref; }
+
+		// preferences overrides the properties file settings
+		if(pref != null)
+		{
+			if(pref.getReferral() == BillingPreference.REFER_TO_CODE)
+			{
+				refType1 = "T";
+				refType2 = "T";
+			}
+			else if(pref.getReferral() == BillingPreference.REFER_FROM_CODE)
+			{
+				refType1 = "B";
+				refType2 = "B";
+			}
+		}
+		thisForm.setRefertype1(refType1);
+		thisForm.setRefertype2(refType2);
+
+		// -- autofill referral physician --
+		if(oscarProperties.isPropertyActive("auto_populate_billingreferral_bc"))
+		{
+			thisForm.setXml_refer1(bean.getReferral1());
+		}
+
+	    // OHSUPORT-2883 - autofill diagnostic codes with specific values (from url)
+	    if ( request.getParameter("diag_code_1") != null ) { thisForm.setXml_diagnostic_detail1(request.getParameter("diag_code_1")); }
+	    if ( request.getParameter("diag_code_2") != null ) { thisForm.setXml_diagnostic_detail2(request.getParameter("diag_code_2")); }
+	    if ( request.getParameter("diag_code_3") != null ) { thisForm.setXml_diagnostic_detail3(request.getParameter("diag_code_3")); }
+
+		// OHSUPORT-2883 - autofill other codes with specific values (from url)
+		if ( request.getParameter("other_code_1") != null ) { thisForm.setXml_other1(request.getParameter("other_code_1")); }
+		if ( request.getParameter("other_code_2") != null ) { thisForm.setXml_other2(request.getParameter("other_code_2")); }
+		if ( request.getParameter("other_code_3") != null ) { thisForm.setXml_other3(request.getParameter("other_code_3")); }
+	}
 %>
   <table width="100%" border="0" cellspacing="0" cellpadding="0">
     <tr>
@@ -796,7 +895,7 @@ if(wcbneeds != null){%>
             </td>
             <td>
                 <u><%=demo.getLastName()%>,<%=demo.getFirstName()%></u>
-                <a href="javascript: void();" onclick="popup(800, 1000, 'billStatus.jsp?lastName=<%=demo.getLastName()%>&firstName=<%=demo.getFirstName()%>&filterPatient=true&demographicNo=<%=demo.getDemographicNo()%>','InvoiceList');return false;">
+                <a href="javascript: return false;" onclick="popup(800, 1000, 'billStatus.jsp?lastName=<%=demo.getLastName()%>&firstName=<%=demo.getFirstName()%>&filterPatient=true&demographicNo=<%=demo.getDemographicNo()%>','InvoiceList');return false;">
 				<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/></a>
             </td>
             <td>
@@ -1058,7 +1157,7 @@ if(wcbneeds != null){%>
                 </tr>
               <%for (int i = 0; i < billlist1.length; i++) {              %>
                 <tr bgcolor>
-                <%String svcCall = "addSvcCode('" + billlist1[i].getServiceCode() + "')";                %>
+                <%String svcCall = "addSvcCode(this, '" + billlist1[i].getServiceCode() + "')";                %>
                   <td width="25%" height="14">
                     <b>                    </b>
                     <font face="Verdana, Arial, Helvetica, sans-serif">
@@ -1164,7 +1263,7 @@ if(wcbneeds != null){%>
                 </tr>
               <%for (int i = 0; i < billlist2.length; i++) {              %>
                 <tr bgcolor>
-                <%String svcCall = "addSvcCode('" + billlist2[i].getServiceCode() + "')";                %>
+                <%String svcCall = "addSvcCode(this, '" + billlist2[i].getServiceCode() + "')";                %>
                   <td width="21%" height="14">  d
                       <html:multibox property="service" value="<%=billlist2[i].getServiceCode()%>" onclick="<%=svcCall%>"/>
                       <%=billlist2[i].getServiceCode()%>
@@ -1253,7 +1352,7 @@ if(wcbneeds != null){%>
                 </tr>
               <%for (int i = 0; i < billlist3.length; i++) {              %>
                 <tr bgcolor>
-                <%String svcCall = "addSvcCode('" + billlist3[i].getServiceCode() + "')";                %>
+                <%String svcCall = "addSvcCode(this, '" + billlist3[i].getServiceCode() + "')";                %>
                   <td width="25%" height="14">
                       <html:multibox property="service" value="<%=billlist3[i].getServiceCode()%>" onclick="<%=svcCall%>"/>
                       <%=billlist3[i].getServiceCode()%>
