@@ -98,6 +98,7 @@ public class SendFaxPDFAction extends DispatchAction {
 				for (int j = 0; j < recipients.length; j++)
 				{
 					String faxNo = recipients[j].replaceAll("\\D", "");
+
 					String error = "";
 					String message = "";
 					Exception exception = null;
