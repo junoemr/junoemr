@@ -144,6 +144,7 @@
 	List<String> siteGroups = new ArrayList<String>();
 	String selectedSite = null;
 	HashMap<String,String> CurrentSiteMap = new HashMap<String,String>();
+	boolean hasSite=true;
 
 	if (bMultisites) {
 		sites = siteDao.getAllActiveSites();
@@ -174,6 +175,12 @@
 		//get all sites bgColors
 		for (Site st : sites) {
 			siteBgColor.put(st.getName(),st.getBgColor());
+		}
+
+		List<ProviderSite> psList = providerSiteDao.findByProviderNo(loggedInInfo1.getLoggedInProviderNo());
+		if (psList.size() == 0)
+		{
+			hasSite=false;
 		}
 	}
 //multisite ends =======================
@@ -1653,18 +1660,6 @@ public boolean isBirthday(String schedDate,String demBday){
 																	int ratio = (hourCursor*60+minuteCursor)/nLen;
 																	hourmin = new StringBuffer(dateTimeCodeBean.get(curProvider_no[nProvider])!=null?((String) dateTimeCodeBean.get(curProvider_no[nProvider])).substring(ratio,ratio+1):" " );
 																} else { hourmin = new StringBuffer(); }
-
-																boolean isMultisitesOn = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
-																boolean hasSite=true;
-
-																if (isMultisitesOn)
-																{
-																	List<ProviderSite> psList = providerSiteDao.findByProviderNo(curProvider_no[nProvider]);
-																	if (psList.size() == 0)
-																	{
-																		hasSite=false;
-																	}
-																}
 														%>
 														<tr>
 															<td align="RIGHT" class="<%=bColorHour?"scheduleTime00":"scheduleTimeNot00"%>" NOWRAP>
