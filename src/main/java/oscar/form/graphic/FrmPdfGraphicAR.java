@@ -8,6 +8,7 @@ package oscar.form.graphic;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang.math.NumberUtils;
 import oscar.util.UtilDateUtilities;
 
 /**
@@ -56,7 +57,7 @@ public final class FrmPdfGraphicAR extends FrmPdfGraphic {
 	}
 
 	public void getGraphicXYProp(String xDate, String yHeight) {
-		if (!checkDateStr(xDate) || !isDigitNum(yHeight))
+		if (!checkDateStr(xDate) || !NumberUtils.isNumber(yHeight))
 			return;
 
 		if (checkDateStr(xDate)) {
