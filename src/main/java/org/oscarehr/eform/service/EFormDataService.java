@@ -141,8 +141,11 @@ public class EFormDataService
 		eFormDataDao.persist(eForm);
 
 		// now that the eForm data is persisted, update the id in the instance table;
-		eFormInstance.setCurrentEFormData(eForm);
-		eFormInstanceDao.merge(eFormInstance);
+		if(eFormInstance != null)
+		{
+			eFormInstance.setCurrentEFormData(eForm);
+			eFormInstanceDao.merge(eFormInstance);
+		}
 
 		// save the eForm values
 		saveEFormValues(eForm.getFormId(), eForm.getId(), eForm.getDemographicId(), eFormValueMap);
