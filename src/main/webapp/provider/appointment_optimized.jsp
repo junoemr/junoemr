@@ -399,8 +399,6 @@ private long getAppointmentRowSpan(
 
 	int nProvider;
 
-	//ResourceSchedule resourceScheduleDTO = null;
-
 	if(mygroupno != null && providerBean.get(mygroupno) != null) { //single appointed provider view
 		numProvider=1;
 		curProvider_no = new String [numProvider];
@@ -611,6 +609,11 @@ private long getAppointmentRowSpan(
 
 	<link rel="stylesheet" href="../css/receptionistapptstyle.css" type="text/css">
 	<link rel="stylesheet" href="../css/helpdetails.css" type="text/css">
+
+	<c:if test="${empty sessionScope.archiveView or sessionScope.archiveView != true}">
+		<%!String refresh = oscar.OscarProperties.getInstance().getProperty("refresh.appointmentprovideradminday.jsp", "-1");%>
+		<%="-1".equals(refresh)?"":"<meta http-equiv=\"refresh\" content=\""+refresh+";\">"%>
+	</c:if>
 
 	<script type="text/javascript" src="../share/javascript/Oscar.js" ></script>
 	<script type="text/javascript" src="../share/javascript/prototype.js"></script>
@@ -1117,11 +1120,13 @@ private long getAppointmentRowSpan(
 								sel.style.backgroundColor=sel.options[sel.selectedIndex].style.backgroundColor;
 								var siteName = sel.options[sel.selectedIndex].value;
 								var newGroupNo = "<%=(mygroupno == null ? ".default" : mygroupno)%>";
-								<%if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.IsPropertiesOn.isTicklerPlusEnable()){%>
-								popupPage(10,10, "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&new_tickler_warning_window=<%=newticklerwarningwindow%>&default_pmm=<%=default_pmm%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no="+newGroupNo+"&site="+siteName);
-								<%}else {%>
-								popupPage(10,10, "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no="+newGroupNo+"&site="+siteName);
-								<%}%>
+								jQuery.ajax({
+									url: 'providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no=' + newGroupNo + '&site=' + siteName,
+									success: function(result)
+									{
+										location.reload();
+									}
+								});
 							}
 						</script>
 

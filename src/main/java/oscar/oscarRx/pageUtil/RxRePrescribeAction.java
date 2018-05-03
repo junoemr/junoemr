@@ -323,7 +323,7 @@ public final class RxRePrescribeAction extends DispatchAction {
 	public ActionForward repcbAllLongTerm(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		checkPrivilege(loggedInInfo, PRIVILEGE_WRITE);
-		
+
 		oscar.oscarRx.pageUtil.RxSessionBean beanRX = (oscar.oscarRx.pageUtil.RxSessionBean) request.getSession().getAttribute("RxSessionBean");
 		if (beanRX == null) {
 			response.sendRedirect("error.html");
@@ -349,8 +349,8 @@ public final class RxRePrescribeAction extends DispatchAction {
 		// p("size of prescriptDrugs",""+prescriptDrugs.size());
 		for (Drug prescriptDrug : prescriptDrugs) {
 			// p("id of drug returned",""+prescriptDrug.getId());
-			// add all long term med drugIds to an array.
-			if (prescriptDrug.isLongTerm()) {
+			// add all expired long term med drugIds to an array.
+			if (prescriptDrug.isLongTerm() && prescriptDrug.isExpired()) {
 
 				listLongTermMed.add(prescriptDrug.getId());
 			}
@@ -370,7 +370,7 @@ public final class RxRePrescribeAction extends DispatchAction {
 			
             //add drug to re-prescribe drug list
             reRxDrugIdList.add(Integer.toString(drugId));
-			
+
 			// get original drug
 			RxPrescriptionData rxData = new RxPrescriptionData();
 			RxPrescriptionData.Prescription oldRx = rxData.getPrescription(drugId);
