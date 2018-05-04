@@ -93,7 +93,7 @@ public class AddEFormAction extends Action {
 		String subject = org.apache.commons.lang.StringUtils.trimToEmpty(request.getParameter("subject"));
 		boolean doDatabaseUpdate = "on".equalsIgnoreCase(request.getParameter("_oscardodatabaseupdate"));
 
-		Integer formId = Integer.parseInt(fid);
+		Integer eformTemplateId = Integer.parseInt(fid);
 		Integer demographicNo = Integer.parseInt(demographicNoStr);
 		Integer providerNo = Integer.parseInt(providerNoStr);
 
@@ -195,11 +195,11 @@ public class AddEFormAction extends Action {
 			if(StringUtils.filled(oldFormDataId))
 			{
 				Integer oldFdid = Integer.parseInt(oldFormDataId);
-				eForm = eFormService.saveExistingEForm(oldFdid, demographicNo, providerNo, formId, subject, formOpenerMap, paramValueMap, eFormLink);
+				eForm = eFormService.saveExistingEForm(oldFdid, demographicNo, providerNo, subject, formOpenerMap, paramValueMap, eFormLink);
 			}
 			else
 			{
-				eForm = eFormService.saveNewEForm(demographicNo, providerNo, formId, subject, formOpenerMap, paramValueMap, eFormLink);
+				eForm = eFormService.saveNewEForm(demographicNo, providerNo, eformTemplateId, subject, formOpenerMap, paramValueMap, eFormLink);
 			}
 
 

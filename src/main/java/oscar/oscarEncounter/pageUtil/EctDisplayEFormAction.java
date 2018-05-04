@@ -25,30 +25,32 @@
 
 package oscar.oscarEncounter.pageUtil;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.log4j.Logger;
+import org.apache.struts.util.MessageResources;
+import org.oscarehr.eform.dao.EFormDataDao;
+import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.eform.EFormUtil;
+import oscar.util.DateUtils;
+import oscar.util.OscarRoleObjectPrivilege;
+import oscar.util.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
-import org.apache.struts.util.MessageResources;
-import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-
-import oscar.eform.EFormUtil;
-import oscar.util.DateUtils;
-import oscar.util.OscarRoleObjectPrivilege;
-import oscar.util.StringUtils;
-
 public class EctDisplayEFormAction extends EctDisplayAction {
     private static Logger logger = MiscUtils.getLogger();
     //private final static String BGCOLOUR = "11CC00";
     private String cmd = "eforms";
+
+    private static EFormDataDao eFormDataDao = SpringUtils.getBean(EFormDataDao.class);
     
   public boolean getInfo(EctSessionBean bean, HttpServletRequest request, NavBarDisplayDAO Dao, MessageResources messages) {                                                                                                  
 	try
@@ -76,31 +78,32 @@ public class EctDisplayEFormAction extends EctDisplayAction {
 	        url = "popupPage(500,950,'"+winName+"','"+request.getContextPath()+"/eform/efmformslistadd.jsp?demographic_no="+bean.demographicNo+"&appointment="+bean.appointmentNo+"&parentAjaxId="+cmd+"'); return false;";
 	        Dao.setRightURL(url);        
 	        Dao.setRightHeadingID(cmd);  //no menu so set div id to unique id for this action      
-	
-	        StringBuilder javascript = new StringBuilder("<script type=\"text/javascript\">");        
-	        String js = ""; 
-	        ArrayList<HashMap<String, ? extends Object>> eForms = EFormUtil.listEForms(EFormUtil.DATE, EFormUtil.CURRENT, roleName);//EFormUtil.listEForms(EFormUtil.DATE, EFormUtil.NAME, EFormUtil.CURRENT, roleName);
-	        String key;
-	        int hash;
-	        String BGCOLOUR = request.getParameter("hC");
-	        for( int i = 0; i < eForms.size(); ++i ) {
-	        	HashMap<String, ? extends Object> curform = eForms.get(i);
-	            winName = (String)curform.get("formName") + bean.demographicNo;            
-	            hash = Math.abs(winName.hashCode());
-	            url = "popupPage(700,800,'"+hash+"','"+request.getContextPath()+"/eform/efmformadd_data.jsp?fid="+curform.get("fid")+"&demographic_no="+bean.demographicNo+"&appointment="+bean.appointmentNo+"&parentAjaxId="+cmd+"','"+ curform.get("fid") + "_" + bean.demographicNo  +"');";
-	            logger.debug("SETTING EFORM URL " + url);
-	            key = StringUtils.maxLenString((String)curform.get("formName"), MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + " (new)";
-	            key = StringEscapeUtils.escapeJavaScript(key);
-	            js = "itemColours['" + key + "'] = '" + BGCOLOUR + "'; autoCompleted['" + key + "'] = \"" + url + "\"; autoCompList.push('" + key + "');";
-	            javascript.append(js);
-	        }
-	        
-	        eForms.clear();
+
+			StringBuilder javascript = new StringBuilder("<script type=\"text/javascript\">");
+			String js = "";
+			ArrayList<HashMap<String, ? extends Object>> eForms = EFormUtil.listEForms(EFormUtil.DATE, EFormUtil.CURRENT, roleName);//EFormUtil.listEForms(EFormUtil.DATE, EFormUtil.NAME, EFormUtil.CURRENT, roleName);
+			String key;
+			int hash;
+			String BGCOLOUR = request.getParameter("hC");
+			for(int i = 0; i < eForms.size(); ++i)
+			{
+				HashMap<String, ? extends Object> curform = eForms.get(i);
+				winName = (String) curform.get("formName") + bean.demographicNo;
+				hash = Math.abs(winName.hashCode());
+				url = "popupPage(700,800,'" + hash + "','" + request.getContextPath() + "/eform/efmformadd_data.jsp?fid=" + curform.get("fid") + "&demographic_no=" + bean.demographicNo + "&appointment=" + bean.appointmentNo + "&parentAjaxId=" + cmd + "','" + curform.get("fid") + "_" + bean.demographicNo + "');";
+				logger.debug("SETTING EFORM URL " + url);
+				key = StringUtils.maxLenString((String) curform.get("formName"), MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + " (new)";
+				key = StringEscapeUtils.escapeJavaScript(key);
+				js = "itemColours['" + key + "'] = '" + BGCOLOUR + "'; autoCompleted['" + key + "'] = \"" + url + "\"; autoCompList.push('" + key + "');";
+				javascript.append(js);
+			}
+
+			eForms.clear();
 	
 			//I've put in an arbitrary limit here of 100. Some people use a single eform/patient for
 			//logging calls, etc. This makes this result set huge. People can click on the eform tab and view the full
 			//history if they need to.
-			List<EFormData> eFormDatas=EFormUtil.listPatientEformsCurrent(new Integer(bean.demographicNo), true, 0, 100);
+			List<EFormData> eFormDatas = eFormDataDao.findInstancedByDemographicIdCurrent(Integer.parseInt(bean.demographicNo), true, 0, 100, null);
 			filterRoles(eFormDatas, roleName);
 			//Collections.sort(eFormDatas, EFormData.FORM_DATE_COMPARATOR);
 			//Collections.reverse(eFormDatas);

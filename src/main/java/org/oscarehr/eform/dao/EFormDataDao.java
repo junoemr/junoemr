@@ -36,10 +36,13 @@ import javax.persistence.Query;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.eform.model.EFormInstance;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
+@Transactional
 public class EFormDataDao extends AbstractDao<EFormData>
 {
 
@@ -163,6 +166,23 @@ public class EFormDataDao extends AbstractDao<EFormData>
 
 		return (results);
 	}
+
+	public List<EFormData> findInstancedByDemographicIdCurrent(Integer demographicId, Boolean current, int startIndex, int numToReturn, String sortBy)
+	{
+		List<EFormData> unfilteredList = findByDemographicIdCurrent(demographicId, current, startIndex, numToReturn, sortBy);
+		List<EFormData> filteredList = new ArrayList<>(unfilteredList.size());
+
+		for(EFormData eFormData : unfilteredList)
+		{
+			EFormInstance eFormInstance = eFormData.getEFormInstance();
+			if(eFormInstance == null || eFormInstance.getCurrentEFormData().getId().equals(eFormData.getId()))
+			{
+				filteredList.add(eFormData);
+			}
+		}
+		return filteredList;
+	}
+
 
 	/**
 	 * @param demographicId can not be null

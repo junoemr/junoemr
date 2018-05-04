@@ -67,23 +67,23 @@ public class EFormDataService
 	@Autowired
 	private EFormDao eFormTemplateDao;
 
-	public EFormData saveExistingEForm(Integer oldFormDataId, Integer demographicNo, Integer providerNo, Integer formId, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	public EFormData saveExistingEForm(Integer oldFormDataId, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
-		logger.info("Save Existing EForm (template id " + formId + ")");
+		logger.info("Save Existing EForm (Previous eform_data fdid " + oldFormDataId + ")");
 		EFormData oldVersion = eFormDataDao.find(oldFormDataId);
 		if(oldVersion == null)
 		{
 			throw new IllegalArgumentException("No FormData found for fdid " + oldFormDataId);
 		}
-		EForm template = getEFormTemplate(formId);
+		EForm template = getEFormTemplate(oldVersion.getFormId());
 		EFormData newVersion = copyFromEFormData(oldVersion);
 
 		return saveEForm(newVersion, template, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
 	}
-	public EFormData saveNewEForm(Integer demographicNo, Integer providerNo, Integer formId, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	public EFormData saveNewEForm(Integer demographicNo, Integer providerNo, Integer templateId, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
-		logger.info("Save New EForm (template id " + formId + ")");
-		EForm template = getEFormTemplate(formId);
+		logger.info("Save New EForm (template id " + templateId + ")");
+		EForm template = getEFormTemplate(templateId);
 		EFormData newVersion = copyFromTemplate(template);
 		return saveEForm(newVersion, template, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
 	}
@@ -233,7 +233,7 @@ public class EFormDataService
 	private EFormData copyFromEFormData(EFormData eFormData)
 	{
 		EFormData eFormCopy = new EFormData();
-		eFormCopy.setFormId(eFormData.getId());
+		eFormCopy.setFormId(eFormData.getFormId());
 		eFormCopy.setFormName(eFormData.getFormName());
 		eFormCopy.setFormDate(eFormData.getFormDate());
 		eFormCopy.setFormTime(eFormData.getFormTime());
