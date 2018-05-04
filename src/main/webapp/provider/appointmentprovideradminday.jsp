@@ -1281,11 +1281,14 @@ public boolean isBirthday(String schedDate,String demBday){
 									sel.style.backgroundColor=sel.options[sel.selectedIndex].style.backgroundColor;
 									var siteName = sel.options[sel.selectedIndex].value;
 									var newGroupNo = "<%=(mygroupno == null ? ".default" : mygroupno)%>";
-									<%if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.IsPropertiesOn.isTicklerPlusEnable()){%>
-									popupPage(10,10, "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&new_tickler_warning_window=<%=newticklerwarningwindow%>&default_pmm=<%=default_pmm%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no="+newGroupNo+"&site="+siteName);
-									<%}else {%>
-									popupPage(10,10, "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no="+newGroupNo+"&site="+siteName);
-									<%}%>
+
+									jQuery.ajax({
+										url: 'providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no=' + newGroupNo + '&site=' + siteName,
+										success: function(result)
+										{
+											location.reload();
+										}
+									});
 								}
 							</script>
 
@@ -2082,7 +2085,7 @@ start_time += iSm + ":00";
 	}
 
 	String defaultBillingView = oscarVariables.getProperty("default_view");
-	ProviderPreference preference = providerPreferenceDao.find(demographic.getProviderNo());
+	ProviderPreference preference = providerPreferenceDao.find(loggedInInfo1.getLoggedInProviderNo());
 	if(preference != null)
 	{
 		String preferredView = preference.getDefaultServiceType();

@@ -264,7 +264,15 @@ public class AppointmentDisplayController
 
 	public String getIconImage()
 	{
-		return appointment.getIconImage();
+		String iconImage = appointment.getIconImage();
+		String status = appointment.getStatus();
+
+		if(status.length() >= 2)
+		{
+			iconImage = status.substring(1,2) + iconImage;
+		}
+
+		return iconImage;
 	}
 
 	public String getStatusTitle()
@@ -386,9 +394,9 @@ public class AppointmentDisplayController
 				"&demographic_name=" + getName() +
 				"&status=" + appointment.getStatus() +
 				"&demographic_no=" + appointment.getDemographicNo().toString() +
-				"&providerview=" + currentProvider +
+				"&providerview=" + providerNo +
 				"&user_no=" + currentUserNo +
-				"&apptProvider_no=" + currentProvider +
+				"&apptProvider_no=" + providerNo +
 				"&appointmentDate=" + appointment.getDate().format(dateFormatter) +
 				"&start_time=" + appointment.getStartTime().format(timeFormatter) +
 				"&bNewForm=1";

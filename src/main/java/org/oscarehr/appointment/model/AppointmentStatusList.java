@@ -36,6 +36,7 @@ import java.util.ResourceBundle;
 
 public class AppointmentStatusList
 {
+	private static final String STATUS_BILLED = "B";
 	private static final String STATUS_SIGNED = "S";
 	private static final Map<String, String> titleMap;
 
@@ -66,7 +67,13 @@ public class AppointmentStatusList
 
 		for(AppointmentStatus appointmentStatus: appointmentManager.getAppointmentStatuses())
 		{
-			orderedStatusList.add(appointmentStatus.getStatus());
+			String status = appointmentStatus.getStatus();
+
+			// Leave billed out of status rotation
+			if(!STATUS_BILLED.equals(status))
+			{
+				orderedStatusList.add(appointmentStatus.getStatus());
+			}
 			descriptionMap.put(appointmentStatus.getStatus(), appointmentStatus.getDescription());
 		}
 
@@ -93,17 +100,13 @@ public class AppointmentStatusList
 
 		int nextStatusIndex = (currentStatusIndex + 1) % orderedStatusList.size();
 
-		return orderedStatusList.get(nextStatusIndex);
+		return orderedStatusList.get(nextStatusIndex) + getModifierChar(status);
 	}
 
 	public String getTitle(String status, Locale locale)
 	{
 		String statusChar = status.substring(0, 1);
-		String modifierChar = null;
-		if(status.length() > 1)
-		{
-			modifierChar = status.substring(1, 2);
-		}
+		String modifierChar = getModifierChar(status);
 
 		String title = "";
 
@@ -117,7 +120,7 @@ public class AppointmentStatusList
 		{
 			title = descriptionMap.get(statusChar);
 
-			if(modifierChar != null)
+			if(!"".equals(modifierChar))
 			{
 				if(STATUS_SIGNED.equals(modifierChar))
 				{
@@ -130,5 +133,17 @@ public class AppointmentStatusList
 		}
 
 		return title;
+	}
+
+	private String getModifierChar(String status)
+	{
+		String modifierChar = "";
+
+		if(status.length() > 1)
+		{
+			modifierChar = status.substring(1, 2);
+		}
+
+		return modifierChar;
 	}
 }

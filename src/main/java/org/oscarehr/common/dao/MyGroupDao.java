@@ -98,19 +98,21 @@ public class MyGroupDao extends AbstractDao<MyGroup> {
      */
     public List<MyGroup> getGroupWithScheduleByGroupNo(String groupNo, LocalDate date, Integer providerNo)
 	{
-        String sql = "SELECT " +
-			"  g.mygroup_no, " +
-			"  g.provider_no, " +
-			"  g.last_name," +
-			"  g.first_name, " +
-			"  g.vieworder, " +
-			"  g.default_billing_form " +
-		"FROM mygroup g " +
-		"LEFT JOIN scheduledate sd ON g.provider_no = sd.provider_no " +
-		"WHERE g.mygroup_no = :groupNo " +
-		"AND ((sd.status = 'A' " +
-		"AND sd.sdate = :date " +
-		"AND sd.id IS NOT NULL) OR g.provider_no = :providerNo) ";
+        String sql =
+			"SELECT \n" +
+			"  g.mygroup_no, \n" +
+			"  g.provider_no, \n" +
+			"  g.last_name,\n" +
+			"  g.first_name, \n" +
+			"  g.vieworder, \n" +
+			"  g.default_billing_form\n" +
+			"FROM mygroup g \n" +
+			"LEFT JOIN scheduledate sd \n" +
+			"ON sd.status = 'A' \n" +
+			"AND sd.sdate = :date \n" +
+			"AND sd.provider_no = g.provider_no\n" +
+			"WHERE g.mygroup_no = :groupNo \n" +
+			"AND (sd.id IS NOT NULL OR g.provider_no = :providerNo)";
 
 		Query query = entityManager.createNativeQuery(sql);
 
