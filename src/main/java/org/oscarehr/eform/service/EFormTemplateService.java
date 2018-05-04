@@ -60,10 +60,10 @@ public class EFormTemplateService
 	 * @param roleType role
 	 * @return The newly saved model
 	 */
-	public EForm addEFormTemplate(String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, String roleType)
+	public EForm addEFormTemplate(String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, boolean instanced, String roleType)
 	{
 		EForm eFormTemplate = new EForm();
-		eFormTemplate = copyToModel(eFormTemplate, formName, formSubject, fileName, htmlStr, creator, showLatestFormOnly, patientIndependent, roleType);
+		eFormTemplate = copyToModel(eFormTemplate, formName, formSubject, fileName, htmlStr, creator, showLatestFormOnly, patientIndependent, instanced, roleType);
 
 		eFormTemplateDao.persist(eFormTemplate);
 		return eFormTemplate;
@@ -83,19 +83,19 @@ public class EFormTemplateService
 	 * @return The newly updated model
 	 * @throws IllegalArgumentException if id is invalid
 	 */
-	public EForm updateEFormTemplate(Integer id, String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, String roleType)
+	public EForm updateEFormTemplate(Integer id, String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, boolean instanced, String roleType)
 	{
 		EForm eFormTemplate = eFormTemplateDao.find(id);
 		if(eFormTemplate == null)
 		{
 			throw new IllegalArgumentException("No EFormTemplate found for id " + id);
 		}
-		eFormTemplate = copyToModel(eFormTemplate, formName, formSubject, fileName, htmlStr, creator, showLatestFormOnly, patientIndependent, roleType);
+		eFormTemplate = copyToModel(eFormTemplate, formName, formSubject, fileName, htmlStr, creator, showLatestFormOnly, patientIndependent, instanced, roleType);
 
 		eFormTemplateDao.merge(eFormTemplate);
 		return eFormTemplate;
 	}
-	private EForm copyToModel(EForm eFormTemplate, String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, String roleType)
+	private EForm copyToModel(EForm eFormTemplate, String formName, String formSubject, String fileName, String htmlStr, String creator, boolean showLatestFormOnly, boolean patientIndependent, boolean instanced, String roleType)
 	{
 		eFormTemplate.setFormName(formName);
 		eFormTemplate.setFileName(fileName);
@@ -105,6 +105,7 @@ public class EFormTemplateService
 		eFormTemplate.setFormHtml(htmlStr);
 		eFormTemplate.setShowLatestFormOnly(showLatestFormOnly);
 		eFormTemplate.setPatientIndependent(patientIndependent);
+		eFormTemplate.setInstanced(instanced);
 		eFormTemplate.setRoleType(roleType);
 
 		Date now = new Date();
@@ -115,7 +116,7 @@ public class EFormTemplateService
 
 
 	/**
-	 * delete an eform template with the given ID
+	 * delete an eForm template with the given ID
 	 *
 	 * @param formId - id of the eform template to delete
 	 * @throws IllegalArgumentException - if the id is invalid
@@ -125,7 +126,7 @@ public class EFormTemplateService
 		return setTemplateDeleted(formId, true);
 	}
 	/**
-	 * restore an eform template with the given ID
+	 * restore an eForm template with the given ID
 	 * @param formId - id of the eform template to restore
 	 * @throws IllegalArgumentException - if the id is invalid
 	 */

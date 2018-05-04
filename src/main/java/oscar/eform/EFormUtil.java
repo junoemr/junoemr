@@ -453,6 +453,7 @@ public class EFormUtil {
 		curht.put("formHtml", eform.getFormHtml());
 		curht.put("showLatestFormOnly", eform.isShowLatestFormOnly());
 		curht.put("patientIndependent", eform.isPatientIndependent());
+		curht.put("instanced", eform.isInstanced());
 		curht.put("roleType", eform.getRoleType());
 
 		return (curht);
