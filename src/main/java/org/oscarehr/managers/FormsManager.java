@@ -128,7 +128,7 @@ public class FormsManager {
 		if(results.size() > 0)
 		{
 			String resultIds = EForm.getIdsAsStringList(results);
-			LogAction.addLogSynchronous(loggedInInfo, "FormsManager.findByDemographicId", "ids returned=" + resultIds);
+			LogAction.addLogSynchronous(loggedInInfo, "FormsManager.findInstancedByDemographicId", "ids returned=" + resultIds);
 		}
 
 		return (results);
