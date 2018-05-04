@@ -23,6 +23,14 @@
 
 package org.oscarehr.eform.dao;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.util.MiscUtils;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -30,16 +38,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-
-import javax.persistence.Query;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.eform.model.EFormInstance;
-import org.oscarehr.util.MiscUtils;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @Transactional
@@ -63,6 +61,47 @@ public class EFormDataDao extends AbstractDao<EFormData>
 		List<EFormData> results = query.getResultList();
 
 		return (results);
+	}
+
+	/**
+	 * Find all EForms for a demographic, but filter out old versions of instanced forms.
+	 * The result list only includes models for the most recent version of an instanced EForm.
+	 * @param demographicId - id to find by
+	 * @param offset - offset of first result
+	 * @param limit - maximum results returned
+	 * @param current - status (false for deleted)
+	 * @return - filtered list of EFormData objects
+	 */
+	public List<EFormData> findInstancedByDemographicId(Integer demographicId, Integer offset, Integer limit, boolean current)
+	{
+		String hql = "SELECT x FROM " + modelClass.getSimpleName() + " x " +
+				"LEFT JOIN x.eFormInstance i " +
+				"WHERE x.demographicId = :demographicNo " +
+				"AND (i IS NULL OR x.id = i.currentEFormData.id)" +
+				"AND x.current = :current " +
+				"ORDER BY x.formDate DESC, x.formTime DESC";
+
+		Query query = entityManager.createQuery(hql);
+		query.setParameter("demographicNo", demographicId);
+		query.setParameter("current", current);//status
+
+		if(offset != null)
+		{
+			query.setFirstResult(offset);
+		}
+		if(limit != null)
+		{
+			query.setMaxResults(limit);
+		}
+
+		@SuppressWarnings("unchecked")
+		List<EFormData> results = query.getResultList();
+
+		return (results);
+	}
+	public List<EFormData> findInstancedByDemographicId(Integer demographicId)
+	{
+		return findInstancedByDemographicId(demographicId, null, null, true);
 	}
 
 	public List<EFormData> findByDemographicIdSinceLastDate(Integer demographicId, Date lastDate) {
@@ -166,23 +205,6 @@ public class EFormDataDao extends AbstractDao<EFormData>
 
 		return (results);
 	}
-
-	public List<EFormData> findInstancedByDemographicIdCurrent(Integer demographicId, Boolean current, int startIndex, int numToReturn, String sortBy)
-	{
-		List<EFormData> unfilteredList = findByDemographicIdCurrent(demographicId, current, startIndex, numToReturn, sortBy);
-		List<EFormData> filteredList = new ArrayList<>(unfilteredList.size());
-
-		for(EFormData eFormData : unfilteredList)
-		{
-			EFormInstance eFormInstance = eFormData.getEFormInstance();
-			if(eFormInstance == null || eFormInstance.getCurrentEFormData().getId().equals(eFormData.getId()))
-			{
-				filteredList.add(eFormData);
-			}
-		}
-		return filteredList;
-	}
-
 
 	/**
 	 * @param demographicId can not be null
