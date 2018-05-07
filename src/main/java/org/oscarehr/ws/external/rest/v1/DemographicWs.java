@@ -219,7 +219,7 @@ public class DemographicWs extends AbstractExternalRestWs
 			int providerNo = Integer.parseInt(providerNoStr);
 			String ip = getHttpServletRequest().getRemoteAddr();
 
-			eForm = eFormService.saveNewEForm(demographicId, providerNo, transfer.getTemplateId(),
+			eForm = eFormService.saveNewEForm(transfer.getTemplateId(), demographicId, providerNo,
 					transfer.getSubject(), new HashMap<>(), transfer.getFormValues(), null);
 
 			LogAction.addLogEntry(providerNoStr, demographicId, LogConst.ACTION_ADD, LogConst.CON_EFORM_DATA, LogConst.STATUS_SUCCESS,

@@ -199,7 +199,7 @@ public class AddEFormAction extends Action {
 			}
 			else
 			{
-				eForm = eFormService.saveNewEForm(demographicNo, providerNo, eformTemplateId, subject, formOpenerMap, paramValueMap, eFormLink);
+				eForm = eFormService.saveNewEForm(eformTemplateId, demographicNo, providerNo, subject, formOpenerMap, paramValueMap, eFormLink);
 			}
 
 
