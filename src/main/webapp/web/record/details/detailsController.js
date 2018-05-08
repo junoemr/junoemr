@@ -84,6 +84,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		var onWaitingListSinceDate0;
 		var paperChartArchivedDate0;
 
+		controller.properties = $scope.$parent.recordCtrl.properties;
+
 		controller.init = function init()
 		{
 			demographicService.getDemographic($stateParams.demographicNo).then(

@@ -40,6 +40,7 @@ angular.module('Record').controller('Record.RecordController', [
 	'demographicService',
 	'demo',
 	'user',
+	'properties',
 	'noteService',
 	'uxService',
 	'securityService',
@@ -61,6 +62,7 @@ angular.module('Record').controller('Record.RecordController', [
 		demographicService,
 		demo,
 		user,
+		properties,
 		noteService,
 		uxService,
 		securityService,
@@ -72,6 +74,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.demographic = demo;
+		controller.properties = properties;
 		controller.page = {};
 		controller.page.assignedCMIssues = [];
 
@@ -84,7 +87,6 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.page.isNoteSaved = false; // Track save state of note TODO: Potentially add this to the encounterNote object on the backend
 
 		controller.$storage = $localStorage; // Define persistent storage
-
 		/*
 		controller.recordtabs2 = [ 
 		 {id : 0,name : 'Master',url : 'partials/master.html'},
