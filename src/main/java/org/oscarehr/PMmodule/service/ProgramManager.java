@@ -128,6 +128,11 @@ public class ProgramManager {
     public Program getProgram(Long programId) {
         return programDao.getProgram(new Integer(programId.intValue()));
     }
+
+    public Integer getDefaultProgramId()
+    {
+        return getProgramIdByProgramName("OSCAR");
+    }
     
     public List<Program> getActiveProgramByFacility(String providerNo, Integer facilityId) {
         List<Program> programs = new ArrayList<Program>();
@@ -502,9 +507,4 @@ public class ProgramManager {
     	}
     	return results;
     }
-
-	public Integer getDefaultProgramId()
-	{
-		return getProgramIdByProgramName("OSCAR");
-	}
 }

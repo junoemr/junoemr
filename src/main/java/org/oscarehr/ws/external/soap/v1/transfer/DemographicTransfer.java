@@ -57,6 +57,7 @@ public final class DemographicTransfer {
 	private String sexDesc;
 	private Date dateJoined;
 	private String familyDoctor;
+	private String familyDoctor2;
 	private String city;
 	private String firstName;
 	private String postal;
@@ -90,6 +91,9 @@ public final class DemographicTransfer {
 	private Date lastUpdateDate;
 	private String title;
 	private String officialLanguage;
+	private String countryOfOrigin;
+	private String newsletter;
+	private String veteranNo;
 
 	
 	public Integer getDemographicNo() {
@@ -500,6 +504,46 @@ public final class DemographicTransfer {
     	this.officialLanguage = officialLanguage;
     }
 
+	public String getFamilyDoctor2()
+	{
+		return familyDoctor2;
+	}
+
+	public void setFamilyDoctor2(String familyDoctor2)
+	{
+		this.familyDoctor2 = familyDoctor2;
+	}
+
+	public String getCountryOfOrigin()
+	{
+		return countryOfOrigin;
+	}
+
+	public void setCountryOfOrigin(String countryOfOrigin)
+	{
+		this.countryOfOrigin = countryOfOrigin;
+	}
+
+	public String getNewsletter()
+	{
+		return newsletter;
+	}
+
+	public void setNewsletter(String newsletter)
+	{
+		this.newsletter = newsletter;
+	}
+
+	public String getVeteranNo()
+	{
+		return veteranNo;
+	}
+
+	public void setVeteranNo(String veteranNo)
+	{
+		this.veteranNo = veteranNo;
+	}
+
 	public static DemographicTransfer toTransfer(Demographic demographic) {
 		if (demographic==null) return(null);
 		
@@ -536,5 +580,11 @@ public final class DemographicTransfer {
 	@Override
 	public String toString() {
 		return (ReflectionToStringBuilder.toString(this));
+	}
+
+	public Demographic copyTo(Demographic demographic) {
+		BeanUtils.copyProperties(this, demographic);
+
+		return (demographic);
 	}
 }
