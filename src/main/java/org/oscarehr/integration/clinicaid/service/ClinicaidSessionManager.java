@@ -175,7 +175,9 @@ public class ClinicaidSessionManager
 
 		for (Map.Entry<String, String> pair : data.entrySet())
 		{
-			stringBuilder.append(String.format("%s=%s&", pair.getKey(), pair.getValue()));
+			stringBuilder.append(
+					String.format("%s=%s&", pair.getKey(), urlEncode(pair.getValue()))
+			);
 		}
 		return stringBuilder.toString();
 	}
