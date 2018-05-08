@@ -530,10 +530,14 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function success(reqId)
 				{
 					if (controller.invalidData()) return;
-
-					window.open("../oscarEncounter/oscarConsultationRequest/printPdf2.do?reqId=" + reqId + "&demographicNo=" + consult.demographicId);
+					controller.print(reqId);
 				}
 			);
-		}
+		};
+
+		controller.print = function print(reqId)
+		{
+			window.open("../oscarEncounter/oscarConsultationRequest/printPdf2.do?reqId=" + reqId + "&demographicNo=" + consult.demographicId);
+		};
 	}
 ]);
