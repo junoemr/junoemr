@@ -46,6 +46,7 @@ public class PDFFile extends GenericFile
 	public PDFFile(File file)
 	{
 		super(file);
+		allowedErrors.add("command line error: incorrect password");
 	}
 
 	private boolean isAllowedWarning(String line)
@@ -129,7 +130,7 @@ public class PDFFile extends GenericFile
 		in.close();
 
 		int exitValue = process.exitValue();
-		if(exitValue != 0) {
+		if(exitValue != 0 && !isValid) {
 			isValid = false;
 		}
 
