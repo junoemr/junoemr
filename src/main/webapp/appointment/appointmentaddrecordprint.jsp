@@ -98,7 +98,7 @@
 %>
 	<script LANGUAGE="JavaScript">
 		self.opener.refresh();
-		popupPage(350,750,'../report/reportdaysheet.jsp?dsmode=new&provider_no=<%=param[0]%>&sdate=<%=param[1]%>&appointment_no=<%=apptNo%>') ;
+		popupPage(350,750,'../report/reportdaysheet.jsp?dsmode=newappt&provider_no=<%=param[0]%>&sdate=<%=param[1]%>&appointment_no=<%=apptNo%>') ;
 		self.close();
 	</script>
 <%
