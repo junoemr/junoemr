@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,31 +45,32 @@ import org.apache.commons.lang.StringUtils;
 
 @Entity
 @Table(name = "consultationRequests")
-public class ConsultationRequest extends AbstractModel<Integer> implements Serializable {
+public class ConsultationRequest extends AbstractModel<Integer> implements Serializable
+{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "requestId")
 	private Integer id;
-	
+
 	@Column(name = "referalDate")
-        @Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.DATE)
 	private Date referralDate;
-	
+
 	private Integer serviceId;
 
-        @ManyToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-        @JoinColumn(name="specId")
-        private ProfessionalSpecialist professionalSpecialist;
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "specId")
+	private ProfessionalSpecialist professionalSpecialist;
 
 	@Temporal(TemporalType.DATE)
-	private Date appointmentDate;	
+	private Date appointmentDate;
 	@Temporal(TemporalType.TIME)
 	private Date appointmentTime;
 
 	@Column(name = "reason")
 	private String reasonForReferral;
-	
+
 	private String clinicalInfo;
 	private String currentMeds;
 	private String allergies;
@@ -83,230 +84,292 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 	private String sendTo;
 	private String concurrentProblems;
 	private String urgency;
-	private boolean patientWillBook;	
-	
+	private boolean patientWillBook;
+
 	@Column(name = "site_name")
 	private String siteName;
-        
-    @Temporal(TemporalType.DATE)
-    private Date followUpDate;
-    @Column(name = "signature_img")
-    private String signatureImg;
-    private String letterheadName;
-    private String letterheadAddress;
-    private String letterheadPhone;
-    private String letterheadFax;
-    
+
+	@Temporal(TemporalType.DATE)
+	private Date followUpDate;
+	@Column(name = "signature_img")
+	private String signatureImg;
+	private String letterheadName;
+	private String letterheadAddress;
+	private String letterheadPhone;
+	private String letterheadFax;
+	@Column(name = "notification_sent", columnDefinition = "TINYINT(1)", nullable = false)
+	private boolean notificationSent = false;
+
 	@Override
-    public Integer getId() {
-	    return(id);
-    }
+	public Integer getId()
+	{
+		return (id);
+	}
 
-	public Date getReferralDate() {
-    	return referralDate;
-    }
+	public Date getReferralDate()
+	{
+		return referralDate;
+	}
 
-	public void setReferralDate(Date referralDate) {
-    	this.referralDate = referralDate;
-    }
+	public void setReferralDate(Date referralDate)
+	{
+		this.referralDate = referralDate;
+	}
 
-	public Integer getServiceId() {
-    	return serviceId;
-    }
+	public Integer getServiceId()
+	{
+		return serviceId;
+	}
 
-	public void setServiceId(Integer serviceId) {
-    	this.serviceId = serviceId;
-    }
+	public void setServiceId(Integer serviceId)
+	{
+		this.serviceId = serviceId;
+	}
 
-	public Date getAppointmentDate() {
-    	return appointmentDate;
-    }
+	public Date getAppointmentDate()
+	{
+		return appointmentDate;
+	}
 
-	public void setAppointmentDate(Date appointmentDate) {
-    	this.appointmentDate = appointmentDate;
-    }
+	public void setAppointmentDate(Date appointmentDate)
+	{
+		this.appointmentDate = appointmentDate;
+	}
 
-	public Date getAppointmentTime() {
-    	return appointmentTime;
-    }
+	public Date getAppointmentTime()
+	{
+		return appointmentTime;
+	}
 
-	public void setAppointmentTime(Date appointmentTime) {
-    	this.appointmentTime = appointmentTime;
-    }
+	public void setAppointmentTime(Date appointmentTime)
+	{
+		this.appointmentTime = appointmentTime;
+	}
 
-	public String getReasonForReferral() {
-    	return reasonForReferral;
-    }
+	public String getReasonForReferral()
+	{
+		return reasonForReferral;
+	}
 
-	public void setReasonForReferral(String reasonForReferral) {
-    	this.reasonForReferral = StringUtils.trimToNull(reasonForReferral);
-    }
+	public void setReasonForReferral(String reasonForReferral)
+	{
+		this.reasonForReferral = StringUtils.trimToNull(reasonForReferral);
+	}
 
-	public String getClinicalInfo() {
-    	return clinicalInfo;
-    }
+	public String getClinicalInfo()
+	{
+		return clinicalInfo;
+	}
 
-	public void setClinicalInfo(String clinicalInfo) {
-    	this.clinicalInfo = StringUtils.trimToNull(clinicalInfo);
-    }
+	public void setClinicalInfo(String clinicalInfo)
+	{
+		this.clinicalInfo = StringUtils.trimToNull(clinicalInfo);
+	}
 
-	public String getCurrentMeds() {
-    	return currentMeds;
-    }
+	public String getCurrentMeds()
+	{
+		return currentMeds;
+	}
 
-	public void setCurrentMeds(String currentMeds) {
-    	this.currentMeds = StringUtils.trimToNull(currentMeds);
-    }
+	public void setCurrentMeds(String currentMeds)
+	{
+		this.currentMeds = StringUtils.trimToNull(currentMeds);
+	}
 
-	public String getAllergies() {
-    	return allergies;
-    }
+	public String getAllergies()
+	{
+		return allergies;
+	}
 
-	public void setAllergies(String allergies) {
-    	this.allergies = StringUtils.trimToNull(allergies);
-    }
+	public void setAllergies(String allergies)
+	{
+		this.allergies = StringUtils.trimToNull(allergies);
+	}
 
-	public String getProviderNo() {
-    	return providerNo;
-    }
+	public String getProviderNo()
+	{
+		return providerNo;
+	}
 
-	public void setProviderNo(String providerNo) {
-    	this.providerNo = StringUtils.trimToNull(providerNo);
-    }
+	public void setProviderNo(String providerNo)
+	{
+		this.providerNo = StringUtils.trimToNull(providerNo);
+	}
 
-	public Integer getDemographicId() {
-    	return demographicId;
-    }
+	public Integer getDemographicId()
+	{
+		return demographicId;
+	}
 
-	public void setDemographicId(Integer demographicId) {
-    	this.demographicId = demographicId;
-    }
+	public void setDemographicId(Integer demographicId)
+	{
+		this.demographicId = demographicId;
+	}
 
-	public String getStatus() {
-    	return status;
-    }
+	public String getStatus()
+	{
+		return status;
+	}
 
-	public void setStatus(String status) {
-    	this.status = StringUtils.trimToNull(status);
-    }
+	public void setStatus(String status)
+	{
+		this.status = StringUtils.trimToNull(status);
+	}
 
-	public String getStatusText() {
-    	return statusText;
-    }
+	public String getStatusText()
+	{
+		return statusText;
+	}
 
-	public void setStatusText(String statusText) {
-    	this.statusText = StringUtils.trimToNull(statusText);
-    }
+	public void setStatusText(String statusText)
+	{
+		this.statusText = StringUtils.trimToNull(statusText);
+	}
 
-	public String getSendTo() {
-    	return sendTo;
-    }
+	public String getSendTo()
+	{
+		return sendTo;
+	}
 
-	public void setSendTo(String sendTo) {
-    	this.sendTo = StringUtils.trimToNull(sendTo);
-    }
+	public void setSendTo(String sendTo)
+	{
+		this.sendTo = StringUtils.trimToNull(sendTo);
+	}
 
-	public String getConcurrentProblems() {
-    	return concurrentProblems;
-    }
+	public String getConcurrentProblems()
+	{
+		return concurrentProblems;
+	}
 
-	public void setConcurrentProblems(String concurrentProblems) {
-    	this.concurrentProblems = StringUtils.trimToNull(concurrentProblems);
-    }
+	public void setConcurrentProblems(String concurrentProblems)
+	{
+		this.concurrentProblems = StringUtils.trimToNull(concurrentProblems);
+	}
 
-	public String getUrgency() {
-    	return urgency;
-    }
+	public String getUrgency()
+	{
+		return urgency;
+	}
 
-	public void setUrgency(String urgency) {
-    	this.urgency = StringUtils.trimToNull(urgency);
-    }
-	
-	public String getSiteName() {
-    	return siteName;
-    }
+	public void setUrgency(String urgency)
+	{
+		this.urgency = StringUtils.trimToNull(urgency);
+	}
 
-	public void setSiteName(String siteName) {
-    	this.siteName = siteName;
-    }
+	public String getSiteName()
+	{
+		return siteName;
+	}
 
-	public boolean isPatientWillBook() {
-    	return patientWillBook;
-    }
+	public void setSiteName(String siteName)
+	{
+		this.siteName = siteName;
+	}
 
-	public void setPatientWillBook(boolean patientWillBook) {
-    	this.patientWillBook = patientWillBook;
-    }
+	public boolean isPatientWillBook()
+	{
+		return patientWillBook;
+	}
 
-    /**
-     * @return the followUpDate
-     */
-    public Date getFollowUpDate() {
-        return followUpDate;
-    }
+	public void setPatientWillBook(boolean patientWillBook)
+	{
+		this.patientWillBook = patientWillBook;
+	}
 
-    /**
-     * @param followUpDate the followUpDate to set
-     */
-    public void setFollowUpDate(Date followUpDate) {
-        this.followUpDate = followUpDate;
-    }
+	/**
+	 * @return the followUpDate
+	 */
+	public Date getFollowUpDate()
+	{
+		return followUpDate;
+	}
 
-    /**
-     * @return the professionalSpecialist
-     */
-    public ProfessionalSpecialist getProfessionalSpecialist() {
-        return professionalSpecialist;
-}
+	/**
+	 * @param followUpDate the followUpDate to set
+	 */
+	public void setFollowUpDate(Date followUpDate)
+	{
+		this.followUpDate = followUpDate;
+	}
 
-    /**
-     * @param professionalSpecialist the professionalSpecialist to set
-     */
-    public void setProfessionalSpecialist(ProfessionalSpecialist professionalSpecialist) {
-        this.professionalSpecialist = professionalSpecialist;
-    }
+	/**
+	 * @return the professionalSpecialist
+	 */
+	public ProfessionalSpecialist getProfessionalSpecialist()
+	{
+		return professionalSpecialist;
+	}
 
-    public Integer getSpecialistId() {
-        return this.professionalSpecialist.getId();
-    }
+	/**
+	 * @param professionalSpecialist the professionalSpecialist to set
+	 */
+	public void setProfessionalSpecialist(ProfessionalSpecialist professionalSpecialist)
+	{
+		this.professionalSpecialist = professionalSpecialist;
+	}
 
-	public String getSignatureImg() {
-	    return signatureImg;
-    }
+	public Integer getSpecialistId()
+	{
+		return this.professionalSpecialist.getId();
+	}
 
-	public void setSignatureImg(String signatureImg) {
-	    this.signatureImg = signatureImg;
-    }
+	public String getSignatureImg()
+	{
+		return signatureImg;
+	}
 
-	public String getLetterheadName() {
-	    return letterheadName;
-    }
+	public void setSignatureImg(String signatureImg)
+	{
+		this.signatureImg = signatureImg;
+	}
 
-	public void setLetterheadName(String letterheadName) {
-	    this.letterheadName = letterheadName;
-    }
+	public String getLetterheadName()
+	{
+		return letterheadName;
+	}
 
-	public String getLetterheadAddress() {
-	    return letterheadAddress;
-    }
+	public void setLetterheadName(String letterheadName)
+	{
+		this.letterheadName = letterheadName;
+	}
 
-	public void setLetterheadAddress(String letterheadAddress) {
-	    this.letterheadAddress = letterheadAddress;
-    }
+	public String getLetterheadAddress()
+	{
+		return letterheadAddress;
+	}
 
-	public String getLetterheadPhone() {
-	    return letterheadPhone;
-    }
+	public void setLetterheadAddress(String letterheadAddress)
+	{
+		this.letterheadAddress = letterheadAddress;
+	}
 
-	public void setLetterheadPhone(String letterheadPhone) {
-	    this.letterheadPhone = letterheadPhone;
-    }
+	public String getLetterheadPhone()
+	{
+		return letterheadPhone;
+	}
 
-	public String getLetterheadFax() {
-	    return letterheadFax;
-    }
+	public void setLetterheadPhone(String letterheadPhone)
+	{
+		this.letterheadPhone = letterheadPhone;
+	}
 
-	public void setLetterheadFax(String letterheadFax) {
-	    this.letterheadFax = letterheadFax;
-    }
+	public String getLetterheadFax()
+	{
+		return letterheadFax;
+	}
+
+	public void setLetterheadFax(String letterheadFax)
+	{
+		this.letterheadFax = letterheadFax;
+	}
+
+	public boolean isNotificationSent()
+	{
+		return notificationSent;
+	}
+
+	public void setNotificationSent(boolean notificationSent)
+	{
+		this.notificationSent = notificationSent;
+	}
 }
