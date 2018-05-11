@@ -53,7 +53,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				name: ''
 			},
 			serviceDateDate: new Date(),
-			serviceDateTime: new Date(),
+			serviceDateTime: "12:00 AM",
 			suggestedTextId: 0
 		};
 
@@ -77,6 +77,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				});
 			}
 
+			$('#timepicker').timepicker({defaultTime: controller.tickler.serviceDateTime});
 		};
 
 		ticklerService.getTextSuggestions().then(function(data)
@@ -136,11 +137,10 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			t.status = 'A';
 			t.message = controller.tickler.message;
 
-
 			var givenDate = controller.tickler.serviceDateDate;
-			var givenTime = controller.tickler.serviceDateTime;
-			givenDate.setHours(givenTime.getHours());
-			givenDate.setMinutes(givenTime.getMinutes());
+			var givenTime = moment(controller.tickler.serviceDateTime, 'hh:mm A');
+			givenDate.setHours(givenTime.get('hour'));
+			givenDate.setMinutes(givenTime.get('minute'));
 
 			t.serviceDate = givenDate;
 			ticklerService.add(t).then(function(data)
@@ -176,7 +176,7 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			var search = {
 				type: 'Name',
 				'term': term,
-				active: true,
+				status: 'active',
 				integrator: false,
 				outofdomain: true
 			};
@@ -238,6 +238,11 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 			{
 				controller.tickler.message = results[0].suggestedText;
 			}
+		};
+
+		controller.addMonthsFromNow = function(num)
+		{
+			controller.tickler.serviceDateDate = moment().add(num, 'months').toDate();
 		};
 	}
 ]);

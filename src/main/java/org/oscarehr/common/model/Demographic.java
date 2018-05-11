@@ -59,6 +59,10 @@ public class Demographic implements Serializable
 	private static final String DEFAULT_FUTURE_DATE = "2100-01-01";
 	public static final String ANONYMOUS = "ANONYMOUS";
 	public static final String UNIQUE_ANONYMOUS = "UNIQUE_ANONYMOUS";
+	public static final String ROSTER_STATUS_FEE_SERVICE = "FS";
+	public static final String ROSTER_STATUS_ROSTERED = "RO";
+	public static final String ROSTER_STATUS_NOT_ROSTERED = "NR";
+	public static final String ROSTER_STATUS_TERMINATED = "TE";
 
 	private final static Pattern FD_LAST_NAME = Pattern.compile(".*<rd>([^,]*),.*</rd>.*");
 	private final static Pattern FD_FIRST_NAME = Pattern.compile(".*<rd>[^,]*,(.*)</rd>.*");

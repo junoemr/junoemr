@@ -30,7 +30,7 @@
 
 <div id="dashboard-page" ng-controller="Dashboard.DashboardController as dashboardCtrl">
 	<div ng-if="dashboardCtrl.me != null">
-		<div class="row" id="dashboard-header">
+		<div class="row vertical-align" id="dashboard-header">
 			<div class="col-md-9 col-xs-8">
 				<h3>
 					<bean:message key="dashboard.welcome" bundle="ui"/> to your dashboard,
