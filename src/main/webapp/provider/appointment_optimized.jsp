@@ -57,6 +57,7 @@
 <%@ page import="org.oscarehr.common.model.MyGroup" %>
 <%@ page import="org.oscarehr.common.model.MyGroupAccessRestriction" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
+<%@ page import="org.oscarehr.common.model.ProviderSite" %>
 <%@ page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
@@ -227,6 +228,7 @@ private long getAppointmentRowSpan(
 	HashMap<String,String> currentSiteMap = new HashMap<String,String>();
 	boolean isSiteAccessPrivacy = false;
 	boolean isTeamAccessPrivacy = false;
+	boolean hasSite=true;
 
 	String selectedSite = null;
 
@@ -301,7 +303,14 @@ private long getAppointmentRowSpan(
 	// Required for menu bar
 	LoggedInInfo loggedInInfo1=LoggedInInfo.getLoggedInInfoFromSession(request);
 
-
+	if (bMultisites)
+	{
+		List<ProviderSite> psList = providerSiteDao.findByProviderNo(loggedInInfo1.getLoggedInProviderNo());
+		if (psList.size() == 0)
+		{
+			hasSite=false;
+		}
+	}
 	OscarProperties oscarProperties = OscarProperties.getInstance();
 
 	String resourceBaseUrl =  oscarProperties.getProperty("resource_base_url");
@@ -1504,7 +1513,7 @@ private long getAppointmentRowSpan(
 										<td align="RIGHT" class="<%=isExactHour?"scheduleTime00":"scheduleTimeNot00"%>" NOWRAP>
 											<a
 													href=#
-													onClick="confirmPopupPage(400,780,'<%= url %>','<%= confirmString %>','<%=allowDay%>','<%=allowWeek%>');return false;"
+													onClick="confirmPopupPage(400,780,'<%= url %>','<%= confirmString %>','<%=allowDay%>','<%=allowWeek%>', <%=hasSite%>);return false;"
 													title='<%= timeTitle %>' class="adhour"
 											>
 												<%= slotTime.format(formatter) %>&nbsp;
