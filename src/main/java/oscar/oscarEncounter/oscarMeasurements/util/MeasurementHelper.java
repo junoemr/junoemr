@@ -33,7 +33,12 @@ import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
  */
 public class MeasurementHelper {
 
-    public static boolean flowSheetRequiresWork(String demographic_no, MeasurementFlowSheet mFlowsheet) throws Exception {
+    public static boolean flowSheetRequiresWork(String demographic_no, MeasurementFlowSheet mFlowsheet)
+    {
+        if(mFlowsheet == null)
+        {
+            throw new IllegalArgumentException("MeasurementFlowSheet cannot be null");
+        }
         MeasurementInfo mi = new MeasurementInfo(demographic_no);
         List<String> measurements = mFlowsheet.getMeasurementList();
         mi.getMeasurements(measurements);

@@ -146,7 +146,7 @@ public class LogAction {
 	}
 
 
-	public static void addLogEntrySyncronous(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip, String data, Integer securityId) {
+	public static void addLogEntrySynchronous(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip, String data, Integer securityId) {
 		OscarLog oscarLog = new OscarLog();
 
 		oscarLog.setProviderNo(providerNo);
@@ -161,21 +161,24 @@ public class LogAction {
 
 		addLogSynchronous(oscarLog);
 	}
-	public static void addLogEntrySyncronous(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip, String data) {
-		addLogEntrySyncronous(providerNo, demographicNo, action, module, status, contentId, ip, data, null);
+	public static void addLogEntrySynchronous(String providerNo, Integer demographicNo, String action, String module, String status, String contentId, String ip, String data) {
+		addLogEntrySynchronous(providerNo, demographicNo, action, module, status, contentId, ip, data, null);
 	}
-	public static void addLogEntrySyncronous(String providerNo, String action, String module, String status, String contentId, String ip, String data) {
-		addLogEntrySyncronous(providerNo, null, action, module, status, contentId, ip, data, null);
+	public static void addLogEntrySynchronous(String providerNo, String action, String module, String status, String contentId, String ip, String data) {
+		addLogEntrySynchronous(providerNo, null, action, module, status, contentId, ip, data, null);
 	}
-	public static void addLogEntrySyncronous(String providerNo, String action, String module, String status, String contentId, String ip) {
-		addLogEntrySyncronous(providerNo, null, action, module, status, contentId, ip, null, null);
+	public static void addLogEntrySynchronous(String providerNo, String action, String module, String status, String contentId, String ip) {
+		addLogEntrySynchronous(providerNo, null, action, module, status, contentId, ip, null, null);
 	}
-	public static void addLogEntrySyncronous(String providerNo, String action, String module, String status, String data) {
-		addLogEntrySyncronous(providerNo, null, action, module, status, null, null, data, null);
+	public static void addLogEntrySynchronous(String providerNo, String action, String module, String status, String data) {
+		addLogEntrySynchronous(providerNo, null, action, module, status, null, null, data, null);
+	}
+	public static void addLogEntrySynchronous(String action, String data) {
+		addLogEntrySynchronous(null, null, action, null, null, null, null, data, null);
 	}
 	
 	/**
-	 * @deprecated - use addLogEntrySyncronous instead
+	 * @deprecated - use addLogEntrySynchronous instead
 	 */
 	@Deprecated
 	public static void addLogSynchronous(LoggedInInfo loggedInInfo, String action, String data)
@@ -189,7 +192,7 @@ public class LogAction {
 	}
 	/**
 	 * This method will add a log entry in the same thread and can participate in the same transaction if one exists.
-	 * @deprecated - use addLogEntrySyncronous instead
+	 * @deprecated - use addLogEntrySynchronous instead
 	 */
 	@Deprecated
 	public static void addLogSynchronous(String provider_no, String action, String content, String contentId, String ip) {

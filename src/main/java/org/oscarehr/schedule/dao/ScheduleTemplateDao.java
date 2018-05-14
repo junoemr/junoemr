@@ -25,14 +25,24 @@
 
 package org.oscarehr.schedule.dao;
 
+import java.sql.Time;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
+import com.google.common.collect.TreeRangeMap;
 import org.oscarehr.common.NativeSql;
-import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.schedule.model.ScheduleTemplate;
+import org.oscarehr.schedule.dto.ScheduleSlot;
+import org.oscarehr.common.dao.AbstractDao;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -121,5 +131,69 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		query.setParameter("providerNo", providerNo);
 		return query.getResultList();
 	}
-	
+
+
+	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
+	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, Integer providerNo)
+	{
+		String sql = "SELECT \n" +
+				"  (n3.i + (10 * n2.i) + (100 * n1.i))+1 AS position, \n" +
+				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
+				"  sd.sdate AS appt_date,\n" +
+				"  SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode))) AS appt_time,\n" +
+				"  stc.code,\n" +
+				"  CAST(stc.duration AS integer),\n" +
+				"  stc.description,\n" +
+				"  stc.color,\n" +
+				"  stc.confirm,\n" +
+				"  stc.bookinglimit\n" +
+				"FROM \n" +
+				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n1    \n" +
+				"    CROSS JOIN \n" +
+				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n2     \n" +
+				"    CROSS JOIN \n" +
+				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n3 \n" +
+				"CROSS JOIN scheduledate sd\n" +
+				"JOIN scheduletemplate st ON sd.hour = st.name\n" +
+				"LEFT JOIN scheduletemplatecode stc ON stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
+				"WHERE sd.status = 'A'\n" +
+				"AND stc.duration IS NOT NULL\n" + // Ignore blank durations because they'll have 0 range
+				"AND sd.sdate = :date\n" +
+				"AND sd.provider_no = :providerNo\n" +
+				"AND (n3.i + (10 * n2.i) + (100 * n1.i)) < LENGTH(st.timecode)\n" +
+				"ORDER BY (n3.i + (10 * n2.i) + (100 * n1.i));";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
+		query.setParameter("providerNo", providerNo);
+
+		List<Object[]> results = query.getResultList();
+
+		RangeMap<LocalTime, ScheduleSlot> slots = TreeRangeMap.create();
+		for(Object[] result: results)
+		{
+			java.sql.Date appointmentDate = (java.sql.Date) result[2];
+			Time appointmentTime = (java.sql.Time) result[3];
+			String code = (String) result[1];
+			Integer durationMinutes = (Integer) result[5];
+			String description = (String) result[6];
+			String color = (String) result[7];
+			String confirm = (String) result[8];
+			Integer bookingLimit = (Integer) result[9];
+
+			LocalDate slotDate = appointmentDate.toLocalDate();
+			LocalTime slotTime = appointmentTime.toLocalTime();
+
+			LocalDateTime appointmentDateTime = LocalDateTime.of(slotDate, slotTime);
+
+			// Get the end time by adding the duration
+			LocalTime endTime = slotTime.plus(Duration.ofMinutes(durationMinutes));
+
+			Range range = Range.closedOpen(slotTime, endTime);
+			slots.put(range, new ScheduleSlot(appointmentDateTime, code, durationMinutes, description,
+					color, confirm, bookingLimit));
+		}
+
+		return slots;
+	}
 }

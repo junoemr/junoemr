@@ -1,6 +1,5 @@
 /**
- *
- * Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,15 +16,26 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * This software was written for
- * Centre for Research on Inner City Health, St. Michael's Hospital,
- * Toronto, Ontario, Canada
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
  */
-
 package org.oscarehr.schedule.service;
 
+import com.google.common.collect.RangeMap;
+import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.dao.MyGroupDao;
+import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.model.MyGroup;
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.schedule.dto.AppointmentDetails;
+import org.oscarehr.schedule.dto.ResourceSchedule;
+import org.oscarehr.schedule.dto.ScheduleSlot;
+import org.oscarehr.schedule.dto.UserDateSchedule;
 import org.oscarehr.schedule.dao.RScheduleDao;
 import org.oscarehr.schedule.dao.ScheduleDateDao;
 import org.oscarehr.schedule.dao.ScheduleHolidayDao;
+import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.RSchedule;
 import org.oscarehr.schedule.model.ScheduleDate;
 import org.oscarehr.schedule.model.ScheduleHoliday;
@@ -44,11 +54,29 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.ArrayList;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
+import java.util.Locale;
+import java.util.SortedMap;
+
 
 @Service
 @Transactional
 public class Schedule
 {
+	@Autowired
+	OscarAppointmentDao appointmentDao;
+
+	@Autowired
+	MyGroupDao myGroupDao;
+
+	@Autowired
+	ProviderDao providerDao;
+
 	@Autowired
 	ScheduleDateDao scheduleDateDao;
 
@@ -57,6 +85,9 @@ public class Schedule
 
 	@Autowired
 	ScheduleHolidayDao scheduleHolidayDao;
+
+	@Autowired
+	ScheduleTemplateDao scheduleTemplateDao;
 
 
 	public long updateSchedule(RscheduleBean scheduleRscheduleBean,
@@ -199,7 +230,12 @@ public class Schedule
 			endDate = MyDateFormat.getSysDate(endDateStr);
 		}
 
-		List<RSchedule> rsl = rScheduleDao.findByProviderNoAndDates(providerNo, startDate);
+		if (endDate == null)
+		{
+			throw new IllegalArgumentException("End date cannot be null");
+		}
+
+		List<RSchedule> rsl = rScheduleDao.findByProviderNoAndStartEndDates(providerNo, startDate, endDate);
 		for(RSchedule rs : rsl)
 		{
 			rs.setStatus(RSchedule.STATUS_DELETED);
@@ -259,5 +295,140 @@ public class Schedule
 		sd.setCreator(userName);
 		sd.setStatus(status.toCharArray()[0]);
 		scheduleDateDao.persist(sd);
+	}
+
+	/**
+	 * Get the schedule for the provider on the date.
+	 * @param providerNo Provider to get schedule for.
+	 * @param date Date to get schedule for.
+	 * @param site String the name of the site to get the schedule for.
+	 * @return The schedule for this provider.
+	 */
+	public ResourceSchedule getResourceScheduleByProvider(String providerNo, LocalDate date,
+		String site, boolean viewAll)
+	{
+		Provider provider = providerDao.getProvider(providerNo);
+
+		List<UserDateSchedule> userDateSchedules = new ArrayList<>();
+
+		// get a UserDateSchedule for each
+		UserDateSchedule userDateSchedule = getUserDateSchedule(
+			date,
+			new Integer(provider.getProviderNo()),
+			provider.getFirstName(),
+			provider.getLastName(),
+			site
+		);
+
+		// When not viewing all schedules, only add if there is a schedule set
+		if(viewAll || userDateSchedule.getScheduleSlots().asMapOfRanges().size() > 0)
+		{
+			userDateSchedules.add(userDateSchedule);
+		}
+
+		// Create transfer object
+		return new ResourceSchedule(userDateSchedules);
+	}
+
+	/**
+	 * Get the schedule for the provided date for each member of the group.
+	 * @param group The name of the group to get the schedule for.
+	 * @param date The date to get the schedule for.
+	 * @param site String the name of the site to get the schedule for.
+	 * @param viewAll boolean If false, only show group members with a schedule set.
+	 * @return The schedule for the group.
+	 */
+	public ResourceSchedule getResourceScheduleByGroup(String group, LocalDate date, String site,
+		boolean viewAll, Integer limitProviderNo)
+	{
+		List<MyGroup> results;
+
+		if(viewAll)
+		{
+			results = myGroupDao.getGroupByGroupNo(group);
+		}
+		else
+		{
+			results = myGroupDao.getGroupWithScheduleByGroupNo(group, date, limitProviderNo);
+		}
+
+		List<UserDateSchedule> userDateSchedules = new ArrayList<>();
+
+		for(MyGroup result: results)
+		{
+			// get a UserDateSchedule for each
+			userDateSchedules.add(getUserDateSchedule(
+				date,
+				new Integer(result.getId().getProviderNo()),
+				result.getFirstName(),
+				result.getLastName(),
+				site
+			));
+		}
+
+		// Create transfer object
+		return new ResourceSchedule(userDateSchedules);
+	}
+
+	/**
+	 * Get the provider's schedule for the week (sun-sat) that includes the provided date.
+	 * @param providerNo Provider to get the schedule for.
+	 * @param date Get the schedule for the week (sun-sat) including this date.
+	 * @param site String the name of the site to get the schedule for.
+	 * @return The schedule for the week.
+	 */
+	public ResourceSchedule getWeekScheduleByProvider(String providerNo, LocalDate date, String site)
+	{
+		Provider provider = providerDao.getProvider(providerNo);
+
+		// Get date of the sunday on or before
+		final DayOfWeek firstDayOfWeek = WeekFields.of(Locale.CANADA).getFirstDayOfWeek();
+		LocalDate sunday = date.with(TemporalAdjusters.previousOrSame(firstDayOfWeek));
+
+		List<UserDateSchedule> userDateSchedules = new ArrayList<>();
+
+		// Get 7 days worth of schedule, starting on the first day of the week
+		for(int i = 0; i < 7; i++)
+		{
+			LocalDate currentDay = sunday.plusDays(i);
+
+			// get a UserDateSchedule for each
+			userDateSchedules.add(getUserDateSchedule(
+				currentDay,
+				new Integer(provider.getProviderNo()),
+				provider.getFirstName(),
+				provider.getLastName(),
+				site
+			));
+		}
+
+		// Create transfer object
+		return new ResourceSchedule(userDateSchedules);
+	}
+
+	private UserDateSchedule getUserDateSchedule(
+		LocalDate date,
+		Integer providerNo,
+		String firstName,
+		String lastName,
+		String site
+	)
+	{
+		// Get schedule slots
+		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(
+			date, providerNo);
+
+		// Get appointments
+		SortedMap<LocalTime, List<AppointmentDetails>> appointments =
+			appointmentDao.findAppointmentDetailsByDateAndProvider(date, providerNo, site);
+
+		return new UserDateSchedule(
+			providerNo,
+			date,
+			firstName,
+			lastName,
+			scheduleSlots,
+			appointments
+		);
 	}
 }

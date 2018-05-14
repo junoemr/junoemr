@@ -41,7 +41,7 @@ int curDay = cal.get(Calendar.DAY_OF_MONTH);
 
 %>
 
-location.href = '../oscarEncounter/IncomingEncounter.do?demographicNo=<%=request.getParameter("demographicNo")%>&reason=Lab+Results-Notes&curDate=<%=curYear%>-<%=curMonth%>-<%=curDay%>&encType=<%=URLEncoder.encode("Lab Results","UTF-8")%>&status=';
+location.href = '../oscarEncounter/IncomingEncounter.do?demographicNo=<%=request.getParameter("demographicNo")%>&reason=Lab+Results-Notes&curDate=<%=curYear%>-<%=curMonth%>-<%=curDay%>&appointmentNo=0&apptProvider_no=none&appointmentDate=<%=curYear%>-<%=curMonth%>-<%=curDay%>&startTime=0:00&encType=<%=URLEncoder.encode("Lab Results","UTF-8")%>&status=';
 window.resizeTo(980,700);
 
 </script>
@@ -49,8 +49,7 @@ window.resizeTo(980,700);
 </head>
 <body>
 
-<a
-	href="javascript:popupPage(700, 980, '../oscarEncounter/IncomingEncounter.do?demographicNo=<%=request.getParameter("demographicNo")%>&reason=Lab+Results-Notes&curDate=<%=curYear%>-<%=curMonth%>-<%=curDay%>&encType=<%=URLEncoder.encode("Lab Results","UTF-8")%>&status=');window.close();">Please
+<a href="javascript:popupPage(700, 980, '../oscarEncounter/IncomingEncounter.do?demographicNo=<%=request.getParameter("demographicNo")%>&reason=Lab+Results-Notes&curDate=<%=curYear%>-<%=curMonth%>-<%=curDay%>&appointmentNo=0&apptProvider_no=none&appointmentDate=<%=curYear%>-<%=curMonth%>-<%=curDay%>&startTime=0:00&encType=<%=URLEncoder.encode("Lab Results","UTF-8")%>&status=');window.close();">Please
 click here to go to the patient's E-Chart.</a>
 
 </body>

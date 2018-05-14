@@ -95,7 +95,7 @@ while (iter.hasNext()){%>
 	<tr>
 	<td><b><bean:message key="dms.documentReport.msgEnterDocumentType"/> </b></td>
 	<td >
-		<input <% if (doctypeerrors.containsKey("doctypemissing")) {%>
+		<input <% if (doctypeerrors.containsKey("typemissing") || doctypeerrors.containsKey("typeexists")) {%>
 				class="warning" <%}%> id="docType" type="text" name="docType" value=""> <br></td>
 	</tr>
 	

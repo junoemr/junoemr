@@ -25,21 +25,12 @@
 
 package oscar.oscarBilling.ca.bc.MSP;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.BillingDao;
 import org.oscarehr.common.model.Billing;
-import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.Misc;
 import oscar.entities.Billingmaster;
 import oscar.entities.WCB;
@@ -47,6 +38,13 @@ import oscar.oscarBilling.ca.bc.Teleplan.TeleplanSequenceDAO;
 import oscar.oscarBilling.ca.bc.Teleplan.WCBTeleplanSubmission;
 import oscar.oscarBilling.ca.bc.data.BillingmasterDAO;
 import oscar.oscarProvider.data.ProviderData;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -67,9 +65,8 @@ public class TeleplanFileWriter {
     ArrayList logList = null;
     int totalClaims = 0;
     
-    private BillingmasterDAO billingmasterDAO = null;
-    private DemographicManager demographicManager = null;
-    
+    private static BillingmasterDAO billingmasterDAO = SpringUtils.getBean(BillingmasterDAO.class);
+
     public CheckBillingData checkData = new CheckBillingData();
     
     /** Creates a new instance of TeleplanFileWriter */
@@ -213,29 +210,33 @@ public class TeleplanFileWriter {
                                                                 totalClaims);
         return submission;
     }
-    
-    private Claims createWCB2(LoggedInInfo loggedInInfo, String billing_no){
-        
-        
-            //setMasDAO(new BillingmasterDAO());
-           //log.debug
-            MiscUtils.getLogger().debug("creating WCB teleplan record for claim "+billing_no);
-           List billMasterList = billingmasterDAO.getBillingMasterByBillingNo(billing_no);
-           Billingmaster bm = (Billingmaster) billMasterList.get(0);
-           
-           
-           //Billingmaster bm = billingmasterDAO.getBillingMasterByBillingMasterNo(billing_no);
-           
-            
-           WCB wcbForm = billingmasterDAO.getWCBForm(""+bm.getWcbId());
-               
-           MiscUtils.getLogger().debug("BM "+bm+" WCB "+wcbForm + " for "+billing_no);
-           
-           WCBTeleplanSubmission wcbSub = new WCBTeleplanSubmission();
-           wcbSub.setDemographicManager(demographicManager);
-           //WcbSb sb = new WcbSb(billing_no);
-           appendToHTML(wcbSub.getHtmlLine(wcbForm,bm)); //sb.getHtmlLine());
-           appendToHTML(wcbSub.validate(wcbForm,bm)); //sb.validate());
+
+	private Claims createWCB2(LoggedInInfo loggedInInfo, String billing_no)
+	{
+
+		MiscUtils.getLogger().debug("creating WCB teleplan record for claim " + billing_no);
+		List billMasterList = billingmasterDAO.getBillingMasterByBillingNo(billing_no);
+		Billingmaster bm = (Billingmaster) billMasterList.get(0);
+
+		WCB wcbForm = billingmasterDAO.getWCBForm("" + bm.getWcbId());
+
+		MiscUtils.getLogger().debug("BM " + bm + " WCB " + wcbForm + " for " + billing_no);
+
+		WCBTeleplanSubmission wcbSub = new WCBTeleplanSubmission();
+		//WcbSb sb = new WcbSb(billing_no);
+//           appendToHTML(wcbSub.getHtmlLine(wcbForm,bm)); //sb.getHtmlLine());
+//           appendToHTML(wcbSub.validate(wcbForm,bm)); //sb.validate());
+
+		String html = wcbSub.validate(wcbForm, bm);
+		appendToHTML(html);
+		if(html.equals(""))
+		{
+			appendToHTML(wcbSub.getHtmlLine(wcbForm, bm));
+		}
+		else
+		{
+			return null;
+		}
            //TODO: DOES THIS DO ANYTHING appendToHTML(checkData.printWarningMsg(""))
            
            Claims claims = new Claims();
@@ -307,9 +308,8 @@ public class TeleplanFileWriter {
            Claims claims = new Claims();
            claims.increaseClaims();
            claims.addToTotal(sb.getBillingAmountForFee1BigDecimal());
-           BillingmasterDAO masDAO = SpringUtils.getBean(BillingmasterDAO.class);
-        
-           List billMasterList = masDAO.getBillingMasterByBillingNo(billing_no);
+
+           List billMasterList = billingmasterDAO.getBillingMasterByBillingNo(billing_no);
            Billingmaster bm = (Billingmaster) billMasterList.get(0);
            
            MiscUtils.getLogger().debug("FORM NEEDED ?"+sb.isFormNeeded());
@@ -508,16 +508,6 @@ public class TeleplanFileWriter {
         return dLine.toString();
     }
 
-    public void setBillingmasterDAO(BillingmasterDAO masDAO) {
-        this.billingmasterDAO = masDAO;
-    }
-   
-   
-    public void setDemographicManager(DemographicManager demographicManager) {
-        this.demographicManager = demographicManager;
-    }
-   
-    
     class Claims{
         BigDecimal claimTotal = null;
         int numClaims = 0;

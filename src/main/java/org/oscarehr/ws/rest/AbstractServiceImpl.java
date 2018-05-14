@@ -45,6 +45,8 @@ import oscar.*;
 @Consumes({ "application/xml" })
 public abstract class AbstractServiceImpl {
 
+	private static final int MAX_PAGE_RESULTS = 100;
+
 	protected HttpServletRequest getHttpServletRequest()
 	{
 		Message message = PhaseInterceptorChain.getCurrentMessage();
@@ -82,6 +84,42 @@ public abstract class AbstractServiceImpl {
 	protected Provider getCurrentProvider() {
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		return (loggedInInfo.getLoggedInProvider());
+	}
+
+	/**
+	 * ensure the requested result limit does not exceed the maximum
+	 * @param paramResultsPerPage - proposed limit
+	 * @param maximum - maximum result limit
+	 * @return - the new limit
+	 */
+	protected int limitedResultCount(int paramResultsPerPage, int maximum)
+	{
+		return (maximum < paramResultsPerPage) ? maximum : paramResultsPerPage;
+	}
+	protected int limitedResultCount(int paramResultsPerPage)
+	{
+		return limitedResultCount(paramResultsPerPage, MAX_PAGE_RESULTS);
+	}
+
+	/**
+	 * ensure the page number is valid (non negative)
+	 * @param pageNo proposed page number
+	 * @return valid page number
+	 */
+	protected int validPageNo(int pageNo)
+	{
+		if(pageNo < 1) pageNo = 1;
+		return pageNo;
+	}
+	/**
+	 * calculate the offset based on the current page number and resultCount
+	 * @param pageNo - page
+	 * @param resultsPerPage - limit of results
+	 * @return offset
+	 */
+	protected int calculatedOffset(int pageNo, int resultsPerPage)
+	{
+		return resultsPerPage * (pageNo - 1);
 	}
 
 	/**

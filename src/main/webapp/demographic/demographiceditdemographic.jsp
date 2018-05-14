@@ -128,6 +128,7 @@ if(!authed) {
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
 	List<Provider> doctors = providerDao.getActiveProvidersByType("doctor");
 	List<Provider> nurses = providerDao.getActiveProvidersByRole("nurse");
 	List<Provider> midwifes = providerDao.getActiveProvidersByRole("midwife");
@@ -253,6 +254,8 @@ if(!authed) {
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.Vector" %>
+<%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
+<%@ page import="org.oscarehr.common.model.ProviderPreference" %>
 <html:html locale="true">
 
 <head>
@@ -979,10 +982,10 @@ if(wLReadonly.equals("")){
 						    %>
 
 							<br/>
-                            <a  href="javascript: void();" onclick="return !showMenu('2', event);" onmouseover="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','returnTeleplanMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+                            <a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
                             <div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
                                 <span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
-                                <span id="returnTeleplanMsg"></span>
+                                <span id="eligibilityMsg"></span>
                             </div>
 					<%
 						}
@@ -1004,17 +1007,34 @@ if(wLReadonly.equals("")){
 
 
 						<br/>
-						<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmouseover="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','returnTeleplanMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+						<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
 						<div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
 							<span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
-							<span id="returnTeleplanMsg"></span>
+							<span id="eligibilityMsg"></span>
 						</div>
 					<%}%>
 				</td>
 			</tr>
 			<tr>
+				<%
+					String referral_no_parameter = "";
+					String defaultBillingView = oscarVariables.getProperty("default_view");
+					if (oscarProps.isPropertyActive("auto_populate_billingreferral_bc"))
+					{
+						referral_no_parameter = "&referral_no_1=" + referralDoctorNo;
+					}
+					ProviderPreference preference = providerPreferenceDao.find(curProvider_no);
+					if(preference != null)
+					{
+						String preferredView = preference.getDefaultServiceType();
+						if(preferredView != null && !preferredView.equals("no"))
+						{
+							defaultBillingView = preferredView;
+						}
+					}
+				%>
 				<td><a
-					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t')"
+					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t<%=referral_no_parameter%>"
 					target="_blank"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>
@@ -2674,7 +2694,11 @@ if ( Dead.equals(PatStat) ) {%>
 									<option value="BC" <%=hctype.equals("BC")?" selected":""%>>BC-British Columbia</option>
 									<option value="MB" <%=hctype.equals("MB")?" selected":""%>>MB-Manitoba</option>
 									<option value="NB" <%=hctype.equals("NB")?" selected":""%>>NB-New Brunswick</option>
+									<% if (oscarProps.isBritishColumbiaInstanceType() && !oscarProps.isClinicaidBillingType()) {%>
+									<option value="NF" <%=hctype.equals("NF")?" selected":""%>>NF-Newfoundland & Labrador</option>
+									<% } else { %>
 									<option value="NL" <%=hctype.equals("NL")?" selected":""%>>NL-Newfoundland & Labrador</option>
+									<% } %>
 									<option value="NT" <%=hctype.equals("NT")?" selected":""%>>NT-Northwest Territory</option>
 									<option value="NS" <%=hctype.equals("NS")?" selected":""%>>NS-Nova Scotia</option>
 									<option value="NU" <%=hctype.equals("NU")?" selected":""%>>NU-Nunavut</option>
