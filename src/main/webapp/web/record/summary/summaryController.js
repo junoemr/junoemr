@@ -558,6 +558,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				templateUrl: 'record/summary/groupNotes.jsp',
 				controller: 'Record.Summary.GroupNotesController as groupNotesCtrl',
 				backdrop: 'static',
+				windowClass: 'notesModal',
 				size: size,
 				resolve:
 				{
@@ -607,7 +608,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 			if (item == "add")
 			{
-				controller.editGroupedNotes('lg', mod, null);
+				controller.editGroupedNotes('md', mod, null);
 
 			}
 			else if (item.action == 'add' && item.type == 'dx_reg')

@@ -399,8 +399,6 @@ private long getAppointmentRowSpan(
 
 	int nProvider;
 
-	//ResourceSchedule resourceScheduleDTO = null;
-
 	if(mygroupno != null && providerBean.get(mygroupno) != null) { //single appointed provider view
 		numProvider=1;
 		curProvider_no = new String [numProvider];
@@ -611,6 +609,11 @@ private long getAppointmentRowSpan(
 
 	<link rel="stylesheet" href="../css/receptionistapptstyle.css" type="text/css">
 	<link rel="stylesheet" href="../css/helpdetails.css" type="text/css">
+
+	<c:if test="${empty sessionScope.archiveView or sessionScope.archiveView != true}">
+		<%!String refresh = oscar.OscarProperties.getInstance().getProperty("refresh.appointmentprovideradminday.jsp", "-1");%>
+		<%="-1".equals(refresh)?"":"<meta http-equiv=\"refresh\" content=\""+refresh+";\">"%>
+	</c:if>
 
 	<script type="text/javascript" src="../share/javascript/Oscar.js" ></script>
 	<script type="text/javascript" src="../share/javascript/prototype.js"></script>
@@ -1117,11 +1120,13 @@ private long getAppointmentRowSpan(
 								sel.style.backgroundColor=sel.options[sel.selectedIndex].style.backgroundColor;
 								var siteName = sel.options[sel.selectedIndex].value;
 								var newGroupNo = "<%=(mygroupno == null ? ".default" : mygroupno)%>";
-								<%if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.IsPropertiesOn.isTicklerPlusEnable()){%>
-								popupPage(10,10, "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&new_tickler_warning_window=<%=newticklerwarningwindow%>&default_pmm=<%=default_pmm%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no="+newGroupNo+"&site="+siteName);
-								<%}else {%>
-								popupPage(10,10, "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no="+newGroupNo+"&site="+siteName);
-								<%}%>
+								jQuery.ajax({
+									url: 'providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no=' + newGroupNo + '&site=' + siteName,
+									success: function(result)
+									{
+										location.reload();
+									}
+								});
 							}
 						</script>
 
@@ -1311,12 +1316,12 @@ private long getAppointmentRowSpan(
 
 						for(UserDateSchedule schedule: schedules)
 						{
-							Integer providerNo = schedule.getProviderNo();
+							Integer scheduleProviderNo = schedule.getProviderNo();
 
 							headerColor = !headerColor;
 
 							boolean notOnSchedule = false;
-							if(!viewall.equals("1") && providerNo == Integer.parseInt(curUser_no) && !schedule.hasSchedule())
+							if(!viewall.equals("1") && scheduleProviderNo == Integer.parseInt(curUser_no) && !schedule.hasSchedule())
 							{
 								notOnSchedule = true;
 							}
@@ -1361,13 +1366,13 @@ private long getAppointmentRowSpan(
 								else
 								{
 									%>
-									<b><input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= providerNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
-										<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.searchLetter"/>" name='searchview' onClick=goSearchView('<%= providerNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.searchView"/>" style="color:black" class="noprint">
-										<b><input type='radio' name='flipview' class="noprint" onClick="goFilpView('<%= providerNo %>')" title="Flip view"  >
-											<a href=# onClick="goZoomView('<%= providerNo %>','<%=StringEscapeUtils.escapeJavaScript(schedule.getFullName())%>')" onDblClick="goFilpView('<%= providerNo %>')" title="<bean:message key="provider.appointmentProviderAdminDay.zoomView"/>" >
+									<b><input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
+										<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.searchLetter"/>" name='searchview' onClick=goSearchView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.searchView"/>" style="color:black" class="noprint">
+										<b><input type='radio' name='flipview' class="noprint" onClick="goFilpView('<%= scheduleProviderNo %>')" title="Flip view"  >
+											<a href=# onClick="goZoomView('<%= scheduleProviderNo %>','<%=StringEscapeUtils.escapeJavaScript(schedule.getFullName())%>')" onDblClick="goFilpView('<%= scheduleProviderNo %>')" title="<bean:message key="provider.appointmentProviderAdminDay.zoomView"/>" >
 												<%=schedule.getFullName()%></a>
 											<oscar:oscarPropertiesCheck value="yes" property="TOGGLE_REASON_BY_PROVIDER" defaultVal="true">
-												<a id="expandReason" href="#" onclick="return toggleReason('<%=providerNo%>');"
+												<a id="expandReason" href="#" onclick="return toggleReason('<%=scheduleProviderNo%>');"
 												   title="<bean:message key="provider.appointmentProviderAdminDay.expandreason"/>">*</a>
 												<%-- Default is to hide inline reasons. --%>
 											</oscar:oscarPropertiesCheck>
@@ -1473,7 +1478,7 @@ private long getAppointmentRowSpan(
 									}
 
 									String url = "../appointment/addappointment.jsp" +
-											"?provider_no=" + providerNo +
+											"?provider_no=" + scheduleProviderNo +
 											"&bFirstDisp=true" +
 											"&year=" + strYear +
 											"&month=" + strMonth +
@@ -1576,9 +1581,14 @@ private long getAppointmentRowSpan(
 													nameLength = lenLimitedS;
 												}
 
+
 												// Load appointmentInfo bean for this appointment
 												appointmentInfo.init(
 													appointment,
+													curUser_no,
+													scheduleProviderNo,
+													request.getParameter("curProvider"),
+													request.getParameter("curProviderName"),
 													bMultisites,
 													siteBgColor,
 													appointmentStatusList,
@@ -1588,10 +1598,7 @@ private long getAppointmentRowSpan(
 													numAvailProvider,
 													nameLength,
 													lenLimitedL,
-													request.getParameter("curProvider"),
-													request.getParameter("curProviderName"),
 													request.getParameter("viewall"),
-													providerNo,
 													reasonCodesMap,
 													showDocumentLink,
 													showEncounterLink,
@@ -1682,7 +1689,7 @@ private long getAppointmentRowSpan(
 															.${appointmentInfo.truncatedUpperName}
 														</a><!--Inline display of reason -->
 														<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-															<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.providerNo} ${appointmentInfo.hideReasonClass}">
+															<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
 																<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
 															</span>
 														</oscar:oscarPropertiesCheck></td>
@@ -1814,7 +1821,7 @@ private long getAppointmentRowSpan(
 															<!-- billing code block -->
 
 															<c:if test="${appointmentInfo.showMasterLink}">
-																&#124; <a class="masterBtn" href="javascript: function myFunction() {return false; }" onClick="popupWithApptNo(700,1024,'../demographic/demographiccontrol.jsp?demographic_no=${appointmentInfo.demographicNo}&apptProvider=${appointmentInfo.currentProviderNo}&appointment=${appointmentInfo.appointmentNo}&displaymode=edit&dboperation=search_detail','master',${appointmentInfo.appointmentNo})"
+																&#124; <a class="masterBtn" href="javascript: function myFunction() {return false; }" onClick="popupWithApptNo(700,1024,'../demographic/demographiccontrol.jsp?demographic_no=${appointmentInfo.demographicNo}&apptProvider=${appointmentInfo.scheduleProviderNo}&appointment=${appointmentInfo.appointmentNo}&displaymode=edit&dboperation=search_detail','master',${appointmentInfo.appointmentNo})"
 																		  title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>"><bean:message key="provider.appointmentProviderAdminDay.btnM"/></a>
 															</c:if>
 
@@ -1822,7 +1829,7 @@ private long getAppointmentRowSpan(
 
 																<!-- doctor code block 4 -->
 																<c:if test="${appointmentInfo.showDoctorLink}">
-																	&#124; <a href=# onClick="popupWithApptNo(700,1027,'../oscarRx/choosePatient.do?providerNo=${appointmentInfo.providerNo}&demographicNo=${appointmentInfo.demographicNo}','rx',${appointmentInfo.appointmentNo})" title="<bean:message key="global.prescriptions"/>">
+																	&#124; <a href=# onClick="popupWithApptNo(700,1027,'../oscarRx/choosePatient.do?providerNo=${appointmentInfo.sessionProviderNo}&demographicNo=${appointmentInfo.demographicNo}','rx',${appointmentInfo.appointmentNo})" title="<bean:message key="global.prescriptions"/>">
 																		<bean:message key="global.rx"/>
 																	</a>
 
@@ -1838,7 +1845,7 @@ private long getAppointmentRowSpan(
 																		&#124;<b style="color:#FF0000">$</b>
 																	</c:if>
 																	<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-																		<span class="toggleable reason_${appointmentInfo.providerNo} ${appointmentInfo.hideReasonClass}">
+																		<span class="toggleable reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
 																			<strong>&#124;${appointmentInfo.formattedReason}</strong>
 																		</span>
 																	</oscar:oscarPropertiesCheck>
@@ -1934,10 +1941,10 @@ private long getAppointmentRowSpan(
 									else
 									{
 										%>
-										<b><input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= providerNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
-											<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.searchLetter"/>" name='searchview' onClick=goSearchView('<%= providerNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.searchView"/>" style="color:black" class="noprint">
-											<b><input type='radio' name='flipview' class="noprint" onClick="goFilpView('<%= providerNo %>')" title="Flip view"  >
-												<a href=# onClick="goZoomView('<%= providerNo %>','<%=StringEscapeUtils.escapeJavaScript(schedule.getFullName())%>')" onDblClick="goFilpView('<%= providerNo %>')" title="<bean:message key="provider.appointmentProviderAdminDay.zoomView"/>" >
+										<b><input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
+											<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.searchLetter"/>" name='searchview' onClick=goSearchView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.searchView"/>" style="color:black" class="noprint">
+											<b><input type='radio' name='flipview' class="noprint" onClick="goFilpView('<%= scheduleProviderNo %>')" title="Flip view"  >
+												<a href=# onClick="goZoomView('<%= scheduleProviderNo %>','<%=StringEscapeUtils.escapeJavaScript(schedule.getFullName())%>')" onDblClick="goFilpView('<%= scheduleProviderNo %>')" title="<bean:message key="provider.appointmentProviderAdminDay.zoomView"/>" >
 													<%=schedule.getFullName()%></a>
 											</b>
 										<%
@@ -2033,7 +2040,7 @@ private long getAppointmentRowSpan(
 			switch(evt.keyCode) {
 				case <bean:message key="global.adminShortcut"/> : newWindow("../administration/","admin");  return false;  //run code for 'A'dmin
 				case <bean:message key="global.billingShortcut"/> : popupOscarRx(600,1024,'../billing/CA/<%=prov%>/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;  //code for 'B'illing
-				case <bean:message key="global.calendarShortcut"/> : popupOscarRx(425,430,'../share/CalendarPopup.jsp?urlfrom=../provider/providercontrol.jsp&year=<%=strYear%>&month=<%=strMonth%>&param=<%=URLEncoder.encode("&view=0&displaymode=day&dboperation=searchappointmentday","UTF-8")%>');  return false;  //run code for 'C'alendar
+				case <bean:message key="global.calendarShortcut"/> : popupOscarRx(425,430,'../share/CalendarPopup.jsp?urlfrom=../provider/providercontrol.jsp&year=<%=strYear%>&month=<%=strMonth%>&param=<%=URLEncoder.encode("&view=0&displaymode=day&dboperation=searchappointmentday&viewall="+viewall,"UTF-8")%>');  return false;  //run code for 'C'alendar
 				case <bean:message key="global.edocShortcut"/> : popupOscarRx('700', '1024', '../dms/documentReport.jsp?function=provider&functionid=<%=curUser_no%>&curUser=<%=curUser_no%>', 'edocView');  return false;  //run code for e'D'oc
 				case <bean:message key="global.resourcesShortcut"/> : popupOscarRx(550,687,'<%=resourceBaseUrl%>'); return false; // code for R'e'sources
 				case <bean:message key="global.helpShortcut"/> : popupOscarRx(600,750,'<%=resourceBaseUrl%>');  return false;  //run code for 'H'elp

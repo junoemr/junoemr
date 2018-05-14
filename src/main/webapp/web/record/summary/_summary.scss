@@ -112,6 +112,23 @@
 	}
 }
 
+.notesModal {
+	.modal-content {
+		background-color: $modal-color;
+	}
+	.modal-body {
+		background-color: $primary-white;
+	}
+	.modal-header {
+		color: $primary-white;
+	}
+	.modal-footer {
+		background-color: $light-grey;
+		padding-top: 20px;
+		padding-bottom: 20px;
+	}
+}
+
 @media (max-width: $screen-sm) {
 	.summary-section {
 		.note-list {

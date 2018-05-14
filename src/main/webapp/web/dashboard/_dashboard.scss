@@ -18,16 +18,15 @@
 // Ontario, Canada
 #dashboard-page {
 	#dashboard-header {
-		margin-top: -$margin-lg;
+		margin-top: -$margin-sm;
 		background-color: #ededed;
-		padding-top: 18px;
-		padding-bottom: 18px;
+		height: 72px;
 		margin-bottom: $margin-md;
 		h3 {
 			color: $primary-blue-text;
 		}
-		p {
-			margin-top: 20px;
+		h3, p {
+			margin: 0;
 		}
 	}
 

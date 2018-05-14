@@ -879,6 +879,10 @@
 			<type>pom</type>
 			<exclusions>
 				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>javax.servlet-api</artifactId>
+				</exclusion>
+				<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring-web</artifactId>
 				</exclusion>
@@ -978,10 +982,6 @@
 				<exclusion>
 					<groupId>org.slf4j</groupId>
 					<artifactId>log4j-over-slf4j</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bcprov-jdk16</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>org.apache.santuario</groupId>
