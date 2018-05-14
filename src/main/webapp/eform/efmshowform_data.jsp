@@ -23,43 +23,67 @@
     Ontario, Canada
 
 --%>
-<%@ page import="oscar.eform.data.EForm"%>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.oscarehr.eform.service.EFormDataService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.eform.data.EForm" %>
 <%
-  String id = request.getParameter("fid");
-  String messageOnFailure = "No eform or appointment is available";
-  String providerNo = (String) session.getValue("user");
-  if (id == null) {  // form exists in patient
-      id = request.getParameter("fdid");
-      String appointmentNo = request.getParameter("appointment");
-      String eformLink = request.getParameter("eform_link");
+	EFormDataService eFormDataService = SpringUtils.getBean(EFormDataService.class);
 
-      EForm eForm = new EForm(id);
-      eForm.setLoggedInProvider(providerNo);
-      eForm.setContextPath(request.getContextPath());
-      eForm.setOscarOPEN(request.getRequestURI());
-      if ( appointmentNo != null ) eForm.setAppointmentNo(appointmentNo);
-      if ( eformLink != null ) eForm.setEformLink(eformLink);
+	String id = request.getParameter("fid");
+	String messageOnFailure = "No eform or appointment is available";
+	String providerNo = (String) session.getValue("user");
+	boolean showInstancedWarning = false;
 
-      String parentAjaxId = request.getParameter("parentAjaxId");
-      if( parentAjaxId != null ) eForm.setAction(parentAjaxId);
-      eForm.setDatabaseUpdateAPs();
-      out.print(eForm.getFormHtml());
-  } else {  //if form is viewed from admin screen
-      EForm eForm = new EForm(id, "-1"); //form cannot be submitted, demographic_no "-1" indicate this specialty
-      eForm.setLoggedInProvider(providerNo);
-      eForm.setContextPath(request.getContextPath());
-      eForm.setupInputFields();
-      eForm.setOscarOPEN(request.getRequestURI());
-      eForm.setImagePath();
-      eForm.setDatabaseUpdateAPs();
-      out.print(eForm.getFormHtml());
-  }
-%>
-<%
-String iframeResize = (String) session.getAttribute("useIframeResizing");
-if(iframeResize !=null && "true".equalsIgnoreCase(iframeResize)){ %>
+	if(id == null)
+	{  // form exists in patient
+		id = request.getParameter("fdid");
+		String appointmentNo = request.getParameter("appointment");
+		String eformLink = request.getParameter("eform_link");
+
+		EForm eForm = new EForm(id);
+		showInstancedWarning = !eFormDataService.isLatestInstancedVersion(Integer.parseInt(id));
+
+		eForm.setLoggedInProvider(providerNo);
+		eForm.setContextPath(request.getContextPath());
+		eForm.setOscarOPEN(request.getRequestURI());
+		if(appointmentNo != null) eForm.setAppointmentNo(appointmentNo);
+		if(eformLink != null) eForm.setEformLink(eformLink);
+
+		String parentAjaxId = StringUtils.trimToNull(request.getParameter("parentAjaxId"));
+		eForm.setParentAjaxId(parentAjaxId);
+		eForm.setAction();
+		eForm.setDatabaseUpdateAPs();
+		out.print(eForm.getFormHtml());
+	}
+	else
+	{  //if form is viewed from admin screen
+		EForm eForm = new EForm(id, "-1"); //form cannot be submitted, demographic_no "-1" indicate this specialty
+		eForm.setLoggedInProvider(providerNo);
+		eForm.setContextPath(request.getContextPath());
+		eForm.setupInputFields();
+		eForm.setOscarOPEN(request.getRequestURI());
+		eForm.setImagePath();
+		eForm.setDatabaseUpdateAPs();
+		out.print(eForm.getFormHtml());
+	}
+
+	String iframeResize = (String) session.getAttribute("useIframeResizing");
+	if("true".equalsIgnoreCase(iframeResize))
+	{ %>
 <script src="<%=request.getContextPath() %>/library/pym.js"></script>
 <script>
-    var pymChild = new pym.Child({ polling: 500 });
+	var pymChild = new pym.Child({polling: 500});
+
 </script>
-<%}%>
+<%
+	}
+	if(showInstancedWarning)
+	{
+%>
+	<script>
+		alert("You are editing an outdated version of an instanced eForm. Saving this version will overwrite the existing version and could result in a data loss.");
+	</script>
+<%
+	}
+%>

@@ -126,6 +126,27 @@ public class EFormDataService
 	}
 
 	/**
+	 * Checks that this eForm is the latest version of an instanced eForm.
+	 * @param eForm - the eForm model to check
+	 * @return - true if the eForm is the latest instance version, or true if the eForm is not instanced. false otherwise
+	 */
+	public boolean isLatestInstancedVersion(EFormData eForm)
+	{
+		// this needs to be within a transaction to load the instance object correctly
+		EFormInstance instance = eForm.getEFormInstance();
+		return (instance == null || (eForm.getId().equals(instance.getCurrentEFormData().getId())));
+	}
+	/**
+	 * Checks that this eForm is the latest version of an instanced eForm.
+	 * @param eFormId - the eForm id to check
+	 * @return - true if the eForm is the latest instance version, or true if the eForm is not instanced. false otherwise
+	 */
+	public boolean isLatestInstancedVersion(Integer eFormId)
+	{
+		return isLatestInstancedVersion(eFormDataDao.find(eFormId));
+	}
+
+	/**
 	 * Handle all of the major eForm creation logic. save an eForm data model for a demographic.
 	 */
 	private EFormData saveEForm(EFormData eForm, EForm template, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)

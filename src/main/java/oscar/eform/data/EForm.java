@@ -176,9 +176,14 @@ public class EForm extends EFormBase {
 		this.eform_link = el;
 	}
 
-	public void setAction(String pAjaxId) {
-		parentAjaxId = pAjaxId;
-		setAction();
+	public String getParentAjaxId()
+	{
+		return parentAjaxId;
+	}
+
+	public void setParentAjaxId(String parentAjaxId)
+	{
+		this.parentAjaxId = parentAjaxId;
 	}
 
 	public void setAction() {
