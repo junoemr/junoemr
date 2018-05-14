@@ -77,11 +77,6 @@
 <p>
 <h1><bean:message key="appointment.addappointment.msgAddSuccess" /></h1>
 
-<script LANGUAGE="JavaScript">
-	self.opener.refresh();
-	popupPage(350,750,'../report/reportdaysheet.jsp?dsmode=new&provider_no=<%=param[0]%>&sdate=<%=param[1]%>') ;
-	self.close();
-</script>
 <%
 		String[] param2 = new String[7];
 		param2[0]=param[0]; //provider_no
@@ -100,7 +95,13 @@
 			
 			EventService eventService = SpringUtils.getBean(EventService.class); //Add Appointment and print preview
 			eventService.appointmentCreated(this,apptNo.toString(), param[0]);
-			
+%>
+	<script LANGUAGE="JavaScript">
+		self.opener.refresh();
+		popupPage(350,750,'../report/reportdaysheet.jsp?dsmode=newappt&provider_no=<%=param[0]%>&sdate=<%=param[1]%>&appointment_no=<%=apptNo%>') ;
+		self.close();
+	</script>
+<%
 		}
 	} else {
 %>
