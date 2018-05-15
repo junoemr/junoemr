@@ -1586,12 +1586,12 @@ var requestIdKey = "<%=signatureRequestId %>";
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formPhone" />:
 							</td>
-							<td align="right" class="tite2"><input disabled type="text" name="phone" class="righty" value="<%=thisForm.getProfessionalSpecialistPhone()%>" /></td>
+							<td align="right" class="tite2"><input readonly="readonly" type="text" name="phone" class="righty" value="<%=thisForm.getProfessionalSpecialistPhone()%>" /></td>
 						</tr>
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formFax" />:
 							</td>
-							<td align="right" class="tite3"><input disabled type="text" onchange="onChangeSpecialistFax();" name="fax" class="righty" /></td>
+							<td align="right" class="tite3"><input readonly="readonly" type="text" onchange="onChangeSpecialistFax();" name="fax" class="righty" /></td>
 						</tr>
 
 						<tr>
@@ -1599,7 +1599,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 								<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formAddr" />:
 							</td>
 							<td align="right" class="tite3">
-								<textarea disabled name="address" cols=20 ><%=thisForm.getProfessionalSpecialistAddress()%></textarea>
+								<textarea readonly="readonly" name="address" cols=20 ><%=thisForm.getProfessionalSpecialistAddress()%></textarea>
 							</td>
 						</tr>
 						<tr>
