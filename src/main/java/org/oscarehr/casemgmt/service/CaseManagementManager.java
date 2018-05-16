@@ -1014,7 +1014,7 @@ public class CaseManagementManager {
 		Demographic dg = demographicDao.getClientByDemographicNo(new Integer(demoNo));
 		if (dg == null)
 		{
-			return "";
+			return null;
 		} else
 		{
 			return dg.getHin();
