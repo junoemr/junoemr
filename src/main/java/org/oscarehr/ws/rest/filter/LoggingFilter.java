@@ -31,7 +31,9 @@ import org.oscarehr.common.model.RestServiceLog;
 import org.oscarehr.util.MiscUtils;
 import oscar.log.LogAction;
 
+import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -46,6 +48,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Date;
 
+@Priority(Priorities.USER)
 public class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter
 {
 	private static Logger logger = MiscUtils.getLogger();
@@ -53,6 +56,8 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 	private static final String PROP_REQUEST_BODY = "LoggingFilter.requestBody";
 	private static final String PROP_REQUEST_PROVIDER = "LoggingFilter.requestProviderNo";
 	private static final String PROP_REQUEST_DATETIME = "LoggingFilter.requestDateTime";
+
+	public static final String PROP_SKIP_LOGGING = "LoggingFilter.doNotLog";
 
 	@Context
 	private ContextResolver<ObjectMapper> mapperResolver;
@@ -94,6 +99,12 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 	 */
 	public void filter(ContainerRequestContext request, ContainerResponseContext response)
 	{
+		// some things should not be logged, if they set this property, we deliberatly skip the logging process
+		Boolean skipLogging = (Boolean) request.getProperty(PROP_SKIP_LOGGING);
+		if(skipLogging != null && skipLogging)
+		{
+			return;
+		}
 
 		String providerNo = (String) request.getProperty(PROP_REQUEST_PROVIDER);
 		String rawPostData = (String) request.getProperty(PROP_REQUEST_BODY);
@@ -151,14 +162,14 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 			restLog.setUserAgent(request.getHeaderString("User-Agent"));
 			restLog.setUrl(url);
 			restLog.setMethod(request.getMethod());
-			restLog.setRequestMediaType(request.getMediaType().toString());
+			restLog.setRequestMediaType(String.valueOf(request.getMediaType()));
 			restLog.setRawQueryString(queryString);
 			restLog.setRawPost(rawPostData);
 
 			restLog.setStatusCode(response.getStatus());
 			restLog.setRawOutput(rawResponseData);
 			restLog.setDuration(duration);
-			restLog.setResponseMediaType(response.getMediaType().toString());
+			restLog.setResponseMediaType(String.valueOf(response.getMediaType()));
 
 			LogAction.saveRestLogEntry(restLog);
 		}
@@ -166,55 +177,6 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 		{
 			logger.error("Failed to save REST Log Entry", e);
 		}
-
-
-		logger.info("=======================================");
-		logger.info("GENERAL");
-		logger.info("-------");
-
-		logger.info(request.getProperty(PROP_REQUEST_PROVIDER));
-		logger.info(httpRequest.getRemoteAddr());
-		logger.info(request.getHeaderString("User-Agent"));
-
-
-		logger.info("REQUEST");
-		logger.info("-------");
-
-		logger.info(request.getMediaType());
-		logger.info(request.getMethod());
-
-		if(uriInfo != null)
-		{
-			logger.info(uriInfo.getRequestUri().toString());
-		}
-
-		logger.info(request.getProperty(PROP_REQUEST_BODY));
-
-		logger.info("RESPONSE");
-		logger.info("--------");
-		logger.info(response.getMediaType());
-		logger.info(response.getStatus());
-
-
-		logger.info(response.getEntityClass());
-
-		if(response.getEntity() != null)
-		{
-			Object entity = response.getEntity();
-
-			final ObjectMapper objectMapper = mapperResolver.getContext(Object.class);
-
-			try
-			{
-				logger.info(objectMapper.writeValueAsString(entity));
-			}
-			catch(Exception e)
-			{
-				logger.error("Error writing API response as JSON", e);
-			}
-		}
-
-		logger.info("=======================================");
 	}
 
 

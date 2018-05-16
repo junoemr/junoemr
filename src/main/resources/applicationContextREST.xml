@@ -50,6 +50,7 @@
 	<bean id="generalExceptionMapper" class="org.oscarehr.ws.rest.filter.exceptionMapping.GeneralExceptionMapper"/>
 	<bean id="invalidFormatExceptionMapper" class="org.oscarehr.ws.rest.filter.exceptionMapping.InvalidFormatExceptionMapper"/>
 	<bean id="jsonParseExceptionMapper" class="org.oscarehr.ws.rest.filter.exceptionMapping.JsonParseExceptionMapper"/>
+	<bean id="rateLimitExceptionMapper" class="org.oscarehr.ws.rest.filter.exceptionMapping.RateLimitExceptionMapper"/>
 	<bean id="objectMapperProvider" class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
 
 	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
@@ -117,9 +118,11 @@
 			<ref bean="validationExceptionMapper"/>
 			<ref bean="invalidFormatExceptionMapper"/>
 			<ref bean="jsonParseExceptionMapper"/>
+			<ref bean="rateLimitExceptionMapper"/>
 			<ref bean="generalExceptionMapper"/>
 			<ref bean="objectMapperProvider"/>
 			<bean class="org.oscarehr.ws.rest.filter.LoggingFilter"/>
+			<bean class="org.oscarehr.ws.rest.filter.RateLimitFilter"/>
 			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
 		</jaxrs:providers>
 
