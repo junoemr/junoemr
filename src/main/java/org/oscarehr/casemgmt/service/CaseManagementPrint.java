@@ -105,6 +105,7 @@ public class CaseManagementPrint {
 		request.setAttribute("demoSex", getDemoSex(demono));
 		request.setAttribute("demoAge", getDemoAge(demono));
 		request.setAttribute("mrp", getMRP(request,demono));
+		request.setAttribute("hin", getDemoHIN(demono));
 		String dob = getDemoDOB(demono);
 		dob = convertDateFmt(dob, request);
 		request.setAttribute("demoDOB", dob);
@@ -403,6 +404,15 @@ public class CaseManagementPrint {
 	protected String getDemoDOB(String demoNo){
 		if (demoNo==null) return "";
 		return caseManagementMgr.getDemoDOB(demoNo);
+	}
+
+	protected String getDemoHIN(String demoNo)
+	{
+		if (demoNo == null)
+		{
+			return "";
+		}
+		return caseManagementMgr.getDemoHIN(demoNo);
 	}
 	
 	protected String getMRP(HttpServletRequest request,String demographicNo) {

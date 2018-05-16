@@ -1009,6 +1009,18 @@ public class CaseManagementManager {
 		else return dg.getFormattedDob();
 	}
 
+	public String getDemoHIN(String demoNo)
+	{
+		Demographic dg = demographicDao.getClientByDemographicNo(new Integer(demoNo));
+		if (dg == null)
+		{
+			return "";
+		} else
+		{
+			return dg.getHin();
+		}
+	}
+
 	public String getCaisiRoleById(String id) {
 		// return providerCaisiRoleDAO.getCaisiRoleById(id);
 		return roleManager.getRole(id).getName();
