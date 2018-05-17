@@ -91,8 +91,9 @@ OscarProperties props = OscarProperties.getInstance();
 <!-- #BILLING -->
 <security:oscarSec roleName="<%=roleName$%>" objectName="_admin.invoices,_admin,_admin.billing" rights="r" reverse="<%=false%>">
 				<%
-					boolean showOldBillingBC = false;
-					boolean showOldBillingON = false;
+					boolean showOldBillingLinks = props.isPropertyActive("admin.show_old_billing");
+					boolean showOldBillingBC = (props.isClinicaidBillingType() && props.isBritishColumbiaInstanceType() && showOldBillingLinks);
+					boolean showOldBillingON = (props.isClinicaidBillingType() && props.isOntarioInstanceType() && showOldBillingLinks);
 				%>
 				<div class="accordion-heading">
 				<a class="accordion-toggle" data-toggle="collapse" data-parent="#adminNav" href="#collapseTwo">
@@ -104,41 +105,29 @@ OscarProperties props = OscarProperties.getInstance();
 				<div class="accordion-inner">
 				<ul>
 		            <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.billing" rights="r" reverse="<%=false%>">
-		            
-		            <oscar:oscarPropertiesCheck property="billing_type" value="CLINICAID">
-						<%
-							if(props.isPropertyActive("show_old_billing"))
-							{
-						%>
-								<b>Clinicaid</b>
-						<%
-							}
-						%>
-						<li><a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">Manage Invoices</a></li>
-
-						<oscar:oscarPropertiesCheck property="instance_type" value="BC">
-							<!-- BC clinicaid users still need to be able to edit billingreferral for consultations etc. -->
-							<li><a href="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="contentLink defaultManageReferralDoc"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
-							<%
-								if(props.isPropertyActive("show_old_billing"))
-								{
-									showOldBillingBC = true;
-								}
-							%>
-						</oscar:oscarPropertiesCheck>
-
-						<oscar:oscarPropertiesCheck property="instance_type" value="ON">
-							<%
-								if(props.isPropertyActive("show_old_billing"))
-								{
-									showOldBillingON = true;
-								}
-							%>
-						</oscar:oscarPropertiesCheck>
-
-					</oscar:oscarPropertiesCheck>
 
 					<%
+						if(props.isClinicaidBillingType())
+						{
+							if(showOldBillingLinks)
+							{
+					%>
+								<b>Clinicaid</b>
+					<%
+							}
+					%>
+							<li><a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">Manage Invoices</a></li>
+
+					<%
+							if(props.isBritishColumbiaInstanceType())
+							{
+					%>
+								<!--oscar:oscarPropertiesCheck property="instance_type" value="BC"-->
+								<li><a href="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="contentLink defaultManageReferralDoc"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
+					<%
+							}
+						}
+
 						if(showOldBillingBC || showOldBillingON)
 						{
 					%>
@@ -146,7 +135,7 @@ OscarProperties props = OscarProperties.getInstance();
 					<%
 						}
 
-						if(props.getProperty("billing_type", "").equals("BC") || showOldBillingBC)
+						if(props.isBritishColumbiaBillingType() || showOldBillingBC)
 						{
 					%>
 							<li><a href='javascript:void(0);'
@@ -201,7 +190,7 @@ OscarProperties props = OscarProperties.getInstance();
 					<%
 						}
 
-						if(props.getProperty("billing_type", "").equals("ON") || showOldBillingON)
+						if(props.isOntarioBillingType() || showOldBillingON)
 						{
 					%>
 							<li><a href='javascript:void(0);'
@@ -283,7 +272,7 @@ OscarProperties props = OscarProperties.getInstance();
 		            </security:oscarSec>
 
 					<%
-						if(props.getProperty("billing_type", "").equals("ON") || showOldBillingON)
+						if(props.isOntarioBillingType() || showOldBillingON)
 						{
 					%>
 							<li><a href='javascript:void(0);' class="xlink" rel='${ctx}/billing/CA/ON/billingONPayment.jsp'><bean:message key="admin.admin.paymentReceived"/></a></li>
