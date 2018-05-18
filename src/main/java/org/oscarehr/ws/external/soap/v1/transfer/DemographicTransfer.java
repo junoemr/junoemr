@@ -32,7 +32,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.DemographicExtDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.BeanUtils;

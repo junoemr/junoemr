@@ -32,13 +32,13 @@ import java.util.List;
 
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.DemographicExtDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.OscarLogDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DemographicExt;
+import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.common.model.Provider;

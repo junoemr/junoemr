@@ -75,7 +75,9 @@ import oscar.OscarProperties;
 import oscar.util.SqlUtils;
 
 /**
+ * @deprecated use the jpa version instead
  */
+@Deprecated
 public class DemographicDao extends HibernateDaoSupport implements ApplicationEventPublisherAware {
 
 	private static final int MAX_SELECT_SIZE = 500;

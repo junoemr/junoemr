@@ -23,18 +23,20 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.demographic.dao;
 
 import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.DemographicCust;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.demographic.model.DemographicCust;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class DemographicCustDao extends AbstractDao<DemographicCust> {
+public class DemographicCustDao extends AbstractDao<DemographicCust>
+{
 
 	public DemographicCustDao() {
 		super(DemographicCust.class);

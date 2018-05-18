@@ -23,7 +23,7 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.demographic.dao;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,11 +34,13 @@ import java.util.Map;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.DemographicExt;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.demographic.model.DemographicExt;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class DemographicExtDao extends AbstractDao<DemographicExt>{
+public class DemographicExtDao extends AbstractDao<DemographicExt>
+{
 
 	public DemographicExtDao() {
 		super(DemographicExt.class);

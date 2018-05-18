@@ -42,13 +42,13 @@
 <%@ page import="org.oscarehr.PMmodule.model.Program, org.oscarehr.PMmodule.service.AdmissionManager, org.oscarehr.PMmodule.service.ProgramManager, org.oscarehr.PMmodule.web.GenericIntakeEditAction, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
 
 <%@page import="org.oscarehr.common.dao.DemographicArchiveDao"%>
-<%@page import="org.oscarehr.common.dao.DemographicCustDao"%>
+<%@page import="org.oscarehr.demographic.dao.DemographicCustDao"%>
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
 
 <%@page import="org.oscarehr.common.model.ConsentType" %>
 <%@page import="org.oscarehr.common.model.Demographic" %>
-<%@page import="org.oscarehr.common.model.DemographicCust" %>
-<%@page import="org.oscarehr.common.model.DemographicExt" %>
+<%@page import="org.oscarehr.demographic.model.DemographicCust" %>
+<%@page import="org.oscarehr.demographic.model.DemographicExt" %>
 <%@page import="org.oscarehr.managers.DemographicManager" %>
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
 <%@page import="org.oscarehr.provider.model.ProviderPreventionManager" %>

@@ -57,9 +57,9 @@
 <%@page import="org.oscarehr.common.OtherIdManager" %>
 <%@page import="org.oscarehr.common.dao.CountryCodeDao" %>
 <%@page import="org.oscarehr.common.dao.DemographicContactDao" %>
-<%@page import="org.oscarehr.common.dao.DemographicCustDao" %>
+<%@page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
-<%@page import="org.oscarehr.common.dao.DemographicExtDao" %>
+<%@page import="org.oscarehr.demographic.dao.DemographicExtDao" %>
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.dao.ProfessionalSpecialistDao" %>
 <%@page import="org.oscarehr.schedule.dao.ScheduleTemplateCodeDao" %>
@@ -100,7 +100,7 @@ if(!authed) {
 }
 
 %>
-<%@ page import="org.oscarehr.common.model.Admission, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.CountryCode,org.oscarehr.common.model.Demographic, org.oscarehr.common.model.DemographicContact, org.oscarehr.common.model.DemographicCust, org.oscarehr.common.model.ProfessionalSpecialist, org.oscarehr.common.model.Provider,org.oscarehr.schedule.model.ScheduleTemplateCode"%>
+<%@ page import="org.oscarehr.common.model.Admission, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.CountryCode,org.oscarehr.common.model.Demographic, org.oscarehr.common.model.DemographicContact, org.oscarehr.demographic.model.DemographicCust, org.oscarehr.common.model.ProfessionalSpecialist, org.oscarehr.common.model.Provider,org.oscarehr.schedule.model.ScheduleTemplateCode"%>
 <%@ page import="org.oscarehr.common.model.UserProperty"%>
 <%@ page import="org.oscarehr.common.model.WaitingListName" %>
 <%@ page import="org.oscarehr.common.web.ContactAction,org.oscarehr.managers.DemographicManager" %>

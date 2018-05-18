@@ -22,7 +22,9 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.demographic.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.io.Serializable;
 import java.util.Date;

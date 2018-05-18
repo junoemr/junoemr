@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.DemographicExtDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.common.dao.DrugDao;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.FormLabReq07Dao;

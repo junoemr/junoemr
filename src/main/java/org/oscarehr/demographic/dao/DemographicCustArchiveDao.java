@@ -22,14 +22,16 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.common.dao;
+package org.oscarehr.demographic.dao;
 
-import org.oscarehr.common.model.DemographicCust;
-import org.oscarehr.common.model.DemographicCustArchive;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.model.DemographicCustArchive;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class DemographicCustArchiveDao extends AbstractDao<DemographicCustArchive> {
+public class DemographicCustArchiveDao extends AbstractDao<DemographicCustArchive>
+{
 
 	public DemographicCustArchiveDao() {
 		super(DemographicCustArchive.class);

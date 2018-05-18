@@ -23,20 +23,28 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.demographic.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="demographiccust")
-public class DemographicCust extends AbstractModel<Integer>{
+@Table(name="demographiccustArchive")
+public class DemographicCustArchive extends AbstractModel<Integer>
+{
 
 	@Id
-	@Column(name="demographic_no")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
+	
+	@Column(name="demographic_no")
+	private Integer demographicNo;
 
 	@Column(name="cust1")
 	private String nurse;
@@ -53,8 +61,18 @@ public class DemographicCust extends AbstractModel<Integer>{
 	@Column(name="content")
 	private String notes;
 
+	
+	@Override
 	public Integer getId() {
 		return id;
+	}
+	
+	public Integer getDemographicNo() {
+		return demographicNo;
+	}
+	
+	public void setDemographicNo(Integer demographicNo) {
+		this.demographicNo = demographicNo;
 	}
 
 	public String getNurse() {
@@ -96,12 +114,16 @@ public class DemographicCust extends AbstractModel<Integer>{
 	public void setNotes(String notes) {
     	this.notes = notes;
     }
-
-	public void setId(Integer id) {
-    	this.id = id;
-    }
-
-
-
-
+	
+	//constructors
+	public DemographicCustArchive() {}
+	
+	public DemographicCustArchive(DemographicCust dc) {
+		this.demographicNo = dc.getId();
+		this.alert = dc.getAlert();
+		this.midwife = dc.getMidwife();
+		this.nurse = dc.getNurse();
+		this.resident = dc.getResident();
+		this.notes = dc.getNotes();
+	}
 }

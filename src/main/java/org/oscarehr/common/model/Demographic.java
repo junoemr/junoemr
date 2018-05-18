@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
 import org.oscarehr.PMmodule.utility.Utility;
+import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
@@ -46,7 +47,9 @@ import java.util.regex.Pattern;
 
 /**
  * This is the object class that relates to the demographic table. Any customizations belong here.
+ * @deprecated use the jpa version instead
  */
+@Deprecated
 public class Demographic implements Serializable
 {
 

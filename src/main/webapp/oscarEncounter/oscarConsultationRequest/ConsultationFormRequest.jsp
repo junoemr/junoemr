@@ -69,13 +69,12 @@ if(!authed) {
 <%@ page import="org.oscarehr.util.DigitalSignatureUtils"%>
 <%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.util.MiscUtils"%>
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao, org.oscarehr.PMmodule.model.Program" %>
-<%@page import="oscar.oscarDemographic.data.DemographicData, oscar.oscarRx.data.RxProviderData, oscar.oscarRx.data.RxProviderData.Provider, oscar.oscarClinic.ClinicData"%>
+<%@page import="oscar.oscarRx.data.RxProviderData, oscar.oscarRx.data.RxProviderData.Provider"%>
 <%@page import="org.oscarehr.common.dao.ConsultationServiceDao" %>
 <%@page import="org.oscarehr.common.model.ConsultationServices" %>
-<%@ page import="org.oscarehr.common.model.DemographicExt" %>
-<%@ page import="org.oscarehr.common.dao.DemographicExtDao" %>
+<%@ page import="org.oscarehr.demographic.model.DemographicExt" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicExtDao" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
