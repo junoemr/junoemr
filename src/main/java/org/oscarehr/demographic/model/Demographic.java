@@ -28,15 +28,19 @@ import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Entity(name = "DemographicModel") // use a name to prevent autowire conflict with old model
 @Table(name = "demographic")
@@ -157,6 +161,12 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String newsletter;
 	@Column(name = "veteran_no")
 	private String veteranNo;
+
+	@OneToOne(fetch=FetchType.LAZY, mappedBy = "id")
+	private DemographicCust demographicCust;
+
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
+	private List<DemographicExt> demographicExtList;
 
 
 	@Override
@@ -645,5 +655,25 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public void setVeteranNo(String veteranNo)
 	{
 		this.veteranNo = veteranNo;
+	}
+
+	public DemographicCust getDemographicCust()
+	{
+		return demographicCust;
+	}
+
+	public void setDemographicCust(DemographicCust demographicCust)
+	{
+		this.demographicCust = demographicCust;
+	}
+
+	public List<DemographicExt> getDemographicExtList()
+	{
+		return demographicExtList;
+	}
+
+	public void setDemographicExtList(List<DemographicExt> demographicExtList)
+	{
+		this.demographicExtList = demographicExtList;
 	}
 }
