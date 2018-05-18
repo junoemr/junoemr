@@ -29,7 +29,8 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicCust;
 import org.oscarehr.common.model.DemographicExt;
-import org.oscarehr.ws.external.rest.v1.transfer.DemographicTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ import java.util.List;
 
 public class DemographicConverter
 {
-	public static Demographic getAsDomainObject(DemographicTransfer transfer)
+	public static Demographic getAsDomainObject(DemographicTransferInbound transfer)
 	{
 		Demographic demographic = new Demographic();
 
@@ -101,7 +102,7 @@ public class DemographicConverter
 
 		return demographic;
 	}
-	public static List<DemographicExt> getExtensionList(DemographicTransfer transfer)
+	public static List<DemographicExt> getExtensionList(DemographicTransferInbound transfer)
 	{
 		List<DemographicExt> extensionList = new ArrayList<>(1);
 
@@ -116,7 +117,7 @@ public class DemographicConverter
 		}
 		return extensionList;
 	}
-	public static DemographicCust getCustom(DemographicTransfer transfer)
+	public static DemographicCust getCustom(DemographicTransferInbound transfer)
 	{
 		DemographicCust demographicCustom = null;
 		if (transfer.getNurse() != null || transfer.getResident() != null || transfer.getAlert() != null || transfer.getMidwife() != null || transfer.getNotes() != null)
@@ -132,9 +133,9 @@ public class DemographicConverter
 		return demographicCustom;
 	}
 
-	public static DemographicTransfer getAsTransferObject(Demographic demographic, List<DemographicExt> demographicExtensions, DemographicCust demographicCustom)
+	public static DemographicTransferOutbound getAsTransferObject(Demographic demographic, List<DemographicExt> demographicExtensions, DemographicCust demographicCustom)
 	{
-		DemographicTransfer transfer = new DemographicTransfer();
+		DemographicTransferOutbound transfer = new DemographicTransferOutbound();
 
 		// base info
 		transfer.setDemographicNo(demographic.getDemographicNo());
@@ -189,6 +190,7 @@ public class DemographicConverter
 		transfer.setCountryOfOrigin(demographic.getCountryOfOrigin());
 		transfer.setNewsletter(demographic.getNewsletter());
 		transfer.setAnonymous(demographic.getAnonymous());
+		transfer.setLastUpdateDate(ConversionUtils.toNullableLocalDate(demographic.getLastUpdateDate()));
 
 		if(demographicExtensions != null)
 		{

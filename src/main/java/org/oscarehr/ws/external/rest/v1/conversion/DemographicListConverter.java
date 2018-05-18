@@ -24,18 +24,18 @@
 
 package org.oscarehr.ws.external.rest.v1.conversion;
 
-import org.oscarehr.ws.external.rest.v1.transfer.DemographicSearchTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicListTransfer;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DemographicSearchConverter
+public class DemographicListConverter
 {
-	public static DemographicSearchTransfer getAsTransferObject(DemographicSearchResult demographic)
+	public static DemographicListTransfer getAsTransferObject(DemographicSearchResult demographic)
 	{
-		DemographicSearchTransfer transfer = new DemographicSearchTransfer();
+		DemographicListTransfer transfer = new DemographicListTransfer();
 
 		// base info
 		transfer.setDemographicNo(demographic.getDemographicNo());
@@ -55,12 +55,12 @@ public class DemographicSearchConverter
 		return transfer;
 	}
 
-	public static List<DemographicSearchTransfer> getListAsTransferObjects(List<DemographicSearchResult> demographics)
+	public static List<DemographicListTransfer> getListAsTransferObjects(List<DemographicSearchResult> demographics)
 	{
-		List<DemographicSearchTransfer> response = new ArrayList<>(demographics.size());
+		List<DemographicListTransfer> response = new ArrayList<>(demographics.size());
 		for(DemographicSearchResult searchResult : demographics)
 		{
-			DemographicSearchTransfer transfer = getAsTransferObject(searchResult);
+			DemographicListTransfer transfer = getAsTransferObject(searchResult);
 			response.add(transfer);
 		}
 		return response;

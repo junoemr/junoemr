@@ -20,7 +20,7 @@
  * Centre for Research on Inner City Health, St. Michael's Hospital,
  * Toronto, Ontario, Canada
  */
-package org.oscarehr.ws.external.rest.v1.transfer;
+package org.oscarehr.ws.external.rest.v1.transfer.demographic;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,7 +38,7 @@ import java.time.LocalDate;
 @XmlRootElement
 @Schema(description = "Partial Demographic record data transfer object")
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class DemographicSearchTransfer implements Serializable
+public class DemographicListTransfer implements Serializable
 {
 	// demographic base info
 	@Schema(description = "patient demographic record identifier")

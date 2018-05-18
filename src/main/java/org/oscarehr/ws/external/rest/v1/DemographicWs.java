@@ -37,7 +37,8 @@ import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
-import org.oscarehr.ws.external.rest.v1.transfer.DemographicTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
 import org.oscarehr.ws.external.rest.v1.transfer.eform.EFormTransferInbound;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,9 +84,9 @@ public class DemographicWs extends AbstractExternalRestWs
 	@GET
 	@Path("/{demographicId}")
 	@Operation(summary = "Retrieve an existing patient demographic record by demographic id.")
-	public RestResponse<DemographicTransfer> getDemographic(@PathParam("demographicId") Integer demographicNo)
+	public RestResponse<DemographicTransferOutbound> getDemographic(@PathParam("demographicId") Integer demographicNo)
 	{
-		DemographicTransfer demographicTransfer;
+		DemographicTransferOutbound demographicTransfer;
 		try
 		{
 			String providerNoStr = getOAuthProviderNo();
@@ -116,8 +117,8 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Path("/{demographicId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Update an existing patient demographic record by demographic id.")
-	public RestResponse<DemographicTransfer> putDemographic(@PathParam("demographicId") Integer demographicNo,
-	                                                        @Valid DemographicTransfer demographicTo)
+	public RestResponse<DemographicTransferOutbound> putDemographic(@PathParam("demographicId") Integer demographicNo,
+	                                                                @Valid DemographicTransferInbound demographicTo)
 	{
 		return RestResponse.errorResponse("Not Implemented");
 	}
@@ -125,7 +126,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Add a new patient demographic record to the system.")
-	public RestResponse<Integer> postDemographic(@Valid DemographicTransfer demographicTo)
+	public RestResponse<Integer> postDemographic(@Valid DemographicTransferInbound demographicTo)
 	{
 		Integer demographicNo;
 		try
