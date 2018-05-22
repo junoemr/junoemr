@@ -364,7 +364,7 @@ public class AppointmentDisplayController
 				"&appointmentNo=" + appointment.getAppointmentNo().toString() +
 				"&demographicNo=" + appointment.getDemographicNo() +
 				"&curProviderNo=" + parameterProviderNo +
-				"&reason=" + getReason() +
+				"&reason=" + URLEncoder.encode(appointment.getReason()) +
 				"&encType=" + URLEncoder.encode("face to face encounter with client","UTF-8") +
 				"&userName=" + URLEncoder.encode( userFirstName + " " + userLastName, "UTF-8") +
 				"&curDate=" + LocalDate.now().format(dateFormatter) +
