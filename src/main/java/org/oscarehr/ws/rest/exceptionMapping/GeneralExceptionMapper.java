@@ -21,50 +21,37 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest.filter.exceptionMapping;
+package org.oscarehr.ws.rest.exceptionMapping;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.filter.exception.RateLimitException;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.response.RestResponseRateLimitError;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 /**
- * Exception mapper for handling exceeded request rate limits.
+ * Generalized exception mapper. This class catches all uncaught exceptions and formats them in a response object.
+ * The LoggingFilter is able to handle these responses like a regular response.
  */
 @Provider
-@Priority(Priorities.AUTHENTICATION)
-public class RateLimitExceptionMapper implements ExceptionMapper<RateLimitException>
+public class GeneralExceptionMapper implements ExceptionMapper<Exception>
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
-	public RateLimitExceptionMapper()
+	public GeneralExceptionMapper()
 	{
 	}
 
 	@Override
-	public Response toResponse(RateLimitException exception)
+	public Response toResponse(Exception exception)
 	{
-		String errorMessage = "The maximum request rate of " + exception.getMaxRequests() + "/" + exception.getResetPeriod() + "ms was exceeded.";
+		RestResponse<String> response = RestResponse.errorResponse("System error");
+		logger.error("Uncaught System Error", exception);
 
-		RestResponseRateLimitError rateLimitError = new RestResponseRateLimitError(errorMessage);
-		rateLimitError.setRequestLimit(exception.getMaxRequests());
-		rateLimitError.setCurrentRequestCount(exception.getCurrentRequestCount());
-		rateLimitError.setResetPeriod(exception.getResetPeriod());
-		rateLimitError.setTimeToReset(exception.getTimeToReset());
-
-		RestResponse<String> response = RestResponse.errorResponse(rateLimitError);
-		logger.warn(errorMessage);
-
-		// should be status code 429 but this response status doesn't have that value
-		return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(response)
+		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(response)
 				.type(MediaType.APPLICATION_JSON).build();
 	}
 }

@@ -26,7 +26,7 @@ package org.oscarehr.ws.external.rest.v1.conversion;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.oscarehr.common.model.Demographic;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
@@ -44,7 +44,7 @@ public class DemographicConverter
 		Demographic demographic = new Demographic();
 
 		// base info
-		demographic.setDemographicNo(transfer.getDemographicNo());
+		demographic.setDemographicId(transfer.getDemographicNo());
 		demographic.setFirstName(transfer.getFirstName());
 		demographic.setLastName(transfer.getLastName());
 		demographic.setDateOfBirth(transfer.getDateOfBirth());
@@ -54,7 +54,7 @@ public class DemographicConverter
 		demographic.setHcType(transfer.getHcType());
 		demographic.setHcRenewDate(ConversionUtils.toNullableLegacyDate(transfer.getHcRenewDate()));
 		demographic.setSex(transfer.getSex());
-		demographic.setEffDate(ConversionUtils.toNullableLegacyDate(transfer.getHcEffectiveDate()));
+		demographic.setHcEffectiveDate(ConversionUtils.toNullableLegacyDate(transfer.getHcEffectiveDate()));
 		demographic.setSin(transfer.getSin());
 		demographic.setDateJoined(ConversionUtils.toNullableLegacyDate(transfer.getDateJoined()));
 		demographic.setEndDate(ConversionUtils.toNullableLegacyDate(transfer.getEndDate()));
@@ -79,17 +79,16 @@ public class DemographicConverter
 
 		// physician info
 		demographic.setProviderNo(transfer.getProviderNo());
-		demographic.setFamilyDoctor(
+		demographic.setReferralDoctor(
 				"<rdohip>" + StringEscapeUtils.escapeXml(StringUtils.trimToEmpty(transfer.getReferralDoctorNo())) + "</rdohip>" +
 				"<rd>" + StringEscapeUtils.escapeXml(StringUtils.trimToEmpty(transfer.getReferralDoctorName())) + "</rd>");
-		demographic.setFamilyDoctor2(
+		demographic.setFamilyDoctor(
 				"<fd>" + StringEscapeUtils.escapeXml(StringUtils.trimToEmpty(transfer.getFamilyDoctorNo())) + "</fd>" +
 				"<fdname>" + StringEscapeUtils.escapeXml(StringUtils.trimToEmpty(transfer.getFamilyDoctorName())) + "</fdname>");
 
 		// other info
 		demographic.setPcnIndicator(transfer.getPcnIndicator());
 		demographic.setChartNo(transfer.getChartNo());
-		demographic.setLinks(transfer.getRosterTerminationReason());
 		demographic.setAlias(transfer.getAlias());
 		demographic.setChildren(transfer.getChildren());
 		demographic.setSourceOfIncome(transfer.getSourceOfIncome());
@@ -138,10 +137,10 @@ public class DemographicConverter
 		DemographicTransferOutbound transfer = new DemographicTransferOutbound();
 
 		// base info
-		transfer.setDemographicNo(demographic.getDemographicNo());
+		transfer.setDemographicNo(demographic.getDemographicId());
 		transfer.setFirstName(demographic.getFirstName());
 		transfer.setLastName(demographic.getLastName());
-		transfer.setDateOfBirth(ConversionUtils.toNullableLocalDate(demographic.getBirthDate()));
+		transfer.setDateOfBirth(demographic.getDateOfBirth());
 		transfer.setTitle(demographic.getTitle());
 		transfer.setSex(demographic.getSex());
 		transfer.setHin(demographic.getHin());
@@ -149,7 +148,7 @@ public class DemographicConverter
 		transfer.setHcVersion(demographic.getVer());
 		transfer.setHcType(demographic.getHcType());
 		transfer.setHcRenewDate(ConversionUtils.toNullableLocalDate(demographic.getHcRenewDate()));
-		transfer.setHcEffectiveDate(ConversionUtils.toNullableLocalDate(demographic.getEffDate()));
+		transfer.setHcEffectiveDate(ConversionUtils.toNullableLocalDate(demographic.getHcEffectiveDate()));
 		transfer.setPatientStatus(demographic.getPatientStatus());
 		transfer.setPatientStatusDate(ConversionUtils.toNullableLocalDate(demographic.getPatientStatusDate()));
 		transfer.setDateJoined(ConversionUtils.toNullableLocalDate(demographic.getDateJoined()));
@@ -173,10 +172,10 @@ public class DemographicConverter
 
 		// physician info
 		transfer.setProviderNo(demographic.getProviderNo());
-		transfer.setReferralDoctorName(demographic.getFamilyDoctorName());
-		transfer.setReferralDoctorNo(demographic.getFamilyDoctorNumber());
-		transfer.setFamilyDoctorName(demographic.getFamilyDoctor2Name());
-		transfer.setFamilyDoctorNo(demographic.getFamilyDoctor2Number());
+		transfer.setReferralDoctorName(demographic.getReferralDoctorName());
+		transfer.setReferralDoctorNo(demographic.getReferralDoctorNumber());
+		transfer.setFamilyDoctorName(demographic.getFamilyDoctorName());
+		transfer.setFamilyDoctorNo(demographic.getFamilyDoctorNumber());
 
 		//other info
 		transfer.setPcnIndicator(demographic.getPcnIndicator());

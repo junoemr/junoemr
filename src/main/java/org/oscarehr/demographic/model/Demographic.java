@@ -33,7 +33,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -42,7 +41,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
-@Entity(name = "DemographicModel") // use a name to prevent autowire conflict with old model
+@Entity(name = "service.model.Demographic") // use a name to prevent autowire conflict with old model
 @Table(name = "demographic")
 public class Demographic extends AbstractModel<Integer> implements Serializable
 {
@@ -162,8 +161,8 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@Column(name = "veteran_no")
 	private String veteranNo;
 
-	@OneToOne(fetch=FetchType.LAZY, mappedBy = "id")
-	private DemographicCust demographicCust;
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "id")
+	private List<DemographicCust> demographicCust;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
 	private List<DemographicExt> demographicExtList;
@@ -472,6 +471,16 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		return referralDoctor;
 	}
 
+	public String getReferralDoctorName()
+	{
+		return StringUtils.substringBetween(getReferralDoctor(), "<rd>", "</rd>");
+	}
+
+	public String getReferralDoctorNumber()
+	{
+		return StringUtils.substringBetween(getReferralDoctor(), "<rdohip>", "</rdohip>");
+	}
+
 	public void setReferralDoctor(String familyDoctor)
 	{
 		this.referralDoctor = familyDoctor;
@@ -480,6 +489,16 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public String getFamilyDoctor()
 	{
 		return familyDoctor;
+	}
+
+	public String getFamilyDoctorName()
+	{
+		return StringUtils.substringBetween(getFamilyDoctor(), "<fdname>", "</fdname>");
+	}
+
+	public String getFamilyDoctorNumber()
+	{
+		return StringUtils.substringBetween(getFamilyDoctor(), "<fd>", "</fd>");
 	}
 
 	public void setFamilyDoctor(String familyDoctor2)
@@ -657,12 +676,12 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		this.veteranNo = veteranNo;
 	}
 
-	public DemographicCust getDemographicCust()
+	public List<DemographicCust> getDemographicCust()
 	{
 		return demographicCust;
 	}
 
-	public void setDemographicCust(DemographicCust demographicCust)
+	public void setDemographicCust(List<DemographicCust> demographicCust)
 	{
 		this.demographicCust = demographicCust;
 	}

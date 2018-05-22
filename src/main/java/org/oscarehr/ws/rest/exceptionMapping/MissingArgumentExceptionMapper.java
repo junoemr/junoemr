@@ -21,17 +21,32 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.demographic.dao;
+package org.oscarehr.ws.rest.exceptionMapping;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.model.Demographic;
-import org.springframework.stereotype.Repository;
+import org.oscarehr.ws.rest.exception.MissingArgumentException;
+import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestResponseError;
 
-@Repository("demographic.dao.DemographicDao")
-public class DemographicDao extends AbstractDao<Demographic>
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+
+
+@Provider
+public class MissingArgumentExceptionMapper implements ExceptionMapper<MissingArgumentException>
 {
-	public DemographicDao()
+	public MissingArgumentExceptionMapper()
 	{
-		super(Demographic.class);
+	}
+
+	@Override
+	public Response toResponse(MissingArgumentException exception)
+	{
+		RestResponseError responseError = new RestResponseError(exception.getMessage());
+		RestResponse<String> response = RestResponse.errorResponse(responseError);
+
+		return Response.status(Response.Status.PRECONDITION_FAILED).entity(response)
+				.type(MediaType.APPLICATION_JSON).build();
 	}
 }

@@ -21,42 +21,30 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest.filter.exceptionMapping;
+package org.oscarehr.ws.rest.exceptionMapping;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.core.JsonParseException;
+import org.oscarehr.ws.rest.response.RestResponse;
 
-public class ValidationError implements Serializable
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+
+@Provider
+public class JsonParseExceptionMapper implements ExceptionMapper<JsonParseException>
 {
-	private String path;
-	private String message;
-
-	public ValidationError()
+	public JsonParseExceptionMapper()
 	{
-		this(null,null);
-	}
-	public ValidationError(String path, String message)
-	{
-		this.path = path;
-		this.message = message;
 	}
 
-	public String getPath()
+	@Override
+	public Response toResponse(JsonParseException exception)
 	{
-		return path;
-	}
+		String originalMessage = exception.getOriginalMessage();
+		RestResponse<String> response = RestResponse.errorResponse(originalMessage);
 
-	public void setPath(String path)
-	{
-		this.path = path;
-	}
-
-	public String getMessage()
-	{
-		return message;
-	}
-
-	public void setMessage(String message)
-	{
-		this.message = message;
+		return Response.status(Response.Status.BAD_REQUEST).entity(response)
+				.type(MediaType.APPLICATION_JSON).build();
 	}
 }

@@ -23,7 +23,7 @@
  */
 package org.oscarehr.ws.rest.response;
 
-import org.oscarehr.ws.rest.filter.exceptionMapping.ValidationError;
+import org.oscarehr.ws.rest.exceptionMapping.ValidationError;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -21,30 +21,31 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest.filter.exceptionMapping;
+package org.oscarehr.ws.rest.exceptionMapping;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestResponseError;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+
 @Provider
-public class InvalidFormatExceptionMapper implements ExceptionMapper<InvalidFormatException>
+public class SecurityExceptionMapper implements ExceptionMapper<SecurityException>
 {
-	public InvalidFormatExceptionMapper()
+	public SecurityExceptionMapper()
 	{
 	}
 
 	@Override
-	public Response toResponse(InvalidFormatException exception)
+	public Response toResponse(SecurityException exception)
 	{
-		String originalMessage = exception.getOriginalMessage();
-		RestResponse<String> response = RestResponse.errorResponse(originalMessage);
+		RestResponseError responseError = new RestResponseError(exception.getMessage());
+		RestResponse<String> response = RestResponse.errorResponse(responseError);
 
-		return Response.status(Response.Status.BAD_REQUEST).entity(response)
+		return Response.status(Response.Status.UNAUTHORIZED).entity(response)
 				.type(MediaType.APPLICATION_JSON).build();
 	}
 }

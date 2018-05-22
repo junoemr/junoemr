@@ -21,10 +21,9 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest.filter.exceptionMapping;
+package org.oscarehr.ws.rest.exceptionMapping;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.util.MiscUtils;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.oscarehr.ws.rest.response.RestResponse;
 
 import javax.ws.rs.core.MediaType;
@@ -32,26 +31,20 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-/**
- * Generalized exception mapper. This class catches all uncaught exceptions and formats them in a response object.
- * The LoggingFilter is able to handle these responses like a regular response.
- */
 @Provider
-public class GeneralExceptionMapper implements ExceptionMapper<Exception>
+public class InvalidFormatExceptionMapper implements ExceptionMapper<InvalidFormatException>
 {
-	private static final Logger logger = MiscUtils.getLogger();
-
-	public GeneralExceptionMapper()
+	public InvalidFormatExceptionMapper()
 	{
 	}
 
 	@Override
-	public Response toResponse(Exception exception)
+	public Response toResponse(InvalidFormatException exception)
 	{
-		RestResponse<String> response = RestResponse.errorResponse("System error");
-		logger.error("Uncaught System Error", exception);
+		String originalMessage = exception.getOriginalMessage();
+		RestResponse<String> response = RestResponse.errorResponse(originalMessage);
 
-		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(response)
+		return Response.status(Response.Status.BAD_REQUEST).entity(response)
 				.type(MediaType.APPLICATION_JSON).build();
 	}
 }

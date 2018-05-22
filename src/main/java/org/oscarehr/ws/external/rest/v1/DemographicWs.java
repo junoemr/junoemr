@@ -25,18 +25,15 @@ package org.oscarehr.ws.external.rest.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.service.ProgramManager;
-import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographic.model.DemographicCust;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.service.EFormDataService;
-import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
-import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
 import org.oscarehr.ws.external.rest.v1.transfer.eform.EFormTransferInbound;
@@ -55,9 +52,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 @Component("DemographicWs")
 @Path("/demographic")
@@ -67,13 +62,10 @@ public class DemographicWs extends AbstractExternalRestWs
 	private static Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	DemographicManager demographicManager;
-
-	@Autowired
 	RecentDemographicAccessService recentDemographicAccessService;
 
 	@Autowired
-	ProgramManager programManager;
+	DemographicService demographicService;
 
 	@Autowired
 	DocumentService documentService;
@@ -81,35 +73,23 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Autowired
 	EFormDataService eFormService;
 
+	@Autowired
+	private SecurityInfoManager securityInfoManager;
+
 	@GET
 	@Path("/{demographicId}")
 	@Operation(summary = "Retrieve an existing patient demographic record by demographic id.")
 	public RestResponse<DemographicTransferOutbound> getDemographic(@PathParam("demographicId") Integer demographicNo)
 	{
-		DemographicTransferOutbound demographicTransfer;
-		try
-		{
-			String providerNoStr = getOAuthProviderNo();
-			int providerNo = Integer.parseInt(providerNoStr);
-			Demographic demographic = demographicManager.getDemographic(providerNoStr, demographicNo);
-			List<DemographicExt> demoExtras = demographicManager.getDemographicExts(providerNoStr, demographicNo);
-			DemographicCust demoCustom = demographicManager.getDemographicCust(providerNoStr, demographicNo);
+		String providerNoStr = getOAuthProviderNo();
+		int providerNo = Integer.parseInt(providerNoStr);
 
-			demographicTransfer = DemographicConverter.getAsTransferObject(demographic, demoExtras, demoCustom);
+		securityInfoManager.requiresPrivilege(providerNoStr, "_demographic", SecurityInfoManager.READ, demographicNo);
+		DemographicTransferOutbound demographicTransfer = demographicService.getDemographicTransferOutbound(providerNoStr, demographicNo);
 
-			LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
-			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
-		}
-		catch(SecurityException e)
-		{
-			logger.error("Security Error", e);
-			return RestResponse.errorResponse("User Permissions Error");
-		}
-		catch(Exception e)
-		{
-			logger.error("Error", e);
-			return RestResponse.errorResponse("System Error");
-		}
+		LogAction.addLogEntry(providerNoStr, demographicTransfer.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+		recentDemographicAccessService.updateAccessRecord(providerNo, demographicTransfer.getDemographicNo());
+
 		return RestResponse.successResponse(demographicTransfer);
 	}
 
@@ -120,6 +100,9 @@ public class DemographicWs extends AbstractExternalRestWs
 	public RestResponse<DemographicTransferOutbound> putDemographic(@PathParam("demographicId") Integer demographicNo,
 	                                                                @Valid DemographicTransferInbound demographicTo)
 	{
+		String providerNoStr = getOAuthProviderNo();
+		securityInfoManager.requiresPrivilege(providerNoStr, "_demographic", SecurityInfoManager.WRITE, demographicNo);
+
 		return RestResponse.errorResponse("Not Implemented");
 	}
 
@@ -128,58 +111,21 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Operation(summary = "Add a new patient demographic record to the system.")
 	public RestResponse<Integer> postDemographic(@Valid DemographicTransferInbound demographicTo)
 	{
-		Integer demographicNo;
-		try
+		if(demographicTo.getDemographicNo() != null)
 		{
-			Demographic demographic = DemographicConverter.getAsDomainObject(demographicTo);
-
-			if(demographic.getDemographicNo() != null)
-			{
-				return RestResponse.errorResponse("Demographic number for a new record must be null");
-			}
-			String providerNoStr = getOAuthProviderNo();
-			int providerNo = Integer.parseInt(providerNoStr);
-			String ip = getHttpServletRequest().getRemoteAddr();
-
-			/* set some default values */
-			demographic.setLastUpdateDate(new Date());
-			demographic.setLastUpdateUser(providerNoStr);
-
-			// save the base demographic object
-			demographicManager.createDemographic(providerNoStr, demographic, programManager.getDefaultProgramId());
-			demographicNo = demographic.getDemographicNo();
-
-			DemographicCust demoCustom = DemographicConverter.getCustom(demographicTo);
-			if(demoCustom != null)
-			{
-				// save the custom fields
-				demoCustom.setId(demographicNo);
-				demographicManager.createUpdateDemographicCust(providerNoStr, demoCustom);
-			}
-			List<DemographicExt> demographicExtensions = DemographicConverter.getExtensionList(demographicTo);
-			for(DemographicExt extension : demographicExtensions)
-			{
-				//save the extension fields
-				extension.setDemographicNo(demographicNo);
-				extension.setProviderNo(providerNoStr);
-				demographicManager.createExtension(providerNoStr, extension);
-			}
-
-			// log the action and update the access record
-			LogAction.addLogEntry(providerNoStr, demographicNo, LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, ip);
-			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
+			return RestResponse.errorResponse("Demographic number for a new record must be null");
 		}
-		catch(SecurityException e)
-		{
-			logger.error("Security Error", e);
-			return RestResponse.errorResponse("User Permissions Error");
-		}
-		catch(Exception e)
-		{
-			logger.error("Error", e);
-			return RestResponse.errorResponse("System Error");
-		}
-		return RestResponse.successResponse(demographicNo);
+		String providerNoStr = getOAuthProviderNo();
+		int providerNo = Integer.parseInt(providerNoStr);
+		String ip = getHttpServletRequest().getRemoteAddr();
+
+		securityInfoManager.requiresPrivilege(providerNoStr, "_demographic", SecurityInfoManager.WRITE, null);
+		Demographic demographic = demographicService.addNewDemographicRecord(providerNoStr, demographicTo);
+
+		// log the action and update the access record
+		LogAction.addLogEntry(providerNoStr, demographic.getId(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, ip);
+		recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicId());
+		return RestResponse.successResponse(demographic.getId());
 	}
 
 	@POST
@@ -189,20 +135,13 @@ public class DemographicWs extends AbstractExternalRestWs
 	public RestResponse<Integer> assignDocument(@PathParam("demographicId") Integer demographicId,
 	                                            @PathParam("documentId") Integer documentId)
 	{
-		try
-		{
-			String providerNoStr = getOAuthProviderNo();
-			String ip = getHttpServletRequest().getRemoteAddr();
+		String providerNoStr = getOAuthProviderNo();
+		String ip = getHttpServletRequest().getRemoteAddr();
 
-			documentService.assignDocumentToDemographic(documentId, demographicId);
-			LogAction.addLogEntry(providerNoStr, demographicId, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
-					String.valueOf(documentId), ip);
-		}
-		catch(Exception e)
-		{
-			logger.error("Error", e);
-			return RestResponse.errorResponse("System Error");
-		}
+		documentService.assignDocumentToDemographic(documentId, demographicId);
+		LogAction.addLogEntry(providerNoStr, demographicId, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+				String.valueOf(documentId), ip);
+
 		return RestResponse.successResponse(documentId);
 	}
 
@@ -213,24 +152,15 @@ public class DemographicWs extends AbstractExternalRestWs
 	public RestResponse<Integer> postEForm(@PathParam("demographicId") Integer demographicId,
 	                                       @Valid EFormTransferInbound transfer)
 	{
-		EFormData eForm;
-		try
-		{
-			String providerNoStr = getOAuthProviderNo();
-			int providerNo = Integer.parseInt(providerNoStr);
-			String ip = getHttpServletRequest().getRemoteAddr();
+		String providerNoStr = getOAuthProviderNo();
+		int providerNo = Integer.parseInt(providerNoStr);
+		String ip = getHttpServletRequest().getRemoteAddr();
 
-			eForm = eFormService.saveNewEForm(transfer.getTemplateId(), demographicId, providerNo,
-					transfer.getSubject(), new HashMap<>(), transfer.getFormValues(), null);
+		EFormData eForm = eFormService.saveNewEForm(transfer.getTemplateId(), demographicId, providerNo,
+				transfer.getSubject(), new HashMap<>(), transfer.getFormValues(), null);
 
-			LogAction.addLogEntry(providerNoStr, demographicId, LogConst.ACTION_ADD, LogConst.CON_EFORM_DATA, LogConst.STATUS_SUCCESS,
-					String.valueOf(eForm.getId()), ip, eForm.getFormName());
-		}
-		catch(Exception e)
-		{
-			logger.error("Error", e);
-			return RestResponse.errorResponse("System Error");
-		}
+		LogAction.addLogEntry(providerNoStr, demographicId, LogConst.ACTION_ADD, LogConst.CON_EFORM_DATA, LogConst.STATUS_SUCCESS,
+				String.valueOf(eForm.getId()), ip, eForm.getFormName());
 
 		return RestResponse.successResponse(eForm.getId());
 	}

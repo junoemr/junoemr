@@ -31,6 +31,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicListConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicListTransfer;
+import org.oscarehr.ws.rest.exception.MissingArgumentException;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
@@ -78,42 +79,35 @@ public class DemographicsWs extends AbstractExternalRestWs
 	{
 		List<DemographicListTransfer> response = new ArrayList<>(0);
 
-		int totalResultCount;
-		try
+		perPage = limitedResultCount(perPage);
+		page = validPageNo(page);
+		int offset = calculatedOffset(page, perPage);
+
+		DemographicSearchRequest searchRequest = new DemographicSearchRequest();
+		searchRequest.setStatusMode(DemographicSearchRequest.STATUSMODE.all);
+		searchRequest.setIntegrator(false); //this should be configurable by persona
+		searchRequest.setOutOfDomain(true);
+		searchRequest.setExactMatch(exactMatch);
+
+		if(hin != null)
 		{
-			perPage = limitedResultCount(perPage);
-			page = validPageNo(page);
-			int offset = calculatedOffset(page, perPage);
-
-			DemographicSearchRequest searchRequest = new DemographicSearchRequest();
-			searchRequest.setStatusMode(DemographicSearchRequest.STATUSMODE.all);
-			searchRequest.setIntegrator(false); //this should be configurable by persona
-			searchRequest.setOutOfDomain(true);
-			searchRequest.setExactMatch(exactMatch);
-
-			if(hin != null)
-			{
-				searchRequest.setMode(DemographicSearchRequest.SEARCHMODE.HIN);
-				searchRequest.setKeyword(hin.trim());
-			}
-			else
-			{
-				logger.warn("Missing Search Parameter");
-				return RestSearchResponse.errorResponse("Missing Search Parameter");
-			}
-
-			totalResultCount = demographicManager.searchPatientsCount(getLoggedInInfo(), searchRequest);
-			if(totalResultCount > 0)
-			{
-				List<DemographicSearchResult> list = demographicManager.searchPatients(getLoggedInInfo(), searchRequest, offset, perPage);
-				response = DemographicListConverter.getListAsTransferObjects(list);
-			}
+			searchRequest.setMode(DemographicSearchRequest.SEARCHMODE.HIN);
+			searchRequest.setKeyword(hin.trim());
 		}
-		catch(Exception e)
+		else
 		{
-			logger.error("Error", e);
-			return RestSearchResponse.errorResponse("System Error");
+			MissingArgumentException exception = new MissingArgumentException();
+			exception.addMissingArgument("Search parameter", "At least one search parameter is required");
+			throw exception;
 		}
+
+		int totalResultCount = demographicManager.searchPatientsCount(getLoggedInInfo(), searchRequest);
+		if(totalResultCount > 0)
+		{
+			List<DemographicSearchResult> list = demographicManager.searchPatients(getLoggedInInfo(), searchRequest, offset, perPage);
+			response = DemographicListConverter.getListAsTransferObjects(list);
+		}
+
 		return RestSearchResponse.successResponse(response, page, perPage, totalResultCount);
 	}
 }

@@ -21,30 +21,36 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest.filter.exceptionMapping;
+package org.oscarehr.ws.rest.exception;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import org.oscarehr.ws.rest.response.RestResponse;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
-
-@Provider
-public class JsonParseExceptionMapper implements ExceptionMapper<JsonParseException>
+public class MissingArgumentException extends RuntimeException
 {
-	public JsonParseExceptionMapper()
+	private Map<String,String> missingArgumentMap;
+
+	public MissingArgumentException()
 	{
+		this(new HashMap<>());
+	}
+	public MissingArgumentException(Map<String,String> missingArgumentMap)
+	{
+		this.missingArgumentMap = missingArgumentMap;
 	}
 
-	@Override
-	public Response toResponse(JsonParseException exception)
+	public void addMissingArgument(String argument, String reason)
 	{
-		String originalMessage = exception.getOriginalMessage();
-		RestResponse<String> response = RestResponse.errorResponse(originalMessage);
+		missingArgumentMap.put(argument, reason);
+	}
 
-		return Response.status(Response.Status.BAD_REQUEST).entity(response)
-				.type(MediaType.APPLICATION_JSON).build();
+	public Map<String, String> getMissingArgumentMap()
+	{
+		return missingArgumentMap;
+	}
+
+	public void setMissingArgumentMap(Map<String, String> missingArgumentMap)
+	{
+		this.missingArgumentMap = missingArgumentMap;
 	}
 }

@@ -21,17 +21,42 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.demographic.dao;
+package org.oscarehr.ws.rest.exceptionMapping;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.model.Demographic;
-import org.springframework.stereotype.Repository;
+import java.io.Serializable;
 
-@Repository("demographic.dao.DemographicDao")
-public class DemographicDao extends AbstractDao<Demographic>
+public class ValidationError implements Serializable
 {
-	public DemographicDao()
+	private String path;
+	private String message;
+
+	public ValidationError()
 	{
-		super(Demographic.class);
+		this(null,null);
+	}
+	public ValidationError(String path, String message)
+	{
+		this.path = path;
+		this.message = message;
+	}
+
+	public String getPath()
+	{
+		return path;
+	}
+
+	public void setPath(String path)
+	{
+		this.path = path;
+	}
+
+	public String getMessage()
+	{
+		return message;
+	}
+
+	public void setMessage(String message)
+	{
+		this.message = message;
 	}
 }
