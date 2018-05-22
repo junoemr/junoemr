@@ -96,9 +96,7 @@ public class DemographicsWs extends AbstractExternalRestWs
 		}
 		else
 		{
-			MissingArgumentException exception = new MissingArgumentException();
-			exception.addMissingArgument("Search parameter", "At least one search parameter is required");
-			throw exception;
+			throw new MissingArgumentException("At least one search parameter is required");
 		}
 
 		int totalResultCount = demographicManager.searchPatientsCount(getLoggedInInfo(), searchRequest);

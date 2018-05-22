@@ -21,33 +21,40 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest.exceptionMapping;
+package org.oscarehr.ws.rest.response;
 
-import org.oscarehr.ws.rest.exception.MissingArgumentException;
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.response.RestResponseMapError;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import java.util.HashMap;
+import java.util.Map;
 
-
-@Provider
-public class MissingArgumentExceptionMapper implements ExceptionMapper<MissingArgumentException>
+@Schema(description = "Response wrapper object for error information")
+public class RestResponseMapError extends RestResponseError
 {
-	public MissingArgumentExceptionMapper()
+	private Map<String, String> infoMap;
+
+	public RestResponseMapError()
 	{
+		this(null);
+	}
+	public RestResponseMapError(String message)
+	{
+		super(message);
+		infoMap = new HashMap<>();
 	}
 
-	@Override
-	public Response toResponse(MissingArgumentException exception)
+	public void put(String key, String value)
 	{
-		RestResponseMapError responseError = new RestResponseMapError(exception.getMessage());
-		responseError.setInfoMap(exception.getMissingArgumentMap());
-		RestResponse<String> response = RestResponse.errorResponse(responseError);
+		infoMap.put(key, value);
+	}
 
-		return Response.status(Response.Status.PRECONDITION_FAILED).entity(response)
-				.type(MediaType.APPLICATION_JSON).build();
+	public void setInfoMap(Map<String, String> infoMap)
+	{
+		this.infoMap = infoMap;
+	}
+
+	public Map<String, String> getInfoMap()
+	{
+		return infoMap;
 	}
 }

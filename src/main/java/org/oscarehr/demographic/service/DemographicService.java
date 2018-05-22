@@ -77,19 +77,24 @@ public class DemographicService
 	public Demographic addNewDemographicRecord(String providerNoStr, DemographicTransferInbound demographicTransferInbound)
 	{
 		Demographic demographic = DemographicConverter.getAsDomainObject(demographicTransferInbound);
+		DemographicCust demoCustom = DemographicConverter.getCustom(demographicTransferInbound);
+		List<DemographicExt> demographicExtensions = DemographicConverter.getExtensionList(demographicTransferInbound);
 
+		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtensions);
+	}
+	public Demographic addNewDemographicRecord(String providerNoStr, Demographic demographic,
+	                                    DemographicCust demoCustom, List<DemographicExt> demographicExtensions)
+	{
 		// save the base demographic object
 		addNewDemographicRecord(providerNoStr, demographic);
 		Integer demographicNo = demographic.getDemographicId();
 
-		DemographicCust demoCustom = DemographicConverter.getCustom(demographicTransferInbound);
 		if(demoCustom != null)
 		{
 			// save the custom fields
 			demoCustom.setId(demographicNo);
 			demographicManager.createUpdateDemographicCust(providerNoStr, demoCustom);
 		}
-		List<DemographicExt> demographicExtensions = DemographicConverter.getExtensionList(demographicTransferInbound);
 		for(DemographicExt extension : demographicExtensions)
 		{
 			//save the extension fields
@@ -112,10 +117,11 @@ public class DemographicService
 		{
 			demographic.setPatientStatus(org.oscarehr.common.model.Demographic.PatientStatus.AC.name());
 		}
-		if(demographic.getFamilyDoctor() == null)
+		if(demographic.getReferralDoctor() == null)
 		{
-			demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
+			demographic.setReferralDoctor("<rdohip></rdohip><rd></rd>");
 		}
+		demographicDao.persist(demographic);
 
 		Admission admission = new Admission();
 		admission.setClientId(demographic.getDemographicId());

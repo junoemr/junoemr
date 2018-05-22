@@ -116,7 +116,7 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String providerNo;
 	@Column(name = "family_doctor")
 	private String referralDoctor;
-	@Column(name = "family_doctor2")
+	@Column(name = "family_doctor_2")
 	private String familyDoctor;
 
 	// roster info
@@ -133,7 +133,7 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 
 	// other info
 	@Column(name = "lastUpdateUser")
-	private String lastUpdateUser = null;
+	private String lastUpdateUser;
 	@Column(name = "lastUpdateDate")
 	@Temporal(TemporalType.DATE)
 	private Date lastUpdateDate = new Date();
@@ -148,8 +148,8 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String sourceOfIncome;
 	@Column(name = "citizenship")
 	private String citizenship;
-	@Column(name = "anontmous")
-	private String anonymous = null;
+	@Column(name = "anonymous")
+	private String anonymous;
 	@Column(name = "spoken_lang")
 	private String spokenLanguage;
 	@Column(name = "official_lang")
