@@ -119,6 +119,22 @@ public abstract class AbstractServiceImpl {
 		return resultsPerPage * (pageNo - 1);
 	}
 
+	protected boolean parametersNotAllNull(Object... parameters)
+	{
+		for(Object parameter : parameters)
+		{
+			if(parameter != null)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	protected boolean parametersAllNull(Object... parameters)
+	{
+		return !parametersNotAllNull(parameters);
+	}
+
 	/**
 	 * Gets the login information associated with the current request.
 	 * 

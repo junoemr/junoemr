@@ -26,15 +26,16 @@ package org.oscarehr.ws.external.rest.v1;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.log4j.Logger;
-import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicListConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicListTransfer;
 import org.oscarehr.ws.rest.exception.MissingArgumentException;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
-import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +45,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +58,10 @@ public class DemographicsWs extends AbstractExternalRestWs
 	private static Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	private DemographicManager demographicManager;
+	private DemographicDao demographicDao;
+
+	@Autowired
+	private SecurityInfoManager securityInfoManager;
 
 	@GET
 	@Path("/search")
@@ -73,39 +79,83 @@ public class DemographicsWs extends AbstractExternalRestWs
 			@DefaultValue("false")
 			@Parameter(description = "When true, search results will only be returned if they are a complete match. Otherwise partial matches may be returned.")
 					Boolean exactMatch,
+			@Parameter(description = "Match results by given name")
+			@QueryParam("firstName") String firstName,
+			@Parameter(description = "Match results by family name")
+			@QueryParam("lastName") String lastName,
 			@Parameter(description = "Match results by health insurance number")
-			@QueryParam("hin") String hin
+			@QueryParam("hin") String hin,
+			@Parameter(description = "Match results by sex")
+			@QueryParam("sex") String sex,
+			@Parameter(description = "Match results by date of birth")
+			@QueryParam("dateOfBirth") String dateOfBirthStr,
+			@Parameter(description = "Match results by address")
+			@QueryParam("address") String address,
+			@Parameter(description = "Match results chart number")
+			@QueryParam("charNo") String chartNo,
+			@Parameter(description = "Match results by phone number")
+			@QueryParam("phone") String phone,
+			@Parameter(description = "Match results by provider id")
+			@QueryParam("providerNo") String searchProviderNo
 	)
 	{
-		List<DemographicListTransfer> response = new ArrayList<>(0);
+		String providerNoStr = getOAuthProviderNo();
+		securityInfoManager.requiresPrivilege(providerNoStr, "_demographic", SecurityInfoManager.READ, null);
 
-		perPage = limitedResultCount(perPage);
-		page = validPageNo(page);
-		int offset = calculatedOffset(page, perPage);
-
-		DemographicSearchRequest searchRequest = new DemographicSearchRequest();
-		searchRequest.setStatusMode(DemographicSearchRequest.STATUSMODE.all);
-		searchRequest.setIntegrator(false); //this should be configurable by persona
-		searchRequest.setOutOfDomain(true);
-		searchRequest.setExactMatch(exactMatch);
-
-		if(hin != null)
-		{
-			searchRequest.setMode(DemographicSearchRequest.SEARCHMODE.HIN);
-			searchRequest.setKeyword(hin.trim());
-		}
-		else
+		if(parametersAllNull(firstName, lastName, hin, sex, dateOfBirthStr, address, chartNo, phone, searchProviderNo))
 		{
 			throw new MissingArgumentException("At least one search parameter is required");
 		}
-
-		int totalResultCount = demographicManager.searchPatientsCount(getLoggedInInfo(), searchRequest);
-		if(totalResultCount > 0)
+		LocalDate dateOfBirth;
+		try
 		{
-			List<DemographicSearchResult> list = demographicManager.searchPatients(getLoggedInInfo(), searchRequest, offset, perPage);
-			response = DemographicListConverter.getListAsTransferObjects(list);
+			dateOfBirth = (dateOfBirthStr != null ? LocalDate.parse(dateOfBirthStr, DateTimeFormatter.ISO_LOCAL_DATE) : null);
+		}
+		catch(Exception e)
+		{
+			MissingArgumentException exception = new MissingArgumentException("Argument Error");
+			exception.addMissingArgument("dateOfBirth", "Invalid Format");
+			throw exception;
 		}
 
+		// set up the search criteria
+		DemographicCriteriaSearch searchQuery = new DemographicCriteriaSearch();
+		searchQuery.setHin(hin);
+		searchQuery.setSex(sex);
+		searchQuery.setFirstName(firstName);
+		searchQuery.setLastName(lastName);
+		searchQuery.setDateOfBirth(dateOfBirth);
+		searchQuery.setAddress(address);
+		searchQuery.setChartNo(chartNo);
+		searchQuery.setPhone(phone);
+		searchQuery.setProviderNo(searchProviderNo);
+		searchQuery.setIntegrator(false);
+		searchQuery.setOutOfDomain(true);
+
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
+
+		searchQuery.setOffset(offset);
+		searchQuery.setLimit(perPage);
+		searchQuery.setExactMatch(exactMatch);
+
+		searchQuery.setSortDir(DemographicCriteriaSearch.SORTDIR.asc);
+		searchQuery.setSortMode(DemographicCriteriaSearch.SORTMODE.DemographicName);
+		searchQuery.setStatusMode(DemographicCriteriaSearch.STATUSMODE.all);
+
+		int totalResultCount = demographicDao.criteriaSearchCount(searchQuery);
+
+		List<DemographicListTransfer> response;
+		if(totalResultCount > 0)
+		{
+			List<Demographic> results = demographicDao.criteriaSearch(searchQuery);
+			response = DemographicListConverter.getListAsTransferObjects(results);
+		}
+		else
+		{
+			response = new ArrayList<>(0);
+		}
 		return RestSearchResponse.successResponse(response, page, perPage, totalResultCount);
 	}
 }

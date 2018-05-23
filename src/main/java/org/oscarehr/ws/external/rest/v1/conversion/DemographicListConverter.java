@@ -24,6 +24,7 @@
 
 package org.oscarehr.ws.external.rest.v1.conversion;
 
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicListTransfer;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import oscar.util.ConversionUtils;
@@ -55,10 +56,32 @@ public class DemographicListConverter
 		return transfer;
 	}
 
-	public static List<DemographicListTransfer> getListAsTransferObjects(List<DemographicSearchResult> demographics)
+	public static DemographicListTransfer getAsTransferObject(Demographic demographic)
+	{
+		DemographicListTransfer transfer = new DemographicListTransfer();
+
+		// base info
+		transfer.setDemographicNo(demographic.getDemographicId());
+		transfer.setFirstName(demographic.getFirstName());
+		transfer.setLastName(demographic.getLastName());
+		transfer.setDateOfBirth(demographic.getDateOfBirth());
+		transfer.setSex(demographic.getSex());
+		transfer.setHin(demographic.getHin());
+		transfer.setPatientStatus(demographic.getPatientStatus());
+
+		// physician info
+		transfer.setProviderNo(demographic.getProviderNo());
+
+		//other info
+		transfer.setChartNo(demographic.getChartNo());
+
+		return transfer;
+	}
+
+	public static List<DemographicListTransfer> getListAsTransferObjects(List<Demographic> demographics)
 	{
 		List<DemographicListTransfer> response = new ArrayList<>(demographics.size());
-		for(DemographicSearchResult searchResult : demographics)
+		for(Demographic searchResult : demographics)
 		{
 			DemographicListTransfer transfer = getAsTransferObject(searchResult);
 			response.add(transfer);
