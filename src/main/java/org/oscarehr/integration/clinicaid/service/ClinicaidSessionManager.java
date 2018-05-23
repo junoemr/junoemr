@@ -60,7 +60,7 @@ public class ClinicaidSessionManager
 	private final String apiDomain = oscarProps.getProperty("clinicaid_api_domain", clinicaidDomain);
 	private final String instanceName = oscarProps.getProperty("clinicaid_instance_name");
 	private final String apiKey = oscarProps.getProperty("clinicaid_api_key");
-	private final String loginEndPoint = apiDomain + "/auth/pushed_login/";
+	private final String loginEndPoint = clinicaidDomain + "/auth/pushed_login/";
 
 	private ClinicaidUserTo1 clinicaidUser;
 
@@ -175,7 +175,9 @@ public class ClinicaidSessionManager
 
 		for (Map.Entry<String, String> pair : data.entrySet())
 		{
-			stringBuilder.append(String.format("%s=%s&", pair.getKey(), pair.getValue()));
+			stringBuilder.append(
+					String.format("%s=%s&", pair.getKey(), urlEncode(pair.getValue()))
+			);
 		}
 		return stringBuilder.toString();
 	}

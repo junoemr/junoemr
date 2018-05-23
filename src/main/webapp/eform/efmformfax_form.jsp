@@ -36,7 +36,12 @@ This Page creates the fax form for eforms.
 		rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(), "rdohip").trim();
 	}
 	boolean faxEnabled = props.isEFormFaxEnabled();
-%> 
+%>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/util/fax.js"></script>
+<script type="text/javascript">
+	Oscar.Util.Fax.updateFaxButton();
+</script>
+
 <table width="100%">
 	<input type="hidden" value=<%=faxEnabled%> id="faxControl_faxEnabled"></input>
 	<%
@@ -75,7 +80,7 @@ This Page creates the fax form for eforms.
 		</select>
 	</td>
 	<td class="tite3">				
-		<button onclick="AddOtherFaxProvider(); return false;">Add Provider</button>
+		<button onclick="Oscar.Util.Fax.AddOtherFaxProvider(); return false;">Add Provider</button>
 	</td>
 </tr>
 	<%
@@ -88,7 +93,7 @@ This Page creates the fax form for eforms.
 		<font size="1">(xxx-xxx-xxxx)  </font>					
 	</td>
 	<td class="tite3">
-		<button onclick="AddOtherFax(); return false;">Add Other Fax Recipient</button>
+		<button onclick="Oscar.Util.Fax.AddOtherFax(); return false;">Add Other Fax Recipient</button>
 	</td>		
 </tr>
 <tr>
@@ -104,7 +109,7 @@ This Page creates the fax form for eforms.
 		if (eformFaxRefer && !"".equals(rdName) && !"".equals(rdFaxNo)) {
 			%>
 			<li>
-			<%=rdName %> <b>Fax No: </b><%= rdFaxNo %> <a href="javascript:void(0);" onclick="removeRecipient(this)">remove</a>
+			<%=rdName %> <b>Fax No: </b><%= rdFaxNo %> <a href="javascript:void(0);" onclick="Oscar.Util.Fax.removeRecipient(this)">remove</a>
 				<input type="hidden" name="faxRecipients" value="<%= rdFaxNo %>" />
 			</li>
 			<%

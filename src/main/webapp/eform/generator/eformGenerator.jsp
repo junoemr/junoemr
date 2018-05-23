@@ -1332,8 +1332,8 @@
 
                         var status = data.status;
 						if(status === "SUCCESS") {
-	                        var options = [];
-	                        var values = [];
+	                        var options = [""];
+	                        var values = [0];
 	                        var selectedId = 0;
 	                        for(var i=0; i<data.body.length; i++) {
 	                            options.push(data.body[i].formName);

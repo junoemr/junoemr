@@ -399,10 +399,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 							boolean obxCountBool = ((isTypeCLS && obxCount > 0 ) || obxCount > 1);
 
 							// add the obrname if necessary
-							if (!obrFlag
-									&& !obrName.equals("")
-									&& ((!(obxName.contains(obrName) || obxCountBool)
-										&& obxCount < 2 && !isUnstructuredDoc))) {
+							if (!obrFlag && !obrName.equals("") && ((!(obxName.contains(obrName)) || obxCountBool) && !isUnstructuredDoc)) {
 								// cell.setBackgroundColor(getHighlightColor(linenum));
 								linenum++;
 								cell.setPhrase(new Phrase(obrName, boldFont));
@@ -422,7 +419,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 							if(isUnstructuredDoc){
 								cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 								//if there are duplicate obxNames, display only the first 
-								if((handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1)) || (obxName.equalsIgnoreCase(obrName))){
+								if((handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1))){
 									cell.setPhrase(new Phrase("", lineFont));
 									table.addCell(cell);
 								}else {

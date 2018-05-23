@@ -34,6 +34,8 @@
 <%@ page import="java.util.*,java.net.*, oscar.util.*"
 	errorPage="errorpage.jsp"%>
 <%@ page import="oscar.OscarProperties" %>
+<%@ page import="org.oscarehr.common.dao.DemographicStudyDao" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 
 <caisi:isModuleLoad moduleName="caisi">
 <%
@@ -51,6 +53,8 @@
 </caisi:isModuleLoad>
 
 <%
+	DemographicStudyDao demographicStudyDao = SpringUtils.getBean(DemographicStudyDao.class);
+
     if(session.getAttribute("userrole") == null ) {
    	 	MiscUtils.getLogger().error("userrole is null? logging user out");
         response.sendRedirect("../logout.jsp");
@@ -108,12 +112,13 @@
 	}
 	//preserving context ---end
 
+	OscarProperties props = OscarProperties.getInstance();
+
     if(request.getParameter("year")==null && request.getParameter("month")==null && request.getParameter("day")==null && request.getParameter("displaymode")==null && request.getParameter("dboperation")==null) {
         GregorianCalendar now=new GregorianCalendar();
         int nowYear = now.get(Calendar.YEAR);
         int nowMonth = now.get(Calendar.MONTH)+1 ; //be care for the month +-1
         int nowDay = now.get(Calendar.DAY_OF_MONTH);
-        OscarProperties props = OscarProperties.getInstance();
         String caisiView = null;
         caisiView = request.getParameter("GoToCaisiViewFromOscarView");
         boolean viewAll_bool = true;  // false, restore original schedule view on appointment screen
@@ -143,9 +148,38 @@
 	        
     }
 
+	String day_file = "appointment_optimized.jsp";
+	boolean isMobileOptimized = session.getAttribute("mobileOptimized") != null;
+
+	// Use the old schedule if any of the following conditions are true because
+	// appointment_optimized.jsp doesn't account for them.
+    // This assumes that the user is not using indivo
+    if(
+		!props.isPropertyActive("optimized_schedule_enable") ||
+    	isMobileOptimized ||
+		props.isPropertyActive("caisi") ||
+		props.isPropertyActive("TORONTO_RFQ") ||
+		props.isPropertyActive("ticklerplus") ||
+		props.isPropertyActive("OSCAR_LEARNING") ||
+		(
+			props.isPropertyActive("optimized_schedule_default_new") &&
+			"1".equals(request.getParameter("oldschedule"))
+		) ||
+		(
+			!props.isPropertyActive("optimized_schedule_default_new") &&
+			!"1".equals(request.getParameter("newschedule"))
+		) ||
+		"1".equals(request.getParameter("caseload")) ||
+		demographicStudyDao.hasStudy()
+	)
+	{
+		day_file = "appointmentprovideradminday.jsp";
+	}
+
+
     //associate each operation with an output JSP file - displaymode
     String[][] opToFile = new String[][] {
-            {"day" , "appointmentprovideradminday.jsp"},
+            {"day" , day_file},
             {"month" , "appointmentprovideradminmonth.jsp"},
             {"addstatus" , "provideraddstatus.jsp"},
             {"updatepreference" , "providerupdatepreference.jsp"},
