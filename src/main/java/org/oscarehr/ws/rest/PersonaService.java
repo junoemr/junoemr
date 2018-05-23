@@ -235,7 +235,7 @@ public class PersonaService extends AbstractServiceImpl {
 		
 		MenuTo1 menu = new MenuTo1()
 				.addWithState(idCounter++,bundle.getString("navbar.menu.dashboard"), null, "dashboard")
-		        .add(idCounter++,bundle.getString("navbar.menu.schedule"),null,"../provider/providercontrol.jsp")
+		        .addWithState(idCounter++,bundle.getString("navbar.menu.schedule"),null,"schedule")
 				.addWithState(idCounter++,bundle.getString("navbar.menu.inbox"),null,"inbox");
 
 		if (!consultationManager.isConsultResponseEnabled()) {

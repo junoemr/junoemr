@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('Schedule', ['Common', 'Common.Services']);
+angular.module('Schedule', ['Common', 'Common.Services', 'cpCalendar']);

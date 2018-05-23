@@ -3,6 +3,8 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'ui.router.state.events',
 	'ngResource',
 	'ui.bootstrap',
+	'ui.calendar',
+	'cpCalendar',
 	'angular-loading-bar',
 	'ngTable',
 	'ngStorage',
@@ -83,7 +85,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('schedule',
 		{
 			url: '/schedule',
-			templateUrl: 'schedule/classic.jsp',
+			templateUrl: 'schedule/view.jsp',
 			controller: 'Schedule.ScheduleController'
 		})
 		.state('admin',

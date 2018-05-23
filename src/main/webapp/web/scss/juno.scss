@@ -17,6 +17,7 @@
 @import "index";
 @import "note-editor";
 // Section-specific things
+@import "../schedule/schedule";
 @import "../common/directives/patientSelectorOption";
 @import "../dashboard/dashboard";
 @import "../patient/patient";

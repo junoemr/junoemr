@@ -55,6 +55,8 @@
 	<link href="bower_components/angular-loading-bar/build/loading-bar.min.css" rel="stylesheet">
 	<link href="bower_components/components-font-awesome/css/font-awesome.min.css" rel="stylesheet">
 	<link href="bower_components/jquery-ui/themes/base/jquery-ui.min.css" rel="stylesheet">
+	<link href="bower_components/fullcalendar/dist/fullcalendar.min.css" rel="stylesheet">
+	<link href="bower_components/fullcalendar-scheduler/dist/scheduler.min.css" rel="stylesheet">
 
 	<%-- combined CSS from compiled SCSS --%>
 	<link href="dist/juno.css" rel="stylesheet">
@@ -411,9 +413,13 @@
 <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.min.js"></script>
+<script type="text/javascript" src="bower_components/moment/min/moment-with-locales.min.js"></script>
 <script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
 <script type="text/javascript" src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
 <script type="text/javascript" src="bower_components/angular-ui-router/release/stateEvents.js"></script>
+<script type="text/javascript" src="bower_components/angular-ui-calendar/src/calendar.js"></script>
+<script type="text/javascript" src="bower_components/fullcalendar/dist/fullcalendar.js"></script>
+<script type="text/javascript" src="bower_components/fullcalendar-scheduler/dist/scheduler.js"></script>
 <script type="text/javascript" src="bower_components/angular-resource/angular-resource.min.js"></script>
 <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 <script type="text/javascript" src="bower_components/bootstrap-timepicker/js/bootstrap-timepicker.js"></script>
@@ -421,8 +427,12 @@
 <script type="text/javascript" src="bower_components/ng-table-bundle/ng-table.min.js"></script>
 <script type="text/javascript" src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
 <script type="text/javascript" src="bower_components/pym.js/dist/pym.v1.min.js"></script>
-<script type="text/javascript" src="bower_components/moment/min/moment-with-locales.min.js"></script>
 <script type="text/javascript" src="bower_components/ngstorage/ngStorage.js"></script>
+<script type="text/javascript" src="bower_components/cp-calendar/module.js"></script>
+<script type="text/javascript" src="bower_components/cp-calendar/directive.js"></script>
+<script type="text/javascript" src="bower_components/cp-calendar/controller.js"></script>
+<script type="text/javascript" src="bower_components/cp-calendar/event_controller.js"></script>
+<script type="text/javascript" src="bower_components/cp-calendar/util.js"></script>
 <!-- endbuild -->
 
 <%-- JunoUI application code, to be combined and minified for production --%>
@@ -448,12 +458,14 @@
 <%--Angular Services--%>
 <script type="text/javascript" src="common/services/module.js"></script>
 <script type="text/javascript" src="common/services/appService.js"></script>
+<script type="text/javascript" src="common/services/autoCompleteService.js"></script>
 <script type="text/javascript" src="common/services/billingService.js"></script>
 <script type="text/javascript" src="common/services/consultService.js"></script>
 <script type="text/javascript" src="common/services/demographicService.js"></script>
 <script type="text/javascript" src="common/services/demographicsService.js"></script>
 <script type="text/javascript" src="common/services/diseaseRegistryService.js"></script>
 <script type="text/javascript" src="common/services/formService.js"></script>
+<script type="text/javascript" src="common/services/globalStateService.js"></script>
 <script type="text/javascript" src="common/services/inboxService.js"></script>
 <script type="text/javascript" src="common/services/k2aService.js"></script>
 <script type="text/javascript" src="common/services/messageService.js"></script>
@@ -463,6 +475,7 @@
 <script type="text/javascript" src="common/services/programService.js"></script>
 <script type="text/javascript" src="common/services/providerService.js"></script>
 <script type="text/javascript" src="common/services/providersService.js"></script>
+<script type="text/javascript" src="common/services/resultsService.js"></script>
 <script type="text/javascript" src="common/services/scheduleService.js"></script>
 <script type="text/javascript" src="common/services/securityService.js"></script>
 <script type="text/javascript" src="common/services/staticDataService.js"></script>
@@ -532,6 +545,7 @@
 
 <script type="text/javascript" src="schedule/module.js"></script>
 <script type="text/javascript" src="schedule/scheduleController.js"></script>
+<script type="text/javascript" src="schedule/calendarApiAdapter.js"></script>
 <script type="text/javascript" src="schedule/appointmentAddController.js"></script>
 <script type="text/javascript" src="schedule/appointmentViewController.js"></script>
 
