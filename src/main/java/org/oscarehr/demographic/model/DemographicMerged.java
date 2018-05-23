@@ -21,7 +21,9 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.model;
+package org.oscarehr.demographic.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.util.Date;
 
@@ -36,7 +38,8 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name="demographic_merged")
-public class DemographicMerged extends AbstractModel<Integer> {
+public class DemographicMerged extends AbstractModel<Integer>
+{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
