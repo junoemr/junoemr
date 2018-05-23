@@ -167,6 +167,12 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
 	private List<DemographicExt> demographicExtList;
 
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
+	private List<DemographicMerged> mergedDemographicsList;
+
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "mergedTo")
+	private List<DemographicMerged> mergedToDemographicsList;
+
 
 	@Override
 	public Integer getId()
@@ -694,5 +700,25 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public void setDemographicExtList(List<DemographicExt> demographicExtList)
 	{
 		this.demographicExtList = demographicExtList;
+	}
+
+	public List<DemographicMerged> getMergedDemographicsList()
+	{
+		return mergedDemographicsList;
+	}
+
+	public void setMergedDemographicsList(List<DemographicMerged> mergedDemographicsList)
+	{
+		this.mergedDemographicsList = mergedDemographicsList;
+	}
+
+	public List<DemographicMerged> getMergedToDemographicsList()
+	{
+		return mergedToDemographicsList;
+	}
+
+	public void setMergedToDemographicsList(List<DemographicMerged> mergedToDemographicsList)
+	{
+		this.mergedToDemographicsList = mergedToDemographicsList;
 	}
 }

@@ -79,7 +79,13 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	public Criteria setCriteriaProperties(Criteria criteria)
 	{
 		boolean exactMatching = isExactMatch();
+		String alias = criteria.getAlias();
 
+		// left join demographic merged and only return the result if it isn't merged
+		criteria.createAlias(alias + ".mergedDemographicsList", "dm", Criteria.LEFT_JOIN);
+		criteria.add(Restrictions.or(Restrictions.isNull("dm.id"), Restrictions.ne("dm.deleted", 0)));
+
+		// set the search filters
 		if(getDemographicNo() != null)
 		{
 			criteria.add(Restrictions.eq("demographicId", getDemographicNo()));
@@ -125,6 +131,8 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 			criteria.add(Restrictions.eq("providerNo", getProviderNo()));
 		}
 
+		// set status filters and result ordering
+		setStatusCriteria(criteria);
 		setOrderByCriteria(criteria);
 		return criteria;
 	}
