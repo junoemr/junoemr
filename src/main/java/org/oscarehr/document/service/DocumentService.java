@@ -25,6 +25,7 @@
 package org.oscarehr.document.service;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.io.FileFactory;
@@ -75,6 +76,9 @@ public class DocumentService
 	@Autowired
 	PatientLabRoutingDao patientLabRoutingDao;
 
+	@Autowired
+	ProgramManager programManager;
+
 	/**
 	 * Create a new document from the given document model and a file input stream.
 	 * This method will write the file from the stream and persist the document record.
@@ -100,6 +104,19 @@ public class DocumentService
 		document.setContenttype(file.getContentType());
 		document.setNumberofpages(file.getPageCount());
 
+		// default some values if they are missing
+		if(document.getObservationdate() == null)
+		{
+			document.setObservationdate(new Date());
+		}
+		if(document.getContentdatetime() == null)
+		{
+			document.setContentdatetime(new Date());
+		}
+		if(document.getProgramId() == null)
+		{
+			document.setProgramId(programManager.getDefaultProgramId());
+		}
 		documentDao.persist(document);
 
 		if(demographicNo == null || demographicNo < 1)

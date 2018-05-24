@@ -100,7 +100,7 @@ public class DemographicsWs extends AbstractExternalRestWs
 	)
 	{
 		String providerNoStr = getOAuthProviderNo();
-		securityInfoManager.requiresPrivilege(providerNoStr, "_demographic", SecurityInfoManager.READ, null);
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.READ, null, "_demographic");
 
 		if(parametersAllNull(firstName, lastName, hin, sex, dateOfBirthStr, address, chartNo, phone, searchProviderNo))
 		{

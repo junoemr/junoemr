@@ -24,14 +24,14 @@ package org.oscarehr.ws.external.rest.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.service.ProgramManager;
-import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.conversion.DocumentConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferInbound;
+import org.oscarehr.ws.rest.exception.MissingArgumentException;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -46,9 +46,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
-import java.util.Date;
 
 @Component("DocumentWs")
 @Path("/document")
@@ -61,66 +61,40 @@ public class DocumentWs extends AbstractExternalRestWs
 	DocumentService documentService;
 
 	@Autowired
-	DocumentDao documentDao;
-
-	@Autowired
-	ProgramManager programManager;
+	private SecurityInfoManager securityInfoManager;
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Add a new document to the system")
-	public RestResponse<Integer> postDocument(@Valid DocumentTransferInbound transfer)
+	public RestResponse<Integer> postDocument(@Valid DocumentTransferInbound transfer) throws IOException, InterruptedException
 	{
-		Document document;
+		String providerNoStr = getOAuthProviderNo();
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_edoc");
+
+		if(transfer.getDocumentNo() != null)
+		{
+			throw new MissingArgumentException("Argument Error", "documentNo", "Document number for a new record must be null");
+		}
+
+		InputStream inputStream;
 		try
 		{
-			if(transfer.getDocumentNo() != null)
-			{
-				return RestResponse.errorResponse("Document number for a new record must be null");
-			}
-
-			InputStream inputStream;
-			try
-			{
-				byte[] imageByteArray = Base64.getDecoder().decode(transfer.getBase64EncodedFile());
-				inputStream = new ByteArrayInputStream(imageByteArray);
-			}
-			catch(IllegalArgumentException e)
-			{
-				return RestResponse.errorResponse("Error decoding file: " + e.getMessage());
-			}
-
-			document = DocumentConverter.getInboundAsDomainObject(transfer);
-			document.setProgramId(programManager.getDefaultProgramId());
-			// default some dates if they are missing
-			if(document.getObservationdate() == null)
-			{
-				document.setObservationdate(new Date());
-			}
-			if(document.getContentdatetime() == null)
-			{
-				document.setContentdatetime(new Date());
-			}
-			// upload the document record
-			document = documentService.uploadNewDocument(document, inputStream);
-
-			String providerNoStr = getOAuthProviderNo();
-			String ip = getHttpServletRequest().getRemoteAddr();
-
-			LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
-					String.valueOf(document.getDocumentNo()), ip, document.getDocfilename());
-
+			byte[] imageByteArray = Base64.getDecoder().decode(transfer.getBase64EncodedFile());
+			inputStream = new ByteArrayInputStream(imageByteArray);
 		}
-		catch(SecurityException e)
+		catch(IllegalArgumentException e)
 		{
-			logger.error("Security Error", e);
-			return RestResponse.errorResponse("User Permissions Error");
+			throw new MissingArgumentException("Argument Error", "getBase64EncodedFile", "Error decoding file: " + e.getMessage());
 		}
-		catch(Exception e)
-		{
-			logger.error("Error", e);
-			return RestResponse.errorResponse("System Error");
-		}
+
+		// upload the document record
+		Document document = DocumentConverter.getInboundAsDomainObject(transfer);
+		document = documentService.uploadNewDocument(document, inputStream);
+
+		String ip = getHttpServletRequest().getRemoteAddr();
+		LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+				String.valueOf(document.getDocumentNo()), ip, document.getDocfilename());
+
 		return RestResponse.successResponse(document.getDocumentNo());
 	}
 
@@ -130,20 +104,14 @@ public class DocumentWs extends AbstractExternalRestWs
 	@Operation(summary = "Route the document to the unclaimed inbox")
 	public RestResponse<Integer> postDocument(@PathParam("documentId") Integer documentId)
 	{
-		try
-		{
-			String providerNoStr = getOAuthProviderNo();
-			String ip = getHttpServletRequest().getRemoteAddr();
+		String providerNoStr = getOAuthProviderNo();
+		String ip = getHttpServletRequest().getRemoteAddr();
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_edoc");
 
-			documentService.routeToGeneralInbox(documentId);
-			LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
-					String.valueOf(documentId), ip);
-		}
-		catch(Exception e)
-		{
-			logger.error("Error", e);
-			return RestResponse.errorResponse("System Error");
-		}
+		documentService.routeToGeneralInbox(documentId);
+		LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+				String.valueOf(documentId), ip);
+
 		return RestResponse.successResponse(documentId);
 	}
 	@POST
@@ -153,20 +121,14 @@ public class DocumentWs extends AbstractExternalRestWs
 	public RestResponse<Integer> postDocument(@PathParam("documentId") Integer documentId,
 	                                          @PathParam("providerId") Integer providerId)
 	{
-		try
-		{
-			String providerNoStr = getOAuthProviderNo();
-			String ip = getHttpServletRequest().getRemoteAddr();
+		String providerNoStr = getOAuthProviderNo();
+		String ip = getHttpServletRequest().getRemoteAddr();
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_edoc");
 
-			documentService.routeToProviderInbox(documentId, providerId);
-			LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
-					String.valueOf(documentId), ip);
-		}
-		catch(Exception e)
-		{
-			logger.error("Error", e);
-			return RestResponse.errorResponse("System Error");
-		}
+		documentService.routeToProviderInbox(documentId, providerId);
+		LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+				String.valueOf(documentId), ip);
+
 		return RestResponse.successResponse(documentId);
 	}
 }

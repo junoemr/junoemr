@@ -84,7 +84,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		String providerNoStr = getOAuthProviderNo();
 		int providerNo = Integer.parseInt(providerNoStr);
 
-		securityInfoManager.requiresPrivilege(providerNoStr, "_demographic", SecurityInfoManager.READ, demographicNo);
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.READ, demographicNo, "_demographic");
 		DemographicTransferOutbound demographicTransfer = demographicService.getDemographicTransferOutbound(providerNoStr, demographicNo);
 
 		LogAction.addLogEntry(providerNoStr, demographicTransfer.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
@@ -101,7 +101,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	                                                                @Valid DemographicTransferInbound demographicTo)
 	{
 		String providerNoStr = getOAuthProviderNo();
-		securityInfoManager.requiresPrivilege(providerNoStr, "_demographic", SecurityInfoManager.WRITE, demographicNo);
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, demographicNo, "_demographic");
 
 		return RestResponse.errorResponse("Not Implemented");
 	}
@@ -119,7 +119,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		int providerNo = Integer.parseInt(providerNoStr);
 		String ip = getHttpServletRequest().getRemoteAddr();
 
-		securityInfoManager.requiresPrivilege(providerNoStr, "_demographic", SecurityInfoManager.WRITE, null);
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_demographic");
 		Demographic demographic = demographicService.addNewDemographicRecord(providerNoStr, demographicTo);
 
 		// log the action and update the access record
@@ -137,6 +137,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	{
 		String providerNoStr = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, demographicId, "_demographic", "_edoc");
 
 		documentService.assignDocumentToDemographic(documentId, demographicId);
 		LogAction.addLogEntry(providerNoStr, demographicId, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
@@ -155,6 +156,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		String providerNoStr = getOAuthProviderNo();
 		int providerNo = Integer.parseInt(providerNoStr);
 		String ip = getHttpServletRequest().getRemoteAddr();
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, demographicId, "_demographic", "_eform");
 
 		EFormData eForm = eFormService.saveNewEForm(transfer.getTemplateId(), demographicId, providerNo,
 				transfer.getSubject(), new HashMap<>(), transfer.getFormValues(), null);

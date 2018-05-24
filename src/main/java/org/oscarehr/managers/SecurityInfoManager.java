@@ -198,21 +198,18 @@ public class SecurityInfoManager {
 		return true;
 	}
 
-	public void requiresPrivilege(String providerNo, String objectName, String privilege, Integer demographicNo)
-	{
-		if(!hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
-		{
-			throw new SecurityException("missing required privilege: " + privilege + " for security object (" + objectName + ")");
-		}
-	}
-	public void requiresAllPrivledges(String providerNo, List<String> requiredObjList, String privilege, Integer demographicNo)
+	public void requireAllPrivilege(String providerNo, String privilege, Integer demographicNo, String... requiredObjList)
 	{
 		for(String objectName:requiredObjList)
 		{
-			requiresPrivilege(providerNo, objectName, privilege, demographicNo);
+			if(!hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
+			{
+				throw new SecurityException("missing required privilege: " + privilege + " for security object (" + objectName + ")");
+			}
 		}
 	}
-	public void requiresOneOfPrivledges(String providerNo, List<String> requiredObjList, String privilege, Integer demographicNo)
+
+	public void requireOnePrivilege(String providerNo, String privilege, Integer demographicNo, String... requiredObjList)
 	{
 		for(String objectName:requiredObjList)
 		{
@@ -222,5 +219,6 @@ public class SecurityInfoManager {
 			}
 		}
 		throw new SecurityException("missing one or more required privileges: " + privilege + " for security objects (" + String.join(",", requiredObjList) + ")");
+
 	}
 }

@@ -38,6 +38,12 @@ public class MissingArgumentException extends RuntimeException
 	{
 		this(message, new HashMap<>());
 	}
+	public MissingArgumentException(String message, String argument, String reason)
+	{
+		this(message, new HashMap<>());
+		addMissingArgument(argument, reason);
+	}
+
 	public MissingArgumentException(Map<String,String> missingArgumentMap)
 	{
 		this(null, missingArgumentMap);
