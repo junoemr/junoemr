@@ -464,7 +464,19 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 	}
 
 	private void addSignature(PdfPTable parentTable) {
-		String filePath = String.format("%sdoctor_signature_%s.png", props.getProperty("eform_image",""), reqFrm.providerNo);
+		String filePath;
+		if (props.isPropertyActive("referring_prac_signature_with_cpsid"))
+		{
+			ProviderDao proDAO = (ProviderDao) SpringUtils.getBean("providerDao");
+			org.oscarehr.common.model.Provider pro = proDAO.getProvider(reqFrm.providerNo);
+
+			String CPSID = pro.getPractitionerNo();
+			filePath = String.format("%sdoctor_signature_%s.png", props.getProperty("eform_image", ""), CPSID);
+		} else
+		{
+			filePath = String.format("%sdoctor_signature_%s.png", props.getProperty("eform_image", ""), reqFrm.providerNo);
+		}
+
 
 		File file = new File(filePath);
 		if(!file.exists() || !file.isFile())
