@@ -129,8 +129,6 @@ public class DemographicsWs extends AbstractExternalRestWs
 		searchQuery.setChartNo(chartNo);
 		searchQuery.setPhone(phone);
 		searchQuery.setProviderNo(searchProviderNo);
-		searchQuery.setIntegrator(false);
-		searchQuery.setOutOfDomain(true);
 
 		page = validPageNo(page);
 		perPage = limitedResultCount(perPage);
@@ -138,11 +136,20 @@ public class DemographicsWs extends AbstractExternalRestWs
 
 		searchQuery.setOffset(offset);
 		searchQuery.setLimit(perPage);
-		searchQuery.setExactMatch(exactMatch);
 
 		searchQuery.setSortDir(DemographicCriteriaSearch.SORTDIR.asc);
-		searchQuery.setSortMode(DemographicCriteriaSearch.SORTMODE.DemographicName);
+		searchQuery.setSortMode(DemographicCriteriaSearch.SORTMODE.DemographicNo);
 		searchQuery.setStatusMode(DemographicCriteriaSearch.STATUSMODE.all);
+		searchQuery.setCustomWildcardsEnabled(false);
+
+		if(exactMatch)
+		{
+			searchQuery.setMatchModeExact();
+		}
+		else
+		{
+			searchQuery.setMatchModeStart();
+		}
 
 		int totalResultCount = demographicDao.criteriaSearchCount(searchQuery);
 

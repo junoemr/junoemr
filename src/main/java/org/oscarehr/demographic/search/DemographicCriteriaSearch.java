@@ -35,7 +35,8 @@ import java.time.LocalDate;
 
 public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 {
-	public enum SORTMODE {
+	public enum SORTMODE
+	{
 		DemographicNo,
 		DemographicName,
 		Phone,
@@ -46,13 +47,17 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		ProviderName
 	}
 
-	public enum STATUSMODE {
+	public enum STATUSMODE
+	{
 		all, active, inactive, deceased
 	}
 
-	public enum SORTDIR {
-		asc,desc
+	public enum SORTDIR
+	{
+		asc, desc
 	}
+
+	private MatchMode matchMode = MatchMode.START;
 
 	private Integer DemographicNo;
 	private String hin;
@@ -64,21 +69,15 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private String chartNo;
 	private String sex;
 	private String providerNo;
-	private String providerFirstName;
-	private String providerLastName;
-
-	private boolean integrator = false;
-	private boolean outOfDomain = false;
-	private boolean exactMatch = false;
 
 	private SORTMODE sortMode = SORTMODE.DemographicNo;
 	private SORTDIR sortDir = SORTDIR.asc;
 	private STATUSMODE statusMode = STATUSMODE.all;
+	private boolean customWildcardsEnabled = false;
 
 	@Override
 	public Criteria setCriteriaProperties(Criteria criteria)
 	{
-		boolean exactMatching = isExactMatch();
 		String alias = criteria.getAlias();
 
 		// left join demographic merged and only return the result if it isn't merged
@@ -88,20 +87,22 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		// set the search filters
 		if(getDemographicNo() != null)
 		{
-			criteria.add(Restrictions.eq("demographicId", getDemographicNo()));
+			criteria.add(getRestrictionCriterion("demographicId", String.valueOf(getDemographicNo())));
 		}
 		if(getFirstName() != null)
 		{
-			criteria.add(getRestrictionCriterion("firstName", getFirstName(), exactMatching, MatchMode.START));
+			criteria.add(getRestrictionCriterion("firstName", getFirstName()));
 		}
 		if(getLastName() != null)
 		{
-			criteria.add(getRestrictionCriterion("lastName", getLastName(), exactMatching, MatchMode.START));
+			criteria.add(getRestrictionCriterion("lastName", getLastName()));
 		}
 		if(getHin() != null)
 		{
-			criteria.add(getRestrictionCriterion("hin", getHin(), exactMatching, MatchMode.START));
+			criteria.add(getRestrictionCriterion("hin", getHin()));
 		}
+
+		// birthdate searches are always exact due to how the values are stored
 		if(getDateOfBirth() != null)
 		{
 			criteria.add(Restrictions.eq("dayOfBirth", String.valueOf(getDateOfBirth().getDayOfMonth())));
@@ -111,30 +112,48 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 
 		if(getAddress() != null)
 		{
-			criteria.add(getRestrictionCriterion("address", getAddress(), exactMatching, MatchMode.ANYWHERE));
+			criteria.add(getRestrictionCriterion("address", getAddress()));
 		}
 		if(getPhone() != null)
 		{
-			criteria.add(getRestrictionCriterion("phone", getPhone(), exactMatching, MatchMode.ANYWHERE));
-			criteria.add(getRestrictionCriterion("phone2", getPhone(), exactMatching, MatchMode.ANYWHERE));
+			criteria.add(getRestrictionCriterion("phone", getPhone()));
+			criteria.add(getRestrictionCriterion("phone2", getPhone()));
 		}
 		if(getChartNo() != null)
 		{
-			criteria.add(getRestrictionCriterion("chartNo", getChartNo(), exactMatching, MatchMode.START));
+			criteria.add(getRestrictionCriterion("chartNo", getChartNo()));
 		}
 		if(getSex() != null)
 		{
-			criteria.add(getRestrictionCriterion("sex", getSex(), exactMatching, MatchMode.START));
+			criteria.add(getRestrictionCriterion("sex", getSex()));
 		}
 		if(getProviderNo() != null)
 		{
-			criteria.add(Restrictions.eq("providerNo", getProviderNo()));
+			criteria.add(getRestrictionCriterion("providerNo", getProviderNo()));
 		}
 
 		// set status filters and result ordering
 		setStatusCriteria(criteria);
 		setOrderByCriteria(criteria);
 		return criteria;
+	}
+
+	private Criterion getRestrictionCriterion(String propertyName, String value)
+	{
+		MatchMode matchMode = this.matchMode;
+		if(customWildcardsEnabled)
+		{
+			// convert the * character to a wildcard for mysql
+			value = value.replaceAll("\\*", "%");
+			matchMode = MatchMode.EXACT;
+		}
+		else
+		{
+			// escape mysql wildcard characters for literal search
+			value = value.replaceAll("%", "\\\\%");
+			value = value.replaceAll("_", "\\\\_");
+		}
+		return Restrictions.ilike(propertyName, value, matchMode);
 	}
 
 	private void setStatusCriteria(Criteria criteria)
@@ -173,15 +192,6 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private Order getOrder(String propertyName)
 	{
 		return (SORTDIR.asc.equals(sortDir))? Order.asc(propertyName) : Order.desc(propertyName);
-	}
-
-	private Criterion getRestrictionCriterion(String propertyName, String value, boolean exactMatch, MatchMode matchMode)
-	{
-		if(exactMatch)
-		{
-			return Restrictions.eq(propertyName, value);
-		}
-		return Restrictions.ilike(propertyName, value, matchMode);
 	}
 
 	public Integer getDemographicNo()
@@ -284,56 +294,6 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		this.providerNo = providerNo;
 	}
 
-	public String getProviderFirstName()
-	{
-		return providerFirstName;
-	}
-
-	public void setProviderFirstName(String providerFirstName)
-	{
-		this.providerFirstName = providerFirstName;
-	}
-
-	public String getProviderLastName()
-	{
-		return providerLastName;
-	}
-
-	public void setProviderLastName(String providerLastName)
-	{
-		this.providerLastName = providerLastName;
-	}
-
-	public boolean isIntegrator()
-	{
-		return integrator;
-	}
-
-	public void setIntegrator(boolean integrator)
-	{
-		this.integrator = integrator;
-	}
-
-	public boolean isOutOfDomain()
-	{
-		return outOfDomain;
-	}
-
-	public void setOutOfDomain(boolean outOfDomain)
-	{
-		this.outOfDomain = outOfDomain;
-	}
-
-	public boolean isExactMatch()
-	{
-		return exactMatch;
-	}
-
-	public void setExactMatch(boolean exactMatch)
-	{
-		this.exactMatch = exactMatch;
-	}
-
 	public SORTMODE getSortMode()
 	{
 		return sortMode;
@@ -362,5 +322,70 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	public void setStatusMode(STATUSMODE statusMode)
 	{
 		this.statusMode = statusMode;
+	}
+
+	public MatchMode getMatchMode()
+	{
+		return matchMode;
+	}
+
+	public boolean isCustomWildcardsEnabled()
+	{
+		return customWildcardsEnabled;
+	}
+
+	/**
+	 * Enable custom wildcard use in search strings. Enabling this forces the search matching to EXACT mode.
+	 * @param customWildcardsEnabled - true to enable custom wildcard use, false otherwise
+	 */
+	public void setCustomWildcardsEnabled(boolean customWildcardsEnabled)
+	{
+		this.customWildcardsEnabled = customWildcardsEnabled;
+	}
+
+	/**
+	 * Set the query keyword matching mode.
+	 * When custom wildcards are enabled searches will always use EXACT
+	 * @param matchMode - match mode
+	 */
+	private void setMatchMode(MatchMode matchMode)
+	{
+		this.matchMode = matchMode;
+	}
+
+	/**
+	 * Set the query keyword matching mode to match anywhere in the search string.
+	 * When custom wildcards are enabled searches will always use EXACT
+	 */
+	public void setMatchModeAnywhere()
+	{
+		setMatchMode(MatchMode.ANYWHERE);
+	}
+
+	/**
+	 * Set the query keyword matching mode to exact matching.
+	 * When custom wildcards are enabled searches will always use EXACT
+	 */
+	public void setMatchModeExact()
+	{
+		setMatchMode(MatchMode.EXACT);
+	}
+
+	/**
+	 * Set the query keyword matching mode to anything starting with the search string.
+	 * When custom wildcards are enabled searches will always use EXACT
+	 */
+	public void setMatchModeStart()
+	{
+		setMatchMode(MatchMode.START);
+	}
+
+	/**
+	 * Set the query keyword matching mode to anything ending with the search string.
+	 * When custom wildcards are enabled searches will always use EXACT
+	 */
+	public void setMatchModeEnd()
+	{
+		setMatchMode(MatchMode.END);
 	}
 }
