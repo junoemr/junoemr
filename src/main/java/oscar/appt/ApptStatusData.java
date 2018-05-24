@@ -95,8 +95,16 @@ public final class ApptStatusData {
 
 
 	public String getImageName() {
+		String baseIcon;
 		// icon images exists for all statuses including up to 11 custom statuses
-		String baseIcon = statusData.getIcon();
+		if(statusData != null)
+		{
+			baseIcon = statusData.getIcon();
+		}
+		else
+		{
+			return null;
+		}
 		String status = apptStatus;
 		String returnIcon = baseIcon;
 
@@ -153,7 +161,14 @@ public final class ApptStatusData {
 	 */
 	public String getTitleString(Locale locale) {
 		ResourceBundle bundle = ResourceBundle.getBundle("oscarResources", locale);
-		String status = statusData.getStatus();
+		String status;
+		if(statusData != null)
+		{
+			status = statusData.getStatus();
+		}
+		else {
+			return null;
+		}
 		String localeTitle = getTitle();
 
 		if(bundle != null && !strEditable.equalsIgnoreCase("yes")) {
@@ -166,7 +181,13 @@ public final class ApptStatusData {
 	}
 
 	public String getBgColor() {
-		return statusData.getColor();
+		if (statusData == null)
+		{
+			return "#000000";
+		} else
+		{
+			return statusData.getColor();
+		}
 	}
 
 	/**
