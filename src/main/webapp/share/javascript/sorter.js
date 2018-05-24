@@ -238,7 +238,12 @@ $(document).ready(function() {
 				$("#tool_savecontinue span").html("Save &amp; Continue");
 				opener.refreshView();				
 				return false;
-			}
+			},
+			error:
+				function(XMLHttpRequest, textStatus, errorThrown){
+					alert("Failed to split document");
+					$("#tool_savecontinue span").html("Save &amp; Continue");
+				}
 		});
 	});
 	
