@@ -1217,8 +1217,8 @@
 	</databaseap>
 	<databaseap>
 		<ap-name>bc_referral_address</ap-name>
-		<ap-sql>SELECT CONCAT( b.address1, IF( b.address1 ='', '', '\n' ),
-			b.address2, IF( b.address2 ='', '', '\n' ) , b.city, ' ', b.province,
+		<ap-sql>SELECT CONCAT( COALESCE(b.address1, ''), IF( COALESCE(b.address1, '') ='', '', '\n' ),
+			COALESCE(b.address2, ''), IF( COALESCE(b.address2, '') ='', '', '\n' ) , b.city, ' ', b.province,
 			' ', b.postal ) AS raddress
 			FROM billingreferral b, demographic d
 			WHERE d.demographic_no=${demographic}
