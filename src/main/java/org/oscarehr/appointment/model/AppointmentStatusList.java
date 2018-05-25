@@ -89,50 +89,61 @@ public class AppointmentStatusList
 
 	public String getStatusAfter(String status)
 	{
-		String statusChar = status.substring(0, 1);
-		int currentStatusIndex = orderedStatusList.indexOf(statusChar);
-
-		// Return current status if not found
-		if(currentStatusIndex < 0)
+		if (status == null)
 		{
-			return status;
+			return null;
+		} else
+		{
+			String statusChar = status.substring(0, 1);
+			int currentStatusIndex = orderedStatusList.indexOf(statusChar);
+
+			// Return current status if not found
+			if (currentStatusIndex < 0)
+			{
+				return status;
+			}
+
+			int nextStatusIndex = (currentStatusIndex + 1) % orderedStatusList.size();
+
+			return orderedStatusList.get(nextStatusIndex) + getModifierChar(status);
 		}
-
-		int nextStatusIndex = (currentStatusIndex + 1) % orderedStatusList.size();
-
-		return orderedStatusList.get(nextStatusIndex) + getModifierChar(status);
 	}
 
 	public String getTitle(String status, Locale locale)
 	{
-		String statusChar = status.substring(0, 1);
-		String modifierChar = getModifierChar(status);
-
-		String title = "";
-
-		ResourceBundle bundle = ResourceBundle.getBundle("oscarResources", locale);
-
-		if(bundle != null && !editable && titleMap.containsKey(statusChar))
+		if (status == null)
 		{
-			title = bundle.getString(titleMap.get(statusChar));
-		}
-		else if(descriptionMap.containsKey(statusChar))
+			return null;
+		} else
 		{
-			title = descriptionMap.get(statusChar);
+			String statusChar = status.substring(0, 1);
+			String modifierChar = getModifierChar(status);
 
-			if(!"".equals(modifierChar))
+			String title = "";
+
+			ResourceBundle bundle = ResourceBundle.getBundle("oscarResources", locale);
+
+			if (bundle != null && !editable && titleMap.containsKey(statusChar))
 			{
-				if(STATUS_SIGNED.equals(modifierChar))
+				title = bundle.getString(titleMap.get(statusChar));
+			} else if (descriptionMap.containsKey(statusChar))
+			{
+				title = descriptionMap.get(statusChar);
+
+				if (!"".equals(modifierChar))
 				{
-					title += "/Signed";
-				}
-				else{
-					title += "/Verified";
+					if (STATUS_SIGNED.equals(modifierChar))
+					{
+						title += "/Signed";
+					} else
+					{
+						title += "/Verified";
+					}
 				}
 			}
-		}
 
-		return title;
+			return title;
+		}
 	}
 
 	private String getModifierChar(String status)

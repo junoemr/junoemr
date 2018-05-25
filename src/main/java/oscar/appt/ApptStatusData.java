@@ -183,7 +183,7 @@ public final class ApptStatusData {
 	public String getBgColor() {
 		if (statusData == null)
 		{
-			return "#000000";
+			return null;
 		} else
 		{
 			return statusData.getColor();

@@ -606,6 +606,9 @@ public boolean isBirthday(String schedDate,String demBday){
 				padding-top:17px;
 			}
 			<% } %>
+			.appt.noStatus a {
+				color: #FFFFFF;
+			}
 		</style>
 
 		<%
@@ -1814,7 +1817,7 @@ public boolean isBirthday(String schedDate,String demBday){
 	 //multi-site. if a site have been selected, only display appointment in that site
 	 if (!bMultisites || (selectedSite == null && CurrentSiteMap.get(sitename) != null) || sitename.equals(selectedSite)) {
 %>
-															<td class="appt" bgcolor='<%=apptStatusData.getBgColor()%>' rowspan="<%=iRows%>" <%-- =view==0?(len==lenLimitedL?"nowrap":""):"nowrap"--%> nowrap>
+															<td class="appt <%=apptStatusData.getBgColor()==null?"noStatus":""%>" bgcolor='<%=apptStatusData.getBgColor()%>' rowspan="<%=iRows%>" <%-- =view==0?(len==lenLimitedL?"nowrap":""):"nowrap"--%> nowrap>
 																<%
 																	if (BookingSource.MYOSCAR_SELF_BOOKING == appointment.getBookingSource())
 																	{

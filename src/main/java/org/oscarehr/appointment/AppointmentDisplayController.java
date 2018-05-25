@@ -187,7 +187,13 @@ public class AppointmentDisplayController
 
 	public boolean isBilled()
 	{
-		return (appointment.getStatus().equals(BILLED_STATUS));
+		if (appointment.getStatus() == null)
+		{
+			return false;
+		} else
+		{
+			return (appointment.getStatus().equals(BILLED_STATUS));
+		}
 	}
 
 	public boolean isShowDocumentLink()
@@ -271,13 +277,18 @@ public class AppointmentDisplayController
 	{
 		String iconImage = appointment.getIconImage();
 		String status = appointment.getStatus();
-
-		if(status.length() >= 2)
+		if (status == null)
 		{
-			iconImage = status.substring(1,2) + iconImage;
-		}
+			return null;
+		} else
+		{
+			if (status.length() >= 2)
+			{
+				iconImage = status.substring(1, 2) + iconImage;
+			}
 
-		return iconImage;
+			return iconImage;
+		}
 	}
 
 	public String getStatusTitle()

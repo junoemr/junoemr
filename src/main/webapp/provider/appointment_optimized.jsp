@@ -707,6 +707,9 @@ private long getAppointmentRowSpan(
 			padding-top:17px;
 		}
 		<% } %>
+		.appt.noStatus a {
+			color: #FFFFFF;
+		}
 	</style>
 
 
@@ -1632,7 +1635,7 @@ private long getAppointmentRowSpan(
 
 											%>
 
-											<td class="appt" bgcolor='<%= appointment.getColor() %>' rowspan="<%= appointmentRowSpan %>" nowrap>
+											<td class="appt <%=appointment.getColor()==null?"noStatus":""%>" bgcolor='<%= appointment.getColor() %>' rowspan="<%= appointmentRowSpan %>" nowrap>
 
 												<!-- Self booking notice -->
 												<c:if test="${appointmentInfo.selfBooked}">
