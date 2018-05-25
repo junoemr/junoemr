@@ -274,19 +274,17 @@ public class EFormDataDao extends AbstractDao<EFormData>
 	 * @param current can be null for both
 	 * @return list of maps
 	 */
-	public List<Map<String, Object>> findByDemographicIdCurrentNoData(Integer demographicId, Boolean current) {
+	public List<Map<String, Object>> findByDemographicIdCurrentNoData(Integer demographicId, Boolean current)
+	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("select new map(x.id as id, x.formId as formId, x.formName as formName, x.subject as subject, x.demographicId as demographicId, x.current as current, x.formDate as formDate, x.formTime as formTime, x.providerNo as providerNo, x.patientIndependent as patientIndependent, x.roleType as roleType) from ");
-		sb.append(modelClass.getSimpleName());
-		sb.append(" x where x.demographicId=?1");
-		sb.append(" and x.patientIndependent=false");
+		sb.append("SELECT new map(x.id as id, x.formId as formId, x.formName as formName, x.subject as subject, x.demographicId as demographicId, x.current as current, x.formDate as formDate, x.formTime as formTime, x.providerNo as providerNo, x.patientIndependent as patientIndependent, x.roleType as roleType) ");
+		sb.append("FROM " + modelClass.getSimpleName() + " x LEFT OUTER JOIN x.eFormInstance i ");
+		sb.append("WHERE x.demographicId= :demographicNo ");
+		sb.append("AND x.patientIndependent=false ");
 
-		int counter = 2;
-
-		if (current != null) {
-			sb.append(" and x.current=?");
-			sb.append(counter);
-			counter++;
+		if(current != null)
+		{
+			sb.append("AND ((i IS NULL AND x.current = :current) OR (i.deleted = :deleted)) ");
 		}
 
 		String sqlCommand = sb.toString();
@@ -294,13 +292,12 @@ public class EFormDataDao extends AbstractDao<EFormData>
 		logger.debug("SqlCommand=" + sqlCommand);
 
 		Query query = entityManager.createQuery(sqlCommand);
-		query.setParameter(1, demographicId);
+		query.setParameter("demographicNo", demographicId);
 
-		counter = 2;
-
-		if (current != null) {
-			query.setParameter(counter, current);
-			counter++;
+		if(current != null)
+		{
+			query.setParameter("current", current);
+			query.setParameter("deleted", !current);
 		}
 
 		@SuppressWarnings("unchecked")
