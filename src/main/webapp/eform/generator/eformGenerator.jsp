@@ -2395,8 +2395,8 @@
 					};
 					// initialize the signature pad
 					var signPad = new SignaturePad(canvas, {
-						minWidth: 2,
-						maxWidth: 4,
+						minWidth: 1,
+						maxWidth: 2,
 						onEnd: function () {
 							$this.trigger("signatureChange");
 						}
