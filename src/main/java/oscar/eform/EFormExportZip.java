@@ -53,8 +53,10 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.eform.service.EFormTemplateService;
 import org.oscarehr.util.MiscUtils;
 
+import org.oscarehr.util.SpringUtils;
 import oscar.eform.actions.DisplayImageAction;
 import oscar.eform.data.EForm;
 import oscar.eform.upload.ImageUploadAction;
@@ -65,6 +67,8 @@ import oscar.eform.upload.ImageUploadAction;
  */
 public class EFormExportZip {
     private static final Logger _log = MiscUtils.getLogger();
+
+    private EFormTemplateService eFormTemplateService = SpringUtils.getBean(EFormTemplateService.class);
 
     public void exportForms(List<EForm> eForms, OutputStream os) throws IOException, Exception {
         ZipOutputStream zos = new ZipOutputStream(os);
@@ -92,6 +96,7 @@ public class EFormExportZip {
             if (eForm.getFormDate()!=null && !eForm.getFormDate().equals("")) properties.setProperty("form.date", eForm.getFormDate());
             if (eForm.isShowLatestFormOnly()) properties.setProperty("form.showLatestFormOnly", "true");
             if (eForm.isPatientIndependent()) properties.setProperty("form.patientIndependent", "true");
+	        if (eForm.isInstanced()) properties.setProperty("form.instanced", "true");
 
             //write properties file
             ZipEntry propertiesZipEntry = new ZipEntry(directoryName + "eform.properties");
@@ -255,7 +260,9 @@ public class EFormExportZip {
         //write constructed eforms
         for (EForm eform: eformTable.values()) {
             _log.info("New eform: " + eform.getFormName());
-            EFormUtil.saveEForm(eform);
+
+            eFormTemplateService.addEFormTemplate(eform.getFormName(), eform.getFormSubject(), eform.getFormFileName(), eform.getFormHtml(),
+		            eform.getProviderNo(), eform.isShowLatestFormOnly(), eform.isPatientIndependent(), eform.isInstanced(), eform.getRoleType());
         }
         deleteDirectory(imageTempFolderDir);
         return errors;
@@ -278,6 +285,7 @@ public class EFormExportZip {
         eForm.setFormDate(properties.getProperty("form.date"));
         eForm.setShowLatestFormOnly(Boolean.valueOf(properties.getProperty("form.showLatestFormOnly")));
 		eForm.setPatientIndependent(Boolean.valueOf(properties.getProperty("form.patientIndependent")));
+		eForm.setInstanced(Boolean.valueOf(properties.getProperty("form.instanced")));
         return eForm;
     }
 

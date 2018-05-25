@@ -155,6 +155,7 @@ public class EForm extends EFormBase {
 		this.demographicNo = demographicNo;
 		this.showLatestFormOnly = (Boolean)loaded.get("showLatestFormOnly");
 		this.patientIndependent = (Boolean)loaded.get("patientIndependent");
+		this.instanced = (Boolean)loaded.get("instanced");
 		this.roleType = (String) loaded.get("roleType");
 	}
 

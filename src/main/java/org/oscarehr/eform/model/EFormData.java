@@ -236,6 +236,14 @@ public class EFormData extends AbstractModel<Integer> implements Serializable {
 		this.eFormInstance = eFormInstance;
 	}
 
+	/**
+	 * must be run in a transaction or it will always be false.
+	 */
+	public boolean isInstanced()
+	{
+		return (getEFormInstance() != null);
+	}
+
 	@PreRemove
 	protected void jpa_preventDelete()
 	{

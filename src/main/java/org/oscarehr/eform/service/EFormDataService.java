@@ -75,17 +75,19 @@ public class EFormDataService
 		{
 			throw new IllegalArgumentException("No FormData found for fdid " + oldFormDataId);
 		}
-		EForm template = getEFormTemplate(oldVersion.getFormId());
 		EFormData newVersion = copyFromEFormData(oldVersion);
 
-		return saveEForm(newVersion, template, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
+		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
 	}
 	public EFormData saveNewEForm(Integer templateId, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
 		logger.info("Save New EForm (template id " + templateId + ")");
 		EForm template = getEFormTemplate(templateId);
 		EFormData newVersion = copyFromTemplate(template);
-		return saveEForm(newVersion, template, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
+		// must have a persisted instance in order to save the id
+		newVersion.setEFormInstance(getNewPersistedEFormInstance(template));
+
+		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
 	}
 
 	/**
@@ -109,9 +111,8 @@ public class EFormDataService
 	private void flagAsDeleted(Integer formDataId, boolean deleted)
 	{
 		EFormData eForm = eFormDataDao.find(formDataId);
-		EForm template = getEFormTemplate(eForm.getFormId());
 
-		EFormInstance instance = getPersistedEFormInstance(template, eForm);
+		EFormInstance instance = eForm.getEFormInstance();
 		// instanced eForms use the instanced table deleted flag. regular eForms use the "status" isCurrent flag
 		if(instance != null)
 		{
@@ -149,7 +150,7 @@ public class EFormDataService
 	/**
 	 * Handle all of the major eForm creation logic. save an eForm data model for a demographic.
 	 */
-	private EFormData saveEForm(EFormData eForm, EForm template, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	private EFormData saveEForm(EFormData eForm, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
 		Date currentDate = new Date();
 		eForm.setFormDate(currentDate);
@@ -191,14 +192,10 @@ public class EFormDataService
 
 		// must update the html after running the image/action etc. changes on curForm
 		eForm.setFormData(curForm.getFormHtml());
-
-		// must have a persisted instance in order to save the id
-		EFormInstance eFormInstance = getPersistedEFormInstance(template, eForm);
-		eForm.setEFormInstance(eFormInstance);
-
 		eFormDataDao.persist(eForm);
 
 		// now that the eForm data is persisted, update the id in the instance table;
+		EFormInstance eFormInstance = eForm.getEFormInstance();
 		if(eFormInstance != null)
 		{
 			eFormInstance.setCurrentEFormData(eForm);
@@ -231,23 +228,18 @@ public class EFormDataService
 	}
 
 	/**
-	 * get an existing eForm instance model, or create a new one.
-	 * new models get persisted to ensure the id exists
+	 * create a new eForm instance model. new models get persisted to ensure the id exists
 	 * @return the persisted model object, or null if the template is not flagged as an instanced eForm.
 	 */
-	private EFormInstance getPersistedEFormInstance(EForm eFormTemplate, EFormData eForm)
+	private EFormInstance getNewPersistedEFormInstance(EForm eFormTemplate)
 	{
 		EFormInstance eFormInstance = null;
 		if(eFormTemplate.isInstanced())
 		{
-			eFormInstance = eForm.getEFormInstance();
-			if(eFormInstance == null)
-			{
-				eFormInstance = new EFormInstance();
-				eFormInstance.setCreatedAt(new Date());
-				eFormInstance.setEFormTemplate(eFormTemplate);
-				eFormInstanceDao.persist(eFormInstance);
-			}
+			eFormInstance = new EFormInstance();
+			eFormInstance.setCreatedAt(new Date());
+			eFormInstance.setEFormTemplate(eFormTemplate);
+			eFormInstanceDao.persist(eFormInstance);
 		}
 		return eFormInstance;
 	}
