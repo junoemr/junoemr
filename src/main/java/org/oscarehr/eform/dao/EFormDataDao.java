@@ -154,6 +154,33 @@ public class EFormDataDao extends AbstractDao<EFormData>
 		return query.getResultList();
 	}
 
+	public List<EFormData> findInstancedVersionsByDemographicId(Integer demographicId, Integer offset, Integer limit, boolean deleted)
+	{
+		String hql = "SELECT x FROM " + modelClass.getSimpleName() + " x " +
+				"INNER JOIN x.eFormInstance i " +
+				"WHERE x.demographicId = :demographicNo " +
+				"AND (i.deleted = :deleted) " +
+				"ORDER BY x.formName ASC, i.createdAt ASC, x.formDate ASC";
+
+		Query query = entityManager.createQuery(hql);
+		query.setParameter("demographicNo", demographicId);
+		query.setParameter("deleted", deleted);//status - is deleted
+
+		if(offset != null)
+		{
+			query.setFirstResult(offset);
+		}
+		if(limit != null)
+		{
+			query.setMaxResults(limit);
+		}
+
+		@SuppressWarnings("unchecked")
+		List<EFormData> results = query.getResultList();
+
+		return (results);
+	}
+
 
 	private String getOrderBy(String alias, String sortBy)
 	{

@@ -24,6 +24,7 @@
 package org.oscarehr.eform.model;
 
 import org.oscarehr.common.model.AbstractModel;
+import oscar.util.ConversionUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,7 +36,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 
@@ -150,20 +150,7 @@ public class EForm extends AbstractModel<Integer> implements Serializable {
 	}
 	public Date getFormDateTime()
 	{
-		Date date = getFormDate();
-		Date time = getFormTime();
-
-		Calendar calendarA = Calendar.getInstance();
-		calendarA.setTime(date);
-		Calendar calendarB = Calendar.getInstance();
-		calendarB.setTime(time);
-
-		calendarA.set(Calendar.HOUR_OF_DAY, calendarB.get(Calendar.HOUR_OF_DAY));
-		calendarA.set(Calendar.MINUTE, calendarB.get(Calendar.MINUTE));
-		calendarA.set(Calendar.SECOND, calendarB.get(Calendar.SECOND));
-		calendarA.set(Calendar.MILLISECOND, calendarB.get(Calendar.MILLISECOND));
-
-		return calendarA.getTime();
+		return ConversionUtils.combineDateAndTime(getFormDate(), getFormTime());
 	}
 
 	public void setFormTime(Date formTime) {

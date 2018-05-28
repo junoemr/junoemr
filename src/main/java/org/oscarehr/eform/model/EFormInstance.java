@@ -31,11 +31,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "eform_instance")
@@ -53,6 +55,9 @@ public class EFormInstance extends AbstractModel<Long>
 	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="current_eform_data_id")
 	private EFormData currentEFormData;
+
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "eFormInstance")
+	private List<EFormData> eFormDataList;
 
 	@Column(name = "created_at")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -85,6 +90,16 @@ public class EFormInstance extends AbstractModel<Long>
 	public void setCurrentEFormData(EFormData currentEFormData)
 	{
 		this.currentEFormData = currentEFormData;
+	}
+
+	public List<EFormData> getEFormDataList()
+	{
+		return eFormDataList;
+	}
+
+	public void setEFormDataList(List<EFormData> eFormDataList)
+	{
+		this.eFormDataList = eFormDataList;
 	}
 
 	public Date getCreatedAt()

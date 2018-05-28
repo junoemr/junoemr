@@ -35,13 +35,16 @@ import org.oscarehr.eform.model.EForm;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.model.EFormInstance;
 import org.oscarehr.eform.model.EFormValue;
+import org.oscarehr.eform.transfer.InstancedEFormListTransfer;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -145,6 +148,28 @@ public class EFormDataService
 	public boolean isLatestInstancedVersion(Integer eFormId)
 	{
 		return isLatestInstancedVersion(eFormDataDao.find(eFormId));
+	}
+
+	public List<InstancedEFormListTransfer> getInstancedEformsForDemographic(Integer demographicId, Integer offset, Integer limit)
+	{
+		List<EFormData> eFormDataList = eFormDataDao.findInstancedVersionsByDemographicId(demographicId, offset, limit, false);
+		List<InstancedEFormListTransfer> transferList = new ArrayList<>(eFormDataList.size());
+
+		//Convert to transfer objects
+		for(EFormData eForm : eFormDataList)
+		{
+			InstancedEFormListTransfer transfer = new InstancedEFormListTransfer();
+			transfer.setDemographicId(eForm.getDemographicId());
+			transfer.setFormDataId(eForm.getId());
+			transfer.setFormName(eForm.getFormName());
+			transfer.setFormSubject(eForm.getSubject());
+			Date legacyDateTime = ConversionUtils.combineDateAndTime(eForm.getFormDate(), eForm.getFormTime());
+			transfer.setFormDateTime(ConversionUtils.toLocalDateTime(legacyDateTime));
+			transfer.setInstanceCreationDateTime(ConversionUtils.toLocalDateTime(eForm.getEFormInstance().getCreatedAt()));
+
+			transferList.add(transfer);
+		}
+		return transferList;
 	}
 
 	/**

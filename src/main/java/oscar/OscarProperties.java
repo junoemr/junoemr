@@ -54,6 +54,7 @@ public class OscarProperties extends Properties {
 	private static final String INSTANCE_TYPE_ALBERTA = "AB";
 
 	private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+	private static final String DEFAULT_DATETIME_FORMAT = DEFAULT_DATE_FORMAT + " HH:mm:ss";
 
 	/* Do not use this constructor. Use getInstance instead */
 	private OscarProperties() {
@@ -204,19 +205,31 @@ public class OscarProperties extends Properties {
 	// Methods for getting specific property values
 	// =========================================================================
 
-	public String getDisplayDateFormat() {
+	public String getDisplayDateFormat()
+	{
+		return getDisplayDateFormat(getProperty("display_date_format"), DEFAULT_DATE_FORMAT);
+	}
 
-		String dateFormat;
+	public String getDisplayDateTimeFormat()
+	{
+		return getDisplayDateFormat(getProperty("display_datetime_format"), DEFAULT_DATETIME_FORMAT);
+	}
 
-		try {
-			dateFormat = getProperty("display_date_format");
-			SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-		} catch(NullPointerException | IllegalArgumentException e)  {
-			dateFormat = DEFAULT_DATE_FORMAT;
-			MiscUtils.getLogger().error("Error", e);
+	private String getDisplayDateFormat(String preferredFormat, String defaultFormat)
+	{
+		String dateTimeFormat;
+		try
+		{
+			dateTimeFormat = (preferredFormat != null)? preferredFormat : defaultFormat;
+			new SimpleDateFormat(dateTimeFormat);
+		}
+		catch(NullPointerException | IllegalArgumentException e)
+		{
+			dateTimeFormat = defaultFormat;
+			MiscUtils.getLogger().error("Invalid Date/Time display format", e);
 		}
 
-		return dateFormat;
+		return dateTimeFormat;
 	}
 
 	public Date getStartTime() {

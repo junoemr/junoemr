@@ -27,8 +27,10 @@ import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.eform.model.EFormInstance;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
+@Transactional
 public class EFormInstanceDao extends AbstractDao<EFormInstance>
 {
 	private static final Logger logger = MiscUtils.getLogger();

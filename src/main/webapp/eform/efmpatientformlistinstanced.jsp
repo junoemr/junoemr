@@ -25,27 +25,31 @@
 --%>
 
 <%
-if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.jsp");
-    String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-  
-  //int demographic_no = Integer.parseInt(request.getParameter("demographic_no")); 
-  String demographic_no = request.getParameter("demographic_no"); 
-  String deepColor = "#CCCCFF" , weakColor = "#EEEEFF" ;
+	if(session.getAttribute("userrole") == null) response.sendRedirect("../logout.jsp");
+	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+
+	EFormDataService eFormService = SpringUtils.getBean(EFormDataService.class);
+
+	//int demographic_no = Integer.parseInt(request.getParameter("demographic_no"));
+	String demographic_no = request.getParameter("demographic_no");
+	String deepColor = "#CCCCFF", weakColor = "#EEEEFF";
 %>
 
-<%@ page import="java.util.*, oscar.eform.*"%>
+<%@ page import="org.oscarehr.eform.service.EFormDataService"%>
+<%@ page import="org.oscarehr.eform.transfer.InstancedEFormListTransfer"%>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="java.util.List" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 
 <%
-String country = request.getLocale().getCountry();
-String orderByRequest = request.getParameter("orderby");
-String orderBy = "";
-if (orderByRequest == null) orderBy = EFormUtil.DATE;
-else if (orderByRequest.equals("form_subject")) orderBy = EFormUtil.SUBJECT;
-else if (orderByRequest.equals("form_name")) orderBy = EFormUtil.NAME;
 
-String appointment = request.getParameter("appointment");
-String parentAjaxId = request.getParameter("parentAjaxId");
+	String appointment = request.getParameter("appointment");
+	String parentAjaxId = request.getParameter("parentAjaxId");
+
+	DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(OscarProperties.getInstance().getDisplayDateTimeFormat());
+
 %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -77,7 +81,7 @@ function popupPage(varpage, windowname) {
 }
 
 function updateAjax() {
-    var parentAjaxId = "<%=parentAjaxId%>";    
+    var parentAjaxId = "<%=parentAjaxId%>";
     if( parentAjaxId != "null" ) {
         window.opener.document.forms['encForm'].elements['reloadDiv'].value = parentAjaxId;
         window.opener.updateNeeded = true;    
@@ -110,8 +114,8 @@ function updateAjax() {
 	</tr>
 	<tr>
 		<td class="MainTableLeftColumn" valign="top">
-                <a href="../demographic/demographiccontrol.jsp?demographic_no=<%=demographic_no%>&appointment=<%=appointment%>&displaymode=edit&dboperation=search_detail"><bean:message key="demographic.demographiceditdemographic.btnMasterFile" /></a>
-
+			<a href="../demographic/demographiccontrol.jsp?demographic_no=<%=demographic_no%>&appointment=<%=appointment%>&displaymode=edit&dboperation=search_detail">
+				<bean:message key="demographic.demographiceditdemographic.btnMasterFile"/></a>
 			<br>
 			<a href="efmformslistadd.jsp?demographic_no=<%=demographic_no%>&appointment=<%=appointment%>&parentAjaxId=<%=parentAjaxId%>" class="current">
 				<bean:message key="eform.showmyform.btnAddEForm"/></a><br/>
@@ -123,51 +127,65 @@ function updateAjax() {
 				<bean:message key="eform.showmyform.btnDeleted"/></a>
 			<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.eform" rights="r" reverse="<%=false%>">
 				<br/>
-                <a href="#" onclick="javascript: return popup(600, 1200, '../administration/?show=Forms', 'manageeforms');" style="color: #835921;"><bean:message key="eform.showmyform.msgManageEFrm"/></a>
-            </security:oscarSec>
+				<a href="#" onclick="javascript: return popup(600, 1200, '../administration/?show=Forms', 'manageeforms');" style="color: #835921;"><bean:message
+						key="eform.showmyform.msgManageEFrm"/></a>
+			</security:oscarSec>
 		</td>
 		
 		<td class="MainTableRightColumn" valign="top">
 		<table class="elements" width="100%">
 			<tr bgcolor=<%=deepColor%>>
-				<th><a
-					href="efmpatientformlistdeleted.jsp?demographic_no=<%=demographic_no%>&orderby=form_name&parentAjaxId=<%=parentAjaxId%>"><bean:message
-					key="eform.showmyform.btnFormName" /></a></th>
-				<th><a
-					href="efmpatientformlistdeleted.jsp?demographic_no=<%=demographic_no%>&orderby=form_subject&parentAjaxId=<%=parentAjaxId%>"><bean:message
-					key="eform.showmyform.btnSubject" /></a></th>
-				<th><a
-					href="efmpatientformlistdeleted.jsp?demographic_no=<%=demographic_no%>&parentAjaxId=<%=parentAjaxId%>"><bean:message
-					key="eform.showmyform.formDate" /></a></th>
-				<th><bean:message key="eform.showmyform.msgAction" /></th>
+				<th>
+					<bean:message key="eform.showmyform.btnFormName"/>
+				</th>
+				<th>
+					<bean:message key="eform.showmyform.btnSubject"/>
+				</th>
+				<th>
+					<bean:message key="eform.showmyform.formDate"/>
+				</th>
+				<th>
+					<bean:message key="eform.showmyform.formDateCreated"/>
+				</th>
 			</tr>
 			<%
-			ArrayList<HashMap<String, ? extends Object>> forms = EFormUtil.listPatientEForms(orderBy, EFormUtil.DELETED, demographic_no, null);
-			    for (int i=0; i< forms.size(); i++) {
-			    	HashMap<String, ? extends Object> curform = forms.get(i);
+				List<InstancedEFormListTransfer> transferList = eFormService.getInstancedEformsForDemographic(Integer.parseInt(demographic_no), null, null);
+
+				int i=0;
+				for(InstancedEFormListTransfer eForm : transferList)
+				{
 			%>
 			<tr bgcolor="<%= ((i%2) == 1)?"#F2F2F2":"white"%>">
-				<td><a href="#"
-					ONCLICK="popupPage('efmshowform_data.jsp?fdid=<%= curform.get("fdid")%>', '<%="FormPD" + i%>'); return false;"
-					TITLE="View Form"
-					onmouseover="window.status='View This Form'; return true"><%=curform.get("formName")%></a></td>
-				<td><%=curform.get("formSubject")%></td>
-				<td align='center'><%=curform.get("formDate")%></td>
-				<td align='center'><a
-					href="../eform/unRemoveEForm.do?fdid=<%=curform.get("fdid")%>&demographic_no=<%=demographic_no%>&parentAjaxId=<%=parentAjaxId%>" onClick="javascript: return confirm('Are you sure you want to restore this eform?');"><bean:message
-					key="global.btnRestore" /></a></td>
+				<td>
+					<a href="#"
+				       ONCLICK="popupPage('efmshowform_data.jsp?fdid=<%= eForm.getFormDataId()%>', '<%="FormPD" + i%>'); return false;"
+				       TITLE="View Form"
+				       onmouseover="window.status='View This Form'; return true"><%=eForm.getFormName()%>
+					</a>
+				</td>
+				<td>
+					<%=eForm.getFormSubject()%>
+				</td>
+				<td align='center'>
+					<%=eForm.getFormDateTime().format(dateTimeFormatter)%>
+				</td>
+				<td align='center'>
+					<%=eForm.getInstanceCreationDateTime().format(dateTimeFormatter)%>
+				</td>
 			</tr>
 			<%
-  }
- if (forms.size() <= 0) {
-%>
+					i++;
+				}
+				if(transferList.isEmpty())
+				{
+			%>
 			<tr>
 				<td align='center' colspan='5'><bean:message
-					key="eform.showmyform.msgNoData" /></td>
+						key="eform.showmyform.msgNoData"/></td>
 			</tr>
 			<%
-  }
-%>
+				}
+			%>
 		</table>
 		</td>
 	</tr>

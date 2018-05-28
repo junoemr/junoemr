@@ -38,6 +38,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -423,5 +424,21 @@ public class ConversionUtils {
 	public static LocalDateTime toLocalDateTime(Date legacyDate)
 	{
 		return new java.sql.Timestamp(legacyDate.getTime()).toLocalDateTime();
+	}
+
+
+	public static Date combineDateAndTime(Date date, Date time)
+	{
+		Calendar calendarA = Calendar.getInstance();
+		calendarA.setTime(date);
+		Calendar calendarB = Calendar.getInstance();
+		calendarB.setTime(time);
+
+		calendarA.set(Calendar.HOUR_OF_DAY, calendarB.get(Calendar.HOUR_OF_DAY));
+		calendarA.set(Calendar.MINUTE, calendarB.get(Calendar.MINUTE));
+		calendarA.set(Calendar.SECOND, calendarB.get(Calendar.SECOND));
+		calendarA.set(Calendar.MILLISECOND, calendarB.get(Calendar.MILLISECOND));
+
+		return calendarA.getTime();
 	}
 }
