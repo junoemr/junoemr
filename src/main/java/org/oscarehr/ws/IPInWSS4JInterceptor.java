@@ -93,8 +93,7 @@ public class IPInWSS4JInterceptor extends WSS4JInInterceptor implements Callback
 	private boolean isIPAllowed(String ip)
 	{
 		Properties oscarVariables = OscarProperties.getInstance();
-		String allowedIPs =
-				oscarVariables.getProperty("web_service_allowed_ips");
+		String allowedIPs = oscarVariables.getProperty("web_service_allowed_ips");
 
 		// Allow access if there is no whitelist
 		if(allowedIPs == null)

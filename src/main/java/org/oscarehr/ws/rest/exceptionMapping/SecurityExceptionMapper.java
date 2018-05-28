@@ -45,7 +45,7 @@ public class SecurityExceptionMapper implements ExceptionMapper<SecurityExceptio
 		RestResponseError responseError = new RestResponseError(exception.getMessage());
 		RestResponse<String> response = RestResponse.errorResponse(responseError);
 
-		return Response.status(Response.Status.UNAUTHORIZED).entity(response)
+		return Response.status(Response.Status.FORBIDDEN).entity(response)
 				.type(MediaType.APPLICATION_JSON).build();
 	}
 }
