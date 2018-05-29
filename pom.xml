@@ -1086,6 +1086,11 @@
             <artifactId>simpleclient_servlet</artifactId>
             <version>0.1.0</version>
         </dependency>
+<!--		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>RELEASE</version>
+		</dependency>-->
 	</dependencies>
 	<build>
 		<resources>
@@ -1485,6 +1490,12 @@
 						<oscar.dbinit.skip>${oscar.dbinit.skip}</oscar.dbinit.skip>
 						<buildDirectory>${project.build.directory}</buildDirectory>
 					</systemPropertyVariables>
+<!--					<properties>
+						<property>
+							<name>junit</name>
+							<value>false</value>
+						</property>
+					</properties>-->
 				</configuration>
 				<version>2.10</version>
 			</plugin>

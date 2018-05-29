@@ -24,8 +24,10 @@
 
 package org.oscarehr.schedule.service;
 
+import org.oscarehr.schedule.dao.ScheduleTemplateCodeDao;
 import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.ScheduleTemplate;
+import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,8 @@ public class ScheduleTemplateService
 {
 	@Autowired
 	ScheduleTemplateDao scheduleTemplateDao;
+	@Autowired
+	ScheduleTemplateCodeDao scheduleTemplateCodeDao;
 
 	/**
 	 * Find the public and private templates available to the provider.
@@ -51,5 +55,10 @@ public class ScheduleTemplateService
 
 		templateList.addAll(providerTemplates);
 		return templateList;
+	}
+
+	public List<ScheduleTemplateCode> getScheduleTemplateCodes()
+	{
+		return scheduleTemplateCodeDao.findAll();
 	}
 }

@@ -25,6 +25,7 @@ package org.oscarehr.ws.rest;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -34,6 +35,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -48,6 +50,12 @@ import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.schedule.dto.ScheduleGroup;
+import org.oscarehr.schedule.model.ScheduleTemplateCode;
+import org.oscarehr.schedule.service.Schedule;
+import org.oscarehr.schedule.service.ScheduleGroupService;
+import org.oscarehr.schedule.service.ScheduleTemplateService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.PatientListApptBean;
@@ -63,6 +71,7 @@ import org.oscarehr.ws.rest.to.model.AppointmentStatusTo1;
 import org.oscarehr.ws.rest.to.model.AppointmentTo1;
 import org.oscarehr.ws.rest.to.model.NewAppointmentTo1;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 @Path("/schedule")
@@ -79,6 +88,12 @@ public class ScheduleService extends AbstractServiceImpl {
 	private DemographicManager demographicManager;
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
+	@Autowired
+	private Schedule scheduleService;
+	@Autowired
+	private ScheduleGroupService scheduleGroupService;
+	@Autowired
+	private ScheduleTemplateService scheduleTemplateService;
 
 	@GET
 	@Path("/day/{date}")
@@ -362,4 +377,49 @@ public class ScheduleService extends AbstractServiceImpl {
 		return response;
 	}
 
+	@GET
+	@Path("/groups")
+	@Produces("application/json")
+	public RestResponse<List<ScheduleGroup>, String> getScheduleGroups()
+	{
+		List<ScheduleGroup> scheduleGroups = scheduleGroupService.getScheduleGroups();
+
+		return new RestResponse<>(new HttpHeaders(), scheduleGroups);
+	}
+
+	@GET
+	@Path("/templateCodes")
+	@Produces("application/json")
+	public RestResponse<List<ScheduleTemplateCode>, String> getScheduleTemplateCodes()
+	{
+		List<ScheduleTemplateCode> scheduleTemplateCodes =
+			scheduleTemplateService.getScheduleTemplateCodes();
+
+		return new RestResponse<>(new HttpHeaders(), scheduleTemplateCodes);
+	}
+
+	@GET
+	@Path("/calendar/{providerId}/")
+	@Produces("application/json")
+	public RestResponse<List<CalendarEvent>, String> getCalendarEvents(
+		@PathParam("providerId") Integer providerId,
+		@QueryParam("startDate") String startDateString,
+		@QueryParam("endDate") String endDateString
+	)
+	{
+		LocalDate startDate = toNullableLocalDate(startDateString);
+		LocalDate endDate = toNullableLocalDate(endDateString);
+
+		// Default to today if either date is null
+		if(startDate == null || endDate == null)
+		{
+			startDate = LocalDate.now();
+			endDate = LocalDate.now();
+		}
+
+		List<CalendarEvent> calendarEvents =
+			scheduleService.getCalendarEvents(providerId, startDate, endDate);
+
+		return new RestResponse<>(new HttpHeaders(), calendarEvents);
+	}
 }

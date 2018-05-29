@@ -50,7 +50,7 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unchecked")
 public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 {
-	
+
 	public ScheduleTemplateDao() {
 		super(ScheduleTemplate.class);
 	}
@@ -133,42 +133,46 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		return query.getResultList();
 	}
 
-
-	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
-	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, Integer providerNo)
+	public List<Object[]> getRawScheduleSlots(Integer providerNo, LocalDate date)
 	{
 		String sql = "SELECT \n" +
-				"  (n3.i + (10 * n2.i) + (100 * n1.i))+1 AS position, \n" +
-				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
-				"  sd.sdate AS appt_date,\n" +
-				"  SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode))) AS appt_time,\n" +
-				"  stc.code,\n" +
-				"  CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration,\n" +
-				"  stc.description,\n" +
-				"  stc.color,\n" +
-				"  stc.confirm,\n" +
-				"  stc.bookinglimit\n" +
-				"FROM \n" +
-				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n1    \n" +
-				"    CROSS JOIN \n" +
-				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n2     \n" +
-				"    CROSS JOIN \n" +
-				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n3 \n" +
-				"CROSS JOIN scheduledate sd\n" +
-				"JOIN scheduletemplate st ON sd.hour = st.name\n" +
-				"LEFT JOIN scheduletemplatecode stc " +
-				"  ON BINARY stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
-				"WHERE sd.status = 'A'\n" +
-				"AND sd.sdate = :date\n" +
-				"AND sd.provider_no = :providerNo\n" +
-				"AND (n3.i + (10 * n2.i) + (100 * n1.i)) < LENGTH(st.timecode)\n" +
-				"ORDER BY (n3.i + (10 * n2.i) + (100 * n1.i));";
+			"  (n3.i + (10 * n2.i) + (100 * n1.i))+1 AS position, \n" +
+			"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
+			"  sd.sdate AS appt_date,\n" +
+			"  SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode))) AS appt_time,\n" +
+			"  stc.code,\n" +
+			"  CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration,\n" +
+			"  stc.description,\n" +
+			"  stc.color,\n" +
+			"  stc.confirm,\n" +
+			"  stc.bookinglimit\n" +
+			"FROM \n" +
+			"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n1    \n" +
+			"    CROSS JOIN \n" +
+			"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n2     \n" +
+			"    CROSS JOIN \n" +
+			"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n3 \n" +
+			"CROSS JOIN scheduledate sd\n" +
+			"JOIN scheduletemplate st ON sd.hour = st.name\n" +
+			"LEFT JOIN scheduletemplatecode stc " +
+			"  ON BINARY stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
+			"WHERE sd.status = 'A'\n" +
+			"AND sd.sdate = :date\n" +
+			"AND sd.provider_no = :providerNo\n" +
+			"AND (n3.i + (10 * n2.i) + (100 * n1.i)) < LENGTH(st.timecode)\n" +
+			"ORDER BY (n3.i + (10 * n2.i) + (100 * n1.i));";
 
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
 
-		List<Object[]> results = query.getResultList();
+		return query.getResultList();
+	}
+
+	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
+	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, Integer providerNo)
+	{
+		List<Object[]> results = getRawScheduleSlots(providerNo, date);
 
 		RangeMap<LocalTime, ScheduleSlot> slots = TreeRangeMap.create();
 		for(Object[] result: results)

@@ -53,9 +53,9 @@
 							<label for="schedule-select">Schedule:</label>
 							<select id="schedule-select"
 									class="form-control"
-									ng-change="on_schedule_changed()"
+									ng-change="onScheduleChanged()"
 									ng-model="selectedSchedule"
-									ng-options="option as option.display_name for option in get_schedule_options()">
+									ng-options="option as option.name for option in getScheduleOptions()">
 							</select>
 						</div>
 						<button type="button"

@@ -61,77 +61,258 @@ angular.module('Schedule').factory(
 			// Data Loading/manipulation
 			// -----------------------------------------------------------------------------------------------
 
-			service.load_schedule_events = function load_schedule_events(schedule, start, end,
-																		 view_name, schedule_templates, event_statuses, default_event_color, availability_types)
+			service.load_schedule_events = function load_schedule_events(providerId, start, end,
+				view_name, schedule_templates, event_statuses, default_event_color, availability_types)
 			{
-				// Set some global state
-				service.event_statuses = event_statuses;
-				service.default_event_color = default_event_color;
-
+				console.log("=======================================================");
+				console.log(providerId);
+				console.log(availability_types);
+				console.log(start.format("YYYY-MM-DD"));
+				console.log(end.subtract(1, 'seconds').format("YYYY-MM-DD"));
+				console.log("=======================================================");
 
 				var deferred = $q.defer();
 
+
+				// Get date strings to pass to the backend.  The calendar provides datetime that describe
+				// and inclusive start time and exclusive end time, so one second is removed from
+				// the end time to convert to the correct date.
+				//var startDateString = start.format("YYYY-MM-DD");
+				//var endDateString = end.subtract(1, 'seconds').format("YYYY-MM-DD");
+
+/*				scheduleService.getSchedulesForCalendar(
+					schedule.uuid,
+					startDateString,
+					endDateString
+				).then(function success(results)
+				{*/
+				var results = {
+					schedule_templates: {
+						1: {
+							name: "template 1",
+							schedule_template_days: [
+								{
+									day_of_the_week: "monday",
+									schedule_template_time_periods: [
+										{
+											availability_type_uuid: 6,
+											start_time: "09:00",
+											end_time: "12:00",
+										},
+										{
+											availability_type_uuid: 2,
+											start_time: "13:00",
+											end_time: "17:00",
+										},
+									],
+								},
+								{
+									day_of_the_week: "tuesday",
+									schedule_template_time_periods: [
+										{
+											availability_type_uuid: 6,
+											start_time: "09:00",
+											end_time: "12:00",
+										},
+										{
+											availability_type_uuid: 2,
+											start_time: "13:00",
+											end_time: "17:00",
+										},
+									],
+								},
+								{
+									day_of_the_week: "wednesday",
+									schedule_template_time_periods: [
+										{
+											availability_type_uuid: 6,
+											start_time: "09:00",
+											end_time: "12:00",
+										},
+										{
+											availability_type_uuid: 2,
+											start_time: "13:00",
+											end_time: "17:00",
+										},
+									],
+								},
+								{
+									day_of_the_week: "thursday",
+									schedule_template_time_periods: [
+										{
+											availability_type_uuid: 1,
+											start_time: "09:00",
+											end_time: "12:00",
+										},
+										{
+											availability_type_uuid: 6,
+											start_time: "13:00",
+											end_time: "17:00",
+										},
+									],
+								},
+								{
+									day_of_the_week: "friday",
+									schedule_template_time_periods: [
+										{
+											availability_type_uuid: 6,
+											start_time: "09:00",
+											end_time: "12:00",
+										},
+										{
+											availability_type_uuid: 2,
+											start_time: "13:00",
+											end_time: "17:00",
+										},
+									],
+								},
+							],
+						}
+					},
+					schedule_days: {
+						"2018-05-28": {
+							events: [
+								{
+									schedule_uuid: 1,
+									demographic_patient_dob: "1980-02-15",
+									demographic_patient_name: "Jordan",
+									demographic_patient_phone: "1231231234",
+									demographic_patient_uuid: "1",
+									demographic_patient_practitioner_name: "Dr. Jones",
+									demographic_patient_practitioner_uuid: "1",
+									start_time: "2018-05-28T09:00:00+00:00",
+									end_time: "2018-05-28T10:00:00+00:00",
+									event_status_uuid: 1,
+									num_invoices: 0,
+									reason: "Not a real event",
+									tag_names: null,
+									tag_self_booked: false,
+									tag_self_cancelled: false,
+									tag_system_codes: null,
+								},
+								{
+									schedule_uuid: 2,
+									demographic_patient_dob: "1980-02-15",
+									demographic_patient_name: "Jordan",
+									demographic_patient_phone: "1231231234",
+									demographic_patient_uuid: "1",
+									demographic_patient_practitioner_name: "Dr. Jones",
+									demographic_patient_practitioner_uuid: "1",
+									start_time: "2018-05-28T11:00:00+00:00",
+									end_time: "2018-05-28T11:30:00+00:00",
+									event_status_uuid: 1,
+									num_invoices: 0,
+									reason: "Not a real event",
+									tag_names: null,
+									tag_self_booked: false,
+									tag_self_cancelled: false,
+									tag_system_codes: null,
+								},
+							],
+							availabilities: [
+								{
+									schedule_uuid: 1,
+									availability_type_uuid: 3,
+									start_time: "2018-05-28T00:00:00+00:00",
+									end_time: "2018-05-29T00:00:00+00:00",
+								},
+							],
+							relations: [
+								{
+									schedule_uuid: 1,
+									schedule_template_uuid: 1,
+									start_date: "2018-05-28", // exclusive?
+									end_date: "2018-06-04", // inclusive
+								},
+							],
+						}
+					}
+				};
+
+/*				availability_types = {
+					1: {
+						color: "#944DFF",
+						name: "Long Appointments",
+						preferred_event_length_minutes: 60,
+						system_code: null,
+					},
+					2: {
+						color: "#335CD6",
+						name: "Regular Appointments",
+						preferred_event_length_minutes: 15,
+						system_code: null,
+					},
+					3: {
+						color: "#000000",
+						name: "Do Not Book",
+						preferred_event_length_minutes: null,
+						system_code: "unavailable",
+					},
+				};*/
+
+				// Set some global state
+				service.event_statuses = {
+					1: {
+						color: "#4DB8B8",
+							display_letter: "N",
+							name: "Booked",
+							rotates: true,
+							sort_order: 10,
+							system_code: null
+					}
+				};
+
+				service.default_event_color = default_event_color;
+
 				var schedule_events = [];
 				var background_events = [];
+
 
 				// load the schedule events,
 				// then create the calendar events for each event,
 				// then create the background calendar events for
 				//   each schedule availability and schedule template relation
-				event_model.list(schedule.uuid, start.format(), end.format()).then(
-					function success(results)
-					{
-						for(var i = 0; i < results.data.length; i++)
-						{
-							schedule_events.push(
-								service.create_schedule_event(results.data[i]));
-						}
-					}).then(
-					function success()
-					{
-						// don't bother assembling background events for month view
-						if(view_name !== "month")
-						{
-							if(util.exists(schedule.availabilities))
-							{
-								for(var j = 0; j < schedule.availabilities.length; j++)
-								{
-									util.create_availability_events(
-										background_events, schedule.availabilities[j], availability_types,
-										start, end);
-								}
-							}
-
-							if(util.exists(schedule.relations))
-							{
-								for(var k = 0; k < schedule.relations.length; k++)
-								{
-									util.create_relation_events(
-										background_events, schedule_templates, availability_types,
-										schedule.relations[k], start, end);
-								}
-							}
-						}
-
-					}).then(function success()
+				angular.forEach(results.schedule_days, function(day, date)
 				{
-					Array.prototype.push.apply(schedule_events, background_events);
+					for(var i = 0; i < day.events.length; i++)
+					{
+						schedule_events.push(
+							service.create_schedule_event(day.events[i]));
+					}
 
-					deferred.resolve(results_factory.factory(schedule_events));
+					for(var j = 0; j < day.relations.length; j++)
+					{
+						util.create_relation_events(background_events, results.schedule_templates,
+							availability_types, day.relations[j], start, end);
+					}
+
+					for(var k = 0; k < day.availabilities.length; k++)
+					{
+						util.create_availability_events(background_events,
+							day.availabilities[k], availability_types, start, end)
+					}
 				});
 
-				return deferred.promise;
+				Array.prototype.push.apply(schedule_events, background_events);
+				console.log("-- Base array format ---------------------------");
+				console.log(JSON.stringify(schedule_events, null, "\t"));
+				deferred.resolve({data: schedule_events});
 
+				return deferred.promise;
 			};
 
 			service.load_schedule_templates = function load_schedule_templates()
 			{
+				// XXX: can't implement this because it requires the date range and provider number
+				// because oscar stores it's templates per day and provider
+
 				var deferred = $q.defer();
 
 				var schedule_templates = {};
 				var promise_array = [];
 
-				schedule_template_model.list().then(
+				deferred.resolve([]);
+/*				schedule_template_model.list().then(
 					function success(results)
 					{
 						for(var i = 0; i < results.data.length; i++)
@@ -152,7 +333,7 @@ angular.module('Schedule').factory(
 								}
 								deferred.resolve(schedule_templates);
 							});
-					});
+					});*/
 
 				return deferred.promise;
 			};
@@ -162,13 +343,30 @@ angular.module('Schedule').factory(
 				var deferred = $q.defer();
 				var availability_types = {};
 
-				availability_type_model.list().then(
+				scheduleService.getScheduleTemplateCodes().then(
 					function success(results)
 					{
-						for(var i = 0; i < results.data.length; i++)
+						/*	Example JSON result (P is the oscar scheduletemplatecode.code)
+						var example_result = {
+							P: {
+								color: "#000000",
+								name: "Do Not Book",
+								preferred_event_length_minutes: null,
+								system_code: "unavailable",
+							},
+						};
+						*/
+
+						for(var i = 0; i < results.length; i++)
 						{
-							var result = results.data[i];
-							availability_types[result.uuid] = result;
+							var result = results[i];
+
+							availability_types[result.code] = {
+								color: result.color,
+								name: result.description,
+								preferred_event_length_minutes: result.duration,
+								system_code: null,
+							};
 						}
 
 						deferred.resolve(availability_types);
@@ -181,11 +379,12 @@ angular.module('Schedule').factory(
 			{
 				var deferred = $q.defer();
 
-				event_status_model.list().then(
+				deferred.resolve([]);
+/*				event_status_model.list().then(
 					function success(results)
 					{
 						deferred.resolve(results.data);
-					});
+					});*/
 
 				return deferred.promise;
 			};
@@ -194,11 +393,16 @@ angular.module('Schedule').factory(
 			{
 				var deferred = $q.defer();
 
-				schedule_model.list().then(
+				scheduleService.getScheduleGroups().then(
 					function success(results)
 					{
-						deferred.resolve(results.data);
-					});
+						for(var i = 0; i < results.length; i++)
+						{
+							results[i].uuid = results[i].identifier;
+						}
+						deferred.resolve(results);
+					}
+				);
 
 				return deferred.promise;
 			};
@@ -257,8 +461,43 @@ angular.module('Schedule').factory(
 						'schedule_resources');
 				}
 
-				return schedule_model.get_group_resources(
+				return service.get_group_resources(
 					custom_resource_list, resource_options);
+			};
+
+			service.get_group_resources = function get_group_resources(default_selections, schedules)
+			{
+				var has_defaults = util.exists(default_selections) && default_selections.length > 0;
+
+				var selected_resources = [];
+				for(var i = 0; i < schedules.length; i++)
+				{
+					var schedule_data = schedules[i];
+
+					if(has_defaults &&
+						default_selections.indexOf(schedule_data.uuid) > -1)
+					{
+						selected_resources.push(schedule_data);
+					}
+					else if(!has_defaults &&
+						!util.exists(schedule_data.demographics_practitioner_uuid))
+					{
+						selected_resources.push(schedule_data);
+					}
+				}
+
+				// if default selections list is set but the schedules in it no longer exist,
+				// or if there are no settings and no non-doctor schedules,
+				// then could end up with nothing selected, so select everything
+				if(selected_resources.length === 0)
+				{
+					for(var j = 0; j < schedules.length; j++)
+					{
+						selected_resources.push(schedule_data);
+					}
+				}
+
+				return selected_resources;
 			};
 
 			service.get_selected_time_interval = function get_selected_time_interval(
@@ -300,33 +539,37 @@ angular.module('Schedule').factory(
 			service.get_schedule_min_time = function get_schedule_min_time() {
 				// restrict day view if user preferences are set
 
-				var min_time = service.get_global_preference_setting('schedule_min_time');
+/*				var min_time = service.get_global_preference_setting('schedule_min_time');
 				if (util.exists(min_time)) {
 					// format: HH24:MM:SS - expect HH24:MM in preference
 					return min_time + ":00";
 				}
 
-				return null;
+				return null;*/
+
+				return "08:00";
 			};
 
 			service.get_schedule_max_time = function get_schedule_max_time()
 			{
-				var max_time = service.get_global_preference_setting('schedule_max_time');
+/*				var max_time = service.get_global_preference_setting('schedule_max_time');
 				if(util.exists(max_time))
 				{
 					// format: HH24:MM:SS - expect HH24:MM in preference
 					return max_time + ":00";
 				}
 
-				return null;
+				return null;*/
+				return "20:00";
 			};
 
 
-			service.load_schedule = function load_schedule(uuid)
+			service.load_schedule = function load_schedule(providerId)
 			{
 				var deferred = $q.defer();
+				deferred.resolve({data: providerId});
 
-				schedule_model.fetch(uuid).then(
+/*				schedule_model.fetch(uuid).then(
 					function success(results)
 					{
 						service.load_schedule_availabilities(results.data).then(
@@ -347,7 +590,7 @@ angular.module('Schedule').factory(
 					}, function error(errors)
 					{
 						console.log('error fetching schedules', errors);
-					});
+					});*/
 
 				return deferred.promise;
 			};

@@ -29,14 +29,19 @@ import org.oscarehr.util.MiscUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Yet another conversion utility class for bridging JPA entity to legacy schema mismatch. 
@@ -361,4 +366,27 @@ public class ConversionUtils {
 		return returnDate;
 	}
 
+
+	public static LocalDateTime getLocalDateTimeFromSqlDateAndTime(java.sql.Date date, java.sql.Time time)
+	{
+		LocalDate localDate = date.toLocalDate();
+		LocalTime localTime = time.toLocalTime();
+		return LocalDateTime.of(localDate, localTime);
+	}
+
+	/**
+	 * Creates a list of dates.  Taken from http://www.baeldung.com/java-between-dates
+	 * @param startDate
+	 * @param endDate
+	 * @return An iclusive list of dates
+	 */
+	public static List<LocalDate> getDateList(LocalDate startDate, LocalDate endDate)
+	{
+		long numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+
+		return IntStream.iterate(0, i -> i + 1)
+			.limit(numOfDaysBetween)
+			.mapToObj(i -> startDate.plusDays(i))
+			.collect(Collectors.toList());
+	}
 }

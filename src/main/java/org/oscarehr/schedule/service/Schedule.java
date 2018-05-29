@@ -24,11 +24,14 @@ package org.oscarehr.schedule.service;
 
 import com.google.common.collect.RangeMap;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.appointment.service.Appointment;
 import org.oscarehr.common.dao.MyGroupDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.MyGroup;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.schedule.dto.AppointmentDetails;
+import org.oscarehr.schedule.dto.AvailabilityType;
+import org.oscarehr.schedule.dto.CalendarEvent;
 import org.oscarehr.schedule.dto.ResourceSchedule;
 import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.schedule.dto.UserDateSchedule;
@@ -48,11 +51,16 @@ import oscar.MyDateFormat;
 import oscar.RscheduleBean;
 import oscar.util.ConversionUtils;
 
+import java.math.BigInteger;
+import java.sql.Time;
 import java.text.ParseException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.time.DayOfWeek;
@@ -72,6 +80,9 @@ public class Schedule
 	OscarAppointmentDao appointmentDao;
 
 	@Autowired
+	Appointment appointmentService;
+
+	@Autowired
 	MyGroupDao myGroupDao;
 
 	@Autowired
@@ -88,6 +99,10 @@ public class Schedule
 
 	@Autowired
 	ScheduleTemplateDao scheduleTemplateDao;
+
+
+	private final String NO_APPOINTMENT_CHARACTER = "_";
+	private final String SCHEDULE_TEMPLATE_CLASSNAME= null;
 
 
 	public long updateSchedule(RscheduleBean scheduleRscheduleBean,
@@ -430,5 +445,134 @@ public class Schedule
 			scheduleSlots,
 			appointments
 		);
+	}
+
+	public List<CalendarEvent> getCalendarEvents(
+		Integer providerId,
+		LocalDate startDate,
+		LocalDate endDate
+	)
+	{
+		List<CalendarEvent> calendarEvents = new ArrayList<>();
+
+		// Loop through the dates between startDate and endDate (inclusive) and add schedules
+		for(LocalDate date: ConversionUtils.getDateList(startDate, endDate))
+		{
+			// Get schedule templates for this provider/date
+			calendarEvents.addAll(getCalendarEvents(providerId, date));
+		}
+
+		// Get appointments for this provider/date
+		calendarEvents.addAll(appointmentService.getCalendarEvents(providerId, startDate, endDate));
+
+		return calendarEvents;
+	}
+
+	/**
+	 * Gets a list of schedule template slots and creates a list with adjacent slots of the same
+	 * type grouped together.  It basically converts from the Juno database format into the format
+	 * required for cp-calendar.  This is essentially doing a group by, but would end up being a
+	 * very hideous sql query if done that way.
+	 * @param date The day to get the schedule for
+	 * @param providerId The provider to get the schedule for
+	 * @return A list of CalendarEvent objects
+	 */
+	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate date)
+	{
+		List<Object[]> results = scheduleTemplateDao.getRawScheduleSlots(providerId, date);
+
+		List<CalendarEvent> calendarEvents = new ArrayList<>();
+
+		Iterator<Object[]> iterator = results.iterator();
+
+		int resourceId = 1; // Increments to identify rows
+		Object[] previousRow = null; // Save the previous row to at to result
+		LocalDateTime startDateTime = null;
+
+		while(iterator.hasNext())
+		{
+			Object[] result = iterator.next();
+
+			String currentCode = (String)result[1];
+
+			// If the code changed or if this is the last row
+			//   save the previous row with the saved start date
+			//   reset the saved row and start date
+			if(previousRow != null && previousRow[1] != null && !previousRow[1].equals(currentCode))
+			{
+				calendarEvents.add(createCalendarEvent(startDateTime, previousRow, resourceId++));
+
+				previousRow = null;
+				startDateTime = null;
+			}
+
+			// If this is the last row, also add a result for that
+			if(!iterator.hasNext() && !NO_APPOINTMENT_CHARACTER.equals(currentCode))
+			{
+				// Use this date if there wasn't one set already
+				if(startDateTime == null)
+				{
+					startDateTime = ConversionUtils.getLocalDateTimeFromSqlDateAndTime(
+						(java.sql.Date) result[2],
+						(java.sql.Time) result[3]
+					);
+				}
+
+				// Add this row because it is the last
+				calendarEvents.add(createCalendarEvent(startDateTime, result, resourceId++));
+			}
+
+			// If this is not a _, save the current row and maybe start date
+
+			if(!NO_APPOINTMENT_CHARACTER.equals(currentCode))
+			{
+				previousRow = result;
+				if(startDateTime == null)
+				{
+					startDateTime = ConversionUtils.getLocalDateTimeFromSqlDateAndTime(
+						(java.sql.Date) result[2],
+						(java.sql.Time)result[3]
+					);
+				}
+			}
+		}
+
+		return calendarEvents;
+	}
+
+	private CalendarEvent createCalendarEvent(LocalDateTime startDateTime, Object[] result, int resourceId)
+	{
+		java.sql.Date appointmentDate = (java.sql.Date) result[2];
+		Time appointmentTime = (java.sql.Time) result[3];
+		String code = (String) result[1];
+		Integer durationMinutes = ((BigInteger) result[5]).intValue();
+		String description = (String) result[6];
+		String color = (String) result[7];
+
+		LocalDateTime appointmentDateTime = ConversionUtils.getLocalDateTimeFromSqlDateAndTime(
+			appointmentDate,
+			appointmentTime
+		);
+
+		// package up the event and add to the list
+		LocalDateTime endDateTime =
+			appointmentDateTime.plus(Duration.ofMinutes(durationMinutes));
+
+		AvailabilityType availabilityType = new AvailabilityType(
+			color,
+			description,
+			durationMinutes,
+			null
+		);
+
+		return new CalendarEvent(
+			startDateTime,
+			endDateTime,
+			color,
+			SCHEDULE_TEMPLATE_CLASSNAME,
+			resourceId,
+			code,
+			availabilityType,
+			null);
 	}
 }

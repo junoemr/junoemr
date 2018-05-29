@@ -26,8 +26,15 @@
 
  */
 angular.module("Common.Services").service("scheduleService", [
-	'$http', '$q',
-	function($http, $q)
+	'$http',
+	'$q',
+	'junoHttp',
+
+	function(
+		$http,
+		$q,
+		junoHttp
+	)
 	{
 		var service = {};
 
@@ -244,6 +251,78 @@ angular.module("Common.Services").service("scheduleService", [
 					console.log("scheduleService::noShowAppointment error", errors);
 					deferred.reject("An error occured while setting no show appointment");
 				});
+
+			return deferred.promise;
+		};
+
+		service.getScheduleGroups = function getScheduleGroups()
+		{
+			var deferred = $q.defer();
+
+			junoHttp.get(
+				service.apiPath + 'schedule/groups',
+				{headers: Juno.Common.ServiceHelper.configHeaders()}
+			).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("scheduleService::getScheduleGroups error", errors);
+					deferred.reject();
+				}
+			);
+
+			return deferred.promise;
+		};
+
+		service.getSchedulesForCalendar = function getSchedulesForCalendar(providerId, startDate, endDate)
+		{
+			var deferred = $q.defer();
+
+			var url = service.apiPath + 'schedule/calendar/';
+			url += encodeURIComponent(providerId) + '/';
+			url += '?startDate=' + encodeURIComponent(startDate);
+			url += '&endDate=' + encodeURIComponent(endDate);
+
+			junoHttp.get(
+				url,
+				{headers: Juno.Common.ServiceHelper.configHeaders()}
+			).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("scheduleService::getSchedulesForCalendar error", errors);
+					deferred.reject();
+				}
+			);
+
+			return deferred.promise;
+		};
+
+		service.getScheduleTemplateCodes = function getAvailabilityCodes()
+		{
+			var deferred = $q.defer();
+
+			junoHttp.get(
+				service.apiPath + 'schedule/templateCodes',
+				{headers: Juno.Common.ServiceHelper.configHeaders()}
+			).then(
+				function success(results)
+				{
+
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("scheduleService::getAvailabilityTypes error", errors);
+					deferred.reject();
+				}
+			);
 
 			return deferred.promise;
 		};
