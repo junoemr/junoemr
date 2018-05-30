@@ -109,6 +109,7 @@ public class PDFFile extends GenericFile
 	{
 		logger.info("BEGIN PDF VALIDATION");
 		boolean isValid = true;
+		boolean isEncrypted = false;
 
 		String pdfInfo = props.getProperty("document.pdfinfo_path", "/usr/bin/pdfinfo");
 
@@ -123,14 +124,22 @@ public class PDFFile extends GenericFile
 			logger.warn("validator error line: " + line);
 			// if error is allowed and flag not already set to fail
 			isValid = (isValid && allowedErrors.contains(line.toLowerCase()));
+			isEncrypted = (line.toLowerCase().equals("command line error: incorrect password"));
 			this.reasonInvalid = (this.reasonInvalid == null)? line : this.reasonInvalid + ", " + line;
 		}
 		process.waitFor();
 		in.close();
 
 		int exitValue = process.exitValue();
-		if(exitValue != 0) {
-			isValid = false;
+		if (exitValue != 0)
+		{
+			if (isEncrypted)
+			{
+				isValid = true;
+			} else
+			{
+				isValid = false;
+			}
 		}
 
 		logger.info("Passed PDF Validation: " + isValid);
