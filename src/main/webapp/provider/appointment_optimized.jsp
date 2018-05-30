@@ -1489,9 +1489,9 @@ private long getAppointmentRowSpan(
 									String url = "../appointment/addappointment.jsp" +
 											"?provider_no=" + scheduleProviderNo +
 											"&bFirstDisp=true" +
-											"&year=" + strYear +
-											"&month=" + strMonth +
-											"&day=" + strDay +
+											"&year=" + schedule.getScheduleDate().getYear() +
+											"&month=" + schedule.getScheduleDate().getMonthValue() +
+											"&day=" + schedule.getScheduleDate().getDayOfMonth() +
 											"&start_time=" + slotTime.format(formatter) +
 											"&end_time=" + slotTime.plusMinutes(slotLengthInMinutes - 1) +
 											"&duration=" + durationString;
