@@ -86,7 +86,7 @@
 		}
 		.eform_checkbox_list label {
 			display: inline-block;
-			width: 180px;
+			width: 350px;
 			text-align: right;
 		}
 
