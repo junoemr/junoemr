@@ -23,12 +23,13 @@
     Ontario, Canada
 
 --%>
-
 <%
 String result = oscar.Misc.safeString((String) request.getAttribute("Result"));
 String msgs   = oscar.Misc.safeString((String) request.getAttribute("Msgs"));
 String error  = oscar.Misc.safeString((String) request.getAttribute("error"));
-if ( error.length() != 0){
-   error = "Error in teleplan connection : "+error;
+if ( error.length() != 0)
+{
+   error = "Error in connection : " + error;
 }
-%><%=result%>-<%=msgs%><%=error%>
+%><%=result%>
+<%=msgs%><%=error%>

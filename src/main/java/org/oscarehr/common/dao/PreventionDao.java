@@ -22,13 +22,12 @@
  */
 package org.oscarehr.common.dao;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Prevention;
+
+import javax.persistence.Query;
+import java.util.Date;
+import java.util.List;
 
 public class PreventionDao extends AbstractDao<Prevention> {
 
@@ -169,6 +168,24 @@ public class PreventionDao extends AbstractDao<Prevention> {
 		List<Prevention> results = query.getResultList();
 		
 		return (results);
+	}
+
+	public Prevention findMostRecentByTypeAndDemoNo(String preventionType, Integer demoNo)
+	{
+		Query query = entityManager.createQuery("SELECT x FROM Prevention x " +
+				"WHERE x.preventionType = :preventionType " +
+				"AND x.demographicId = :demographicNo " +
+				"AND x.deleted='0' " +
+				"ORDER BY x.preventionDate DESC, x.id DESC");
+
+		query.setParameter("preventionType", preventionType);
+		query.setParameter("demographicNo", demoNo);
+
+		query.setMaxResults(1);
+
+		@SuppressWarnings("unchecked")
+		List<Prevention> results = query.getResultList();
+		return (results.isEmpty()) ? null : results.get(0);
 	}
 	
 	

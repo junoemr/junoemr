@@ -43,7 +43,7 @@ public class PDFFile extends GenericFile
 {
 	private static Logger logger = MiscUtils.getLogger();
 	private static final Set<String> allowedErrors = new HashSet<>();
-	private static final Set<Pattern> allowedWarningsGS = new HashSet<>();
+	private static Pattern[] allowedWarningsGS = null;
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
 	private long maxMemoryUsage = oscarProperties.getPDFMaxMemUsage();
@@ -51,21 +51,26 @@ public class PDFFile extends GenericFile
 	public PDFFile(File file) throws IOException
 	{
 		super(file);
-
-		// define allowed GhostScript warnings
-		allowedWarningsGS.add(
-				Pattern.compile(".*Missing glyph .* in the font HiddenHorzOCR.*", Pattern.CASE_INSENSITIVE)
-		);
 	}
 
 	private boolean isAllowedWarning(String line)
 	{
-		for (Pattern pattern : allowedWarningsGS)
+		for (Pattern pattern : getAllowedWarningsGS())
 		{
 			if (pattern.matcher(line).matches())
 				return true;
 		}
 		return false;
+	}
+
+	private static Pattern[] getAllowedWarningsGS()
+	{
+		if(allowedWarningsGS == null)
+		{
+			allowedWarningsGS = new Pattern[1];
+			allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font HiddenHorzOCR.*", Pattern.CASE_INSENSITIVE);
+		}
+		return allowedWarningsGS;
 	}
 
 	@Override
@@ -104,6 +109,7 @@ public class PDFFile extends GenericFile
 	{
 		logger.info("BEGIN PDF VALIDATION");
 		boolean isValid = true;
+		boolean isEncrypted = false;
 
 		String pdfInfo = props.getProperty("document.pdfinfo_path", "/usr/bin/pdfinfo");
 
@@ -118,14 +124,22 @@ public class PDFFile extends GenericFile
 			logger.warn("validator error line: " + line);
 			// if error is allowed and flag not already set to fail
 			isValid = (isValid && allowedErrors.contains(line.toLowerCase()));
+			isEncrypted = (line.toLowerCase().equals("command line error: incorrect password"));
 			this.reasonInvalid = (this.reasonInvalid == null)? line : this.reasonInvalid + ", " + line;
 		}
 		process.waitFor();
 		in.close();
 
 		int exitValue = process.exitValue();
-		if(exitValue != 0) {
-			isValid = false;
+		if (exitValue != 0)
+		{
+			if (isEncrypted)
+			{
+				isValid = true;
+			} else
+			{
+				isValid = false;
+			}
 		}
 
 		logger.info("Passed PDF Validation: " + isValid);

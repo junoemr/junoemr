@@ -70,19 +70,23 @@ public class CtlBillingServiceDao extends AbstractDao<CtlBillingService> {
 	 * @return
 	 * 		Returns list containing arrays of strings, where the first element represents the service type code and the second element is the service type name.
 	 */
-	public List<Object[]> getUniqueServiceTypes() {
+	public List<Object[]> getUniqueServiceTypes()
+	{
 		return getUniqueServiceTypes(DEFAULT_STATUS);
 	}
-        
-        public List<CtlBillingService> findByServiceTypeId(String serviceTypeId) {
-            Query query = entityManager.createQuery("select b from CtlBillingService b where b.status='A' and b.serviceType like ?");
-            query.setParameter(1, serviceTypeId);
-            
-            
-            List<CtlBillingService> results = query.getResultList();
-            
-            return results;
-        }
+
+	public List<CtlBillingService> findByServiceTypeId(String serviceTypeId)
+	{
+		String queryString = "SELECT b FROM CtlBillingService b WHERE b.status=:status and b.serviceType like :serviceType";
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("status", DEFAULT_STATUS);
+		query.setParameter("serviceType", serviceTypeId);
+
+
+		List<CtlBillingService> results = query.getResultList();
+
+		return results;
+	}
         
         public List<CtlBillingService> findByServiceGroupAndServiceTypeId(String serviceGroup, String serviceTypeId) {
             Query query = entityManager.createQuery("select b from CtlBillingService b where b.status='A' and b.serviceGroup = ? and b.serviceType like ?");

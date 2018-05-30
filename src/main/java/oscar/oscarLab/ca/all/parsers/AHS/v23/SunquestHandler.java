@@ -97,6 +97,25 @@ public class SunquestHandler extends AHSHandler
 		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-2"));
 	}
 
+	/* ===================================== OBX ====================================== */
+
+	public String getOBXResult(int i, int j)
+	{
+		// for whatever reason, the OBX-5 field uses ~ to denote a line break (breaking hl7 standards).
+		// so here we concat all the segment repetitions into a single result string.
+		String newline = "<br />";
+
+		int reps = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObx5_ObservationValueReps();
+		String[] lines = new String[reps];
+
+		// gather all the strings into a list. join the list with the newline delimiter
+		for(int k=0; k<reps; k++)
+		{
+			lines[k] = getString(get("/.ORDER_OBSERVATION(" + i + ")/OBSERVATION(" + j + ")/OBX-5(" + k + ")"));
+		}
+		return String.join(newline, lines);
+	}
+
     /* =============================== Upload Handling ================================ */
 
 	@Override
@@ -104,6 +123,7 @@ public class SunquestHandler extends AHSHandler
 	{
 		return hl7Message;
 	}
+
 	@Override
 	public boolean canUpload()
 	{

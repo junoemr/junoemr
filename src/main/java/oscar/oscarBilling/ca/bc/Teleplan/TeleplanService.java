@@ -37,7 +37,7 @@ import org.oscarehr.util.MiscUtils;
  * @author jay
  */
 public class TeleplanService {
-    static Logger log=MiscUtils.getLogger();
+    private static Logger log=MiscUtils.getLogger();
     
     /** Creates a new instance of TeleplanService */
     public TeleplanService() {
@@ -54,21 +54,39 @@ public class TeleplanService {
 //        log.debug(errormsg.substring(i+10));
 //        return i;
 //    }
-    
-     
-    public TeleplanAPI getTeleplanAPI(String username,String password) throws Exception{
-        TeleplanAPI tAPI = new TeleplanAPI();//
-        
-        TeleplanResponse tr = tAPI.login(username,password);
-        
-               
-        if (tr != null && tr.getResult().equals("SUCCESS")){
-           return tAPI;
-        }
-        //TODO: ALSO RESULT COULD BE   EXPIRED.PASSWORD   need some kind of trigger that will propmt user to change password
-        
-        throw new Exception(tr.getMsgs());
-    } 
+
+
+	public TeleplanAPI getTeleplanAPI(String username, String password) throws RuntimeException
+	{
+		TeleplanAPI tAPI = new TeleplanAPI();
+		String errorMesage = "";
+
+		TeleplanResponse tr = tAPI.login(username, password);
+
+		if(tr == null || tr.getResult() == null)
+		{
+			log.error("TeleplanAPI login returned null " + ((tr == null) ? "TeleplanResponse object" : "results string") + " during login attempt");
+			errorMesage = "Teleplan API returned an unknown response";
+		}
+		else if(tr.getResult().equalsIgnoreCase("SUCCESS"))
+		{
+			return tAPI;
+		}
+		else if(tr.getResult().equalsIgnoreCase("FAILURE"))
+		{
+			errorMesage = "Invalid Login Information";
+		}
+		else if(tr.getResult().equalsIgnoreCase("EXPIRED.PASSWORD"))
+		{
+			errorMesage = "User password has expired and must be updated!";
+		}
+		else
+		{
+			log.error("TeleplanAPI login returned an unknown state: " + tr.getResult() + "\nWith message: " + tr.getMsgs());
+			errorMesage = tr.getMsgs();
+		}
+		throw new RuntimeException(errorMesage);
+	}
     
     
     

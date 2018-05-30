@@ -67,72 +67,21 @@
 
 <link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css" />
 
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/util/fax.js"></script>
+<script type="text/javascript">
+	Oscar.Util.Fax.updateFaxButton();
+</script>
 <script src="//code.jquery.com/jquery-latest.js"></script>
 <script type="text/javascript">
 
-function submitForm(actionPath) 
+function submitForm(actionPath)
 {
 	var form = document.forms[0];
 	form.action = actionPath;
 	form.submit();
 	return true;
 }
-
-function AddOtherFaxProvider() 
-{
-	var selected = jQuery("#otherFaxSelect option:selected");
-	_AddOtherFax(selected.text(),selected.val());
-}
-
-function AddOtherFax() 
-{
-	var number = jQuery("#otherFaxInput").val();
-	if (checkPhone(number)) 
-	{
-		_AddOtherFax(number,number);
-	}
-	else 
-	{
-		alert("The fax number you entered is invalid.");
-	}
-}
-
-function _AddOtherFax(name, number) 
-{
-	var remove = "<a href='javascript:void(0);' onclick='removeRecipient(this)'>remove</a>";
-	var html = "<li>"+name+"<b>, Fax No: </b>"+number+ " " +remove+"<input type='hidden' name='faxRecipients' value='"+number+"'></input></li>";
-	jQuery("#faxRecipients").append(jQuery(html));
-	updateFaxButton();
-}
-
-function checkPhone(str)
-{
-	var phone =  /^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/;
-	if (str.match(phone)) {
-   		return true;
- 	} else {
- 		return false;
- 	}
-}
-
-function removeRecipient(el) 
-{
-	var el = jQuery(el);
-	if (el) { el.parent().remove(); updateFaxButton(); }
-	else { alert("Unable to remove recipient."); }
-}
-
-function hasFaxNumber() 
-{
-	return jQuery("#faxRecipients").children().size() > 0;
-}
-
-function updateFaxButton() 
-{
-	var disabled = !hasFaxNumber();
-	document.getElementById("fax_button").disabled = disabled;
-}
-
 </script>
 
 
@@ -180,6 +129,7 @@ function updateFaxButton()
 					<td class="tite4" width="10%">  Providers: </td>
 					<td class="tite3" width="20%">
 						<select id="otherFaxSelect">
+							<option value="">--Select Provider--</option>
 						<%
 						String rdName = "";
 						String rdFaxNo = "";
@@ -210,7 +160,7 @@ function updateFaxButton()
 						</select>
 					</td>
 					<td class="tite3">
-						<button onclick="AddOtherFaxProvider(); return false;">Add Provider</button>
+						<button onclick="Oscar.Util.Fax.AddOtherFaxProvider(); return false;">Add Provider</button>
 					</td>
 				</tr>
 				<tr>
@@ -220,7 +170,7 @@ function updateFaxButton()
 
 					<font size="1">(xxx-xxx-xxxx)  </font></td>
 					<td class="tite3">
-						<button onclick="AddOtherFax(); return false;">Add Other Fax Recipient</button>
+						<button onclick="Oscar.Util.Fax.AddOtherFax(); return false;">Add Other Fax Recipient</button>
 					</td>
 				</tr>
 				</table>
@@ -247,7 +197,7 @@ function updateFaxButton()
 	<!-- Show free-form phone number box -->
 
 
-    <input type="button" id="fax_button" disabled="disabled"
+    <input type="button" class="faxButton" disabled="disabled"
         value="<bean:message key="dms.documentReport.btnFaxPDF"/>"
         onclick="return submitForm('<rewrite:reWrite jspPage="sendFaxPDFs.do?method=faxDocument"/>');" />
 
