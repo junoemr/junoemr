@@ -14,6 +14,7 @@ angular.module('Schedule').factory(
 
 		'demographicService',
 		'scheduleService',
+		'globalStateService',
 /*		'Models.ScheduleTemplate',
 		'Models.Schedule',
 		'Models.ScheduleScheduleTemplate',
@@ -33,7 +34,8 @@ angular.module('Schedule').factory(
 			util,
 
 			demographicService,
-			scheduleService
+			scheduleService,
+			globalStateService
 
 /*			schedule_template_model,
 			schedule_model,
@@ -77,15 +79,54 @@ angular.module('Schedule').factory(
 				// Get date strings to pass to the backend.  The calendar provides datetime that describe
 				// and inclusive start time and exclusive end time, so one second is removed from
 				// the end time to convert to the correct date.
-				//var startDateString = start.format("YYYY-MM-DD");
-				//var endDateString = end.subtract(1, 'seconds').format("YYYY-MM-DD");
+				var startDateString = start.format("YYYY-MM-DD");
+				var endDateString = end.subtract(1, 'seconds').format("YYYY-MM-DD");
 
-/*				scheduleService.getSchedulesForCalendar(
-					schedule.uuid,
+				scheduleService.getSchedulesForCalendar(
+					providerId,
 					startDateString,
 					endDateString
 				).then(function success(results)
-				{*/
+				{
+					//console.log(JSON.stringify(results, null, "\t"));
+					deferred.resolve({data: results});
+
+/*					var fake_results = [
+/!*						{
+							"start": "2018-05-29T09:00:00.000Z",
+							"end": "2018-05-29T12:00:00.000Z",
+							"color": "#BFEFFF",
+							"rendering": "background",
+							"resourceId": 1,
+							"availability_type": {
+								"color": "#BFEFFF",
+								"name": "60 Minute Appointment",
+								"preferred_event_length_minutes": "60",
+								"system_code": null
+							}
+						},*!/
+						{
+							"start": "2018-05-29T09:00:00",
+							"end": "2018-05-29T12:00:00",
+							"color": "#BFEFFF",
+							"rendering": "background",
+							"className": null,
+							"resourceId": 1,
+							"scheduleTemplateCode": "1",
+							"availabilityType": {
+								"color": "#BFEFFF",
+								"name": "15 Minute Appointment",
+								"preferredEventLengthMinutes": 15,
+								"systemCode": null
+							},
+							"data": null
+						},
+					];
+					deferred.resolve({data: fake_results});*/
+				});
+
+
+/*
 				var results = {
 					schedule_templates: {
 						1: {
@@ -229,7 +270,7 @@ angular.module('Schedule').factory(
 					}
 				};
 
-/*				availability_types = {
+/!*				availability_types = {
 					1: {
 						color: "#944DFF",
 						name: "Long Appointments",
@@ -248,7 +289,7 @@ angular.module('Schedule').factory(
 						preferred_event_length_minutes: null,
 						system_code: "unavailable",
 					},
-				};*/
+				};*!/
 
 				// Set some global state
 				service.event_statuses = {
@@ -297,6 +338,7 @@ angular.module('Schedule').factory(
 				console.log("-- Base array format ---------------------------");
 				console.log(JSON.stringify(schedule_events, null, "\t"));
 				deferred.resolve({data: schedule_events});
+*/
 
 				return deferred.promise;
 			};
@@ -753,20 +795,18 @@ angular.module('Schedule').factory(
 
 			service.get_global_preference_setting = function get_global_preference_setting(key)
 			{
-/*
-				if(util.exists(global_state.preferences) &&
-					util.exists(global_state.preferences.settings))
+				if(util.exists(globalStateService.preferences) &&
+					util.exists(globalStateService.preferences.settings))
 				{
-					return global_state.preferences.settings[key];
+					return globalStateService.preferences.settings[key];
 				}
-*/
 
 				return null;
 			};
 
 			service.get_global_state = function get_global_setting(key)
 			{
-				var setting = null;//global_state[key];
+				var setting = globalStateService[key];
 				if(!util.exists(setting))
 				{
 					setting = null;
@@ -776,7 +816,7 @@ angular.module('Schedule').factory(
 
 			service.save_global_state = function save_global_setting(key, value)
 			{
-				//global_state[key] = value;
+				globalStateService[key] = value;
 			};
 
 			// -----------------------------------------------------------------------------------------------

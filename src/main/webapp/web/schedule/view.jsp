@@ -66,7 +66,7 @@
 						</button>
 					</div>
 
-					<div class="pull-left form-inline"
+<%--					<div class="pull-left form-inline"
 						 ng-show="!show_schedule_select()">
 
 						<button type="button"
@@ -82,7 +82,7 @@
 							<i class="fa fa-refresh"></i>
 						</button>
 
-					</div>
+					</div>--%>
 
 					<div class="pull-right form-inline">
 

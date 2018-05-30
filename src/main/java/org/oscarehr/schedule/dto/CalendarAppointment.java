@@ -22,24 +22,179 @@
  */
 package org.oscarehr.schedule.dto;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class CalendarAppointment
 {
 	private Integer scheduleUuid;
-	private LocalDate demographicPatientDob;
+	private String demographicPatientDob; // TODO change to LocalDate
 	private String demographicPatientName;
 	private String demographicPatientPhone;
 	private Integer demographicPatientUuid;
 	private Integer demographicPractitionerUuid;
-	private LocalDateTime startTime;
-	private LocalDateTime endTime;
-	private Integer eventStatusUuid;
+	private String startTime; // TODO change to LocalDateTime
+	private String endTime; // TODO change to LocalDateTime
+	private String eventStatusUuid;
 	private Integer numInvoices;
 	private String reason;
 	private String tagNames;
 	private boolean tagSelfBooked;
 	private boolean tagSelfCancelled;
 	private String tagSystemCodes;
+
+	public CalendarAppointment(Integer scheduleUuid, String demographicPatientDob,
+		String demographicPatientName, String demographicPatientPhone,
+		Integer demographicPatientUuid, Integer demographicPractitionerUuid, String startTime,
+		String endTime, String eventStatusUuid, Integer numInvoices, String reason,
+		String tagNames, boolean tagSelfBooked, boolean tagSelfCancelled,
+		String tagSystemCodes)
+	{
+		this.scheduleUuid = scheduleUuid;
+		this.demographicPatientDob = demographicPatientDob;
+		this.demographicPatientName = demographicPatientName;
+		this.demographicPatientPhone = demographicPatientPhone;
+		this.demographicPatientUuid = demographicPatientUuid;
+		this.demographicPractitionerUuid = demographicPractitionerUuid;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.eventStatusUuid = eventStatusUuid;
+		this.numInvoices = numInvoices;
+		this.reason = reason;
+		this.tagNames = tagNames;
+		this.tagSelfBooked = tagSelfBooked;
+		this.tagSelfCancelled = tagSelfCancelled;
+		this.tagSystemCodes = tagSystemCodes;
+	}
+
+	public Integer getScheduleUuid()
+	{
+		return scheduleUuid;
+	}
+
+	public String getDemographicPatientDob()
+	{
+		return demographicPatientDob;
+	}
+
+	public String getDemographicPatientName()
+	{
+		return demographicPatientName;
+	}
+
+	public String getDemographicPatientPhone()
+	{
+		return demographicPatientPhone;
+	}
+
+	public Integer getDemographicPatientUuid()
+	{
+		return demographicPatientUuid;
+	}
+
+	public Integer getDemographicPractitionerUuid()
+	{
+		return demographicPractitionerUuid;
+	}
+
+	public String getStartTime()
+	{
+		return startTime;
+	}
+
+	public String getEndTime()
+	{
+		return endTime;
+	}
+
+	public String getEventStatusUuid()
+	{
+		return eventStatusUuid;
+	}
+
+	public Integer getNumInvoices()
+	{
+		return numInvoices;
+	}
+
+	public String getReason()
+	{
+		return reason;
+	}
+
+	public String getTagNames()
+	{
+		return tagNames;
+	}
+
+	public boolean isTagSelfBooked()
+	{
+		return tagSelfBooked;
+	}
+
+	public boolean isTagSelfCancelled()
+	{
+		return tagSelfCancelled;
+	}
+
+	public String getTagSystemCodes()
+	{
+		return tagSystemCodes;
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		CalendarAppointment that = (CalendarAppointment) o;
+		return tagSelfBooked == that.tagSelfBooked &&
+			tagSelfCancelled == that.tagSelfCancelled &&
+			Objects.equals(scheduleUuid, that.scheduleUuid) &&
+			Objects.equals(demographicPatientDob, that.demographicPatientDob) &&
+			Objects.equals(demographicPatientName, that.demographicPatientName) &&
+			Objects.equals(demographicPatientPhone, that.demographicPatientPhone) &&
+			Objects.equals(demographicPatientUuid, that.demographicPatientUuid) &&
+			Objects.equals(demographicPractitionerUuid, that.demographicPractitionerUuid) &&
+			Objects.equals(startTime, that.startTime) &&
+			Objects.equals(endTime, that.endTime) &&
+			Objects.equals(eventStatusUuid, that.eventStatusUuid) &&
+			Objects.equals(numInvoices, that.numInvoices) &&
+			Objects.equals(reason, that.reason) &&
+			Objects.equals(tagNames, that.tagNames) &&
+			Objects.equals(tagSystemCodes, that.tagSystemCodes);
+	}
+
+	@Override
+	public int hashCode()
+	{
+
+		return Objects
+			.hash(scheduleUuid, demographicPatientDob, demographicPatientName,
+				demographicPatientPhone,
+				demographicPatientUuid, demographicPractitionerUuid, startTime, endTime,
+				eventStatusUuid, numInvoices, reason, tagNames, tagSelfBooked, tagSelfCancelled,
+				tagSystemCodes);
+	}
+
+	@Override
+	public String toString()
+	{
+		return "CalendarAppointment{" +
+			"scheduleUuid=" + scheduleUuid +
+			", demographicPatientDob=" + demographicPatientDob +
+			", demographicPatientName='" + demographicPatientName + '\'' +
+			", demographicPatientPhone='" + demographicPatientPhone + '\'' +
+			", demographicPatientUuid=" + demographicPatientUuid +
+			", demographicPractitionerUuid=" + demographicPractitionerUuid +
+			", startTime=" + startTime +
+			", endTime=" + endTime +
+			", eventStatusUuid='" + eventStatusUuid + '\'' +
+			", numInvoices=" + numInvoices +
+			", reason='" + reason + '\'' +
+			", tagNames='" + tagNames + '\'' +
+			", tagSelfBooked=" + tagSelfBooked +
+			", tagSelfCancelled=" + tagSelfCancelled +
+			", tagSystemCodes='" + tagSystemCodes + '\'' +
+			'}';
+	}
 }

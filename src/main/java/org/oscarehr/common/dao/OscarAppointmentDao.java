@@ -774,6 +774,12 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 	public SortedMap<LocalTime, List<AppointmentDetails>> findAppointmentDetailsByDateAndProvider(
 		LocalDate date, Integer providerNo, String site)
 	{
+		return findAppointmentDetailsByDateAndProvider(date, date, providerNo, site);
+	}
+
+	public SortedMap<LocalTime, List<AppointmentDetails>> findAppointmentDetailsByDateAndProvider(
+		LocalDate startDate, LocalDate endDate, Integer providerNo, String site)
+	{
 		String sql = "SELECT\n" +
 				"  a.appointment_no,\n" +
 				"  a.demographic_no,\n" +
@@ -819,7 +825,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  ON d.demographic_no = t.demographic_no \n" +
 				"  AND t.service_date <= a.appointment_date \n" +
 				"  AND t.status = 'A'\n" +
-				"WHERE a.appointment_date = :date\n" +
+				"WHERE a.appointment_date >= :startDate\n" +
+				"AND a.appointment_date <= :endDate\n" +
 				"AND a.provider_no = :providerNo\n";
 
 				if(site != null)
@@ -864,7 +871,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("property_name", UserPropertyDAO.COLOR_PROPERTY);
-		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
+		query.setParameter("startDate", java.sql.Date.valueOf(startDate), TemporalType.DATE);
+		query.setParameter("endDate", java.sql.Date.valueOf(endDate), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
 
 		if(site != null)

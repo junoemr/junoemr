@@ -22,27 +22,30 @@
  */
 package org.oscarehr.schedule.dto;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class CalendarEvent
 {
-	private LocalDateTime start;
-	private LocalDateTime end;
+	public static final String RENDERING_BACKGROUND = "background";
+
+	private String start; // TODO change to LocalDateTime
+	private String end; // TODO change to LocalDateTime
 	private String color;
+	private String rendering;
 	private String className;
 	private Integer resourceId;
 	private String scheduleTemplateCode;
 	private AvailabilityType availabilityType;
 	private CalendarAppointment data;
 
-	public CalendarEvent(LocalDateTime start, LocalDateTime end, String color,
-		String className, Integer resourceId, String scheduleTemplateCode,
+	public CalendarEvent(String start, String end, String color, String rendering, String className,
+		Integer resourceId, String scheduleTemplateCode,
 		AvailabilityType availabilityType, CalendarAppointment data)
 	{
 		this.start = start;
 		this.end = end;
 		this.color = color;
+		this.rendering = rendering;
 		this.className = className;
 		this.resourceId = resourceId;
 		this.scheduleTemplateCode = scheduleTemplateCode;
@@ -50,12 +53,12 @@ public class CalendarEvent
 		this.data = data;
 	}
 
-	public LocalDateTime getStart()
+	public String getStart()
 	{
 		return start;
 	}
 
-	public LocalDateTime getEnd()
+	public String getEnd()
 	{
 		return end;
 	}
@@ -63,6 +66,11 @@ public class CalendarEvent
 	public String getColor()
 	{
 		return color;
+	}
+
+	public String getRendering()
+	{
+		return rendering;
 	}
 
 	public String getClassName()
@@ -96,9 +104,11 @@ public class CalendarEvent
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		CalendarEvent that = (CalendarEvent) o;
-		return Objects.equals(start, that.start) &&
+		return Objects.equals(RENDERING_BACKGROUND, that.RENDERING_BACKGROUND) &&
+			Objects.equals(start, that.start) &&
 			Objects.equals(end, that.end) &&
 			Objects.equals(color, that.color) &&
+			Objects.equals(rendering, that.rendering) &&
 			Objects.equals(className, that.className) &&
 			Objects.equals(resourceId, that.resourceId) &&
 			Objects.equals(scheduleTemplateCode, that.scheduleTemplateCode) &&
@@ -111,17 +121,19 @@ public class CalendarEvent
 	{
 
 		return Objects
-			.hash(start, end, color, className, resourceId, scheduleTemplateCode, availabilityType,
-				data);
+			.hash(RENDERING_BACKGROUND, start, end, color, rendering, className, resourceId,
+				scheduleTemplateCode, availabilityType, data);
 	}
 
 	@Override
 	public String toString()
 	{
 		return "CalendarEvent{" +
-			"start=" + start +
-			", end=" + end +
+			"RENDERING_BACKGROUND='" + RENDERING_BACKGROUND + '\'' +
+			", start='" + start + '\'' +
+			", end='" + end + '\'' +
 			", color='" + color + '\'' +
+			", rendering='" + rendering + '\'' +
 			", className='" + className + '\'' +
 			", resourceId=" + resourceId +
 			", scheduleTemplateCode='" + scheduleTemplateCode + '\'' +

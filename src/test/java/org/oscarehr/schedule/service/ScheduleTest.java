@@ -29,16 +29,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.oscarehr.schedule.dao.ScheduleTemplateDao;
-import org.oscarehr.schedule.dto.AvailabilityType;
+import org.oscarehr.appointment.service.Appointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigInteger;
-import java.sql.Date;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +46,10 @@ public class ScheduleTest
 	private Schedule scheduleService;
 
 	@Mock
-	private ScheduleTemplateDao scheduleTemplateDao;
+	private ScheduleTemplateService scheduleTemplateService;
+
+	@Mock
+	private Appointment appointmentService;
 
 	@Before
 	public void setUp()
@@ -60,13 +60,16 @@ public class ScheduleTest
 	@Test
 	public void getCalendarEventsEmptyTest()
 	{
-		LocalDate date = LocalDate.of(2018, 1, 1);
 		Integer providerId = 1;
-		List<Object[]> mockData = new ArrayList<>();
+		LocalDate startDate = LocalDate.of(2018, 1, 1);
+		LocalDate endDate = LocalDate.of(2018, 1, 1);
 
-		Mockito.when(scheduleTemplateDao.getRawScheduleSlots(providerId, date)).thenReturn(mockData);
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, date);
+		List<CalendarEvent> mockData = new ArrayList<>();
 
+		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(mockData);
+		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate)).thenReturn(mockData);
+
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -74,651 +77,146 @@ public class ScheduleTest
 	}
 
 	@Test
-	public void getCalendarEventsOneTest()
+	public void getCalendarEventsOneScheduleTemplateTest()
 	{
-		LocalDate date = LocalDate.of(2018, 1, 1);
 		Integer providerId = 1;
-		List<Object[]> mockData = new ArrayList<>();
+		LocalDate startDate = LocalDate.of(2018, 1, 1);
+		LocalDate endDate = LocalDate.of(2018, 1, 1);
 
-		Date testDateSql = new Date(1514793600000L);
-		Time testTimeSql = new Time(28800000L);
+		LocalDateTime start1 = LocalDateTime.of(2018,1,1,0,0,0);
+		LocalDateTime end1 = LocalDateTime.of(2018,1,1,0,15,0);
+		String color1 = "color1";
+		String className1 = "className1";
+		Integer resourceId1 = 1;
+		String scheduleTemplateCode1 = "code1";
 
-		mockData.add(new Object[]{
-			1,
-			"code",
-			testDateSql,
-			testTimeSql,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
+		List<CalendarEvent> templateMockData = new ArrayList<>();
+		templateMockData.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
 
-		Mockito.when(scheduleTemplateDao.getRawScheduleSlots(providerId, date)).thenReturn(mockData);
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, date);
+		List<CalendarEvent> appointmentMockData = new ArrayList<>();
 
-		LocalDateTime testStart = LocalDateTime.of(2018, 1, 1, 0, 0, 0);
-		LocalDateTime testEnd = LocalDateTime.of(2018, 1, 1, 0, 15, 0);
-		String className = null;
 
+		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData);
+		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate)).thenReturn(appointmentMockData);
+
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
-
-		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", className, 1, "code", availabilityType, null));
+		expectedResult.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
 
 	@Test
-	public void getCalendarEventsTwoInARowTest()
+	public void getCalendarEventsOneAppointmentTest()
 	{
-		LocalDate date = LocalDate.of(2018, 1, 1);
 		Integer providerId = 1;
-		List<Object[]> mockData = new ArrayList<>();
+		LocalDate startDate = LocalDate.of(2018, 1, 1);
+		LocalDate endDate = LocalDate.of(2018, 1, 3);
 
-		Date testDateSql = new Date(1514793600000L);
-		Time testTimeSql1 = new Time(28800000L);
-		Time testTimeSql2 = new Time(28800000L + (15*60*1000));
+		LocalDateTime start1 = LocalDateTime.of(2018,1,1,0,0,0);
+		LocalDateTime end1 = LocalDateTime.of(2018,1,1,0,15,0);
+		String color1 = "color1";
+		String className1 = "className1";
+		Integer resourceId1 = 1;
+		String scheduleTemplateCode1 = "code1";
 
-		mockData.add(new Object[]{
-			1,
-			"code",
-			testDateSql,
-			testTimeSql1,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
+		List<CalendarEvent> templateMockData = new ArrayList<>();
 
-		mockData.add(new Object[]{
-			2,
-			"code",
-			testDateSql,
-			testTimeSql2,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
+		List<CalendarEvent> appointmentMockData = new ArrayList<>();
+		appointmentMockData.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, null, className1, resourceId1, scheduleTemplateCode1, null, null));
 
-		Mockito.when(scheduleTemplateDao.getRawScheduleSlots(providerId, date)).thenReturn(mockData);
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, date);
+		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData);
+		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate)).thenReturn(appointmentMockData);
 
-		LocalDateTime testStart = LocalDateTime.of(2018, 1, 1, 0, 0, 0);
-		LocalDateTime testEnd = LocalDateTime.of(2018, 1, 1, 0, 30, 0);
-		String className = null;
-
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
-
-		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", className, 1, "code", availabilityType, null));
+		expectedResult.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, null, className1, resourceId1, scheduleTemplateCode1, null, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
 
 	@Test
-	public void getCalendarEventsThreeInARowTest()
+	public void getCalendarEventsOneEachTest()
 	{
-		LocalDate date = LocalDate.of(2018, 1, 1);
 		Integer providerId = 1;
-		List<Object[]> mockData = new ArrayList<>();
+		LocalDate startDate = LocalDate.of(2018, 1, 1);
+		LocalDate endDate = LocalDate.of(2018, 1, 3);
 
-		Date testDateSql = new Date(1514793600000L);
-		Time testTimeSql1 = new Time(28800000L);
-		Time testTimeSql2 = new Time(28800000L + (15*60*1000));
-		Time testTimeSql3 = new Time(28800000L + (2*15*60*1000));
+		LocalDateTime start1 = LocalDateTime.of(2018,1,1,0,0,0);
+		LocalDateTime end1 = LocalDateTime.of(2018,1,1,0,15,0);
+		String color1 = "color1";
+		String className1 = "className1";
+		Integer resourceId1 = 1;
+		String scheduleTemplateCode1 = "code1";
 
-		mockData.add(new Object[]{
-			1,
-			"code",
-			testDateSql,
-			testTimeSql1,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
+		LocalDateTime start2 = LocalDateTime.of(2018,1,1,0,0,0);
+		LocalDateTime end2 = LocalDateTime.of(2018,1,1,0,30,0);
+		String color2 = "color2";
+		String className2 = "className2";
+		Integer resourceId2 = 2;
+		String scheduleTemplateCode2 = "code2";
 
-		mockData.add(new Object[]{
-			2,
-			"code",
-			testDateSql,
-			testTimeSql2,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
+		List<CalendarEvent> templateMockData = new ArrayList<>();
+		templateMockData.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
 
-		mockData.add(new Object[]{
-			3,
-			"code",
-			testDateSql,
-			testTimeSql3,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
+		List<CalendarEvent> appointmentMockData = new ArrayList<>();
+		appointmentMockData.add(new CalendarEvent(start2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color2, null, className2, resourceId2, scheduleTemplateCode2, null, null));
 
-		Mockito.when(scheduleTemplateDao.getRawScheduleSlots(providerId, date)).thenReturn(mockData);
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, date);
+		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData);
+		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate)).thenReturn(appointmentMockData);
 
-		LocalDateTime testStart = LocalDateTime.of(2018, 1, 1, 0, 0, 0);
-		LocalDateTime testEnd = LocalDateTime.of(2018, 1, 1, 0, 45, 0);
-		String className = null;
-
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
-
-		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", className, 1, "code", availabilityType, null));
+		expectedResult.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
+		expectedResult.add(new CalendarEvent(start2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color2, null, className2, resourceId2, scheduleTemplateCode2, null, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
 
 	@Test
-	public void getCalendarEventsTwoInARowWithBlanksTest()
+	public void getCalendarEventsTwoTemplatesTest()
 	{
-		LocalDate date = LocalDate.of(2018, 1, 1);
 		Integer providerId = 1;
-		List<Object[]> mockData = new ArrayList<>();
+		LocalDate startDate = LocalDate.of(2018, 1, 1);
+		LocalDate endDate = LocalDate.of(2018, 1, 3);
 
-		Date testDateSql = new Date(1514793600000L);
-		Time testTimeSql1 = new Time(28800000L);
-		Time testTimeSql2 = new Time(28800000L + (1*15*60*1000));
-		Time testTimeSql3 = new Time(28800000L + (2*15*60*1000));
-		Time testTimeSql4 = new Time(28800000L + (3*15*60*1000));
+		LocalDateTime start1 = LocalDateTime.of(2018,1,1,0,0,0);
+		LocalDateTime end1 = LocalDateTime.of(2018,1,1,0,15,0);
+		String color1 = "color1";
+		String className1 = "className1";
+		Integer resourceId1 = 1;
+		String scheduleTemplateCode1 = "code1";
 
-		mockData.add(new Object[]{
-			1,
-			"_",
-			testDateSql,
-			testTimeSql1,
-			null,
-			new BigInteger("15"),
-			"description2",
-			"color2",
-			"confirm2",
-			"bookingLimit2"
-		});
+		LocalDateTime start2 = LocalDateTime.of(2018,1,1,0,0,0);
+		LocalDateTime end2 = LocalDateTime.of(2018,1,1,0,30,0);
+		String color2 = "color2";
+		String className2 = "className2";
+		Integer resourceId2 = 2;
+		String scheduleTemplateCode2 = "code2";
 
-		mockData.add(new Object[]{
-			2,
-			"code",
-			testDateSql,
-			testTimeSql2,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
+		List<CalendarEvent> templateMockData1 = new ArrayList<>();
+		templateMockData1.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
 
-		mockData.add(new Object[]{
-			3,
-			"code",
-			testDateSql,
-			testTimeSql3,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
+		List<CalendarEvent> templateMockData2 = new ArrayList<>();
 
-		mockData.add(new Object[]{
-			4,
-			"_",
-			testDateSql,
-			testTimeSql4,
-			null,
-			new BigInteger("15"),
-			"description1",
-			"color1",
-			"confirm1",
-			"bookingLimit1"
-		});
+		List<CalendarEvent> templateMockData3 = new ArrayList<>();
+		templateMockData3.add(new CalendarEvent(start2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color2, CalendarEvent.RENDERING_BACKGROUND, className2, resourceId2, scheduleTemplateCode2, null, null));
 
-		Mockito.when(scheduleTemplateDao.getRawScheduleSlots(providerId, date)).thenReturn(mockData);
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, date);
+		List<CalendarEvent> appointmentMockData = new ArrayList<>();
 
-		LocalDateTime testStart = LocalDateTime.of(2018, 1, 1, 0, 15, 0);
-		LocalDateTime testEnd = LocalDateTime.of(2018, 1, 1, 0, 45, 0);
-		String className = null;
+		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData1);
+		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate.plusDays(1))).thenReturn(templateMockData2);
+		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate.plusDays(2))).thenReturn(templateMockData3);
+		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate)).thenReturn(appointmentMockData);
 
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
-
-		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", className, 1, "code", availabilityType, null));
-
-		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
-	}
-
-	@Test
-	public void getCalendarEventsTwoTest()
-	{
-		LocalDate date = LocalDate.of(2018, 1, 1);
-		Integer providerId = 1;
-		List<Object[]> mockData = new ArrayList<>();
-
-		Date testDateSql = new Date(1514793600000L);
-		Time testTimeSql1 = new Time(28800000L);
-		Time testTimeSql2 = new Time(28800000L + (15*60*1000));
-
-		mockData.add(new Object[]{
-			1,
-			"code",
-			testDateSql,
-			testTimeSql1,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
-
-		mockData.add(new Object[]{
-			2,
-			"code2",
-			testDateSql,
-			testTimeSql2,
-			"stc_code2",
-			new BigInteger("15"),
-			"description2",
-			"color2",
-			"confirm2",
-			"bookingLimit2"
-		});
-
-		Mockito.when(scheduleTemplateDao.getRawScheduleSlots(providerId, date)).thenReturn(mockData);
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, date);
-
-		LocalDateTime testStart = LocalDateTime.of(2018, 1, 1, 0, 0, 0);
-		LocalDateTime testEnd = LocalDateTime.of(2018, 1, 1, 0, 15, 0);
-		String className = null;
-
-
-		List<CalendarEvent> expectedResult = new ArrayList<>();
-
-		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", className, 1, "code", availabilityType, null));
-
-		LocalDateTime testStart2 = LocalDateTime.of(2018, 1, 1, 0, 15, 0);
-		LocalDateTime testEnd2 = LocalDateTime.of(2018, 1, 1, 0, 30, 0);
-		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, null);
-		expectedResult.add(new CalendarEvent(testStart2, testEnd2, "color2", className, 2, "code2", availabilityType2, null));
-
-		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
-	}
-
-	@Test
-	public void getCalendarEventsTwoWithBlanksTest()
-	{
-		LocalDate date = LocalDate.of(2018, 1, 1);
-		Integer providerId = 1;
-		List<Object[]> mockData = new ArrayList<>();
-
-		Date testDateSql = new Date(1514793600000L);
-		Time testTimeSql1 = new Time(28800000L);
-		Time testTimeSql2 = new Time(28800000L + (1*15*60*1000));
-		Time testTimeSql3 = new Time(28800000L + (2*15*60*1000));
-		Time testTimeSql4 = new Time(28800000L + (3*15*60*1000));
-		Time testTimeSql5 = new Time(28800000L + (4*15*60*1000));
-
-		mockData.add(new Object[]{
-			1,
-			"_",
-			testDateSql,
-			testTimeSql1,
-			null,
-			new BigInteger("15"),
-			"description2",
-			"color2",
-			"confirm2",
-			"bookingLimit2"
-		});
-
-		mockData.add(new Object[]{
-			2,
-			"code",
-			testDateSql,
-			testTimeSql2,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
-
-		mockData.add(new Object[]{
-			3,
-			"_",
-			testDateSql,
-			testTimeSql3,
-			null,
-			new BigInteger("15"),
-			"description1",
-			"color1",
-			"confirm1",
-			"bookingLimit1"
-		});
-
-		mockData.add(new Object[]{
-			4,
-			"code",
-			testDateSql,
-			testTimeSql4,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
-
-		mockData.add(new Object[]{
-			5,
-			"_",
-			testDateSql,
-			testTimeSql5,
-			null,
-			new BigInteger("15"),
-			"description1",
-			"color1",
-			"confirm1",
-			"bookingLimit1"
-		});
-
-		Mockito.when(scheduleTemplateDao.getRawScheduleSlots(providerId, date)).thenReturn(mockData);
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, date);
-
-		LocalDateTime testStart = LocalDateTime.of(2018, 1, 1, 0, 15, 0);
-		LocalDateTime testEnd = LocalDateTime.of(2018, 1, 1, 0, 30, 0);
-		String className = null;
-
-
-		List<CalendarEvent> expectedResult = new ArrayList<>();
-
-		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", className, 1, "code", availabilityType, null));
-
-		LocalDateTime testStart2 = LocalDateTime.of(2018, 1, 1, 0, 45, 0);
-		LocalDateTime testEnd2 = LocalDateTime.of(2018, 1, 1, 1, 0, 0);
-		AvailabilityType availabilityType2 = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart2, testEnd2, "color", className, 2, "code", availabilityType2, null));
-
-		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
-	}
-
-	@Test
-	public void getCalendarEventsThreeWithBlanksTest()
-	{
-		LocalDate date = LocalDate.of(2018, 1, 1);
-		Integer providerId = 1;
-		List<Object[]> mockData = new ArrayList<>();
-
-		Date testDateSql = new Date(1514793600000L);
-		Time testTimeSql1 = new Time(28800000L);
-		Time testTimeSql2 = new Time(28800000L + (1*15*60*1000));
-		Time testTimeSql3 = new Time(28800000L + (2*15*60*1000));
-		Time testTimeSql4 = new Time(28800000L + (3*15*60*1000));
-		Time testTimeSql5 = new Time(28800000L + (4*15*60*1000));
-
-		mockData.add(new Object[]{
-			1,
-			"_",
-			testDateSql,
-			testTimeSql1,
-			null,
-			new BigInteger("15"),
-			"description2",
-			"color2",
-			"confirm2",
-			"bookingLimit2"
-		});
-
-		mockData.add(new Object[]{
-			2,
-			"code",
-			testDateSql,
-			testTimeSql2,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
-
-		mockData.add(new Object[]{
-			3,
-			"code2",
-			testDateSql,
-			testTimeSql3,
-			null,
-			new BigInteger("15"),
-			"description2",
-			"color2",
-			"confirm2",
-			"bookingLimit2"
-		});
-
-		mockData.add(new Object[]{
-			4,
-			"code",
-			testDateSql,
-			testTimeSql4,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
-
-		mockData.add(new Object[]{
-			5,
-			"_",
-			testDateSql,
-			testTimeSql5,
-			null,
-			new BigInteger("15"),
-			"description1",
-			"color1",
-			"confirm1",
-			"bookingLimit1"
-		});
-
-		Mockito.when(scheduleTemplateDao.getRawScheduleSlots(providerId, date)).thenReturn(mockData);
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, date);
-
-		LocalDateTime testStart = LocalDateTime.of(2018, 1, 1, 0, 15, 0);
-		LocalDateTime testEnd = LocalDateTime.of(2018, 1, 1, 0, 30, 0);
-		String className = null;
-
-
-		List<CalendarEvent> expectedResult = new ArrayList<>();
-
-		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", className, 1, "code", availabilityType, null));
-
-		LocalDateTime testStart2 = LocalDateTime.of(2018, 1, 1, 0, 30, 0);
-		LocalDateTime testEnd2 = LocalDateTime.of(2018, 1, 1, 0, 45, 0);
-		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, null);
-		expectedResult.add(new CalendarEvent(testStart2, testEnd2, "color2", className, 2, "code2", availabilityType2, null));
-
-		LocalDateTime testStart3 = LocalDateTime.of(2018, 1, 1, 0, 45, 0);
-		LocalDateTime testEnd3 = LocalDateTime.of(2018, 1, 1, 1, 0, 0);
-		AvailabilityType availabilityType3 = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart3, testEnd3, "color", className, 3, "code", availabilityType3, null));
-
-		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
-	}
-
-	@Test
-	public void getCalendarEventsThreeDoublesWithBlanksTest()
-	{
-		LocalDate date = LocalDate.of(2018, 1, 1);
-		Integer providerId = 1;
-		List<Object[]> mockData = new ArrayList<>();
-
-		Date testDateSql = new Date(1514793600000L);
-		Time testTimeSql1 = new Time(28800000L);
-		Time testTimeSql2 = new Time(28800000L + (1*15*60*1000));
-		Time testTimeSql3 = new Time(28800000L + (2*15*60*1000));
-		Time testTimeSql4 = new Time(28800000L + (3*15*60*1000));
-		Time testTimeSql5 = new Time(28800000L + (4*15*60*1000));
-		Time testTimeSql6 = new Time(28800000L + (5*15*60*1000));
-		Time testTimeSql7 = new Time(28800000L + (6*15*60*1000));
-		Time testTimeSql8 = new Time(28800000L + (7*15*60*1000));
-
-		mockData.add(new Object[]{
-			1,
-			"_",
-			testDateSql,
-			testTimeSql1,
-			null,
-			new BigInteger("15"),
-			"description2",
-			"color2",
-			"confirm2",
-			"bookingLimit2"
-		});
-
-		mockData.add(new Object[]{
-			2,
-			"code",
-			testDateSql,
-			testTimeSql2,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
-
-		mockData.add(new Object[]{
-			3,
-			"code",
-			testDateSql,
-			testTimeSql3,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
-
-		mockData.add(new Object[]{
-			4,
-			"code2",
-			testDateSql,
-			testTimeSql4,
-			null,
-			new BigInteger("15"),
-			"description2",
-			"color2",
-			"confirm2",
-			"bookingLimit2"
-		});
-
-		mockData.add(new Object[]{
-			5,
-			"code2",
-			testDateSql,
-			testTimeSql5,
-			null,
-			new BigInteger("15"),
-			"description2",
-			"color2",
-			"confirm2",
-			"bookingLimit2"
-		});
-
-		mockData.add(new Object[]{
-			6,
-			"code",
-			testDateSql,
-			testTimeSql6,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
-
-		mockData.add(new Object[]{
-			7,
-			"code",
-			testDateSql,
-			testTimeSql7,
-			"stc_code",
-			new BigInteger("15"),
-			"description",
-			"color",
-			"confirm",
-			"bookingLimit"
-		});
-
-		mockData.add(new Object[]{
-			8,
-			"_",
-			testDateSql,
-			testTimeSql8,
-			null,
-			new BigInteger("15"),
-			"description1",
-			"color1",
-			"confirm1",
-			"bookingLimit1"
-		});
-
-		Mockito.when(scheduleTemplateDao.getRawScheduleSlots(providerId, date)).thenReturn(mockData);
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, date);
-
-		LocalDateTime testStart = LocalDateTime.of(2018, 1, 1, 0, 15, 0);
-		LocalDateTime testEnd = LocalDateTime.of(2018, 1, 1, 0, 45, 0);
-		String className = null;
-
-
-		List<CalendarEvent> expectedResult = new ArrayList<>();
-
-		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", className, 1, "code", availabilityType, null));
-
-		LocalDateTime testStart2 = LocalDateTime.of(2018, 1, 1, 0, 45, 0);
-		LocalDateTime testEnd2 = LocalDateTime.of(2018, 1, 1, 1, 15, 0);
-		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, null);
-		expectedResult.add(new CalendarEvent(testStart2, testEnd2, "color2", className, 2, "code2", availabilityType2, null));
-
-		LocalDateTime testStart3 = LocalDateTime.of(2018, 1, 1, 1, 15, 0);
-		LocalDateTime testEnd3 = LocalDateTime.of(2018, 1, 1, 1, 45, 0);
-		AvailabilityType availabilityType3 = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart3, testEnd3, "color", className, 3, "code", availabilityType3, null));
+		expectedResult.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
+		expectedResult.add(new CalendarEvent(start2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color2, CalendarEvent.RENDERING_BACKGROUND, className2, resourceId2, scheduleTemplateCode2, null, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}

@@ -378,11 +378,11 @@ public class ConversionUtils {
 	 * Creates a list of dates.  Taken from http://www.baeldung.com/java-between-dates
 	 * @param startDate
 	 * @param endDate
-	 * @return An iclusive list of dates
+	 * @return An inclusive list of dates
 	 */
 	public static List<LocalDate> getDateList(LocalDate startDate, LocalDate endDate)
 	{
-		long numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+		long numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1;
 
 		return IntStream.iterate(0, i -> i + 1)
 			.limit(numOfDaysBetween)

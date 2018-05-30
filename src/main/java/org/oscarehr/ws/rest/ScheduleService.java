@@ -407,9 +407,10 @@ public class ScheduleService extends AbstractServiceImpl {
 		@QueryParam("endDate") String endDateString
 	)
 	{
-		LocalDate startDate = toNullableLocalDate(startDateString);
-		LocalDate endDate = toNullableLocalDate(endDateString);
+		LocalDate startDate = dateStringToNullableLocalDate(startDateString);
+		LocalDate endDate = dateStringToNullableLocalDate(endDateString);
 
+		// TODO: Change this tho throw an exception
 		// Default to today if either date is null
 		if(startDate == null || endDate == null)
 		{

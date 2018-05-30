@@ -143,7 +143,15 @@ public abstract class AbstractServiceImpl {
 		return info;
 	}
 
-
+	protected LocalDate dateStringToNullableLocalDate(String dateString)
+	{
+		if(dateString == null) return null;
+		return dateStringToLocalDate(dateString);
+	}
+	protected LocalDate dateStringToLocalDate(String dateString)
+	{
+		return LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
+	}
 	protected LocalDate toNullableLocalDate(String dateString) {
 		if(dateString == null) return null;
 		return toLocalDate(dateString);
