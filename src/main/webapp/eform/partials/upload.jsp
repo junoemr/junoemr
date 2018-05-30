@@ -51,7 +51,7 @@
 		}
 		.uploadEformTitle label {
 			display: inline-block;
-			width: 160px;
+			width: 180px;
 			text-align: right;
 		}
 	</style>
@@ -110,16 +110,20 @@
 
 		<div class="uploadEformTitle">
 			<div>
-				<label for="showLatestFormOnly"><bean:message key="eform.uploadhtml.showLatestFormOnly" /></label>
+				<label for="showLatestFormOnly" title='<bean:message key="eform.uploadhtml.showLatestFormOnly.tooltip"/>'>
+					<bean:message key="eform.uploadhtml.showLatestFormOnly" />
+				</label>
 				<input type="checkbox" id="showLatestFormOnly" name="showLatestFormOnly" value="true"/>
+			</div>
+			<div>
+				<label for="instanced" title='<bean:message key="eform.uploadhtml.instanced.tooltip"/>'>
+					<bean:message key="eform.uploadhtml.instanced" />
+				</label>
+				<input type="checkbox" id="instanced" name="instanced" value="true" checked />
 			</div>
 			<div>
 				<label for="patientIndependent"><bean:message key="eform.uploadhtml.patientIndependent" /></label>
 				<input type="checkbox" id="patientIndependent" name="patientIndependent" value="true"/>
-			</div>
-			<div>
-				<label for="instanced"><bean:message key="eform.uploadhtml.instanced" /></label>
-				<input type="checkbox" id="instanced" name="instanced" value="true"/>
 			</div>
 		</div>
 

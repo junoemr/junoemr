@@ -60,7 +60,7 @@
 
 	curform.putIfAbsent("showLatestFormOnly", false);
 	curform.putIfAbsent("patientIndependent", false);
-	curform.putIfAbsent("instanced", false);
+	curform.putIfAbsent("instanced", true); //new eForms should be instanced by default
 
 	String formHtml = StringUtils.trimToEmpty(StringEscapeUtils.escapeHtml((String) curform.get("formHtml")));
 %>
@@ -86,7 +86,7 @@
 		}
 		.eform_checkbox_list label {
 			display: inline-block;
-			width: 160px;
+			width: 180px;
 			text-align: right;
 		}
 
@@ -201,16 +201,20 @@ window.opener.location.href = '<%=request.getContextPath()%>/administration/?sho
 			<!--PATIENT INDEPENDANT-->
 			<div class="eform_checkbox_list" style="display:inline-block">
 				<div>
-					<label for="showLatestFormOnly"><bean:message key="eform.uploadhtml.showLatestFormOnly" /></label>
+					<label for="showLatestFormOnly" title='<bean:message key="eform.uploadhtml.showLatestFormOnly.tooltip"/>'>
+						<bean:message key="eform.uploadhtml.showLatestFormOnly" />
+					</label>
 					<input type="checkbox" id="showLatestFormOnly" name="showLatestFormOnly" value="true" <%= (Boolean) curform.get("showLatestFormOnly") ? "checked" : "" %> />
+				</div>
+				<div>
+					<label for="instanced" title='<bean:message key="eform.uploadhtml.instanced.tooltip"/>'>
+						<bean:message key="eform.uploadhtml.instanced" />
+					</label>
+					<input type="checkbox" id="instanced" name="instanced" value="true" <%= (Boolean)curform.get("instanced")?"checked":"" %> />
 				</div>
 				<div>
 					<label for="patientIndependent"><bean:message key="eform.uploadhtml.patientIndependent" /></label>
 					<input type="checkbox" id="patientIndependent" name="patientIndependent" value="true" <%= (Boolean)curform.get("patientIndependent")?"checked":"" %> />
-				</div>
-				<div>
-					<label for="instanced"><bean:message key="eform.uploadhtml.instanced" /></label>
-					<input type="checkbox" id="instanced" name="instanced" value="true" <%= (Boolean)curform.get("instanced")?"checked":"" %> />
 				</div>
 			</div>
 
