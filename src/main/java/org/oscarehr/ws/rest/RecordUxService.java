@@ -70,6 +70,7 @@ import org.springframework.stereotype.Component;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import oscar.OscarProperties;
 import oscar.oscarProvider.data.ProviderMyOscarIdData;
 
 
@@ -503,6 +504,17 @@ public class RecordUxService extends AbstractServiceImpl {
 		EncounterTemplateResponse response = new EncounterTemplateResponse();
 		response.setTemplates(transfers);
 		
+		return response;
+	}
+
+	@GET
+	@Path("/properties")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JSONObject getDisplayProperties() {
+		JSONObject response = new JSONObject();
+		OscarProperties oscarProperties = OscarProperties.getInstance();
+
+		response.put("demographic_family_doctor", oscarProperties.isPropertyActive("demographic_family_doctor"));
 		return response;
 	}
 	

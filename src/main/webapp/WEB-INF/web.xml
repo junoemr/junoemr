@@ -13,22 +13,27 @@
 		<param-value>classpath:applicationContext*.xml</param-value>
 	</context-param>
 
-        <filter>
-               <filter-name>monitoring</filter-name>
-               <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
-               <init-param>
-                        <param-name>system-actions-enabled</param-name>
-                        <param-value>true</param-value>
-                </init-param>
-                <init-param>
-				   <param-name>disabled</param-name>
-				   <param-value>true</param-value>
-				</init-param>
-        </filter>
-        <filter-mapping>
-                <filter-name>monitoring</filter-name>
-                <url-pattern>/*</url-pattern>
-        </filter-mapping>
+    <error-page>
+        <error-code>400</error-code>
+        <location>/400.jsp</location>
+    </error-page>
+
+    <filter>
+           <filter-name>monitoring</filter-name>
+           <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
+           <init-param>
+                    <param-name>system-actions-enabled</param-name>
+                    <param-value>true</param-value>
+            </init-param>
+            <init-param>
+               <param-name>disabled</param-name>
+               <param-value>true</param-value>
+            </init-param>
+    </filter>
+    <filter-mapping>
+            <filter-name>monitoring</filter-name>
+            <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <filter>
             <filter-name>WebServiceSessionInvalidatingFilter</filter-name>
@@ -38,6 +43,15 @@
             <filter-name>WebServiceSessionInvalidatingFilter</filter-name>
             <url-pattern>/ws/*</url-pattern>
     </filter-mapping>
+
+	<filter>
+		<filter-name>failedRequestFilter</filter-name>
+		<filter-class>org.apache.catalina.filters.FailedRequestFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>failedRequestFilter</filter-name>
+		<url-pattern>/eform/addEForm.do</url-pattern>
+	</filter-mapping>
 
 	<filter>
 		<filter-name>ProblemCheckFilter</filter-name>

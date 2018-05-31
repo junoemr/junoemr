@@ -1,7 +1,8 @@
 #patient-record-page {
+	margin-top: -$margin-sm;
 	.patient-header-name {
 		color: $primary-blue-text;
-		margin-top: $margin-sm;
+		margin: 15px 0;
 	} // for patient header
 	.patient-header-label {
 		color: $primary-blue-text;

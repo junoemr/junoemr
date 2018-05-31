@@ -1332,8 +1332,8 @@
 
                         var status = data.status;
 						if(status === "SUCCESS") {
-	                        var options = [];
-	                        var values = [];
+	                        var options = [""];
+	                        var values = [0];
 	                        var selectedId = 0;
 	                        for(var i=0; i<data.body.length; i++) {
 	                            options.push(data.body[i].formName);
@@ -2395,8 +2395,8 @@
 					};
 					// initialize the signature pad
 					var signPad = new SignaturePad(canvas, {
-						minWidth: 2,
-						maxWidth: 4,
+						minWidth: 1,
+						maxWidth: 2,
 						onEnd: function () {
 							$this.trigger("signatureChange");
 						}

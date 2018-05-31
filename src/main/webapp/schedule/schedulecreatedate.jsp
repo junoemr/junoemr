@@ -301,14 +301,14 @@
 							if(aHScheduleHoliday != null)
 							{
 								bgcolor = new StringBuffer("pink");
-								strHolidayName = new StringBuffer(aHScheduleHoliday.holiday_name);
+								strHolidayName = new StringBuffer(aHScheduleHoliday.holiday_name != null ? aHScheduleHoliday.holiday_name : "");
 							}
 							aHScheduleDate = (HScheduleDate) scheduleDateBean.get(year + "-" + MyDateFormat.getDigitalXX(month) + "-" + MyDateFormat.getDigitalXX(dateGrid[i][j]));
 							if(aHScheduleDate != null)
 							{
 								bgcolor = new StringBuffer("gold");
 								if(aHScheduleDate.available.equals("0")) bgcolor = new StringBuffer("navy");
-								strHour = new StringBuffer(aHScheduleDate.hour);
+								strHour = new StringBuffer(aHScheduleDate.hour != null ? aHScheduleDate.hour : "");
 								strReason = new StringBuffer(aHScheduleDate.reason != null ? aHScheduleDate.reason : "");
 							}
 

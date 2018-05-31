@@ -78,10 +78,15 @@ function toggleReason( providerNo ) {
     jQuery( id ).toggle();
     localStorage.setItem( id, jQuery( id ).is( ":visible" ) );
 }
-    
 
-function confirmPopupPage(height, width, queryString, doConfirm, allowDay, allowWeek){
-        if (doConfirm == "Yes") {
+function confirmPopupPage(height, width, queryString, doConfirm, allowDay, allowWeek, hasSite){
+		if(!hasSite)
+		{
+				window.alert("<bean:message key="appointment.addappointment.msgNoSiteAssigned"/>");
+				return;
+		}
+
+		if (doConfirm == "Yes") {
                 if (confirm("<bean:message key="provider.appointmentProviderAdminDay.confirmBooking"/>")){
                  popupPage(height, width, queryString);
                 }

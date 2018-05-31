@@ -217,6 +217,7 @@ public class ClinicaidAPIService
 			HashMap<String, String> data = new HashMap<>();
 			data.put("service_recipient_uli", demo.getHin());
 			data.put("service_recipient_ver", demo.getVer());
+			data.put("service_recipient_first_name", UtilMisc.toUpperLowerCase(demo.getFirstName()));
 			data.put("service_recipient_last_name", UtilMisc.toUpperLowerCase(demo.getLastName()));
 			data.put("service_recipient_oscar_number", service_recipient_oscar_number);
 			data.put("service_recipient_status", demo.getPatientStatus());

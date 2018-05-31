@@ -51,6 +51,10 @@ public abstract class AbstractModel<T> implements java.io.Serializable
 		        		&& stack[i].getMethodName().equals("toString")) {
 		        	return super.hashCode();
 		        }
+				if(stack[i].getClassName().equals("org.oscarehr.common.listeners.BeanValidationEventListener")
+						&& stack[i].getMethodName().equals("validate")) {
+					return super.hashCode();
+				}
 	        }
 			MiscUtils.getLogger().warn(OBJECT_NOT_YET_PERISTED, new Exception());
 			return(super.hashCode());

@@ -5,6 +5,7 @@
 <%@ page import="org.oscarehr.eform.model.EForm" %>
 
 <%
+
 	LoggedInInfo loggedInInfo3=LoggedInInfo.getLoggedInInfoFromSession(request);
 	if (providerPreference!=null)
 	{

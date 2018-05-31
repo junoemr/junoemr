@@ -129,7 +129,7 @@ public final class LoginCheckLoginBean {
 
 	private String[] cleanNullObj(String errorMsg) {
 		logger.warn(errorMsg);
-		LogAction.addLogEntrySyncronous(null, LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_FAILURE, null, ip, errorMsg);
+		LogAction.addLogEntrySynchronous(null, LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_FAILURE, null, ip, errorMsg);
 		userpassword = null;
 		password = null;
 		return null;
@@ -137,7 +137,7 @@ public final class LoginCheckLoginBean {
 
 	private String[] cleanNullObjExpire(String errorMsg) {
 		logger.warn(errorMsg);
-		LogAction.addLogEntrySyncronous(null, LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_FAILURE, null, ip, errorMsg);
+		LogAction.addLogEntrySynchronous(null, LogConst.ACTION_LOGIN, LogConst.CON_LOGIN, LogConst.STATUS_FAILURE, null, ip, errorMsg);
 		userpassword = null;
 		password = null;
 		return new String[] { "expired" };

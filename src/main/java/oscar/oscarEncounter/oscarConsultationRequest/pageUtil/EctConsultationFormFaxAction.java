@@ -199,9 +199,6 @@ public class EctConsultationFormFaxAction extends Action
 
 			if (alist.size() > 0)
 			{
-
-				String referralFax = request.getParameter("fax");
-
 				// Retrieving additional fax recipients.
 				String[] tmpRecipients = request.getParameterValues("faxRecipients");
 
@@ -211,12 +208,6 @@ public class EctConsultationFormFaxAction extends Action
 					tmpRecipients[i] = tmpRecipients[i].trim().replaceAll("\\D", "");
 				}
 				ArrayList<String> recipients = tmpRecipients == null ? new ArrayList<String>() : new ArrayList<String>(Arrays.asList(tmpRecipients));
-
-				// Including consultant fax number if appropriate.
-				if (referralFax != null && !referralFax.equals(""))
-				{
-					recipients.add(referralFax.trim().replaceAll("\\D", ""));
-				}
 
 				// Removing duplicate phone numbers.
 				recipients = new ArrayList<String>(new HashSet<String>(recipients));
@@ -262,7 +253,7 @@ public class EctConsultationFormFaxAction extends Action
 						throw new DocumentException("Document target fax number '" + faxNo + "' is invalid.");
 					}
 
-					String tempName = "CRF-" + faxClinicId + reqId + "." + System.currentTimeMillis();
+					String tempName = String.format("CRF-%s%s.%s.%d", faxClinicId, reqId, faxNo, System.currentTimeMillis());
 
 					String tempPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
 					String tempTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);

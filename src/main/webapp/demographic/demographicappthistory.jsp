@@ -62,7 +62,7 @@
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.model.Appointment" %>
 <%@page import="org.oscarehr.common.model.AppointmentArchive" %>
-<%@page import="org.oscarehr.common.dao.AppointmentStatusDao" %>
+<%@page import="org.oscarehr.appointment.dao.AppointmentStatusDao" %>
 <%@page import="org.oscarehr.common.model.AppointmentStatus" %>
 
 

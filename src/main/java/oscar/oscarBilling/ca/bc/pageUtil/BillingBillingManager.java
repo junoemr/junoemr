@@ -23,6 +23,7 @@
  */
 package oscar.oscarBilling.ca.bc.pageUtil;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -234,7 +235,8 @@ public class BillingBillingManager {
 
 	}
 
-	public class BillingItem {
+	public class BillingItem implements Serializable
+	{
 
 		String service_code;
 		String description;
@@ -308,28 +310,36 @@ public class BillingBillingManager {
 
 		public void fill(String billType) {
 			BillingServiceDao dao = SpringUtils.getBean(BillingServiceDao.class);
-			List<BillingService> bss = null;
+			BillingService bs;
 			//make sure to load private fee if required,but defaqult to MSP fee if Private fee unavailable
-			if ("pri".equalsIgnoreCase(billType)) {
-				bss = dao.findByServiceCodes(Arrays.asList(new String[] { service_code, "A" + service_code }));
-			} else {
-				bss = dao.findByServiceCode(service_code);
+			if("pri".equalsIgnoreCase(billType))
+			{
+				//TODO rewrite this query method
+				List<BillingService> bss = dao.findByServiceCodes(Arrays.asList(new String[]{service_code, "A" + service_code}));
+				bs = bss.get(bss.size()-1);
 			}
+			else
+			{
+				bs = dao.findLatestServiceDateByServiceCode(service_code);
+			}
+			this.description = bs.getDescription();
+			this.price = Double.parseDouble(bs.getValue());
 
-			for (BillingService bs : bss) {
-				this.description = bs.getDescription();
-				this.price = Double.parseDouble(bs.getValue());
-
-				try {
-					String percRes = bs.getPercentage();
-					if (percRes != null && !"".equals(percRes)) {
-						this.percentage = Double.parseDouble(percRes);
-					} else {
-						this.percentage = 100.00;
-					}
-				} catch (NumberFormatException eNum) {
-					this.percentage = 100;
+			try
+			{
+				String percRes = bs.getPercentage();
+				if(percRes != null && !"".equals(percRes))
+				{
+					this.percentage = Double.parseDouble(percRes);
 				}
+				else
+				{
+					this.percentage = 100.00;
+				}
+			}
+			catch(NumberFormatException eNum)
+			{
+				this.percentage = 100;
 			}
 		}
 

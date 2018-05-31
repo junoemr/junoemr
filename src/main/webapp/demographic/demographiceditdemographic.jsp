@@ -1053,7 +1053,7 @@ if(wLReadonly.equals("")){
 					{
 						referral_no_parameter = "&referral_no_1=" + referralDoctorNo;
 					}
-					ProviderPreference preference = providerPreferenceDao.find(demographic.getProviderNo());
+					ProviderPreference preference = providerPreferenceDao.find(curProvider_no);
 					if(preference != null)
 					{
 						String preferredView = preference.getDefaultServiceType();
