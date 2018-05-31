@@ -69,6 +69,7 @@
 <%@ page import="java.util.HashSet" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -235,6 +236,21 @@
 
     demographicDao.save(demographic);
 
+	// save custom licensed producer if enabled
+	if(oscarVariables.isPropertyActive("show_demographic_licensed_producers")) {
+		try {
+			int licensedProducerID = Integer.parseInt(request.getParameter("licensed_producer"));
+			int licensedProducerID2 = Integer.parseInt(request.getParameter("licensed_producer2"));
+			int licensedProducerAddressID = Integer.parseInt(request.getParameter("licensed_producer_address"));
+			demographicDao.saveDemographicLicensedProducer(demographic.getDemographicNo(), licensedProducerID, licensedProducerID2, licensedProducerAddressID);
+		}
+		catch(NumberFormatException e) {
+			// unable to save licensed producer info
+			MiscUtils.getLogger().warn(
+					String.format("Failed to save licensed producer for demographic %d.", demographic.getDemographicNo())
+			);
+		}
+	}
 
 	GenericIntakeEditAction gieat = new GenericIntakeEditAction();
 	gieat.setAdmissionManager(am);
