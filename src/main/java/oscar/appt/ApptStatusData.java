@@ -36,7 +36,6 @@ import java.util.ResourceBundle;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.managers.AppointmentManager;
 
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 
@@ -108,8 +107,8 @@ public final class ApptStatusData {
 		}
 		String status = apptStatus;
 		String returnIcon = baseIcon;
-		MiscUtils.getLogger().info("STATUS: " + status);
-		if(status.length() >= 2 && !status.equals("null")) {
+
+		if(status.length() >= 2 && !status.equalsIgnoreCase("null")) {
 			String otherIcon = status.substring(1,2);
 			returnIcon = otherIcon + baseIcon;
 		}
@@ -142,7 +141,7 @@ public final class ApptStatusData {
 		}
 
 		// have to preserver billed/verified status
-		if(currentStatus.length() >= 2 && !currentStatus.equals("null")) {
+		if(currentStatus.length() >= 2 && !currentStatus.equalsIgnoreCase("null")) {
 			nextStatus = nextStatus.charAt(0) + currentStatus.substring(1);
 		}
 
