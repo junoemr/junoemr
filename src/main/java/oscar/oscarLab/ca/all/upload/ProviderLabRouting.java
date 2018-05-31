@@ -47,6 +47,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarLab.ForwardingRules;
@@ -158,7 +159,7 @@ public class ProviderLabRouting {
         String autoFileLabs = props.getProperty("AUTO_FILE_LABS");
         String autoUnfileLabs = props.getProperty("AUTO_UNFILE_LABS");
 
-        ProviderLabRoutingDao providerLabRoutingDao = new ProviderLabRoutingDao();
+		ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean("providerLabRoutingDao");
         List<ProviderLabRoutingModel> rs = providerLabRoutingDao.getProviderLabRoutingForLabProviderType(labId, provider_no, labType);
 
         if(!rs.isEmpty()) {

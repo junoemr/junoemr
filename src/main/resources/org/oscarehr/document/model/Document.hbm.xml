@@ -33,6 +33,8 @@
 			type="date" not-null="false" length="10" />
 		<property name="docresultstatus" column="doc_result_status"
             type="string" length="1" />
+		<property name="numberOfPages" column="number_of_pages"
+			type="integer" length="6" />
 		
 
 
