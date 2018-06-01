@@ -32,6 +32,11 @@
     <cxf:bus>
 		<cxf:properties>
 			<entry key="ws-security.ut.validator" value="org.oscarehr.ws.OscarUsernameTokenValidator" />
+			<!--
+			  This property needs to be set 'true' in order to give preference to JacksonJsonProvider
+			  over the default Jettison provider.
+			-->
+			<entry key="skip.default.json.provider.registration" value="true" />
 		</cxf:properties>
 
 		<!-- logging interceptors -->
