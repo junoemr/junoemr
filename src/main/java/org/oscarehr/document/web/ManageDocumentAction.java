@@ -425,7 +425,7 @@ public class ManageDocumentAction extends DispatchAction {
 			}
 
 		}catch(Exception e) {
-			log.error("Error decoding pdf file " + d.getDocfilename());
+			log.error("Error decoding pdf file " + d.getDocfilename(), e);
 			decode_pdf.closePdfFile();
 		}
 

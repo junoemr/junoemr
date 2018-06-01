@@ -38,6 +38,7 @@ import javax.persistence.Query;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.common.model.ConsultDocs;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
 import org.springframework.stereotype.Repository;
 
@@ -147,9 +148,11 @@ public class DocumentDao extends AbstractDao<Document>
 		String sql = "FROM Document d, CtlDocument c " + 
 				"WHERE c.id.documentNo = d.documentNo " +
                 "AND c.id.documentNo = :documentNo " +
+				"AND c.id.module = :module " +
                 "ORDER BY d.observationdate DESC, d.updatedatetime DESC";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("documentNo", documentNo);
+		query.setParameter("module", CtlDocument.MODULE_DEMOGRAPHIC);
 		return query.getResultList();
     }
 

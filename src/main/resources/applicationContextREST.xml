@@ -8,16 +8,6 @@
 		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
 	">
 
-	<cxf:bus>
-		<cxf:properties>
-			<!--
-			  This property needs to be set 'true' in order to give preference to JacksonJsonProvider
-			  over the default Jettison provider.
-			-->
-			<entry key="skip.default.json.provider.registration" value="true" ></entry>
-		</cxf:properties>
-	</cxf:bus>
-
 	<!--<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>-->
 	<!--<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>-->
 
