@@ -91,7 +91,7 @@ public class AppointmentStatusList
 	{
 		if (status == null)
 		{
-			return null;
+			return orderedStatusList.get(0);
 		} else
 		{
 			String statusChar = status.substring(0, 1);
