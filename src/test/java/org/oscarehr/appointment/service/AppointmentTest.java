@@ -22,7 +22,6 @@
  */
 package org.oscarehr.appointment.service;
 
-import com.google.common.collect.RangeMap;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,7 +71,7 @@ public class AppointmentTest
 
 		Mockito.when(appointmentDao.findAppointmentDetailsByDateAndProvider(startDate, endDate, providerId, site)).thenReturn(mockData);
 
-		List<CalendarEvent> result = appointmentService.getCalendarEvents(providerId, startDate, endDate);
+		List<CalendarEvent> result = appointmentService.getCalendarEvents(providerId, startDate, endDate, site);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -131,7 +130,7 @@ public class AppointmentTest
 
 		Mockito.when(appointmentDao.findAppointmentDetailsByDateAndProvider(startDate, endDate, providerId, site)).thenReturn(mockData);
 
-		List<CalendarEvent> result = appointmentService.getCalendarEvents(providerId, startDate, endDate);
+		List<CalendarEvent> result = appointmentService.getCalendarEvents(providerId, startDate, endDate, site);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -141,13 +140,13 @@ public class AppointmentTest
 			"color1",
 			null,
 			"text-dark",
-			1,
+			providerId,
 			null,
 			null,
 			new CalendarAppointment(
 				1,
 				LocalDate.of(2000,1,1).format(DateTimeFormatter.ISO_LOCAL_DATE),
-				"last1, first1",
+				"Last1, First1",
 				null, // TODO get phone number
 				1,
 				null, // TODO get patient's doctor

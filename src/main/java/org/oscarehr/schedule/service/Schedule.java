@@ -443,7 +443,8 @@ public class Schedule
 	public List<CalendarEvent> getCalendarEvents(
 		Integer providerId,
 		LocalDate startDate,
-		LocalDate endDate
+		LocalDate endDate,
+		String siteName
 	)
 	{
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
@@ -457,7 +458,8 @@ public class Schedule
 		}
 
 		// Get appointments for this provider/date range
-		calendarEvents.addAll(appointmentService.getCalendarEvents(providerId, startDate, endDate));
+		calendarEvents.addAll(appointmentService.getCalendarEvents(
+			providerId, startDate, endDate, siteName));
 
 		return calendarEvents;
 	}

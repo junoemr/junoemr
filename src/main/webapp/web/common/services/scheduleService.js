@@ -277,7 +277,12 @@ angular.module("Common.Services").service("scheduleService", [
 			return deferred.promise;
 		};
 
-		service.getSchedulesForCalendar = function getSchedulesForCalendar(providerId, startDate, endDate)
+		service.getSchedulesForCalendar = function getSchedulesForCalendar(
+			providerId,
+			startDate,
+			endDate,
+			siteName
+		)
 		{
 			var deferred = $q.defer();
 
@@ -285,6 +290,11 @@ angular.module("Common.Services").service("scheduleService", [
 			url += encodeURIComponent(providerId) + '/';
 			url += '?startDate=' + encodeURIComponent(startDate);
 			url += '&endDate=' + encodeURIComponent(endDate);
+
+			if(siteName != null)
+			{
+				url += '&site=' + encodeURIComponent(siteName);
+			}
 
 			junoHttp.get(
 				url,
@@ -320,6 +330,50 @@ angular.module("Common.Services").service("scheduleService", [
 				function error(errors)
 				{
 					console.log("scheduleService::getAvailabilityTypes error", errors);
+					deferred.reject();
+				}
+			);
+
+			return deferred.promise;
+		};
+
+		service.getAppointmentStatuses = function getAppointmentStatuses()
+		{
+			var deferred = $q.defer();
+
+			junoHttp.get(
+				service.apiPath + 'schedule/calendar/statuses',
+				{headers: Juno.Common.ServiceHelper.configHeaders()}
+			).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("scheduleService::getAppointmentStatuses error", errors);
+					deferred.reject();
+				}
+			);
+
+			return deferred.promise;
+		};
+
+		service.getSites = function getSites()
+		{
+			var deferred = $q.defer();
+
+			junoHttp.get(
+				service.apiPath + 'sites',
+				{headers: Juno.Common.ServiceHelper.configHeaders()}
+			).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("scheduleService::getSites error", errors);
 					deferred.reject();
 				}
 			);

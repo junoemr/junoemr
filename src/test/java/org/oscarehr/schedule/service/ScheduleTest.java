@@ -63,13 +63,14 @@ public class ScheduleTest
 		Integer providerId = 1;
 		LocalDate startDate = LocalDate.of(2018, 1, 1);
 		LocalDate endDate = LocalDate.of(2018, 1, 1);
+		String siteName = "site";
 
 		List<CalendarEvent> mockData = new ArrayList<>();
 
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(mockData);
-		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate)).thenReturn(mockData);
+		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate, siteName)).thenReturn(mockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -82,6 +83,7 @@ public class ScheduleTest
 		Integer providerId = 1;
 		LocalDate startDate = LocalDate.of(2018, 1, 1);
 		LocalDate endDate = LocalDate.of(2018, 1, 1);
+		String siteName = "site";
 
 		LocalDateTime start1 = LocalDateTime.of(2018,1,1,0,0,0);
 		LocalDateTime end1 = LocalDateTime.of(2018,1,1,0,15,0);
@@ -97,9 +99,9 @@ public class ScheduleTest
 
 
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData);
-		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate)).thenReturn(appointmentMockData);
+		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
@@ -113,6 +115,7 @@ public class ScheduleTest
 		Integer providerId = 1;
 		LocalDate startDate = LocalDate.of(2018, 1, 1);
 		LocalDate endDate = LocalDate.of(2018, 1, 3);
+		String siteName = "site";
 
 		LocalDateTime start1 = LocalDateTime.of(2018,1,1,0,0,0);
 		LocalDateTime end1 = LocalDateTime.of(2018,1,1,0,15,0);
@@ -127,9 +130,9 @@ public class ScheduleTest
 		appointmentMockData.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, null, className1, resourceId1, scheduleTemplateCode1, null, null));
 
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData);
-		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate)).thenReturn(appointmentMockData);
+		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, null, className1, resourceId1, scheduleTemplateCode1, null, null));
@@ -143,6 +146,7 @@ public class ScheduleTest
 		Integer providerId = 1;
 		LocalDate startDate = LocalDate.of(2018, 1, 1);
 		LocalDate endDate = LocalDate.of(2018, 1, 3);
+		String siteName = "site";
 
 		LocalDateTime start1 = LocalDateTime.of(2018,1,1,0,0,0);
 		LocalDateTime end1 = LocalDateTime.of(2018,1,1,0,15,0);
@@ -165,9 +169,9 @@ public class ScheduleTest
 		appointmentMockData.add(new CalendarEvent(start2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color2, null, className2, resourceId2, scheduleTemplateCode2, null, null));
 
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData);
-		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate)).thenReturn(appointmentMockData);
+		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
@@ -182,6 +186,7 @@ public class ScheduleTest
 		Integer providerId = 1;
 		LocalDate startDate = LocalDate.of(2018, 1, 1);
 		LocalDate endDate = LocalDate.of(2018, 1, 3);
+		String siteName = "site";
 
 		LocalDateTime start1 = LocalDateTime.of(2018,1,1,0,0,0);
 		LocalDateTime end1 = LocalDateTime.of(2018,1,1,0,15,0);
@@ -210,9 +215,9 @@ public class ScheduleTest
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData1);
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate.plusDays(1))).thenReturn(templateMockData2);
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate.plusDays(2))).thenReturn(templateMockData3);
-		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate)).thenReturn(appointmentMockData);
+		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));

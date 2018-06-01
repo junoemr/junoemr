@@ -22,6 +22,7 @@
  */
 package org.oscarehr.appointment.service;
 
+import org.apache.commons.lang.WordUtils;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
@@ -45,14 +46,37 @@ public class Appointment
 	@Autowired
 	OscarAppointmentDao oscarAppointmentDao;
 
-	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate startDate, LocalDate endDate)
+	private String formatName(String upperFirstName, String upperLastName)
+	{
+		List<String> outputList = new ArrayList<>();
+
+		if(upperLastName != null)
+		{
+			outputList.add(WordUtils.capitalize(upperLastName.toLowerCase()));
+		}
+
+		if(upperFirstName != null)
+		{
+			outputList.add(WordUtils.capitalize(upperFirstName.toLowerCase()));
+		}
+
+		if(outputList.size() == 0)
+		{
+			return null;
+		}
+
+		return String.join(", ", outputList);
+	}
+
+	public List<CalendarEvent> getCalendarEvents(
+		Integer providerId, LocalDate startDate, LocalDate endDate, String siteName)
 	{
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
 
 
 		SortedMap<LocalTime, List<AppointmentDetails>> appointments =
 			oscarAppointmentDao.findAppointmentDetailsByDateAndProvider(
-				startDate, endDate, providerId, null);
+				startDate, endDate, providerId, siteName);
 
 		for(List<AppointmentDetails> dateList: appointments.values())
 		{
@@ -70,7 +94,7 @@ public class Appointment
 				CalendarAppointment appointment = new CalendarAppointment(
 					details.getAppointmentNo(),
 					birthdayString,
-					details.getLastName() + ", " + details.getFirstName(),
+					formatName(details.getFirstName(), details.getLastName()),
 					null, // TODO get phone number
 					details.getDemographicNo(),
 					null, // TODO get patient's doctor
@@ -91,7 +115,7 @@ public class Appointment
 					details.getColor(),
 					null,
 					"text-dark",       // TODO remove?
-					details.getAppointmentNo(), // TODO remove?
+					providerId, // TODO remove?
 					null,
 					null,
 					appointment

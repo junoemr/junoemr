@@ -22,6 +22,7 @@
  */
 package org.oscarehr.appointment.model;
 
+import org.oscarehr.appointment.dto.CalendarAppointmentStatus;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.managers.AppointmentManager;
 import oscar.OscarProperties;
@@ -38,6 +39,8 @@ public class AppointmentStatusList
 {
 	private static final String STATUS_BILLED = "B";
 	private static final String STATUS_SIGNED = "S";
+	private static final Locale DEFAULT_CALENDAR_LOCALE = Locale.ENGLISH;
+	private static final String SYSTEM_CODE_BILLED = "billed";
 	private static final Map<String, String> titleMap;
 
 	static
@@ -59,13 +62,16 @@ public class AppointmentStatusList
 	private List<String> orderedStatusList;
 	private Map<String, String> descriptionMap;
 	private boolean editable;
+	private List<AppointmentStatus> appointmentStatusList;
 
 	public static AppointmentStatusList factory(AppointmentManager appointmentManager)
 	{
 		List<String> orderedStatusList = new ArrayList<>();
 		Map<String, String> descriptionMap = new HashMap<>();
 
-		for(AppointmentStatus appointmentStatus: appointmentManager.getAppointmentStatuses())
+		List<AppointmentStatus> appointmentStatusList = appointmentManager.getAppointmentStatuses();
+
+		for(AppointmentStatus appointmentStatus: appointmentStatusList)
 		{
 			String status = appointmentStatus.getStatus();
 
@@ -77,14 +83,50 @@ public class AppointmentStatusList
 			descriptionMap.put(appointmentStatus.getStatus(), appointmentStatus.getDescription());
 		}
 
-		return new AppointmentStatusList(orderedStatusList, descriptionMap);
+		return new AppointmentStatusList(orderedStatusList, descriptionMap, appointmentStatusList);
 	}
 
-	public AppointmentStatusList(List<String> orderedStatusList, Map<String, String> descriptionMap)
+	public AppointmentStatusList(
+		List<String> orderedStatusList,
+		Map<String, String> descriptionMap,
+		List<AppointmentStatus> appointmentStatusList
+	)
 	{
 		this.orderedStatusList = orderedStatusList;
 		this.descriptionMap = descriptionMap;
+		this.appointmentStatusList = appointmentStatusList;
 		this.editable = OscarProperties.getInstance().isEditAppointmentStatusEnabled();
+	}
+
+	/**
+	 * Gets a list of appointment statuses for use in the calendar.
+	 * @return List of appointment statuses.
+	 */
+	public List<CalendarAppointmentStatus> getCalendarAppointmentStatusList()
+	{
+		List<CalendarAppointmentStatus> calendarAppointmentStatusList = new ArrayList<>();
+
+		for(AppointmentStatus appointmentStatus: appointmentStatusList)
+		{
+			boolean rotates = true;
+			String systemCode = null;
+			if(STATUS_BILLED.equals(appointmentStatus.getStatus()))
+			{
+				rotates = false;
+				systemCode = SYSTEM_CODE_BILLED;
+			}
+
+			calendarAppointmentStatusList.add(new CalendarAppointmentStatus(
+				appointmentStatus.getColor(),
+				appointmentStatus.getStatus(),
+				getTitle(appointmentStatus.getStatus(), DEFAULT_CALENDAR_LOCALE),
+				rotates,
+				appointmentStatus.getId(),
+				systemCode
+			));
+		}
+
+		return calendarAppointmentStatusList;
 	}
 
 	public String getStatusAfter(String status)

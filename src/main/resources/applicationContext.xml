@@ -280,8 +280,10 @@
          </property>
 	</bean>
 
-	<bean id="scheduleService" class="org.oscarehr.schedule.service.Schedule" autowire="byName" />
+	<bean id="appointmentManager" class="org.oscarehr.managers.AppointmentManager" autowire="byName" />
 	<bean id="appointmentService" class="org.oscarehr.appointment.service.Appointment" autowire="byName" />
+	<bean id="appointmentStatusService" class="org.oscarehr.appointment.service.AppointmentStatusService" autowire="byName" />
+	<bean id="scheduleService" class="org.oscarehr.schedule.service.Schedule" autowire="byName" />
 
 	<!--
 	<task:executor id="taskExecutor" />

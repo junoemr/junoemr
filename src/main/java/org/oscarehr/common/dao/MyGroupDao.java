@@ -58,7 +58,7 @@ public class MyGroupDao extends AbstractDao<MyGroup> {
 	@SuppressWarnings("unchecked")
 	public List<MyGroup> findAllOrdered()
 	{
-		Query query = entityManager.createQuery("SELECT g FROM MyGroup g ORDER BY g.id.myGroupNo, g.id.providerNo");
+		Query query = entityManager.createQuery("SELECT g FROM MyGroup g, ProviderData p WHERE p.id = g.id.providerNo AND  p.status = 1 ORDER BY g.id.myGroupNo, g.id.providerNo");
 		return query.getResultList();
 	}
 

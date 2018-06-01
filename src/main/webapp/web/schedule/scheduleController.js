@@ -15,6 +15,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.uiConfig = {};
 		$scope.selectedSchedule = null;
+		$scope.selectedSite = null;
 		$scope.selectedTimeInterval = null;
 		$scope.selectedResources = [];
 
@@ -44,9 +45,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return $scope.callCalendarMethod("has_schedules");
 		};
 
-		$scope.showScheduleSelect = function showScheduleSelect()
+		$scope.hasSites = function hasSites()
 		{
-			return true;
+			return $scope.callCalendarMethod("has_sites");
 		};
 
 		$scope.getTimeIntervalOptions = function getTimeIntervalOptions()
@@ -59,14 +60,21 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return $scope.callCalendarMethod("get_schedule_options");
 		};
 
+		$scope.getSiteOptions = function getSiteOptions()
+		{
+			var result = $scope.callCalendarMethod("get_site_options");
+
+			if(!angular.isDefined($scope.selectedSite) || $scope.selectedSite === null)
+			{
+				$scope.selectedSite = result[0];
+			}
+
+			return result;
+		};
+
 		$scope.viewName = function viewName()
 		{
 			return $scope.callCalendarMethod("view_name");
-		};
-
-		$scope.showScheduleSelect = function()
-		{
-			return $scope.viewName() !== 'resourceDay';
 		};
 
 		$scope.showTimeIntervals = function showTimeIntervals()
@@ -76,7 +84,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onScheduleChanged = function onScheduleChanged()
 		{
-			return $scope.callCalendarMethod("on_schedule_changed", [$scope.selectedSchedule.uuid]);
+			return $scope.callCalendarMethod("on_schedule_changed", [$scope.selectedSchedule, $scope.selectedSite]);
+		};
+
+		$scope.onSiteChanged = function onSiteChanged()
+		{
+			return $scope.callCalendarMethod("on_schedule_changed", [$scope.selectedSchedule, $scope.selectedSite]);
 		};
 
 		$scope.onTimeIntervalChanged = function onTimeIntervalChanged()
@@ -86,10 +99,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			// updating the config will automatically trigger an events refresh
 			if($scope.uiConfig.calendar)
 			{
-				$scope.uiConfig.calendar.slotDuration = $scope.selected_time_interval;
-				$scope.uiConfig.calendar.slotLabelInterval = $scope.selected_time_interval;
+				$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
+				$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedTimeInterval;
 			}
-
 		};
 
 		$scope.changeView = function changeView(view)
@@ -100,6 +112,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.showLegend = function showLegend()
 		{
 			return $scope.callCalendarMethod('show_legend');
+		};
+
+		$scope.isAgendaView = function isAgendaView()
+		{
+			return ($scope.viewName() != 'resourceDay')
 		};
 
 

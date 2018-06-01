@@ -46,8 +46,7 @@
 
 				<div ng-show="hasSchedules()">
 
-					<div class="pull-left form-inline"
-						 ng-show="showScheduleSelect()">
+					<div class="pull-left form-inline">
 
 						<div class="form-group">
 							<label for="schedule-select">Schedule:</label>
@@ -61,28 +60,24 @@
 						<button type="button"
 								class="btn btn-icon-bare"
 								title="Refresh Schedule"
-								ng-click="refetch_events()">
+								ng-click="refetchEvents()">
 							<i class="fa fa-refresh"></i>
 						</button>
 					</div>
 
-<%--					<div class="pull-left form-inline"
-						 ng-show="!show_schedule_select()">
-
-						<button type="button"
-								class="btn btn-primary"
-								ng-click="select_resources()">
-							Select Schedules
-						</button>
-
-						<button type="button"
-								class="btn btn-icon-bare"
-								title="Refresh Schedules"
-								ng-click="refetch_events()">
-							<i class="fa fa-refresh"></i>
-						</button>
-
-					</div>--%>
+					<div class="pull-left form-inline">
+						<div ng-show="hasSites()">
+							<div class="form-group">
+								<label for="site-select">Site:</label>
+								<select id="site-select"
+										class="form-control"
+										ng-change="onSiteChanged()"
+										ng-model="selectedSite"
+										ng-options="option as option.display_name for option in getSiteOptions()">
+								</select>
+							</div>
+						</div>
+					</div>
 
 					<div class="pull-right form-inline">
 
@@ -93,51 +88,44 @@
 
 						<button type="button"
 								class="btn btn-black"
-								ng-click="show_legend()">
+								ng-click="showLegend()">
 							Legend
 						</button>
 
 						<div class="form-group"
-							 ng-show="show_time_intervals()">
+							 ng-show="showTimeIntervals()">
 							<label for="interval-select">Time Interval:</label>
 							<select id="interval-select"
 									class="form-control"
-									ng-change="on_time_interval_changed()"
+									ng-change="onTimeIntervalChanged()"
 									ng-model="selectedTimeInterval"
-									ng-options="option for option in get_time_interval_options()">
+									ng-options="option for option in getTimeIntervalOptions()">
 							</select>
 					</div>
 
 
 						<div class="form-group">
-							<div class="btn-group" role="group">
+							<div class="btn-group" role="group" ng-show="isAgendaView()">
 								<button type="button"
 										class="btn"
-										ng-class=" { 'btn-addon': view_name() != 'agendaDay', 'btn-primary': view_name() == 'agendaDay' } "
+										ng-class=" { 'btn-addon': viewName() != 'agendaDay', 'btn-primary': viewName() == 'agendaDay' } "
 										viewName="agendaDay"
-										ng-click="change_view('agendaDay')">
+										ng-click="changeView('agendaDay')">
 									Day
 								</button>
 								<button type="button"
 										class="btn"
-										ng-class=" { 'btn-addon': view_name() != 'agendaWeek', 'btn-primary': view_name() == 'agendaWeek' } "
+										ng-class=" { 'btn-addon': viewName() != 'agendaWeek', 'btn-primary': viewName() == 'agendaWeek' } "
 										viewName="agendaWeek"
-										ng-click="change_view('agendaWeek')">
+										ng-click="changeView('agendaWeek')">
 									Week
 								</button>
 								<button type="button"
 										class="btn"
-										ng-class=" { 'btn-addon': view_name() != 'month', 'btn-primary': view_name() == 'month' } "
+										ng-class=" { 'btn-addon': viewName() != 'month', 'btn-primary': viewName() == 'month' } "
 										viewName="month"
-										ng-click="change_view('month')">
+										ng-click="changeView('month')">
 									Month
-								</button>
-								<button type="button"
-										class="btn"
-										ng-class=" { 'btn-addon': view_name() != 'resourceDay', 'btn-primary': view_name() == 'resourceDay' } "
-										viewName="resourceDay"
-										ng-click="change_view('resourceDay')">
-									Group
 								</button>
 							</div>
 						</div>

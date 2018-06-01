@@ -109,7 +109,7 @@ public class ScheduleTemplateService
 			//   reset the saved row and start date
 			if(previousRow != null && previousRow[1] != null && !previousRow[1].equals(currentCode))
 			{
-				calendarEvents.add(createCalendarEvent(startDateTime, previousRow, resourceId++));
+				calendarEvents.add(createCalendarEvent(startDateTime, previousRow, providerId));
 
 				previousRow = null;
 				startDateTime = null;
@@ -128,7 +128,7 @@ public class ScheduleTemplateService
 				}
 
 				// Add this row because it is the last
-				calendarEvents.add(createCalendarEvent(startDateTime, result, resourceId++));
+				calendarEvents.add(createCalendarEvent(startDateTime, result, providerId));
 			}
 
 			// If this is not a _, save the current row and maybe start date

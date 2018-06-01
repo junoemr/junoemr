@@ -39,7 +39,7 @@ public class MyGroup  extends AbstractModel<MyGroupPrimaryKey> implements Serial
 
 	@EmbeddedId     
 	private MyGroupPrimaryKey id;
-	
+
 	@Column(name="last_name")
     private String lastName;
 	@Column(name="first_name")

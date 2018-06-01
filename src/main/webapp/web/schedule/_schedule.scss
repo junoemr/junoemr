@@ -18,6 +18,26 @@
 
 .calendar
 {
+/*	overflow-x: auto;
+	table
+	{
+		table-layout: fixed;
+	}
+
+	.fc-widget-header
+	{
+		width:100px;
+	}
+	.fc-widget-content
+	{
+		width:100px;
+	}
+	.fc-resourceName
+	{
+		background-color:aliceblue;
+		width:150px;
+	}*/
+
 	.fc-toolbar
 	{
 		h2 { font-size: 1.571em; }
@@ -27,6 +47,7 @@
 	.fc-view-container
 	{
 		background: #f6f6f6;
+		overflow-x: scroll;
 
 		.text-light
 		{

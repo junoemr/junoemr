@@ -15,14 +15,6 @@ angular.module('Schedule').factory(
 		'demographicService',
 		'scheduleService',
 		'globalStateService',
-/*		'Models.ScheduleTemplate',
-		'Models.Schedule',
-		'Models.ScheduleScheduleTemplate',
-		'Models.ScheduleAvailability',
-		'Models.AvailabilityType',
-		'Models.EventStatus',
-		'Models.Patient',
-		'Models.Event',*/
 
 		function (
 			$q,
@@ -37,14 +29,6 @@ angular.module('Schedule').factory(
 			scheduleService,
 			globalStateService
 
-/*			schedule_template_model,
-			schedule_model,
-			schedule_template_relation_model,
-			schedule_availability_model,
-			availability_type_model,
-			event_status_model,
-			patient_model,
-			event_model*/
 		) {
 
 			var service = {
@@ -63,15 +47,11 @@ angular.module('Schedule').factory(
 			// Data Loading/manipulation
 			// -----------------------------------------------------------------------------------------------
 
-			service.load_schedule_events = function load_schedule_events(providerId, start, end,
-				view_name, schedule_templates, event_statuses, default_event_color, availability_types)
+			service.load_schedule_events = function load_schedule_events(providerId, siteName,
+				start, end, view_name, schedule_templates, event_statuses, default_event_color,
+				availability_types)
 			{
-				console.log("=======================================================");
-				console.log(providerId);
-				console.log(availability_types);
-				console.log(start.format("YYYY-MM-DD"));
-				console.log(end.subtract(1, 'seconds').format("YYYY-MM-DD"));
-				console.log("=======================================================");
+				//console.log("FETCHING: " + providerId + " " + start.format("YYYY-MM-DD") + " " + end.subtract(1, "seconds").format("YYYY-MM-DD"));
 
 				var deferred = $q.defer();
 
@@ -85,262 +65,86 @@ angular.module('Schedule').factory(
 				scheduleService.getSchedulesForCalendar(
 					providerId,
 					startDateString,
-					endDateString
+					endDateString,
+					siteName
 				).then(function success(results)
 				{
-					//console.log(JSON.stringify(results, null, "\t"));
-					deferred.resolve({data: results});
-
-/*					var fake_results = [
-/!*						{
-							"start": "2018-05-29T09:00:00.000Z",
-							"end": "2018-05-29T12:00:00.000Z",
-							"color": "#BFEFFF",
-							"rendering": "background",
-							"resourceId": 1,
-							"availability_type": {
-								"color": "#BFEFFF",
-								"name": "60 Minute Appointment",
-								"preferred_event_length_minutes": "60",
-								"system_code": null
-							}
-						},*!/
-						{
-							"start": "2018-05-29T09:00:00",
-							"end": "2018-05-29T12:00:00",
-							"color": "#BFEFFF",
-							"rendering": "background",
-							"className": null,
-							"resourceId": 1,
-							"scheduleTemplateCode": "1",
-							"availabilityType": {
-								"color": "#BFEFFF",
-								"name": "15 Minute Appointment",
-								"preferredEventLengthMinutes": 15,
-								"systemCode": null
-							},
-							"data": null
-						},
-					];
-					deferred.resolve({data: fake_results});*/
+					// Transform from camel to snake.  Normally this wouldn't need to happen, but
+					// this is an external library that requires a certain format.
+					// TODO: maybe do this in CXF?
+					deferred.resolve({data: service.snake_schedule_results(results)});
 				});
-
-
-/*
-				var results = {
-					schedule_templates: {
-						1: {
-							name: "template 1",
-							schedule_template_days: [
-								{
-									day_of_the_week: "monday",
-									schedule_template_time_periods: [
-										{
-											availability_type_uuid: 6,
-											start_time: "09:00",
-											end_time: "12:00",
-										},
-										{
-											availability_type_uuid: 2,
-											start_time: "13:00",
-											end_time: "17:00",
-										},
-									],
-								},
-								{
-									day_of_the_week: "tuesday",
-									schedule_template_time_periods: [
-										{
-											availability_type_uuid: 6,
-											start_time: "09:00",
-											end_time: "12:00",
-										},
-										{
-											availability_type_uuid: 2,
-											start_time: "13:00",
-											end_time: "17:00",
-										},
-									],
-								},
-								{
-									day_of_the_week: "wednesday",
-									schedule_template_time_periods: [
-										{
-											availability_type_uuid: 6,
-											start_time: "09:00",
-											end_time: "12:00",
-										},
-										{
-											availability_type_uuid: 2,
-											start_time: "13:00",
-											end_time: "17:00",
-										},
-									],
-								},
-								{
-									day_of_the_week: "thursday",
-									schedule_template_time_periods: [
-										{
-											availability_type_uuid: 1,
-											start_time: "09:00",
-											end_time: "12:00",
-										},
-										{
-											availability_type_uuid: 6,
-											start_time: "13:00",
-											end_time: "17:00",
-										},
-									],
-								},
-								{
-									day_of_the_week: "friday",
-									schedule_template_time_periods: [
-										{
-											availability_type_uuid: 6,
-											start_time: "09:00",
-											end_time: "12:00",
-										},
-										{
-											availability_type_uuid: 2,
-											start_time: "13:00",
-											end_time: "17:00",
-										},
-									],
-								},
-							],
-						}
-					},
-					schedule_days: {
-						"2018-05-28": {
-							events: [
-								{
-									schedule_uuid: 1,
-									demographic_patient_dob: "1980-02-15",
-									demographic_patient_name: "Jordan",
-									demographic_patient_phone: "1231231234",
-									demographic_patient_uuid: "1",
-									demographic_patient_practitioner_name: "Dr. Jones",
-									demographic_patient_practitioner_uuid: "1",
-									start_time: "2018-05-28T09:00:00+00:00",
-									end_time: "2018-05-28T10:00:00+00:00",
-									event_status_uuid: 1,
-									num_invoices: 0,
-									reason: "Not a real event",
-									tag_names: null,
-									tag_self_booked: false,
-									tag_self_cancelled: false,
-									tag_system_codes: null,
-								},
-								{
-									schedule_uuid: 2,
-									demographic_patient_dob: "1980-02-15",
-									demographic_patient_name: "Jordan",
-									demographic_patient_phone: "1231231234",
-									demographic_patient_uuid: "1",
-									demographic_patient_practitioner_name: "Dr. Jones",
-									demographic_patient_practitioner_uuid: "1",
-									start_time: "2018-05-28T11:00:00+00:00",
-									end_time: "2018-05-28T11:30:00+00:00",
-									event_status_uuid: 1,
-									num_invoices: 0,
-									reason: "Not a real event",
-									tag_names: null,
-									tag_self_booked: false,
-									tag_self_cancelled: false,
-									tag_system_codes: null,
-								},
-							],
-							availabilities: [
-								{
-									schedule_uuid: 1,
-									availability_type_uuid: 3,
-									start_time: "2018-05-28T00:00:00+00:00",
-									end_time: "2018-05-29T00:00:00+00:00",
-								},
-							],
-							relations: [
-								{
-									schedule_uuid: 1,
-									schedule_template_uuid: 1,
-									start_date: "2018-05-28", // exclusive?
-									end_date: "2018-06-04", // inclusive
-								},
-							],
-						}
-					}
-				};
-
-/!*				availability_types = {
-					1: {
-						color: "#944DFF",
-						name: "Long Appointments",
-						preferred_event_length_minutes: 60,
-						system_code: null,
-					},
-					2: {
-						color: "#335CD6",
-						name: "Regular Appointments",
-						preferred_event_length_minutes: 15,
-						system_code: null,
-					},
-					3: {
-						color: "#000000",
-						name: "Do Not Book",
-						preferred_event_length_minutes: null,
-						system_code: "unavailable",
-					},
-				};*!/
-
-				// Set some global state
-				service.event_statuses = {
-					1: {
-						color: "#4DB8B8",
-							display_letter: "N",
-							name: "Booked",
-							rotates: true,
-							sort_order: 10,
-							system_code: null
-					}
-				};
-
-				service.default_event_color = default_event_color;
-
-				var schedule_events = [];
-				var background_events = [];
-
-
-				// load the schedule events,
-				// then create the calendar events for each event,
-				// then create the background calendar events for
-				//   each schedule availability and schedule template relation
-				angular.forEach(results.schedule_days, function(day, date)
-				{
-					for(var i = 0; i < day.events.length; i++)
-					{
-						schedule_events.push(
-							service.create_schedule_event(day.events[i]));
-					}
-
-					for(var j = 0; j < day.relations.length; j++)
-					{
-						util.create_relation_events(background_events, results.schedule_templates,
-							availability_types, day.relations[j], start, end);
-					}
-
-					for(var k = 0; k < day.availabilities.length; k++)
-					{
-						util.create_availability_events(background_events,
-							day.availabilities[k], availability_types, start, end)
-					}
-				});
-
-				Array.prototype.push.apply(schedule_events, background_events);
-				console.log("-- Base array format ---------------------------");
-				console.log(JSON.stringify(schedule_events, null, "\t"));
-				deferred.resolve({data: schedule_events});
-*/
 
 				return deferred.promise;
+			};
+
+			service.snake_appointment_data = function snake_appointment_data(data)
+			{
+				if(data == null)
+				{
+					return data;
+				}
+
+				return {
+					schedule_uuid: data.scheduleUuid,
+					event_status_uuid: data.eventStatusUuid,
+					start_time: data.startTime,
+					end_time: data.endTime,
+					reason: data.reason,
+					num_invoices: data.numInvoices,
+					demographics_patient_dob: data.demographicPatientDob,
+					demographics_patient_name: data.demographicPatientName,
+					demographics_patient_phone: data.demographicPatientPhone,
+					demographics_patient_uuid: data.demographicPatientUuid,
+					demographics_practitioner_uuid: data.demographicPractitionerUuid,
+					tag_names: data.tagNames,
+					tag_self_booked: data.tagSelfBooked,
+					tag_self_cancelled: data.tagSelfCancelled,
+					tag_system_codes: data.tagSystemCodes
+				};
+			};
+
+			service.snake_availability_type = function snake_availability_type(data)
+			{
+				if(data == null)
+				{
+					return data;
+				}
+
+				return {
+					name: data.name,
+					color: data.color,
+					preferred_event_length_minutes: data.preferredEventLengthMinutes,
+					system_code: data.systemCode,
+				};
+			}
+
+			service.snake_schedule_results = function snake_schedule_results(results)
+			{
+				if(!angular.isArray(results))
+				{
+					return results;
+				}
+
+				var snake_results = [];
+
+				for(var i = 0; i < results.length; i++)
+				{
+					var result = results[i];
+					snake_results.push({
+						resourceId: result.resourceId,
+						start: result.start,
+						end: result.end,
+						color: result.color,
+						rendering: result.rendering,
+						schedule_template_code: result.scheduleTemplateCode,
+						className: result.className,
+						availability_type: service.snake_availability_type(result.availabilityType),
+						data: service.snake_appointment_data(result.data),
+					});
+				}
+
+				return snake_results;
 			};
 
 			service.load_schedule_templates = function load_schedule_templates()
@@ -421,15 +225,67 @@ angular.module('Schedule').factory(
 			{
 				var deferred = $q.defer();
 
-				deferred.resolve([]);
-/*				event_status_model.list().then(
+				scheduleService.getAppointmentStatuses().then(
 					function success(results)
 					{
-						deferred.resolve(results.data);
-					});*/
+						deferred.resolve(service.snake_appointment_statuses(results));
+					}
+				);
 
 				return deferred.promise;
 			};
+
+			service.load_sites = function load_sites()
+			{
+				var deferred = $q.defer();
+
+				scheduleService.getSites().then(
+					function success(results)
+					{
+						var out = [];
+						if(angular.isArray(results))
+						{
+							for(var i = 0; i < results.length; i++)
+							{
+								out.push({
+									uuid: results[i].siteId,
+									name: results[i].name,
+									display_name: results[i].name,
+								});
+							}
+						}
+						deferred.resolve(out);
+					}
+				);
+
+				return deferred.promise;
+			};
+
+			service.snake_appointment_statuses = function snake_appointment_statuses(data)
+			{
+				if (!angular.isArray(data))
+				{
+					return data;
+				}
+
+				var snake_data = [];
+
+				for (var i = 0; i < data.length; i++)
+				{
+					snake_data.push({
+						uuid: data[i].displayLetter,
+						name: data[i].name,
+						display_letter: data[i].displayLetter,
+						color: data[i].color,
+						rotates: data[i].rotates,
+						system_code: data[i].systemCode,
+						sort_order: data[i].sortOrder,
+					});
+				}
+
+				return snake_data;
+			};
+
 
 			service.load_schedule_options = function load_schedule_options()
 			{
@@ -610,29 +466,6 @@ angular.module('Schedule').factory(
 			{
 				var deferred = $q.defer();
 				deferred.resolve({data: providerId});
-
-/*				schedule_model.fetch(uuid).then(
-					function success(results)
-					{
-						service.load_schedule_availabilities(results.data).then(
-							function success(results)
-							{
-								service.load_schedule_tmpl_rels(results.data).then(
-									function success(results)
-									{
-										deferred.resolve(results);
-									}, function error(errors)
-									{
-										console.log('error loading schedule template rels', errors);
-									});
-							}, function error(errors)
-							{
-								console.log('error loading schedule availabilities', errors);
-							});
-					}, function error(errors)
-					{
-						console.log('error fetching schedules', errors);
-					});*/
 
 				return deferred.promise;
 			};

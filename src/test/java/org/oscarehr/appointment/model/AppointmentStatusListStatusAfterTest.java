@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.oscarehr.common.model.AppointmentStatus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,16 +73,17 @@ public class AppointmentStatusListStatusAfterTest
 				{"a", "b"},
 				{"b", "c"},
 				{"d", "a"},
-				{"aS", "b"},
-				{"bV", "c"},
-				{"dN", "a"},
+				{"aS", "bS"},
+				{"bV", "cV"},
+				{"dN", "aN"},
 			});
 	}
 
 	@Test
 	public void testGetStatusAfter()
 	{
-		AppointmentStatusList asl = new AppointmentStatusList(testStatusList, testDescriptionMap);
+		List<AppointmentStatus> appointmentStatuses = new ArrayList<>();
+		AppointmentStatusList asl = new AppointmentStatusList(testStatusList, testDescriptionMap, appointmentStatuses);
 
 		String result = asl.getStatusAfter(inputValue);
 		assertEquals(expectedResult, result);

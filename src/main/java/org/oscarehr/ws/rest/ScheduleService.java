@@ -41,6 +41,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.util.DateUtils;
+import org.oscarehr.appointment.dto.CalendarAppointmentStatus;
+import org.oscarehr.appointment.service.AppointmentStatusService;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentStatus;
@@ -84,6 +86,8 @@ public class ScheduleService extends AbstractServiceImpl {
 	private ScheduleManager scheduleManager;
 	@Autowired
 	private AppointmentManager appointmentManager;
+	@Autowired
+	private AppointmentStatusService appointmentStatusService;
 	@Autowired
 	private DemographicManager demographicManager;
 	@Autowired
@@ -377,6 +381,7 @@ public class ScheduleService extends AbstractServiceImpl {
 		return response;
 	}
 
+	// TODO: make the services below match the current status quo (logging, limits, etc)
 	@GET
 	@Path("/groups")
 	@Produces("application/json")
@@ -399,18 +404,30 @@ public class ScheduleService extends AbstractServiceImpl {
 	}
 
 	@GET
+	@Path("/calendar/statuses")
+	@Produces("application/json")
+	public RestResponse<List<CalendarAppointmentStatus>, String> getCalendarAppointmentStatuses()
+	{
+		List<CalendarAppointmentStatus> appointmentStatusList =
+			appointmentStatusService.getCalendarAppointmentStatusList();
+
+		return new RestResponse<>(new HttpHeaders(), appointmentStatusList);
+	}
+
+	@GET
 	@Path("/calendar/{providerId}/")
 	@Produces("application/json")
 	public RestResponse<List<CalendarEvent>, String> getCalendarEvents(
 		@PathParam("providerId") Integer providerId,
 		@QueryParam("startDate") String startDateString,
-		@QueryParam("endDate") String endDateString
+		@QueryParam("endDate") String endDateString,
+		@QueryParam("site") String siteName
 	)
 	{
 		LocalDate startDate = dateStringToNullableLocalDate(startDateString);
 		LocalDate endDate = dateStringToNullableLocalDate(endDateString);
 
-		// TODO: Change this tho throw an exception
+		// TODO: Change this to throw an exception
 		// Default to today if either date is null
 		if(startDate == null || endDate == null)
 		{
@@ -419,7 +436,7 @@ public class ScheduleService extends AbstractServiceImpl {
 		}
 
 		List<CalendarEvent> calendarEvents =
-			scheduleService.getCalendarEvents(providerId, startDate, endDate);
+			scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
 
 		return new RestResponse<>(new HttpHeaders(), calendarEvents);
 	}
