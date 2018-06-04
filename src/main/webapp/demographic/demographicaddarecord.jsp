@@ -393,6 +393,7 @@
 		if(fileContent != null && fileContent.available() != 0)
 		{
 			Document document = new Document();
+			document.setDoctype("");
 			document.setDocdesc(multipartParams.get("docDesc"));
 			document.setDocfilename(multipartParams.get("docFile"));
 			document.setDoccreator(loggedInInfo.getLoggedInProviderNo());
