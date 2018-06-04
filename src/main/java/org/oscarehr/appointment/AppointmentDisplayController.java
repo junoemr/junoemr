@@ -608,7 +608,7 @@ public class AppointmentDisplayController
 	{
 		String name = getName();
 
-		if (view == 0 && numAvailProvider != 1 && name.length() > nameLength)
+		if (view == 0 && name.length() > nameLength)
 		{
 			return name.substring(0, nameLength);
 		}
@@ -618,6 +618,13 @@ public class AppointmentDisplayController
 
 	public String getTruncatedUpperName()
 	{
+		String name = getName();
+
+		if (view == 0 && numAvailProvider != 1 && name.length() > nameLength)
+		{
+			return name.substring(0, nameLength).toUpperCase();
+		}
+
 		return getTruncatedName().toUpperCase();
 	}
 

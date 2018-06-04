@@ -24,129 +24,172 @@
 
 --%>
 <!DOCTYPE html>
-<%@ page import="oscar.eform.EFormUtil, java.util.ArrayList"%>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
+<%@ page import="oscar.eform.EFormUtil, java.util.ArrayList" %>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 
 <%
-String status = (String) request.getAttribute("status");    		
+	String status = (String) request.getAttribute("status");
 %>
 <html:html locale="true">
 
-<head>
-<link href="<%=request.getContextPath()%>/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/js/jquery_css/smoothness/jquery-ui-1.10.2.custom.min.css"/>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
+	<head>
+		<link href="<%=request.getContextPath()%>/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/js/jquery_css/smoothness/jquery-ui-1.10.2.custom.min.css"/>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
 
-</head>
+	</head>
 
-<style>
-body{background-color:#f5f5f5;}
+	<style>
+		body {
+			background-color: #f5f5f5;
+		}
 
-.uploadEformTitle{display:inline-block;}
-</style>
+		.uploadEformTitle {
+			display: inline-block;
+		}
+		.uploadEformTitle label {
+			display: inline-block;
+			width: 350px;
+			text-align: right;
+		}
+	</style>
 
-<body>
+	<body>
 
-<%if(status != null){ %>
-    <div class="alert alert-success">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <strong>Success!</strong> Your eform was uploaded.
-    </div>
+	<%
+		if(status != null)
+		{
+	%>
+	<div class="alert alert-success">
+		<button type="button" class="close" data-dismiss="alert">&times;</button>
+		<strong>Success!</strong> Your eform was uploaded.
+	</div>
 
-<script>
-window.top.location.href = "<%=request.getContextPath()%>/administration/?show=Forms";
-</script>
+	<script>
+		window.top.location.href = "<%=request.getContextPath()%>/administration/?show=Forms";
+	</script>
 
-<%}else{%>
+	<%
+		}
+		else
+		{
+	%>
 
-<html:form action="/eform/uploadHtml" method="POST" onsubmit="return checkFormAndDisable()" enctype="multipart/form-data">
-<div class="alert alert-error" style="display:none"> <html:errors /> </div>
-                                       
-                                        <div class='uploadEformTitle'>
-                                        <bean:message key="eform.uploadhtml.formName" /> <span class="text-error textExists" style='display:none;'>Name already exists</span><br>
-                                        <input type="text" name="formName" size="30" class="check" required>
-                                        </div>
-                                        
-                                        <div class='uploadEformTitle'>
-                                        <bean:message key="eform.uploadhtml.formSubject" /><br>
-                                        <input type="text" name="formSubject" size="30">
-                                        </div>
-                                        
-                                        <div class='uploadEformTitle'>
-                                        <bean:message key="eform.uploadhtml.btnRoleType"/><br>
-                                        <select name="roleType">
-                                        <option value="" >- select one -</option>
-                                       <%  ArrayList roleList = EFormUtil.listSecRole();
-  											for (int i=0; i<roleList.size(); i++) {    
-  										%>  											
-                                        	
-                                        		<option value="<%=roleList.get(i) %>"><%=roleList.get(i) %></option>
-                                        	
-                                        <%} %>
-                                        </select>
-                                        </div>
-                                        
-                                        <div class='uploadEformTitle'>
-                                        <input type="checkbox" name="showLatestFormOnly" value="true"/><bean:message key="eform.uploadhtml.showLatestFormOnly"/><br>
-                                        <input type="checkbox" name="patientIndependent" value="true"/><bean:message key="eform.uploadhtml.patientIndependent"/>
-                                        </div>
-                                        
-                                        <input type="file" name="formHtml" id="formHtml" class="check" size="50" required>
-                                        <span title="<bean:message key="global.uploadWarningBody"/>" style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer"><img border="0" src="../../images/icon_alertsml.gif"/></span></span>
-                                        
-                                        
-                                        
-                                        <input type="submit" name="subm" class="btn btn-primary upload" value="<bean:message key="eform.uploadhtml.btnUpload"/>" disabled>
-               
-</html:form>
-<%}%>
-<div style="font-size:0%; line-height:0%">&nbsp;</div>
+	<html:form action="/eform/uploadHtml" method="POST" onsubmit="return checkFormAndDisable()" enctype="multipart/form-data">
+		<div class="alert alert-error" style="display:none">
+			<html:errors/></div>
 
-<script src="<%=request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>  
+		<div class='uploadEformTitle'>
+			<bean:message key="eform.uploadhtml.formName"/> <span class="text-error textExists" style='display:none;'>Name already exists</span><br>
+			<input type="text" name="formName" size="30" class="check" required>
+		</div>
 
-<script>
-$( document ).ready(function() {
-$(".check").change(validate).keyup(validate);
-});
+		<div class='uploadEformTitle'>
+			<bean:message key="eform.uploadhtml.formSubject"/><br>
+			<input type="text" name="formSubject" size="30">
+		</div>
 
-function validate()
-{
-var v = $(this).val();
-var id = $(this).attr("id");
-var formHtml = $("#formHtml").val();
+		<div class='uploadEformTitle'>
+			<bean:message key="eform.uploadhtml.btnRoleType"/><br>
+			<select name="roleType">
+				<option value="">- select one -</option>
+				<% ArrayList roleList = EFormUtil.listSecRole();
+					for(int i = 0; i < roleList.size(); i++)
+					{
+				%>
 
-var inputCheck=checkRow(v);
+				<option value="<%=roleList.get(i) %>"><%=roleList.get(i) %>
+				</option>
 
-if (v!="" && inputCheck=="" && formHtml!="") {
-	    $('.upload').removeAttr("disabled");
-		$('.upload').addClass("btn-success");
-		$('.textExists').hide();
-    } else if(inputCheck=="exists"){
-	    $('.upload').attr("disabled", "disabled");
-		$('.upload').removeClass("btn-success");
-		$('.textExists').show();
-    }else{
-	    $('.upload').attr("disabled", "disabled");
-		$('.upload').removeClass("btn-success");
-		$('.textExists').hide();
-    } 
-}
+				<%} %>
+			</select>
+		</div>
 
-function checkRow(textInput)
-{
-var result="";
-window.parent.$('#eformTbl tbody').find('tr').each(function(){
 
-    if($('td:nth(1)',$(this)).attr("title")===textInput){
-	result="exists";
-        return false;
-    }
-});
+		<div class="uploadEformTitle">
+			<div>
+				<label for="showLatestFormOnly" title='<bean:message key="eform.uploadhtml.showLatestFormOnly.tooltip"/>'>
+					<bean:message key="eform.uploadhtml.showLatestFormOnly" />
+				</label>
+				<input type="checkbox" id="showLatestFormOnly" name="showLatestFormOnly" value="true"/>
+			</div>
+			<div>
+				<label for="instanced" title='<bean:message key="eform.uploadhtml.instanced.tooltip"/>'>
+					<bean:message key="eform.uploadhtml.instanced" />
+				</label>
+				<input type="checkbox" id="instanced" name="instanced" value="true" checked />
+			</div>
+			<div>
+				<label for="patientIndependent"><bean:message key="eform.uploadhtml.patientIndependent" /></label>
+				<input type="checkbox" id="patientIndependent" name="patientIndependent" value="true"/>
+			</div>
+		</div>
 
-return result
-}
-</script>
-</body>
+		<input type="file" name="formHtml" id="formHtml" class="check" size="50" required>
+		<span title="<bean:message key="global.uploadWarningBody"/>"
+		      style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer"><img
+				border="0" src="../../images/icon_alertsml.gif"/></span></span>
+
+
+		<input type="submit" name="subm" class="btn btn-primary upload" value="<bean:message key="eform.uploadhtml.btnUpload"/>" disabled>
+
+	</html:form>
+	<%}%>
+	<div style="font-size:0%; line-height:0%">&nbsp;</div>
+
+	<script src="<%=request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
+
+	<script>
+		$(document).ready(function ()
+		{
+			$(".check").change(validate).keyup(validate);
+		});
+
+		function validate()
+		{
+			var v = $(this).val();
+			var id = $(this).attr("id");
+			var formHtml = $("#formHtml").val();
+
+			var inputCheck = checkRow(v);
+
+			if (v != "" && inputCheck == "" && formHtml != "")
+			{
+				$('.upload').removeAttr("disabled");
+				$('.upload').addClass("btn-success");
+				$('.textExists').hide();
+			}
+			else if (inputCheck == "exists")
+			{
+				$('.upload').attr("disabled", "disabled");
+				$('.upload').removeClass("btn-success");
+				$('.textExists').show();
+			}
+			else
+			{
+				$('.upload').attr("disabled", "disabled");
+				$('.upload').removeClass("btn-success");
+				$('.textExists').hide();
+			}
+		}
+
+		function checkRow(textInput)
+		{
+			var result = "";
+			window.parent.$('#eformTbl tbody').find('tr').each(function ()
+			{
+
+				if ($('td:nth(1)', $(this)).attr("title") === textInput)
+				{
+					result = "exists";
+					return false;
+				}
+			});
+
+			return result
+		}
+	</script>
+	</body>
 </html:html>

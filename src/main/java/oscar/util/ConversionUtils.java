@@ -29,15 +29,18 @@ import org.oscarehr.util.MiscUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -388,5 +391,81 @@ public class ConversionUtils {
 			.limit(numOfDaysBetween)
 			.mapToObj(i -> startDate.plusDays(i))
 			.collect(Collectors.toList());
+	}
+
+	public static Date toNullableLegacyDate(LocalDate localDate)
+	{
+		if(localDate == null) return null;
+		return toLegacyDate(localDate);
+	}
+
+	public static Date toLegacyDate(LocalDate localDate)
+	{
+		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	}
+
+	public static Date toNullableLegacyDateTime(LocalDateTime localDateTime)
+	{
+		if(localDateTime == null) return null;
+		return toLegacyDateTime(localDateTime);
+	}
+	public static Date toLegacyDateTime(LocalDateTime localDateTime)
+	{
+		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+	}
+
+	public static LocalDate toNullableLocalDate(String dateString)
+	{
+		if(dateString == null) return null;
+		return toLocalDate(dateString);
+	}
+
+	public static LocalDate toNullableLocalDate(Date legacyDate)
+	{
+		if(legacyDate == null) return null;
+		return toLocalDate(legacyDate);
+	}
+
+	public static LocalDate toLocalDate(String dateString)
+	{
+		ZonedDateTime result = ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
+		return result.toLocalDate();
+	}
+
+	public static LocalDate toLocalDate(Date legacyDate)
+	{
+		LocalDate date = Instant
+				// get the millis value to build the Instant
+				.ofEpochMilli(legacyDate.getTime())
+				// convert to JVM default timezone
+				.atZone(ZoneId.systemDefault())
+				// convert to LocalDate
+				.toLocalDate();
+		return date;
+	}
+	public static LocalDateTime toNullableLocalDateTime(Date legacyDate)
+	{
+		if(legacyDate == null) return null;
+		return toLocalDateTime(legacyDate);
+	}
+	public static LocalDateTime toLocalDateTime(Date legacyDate)
+	{
+		return new java.sql.Timestamp(legacyDate.getTime()).toLocalDateTime();
+	}
+
+
+	public static Date combineDateAndTime(Date date, Date time)
+	{
+		Calendar calendarA = Calendar.getInstance();
+		calendarA.setTime(date);
+		Calendar calendarB = Calendar.getInstance();
+		calendarB.setTime(time);
+
+		calendarA.set(Calendar.HOUR_OF_DAY, calendarB.get(Calendar.HOUR_OF_DAY));
+		calendarA.set(Calendar.MINUTE, calendarB.get(Calendar.MINUTE));
+		calendarA.set(Calendar.SECOND, calendarB.get(Calendar.SECOND));
+		calendarA.set(Calendar.MILLISECOND, calendarB.get(Calendar.MILLISECOND));
+
+		return calendarA.getTime();
 	}
 }

@@ -75,7 +75,7 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.AllergyDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.dao.DemographicContactDao;
-import org.oscarehr.common.dao.DemographicExtDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.common.dao.DrugDao;
 import org.oscarehr.common.dao.DrugReasonDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;

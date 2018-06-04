@@ -33,7 +33,7 @@
 		<cxf:properties>
 			<entry key="ws-security.ut.validator" value="org.oscarehr.ws.OscarUsernameTokenValidator" />
 		</cxf:properties>
-		
+
 		<!-- logging interceptors -->
 		<cxf:inInterceptors>
 			<ref bean="loggingInInterceptor" />
@@ -58,6 +58,7 @@
  	<context:component-scan base-package="org.oscarehr.ws.external.soap"/>
 
 	<bean id="authenticationInWSS4JInterceptor" class="org.oscarehr.ws.AuthenticationInWSS4JInterceptor" />
+	<bean id="IPInWSS4JInterceptor" class="org.oscarehr.ws.IPInWSS4JInterceptor"/>
 
 	<!-- web service endpoints -->
 	<jaxws:endpoint implementor="#systemInfoWs" address="/SystemInfoService"/>
@@ -65,66 +66,77 @@
 
 	<jaxws:endpoint implementor="#scheduleWs" address="/ScheduleService">
 		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#providerWs" address="/ProviderService" >
 		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#demographicWs" address="/DemographicService" >
 		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
 
     <jaxws:endpoint implementor="#userMetricsWs" address="/UserMetricsService" >
         <jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
             <ref bean="authenticationInWSS4JInterceptor"/>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#facilityWs" address="/FacilityService" >
 		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#programWs" address="/ProgramService" >
 		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#allergyWs" address="/AllergyService" >
 		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#preventionWs" address="/PreventionService" >
 		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#measurementWs" address="/MeasurementService" >
 		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#documentWs" address="/DocumentService" >
 		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#prescriptionWs" address="/PrescriptionService" >
 		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
@@ -155,7 +167,7 @@
 		
 		<jaxrs:providers>
 		    <ref bean="jaxb"/>
-			<bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
+			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
 		</jaxrs:providers>
 
 		<jaxrs:features>
@@ -212,7 +224,7 @@
 
       <property name="extraClass">
          <list>
-           <value>org.oscarehr.ws.transfer_objects.ProviderTransfer</value>
+           <value>org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer</value>
          </list>
       </property>
 

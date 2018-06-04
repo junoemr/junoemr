@@ -23,6 +23,10 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
+/**
+ * @deprecated - use the DemographicCriteriaSearch in future
+ */
+@Deprecated
 public class DemographicSearchRequest {
 	
 	public static enum SEARCHMODE {

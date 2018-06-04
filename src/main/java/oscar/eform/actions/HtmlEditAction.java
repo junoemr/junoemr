@@ -31,6 +31,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.eform.model.EForm;
+import org.oscarehr.eform.service.EFormTemplateService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -52,7 +53,7 @@ public class HtmlEditAction extends Action
 {
 	private static Logger logger = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private org.oscarehr.eform.service.EFormTemplate eFormTemplateService = SpringUtils.getBean(org.oscarehr.eform.service.EFormTemplate.class);
+	private EFormTemplateService eFormTemplateService = SpringUtils.getBean(EFormTemplateService.class);
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -74,6 +75,7 @@ public class HtmlEditAction extends Action
 			String formHtml = fm.getFormHtml();
 			boolean showLatestFormOnly = WebUtils.isChecked(request, "showLatestFormOnly");
 			boolean patientIndependent = WebUtils.isChecked(request, "patientIndependent");
+			boolean instanced = WebUtils.isChecked(request, "instanced");
 			String roleType = fm.getRoleType();
 
 			boolean isNewEFormTemplate = (fidStr.length() == 0);
@@ -97,7 +99,7 @@ public class HtmlEditAction extends Action
 				{
 					logger.info("Created new EForm Template");
 					eFormTemplate = eFormTemplateService.addEFormTemplate(formName, formSubject, formFileName, formHtml,
-							creatorNo, showLatestFormOnly, patientIndependent, roleType);
+							creatorNo, showLatestFormOnly, patientIndependent, instanced, roleType);
 					LogAction.addLogEntry(creatorNo, null, LogConst.ACTION_ADD, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
 							String.valueOf(eFormTemplate.getId()), loggedInInfo.getIp(), eFormTemplate.getFormName());
 				}
@@ -105,7 +107,7 @@ public class HtmlEditAction extends Action
 				{
 					logger.info("Update EForm Template (id: " + fidStr + ")");
 					eFormTemplate = eFormTemplateService.updateEFormTemplate(Integer.parseInt(fidStr), formName, formSubject,
-							formFileName, formHtml, creatorNo, showLatestFormOnly, patientIndependent, roleType);
+							formFileName, formHtml, creatorNo, showLatestFormOnly, patientIndependent, instanced, roleType);
 					LogAction.addLogEntry(creatorNo, null, LogConst.ACTION_UPDATE, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
 							String.valueOf(eFormTemplate.getId()), loggedInInfo.getIp(), eFormTemplate.getFormName());
 				}
@@ -114,7 +116,7 @@ public class HtmlEditAction extends Action
 			}
 			else
 			{
-				submittedValues = createHashMap(fidStr, formName, formSubject, formFileName, formHtml, showLatestFormOnly, patientIndependent, roleType, null);
+				submittedValues = createHashMap(fidStr, formName, formSubject, formFileName, formHtml, showLatestFormOnly, patientIndependent, instanced, roleType, null);
 			}
 
 			request.setAttribute("submitted", submittedValues);
@@ -138,10 +140,11 @@ public class HtmlEditAction extends Action
 				eFormTemplate.getFormHtml(),
 				eFormTemplate.isShowLatestFormOnly(),
 				eFormTemplate.isPatientIndependent(),
+				eFormTemplate.isInstanced(),
 				eFormTemplate.getRoleType(),
 				eFormTemplate.getFormDateTime());
 	}
-	private HashMap<String, Object> createHashMap(String fid, String formName, String formSubject, String formFileName, String formHtml, boolean showLatestFormOnly, boolean patientIndependent, String roleType, Date formDateTime)
+	private HashMap<String, Object> createHashMap(String fid, String formName, String formSubject, String formFileName, String formHtml, boolean showLatestFormOnly, boolean patientIndependent, boolean instanced, String roleType, Date formDateTime)
 	{
 		HashMap<String, Object> curht = new HashMap<>();
 		curht.put("fid", fid);
@@ -151,6 +154,7 @@ public class HtmlEditAction extends Action
 		curht.put("formHtml", formHtml);
 		curht.put("showLatestFormOnly", showLatestFormOnly);
 		curht.put("patientIndependent", patientIndependent);
+		curht.put("instanced", instanced);
 		curht.put("roleType", roleType);
 
 		if(formDateTime == null)

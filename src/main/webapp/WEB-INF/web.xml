@@ -5,7 +5,10 @@
 	the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program; if not, write to the Free
 	Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. <OSCAR TEAM> This software was written for the Department of Family Medicine McMaster University Hamilton Ontario, Canada
 -->
-<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+<web-app version="2.4"
+         xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	<distributable />
 	<display-name>oscar_mcmaster</display-name>
 	<context-param>
@@ -13,22 +16,27 @@
 		<param-value>classpath:applicationContext*.xml</param-value>
 	</context-param>
 
-        <filter>
-               <filter-name>monitoring</filter-name>
-               <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
-               <init-param>
-                        <param-name>system-actions-enabled</param-name>
-                        <param-value>true</param-value>
-                </init-param>
-                <init-param>
-				   <param-name>disabled</param-name>
-				   <param-value>true</param-value>
-				</init-param>
-        </filter>
-        <filter-mapping>
-                <filter-name>monitoring</filter-name>
-                <url-pattern>/*</url-pattern>
-        </filter-mapping>
+    <error-page>
+        <error-code>400</error-code>
+        <location>/400.jsp</location>
+    </error-page>
+
+    <filter>
+           <filter-name>monitoring</filter-name>
+           <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
+           <init-param>
+                    <param-name>system-actions-enabled</param-name>
+                    <param-value>true</param-value>
+            </init-param>
+            <init-param>
+               <param-name>disabled</param-name>
+               <param-value>true</param-value>
+            </init-param>
+    </filter>
+    <filter-mapping>
+            <filter-name>monitoring</filter-name>
+            <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <filter>
             <filter-name>WebServiceSessionInvalidatingFilter</filter-name>
@@ -38,6 +46,15 @@
             <filter-name>WebServiceSessionInvalidatingFilter</filter-name>
             <url-pattern>/ws/*</url-pattern>
     </filter-mapping>
+
+	<filter>
+		<filter-name>failedRequestFilter</filter-name>
+		<filter-class>org.apache.catalina.filters.FailedRequestFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>failedRequestFilter</filter-name>
+		<url-pattern>/eform/addEForm.do</url-pattern>
+	</filter-mapping>
 
 	<filter>
 		<filter-name>ProblemCheckFilter</filter-name>
@@ -212,6 +229,32 @@
 	<servlet-mapping>
 		<servlet-name>CXFServlet</servlet-name>
 		<url-pattern>/ws/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- Swagger -->
+	<servlet>
+		<servlet-name>OpenApi</servlet-name>
+		<servlet-class>io.swagger.v3.jaxrs2.integration.OpenApiServlet</servlet-class>
+
+		<init-param>
+			<param-name>openApi.configuration.resourcePackages</param-name>
+			<param-value>org.oscarehr.ws.external.rest.v1</param-value>
+		</init-param>
+
+		<!-- alternatively include a file openapi.json or openapi.yaml / openapi-configuration.json or openapi-configuration.yaml in classpath -->
+
+		<!-- alternatively include a configuration file in the location specified below -->
+		<!--
+		  <init-param>
+			<param-name>openApi.configuration.location</param-name>
+			<param-value>/openapi-configuration.json</param-value>
+		  </init-param>
+		-->
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>OpenApi</servlet-name>
+		<url-pattern>/openapi/*</url-pattern>
 	</servlet-mapping>
 
     <servlet>

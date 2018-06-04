@@ -108,18 +108,31 @@ public class FormsManager {
     public List<String> getGroupNames(){
     	return eFormGroupDao.getGroupNames();
     }
-    
-    
-    public List<EFormData> findByDemographicId(LoggedInInfo loggedInInfo, Integer demographicId){
-    	List<EFormData> results = eFormDataDao.findByDemographicId(demographicId);
-    	if (results.size() > 0) {
+
+
+	public List<EFormData> findByDemographicId(LoggedInInfo loggedInInfo, Integer demographicId)
+	{
+		List<EFormData> results = eFormDataDao.findByDemographicId(demographicId);
+		if(results.size() > 0)
+		{
 			String resultIds = EForm.getIdsAsStringList(results);
 			LogAction.addLogSynchronous(loggedInInfo, "FormsManager.findByDemographicId", "ids returned=" + resultIds);
 		}
 
 		return (results);
-    	
-    }
+	}
+
+	public List<EFormData> findInstancedByDemographicId(LoggedInInfo loggedInInfo, Integer demographicId)
+	{
+		List<EFormData> results = eFormDataDao.findInstancedByDemographicId(demographicId);
+		if(results.size() > 0)
+		{
+			String resultIds = EForm.getIdsAsStringList(results);
+			LogAction.addLogSynchronous(loggedInInfo, "FormsManager.findInstancedByDemographicId", "ids returned=" + resultIds);
+		}
+
+		return (results);
+	}
     
 	public List<EncounterForm> getAllEncounterForms() {
 		List<EncounterForm> results = encounterFormDao.findAll();

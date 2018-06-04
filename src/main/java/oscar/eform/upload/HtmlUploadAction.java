@@ -25,49 +25,65 @@
 
 package oscar.eform.upload;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
+import org.oscarehr.eform.model.EForm;
+import org.oscarehr.eform.service.EFormTemplateService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
-import oscar.eform.EFormUtil;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.util.StringUtils;
 
-public class HtmlUploadAction extends Action {
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class HtmlUploadAction extends Action
+{
+	private static Logger logger = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
-    public ActionForward execute(ActionMapping mapping, ActionForm form,
-                                HttpServletRequest request, HttpServletResponse response) {
-    	
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null)) {
-			throw new SecurityException("missing required security object (_eform)");
+	private EFormTemplateService eFormTemplateService = SpringUtils.getBean(EFormTemplateService.class);
+
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+	                             HttpServletRequest request, HttpServletResponse response)
+	{
+
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		String ipAddress = LoggedInInfo.getLoggedInInfoFromSession(request).getIp();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_eform");
+
+		HtmlUploadForm fm = (HtmlUploadForm) form;
+		FormFile formHtml = fm.getFormHtml();
+		try
+		{
+			String formHtmlStr = StringUtils.readFileStream(formHtml);
+			String formName = fm.getFormName();
+			String roleType = fm.getRoleType();
+			String formSubject = fm.getSubject();
+			boolean showLatestFormOnly = fm.isShowLatestFormOnly();
+			boolean patientIndependent = fm.isPatientIndependent();
+			boolean instanced = fm.isInstanced();
+			String formFileName = formHtml.getFileName();
+
+			logger.info("Created new EForm Template");
+			EForm eFormTemplate = eFormTemplateService.addEFormTemplate(formName, formSubject, formFileName, formHtmlStr,
+					loggedInProviderNo, showLatestFormOnly, patientIndependent, instanced, roleType);
+			LogAction.addLogEntry(loggedInProviderNo, null, LogConst.ACTION_ADD, LogConst.CON_EFORM_TEMPLATE, LogConst.STATUS_SUCCESS,
+					String.valueOf(eFormTemplate.getId()), ipAddress, eFormTemplate.getFormName());
+			request.setAttribute("status", "success");
+			return (mapping.findForward("success"));
 		}
-    	
-        HtmlUploadForm fm = (HtmlUploadForm) form;
-        FormFile formHtml = fm.getFormHtml();
-        try {
-            String formHtmlStr = StringUtils.readFileStream(formHtml);
-            String formName = fm.getFormName();
-            String roleType = fm.getRoleType();
-            String subject = fm.getSubject();
-            boolean showLatestFormOnly = fm.isShowLatestFormOnly();
-            boolean patientIndependent = fm.isPatientIndependent();
-            String fileName = formHtml.getFileName();
-            EFormUtil.saveEForm(formName, subject, fileName, formHtmlStr, showLatestFormOnly, patientIndependent, roleType);
-            request.setAttribute("status", "success");
-            return(mapping.findForward("success"));
-        } catch (Exception e) {
-            MiscUtils.getLogger().error("Error", e);
-            return(mapping.findForward("fail"));
-        }
-        
-    }
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+			return (mapping.findForward("fail"));
+		}
+
+	}
 }

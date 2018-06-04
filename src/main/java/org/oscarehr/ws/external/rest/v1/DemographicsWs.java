@@ -1,6 +1,5 @@
 /**
- *
- * Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,19 +16,26 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * This software was written for
- * Centre for Research on Inner City Health, St. Michael's Hospital,
- * Toronto, Ontario, Canada
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
  */
 
 package org.oscarehr.ws.external.rest.v1;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.log4j.Logger;
-import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
-import org.oscarehr.ws.rest.RestSearchResponse;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
-import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
+import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
+import org.oscarehr.ws.external.rest.v1.conversion.DemographicListConverter;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicListTransfer;
+import org.oscarehr.ws.rest.exception.MissingArgumentException;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,65 +44,125 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component("DemographicsWs")
-@Path("/v1/demographics/")
-@Produces("application/json")
-public class DemographicsWs extends AbstractServiceImpl
+@Path("/demographics")
+@Produces(MediaType.APPLICATION_JSON)
+public class DemographicsWs extends AbstractExternalRestWs
 {
 	private static Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	private DemographicManager demographicManager;
+	private DemographicDao demographicDao;
+
+	@Autowired
+	private SecurityInfoManager securityInfoManager;
 
 	@GET
 	@Path("/search")
-	public RestSearchResponse<DemographicSearchResult, String> search(
-			@QueryParam("page") @DefaultValue("1") Integer page,
-			@QueryParam("perPage") @DefaultValue("10") Integer perPage,
-			@QueryParam("exactMatch") @DefaultValue("false") Boolean exactMatch,
-			@QueryParam("hin") String hin
+	@Operation(summary = "Search demographics by parameter")
+	public RestSearchResponse<DemographicListTransfer> search(
+			@QueryParam("page")
+			@DefaultValue("1")
+			@Parameter(description = "Requested result page")
+					Integer page,
+			@QueryParam("perPage")
+			@DefaultValue("10")
+			@Parameter(description = "Number of results per page")
+					Integer perPage,
+			@QueryParam("exactMatch")
+			@DefaultValue("false")
+			@Parameter(description = "When true, search results will only be returned if they are a complete match. Otherwise partial matches may be returned.")
+					Boolean exactMatch,
+			@Parameter(description = "Match results by given name")
+			@QueryParam("firstName") String firstName,
+			@Parameter(description = "Match results by family name")
+			@QueryParam("lastName") String lastName,
+			@Parameter(description = "Match results by health insurance number")
+			@QueryParam("hin") String hin,
+			@Parameter(description = "Match results by sex")
+			@QueryParam("sex") String sex,
+			@Parameter(description = "Match results by date of birth")
+			@QueryParam("dateOfBirth") String dateOfBirthStr,
+			@Parameter(description = "Match results by address")
+			@QueryParam("address") String address,
+			@Parameter(description = "Match results chart number")
+			@QueryParam("charNo") String chartNo,
+			@Parameter(description = "Match results by phone number")
+			@QueryParam("phone") String phone,
+			@Parameter(description = "Match results by provider id")
+			@QueryParam("providerNo") String searchProviderNo
 	)
 	{
-		List<DemographicSearchResult> response = new ArrayList<>(0);
+		String providerNoStr = getOAuthProviderNo();
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.READ, null, "_demographic");
 
-		int totalResultCount;
+		if(parametersAllNull(firstName, lastName, hin, sex, dateOfBirthStr, address, chartNo, phone, searchProviderNo))
+		{
+			throw new MissingArgumentException("At least one search parameter is required");
+		}
+		LocalDate dateOfBirth;
 		try
 		{
-			perPage = limitedResultCount(perPage);
-			page = validPageNo(page);
-			int offset = calculatedOffset(page, perPage);
-
-			DemographicSearchRequest searchRequest = new DemographicSearchRequest();
-			searchRequest.setStatusMode(DemographicSearchRequest.STATUSMODE.all);
-			searchRequest.setIntegrator(false); //this should be configurable by persona
-			searchRequest.setOutOfDomain(true);
-			searchRequest.setExactMatch(exactMatch);
-
-			if(hin != null)
-			{
-				searchRequest.setMode(DemographicSearchRequest.SEARCHMODE.HIN);
-				searchRequest.setKeyword(hin.trim());
-			}
-			else
-			{
-				logger.warn("Missing Search Parameter");
-				return RestSearchResponse.errorSearchResponse("Missing Search Parameter");
-			}
-
-			totalResultCount = demographicManager.searchPatientsCount(getLoggedInInfo(), searchRequest);
-			if(totalResultCount > 0)
-			{
-				response = demographicManager.searchPatients(getLoggedInInfo(), searchRequest, offset, perPage);
-			}
+			dateOfBirth = (dateOfBirthStr != null ? LocalDate.parse(dateOfBirthStr, DateTimeFormatter.ISO_LOCAL_DATE) : null);
 		}
 		catch(Exception e)
 		{
-			logger.error("Error", e);
-			return RestSearchResponse.errorSearchResponse("System Error");
+			MissingArgumentException exception = new MissingArgumentException("Argument Error");
+			exception.addMissingArgument("dateOfBirth", "Invalid Format");
+			throw exception;
 		}
-		return RestSearchResponse.successSearchResponse(response, page, perPage, totalResultCount);
+
+		// set up the search criteria
+		DemographicCriteriaSearch searchQuery = new DemographicCriteriaSearch();
+		searchQuery.setHin(hin);
+		searchQuery.setSex(sex);
+		searchQuery.setFirstName(firstName);
+		searchQuery.setLastName(lastName);
+		searchQuery.setDateOfBirth(dateOfBirth);
+		searchQuery.setAddress(address);
+		searchQuery.setChartNo(chartNo);
+		searchQuery.setPhone(phone);
+		searchQuery.setProviderNo(searchProviderNo);
+
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
+
+		searchQuery.setOffset(offset);
+		searchQuery.setLimit(perPage);
+
+		searchQuery.setSortDir(DemographicCriteriaSearch.SORTDIR.asc);
+		searchQuery.setSortMode(DemographicCriteriaSearch.SORTMODE.DemographicNo);
+		searchQuery.setStatusMode(DemographicCriteriaSearch.STATUSMODE.all);
+		searchQuery.setCustomWildcardsEnabled(false);
+
+		if(exactMatch)
+		{
+			searchQuery.setMatchModeExact();
+		}
+		else
+		{
+			searchQuery.setMatchModeStart();
+		}
+
+		int totalResultCount = demographicDao.criteriaSearchCount(searchQuery);
+
+		List<DemographicListTransfer> response;
+		if(totalResultCount > 0)
+		{
+			List<Demographic> results = demographicDao.criteriaSearch(searchQuery);
+			response = DemographicListConverter.getListAsTransferObjects(results);
+		}
+		else
+		{
+			response = new ArrayList<>(0);
+		}
+		return RestSearchResponse.successResponse(response, page, perPage, totalResultCount);
 	}
 }

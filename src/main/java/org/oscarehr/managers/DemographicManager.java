@@ -24,12 +24,6 @@
 
 package org.oscarehr.managers;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.service.ProgramManager;
@@ -37,36 +31,41 @@ import org.oscarehr.common.Gender;
 import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.dao.DemographicContactDao;
-import org.oscarehr.common.dao.DemographicCustArchiveDao;
-import org.oscarehr.common.dao.DemographicCustDao;
+import org.oscarehr.demographic.dao.DemographicCustArchiveDao;
+import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.DemographicExtArchiveDao;
-import org.oscarehr.common.dao.DemographicExtDao;
-import org.oscarehr.common.dao.DemographicMergedDao;
+import org.oscarehr.demographic.dao.DemographicExtArchiveDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
+import org.oscarehr.demographic.dao.DemographicMergedDao;
 import org.oscarehr.common.dao.PHRVerificationDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Demographic.PatientStatus;
 import org.oscarehr.common.model.DemographicContact;
-import org.oscarehr.common.model.DemographicCust;
-import org.oscarehr.common.model.DemographicExt;
-import org.oscarehr.common.model.DemographicExtArchive;
-import org.oscarehr.common.model.DemographicMerged;
+import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.model.DemographicExtArchive;
+import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
-import org.oscarehr.ws.transfer_objects.DemographicTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
 import oscar.log.LogAction;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Will provide access to demographic data, as well as closely related data such as 
@@ -120,8 +119,11 @@ public class DemographicManager {
 	
 
 	public Demographic getDemographic(LoggedInInfo loggedInInfo, Integer demographicId) throws PatientDirectiveException {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ, demographicId);
-		
+		return getDemographic(loggedInInfo.getLoggedInProviderNo() , demographicId);
+	}
+	public Demographic getDemographic(String providerNo, Integer demographicId) throws PatientDirectiveException {
+		checkPrivilege(providerNo, SecurityInfoManager.READ, demographicId);
+
 		return demographicDao.getDemographicById(demographicId);
 	}
 		
@@ -179,13 +181,14 @@ public class DemographicManager {
 		return (results);
 	}
 
-	public List<DemographicExt> getDemographicExts(LoggedInInfo loggedInInfo, Integer id) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-		List<DemographicExt> result = null;
-
-		result = demographicExtDao.getDemographicExtByDemographicNo(id);
-
-		return result;
+	public List<DemographicExt> getDemographicExts(LoggedInInfo loggedInInfo, Integer id)
+	{
+		return getDemographicExts(loggedInInfo.getLoggedInProviderNo(), id);
+	}
+	public List<DemographicExt> getDemographicExts(String providerNo, Integer id)
+	{
+		checkPrivilege(providerNo, SecurityInfoManager.READ);
+		return demographicExtDao.getDemographicExtByDemographicNo(id);
 	}
 
 	public DemographicExt getDemographicExt(LoggedInInfo loggedInInfo, Integer demographicNo, String key) {
@@ -196,20 +199,31 @@ public class DemographicManager {
 		return result;
 	}
 
-	public DemographicCust getDemographicCust(LoggedInInfo loggedInInfo, Integer id) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-		DemographicCust result = demographicCustDao.find(id);
-
-		return result;
+	public DemographicCust getDemographicCust(LoggedInInfo loggedInInfo, Integer id)
+	{
+		return getDemographicCust(loggedInInfo.getLoggedInProviderNo(), id);
+	}
+	public DemographicCust getDemographicCust(String providerNo, Integer id)
+	{
+		checkPrivilege(providerNo, SecurityInfoManager.READ);
+		return demographicCustDao.find(id);
 	}
 
-	public void createUpdateDemographicCust(LoggedInInfo loggedInInfo, DemographicCust demoCust) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
-		if (demoCust != null) {
+	public void createUpdateDemographicCust(LoggedInInfo loggedInInfo, DemographicCust demoCust)
+	{
+		createUpdateDemographicCust(loggedInInfo.getLoggedInProviderNo(), demoCust);
+	}
+
+	public void createUpdateDemographicCust(String providerNo, DemographicCust demoCust)
+	{
+		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
+		if(demoCust != null)
+		{
 			//Archive previous demoCust
 			DemographicCust prevCust = demographicCustDao.find(demoCust.getId());
-			if (prevCust != null) {
-				if (!(StringUtils.equals(prevCust.getAlert(), demoCust.getAlert()) &&
+			if(prevCust != null)
+			{
+				if(!(StringUtils.equals(prevCust.getAlert(), demoCust.getAlert()) &&
 						StringUtils.equals(prevCust.getMidwife(), demoCust.getMidwife()) &&
 						StringUtils.equals(prevCust.getNurse(), demoCust.getNurse()) &&
 						StringUtils.equals(prevCust.getResident(), demoCust.getResident()) &&
@@ -235,23 +249,33 @@ public class DemographicManager {
 		return result;
 	}
 
-	public void createDemographic(LoggedInInfo loggedInInfo, Demographic demographic, Integer admissionProgramId) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+	public void createDemographic(LoggedInInfo loggedInInfo, Demographic demographic, Integer admissionProgramId)
+	{
+		createDemographic(loggedInInfo.getLoggedInProviderNo(), demographic, admissionProgramId);
+	}
+	public void createDemographic(String providerNo, Demographic demographic, Integer admissionProgramId) {
+		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
 		try {
 			demographic.getBirthDay();
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Birth date was specified for " + demographic.getFullName() + ": " + demographic.getBirthDayAsString());
 		}
 
-		demographic.setPatientStatus(PatientStatus.AC.name());
-		demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
-		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		if(demographic.getPatientStatus() == null)
+		{
+			demographic.setPatientStatus(PatientStatus.AC.name());
+		}
+		if(demographic.getFamilyDoctor() == null)
+		{
+			demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
+		}
+		demographic.setLastUpdateUser(providerNo);
 		demographicDao.save(demographic);
 
 		Admission admission = new Admission();
 		admission.setClientId(demographic.getDemographicNo());
 		admission.setProgramId(admissionProgramId);
-		admission.setProviderNo(loggedInInfo.getLoggedInProviderNo());
+		admission.setProviderNo(providerNo);
 		admission.setAdmissionDate(new Date());
 		admission.setAdmissionStatus(Admission.STATUS_CURRENT);
 		admission.setAdmissionNotes("");
@@ -260,7 +284,7 @@ public class DemographicManager {
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
-				createExtension(loggedInInfo, ext);
+				createExtension(providerNo, ext);
 			}
 		}
 	}
@@ -311,8 +335,8 @@ public class DemographicManager {
 	}
 	
 
-	public void createExtension(LoggedInInfo loggedInInfo, DemographicExt ext) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+	public void createExtension(String providerNo, DemographicExt ext) {
+		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
 		demographicExtDao.saveEntity(ext);
 	}
 
@@ -609,15 +633,19 @@ public class DemographicManager {
 		return (results);
 	}
 
-	private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege) {
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_demographic", privilege, null)) {
-			throw new RuntimeException("missing required security object (_demographic)");
+	private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege)
+	{
+		checkPrivilege(loggedInInfo.getLoggedInProviderNo(), privilege);
+	}
+	private void checkPrivilege(String providerNo, String privilege) {
+		if (!securityInfoManager.hasPrivilege(providerNo, "_demographic", privilege, null)) {
+			throw new SecurityException("missing required security object (_demographic)");
 		}
 	}
 
-	private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege, int demographicNo) {
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_demographic", privilege, demographicNo)) {
-			throw new RuntimeException("missing required security object (_demographic)");
+	private void checkPrivilege(String providerNo, String privilege, int demographicNo) {
+		if (!securityInfoManager.hasPrivilege(providerNo, "_demographic", privilege, String.valueOf(demographicNo))) {
+			throw new SecurityException("missing required security object (_demographic)");
 		}
 	}
 
