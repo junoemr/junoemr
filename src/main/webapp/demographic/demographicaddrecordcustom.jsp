@@ -103,7 +103,7 @@
 	if(demographic_string == null){
 		demographic_string = "";
 	}
-	String all_fields = "last_name,first_name,official_lang,title,address,city,province,postal,phone,phone2,cellphone,newsletter,email,pin,dob,sex,hin,eff_date,hc_type,countryOfOrigin,sin,cytolNum,doctor,nurse,midwife,resident,referral_doc,roster_status,patient_status,chart_no,waiting_list,date_joined,end_date,alert,form_notes";
+	String all_fields = "last_name,first_name,official_lang,title,address,city,province,postal,phone,phone2,cellphone,newsletter,email,pin,dob,sex,hin,eff_date,hc_type,countryOfOrigin,sin,cytolNum,doctor,nurse,midwife,resident,referral_doc,roster_status,patient_status,chart_no,waiting_list,date_joined,end_date,alert,form_notes,document";
 	if(oscarProps.isPropertyActive("demographic_veteran_no")) {
 		all_fields += ",veteran_no";
 	}
@@ -207,6 +207,8 @@
 
 			function onSubmit()
 			{
+
+				document.adddemographic.submitType.value = document.adddemographic.submited;
 				document.adddemographic.submit.disabled = true;
 				if (!checkFormTypeIn())
 				{
@@ -498,7 +500,7 @@
 	</table>
 
 	<%@ include file="zdemographicfulltitlesearch.jsp"%>
-	<form method="post" name="adddemographic" action="demographicaddarecord.jsp" onsubmit="return onSubmit()">
+	<form method="post" name="adddemographic" enctype="multipart/form-data" action="demographicaddarecord.jsp" onsubmit="return onSubmit()">
 		<%
 			for(int i=0; i<custom_demographic_fields.size(); i++){
 				if(hidden_demographic_fields.indexOf(custom_demographic_fields.get(i)) >= 0){
@@ -975,6 +977,21 @@
 				<option value=""></option>
 			</select>
 		</div>
+		<%
+		}else if(custom_demographic_fields.get(i).equals("document")){
+		%>
+			<label>
+				<b>
+					Add a Document:
+				</b>
+			</label>
+			<span>
+				<input type="text" name="docDesc" size="19"	placeholder="Enter Title">
+				<input type="file" name="docFile" size="20" class="warning" >
+			</span>
+
+
+			<br />
 		<%
 		}else if(custom_demographic_fields.get(i).equals("nurse")){
 		%>
@@ -1611,14 +1628,22 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 
 %>
 
-		<div style="background-color: #CCCCFF;">
+		<div style="background-color: #CCCCFF; text-align: center;">
 			<input type="hidden" name="dboperation"	value="add_record">
-			<label></label>
 			<%if (vLocale.getCountry().equals("BR")) { %>
 			<input type="hidden" name="dboperation2" value="add_record_ptbr">
 			<%}%>
+			<input type="hidden" name="submitType" value="test">
 			<input type="hidden" name="displaymode" value="Add Record">
-			<input type="submit" name="submit" value="<bean:message key="demographic.demographicaddrecordhtm.btnAddRecord"/>">
+			<input type="submit" name="submit" onclick="this.form.submited=this.value;" value="<bean:message key="demographic.demographicaddrecordhtm.btnAddRecord"/>">
+			<%if (custom_demographic_fields.contains("document"))
+				{
+			%>
+					<input type="submit" name="submit" onclick="this.form.submited=this.value;" value="<bean:message key="demographic.demographicaddrecordhtm.btnAddDocs"/>">
+			<%
+				}
+			%>
+
 			<input type="button" name="Button" value="<bean:message key="demographic.demographicaddrecordhtm.btnSwipeCard"/>" onclick="window.open('zadddemographicswipe.htm','', 'scrollbars=yes,resizable=yes,width=600,height=300')";>
 			<input type="button" name="Button" value="<bean:message key="demographic.demographicaddrecordhtm.btnCancel"/>" onclick=self.close();>
 		</div>
